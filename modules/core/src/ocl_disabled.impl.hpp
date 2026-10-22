@@ -2,238 +2,238 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "opencv2/core/ocl_genbase.hpp"
+#அந்தர்பாவ "opencv2/core/ocl_genbase.hpp"
 
-#if defined(_MSC_VER)
+#எனில் defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable : 4100)
     #pragma warning(disable : 4702)
-#elif defined(__clang__)
+#அல்லதெனில் defined(__clang__)
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wunused-parameter"
-#elif defined(__GNUC__)
+#அல்லதெனில் defined(__GNUC__)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
-namespace cv { namespace ocl {
+நாமாகாஶ cv { நாமாகாஶ ocl {
 
-static
-CV_NORETURN void throw_no_ocl()
+நிலையான
+CV_NORETURN வெறுமை throw_no_ocl()
 {
     CV_Error(Error::OpenCLApiCallError, "OpenCV build without OpenCL support");
 }
 #define OCL_NOT_AVAILABLE() throw_no_ocl();
 
-CV_EXPORTS_W bool haveOpenCL() { return false; }
-CV_EXPORTS_W bool useOpenCL() { return false; }
-CV_EXPORTS_W bool haveAmdBlas() { return false; }
-CV_EXPORTS_W bool haveAmdFft() { return false; }
-CV_EXPORTS_W void setUseOpenCL(bool flag) { /* nothing */ }
-CV_EXPORTS_W void finish() { /* nothing */ }
+CV_EXPORTS_W தருக்க haveOpenCL() { திரும்பு பொய்; }
+CV_EXPORTS_W தருக்க useOpenCL() { திரும்பு பொய்; }
+CV_EXPORTS_W தருக்க haveAmdBlas() { திரும்பு பொய்; }
+CV_EXPORTS_W தருக்க haveAmdFft() { திரும்பு பொய்; }
+CV_EXPORTS_W வெறுமை setUseOpenCL(தருக்க flag) { /* nothing */ }
+CV_EXPORTS_W வெறுமை finish() { /* nothing */ }
 
-CV_EXPORTS bool haveSVM() { return false; }
+CV_EXPORTS தருக்க haveSVM() { திரும்பு பொய்; }
 
-Device::Device() CV_NOEXCEPT : p(NULL) { }
-Device::Device(void* d) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Device::Device(const Device& d) : p(NULL) { }
-Device& Device::operator=(const Device& d) { return *this; }
-Device::Device(Device&&) CV_NOEXCEPT : p(NULL) { }
-Device& Device::operator=(Device&&) CV_NOEXCEPT { return *this; }
+Device::Device() CV_NOEXCEPT : p(வெற்று) { }
+Device::Device(வெறுமை* d) : p(வெற்று) { OCL_NOT_AVAILABLE(); }
+Device::Device(மாறிலி Device& d) : p(வெற்று) { }
+Device& Device::operator=(மாறிலி Device& d) { திரும்பு *இது; }
+Device::Device(Device&&) CV_NOEXCEPT : p(வெற்று) { }
+Device& Device::operator=(Device&&) CV_NOEXCEPT { திரும்பு *இது; }
 Device::~Device() { }
 
-void Device::set(void* d) { OCL_NOT_AVAILABLE(); }
+வெறுமை Device::set(வெறுமை* d) { OCL_NOT_AVAILABLE(); }
 
-String Device::name() const { OCL_NOT_AVAILABLE(); }
-String Device::extensions() const { OCL_NOT_AVAILABLE(); }
-bool Device::isExtensionSupported(const String& extensionName) const { OCL_NOT_AVAILABLE(); }
-String Device::version() const { OCL_NOT_AVAILABLE(); }
-String Device::vendorName() const { OCL_NOT_AVAILABLE(); }
-String Device::OpenCL_C_Version() const { OCL_NOT_AVAILABLE(); }
-String Device::OpenCLVersion() const { OCL_NOT_AVAILABLE(); }
-int Device::deviceVersionMajor() const { OCL_NOT_AVAILABLE(); }
-int Device::deviceVersionMinor() const { OCL_NOT_AVAILABLE(); }
-String Device::driverVersion() const { OCL_NOT_AVAILABLE(); }
-void* Device::ptr() const { /*OCL_NOT_AVAILABLE();*/ return NULL; }
+String Device::name() மாறிலி { OCL_NOT_AVAILABLE(); }
+String Device::extensions() மாறிலி { OCL_NOT_AVAILABLE(); }
+தருக்க Device::isExtensionSupported(மாறிலி String& extensionName) மாறிலி { OCL_NOT_AVAILABLE(); }
+String Device::version() மாறிலி { OCL_NOT_AVAILABLE(); }
+String Device::vendorName() மாறிலி { OCL_NOT_AVAILABLE(); }
+String Device::OpenCL_C_Version() மாறிலி { OCL_NOT_AVAILABLE(); }
+String Device::OpenCLVersion() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::deviceVersionMajor() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::deviceVersionMinor() மாறிலி { OCL_NOT_AVAILABLE(); }
+String Device::driverVersion() மாறிலி { OCL_NOT_AVAILABLE(); }
+வெறுமை* Device::ptr() மாறிலி { /*OCL_NOT_AVAILABLE();*/ திரும்பு வெற்று; }
 
-int Device::type() const { OCL_NOT_AVAILABLE(); }
+முழு Device::type() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::addressBits() const { OCL_NOT_AVAILABLE(); }
-bool Device::available() const { OCL_NOT_AVAILABLE(); }
-bool Device::compilerAvailable() const { OCL_NOT_AVAILABLE(); }
-bool Device::linkerAvailable() const { OCL_NOT_AVAILABLE(); }
+முழு Device::addressBits() மாறிலி { OCL_NOT_AVAILABLE(); }
+தருக்க Device::available() மாறிலி { OCL_NOT_AVAILABLE(); }
+தருக்க Device::compilerAvailable() மாறிலி { OCL_NOT_AVAILABLE(); }
+தருக்க Device::linkerAvailable() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::doubleFPConfig() const { OCL_NOT_AVAILABLE(); }
-int Device::singleFPConfig() const { OCL_NOT_AVAILABLE(); }
-int Device::halfFPConfig() const { OCL_NOT_AVAILABLE(); }
+முழு Device::doubleFPConfig() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::singleFPConfig() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::halfFPConfig() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-bool Device::hasFP64() const { OCL_NOT_AVAILABLE(); }
-bool Device::hasFP16() const { OCL_NOT_AVAILABLE(); }
+தருக்க Device::hasFP64() மாறிலி { OCL_NOT_AVAILABLE(); }
+தருக்க Device::hasFP16() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-bool Device::endianLittle() const { OCL_NOT_AVAILABLE(); }
-bool Device::errorCorrectionSupport() const { OCL_NOT_AVAILABLE(); }
+தருக்க Device::endianLittle() மாறிலி { OCL_NOT_AVAILABLE(); }
+தருக்க Device::errorCorrectionSupport() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::executionCapabilities() const { OCL_NOT_AVAILABLE(); }
+முழு Device::executionCapabilities() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-size_t Device::globalMemCacheSize() const { OCL_NOT_AVAILABLE(); }
+size_t Device::globalMemCacheSize() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::globalMemCacheType() const { OCL_NOT_AVAILABLE(); }
-int Device::globalMemCacheLineSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::globalMemSize() const { OCL_NOT_AVAILABLE(); }
+முழு Device::globalMemCacheType() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::global_Mem_Cache_வரி_Size() மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Device::globalMemSize() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-size_t Device::localMemSize() const { OCL_NOT_AVAILABLE(); }
-int Device::localMemType() const { return NO_LOCAL_MEM; }
-bool Device::hostUnifiedMemory() const { OCL_NOT_AVAILABLE(); }
+size_t Device::localMemSize() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::localMemType() மாறிலி { திரும்பு NO_LOCAL_MEM; }
+தருக்க Device::hostUnifiedMemory() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-bool Device::imageSupport() const { OCL_NOT_AVAILABLE(); }
+தருக்க Device::imageSupport() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-bool Device::imageFromBufferSupport() const { OCL_NOT_AVAILABLE(); }
-uint Device::imagePitchAlignment() const { OCL_NOT_AVAILABLE(); }
-uint Device::imageBaseAddressAlignment() const { OCL_NOT_AVAILABLE(); }
+தருக்க Device::imageFromBufferSupport() மாறிலி { OCL_NOT_AVAILABLE(); }
+uint Device::imagePitchAlignment() மாறிலி { OCL_NOT_AVAILABLE(); }
+uint Device::imageBaseAddressAlignment() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-bool Device::intelSubgroupsSupport() const { OCL_NOT_AVAILABLE(); }
+தருக்க Device::intelSubgroupsSupport() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-size_t Device::image2DMaxWidth() const { OCL_NOT_AVAILABLE(); }
-size_t Device::image2DMaxHeight() const { OCL_NOT_AVAILABLE(); }
+size_t Device::image2DMaxWidth() மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Device::image2DMaxHeight() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-size_t Device::image3DMaxWidth() const { OCL_NOT_AVAILABLE(); }
-size_t Device::image3DMaxHeight() const { OCL_NOT_AVAILABLE(); }
-size_t Device::image3DMaxDepth() const { OCL_NOT_AVAILABLE(); }
+size_t Device::image3DMaxWidth() மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Device::image3DMaxHeight() மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Device::image3DMaxDepth() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-size_t Device::imageMaxBufferSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::imageMaxArraySize() const { OCL_NOT_AVAILABLE(); }
+size_t Device::imageMaxBufferSize() மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Device::imageMaxArraySize() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::vendorID() const { OCL_NOT_AVAILABLE(); }
+முழு Device::vendorID() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::maxClockFrequency() const { OCL_NOT_AVAILABLE(); }
-int Device::maxComputeUnits() const { OCL_NOT_AVAILABLE(); }
-int Device::maxConstantArgs() const { OCL_NOT_AVAILABLE(); }
-size_t Device::maxConstantBufferSize() const { OCL_NOT_AVAILABLE(); }
+முழு Device::maxClockFrequency() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::maxComputeUnits() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::maxConstantArgs() மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Device::maxConstantBufferSize() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-size_t Device::maxMemAllocSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::maxParameterSize() const { OCL_NOT_AVAILABLE(); }
+size_t Device::maxMemAllocSize() மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Device::maxParameterSize() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::maxReadImageArgs() const { OCL_NOT_AVAILABLE(); }
-int Device::maxWriteImageArgs() const { OCL_NOT_AVAILABLE(); }
-int Device::maxSamplers() const { OCL_NOT_AVAILABLE(); }
+முழு Device::maxReadImageArgs() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::maxWriteImageArgs() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::maxSamplers() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-size_t Device::maxWorkGroupSize() const { OCL_NOT_AVAILABLE(); }
-int Device::maxWorkItemDims() const { OCL_NOT_AVAILABLE(); }
-void Device::maxWorkItemSizes(size_t*) const { OCL_NOT_AVAILABLE(); }
+size_t Device::maxWorkGroupSize() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::maxWorkItemDims() மாறிலி { OCL_NOT_AVAILABLE(); }
+வெறுமை Device::maxWorkItemSizes(size_t*) மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::memBaseAddrAlign() const { OCL_NOT_AVAILABLE(); }
+முழு Device::memBaseAddrAlign() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::nativeVectorWidthChar() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthShort() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthInt() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthLong() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthFloat() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthDouble() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthHalf() const { OCL_NOT_AVAILABLE(); }
+முழு Device::nativeVectorWidthChar() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::nativeVectorWidthShort() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::nativeVectorWidthInt() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::nativeVectorWidthLong() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::nativeVectorWidthFloat() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::nativeVectorWidthDouble() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::nativeVectorWidthHalf() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-int Device::preferredVectorWidthChar() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthShort() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthInt() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthLong() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthFloat() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthDouble() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthHalf() const { OCL_NOT_AVAILABLE(); }
+முழு Device::preferredVectorWidthChar() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::preferredVectorWidthShort() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::preferredVectorWidthInt() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::preferredVectorWidthLong() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::preferredVectorWidthFloat() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::preferredVectorWidthDouble() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு Device::preferredVectorWidthHalf() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-size_t Device::printfBufferSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::profilingTimerResolution() const { OCL_NOT_AVAILABLE(); }
+size_t Device::printfBufferSize() மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Device::profilingTimerResolution() மாறிலி { OCL_NOT_AVAILABLE(); }
 
 /* static */
-const Device& Device::getDefault()
+மாறிலி Device& Device::getDefault()
 {
-    static Device dummy;
-    return dummy;
+    நிலையான Device dummy;
+    திரும்பு dummy;
 }
 
-/* static */ Device Device::fromHandle(void* d) { OCL_NOT_AVAILABLE(); }
+/* static */ Device Device::fromHandle(வெறுமை* d) { OCL_NOT_AVAILABLE(); }
 
 
-Context::Context() CV_NOEXCEPT : p(NULL) { }
-Context::Context(int dtype) : p(NULL) { }
+Context::Context() CV_NOEXCEPT : p(வெற்று) { }
+Context::Context(முழு dtype) : p(வெற்று) { }
 Context::~Context() { }
-Context::Context(const Context& c) : p(NULL) { }
-Context& Context::operator=(const Context& c) { return *this; }
-Context::Context(Context&&) CV_NOEXCEPT : p(NULL) { }
-Context& Context::operator=(Context&&) CV_NOEXCEPT { return *this; }
+Context::Context(மாறிலி Context& c) : p(வெற்று) { }
+Context& Context::operator=(மாறிலி Context& c) { திரும்பு *இது; }
+Context::Context(Context&&) CV_NOEXCEPT : p(வெற்று) { }
+Context& Context::operator=(Context&&) CV_NOEXCEPT { திரும்பு *இது; }
 
-bool Context::create() { return false; }
-bool Context::create(int dtype) { return false; }
-size_t Context::ndevices() const { return 0; }
-Device& Context::device(size_t idx) const { OCL_NOT_AVAILABLE(); }
-Program Context::getProg(const ProgramSource& prog, const String& buildopt, String& errmsg) { OCL_NOT_AVAILABLE(); }
-void Context::unloadProg(Program& prog) { }
+தருக்க Context::create() { திரும்பு பொய்; }
+தருக்க Context::create(முழு dtype) { திரும்பு பொய்; }
+size_t Context::ndevices() மாறிலி { திரும்பு 0; }
+Device& Context::device(size_t idx) மாறிலி { OCL_NOT_AVAILABLE(); }
+Program Context::getProg(மாறிலி ProgramSource& prog, மாறிலி String& buildopt, String& errmsg) { OCL_NOT_AVAILABLE(); }
+வெறுமை Context::unloadProg(Program& prog) { }
 
 /* static */
 Context& Context::getDefault()
 {
-    static Context dummy;
-    return dummy;
+    நிலையான Context dummy;
+    திரும்பு dummy;
 }
-void* Context::ptr() const { return NULL; }
+வெறுமை* Context::ptr() மாறிலி { திரும்பு வெற்று; }
 
-void* Context::getOpenCLContextProperty(int /*propertyId*/) const { OCL_NOT_AVAILABLE(); }
+வெறுமை* Context::getOpenCLContextProperty(முழு /*propertyId*/) மாறிலி { OCL_NOT_AVAILABLE(); }
 
-bool Context::useSVM() const { return false; }
-void Context::setUseSVM(bool enabled) { }
+தருக்க Context::useSVM() மாறிலி { திரும்பு பொய்; }
+வெறுமை Context::setUseSVM(தருக்க enabled) { }
 
 Context::UserContext::~UserContext() { }
 
-void Context::setUserContext(std::type_index /*typeId*/, const std::shared_ptr<Context::UserContext>& /*userContext*/) { OCL_NOT_AVAILABLE(); }
+வெறுமை Context::setUserContext(std::type_index /*typeId*/, மாறிலி std::shared_ptr<Context::UserContext>& /*userContext*/) { OCL_NOT_AVAILABLE(); }
 std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_index /*typeId*/) { OCL_NOT_AVAILABLE(); }
 
-/* static */ Context Context::fromHandle(void* context) { OCL_NOT_AVAILABLE(); }
-/* static */ Context Context::fromDevice(const ocl::Device& device) { OCL_NOT_AVAILABLE(); }
-/* static */ Context Context::create(const std::string& configuration) { OCL_NOT_AVAILABLE(); }
+/* static */ Context Context::fromHandle(வெறுமை* context) { OCL_NOT_AVAILABLE(); }
+/* static */ Context Context::fromDevice(மாறிலி ocl::Device& device) { OCL_NOT_AVAILABLE(); }
+/* static */ Context Context::create(மாறிலி std::string& configuration) { OCL_NOT_AVAILABLE(); }
 
-void Context::release() { }
+வெறுமை Context::release() { }
 
 
-Platform::Platform() CV_NOEXCEPT : p(NULL) { }
+Platform::Platform() CV_NOEXCEPT : p(வெற்று) { }
 Platform::~Platform() { }
-Platform::Platform(const Platform&) : p(NULL) { }
-Platform& Platform::operator=(const Platform&) { return *this; }
-Platform::Platform(Platform&&) CV_NOEXCEPT : p(NULL) { }
-Platform& Platform::operator=(Platform&&) CV_NOEXCEPT { return *this; }
+Platform::Platform(மாறிலி Platform&) : p(வெற்று) { }
+Platform& Platform::operator=(மாறிலி Platform&) { திரும்பு *இது; }
+Platform::Platform(Platform&&) CV_NOEXCEPT : p(வெற்று) { }
+Platform& Platform::operator=(Platform&&) CV_NOEXCEPT { திரும்பு *இது; }
 
-void* Platform::ptr() const { return NULL; }
+வெறுமை* Platform::ptr() மாறிலி { திரும்பு வெற்று; }
 
 /* static */
 Platform& Platform::getDefault()
 {
-    static Platform dummy;
-    return dummy;
+    நிலையான Platform dummy;
+    திரும்பு dummy;
 }
 
-void attachContext(const String& platformName, void* platformID, void* context, void* deviceID) { OCL_NOT_AVAILABLE(); }
-void convertFromBuffer(void* cl_mem_buffer, size_t step, int rows, int cols, int type, UMat& dst) { OCL_NOT_AVAILABLE(); }
-void convertFromImage(void* cl_mem_image, UMat& dst) { OCL_NOT_AVAILABLE(); }
+வெறுமை attachContext(மாறிலி String& platformName, வெறுமை* platformID, வெறுமை* context, வெறுமை* deviceID) { OCL_NOT_AVAILABLE(); }
+வெறுமை convertFromBuffer(வெறுமை* cl_mem_buffer, size_t step, முழு rows, முழு cols, முழு type, UMat& dst) { OCL_NOT_AVAILABLE(); }
+வெறுமை convertFromImage(வெறுமை* cl_mem_image, UMat& dst) { OCL_NOT_AVAILABLE(); }
 
-void initializeContextFromHandle(Context& ctx, void* platform, void* context, void* device) { OCL_NOT_AVAILABLE(); }
+வெறுமை initializeContextFromHandle(Context& ctx, வெறுமை* platform, வெறுமை* context, வெறுமை* device) { OCL_NOT_AVAILABLE(); }
 
-Queue::Queue() CV_NOEXCEPT : p(NULL) { }
-Queue::Queue(const Context& c, const Device& d) : p(NULL) { OCL_NOT_AVAILABLE(); }
+Queue::Queue() CV_NOEXCEPT : p(வெற்று) { }
+Queue::Queue(மாறிலி Context& c, மாறிலி Device& d) : p(வெற்று) { OCL_NOT_AVAILABLE(); }
 Queue::~Queue() { }
-Queue::Queue(const Queue& q) {}
-Queue& Queue::operator=(const Queue& q) { return *this; }
-Queue::Queue(Queue&&) CV_NOEXCEPT : p(NULL) { }
-Queue& Queue::operator=(Queue&&) CV_NOEXCEPT { return *this; }
+Queue::Queue(மாறிலி Queue& q) {}
+Queue& Queue::operator=(மாறிலி Queue& q) { திரும்பு *இது; }
+Queue::Queue(Queue&&) CV_NOEXCEPT : p(வெற்று) { }
+Queue& Queue::operator=(Queue&&) CV_NOEXCEPT { திரும்பு *இது; }
 
-bool Queue::create(const Context& c, const Device& d) { OCL_NOT_AVAILABLE(); }
-void Queue::finish() {}
-void* Queue::ptr() const { return NULL; }
+தருக்க Queue::create(மாறிலி Context& c, மாறிலி Device& d) { OCL_NOT_AVAILABLE(); }
+வெறுமை Queue::finish() {}
+வெறுமை* Queue::ptr() மாறிலி { திரும்பு வெற்று; }
 /* static */
 Queue& Queue::getDefault()
 {
-    static Queue dummy;
-    return dummy;
+    நிலையான Queue dummy;
+    திரும்பு dummy;
 }
 
 /// @brief Returns OpenCL command queue with enable profiling mode support
-const Queue& Queue::getProfilingQueue() const { OCL_NOT_AVAILABLE(); }
+மாறிலி Queue& Queue::getProfilingQueue() மாறிலி { OCL_NOT_AVAILABLE(); }
 
 
 KernelArg::KernelArg() CV_NOEXCEPT
@@ -241,200 +241,200 @@ KernelArg::KernelArg() CV_NOEXCEPT
 {
 }
 
-KernelArg::KernelArg(int _flags, UMat* _m, int _wscale, int _iwscale, const void* _obj, size_t _sz)
+KernelArg::KernelArg(முழு _flags, UMat* _m, முழு _wscale, முழு _iwscale, மாறிலி வெறுமை* _obj, size_t _sz)
     : flags(_flags), m(_m), obj(_obj), sz(_sz), wscale(_wscale), iwscale(_iwscale)
 {
     OCL_NOT_AVAILABLE();
 }
 
-KernelArg KernelArg::Constant(const Mat& m)
+KernelArg KernelArg::Constant(மாறிலி Mat& m)
 {
     OCL_NOT_AVAILABLE();
 }
 
 
-Kernel::Kernel() CV_NOEXCEPT : p(NULL) { }
-Kernel::Kernel(const char* kname, const Program& prog) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Kernel::Kernel(const char* kname, const ProgramSource& prog, const String& buildopts, String* errmsg) : p(NULL) { OCL_NOT_AVAILABLE(); }
+Kernel::Kernel() CV_NOEXCEPT : p(வெற்று) { }
+Kernel::Kernel(மாறிலி எழுத்து* kname, மாறிலி Program& prog) : p(வெற்று) { OCL_NOT_AVAILABLE(); }
+Kernel::Kernel(மாறிலி எழுத்து* kname, மாறிலி ProgramSource& prog, மாறிலி String& buildopts, String* errmsg) : p(வெற்று) { OCL_NOT_AVAILABLE(); }
 Kernel::~Kernel() { }
-Kernel::Kernel(const Kernel& k) : p(NULL) { }
-Kernel& Kernel::operator=(const Kernel& k) { return *this; }
-Kernel::Kernel(Kernel&&) CV_NOEXCEPT : p(NULL) { }
-Kernel& Kernel::operator=(Kernel&&) CV_NOEXCEPT { return *this; }
+Kernel::Kernel(மாறிலி Kernel& k) : p(வெற்று) { }
+Kernel& Kernel::operator=(மாறிலி Kernel& k) { திரும்பு *இது; }
+Kernel::Kernel(Kernel&&) CV_NOEXCEPT : p(வெற்று) { }
+Kernel& Kernel::operator=(Kernel&&) CV_NOEXCEPT { திரும்பு *இது; }
 
-bool Kernel::empty() const { return true; }
-bool Kernel::create(const char* kname, const Program& prog) { OCL_NOT_AVAILABLE(); }
-bool Kernel::create(const char* kname, const ProgramSource& prog, const String& buildopts, String* errmsg) { OCL_NOT_AVAILABLE(); }
+தருக்க Kernel::empty() மாறிலி { திரும்பு உண்மை; }
+தருக்க Kernel::create(மாறிலி எழுத்து* kname, மாறிலி Program& prog) { OCL_NOT_AVAILABLE(); }
+தருக்க Kernel::create(மாறிலி எழுத்து* kname, மாறிலி ProgramSource& prog, மாறிலி String& buildopts, String* errmsg) { OCL_NOT_AVAILABLE(); }
 
-int Kernel::set(int i, const void* value, size_t sz) { OCL_NOT_AVAILABLE(); }
-int Kernel::set(int i, const Image2D& image2D) { OCL_NOT_AVAILABLE(); }
-int Kernel::set(int i, const UMat& m) { OCL_NOT_AVAILABLE(); }
-int Kernel::set(int i, const KernelArg& arg) { OCL_NOT_AVAILABLE(); }
+முழு Kernel::set(முழு i, மாறிலி வெறுமை* value, size_t sz) { OCL_NOT_AVAILABLE(); }
+முழு Kernel::set(முழு i, மாறிலி Image2D& image2D) { OCL_NOT_AVAILABLE(); }
+முழு Kernel::set(முழு i, மாறிலி UMat& m) { OCL_NOT_AVAILABLE(); }
+முழு Kernel::set(முழு i, மாறிலி KernelArg& arg) { OCL_NOT_AVAILABLE(); }
 
-bool Kernel::run(int dims, size_t globalsize[], size_t localsize[], bool sync, const Queue& q) { OCL_NOT_AVAILABLE(); }
-bool Kernel::runTask(bool sync, const Queue& q) { OCL_NOT_AVAILABLE(); }
+தருக்க Kernel::run(முழு dims, size_t globalsize[], size_t localsize[], தருக்க ஒத்திசை, மாறிலி Queue& q) { OCL_NOT_AVAILABLE(); }
+தருக்க Kernel::runTask(தருக்க ஒத்திசை, மாறிலி Queue& q) { OCL_NOT_AVAILABLE(); }
 
-int64 Kernel::runProfiling(int dims, size_t globalsize[], size_t localsize[], const Queue& q) { OCL_NOT_AVAILABLE(); }
+int64 Kernel::runProfiling(முழு dims, size_t globalsize[], size_t localsize[], மாறிலி Queue& q) { OCL_NOT_AVAILABLE(); }
 
-size_t Kernel::workGroupSize() const { OCL_NOT_AVAILABLE(); }
-size_t Kernel::preferedWorkGroupSizeMultiple() const { OCL_NOT_AVAILABLE(); }
-bool Kernel::compileWorkGroupSize(size_t wsz[]) const { OCL_NOT_AVAILABLE(); }
-size_t Kernel::localMemSize() const { OCL_NOT_AVAILABLE(); }
+size_t Kernel::workGroupSize() மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Kernel::preferedWorkGroupSizeMultiple() மாறிலி { OCL_NOT_AVAILABLE(); }
+தருக்க Kernel::compileWorkGroupSize(size_t wsz[]) மாறிலி { OCL_NOT_AVAILABLE(); }
+size_t Kernel::localMemSize() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-void* Kernel::ptr() const { return NULL; }
+வெறுமை* Kernel::ptr() மாறிலி { திரும்பு வெற்று; }
 
 
-Program::Program() CV_NOEXCEPT : p(NULL) { }
-Program::Program(const ProgramSource& src, const String& buildflags, String& errmsg) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Program::Program(const Program& prog) : p(NULL) { }
-Program& Program::operator=(const Program& prog) { return *this; }
-Program::Program(Program&&) CV_NOEXCEPT : p(NULL) { }
-Program& Program::operator=(Program&&) CV_NOEXCEPT { return *this; }
+Program::Program() CV_NOEXCEPT : p(வெற்று) { }
+Program::Program(மாறிலி ProgramSource& src, மாறிலி String& buildflags, String& errmsg) : p(வெற்று) { OCL_NOT_AVAILABLE(); }
+Program::Program(மாறிலி Program& prog) : p(வெற்று) { }
+Program& Program::operator=(மாறிலி Program& prog) { திரும்பு *இது; }
+Program::Program(Program&&) CV_NOEXCEPT : p(வெற்று) { }
+Program& Program::operator=(Program&&) CV_NOEXCEPT { திரும்பு *இது; }
 Program::~Program() { }
 
-bool Program::create(const ProgramSource& src, const String& buildflags, String& errmsg) { OCL_NOT_AVAILABLE(); }
+தருக்க Program::create(மாறிலி ProgramSource& src, மாறிலி String& buildflags, String& errmsg) { OCL_NOT_AVAILABLE(); }
 
-void* Program::ptr() const { return NULL; }
+வெறுமை* Program::ptr() மாறிலி { திரும்பு வெற்று; }
 
-void Program::getBinary(std::vector<char>& binary) const { OCL_NOT_AVAILABLE(); }
+வெறுமை Program::get_இருமம்(std::vector<எழுத்து>& binary) மாறிலி { OCL_NOT_AVAILABLE(); }
 
-bool Program::read(const String& buf, const String& buildflags) { OCL_NOT_AVAILABLE(); }
-bool Program::write(String& buf) const { OCL_NOT_AVAILABLE(); }
-const ProgramSource& Program::source() const { OCL_NOT_AVAILABLE(); }
-String Program::getPrefix() const { OCL_NOT_AVAILABLE(); }
-/* static */ String Program::getPrefix(const String& buildflags) { OCL_NOT_AVAILABLE(); }
+தருக்க Program::பட(மாறிலி String& buf, மாறிலி String& buildflags) { OCL_NOT_AVAILABLE(); }
+தருக்க Program::லிக(String& buf) மாறிலி { OCL_NOT_AVAILABLE(); }
+மாறிலி ProgramSource& Program::source() மாறிலி { OCL_NOT_AVAILABLE(); }
+String Program::getPrefix() மாறிலி { OCL_NOT_AVAILABLE(); }
+/* static */ String Program::getPrefix(மாறிலி String& buildflags) { OCL_NOT_AVAILABLE(); }
 
 
-ProgramSource::ProgramSource() CV_NOEXCEPT : p(NULL) { }
-ProgramSource::ProgramSource(const String& module, const String& name, const String& codeStr, const String& codeHash) : p(NULL) { }
-ProgramSource::ProgramSource(const String& prog) : p(NULL) { }
-ProgramSource::ProgramSource(const char* prog) : p(NULL) { }
+ProgramSource::ProgramSource() CV_NOEXCEPT : p(வெற்று) { }
+ProgramSource::ProgramSource(மாறிலி String& module, மாறிலி String& name, மாறிலி String& codeStr, மாறிலி String& codeHash) : p(வெற்று) { }
+ProgramSource::ProgramSource(மாறிலி String& prog) : p(வெற்று) { }
+ProgramSource::ProgramSource(மாறிலி எழுத்து* prog) : p(வெற்று) { }
 ProgramSource::~ProgramSource() { }
-ProgramSource::ProgramSource(const ProgramSource& prog) : p(NULL) { }
-ProgramSource& ProgramSource::operator=(const ProgramSource& prog) { return *this; }
-ProgramSource::ProgramSource(ProgramSource&&) CV_NOEXCEPT : p(NULL) { }
-ProgramSource& ProgramSource::operator=(ProgramSource&&) CV_NOEXCEPT { return *this; }
+ProgramSource::ProgramSource(மாறிலி ProgramSource& prog) : p(வெற்று) { }
+ProgramSource& ProgramSource::operator=(மாறிலி ProgramSource& prog) { திரும்பு *இது; }
+ProgramSource::ProgramSource(ProgramSource&&) CV_NOEXCEPT : p(வெற்று) { }
+ProgramSource& ProgramSource::operator=(ProgramSource&&) CV_NOEXCEPT { திரும்பு *இது; }
 
-const String& ProgramSource::source() const { OCL_NOT_AVAILABLE(); }
-ProgramSource::hash_t ProgramSource::hash() const { OCL_NOT_AVAILABLE(); }
+மாறிலி String& ProgramSource::source() மாறிலி { OCL_NOT_AVAILABLE(); }
+ProgramSource::hash_t ProgramSource::hash() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-/* static */ ProgramSource ProgramSource::fromBinary(const String& module, const String& name, const unsigned char* binary, const size_t size, const cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
-/* static */ ProgramSource ProgramSource::fromSPIR(const String& module, const String& name, const unsigned char* binary, const size_t size, const cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
+/* static */ ProgramSource ProgramSource::from_இருமம்(மாறிலி String& module, மாறிலி String& name, மாறிலி unsigned எழுத்து* binary, மாறிலி size_t size, மாறிலி cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
+/* static */ ProgramSource ProgramSource::fromSPIR(மாறிலி String& module, மாறிலி String& name, மாறிலி unsigned எழுத்து* binary, மாறிலி size_t size, மாறிலி cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
 
 
-PlatformInfo::PlatformInfo() CV_NOEXCEPT : p(NULL) { }
-PlatformInfo::PlatformInfo(void* id) : p(NULL) { OCL_NOT_AVAILABLE(); }
+PlatformInfo::PlatformInfo() CV_NOEXCEPT : p(வெற்று) { }
+PlatformInfo::PlatformInfo(வெறுமை* id) : p(வெற்று) { OCL_NOT_AVAILABLE(); }
 PlatformInfo::~PlatformInfo() { }
 
-PlatformInfo::PlatformInfo(const PlatformInfo& i) : p(NULL) { }
-PlatformInfo& PlatformInfo::operator=(const PlatformInfo& i) { return *this; }
-PlatformInfo::PlatformInfo(PlatformInfo&&) CV_NOEXCEPT : p(NULL) { }
-PlatformInfo& PlatformInfo::operator=(PlatformInfo&&) CV_NOEXCEPT { return *this; }
+PlatformInfo::PlatformInfo(மாறிலி PlatformInfo& i) : p(வெற்று) { }
+PlatformInfo& PlatformInfo::operator=(மாறிலி PlatformInfo& i) { திரும்பு *இது; }
+PlatformInfo::PlatformInfo(PlatformInfo&&) CV_NOEXCEPT : p(வெற்று) { }
+PlatformInfo& PlatformInfo::operator=(PlatformInfo&&) CV_NOEXCEPT { திரும்பு *இது; }
 
-String PlatformInfo::name() const { OCL_NOT_AVAILABLE(); }
-String PlatformInfo::vendor() const { OCL_NOT_AVAILABLE(); }
-String PlatformInfo::version() const { OCL_NOT_AVAILABLE(); }
-int PlatformInfo::deviceNumber() const { OCL_NOT_AVAILABLE(); }
-void PlatformInfo::getDevice(Device& device, int d) const { OCL_NOT_AVAILABLE(); }
+String PlatformInfo::name() மாறிலி { OCL_NOT_AVAILABLE(); }
+String PlatformInfo::vendor() மாறிலி { OCL_NOT_AVAILABLE(); }
+String PlatformInfo::version() மாறிலி { OCL_NOT_AVAILABLE(); }
+முழு PlatformInfo::device_எண்() மாறிலி { OCL_NOT_AVAILABLE(); }
+வெறுமை PlatformInfo::getDevice(Device& device, முழு d) மாறிலி { OCL_NOT_AVAILABLE(); }
 
-const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf) { OCL_NOT_AVAILABLE(); }
-const char* typeToStr(int t) { OCL_NOT_AVAILABLE(); }
-const char* memopTypeToStr(int t) { OCL_NOT_AVAILABLE(); }
-const char* vecopTypeToStr(int t) { OCL_NOT_AVAILABLE(); }
-const char* getOpenCLErrorString(int errorCode) { OCL_NOT_AVAILABLE(); }
-String kernelToStr(InputArray _kernel, int ddepth, const char* name) { OCL_NOT_AVAILABLE(); }
-void getPlatfomsInfo(std::vector<PlatformInfo>& platform_info) { OCL_NOT_AVAILABLE(); }
+மாறிலி எழுத்து* convertTypeStr(முழு sdepth, முழு ddepth, முழு cn, எழுத்து* buf) { OCL_NOT_AVAILABLE(); }
+மாறிலி எழுத்து* typeToStr(முழு t) { OCL_NOT_AVAILABLE(); }
+மாறிலி எழுத்து* memopTypeToStr(முழு t) { OCL_NOT_AVAILABLE(); }
+மாறிலி எழுத்து* vecopTypeToStr(முழு t) { OCL_NOT_AVAILABLE(); }
+மாறிலி எழுத்து* getOpenCLErrorString(முழு errorCode) { OCL_NOT_AVAILABLE(); }
+String kernelToStr(உள்ளீடு_Array _kernel, முழு ddepth, மாறிலி எழுத்து* name) { OCL_NOT_AVAILABLE(); }
+வெறுமை getPlatfomsInfo(std::vector<PlatformInfo>& platform_info) { OCL_NOT_AVAILABLE(); }
 
 
-int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9,
+முழு predictOptimalVectorWidth(உள்ளீடு_Array src1, உள்ளீடு_Array src2, உள்ளீடு_Array src3,
+        உள்ளீடு_Array src4, உள்ளீடு_Array src5, உள்ளீடு_Array src6,
+        உள்ளீடு_Array src7, உள்ளீடு_Array src8, உள்ளீடு_Array src9,
         OclVectorStrategy strat)
 { OCL_NOT_AVAILABLE(); }
 
-int checkOptimalVectorWidth(const int *vectorWidths,
-        InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9,
+முழு checkOptimalVectorWidth(மாறிலி முழு *vectorWidths,
+        உள்ளீடு_Array src1, உள்ளீடு_Array src2, உள்ளீடு_Array src3,
+        உள்ளீடு_Array src4, உள்ளீடு_Array src5, உள்ளீடு_Array src6,
+        உள்ளீடு_Array src7, உள்ளீடு_Array src8, உள்ளீடு_Array src9,
         OclVectorStrategy strat)
 { OCL_NOT_AVAILABLE(); }
 
-int predictOptimalVectorWidthMax(InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9)
+முழு predictOptimalVectorWidthMax(உள்ளீடு_Array src1, உள்ளீடு_Array src2, உள்ளீடு_Array src3,
+        உள்ளீடு_Array src4, உள்ளீடு_Array src5, உள்ளீடு_Array src6,
+        உள்ளீடு_Array src7, உள்ளீடு_Array src8, உள்ளீடு_Array src9)
 { OCL_NOT_AVAILABLE(); }
 
-void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, InputArray _m) { OCL_NOT_AVAILABLE(); }
+வெறுமை buildOptionsAddMatrixDescription(String& buildOptions, மாறிலி String& name, உள்ளீடு_Array _m) { OCL_NOT_AVAILABLE(); }
 
 
-Image2D::Image2D() CV_NOEXCEPT : p(NULL) { }
-Image2D::Image2D(const UMat &src, bool norm, bool alias) { OCL_NOT_AVAILABLE(); }
-Image2D::Image2D(const Image2D & i) : p(NULL) { OCL_NOT_AVAILABLE(); }
+Image2D::Image2D() CV_NOEXCEPT : p(வெற்று) { }
+Image2D::Image2D(மாறிலி UMat &src, தருக்க norm, தருக்க alias) { OCL_NOT_AVAILABLE(); }
+Image2D::Image2D(மாறிலி Image2D & i) : p(வெற்று) { OCL_NOT_AVAILABLE(); }
 Image2D::~Image2D() { }
-Image2D& Image2D::operator=(const Image2D & i) { return *this; }
-Image2D::Image2D(Image2D&&) CV_NOEXCEPT : p(NULL) { }
-Image2D& Image2D::operator=(Image2D&&) CV_NOEXCEPT { return *this; }
+Image2D& Image2D::operator=(மாறிலி Image2D & i) { திரும்பு *இது; }
+Image2D::Image2D(Image2D&&) CV_NOEXCEPT : p(வெற்று) { }
+Image2D& Image2D::operator=(Image2D&&) CV_NOEXCEPT { திரும்பு *இது; }
 
-/* static */ bool Image2D::canCreateAlias(const UMat &u) { OCL_NOT_AVAILABLE(); }
-/* static */ bool Image2D::isFormatSupported(int depth, int cn, bool norm) { OCL_NOT_AVAILABLE(); }
+/* static */ தருக்க Image2D::canCreateAlias(மாறிலி UMat &u) { OCL_NOT_AVAILABLE(); }
+/* static */ தருக்க Image2D::isFormatSupported(முழு depth, முழு cn, தருக்க norm) { OCL_NOT_AVAILABLE(); }
 
-void* Image2D::ptr() const { return NULL; }
+வெறுமை* Image2D::ptr() மாறிலி { திரும்பு வெற்று; }
 
 
-Timer::Timer(const Queue& q) : p(NULL) {}
+Timer::Timer(மாறிலி Queue& q) : p(வெற்று) {}
 Timer::~Timer() {}
-void Timer::start() { OCL_NOT_AVAILABLE(); }
-void Timer::stop() { OCL_NOT_AVAILABLE();}
+வெறுமை Timer::start() { OCL_NOT_AVAILABLE(); }
+வெறுமை Timer::stop() { OCL_NOT_AVAILABLE();}
 
-uint64 Timer::durationNS() const { OCL_NOT_AVAILABLE(); }
+uint64 Timer::durationNS() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-MatAllocator* getOpenCLAllocator() { return NULL; }
+MatAllocator* getOpenCLAllocator() { திரும்பு வெற்று; }
 
-internal::ProgramEntry::operator ProgramSource&() const { OCL_NOT_AVAILABLE(); }
+internal::ProgramEntry::operator ProgramSource&() மாறிலி { OCL_NOT_AVAILABLE(); }
 
 
-struct OpenCLExecutionContext::Impl
+கட்டமைப்பு OpenCLExecutionContext::Impl
 {
-    Impl() = default;
+    Impl() = இயல்பு;
 };
 
-Context& OpenCLExecutionContext::getContext() const { OCL_NOT_AVAILABLE(); }
-Device& OpenCLExecutionContext::getDevice() const { OCL_NOT_AVAILABLE(); }
-Queue& OpenCLExecutionContext::getQueue() const { OCL_NOT_AVAILABLE(); }
+Context& OpenCLExecutionContext::getContext() மாறிலி { OCL_NOT_AVAILABLE(); }
+Device& OpenCLExecutionContext::getDevice() மாறிலி { OCL_NOT_AVAILABLE(); }
+Queue& OpenCLExecutionContext::getQueue() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-bool OpenCLExecutionContext::useOpenCL() const { return false; }
-void OpenCLExecutionContext::setUseOpenCL(bool flag) { }
+தருக்க OpenCLExecutionContext::useOpenCL() மாறிலி { திரும்பு பொய்; }
+வெறுமை OpenCLExecutionContext::setUseOpenCL(தருக்க flag) { }
 
-static
+நிலையான
 OpenCLExecutionContext& getDummyOpenCLExecutionContext()
 {
-    static OpenCLExecutionContext dummy;
-    return dummy;
+    நிலையான OpenCLExecutionContext dummy;
+    திரும்பு dummy;
 }
 
 /* static */
-OpenCLExecutionContext& OpenCLExecutionContext::getCurrent() { return getDummyOpenCLExecutionContext(); }
+OpenCLExecutionContext& OpenCLExecutionContext::getCurrent() { திரும்பு getDummyOpenCLExecutionContext(); }
 
 /* static */
-OpenCLExecutionContext& OpenCLExecutionContext::getCurrentRef() { return getDummyOpenCLExecutionContext(); }
+OpenCLExecutionContext& OpenCLExecutionContext::getCurrentRef() { திரும்பு getDummyOpenCLExecutionContext(); }
 
-void OpenCLExecutionContext::bind() const { OCL_NOT_AVAILABLE(); }
+வெறுமை OpenCLExecutionContext::bind() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue(const ocl::Queue& q) const { OCL_NOT_AVAILABLE(); }
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue() const { OCL_NOT_AVAILABLE(); }
+OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue(மாறிலி ocl::Queue& q) மாறிலி { OCL_NOT_AVAILABLE(); }
+OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue() மாறிலி { OCL_NOT_AVAILABLE(); }
 
-/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(const std::string& platformName, void* platformID, void* context, void* deviceID) { OCL_NOT_AVAILABLE(); }
-/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device, const ocl::Queue& queue) { OCL_NOT_AVAILABLE(); }
-/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device) { OCL_NOT_AVAILABLE(); }
+/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(மாறிலி std::string& platformName, வெறுமை* platformID, வெறுமை* context, வெறுமை* deviceID) { OCL_NOT_AVAILABLE(); }
+/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(மாறிலி Context& context, மாறிலி Device& device, மாறிலி ocl::Queue& queue) { OCL_NOT_AVAILABLE(); }
+/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(மாறிலி Context& context, மாறிலி Device& device) { OCL_NOT_AVAILABLE(); }
 
-void OpenCLExecutionContext::release() { }
+வெறுமை OpenCLExecutionContext::release() { }
 
 }}
 
-#if defined(_MSC_VER)
+#எனில் defined(_MSC_VER)
     #pragma warning(pop)
-#elif defined(__clang__)
+#அல்லதெனில் defined(__clang__)
     #pragma clang diagnostic pop
-#elif defined(__GNUC__)
+#அல்லதெனில் defined(__GNUC__)
     #pragma GCC diagnostic pop
 #endif

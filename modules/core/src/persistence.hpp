@@ -6,13 +6,13 @@
 #ifndef SRC_PERSISTENCE_HPP
 #define SRC_PERSISTENCE_HPP
 
-#include <deque>
-#include <sstream>
-#include <string>
-#include <iterator>
+#அந்தர்பாவ <deque>
+#அந்தர்பாவ <sstream>
+#அந்தர்பாவ <string>
+#அந்தர்பாவ <iterator>
 
 #define USE_ZLIB 1
-#if USE_ZLIB
+#எனில் USE_ZLIB
 #  ifndef _LFS64_LARGEFILE
 #    define _LFS64_LARGEFILE 0
 #  endif
@@ -20,18 +20,18 @@
 #    define _FILE_OFFSET_BITS 0
 #  endif
 #  include <zlib.h>
-#else
-typedef void* gzFile;
+#இல்லையெனில்
+வகைவரை வெறுமை* gzFile;
 #endif
 
 //=====================================================================================
 
-static const size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
-static const int CV_PERSISTENCE_MAX_DEPTH = 1024;
+நிலையான மாறிலி size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
+நிலையான மாறிலி முழு CV_PERSISTENCE_MAX_DEPTH = 1024;
 
-namespace base64 {
+நாமாகாஶ base64 {
 
-enum
+எண்ணிக்கை
 {
     HEADER_SIZE         = 24,
     ENCODED_HEADER_SIZE = 32
@@ -51,76 +51,76 @@ enum
 #define cv_isprint(c)     ((uchar)(c) >= (uchar)' ')
 #define cv_isprint_or_tab(c)  ((uchar)(c) >= (uchar)' ' || (c) == '\t')
 
-inline bool cv_isalnum(char c)
+உள்வரி தருக்க cv_isalnum(எழுத்து c)
 {
-    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    திரும்பு ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isalpha(char c)
+உள்வரி தருக்க cv_isalpha(எழுத்து c)
 {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    திரும்பு ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isdigit(char c)
+உள்வரி தருக்க cv_isdigit(எழுத்து c)
 {
-    return '0' <= c && c <= '9';
+    திரும்பு '0' <= c && c <= '9';
 }
 
-inline bool cv_isspace(char c)
+உள்வரி தருக்க cv_isspace(எழுத்து c)
 {
-    return (9 <= c && c <= 13) || c == ' ';
+    திரும்பு (9 <= c && c <= 13) || c == ' ';
 }
 
-inline char* cv_skip_BOM(char* ptr)
+உள்வரி எழுத்து* cv_skip_BOM(எழுத்து* ptr)
 {
-    if((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
+    எனில்((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
     {
-      return ptr + 3;
+      திரும்பு ptr + 3;
     }
-    return ptr;
+    திரும்பு ptr;
 }
 
-namespace cv
+நாமாகாஶ cv
 {
-namespace fs
+நாமாகாஶ fs
 {
-int strcasecmp(const char* str1, const char* str2);
-char* itoa( int _val, char* buffer, int /*radix*/ );
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed );
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero );
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero );
+முழு strcasecmp(மாறிலி எழுத்து* str1, மாறிலி எழுத்து* str2);
+எழுத்து* itoa( முழு _val, எழுத்து* buffer, முழு /*radix*/ );
+எழுத்து* itoa( int64_t _val, எழுத்து* buffer, முழு /*radix*/, தருக்க _signed );
+எழுத்து* floatToString( எழுத்து* buf, size_t bufSize, தசம value, தருக்க halfprecision, தருக்க explicitZero );
+எழுத்து* doubleToString( எழுத்து* buf, size_t bufSize, இரட்டை value, தருக்க explicitZero );
 
-int calcStructSize( const char* dt, int initial_size );
-int calcElemSize( const char* dt, int initial_size );
-CV_DEPRECATED char* encodeFormat( int elem_type, char* dt );
-char* encodeFormat( int elem_type, char* dt, size_t dt_len );
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len );
-int decodeSimpleFormat( const char* dt );
+முழு calcStructSize( மாறிலி எழுத்து* dt, முழு initial_size );
+முழு calcElemSize( மாறிலி எழுத்து* dt, முழு initial_size );
+CV_DEPRECATED எழுத்து* encodeFormat( முழு elem_type, எழுத்து* dt );
+எழுத்து* encodeFormat( முழு elem_type, எழுத்து* dt, size_t dt_len );
+முழு decodeFormat( மாறிலி எழுத்து* dt, முழு* fmt_pairs, முழு max_len );
+முழு decodeSimpleFormat( மாறிலி எழுத்து* dt );
 }
 
 
 #ifdef CV_STATIC_ANALYSIS
-#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } while (0)
-#else
+#define CV_PARSE_ERROR_CPP(errmsg) செய் { (வெறுமை)fs; abort(); } போது (0)
+#இல்லையெனில்
 #define CV_PARSE_ERROR_CPP( errmsg ) \
     fs->parseError( CV_Func, (errmsg), __FILE__, __LINE__ )
 #endif
 
 
-#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() do { \
+#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() செய் { \
     CV_DbgAssert(ptr); \
-    if((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
-} while (0)
+    எனில்((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
+} போது (0)
 
 
-class FileStorageParser;
-class FileStorageEmitter;
+வகுப்பு FileStorageParser;
+வகுப்பு FileStorageEmitter;
 
-struct FStructData
+கட்டமைப்பு FStructData
 {
     FStructData() { indent = flags = 0; }
-    FStructData( const std::string& _struct_tag,
-                 int _struct_flags, int _struct_indent )
+    FStructData( மாறிலி std::string& _struct_tag,
+                 முழு _struct_flags, முழு _struct_indent )
     {
         tag = _struct_tag;
         flags = _struct_flags;
@@ -128,88 +128,88 @@ struct FStructData
     }
 
     std::string tag;
-    int flags;
-    int indent;
+    முழு flags;
+    முழு indent;
 };
 
-class FileStorage_API
+வகுப்பு FileStorage_API
 {
-public:
-    virtual ~FileStorage_API();
-    virtual FileStorage* getFS() = 0;
+பொது:
+    மெய்நிகர் ~FileStorage_API();
+    மெய்நிகர் FileStorage* getFS() = 0;
 
-    virtual int getFormat() const = 0;
+    மெய்நிகர் முழு getFormat() மாறிலி = 0;
 
-    virtual void puts( const char* str ) = 0;
-    virtual char* gets() = 0;
-    virtual bool eof() = 0;
-    virtual void setEof() = 0;
-    virtual void closeFile() = 0;
-    virtual void rewind() = 0;
-    virtual char* resizeWriteBuffer( char* ptr, int len ) = 0;
-    virtual char* bufferPtr() const = 0;
-    virtual char* bufferStart() const = 0;
-    virtual char* bufferEnd() const = 0;
-    virtual void setBufferPtr(char* ptr) = 0;
-    virtual char* flush() = 0;
-    virtual void setNonEmpty() = 0;
-    virtual int wrapMargin() const = 0;
+    மெய்நிகர் வெறுமை puts( மாறிலி எழுத்து* str ) = 0;
+    மெய்நிகர் எழுத்து* gets() = 0;
+    மெய்நிகர் தருக்க eof() = 0;
+    மெய்நிகர் வெறுமை setEof() = 0;
+    மெய்நிகர் வெறுமை closeFile() = 0;
+    மெய்நிகர் வெறுமை rewind() = 0;
+    மெய்நிகர் எழுத்து* resizeWriteBuffer( எழுத்து* ptr, முழு len ) = 0;
+    மெய்நிகர் எழுத்து* bufferPtr() மாறிலி = 0;
+    மெய்நிகர் எழுத்து* bufferStart() மாறிலி = 0;
+    மெய்நிகர் எழுத்து* bufferEnd() மாறிலி = 0;
+    மெய்நிகர் வெறுமை setBufferPtr(எழுத்து* ptr) = 0;
+    மெய்நிகர் எழுத்து* flush() = 0;
+    மெய்நிகர் வெறுமை setNonEmpty() = 0;
+    மெய்நிகர் முழு wrapMargin() மாறிலி = 0;
 
-    virtual FStructData& getCurrentStruct() = 0;
+    மெய்நிகர் FStructData& getCurrentStruct() = 0;
 
-    virtual void convertToCollection( int type, FileNode& node ) = 0;
-    virtual FileNode addNode( FileNode& collection, const std::string& key,
-                               int type, const void* value=0, int len=-1 ) = 0;
-    virtual void finalizeCollection( FileNode& collection ) = 0;
-    virtual double strtod(char* ptr, char** endptr) = 0;
+    மெய்நிகர் வெறுமை convertToCollection( முழு type, File_முனை& முனை ) = 0;
+    மெய்நிகர் File_முனை add_முனை( File_முனை& collection, மாறிலி std::string& சாவி,
+                               முழு type, மாறிலி வெறுமை* value=0, முழு len=-1 ) = 0;
+    மெய்நிகர் வெறுமை finalizeCollection( File_முனை& collection ) = 0;
+    மெய்நிகர் இரட்டை strtod(எழுத்து* ptr, எழுத்து** endptr) = 0;
 
-    virtual char* parseBase64(char* ptr, int indent, FileNode& collection) = 0;
+    மெய்நிகர் எழுத்து* parseBase64(எழுத்து* ptr, முழு indent, File_முனை& collection) = 0;
     CV_NORETURN
-    virtual void parseError(const char* funcname, const std::string& msg,
-                            const char* filename, int lineno) = 0;
+    மெய்நிகர் வெறுமை parseError(மாறிலி எழுத்து* funcname, மாறிலி std::string& செய்தி,
+                            மாறிலி எழுத்து* filename, முழு lineno) = 0;
 
-private:
-    enum Base64State{
+தனிப்பட்ட:
+    எண்ணிக்கை Base64State{
         Uncertain,
         NotUse,
         InUse,
     };
 
-    friend class cv::FileStorage::Impl;
-    friend class cv::FileStorage;
-    friend class JSONEmitter;
-    friend class XMLEmitter;
-    friend class YAMLEmitter;
+    friend வகுப்பு cv::FileStorage::Impl;
+    friend வகுப்பு cv::FileStorage;
+    friend வகுப்பு JSONEmitter;
+    friend வகுப்பு XMLEmitter;
+    friend வகுப்பு YAMLEmitter;
 
-    virtual void check_if_write_struct_is_delayed(bool change_type_to_base64 = false) = 0;
-    virtual void switch_to_Base64_state(Base64State state) = 0;
-    virtual Base64State get_state_of_writing_base64() = 0;
-    virtual int get_space() = 0;
+    மெய்நிகர் வெறுமை check_if_write_struct_is_delayed(தருக்க change_type_to_base64 = பொய்) = 0;
+    மெய்நிகர் வெறுமை switch_to_Base64_state(Base64State state) = 0;
+    மெய்நிகர் Base64State get_state_of_writing_base64() = 0;
+    மெய்நிகர் முழு get_space() = 0;
 };
 
-class FileStorageEmitter
+வகுப்பு FileStorageEmitter
 {
-public:
-    virtual ~FileStorageEmitter() {}
+பொது:
+    மெய்நிகர் ~FileStorageEmitter() {}
 
-    virtual FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                          int struct_flags, const char* type_name=0 ) = 0;
-    virtual void endWriteStruct(const FStructData& current_struct) = 0;
-    virtual void write(const char* key, int value) = 0;
-    virtual void write(const char* key, int64_t value) = 0;
-    virtual void write(const char* key, double value) = 0;
-    virtual void write(const char* key, const char* value, bool quote) = 0;
-    virtual void writeScalar(const char* key, const char* value) = 0;
-    virtual void writeComment(const char* comment, bool eol_comment) = 0;
-    virtual void startNextStream() = 0;
+    மெய்நிகர் FStructData startWriteStruct( மாறிலி FStructData& parent, மாறிலி எழுத்து* சாவி,
+                                          முழு struct_flags, மாறிலி எழுத்து* type_name=0 ) = 0;
+    மெய்நிகர் வெறுமை endWriteStruct(மாறிலி FStructData& current_struct) = 0;
+    மெய்நிகர் வெறுமை லிக(மாறிலி எழுத்து* சாவி, முழு value) = 0;
+    மெய்நிகர் வெறுமை லிக(மாறிலி எழுத்து* சாவி, int64_t value) = 0;
+    மெய்நிகர் வெறுமை லிக(மாறிலி எழுத்து* சாவி, இரட்டை value) = 0;
+    மெய்நிகர் வெறுமை லிக(மாறிலி எழுத்து* சாவி, மாறிலி எழுத்து* value, தருக்க quote) = 0;
+    மெய்நிகர் வெறுமை writeScalar(மாறிலி எழுத்து* சாவி, மாறிலி எழுத்து* value) = 0;
+    மெய்நிகர் வெறுமை writeComment(மாறிலி எழுத்து* comment, தருக்க eol_comment) = 0;
+    மெய்நிகர் வெறுமை startNextStream() = 0;
 };
 
-class FileStorageParser
+வகுப்பு FileStorageParser
 {
-public:
-    virtual ~FileStorageParser() {}
-    virtual bool parse(char* ptr) = 0;
-    virtual bool getBase64Row(char* ptr, int indent, char* &beg, char* &end) = 0;
+பொது:
+    மெய்நிகர் ~FileStorageParser() {}
+    மெய்நிகர் தருக்க parse(எழுத்து* ptr) = 0;
+    மெய்நிகர் தருக்க getBase64Row(எழுத்து* ptr, முழு indent, எழுத்து* &beg, எழுத்து* &end) = 0;
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs);

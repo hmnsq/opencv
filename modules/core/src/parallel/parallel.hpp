@@ -4,11 +4,11 @@
 #ifndef OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
 #define OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#அந்தர்பாவ "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+நாமாகாஶ cv { நாமாகாஶ parallel {
 
-extern int numThreads;
+வெளி முழு இலக்கம்_Threads;
 
 std::shared_ptr<ParallelForAPI>& getCurrentParallelForAPI();
 

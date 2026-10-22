@@ -1,9 +1,9 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
-#if ARITHM_USE_IPP
+#எனில் ARITHM_USE_IPP
 
-namespace cv { namespace hal {
+நாமாகாஶ cv { நாமாகாஶ hal {
 
 //=======================================
 // Arithmetic and logical operations
@@ -11,46 +11,46 @@ namespace cv { namespace hal {
 //=======================================
 
 #define ARITHM_IPP_BIN(fun, ...)                        \
-do {                                                    \
-    if (!CV_IPP_CHECK_COND)                             \
-        return 0;                                       \
-    if (height == 1)                                    \
-        step1 = step2 = step = width * sizeof(dst[0]);  \
-    if (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__))   \
+செய் {                                                    \
+    எனில் (!CV_IPP_CHECK_COND)                             \
+        திரும்பு 0;                                       \
+    எனில் (height == 1)                                    \
+        step1 = step2 = step = width * அளவு(dst[0]);  \
+    எனில் (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__))   \
     {                                                   \
         CV_IMPL_ADD(CV_IMPL_IPP);                       \
-        return 1;                                       \
+        திரும்பு 1;                                       \
     }                                                   \
     setIppErrorStatus();                                \
-    return 0;                                           \
-} while(0)
+    திரும்பு 0;                                           \
+} போது(0)
 
 //=======================================
 // Addition
 //=======================================
 
-inline int arithm_ipp_add8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_add8u(மாறிலி uchar* src1, size_t step1, மாறிலி uchar* src2, size_t step2,
+                            uchar* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiAdd_8u_C1RSfs, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippiAdd_8u_C1RSfs, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height), 0);
 }
 
-inline int arithm_ipp_add16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                             ushort* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_add16u(மாறிலி ushort* src1, size_t step1, மாறிலி ushort* src2, size_t step2,
+                             ushort* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiAdd_16u_C1RSfs, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippiAdd_16u_C1RSfs, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height), 0);
 }
 
-inline int arithm_ipp_add16s(const short* src1, size_t step1, const short* src2, size_t step2,
-                             short* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_add16s(மாறிலி short* src1, size_t step1, மாறிலி short* src2, size_t step2,
+                             short* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiAdd_16s_C1RSfs, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippiAdd_16s_C1RSfs, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height), 0);
 }
 
-inline int arithm_ipp_add32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                             float* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_add32f(மாறிலி தசம* src1, size_t step1, மாறிலி தசம* src2, size_t step2,
+                             தசம* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiAdd_32f_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiAdd_32f_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
 #define arithm_ipp_add8s(...)  0
@@ -61,28 +61,28 @@ inline int arithm_ipp_add32f(const float* src1, size_t step1, const float* src2,
 // Subtract
 //=======================================
 
-inline int arithm_ipp_sub8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_sub8u(மாறிலி uchar* src1, size_t step1, மாறிலி uchar* src2, size_t step2,
+                            uchar* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiSub_8u_C1RSfs, src2, (int)step2, src1, (int)step1, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippiSub_8u_C1RSfs, src2, (முழு)step2, src1, (முழு)step1, dst, (முழு)step, ippiSize(width, height), 0);
 }
 
-inline int arithm_ipp_sub16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                             ushort* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_sub16u(மாறிலி ushort* src1, size_t step1, மாறிலி ushort* src2, size_t step2,
+                             ushort* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiSub_16u_C1RSfs, src2, (int)step2, src1, (int)step1, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippiSub_16u_C1RSfs, src2, (முழு)step2, src1, (முழு)step1, dst, (முழு)step, ippiSize(width, height), 0);
 }
 
-inline int arithm_ipp_sub16s(const short* src1, size_t step1, const short* src2, size_t step2,
-                            short* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_sub16s(மாறிலி short* src1, size_t step1, மாறிலி short* src2, size_t step2,
+                            short* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiSub_16s_C1RSfs, src2, (int)step2, src1, (int)step1, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippiSub_16s_C1RSfs, src2, (முழு)step2, src1, (முழு)step1, dst, (முழு)step, ippiSize(width, height), 0);
 }
 
-inline int arithm_ipp_sub32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                            float* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_sub32f(மாறிலி தசம* src1, size_t step1, மாறிலி தசம* src2, size_t step2,
+                            தசம* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiSub_32f_C1R, src2, (int)step2, src1, (int)step1, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiSub_32f_C1R, src2, (முழு)step2, src1, (முழு)step1, dst, (முழு)step, ippiSize(width, height));
 }
 
 #define arithm_ipp_sub8s(...)  0
@@ -92,58 +92,58 @@ inline int arithm_ipp_sub32f(const float* src1, size_t step1, const float* src2,
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define ARITHM_IPP_MIN_MAX(fun, type)                            \
-do {                                                             \
-    if (!CV_IPP_CHECK_COND)                                      \
-        return 0;                                                \
+செய் {                                                             \
+    எனில் (!CV_IPP_CHECK_COND)                                      \
+        திரும்பு 0;                                                \
     type* s1 = (type*)src1;                                      \
     type* s2 = (type*)src2;                                      \
     type* d  = dst;                                              \
-    if (height == 1)                                             \
-        step1 = step2 = step = width * sizeof(dst[0]);           \
-    int i = 0;                                                   \
-    for(; i < height; i++)                                       \
+    எனில் (height == 1)                                             \
+        step1 = step2 = step = width * அளவு(dst[0]);           \
+    முழு i = 0;                                                   \
+    க்கு(; i < height; i++)                                       \
     {                                                            \
-        if (0 > CV_INSTRUMENT_FUN_IPP(fun, s1, s2, d, width))    \
-            break;                                               \
+        எனில் (0 > CV_INSTRUMENT_FUN_IPP(fun, s1, s2, d, width))    \
+            நிறுத்து;                                               \
         s1 = (type*)((uchar*)s1 + step1);                        \
         s2 = (type*)((uchar*)s2 + step2);                        \
         d  = (type*)((uchar*)d + step);                          \
     }                                                            \
-    if (i == height)                                             \
+    எனில் (i == height)                                             \
     {                                                            \
         CV_IMPL_ADD(CV_IMPL_IPP);                                \
-        return 1;                                                \
+        திரும்பு 1;                                                \
     }                                                            \
     setIppErrorStatus();                                         \
-    return 0;                                                    \
-} while(0)
+    திரும்பு 0;                                                    \
+} போது(0)
 
 //=======================================
 // Max
 //=======================================
 
-inline int arithm_ipp_max8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                           uchar* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_max8u(மாறிலி uchar* src1, size_t step1, மாறிலி uchar* src2, size_t step2,
+                           uchar* dst, size_t step, முழு width, முழு height)
 {
     ARITHM_IPP_MIN_MAX(ippsMaxEvery_8u, uchar);
 }
 
-inline int arithm_ipp_max16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                             ushort* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_max16u(மாறிலி ushort* src1, size_t step1, மாறிலி ushort* src2, size_t step2,
+                             ushort* dst, size_t step, முழு width, முழு height)
 {
     ARITHM_IPP_MIN_MAX(ippsMaxEvery_16u, ushort);
 }
 
-inline int arithm_ipp_max32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                             float* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_max32f(மாறிலி தசம* src1, size_t step1, மாறிலி தசம* src2, size_t step2,
+                             தசம* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_MIN_MAX(ippsMaxEvery_32f, float);
+    ARITHM_IPP_MIN_MAX(ippsMaxEvery_32f, தசம);
 }
 
-inline int arithm_ipp_max64f(const double* src1, size_t step1, const double* src2, size_t step2,
-                             double* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_max64f(மாறிலி இரட்டை* src1, size_t step1, மாறிலி இரட்டை* src2, size_t step2,
+                             இரட்டை* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_MIN_MAX(ippsMaxEvery_64f, double);
+    ARITHM_IPP_MIN_MAX(ippsMaxEvery_64f, இரட்டை);
 }
 
 #define arithm_ipp_max8s(...)  0
@@ -154,28 +154,28 @@ inline int arithm_ipp_max64f(const double* src1, size_t step1, const double* src
 // Min
 //=======================================
 
-inline int arithm_ipp_min8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_min8u(மாறிலி uchar* src1, size_t step1, மாறிலி uchar* src2, size_t step2,
+                            uchar* dst, size_t step, முழு width, முழு height)
 {
     ARITHM_IPP_MIN_MAX(ippsMinEvery_8u, uchar);
 }
 
-inline int arithm_ipp_min16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                            ushort* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_min16u(மாறிலி ushort* src1, size_t step1, மாறிலி ushort* src2, size_t step2,
+                            ushort* dst, size_t step, முழு width, முழு height)
 {
     ARITHM_IPP_MIN_MAX(ippsMinEvery_16u, ushort);
 }
 
-inline int arithm_ipp_min32f(const float* src1, size_t step1, const float* src2,size_t step2,
-                             float* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_min32f(மாறிலி தசம* src1, size_t step1, மாறிலி தசம* src2,size_t step2,
+                             தசம* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_MIN_MAX(ippsMinEvery_32f, float);
+    ARITHM_IPP_MIN_MAX(ippsMinEvery_32f, தசம);
 }
 
-inline int arithm_ipp_min64f(const double* src1, size_t step1, const double* src2, size_t step2,
-                             double* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_min64f(மாறிலி இரட்டை* src1, size_t step1, மாறிலி இரட்டை* src2, size_t step2,
+                             இரட்டை* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_MIN_MAX(ippsMinEvery_64f, double);
+    ARITHM_IPP_MIN_MAX(ippsMinEvery_64f, இரட்டை);
 }
 
 #define arithm_ipp_min8s(...)  0
@@ -186,22 +186,22 @@ inline int arithm_ipp_min64f(const double* src1, size_t step1, const double* src
 // AbsDiff
 //=======================================
 
-inline int arithm_ipp_absdiff8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                                uchar* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_absdiff8u(மாறிலி uchar* src1, size_t step1, மாறிலி uchar* src2, size_t step2,
+                                uchar* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiAbsDiff_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiAbsDiff_8u_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
-inline int arithm_ipp_absdiff16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                                ushort* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_absdiff16u(மாறிலி ushort* src1, size_t step1, மாறிலி ushort* src2, size_t step2,
+                                ushort* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiAbsDiff_16u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiAbsDiff_16u_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
-inline int arithm_ipp_absdiff32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                                float* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_absdiff32f(மாறிலி தசம* src1, size_t step1, மாறிலி தசம* src2, size_t step2,
+                                தசம* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiAbsDiff_32f_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiAbsDiff_32f_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 #define arithm_ipp_absdiff8s(...)  0
 #define arithm_ipp_absdiff16s(...) 0
@@ -212,37 +212,37 @@ inline int arithm_ipp_absdiff32f(const float* src1, size_t step1, const float* s
 // Logical
 //=======================================
 
-inline int arithm_ipp_and8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_and8u(மாறிலி uchar* src1, size_t step1, மாறிலி uchar* src2, size_t step2,
+                            uchar* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiAnd_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiAnd_8u_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
-inline int arithm_ipp_or8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                           uchar* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_or8u(மாறிலி uchar* src1, size_t step1, மாறிலி uchar* src2, size_t step2,
+                           uchar* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiOr_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiOr_8u_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
-inline int arithm_ipp_xor8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_xor8u(மாறிலி uchar* src1, size_t step1, மாறிலி uchar* src2, size_t step2,
+                            uchar* dst, size_t step, முழு width, முழு height)
 {
-    ARITHM_IPP_BIN(ippiXor_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiXor_8u_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
-inline int arithm_ipp_not8u(const uchar* src1, size_t step1, uchar* dst, size_t step, int width, int height)
+உள்வரி முழு arithm_ipp_not8u(மாறிலி uchar* src1, size_t step1, uchar* dst, size_t step, முழு width, முழு height)
 {
-    if (!CV_IPP_CHECK_COND)
-        return 0;
-    if (height == 1)
-        step1 = step = width * sizeof(dst[0]);
-    if (0 <= CV_INSTRUMENT_FUN_IPP(ippiNot_8u_C1R, src1, (int)step1, dst, (int)step, ippiSize(width, height)))
+    எனில் (!CV_IPP_CHECK_COND)
+        திரும்பு 0;
+    எனில் (height == 1)
+        step1 = step = width * அளவு(dst[0]);
+    எனில் (0 <= CV_INSTRUMENT_FUN_IPP(ippiNot_8u_C1R, src1, (முழு)step1, dst, (முழு)step, ippiSize(width, height)))
     {
         CV_IMPL_ADD(CV_IMPL_IPP);
-        return 1;
+        திரும்பு 1;
     }
     setIppErrorStatus();
-    return 0;
+    திரும்பு 0;
 }
 
 //=======================================
@@ -250,58 +250,58 @@ inline int arithm_ipp_not8u(const uchar* src1, size_t step1, uchar* dst, size_t 
 //=======================================
 
 #define ARITHM_IPP_CMP(fun, ...)                          \
-do {                                                      \
-    if (!CV_IPP_CHECK_COND)                               \
-        return 0;                                         \
+செய் {                                                      \
+    எனில் (!CV_IPP_CHECK_COND)                               \
+        திரும்பு 0;                                         \
     IppCmpOp op = arithm_ipp_convert_cmp(cmpop);          \
-    if (op < 0)                                           \
-        return 0;                                         \
-    if (height == 1)                                      \
-        step1 = step2 = step = width * sizeof(dst[0]);    \
-    if (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__, op)) \
+    எனில் (op < 0)                                           \
+        திரும்பு 0;                                         \
+    எனில் (height == 1)                                      \
+        step1 = step2 = step = width * அளவு(dst[0]);    \
+    எனில் (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__, op)) \
     {                                                     \
         CV_IMPL_ADD(CV_IMPL_IPP);                         \
-        return 1;                                         \
+        திரும்பு 1;                                         \
     }                                                     \
     setIppErrorStatus();                                  \
-    return 0;                                             \
-} while(0)
+    திரும்பு 0;                                             \
+} போது(0)
 
-inline IppCmpOp arithm_ipp_convert_cmp(int cmpop)
+உள்வரி IppCmpOp arithm_ipp_convert_cmp(முழு cmpop)
 {
-    switch(cmpop)
+    தேர்வு(cmpop)
     {
-        case CMP_EQ: return ippCmpEq;
-        case CMP_GT: return ippCmpGreater;
-        case CMP_GE: return ippCmpGreaterEq;
-        case CMP_LT: return ippCmpLess;
-        case CMP_LE: return ippCmpLessEq;
-        default:     return (IppCmpOp)-1;
+        நிலை CMP_EQ: திரும்பு ippCmpEq;
+        நிலை CMP_GT: திரும்பு ippCmpGreater;
+        நிலை CMP_GE: திரும்பு ippCmpGreaterEq;
+        நிலை CMP_LT: திரும்பு ippCmpLess;
+        நிலை CMP_LE: திரும்பு ippCmpLessEq;
+        இயல்பு:     திரும்பு (IppCmpOp)-1;
     }
 }
 
-inline int arithm_ipp_cmp8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height, int cmpop)
+உள்வரி முழு arithm_ipp_cmp8u(மாறிலி uchar* src1, size_t step1, மாறிலி uchar* src2, size_t step2,
+                            uchar* dst, size_t step, முழு width, முழு height, முழு cmpop)
 {
-    ARITHM_IPP_CMP(ippiCompare_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_CMP(ippiCompare_8u_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
-inline int arithm_ipp_cmp16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height, int cmpop)
+உள்வரி முழு arithm_ipp_cmp16u(மாறிலி ushort* src1, size_t step1, மாறிலி ushort* src2, size_t step2,
+                            uchar* dst, size_t step, முழு width, முழு height, முழு cmpop)
 {
-    ARITHM_IPP_CMP(ippiCompare_16u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_CMP(ippiCompare_16u_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
-inline int arithm_ipp_cmp16s(const short* src1, size_t step1, const short* src2, size_t step2,
-                             uchar* dst, size_t step, int width, int height, int cmpop)
+உள்வரி முழு arithm_ipp_cmp16s(மாறிலி short* src1, size_t step1, மாறிலி short* src2, size_t step2,
+                             uchar* dst, size_t step, முழு width, முழு height, முழு cmpop)
 {
-    ARITHM_IPP_CMP(ippiCompare_16s_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_CMP(ippiCompare_16s_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
-inline int arithm_ipp_cmp32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                             uchar* dst, size_t step, int width, int height, int cmpop)
+உள்வரி முழு arithm_ipp_cmp32f(மாறிலி தசம* src1, size_t step1, மாறிலி தசம* src2, size_t step2,
+                             uchar* dst, size_t step, முழு width, முழு height, முழு cmpop)
 {
-    ARITHM_IPP_CMP(ippiCompare_32f_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_CMP(ippiCompare_32f_C1R, src1, (முழு)step1, src2, (முழு)step2, dst, (முழு)step, ippiSize(width, height));
 }
 
 #define arithm_ipp_cmp8s(...)  0
@@ -313,42 +313,42 @@ inline int arithm_ipp_cmp32f(const float* src1, size_t step1, const float* src2,
 //=======================================
 
 #define ARITHM_IPP_MUL(fun, ...)                      \
-do {                                                  \
-    if (!CV_IPP_CHECK_COND)                           \
-        return 0;                                     \
-    float fscale = (float)scale;                      \
-    if (std::fabs(fscale - 1) > FLT_EPSILON)          \
-        return 0;                                     \
-    if (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__)) \
+செய் {                                                  \
+    எனில் (!CV_IPP_CHECK_COND)                           \
+        திரும்பு 0;                                     \
+    தசம fscale = (தசம)scale;                      \
+    எனில் (std::fabs(fscale - 1) > FLT_EPSILON)          \
+        திரும்பு 0;                                     \
+    எனில் (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__)) \
     {                                                 \
         CV_IMPL_ADD(CV_IMPL_IPP);                     \
-        return 1;                                     \
+        திரும்பு 1;                                     \
     }                                                 \
     setIppErrorStatus();                              \
-    return 0;                                         \
-} while(0)
+    திரும்பு 0;                                         \
+} போது(0)
 
-inline int arithm_ipp_mul8u(const uchar *src1, size_t step1, const uchar *src2, size_t step2,
-                            uchar *dst, size_t step, int width, int height, double scale)
+உள்வரி முழு arithm_ipp_mul8u(மாறிலி uchar *src1, size_t step1, மாறிலி uchar *src2, size_t step2,
+                            uchar *dst, size_t step, முழு width, முழு height, இரட்டை scale)
 {
-    ARITHM_IPP_MUL(ippiMul_8u_C1RSfs, src1, (int)step1, src2, (int)step2,dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_MUL(ippiMul_8u_C1RSfs, src1, (முழு)step1, src2, (முழு)step2,dst, (முழு)step, ippiSize(width, height), 0);
 }
-inline int arithm_ipp_mul16u(const ushort *src1, size_t step1, const ushort *src2, size_t step2,
-                            ushort *dst, size_t step, int width, int height, double scale)
+உள்வரி முழு arithm_ipp_mul16u(மாறிலி ushort *src1, size_t step1, மாறிலி ushort *src2, size_t step2,
+                            ushort *dst, size_t step, முழு width, முழு height, இரட்டை scale)
 {
-    ARITHM_IPP_MUL(ippiMul_16u_C1RSfs, src1, (int)step1, src2, (int)step2,dst, (int)step, ippiSize(width, height), 0);
-}
-
-inline int arithm_ipp_mul16s(const short *src1, size_t step1, const short *src2, size_t step2,
-                            short *dst, size_t step, int width, int height, double scale)
-{
-    ARITHM_IPP_MUL(ippiMul_16s_C1RSfs, src1, (int)step1, src2, (int)step2,dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_MUL(ippiMul_16u_C1RSfs, src1, (முழு)step1, src2, (முழு)step2,dst, (முழு)step, ippiSize(width, height), 0);
 }
 
-inline int arithm_ipp_mul32f(const float *src1, size_t step1, const float *src2, size_t step2,
-                            float *dst, size_t step, int width, int height, double scale)
+உள்வரி முழு arithm_ipp_mul16s(மாறிலி short *src1, size_t step1, மாறிலி short *src2, size_t step2,
+                            short *dst, size_t step, முழு width, முழு height, இரட்டை scale)
 {
-    ARITHM_IPP_MUL(ippiMul_32f_C1R, src1, (int)step1, src2, (int)step2,dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_MUL(ippiMul_16s_C1RSfs, src1, (முழு)step1, src2, (முழு)step2,dst, (முழு)step, ippiSize(width, height), 0);
+}
+
+உள்வரி முழு arithm_ipp_mul32f(மாறிலி தசம *src1, size_t step1, மாறிலி தசம *src2, size_t step2,
+                            தசம *dst, size_t step, முழு width, முழு height, இரட்டை scale)
+{
+    ARITHM_IPP_MUL(ippiMul_32f_C1R, src1, (முழு)step1, src2, (முழு)step2,dst, (முழு)step, ippiSize(width, height));
 }
 
 #define arithm_ipp_mul8s(...)  0
@@ -405,13 +405,13 @@ inline int arithm_ipp_mul32f(const float *src1, size_t step1, const float *src2,
 
 #define ARITHM_CALL_IPP(fun, ...)       \
 {                                       \
-    if (__CV_EXPAND(fun(__VA_ARGS__)))  \
-        return;                         \
+    எனில் (__CV_EXPAND(fun(__VA_ARGS__)))  \
+        திரும்பு;                         \
 }
 
 #endif // ARITHM_USE_IPP
 
 
-#if !ARITHM_USE_IPP
+#எனில் !ARITHM_USE_IPP
 #define ARITHM_CALL_IPP(...)
 #endif

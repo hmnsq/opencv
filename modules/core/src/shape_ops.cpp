@@ -4,33 +4,33 @@
 // Copyright (C) 2026, BigVision LLC, all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
+#அந்தர்பாவ "precomp.hpp"
 
-namespace cv {
+நாமாகாஶ cv {
 
 // In place (dst shares the data of a continuous src) only the header changes; otherwise the
 // elements are copied into dst.
-static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
+நிலையான வெறுமை reshapeTo(உள்ளீடு_Array _src, OutputArray _dst, மாறிலி MatShape& shape)
 {
     Mat src = _src.getMat();
     CV_Assert(shape.total() == src.total());
-    if (_dst.kind() == _InputArray::MAT && src.isContinuous())
+    எனில் (_dst.kind() == உள்ளீடு_Array_2::MAT && src.isContinuous())
     {
         Mat& dst = _dst.getMatRef();
-        if (dst.data && dst.data == src.data)
+        எனில் (dst.data && dst.data == src.data)
         {
             dst = src.reshape(0, shape);
-            return;
+            திரும்பு;
         }
     }
     _dst.create(shape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data)
-        return;
-    if (dst.isContinuous())
+    எனில் (dst.data == src.data)
+        திரும்பு;
+    எனில் (dst.isContinuous())
     {
         src.copyTo(Mat(src.dims, src.size.p, src.type(), dst.data));
-        return;
+        திரும்பு;
     }
     // create() keeps a preallocated destination of the right shape even when it is strided
     Mat tmp;
@@ -38,25 +38,25 @@ static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
     Mat(shape.dims, shape.p, src.type(), tmp.data).copyTo(dst);
 }
 
-void squeeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+வெறுமை squeeze(உள்ளீடு_Array src, OutputArray dst, மாறிலி std::vector<முழு>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().squeeze(axes));
 }
 
-void unsqueeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+வெறுமை unsqueeze(உள்ளீடு_Array src, OutputArray dst, மாறிலி std::vector<முழு>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().unsqueeze(axes));
 }
 
-void flatten(InputArray src, OutputArray dst, int startAxis, int endAxis)
+வெறுமை flatten(உள்ளீடு_Array src, OutputArray dst, முழு startAxis, முழு endAxis)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().flatten(startAxis, endAxis));
 }
 
-void reshape(InputArray src, OutputArray dst, const std::vector<int>& newShape, bool allowZero)
+வெறுமை reshape(உள்ளீடு_Array src, OutputArray dst, மாறிலி std::vector<முழு>& newShape, தருக்க allowZero)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().reshape(MatShape(newShape), allowZero));

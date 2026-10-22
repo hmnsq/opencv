@@ -2,81 +2,81 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "opencv2/core/utils/buffer_area.private.hpp"
-#include "opencv2/core/utils/configuration.private.hpp"
+#அந்தர்பாவ "opencv2/core/utils/buffer_area.private.hpp"
+#அந்தர்பாவ "opencv2/core/utils/configuration.private.hpp"
 
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-static bool CV_BUFFER_AREA_OVERRIDE_SAFE_MODE =
-    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", false);
+நிலையான தருக்க CV_BUFFER_AREA_OVERRIDE_SAFE_MODE =
+    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", பொய்);
 #endif
 
-namespace cv { namespace utils {
+நாமாகாஶ cv { நாமாகாஶ utils {
 
 //==================================================================================================
 
-class BufferArea::Block
+வகுப்பு BufferArea::Block
 {
-private:
-    inline size_t reserve_count() const
+தனிப்பட்ட:
+    உள்வரி size_t reserve_மொத்தம்() மாறிலி
     {
-        return alignment / type_size - 1;
+        திரும்பு alignment / type_size - 1;
     }
-public:
-    Block(void **ptr_, ushort type_size_, size_t count_, ushort alignment_)
-        : ptr(ptr_), raw_mem(0), count(count_), type_size(type_size_), alignment(alignment_)
+பொது:
+    Block(வெறுமை **ptr_, ushort type_size_, size_t மொத்தம், ushort alignment_)
+        : ptr(ptr_), raw_mem(0), மொத்தம்_2(மொத்தம்), type_size(type_size_), alignment(alignment_)
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == வெற்று);
     }
-    void cleanup() const
+    வெறுமை cleanup() மாறிலி
     {
         CV_DbgAssert(ptr);
-        if (raw_mem)
+        எனில் (raw_mem)
             fastFree(raw_mem);
     }
-    size_t getByteCount() const
+    size_t get_Byte_மொத்தம்() மாறிலி
     {
-        return type_size * (count + reserve_count());
+        திரும்பு type_size * (மொத்தம்_2 + reserve_மொத்தம்());
     }
-    void real_allocate()
+    வெறுமை real_allocate()
     {
-        CV_Assert(ptr && *ptr == NULL);
-        const size_t allocated_count = count + reserve_count();
-        raw_mem = fastMalloc(type_size * allocated_count);
-        if (alignment != type_size)
+        CV_Assert(ptr && *ptr == வெற்று);
+        மாறிலி size_t allocated_மொத்தம் = மொத்தம்_2 + reserve_மொத்தம்();
+        raw_mem = fastMalloc(type_size * allocated_மொத்தம்);
+        எனில் (alignment != type_size)
         {
             *ptr = alignPtr(raw_mem, alignment);
             CV_Assert(reinterpret_cast<size_t>(*ptr) % alignment == 0);
-            CV_Assert(static_cast<uchar*>(*ptr) + type_size * count <= static_cast<uchar*>(raw_mem) + type_size * allocated_count);
+            CV_Assert(static_cast<uchar*>(*ptr) + type_size * மொத்தம்_2 <= static_cast<uchar*>(raw_mem) + type_size * allocated_மொத்தம்);
         }
-        else
+        இல்லையெனில்
         {
             *ptr = raw_mem;
         }
     }
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    void * fast_allocate(void * buf) const
+    வெறுமை * fast_allocate(வெறுமை * buf) மாறிலி
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == வெற்று);
         buf = alignPtr(buf, alignment);
         CV_Assert(reinterpret_cast<size_t>(buf) % alignment == 0);
         *ptr = buf;
-        return static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * count);
+        திரும்பு static_cast<வெறுமை*>(static_cast<uchar*>(*ptr) + type_size * மொத்தம்_2);
     }
 #endif
-    bool operator==(void **other) const
+    தருக்க operator==(வெறுமை **other) மாறிலி
     {
         CV_Assert(ptr && other);
-        return *ptr == *other;
+        திரும்பு *ptr == *other;
     }
-    void zeroFill() const
+    வெறுமை zeroFill() மாறிலி
     {
         CV_Assert(ptr && *ptr);
-        memset(static_cast<uchar*>(*ptr), 0, count * type_size);
+        memset(static_cast<uchar*>(*ptr), 0, மொத்தம்_2 * type_size);
     }
-private:
-    void **ptr;
-    void * raw_mem;
-    size_t count;
+தனிப்பட்ட:
+    வெறுமை **ptr;
+    வெறுமை * raw_mem;
+    size_t மொத்தம்_2;
     ushort type_size;
     ushort alignment;
 };
@@ -84,15 +84,15 @@ private:
 //==================================================================================================
 
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-BufferArea::BufferArea(bool safe_) :
+BufferArea::BufferArea(தருக்க safe_) :
     oneBuf(0),
     totalSize(0),
     safe(safe_ || CV_BUFFER_AREA_OVERRIDE_SAFE_MODE)
 {
     // nothing
 }
-#else
-BufferArea::BufferArea(bool safe_)
+#இல்லையெனில்
+BufferArea::BufferArea(தருக்க safe_)
 {
     CV_UNUSED(safe_);
 }
@@ -103,52 +103,52 @@ BufferArea::~BufferArea()
     release();
 }
 
-void BufferArea::allocate_(void **ptr, ushort type_size, size_t count, ushort alignment)
+வெறுமை BufferArea::allocate_(வெறுமை **ptr, ushort type_size, size_t மொத்தம்_2, ushort alignment)
 {
-    blocks.push_back(Block(ptr, type_size, count, alignment));
+    blocks.push_back(Block(ptr, type_size, மொத்தம்_2, alignment));
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    எனில் (!safe)
     {
-        totalSize += blocks.back().getByteCount();
+        totalSize += blocks.back().get_Byte_மொத்தம்();
     }
-    else
+    இல்லையெனில்
 #endif
     {
         blocks.back().real_allocate();
     }
 }
 
-void BufferArea::zeroFill_(void **ptr)
+வெறுமை BufferArea::zeroFill_(வெறுமை **ptr)
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    க்கு(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
-        if (*i == ptr)
+        எனில் (*i == ptr)
         {
             i->zeroFill();
-            break;
+            நிறுத்து;
         }
     }
 }
 
-void BufferArea::zeroFill()
+வெறுமை BufferArea::zeroFill()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    க்கு(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
         i->zeroFill();
     }
 }
 
-void BufferArea::commit()
+வெறுமை BufferArea::commit()
 {
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    எனில் (!safe)
     {
         CV_Assert(totalSize > 0);
-        CV_Assert(oneBuf == NULL);
+        CV_Assert(oneBuf == வெற்று);
         CV_Assert(!blocks.empty());
         oneBuf = fastMalloc(totalSize);
-        void * ptr = oneBuf;
-        for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+        வெறுமை * ptr = oneBuf;
+        க்கு(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
         {
             ptr = i->fast_allocate(ptr);
         }
@@ -156,15 +156,15 @@ void BufferArea::commit()
 #endif
 }
 
-void BufferArea::release()
+வெறுமை BufferArea::release()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    க்கு(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
         i->cleanup();
     }
     blocks.clear();
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (oneBuf)
+    எனில் (oneBuf)
     {
         fastFree(oneBuf);
         oneBuf = 0;

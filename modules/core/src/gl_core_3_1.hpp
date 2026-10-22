@@ -43,13 +43,13 @@
 #ifndef OPENGL_NOLOAD_STYLE_HPP
 #define OPENGL_NOLOAD_STYLE_HPP
 
-#if defined(__gl_h_) || defined(__GL_H__)
+#எனில் defined(__gl_h_) || defined(__GL_H__)
 #error Attempt to include auto-generated header after including gl.h
 #endif
-#if defined(__glext_h_) || defined(__GLEXT_H_)
+#எனில் defined(__glext_h_) || defined(__GLEXT_H_)
 #error Attempt to include auto-generated header after including glext.h
 #endif
-#if defined(__gl_ATI_h_)
+#எனில் defined(__gl_ATI_h_)
 #error Attempt to include auto-generated header after including glATI.h
 #endif
 
@@ -60,86 +60,86 @@
 #define __gl_ATI_h_
 
 #ifndef APIENTRY
-    #if defined(__MINGW32__)
+    #எனில் defined(__MINGW32__)
         #ifndef WIN32_LEAN_AND_MEAN
             #define WIN32_LEAN_AND_MEAN 1
         #endif
         #ifndef NOMINMAX
             #define NOMINMAX
         #endif
-        #include <windows.h>
-    #elif (defined(_MSC_VER) && _MSC_VER >= 800) || defined(_STDCALL_SUPPORTED) || defined(__BORLANDC__)
+        #அந்தர்பாவ <windows.h>
+    #அல்லதெனில் (defined(_MSC_VER) && _MSC_VER >= 800) || defined(_STDCALL_SUPPORTED) || defined(__BORLANDC__)
         #ifndef WIN32_LEAN_AND_MEAN
             #define WIN32_LEAN_AND_MEAN 1
         #endif
         #ifndef NOMINMAX
             #define NOMINMAX
         #endif
-        #include <windows.h>
-    #else
+        #அந்தர்பாவ <windows.h>
+    #இல்லையெனில்
         #define APIENTRY
     #endif
 #endif // APIENTRY
 
 #ifndef CODEGEN_FUNCPTR
     #define CODEGEN_REMOVE_FUNCPTR
-    #if defined(_WIN32)
+    #எனில் defined(_WIN32)
         #define CODEGEN_FUNCPTR APIENTRY
-    #else
+    #இல்லையெனில்
         #define CODEGEN_FUNCPTR
     #endif
 #endif // CODEGEN_FUNCPTR
 
 #ifndef GL_LOAD_GEN_BASIC_OPENGL_TYPEDEFS
 #define GL_LOAD_GEN_BASIC_OPENGL_TYPEDEFS
-    typedef unsigned int GLenum;
-    typedef unsigned char GLboolean;
-    typedef unsigned int GLbitfield;
-    typedef signed char GLbyte;
-    typedef short GLshort;
-    typedef int GLint;
-    typedef int GLsizei;
-    typedef unsigned char GLubyte;
-    typedef unsigned short GLushort;
-    typedef unsigned int GLuint;
-    typedef float GLfloat;
-    typedef float GLclampf;
-    typedef double GLdouble;
-    typedef double GLclampd;
-    #define GLvoid void
+    வகைவரை unsigned முழு GLenum;
+    வகைவரை unsigned எழுத்து GLboolean;
+    வகைவரை unsigned முழு GLbitfield;
+    வகைவரை signed எழுத்து GLbyte;
+    வகைவரை short GLshort;
+    வகைவரை முழு GLint;
+    வகைவரை முழு GLsizei;
+    வகைவரை unsigned எழுத்து GLubyte;
+    வகைவரை unsigned short GLushort;
+    வகைவரை unsigned முழு GLuint;
+    வகைவரை தசம GLfloat;
+    வகைவரை தசம GLclampf;
+    வகைவரை இரட்டை GLdouble;
+    வகைவரை இரட்டை GLclampd;
+    #define GLvoid வெறுமை
 #endif // GL_LOAD_GEN_BASIC_OPENGL_TYPEDEFS
 
-#include <stddef.h>
+#அந்தர்பாவ <stddef.h>
 
 #ifndef GL_VERSION_2_0
     // GL type for program/shader text
-    typedef char GLchar;
+    வகைவரை எழுத்து GLchar;
 #endif
 
 #ifndef GL_VERSION_1_5
     // GL types for handling large vertex buffer objects
-    typedef ptrdiff_t GLintptr;
-    typedef ptrdiff_t GLsizeiptr;
+    வகைவரை ptrdiff_t GLintptr;
+    வகைவரை ptrdiff_t GLsizeiptr;
 #endif
 
 #ifndef GL_ARB_vertex_buffer_object
     // GL types for handling large vertex buffer objects
-    typedef ptrdiff_t GLintptrARB;
-    typedef ptrdiff_t GLsizeiptrARB;
+    வகைவரை ptrdiff_t GLintptrARB;
+    வகைவரை ptrdiff_t GLsizeiptrARB;
 #endif
 
 #ifndef GL_ARB_shader_objects
     // GL types for program/shader text and shader object handles
-    typedef char GLcharARB;
-    typedef unsigned int GLhandleARB;
+    வகைவரை எழுத்து GLcharARB;
+    வகைவரை unsigned முழு GLhandleARB;
 #endif
 
 // GL type for "half" precision (s10e5) float data in host memory
 #ifndef GL_ARB_half_float_pixel
-    typedef unsigned short GLhalfARB;
+    வகைவரை unsigned short GLhalfARB;
 #endif
 #ifndef GL_NV_half_float
-    typedef unsigned short GLhalfNV;
+    வகைவரை unsigned short GLhalfNV;
 #endif
 
 #ifndef GLEXT_64_TYPES_DEFINED
@@ -148,75 +148,75 @@
 
     // Define int32_t, int64_t, and uint64_t types for UST/MSC
     // (as used in the GL_EXT_timer_query extension)
-    #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-        #include <inttypes.h>
-    #elif defined(__sun__) || defined(__digital__)
-        #include <inttypes.h>
-        #if defined(__STDC__)
-            #if defined(__arch64__) || defined(_LP64)
-                typedef long int int64_t;
-                typedef unsigned long int uint64_t;
-            #else
-                typedef long long int int64_t;
-                typedef unsigned long long int uint64_t;
+    #எனில் defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+        #அந்தர்பாவ <inttypes.h>
+    #அல்லதெனில் defined(__sun__) || defined(__digital__)
+        #அந்தர்பாவ <inttypes.h>
+        #எனில் defined(__STDC__)
+            #எனில் defined(__arch64__) || defined(_LP64)
+                வகைவரை long முழு int64_t;
+                வகைவரை unsigned long முழு uint64_t;
+            #இல்லையெனில்
+                வகைவரை long long முழு int64_t;
+                வகைவரை unsigned long long முழு uint64_t;
             #endif // __arch64__
         #endif // __STDC__
-    #elif defined( __VMS ) || defined(__sgi)
-        #include <inttypes.h>
-    #elif defined(__SCO__) || defined(__USLC__)
-        #include <stdint.h>
-    #elif defined(__UNIXOS2__) || defined(__SOL64__)
-        typedef long int int32_t;
-        typedef long long int int64_t;
-        typedef unsigned long long int uint64_t;
-    #elif defined(_WIN32) && defined(__GNUC__)
-        #include <stdint.h>
-    #elif defined(_WIN32)
-        typedef __int32 int32_t;
-        typedef __int64 int64_t;
-        typedef unsigned __int64 uint64_t;
-    #else
+    #அல்லதெனில் defined( __VMS ) || defined(__sgi)
+        #அந்தர்பாவ <inttypes.h>
+    #அல்லதெனில் defined(__SCO__) || defined(__USLC__)
+        #அந்தர்பாவ <stdint.h>
+    #அல்லதெனில் defined(__UNIXOS2__) || defined(__SOL64__)
+        வகைவரை long முழு int32_t;
+        வகைவரை long long முழு int64_t;
+        வகைவரை unsigned long long முழு uint64_t;
+    #அல்லதெனில் defined(_WIN32) && defined(__GNUC__)
+        #அந்தர்பாவ <stdint.h>
+    #அல்லதெனில் defined(_WIN32)
+        வகைவரை __int32 int32_t;
+        வகைவரை __int64 int64_t;
+        வகைவரை unsigned __int64 uint64_t;
+    #இல்லையெனில்
         // Fallback if nothing above works
-        #include <inttypes.h>
+        #அந்தர்பாவ <inttypes.h>
     #endif
 #endif
 
 #ifndef GL_EXT_timer_query
-    typedef int64_t GLint64EXT;
-    typedef uint64_t GLuint64EXT;
+    வகைவரை int64_t GLint64EXT;
+    வகைவரை uint64_t GLuint64EXT;
 #endif
 
 #ifndef GL_ARB_sync
-    typedef int64_t GLint64;
-    typedef uint64_t GLuint64;
-    typedef struct __GLsync *GLsync;
+    வகைவரை int64_t GLint64;
+    வகைவரை uint64_t GLuint64;
+    வகைவரை கட்டமைப்பு __GLsync *GLsync;
 #endif
 
 #ifndef GL_ARB_cl_event
     // These incomplete types let us declare types compatible with OpenCL's cl_context and cl_event
-    struct _cl_context;
-    struct _cl_event;
+    கட்டமைப்பு _cl_context;
+    கட்டமைப்பு _cl_event;
 #endif
 
 #ifndef GL_ARB_debug_output
-    typedef void (APIENTRY *GLDEBUGPROCARB)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam);
+    வகைவரை வெறுமை (APIENTRY *GLDEBUGPROCARB)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,மாறிலி GLchar *message,GLvoid *userParam);
 #endif
 
 #ifndef GL_AMD_debug_output
-    typedef void (APIENTRY *GLDEBUGPROCAMD)(GLuint id,GLenum category,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam);
+    வகைவரை வெறுமை (APIENTRY *GLDEBUGPROCAMD)(GLuint id,GLenum category,GLenum severity,GLsizei length,மாறிலி GLchar *message,GLvoid *userParam);
 #endif
 
 #ifndef GL_KHR_debug
-    typedef void (APIENTRY *GLDEBUGPROC)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam);
+    வகைவரை வெறுமை (APIENTRY *GLDEBUGPROC)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,மாறிலி GLchar *message,GLvoid *userParam);
 #endif
 
 #ifndef GL_NV_vdpau_interop
-    typedef GLintptr GLvdpauSurfaceNV;
+    வகைவரை GLintptr GLvdpauSurfaceNV;
 #endif
 
-namespace gl
+நாமாகாஶ gl
 {
-    enum
+    எண்ணிக்கை
     {
         // Version: 1.1
         DEPTH_BUFFER_BIT                 = 0x00000100,
@@ -225,9 +225,9 @@ namespace gl
         FALSE_                           = 0,
         TRUE_                            = 1,
         POINTS                           = 0x0000,
-        LINES                            = 0x0001,
-        LINE_LOOP                        = 0x0002,
-        LINE_STRIP                       = 0x0003,
+        வரிகள்                            = 0x0001,
+        வரி_LOOP                        = 0x0002,
+        வரி_STRIP                       = 0x0003,
         TRIANGLES                        = 0x0004,
         TRIANGLE_STRIP                   = 0x0005,
         TRIANGLE_FAN                     = 0x0006,
@@ -252,18 +252,18 @@ namespace gl
         ONE_MINUS_DST_COLOR              = 0x0307,
         SRC_ALPHA_SATURATE               = 0x0308,
         NONE                             = 0,
-        FRONT_LEFT                       = 0x0400,
-        FRONT_RIGHT                      = 0x0401,
-        BACK_LEFT                        = 0x0402,
-        BACK_RIGHT                       = 0x0403,
+        FRONT_இடது                       = 0x0400,
+        FRONT_வலது                      = 0x0401,
+        BACK_இடது                        = 0x0402,
+        BACK_வலது                       = 0x0403,
         FRONT                            = 0x0404,
         BACK                             = 0x0405,
-        LEFT                             = 0x0406,
-        RIGHT                            = 0x0407,
+        இடது_2                             = 0x0406,
+        வலது_2                            = 0x0407,
         FRONT_AND_BACK                   = 0x0408,
         NO_ERROR_                        = 0,
         INVALID_ENUM                     = 0x0500,
-        INVALID_VALUE                    = 0x0501,
+        INVALID_மதிப்பு                    = 0x0501,
         INVALID_OPERATION                = 0x0502,
         OUT_OF_MEMORY                    = 0x0505,
         CW                               = 0x0900,
@@ -271,10 +271,10 @@ namespace gl
         POINT_SIZE                       = 0x0B11,
         POINT_SIZE_RANGE                 = 0x0B12,
         POINT_SIZE_GRANULARITY           = 0x0B13,
-        LINE_SMOOTH                      = 0x0B20,
-        LINE_WIDTH                       = 0x0B21,
-        LINE_WIDTH_RANGE                 = 0x0B22,
-        LINE_WIDTH_GRANULARITY           = 0x0B23,
+        வரி_SMOOTH                      = 0x0B20,
+        வரி_WIDTH                       = 0x0B21,
+        வரி_WIDTH_RANGE                 = 0x0B22,
+        வரி_WIDTH_GRANULARITY           = 0x0B23,
         POLYGON_MODE                     = 0x0B40,
         POLYGON_SMOOTH                   = 0x0B41,
         CULL_FACE                        = 0x0B44,
@@ -283,12 +283,12 @@ namespace gl
         DEPTH_RANGE                      = 0x0B70,
         DEPTH_TEST                       = 0x0B71,
         DEPTH_WRITEMASK                  = 0x0B72,
-        DEPTH_CLEAR_VALUE                = 0x0B73,
+        DEPTH_CLEAR_மதிப்பு                = 0x0B73,
         DEPTH_FUNC                       = 0x0B74,
         STENCIL_TEST                     = 0x0B90,
-        STENCIL_CLEAR_VALUE              = 0x0B91,
+        STENCIL_CLEAR_மதிப்பு              = 0x0B91,
         STENCIL_FUNC                     = 0x0B92,
-        STENCIL_VALUE_MASK               = 0x0B93,
+        STENCIL_மதிப்பு_MASK               = 0x0B93,
         STENCIL_FAIL                     = 0x0B94,
         STENCIL_PASS_DEPTH_FAIL          = 0x0B95,
         STENCIL_PASS_DEPTH_PASS          = 0x0B96,
@@ -305,11 +305,11 @@ namespace gl
         READ_BUFFER                      = 0x0C02,
         SCISSOR_BOX                      = 0x0C10,
         SCISSOR_TEST                     = 0x0C11,
-        COLOR_CLEAR_VALUE                = 0x0C22,
+        COLOR_CLEAR_மதிப்பு                = 0x0C22,
         COLOR_WRITEMASK                  = 0x0C23,
         DOUBLEBUFFER                     = 0x0C32,
         STEREO                           = 0x0C33,
-        LINE_SMOOTH_HINT                 = 0x0C52,
+        வரி_SMOOTH_HINT                 = 0x0C52,
         POLYGON_SMOOTH_HINT              = 0x0C53,
         UNPACK_SWAP_BYTES                = 0x0CF0,
         UNPACK_LSB_FIRST                 = 0x0CF1,
@@ -330,7 +330,7 @@ namespace gl
         TEXTURE_2D                       = 0x0DE1,
         POLYGON_OFFSET_UNITS             = 0x2A00,
         POLYGON_OFFSET_POINT             = 0x2A01,
-        POLYGON_OFFSET_LINE              = 0x2A02,
+        POLYGON_OFFSET_வரி              = 0x2A02,
         POLYGON_OFFSET_FILL              = 0x8037,
         POLYGON_OFFSET_FACTOR            = 0x8038,
         TEXTURE_BINDING_1D               = 0x8068,
@@ -383,7 +383,7 @@ namespace gl
         RGB                              = 0x1907,
         RGBA                             = 0x1908,
         POINT                            = 0x1B00,
-        LINE                             = 0x1B01,
+        வரி_2                             = 0x1B01,
         FILL                             = 0x1B02,
         KEEP                             = 0x1E00,
         REPLACE                          = 0x1E01,
@@ -468,8 +468,8 @@ namespace gl
         MINMAX_SINK                      = 0x8030,
         TABLE_TOO_LARGE                  = 0x8031,
         COLOR_MATRIX                     = 0x80B1,
-        COLOR_MATRIX_STACK_DEPTH         = 0x80B2,
-        MAX_COLOR_MATRIX_STACK_DEPTH     = 0x80B3,
+        COLOR_MATRIX_அடுக்கு_DEPTH         = 0x80B2,
+        MAX_COLOR_MATRIX_அடுக்கு_DEPTH     = 0x80B3,
         POST_COLOR_MATRIX_RED_SCALE      = 0x80B4,
         POST_COLOR_MATRIX_GREEN_SCALE    = 0x80B5,
         POST_COLOR_MATRIX_BLUE_SCALE     = 0x80B6,
@@ -532,9 +532,9 @@ namespace gl
         TEXTURE_MAX_LEVEL                = 0x813D,
         SMOOTH_POINT_SIZE_RANGE          = 0x0B12,
         SMOOTH_POINT_SIZE_GRANULARITY    = 0x0B13,
-        SMOOTH_LINE_WIDTH_RANGE          = 0x0B22,
-        SMOOTH_LINE_WIDTH_GRANULARITY    = 0x0B23,
-        ALIASED_LINE_WIDTH_RANGE         = 0x846E,
+        SMOOTH_வரி_WIDTH_RANGE          = 0x0B22,
+        SMOOTH_வரி_WIDTH_GRANULARITY    = 0x0B23,
+        ALIASED_வரி_WIDTH_RANGE         = 0x846E,
 
         // Version: 1.3
         TEXTURE0                         = 0x84C0,
@@ -576,7 +576,7 @@ namespace gl
         SAMPLE_COVERAGE                  = 0x80A0,
         SAMPLE_BUFFERS                   = 0x80A8,
         SAMPLES                          = 0x80A9,
-        SAMPLE_COVERAGE_VALUE            = 0x80AA,
+        SAMPLE_COVERAGE_மதிப்பு            = 0x80AA,
         SAMPLE_COVERAGE_INVERT           = 0x80AB,
         TEXTURE_CUBE_MAP                 = 0x8513,
         TEXTURE_BINDING_CUBE_MAP         = 0x8514,
@@ -593,7 +593,7 @@ namespace gl
         TEXTURE_COMPRESSION_HINT         = 0x84EF,
         TEXTURE_COMPRESSED_IMAGE_SIZE    = 0x86A0,
         TEXTURE_COMPRESSED               = 0x86A1,
-        NUM_COMPRESSED_TEXTURE_FORMATS   = 0x86A2,
+        இலக்கம்_COMPRESSED_TEXTURE_FORMATS   = 0x86A2,
         COMPRESSED_TEXTURE_FORMATS       = 0x86A3,
         CLAMP_TO_BORDER                  = 0x812D,
 
@@ -721,10 +721,10 @@ namespace gl
         SHADING_LANGUAGE_VERSION         = 0x8B8C,
         CURRENT_PROGRAM                  = 0x8B8D,
         POINT_SPRITE_COORD_ORIGIN        = 0x8CA0,
-        LOWER_LEFT                       = 0x8CA1,
-        UPPER_LEFT                       = 0x8CA2,
+        LOWER_இடது                       = 0x8CA1,
+        UPPER_இடது                       = 0x8CA2,
         STENCIL_BACK_REF                 = 0x8CA3,
-        STENCIL_BACK_VALUE_MASK          = 0x8CA4,
+        STENCIL_BACK_மதிப்பு_MASK          = 0x8CA4,
         STENCIL_BACK_WRITEMASK           = 0x8CA5,
 
         // Version: 2.1
@@ -892,7 +892,7 @@ namespace gl
         MAX_CLIP_DISTANCES               = 0x0D32,
         MAJOR_VERSION                    = 0x821B,
         MINOR_VERSION                    = 0x821C,
-        NUM_EXTENSIONS                   = 0x821D,
+        இலக்கம்_EXTENSIONS                   = 0x821D,
         CONTEXT_FLAGS                    = 0x821E,
         COMPRESSED_RED                   = 0x8225,
         COMPRESSED_RG                    = 0x8226,
@@ -1066,308 +1066,308 @@ namespace gl
     };
 
     // Extension: 1.1
-    extern void (CODEGEN_FUNCPTR *CullFace)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *FrontFace)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *Hint)(GLenum target, GLenum mode);
-    extern void (CODEGEN_FUNCPTR *LineWidth)(GLfloat width);
-    extern void (CODEGEN_FUNCPTR *PointSize)(GLfloat size);
-    extern void (CODEGEN_FUNCPTR *PolygonMode)(GLenum face, GLenum mode);
-    extern void (CODEGEN_FUNCPTR *Scissor)(GLint x, GLint y, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *TexParameterf)(GLenum target, GLenum pname, GLfloat param);
-    extern void (CODEGEN_FUNCPTR *TexParameterfv)(GLenum target, GLenum pname, const GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *TexParameteri)(GLenum target, GLenum pname, GLint param);
-    extern void (CODEGEN_FUNCPTR *TexParameteriv)(GLenum target, GLenum pname, const GLint *params);
-    extern void (CODEGEN_FUNCPTR *TexImage1D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *TexImage2D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *DrawBuffer)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *Clear)(GLbitfield mask);
-    extern void (CODEGEN_FUNCPTR *ClearColor)(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
-    extern void (CODEGEN_FUNCPTR *ClearStencil)(GLint s);
-    extern void (CODEGEN_FUNCPTR *ClearDepth)(GLdouble depth);
-    extern void (CODEGEN_FUNCPTR *StencilMask)(GLuint mask);
-    extern void (CODEGEN_FUNCPTR *ColorMask)(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
-    extern void (CODEGEN_FUNCPTR *DepthMask)(GLboolean flag);
-    extern void (CODEGEN_FUNCPTR *Disable)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *Enable)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *Finish)();
-    extern void (CODEGEN_FUNCPTR *Flush)();
-    extern void (CODEGEN_FUNCPTR *BlendFunc)(GLenum sfactor, GLenum dfactor);
-    extern void (CODEGEN_FUNCPTR *LogicOp)(GLenum opcode);
-    extern void (CODEGEN_FUNCPTR *StencilFunc)(GLenum func, GLint ref, GLuint mask);
-    extern void (CODEGEN_FUNCPTR *StencilOp)(GLenum fail, GLenum zfail, GLenum zpass);
-    extern void (CODEGEN_FUNCPTR *DepthFunc)(GLenum func);
-    extern void (CODEGEN_FUNCPTR *PixelStoref)(GLenum pname, GLfloat param);
-    extern void (CODEGEN_FUNCPTR *PixelStorei)(GLenum pname, GLint param);
-    extern void (CODEGEN_FUNCPTR *ReadBuffer)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *ReadPixels)(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *GetBooleanv)(GLenum pname, GLboolean *params);
-    extern void (CODEGEN_FUNCPTR *GetDoublev)(GLenum pname, GLdouble *params);
-    extern GLenum (CODEGEN_FUNCPTR *GetError)();
-    extern void (CODEGEN_FUNCPTR *GetFloatv)(GLenum pname, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetIntegerv)(GLenum pname, GLint *params);
-    extern const GLubyte * (CODEGEN_FUNCPTR *GetString)(GLenum name);
-    extern void (CODEGEN_FUNCPTR *GetTexImage)(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *GetTexParameterfv)(GLenum target, GLenum pname, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetTexParameteriv)(GLenum target, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetTexLevelParameterfv)(GLenum target, GLint level, GLenum pname, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetTexLevelParameteriv)(GLenum target, GLint level, GLenum pname, GLint *params);
-    extern GLboolean (CODEGEN_FUNCPTR *IsEnabled)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *DepthRange)(GLdouble ren_near, GLdouble ren_far);
-    extern void (CODEGEN_FUNCPTR *Viewport)(GLint x, GLint y, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *DrawArrays)(GLenum mode, GLint first, GLsizei count);
-    extern void (CODEGEN_FUNCPTR *DrawElements)(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
-    extern void (CODEGEN_FUNCPTR *GetPointerv)(GLenum pname, GLvoid* *params);
-    extern void (CODEGEN_FUNCPTR *PolygonOffset)(GLfloat factor, GLfloat units);
-    extern void (CODEGEN_FUNCPTR *CopyTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLint border);
-    extern void (CODEGEN_FUNCPTR *CopyTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border);
-    extern void (CODEGEN_FUNCPTR *CopyTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width);
-    extern void (CODEGEN_FUNCPTR *CopyTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *TexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *TexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *BindTexture)(GLenum target, GLuint texture);
-    extern void (CODEGEN_FUNCPTR *DeleteTextures)(GLsizei n, const GLuint *textures);
-    extern void (CODEGEN_FUNCPTR *GenTextures)(GLsizei n, GLuint *textures);
-    extern GLboolean (CODEGEN_FUNCPTR *IsTexture)(GLuint texture);
-    extern void (CODEGEN_FUNCPTR *Indexub)(GLubyte c);
-    extern void (CODEGEN_FUNCPTR *Indexubv)(const GLubyte *c);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CullFace)(GLenum mode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *FrontFace)(GLenum mode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Hint)(GLenum target, GLenum mode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *வரி_Width)(GLfloat width);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PointSize)(GLfloat size);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PolygonMode)(GLenum face, GLenum mode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Scissor)(GLint x, GLint y, GLsizei width, GLsizei height);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexParameterf)(GLenum target, GLenum pname, GLfloat param);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexParameterfv)(GLenum target, GLenum pname, மாறிலி GLfloat *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexParameteri)(GLenum target, GLenum pname, GLint param);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexParameteriv)(GLenum target, GLenum pname, மாறிலி GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexImage1D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, மாறிலி GLvoid *pixels);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexImage2D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, மாறிலி GLvoid *pixels);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DrawBuffer)(GLenum mode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Clear)(GLbitfield mask);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ClearColor)(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ClearStencil)(GLint s);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ClearDepth)(GLdouble depth);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *StencilMask)(GLuint mask);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ColorMask)(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DepthMask)(GLboolean flag);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Disable)(GLenum cap);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Enable)(GLenum cap);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Finish)();
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Flush)();
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BlendFunc)(GLenum sfactor, GLenum dfactor);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *LogicOp)(GLenum opcode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *StencilFunc)(GLenum func, GLint ref, GLuint mask);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *StencilOp)(GLenum fail, GLenum zfail, GLenum zpass);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DepthFunc)(GLenum func);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PixelStoref)(GLenum pname, GLfloat param);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PixelStorei)(GLenum pname, GLint param);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ReadBuffer)(GLenum mode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ReadPixels)(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetBooleanv)(GLenum pname, GLboolean *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetDoublev)(GLenum pname, GLdouble *params);
+    வெளி GLenum (CODEGEN_FUNCPTR *GetError)();
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetFloatv)(GLenum pname, GLfloat *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetIntegerv)(GLenum pname, GLint *params);
+    வெளி மாறிலி GLubyte * (CODEGEN_FUNCPTR *GetString)(GLenum name);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetTexImage)(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetTexParameterfv)(GLenum target, GLenum pname, GLfloat *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetTexParameteriv)(GLenum target, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetTexLevelParameterfv)(GLenum target, GLint level, GLenum pname, GLfloat *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetTexLevelParameteriv)(GLenum target, GLint level, GLenum pname, GLint *params);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsEnabled)(GLenum cap);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DepthRange)(GLdouble ren_near, GLdouble ren_far);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Viewport)(GLint x, GLint y, GLsizei width, GLsizei height);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DrawArrays)(GLenum mode, GLint first, GLsizei மொத்தம்_2);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DrawElements)(GLenum mode, GLsizei மொத்தம்_2, GLenum type, மாறிலி GLvoid *indices);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetPointerv)(GLenum pname, GLvoid* *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PolygonOffset)(GLfloat factor, GLfloat units);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CopyTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLint border);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CopyTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CopyTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CopyTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, மாறிலி GLvoid *pixels);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, மாறிலி GLvoid *pixels);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BindTexture)(GLenum target, GLuint texture);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DeleteTextures)(GLsizei n, மாறிலி GLuint *textures);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GenTextures)(GLsizei n, GLuint *textures);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsTexture)(GLuint texture);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Indexub)(GLubyte c);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Indexubv)(மாறிலி GLubyte *c);
 
     // Extension: 1.2
-    extern void (CODEGEN_FUNCPTR *BlendColor)(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
-    extern void (CODEGEN_FUNCPTR *BlendEquation)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *DrawRangeElements)(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices);
-    extern void (CODEGEN_FUNCPTR *TexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *CopyTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BlendColor)(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BlendEquation)(GLenum mode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DrawRangeElements)(GLenum mode, GLuint start, GLuint end, GLsizei மொத்தம்_2, GLenum type, மாறிலி GLvoid *indices);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, மாறிலி GLvoid *pixels);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CopyTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
 
     // Extension: 1.3
-    extern void (CODEGEN_FUNCPTR *ActiveTexture)(GLenum texture);
-    extern void (CODEGEN_FUNCPTR *SampleCoverage)(GLfloat value, GLboolean invert);
-    extern void (CODEGEN_FUNCPTR *CompressedTexImage3D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *GetCompressedTexImage)(GLenum target, GLint level, GLvoid *img);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ActiveTexture)(GLenum texture);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *SampleCoverage)(GLfloat value, GLboolean invert);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CompressedTexImage3D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, மாறிலி GLvoid *data);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CompressedTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, மாறிலி GLvoid *data);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CompressedTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, மாறிலி GLvoid *data);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CompressedTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, மாறிலி GLvoid *data);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CompressedTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, மாறிலி GLvoid *data);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CompressedTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, மாறிலி GLvoid *data);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetCompressedTexImage)(GLenum target, GLint level, GLvoid *img);
 
     // Extension: 1.4
-    extern void (CODEGEN_FUNCPTR *BlendFuncSeparate)(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
-    extern void (CODEGEN_FUNCPTR *MultiDrawArrays)(GLenum mode, const GLint *first, const GLsizei *count, GLsizei drawcount);
-    extern void (CODEGEN_FUNCPTR *MultiDrawElements)(GLenum mode, const GLsizei *count, GLenum type, const GLvoid* const *indices, GLsizei drawcount);
-    extern void (CODEGEN_FUNCPTR *PointParameterf)(GLenum pname, GLfloat param);
-    extern void (CODEGEN_FUNCPTR *PointParameterfv)(GLenum pname, const GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *PointParameteri)(GLenum pname, GLint param);
-    extern void (CODEGEN_FUNCPTR *PointParameteriv)(GLenum pname, const GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BlendFuncSeparate)(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *MultiDrawArrays)(GLenum mode, மாறிலி GLint *first, மாறிலி GLsizei *மொத்தம்_2, GLsizei drawcount);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *MultiDrawElements)(GLenum mode, மாறிலி GLsizei *மொத்தம்_2, GLenum type, மாறிலி GLvoid* மாறிலி *indices, GLsizei drawcount);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PointParameterf)(GLenum pname, GLfloat param);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PointParameterfv)(GLenum pname, மாறிலி GLfloat *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PointParameteri)(GLenum pname, GLint param);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PointParameteriv)(GLenum pname, மாறிலி GLint *params);
 
     // Extension: 1.5
-    extern void (CODEGEN_FUNCPTR *GenQueries)(GLsizei n, GLuint *ids);
-    extern void (CODEGEN_FUNCPTR *DeleteQueries)(GLsizei n, const GLuint *ids);
-    extern GLboolean (CODEGEN_FUNCPTR *IsQuery)(GLuint id);
-    extern void (CODEGEN_FUNCPTR *BeginQuery)(GLenum target, GLuint id);
-    extern void (CODEGEN_FUNCPTR *EndQuery)(GLenum target);
-    extern void (CODEGEN_FUNCPTR *GetQueryiv)(GLenum target, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetQueryObjectiv)(GLuint id, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetQueryObjectuiv)(GLuint id, GLenum pname, GLuint *params);
-    extern void (CODEGEN_FUNCPTR *BindBuffer)(GLenum target, GLuint buffer);
-    extern void (CODEGEN_FUNCPTR *DeleteBuffers)(GLsizei n, const GLuint *buffers);
-    extern void (CODEGEN_FUNCPTR *GenBuffers)(GLsizei n, GLuint *buffers);
-    extern GLboolean (CODEGEN_FUNCPTR *IsBuffer)(GLuint buffer);
-    extern void (CODEGEN_FUNCPTR *BufferData)(GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage);
-    extern void (CODEGEN_FUNCPTR *BufferSubData)(GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *GetBufferSubData)(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *data);
-    extern GLvoid* (CODEGEN_FUNCPTR *MapBuffer)(GLenum target, GLenum access);
-    extern GLboolean (CODEGEN_FUNCPTR *UnmapBuffer)(GLenum target);
-    extern void (CODEGEN_FUNCPTR *GetBufferParameteriv)(GLenum target, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetBufferPointerv)(GLenum target, GLenum pname, GLvoid* *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GenQueries)(GLsizei n, GLuint *ids);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DeleteQueries)(GLsizei n, மாறிலி GLuint *ids);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsQuery)(GLuint id);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BeginQuery)(GLenum target, GLuint id);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *EndQuery)(GLenum target);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetQueryiv)(GLenum target, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetQueryObjectiv)(GLuint id, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetQueryObjectuiv)(GLuint id, GLenum pname, GLuint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BindBuffer)(GLenum target, GLuint buffer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DeleteBuffers)(GLsizei n, மாறிலி GLuint *buffers);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GenBuffers)(GLsizei n, GLuint *buffers);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsBuffer)(GLuint buffer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BufferData)(GLenum target, GLsizeiptr size, மாறிலி GLvoid *data, GLenum usage);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BufferSubData)(GLenum target, GLintptr offset, GLsizeiptr size, மாறிலி GLvoid *data);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetBufferSubData)(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *data);
+    வெளி GLvoid* (CODEGEN_FUNCPTR *MapBuffer)(GLenum target, GLenum access);
+    வெளி GLboolean (CODEGEN_FUNCPTR *UnmapBuffer)(GLenum target);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetBufferParameteriv)(GLenum target, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetBufferPointerv)(GLenum target, GLenum pname, GLvoid* *params);
 
     // Extension: 2.0
-    extern void (CODEGEN_FUNCPTR *BlendEquationSeparate)(GLenum modeRGB, GLenum modeAlpha);
-    extern void (CODEGEN_FUNCPTR *DrawBuffers)(GLsizei n, const GLenum *bufs);
-    extern void (CODEGEN_FUNCPTR *StencilOpSeparate)(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
-    extern void (CODEGEN_FUNCPTR *StencilFuncSeparate)(GLenum face, GLenum func, GLint ref, GLuint mask);
-    extern void (CODEGEN_FUNCPTR *StencilMaskSeparate)(GLenum face, GLuint mask);
-    extern void (CODEGEN_FUNCPTR *AttachShader)(GLuint program, GLuint shader);
-    extern void (CODEGEN_FUNCPTR *BindAttribLocation)(GLuint program, GLuint index, const GLchar *name);
-    extern void (CODEGEN_FUNCPTR *CompileShader)(GLuint shader);
-    extern GLuint (CODEGEN_FUNCPTR *CreateProgram)();
-    extern GLuint (CODEGEN_FUNCPTR *CreateShader)(GLenum type);
-    extern void (CODEGEN_FUNCPTR *DeleteProgram)(GLuint program);
-    extern void (CODEGEN_FUNCPTR *DeleteShader)(GLuint shader);
-    extern void (CODEGEN_FUNCPTR *DetachShader)(GLuint program, GLuint shader);
-    extern void (CODEGEN_FUNCPTR *DisableVertexAttribArray)(GLuint index);
-    extern void (CODEGEN_FUNCPTR *EnableVertexAttribArray)(GLuint index);
-    extern void (CODEGEN_FUNCPTR *GetActiveAttrib)(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniform)(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
-    extern void (CODEGEN_FUNCPTR *GetAttachedShaders)(GLuint program, GLsizei maxCount, GLsizei *count, GLuint *obj);
-    extern GLint (CODEGEN_FUNCPTR *GetAttribLocation)(GLuint program, const GLchar *name);
-    extern void (CODEGEN_FUNCPTR *GetProgramiv)(GLuint program, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetProgramInfoLog)(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
-    extern void (CODEGEN_FUNCPTR *GetShaderiv)(GLuint shader, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetShaderInfoLog)(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
-    extern void (CODEGEN_FUNCPTR *GetShaderSource)(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source);
-    extern GLint (CODEGEN_FUNCPTR *GetUniformLocation)(GLuint program, const GLchar *name);
-    extern void (CODEGEN_FUNCPTR *GetUniformfv)(GLuint program, GLint location, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetUniformiv)(GLuint program, GLint location, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribdv)(GLuint index, GLenum pname, GLdouble *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribfv)(GLuint index, GLenum pname, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribiv)(GLuint index, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribPointerv)(GLuint index, GLenum pname, GLvoid* *pointer);
-    extern GLboolean (CODEGEN_FUNCPTR *IsProgram)(GLuint program);
-    extern GLboolean (CODEGEN_FUNCPTR *IsShader)(GLuint shader);
-    extern void (CODEGEN_FUNCPTR *LinkProgram)(GLuint program);
-    extern void (CODEGEN_FUNCPTR *ShaderSource)(GLuint shader, GLsizei count, const GLchar* const *string, const GLint *length);
-    extern void (CODEGEN_FUNCPTR *UseProgram)(GLuint program);
-    extern void (CODEGEN_FUNCPTR *Uniform1f)(GLint location, GLfloat v0);
-    extern void (CODEGEN_FUNCPTR *Uniform2f)(GLint location, GLfloat v0, GLfloat v1);
-    extern void (CODEGEN_FUNCPTR *Uniform3f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
-    extern void (CODEGEN_FUNCPTR *Uniform4f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
-    extern void (CODEGEN_FUNCPTR *Uniform1i)(GLint location, GLint v0);
-    extern void (CODEGEN_FUNCPTR *Uniform2i)(GLint location, GLint v0, GLint v1);
-    extern void (CODEGEN_FUNCPTR *Uniform3i)(GLint location, GLint v0, GLint v1, GLint v2);
-    extern void (CODEGEN_FUNCPTR *Uniform4i)(GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
-    extern void (CODEGEN_FUNCPTR *Uniform1fv)(GLint location, GLsizei count, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *Uniform2fv)(GLint location, GLsizei count, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *Uniform3fv)(GLint location, GLsizei count, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *Uniform4fv)(GLint location, GLsizei count, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *Uniform1iv)(GLint location, GLsizei count, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform2iv)(GLint location, GLsizei count, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform3iv)(GLint location, GLsizei count, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform4iv)(GLint location, GLsizei count, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix2fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix3fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *ValidateProgram)(GLuint program);
-    extern void (CODEGEN_FUNCPTR *VertexAttribPointer)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BlendEquationSeparate)(GLenum modeRGB, GLenum modeAlpha);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DrawBuffers)(GLsizei n, மாறிலி GLenum *bufs);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *StencilOpSeparate)(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *StencilFuncSeparate)(GLenum face, GLenum func, GLint ref, GLuint mask);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *StencilMaskSeparate)(GLenum face, GLuint mask);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *AttachShader)(GLuint program, GLuint shader);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BindAttribLocation)(GLuint program, GLuint index, மாறிலி GLchar *name);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CompileShader)(GLuint shader);
+    வெளி GLuint (CODEGEN_FUNCPTR *CreateProgram)();
+    வெளி GLuint (CODEGEN_FUNCPTR *CreateShader)(GLenum type);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DeleteProgram)(GLuint program);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DeleteShader)(GLuint shader);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DetachShader)(GLuint program, GLuint shader);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DisableVertexAttribArray)(GLuint index);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *EnableVertexAttribArray)(GLuint index);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetActiveAttrib)(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetActiveUniform)(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetAttachedShaders)(GLuint program, GLsizei max_மொத்தம், GLsizei *மொத்தம்_2, GLuint *obj);
+    வெளி GLint (CODEGEN_FUNCPTR *GetAttribLocation)(GLuint program, மாறிலி GLchar *name);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetProgramiv)(GLuint program, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetProgramInfoLog)(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetShaderiv)(GLuint shader, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetShaderInfoLog)(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetShaderSource)(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source);
+    வெளி GLint (CODEGEN_FUNCPTR *GetUniformLocation)(GLuint program, மாறிலி GLchar *name);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetUniformfv)(GLuint program, GLint location, GLfloat *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetUniformiv)(GLuint program, GLint location, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetVertexAttribdv)(GLuint index, GLenum pname, GLdouble *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetVertexAttribfv)(GLuint index, GLenum pname, GLfloat *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetVertexAttribiv)(GLuint index, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetVertexAttribPointerv)(GLuint index, GLenum pname, GLvoid* *pointer);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsProgram)(GLuint program);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsShader)(GLuint shader);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *LinkProgram)(GLuint program);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ShaderSource)(GLuint shader, GLsizei மொத்தம்_2, மாறிலி GLchar* மாறிலி *string, மாறிலி GLint *length);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UseProgram)(GLuint program);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform1f)(GLint location, GLfloat v0);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform2f)(GLint location, GLfloat v0, GLfloat v1);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform3f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform4f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform1i)(GLint location, GLint v0);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform2i)(GLint location, GLint v0, GLint v1);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform3i)(GLint location, GLint v0, GLint v1, GLint v2);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform4i)(GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform1fv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform2fv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform3fv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform4fv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform1iv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform2iv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform3iv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform4iv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformMatrix2fv)(GLint location, GLsizei மொத்தம்_2, GLboolean transpose, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformMatrix3fv)(GLint location, GLsizei மொத்தம்_2, GLboolean transpose, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformMatrix4fv)(GLint location, GLsizei மொத்தம்_2, GLboolean transpose, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ValidateProgram)(GLuint program);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribPointer)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, மாறிலி GLvoid *pointer);
 
     // Extension: 2.1
-    extern void (CODEGEN_FUNCPTR *UniformMatrix2x3fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix3x2fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix2x4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix4x2fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix3x4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix4x3fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformMatrix2x3fv)(GLint location, GLsizei மொத்தம்_2, GLboolean transpose, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformMatrix3x2fv)(GLint location, GLsizei மொத்தம்_2, GLboolean transpose, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformMatrix2x4fv)(GLint location, GLsizei மொத்தம்_2, GLboolean transpose, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformMatrix4x2fv)(GLint location, GLsizei மொத்தம்_2, GLboolean transpose, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformMatrix3x4fv)(GLint location, GLsizei மொத்தம்_2, GLboolean transpose, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformMatrix4x3fv)(GLint location, GLsizei மொத்தம்_2, GLboolean transpose, மாறிலி GLfloat *value);
 
     // Extension: ARB_vertex_array_object
-    extern void (CODEGEN_FUNCPTR *BindVertexArray)(GLuint ren_array);
-    extern void (CODEGEN_FUNCPTR *DeleteVertexArrays)(GLsizei n, const GLuint *arrays);
-    extern void (CODEGEN_FUNCPTR *GenVertexArrays)(GLsizei n, GLuint *arrays);
-    extern GLboolean (CODEGEN_FUNCPTR *IsVertexArray)(GLuint ren_array);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BindVertexArray)(GLuint ren_array);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DeleteVertexArrays)(GLsizei n, மாறிலி GLuint *arrays);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GenVertexArrays)(GLsizei n, GLuint *arrays);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsVertexArray)(GLuint ren_array);
 
     // Extension: ARB_map_buffer_range
-    extern GLvoid* (CODEGEN_FUNCPTR *MapBufferRange)(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
-    extern void (CODEGEN_FUNCPTR *FlushMappedBufferRange)(GLenum target, GLintptr offset, GLsizeiptr length);
+    வெளி GLvoid* (CODEGEN_FUNCPTR *MapBufferRange)(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *FlushMappedBufferRange)(GLenum target, GLintptr offset, GLsizeiptr length);
 
     // Extension: ARB_framebuffer_object
-    extern GLboolean (CODEGEN_FUNCPTR *IsRenderbuffer)(GLuint renderbuffer);
-    extern void (CODEGEN_FUNCPTR *BindRenderbuffer)(GLenum target, GLuint renderbuffer);
-    extern void (CODEGEN_FUNCPTR *DeleteRenderbuffers)(GLsizei n, const GLuint *renderbuffers);
-    extern void (CODEGEN_FUNCPTR *GenRenderbuffers)(GLsizei n, GLuint *renderbuffers);
-    extern void (CODEGEN_FUNCPTR *RenderbufferStorage)(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *GetRenderbufferParameteriv)(GLenum target, GLenum pname, GLint *params);
-    extern GLboolean (CODEGEN_FUNCPTR *IsFramebuffer)(GLuint framebuffer);
-    extern void (CODEGEN_FUNCPTR *BindFramebuffer)(GLenum target, GLuint framebuffer);
-    extern void (CODEGEN_FUNCPTR *DeleteFramebuffers)(GLsizei n, const GLuint *framebuffers);
-    extern void (CODEGEN_FUNCPTR *GenFramebuffers)(GLsizei n, GLuint *framebuffers);
-    extern GLenum (CODEGEN_FUNCPTR *CheckFramebufferStatus)(GLenum target);
-    extern void (CODEGEN_FUNCPTR *FramebufferTexture1D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
-    extern void (CODEGEN_FUNCPTR *FramebufferTexture2D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
-    extern void (CODEGEN_FUNCPTR *FramebufferTexture3D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset);
-    extern void (CODEGEN_FUNCPTR *FramebufferRenderbuffer)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
-    extern void (CODEGEN_FUNCPTR *GetFramebufferAttachmentParameteriv)(GLenum target, GLenum attachment, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GenerateMipmap)(GLenum target);
-    extern void (CODEGEN_FUNCPTR *BlitFramebuffer)(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
-    extern void (CODEGEN_FUNCPTR *RenderbufferStorageMultisample)(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *FramebufferTextureLayer)(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsRenderbuffer)(GLuint renderbuffer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BindRenderbuffer)(GLenum target, GLuint renderbuffer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DeleteRenderbuffers)(GLsizei n, மாறிலி GLuint *renderbuffers);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GenRenderbuffers)(GLsizei n, GLuint *renderbuffers);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *RenderbufferStorage)(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetRenderbufferParameteriv)(GLenum target, GLenum pname, GLint *params);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsFramebuffer)(GLuint framebuffer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BindFramebuffer)(GLenum target, GLuint framebuffer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DeleteFramebuffers)(GLsizei n, மாறிலி GLuint *framebuffers);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GenFramebuffers)(GLsizei n, GLuint *framebuffers);
+    வெளி GLenum (CODEGEN_FUNCPTR *CheckFramebufferStatus)(GLenum target);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *FramebufferTexture1D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *FramebufferTexture2D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *FramebufferTexture3D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *FramebufferRenderbuffer)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetFramebufferAttachmentParameteriv)(GLenum target, GLenum attachment, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GenerateMipmap)(GLenum target);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BlitFramebuffer)(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *RenderbufferStorageMultisample)(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *FramebufferTextureLayer)(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
 
     // Extension: 3.0
-    extern void (CODEGEN_FUNCPTR *ColorMaski)(GLuint index, GLboolean r, GLboolean g, GLboolean b, GLboolean a);
-    extern void (CODEGEN_FUNCPTR *GetBooleani_v)(GLenum target, GLuint index, GLboolean *data);
-    extern void (CODEGEN_FUNCPTR *GetIntegeri_v)(GLenum target, GLuint index, GLint *data);
-    extern void (CODEGEN_FUNCPTR *Enablei)(GLenum target, GLuint index);
-    extern void (CODEGEN_FUNCPTR *Disablei)(GLenum target, GLuint index);
-    extern GLboolean (CODEGEN_FUNCPTR *IsEnabledi)(GLenum target, GLuint index);
-    extern void (CODEGEN_FUNCPTR *BeginTransformFeedback)(GLenum primitiveMode);
-    extern void (CODEGEN_FUNCPTR *EndTransformFeedback)();
-    extern void (CODEGEN_FUNCPTR *BindBufferRange)(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size);
-    extern void (CODEGEN_FUNCPTR *BindBufferBase)(GLenum target, GLuint index, GLuint buffer);
-    extern void (CODEGEN_FUNCPTR *TransformFeedbackVaryings)(GLuint program, GLsizei count, const GLchar* const *varyings, GLenum bufferMode);
-    extern void (CODEGEN_FUNCPTR *GetTransformFeedbackVarying)(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLsizei *size, GLenum *type, GLchar *name);
-    extern void (CODEGEN_FUNCPTR *ClampColor)(GLenum target, GLenum clamp);
-    extern void (CODEGEN_FUNCPTR *BeginConditionalRender)(GLuint id, GLenum mode);
-    extern void (CODEGEN_FUNCPTR *EndConditionalRender)();
-    extern void (CODEGEN_FUNCPTR *VertexAttribIPointer)(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribIiv)(GLuint index, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribIuiv)(GLuint index, GLenum pname, GLuint *params);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI1i)(GLuint index, GLint x);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI2i)(GLuint index, GLint x, GLint y);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI3i)(GLuint index, GLint x, GLint y, GLint z);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4i)(GLuint index, GLint x, GLint y, GLint z, GLint w);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI1ui)(GLuint index, GLuint x);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI2ui)(GLuint index, GLuint x, GLuint y);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI3ui)(GLuint index, GLuint x, GLuint y, GLuint z);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4ui)(GLuint index, GLuint x, GLuint y, GLuint z, GLuint w);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI1iv)(GLuint index, const GLint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI2iv)(GLuint index, const GLint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI3iv)(GLuint index, const GLint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4iv)(GLuint index, const GLint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI1uiv)(GLuint index, const GLuint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI2uiv)(GLuint index, const GLuint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI3uiv)(GLuint index, const GLuint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4uiv)(GLuint index, const GLuint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4bv)(GLuint index, const GLbyte *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4sv)(GLuint index, const GLshort *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4ubv)(GLuint index, const GLubyte *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4usv)(GLuint index, const GLushort *v);
-    extern void (CODEGEN_FUNCPTR *GetUniformuiv)(GLuint program, GLint location, GLuint *params);
-    extern void (CODEGEN_FUNCPTR *BindFragDataLocation)(GLuint program, GLuint color, const GLchar *name);
-    extern GLint (CODEGEN_FUNCPTR *GetFragDataLocation)(GLuint program, const GLchar *name);
-    extern void (CODEGEN_FUNCPTR *Uniform1ui)(GLint location, GLuint v0);
-    extern void (CODEGEN_FUNCPTR *Uniform2ui)(GLint location, GLuint v0, GLuint v1);
-    extern void (CODEGEN_FUNCPTR *Uniform3ui)(GLint location, GLuint v0, GLuint v1, GLuint v2);
-    extern void (CODEGEN_FUNCPTR *Uniform4ui)(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3);
-    extern void (CODEGEN_FUNCPTR *Uniform1uiv)(GLint location, GLsizei count, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform2uiv)(GLint location, GLsizei count, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform3uiv)(GLint location, GLsizei count, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform4uiv)(GLint location, GLsizei count, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *TexParameterIiv)(GLenum target, GLenum pname, const GLint *params);
-    extern void (CODEGEN_FUNCPTR *TexParameterIuiv)(GLenum target, GLenum pname, const GLuint *params);
-    extern void (CODEGEN_FUNCPTR *GetTexParameterIiv)(GLenum target, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetTexParameterIuiv)(GLenum target, GLenum pname, GLuint *params);
-    extern void (CODEGEN_FUNCPTR *ClearBufferiv)(GLenum buffer, GLint drawbuffer, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *ClearBufferuiv)(GLenum buffer, GLint drawbuffer, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *ClearBufferfv)(GLenum buffer, GLint drawbuffer, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *ClearBufferfi)(GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil);
-    extern const GLubyte * (CODEGEN_FUNCPTR *GetStringi)(GLenum name, GLuint index);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ColorMaski)(GLuint index, GLboolean r, GLboolean g, GLboolean b, GLboolean a);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetBooleani_v)(GLenum target, GLuint index, GLboolean *data);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetIntegeri_v)(GLenum target, GLuint index, GLint *data);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Enablei)(GLenum target, GLuint index);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Disablei)(GLenum target, GLuint index);
+    வெளி GLboolean (CODEGEN_FUNCPTR *IsEnabledi)(GLenum target, GLuint index);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BeginTransformFeedback)(GLenum primitiveMode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *EndTransformFeedback)();
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BindBufferRange)(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BindBufferBase)(GLenum target, GLuint index, GLuint buffer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TransformFeedbackVaryings)(GLuint program, GLsizei மொத்தம்_2, மாறிலி GLchar* மாறிலி *varyings, GLenum bufferMode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetTransformFeedbackVarying)(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLsizei *size, GLenum *type, GLchar *name);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ClampColor)(GLenum target, GLenum clamp);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BeginConditionalRender)(GLuint id, GLenum mode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *EndConditionalRender)();
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribIPointer)(GLuint index, GLint size, GLenum type, GLsizei stride, மாறிலி GLvoid *pointer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetVertexAttribIiv)(GLuint index, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetVertexAttribIuiv)(GLuint index, GLenum pname, GLuint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI1i)(GLuint index, GLint x);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI2i)(GLuint index, GLint x, GLint y);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI3i)(GLuint index, GLint x, GLint y, GLint z);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI4i)(GLuint index, GLint x, GLint y, GLint z, GLint w);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI1ui)(GLuint index, GLuint x);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI2ui)(GLuint index, GLuint x, GLuint y);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI3ui)(GLuint index, GLuint x, GLuint y, GLuint z);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI4ui)(GLuint index, GLuint x, GLuint y, GLuint z, GLuint w);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI1iv)(GLuint index, மாறிலி GLint *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI2iv)(GLuint index, மாறிலி GLint *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI3iv)(GLuint index, மாறிலி GLint *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI4iv)(GLuint index, மாறிலி GLint *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI1uiv)(GLuint index, மாறிலி GLuint *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI2uiv)(GLuint index, மாறிலி GLuint *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI3uiv)(GLuint index, மாறிலி GLuint *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI4uiv)(GLuint index, மாறிலி GLuint *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI4bv)(GLuint index, மாறிலி GLbyte *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI4sv)(GLuint index, மாறிலி GLshort *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI4ubv)(GLuint index, மாறிலி GLubyte *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexAttribI4usv)(GLuint index, மாறிலி GLushort *v);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetUniformuiv)(GLuint program, GLint location, GLuint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *BindFragDataLocation)(GLuint program, GLuint color, மாறிலி GLchar *name);
+    வெளி GLint (CODEGEN_FUNCPTR *GetFragDataLocation)(GLuint program, மாறிலி GLchar *name);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform1ui)(GLint location, GLuint v0);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform2ui)(GLint location, GLuint v0, GLuint v1);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform3ui)(GLint location, GLuint v0, GLuint v1, GLuint v2);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform4ui)(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform1uiv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLuint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform2uiv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLuint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform3uiv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLuint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Uniform4uiv)(GLint location, GLsizei மொத்தம்_2, மாறிலி GLuint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexParameterIiv)(GLenum target, GLenum pname, மாறிலி GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexParameterIuiv)(GLenum target, GLenum pname, மாறிலி GLuint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetTexParameterIiv)(GLenum target, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetTexParameterIuiv)(GLenum target, GLenum pname, GLuint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ClearBufferiv)(GLenum buffer, GLint drawbuffer, மாறிலி GLint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ClearBufferuiv)(GLenum buffer, GLint drawbuffer, மாறிலி GLuint *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ClearBufferfv)(GLenum buffer, GLint drawbuffer, மாறிலி GLfloat *value);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ClearBufferfi)(GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil);
+    வெளி மாறிலி GLubyte * (CODEGEN_FUNCPTR *GetStringi)(GLenum name, GLuint index);
 
     // Extension: ARB_uniform_buffer_object
-    extern void (CODEGEN_FUNCPTR *GetUniformIndices)(GLuint program, GLsizei uniformCount, const GLchar* const *uniformNames, GLuint *uniformIndices);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniformsiv)(GLuint program, GLsizei uniformCount, const GLuint *uniformIndices, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniformName)(GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformName);
-    extern GLuint (CODEGEN_FUNCPTR *GetUniformBlockIndex)(GLuint program, const GLchar *uniformBlockName);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniformBlockiv)(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniformBlockName)(GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformBlockName);
-    extern void (CODEGEN_FUNCPTR *UniformBlockBinding)(GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetUniformIndices)(GLuint program, GLsizei uniform_மொத்தம், மாறிலி GLchar* மாறிலி *uniformNames, GLuint *uniformIndices);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetActiveUniformsiv)(GLuint program, GLsizei uniform_மொத்தம், மாறிலி GLuint *uniformIndices, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetActiveUniformName)(GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformName);
+    வெளி GLuint (CODEGEN_FUNCPTR *GetUniformBlockIndex)(GLuint program, மாறிலி GLchar *uniformBlockName);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetActiveUniformBlockiv)(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint *params);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *GetActiveUniformBlockName)(GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformBlockName);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *UniformBlockBinding)(GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding);
 
     // Extension: ARB_copy_buffer
-    extern void (CODEGEN_FUNCPTR *CopyBufferSubData)(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *CopyBufferSubData)(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size);
 
     // Extension: 3.1
-    extern void (CODEGEN_FUNCPTR *DrawArraysInstanced)(GLenum mode, GLint first, GLsizei count, GLsizei instancecount);
-    extern void (CODEGEN_FUNCPTR *DrawElementsInstanced)(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices, GLsizei instancecount);
-    extern void (CODEGEN_FUNCPTR *TexBuffer)(GLenum target, GLenum internalformat, GLuint buffer);
-    extern void (CODEGEN_FUNCPTR *PrimitiveRestartIndex)(GLuint index);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DrawArraysInstanced)(GLenum mode, GLint first, GLsizei மொத்தம்_2, GLsizei instancecount);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DrawElementsInstanced)(GLenum mode, GLsizei மொத்தம்_2, GLenum type, மாறிலி GLvoid *indices, GLsizei instancecount);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexBuffer)(GLenum target, GLenum internalformat, GLuint buffer);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *PrimitiveRestartIndex)(GLuint index);
 
     // Legacy
-    extern void (CODEGEN_FUNCPTR *EnableClientState)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *DisableClientState)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *VertexPointer)(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr);
-    extern void (CODEGEN_FUNCPTR *NormalPointer)(GLenum type, GLsizei stride, const GLvoid *ptr);
-    extern void (CODEGEN_FUNCPTR *ColorPointer)(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr);
-    extern void (CODEGEN_FUNCPTR *TexCoordPointer)(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr);
-    extern void (CODEGEN_FUNCPTR *TexEnvi)(GLenum target, GLenum pname, GLint param);
-    extern void (CODEGEN_FUNCPTR *MatrixMode)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *LoadIdentity)(void);
-    extern void (CODEGEN_FUNCPTR *Ortho)(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
-    extern void (CODEGEN_FUNCPTR *Color3d)(GLdouble red, GLdouble green, GLdouble blue);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *EnableClientState)(GLenum cap);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *DisableClientState)(GLenum cap);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *VertexPointer)(GLint size, GLenum type, GLsizei stride, மாறிலி GLvoid *ptr);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *NormalPointer)(GLenum type, GLsizei stride, மாறிலி GLvoid *ptr);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *ColorPointer)(GLint size, GLenum type, GLsizei stride, மாறிலி GLvoid *ptr);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexCoordPointer)(GLint size, GLenum type, GLsizei stride, மாறிலி GLvoid *ptr);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *TexEnvi)(GLenum target, GLenum pname, GLint param);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *MatrixMode)(GLenum mode);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *LoadIdentity)(வெறுமை);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Ortho)(GLdouble இடது, GLdouble வலது, GLdouble bottom, GLdouble உச்சி_2, GLdouble near_val, GLdouble far_val);
+    வெளி வெறுமை (CODEGEN_FUNCPTR *Color3d)(GLdouble red, GLdouble green, GLdouble blue);
 }
 
 #endif // OPENGL_NOLOAD_STYLE_HPP

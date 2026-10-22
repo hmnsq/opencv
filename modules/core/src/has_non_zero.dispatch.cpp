@@ -3,16 +3,16 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#அந்தர்பாவ "precomp.hpp"
+#அந்தர்பாவ "opencl_kernels_core.hpp"
+#அந்தர்பாவ "stat.hpp"
 
-#include "has_non_zero.simd.hpp"
-#include "has_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#அந்தர்பாவ "has_non_zero.simd.hpp"
+#அந்தர்பாவ "has_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+நாமாகாஶ cv {
 
-static HasNonZeroFunc getHasNonZeroFunc(int depth)
+நிலையான HasNonZeroFunc getHasNonZeroFunc(முழு depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getHasNonZeroFunc, (depth),
@@ -20,19 +20,19 @@ static HasNonZeroFunc getHasNonZeroFunc(int depth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_hasNonZero( InputArray _src, bool & res )
+நிலையான தருக்க ocl_hasNonZero( உள்ளீடு_Array _src, தருக்க & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    முழு type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
+    தருக்க doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    எனில் (depth == CV_64F && !doubleSupport)
+        திரும்பு பொய்;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
+    முழு dbsize = ocl::Device::getDefault().maxComputeUnits();
     size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    முழு wgs2_aligned = 1;
+    போது (wgs2_aligned < (முழு)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
@@ -40,31 +40,31 @@ static bool ocl_hasNonZero( InputArray _src, bool & res )
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::typeToStr(depth), (முழு)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    எனில் (k.empty())
+        திரும்பு பொய்;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (முழு)src.total(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = (saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0])>0), true;
-    return false;
+    எனில் (k.run(1, &globalsize, &wgs, உண்மை))
+        திரும்பு res = (saturate_cast<முழு>(cv::sum(db.getMat(ACCESS_READ))[0])>0), உண்மை;
+    திரும்பு பொய்;
 }
 #endif
 
-bool hasNonZero(InputArray _src)
+தருக்க hasNonZero(உள்ளீடு_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    முழு type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-    bool res = false;
+    தருக்க res = பொய்;
 
 #ifdef HAVE_OPENCL
     CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
@@ -77,31 +77,31 @@ bool hasNonZero(InputArray _src)
     HasNonZeroFunc func = getHasNonZeroFunc(src.depth());
     CV_Assert( func != 0 );
 
-    if (src.dims == 2)//fast path to avoid creating planes of single rows
+    எனில் (src.dims == 2)//fast path to avoid creating planes of single rows
     {
-        if (src.isContinuous())
+        எனில் (src.isContinuous())
             res |= func(src.ptr<uchar>(0), src.total());
-        else
-            for(int row = 0, rowsCount = src.rows ; !res && (row<rowsCount) ; ++row)
+        இல்லையெனில்
+            க்கு(முழு row = 0, rows_மொத்தம் = src.rows ; !res && (row<rows_மொத்தம்) ; ++row)
                 res |= func(src.ptr<uchar>(row), src.cols);
     }
-    else//if (src.dims != 2)
+    இல்லையெனில்//if (src.dims != 2)
     {
-        const Mat* arrays[] = {&src, nullptr};
+        மாறிலி Mat* arrays[] = {&src, nullptr};
         Mat planes[1];
         NAryMatIterator itNAry(arrays, planes, 1);
-        for(size_t p = 0 ; !res && (p<itNAry.nplanes) ; ++p, ++itNAry)
+        க்கு(size_t p = 0 ; !res && (p<itNAry.nplanes) ; ++p, ++itNAry)
         {
-            const Mat& plane = itNAry.planes[0];
-            if (plane.isContinuous())
+            மாறிலி Mat& plane = itNAry.planes[0];
+            எனில் (plane.isContinuous())
                 res |= func(plane.ptr<uchar>(0), plane.total());
-            else
-              for(int row = 0, rowsCount = plane.rows ; !res && (row<rowsCount) ; ++row)
+            இல்லையெனில்
+              க்கு(முழு row = 0, rows_மொத்தம் = plane.rows ; !res && (row<rows_மொத்தம்) ; ++row)
                   res |= func(plane.ptr<uchar>(row), plane.cols);
         }
     }
 
-    return res;
+    திரும்பு res;
 }
 
 } // namespace

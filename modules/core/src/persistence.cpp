@@ -2,85 +2,85 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
-#include "persistence_impl.hpp"
-#include "persistence_base64_encoding.hpp"
-#include <unordered_map>
-#include <iterator>
+#அந்தர்பாவ "precomp.hpp"
+#அந்தர்பாவ "persistence.hpp"
+#அந்தர்பாவ "persistence_impl.hpp"
+#அந்தர்பாவ "persistence_base64_encoding.hpp"
+#அந்தர்பாவ <unordered_map>
+#அந்தர்பாவ <iterator>
 
-#include <opencv2/core/utils/logger.hpp>
+#அந்தர்பாவ <opencv2/core/utils/logger.hpp>
 
 #define CV_SEQ_ELTYPE_PTR            CV_MAKE_TYPE(CV_8U, 8 /*sizeof(void*)*/)
 
-namespace cv
+நாமாகாஶ cv
 {
 
-namespace fs
+நாமாகாஶ fs
 {
 
-int strcasecmp(const char* s1, const char* s2)
+முழு strcasecmp(மாறிலி எழுத்து* s1, மாறிலி எழுத்து* s2)
 {
-    const char* dummy="";
-    if(!s1) s1=dummy;
-    if(!s2) s2=dummy;
+    மாறிலி எழுத்து* dummy="";
+    எனில்(!s1) s1=dummy;
+    எனில்(!s2) s2=dummy;
 
     size_t len1 = strlen(s1);
     size_t len2 = strlen(s2);
     size_t i, len = std::min(len1, len2);
-    for( i = 0; i < len; i++ )
+    க்கு( i = 0; i < len; i++ )
     {
-        int d = tolower((int)s1[i]) - tolower((int)s2[i]);
-        if( d != 0 )
-            return d;
+        முழு d = tolower((முழு)s1[i]) - tolower((முழு)s2[i]);
+        எனில்( d != 0 )
+            திரும்பு d;
     }
-    return len1 < len2 ? -1 : len1 > len2 ? 1 : 0;
+    திரும்பு len1 < len2 ? -1 : len1 > len2 ? 1 : 0;
 }
 
-char* itoa( int _val, char* buffer, int /*radix*/ )
+எழுத்து* itoa( முழு _val, எழுத்து* buffer, முழு /*radix*/ )
 {
-    const int radix = 10;
-    char* ptr=buffer + 23 /* enough even for 64-bit integers */;
+    மாறிலி முழு radix = 10;
+    எழுத்து* ptr=buffer + 23 /* enough even for 64-bit integers */;
     unsigned val = abs(_val);
 
     *ptr = '\0';
-    do
+    செய்
     {
         unsigned r = val / radix;
-        *--ptr = (char)(val - (r*radix) + '0');
+        *--ptr = (எழுத்து)(val - (r*radix) + '0');
         val = r;
     }
-    while( val != 0 );
+    போது( val != 0 );
 
-    if( _val < 0 )
+    எனில்( _val < 0 )
         *--ptr = '-';
 
-    return ptr;
+    திரும்பு ptr;
 }
 
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed)
+எழுத்து* itoa( int64_t _val, எழுத்து* buffer, முழு /*radix*/, தருக்க _signed)
 {
-    const int radix = 10;
-    char* ptr=buffer + 23 /* enough even for 64-bit integers */;
-    int sign = _signed && _val < 0 ? -1 : 1;
+    மாறிலி முழு radix = 10;
+    எழுத்து* ptr=buffer + 23 /* enough even for 64-bit integers */;
+    முழு sign = _signed && _val < 0 ? -1 : 1;
     uint64_t val = !_signed ? (uint64_t)_val : abs(_val);
 
     *ptr = '\0';
-    do
+    செய்
     {
         uint64_t r = val / radix;
-        *--ptr = (char)(val - (r*radix) + '0');
+        *--ptr = (எழுத்து)(val - (r*radix) + '0');
         val = r;
     }
-    while( val != 0 );
+    போது( val != 0 );
 
-    if( sign < 0 )
+    எனில்( sign < 0 )
         *--ptr = '-';
 
-    return ptr;
+    திரும்பு ptr;
 }
 
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero )
+எழுத்து* doubleToString( எழுத்து* buf, size_t bufSize, இரட்டை value, தருக்க explicitZero )
 {
     Cv64suf val;
     unsigned ieee754_hi;
@@ -88,324 +88,324 @@ char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero
     val.f = value;
     ieee754_hi = (unsigned)(val.u >> 32);
 
-    if( (ieee754_hi & 0x7ff00000) != 0x7ff00000 )
+    எனில்( (ieee754_hi & 0x7ff00000) != 0x7ff00000 )
     {
-        int ivalue = cvRound(value);
-        if( ivalue == value )
+        முழு ivalue = cvRound(value);
+        எனில்( ivalue == value )
         {
-            if( explicitZero )
+            எனில்( explicitZero )
                 snprintf( buf, bufSize, "%d.0", ivalue );
-            else
+            இல்லையெனில்
                 snprintf( buf, bufSize, "%d.", ivalue );
         }
-        else
+        இல்லையெனில்
         {
             // binary64 has 52 bit fraction with hidden bit.
             // 53 * log_10(2) is 15.955. So "%.16f" should be fine, but its test fails.
             snprintf( buf, bufSize, "%.17g", value );
 
-            char* ptr = buf;
-            if( *ptr == '+' || *ptr == '-' )
+            எழுத்து* ptr = buf;
+            எனில்( *ptr == '+' || *ptr == '-' )
                 ptr++;
-            for( ; cv_isdigit(*ptr); ptr++ )
+            க்கு( ; cv_isdigit(*ptr); ptr++ )
                 ;
-            if( *ptr == ',' )
+            எனில்( *ptr == ',' )
                 *ptr = '.';
         }
     }
-    else
+    இல்லையெனில்
     {
         unsigned ieee754_lo = (unsigned)val.u;
-        if( (ieee754_hi & 0x7fffffff) + (ieee754_lo != 0) > 0x7ff00000 )
+        எனில்( (ieee754_hi & 0x7fffffff) + (ieee754_lo != 0) > 0x7ff00000 )
             strcpy( buf, ".Nan" );
-        else
-            strcpy( buf, (int)ieee754_hi < 0 ? "-.Inf" : ".Inf" );
+        இல்லையெனில்
+            strcpy( buf, (முழு)ieee754_hi < 0 ? "-.Inf" : ".Inf" );
     }
 
-    return buf;
+    திரும்பு buf;
 }
 
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero )
+எழுத்து* floatToString( எழுத்து* buf, size_t bufSize, தசம value, தருக்க halfprecision, தருக்க explicitZero )
 {
     Cv32suf val;
     unsigned ieee754;
     val.f = value;
     ieee754 = val.u;
 
-    if( (ieee754 & 0x7f800000) != 0x7f800000 )
+    எனில்( (ieee754 & 0x7f800000) != 0x7f800000 )
     {
-        int ivalue = cvRound(value);
-        if( ivalue == value )
+        முழு ivalue = cvRound(value);
+        எனில்( ivalue == value )
         {
-            if( explicitZero )
+            எனில்( explicitZero )
                 snprintf( buf, bufSize, "%d.0", ivalue );
-            else
+            இல்லையெனில்
                 snprintf( buf, bufSize, "%d.", ivalue );
         }
-        else
+        இல்லையெனில்
         {
-            if (halfprecision)
+            எனில் (halfprecision)
             {
                 // bfloat16 has 7 bit fraction with hidden bit.
                 // binary16 has 10 bit fraction with hidden bit.
                 // 11 * log_10(2) is 3.311. So "%.4f" should be fine, but its test fails.
                 snprintf(buf, bufSize, "%.5g", value);
             }
-            else
+            இல்லையெனில்
             {
                 // binray32 has 23 bit fraction with hidden bit.
                 // 24 * log_10(2) is 7.225. So "%.8f" should be fine, but its test fails.
                 snprintf(buf, bufSize, "%.9g", value);
             }
 
-            char* ptr = buf;
-            if( *ptr == '+' || *ptr == '-' )
+            எழுத்து* ptr = buf;
+            எனில்( *ptr == '+' || *ptr == '-' )
                 ptr++;
-            for( ; cv_isdigit(*ptr); ptr++ )
+            க்கு( ; cv_isdigit(*ptr); ptr++ )
                 ;
-            if( *ptr == ',' )
+            எனில்( *ptr == ',' )
                 *ptr = '.';
         }
     }
-    else
+    இல்லையெனில்
     {
-        if( (ieee754 & 0x7fffffff) != 0x7f800000 )
+        எனில்( (ieee754 & 0x7fffffff) != 0x7f800000 )
             strcpy( buf, ".Nan" );
-        else
-            strcpy( buf, (int)ieee754 < 0 ? "-.Inf" : ".Inf" );
+        இல்லையெனில்
+            strcpy( buf, (முழு)ieee754 < 0 ? "-.Inf" : ".Inf" );
     }
 
-    return buf;
+    திரும்பு buf;
 }
 
-static const char symbols[] = "ucwsifdhHbUIneE";
+நிலையான மாறிலி எழுத்து symbols[] = "ucwsifdhHbUIneE";
 
-static char typeSymbol(int depth)
+நிலையான எழுத்து type_குறியீடு(முழு depth)
 {
     CV_StaticAssert(CV_64F == 6, "");
     CV_CheckDepth(depth, depth >= 0 && depth <= CV_8F_E4M3FNUZ, "");
-    return symbols[depth];
+    திரும்பு symbols[depth];
 }
 
-static int symbolToType(char c)
+நிலையான முழு குறியீடு_To_Type(எழுத்து c)
 {
-    if (c == 'r')
-        return CV_SEQ_ELTYPE_PTR;
-    const char* pos = strchr( symbols, c );
-    if( !pos )
+    எனில் (c == 'r')
+        திரும்பு CV_SEQ_ELTYPE_PTR;
+    மாறிலி எழுத்து* pos = strchr( symbols, c );
+    எனில்( !pos )
         CV_Error( cv::Error::StsBadArg, "Invalid data type specification" );
-    return static_cast<int>(pos - symbols);
+    திரும்பு static_cast<முழு>(pos - symbols);
 }
 
-char* encodeFormat(int elem_type, char* dt, size_t dt_len)
+எழுத்து* encodeFormat(முழு elem_type, எழுத்து* dt, size_t dt_len)
 {
-    int cn = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 1 : CV_MAT_CN(elem_type);
-    char symbol = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : typeSymbol(CV_MAT_DEPTH(elem_type));
-    snprintf(dt, dt_len, "%d%c", cn, symbol);
-    return dt + (cn == 1 ? 1 : 0);
+    முழு cn = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 1 : CV_MAT_CN(elem_type);
+    எழுத்து குறியீடு = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : type_குறியீடு(CV_MAT_DEPTH(elem_type));
+    snprintf(dt, dt_len, "%d%c", cn, குறியீடு);
+    திரும்பு dt + (cn == 1 ? 1 : 0);
 }
 
 // Deprecated due to size of dt buffer being unknowable.
-char* encodeFormat(int elem_type, char* dt)
+எழுத்து* encodeFormat(முழு elem_type, எழுத்து* dt)
 {
     constexpr size_t max = 20+1+1; // UINT64_MAX + one char + nul termination.
-    return encodeFormat(elem_type, dt, max);
+    திரும்பு encodeFormat(elem_type, dt, max);
 }
 
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len )
+முழு decodeFormat( மாறிலி எழுத்து* dt, முழு* fmt_pairs, முழு max_len )
 {
-    int fmt_pair_count = 0;
-    int i = 0, k = 0, len = dt ? (int)strlen(dt) : 0;
+    முழு fmt_pair_மொத்தம் = 0;
+    முழு i = 0, k = 0, len = dt ? (முழு)strlen(dt) : 0;
 
-    if( !dt || !len )
-        return 0;
+    எனில்( !dt || !len )
+        திரும்பு 0;
 
     CV_Assert( fmt_pairs != 0 && max_len > 0 );
     fmt_pairs[0] = 0;
     max_len *= 2;
 
-    for( ; k < len; k++ )
+    க்கு( ; k < len; k++ )
     {
-        char c = dt[k];
+        எழுத்து c = dt[k];
 
-        if( cv_isdigit(c) )
+        எனில்( cv_isdigit(c) )
         {
-            int count = c - '0';
-            if( cv_isdigit(dt[k+1]) )
+            முழு மொத்தம்_2 = c - '0';
+            எனில்( cv_isdigit(dt[k+1]) )
             {
-                char* endptr = 0;
-                count = (int)strtol( dt+k, &endptr, 10 );
-                k = (int)(endptr - dt) - 1;
+                எழுத்து* endptr = 0;
+                மொத்தம்_2 = (முழு)strtol( dt+k, &endptr, 10 );
+                k = (முழு)(endptr - dt) - 1;
             }
 
-            if( count <= 0 )
+            எனில்( மொத்தம்_2 <= 0 )
                 CV_Error( cv::Error::StsBadArg, "Invalid data type specification" );
 
-            fmt_pairs[i] = count;
+            fmt_pairs[i] = மொத்தம்_2;
         }
-        else
+        இல்லையெனில்
         {
-            int depth = symbolToType(c);
-            if( fmt_pairs[i] == 0 )
+            முழு depth = குறியீடு_To_Type(c);
+            எனில்( fmt_pairs[i] == 0 )
                 fmt_pairs[i] = 1;
             fmt_pairs[i+1] = depth;
-            if( i > 0 && fmt_pairs[i+1] == fmt_pairs[i-1] )
+            எனில்( i > 0 && fmt_pairs[i+1] == fmt_pairs[i-1] )
                 fmt_pairs[i-2] += fmt_pairs[i];
-            else
+            இல்லையெனில்
             {
                 i += 2;
-                if( i >= max_len )
+                எனில்( i >= max_len )
                     CV_Error( cv::Error::StsBadArg, "Too long data type specification" );
             }
             fmt_pairs[i] = 0;
         }
     }
 
-    fmt_pair_count = i/2;
-    return fmt_pair_count;
+    fmt_pair_மொத்தம் = i/2;
+    திரும்பு fmt_pair_மொத்தம்;
 }
 
-int calcElemSize( const char* dt, int initial_size )
+முழு calcElemSize( மாறிலி எழுத்து* dt, முழு initial_size )
 {
-    int size = 0;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], i, fmt_pair_count;
-    int comp_size;
+    முழு size = 0;
+    முழு fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], i, fmt_pair_மொத்தம்;
+    முழு comp_size;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    fmt_pair_count *= 2;
-    for( i = 0, size = initial_size; i < fmt_pair_count; i += 2 )
+    fmt_pair_மொத்தம் = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+    fmt_pair_மொத்தம் *= 2;
+    க்கு( i = 0, size = initial_size; i < fmt_pair_மொத்தம்; i += 2 )
     {
         comp_size = CV_ELEM_SIZE(fmt_pairs[i+1]);
         size = cvAlign( size, comp_size );
         size += comp_size * fmt_pairs[i];
     }
-    if( initial_size == 0 )
+    எனில்( initial_size == 0 )
     {
         comp_size = CV_ELEM_SIZE(fmt_pairs[1]);
         size = cvAlign( size, comp_size );
     }
-    return size;
+    திரும்பு size;
 }
 
 
-int calcStructSize( const char* dt, int initial_size )
+முழு calcStructSize( மாறிலி எழுத்து* dt, முழு initial_size )
 {
-    int size = calcElemSize( dt, initial_size );
+    முழு size = calcElemSize( dt, initial_size );
     size_t elem_max_size = 0;
-    for ( const char * type = dt; *type != '\0'; type++ )
+    க்கு ( மாறிலி எழுத்து * type = dt; *type != '\0'; type++ )
     {
-        char v = *type;
-        if (v >= '0' && v <= '9')
-            continue;  // skip vector size
-        switch (v)
+        எழுத்து v = *type;
+        எனில் (v >= '0' && v <= '9')
+            தொடர்;  // skip vector size
+        தேர்வு (v)
         {
-        case 'u': { elem_max_size = std::max( elem_max_size, sizeof(uchar ) ); break; }
-        case 'b': { elem_max_size = std::max( elem_max_size, sizeof(bool  ) ); break; }
-        case 'c': { elem_max_size = std::max( elem_max_size, sizeof(schar ) ); break; }
-        case 'w': { elem_max_size = std::max( elem_max_size, sizeof(ushort) ); break; }
-        case 's': { elem_max_size = std::max( elem_max_size, sizeof(short ) ); break; }
-        case 'i': { elem_max_size = std::max( elem_max_size, sizeof(int   ) ); break; }
-        case 'n': { elem_max_size = std::max( elem_max_size, sizeof(unsigned) ); break; }
-        case 'f': { elem_max_size = std::max( elem_max_size, sizeof(float ) ); break; }
-        case 'd': { elem_max_size = std::max( elem_max_size, sizeof(double) ); break; }
-        case 'h': { elem_max_size = std::max( elem_max_size, sizeof(hfloat)); break; }
-        case 'H': { elem_max_size = std::max( elem_max_size, sizeof(bfloat)); break; }
-        case 'e': { elem_max_size = std::max( elem_max_size, sizeof(fp8_t) ); break; }
-        case 'E': { elem_max_size = std::max( elem_max_size, sizeof(fp8a_t)); break; }
-        case 'I': { elem_max_size = std::max( elem_max_size, sizeof(int64_t)); break; }
-        case 'U': { elem_max_size = std::max( elem_max_size, sizeof(uint64_t)); break; }
-        default:
-            CV_Error_(Error::StsNotImplemented, ("Unknown type identifier: '%c' in '%s'", (char)(*type), dt));
+        நிலை 'u': { elem_max_size = std::max( elem_max_size, அளவு(uchar ) ); நிறுத்து; }
+        நிலை 'b': { elem_max_size = std::max( elem_max_size, அளவு(தருக்க  ) ); நிறுத்து; }
+        நிலை 'c': { elem_max_size = std::max( elem_max_size, அளவு(schar ) ); நிறுத்து; }
+        நிலை 'w': { elem_max_size = std::max( elem_max_size, அளவு(ushort) ); நிறுத்து; }
+        நிலை 's': { elem_max_size = std::max( elem_max_size, அளவு(short ) ); நிறுத்து; }
+        நிலை 'i': { elem_max_size = std::max( elem_max_size, அளவு(முழு   ) ); நிறுத்து; }
+        நிலை 'n': { elem_max_size = std::max( elem_max_size, அளவு(unsigned) ); நிறுத்து; }
+        நிலை 'f': { elem_max_size = std::max( elem_max_size, அளவு(தசம ) ); நிறுத்து; }
+        நிலை 'd': { elem_max_size = std::max( elem_max_size, அளவு(இரட்டை) ); நிறுத்து; }
+        நிலை 'h': { elem_max_size = std::max( elem_max_size, அளவு(hfloat)); நிறுத்து; }
+        நிலை 'H': { elem_max_size = std::max( elem_max_size, அளவு(bfloat)); நிறுத்து; }
+        நிலை 'e': { elem_max_size = std::max( elem_max_size, அளவு(fp8_t) ); நிறுத்து; }
+        நிலை 'E': { elem_max_size = std::max( elem_max_size, அளவு(fp8a_t)); நிறுத்து; }
+        நிலை 'I': { elem_max_size = std::max( elem_max_size, அளவு(int64_t)); நிறுத்து; }
+        நிலை 'U': { elem_max_size = std::max( elem_max_size, அளவு(uint64_t)); நிறுத்து; }
+        இயல்பு:
+            CV_Error_(Error::StsNotImplemented, ("Unknown type identifier: '%c' in '%s'", (எழுத்து)(*type), dt));
         }
     }
-    size = cvAlign( size, static_cast<int>(elem_max_size) );
-    return size;
+    size = cvAlign( size, static_cast<முழு>(elem_max_size) );
+    திரும்பு size;
 }
 
-int decodeSimpleFormat( const char* dt )
+முழு decodeSimpleFormat( மாறிலி எழுத்து* dt )
 {
-    int elem_type = -1;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], fmt_pair_count;
+    முழு elem_type = -1;
+    முழு fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], fmt_pair_மொத்தம்;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    if( fmt_pair_count != 1 || fmt_pairs[0] >= CV_CN_MAX)
+    fmt_pair_மொத்தம் = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+    எனில்( fmt_pair_மொத்தம் != 1 || fmt_pairs[0] >= CV_CN_MAX)
         CV_Error( cv::Error::StsError, "Too complex format for the matrix" );
 
     elem_type = CV_MAKETYPE( fmt_pairs[1], fmt_pairs[0] );
 
-    return elem_type;
+    திரும்பு elem_type;
 }
 
 }
 
-#if defined __i386__ || defined(_M_IX86) || defined __x86_64__ || defined(_M_X64) || \
+#எனில் defined __i386__ || defined(_M_IX86) || defined __x86_64__ || defined(_M_X64) || \
     (defined (__LITTLE_ENDIAN__) && __LITTLE_ENDIAN__)
 #define CV_LITTLE_ENDIAN_MEM_ACCESS 1
-#else
+#இல்லையெனில்
 #define CV_LITTLE_ENDIAN_MEM_ACCESS 0
 #endif
 
-static inline int readInt(const uchar* p)
+நிலையான உள்வரி முழு readInt(மாறிலி uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    int val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
-    int val = (int)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
-    return val;
+#எனில் CV_LITTLE_ENDIAN_MEM_ACCESS
+    முழு val;
+    memcpy(&val, p, அளவு(val));
+    திரும்பு val;
+#இல்லையெனில்
+    முழு val = (முழு)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
+    திரும்பு val;
 #endif
 }
 
-static inline int64_t readLong(const uchar* p)
+நிலையான உள்வரி int64_t readLong(மாறிலி uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
+#எனில் CV_LITTLE_ENDIAN_MEM_ACCESS
     int64_t val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
+    memcpy(&val, p, அளவு(val));
+    திரும்பு val;
+#இல்லையெனில்
     unsigned val0 = (unsigned)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
     unsigned val1 = (unsigned)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
-    return val0 | ((int64_t)val1 << 32);
+    திரும்பு val0 | ((int64_t)val1 << 32);
 #endif
 }
 
-static inline double readReal(const uchar* p)
+நிலையான உள்வரி இரட்டை readReal(மாறிலி uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    double val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
+#எனில் CV_LITTLE_ENDIAN_MEM_ACCESS
+    இரட்டை val;
+    memcpy(&val, p, அளவு(val));
+    திரும்பு val;
+#இல்லையெனில்
     unsigned val0 = (unsigned)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
     unsigned val1 = (unsigned)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
     Cv64suf val;
     val.u = val0 | ((uint64)val1 << 32);
-    return val.f;
+    திரும்பு val.f;
 #endif
 }
 
 template <typename T>
-static inline void writeInt(uchar* p, T ival)
+நிலையான உள்வரி வெறுமை writeInt(uchar* p, T ival)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    memcpy(p, &ival, sizeof(ival));
-#else
-    for (size_t i = 0, j = 0; i < sizeof(ival); ++i, j += 8)
+#எனில் CV_LITTLE_ENDIAN_MEM_ACCESS
+    memcpy(p, &ival, அளவு(ival));
+#இல்லையெனில்
+    க்கு (size_t i = 0, j = 0; i < அளவு(ival); ++i, j += 8)
         p[i] = (uchar)(ival >> j);
 #endif
 }
 
-static inline void writeReal(uchar* p, double fval)
+நிலையான உள்வரி வெறுமை writeReal(uchar* p, இரட்டை fval)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    memcpy(p, &fval, sizeof(fval));
-#else
+#எனில் CV_LITTLE_ENDIAN_MEM_ACCESS
+    memcpy(p, &fval, அளவு(fval));
+#இல்லையெனில்
     Cv64suf v;
     v.f = fval;
     p[0] = (uchar)v.u;
@@ -421,28 +421,28 @@ static inline void writeReal(uchar* p, double fval)
 
 
 
-void FileStorage::Impl::init() {
+வெறுமை FileStorage::Impl::init() {
     flags = 0;
     buffer.clear();
     bufofs = 0;
     state = UNDEFINED;
-    is_using_base64 = false;
+    is_using_base64 = பொய்;
     state_of_writing_base64 = FileStorage_API::Base64State::Uncertain;
-    is_write_struct_delayed = false;
-    delayed_struct_key = nullptr;
+    is_write_struct_delayed = பொய்;
+    delayed_struct_சாவி = nullptr;
     delayed_struct_flags = 0;
     delayed_type_name = nullptr;
     base64_writer = nullptr;
-    is_opened = false;
-    dummy_eof = false;
-    write_mode = false;
-    mem_mode = false;
+    is_opened = பொய்;
+    dummy_eof = பொய்;
+    write_mode = பொய்;
+    mem_mode = பொய்;
     space = 0;
     wrap_margin = 71;
     fmt = 0;
     file = 0;
     gzfile = 0;
-    empty_stream = true;
+    empty_stream = உண்மை;
 
     strbufv.clear();
     strbuf = 0;
@@ -472,21 +472,21 @@ FileStorage::Impl::~Impl() {
     release();
 }
 
-void FileStorage::Impl::release(String *out) {
-    if (is_opened) {
-        if (out)
+வெறுமை FileStorage::Impl::release(String *out) {
+    எனில் (is_opened) {
+        எனில் (out)
             out->clear();
-        if (write_mode) {
-            while (write_stack.size() > 1) {
+        எனில் (write_mode) {
+            போது (write_அடுக்கு.size() > 1) {
                 endWriteStruct();
             }
             flush();
-            if (fmt == FileStorage::FORMAT_XML)
+            எனில் (fmt == FileStorage::FORMAT_XML)
                 puts("</opencv_storage>\n");
-            else if (fmt == FileStorage::FORMAT_JSON)
+            இல்லையெனில் எனில் (fmt == FileStorage::FORMAT_JSON)
                 puts("}\n");
         }
-        if (mem_mode && out) {
+        எனில் (mem_mode && out) {
             *out = cv::String(outbuf.begin(), outbuf.end());
         }
     }
@@ -494,111 +494,111 @@ void FileStorage::Impl::release(String *out) {
     init();
 }
 
-void FileStorage::Impl::analyze_file_name(const std::string &file_name, std::vector<std::string> &params) {
+வெறுமை FileStorage::Impl::analyze_file_name(மாறிலி std::string &file_name, std::vector<std::string> &params) {
     params.clear();
-    static const char not_file_name = '\n';
-    static const char parameter_begin = '?';
-    static const char parameter_separator = '&';
+    நிலையான மாறிலி எழுத்து not_file_name = '\n';
+    நிலையான மாறிலி எழுத்து parameter_begin = '?';
+    நிலையான மாறிலி எழுத்து parameter_separator = '&';
 
-    if (file_name.find(not_file_name, (size_t) 0) != std::string::npos)
-        return;
+    எனில் (file_name.find(not_file_name, (size_t) 0) != std::string::npos)
+        திரும்பு;
 
     size_t beg = file_name.find_last_of(parameter_begin);
     params.push_back(file_name.substr((size_t) 0, beg));
 
-    if (beg != std::string::npos) {
+    எனில் (beg != std::string::npos) {
         size_t end = file_name.size();
         beg++;
-        for (size_t param_beg = beg, param_end = beg;
+        க்கு (size_t param_beg = beg, param_end = beg;
              param_end < end;
              param_beg = param_end + 1) {
             param_end = file_name.find_first_of(parameter_separator, param_beg);
-            if ((param_end == std::string::npos || param_end != param_beg) && param_beg + 1 < end) {
+            எனில் ((param_end == std::string::npos || param_end != param_beg) && param_beg + 1 < end) {
                 params.push_back(file_name.substr(param_beg, param_end - param_beg));
             }
         }
     }
 }
 
-bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char *encoding) {
-    bool ok = true;
+தருக்க FileStorage::Impl::open(மாறிலி எழுத்து *filename_or_buf, முழு _flags, மாறிலி எழுத்து *encoding) {
+    தருக்க ok = உண்மை;
     release();
 
-    bool append = (_flags & 3) == FileStorage::APPEND;
+    தருக்க append = (_flags & 3) == FileStorage::APPEND;
     mem_mode = (_flags & FileStorage::MEMORY) != 0;
 
     write_mode = (_flags & 3) != 0;
-    bool write_base64 = (write_mode || append) && (_flags & FileStorage::BASE64) != 0;
+    தருக்க write_base64 = (write_mode || append) && (_flags & FileStorage::BASE64) != 0;
 
-    bool isGZ = false;
+    தருக்க isGZ = பொய்;
 
     std::vector<std::string> params;
     //if ( !mem_mode )
     {
         analyze_file_name(filename_or_buf, params);
-        if (!params.empty())
+        எனில் (!params.empty())
             filename = params[0];
 
-        if (!write_base64 && params.size() >= 2 &&
+        எனில் (!write_base64 && params.size() >= 2 &&
             std::find(params.begin() + 1, params.end(), std::string("base64")) != params.end())
             write_base64 = (write_mode || append);
     }
 
-    if (filename.size() == 0 && !mem_mode && !write_mode)
+    எனில் (filename.size() == 0 && !mem_mode && !write_mode)
         CV_Error(cv::Error::StsNullPtr, "NULL or empty filename");
 
-    if (mem_mode && append)
+    எனில் (mem_mode && append)
         CV_Error(cv::Error::StsBadFlag, "FileStorage::APPEND and FileStorage::MEMORY are not currently compatible");
 
     flags = _flags;
 
-    if (!mem_mode) {
+    எனில் (!mem_mode) {
         size_t dot_idx = filename.find_last_of('.');
-        char compression = '\0';
+        எழுத்து compression = '\0';
 
-        if (dot_idx != std::string::npos)
+        எனில் (dot_idx != std::string::npos)
         {
             std::string ext = filename.substr(dot_idx);
 
             // Instead of `ext.starts_with(".gz")
-            if (ext.size() >= 3 && (ext[1] == 'g') && (ext[2] == 'z') )
+            எனில் (ext.size() >= 3 && (ext[1] == 'g') && (ext[2] == 'z') )
             {
-                if (ext.size() == 3)
+                எனில் (ext.size() == 3)
                 {
                     // ".gz"
-                    isGZ = true;
+                    isGZ = உண்மை;
                 }
 
-                else if(ext.size() == 4 && cv_isdigit(ext[3]))
+                இல்லையெனில் எனில்(ext.size() == 4 && cv_isdigit(ext[3]))
                 {
                     // ".gz[0-9]"
-                    isGZ = true;
+                    isGZ = உண்மை;
                     compression = ext[3];
                     filename.pop_back(); // Replace `gz[0-9]' to 'gz'.
                 }
             }
         }
 
-        if (!isGZ) {
+        எனில் (!isGZ) {
             file = fopen(filename.c_str(), !write_mode ? "rt" : !append ? "wt" : "a+t");
-            if (!file)
+            எனில் (!file)
             {
-                CV_LOG_ERROR(NULL, "Can't open file: '" << filename << "' in " << (!write_mode ? "read" : !append ? "write" : "append") << " mode");
-                return false;
+                CV_LOG_ERROR(வெற்று, "Can't open file: '" << filename << "' in " << (!write_mode ? "read" : !append ? "write" : "append") << " mode");
+                திரும்பு பொய்;
             }
-        } else {
-#if USE_ZLIB
-            if (append) {
+        } இல்லையெனில் {
+#எனில் USE_ZLIB
+            எனில் (append) {
                 CV_Error(cv::Error::StsNotImplemented, "Appending data to compressed file is not implemented");
             }
-            char mode[] = {write_mode ? 'w' : 'r', 'b', compression ? compression : '3', '\0'};
+            எழுத்து mode[] = {write_mode ? 'w' : 'r', 'b', compression ? compression : '3', '\0'};
             gzfile = gzopen(filename.c_str(), mode);
-            if (!gzfile)
+            எனில் (!gzfile)
             {
-                CV_LOG_ERROR(NULL, "Can't open archive: '" << filename << "' mode=" << mode);
-                return false;
+                CV_LOG_ERROR(வெற்று, "Can't open archive: '" << filename << "' mode=" << mode);
+                திரும்பு பொய்;
             }
-#else
+#இல்லையெனில்
             CV_Error(cv::Error::StsNotImplemented, "There is no compressed file storage support in this configuration");
 #endif
         }
@@ -611,23 +611,23 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
     wrap_margin = 71;
     fmt = FileStorage::FORMAT_AUTO;
 
-    if (write_mode) {
+    எனில் (write_mode) {
         fmt = flags & FileStorage::FORMAT_MASK;
 
-        if (mem_mode)
+        எனில் (mem_mode)
             outbuf.clear();
 
-        if (fmt == FileStorage::FORMAT_AUTO && !filename.empty()) {
-            const char *dot_pos = NULL;
-            const char *dot_pos2 = NULL;
+        எனில் (fmt == FileStorage::FORMAT_AUTO && !filename.empty()) {
+            மாறிலி எழுத்து *dot_pos = வெற்று;
+            மாறிலி எழுத்து *dot_pos2 = வெற்று;
             // like strrchr() implementation, but save two last positions simultaneously
-            for (const char *pos = &filename[0]; pos[0] != 0; pos++) {
-                if (pos[0] == '.') {
+            க்கு (மாறிலி எழுத்து *pos = &filename[0]; pos[0] != 0; pos++) {
+                எனில் (pos[0] == '.') {
                     dot_pos2 = dot_pos;
                     dot_pos = pos;
                 }
             }
-            if (fs::strcasecmp(dot_pos, ".gz") == 0 && dot_pos2 != NULL) {
+            எனில் (fs::strcasecmp(dot_pos, ".gz") == 0 && dot_pos2 != வெற்று) {
                 dot_pos = dot_pos2;
             }
             fmt = (fs::strcasecmp(dot_pos, ".xml") == 0 || fs::strcasecmp(dot_pos, ".xml.gz") == 0)
@@ -635,68 +635,68 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                   : (fs::strcasecmp(dot_pos, ".json") == 0 || fs::strcasecmp(dot_pos, ".json.gz") == 0)
                     ? FileStorage::FORMAT_JSON
                     : FileStorage::FORMAT_YAML;
-        } else if (fmt == FileStorage::FORMAT_AUTO) {
+        } இல்லையெனில் எனில் (fmt == FileStorage::FORMAT_AUTO) {
             fmt = FileStorage::FORMAT_XML;
         }
 
         // we use factor=6 for XML (the longest characters (' and ") are encoded with 6 bytes (&apos; and &quot;)
         // and factor=4 for YAML ( as we use 4 bytes for non ASCII characters (e.g. \xAB))
-        int buf_size = CV_FS_MAX_LEN * (fmt == FileStorage::FORMAT_XML ? 6 : 4) + 1024;
+        முழு buf_size = CV_FS_MAX_LEN * (fmt == FileStorage::FORMAT_XML ? 6 : 4) + 1024;
 
-        if (append) {
+        எனில் (append) {
             fseek(file, 0, SEEK_END);
-            if (ftell(file) == 0)
-                append = false;
+            எனில் (ftell(file) == 0)
+                append = பொய்;
         }
 
-        write_stack.clear();
-        empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::MAP | FileNode::EMPTY, 0));
+        write_அடுக்கு.clear();
+        empty_stream = உண்மை;
+        write_அடுக்கு.push_back(FStructData("", File_முனை::MAP | File_முனை::EMPTY, 0));
         buffer.reserve(buf_size + 1024);
         buffer.resize(buf_size);
         bufofs = 0;
         is_using_base64 = write_base64;
         state_of_writing_base64 = FileStorage_API::Base64State::Uncertain;
 
-        if (fmt == FileStorage::FORMAT_XML) {
+        எனில் (fmt == FileStorage::FORMAT_XML) {
             size_t file_size = file ? (size_t) ftell(file) : (size_t) 0;
-            if (!append || file_size == 0) {
-                if (encoding && *encoding != '\0') {
-                    if (fs::strcasecmp(encoding, "UTF-16") == 0) {
+            எனில் (!append || file_size == 0) {
+                எனில் (encoding && *encoding != '\0') {
+                    எனில் (fs::strcasecmp(encoding, "UTF-16") == 0) {
                         release();
                         CV_Error(cv::Error::StsBadArg, "UTF-16 XML encoding is not supported! Use 8-bit encoding\n");
                     }
 
                     CV_Assert(strlen(encoding) < 1000);
-                    char buf[1100];
-                    snprintf(buf, sizeof(buf), "<?xml version=\"1.0\" encoding=\"%s\"?>\n", encoding);
+                    எழுத்து buf[1100];
+                    snprintf(buf, அளவு(buf), "<?xml version=\"1.0\" encoding=\"%s\"?>\n", encoding);
                     puts(buf);
-                } else
+                } இல்லையெனில்
                     puts("<?xml version=\"1.0\"?>\n");
                 puts("<opencv_storage>\n");
-            } else {
-                int xml_buf_size = 1 << 10;
-                char substr[] = "</opencv_storage>";
-                int last_occurrence = -1;
-                xml_buf_size = MIN(xml_buf_size, int(file_size));
+            } இல்லையெனில் {
+                முழு xml_buf_size = 1 << 10;
+                எழுத்து substr[] = "</opencv_storage>";
+                முழு last_occurrence = -1;
+                xml_buf_size = MIN(xml_buf_size, முழு(file_size));
                 fseek(file, -xml_buf_size, SEEK_END);
                 // find the last occurrence of </opencv_storage>
-                for (;;) {
-                    int line_offset = (int) ftell(file);
-                    const char *ptr0 = this->gets(xml_buf_size);
-                    const char *ptr = NULL;
-                    if (!ptr0)
-                        break;
+                க்கு (;;) {
+                    முழு வரி_offset = (முழு) ftell(file);
+                    மாறிலி எழுத்து *ptr0 = இது->gets(xml_buf_size);
+                    மாறிலி எழுத்து *ptr = வெற்று;
+                    எனில் (!ptr0)
+                        நிறுத்து;
                     ptr = ptr0;
-                    for (;;) {
+                    க்கு (;;) {
                         ptr = strstr(ptr, substr);
-                        if (!ptr)
-                            break;
-                        last_occurrence = line_offset + (int) (ptr - ptr0);
+                        எனில் (!ptr)
+                            நிறுத்து;
+                        last_occurrence = வரி_offset + (முழு) (ptr - ptr0);
                         ptr += strlen(substr);
                     }
                 }
-                if (last_occurrence < 0) {
+                எனில் (last_occurrence < 0) {
                     release();
                     CV_Error(cv::Error::StsError, "Could not find </opencv_storage> in the end of file.\n");
                 }
@@ -710,436 +710,436 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                 puts("\n");
             }
 
-            emitter_do_not_use_direct_dereference = createXMLEmitter(this);
-        } else if (fmt == FileStorage::FORMAT_YAML || fmt == FileStorage::FORMAT_YAML_1_0) {
-                if (!append) {
-                    if (fmt == FileStorage::FORMAT_YAML_1_0)
+            emitter_do_not_use_direct_dereference = createXMLEmitter(இது);
+        } இல்லையெனில் எனில் (fmt == FileStorage::FORMAT_YAML || fmt == FileStorage::FORMAT_YAML_1_0) {
+                எனில் (!append) {
+                    எனில் (fmt == FileStorage::FORMAT_YAML_1_0)
                         puts("%YAML:1.0\n---\n"); // Legacy Flag -> Legacy Header
-                    else
+                    இல்லையெனில்
                         puts("%YAML 1.2\n---\n"); // Default -> Modern Header
                 }
-            else
+            இல்லையெனில்
                 puts("...\n---\n");
 
-            emitter_do_not_use_direct_dereference = createYAMLEmitter(this);
-        } else {
+            emitter_do_not_use_direct_dereference = createYAMLEmitter(இது);
+        } இல்லையெனில் {
             CV_Assert(fmt == FileStorage::FORMAT_JSON);
-            if (!append)
+            எனில் (!append)
                 puts("{\n");
-            else {
-                bool valid = false;
+            இல்லையெனில் {
+                தருக்க valid = பொய்;
                 long roffset = 0;
-                for (;
+                க்கு (;
                         fseek(file, roffset, SEEK_END) == 0;
                         roffset -= 1) {
-                    const char end_mark = '}';
-                    if (fgetc(file) == end_mark) {
+                    மாறிலி எழுத்து end_mark = '}';
+                    எனில் (fgetc(file) == end_mark) {
                         fseek(file, roffset, SEEK_END);
-                        valid = true;
-                        break;
+                        valid = உண்மை;
+                        நிறுத்து;
                     }
                 }
 
-                if (valid) {
+                எனில் (valid) {
                     closeFile();
                     file = fopen(filename.c_str(), "r+t");
                     CV_Assert(file != 0);
                     fseek(file, roffset, SEEK_END);
                     fputs(",", file);
-                } else {
+                } இல்லையெனில் {
                     CV_Error(cv::Error::StsError, "Could not find '}' in the end of file.\n");
                 }
             }
-            write_stack.back().indent = 4;
-            emitter_do_not_use_direct_dereference = createJSONEmitter(this);
+            write_அடுக்கு.back().indent = 4;
+            emitter_do_not_use_direct_dereference = createJSONEmitter(இது);
         }
-        is_opened = true;
-    } else {
-        const size_t buf_size0 = 40;
+        is_opened = உண்மை;
+    } இல்லையெனில் {
+        மாறிலி size_t buf_size0 = 40;
         buffer.resize(buf_size0);
-        if (mem_mode) {
-            strbuf = (char *) filename_or_buf;
+        எனில் (mem_mode) {
+            strbuf = (எழுத்து *) filename_or_buf;
             strbufsize = strlen(strbuf);
         }
 
-        const char *yaml_signature = "%YAML";
-        const char *json_signature = "{";
-        const char *xml_signature = "<?xml";
-        char *buf = this->gets(16);
+        மாறிலி எழுத்து *yaml_signature = "%YAML";
+        மாறிலி எழுத்து *json_signature = "{";
+        மாறிலி எழுத்து *xml_signature = "<?xml";
+        எழுத்து *buf = இது->gets(16);
         CV_Assert(buf);
-        char *bufPtr = cv_skip_BOM(buf);
+        எழுத்து *bufPtr = cv_skip_BOM(buf);
         size_t bufOffset = bufPtr - buf;
 
         // NOTE: Yaml 1.2 allows to skip header. Data without type signature is read as YAML
-        if (strncmp(bufPtr, yaml_signature, strlen(yaml_signature)) == 0)
+        எனில் (strncmp(bufPtr, yaml_signature, strlen(yaml_signature)) == 0)
             fmt = FileStorage::FORMAT_YAML;
-        else if (strncmp(bufPtr, json_signature, strlen(json_signature)) == 0)
+        இல்லையெனில் எனில் (strncmp(bufPtr, json_signature, strlen(json_signature)) == 0)
             fmt = FileStorage::FORMAT_JSON;
-        else if (strncmp(bufPtr, xml_signature, strlen(xml_signature)) == 0)
+        இல்லையெனில் எனில் (strncmp(bufPtr, xml_signature, strlen(xml_signature)) == 0)
             fmt = FileStorage::FORMAT_XML;
-        else
+        இல்லையெனில்
             fmt = FileStorage::FORMAT_YAML;
 
         rewind();
         strbufpos = bufOffset;
         bufofs = 0;
 
-        try {
-            char *ptr = bufferStart();
+        முயல் {
+            எழுத்து *ptr = bufferStart();
             ptr[0] = ptr[1] = ptr[2] = '\0';
-            FileNode root_nodes(fs_ext, 0, 0);
+            File_முனை வேர்_nodes(fs_ext, 0, 0);
 
-            uchar *rptr = reserveNodeSpace(root_nodes, 9);
-            *rptr = FileNode::SEQ;
+            uchar *rptr = reserve_முனை_Space(வேர்_nodes, 9);
+            *rptr = File_முனை::SEQ;
             writeInt(rptr + 1, 4);
             writeInt(rptr + 5, 0);
 
             roots.clear();
 
-            switch (fmt) {
-                case FileStorage::FORMAT_XML:
-                    parser_do_not_use_direct_dereference = createXMLParser(this);
-                    break;
-                case FileStorage::FORMAT_YAML:
-                case FileStorage::FORMAT_YAML_1_0:
-                    parser_do_not_use_direct_dereference = createYAMLParser(this);
-                    break;
-                case FileStorage::FORMAT_JSON:
-                    parser_do_not_use_direct_dereference = createJSONParser(this);
-                    break;
-                default:
+            தேர்வு (fmt) {
+                நிலை FileStorage::FORMAT_XML:
+                    parser_do_not_use_direct_dereference = createXMLParser(இது);
+                    நிறுத்து;
+                நிலை FileStorage::FORMAT_YAML:
+                நிலை FileStorage::FORMAT_YAML_1_0:
+                    parser_do_not_use_direct_dereference = createYAMLParser(இது);
+                    நிறுத்து;
+                நிலை FileStorage::FORMAT_JSON:
+                    parser_do_not_use_direct_dereference = createJSONParser(இது);
+                    நிறுத்து;
+                இயல்பு:
                     parser_do_not_use_direct_dereference = Ptr<FileStorageParser>();
             }
 
-            if (!parser_do_not_use_direct_dereference.empty()) {
+            எனில் (!parser_do_not_use_direct_dereference.empty()) {
                 ok = getParser().parse(ptr);
-                if (ok) {
-                    finalizeCollection(root_nodes);
+                எனில் (ok) {
+                    finalizeCollection(வேர்_nodes);
 
                     CV_Assert(!fs_data_ptrs.empty());
-                    FileNode roots_node(fs_ext, 0, 0);
-                    size_t i, nroots = roots_node.size();
-                    FileNodeIterator it = roots_node.begin();
+                    File_முனை roots_முனை(fs_ext, 0, 0);
+                    size_t i, nroots = roots_முனை.size();
+                    File_முனை_Iterator it = roots_முனை.begin();
 
-                    for (i = 0; i < nroots; i++, ++it)
+                    க்கு (i = 0; i < nroots; i++, ++it)
                         roots.push_back(*it);
                 }
             }
         }
-        catch (...)
+        பிடி (...)
         {
             // FIXIT log error message
-            is_opened = true;
+            is_opened = உண்மை;
             release();
-            throw;
+            எறி;
         }
 
         // release resources that we do not need anymore
         closeFile();
-        is_opened = true;
-        std::vector<char> tmpbuf;
+        is_opened = உண்மை;
+        std::vector<எழுத்து> tmpbuf;
         std::swap(buffer, tmpbuf);
         bufofs = 0;
     }
-    return ok;
+    திரும்பு ok;
 }
 
-void FileStorage::Impl::puts(const char *str) {
+வெறுமை FileStorage::Impl::puts(மாறிலி எழுத்து *str) {
     CV_Assert(write_mode);
-    if (mem_mode)
+    எனில் (mem_mode)
         std::copy(str, str + strlen(str), std::back_inserter(outbuf));
-    else if (file)
+    இல்லையெனில் எனில் (file)
         fputs(str, file);
-#if USE_ZLIB
-    else if (gzfile)
+#எனில் USE_ZLIB
+    இல்லையெனில் எனில் (gzfile)
         gzputs(gzfile, str);
 #endif
-    else
+    இல்லையெனில்
         CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::getsFromFile(char *buf, int count) {
-    if (file)
-        return fgets(buf, count, file);
-#if USE_ZLIB
-    if (gzfile)
-        return gzgets(gzfile, buf, count);
+எழுத்து *FileStorage::Impl::getsFromFile(எழுத்து *buf, முழு மொத்தம்_2) {
+    எனில் (file)
+        திரும்பு fgets(buf, மொத்தம்_2, file);
+#எனில் USE_ZLIB
+    எனில் (gzfile)
+        திரும்பு gzgets(gzfile, buf, மொத்தம்_2);
 #endif
     CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::gets(size_t maxCount) {
-    if (strbuf) {
+எழுத்து *FileStorage::Impl::gets(size_t max_மொத்தம்) {
+    எனில் (strbuf) {
         size_t i = strbufpos, len = strbufsize;
-        const char *instr = strbuf;
-        for (; i < len; i++) {
-            char c = instr[i];
-            if (c == '\0' || c == '\n') {
-                if (c == '\n')
+        மாறிலி எழுத்து *instr = strbuf;
+        க்கு (; i < len; i++) {
+            எழுத்து c = instr[i];
+            எனில் (c == '\0' || c == '\n') {
+                எனில் (c == '\n')
                     i++;
-                break;
+                நிறுத்து;
             }
         }
-        size_t count = i - strbufpos;
-        if (maxCount == 0 || maxCount > count)
-            maxCount = count;
-        buffer.resize(std::max(buffer.size(), maxCount + 8));
-        memcpy(&buffer[0], instr + strbufpos, maxCount);
-        buffer[maxCount] = '\0';
+        size_t மொத்தம்_2 = i - strbufpos;
+        எனில் (max_மொத்தம் == 0 || max_மொத்தம் > மொத்தம்_2)
+            max_மொத்தம் = மொத்தம்_2;
+        buffer.resize(std::max(buffer.size(), max_மொத்தம் + 8));
+        memcpy(&buffer[0], instr + strbufpos, max_மொத்தம்);
+        buffer[max_மொத்தம்] = '\0';
         strbufpos = i;
-        return maxCount > 0 ? &buffer[0] : 0;
+        திரும்பு max_மொத்தம் > 0 ? &buffer[0] : 0;
     }
 
-    const size_t MAX_BLOCK_SIZE = INT_MAX / 2; // hopefully, that will be enough
-    if (maxCount == 0)
-        maxCount = MAX_BLOCK_SIZE;
-    else
-        CV_Assert(maxCount < MAX_BLOCK_SIZE);
+    மாறிலி size_t MAX_BLOCK_SIZE = INT_MAX / 2; // hopefully, that will be enough
+    எனில் (max_மொத்தம் == 0)
+        max_மொத்தம் = MAX_BLOCK_SIZE;
+    இல்லையெனில்
+        CV_Assert(max_மொத்தம் < MAX_BLOCK_SIZE);
     size_t ofs = 0;
 
-    for (;;) {
-        int count = (int) std::min(buffer.size() - ofs - 16, maxCount);
-        char *ptr = getsFromFile(&buffer[ofs], count + 1);
-        if (!ptr)
-            break;
-        int delta = (int) strlen(ptr);
+    க்கு (;;) {
+        முழு மொத்தம்_2 = (முழு) std::min(buffer.size() - ofs - 16, max_மொத்தம்);
+        எழுத்து *ptr = getsFromFile(&buffer[ofs], மொத்தம்_2 + 1);
+        எனில் (!ptr)
+            நிறுத்து;
+        முழு delta = (முழு) strlen(ptr);
         ofs += delta;
-        maxCount -= delta;
-        if (delta == 0 || ptr[delta - 1] == '\n' || maxCount == 0)
-            break;
-        if (delta == count)
+        max_மொத்தம் -= delta;
+        எனில் (delta == 0 || ptr[delta - 1] == '\n' || max_மொத்தம் == 0)
+            நிறுத்து;
+        எனில் (delta == மொத்தம்_2)
             buffer.resize((size_t) (buffer.size() * 1.5));
     }
-    return ofs > 0 ? &buffer[0] : 0;
+    திரும்பு ofs > 0 ? &buffer[0] : 0;
 }
 
-char *FileStorage::Impl::gets() {
-    char *ptr = this->gets(0);
-    if (!ptr) {
+எழுத்து *FileStorage::Impl::gets() {
+    எழுத்து *ptr = இது->gets(0);
+    எனில் (!ptr) {
         ptr = bufferStart();  // FIXIT Why do we need this hack? What is about other parsers JSON/YAML?
         *ptr = '\0';
         setEof();
-        return 0;
-    } else {
+        திரும்பு 0;
+    } இல்லையெனில் {
         size_t l = strlen(ptr);
-        if (l > 0 && ptr[l - 1] != '\n' && ptr[l - 1] != '\r' && !eof()) {
+        எனில் (l > 0 && ptr[l - 1] != '\n' && ptr[l - 1] != '\r' && !eof()) {
             ptr[l] = '\n';
             ptr[l + 1] = '\0';
         }
     }
     lineno++;
-    return ptr;
+    திரும்பு ptr;
 }
 
-bool FileStorage::Impl::eof() {
-    if (dummy_eof)
-        return true;
-    if (strbuf)
-        return strbufpos >= strbufsize;
-    if (file)
-        return feof(file) != 0;
-#if USE_ZLIB
-    if (gzfile)
-        return gzeof(gzfile) != 0;
+தருக்க FileStorage::Impl::eof() {
+    எனில் (dummy_eof)
+        திரும்பு உண்மை;
+    எனில் (strbuf)
+        திரும்பு strbufpos >= strbufsize;
+    எனில் (file)
+        திரும்பு feof(file) != 0;
+#எனில் USE_ZLIB
+    எனில் (gzfile)
+        திரும்பு gzeof(gzfile) != 0;
 #endif
-    return false;
+    திரும்பு பொய்;
 }
 
-void FileStorage::Impl::setEof() {
-    dummy_eof = true;
+வெறுமை FileStorage::Impl::setEof() {
+    dummy_eof = உண்மை;
 }
 
-void FileStorage::Impl::closeFile() {
-    if (file)
+வெறுமை FileStorage::Impl::closeFile() {
+    எனில் (file)
         fclose(file);
-#if USE_ZLIB
-    else if (gzfile)
+#எனில் USE_ZLIB
+    இல்லையெனில் எனில் (gzfile)
         gzclose(gzfile);
 #endif
     file = 0;
     gzfile = 0;
     strbuf = 0;
     strbufpos = 0;
-    is_opened = false;
+    is_opened = பொய்;
 }
 
-void FileStorage::Impl::rewind() {
-    if (file)
+வெறுமை FileStorage::Impl::rewind() {
+    எனில் (file)
         ::rewind(file);
-#if USE_ZLIB
-    else if (gzfile)
+#எனில் USE_ZLIB
+    இல்லையெனில் எனில் (gzfile)
         gzrewind(gzfile);
 #endif
     strbufpos = 0;
 }
 
-char *FileStorage::Impl::resizeWriteBuffer(char *ptr, int len) {
-    const char *buffer_end = &buffer[0] + buffer.size();
-    if (ptr + len < buffer_end)
-        return ptr;
+எழுத்து *FileStorage::Impl::resizeWriteBuffer(எழுத்து *ptr, முழு len) {
+    மாறிலி எழுத்து *buffer_end = &buffer[0] + buffer.size();
+    எனில் (ptr + len < buffer_end)
+        திரும்பு ptr;
 
-    const char *buffer_start = &buffer[0];
-    int written_len = (int) (ptr - buffer_start);
+    மாறிலி எழுத்து *buffer_start = &buffer[0];
+    முழு written_len = (முழு) (ptr - buffer_start);
 
-    CV_Assert(written_len <= (int) buffer.size());
-    int new_size = (int) ((buffer_end - buffer_start) * 3 / 2);
+    CV_Assert(written_len <= (முழு) buffer.size());
+    முழு new_size = (முழு) ((buffer_end - buffer_start) * 3 / 2);
     new_size = MAX(written_len + len, new_size);
     buffer.reserve(new_size + 256);
     buffer.resize(new_size);
     bufofs = written_len;
-    return &buffer[0] + bufofs;
+    திரும்பு &buffer[0] + bufofs;
 }
 
-char *FileStorage::Impl::flush() {
-    char *buffer_start = &buffer[0];
-    char *ptr = buffer_start + bufofs;
+எழுத்து *FileStorage::Impl::flush() {
+    எழுத்து *buffer_start = &buffer[0];
+    எழுத்து *ptr = buffer_start + bufofs;
 
-    if (ptr > buffer_start + space) {
+    எனில் (ptr > buffer_start + space) {
         ptr[0] = '\n';
         ptr[1] = '\0';
         puts(buffer_start);
         bufofs = 0;
     }
 
-    int indent = write_stack.back().indent;
+    முழு indent = write_அடுக்கு.back().indent;
 
-    if (space != indent) {
+    எனில் (space != indent) {
         memset(buffer_start, ' ', indent);
         space = indent;
     }
     bufofs = space;
     ptr = buffer_start + bufofs;
 
-    return ptr;
+    திரும்பு ptr;
 }
 
-void FileStorage::Impl::endWriteStruct() {
+வெறுமை FileStorage::Impl::endWriteStruct() {
     CV_Assert(write_mode);
 
-    check_if_write_struct_is_delayed(false);
-    if (state_of_writing_base64 != FileStorage_API::Uncertain)
+    check_if_write_struct_is_delayed(பொய்);
+    எனில் (state_of_writing_base64 != FileStorage_API::Uncertain)
         switch_to_Base64_state(FileStorage_API::Uncertain);
 
-    CV_Assert(!write_stack.empty());
+    CV_Assert(!write_அடுக்கு.empty());
 
-    FStructData &current_struct = write_stack.back();
-    if (fmt == FileStorage::FORMAT_JSON && !FileNode::isFlow(current_struct.flags) && write_stack.size() > 1)
-        current_struct.indent = write_stack[write_stack.size() - 2].indent;
+    FStructData &current_struct = write_அடுக்கு.back();
+    எனில் (fmt == FileStorage::FORMAT_JSON && !File_முனை::isFlow(current_struct.flags) && write_அடுக்கு.size() > 1)
+        current_struct.indent = write_அடுக்கு[write_அடுக்கு.size() - 2].indent;
 
     getEmitter().endWriteStruct(current_struct);
 
-    write_stack.pop_back();
-    if (!write_stack.empty())
-        write_stack.back().flags &= ~FileNode::EMPTY;
+    write_அடுக்கு.pop_back();
+    எனில் (!write_அடுக்கு.empty())
+        write_அடுக்கு.back().flags &= ~File_முனை::EMPTY;
 }
 
-void FileStorage::Impl::startWriteStruct_helper(const char *key, int struct_flags,
-                                                const char *type_name) {
+வெறுமை FileStorage::Impl::startWriteStruct_helper(மாறிலி எழுத்து *சாவி, முழு struct_flags,
+                                                மாறிலி எழுத்து *type_name) {
     CV_Assert(write_mode);
 
-    struct_flags = (struct_flags & (FileNode::TYPE_MASK | FileNode::FLOW)) | FileNode::EMPTY;
-    if (!FileNode::isCollection(struct_flags))
+    struct_flags = (struct_flags & (File_முனை::TYPE_MASK | File_முனை::FLOW)) | File_முனை::EMPTY;
+    எனில் (!File_முனை::isCollection(struct_flags))
         CV_Error(cv::Error::StsBadArg,
                  "Some collection type: FileNode::SEQ or FileNode::MAP must be specified");
 
-    if (type_name && type_name[0] == '\0')
+    எனில் (type_name && type_name[0] == '\0')
         type_name = 0;
 
-    FStructData s = getEmitter().startWriteStruct(write_stack.back(), key, struct_flags, type_name);
+    FStructData s = getEmitter().startWriteStruct(write_அடுக்கு.back(), சாவி, struct_flags, type_name);
 
-    write_stack.push_back(s);
-    size_t write_stack_size = write_stack.size();
-    if (write_stack_size > 1)
-        write_stack[write_stack_size - 2].flags &= ~FileNode::EMPTY;
+    write_அடுக்கு.push_back(s);
+    size_t write_அடுக்கு_size = write_அடுக்கு.size();
+    எனில் (write_அடுக்கு_size > 1)
+        write_அடுக்கு[write_அடுக்கு_size - 2].flags &= ~File_முனை::EMPTY;
 
-    if (fmt != FileStorage::FORMAT_JSON && !FileNode::isFlow(s.flags))
+    எனில் (fmt != FileStorage::FORMAT_JSON && !File_முனை::isFlow(s.flags))
         flush();
 
-    if (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && FileNode::isMap(struct_flags)) {
-        getEmitter().write("type_id", type_name, false);
+    எனில் (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && File_முனை::isMap(struct_flags)) {
+        getEmitter().லிக("type_id", type_name, பொய்);
     }
 }
 
-void FileStorage::Impl::startWriteStruct(const char *key, int struct_flags,
-                                         const char *type_name) {
-    check_if_write_struct_is_delayed(false);
-    if (state_of_writing_base64 == FileStorage_API::NotUse)
+வெறுமை FileStorage::Impl::startWriteStruct(மாறிலி எழுத்து *சாவி, முழு struct_flags,
+                                         மாறிலி எழுத்து *type_name) {
+    check_if_write_struct_is_delayed(பொய்);
+    எனில் (state_of_writing_base64 == FileStorage_API::NotUse)
         switch_to_Base64_state(FileStorage_API::Uncertain);
 
-    if (state_of_writing_base64 == FileStorage_API::Uncertain && FileNode::isSeq(struct_flags)
+    எனில் (state_of_writing_base64 == FileStorage_API::Uncertain && File_முனை::isSeq(struct_flags)
         && is_using_base64 && type_name == 0) {
         /* Uncertain whether output Base64 data */
-        make_write_struct_delayed(key, struct_flags, type_name);
-    } else if (type_name && memcmp(type_name, "binary", 6) == 0) {
+        make_write_struct_delayed(சாவி, struct_flags, type_name);
+    } இல்லையெனில் எனில் (type_name && memcmp(type_name, "binary", 6) == 0) {
         /* Must output Base64 data */
-        if ((FileNode::TYPE_MASK & struct_flags) != FileNode::SEQ)
+        எனில் ((File_முனை::TYPE_MASK & struct_flags) != File_முனை::SEQ)
             CV_Error(cv::Error::StsBadArg, "must set 'struct_flags |= CV_NODE_SEQ' if using Base64.");
-        else if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        இல்லையெனில் எனில் (state_of_writing_base64 != FileStorage_API::Uncertain)
             CV_Error(cv::Error::StsError, "function \'cvStartWriteStruct\' calls cannot be nested if using Base64.");
 
-        startWriteStruct_helper(key, struct_flags, "binary");
+        startWriteStruct_helper(சாவி, struct_flags, "binary");
 
-        if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        எனில் (state_of_writing_base64 != FileStorage_API::Uncertain)
             switch_to_Base64_state(FileStorage_API::Uncertain);
         switch_to_Base64_state(FileStorage_API::InUse);
-    } else {
+    } இல்லையெனில் {
         /* Won't output Base64 data */
-        if (state_of_writing_base64 == FileStorage_API::InUse)
+        எனில் (state_of_writing_base64 == FileStorage_API::InUse)
             CV_Error(cv::Error::StsError, "At the end of the output Base64, `cvEndWriteStruct` is needed.");
 
-        startWriteStruct_helper(key, struct_flags, type_name);
+        startWriteStruct_helper(சாவி, struct_flags, type_name);
 
-        if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        எனில் (state_of_writing_base64 != FileStorage_API::Uncertain)
             switch_to_Base64_state(FileStorage_API::Uncertain);
         switch_to_Base64_state(FileStorage_API::NotUse);
     }
 }
 
-void FileStorage::Impl::writeComment(const char *comment, bool eol_comment) {
+வெறுமை FileStorage::Impl::writeComment(மாறிலி எழுத்து *comment, தருக்க eol_comment) {
     CV_Assert(write_mode);
     getEmitter().writeComment(comment, eol_comment);
 }
 
-void FileStorage::Impl::startNextStream() {
+வெறுமை FileStorage::Impl::startNextStream() {
     CV_Assert(write_mode);
-    if (!empty_stream) {
-        while (!write_stack.empty())
+    எனில் (!empty_stream) {
+        போது (!write_அடுக்கு.empty())
             endWriteStruct();
         flush();
         getEmitter().startNextStream();
-        empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::EMPTY, 0));
+        empty_stream = உண்மை;
+        write_அடுக்கு.push_back(FStructData("", File_முனை::EMPTY, 0));
         bufofs = 0;
     }
 }
 
-void FileStorage::Impl::write(const String &key, int value) {
+வெறுமை FileStorage::Impl::லிக(மாறிலி String &சாவி, முழு value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().லிக(சாவி.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, int64_t value) {
+வெறுமை FileStorage::Impl::லிக(மாறிலி String &சாவி, int64_t value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().லிக(சாவி.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, double value) {
+வெறுமை FileStorage::Impl::லிக(மாறிலி String &சாவி, இரட்டை value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().லிக(சாவி.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, const String &value) {
+வெறுமை FileStorage::Impl::லிக(மாறிலி String &சாவி, மாறிலி String &value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value.c_str(), false);
+    getEmitter().லிக(சாவி.c_str(), value.c_str(), பொய்);
 }
 
-void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, size_t len) {
+வெறுமை FileStorage::Impl::writeRawData(மாறிலி std::string &dt, மாறிலி வெறுமை *_data, size_t len) {
     CV_Assert(write_mode);
 
-    if (is_using_base64 || state_of_writing_base64 == FileStorage_API::Base64State::InUse) {
+    எனில் (is_using_base64 || state_of_writing_base64 == FileStorage_API::Base64State::InUse) {
         writeRawDataBase64(_data, len, dt.c_str());
-        return;
-    } else if (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
+        திரும்பு;
+    } இல்லையெனில் எனில் (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
         switch_to_Base64_state(FileStorage_API::Base64State::NotUse);
     }
 
@@ -1148,400 +1148,400 @@ void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, s
     CV_Assert(len % elemSize == 0);
     len /= elemSize;
 
-    bool explicitZero = fmt == FileStorage::FORMAT_JSON;
-    const uchar *data0 = (const uchar *) _data;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2], k, fmt_pair_count;
-    char buf[256] = "";
+    தருக்க explicitZero = fmt == FileStorage::FORMAT_JSON;
+    மாறிலி uchar *data0 = (மாறிலி uchar *) _data;
+    முழு fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2], k, fmt_pair_மொத்தம்;
+    எழுத்து buf[256] = "";
 
-    fmt_pair_count = fs::decodeFormat(dt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    fmt_pair_மொத்தம் = fs::decodeFormat(dt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS);
 
-    if (!len)
-        return;
+    எனில் (!len)
+        திரும்பு;
 
-    if (!data0)
+    எனில் (!data0)
         CV_Error(cv::Error::StsNullPtr, "Null data pointer");
 
-    if (fmt_pair_count == 1) {
-        fmt_pairs[0] *= (int) len;
+    எனில் (fmt_pair_மொத்தம் == 1) {
+        fmt_pairs[0] *= (முழு) len;
         len = 1;
     }
 
-    for (; len--; data0 += elemSize) {
-        int offset = 0;
-        for (k = 0; k < fmt_pair_count; k++) {
-            int i, count = fmt_pairs[k * 2];
-            int elem_type = fmt_pairs[k * 2 + 1];
-            int elem_size = CV_ELEM_SIZE(elem_type);
-            const char *ptr;
+    க்கு (; len--; data0 += elemSize) {
+        முழு offset = 0;
+        க்கு (k = 0; k < fmt_pair_மொத்தம்; k++) {
+            முழு i, மொத்தம்_2 = fmt_pairs[k * 2];
+            முழு elem_type = fmt_pairs[k * 2 + 1];
+            முழு elem_size = CV_ELEM_SIZE(elem_type);
+            மாறிலி எழுத்து *ptr;
 
             offset = cvAlign(offset, elem_size);
-            const uchar *data = data0 + offset;
+            மாறிலி uchar *data = data0 + offset;
 
-            for (i = 0; i < count; i++) {
-                switch (elem_type) {
-                    case CV_8U:
+            க்கு (i = 0; i < மொத்தம்_2; i++) {
+                தேர்வு (elem_type) {
+                    நிலை CV_8U:
                         ptr = fs::itoa(*(uchar *) data, buf, 10);
                         data++;
-                        break;
-                    case CV_Bool:
+                        நிறுத்து;
+                    நிலை CV_Bool:
                         ptr = fs::itoa(*(uchar *) data != 0, buf, 10);
                         data++;
-                        break;
-                    case CV_8S:
-                        ptr = fs::itoa(*(char *) data, buf, 10);
+                        நிறுத்து;
+                    நிலை CV_8S:
+                        ptr = fs::itoa(*(எழுத்து *) data, buf, 10);
                         data++;
-                        break;
-                    case CV_16U:
+                        நிறுத்து;
+                    நிலை CV_16U:
                         ptr = fs::itoa(*(ushort *) data, buf, 10);
-                        data += sizeof(ushort);
-                        break;
-                    case CV_16S:
+                        data += அளவு(ushort);
+                        நிறுத்து;
+                    நிலை CV_16S:
                         ptr = fs::itoa(*(short *) data, buf, 10);
-                        data += sizeof(short);
-                        break;
-                    case CV_32U:
-                        ptr = fs::itoa((int64_t)*(unsigned*) data, buf, 10, false);
-                        data += sizeof(unsigned);
-                        break;
-                    case CV_32S:
-                        ptr = fs::itoa(*(int *) data, buf, 10);
-                        data += sizeof(int);
-                        break;
-                    case CV_64U:
-                        ptr = fs::itoa(*(uint64_t*) data, buf, 10, false);
-                        data += sizeof(uint64_t);
-                        break;
-                    case CV_64S:
-                        ptr = fs::itoa(*(int64_t*) data, buf, 10, true);
-                        data += sizeof(int64_t);
-                        break;
-                    case CV_32F:
-                        ptr = fs::floatToString(buf, sizeof(buf), *(float *) data, false, explicitZero);
-                        data += sizeof(float);
-                        break;
-                    case CV_64F:
-                        ptr = fs::doubleToString(buf, sizeof(buf), *(double *) data, explicitZero);
-                        data += sizeof(double);
-                        break;
-                    case CV_16F:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(hfloat *) data, true, explicitZero);
-                        data += sizeof(hfloat);
-                        break;
-                    case CV_16BF:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(bfloat *) data, true, explicitZero);
-                        data += sizeof(bfloat);
-                        break;
-                    case CV_8F_E4M3FN:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(fp8_t *) data, true, explicitZero);
-                        data += sizeof(fp8_t);
-                        break;
-                    case CV_8F_E4M3FNUZ:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(fp8a_t *) data, true, explicitZero);
-                        data += sizeof(fp8a_t);
-                        break;
-                    default:
+                        data += அளவு(short);
+                        நிறுத்து;
+                    நிலை CV_32U:
+                        ptr = fs::itoa((int64_t)*(unsigned*) data, buf, 10, பொய்);
+                        data += அளவு(unsigned);
+                        நிறுத்து;
+                    நிலை CV_32S:
+                        ptr = fs::itoa(*(முழு *) data, buf, 10);
+                        data += அளவு(முழு);
+                        நிறுத்து;
+                    நிலை CV_64U:
+                        ptr = fs::itoa(*(uint64_t*) data, buf, 10, பொய்);
+                        data += அளவு(uint64_t);
+                        நிறுத்து;
+                    நிலை CV_64S:
+                        ptr = fs::itoa(*(int64_t*) data, buf, 10, உண்மை);
+                        data += அளவு(int64_t);
+                        நிறுத்து;
+                    நிலை CV_32F:
+                        ptr = fs::floatToString(buf, அளவு(buf), *(தசம *) data, பொய், explicitZero);
+                        data += அளவு(தசம);
+                        நிறுத்து;
+                    நிலை CV_64F:
+                        ptr = fs::doubleToString(buf, அளவு(buf), *(இரட்டை *) data, explicitZero);
+                        data += அளவு(இரட்டை);
+                        நிறுத்து;
+                    நிலை CV_16F:
+                        ptr = fs::floatToString(buf, அளவு(buf), (தசம) *(hfloat *) data, உண்மை, explicitZero);
+                        data += அளவு(hfloat);
+                        நிறுத்து;
+                    நிலை CV_16BF:
+                        ptr = fs::floatToString(buf, அளவு(buf), (தசம) *(bfloat *) data, உண்மை, explicitZero);
+                        data += அளவு(bfloat);
+                        நிறுத்து;
+                    நிலை CV_8F_E4M3FN:
+                        ptr = fs::floatToString(buf, அளவு(buf), (தசம) *(fp8_t *) data, உண்மை, explicitZero);
+                        data += அளவு(fp8_t);
+                        நிறுத்து;
+                    நிலை CV_8F_E4M3FNUZ:
+                        ptr = fs::floatToString(buf, அளவு(buf), (தசம) *(fp8a_t *) data, உண்மை, explicitZero);
+                        data += அளவு(fp8a_t);
+                        நிறுத்து;
+                    இயல்பு:
                         CV_Error(cv::Error::StsUnsupportedFormat, "Unsupported type");
-                        return;
+                        திரும்பு;
                 }
 
                 getEmitter().writeScalar(0, ptr);
             }
 
-            offset = (int) (data - data0);
+            offset = (முழு) (data - data0);
         }
     }
 }
 
-void FileStorage::Impl::workaround() {
-    check_if_write_struct_is_delayed(false);
+வெறுமை FileStorage::Impl::workaround() {
+    check_if_write_struct_is_delayed(பொய்);
 
-    if (state_of_writing_base64 != FileStorage_API::Base64State::Uncertain)
+    எனில் (state_of_writing_base64 != FileStorage_API::Base64State::Uncertain)
         switch_to_Base64_state(FileStorage_API::Base64State::Uncertain);
 }
 
-void FileStorage::Impl::switch_to_Base64_state(FileStorage_API::Base64State new_state) {
-    const char *err_unkonwn_state = "Unexpected error, unable to determine the Base64 state.";
-    const char *err_unable_to_switch = "Unexpected error, unable to switch to this state.";
+வெறுமை FileStorage::Impl::switch_to_Base64_state(FileStorage_API::Base64State new_state) {
+    மாறிலி எழுத்து *err_unkonwn_state = "Unexpected error, unable to determine the Base64 state.";
+    மாறிலி எழுத்து *err_unable_to_switch = "Unexpected error, unable to switch to this state.";
 
     /* like a finite state machine */
-    switch (state_of_writing_base64) {
-        case FileStorage_API::Base64State::Uncertain:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
+    தேர்வு (state_of_writing_base64) {
+        நிலை FileStorage_API::Base64State::Uncertain:
+            தேர்வு (new_state) {
+                நிலை FileStorage_API::Base64State::InUse:
                 {
                     CV_DbgAssert(base64_writer == 0);
-                    bool can_indent = (fmt != cv::FileStorage::Mode::FORMAT_JSON);
-                    base64_writer = new base64::Base64Writer(*this, can_indent);
-                    if (!can_indent) {
-                        char *ptr = bufferPtr();
+                    தருக்க can_indent = (fmt != cv::FileStorage::Mode::FORMAT_JSON);
+                    base64_writer = புதிய base64::Base64Writer(*இது, can_indent);
+                    எனில் (!can_indent) {
+                        எழுத்து *ptr = bufferPtr();
                         *ptr++ = '\0';
                         puts(bufferStart());
                         setBufferPtr(bufferStart());
-                        memset(bufferStart(), 0, static_cast<int>(space));
+                        memset(bufferStart(), 0, static_cast<முழு>(space));
                         puts("\"$base64$");
                     }
-                    break;
+                    நிறுத்து;
                 }
-                case FileStorage_API::Base64State::Uncertain:
-                    break;
-                case FileStorage_API::Base64State::NotUse:
-                    break;
-                default:
+                நிலை FileStorage_API::Base64State::Uncertain:
+                    நிறுத்து;
+                நிலை FileStorage_API::Base64State::NotUse:
+                    நிறுத்து;
+                இயல்பு:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    நிறுத்து;
             }
-            break;
-        case FileStorage_API::Base64State::InUse:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
-                case FileStorage_API::Base64State::NotUse:
+            நிறுத்து;
+        நிலை FileStorage_API::Base64State::InUse:
+            தேர்வு (new_state) {
+                நிலை FileStorage_API::Base64State::InUse:
+                நிலை FileStorage_API::Base64State::NotUse:
                     CV_Error(cv::Error::StsError, err_unable_to_switch);
-                    break;
-                case FileStorage_API::Base64State::Uncertain:
+                    நிறுத்து;
+                நிலை FileStorage_API::Base64State::Uncertain:
                     delete base64_writer;
                     base64_writer = 0;
-                    if ( fmt == cv::FileStorage::FORMAT_JSON )
+                    எனில் ( fmt == cv::FileStorage::FORMAT_JSON )
                     {
                         puts("\"");
                         setBufferPtr(bufferStart());
                         flush();
-                        memset(bufferStart(), 0, static_cast<int>(space) );
+                        memset(bufferStart(), 0, static_cast<முழு>(space) );
                         setBufferPtr(bufferStart());
                     }
-                    break;
-                default:
+                    நிறுத்து;
+                இயல்பு:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    நிறுத்து;
             }
-            break;
-        case FileStorage_API::Base64State::NotUse:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
-                case FileStorage_API::Base64State::NotUse:
+            நிறுத்து;
+        நிலை FileStorage_API::Base64State::NotUse:
+            தேர்வு (new_state) {
+                நிலை FileStorage_API::Base64State::InUse:
+                நிலை FileStorage_API::Base64State::NotUse:
                     CV_Error(cv::Error::StsError, err_unable_to_switch);
-                    break;
-                case FileStorage_API::Base64State::Uncertain:
-                    break;
-                default:
+                    நிறுத்து;
+                நிலை FileStorage_API::Base64State::Uncertain:
+                    நிறுத்து;
+                இயல்பு:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    நிறுத்து;
             }
-            break;
-        default:
+            நிறுத்து;
+        இயல்பு:
             CV_Error(cv::Error::StsError, err_unkonwn_state);
-            break;
+            நிறுத்து;
     }
 
     state_of_writing_base64 = new_state;
 }
 
-void FileStorage::Impl::make_write_struct_delayed(const char *key, int struct_flags, const char *type_name) {
-    CV_Assert(is_write_struct_delayed == false);
-    CV_DbgAssert(delayed_struct_key == nullptr);
+வெறுமை FileStorage::Impl::make_write_struct_delayed(மாறிலி எழுத்து *சாவி, முழு struct_flags, மாறிலி எழுத்து *type_name) {
+    CV_Assert(is_write_struct_delayed == பொய்);
+    CV_DbgAssert(delayed_struct_சாவி == nullptr);
     CV_DbgAssert(delayed_struct_flags == 0);
     CV_DbgAssert(delayed_type_name == nullptr);
 
     delayed_struct_flags = struct_flags;
 
-    if (key != nullptr) {
-        delayed_struct_key = new char[strlen(key) + 1U];
-        strcpy(delayed_struct_key, key);
+    எனில் (சாவி != nullptr) {
+        delayed_struct_சாவி = புதிய எழுத்து[strlen(சாவி) + 1U];
+        strcpy(delayed_struct_சாவி, சாவி);
     }
 
-    if (type_name != nullptr) {
-        delayed_type_name = new char[strlen(type_name) + 1U];
+    எனில் (type_name != nullptr) {
+        delayed_type_name = புதிய எழுத்து[strlen(type_name) + 1U];
         strcpy(delayed_type_name, type_name);
     }
 
-    is_write_struct_delayed = true;
+    is_write_struct_delayed = உண்மை;
 }
 
-void FileStorage::Impl::check_if_write_struct_is_delayed(bool change_type_to_base64) {
-    if (is_write_struct_delayed) {
+வெறுமை FileStorage::Impl::check_if_write_struct_is_delayed(தருக்க change_type_to_base64) {
+    எனில் (is_write_struct_delayed) {
         /* save data to prevent recursive call errors */
-        std::string struct_key;
+        std::string struct_சாவி;
         std::string type_name;
-        int struct_flags = delayed_struct_flags;
+        முழு struct_flags = delayed_struct_flags;
 
-        if (delayed_struct_key != nullptr && *delayed_struct_key != '\0') {
-            struct_key.assign(delayed_struct_key);
+        எனில் (delayed_struct_சாவி != nullptr && *delayed_struct_சாவி != '\0') {
+            struct_சாவி.assign(delayed_struct_சாவி);
         }
-        if (delayed_type_name != nullptr && *delayed_type_name != '\0') {
+        எனில் (delayed_type_name != nullptr && *delayed_type_name != '\0') {
             type_name.assign(delayed_type_name);
         }
 
         /* reset */
-        delete[] delayed_struct_key;
+        delete[] delayed_struct_சாவி;
         delete[] delayed_type_name;
-        delayed_struct_key = nullptr;
+        delayed_struct_சாவி = nullptr;
         delayed_struct_flags = 0;
         delayed_type_name = nullptr;
 
-        is_write_struct_delayed = false;
+        is_write_struct_delayed = பொய்;
 
         /* call */
-        if (change_type_to_base64) {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, "binary");
-            if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        எனில் (change_type_to_base64) {
+            startWriteStruct_helper(struct_சாவி.c_str(), struct_flags, "binary");
+            எனில் (state_of_writing_base64 != FileStorage_API::Uncertain)
                 switch_to_Base64_state(FileStorage_API::Uncertain);
             switch_to_Base64_state(FileStorage_API::InUse);
-        } else {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, type_name.c_str());
-            if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        } இல்லையெனில் {
+            startWriteStruct_helper(struct_சாவி.c_str(), struct_flags, type_name.c_str());
+            எனில் (state_of_writing_base64 != FileStorage_API::Uncertain)
                 switch_to_Base64_state(FileStorage_API::Uncertain);
             switch_to_Base64_state(FileStorage_API::NotUse);
         }
     }
 }
 
-void FileStorage::Impl::writeRawDataBase64(const void *_data, size_t len, const char *dt) {
+வெறுமை FileStorage::Impl::writeRawDataBase64(மாறிலி வெறுமை *_data, size_t len, மாறிலி எழுத்து *dt) {
     CV_Assert(write_mode);
 
-    check_if_write_struct_is_delayed(true);
+    check_if_write_struct_is_delayed(உண்மை);
 
-    if (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
+    எனில் (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
         switch_to_Base64_state(FileStorage_API::Base64State::InUse);
-    } else if (state_of_writing_base64 != FileStorage_API::Base64State::InUse) {
+    } இல்லையெனில் எனில் (state_of_writing_base64 != FileStorage_API::Base64State::InUse) {
         CV_Error(cv::Error::StsError, "Base64 should not be used at present.");
     }
 
-    base64_writer->write(_data, len, dt);
+    base64_writer->லிக(_data, len, dt);
 }
 
-FileNode FileStorage::Impl::getFirstTopLevelNode() const {
-    return roots.empty() ? FileNode() : roots[0];
+File_முனை FileStorage::Impl::get_First_உச்சி_Level_முனை() மாறிலி {
+    திரும்பு roots.empty() ? File_முனை() : roots[0];
 }
 
-FileNode FileStorage::Impl::root(int streamIdx) const {
-    return streamIdx >= 0 && streamIdx < (int) roots.size() ? roots[streamIdx] : FileNode();
+File_முனை FileStorage::Impl::வேர்(முழு streamIdx) மாறிலி {
+    திரும்பு streamIdx >= 0 && streamIdx < (முழு) roots.size() ? roots[streamIdx] : File_முனை();
 }
 
-FileNode FileStorage::Impl::operator[](const String &nodename) const {
-    return this->operator[](nodename.c_str());
+File_முனை FileStorage::Impl::operator[](மாறிலி String &nodename) மாறிலி {
+    திரும்பு இது->operator[](nodename.c_str());
 }
 
-FileNode FileStorage::Impl::operator[](const char * /*nodename*/) const {
-    return FileNode();
+File_முனை FileStorage::Impl::operator[](மாறிலி எழுத்து * /*nodename*/) மாறிலி {
+    திரும்பு File_முனை();
 }
 
-int FileStorage::Impl::getFormat() const { return fmt; }
+முழு FileStorage::Impl::getFormat() மாறிலி { திரும்பு fmt; }
 
-char *FileStorage::Impl::bufferPtr() const { return (char *) (&buffer[0] + bufofs); }
+எழுத்து *FileStorage::Impl::bufferPtr() மாறிலி { திரும்பு (எழுத்து *) (&buffer[0] + bufofs); }
 
-char *FileStorage::Impl::bufferStart() const { return (char *) &buffer[0]; }
+எழுத்து *FileStorage::Impl::bufferStart() மாறிலி { திரும்பு (எழுத்து *) &buffer[0]; }
 
-char *FileStorage::Impl::bufferEnd() const { return (char *) (&buffer[0] + buffer.size()); }
+எழுத்து *FileStorage::Impl::bufferEnd() மாறிலி { திரும்பு (எழுத்து *) (&buffer[0] + buffer.size()); }
 
-void FileStorage::Impl::setBufferPtr(char *ptr) {
-    char *bufferstart = bufferStart();
+வெறுமை FileStorage::Impl::setBufferPtr(எழுத்து *ptr) {
+    எழுத்து *bufferstart = bufferStart();
     CV_Assert(ptr >= bufferstart && ptr <= bufferEnd());
     bufofs = ptr - bufferstart;
 }
 
-int FileStorage::Impl::wrapMargin() const { return wrap_margin; }
+முழு FileStorage::Impl::wrapMargin() மாறிலி { திரும்பு wrap_margin; }
 
 FStructData &FileStorage::Impl::getCurrentStruct() {
-    CV_Assert(!write_stack.empty());
-    return write_stack.back();
+    CV_Assert(!write_அடுக்கு.empty());
+    திரும்பு write_அடுக்கு.back();
 }
 
-void FileStorage::Impl::setNonEmpty() {
-    empty_stream = false;
+வெறுமை FileStorage::Impl::setNonEmpty() {
+    empty_stream = பொய்;
 }
 
-void FileStorage::Impl::processSpecialDouble(char *buf, double *value, char **endptr) {
-    FileStorage_API *fs = this;
-    char c = buf[0];
-    int inf_hi = 0x7ff00000;
+வெறுமை FileStorage::Impl::processSpecialDouble(எழுத்து *buf, இரட்டை *value, எழுத்து **endptr) {
+    FileStorage_API *fs = இது;
+    எழுத்து c = buf[0];
+    முழு inf_hi = 0x7ff00000;
 
-    if (c == '-' || c == '+') {
+    எனில் (c == '-' || c == '+') {
         inf_hi = c == '-' ? 0xfff00000 : 0x7ff00000;
         c = *++buf;
     }
 
-    if (c != '.')
+    எனில் (c != '.')
         CV_PARSE_ERROR_CPP("Bad format of floating-point constant");
 
     Cv64suf v;
     v.f = 0.;
-    if (toupper(buf[1]) == 'I' && toupper(buf[2]) == 'N' && toupper(buf[3]) == 'F')
+    எனில் (toupper(buf[1]) == 'I' && toupper(buf[2]) == 'N' && toupper(buf[3]) == 'F')
         v.u = (uint64) inf_hi << 32;
-    else if (toupper(buf[1]) == 'N' && toupper(buf[2]) == 'A' && toupper(buf[3]) == 'N')
+    இல்லையெனில் எனில் (toupper(buf[1]) == 'N' && toupper(buf[2]) == 'A' && toupper(buf[3]) == 'N')
         v.u = (uint64) -1;
-    else
+    இல்லையெனில்
         CV_PARSE_ERROR_CPP("Bad format of floating-point constant");
     *value = v.f;
     *endptr = buf + 4;
 }
 
-double FileStorage::Impl::strtod(char *ptr, char **endptr) {
-    double fval = ::strtod(ptr, endptr);
-    if (**endptr == '.') {
-        char *dot_pos = *endptr;
+இரட்டை FileStorage::Impl::strtod(எழுத்து *ptr, எழுத்து **endptr) {
+    இரட்டை fval = ::strtod(ptr, endptr);
+    எனில் (**endptr == '.') {
+        எழுத்து *dot_pos = *endptr;
         *dot_pos = ',';
-        double fval2 = ::strtod(ptr, endptr);
+        இரட்டை fval2 = ::strtod(ptr, endptr);
         *dot_pos = '.';
-        if (*endptr > dot_pos)
+        எனில் (*endptr > dot_pos)
             fval = fval2;
-        else
+        இல்லையெனில்
             *endptr = dot_pos;
     }
 
-    if (*endptr == ptr || cv_isalpha(**endptr))
+    எனில் (*endptr == ptr || cv_isalpha(**endptr))
         processSpecialDouble(ptr, &fval, endptr);
 
-    return fval;
+    திரும்பு fval;
 }
 
-void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
-    CV_Assert(type == FileNode::SEQ || type == FileNode::MAP);
+வெறுமை FileStorage::Impl::convertToCollection(முழு type, File_முனை &முனை) {
+    CV_Assert(type == File_முனை::SEQ || type == File_முனை::MAP);
 
-    int node_type = node.type();
-    if (node_type == type)
-        return;
+    முழு முனை_type = முனை.type();
+    எனில் (முனை_type == type)
+        திரும்பு;
 
-    bool named = node.isNamed();
-    uchar *ptr = node.ptr() + 1 + (named ? 4 : 0);
+    தருக்க named = முனை.isNamed();
+    uchar *ptr = முனை.ptr() + 1 + (named ? 4 : 0);
 
     int64_t ival = 0;
-    double fval = 0;
+    இரட்டை fval = 0;
     std::string sval;
-    bool add_first_scalar = false;
+    தருக்க add_first_scalar = பொய்;
 
-    if (node_type != FileNode::NONE) {
+    எனில் (முனை_type != File_முனை::NONE) {
         // scalar nodes can only be converted to sequences, e.g. in XML:
         // <a>5[parser_position]... => create 5 with name "a"
         // <a>5 6[parser_position]... => 5 is converted to [5] and then 6 is added to it
         //
         // otherwise we don't know where to get the element names from
-        CV_Assert(type == FileNode::SEQ);
-        if (node_type == FileNode::INT) {
+        CV_Assert(type == File_முனை::SEQ);
+        எனில் (முனை_type == File_முனை::INT) {
             ival = readLong(ptr);
-            add_first_scalar = true;
-        } else if (node_type == FileNode::REAL) {
+            add_first_scalar = உண்மை;
+        } இல்லையெனில் எனில் (முனை_type == File_முனை::REAL) {
             fval = readReal(ptr);
-            add_first_scalar = true;
-        } else if (node_type == FileNode::STRING) {
-            sval = std::string(node);
-            add_first_scalar = true;
-        } else
-            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", node_type));
+            add_first_scalar = உண்மை;
+        } இல்லையெனில் எனில் (முனை_type == File_முனை::STRING) {
+            sval = std::string(முனை);
+            add_first_scalar = உண்மை;
+        } இல்லையெனில்
+            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", முனை_type));
     }
 
-    ptr = reserveNodeSpace(node, 1 + (named ? 4 : 0) + 4 + 4);
-    *ptr++ = (uchar) (type | (named ? FileNode::NAMED : 0));
+    ptr = reserve_முனை_Space(முனை, 1 + (named ? 4 : 0) + 4 + 4);
+    *ptr++ = (uchar) (type | (named ? File_முனை::NAMED : 0));
     // name has been copied automatically
-    if (named)
+    எனில் (named)
         ptr += 4;
     // set raw_size(collection)==4, nelems(collection)==1
     writeInt(ptr, 4);
     writeInt(ptr + 4, 0);
 
-    if (add_first_scalar)
-        addNode(node, std::string(), node_type,
-                node_type == FileNode::INT ? (const void *) &ival :
-                node_type == FileNode::REAL ? (const void *) &fval :
-                node_type == FileNode::STRING ? (const void *) sval.c_str() : 0,
+    எனில் (add_first_scalar)
+        add_முனை(முனை, std::string(), முனை_type,
+                முனை_type == File_முனை::INT ? (மாறிலி வெறுமை *) &ival :
+                முனை_type == File_முனை::REAL ? (மாறிலி வெறுமை *) &fval :
+                முனை_type == File_முனை::STRING ? (மாறிலி வெறுமை *) sval.c_str() : 0,
                 -1);
 }
 
@@ -1552,15 +1552,15 @@ void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
 //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
 // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
 // In the case (b) the existing tag and the name are copied automatically.
-uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
-    bool shrinkBlock = false;
+uchar *FileStorage::Impl::reserve_முனை_Space(File_முனை &முனை, size_t sz) {
+    தருக்க shrinkBlock = பொய்;
     size_t shrinkBlockIdx = 0, shrinkSize = 0;
 
     uchar *ptr = 0, *blockEnd = 0;
 
-    if (!fs_data_ptrs.empty()) {
-        size_t blockIdx = node.blockIdx;
-        size_t ofs = node.ofs;
+    எனில் (!fs_data_ptrs.empty()) {
+        size_t blockIdx = முனை.blockIdx;
+        size_t ofs = முனை.ofs;
         CV_Assert(blockIdx == fs_data_ptrs.size() - 1);
         CV_Assert(ofs <= fs_data_blksz[blockIdx]);
         CV_Assert(freeSpaceOfs <= fs_data_blksz[blockIdx]);
@@ -1570,12 +1570,12 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
         blockEnd = fs_data_ptrs[blockIdx] + fs_data_blksz[blockIdx];
 
         CV_Assert(ptr >= fs_data_ptrs[blockIdx] && ptr <= blockEnd);
-        if (ptr + sz <= blockEnd) {
+        எனில் (ptr + sz <= blockEnd) {
             freeSpaceOfs = ofs + sz;
-            return ptr;
+            திரும்பு ptr;
         }
 
-        if (ofs ==
+        எனில் (ofs ==
             0)  // FileNode is a first component of this block. Resize current block instead of allocation of new one.
         {
             fs_data[blockIdx]->resize(sz);
@@ -1583,10 +1583,10 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
             fs_data_ptrs[blockIdx] = ptr;
             fs_data_blksz[blockIdx] = sz;
             freeSpaceOfs = sz;
-            return ptr;
+            திரும்பு ptr;
         }
 
-        shrinkBlock = true;
+        shrinkBlock = உண்மை;
         shrinkBlockIdx = blockIdx;
         shrinkSize = ofs;
     }
@@ -1597,13 +1597,13 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
     uchar *new_ptr = &pv->at(0);
     fs_data_ptrs.push_back(new_ptr);
     fs_data_blksz.push_back(blockSize);
-    node.blockIdx = fs_data_ptrs.size() - 1;
-    node.ofs = 0;
+    முனை.blockIdx = fs_data_ptrs.size() - 1;
+    முனை.ofs = 0;
     freeSpaceOfs = sz;
 
-    if (ptr && ptr + 5 <= blockEnd) {
+    எனில் (ptr && ptr + 5 <= blockEnd) {
         new_ptr[0] = ptr[0];
-        if (ptr[0] & FileNode::NAMED) {
+        எனில் (ptr[0] & File_முனை::NAMED) {
             new_ptr[1] = ptr[1];
             new_ptr[2] = ptr[2];
             new_ptr[3] = ptr[3];
@@ -1611,38 +1611,38 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
         }
     }
 
-    if (shrinkBlock) {
+    எனில் (shrinkBlock) {
         fs_data[shrinkBlockIdx]->resize(shrinkSize);
         fs_data_blksz[shrinkBlockIdx] = shrinkSize;
     }
 
-    return new_ptr;
+    திரும்பு new_ptr;
 }
 
-unsigned FileStorage::Impl::getStringOfs(const std::string &key) const {
-    str_hash_t::const_iterator it = str_hash.find(key);
-    return it != str_hash.end() ? it->second : 0;
+unsigned FileStorage::Impl::getStringOfs(மாறிலி std::string &சாவி) மாறிலி {
+    str_hash_t::const_iterator it = str_hash.find(சாவி);
+    திரும்பு it != str_hash.end() ? it->second : 0;
 }
 
-FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key,
-                                    int elem_type, const void *value, int len) {
-    FileStorage_API *fs = this;
-    bool noname = key.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(key.c_str(), "_") == 0);
-    convertToCollection(noname ? FileNode::SEQ : FileNode::MAP, collection);
+File_முனை FileStorage::Impl::add_முனை(File_முனை &collection, மாறிலி std::string &சாவி,
+                                    முழு elem_type, மாறிலி வெறுமை *value, முழு len) {
+    FileStorage_API *fs = இது;
+    தருக்க noname = சாவி.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(சாவி.c_str(), "_") == 0);
+    convertToCollection(noname ? File_முனை::SEQ : File_முனை::MAP, collection);
 
-    bool isseq = collection.empty() ? false : collection.isSeq();
-    if (noname != isseq)
+    தருக்க isseq = collection.empty() ? பொய் : collection.isSeq();
+    எனில் (noname != isseq)
         CV_PARSE_ERROR_CPP(noname ? "Map element should have a name" :
                            "Sequence element should not have name (use <_></_>)");
     unsigned strofs = 0;
-    if (!noname) {
-        strofs = getStringOfs(key);
-        if (!strofs) {
+    எனில் (!noname) {
+        strofs = getStringOfs(சாவி);
+        எனில் (!strofs) {
             strofs = (unsigned) str_hash_data.size();
-            size_t keysize = key.size() + 1;
+            size_t keysize = சாவி.size() + 1;
             str_hash_data.resize(strofs + keysize);
-            memcpy(&str_hash_data[0] + strofs, &key[0], keysize);
-            str_hash.insert(std::make_pair(key, strofs));
+            memcpy(&str_hash_data[0] + strofs, &சாவி[0], keysize);
+            str_hash.insert(std::make_pair(சாவி, strofs));
         }
     }
 
@@ -1650,63 +1650,63 @@ FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key
 
     size_t blockIdx = fs_data_ptrs.size() - 1;
     size_t ofs = freeSpaceOfs;
-    FileNode node(fs_ext, blockIdx, ofs);
+    File_முனை முனை(fs_ext, blockIdx, ofs);
 
     size_t sz0 = 1 + (noname ? 0 : 4) + 8;
-    uchar *ptr = reserveNodeSpace(node, sz0);
+    uchar *ptr = reserve_முனை_Space(முனை, sz0);
 
-    *ptr++ = (uchar) (elem_type | (noname ? 0 : FileNode::NAMED));
-    if (elem_type == FileNode::NONE)
+    *ptr++ = (uchar) (elem_type | (noname ? 0 : File_முனை::NAMED));
+    எனில் (elem_type == File_முனை::NONE)
         freeSpaceOfs -= 8;
 
-    if (!noname) {
-        writeInt(ptr, (int) strofs);
+    எனில் (!noname) {
+        writeInt(ptr, (முழு) strofs);
         ptr += 4;
     }
 
-    if (elem_type == FileNode::SEQ || elem_type == FileNode::MAP) {
+    எனில் (elem_type == File_முனை::SEQ || elem_type == File_முனை::MAP) {
         writeInt(ptr, 4);
         writeInt(ptr, 0);
     }
 
-    if (value)
-        node.setValue(elem_type, value, len);
+    எனில் (value)
+        முனை.set_மதிப்பு(elem_type, value, len);
 
-    if (collection.isNamed())
+    எனில் (collection.isNamed())
         cp += 4;
-    int nelems = readInt(cp + 5);
+    முழு nelems = readInt(cp + 5);
     writeInt(cp + 5, nelems + 1);
 
-    return node;
+    திரும்பு முனை;
 }
 
-void FileStorage::Impl::finalizeCollection(FileNode &collection) {
-    if (!collection.isSeq() && !collection.isMap())
-        return;
+வெறுமை FileStorage::Impl::finalizeCollection(File_முனை &collection) {
+    எனில் (!collection.isSeq() && !collection.isMap())
+        திரும்பு;
     uchar *ptr0 = collection.ptr(), *ptr = ptr0 + 1;
-    if (*ptr0 & FileNode::NAMED)
+    எனில் (*ptr0 & File_முனை::NAMED)
         ptr += 4;
     size_t blockIdx = collection.blockIdx;
     size_t ofs = collection.ofs + (size_t) (ptr + 8 - ptr0);
     size_t rawSize = 4;
     unsigned sz = (unsigned) readInt(ptr + 4);
-    if (sz > 0) {
+    எனில் (sz > 0) {
         size_t lastBlockIdx = fs_data_ptrs.size() - 1;
 
-        for (; blockIdx < lastBlockIdx; blockIdx++) {
+        க்கு (; blockIdx < lastBlockIdx; blockIdx++) {
             rawSize += fs_data_blksz[blockIdx] - ofs;
             ofs = 0;
         }
     }
     rawSize += freeSpaceOfs - ofs;
-    writeInt(ptr, (int) rawSize);
+    writeInt(ptr, (முழு) rawSize);
 }
 
-void FileStorage::Impl::normalizeNodeOfs(size_t &blockIdx, size_t &ofs) const {
-    while (ofs >= fs_data_blksz[blockIdx]) {
-        if (blockIdx == fs_data_blksz.size() - 1) {
+வெறுமை FileStorage::Impl::normalize_முனை_Ofs(size_t &blockIdx, size_t &ofs) மாறிலி {
+    போது (ofs >= fs_data_blksz[blockIdx]) {
+        எனில் (blockIdx == fs_data_blksz.size() - 1) {
             CV_Assert(ofs == fs_data_blksz[blockIdx]);
-            break;
+            நிறுத்து;
         }
         ofs -= fs_data_blksz[blockIdx];
         blockIdx++;
@@ -1714,11 +1714,11 @@ void FileStorage::Impl::normalizeNodeOfs(size_t &blockIdx, size_t &ofs) const {
 }
 
 FileStorage::Impl::Base64State FileStorage::Impl::get_state_of_writing_base64() {
-    return state_of_writing_base64;
+    திரும்பு state_of_writing_base64;
 }
 
-int FileStorage::Impl::get_space() {
-    return space;
+முழு FileStorage::Impl::get_space() {
+    திரும்பு space;
 }
 
 
@@ -1727,10 +1727,10 @@ FileStorage::Impl::Base64Decoder::Base64Decoder() {
     ptr = 0;
     indent = 0;
     totalchars = 0;
-    eos = true;
+    eos = உண்மை;
 }
 
-void FileStorage::Impl::Base64Decoder::init(const Ptr<FileStorageParser> &_parser, char *_ptr, int _indent) {
+வெறுமை FileStorage::Impl::Base64Decoder::init(மாறிலி Ptr<FileStorageParser> &_parser, எழுத்து *_ptr, முழு _indent) {
     parser_do_not_use_direct_dereference = _parser;
     ptr = _ptr;
     indent = _indent;
@@ -1738,11 +1738,11 @@ void FileStorage::Impl::Base64Decoder::init(const Ptr<FileStorageParser> &_parse
     decoded.clear();
     ofs = 0;
     totalchars = 0;
-    eos = false;
+    eos = பொய்;
 }
 
-bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
-    static const uchar base64tab[] =
+தருக்க FileStorage::Impl::Base64Decoder::readMore(முழு needed) {
+    நிலையான மாறிலி uchar base64tab[] =
             {
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1762,43 +1762,43 @@ bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };
 
-    if (eos)
-        return false;
+    எனில் (eos)
+        திரும்பு பொய்;
 
     size_t sz = decoded.size();
     CV_Assert(ofs <= sz);
     sz -= ofs;
-    for (size_t i = 0; i < sz; i++)
+    க்கு (size_t i = 0; i < sz; i++)
         decoded[i] = decoded[ofs + i];
 
     decoded.resize(sz);
     ofs = 0;
 
     CV_Assert(ptr);
-    char *beg = 0, *end = 0;
-    bool ok = getParser().getBase64Row(ptr, indent, beg, end);
+    எழுத்து *beg = 0, *end = 0;
+    தருக்க ok = getParser().getBase64Row(ptr, indent, beg, end);
     ptr = end;
     std::copy(beg, end, std::back_inserter(encoded));
     totalchars += end - beg;
 
-    if (!ok || beg == end) {
+    எனில் (!ok || beg == end) {
         // in the end of base64 sequence pad it with '=' characters so that
         // its total length is multiple of
-        eos = true;
+        eos = உண்மை;
         size_t tc = totalchars;
-        for (; tc % 4 != 0; tc++)
+        க்கு (; tc % 4 != 0; tc++)
             encoded.push_back('=');
     }
 
-    int i = 0, j, n = (int) encoded.size();
-    if (n > 0) {
-        const uchar *tab = base64tab;
-        char *src = &encoded[0];
+    முழு i = 0, j, n = (முழு) encoded.size();
+    எனில் (n > 0) {
+        மாறிலி uchar *tab = base64tab;
+        எழுத்து *src = &encoded[0];
 
-        for (; i <= n - 4; i += 4) {
+        க்கு (; i <= n - 4; i += 4) {
             // dddddd cccccc bbbbbb aaaaaa => ddddddcc ccccbbbb bbaaaaaa
-            uchar d = tab[(int) (uchar) src[i]], c = tab[(int) (uchar) src[i + 1]];
-            uchar b = tab[(int) (uchar) src[i + 2]], a = tab[(int) (uchar) src[i + 3]];
+            uchar d = tab[(முழு) (uchar) src[i]], c = tab[(முழு) (uchar) src[i + 1]];
+            uchar b = tab[(முழு) (uchar) src[i + 2]], a = tab[(முழு) (uchar) src[i + 3]];
 
             decoded.push_back((uchar) ((d << 2) | (c >> 4)));
             decoded.push_back((uchar) ((c << 4) | (b >> 2)));
@@ -1806,218 +1806,218 @@ bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
         }
     }
 
-    if (i > 0 && encoded[i - 1] == '=') {
-        if (i > 1 && encoded[i - 2] == '=' && !decoded.empty())
+    எனில் (i > 0 && encoded[i - 1] == '=') {
+        எனில் (i > 1 && encoded[i - 2] == '=' && !decoded.empty())
             decoded.pop_back();
-        if (!decoded.empty())
+        எனில் (!decoded.empty())
             decoded.pop_back();
     }
 
     n -= i;
-    for (j = 0; j < n; j++)
+    க்கு (j = 0; j < n; j++)
         encoded[j] = encoded[i + j];
     encoded.resize(n);
 
-    return (int) decoded.size() >= needed;
+    திரும்பு (முழு) decoded.size() >= needed;
 }
 
 uchar FileStorage::Impl::Base64Decoder::getUInt8() {
     size_t sz = decoded.size();
-    if (ofs >= sz && !readMore(1))
-        return (uchar) 0;
-    return decoded[ofs++];
+    எனில் (ofs >= sz && !readMore(1))
+        திரும்பு (uchar) 0;
+    திரும்பு decoded[ofs++];
 }
 
 ushort FileStorage::Impl::Base64Decoder::getUInt16() {
     size_t sz = decoded.size();
-    if (ofs + 2 > sz && !readMore(2))
-        return (ushort) 0;
+    எனில் (ofs + 2 > sz && !readMore(2))
+        திரும்பு (ushort) 0;
     ushort val = (decoded[ofs] + (decoded[ofs + 1] << 8));
     ofs += 2;
-    return val;
+    திரும்பு val;
 }
 
-int FileStorage::Impl::Base64Decoder::getInt32() {
+முழு FileStorage::Impl::Base64Decoder::getInt32() {
     size_t sz = decoded.size();
-    if (ofs + 4 > sz && !readMore(4))
-        return 0;
-    int ival = readInt(&decoded[ofs]);
+    எனில் (ofs + 4 > sz && !readMore(4))
+        திரும்பு 0;
+    முழு ival = readInt(&decoded[ofs]);
     ofs += 4;
-    return ival;
+    திரும்பு ival;
 }
 
 int64_t FileStorage::Impl::Base64Decoder::getInt64() {
     size_t sz = decoded.size();
-    if (ofs + 8 > sz && !readMore(8))
-        return 0;
+    எனில் (ofs + 8 > sz && !readMore(8))
+        திரும்பு 0;
     int64_t ival = readLong(&decoded[ofs]);
     ofs += 8;
-    return ival;
+    திரும்பு ival;
 }
 
-double FileStorage::Impl::Base64Decoder::getFloat64() {
+இரட்டை FileStorage::Impl::Base64Decoder::getFloat64() {
     size_t sz = decoded.size();
-    if (ofs + 8 > sz && !readMore(8))
-        return 0;
-    double fval = readReal(&decoded[ofs]);
+    எனில் (ofs + 8 > sz && !readMore(8))
+        திரும்பு 0;
+    இரட்டை fval = readReal(&decoded[ofs]);
     ofs += 8;
-    return fval;
+    திரும்பு fval;
 }
 
-bool FileStorage::Impl::Base64Decoder::endOfStream() const { return eos; }
+தருக்க FileStorage::Impl::Base64Decoder::endOfStream() மாறிலி { திரும்பு eos; }
 
-char *FileStorage::Impl::Base64Decoder::getPtr() const { return ptr; }
+எழுத்து *FileStorage::Impl::Base64Decoder::getPtr() மாறிலி { திரும்பு ptr; }
 
 
-char *FileStorage::Impl::parseBase64(char *ptr, int indent, FileNode &collection) {
-    const int BASE64_HDR_SIZE = 24;
-    char dt[BASE64_HDR_SIZE + 1] = {0};
+எழுத்து *FileStorage::Impl::parseBase64(எழுத்து *ptr, முழு indent, File_முனை &collection) {
+    மாறிலி முழு BASE64_HDR_SIZE = 24;
+    எழுத்து dt[BASE64_HDR_SIZE + 1] = {0};
     base64decoder.init(parser_do_not_use_direct_dereference, ptr, indent);
 
-    int i, k;
+    முழு i, k;
 
-    for (i = 0; i < BASE64_HDR_SIZE; i++)
-        dt[i] = (char) base64decoder.getUInt8();
-    for (i = 0; i < BASE64_HDR_SIZE; i++)
-        if (isspace(dt[i]))
-            break;
+    க்கு (i = 0; i < BASE64_HDR_SIZE; i++)
+        dt[i] = (எழுத்து) base64decoder.getUInt8();
+    க்கு (i = 0; i < BASE64_HDR_SIZE; i++)
+        எனில் (isspace(dt[i]))
+            நிறுத்து;
     dt[i] = '\0';
 
     CV_Assert(!base64decoder.endOfStream());
 
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2];
-    int fmt_pair_count = fs::decodeFormat(dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    முழு fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2];
+    முழு fmt_pair_மொத்தம் = fs::decodeFormat(dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS);
     int64_t ival = 0;
-    double fval = 0;
+    இரட்டை fval = 0;
 
-    for (;;) {
-        for (k = 0; k < fmt_pair_count; k++) {
-            int elem_type = fmt_pairs[k * 2 + 1];
-            int count = fmt_pairs[k * 2];
+    க்கு (;;) {
+        க்கு (k = 0; k < fmt_pair_மொத்தம்; k++) {
+            முழு elem_type = fmt_pairs[k * 2 + 1];
+            முழு மொத்தம்_2 = fmt_pairs[k * 2];
 
-            for (i = 0; i < count; i++) {
-                int node_type = FileNode::INT;
-                switch (elem_type) {
-                    case CV_8U:
+            க்கு (i = 0; i < மொத்தம்_2; i++) {
+                முழு முனை_type = File_முனை::INT;
+                தேர்வு (elem_type) {
+                    நிலை CV_8U:
                         ival = base64decoder.getUInt8();
-                        break;
-                    case CV_8S:
-                        ival = (char) base64decoder.getUInt8();
-                        break;
-                    case CV_Bool:
+                        நிறுத்து;
+                    நிலை CV_8S:
+                        ival = (எழுத்து) base64decoder.getUInt8();
+                        நிறுத்து;
+                    நிலை CV_Bool:
                         ival = base64decoder.getUInt8() != 0;
-                        break;
-                    case CV_16U:
+                        நிறுத்து;
+                    நிலை CV_16U:
                         ival = base64decoder.getUInt16();
-                        break;
-                    case CV_16S:
+                        நிறுத்து;
+                    நிலை CV_16S:
                         ival = (short) base64decoder.getUInt16();
-                        break;
-                    case CV_32U:
+                        நிறுத்து;
+                    நிலை CV_32U:
                         ival = base64decoder.getInt32();
-                        break;
-                    case CV_32S:
+                        நிறுத்து;
+                    நிலை CV_32S:
                         ival = base64decoder.getInt32();
-                        break;
-                    case CV_64U:
+                        நிறுத்து;
+                    நிலை CV_64U:
                         ival = base64decoder.getInt64();
-                        break;
-                    case CV_64S:
+                        நிறுத்து;
+                    நிலை CV_64S:
                         ival = base64decoder.getInt64();
-                        break;
-                    case CV_32F: {
+                        நிறுத்து;
+                    நிலை CV_32F: {
                         Cv32suf v;
                         v.i = base64decoder.getInt32();
                         fval = v.f;
-                        node_type = FileNode::REAL;
+                        முனை_type = File_முனை::REAL;
                     }
-                        break;
-                    case CV_64F:
+                        நிறுத்து;
+                    நிலை CV_64F:
                         fval = base64decoder.getFloat64();
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_16F:
-                        fval = float(hfloatFromBits(base64decoder.getUInt16()));
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_8F_E4M3FN:
+                        முனை_type = File_முனை::REAL;
+                        நிறுத்து;
+                    நிலை CV_16F:
+                        fval = தசம(hfloatFromBits(base64decoder.getUInt16()));
+                        முனை_type = File_முனை::REAL;
+                        நிறுத்து;
+                    நிலை CV_8F_E4M3FN:
                         fval = fp8_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_8F_E4M3FNUZ:
+                        முனை_type = File_முனை::REAL;
+                        நிறுத்து;
+                    நிலை CV_8F_E4M3FNUZ:
                         fval = fp8a_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
-                        break;
-                    default:
+                        முனை_type = File_முனை::REAL;
+                        நிறுத்து;
+                    இயல்பு:
                         CV_Error(Error::StsUnsupportedFormat, "Unsupported type");
                 }
 
-                if (base64decoder.endOfStream())
-                    break;
-                addNode(collection, std::string(), node_type,
-                        node_type == FileNode::INT ? (void *) &ival : (void *) &fval, -1);
+                எனில் (base64decoder.endOfStream())
+                    நிறுத்து;
+                add_முனை(collection, std::string(), முனை_type,
+                        முனை_type == File_முனை::INT ? (வெறுமை *) &ival : (வெறுமை *) &fval, -1);
             }
         }
-        if (base64decoder.endOfStream())
-            break;
+        எனில் (base64decoder.endOfStream())
+            நிறுத்து;
     }
 
     finalizeCollection(collection);
-    return base64decoder.getPtr();
+    திரும்பு base64decoder.getPtr();
 }
 
-void FileStorage::Impl::parseError(const char *func_name, const std::string &err_msg, const char *source_file,
-                                   int source_line) {
-    std::string msg = format("%s(%d): %s", filename.c_str(), lineno, err_msg.c_str());
-    error(Error::StsParseError, func_name, msg.c_str(), source_file, source_line);
+வெறுமை FileStorage::Impl::parseError(மாறிலி எழுத்து *func_name, மாறிலி std::string &err_செய்தி, மாறிலி எழுத்து *source_file,
+                                   முழு source_வரி) {
+    std::string செய்தி = format("%s(%d): %s", filename.c_str(), lineno, err_செய்தி.c_str());
+    error(Error::StsParseError, func_name, செய்தி.c_str(), source_file, source_வரி);
 }
 
-const uchar *FileStorage::Impl::getNodePtr(size_t blockIdx, size_t ofs) const {
+மாறிலி uchar *FileStorage::Impl::get_முனை_Ptr(size_t blockIdx, size_t ofs) மாறிலி {
     CV_Assert(blockIdx < fs_data_ptrs.size());
     CV_Assert(ofs < fs_data_blksz[blockIdx]);
 
-    return fs_data_ptrs[blockIdx] + ofs;
+    திரும்பு fs_data_ptrs[blockIdx] + ofs;
 }
 
-std::string FileStorage::Impl::getName(size_t nameofs) const {
+std::string FileStorage::Impl::getName(size_t nameofs) மாறிலி {
     CV_Assert(nameofs < str_hash_data.size());
-    return std::string(&str_hash_data[nameofs]);
+    திரும்பு std::string(&str_hash_data[nameofs]);
 }
 
-FileStorage *FileStorage::Impl::getFS() { return fs_ext; }
+FileStorage *FileStorage::Impl::getFS() { திரும்பு fs_ext; }
 
 
 FileStorage::FileStorage()
     : state(0)
 {
-    p = makePtr<FileStorage::Impl>(this);
+    p = makePtr<FileStorage::Impl>(இது);
 }
 
-FileStorage::FileStorage(const String& filename, int flags, const String& encoding)
+FileStorage::FileStorage(மாறிலி String& filename, முழு flags, மாறிலி String& encoding)
     : state(0)
 {
-    p = makePtr<FileStorage::Impl>(this);
-    bool ok = p->open(filename.c_str(), flags, encoding.c_str());
-    if(ok)
+    p = makePtr<FileStorage::Impl>(இது);
+    தருக்க ok = p->open(filename.c_str(), flags, encoding.c_str());
+    எனில்(ok)
         state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
 }
 
-void FileStorage::startWriteStruct(const String& name, int struct_flags, const String& typeName)
+வெறுமை FileStorage::startWriteStruct(மாறிலி String& name, முழு struct_flags, மாறிலி String& typeName)
 {
     p->startWriteStruct(name.size() ? name.c_str() : 0, struct_flags, typeName.size() ? typeName.c_str() : 0);
     elname = String();
-    if ((struct_flags & FileNode::TYPE_MASK) == FileNode::SEQ)
-        state = FileStorage::VALUE_EXPECTED;
-    else
+    எனில் ((struct_flags & File_முனை::TYPE_MASK) == File_முனை::SEQ)
+        state = FileStorage::மதிப்பு_EXPECTED;
+    இல்லையெனில்
         state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
 }
 
-void FileStorage::endWriteStruct()
+வெறுமை FileStorage::endWriteStruct()
 {
     p->endWriteStruct();
-    state = p->write_stack.empty() || FileNode::isMap(p->write_stack.back().flags) ?
+    state = p->write_அடுக்கு.empty() || File_முனை::isMap(p->write_அடுக்கு.back().flags) ?
         FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP :
-        FileStorage::VALUE_EXPECTED;
+        FileStorage::மதிப்பு_EXPECTED;
     elname = String();
 }
 
@@ -2025,955 +2025,955 @@ FileStorage::~FileStorage()
 {
 }
 
-bool FileStorage::open(const String& filename, int flags, const String& encoding)
+தருக்க FileStorage::open(மாறிலி String& filename, முழு flags, மாறிலி String& encoding)
 {
-    try
+    முயல்
     {
-        bool ok = p->open(filename.c_str(), flags, encoding.c_str());
-        if(ok)
+        தருக்க ok = p->open(filename.c_str(), flags, encoding.c_str());
+        எனில்(ok)
             state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
-        return ok;
+        திரும்பு ok;
     }
-    catch (...)
+    பிடி (...)
     {
         release();
-        throw;  // re-throw
+        எறி;  // re-throw
     }
 }
 
-bool FileStorage::isOpened() const { return p->is_opened; }
+தருக்க FileStorage::isOpened() மாறிலி { திரும்பு p->is_opened; }
 
-void FileStorage::release()
+வெறுமை FileStorage::release()
 {
     p->release();
 }
 
-FileNode FileStorage::root(int i) const
+File_முனை FileStorage::வேர்(முழு i) மாறிலி
 {
-    if( p.empty() || p->roots.empty() || i < 0 || i >= (int)p->roots.size() )
-        return FileNode();
+    எனில்( p.empty() || p->roots.empty() || i < 0 || i >= (முழு)p->roots.size() )
+        திரும்பு File_முனை();
 
-    return p->roots[i];
+    திரும்பு p->roots[i];
 }
 
-FileNode FileStorage::getFirstTopLevelNode() const
+File_முனை FileStorage::get_First_உச்சி_Level_முனை() மாறிலி
 {
-    FileNode r = root();
-    FileNodeIterator it = r.begin();
-    return it != r.end() ? *it : FileNode();
+    File_முனை r = வேர்();
+    File_முனை_Iterator it = r.begin();
+    திரும்பு it != r.end() ? *it : File_முனை();
 }
 
-std::string FileStorage::getDefaultObjectName(const std::string& _filename)
+std::string FileStorage::getDefaultObjectName(மாறிலி std::string& _filename)
 {
-    static const char* stubname = "unnamed";
-    const char* filename = _filename.c_str();
-    const char* ptr2 = filename + _filename.size();
-    const char* ptr = ptr2 - 1;
-    cv::AutoBuffer<char> name_buf(_filename.size()+1);
+    நிலையான மாறிலி எழுத்து* stubname = "unnamed";
+    மாறிலி எழுத்து* filename = _filename.c_str();
+    மாறிலி எழுத்து* ptr2 = filename + _filename.size();
+    மாறிலி எழுத்து* ptr = ptr2 - 1;
+    cv::AutoBuffer<எழுத்து> name_buf(_filename.size()+1);
 
-    while( ptr >= filename && *ptr != '\\' && *ptr != '/' && *ptr != ':' )
+    போது( ptr >= filename && *ptr != '\\' && *ptr != '/' && *ptr != ':' )
     {
-        if( *ptr == '.' && (!*ptr2 || strncmp(ptr2, ".gz", 3) == 0) )
+        எனில்( *ptr == '.' && (!*ptr2 || strncmp(ptr2, ".gz", 3) == 0) )
             ptr2 = ptr;
         ptr--;
     }
     ptr++;
-    if( ptr == ptr2 )
+    எனில்( ptr == ptr2 )
         CV_Error( cv::Error::StsBadArg, "Invalid filename" );
 
-    char* name = name_buf.data();
+    எழுத்து* name = name_buf.data();
 
     // name must start with letter or '_'
-    if( !cv_isalpha(*ptr) && *ptr!= '_' ){
+    எனில்( !cv_isalpha(*ptr) && *ptr!= '_' ){
         *name++ = '_';
     }
 
-    while( ptr < ptr2 )
+    போது( ptr < ptr2 )
     {
-        char c = *ptr++;
-        if( !cv_isalnum(c) && c != '-' && c != '_' )
+        எழுத்து c = *ptr++;
+        எனில்( !cv_isalnum(c) && c != '-' && c != '_' )
             c = '_';
         *name++ = c;
     }
     *name = '\0';
     name = name_buf.data();
-    if( strcmp( name, "_" ) == 0 )
+    எனில்( strcmp( name, "_" ) == 0 )
         strcpy( name, stubname );
-    return name;
+    திரும்பு name;
 }
 
 
-int FileStorage::getFormat() const
+முழு FileStorage::getFormat() மாறிலி
 {
-    return p->fmt;
+    திரும்பு p->fmt;
 }
 
-FileNode FileStorage::operator [](const char* key) const
+File_முனை FileStorage::operator [](மாறிலி எழுத்து* சாவி) மாறிலி
 {
-    return this->operator[](std::string(key));
+    திரும்பு இது->operator[](std::string(சாவி));
 }
 
-FileNode FileStorage::operator [](const std::string& key) const
+File_முனை FileStorage::operator [](மாறிலி std::string& சாவி) மாறிலி
 {
-    FileNode res;
-    for (size_t i = 0; i < p->roots.size(); i++)
+    File_முனை res;
+    க்கு (size_t i = 0; i < p->roots.size(); i++)
     {
-        res = p->roots[i][key];
-        if (!res.empty())
-            break;
+        res = p->roots[i][சாவி];
+        எனில் (!res.empty())
+            நிறுத்து;
     }
-    return res;
+    திரும்பு res;
 }
 
 String FileStorage::releaseAndGetString()
 {
     String buf;
     p->release(&buf);
-    return buf;
+    திரும்பு buf;
 }
 
-void FileStorage::writeRaw( const String& fmt, const void* vec, size_t len )
+வெறுமை FileStorage::writeRaw( மாறிலி String& fmt, மாறிலி வெறுமை* vec, size_t len )
 {
-    p->writeRawData(fmt, (const uchar*)vec, len);
+    p->writeRawData(fmt, (மாறிலி uchar*)vec, len);
 }
 
-void FileStorage::writeComment( const String& comment, bool eol_comment )
+வெறுமை FileStorage::writeComment( மாறிலி String& comment, தருக்க eol_comment )
 {
     p->writeComment(comment.c_str(), eol_comment);
 }
 
-void writeScalar( FileStorage& fs, int value )
+வெறுமை writeScalar( FileStorage& fs, முழு value )
 {
-    fs.p->write(String(), value);
+    fs.p->லிக(String(), value);
 }
 
-void writeScalar( FileStorage& fs, int64_t value )
+வெறுமை writeScalar( FileStorage& fs, int64_t value )
 {
-    fs.p->write(String(), value);
+    fs.p->லிக(String(), value);
 }
 
-void writeScalar( FileStorage& fs, float value )
+வெறுமை writeScalar( FileStorage& fs, தசம value )
 {
-    fs.p->write(String(), (double)value);
+    fs.p->லிக(String(), (இரட்டை)value);
 }
 
-void writeScalar( FileStorage& fs, double value )
+வெறுமை writeScalar( FileStorage& fs, இரட்டை value )
 {
-    fs.p->write(String(), value);
+    fs.p->லிக(String(), value);
 }
 
-void writeScalar( FileStorage& fs, const String& value )
+வெறுமை writeScalar( FileStorage& fs, மாறிலி String& value )
 {
-    fs.p->write(String(), value);
+    fs.p->லிக(String(), value);
 }
 
-void write( FileStorage& fs, const String& name, int value )
+வெறுமை லிக( FileStorage& fs, மாறிலி String& name, முழு value )
 {
-    fs.p->write(name, value);
+    fs.p->லிக(name, value);
 }
 
-void write( FileStorage& fs, const String& name, int64_t value )
+வெறுமை லிக( FileStorage& fs, மாறிலி String& name, int64_t value )
 {
-    fs.p->write(name, value);
+    fs.p->லிக(name, value);
 }
 
-void write( FileStorage& fs, const String& name, float value )
+வெறுமை லிக( FileStorage& fs, மாறிலி String& name, தசம value )
 {
-    fs.p->write(name, (double)value);
+    fs.p->லிக(name, (இரட்டை)value);
 }
 
-void write( FileStorage& fs, const String& name, double value )
+வெறுமை லிக( FileStorage& fs, மாறிலி String& name, இரட்டை value )
 {
-    fs.p->write(name, value);
+    fs.p->லிக(name, value);
 }
 
-void write( FileStorage& fs, const String& name, const String& value )
+வெறுமை லிக( FileStorage& fs, மாறிலி String& name, மாறிலி String& value )
 {
-    fs.p->write(name, value);
+    fs.p->லிக(name, value);
 }
 
-void write( FileStorage& fs, const String& name, bool value )
+வெறுமை லிக( FileStorage& fs, மாறிலி String& name, தருக்க value )
 {
-    fs.p->write(name, value);
+    fs.p->லிக(name, value);
 }
 
-void FileStorage::write(const String& name, int val) { p->write(name, val); }
-void FileStorage::write(const String& name, bool val) { p->write(name, val); }
-void FileStorage::write(const String& name, int64_t val) { p->write(name, val); }
-void FileStorage::write(const String& name, double val) { p->write(name, val); }
-void FileStorage::write(const String& name, const String& val) { p->write(name, val); }
-void FileStorage::write(const String& name, const Mat& val) { cv::write(*this, name, val); }
-void FileStorage::write(const String& name, const std::vector<String>& val) { cv::write(*this, name, val); }
+வெறுமை FileStorage::லிக(மாறிலி String& name, முழு val) { p->லிக(name, val); }
+வெறுமை FileStorage::லிக(மாறிலி String& name, தருக்க val) { p->லிக(name, val); }
+வெறுமை FileStorage::லிக(மாறிலி String& name, int64_t val) { p->லிக(name, val); }
+வெறுமை FileStorage::லிக(மாறிலி String& name, இரட்டை val) { p->லிக(name, val); }
+வெறுமை FileStorage::லிக(மாறிலி String& name, மாறிலி String& val) { p->லிக(name, val); }
+வெறுமை FileStorage::லிக(மாறிலி String& name, மாறிலி Mat& val) { cv::லிக(*இது, name, val); }
+வெறுமை FileStorage::லிக(மாறிலி String& name, மாறிலி std::vector<String>& val) { cv::லிக(*இது, name, val); }
 
-FileStorage& operator << (FileStorage& fs, const String& str)
+FileStorage& operator << (FileStorage& fs, மாறிலி String& str)
 {
-    enum { NAME_EXPECTED = FileStorage::NAME_EXPECTED,
-        VALUE_EXPECTED = FileStorage::VALUE_EXPECTED,
+    எண்ணிக்கை { NAME_EXPECTED = FileStorage::NAME_EXPECTED,
+        மதிப்பு_EXPECTED = FileStorage::மதிப்பு_EXPECTED,
         INSIDE_MAP = FileStorage::INSIDE_MAP };
-    const char* _str = str.c_str();
-    if( !fs.isOpened() || !_str )
-        return fs;
+    மாறிலி எழுத்து* _str = str.c_str();
+    எனில்( !fs.isOpened() || !_str )
+        திரும்பு fs;
     Ptr<FileStorage::Impl>& fs_impl = fs.p;
-    char c = *_str;
+    எழுத்து c = *_str;
 
-    if( c == '}' || c == ']' )
+    எனில்( c == '}' || c == ']' )
     {
-        if( fs_impl->write_stack.empty() )
+        எனில்( fs_impl->write_அடுக்கு.empty() )
             CV_Error_( cv::Error::StsError, ("Extra closing '%c'", *_str) );
 
         fs_impl->workaround();
 
-        int struct_flags = fs_impl->write_stack.back().flags;
-        char expected_bracket = FileNode::isMap(struct_flags) ? '}' : ']';
-        if( c != expected_bracket )
+        முழு struct_flags = fs_impl->write_அடுக்கு.back().flags;
+        எழுத்து expected_bracket = File_முனை::isMap(struct_flags) ? '}' : ']';
+        எனில்( c != expected_bracket )
             CV_Error_( cv::Error::StsError, ("The closing '%c' does not match the opening '%c'", c, expected_bracket));
         fs_impl->endWriteStruct();
-        CV_Assert(!fs_impl->write_stack.empty());
-        struct_flags = fs_impl->write_stack.back().flags;
-        fs.state = FileNode::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+        CV_Assert(!fs_impl->write_அடுக்கு.empty());
+        struct_flags = fs_impl->write_அடுக்கு.back().flags;
+        fs.state = File_முனை::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : மதிப்பு_EXPECTED;
         fs.elname = String();
     }
-    else if( fs.state == NAME_EXPECTED + INSIDE_MAP )
+    இல்லையெனில் எனில்( fs.state == NAME_EXPECTED + INSIDE_MAP )
     {
-        if (!cv_isalpha(c) && c != '_')
+        எனில் (!cv_isalpha(c) && c != '_')
             CV_Error_( cv::Error::StsError, ("Incorrect element name %s; should start with a letter or '_'", _str) );
         fs.elname = str;
-        fs.state = VALUE_EXPECTED + INSIDE_MAP;
+        fs.state = மதிப்பு_EXPECTED + INSIDE_MAP;
     }
-    else if( (fs.state & 3) == VALUE_EXPECTED )
+    இல்லையெனில் எனில்( (fs.state & 3) == மதிப்பு_EXPECTED )
     {
-        if( c == '{' || c == '[' )
+        எனில்( c == '{' || c == '[' )
         {
-            int struct_flags = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            fs.state = struct_flags == FileNode::MAP ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+            முழு struct_flags = c == '{' ? File_முனை::MAP : File_முனை::SEQ;
+            fs.state = struct_flags == File_முனை::MAP ? INSIDE_MAP + NAME_EXPECTED : மதிப்பு_EXPECTED;
             _str++;
-            if( *_str == ':' )
+            எனில்( *_str == ':' )
             {
                 _str++;
-                if( !*_str )
-                    struct_flags |= FileNode::FLOW;
+                எனில்( !*_str )
+                    struct_flags |= File_முனை::FLOW;
             }
             fs_impl->startWriteStruct(!fs.elname.empty() ? fs.elname.c_str() : 0, struct_flags, *_str ? _str : 0 );
             fs.elname = String();
         }
-        else
+        இல்லையெனில்
         {
-            write( fs, fs.elname, (c == '\\' && (_str[1] == '{' || _str[1] == '}' ||
+            லிக( fs, fs.elname, (c == '\\' && (_str[1] == '{' || _str[1] == '}' ||
                                 _str[1] == '[' || _str[1] == ']')) ? String(_str+1) : str );
-            if( fs.state == INSIDE_MAP + VALUE_EXPECTED )
+            எனில்( fs.state == INSIDE_MAP + மதிப்பு_EXPECTED )
                 fs.state = INSIDE_MAP + NAME_EXPECTED;
         }
     }
-    else
+    இல்லையெனில்
         CV_Error( cv::Error::StsError, "Invalid fs.state" );
-    return fs;
+    திரும்பு fs;
 }
 
 
-FileNode::FileNode()
-    : fs(NULL)
+File_முனை::File_முனை()
+    : fs(வெற்று)
 {
     blockIdx = ofs = 0;
 }
 
-FileNode::FileNode(FileStorage::Impl* _fs, size_t _blockIdx, size_t _ofs)
+File_முனை::File_முனை(FileStorage::Impl* _fs, size_t _blockIdx, size_t _ofs)
     : fs(_fs)
 {
     blockIdx = _blockIdx;
     ofs = _ofs;
 }
 
-FileNode::FileNode(const FileStorage* _fs, size_t _blockIdx, size_t _ofs)
-    : FileNode(_fs->p.get(), _blockIdx, _ofs)
+File_முனை::File_முனை(மாறிலி FileStorage* _fs, size_t _blockIdx, size_t _ofs)
+    : File_முனை(_fs->p.get(), _blockIdx, _ofs)
 {
     // nothing
 }
 
-FileNode::FileNode(const FileNode& node)
+File_முனை::File_முனை(மாறிலி File_முனை& முனை)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
+    fs = முனை.fs;
+    blockIdx = முனை.blockIdx;
+    ofs = முனை.ofs;
 }
 
-FileNode& FileNode::operator=(const FileNode& node)
+File_முனை& File_முனை::operator=(மாறிலி File_முனை& முனை)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
-    return *this;
+    fs = முனை.fs;
+    blockIdx = முனை.blockIdx;
+    ofs = முனை.ofs;
+    திரும்பு *இது;
 }
 
-FileNode FileNode::operator[](const std::string& nodename) const
+File_முனை File_முனை::operator[](மாறிலி std::string& nodename) மாறிலி
 {
-    if(!fs)
-        return FileNode();
+    எனில்(!fs)
+        திரும்பு File_முனை();
 
     CV_Assert( isMap() );
 
-    unsigned key = fs->getStringOfs(nodename);
+    unsigned சாவி = fs->getStringOfs(nodename);
     size_t i, sz = size();
-    FileNodeIterator it = begin();
+    File_முனை_Iterator it = begin();
 
-    for( i = 0; i < sz; i++, ++it )
+    க்கு( i = 0; i < sz; i++, ++it )
     {
-        FileNode n = *it;
-        const uchar* p = n.ptr();
+        File_முனை n = *it;
+        மாறிலி uchar* p = n.ptr();
         unsigned key2 = (unsigned)readInt(p + 1);
         CV_Assert( key2 < fs->str_hash_data.size() );
-        if( key == key2 )
-            return n;
+        எனில்( சாவி == key2 )
+            திரும்பு n;
     }
-    return FileNode();
+    திரும்பு File_முனை();
 }
 
-FileNode FileNode::operator[](const char* nodename) const
+File_முனை File_முனை::operator[](மாறிலி எழுத்து* nodename) மாறிலி
 {
-    return this->operator[](std::string(nodename));
+    திரும்பு இது->operator[](std::string(nodename));
 }
 
-FileNode FileNode::operator[](int i) const
+File_முனை File_முனை::operator[](முழு i) மாறிலி
 {
-    if(!fs)
-        return FileNode();
+    எனில்(!fs)
+        திரும்பு File_முனை();
 
     CV_Assert( isSeq() );
 
-    int sz = (int)size();
+    முழு sz = (முழு)size();
     CV_Assert( 0 <= i && i < sz );
 
-    FileNodeIterator it = begin();
+    File_முனை_Iterator it = begin();
     it += i;
 
-    return *it;
+    திரும்பு *it;
 }
 
-std::vector<String> FileNode::keys() const
+std::vector<String> File_முனை::சாவிகள்() மாறிலி
 {
     CV_Assert(isMap());
 
     std::vector<String> res;
     res.reserve(size());
-    for (FileNodeIterator it = begin(); it != end(); ++it)
+    க்கு (File_முனை_Iterator it = begin(); it != end(); ++it)
     {
         res.push_back((*it).name());
     }
-    return res;
+    திரும்பு res;
 }
 
-int FileNode::type() const
+முழு File_முனை::type() மாறிலி
 {
-    const uchar* p = ptr();
-    if(!p)
-        return NONE;
-    return (*p & TYPE_MASK);
+    மாறிலி uchar* p = ptr();
+    எனில்(!p)
+        திரும்பு NONE;
+    திரும்பு (*p & TYPE_MASK);
 }
 
-bool FileNode::isMap(int flags) { return (flags & TYPE_MASK) == MAP; }
-bool FileNode::isSeq(int flags) { return (flags & TYPE_MASK) == SEQ; }
-bool FileNode::isCollection(int flags) { return isMap(flags) || isSeq(flags); }
-bool FileNode::isFlow(int flags) { return (flags & FLOW) != 0; }
-bool FileNode::isEmptyCollection(int flags) { return (flags & EMPTY) != 0; }
+தருக்க File_முனை::isMap(முழு flags) { திரும்பு (flags & TYPE_MASK) == MAP; }
+தருக்க File_முனை::isSeq(முழு flags) { திரும்பு (flags & TYPE_MASK) == SEQ; }
+தருக்க File_முனை::isCollection(முழு flags) { திரும்பு isMap(flags) || isSeq(flags); }
+தருக்க File_முனை::isFlow(முழு flags) { திரும்பு (flags & FLOW) != 0; }
+தருக்க File_முனை::isEmptyCollection(முழு flags) { திரும்பு (flags & EMPTY) != 0; }
 
-bool FileNode::empty() const   { return fs == 0; }
-bool FileNode::isNone() const  { return type() == NONE; }
-bool FileNode::isSeq() const   { return type() == SEQ; }
-bool FileNode::isMap() const   { return type() == MAP; }
-bool FileNode::isInt() const   { return type() == INT;  }
-bool FileNode::isReal() const  { return type() == REAL; }
-bool FileNode::isString() const { return type() == STRING;  }
-bool FileNode::isNamed() const
+தருக்க File_முனை::empty() மாறிலி   { திரும்பு fs == 0; }
+தருக்க File_முனை::isNone() மாறிலி  { திரும்பு type() == NONE; }
+தருக்க File_முனை::isSeq() மாறிலி   { திரும்பு type() == SEQ; }
+தருக்க File_முனை::isMap() மாறிலி   { திரும்பு type() == MAP; }
+தருக்க File_முனை::isInt() மாறிலி   { திரும்பு type() == INT;  }
+தருக்க File_முனை::isReal() மாறிலி  { திரும்பு type() == REAL; }
+தருக்க File_முனை::isString() மாறிலி { திரும்பு type() == STRING;  }
+தருக்க File_முனை::isNamed() மாறிலி
 {
-    const uchar* p = ptr();
-    if(!p)
-        return false;
-    return (*p & NAMED) != 0;
+    மாறிலி uchar* p = ptr();
+    எனில்(!p)
+        திரும்பு பொய்;
+    திரும்பு (*p & NAMED) != 0;
 }
 
-std::string FileNode::name() const
+std::string File_முனை::name() மாறிலி
 {
-    const uchar* p = ptr();
-    if(!p)
-        return std::string();
+    மாறிலி uchar* p = ptr();
+    எனில்(!p)
+        திரும்பு std::string();
     size_t nameofs = p[1] | (p[2]<<8) | (p[3]<<16) | (p[4]<<24);
-    return fs->getName(nameofs);
+    திரும்பு fs->getName(nameofs);
 }
 
-FileNode::operator int() const
+File_முனை::operator முழு() மாறிலி
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    மாறிலி uchar* p = ptr();
+    எனில்(!p)
+        திரும்பு 0;
+    முழு tag = *p;
+    முழு type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    எனில்( type == INT )
     {
-        return readInt(p);
+        திரும்பு readInt(p);
     }
-    else if( type == REAL )
+    இல்லையெனில் எனில்( type == REAL )
     {
-        return cvRound(readReal(p));
+        திரும்பு cvRound(readReal(p));
     }
-    else
-        return 0x7fffffff;
+    இல்லையெனில்
+        திரும்பு 0x7fffffff;
 }
 
-FileNode::operator int64_t() const
+File_முனை::operator int64_t() மாறிலி
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    மாறிலி uchar* p = ptr();
+    எனில்(!p)
+        திரும்பு 0;
+    முழு tag = *p;
+    முழு type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    எனில்( type == INT )
     {
-        return readLong(p);
+        திரும்பு readLong(p);
     }
-    else if( type == REAL )
+    இல்லையெனில் எனில்( type == REAL )
     {
-        return cvRound(readReal(p));
+        திரும்பு cvRound(readReal(p));
     }
-    else
-        return 0x7fffffff;
+    இல்லையெனில்
+        திரும்பு 0x7fffffff;
 }
 
-FileNode::operator float() const
+File_முனை::operator தசம() மாறிலி
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0.f;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    மாறிலி uchar* p = ptr();
+    எனில்(!p)
+        திரும்பு 0.f;
+    முழு tag = *p;
+    முழு type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    எனில்( type == INT )
     {
-        return (float)readLong(p);
+        திரும்பு (தசம)readLong(p);
     }
-    else if( type == REAL )
+    இல்லையெனில் எனில்( type == REAL )
     {
-        return (float)readReal(p);
+        திரும்பு (தசம)readReal(p);
     }
-    else
-        return FLT_MAX;
+    இல்லையெனில்
+        திரும்பு FLT_MAX;
 }
 
-FileNode::operator double() const
+File_முனை::operator இரட்டை() மாறிலி
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0.f;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    மாறிலி uchar* p = ptr();
+    எனில்(!p)
+        திரும்பு 0.f;
+    முழு tag = *p;
+    முழு type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    எனில்( type == INT )
     {
-        return (double)readLong(p);
+        திரும்பு (இரட்டை)readLong(p);
     }
-    else if( type == REAL )
+    இல்லையெனில் எனில்( type == REAL )
     {
-        return readReal(p);
+        திரும்பு readReal(p);
     }
-    else
-        return DBL_MAX;
+    இல்லையெனில்
+        திரும்பு DBL_MAX;
 }
 
-double FileNode::real() const  { return double(*this); }
+இரட்டை File_முனை::real() மாறிலி  { திரும்பு இரட்டை(*இது); }
 
-std::string FileNode::string() const
+std::string File_முனை::string() மாறிலி
 {
-    const uchar* p = ptr();
-    if( !p || (*p & TYPE_MASK) != STRING )
-        return std::string();
+    மாறிலி uchar* p = ptr();
+    எனில்( !p || (*p & TYPE_MASK) != STRING )
+        திரும்பு std::string();
     p += (*p & NAMED) ? 5 : 1;
     size_t sz = (size_t)(unsigned)readInt(p);
-    return std::string((const char*)(p + 4), sz - 1);
+    திரும்பு std::string((மாறிலி எழுத்து*)(p + 4), sz - 1);
 }
-Mat FileNode::mat() const { Mat value; read(*this, value, Mat()); return value; }
+Mat File_முனை::mat() மாறிலி { Mat value; பட(*இது, value, Mat()); திரும்பு value; }
 
-FileNodeIterator FileNode::begin() const { return FileNodeIterator(*this, false); }
-FileNodeIterator FileNode::end() const   { return FileNodeIterator(*this, true); }
+File_முனை_Iterator File_முனை::begin() மாறிலி { திரும்பு File_முனை_Iterator(*இது, பொய்); }
+File_முனை_Iterator File_முனை::end() மாறிலி   { திரும்பு File_முனை_Iterator(*இது, உண்மை); }
 
-void FileNode::readRaw( const std::string& fmt, void* vec, size_t len ) const
+வெறுமை File_முனை::readRaw( மாறிலி std::string& fmt, வெறுமை* vec, size_t len ) மாறிலி
 {
-    FileNodeIterator it = begin();
+    File_முனை_Iterator it = begin();
     it.readRaw( fmt, vec, len );
 }
 
-size_t FileNode::size() const
+size_t File_முனை::size() மாறிலி
 {
-    const uchar* p = ptr();
-    if( !p )
-        return 0;
-    int tag = *p;
-    int tp = tag & TYPE_MASK;
-    if( tp == MAP || tp == SEQ )
+    மாறிலி uchar* p = ptr();
+    எனில்( !p )
+        திரும்பு 0;
+    முழு tag = *p;
+    முழு tp = tag & TYPE_MASK;
+    எனில்( tp == MAP || tp == SEQ )
     {
-        if( tag & NAMED )
+        எனில்( tag & NAMED )
             p += 4;
-        return (size_t)(unsigned)readInt(p + 5);
+        திரும்பு (size_t)(unsigned)readInt(p + 5);
     }
-    return tp != NONE;
+    திரும்பு tp != NONE;
 }
 
-size_t FileNode::rawSize() const
+size_t File_முனை::rawSize() மாறிலி
 {
-    const uchar* p0 = ptr(), *p = p0;
-    if( !p )
-        return 0;
-    int tag = *p++;
-    int tp = tag & TYPE_MASK;
-    if( tag & NAMED )
+    மாறிலி uchar* p0 = ptr(), *p = p0;
+    எனில்( !p )
+        திரும்பு 0;
+    முழு tag = *p++;
+    முழு tp = tag & TYPE_MASK;
+    எனில்( tag & NAMED )
         p += 4;
     size_t sz0 = (size_t)(p - p0);
-    if( tp == INT )
-        return sz0 + 8;
-    if( tp == REAL )
-        return sz0 + 8;
-    if( tp == NONE )
-        return sz0;
+    எனில்( tp == INT )
+        திரும்பு sz0 + 8;
+    எனில்( tp == REAL )
+        திரும்பு sz0 + 8;
+    எனில்( tp == NONE )
+        திரும்பு sz0;
     CV_Assert( tp == STRING || tp == SEQ || tp == MAP );
-    return sz0 + 4 + readInt(p);
+    திரும்பு sz0 + 4 + readInt(p);
 }
 
-uchar* FileNode::ptr()
+uchar* File_முனை::ptr()
 {
-    return !fs ? 0 : (uchar*)fs->getNodePtr(blockIdx, ofs);
+    திரும்பு !fs ? 0 : (uchar*)fs->get_முனை_Ptr(blockIdx, ofs);
 }
 
-const uchar* FileNode::ptr() const
+மாறிலி uchar* File_முனை::ptr() மாறிலி
 {
-    return !fs ? 0 : fs->getNodePtr(blockIdx, ofs);
+    திரும்பு !fs ? 0 : fs->get_முனை_Ptr(blockIdx, ofs);
 }
 
-void FileNode::setValue( int type, const void* value, int len )
+வெறுமை File_முனை::set_மதிப்பு( முழு type, மாறிலி வெறுமை* value, முழு len )
 {
     uchar *p = ptr();
     CV_Assert(p != 0);
 
-    int tag = *p;
-    int current_type = tag & TYPE_MASK;
+    முழு tag = *p;
+    முழு current_type = tag & TYPE_MASK;
     CV_Assert( current_type == NONE || current_type == type );
 
-    int sz = 1;
+    முழு sz = 1;
 
-    if( tag & NAMED )
+    எனில்( tag & NAMED )
         sz += 4;
 
-    if( type == INT )
+    எனில்( type == INT )
         sz += 8;
-    else if( type == REAL )
+    இல்லையெனில் எனில்( type == REAL )
         sz += 8;
-    else if( type == STRING )
+    இல்லையெனில் எனில்( type == STRING )
     {
-        if( len < 0 )
-            len = (int)strlen((const char*)value);
+        எனில்( len < 0 )
+            len = (முழு)strlen((மாறிலி எழுத்து*)value);
         sz += 4 + len + 1; // besides the string content,
                            // take the size (4 bytes) and the final '\0' into account
     }
-    else
+    இல்லையெனில்
         CV_Error(Error::StsNotImplemented, "Only scalar types can be dynamically assigned to a file node");
 
-    p = fs->reserveNodeSpace(*this, sz);
+    p = fs->reserve_முனை_Space(*இது, sz);
     *p++ = (uchar)(type | (tag & NAMED));
-    if( tag & NAMED )
+    எனில்( tag & NAMED )
         p += 4;
 
-    if( type == INT )
+    எனில்( type == INT )
     {
-        int64_t ival = *(const int64_t*)value;
+        int64_t ival = *(மாறிலி int64_t*)value;
         writeInt(p, ival);
     }
-    else if( type == REAL )
+    இல்லையெனில் எனில்( type == REAL )
     {
-        double dbval = *(const double*)value;
+        இரட்டை dbval = *(மாறிலி இரட்டை*)value;
         writeReal(p, dbval);
     }
-    else if( type == STRING )
+    இல்லையெனில் எனில்( type == STRING )
     {
-        const char* str = (const char*)value;
+        மாறிலி எழுத்து* str = (மாறிலி எழுத்து*)value;
         writeInt(p, len + 1);
         memcpy(p + 4, str, len);
         p[4 + len] = (uchar)'\0';
     }
 }
 
-FileNodeIterator::FileNodeIterator()
+File_முனை_Iterator::File_முனை_Iterator()
 {
     fs = 0;
     blockIdx = 0;
     ofs = 0;
     blockSize = 0;
-    nodeNElems = 0;
+    முனை_NElems = 0;
     idx = 0;
 }
 
-FileNodeIterator::FileNodeIterator( const FileNode& node, bool seekEnd )
+File_முனை_Iterator::File_முனை_Iterator( மாறிலி File_முனை& முனை, தருக்க seekEnd )
 {
-    fs = node.fs;
+    fs = முனை.fs;
     idx = 0;
-    if( !fs )
-        blockIdx = ofs = blockSize = nodeNElems = 0;
-    else
+    எனில்( !fs )
+        blockIdx = ofs = blockSize = முனை_NElems = 0;
+    இல்லையெனில்
     {
-        blockIdx = node.blockIdx;
-        ofs = node.ofs;
+        blockIdx = முனை.blockIdx;
+        ofs = முனை.ofs;
 
-        bool collection = node.isSeq() || node.isMap();
-        if( node.isNone() )
+        தருக்க collection = முனை.isSeq() || முனை.isMap();
+        எனில்( முனை.isNone() )
         {
-            nodeNElems = 0;
+            முனை_NElems = 0;
         }
-        else if( !collection )
+        இல்லையெனில் எனில்( !collection )
         {
-            nodeNElems = 1;
-            if( seekEnd )
+            முனை_NElems = 1;
+            எனில்( seekEnd )
             {
                 idx = 1;
-                ofs += node.rawSize();
+                ofs += முனை.rawSize();
             }
         }
-        else
+        இல்லையெனில்
         {
-            nodeNElems = node.size();
-            const uchar* p0 = node.ptr(), *p = p0 + 1;
-            if(*p0 & FileNode::NAMED )
+            முனை_NElems = முனை.size();
+            மாறிலி uchar* p0 = முனை.ptr(), *p = p0 + 1;
+            எனில்(*p0 & File_முனை::NAMED )
                 p += 4;
-            if( !seekEnd )
+            எனில்( !seekEnd )
                 ofs += (p - p0) + 8;
-            else
+            இல்லையெனில்
             {
                 size_t rawsz = (size_t)(unsigned)readInt(p);
                 ofs += (p - p0) + 4 + rawsz;
-                idx = nodeNElems;
+                idx = முனை_NElems;
             }
         }
-        fs->normalizeNodeOfs(blockIdx, ofs);
+        fs->normalize_முனை_Ofs(blockIdx, ofs);
         blockSize = fs->fs_data_blksz[blockIdx];
     }
 }
 
-FileNodeIterator::FileNodeIterator(const FileNodeIterator& it)
+File_முனை_Iterator::File_முனை_Iterator(மாறிலி File_முனை_Iterator& it)
 {
     fs = it.fs;
     blockIdx = it.blockIdx;
     ofs = it.ofs;
     blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    முனை_NElems = it.முனை_NElems;
     idx = it.idx;
 }
 
-FileNodeIterator& FileNodeIterator::operator=(const FileNodeIterator& it)
+File_முனை_Iterator& File_முனை_Iterator::operator=(மாறிலி File_முனை_Iterator& it)
 {
     fs = it.fs;
     blockIdx = it.blockIdx;
     ofs = it.ofs;
     blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    முனை_NElems = it.முனை_NElems;
     idx = it.idx;
-    return *this;
+    திரும்பு *இது;
 }
 
-FileNode FileNodeIterator::operator *() const
+File_முனை File_முனை_Iterator::operator *() மாறிலி
 {
-    return FileNode(idx < nodeNElems ? fs : NULL, blockIdx, ofs);
+    திரும்பு File_முனை(idx < முனை_NElems ? fs : வெற்று, blockIdx, ofs);
 }
 
-FileNodeIterator& FileNodeIterator::operator ++ ()
+File_முனை_Iterator& File_முனை_Iterator::operator ++ ()
 {
-    if( idx == nodeNElems || !fs )
-        return *this;
+    எனில்( idx == முனை_NElems || !fs )
+        திரும்பு *இது;
     idx++;
-    FileNode n(fs, blockIdx, ofs);
+    File_முனை n(fs, blockIdx, ofs);
     ofs += n.rawSize();
-    if( ofs >= blockSize )
+    எனில்( ofs >= blockSize )
     {
-        fs->normalizeNodeOfs(blockIdx, ofs);
+        fs->normalize_முனை_Ofs(blockIdx, ofs);
         blockSize = fs->fs_data_blksz[blockIdx];
     }
-    return *this;
+    திரும்பு *இது;
 }
 
-FileNodeIterator FileNodeIterator::operator ++ (int)
+File_முனை_Iterator File_முனை_Iterator::operator ++ (முழு)
 {
-    FileNodeIterator it = *this;
-    ++(*this);
-    return it;
+    File_முனை_Iterator it = *இது;
+    ++(*இது);
+    திரும்பு it;
 }
 
-FileNodeIterator& FileNodeIterator::operator += (int _ofs)
+File_முனை_Iterator& File_முனை_Iterator::operator += (முழு _ofs)
 {
     CV_Assert( _ofs >= 0 );
-    for( ; _ofs > 0; _ofs-- )
-        this->operator ++();
-    return *this;
+    க்கு( ; _ofs > 0; _ofs-- )
+        இது->operator ++();
+    திரும்பு *இது;
 }
 
-FileNodeIterator& FileNodeIterator::readRaw( const String& fmt, void* _data0, size_t maxsz)
+File_முனை_Iterator& File_முனை_Iterator::readRaw( மாறிலி String& fmt, வெறுமை* _data0, size_t maxsz)
 {
-    if( fs && idx < nodeNElems )
+    எனில்( fs && idx < முனை_NElems )
     {
         uchar* data0 = (uchar*)_data0;
-        int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2];
-        int fmt_pair_count = fs::decodeFormat( fmt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+        முழு fmt_pairs[CV_FS_MAX_FMT_PAIRS*2];
+        முழு fmt_pair_மொத்தம் = fs::decodeFormat( fmt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS );
         size_t esz = fs::calcStructSize( fmt.c_str(), 0 );
 
         CV_Assert( maxsz % esz == 0 );
         maxsz /= esz;
 
-        for( ; maxsz > 0; maxsz--, data0 += esz )
+        க்கு( ; maxsz > 0; maxsz--, data0 += esz )
         {
             size_t offset = 0;
-            for( int k = 0; k < fmt_pair_count; k++ )
+            க்கு( முழு k = 0; k < fmt_pair_மொத்தம்; k++ )
             {
-                int elem_type = fmt_pairs[k*2+1];
-                int elem_size = CV_ELEM_SIZE(elem_type);
+                முழு elem_type = fmt_pairs[k*2+1];
+                முழு elem_size = CV_ELEM_SIZE(elem_type);
 
-                int count = fmt_pairs[k*2];
+                முழு மொத்தம்_2 = fmt_pairs[k*2];
                 offset = alignSize( offset, elem_size );
                 uchar* data = data0 + offset;
 
-                for( int i = 0; i < count; i++, ++(*this) )
+                க்கு( முழு i = 0; i < மொத்தம்_2; i++, ++(*இது) )
                 {
-                    FileNode node = *(*this);
-                    if( node.isInt() )
+                    File_முனை முனை = *(*இது);
+                    எனில்( முனை.isInt() )
                     {
-                        int64_t ival = static_cast<int64_t>(elem_size == 8 ? (int64_t)node : (int)node);
-                        switch( elem_type )
+                        int64_t ival = static_cast<int64_t>(elem_size == 8 ? (int64_t)முனை : (முழு)முனை);
+                        தேர்வு( elem_type )
                         {
-                        case CV_8U:
+                        நிலை CV_8U:
                             *(uchar*)data = saturate_cast<uchar>(ival);
                             data++;
-                            break;
-                        case CV_8S:
-                            *(char*)data = saturate_cast<schar>(ival);
+                            நிறுத்து;
+                        நிலை CV_8S:
+                            *(எழுத்து*)data = saturate_cast<schar>(ival);
                             data++;
-                            break;
-                        case CV_Bool:
-                            *(bool*)data = ival != 0;
+                            நிறுத்து;
+                        நிலை CV_Bool:
+                            *(தருக்க*)data = ival != 0;
                             data++;
-                            break;
-                        case CV_16U:
+                            நிறுத்து;
+                        நிலை CV_16U:
                             *(ushort*)data = saturate_cast<ushort>(ival);
-                            data += sizeof(ushort);
-                            break;
-                        case CV_16S:
+                            data += அளவு(ushort);
+                            நிறுத்து;
+                        நிலை CV_16S:
                             *(short*)data = saturate_cast<short>(ival);
-                            data += sizeof(short);
-                            break;
-                        case CV_32U:
+                            data += அளவு(short);
+                            நிறுத்து;
+                        நிலை CV_32U:
                             *(unsigned*)data = (unsigned)std::max(ival, (int64_t)0);
-                            data += sizeof(unsigned);
-                            break;
-                        case CV_32S:
-                            *(int*)data = (int)ival;
-                            data += sizeof(int);
-                            break;
-                        case CV_32F:
-                            *(float*)data = (float)ival;
-                            data += sizeof(float);
-                            break;
-                        case CV_64U:
+                            data += அளவு(unsigned);
+                            நிறுத்து;
+                        நிலை CV_32S:
+                            *(முழு*)data = (முழு)ival;
+                            data += அளவு(முழு);
+                            நிறுத்து;
+                        நிலை CV_32F:
+                            *(தசம*)data = (தசம)ival;
+                            data += அளவு(தசம);
+                            நிறுத்து;
+                        நிலை CV_64U:
                             *(uint64_t*)data = (uint64_t)ival;
-                            data += sizeof(uint64_t);
-                            break;
-                        case CV_64S:
+                            data += அளவு(uint64_t);
+                            நிறுத்து;
+                        நிலை CV_64S:
                             *(int64_t*)data = (int64_t)ival;
-                            data += sizeof(int64_t);
-                            break;
-                        case CV_64F:
-                            *(double*)data = (double)ival;
-                            data += sizeof(double);
-                            break;
-                        case CV_16F:
-                            *(hfloat*)data = hfloat((float)ival);
-                            data += sizeof(hfloat);
-                            break;
-                        case CV_16BF:
-                            *(bfloat*)data = bfloat((float)ival);
-                            data += sizeof(bfloat);
-                            break;
-                        case CV_8F_E4M3FN:
-                            *(fp8_t*)data = fp8_t((float)ival);
-                            data += sizeof(fp8_t);
-                            break;
-                        case CV_8F_E4M3FNUZ:
-                            *(fp8a_t*)data = fp8a_t((float)ival);
-                            data += sizeof(fp8a_t);
-                            break;
-                        default:
+                            data += அளவு(int64_t);
+                            நிறுத்து;
+                        நிலை CV_64F:
+                            *(இரட்டை*)data = (இரட்டை)ival;
+                            data += அளவு(இரட்டை);
+                            நிறுத்து;
+                        நிலை CV_16F:
+                            *(hfloat*)data = hfloat((தசம)ival);
+                            data += அளவு(hfloat);
+                            நிறுத்து;
+                        நிலை CV_16BF:
+                            *(bfloat*)data = bfloat((தசம)ival);
+                            data += அளவு(bfloat);
+                            நிறுத்து;
+                        நிலை CV_8F_E4M3FN:
+                            *(fp8_t*)data = fp8_t((தசம)ival);
+                            data += அளவு(fp8_t);
+                            நிறுத்து;
+                        நிலை CV_8F_E4M3FNUZ:
+                            *(fp8a_t*)data = fp8a_t((தசம)ival);
+                            data += அளவு(fp8a_t);
+                            நிறுத்து;
+                        இயல்பு:
                             CV_Error( Error::StsUnsupportedFormat, "Unsupported type" );
                         }
                     }
-                    else if( node.isReal() )
+                    இல்லையெனில் எனில்( முனை.isReal() )
                     {
-                        double fval = (double)node;
+                        இரட்டை fval = (இரட்டை)முனை;
 
-                        switch( elem_type )
+                        தேர்வு( elem_type )
                         {
-                        case CV_8U:
+                        நிலை CV_8U:
                             *(uchar*)data = saturate_cast<uchar>(fval);
                             data++;
-                            break;
-                        case CV_8S:
-                            *(char*)data = saturate_cast<schar>(fval);
+                            நிறுத்து;
+                        நிலை CV_8S:
+                            *(எழுத்து*)data = saturate_cast<schar>(fval);
                             data++;
-                            break;
-                        case CV_16U:
+                            நிறுத்து;
+                        நிலை CV_16U:
                             *(ushort*)data = saturate_cast<ushort>(fval);
-                            data += sizeof(ushort);
-                            break;
-                        case CV_16S:
+                            data += அளவு(ushort);
+                            நிறுத்து;
+                        நிலை CV_16S:
                             *(short*)data = saturate_cast<short>(fval);
-                            data += sizeof(short);
-                            break;
-                        case CV_32U:
-                            *(int*)data = saturate_cast<unsigned>(fval);
-                            data += sizeof(int);
-                            break;
-                        case CV_32S:
-                            *(int*)data = saturate_cast<int>(fval);
-                            data += sizeof(int);
-                            break;
-                        case CV_32F:
-                            *(float*)data = (float)fval;
-                            data += sizeof(float);
-                            break;
-                        case CV_64U:
+                            data += அளவு(short);
+                            நிறுத்து;
+                        நிலை CV_32U:
+                            *(முழு*)data = saturate_cast<unsigned>(fval);
+                            data += அளவு(முழு);
+                            நிறுத்து;
+                        நிலை CV_32S:
+                            *(முழு*)data = saturate_cast<முழு>(fval);
+                            data += அளவு(முழு);
+                            நிறுத்து;
+                        நிலை CV_32F:
+                            *(தசம*)data = (தசம)fval;
+                            data += அளவு(தசம);
+                            நிறுத்து;
+                        நிலை CV_64U:
                             *(uint64_t*)data = (uint64_t)round(std::max(fval, 0.));
-                            data += sizeof(uint64_t);
-                            break;
-                        case CV_64S:
+                            data += அளவு(uint64_t);
+                            நிறுத்து;
+                        நிலை CV_64S:
                             *(int64_t*)data = (int64_t)round(std::max(fval, 0.));
-                            data += sizeof(int64_t);
-                            break;
-                        case CV_64F:
-                            *(double*)data = fval;
-                            data += sizeof(double);
-                            break;
-                        case CV_16F:
-                            *(hfloat*)data = hfloat((float)fval);
-                            data += sizeof(hfloat);
-                            break;
-                        case CV_16BF:
-                            *(bfloat*)data = bfloat((float)fval);
-                            data += sizeof(bfloat);
-                            break;
-                        case CV_8F_E4M3FN:
-                            *(fp8_t*)data = fp8_t((float)fval);
-                            data += sizeof(fp8_t);
-                            break;
-                        case CV_8F_E4M3FNUZ:
-                            *(fp8a_t*)data = fp8a_t((float)fval);
-                            data += sizeof(fp8a_t);
-                            break;
-                        default:
+                            data += அளவு(int64_t);
+                            நிறுத்து;
+                        நிலை CV_64F:
+                            *(இரட்டை*)data = fval;
+                            data += அளவு(இரட்டை);
+                            நிறுத்து;
+                        நிலை CV_16F:
+                            *(hfloat*)data = hfloat((தசம)fval);
+                            data += அளவு(hfloat);
+                            நிறுத்து;
+                        நிலை CV_16BF:
+                            *(bfloat*)data = bfloat((தசம)fval);
+                            data += அளவு(bfloat);
+                            நிறுத்து;
+                        நிலை CV_8F_E4M3FN:
+                            *(fp8_t*)data = fp8_t((தசம)fval);
+                            data += அளவு(fp8_t);
+                            நிறுத்து;
+                        நிலை CV_8F_E4M3FNUZ:
+                            *(fp8a_t*)data = fp8a_t((தசம)fval);
+                            data += அளவு(fp8a_t);
+                            நிறுத்து;
+                        இயல்பு:
                             CV_Error( Error::StsUnsupportedFormat, "Unsupported type" );
                         }
                     }
-                    else
+                    இல்லையெனில்
                         CV_Error( Error::StsError, "readRawData can only be used to read plain sequences of numbers" );
                 }
-                offset = (int)(data - data0);
+                offset = (முழு)(data - data0);
             }
         }
     }
 
-    return *this;
+    திரும்பு *இது;
 }
 
-bool FileNodeIterator::equalTo(const FileNodeIterator& it) const
+தருக்க File_முனை_Iterator::equalTo(மாறிலி File_முனை_Iterator& it) மாறிலி
 {
-    return fs == it.fs && blockIdx == it.blockIdx && ofs == it.ofs &&
-           idx == it.idx && nodeNElems == it.nodeNElems;
+    திரும்பு fs == it.fs && blockIdx == it.blockIdx && ofs == it.ofs &&
+           idx == it.idx && முனை_NElems == it.முனை_NElems;
 }
 
-size_t FileNodeIterator::remaining() const
+size_t File_முனை_Iterator::remaining() மாறிலி
 {
-    return nodeNElems - idx;
+    திரும்பு முனை_NElems - idx;
 }
 
-bool operator == ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+தருக்க operator == ( மாறிலி File_முனை_Iterator& it1, மாறிலி File_முனை_Iterator& it2 )
 {
-    return it1.equalTo(it2);
+    திரும்பு it1.equalTo(it2);
 }
 
-bool operator != ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+தருக்க operator != ( மாறிலி File_முனை_Iterator& it1, மாறிலி File_முனை_Iterator& it2 )
 {
-    return !it1.equalTo(it2);
+    திரும்பு !it1.equalTo(it2);
 }
 
-void read(const FileNode& node, int& val, int default_val)
+வெறுமை பட(மாறிலி File_முனை& முனை, முழு& val, முழு default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    எனில்( !முனை.empty() )
     {
-        val = (int)node;
+        val = (முழு)முனை;
     }
 }
 
-void read(const FileNode& node, int64_t& val, int64_t default_val)
+வெறுமை பட(மாறிலி File_முனை& முனை, int64_t& val, int64_t default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    எனில்( !முனை.empty() )
     {
-        val = (int64_t)node;
+        val = (int64_t)முனை;
     }
 }
 
-void read(const FileNode& node, double& val, double default_val)
+வெறுமை பட(மாறிலி File_முனை& முனை, இரட்டை& val, இரட்டை default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    எனில்( !முனை.empty() )
     {
-        val = (double)node;
+        val = (இரட்டை)முனை;
     }
 }
 
-void read(const FileNode& node, float& val, float default_val)
+வெறுமை பட(மாறிலி File_முனை& முனை, தசம& val, தசம default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    எனில்( !முனை.empty() )
     {
-        val = (float)node;
+        val = (தசம)முனை;
     }
 }
 
-void read(const FileNode& node, std::string& val, const std::string& default_val)
+வெறுமை பட(மாறிலி File_முனை& முனை, std::string& val, மாறிலி std::string& default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    எனில்( !முனை.empty() )
     {
-        val = (std::string)node;
+        val = (std::string)முனை;
     }
 }
-void FileStorage::Impl::write(const String &key, bool value)
+வெறுமை FileStorage::Impl::லிக(மாறிலி String &சாவி, தருக்க value)
 {
     CV_Assert(write_mode);
-    if (fmt != FileStorage::FORMAT_YAML)
+    எனில் (fmt != FileStorage::FORMAT_YAML)
     {
         // Legacy behavior: Write as integer 1 or 0
-        getEmitter().write(key.c_str(), (int)value);
+        getEmitter().லிக(சாவி.c_str(), (முழு)value);
     }
-    else
+    இல்லையெனில்
     {
         // Default/Modern behavior: Write as "true" or "false"
-        getEmitter().write(key.c_str(), value ? "true" : "false", false);
+        getEmitter().லிக(சாவி.c_str(), value ? "true" : "false", பொய்);
     }
 }
 
 FileStorage_API::~FileStorage_API() {}
 
-namespace internal
+நாமாகாஶ internal
 {
 
-WriteStructContext::WriteStructContext(FileStorage& _fs, const std::string& name,
-                                       int flags, const std::string& typeName)
+WriteStructContext::WriteStructContext(FileStorage& _fs, மாறிலி std::string& name,
+                                       முழு flags, மாறிலி std::string& typeName)
 {
     fs = &_fs;
     fs->startWriteStruct(name, flags, typeName);

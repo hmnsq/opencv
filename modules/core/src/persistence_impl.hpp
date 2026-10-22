@@ -5,117 +5,117 @@
 #ifndef OPENCV_CORE_PERSISTENCE_IMPL_HPP
 #define OPENCV_CORE_PERSISTENCE_IMPL_HPP
 
-#include "persistence.hpp"
-#include "persistence_base64_encoding.hpp"
-#include <unordered_map>
-#include <iterator>
+#அந்தர்பாவ "persistence.hpp"
+#அந்தர்பாவ "persistence_base64_encoding.hpp"
+#அந்தர்பாவ <unordered_map>
+#அந்தர்பாவ <iterator>
 
 
-namespace cv
+நாமாகாஶ cv
 {
 
-enum Base64State{
+எண்ணிக்கை Base64State{
     Uncertain,
     NotUse,
     InUse,
 };
 
-class cv::FileStorage::Impl : public FileStorage_API
+வகுப்பு cv::FileStorage::Impl : பொது FileStorage_API
 {
-public:
-    void init();
+பொது:
+    வெறுமை init();
 
     Impl(FileStorage* _fs);
 
-    virtual ~Impl();
+    மெய்நிகர் ~Impl();
 
-    void release(String* out=0);
+    வெறுமை release(String* out=0);
 
-    void analyze_file_name( const std::string& file_name, std::vector<std::string>& params );
+    வெறுமை analyze_file_name( மாறிலி std::string& file_name, std::vector<std::string>& params );
 
-    bool open( const char* filename_or_buf, int _flags, const char* encoding );
+    தருக்க open( மாறிலி எழுத்து* filename_or_buf, முழு _flags, மாறிலி எழுத்து* encoding );
 
-    void puts( const char* str );
+    வெறுமை puts( மாறிலி எழுத்து* str );
 
-    char* getsFromFile( char* buf, int count );
+    எழுத்து* getsFromFile( எழுத்து* buf, முழு மொத்தம்_2 );
 
-    char* gets( size_t maxCount );
+    எழுத்து* gets( size_t max_மொத்தம் );
 
-    char* gets();
+    எழுத்து* gets();
 
-    bool eof();
+    தருக்க eof();
 
-    void setEof();
+    வெறுமை setEof();
 
-    void closeFile();
+    வெறுமை closeFile();
 
-    void rewind();
+    வெறுமை rewind();
 
-    char* resizeWriteBuffer( char* ptr, int len );
+    எழுத்து* resizeWriteBuffer( எழுத்து* ptr, முழு len );
 
-    char* flush();
+    எழுத்து* flush();
 
-    void endWriteStruct();
+    வெறுமை endWriteStruct();
 
-    void startWriteStruct_helper( const char* key, int struct_flags,
-                                  const char* type_name );
+    வெறுமை startWriteStruct_helper( மாறிலி எழுத்து* சாவி, முழு struct_flags,
+                                  மாறிலி எழுத்து* type_name );
 
-    void startWriteStruct( const char* key, int struct_flags,
-                           const char* type_name );
+    வெறுமை startWriteStruct( மாறிலி எழுத்து* சாவி, முழு struct_flags,
+                           மாறிலி எழுத்து* type_name );
 
-    void writeComment( const char* comment, bool eol_comment );
+    வெறுமை writeComment( மாறிலி எழுத்து* comment, தருக்க eol_comment );
 
-    void startNextStream();
+    வெறுமை startNextStream();
 
-    void write( const String& key, int value );
+    வெறுமை லிக( மாறிலி String& சாவி, முழு value );
 
-    void write( const String& key, bool value );
+    வெறுமை லிக( மாறிலி String& சாவி, தருக்க value );
 
-    void write( const String& key, int64_t value );
+    வெறுமை லிக( மாறிலி String& சாவி, int64_t value );
 
-    void write( const String& key, double value );
+    வெறுமை லிக( மாறிலி String& சாவி, இரட்டை value );
 
-    void write( const String& key, const String& value );
+    வெறுமை லிக( மாறிலி String& சாவி, மாறிலி String& value );
 
-    void writeRawData( const std::string& dt, const void* _data, size_t len );
+    வெறுமை writeRawData( மாறிலி std::string& dt, மாறிலி வெறுமை* _data, size_t len );
 
-    void workaround();
+    வெறுமை workaround();
 
-    void switch_to_Base64_state( FileStorage_API::Base64State new_state);
+    வெறுமை switch_to_Base64_state( FileStorage_API::Base64State new_state);
 
-    void make_write_struct_delayed( const char* key, int struct_flags, const char* type_name );
+    வெறுமை make_write_struct_delayed( மாறிலி எழுத்து* சாவி, முழு struct_flags, மாறிலி எழுத்து* type_name );
 
-    void check_if_write_struct_is_delayed( bool change_type_to_base64 );
+    வெறுமை check_if_write_struct_is_delayed( தருக்க change_type_to_base64 );
 
-    void writeRawDataBase64(const void* _data, size_t len, const char* dt );
+    வெறுமை writeRawDataBase64(மாறிலி வெறுமை* _data, size_t len, மாறிலி எழுத்து* dt );
 
     String releaseAndGetString();
 
-    FileNode getFirstTopLevelNode() const;
+    File_முனை get_First_உச்சி_Level_முனை() மாறிலி;
 
-    FileNode root(int streamIdx=0) const;
+    File_முனை வேர்(முழு streamIdx=0) மாறிலி;
 
-    FileNode operator[](const String& nodename) const;
+    File_முனை operator[](மாறிலி String& nodename) மாறிலி;
 
-    FileNode operator[](const char* /*nodename*/) const;
+    File_முனை operator[](மாறிலி எழுத்து* /*nodename*/) மாறிலி;
 
-    virtual int getFormat() const CV_OVERRIDE;
+    மெய்நிகர் முழு getFormat() மாறிலி CV_OVERRIDE;
 
-    char* bufferPtr() const;
-    char* bufferStart() const;
-    char* bufferEnd() const;
-    void setBufferPtr(char* ptr);
-    int wrapMargin() const;
+    எழுத்து* bufferPtr() மாறிலி;
+    எழுத்து* bufferStart() மாறிலி;
+    எழுத்து* bufferEnd() மாறிலி;
+    வெறுமை setBufferPtr(எழுத்து* ptr);
+    முழு wrapMargin() மாறிலி;
 
     FStructData& getCurrentStruct();
 
-    void setNonEmpty();
+    வெறுமை setNonEmpty();
 
-    void processSpecialDouble( char* buf, double* value, char** endptr );
+    வெறுமை processSpecialDouble( எழுத்து* buf, இரட்டை* value, எழுத்து** endptr );
 
-    double strtod( char* ptr, char** endptr );
+    இரட்டை strtod( எழுத்து* ptr, எழுத்து** endptr );
 
-    void convertToCollection(int type, FileNode& node);
+    வெறுமை convertToCollection(முழு type, File_முனை& முனை);
 
     // a) allocates new FileNode (for that just set blockIdx to the last block and ofs to freeSpaceOfs) or
     // b) reallocates just created new node (blockIdx and ofs must be taken from FileNode).
@@ -124,130 +124,130 @@ public:
     //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
     // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
     // In the case (b) the existing tag and the name are copied automatically.
-    uchar* reserveNodeSpace(FileNode& node, size_t sz);
+    uchar* reserve_முனை_Space(File_முனை& முனை, size_t sz);
 
-    unsigned getStringOfs( const std::string& key ) const;
+    unsigned getStringOfs( மாறிலி std::string& சாவி ) மாறிலி;
 
-    FileNode addNode( FileNode& collection, const std::string& key,
-                      int elem_type, const void* value, int len );
+    File_முனை add_முனை( File_முனை& collection, மாறிலி std::string& சாவி,
+                      முழு elem_type, மாறிலி வெறுமை* value, முழு len );
 
-    void finalizeCollection( FileNode& collection );
+    வெறுமை finalizeCollection( File_முனை& collection );
 
-    void normalizeNodeOfs(size_t& blockIdx, size_t& ofs) const;
+    வெறுமை normalize_முனை_Ofs(size_t& blockIdx, size_t& ofs) மாறிலி;
 
     Base64State get_state_of_writing_base64();
 
-    int get_space();
+    முழு get_space();
 
-    class Base64Decoder
+    வகுப்பு Base64Decoder
     {
-    public:
+    பொது:
         Base64Decoder();
-        void init(const Ptr<FileStorageParser>& _parser, char* _ptr, int _indent);
+        வெறுமை init(மாறிலி Ptr<FileStorageParser>& _parser, எழுத்து* _ptr, முழு _indent);
 
-        bool readMore(int needed);
+        தருக்க readMore(முழு needed);
 
         uchar getUInt8();
 
         ushort getUInt16();
 
-        int getInt32();
+        முழு getInt32();
 
         int64_t getInt64();
 
-        double getFloat64();
+        இரட்டை getFloat64();
 
-        bool endOfStream() const;
-        char* getPtr() const;
-    protected:
+        தருக்க endOfStream() மாறிலி;
+        எழுத்து* getPtr() மாறிலி;
+    பாதுகாக்கப்பட்ட:
 
         Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-        FileStorageParser& getParser() const
+        FileStorageParser& getParser() மாறிலி
         {
-            if (!parser_do_not_use_direct_dereference)
+            எனில் (!parser_do_not_use_direct_dereference)
                 CV_Error(Error::StsNullPtr, "Parser is not available");
-            return *parser_do_not_use_direct_dereference;
+            திரும்பு *parser_do_not_use_direct_dereference;
         }
-        char* ptr;
-        int indent;
-        std::vector<char> encoded;
+        எழுத்து* ptr;
+        முழு indent;
+        std::vector<எழுத்து> encoded;
         std::vector<uchar> decoded;
         size_t ofs;
         size_t totalchars;
-        bool eos;
+        தருக்க eos;
     };
 
-    char* parseBase64(char* ptr, int indent, FileNode& collection);
+    எழுத்து* parseBase64(எழுத்து* ptr, முழு indent, File_முனை& collection);
 
-    void parseError( const char* func_name, const std::string& err_msg, const char* source_file, int source_line );
+    வெறுமை parseError( மாறிலி எழுத்து* func_name, மாறிலி std::string& err_செய்தி, மாறிலி எழுத்து* source_file, முழு source_வரி );
 
-    const uchar* getNodePtr(size_t blockIdx, size_t ofs) const;
+    மாறிலி uchar* get_முனை_Ptr(size_t blockIdx, size_t ofs) மாறிலி;
 
-    std::string getName( size_t nameofs ) const;
+    std::string getName( size_t nameofs ) மாறிலி;
 
     FileStorage* getFS();
 
     FileStorage* fs_ext;
 
     std::string filename;
-    int flags;
-    bool empty_stream;
+    முழு flags;
+    தருக்க empty_stream;
 
     FILE* file;
     gzFile gzfile;
 
-    bool is_opened;
-    bool dummy_eof;
-    bool write_mode;
-    bool mem_mode;
-    int fmt;
+    தருக்க is_opened;
+    தருக்க dummy_eof;
+    தருக்க write_mode;
+    தருக்க mem_mode;
+    முழு fmt;
 
     State state; //!< current state of the FileStorage (used only for writing)
-    bool is_using_base64;
-    bool is_write_struct_delayed;
-    char* delayed_struct_key;
-    int   delayed_struct_flags;
-    char* delayed_type_name;
+    தருக்க is_using_base64;
+    தருக்க is_write_struct_delayed;
+    எழுத்து* delayed_struct_சாவி;
+    முழு   delayed_struct_flags;
+    எழுத்து* delayed_type_name;
     FileStorage_API::Base64State state_of_writing_base64;
 
-    int space, wrap_margin;
-    std::deque<FStructData> write_stack;
-    std::vector<char> buffer;
+    முழு space, wrap_margin;
+    std::deque<FStructData> write_அடுக்கு;
+    std::vector<எழுத்து> buffer;
     size_t bufofs;
 
-    std::deque<char> outbuf;
+    std::deque<எழுத்து> outbuf;
 
     Ptr<FileStorageEmitter> emitter_do_not_use_direct_dereference;
     FileStorageEmitter& getEmitter()
     {
-        if (!emitter_do_not_use_direct_dereference)
+        எனில் (!emitter_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Emitter is not available");
-        return *emitter_do_not_use_direct_dereference;
+        திரும்பு *emitter_do_not_use_direct_dereference;
     }
     Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-    FileStorageParser& getParser() const
+    FileStorageParser& getParser() மாறிலி
     {
-        if (!parser_do_not_use_direct_dereference)
+        எனில் (!parser_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Parser is not available");
-        return *parser_do_not_use_direct_dereference;
+        திரும்பு *parser_do_not_use_direct_dereference;
     }
     Base64Decoder base64decoder;
     base64::Base64Writer* base64_writer;
 
-    std::vector<FileNode> roots;
+    std::vector<File_முனை> roots;
     std::vector<Ptr<std::vector<uchar> > > fs_data;
     std::vector<uchar*> fs_data_ptrs;
     std::vector<size_t> fs_data_blksz;
     size_t freeSpaceOfs;
-    typedef std::unordered_map<std::string, unsigned> str_hash_t;
+    வகைவரை std::unordered_map<std::string, unsigned> str_hash_t;
     str_hash_t str_hash;
-    std::vector<char> str_hash_data;
+    std::vector<எழுத்து> str_hash_data;
 
-    std::vector<char> strbufv;
-    char* strbuf;
+    std::vector<எழுத்து> strbufv;
+    எழுத்து* strbuf;
     size_t strbufsize;
     size_t strbufpos;
-    int lineno;
+    முழு lineno;
 };
 
 }

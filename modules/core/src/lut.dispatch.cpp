@@ -3,53 +3,53 @@
 // of this distribution and at http://opencv.org/license.html
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
-#include "precomp.hpp"
+#அந்தர்பாவ "precomp.hpp"
 
-#include "lut.simd.hpp"
-#include "lut.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX512_ICL,...,BASELINE based on CMakeLists.txt content
+#அந்தர்பாவ "lut.simd.hpp"
+#அந்தர்பாவ "lut.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX512_ICL,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+நாமாகாஶ cv {
 
-namespace {
+நாமாகாஶ {
 
-typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, int, int, int );
-typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, int, int, int );
+வகைவரை வெறுமை (*LUT8uFunc)( மாறிலி uchar*, மாறிலி uchar*, uchar*, முழு, முழு, முழு );
+வகைவரை வெறுமை (*LUT16uFunc)( மாறிலி uchar*, மாறிலி ushort*, ushort*, முழு, முழு, முழு );
 
-static LUT8uFunc resolveLUT8uFunc()
+நிலையான LUT8uFunc resolveLUT8uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT8u_;
+#எனில் CV_TRY_AVX512_ICL
+    எனில் (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        திரும்பு opt_AVX512_ICL::LUT8u_;
 #endif
-    return cpu_baseline::LUT8u_;
+    திரும்பு cpu_baseline::LUT8u_;
 }
 
-static LUT16uFunc resolveLUT16uFunc()
+நிலையான LUT16uFunc resolveLUT16uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT16u_;
+#எனில் CV_TRY_AVX512_ICL
+    எனில் (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        திரும்பு opt_AVX512_ICL::LUT16u_;
 #endif
-    return cpu_baseline::LUT16u_;
+    திரும்பு cpu_baseline::LUT16u_;
 }
 
 } // namespace
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
+வெறுமை LUT8u_dispatch( மாறிலி uchar* src, மாறிலி uchar* lut, uchar* dst, முழு len, முழு cn, முழு lutcn );
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn )
+வெறுமை LUT8u_dispatch( மாறிலி uchar* src, மாறிலி uchar* lut, uchar* dst, முழு len, முழு cn, முழு lutcn )
 {
     CV_INSTRUMENT_REGION();
-    static LUT8uFunc fn = resolveLUT8uFunc();
+    நிலையான LUT8uFunc fn = resolveLUT8uFunc();
     fn(src, lut, dst, len, cn, lutcn);
 }
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+வெறுமை LUT16u_dispatch( மாறிலி uchar* src, மாறிலி ushort* lut, ushort* dst, முழு len, முழு cn, முழு lutcn );
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn )
+வெறுமை LUT16u_dispatch( மாறிலி uchar* src, மாறிலி ushort* lut, ushort* dst, முழு len, முழு cn, முழு lutcn )
 {
     CV_INSTRUMENT_REGION();
-    static LUT16uFunc fn = resolveLUT16uFunc();
+    நிலையான LUT16uFunc fn = resolveLUT16uFunc();
     fn(src, lut, dst, len, cn, lutcn);
 }
 

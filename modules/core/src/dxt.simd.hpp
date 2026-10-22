@@ -18,30 +18,30 @@
 //    table layout (leg-major, tw_stride per leg) that makes this correct. Kernels never
 //    special-case span < VL themselves: the plan selects DFT_STAGE_SCALAR for those.
 
-#include "opencv2/core/hal/intrin.hpp"
-#include "dxt.hpp"
-#include <cmath>
-#include <cstring>
+#அந்தர்பாவ "opencv2/core/hal/intrin.hpp"
+#அந்தர்பாவ "dxt.hpp"
+#அந்தர்பாவ <cmath>
+#அந்தர்பாவ <cstring>
 
-namespace cv {
+நாமாகாஶ cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-DFTKernels getDFTKernels_(int depth);
+DFTKernels getDFTKernels_(முழு depth);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-namespace {
+நாமாகாஶ {
 
-template<typename T> struct DftConst
+template<typename T> கட்டமைப்பு DftConst
 {
     // sin(2*pi/3), (cos(2pi/5)-cos(4pi/5))/2, sin(2pi/5), sin(4pi/5), sqrt(2)/2
-    static const T sin120, fft5_2, sin72, sin144, sin45;
+    நிலையான மாறிலி T sin120, fft5_2, sin72, sin144, sin45;
 };
-template<typename T> const T DftConst<T>::sin120 = (T)0.86602540378443864676372317075294;
-template<typename T> const T DftConst<T>::fft5_2 = (T)0.559016994374947424102293417182819;
-template<typename T> const T DftConst<T>::sin72  = (T)0.951056516295153572116439333379382;
-template<typename T> const T DftConst<T>::sin144 = (T)0.587785252292473129168705954639073;
-template<typename T> const T DftConst<T>::sin45  = (T)0.70710678118654752440084436210485;
+template<typename T> மாறிலி T DftConst<T>::sin120 = (T)0.86602540378443864676372317075294;
+template<typename T> மாறிலி T DftConst<T>::fft5_2 = (T)0.559016994374947424102293417182819;
+template<typename T> மாறிலி T DftConst<T>::sin72  = (T)0.951056516295153572116439333379382;
+template<typename T> மாறிலி T DftConst<T>::sin144 = (T)0.587785252292473129168705954639073;
+template<typename T> மாறிலி T DftConst<T>::sin45  = (T)0.70710678118654752440084436210485;
 
 // 4-point forward DFT of (x0,x1,x2,x3) -> (X0,X1,X2,X3), scalar.
 // (internal temporaries are prefixed with _t so that callers may pass any names as outputs)
@@ -53,13 +53,13 @@ template<typename T> const T DftConst<T>::sin45  = (T)0.707106781186547524400844
         X1r = _t1r + _t3i; X1i = _t1i - _t3r; X3r = _t1r - _t3i; X3i = _t1i + _t3r; \
     }
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-inline v_float32 v_setall_(float x) { return vx_setall_f32(x); }
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+உள்வரி v_float32 v_setall_(தசம x) { திரும்பு vx_setall_f32(x); }
 // all-lanes sign-bit mask (when neg) or zero: x ^ mask negates x when neg, keeps it otherwise
-inline v_float32 v_signmask_(bool neg, float) { return v_reinterpret_as_f32(vx_setall_u32(neg ? 0x80000000u : 0u)); }
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-inline v_float64 v_setall_(double x) { return vx_setall_f64(x); }
-inline v_float64 v_signmask_(bool neg, double) { return v_reinterpret_as_f64(vx_setall_u64(neg ? 0x8000000000000000ULL : 0ULL)); }
+உள்வரி v_float32 v_signmask_(தருக்க neg, தசம) { திரும்பு v_reinterpret_as_f32(vx_setall_u32(neg ? 0x80000000u : 0u)); }
+#எனில் (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+உள்வரி v_float64 v_setall_(இரட்டை x) { திரும்பு vx_setall_f64(x); }
+உள்வரி v_float64 v_signmask_(தருக்க neg, இரட்டை) { திரும்பு v_reinterpret_as_f64(vx_setall_u64(neg ? 0x8000000000000000ULL : 0ULL)); }
 #endif
 #endif
 
@@ -78,31 +78,31 @@ inline v_float64 v_signmask_(bool neg, double) { return v_reinterpret_as_f64(vx_
 //    preprocDCT (Makhoul permutation into the temp) first.
 
 template<typename T>
-void preprocRadix0_(const DftPlan& plan, const void* _src, size_t sstep, void* _re, void* _im, bool conj)
+வெறுமை preprocRadix0_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _src, size_t sstep, வெறுமை* _re, வெறுமை* _im, தருக்க conj)
 {
-    const T* src = (const T*)_src;
+    மாறிலி T* src = (மாறிலி T*)_src;
     T* re = (T*)_re; T* im = (T*)_im;
-    const int* itab = plan.itab.data();
-    int nc = plan.nc;
-    if (plan.real_input)
+    மாறிலி முழு* itab = plan.itab.data();
+    முழு nc = plan.nc;
+    எனில் (plan.real_உள்ளீடு)
     {
-        for (int i = 0; i < nc; i++)
+        க்கு (முழு i = 0; i < nc; i++)
         {
             re[i] = src[itab[i*2]*sstep];
             im[i] = 0;
         }
     }
-    else if (!conj)
+    இல்லையெனில் எனில் (!conj)
     {
-        for (int i = 0; i < nc; i++)
+        க்கு (முழு i = 0; i < nc; i++)
         {
             re[i] = src[itab[i*2]*sstep];
             im[i] = src[itab[i*2+1]*sstep];
         }
     }
-    else
+    இல்லையெனில்
     {
-        for (int i = 0; i < nc; i++)
+        க்கு (முழு i = 0; i < nc; i++)
         {
             re[i] = src[itab[i*2]*sstep];
             im[i] = -src[itab[i*2+1]*sstep];
@@ -112,7 +112,7 @@ void preprocRadix0_(const DftPlan& plan, const void* _src, size_t sstep, void* _
 
 // scalar r0-point DFTs of one column j (used for the vector tail and the no-SIMD build)
 template<typename T>
-static inline void firstStage2_scalar(const T* x, int M, int j, T* re, T* im, T conjsign)
+நிலையான உள்வரி வெறுமை firstStage2_scalar(மாறிலி T* x, முழு M, முழு j, T* re, T* im, T conjsign)
 {
     T x0r = x[j*2], x0i = conjsign*x[j*2+1], x1r = x[(j+M)*2], x1i = conjsign*x[(j+M)*2+1];
     re[0] = x0r + x1r; im[0] = x0i + x1i;
@@ -120,7 +120,7 @@ static inline void firstStage2_scalar(const T* x, int M, int j, T* re, T* im, T 
 }
 
 template<typename T>
-static inline void firstStage4_scalar(const T* x, int M, int j, T* re, T* im, T conjsign)
+நிலையான உள்வரி வெறுமை firstStage4_scalar(மாறிலி T* x, முழு M, முழு j, T* re, T* im, T conjsign)
 {
     T x0r = x[j*2], x0i = conjsign*x[j*2+1];
     T x1r = x[(j+M)*2], x1i = conjsign*x[(j+M)*2+1];
@@ -130,11 +130,11 @@ static inline void firstStage4_scalar(const T* x, int M, int j, T* re, T* im, T 
 }
 
 template<typename T>
-static inline void firstStage8_scalar(const T* x, int M, int j, T* re, T* im, T conjsign)
+நிலையான உள்வரி வெறுமை firstStage8_scalar(மாறிலி T* x, முழு M, முழு j, T* re, T* im, T conjsign)
 {
-    const T c = DftConst<T>::sin45;
+    மாறிலி T c = DftConst<T>::sin45;
     T xr[8], xi[8];
-    for (int q = 0; q < 8; q++)
+    க்கு (முழு q = 0; q < 8; q++)
     {
         xr[q] = x[(j + q*M)*2];
         xi[q] = conjsign*x[(j + q*M)*2 + 1];
@@ -152,7 +152,7 @@ static inline void firstStage8_scalar(const T* x, int M, int j, T* re, T* im, T 
     re[3] = e3r + t3r; im[3] = e3i + t3i; re[7] = e3r - t3r; im[7] = e3i - t3i;
 }
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
 
 // 4-point forward DFT on vectors
 #define DFT4_VEC(x0r,x0i,x1r,x1i,x2r,x2i,x3r,x3i, X0r,X0i,X1r,X1i,X2r,X2i,X3r,X3i) \
@@ -170,25 +170,25 @@ static inline void firstStage8_scalar(const T* x, int M, int j, T* re, T* im, T 
     xi = v_xor(xi, imsign);
 
 // scatters the r0 outputs of every lane: buf holds them lane-major (r0 consecutive values per lane)
-template<typename T, int R0>
-static inline void scatterLanes(const T* bufr, const T* bufi, T* re, T* im, const int* gtab, int VL)
+template<typename T, முழு R0>
+நிலையான உள்வரி வெறுமை scatterLanes(மாறிலி T* bufr, மாறிலி T* bufi, T* re, T* im, மாறிலி முழு* gtab, முழு VL)
 {
-    for (int l = 0; l < VL; l++)
+    க்கு (முழு l = 0; l < VL; l++)
     {
-        int base = gtab[l];
-        memcpy(re + base, bufr + l*R0, R0*sizeof(T));
-        memcpy(im + base, bufi + l*R0, R0*sizeof(T));
+        முழு base = gtab[l];
+        memcpy(re + base, bufr + l*R0, R0*அளவு(T));
+        memcpy(im + base, bufi + l*R0, R0*அளவு(T));
     }
 }
 
 template<typename T, typename VT>
-static void firstStage2_vec(const T* x, int M, const int* gtab, T* re, T* im, bool conj)
+நிலையான வெறுமை firstStage2_vec(மாறிலி T* x, முழு M, மாறிலி முழு* gtab, T* re, T* im, தருக்க conj)
 {
-    const int VL = VTraits<VT>::vlanes();
-    const VT imsign = v_signmask_(conj, (T)0);
+    மாறிலி முழு VL = VTraits<VT>::vlanes();
+    மாறிலி VT imsign = v_signmask_(conj, (T)0);
     T bufr[2*VTraits<VT>::max_nlanes], bufi[2*VTraits<VT>::max_nlanes];
-    int j = 0;
-    for (; j + VL <= M; j += VL)
+    முழு j = 0;
+    க்கு (; j + VL <= M; j += VL)
     {
         VT x0r, x0i, x1r, x1i;
         DFT_LOAD_LEG(0, x0r, x0i)
@@ -198,18 +198,18 @@ static void firstStage2_vec(const T* x, int M, const int* gtab, T* re, T* im, bo
         scatterLanes<T, 2>(bufr, bufi, re, im, gtab + j, VL);
     }
     T conjsign = conj ? (T)-1 : (T)1;
-    for (; j < M; j++)
+    க்கு (; j < M; j++)
         firstStage2_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
 }
 
 template<typename T, typename VT>
-static void firstStage4_vec(const T* x, int M, const int* gtab, T* re, T* im, bool conj)
+நிலையான வெறுமை firstStage4_vec(மாறிலி T* x, முழு M, மாறிலி முழு* gtab, T* re, T* im, தருக்க conj)
 {
-    const int VL = VTraits<VT>::vlanes();
-    const VT imsign = v_signmask_(conj, (T)0);
+    மாறிலி முழு VL = VTraits<VT>::vlanes();
+    மாறிலி VT imsign = v_signmask_(conj, (T)0);
     T bufr[4*VTraits<VT>::max_nlanes], bufi[4*VTraits<VT>::max_nlanes];
-    int j = 0;
-    for (; j + VL <= M; j += VL)
+    முழு j = 0;
+    க்கு (; j + VL <= M; j += VL)
     {
         VT x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, y0r, y0i, y1r, y1i, y2r, y2i, y3r, y3i;
         DFT_LOAD_LEG(0, x0r, x0i)
@@ -222,19 +222,19 @@ static void firstStage4_vec(const T* x, int M, const int* gtab, T* re, T* im, bo
         scatterLanes<T, 4>(bufr, bufi, re, im, gtab + j, VL);
     }
     T conjsign = conj ? (T)-1 : (T)1;
-    for (; j < M; j++)
+    க்கு (; j < M; j++)
         firstStage4_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
 }
 
 template<typename T, typename VT>
-static void firstStage8_vec(const T* x, int M, const int* gtab, T* re, T* im, bool conj)
+நிலையான வெறுமை firstStage8_vec(மாறிலி T* x, முழு M, மாறிலி முழு* gtab, T* re, T* im, தருக்க conj)
 {
-    const int VL = VTraits<VT>::vlanes();
-    const VT zero = v_setall_((T)0), imsign = v_signmask_(conj, (T)0);
-    const VT c = v_setall_((T)DftConst<T>::sin45);
+    மாறிலி முழு VL = VTraits<VT>::vlanes();
+    மாறிலி VT zero = v_setall_((T)0), imsign = v_signmask_(conj, (T)0);
+    மாறிலி VT c = v_setall_((T)DftConst<T>::sin45);
     T bufr[8*VTraits<VT>::max_nlanes], bufi[8*VTraits<VT>::max_nlanes];
-    int j = 0;
-    for (; j + VL <= M; j += VL)
+    முழு j = 0;
+    க்கு (; j + VL <= M; j += VL)
     {
         VT x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, x4r, x4i, x5r, x5i, x6r, x6i, x7r, x7i;
         VT e0r, e0i, e1r, e1i, e2r, e2i, e3r, e3i, o0r, o0i, o1r, o1i, o2r, o2i, o3r, o3i;
@@ -257,17 +257,17 @@ static void firstStage8_vec(const T* x, int M, const int* gtab, T* re, T* im, bo
         v_store_interleave(bufi, v_add(e0i, o0i), v_add(e1i, t1i), v_add(e2i, t2i), v_add(e3i, t3i));
         v_store_interleave(bufr + 4*VL, v_sub(e0r, o0r), v_sub(e1r, t1r), v_sub(e2r, t2r), v_sub(e3r, t3r));
         v_store_interleave(bufi + 4*VL, v_sub(e0i, o0i), v_sub(e1i, t1i), v_sub(e2i, t2i), v_sub(e3i, t3i));
-        for (int l = 0; l < VL; l++)
+        க்கு (முழு l = 0; l < VL; l++)
         {
-            int base = gtab[j + l];
-            memcpy(re + base, bufr + l*4, 4*sizeof(T));
-            memcpy(re + base + 4, bufr + 4*VL + l*4, 4*sizeof(T));
-            memcpy(im + base, bufi + l*4, 4*sizeof(T));
-            memcpy(im + base + 4, bufi + 4*VL + l*4, 4*sizeof(T));
+            முழு base = gtab[j + l];
+            memcpy(re + base, bufr + l*4, 4*அளவு(T));
+            memcpy(re + base + 4, bufr + 4*VL + l*4, 4*அளவு(T));
+            memcpy(im + base, bufi + l*4, 4*அளவு(T));
+            memcpy(im + base + 4, bufi + 4*VL + l*4, 4*அளவு(T));
         }
     }
     T conjsign = conj ? (T)-1 : (T)1;
-    for (; j < M; j++)
+    க்கு (; j < M; j++)
         firstStage8_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
 }
 
@@ -276,80 +276,80 @@ static void firstStage8_vec(const T* x, int M, const int* gtab, T* re, T* im, bo
 
 #endif // CV_SIMD || CV_SIMD_SCALABLE
 
-template<typename T, typename VT, bool haveSIMD>
-void preprocRadix2_(const DftPlan& plan, const void* _src, size_t sstep, void* _re, void* _im, bool conj)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை preprocRadix2_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _src, size_t sstep, வெறுமை* _re, வெறுமை* _im, தருக்க conj)
 {
     CV_DbgAssert(sstep == 1); CV_UNUSED(sstep);
-    const T* x = (const T*)_src;
+    மாறிலி T* x = (மாறிலி T*)_src;
     T* re = (T*)_re; T* im = (T*)_im;
-    const int* gtab = plan.itab.data();
-    int M = plan.nc/2;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    மாறிலி முழு* gtab = plan.itab.data();
+    முழு M = plan.nc/2;
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
         firstStage2_vec<T, VT>(x, M, gtab, re, im, conj);
-    else
+    இல்லையெனில்
 #endif
     {
         T conjsign = conj ? (T)-1 : (T)1;
-        for (int j = 0; j < M; j++)
+        க்கு (முழு j = 0; j < M; j++)
             firstStage2_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
     }
 }
 
-template<typename T, typename VT, bool haveSIMD>
-void preprocRadix4_(const DftPlan& plan, const void* _src, size_t sstep, void* _re, void* _im, bool conj)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை preprocRadix4_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _src, size_t sstep, வெறுமை* _re, வெறுமை* _im, தருக்க conj)
 {
     CV_DbgAssert(sstep == 1); CV_UNUSED(sstep);
-    const T* x = (const T*)_src;
+    மாறிலி T* x = (மாறிலி T*)_src;
     T* re = (T*)_re; T* im = (T*)_im;
-    const int* gtab = plan.itab.data();
-    int M = plan.nc/4;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    மாறிலி முழு* gtab = plan.itab.data();
+    முழு M = plan.nc/4;
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
         firstStage4_vec<T, VT>(x, M, gtab, re, im, conj);
-    else
+    இல்லையெனில்
 #endif
     {
         T conjsign = conj ? (T)-1 : (T)1;
-        for (int j = 0; j < M; j++)
+        க்கு (முழு j = 0; j < M; j++)
             firstStage4_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
     }
 }
 
-template<typename T, typename VT, bool haveSIMD>
-void preprocRadix8_(const DftPlan& plan, const void* _src, size_t sstep, void* _re, void* _im, bool conj)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை preprocRadix8_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _src, size_t sstep, வெறுமை* _re, வெறுமை* _im, தருக்க conj)
 {
     CV_DbgAssert(sstep == 1); CV_UNUSED(sstep);
-    const T* x = (const T*)_src;
+    மாறிலி T* x = (மாறிலி T*)_src;
     T* re = (T*)_re; T* im = (T*)_im;
-    const int* gtab = plan.itab.data();
-    int M = plan.nc/8;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    மாறிலி முழு* gtab = plan.itab.data();
+    முழு M = plan.nc/8;
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
         firstStage8_vec<T, VT>(x, M, gtab, re, im, conj);
-    else
+    இல்லையெனில்
 #endif
     {
         T conjsign = conj ? (T)-1 : (T)1;
-        for (int j = 0; j < M; j++)
+        க்கு (முழு j = 0; j < M; j++)
             firstStage8_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
     }
 }
 
 // DCT input permutation (Makhoul): v[j] = x[2j], v[n-1-j] = x[2j+1], j in [0, n/2), into the temp
-template<typename T, typename VT, bool haveSIMD>
-void preprocDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tmp)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை preprocDCT_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _src, size_t sstep, வெறுமை* _tmp)
 {
-    const T* x = (const T*)_src;
+    மாறிலி T* x = (மாறிலி T*)_src;
     T* v = (T*)_tmp;
-    int n = plan.n, nc = plan.nc, j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    முழு n = plan.n, nc = plan.nc, j = 0;
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        if (sstep == 1)
+        எனில் (sstep == 1)
         {
-            const int VL = VTraits<VT>::vlanes();
-            for (; j + VL <= nc; j += VL)
+            மாறிலி முழு VL = VTraits<VT>::vlanes();
+            க்கு (; j + VL <= nc; j += VL)
             {
                 VT even, odd;
                 v_load_deinterleave(x + j*2, even, odd);
@@ -359,7 +359,7 @@ void preprocDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tmp
         }
     }
 #endif
-    for (; j < nc; j++)
+    க்கு (; j < nc; j++)
     {
         v[j] = x[(2*j)*sstep];
         v[n - 1 - j] = x[(2*j + 1)*sstep];
@@ -374,7 +374,7 @@ void preprocDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tmp
     T Br = akr - amr, Bi = aki + ami; \
     T Cr = wr[k]*Br + wi[k]*Bi, Ci = wr[k]*Bi - wi[k]*Br; \
     T zkr = Ar - Ci, zki = Ai + Cr, zmr = Ar + Ci, zmi = Cr - Ai;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
 #define DFT_UNTANGLE_INV_VEC(k, akr, aki, amr, ami, zkr, zki, zmr, zmi) \
     VT Ar = v_add(akr, amr), Ai = v_sub(aki, ami); \
     VT Br = v_sub(akr, amr), Bi = v_add(aki, ami); \
@@ -387,20 +387,20 @@ void preprocDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tmp
 // interleaved 2Z values; the driver then runs the complex nc-point transform on it with conj = true.
 // The factor 2 is what makes scale = 1/n correct for the nc-point inverse (nc*2*z = n*z).
 // 2Z[0] = (X0+Xnc) + i(X0-Xnc), 2Z[nc/2] = 2*conj(X[n/4]).
-template<typename T, typename VT, bool haveSIMD>
-static inline void ccsUntangleInv(const DftPlan& plan, T X0, T Xnc, const T* x, T* tmp)
+template<typename T, typename VT, தருக்க haveSIMD>
+நிலையான உள்வரி வெறுமை ccsUntangleInv(மாறிலி DftPlan& plan, T X0, T Xnc, மாறிலி T* x, T* tmp)
 {
-    int nc = plan.nc;
-    const T* wr = (const T*)plan.rtw_re;
-    const T* wi = (const T*)plan.rtw_im;
+    முழு nc = plan.nc;
+    மாறிலி T* wr = (மாறிலி T*)plan.rtw_re;
+    மாறிலி T* wi = (மாறிலி T*)plan.rtw_im;
     tmp[0] = X0 + Xnc;
     tmp[1] = X0 - Xnc;
-    int k = 1, m = nc - 1;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    முழு k = 1, m = nc - 1;
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        const int VL = VTraits<VT>::vlanes();
-        for (; m - k + 1 >= 2*VL; k += VL, m -= VL)
+        மாறிலி முழு VL = VTraits<VT>::vlanes();
+        க்கு (; m - k + 1 >= 2*VL; k += VL, m -= VL)
         {
             VT akr, aki, amr, ami;
             v_load_deinterleave(x + k*2, akr, aki);
@@ -412,14 +412,14 @@ static inline void ccsUntangleInv(const DftPlan& plan, T X0, T Xnc, const T* x, 
         }
     }
 #endif
-    for (; k < m; k++, m--)
+    க்கு (; k < m; k++, m--)
     {
         T akr = x[k*2], aki = x[k*2+1], amr = x[m*2], ami = x[m*2+1];
         DFT_UNTANGLE_INV_SCALAR(k, akr, aki, amr, ami, zkr, zki, zmr, zmi)
         tmp[k*2] = zkr; tmp[k*2+1] = zki;
         tmp[m*2] = zmr; tmp[m*2+1] = zmi;
     }
-    if ((nc & 1) == 0 && nc >= 2)
+    எனில் ((nc & 1) == 0 && nc >= 2)
     {
         k = nc/2;
         tmp[k*2] = x[k*2]*2;
@@ -427,54 +427,54 @@ static inline void ccsUntangleInv(const DftPlan& plan, T X0, T Xnc, const T* x, 
     }
 }
 
-template<typename T, typename VT, bool haveSIMD>
-void preprocCCS_(const DftPlan& plan, const void* _src, void* _tmp, bool complex_input)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை preprocCCS_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _src, வெறுமை* _tmp, தருக்க complex_உள்ளீடு)
 {
-    const T* src = (const T*)_src;
+    மாறிலி T* src = (மாறிலி T*)_src;
     T* tmp = (T*)_tmp;
-    int n = plan.n, nc = plan.nc;
-    if (nc == n)
+    முழு n = plan.n, nc = plan.nc;
+    எனில் (nc == n)
     {
         // odd n: expand the packed half-spectrum into the full conjugate-symmetric spectrum
         tmp[0] = src[0]; tmp[1] = 0;
-        const T* x = complex_input ? src + 2 : src + 1;   // X[k] = (x[2(k-1)], x[2(k-1)+1])
-        for (int k = 1; k <= (n-1)/2; k++)
+        மாறிலி T* x = complex_உள்ளீடு ? src + 2 : src + 1;   // X[k] = (x[2(k-1)], x[2(k-1)+1])
+        க்கு (முழு k = 1; k <= (n-1)/2; k++)
         {
             T xr = x[(k-1)*2], xi = x[(k-1)*2+1];
             tmp[k*2] = xr; tmp[k*2+1] = xi;
             tmp[(n-k)*2] = xr; tmp[(n-k)*2+1] = -xi;
         }
-        return;
+        திரும்பு;
     }
-    T X0 = src[0], Xnc = complex_input ? src[n] : src[n-1];
+    T X0 = src[0], Xnc = complex_உள்ளீடு ? src[n] : src[n-1];
     // CCS: X[k] = (src[2k-1], src[2k]); complex: X[k] = (src[2k], src[2k+1])
-    ccsUntangleInv<T, VT, haveSIMD>(plan, X0, Xnc, complex_input ? src : src - 1, tmp);
+    ccsUntangleInv<T, VT, haveSIMD>(plan, X0, Xnc, complex_உள்ளீடு ? src : src - 1, tmp);
 }
 
-template<typename T, typename VT, bool haveSIMD>
-void preprocIDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tmp)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை preprocIDCT_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _src, size_t sstep, வெறுமை* _tmp)
 {
-    const T* src = (const T*)_src;
+    மாறிலி T* src = (மாறிலி T*)_src;
     T* tmp = (T*)_tmp;
-    int n = plan.n, nc = plan.nc;
-    const T* dr = (const T*)plan.dct_re;
-    const T* di = (const T*)plan.dct_im;
-    const T* wr = (const T*)plan.rtw_re;
-    const T* wi = (const T*)plan.rtw_im;
+    முழு n = plan.n, nc = plan.nc;
+    மாறிலி T* dr = (மாறிலி T*)plan.dct_re;
+    மாறிலி T* di = (மாறிலி T*)plan.dct_im;
+    மாறிலி T* wr = (மாறிலி T*)plan.rtw_re;
+    மாறிலி T* wi = (மாறிலி T*)plan.rtw_im;
     // pre-twiddle: X[k] = conj(w_k) * (src[k] - i*src[n-k]), k in [1, nc-1],
     // X0 = 2*src[0]*w_0*sin45, Xnc = 2*src[nc]*w_nc (the two special normalizations of DCT-III).
     T X0 = src[0]*2*dr[0]*DftConst<T>::sin45;
     T Xnc = src[nc*sstep]*2*dr[nc];
     tmp[0] = X0 + Xnc;
     tmp[1] = X0 - Xnc;
-    int k = 1, m = nc - 1;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    முழு k = 1, m = nc - 1;
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        if (sstep == 1)
+        எனில் (sstep == 1)
         {
-            const int VL = VTraits<VT>::vlanes();
-            for (; m - k + 1 >= 2*VL; k += VL, m -= VL)
+            மாறிலி முழு VL = VTraits<VT>::vlanes();
+            க்கு (; m - k + 1 >= 2*VL; k += VL, m -= VL)
             {
                 VT a = vx_load(src + k), b = v_reverse(vx_load(src + n - k - VL + 1));   // src[k+l], src[n-k-l]
                 VT dkr = vx_load(dr + k), dki = vx_load(di + k);
@@ -489,7 +489,7 @@ void preprocIDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tm
         }
     }
 #endif
-    for (; k < m; k++, m--)
+    க்கு (; k < m; k++, m--)
     {
         T a = src[k*sstep], b = src[(n-k)*sstep];
         T akr = dr[k]*a - di[k]*b, aki = -dr[k]*b - di[k]*a;
@@ -499,7 +499,7 @@ void preprocIDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tm
         tmp[k*2] = zkr; tmp[k*2+1] = zki;
         tmp[m*2] = zmr; tmp[m*2+1] = zmi;
     }
-    if ((nc & 1) == 0 && nc >= 2)
+    எனில் ((nc & 1) == 0 && nc >= 2)
     {
         k = nc/2;
         T a = src[k*sstep], b = src[(n-k)*sstep];
@@ -526,17 +526,17 @@ void preprocIDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tm
 #define DFT_CMUL(xr, xi, ar, ai, wr, wi) { xr = (ar)*(wr) - (ai)*(wi); xi = (ar)*(wi) + (ai)*(wr); }
 
 template<typename T>
-void radix3_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
+வெறுமை radix3_scalar(மாறிலி DftStage& st, மாறிலி T* sre, மாறிலி T* sim, T* dre, T* dim)
 {
-    const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    int L = st.span, G = st.ngroups, ts = st.tw_stride;
-    const T s120 = DftConst<T>::sin120;
-    for (int g = 0; g < G; g++)
+    மாறிலி T* twr = (மாறிலி T*)st.tw_re; மாறிலி T* twi = (மாறிலி T*)st.tw_im;
+    முழு L = st.span, G = st.ngroups, ts = st.tw_stride;
+    மாறிலி T s120 = DftConst<T>::sin120;
+    க்கு (முழு g = 0; g < G; g++)
     {
-        int base = g*3*L;
-        for (int j = 0; j < L; j++)
+        முழு base = g*3*L;
+        க்கு (முழு j = 0; j < L; j++)
         {
-            int i0 = base + j, i1 = i0 + L, i2 = i1 + L;
+            முழு i0 = base + j, i1 = i0 + L, i2 = i1 + L;
             T x0r = sre[i0], x0i = sim[i0], x1r, x1i, x2r, x2i;
             DFT_CMUL(x1r, x1i, sre[i1], sim[i1], twr[j], twi[j]);
             DFT_CMUL(x2r, x2i, sre[i2], sim[i2], twr[ts + j], twi[ts + j]);
@@ -551,16 +551,16 @@ void radix3_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* di
 }
 
 template<typename T>
-void radix4_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
+வெறுமை radix4_scalar(மாறிலி DftStage& st, மாறிலி T* sre, மாறிலி T* sim, T* dre, T* dim)
 {
-    const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    int L = st.span, G = st.ngroups, ts = st.tw_stride;
-    for (int g = 0; g < G; g++)
+    மாறிலி T* twr = (மாறிலி T*)st.tw_re; மாறிலி T* twi = (மாறிலி T*)st.tw_im;
+    முழு L = st.span, G = st.ngroups, ts = st.tw_stride;
+    க்கு (முழு g = 0; g < G; g++)
     {
-        int base = g*4*L;
-        for (int j = 0; j < L; j++)
+        முழு base = g*4*L;
+        க்கு (முழு j = 0; j < L; j++)
         {
-            int i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L;
+            முழு i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L;
             T x0r = sre[i0], x0i = sim[i0], x1r, x1i, x2r, x2i, x3r, x3i;
             DFT_CMUL(x1r, x1i, sre[i1], sim[i1], twr[j], twi[j]);
             DFT_CMUL(x2r, x2i, sre[i2], sim[i2], twr[ts + j], twi[ts + j]);
@@ -572,17 +572,17 @@ void radix4_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* di
 }
 
 template<typename T>
-void radix5_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
+வெறுமை radix5_scalar(மாறிலி DftStage& st, மாறிலி T* sre, மாறிலி T* sim, T* dre, T* dim)
 {
-    const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    int L = st.span, G = st.ngroups, ts = st.tw_stride;
-    const T c5 = DftConst<T>::fft5_2, s1 = DftConst<T>::sin72, s2 = DftConst<T>::sin144;
-    for (int g = 0; g < G; g++)
+    மாறிலி T* twr = (மாறிலி T*)st.tw_re; மாறிலி T* twi = (மாறிலி T*)st.tw_im;
+    முழு L = st.span, G = st.ngroups, ts = st.tw_stride;
+    மாறிலி T c5 = DftConst<T>::fft5_2, s1 = DftConst<T>::sin72, s2 = DftConst<T>::sin144;
+    க்கு (முழு g = 0; g < G; g++)
     {
-        int base = g*5*L;
-        for (int j = 0; j < L; j++)
+        முழு base = g*5*L;
+        க்கு (முழு j = 0; j < L; j++)
         {
-            int i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L, i4 = i3 + L;
+            முழு i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L, i4 = i3 + L;
             T x0r = sre[i0], x0i = sim[i0], x1r, x1i, x2r, x2i, x3r, x3i, x4r, x4i;
             DFT_CMUL(x1r, x1i, sre[i1], sim[i1], twr[j], twi[j]);
             DFT_CMUL(x2r, x2i, sre[i2], sim[i2], twr[ts + j], twi[ts + j]);
@@ -607,23 +607,23 @@ void radix5_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* di
 
 // generic odd radix r = 2h+1 (r >= 7); scratch holds a[h], b[h] (complex) for the current butterfly
 template<typename T>
-void radixOdd_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim, T* scratch)
+வெறுமை radixOdd_scalar(மாறிலி DftStage& st, மாறிலி T* sre, மாறிலி T* sim, T* dre, T* dim, T* scratch)
 {
-    const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    const T* cs = (const T*)st.cs; const T* sn = (const T*)st.sn;
-    int L = st.span, G = st.ngroups, ts = st.tw_stride, r = st.radix, h = (r - 1)/2;
+    மாறிலி T* twr = (மாறிலி T*)st.tw_re; மாறிலி T* twi = (மாறிலி T*)st.tw_im;
+    மாறிலி T* cs = (மாறிலி T*)st.cs; மாறிலி T* sn = (மாறிலி T*)st.sn;
+    முழு L = st.span, G = st.ngroups, ts = st.tw_stride, r = st.radix, h = (r - 1)/2;
     T* ar = scratch; T* ai = ar + h; T* br = ai + h; T* bi = br + h;
-    for (int g = 0; g < G; g++)
+    க்கு (முழு g = 0; g < G; g++)
     {
-        int base = g*r*L;
-        for (int j = 0; j < L; j++)
+        முழு base = g*r*L;
+        க்கு (முழு j = 0; j < L; j++)
         {
-            int i0 = base + j;
+            முழு i0 = base + j;
             T x0r = sre[i0], x0i = sim[i0];
             T X0r = x0r, X0i = x0i;
-            for (int p = 1; p <= h; p++)
+            க்கு (முழு p = 1; p <= h; p++)
             {
-                int ip = i0 + p*L, iq = i0 + (r-p)*L;
+                முழு ip = i0 + p*L, iq = i0 + (r-p)*L;
                 T xpr, xpi, xqr, xqi;
                 DFT_CMUL(xpr, xpi, sre[ip], sim[ip], twr[(p-1)*ts + j], twi[(p-1)*ts + j]);
                 DFT_CMUL(xqr, xqi, sre[iq], sim[iq], twr[(r-p-1)*ts + j], twi[(r-p-1)*ts + j]);
@@ -632,10 +632,10 @@ void radixOdd_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* 
                 X0r += ar[p-1]; X0i += ai[p-1];
             }
             dre[i0] = X0r; dim[i0] = X0i;
-            for (int k = 1; k <= h; k++)
+            க்கு (முழு k = 1; k <= h; k++)
             {
                 T sr = x0r, si = x0i, tr = 0, ti = 0;
-                for (int p = 1; p <= h; p++)
+                க்கு (முழு p = 1; p <= h; p++)
                 {
                     T c = cs[(p-1)*h + (k-1)], s = sn[(p-1)*h + (k-1)];
                     sr += c*ar[p-1]; si += c*ai[p-1];
@@ -650,11 +650,11 @@ void radixOdd_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* 
 
 #undef DFT_CMUL
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
 
 // dst = a*s + c, s is a scalar constant of the stage (the compiler hoists the broadcast)
 template<typename VT, typename T>
-inline VT v_fma_n(const VT& a, T s, const VT& c) { return v_fma(a, v_setall_(s), c); }
+உள்வரி VT v_fma_n(மாறிலி VT& a, T s, மாறிலி VT& c) { திரும்பு v_fma(a, v_setall_(s), c); }
 
 // (xr, xi) = (ar, ai) * (wr, wi)
 #define DFT_VCMUL(xr, xi, ar, ai, wr, wi) \
@@ -662,25 +662,25 @@ inline VT v_fma_n(const VT& a, T s, const VT& c) { return v_fma(a, v_setall_(s),
 
 // the flat loop of the brief (section 5): clamp, body, branchless wrap
 #define DFT_VLOOP_BEGIN(r) \
-    int j = 0, base = 0; \
-    for (int t = 0; t < st.nsteps; t++) \
+    முழு j = 0, base = 0; \
+    க்கு (முழு t = 0; t < st.nsteps; t++) \
     { \
         j = std::min(j, L - VL);
 #define DFT_VLOOP_END(r) \
-        int nj = j + VL; \
-        int wrap = -(int)(nj >= L); \
+        முழு nj = j + VL; \
+        முழு wrap = -(முழு)(nj >= L); \
         base += ((r)*L) & wrap; \
         j = nj & ~wrap; \
     }
 
 template<typename T, typename VT>
-void radix3_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
+வெறுமை radix3_vec(மாறிலி DftStage& st, மாறிலி T* sre, மாறிலி T* sim, T* dre, T* dim)
 {
-    const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    const int L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
-    const VT s120 = v_setall_((T)DftConst<T>::sin120), half = v_setall_((T)0.5);
+    மாறிலி T* twr = (மாறிலி T*)st.tw_re; மாறிலி T* twi = (மாறிலி T*)st.tw_im;
+    மாறிலி முழு L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
+    மாறிலி VT s120 = v_setall_((T)DftConst<T>::sin120), half = v_setall_((T)0.5);
     DFT_VLOOP_BEGIN(3)
-        int i0 = base + j, i1 = i0 + L, i2 = i1 + L;
+        முழு i0 = base + j, i1 = i0 + L, i2 = i1 + L;
         VT x0r = vx_load(sre + i0), x0i = vx_load(sim + i0), x1r, x1i, x2r, x2i;
         DFT_VCMUL(x1r, x1i, vx_load(sre + i1), vx_load(sim + i1), vx_load(twr + j), vx_load(twi + j));
         DFT_VCMUL(x2r, x2i, vx_load(sre + i2), vx_load(sim + i2), vx_load(twr + ts + j), vx_load(twi + ts + j));
@@ -694,12 +694,12 @@ void radix3_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
 }
 
 template<typename T, typename VT>
-void radix4_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
+வெறுமை radix4_vec(மாறிலி DftStage& st, மாறிலி T* sre, மாறிலி T* sim, T* dre, T* dim)
 {
-    const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    const int L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
+    மாறிலி T* twr = (மாறிலி T*)st.tw_re; மாறிலி T* twi = (மாறிலி T*)st.tw_im;
+    மாறிலி முழு L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
     DFT_VLOOP_BEGIN(4)
-        int i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L;
+        முழு i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L;
         VT x0r = vx_load(sre + i0), x0i = vx_load(sim + i0), x1r, x1i, x2r, x2i, x3r, x3i;
         DFT_VCMUL(x1r, x1i, vx_load(sre + i1), vx_load(sim + i1), vx_load(twr + j), vx_load(twi + j));
         DFT_VCMUL(x2r, x2i, vx_load(sre + i2), vx_load(sim + i2), vx_load(twr + ts + j), vx_load(twi + ts + j));
@@ -714,14 +714,14 @@ void radix4_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
 }
 
 template<typename T, typename VT>
-void radix5_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
+வெறுமை radix5_vec(மாறிலி DftStage& st, மாறிலி T* sre, மாறிலி T* sim, T* dre, T* dim)
 {
-    const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    const int L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
-    const T c5 = DftConst<T>::fft5_2, s1 = DftConst<T>::sin72, s2 = DftConst<T>::sin144;
-    const VT quarter = v_setall_((T)0.25);
+    மாறிலி T* twr = (மாறிலி T*)st.tw_re; மாறிலி T* twi = (மாறிலி T*)st.tw_im;
+    மாறிலி முழு L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
+    மாறிலி T c5 = DftConst<T>::fft5_2, s1 = DftConst<T>::sin72, s2 = DftConst<T>::sin144;
+    மாறிலி VT quarter = v_setall_((T)0.25);
     DFT_VLOOP_BEGIN(5)
-        int i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L, i4 = i3 + L;
+        முழு i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L, i4 = i3 + L;
         VT x0r = vx_load(sre + i0), x0i = vx_load(sim + i0), x1r, x1i, x2r, x2i, x3r, x3i, x4r, x4i;
         DFT_VCMUL(x1r, x1i, vx_load(sre + i1), vx_load(sim + i1), vx_load(twr + j), vx_load(twi + j));
         DFT_VCMUL(x2r, x2i, vx_load(sre + i2), vx_load(sim + i2), vx_load(twr + ts + j), vx_load(twi + ts + j));
@@ -746,19 +746,19 @@ void radix5_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
 
 // generic odd radix, vector lanes; scratch holds a[h], b[h] as VL-wide vectors (4*h*VL elements)
 template<typename T, typename VT>
-void radixOdd_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim, T* scratch)
+வெறுமை radixOdd_vec(மாறிலி DftStage& st, மாறிலி T* sre, மாறிலி T* sim, T* dre, T* dim, T* scratch)
 {
-    const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    const T* cs = (const T*)st.cs; const T* sn = (const T*)st.sn;
-    const int L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes(), r = st.radix, h = (r - 1)/2;
+    மாறிலி T* twr = (மாறிலி T*)st.tw_re; மாறிலி T* twi = (மாறிலி T*)st.tw_im;
+    மாறிலி T* cs = (மாறிலி T*)st.cs; மாறிலி T* sn = (மாறிலி T*)st.sn;
+    மாறிலி முழு L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes(), r = st.radix, h = (r - 1)/2;
     T* ar = scratch; T* ai = ar + h*VL; T* br = ai + h*VL; T* bi = br + h*VL;
     DFT_VLOOP_BEGIN(r)
-        int i0 = base + j;
+        முழு i0 = base + j;
         VT x0r = vx_load(sre + i0), x0i = vx_load(sim + i0);
         VT X0r = x0r, X0i = x0i;
-        for (int p = 1; p <= h; p++)
+        க்கு (முழு p = 1; p <= h; p++)
         {
-            int ip = i0 + p*L, iq = i0 + (r-p)*L;
+            முழு ip = i0 + p*L, iq = i0 + (r-p)*L;
             VT xpr, xpi, xqr, xqi;
             DFT_VCMUL(xpr, xpi, vx_load(sre + ip), vx_load(sim + ip),
                       vx_load(twr + (p-1)*ts + j), vx_load(twi + (p-1)*ts + j));
@@ -770,10 +770,10 @@ void radixOdd_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim
             X0r = v_add(X0r, apr); X0i = v_add(X0i, api);
         }
         v_store(dre + i0, X0r); v_store(dim + i0, X0i);
-        for (int k = 1; k <= h; k++)
+        க்கு (முழு k = 1; k <= h; k++)
         {
             VT sr = x0r, si = x0i, tr = v_setall_((T)0), ti = tr;
-            for (int p = 1; p <= h; p++)
+            க்கு (முழு p = 1; p <= h; p++)
             {
                 T c = cs[(p-1)*h + (k-1)], s = sn[(p-1)*h + (k-1)];
                 sr = v_fma_n(vx_load(ar + (p-1)*VL), c, sr); si = v_fma_n(vx_load(ai + (p-1)*VL), c, si);
@@ -792,69 +792,69 @@ void radixOdd_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim
 #endif // CV_SIMD || CV_SIMD_SCALABLE
 
 // entry points: the plan's stage mode selects the body; VT = T (no SIMD for this type) means scalar only
-template<typename T, typename VT, bool haveSIMD>
-void radix3_(const DftStage& st, const void* sre, const void* sim, void* dre, void* dim, void*)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை radix3_(மாறிலி DftStage& st, மாறிலி வெறுமை* sre, மாறிலி வெறுமை* sim, வெறுமை* dre, வெறுமை* dim, வெறுமை*)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        if (st.mode == DFT_STAGE_FULL)
+        எனில் (st.mode == DFT_STAGE_FULL)
         {
-            radix3_vec<T, VT>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim);
-            return;
+            radix3_vec<T, VT>(st, (மாறிலி T*)sre, (மாறிலி T*)sim, (T*)dre, (T*)dim);
+            திரும்பு;
         }
     }
 #endif
-    radix3_scalar<T>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim);
+    radix3_scalar<T>(st, (மாறிலி T*)sre, (மாறிலி T*)sim, (T*)dre, (T*)dim);
 }
 
-template<typename T, typename VT, bool haveSIMD>
-void radix4_(const DftStage& st, const void* sre, const void* sim, void* dre, void* dim, void*)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை radix4_(மாறிலி DftStage& st, மாறிலி வெறுமை* sre, மாறிலி வெறுமை* sim, வெறுமை* dre, வெறுமை* dim, வெறுமை*)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        if (st.mode == DFT_STAGE_FULL)
+        எனில் (st.mode == DFT_STAGE_FULL)
         {
-            radix4_vec<T, VT>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim);
-            return;
+            radix4_vec<T, VT>(st, (மாறிலி T*)sre, (மாறிலி T*)sim, (T*)dre, (T*)dim);
+            திரும்பு;
         }
     }
 #endif
-    radix4_scalar<T>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim);
+    radix4_scalar<T>(st, (மாறிலி T*)sre, (மாறிலி T*)sim, (T*)dre, (T*)dim);
 }
 
-template<typename T, typename VT, bool haveSIMD>
-void radix5_(const DftStage& st, const void* sre, const void* sim, void* dre, void* dim, void*)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை radix5_(மாறிலி DftStage& st, மாறிலி வெறுமை* sre, மாறிலி வெறுமை* sim, வெறுமை* dre, வெறுமை* dim, வெறுமை*)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        if (st.mode == DFT_STAGE_FULL)
+        எனில் (st.mode == DFT_STAGE_FULL)
         {
-            radix5_vec<T, VT>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim);
-            return;
+            radix5_vec<T, VT>(st, (மாறிலி T*)sre, (மாறிலி T*)sim, (T*)dre, (T*)dim);
+            திரும்பு;
         }
     }
 #endif
-    radix5_scalar<T>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim);
+    radix5_scalar<T>(st, (மாறிலி T*)sre, (மாறிலி T*)sim, (T*)dre, (T*)dim);
 }
 
 
-template<typename T, typename VT, bool haveSIMD>
-void radixOdd_(const DftStage& st, const void* sre, const void* sim, void* dre, void* dim, void* scratch)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை radixOdd_(மாறிலி DftStage& st, மாறிலி வெறுமை* sre, மாறிலி வெறுமை* sim, வெறுமை* dre, வெறுமை* dim, வெறுமை* scratch)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        if (st.mode == DFT_STAGE_FULL)
+        எனில் (st.mode == DFT_STAGE_FULL)
         {
-            radixOdd_vec<T, VT>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim, (T*)scratch);
-            return;
+            radixOdd_vec<T, VT>(st, (மாறிலி T*)sre, (மாறிலி T*)sim, (T*)dre, (T*)dim, (T*)scratch);
+            திரும்பு;
         }
     }
 #endif
-    radixOdd_scalar<T>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim, (T*)scratch);
+    radixOdd_scalar<T>(st, (மாறிலி T*)sre, (மாறிலி T*)sim, (T*)dre, (T*)dim, (T*)scratch);
 }
 
 
@@ -865,47 +865,47 @@ void radixOdd_(const DftStage& st, const void* sre, const void* sim, void* dre, 
 // scalar tail. The "pair" passes (RFFT untangle, DCT) process k ascending together with m = nc-k
 // descending; the descending side is loaded/stored through v_reverse.
 
-template<typename T, typename VT, bool haveSIMD>
-void postprocDFT_(const DftPlan& plan, const void* _re, const void* _im, void* _dst,
-                  double re_scale, double im_scale)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை postprocDFT_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _re, மாறிலி வெறுமை* _im, வெறுமை* _dst,
+                  இரட்டை re_scale, இரட்டை im_scale)
 {
-    const T* re = (const T*)_re; const T* im = (const T*)_im;
+    மாறிலி T* re = (மாறிலி T*)_re; மாறிலி T* im = (மாறிலி T*)_im;
     T* dst = (T*)_dst;
-    int nc = plan.nc, i = 0;
+    முழு nc = plan.nc, i = 0;
     T rs = (T)re_scale, is = (T)im_scale;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        const int VL = VTraits<VT>::vlanes();
+        மாறிலி முழு VL = VTraits<VT>::vlanes();
         VT vrs = v_setall_(rs), vis = v_setall_(is);
-        for (; i + VL <= nc; i += VL)
+        க்கு (; i + VL <= nc; i += VL)
             v_store_interleave(dst + i*2, v_mul(vx_load(re + i), vrs), v_mul(vx_load(im + i), vis));
     }
 #endif
-    for (; i < nc; i++)
+    க்கு (; i < nc; i++)
     {
         dst[i*2] = re[i]*rs;
         dst[i*2+1] = im[i]*is;
     }
 }
 
-template<typename T, typename VT, bool haveSIMD>
-void postprocReal_(const DftPlan& plan, const void* _re, void* _dst, double scale)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை postprocReal_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _re, வெறுமை* _dst, இரட்டை scale)
 {
-    const T* re = (const T*)_re;
+    மாறிலி T* re = (மாறிலி T*)_re;
     T* dst = (T*)_dst;
-    int nc = plan.nc, i = 0;
+    முழு nc = plan.nc, i = 0;
     T s = (T)scale;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        const int VL = VTraits<VT>::vlanes();
+        மாறிலி முழு VL = VTraits<VT>::vlanes();
         VT vs = v_setall_(s);
-        for (; i + VL <= nc; i += VL)
+        க்கு (; i + VL <= nc; i += VL)
             v_store(dst + i, v_mul(vx_load(re + i), vs));
     }
 #endif
-    for (; i < nc; i++)
+    க்கு (; i < nc; i++)
         dst[i] = re[i]*s;
 }
 
@@ -920,7 +920,7 @@ void postprocReal_(const DftPlan& plan, const void* _re, void* _dst, double scal
     T Pr = wr[k]*Or - wi[k]*Oi, Pi = wr[k]*Oi + wi[k]*Or; \
     T Xkr = Er + Pr, Xki = Ei + Pi, Xmr = Er - Pr, Xmi = Pi - Ei;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
 // vector version: lanes l = 0..VL-1 hold k+l (ascending) and m-l (descending; loaded reversed)
 #define DFT_UNTANGLE_FWD_VEC(k, m, Xkr, Xki, Xmr, Xmi) \
     VT rk = vx_load(re + (k)), ik = vx_load(im + (k)); \
@@ -932,19 +932,19 @@ void postprocReal_(const DftPlan& plan, const void* _re, void* _dst, double scal
     VT Xkr = v_add(Er, Pr), Xki = v_add(Ei, Pi), Xmr = v_sub(Er, Pr), Xmi = v_sub(Pi, Ei);
 #endif
 
-template<typename T, typename VT, bool haveSIMD>
-static inline void ccsUntangleFwd(const DftPlan& plan, const T* re, const T* im, T s, T* out)
+template<typename T, typename VT, தருக்க haveSIMD>
+நிலையான உள்வரி வெறுமை ccsUntangleFwd(மாறிலி DftPlan& plan, மாறிலி T* re, மாறிலி T* im, T s, T* out)
 {
-    int nc = plan.nc;
-    const T* wr = (const T*)plan.rtw_re;
-    const T* wi = (const T*)plan.rtw_im;
-    int k = 1, m = nc - 1;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    முழு nc = plan.nc;
+    மாறிலி T* wr = (மாறிலி T*)plan.rtw_re;
+    மாறிலி T* wi = (மாறிலி T*)plan.rtw_im;
+    முழு k = 1, m = nc - 1;
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        const int VL = VTraits<VT>::vlanes();
-        const VT half = v_setall_((T)0.5), vs = v_setall_(s);
-        for (; m - k + 1 >= 2*VL; k += VL, m -= VL)
+        மாறிலி முழு VL = VTraits<VT>::vlanes();
+        மாறிலி VT half = v_setall_((T)0.5), vs = v_setall_(s);
+        க்கு (; m - k + 1 >= 2*VL; k += VL, m -= VL)
         {
             DFT_UNTANGLE_FWD_VEC(k, m, Xkr, Xki, Xmr, Xmi)
             v_store_interleave(out + k*2 - 1, v_mul(Xkr, vs), v_mul(Xki, vs));
@@ -952,81 +952,81 @@ static inline void ccsUntangleFwd(const DftPlan& plan, const T* re, const T* im,
         }
     }
 #endif
-    for (; k < m; k++, m--)
+    க்கு (; k < m; k++, m--)
     {
         DFT_UNTANGLE_FWD_SCALAR(k, m, Xkr, Xki, Xmr, Xmi)
         out[k*2-1] = Xkr*s; out[k*2] = Xki*s;
         out[m*2-1] = Xmr*s; out[m*2] = Xmi*s;
     }
-    if ((nc & 1) == 0 && nc >= 2)
+    எனில் ((nc & 1) == 0 && nc >= 2)
     {
         k = nc/2;
         out[k*2-1] = re[k]*s; out[k*2] = -im[k]*s;
     }
 }
 
-template<typename T, typename VT, bool haveSIMD>
-void postprocRealDFT_(const DftPlan& plan, const void* _re, const void* _im, void* _dst,
-                      double scale, bool complex_output)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை postprocRealDFT_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _re, மாறிலி வெறுமை* _im, வெறுமை* _dst,
+                      இரட்டை scale, தருக்க complex_output)
 {
-    const T* re = (const T*)_re; const T* im = (const T*)_im;
+    மாறிலி T* re = (மாறிலி T*)_re; மாறிலி T* im = (மாறிலி T*)_im;
     T* dst = (T*)_dst;
-    int n = plan.n, nc = plan.nc;
+    முழு n = plan.n, nc = plan.nc;
     T s = (T)scale;
-    if (nc == n)
+    எனில் (nc == n)
     {
         // odd n: the full complex spectrum was computed
-        if (complex_output)
+        எனில் (complex_output)
             postprocDFT_<T, VT, haveSIMD>(plan, _re, _im, _dst, scale, scale);
-        else
+        இல்லையெனில்
         {
             dst[0] = re[0]*s;
-            for (int k = 1; k <= (n-1)/2; k++)
+            க்கு (முழு k = 1; k <= (n-1)/2; k++)
             {
                 dst[k*2-1] = re[k]*s;
                 dst[k*2] = im[k]*s;
             }
         }
-        return;
+        திரும்பு;
     }
     T X0 = (re[0] + im[0])*s, Xnc = (re[0] - im[0])*s;
     ccsUntangleFwd<T, VT, haveSIMD>(plan, re, im, s, complex_output ? dst + 1 : dst);
-    if (complex_output)
+    எனில் (complex_output)
     {
         dst[0] = X0; dst[1] = 0;
         dst[n] = Xnc; dst[n+1] = 0;
     }
-    else
+    இல்லையெனில்
     {
         dst[0] = X0;
         dst[n-1] = Xnc;
     }
 }
 
-template<typename T, typename VT, bool haveSIMD>
-void postprocDCT_(const DftPlan& plan, const void* _re, const void* _im, void* _dst, size_t dstep)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை postprocDCT_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _re, மாறிலி வெறுமை* _im, வெறுமை* _dst, size_t dstep)
 {
-    const T* re = (const T*)_re; const T* im = (const T*)_im;
+    மாறிலி T* re = (மாறிலி T*)_re; மாறிலி T* im = (மாறிலி T*)_im;
     T* dst = (T*)_dst;
-    int n = plan.n, nc = plan.nc;
-    const T* wr = (const T*)plan.rtw_re;
-    const T* wi = (const T*)plan.rtw_im;
-    const T* dr = (const T*)plan.dct_re;
-    const T* di = (const T*)plan.dct_im;
+    முழு n = plan.n, nc = plan.nc;
+    மாறிலி T* wr = (மாறிலி T*)plan.rtw_re;
+    மாறிலி T* wi = (மாறிலி T*)plan.rtw_im;
+    மாறிலி T* dr = (மாறிலி T*)plan.dct_re;
+    மாறிலி T* di = (மாறிலி T*)plan.dct_im;
     // dst[k] = Re(X_k*w_k), dst[n-k] = -Im(X_k*w_k); w_k = s*W_4n^k (s = DCT normalization);
     // the k = 0 and k = nc terms get the extra sin45 (= 1/sqrt(2)) of DCT-II.
     T X0 = re[0] + im[0], Xnc = re[0] - im[0];
     dst[0] = X0*dr[0]*DftConst<T>::sin45;
     dst[nc*dstep] = Xnc*dr[nc];
-    int k = 1, m = nc - 1;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    முழு k = 1, m = nc - 1;
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        if (dstep == 1)
+        எனில் (dstep == 1)
         {
-            const int VL = VTraits<VT>::vlanes();
-            const VT half = v_setall_((T)0.5);
-            for (; m - k + 1 >= 2*VL; k += VL, m -= VL)
+            மாறிலி முழு VL = VTraits<VT>::vlanes();
+            மாறிலி VT half = v_setall_((T)0.5);
+            க்கு (; m - k + 1 >= 2*VL; k += VL, m -= VL)
             {
                 DFT_UNTANGLE_FWD_VEC(k, m, Xkr, Xki, Xmr, Xmi)
                 VT dkr = vx_load(dr + k), dki = vx_load(di + k);
@@ -1039,7 +1039,7 @@ void postprocDCT_(const DftPlan& plan, const void* _re, const void* _im, void* _
         }
     }
 #endif
-    for (; k < m; k++, m--)
+    க்கு (; k < m; k++, m--)
     {
         DFT_UNTANGLE_FWD_SCALAR(k, m, Xkr, Xki, Xmr, Xmi)
         dst[k*dstep] = Xkr*dr[k] - Xki*di[k];
@@ -1047,7 +1047,7 @@ void postprocDCT_(const DftPlan& plan, const void* _re, const void* _im, void* _
         dst[m*dstep] = Xmr*dr[m] - Xmi*di[m];
         dst[(n-m)*dstep] = -(Xmr*di[m] + Xmi*dr[m]);
     }
-    if ((nc & 1) == 0 && nc >= 2)
+    எனில் ((nc & 1) == 0 && nc >= 2)
     {
         k = nc/2;
         T Xkr = re[k], Xki = -im[k];
@@ -1059,25 +1059,25 @@ void postprocDCT_(const DftPlan& plan, const void* _re, const void* _im, void* _
 #undef DFT_UNTANGLE_FWD_SCALAR
 #undef DFT_UNTANGLE_FWD_VEC
 
-template<typename T, typename VT, bool haveSIMD>
-void postprocIDCT_(const DftPlan& plan, const void* _re, const void* _im, void* _dst, size_t dstep)
+template<typename T, typename VT, தருக்க haveSIMD>
+வெறுமை postprocIDCT_(மாறிலி DftPlan& plan, மாறிலி வெறுமை* _re, மாறிலி வெறுமை* _im, வெறுமை* _dst, size_t dstep)
 {
-    const T* re = (const T*)_re; const T* im = (const T*)_im;
+    மாறிலி T* re = (மாறிலி T*)_re; மாறிலி T* im = (மாறிலி T*)_im;
     T* dst = (T*)_dst;
-    int n = plan.n, nc = plan.nc;
+    முழு n = plan.n, nc = plan.nc;
     // out[2m] = re[m], out[2m+1] = -im[m] (conjugation trick) is the CCS inverse result;
     // Makhoul reordering: dst[2j] = out[j], dst[2j+1] = out[n-1-j], i.e. for j = 2m, 2m+1:
     // dst[4m..4m+3] = (re[m], -im[nc-1-m], -im[m], re[nc-1-m]).
-    int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    முழு j = 0;
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+    எனில் constexpr (haveSIMD)
     {
-        if (dstep == 1)
+        எனில் (dstep == 1)
         {
-            const int VL = VTraits<VT>::vlanes();
-            const VT zero = v_setall_((T)0);
-            int m = 0;
-            for (; m + VL <= nc/2; m += VL)
+            மாறிலி முழு VL = VTraits<VT>::vlanes();
+            மாறிலி VT zero = v_setall_((T)0);
+            முழு m = 0;
+            க்கு (; m + VL <= nc/2; m += VL)
             {
                 VT a = vx_load(re + m);
                 VT b = v_sub(zero, v_reverse(vx_load(im + nc - m - VL)));
@@ -1090,17 +1090,17 @@ void postprocIDCT_(const DftPlan& plan, const void* _re, const void* _im, void* 
     }
 #endif
     // j even: out[j] = re[j/2], out[n-1-j] = -im[(n-1-j)/2]; j odd: out[j] = -im[j/2], out[n-1-j] = re[(n-1-j)/2]
-    for (; j + 1 < nc; j += 2)
+    க்கு (; j + 1 < nc; j += 2)
     {
-        int m = j >> 1, q = (n - 1 - j) >> 1;
+        முழு m = j >> 1, q = (n - 1 - j) >> 1;
         dst[(2*j)*dstep] = re[m];
         dst[(2*j+1)*dstep] = -im[q];
         dst[(2*j+2)*dstep] = -im[m];
         dst[(2*j+3)*dstep] = re[q];
     }
-    if (j < nc)     // nc odd: the last j is even
+    எனில் (j < nc)     // nc odd: the last j is even
     {
-        int m = j >> 1, q = (n - 1 - j) >> 1;
+        முழு m = j >> 1, q = (n - 1 - j) >> 1;
         dst[(2*j)*dstep] = re[m];
         dst[(2*j+1)*dstep] = -im[q];
     }
@@ -1108,7 +1108,7 @@ void postprocIDCT_(const DftPlan& plan, const void* _re, const void* _im, void* 
 
 #undef DFT4_SCALAR
 
-template<typename T, typename VT, bool haveSIMD>
+template<typename T, typename VT, தருக்க haveSIMD>
 DFTKernels makeKernels()
 {
     DFTKernels k;
@@ -1128,30 +1128,30 @@ DFTKernels makeKernels()
     k.postprocReal = postprocReal_<T, VT, haveSIMD>;
     k.postprocDCT = postprocDCT_<T, VT, haveSIMD>;
     k.postprocIDCT = postprocIDCT_<T, VT, haveSIMD>;
-    if constexpr (haveSIMD)
+    எனில் constexpr (haveSIMD)
         k.vlanes = VTraits<VT>::vlanes();
-    else
+    இல்லையெனில்
         k.vlanes = 1;
-    return k;
+    திரும்பு k;
 }
 
 } // namespace
 
-DFTKernels getDFTKernels_(int depth)
+DFTKernels getDFTKernels_(முழு depth)
 {
-    if (depth == CV_32F)
+    எனில் (depth == CV_32F)
     {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        return makeKernels<float, v_float32, true>();
-#else
-        return makeKernels<float, float, false>();
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
+        திரும்பு makeKernels<தசம, v_float32, உண்மை>();
+#இல்லையெனில்
+        திரும்பு makeKernels<தசம, தசம, பொய்>();
 #endif
     }
     CV_Assert(depth == CV_64F);
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    return makeKernels<double, v_float64, true>();
-#else
-    return makeKernels<double, double, false>();
+#எனில் (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    திரும்பு makeKernels<இரட்டை, v_float64, உண்மை>();
+#இல்லையெனில்
+    திரும்பு makeKernels<இரட்டை, இரட்டை, பொய்>();
 #endif
 }
 

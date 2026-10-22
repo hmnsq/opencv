@@ -5,125 +5,125 @@
 #ifndef OPENCV_CORE_BASE64_ENCODING_HPP
 #define OPENCV_CORE_BASE64_ENCODING_HPP
 
-namespace cv
+நாமாகாஶ cv
 {
 
-namespace base64
+நாமாகாஶ base64
 {
 /* A decorator for CvFileStorage
 * - no copyable
 * - not safe for now
 * - move constructor may be needed if C++11
 */
-uint8_t const base64_mapping[] =
+uint8_t மாறிலி base64_mapping[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789+/";
 
-uint8_t const base64_padding = '=';
+uint8_t மாறிலி base64_padding = '=';
 
-std::string make_base64_header(const char * dt);
+std::string make_base64_header(மாறிலி எழுத்து * dt);
 
-size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
+size_t base64_encode(uint8_t மாறிலி * src, uint8_t * dst, size_t off, size_t cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+முழு icvCalcStructSize( மாறிலி எழுத்து* dt, முழு initial_size );
 
-class Base64ContextEmitter;
-class Impl;
+வகுப்பு Base64ContextEmitter;
+வகுப்பு Impl;
 
-class Base64Writer
+வகுப்பு Base64Writer
 {
-public:
-    Base64Writer(cv::FileStorage::Impl& fs, bool can_indent);
+பொது:
+    Base64Writer(cv::FileStorage::Impl& fs, தருக்க can_indent);
     ~Base64Writer();
-    void write(const void* _data, size_t len, const char* dt);
-    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const char* dt);
+    வெறுமை லிக(மாறிலி வெறுமை* _data, size_t len, மாறிலி எழுத்து* dt);
+    template<typename to_இருமம்_convertor_t> வெறுமை லிக(to_இருமம்_convertor_t & convertor, மாறிலி எழுத்து* dt);
 
-private:
-    void check_dt(const char* dt);
+தனிப்பட்ட:
+    வெறுமை check_dt(மாறிலி எழுத்து* dt);
 
-private:
+தனிப்பட்ட:
     // disable copy and assignment
-    Base64Writer(const Base64Writer &);
-    Base64Writer & operator=(const Base64Writer &);
+    Base64Writer(மாறிலி Base64Writer &);
+    Base64Writer & operator=(மாறிலி Base64Writer &);
 
-private:
+தனிப்பட்ட:
 
     Base64ContextEmitter * emitter;
     std::string data_type_string;
 };
 
-size_t base64_encode_buffer_size(size_t cnt, bool is_end_with_zero = true);
+size_t base64_encode_buffer_size(size_t cnt, தருக்க is_end_with_zero = உண்மை);
 
-template<typename _uint_t> inline size_t
-to_binary(_uint_t val, uchar * cur)
+template<typename _uint_t> உள்வரி size_t
+to_இருமம்(_uint_t val, uchar * cur)
 {
     size_t delta = CHAR_BIT;
-    size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    size_t cnt = அளவு(_uint_t);
+    போது (cnt --> static_cast<size_t>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    திரும்பு அளவு(_uint_t);
 }
 
-template<> inline size_t to_binary(bool val, uchar * cur)
+template<> உள்வரி size_t to_இருமம்(தருக்க val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    திரும்பு to_இருமம்(static_cast<uchar>(val), cur);
 }
 
-template<> inline size_t to_binary(double val, uchar * cur)
+template<> உள்வரி size_t to_இருமம்(இரட்டை val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    திரும்பு to_இருமம்(bit64.u, cur);
 }
 
-template<> inline size_t to_binary(float val, uchar * cur)
+template<> உள்வரி size_t to_இருமம்(தசம val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    திரும்பு to_இருமம்(bit32.u, cur);
 }
 
-template<typename _primitive_t> inline size_t
-to_binary(uchar const * val, uchar * cur)
+template<typename _primitive_t> உள்வரி size_t
+to_இருமம்(uchar மாறிலி * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    திரும்பு to_இருமம்<_primitive_t>(*reinterpret_cast<_primitive_t மாறிலி *>(val), cur);
 }
 
 
 
-class RawDataToBinaryConvertor
+வகுப்பு Raw_Data_To_இருமம்_Convertor
 {
-public:
+பொது:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    Raw_Data_To_இருமம்_Convertor(மாறிலி வெறுமை* src, முழு len, மாறிலி std::string & dt);
 
-    inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
-    inline operator bool() const;
+    உள்வரி Raw_Data_To_இருமம்_Convertor & operator >>(uchar * & dst);
+    உள்வரி operator தருக்க() மாறிலி;
 
-private:
-    typedef size_t(*to_binary_t)(const uchar *, uchar *);
-    struct elem_to_binary_t
+தனிப்பட்ட:
+    வகைவரை size_t(*to_இருமம்_t)(மாறிலி uchar *, uchar *);
+    கட்டமைப்பு elem_to_இருமம்_t
     {
         size_t      offset;
         size_t      offset_packed;
-        to_binary_t func;
+        to_இருமம்_t func;
     };
 
-private:
-    size_t make_to_binary_funcs(const std::string &dt);
+தனிப்பட்ட:
+    size_t make_to_இருமம்_funcs(மாறிலி std::string &dt);
 
-private:
-    const uchar * beg;
-    const uchar * cur;
-    const uchar * end;
+தனிப்பட்ட:
+    மாறிலி uchar * beg;
+    மாறிலி uchar * cur;
+    மாறிலி uchar * end;
 
     size_t step;
     size_t step_packed;
-    std::vector<elem_to_binary_t> to_binary_funcs;
+    std::vector<elem_to_இருமம்_t> to_இருமம்_funcs;
 };
 
 }

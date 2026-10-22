@@ -41,55 +41,55 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#அந்தர்பாவ "precomp.hpp"
 
-namespace cv
+நாமாகாஶ cv
 {
-    class FormattedImpl CV_FINAL : public Formatted
+    வகுப்பு FormattedImpl CV_FINAL : பொது Formatted
     {
-        enum { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
-               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_VALUE, STATE_FINISHED,
-               STATE_LINE_SEPARATOR, STATE_CN_SEPARATOR, STATE_VALUE_SEPARATOR };
-        enum {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
+        எண்ணிக்கை { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
+               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_மதிப்பு, STATE_FINISHED,
+               STATE_வரி_SEPARATOR, STATE_CN_SEPARATOR, STATE_மதிப்பு_SEPARATOR };
+        எண்ணிக்கை {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
 
-        char floatFormat[8];
-        char buf[32];   // enough for double with precision up to 20
+        எழுத்து floatFormat[8];
+        எழுத்து buf[32];   // enough for double with precision up to 20
 
         Mat mtx;
-        int mcn; // == mtx.channels()
-        bool singleLine;
-        bool alignOrder;    // true when cn first order
+        முழு mcn; // == mtx.channels()
+        தருக்க single_வரி;
+        தருக்க alignOrder;    // true when cn first order
 
-        int state;
-        int row;
-        int col;
-        int cn;
+        முழு state;
+        முழு row;
+        முழு col;
+        முழு cn;
 
         String prologue;
         String epilogue;
-        char braces[5];
+        எழுத்து braces[5];
 
-        void (FormattedImpl::*valueToStr)();
-        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
-        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
-        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
-        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
-        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
-        void valueToStr32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
-        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
-        void valueToStr32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
-        void valueToStr64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
-        void valueToStr64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
-        void valueToStr64s() { snprintf(buf, sizeof(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
-        void valueToStr16f() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<hfloat>(row, col)[cn]); }
-        void valueToStr16bf() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<bfloat>(row, col)[cn]); }
-        void valueToStr8f()   { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8_t>(row, col)[cn]); }
-        void valueToStr8fnuz() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8a_t>(row, col)[cn]); }
-        void valueToStrOther() { buf[0] = 0; }
+        வெறுமை (FormattedImpl::*மதிப்பு_To_Str)();
+        வெறுமை மதிப்பு_To_Str_Bool() { snprintf(buf, அளவு(buf), "%d", (முழு)mtx.ptr<uchar>(row, col)[cn] != 0); }
+        வெறுமை மதிப்பு_To_Str8u()  { snprintf(buf, அளவு(buf), "%3d", (முழு)mtx.ptr<uchar>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str8s()  { snprintf(buf, அளவு(buf), "%3d", (முழு)mtx.ptr<schar>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str16u() { snprintf(buf, அளவு(buf), "%d", (முழு)mtx.ptr<ushort>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str16s() { snprintf(buf, அளவு(buf), "%d", (முழு)mtx.ptr<short>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str32u() { snprintf(buf, அளவு(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str32s() { snprintf(buf, அளவு(buf), "%d", mtx.ptr<முழு>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str32f() { snprintf(buf, அளவு(buf), floatFormat, mtx.ptr<தசம>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str64f() { snprintf(buf, அளவு(buf), floatFormat, mtx.ptr<இரட்டை>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str64u() { snprintf(buf, அளவு(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str64s() { snprintf(buf, அளவு(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str16f() { snprintf(buf, அளவு(buf), floatFormat, (தசம)mtx.ptr<hfloat>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str16bf() { snprintf(buf, அளவு(buf), floatFormat, (தசம)mtx.ptr<bfloat>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str8f()   { snprintf(buf, அளவு(buf), floatFormat, (தசம)mtx.ptr<fp8_t>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str8fnuz() { snprintf(buf, அளவு(buf), floatFormat, (தசம)mtx.ptr<fp8a_t>(row, col)[cn]); }
+        வெறுமை மதிப்பு_To_Str_Other() { buf[0] = 0; }
 
-    public:
+    பொது:
 
-        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, int precision)
+        FormattedImpl(String pl, String el, Mat m, எழுத்து br[5], தருக்க s_வரி, தருக்க aOrder, முழு precision)
         {
             CV_Assert(m.dims <= 2);
 
@@ -99,290 +99,290 @@ namespace cv
             mcn = m.channels();
             memcpy(braces, br, 5);
             state = STATE_PROLOGUE;
-            singleLine = sLine;
+            single_வரி = s_வரி;
             alignOrder = aOrder;
             row = col = cn =0;
 
-            if (precision < 0)
+            எனில் (precision < 0)
             {
                 floatFormat[0] = '%';
                 floatFormat[1] = 'a';
                 floatFormat[2] = 0;
             }
-            else
+            இல்லையெனில்
             {
-                cv_snprintf(floatFormat, sizeof(floatFormat), "%%.%dg", std::min(precision, 20));
+                cv_snprintf(floatFormat, அளவு(floatFormat), "%%.%dg", std::min(precision, 20));
             }
 
-            switch(mtx.depth())
+            தேர்வு(mtx.depth())
             {
-                case CV_8U:  valueToStr = &FormattedImpl::valueToStr8u; break;
-                case CV_8S:  valueToStr = &FormattedImpl::valueToStr8s; break;
-                case CV_Bool: valueToStr = &FormattedImpl::valueToStrBool; break;
-                case CV_16U: valueToStr = &FormattedImpl::valueToStr16u; break;
-                case CV_16S: valueToStr = &FormattedImpl::valueToStr16s; break;
-                case CV_32U: valueToStr = &FormattedImpl::valueToStr32u; break;
-                case CV_32S: valueToStr = &FormattedImpl::valueToStr32s; break;
-                case CV_32F: valueToStr = &FormattedImpl::valueToStr32f; break;
-                case CV_64F: valueToStr = &FormattedImpl::valueToStr64f; break;
-                case CV_64U: valueToStr = &FormattedImpl::valueToStr64u; break;
-                case CV_64S: valueToStr = &FormattedImpl::valueToStr64s; break;
-                case CV_16F: valueToStr = &FormattedImpl::valueToStr16f; break;
-                case CV_16BF: valueToStr = &FormattedImpl::valueToStr16bf; break;
-                case CV_8F_E4M3FN:   valueToStr = &FormattedImpl::valueToStr8f; break;
-                case CV_8F_E4M3FNUZ: valueToStr = &FormattedImpl::valueToStr8fnuz; break;
-                default:
+                நிலை CV_8U:  மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str8u; நிறுத்து;
+                நிலை CV_8S:  மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str8s; நிறுத்து;
+                நிலை CV_Bool: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str_Bool; நிறுத்து;
+                நிலை CV_16U: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str16u; நிறுத்து;
+                நிலை CV_16S: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str16s; நிறுத்து;
+                நிலை CV_32U: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str32u; நிறுத்து;
+                நிலை CV_32S: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str32s; நிறுத்து;
+                நிலை CV_32F: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str32f; நிறுத்து;
+                நிலை CV_64F: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str64f; நிறுத்து;
+                நிலை CV_64U: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str64u; நிறுத்து;
+                நிலை CV_64S: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str64s; நிறுத்து;
+                நிலை CV_16F: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str16f; நிறுத்து;
+                நிலை CV_16BF: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str16bf; நிறுத்து;
+                நிலை CV_8F_E4M3FN:   மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str8f; நிறுத்து;
+                நிலை CV_8F_E4M3FNUZ: மதிப்பு_To_Str = &FormattedImpl::மதிப்பு_To_Str8fnuz; நிறுத்து;
+                இயல்பு:
                     CV_Error_(Error::StsError, ("unsupported matrix type %d\n", mtx.depth()));
             }
         }
 
-        void reset() CV_OVERRIDE
+        வெறுமை reset() CV_OVERRIDE
         {
             state = STATE_PROLOGUE;
         }
 
-        const char* next() CV_OVERRIDE
+        மாறிலி எழுத்து* next() CV_OVERRIDE
         {
-            switch(state)
+            தேர்வு(state)
             {
-                case STATE_PROLOGUE:
+                நிலை STATE_PROLOGUE:
                     row = 0;
-                    if (mtx.empty())
+                    எனில் (mtx.empty())
                         state = STATE_EPILOGUE;
-                    else if (alignOrder)
+                    இல்லையெனில் எனில் (alignOrder)
                         state = STATE_INTERLUDE;
-                    else
+                    இல்லையெனில்
                         state = STATE_ROW_OPEN;
-                    return prologue.c_str();
-                case STATE_INTERLUDE:
+                    திரும்பு prologue.c_str();
+                நிலை STATE_INTERLUDE:
                     state = STATE_ROW_OPEN;
-                    if (row >= mtx.rows)
+                    எனில் (row >= mtx.rows)
                     {
-                        if (++cn >= mcn)
+                        எனில் (++cn >= mcn)
                         {
                             state = STATE_EPILOGUE;
                             buf[0] = 0;
-                            return buf;
+                            திரும்பு buf;
                         }
-                        else
+                        இல்லையெனில்
                             row = 0;
-                        snprintf(buf, sizeof(buf), "\n(:, :, %d) = \n", cn+1);
-                        return buf;
+                        snprintf(buf, அளவு(buf), "\n(:, :, %d) = \n", cn+1);
+                        திரும்பு buf;
                     }
-                    snprintf(buf, sizeof(buf), "(:, :, %d) = \n", cn+1);
-                    return buf;
-                case STATE_EPILOGUE:
+                    snprintf(buf, அளவு(buf), "(:, :, %d) = \n", cn+1);
+                    திரும்பு buf;
+                நிலை STATE_EPILOGUE:
                     state = STATE_FINISHED;
-                    return epilogue.c_str();
-                case STATE_ROW_OPEN:
+                    திரும்பு epilogue.c_str();
+                நிலை STATE_ROW_OPEN:
                     col = 0;
                     state = STATE_CN_OPEN;
                     {
                         size_t pos = 0;
-                        if (row > 0)
-                            while(pos < prologue.size() && pos < sizeof(buf) - 2)
+                        எனில் (row > 0)
+                            போது(pos < prologue.size() && pos < அளவு(buf) - 2)
                                 buf[pos++] = ' ';
-                        if (braces[BRACE_ROW_OPEN])
+                        எனில் (braces[BRACE_ROW_OPEN])
                             buf[pos++] = braces[BRACE_ROW_OPEN];
-                        if(!pos)
-                            return next();
+                        எனில்(!pos)
+                            திரும்பு next();
                         buf[pos] = 0;
                     }
-                    return buf;
-                case STATE_ROW_CLOSE:
-                    state = STATE_LINE_SEPARATOR;
+                    திரும்பு buf;
+                நிலை STATE_ROW_CLOSE:
+                    state = STATE_வரி_SEPARATOR;
                     ++row;
-                    if (braces[BRACE_ROW_CLOSE])
+                    எனில் (braces[BRACE_ROW_CLOSE])
                     {
                         buf[0] = braces[BRACE_ROW_CLOSE];
                         buf[1] = row < mtx.rows ? ',' : '\0';
                         buf[2] = 0;
-                        return buf;
+                        திரும்பு buf;
                     }
-                    else if(braces[BRACE_ROW_SEP] && row < mtx.rows)
+                    இல்லையெனில் எனில்(braces[BRACE_ROW_SEP] && row < mtx.rows)
                     {
                         buf[0] = braces[BRACE_ROW_SEP];
                         buf[1] = 0;
-                        return buf;
+                        திரும்பு buf;
                     }
-                    return next();
-                case STATE_CN_OPEN:
-                    state = STATE_VALUE;
-                    if (!alignOrder)
+                    திரும்பு next();
+                நிலை STATE_CN_OPEN:
+                    state = STATE_மதிப்பு;
+                    எனில் (!alignOrder)
                         cn = 0;
-                    if (mcn > 1 && braces[BRACE_CN_OPEN])
+                    எனில் (mcn > 1 && braces[BRACE_CN_OPEN])
                     {
                         buf[0] = braces[BRACE_CN_OPEN];
                         buf[1] = 0;
-                        return buf;
+                        திரும்பு buf;
                     }
-                    return next();
-                case STATE_CN_CLOSE:
+                    திரும்பு next();
+                நிலை STATE_CN_CLOSE:
                     ++col;
-                    if (col >= mtx.cols)
+                    எனில் (col >= mtx.cols)
                         state = STATE_ROW_CLOSE;
-                    else
+                    இல்லையெனில்
                         state = STATE_CN_SEPARATOR;
-                    if (mcn > 1 && braces[BRACE_CN_CLOSE])
+                    எனில் (mcn > 1 && braces[BRACE_CN_CLOSE])
                     {
                         buf[0] = braces[BRACE_CN_CLOSE];
                         buf[1] = 0;
-                        return buf;
+                        திரும்பு buf;
                     }
-                    return next();
-                case STATE_VALUE:
-                    (this->*valueToStr)();
+                    திரும்பு next();
+                நிலை STATE_மதிப்பு:
+                    (இது->*மதிப்பு_To_Str)();
                     state = STATE_CN_CLOSE;
-                    if (alignOrder)
-                        return buf;
-                    if (++cn < mcn)
-                        state = STATE_VALUE_SEPARATOR;
-                    return buf;
-                case STATE_FINISHED:
-                    return 0;
-                case STATE_LINE_SEPARATOR:
-                    if (row >= mtx.rows)
+                    எனில் (alignOrder)
+                        திரும்பு buf;
+                    எனில் (++cn < mcn)
+                        state = STATE_மதிப்பு_SEPARATOR;
+                    திரும்பு buf;
+                நிலை STATE_FINISHED:
+                    திரும்பு 0;
+                நிலை STATE_வரி_SEPARATOR:
+                    எனில் (row >= mtx.rows)
                     {
-                        if (alignOrder)
+                        எனில் (alignOrder)
                             state = STATE_INTERLUDE;
-                        else
+                        இல்லையெனில்
                             state = STATE_EPILOGUE;
-                        return next();
+                        திரும்பு next();
                     }
                     state = STATE_ROW_OPEN;
-                    buf[0] = singleLine ? ' ' : '\n';
+                    buf[0] = single_வரி ? ' ' : '\n';
                     buf[1] = 0;
-                    return buf;
-                case STATE_CN_SEPARATOR:
+                    திரும்பு buf;
+                நிலை STATE_CN_SEPARATOR:
                     state = STATE_CN_OPEN;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
-                case STATE_VALUE_SEPARATOR:
-                    state = STATE_VALUE;
+                    திரும்பு buf;
+                நிலை STATE_மதிப்பு_SEPARATOR:
+                    state = STATE_மதிப்பு;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    திரும்பு buf;
             }
-            return 0;
+            திரும்பு 0;
         }
     };
 
-    class FormatterBase : public Formatter
+    வகுப்பு FormatterBase : பொது Formatter
     {
-    public:
-        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(true) {}
+    பொது:
+        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(உண்மை) {}
 
-        void set16fPrecision(int p) CV_OVERRIDE
+        வெறுமை set16fPrecision(முழு p) CV_OVERRIDE
         {
             prec16f = p;
         }
 
-        void set32fPrecision(int p) CV_OVERRIDE
+        வெறுமை set32fPrecision(முழு p) CV_OVERRIDE
         {
             prec32f = p;
         }
 
-        void set64fPrecision(int p) CV_OVERRIDE
+        வெறுமை set64fPrecision(முழு p) CV_OVERRIDE
         {
             prec64f = p;
         }
 
-        void setMultiline(bool ml) CV_OVERRIDE
+        வெறுமை setMultiline(தருக்க ml) CV_OVERRIDE
         {
             multiline = ml;
         }
 
-    protected:
-        int prec16f;
-        int prec32f;
-        int prec64f;
-        int multiline;
+    பாதுகாக்கப்பட்ட:
+        முழு prec16f;
+        முழு prec32f;
+        முழு prec64f;
+        முழு multiline;
     };
 
-    class DefaultFormatter CV_FINAL : public FormatterBase
+    வகுப்பு DefaultFormatter CV_FINAL : பொது FormatterBase
     {
-    public:
+    பொது:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(மாறிலி Mat& mtx) மாறிலி CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            எழுத்து braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            திரும்பு makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.rows == 1 || !multiline, பொய், mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class MatlabFormatter CV_FINAL : public FormatterBase
+    வகுப்பு MatlabFormatter CV_FINAL : பொது FormatterBase
     {
-    public:
+    பொது:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(மாறிலி Mat& mtx) மாறிலி CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("", "", mtx, &*braces,
-                mtx.rows == 1 || !multiline, true, mtx.depth() == CV_64F ? prec64f : prec32f );
+            எழுத்து braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            திரும்பு makePtr<FormattedImpl>("", "", mtx, &*braces,
+                mtx.rows == 1 || !multiline, உண்மை, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class PythonFormatter CV_FINAL : public FormatterBase
+    வகுப்பு PythonFormatter CV_FINAL : பொது FormatterBase
     {
-    public:
+    பொது:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(மாறிலி Mat& mtx) மாறிலி CV_OVERRIDE
         {
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            எழுத்து braces[5] = {'[', ']', ',', '[', ']'};
+            எனில் (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            திரும்பு makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.rows == 1 || !multiline, பொய், mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class NumpyFormatter CV_FINAL : public FormatterBase
+    வகுப்பு NumpyFormatter CV_FINAL : பொது FormatterBase
     {
-    public:
+    பொது:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(மாறிலி Mat& mtx) மாறிலி CV_OVERRIDE
         {
-            static const char* numpyTypes[CV_DEPTH_MAX] =
+            நிலையான மாறிலி எழுத்து* numpyTypes[CV_DEPTH_MAX] =
             {
                 "uint8", "int8", "uint16", "int16", "int32", "float32", "float64",
                 "float16", "bfloat16", "bool", "uint64", "int64", "uint32",
                 "float8_e4m3fn", "float8_e4m3fnuz"
             };
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            எழுத்து braces[5] = {'[', ']', ',', '[', ']'};
+            எனில் (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("array([",
+            திரும்பு makePtr<FormattedImpl>("array([",
                 cv::format("], dtype='%s')", numpyTypes[mtx.depth()]), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+                mtx.rows == 1 || !multiline, பொய், mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CSVFormatter CV_FINAL : public FormatterBase
+    வகுப்பு CSVFormatter CV_FINAL : பொது FormatterBase
     {
-    public:
+    பொது:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(மாறிலி Mat& mtx) மாறிலி CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', '\0', '\0', '\0'};
-            return makePtr<FormattedImpl>(String(),
+            எழுத்து braces[5] = {'\0', '\0', '\0', '\0', '\0'};
+            திரும்பு makePtr<FormattedImpl>(String(),
                 mtx.rows > 1 ? String("\n") : String(), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+                mtx.rows == 1 || !multiline, பொய், mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CFormatter CV_FINAL : public FormatterBase
+    வகுப்பு CFormatter CV_FINAL : பொது FormatterBase
     {
-    public:
+    பொது:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(மாறிலி Mat& mtx) மாறிலி CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ',', '\0', '\0'};
-            return makePtr<FormattedImpl>("{", "}", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            எழுத்து braces[5] = {'\0', '\0', ',', '\0', '\0'};
+            திரும்பு makePtr<FormattedImpl>("{", "}", mtx, &*braces,
+                mtx.rows == 1 || !multiline, பொய், mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
@@ -391,188 +391,188 @@ namespace cv
 
     Ptr<Formatter> Formatter::get(Formatter::FormatType fmt)
     {
-        switch(fmt)
+        தேர்வு(fmt)
         {
-            case FMT_DEFAULT:
-                return makePtr<DefaultFormatter>();
-            case FMT_MATLAB:
-                return makePtr<MatlabFormatter>();
-            case FMT_CSV:
-                return makePtr<CSVFormatter>();
-            case FMT_PYTHON:
-                return makePtr<PythonFormatter>();
-            case FMT_NUMPY:
-                return makePtr<NumpyFormatter>();
-            case FMT_C:
-                return makePtr<CFormatter>();
+            நிலை FMT_DEFAULT:
+                திரும்பு makePtr<DefaultFormatter>();
+            நிலை FMT_MATLAB:
+                திரும்பு makePtr<MatlabFormatter>();
+            நிலை FMT_CSV:
+                திரும்பு makePtr<CSVFormatter>();
+            நிலை FMT_PYTHON:
+                திரும்பு makePtr<PythonFormatter>();
+            நிலை FMT_NUMPY:
+                திரும்பு makePtr<NumpyFormatter>();
+            நிலை FMT_C:
+                திரும்பு makePtr<CFormatter>();
         }
-        return makePtr<DefaultFormatter>();
+        திரும்பு makePtr<DefaultFormatter>();
     }
 
-    template<typename _Tp> struct Fmt
+    template<typename _Tp> கட்டமைப்பு Fmt
     {
-        typedef int temp_type;
-        static const char* fmt() { return "%d"; }
+        வகைவரை முழு temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%d"; }
     };
 
-    template<> struct Fmt<uint32_t>
+    template<> கட்டமைப்பு Fmt<uint32_t>
     {
-        typedef unsigned temp_type;
-        static const char* fmt() { return "%u"; }
+        வகைவரை unsigned temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%u"; }
     };
 
-    template<> struct Fmt<int64_t>
+    template<> கட்டமைப்பு Fmt<int64_t>
     {
-        typedef long long temp_type;
-        static const char* fmt() { return "%lld"; }
+        வகைவரை long long temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%lld"; }
     };
 
-    template<> struct Fmt<uint64_t>
+    template<> கட்டமைப்பு Fmt<uint64_t>
     {
-        typedef unsigned long long temp_type;
-        static const char* fmt() { return "%llu"; }
+        வகைவரை unsigned long long temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%llu"; }
     };
 
-    template<> struct Fmt<float>
+    template<> கட்டமைப்பு Fmt<தசம>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        வகைவரை தசம temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%.5g"; }
     };
 
-    template<> struct Fmt<double>
+    template<> கட்டமைப்பு Fmt<இரட்டை>
     {
-        typedef double temp_type;
-        static const char* fmt() { return "%.5g"; }
+        வகைவரை இரட்டை temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%.5g"; }
     };
 
-    template<> struct Fmt<hfloat>
+    template<> கட்டமைப்பு Fmt<hfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        வகைவரை தசம temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%.5g"; }
     };
 
-    template<> struct Fmt<bfloat>
+    template<> கட்டமைப்பு Fmt<bfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        வகைவரை தசம temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%.4g"; }
     };
 
-    template<> struct Fmt<fp8_t>
+    template<> கட்டமைப்பு Fmt<fp8_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        வகைவரை தசம temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%.4g"; }
     };
 
-    template<> struct Fmt<fp8a_t>
+    template<> கட்டமைப்பு Fmt<fp8a_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        வகைவரை தசம temp_type;
+        நிலையான மாறிலி எழுத்து* fmt() { திரும்பு "%.4g"; }
     };
 
     template <typename _Tp>
-    static void pprintRow(std::ostream& strm, const _Tp* ptr, int n, size_t ofs, int edge)
+    நிலையான வெறுமை pprintRow(std::ostream& strm, மாறிலி _Tp* ptr, முழு n, size_t ofs, முழு edge)
     {
-        char buf[128];
-        const char* fmt = Fmt<_Tp>::fmt();
-        int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-        if (edge == 0)
+        எழுத்து buf[128];
+        மாறிலி எழுத்து* fmt = Fmt<_Tp>::fmt();
+        முழு i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+        எனில் (edge == 0)
             edge = ndump;
-        for (i = 0; i < ndump; i++) {
-            int j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
-            if (i > 0)
+        க்கு (i = 0; i < ndump; i++) {
+            முழு j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
+            எனில் (i > 0)
                 strm << ", ";
-            if (j >= 0) {
-                snprintf(buf, sizeof(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
+            எனில் (j >= 0) {
+                snprintf(buf, அளவு(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
                 strm << buf;
-            } else
+            } இல்லையெனில்
                 strm << "... ";
         }
     }
 
-    static void pprintSlice(std::ostream& strm, const Mat& tensor,
-                            const size_t* step, int d,
-                            size_t ofs, int edge)
+    நிலையான வெறுமை pprintSlice(std::ostream& strm, மாறிலி Mat& tensor,
+                            மாறிலி size_t* step, முழு d,
+                            size_t ofs, முழு edge)
     {
         MatShape shape = tensor.shape();
-        int ndims = shape.dims;
-        int n = d >= ndims ? 1 : shape[d];
-        if (d >= ndims - 1) {
-            int typ = tensor.depth();
-            void* data = tensor.data;
+        முழு ndims = shape.dims;
+        முழு n = d >= ndims ? 1 : shape[d];
+        எனில் (d >= ndims - 1) {
+            முழு typ = tensor.depth();
+            வெறுமை* data = tensor.data;
             CV_Assert(data);
             n *= tensor.channels();
-            if (typ == CV_8U)
-                pprintRow(strm, (const uint8_t*)data, n, ofs, edge);
-            else if (typ == CV_8S)
-                pprintRow(strm, (const int8_t*)data, n, ofs, edge);
-            else if (typ == CV_16U)
-                pprintRow(strm, (const uint16_t*)data, n, ofs, edge);
-            else if (typ == CV_16S)
-                pprintRow(strm, (const int16_t*)data, n, ofs, edge);
-            else if (typ == CV_32U)
-                pprintRow(strm, (const unsigned*)data, n, ofs, edge);
-            else if (typ == CV_32S)
-                pprintRow(strm, (const int*)data, n, ofs, edge);
-            else if (typ == CV_64U)
-                pprintRow(strm, (const uint64_t*)data, n, ofs, edge);
-            else if (typ == CV_64S)
-                pprintRow(strm, (const int64_t*)data, n, ofs, edge);
-            else if (typ == CV_32F)
-                pprintRow(strm, (const float*)data, n, ofs, edge);
-            else if (typ == CV_64F)
-                pprintRow(strm, (const double*)data, n, ofs, edge);
-            else if (typ == CV_16F)
-                pprintRow(strm, (const hfloat*)data, n, ofs, edge);
-            else if (typ == CV_16BF)
-                pprintRow(strm, (const bfloat*)data, n, ofs, edge);
-            else if (typ == CV_Bool)
-                pprintRow(strm, (const bool*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FN)
-                pprintRow(strm, (const fp8_t*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FNUZ)
-                pprintRow(strm, (const fp8a_t*)data, n, ofs, edge);
-            else {
+            எனில் (typ == CV_8U)
+                pprintRow(strm, (மாறிலி uint8_t*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_8S)
+                pprintRow(strm, (மாறிலி int8_t*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_16U)
+                pprintRow(strm, (மாறிலி uint16_t*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_16S)
+                pprintRow(strm, (மாறிலி int16_t*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_32U)
+                pprintRow(strm, (மாறிலி unsigned*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_32S)
+                pprintRow(strm, (மாறிலி முழு*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_64U)
+                pprintRow(strm, (மாறிலி uint64_t*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_64S)
+                pprintRow(strm, (மாறிலி int64_t*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_32F)
+                pprintRow(strm, (மாறிலி தசம*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_64F)
+                pprintRow(strm, (மாறிலி இரட்டை*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_16F)
+                pprintRow(strm, (மாறிலி hfloat*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_16BF)
+                pprintRow(strm, (மாறிலி bfloat*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_Bool)
+                pprintRow(strm, (மாறிலி தருக்க*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_8F_E4M3FN)
+                pprintRow(strm, (மாறிலி fp8_t*)data, n, ofs, edge);
+            இல்லையெனில் எனில் (typ == CV_8F_E4M3FNUZ)
+                pprintRow(strm, (மாறிலி fp8a_t*)data, n, ofs, edge);
+            இல்லையெனில் {
                 CV_Error(Error::StsNotImplemented, "unsupported type");
             }
-        } else {
-            int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-            bool dots = false;
-            for (i = 0; i < ndump; i++) {
-                if (i > 0 && !dots) {
-                    int nempty_lines = ndims - 2 - d;
-                    for (int k = 0; k < nempty_lines; k++)
+        } இல்லையெனில் {
+            முழு i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+            தருக்க dots = பொய்;
+            க்கு (i = 0; i < ndump; i++) {
+                எனில் (i > 0 && !dots) {
+                    முழு nempty_வரிகள் = ndims - 2 - d;
+                    க்கு (முழு k = 0; k < nempty_வரிகள்; k++)
                         strm << "\n";
                 }
-                if (i > 0)
+                எனில் (i > 0)
                     strm << "\n";
-                int j = n == ndump || i < edge ? i :
+                முழு j = n == ndump || i < edge ? i :
                         i == edge ? -1 :
                         n - edge*2 - 1 + i;
                 dots = j < 0;
-                if (!dots)
+                எனில் (!dots)
                     pprintSlice(strm, tensor, step, d+1, ofs + j*step[d], edge);
-                else
+                இல்லையெனில்
                     strm << "...";
             }
         }
     }
 
-    std::ostream& pprint(std::ostream& strm, InputArray array,
-                         int /*indent*/, int edge_,
-                         int wholeTensorThreshold,
-                         char parens)
+    std::ostream& pprint(std::ostream& strm, உள்ளீடு_Array array,
+                         முழு /*indent*/, முழு edge_,
+                         முழு wholeTensorThreshold,
+                         எழுத்து parens)
     {
-        char oparen = parens;
-        char cparen = parens == '(' ? ')' :
+        எழுத்து oparen = parens;
+        எழுத்து cparen = parens == '(' ? ')' :
                       parens == '[' ? ']' :
                       parens == '{' ? '}' :
                       parens == '<' ? '>' :
                       parens;
-        int edge = edge_ > 0 ? edge_ : 3;
+        முழு edge = edge_ > 0 ? edge_ : 3;
         wholeTensorThreshold = wholeTensorThreshold > 0 ? wholeTensorThreshold : 100;
 
         Mat tensor = array.getMat();
-        if (!tensor.isContinuous()) {
+        எனில் (!tensor.isContinuous()) {
             // [TODO] print non-continous arrays without copy
             Mat temp;
             tensor.copyTo(temp);
@@ -582,28 +582,28 @@ namespace cv
         MatShape shape = tensor.shape();
         size_t sz_all = tensor.total();
 
-        if (parens)
+        எனில் (parens)
             strm << oparen;
-        if (sz_all == 0) {
-            if (!parens)
+        எனில் (sz_all == 0) {
+            எனில் (!parens)
                 strm << "<empty>";
-        } else {
-            if (sz_all <= (size_t)wholeTensorThreshold)
+        } இல்லையெனில் {
+            எனில் (sz_all <= (size_t)wholeTensorThreshold)
                 edge = 0;
 
-            int ndims = shape.dims;
-            int cn = tensor.channels();
+            முழு ndims = shape.dims;
+            முழு cn = tensor.channels();
             size_t step[MatShape::MAX_DIMS];
             step[std::max(ndims-1, 0)] = 1;
-            for (int i = ndims-2; i >= 0; i--) {
+            க்கு (முழு i = ndims-2; i >= 0; i--) {
                 step[i] = step[i+1]*shape[i+1]*cn;
                 cn = 1;
             }
             pprintSlice(strm, tensor, step, 0, 0, edge);
         }
-        if (parens)
+        எனில் (parens)
             strm << cparen;
-        return strm;
+        திரும்பு strm;
     }
 
 } // cv

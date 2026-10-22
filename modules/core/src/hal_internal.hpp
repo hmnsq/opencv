@@ -47,26 +47,26 @@
 
 #ifdef HAVE_LAPACK
 
-int lapack_LU32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, int* info);
-int lapack_LU64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, int* info);
-int lapack_Cholesky32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, bool* info);
-int lapack_Cholesky64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, bool* info);
-int lapack_SVD32f(float* a, size_t a_step, float* w, float* u, size_t u_step, float* vt, size_t v_step, int m, int n, int flags);
-int lapack_SVD64f(double* a, size_t a_step, double* w, double* u, size_t u_step, double* vt, size_t v_step, int m, int n, int flags);
-int lapack_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info);
-int lapack_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info);
-int lapack_gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
+முழு lapack_LU32f(தசம* a, size_t a_step, முழு m, தசம* b, size_t b_step, முழு n, முழு* info);
+முழு lapack_LU64f(இரட்டை* a, size_t a_step, முழு m, இரட்டை* b, size_t b_step, முழு n, முழு* info);
+முழு lapack_Cholesky32f(தசம* a, size_t a_step, முழு m, தசம* b, size_t b_step, முழு n, தருக்க* info);
+முழு lapack_Cholesky64f(இரட்டை* a, size_t a_step, முழு m, இரட்டை* b, size_t b_step, முழு n, தருக்க* info);
+முழு lapack_SVD32f(தசம* a, size_t a_step, தசம* w, தசம* u, size_t u_step, தசம* vt, size_t v_step, முழு m, முழு n, முழு flags);
+முழு lapack_SVD64f(இரட்டை* a, size_t a_step, இரட்டை* w, இரட்டை* u, size_t u_step, இரட்டை* vt, size_t v_step, முழு m, முழு n, முழு flags);
+முழு lapack_QR32f(தசம* src1, size_t src1_step, முழு m, முழு n, முழு k, தசம* src2, size_t src2_step, தசம* dst, முழு* info);
+முழு lapack_QR64f(இரட்டை* src1, size_t src1_step, முழு m, முழு n, முழு k, இரட்டை* src2, size_t src2_step, இரட்டை* dst, முழு* info);
+முழு lapack_gemm32f(மாறிலி தசம* src1, size_t src1_step, மாறிலி தசம* src2, size_t src2_step,
+                   தசம alpha, மாறிலி தசம* src3, size_t src3_step, தசம beta, தசம* dst, size_t dst_step,
+                   முழு m, முழு n, முழு k, முழு flags);
+முழு lapack_gemm64f(மாறிலி இரட்டை* src1, size_t src1_step, மாறிலி இரட்டை* src2, size_t src2_step,
+                   இரட்டை alpha, மாறிலி இரட்டை* src3, size_t src3_step, இரட்டை beta, இரட்டை* dst, size_t dst_step,
+                   முழு m, முழு n, முழு k, முழு flags);
+முழு lapack_gemm32fc(மாறிலி தசம* src1, size_t src1_step, மாறிலி தசம* src2, size_t src2_step,
+                   தசம alpha, மாறிலி தசம* src3, size_t src3_step, தசம beta, தசம* dst, size_t dst_step,
+                   முழு m, முழு n, முழு k, முழு flags);
+முழு lapack_gemm64fc(மாறிலி இரட்டை* src1, size_t src1_step, மாறிலி இரட்டை* src2, size_t src2_step,
+                   இரட்டை alpha, மாறிலி இரட்டை* src3, size_t src3_step, இரட்டை beta, இரட்டை* dst, size_t dst_step,
+                   முழு m, முழு n, முழு k, முழு flags);
 
 #undef cv_hal_LU32f
 #define cv_hal_LU32f lapack_LU32f

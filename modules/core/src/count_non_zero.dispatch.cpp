@@ -3,36 +3,36 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#அந்தர்பாவ "precomp.hpp"
+#அந்தர்பாவ "opencl_kernels_core.hpp"
+#அந்தர்பாவ "stat.hpp"
 
-#include "count_non_zero.simd.hpp"
-#include "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#அந்தர்பாவ "count_non_zero.simd.hpp"
+#அந்தர்பாவ "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+நாமாகாஶ cv {
 
-static CountNonZeroFunc getCountNonZeroTab(int depth)
+நிலையான மொத்தம்_Non_Zero_Func get_மொத்தம்_Non_Zero_Tab(முழு depth)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getCountNonZeroTab, (depth),
+    CV_CPU_DISPATCH(get_மொத்தம்_Non_Zero_Tab, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_countNonZero( InputArray _src, int & res )
+நிலையான தருக்க ocl_மொத்தம்_Non_Zero( உள்ளீடு_Array _src, முழு & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    முழு type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
+    தருக்க doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    எனில் (depth == CV_64F && !doubleSupport)
+        திரும்பு பொய்;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
+    முழு dbsize = ocl::Device::getDefault().maxComputeUnits();
     size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    முழு wgs2_aligned = 1;
+    போது (wgs2_aligned < (முழு)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
@@ -40,207 +40,207 @@ static bool ocl_countNonZero( InputArray _src, int & res )
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::typeToStr(depth), (முழு)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    எனில் (k.empty())
+        திரும்பு பொய்;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (முழு)src.total(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0]), true;
-    return false;
+    எனில் (k.run(1, &globalsize, &wgs, உண்மை))
+        திரும்பு res = saturate_cast<முழு>(cv::sum(db.getMat(ACCESS_READ))[0]), உண்மை;
+    திரும்பு பொய்;
 }
 #endif
 
-#if defined HAVE_IPP
-static bool ipp_countNonZero( Mat &src, int &res )
+#எனில் defined HAVE_IPP
+நிலையான தருக்க ipp_மொத்தம்_Non_Zero( Mat &src, முழு &res )
 {
     CV_INSTRUMENT_REGION_IPP();
 
-#if IPP_VERSION_X100 < 201801
+#எனில் IPP_VERSION_X100 < 201801
     // Poor performance of SSE42
-    if(cv::ipp::getIppTopFeatures() == ippCPUID_SSE42)
-        return false;
+    எனில்(cv::ipp::get_Ipp_உச்சி_Features() == ippCPUID_SSE42)
+        திரும்பு பொய்;
 #endif
 
-    Ipp32s  count = 0;
-    int     depth = src.depth();
+    Ipp32s  மொத்தம்_2 = 0;
+    முழு     depth = src.depth();
 
-    if(src.dims <= 2)
+    எனில்(src.dims <= 2)
     {
         IppStatus status;
         IppiSize  size = {src.cols*src.channels(), src.rows};
 
-        if(depth == CV_8U)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, (const Ipp8u *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else if(depth == CV_32F)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, (const Ipp32f *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else
-            return false;
+        எனில்(depth == CV_8U)
+            status = CV_INSTRUMENT_FUN_IPP(ippi_மொத்தம்_In_Range_8u_C1_R, (மாறிலி Ipp8u *)src.ptr(), (முழு)src.step, size, &மொத்தம்_2, 0, 0);
+        இல்லையெனில் எனில்(depth == CV_32F)
+            status = CV_INSTRUMENT_FUN_IPP(ippi_மொத்தம்_In_Range_32f_C1_R, (மாறிலி Ipp32f *)src.ptr(), (முழு)src.step, size, &மொத்தம்_2, 0, 0);
+        இல்லையெனில்
+            திரும்பு பொய்;
 
-        if(status < 0)
-            return false;
+        எனில்(status < 0)
+            திரும்பு பொய்;
 
-        res = size.width*size.height - count;
+        res = size.width*size.height - மொத்தம்_2;
     }
-    else
+    இல்லையெனில்
     {
         IppStatus       status;
-        const Mat      *arrays[] = {&src, NULL};
+        மாறிலி Mat      *arrays[] = {&src, வெற்று};
         Mat            planes[1];
         NAryMatIterator it(arrays, planes, 1);
-        IppiSize        size  = {(int)it.size*src.channels(), 1};
+        IppiSize        size  = {(முழு)it.size*src.channels(), 1};
         res = 0;
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        க்கு (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(depth == CV_8U)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, it.planes->ptr<Ipp8u>(), (int)it.planes->step, size, &count, 0, 0);
-            else if(depth == CV_32F)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, it.planes->ptr<Ipp32f>(), (int)it.planes->step, size, &count, 0, 0);
-            else
-                return false;
+            எனில்(depth == CV_8U)
+                status = CV_INSTRUMENT_FUN_IPP(ippi_மொத்தம்_In_Range_8u_C1_R, it.planes->ptr<Ipp8u>(), (முழு)it.planes->step, size, &மொத்தம்_2, 0, 0);
+            இல்லையெனில் எனில்(depth == CV_32F)
+                status = CV_INSTRUMENT_FUN_IPP(ippi_மொத்தம்_In_Range_32f_C1_R, it.planes->ptr<Ipp32f>(), (முழு)it.planes->step, size, &மொத்தம்_2, 0, 0);
+            இல்லையெனில்
+                திரும்பு பொய்;
 
-            if(status < 0 || (int)it.planes->total()*src.channels() < count)
-                return false;
+            எனில்(status < 0 || (முழு)it.planes->total()*src.channels() < மொத்தம்_2)
+                திரும்பு பொய்;
 
-            res += (int)it.planes->total()*src.channels() - count;
+            res += (முழு)it.planes->total()*src.channels() - மொத்தம்_2;
         }
     }
 
-    return true;
+    திரும்பு உண்மை;
 }
 #endif
 
-int countNonZero(InputArray _src)
+முழு மொத்தம்_Non_Zero(உள்ளீடு_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    முழு type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-#if defined HAVE_OPENCL || defined HAVE_IPP
-    int res = -1;
+#எனில் defined HAVE_OPENCL || defined HAVE_IPP
+    முழு res = -1;
 #endif
 
 #ifdef HAVE_OPENCL
     CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_countNonZero(_src, res),
+                ocl_மொத்தம்_Non_Zero(_src, res),
                 res)
 #endif
 
     Mat src = _src.getMat();
-    CV_IPP_RUN_FAST(ipp_countNonZero(src, res), res);
+    CV_IPP_RUN_FAST(ipp_மொத்தம்_Non_Zero(src, res), res);
 
-    CountNonZeroFunc func = getCountNonZeroTab(src.depth());
+    மொத்தம்_Non_Zero_Func func = get_மொத்தம்_Non_Zero_Tab(src.depth());
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, 0};
+    மாறிலி Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, nz = 0;
+    முழு total = (முழு)it.size, nz = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    க்கு( size_t i = 0; i < it.nplanes; i++, ++it )
         nz += func( ptrs[0], total );
 
-    return nz;
+    திரும்பு nz;
 }
 
-void findNonZero(InputArray _src, OutputArray _idx)
+வெறுமை findNonZero(உள்ளீடு_Array _src, OutputArray _idx)
 {
     Mat src = _src.getMat();
     CV_Assert( src.channels() == 1 && src.dims == 2 );
 
-    int depth = src.depth();
+    முழு depth = src.depth();
     std::vector<Point> idxvec;
-    int rows = src.rows, cols = src.cols;
-    AutoBuffer<int> buf_(cols + 1);
-    int* buf = buf_.data();
+    முழு rows = src.rows, cols = src.cols;
+    AutoBuffer<முழு> buf_(cols + 1);
+    முழு* buf = buf_.data();
 
-    for( int i = 0; i < rows; i++ )
+    க்கு( முழு i = 0; i < rows; i++ )
     {
-        int j, k = 0;
-        const uchar* ptr8 = src.ptr(i);
-        if( depth == CV_8U || depth == CV_8S || depth == CV_Bool || depth == CV_8F_E4M3FNUZ )
+        முழு j, k = 0;
+        மாறிலி uchar* ptr8 = src.ptr(i);
+        எனில்( depth == CV_8U || depth == CV_8S || depth == CV_Bool || depth == CV_8F_E4M3FNUZ )
         {
             j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#எனில் (CV_SIMD || CV_SIMD_SCALABLE)
             // skip whole SIMD blocks of zeros; only scan blocks that contain a non-zero byte
-            const int vlanes = VTraits<v_uint8>::vlanes();
-            const v_uint8 vzero = vx_setzero_u8();
-            for( ; j <= cols - vlanes; j += vlanes )
+            மாறிலி முழு vlanes = VTraits<v_uint8>::vlanes();
+            மாறிலி v_uint8 vzero = vx_setzero_u8();
+            க்கு( ; j <= cols - vlanes; j += vlanes )
             {
-                if( !v_check_any(v_ne(vx_load(ptr8 + j), vzero)) )
-                    continue;
-                for( int t = j; t < j + vlanes; t++ )
-                    if( ptr8[t] != 0 ) buf[k++] = t;
+                எனில்( !v_check_any(v_ne(vx_load(ptr8 + j), vzero)) )
+                    தொடர்;
+                க்கு( முழு t = j; t < j + vlanes; t++ )
+                    எனில்( ptr8[t] != 0 ) buf[k++] = t;
             }
 #endif
-            for( ; j < cols; j++ )
-                if( ptr8[j] != 0 ) buf[k++] = j;
+            க்கு( ; j < cols; j++ )
+                எனில்( ptr8[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16U || depth == CV_16S )
+        இல்லையெனில் எனில்( depth == CV_16U || depth == CV_16S )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr16[j] != 0 ) buf[k++] = j;
+            மாறிலி ushort* ptr16 = (மாறிலி ushort*)ptr8;
+            க்கு( j = 0; j < cols; j++ )
+                எனில்( ptr16[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32S || depth == CV_32U )
+        இல்லையெனில் எனில்( depth == CV_32S || depth == CV_32U )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr32s[j] != 0 ) buf[k++] = j;
+            மாறிலி முழு* ptr32s = (மாறிலி முழு*)ptr8;
+            க்கு( j = 0; j < cols; j++ )
+                எனில்( ptr32s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_64S || depth == CV_64U )
+        இல்லையெனில் எனில்( depth == CV_64S || depth == CV_64U )
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr64s[j] != 0 ) buf[k++] = j;
+            மாறிலி int64* ptr64s = (மாறிலி int64*)ptr8;
+            க்கு( j = 0; j < cols; j++ )
+                எனில்( ptr64s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32F )
+        இல்லையெனில் எனில்( depth == CV_32F )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
+            மாறிலி முழு* ptr32s = (மாறிலி முழு*)ptr8;
+            க்கு( j = 0; j < cols; j++ )
+                எனில்( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16F || depth == CV_16BF )
+        இல்லையெனில் எனில்( depth == CV_16F || depth == CV_16BF )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
+            மாறிலி ushort* ptr16 = (மாறிலி ushort*)ptr8;
+            க்கு( j = 0; j < cols; j++ )
                 // mask sign bit so -0 (0x8000) is treated as zero; cannot use <<1 here
                 // because ushort is promoted to int and the sign bit would not be discarded
-                if( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
+                எனில்( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_8F_E4M3FN )
+        இல்லையெனில் எனில்( depth == CV_8F_E4M3FN )
         {
-            for( j = 0; j < cols; j++ )
+            க்கு( j = 0; j < cols; j++ )
                 // mask sign bit so -0 (0x80) is treated as zero
-                if( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
+                எனில்( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
         }
-        else
+        இல்லையெனில்
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
+            மாறிலி int64* ptr64s = (மாறிலி int64*)ptr8;
+            க்கு( j = 0; j < cols; j++ )
+                எனில்( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
         }
 
-        if( k > 0 )
+        எனில்( k > 0 )
         {
             size_t sz = idxvec.size();
             idxvec.resize(sz + k);
-            for( j = 0; j < k; j++ )
+            க்கு( j = 0; j < k; j++ )
                 idxvec[sz + j] = Point(buf[j], i);
         }
     }
 
-    if( idxvec.empty() || (_idx.kind() == _InputArray::MAT && !_idx.getMatRef().isContinuous()) )
+    எனில்( idxvec.empty() || (_idx.kind() == உள்ளீடு_Array_2::MAT && !_idx.getMatRef().isContinuous()) )
         _idx.release();
 
-    if( !idxvec.empty() )
+    எனில்( !idxvec.empty() )
         Mat(idxvec).copyTo(_idx);
 }
 

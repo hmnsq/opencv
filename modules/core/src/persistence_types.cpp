@@ -2,328 +2,328 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#அந்தர்பாவ "precomp.hpp"
+#அந்தர்பாவ "persistence.hpp"
 
-namespace cv
+நாமாகாஶ cv
 {
 
-void write( FileStorage& fs, const String& name, const Mat& m )
+வெறுமை லிக( FileStorage& fs, மாறிலி String& name, மாறிலி Mat& m )
 {
-    char dt[22];
+    எழுத்து dt[22];
 
-    if( m.dims == 2 || m.empty() )
+    எனில்( m.dims == 2 || m.empty() )
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-matrix"));
+        fs.startWriteStruct(name, File_முனை::MAP, String("opencv-matrix"));
         fs << "rows" << m.rows;
         fs << "cols" << m.cols;
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, அளவு(dt) );
         fs << "data" << "[:";
-        for( int i = 0; i < m.rows; i++ )
+        க்கு( முழு i = 0; i < m.rows; i++ )
             fs.writeRaw(dt, m.ptr(i), m.cols*m.elemSize());
         fs << "]";
         fs.endWriteStruct();
     }
-    else
+    இல்லையெனில்
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-nd-matrix"));
+        fs.startWriteStruct(name, File_முனை::MAP, String("opencv-nd-matrix"));
         fs << "sizes" << "[:";
-        fs.writeRaw( "i", m.size.p, m.dims*sizeof(int) );
+        fs.writeRaw( "i", m.size.p, m.dims*அளவு(முழு) );
         fs << "]";
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, அளவு(dt) );
         fs << "data" << "[:";
-        const Mat* arrays[] = {&m, 0};
+        மாறிலி Mat* arrays[] = {&m, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
         size_t total = it.size*m.elemSize();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        க்கு( size_t i = 0; i < it.nplanes; i++, ++it )
             fs.writeRaw( dt, ptrs[0], total );
         fs << "]";
         fs.endWriteStruct();
     }
 }
 
-struct SparseNodeCmp
+கட்டமைப்பு Sparse_முனை_Cmp
 {
-    SparseNodeCmp(int _dims) : dims(_dims) {}
-    bool operator()(const SparseMat::Node* a, const SparseMat::Node* b)
+    Sparse_முனை_Cmp(முழு _dims) : dims(_dims) {}
+    தருக்க operator()(மாறிலி SparseMat::Node* a, மாறிலி SparseMat::Node* b)
     {
-        for( int i = 0; i < dims; i++ )
+        க்கு( முழு i = 0; i < dims; i++ )
         {
-            int d = a->idx[i] - b->idx[i];
-            if(d)
-                return d < 0;
+            முழு d = a->idx[i] - b->idx[i];
+            எனில்(d)
+                திரும்பு d < 0;
         }
-        return false;
+        திரும்பு பொய்;
     }
 
-    int dims;
+    முழு dims;
 };
 
-void write( FileStorage& fs, const String& name, const SparseMat& m )
+வெறுமை லிக( FileStorage& fs, மாறிலி String& name, மாறிலி SparseMat& m )
 {
-    char dt[22];
+    எழுத்து dt[22];
 
-    fs.startWriteStruct(name, FileNode::MAP, String("opencv-sparse-matrix"));
+    fs.startWriteStruct(name, File_முனை::MAP, String("opencv-sparse-matrix"));
     fs << "sizes" << "[:";
-    int dims = m.dims();
-    if( dims > 0 )
-        fs.writeRaw("i", m.hdr->size, dims*sizeof(int) );
+    முழு dims = m.dims();
+    எனில்( dims > 0 )
+        fs.writeRaw("i", m.hdr->size, dims*அளவு(முழு) );
     fs << "]";
-    fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+    fs << "dt" << fs::encodeFormat( m.type(), dt, அளவு(dt) );
     fs << "data" << "[:";
 
     size_t i = 0, n = m.nzcount();
-    AutoBuffer<const SparseMat::Node*> elems(n);
+    AutoBuffer<மாறிலி SparseMat::Node*> elems(n);
     SparseMatConstIterator it = m.begin(), it_end = m.end();
 
-    for( ; it != it_end; ++it )
+    க்கு( ; it != it_end; ++it )
     {
-        CV_Assert(it.node() != 0);
-        elems[i++] = it.node();
+        CV_Assert(it.முனை() != 0);
+        elems[i++] = it.முனை();
     }
 
-    std::sort(elems.begin(), elems.end(), SparseNodeCmp(dims));
-    const SparseMat::Node* prev_node = 0;
+    std::sort(elems.begin(), elems.end(), Sparse_முனை_Cmp(dims));
+    மாறிலி SparseMat::Node* prev_முனை = 0;
     size_t esz = m.elemSize();
 
-    for( i = 0; i < n; i++ )
+    க்கு( i = 0; i < n; i++ )
     {
-        const SparseMat::Node* node = elems[i];
-        int k = 0;
+        மாறிலி SparseMat::Node* முனை = elems[i];
+        முழு k = 0;
 
-        if( prev_node )
+        எனில்( prev_முனை )
         {
-            for( ; k < dims; k++ )
-                if( node->idx[k] != prev_node->idx[k] )
-                    break;
+            க்கு( ; k < dims; k++ )
+                எனில்( முனை->idx[k] != prev_முனை->idx[k] )
+                    நிறுத்து;
             CV_Assert( k < dims );
-            if( k < dims - 1 )
+            எனில்( k < dims - 1 )
                 writeScalar( fs, k - dims + 1 );
         }
-        for( ; k < dims; k++ )
-            writeScalar( fs, node->idx[k] );
-        prev_node = node;
+        க்கு( ; k < dims; k++ )
+            writeScalar( fs, முனை->idx[k] );
+        prev_முனை = முனை;
 
-        const uchar* value = &m.value<uchar>(node);
+        மாறிலி uchar* value = &m.value<uchar>(முனை);
         fs.writeRaw(dt, value, esz);
     }
 
     fs << "]" << "}";
 }
 
-void read(const FileNode& node, Mat& m, const Mat& default_mat)
+வெறுமை பட(மாறிலி File_முனை& முனை, Mat& m, மாறிலி Mat& default_mat)
 {
-    if( node.empty() )
+    எனில்( முனை.empty() )
     {
         default_mat.copyTo(m);
-        return;
+        திரும்பு;
     }
 
     std::string dt;
-    int rows, cols, elem_type;
+    முழு rows, cols, elem_type;
 
-    read(node["dt"], dt, std::string());
+    பட(முனை["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
     elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    read(node["rows"], rows, -1);
-    if( rows >= 0 )
+    பட(முனை["rows"], rows, -1);
+    எனில்( rows >= 0 )
     {
-        read(node["cols"], cols, -1);
+        பட(முனை["cols"], cols, -1);
         m.create(rows, cols, elem_type);
     }
-    else
+    இல்லையெனில்
     {
-        int sizes[CV_MAX_DIM] = {0}, dims;
-        FileNode sizes_node = node["sizes"];
-        CV_Assert( !sizes_node.empty() );
+        முழு sizes[CV_MAX_DIM] = {0}, dims;
+        File_முனை sizes_முனை = முனை["sizes"];
+        CV_Assert( !sizes_முனை.empty() );
 
-        dims = (int)sizes_node.size();
+        dims = (முழு)sizes_முனை.size();
         CV_Assert( dims >= 0 && dims <= CV_MAX_DIM );
-        sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+        sizes_முனை.readRaw("i", sizes, dims*அளவு(sizes[0]));
 
         m.create(dims, sizes, elem_type);
     }
 
-    FileNode data_node = node["data"];
-    CV_Assert(!data_node.empty());
+    File_முனை data_முனை = முனை["data"];
+    CV_Assert(!data_முனை.empty());
 
-    size_t nelems = data_node.size();
-    if (nelems == 0)
+    size_t nelems = data_முனை.size();
+    எனில் (nelems == 0)
     {
         m = Mat();
-        return;
+        திரும்பு;
     }
     CV_Assert(nelems == m.total()*m.channels());
 
-    data_node.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
+    data_முனை.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
 }
 
-void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
+வெறுமை பட( மாறிலி File_முனை& முனை, SparseMat& m, மாறிலி SparseMat& default_mat )
 {
-    if( node.empty() )
+    எனில்( முனை.empty() )
     {
         default_mat.copyTo(m);
-        return;
+        திரும்பு;
     }
 
     std::string dt;
-    read(node["dt"], dt, std::string());
+    பட(முனை["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
-    int elem_type = fs::decodeSimpleFormat( dt.c_str() );
+    முழு elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    int sizes[CV_MAX_DIM] = {0};
-    FileNode sizes_node = node["sizes"];
-    CV_Assert( !sizes_node.empty() );
+    முழு sizes[CV_MAX_DIM] = {0};
+    File_முனை sizes_முனை = முனை["sizes"];
+    CV_Assert( !sizes_முனை.empty() );
 
-    int dims = (int)sizes_node.size();
+    முழு dims = (முழு)sizes_முனை.size();
     CV_Assert( dims > 0 && dims <= CV_MAX_DIM );
-    sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+    sizes_முனை.readRaw("i", sizes, dims*அளவு(sizes[0]));
 
     m.create(dims, sizes, elem_type);
 
-    FileNode data = node["data"];
+    File_முனை data = முனை["data"];
     CV_Assert( data.isSeq() );
 
-    int cn = CV_MAT_CN(elem_type);
-    int idx[CV_MAX_DIM] = {0};
+    முழு cn = CV_MAT_CN(elem_type);
+    முழு idx[CV_MAX_DIM] = {0};
     size_t i, sz = data.size();
     size_t esz = m.elemSize();
-    FileNodeIterator it = data.begin();
+    File_முனை_Iterator it = data.begin();
 
-    for( i = 0; i < sz; )
+    க்கு( i = 0; i < sz; )
     {
-        FileNode n = *it;
-        int k = (int)n;
-        if( i > 0 && k >= 0 )
+        File_முனை n = *it;
+        முழு k = (முழு)n;
+        எனில்( i > 0 && k >= 0 )
         {
             CV_Assert( k < sizes[dims-1] );
             idx[dims-1] = k;
         }
-        else
+        இல்லையெனில்
         {
-            if( i > 0 )
+            எனில்( i > 0 )
             {
                 // write() stores the first changed dimension as k - dims + 1
                 k = dims + k - 1;
                 CV_Assert( k >= 0 );
             }
-            else
+            இல்லையெனில்
             {
                 CV_Assert( k >= 0 && k < sizes[0] );
                 idx[0] = k, k = 1;
             }
-            for( ; k < dims; k++ )
+            க்கு( ; k < dims; k++ )
             {
                 ++it;
                 i++;
                 n = *it;
                 CV_Assert( n.isInt() );
-                int idx_k = (int)n;
+                முழு idx_k = (முழு)n;
                 CV_Assert( idx_k >= 0 && idx_k < sizes[k] );
                 idx[k] = idx_k;
             }
         }
         ++it;
         i++;
-        uchar* valptr = m.ptr(idx, true);
+        uchar* valptr = m.ptr(idx, உண்மை);
         it.readRaw(dt, valptr, esz);
         i += cn;
     }
 }
 
-void read(const FileNode& node, KeyPoint& value, const KeyPoint& default_value)
+வெறுமை பட(மாறிலி File_முனை& முனை, சாவி_Point& value, மாறிலி சாவி_Point& default_மதிப்பு)
 {
-    if( node.empty() )
+    எனில்( முனை.empty() )
     {
-        value = default_value;
-        return;
+        value = default_மதிப்பு;
+        திரும்பு;
     }
-    node >> value;
+    முனை >> value;
 }
 
-void read(const FileNode& node, DMatch& value, const DMatch& default_value)
+வெறுமை பட(மாறிலி File_முனை& முனை, DMatch& value, மாறிலி DMatch& default_மதிப்பு)
 {
-    if( node.empty() )
+    எனில்( முனை.empty() )
     {
-        value = default_value;
-        return;
+        value = default_மதிப்பு;
+        திரும்பு;
     }
-    node >> value;
+    முனை >> value;
 }
 
 #ifdef CV__LEGACY_PERSISTENCE
-void write( FileStorage& fs, const std::string& name, const std::vector<KeyPoint>& vec)
+வெறுமை லிக( FileStorage& fs, மாறிலி std::string& name, மாறிலி std::vector<சாவி_Point>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_முனை::SEQ);
+    லிக(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
+வெறுமை பட(மாறிலி File_முனை& முனை, std::vector<சாவி_Point>& keypoints)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_முனை first_முனை = *(முனை.begin());
+    எனில் (first_முனை.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
+        File_முனை_Iterator it = முனை.begin();
         size_t total = (size_t)it.remaining;
         keypoints.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+        க்கு (size_t i = 0; i < total; ++i, ++it)
         {
             (*it) >> keypoints[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#இல்லையெனில்
+        File_முனை_Iterator it = முனை.begin();
         it >> keypoints;
 #endif
-        return;
+        திரும்பு;
     }
     keypoints.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_முனை_Iterator it = முனை.begin(), it_end = முனை.end();
+    க்கு( ; it != it_end; )
     {
-        KeyPoint kpt;
+        சாவி_Point kpt;
         it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
         keypoints.push_back(kpt);
     }
 }
 
-void write( FileStorage& fs, const std::string& name, const std::vector<DMatch>& vec)
+வெறுமை லிக( FileStorage& fs, மாறிலி std::string& name, மாறிலி std::vector<DMatch>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_முனை::SEQ);
+    லிக(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<DMatch>& matches)
+வெறுமை பட(மாறிலி File_முனை& முனை, std::vector<DMatch>& matches)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_முனை first_முனை = *(முனை.begin());
+    எனில் (first_முனை.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
+        File_முனை_Iterator it = முனை.begin();
         size_t total = (size_t)it.remaining;
         matches.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+        க்கு (size_t i = 0; i < total; ++i, ++it)
         {
             (*it) >> matches[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#இல்லையெனில்
+        File_முனை_Iterator it = முனை.begin();
         it >> matches;
 #endif
-        return;
+        திரும்பு;
     }
     matches.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_முனை_Iterator it = முனை.begin(), it_end = முனை.end();
+    க்கு( ; it != it_end; )
     {
         DMatch m;
         it >> m.queryIdx >> m.trainIdx >> m.imgIdx >> m.distance;

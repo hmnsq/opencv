@@ -6,168 +6,168 @@
 // Not a standalone header, part of parallel.cpp
 //
 
-#include "opencv2/core/utils/filesystem.private.hpp"  // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#அந்தர்பாவ "opencv2/core/utils/filesystem.private.hpp"  // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-namespace cv { namespace parallel {
+நாமாகாஶ cv { நாமாகாஶ parallel {
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#எனில் OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
 #define DECLARE_DYNAMIC_BACKEND(name) \
 ParallelBackendInfo { \
     1000, name, createPluginParallelBackendFactory(name) \
 },
-#else
+#இல்லையெனில்
 #define DECLARE_DYNAMIC_BACKEND(name) /* nothing */
 #endif
 
 #define DECLARE_STATIC_BACKEND(name, createBackendAPI) \
 ParallelBackendInfo { \
-    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { return createBackendAPI(); }) \
+    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { திரும்பு createBackendAPI(); }) \
 },
 
-static
+நிலையான
 std::vector<ParallelBackendInfo>& getBuiltinParallelBackendsInfo()
 {
-    static std::vector<ParallelBackendInfo> g_backends
+    நிலையான std::vector<ParallelBackendInfo> g_backends
     {
 #ifdef HAVE_TBB
         DECLARE_STATIC_BACKEND("TBB", createParallelBackendTBB)
-#elif defined(PARALLEL_ENABLE_PLUGINS)
+#அல்லதெனில் defined(PARALLEL_ENABLE_PLUGINS)
         DECLARE_DYNAMIC_BACKEND("ONETBB")   // dedicated oneTBB plugin (interface >= 12000, binary incompatibe with TBB 2017-2020)
         DECLARE_DYNAMIC_BACKEND("TBB")      // generic TBB plugins
 #endif
 
 #ifdef HAVE_OPENMP
         DECLARE_STATIC_BACKEND("OPENMP", createParallelBackendOpenMP)
-#elif defined(PARALLEL_ENABLE_PLUGINS)
+#அல்லதெனில் defined(PARALLEL_ENABLE_PLUGINS)
         DECLARE_DYNAMIC_BACKEND("OPENMP")  // TODO Intel OpenMP?
 #endif
     };
-    return g_backends;
+    திரும்பு g_backends;
 }
 
-static
-bool sortByPriority(const ParallelBackendInfo &lhs, const ParallelBackendInfo &rhs)
+நிலையான
+தருக்க sortByPriority(மாறிலி ParallelBackendInfo &lhs, மாறிலி ParallelBackendInfo &rhs)
 {
-    return lhs.priority > rhs.priority;
+    திரும்பு lhs.priority > rhs.priority;
 }
 
 /** @brief Manages list of enabled backends
  */
-class ParallelBackendRegistry
+வகுப்பு ParallelBackendRegistry
 {
-protected:
+பாதுகாக்கப்பட்ட:
     std::vector<ParallelBackendInfo> enabledBackends;
     ParallelBackendRegistry()
     {
         enabledBackends = getBuiltinParallelBackendsInfo();
-        int N = (int)enabledBackends.size();
-        for (int i = 0; i < N; i++)
+        முழு N = (முழு)enabledBackends.size();
+        க்கு (முழு i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[i];
             info.priority = 1000 - i * 10;
         }
-        CV_LOG_DEBUG(NULL, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
-        if (readPrioritySettings())
+        CV_LOG_DEBUG(வெற்று, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
+        எனில் (readPrioritySettings())
         {
-            CV_LOG_INFO(NULL, "core(parallel): Updated backends priorities: " << dumpBackends());
-            N = (int)enabledBackends.size();
+            CV_LOG_INFO(வெற்று, "core(parallel): Updated backends priorities: " << dumpBackends());
+            N = (முழு)enabledBackends.size();
         }
-        int enabled = 0;
-        for (int i = 0; i < N; i++)
+        முழு enabled = 0;
+        க்கு (முழு i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[enabled];
-            if (enabled != i)
+            எனில் (enabled != i)
                 info = enabledBackends[i];
             size_t param_priority = utils::getConfigurationParameterSizeT(cv::format("OPENCV_PARALLEL_PRIORITY_%s", info.name.c_str()).c_str(), (size_t)info.priority);
-            CV_Assert(param_priority == (size_t)(int)param_priority); // overflow check
-            if (param_priority > 0)
+            CV_Assert(param_priority == (size_t)(முழு)param_priority); // overflow check
+            எனில் (param_priority > 0)
             {
-                info.priority = (int)param_priority;
+                info.priority = (முழு)param_priority;
                 enabled++;
             }
-            else
+            இல்லையெனில்
             {
-                CV_LOG_INFO(NULL, "core(parallel): Disable backend: " << info.name);
+                CV_LOG_INFO(வெற்று, "core(parallel): Disable backend: " << info.name);
             }
         }
         enabledBackends.resize(enabled);
-        CV_LOG_DEBUG(NULL, "core(parallel): Available backends(" << enabled << "): " << dumpBackends());
+        CV_LOG_DEBUG(வெற்று, "core(parallel): Available backends(" << enabled << "): " << dumpBackends());
         std::sort(enabledBackends.begin(), enabledBackends.end(), sortByPriority);
-        CV_LOG_INFO(NULL, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
+        CV_LOG_INFO(வெற்று, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
     }
 
-    static std::vector<std::string> tokenize_string(const std::string& input, char token)
+    நிலையான std::vector<std::string> tokenize_string(மாறிலி std::string& உள்ளீடு_2, எழுத்து token)
     {
         std::vector<std::string> result;
         std::string::size_type prev_pos = 0, pos = 0;
-        while((pos = input.find(token, pos)) != std::string::npos)
+        போது((pos = உள்ளீடு_2.find(token, pos)) != std::string::npos)
         {
-            result.push_back(input.substr(prev_pos, pos-prev_pos));
+            result.push_back(உள்ளீடு_2.substr(prev_pos, pos-prev_pos));
             prev_pos = ++pos;
         }
-        result.push_back(input.substr(prev_pos));
-        return result;
+        result.push_back(உள்ளீடு_2.substr(prev_pos));
+        திரும்பு result;
     }
-    bool readPrioritySettings()
+    தருக்க readPrioritySettings()
     {
-        bool hasChanges = false;
+        தருக்க hasChanges = பொய்;
         cv::String prioritized_backends = utils::getConfigurationParameterString("OPENCV_PARALLEL_PRIORITY_LIST");
-        if (prioritized_backends.empty())
-            return hasChanges;
-        CV_LOG_INFO(NULL, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
-        const std::vector<std::string> names = tokenize_string(prioritized_backends, ',');
-        for (size_t i = 0; i < names.size(); i++)
+        எனில் (prioritized_backends.empty())
+            திரும்பு hasChanges;
+        CV_LOG_INFO(வெற்று, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
+        மாறிலி std::vector<std::string> names = tokenize_string(prioritized_backends, ',');
+        க்கு (size_t i = 0; i < names.size(); i++)
         {
-            const std::string& name = names[i];
-            int priority = (int)(100000 + (names.size() - i) * 1000);
-            bool found = false;
-            for (size_t k = 0; k < enabledBackends.size(); k++)
+            மாறிலி std::string& name = names[i];
+            முழு priority = (முழு)(100000 + (names.size() - i) * 1000);
+            தருக்க found = பொய்;
+            க்கு (size_t k = 0; k < enabledBackends.size(); k++)
             {
                 ParallelBackendInfo& info = enabledBackends[k];
-                if (name == info.name)
+                எனில் (name == info.name)
                 {
                     info.priority = priority;
-                    CV_LOG_DEBUG(NULL, "core(parallel): New backend priority: '" << name << "' => " << info.priority);
-                    found = true;
-                    hasChanges = true;
-                    break;
+                    CV_LOG_DEBUG(வெற்று, "core(parallel): New backend priority: '" << name << "' => " << info.priority);
+                    found = உண்மை;
+                    hasChanges = உண்மை;
+                    நிறுத்து;
                 }
             }
-            if (!found)
+            எனில் (!found)
             {
-                CV_LOG_INFO(NULL, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
+                CV_LOG_INFO(வெற்று, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
                 enabledBackends.push_back(ParallelBackendInfo{priority, name, createPluginParallelBackendFactory(name)});
-                hasChanges = true;
+                hasChanges = உண்மை;
             }
         }
-        return hasChanges;
+        திரும்பு hasChanges;
     }
-public:
-    std::string dumpBackends() const
+பொது:
+    std::string dumpBackends() மாறிலி
     {
         std::ostringstream os;
-        for (size_t i = 0; i < enabledBackends.size(); i++)
+        க்கு (size_t i = 0; i < enabledBackends.size(); i++)
         {
-            if (i > 0) os << "; ";
-            const ParallelBackendInfo& info = enabledBackends[i];
+            எனில் (i > 0) os << "; ";
+            மாறிலி ParallelBackendInfo& info = enabledBackends[i];
             os << info.name << '(' << info.priority << ')';
         }
-        return os.str();
+        திரும்பு os.str();
     }
 
-    static ParallelBackendRegistry& getInstance()
+    நிலையான ParallelBackendRegistry& getInstance()
     {
-        static ParallelBackendRegistry g_instance;
-        return g_instance;
+        நிலையான ParallelBackendRegistry g_instance;
+        திரும்பு g_instance;
     }
 
-    inline const std::vector<ParallelBackendInfo>& getEnabledBackends() const { return enabledBackends; }
+    உள்வரி மாறிலி std::vector<ParallelBackendInfo>& getEnabledBackends() மாறிலி { திரும்பு enabledBackends; }
 };
 
 
-const std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
+மாறிலி std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
 {
-    return cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
+    திரும்பு cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
 }
 
 }} // namespace

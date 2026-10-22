@@ -2,147 +2,147 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "opencv2/core/async.hpp"
-#include "opencv2/core/detail/async_promise.hpp"
+#அந்தர்பாவ "precomp.hpp"
+#அந்தர்பாவ "opencv2/core/async.hpp"
+#அந்தர்பாவ "opencv2/core/detail/async_promise.hpp"
 
-#include "opencv2/core/cvstd.hpp"
+#அந்தர்பாவ "opencv2/core/cvstd.hpp"
 
-#include <opencv2/core/utils/logger.defines.hpp>
+#அந்தர்பாவ <opencv2/core/utils/logger.defines.hpp>
 #undef CV_LOG_STRIP_LEVEL
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#include <opencv2/core/utils/logger.hpp>
+#அந்தர்பாவ <opencv2/core/utils/logger.hpp>
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
 
-#include <mutex>
-#include <condition_variable>
-#include <chrono>
+#அந்தர்பாவ <mutex>
+#அந்தர்பாவ <condition_variable>
+#அந்தர்பாவ <chrono>
 
-namespace cv {
+நாமாகாஶ cv {
 
 /**
 Manages shared state of asynchronous result
 */
-struct AsyncArray::Impl
+கட்டமைப்பு AsyncArray::Impl
 {
-    int refcount;
-    void addrefFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, 1); CV_XADD(&refcount, 1); } \
-    void releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_future;
-    void addrefPromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, 1); CV_XADD(&refcount, 1); } \
-    void releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_promise;
+    முழு refcount;
+    வெறுமை addrefFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, 1); CV_XADD(&refcount, 1); } \
+    வெறுமை releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); எனில்(1 == CV_XADD(&refcount, -1)) delete இது; } \
+    முழு refcount_future;
+    வெறுமை addrefPromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, 1); CV_XADD(&refcount, 1); } \
+    வெறுமை releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); எனில்(1 == CV_XADD(&refcount, -1)) delete இது; } \
+    முழு refcount_promise;
 
     mutable std::mutex mtx;
     mutable std::condition_variable cond_var;
 
-    mutable bool has_result; // Mat, UMat or exception
+    mutable தருக்க has_result; // Mat, UMat or exception
 
     mutable cv::Ptr<Mat> result_mat;
     mutable cv::Ptr<UMat> result_umat;
 
 
-    bool has_exception;
-#if CV__EXCEPTION_PTR
+    தருக்க has_exception;
+#எனில் CV__EXCEPTION_PTR
     std::exception_ptr exception;
 #endif
     cv::Exception cv_exception;
 
-    mutable bool result_is_fetched;
+    mutable தருக்க result_is_fetched;
 
-    bool future_is_returned;
+    தருக்க future_is_returned;
 
     Impl()
         : refcount(1), refcount_future(0), refcount_promise(1)
-        , has_result(false)
-        , has_exception(false)
-        , result_is_fetched(false)
-        , future_is_returned(false)
+        , has_result(பொய்)
+        , has_exception(பொய்)
+        , result_is_fetched(பொய்)
+        , future_is_returned(பொய்)
     {
         // nothing
     }
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        எனில் (has_result && !result_is_fetched)
         {
-            CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
+            CV_LOG_INFO(வெற்று, "Asynchronous result has not been fetched");
         }
     }
 
-    bool get(OutputArray dst, int64 timeoutNs) const
+    தருக்க get(OutputArray dst, int64 timeoutNs) மாறிலி
     {
         CV_Assert(!result_is_fetched);
-        if (!has_result)
+        எனில் (!has_result)
         {
-            if(refcount_promise == 0)
+            எனில்(refcount_promise == 0)
                 CV_Error(Error::StsInternal, "Asynchronous result producer has been destroyed");
-            if (!wait_for(timeoutNs))
-                return false;
+            எனில் (!wait_for(timeoutNs))
+                திரும்பு பொய்;
         }
         std::unique_lock<std::mutex> lock(mtx);
-        if (has_result)
+        எனில் (has_result)
         {
-            if (!result_mat.empty())
+            எனில் (!result_mat.empty())
             {
                 dst.move(*result_mat.get());
                 result_mat.release();
-                result_is_fetched = true;
-                return true;
+                result_is_fetched = உண்மை;
+                திரும்பு உண்மை;
             }
-            if (!result_umat.empty())
+            எனில் (!result_umat.empty())
             {
                 dst.move(*result_umat.get());
                 result_umat.release();
-                result_is_fetched = true;
-                return true;
+                result_is_fetched = உண்மை;
+                திரும்பு உண்மை;
             }
-#if CV__EXCEPTION_PTR
-            if (has_exception && exception)
+#எனில் CV__EXCEPTION_PTR
+            எனில் (has_exception && exception)
             {
-                result_is_fetched = true;
+                result_is_fetched = உண்மை;
                 std::rethrow_exception(exception);
             }
 #endif
-            if (has_exception)
+            எனில் (has_exception)
             {
-                result_is_fetched = true;
-                throw cv_exception;
+                result_is_fetched = உண்மை;
+                எறி cv_exception;
             }
             CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
         }
         CV_Assert(!has_result);
         CV_Assert(timeoutNs < 0);
-        return false;
+        திரும்பு பொய்;
     }
 
-    bool valid() const CV_NOEXCEPT
+    தருக்க valid() மாறிலி CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        எனில் (result_is_fetched)
+            திரும்பு பொய்;
+        எனில் (refcount_promise == 0 && !has_result)
+            திரும்பு பொய்;
+        திரும்பு உண்மை;
     }
 
-    bool wait_for(int64 timeoutNs) const
+    தருக்க wait_for(int64 timeoutNs) மாறிலி
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
-        CV_LOG_INFO(NULL, "Waiting for async result ...");
+        எனில் (has_result)
+            திரும்பு has_result;
+        எனில் (timeoutNs == 0)
+            திரும்பு has_result;
+        CV_LOG_INFO(வெற்று, "Waiting for async result ...");
         std::unique_lock<std::mutex> lock(mtx);
-        const auto cond_pred = [&]{ return has_result == true; };
-        if (timeoutNs > 0)
-            return cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
-        else
+        மாறிலி auto cond_pred = [&]{ திரும்பு has_result == உண்மை; };
+        எனில் (timeoutNs > 0)
+            திரும்பு cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
+        இல்லையெனில்
         {
             cond_var.wait(lock, cond_pred);
             CV_Assert(has_result);
-            return true;
+            திரும்பு உண்மை;
         }
     }
 
@@ -151,164 +151,164 @@ struct AsyncArray::Impl
         CV_Assert(refcount_future == 0);
         AsyncArray result;
         addrefFuture();
-        result.p = this;
-        future_is_returned = true;
-        return result;
+        result.p = இது;
+        future_is_returned = உண்மை;
+        திரும்பு result;
     }
 
-    void setValue(InputArray value)
+    வெறுமை set_மதிப்பு(உள்ளீடு_Array value)
     {
-        if (future_is_returned && refcount_future == 0)
+        எனில் (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        முழு k = value.kind();
+        எனில் (k == உள்ளீடு_Array_2::UMAT)
         {
             result_umat = makePtr<UMat>();
             value.copyTo(*result_umat.get());
         }
-        else
+        இல்லையெனில்
         {
             result_mat = makePtr<Mat>();
             value.copyTo(*result_mat.get());
         }
-        has_result = true;
+        has_result = உண்மை;
         cond_var.notify_all();
     }
 
-#if CV__EXCEPTION_PTR
-    void setException(std::exception_ptr e)
+#எனில் CV__EXCEPTION_PTR
+    வெறுமை setException(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        எனில் (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
-        has_exception = true;
+        has_exception = உண்மை;
         exception = e;
-        has_result = true;
+        has_result = உண்மை;
         cond_var.notify_all();
     }
 #endif
 
-    void setException(const cv::Exception e)
+    வெறுமை setException(மாறிலி cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        எனில் (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
-        has_exception = true;
+        has_exception = உண்மை;
         cv_exception = e;
-        has_result = true;
+        has_result = உண்மை;
         cond_var.notify_all();
     }
 };
 
 }  // namespace
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
+#இல்லையெனில்  // OPENCV_DISABLE_THREAD_SUPPORT
 
-namespace cv {
+நாமாகாஶ cv {
 
 // no threading
-struct AsyncArray::Impl
+கட்டமைப்பு AsyncArray::Impl
 {
-    int refcount;
-    void addrefFuture() CV_NOEXCEPT { refcount_future++; refcount++; }
-    void releaseFuture() CV_NOEXCEPT { refcount_future--; if (0 == --refcount) delete this; }
-    int refcount_future;
-    void addrefPromise() CV_NOEXCEPT { refcount_promise++; refcount++; } \
-    void releasePromise() CV_NOEXCEPT { refcount_promise--; if (0 == --refcount) delete this; }
-    int refcount_promise;
+    முழு refcount;
+    வெறுமை addrefFuture() CV_NOEXCEPT { refcount_future++; refcount++; }
+    வெறுமை releaseFuture() CV_NOEXCEPT { refcount_future--; எனில் (0 == --refcount) delete இது; }
+    முழு refcount_future;
+    வெறுமை addrefPromise() CV_NOEXCEPT { refcount_promise++; refcount++; } \
+    வெறுமை releasePromise() CV_NOEXCEPT { refcount_promise--; எனில் (0 == --refcount) delete இது; }
+    முழு refcount_promise;
 
-    mutable bool has_result; // Mat, UMat or exception
+    mutable தருக்க has_result; // Mat, UMat or exception
 
     mutable cv::Ptr<Mat> result_mat;
     mutable cv::Ptr<UMat> result_umat;
 
 
-    bool has_exception;
-#if CV__EXCEPTION_PTR
+    தருக்க has_exception;
+#எனில் CV__EXCEPTION_PTR
     std::exception_ptr exception;
 #endif
     cv::Exception cv_exception;
 
-    mutable bool result_is_fetched;
+    mutable தருக்க result_is_fetched;
 
-    bool future_is_returned;
+    தருக்க future_is_returned;
 
     Impl()
         : refcount(1), refcount_future(0), refcount_promise(1)
-        , has_result(false)
-        , has_exception(false)
-        , result_is_fetched(false)
-        , future_is_returned(false)
+        , has_result(பொய்)
+        , has_exception(பொய்)
+        , result_is_fetched(பொய்)
+        , future_is_returned(பொய்)
     {
         // nothing
     }
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        எனில் (has_result && !result_is_fetched)
         {
-            CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
+            CV_LOG_INFO(வெற்று, "Asynchronous result has not been fetched");
         }
     }
 
-    bool get(OutputArray dst, int64 timeoutNs) const
+    தருக்க get(OutputArray dst, int64 timeoutNs) மாறிலி
     {
         CV_Assert(!result_is_fetched);
-        if (!has_result)
+        எனில் (!has_result)
         {
             CV_UNUSED(timeoutNs);
             CV_Error(Error::StsError, "Result is not produced (unable to wait for result in OPENCV_DISABLE_THREAD_SUPPORT mode)");
         }
-        if (!result_mat.empty())
+        எனில் (!result_mat.empty())
         {
             dst.move(*result_mat.get());
             result_mat.release();
-            result_is_fetched = true;
-            return true;
+            result_is_fetched = உண்மை;
+            திரும்பு உண்மை;
         }
-        if (!result_umat.empty())
+        எனில் (!result_umat.empty())
         {
             dst.move(*result_umat.get());
             result_umat.release();
-            result_is_fetched = true;
-            return true;
+            result_is_fetched = உண்மை;
+            திரும்பு உண்மை;
         }
-#if CV__EXCEPTION_PTR
-        if (has_exception && exception)
+#எனில் CV__EXCEPTION_PTR
+        எனில் (has_exception && exception)
         {
-            result_is_fetched = true;
+            result_is_fetched = உண்மை;
             std::rethrow_exception(exception);
         }
 #endif
-        if (has_exception)
+        எனில் (has_exception)
         {
-            result_is_fetched = true;
-            throw cv_exception;
+            result_is_fetched = உண்மை;
+            எறி cv_exception;
         }
         CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
-        return false;
+        திரும்பு பொய்;
     }
 
-    bool valid() const CV_NOEXCEPT
+    தருக்க valid() மாறிலி CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        எனில் (result_is_fetched)
+            திரும்பு பொய்;
+        எனில் (refcount_promise == 0 && !has_result)
+            திரும்பு பொய்;
+        திரும்பு உண்மை;
     }
 
-    bool wait_for(int64 timeoutNs) const
+    தருக்க wait_for(int64 timeoutNs) மாறிலி
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
+        எனில் (has_result)
+            திரும்பு has_result;
+        எனில் (timeoutNs == 0)
+            திரும்பு has_result;
         CV_Error(Error::StsError, "Unable to wait in OPENCV_DISABLE_THREAD_SUPPORT mode");
     }
 
@@ -317,50 +317,50 @@ struct AsyncArray::Impl
         CV_Assert(refcount_future == 0);
         AsyncArray result;
         addrefFuture();
-        result.p = this;
-        future_is_returned = true;
-        return result;
+        result.p = இது;
+        future_is_returned = உண்மை;
+        திரும்பு result;
     }
 
-    void setValue(InputArray value)
+    வெறுமை set_மதிப்பு(உள்ளீடு_Array value)
     {
-        if (future_is_returned && refcount_future == 0)
+        எனில் (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        முழு k = value.kind();
+        எனில் (k == உள்ளீடு_Array_2::UMAT)
         {
             result_umat = makePtr<UMat>();
             value.copyTo(*result_umat.get());
         }
-        else
+        இல்லையெனில்
         {
             result_mat = makePtr<Mat>();
             value.copyTo(*result_mat.get());
         }
-        has_result = true;
+        has_result = உண்மை;
     }
 
-#if CV__EXCEPTION_PTR
-    void setException(std::exception_ptr e)
+#எனில் CV__EXCEPTION_PTR
+    வெறுமை setException(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        எனில் (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
-        has_exception = true;
+        has_exception = உண்மை;
         exception = e;
-        has_result = true;
+        has_result = உண்மை;
     }
 #endif
 
-    void setException(const cv::Exception e)
+    வெறுமை setException(மாறிலி cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        எனில் (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
-        has_exception = true;
+        has_exception = உண்மை;
         cv_exception = e;
-        has_result = true;
+        has_result = உண்மை;
     }
 };
 
@@ -368,10 +368,10 @@ struct AsyncArray::Impl
 
 #endif  // OPENCV_DISABLE_THREAD_SUPPORT
 
-namespace cv {
+நாமாகாஶ cv {
 
 AsyncArray::AsyncArray() CV_NOEXCEPT
-    : p(NULL)
+    : p(வெற்று)
 {
 }
 
@@ -380,54 +380,54 @@ AsyncArray::~AsyncArray() CV_NOEXCEPT
     release();
 }
 
-AsyncArray::AsyncArray(const AsyncArray& o) CV_NOEXCEPT
+AsyncArray::AsyncArray(மாறிலி AsyncArray& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    எனில் (p)
         p->addrefFuture();
 }
 
-AsyncArray& AsyncArray::operator=(const AsyncArray& o) CV_NOEXCEPT
+AsyncArray& AsyncArray::operator=(மாறிலி AsyncArray& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    எனில் (newp)
         newp->addrefFuture();
     release();
     p = newp;
-    return *this;
+    திரும்பு *இது;
 }
 
-void AsyncArray::release() CV_NOEXCEPT
+வெறுமை AsyncArray::release() CV_NOEXCEPT
 {
     Impl* impl = p;
-    p = NULL;
-    if (impl)
+    p = வெற்று;
+    எனில் (impl)
         impl->releaseFuture();
 }
 
-bool AsyncArray::get(OutputArray dst, int64 timeoutNs) const
+தருக்க AsyncArray::get(OutputArray dst, int64 timeoutNs) மாறிலி
 {
     CV_Assert(p);
-    return p->get(dst, timeoutNs);
+    திரும்பு p->get(dst, timeoutNs);
 }
 
-void AsyncArray::get(OutputArray dst) const
+வெறுமை AsyncArray::get(OutputArray dst) மாறிலி
 {
     CV_Assert(p);
-    bool res = p->get(dst, -1);
+    தருக்க res = p->get(dst, -1);
     CV_Assert(res);
 }
 
-bool AsyncArray::wait_for(int64 timeoutNs) const
+தருக்க AsyncArray::wait_for(int64 timeoutNs) மாறிலி
 {
     CV_Assert(p);
-    return p->wait_for(timeoutNs);
+    திரும்பு p->wait_for(timeoutNs);
 }
 
-bool AsyncArray::valid() const CV_NOEXCEPT
+தருக்க AsyncArray::valid() மாறிலி CV_NOEXCEPT
 {
-    if (!p) return false;
-    return p->valid();
+    எனில் (!p) திரும்பு பொய்;
+    திரும்பு p->valid();
 }
 
 
@@ -436,7 +436,7 @@ bool AsyncArray::valid() const CV_NOEXCEPT
 //
 
 AsyncPromise::AsyncPromise() CV_NOEXCEPT
-    : p(new AsyncArray::Impl())
+    : p(புதிய AsyncArray::Impl())
 {
 }
 
@@ -445,54 +445,54 @@ AsyncPromise::~AsyncPromise() CV_NOEXCEPT
     release();
 }
 
-AsyncPromise::AsyncPromise(const AsyncPromise& o) CV_NOEXCEPT
+AsyncPromise::AsyncPromise(மாறிலி AsyncPromise& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    எனில் (p)
         p->addrefPromise();
 }
 
-AsyncPromise& AsyncPromise::operator=(const AsyncPromise& o) CV_NOEXCEPT
+AsyncPromise& AsyncPromise::operator=(மாறிலி AsyncPromise& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    எனில் (newp)
         newp->addrefPromise();
     release();
     p = newp;
-    return *this;
+    திரும்பு *இது;
 }
 
-void AsyncPromise::release() CV_NOEXCEPT
+வெறுமை AsyncPromise::release() CV_NOEXCEPT
 {
     Impl* impl = p;
-    p = NULL;
-    if (impl)
+    p = வெற்று;
+    எனில் (impl)
         impl->releasePromise();
 }
 
 AsyncArray AsyncPromise::getArrayResult()
 {
     CV_Assert(p);
-    return p->getArrayResult();
+    திரும்பு p->getArrayResult();
 }
 
-void AsyncPromise::setValue(InputArray value)
+வெறுமை AsyncPromise::set_மதிப்பு(உள்ளீடு_Array value)
 {
     CV_Assert(p);
-    return p->setValue(value);
+    திரும்பு p->set_மதிப்பு(value);
 }
 
-void AsyncPromise::setException(const cv::Exception& exception)
+வெறுமை AsyncPromise::setException(மாறிலி cv::Exception& exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    திரும்பு p->setException(exception);
 }
 
-#if CV__EXCEPTION_PTR
-void AsyncPromise::setException(std::exception_ptr exception)
+#எனில் CV__EXCEPTION_PTR
+வெறுமை AsyncPromise::setException(std::exception_ptr exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    திரும்பு p->setException(exception);
 }
 #endif
 

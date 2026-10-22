@@ -6,72 +6,72 @@
 // Not a standalone header, part of filesystem.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"
+#அந்தர்பாவ "opencv2/core/utils/plugin_loader.private.hpp"
 
-#if !OPENCV_HAVE_FILESYSTEM_SUPPORT
+#எனில் !OPENCV_HAVE_FILESYSTEM_SUPPORT
 #error "Invalid build configuration"
 #endif
 
-#if 0  // TODO
+#எனில் 0  // TODO
 #ifdef NDEBUG
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#else
+#இல்லையெனில்
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
 #endif
-#include <opencv2/core/utils/logger.hpp>
+#அந்தர்பாவ <opencv2/core/utils/logger.hpp>
 #endif
 
-namespace cv { namespace plugin { namespace impl {
+நாமாகாஶ cv { நாமாகாஶ plugin { நாமாகாஶ impl {
 
-DynamicLib::DynamicLib(const FileSystemPath_t& filename)
-    : handle(0), fname(filename), disableAutoUnloading_(false)
+DynamicLib::DynamicLib(மாறிலி FileSystemPath_t& filename)
+    : handle(0), fname(filename), disableAutoUnloading_(பொய்)
 {
     libraryLoad(filename);
 }
 
 DynamicLib::~DynamicLib()
 {
-    if (!disableAutoUnloading_)
+    எனில் (!disableAutoUnloading_)
     {
         libraryRelease();
     }
-    else if (handle)
+    இல்லையெனில் எனில் (handle)
     {
-        CV_LOG_INFO(NULL, "skip auto unloading (disabled): " << toPrintablePath(fname));
+        CV_LOG_INFO(வெற்று, "skip auto unloading (disabled): " << toPrintablePath(fname));
         handle = 0;
     }
 }
 
-void* DynamicLib::getSymbol(const char* symbolName) const
+வெறுமை* DynamicLib::get_குறியீடு(மாறிலி எழுத்து* குறியீடு_Name) மாறிலி
 {
-    if (!handle)
+    எனில் (!handle)
     {
-        return 0;
+        திரும்பு 0;
     }
-    void* res = getSymbol_(handle, symbolName);
-    if (!res)
+    வெறுமை* res = get_குறியீடு_2(handle, குறியீடு_Name);
+    எனில் (!res)
     {
-        CV_LOG_DEBUG(NULL, "No symbol '" << symbolName << "' in " << toPrintablePath(fname));
+        CV_LOG_DEBUG(வெற்று, "No symbol '" << குறியீடு_Name << "' in " << toPrintablePath(fname));
     }
-    return res;
+    திரும்பு res;
 }
 
-std::string DynamicLib::getName() const
+std::string DynamicLib::getName() மாறிலி
 {
-    return toPrintablePath(fname);
+    திரும்பு toPrintablePath(fname);
 }
 
-void DynamicLib::libraryLoad(const FileSystemPath_t& filename)
+வெறுமை DynamicLib::libraryLoad(மாறிலி FileSystemPath_t& filename)
 {
     handle = libraryLoad_(filename);
-    CV_LOG_INFO(NULL, "load " << toPrintablePath(filename) << " => " << (handle ? "OK" : "FAILED"));
+    CV_LOG_INFO(வெற்று, "load " << toPrintablePath(filename) << " => " << (handle ? "OK" : "FAILED"));
 }
 
-void DynamicLib::libraryRelease()
+வெறுமை DynamicLib::libraryRelease()
 {
-    if (handle)
+    எனில் (handle)
     {
-        CV_LOG_INFO(NULL, "unload "<< toPrintablePath(fname));
+        CV_LOG_INFO(வெற்று, "unload "<< toPrintablePath(fname));
         libraryRelease_(handle);
         handle = 0;
     }

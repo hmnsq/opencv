@@ -2,183 +2,183 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
+#அந்தர்பாவ "precomp.hpp"
+#அந்தர்பாவ "opencv2/core/mat.hpp"
 
-namespace cv {
+நாமாகாஶ cv {
 
-template<typename T1, typename T2> void
-convertData_(const void* _from, void* _to, int cn)
+template<typename T1, typename T2> வெறுமை
+convertData_(மாறிலி வெறுமை* _from, வெறுமை* _to, முழு cn)
 {
-    const T1* from = (const T1*)_from;
+    மாறிலி T1* from = (மாறிலி T1*)_from;
     T2* to = (T2*)_to;
-    if( cn == 1 )
+    எனில்( cn == 1 )
         *to = saturate_cast<T2>(*from);
-    else
-        for( int i = 0; i < cn; i++ )
+    இல்லையெனில்
+        க்கு( முழு i = 0; i < cn; i++ )
             to[i] = saturate_cast<T2>(from[i]);
 }
 
-template<typename T1, typename T2> void
-convertScaleData_(const void* _from, void* _to, int cn, double alpha, double beta)
+template<typename T1, typename T2> வெறுமை
+convertScaleData_(மாறிலி வெறுமை* _from, வெறுமை* _to, முழு cn, இரட்டை alpha, இரட்டை beta)
 {
-    const T1* from = (const T1*)_from;
+    மாறிலி T1* from = (மாறிலி T1*)_from;
     T2* to = (T2*)_to;
-    if( cn == 1 )
+    எனில்( cn == 1 )
         *to = saturate_cast<T2>(*from*alpha + beta);
-    else
-        for( int i = 0; i < cn; i++ )
+    இல்லையெனில்
+        க்கு( முழு i = 0; i < cn; i++ )
             to[i] = saturate_cast<T2>(from[i]*alpha + beta);
 }
 
-typedef void (*ConvertData)(const void* from, void* to, int cn);
-typedef void (*ConvertScaleData)(const void* from, void* to, int cn, double alpha, double beta);
+வகைவரை வெறுமை (*ConvertData)(மாறிலி வெறுமை* from, வெறுமை* to, முழு cn);
+வகைவரை வெறுமை (*ConvertScaleData)(மாறிலி வெறுமை* from, வெறுமை* to, முழு cn, இரட்டை alpha, இரட்டை beta);
 
-static ConvertData getConvertElem(int fromType, int toType)
+நிலையான ConvertData getConvertElem(முழு fromType, முழு toType)
 {
-    static ConvertData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
+    நிலையான ConvertData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
     {{ convertData_<uchar, uchar>, convertData_<uchar, schar>,
       convertData_<uchar, ushort>, convertData_<uchar, short>,
-      convertData_<uchar, int>, convertData_<uchar, float>,
-      convertData_<uchar, double>, 0 },
+      convertData_<uchar, முழு>, convertData_<uchar, தசம>,
+      convertData_<uchar, இரட்டை>, 0 },
 
     { convertData_<schar, uchar>, convertData_<schar, schar>,
       convertData_<schar, ushort>, convertData_<schar, short>,
-      convertData_<schar, int>, convertData_<schar, float>,
-      convertData_<schar, double>, 0 },
+      convertData_<schar, முழு>, convertData_<schar, தசம>,
+      convertData_<schar, இரட்டை>, 0 },
 
     { convertData_<ushort, uchar>, convertData_<ushort, schar>,
       convertData_<ushort, ushort>, convertData_<ushort, short>,
-      convertData_<ushort, int>, convertData_<ushort, float>,
-      convertData_<ushort, double>, 0 },
+      convertData_<ushort, முழு>, convertData_<ushort, தசம>,
+      convertData_<ushort, இரட்டை>, 0 },
 
     { convertData_<short, uchar>, convertData_<short, schar>,
       convertData_<short, ushort>, convertData_<short, short>,
-      convertData_<short, int>, convertData_<short, float>,
-      convertData_<short, double>, 0 },
+      convertData_<short, முழு>, convertData_<short, தசம>,
+      convertData_<short, இரட்டை>, 0 },
 
-    { convertData_<int, uchar>, convertData_<int, schar>,
-      convertData_<int, ushort>, convertData_<int, short>,
-      convertData_<int, int>, convertData_<int, float>,
-      convertData_<int, double>, 0 },
+    { convertData_<முழு, uchar>, convertData_<முழு, schar>,
+      convertData_<முழு, ushort>, convertData_<முழு, short>,
+      convertData_<முழு, முழு>, convertData_<முழு, தசம>,
+      convertData_<முழு, இரட்டை>, 0 },
 
-    { convertData_<float, uchar>, convertData_<float, schar>,
-      convertData_<float, ushort>, convertData_<float, short>,
-      convertData_<float, int>, convertData_<float, float>,
-      convertData_<float, double>, 0 },
+    { convertData_<தசம, uchar>, convertData_<தசம, schar>,
+      convertData_<தசம, ushort>, convertData_<தசம, short>,
+      convertData_<தசம, முழு>, convertData_<தசம, தசம>,
+      convertData_<தசம, இரட்டை>, 0 },
 
-    { convertData_<double, uchar>, convertData_<double, schar>,
-      convertData_<double, ushort>, convertData_<double, short>,
-      convertData_<double, int>, convertData_<double, float>,
-      convertData_<double, double>, 0 },
+    { convertData_<இரட்டை, uchar>, convertData_<இரட்டை, schar>,
+      convertData_<இரட்டை, ushort>, convertData_<இரட்டை, short>,
+      convertData_<இரட்டை, முழு>, convertData_<இரட்டை, தசம>,
+      convertData_<இரட்டை, இரட்டை>, 0 },
 
     { 0, 0, 0, 0, 0, 0, 0, 0 }};
 
     ConvertData func = tab[CV_MAT_DEPTH(fromType)][CV_MAT_DEPTH(toType)];
     CV_Assert( func != 0 );
-    return func;
+    திரும்பு func;
 }
 
-static ConvertScaleData getConvertScaleElem(int fromType, int toType)
+நிலையான ConvertScaleData getConvertScaleElem(முழு fromType, முழு toType)
 {
-    static ConvertScaleData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
+    நிலையான ConvertScaleData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
     {{ convertScaleData_<uchar, uchar>, convertScaleData_<uchar, schar>,
       convertScaleData_<uchar, ushort>, convertScaleData_<uchar, short>,
-      convertScaleData_<uchar, int>, convertScaleData_<uchar, float>,
-      convertScaleData_<uchar, double>, 0 },
+      convertScaleData_<uchar, முழு>, convertScaleData_<uchar, தசம>,
+      convertScaleData_<uchar, இரட்டை>, 0 },
 
     { convertScaleData_<schar, uchar>, convertScaleData_<schar, schar>,
       convertScaleData_<schar, ushort>, convertScaleData_<schar, short>,
-      convertScaleData_<schar, int>, convertScaleData_<schar, float>,
-      convertScaleData_<schar, double>, 0 },
+      convertScaleData_<schar, முழு>, convertScaleData_<schar, தசம>,
+      convertScaleData_<schar, இரட்டை>, 0 },
 
     { convertScaleData_<ushort, uchar>, convertScaleData_<ushort, schar>,
       convertScaleData_<ushort, ushort>, convertScaleData_<ushort, short>,
-      convertScaleData_<ushort, int>, convertScaleData_<ushort, float>,
-      convertScaleData_<ushort, double>, 0 },
+      convertScaleData_<ushort, முழு>, convertScaleData_<ushort, தசம>,
+      convertScaleData_<ushort, இரட்டை>, 0 },
 
     { convertScaleData_<short, uchar>, convertScaleData_<short, schar>,
       convertScaleData_<short, ushort>, convertScaleData_<short, short>,
-      convertScaleData_<short, int>, convertScaleData_<short, float>,
-      convertScaleData_<short, double>, 0 },
+      convertScaleData_<short, முழு>, convertScaleData_<short, தசம>,
+      convertScaleData_<short, இரட்டை>, 0 },
 
-    { convertScaleData_<int, uchar>, convertScaleData_<int, schar>,
-      convertScaleData_<int, ushort>, convertScaleData_<int, short>,
-      convertScaleData_<int, int>, convertScaleData_<int, float>,
-      convertScaleData_<int, double>, 0 },
+    { convertScaleData_<முழு, uchar>, convertScaleData_<முழு, schar>,
+      convertScaleData_<முழு, ushort>, convertScaleData_<முழு, short>,
+      convertScaleData_<முழு, முழு>, convertScaleData_<முழு, தசம>,
+      convertScaleData_<முழு, இரட்டை>, 0 },
 
-    { convertScaleData_<float, uchar>, convertScaleData_<float, schar>,
-      convertScaleData_<float, ushort>, convertScaleData_<float, short>,
-      convertScaleData_<float, int>, convertScaleData_<float, float>,
-      convertScaleData_<float, double>, 0 },
+    { convertScaleData_<தசம, uchar>, convertScaleData_<தசம, schar>,
+      convertScaleData_<தசம, ushort>, convertScaleData_<தசம, short>,
+      convertScaleData_<தசம, முழு>, convertScaleData_<தசம, தசம>,
+      convertScaleData_<தசம, இரட்டை>, 0 },
 
-    { convertScaleData_<double, uchar>, convertScaleData_<double, schar>,
-      convertScaleData_<double, ushort>, convertScaleData_<double, short>,
-      convertScaleData_<double, int>, convertScaleData_<double, float>,
-      convertScaleData_<double, double>, 0 },
+    { convertScaleData_<இரட்டை, uchar>, convertScaleData_<இரட்டை, schar>,
+      convertScaleData_<இரட்டை, ushort>, convertScaleData_<இரட்டை, short>,
+      convertScaleData_<இரட்டை, முழு>, convertScaleData_<இரட்டை, தசம>,
+      convertScaleData_<இரட்டை, இரட்டை>, 0 },
 
     { 0, 0, 0, 0, 0, 0, 0, 0 }};
 
     ConvertScaleData func = tab[CV_MAT_DEPTH(fromType)][CV_MAT_DEPTH(toType)];
     CV_Assert( func != 0 );
-    return func;
+    திரும்பு func;
 }
 
-enum { HASH_SIZE0 = 8 };
+எண்ணிக்கை { HASH_SIZE0 = 8 };
 
-static inline void copyElem(const uchar* from, uchar* to, size_t elemSize)
+நிலையான உள்வரி வெறுமை copyElem(மாறிலி uchar* from, uchar* to, size_t elemSize)
 {
     size_t i;
-    for( i = 0; i + sizeof(int) <= elemSize; i += sizeof(int) )
-        *(int*)(to + i) = *(const int*)(from + i);
-    for( ; i < elemSize; i++ )
+    க்கு( i = 0; i + அளவு(முழு) <= elemSize; i += அளவு(முழு) )
+        *(முழு*)(to + i) = *(மாறிலி முழு*)(from + i);
+    க்கு( ; i < elemSize; i++ )
         to[i] = from[i];
 }
 
-static inline bool isZeroElem(const uchar* data, size_t elemSize)
+நிலையான உள்வரி தருக்க isZeroElem(மாறிலி uchar* data, size_t elemSize)
 {
     size_t i;
-    for( i = 0; i + sizeof(int) <= elemSize; i += sizeof(int) )
-        if( *(int*)(data + i) != 0 )
-            return false;
-    for( ; i < elemSize; i++ )
-        if( data[i] != 0 )
-            return false;
-    return true;
+    க்கு( i = 0; i + அளவு(முழு) <= elemSize; i += அளவு(முழு) )
+        எனில்( *(முழு*)(data + i) != 0 )
+            திரும்பு பொய்;
+    க்கு( ; i < elemSize; i++ )
+        எனில்( data[i] != 0 )
+            திரும்பு பொய்;
+    திரும்பு உண்மை;
 }
 
-SparseMat::Hdr::Hdr( int _dims, const int* _sizes, int _type )
+SparseMat::Hdr::Hdr( முழு _dims, மாறிலி முழு* _sizes, முழு _type )
 {
     refcount = 1;
 
     dims = _dims;
-    valueOffset = (int)alignSize(sizeof(SparseMat::Node) - MAX_DIM*sizeof(int) +
-                                 dims*sizeof(int), CV_ELEM_SIZE1(_type));
-    nodeSize = alignSize(valueOffset +
-        CV_ELEM_SIZE(_type), (int)sizeof(size_t));
+    மதிப்பு_Offset = (முழு)alignSize(அளவு(SparseMat::Node) - MAX_DIM*அளவு(முழு) +
+                                 dims*அளவு(முழு), CV_ELEM_SIZE1(_type));
+    முனை_Size = alignSize(மதிப்பு_Offset +
+        CV_ELEM_SIZE(_type), (முழு)அளவு(size_t));
 
-    int i;
-    for( i = 0; i < dims; i++ )
+    முழு i;
+    க்கு( i = 0; i < dims; i++ )
         size[i] = _sizes[i];
-    for( ; i < CV_MAX_DIM; i++ )
+    க்கு( ; i < CV_MAX_DIM; i++ )
         size[i] = 0;
     clear();
 }
 
-void SparseMat::Hdr::clear()
+வெறுமை SparseMat::Hdr::clear()
 {
     hashtab.clear();
     hashtab.resize(HASH_SIZE0);
     pool.clear();
-#if defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
+#எனில் defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
-    pool.resize(nodeSize);
-#if defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
+    pool.resize(முனை_Size);
+#எனில் defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
 #pragma GCC diagnostic pop
 #endif
-    nodeCount = freeList = 0;
+    முனை_மொத்தம் = freeList = 0;
 }
 
 ///////////////////////////// SparseMat /////////////////////////////
@@ -187,13 +187,13 @@ SparseMat::SparseMat()
     : flags(MAGIC_VAL), hdr(0)
 {}
 
-SparseMat::SparseMat(int _dims, const int* _sizes, int _type)
+SparseMat::SparseMat(முழு _dims, மாறிலி முழு* _sizes, முழு _type)
     : flags(MAGIC_VAL), hdr(0)
 {
     create(_dims, _sizes, _type);
 }
 
-SparseMat::SparseMat(const SparseMat& m)
+SparseMat::SparseMat(மாறிலி SparseMat& m)
     : flags(m.flags), hdr(m.hdr)
 {
     addref();
@@ -204,223 +204,223 @@ SparseMat::~SparseMat()
     release();
 }
 
-SparseMat& SparseMat::operator = (const SparseMat& m)
+SparseMat& SparseMat::operator = (மாறிலி SparseMat& m)
 {
-    if( this != &m )
+    எனில்( இது != &m )
     {
-        if( m.hdr )
+        எனில்( m.hdr )
             CV_XADD(&m.hdr->refcount, 1);
         release();
         flags = m.flags;
         hdr = m.hdr;
     }
-    return *this;
+    திரும்பு *இது;
 }
 
-SparseMat& SparseMat::operator=(const Mat& m)
+SparseMat& SparseMat::operator=(மாறிலி Mat& m)
 {
-    return (*this = SparseMat(m));
+    திரும்பு (*இது = SparseMat(m));
 }
 
-void SparseMat::assignTo(SparseMat& m, int _type) const
+வெறுமை SparseMat::assignTo(SparseMat& m, முழு _type) மாறிலி
 {
-    if( _type < 0 )
-        m = *this;
-    else
+    எனில்( _type < 0 )
+        m = *இது;
+    இல்லையெனில்
         convertTo(m, _type);
 }
 
-void SparseMat::addref()
+வெறுமை SparseMat::addref()
 {
-    if( hdr )
+    எனில்( hdr )
         CV_XADD(&hdr->refcount, 1);
 }
 
-void SparseMat::release()
+வெறுமை SparseMat::release()
 {
-    if( hdr && CV_XADD(&hdr->refcount, -1) == 1 )
+    எனில்( hdr && CV_XADD(&hdr->refcount, -1) == 1 )
         delete hdr;
     hdr = 0;
 }
 
-size_t SparseMat::hash(int i0) const
+size_t SparseMat::hash(முழு i0) மாறிலி
 {
-    return (size_t)i0;
+    திரும்பு (size_t)i0;
 }
 
-size_t SparseMat::hash(int i0, int i1) const
+size_t SparseMat::hash(முழு i0, முழு i1) மாறிலி
 {
-    return (size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1;
+    திரும்பு (size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1;
 }
 
-size_t SparseMat::hash(int i0, int i1, int i2) const
+size_t SparseMat::hash(முழு i0, முழு i1, முழு i2) மாறிலி
 {
-    return ((size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1) * HASH_SCALE + (unsigned)i2;
+    திரும்பு ((size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1) * HASH_SCALE + (unsigned)i2;
 }
 
-size_t SparseMat::hash(const int* idx) const
+size_t SparseMat::hash(மாறிலி முழு* idx) மாறிலி
 {
     size_t h = (unsigned)idx[0];
-    if( !hdr )
-        return 0;
-    int d = hdr->dims;
-    for(int i = 1; i < d; i++ )
+    எனில்( !hdr )
+        திரும்பு 0;
+    முழு d = hdr->dims;
+    க்கு(முழு i = 1; i < d; i++ )
         h = h * HASH_SCALE + (unsigned)idx[i];
-    return h;
+    திரும்பு h;
 }
 
 
-SparseMat::SparseMat(const Mat& m)
+SparseMat::SparseMat(மாறிலி Mat& m)
 : flags(MAGIC_VAL), hdr(0)
 {
     create( m.dims, m.size.p, m.type() );
 
-    int i, idx[CV_MAX_DIM] = {0}, d = m.dims, lastSize = m.size[d - 1];
+    முழு i, idx[CV_MAX_DIM] = {0}, d = m.dims, lastSize = m.size[d - 1];
     size_t esz = m.elemSize();
-    const uchar* dptr = m.ptr();
+    மாறிலி uchar* dptr = m.ptr();
 
-    for(;;)
+    க்கு(;;)
     {
-        for( i = 0; i < lastSize; i++, dptr += esz )
+        க்கு( i = 0; i < lastSize; i++, dptr += esz )
         {
-            if( isZeroElem(dptr, esz) )
-                continue;
+            எனில்( isZeroElem(dptr, esz) )
+                தொடர்;
             idx[d-1] = i;
-            uchar* to = newNode(idx, hash(idx));
+            uchar* to = new_முனை(idx, hash(idx));
             copyElem( dptr, to, esz );
         }
 
-        for( i = d - 2; i >= 0; i-- )
+        க்கு( i = d - 2; i >= 0; i-- )
         {
             dptr += m.step[i] - m.size[i+1]*m.step[i+1];
-            if( ++idx[i] < m.size[i] )
-                break;
+            எனில்( ++idx[i] < m.size[i] )
+                நிறுத்து;
             idx[i] = 0;
         }
-        if( i < 0 )
-            break;
+        எனில்( i < 0 )
+            நிறுத்து;
     }
 }
 
-void SparseMat::create(int d, const int* _sizes, int _type)
+வெறுமை SparseMat::create(முழு d, மாறிலி முழு* _sizes, முழு _type)
 {
     CV_Assert( _sizes && 0 < d && d <= CV_MAX_DIM );
-    for( int i = 0; i < d; i++ )
+    க்கு( முழு i = 0; i < d; i++ )
         CV_Assert( _sizes[i] > 0 );
     _type = CV_MAT_TYPE(_type);
-    if( hdr && _type == type() && hdr->dims == d && hdr->refcount == 1 )
+    எனில்( hdr && _type == type() && hdr->dims == d && hdr->refcount == 1 )
     {
-        int i;
-        for( i = 0; i < d; i++ )
-            if( _sizes[i] != hdr->size[i] )
-                break;
-        if( i == d )
+        முழு i;
+        க்கு( i = 0; i < d; i++ )
+            எனில்( _sizes[i] != hdr->size[i] )
+                நிறுத்து;
+        எனில்( i == d )
         {
             clear();
-            return;
+            திரும்பு;
         }
     }
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (hdr && _sizes == hdr->size)
+    முழு _sizes_backup[CV_MAX_DIM]; // #5991
+    எனில் (hdr && _sizes == hdr->size)
     {
-        for(int i = 0; i < d; i++ )
+        க்கு(முழு i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
     release();
     flags = MAGIC_VAL | _type;
-    hdr = new Hdr(d, _sizes, _type);
+    hdr = புதிய Hdr(d, _sizes, _type);
 }
 
-void SparseMat::copyTo( SparseMat& m ) const
+வெறுமை SparseMat::copyTo( SparseMat& m ) மாறிலி
 {
-    if( hdr == m.hdr )
-        return;
-    if( !hdr )
+    எனில்( hdr == m.hdr )
+        திரும்பு;
+    எனில்( !hdr )
     {
         m.release();
-        return;
+        திரும்பு;
     }
     m.create( hdr->dims, hdr->size, type() );
     SparseMatConstIterator from = begin();
     size_t N = nzcount(), esz = elemSize();
 
-    for( size_t i = 0; i < N; i++, ++from )
+    க்கு( size_t i = 0; i < N; i++, ++from )
     {
-        const Node* n = from.node();
-        uchar* to = m.newNode(n->idx, n->hashval);
+        மாறிலி Node* n = from.முனை();
+        uchar* to = m.new_முனை(n->idx, n->hashval);
         copyElem( from.ptr, to, esz );
     }
 }
 
-void SparseMat::copyTo( Mat& m ) const
+வெறுமை SparseMat::copyTo( Mat& m ) மாறிலி
 {
     CV_Assert( hdr );
-    int ndims = dims();
+    முழு ndims = dims();
     m.create( ndims, hdr->size, type() );
     m = Scalar(0);
 
     SparseMatConstIterator from = begin();
     size_t N = nzcount(), esz = elemSize();
 
-    for( size_t i = 0; i < N; i++, ++from )
+    க்கு( size_t i = 0; i < N; i++, ++from )
     {
-        const Node* n = from.node();
+        மாறிலி Node* n = from.முனை();
         copyElem( from.ptr, (ndims > 1 ? m.ptr(n->idx) : m.ptr(n->idx[0])), esz);
     }
 }
 
 
-void SparseMat::convertTo( SparseMat& m, int rtype, double alpha ) const
+வெறுமை SparseMat::convertTo( SparseMat& m, முழு rtype, இரட்டை alpha ) மாறிலி
 {
-    int cn = channels();
-    if( rtype < 0 )
+    முழு cn = channels();
+    எனில்( rtype < 0 )
         rtype = type();
     rtype = CV_MAKETYPE(rtype, cn);
-    if( hdr == m.hdr && rtype != type()  )
+    எனில்( hdr == m.hdr && rtype != type()  )
     {
         SparseMat temp;
         convertTo(temp, rtype, alpha);
         m = temp;
-        return;
+        திரும்பு;
     }
 
     CV_Assert(hdr != 0);
-    if( hdr != m.hdr )
+    எனில்( hdr != m.hdr )
         m.create( hdr->dims, hdr->size, rtype );
 
     SparseMatConstIterator from = begin();
     size_t N = nzcount();
 
-    if( alpha == 1 )
+    எனில்( alpha == 1 )
     {
         ConvertData cvtfunc = getConvertElem(type(), rtype);
         CV_Assert(cvtfunc);
-        for( size_t i = 0; i < N; i++, ++from )
+        க்கு( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
-            uchar* to = hdr == m.hdr ? from.ptr : m.newNode(n->idx, n->hashval);
+            மாறிலி Node* n = from.முனை();
+            uchar* to = hdr == m.hdr ? from.ptr : m.new_முனை(n->idx, n->hashval);
             cvtfunc( from.ptr, to, cn );
         }
     }
-    else
+    இல்லையெனில்
     {
         ConvertScaleData cvtfunc = getConvertScaleElem(type(), rtype);
         CV_Assert(cvtfunc);
-        for( size_t i = 0; i < N; i++, ++from )
+        க்கு( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
-            uchar* to = hdr == m.hdr ? from.ptr : m.newNode(n->idx, n->hashval);
+            மாறிலி Node* n = from.முனை();
+            uchar* to = hdr == m.hdr ? from.ptr : m.new_முனை(n->idx, n->hashval);
             cvtfunc( from.ptr, to, cn, alpha, 0 );
         }
     }
 }
 
 
-void SparseMat::convertTo( Mat& m, int rtype, double alpha, double beta ) const
+வெறுமை SparseMat::convertTo( Mat& m, முழு rtype, இரட்டை alpha, இரட்டை beta ) மாறிலி
 {
-    int cn = channels();
-    if( rtype < 0 )
+    முழு cn = channels();
+    எனில்( rtype < 0 )
         rtype = type();
     rtype = CV_MAKETYPE(rtype, cn);
 
@@ -431,206 +431,206 @@ void SparseMat::convertTo( Mat& m, int rtype, double alpha, double beta ) const
     SparseMatConstIterator from = begin();
     size_t N = nzcount();
 
-    if( alpha == 1 && beta == 0 )
+    எனில்( alpha == 1 && beta == 0 )
     {
         ConvertData cvtfunc = getConvertElem(type(), rtype);
-        for( size_t i = 0; i < N; i++, ++from )
+        க்கு( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
+            மாறிலி Node* n = from.முனை();
             uchar* to = m.ptr(n->idx);
             cvtfunc( from.ptr, to, cn );
         }
     }
-    else
+    இல்லையெனில்
     {
         ConvertScaleData cvtfunc = getConvertScaleElem(type(), rtype);
-        for( size_t i = 0; i < N; i++, ++from )
+        க்கு( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
+            மாறிலி Node* n = from.முனை();
             uchar* to = m.ptr(n->idx);
             cvtfunc( from.ptr, to, cn, alpha, beta );
         }
     }
 }
 
-void SparseMat::clear()
+வெறுமை SparseMat::clear()
 {
-    if( hdr )
+    எனில்( hdr )
         hdr->clear();
 }
 
-uchar* SparseMat::ptr(int i0, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(முழு i0, தருக்க createMissing, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 1 );
     size_t h = hashval ? *hashval : hash(i0);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    போது( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 )
-            return &value<uchar>(elem);
+        எனில்( elem->hashval == h && elem->idx[0] == i0 )
+            திரும்பு &value<uchar>(elem);
         nidx = elem->next;
     }
 
-    if( createMissing )
+    எனில்( createMissing )
     {
-        int idx[] = { i0 };
-        return newNode( idx, h );
+        முழு idx[] = { i0 };
+        திரும்பு new_முனை( idx, h );
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 
-uchar* SparseMat::ptr(int i0, int i1, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(முழு i0, முழு i1, தருக்க createMissing, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 2 );
     size_t h = hashval ? *hashval : hash(i0, i1);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    போது( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
-            return &value<uchar>(elem);
+        எனில்( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
+            திரும்பு &value<uchar>(elem);
         nidx = elem->next;
     }
 
-    if( createMissing )
+    எனில்( createMissing )
     {
-        int idx[] = { i0, i1 };
-        return newNode( idx, h );
+        முழு idx[] = { i0, i1 };
+        திரும்பு new_முனை( idx, h );
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 
-uchar* SparseMat::ptr(int i0, int i1, int i2, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(முழு i0, முழு i1, முழு i2, தருக்க createMissing, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 3 );
     size_t h = hashval ? *hashval : hash(i0, i1, i2);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    போது( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 &&
+        எனில்( elem->hashval == h && elem->idx[0] == i0 &&
             elem->idx[1] == i1 && elem->idx[2] == i2 )
-            return &value<uchar>(elem);
+            திரும்பு &value<uchar>(elem);
         nidx = elem->next;
     }
 
-    if( createMissing )
+    எனில்( createMissing )
     {
-        int idx[] = { i0, i1, i2 };
-        return newNode( idx, h );
+        முழு idx[] = { i0, i1, i2 };
+        திரும்பு new_முனை( idx, h );
     }
-    return NULL;
+    திரும்பு வெற்று;
 }
 
-uchar* SparseMat::ptr(const int* idx, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(மாறிலி முழு* idx, தருக்க createMissing, size_t* hashval)
 {
     CV_Assert( hdr );
-    int i, d = hdr->dims;
+    முழு i, d = hdr->dims;
     size_t h = hashval ? *hashval : hash(idx);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    போது( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h )
+        எனில்( elem->hashval == h )
         {
-            for( i = 0; i < d; i++ )
-                if( elem->idx[i] != idx[i] )
-                    break;
-            if( i == d )
-                return &value<uchar>(elem);
+            க்கு( i = 0; i < d; i++ )
+                எனில்( elem->idx[i] != idx[i] )
+                    நிறுத்து;
+            எனில்( i == d )
+                திரும்பு &value<uchar>(elem);
         }
         nidx = elem->next;
     }
 
-    return createMissing ? newNode(idx, h) : NULL;
+    திரும்பு createMissing ? new_முனை(idx, h) : வெற்று;
 }
 
-void SparseMat::erase(int i0, int i1, size_t* hashval)
+வெறுமை SparseMat::erase(முழு i0, முழு i1, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 2 );
     size_t h = hashval ? *hashval : hash(i0, i1);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    போது( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
-            break;
+        எனில்( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
+            நிறுத்து;
         previdx = nidx;
         nidx = elem->next;
     }
 
-    if( nidx )
-        removeNode(hidx, nidx, previdx);
+    எனில்( nidx )
+        remove_முனை(hidx, nidx, previdx);
 }
 
-void SparseMat::erase(int i0, int i1, int i2, size_t* hashval)
+வெறுமை SparseMat::erase(முழு i0, முழு i1, முழு i2, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 3 );
     size_t h = hashval ? *hashval : hash(i0, i1, i2);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    போது( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 &&
+        எனில்( elem->hashval == h && elem->idx[0] == i0 &&
             elem->idx[1] == i1 && elem->idx[2] == i2 )
-            break;
+            நிறுத்து;
         previdx = nidx;
         nidx = elem->next;
     }
 
-    if( nidx )
-        removeNode(hidx, nidx, previdx);
+    எனில்( nidx )
+        remove_முனை(hidx, nidx, previdx);
 }
 
-void SparseMat::erase(const int* idx, size_t* hashval)
+வெறுமை SparseMat::erase(மாறிலி முழு* idx, size_t* hashval)
 {
     CV_Assert( hdr );
-    int i, d = hdr->dims;
+    முழு i, d = hdr->dims;
     size_t h = hashval ? *hashval : hash(idx);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    போது( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h )
+        எனில்( elem->hashval == h )
         {
-            for( i = 0; i < d; i++ )
-                if( elem->idx[i] != idx[i] )
-                    break;
-            if( i == d )
-                break;
+            க்கு( i = 0; i < d; i++ )
+                எனில்( elem->idx[i] != idx[i] )
+                    நிறுத்து;
+            எனில்( i == d )
+                நிறுத்து;
         }
         previdx = nidx;
         nidx = elem->next;
     }
 
-    if( nidx )
-        removeNode(hidx, nidx, previdx);
+    எனில்( nidx )
+        remove_முனை(hidx, nidx, previdx);
 }
 
-void SparseMat::resizeHashTab(size_t newsize)
+வெறுமை SparseMat::resizeHashTab(size_t newsize)
 {
     newsize = std::max(newsize, (size_t)8);
-    if((newsize & (newsize-1)) != 0)
-        newsize = (size_t)1 << cvCeil(std::log((double)newsize)/CV_LOG2);
+    எனில்((newsize & (newsize-1)) != 0)
+        newsize = (size_t)1 << cvCeil(std::log((இரட்டை)newsize)/CV_LOG2);
 
     size_t hsize = hdr->hashtab.size();
     std::vector<size_t> _newh(newsize);
     size_t* newh = &_newh[0];
-    for( size_t i = 0; i < newsize; i++ )
+    க்கு( size_t i = 0; i < newsize; i++ )
         newh[i] = 0;
     uchar* pool = &hdr->pool[0];
-    for( size_t i = 0; i < hsize; i++ )
+    க்கு( size_t i = 0; i < hsize; i++ )
     {
         size_t nidx = hdr->hashtab[i];
-        while( nidx )
+        போது( nidx )
         {
             Node* elem = (Node*)(pool + nidx);
             size_t next = elem->next;
@@ -643,26 +643,26 @@ void SparseMat::resizeHashTab(size_t newsize)
     hdr->hashtab = _newh;
 }
 
-uchar* SparseMat::newNode(const int* idx, size_t hashval)
+uchar* SparseMat::new_முனை(மாறிலி முழு* idx, size_t hashval)
 {
-    const int HASH_MAX_FILL_FACTOR=3;
+    மாறிலி முழு HASH_MAX_FILL_FACTOR=3;
     CV_Assert(hdr);
     size_t hsize = hdr->hashtab.size();
-    if( ++hdr->nodeCount > hsize*HASH_MAX_FILL_FACTOR )
+    எனில்( ++hdr->முனை_மொத்தம் > hsize*HASH_MAX_FILL_FACTOR )
     {
         resizeHashTab(std::max(hsize*2, (size_t)8));
         hsize = hdr->hashtab.size();
     }
 
-    if( !hdr->freeList )
+    எனில்( !hdr->freeList )
     {
-        size_t i, nsz = hdr->nodeSize, psize = hdr->pool.size(),
+        size_t i, nsz = hdr->முனை_Size, psize = hdr->pool.size(),
             newpsize = std::max(psize*3/2, 8*nsz);
         newpsize = (newpsize/nsz)*nsz;
         hdr->pool.resize(newpsize);
         uchar* pool = &hdr->pool[0];
         hdr->freeList = std::max(psize, nsz);
-        for( i = hdr->freeList; i < newpsize - nsz; i += nsz )
+        க்கு( i = hdr->freeList; i < newpsize - nsz; i += nsz )
             ((Node*)(pool + i))->next = i + nsz;
         ((Node*)(pool + i))->next = 0;
     }
@@ -674,41 +674,41 @@ uchar* SparseMat::newNode(const int* idx, size_t hashval)
     elem->next = hdr->hashtab[hidx];
     hdr->hashtab[hidx] = nidx;
 
-    int i, d = hdr->dims;
-    for( i = 0; i < d; i++ )
+    முழு i, d = hdr->dims;
+    க்கு( i = 0; i < d; i++ )
         elem->idx[i] = idx[i];
     size_t esz = elemSize();
     uchar* p = &value<uchar>(elem);
-    if( esz == sizeof(float) )
-        *((float*)p) = 0.f;
-    else if( esz == sizeof(double) )
-        *((double*)p) = 0.;
-    else
+    எனில்( esz == அளவு(தசம) )
+        *((தசம*)p) = 0.f;
+    இல்லையெனில் எனில்( esz == அளவு(இரட்டை) )
+        *((இரட்டை*)p) = 0.;
+    இல்லையெனில்
         memset(p, 0, esz);
 
-    return p;
+    திரும்பு p;
 }
 
 
-void SparseMat::removeNode(size_t hidx, size_t nidx, size_t previdx)
+வெறுமை SparseMat::remove_முனை(size_t hidx, size_t nidx, size_t previdx)
 {
-    Node* n = node(nidx);
-    if( previdx )
+    Node* n = முனை(nidx);
+    எனில்( previdx )
     {
-        Node* prev = node(previdx);
+        Node* prev = முனை(previdx);
         prev->next = n->next;
     }
-    else
+    இல்லையெனில்
         hdr->hashtab[hidx] = n->next;
     n->next = hdr->freeList;
     hdr->freeList = nidx;
-    --hdr->nodeCount;
+    --hdr->முனை_மொத்தம்;
 }
 
 //
 // Operations
 //
-double norm( const SparseMat& src, int normType )
+இரட்டை norm( மாறிலி SparseMat& src, முழு normType )
 {
     CV_INSTRUMENT_REGION();
 
@@ -716,141 +716,141 @@ double norm( const SparseMat& src, int normType )
 
     size_t i, N = src.nzcount();
     normType &= NORM_TYPE_MASK;
-    int type = src.type();
-    double result = 0;
+    முழு type = src.type();
+    இரட்டை result = 0;
 
     CV_Assert( normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 );
 
-    if( type == CV_32F )
+    எனில்( type == CV_32F )
     {
-        if( normType == NORM_INF )
-            for( i = 0; i < N; i++, ++it )
+        எனில்( normType == NORM_INF )
+            க்கு( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result = std::max(result, std::abs((double)it.value<float>()));
+                result = std::max(result, std::abs((இரட்டை)it.value<தசம>()));
             }
-        else if( normType == NORM_L1 )
-            for( i = 0; i < N; i++, ++it )
+        இல்லையெனில் எனில்( normType == NORM_L1 )
+            க்கு( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result += std::abs(it.value<float>());
+                result += std::abs(it.value<தசம>());
             }
-        else
-            for( i = 0; i < N; i++, ++it )
+        இல்லையெனில்
+            க்கு( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                double v = it.value<float>();
+                இரட்டை v = it.value<தசம>();
                 result += v*v;
             }
     }
-    else if( type == CV_64F )
+    இல்லையெனில் எனில்( type == CV_64F )
     {
-        if( normType == NORM_INF )
-            for( i = 0; i < N; i++, ++it )
+        எனில்( normType == NORM_INF )
+            க்கு( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result = std::max(result, std::abs(it.value<double>()));
+                result = std::max(result, std::abs(it.value<இரட்டை>()));
             }
-        else if( normType == NORM_L1 )
-            for( i = 0; i < N; i++, ++it )
+        இல்லையெனில் எனில்( normType == NORM_L1 )
+            க்கு( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result += std::abs(it.value<double>());
+                result += std::abs(it.value<இரட்டை>());
             }
-        else
-            for( i = 0; i < N; i++, ++it )
+        இல்லையெனில்
+            க்கு( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                double v = it.value<double>();
+                இரட்டை v = it.value<இரட்டை>();
                 result += v*v;
             }
     }
-    else
+    இல்லையெனில்
         CV_Error( cv::Error::StsUnsupportedFormat, "Only 32f and 64f are supported" );
 
-    if( normType == NORM_L2 )
+    எனில்( normType == NORM_L2 )
         result = std::sqrt(result);
-    return result;
+    திரும்பு result;
 }
 
-void minMaxLoc( const SparseMat& src, double* _minval, double* _maxval, int* _minidx, int* _maxidx )
+வெறுமை minMaxLoc( மாறிலி SparseMat& src, இரட்டை* _minval, இரட்டை* _maxval, முழு* _minidx, முழு* _maxidx )
 {
     CV_INSTRUMENT_REGION();
 
     SparseMatConstIterator it = src.begin();
     size_t i, N = src.nzcount(), d = src.hdr ? src.hdr->dims : 0;
-    int type = src.type();
-    const int *minidx = 0, *maxidx = 0;
+    முழு type = src.type();
+    மாறிலி முழு *minidx = 0, *maxidx = 0;
 
-    if( type == CV_32F )
+    எனில்( type == CV_32F )
     {
-        float minval = FLT_MAX, maxval = -FLT_MAX;
-        for( i = 0; i < N; i++, ++it )
+        தசம minval = FLT_MAX, maxval = -FLT_MAX;
+        க்கு( i = 0; i < N; i++, ++it )
         {
             CV_Assert(it.ptr);
-            float v = it.value<float>();
-            if( v < minval )
+            தசம v = it.value<தசம>();
+            எனில்( v < minval )
             {
                 minval = v;
-                minidx = it.node()->idx;
+                minidx = it.முனை()->idx;
             }
-            if( v > maxval )
+            எனில்( v > maxval )
             {
                 maxval = v;
-                maxidx = it.node()->idx;
+                maxidx = it.முனை()->idx;
             }
         }
-        if( _minval )
+        எனில்( _minval )
             *_minval = minval;
-        if( _maxval )
+        எனில்( _maxval )
             *_maxval = maxval;
     }
-    else if( type == CV_64F )
+    இல்லையெனில் எனில்( type == CV_64F )
     {
-        double minval = DBL_MAX, maxval = -DBL_MAX;
-        for( i = 0; i < N; i++, ++it )
+        இரட்டை minval = DBL_MAX, maxval = -DBL_MAX;
+        க்கு( i = 0; i < N; i++, ++it )
         {
             CV_Assert(it.ptr);
-            double v = it.value<double>();
-            if( v < minval )
+            இரட்டை v = it.value<இரட்டை>();
+            எனில்( v < minval )
             {
                 minval = v;
-                minidx = it.node()->idx;
+                minidx = it.முனை()->idx;
             }
-            if( v > maxval )
+            எனில்( v > maxval )
             {
                 maxval = v;
-                maxidx = it.node()->idx;
+                maxidx = it.முனை()->idx;
             }
         }
-        if( _minval )
+        எனில்( _minval )
             *_minval = minval;
-        if( _maxval )
+        எனில்( _maxval )
             *_maxval = maxval;
     }
-    else
+    இல்லையெனில்
         CV_Error( cv::Error::StsUnsupportedFormat, "Only 32f and 64f are supported" );
 
-    if( _minidx && minidx )
-        for( i = 0; i < d; i++ )
+    எனில்( _minidx && minidx )
+        க்கு( i = 0; i < d; i++ )
             _minidx[i] = minidx[i];
-    if( _maxidx && maxidx )
-        for( i = 0; i < d; i++ )
+    எனில்( _maxidx && maxidx )
+        க்கு( i = 0; i < d; i++ )
             _maxidx[i] = maxidx[i];
 }
 
 
-void normalize( const SparseMat& src, SparseMat& dst, double a, int norm_type )
+வெறுமை normalize( மாறிலி SparseMat& src, SparseMat& dst, இரட்டை a, முழு norm_type )
 {
     CV_INSTRUMENT_REGION();
 
-    double scale = 1;
-    if( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
+    இரட்டை scale = 1;
+    எனில்( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
     {
         scale = norm( src, norm_type );
         scale = scale > DBL_EPSILON ? a/scale : 0.;
     }
-    else
+    இல்லையெனில்
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported norm type" );
 
     src.convertTo( dst, -1, scale );

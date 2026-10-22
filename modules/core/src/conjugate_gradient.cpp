@@ -39,28 +39,28 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#அந்தர்பாவ "precomp.hpp"
 
 #define dprintf(x)
 #define print_matrix(x)
 
-namespace cv
+நாமாகாஶ cv
 {
-    double MinProblemSolver::Function::getGradientEps() const { return 1e-3; }
-    void MinProblemSolver::Function::getGradient(const double* x, double* grad)
+    இரட்டை MinProblemSolver::Function::getGradientEps() மாறிலி { திரும்பு 1e-3; }
+    வெறுமை MinProblemSolver::Function::getGradient(மாறிலி இரட்டை* x, இரட்டை* grad)
     {
-        double eps = getGradientEps();
-        int i, n = getDims();
-        AutoBuffer<double> x_buf(n);
-        double* x_ = x_buf.data();
-        for( i = 0; i < n; i++ )
+        இரட்டை eps = getGradientEps();
+        முழு i, n = getDims();
+        AutoBuffer<இரட்டை> x_buf(n);
+        இரட்டை* x_ = x_buf.data();
+        க்கு( i = 0; i < n; i++ )
             x_[i] = x[i];
-        for( i = 0; i < n; i++ )
+        க்கு( i = 0; i < n; i++ )
         {
             x_[i] = x[i] + eps;
-            double y1 = calc(x_);
+            இரட்டை y1 = calc(x_);
             x_[i] = x[i] - eps;
-            double y0 = calc(x_);
+            இரட்டை y0 = calc(x_);
             grad[i] = (y1 - y0)/(2*eps);
             x_[i] = x[i];
         }
@@ -68,27 +68,27 @@ namespace cv
 
 #define SEC_METHOD_ITERATIONS 4
 #define INITIAL_SEC_METHOD_SIGMA 0.1
-    class ConjGradSolverImpl CV_FINAL : public ConjGradSolver
+    வகுப்பு ConjGradSolverImpl CV_FINAL : பொது ConjGradSolver
     {
-    public:
-        Ptr<Function> getFunction() const CV_OVERRIDE;
-        void setFunction(const Ptr<Function>& f) CV_OVERRIDE;
-        TermCriteria getTermCriteria() const CV_OVERRIDE;
+    பொது:
+        Ptr<Function> getFunction() மாறிலி CV_OVERRIDE;
+        வெறுமை setFunction(மாறிலி Ptr<Function>& f) CV_OVERRIDE;
+        TermCriteria getTermCriteria() மாறிலி CV_OVERRIDE;
         ConjGradSolverImpl();
-        void setTermCriteria(const TermCriteria& termcrit) CV_OVERRIDE;
-        double minimize(InputOutputArray x) CV_OVERRIDE;
-    protected:
+        வெறுமை setTermCriteria(மாறிலி TermCriteria& termcrit) CV_OVERRIDE;
+        இரட்டை minimize(உள்ளீடு_Output_Array x) CV_OVERRIDE;
+    பாதுகாக்கப்பட்ட:
         Ptr<MinProblemSolver::Function> _Function;
         TermCriteria _termcrit;
-        Mat_<double> d,r,buf_x,r_old;
-        Mat_<double> minimizeOnTheLine_buf1,minimizeOnTheLine_buf2;
-    private:
-        static void minimizeOnTheLine(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,Mat_<double>& buf2);
+        Mat_<இரட்டை> d,r,buf_x,r_old;
+        Mat_<இரட்டை> minimize_On_The_வரி_buf1,minimize_On_The_வரி_buf2;
+    தனிப்பட்ட:
+        நிலையான வெறுமை minimize_On_The_வரி(Ptr<MinProblemSolver::Function> _f,Mat_<இரட்டை>& x,மாறிலி Mat_<இரட்டை>& d,Mat_<இரட்டை>& buf1,Mat_<இரட்டை>& buf2);
     };
 
-    void ConjGradSolverImpl::minimizeOnTheLine(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,
-            Mat_<double>& buf2){
-        double sigma=INITIAL_SEC_METHOD_SIGMA;
+    வெறுமை ConjGradSolverImpl::minimize_On_The_வரி(Ptr<MinProblemSolver::Function> _f,Mat_<இரட்டை>& x,மாறிலி Mat_<இரட்டை>& d,Mat_<இரட்டை>& buf1,
+            Mat_<இரட்டை>& buf2){
+        இரட்டை sigma=INITIAL_SEC_METHOD_SIGMA;
         buf1=0.0;
         buf2=0.0;
 
@@ -98,19 +98,19 @@ namespace cv
         dprintf(("d:\n"));
         print_matrix(d);
 
-        for(int i=0;i<SEC_METHOD_ITERATIONS;i++){
-            _f->getGradient((double*)x.data,(double*)buf1.data);
+        க்கு(முழு i=0;i<SEC_METHOD_ITERATIONS;i++){
+            _f->getGradient((இரட்டை*)x.data,(இரட்டை*)buf1.data);
             dprintf(("buf1:\n"));
             print_matrix(buf1);
             x=x+sigma*d;
-            _f->getGradient((double*)x.data,(double*)buf2.data);
+            _f->getGradient((இரட்டை*)x.data,(இரட்டை*)buf2.data);
             dprintf(("buf2:\n"));
             print_matrix(buf2);
-            double d1=buf1.dot(d), d2=buf2.dot(d);
-            if((d1-d2)==0){
-                break;
+            இரட்டை d1=buf1.dot(d), d2=buf2.dot(d);
+            எனில்((d1-d2)==0){
+                நிறுத்து;
             }
-            double alpha=-sigma*d1/(d2-d1);
+            இரட்டை alpha=-sigma*d1/(d2-d1);
             dprintf(("(buf2.dot(d)-buf1.dot(d))=%f\nalpha=%f\n",(buf2.dot(d)-buf1.dot(d)),alpha));
             x=x+(alpha-sigma)*d;
             sigma=-alpha;
@@ -120,33 +120,33 @@ namespace cv
         print_matrix(x);
     }
 
-    double ConjGradSolverImpl::minimize(InputOutputArray x){
-        CV_Assert(_Function.empty()==false);
-        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.maxCount,_termcrit.epsilon));
+    இரட்டை ConjGradSolverImpl::minimize(உள்ளீடு_Output_Array x){
+        CV_Assert(_Function.empty()==பொய்);
+        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.max_மொத்தம்,_termcrit.epsilon));
 
         Mat x_mat=x.getMat();
         CV_Assert(MIN(x_mat.rows,x_mat.cols)==1);
-        int ndim=MAX(x_mat.rows,x_mat.cols);
+        முழு ndim=MAX(x_mat.rows,x_mat.cols);
         CV_Assert(x_mat.type()==CV_64FC1);
 
-        if(d.cols!=ndim){
+        எனில்(d.cols!=ndim){
             d.create(1,ndim);
             r.create(1,ndim);
             r_old.create(1,ndim);
-            minimizeOnTheLine_buf1.create(1,ndim);
-            minimizeOnTheLine_buf2.create(1,ndim);
+            minimize_On_The_வரி_buf1.create(1,ndim);
+            minimize_On_The_வரி_buf2.create(1,ndim);
         }
 
-        Mat_<double> proxy_x;
-        if(x_mat.rows>1){
+        Mat_<இரட்டை> proxy_x;
+        எனில்(x_mat.rows>1){
             buf_x.create(1,ndim);
-            Mat_<double> proxy(ndim,1,buf_x.ptr<double>());
+            Mat_<இரட்டை> proxy(ndim,1,buf_x.ptr<இரட்டை>());
             x_mat.copyTo(proxy);
             proxy_x=buf_x;
-        }else{
+        }இல்லையெனில்{
             proxy_x=x_mat;
         }
-        _Function->getGradient(proxy_x.ptr<double>(),d.ptr<double>());
+        _Function->getGradient(proxy_x.ptr<இரட்டை>(),d.ptr<இரட்டை>());
         d*=-1.0;
         d.copyTo(r);
 
@@ -155,50 +155,50 @@ namespace cv
         dprintf(("d first time\n"));print_matrix(d);
         dprintf(("r\n"));print_matrix(r);
 
-        for(int count=0;count<_termcrit.maxCount;count++){
-            minimizeOnTheLine(_Function,proxy_x,d,minimizeOnTheLine_buf1,minimizeOnTheLine_buf2);
+        க்கு(முழு மொத்தம்_2=0;மொத்தம்_2<_termcrit.max_மொத்தம்;மொத்தம்_2++){
+            minimize_On_The_வரி(_Function,proxy_x,d,minimize_On_The_வரி_buf1,minimize_On_The_வரி_buf2);
             r.copyTo(r_old);
-            _Function->getGradient(proxy_x.ptr<double>(),r.ptr<double>());
+            _Function->getGradient(proxy_x.ptr<இரட்டை>(),r.ptr<இரட்டை>());
             r*=-1.0;
-            double r_norm_sq=norm(r);
-            if(_termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && r_norm_sq<_termcrit.epsilon){
-                break;
+            இரட்டை r_norm_sq=norm(r);
+            எனில்(_termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && r_norm_sq<_termcrit.epsilon){
+                நிறுத்து;
             }
             r_norm_sq=r_norm_sq*r_norm_sq;
-            double beta=MAX(0.0,(r_norm_sq-r.dot(r_old))/r_norm_sq);
+            இரட்டை beta=MAX(0.0,(r_norm_sq-r.dot(r_old))/r_norm_sq);
             d=r+beta*d;
         }
 
 
 
-        if(x_mat.rows>1){
-            Mat(ndim, 1, CV_64F, proxy_x.ptr<double>()).copyTo(x);
+        எனில்(x_mat.rows>1){
+            Mat(ndim, 1, CV_64F, proxy_x.ptr<இரட்டை>()).copyTo(x);
         }
-        return _Function->calc(proxy_x.ptr<double>());
+        திரும்பு _Function->calc(proxy_x.ptr<இரட்டை>());
     }
 
     ConjGradSolverImpl::ConjGradSolverImpl(){
         _Function=Ptr<Function>();
     }
-    Ptr<MinProblemSolver::Function> ConjGradSolverImpl::getFunction()const{
-        return _Function;
+    Ptr<MinProblemSolver::Function> ConjGradSolverImpl::getFunction()மாறிலி{
+        திரும்பு _Function;
     }
-    void ConjGradSolverImpl::setFunction(const Ptr<Function>& f){
+    வெறுமை ConjGradSolverImpl::setFunction(மாறிலி Ptr<Function>& f){
         _Function=f;
     }
-    TermCriteria ConjGradSolverImpl::getTermCriteria()const{
-        return _termcrit;
+    TermCriteria ConjGradSolverImpl::getTermCriteria()மாறிலி{
+        திரும்பு _termcrit;
     }
-    void ConjGradSolverImpl::setTermCriteria(const TermCriteria& termcrit){
-        CV_Assert((termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && termcrit.epsilon>0 && termcrit.maxCount>0) ||
-                ((termcrit.type==TermCriteria::MAX_ITER) && termcrit.maxCount>0));
+    வெறுமை ConjGradSolverImpl::setTermCriteria(மாறிலி TermCriteria& termcrit){
+        CV_Assert((termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && termcrit.epsilon>0 && termcrit.max_மொத்தம்>0) ||
+                ((termcrit.type==TermCriteria::MAX_ITER) && termcrit.max_மொத்தம்>0));
         _termcrit=termcrit;
     }
     // both minRange & minError are specified by termcrit.epsilon; In addition, user may specify the number of iterations that the algorithm does.
-    Ptr<ConjGradSolver> ConjGradSolver::create(const Ptr<MinProblemSolver::Function>& f, TermCriteria termcrit){
+    Ptr<ConjGradSolver> ConjGradSolver::create(மாறிலி Ptr<MinProblemSolver::Function>& f, TermCriteria termcrit){
         Ptr<ConjGradSolver> CG = makePtr<ConjGradSolverImpl>();
         CG->setFunction(f);
         CG->setTermCriteria(termcrit);
-        return CG;
+        திரும்பு CG;
     }
 }

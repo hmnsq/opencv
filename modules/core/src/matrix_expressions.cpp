@@ -9,209 +9,209 @@
 //
 // */
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#அந்தர்பாவ "precomp.hpp"
+#அந்தர்பாவ <opencv2/core/utils/logger.hpp>
 
-namespace cv
+நாமாகாஶ cv
 {
 
 //This and its overload below are used in various MatExpr operator overloads
 //implemented to check that Matrix operands exist.
-static void checkOperandsExist(const Mat& a)
+நிலையான வெறுமை checkOperandsExist(மாறிலி Mat& a)
 {
-    if (a.empty())
+    எனில் (a.empty())
     {
         CV_Error(cv::Error::StsBadArg, "Matrix operand is an empty matrix.");
     }
 }
 
-static void checkOperandsExist(const Mat& a, const Mat& b)
+நிலையான வெறுமை checkOperandsExist(மாறிலி Mat& a, மாறிலி Mat& b)
 {
-    if (a.empty() || b.empty())
+    எனில் (a.empty() || b.empty())
     {
         CV_Error(cv::Error::StsBadArg, "One or more matrix operands are empty.");
     }
 }
 
 
-class MatOp_Identity CV_FINAL : public MatOp
+வகுப்பு MatOp_Identity CV_FINAL : பொது MatOp
 {
-public:
+பொது:
     MatOp_Identity() {}
-    virtual ~MatOp_Identity() {}
+    மெய்நிகர் ~MatOp_Identity() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    தருக்க elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி CV_OVERRIDE { திரும்பு உண்மை; }
+    வெறுமை assign(மாறிலி Mat_கோவை& கோவை, Mat& m, முழு type=-1) மாறிலி CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, மாறிலி Mat& m);
 };
 
-static MatOp_Identity g_MatOp_Identity;
+நிலையான MatOp_Identity g_MatOp_Identity;
 
-class MatOp_AddEx CV_FINAL : public MatOp
+வகுப்பு MatOp_AddEx CV_FINAL : பொது MatOp
 {
-public:
+பொது:
     MatOp_AddEx() {}
-    virtual ~MatOp_AddEx() {}
+    மெய்நிகர் ~MatOp_AddEx() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    தருக்க elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி CV_OVERRIDE { திரும்பு உண்மை; }
+    வெறுமை assign(மாறிலி Mat_கோவை& கோவை, Mat& m, முழு type=-1) மாறிலி CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    வெறுமை add(மாறிலி Mat_கோவை& e1, மாறிலி Scalar& s, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
+    வெறுமை subtract(மாறிலி Scalar& s, மாறிலி Mat_கோவை& கோவை, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
+    வெறுமை multiply(மாறிலி Mat_கோவை& e1, இரட்டை s, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
+    வெறுமை divide(இரட்டை s, மாறிலி Mat_கோவை& e, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    வெறுமை transpose(மாறிலி Mat_கோவை& e1, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
+    வெறுமை abs(மாறிலி Mat_கோவை& கோவை, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, மாறிலி Mat& a, மாறிலி Mat& b, இரட்டை alpha, இரட்டை beta, மாறிலி Scalar& s=Scalar());
 };
 
-static MatOp_AddEx g_MatOp_AddEx;
+நிலையான MatOp_AddEx g_MatOp_AddEx;
 
-class MatOp_Bin CV_FINAL : public MatOp
+வகுப்பு MatOp_Bin CV_FINAL : பொது MatOp
 {
-public:
+பொது:
     MatOp_Bin() {}
-    virtual ~MatOp_Bin() {}
+    மெய்நிகர் ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    தருக்க elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி CV_OVERRIDE { திரும்பு உண்மை; }
+    வெறுமை assign(மாறிலி Mat_கோவை& கோவை, Mat& m, முழு type=-1) மாறிலி CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    வெறுமை multiply(மாறிலி Mat_கோவை& e1, இரட்டை s, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
+    வெறுமை divide(இரட்டை s, மாறிலி Mat_கோவை& e, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, எழுத்து op, மாறிலி Mat& a, மாறிலி Mat& b, இரட்டை scale=1);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, எழுத்து op, மாறிலி Mat& a, மாறிலி Scalar& s);
 };
 
-static MatOp_Bin g_MatOp_Bin;
+நிலையான MatOp_Bin g_MatOp_Bin;
 
-class MatOp_Cmp CV_FINAL : public MatOp
+வகுப்பு MatOp_Cmp CV_FINAL : பொது MatOp
 {
-public:
+பொது:
     MatOp_Cmp() {}
-    virtual ~MatOp_Cmp() {}
+    மெய்நிகர் ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    தருக்க elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி CV_OVERRIDE { திரும்பு உண்மை; }
+    வெறுமை assign(மாறிலி Mat_கோவை& கோவை, Mat& m, முழு type=-1) மாறிலி CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, முழு cmpop, மாறிலி Mat& a, மாறிலி Mat& b);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, முழு cmpop, மாறிலி Mat& a, இரட்டை alpha);
 };
 
-static MatOp_Cmp g_MatOp_Cmp;
+நிலையான MatOp_Cmp g_MatOp_Cmp;
 
-class MatOp_GEMM CV_FINAL : public MatOp
+வகுப்பு MatOp_GEMM CV_FINAL : பொது MatOp
 {
-public:
+பொது:
     MatOp_GEMM() {}
-    virtual ~MatOp_GEMM() {}
+    மெய்நிகர் ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    தருக்க elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி CV_OVERRIDE { திரும்பு பொய்; }
+    வெறுமை assign(மாறிலி Mat_கோவை& கோவை, Mat& m, முழு type=-1) மாறிலி CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    வெறுமை add(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
+    வெறுமை subtract(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
+    வெறுமை multiply(மாறிலி Mat_கோவை& e, இரட்டை s, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    வெறுமை transpose(மாறிலி Mat_கோவை& கோவை, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    Size size(மாறிலி Mat_கோவை& கோவை) மாறிலி CV_OVERRIDE
     {
-        return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+        திரும்பு Size(
+            (கோவை.flags & GEMM_2_T) ? கோவை.b.rows : கோவை.b.cols,
+            (கோவை.flags & GEMM_1_T) ? கோவை.a.cols : கோவை.a.rows
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                         double alpha=1, const Mat& c=Mat(), double beta=1);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, முழு flags, மாறிலி Mat& a, மாறிலி Mat& b,
+                         இரட்டை alpha=1, மாறிலி Mat& c=Mat(), இரட்டை beta=1);
 
 };
 
-static MatOp_GEMM g_MatOp_GEMM;
+நிலையான MatOp_GEMM g_MatOp_GEMM;
 
-class MatOp_Invert CV_FINAL : public MatOp
+வகுப்பு MatOp_Invert CV_FINAL : பொது MatOp
 {
-public:
+பொது:
     MatOp_Invert() {}
-    virtual ~MatOp_Invert() {}
+    மெய்நிகர் ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    தருக்க elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி CV_OVERRIDE { திரும்பு பொய்; }
+    வெறுமை assign(மாறிலி Mat_கோவை& கோவை, Mat& m, முழு type=-1) மாறிலி CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    வெறுமை matmul(மாறிலி Mat_கோவை& expr1, மாறிலி Mat_கோவை& expr2, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, முழு method, மாறிலி Mat& m);
 };
 
-static MatOp_Invert g_MatOp_Invert;
+நிலையான MatOp_Invert g_MatOp_Invert;
 
-class MatOp_T CV_FINAL : public MatOp
+வகுப்பு MatOp_T CV_FINAL : பொது MatOp
 {
-public:
+பொது:
     MatOp_T() {}
-    virtual ~MatOp_T() {}
+    மெய்நிகர் ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    தருக்க elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி CV_OVERRIDE { திரும்பு பொய்; }
+    வெறுமை assign(மாறிலி Mat_கோவை& கோவை, Mat& m, முழு type=-1) மாறிலி CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    வெறுமை multiply(மாறிலி Mat_கோவை& e1, இரட்டை s, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
+    வெறுமை transpose(மாறிலி Mat_கோவை& கோவை, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, மாறிலி Mat& a, இரட்டை alpha=1);
 };
 
-static MatOp_T g_MatOp_T;
+நிலையான MatOp_T g_MatOp_T;
 
-class MatOp_Solve CV_FINAL : public MatOp
+வகுப்பு MatOp_Solve CV_FINAL : பொது MatOp
 {
-public:
+பொது:
     MatOp_Solve() {}
-    virtual ~MatOp_Solve() {}
+    மெய்நிகர் ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    தருக்க elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி CV_OVERRIDE { திரும்பு பொய்; }
+    வெறுமை assign(மாறிலி Mat_கோவை& கோவை, Mat& m, முழு type=-1) மாறிலி CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, முழு method, மாறிலி Mat& a, மாறிலி Mat& b);
 };
 
-static MatOp_Solve g_MatOp_Solve;
+நிலையான MatOp_Solve g_MatOp_Solve;
 
-class MatOp_Initializer CV_FINAL : public MatOp
+வகுப்பு MatOp_Initializer CV_FINAL : பொது MatOp
 {
-public:
+பொது:
     MatOp_Initializer() {}
-    virtual ~MatOp_Initializer() {}
+    மெய்நிகர் ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    தருக்க elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி CV_OVERRIDE { திரும்பு பொய்; }
+    வெறுமை assign(மாறிலி Mat_கோவை& கோவை, Mat& m, முழு type=-1) மாறிலி CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    வெறுமை multiply(மாறிலி Mat_கோவை& e, இரட்டை s, Mat_கோவை& res) மாறிலி CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, முழு method, Size sz, முழு type, இரட்டை alpha=1);
+    நிலையான வெறுமை make_கோவை(Mat_கோவை& res, முழு method, முழு ndims, மாறிலி முழு* sizes, முழு type, இரட்டை alpha=1);
 };
 
-static MatOp_Initializer* getGlobalMatOpInitializer()
+நிலையான MatOp_Initializer* getGlobalMatOpInitializer()
 {
-    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
+    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, புதிய MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+நிலையான உள்வரி தருக்க isIdentity(மாறிலி Mat_கோவை& e) { திரும்பு e.op == &g_MatOp_Identity; }
+நிலையான உள்வரி தருக்க isAddEx(மாறிலி Mat_கோவை& e) { திரும்பு e.op == &g_MatOp_AddEx; }
+நிலையான உள்வரி தருக்க isScaled(மாறிலி Mat_கோவை& e) { திரும்பு isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
+நிலையான உள்வரி தருக்க isBin(மாறிலி Mat_கோவை& e, எழுத்து c) { திரும்பு e.op == &g_MatOp_Bin && e.flags == c; }
+நிலையான உள்வரி தருக்க isCmp(மாறிலி Mat_கோவை& e) { திரும்பு e.op == &g_MatOp_Cmp; }
+நிலையான உள்வரி தருக்க isReciprocal(மாறிலி Mat_கோவை& e) { திரும்பு isBin(e,'/') && (!e.b.data || e.beta == 0); }
+நிலையான உள்வரி தருக்க isT(மாறிலி Mat_கோவை& e) { திரும்பு e.op == &g_MatOp_T; }
+நிலையான உள்வரி தருக்க isInv(மாறிலி Mat_கோவை& e) { திரும்பு e.op == &g_MatOp_Invert; }
+நிலையான உள்வரி தருக்க isSolve(மாறிலி Mat_கோவை& e) { திரும்பு e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+நிலையான உள்வரி தருக்க isMatProd(மாறிலி Mat_கோவை& e) { திரும்பு e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
+நிலையான உள்வரி தருக்க isInitializer(மாறிலி Mat_கோவை& e) { திரும்பு e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,1138 +219,1138 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+தருக்க MatOp::elementWise(மாறிலி Mat_கோவை& /*கோவை*/) மாறிலி
 {
-    return false;
+    திரும்பு பொய்;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+வெறுமை MatOp::roi(மாறிலி Mat_கோவை& கோவை, மாறிலி Range& rowRange, மாறிலி Range& colRange, Mat_கோவை& e) மாறிலி
 {
-    if( elementWise(expr) )
+    எனில்( elementWise(கோவை) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_கோவை(கோவை.op, கோவை.flags, Mat(), Mat(), Mat(),
+                    கோவை.alpha, கோவை.beta, கோவை.s);
+        எனில்(கோவை.a.data)
+            e.a = கோவை.a(rowRange, colRange);
+        எனில்(கோவை.b.data)
+            e.b = கோவை.b(rowRange, colRange);
+        எனில்(கோவை.c.data)
+            e.c = கோவை.c(rowRange, colRange);
     }
-    else
+    இல்லையெனில்
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
+        கோவை.op->assign(கோவை, m);
+        e = Mat_கோவை(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
     }
 }
 
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
+வெறுமை MatOp::diag(மாறிலி Mat_கோவை& கோவை, முழு d, Mat_கோவை& e) மாறிலி
 {
-    if( elementWise(expr) )
+    எனில்( elementWise(கோவை) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
+        e = Mat_கோவை(கோவை.op, கோவை.flags, Mat(), Mat(), Mat(),
+                    கோவை.alpha, கோவை.beta, கோவை.s);
+        எனில்(கோவை.a.data)
+            e.a = கோவை.a.diag(d);
+        எனில்(கோவை.b.data)
+            e.b = கோவை.b.diag(d);
+        எனில்(கோவை.c.data)
+            e.c = கோவை.c.diag(d);
     }
-    else
+    இல்லையெனில்
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        கோவை.op->assign(கோவை, m);
+        e = Mat_கோவை(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+வெறுமை MatOp::augAssignAdd(மாறிலி Mat_கோவை& கோவை, Mat& m) மாறிலி
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    கோவை.op->assign(கோவை, temp);
     m += temp;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+வெறுமை MatOp::augAssignSubtract(மாறிலி Mat_கோவை& கோவை, Mat& m) மாறிலி
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    கோவை.op->assign(கோவை, temp);
     m -= temp;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+வெறுமை MatOp::augAssignMultiply(மாறிலி Mat_கோவை& கோவை, Mat& m) மாறிலி
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    கோவை.op->assign(கோவை, temp);
     m *= temp;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+வெறுமை MatOp::augAssignDivide(மாறிலி Mat_கோவை& கோவை, Mat& m) மாறிலி
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    கோவை.op->assign(கோவை, temp);
     m /= temp;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+வெறுமை MatOp::augAssignAnd(மாறிலி Mat_கோவை& கோவை, Mat& m) மாறிலி
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    கோவை.op->assign(கோவை, temp);
     m &= temp;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+வெறுமை MatOp::augAssignOr(மாறிலி Mat_கோவை& கோவை, Mat& m) மாறிலி
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    கோவை.op->assign(கோவை, temp);
     m |= temp;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+வெறுமை MatOp::augAssignXor(மாறிலி Mat_கோவை& கோவை, Mat& m) மாறிலி
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    கோவை.op->assign(கோவை, temp);
     m ^= temp;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+வெறுமை MatOp::add(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    எனில்( இது == e2.op )
     {
-        double alpha = 1, beta = 1;
+        இரட்டை alpha = 1, beta = 1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        எனில்( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        இல்லையெனில்
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        எனில்( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = e2.alpha;
             s += e2.s;
         }
-        else
+        இல்லையெனில்
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_கோவை(res, m1, m2, alpha, beta, s);
     }
-    else
+    இல்லையெனில்
         e2.op->add(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+வெறுமை MatOp::add(மாறிலி Mat_கோவை& expr1, மாறிலி Scalar& s, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    MatOp_AddEx::make_கோவை(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+வெறுமை MatOp::subtract(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    எனில்( இது == e2.op )
     {
-        double alpha = 1, beta = -1;
+        இரட்டை alpha = 1, beta = -1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        எனில்( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        இல்லையெனில்
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        எனில்( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = -e2.alpha;
             s -= e2.s;
         }
-        else
+        இல்லையெனில்
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_கோவை(res, m1, m2, alpha, beta, s);
     }
-    else
+    இல்லையெனில்
         e2.op->subtract(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+வெறுமை MatOp::subtract(மாறிலி Scalar& s, மாறிலி Mat_கோவை& கோவை, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    கோவை.op->assign(கோவை, m);
+    MatOp_AddEx::make_கோவை(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+வெறுமை MatOp::multiply(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res, இரட்டை scale) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    எனில்( இது == e2.op )
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        எனில்( isReciprocal(e1) )
         {
-            if( isScaled(e2) )
+            எனில்( isScaled(e2) )
             {
                 scale *= e2.alpha;
                 m2 = e2.a;
             }
-            else
+            இல்லையெனில்
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_கோவை(res, '/', m2, e1.a, scale/e1.alpha);
         }
-        else
+        இல்லையெனில்
         {
-            char op = '*';
-            if( isScaled(e1) )
+            எழுத்து op = '*';
+            எனில்( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            இல்லையெனில்
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            எனில்( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            இல்லையெனில் எனில்( isReciprocal(e2) )
             {
                 op = '/';
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else
+            இல்லையெனில்
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_கோவை(res, op, m1, m2, scale);
         }
     }
-    else
+    இல்லையெனில்
         e2.op->multiply(e1, e2, res, scale);
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+வெறுமை MatOp::multiply(மாறிலி Mat_கோவை& கோவை, இரட்டை s, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    கோவை.op->assign(கோவை, m);
+    MatOp_AddEx::make_கோவை(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+வெறுமை MatOp::divide(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res, இரட்டை scale) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    எனில்( இது == e2.op )
     {
-        if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
-        else
+        எனில்( isReciprocal(e1) && isReciprocal(e2) )
+            MatOp_Bin::make_கோவை(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+        இல்லையெனில்
         {
             Mat m1, m2;
-            char op = '/';
+            எழுத்து op = '/';
 
-            if( isScaled(e1) )
+            எனில்( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            இல்லையெனில்
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            எனில்( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            இல்லையெனில் எனில்( isReciprocal(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
                 op = '*';
             }
-            else
+            இல்லையெனில்
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_கோவை(res, op, m1, m2, scale);
         }
     }
-    else
+    இல்லையெனில்
         e2.op->divide(e1, e2, res, scale);
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+வெறுமை MatOp::divide(இரட்டை s, மாறிலி Mat_கோவை& கோவை, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    கோவை.op->assign(கோவை, m);
+    MatOp_Bin::make_கோவை(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+வெறுமை MatOp::abs(மாறிலி Mat_கோவை& கோவை, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    கோவை.op->assign(கோவை, m);
+    MatOp_Bin::make_கோவை(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+வெறுமை MatOp::transpose(மாறிலி Mat_கோவை& கோவை, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    கோவை.op->assign(கோவை, m);
+    MatOp_T::make_கோவை(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+வெறுமை MatOp::matmul(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res) மாறிலி
 {
-    if( this == e2.op )
+    எனில்( இது == e2.op )
     {
-        double scale = 1;
-        int flags = 0;
+        இரட்டை scale = 1;
+        முழு flags = 0;
         Mat m1, m2;
 
-        if( isT(e1) )
+        எனில்( isT(e1) )
         {
             flags = cv::GEMM_1_T;
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else if( isScaled(e1) )
+        இல்லையெனில் எனில்( isScaled(e1) )
         {
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else
+        இல்லையெனில்
             e1.op->assign(e1, m1);
 
-        if( isT(e2) )
+        எனில்( isT(e2) )
         {
             flags |= cv::GEMM_2_T;
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else if( isScaled(e2) )
+        இல்லையெனில் எனில்( isScaled(e2) )
         {
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else
+        இல்லையெனில்
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_கோவை(res, flags, m1, m2, scale);
     }
-    else
+    இல்லையெனில்
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+வெறுமை MatOp::invert(மாறிலி Mat_கோவை& கோவை, முழு method, Mat_கோவை& res) மாறிலி
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    கோவை.op->assign(கோவை, m);
+    MatOp_Invert::make_கோவை(res, method, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+Size MatOp::size(மாறிலி Mat_கோவை& கோவை) மாறிலி
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    திரும்பு !கோவை.a.empty() ? கோவை.a.size() : கோவை.b.empty() ? கோவை.b.size() : கோவை.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+முழு MatOp::type(மாறிலி Mat_கோவை& கோவை) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    திரும்பு !கோவை.a.empty() ? கோவை.a.type() : கோவை.b.empty() ? கோவை.b.type() : கோவை.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_கோவை::Mat_கோவை(மாறிலி Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_கோவை Mat_கோவை::row(முழு y) மாறிலி
 {
-    MatExpr e;
-    op->roi(*this, Range(y, y+1), Range::all(), e);
-    return e;
+    Mat_கோவை e;
+    op->roi(*இது, Range(y, y+1), Range::all(), e);
+    திரும்பு e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_கோவை Mat_கோவை::col(முழு x) மாறிலி
 {
-    MatExpr e;
-    op->roi(*this, Range::all(), Range(x, x+1), e);
-    return e;
+    Mat_கோவை e;
+    op->roi(*இது, Range::all(), Range(x, x+1), e);
+    திரும்பு e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_கோவை Mat_கோவை::diag(முழு d) மாறிலி
 {
-    MatExpr e;
-    op->diag(*this, d, e);
-    return e;
+    Mat_கோவை e;
+    op->diag(*இது, d, e);
+    திரும்பு e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_கோவை Mat_கோவை::operator()( மாறிலி Range& rowRange, மாறிலி Range& colRange ) மாறிலி
 {
-    MatExpr e;
-    op->roi(*this, rowRange, colRange, e);
-    return e;
+    Mat_கோவை e;
+    op->roi(*இது, rowRange, colRange, e);
+    திரும்பு e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_கோவை Mat_கோவை::operator()( மாறிலி Rect& roi ) மாறிலி
 {
-    MatExpr e;
-    op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
-    return e;
+    Mat_கோவை e;
+    op->roi(*இது, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
+    திரும்பு e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_கோவை::cross(மாறிலி Mat& m) மாறிலி
 {
-    return ((Mat)*this).cross(m);
+    திரும்பு ((Mat)*இது).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+இரட்டை Mat_கோவை::dot(மாறிலி Mat& m) மாறிலி
 {
-    return ((Mat)*this).dot(m);
+    திரும்பு ((Mat)*இது).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_கோவை Mat_கோவை::t() மாறிலி
 {
-    MatExpr e;
-    op->transpose(*this, e);
-    return e;
+    Mat_கோவை e;
+    op->transpose(*இது, e);
+    திரும்பு e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_கோவை Mat_கோவை::inv(முழு method) மாறிலி
 {
-    MatExpr e;
-    op->invert(*this, method, e);
-    return e;
+    Mat_கோவை e;
+    op->invert(*இது, method, e);
+    திரும்பு e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_கோவை Mat_கோவை::mul(மாறிலி Mat_கோவை& e, இரட்டை scale) மாறிலி
 {
-    MatExpr en;
-    op->multiply(*this, e, en, scale);
-    return en;
+    Mat_கோவை en;
+    op->multiply(*இது, e, en, scale);
+    திரும்பு en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_கோவை Mat_கோவை::mul(மாறிலி Mat& m, இரட்டை scale) மாறிலி
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
-    return e;
+    Mat_கோவை e;
+    op->multiply(*இது, Mat_கோவை(m), e, scale);
+    திரும்பு e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_கோவை operator + (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, a, b, 1, 1);
+    திரும்பு e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_கோவை operator + (மாறிலி Mat& a, மாறிலி Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, a, Mat(), 1, 0, s);
+    திரும்பு e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_கோவை operator + (மாறிலி Scalar& s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, a, Mat(), 1, 0, s);
+    திரும்பு e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_கோவை operator + (மாறிலி Mat_கோவை& e, மாறிலி Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_கோவை en;
+    e.op->add(e, Mat_கோவை(m), en);
+    திரும்பு en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_கோவை operator + (மாறிலி Mat& m, மாறிலி Mat_கோவை& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_கோவை en;
+    e.op->add(e, Mat_கோவை(m), en);
+    திரும்பு en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_கோவை operator + (மாறிலி Mat_கோவை& e, மாறிலி Scalar& s)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e.op->add(e, s, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_கோவை operator + (மாறிலி Scalar& s, மாறிலி Mat_கோவை& e)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e.op->add(e, s, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_கோவை operator + (மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e1.op->add(e1, e2, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_கோவை operator - (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, a, b, 1, -1);
+    திரும்பு e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_கோவை operator - (மாறிலி Mat& a, மாறிலி Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, a, Mat(), 1, 0, -s);
+    திரும்பு e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_கோவை operator - (மாறிலி Scalar& s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, a, Mat(), -1, 0, s);
+    திரும்பு e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_கோவை operator - (மாறிலி Mat_கோவை& e, மாறிலி Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
-    return en;
+    Mat_கோவை en;
+    e.op->subtract(e, Mat_கோவை(m), en);
+    திரும்பு en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_கோவை operator - (மாறிலி Mat& m, மாறிலி Mat_கோவை& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
-    return en;
+    Mat_கோவை en;
+    e.op->subtract(Mat_கோவை(m), e, en);
+    திரும்பு en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_கோவை operator - (மாறிலி Mat_கோவை& e, மாறிலி Scalar& s)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e.op->add(e, -s, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_கோவை operator - (மாறிலி Scalar& s, மாறிலி Mat_கோவை& e)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e.op->subtract(s, e, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_கோவை operator - (மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e1.op->subtract(e1, e2, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_கோவை operator - (மாறிலி Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, m, Mat(), -1, 0);
+    திரும்பு e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_கோவை operator - (மாறிலி Mat_கோவை& e)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e.op->subtract(Scalar(0), e, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_கோவை operator * (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_GEMM::make_கோவை(e, 0, a, b);
+    திரும்பு e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_கோவை operator * (மாறிலி Mat& a, இரட்டை s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, a, Mat(), s, 0);
+    திரும்பு e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_கோவை operator * (இரட்டை s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, a, Mat(), s, 0);
+    திரும்பு e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_கோவை operator * (மாறிலி Mat_கோவை& e, மாறிலி Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
-    return en;
+    Mat_கோவை en;
+    e.op->matmul(e, Mat_கோவை(m), en);
+    திரும்பு en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_கோவை operator * (மாறிலி Mat& m, மாறிலி Mat_கோவை& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
-    return en;
+    Mat_கோவை en;
+    e.op->matmul(Mat_கோவை(m), e, en);
+    திரும்பு en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_கோவை operator * (மாறிலி Mat_கோவை& e, இரட்டை s)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e.op->multiply(e, s, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_கோவை operator * (இரட்டை s, மாறிலி Mat_கோவை& e)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e.op->multiply(e, s, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_கோவை operator * (மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e1.op->matmul(e1, e2, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_கோவை operator / (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '/', a, b);
+    திரும்பு e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_கோவை operator / (மாறிலி Mat& a, இரட்டை s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
-    return e;
+    Mat_கோவை e;
+    MatOp_AddEx::make_கோவை(e, a, Mat(), 1./s, 0);
+    திரும்பு e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_கோவை operator / (இரட்டை s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '/', a, Mat(), s);
+    திரும்பு e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_கோவை operator / (மாறிலி Mat_கோவை& e, மாறிலி Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
-    return en;
+    Mat_கோவை en;
+    e.op->divide(e, Mat_கோவை(m), en);
+    திரும்பு en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_கோவை operator / (மாறிலி Mat& m, மாறிலி Mat_கோவை& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
-    return en;
+    Mat_கோவை en;
+    e.op->divide(Mat_கோவை(m), e, en);
+    திரும்பு en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_கோவை operator / (மாறிலி Mat_கோவை& e, இரட்டை s)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e.op->multiply(e, 1./s, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_கோவை operator / (இரட்டை s, மாறிலி Mat_கோவை& e)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e.op->divide(s, e, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_கோவை operator / (மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2)
 {
-    MatExpr en;
+    Mat_கோவை en;
     e1.op->divide(e1, e2, en);
-    return en;
+    திரும்பு en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_கோவை operator < (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_LT, a, b);
+    திரும்பு e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_கோவை operator < (மாறிலி Mat& a, இரட்டை s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_LT, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_கோவை operator < (இரட்டை s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_GT, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_கோவை operator <= (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_LE, a, b);
+    திரும்பு e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_கோவை operator <= (மாறிலி Mat& a, இரட்டை s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_LE, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_கோவை operator <= (இரட்டை s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_GE, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_கோவை operator == (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_EQ, a, b);
+    திரும்பு e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_கோவை operator == (மாறிலி Mat& a, இரட்டை s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_EQ, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_கோவை operator == (இரட்டை s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_EQ, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_கோவை operator != (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_NE, a, b);
+    திரும்பு e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_கோவை operator != (மாறிலி Mat& a, இரட்டை s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_NE, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_கோவை operator != (இரட்டை s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_NE, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_கோவை operator >= (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_GE, a, b);
+    திரும்பு e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_கோவை operator >= (மாறிலி Mat& a, இரட்டை s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_GE, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_கோவை operator >= (இரட்டை s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_LE, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_கோவை operator > (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_GT, a, b);
+    திரும்பு e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_கோவை operator > (மாறிலி Mat& a, இரட்டை s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_GT, a, s);
+    திரும்பு e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_கோவை operator > (இரட்டை s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Cmp::make_கோவை(e, cv::CMP_LT, a, s);
+    திரும்பு e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_கோவை min(மாறிலி Mat& a, மாறிலி Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, 'm', a, b);
+    திரும்பு e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_கோவை min(மாறிலி Mat& a, இரட்டை s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, 'n', a, s);
+    திரும்பு e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_கோவை min(இரட்டை s, மாறிலி Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, 'n', a, s);
+    திரும்பு e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_கோவை max(மாறிலி Mat& a, மாறிலி Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, 'M', a, b);
+    திரும்பு e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_கோவை max(மாறிலி Mat& a, இரட்டை s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, 'N', a, s);
+    திரும்பு e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_கோவை max(இரட்டை s, மாறிலி Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, 'N', a, s);
+    திரும்பு e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_கோவை operator & (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '&', a, b);
+    திரும்பு e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_கோவை operator & (மாறிலி Mat& a, மாறிலி Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '&', a, s);
+    திரும்பு e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_கோவை operator & (மாறிலி Scalar& s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '&', a, s);
+    திரும்பு e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_கோவை operator | (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '|', a, b);
+    திரும்பு e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_கோவை operator | (மாறிலி Mat& a, மாறிலி Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '|', a, s);
+    திரும்பு e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_கோவை operator | (மாறிலி Scalar& s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '|', a, s);
+    திரும்பு e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_கோவை operator ^ (மாறிலி Mat& a, மாறிலி Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '^', a, b);
+    திரும்பு e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_கோவை operator ^ (மாறிலி Mat& a, மாறிலி Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '^', a, s);
+    திரும்பு e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_கோவை operator ^ (மாறிலி Scalar& s, மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '^', a, s);
+    திரும்பு e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_கோவை operator ~(மாறிலி Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '~', a, Scalar());
+    திரும்பு e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_கோவை abs(மாறிலி Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, 'a', a, Scalar());
+    திரும்பு e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_கோவை abs(மாறிலி Mat_கோவை& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
+    Mat_கோவை en;
     e.op->abs(e, en);
-    return en;
+    திரும்பு en;
 }
 
 
-Size MatExpr::size() const
+Size Mat_கோவை::size() மாறிலி
 {
-    if( isT(*this) || isInv(*this) )
-        return Size(a.rows, a.cols);
-    if( isSolve(*this) )
-        return Size(b.cols, a.cols);
-    if( isInitializer(*this) )
-        return a.size();
-    return op ? op->size(*this) : Size();
+    எனில்( isT(*இது) || isInv(*இது) )
+        திரும்பு Size(a.rows, a.cols);
+    எனில்( isSolve(*இது) )
+        திரும்பு Size(b.cols, a.cols);
+    எனில்( isInitializer(*இது) )
+        திரும்பு a.size();
+    திரும்பு op ? op->size(*இது) : Size();
 }
 
 
-int MatExpr::type() const
+முழு Mat_கோவை::type() மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( isInitializer(*this) )
-        return a.type();
-    if( isCmp(*this) )
-        return CV_MAKETYPE(CV_8U, a.channels());
-    return op ? op->type(*this) : -1;
+    எனில்( isInitializer(*இது) )
+        திரும்பு a.type();
+    எனில்( isCmp(*இது) )
+        திரும்பு CV_MAKETYPE(CV_8U, a.channels());
+    திரும்பு op ? op->type(*இது) : -1;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+வெறுமை MatOp_Identity::assign(மாறிலி Mat_கோவை& e, Mat& m, முழு _type) மாறிலி
 {
-    if( _type == -1 || _type == e.a.type() )
+    எனில்( _type == -1 || _type == e.a.type() )
         m = e.a;
-    else
+    இல்லையெனில்
     {
         CV_Assert( CV_MAT_CN(_type) == e.a.channels() );
         e.a.convertTo(m, _type);
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+உள்வரி வெறுமை MatOp_Identity::make_கோவை(Mat_கோவை& res, மாறிலி Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_கோவை(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+வெறுமை MatOp_AddEx::assign(மாறிலி Mat_கோவை& e, Mat& m, முழு _type) மாறிலி
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
-    if( e.b.data )
+    எனில்( e.b.data )
     {
-        if( e.s == Scalar() || !e.s.isReal() )
+        எனில்( e.s == Scalar() || !e.s.isReal() )
         {
-            if( e.alpha == 1 )
+            எனில்( e.alpha == 1 )
             {
-                if( e.beta == 1 )
+                எனில்( e.beta == 1 )
                     cv::add(e.a, e.b, dst);
-                else if( e.beta == -1 )
+                இல்லையெனில் எனில்( e.beta == -1 )
                     cv::subtract(e.a, e.b, dst);
-                else
+                இல்லையெனில்
                     cv::scaleAdd(e.b, e.beta, e.a, dst);
             }
-            else if( e.beta == 1 )
+            இல்லையெனில் எனில்( e.beta == 1 )
             {
-                if( e.alpha == -1 )
+                எனில்( e.alpha == -1 )
                     cv::subtract(e.b, e.a, dst);
-                else
+                இல்லையெனில்
                     cv::scaleAdd(e.a, e.alpha, e.b, dst);
             }
-            else
+            இல்லையெனில்
                 cv::addWeighted(e.a, e.alpha, e.b, e.beta, 0, dst);
 
-            if( !e.s.isReal() )
+            எனில்( !e.s.isReal() )
                 cv::add(dst, e.s, dst);
         }
-        else
+        இல்லையெனில்
         {
-            if (e.a.channels() > 1)
-                CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+            எனில் (e.a.channels() > 1)
+                CV_LOG_ONCE_WARNING(வெற்று, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                           "https://github.com/opencv/opencv/issues/16739");
             cv::addWeighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
         }
     }
-    else if( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
+    இல்லையெனில் எனில்( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
     {
-        if (e.a.channels() > 1 && e.s[0] != 0.0)
-            CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+        எனில் (e.a.channels() > 1 && e.s[0] != 0.0)
+            CV_LOG_ONCE_WARNING(வெற்று, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                       "https://github.com/opencv/opencv/issues/16739");
         e.a.convertTo(m, _type, e.alpha, e.s[0]);
-        return;
+        திரும்பு;
     }
-    else if( e.alpha == 1 )
+    இல்லையெனில் எனில்( e.alpha == 1 )
         cv::add(e.a, e.s, dst);
-    else if( e.alpha == -1 )
+    இல்லையெனில் எனில்( e.alpha == -1 )
         cv::subtract(e.s, e.a, dst);
-    else
+    இல்லையெனில்
     {
         e.a.convertTo(dst, e.a.type(), e.alpha);
         cv::add(dst, e.s, dst);
     }
 
-    if( dst.data != m.data )
+    எனில்( dst.data != m.data )
         dst.convertTo(m, m.type());
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+வெறுமை MatOp_AddEx::add(மாறிலி Mat_கோவை& e, மாறிலி Scalar& s, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+வெறுமை MatOp_AddEx::subtract(மாறிலி Scalar& s, மாறிலி Mat_கோவை& e, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+வெறுமை MatOp_AddEx::multiply(மாறிலி Mat_கோவை& e, இரட்டை s, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,160 +1379,160 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+வெறுமை MatOp_AddEx::divide(இரட்டை s, மாறிலி Mat_கோவை& e, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
-    else
+    எனில்( isScaled(e) )
+        MatOp_Bin::make_கோவை(res, '/', e.a, Mat(), s/e.alpha);
+    இல்லையெனில்
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+வெறுமை MatOp_AddEx::transpose(மாறிலி Mat_கோவை& e, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
-    else
+    எனில்( isScaled(e) )
+        MatOp_T::make_கோவை(res, e.a, e.alpha);
+    இல்லையெனில்
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+வெறுமை MatOp_AddEx::abs(மாறிலி Mat_கோவை& e, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
-    else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
-    else
+    எனில்( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
+        MatOp_Bin::make_கோவை(res, 'a', e.a, -e.s*e.alpha);
+    இல்லையெனில் எனில்( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
+        MatOp_Bin::make_கோவை(res, 'a', e.a, e.b);
+    இல்லையெனில்
         MatOp::abs(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+உள்வரி வெறுமை MatOp_AddEx::make_கோவை(Mat_கோவை& res, மாறிலி Mat& a, மாறிலி Mat& b, இரட்டை alpha, இரட்டை beta, மாறிலி Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_கோவை(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+வெறுமை MatOp_Bin::assign(மாறிலி Mat_கோவை& e, Mat& m, முழு _type) மாறிலி
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
 
-    if( e.flags == '*' )
+    எனில்( e.flags == '*' )
         cv::multiply(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && e.b.data )
+    இல்லையெனில் எனில்( e.flags == '/' && e.b.data )
         cv::divide(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && !e.b.data )
+    இல்லையெனில் எனில்( e.flags == '/' && !e.b.data )
         cv::divide(e.alpha, e.a, dst );
-    else if( e.flags == '&' && e.b.data )
+    இல்லையெனில் எனில்( e.flags == '&' && e.b.data )
         bitwise_and(e.a, e.b, dst);
-    else if( e.flags == '&' && !e.b.data )
+    இல்லையெனில் எனில்( e.flags == '&' && !e.b.data )
         bitwise_and(e.a, e.s, dst);
-    else if( e.flags == '|' && e.b.data )
+    இல்லையெனில் எனில்( e.flags == '|' && e.b.data )
         bitwise_or(e.a, e.b, dst);
-    else if( e.flags == '|' && !e.b.data )
+    இல்லையெனில் எனில்( e.flags == '|' && !e.b.data )
         bitwise_or(e.a, e.s, dst);
-    else if( e.flags == '^' && e.b.data )
+    இல்லையெனில் எனில்( e.flags == '^' && e.b.data )
         bitwise_xor(e.a, e.b, dst);
-    else if( e.flags == '^' && !e.b.data )
+    இல்லையெனில் எனில்( e.flags == '^' && !e.b.data )
         bitwise_xor(e.a, e.s, dst);
-    else if( e.flags == '~' && !e.b.data )
+    இல்லையெனில் எனில்( e.flags == '~' && !e.b.data )
         bitwise_not(e.a, dst);
-    else if( e.flags == 'm' )
+    இல்லையெனில் எனில்( e.flags == 'm' )
         cv::min(e.a, e.b, dst);
-    else if( e.flags == 'n' )
+    இல்லையெனில் எனில்( e.flags == 'n' )
         cv::min(e.a, e.s[0], dst);
-    else if( e.flags == 'M' )
+    இல்லையெனில் எனில்( e.flags == 'M' )
         cv::max(e.a, e.b, dst);
-    else if( e.flags == 'N' )
+    இல்லையெனில் எனில்( e.flags == 'N' )
         cv::max(e.a, e.s[0], dst);
-    else if( e.flags == 'a' && e.b.data )
+    இல்லையெனில் எனில்( e.flags == 'a' && e.b.data )
         cv::absdiff(e.a, e.b, dst);
-    else if( e.flags == 'a' && !e.b.data )
+    இல்லையெனில் எனில்( e.flags == 'a' && !e.b.data )
         cv::absdiff(e.a, e.s, dst);
-    else
+    இல்லையெனில்
         CV_Error(cv::Error::StsError, "Unknown operation");
 
-    if( dst.data != m.data )
+    எனில்( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+வெறுமை MatOp_Bin::multiply(மாறிலி Mat_கோவை& e, இரட்டை s, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '*' || e.flags == '/' )
+    எனில்( e.flags == '*' || e.flags == '/' )
     {
         res = e;
         res.alpha *= s;
     }
-    else
+    இல்லையெனில்
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+வெறுமை MatOp_Bin::divide(இரட்டை s, மாறிலி Mat_கோவை& e, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
-    else
+    எனில்( e.flags == '/' && (!e.b.data || e.beta == 0) )
+        MatOp_AddEx::make_கோவை(res, e.a, Mat(), s/e.alpha, 0);
+    இல்லையெனில்
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+உள்வரி வெறுமை MatOp_Bin::make_கோவை(Mat_கோவை& res, எழுத்து op, மாறிலி Mat& a, மாறிலி Mat& b, இரட்டை scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_கோவை(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+உள்வரி வெறுமை MatOp_Bin::make_கோவை(Mat_கோவை& res, எழுத்து op, மாறிலி Mat& a, மாறிலி Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_கோவை(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+வெறுமை MatOp_Cmp::assign(மாறிலி Mat_கோவை& e, Mat& m, முழு _type) மாறிலி
 {
     Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
 
-    if( e.b.data )
+    எனில்( e.b.data )
         cv::compare(e.a, e.b, dst, e.flags);
-    else
+    இல்லையெனில்
         cv::compare(e.a, e.alpha, dst, e.flags);
 
-    if( dst.data != m.data )
+    எனில்( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+உள்வரி வெறுமை MatOp_Cmp::make_கோவை(Mat_கோவை& res, முழு cmpop, மாறிலி Mat& a, மாறிலி Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_கோவை(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+உள்வரி வெறுமை MatOp_Cmp::make_கோவை(Mat_கோவை& res, முழு cmpop, மாறிலி Mat& a, இரட்டை alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_கோவை(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+வெறுமை MatOp_T::assign(மாறிலி Mat_கோவை& e, Mat& m, முழு _type) மாறிலி
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::transpose(e.a, dst);
 
-    if( dst.data != m.data || e.alpha != 1 )
+    எனில்( dst.data != m.data || e.alpha != 1 )
         dst.convertTo(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+வெறுமை MatOp_T::multiply(மாறிலி Mat_கோவை& e, இரட்டை s, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,71 +1540,71 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+வெறுமை MatOp_T::transpose(மாறிலி Mat_கோவை& e, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
-    else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+    எனில்( e.alpha == 1 )
+        MatOp_Identity::make_கோவை(res, e.a);
+    இல்லையெனில்
+        MatOp_AddEx::make_கோவை(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+உள்வரி வெறுமை MatOp_T::make_கோவை(Mat_கோவை& res, மாறிலி Mat& a, இரட்டை alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_கோவை(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+வெறுமை MatOp_GEMM::assign(மாறிலி Mat_கோவை& e, Mat& m, முழு _type) மாறிலி
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::gemm(e.a, e.b, e.alpha, e.c, e.beta, dst, e.flags);
-    if( dst.data != m.data )
+    எனில்( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+வெறுமை MatOp_GEMM::add(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    தருக்க i1 = isIdentity(e1), i2 = isIdentity(e2);
+    இரட்டை alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    எனில்( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_கோவை(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    இல்லையெனில் எனில்( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_கோவை(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    இல்லையெனில் எனில்( இது == e2.op )
         MatOp::add(e1, e2, res);
-    else
+    இல்லையெனில்
         e2.op->add(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+வெறுமை MatOp_GEMM::subtract(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    தருக்க i1 = isIdentity(e1), i2 = isIdentity(e2);
+    இரட்டை alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    எனில்( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_கோவை(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    இல்லையெனில் எனில்( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_கோவை(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    இல்லையெனில் எனில்( இது == e2.op )
         MatOp::subtract(e1, e2, res);
-    else
+    இல்லையெனில்
         e2.op->subtract(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+வெறுமை MatOp_GEMM::multiply(மாறிலி Mat_கோவை& e, இரட்டை s, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+வெறுமை MatOp_GEMM::transpose(மாறிலி Mat_கோவை& e, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,74 +1624,74 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                                 double alpha, const Mat& c, double beta)
+உள்வரி வெறுமை MatOp_GEMM::make_கோவை(Mat_கோவை& res, முழு flags, மாறிலி Mat& a, மாறிலி Mat& b,
+                                 இரட்டை alpha, மாறிலி Mat& c, இரட்டை beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_கோவை(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+வெறுமை MatOp_Invert::assign(மாறிலி Mat_கோவை& e, Mat& m, முழு _type) மாறிலி
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::invert(e.a, dst, e.flags);
-    if( dst.data != m.data )
+    எனில்( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+வெறுமை MatOp_Invert::matmul(மாறிலி Mat_கோவை& e1, மாறிலி Mat_கோவை& e2, Mat_கோவை& res) மாறிலி
 {
-    if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
-    else if( this == e2.op )
+    எனில்( isInv(e1) && isIdentity(e2) )
+        MatOp_Solve::make_கோவை(res, e1.flags, e1.a, e2.a);
+    இல்லையெனில் எனில்( இது == e2.op )
         MatOp::matmul(e1, e2, res);
-    else
+    இல்லையெனில்
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+உள்வரி வெறுமை MatOp_Invert::make_கோவை(Mat_கோவை& res, முழு method, மாறிலி Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_கோவை(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+வெறுமை MatOp_Solve::assign(மாறிலி Mat_கோவை& e, Mat& m, முழு _type) மாறிலி
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::solve(e.a, e.b, dst, e.flags);
-    if( dst.data != m.data )
+    எனில்( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+உள்வரி வெறுமை MatOp_Solve::make_கோவை(Mat_கோவை& res, முழு method, மாறிலி Mat& a, மாறிலி Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_கோவை(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+வெறுமை MatOp_Initializer::assign(மாறிலி Mat_கோவை& e, Mat& m, முழு _type) மாறிலி
 {
-    if( _type == -1 )
+    எனில்( _type == -1 )
         _type = e.a.type();
 
     m.create(e.a.size, _type);
 
-    if( e.flags == 'I' && e.a.dims <= 2 )
+    எனில்( e.flags == 'I' && e.a.dims <= 2 )
         setIdentity(m, Scalar(e.alpha));
-    else if( e.flags == '0' )
+    இல்லையெனில் எனில்( e.flags == '0' )
         m = Scalar();
-    else if( e.flags == '1' )
+    இல்லையெனில் எனில்( e.flags == '1' )
         m = Scalar(e.alpha);
-    else
+    இல்லையெனில்
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+வெறுமை MatOp_Initializer::multiply(மாறிலி Mat_கோவை& e, இரட்டை s, Mat_கோவை& res) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+உள்வரி வெறுமை MatOp_Initializer::make_கோவை(Mat_கோவை& res, முழு method, Size sz, முழு type, இரட்டை alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_கோவை(getGlobalMatOpInitializer(), method, Mat(sz, type, (வெறுமை*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+உள்வரி வெறுமை MatOp_Initializer::make_கோவை(Mat_கோவை& res, முழு method, முழு ndims, மாறிலி முழு* sizes, முழு type, இரட்டை alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_கோவை(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (வெறுமை*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_கோவை Mat::t() மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
-    return e;
+    checkOperandsExist(*இது);
+    Mat_கோவை e;
+    MatOp_T::make_கோவை(e, *இது);
+    திரும்பு e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_கோவை Mat::inv(முழு method) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
-    return e;
+    Mat_கோவை e;
+    MatOp_Invert::make_கோவை(e, method, *இது);
+    திரும்பு e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_கோவை Mat::mul(உள்ளீடு_Array m, இரட்டை scale) மாறிலி
 {
     CV_INSTRUMENT_REGION();
 
@@ -1740,105 +1740,105 @@ MatExpr Mat::mul(InputArray m, double scale) const
     // a non-owning view of caller memory (e.g. a scalar bound to _InputArray(const double&),
     // a Matx or a Vec) that the returned MatExpr can outlive, so snapshot it.
     // See https://github.com/opencv/opencv/issues/23577
-    if( !m.isMat() && !m.isUMat() )
+    எனில்( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
-    return e;
+    Mat_கோவை e;
+    MatOp_Bin::make_கோவை(e, '*', *இது, b, scale);
+    திரும்பு e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_கோவை Mat::zeros(முழு rows, முழு cols, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, '0', Size(cols, rows), type);
+    திரும்பு e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_கோவை Mat::zeros(Size size, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, '0', size, type);
+    திரும்பு e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_கோவை Mat::zeros(முழு ndims, மாறிலி முழு* sizes, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, '0', ndims, sizes, type);
+    திரும்பு e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_கோவை Mat::zeros(மாறிலி MatShape& shape, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, '0', shape.dims, shape.p, type);
+    திரும்பு e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_கோவை Mat::ones(முழு rows, முழு cols, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, '1', Size(cols, rows), type);
+    திரும்பு e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_கோவை Mat::ones(Size size, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, '1', size, type);
+    திரும்பு e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_கோவை Mat::ones(முழு ndims, மாறிலி முழு* sizes, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, '1', ndims, sizes, type);
+    திரும்பு e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_கோவை Mat::ones(மாறிலி MatShape& shape, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, '1', shape.dims, shape.p, type);
+    திரும்பு e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_கோவை Mat::eye(முழு rows, முழு cols, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, 'I', Size(cols, rows), type);
+    திரும்பு e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_கோவை Mat::eye(Size size, முழு type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
-    return e;
+    Mat_கோவை e;
+    MatOp_Initializer::make_கோவை(e, 'I', size, type);
+    திரும்பு e;
 }
 
-void MatExpr::swap(MatExpr& other)
+வெறுமை Mat_கோவை::swap(Mat_கோவை& other)
 {
     using std::swap;
 
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+உள்ளீடு_Array_2::உள்ளீடு_Array_2(மாறிலி Mat_கோவை& கோவை)
 {
-    if (!isIdentity(expr))
+    எனில் (!isIdentity(கோவை))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat result = கோவை;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_கோவை result_கோவை(result);
+        swap(const_cast<Mat_கோவை&>(கோவை), result_கோவை);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(isIdentity(கோவை));
+    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &கோவை.a);
 }
 
 } // cv::

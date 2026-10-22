@@ -6,100 +6,100 @@
 // Not a standalone header, part of va_intel.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
-#include "opencv2/core/utils/configuration.private.hpp"
+#அந்தர்பாவ "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
+#அந்தர்பாவ "opencv2/core/utils/configuration.private.hpp"
 
-namespace cv { namespace detail {
+நாமாகாஶ cv { நாமாகாஶ detail {
 
-typedef VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
-typedef VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
-typedef VAStatus (*FN_vaMapBuffer)(VADisplay dpy, VABufferID buf_id, void **pbuf);
-typedef VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_target);
-typedef VAStatus (*FN_vaUnmapBuffer)(VADisplay dpy, VABufferID buf_id);
-typedef int (*FN_vaMaxNumImageFormats)(VADisplay dpy);
-typedef VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, int *num_formats);
-typedef VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, int width, int height, VAImage *image);
-typedef VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, int src_x, int src_y, unsigned int src_width, unsigned int src_height, int dest_x, int dest_y, unsigned int dest_width, unsigned int dest_height);
-typedef VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, int x, int y, unsigned int width, unsigned int height, VAImageID image);
+வகைவரை VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
+வகைவரை VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
+வகைவரை VAStatus (*FN_vaMapBuffer)(VADisplay dpy, VABufferID buf_id, வெறுமை **pbuf);
+வகைவரை VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_target);
+வகைவரை VAStatus (*FN_vaUnmapBuffer)(VADisplay dpy, VABufferID buf_id);
+வகைவரை முழு (*FN_va_Max_இலக்கம்_Image_Formats)(VADisplay dpy);
+வகைவரை VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, முழு *இலக்கம்_formats);
+வகைவரை VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, முழு width, முழு height, VAImage *image);
+வகைவரை VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, முழு src_x, முழு src_y, unsigned முழு src_width, unsigned முழு src_height, முழு dest_x, முழு dest_y, unsigned முழு dest_width, unsigned முழு dest_height);
+வகைவரை VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, முழு x, முழு y, unsigned முழு width, unsigned முழு height, VAImageID image);
 
-static FN_vaDeriveImage fn_vaDeriveImage = NULL;
-static FN_vaDestroyImage fn_vaDestroyImage = NULL;
-static FN_vaMapBuffer fn_vaMapBuffer = NULL;
-static FN_vaSyncSurface fn_vaSyncSurface = NULL;
-static FN_vaUnmapBuffer fn_vaUnmapBuffer = NULL;
-static FN_vaMaxNumImageFormats fn_vaMaxNumImageFormats = NULL;
-static FN_vaQueryImageFormats fn_vaQueryImageFormats = NULL;
-static FN_vaCreateImage fn_vaCreateImage = NULL;
-static FN_vaPutImage fn_vaPutImage = NULL;
-static FN_vaGetImage fn_vaGetImage = NULL;
+நிலையான FN_vaDeriveImage fn_vaDeriveImage = வெற்று;
+நிலையான FN_vaDestroyImage fn_vaDestroyImage = வெற்று;
+நிலையான FN_vaMapBuffer fn_vaMapBuffer = வெற்று;
+நிலையான FN_vaSyncSurface fn_vaSyncSurface = வெற்று;
+நிலையான FN_vaUnmapBuffer fn_vaUnmapBuffer = வெற்று;
+நிலையான FN_va_Max_இலக்கம்_Image_Formats fn_va_Max_இலக்கம்_Image_Formats = வெற்று;
+நிலையான FN_vaQueryImageFormats fn_vaQueryImageFormats = வெற்று;
+நிலையான FN_vaCreateImage fn_vaCreateImage = வெற்று;
+நிலையான FN_vaPutImage fn_vaPutImage = வெற்று;
+நிலையான FN_vaGetImage fn_vaGetImage = வெற்று;
 
 #define vaDeriveImage fn_vaDeriveImage
 #define vaDestroyImage fn_vaDestroyImage
 #define vaMapBuffer fn_vaMapBuffer
 #define vaSyncSurface fn_vaSyncSurface
 #define vaUnmapBuffer fn_vaUnmapBuffer
-#define vaMaxNumImageFormats fn_vaMaxNumImageFormats
+#define va_Max_இலக்கம்_Image_Formats fn_va_Max_இலக்கம்_Image_Formats
 #define vaQueryImageFormats fn_vaQueryImageFormats
 #define vaCreateImage fn_vaCreateImage
 #define vaPutImage fn_vaPutImage
 #define vaGetImage fn_vaGetImage
 
 
-static std::shared_ptr<cv::plugin::impl::DynamicLib> loadLibVA()
+நிலையான std::shared_ptr<cv::plugin::impl::DynamicLib> loadLibVA()
 {
     std::shared_ptr<cv::plugin::impl::DynamicLib> lib;
-    const std::string envPath = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
-    if (!envPath.empty())
+    மாறிலி std::string envPath = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
+    எனில் (!envPath.empty())
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(envPath);
-        return lib;
+        திரும்பு lib;
     }
-    static const char* const candidates[] = {
+    நிலையான மாறிலி எழுத்து* மாறிலி candidates[] = {
         "libva.so",
         "libva.so.2",
         "libva.so.1",
     };
-    for (int i = 0; i < 3; ++i)
+    க்கு (முழு i = 0; i < 3; ++i)
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(candidates[i]);
-        if (lib->isLoaded())
-            break;
+        எனில் (lib->isLoaded())
+            நிறுத்து;
     }
-    return lib;
+    திரும்பு lib;
 }
-static void init_libva()
+நிலையான வெறுமை init_libva()
 {
-    static bool initialized = false;
-    static auto library = loadLibVA();
-    if (!initialized)
+    நிலையான தருக்க initialized = பொய்;
+    நிலையான auto library = loadLibVA();
+    எனில் (!initialized)
     {
-        if (!library || !library->isLoaded())
+        எனில் (!library || !library->isLoaded())
         {
             library.reset();
             CV_Error(cv::Error::StsBadFunc, "OpenCV can't load VA library (libva)");
         }
         auto& lib = *library.get();
-#define VA_LOAD_SYMBOL(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.getSymbol(#name)); \
-        if (!fn_ ## name) \
+#define VA_LOAD_குறியீடு(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.get_குறியீடு(#name)); \
+        எனில் (!fn_ ## name) \
         { \
             library.reset(); \
-            initialized = true; \
+            initialized = உண்மை; \
             CV_Error_(cv::Error::StsBadFunc, ("OpenCV can't load VA library (libva), missing symbol: %s", #name)); \
         }
 
-        VA_LOAD_SYMBOL(vaDeriveImage);
-        VA_LOAD_SYMBOL(vaDestroyImage);
-        VA_LOAD_SYMBOL(vaMapBuffer);
-        VA_LOAD_SYMBOL(vaSyncSurface);
-        VA_LOAD_SYMBOL(vaUnmapBuffer);
-        VA_LOAD_SYMBOL(vaMaxNumImageFormats);
-        VA_LOAD_SYMBOL(vaQueryImageFormats);
-        VA_LOAD_SYMBOL(vaCreateImage);
-        VA_LOAD_SYMBOL(vaPutImage);
-        VA_LOAD_SYMBOL(vaGetImage);
-        initialized = true;
+        VA_LOAD_குறியீடு(vaDeriveImage);
+        VA_LOAD_குறியீடு(vaDestroyImage);
+        VA_LOAD_குறியீடு(vaMapBuffer);
+        VA_LOAD_குறியீடு(vaSyncSurface);
+        VA_LOAD_குறியீடு(vaUnmapBuffer);
+        VA_LOAD_குறியீடு(va_Max_இலக்கம்_Image_Formats);
+        VA_LOAD_குறியீடு(vaQueryImageFormats);
+        VA_LOAD_குறியீடு(vaCreateImage);
+        VA_LOAD_குறியீடு(vaPutImage);
+        VA_LOAD_குறியீடு(vaGetImage);
+        initialized = உண்மை;
     }
-    if (!library)
+    எனில் (!library)
         CV_Error(cv::Error::StsBadFunc, "OpenCV can't load/initialize VA library (libva)");
 }
 

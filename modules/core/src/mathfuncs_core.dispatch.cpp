@@ -2,15 +2,15 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "arithm_expr.hpp"      // ew::mathSpanEngine - the engine fallback for exp/log
+#அந்தர்பாவ "precomp.hpp"
+#அந்தர்பாவ "arithm_expr.hpp"      // ew::mathSpanEngine - the engine fallback for exp/log
 
-#include "mathfuncs_core.simd.hpp"
-#include "mathfuncs_core.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#அந்தர்பாவ "mathfuncs_core.simd.hpp"
+#அந்தர்பாவ "mathfuncs_core.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+நாமாகாஶ cv { நாமாகாஶ hal {
 
-void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, int len, bool angleInDegrees)
+வெறுமை cartToPolar32f(மாறிலி தசம* x, மாறிலி தசம* y, தசம* mag, தசம* angle, முழு len, தருக்க angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -20,7 +20,7 @@ void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, in
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void cartToPolar64f(const double* x, const double* y, double* mag, double* angle, int len, bool angleInDegrees)
+வெறுமை cartToPolar64f(மாறிலி இரட்டை* x, மாறிலி இரட்டை* y, இரட்டை* mag, இரட்டை* angle, முழு len, தருக்க angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -30,7 +30,7 @@ void cartToPolar64f(const double* x, const double* y, double* mag, double* angle
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart32f(const float* mag, const float* angle, float* x, float* y, int len, bool angleInDegrees)
+வெறுமை polarToCart32f(மாறிலி தசம* mag, மாறிலி தசம* angle, தசம* x, தசம* y, முழு len, தருக்க angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -40,7 +40,7 @@ void polarToCart32f(const float* mag, const float* angle, float* x, float* y, in
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart64f(const double* mag, const double* angle, double* x, double* y, int len, bool angleInDegrees)
+வெறுமை polarToCart64f(மாறிலி இரட்டை* mag, மாறிலி இரட்டை* angle, இரட்டை* x, இரட்டை* y, முழு len, தருக்க angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -50,7 +50,7 @@ void polarToCart64f(const double* mag, const double* angle, double* x, double* y
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+வெறுமை fastAtan32f(மாறிலி தசம *Y, மாறிலி தசம *X, தசம *angle, முழு len, தருக்க angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
@@ -60,7 +60,7 @@ void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool ang
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees)
+வெறுமை fastAtan64f(மாறிலி இரட்டை *Y, மாறிலி இரட்டை *X, இரட்டை *angle, முழு len, தருக்க angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -71,39 +71,39 @@ void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool 
 }
 
 // deprecated
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+வெறுமை fastAtan2(மாறிலி தசம *Y, மாறிலி தசம *X, தசம *angle, முழு len, தருக்க angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
     fastAtan32f(Y, X, angle, len, angleInDegrees);
 }
 
-void magnitude32f(const float* x, const float* y, float* mag, int len)
+வெறுமை magnitude32f(மாறிலி தசம* x, மாறிலி தசம* y, தசம* mag, முழு len)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(magnitude32f, cv_hal_magnitude32f, x, y, mag, len);
     // SSE42 performance issues
-    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::getIppTopFeatures() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_32f, x, y, mag, len) >= 0);
+    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::get_Ipp_உச்சி_Features() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_32f, x, y, mag, len) >= 0);
 
     CV_CPU_DISPATCH(magnitude32f, (x, y, mag, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void magnitude64f(const double* x, const double* y, double* mag, int len)
+வெறுமை magnitude64f(மாறிலி இரட்டை* x, மாறிலி இரட்டை* y, இரட்டை* mag, முழு len)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(magnitude64f, cv_hal_magnitude64f, x, y, mag, len);
     // SSE42 performance issues
-    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::getIppTopFeatures() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_64f, x, y, mag, len) >= 0);
+    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::get_Ipp_உச்சி_Features() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_64f, x, y, mag, len) >= 0);
 
     CV_CPU_DISPATCH(magnitude64f, (x, y, mag, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 
-void invSqrt32f(const float* src, float* dst, int len)
+வெறுமை invSqrt32f(மாறிலி தசம* src, தசம* dst, முழு len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -114,7 +114,7 @@ void invSqrt32f(const float* src, float* dst, int len)
 }
 
 
-void invSqrt64f(const double* src, double* dst, int len)
+வெறுமை invSqrt64f(மாறிலி இரட்டை* src, இரட்டை* dst, முழு len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -125,7 +125,7 @@ void invSqrt64f(const double* src, double* dst, int len)
 }
 
 
-void sqrt32f(const float* src, float* dst, int len)
+வெறுமை sqrt32f(மாறிலி தசம* src, தசம* dst, முழு len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -136,7 +136,7 @@ void sqrt32f(const float* src, float* dst, int len)
 }
 
 
-void sqrt64f(const double* src, double* dst, int len)
+வெறுமை sqrt64f(மாறிலி இரட்டை* src, இரட்டை* dst, முழு len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -146,7 +146,7 @@ void sqrt64f(const double* src, double* dst, int len)
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void exp32f(const float *src, float *dst, int n)
+வெறுமை exp32f(மாறிலி தசம *src, தசம *dst, முழு n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -156,7 +156,7 @@ void exp32f(const float *src, float *dst, int n)
                                                        // table implementation is removed)
 }
 
-void exp64f(const double *src, double *dst, int n)
+வெறுமை exp64f(மாறிலி இரட்டை *src, இரட்டை *dst, முழு n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -166,7 +166,7 @@ void exp64f(const double *src, double *dst, int n)
                                                        // table implementation is removed)
 }
 
-void log32f(const float *src, float *dst, int n)
+வெறுமை log32f(மாறிலி தசம *src, தசம *dst, முழு n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -176,7 +176,7 @@ void log32f(const float *src, float *dst, int n)
                                                        // table implementation is removed)
 }
 
-void log64f(const double *src, double *dst, int n)
+வெறுமை log64f(மாறிலி இரட்டை *src, இரட்டை *dst, முழு n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -189,60 +189,60 @@ void log64f(const double *src, double *dst, int n)
 //=============================================================================
 // for compatibility with 3.0
 
-void exp(const float* src, float* dst, int n)
+வெறுமை exp(மாறிலி தசம* src, தசம* dst, முழு n)
 {
     exp32f(src, dst, n);
 }
 
-void exp(const double* src, double* dst, int n)
+வெறுமை exp(மாறிலி இரட்டை* src, இரட்டை* dst, முழு n)
 {
     exp64f(src, dst, n);
 }
 
-void log(const float* src, float* dst, int n)
+வெறுமை log(மாறிலி தசம* src, தசம* dst, முழு n)
 {
     log32f(src, dst, n);
 }
 
-void log(const double* src, double* dst, int n)
+வெறுமை log(மாறிலி இரட்டை* src, இரட்டை* dst, முழு n)
 {
     log64f(src, dst, n);
 }
 
-void magnitude(const float* x, const float* y, float* dst, int n)
+வெறுமை magnitude(மாறிலி தசம* x, மாறிலி தசம* y, தசம* dst, முழு n)
 {
     magnitude32f(x, y, dst, n);
 }
 
-void magnitude(const double* x, const double* y, double* dst, int n)
+வெறுமை magnitude(மாறிலி இரட்டை* x, மாறிலி இரட்டை* y, இரட்டை* dst, முழு n)
 {
     magnitude64f(x, y, dst, n);
 }
 
-void sqrt(const float* src, float* dst, int len)
+வெறுமை sqrt(மாறிலி தசம* src, தசம* dst, முழு len)
 {
     sqrt32f(src, dst, len);
 }
 
-void sqrt(const double* src, double* dst, int len)
+வெறுமை sqrt(மாறிலி இரட்டை* src, இரட்டை* dst, முழு len)
 {
     sqrt64f(src, dst, len);
 }
 
-void invSqrt(const float* src, float* dst, int len)
+வெறுமை invSqrt(மாறிலி தசம* src, தசம* dst, முழு len)
 {
     invSqrt32f(src, dst, len);
 }
 
-void invSqrt(const double* src, double* dst, int len)
+வெறுமை invSqrt(மாறிலி இரட்டை* src, இரட்டை* dst, முழு len)
 {
     invSqrt64f(src, dst, len);
 }
 
 }} // namespace cv::hal::
 
-float cv::fastAtan2( float y, float x )
+தசம cv::fastAtan2( தசம y, தசம x )
 {
-    using namespace cv::hal;
+    using நாமாகாஶ cv::hal;
     CV_CPU_CALL_BASELINE(fastAtan2, (y, x));
 }

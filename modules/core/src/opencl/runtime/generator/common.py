@@ -1,5 +1,5 @@
-from __future__ import print_function
-import sys, os, re
+தஃ __future__ இறக்குமதி print_function
+இறக்குமதி sys, os, re
 
 #
 # Parser helpers
@@ -8,107 +8,107 @@ import sys, os, re
 def remove_comments(s):
     def replacer(match):
         s = match.group(0)
-        if s.startswith('/'):
-            return ""
-        else:
-            return s
+        எனில் s.startswith('/'):
+            திரும்பு ""
+        இல்லையெனில்:
+            திரும்பு s
     pattern = re.compile(
         r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
         re.DOTALL | re.MULTILINE
     )
-    return re.sub(pattern, replacer, s)
+    திரும்பு re.sub(pattern, replacer, s)
 
 
 def getTokens(s):
-    return re.findall(r'[a-z_A-Z0-9_]+|[^[a-z_A-Z0-9_ \n\r\t]', s)
+    திரும்பு re.findall(r'[a-z_A-Z0-9_]+|[^[a-z_A-Z0-9_ \n\r\t]', s)
 
 
 def getParameter(pos, tokens):
     deep = 0
     p = []
-    while True:
-        if pos >= len(tokens):
-            break
-        if (tokens[pos] == ')' or tokens[pos] == ',') and deep == 0:
-            if tokens[pos] == ')':
+    போது உண்மை:
+        எனில் pos >= len(tokens):
+            நிறுத்து
+        எனில் (tokens[pos] == ')' அல்லது tokens[pos] == ',') மற்றும் deep == 0:
+            எனில் tokens[pos] == ')':
                 pos = len(tokens)
-            else:
+            இல்லையெனில்:
                 pos += 1
-            break
-        if tokens[pos] == '(':
+            நிறுத்து
+        எனில் tokens[pos] == '(':
             deep += 1
-        if tokens[pos] == ')':
+        எனில் tokens[pos] == ')':
             deep -= 1
         p.append(tokens[pos])
         pos += 1
-    return (' '.join(p), pos)
+    திரும்பு (' '.join(p), pos)
 
 
 def getParameters(i, tokens):
-    assert tokens[i] == '('
+    ப்ரதிஜ்ஞா tokens[i] == '('
     i += 1
 
     params = []
-    while True:
-        if i >= len(tokens) or tokens[i] == ')':
-            break
+    போது உண்மை:
+        எனில் i >= len(tokens) அல்லது tokens[i] == ')':
+            நிறுத்து
 
         (param, i) = getParameter(i, tokens)
-        if len(param) > 0:
+        எனில் len(param) > 0:
             params.append(param)
-        else:
-            assert False
-            break
+        இல்லையெனில்:
+            ப்ரதிஜ்ஞா பொய்
+            நிறுத்து
 
-    if len(params) > 0 and params[0] == 'void':
+    எனில் len(params) > 0 மற்றும் params[0] == 'void':
         del params[0]
 
-    return params
+    திரும்பு params
 
 def postProcessParameters(fns):
-    fns.sort(key=lambda x: x['name'])
-    for fn in fns:
+    fns.sort(சாவி=பெயரிலி x: x['name'])
+    க்கு fn உள் fns:
         fn['params_full'] = list(fn['params'])
-        for i in range(len(fn['params'])):
+        க்கு i உள் range(len(fn['params'])):
             p = fn['params'][i]
-            if p.find('(') != -1:
+            எனில் p.find('(') != -1:
                 p = re.sub(r'\* *([a-zA-Z0-9_]*) ?\)', '*)', p, 1)
                 fn['params'][i] = p
-                continue
+                தொடர்
             parts = re.findall(r'[a-z_A-Z0-9]+|\*', p)
-            if len(parts) > 1:
-                if parts[-1].find('*') == -1:
+            எனில் len(parts) > 1:
+                எனில் parts[-1].find('*') == -1:
                     del parts[-1]
             fn['params'][i] = ' '.join(parts)
 
 def readFunctionFilter(fns, fileName):
-    try:
+    முயல்:
         f = open(fileName, "r")
-    except:
+    விதிவிலக்கு:
         print("ERROR: Can't open filter file: %s" % fileName)
-        return 0
+        திரும்பு 0
 
-    count = 0
-    while f:
-        line = f.readline()
-        if not line:
-            break
-        assert isinstance(line, str)
-        if line.startswith('#') or line.startswith('//'):
-            continue
-        line = line.replace('\n', '')
-        if len(line) == 0:
-            continue
-        found = False
-        for fn in fns:
-            if fn['name'] == line:
-                found = True
-                fn['enabled'] = True
-        if not found:
-            sys.exit("FATAL ERROR: Unknown function: %s" % line)
-        count = count + 1
+    மொத்தம்_2 = 0
+    போது f:
+        வரி = f.readline()
+        எனில் இல்லை வரி:
+            நிறுத்து
+        ப்ரதிஜ்ஞா isinstance(வரி, str)
+        எனில் வரி.startswith('#') அல்லது வரி.startswith('//'):
+            தொடர்
+        வரி = வரி.replace('\n', '')
+        எனில் len(வரி) == 0:
+            தொடர்
+        found = பொய்
+        க்கு fn உள் fns:
+            எனில் fn['name'] == வரி:
+                found = உண்மை
+                fn['enabled'] = உண்மை
+        எனில் இல்லை found:
+            sys.exit("FATAL ERROR: Unknown function: %s" % வரி)
+        மொத்தம்_2 = மொத்தம்_2 + 1
     f.close()
-    return count
+    திரும்பு மொத்தம்_2
 
 #
 # Generator helpers
@@ -116,11 +116,11 @@ def readFunctionFilter(fns, fileName):
 
 def outputToString(f):
     def wrapped(*args, **kwargs):
-        from io import StringIO
+        தஃ io இறக்குமதி StringIO
         old_stdout = sys.stdout
         sys.stdout = str_stdout = StringIO()
         res = f(*args, **kwargs)
-        assert res is None
+        ப்ரதிஜ்ஞா res is None
         sys.stdout = old_stdout
         result = str_stdout.getvalue()
         result = re.sub(r'([^\n /]) [ ]+', r'\1 ', result)  # don't remove spaces at start of line
@@ -128,36 +128,36 @@ def outputToString(f):
         result = re.sub(r' \*', '*', result)
         result = re.sub(r'\( ', '(', result)
         result = re.sub(r' \)', ')', result)
-        return result
-    return wrapped
+        திரும்பு result
+    திரும்பு wrapped
 
 @outputToString
 def generateFilterNames(fns):
-    for fn in fns:
-        print('%s%s' % ('' if 'enabled' in fn else '//', fn['name']))
+    க்கு fn உள் fns:
+        print('%s%s' % ('' எனில் 'enabled' உள் fn இல்லையெனில் '//', fn['name']))
     print('#total %d' % len(fns))
 
 callback_check = re.compile(r'([^\(]*\(.*)(\* *)(\).*\(.*\))')
 
 def getTypeWithParam(t, p):
-    if callback_check.match(t):
-        return callback_check.sub(r'\1 *' + p + r'\3', t)
-    return t + ' ' + p
+    எனில் callback_check.match(t):
+        திரும்பு callback_check.sub(r'\1 *' + p + r'\3', t)
+    திரும்பு t + ' ' + p
 
 @outputToString
 def generateStructDefinitions(fns, lprefix='opencl_fn', enumprefix='OPENCL_FN'):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
+    க்கு fn உள் fns:
+        commentStr = '' எனில் 'enabled' உள் fn இல்லையெனில் '//'
         decl_args = []
-        for (i, t) in enumerate(fn['params']):
+        க்கு (i, t) உள் enumerate(fn['params']):
             decl_args.append(getTypeWithParam(t, 'p%d' % (i+1)))
         decl_args_str = '(' + (', '.join(decl_args)) + ')'
         print('%s%s%d(%s_%s, %s, %s)' % \
              (commentStr, lprefix, len(fn['params']), enumprefix, fn['name'], \
              ' '.join(fn['ret']), decl_args_str))
         print(commentStr + ('%s%s (%s *%s)(%s) =\n%s        %s_%s_switch_fn;' % \
-            ((' '.join(fn['modifiers'] + ' ') if len(fn['modifiers']) > 0 else ''),
+            ((' '.join(fn['modifiers'] + ' ') எனில் len(fn['modifiers']) > 0 இல்லையெனில் ''),
              ' '.join(fn['ret']), ' '.join(fn['calling']), fn['name'], ', '.join(fn['params']), \
              commentStr, enumprefix, fn['name'])))
         print(commentStr + ('static const struct DynamicFnEntry %s_definition = { "%s", (void**)&%s};' % (fn['name'], fn['name'], fn['name'])))
@@ -166,14 +166,14 @@ def generateStructDefinitions(fns, lprefix='opencl_fn', enumprefix='OPENCL_FN'):
 @outputToString
 def generateStaticDefinitions(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
+    க்கு fn உள் fns:
+        commentStr = '' எனில் 'enabled' உள் fn இல்லையெனில் '//'
         decl_args = []
-        for (i, t) in enumerate(fn['params']):
+        க்கு (i, t) உள் enumerate(fn['params']):
             decl_args.append(getTypeWithParam(t, 'p%d' % (i+1)))
         decl_args_str = '(' + (', '.join(decl_args)) + ')'
         print(commentStr + ('CL_RUNTIME_EXPORT %s%s (%s *%s_pfn)(%s) = %s;' % \
-            ((' '.join(fn['modifiers'] + ' ') if len(fn['modifiers']) > 0 else ''),
+            ((' '.join(fn['modifiers'] + ' ') எனில் len(fn['modifiers']) > 0 இல்லையெனில் ''),
              ' '.join(fn['ret']), ' '.join(fn['calling']), fn['name'], ', '.join(fn['params']), \
              fn['name'])))
 
@@ -181,52 +181,52 @@ def generateStaticDefinitions(fns):
 def generateListOfDefinitions(fns, name='opencl_fn_list'):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
     print('static const struct DynamicFnEntry* %s[] = {' % (name))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
-        if 'enabled' in fn:
+    க்கு fn உள் fns:
+        commentStr = '' எனில் 'enabled' உள் fn இல்லையெனில் '//'
+        எனில் 'enabled' உள் fn:
             print('    &%s_definition,' % (fn['name']))
-        else:
+        இல்லையெனில்:
             print('    NULL/*&%s_definition*/,' % (fn['name']))
-        first = False
+        first = பொய்
     print('};')
 
 @outputToString
 def generateEnums(fns, prefix='OPENCL_FN'):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
     print('enum %s_ID {' % prefix)
-    for (i, fn) in enumerate(fns):
-        commentStr = '' if 'enabled' in fn else '//'
+    க்கு (i, fn) உள் enumerate(fns):
+        commentStr = '' எனில் 'enabled' உள் fn இல்லையெனில் '//'
         print(commentStr + ('    %s_%s = %d,' % (prefix, fn['name'], i)))
     print('};')
 
 @outputToString
 def generateRemapOrigin(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
+    க்கு fn உள் fns:
         print('#define %s %s_' % (fn['name'], fn['name']))
 
 @outputToString
 def generateRemapDynamic(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
+    க்கு fn உள் fns:
         print('#undef %s' % (fn['name']))
-        commentStr = '' if 'enabled' in fn else '//'
+        commentStr = '' எனில் 'enabled' உள் fn இல்லையெனில் '//'
         print(commentStr + ('#define %s %s_pfn' % (fn['name'], fn['name'])))
 
 @outputToString
 def generateFnDeclaration(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
+    க்கு fn உள் fns:
+        commentStr = '' எனில் 'enabled' உள் fn இல்லையெனில் '//'
         print(commentStr + ('extern CL_RUNTIME_EXPORT %s %s (%s *%s)(%s);' % (' '.join(fn['modifiers']), ' '.join(fn['ret']), ' '.join(fn['calling']),
-                                  fn['name'], ', '.join(fn['params'] if 'params_full' not in fn else fn['params_full']))))
+                                  fn['name'], ', '.join(fn['params'] எனில் 'params_full' இல்லை உள் fn இல்லையெனில் fn['params_full']))))
 
 @outputToString
 def generateTemplates(total, lprefix, switch_name, calling_convention=''):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for sz in range(total):
+    க்கு sz உள் range(total):
         template_params = ['ID', '_R', 'decl_args']
-        params = ['p%d' % (i + 1) for i in range(0, sz)]
+        params = ['p%d' % (i + 1) க்கு i உள் range(0, sz)]
         print('#define %s%d(%s) \\' % (lprefix, sz, ', '.join(template_params)))
         print('    typedef _R (%s *ID##FN)decl_args; \\' % (calling_convention))
         print('    static _R %s ID##_switch_fn decl_args \\' % (calling_convention))
@@ -236,39 +236,39 @@ def generateTemplates(total, lprefix, switch_name, calling_convention=''):
 @outputToString
 def generateInlineWrappers(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
+    க்கு fn உள் fns:
+        commentStr = '' எனில் 'enabled' உள் fn இல்லையெனில் '//'
         print('#undef %s' % (fn['name']))
         print(commentStr + ('#define %s %s_fn' % (fn['name'], fn['name'])))
         params = []
         call_params = []
-        for i in range(0, len(fn['params'])):
+        க்கு i உள் range(0, len(fn['params'])):
             t = fn['params'][i]
-            if t.find('*)') >= 0:
+            எனில் t.find('*)') >= 0:
                 p = re.sub(r'\*\)', (' *p%d)' % i), t, 1)
                 params.append(p)
-            else:
+            இல்லையெனில்:
                 params.append('%s p%d' % (t, i))
             call_params.append('p%d' % (i))
 
-        if len(fn['ret']) == 1 and fn['ret'][0] == 'void':
+        எனில் len(fn['ret']) == 1 மற்றும் fn['ret'][0] == 'void':
             print(commentStr + ('inline void %s(%s) { %s_pfn(%s); }' \
                     % (fn['name'], ', '.join(params), fn['name'], ', '.join(call_params))))
-        else:
+        இல்லையெனில்:
             print(commentStr + ('inline %s %s(%s) { return %s_pfn(%s); }' \
                     % (' '.join(fn['ret']), fn['name'], ', '.join(params), fn['name'], ', '.join(call_params))))
 
-def ProcessTemplate(inputFile, ctx, noteLine='//\n// AUTOGENERATED, DO NOT EDIT\n//'):
-    f = open(inputFile, "r")
-    if noteLine:
-        print(noteLine)
-    for line in f:
-        if line.startswith('@'):
-            assert line[-1] == '\n'
-            line = line[:-1]  # remove '\n'
-            assert line[-1] == '@'
-            name = line[1:-1]
-            assert name in ctx, name
-            line = ctx[name] + ('\n' if len(ctx[name]) > 0 and ctx[name][-1] != '\n' else '')
-        sys.stdout.write(line)
+def ProcessTemplate(உள்ளீடு_File, ctx, note_வரி='//\n// AUTOGENERATED, DO NOT EDIT\n//'):
+    f = open(உள்ளீடு_File, "r")
+    எனில் note_வரி:
+        print(note_வரி)
+    க்கு வரி உள் f:
+        எனில் வரி.startswith('@'):
+            ப்ரதிஜ்ஞா வரி[-1] == '\n'
+            வரி = வரி[:-1]  # remove '\n'
+            ப்ரதிஜ்ஞா வரி[-1] == '@'
+            name = வரி[1:-1]
+            ப்ரதிஜ்ஞா name உள் ctx, name
+            வரி = ctx[name] + ('\n' எனில் len(ctx[name]) > 0 மற்றும் ctx[name][-1] != '\n' இல்லையெனில் '')
+        sys.stdout.லிக(வரி)
     f.close()
