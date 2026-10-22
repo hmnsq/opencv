@@ -3,15 +3,15 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#ضمن "precomp.hpp"
+#ضمن "opencl_kernels_core.hpp"
 
-#include "split.simd.hpp"
-#include "split.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ضمن "split.simd.hpp"
+#ضمن "split.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+نطاق cv { نطاق hal {
 
-void split8u(const uchar* src, uchar** dst, int len, int cn )
+فراغ split8u(ثابت uchar* src, uchar** dst, صحيح len, صحيح cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split8u, cv_hal_split8u, src,dst, len, cn)
@@ -19,7 +19,7 @@ void split8u(const uchar* src, uchar** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split16u(const ushort* src, ushort** dst, int len, int cn )
+فراغ split16u(ثابت ushort* src, ushort** dst, صحيح len, صحيح cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split16u, cv_hal_split16u, src,dst, len, cn)
@@ -27,7 +27,7 @@ void split16u(const ushort* src, ushort** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split32s(const int* src, int** dst, int len, int cn )
+فراغ split32s(ثابت صحيح* src, صحيح** dst, صحيح len, صحيح cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split32s, cv_hal_split32s, src,dst, len, cn)
@@ -35,7 +35,7 @@ void split32s(const int* src, int** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split64s(const int64* src, int64** dst, int len, int cn )
+فراغ split64s(ثابت int64* src, int64** dst, صحيح len, صحيح cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split64s, cv_hal_split64s, src,dst, len, cn)
@@ -49,95 +49,95 @@ void split64s(const int64* src, int64** dst, int len, int cn )
 *                                       split & merge                                    *
 \****************************************************************************************/
 
-typedef void (*SplitFunc)(const void* src, void** dst, int len, int cn);
+تعريفنوع فراغ (*SplitFunc)(ثابت فراغ* src, فراغ** dst, صحيح len, صحيح cn);
 
-template<typename T, void (*fn)(const T*, T**, int, int)>
-static void splitWrap(const void* src, void** dst, int len, int cn)
+template<typename T, فراغ (*fn)(ثابت T*, T**, صحيح, صحيح)>
+ساكن فراغ splitWrap(ثابت فراغ* src, فراغ** dst, صحيح len, صحيح cn)
 {
-    fn((const T*)src, (T**)dst, len, cn);
+    fn((ثابت T*)src, (T**)dst, len, cn);
 }
 
-static SplitFunc getSplitFunc(int depth)
+ساكن SplitFunc getSplitFunc(صحيح depth)
 {
-    static SplitFunc splitTab[CV_DEPTH_MAX] =
+    ساكن SplitFunc splitTab[CV_DEPTH_MAX] =
     {
         splitWrap<uchar, cv::hal::split8u>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<ushort, cv::hal::split16u>, splitWrap<ushort, cv::hal::split16u>,
-        splitWrap<int, cv::hal::split32s>, splitWrap<int, cv::hal::split32s>,
+        splitWrap<صحيح, cv::hal::split32s>, splitWrap<صحيح, cv::hal::split32s>,
         splitWrap<int64_t, cv::hal::split64s>, splitWrap<ushort, cv::hal::split16u>,
         splitWrap<ushort, cv::hal::split16u>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<int64_t, cv::hal::split64s>, splitWrap<int64_t, cv::hal::split64s>,
-        splitWrap<int, cv::hal::split32s>, splitWrap<uchar, cv::hal::split8u>,
+        splitWrap<صحيح, cv::hal::split32s>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<uchar, cv::hal::split8u>, 0,
     };
 
-    return splitTab[depth];
+    إرجاع splitTab[depth];
 }
 
 #ifdef HAVE_IPP
 
-static bool ipp_split(const Mat& src, Mat* mv, int channels)
+ساكن منطقي ipp_split(ثابت Mat& src, Mat* mv, صحيح channels)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(channels != 3 && channels != 4)
-        return false;
+    إذا(channels != 3 && channels != 4)
+        إرجاع خطأ;
 
-    if(src.dims <= 2)
+    إذا(src.dims <= 2)
     {
         IppiSize size       = ippiSize(src.size());
-        void    *dstPtrs[4] = {NULL};
+        فراغ    *dstPtrs[4] = {عدم};
         size_t   dstStep    = mv[0].step;
-        for(int i = 0; i < channels; i++)
+        لكل(صحيح i = 0; i < channels; i++)
         {
             dstPtrs[i] = mv[i].ptr();
-            if(dstStep != mv[i].step)
-                return false;
+            إذا(dstStep != mv[i].step)
+                إرجاع خطأ;
         }
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopySplit, src.ptr(), (int)src.step, dstPtrs, (int)dstStep, size, (int)src.elemSize1(), channels, 0) >= 0;
+        إرجاع CV_INSTRUMENT_FUN_IPP(llwiCopySplit, src.ptr(), (صحيح)src.step, dstPtrs, (صحيح)dstStep, size, (صحيح)src.elemSize1(), channels, 0) >= 0;
     }
-    else
+    وإلا
     {
-        const Mat *arrays[5] = {NULL};
-        uchar     *ptrs[5]   = {NULL};
+        ثابت Mat *arrays[5] = {عدم};
+        uchar     *ptrs[5]   = {عدم};
         arrays[0] = &src;
 
-        for(int i = 1; i < channels; i++)
+        لكل(صحيح i = 1; i < channels; i++)
         {
             arrays[i] = &mv[i-1];
         }
 
         NAryMatIterator it(arrays, ptrs);
-        IppiSize size = { (int)it.size, 1 };
+        IppiSize size = { (صحيح)it.size, 1 };
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        لكل( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopySplit, ptrs[0], 0, (void**)&ptrs[1], 0, size, (int)src.elemSize1(), channels, 0) < 0)
-                return false;
+            إذا(CV_INSTRUMENT_FUN_IPP(llwiCopySplit, ptrs[0], 0, (فراغ**)&ptrs[1], 0, size, (صحيح)src.elemSize1(), channels, 0) < 0)
+                إرجاع خطأ;
         }
-        return true;
+        إرجاع true;
     }
-#else
+#وإلا
     CV_UNUSED(src); CV_UNUSED(mv); CV_UNUSED(channels);
-    return false;
+    إرجاع خطأ;
 #endif
 }
 #endif
 
-void split(const Mat& src, Mat* mv)
+فراغ split(ثابت Mat& src, Mat* mv)
 {
     CV_INSTRUMENT_REGION();
 
-    int k, depth = src.depth(), cn = src.channels();
-    if( cn == 1 )
+    صحيح k, depth = src.depth(), cn = src.channels();
+    إذا( cn == 1 )
     {
         src.copyTo(mv[0]);
-        return;
+        إرجاع;
     }
 
-    for( k = 0; k < cn; k++ )
+    لكل( k = 0; k < cn; k++ )
     {
         mv[k].create(src.size, depth);
     }
@@ -149,12 +149,12 @@ void split(const Mat& src, Mat* mv)
 
     size_t esz = src.elemSize(), esz1 = src.elemSize1();
     size_t blocksize0 = (BLOCK_SIZE + esz-1)/esz;
-    AutoBuffer<uchar> _buf((cn+1)*(sizeof(Mat*) + sizeof(uchar*)) + 16);
-    const Mat** arrays = (const Mat**)_buf.data();
+    AutoBuffer<uchar> _buf((cn+1)*(حجم(Mat*) + حجم(uchar*)) + 16);
+    ثابت Mat** arrays = (ثابت Mat**)_buf.data();
     uchar** ptrs = (uchar**)alignPtr(arrays + cn + 1, 16);
 
     arrays[0] = &src;
-    for( k = 0; k < cn; k++ )
+    لكل( k = 0; k < cn; k++ )
     {
         arrays[k+1] = &mv[k];
     }
@@ -163,17 +163,17 @@ void split(const Mat& src, Mat* mv)
     size_t total = it.size;
     size_t blocksize = std::min((size_t)CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn), cn <= 4 ? total : std::min(total, blocksize0));
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( size_t j = 0; j < total; j += blocksize )
+        لكل( size_t j = 0; j < total; j += blocksize )
         {
             size_t bsz = std::min(total - j, blocksize);
-            func( ptrs[0], (void**)&ptrs[1], (int)bsz, cn );
+            func( ptrs[0], (فراغ**)&ptrs[1], (صحيح)bsz, cn );
 
-            if( j + blocksize < total )
+            إذا( j + blocksize < total )
             {
                 ptrs[0] += bsz*esz;
-                for( k = 0; k < cn; k++ )
+                لكل( k = 0; k < cn; k++ )
                     ptrs[k+1] += bsz*esz1;
             }
         }
@@ -182,13 +182,13 @@ void split(const Mat& src, Mat* mv)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
+ساكن منطقي ocl_split( إدخال_Array _m, OutputArrayOfArrays _mv )
 {
-    int type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    صحيح type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
 
     String dstargs, processelem, indexdecl;
-    for (int i = 0; i < cn; ++i)
+    لكل (صحيح i = 0; i < cn; ++i)
     {
         dstargs += format("DECLARE_DST_PARAM(%d)", i);
         indexdecl += format("DECLARE_INDEX(%d)", i);
@@ -200,29 +200,29 @@ static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
                          " -D PROCESS_ELEMS_N=%s -D DECLARE_INDEX_N=%s",
                          ocl::memopTypeToStr(depth), cn, dstargs.c_str(),
                          processelem.c_str(), indexdecl.c_str()));
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        إرجاع خطأ;
 
     Size size = _m.size();
     _mv.create(cn, 1, depth);
-    for (int i = 0; i < cn; ++i)
+    لكل (صحيح i = 0; i < cn; ++i)
         _mv.create(size, depth, i);
 
     std::vector<UMat> dst;
     _mv.getUMatVector(dst);
 
-    int argidx = k.set(0, ocl::KernelArg::ReadOnly(_m.getUMat()));
-    for (int i = 0; i < cn; ++i)
+    صحيح argidx = k.set(0, ocl::KernelArg::ReadOnly(_m.getUMat()));
+    لكل (صحيح i = 0; i < cn; ++i)
         argidx = k.set(argidx, ocl::KernelArg::WriteOnlyNoSize(dst[i]));
     k.set(argidx, rowsPerWI);
 
     size_t globalsize[2] = { (size_t)size.width, ((size_t)size.height + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    إرجاع k.run(2, globalsize, عدم, خطأ);
 }
 
 #endif
 
-void split(InputArray _m, OutputArrayOfArrays _mv)
+فراغ split(إدخال_Array _m, OutputArrayOfArrays _mv)
 {
     CV_INSTRUMENT_REGION();
 
@@ -230,17 +230,17 @@ void split(InputArray _m, OutputArrayOfArrays _mv)
                ocl_split(_m, _mv))
 
     Mat m = _m.getMat();
-    if( m.empty() )
+    إذا( m.empty() )
     {
         _mv.release();
-        return;
+        إرجاع;
     }
 
     CV_Assert( !_mv.fixedType() || _mv.empty() || _mv.type() == m.depth() );
 
-    int depth = m.depth(), cn = m.channels();
+    صحيح depth = m.depth(), cn = m.channels();
     _mv.create(cn, 1, depth);
-    for (int i = 0; i < cn; ++i)
+    لكل (صحيح i = 0; i < cn; ++i)
         _mv.create(m.dims, m.size.p, depth, i);
 
     std::vector<Mat> dst;
