@@ -63,8 +63,8 @@
 #define HAL_LU_SMALL_MATRIX_THRESH 100
 #define HAL_CHOLESKY_SMALL_MATRIX_THRESH 100
 
-#if defined(__clang__) && defined(__has_feature)
-#if __has_feature(memory_sanitizer)
+#если defined(__clang__) && defined(__has_feature)
+#если __has_feature(memory_sanitizer)
 #include <sanitizer/msan_interface.h>
 #define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) \
 __msan_unpoison(address, size)
@@ -72,11 +72,11 @@ __msan_unpoison(address, size)
 #endif
 #endif
 #ifndef CV_ANNOTATE_MEMORY_IS_INITIALIZED
-#define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) do { } while(0)
+#define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) do { } пока(0)
 #define CV_ANNOTATE_NO_SANITIZE_MEMORY
 #endif
 
-#if defined(__APPLE__) && defined(__clang__)
+#если defined(__APPLE__) && defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
@@ -85,160 +85,160 @@ __msan_unpoison(address, size)
 template <typename fptype> static inline void
 transpose_square_inplace(fptype *src, size_t src_ld, size_t m)
 {
-    for(size_t i = 0; i < m - 1; i++)
-        for(size_t j = i + 1; j < m; j++)
+    для(size_t i = 0; i < m - 1; i++)
+        для(size_t j = i + 1; j < m; j++)
             std::swap(src[j*src_ld + i], src[i*src_ld + j]);
 }
 
 template <typename fptype> static inline void
 transpose(const fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    для(size_t i = 0; i < m; i++)
+        для(size_t j = 0; j < n; j++)
             dst[j*dst_ld + i] = src[i*src_ld + j];
 }
 
 template <typename fptype> static inline void
 copy_matrix(const fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    для(size_t i = 0; i < m; i++)
+        для(size_t j = 0; j < n; j++)
             dst[i*dst_ld + j] = src[i*src_ld + j];
 }
 
 template <typename fptype> static inline void
 set_value(fptype *dst, size_t dst_ld, fptype value, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    для(size_t i = 0; i < m; i++)
+        для(size_t j = 0; j < n; j++)
             dst[i*dst_ld + j] = value;
 }
 
 // MSAN can't see that the fortran LAPACK functions initialize `info`
-template <typename fptype> static inline int
-CV_ANNOTATE_NO_SANITIZE_MEMORY lapack_LU(fptype* a, size_t a_step, int m, fptype* b, size_t b_step, int n, int* info)
+template <typename fptype> static inline целое
+CV_ANNOTATE_NO_SANITIZE_MEMORY lapack_LU(fptype* a, size_t a_step, целое m, fptype* b, size_t b_step, целое n, целое* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#если defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     cv::AutoBuffer<long> piv_buff(m);
     long lda = (long)(a_step / sizeof(fptype));
     long _m = static_cast<long>(m), _n = static_cast<long>(n);
     long _info[1];
-#else
-    cv::AutoBuffer<int> piv_buff(m);
-    int lda = (int)(a_step / sizeof(fptype));
-    int _m = m, _n = n;
-    int* _info = info;
+#иначе
+    cv::AutoBuffer<целое> piv_buff(m);
+    целое lda = (целое)(a_step / sizeof(fptype));
+    целое _m = m, _n = n;
+    целое* _info = info;
 #endif
     auto piv = piv_buff.data();
 
     transpose_square_inplace(a, lda, m);
 
-    if(b)
+    если(b)
     {
-        if(n == 1 && b_step == sizeof(fptype))
+        если(n == 1 && b_step == sizeof(fptype))
         {
-            if(typeid(fptype) == typeid(float))
+            если(typeid(fptype) == typeid(float))
                 sgesv_(&_m, &_n, (float*)a, &lda, piv, (float*)b, &_m, _info);
-            else if(typeid(fptype) == typeid(double))
+            иначе если(typeid(fptype) == typeid(double))
                 dgesv_(&_m, &_n, (double*)a, &lda, piv, (double*)b, &_m, _info);
         }
-        else
+        иначе
         {
-            int ldb = (int)(b_step / sizeof(fptype));
+            целое ldb = (целое)(b_step / sizeof(fptype));
             std::vector<fptype> tmpB(m*n+1);
 
             transpose(b, ldb, &tmpB[0], m, m, n);
 
-            if(typeid(fptype) == typeid(float))
+            если(typeid(fptype) == typeid(float))
                 sgesv_(&_m, &_n, (float*)a, &lda, piv, (float*)&tmpB[0], &_m, _info);
-            else if(typeid(fptype) == typeid(double))
+            иначе если(typeid(fptype) == typeid(double))
                 dgesv_(&_m, &_n, (double*)a, &lda, piv, (double*)&tmpB[0], &_m, _info);
 
             transpose(&tmpB[0], m, b, ldb, n, m);
         }
     }
-    else
+    иначе
     {
-        if(typeid(fptype) == typeid(float))
+        если(typeid(fptype) == typeid(float))
             sgetrf_(&_m, &_m, (float*)a, &lda, piv, _info);
-        else if(typeid(fptype) == typeid(double))
+        иначе если(typeid(fptype) == typeid(double))
             dgetrf_(&_m, &_m, (double*)a, &lda, piv, _info);
     }
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
+#если defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<целое>(_info[0]);
 #endif
-    int retcode = *info >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
+    целое retcode = *info >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-    int sign = 0;
-    if(*info == 0)
+    целое sign = 0;
+    если(*info == 0)
     {
-        for(int i = 0; i < m; i++)
+        для(целое i = 0; i < m; i++)
             sign ^= piv[i] != i + 1;
         *info = sign ? -1 : 1;
     }
-    else
+    иначе
         *info = 0; //in opencv LU function zero means error
 
-    return retcode;
+    вернуть retcode;
 }
 
-template <typename fptype> static inline int
-lapack_Cholesky(fptype* a, size_t a_step, int m, fptype* b, size_t b_step, int n, bool* info)
+template <typename fptype> static inline целое
+lapack_Cholesky(fptype* a, size_t a_step, целое m, fptype* b, size_t b_step, целое n, bool* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#если defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     long _m = static_cast<long>(m), _n = static_cast<long>(n);
     long lapackStatus = 0;
     long lda = (long)(a_step / sizeof(fptype));
-#else
-    int _m = m, _n = n;
-    int lapackStatus = 0;
-    int lda = (int)(a_step / sizeof(fptype));
+#иначе
+    целое _m = m, _n = n;
+    целое lapackStatus = 0;
+    целое lda = (целое)(a_step / sizeof(fptype));
 #endif
     char L[] = {'L', '\0'};
 
-    if(b)
+    если(b)
     {
-        if(n == 1 && b_step == sizeof(fptype))
+        если(n == 1 && b_step == sizeof(fptype))
         {
-            if(typeid(fptype) == typeid(float))
+            если(typeid(fptype) == typeid(float))
                 OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (float*)a, &lda, (float*)b, &_m, &lapackStatus);
-            else if(typeid(fptype) == typeid(double))
+            иначе если(typeid(fptype) == typeid(double))
                 OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (double*)a, &lda, (double*)b, &_m, &lapackStatus);
         }
-        else
+        иначе
         {
-            int ldb = (int)(b_step / sizeof(fptype));
+            целое ldb = (целое)(b_step / sizeof(fptype));
             fptype* tmpB = new fptype[m*n];
             transpose(b, ldb, tmpB, m, m, n);
 
-            if(typeid(fptype) == typeid(float))
+            если(typeid(fptype) == typeid(float))
                 OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (float*)a, &lda, (float*)tmpB, &_m, &lapackStatus);
-            else if(typeid(fptype) == typeid(double))
+            иначе если(typeid(fptype) == typeid(double))
                 OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (double*)a, &lda, (double*)tmpB, &_m, &lapackStatus);
 
             transpose(tmpB, m, b, ldb, n, m);
             delete[] tmpB;
         }
     }
-    else
+    иначе
     {
-        if(typeid(fptype) == typeid(float))
+        если(typeid(fptype) == typeid(float))
             OCV_LAPACK_FUNC(spotrf)(L, &_m, (float*)a, &lda, &lapackStatus);
-        else if(typeid(fptype) == typeid(double))
+        иначе если(typeid(fptype) == typeid(double))
             OCV_LAPACK_FUNC(dpotrf)(L, &_m, (double*)a, &lda, &lapackStatus);
     }
 
-    if(lapackStatus == 0) *info = true;
-    else *info = false; //in opencv Cholesky function false means error
+    если(lapackStatus == 0) *info = true;
+    иначе *info = false; //in opencv Cholesky function false means error
 
-    return lapackStatus >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapackStatus >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
 }
 
-template <typename fptype> static inline int
-lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype* vt, size_t v_step, int m, int n, int flags, int* info)
+template <typename fptype> static inline целое
+lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype* vt, size_t v_step, целое m, целое n, целое flags, целое* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#если defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     long _m = static_cast<long>(m), _n = static_cast<long>(n);
     long _info[1];
     long lda = (long)(a_step / sizeof(fptype));
@@ -246,14 +246,14 @@ lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype
     long ldu = (long)(u_step / sizeof(fptype));
     long lwork = -1;
     cv::AutoBuffer<long> iworkBuf_(8 * std::min(m, n));
-#else
-    int _m = m, _n = n;
-    int* _info = info;
-    int lda = (int)(a_step / sizeof(fptype));
-    int ldv = (int)(v_step / sizeof(fptype));
-    int ldu = (int)(u_step / sizeof(fptype));
-    int lwork = -1;
-    cv::AutoBuffer<int> iworkBuf_(8 * std::min(m, n));
+#иначе
+    целое _m = m, _n = n;
+    целое* _info = info;
+    целое lda = (целое)(a_step / sizeof(fptype));
+    целое ldv = (целое)(v_step / sizeof(fptype));
+    целое ldu = (целое)(u_step / sizeof(fptype));
+    целое lwork = -1;
+    cv::AutoBuffer<целое> iworkBuf_(8 * std::min(m, n));
 #endif
     auto iworkBuf = iworkBuf_.data();
     std::vector<fptype> ubuf;
@@ -261,34 +261,34 @@ lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype
 
     //A already transposed and m>=n
     char mode[] = { ' ', '\0'};
-    if(flags & CV_HAL_SVD_NO_UV)
+    если(flags & CV_HAL_SVD_NO_UV)
     {
         ldv = 1;
         mode[0] = 'N';
     }
-    else if((flags & CV_HAL_SVD_SHORT_UV) && (flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in a
+    иначе если((flags & CV_HAL_SVD_SHORT_UV) && (flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in a
         mode[0] = 'O';
-    else if((flags & CV_HAL_SVD_SHORT_UV) && !(flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in u if m>=n
+    иначе если((flags & CV_HAL_SVD_SHORT_UV) && !(flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in u if m>=n
         mode[0] = 'S';
-    else if(flags & CV_HAL_SVD_FULL_UV) //full SVD, U stored in u or in a
+    иначе если(flags & CV_HAL_SVD_FULL_UV) //full SVD, U stored in u or in a
         mode[0] = 'A';
 
-    if((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV)) //U stored in a
+    если((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV)) //U stored in a
     {
         ubuf.resize(m*m);
         u = &ubuf[0];
         ldu = m;
     }
 
-    if(typeid(fptype) == typeid(float))
+    если(typeid(fptype) == typeid(float))
         OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (float*)a, &lda, (float*)w, (float*)u, &ldu, (float*)vt, &ldv, (float*)&work1, &lwork, iworkBuf, _info);
-    else if(typeid(fptype) == typeid(double))
+    иначе если(typeid(fptype) == typeid(double))
         OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (double*)a, &lda, (double*)w, (double*)u, &ldu, (double*)vt, &ldv, (double*)&work1, &lwork, iworkBuf, _info);
 
-    if(*info < 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
+    если(*info < 0)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-    lwork = (int)round(work1); //optimal buffer size
+    lwork = (целое)round(work1); //optimal buffer size
     std::vector<fptype> buffer(lwork + 1);
 
     // Make sure MSAN sees the memory as having been written.
@@ -296,71 +296,71 @@ lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype
     // Note: we do this here because if dgesdd is C++, MSAN errors can be reported within it.
     CV_ANNOTATE_MEMORY_IS_INITIALIZED(buffer.data(), sizeof(fptype) * (lwork + 1));
 
-    if(typeid(fptype) == typeid(float))
+    если(typeid(fptype) == typeid(float))
         OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (float*)a, &lda, (float*)w, (float*)u, &ldu, (float*)vt, &ldv, (float*)&buffer[0], &lwork, iworkBuf, _info);
-    else if(typeid(fptype) == typeid(double))
+    иначе если(typeid(fptype) == typeid(double))
         OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (double*)a, &lda, (double*)w, (double*)u, &ldu, (double*)vt, &ldv, (double*)&buffer[0], &lwork, iworkBuf, _info);
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
+#если defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<целое>(_info[0]);
 #endif
 
     // Make sure MSAN sees the memory as having been written.
     // MSAN does not think it has been written because a different language was called.
     CV_ANNOTATE_MEMORY_IS_INITIALIZED(a, a_step * n);
-    if (u)
+    если (u)
       CV_ANNOTATE_MEMORY_IS_INITIALIZED(u, u_step * m);
-    if (vt)
+    если (vt)
       CV_ANNOTATE_MEMORY_IS_INITIALIZED(vt, v_step * n);
-    if (w)
+    если (w)
       CV_ANNOTATE_MEMORY_IS_INITIALIZED(w, sizeof(fptype) * std::min(m, n));
 
-    if(!(flags & CV_HAL_SVD_NO_UV))
+    если(!(flags & CV_HAL_SVD_NO_UV))
         transpose_square_inplace(vt, ldv, n);
 
-    if((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV))
+    если((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV))
     {
-        for(int i = 0; i < m; i++)
-            for(int j = 0; j < m; j++)
+        для(целое i = 0; i < m; i++)
+            для(целое j = 0; j < m; j++)
                 a[i*lda + j] = u[i*m + j];
     }
 
-    if(*info < 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return CV_HAL_ERROR_OK;
+    если(*info < 0)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_QR(fptype* a, size_t a_step, int m, int n, int k, fptype* b, size_t b_step, fptype* dst, int* info)
+template <typename fptype> static inline целое
+lapack_QR(fptype* a, size_t a_step, целое m, целое n, целое k, fptype* b, size_t b_step, fptype* dst, целое* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#если defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     long _m = static_cast<long>(m), _n = static_cast<long>(n), _k = static_cast<long>(k);
     long _info[1];
     long lda = (long)(a_step / sizeof(fptype));
     long lwork = -1;
     long ldtmpA;
-#else
-    int _m = m, _n = n, _k = k;
-    int* _info = info;
-    int lda = (int)(a_step / sizeof(fptype));
-    int lwork = -1;
-    int ldtmpA;
+#иначе
+    целое _m = m, _n = n, _k = k;
+    целое* _info = info;
+    целое lda = (целое)(a_step / sizeof(fptype));
+    целое lwork = -1;
+    целое ldtmpA;
 #endif
 
     char mode[] = { 'N', '\0' };
-    if(m < n)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
+    если(m < n)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
 
     std::vector<fptype> tmpAMemHolder;
     fptype* tmpA;
 
-    if (m == n)
+    если (m == n)
     {
         transpose_square_inplace(a, lda, m);
         tmpA = a;
         ldtmpA = lda;
     }
-    else
+    иначе
     {
         tmpAMemHolder.resize(m*n);
         tmpA = &tmpAMemHolder.front();
@@ -370,357 +370,357 @@ lapack_QR(fptype* a, size_t a_step, int m, int n, int k, fptype* b, size_t b_ste
 
     fptype work1 = 0.;
 
-    if (b)
+    если (b)
     {
-        if (k == 1 && b_step == sizeof(fptype))
+        если (k == 1 && b_step == sizeof(fptype))
         {
-            if (typeid(fptype) == typeid(float))
+            если (typeid(fptype) == typeid(float))
                 OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)b, &_m, (float*)&work1, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
+            иначе если (typeid(fptype) == typeid(double))
                 OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)b, &_m, (double*)&work1, &lwork, _info);
 
-            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-            if (*info < 0)
-                return CV_HAL_ERROR_NOT_IMPLEMENTED;
+            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(целое));
+            если (*info < 0)
+                вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
 
             lwork = cvRound(work1); //optimal buffer size
             std::vector<fptype> workBufMemHolder(lwork + 1);
             fptype* buffer = &workBufMemHolder.front();
 
-            if (typeid(fptype) == typeid(float))
+            если (typeid(fptype) == typeid(float))
                 OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)b, &_m, (float*)buffer, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
+            иначе если (typeid(fptype) == typeid(double))
                 OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)b, &_m, (double*)buffer, &lwork, _info);
         }
-        else
+        иначе
         {
             std::vector<fptype> tmpBMemHolder(m*k);
             fptype* tmpB = &tmpBMemHolder.front();
-            int ldb = (int)(b_step / sizeof(fptype));
+            целое ldb = (целое)(b_step / sizeof(fptype));
             transpose(b, ldb, tmpB, m, m, k);
 
-            if (typeid(fptype) == typeid(float))
+            если (typeid(fptype) == typeid(float))
                 OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)tmpB, &_m, (float*)&work1, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
+            иначе если (typeid(fptype) == typeid(double))
                 OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)tmpB, &_m, (double*)&work1, &lwork, _info);
 
-            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-            if (*info < 0)
-                return CV_HAL_ERROR_NOT_IMPLEMENTED;
+            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(целое));
+            если (*info < 0)
+                вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
 
             lwork = cvRound(work1); //optimal buffer size
             std::vector<fptype> workBufMemHolder(lwork + 1);
             fptype* buffer = &workBufMemHolder.front();
 
-            if (typeid(fptype) == typeid(float))
+            если (typeid(fptype) == typeid(float))
                 OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)tmpB, &_m, (float*)buffer, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
+            иначе если (typeid(fptype) == typeid(double))
                 OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)tmpB, &_m, (double*)buffer, &lwork, _info);
 
             transpose(tmpB, m, b, ldb, k, m);
         }
     }
-    else
+    иначе
     {
-        if (typeid(fptype) == typeid(float))
+        если (typeid(fptype) == typeid(float))
             sgeqrf_(&_m, &_n, (float*)tmpA, &ldtmpA, (float*)dst, (float*)&work1, &lwork, _info);
-        else if (typeid(fptype) == typeid(double))
+        иначе если (typeid(fptype) == typeid(double))
             dgeqrf_(&_m, &_n, (double*)tmpA, &ldtmpA, (double*)dst, (double*)&work1, &lwork, _info);
 
-        CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-        if (*info < 0)
-            return CV_HAL_ERROR_NOT_IMPLEMENTED;
+        CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(целое));
+        если (*info < 0)
+            вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
 
         lwork = cvRound(work1); //optimal buffer size
         std::vector<fptype> workBufMemHolder(lwork + 1);
         fptype* buffer = &workBufMemHolder.front();
 
-        if (typeid(fptype) == typeid(float))
+        если (typeid(fptype) == typeid(float))
             sgeqrf_(&_m, &_n, (float*)tmpA, &ldtmpA, (float*)dst, (float*)buffer, &lwork, _info);
-        else if (typeid(fptype) == typeid(double))
+        иначе если (typeid(fptype) == typeid(double))
             dgeqrf_(&_m, &_n, (double*)tmpA, &ldtmpA, (double*)dst, (double*)buffer, &lwork, _info);
     }
 
-    CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-    if (m == n)
+    CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(целое));
+    если (m == n)
         transpose_square_inplace(a, lda, m);
-    else
+    иначе
         transpose(tmpA, m, a, lda, n, m);
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
+#если defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<целое>(_info[0]);
 #endif
 
-    if (*info != 0)
+    если (*info != 0)
         *info = 0;
-    else
+    иначе
         *info = 1;
 
-    return CV_HAL_ERROR_OK;
+    вернуть CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
+template <typename fptype> static inline целое
 lapack_gemm(const fptype *src1, size_t src1_step, const fptype *src2, size_t src2_step, fptype alpha,
-            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, int a_m, int a_n, int d_n, int flags)
+            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, целое a_m, целое a_n, целое d_n, целое flags)
 {
-    int ldsrc1 = (int)(src1_step / sizeof(fptype));
-    int ldsrc2 = (int)(src2_step / sizeof(fptype));
-    int ldsrc3 = (int)(src3_step / sizeof(fptype));
-    int lddst = (int)(dst_step / sizeof(fptype));
-    int c_m, c_n, d_m;
+    целое ldsrc1 = (целое)(src1_step / sizeof(fptype));
+    целое ldsrc2 = (целое)(src2_step / sizeof(fptype));
+    целое ldsrc3 = (целое)(src3_step / sizeof(fptype));
+    целое lddst = (целое)(dst_step / sizeof(fptype));
+    целое c_m, c_n, d_m;
     CBLAS_TRANSPOSE transA, transB;
 
-    if(flags & CV_HAL_GEMM_2_T)
+    если(flags & CV_HAL_GEMM_2_T)
     {
         transB = CblasTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        если(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        иначе
         {
             d_m = a_m;
         }
     }
-    else
+    иначе
     {
         transB = CblasNoTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        если(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        иначе
         {
             d_m = a_m;
         }
     }
 
-    if(flags & CV_HAL_GEMM_3_T)
+    если(flags & CV_HAL_GEMM_3_T)
     {
         c_m = d_n;
         c_n = d_m;
     }
-    else
+    иначе
     {
         c_m = d_m;
         c_n = d_n;
     }
 
-    if(flags & CV_HAL_GEMM_1_T )
+    если(flags & CV_HAL_GEMM_1_T )
     {
         transA = CblasTrans;
         std::swap(a_n, a_m);
     }
-    else
+    иначе
     {
         transA = CblasNoTrans;
     }
 
-    if(src3 != dst && beta != 0.0 && src3_step != 0) {
-        if(flags & CV_HAL_GEMM_3_T)
+    если(src3 != dst && beta != 0.0 && src3_step != 0) {
+        если(flags & CV_HAL_GEMM_3_T)
             transpose(src3, ldsrc3, dst, lddst, c_m, c_n);
-        else
+        иначе
             copy_matrix(src3, ldsrc3, dst, lddst, c_m, c_n);
     }
-    else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    else if(src3_step == 0 && beta != 0.0)
+    иначе если (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    иначе если(src3_step == 0 && beta != 0.0)
         set_value(dst, lddst, (fptype)0.0, d_m, d_n);
 
-    if(typeid(fptype) == typeid(float))
+    если(typeid(fptype) == typeid(float))
         cblas_sgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (float)alpha, (float*)src1, ldsrc1, (float*)src2, ldsrc2, (float)beta, (float*)dst, lddst);
-    else if(typeid(fptype) == typeid(double))
+    иначе если(typeid(fptype) == typeid(double))
         cblas_dgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (double)alpha, (double*)src1, ldsrc1, (double*)src2, ldsrc2, (double)beta, (double*)dst, lddst);
 
-    return CV_HAL_ERROR_OK;
+    вернуть CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
+template <typename fptype> static inline целое
 lapack_gemm_c(const fptype *src1, size_t src1_step, const fptype *src2, size_t src2_step, fptype alpha,
-            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, int a_m, int a_n, int d_n, int flags)
+            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, целое a_m, целое a_n, целое d_n, целое flags)
 {
-    int ldsrc1 = (int)(src1_step / sizeof(std::complex<fptype>));
-    int ldsrc2 = (int)(src2_step / sizeof(std::complex<fptype>));
-    int ldsrc3 = (int)(src3_step / sizeof(std::complex<fptype>));
-    int lddst = (int)(dst_step / sizeof(std::complex<fptype>));
-    int c_m, c_n, d_m;
+    целое ldsrc1 = (целое)(src1_step / sizeof(std::complex<fptype>));
+    целое ldsrc2 = (целое)(src2_step / sizeof(std::complex<fptype>));
+    целое ldsrc3 = (целое)(src3_step / sizeof(std::complex<fptype>));
+    целое lddst = (целое)(dst_step / sizeof(std::complex<fptype>));
+    целое c_m, c_n, d_m;
     CBLAS_TRANSPOSE transA, transB;
     std::complex<fptype> cAlpha(alpha, 0.0);
     std::complex<fptype> cBeta(beta, 0.0);
 
-    if(flags & CV_HAL_GEMM_2_T)
+    если(flags & CV_HAL_GEMM_2_T)
     {
         transB = CblasTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        если(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        иначе
         {
             d_m = a_m;
         }
     }
-    else
+    иначе
     {
         transB = CblasNoTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        если(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        иначе
         {
             d_m = a_m;
         }
     }
 
-    if(flags & CV_HAL_GEMM_3_T)
+    если(flags & CV_HAL_GEMM_3_T)
     {
         c_m = d_n;
         c_n = d_m;
     }
-    else
+    иначе
     {
         c_m = d_m;
         c_n = d_n;
     }
 
-    if(flags & CV_HAL_GEMM_1_T )
+    если(flags & CV_HAL_GEMM_1_T )
     {
         transA = CblasTrans;
         std::swap(a_n, a_m);
     }
-    else
+    иначе
     {
         transA = CblasNoTrans;
     }
 
-    if(src3 != dst && beta != 0.0 && src3_step != 0) {
-        if(flags & CV_HAL_GEMM_3_T)
+    если(src3 != dst && beta != 0.0 && src3_step != 0) {
+        если(flags & CV_HAL_GEMM_3_T)
             transpose((std::complex<fptype>*)src3, ldsrc3, (std::complex<fptype>*)dst, lddst, c_m, c_n);
-        else
+        иначе
             copy_matrix((std::complex<fptype>*)src3, ldsrc3, (std::complex<fptype>*)dst, lddst, c_m, c_n);
     }
-    else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    else if(src3_step == 0 && beta != 0.0)
+    иначе если (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    иначе если(src3_step == 0 && beta != 0.0)
         set_value((std::complex<fptype>*)dst, lddst, std::complex<fptype>(0.0, 0.0), d_m, d_n);
 
     // FIXME: this is a workaround. Support ILP64 in HAL API.
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    int M = a_m, N = d_n, K = a_n;
-    if(typeid(fptype) == typeid(float)) {
+#если defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    целое M = a_m, N = d_n, K = a_n;
+    если(typeid(fptype) == typeid(float)) {
         auto src1_cast = (std::complex<float>*)(src1);
         auto src2_cast = (std::complex<float>*)(src2);
         auto dst_cast = (std::complex<float>*)(dst);
         long lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
         cblas_cgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<float>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<float>*)&cBeta, dst_cast, ldc);
     }
-    else if(typeid(fptype) == typeid(double)) {
+    иначе если(typeid(fptype) == typeid(double)) {
         auto src1_cast = (std::complex<double>*)(src1);
         auto src2_cast = (std::complex<double>*)(src2);
         auto dst_cast = (std::complex<double>*)(dst);
         long lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
         cblas_zgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<double>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<double>*)&cBeta, dst_cast, ldc);
     }
-#else
-    if(typeid(fptype) == typeid(float))
+#иначе
+    если(typeid(fptype) == typeid(float))
         cblas_cgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (float*)reinterpret_cast<fptype(&)[2]>(cAlpha), (float*)src1, ldsrc1, (float*)src2, ldsrc2, (float*)reinterpret_cast<fptype(&)[2]>(cBeta), (float*)dst, lddst);
-    else if(typeid(fptype) == typeid(double))
+    иначе если(typeid(fptype) == typeid(double))
         cblas_zgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (double*)reinterpret_cast<fptype(&)[2]>(cAlpha), (double*)src1, ldsrc1, (double*)src2, ldsrc2, (double*)reinterpret_cast<fptype(&)[2]>(cBeta), (double*)dst, lddst);
 #endif
 
-    return CV_HAL_ERROR_OK;
+    вернуть CV_HAL_ERROR_OK;
 }
-int lapack_LU32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, int* info)
+целое lapack_LU32f(float* a, size_t a_step, целое m, float* b, size_t b_step, целое n, целое* info)
 {
-    if(m < HAL_LU_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_LU(a, a_step, m, b, b_step, n, info);
+    если(m < HAL_LU_SMALL_MATRIX_THRESH)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_LU(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_LU64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, int* info)
+целое lapack_LU64f(double* a, size_t a_step, целое m, double* b, size_t b_step, целое n, целое* info)
 {
-    if(m < HAL_LU_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_LU(a, a_step, m, b, b_step, n, info);
+    если(m < HAL_LU_SMALL_MATRIX_THRESH)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_LU(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_Cholesky32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, bool *info)
+целое lapack_Cholesky32f(float* a, size_t a_step, целое m, float* b, size_t b_step, целое n, bool *info)
 {
-    if(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_Cholesky(a, a_step, m, b, b_step, n, info);
+    если(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_Cholesky(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_Cholesky64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, bool *info)
+целое lapack_Cholesky64f(double* a, size_t a_step, целое m, double* b, size_t b_step, целое n, bool *info)
 {
-    if(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_Cholesky(a, a_step, m, b, b_step, n, info);
+    если(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_Cholesky(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_SVD32f(float* a, size_t a_step, float *w, float* u, size_t u_step, float* vt, size_t v_step, int m, int n, int flags)
+целое lapack_SVD32f(float* a, size_t a_step, float *w, float* u, size_t u_step, float* vt, size_t v_step, целое m, целое n, целое flags)
 {
-    if(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    int info = 0;
-    return lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
+    если(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    целое info = 0;
+    вернуть lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
 }
 
-int lapack_SVD64f(double* a, size_t a_step, double *w, double* u, size_t u_step, double* vt, size_t v_step, int m, int n, int flags)
+целое lapack_SVD64f(double* a, size_t a_step, double *w, double* u, size_t u_step, double* vt, size_t v_step, целое m, целое n, целое flags)
 {
-    if(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    int info = 0;
-    return lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
+    если(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    целое info = 0;
+    вернуть lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
 }
 
-int lapack_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info)
+целое lapack_QR32f(float* src1, size_t src1_step, целое m, целое n, целое k, float* src2, size_t src2_step, float* dst, целое* info)
 {
-    if (m < HAL_QR_SMALL_MATRIX_THRESH)
-      return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
+    если (m < HAL_QR_SMALL_MATRIX_THRESH)
+      вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
 }
 
-int lapack_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info)
+целое lapack_QR64f(double* src1, size_t src1_step, целое m, целое n, целое k, double* src2, size_t src2_step, double* dst, целое* info)
 {
-    if (m < HAL_QR_SMALL_MATRIX_THRESH)
-      return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
+    если (m < HAL_QR_SMALL_MATRIX_THRESH)
+      вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
 }
 
-int lapack_gemm32f(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
-                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, int m, int n, int k, int flags)
+целое lapack_gemm32f(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
+                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, целое m, целое n, целое k, целое flags)
 {
-    if(m < HAL_GEMM_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    если(m < HAL_GEMM_SMALL_MATRIX_THRESH)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
 
-int lapack_gemm64f(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
-                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, int m, int n, int k, int flags)
+целое lapack_gemm64f(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
+                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, целое m, целое n, целое k, целое flags)
 {
-    if(m < HAL_GEMM_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    если(m < HAL_GEMM_SMALL_MATRIX_THRESH)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
 
-int lapack_gemm32fc(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
-                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, int m, int n, int k, int flags)
+целое lapack_gemm32fc(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
+                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, целое m, целое n, целое k, целое flags)
 {
-    if(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    если(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
-int lapack_gemm64fc(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
-                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, int m, int n, int k, int flags)
+целое lapack_gemm64fc(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
+                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, целое m, целое n, целое k, целое flags)
 {
-    if(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    если(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
+        вернуть CV_HAL_ERROR_NOT_IMPLEMENTED;
+    вернуть lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
 
-#if defined(__APPLE__) && defined(__clang__)
+#если defined(__APPLE__) && defined(__clang__)
 #pragma clang diagnostic pop
 #endif
 

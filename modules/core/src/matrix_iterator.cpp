@@ -12,22 +12,22 @@ NAryMatIterator::NAryMatIterator()
 {
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, Mat* _planes, int _narrays)
+NAryMatIterator::NAryMatIterator(const Mat** _arrays, Mat* _planes, целое _narrays)
 : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, _planes, 0, _narrays);
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, uchar** _ptrs, int _narrays)
+NAryMatIterator::NAryMatIterator(const Mat** _arrays, uchar** _ptrs, целое _narrays)
     : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, 0, _ptrs, _narrays);
 }
 
-void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int _narrays)
+void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, целое _narrays)
 {
     CV_Assert( _arrays && (_ptrs || _planes) );
-    int i, j, d1=0, i0 = -1, d = -1;
+    целое i, j, d1=0, i0 = -1, d = -1;
 
     arrays = _arrays;
     ptrs = _ptrs;
@@ -36,9 +36,9 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
     nplanes = 0;
     size = 0;
 
-    if( narrays < 0 )
+    если( narrays < 0 )
     {
-        for( i = 0; _arrays[i] != 0; i++ )
+        для( i = 0; _arrays[i] != 0; i++ )
             ;
         narrays = i;
         CV_Assert(narrays <= 1000);
@@ -46,261 +46,261 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
 
     iterdepth = 0;
 
-    for( i = 0; i < narrays; i++ )
+    для( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
         const Mat& A = *arrays[i];
-        if( ptrs )
+        если( ptrs )
             ptrs[i] = A.data;
 
-        if( !A.data )
+        если( !A.data )
             continue;
 
-        if( i0 < 0 )
+        если( i0 < 0 )
         {
             i0 = i;
             d = A.dims;
 
             // find the first dimensionality which is different from 1;
             // in any of the arrays the first "d1" step do not affect the continuity
-            for( d1 = 0; d1 < d; d1++ )
-                if( A.size[d1] > 1 )
+            для( d1 = 0; d1 < d; d1++ )
+                если( A.size[d1] > 1 )
                     break;
         }
-        else
+        иначе
             CV_Assert( A.size == arrays[i0]->size );
 
-        if( !A.isContinuous() )
+        если( !A.isContinuous() )
         {
             CV_Assert( A.step[d-1] == A.elemSize() );
-            for( j = d-1; j > d1; j-- )
-                if( A.step[j]*A.size[j] < A.step[j-1] )
+            для( j = d-1; j > d1; j-- )
+                если( A.step[j]*A.size[j] < A.step[j-1] )
                     break;
             iterdepth = std::max(iterdepth, j);
         }
     }
 
-    if( i0 >= 0 )
+    если( i0 >= 0 )
     {
         size = arrays[i0]->size[std::max(d-1, 0)];
-        for( j = d-1; j > iterdepth; j-- )
+        для( j = d-1; j > iterdepth; j-- )
         {
             int64 total1 = (int64)size*arrays[i0]->size[j-1];
-            if( total1 != (int)total1 )
+            если( total1 != (целое)total1 )
                 break;
-            size = (int)total1;
+            size = (целое)total1;
         }
 
         iterdepth = j;
-        if( iterdepth == d1 )
+        если( iterdepth == d1 )
             iterdepth = 0;
 
         nplanes = 1;
-        for( j = iterdepth-1; j >= 0; j-- )
+        для( j = iterdepth-1; j >= 0; j-- )
             nplanes *= arrays[i0]->size[j];
     }
-    else
+    иначе
         iterdepth = 0;
 
     idx = 0;
 
-    if( !planes )
-        return;
+    если( !planes )
+        вернуть;
 
-    for( i = 0; i < narrays; i++ )
+    для( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
         const Mat& A = *arrays[i];
 
-        if( !A.data )
+        если( !A.data )
         {
             planes[i] = Mat();
             continue;
         }
 
-        planes[i] = Mat(1, (int)size, A.type(), A.data);
+        planes[i] = Mat(1, (целое)size, A.type(), A.data);
     }
 }
 
 
 NAryMatIterator& NAryMatIterator::operator ++()
 {
-    if( idx >= nplanes-1 )
-        return *this;
+    если( idx >= nplanes-1 )
+        вернуть *this;
     ++idx;
 
-    if( iterdepth == 1 )
+    если( iterdepth == 1 )
     {
-        if( ptrs )
+        если( ptrs )
         {
-            for( int i = 0; i < narrays; i++ )
+            для( целое i = 0; i < narrays; i++ )
             {
-                if( !ptrs[i] )
+                если( !ptrs[i] )
                     continue;
                 ptrs[i] = arrays[i]->data + arrays[i]->step[0]*idx;
             }
         }
-        if( planes )
+        если( planes )
         {
-            for( int i = 0; i < narrays; i++ )
+            для( целое i = 0; i < narrays; i++ )
             {
-                if( !planes[i].data )
+                если( !planes[i].data )
                     continue;
                 planes[i].data = arrays[i]->data + arrays[i]->step[0]*idx;
             }
         }
     }
-    else
+    иначе
     {
-        for( int i = 0; i < narrays; i++ )
+        для( целое i = 0; i < narrays; i++ )
         {
             const Mat& A = *arrays[i];
-            if( !A.data )
+            если( !A.data )
                 continue;
-            int _idx = (int)idx;
+            целое _idx = (целое)idx;
             uchar* data = A.data;
-            for( int j = iterdepth-1; j >= 0 && _idx > 0; j-- )
+            для( целое j = iterdepth-1; j >= 0 && _idx > 0; j-- )
             {
-                int szi = A.size[j], t = _idx/szi;
+                целое szi = A.size[j], t = _idx/szi;
                 data += (_idx - t * szi)*A.step[j];
                 _idx = t;
             }
-            if( ptrs )
+            если( ptrs )
                 ptrs[i] = data;
-            if( planes )
+            если( planes )
                 planes[i].data = data;
         }
     }
 
-    return *this;
+    вернуть *this;
 }
 
-NAryMatIterator NAryMatIterator::operator ++(int)
+NAryMatIterator NAryMatIterator::operator ++(целое)
 {
     NAryMatIterator it = *this;
     ++*this;
-    return it;
+    вернуть it;
 }
 
 //==================================================================================================
 
 Point MatConstIterator::pos() const
 {
-    if( !m )
-        return Point();
+    если( !m )
+        вернуть Point();
     CV_DbgAssert(m->dims <= 2);
 
     ptrdiff_t ofs = ptr - m->ptr();
-    int y = (int)(ofs/m->step[0]);
-    return Point((int)((ofs - y*m->step[0])/elemSize), y);
+    целое y = (целое)(ofs/m->step[0]);
+    вернуть Point((целое)((ofs - y*m->step[0])/elemSize), y);
 }
 
-void MatConstIterator::pos(int* _idx) const
+void MatConstIterator::pos(целое* _idx) const
 {
     CV_Assert(m != 0 && _idx);
     ptrdiff_t ofs = ptr - m->ptr();
-    for( int i = 0; i < m->dims; i++ )
+    для( целое i = 0; i < m->dims; i++ )
     {
         size_t s = m->step[i], v = ofs/s;
         ofs -= v*s;
-        _idx[i] = (int)v;
+        _idx[i] = (целое)v;
     }
 }
 
 ptrdiff_t MatConstIterator::lpos() const
 {
-    if(!m)
-        return 0;
-    if( m->isContinuous() )
-        return (ptr - sliceStart)/elemSize;
+    если(!m)
+        вернуть 0;
+    если( m->isContinuous() )
+        вернуть (ptr - sliceStart)/elemSize;
     ptrdiff_t ofs = ptr - m->ptr();
-    int i, d = m->dims;
-    if( d == 2 )
+    целое i, d = m->dims;
+    если( d == 2 )
     {
         ptrdiff_t y = ofs/m->step[0];
-        return y*m->cols + (ofs - y*m->step[0])/elemSize;
+        вернуть y*m->cols + (ofs - y*m->step[0])/elemSize;
     }
     ptrdiff_t result = 0;
-    for( i = 0; i < d; i++ )
+    для( i = 0; i < d; i++ )
     {
         size_t s = m->step[i], v = ofs/s;
         ofs -= v*s;
         result = result*m->size[i] + v;
     }
-    return result;
+    вернуть result;
 }
 
 void MatConstIterator::seek(ptrdiff_t ofs, bool relative)
 {
-    if( m->isContinuous() )
+    если( m->isContinuous() )
     {
         ptr = (relative ? ptr : sliceStart) + ofs*elemSize;
-        if( ptr < sliceStart )
+        если( ptr < sliceStart )
             ptr = sliceStart;
-        else if( ptr > sliceEnd )
+        иначе если( ptr > sliceEnd )
             ptr = sliceEnd;
-        return;
+        вернуть;
     }
 
-    int d = m->dims;
-    if( d == 2 )
+    целое d = m->dims;
+    если( d == 2 )
     {
         ptrdiff_t ofs0, y;
-        if( relative )
+        если( relative )
         {
             ofs0 = ptr - m->ptr();
             y = ofs0/m->step[0];
             ofs += y*m->cols + (ofs0 - y*m->step[0])/elemSize;
         }
         y = ofs/m->cols;
-        int y1 = std::min(std::max((int)y, 0), m->rows-1);
+        целое y1 = std::min(std::max((целое)y, 0), m->rows-1);
         sliceStart = m->ptr(y1);
         sliceEnd = sliceStart + m->cols*elemSize;
         ptr = y < 0 ? sliceStart : y >= m->rows ? sliceEnd :
             sliceStart + (ofs - y*m->cols)*elemSize;
-        return;
+        вернуть;
     }
 
-    if( relative )
+    если( relative )
         ofs += lpos();
 
-    if( ofs < 0 )
+    если( ofs < 0 )
         ofs = 0;
 
-    int szi = m->size[d-1];
+    целое szi = m->size[d-1];
     ptrdiff_t t = ofs/szi;
-    int v = (int)(ofs - t*szi);
+    целое v = (целое)(ofs - t*szi);
     ofs = t;
     ptr = m->ptr() + v*elemSize;
     sliceStart = m->ptr();
 
-    for( int i = d-2; i >= 0; i-- )
+    для( целое i = d-2; i >= 0; i-- )
     {
         szi = m->size[i];
         t = ofs/szi;
-        v = (int)(ofs - t*szi);
+        v = (целое)(ofs - t*szi);
         ofs = t;
         sliceStart += v*m->step[i];
     }
 
     sliceEnd = sliceStart + m->size[d-1]*elemSize;
-    if( ofs > 0 )
+    если( ofs > 0 )
         ptr = sliceEnd;
-    else
+    иначе
         ptr = sliceStart + (ptr - m->ptr());
 }
 
-void MatConstIterator::seek(const int* _idx, bool relative)
+void MatConstIterator::seek(const целое* _idx, bool relative)
 {
-    int d = m->dims;
+    целое d = m->dims;
     ptrdiff_t ofs = 0;
-    if( !_idx )
+    если( !_idx )
         ;
-    else if( d == 2 )
+    иначе если( d == 2 )
         ofs = _idx[0]*m->size[1] + _idx[1];
-    else
+    иначе
     {
-        for( int i = 0; i < d; i++ )
+        для( целое i = 0; i < d; i++ )
             ofs = ofs*m->size[i] + _idx[i];
     }
     seek(ofs, relative);
@@ -310,48 +310,48 @@ void MatConstIterator::seek(const int* _idx, bool relative)
 
 SparseMatConstIterator::SparseMatConstIterator(const SparseMat* _m) : m((SparseMat*)_m), hashidx(0), ptr(0)
 {
-    if(!_m || !_m->hdr)
-        return;
+    если(!_m || !_m->hdr)
+        вернуть;
     SparseMat::Hdr& hdr = *m->hdr;
     const std::vector<size_t>& htab = hdr.hashtab;
     size_t i, hsize = htab.size();
-    for( i = 0; i < hsize; i++ )
+    для( i = 0; i < hsize; i++ )
     {
         size_t nidx = htab[i];
-        if( nidx )
+        если( nidx )
         {
             hashidx = i;
             ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return;
+            вернуть;
         }
     }
 }
 
 SparseMatConstIterator& SparseMatConstIterator::operator ++()
 {
-    if( !ptr || !m || !m->hdr )
-        return *this;
+    если( !ptr || !m || !m->hdr )
+        вернуть *this;
     SparseMat::Hdr& hdr = *m->hdr;
     size_t next = ((const SparseMat::Node*)(ptr - hdr.valueOffset))->next;
-    if( next )
+    если( next )
     {
         ptr = &hdr.pool[next] + hdr.valueOffset;
-        return *this;
+        вернуть *this;
     }
     size_t i = hashidx + 1, sz = hdr.hashtab.size();
-    for( ; i < sz; i++ )
+    для( ; i < sz; i++ )
     {
         size_t nidx = hdr.hashtab[i];
-        if( nidx )
+        если( nidx )
         {
             hashidx = i;
             ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return *this;
+            вернуть *this;
         }
     }
     hashidx = sz;
     ptr = 0;
-    return *this;
+    вернуть *this;
 }
 
 } // cv::

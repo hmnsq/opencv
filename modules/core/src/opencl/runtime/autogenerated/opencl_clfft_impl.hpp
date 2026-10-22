@@ -43,117 +43,117 @@ namespace {
 #define openclamdfft_fn0(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(); } \
 
 #define openclamdfft_fn1(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1); } \
 
 #define openclamdfft_fn2(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2); } \
 
 #define openclamdfft_fn3(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3); } \
 
 #define openclamdfft_fn4(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4); } \
 
 #define openclamdfft_fn5(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5); } \
 
 #define openclamdfft_fn6(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6); } \
 
 #define openclamdfft_fn7(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7); } \
 
 #define openclamdfft_fn8(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8); } \
 
 #define openclamdfft_fn9(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9); } \
 
 #define openclamdfft_fn10(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } \
 
 #define openclamdfft_fn11(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } \
 
 #define openclamdfft_fn12(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } \
 
 #define openclamdfft_fn13(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } \
 
 #define openclamdfft_fn14(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14); } \
 
 #define openclamdfft_fn15(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15); } \
 
 #define openclamdfft_fn16(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16); } \
 
 #define openclamdfft_fn17(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17); } \
 
 #define openclamdfft_fn18(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18); } \
 
 #define openclamdfft_fn19(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19); } \
 
 #define openclamdfft_fn20(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20); } \
 
 #define openclamdfft_fn21(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21); } \
 
 #define openclamdfft_fn22(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22); } \
+    { вернуть ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22); } \
 
 }
 

@@ -14,38 +14,38 @@ namespace cv {
 
 static bool ocl_patchNaNs( InputOutputArray _a, double value )
 {
-    int ftype = _a.depth();
+    целое ftype = _a.depth();
 
     const ocl::Device d = ocl::Device::getDefault();
     bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && ftype == CV_64F)
+    если (!doubleSupport && ftype == CV_64F)
     {
-        return false;
+        вернуть false;
     }
 
-    int rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    целое rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                      format("-D UNARY_OP -D OP_PATCH_NANS -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d %s",
                             ftype == CV_64F ? "double" : "float", ftype, rowsPerWI,
                             doubleSupport ? "-D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    если (k.empty())
+        вернуть false;
 
     UMat a = _a.getUMat();
-    int cn = a.channels();
+    целое cn = a.channels();
 
     // to pass float or double to args
-    if (ftype == CV_32F)
+    если (ftype == CV_32F)
     {
         k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), (float)value);
     }
-    else // CV_64F
+    иначе // CV_64F
     {
         k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), value);
     }
 
     size_t globalsize[2] = { (size_t)a.cols * cn, ((size_t)a.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    вернуть k.run(2, globalsize, NULL, false);
 }
 
 #endif
@@ -72,7 +72,7 @@ void patchNaNs( InputOutputArray _a, double _val )
 
     PatchNanFunc func = getPatchNanFunc(_a.depth() == CV_64F);
 
-    for (size_t i = 0; i < it.nplanes; i++, ++it)
+    для (size_t i = 0; i < it.nplanes; i++, ++it)
     {
         func(ptrs[0], len, _val);
     }
@@ -83,33 +83,33 @@ void patchNaNs( InputOutputArray _a, double _val )
 
 static bool ocl_finiteMask(const UMat img, UMat mask)
 {
-    int channels = img.channels();
-    int depth = img.depth();
+    целое channels = img.channels();
+    целое depth = img.depth();
 
     const ocl::Device d = ocl::Device::getDefault();
     bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
+    если (!doubleSupport && depth == CV_64F)
     {
-        return false;
+        вернуть false;
     }
 
-    int rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    целое rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     ocl::Kernel k("finiteMask", ocl::core::finitemask_oclsrc,
                   format("-D srcT=%s -D cn=%d -D rowsPerWI=%d %s",
                          depth == CV_32F ? "float" : "double", channels, rowsPerWI,
                          doubleSupport ? "-D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    если (k.empty())
+        вернуть false;
 
     k.args(ocl::KernelArg::ReadOnlyNoSize(img), ocl::KernelArg::WriteOnly(mask));
 
     size_t globalsize[2] = { (size_t)img.cols, ((size_t)img.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    вернуть k.run(2, globalsize, NULL, false);
 }
 
 #endif
 
-static FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn)
+static FiniteMaskFunc getFiniteMaskFunc(bool isDouble, целое cn)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getFiniteMaskFunc, (isDouble, cn), CV_CPU_DISPATCH_MODES_ALL);
@@ -119,11 +119,11 @@ void finiteMask(InputArray _src, OutputArray _mask)
 {
     CV_INSTRUMENT_REGION();
 
-    int channels = _src.channels();
-    int depth = _src.depth();
+    целое channels = _src.channels();
+    целое depth = _src.depth();
     CV_Assert( channels > 0 && channels <= 4);
     CV_Assert( depth == CV_32F || depth == CV_64F );
-    std::vector<int> vsz(_src.dims());
+    std::vector<целое> vsz(_src.dims());
     _src.sizend(vsz.data());
     _mask.create(_src.dims(), vsz.data(), CV_8UC1);
 
@@ -141,7 +141,7 @@ void finiteMask(InputArray _src, OutputArray _mask)
 
     FiniteMaskFunc func = getFiniteMaskFunc((depth == CV_64F), channels);
 
-    for( i = 0; i < nplanes; i++, ++it )
+    для( i = 0; i < nplanes; i++, ++it )
     {
         const uchar* sptr = planes[0].ptr();
         uchar* dptr = planes[1].ptr();

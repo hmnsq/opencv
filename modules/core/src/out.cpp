@@ -56,27 +56,27 @@ namespace cv
         char buf[32];   // enough for double with precision up to 20
 
         Mat mtx;
-        int mcn; // == mtx.channels()
+        целое mcn; // == mtx.channels()
         bool singleLine;
         bool alignOrder;    // true when cn first order
 
-        int state;
-        int row;
-        int col;
-        int cn;
+        целое state;
+        целое row;
+        целое col;
+        целое cn;
 
         String prologue;
         String epilogue;
         char braces[5];
 
         void (FormattedImpl::*valueToStr)();
-        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
-        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
-        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
-        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
-        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
+        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (целое)mtx.ptr<uchar>(row, col)[cn] != 0); }
+        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (целое)mtx.ptr<uchar>(row, col)[cn]); }
+        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (целое)mtx.ptr<schar>(row, col)[cn]); }
+        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (целое)mtx.ptr<ushort>(row, col)[cn]); }
+        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (целое)mtx.ptr<short>(row, col)[cn]); }
         void valueToStr32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
-        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
+        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<целое>(row, col)[cn]); }
         void valueToStr32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
         void valueToStr64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
         void valueToStr64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
@@ -89,7 +89,7 @@ namespace cv
 
     public:
 
-        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, int precision)
+        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, целое precision)
         {
             CV_Assert(m.dims <= 2);
 
@@ -103,13 +103,13 @@ namespace cv
             alignOrder = aOrder;
             row = col = cn =0;
 
-            if (precision < 0)
+            если (precision < 0)
             {
                 floatFormat[0] = '%';
                 floatFormat[1] = 'a';
                 floatFormat[2] = 0;
             }
-            else
+            иначе
             {
                 cv_snprintf(floatFormat, sizeof(floatFormat), "%%.%dg", std::min(precision, 20));
             }
@@ -147,126 +147,126 @@ namespace cv
             {
                 case STATE_PROLOGUE:
                     row = 0;
-                    if (mtx.empty())
+                    если (mtx.empty())
                         state = STATE_EPILOGUE;
-                    else if (alignOrder)
+                    иначе если (alignOrder)
                         state = STATE_INTERLUDE;
-                    else
+                    иначе
                         state = STATE_ROW_OPEN;
-                    return prologue.c_str();
+                    вернуть prologue.c_str();
                 case STATE_INTERLUDE:
                     state = STATE_ROW_OPEN;
-                    if (row >= mtx.rows)
+                    если (row >= mtx.rows)
                     {
-                        if (++cn >= mcn)
+                        если (++cn >= mcn)
                         {
                             state = STATE_EPILOGUE;
                             buf[0] = 0;
-                            return buf;
+                            вернуть buf;
                         }
-                        else
+                        иначе
                             row = 0;
                         snprintf(buf, sizeof(buf), "\n(:, :, %d) = \n", cn+1);
-                        return buf;
+                        вернуть buf;
                     }
                     snprintf(buf, sizeof(buf), "(:, :, %d) = \n", cn+1);
-                    return buf;
+                    вернуть buf;
                 case STATE_EPILOGUE:
                     state = STATE_FINISHED;
-                    return epilogue.c_str();
+                    вернуть epilogue.c_str();
                 case STATE_ROW_OPEN:
                     col = 0;
                     state = STATE_CN_OPEN;
                     {
                         size_t pos = 0;
-                        if (row > 0)
-                            while(pos < prologue.size() && pos < sizeof(buf) - 2)
+                        если (row > 0)
+                            пока(pos < prologue.size() && pos < sizeof(buf) - 2)
                                 buf[pos++] = ' ';
-                        if (braces[BRACE_ROW_OPEN])
+                        если (braces[BRACE_ROW_OPEN])
                             buf[pos++] = braces[BRACE_ROW_OPEN];
-                        if(!pos)
-                            return next();
+                        если(!pos)
+                            вернуть next();
                         buf[pos] = 0;
                     }
-                    return buf;
+                    вернуть buf;
                 case STATE_ROW_CLOSE:
                     state = STATE_LINE_SEPARATOR;
                     ++row;
-                    if (braces[BRACE_ROW_CLOSE])
+                    если (braces[BRACE_ROW_CLOSE])
                     {
                         buf[0] = braces[BRACE_ROW_CLOSE];
                         buf[1] = row < mtx.rows ? ',' : '\0';
                         buf[2] = 0;
-                        return buf;
+                        вернуть buf;
                     }
-                    else if(braces[BRACE_ROW_SEP] && row < mtx.rows)
+                    иначе если(braces[BRACE_ROW_SEP] && row < mtx.rows)
                     {
                         buf[0] = braces[BRACE_ROW_SEP];
                         buf[1] = 0;
-                        return buf;
+                        вернуть buf;
                     }
-                    return next();
+                    вернуть next();
                 case STATE_CN_OPEN:
                     state = STATE_VALUE;
-                    if (!alignOrder)
+                    если (!alignOrder)
                         cn = 0;
-                    if (mcn > 1 && braces[BRACE_CN_OPEN])
+                    если (mcn > 1 && braces[BRACE_CN_OPEN])
                     {
                         buf[0] = braces[BRACE_CN_OPEN];
                         buf[1] = 0;
-                        return buf;
+                        вернуть buf;
                     }
-                    return next();
+                    вернуть next();
                 case STATE_CN_CLOSE:
                     ++col;
-                    if (col >= mtx.cols)
+                    если (col >= mtx.cols)
                         state = STATE_ROW_CLOSE;
-                    else
+                    иначе
                         state = STATE_CN_SEPARATOR;
-                    if (mcn > 1 && braces[BRACE_CN_CLOSE])
+                    если (mcn > 1 && braces[BRACE_CN_CLOSE])
                     {
                         buf[0] = braces[BRACE_CN_CLOSE];
                         buf[1] = 0;
-                        return buf;
+                        вернуть buf;
                     }
-                    return next();
+                    вернуть next();
                 case STATE_VALUE:
                     (this->*valueToStr)();
                     state = STATE_CN_CLOSE;
-                    if (alignOrder)
-                        return buf;
-                    if (++cn < mcn)
+                    если (alignOrder)
+                        вернуть buf;
+                    если (++cn < mcn)
                         state = STATE_VALUE_SEPARATOR;
-                    return buf;
+                    вернуть buf;
                 case STATE_FINISHED:
-                    return 0;
+                    вернуть 0;
                 case STATE_LINE_SEPARATOR:
-                    if (row >= mtx.rows)
+                    если (row >= mtx.rows)
                     {
-                        if (alignOrder)
+                        если (alignOrder)
                             state = STATE_INTERLUDE;
-                        else
+                        иначе
                             state = STATE_EPILOGUE;
-                        return next();
+                        вернуть next();
                     }
                     state = STATE_ROW_OPEN;
                     buf[0] = singleLine ? ' ' : '\n';
                     buf[1] = 0;
-                    return buf;
+                    вернуть buf;
                 case STATE_CN_SEPARATOR:
                     state = STATE_CN_OPEN;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    вернуть buf;
                 case STATE_VALUE_SEPARATOR:
                     state = STATE_VALUE;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    вернуть buf;
             }
-            return 0;
+            вернуть 0;
         }
     };
 
@@ -275,17 +275,17 @@ namespace cv
     public:
         FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(true) {}
 
-        void set16fPrecision(int p) CV_OVERRIDE
+        void set16fPrecision(целое p) CV_OVERRIDE
         {
             prec16f = p;
         }
 
-        void set32fPrecision(int p) CV_OVERRIDE
+        void set32fPrecision(целое p) CV_OVERRIDE
         {
             prec32f = p;
         }
 
-        void set64fPrecision(int p) CV_OVERRIDE
+        void set64fPrecision(целое p) CV_OVERRIDE
         {
             prec64f = p;
         }
@@ -296,10 +296,10 @@ namespace cv
         }
 
     protected:
-        int prec16f;
-        int prec32f;
-        int prec64f;
-        int multiline;
+        целое prec16f;
+        целое prec32f;
+        целое prec64f;
+        целое multiline;
     };
 
     class DefaultFormatter CV_FINAL : public FormatterBase
@@ -309,7 +309,7 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+            вернуть makePtr<FormattedImpl>("[", "]", mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
@@ -321,7 +321,7 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("", "", mtx, &*braces,
+            вернуть makePtr<FormattedImpl>("", "", mtx, &*braces,
                 mtx.rows == 1 || !multiline, true, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
@@ -333,9 +333,9 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            если (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+            вернуть makePtr<FormattedImpl>("[", "]", mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
@@ -353,9 +353,9 @@ namespace cv
                 "float8_e4m3fn", "float8_e4m3fnuz"
             };
             char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            если (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("array([",
+            вернуть makePtr<FormattedImpl>("array([",
                 cv::format("], dtype='%s')", numpyTypes[mtx.depth()]), mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
@@ -368,7 +368,7 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'\0', '\0', '\0', '\0', '\0'};
-            return makePtr<FormattedImpl>(String(),
+            вернуть makePtr<FormattedImpl>(String(),
                 mtx.rows > 1 ? String("\n") : String(), mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
@@ -381,7 +381,7 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'\0', '\0', ',', '\0', '\0'};
-            return makePtr<FormattedImpl>("{", "}", mtx, &*braces,
+            вернуть makePtr<FormattedImpl>("{", "}", mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
@@ -394,172 +394,172 @@ namespace cv
         switch(fmt)
         {
             case FMT_DEFAULT:
-                return makePtr<DefaultFormatter>();
+                вернуть makePtr<DefaultFormatter>();
             case FMT_MATLAB:
-                return makePtr<MatlabFormatter>();
+                вернуть makePtr<MatlabFormatter>();
             case FMT_CSV:
-                return makePtr<CSVFormatter>();
+                вернуть makePtr<CSVFormatter>();
             case FMT_PYTHON:
-                return makePtr<PythonFormatter>();
+                вернуть makePtr<PythonFormatter>();
             case FMT_NUMPY:
-                return makePtr<NumpyFormatter>();
+                вернуть makePtr<NumpyFormatter>();
             case FMT_C:
-                return makePtr<CFormatter>();
+                вернуть makePtr<CFormatter>();
         }
-        return makePtr<DefaultFormatter>();
+        вернуть makePtr<DefaultFormatter>();
     }
 
     template<typename _Tp> struct Fmt
     {
-        typedef int temp_type;
-        static const char* fmt() { return "%d"; }
+        typedef целое temp_type;
+        static const char* fmt() { вернуть "%d"; }
     };
 
     template<> struct Fmt<uint32_t>
     {
         typedef unsigned temp_type;
-        static const char* fmt() { return "%u"; }
+        static const char* fmt() { вернуть "%u"; }
     };
 
     template<> struct Fmt<int64_t>
     {
         typedef long long temp_type;
-        static const char* fmt() { return "%lld"; }
+        static const char* fmt() { вернуть "%lld"; }
     };
 
     template<> struct Fmt<uint64_t>
     {
         typedef unsigned long long temp_type;
-        static const char* fmt() { return "%llu"; }
+        static const char* fmt() { вернуть "%llu"; }
     };
 
     template<> struct Fmt<float>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        static const char* fmt() { вернуть "%.5g"; }
     };
 
     template<> struct Fmt<double>
     {
         typedef double temp_type;
-        static const char* fmt() { return "%.5g"; }
+        static const char* fmt() { вернуть "%.5g"; }
     };
 
     template<> struct Fmt<hfloat>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        static const char* fmt() { вернуть "%.5g"; }
     };
 
     template<> struct Fmt<bfloat>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        static const char* fmt() { вернуть "%.4g"; }
     };
 
     template<> struct Fmt<fp8_t>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        static const char* fmt() { вернуть "%.4g"; }
     };
 
     template<> struct Fmt<fp8a_t>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        static const char* fmt() { вернуть "%.4g"; }
     };
 
     template <typename _Tp>
-    static void pprintRow(std::ostream& strm, const _Tp* ptr, int n, size_t ofs, int edge)
+    static void pprintRow(std::ostream& strm, const _Tp* ptr, целое n, size_t ofs, целое edge)
     {
         char buf[128];
         const char* fmt = Fmt<_Tp>::fmt();
-        int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-        if (edge == 0)
+        целое i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+        если (edge == 0)
             edge = ndump;
-        for (i = 0; i < ndump; i++) {
-            int j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
-            if (i > 0)
+        для (i = 0; i < ndump; i++) {
+            целое j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
+            если (i > 0)
                 strm << ", ";
-            if (j >= 0) {
+            если (j >= 0) {
                 snprintf(buf, sizeof(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
                 strm << buf;
-            } else
+            } иначе
                 strm << "... ";
         }
     }
 
     static void pprintSlice(std::ostream& strm, const Mat& tensor,
-                            const size_t* step, int d,
-                            size_t ofs, int edge)
+                            const size_t* step, целое d,
+                            size_t ofs, целое edge)
     {
         MatShape shape = tensor.shape();
-        int ndims = shape.dims;
-        int n = d >= ndims ? 1 : shape[d];
-        if (d >= ndims - 1) {
-            int typ = tensor.depth();
+        целое ndims = shape.dims;
+        целое n = d >= ndims ? 1 : shape[d];
+        если (d >= ndims - 1) {
+            целое typ = tensor.depth();
             void* data = tensor.data;
             CV_Assert(data);
             n *= tensor.channels();
-            if (typ == CV_8U)
+            если (typ == CV_8U)
                 pprintRow(strm, (const uint8_t*)data, n, ofs, edge);
-            else if (typ == CV_8S)
+            иначе если (typ == CV_8S)
                 pprintRow(strm, (const int8_t*)data, n, ofs, edge);
-            else if (typ == CV_16U)
+            иначе если (typ == CV_16U)
                 pprintRow(strm, (const uint16_t*)data, n, ofs, edge);
-            else if (typ == CV_16S)
+            иначе если (typ == CV_16S)
                 pprintRow(strm, (const int16_t*)data, n, ofs, edge);
-            else if (typ == CV_32U)
+            иначе если (typ == CV_32U)
                 pprintRow(strm, (const unsigned*)data, n, ofs, edge);
-            else if (typ == CV_32S)
-                pprintRow(strm, (const int*)data, n, ofs, edge);
-            else if (typ == CV_64U)
+            иначе если (typ == CV_32S)
+                pprintRow(strm, (const целое*)data, n, ofs, edge);
+            иначе если (typ == CV_64U)
                 pprintRow(strm, (const uint64_t*)data, n, ofs, edge);
-            else if (typ == CV_64S)
+            иначе если (typ == CV_64S)
                 pprintRow(strm, (const int64_t*)data, n, ofs, edge);
-            else if (typ == CV_32F)
+            иначе если (typ == CV_32F)
                 pprintRow(strm, (const float*)data, n, ofs, edge);
-            else if (typ == CV_64F)
+            иначе если (typ == CV_64F)
                 pprintRow(strm, (const double*)data, n, ofs, edge);
-            else if (typ == CV_16F)
+            иначе если (typ == CV_16F)
                 pprintRow(strm, (const hfloat*)data, n, ofs, edge);
-            else if (typ == CV_16BF)
+            иначе если (typ == CV_16BF)
                 pprintRow(strm, (const bfloat*)data, n, ofs, edge);
-            else if (typ == CV_Bool)
+            иначе если (typ == CV_Bool)
                 pprintRow(strm, (const bool*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FN)
+            иначе если (typ == CV_8F_E4M3FN)
                 pprintRow(strm, (const fp8_t*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FNUZ)
+            иначе если (typ == CV_8F_E4M3FNUZ)
                 pprintRow(strm, (const fp8a_t*)data, n, ofs, edge);
-            else {
+            иначе {
                 CV_Error(Error::StsNotImplemented, "unsupported type");
             }
-        } else {
-            int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+        } иначе {
+            целое i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
             bool dots = false;
-            for (i = 0; i < ndump; i++) {
-                if (i > 0 && !dots) {
-                    int nempty_lines = ndims - 2 - d;
-                    for (int k = 0; k < nempty_lines; k++)
+            для (i = 0; i < ndump; i++) {
+                если (i > 0 && !dots) {
+                    целое nempty_lines = ndims - 2 - d;
+                    для (целое k = 0; k < nempty_lines; k++)
                         strm << "\n";
                 }
-                if (i > 0)
+                если (i > 0)
                     strm << "\n";
-                int j = n == ndump || i < edge ? i :
+                целое j = n == ndump || i < edge ? i :
                         i == edge ? -1 :
                         n - edge*2 - 1 + i;
                 dots = j < 0;
-                if (!dots)
+                если (!dots)
                     pprintSlice(strm, tensor, step, d+1, ofs + j*step[d], edge);
-                else
+                иначе
                     strm << "...";
             }
         }
     }
 
     std::ostream& pprint(std::ostream& strm, InputArray array,
-                         int /*indent*/, int edge_,
-                         int wholeTensorThreshold,
+                         целое /*indent*/, целое edge_,
+                         целое wholeTensorThreshold,
                          char parens)
     {
         char oparen = parens;
@@ -568,11 +568,11 @@ namespace cv
                       parens == '{' ? '}' :
                       parens == '<' ? '>' :
                       parens;
-        int edge = edge_ > 0 ? edge_ : 3;
+        целое edge = edge_ > 0 ? edge_ : 3;
         wholeTensorThreshold = wholeTensorThreshold > 0 ? wholeTensorThreshold : 100;
 
         Mat tensor = array.getMat();
-        if (!tensor.isContinuous()) {
+        если (!tensor.isContinuous()) {
             // [TODO] print non-continous arrays without copy
             Mat temp;
             tensor.copyTo(temp);
@@ -582,28 +582,28 @@ namespace cv
         MatShape shape = tensor.shape();
         size_t sz_all = tensor.total();
 
-        if (parens)
+        если (parens)
             strm << oparen;
-        if (sz_all == 0) {
-            if (!parens)
+        если (sz_all == 0) {
+            если (!parens)
                 strm << "<empty>";
-        } else {
-            if (sz_all <= (size_t)wholeTensorThreshold)
+        } иначе {
+            если (sz_all <= (size_t)wholeTensorThreshold)
                 edge = 0;
 
-            int ndims = shape.dims;
-            int cn = tensor.channels();
+            целое ndims = shape.dims;
+            целое cn = tensor.channels();
             size_t step[MatShape::MAX_DIMS];
             step[std::max(ndims-1, 0)] = 1;
-            for (int i = ndims-2; i >= 0; i--) {
+            для (целое i = ndims-2; i >= 0; i--) {
                 step[i] = step[i+1]*shape[i+1]*cn;
                 cn = 1;
             }
             pprintSlice(strm, tensor, step, 0, 0, edge);
         }
-        if (parens)
+        если (parens)
             strm << cparen;
-        return strm;
+        вернуть strm;
     }
 
 } // cv

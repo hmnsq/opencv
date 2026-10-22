@@ -11,7 +11,7 @@
 
 namespace cv { namespace hal {
 
-void merge8u(const uchar** src, uchar* dst, int len, int cn )
+void merge8u(const uchar** src, uchar* dst, целое len, целое cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge8u, cv_hal_merge8u, src, dst, len, cn)
@@ -19,7 +19,7 @@ void merge8u(const uchar** src, uchar* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge16u(const ushort** src, ushort* dst, int len, int cn )
+void merge16u(const ushort** src, ushort* dst, целое len, целое cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge16u, cv_hal_merge16u, src, dst, len, cn)
@@ -27,7 +27,7 @@ void merge16u(const ushort** src, ushort* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge32s(const int** src, int* dst, int len, int cn )
+void merge32s(const целое** src, целое* dst, целое len, целое cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge32s, cv_hal_merge32s, src, dst, len, cn)
@@ -35,7 +35,7 @@ void merge32s(const int** src, int* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge64s(const int64** src, int64* dst, int len, int cn )
+void merge64s(const int64** src, int64* dst, целое len, целое cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge64s, cv_hal_merge64s, src, dst, len, cn)
@@ -46,79 +46,79 @@ void merge64s(const int64** src, int64* dst, int len, int cn )
 } // namespace cv::hal::
 
 
-typedef void (*MergeFunc)(const void** src, void* dst, int len, int cn);
+typedef void (*MergeFunc)(const void** src, void* dst, целое len, целое cn);
 
-template<typename T, void (*fn)(const T**, T*, int, int)>
-static void mergeWrap(const void** src, void* dst, int len, int cn)
+template<typename T, void (*fn)(const T**, T*, целое, целое)>
+static void mergeWrap(const void** src, void* dst, целое len, целое cn)
 {
     fn((const T**)src, (T*)dst, len, cn);
 }
 
-static MergeFunc getMergeFunc(int depth)
+static MergeFunc getMergeFunc(целое depth)
 {
     static MergeFunc mergeTab[CV_DEPTH_MAX] =
     {
         mergeWrap<uchar, cv::hal::merge8u>, mergeWrap<uchar, cv::hal::merge8u>,
         mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<ushort, cv::hal::merge16u>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<int, cv::hal::merge32s>,
+        mergeWrap<целое, cv::hal::merge32s>, mergeWrap<целое, cv::hal::merge32s>,
         mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<ushort, cv::hal::merge16u>,
         mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<uchar, cv::hal::merge8u>,
         mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<int64_t, cv::hal::merge64s>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<uchar, cv::hal::merge8u>,
+        mergeWrap<целое, cv::hal::merge32s>, mergeWrap<uchar, cv::hal::merge8u>,
         mergeWrap<uchar, cv::hal::merge8u>, 0,
     };
 
-    return mergeTab[depth];
+    вернуть mergeTab[depth];
 }
 
 #ifdef HAVE_IPP
 
-static bool ipp_merge(const Mat* mv, Mat& dst, int channels)
+static bool ipp_merge(const Mat* mv, Mat& dst, целое channels)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(channels != 3 && channels != 4)
-        return false;
+    если(channels != 3 && channels != 4)
+        вернуть false;
 
-    if(mv[0].dims <= 2)
+    если(mv[0].dims <= 2)
     {
         IppiSize    size       = ippiSize(mv[0].size());
         const void *srcPtrs[4] = {NULL};
         size_t      srcStep    = mv[0].step;
-        for(int i = 0; i < channels; i++)
+        для(целое i = 0; i < channels; i++)
         {
             srcPtrs[i] = mv[i].ptr();
-            if(srcStep != mv[i].step)
-                return false;
+            если(srcStep != mv[i].step)
+                вернуть false;
         }
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, srcPtrs, (int)srcStep, dst.ptr(), (int)dst.step, size, (int)mv[0].elemSize1(), channels, 0) >= 0;
+        вернуть CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, srcPtrs, (целое)srcStep, dst.ptr(), (целое)dst.step, size, (целое)mv[0].elemSize1(), channels, 0) >= 0;
     }
-    else
+    иначе
     {
         const Mat *arrays[5] = {NULL};
         uchar     *ptrs[5]   = {NULL};
         arrays[0] = &dst;
 
-        for(int i = 1; i < channels; i++)
+        для(целое i = 1; i < channels; i++)
         {
             arrays[i] = &mv[i-1];
         }
 
         NAryMatIterator it(arrays, ptrs);
-        IppiSize size = { (int)it.size, 1 };
+        IppiSize size = { (целое)it.size, 1 };
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        для( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, (const void**)&ptrs[1], 0, ptrs[0], 0, size, (int)mv[0].elemSize1(), channels, 0) < 0)
-                return false;
+            если(CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, (const void**)&ptrs[1], 0, ptrs[0], 0, size, (целое)mv[0].elemSize1(), channels, 0) < 0)
+                вернуть false;
         }
-        return true;
+        вернуть true;
     }
-#else
+#иначе
     CV_UNUSED(dst); CV_UNUSED(mv); CV_UNUSED(channels);
-    return false;
+    вернуть false;
 #endif
 }
 #endif
@@ -130,12 +130,12 @@ void merge(const Mat* mv, size_t n, OutputArray _dst)
     CV_Assert( mv && n > 0 );
     CV_Assert(!mv[0].empty());
 
-    int depth = mv[0].depth();
+    целое depth = mv[0].depth();
     bool allch1 = true;
-    int k, cn = 0;
+    целое k, cn = 0;
     size_t i;
 
-    for( i = 0; i < n; i++ )
+    для( i = 0; i < n; i++ )
     {
         CV_Assert(mv[i].size == mv[0].size && mv[i].depth() == depth);
         allch1 = allch1 && mv[i].channels() == 1;
@@ -146,60 +146,60 @@ void merge(const Mat* mv, size_t n, OutputArray _dst)
     _dst.create(mv[0].size, CV_MAKETYPE(depth, cn));
     Mat dst = _dst.getMat();
 
-    if( n == 1 )
+    если( n == 1 )
     {
         mv[0].copyTo(dst);
-        return;
+        вернуть;
     }
 
-    CV_IPP_RUN(allch1, ipp_merge(mv, dst, (int)n));
+    CV_IPP_RUN(allch1, ipp_merge(mv, dst, (целое)n));
 
-    if( !allch1 )
+    если( !allch1 )
     {
-        AutoBuffer<int> pairs(cn*2);
-        int j, ni=0;
+        AutoBuffer<целое> pairs(cn*2);
+        целое j, ni=0;
 
-        for( i = 0, j = 0; i < n; i++, j += ni )
+        для( i = 0, j = 0; i < n; i++, j += ni )
         {
             ni = mv[i].channels();
-            for( k = 0; k < ni; k++ )
+            для( k = 0; k < ni; k++ )
             {
                 pairs[(j+k)*2] = j + k;
                 pairs[(j+k)*2+1] = j + k;
             }
         }
         mixChannels( mv, n, &dst, 1, &pairs[0], cn );
-        return;
+        вернуть;
     }
 
     MergeFunc func = getMergeFunc(depth);
     CV_Assert( func != 0 );
 
     size_t esz = dst.elemSize(), esz1 = dst.elemSize1();
-    size_t blocksize0 = (int)((BLOCK_SIZE + esz-1)/esz);
+    size_t blocksize0 = (целое)((BLOCK_SIZE + esz-1)/esz);
     AutoBuffer<uchar> _buf((cn+1)*(sizeof(Mat*) + sizeof(uchar*)) + 16);
     const Mat** arrays = (const Mat**)_buf.data();
     uchar** ptrs = (uchar**)alignPtr(arrays + cn + 1, 16);
 
     arrays[0] = &dst;
-    for( k = 0; k < cn; k++ )
+    для( k = 0; k < cn; k++ )
         arrays[k+1] = &mv[k];
 
     NAryMatIterator it(arrays, ptrs, cn+1);
-    size_t total = (int)it.size;
+    size_t total = (целое)it.size;
     size_t blocksize = std::min((size_t)CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn), cn <= 4 ? total : std::min(total, blocksize0));
 
-    for( i = 0; i < it.nplanes; i++, ++it )
+    для( i = 0; i < it.nplanes; i++, ++it )
     {
-        for( size_t j = 0; j < total; j += blocksize )
+        для( size_t j = 0; j < total; j += blocksize )
         {
             size_t bsz = std::min(total - j, blocksize);
-            func( (const void**)&ptrs[1], ptrs[0], (int)bsz, cn );
+            func( (const void**)&ptrs[1], ptrs[0], (целое)bsz, cn );
 
-            if( j + blocksize < total )
+            если( j + blocksize < total )
             {
                 ptrs[0] += bsz*esz;
-                for( int t = 0; t < cn; t++ )
+                для( целое t = 0; t < cn; t++ )
                     ptrs[t+1] += bsz*esz1;
             }
         }
@@ -214,30 +214,30 @@ static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
     _mv.getUMatVector(src);
     CV_Assert(!src.empty());
 
-    int type = src[0].type(), depth = CV_MAT_DEPTH(type),
+    целое type = src[0].type(), depth = CV_MAT_DEPTH(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     Size size = src[0].size();
 
-    for (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
+    для (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
     {
-        int itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_DEPTH(itype),
+        целое itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_DEPTH(itype),
                 esz1 = CV_ELEM_SIZE1(idepth);
-        if (src[i].dims > 2)
-            return false;
+        если (src[i].dims > 2)
+            вернуть false;
 
         CV_Assert(size == src[i].size() && depth == idepth);
 
-        for (int cn = 0; cn < icn; ++cn)
+        для (целое cn = 0; cn < icn; ++cn)
         {
             UMat tsrc = src[i];
             tsrc.offset += cn * esz1;
             ksrc.push_back(tsrc);
         }
     }
-    int dcn = (int)ksrc.size();
+    целое dcn = (целое)ksrc.size();
 
     String srcargs, processelem, cndecl, indexdecl;
-    for (int i = 0; i < dcn; ++i)
+    для (целое i = 0; i < dcn; ++i)
     {
         srcargs += format("DECLARE_SRC_PARAM(%d)", i);
         processelem += format("PROCESS_ELEM(%d)", i);
@@ -250,20 +250,20 @@ static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
                          " -D DECLARE_INDEX_N=%s -D PROCESS_ELEMS_N=%s%s",
                          dcn, ocl::memopTypeToStr(depth), srcargs.c_str(),
                          indexdecl.c_str(), processelem.c_str(), cndecl.c_str()));
-    if (k.empty())
-        return false;
+    если (k.empty())
+        вернуть false;
 
     _dst.create(size, CV_MAKE_TYPE(depth, dcn));
     UMat dst = _dst.getUMat();
 
-    int argidx = 0;
-    for (int i = 0; i < dcn; ++i)
+    целое argidx = 0;
+    для (целое i = 0; i < dcn; ++i)
         argidx = k.set(argidx, ocl::KernelArg::ReadOnlyNoSize(ksrc[i]));
     argidx = k.set(argidx, ocl::KernelArg::WriteOnly(dst));
     k.set(argidx, rowsPerWI);
 
     size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    вернуть k.run(2, globalsize, NULL, false);
 }
 
 #endif

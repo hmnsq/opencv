@@ -46,12 +46,12 @@ enum { DFT_MAX_STAGES = 40 };
 
 struct DftStage
 {
-    int radix;          // 3, 4, 5 or an odd number >= 7
-    int span;           // L: length of the sub-DFTs combined by this stage
-    int ngroups;        // G = nc / (radix*span)
-    int nsteps;         // number of (vector) iterations of the flat loop, precomputed by the plan
-    int mode;           // DftStageMode
-    int tw_stride;      // per-leg twiddle table length (== span for now)
+    целое radix;          // 3, 4, 5 or an odd number >= 7
+    целое span;           // L: length of the sub-DFTs combined by this stage
+    целое ngroups;        // G = nc / (radix*span)
+    целое nsteps;         // number of (vector) iterations of the flat loop, precomputed by the plan
+    целое mode;           // DftStageMode
+    целое tw_stride;      // per-leg twiddle table length (== span for now)
     // Per-stage twiddles, split layout, leg-major: tw_re[(q-1)*tw_stride + j] = cos(-2*pi*q*j/(radix*span)),
     // q in [1, radix), j in [0, span). Type T of the plan.
     const void* tw_re;
@@ -63,20 +63,20 @@ struct DftStage
 
 struct DftPlan
 {
-    int kind;           // DftKind
-    int n;              // logical transform length (real length for R2C/C2R/DCT/IDCT)
-    int nc;             // complex length actually run through the stages (n/2 for even real kinds)
-    int depth;          // CV_32F or CV_64F
-    int vl;             // vector lanes of the kernels this plan was built for (DFTKernels::vlanes)
-    int first_radix;    // 1, 2, 4 or 8: the fused first stage done in preproc
+    целое kind;           // DftKind
+    целое n;              // logical transform length (real length for R2C/C2R/DCT/IDCT)
+    целое nc;             // complex length actually run through the stages (n/2 for even real kinds)
+    целое depth;          // CV_32F or CV_64F
+    целое vl;             // vector lanes of the kernels this plan was built for (DFTKernels::vlanes)
+    целое first_radix;    // 1, 2, 4 or 8: the fused first stage done in preproc
     bool real_input;    // R2C with odd n: gather real samples, im = 0
     bool pingpong;      // stages must alternate between two workspace pairs
     bool need_tmp;      // C2R / DCT / IDCT: a temp of 2*nc elements (interleaved complex or the Makhoul-permuted reals)
-    int nstages;
+    целое nstages;
     DftStage stages[DFT_MAX_STAGES];
     // first_radix == 1: 2*nc element indices into the (real-typed) source (re index, im index);
     // first_radix > 1: nc/first_radix output positions (g*first_radix) of the input columns j
-    AutoBuffer<int> itab;
+    AutoBuffer<целое> itab;
     AutoBuffer<double> tw;      // storage for all the tables below (type T, 8-byte aligned)
     const void* rtw_re;         // W_n^k = exp(-2*pi*i*k/n), k in [0, n/2]; R2C/C2R/DCT/IDCT with even n
     const void* rtw_im;
@@ -96,7 +96,7 @@ struct DftPlan
     // (DFTKernels::vlanes), never from VTraits<> in dxt.cpp, which is compiled for the baseline
     // ISA and reports the wrong lane count on AVX2/AVX512/RVV builds. Stage modes and step counts
     // depend on it.
-    void build(int kind, int n, int depth, int vl);
+    void build(целое kind, целое n, целое depth, целое vl);
 
 private:
     // fills the twiddle tables (stage tables, W_n^k, DCT) into `tw`; ntw = total number of T entries
@@ -136,7 +136,7 @@ struct DFTKernels
     void (*postprocReal)(const DftPlan& plan, const void* re, void* dst, double scale); // re only
     void (*postprocDCT)(const DftPlan& plan, const void* re, const void* im, void* dst, size_t dstep);
     void (*postprocIDCT)(const DftPlan& plan, const void* re, const void* im, void* dst, size_t dstep);
-    int vlanes;     // VTraits<v_T>::vlanes() of the ISA these pointers belong to (1 = no SIMD)
+    целое vlanes;     // VTraits<v_T>::vlanes() of the ISA these pointers belong to (1 = no SIMD)
 };
 
 }

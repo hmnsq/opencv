@@ -31,9 +31,9 @@ namespace internal
 struct GlobalLoggingInitStruct
 {
 public:
-#if defined NDEBUG
+#если defined NDEBUG
     static const bool m_isDebugBuild = false;
-#else
+#иначе
     static const bool m_isDebugBuild = true;
 #endif
 
@@ -61,13 +61,13 @@ private:
     void handleMalformed()
     {
         // need to print warning for malformed log tag config strings?
-        if (m_isDebugBuild)
+        если (m_isDebugBuild)
         {
             const auto& parser = logTagManager.getConfigParser();
-            if (parser.hasMalformed())
+            если (parser.hasMalformed())
             {
                 const auto& malformedList = parser.getMalformed();
-                for (const auto& malformed : malformedList)
+                для (const auto& malformed : malformedList)
                 {
                     std::cout << "Malformed log level config: \"" << malformed << "\"\n";
                 }
@@ -117,53 +117,53 @@ static GlobalLoggingInitCall globalLoggingInitCall;
 static LogTagManager& getLogTagManager()
 {
     static LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
-    return logTagManagerInstance;
+    вернуть logTagManagerInstance;
 }
 
 static LogLevel& getLogLevelVariable()
 {
     static LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
-    return refGlobalLogLevel;
+    вернуть refGlobalLogLevel;
 }
 
 LogTag* getGlobalLogTag()
 {
     static LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
-    return globalLogTagPtr;
+    вернуть globalLogTagPtr;
 }
 
 } // namespace
 
 void registerLogTag(LogTag* plogtag)
 {
-    if (!plogtag || !plogtag->name)
+    если (!plogtag || !plogtag->name)
     {
-        return;
+        вернуть;
     }
     internal::getLogTagManager().assign(plogtag->name, plogtag);
 }
 
 void setLogTagLevel(const char* tag, LogLevel level)
 {
-    if (!tag)
+    если (!tag)
     {
-        return;
+        вернуть;
     }
     internal::getLogTagManager().setLevelByFullName(std::string(tag), level);
 }
 
 LogLevel getLogTagLevel(const char* tag)
 {
-    if (!tag)
+    если (!tag)
     {
-        return getLogLevel();
+        вернуть getLogLevel();
     }
     const LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
-    if (!ptr)
+    если (!ptr)
     {
-        return getLogLevel();
+        вернуть getLogLevel();
     }
-    return ptr->level;
+    вернуть ptr->level;
 }
 
 LogLevel setLogLevel(LogLevel logLevel)
@@ -172,12 +172,12 @@ LogLevel setLogLevel(LogLevel logLevel)
     LogLevel& refGlobalLevel = internal::getLogLevelVariable();
     const LogLevel old = refGlobalLevel;
     refGlobalLevel = logLevel;
-    return old;
+    вернуть old;
 }
 
 LogLevel getLogLevel()
 {
-    return internal::getLogLevelVariable();
+    вернуть internal::getLogLevelVariable();
 }
 
 namespace internal {
@@ -188,29 +188,29 @@ namespace //unnamed
     std::atomic<WriteLogMessageExFuncType> stc_userWriteLogMessageExFunc{};
 } //unnamed
 
-static int getShowTimestampMode()
+static целое getShowTimestampMode()
 {
     static bool param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", true);
     static bool param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", false);
-    return (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
+    вернуть (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
 }
 
 void writeLogMessage(LogLevel logLevel, const char* message)
 {
     WriteLogMessageFuncType userFunc = stc_userWriteLogMessageFunc.load();
-    if (userFunc && userFunc != writeLogMessage)
+    если (userFunc && userFunc != writeLogMessage)
     {
         (*userFunc)(logLevel, message);
-        return;
+        вернуть;
     }
 
-    const int threadID = cv::utils::getThreadID();
+    const целое threadID = cv::utils::getThreadID();
 
     std::string message_id;
     switch (getShowTimestampMode())
     {
         case 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); break;
-        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned int)getTimestampNS()); break;
+        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned целое)getTimestampNS()); break;
         default: message_id = cv::format("%d", threadID); break;
     }
 
@@ -223,11 +223,11 @@ void writeLogMessage(LogLevel logLevel, const char* message)
     case LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; break;
     case LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; break;
     case LOG_LEVEL_VERBOSE: ss << message << std::endl; break;
-    case LOG_LEVEL_SILENT: return;  // avoid compiler warning about incomplete switch
-    case ENUM_LOG_LEVEL_FORCE_INT: return;  // avoid compiler warning about incomplete switch
+    case LOG_LEVEL_SILENT: вернуть;  // avoid compiler warning about incomplete switch
+    case ENUM_LOG_LEVEL_FORCE_INT: вернуть;  // avoid compiler warning about incomplete switch
     }
 #ifdef __ANDROID__
-    int android_logLevel = ANDROID_LOG_INFO;
+    целое android_logLevel = ANDROID_LOG_INFO;
     switch (logLevel)
     {
     case LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; break;
@@ -243,7 +243,7 @@ void writeLogMessage(LogLevel logLevel, const char* message)
 #endif
     std::ostream* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::cerr : &std::cout;
     (*out) << ss.str();
-    if (logLevel <= LOG_LEVEL_WARNING)
+    если (logLevel <= LOG_LEVEL_WARNING)
     {
         (*out) << std::flush;
     }
@@ -255,41 +255,41 @@ static const char* stripSourceFilePathPrefix(const char* file)
     const char* pos = file;
     const char* strip_pos = NULL;
     char ch = 0;
-    while ((ch = pos[0]) != 0)
+    пока ((ch = pos[0]) != 0)
     {
         ++pos;
-        if (ch == '/' || ch == '\\')
+        если (ch == '/' || ch == '\\')
             strip_pos = pos;
     }
-    if (strip_pos == NULL || strip_pos == pos/*eos*/)
-        return file;
-    return strip_pos;
+    если (strip_pos == NULL || strip_pos == pos/*eos*/)
+        вернуть file;
+    вернуть strip_pos;
 }
 
-void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int line, const char* func, const char* message)
+void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, целое line, const char* func, const char* message)
 {
     WriteLogMessageExFuncType userFunc = stc_userWriteLogMessageExFunc.load();
-    if (userFunc && userFunc != writeLogMessageEx)
+    если (userFunc && userFunc != writeLogMessageEx)
     {
         (*userFunc)(logLevel, tag, file, line, func, message);
-        return;
+        вернуть;
     }
 
     std::ostringstream strm;
-    if (tag)
+    если (tag)
     {
         strm << tag << ' ';
     }
-    if (file)
+    если (file)
     {
         strm << stripSourceFilePathPrefix(file);
-        if (line > 0)
+        если (line > 0)
         {
             strm << ':' << line;
         }
         strm << ' ';
     }
-    if (func)
+    если (func)
     {
         strm << func << ' ';
     }
@@ -299,7 +299,7 @@ void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int
 
 void replaceWriteLogMessage(WriteLogMessageFuncType f)
 {
-    if (f == writeLogMessage)
+    если (f == writeLogMessage)
     {
         f = nullptr;
     }
@@ -308,7 +308,7 @@ void replaceWriteLogMessage(WriteLogMessageFuncType f)
 
 void replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
 {
-    if (f == writeLogMessageEx)
+    если (f == writeLogMessageEx)
     {
         f = nullptr;
     }

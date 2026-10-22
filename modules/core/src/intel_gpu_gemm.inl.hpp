@@ -38,59 +38,59 @@ static bool intel_gpu_gemm(
 {
     CV_UNUSED(sizeB);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    целое M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    если (M < 4 || N < 4 || K < 4)  // vload4
+        вернуть false;
 
     CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    unsigned целое lx = 8, ly = 4;
+    unsigned целое dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    если(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        если (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        иначе
         {
-            if (M % 2 != 0)
-                return false;
+            если (M % 2 != 0)
+                вернуть false;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            если (N % (4*8) != 0)
+                вернуть false;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    иначе если(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        если (M % 32 != 0)
+            вернуть false;
+        если (N % 32 != 0)
+            вернуть false;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    иначе если(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        если (K % 4 != 0)
+            вернуть false;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    иначе
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        если (M % 32 != 0)
+            вернуть false;
+        если (N % 32 != 0)
+            вернуть false;
+        если (K % 16 != 0)
+            вернуть false;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
@@ -106,62 +106,62 @@ static bool intel_gpu_gemm(
     String errmsg;
     const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    если(!atrans && btrans)
     {
         ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        если (k.empty())
         {
-            return false;
+            вернуть false;
         }
 
         k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+               (целое) (A.offset / sizeof(float)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (целое) (B.offset / sizeof(float)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (целое) (D.offset / sizeof(float)),
                M, N, K,
                (float)alpha,
                (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (целое)(A.step / sizeof(float)),
+               (целое)(B.step / sizeof(float)),
+               (целое)(D.step / sizeof(float))
         );
 
         bool ret = k.run(2, global, local, false, q);
-        return ret;
+        вернуть ret;
     }
-    else
+    иначе
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        целое stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        для(целое start_index = 0; start_index < K; start_index += stride)
         {
              ocl::Kernel k(kernelName.c_str(), program);
              k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+                    (целое) (A.offset / sizeof(float)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (целое) (B.offset / sizeof(float)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (целое) (D.offset / sizeof(float)),
                     M, N, K,
                     (float)alpha,
                     (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (целое)(A.step / sizeof(float)),
+                    (целое)(B.step / sizeof(float)),
+                    (целое)(D.step / sizeof(float)),
+                    (целое) start_index,                          // 14 start_index
                     stride);
 
             bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            если (!ret)
             {
-                if (start_index != 0)
+                если (start_index != 0)
                     isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                вернуть false;
             }
         }
-        return true;
+        вернуть true;
     }
 }
 
