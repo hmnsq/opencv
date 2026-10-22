@@ -5,125 +5,125 @@
 #ifndef OPENCV_CORE_BASE64_ENCODING_HPP
 #define OPENCV_CORE_BASE64_ENCODING_HPP
 
-namespace cv
+ନାମାକାଶ cv
 {
 
-namespace base64
+ନାମାକାଶ base64
 {
 /* A decorator for CvFileStorage
 * - no copyable
 * - not safe for now
 * - move constructor may be needed if C++11
 */
-uint8_t const base64_mapping[] =
+uint8_t ଅଚଳ base64_mapping[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789+/";
 
-uint8_t const base64_padding = '=';
+uint8_t ଅଚଳ base64_padding = '=';
 
-std::string make_base64_header(const char * dt);
+std::string make_base64_header(ଅଚଳ ଅକ୍ଷର * dt);
 
-size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
+size_t base64_encode(uint8_t ଅଚଳ * src, uint8_t * dst, size_t off, size_t cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା icvCalcStructSize( ଅଚଳ ଅକ୍ଷର* dt, ପୂର୍ଣ୍ଣସଂଖ୍ୟା initial_size );
 
-class Base64ContextEmitter;
-class Impl;
+ଶ୍ରେଣୀ Base64ContextEmitter;
+ଶ୍ରେଣୀ Impl;
 
-class Base64Writer
+ଶ୍ରେଣୀ Base64Writer
 {
-public:
-    Base64Writer(cv::FileStorage::Impl& fs, bool can_indent);
+ସର୍ବସାଧାରଣ:
+    Base64Writer(cv::FileStorage::Impl& fs, ତାର୍କିକ can_indent);
     ~Base64Writer();
-    void write(const void* _data, size_t len, const char* dt);
-    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const char* dt);
+    ଶୂନ୍ୟ ଲିଖ(ଅଚଳ ଶୂନ୍ୟ* _data, size_t len, ଅଚଳ ଅକ୍ଷର* dt);
+    template<typename to_ଦ୍ୱିମିକ_convertor_t> ଶୂନ୍ୟ ଲିଖ(to_ଦ୍ୱିମିକ_convertor_t & convertor, ଅଚଳ ଅକ୍ଷର* dt);
 
-private:
-    void check_dt(const char* dt);
+ବ୍ୟକ୍ତିଗତ:
+    ଶୂନ୍ୟ check_dt(ଅଚଳ ଅକ୍ଷର* dt);
 
-private:
+ବ୍ୟକ୍ତିଗତ:
     // disable copy and assignment
-    Base64Writer(const Base64Writer &);
-    Base64Writer & operator=(const Base64Writer &);
+    Base64Writer(ଅଚଳ Base64Writer &);
+    Base64Writer & operator=(ଅଚଳ Base64Writer &);
 
-private:
+ବ୍ୟକ୍ତିଗତ:
 
     Base64ContextEmitter * emitter;
     std::string data_type_string;
 };
 
-size_t base64_encode_buffer_size(size_t cnt, bool is_end_with_zero = true);
+size_t base64_encode_buffer_size(size_t cnt, ତାର୍କିକ is_end_with_zero = ସତ୍ୟ);
 
-template<typename _uint_t> inline size_t
-to_binary(_uint_t val, uchar * cur)
+template<typename _uint_t> ଧାଡ଼ିଭିତରେ size_t
+to_ଦ୍ୱିମିକ(_uint_t val, uchar * cur)
 {
     size_t delta = CHAR_BIT;
-    size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    size_t cnt = ଆକାର(_uint_t);
+    ଯେତେବେଳେ (cnt --> static_cast<size_t>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    ଫେରନ୍ତୁ ଆକାର(_uint_t);
 }
 
-template<> inline size_t to_binary(bool val, uchar * cur)
+template<> ଧାଡ଼ିଭିତରେ size_t to_ଦ୍ୱିମିକ(ତାର୍କିକ val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    ଫେରନ୍ତୁ to_ଦ୍ୱିମିକ(static_cast<uchar>(val), cur);
 }
 
-template<> inline size_t to_binary(double val, uchar * cur)
+template<> ଧାଡ଼ିଭିତରେ size_t to_ଦ୍ୱିମିକ(ଦ୍ୱିଗୁଣ val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    ଫେରନ୍ତୁ to_ଦ୍ୱିମିକ(bit64.u, cur);
 }
 
-template<> inline size_t to_binary(float val, uchar * cur)
+template<> ଧାଡ଼ିଭିତରେ size_t to_ଦ୍ୱିମିକ(ଦଶମିକ val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    ଫେରନ୍ତୁ to_ଦ୍ୱିମିକ(bit32.u, cur);
 }
 
-template<typename _primitive_t> inline size_t
-to_binary(uchar const * val, uchar * cur)
+template<typename _primitive_t> ଧାଡ଼ିଭିତରେ size_t
+to_ଦ୍ୱିମିକ(uchar ଅଚଳ * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    ଫେରନ୍ତୁ to_ଦ୍ୱିମିକ<_primitive_t>(*reinterpret_cast<_primitive_t ଅଚଳ *>(val), cur);
 }
 
 
 
-class RawDataToBinaryConvertor
+ଶ୍ରେଣୀ Raw_Data_To_ଦ୍ୱିମିକ_Convertor
 {
-public:
+ସର୍ବସାଧାରଣ:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    Raw_Data_To_ଦ୍ୱିମିକ_Convertor(ଅଚଳ ଶୂନ୍ୟ* src, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ଅଚଳ std::string & dt);
 
-    inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
-    inline operator bool() const;
+    ଧାଡ଼ିଭିତରେ Raw_Data_To_ଦ୍ୱିମିକ_Convertor & operator >>(uchar * & dst);
+    ଧାଡ଼ିଭିତରେ operator ତାର୍କିକ() ଅଚଳ;
 
-private:
-    typedef size_t(*to_binary_t)(const uchar *, uchar *);
-    struct elem_to_binary_t
+ବ୍ୟକ୍ତିଗତ:
+    ପ୍ରକାରବ୍ୟାଖ୍ୟା size_t(*to_ଦ୍ୱିମିକ_t)(ଅଚଳ uchar *, uchar *);
+    ସଂରଚନା elem_to_ଦ୍ୱିମିକ_t
     {
         size_t      offset;
         size_t      offset_packed;
-        to_binary_t func;
+        to_ଦ୍ୱିମିକ_t func;
     };
 
-private:
-    size_t make_to_binary_funcs(const std::string &dt);
+ବ୍ୟକ୍ତିଗତ:
+    size_t make_to_ଦ୍ୱିମିକ_funcs(ଅଚଳ std::string &dt);
 
-private:
-    const uchar * beg;
-    const uchar * cur;
-    const uchar * end;
+ବ୍ୟକ୍ତିଗତ:
+    ଅଚଳ uchar * beg;
+    ଅଚଳ uchar * cur;
+    ଅଚଳ uchar * end;
 
     size_t step;
     size_t step_packed;
-    std::vector<elem_to_binary_t> to_binary_funcs;
+    std::vector<elem_to_ଦ୍ୱିମିକ_t> to_ଦ୍ୱିମିକ_funcs;
 };
 
 }

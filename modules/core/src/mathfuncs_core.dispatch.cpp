@@ -2,15 +2,15 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "arithm_expr.hpp"      // ew::mathSpanEngine - the engine fallback for exp/log
+#ଅନ୍ତର୍ଭାଵ "precomp.hpp"
+#ଅନ୍ତର୍ଭାଵ "arithm_expr.hpp"      // ew::mathSpanEngine - the engine fallback for exp/log
 
-#include "mathfuncs_core.simd.hpp"
-#include "mathfuncs_core.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ଅନ୍ତର୍ଭାଵ "mathfuncs_core.simd.hpp"
+#ଅନ୍ତର୍ଭାଵ "mathfuncs_core.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+ନାମାକାଶ cv { ନାମାକାଶ hal {
 
-void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, int len, bool angleInDegrees)
+ଶୂନ୍ୟ cartToPolar32f(ଅଚଳ ଦଶମିକ* x, ଅଚଳ ଦଶମିକ* y, ଦଶମିକ* mag, ଦଶମିକ* angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -20,7 +20,7 @@ void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, in
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void cartToPolar64f(const double* x, const double* y, double* mag, double* angle, int len, bool angleInDegrees)
+ଶୂନ୍ୟ cartToPolar64f(ଅଚଳ ଦ୍ୱିଗୁଣ* x, ଅଚଳ ଦ୍ୱିଗୁଣ* y, ଦ୍ୱିଗୁଣ* mag, ଦ୍ୱିଗୁଣ* angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -30,7 +30,7 @@ void cartToPolar64f(const double* x, const double* y, double* mag, double* angle
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart32f(const float* mag, const float* angle, float* x, float* y, int len, bool angleInDegrees)
+ଶୂନ୍ୟ polarToCart32f(ଅଚଳ ଦଶମିକ* mag, ଅଚଳ ଦଶମିକ* angle, ଦଶମିକ* x, ଦଶମିକ* y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -40,7 +40,7 @@ void polarToCart32f(const float* mag, const float* angle, float* x, float* y, in
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart64f(const double* mag, const double* angle, double* x, double* y, int len, bool angleInDegrees)
+ଶୂନ୍ୟ polarToCart64f(ଅଚଳ ଦ୍ୱିଗୁଣ* mag, ଅଚଳ ଦ୍ୱିଗୁଣ* angle, ଦ୍ୱିଗୁଣ* x, ଦ୍ୱିଗୁଣ* y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -50,7 +50,7 @@ void polarToCart64f(const double* mag, const double* angle, double* x, double* y
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ଶୂନ୍ୟ fastAtan32f(ଅଚଳ ଦଶମିକ *Y, ଅଚଳ ଦଶମିକ *X, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
@@ -60,7 +60,7 @@ void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool ang
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees)
+ଶୂନ୍ୟ fastAtan64f(ଅଚଳ ଦ୍ୱିଗୁଣ *Y, ଅଚଳ ଦ୍ୱିଗୁଣ *X, ଦ୍ୱିଗୁଣ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -71,39 +71,39 @@ void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool 
 }
 
 // deprecated
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ଶୂନ୍ୟ fastAtan2(ଅଚଳ ଦଶମିକ *Y, ଅଚଳ ଦଶମିକ *X, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
     fastAtan32f(Y, X, angle, len, angleInDegrees);
 }
 
-void magnitude32f(const float* x, const float* y, float* mag, int len)
+ଶୂନ୍ୟ magnitude32f(ଅଚଳ ଦଶମିକ* x, ଅଚଳ ଦଶମିକ* y, ଦଶମିକ* mag, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(magnitude32f, cv_hal_magnitude32f, x, y, mag, len);
     // SSE42 performance issues
-    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::getIppTopFeatures() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_32f, x, y, mag, len) >= 0);
+    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::get_Ipp_ଶୀର୍ଷ_Features() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_32f, x, y, mag, len) >= 0);
 
     CV_CPU_DISPATCH(magnitude32f, (x, y, mag, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void magnitude64f(const double* x, const double* y, double* mag, int len)
+ଶୂନ୍ୟ magnitude64f(ଅଚଳ ଦ୍ୱିଗୁଣ* x, ଅଚଳ ଦ୍ୱିଗୁଣ* y, ଦ୍ୱିଗୁଣ* mag, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(magnitude64f, cv_hal_magnitude64f, x, y, mag, len);
     // SSE42 performance issues
-    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::getIppTopFeatures() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_64f, x, y, mag, len) >= 0);
+    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::get_Ipp_ଶୀର୍ଷ_Features() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_64f, x, y, mag, len) >= 0);
 
     CV_CPU_DISPATCH(magnitude64f, (x, y, mag, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 
-void invSqrt32f(const float* src, float* dst, int len)
+ଶୂନ୍ୟ invSqrt32f(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -114,7 +114,7 @@ void invSqrt32f(const float* src, float* dst, int len)
 }
 
 
-void invSqrt64f(const double* src, double* dst, int len)
+ଶୂନ୍ୟ invSqrt64f(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -125,7 +125,7 @@ void invSqrt64f(const double* src, double* dst, int len)
 }
 
 
-void sqrt32f(const float* src, float* dst, int len)
+ଶୂନ୍ୟ sqrt32f(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -136,7 +136,7 @@ void sqrt32f(const float* src, float* dst, int len)
 }
 
 
-void sqrt64f(const double* src, double* dst, int len)
+ଶୂନ୍ୟ sqrt64f(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -146,7 +146,7 @@ void sqrt64f(const double* src, double* dst, int len)
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void exp32f(const float *src, float *dst, int n)
+ଶୂନ୍ୟ exp32f(ଅଚଳ ଦଶମିକ *src, ଦଶମିକ *dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -156,7 +156,7 @@ void exp32f(const float *src, float *dst, int n)
                                                        // table implementation is removed)
 }
 
-void exp64f(const double *src, double *dst, int n)
+ଶୂନ୍ୟ exp64f(ଅଚଳ ଦ୍ୱିଗୁଣ *src, ଦ୍ୱିଗୁଣ *dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -166,7 +166,7 @@ void exp64f(const double *src, double *dst, int n)
                                                        // table implementation is removed)
 }
 
-void log32f(const float *src, float *dst, int n)
+ଶୂନ୍ୟ log32f(ଅଚଳ ଦଶମିକ *src, ଦଶମିକ *dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -176,7 +176,7 @@ void log32f(const float *src, float *dst, int n)
                                                        // table implementation is removed)
 }
 
-void log64f(const double *src, double *dst, int n)
+ଶୂନ୍ୟ log64f(ଅଚଳ ଦ୍ୱିଗୁଣ *src, ଦ୍ୱିଗୁଣ *dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -189,60 +189,60 @@ void log64f(const double *src, double *dst, int n)
 //=============================================================================
 // for compatibility with 3.0
 
-void exp(const float* src, float* dst, int n)
+ଶୂନ୍ୟ exp(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     exp32f(src, dst, n);
 }
 
-void exp(const double* src, double* dst, int n)
+ଶୂନ୍ୟ exp(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     exp64f(src, dst, n);
 }
 
-void log(const float* src, float* dst, int n)
+ଶୂନ୍ୟ log(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     log32f(src, dst, n);
 }
 
-void log(const double* src, double* dst, int n)
+ଶୂନ୍ୟ log(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     log64f(src, dst, n);
 }
 
-void magnitude(const float* x, const float* y, float* dst, int n)
+ଶୂନ୍ୟ magnitude(ଅଚଳ ଦଶମିକ* x, ଅଚଳ ଦଶମିକ* y, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     magnitude32f(x, y, dst, n);
 }
 
-void magnitude(const double* x, const double* y, double* dst, int n)
+ଶୂନ୍ୟ magnitude(ଅଚଳ ଦ୍ୱିଗୁଣ* x, ଅଚଳ ଦ୍ୱିଗୁଣ* y, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     magnitude64f(x, y, dst, n);
 }
 
-void sqrt(const float* src, float* dst, int len)
+ଶୂନ୍ୟ sqrt(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     sqrt32f(src, dst, len);
 }
 
-void sqrt(const double* src, double* dst, int len)
+ଶୂନ୍ୟ sqrt(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     sqrt64f(src, dst, len);
 }
 
-void invSqrt(const float* src, float* dst, int len)
+ଶୂନ୍ୟ invSqrt(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     invSqrt32f(src, dst, len);
 }
 
-void invSqrt(const double* src, double* dst, int len)
+ଶୂନ୍ୟ invSqrt(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     invSqrt64f(src, dst, len);
 }
 
 }} // namespace cv::hal::
 
-float cv::fastAtan2( float y, float x )
+ଦଶମିକ cv::fastAtan2( ଦଶମିକ y, ଦଶମିକ x )
 {
-    using namespace cv::hal;
+    using ନାମାକାଶ cv::hal;
     CV_CPU_CALL_BASELINE(fastAtan2, (y, x));
 }

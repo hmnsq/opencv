@@ -5,22 +5,22 @@
 #ifndef OPENCV_CORE_LOGTAGCONFIG_HPP
 #define OPENCV_CORE_LOGTAGCONFIG_HPP
 
-#if 1 // if not already in precompiled headers
-#include <opencv2/core/utils/logger.defines.hpp>
-#include <string>
+#ଯଦି 1 // if not already in precompiled headers
+#ଅନ୍ତର୍ଭାଵ <opencv2/core/utils/logger.defines.hpp>
+#ଅନ୍ତର୍ଭାଵ <string>
 #endif
 
-namespace cv {
-namespace utils {
-namespace logging {
+ନାମାକାଶ cv {
+ନାମାକାଶ utils {
+ନାମାକାଶ logging {
 
-struct LogTagConfig
+ସଂରଚନା LogTagConfig
 {
     std::string namePart;
     LogLevel level;
-    bool isGlobal;
-    bool hasPrefixWildcard;
-    bool hasSuffixWildcard;
+    ତାର୍କିକ isGlobal;
+    ତାର୍କିକ hasPrefixWildcard;
+    ତାର୍କିକ hasSuffixWildcard;
 
     LogTagConfig()
         : namePart()
@@ -31,8 +31,8 @@ struct LogTagConfig
     {
     }
 
-    LogTagConfig(const std::string& _namePart, LogLevel _level, bool _isGlobal = false,
-        bool _hasPrefixWildcard = false, bool _hasSuffixWildcard = false)
+    LogTagConfig(ଅଚଳ std::string& _namePart, LogLevel _level, ତାର୍କିକ _isGlobal = ମିଥ୍ୟା,
+        ତାର୍କିକ _hasPrefixWildcard = ମିଥ୍ୟା, ତାର୍କିକ _hasSuffixWildcard = ମିଥ୍ୟା)
         : namePart(_namePart)
         , level(_level)
         , isGlobal(_isGlobal)
@@ -41,9 +41,9 @@ struct LogTagConfig
     {
     }
 
-    LogTagConfig(const LogTagConfig&) = default;
-    LogTagConfig(LogTagConfig&&) = default;
-    ~LogTagConfig() = default;
+    LogTagConfig(ଅଚଳ LogTagConfig&) = ପୂର୍ବନିର୍ଦ୍ଧାରିତ;
+    LogTagConfig(LogTagConfig&&) = ପୂର୍ବନିର୍ଦ୍ଧାରିତ;
+    ~LogTagConfig() = ପୂର୍ବନିର୍ଦ୍ଧାରିତ;
 };
 
 }}}

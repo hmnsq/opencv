@@ -11,63 +11,63 @@
 #ifndef OPENCV_CORE_STAT_PARALLEL_HPP
 #define OPENCV_CORE_STAT_PARALLEL_HPP
 
-namespace cv {
+ନାମାକାଶ cv {
 
-struct StatChunk
+ସଂରଚନା StatChunk
 {
     Mat src, mask;
     size_t firstElem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ splitForParallelStat(ଅଚଳ Mat& src, ଅଚଳ Mat& mask, std::vector<StatChunk>& chunks)
 {
-    const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    ଅଚଳ size_t total = src.total(), work = total*src.channels();
+    ଯଦି (work < ((size_t)1 << 18))
+        ଫେରନ୍ତୁ ମିଥ୍ୟା;
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା nthreads = get_ଅଙ୍କ_Threads();
+    ଯଦି (nthreads <= 1)
+        ଫେରନ୍ତୁ ମିଥ୍ୟା;
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା n = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)std::min((size_t)nthreads*2, work >> 16);
+    ଯଦି (n < 2)
+        ଫେରନ୍ତୁ ମିଥ୍ୟା;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    ଯଦି (src.dims <= 2 && src.rows >= n)
     {
-        for (int i = 0; i < n; i++)
+        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            ପୂର୍ଣ୍ଣସଂଖ୍ୟା r0 = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)((int64)src.rows*i/n), r1 = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)((int64)src.rows*(i + 1)/n);
             StatChunk c;
             c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
+            ଯଦି (!mask.empty())
                 c.mask = mask.rowRange(r0, r1);
             c.firstElem = (size_t)r0*src.cols;
             chunks.push_back(c);
         }
-        return true;
+        ଫେରନ୍ତୁ ସତ୍ୟ;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    ଯଦି (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
     {
-        for (int i = 0; i < n; i++)
+        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n; i++)
         {
             size_t e0 = total*i/n, e1 = total*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
+            c.src = Mat(1, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(e1 - e0), src.type(), (ଶୂନ୍ୟ*)(src.data + e0*src.elemSize()));
+            ଯଦି (!mask.empty())
+                c.mask = Mat(1, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(e1 - e0), mask.type(), (ଶୂନ୍ୟ*)(mask.data + e0*mask.elemSize()));
             c.firstElem = e0;
             chunks.push_back(c);
         }
-        return true;
+        ଫେରନ୍ତୁ ସତ୍ୟ;
     }
-    return false;
+    ଫେରନ୍ତୁ ମିଥ୍ୟା;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ size_t chunkIndexToElem(ଅଚଳ StatChunk& c, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    ଫେରନ୍ତୁ c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
 }
 
 } // namespace cv

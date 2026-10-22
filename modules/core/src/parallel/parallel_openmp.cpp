@@ -1,26 +1,26 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "../precomp.hpp"
+#ଅନ୍ତର୍ଭାଵ "../precomp.hpp"
 
 #ifdef HAVE_OPENMP
 
-#include "parallel.hpp"
-#include "opencv2/core/parallel/backend/parallel_for.openmp.hpp"
+#ଅନ୍ତର୍ଭାଵ "parallel.hpp"
+#ଅନ୍ତର୍ଭାଵ "opencv2/core/parallel/backend/parallel_for.openmp.hpp"
 
-namespace cv { namespace parallel {
+ନାମାକାଶ cv { ନାମାକାଶ parallel {
 
-static
+ସ୍ଥିର
 std::shared_ptr<cv::parallel::openmp::ParallelForBackend>& getInstance()
 {
-    static std::shared_ptr<cv::parallel::openmp::ParallelForBackend> g_instance = std::make_shared<cv::parallel::openmp::ParallelForBackend>();
-    return g_instance;
+    ସ୍ଥିର std::shared_ptr<cv::parallel::openmp::ParallelForBackend> g_instance = std::make_shared<cv::parallel::openmp::ParallelForBackend>();
+    ଫେରନ୍ତୁ g_instance;
 }
 
 #ifndef BUILD_PLUGIN
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendOpenMP()
 {
-    return getInstance();
+    ଫେରନ୍ତୁ getInstance();
 }
 #endif
 
@@ -30,28 +30,28 @@ std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendOpenMP()
 
 #define ABI_VERSION 0
 #define API_VERSION 0
-#include "plugin_parallel_api.hpp"
+#ଅନ୍ତର୍ଭାଵ "plugin_parallel_api.hpp"
 
-static
+ସ୍ଥିର
 CvResult cv_getInstance(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
 {
-    try
+    ଚେଷ୍ଟା
     {
-        if (!handle)
-            return CV_ERROR_FAIL;
+        ଯଦି (!handle)
+            ଫେରନ୍ତୁ CV_ERROR_FAIL;
         *handle = cv::parallel::getInstance().get();
-        return CV_ERROR_OK;
+        ଫେରନ୍ତୁ CV_ERROR_OK;
     }
-    catch (...)
+    ଧର (...)
     {
-        return CV_ERROR_FAIL;
+        ଫେରନ୍ତୁ CV_ERROR_FAIL;
     }
 }
 
-static const OpenCV_Core_Parallel_Plugin_API plugin_api =
+ସ୍ଥିର ଅଚଳ OpenCV_Core_Parallel_Plugin_API plugin_api =
 {
     {
-        sizeof(OpenCV_Core_Parallel_Plugin_API), ABI_VERSION, API_VERSION,
+        ଆକାର(OpenCV_Core_Parallel_Plugin_API), ABI_VERSION, API_VERSION,
         CV_VERSION_MAJOR, CV_VERSION_MINOR, CV_VERSION_REVISION, CV_VERSION_STATUS,
         "OpenMP (" CVAUX_STR(_OPENMP) ") OpenCV parallel plugin"
     },
@@ -60,11 +60,11 @@ static const OpenCV_Core_Parallel_Plugin_API plugin_api =
     }
 };
 
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(int requested_abi_version, int requested_api_version, void* /*reserved=NULL*/) CV_NOEXCEPT
+ଅଚଳ OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(ପୂର୍ଣ୍ଣସଂଖ୍ୟା requested_abi_version, ପୂର୍ଣ୍ଣସଂଖ୍ୟା requested_api_version, ଶୂନ୍ୟ* /*reserved=NULL*/) CV_NOEXCEPT
 {
-    if (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
-        return &plugin_api;
-    return NULL;
+    ଯଦି (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
+        ଫେରନ୍ତୁ &plugin_api;
+    ଫେରନ୍ତୁ ଖାଲି;
 }
 
 #endif  // BUILD_PLUGIN

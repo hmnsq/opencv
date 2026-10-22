@@ -2,80 +2,80 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "mathfuncs.hpp"
+#ଅନ୍ତର୍ଭାଵ "mathfuncs.hpp"
 
-namespace cv { namespace hal {
+ନାମାକାଶ cv { ନାମାକାଶ hal {
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // forward declarations
-void cartToPolar32f(const float *X, const float *Y, float* mag, float *angle, int len, bool angleInDegrees);
-void cartToPolar64f(const double *X, const double *Y, double* mag, double *angle, int len, bool angleInDegrees);
-void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, int len, bool angleInDegrees);
-void polarToCart64f(const double *mag, const double *angle, double *X, double *Y, int len, bool angleInDegrees);
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees);
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees);
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees);
-void magnitude32f(const float* x, const float* y, float* mag, int len);
-void magnitude64f(const double* x, const double* y, double* mag, int len);
-void invSqrt32f(const float* src, float* dst, int len);
-void invSqrt64f(const double* src, double* dst, int len);
-void sqrt32f(const float* src, float* dst, int len);
-void sqrt64f(const double* src, double* dst, int len);
-float fastAtan2(float y, float x);
+ଶୂନ୍ୟ cartToPolar32f(ଅଚଳ ଦଶମିକ *X, ଅଚଳ ଦଶମିକ *Y, ଦଶମିକ* mag, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees);
+ଶୂନ୍ୟ cartToPolar64f(ଅଚଳ ଦ୍ୱିଗୁଣ *X, ଅଚଳ ଦ୍ୱିଗୁଣ *Y, ଦ୍ୱିଗୁଣ* mag, ଦ୍ୱିଗୁଣ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees);
+ଶୂନ୍ୟ polarToCart32f(ଅଚଳ ଦଶମିକ *mag, ଅଚଳ ଦଶମିକ *angle, ଦଶମିକ *X, ଦଶମିକ *Y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees);
+ଶୂନ୍ୟ polarToCart64f(ଅଚଳ ଦ୍ୱିଗୁଣ *mag, ଅଚଳ ଦ୍ୱିଗୁଣ *angle, ଦ୍ୱିଗୁଣ *X, ଦ୍ୱିଗୁଣ *Y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees);
+ଶୂନ୍ୟ fastAtan32f(ଅଚଳ ଦଶମିକ *Y, ଅଚଳ ଦଶମିକ *X, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees);
+ଶୂନ୍ୟ fastAtan64f(ଅଚଳ ଦ୍ୱିଗୁଣ *Y, ଅଚଳ ଦ୍ୱିଗୁଣ *X, ଦ୍ୱିଗୁଣ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees);
+ଶୂନ୍ୟ fastAtan2(ଅଚଳ ଦଶମିକ *Y, ଅଚଳ ଦଶମିକ *X, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees);
+ଶୂନ୍ୟ magnitude32f(ଅଚଳ ଦଶମିକ* x, ଅଚଳ ଦଶମିକ* y, ଦଶମିକ* mag, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len);
+ଶୂନ୍ୟ magnitude64f(ଅଚଳ ଦ୍ୱିଗୁଣ* x, ଅଚଳ ଦ୍ୱିଗୁଣ* y, ଦ୍ୱିଗୁଣ* mag, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len);
+ଶୂନ୍ୟ invSqrt32f(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len);
+ଶୂନ୍ୟ invSqrt64f(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len);
+ଶୂନ୍ୟ sqrt32f(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len);
+ଶୂନ୍ୟ sqrt64f(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len);
+ଦଶମିକ fastAtan2(ଦଶମିକ y, ଦଶମିକ x);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-using namespace std;
-using namespace cv;
+using ନାମାକାଶ std;
+using ନାମାକାଶ cv;
 
-namespace {
+ନାମାକାଶ {
 
-static const float atan2_p1 = 0.9997878412794807f*(float)(180/CV_PI);
-static const float atan2_p3 = -0.3258083974640975f*(float)(180/CV_PI);
-static const float atan2_p5 = 0.1555786518463281f*(float)(180/CV_PI);
-static const float atan2_p7 = -0.04432655554792128f*(float)(180/CV_PI);
+ସ୍ଥିର ଅଚଳ ଦଶମିକ atan2_p1 = 0.9997878412794807f*(ଦଶମିକ)(180/CV_PI);
+ସ୍ଥିର ଅଚଳ ଦଶମିକ atan2_p3 = -0.3258083974640975f*(ଦଶମିକ)(180/CV_PI);
+ସ୍ଥିର ଅଚଳ ଦଶମିକ atan2_p5 = 0.1555786518463281f*(ଦଶମିକ)(180/CV_PI);
+ସ୍ଥିର ଅଚଳ ଦଶମିକ atan2_p7 = -0.04432655554792128f*(ଦଶମିକ)(180/CV_PI);
 
 #ifdef __EMSCRIPTEN__
-static inline float atan_f32(float y, float x)
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ଦଶମିକ atan_f32(ଦଶମିକ y, ଦଶମିକ x)
 {
-    float a = atan2(y, x) * 180.0f / CV_PI;
-    if (a < 0.0f)
+    ଦଶମିକ a = atan2(y, x) * 180.0f / CV_PI;
+    ଯଦି (a < 0.0f)
         a += 360.0f;
-    if (a >= 360.0f)
+    ଯଦି (a >= 360.0f)
         a -= 360.0f;
-    return a; // range [0; 360)
+    ଫେରନ୍ତୁ a; // range [0; 360)
 }
-#else
-static inline float atan_f32(float y, float x)
+#ଅନ୍ୟଥା
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ଦଶମିକ atan_f32(ଦଶମିକ y, ଦଶମିକ x)
 {
-    float ax = std::abs(x), ay = std::abs(y);
-    float a, c, c2;
-    if( ax >= ay )
+    ଦଶମିକ ax = std::abs(x), ay = std::abs(y);
+    ଦଶମିକ a, c, c2;
+    ଯଦି( ax >= ay )
     {
-        c = ay/(ax + (float)DBL_EPSILON);
+        c = ay/(ax + (ଦଶମିକ)DBL_EPSILON);
         c2 = c*c;
         a = (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
     }
-    else
+    ଅନ୍ୟଥା
     {
-        c = ax/(ay + (float)DBL_EPSILON);
+        c = ax/(ay + (ଦଶମିକ)DBL_EPSILON);
         c2 = c*c;
         a = 90.f - (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
     }
-    if( x < 0 )
+    ଯଦି( x < 0 )
         a = 180.f - a;
-    if( y < 0 )
+    ଯଦି( y < 0 )
         a = 360.f - a;
-    return a;
+    ଫେରନ୍ତୁ a;
 }
 #endif
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
 
-v_float32 v_atan_f32(const v_float32& y, const v_float32& x)
+v_float32 v_atan_f32(ଅଚଳ v_float32& y, ଅଚଳ v_float32& x)
 {
-    v_float32 eps = vx_setall_f32((float)DBL_EPSILON);
+    v_float32 eps = vx_setall_f32((ଦଶମିକ)DBL_EPSILON);
     v_float32 z = vx_setzero_f32();
     v_float32 p7 = vx_setall_f32(atan2_p7);
     v_float32 p5 = vx_setall_f32(atan2_p5);
@@ -93,30 +93,30 @@ v_float32 v_atan_f32(const v_float32& y, const v_float32& x)
     a = v_select(v_ge(ax, ay), a, v_sub(val90, a));
     a = v_select(v_lt(x, z), v_sub(val180, a), a);
     a = v_select(v_lt(y, z), v_sub(val360, a), a);
-    return a;
+    ଫେରନ୍ତୁ a;
 }
 
 #endif
 
 } // anonymous::
 
-static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *angle, int len, bool angleInDegrees )
+ସ୍ଥିର ଶୂନ୍ୟ cartToPolar32f_(ଅଚଳ ଦଶମିକ *X, ଅଚଳ ଦଶମିକ *Y, ଦଶମିକ *mag, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees )
 {
-    float scale = angleInDegrees ? 1.f : (float)(CV_PI/180);
-    int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    ଦଶମିକ scale = angleInDegrees ? 1.f : (ଦଶମିକ)(CV_PI/180);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<v_float32>::vlanes();
     v_float32 s = vx_setall_f32(scale);
 
-    for( ; i < len; i += VECSZ*2 )
+    ପାଇଁ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ଯଦି( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == X || angle == Y )
-                break;
+            ଯଦି( i == 0 || angle == X || angle == Y )
+                ଭାଙ୍ଗ;
             i = len - VECSZ*2;
         }
 
@@ -140,49 +140,49 @@ static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *a
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ପାଇଁ( ; i < len; i++ )
     {
-        float x0 = X[i], y0 = Y[i];
+        ଦଶମିକ x0 = X[i], y0 = Y[i];
         mag[i] = std::sqrt(x0*x0 + y0*y0);
         angle[i] = atan_f32(y0, x0)*scale;
     }
 }
 
-void cartToPolar32f(const float *X, const float *Y, float *mag, float *angle, int len, bool angleInDegrees )
+ଶୂନ୍ୟ cartToPolar32f(ଅଚଳ ଦଶମିକ *X, ଅଚଳ ଦଶମିକ *Y, ଦଶମିକ *mag, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
     cartToPolar32f_(X, Y, mag, angle, len, angleInDegrees );
 }
 
-void cartToPolar64f(const double *X, const double *Y, double *mag, double *angle, int len, bool angleInDegrees)
+ଶୂନ୍ୟ cartToPolar64f(ଅଚଳ ଦ୍ୱିଗୁଣ *X, ଅଚଳ ଦ୍ୱିଗୁଣ *Y, ଦ୍ୱିଗୁଣ *mag, ଦ୍ୱିଗୁଣ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
-    float ybuf[BLKSZ], xbuf[BLKSZ], mbuf[BLKSZ], abuf[BLKSZ];
-    for( int i = 0; i < len; i += BLKSZ )
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା BLKSZ = 128;
+    ଦଶମିକ ybuf[BLKSZ], xbuf[BLKSZ], mbuf[BLKSZ], abuf[BLKSZ];
+    ପାଇଁ( ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା j, blksz = std::min(BLKSZ, len - i);
+        ପାଇଁ( j = 0; j < blksz; j++ )
         {
-            xbuf[j] = (float)X[i + j];
-            ybuf[j] = (float)Y[i + j];
+            xbuf[j] = (ଦଶମିକ)X[i + j];
+            ybuf[j] = (ଦଶମିକ)Y[i + j];
         }
         cartToPolar32f_(xbuf, ybuf, mbuf, abuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        ପାଇଁ( j = 0; j < blksz; j++ )
             mag[i + j] = mbuf[j];
-        for( j = 0; j < blksz; j++ )
+        ପାଇଁ( j = 0; j < blksz; j++ )
             angle[i + j] = abuf[j];
     }
 }
 
-namespace {
+ନାମାକାଶ {
 
-static inline void SinCos_32f(const float* mag, const float* angle, float* cosval, float* sinval, int len, int angle_in_degrees)
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ SinCos_32f(ଅଚଳ ଦଶମିକ* mag, ଅଚଳ ଦଶମିକ* angle, ଦଶମିକ* cosval, ଦଶମିକ* sinval, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା angle_in_degrees)
 {
-    const int N = 64;
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା N = 64;
 
-    static const double sin_table[] =
+    ସ୍ଥିର ଅଚଳ ଦ୍ୱିଗୁଣ sin_table[] =
     {
      0.00000000000000000000,     0.09801714032956060400,
      0.19509032201612825000,     0.29028467725446233000,
@@ -218,35 +218,35 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
     -0.19509032201612872000,    -0.09801714032956050600,
     };
 
-    static const double k2 = (2*CV_PI)/N;
+    ସ୍ଥିର ଅଚଳ ଦ୍ୱିଗୁଣ k2 = (2*CV_PI)/N;
 
-    static const double sin_a0 = -0.166630293345647*k2*k2*k2;
-    static const double sin_a2 = k2;
+    ସ୍ଥିର ଅଚଳ ଦ୍ୱିଗୁଣ sin_a0 = -0.166630293345647*k2*k2*k2;
+    ସ୍ଥିର ଅଚଳ ଦ୍ୱିଗୁଣ sin_a2 = k2;
 
-    static const double cos_a0 = -0.499818138450326*k2*k2;
+    ସ୍ଥିର ଅଚଳ ଦ୍ୱିଗୁଣ cos_a0 = -0.499818138450326*k2*k2;
     /*static const double cos_a2 =  1;*/
 
-    double k1;
-    int i = 0;
+    ଦ୍ୱିଗୁଣ k1;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
 
-    if( !angle_in_degrees )
+    ଯଦି( !angle_in_degrees )
         k1 = N/(2*CV_PI);
-    else
+    ଅନ୍ୟଥା
         k1 = N/360.;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    const v_float32 scale = vx_setall_f32(angle_in_degrees ? (float)CV_PI / 180.f : 1.f);
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<v_float32>::vlanes();
+    ଅଚଳ v_float32 scale = vx_setall_f32(angle_in_degrees ? (ଦଶମିକ)CV_PI / 180.f : 1.f);
 
-    for( ; i < len; i += VECSZ*2 )
+    ପାଇଁ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ଯଦି( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == cosval || angle == sinval || mag == cosval || mag == sinval )
-                break;
+            ଯଦି( i == 0 || angle == cosval || angle == sinval || mag == cosval || mag == sinval )
+                ଭାଙ୍ଗ;
             i = len - VECSZ*2;
         }
 
@@ -257,7 +257,7 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
         v_sincos(r0, s0, c0);
         v_sincos(r1, s1, c1);
 
-        if( mag )
+        ଯଦି( mag )
         {
             v_float32 m0 = vx_load(mag + i);
             v_float32 m1 = vx_load(mag + i + VECSZ);
@@ -276,84 +276,84 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ପାଇଁ( ; i < len; i++ )
     {
-        double t = angle[i]*k1;
-        int it = cvRound(t);
+        ଦ୍ୱିଗୁଣ t = angle[i]*k1;
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା it = cvRound(t);
         t -= it;
-        int sin_idx = it & (N - 1);
-        int cos_idx = (N/4 - sin_idx) & (N - 1);
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା sin_idx = it & (N - 1);
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା cos_idx = (N/4 - sin_idx) & (N - 1);
 
-        double sin_b = (sin_a0*t*t + sin_a2)*t;
-        double cos_b = cos_a0*t*t + 1;
+        ଦ୍ୱିଗୁଣ sin_b = (sin_a0*t*t + sin_a2)*t;
+        ଦ୍ୱିଗୁଣ cos_b = cos_a0*t*t + 1;
 
-        double sin_a = sin_table[sin_idx];
-        double cos_a = sin_table[cos_idx];
+        ଦ୍ୱିଗୁଣ sin_a = sin_table[sin_idx];
+        ଦ୍ୱିଗୁଣ cos_a = sin_table[cos_idx];
 
-        double sin_val = sin_a*cos_b + cos_a*sin_b;
-        double cos_val = cos_a*cos_b - sin_a*sin_b;
+        ଦ୍ୱିଗୁଣ sin_val = sin_a*cos_b + cos_a*sin_b;
+        ଦ୍ୱିଗୁଣ cos_val = cos_a*cos_b - sin_a*sin_b;
 
-        if (mag)
+        ଯଦି (mag)
         {
-            double mag_val = mag[i];
+            ଦ୍ୱିଗୁଣ mag_val = mag[i];
             sin_val *= mag_val;
             cos_val *= mag_val;
         }
 
-        sinval[i] = (float)sin_val;
-        cosval[i] = (float)cos_val;
+        sinval[i] = (ଦଶମିକ)sin_val;
+        cosval[i] = (ଦଶମିକ)cos_val;
     }
 }
 
 } // anonymous::
 
-void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, int len, bool angleInDegrees)
+ଶୂନ୍ୟ polarToCart32f(ଅଚଳ ଦଶମିକ *mag, ଅଚଳ ଦଶମିକ *angle, ଦଶମିକ *X, ଦଶମିକ *Y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
     SinCos_32f(mag, angle, X, Y, len, angleInDegrees);
 }
 
-void polarToCart64f(const double *mag, const double *angle, double *X, double *Y, int len, bool angleInDegrees)
+ଶୂନ୍ୟ polarToCart64f(ଅଚଳ ଦ୍ୱିଗୁଣ *mag, ଅଚଳ ଦ୍ୱିଗୁଣ *angle, ଦ୍ୱିଗୁଣ *X, ଦ୍ୱିଗୁଣ *Y, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
-    float ybuf[BLKSZ], xbuf[BLKSZ], _mbuf[BLKSZ], abuf[BLKSZ];
-    float* mbuf = mag ? _mbuf : nullptr;
-    for( int i = 0; i < len; i += BLKSZ )
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା BLKSZ = 128;
+    ଦଶମିକ ybuf[BLKSZ], xbuf[BLKSZ], _mbuf[BLKSZ], abuf[BLKSZ];
+    ଦଶମିକ* mbuf = mag ? _mbuf : nullptr;
+    ପାଇଁ( ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା j, blksz = std::min(BLKSZ, len - i);
+        ପାଇଁ( j = 0; j < blksz; j++ )
         {
-            if (mbuf)
-                mbuf[j] = (float)mag[i + j];
-            abuf[j] = (float)angle[i + j];
+            ଯଦି (mbuf)
+                mbuf[j] = (ଦଶମିକ)mag[i + j];
+            abuf[j] = (ଦଶମିକ)angle[i + j];
         }
         SinCos_32f(mbuf, abuf, xbuf, ybuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        ପାଇଁ( j = 0; j < blksz; j++ )
             X[i + j] = xbuf[j];
-        for( j = 0; j < blksz; j++ )
+        ପାଇଁ( j = 0; j < blksz; j++ )
             Y[i + j] = ybuf[j];
     }
 }
 
-static void fastAtan32f_(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ସ୍ଥିର ଶୂନ୍ୟ fastAtan32f_(ଅଚଳ ଦଶମିକ *Y, ଅଚଳ ଦଶମିକ *X, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees )
 {
-    float scale = angleInDegrees ? 1.f : (float)(CV_PI/180);
-    int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    ଦଶମିକ scale = angleInDegrees ? 1.f : (ଦଶମିକ)(CV_PI/180);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<v_float32>::vlanes();
     v_float32 s = vx_setall_f32(scale);
 
-    for( ; i < len; i += VECSZ*2 )
+    ପାଇଁ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ଯଦି( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == X || angle == Y )
-                break;
+            ଯଦି( i == 0 || angle == X || angle == Y )
+                ଭାଙ୍ଗ;
             i = len - VECSZ*2;
         }
 
@@ -371,57 +371,57 @@ static void fastAtan32f_(const float *Y, const float *X, float *angle, int len, 
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ପାଇଁ( ; i < len; i++ )
         angle[i] = atan_f32(Y[i], X[i])*scale;
 }
 
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ଶୂନ୍ୟ fastAtan32f(ଅଚଳ ଦଶମିକ *Y, ଅଚଳ ଦଶମିକ *X, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
     fastAtan32f_(Y, X, angle, len, angleInDegrees );
 }
 
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees)
+ଶୂନ୍ୟ fastAtan64f(ଅଚଳ ଦ୍ୱିଗୁଣ *Y, ଅଚଳ ଦ୍ୱିଗୁଣ *X, ଦ୍ୱିଗୁଣ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
-    float ybuf[BLKSZ], xbuf[BLKSZ], abuf[BLKSZ];
-    for( int i = 0; i < len; i += BLKSZ )
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା BLKSZ = 128;
+    ଦଶମିକ ybuf[BLKSZ], xbuf[BLKSZ], abuf[BLKSZ];
+    ପାଇଁ( ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା j, blksz = std::min(BLKSZ, len - i);
+        ପାଇଁ( j = 0; j < blksz; j++ )
         {
-            ybuf[j] = (float)Y[i + j];
-            xbuf[j] = (float)X[i + j];
+            ybuf[j] = (ଦଶମିକ)Y[i + j];
+            xbuf[j] = (ଦଶମିକ)X[i + j];
         }
         fastAtan32f_(ybuf, xbuf, abuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        ପାଇଁ( j = 0; j < blksz; j++ )
             angle[i + j] = abuf[j];
     }
 }
 
 // deprecated
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ଶୂନ୍ୟ fastAtan2(ଅଚଳ ଦଶମିକ *Y, ଅଚଳ ଦଶମିକ *X, ଦଶମିକ *angle, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ତାର୍କିକ angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
     fastAtan32f(Y, X, angle, len, angleInDegrees);
 }
 
-void magnitude32f(const float* x, const float* y, float* mag, int len)
+ଶୂନ୍ୟ magnitude32f(ଅଚଳ ଦଶମିକ* x, ଅଚଳ ଦଶମିକ* y, ଦଶମିକ* mag, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<v_float32>::vlanes();
+    ପାଇଁ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ଯଦି( i + VECSZ*2 > len )
         {
-            if( i == 0 || mag == x || mag == y )
-                break;
+            ଯଦି( i == 0 || mag == x || mag == y )
+                ଭାଙ୍ଗ;
             i = len - VECSZ*2;
         }
         v_float32 x0 = vx_load(x + i), x1 = vx_load(x + i + VECSZ);
@@ -434,27 +434,27 @@ void magnitude32f(const float* x, const float* y, float* mag, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ପାଇଁ( ; i < len; i++ )
     {
-        float x0 = x[i], y0 = y[i];
+        ଦଶମିକ x0 = x[i], y0 = y[i];
         mag[i] = std::sqrt(x0*x0 + y0*y0);
     }
 }
 
-void magnitude64f(const double* x, const double* y, double* mag, int len)
+ଶୂନ୍ୟ magnitude64f(ଅଚଳ ଦ୍ୱିଗୁଣ* x, ଅଚଳ ଦ୍ୱିଗୁଣ* y, ଦ୍ୱିଗୁଣ* mag, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ଯଦି (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<v_float64>::vlanes();
+    ପାଇଁ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ଯଦି( i + VECSZ*2 > len )
         {
-            if( i == 0 || mag == x || mag == y )
-                break;
+            ଯଦି( i == 0 || mag == x || mag == y )
+                ଭାଙ୍ଗ;
             i = len - VECSZ*2;
         }
         v_float64 x0 = vx_load(x + i), x1 = vx_load(x + i + VECSZ);
@@ -467,28 +467,28 @@ void magnitude64f(const double* x, const double* y, double* mag, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ପାଇଁ( ; i < len; i++ )
     {
-        double x0 = x[i], y0 = y[i];
+        ଦ୍ୱିଗୁଣ x0 = x[i], y0 = y[i];
         mag[i] = std::sqrt(x0*x0 + y0*y0);
     }
 }
 
 
-void invSqrt32f(const float* src, float* dst, int len)
+ଶୂନ୍ୟ invSqrt32f(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<v_float32>::vlanes();
+    ପାଇଁ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ଯଦି( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ଯଦି( i == 0 || src == dst )
+                ଭାଙ୍ଗ;
             i = len - VECSZ*2;
         }
         v_float32 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -499,24 +499,24 @@ void invSqrt32f(const float* src, float* dst, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ପାଇଁ( ; i < len; i++ )
         dst[i] = 1/std::sqrt(src[i]);
 }
 
 
-void invSqrt64f(const double* src, double* dst, int len)
+ଶୂନ୍ୟ invSqrt64f(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
-    int i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for ( ; i < len; i += VECSZ*2)
+#ଯଦି (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<v_float64>::vlanes();
+    ପାଇଁ ( ; i < len; i += VECSZ*2)
     {
-        if( i + VECSZ*2 > len )
+        ଯଦି( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ଯଦି( i == 0 || src == dst )
+                ଭାଙ୍ଗ;
             i = len - VECSZ*2;
         }
         v_float64 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -526,25 +526,25 @@ void invSqrt64f(const double* src, double* dst, int len)
     }
 #endif
 
-    for( ; i < len; i++ )
+    ପାଇଁ( ; i < len; i++ )
         dst[i] = 1/std::sqrt(src[i]);
 }
 
 
-void sqrt32f(const float* src, float* dst, int len)
+ଶୂନ୍ୟ sqrt32f(ଅଚଳ ଦଶମିକ* src, ଦଶମିକ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<v_float32>::vlanes();
+    ପାଇଁ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ଯଦି( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ଯଦି( i == 0 || src == dst )
+                ଭାଙ୍ଗ;
             i = len - VECSZ*2;
         }
         v_float32 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -555,25 +555,25 @@ void sqrt32f(const float* src, float* dst, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ପାଇଁ( ; i < len; i++ )
         dst[i] = std::sqrt(src[i]);
 }
 
 
-void sqrt64f(const double* src, double* dst, int len)
+ଶୂନ୍ୟ sqrt64f(ଅଚଳ ଦ୍ୱିଗୁଣ* src, ଦ୍ୱିଗୁଣ* dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ଯଦି (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<v_float64>::vlanes();
+    ପାଇଁ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ଯଦି( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ଯଦି( i == 0 || src == dst )
+                ଭାଙ୍ଗ;
             i = len - VECSZ*2;
         }
         v_float64 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -584,62 +584,62 @@ void sqrt64f(const double* src, double* dst, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ପାଇଁ( ; i < len; i++ )
         dst[i] = std::sqrt(src[i]);
 }
 
 // Workaround for ICE in MSVS 2015 update 3 (issue #7795)
 // CV_AVX is not used here, because generated code is faster in non-AVX mode.
 // (tested with disabled IPP on i5-6300U)
-#if (defined _MSC_VER && _MSC_VER >= 1900 && (defined(_M_IX86) || defined(_M_X64))) || defined(__EMSCRIPTEN__)
-void exp32f(const float *src, float *dst, int n)
+#ଯଦି (defined _MSC_VER && _MSC_VER >= 1900 && (defined(_M_IX86) || defined(_M_X64))) || defined(__EMSCRIPTEN__)
+ଶୂନ୍ୟ exp32f(ଅଚଳ ଦଶମିକ *src, ଦଶମିକ *dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n; i++)
     {
         dst[i] = std::exp(src[i]);
     }
 }
 
-void exp64f(const double *src, double *dst, int n)
+ଶୂନ୍ୟ exp64f(ଅଚଳ ଦ୍ୱିଗୁଣ *src, ଦ୍ୱିଗୁଣ *dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n; i++)
     {
         dst[i] = std::exp(src[i]);
     }
 }
 
-void log32f(const float *src, float *dst, int n)
+ଶୂନ୍ୟ log32f(ଅଚଳ ଦଶମିକ *src, ଦଶମିକ *dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n; i++)
     {
         dst[i] = std::log(src[i]);
     }
 }
-void log64f(const double *src, double *dst, int n)
+ଶୂନ୍ୟ log64f(ଅଚଳ ଦ୍ୱିଗୁଣ *src, ଦ୍ୱିଗୁଣ *dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < n; i++)
     {
         dst[i] = std::log(src[i]);
     }
 }
-#else
+#ଅନ୍ୟଥା
 
 ////////////////////////////////////// EXP /////////////////////////////////////
 
 
 #endif // issue 7795
 
-float fastAtan2( float y, float x )
+ଦଶମିକ fastAtan2( ଦଶମିକ y, ଦଶମିକ x )
 {
-    return atan_f32(y, x);
+    ଫେରନ୍ତୁ atan_f32(y, x);
 }
 
 #endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY

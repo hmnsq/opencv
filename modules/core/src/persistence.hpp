@@ -6,13 +6,13 @@
 #ifndef SRC_PERSISTENCE_HPP
 #define SRC_PERSISTENCE_HPP
 
-#include <deque>
-#include <sstream>
-#include <string>
-#include <iterator>
+#ଅନ୍ତର୍ଭାଵ <deque>
+#ଅନ୍ତର୍ଭାଵ <sstream>
+#ଅନ୍ତର୍ଭାଵ <string>
+#ଅନ୍ତର୍ଭାଵ <iterator>
 
 #define USE_ZLIB 1
-#if USE_ZLIB
+#ଯଦି USE_ZLIB
 #  ifndef _LFS64_LARGEFILE
 #    define _LFS64_LARGEFILE 0
 #  endif
@@ -20,18 +20,18 @@
 #    define _FILE_OFFSET_BITS 0
 #  endif
 #  include <zlib.h>
-#else
-typedef void* gzFile;
+#ଅନ୍ୟଥା
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ଶୂନ୍ୟ* gzFile;
 #endif
 
 //=====================================================================================
 
-static const size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
-static const int CV_PERSISTENCE_MAX_DEPTH = 1024;
+ସ୍ଥିର ଅଚଳ size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
+ସ୍ଥିର ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା CV_PERSISTENCE_MAX_DEPTH = 1024;
 
-namespace base64 {
+ନାମାକାଶ base64 {
 
-enum
+ଗଣନା
 {
     HEADER_SIZE         = 24,
     ENCODED_HEADER_SIZE = 32
@@ -51,76 +51,76 @@ enum
 #define cv_isprint(c)     ((uchar)(c) >= (uchar)' ')
 #define cv_isprint_or_tab(c)  ((uchar)(c) >= (uchar)' ' || (c) == '\t')
 
-inline bool cv_isalnum(char c)
+ଧାଡ଼ିଭିତରେ ତାର୍କିକ cv_isalnum(ଅକ୍ଷର c)
 {
-    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    ଫେରନ୍ତୁ ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isalpha(char c)
+ଧାଡ଼ିଭିତରେ ତାର୍କିକ cv_isalpha(ଅକ୍ଷର c)
 {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    ଫେରନ୍ତୁ ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isdigit(char c)
+ଧାଡ଼ିଭିତରେ ତାର୍କିକ cv_isdigit(ଅକ୍ଷର c)
 {
-    return '0' <= c && c <= '9';
+    ଫେରନ୍ତୁ '0' <= c && c <= '9';
 }
 
-inline bool cv_isspace(char c)
+ଧାଡ଼ିଭିତରେ ତାର୍କିକ cv_isspace(ଅକ୍ଷର c)
 {
-    return (9 <= c && c <= 13) || c == ' ';
+    ଫେରନ୍ତୁ (9 <= c && c <= 13) || c == ' ';
 }
 
-inline char* cv_skip_BOM(char* ptr)
+ଧାଡ଼ିଭିତରେ ଅକ୍ଷର* cv_skip_BOM(ଅକ୍ଷର* ptr)
 {
-    if((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
+    ଯଦି((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
     {
-      return ptr + 3;
+      ଫେରନ୍ତୁ ptr + 3;
     }
-    return ptr;
+    ଫେରନ୍ତୁ ptr;
 }
 
-namespace cv
+ନାମାକାଶ cv
 {
-namespace fs
+ନାମାକାଶ fs
 {
-int strcasecmp(const char* str1, const char* str2);
-char* itoa( int _val, char* buffer, int /*radix*/ );
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed );
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero );
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero );
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା strcasecmp(ଅଚଳ ଅକ୍ଷର* str1, ଅଚଳ ଅକ୍ଷର* str2);
+ଅକ୍ଷର* itoa( ପୂର୍ଣ୍ଣସଂଖ୍ୟା _val, ଅକ୍ଷର* buffer, ପୂର୍ଣ୍ଣସଂଖ୍ୟା /*radix*/ );
+ଅକ୍ଷର* itoa( int64_t _val, ଅକ୍ଷର* buffer, ପୂର୍ଣ୍ଣସଂଖ୍ୟା /*radix*/, ତାର୍କିକ _signed );
+ଅକ୍ଷର* floatToString( ଅକ୍ଷର* buf, size_t bufSize, ଦଶମିକ value, ତାର୍କିକ halfprecision, ତାର୍କିକ explicitZero );
+ଅକ୍ଷର* doubleToString( ଅକ୍ଷର* buf, size_t bufSize, ଦ୍ୱିଗୁଣ value, ତାର୍କିକ explicitZero );
 
-int calcStructSize( const char* dt, int initial_size );
-int calcElemSize( const char* dt, int initial_size );
-CV_DEPRECATED char* encodeFormat( int elem_type, char* dt );
-char* encodeFormat( int elem_type, char* dt, size_t dt_len );
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len );
-int decodeSimpleFormat( const char* dt );
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା calcStructSize( ଅଚଳ ଅକ୍ଷର* dt, ପୂର୍ଣ୍ଣସଂଖ୍ୟା initial_size );
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା calcElemSize( ଅଚଳ ଅକ୍ଷର* dt, ପୂର୍ଣ୍ଣସଂଖ୍ୟା initial_size );
+CV_DEPRECATED ଅକ୍ଷର* encodeFormat( ପୂର୍ଣ୍ଣସଂଖ୍ୟା elem_type, ଅକ୍ଷର* dt );
+ଅକ୍ଷର* encodeFormat( ପୂର୍ଣ୍ଣସଂଖ୍ୟା elem_type, ଅକ୍ଷର* dt, size_t dt_len );
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା decodeFormat( ଅଚଳ ଅକ୍ଷର* dt, ପୂର୍ଣ୍ଣସଂଖ୍ୟା* fmt_pairs, ପୂର୍ଣ୍ଣସଂଖ୍ୟା max_len );
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା decodeSimpleFormat( ଅଚଳ ଅକ୍ଷର* dt );
 }
 
 
 #ifdef CV_STATIC_ANALYSIS
-#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } while (0)
-#else
+#define CV_PARSE_ERROR_CPP(errmsg) କର { (ଶୂନ୍ୟ)fs; abort(); } ଯେତେବେଳେ (0)
+#ଅନ୍ୟଥା
 #define CV_PARSE_ERROR_CPP( errmsg ) \
     fs->parseError( CV_Func, (errmsg), __FILE__, __LINE__ )
 #endif
 
 
-#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() do { \
+#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() କର { \
     CV_DbgAssert(ptr); \
-    if((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
-} while (0)
+    ଯଦି((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
+} ଯେତେବେଳେ (0)
 
 
-class FileStorageParser;
-class FileStorageEmitter;
+ଶ୍ରେଣୀ FileStorageParser;
+ଶ୍ରେଣୀ FileStorageEmitter;
 
-struct FStructData
+ସଂରଚନା FStructData
 {
     FStructData() { indent = flags = 0; }
-    FStructData( const std::string& _struct_tag,
-                 int _struct_flags, int _struct_indent )
+    FStructData( ଅଚଳ std::string& _struct_tag,
+                 ପୂର୍ଣ୍ଣସଂଖ୍ୟା _struct_flags, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _struct_indent )
     {
         tag = _struct_tag;
         flags = _struct_flags;
@@ -128,88 +128,88 @@ struct FStructData
     }
 
     std::string tag;
-    int flags;
-    int indent;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା indent;
 };
 
-class FileStorage_API
+ଶ୍ରେଣୀ FileStorage_API
 {
-public:
-    virtual ~FileStorage_API();
-    virtual FileStorage* getFS() = 0;
+ସର୍ବସାଧାରଣ:
+    ଆଭାସୀ ~FileStorage_API();
+    ଆଭାସୀ FileStorage* getFS() = 0;
 
-    virtual int getFormat() const = 0;
+    ଆଭାସୀ ପୂର୍ଣ୍ଣସଂଖ୍ୟା getFormat() ଅଚଳ = 0;
 
-    virtual void puts( const char* str ) = 0;
-    virtual char* gets() = 0;
-    virtual bool eof() = 0;
-    virtual void setEof() = 0;
-    virtual void closeFile() = 0;
-    virtual void rewind() = 0;
-    virtual char* resizeWriteBuffer( char* ptr, int len ) = 0;
-    virtual char* bufferPtr() const = 0;
-    virtual char* bufferStart() const = 0;
-    virtual char* bufferEnd() const = 0;
-    virtual void setBufferPtr(char* ptr) = 0;
-    virtual char* flush() = 0;
-    virtual void setNonEmpty() = 0;
-    virtual int wrapMargin() const = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ puts( ଅଚଳ ଅକ୍ଷର* str ) = 0;
+    ଆଭାସୀ ଅକ୍ଷର* gets() = 0;
+    ଆଭାସୀ ତାର୍କିକ eof() = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ setEof() = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ closeFile() = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ rewind() = 0;
+    ଆଭାସୀ ଅକ୍ଷର* resizeWriteBuffer( ଅକ୍ଷର* ptr, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len ) = 0;
+    ଆଭାସୀ ଅକ୍ଷର* bufferPtr() ଅଚଳ = 0;
+    ଆଭାସୀ ଅକ୍ଷର* bufferStart() ଅଚଳ = 0;
+    ଆଭାସୀ ଅକ୍ଷର* bufferEnd() ଅଚଳ = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ setBufferPtr(ଅକ୍ଷର* ptr) = 0;
+    ଆଭାସୀ ଅକ୍ଷର* flush() = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ setNonEmpty() = 0;
+    ଆଭାସୀ ପୂର୍ଣ୍ଣସଂଖ୍ୟା wrapMargin() ଅଚଳ = 0;
 
-    virtual FStructData& getCurrentStruct() = 0;
+    ଆଭାସୀ FStructData& getCurrentStruct() = 0;
 
-    virtual void convertToCollection( int type, FileNode& node ) = 0;
-    virtual FileNode addNode( FileNode& collection, const std::string& key,
-                               int type, const void* value=0, int len=-1 ) = 0;
-    virtual void finalizeCollection( FileNode& collection ) = 0;
-    virtual double strtod(char* ptr, char** endptr) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ convertToCollection( ପୂର୍ଣ୍ଣସଂଖ୍ୟା type, File_ଗଣ୍ଠି& ଗଣ୍ଠି ) = 0;
+    ଆଭାସୀ File_ଗଣ୍ଠି add_ଗଣ୍ଠି( File_ଗଣ୍ଠି& collection, ଅଚଳ std::string& ଚାବି,
+                               ପୂର୍ଣ୍ଣସଂଖ୍ୟା type, ଅଚଳ ଶୂନ୍ୟ* value=0, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len=-1 ) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ finalizeCollection( File_ଗଣ୍ଠି& collection ) = 0;
+    ଆଭାସୀ ଦ୍ୱିଗୁଣ strtod(ଅକ୍ଷର* ptr, ଅକ୍ଷର** endptr) = 0;
 
-    virtual char* parseBase64(char* ptr, int indent, FileNode& collection) = 0;
+    ଆଭାସୀ ଅକ୍ଷର* parseBase64(ଅକ୍ଷର* ptr, ପୂର୍ଣ୍ଣସଂଖ୍ୟା indent, File_ଗଣ୍ଠି& collection) = 0;
     CV_NORETURN
-    virtual void parseError(const char* funcname, const std::string& msg,
-                            const char* filename, int lineno) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ parseError(ଅଚଳ ଅକ୍ଷର* funcname, ଅଚଳ std::string& ସନ୍ଦେଶ,
+                            ଅଚଳ ଅକ୍ଷର* filename, ପୂର୍ଣ୍ଣସଂଖ୍ୟା lineno) = 0;
 
-private:
-    enum Base64State{
+ବ୍ୟକ୍ତିଗତ:
+    ଗଣନା Base64State{
         Uncertain,
         NotUse,
         InUse,
     };
 
-    friend class cv::FileStorage::Impl;
-    friend class cv::FileStorage;
-    friend class JSONEmitter;
-    friend class XMLEmitter;
-    friend class YAMLEmitter;
+    friend ଶ୍ରେଣୀ cv::FileStorage::Impl;
+    friend ଶ୍ରେଣୀ cv::FileStorage;
+    friend ଶ୍ରେଣୀ JSONEmitter;
+    friend ଶ୍ରେଣୀ XMLEmitter;
+    friend ଶ୍ରେଣୀ YAMLEmitter;
 
-    virtual void check_if_write_struct_is_delayed(bool change_type_to_base64 = false) = 0;
-    virtual void switch_to_Base64_state(Base64State state) = 0;
-    virtual Base64State get_state_of_writing_base64() = 0;
-    virtual int get_space() = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ check_if_write_struct_is_delayed(ତାର୍କିକ change_type_to_base64 = ମିଥ୍ୟା) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ switch_to_Base64_state(Base64State state) = 0;
+    ଆଭାସୀ Base64State get_state_of_writing_base64() = 0;
+    ଆଭାସୀ ପୂର୍ଣ୍ଣସଂଖ୍ୟା get_space() = 0;
 };
 
-class FileStorageEmitter
+ଶ୍ରେଣୀ FileStorageEmitter
 {
-public:
-    virtual ~FileStorageEmitter() {}
+ସର୍ବସାଧାରଣ:
+    ଆଭାସୀ ~FileStorageEmitter() {}
 
-    virtual FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                          int struct_flags, const char* type_name=0 ) = 0;
-    virtual void endWriteStruct(const FStructData& current_struct) = 0;
-    virtual void write(const char* key, int value) = 0;
-    virtual void write(const char* key, int64_t value) = 0;
-    virtual void write(const char* key, double value) = 0;
-    virtual void write(const char* key, const char* value, bool quote) = 0;
-    virtual void writeScalar(const char* key, const char* value) = 0;
-    virtual void writeComment(const char* comment, bool eol_comment) = 0;
-    virtual void startNextStream() = 0;
+    ଆଭାସୀ FStructData startWriteStruct( ଅଚଳ FStructData& parent, ଅଚଳ ଅକ୍ଷର* ଚାବି,
+                                          ପୂର୍ଣ୍ଣସଂଖ୍ୟା struct_flags, ଅଚଳ ଅକ୍ଷର* type_name=0 ) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ endWriteStruct(ଅଚଳ FStructData& current_struct) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ ଲିଖ(ଅଚଳ ଅକ୍ଷର* ଚାବି, ପୂର୍ଣ୍ଣସଂଖ୍ୟା value) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ ଲିଖ(ଅଚଳ ଅକ୍ଷର* ଚାବି, int64_t value) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ ଲିଖ(ଅଚଳ ଅକ୍ଷର* ଚାବି, ଦ୍ୱିଗୁଣ value) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ ଲିଖ(ଅଚଳ ଅକ୍ଷର* ଚାବି, ଅଚଳ ଅକ୍ଷର* value, ତାର୍କିକ quote) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ writeScalar(ଅଚଳ ଅକ୍ଷର* ଚାବି, ଅଚଳ ଅକ୍ଷର* value) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ writeComment(ଅଚଳ ଅକ୍ଷର* comment, ତାର୍କିକ eol_comment) = 0;
+    ଆଭାସୀ ଶୂନ୍ୟ startNextStream() = 0;
 };
 
-class FileStorageParser
+ଶ୍ରେଣୀ FileStorageParser
 {
-public:
-    virtual ~FileStorageParser() {}
-    virtual bool parse(char* ptr) = 0;
-    virtual bool getBase64Row(char* ptr, int indent, char* &beg, char* &end) = 0;
+ସର୍ବସାଧାରଣ:
+    ଆଭାସୀ ~FileStorageParser() {}
+    ଆଭାସୀ ତାର୍କିକ parse(ଅକ୍ଷର* ptr) = 0;
+    ଆଭାସୀ ତାର୍କିକ getBase64Row(ଅକ୍ଷର* ptr, ପୂର୍ଣ୍ଣସଂଖ୍ୟା indent, ଅକ୍ଷର* &beg, ଅକ୍ଷର* &end) = 0;
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs);

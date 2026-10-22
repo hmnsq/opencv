@@ -9,209 +9,209 @@
 //
 // */
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#ଅନ୍ତର୍ଭାଵ "precomp.hpp"
+#ଅନ୍ତର୍ଭାଵ <opencv2/core/utils/logger.hpp>
 
-namespace cv
+ନାମାକାଶ cv
 {
 
 //This and its overload below are used in various MatExpr operator overloads
 //implemented to check that Matrix operands exist.
-static void checkOperandsExist(const Mat& a)
+ସ୍ଥିର ଶୂନ୍ୟ checkOperandsExist(ଅଚଳ Mat& a)
 {
-    if (a.empty())
+    ଯଦି (a.empty())
     {
         CV_Error(cv::Error::StsBadArg, "Matrix operand is an empty matrix.");
     }
 }
 
-static void checkOperandsExist(const Mat& a, const Mat& b)
+ସ୍ଥିର ଶୂନ୍ୟ checkOperandsExist(ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
-    if (a.empty() || b.empty())
+    ଯଦି (a.empty() || b.empty())
     {
         CV_Error(cv::Error::StsBadArg, "One or more matrix operands are empty.");
     }
 }
 
 
-class MatOp_Identity CV_FINAL : public MatOp
+ଶ୍ରେଣୀ MatOp_Identity CV_FINAL : ସର୍ବସାଧାରଣ MatOp
 {
-public:
+ସର୍ବସାଧାରଣ:
     MatOp_Identity() {}
-    virtual ~MatOp_Identity() {}
+    ଆଭାସୀ ~MatOp_Identity() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ତାର୍କିକ elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ CV_OVERRIDE { ଫେରନ୍ତୁ ସତ୍ୟ; }
+    ଶୂନ୍ୟ assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type=-1) ଅଚଳ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅଚଳ Mat& m);
 };
 
-static MatOp_Identity g_MatOp_Identity;
+ସ୍ଥିର MatOp_Identity g_MatOp_Identity;
 
-class MatOp_AddEx CV_FINAL : public MatOp
+ଶ୍ରେଣୀ MatOp_AddEx CV_FINAL : ସର୍ବସାଧାରଣ MatOp
 {
-public:
+ସର୍ବସାଧାରଣ:
     MatOp_AddEx() {}
-    virtual ~MatOp_AddEx() {}
+    ଆଭାସୀ ~MatOp_AddEx() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ତାର୍କିକ elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ CV_OVERRIDE { ଫେରନ୍ତୁ ସତ୍ୟ; }
+    ଶୂନ୍ୟ assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type=-1) ଅଚଳ CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    ଶୂନ୍ୟ add(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Scalar& s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
+    ଶୂନ୍ୟ subtract(ଅଚଳ Scalar& s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
+    ଶୂନ୍ୟ multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
+    ଶୂନ୍ୟ divide(ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    ଶୂନ୍ୟ transpose(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
+    ଶୂନ୍ୟ abs(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅଚଳ Mat& a, ଅଚଳ Mat& b, ଦ୍ୱିଗୁଣ alpha, ଦ୍ୱିଗୁଣ beta, ଅଚଳ Scalar& s=Scalar());
 };
 
-static MatOp_AddEx g_MatOp_AddEx;
+ସ୍ଥିର MatOp_AddEx g_MatOp_AddEx;
 
-class MatOp_Bin CV_FINAL : public MatOp
+ଶ୍ରେଣୀ MatOp_Bin CV_FINAL : ସର୍ବସାଧାରଣ MatOp
 {
-public:
+ସର୍ବସାଧାରଣ:
     MatOp_Bin() {}
-    virtual ~MatOp_Bin() {}
+    ଆଭାସୀ ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ତାର୍କିକ elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ CV_OVERRIDE { ଫେରନ୍ତୁ ସତ୍ୟ; }
+    ଶୂନ୍ୟ assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type=-1) ଅଚଳ CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    ଶୂନ୍ୟ multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
+    ଶୂନ୍ୟ divide(ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅକ୍ଷର op, ଅଚଳ Mat& a, ଅଚଳ Mat& b, ଦ୍ୱିଗୁଣ scale=1);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅକ୍ଷର op, ଅଚଳ Mat& a, ଅଚଳ Scalar& s);
 };
 
-static MatOp_Bin g_MatOp_Bin;
+ସ୍ଥିର MatOp_Bin g_MatOp_Bin;
 
-class MatOp_Cmp CV_FINAL : public MatOp
+ଶ୍ରେଣୀ MatOp_Cmp CV_FINAL : ସର୍ବସାଧାରଣ MatOp
 {
-public:
+ସର୍ବସାଧାରଣ:
     MatOp_Cmp() {}
-    virtual ~MatOp_Cmp() {}
+    ଆଭାସୀ ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ତାର୍କିକ elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ CV_OVERRIDE { ଫେରନ୍ତୁ ସତ୍ୟ; }
+    ଶୂନ୍ୟ assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type=-1) ଅଚଳ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cmpop, ଅଚଳ Mat& a, ଅଚଳ Mat& b);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cmpop, ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ alpha);
 };
 
-static MatOp_Cmp g_MatOp_Cmp;
+ସ୍ଥିର MatOp_Cmp g_MatOp_Cmp;
 
-class MatOp_GEMM CV_FINAL : public MatOp
+ଶ୍ରେଣୀ MatOp_GEMM CV_FINAL : ସର୍ବସାଧାରଣ MatOp
 {
-public:
+ସର୍ବସାଧାରଣ:
     MatOp_GEMM() {}
-    virtual ~MatOp_GEMM() {}
+    ଆଭାସୀ ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ତାର୍କିକ elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ CV_OVERRIDE { ଫେରନ୍ତୁ ମିଥ୍ୟା; }
+    ଶୂନ୍ୟ assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type=-1) ଅଚଳ CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    ଶୂନ୍ୟ add(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
+    ଶୂନ୍ୟ subtract(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
+    ଶୂନ୍ୟ multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    ଶୂନ୍ୟ transpose(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    Size size(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି) ଅଚଳ CV_OVERRIDE
     {
-        return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+        ଫେରନ୍ତୁ Size(
+            (ପଦସମଷ୍ଟି.flags & GEMM_2_T) ? ପଦସମଷ୍ଟି.b.rows : ପଦସମଷ୍ଟି.b.cols,
+            (ପଦସମଷ୍ଟି.flags & GEMM_1_T) ? ପଦସମଷ୍ଟି.a.cols : ପଦସମଷ୍ଟି.a.rows
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                         double alpha=1, const Mat& c=Mat(), double beta=1);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags, ଅଚଳ Mat& a, ଅଚଳ Mat& b,
+                         ଦ୍ୱିଗୁଣ alpha=1, ଅଚଳ Mat& c=Mat(), ଦ୍ୱିଗୁଣ beta=1);
 
 };
 
-static MatOp_GEMM g_MatOp_GEMM;
+ସ୍ଥିର MatOp_GEMM g_MatOp_GEMM;
 
-class MatOp_Invert CV_FINAL : public MatOp
+ଶ୍ରେଣୀ MatOp_Invert CV_FINAL : ସର୍ବସାଧାରଣ MatOp
 {
-public:
+ସର୍ବସାଧାରଣ:
     MatOp_Invert() {}
-    virtual ~MatOp_Invert() {}
+    ଆଭାସୀ ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ତାର୍କିକ elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ CV_OVERRIDE { ଫେରନ୍ତୁ ମିଥ୍ୟା; }
+    ଶୂନ୍ୟ assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type=-1) ଅଚଳ CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    ଶୂନ୍ୟ matmul(ଅଚଳ Mat_ପଦସମଷ୍ଟି& expr1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& expr2, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା method, ଅଚଳ Mat& m);
 };
 
-static MatOp_Invert g_MatOp_Invert;
+ସ୍ଥିର MatOp_Invert g_MatOp_Invert;
 
-class MatOp_T CV_FINAL : public MatOp
+ଶ୍ରେଣୀ MatOp_T CV_FINAL : ସର୍ବସାଧାରଣ MatOp
 {
-public:
+ସର୍ବସାଧାରଣ:
     MatOp_T() {}
-    virtual ~MatOp_T() {}
+    ଆଭାସୀ ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ତାର୍କିକ elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ CV_OVERRIDE { ଫେରନ୍ତୁ ମିଥ୍ୟା; }
+    ଶୂନ୍ୟ assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type=-1) ଅଚଳ CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    ଶୂନ୍ୟ multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
+    ଶୂନ୍ୟ transpose(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ alpha=1);
 };
 
-static MatOp_T g_MatOp_T;
+ସ୍ଥିର MatOp_T g_MatOp_T;
 
-class MatOp_Solve CV_FINAL : public MatOp
+ଶ୍ରେଣୀ MatOp_Solve CV_FINAL : ସର୍ବସାଧାରଣ MatOp
 {
-public:
+ସର୍ବସାଧାରଣ:
     MatOp_Solve() {}
-    virtual ~MatOp_Solve() {}
+    ଆଭାସୀ ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ତାର୍କିକ elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ CV_OVERRIDE { ଫେରନ୍ତୁ ମିଥ୍ୟା; }
+    ଶୂନ୍ୟ assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type=-1) ଅଚଳ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା method, ଅଚଳ Mat& a, ଅଚଳ Mat& b);
 };
 
-static MatOp_Solve g_MatOp_Solve;
+ସ୍ଥିର MatOp_Solve g_MatOp_Solve;
 
-class MatOp_Initializer CV_FINAL : public MatOp
+ଶ୍ରେଣୀ MatOp_Initializer CV_FINAL : ସର୍ବସାଧାରଣ MatOp
 {
-public:
+ସର୍ବସାଧାରଣ:
     MatOp_Initializer() {}
-    virtual ~MatOp_Initializer() {}
+    ଆଭାସୀ ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ତାର୍କିକ elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ CV_OVERRIDE { ଫେରନ୍ତୁ ମିଥ୍ୟା; }
+    ଶୂନ୍ୟ assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type=-1) ଅଚଳ CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    ଶୂନ୍ୟ multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା method, Size sz, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type, ଦ୍ୱିଗୁଣ alpha=1);
+    ସ୍ଥିର ଶୂନ୍ୟ make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା method, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ndims, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sizes, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type, ଦ୍ୱିଗୁଣ alpha=1);
 };
 
-static MatOp_Initializer* getGlobalMatOpInitializer()
+ସ୍ଥିର MatOp_Initializer* getGlobalMatOpInitializer()
 {
-    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
+    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, ନୂତନ MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isIdentity(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ e.op == &g_MatOp_Identity; }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isAddEx(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ e.op == &g_MatOp_AddEx; }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isScaled(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isBin(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଅକ୍ଷର c) { ଫେରନ୍ତୁ e.op == &g_MatOp_Bin && e.flags == c; }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isCmp(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ e.op == &g_MatOp_Cmp; }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isReciprocal(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ isBin(e,'/') && (!e.b.data || e.beta == 0); }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isT(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ e.op == &g_MatOp_T; }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isInv(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ e.op == &g_MatOp_Invert; }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isSolve(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isMatProd(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
+ସ୍ଥିର ଧାଡ଼ିଭିତରେ ତାର୍କିକ isInitializer(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e) { ଫେରନ୍ତୁ e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,1138 +219,1138 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+ତାର୍କିକ MatOp::elementWise(ଅଚଳ Mat_ପଦସମଷ୍ଟି& /*ପଦସମଷ୍ଟି*/) ଅଚଳ
 {
-    return false;
+    ଫେରନ୍ତୁ ମିଥ୍ୟା;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+ଶୂନ୍ୟ MatOp::roi(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, ଅଚଳ Range& rowRange, ଅଚଳ Range& colRange, Mat_ପଦସମଷ୍ଟି& e) ଅଚଳ
 {
-    if( elementWise(expr) )
+    ଯଦି( elementWise(ପଦସମଷ୍ଟି) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_ପଦସମଷ୍ଟି(ପଦସମଷ୍ଟି.op, ପଦସମଷ୍ଟି.flags, Mat(), Mat(), Mat(),
+                    ପଦସମଷ୍ଟି.alpha, ପଦସମଷ୍ଟି.beta, ପଦସମଷ୍ଟି.s);
+        ଯଦି(ପଦସମଷ୍ଟି.a.data)
+            e.a = ପଦସମଷ୍ଟି.a(rowRange, colRange);
+        ଯଦି(ପଦସମଷ୍ଟି.b.data)
+            e.b = ପଦସମଷ୍ଟି.b(rowRange, colRange);
+        ଯଦି(ପଦସମଷ୍ଟି.c.data)
+            e.c = ପଦସମଷ୍ଟି.c(rowRange, colRange);
     }
-    else
+    ଅନ୍ୟଥା
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
+        ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, m);
+        e = Mat_ପଦସମଷ୍ଟି(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
     }
 }
 
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
+ଶୂନ୍ୟ MatOp::diag(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, ପୂର୍ଣ୍ଣସଂଖ୍ୟା d, Mat_ପଦସମଷ୍ଟି& e) ଅଚଳ
 {
-    if( elementWise(expr) )
+    ଯଦି( elementWise(ପଦସମଷ୍ଟି) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
+        e = Mat_ପଦସମଷ୍ଟି(ପଦସମଷ୍ଟି.op, ପଦସମଷ୍ଟି.flags, Mat(), Mat(), Mat(),
+                    ପଦସମଷ୍ଟି.alpha, ପଦସମଷ୍ଟି.beta, ପଦସମଷ୍ଟି.s);
+        ଯଦି(ପଦସମଷ୍ଟି.a.data)
+            e.a = ପଦସମଷ୍ଟି.a.diag(d);
+        ଯଦି(ପଦସମଷ୍ଟି.b.data)
+            e.b = ପଦସମଷ୍ଟି.b.diag(d);
+        ଯଦି(ପଦସମଷ୍ଟି.c.data)
+            e.c = ପଦସମଷ୍ଟି.c.diag(d);
     }
-    else
+    ଅନ୍ୟଥା
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, m);
+        e = Mat_ପଦସମଷ୍ଟି(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+ଶୂନ୍ୟ MatOp::augAssignAdd(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m) ଅଚଳ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, temp);
     m += temp;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+ଶୂନ୍ୟ MatOp::augAssignSubtract(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m) ଅଚଳ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, temp);
     m -= temp;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+ଶୂନ୍ୟ MatOp::augAssignMultiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m) ଅଚଳ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, temp);
     m *= temp;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+ଶୂନ୍ୟ MatOp::augAssignDivide(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m) ଅଚଳ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, temp);
     m /= temp;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+ଶୂନ୍ୟ MatOp::augAssignAnd(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m) ଅଚଳ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, temp);
     m &= temp;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+ଶୂନ୍ୟ MatOp::augAssignOr(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m) ଅଚଳ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, temp);
     m |= temp;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+ଶୂନ୍ୟ MatOp::augAssignXor(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat& m) ଅଚଳ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, temp);
     m ^= temp;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::add(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ଯଦି( ଏହି == e2.op )
     {
-        double alpha = 1, beta = 1;
+        ଦ୍ୱିଗୁଣ alpha = 1, beta = 1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        ଯଦି( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        ଅନ୍ୟଥା
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        ଯଦି( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = e2.alpha;
             s += e2.s;
         }
-        else
+        ଅନ୍ୟଥା
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_ପଦସମଷ୍ଟି(res, m1, m2, alpha, beta, s);
     }
-    else
+    ଅନ୍ୟଥା
         e2.op->add(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::add(ଅଚଳ Mat_ପଦସମଷ୍ଟି& expr1, ଅଚଳ Scalar& s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::subtract(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ଯଦି( ଏହି == e2.op )
     {
-        double alpha = 1, beta = -1;
+        ଦ୍ୱିଗୁଣ alpha = 1, beta = -1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        ଯଦି( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        ଅନ୍ୟଥା
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        ଯଦି( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = -e2.alpha;
             s -= e2.s;
         }
-        else
+        ଅନ୍ୟଥା
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_ପଦସମଷ୍ଟି(res, m1, m2, alpha, beta, s);
     }
-    else
+    ଅନ୍ୟଥା
         e2.op->subtract(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::subtract(ଅଚଳ Scalar& s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, m);
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+ଶୂନ୍ୟ MatOp::multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res, ଦ୍ୱିଗୁଣ scale) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ଯଦି( ଏହି == e2.op )
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        ଯଦି( isReciprocal(e1) )
         {
-            if( isScaled(e2) )
+            ଯଦି( isScaled(e2) )
             {
                 scale *= e2.alpha;
                 m2 = e2.a;
             }
-            else
+            ଅନ୍ୟଥା
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_ପଦସମଷ୍ଟି(res, '/', m2, e1.a, scale/e1.alpha);
         }
-        else
+        ଅନ୍ୟଥା
         {
-            char op = '*';
-            if( isScaled(e1) )
+            ଅକ୍ଷର op = '*';
+            ଯଦି( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            ଅନ୍ୟଥା
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            ଯଦି( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            ଅନ୍ୟଥା ଯଦି( isReciprocal(e2) )
             {
                 op = '/';
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else
+            ଅନ୍ୟଥା
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_ପଦସମଷ୍ଟି(res, op, m1, m2, scale);
         }
     }
-    else
+    ଅନ୍ୟଥା
         e2.op->multiply(e1, e2, res, scale);
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, m);
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+ଶୂନ୍ୟ MatOp::divide(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res, ଦ୍ୱିଗୁଣ scale) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ଯଦି( ଏହି == e2.op )
     {
-        if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
-        else
+        ଯଦି( isReciprocal(e1) && isReciprocal(e2) )
+            MatOp_Bin::make_ପଦସମଷ୍ଟି(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+        ଅନ୍ୟଥା
         {
             Mat m1, m2;
-            char op = '/';
+            ଅକ୍ଷର op = '/';
 
-            if( isScaled(e1) )
+            ଯଦି( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            ଅନ୍ୟଥା
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            ଯଦି( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            ଅନ୍ୟଥା ଯଦି( isReciprocal(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
                 op = '*';
             }
-            else
+            ଅନ୍ୟଥା
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_ପଦସମଷ୍ଟି(res, op, m1, m2, scale);
         }
     }
-    else
+    ଅନ୍ୟଥା
         e2.op->divide(e1, e2, res, scale);
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::divide(ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, m);
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::abs(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, m);
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::transpose(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, m);
+    MatOp_T::make_ପଦସମଷ୍ଟି(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::matmul(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
-    if( this == e2.op )
+    ଯଦି( ଏହି == e2.op )
     {
-        double scale = 1;
-        int flags = 0;
+        ଦ୍ୱିଗୁଣ scale = 1;
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags = 0;
         Mat m1, m2;
 
-        if( isT(e1) )
+        ଯଦି( isT(e1) )
         {
             flags = cv::GEMM_1_T;
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else if( isScaled(e1) )
+        ଅନ୍ୟଥା ଯଦି( isScaled(e1) )
         {
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else
+        ଅନ୍ୟଥା
             e1.op->assign(e1, m1);
 
-        if( isT(e2) )
+        ଯଦି( isT(e2) )
         {
             flags |= cv::GEMM_2_T;
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else if( isScaled(e2) )
+        ଅନ୍ୟଥା ଯଦି( isScaled(e2) )
         {
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else
+        ଅନ୍ୟଥା
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_ପଦସମଷ୍ଟି(res, flags, m1, m2, scale);
     }
-    else
+    ଅନ୍ୟଥା
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+ଶୂନ୍ୟ MatOp::invert(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି, ପୂର୍ଣ୍ଣସଂଖ୍ୟା method, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    ପଦସମଷ୍ଟି.op->assign(ପଦସମଷ୍ଟି, m);
+    MatOp_Invert::make_ପଦସମଷ୍ଟି(res, method, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+Size MatOp::size(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି) ଅଚଳ
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    ଫେରନ୍ତୁ !ପଦସମଷ୍ଟି.a.empty() ? ପଦସମଷ୍ଟି.a.size() : ପଦସମଷ୍ଟି.b.empty() ? ପଦସମଷ୍ଟି.b.size() : ପଦସମଷ୍ଟି.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା MatOp::type(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    ଫେରନ୍ତୁ !ପଦସମଷ୍ଟି.a.empty() ? ପଦସମଷ୍ଟି.a.type() : ପଦସମଷ୍ଟି.b.empty() ? ପଦସମଷ୍ଟି.b.type() : ପଦସମଷ୍ଟି.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_ପଦସମଷ୍ଟି::Mat_ପଦସମଷ୍ଟି(ଅଚଳ Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_ପଦସମଷ୍ଟି Mat_ପଦସମଷ୍ଟି::row(ପୂର୍ଣ୍ଣସଂଖ୍ୟା y) ଅଚଳ
 {
-    MatExpr e;
-    op->roi(*this, Range(y, y+1), Range::all(), e);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    op->roi(*ଏହି, Range(y, y+1), Range::all(), e);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_ପଦସମଷ୍ଟି Mat_ପଦସମଷ୍ଟି::col(ପୂର୍ଣ୍ଣସଂଖ୍ୟା x) ଅଚଳ
 {
-    MatExpr e;
-    op->roi(*this, Range::all(), Range(x, x+1), e);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    op->roi(*ଏହି, Range::all(), Range(x, x+1), e);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_ପଦସମଷ୍ଟି Mat_ପଦସମଷ୍ଟି::diag(ପୂର୍ଣ୍ଣସଂଖ୍ୟା d) ଅଚଳ
 {
-    MatExpr e;
-    op->diag(*this, d, e);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    op->diag(*ଏହି, d, e);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_ପଦସମଷ୍ଟି Mat_ପଦସମଷ୍ଟି::operator()( ଅଚଳ Range& rowRange, ଅଚଳ Range& colRange ) ଅଚଳ
 {
-    MatExpr e;
-    op->roi(*this, rowRange, colRange, e);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    op->roi(*ଏହି, rowRange, colRange, e);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_ପଦସମଷ୍ଟି Mat_ପଦସମଷ୍ଟି::operator()( ଅଚଳ Rect& roi ) ଅଚଳ
 {
-    MatExpr e;
-    op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    op->roi(*ଏହି, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
+    ଫେରନ୍ତୁ e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_ପଦସମଷ୍ଟି::cross(ଅଚଳ Mat& m) ଅଚଳ
 {
-    return ((Mat)*this).cross(m);
+    ଫେରନ୍ତୁ ((Mat)*ଏହି).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+ଦ୍ୱିଗୁଣ Mat_ପଦସମଷ୍ଟି::dot(ଅଚଳ Mat& m) ଅଚଳ
 {
-    return ((Mat)*this).dot(m);
+    ଫେରନ୍ତୁ ((Mat)*ଏହି).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_ପଦସମଷ୍ଟି Mat_ପଦସମଷ୍ଟି::t() ଅଚଳ
 {
-    MatExpr e;
-    op->transpose(*this, e);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    op->transpose(*ଏହି, e);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_ପଦସମଷ୍ଟି Mat_ପଦସମଷ୍ଟି::inv(ପୂର୍ଣ୍ଣସଂଖ୍ୟା method) ଅଚଳ
 {
-    MatExpr e;
-    op->invert(*this, method, e);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    op->invert(*ଏହି, method, e);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_ପଦସମଷ୍ଟି Mat_ପଦସମଷ୍ଟି::mul(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ scale) ଅଚଳ
 {
-    MatExpr en;
-    op->multiply(*this, e, en, scale);
-    return en;
+    Mat_ପଦସମଷ୍ଟି en;
+    op->multiply(*ଏହି, e, en, scale);
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_ପଦସମଷ୍ଟି Mat_ପଦସମଷ୍ଟି::mul(ଅଚଳ Mat& m, ଦ୍ୱିଗୁଣ scale) ଅଚଳ
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    op->multiply(*ଏହି, Mat_ପଦସମଷ୍ଟି(m), e, scale);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator + (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, a, b, 1, 1);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_ପଦସମଷ୍ଟି operator + (ଅଚଳ Mat& a, ଅଚଳ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, a, Mat(), 1, 0, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator + (ଅଚଳ Scalar& s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, a, Mat(), 1, 0, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_ପଦସମଷ୍ଟି operator + (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଅଚଳ Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_ପଦସମଷ୍ଟି en;
+    e.op->add(e, Mat_ପଦସମଷ୍ଟି(m), en);
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି operator + (ଅଚଳ Mat& m, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_ପଦସମଷ୍ଟି en;
+    e.op->add(e, Mat_ପଦସମଷ୍ଟି(m), en);
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_ପଦସମଷ୍ଟି operator + (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଅଚଳ Scalar& s)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->add(e, s, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି operator + (ଅଚଳ Scalar& s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->add(e, s, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_ପଦସମଷ୍ଟି operator + (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e1.op->add(e1, e2, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, a, b, 1, -1);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Mat& a, ଅଚଳ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, a, Mat(), 1, 0, -s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Scalar& s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, a, Mat(), -1, 0, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଅଚଳ Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
-    return en;
+    Mat_ପଦସମଷ୍ଟି en;
+    e.op->subtract(e, Mat_ପଦସମଷ୍ଟି(m), en);
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Mat& m, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
-    return en;
+    Mat_ପଦସମଷ୍ଟି en;
+    e.op->subtract(Mat_ପଦସମଷ୍ଟି(m), e, en);
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଅଚଳ Scalar& s)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->add(e, -s, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Scalar& s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->subtract(s, e, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e1.op->subtract(e1, e2, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, m, Mat(), -1, 0);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି operator - (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->subtract(Scalar(0), e, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator * (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_GEMM::make_ପଦସମଷ୍ଟି(e, 0, a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି operator * (ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, a, Mat(), s, 0);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator * (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, a, Mat(), s, 0);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_ପଦସମଷ୍ଟି operator * (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଅଚଳ Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
-    return en;
+    Mat_ପଦସମଷ୍ଟି en;
+    e.op->matmul(e, Mat_ପଦସମଷ୍ଟି(m), en);
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି operator * (ଅଚଳ Mat& m, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
-    return en;
+    Mat_ପଦସମଷ୍ଟି en;
+    e.op->matmul(Mat_ପଦସମଷ୍ଟି(m), e, en);
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_ପଦସମଷ୍ଟି operator * (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ s)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->multiply(e, s, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି operator * (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->multiply(e, s, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_ପଦସମଷ୍ଟି operator * (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e1.op->matmul(e1, e2, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator / (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '/', a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି operator / (ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_AddEx::make_ପଦସମଷ୍ଟି(e, a, Mat(), 1./s, 0);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator / (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '/', a, Mat(), s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_ପଦସମଷ୍ଟି operator / (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଅଚଳ Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
-    return en;
+    Mat_ପଦସମଷ୍ଟି en;
+    e.op->divide(e, Mat_ପଦସମଷ୍ଟି(m), en);
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି operator / (ଅଚଳ Mat& m, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
-    return en;
+    Mat_ପଦସମଷ୍ଟି en;
+    e.op->divide(Mat_ପଦସମଷ୍ଟି(m), e, en);
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_ପଦସମଷ୍ଟି operator / (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ s)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->multiply(e, 1./s, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି operator / (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->divide(s, e, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_ପଦସମଷ୍ଟି operator / (ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2)
 {
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e1.op->divide(e1, e2, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator < (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_LT, a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି operator < (ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_LT, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator < (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_GT, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator <= (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_LE, a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି operator <= (ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_LE, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator <= (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_GE, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator == (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_EQ, a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି operator == (ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_EQ, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator == (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_EQ, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator != (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_NE, a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି operator != (ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_NE, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator != (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_NE, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator >= (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_GE, a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି operator >= (ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_GE, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator >= (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_LE, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator > (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_GT, a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି operator > (ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_GT, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator > (ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Cmp::make_ପଦସମଷ୍ଟି(e, cv::CMP_LT, a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି min(ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, 'm', a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି min(ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, 'n', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି min(ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, 'n', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି max(ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, 'M', a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_ପଦସମଷ୍ଟି max(ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, 'N', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି max(ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, 'N', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator & (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '&', a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_ପଦସମଷ୍ଟି operator & (ଅଚଳ Mat& a, ଅଚଳ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '&', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator & (ଅଚଳ Scalar& s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '&', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator | (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '|', a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_ପଦସମଷ୍ଟି operator | (ଅଚଳ Mat& a, ଅଚଳ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '|', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator | (ଅଚଳ Scalar& s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '|', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_ପଦସମଷ୍ଟି operator ^ (ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '^', a, b);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_ପଦସମଷ୍ଟି operator ^ (ଅଚଳ Mat& a, ଅଚଳ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '^', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator ^ (ଅଚଳ Scalar& s, ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '^', a, s);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_ପଦସମଷ୍ଟି operator ~(ଅଚଳ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '~', a, Scalar());
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_ପଦସମଷ୍ଟି abs(ଅଚଳ Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, 'a', a, Scalar());
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_ପଦସମଷ୍ଟି abs(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
+    Mat_ପଦସମଷ୍ଟି en;
     e.op->abs(e, en);
-    return en;
+    ଫେରନ୍ତୁ en;
 }
 
 
-Size MatExpr::size() const
+Size Mat_ପଦସମଷ୍ଟି::size() ଅଚଳ
 {
-    if( isT(*this) || isInv(*this) )
-        return Size(a.rows, a.cols);
-    if( isSolve(*this) )
-        return Size(b.cols, a.cols);
-    if( isInitializer(*this) )
-        return a.size();
-    return op ? op->size(*this) : Size();
+    ଯଦି( isT(*ଏହି) || isInv(*ଏହି) )
+        ଫେରନ୍ତୁ Size(a.rows, a.cols);
+    ଯଦି( isSolve(*ଏହି) )
+        ଫେରନ୍ତୁ Size(b.cols, a.cols);
+    ଯଦି( isInitializer(*ଏହି) )
+        ଫେରନ୍ତୁ a.size();
+    ଫେରନ୍ତୁ op ? op->size(*ଏହି) : Size();
 }
 
 
-int MatExpr::type() const
+ପୂର୍ଣ୍ଣସଂଖ୍ୟା Mat_ପଦସମଷ୍ଟି::type() ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( isInitializer(*this) )
-        return a.type();
-    if( isCmp(*this) )
-        return CV_MAKETYPE(CV_8U, a.channels());
-    return op ? op->type(*this) : -1;
+    ଯଦି( isInitializer(*ଏହି) )
+        ଫେରନ୍ତୁ a.type();
+    ଯଦି( isCmp(*ଏହି) )
+        ଫେରନ୍ତୁ CV_MAKETYPE(CV_8U, a.channels());
+    ଫେରନ୍ତୁ op ? op->type(*ଏହି) : -1;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+ଶୂନ୍ୟ MatOp_Identity::assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _type) ଅଚଳ
 {
-    if( _type == -1 || _type == e.a.type() )
+    ଯଦି( _type == -1 || _type == e.a.type() )
         m = e.a;
-    else
+    ଅନ୍ୟଥା
     {
         CV_Assert( CV_MAT_CN(_type) == e.a.channels() );
         e.a.convertTo(m, _type);
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_Identity::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅଚଳ Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+ଶୂନ୍ୟ MatOp_AddEx::assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _type) ଅଚଳ
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
-    if( e.b.data )
+    ଯଦି( e.b.data )
     {
-        if( e.s == Scalar() || !e.s.isReal() )
+        ଯଦି( e.s == Scalar() || !e.s.isReal() )
         {
-            if( e.alpha == 1 )
+            ଯଦି( e.alpha == 1 )
             {
-                if( e.beta == 1 )
+                ଯଦି( e.beta == 1 )
                     cv::add(e.a, e.b, dst);
-                else if( e.beta == -1 )
+                ଅନ୍ୟଥା ଯଦି( e.beta == -1 )
                     cv::subtract(e.a, e.b, dst);
-                else
+                ଅନ୍ୟଥା
                     cv::scaleAdd(e.b, e.beta, e.a, dst);
             }
-            else if( e.beta == 1 )
+            ଅନ୍ୟଥା ଯଦି( e.beta == 1 )
             {
-                if( e.alpha == -1 )
+                ଯଦି( e.alpha == -1 )
                     cv::subtract(e.b, e.a, dst);
-                else
+                ଅନ୍ୟଥା
                     cv::scaleAdd(e.a, e.alpha, e.b, dst);
             }
-            else
+            ଅନ୍ୟଥା
                 cv::addWeighted(e.a, e.alpha, e.b, e.beta, 0, dst);
 
-            if( !e.s.isReal() )
+            ଯଦି( !e.s.isReal() )
                 cv::add(dst, e.s, dst);
         }
-        else
+        ଅନ୍ୟଥା
         {
-            if (e.a.channels() > 1)
-                CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+            ଯଦି (e.a.channels() > 1)
+                CV_LOG_ONCE_WARNING(ଖାଲି, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                           "https://github.com/opencv/opencv/issues/16739");
             cv::addWeighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
         }
     }
-    else if( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
+    ଅନ୍ୟଥା ଯଦି( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
     {
-        if (e.a.channels() > 1 && e.s[0] != 0.0)
-            CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+        ଯଦି (e.a.channels() > 1 && e.s[0] != 0.0)
+            CV_LOG_ONCE_WARNING(ଖାଲି, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                       "https://github.com/opencv/opencv/issues/16739");
         e.a.convertTo(m, _type, e.alpha, e.s[0]);
-        return;
+        ଫେରନ୍ତୁ;
     }
-    else if( e.alpha == 1 )
+    ଅନ୍ୟଥା ଯଦି( e.alpha == 1 )
         cv::add(e.a, e.s, dst);
-    else if( e.alpha == -1 )
+    ଅନ୍ୟଥା ଯଦି( e.alpha == -1 )
         cv::subtract(e.s, e.a, dst);
-    else
+    ଅନ୍ୟଥା
     {
         e.a.convertTo(dst, e.a.type(), e.alpha);
         cv::add(dst, e.s, dst);
     }
 
-    if( dst.data != m.data )
+    ଯଦି( dst.data != m.data )
         dst.convertTo(m, m.type());
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_AddEx::add(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଅଚଳ Scalar& s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_AddEx::subtract(ଅଚଳ Scalar& s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_AddEx::multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,160 +1379,160 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_AddEx::divide(ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
-    else
+    ଯଦି( isScaled(e) )
+        MatOp_Bin::make_ପଦସମଷ୍ଟି(res, '/', e.a, Mat(), s/e.alpha);
+    ଅନ୍ୟଥା
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_AddEx::transpose(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
-    else
+    ଯଦି( isScaled(e) )
+        MatOp_T::make_ପଦସମଷ୍ଟି(res, e.a, e.alpha);
+    ଅନ୍ୟଥା
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_AddEx::abs(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
-    else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
-    else
+    ଯଦି( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
+        MatOp_Bin::make_ପଦସମଷ୍ଟି(res, 'a', e.a, -e.s*e.alpha);
+    ଅନ୍ୟଥା ଯଦି( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
+        MatOp_Bin::make_ପଦସମଷ୍ଟି(res, 'a', e.a, e.b);
+    ଅନ୍ୟଥା
         MatOp::abs(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_AddEx::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅଚଳ Mat& a, ଅଚଳ Mat& b, ଦ୍ୱିଗୁଣ alpha, ଦ୍ୱିଗୁଣ beta, ଅଚଳ Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+ଶୂନ୍ୟ MatOp_Bin::assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _type) ଅଚଳ
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
 
-    if( e.flags == '*' )
+    ଯଦି( e.flags == '*' )
         cv::multiply(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '/' && e.b.data )
         cv::divide(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && !e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '/' && !e.b.data )
         cv::divide(e.alpha, e.a, dst );
-    else if( e.flags == '&' && e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '&' && e.b.data )
         bitwise_and(e.a, e.b, dst);
-    else if( e.flags == '&' && !e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '&' && !e.b.data )
         bitwise_and(e.a, e.s, dst);
-    else if( e.flags == '|' && e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '|' && e.b.data )
         bitwise_or(e.a, e.b, dst);
-    else if( e.flags == '|' && !e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '|' && !e.b.data )
         bitwise_or(e.a, e.s, dst);
-    else if( e.flags == '^' && e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '^' && e.b.data )
         bitwise_xor(e.a, e.b, dst);
-    else if( e.flags == '^' && !e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '^' && !e.b.data )
         bitwise_xor(e.a, e.s, dst);
-    else if( e.flags == '~' && !e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '~' && !e.b.data )
         bitwise_not(e.a, dst);
-    else if( e.flags == 'm' )
+    ଅନ୍ୟଥା ଯଦି( e.flags == 'm' )
         cv::min(e.a, e.b, dst);
-    else if( e.flags == 'n' )
+    ଅନ୍ୟଥା ଯଦି( e.flags == 'n' )
         cv::min(e.a, e.s[0], dst);
-    else if( e.flags == 'M' )
+    ଅନ୍ୟଥା ଯଦି( e.flags == 'M' )
         cv::max(e.a, e.b, dst);
-    else if( e.flags == 'N' )
+    ଅନ୍ୟଥା ଯଦି( e.flags == 'N' )
         cv::max(e.a, e.s[0], dst);
-    else if( e.flags == 'a' && e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == 'a' && e.b.data )
         cv::absdiff(e.a, e.b, dst);
-    else if( e.flags == 'a' && !e.b.data )
+    ଅନ୍ୟଥା ଯଦି( e.flags == 'a' && !e.b.data )
         cv::absdiff(e.a, e.s, dst);
-    else
+    ଅନ୍ୟଥା
         CV_Error(cv::Error::StsError, "Unknown operation");
 
-    if( dst.data != m.data )
+    ଯଦି( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_Bin::multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '*' || e.flags == '/' )
+    ଯଦି( e.flags == '*' || e.flags == '/' )
     {
         res = e;
         res.alpha *= s;
     }
-    else
+    ଅନ୍ୟଥା
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_Bin::divide(ଦ୍ୱିଗୁଣ s, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
-    else
+    ଯଦି( e.flags == '/' && (!e.b.data || e.beta == 0) )
+        MatOp_AddEx::make_ପଦସମଷ୍ଟି(res, e.a, Mat(), s/e.alpha, 0);
+    ଅନ୍ୟଥା
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_Bin::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅକ୍ଷର op, ଅଚଳ Mat& a, ଅଚଳ Mat& b, ଦ୍ୱିଗୁଣ scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_Bin::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅକ୍ଷର op, ଅଚଳ Mat& a, ଅଚଳ Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+ଶୂନ୍ୟ MatOp_Cmp::assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _type) ଅଚଳ
 {
     Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
 
-    if( e.b.data )
+    ଯଦି( e.b.data )
         cv::compare(e.a, e.b, dst, e.flags);
-    else
+    ଅନ୍ୟଥା
         cv::compare(e.a, e.alpha, dst, e.flags);
 
-    if( dst.data != m.data )
+    ଯଦି( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_Cmp::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cmpop, ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_Cmp::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cmpop, ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+ଶୂନ୍ୟ MatOp_T::assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _type) ଅଚଳ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::transpose(e.a, dst);
 
-    if( dst.data != m.data || e.alpha != 1 )
+    ଯଦି( dst.data != m.data || e.alpha != 1 )
         dst.convertTo(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_T::multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,71 +1540,71 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_T::transpose(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
-    else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+    ଯଦି( e.alpha == 1 )
+        MatOp_Identity::make_ପଦସମଷ୍ଟି(res, e.a);
+    ଅନ୍ୟଥା
+        MatOp_AddEx::make_ପଦସମଷ୍ଟି(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_T::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ଅଚଳ Mat& a, ଦ୍ୱିଗୁଣ alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+ଶୂନ୍ୟ MatOp_GEMM::assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _type) ଅଚଳ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::gemm(e.a, e.b, e.alpha, e.c, e.beta, dst, e.flags);
-    if( dst.data != m.data )
+    ଯଦି( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_GEMM::add(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    ତାର୍କିକ i1 = isIdentity(e1), i2 = isIdentity(e2);
+    ଦ୍ୱିଗୁଣ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    ଯଦି( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_ପଦସମଷ୍ଟି(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    ଅନ୍ୟଥା ଯଦି( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_ପଦସମଷ୍ଟି(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    ଅନ୍ୟଥା ଯଦି( ଏହି == e2.op )
         MatOp::add(e1, e2, res);
-    else
+    ଅନ୍ୟଥା
         e2.op->add(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_GEMM::subtract(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    ତାର୍କିକ i1 = isIdentity(e1), i2 = isIdentity(e2);
+    ଦ୍ୱିଗୁଣ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    ଯଦି( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_ପଦସମଷ୍ଟି(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    ଅନ୍ୟଥା ଯଦି( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_ପଦସମଷ୍ଟି(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    ଅନ୍ୟଥା ଯଦି( ଏହି == e2.op )
         MatOp::subtract(e1, e2, res);
-    else
+    ଅନ୍ୟଥା
         e2.op->subtract(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_GEMM::multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_GEMM::transpose(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,74 +1624,74 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                                 double alpha, const Mat& c, double beta)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_GEMM::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags, ଅଚଳ Mat& a, ଅଚଳ Mat& b,
+                                 ଦ୍ୱିଗୁଣ alpha, ଅଚଳ Mat& c, ଦ୍ୱିଗୁଣ beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+ଶୂନ୍ୟ MatOp_Invert::assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _type) ଅଚଳ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::invert(e.a, dst, e.flags);
-    if( dst.data != m.data )
+    ଯଦି( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_Invert::matmul(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e1, ଅଚଳ Mat_ପଦସମଷ୍ଟି& e2, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
-    if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
-    else if( this == e2.op )
+    ଯଦି( isInv(e1) && isIdentity(e2) )
+        MatOp_Solve::make_ପଦସମଷ୍ଟି(res, e1.flags, e1.a, e2.a);
+    ଅନ୍ୟଥା ଯଦି( ଏହି == e2.op )
         MatOp::matmul(e1, e2, res);
-    else
+    ଅନ୍ୟଥା
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_Invert::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା method, ଅଚଳ Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+ଶୂନ୍ୟ MatOp_Solve::assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _type) ଅଚଳ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::solve(e.a, e.b, dst, e.flags);
-    if( dst.data != m.data )
+    ଯଦି( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_Solve::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା method, ଅଚଳ Mat& a, ଅଚଳ Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_ପଦସମଷ୍ଟି(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+ଶୂନ୍ୟ MatOp_Initializer::assign(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, Mat& m, ପୂର୍ଣ୍ଣସଂଖ୍ୟା _type) ଅଚଳ
 {
-    if( _type == -1 )
+    ଯଦି( _type == -1 )
         _type = e.a.type();
 
     m.create(e.a.size, _type);
 
-    if( e.flags == 'I' && e.a.dims <= 2 )
+    ଯଦି( e.flags == 'I' && e.a.dims <= 2 )
         setIdentity(m, Scalar(e.alpha));
-    else if( e.flags == '0' )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '0' )
         m = Scalar();
-    else if( e.flags == '1' )
+    ଅନ୍ୟଥା ଯଦି( e.flags == '1' )
         m = Scalar(e.alpha);
-    else
+    ଅନ୍ୟଥା
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+ଶୂନ୍ୟ MatOp_Initializer::multiply(ଅଚଳ Mat_ପଦସମଷ୍ଟି& e, ଦ୍ୱିଗୁଣ s, Mat_ପଦସମଷ୍ଟି& res) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_Initializer::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା method, Size sz, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type, ଦ୍ୱିଗୁଣ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_ପଦସମଷ୍ଟି(getGlobalMatOpInitializer(), method, Mat(sz, type, (ଶୂନ୍ୟ*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+ଧାଡ଼ିଭିତରେ ଶୂନ୍ୟ MatOp_Initializer::make_ପଦସମଷ୍ଟି(Mat_ପଦସମଷ୍ଟି& res, ପୂର୍ଣ୍ଣସଂଖ୍ୟା method, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ndims, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sizes, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type, ଦ୍ୱିଗୁଣ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_ପଦସମଷ୍ଟି(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (ଶୂନ୍ୟ*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_ପଦସମଷ୍ଟି Mat::t() ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
-    return e;
+    checkOperandsExist(*ଏହି);
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_T::make_ପଦସମଷ୍ଟି(e, *ଏହି);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_ପଦସମଷ୍ଟି Mat::inv(ପୂର୍ଣ୍ଣସଂଖ୍ୟା method) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Invert::make_ପଦସମଷ୍ଟି(e, method, *ଏହି);
+    ଫେରନ୍ତୁ e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_ପଦସମଷ୍ଟି Mat::mul(ନିବେଶ_Array m, ଦ୍ୱିଗୁଣ scale) ଅଚଳ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1740,105 +1740,105 @@ MatExpr Mat::mul(InputArray m, double scale) const
     // a non-owning view of caller memory (e.g. a scalar bound to _InputArray(const double&),
     // a Matx or a Vec) that the returned MatExpr can outlive, so snapshot it.
     // See https://github.com/opencv/opencv/issues/23577
-    if( !m.isMat() && !m.isUMat() )
+    ଯଦି( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Bin::make_ପଦସମଷ୍ଟି(e, '*', *ଏହି, b, scale);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_ପଦସମଷ୍ଟି Mat::zeros(ପୂର୍ଣ୍ଣସଂଖ୍ୟା rows, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cols, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, '0', Size(cols, rows), type);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_ପଦସମଷ୍ଟି Mat::zeros(Size size, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, '0', size, type);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_ପଦସମଷ୍ଟି Mat::zeros(ପୂର୍ଣ୍ଣସଂଖ୍ୟା ndims, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sizes, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, '0', ndims, sizes, type);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_ପଦସମଷ୍ଟି Mat::zeros(ଅଚଳ MatShape& shape, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, '0', shape.dims, shape.p, type);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_ପଦସମଷ୍ଟି Mat::ones(ପୂର୍ଣ୍ଣସଂଖ୍ୟା rows, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cols, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, '1', Size(cols, rows), type);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_ପଦସମଷ୍ଟି Mat::ones(Size size, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, '1', size, type);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_ପଦସମଷ୍ଟି Mat::ones(ପୂର୍ଣ୍ଣସଂଖ୍ୟା ndims, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sizes, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, '1', ndims, sizes, type);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_ପଦସମଷ୍ଟି Mat::ones(ଅଚଳ MatShape& shape, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, '1', shape.dims, shape.p, type);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_ପଦସମଷ୍ଟି Mat::eye(ପୂର୍ଣ୍ଣସଂଖ୍ୟା rows, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cols, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, 'I', Size(cols, rows), type);
+    ଫେରନ୍ତୁ e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_ପଦସମଷ୍ଟି Mat::eye(Size size, ପୂର୍ଣ୍ଣସଂଖ୍ୟା type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
-    return e;
+    Mat_ପଦସମଷ୍ଟି e;
+    MatOp_Initializer::make_ପଦସମଷ୍ଟି(e, 'I', size, type);
+    ଫେରନ୍ତୁ e;
 }
 
-void MatExpr::swap(MatExpr& other)
+ଶୂନ୍ୟ Mat_ପଦସମଷ୍ଟି::swap(Mat_ପଦସମଷ୍ଟି& other)
 {
     using std::swap;
 
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+ନିବେଶ_Array_2::ନିବେଶ_Array_2(ଅଚଳ Mat_ପଦସମଷ୍ଟି& ପଦସମଷ୍ଟି)
 {
-    if (!isIdentity(expr))
+    ଯଦି (!isIdentity(ପଦସମଷ୍ଟି))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat result = ପଦସମଷ୍ଟି;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_ପଦସମଷ୍ଟି result_ପଦସମଷ୍ଟି(result);
+        swap(const_cast<Mat_ପଦସମଷ୍ଟି&>(ପଦସମଷ୍ଟି), result_ପଦସମଷ୍ଟି);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(isIdentity(ପଦସମଷ୍ଟି));
+    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &ପଦସମଷ୍ଟି.a);
 }
 
 } // cv::

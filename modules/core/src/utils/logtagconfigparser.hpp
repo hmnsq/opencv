@@ -5,44 +5,44 @@
 #ifndef OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 #define OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <vector>
-#include <functional>
+#ଯଦି 1 // if not already in precompiled headers
+#ଅନ୍ତର୍ଭାଵ <string>
+#ଅନ୍ତର୍ଭାଵ <vector>
+#ଅନ୍ତର୍ଭାଵ <functional>
 #endif
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#ଅନ୍ତର୍ଭାଵ <opencv2/core/utils/logtag.hpp>
+#ଅନ୍ତର୍ଭାଵ "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+ନାମାକାଶ cv {
+ନାମାକାଶ utils {
+ନାମାକାଶ logging {
 
-class LogTagConfigParser
+ଶ୍ରେଣୀ LogTagConfigParser
 {
-public:
+ସର୍ବସାଧାରଣ:
     LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
-    explicit LogTagConfigParser(const std::string& input);
+    explicit LogTagConfigParser(ଅଚଳ std::string& ନିବେଶ_2);
     ~LogTagConfigParser();
 
-public:
-    bool parse(const std::string& input);
-    bool hasMalformed() const;
-    const LogTagConfig& getGlobalConfig() const;
-    const std::vector<LogTagConfig>& getFullNameConfigs() const;
-    const std::vector<LogTagConfig>& getFirstPartConfigs() const;
-    const std::vector<LogTagConfig>& getAnyPartConfigs() const;
-    const std::vector<std::string>& getMalformed() const;
+ସର୍ବସାଧାରଣ:
+    ତାର୍କିକ parse(ଅଚଳ std::string& ନିବେଶ_2);
+    ତାର୍କିକ hasMalformed() ଅଚଳ;
+    ଅଚଳ LogTagConfig& getGlobalConfig() ଅଚଳ;
+    ଅଚଳ std::vector<LogTagConfig>& getFullNameConfigs() ଅଚଳ;
+    ଅଚଳ std::vector<LogTagConfig>& getFirstPartConfigs() ଅଚଳ;
+    ଅଚଳ std::vector<LogTagConfig>& getAnyPartConfigs() ଅଚଳ;
+    ଅଚଳ std::vector<std::string>& getMalformed() ଅଚଳ;
 
-private:
-    void segmentTokens();
-    void parseNameAndLevel(const std::string& s);
-    void parseWildcard(const std::string& name, LogLevel level);
-    static std::pair<LogLevel, bool> parseLogLevel(const std::string& s);
-    static std::string toString(LogLevel level);
+ବ୍ୟକ୍ତିଗତ:
+    ଶୂନ୍ୟ segmentTokens();
+    ଶୂନ୍ୟ parseNameAndLevel(ଅଚଳ std::string& s);
+    ଶୂନ୍ୟ parseWildcard(ଅଚଳ std::string& name, LogLevel level);
+    ସ୍ଥିର std::pair<LogLevel, ତାର୍କିକ> parseLogLevel(ଅଚଳ std::string& s);
+    ସ୍ଥିର std::string toString(LogLevel level);
 
-private:
-    std::string m_input;
+ବ୍ୟକ୍ତିଗତ:
+    std::string m_ନିବେଶ;
     LogTagConfig m_parsedGlobal;
     std::vector<LogTagConfig> m_parsedFullName;
     std::vector<LogTagConfig> m_parsedFirstPart;

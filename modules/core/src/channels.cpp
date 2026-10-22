@@ -3,83 +3,83 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "convert.hpp"
+#ଅନ୍ତର୍ଭାଵ "precomp.hpp"
+#ଅନ୍ତର୍ଭାଵ "opencl_kernels_core.hpp"
+#ଅନ୍ତର୍ଭାଵ "convert.hpp"
 
 /****************************************************************************************\
 *                       Generalized split/merge: mixing channels                         *
 \****************************************************************************************/
 
-namespace cv
+ନାମାକାଶ cv
 {
 
-template<typename T> static void
-mixChannels_( const T** src, const int* sdelta,
-              T** dst, const int* ddelta,
-              int len, int npairs )
+template<typename T> ସ୍ଥିର ଶୂନ୍ୟ
+mixChannels_( ଅଚଳ T** src, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sdelta,
+              T** dst, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* ddelta,
+              ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା npairs )
 {
-    int i, k;
-    for( k = 0; k < npairs; k++ )
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i, k;
+    ପାଇଁ( k = 0; k < npairs; k++ )
     {
-        const T* s = src[k];
+        ଅଚଳ T* s = src[k];
         T* d = dst[k];
-        int ds = sdelta[k], dd = ddelta[k];
-        if( s )
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା ds = sdelta[k], dd = ddelta[k];
+        ଯଦି( s )
         {
-            for( i = 0; i <= len - 2; i += 2, s += ds*2, d += dd*2 )
+            ପାଇଁ( i = 0; i <= len - 2; i += 2, s += ds*2, d += dd*2 )
             {
                 T t0 = s[0], t1 = s[ds];
                 d[0] = t0; d[dd] = t1;
             }
-            if( i < len )
+            ଯଦି( i < len )
                 d[0] = s[0];
         }
-        else
+        ଅନ୍ୟଥା
         {
-            for( i = 0; i <= len - 2; i += 2, d += dd*2 )
+            ପାଇଁ( i = 0; i <= len - 2; i += 2, d += dd*2 )
                 d[0] = d[dd] = 0;
-            if( i < len )
+            ଯଦି( i < len )
                 d[0] = 0;
         }
     }
 }
 
 
-static void mixChannels8u( const void** src, const int* sdelta,
-                           void** dst, const int* ddelta,
-                           int len, int npairs )
+ସ୍ଥିର ଶୂନ୍ୟ mixChannels8u( ଅଚଳ ଶୂନ୍ୟ** src, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sdelta,
+                           ଶୂନ୍ୟ** dst, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* ddelta,
+                           ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା npairs )
 {
-    mixChannels_((const uchar**)src, sdelta, (uchar**)dst, ddelta, len, npairs);
+    mixChannels_((ଅଚଳ uchar**)src, sdelta, (uchar**)dst, ddelta, len, npairs);
 }
 
-static void mixChannels16u( const void** src, const int* sdelta,
-                            void** dst, const int* ddelta,
-                            int len, int npairs )
+ସ୍ଥିର ଶୂନ୍ୟ mixChannels16u( ଅଚଳ ଶୂନ୍ୟ** src, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sdelta,
+                            ଶୂନ୍ୟ** dst, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* ddelta,
+                            ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା npairs )
 {
-    mixChannels_((const ushort**)src, sdelta, (ushort**)dst, ddelta, len, npairs);
+    mixChannels_((ଅଚଳ ushort**)src, sdelta, (ushort**)dst, ddelta, len, npairs);
 }
 
-static void mixChannels32s( const void** src, const int* sdelta,
-                            void** dst, const int* ddelta,
-                            int len, int npairs )
+ସ୍ଥିର ଶୂନ୍ୟ mixChannels32s( ଅଚଳ ଶୂନ୍ୟ** src, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sdelta,
+                            ଶୂନ୍ୟ** dst, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* ddelta,
+                            ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା npairs )
 {
-    mixChannels_((const int**)src, sdelta, (int**)dst, ddelta, len, npairs);
+    mixChannels_((ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା**)src, sdelta, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା**)dst, ddelta, len, npairs);
 }
 
-static void mixChannels64s( const void** src, const int* sdelta,
-                            void** dst, const int* ddelta,
-                            int len, int npairs )
+ସ୍ଥିର ଶୂନ୍ୟ mixChannels64s( ଅଚଳ ଶୂନ୍ୟ** src, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sdelta,
+                            ଶୂନ୍ୟ** dst, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* ddelta,
+                            ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା npairs )
 {
-    mixChannels_((const int64**)src, sdelta, (int64**)dst, ddelta, len, npairs);
+    mixChannels_((ଅଚଳ int64**)src, sdelta, (int64**)dst, ddelta, len, npairs);
 }
 
-typedef void (*MixChannelsFunc)( const void** src, const int* sdelta,
-        void** dst, const int* ddelta, int len, int npairs );
+ପ୍ରକାରବ୍ୟାଖ୍ୟା ଶୂନ୍ୟ (*MixChannelsFunc)( ଅଚଳ ଶୂନ୍ୟ** src, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* sdelta,
+        ଶୂନ୍ୟ** dst, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* ddelta, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା npairs );
 
-static MixChannelsFunc getMixchFunc(int depth)
+ସ୍ଥିର MixChannelsFunc getMixchFunc(ପୂର୍ଣ୍ଣସଂଖ୍ୟା depth)
 {
-    static MixChannelsFunc mixchTab[CV_DEPTH_MAX] =
+    ସ୍ଥିର MixChannelsFunc mixchTab[CV_DEPTH_MAX] =
     {
         mixChannels8u, mixChannels8u, mixChannels16u,
         mixChannels16u, mixChannels32s, mixChannels32s,
@@ -88,89 +88,89 @@ static MixChannelsFunc getMixchFunc(int depth)
         mixChannels32s, mixChannels8u, mixChannels8u
     };
 
-    return mixchTab[depth];
+    ଫେରନ୍ତୁ mixchTab[depth];
 }
 
 } // cv::
 
 
-void cv::mixChannels( const Mat* src, size_t nsrcs, Mat* dst, size_t ndsts, const int* fromTo, size_t npairs )
+ଶୂନ୍ୟ cv::mixChannels( ଅଚଳ Mat* src, size_t nsrcs, Mat* dst, size_t ndsts, ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* fromTo, size_t npairs )
 {
     CV_INSTRUMENT_REGION();
 
-    if( npairs == 0 )
-        return;
+    ଯଦି( npairs == 0 )
+        ଫେରନ୍ତୁ;
     CV_Assert( src && nsrcs > 0 && dst && ndsts > 0 && fromTo && npairs > 0 );
 
     size_t i, j, k, esz1 = dst[0].elemSize1();
-    int depth = dst[0].depth();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା depth = dst[0].depth();
 
-    AutoBuffer<uchar> buf((nsrcs + ndsts + 1)*(sizeof(Mat*) + sizeof(uchar*)) + npairs*(sizeof(uchar*)*2 + sizeof(int)*6));
-    const Mat** arrays = (const Mat**)(uchar*)buf.data();
+    AutoBuffer<uchar> buf((nsrcs + ndsts + 1)*(ଆକାର(Mat*) + ଆକାର(uchar*)) + npairs*(ଆକାର(uchar*)*2 + ଆକାର(ପୂର୍ଣ୍ଣସଂଖ୍ୟା)*6));
+    ଅଚଳ Mat** arrays = (ଅଚଳ Mat**)(uchar*)buf.data();
     uchar** ptrs = (uchar**)(arrays + nsrcs + ndsts);
-    const uchar** srcs = (const uchar**)(ptrs + nsrcs + ndsts + 1);
+    ଅଚଳ uchar** srcs = (ଅଚଳ uchar**)(ptrs + nsrcs + ndsts + 1);
     uchar** dsts = (uchar**)(srcs + npairs);
-    int* tab = (int*)(dsts + npairs);
-    int *sdelta = (int*)(tab + npairs*4), *ddelta = sdelta + npairs;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା* tab = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା*)(dsts + npairs);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା *sdelta = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା*)(tab + npairs*4), *ddelta = sdelta + npairs;
 
-    for( i = 0; i < nsrcs; i++ )
+    ପାଇଁ( i = 0; i < nsrcs; i++ )
     {
         CV_Assert( !src[i].empty() && src[i].size == dst[0].size && src[i].depth() == depth );
         arrays[i] = &src[i];
     }
-    for( i = 0; i < ndsts; i++ )
+    ପାଇଁ( i = 0; i < ndsts; i++ )
     {
         CV_Assert( !dst[i].empty() && dst[i].size == dst[0].size && dst[i].depth() == depth );
         arrays[i + nsrcs] = &dst[i];
     }
     ptrs[nsrcs + ndsts] = 0;
 
-    for( i = 0; i < npairs; i++ )
+    ପାଇଁ( i = 0; i < npairs; i++ )
     {
-        int i0 = fromTo[i*2], i1 = fromTo[i*2+1];
-        if( i0 >= 0 )
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା i0 = fromTo[i*2], i1 = fromTo[i*2+1];
+        ଯଦି( i0 >= 0 )
         {
-            for( j = 0; j < nsrcs; i0 -= src[j].channels(), j++ )
-                if( i0 < src[j].channels() )
-                    break;
+            ପାଇଁ( j = 0; j < nsrcs; i0 -= src[j].channels(), j++ )
+                ଯଦି( i0 < src[j].channels() )
+                    ଭାଙ୍ଗ;
             CV_Assert(j < nsrcs && src[j].depth() == depth);
-            tab[i*4] = (int)j; tab[i*4+1] = (int)(i0*esz1);
+            tab[i*4] = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)j; tab[i*4+1] = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(i0*esz1);
             sdelta[i] = src[j].channels();
         }
-        else
+        ଅନ୍ୟଥା
         {
-            tab[i*4] = (int)(nsrcs + ndsts); tab[i*4+1] = 0;
+            tab[i*4] = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(nsrcs + ndsts); tab[i*4+1] = 0;
             sdelta[i] = 0;
         }
 
-        for( j = 0; j < ndsts; i1 -= dst[j].channels(), j++ )
-            if( i1 < dst[j].channels() )
-                break;
+        ପାଇଁ( j = 0; j < ndsts; i1 -= dst[j].channels(), j++ )
+            ଯଦି( i1 < dst[j].channels() )
+                ଭାଙ୍ଗ;
         CV_Assert(i1 >= 0 && j < ndsts && dst[j].depth() == depth);
-        tab[i*4+2] = (int)(j + nsrcs); tab[i*4+3] = (int)(i1*esz1);
+        tab[i*4+2] = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(j + nsrcs); tab[i*4+3] = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(i1*esz1);
         ddelta[i] = dst[j].channels();
     }
 
-    NAryMatIterator it(arrays, ptrs, (int)(nsrcs + ndsts));
-    int total = (int)it.size, blocksize = std::min(total, (int)((BLOCK_SIZE + esz1-1)/esz1));
+    NAryMatIterator it(arrays, ptrs, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(nsrcs + ndsts));
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା total = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)it.size, blocksize = std::min(total, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)((BLOCK_SIZE + esz1-1)/esz1));
     MixChannelsFunc func = getMixchFunc(depth);
     CV_Assert(func);
 
-    for( i = 0; i < it.nplanes; i++, ++it )
+    ପାଇଁ( i = 0; i < it.nplanes; i++, ++it )
     {
-        for( k = 0; k < npairs; k++ )
+        ପାଇଁ( k = 0; k < npairs; k++ )
         {
             srcs[k] = ptrs[tab[k*4]] + tab[k*4+1];
             dsts[k] = ptrs[tab[k*4+2]] + tab[k*4+3];
         }
 
-        for( int t = 0; t < total; t += blocksize )
+        ପାଇଁ( ପୂର୍ଣ୍ଣସଂଖ୍ୟା t = 0; t < total; t += blocksize )
         {
-            int bsz = std::min(total - t, blocksize);
-            func( (const void**)srcs, sdelta, (void **)dsts, ddelta, bsz, (int)npairs );
+            ପୂର୍ଣ୍ଣସଂଖ୍ୟା bsz = std::min(total - t, blocksize);
+            func( (ଅଚଳ ଶୂନ୍ୟ**)srcs, sdelta, (ଶୂନ୍ୟ **)dsts, ddelta, bsz, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)npairs );
 
-            if( t + blocksize < total )
-                for( k = 0; k < npairs; k++ )
+            ଯଦି( t + blocksize < total )
+                ପାଇଁ( k = 0; k < npairs; k++ )
                 {
                     srcs[k] += blocksize*sdelta[k]*esz1;
                     dsts[k] += blocksize*ddelta[k]*esz1;
@@ -181,35 +181,35 @@ void cv::mixChannels( const Mat* src, size_t nsrcs, Mat* dst, size_t ndsts, cons
 
 #ifdef HAVE_OPENCL
 
-namespace cv {
+ନାମାକାଶ cv {
 
-static void getUMatIndex(const std::vector<UMat> & um, int cn, int & idx, int & cnidx)
+ସ୍ଥିର ଶୂନ୍ୟ getUMatIndex(ଅଚଳ std::vector<UMat> & um, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn, ପୂର୍ଣ୍ଣସଂଖ୍ୟା & idx, ପୂର୍ଣ୍ଣସଂଖ୍ୟା & cnidx)
 {
-    int totalChannels = 0;
-    for (size_t i = 0, size = um.size(); i < size; ++i)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା totalChannels = 0;
+    ପାଇଁ (size_t i = 0, size = um.size(); i < size; ++i)
     {
-        int ccn = um[i].channels();
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା ccn = um[i].channels();
         totalChannels += ccn;
 
-        if (totalChannels == cn)
+        ଯଦି (totalChannels == cn)
         {
-            idx = (int)(i + 1);
+            idx = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)(i + 1);
             cnidx = 0;
-            return;
+            ଫେରନ୍ତୁ;
         }
-        else if (totalChannels > cn)
+        ଅନ୍ୟଥା ଯଦି (totalChannels > cn)
         {
-            idx = (int)i;
+            idx = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)i;
             cnidx = i == 0 ? cn : (cn - totalChannels + ccn);
-            return;
+            ଫେରନ୍ତୁ;
         }
     }
 
     idx = cnidx = -1;
 }
 
-static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _dst,
-                            const int* fromTo, size_t npairs)
+ସ୍ଥିର ତାର୍କିକ ocl_mixChannels(ନିବେଶ_Array_Of_Arrays _src, ନିବେଶ_Output_Array_Of_Arrays _dst,
+                            ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* fromTo, size_t npairs)
 {
     std::vector<UMat> src, dst;
     _src.getUMatVector(src);
@@ -219,21 +219,21 @@ static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _d
     CV_Assert(nsrc > 0 && ndst > 0);
 
     Size size = src[0].size();
-    int depth = src[0].depth(), esz = CV_ELEM_SIZE(depth),
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା depth = src[0].depth(), esz = CV_ELEM_SIZE(depth),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
 
-    for (size_t i = 1, ssize = src.size(); i < ssize; ++i)
+    ପାଇଁ (size_t i = 1, ssize = src.size(); i < ssize; ++i)
         CV_Assert(src[i].size() == size && src[i].depth() == depth);
-    for (size_t i = 0, dsize = dst.size(); i < dsize; ++i)
+    ପାଇଁ (size_t i = 0, dsize = dst.size(); i < dsize; ++i)
         CV_Assert(dst[i].size() == size && dst[i].depth() == depth);
 
     String declsrc, decldst, declproc, declcn, indexdecl;
     std::vector<UMat> srcargs(npairs), dstargs(npairs);
 
-    for (size_t i = 0; i < npairs; ++i)
+    ପାଇଁ (size_t i = 0; i < npairs; ++i)
     {
-        int scn = fromTo[i<<1], dcn = fromTo[(i<<1) + 1];
-        int src_idx, src_cnidx, dst_idx, dst_cnidx;
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା scn = fromTo[i<<1], dcn = fromTo[(i<<1) + 1];
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା src_idx, src_cnidx, dst_idx, dst_cnidx;
 
         getUMatIndex(src, scn, src_idx, src_cnidx);
         getUMatIndex(dst, dcn, dst_idx, dst_cnidx);
@@ -258,184 +258,184 @@ static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _d
                          " -D PROCESS_ELEM_N=%s -D DECLARE_INDEX_N=%s%s",
                          ocl::memopTypeToStr(depth), declsrc.c_str(), decldst.c_str(),
                          declproc.c_str(), indexdecl.c_str(), declcn.c_str()));
-    if (k.empty())
-        return false;
+    ଯଦି (k.empty())
+        ଫେରନ୍ତୁ ମିଥ୍ୟା;
 
-    int argindex = 0;
-    for (size_t i = 0; i < npairs; ++i)
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା argindex = 0;
+    ପାଇଁ (size_t i = 0; i < npairs; ++i)
         argindex = k.set(argindex, ocl::KernelArg::ReadOnlyNoSize(srcargs[i]));
-    for (size_t i = 0; i < npairs; ++i)
+    ପାଇଁ (size_t i = 0; i < npairs; ++i)
         argindex = k.set(argindex, ocl::KernelArg::WriteOnlyNoSize(dstargs[i]));
     argindex = k.set(argindex, size.height);
     argindex = k.set(argindex, size.width);
     k.set(argindex, rowsPerWI);
 
     size_t globalsize[2] = { (size_t)size.width, ((size_t)size.height + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ଫେରନ୍ତୁ k.run(2, globalsize, ଖାଲି, ମିଥ୍ୟା);
 }
 
 }
 
 #endif
 
-void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
-                 const int* fromTo, size_t npairs)
+ଶୂନ୍ୟ cv::mixChannels(ନିବେଶ_Array_Of_Arrays src, ନିବେଶ_Output_Array_Of_Arrays dst,
+                 ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* fromTo, size_t npairs)
 {
     CV_INSTRUMENT_REGION();
 
-    if (npairs == 0 || fromTo == NULL)
-        return;
+    ଯଦି (npairs == 0 || fromTo == ଖାଲି)
+        ଫେରନ୍ତୁ;
 
     CV_OCL_RUN(dst.isUMatVector(),
                ocl_mixChannels(src, dst, fromTo, npairs))
 
-    bool src_is_mat = src.kind() != _InputArray::STD_VECTOR_MAT &&
-            src.kind() != _InputArray::STD_ARRAY_MAT &&
-            src.kind() != _InputArray::STD_VECTOR_VECTOR &&
-            src.kind() != _InputArray::STD_VECTOR_UMAT;
-    bool dst_is_mat = dst.kind() != _InputArray::STD_VECTOR_MAT &&
-            dst.kind() != _InputArray::STD_ARRAY_MAT &&
-            dst.kind() != _InputArray::STD_VECTOR_VECTOR &&
-            dst.kind() != _InputArray::STD_VECTOR_UMAT;
-    int i;
-    int nsrc = src_is_mat ? 1 : (int)src.total();
-    int ndst = dst_is_mat ? 1 : (int)dst.total();
+    ତାର୍କିକ src_is_mat = src.kind() != ନିବେଶ_Array_2::STD_VECTOR_MAT &&
+            src.kind() != ନିବେଶ_Array_2::STD_ARRAY_MAT &&
+            src.kind() != ନିବେଶ_Array_2::STD_VECTOR_VECTOR &&
+            src.kind() != ନିବେଶ_Array_2::STD_VECTOR_UMAT;
+    ତାର୍କିକ dst_is_mat = dst.kind() != ନିବେଶ_Array_2::STD_VECTOR_MAT &&
+            dst.kind() != ନିବେଶ_Array_2::STD_ARRAY_MAT &&
+            dst.kind() != ନିବେଶ_Array_2::STD_VECTOR_VECTOR &&
+            dst.kind() != ନିବେଶ_Array_2::STD_VECTOR_UMAT;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା nsrc = src_is_mat ? 1 : (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)src.total();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ndst = dst_is_mat ? 1 : (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)dst.total();
 
     CV_Assert(nsrc > 0 && ndst > 0);
     cv::AutoBuffer<Mat> _buf(nsrc + ndst);
     Mat* buf = _buf.data();
-    for( i = 0; i < nsrc; i++ )
+    ପାଇଁ( i = 0; i < nsrc; i++ )
         buf[i] = src.getMat(src_is_mat ? -1 : i);
-    for( i = 0; i < ndst; i++ )
+    ପାଇଁ( i = 0; i < ndst; i++ )
         buf[nsrc + i] = dst.getMat(dst_is_mat ? -1 : i);
     mixChannels(&buf[0], nsrc, &buf[nsrc], ndst, fromTo, npairs);
 }
 
-void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
-                     const std::vector<int>& fromTo)
+ଶୂନ୍ୟ cv::mixChannels(ନିବେଶ_Array_Of_Arrays src, ନିବେଶ_Output_Array_Of_Arrays dst,
+                     ଅଚଳ std::vector<ପୂର୍ଣ୍ଣସଂଖ୍ୟା>& fromTo)
 {
     CV_INSTRUMENT_REGION();
 
-    if (fromTo.empty())
-        return;
+    ଯଦି (fromTo.empty())
+        ଫେରନ୍ତୁ;
 
     CV_OCL_RUN(dst.isUMatVector(),
                ocl_mixChannels(src, dst, &fromTo[0], fromTo.size()>>1))
 
-    bool src_is_mat = src.kind() != _InputArray::STD_VECTOR_MAT &&
-            src.kind() != _InputArray::STD_ARRAY_MAT &&
-            src.kind() != _InputArray::STD_VECTOR_VECTOR &&
-            src.kind() != _InputArray::STD_VECTOR_UMAT;
-    bool dst_is_mat = dst.kind() != _InputArray::STD_VECTOR_MAT &&
-            dst.kind() != _InputArray::STD_ARRAY_MAT &&
-            dst.kind() != _InputArray::STD_VECTOR_VECTOR &&
-            dst.kind() != _InputArray::STD_VECTOR_UMAT;
-    int i;
-    int nsrc = src_is_mat ? 1 : (int)src.total();
-    int ndst = dst_is_mat ? 1 : (int)dst.total();
+    ତାର୍କିକ src_is_mat = src.kind() != ନିବେଶ_Array_2::STD_VECTOR_MAT &&
+            src.kind() != ନିବେଶ_Array_2::STD_ARRAY_MAT &&
+            src.kind() != ନିବେଶ_Array_2::STD_VECTOR_VECTOR &&
+            src.kind() != ନିବେଶ_Array_2::STD_VECTOR_UMAT;
+    ତାର୍କିକ dst_is_mat = dst.kind() != ନିବେଶ_Array_2::STD_VECTOR_MAT &&
+            dst.kind() != ନିବେଶ_Array_2::STD_ARRAY_MAT &&
+            dst.kind() != ନିବେଶ_Array_2::STD_VECTOR_VECTOR &&
+            dst.kind() != ନିବେଶ_Array_2::STD_VECTOR_UMAT;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା nsrc = src_is_mat ? 1 : (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)src.total();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ndst = dst_is_mat ? 1 : (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)dst.total();
 
     CV_Assert(fromTo.size()%2 == 0 && nsrc > 0 && ndst > 0);
     cv::AutoBuffer<Mat> _buf(nsrc + ndst);
     Mat* buf = _buf.data();
-    for( i = 0; i < nsrc; i++ )
+    ପାଇଁ( i = 0; i < nsrc; i++ )
         buf[i] = src.getMat(src_is_mat ? -1 : i);
-    for( i = 0; i < ndst; i++ )
+    ପାଇଁ( i = 0; i < ndst; i++ )
         buf[nsrc + i] = dst.getMat(dst_is_mat ? -1 : i);
     mixChannels(&buf[0], nsrc, &buf[nsrc], ndst, &fromTo[0], fromTo.size()/2);
 }
 
 #ifdef HAVE_IPP
 
-namespace cv
+ନାମାକାଶ cv
 {
-static bool ipp_extractChannel(const Mat &src, Mat &dst, int channel)
-{
-#ifdef HAVE_IPP_IW_LL
-    CV_INSTRUMENT_REGION_IPP();
-
-    int srcChannels = src.channels();
-    int dstChannels = dst.channels();
-
-    if(src.dims != dst.dims)
-        return false;
-
-    if(src.dims <= 2)
-    {
-        IppiSize size = ippiSize(src.size());
-
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, src.ptr(), (int)src.step, srcChannels, channel, dst.ptr(), (int)dst.step, dstChannels, 0, size, (int)src.elemSize1()) >= 0;
-    }
-    else
-    {
-        const Mat      *arrays[] = {&dst, NULL};
-        uchar          *ptrs[2]  = {NULL};
-        NAryMatIterator it(arrays, ptrs);
-
-        IppiSize size = {(int)it.size, 1};
-
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
-        {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, ptrs[0], 0, srcChannels, channel, ptrs[1], 0, dstChannels, 0, size, (int)src.elemSize1()) < 0)
-                return false;
-        }
-        return true;
-    }
-#else
-    CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(channel);
-    return false;
-#endif
-}
-
-static bool ipp_insertChannel(const Mat &src, Mat &dst, int channel)
+ସ୍ଥିର ତାର୍କିକ ipp_extractChannel(ଅଚଳ Mat &src, Mat &dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା channel)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    int srcChannels = src.channels();
-    int dstChannels = dst.channels();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା srcChannels = src.channels();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା dstChannels = dst.channels();
 
-    if(src.dims != dst.dims)
-        return false;
+    ଯଦି(src.dims != dst.dims)
+        ଫେରନ୍ତୁ ମିଥ୍ୟା;
 
-    if(src.dims <= 2)
+    ଯଦି(src.dims <= 2)
     {
         IppiSize size = ippiSize(src.size());
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, src.ptr(), (int)src.step, srcChannels, 0, dst.ptr(), (int)dst.step, dstChannels, channel, size, (int)src.elemSize1()) >= 0;
+        ଫେରନ୍ତୁ CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, src.ptr(), (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)src.step, srcChannels, channel, dst.ptr(), (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)dst.step, dstChannels, 0, size, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)src.elemSize1()) >= 0;
     }
-    else
+    ଅନ୍ୟଥା
     {
-        const Mat      *arrays[] = {&dst, NULL};
-        uchar          *ptrs[2]  = {NULL};
+        ଅଚଳ Mat      *arrays[] = {&dst, ଖାଲି};
+        uchar          *ptrs[2]  = {ଖାଲି};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize size = {(int)it.size, 1};
+        IppiSize size = {(ପୂର୍ଣ୍ଣସଂଖ୍ୟା)it.size, 1};
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ପାଇଁ( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, ptrs[0], 0, srcChannels, 0, ptrs[1], 0, dstChannels, channel, size, (int)src.elemSize1()) < 0)
-                return false;
+            ଯଦି(CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, ptrs[0], 0, srcChannels, channel, ptrs[1], 0, dstChannels, 0, size, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)src.elemSize1()) < 0)
+                ଫେରନ୍ତୁ ମିଥ୍ୟା;
         }
-        return true;
+        ଫେରନ୍ତୁ ସତ୍ୟ;
     }
-#else
+#ଅନ୍ୟଥା
     CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(channel);
-    return false;
+    ଫେରନ୍ତୁ ମିଥ୍ୟା;
+#endif
+}
+
+ସ୍ଥିର ତାର୍କିକ ipp_ଭର୍ତ୍ତି_Channel(ଅଚଳ Mat &src, Mat &dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା channel)
+{
+#ifdef HAVE_IPP_IW_LL
+    CV_INSTRUMENT_REGION_IPP();
+
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା srcChannels = src.channels();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା dstChannels = dst.channels();
+
+    ଯଦି(src.dims != dst.dims)
+        ଫେରନ୍ତୁ ମିଥ୍ୟା;
+
+    ଯଦି(src.dims <= 2)
+    {
+        IppiSize size = ippiSize(src.size());
+
+        ଫେରନ୍ତୁ CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, src.ptr(), (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)src.step, srcChannels, 0, dst.ptr(), (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)dst.step, dstChannels, channel, size, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)src.elemSize1()) >= 0;
+    }
+    ଅନ୍ୟଥା
+    {
+        ଅଚଳ Mat      *arrays[] = {&dst, ଖାଲି};
+        uchar          *ptrs[2]  = {ଖାଲି};
+        NAryMatIterator it(arrays, ptrs);
+
+        IppiSize size = {(ପୂର୍ଣ୍ଣସଂଖ୍ୟା)it.size, 1};
+
+        ପାଇଁ( size_t i = 0; i < it.nplanes; i++, ++it )
+        {
+            ଯଦି(CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, ptrs[0], 0, srcChannels, 0, ptrs[1], 0, dstChannels, channel, size, (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)src.elemSize1()) < 0)
+                ଫେରନ୍ତୁ ମିଥ୍ୟା;
+        }
+        ଫେରନ୍ତୁ ସତ୍ୟ;
+    }
+#ଅନ୍ୟଥା
+    CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(channel);
+    ଫେରନ୍ତୁ ମିଥ୍ୟା;
 #endif
 }
 }
 #endif
 
-void cv::extractChannel(InputArray _src, OutputArray _dst, int coi)
+ଶୂନ୍ୟ cv::extractChannel(ନିବେଶ_Array _src, OutputArray _dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା coi)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert( 0 <= coi && coi < cn );
-    int ch[] = { coi, 0 };
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ch[] = { coi, 0 };
 
 #ifdef HAVE_OPENCL
-    if (ocl::isOpenCLActivated() && _src.dims() <= 2 && _dst.isUMat())
+    ଯଦି (ocl::isOpenCLActivated() && _src.dims() <= 2 && _dst.isUMat())
     {
         UMat src = _src.getUMat();
         // NB: fetch the source before (re)allocating the destination so that
@@ -444,7 +444,7 @@ void cv::extractChannel(InputArray _src, OutputArray _dst, int coi)
         _dst.createSameSize(_src, depth);
         UMat dst = _dst.getUMat();
         mixChannels(std::vector<UMat>(1, src), std::vector<UMat>(1, dst), ch, 1);
-        return;
+        ଫେରନ୍ତୁ;
     }
 #endif
 
@@ -457,28 +457,28 @@ void cv::extractChannel(InputArray _src, OutputArray _dst, int coi)
     mixChannels(&src, 1, &dst, 1, ch, 1);
 }
 
-void cv::insertChannel(InputArray _src, InputOutputArray _dst, int coi)
+ଶୂନ୍ୟ cv::ଭର୍ତ୍ତି_Channel(ନିବେଶ_Array _src, ନିବେଶ_Output_Array _dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା coi)
 {
     CV_INSTRUMENT_REGION();
 
-    int stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), scn = CV_MAT_CN(stype);
-    int dtype = _dst.type(), ddepth = CV_MAT_DEPTH(dtype), dcn = CV_MAT_CN(dtype);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), scn = CV_MAT_CN(stype);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା dtype = _dst.type(), ddepth = CV_MAT_DEPTH(dtype), dcn = CV_MAT_CN(dtype);
     CV_Assert( _src.sameSize(_dst) && sdepth == ddepth );
     CV_Assert( 0 <= coi && coi < dcn && scn == 1 );
 
-    int ch[] = { 0, coi };
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା ch[] = { 0, coi };
 #ifdef HAVE_OPENCL
-    if (ocl::isOpenCLActivated() && _src.dims() <= 2 && _dst.isUMat())
+    ଯଦି (ocl::isOpenCLActivated() && _src.dims() <= 2 && _dst.isUMat())
     {
         UMat src = _src.getUMat(), dst = _dst.getUMat();
         mixChannels(std::vector<UMat>(1, src), std::vector<UMat>(1, dst), ch, 1);
-        return;
+        ଫେରନ୍ତୁ;
     }
 #endif
 
     Mat src = _src.getMat(), dst = _dst.getMat();
 
-    CV_IPP_RUN_FAST(ipp_insertChannel(src, dst, coi))
+    CV_IPP_RUN_FAST(ipp_ଭର୍ତ୍ତି_Channel(src, dst, coi))
 
     mixChannels(&src, 1, &dst, 1, ch, 1);
 }

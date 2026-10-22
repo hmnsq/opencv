@@ -3,46 +3,46 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
+#ଅନ୍ତର୍ଭାଵ "precomp.hpp"
 
-namespace cv { namespace hal {
+ନାମାକାଶ cv { ନାମାକାଶ hal {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-void split8u(const uchar* src, uchar** dst, int len, int cn);
-void split16u(const ushort* src, ushort** dst, int len, int cn);
-void split32s(const int* src, int** dst, int len, int cn);
-void split64s(const int64* src, int64** dst, int len, int cn);
+ଶୂନ୍ୟ split8u(ଅଚଳ uchar* src, uchar** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn);
+ଶୂନ୍ୟ split16u(ଅଚଳ ushort* src, ushort** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn);
+ଶୂନ୍ୟ split32s(ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* src, ପୂର୍ଣ୍ଣସଂଖ୍ୟା** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn);
+ଶୂନ୍ୟ split64s(ଅଚଳ int64* src, int64** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
 // see the comments for vecmerge_ in merge.cpp
-template<typename T, typename VecT> static void
-vecsplit_( const T* src, T** dst, int len, int cn )
+template<typename T, typename VecT> ସ୍ଥିର ଶୂନ୍ୟ
+vecsplit_( ଅଚଳ T* src, T** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn )
 {
-    const int VECSZ = VTraits<VecT>::vlanes();
-    int i, i0 = 0;
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା VECSZ = VTraits<VecT>::vlanes();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i, i0 = 0;
     T* dst0 = dst[0];
     T* dst1 = dst[1];
 
-    int r0 = (int)((size_t)(void*)dst0 % (VECSZ*sizeof(T)));
-    int r1 = (int)((size_t)(void*)dst1 % (VECSZ*sizeof(T)));
-    int r2 = cn > 2 ? (int)((size_t)(void*)dst[2] % (VECSZ*sizeof(T))) : r0;
-    int r3 = cn > 3 ? (int)((size_t)(void*)dst[3] % (VECSZ*sizeof(T))) : r0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା r0 = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)((size_t)(ଶୂନ୍ୟ*)dst0 % (VECSZ*ଆକାର(T)));
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା r1 = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)((size_t)(ଶୂନ୍ୟ*)dst1 % (VECSZ*ଆକାର(T)));
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା r2 = cn > 2 ? (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)((size_t)(ଶୂନ୍ୟ*)dst[2] % (VECSZ*ଆକାର(T))) : r0;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା r3 = cn > 3 ? (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)((size_t)(ଶୂନ୍ୟ*)dst[3] % (VECSZ*ଆକାର(T))) : r0;
 
     hal::StoreMode mode = hal::STORE_ALIGNED_NOCACHE;
-    if( (r0|r1|r2|r3) != 0 )
+    ଯଦି( (r0|r1|r2|r3) != 0 )
     {
         mode = hal::STORE_UNALIGNED;
-        if( r0 == r1 && r0 == r2 && r0 == r3 && r0 % sizeof(T) == 0 && len > VECSZ*2 )
-            i0 = VECSZ - (r0 / sizeof(T));
+        ଯଦି( r0 == r1 && r0 == r2 && r0 == r3 && r0 % ଆକାର(T) == 0 && len > VECSZ*2 )
+            i0 = VECSZ - (r0 / ଆକାର(T));
     }
 
-    if( cn == 2 )
+    ଯଦି( cn == 2 )
     {
-        for( i = 0; i < len; i += VECSZ )
+        ପାଇଁ( i = 0; i < len; i += VECSZ )
         {
-            if( i > len - VECSZ )
+            ଯଦି( i > len - VECSZ )
             {
                 i = len - VECSZ;
                 mode = hal::STORE_UNALIGNED;
@@ -51,19 +51,19 @@ vecsplit_( const T* src, T** dst, int len, int cn )
             v_load_deinterleave(src + i*cn, a, b);
             v_store(dst0 + i, a, mode);
             v_store(dst1 + i, b, mode);
-            if( i < i0 )
+            ଯଦି( i < i0 )
             {
                 i = i0 - VECSZ;
                 mode = hal::STORE_ALIGNED_NOCACHE;
             }
         }
     }
-    else if( cn == 3 )
+    ଅନ୍ୟଥା ଯଦି( cn == 3 )
     {
         T* dst2 = dst[2];
-        for( i = 0; i < len; i += VECSZ )
+        ପାଇଁ( i = 0; i < len; i += VECSZ )
         {
-            if( i > len - VECSZ )
+            ଯଦି( i > len - VECSZ )
             {
                 i = len - VECSZ;
                 mode = hal::STORE_UNALIGNED;
@@ -73,21 +73,21 @@ vecsplit_( const T* src, T** dst, int len, int cn )
             v_store(dst0 + i, a, mode);
             v_store(dst1 + i, b, mode);
             v_store(dst2 + i, c, mode);
-            if( i < i0 )
+            ଯଦି( i < i0 )
             {
                 i = i0 - VECSZ;
                 mode = hal::STORE_ALIGNED_NOCACHE;
             }
         }
     }
-    else
+    ଅନ୍ୟଥା
     {
         CV_Assert( cn == 4 );
         T* dst2 = dst[2];
         T* dst3 = dst[3];
-        for( i = 0; i < len; i += VECSZ )
+        ପାଇଁ( i = 0; i < len; i += VECSZ )
         {
-            if( i > len - VECSZ )
+            ଯଦି( i > len - VECSZ )
             {
                 i = len - VECSZ;
                 mode = hal::STORE_UNALIGNED;
@@ -98,7 +98,7 @@ vecsplit_( const T* src, T** dst, int len, int cn )
             v_store(dst1 + i, b, mode);
             v_store(dst2 + i, c, mode);
             v_store(dst3 + i, d, mode);
-            if( i < i0 )
+            ଯଦି( i < i0 )
             {
                 i = i0 - VECSZ;
                 mode = hal::STORE_ALIGNED_NOCACHE;
@@ -109,64 +109,64 @@ vecsplit_( const T* src, T** dst, int len, int cn )
 }
 #endif
 
-template<typename T> static void
-split_( const T* src, T** dst, int len, int cn )
+template<typename T> ସ୍ଥିର ଶୂନ୍ୟ
+split_( ଅଚଳ T* src, T** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn )
 {
-    int k = cn % 4 ? cn % 4 : 4;
-    int i, j;
-    if( k == 1 )
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = cn % 4 ? cn % 4 : 4;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା i, j;
+    ଯଦି( k == 1 )
     {
         T* dst0 = dst[0];
 
-        if(cn == 1)
+        ଯଦି(cn == 1)
         {
-            memcpy(dst0, src, len * sizeof(T));
+            memcpy(dst0, src, len * ଆକାର(T));
         }
-        else
+        ଅନ୍ୟଥା
         {
-            for( i = 0, j = 0 ; i < len; i++, j += cn )
+            ପାଇଁ( i = 0, j = 0 ; i < len; i++, j += cn )
                 dst0[i] = src[j];
         }
     }
-    else if( k == 2 )
+    ଅନ୍ୟଥା ଯଦି( k == 2 )
     {
         T *dst0 = dst[0], *dst1 = dst[1];
         i = j = 0;
 
-        for( ; i < len; i++, j += cn )
+        ପାଇଁ( ; i < len; i++, j += cn )
         {
             dst0[i] = src[j];
             dst1[i] = src[j+1];
         }
     }
-    else if( k == 3 )
+    ଅନ୍ୟଥା ଯଦି( k == 3 )
     {
         T *dst0 = dst[0], *dst1 = dst[1], *dst2 = dst[2];
         i = j = 0;
 
-        for( ; i < len; i++, j += cn )
+        ପାଇଁ( ; i < len; i++, j += cn )
         {
             dst0[i] = src[j];
             dst1[i] = src[j+1];
             dst2[i] = src[j+2];
         }
     }
-    else
+    ଅନ୍ୟଥା
     {
         T *dst0 = dst[0], *dst1 = dst[1], *dst2 = dst[2], *dst3 = dst[3];
         i = j = 0;
 
-        for( ; i < len; i++, j += cn )
+        ପାଇଁ( ; i < len; i++, j += cn )
         {
             dst0[i] = src[j]; dst1[i] = src[j+1];
             dst2[i] = src[j+2]; dst3[i] = src[j+3];
         }
     }
 
-    for( ; k < cn; k += 4 )
+    ପାଇଁ( ; k < cn; k += 4 )
     {
         T *dst0 = dst[k], *dst1 = dst[k+1], *dst2 = dst[k+2], *dst3 = dst[k+3];
-        for( i = 0, j = k; i < len; i++, j += cn )
+        ପାଇଁ( i = 0, j = k; i < len; i++, j += cn )
         {
             dst0[i] = src[j]; dst1[i] = src[j+1];
             dst2[i] = src[j+2]; dst3[i] = src[j+3];
@@ -174,46 +174,46 @@ split_( const T* src, T** dst, int len, int cn )
     }
 }
 
-void split8u(const uchar* src, uchar** dst, int len, int cn )
+ଶୂନ୍ୟ split8u(ଅଚଳ uchar* src, uchar** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_uint8>::vlanes() && 2 <= cn && cn <= 4 )
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଯଦି( len >= VTraits<v_uint8>::vlanes() && 2 <= cn && cn <= 4 )
         vecsplit_<uchar, v_uint8>(src, dst, len, cn);
-    else
+    ଅନ୍ୟଥା
 #endif
         split_(src, dst, len, cn);
 }
 
-void split16u(const ushort* src, ushort** dst, int len, int cn )
+ଶୂନ୍ୟ split16u(ଅଚଳ ushort* src, ushort** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_uint16>::vlanes() && 2 <= cn && cn <= 4 )
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଯଦି( len >= VTraits<v_uint16>::vlanes() && 2 <= cn && cn <= 4 )
         vecsplit_<ushort, v_uint16>(src, dst, len, cn);
-    else
+    ଅନ୍ୟଥା
 #endif
         split_(src, dst, len, cn);
 }
 
-void split32s(const int* src, int** dst, int len, int cn )
+ଶୂନ୍ୟ split32s(ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା* src, ପୂର୍ଣ୍ଣସଂଖ୍ୟା** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_uint32>::vlanes() && 2 <= cn && cn <= 4 )
-        vecsplit_<int, v_int32>(src, dst, len, cn);
-    else
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଯଦି( len >= VTraits<v_uint32>::vlanes() && 2 <= cn && cn <= 4 )
+        vecsplit_<ପୂର୍ଣ୍ଣସଂଖ୍ୟା, v_int32>(src, dst, len, cn);
+    ଅନ୍ୟଥା
 #endif
         split_(src, dst, len, cn);
 }
 
-void split64s(const int64* src, int64** dst, int len, int cn )
+ଶୂନ୍ୟ split64s(ଅଚଳ int64* src, int64** dst, ପୂର୍ଣ୍ଣସଂଖ୍ୟା len, ପୂର୍ଣ୍ଣସଂଖ୍ୟା cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_int64>::vlanes() && 2 <= cn && cn <= 4 )
+#ଯଦି (CV_SIMD || CV_SIMD_SCALABLE)
+    ଯଦି( len >= VTraits<v_int64>::vlanes() && 2 <= cn && cn <= 4 )
         vecsplit_<int64, v_int64>(src, dst, len, cn);
-    else
+    ଅନ୍ୟଥା
 #endif
         split_(src, dst, len, cn);
 }

@@ -41,143 +41,143 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/hal/hal.hpp>
+#ଅନ୍ତର୍ଭାଵ "precomp.hpp"
+#ଅନ୍ତର୍ଭାଵ <opencv2/core/utils/configuration.private.hpp>
+#ଅନ୍ତର୍ଭାଵ <opencv2/core/hal/hal.hpp>
 
 ////////////////////////////////////////// kmeans ////////////////////////////////////////////
 
-namespace cv
+ନାମାକାଶ cv
 {
 
-static int CV_KMEANS_PARALLEL_GRANULARITY = (int)utils::getConfigurationParameterSizeT("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
+ସ୍ଥିର ପୂର୍ଣ୍ଣସଂଖ୍ୟା CV_KMEANS_PARALLEL_GRANULARITY = (ପୂର୍ଣ୍ଣସଂଖ୍ୟା)utils::getConfigurationParameterSizeT("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
 
-static void generateRandomCenter(int dims, const Vec2f* box, float* center, RNG& rng)
+ସ୍ଥିର ଶୂନ୍ୟ generateRandomCenter(ପୂର୍ଣ୍ଣସଂଖ୍ୟା dims, ଅଚଳ Vec2f* box, ଦଶମିକ* center, RNG& rng)
 {
-    float margin = 1.f/dims;
-    for (int j = 0; j < dims; j++)
-        center[j] = ((float)rng*(1.f+margin*2.f)-margin)*(box[j][1] - box[j][0]) + box[j][0];
+    ଦଶମିକ margin = 1.f/dims;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < dims; j++)
+        center[j] = ((ଦଶମିକ)rng*(1.f+margin*2.f)-margin)*(box[j][1] - box[j][0]) + box[j][0];
 }
 
-class KMeansPPDistanceComputer : public ParallelLoopBody
+ଶ୍ରେଣୀ KMeansPPDistanceComputer : ସର୍ବସାଧାରଣ ParallelLoopBody
 {
-public:
-    KMeansPPDistanceComputer(float *tdist2_, const Mat& data_, const float *dist_, int ci_) :
+ସର୍ବସାଧାରଣ:
+    KMeansPPDistanceComputer(ଦଶମିକ *tdist2_, ଅଚଳ Mat& data_, ଅଚଳ ଦଶମିକ *dist_, ପୂର୍ଣ୍ଣସଂଖ୍ୟା ci_) :
         tdist2(tdist2_), data(data_), dist(dist_), ci(ci_)
     { }
 
-    void operator()( const cv::Range& range ) const CV_OVERRIDE
+    ଶୂନ୍ୟ operator()( ଅଚଳ cv::Range& range ) ଅଚଳ CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int dims = data.cols;
+        ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା begin = range.start;
+        ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା end = range.end;
+        ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା dims = data.cols;
 
-        for (int i = begin; i<end; i++)
+        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = begin; i<end; i++)
         {
-            tdist2[i] = std::min(hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(ci), dims), dist[i]);
+            tdist2[i] = std::min(hal::normL2Sqr_(data.ptr<ଦଶମିକ>(i), data.ptr<ଦଶମିକ>(ci), dims), dist[i]);
         }
     }
 
-private:
-    KMeansPPDistanceComputer& operator=(const KMeansPPDistanceComputer&); // = delete
+ବ୍ୟକ୍ତିଗତ:
+    KMeansPPDistanceComputer& operator=(ଅଚଳ KMeansPPDistanceComputer&); // = delete
 
-    float *tdist2;
-    const Mat& data;
-    const float *dist;
-    const int ci;
+    ଦଶମିକ *tdist2;
+    ଅଚଳ Mat& data;
+    ଅଚଳ ଦଶମିକ *dist;
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା ci;
 };
 
 /*
 k-means center initialization using the following algorithm:
 Arthur & Vassilvitskii (2007) k-means++: The Advantages of Careful Seeding
 */
-static bool generateCentersPP(const Mat& data, Mat& _out_centers,
-                              int K, RNG& rng, int trials)
+ସ୍ଥିର ତାର୍କିକ generateCentersPP(ଅଚଳ Mat& data, Mat& _out_centers,
+                              ପୂର୍ଣ୍ଣସଂଖ୍ୟା K, RNG& rng, ପୂର୍ଣ୍ଣସଂଖ୍ୟା trials)
 {
     CV_TRACE_FUNCTION();
-    const int dims = data.cols, N = data.rows;
-    cv::AutoBuffer<int, 64> _centers(K);
-    int* centers = &_centers[0];
-    cv::AutoBuffer<float, 0> _dist(N*3);
-    float* dist = &_dist[0], *tdist = dist + N, *tdist2 = tdist + N;
-    double sum0 = 0;
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା dims = data.cols, N = data.rows;
+    cv::AutoBuffer<ପୂର୍ଣ୍ଣସଂଖ୍ୟା, 64> _centers(K);
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା* centers = &_centers[0];
+    cv::AutoBuffer<ଦଶମିକ, 0> _dist(N*3);
+    ଦଶମିକ* dist = &_dist[0], *tdist = dist + N, *tdist2 = tdist + N;
+    ଦ୍ୱିଗୁଣ sum0 = 0;
 
     centers[0] = (unsigned)rng % N;
 
-    for (int i = 0; i < N; i++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < N; i++)
     {
-        dist[i] = hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(centers[0]), dims);
+        dist[i] = hal::normL2Sqr_(data.ptr<ଦଶମିକ>(i), data.ptr<ଦଶମିକ>(centers[0]), dims);
         sum0 += dist[i];
     }
-    if (!(sum0 < DBL_MAX))
-        return false;
+    ଯଦି (!(sum0 < DBL_MAX))
+        ଫେରନ୍ତୁ ମିଥ୍ୟା;
 
-    for (int k = 1; k < K; k++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = 1; k < K; k++)
     {
-        double bestSum = DBL_MAX;
-        int bestCenter = -1;
+        ଦ୍ୱିଗୁଣ bestSum = DBL_MAX;
+        ପୂର୍ଣ୍ଣସଂଖ୍ୟା bestCenter = -1;
 
-        for (int j = 0; j < trials; j++)
+        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < trials; j++)
         {
-            double p = (double)rng*sum0;
-            int ci = 0;
-            for (; ci < N - 1; ci++)
+            ଦ୍ୱିଗୁଣ p = (ଦ୍ୱିଗୁଣ)rng*sum0;
+            ପୂର୍ଣ୍ଣସଂଖ୍ୟା ci = 0;
+            ପାଇଁ (; ci < N - 1; ci++)
             {
                 p -= dist[ci];
-                if (p <= 0)
-                    break;
+                ଯଦି (p <= 0)
+                    ଭାଙ୍ଗ;
             }
 
             parallel_for_(Range(0, N),
                           KMeansPPDistanceComputer(tdist2, data, dist, ci),
-                          (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
-            double s = 0;
-            int i = 0;
-        #if CV_ENABLE_UNROLLED
-            for (; i + 7 < N; i += 8)
+                          (ଦ୍ୱିଗୁଣ)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
+            ଦ୍ୱିଗୁଣ s = 0;
+            ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0;
+        #ଯଦି CV_ENABLE_UNROLLED
+            ପାଇଁ (; i + 7 < N; i += 8)
             {
                 s += tdist2[i + 0] + tdist2[i + 1] + tdist2[i + 2] + tdist2[i + 3] +
                      tdist2[i + 4] + tdist2[i + 5] + tdist2[i + 6] + tdist2[i + 7];
             }
         #endif
-            for (; i < N; i++)
+            ପାଇଁ (; i < N; i++)
             {
                 s += tdist2[i];
             }
 
-            if (s < bestSum)
+            ଯଦି (s < bestSum)
             {
                 bestSum = s;
                 bestCenter = ci;
                 std::swap(tdist, tdist2);
             }
         }
-        if (bestCenter < 0)
-            return false;
+        ଯଦି (bestCenter < 0)
+            ଫେରନ୍ତୁ ମିଥ୍ୟା;
         centers[k] = bestCenter;
         sum0 = bestSum;
         std::swap(dist, tdist);
     }
 
-    for (int k = 0; k < K; k++)
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = 0; k < K; k++)
     {
-        const float* src = data.ptr<float>(centers[k]);
-        float* dst = _out_centers.ptr<float>(k);
-        for (int j = 0; j < dims; j++)
+        ଅଚଳ ଦଶମିକ* src = data.ptr<ଦଶମିକ>(centers[k]);
+        ଦଶମିକ* dst = _out_centers.ptr<ଦଶମିକ>(k);
+        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < dims; j++)
             dst[j] = src[j];
     }
-    return true;
+    ଫେରନ୍ତୁ ସତ୍ୟ;
 }
 
-template<bool onlyDistance>
-class KMeansDistanceComputer : public ParallelLoopBody
+template<ତାର୍କିକ onlyDistance>
+ଶ୍ରେଣୀ KMeansDistanceComputer : ସର୍ବସାଧାରଣ ParallelLoopBody
 {
-public:
-    KMeansDistanceComputer( double *distances_,
-                            int *labels_,
-                            const Mat& data_,
-                            const Mat& centers_)
+ସର୍ବସାଧାରଣ:
+    KMeansDistanceComputer( ଦ୍ୱିଗୁଣ *distances_,
+                            ପୂର୍ଣ୍ଣସଂଖ୍ୟା *labels_,
+                            ଅଚଳ Mat& data_,
+                            ଅଚଳ Mat& centers_)
         : distances(distances_),
           labels(labels_),
           data(data_),
@@ -185,39 +185,39 @@ public:
     {
     }
 
-    void operator()(const Range& range) const CV_OVERRIDE
+    ଶୂନ୍ୟ operator()(ଅଚଳ Range& range) ଅଚଳ CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int K = centers.rows;
-        const int dims = centers.cols;
+        ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା begin = range.start;
+        ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା end = range.end;
+        ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା K = centers.rows;
+        ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା dims = centers.cols;
 
-        for (int i = begin; i < end; ++i)
+        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = begin; i < end; ++i)
         {
-            const float *sample = data.ptr<float>(i);
-            if (onlyDistance)
+            ଅଚଳ ଦଶମିକ *sample = data.ptr<ଦଶମିକ>(i);
+            ଯଦି (onlyDistance)
             {
-                const float* center = centers.ptr<float>(labels[i]);
+                ଅଚଳ ଦଶମିକ* center = centers.ptr<ଦଶମିକ>(labels[i]);
                 distances[i] = hal::normL2Sqr_(sample, center, dims);
-                continue;
+                ଜାରି;
             }
-            else
+            ଅନ୍ୟଥା
             {
-                int k_best = 0;
-                double min_dist = DBL_MAX;
+                ପୂର୍ଣ୍ଣସଂଖ୍ୟା k_best = 0;
+                ଦ୍ୱିଗୁଣ min_dist = DBL_MAX;
 
-                for (int k = 0; k < K; k++)
+                ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = 0; k < K; k++)
                 {
-                    const float* center = centers.ptr<float>(k);
-                    const double dist = hal::normL2Sqr_(sample, center, dims);
-                    if (!(dist <= FLT_MAX))
+                    ଅଚଳ ଦଶମିକ* center = centers.ptr<ଦଶମିକ>(k);
+                    ଅଚଳ ଦ୍ୱିଗୁଣ dist = hal::normL2Sqr_(sample, center, dims);
+                    ଯଦି (!(dist <= FLT_MAX))
                     {
                         min_dist = DBL_MAX;
-                        break;
+                        ଭାଙ୍ଗ;
                     }
 
-                    if (min_dist > dist)
+                    ଯଦି (min_dist > dist)
                     {
                         min_dist = dist;
                         k_best = k;
@@ -230,54 +230,54 @@ public:
         }
     }
 
-private:
-    KMeansDistanceComputer& operator=(const KMeansDistanceComputer&); // = delete
+ବ୍ୟକ୍ତିଗତ:
+    KMeansDistanceComputer& operator=(ଅଚଳ KMeansDistanceComputer&); // = delete
 
-    double *distances;
-    int *labels;
-    const Mat& data;
-    const Mat& centers;
+    ଦ୍ୱିଗୁଣ *distances;
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା *labels;
+    ଅଚଳ Mat& data;
+    ଅଚଳ Mat& centers;
 };
 
 }
 
-double cv::kmeans( InputArray _data, int K,
-                   InputOutputArray _bestLabels,
-                   TermCriteria criteria, int attempts,
-                   int flags, OutputArray _centers )
+ଦ୍ୱିଗୁଣ cv::kmeans( ନିବେଶ_Array _data, ପୂର୍ଣ୍ଣସଂଖ୍ୟା K,
+                   ନିବେଶ_Output_Array _bestLabels,
+                   TermCriteria criteria, ପୂର୍ଣ୍ଣସଂଖ୍ୟା attempts,
+                   ପୂର୍ଣ୍ଣସଂଖ୍ୟା flags, OutputArray _centers )
 {
     CV_INSTRUMENT_REGION();
-    const int SPP_TRIALS = 3;
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା SPP_TRIALS = 3;
     Mat data0 = _data.getMat();
-    const bool isrow = data0.rows == 1;
-    const int N = isrow ? data0.cols : data0.rows;
-    const int dims = (isrow ? 1 : data0.cols)*data0.channels();
-    const int type = data0.depth();
+    ଅଚଳ ତାର୍କିକ isrow = data0.rows == 1;
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା N = isrow ? data0.cols : data0.rows;
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା dims = (isrow ? 1 : data0.cols)*data0.channels();
+    ଅଚଳ ପୂର୍ଣ୍ଣସଂଖ୍ୟା type = data0.depth();
 
     attempts = std::max(attempts, 1);
     CV_Assert( data0.dims <= 2 && type == CV_32F && K > 0 );
     CV_CheckGE(N, K, "There can't be more clusters than elements");
 
-    Mat data(N, dims, CV_32F, data0.ptr(), isrow ? dims * sizeof(float) : static_cast<size_t>(data0.step));
+    Mat data(N, dims, CV_32F, data0.ptr(), isrow ? dims * ଆକାର(ଦଶମିକ) : static_cast<size_t>(data0.step));
 
-    _bestLabels.create(N, 1, CV_32S, -1, true);
+    _bestLabels.create(N, 1, CV_32S, -1, ସତ୍ୟ);
 
     Mat _labels, best_labels = _bestLabels.getMat();
-    if (flags & KMEANS_USE_INITIAL_LABELS)
+    ଯଦି (flags & KMEANS_USE_INITIAL_LABELS)
     {
         CV_Assert( (best_labels.cols == 1 || best_labels.rows == 1) &&
                   best_labels.cols*best_labels.rows == N &&
                   best_labels.type() == CV_32S &&
                   best_labels.isContinuous());
         best_labels.reshape(1, N).copyTo(_labels);
-        for (int i = 0; i < N; i++)
+        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < N; i++)
         {
-            CV_Assert((unsigned)_labels.at<int>(i) < (unsigned)K);
+            CV_Assert((unsigned)_labels.at<ପୂର୍ଣ୍ଣସଂଖ୍ୟା>(i) < (unsigned)K);
         }
     }
-    else
+    ଅନ୍ୟଥା
     {
-        if (!((best_labels.cols == 1 || best_labels.rows == 1) &&
+        ଯଦି (!((best_labels.cols == 1 || best_labels.rows == 1) &&
              best_labels.cols*best_labels.rows == N &&
              best_labels.type() == CV_32S &&
              best_labels.isContinuous()))
@@ -287,125 +287,125 @@ double cv::kmeans( InputArray _data, int K,
         }
         _labels.create(best_labels.size(), best_labels.type());
     }
-    int* labels = _labels.ptr<int>();
+    ପୂର୍ଣ୍ଣସଂଖ୍ୟା* labels = _labels.ptr<ପୂର୍ଣ୍ଣସଂଖ୍ୟା>();
 
     Mat centers(K, dims, type), old_centers(K, dims, type), temp(1, dims, type);
-    cv::AutoBuffer<int, 64> counters(K);
-    cv::AutoBuffer<double, 64> dists(N);
+    cv::AutoBuffer<ପୂର୍ଣ୍ଣସଂଖ୍ୟା, 64> counters(K);
+    cv::AutoBuffer<ଦ୍ୱିଗୁଣ, 64> dists(N);
     RNG& rng = theRNG();
 
-    if (criteria.type & TermCriteria::EPS)
+    ଯଦି (criteria.type & TermCriteria::EPS)
         criteria.epsilon = std::max(criteria.epsilon, 0.);
-    else
+    ଅନ୍ୟଥା
         criteria.epsilon = FLT_EPSILON;
     criteria.epsilon *= criteria.epsilon;
 
-    if (criteria.type & TermCriteria::COUNT)
-        criteria.maxCount = std::min(std::max(criteria.maxCount, 2), 100);
-    else
-        criteria.maxCount = 100;
+    ଯଦି (criteria.type & TermCriteria::ଗଣନା_4)
+        criteria.max_ଗଣନା = std::min(std::max(criteria.max_ଗଣନା, 2), 100);
+    ଅନ୍ୟଥା
+        criteria.max_ଗଣନା = 100;
 
-    if (K == 1)
+    ଯଦି (K == 1)
     {
         attempts = 1;
-        criteria.maxCount = 2;
+        criteria.max_ଗଣନା = 2;
     }
 
     cv::AutoBuffer<Vec2f, 64> box(dims);
-    if (!(flags & KMEANS_PP_CENTERS))
+    ଯଦି (!(flags & KMEANS_PP_CENTERS))
     {
         {
-            const float* sample = data.ptr<float>(0);
-            for (int j = 0; j < dims; j++)
+            ଅଚଳ ଦଶମିକ* sample = data.ptr<ଦଶମିକ>(0);
+            ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < dims; j++)
                 box[j] = Vec2f(sample[j], sample[j]);
         }
-        for (int i = 1; i < N; i++)
+        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 1; i < N; i++)
         {
-            const float* sample = data.ptr<float>(i);
-            for (int j = 0; j < dims; j++)
+            ଅଚଳ ଦଶମିକ* sample = data.ptr<ଦଶମିକ>(i);
+            ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < dims; j++)
             {
-                float v = sample[j];
+                ଦଶମିକ v = sample[j];
                 box[j][0] = std::min(box[j][0], v);
                 box[j][1] = std::max(box[j][1], v);
             }
         }
     }
 
-    double best_compactness = DBL_MAX;
-    for (int a = 0; a < attempts; a++)
+    ଦ୍ୱିଗୁଣ best_compactness = DBL_MAX;
+    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା a = 0; a < attempts; a++)
     {
-        double compactness = DBL_MAX;
+        ଦ୍ୱିଗୁଣ compactness = DBL_MAX;
 
-        for (int iter = 0; ;)
+        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା iter = 0; ;)
         {
-            double max_center_shift = iter == 0 ? DBL_MAX : 0.0;
+            ଦ୍ୱିଗୁଣ max_center_shift = iter == 0 ? DBL_MAX : 0.0;
 
             swap(centers, old_centers);
 
-            if (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
+            ଯଦି (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
             {
-                if (flags & KMEANS_PP_CENTERS)
+                ଯଦି (flags & KMEANS_PP_CENTERS)
                 {
-                    if (!generateCentersPP(data, centers, K, rng, SPP_TRIALS))
-                        break;
+                    ଯଦି (!generateCentersPP(data, centers, K, rng, SPP_TRIALS))
+                        ଭାଙ୍ଗ;
                 }
-                else
+                ଅନ୍ୟଥା
                 {
-                    for (int k = 0; k < K; k++)
-                        generateRandomCenter(dims, box.data(), centers.ptr<float>(k), rng);
+                    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = 0; k < K; k++)
+                        generateRandomCenter(dims, box.data(), centers.ptr<ଦଶମିକ>(k), rng);
                 }
             }
-            else
+            ଅନ୍ୟଥା
             {
                 // compute centers
                 centers = Scalar(0);
-                for (int k = 0; k < K; k++)
+                ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = 0; k < K; k++)
                     counters[k] = 0;
 
-                for (int i = 0; i < N; i++)
+                ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < N; i++)
                 {
-                    const float* sample = data.ptr<float>(i);
-                    int k = labels[i];
-                    float* center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    ଅଚଳ ଦଶମିକ* sample = data.ptr<ଦଶମିକ>(i);
+                    ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = labels[i];
+                    ଦଶମିକ* center = centers.ptr<ଦଶମିକ>(k);
+                    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < dims; j++)
                         center[j] += sample[j];
                     counters[k]++;
                 }
 
-                for (int k = 0; k < K; k++)
+                ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = 0; k < K; k++)
                 {
-                    if (counters[k] != 0)
-                        continue;
+                    ଯଦି (counters[k] != 0)
+                        ଜାରି;
 
                     // if some cluster appeared to be empty then:
                     //   1. find the biggest cluster
                     //   2. find the farthest from the center point in the biggest cluster
                     //   3. exclude the farthest point from the biggest cluster and form a new 1-point cluster.
-                    int max_k = 0;
-                    for (int k1 = 1; k1 < K; k1++)
+                    ପୂର୍ଣ୍ଣସଂଖ୍ୟା max_k = 0;
+                    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା k1 = 1; k1 < K; k1++)
                     {
-                        if (counters[max_k] < counters[k1])
+                        ଯଦି (counters[max_k] < counters[k1])
                             max_k = k1;
                     }
 
-                    double max_dist = 0;
-                    int farthest_i = -1;
-                    float* base_center = centers.ptr<float>(max_k);
-                    float* _base_center = temp.ptr<float>(); // normalized
-                    float scale = 1.f/counters[max_k];
-                    for (int j = 0; j < dims; j++)
+                    ଦ୍ୱିଗୁଣ max_dist = 0;
+                    ପୂର୍ଣ୍ଣସଂଖ୍ୟା farthest_i = -1;
+                    ଦଶମିକ* base_center = centers.ptr<ଦଶମିକ>(max_k);
+                    ଦଶମିକ* _base_center = temp.ptr<ଦଶମିକ>(); // normalized
+                    ଦଶମିକ scale = 1.f/counters[max_k];
+                    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < dims; j++)
                         _base_center[j] = base_center[j]*scale;
 
-                    for (int i = 0; i < N; i++)
+                    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା i = 0; i < N; i++)
                     {
-                        if (labels[i] != max_k)
-                            continue;
-                        if (farthest_i < 0)
+                        ଯଦି (labels[i] != max_k)
+                            ଜାରି;
+                        ଯଦି (farthest_i < 0)
                             farthest_i = i;
-                        const float* sample = data.ptr<float>(i);
-                        double dist = hal::normL2Sqr_(sample, _base_center, dims);
+                        ଅଚଳ ଦଶମିକ* sample = data.ptr<ଦଶମିକ>(i);
+                        ଦ୍ୱିଗୁଣ dist = hal::normL2Sqr_(sample, _base_center, dims);
 
-                        if (max_dist <= dist)
+                        ଯଦି (max_dist <= dist)
                         {
                             max_dist = dist;
                             farthest_i = i;
@@ -416,31 +416,31 @@ double cv::kmeans( InputArray _data, int K,
                     counters[k]++;
                     labels[farthest_i] = k;
 
-                    const float* sample = data.ptr<float>(farthest_i);
-                    float* cur_center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    ଅଚଳ ଦଶମିକ* sample = data.ptr<ଦଶମିକ>(farthest_i);
+                    ଦଶମିକ* cur_center = centers.ptr<ଦଶମିକ>(k);
+                    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < dims; j++)
                     {
                         base_center[j] -= sample[j];
                         cur_center[j] += sample[j];
                     }
                 }
 
-                for (int k = 0; k < K; k++)
+                ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା k = 0; k < K; k++)
                 {
-                    float* center = centers.ptr<float>(k);
+                    ଦଶମିକ* center = centers.ptr<ଦଶମିକ>(k);
                     CV_Assert( counters[k] != 0 );
 
-                    float scale = 1.f/counters[k];
-                    for (int j = 0; j < dims; j++)
+                    ଦଶମିକ scale = 1.f/counters[k];
+                    ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < dims; j++)
                         center[j] *= scale;
 
-                    if (iter > 0)
+                    ଯଦି (iter > 0)
                     {
-                        double dist = 0;
-                        const float* old_center = old_centers.ptr<float>(k);
-                        for (int j = 0; j < dims; j++)
+                        ଦ୍ୱିଗୁଣ dist = 0;
+                        ଅଚଳ ଦଶମିକ* old_center = old_centers.ptr<ଦଶମିକ>(k);
+                        ପାଇଁ (ପୂର୍ଣ୍ଣସଂଖ୍ୟା j = 0; j < dims; j++)
                         {
-                            double t = center[j] - old_center[j];
+                            ଦ୍ୱିଗୁଣ t = center[j] - old_center[j];
                             dist += t*t;
                         }
                         max_center_shift = std::max(max_center_shift, dist);
@@ -448,45 +448,45 @@ double cv::kmeans( InputArray _data, int K,
                 }
             }
 
-            bool isLastIter = (++iter == MAX(criteria.maxCount, 2) || max_center_shift <= criteria.epsilon);
+            ତାର୍କିକ isLastIter = (++iter == MAX(criteria.max_ଗଣନା, 2) || max_center_shift <= criteria.epsilon);
 
-            if (isLastIter)
+            ଯଦି (isLastIter)
             {
                 // don't re-assign labels to avoid creation of empty clusters
-                parallel_for_(Range(0, N), KMeansDistanceComputer<true>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
+                parallel_for_(Range(0, N), KMeansDistanceComputer<ସତ୍ୟ>(dists.data(), labels, data, centers), (ଦ୍ୱିଗୁଣ)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
                 compactness = sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0];
-                break;
+                ଭାଙ୍ଗ;
             }
-            else
+            ଅନ୍ୟଥା
             {
                 // assign labels
-                parallel_for_(Range(0, N), KMeansDistanceComputer<false>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N * K), CV_KMEANS_PARALLEL_GRANULARITY));
-                if (!(sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
-                    break;
+                parallel_for_(Range(0, N), KMeansDistanceComputer<ମିଥ୍ୟା>(dists.data(), labels, data, centers), (ଦ୍ୱିଗୁଣ)divUp((size_t)(dims * N * K), CV_KMEANS_PARALLEL_GRANULARITY));
+                ଯଦି (!(sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
+                    ଭାଙ୍ଗ;
             }
         }
 
-        if (!(compactness < DBL_MAX))
+        ଯଦି (!(compactness < DBL_MAX))
         {
             centers.setZero();
             _labels.setZero();
             compactness = -1.;
         }
-        if (compactness < best_compactness)
+        ଯଦି (compactness < best_compactness)
         {
             best_compactness = compactness;
-            if (_centers.needed())
+            ଯଦି (_centers.needed())
             {
-                if (_centers.fixedType() && _centers.channels() == dims)
+                ଯଦି (_centers.fixedType() && _centers.channels() == dims)
                     centers.reshape(dims).copyTo(_centers);
-                else
+                ଅନ୍ୟଥା
                     centers.copyTo(_centers);
             }
             _labels.copyTo(best_labels);
         }
-        if (compactness < 0.)
-            break;
+        ଯଦି (compactness < 0.)
+            ଭାଙ୍ଗ;
     }
 
-    return best_compactness;
+    ଫେରନ୍ତୁ best_compactness;
 }
