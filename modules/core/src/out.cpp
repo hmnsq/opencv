@@ -41,55 +41,55 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
-    class FormattedImpl CV_FINAL : public Formatted
+    ವರ್ಗ FormattedImpl CV_FINAL : ಸಾರ್ವಜನಿಕ Formatted
     {
-        enum { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
-               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_VALUE, STATE_FINISHED,
-               STATE_LINE_SEPARATOR, STATE_CN_SEPARATOR, STATE_VALUE_SEPARATOR };
-        enum {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
+        ಎಣಿಕೆ { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
+               STATE_ಅಡ್ಡಸಾಲು_OPEN, STATE_ಅಡ್ಡಸಾಲು_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_ಮೌಲ್ಯ, STATE_ಪೂರ್ಣಗೊಂಡ,
+               STATE_ಸಾಲು_SEPARATOR, STATE_CN_SEPARATOR, STATE_ಮೌಲ್ಯ_SEPARATOR };
+        ಎಣಿಕೆ {BRACE_ಅಡ್ಡಸಾಲು_OPEN = 0, BRACE_ಅಡ್ಡಸಾಲು_CLOSE = 1, BRACE_ಅಡ್ಡಸಾಲು_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
 
-        char floatFormat[8];
-        char buf[32];   // enough for double with precision up to 20
+        ಅಕ್ಷರ floatFormat[8];
+        ಅಕ್ಷರ buf[32];   // enough for double with precision up to 20
 
         Mat mtx;
-        int mcn; // == mtx.channels()
-        bool singleLine;
-        bool alignOrder;    // true when cn first order
+        ಪೂರ್ಣಾಂಕ mcn; // == mtx.channels()
+        ತಾರ್ಕಿಕ single_ಸಾಲು;
+        ತಾರ್ಕಿಕ align_ಕ್ರಮ;    // true when cn first order
 
-        int state;
-        int row;
-        int col;
-        int cn;
+        ಪೂರ್ಣಾಂಕ state;
+        ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು;
+        ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು;
+        ಪೂರ್ಣಾಂಕ cn;
 
         String prologue;
         String epilogue;
-        char braces[5];
+        ಅಕ್ಷರ braces[5];
 
-        void (FormattedImpl::*valueToStr)();
-        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
-        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
-        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
-        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
-        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
-        void valueToStr32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
-        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
-        void valueToStr32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
-        void valueToStr64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
-        void valueToStr64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
-        void valueToStr64s() { snprintf(buf, sizeof(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
-        void valueToStr16f() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<hfloat>(row, col)[cn]); }
-        void valueToStr16bf() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<bfloat>(row, col)[cn]); }
-        void valueToStr8f()   { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8_t>(row, col)[cn]); }
-        void valueToStr8fnuz() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8a_t>(row, col)[cn]); }
-        void valueToStrOther() { buf[0] = 0; }
+        ಶೂನ್ಯ (FormattedImpl::*ಮೌಲ್ಯ_ಗಮ್ಯ_Str)();
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str_Bool() { snprintf(buf, ಗಾತ್ರ(buf), "%d", (ಪೂರ್ಣಾಂಕ)mtx.ptr<uchar>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn] != 0); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str8u()  { snprintf(buf, ಗಾತ್ರ(buf), "%3d", (ಪೂರ್ಣಾಂಕ)mtx.ptr<uchar>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str8s()  { snprintf(buf, ಗಾತ್ರ(buf), "%3d", (ಪೂರ್ಣಾಂಕ)mtx.ptr<schar>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str16u() { snprintf(buf, ಗಾತ್ರ(buf), "%d", (ಪೂರ್ಣಾಂಕ)mtx.ptr<ushort>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str16s() { snprintf(buf, ಗಾತ್ರ(buf), "%d", (ಪೂರ್ಣಾಂಕ)mtx.ptr<ಗಿಡ್ಡ>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str32u() { snprintf(buf, ಗಾತ್ರ(buf), "%u", mtx.ptr<ಚಿಹ್ನೆರಹಿತ>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str32s() { snprintf(buf, ಗಾತ್ರ(buf), "%d", mtx.ptr<ಪೂರ್ಣಾಂಕ>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str32f() { snprintf(buf, ಗಾತ್ರ(buf), floatFormat, mtx.ptr<ದಶಮಾಂಶ>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str64f() { snprintf(buf, ಗಾತ್ರ(buf), floatFormat, mtx.ptr<ದ್ವಿಗುಣ>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str64u() { snprintf(buf, ಗಾತ್ರ(buf), "%llu", (ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ)mtx.ptr<uint64_t>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str64s() { snprintf(buf, ಗಾತ್ರ(buf), "%lld", (ದೀರ್ಘ ದೀರ್ಘ)mtx.ptr<int64_t>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str16f() { snprintf(buf, ಗಾತ್ರ(buf), floatFormat, (ದಶಮಾಂಶ)mtx.ptr<hfloat>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str16bf() { snprintf(buf, ಗಾತ್ರ(buf), floatFormat, (ದಶಮಾಂಶ)mtx.ptr<bfloat>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str8f()   { snprintf(buf, ಗಾತ್ರ(buf), floatFormat, (ದಶಮಾಂಶ)mtx.ptr<fp8_t>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str8fnuz() { snprintf(buf, ಗಾತ್ರ(buf), floatFormat, (ದಶಮಾಂಶ)mtx.ptr<fp8a_t>(ಅಡ್ಡಸಾಲು, ಲಂಬಸಾಲು)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_ಗಮ್ಯ_Str_Other() { buf[0] = 0; }
 
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, int precision)
+        FormattedImpl(String pl, String el, Mat m, ಅಕ್ಷರ br[5], ತಾರ್ಕಿಕ s_ಸಾಲು, ತಾರ್ಕಿಕ a_ಕ್ರಮ, ಪೂರ್ಣಾಂಕ precision)
         {
             CV_Assert(m.dims <= 2);
 
@@ -97,292 +97,292 @@ namespace cv
             epilogue = el;
             mtx = m;
             mcn = m.channels();
-            memcpy(braces, br, 5);
+            ಸ್ಮರಣೆ_ನಕಲು(braces, br, 5);
             state = STATE_PROLOGUE;
-            singleLine = sLine;
-            alignOrder = aOrder;
-            row = col = cn =0;
+            single_ಸಾಲು = s_ಸಾಲು;
+            align_ಕ್ರಮ = a_ಕ್ರಮ;
+            ಅಡ್ಡಸಾಲು = ಲಂಬಸಾಲು = cn =0;
 
-            if (precision < 0)
+            ಆದರೆ (precision < 0)
             {
                 floatFormat[0] = '%';
                 floatFormat[1] = 'a';
                 floatFormat[2] = 0;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                cv_snprintf(floatFormat, sizeof(floatFormat), "%%.%dg", std::min(precision, 20));
+                cv_snprintf(floatFormat, ಗಾತ್ರ(floatFormat), "%%.%dg", std::min(precision, 20));
             }
 
-            switch(mtx.depth())
+            ಆಯ್ಕೆ(mtx.ಆಳ())
             {
-                case CV_8U:  valueToStr = &FormattedImpl::valueToStr8u; break;
-                case CV_8S:  valueToStr = &FormattedImpl::valueToStr8s; break;
-                case CV_Bool: valueToStr = &FormattedImpl::valueToStrBool; break;
-                case CV_16U: valueToStr = &FormattedImpl::valueToStr16u; break;
-                case CV_16S: valueToStr = &FormattedImpl::valueToStr16s; break;
-                case CV_32U: valueToStr = &FormattedImpl::valueToStr32u; break;
-                case CV_32S: valueToStr = &FormattedImpl::valueToStr32s; break;
-                case CV_32F: valueToStr = &FormattedImpl::valueToStr32f; break;
-                case CV_64F: valueToStr = &FormattedImpl::valueToStr64f; break;
-                case CV_64U: valueToStr = &FormattedImpl::valueToStr64u; break;
-                case CV_64S: valueToStr = &FormattedImpl::valueToStr64s; break;
-                case CV_16F: valueToStr = &FormattedImpl::valueToStr16f; break;
-                case CV_16BF: valueToStr = &FormattedImpl::valueToStr16bf; break;
-                case CV_8F_E4M3FN:   valueToStr = &FormattedImpl::valueToStr8f; break;
-                case CV_8F_E4M3FNUZ: valueToStr = &FormattedImpl::valueToStr8fnuz; break;
-                default:
-                    CV_Error_(Error::StsError, ("unsupported matrix type %d\n", mtx.depth()));
+                ಸ್ಥಿತಿ CV_8U:  ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str8u; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_8S:  ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str8s; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_Bool: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str_Bool; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_16U: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str16u; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_16S: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str16s; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_32U: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str32u; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_32S: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str32s; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_32F: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str32f; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_64F: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str64f; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_64U: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str64u; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_64S: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str64s; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_16F: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str16f; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_16BF: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str16bf; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_8F_E4M3FN:   ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str8f; ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ CV_8F_E4M3FNUZ: ಮೌಲ್ಯ_ಗಮ್ಯ_Str = &FormattedImpl::ಮೌಲ್ಯ_ಗಮ್ಯ_Str8fnuz; ನಿಲ್ಲಿಸು;
+                ಪೂರ್ವನಿಯೋಜಿತ:
+                    CV_Error_(Error::StsError, ("unsupported matrix type %d\n", mtx.ಆಳ()));
             }
         }
 
-        void reset() CV_OVERRIDE
+        ಶೂನ್ಯ reset() CV_OVERRIDE
         {
             state = STATE_PROLOGUE;
         }
 
-        const char* next() CV_OVERRIDE
+        ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* next() CV_OVERRIDE
         {
-            switch(state)
+            ಆಯ್ಕೆ(state)
             {
-                case STATE_PROLOGUE:
-                    row = 0;
-                    if (mtx.empty())
+                ಸ್ಥಿತಿ STATE_PROLOGUE:
+                    ಅಡ್ಡಸಾಲು = 0;
+                    ಆದರೆ (mtx.empty())
                         state = STATE_EPILOGUE;
-                    else if (alignOrder)
+                    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (align_ಕ್ರಮ)
                         state = STATE_INTERLUDE;
-                    else
-                        state = STATE_ROW_OPEN;
-                    return prologue.c_str();
-                case STATE_INTERLUDE:
-                    state = STATE_ROW_OPEN;
-                    if (row >= mtx.rows)
+                    ಇಲ್ಲದಿದ್ದರೆ
+                        state = STATE_ಅಡ್ಡಸಾಲು_OPEN;
+                    ಹಿಂತಿರುಗಿ prologue.c_str();
+                ಸ್ಥಿತಿ STATE_INTERLUDE:
+                    state = STATE_ಅಡ್ಡಸಾಲು_OPEN;
+                    ಆದರೆ (ಅಡ್ಡಸಾಲು >= mtx.ಅಡ್ಡಸಾಲುಗಳು)
                     {
-                        if (++cn >= mcn)
+                        ಆದರೆ (++cn >= mcn)
                         {
                             state = STATE_EPILOGUE;
                             buf[0] = 0;
-                            return buf;
+                            ಹಿಂತಿರುಗಿ buf;
                         }
-                        else
-                            row = 0;
-                        snprintf(buf, sizeof(buf), "\n(:, :, %d) = \n", cn+1);
-                        return buf;
+                        ಇಲ್ಲದಿದ್ದರೆ
+                            ಅಡ್ಡಸಾಲು = 0;
+                        snprintf(buf, ಗಾತ್ರ(buf), "\n(:, :, %d) = \n", cn+1);
+                        ಹಿಂತಿರುಗಿ buf;
                     }
-                    snprintf(buf, sizeof(buf), "(:, :, %d) = \n", cn+1);
-                    return buf;
-                case STATE_EPILOGUE:
-                    state = STATE_FINISHED;
-                    return epilogue.c_str();
-                case STATE_ROW_OPEN:
-                    col = 0;
+                    snprintf(buf, ಗಾತ್ರ(buf), "(:, :, %d) = \n", cn+1);
+                    ಹಿಂತಿರುಗಿ buf;
+                ಸ್ಥಿತಿ STATE_EPILOGUE:
+                    state = STATE_ಪೂರ್ಣಗೊಂಡ;
+                    ಹಿಂತಿರುಗಿ epilogue.c_str();
+                ಸ್ಥಿತಿ STATE_ಅಡ್ಡಸಾಲು_OPEN:
+                    ಲಂಬಸಾಲು = 0;
                     state = STATE_CN_OPEN;
                     {
                         size_t pos = 0;
-                        if (row > 0)
-                            while(pos < prologue.size() && pos < sizeof(buf) - 2)
+                        ಆದರೆ (ಅಡ್ಡಸಾಲು > 0)
+                            ಆಗ(pos < prologue.size() && pos < ಗಾತ್ರ(buf) - 2)
                                 buf[pos++] = ' ';
-                        if (braces[BRACE_ROW_OPEN])
-                            buf[pos++] = braces[BRACE_ROW_OPEN];
-                        if(!pos)
-                            return next();
+                        ಆದರೆ (braces[BRACE_ಅಡ್ಡಸಾಲು_OPEN])
+                            buf[pos++] = braces[BRACE_ಅಡ್ಡಸಾಲು_OPEN];
+                        ಆದರೆ(!pos)
+                            ಹಿಂತಿರುಗಿ next();
                         buf[pos] = 0;
                     }
-                    return buf;
-                case STATE_ROW_CLOSE:
-                    state = STATE_LINE_SEPARATOR;
-                    ++row;
-                    if (braces[BRACE_ROW_CLOSE])
+                    ಹಿಂತಿರುಗಿ buf;
+                ಸ್ಥಿತಿ STATE_ಅಡ್ಡಸಾಲು_CLOSE:
+                    state = STATE_ಸಾಲು_SEPARATOR;
+                    ++ಅಡ್ಡಸಾಲು;
+                    ಆದರೆ (braces[BRACE_ಅಡ್ಡಸಾಲು_CLOSE])
                     {
-                        buf[0] = braces[BRACE_ROW_CLOSE];
-                        buf[1] = row < mtx.rows ? ',' : '\0';
+                        buf[0] = braces[BRACE_ಅಡ್ಡಸಾಲು_CLOSE];
+                        buf[1] = ಅಡ್ಡಸಾಲು < mtx.ಅಡ್ಡಸಾಲುಗಳು ? ',' : '\0';
                         buf[2] = 0;
-                        return buf;
+                        ಹಿಂತಿರುಗಿ buf;
                     }
-                    else if(braces[BRACE_ROW_SEP] && row < mtx.rows)
+                    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(braces[BRACE_ಅಡ್ಡಸಾಲು_SEP] && ಅಡ್ಡಸಾಲು < mtx.ಅಡ್ಡಸಾಲುಗಳು)
                     {
-                        buf[0] = braces[BRACE_ROW_SEP];
+                        buf[0] = braces[BRACE_ಅಡ್ಡಸಾಲು_SEP];
                         buf[1] = 0;
-                        return buf;
+                        ಹಿಂತಿರುಗಿ buf;
                     }
-                    return next();
-                case STATE_CN_OPEN:
-                    state = STATE_VALUE;
-                    if (!alignOrder)
+                    ಹಿಂತಿರುಗಿ next();
+                ಸ್ಥಿತಿ STATE_CN_OPEN:
+                    state = STATE_ಮೌಲ್ಯ;
+                    ಆದರೆ (!align_ಕ್ರಮ)
                         cn = 0;
-                    if (mcn > 1 && braces[BRACE_CN_OPEN])
+                    ಆದರೆ (mcn > 1 && braces[BRACE_CN_OPEN])
                     {
                         buf[0] = braces[BRACE_CN_OPEN];
                         buf[1] = 0;
-                        return buf;
+                        ಹಿಂತಿರುಗಿ buf;
                     }
-                    return next();
-                case STATE_CN_CLOSE:
-                    ++col;
-                    if (col >= mtx.cols)
-                        state = STATE_ROW_CLOSE;
-                    else
+                    ಹಿಂತಿರುಗಿ next();
+                ಸ್ಥಿತಿ STATE_CN_CLOSE:
+                    ++ಲಂಬಸಾಲು;
+                    ಆದರೆ (ಲಂಬಸಾಲು >= mtx.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
+                        state = STATE_ಅಡ್ಡಸಾಲು_CLOSE;
+                    ಇಲ್ಲದಿದ್ದರೆ
                         state = STATE_CN_SEPARATOR;
-                    if (mcn > 1 && braces[BRACE_CN_CLOSE])
+                    ಆದರೆ (mcn > 1 && braces[BRACE_CN_CLOSE])
                     {
                         buf[0] = braces[BRACE_CN_CLOSE];
                         buf[1] = 0;
-                        return buf;
+                        ಹಿಂತಿರುಗಿ buf;
                     }
-                    return next();
-                case STATE_VALUE:
-                    (this->*valueToStr)();
+                    ಹಿಂತಿರುಗಿ next();
+                ಸ್ಥಿತಿ STATE_ಮೌಲ್ಯ:
+                    (ಇದು->*ಮೌಲ್ಯ_ಗಮ್ಯ_Str)();
                     state = STATE_CN_CLOSE;
-                    if (alignOrder)
-                        return buf;
-                    if (++cn < mcn)
-                        state = STATE_VALUE_SEPARATOR;
-                    return buf;
-                case STATE_FINISHED:
-                    return 0;
-                case STATE_LINE_SEPARATOR:
-                    if (row >= mtx.rows)
+                    ಆದರೆ (align_ಕ್ರಮ)
+                        ಹಿಂತಿರುಗಿ buf;
+                    ಆದರೆ (++cn < mcn)
+                        state = STATE_ಮೌಲ್ಯ_SEPARATOR;
+                    ಹಿಂತಿರುಗಿ buf;
+                ಸ್ಥಿತಿ STATE_ಪೂರ್ಣಗೊಂಡ:
+                    ಹಿಂತಿರುಗಿ 0;
+                ಸ್ಥಿತಿ STATE_ಸಾಲು_SEPARATOR:
+                    ಆದರೆ (ಅಡ್ಡಸಾಲು >= mtx.ಅಡ್ಡಸಾಲುಗಳು)
                     {
-                        if (alignOrder)
+                        ಆದರೆ (align_ಕ್ರಮ)
                             state = STATE_INTERLUDE;
-                        else
+                        ಇಲ್ಲದಿದ್ದರೆ
                             state = STATE_EPILOGUE;
-                        return next();
+                        ಹಿಂತಿರುಗಿ next();
                     }
-                    state = STATE_ROW_OPEN;
-                    buf[0] = singleLine ? ' ' : '\n';
+                    state = STATE_ಅಡ್ಡಸಾಲು_OPEN;
+                    buf[0] = single_ಸಾಲು ? ' ' : '\n';
                     buf[1] = 0;
-                    return buf;
-                case STATE_CN_SEPARATOR:
+                    ಹಿಂತಿರುಗಿ buf;
+                ಸ್ಥಿತಿ STATE_CN_SEPARATOR:
                     state = STATE_CN_OPEN;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
-                case STATE_VALUE_SEPARATOR:
-                    state = STATE_VALUE;
+                    ಹಿಂತಿರುಗಿ buf;
+                ಸ್ಥಿತಿ STATE_ಮೌಲ್ಯ_SEPARATOR:
+                    state = STATE_ಮೌಲ್ಯ;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    ಹಿಂತಿರುಗಿ buf;
             }
-            return 0;
+            ಹಿಂತಿರುಗಿ 0;
         }
     };
 
-    class FormatterBase : public Formatter
+    ವರ್ಗ Formatter_ತಳ : ಸಾರ್ವಜನಿಕ Formatter
     {
-    public:
-        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(true) {}
+    ಸಾರ್ವಜನಿಕ:
+        Formatter_ತಳ() : prec16f(4), prec32f(8), prec64f(16), multiline(ನಿಜ) {}
 
-        void set16fPrecision(int p) CV_OVERRIDE
+        ಶೂನ್ಯ set16fPrecision(ಪೂರ್ಣಾಂಕ p) CV_OVERRIDE
         {
             prec16f = p;
         }
 
-        void set32fPrecision(int p) CV_OVERRIDE
+        ಶೂನ್ಯ set32fPrecision(ಪೂರ್ಣಾಂಕ p) CV_OVERRIDE
         {
             prec32f = p;
         }
 
-        void set64fPrecision(int p) CV_OVERRIDE
+        ಶೂನ್ಯ set64fPrecision(ಪೂರ್ಣಾಂಕ p) CV_OVERRIDE
         {
             prec64f = p;
         }
 
-        void setMultiline(bool ml) CV_OVERRIDE
+        ಶೂನ್ಯ ಗಣ_Multiline(ತಾರ್ಕಿಕ ml) CV_OVERRIDE
         {
             multiline = ml;
         }
 
-    protected:
-        int prec16f;
-        int prec32f;
-        int prec64f;
-        int multiline;
+    ಸಂರಕ್ಷಿತ:
+        ಪೂರ್ಣಾಂಕ prec16f;
+        ಪೂರ್ಣಾಂಕ prec32f;
+        ಪೂರ್ಣಾಂಕ prec64f;
+        ಪೂರ್ಣಾಂಕ multiline;
     };
 
-    class DefaultFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ DefaultFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ Formatter_ತಳ
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಸ್ಥಿರಾಂಕ Mat& mtx) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ಅಕ್ಷರ braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            ಹಿಂತಿರುಗಿ makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.ಅಡ್ಡಸಾಲುಗಳು == 1 || !multiline, ಸುಳ್ಳು, mtx.ಆಳ() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class MatlabFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ MatlabFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ Formatter_ತಳ
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಸ್ಥಿರಾಂಕ Mat& mtx) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("", "", mtx, &*braces,
-                mtx.rows == 1 || !multiline, true, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ಅಕ್ಷರ braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            ಹಿಂತಿರುಗಿ makePtr<FormattedImpl>("", "", mtx, &*braces,
+                mtx.ಅಡ್ಡಸಾಲುಗಳು == 1 || !multiline, ನಿಜ, mtx.ಆಳ() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class PythonFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ PythonFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ Formatter_ತಳ
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಸ್ಥಿರಾಂಕ Mat& mtx) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
         {
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            ಅಕ್ಷರ braces[5] = {'[', ']', ',', '[', ']'};
+            ಆದರೆ (mtx.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ಹಿಂತಿರುಗಿ makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.ಅಡ್ಡಸಾಲುಗಳು == 1 || !multiline, ಸುಳ್ಳು, mtx.ಆಳ() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class NumpyFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ NumpyFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ Formatter_ತಳ
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಸ್ಥಿರಾಂಕ Mat& mtx) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
         {
-            static const char* numpyTypes[CV_DEPTH_MAX] =
+            ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* numpyTypes[CV_ಆಳ_MAX] =
             {
                 "uint8", "int8", "uint16", "int16", "int32", "float32", "float64",
                 "float16", "bfloat16", "bool", "uint64", "int64", "uint32",
                 "float8_e4m3fn", "float8_e4m3fnuz"
             };
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            ಅಕ್ಷರ braces[5] = {'[', ']', ',', '[', ']'};
+            ಆದರೆ (mtx.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("array([",
-                cv::format("], dtype='%s')", numpyTypes[mtx.depth()]), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ಹಿಂತಿರುಗಿ makePtr<FormattedImpl>("array([",
+                cv::format("], dtype='%s')", numpyTypes[mtx.ಆಳ()]), mtx, &*braces,
+                mtx.ಅಡ್ಡಸಾಲುಗಳು == 1 || !multiline, ಸುಳ್ಳು, mtx.ಆಳ() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CSVFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ CSVFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ Formatter_ತಳ
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಸ್ಥಿರಾಂಕ Mat& mtx) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', '\0', '\0', '\0'};
-            return makePtr<FormattedImpl>(String(),
-                mtx.rows > 1 ? String("\n") : String(), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ಅಕ್ಷರ braces[5] = {'\0', '\0', '\0', '\0', '\0'};
+            ಹಿಂತಿರುಗಿ makePtr<FormattedImpl>(String(),
+                mtx.ಅಡ್ಡಸಾಲುಗಳು > 1 ? String("\n") : String(), mtx, &*braces,
+                mtx.ಅಡ್ಡಸಾಲುಗಳು == 1 || !multiline, ಸುಳ್ಳು, mtx.ಆಳ() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ CFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ Formatter_ತಳ
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಸ್ಥಿರಾಂಕ Mat& mtx) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ',', '\0', '\0'};
-            return makePtr<FormattedImpl>("{", "}", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ಅಕ್ಷರ braces[5] = {'\0', '\0', ',', '\0', '\0'};
+            ಹಿಂತಿರುಗಿ makePtr<FormattedImpl>("{", "}", mtx, &*braces,
+                mtx.ಅಡ್ಡಸಾಲುಗಳು == 1 || !multiline, ಸುಳ್ಳು, mtx.ಆಳ() == CV_64F ? prec64f : prec32f );
         }
     };
 
@@ -391,219 +391,219 @@ namespace cv
 
     Ptr<Formatter> Formatter::get(Formatter::FormatType fmt)
     {
-        switch(fmt)
+        ಆಯ್ಕೆ(fmt)
         {
-            case FMT_DEFAULT:
-                return makePtr<DefaultFormatter>();
-            case FMT_MATLAB:
-                return makePtr<MatlabFormatter>();
-            case FMT_CSV:
-                return makePtr<CSVFormatter>();
-            case FMT_PYTHON:
-                return makePtr<PythonFormatter>();
-            case FMT_NUMPY:
-                return makePtr<NumpyFormatter>();
-            case FMT_C:
-                return makePtr<CFormatter>();
+            ಸ್ಥಿತಿ FMT_DEFAULT:
+                ಹಿಂತಿರುಗಿ makePtr<DefaultFormatter>();
+            ಸ್ಥಿತಿ FMT_MATLAB:
+                ಹಿಂತಿರುಗಿ makePtr<MatlabFormatter>();
+            ಸ್ಥಿತಿ FMT_CSV:
+                ಹಿಂತಿರುಗಿ makePtr<CSVFormatter>();
+            ಸ್ಥಿತಿ FMT_PYTHON:
+                ಹಿಂತಿರುಗಿ makePtr<PythonFormatter>();
+            ಸ್ಥಿತಿ FMT_NUMPY:
+                ಹಿಂತಿರುಗಿ makePtr<NumpyFormatter>();
+            ಸ್ಥಿತಿ FMT_C:
+                ಹಿಂತಿರುಗಿ makePtr<CFormatter>();
         }
-        return makePtr<DefaultFormatter>();
+        ಹಿಂತಿರುಗಿ makePtr<DefaultFormatter>();
     }
 
-    template<typename _Tp> struct Fmt
+    ಮಾದರಿ<ಬಗೆ_ಹೆಸರು _Tp> ರಚನೆ Fmt
     {
-        typedef int temp_type;
-        static const char* fmt() { return "%d"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%d"; }
     };
 
-    template<> struct Fmt<uint32_t>
+    ಮಾದರಿ<> ರಚನೆ Fmt<uint32_t>
     {
-        typedef unsigned temp_type;
-        static const char* fmt() { return "%u"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%u"; }
     };
 
-    template<> struct Fmt<int64_t>
+    ಮಾದರಿ<> ರಚನೆ Fmt<int64_t>
     {
-        typedef long long temp_type;
-        static const char* fmt() { return "%lld"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದೀರ್ಘ ದೀರ್ಘ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%lld"; }
     };
 
-    template<> struct Fmt<uint64_t>
+    ಮಾದರಿ<> ರಚನೆ Fmt<uint64_t>
     {
-        typedef unsigned long long temp_type;
-        static const char* fmt() { return "%llu"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ದೀರ್ಘ ದೀರ್ಘ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%llu"; }
     };
 
-    template<> struct Fmt<float>
+    ಮಾದರಿ<> ರಚನೆ Fmt<ದಶಮಾಂಶ>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದಶಮಾಂಶ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%.5g"; }
     };
 
-    template<> struct Fmt<double>
+    ಮಾದರಿ<> ರಚನೆ Fmt<ದ್ವಿಗುಣ>
     {
-        typedef double temp_type;
-        static const char* fmt() { return "%.5g"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದ್ವಿಗುಣ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%.5g"; }
     };
 
-    template<> struct Fmt<hfloat>
+    ಮಾದರಿ<> ರಚನೆ Fmt<hfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದಶಮಾಂಶ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%.5g"; }
     };
 
-    template<> struct Fmt<bfloat>
+    ಮಾದರಿ<> ರಚನೆ Fmt<bfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದಶಮಾಂಶ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%.4g"; }
     };
 
-    template<> struct Fmt<fp8_t>
+    ಮಾದರಿ<> ರಚನೆ Fmt<fp8_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದಶಮಾಂಶ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%.4g"; }
     };
 
-    template<> struct Fmt<fp8a_t>
+    ಮಾದರಿ<> ರಚನೆ Fmt<fp8a_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದಶಮಾಂಶ ತಾತ್ಕಾಲಿಕ_type;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt() { ಹಿಂತಿರುಗಿ "%.4g"; }
     };
 
-    template <typename _Tp>
-    static void pprintRow(std::ostream& strm, const _Tp* ptr, int n, size_t ofs, int edge)
+    ಮಾದರಿ <ಬಗೆ_ಹೆಸರು _Tp>
+    ಸ್ಥಿರ ಶೂನ್ಯ pprint_ಅಡ್ಡಸಾಲು(std::ostream& strm, ಸ್ಥಿರಾಂಕ _Tp* ptr, ಪೂರ್ಣಾಂಕ n, size_t ofs, ಪೂರ್ಣಾಂಕ ಅಂಚು)
     {
-        char buf[128];
-        const char* fmt = Fmt<_Tp>::fmt();
-        int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-        if (edge == 0)
-            edge = ndump;
-        for (i = 0; i < ndump; i++) {
-            int j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
-            if (i > 0)
+        ಅಕ್ಷರ buf[128];
+        ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt = Fmt<_Tp>::fmt();
+        ಪೂರ್ಣಾಂಕ i, ndump = ಅಂಚು > 0 ? std::min(n, ಅಂಚು*2+1) : n;
+        ಆದರೆ (ಅಂಚು == 0)
+            ಅಂಚು = ndump;
+        ಗಾಗಿ (i = 0; i < ndump; i++) {
+            ಪೂರ್ಣಾಂಕ j = n == ndump || i < ಅಂಚು ? i : i == ಅಂಚು ? -1 : n-ಅಂಚು*2-1+i;
+            ಆದರೆ (i > 0)
                 strm << ", ";
-            if (j >= 0) {
-                snprintf(buf, sizeof(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
+            ಆದರೆ (j >= 0) {
+                snprintf(buf, ಗಾತ್ರ(buf), fmt, (ಬಗೆ_ಹೆಸರು Fmt<_Tp>::ತಾತ್ಕಾಲಿಕ_type)ptr[ofs + j]);
                 strm << buf;
-            } else
+            } ಇಲ್ಲದಿದ್ದರೆ
                 strm << "... ";
         }
     }
 
-    static void pprintSlice(std::ostream& strm, const Mat& tensor,
-                            const size_t* step, int d,
-                            size_t ofs, int edge)
+    ಸ್ಥಿರ ಶೂನ್ಯ pprint_ತುಂಡು(std::ostream& strm, ಸ್ಥಿರಾಂಕ Mat& tensor,
+                            ಸ್ಥಿರಾಂಕ size_t* ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ d,
+                            size_t ofs, ಪೂರ್ಣಾಂಕ ಅಂಚು)
     {
         MatShape shape = tensor.shape();
-        int ndims = shape.dims;
-        int n = d >= ndims ? 1 : shape[d];
-        if (d >= ndims - 1) {
-            int typ = tensor.depth();
-            void* data = tensor.data;
-            CV_Assert(data);
+        ಪೂರ್ಣಾಂಕ ndims = shape.dims;
+        ಪೂರ್ಣಾಂಕ n = d >= ndims ? 1 : shape[d];
+        ಆದರೆ (d >= ndims - 1) {
+            ಪೂರ್ಣಾಂಕ typ = tensor.ಆಳ();
+            ಶೂನ್ಯ* ದತ್ತಾಂಶ = tensor.ದತ್ತಾಂಶ;
+            CV_Assert(ದತ್ತಾಂಶ);
             n *= tensor.channels();
-            if (typ == CV_8U)
-                pprintRow(strm, (const uint8_t*)data, n, ofs, edge);
-            else if (typ == CV_8S)
-                pprintRow(strm, (const int8_t*)data, n, ofs, edge);
-            else if (typ == CV_16U)
-                pprintRow(strm, (const uint16_t*)data, n, ofs, edge);
-            else if (typ == CV_16S)
-                pprintRow(strm, (const int16_t*)data, n, ofs, edge);
-            else if (typ == CV_32U)
-                pprintRow(strm, (const unsigned*)data, n, ofs, edge);
-            else if (typ == CV_32S)
-                pprintRow(strm, (const int*)data, n, ofs, edge);
-            else if (typ == CV_64U)
-                pprintRow(strm, (const uint64_t*)data, n, ofs, edge);
-            else if (typ == CV_64S)
-                pprintRow(strm, (const int64_t*)data, n, ofs, edge);
-            else if (typ == CV_32F)
-                pprintRow(strm, (const float*)data, n, ofs, edge);
-            else if (typ == CV_64F)
-                pprintRow(strm, (const double*)data, n, ofs, edge);
-            else if (typ == CV_16F)
-                pprintRow(strm, (const hfloat*)data, n, ofs, edge);
-            else if (typ == CV_16BF)
-                pprintRow(strm, (const bfloat*)data, n, ofs, edge);
-            else if (typ == CV_Bool)
-                pprintRow(strm, (const bool*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FN)
-                pprintRow(strm, (const fp8_t*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FNUZ)
-                pprintRow(strm, (const fp8a_t*)data, n, ofs, edge);
-            else {
+            ಆದರೆ (typ == CV_8U)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ uint8_t*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_8S)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ int8_t*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_16U)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ uint16_t*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_16S)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ int16_t*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_32U)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_32S)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_64U)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ uint64_t*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_64S)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ int64_t*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_32F)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_64F)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_16F)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ hfloat*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_16BF)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ bfloat*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_Bool)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_8F_E4M3FN)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ fp8_t*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typ == CV_8F_E4M3FNUZ)
+                pprint_ಅಡ್ಡಸಾಲು(strm, (ಸ್ಥಿರಾಂಕ fp8a_t*)ದತ್ತಾಂಶ, n, ofs, ಅಂಚು);
+            ಇಲ್ಲದಿದ್ದರೆ {
                 CV_Error(Error::StsNotImplemented, "unsupported type");
             }
-        } else {
-            int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-            bool dots = false;
-            for (i = 0; i < ndump; i++) {
-                if (i > 0 && !dots) {
-                    int nempty_lines = ndims - 2 - d;
-                    for (int k = 0; k < nempty_lines; k++)
+        } ಇಲ್ಲದಿದ್ದರೆ {
+            ಪೂರ್ಣಾಂಕ i, ndump = ಅಂಚು > 0 ? std::min(n, ಅಂಚು*2+1) : n;
+            ತಾರ್ಕಿಕ dots = ಸುಳ್ಳು;
+            ಗಾಗಿ (i = 0; i < ndump; i++) {
+                ಆದರೆ (i > 0 && !dots) {
+                    ಪೂರ್ಣಾಂಕ nempty_ಸಾಲುಗಳು = ndims - 2 - d;
+                    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k < nempty_ಸಾಲುಗಳು; k++)
                         strm << "\n";
                 }
-                if (i > 0)
+                ಆದರೆ (i > 0)
                     strm << "\n";
-                int j = n == ndump || i < edge ? i :
-                        i == edge ? -1 :
-                        n - edge*2 - 1 + i;
+                ಪೂರ್ಣಾಂಕ j = n == ndump || i < ಅಂಚು ? i :
+                        i == ಅಂಚು ? -1 :
+                        n - ಅಂಚು*2 - 1 + i;
                 dots = j < 0;
-                if (!dots)
-                    pprintSlice(strm, tensor, step, d+1, ofs + j*step[d], edge);
-                else
+                ಆದರೆ (!dots)
+                    pprint_ತುಂಡು(strm, tensor, ಹೆಜ್ಜೆ, d+1, ofs + j*ಹೆಜ್ಜೆ[d], ಅಂಚು);
+                ಇಲ್ಲದಿದ್ದರೆ
                     strm << "...";
             }
         }
     }
 
-    std::ostream& pprint(std::ostream& strm, InputArray array,
-                         int /*indent*/, int edge_,
-                         int wholeTensorThreshold,
-                         char parens)
+    std::ostream& pprint(std::ostream& strm, ಒಳಹರಿವು_Array array,
+                         ಪೂರ್ಣಾಂಕ /*indent*/, ಪೂರ್ಣಾಂಕ ಅಂಚು_2,
+                         ಪೂರ್ಣಾಂಕ ಸಂಪೂರ್ಣ_Tensor_ಮಿತಿ,
+                         ಅಕ್ಷರ parens)
     {
-        char oparen = parens;
-        char cparen = parens == '(' ? ')' :
+        ಅಕ್ಷರ oparen = parens;
+        ಅಕ್ಷರ cparen = parens == '(' ? ')' :
                       parens == '[' ? ']' :
                       parens == '{' ? '}' :
                       parens == '<' ? '>' :
                       parens;
-        int edge = edge_ > 0 ? edge_ : 3;
-        wholeTensorThreshold = wholeTensorThreshold > 0 ? wholeTensorThreshold : 100;
+        ಪೂರ್ಣಾಂಕ ಅಂಚು = ಅಂಚು_2 > 0 ? ಅಂಚು_2 : 3;
+        ಸಂಪೂರ್ಣ_Tensor_ಮಿತಿ = ಸಂಪೂರ್ಣ_Tensor_ಮಿತಿ > 0 ? ಸಂಪೂರ್ಣ_Tensor_ಮಿತಿ : 100;
 
         Mat tensor = array.getMat();
-        if (!tensor.isContinuous()) {
+        ಆದರೆ (!tensor.isContinuous()) {
             // [TODO] print non-continous arrays without copy
-            Mat temp;
-            tensor.copyTo(temp);
-            tensor = temp;
+            Mat ತಾತ್ಕಾಲಿಕ_2;
+            tensor.copy_ಗಮ್ಯ(ತಾತ್ಕಾಲಿಕ_2);
+            tensor = ತಾತ್ಕಾಲಿಕ_2;
         }
 
         MatShape shape = tensor.shape();
-        size_t sz_all = tensor.total();
+        size_t sz_all = tensor.ಒಟ್ಟು();
 
-        if (parens)
+        ಆದರೆ (parens)
             strm << oparen;
-        if (sz_all == 0) {
-            if (!parens)
+        ಆದರೆ (sz_all == 0) {
+            ಆದರೆ (!parens)
                 strm << "<empty>";
-        } else {
-            if (sz_all <= (size_t)wholeTensorThreshold)
-                edge = 0;
+        } ಇಲ್ಲದಿದ್ದರೆ {
+            ಆದರೆ (sz_all <= (size_t)ಸಂಪೂರ್ಣ_Tensor_ಮಿತಿ)
+                ಅಂಚು = 0;
 
-            int ndims = shape.dims;
-            int cn = tensor.channels();
-            size_t step[MatShape::MAX_DIMS];
-            step[std::max(ndims-1, 0)] = 1;
-            for (int i = ndims-2; i >= 0; i--) {
-                step[i] = step[i+1]*shape[i+1]*cn;
+            ಪೂರ್ಣಾಂಕ ndims = shape.dims;
+            ಪೂರ್ಣಾಂಕ cn = tensor.channels();
+            size_t ಹೆಜ್ಜೆ[MatShape::MAX_DIMS];
+            ಹೆಜ್ಜೆ[std::max(ndims-1, 0)] = 1;
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = ndims-2; i >= 0; i--) {
+                ಹೆಜ್ಜೆ[i] = ಹೆಜ್ಜೆ[i+1]*shape[i+1]*cn;
                 cn = 1;
             }
-            pprintSlice(strm, tensor, step, 0, 0, edge);
+            pprint_ತುಂಡು(strm, tensor, ಹೆಜ್ಜೆ, 0, 0, ಅಂಚು);
         }
-        if (parens)
+        ಆದರೆ (parens)
             strm << cparen;
-        return strm;
+        ಹಿಂತಿರುಗಿ strm;
     }
 
 } // cv

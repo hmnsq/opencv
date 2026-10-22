@@ -3,41 +3,41 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#ifndef SRC_STAT_HPP
-#define SRC_STAT_HPP
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ SRC_STAT_HPP
+#ವ್ಯಾಖ್ಯಾನಿಸು SRC_STAT_HPP
 
-#include "opencv2/core/mat.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/mat.hpp"
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
-                     InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+ಎಣಿಕೆ { OCL_OP_ಮೊತ್ತ = 0, OCL_OP_ಮೊತ್ತ_ABS =  1, OCL_OP_ಮೊತ್ತ_SQR = 2 };
+ತಾರ್ಕಿಕ ocl_ಮೊತ್ತ( ಒಳಹರಿವು_Array _src, Scalar & res, ಪೂರ್ಣಾಂಕ ಮೊತ್ತ_op, ಒಳಹರಿವು_Array ಮುಖವಾಡ_2 = noArray(),
+                     ಒಳಹರಿವು_Array _src2 = noArray(), ತಾರ್ಕಿಕ calc2 = ಸುಳ್ಳು, ಸ್ಥಿರಾಂಕ Scalar & res2 = Scalar() );
+ತಾರ್ಕಿಕ ocl_minMaxIdx( ಒಳಹರಿವು_Array _src, ದ್ವಿಗುಣ* minVal, ದ್ವಿಗುಣ* maxVal, ಪೂರ್ಣಾಂಕ* minLoc, ಪೂರ್ಣಾಂಕ* maxLoc, ಒಳಹರಿವು_Array ಮುಖವಾಡ_2,
+                           ಪೂರ್ಣಾಂಕ ddepth = -1, ತಾರ್ಕಿಕ abs_ಮೌಲ್ಯಗಳು = ಸುಳ್ಳು, ಒಳಹರಿವು_Array _src2 = noArray(), ದ್ವಿಗುಣ * maxVal2 = ಖಾಲಿ);
 
-template <typename T> Scalar ocl_part_sum(Mat m)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T> Scalar ocl_part_ಮೊತ್ತ(Mat m)
 {
-    CV_Assert(m.rows == 1);
+    CV_Assert(m.ಅಡ್ಡಸಾಲುಗಳು == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
-    const T * const ptr = m.ptr<T>(0);
+    ಪೂರ್ಣಾಂಕ cn = m.channels();
+    ಸ್ಥಿರಾಂಕ T * ಸ್ಥಿರಾಂಕ ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ x = 0, w = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * cn; x < w; )
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    ಹಿಂತಿರುಗಿ s;
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ (*ಮೊತ್ತ_Func)(ಸ್ಥಿರಾಂಕ uchar*, ಸ್ಥಿರಾಂಕ uchar* ಮುಖವಾಡ, uchar*, ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ);
+ಮೊತ್ತ_Func get_ಮೊತ್ತ_Func(ಪೂರ್ಣಾಂಕ ಆಳ);
 
 }
 
-#endif // SRC_STAT_HPP
+#ಆದರೆ_ಅಂತ್ಯ // SRC_STAT_HPP

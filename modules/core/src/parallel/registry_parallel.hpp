@@ -2,24 +2,24 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_PARALLEL_REGISTRY_HPP
-#define OPENCV_CORE_PARALLEL_REGISTRY_HPP
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_CORE_PARALLEL_REGISTRY_HPP
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENCV_CORE_PARALLEL_REGISTRY_HPP
 
-#include "factory_parallel.hpp"
+#ಅನ್ತರ್ಭಾವ "factory_parallel.hpp"
 
-namespace cv { namespace parallel {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ parallel {
 
-struct ParallelBackendInfo
+ರಚನೆ ParallelBackendInfo
 {
-    int priority;     // 1000-<index*10> - default builtin priority
+    ಪೂರ್ಣಾಂಕ ಆದ್ಯತೆ;     // 1000-<index*10> - default builtin priority
                       // 0 - disabled (OPENCV_PARALLEL_PRIORITY_<name> = 0)
                       // >10000 - prioritized list (OPENCV_PARALLEL_PRIORITY_LIST)
     std::string name;
     std::shared_ptr<IParallelBackendFactory> backendFactory;
 };
 
-const std::vector<ParallelBackendInfo>& getParallelBackendsInfo();
+ಸ್ಥಿರಾಂಕ std::vector<ParallelBackendInfo>& getParallelBackendsInfo();
 
 }} // namespace
 
-#endif // OPENCV_CORE_PARALLEL_REGISTRY_HPP
+#ಆದರೆ_ಅಂತ್ಯ // OPENCV_CORE_PARALLEL_REGISTRY_HPP

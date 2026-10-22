@@ -41,515 +41,515 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+ಬಳಸಿ ನಾಮಾಕಾಶ cv;
+ಬಳಸಿ ನಾಮಾಕಾಶ cv::cuda;
 
-void cv::cuda::GpuMat::updateContinuityFlag()
+ಶೂನ್ಯ cv::cuda::GpuMat::updateContinuityFlag()
 {
-    int sz[] = { rows, cols };
-    size_t steps[] = { step, elemSize() };
-    flags = cv::updateContinuityFlag(flags, 2, sz, steps);
+    ಪೂರ್ಣಾಂಕ sz[] = { ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ };
+    size_t ಹೆಜ್ಜೆಗಳು[] = { ಹೆಜ್ಜೆ, elem_ಗಾತ್ರ() };
+    flags = cv::updateContinuityFlag(flags, 2, sz, ಹೆಜ್ಜೆಗಳು);
 }
 
-cv::cuda::GpuMat::GpuMat(int rows_, int cols_, int type_, void* data_, size_t step_) :
-    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(rows_), cols(cols_),
-    step(step_), data((uchar*)data_), refcount(0),
-    datastart((uchar*)data_), dataend((const uchar*)data_),
+cv::cuda::GpuMat::GpuMat(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_2, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_2, ಪೂರ್ಣಾಂಕ type_, ಶೂನ್ಯ* ದತ್ತಾಂಶ_2, size_t ಹೆಜ್ಜೆ_2) :
+    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_ಮುಖವಾಡ)), ಅಡ್ಡಸಾಲುಗಳು(ಅಡ್ಡಸಾಲುಗಳು_2), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_2),
+    ಹೆಜ್ಜೆ(ಹೆಜ್ಜೆ_2), ದತ್ತಾಂಶ((uchar*)ದತ್ತಾಂಶ_2), refcount(0),
+    datastart((uchar*)ದತ್ತಾಂಶ_2), dataend((ಸ್ಥಿರಾಂಕ uchar*)ದತ್ತಾಂಶ_2),
     allocator(defaultAllocator())
 {
-    size_t minstep = cols * elemSize();
+    size_t minstep = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * elem_ಗಾತ್ರ();
 
-    if (step == Mat::AUTO_STEP)
+    ಆದರೆ (ಹೆಜ್ಜೆ == Mat::AUTO_ಹೆಜ್ಜೆ)
     {
-        step = minstep;
+        ಹೆಜ್ಜೆ = minstep;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if (rows == 1)
-            step = minstep;
+        ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು == 1)
+            ಹೆಜ್ಜೆ = minstep;
 
-        CV_DbgAssert( step >= minstep );
+        CV_DbgAssert( ಹೆಜ್ಜೆ >= minstep );
     }
 
-    dataend += step * (rows - 1) + minstep;
+    dataend += ಹೆಜ್ಜೆ * (ಅಡ್ಡಸಾಲುಗಳು - 1) + minstep;
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(Size size_, int type_, void* data_, size_t step_) :
-    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(size_.height), cols(size_.width),
-    step(step_), data((uchar*)data_), refcount(0),
-    datastart((uchar*)data_), dataend((const uchar*)data_),
+cv::cuda::GpuMat::GpuMat(ಗಾತ್ರ_2 ಗಾತ್ರ_4, ಪೂರ್ಣಾಂಕ type_, ಶೂನ್ಯ* ದತ್ತಾಂಶ_2, size_t ಹೆಜ್ಜೆ_2) :
+    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_ಮುಖವಾಡ)), ಅಡ್ಡಸಾಲುಗಳು(ಗಾತ್ರ_4.ಎತ್ತರ), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(ಗಾತ್ರ_4.ಅಗಲ),
+    ಹೆಜ್ಜೆ(ಹೆಜ್ಜೆ_2), ದತ್ತಾಂಶ((uchar*)ದತ್ತಾಂಶ_2), refcount(0),
+    datastart((uchar*)ದತ್ತಾಂಶ_2), dataend((ಸ್ಥಿರಾಂಕ uchar*)ದತ್ತಾಂಶ_2),
     allocator(defaultAllocator())
 {
-    size_t minstep = cols * elemSize();
+    size_t minstep = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * elem_ಗಾತ್ರ();
 
-    if (step == Mat::AUTO_STEP)
+    ಆದರೆ (ಹೆಜ್ಜೆ == Mat::AUTO_ಹೆಜ್ಜೆ)
     {
-        step = minstep;
+        ಹೆಜ್ಜೆ = minstep;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if (rows == 1)
-            step = minstep;
+        ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು == 1)
+            ಹೆಜ್ಜೆ = minstep;
 
-        CV_DbgAssert( step >= minstep );
+        CV_DbgAssert( ಹೆಜ್ಜೆ >= minstep );
     }
 
-    dataend += step * (rows - 1) + minstep;
+    dataend += ಹೆಜ್ಜೆ * (ಅಡ್ಡಸಾಲುಗಳು - 1) + minstep;
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(const GpuMat& m, Range rowRange_, Range colRange_)
+cv::cuda::GpuMat::GpuMat(ಸ್ಥಿರಾಂಕ GpuMat& m, Range ಅಡ್ಡಸಾಲು_Range, Range ಲಂಬಸಾಲು_Range)
 {
     flags = m.flags;
-    step = m.step; refcount = m.refcount;
-    data = m.data; datastart = m.datastart; dataend = m.dataend;
+    ಹೆಜ್ಜೆ = m.ಹೆಜ್ಜೆ; refcount = m.refcount;
+    ದತ್ತಾಂಶ = m.ದತ್ತಾಂಶ; datastart = m.datastart; dataend = m.dataend;
     allocator = m.allocator;
 
-    if (rowRange_ == Range::all())
+    ಆದರೆ (ಅಡ್ಡಸಾಲು_Range == Range::all())
     {
-        rows = m.rows;
+        ಅಡ್ಡಸಾಲುಗಳು = m.ಅಡ್ಡಸಾಲುಗಳು;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        CV_Assert( 0 <= rowRange_.start && rowRange_.start <= rowRange_.end && rowRange_.end <= m.rows );
+        CV_Assert( 0 <= ಅಡ್ಡಸಾಲು_Range.ಆರಂಭ && ಅಡ್ಡಸಾಲು_Range.ಆರಂಭ <= ಅಡ್ಡಸಾಲು_Range.end && ಅಡ್ಡಸಾಲು_Range.end <= m.ಅಡ್ಡಸಾಲುಗಳು );
 
-        rows = rowRange_.size();
-        data += step*rowRange_.start;
-    }
-
-    if (colRange_ == Range::all())
-    {
-        cols = m.cols;
-    }
-    else
-    {
-        CV_Assert( 0 <= colRange_.start && colRange_.start <= colRange_.end && colRange_.end <= m.cols );
-
-        cols = colRange_.size();
-        data += colRange_.start*elemSize();
+        ಅಡ್ಡಸಾಲುಗಳು = ಅಡ್ಡಸಾಲು_Range.size();
+        ದತ್ತಾಂಶ += ಹೆಜ್ಜೆ*ಅಡ್ಡಸಾಲು_Range.ಆರಂಭ;
     }
 
-    if (refcount)
+    ಆದರೆ (ಲಂಬಸಾಲು_Range == Range::all())
+    {
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    }
+    ಇಲ್ಲದಿದ್ದರೆ
+    {
+        CV_Assert( 0 <= ಲಂಬಸಾಲು_Range.ಆರಂಭ && ಲಂಬಸಾಲು_Range.ಆರಂಭ <= ಲಂಬಸಾಲು_Range.end && ಲಂಬಸಾಲು_Range.end <= m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ );
+
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_Range.size();
+        ದತ್ತಾಂಶ += ಲಂಬಸಾಲು_Range.ಆರಂಭ*elem_ಗಾತ್ರ();
+    }
+
+    ಆದರೆ (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
-        rows = cols = 0;
+    ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು <= 0 || ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ <= 0)
+        ಅಡ್ಡಸಾಲುಗಳು = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 0;
 
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(const GpuMat& m, Rect roi) :
-    flags(m.flags), rows(roi.height), cols(roi.width),
-    step(m.step), data(m.data + roi.y*step), refcount(m.refcount),
+cv::cuda::GpuMat::GpuMat(ಸ್ಥಿರಾಂಕ GpuMat& m, Rect roi) :
+    flags(m.flags), ಅಡ್ಡಸಾಲುಗಳು(roi.ಎತ್ತರ), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(roi.ಅಗಲ),
+    ಹೆಜ್ಜೆ(m.ಹೆಜ್ಜೆ), ದತ್ತಾಂಶ(m.ದತ್ತಾಂಶ + roi.y*ಹೆಜ್ಜೆ), refcount(m.refcount),
     datastart(m.datastart), dataend(m.dataend),
     allocator(m.allocator)
 {
-    data += roi.x * elemSize();
+    ದತ್ತಾಂಶ += roi.x * elem_ಗಾತ್ರ();
 
-    CV_Assert( 0 <= roi.x && 0 <= roi.width &&
-               roi.x + roi.width <= m.cols &&
-               0 <= roi.y && 0 <= roi.height &&
-               roi.y + roi.height <= m.rows );
+    CV_Assert( 0 <= roi.x && 0 <= roi.ಅಗಲ &&
+               roi.x + roi.ಅಗಲ <= m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ &&
+               0 <= roi.y && 0 <= roi.ಎತ್ತರ &&
+               roi.y + roi.ಎತ್ತರ <= m.ಅಡ್ಡಸಾಲುಗಳು );
 
-    if (refcount)
+    ಆದರೆ (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
-        rows = cols = 0;
+    ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು <= 0 || ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ <= 0)
+        ಅಡ್ಡಸಾಲುಗಳು = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 0;
     updateContinuityFlag();
 }
 
-GpuMat cv::cuda::GpuMat::reshape(int new_cn, int new_rows) const
+GpuMat cv::cuda::GpuMat::reshape(ಪೂರ್ಣಾಂಕ new_cn, ಪೂರ್ಣಾಂಕ new_ಅಡ್ಡಸಾಲುಗಳು) ಸ್ಥಿರಾಂಕ
 {
-    GpuMat hdr = *this;
+    GpuMat hdr = *ಇದು;
 
-    int cn = channels();
-    if (new_cn == 0)
+    ಪೂರ್ಣಾಂಕ cn = channels();
+    ಆದರೆ (new_cn == 0)
         new_cn = cn;
 
-    int total_width = cols * cn;
+    ಪೂರ್ಣಾಂಕ ಒಟ್ಟು_ಅಗಲ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * cn;
 
-    if ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
-        new_rows = rows * total_width / new_cn;
+    ಆದರೆ ((new_cn > ಒಟ್ಟು_ಅಗಲ || ಒಟ್ಟು_ಅಗಲ % new_cn != 0) && new_ಅಡ್ಡಸಾಲುಗಳು == 0)
+        new_ಅಡ್ಡಸಾಲುಗಳು = ಅಡ್ಡಸಾಲುಗಳು * ಒಟ್ಟು_ಅಗಲ / new_cn;
 
-    if (new_rows != 0 && new_rows != rows)
+    ಆದರೆ (new_ಅಡ್ಡಸಾಲುಗಳು != 0 && new_ಅಡ್ಡಸಾಲುಗಳು != ಅಡ್ಡಸಾಲುಗಳು)
     {
-        int total_size = total_width * rows;
+        ಪೂರ್ಣಾಂಕ ಒಟ್ಟು_ಗಾತ್ರ_2 = ಒಟ್ಟು_ಅಗಲ * ಅಡ್ಡಸಾಲುಗಳು;
 
-        if (!isContinuous())
-            CV_Error(cv::Error::BadStep, "The matrix is not continuous, thus its number of rows can not be changed");
+        ಆದರೆ (!isContinuous())
+            CV_Error(cv::Error::Bad_ಹೆಜ್ಜೆ, "The matrix is not continuous, thus its number of rows can not be changed");
 
-        if ((unsigned)new_rows > (unsigned)total_size)
-            CV_Error(cv::Error::StsOutOfRange, "Bad new number of rows");
+        ಆದರೆ ((ಚಿಹ್ನೆರಹಿತ)new_ಅಡ್ಡಸಾಲುಗಳು > (ಚಿಹ್ನೆರಹಿತ)ಒಟ್ಟು_ಗಾತ್ರ_2)
+            CV_Error(cv::Error::Sts_ಹೊರಹೋಗು_ದ_Range, "Bad new number of rows");
 
-        total_width = total_size / new_rows;
+        ಒಟ್ಟು_ಅಗಲ = ಒಟ್ಟು_ಗಾತ್ರ_2 / new_ಅಡ್ಡಸಾಲುಗಳು;
 
-        if (total_width * new_rows != total_size)
+        ಆದರೆ (ಒಟ್ಟು_ಅಗಲ * new_ಅಡ್ಡಸಾಲುಗಳು != ಒಟ್ಟು_ಗಾತ್ರ_2)
             CV_Error(cv::Error::StsBadArg, "The total number of matrix elements is not divisible by the new number of rows");
 
-        hdr.rows = new_rows;
-        hdr.step = total_width * elemSize1();
+        hdr.ಅಡ್ಡಸಾಲುಗಳು = new_ಅಡ್ಡಸಾಲುಗಳು;
+        hdr.ಹೆಜ್ಜೆ = ಒಟ್ಟು_ಅಗಲ * elemSize1();
     }
 
-    int new_width = total_width / new_cn;
+    ಪೂರ್ಣಾಂಕ new_ಅಗಲ = ಒಟ್ಟು_ಅಗಲ / new_cn;
 
-    if (new_width * new_cn != total_width)
-        CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
+    ಆದರೆ (new_ಅಗಲ * new_cn != ಒಟ್ಟು_ಅಗಲ)
+        CV_Error(cv::Error::Bad_ಅಂಕೆ_Channels, "The total width is not divisible by the new number of channels");
 
-    hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
+    hdr.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = new_ಅಗಲ;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_ಮುಖವಾಡ) | ((new_cn - 1) << CV_CN_ಸರಿಸು);
 
-    return hdr;
+    ಹಿಂತಿರುಗಿ hdr;
 }
 
-void cv::cuda::GpuMat::locateROI(Size& wholeSize, Point& ofs) const
+ಶೂನ್ಯ cv::cuda::GpuMat::locateROI(ಗಾತ್ರ_2& ಸಂಪೂರ್ಣ_ಗಾತ್ರ, ಬಿಂದು& ofs) ಸ್ಥಿರಾಂಕ
 {
-    CV_DbgAssert( step > 0 );
+    CV_DbgAssert( ಹೆಜ್ಜೆ > 0 );
 
-    size_t esz = elemSize();
-    ptrdiff_t delta1 = data - datastart;
+    size_t esz = elem_ಗಾತ್ರ();
+    ptrdiff_t delta1 = ದತ್ತಾಂಶ - datastart;
     ptrdiff_t delta2 = dataend - datastart;
 
-    if (delta1 == 0)
+    ಆದರೆ (delta1 == 0)
     {
         ofs.x = ofs.y = 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        ofs.y = static_cast<int>(delta1 / step);
-        ofs.x = static_cast<int>((delta1 - step * ofs.y) / esz);
+        ofs.y = static_cast<ಪೂರ್ಣಾಂಕ>(delta1 / ಹೆಜ್ಜೆ);
+        ofs.x = static_cast<ಪೂರ್ಣಾಂಕ>((delta1 - ಹೆಜ್ಜೆ * ofs.y) / esz);
 
-        CV_DbgAssert( data == datastart + ofs.y * step + ofs.x * esz );
+        CV_DbgAssert( ದತ್ತಾಂಶ == datastart + ofs.y * ಹೆಜ್ಜೆ + ofs.x * esz );
     }
 
-    size_t minstep = (ofs.x + cols) * esz;
+    size_t minstep = (ofs.x + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) * esz;
 
-    wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / step + 1), ofs.y + rows);
-    wholeSize.width = std::max(static_cast<int>((delta2 - step * (wholeSize.height - 1)) / esz), ofs.x + cols);
+    ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ = std::max(static_cast<ಪೂರ್ಣಾಂಕ>((delta2 - minstep) / ಹೆಜ್ಜೆ + 1), ofs.y + ಅಡ್ಡಸಾಲುಗಳು);
+    ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಅಗಲ = std::max(static_cast<ಪೂರ್ಣಾಂಕ>((delta2 - ಹೆಜ್ಜೆ * (ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ - 1)) / esz), ofs.x + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 }
 
-GpuMat& cv::cuda::GpuMat::adjustROI(int dtop, int dbottom, int dleft, int dright)
+GpuMat& cv::cuda::GpuMat::adjustROI(ಪೂರ್ಣಾಂಕ dtop, ಪೂರ್ಣಾಂಕ dbottom, ಪೂರ್ಣಾಂಕ dleft, ಪೂರ್ಣಾಂಕ dright)
 {
-    Size wholeSize;
-    Point ofs;
-    locateROI(wholeSize, ofs);
+    ಗಾತ್ರ_2 ಸಂಪೂರ್ಣ_ಗಾತ್ರ;
+    ಬಿಂದು ofs;
+    locateROI(ಸಂಪೂರ್ಣ_ಗಾತ್ರ, ofs);
 
-    size_t esz = elemSize();
+    size_t esz = elem_ಗಾತ್ರ();
 
-    int row1 = std::max(ofs.y - dtop, 0);
-    int row2 = std::min(ofs.y + rows + dbottom, wholeSize.height);
+    ಪೂರ್ಣಾಂಕ row1 = std::max(ofs.y - dtop, 0);
+    ಪೂರ್ಣಾಂಕ row2 = std::min(ofs.y + ಅಡ್ಡಸಾಲುಗಳು + dbottom, ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ);
 
-    int col1 = std::max(ofs.x - dleft, 0);
-    int col2 = std::min(ofs.x + cols + dright, wholeSize.width);
+    ಪೂರ್ಣಾಂಕ col1 = std::max(ofs.x - dleft, 0);
+    ಪೂರ್ಣಾಂಕ col2 = std::min(ofs.x + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ + dright, ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಅಗಲ);
 
-    data += (row1 - ofs.y) * step + (col1 - ofs.x) * esz;
-    rows = row2 - row1;
-    cols = col2 - col1;
+    ದತ್ತಾಂಶ += (row1 - ofs.y) * ಹೆಜ್ಜೆ + (col1 - ofs.x) * esz;
+    ಅಡ್ಡಸಾಲುಗಳು = row2 - row1;
+    ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = col2 - col1;
 
     updateContinuityFlag();
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-namespace
+ನಾಮಾಕಾಶ
 {
-    template <class ObjType>
-    void createContinuousImpl(int rows, int cols, int type, ObjType& obj)
+    ಮಾದರಿ <ವರ್ಗ ObjType>
+    ಶೂನ್ಯ createContinuousImpl(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಪೂರ್ಣಾಂಕ type, ObjType& obj)
     {
-        const int area = rows * cols;
+        ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ area = ಅಡ್ಡಸಾಲುಗಳು * ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-        if (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
+        ಆದರೆ (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
             obj.create(1, area, type);
 
-        obj = obj.reshape(obj.channels(), rows);
+        obj = obj.reshape(obj.channels(), ಅಡ್ಡಸಾಲುಗಳು);
     }
 }
 
-void cv::cuda::createContinuous(int rows, int cols, int type, OutputArray arr)
+ಶೂನ್ಯ cv::cuda::createContinuous(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಪೂರ್ಣಾಂಕ type, OutputArray arr)
 {
-    switch (arr.kind())
+    ಆಯ್ಕೆ (arr.ಬಗೆ())
     {
-    case _InputArray::MAT:
-        ::createContinuousImpl(rows, cols, type, arr.getMatRef());
-        break;
+    ಸ್ಥಿತಿ ಒಳಹರಿವು_Array_2::MAT:
+        ::createContinuousImpl(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type, arr.getMatRef());
+        ನಿಲ್ಲಿಸು;
 
-    case _InputArray::CUDA_GPU_MAT:
-        ::createContinuousImpl(rows, cols, type, arr.getGpuMatRef());
-        break;
+    ಸ್ಥಿತಿ ಒಳಹರಿವು_Array_2::CUDA_GPU_MAT:
+        ::createContinuousImpl(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type, arr.getGpuMatRef());
+        ನಿಲ್ಲಿಸು;
 
-    case _InputArray::CUDA_HOST_MEM:
-        ::createContinuousImpl(rows, cols, type, arr.getHostMemRef());
-        break;
+    ಸ್ಥಿತಿ ಒಳಹರಿವು_Array_2::CUDA_HOST_MEM:
+        ::createContinuousImpl(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type, arr.getHostMemRef());
+        ನಿಲ್ಲಿಸು;
 
-    default:
-        arr.create(rows, cols, type);
+    ಪೂರ್ವನಿಯೋಜಿತ:
+        arr.create(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type);
     }
 }
 
-namespace
+ನಾಮಾಕಾಶ
 {
-    template <class ObjType>
-    void ensureSizeIsEnoughImpl(int rows, int cols, int type, ObjType& obj)
+    ಮಾದರಿ <ವರ್ಗ ObjType>
+    ಶೂನ್ಯ ensure_ಗಾತ್ರ_Is_Enough_Impl(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಪೂರ್ಣಾಂಕ type, ObjType& obj)
     {
-        if (obj.empty() || obj.type() != type || obj.data != obj.datastart)
+        ಆದರೆ (obj.empty() || obj.type() != type || obj.ದತ್ತಾಂಶ != obj.datastart)
         {
-            obj.create(rows, cols, type);
+            obj.create(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            const size_t esz = obj.elemSize();
-            const ptrdiff_t delta2 = obj.dataend - obj.datastart;
+            ಸ್ಥಿರಾಂಕ size_t esz = obj.elem_ಗಾತ್ರ();
+            ಸ್ಥಿರಾಂಕ ptrdiff_t delta2 = obj.dataend - obj.datastart;
 
-            const size_t minstep = obj.cols * esz;
+            ಸ್ಥಿರಾಂಕ size_t minstep = obj.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * esz;
 
-            Size wholeSize;
-            wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / static_cast<size_t>(obj.step) + 1), obj.rows);
-            wholeSize.width = std::max(static_cast<int>((delta2 - static_cast<size_t>(obj.step) * (wholeSize.height - 1)) / esz), obj.cols);
+            ಗಾತ್ರ_2 ಸಂಪೂರ್ಣ_ಗಾತ್ರ;
+            ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ = std::max(static_cast<ಪೂರ್ಣಾಂಕ>((delta2 - minstep) / static_cast<size_t>(obj.ಹೆಜ್ಜೆ) + 1), obj.ಅಡ್ಡಸಾಲುಗಳು);
+            ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಅಗಲ = std::max(static_cast<ಪೂರ್ಣಾಂಕ>((delta2 - static_cast<size_t>(obj.ಹೆಜ್ಜೆ) * (ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ - 1)) / esz), obj.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 
-            if (wholeSize.height < rows || wholeSize.width < cols)
+            ಆದರೆ (ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ < ಅಡ್ಡಸಾಲುಗಳು || ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಅಗಲ < ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
             {
-                obj.create(rows, cols, type);
+                obj.create(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type);
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                obj.cols = cols;
-                obj.rows = rows;
+                obj.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+                obj.ಅಡ್ಡಸಾಲುಗಳು = ಅಡ್ಡಸಾಲುಗಳು;
             }
         }
     }
 }
 
-void cv::cuda::ensureSizeIsEnough(int rows, int cols, int type, OutputArray arr)
+ಶೂನ್ಯ cv::cuda::ensure_ಗಾತ್ರ_Is_Enough(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಪೂರ್ಣಾಂಕ type, OutputArray arr)
 {
-    switch (arr.kind())
+    ಆಯ್ಕೆ (arr.ಬಗೆ())
     {
-    case _InputArray::MAT:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getMatRef());
-        break;
+    ಸ್ಥಿತಿ ಒಳಹರಿವು_Array_2::MAT:
+        ::ensure_ಗಾತ್ರ_Is_Enough_Impl(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type, arr.getMatRef());
+        ನಿಲ್ಲಿಸು;
 
-    case _InputArray::CUDA_GPU_MAT:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getGpuMatRef());
-        break;
+    ಸ್ಥಿತಿ ಒಳಹರಿವು_Array_2::CUDA_GPU_MAT:
+        ::ensure_ಗಾತ್ರ_Is_Enough_Impl(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type, arr.getGpuMatRef());
+        ನಿಲ್ಲಿಸು;
 
-    case _InputArray::CUDA_HOST_MEM:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getHostMemRef());
-        break;
+    ಸ್ಥಿತಿ ಒಳಹರಿವು_Array_2::CUDA_HOST_MEM:
+        ::ensure_ಗಾತ್ರ_Is_Enough_Impl(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type, arr.getHostMemRef());
+        ನಿಲ್ಲಿಸು;
 
-    default:
-        arr.create(rows, cols, type);
+    ಪೂರ್ವನಿಯೋಜಿತ:
+        arr.create(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type);
     }
 }
 
-GpuMat cv::cuda::getInputMat(InputArray _src, Stream& stream)
+GpuMat cv::cuda::get_ಒಳಹರಿವು_Mat(ಒಳಹರಿವು_Array _src, ಹರಿವು& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(_src);
-    CV_UNUSED(stream);
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_CUDA
+    CV_ಬಳಸದ(_src);
+    CV_ಬಳಸದ(stream);
     throw_no_cuda();
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     GpuMat src;
-    if (_src.kind() == _InputArray::CUDA_GPU_MAT)
+    ಆದರೆ (_src.ಬಗೆ() == ಒಳಹರಿವು_Array_2::CUDA_GPU_MAT)
     {
         src = _src.getGpuMat();
     }
-    else if (!_src.empty())
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (!_src.empty())
     {
-        BufferPool pool(stream);
-        src = pool.getBuffer(_src.size(), _src.type());
+        ಬಫರ್_Pool pool(stream);
+        src = pool.get_ಬಫರ್(_src.size(), _src.type());
         src.upload(_src, stream);
     }
-    return src;
-#endif
+    ಹಿಂತಿರುಗಿ src;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-GpuMat cv::cuda::getOutputMat(OutputArray _dst, int rows, int cols, int type, Stream& stream)
+GpuMat cv::cuda::getOutputMat(OutputArray _dst, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಪೂರ್ಣಾಂಕ type, ಹರಿವು& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(_dst);
-    CV_UNUSED(rows);
-    CV_UNUSED(cols);
-    CV_UNUSED(type);
-    CV_UNUSED(stream);
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_CUDA
+    CV_ಬಳಸದ(_dst);
+    CV_ಬಳಸದ(ಅಡ್ಡಸಾಲುಗಳು);
+    CV_ಬಳಸದ(ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+    CV_ಬಳಸದ(type);
+    CV_ಬಳಸದ(stream);
     throw_no_cuda();
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
     GpuMat dst;
-    if (_dst.kind() == _InputArray::CUDA_GPU_MAT)
+    ಆದರೆ (_dst.ಬಗೆ() == ಒಳಹರಿವು_Array_2::CUDA_GPU_MAT)
     {
-        _dst.create(rows, cols, type);
+        _dst.create(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type);
         dst = _dst.getGpuMat();
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        BufferPool pool(stream);
-        dst = pool.getBuffer(rows, cols, type);
+        ಬಫರ್_Pool pool(stream);
+        dst = pool.get_ಬಫರ್(ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type);
     }
-    return dst;
-#endif
+    ಹಿಂತಿರುಗಿ dst;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-void cv::cuda::syncOutput(const GpuMat& dst, OutputArray _dst, Stream& stream)
+ಶೂನ್ಯ cv::cuda::syncOutput(ಸ್ಥಿರಾಂಕ GpuMat& dst, OutputArray _dst, ಹರಿವು& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(dst);
-    CV_UNUSED(_dst);
-    CV_UNUSED(stream);
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_CUDA
+    CV_ಬಳಸದ(dst);
+    CV_ಬಳಸದ(_dst);
+    CV_ಬಳಸದ(stream);
     throw_no_cuda();
-#else
-    if (_dst.kind() != _InputArray::CUDA_GPU_MAT)
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ (_dst.ಬಗೆ() != ಒಳಹರಿವು_Array_2::CUDA_GPU_MAT)
     {
-        if (stream)
+        ಆದರೆ (stream)
             dst.download(_dst, stream);
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
             dst.download(_dst);
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#ifndef HAVE_CUDA
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ HAVE_CUDA
 
 GpuMat::Allocator* cv::cuda::GpuMat::defaultAllocator()
 {
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-void cv::cuda::GpuMat::setDefaultAllocator(Allocator* allocator)
+ಶೂನ್ಯ cv::cuda::GpuMat::ಗಣ_Default_Allocator(Allocator* allocator)
 {
-    CV_UNUSED(allocator);
+    CV_ಬಳಸದ(allocator);
     throw_no_cuda();
 }
 
 GpuMat::Allocator* cv::cuda::GpuMat::getStdAllocator()
 {
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-void cv::cuda::GpuMat::create(int _rows, int _cols, int _type)
+ಶೂನ್ಯ cv::cuda::GpuMat::create(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_3, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, ಪೂರ್ಣಾಂಕ _type)
 {
-    CV_UNUSED(_rows);
-    CV_UNUSED(_cols);
-    CV_UNUSED(_type);
+    CV_ಬಳಸದ(ಅಡ್ಡಸಾಲುಗಳು_3);
+    CV_ಬಳಸದ(ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3);
+    CV_ಬಳಸದ(_type);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::release()
+ಶೂನ್ಯ cv::cuda::GpuMat::release()
 {
-    if( refcount && CV_XADD(refcount, -1) == 1 )
-        defaultAllocator()->free(this);
-    dataend = datastart = data = 0;
-    step = 0;
+    ಆದರೆ( refcount && CV_XADD(refcount, -1) == 1 )
+        defaultAllocator()->ಬಿಡುಗಡೆ(ಇದು);
+    dataend = datastart = ದತ್ತಾಂಶ = 0;
+    ಹೆಜ್ಜೆ = 0;
     refcount = 0;
-    flags &= ~Mat::MAGIC_MASK;
+    flags &= ~Mat::MAGIC_ಮುಖವಾಡ;
 }
 
-void cv::cuda::GpuMat::fit(int _rows, int _cols, int _type)
+ಶೂನ್ಯ cv::cuda::GpuMat::fit(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_3, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, ಪೂರ್ಣಾಂಕ _type)
 {
     // Emulate Mat::fit semantics for GPU: avoid reallocation when possible
-    size_t oldTotalBytes = (datastart && dataend) ? (size_t)(dataend - datastart) : 0;
-    size_t esz = CV_ELEM_SIZE(_type);
-    size_t newTotalBytes = (size_t)_rows * (size_t)_cols * esz;
+    size_t old_ಒಟ್ಟು_ಬೈಟುಗಳು = (datastart && dataend) ? (size_t)(dataend - datastart) : 0;
+    size_t esz = CV_ELEM_ಗಾತ್ರ(_type);
+    size_t new_ಒಟ್ಟು_ಬೈಟುಗಳು = (size_t)ಅಡ್ಡಸಾಲುಗಳು_3 * (size_t)ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3 * esz;
 
     // Reallocate if:
     // - need non-contiguous layout (GPU pitch) or ROI, or
     // - requested bytes exceed current capacity, or
     // - data pointer is not at the start (ROI)
-    if (newTotalBytes > 0 && (!isContinuous() || newTotalBytes > oldTotalBytes || data != datastart))
+    ಆದರೆ (new_ಒಟ್ಟು_ಬೈಟುಗಳು > 0 && (!isContinuous() || new_ಒಟ್ಟು_ಬೈಟುಗಳು > old_ಒಟ್ಟು_ಬೈಟುಗಳು || ದತ್ತಾಂಶ != datastart))
     {
-        create(_rows, _cols, _type);
-        return;
+        create(ಅಡ್ಡಸಾಲುಗಳು_3, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, _type);
+        ಹಿಂತಿರುಗಿ;
     }
 
     // Reuse existing allocation, just adjust header/type
-    flags = (flags & ~Mat::TYPE_MASK) | CV_MAKETYPE(CV_MAT_DEPTH(_type), CV_MAT_CN(_type));
-    rows = _rows;
-    cols = _cols;
-    step = (size_t)cols * esz;
+    flags = (flags & ~Mat::TYPE_ಮುಖವಾಡ) | CV_MAKETYPE(CV_MAT_ಆಳ(_type), CV_MAT_CN(_type));
+    ಅಡ್ಡಸಾಲುಗಳು = ಅಡ್ಡಸಾಲುಗಳು_3;
+    ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3;
+    ಹೆಜ್ಜೆ = (size_t)ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * esz;
 }
 
-void cv::cuda::GpuMat::fit(Size _sz, int _type)
+ಶೂನ್ಯ cv::cuda::GpuMat::fit(ಗಾತ್ರ_2 _sz, ಪೂರ್ಣಾಂಕ _type)
 {
-    fit(_sz.height, _sz.width, _type);
+    fit(_sz.ಎತ್ತರ, _sz.ಅಗಲ, _type);
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr)
+ಶೂನ್ಯ cv::cuda::GpuMat::upload(ಒಳಹರಿವು_Array arr)
 {
-    CV_UNUSED(arr);
+    CV_ಬಳಸದ(arr);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr, Stream& _stream)
+ಶೂನ್ಯ cv::cuda::GpuMat::upload(ಒಳಹರಿವು_Array arr, ಹರಿವು& ಹರಿವು_2)
 {
-    CV_UNUSED(arr);
-    CV_UNUSED(_stream);
+    CV_ಬಳಸದ(arr);
+    CV_ಬಳಸದ(ಹರಿವು_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::download(OutputArray _dst) const
+ಶೂನ್ಯ cv::cuda::GpuMat::download(OutputArray _dst) ಸ್ಥಿರಾಂಕ
 {
-    CV_UNUSED(_dst);
+    CV_ಬಳಸದ(_dst);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::download(OutputArray _dst, Stream& _stream) const
+ಶೂನ್ಯ cv::cuda::GpuMat::download(OutputArray _dst, ಹರಿವು& ಹರಿವು_2) ಸ್ಥಿರಾಂಕ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_stream);
+    CV_ಬಳಸದ(_dst);
+    CV_ಬಳಸದ(ಹರಿವು_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst) const
+ಶೂನ್ಯ cv::cuda::GpuMat::copy_ಗಮ್ಯ(OutputArray _dst) ಸ್ಥಿರಾಂಕ
 {
-    CV_UNUSED(_dst);
+    CV_ಬಳಸದ(_dst);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst, Stream& _stream) const
+ಶೂನ್ಯ cv::cuda::GpuMat::copy_ಗಮ್ಯ(OutputArray _dst, ಹರಿವು& ಹರಿವು_2) ಸ್ಥಿರಾಂಕ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_stream);
+    CV_ಬಳಸದ(_dst);
+    CV_ಬಳಸದ(ಹರಿವು_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst, InputArray _mask, Stream& _stream) const
+ಶೂನ್ಯ cv::cuda::GpuMat::copy_ಗಮ್ಯ(OutputArray _dst, ಒಳಹರಿವು_Array ಮುಖವಾಡ_2, ಹರಿವು& ಹರಿವು_2) ಸ್ಥಿರಾಂಕ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_mask);
-    CV_UNUSED(_stream);
+    CV_ಬಳಸದ(_dst);
+    CV_ಬಳಸದ(ಮುಖವಾಡ_2);
+    CV_ಬಳಸದ(ಹರಿವು_2);
     throw_no_cuda();
 }
 
-GpuMat& cv::cuda::GpuMat::setTo(Scalar s, Stream& _stream)
+GpuMat& cv::cuda::GpuMat::ಗಣ_ಗಮ್ಯ(Scalar s, ಹರಿವು& ಹರಿವು_2)
 {
-    CV_UNUSED(s);
-    CV_UNUSED(_stream);
+    CV_ಬಳಸದ(s);
+    CV_ಬಳಸದ(ಹರಿವು_2);
     throw_no_cuda();
 }
 
-GpuMat& cv::cuda::GpuMat::setTo(Scalar s, InputArray _mask, Stream& _stream)
+GpuMat& cv::cuda::GpuMat::ಗಣ_ಗಮ್ಯ(Scalar s, ಒಳಹರಿವು_Array ಮುಖವಾಡ_2, ಹರಿವು& ಹರಿವು_2)
 {
-    CV_UNUSED(s);
-    CV_UNUSED(_mask);
-    CV_UNUSED(_stream);
+    CV_ಬಳಸದ(s);
+    CV_ಬಳಸದ(ಮುಖವಾಡ_2);
+    CV_ಬಳಸದ(ಹರಿವು_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, Stream& _stream) const
+ಶೂನ್ಯ cv::cuda::GpuMat::convert_ಗಮ್ಯ(OutputArray _dst, ಪೂರ್ಣಾಂಕ rtype, ಹರಿವು& ಹರಿವು_2) ಸ್ಥಿರಾಂಕ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(rtype);
-    CV_UNUSED(_stream);
+    CV_ಬಳಸದ(_dst);
+    CV_ಬಳಸದ(rtype);
+    CV_ಬಳಸದ(ಹರಿವು_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, double alpha, double beta, Stream& _stream) const
+ಶೂನ್ಯ cv::cuda::GpuMat::convert_ಗಮ್ಯ(OutputArray _dst, ಪೂರ್ಣಾಂಕ rtype, ದ್ವಿಗುಣ alpha, ದ್ವಿಗುಣ beta, ಹರಿವು& ಹರಿವು_2) ಸ್ಥಿರಾಂಕ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(rtype);
-    CV_UNUSED(alpha);
-    CV_UNUSED(beta);
-    CV_UNUSED(_stream);
+    CV_ಬಳಸದ(_dst);
+    CV_ಬಳಸದ(rtype);
+    CV_ಬಳಸದ(alpha);
+    CV_ಬಳಸದ(beta);
+    CV_ಬಳಸದ(ಹರಿವು_2);
     throw_no_cuda();
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

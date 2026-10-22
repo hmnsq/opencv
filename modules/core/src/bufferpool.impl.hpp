@@ -4,25 +4,25 @@
 //
 // Copyright (C) 2014, Advanced Micro Devices, Inc., all rights reserved.
 
-#ifndef __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
-#define __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#ವ್ಯಾಖ್ಯಾನಿಸು __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
 
-#include "opencv2/core/bufferpool.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/bufferpool.hpp"
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-class DummyBufferPoolController : public BufferPoolController
+ವರ್ಗ Dummy_ಬಫರ್_Pool_Controller : ಸಾರ್ವಜನಿಕ ಬಫರ್_Pool_Controller
 {
-public:
-    DummyBufferPoolController() { }
-    virtual ~DummyBufferPoolController() { }
+ಸಾರ್ವಜನಿಕ:
+    Dummy_ಬಫರ್_Pool_Controller() { }
+    ವಾಸ್ತವಿಕ ~Dummy_ಬಫರ್_Pool_Controller() { }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual void setMaxReservedSize(size_t size) CV_OVERRIDE { CV_UNUSED(size); }
-    virtual void freeAllReservedBuffers() CV_OVERRIDE { }
+    ವಾಸ್ತವಿಕ size_t get_Reserved_ಗಾತ್ರ() ಸ್ಥಿರಾಂಕ CV_OVERRIDE { ಹಿಂತಿರುಗಿ (size_t)-1; }
+    ವಾಸ್ತವಿಕ size_t get_Max_Reserved_ಗಾತ್ರ() ಸ್ಥಿರಾಂಕ CV_OVERRIDE { ಹಿಂತಿರುಗಿ (size_t)-1; }
+    ವಾಸ್ತವಿಕ ಶೂನ್ಯ ಗಣ_Max_Reserved_ಗಾತ್ರ(size_t size) CV_OVERRIDE { CV_ಬಳಸದ(size); }
+    ವಾಸ್ತವಿಕ ಶೂನ್ಯ freeAllReservedBuffers() CV_OVERRIDE { }
 };
 
 } // namespace
 
-#endif // __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#ಆದರೆ_ಅಂತ್ಯ // __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__

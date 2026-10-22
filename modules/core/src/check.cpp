@@ -2,205 +2,205 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-#include <sstream>
+#ಅನ್ತರ್ಭಾವ <sstream>
 
-#include "opencv2/core/check.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/check.hpp"
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-const char* depthToString(int depth)
+ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* ಆಳ_ಗಮ್ಯ_String(ಪೂರ್ಣಾಂಕ ಆಳ)
 {
-    const char* s = detail::depthToString_(depth);
-    return s ? s : "<invalid depth>";
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* s = detail::ಆಳ_ಗಮ್ಯ_String_2(ಆಳ);
+    ಹಿಂತಿರುಗಿ s ? s : "<invalid depth>";
 }
 
-cv::String typeToString(int type)
+cv::String type_ಗಮ್ಯ_String(ಪೂರ್ಣಾಂಕ type)
 {
-    cv::String s = detail::typeToString_(type);
-    if (s.empty())
+    cv::String s = detail::type_ಗಮ್ಯ_String_2(type);
+    ಆದರೆ (s.empty())
     {
-        static cv::String invalidType("<invalid type>");
-        return invalidType;
+        ಸ್ಥಿರ cv::String invalidType("<invalid type>");
+        ಹಿಂತಿರುಗಿ invalidType;
     }
-    return s;
+    ಹಿಂತಿರುಗಿ s;
 }
 
 
-namespace detail {
+ನಾಮಾಕಾಶ detail {
 
-static const char* getTestOpPhraseStr(unsigned testOp)
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* getTestOpPhraseStr(ಚಿಹ್ನೆರಹಿತ testOp)
 {
-    static const char* _names[] = { "{custom check}", "equal to", "not equal to", "less than or equal to", "less than", "greater than or equal to", "greater than" };
-    CV_DbgAssert(testOp < CV__LAST_TEST_OP);
-    return testOp < CV__LAST_TEST_OP ? _names[testOp] : "???";
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* ಹೆಸರುಗಳು[] = { "{custom check}", "equal to", "not equal to", "less than or equal to", "less than", "greater than or equal to", "greater than" };
+    CV_DbgAssert(testOp < CV_ಕೊನೆಯ_TEST_OP);
+    ಹಿಂತಿರುಗಿ testOp < CV_ಕೊನೆಯ_TEST_OP ? ಹೆಸರುಗಳು[testOp] : "???";
 }
-static const char* getTestOpMath(unsigned testOp)
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* getTestOpMath(ಚಿಹ್ನೆರಹಿತ testOp)
 {
-    static const char* _names[] = { "???", "==", "!=", "<=", "<", ">=", ">" };
-    CV_DbgAssert(testOp < CV__LAST_TEST_OP);
-    return testOp < CV__LAST_TEST_OP ? _names[testOp] : "???";
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* ಹೆಸರುಗಳು[] = { "???", "==", "!=", "<=", "<", ">=", ">" };
+    CV_DbgAssert(testOp < CV_ಕೊನೆಯ_TEST_OP);
+    ಹಿಂತಿರುಗಿ testOp < CV_ಕೊನೆಯ_TEST_OP ? ಹೆಸರುಗಳು[testOp] : "???";
 }
 
-const char* depthToString_(int depth)
+ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* ಆಳ_ಗಮ್ಯ_String_2(ಪೂರ್ಣಾಂಕ ಆಳ)
 {
-    static const char* depthNames[] = { "CV_8U", "CV_8S", "CV_16U", "CV_16S", "CV_32S", "CV_32F", "CV_64F", "CV_16F",
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* ಆಳ_ಹೆಸರುಗಳು[] = { "CV_8U", "CV_8S", "CV_16U", "CV_16S", "CV_32S", "CV_32F", "CV_64F", "CV_16F",
                                         "CV_16BF", "CV_Bool", "CV_64U", "CV_64S", "CV_32U",
                                         "CV_8F", "CV_8FNUZ" };
-    return (depth < CV_DEPTH_CURR_MAX && depth >= 0) ? depthNames[depth] : NULL;
+    ಹಿಂತಿರುಗಿ (ಆಳ < CV_ಆಳ_CURR_MAX && ಆಳ >= 0) ? ಆಳ_ಹೆಸರುಗಳು[ಆಳ] : ಖಾಲಿ;
 }
 
-cv::String typeToString_(int type)
+cv::String type_ಗಮ್ಯ_String_2(ಪೂರ್ಣಾಂಕ type)
 {
-    int depth = CV_MAT_DEPTH(type);
-    int cn = CV_MAT_CN(type);
-    if (depth >= 0 && depth < CV_DEPTH_CURR_MAX)
-        return cv::format("%sC%d", depthToString_(depth), cn);
-    return cv::String();
+    ಪೂರ್ಣಾಂಕ ಆಳ = CV_MAT_ಆಳ(type);
+    ಪೂರ್ಣಾಂಕ cn = CV_MAT_CN(type);
+    ಆದರೆ (ಆಳ >= 0 && ಆಳ < CV_ಆಳ_CURR_MAX)
+        ಹಿಂತಿರುಗಿ cv::format("%sC%d", ಆಳ_ಗಮ್ಯ_String_2(ಆಳ), cn);
+    ಹಿಂತಿರುಗಿ cv::String();
 }
 
-template<typename T> static CV_NORETURN
-void check_failed_auto_(const T& v1, const T& v2, const CheckContext& ctx)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ CV_NORETURN
+ಶೂನ್ಯ check_failed_auto_(ಸ್ಥಿರಾಂಕ T& v1, ಸ್ಥಿರಾಂಕ T& v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v1 << std::endl;
-    if (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
+    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "    '" << ctx.p1_str << "' is " << v1 << std::ಸಾಲು_ಅಂತ್ಯ;
+    ಆದರೆ (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV_ಕೊನೆಯ_TEST_OP)
     {
-        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
+        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::ಸಾಲು_ಅಂತ್ಯ;
     }
     ss  << "    '" << ctx.p2_str << "' is " << v2;
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.ಸಾಲು);
 }
-void check_failed_MatDepth(const int v1, const int v2, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_Mat_ಆಳ(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v1, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v1 << " (" << depthToString(v1) << ")" << std::endl;
-    if (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
+    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "    '" << ctx.p1_str << "' is " << v1 << " (" << ಆಳ_ಗಮ್ಯ_String(v1) << ")" << std::ಸಾಲು_ಅಂತ್ಯ;
+    ಆದರೆ (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV_ಕೊನೆಯ_TEST_OP)
     {
-        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
+        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::ಸಾಲು_ಅಂತ್ಯ;
     }
-    ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << depthToString(v2) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << ಆಳ_ಗಮ್ಯ_String(v2) << ")";
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.ಸಾಲು);
 }
-void check_failed_MatType(const int v1, const int v2, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_MatType(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v1, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v1 << " (" << typeToString(v1) << ")" << std::endl;
-    if (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
+    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "    '" << ctx.p1_str << "' is " << v1 << " (" << type_ಗಮ್ಯ_String(v1) << ")" << std::ಸಾಲು_ಅಂತ್ಯ;
+    ಆದರೆ (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV_ಕೊನೆಯ_TEST_OP)
     {
-        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
+        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::ಸಾಲು_ಅಂತ್ಯ;
     }
-    ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << typeToString(v2) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << type_ಗಮ್ಯ_String(v2) << ")";
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.ಸಾಲು);
 }
-void check_failed_MatChannels(const int v1, const int v2, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_MatChannels(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v1, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_<int>(v1, v2, ctx);
+    check_failed_auto_<ಪೂರ್ಣಾಂಕ>(v1, v2, ctx);
 }
-void check_failed_auto(const bool v1, const bool v2, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ v1, ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_<bool>(v1, v2, ctx);
+    check_failed_auto_<ತಾರ್ಕಿಕ>(v1, v2, ctx);
 }
-void check_failed_auto(const int v1, const int v2, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v1, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_<int>(v1, v2, ctx);
+    check_failed_auto_<ಪೂರ್ಣಾಂಕ>(v1, v2, ctx);
 }
-void check_failed_auto(const size_t v1, const size_t v2, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ size_t v1, ಸ್ಥಿರಾಂಕ size_t v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     check_failed_auto_<size_t>(v1, v2, ctx);
 }
-void check_failed_auto(const float v1, const float v2, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ v1, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_<float>(v1, v2, ctx);
+    check_failed_auto_<ದಶಮಾಂಶ>(v1, v2, ctx);
 }
-void check_failed_auto(const double v1, const double v2, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ v1, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_<double>(v1, v2, ctx);
+    check_failed_auto_<ದ್ವಿಗುಣ>(v1, v2, ctx);
 }
-void check_failed_auto(const Size_<int> v1, const Size_<int> v2, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ ಗಾತ್ರ_3<ಪೂರ್ಣಾಂಕ> v1, ಸ್ಥಿರಾಂಕ ಗಾತ್ರ_3<ಪೂರ್ಣಾಂಕ> v2, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_< Size_<int> >(v1, v2, ctx);
+    check_failed_auto_< ಗಾತ್ರ_3<ಪೂರ್ಣಾಂಕ> >(v1, v2, ctx);
 }
 
 
-template<typename T> static CV_NORETURN
-void check_failed_auto_(const T& v, const CheckContext& ctx)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ CV_NORETURN
+ಶೂನ್ಯ check_failed_auto_(ಸ್ಥಿರಾಂಕ T& v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
-        << "    '" << ctx.p2_str << "'" << std::endl
-        << "where" << std::endl
+    ss  << ctx.message << ":" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "    '" << ctx.p2_str << "'" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "where" << std::ಸಾಲು_ಅಂತ್ಯ
         << "    '" << ctx.p1_str << "' is " << v;
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.ಸಾಲು);
 }
-void check_failed_MatDepth(const int v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_Mat_ಆಳ(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
-        << "    '" << ctx.p2_str << "'" << std::endl
-        << "where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v << " (" << depthToString(v) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    ss  << ctx.message << ":" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "    '" << ctx.p2_str << "'" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "where" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "    '" << ctx.p1_str << "' is " << v << " (" << ಆಳ_ಗಮ್ಯ_String(v) << ")";
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.ಸಾಲು);
 }
-void check_failed_MatType(const int v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_MatType(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
-        << "    '" << ctx.p2_str << "'" << std::endl
-        << "where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v << " (" << typeToString(v) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    ss  << ctx.message << ":" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "    '" << ctx.p2_str << "'" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "where" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "    '" << ctx.p1_str << "' is " << v << " (" << type_ಗಮ್ಯ_String(v) << ")";
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.ಸಾಲು);
 }
-void check_failed_MatChannels(const int v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_MatChannels(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
-        << "    '" << ctx.p2_str << "'" << std::endl
-        << "where" << std::endl
+    ss  << ctx.message << ":" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "    '" << ctx.p2_str << "'" << std::ಸಾಲು_ಅಂತ್ಯ
+        << "where" << std::ಸಾಲು_ಅಂತ್ಯ
         << "    '" << ctx.p1_str << "' is " << v;
-    cv::error(cv::Error::BadNumChannels, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::Bad_ಅಂಕೆ_Channels, ss.str(), ctx.func, ctx.file, ctx.ಸಾಲು);
 }
-void check_failed_true(const bool v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_true(ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    CV_UNUSED(v);
+    CV_ಬಳಸದ(v);
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
+    ss  << ctx.message << ":" << std::ಸಾಲು_ಅಂತ್ಯ
         << "    '" << ctx.p1_str << "' must be 'true'";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.ಸಾಲು);
 }
-void check_failed_false(const bool v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_false(ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    CV_UNUSED(v);
+    CV_ಬಳಸದ(v);
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
+    ss  << ctx.message << ":" << std::ಸಾಲು_ಅಂತ್ಯ
         << "    '" << ctx.p1_str << "' must be 'false'";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.ಸಾಲು);
 }
-void check_failed_auto(const int v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_<int>(v, ctx);
+    check_failed_auto_<ಪೂರ್ಣಾಂಕ>(v, ctx);
 }
-void check_failed_auto(const size_t v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ size_t v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     check_failed_auto_<size_t>(v, ctx);
 }
-void check_failed_auto(const float v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_<float>(v, ctx);
+    check_failed_auto_<ದಶಮಾಂಶ>(v, ctx);
 }
-void check_failed_auto(const double v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_<double>(v, ctx);
+    check_failed_auto_<ದ್ವಿಗುಣ>(v, ctx);
 }
-void check_failed_auto(const Size_<int> v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ ಗಾತ್ರ_3<ಪೂರ್ಣಾಂಕ> v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
-    check_failed_auto_< Size_<int> >(v, ctx);
+    check_failed_auto_< ಗಾತ್ರ_3<ಪೂರ್ಣಾಂಕ> >(v, ctx);
 }
-void check_failed_auto(const std::string& v, const CheckContext& ctx)
+ಶೂನ್ಯ check_failed_auto(ಸ್ಥಿರಾಂಕ std::string& v, ಸ್ಥಿರಾಂಕ CheckContext& ctx)
 {
     check_failed_auto_< std::string >(v, ctx);
 }

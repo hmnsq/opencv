@@ -2,174 +2,174 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "opencv2/core/utils/buffer_area.private.hpp"
-#include "opencv2/core/utils/configuration.private.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/utils/buffer_area.private.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/utils/configuration.private.hpp"
 
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-static bool CV_BUFFER_AREA_OVERRIDE_SAFE_MODE =
-    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", false);
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_ENABLE_ಸ್ಮರಣೆ_SANITIZER
+ಸ್ಥಿರ ತಾರ್ಕಿಕ CV_ಬಫರ್_AREA_OVERRIDE_ಸುರಕ್ಷಿತ_ಬಹುಲಕ =
+    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", ಸುಳ್ಳು);
+#ಆದರೆ_ಅಂತ್ಯ
 
-namespace cv { namespace utils {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ utils {
 
 //==================================================================================================
 
-class BufferArea::Block
+ವರ್ಗ ಬಫರ್_Area::ಖಂಡ
 {
-private:
-    inline size_t reserve_count() const
+ಖಾಸಗಿ:
+    ಸಾಲೊಳಗೆ size_t reserve_ಎಣಿಕೆ() ಸ್ಥಿರಾಂಕ
     {
-        return alignment / type_size - 1;
+        ಹಿಂತಿರುಗಿ alignment / type_ಗಾತ್ರ - 1;
     }
-public:
-    Block(void **ptr_, ushort type_size_, size_t count_, ushort alignment_)
-        : ptr(ptr_), raw_mem(0), count(count_), type_size(type_size_), alignment(alignment_)
+ಸಾರ್ವಜನಿಕ:
+    ಖಂಡ(ಶೂನ್ಯ **ptr_, ushort type_ಗಾತ್ರ_2, size_t ಎಣಿಕೆ_2, ushort alignment_)
+        : ptr(ptr_), raw_mem(0), ಎಣಿಕೆ_3(ಎಣಿಕೆ_2), type_ಗಾತ್ರ(type_ಗಾತ್ರ_2), alignment(alignment_)
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == ಖಾಲಿ);
     }
-    void cleanup() const
+    ಶೂನ್ಯ cleanup() ಸ್ಥಿರಾಂಕ
     {
         CV_DbgAssert(ptr);
-        if (raw_mem)
+        ಆದರೆ (raw_mem)
             fastFree(raw_mem);
     }
-    size_t getByteCount() const
+    size_t get_Byte_ಎಣಿಕೆ() ಸ್ಥಿರಾಂಕ
     {
-        return type_size * (count + reserve_count());
+        ಹಿಂತಿರುಗಿ type_ಗಾತ್ರ * (ಎಣಿಕೆ_3 + reserve_ಎಣಿಕೆ());
     }
-    void real_allocate()
+    ಶೂನ್ಯ real_allocate()
     {
-        CV_Assert(ptr && *ptr == NULL);
-        const size_t allocated_count = count + reserve_count();
-        raw_mem = fastMalloc(type_size * allocated_count);
-        if (alignment != type_size)
+        CV_Assert(ptr && *ptr == ಖಾಲಿ);
+        ಸ್ಥಿರಾಂಕ size_t allocated_ಎಣಿಕೆ = ಎಣಿಕೆ_3 + reserve_ಎಣಿಕೆ();
+        raw_mem = fastMalloc(type_ಗಾತ್ರ * allocated_ಎಣಿಕೆ);
+        ಆದರೆ (alignment != type_ಗಾತ್ರ)
         {
             *ptr = alignPtr(raw_mem, alignment);
             CV_Assert(reinterpret_cast<size_t>(*ptr) % alignment == 0);
-            CV_Assert(static_cast<uchar*>(*ptr) + type_size * count <= static_cast<uchar*>(raw_mem) + type_size * allocated_count);
+            CV_Assert(static_cast<uchar*>(*ptr) + type_ಗಾತ್ರ * ಎಣಿಕೆ_3 <= static_cast<uchar*>(raw_mem) + type_ಗಾತ್ರ * allocated_ಎಣಿಕೆ);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             *ptr = raw_mem;
         }
     }
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    void * fast_allocate(void * buf) const
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_ENABLE_ಸ್ಮರಣೆ_SANITIZER
+    ಶೂನ್ಯ * fast_allocate(ಶೂನ್ಯ * buf) ಸ್ಥಿರಾಂಕ
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == ಖಾಲಿ);
         buf = alignPtr(buf, alignment);
         CV_Assert(reinterpret_cast<size_t>(buf) % alignment == 0);
         *ptr = buf;
-        return static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * count);
+        ಹಿಂತಿರುಗಿ static_cast<ಶೂನ್ಯ*>(static_cast<uchar*>(*ptr) + type_ಗಾತ್ರ * ಎಣಿಕೆ_3);
     }
-#endif
-    bool operator==(void **other) const
+#ಆದರೆ_ಅಂತ್ಯ
+    ತಾರ್ಕಿಕ ಕ್ರಿಯಾಕಾರಕ==(ಶೂನ್ಯ **other) ಸ್ಥಿರಾಂಕ
     {
         CV_Assert(ptr && other);
-        return *ptr == *other;
+        ಹಿಂತಿರುಗಿ *ptr == *other;
     }
-    void zeroFill() const
+    ಶೂನ್ಯ zeroFill() ಸ್ಥಿರಾಂಕ
     {
         CV_Assert(ptr && *ptr);
-        memset(static_cast<uchar*>(*ptr), 0, count * type_size);
+        memset(static_cast<uchar*>(*ptr), 0, ಎಣಿಕೆ_3 * type_ಗಾತ್ರ);
     }
-private:
-    void **ptr;
-    void * raw_mem;
-    size_t count;
-    ushort type_size;
+ಖಾಸಗಿ:
+    ಶೂನ್ಯ **ptr;
+    ಶೂನ್ಯ * raw_mem;
+    size_t ಎಣಿಕೆ_3;
+    ushort type_ಗಾತ್ರ;
     ushort alignment;
 };
 
 //==================================================================================================
 
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-BufferArea::BufferArea(bool safe_) :
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_ENABLE_ಸ್ಮರಣೆ_SANITIZER
+ಬಫರ್_Area::ಬಫರ್_Area(ತಾರ್ಕಿಕ ಸುರಕ್ಷಿತ) :
     oneBuf(0),
-    totalSize(0),
-    safe(safe_ || CV_BUFFER_AREA_OVERRIDE_SAFE_MODE)
+    ಒಟ್ಟು_ಗಾತ್ರ(0),
+    ಸುರಕ್ಷಿತ_2(ಸುರಕ್ಷಿತ || CV_ಬಫರ್_AREA_OVERRIDE_ಸುರಕ್ಷಿತ_ಬಹುಲಕ)
 {
     // nothing
 }
-#else
-BufferArea::BufferArea(bool safe_)
+#ಇಲ್ಲದಿದ್ದರೆ
+ಬಫರ್_Area::ಬಫರ್_Area(ತಾರ್ಕಿಕ ಸುರಕ್ಷಿತ)
 {
-    CV_UNUSED(safe_);
+    CV_ಬಳಸದ(ಸುರಕ್ಷಿತ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-BufferArea::~BufferArea()
+ಬಫರ್_Area::~ಬಫರ್_Area()
 {
     release();
 }
 
-void BufferArea::allocate_(void **ptr, ushort type_size, size_t count, ushort alignment)
+ಶೂನ್ಯ ಬಫರ್_Area::allocate_(ಶೂನ್ಯ **ptr, ushort type_ಗಾತ್ರ, size_t ಎಣಿಕೆ_3, ushort alignment)
 {
-    blocks.push_back(Block(ptr, type_size, count, alignment));
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    ಖಂಡಗಳು.push_back(ಖಂಡ(ptr, type_ಗಾತ್ರ, ಎಣಿಕೆ_3, alignment));
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_ENABLE_ಸ್ಮರಣೆ_SANITIZER
+    ಆದರೆ (!ಸುರಕ್ಷಿತ_2)
     {
-        totalSize += blocks.back().getByteCount();
+        ಒಟ್ಟು_ಗಾತ್ರ += ಖಂಡಗಳು.back().get_Byte_ಎಣಿಕೆ();
     }
-    else
-#endif
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
     {
-        blocks.back().real_allocate();
+        ಖಂಡಗಳು.back().real_allocate();
     }
 }
 
-void BufferArea::zeroFill_(void **ptr)
+ಶೂನ್ಯ ಬಫರ್_Area::zeroFill_(ಶೂನ್ಯ **ptr)
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    ಗಾಗಿ(std::vector<ಖಂಡ>::const_iterator i = ಖಂಡಗಳು.begin(); i != ಖಂಡಗಳು.end(); ++i)
     {
-        if (*i == ptr)
+        ಆದರೆ (*i == ptr)
         {
             i->zeroFill();
-            break;
+            ನಿಲ್ಲಿಸು;
         }
     }
 }
 
-void BufferArea::zeroFill()
+ಶೂನ್ಯ ಬಫರ್_Area::zeroFill()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    ಗಾಗಿ(std::vector<ಖಂಡ>::const_iterator i = ಖಂಡಗಳು.begin(); i != ಖಂಡಗಳು.end(); ++i)
     {
         i->zeroFill();
     }
 }
 
-void BufferArea::commit()
+ಶೂನ್ಯ ಬಫರ್_Area::commit()
 {
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_ENABLE_ಸ್ಮರಣೆ_SANITIZER
+    ಆದರೆ (!ಸುರಕ್ಷಿತ_2)
     {
-        CV_Assert(totalSize > 0);
-        CV_Assert(oneBuf == NULL);
-        CV_Assert(!blocks.empty());
-        oneBuf = fastMalloc(totalSize);
-        void * ptr = oneBuf;
-        for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+        CV_Assert(ಒಟ್ಟು_ಗಾತ್ರ > 0);
+        CV_Assert(oneBuf == ಖಾಲಿ);
+        CV_Assert(!ಖಂಡಗಳು.empty());
+        oneBuf = fastMalloc(ಒಟ್ಟು_ಗಾತ್ರ);
+        ಶೂನ್ಯ * ptr = oneBuf;
+        ಗಾಗಿ(std::vector<ಖಂಡ>::const_iterator i = ಖಂಡಗಳು.begin(); i != ಖಂಡಗಳು.end(); ++i)
         {
             ptr = i->fast_allocate(ptr);
         }
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-void BufferArea::release()
+ಶೂನ್ಯ ಬಫರ್_Area::release()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    ಗಾಗಿ(std::vector<ಖಂಡ>::const_iterator i = ಖಂಡಗಳು.begin(); i != ಖಂಡಗಳು.end(); ++i)
     {
         i->cleanup();
     }
-    blocks.clear();
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (oneBuf)
+    ಖಂಡಗಳು.clear();
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_ENABLE_ಸ್ಮರಣೆ_SANITIZER
+    ಆದರೆ (oneBuf)
     {
         fastFree(oneBuf);
         oneBuf = 0;
     }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 //==================================================================================================

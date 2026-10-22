@@ -39,160 +39,160 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencv2/core/opencl/runtime/opencl_clfft.hpp"
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
-#include "opencl_kernels_core.hpp"
-#include "dxt.hpp"
-#include "dxt.simd.hpp"
-#include "dxt.simd_declarations.hpp"
-#include <map>
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/opencl/runtime/opencl_clfft.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/opencl/runtime/opencl_core.hpp"
+#ಅನ್ತರ್ಭಾವ "opencl_kernels_core.hpp"
+#ಅನ್ತರ್ಭಾವ "dxt.hpp"
+#ಅನ್ತರ್ಭಾವ "dxt.simd.hpp"
+#ಅನ್ತರ್ಭಾವ "dxt.simd_declarations.hpp"
+#ಅನ್ತರ್ಭಾವ <map>
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-#if IPP_VERSION_X100 >= 710
-#define USE_IPP_DFT 1
-#else
-#undef USE_IPP_DFT
-#endif
+#ಆದರೆ IPP_ಆವೃತ್ತಿ_X100 >= 710
+#ವ್ಯಾಖ್ಯಾನಿಸು USE_IPP_DFT 1
+#ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು USE_IPP_DFT
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined USE_IPP_DFT
-#if IPP_VERSION_X100 >= 202220
-#define IPP_DISABLE_DFT32F ((depth == CV_32F) && (ippCPUID_AVX512F&cv::ipp::getIppFeatures()))
-#else
-#define IPP_DISABLE_DFT32F false
-#endif
-#endif
+#ಆದರೆ defined USE_IPP_DFT
+#ಆದರೆ IPP_ಆವೃತ್ತಿ_X100 >= 202220
+#ವ್ಯಾಖ್ಯಾನಿಸು IPP_DISABLE_DFT32F ((ಆಳ == CV_32F) && (ippCPUID_AVX512F&cv::ipp::getIppFeatures()))
+#ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು IPP_DISABLE_DFT32F ಸುಳ್ಳು
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ_ಅಂತ್ಯ
 
 /****************************************************************************************\
                                Discrete Fourier Transform
 \****************************************************************************************/
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 // factorization used by the OpenCL radix selection
-static int
-DFTFactorize( int n, int* factors )
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ
+DFTFactorize( ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ* factors )
 {
-    int nf = 0, f, i, j;
+    ಪೂರ್ಣಾಂಕ nf = 0, f, i, j;
 
-    if( n <= 5 )
+    ಆದರೆ( n <= 5 )
     {
         factors[0] = n;
-        return 1;
+        ಹಿಂತಿರುಗಿ 1;
     }
 
     f = (((n - 1)^n)+1) >> 1;
-    if( f > 1 )
+    ಆದರೆ( f > 1 )
     {
         factors[nf++] = f;
         n = f == n ? 1 : n/f;
     }
 
-    for( f = 3; n > 1; )
+    ಗಾಗಿ( f = 3; n > 1; )
     {
-        int d = n/f;
-        if( d*f == n )
+        ಪೂರ್ಣಾಂಕ d = n/f;
+        ಆದರೆ( d*f == n )
         {
             factors[nf++] = f;
             n = d;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             f += 2;
-            if( f*f > n )
-                break;
+            ಆದರೆ( f*f > n )
+                ನಿಲ್ಲಿಸು;
         }
     }
 
-    if( n > 1 )
+    ಆದರೆ( n > 1 )
         factors[nf++] = n;
 
     f = (factors[0] & 1) == 0;
-    for( i = f; i < (nf+f)/2; i++ )
-        CV_SWAP( factors[i], factors[nf-i-1+f], j );
+    ಗಾಗಿ( i = f; i < (nf+f)/2; i++ )
+        CV_ಅದಲುಬದಲು( factors[i], factors[nf-i-1+f], j );
 
-    return nf;
+    ಹಿಂತಿರುಗಿ nf;
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef USE_IPP_DFT
-static IppStatus ippsDFTFwd_CToC( const Complex<float>* src, Complex<float>* dst,
-                             const void* spec, uchar* buf)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ ippsDFTFwd_CToC( ಸ್ಥಿರಾಂಕ Complex<ದಶಮಾಂಶ>* src, Complex<ದಶಮಾಂಶ>* dst,
+                             ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_32fc, (const Ipp32fc*)src, (Ipp32fc*)dst,
-                                 (const IppsDFTSpec_C_32fc*)spec, buf);
+    ಹಿಂತಿರುಗಿ CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_32fc, (ಸ್ಥಿರಾಂಕ Ipp32fc*)src, (Ipp32fc*)dst,
+                                 (ಸ್ಥಿರಾಂಕ IppsDFTSpec_C_32fc*)spec, buf);
 }
 
-static IppStatus ippsDFTFwd_CToC( const Complex<double>* src, Complex<double>* dst,
-                             const void* spec, uchar* buf)
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ ippsDFTFwd_CToC( ಸ್ಥಿರಾಂಕ Complex<ದ್ವಿಗುಣ>* src, Complex<ದ್ವಿಗುಣ>* dst,
+                             ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_64fc, (const Ipp64fc*)src, (Ipp64fc*)dst,
-                                 (const IppsDFTSpec_C_64fc*)spec, buf);
+    ಹಿಂತಿರುಗಿ CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_64fc, (ಸ್ಥಿರಾಂಕ Ipp64fc*)src, (Ipp64fc*)dst,
+                                 (ಸ್ಥಿರಾಂಕ IppsDFTSpec_C_64fc*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_CToC( const Complex<float>* src, Complex<float>* dst,
-                             const void* spec, uchar* buf)
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ ippsDFTInv_CToC( ಸ್ಥಿರಾಂಕ Complex<ದಶಮಾಂಶ>* src, Complex<ದಶಮಾಂಶ>* dst,
+                             ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_32fc, (const Ipp32fc*)src, (Ipp32fc*)dst,
-                                 (const IppsDFTSpec_C_32fc*)spec, buf);
+    ಹಿಂತಿರುಗಿ CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_32fc, (ಸ್ಥಿರಾಂಕ Ipp32fc*)src, (Ipp32fc*)dst,
+                                 (ಸ್ಥಿರಾಂಕ IppsDFTSpec_C_32fc*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_CToC( const Complex<double>* src, Complex<double>* dst,
-                                  const void* spec, uchar* buf)
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ ippsDFTInv_CToC( ಸ್ಥಿರಾಂಕ Complex<ದ್ವಿಗುಣ>* src, Complex<ದ್ವಿಗುಣ>* dst,
+                                  ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_64fc, (const Ipp64fc*)src, (Ipp64fc*)dst,
-                                 (const IppsDFTSpec_C_64fc*)spec, buf);
+    ಹಿಂತಿರುಗಿ CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_64fc, (ಸ್ಥಿರಾಂಕ Ipp64fc*)src, (Ipp64fc*)dst,
+                                 (ಸ್ಥಿರಾಂಕ IppsDFTSpec_C_64fc*)spec, buf);
 }
 
-static IppStatus ippsDFTFwd_RToPack( const float* src, float* dst,
-                                     const void* spec, uchar* buf)
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ ippsDFTFwd_RToPack( ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst,
+                                     ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_32f, src, dst, (const IppsDFTSpec_R_32f*)spec, buf);
+    ಹಿಂತಿರುಗಿ CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_32f, src, dst, (ಸ್ಥಿರಾಂಕ IppsDFTSpec_R_32f*)spec, buf);
 }
 
-static IppStatus ippsDFTFwd_RToPack( const double* src, double* dst,
-                                     const void* spec, uchar* buf)
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ ippsDFTFwd_RToPack( ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst,
+                                     ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_64f, src, dst, (const IppsDFTSpec_R_64f*)spec, buf);
+    ಹಿಂತಿರುಗಿ CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_64f, src, dst, (ಸ್ಥಿರಾಂಕ IppsDFTSpec_R_64f*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_PackToR( const float* src, float* dst,
-                                     const void* spec, uchar* buf)
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ ipps_DFTInv_Pack_ಗಮ್ಯ_R( ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst,
+                                     ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_PackToR_32f, src, dst, (const IppsDFTSpec_R_32f*)spec, buf);
+    ಹಿಂತಿರುಗಿ CV_INSTRUMENT_FUN_IPP(ipps_DFTInv_Pack_ಗಮ್ಯ_R_32f, src, dst, (ಸ್ಥಿರಾಂಕ IppsDFTSpec_R_32f*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_PackToR( const double* src, double* dst,
-                                     const void* spec, uchar* buf)
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ ipps_DFTInv_Pack_ಗಮ್ಯ_R( ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst,
+                                     ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_PackToR_64f, src, dst, (const IppsDFTSpec_R_64f*)spec, buf);
+    ಹಿಂತಿರುಗಿ CV_INSTRUMENT_FUN_IPP(ipps_DFTInv_Pack_ಗಮ್ಯ_R_64f, src, dst, (ಸ್ಥಿರಾಂಕ IppsDFTSpec_R_64f*)spec, buf);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-struct OcvDftOptions;
+ರಚನೆ OcvDftOptions;
 
-typedef void (*DFTFunc)(const OcvDftOptions & c, const void* src, void* dst);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*DFTFunc)(ಸ್ಥಿರಾಂಕ OcvDftOptions & c, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* src, ಶೂನ್ಯ* dst);
 
 // Per-transform options of the 1D engine: the immutable plan (shared by all rows), the kernel
 // table resolved for the current CPU, and the per-executor workspace (see dxt.hpp).
-struct OcvDftOptions {
-    double scale;
-    int n;
+ರಚನೆ OcvDftOptions {
+    ದ್ವಿಗುಣ scale;
+    ಪೂರ್ಣಾಂಕ n;
 
-    bool isInverse;
-    bool isComplex;     // DFT_COMPLEX_OUTPUT (forward) / complex input (inverse) for real transforms
+    ತಾರ್ಕಿಕ isInverse;
+    ತಾರ್ಕಿಕ isComplex;     // DFT_COMPLEX_OUTPUT (forward) / complex input (inverse) for real transforms
 
     DFTFunc dft_func;
-    bool useIpp;
+    ತಾರ್ಕಿಕ useIpp;
 
-#ifdef USE_IPP_DFT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
     uchar* ipp_spec;
     uchar* ipp_work;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-    const DftPlan* plan;
-    const DFTKernels* kernels;
+    ಸ್ಥಿರಾಂಕ DftPlan* plan;
+    ಸ್ಥಿರಾಂಕ DFTKernels* kernels;
     uchar* workspace;
 
     OcvDftOptions()
@@ -202,13 +202,13 @@ struct OcvDftOptions {
         workspace = 0;
         scale = 0;
         n = 0;
-        isInverse = false;
-        isComplex = false;
-        useIpp = false;
-#ifdef USE_IPP_DFT
+        isInverse = ಸುಳ್ಳು;
+        isComplex = ಸುಳ್ಳು;
+        useIpp = ಸುಳ್ಳು;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
         ipp_spec = 0;
         ipp_work = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
         dft_func = 0;
     }
 };
@@ -218,18 +218,18 @@ struct OcvDftOptions {
                      New 1D engine: kernel table, plan builder, driver
 \****************************************************************************************/
 
-static DFTKernels getDFTKernelsDispatch(int depth)
+ಸ್ಥಿರ DFTKernels getDFTKernelsDispatch(ಪೂರ್ಣಾಂಕ ಆಳ)
 {
-    CV_CPU_DISPATCH(getDFTKernels_, (depth), CV_CPU_DISPATCH_MODES_ALL);
+    CV_CPU_DISPATCH(getDFTKernels_, (ಆಳ), CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // The kernel tables are resolved once for the best available ISA; all further calls go
 // through the function pointers with no dispatch overhead.
-static const DFTKernels& getDFTKernels(int depth)
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ DFTKernels& getDFTKernels(ಪೂರ್ಣಾಂಕ ಆಳ)
 {
-    static const DFTKernels k32 = getDFTKernelsDispatch(CV_32F);
-    static const DFTKernels k64 = getDFTKernelsDispatch(CV_64F);
-    return depth == CV_32F ? k32 : k64;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ DFTKernels k32 = getDFTKernelsDispatch(CV_32F);
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ DFTKernels k64 = getDFTKernelsDispatch(CV_64F);
+    ಹಿಂತಿರುಗಿ ಆಳ == CV_32F ? k32 : k64;
 }
 
 // exp(-2*pi*i*m/M) in double precision, m in [0, M): m = B*a + b -> hi[a]*lo[b] with B a power of
@@ -237,178 +237,178 @@ static const DFTKernels& getDFTKernels(int depth)
 // sin/cos every 16 entries, so the error stays within a few ulps while only ~(B + M/B)/16 + 4
 // trigonometric calls are made (4 for small M). Cheap to build, which matters because cv::dft()
 // builds a fresh plan on every call.
-struct DftTwiddleGen
+ರಚನೆ DftTwiddleGen
 {
-    int M, logB, maskB;
-    AutoBuffer<double, 1024> buf;
-    double *hi_re, *hi_im, *lo_re, *lo_im;
+    ಪೂರ್ಣಾಂಕ M, logB, ಮುಖವಾಡ_B;
+    Auto_ಬಫರ್<ದ್ವಿಗುಣ, 1024> buf;
+    ದ್ವಿಗುಣ *hi_re, *hi_im, *lo_re, *lo_im;
 
     // re[i] + i*im[i] = w^i, i in [0, count), w = (wr, wi) = exp(i*stepAngle); the rotation
     // recurrence is re-seeded with exact sin/cos every 16 entries
-    static void fillTable(double* re, double* im, int count, double wr, double wi, double stepAngle)
+    ಸ್ಥಿರ ಶೂನ್ಯ fill_ಕೋಷ್ಟಕ(ದ್ವಿಗುಣ* re, ದ್ವಿಗುಣ* im, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3, ದ್ವಿಗುಣ wr, ದ್ವಿಗುಣ wi, ದ್ವಿಗುಣ ಹೆಜ್ಜೆ_Angle)
     {
-        for (int i0 = 0; i0 < count; i0 += 16)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i0 = 0; i0 < ಎಣಿಕೆ_3; i0 += 16)
         {
-            double t0 = stepAngle*i0;
-            double cr = i0 == 0 ? 1 : cos(t0), ci = i0 == 0 ? 0 : sin(t0);
-            int i1 = std::min(i0 + 16, count);
-            for (int i = i0; i < i1; i++)
+            ದ್ವಿಗುಣ t0 = ಹೆಜ್ಜೆ_Angle*i0;
+            ದ್ವಿಗುಣ cr = i0 == 0 ? 1 : ಕೋಜ್ಯಾ(t0), ci = i0 == 0 ? 0 : ಜ್ಯಾ(t0);
+            ಪೂರ್ಣಾಂಕ i1 = std::min(i0 + 16, ಎಣಿಕೆ_3);
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = i0; i < i1; i++)
             {
                 re[i] = cr; im[i] = ci;
-                double t = cr*wr - ci*wi;
+                ದ್ವಿಗುಣ t = cr*wr - ci*wi;
                 ci = cr*wi + ci*wr;
                 cr = t;
             }
         }
     }
 
-    void init(int _M)
+    ಶೂನ್ಯ init(ಪೂರ್ಣಾಂಕ _M)
     {
         M = _M;
         logB = 0;
-        while ((1LL << (2*logB)) < M) logB++;   // B = 2^logB >= sqrt(M)
-        int B = 1 << logB;
-        maskB = B - 1;
-        int nhi = (M + B - 1)/B;
+        ಆಗ ((1LL << (2*logB)) < M) logB++;   // B = 2^logB >= sqrt(M)
+        ಪೂರ್ಣಾಂಕ B = 1 << logB;
+        ಮುಖವಾಡ_B = B - 1;
+        ಪೂರ್ಣಾಂಕ nhi = (M + B - 1)/B;
         buf.allocate(2*(B + nhi));
-        hi_re = buf.data(); hi_im = hi_re + nhi;
+        hi_re = buf.ದತ್ತಾಂಶ(); hi_im = hi_re + nhi;
         lo_re = hi_im + nhi; lo_im = lo_re + B;
-        double a = -2*CV_PI/M;
+        ದ್ವಿಗುಣ a = -2*CV_PI/M;
         // the two step angles are computed exactly (4 trigonometric calls in total for small M)
-        fillTable(lo_re, lo_im, B, cos(a), sin(a), a);
-        fillTable(hi_re, hi_im, nhi, cos(a*B), sin(a*B), a*B);
+        fill_ಕೋಷ್ಟಕ(lo_re, lo_im, B, ಕೋಜ್ಯಾ(a), ಜ್ಯಾ(a), a);
+        fill_ಕೋಷ್ಟಕ(hi_re, hi_im, nhi, ಕೋಜ್ಯಾ(a*B), ಜ್ಯಾ(a*B), a*B);
     }
 
     // exp(-2*pi*i*m/M) for any m >= 0 (the angle is periodic: only m mod M matters; callers may
     // ask for m == M, e.g. the rotation step of a chain that covers the whole period)
-    void get(int m, double& re, double& im) const
+    ಶೂನ್ಯ get(ಪೂರ್ಣಾಂಕ m, ದ್ವಿಗುಣ& re, ದ್ವಿಗುಣ& im) ಸ್ಥಿರಾಂಕ
     {
         CV_DbgAssert(m >= 0);
-        if (m >= M)
+        ಆದರೆ (m >= M)
             m %= M;
-        int a = m >> logB, b = m & maskB;
+        ಪೂರ್ಣಾಂಕ a = m >> logB, b = m & ಮುಖವಾಡ_B;
         re = hi_re[a]*lo_re[b] - hi_im[a]*lo_im[b];
         im = hi_re[a]*lo_im[b] + hi_im[a]*lo_re[b];
     }
 };
 
-template<typename T>
-void DftPlan::fillTables(size_t ntw, bool need_rtw, bool need_dct)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T>
+ಶೂನ್ಯ DftPlan::fillTables(size_t ntw, ತಾರ್ಕಿಕ need_rtw, ತಾರ್ಕಿಕ need_dct)
 {
-    DftPlan& p = *this;
+    DftPlan& p = *ಇದು;
     // all angles come from one base table exp(-2*pi*i*m/M), M a multiple of every angle grid used:
     // C2C: M = nc; real kinds with even n: M = n (=2nc) or 4n for DCT (W_4n^k); odd real: M = n = nc.
-    int M = nc*(need_dct ? 8 : need_rtw ? 2 : 1);
+    ಪೂರ್ಣಾಂಕ M = nc*(need_dct ? 8 : need_rtw ? 2 : 1);
     DftTwiddleGen gen;
     gen.init(M);
-    p.tw.allocate((ntw*sizeof(T) + sizeof(double) - 1)/sizeof(double) + 1);
-    T* cur = (T*)p.tw.data();
-    int maxL = 1;
-    for (int s = 0; s < p.nstages; s++)
-        if (p.stages[s].radix <= 8) maxL = std::max(maxL, p.stages[s].span);
-    AutoBuffer<double, 2048> twd_buf(2*maxL);     // leg-1 twiddles of the current stage in double
-    double* twd = twd_buf.data();
-    for (int s = 0; s < p.nstages; s++)
+    p.tw.allocate((ntw*ಗಾತ್ರ(T) + ಗಾತ್ರ(ದ್ವಿಗುಣ) - 1)/ಗಾತ್ರ(ದ್ವಿಗುಣ) + 1);
+    T* cur = (T*)p.tw.ದತ್ತಾಂಶ();
+    ಪೂರ್ಣಾಂಕ maxL = 1;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ s = 0; s < p.nstages; s++)
+        ಆದರೆ (p.stages[s].radix <= 8) maxL = std::max(maxL, p.stages[s].ಹರವು);
+    Auto_ಬಫರ್<ದ್ವಿಗುಣ, 2048> twd_buf(2*maxL);     // leg-1 twiddles of the current stage in double
+    ದ್ವಿಗುಣ* twd = twd_buf.ದತ್ತಾಂಶ();
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ s = 0; s < p.nstages; s++)
     {
         DftStage& st = p.stages[s];
-        int r = st.radix, L = st.span, ts = st.tw_stride;
+        ಪೂರ್ಣಾಂಕ r = st.radix, L = st.ಹರವು, ts = st.tw_stride;
         T* twr = cur; T* twi = cur + (r - 1)*ts;
         cur = twi + (r - 1)*ts;
-        int step = M/(r*L);
-        if (r <= 8)
+        ಪೂರ್ಣಾಂಕ ಹೆಜ್ಜೆ = M/(r*L);
+        ಆದರೆ (r <= 8)
         {
             // Leg 1 (W_{rL}^j) by K independent interleaved rotation recurrences (a single chain is
             // latency-bound), each re-seeded from the exact generator every 16 of its steps; legs
             // q >= 2 as t_q(j) = t_{q-1}(j)*t_1(j), independent per entry (error <= q ulps).
-            constexpr int K = 8;
-            double cr[K], ci[K], wr, wi;
-            gen.get(K*step, wr, wi);
-            double* t1r = twd; double* t1i = twd + L;      // leg 1 kept in double for the products
-            for (int j0 = 0; j0 < L; j0 += 16*K)           // blocks of 16 steps per chain
+            constexpr ಪೂರ್ಣಾಂಕ K = 8;
+            ದ್ವಿಗುಣ cr[K], ci[K], wr, wi;
+            gen.get(K*ಹೆಜ್ಜೆ, wr, wi);
+            ದ್ವಿಗುಣ* t1r = twd; ದ್ವಿಗುಣ* t1i = twd + L;      // leg 1 kept in double for the products
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ j0 = 0; j0 < L; j0 += 16*K)           // blocks of 16 steps per chain
             {
-                for (int k = 0; k < K; k++)
-                    gen.get(std::min(j0 + k, L - 1)*step, cr[k], ci[k]);
-                int j1 = std::min(j0 + 16*K, L);
-                for (int j = j0; j < j1; j += K)
-                    for (int k = 0; k < K && j + k < L; k++)
+                ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k < K; k++)
+                    gen.get(std::min(j0 + k, L - 1)*ಹೆಜ್ಜೆ, cr[k], ci[k]);
+                ಪೂರ್ಣಾಂಕ j1 = std::min(j0 + 16*K, L);
+                ಗಾಗಿ (ಪೂರ್ಣಾಂಕ j = j0; j < j1; j += K)
+                    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k < K && j + k < L; k++)
                     {
                         t1r[j+k] = cr[k]; t1i[j+k] = ci[k];
-                        double t = cr[k]*wr - ci[k]*wi;
+                        ದ್ವಿಗುಣ t = cr[k]*wr - ci[k]*wi;
                         ci[k] = cr[k]*wi + ci[k]*wr;
                         cr[k] = t;
                     }
             }
-            for (int j = 0; j < L; j++)     // separate pass: vectorizes, the recurrence loop does not
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ j = 0; j < L; j++)     // separate pass: vectorizes, the recurrence loop does not
             {
                 twr[j] = (T)t1r[j]; twi[j] = (T)t1i[j];
             }
-            for (int q = 2; q < r; q++)
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ q = 2; q < r; q++)
             {
-                const T* pr = twr + (q-2)*ts; const T* pi = twi + (q-2)*ts;
+                ಸ್ಥಿರಾಂಕ T* pr = twr + (q-2)*ts; ಸ್ಥಿರಾಂಕ T* pi = twi + (q-2)*ts;
                 T* tr = twr + (q-1)*ts; T* ti = twi + (q-1)*ts;
-                for (int j = 0; j < L; j++)
+                ಗಾಗಿ (ಪೂರ್ಣಾಂಕ j = 0; j < L; j++)
                 {
-                    double ar = pr[j], ai = pi[j], br = t1r[j], bi = t1i[j];
+                    ದ್ವಿಗುಣ ar = pr[j], ai = pi[j], br = t1r[j], bi = t1i[j];
                     tr[j] = (T)(ar*br - ai*bi);
                     ti[j] = (T)(ar*bi + ai*br);
                 }
             }
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             // large odd radix: exact-ish generator lookup per entry
-            for (int q = 1; q < r; q++)
-                for (int j = 0; j < L; j++)
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ q = 1; q < r; q++)
+                ಗಾಗಿ (ಪೂರ್ಣಾಂಕ j = 0; j < L; j++)
                 {
-                    double re, im;
-                    gen.get(q*j*step, re, im);
+                    ದ್ವಿಗುಣ re, im;
+                    gen.get(q*j*ಹೆಜ್ಜೆ, re, im);
                     twr[(q-1)*ts + j] = (T)re;
                     twi[(q-1)*ts + j] = (T)im;
                 }
         }
         st.tw_re = twr; st.tw_im = twi;
         st.cs = st.sn = 0;
-        if (r >= 7)
+        ಆದರೆ (r >= 7)
         {
-            int h = (r - 1)/2;
+            ಪೂರ್ಣಾಂಕ h = (r - 1)/2;
             T* cs = cur; T* sn = cur + h*h;
             cur = sn + h*h;
-            for (int pp = 1; pp <= h; pp++)
-                for (int k = 1; k <= h; k++)
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ pp = 1; pp <= h; pp++)
+                ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 1; k <= h; k++)
                 {
-                    double t = 2*CV_PI*((double)pp*k/r);
-                    cs[(pp-1)*h + (k-1)] = (T)cos(t);
-                    sn[(pp-1)*h + (k-1)] = (T)sin(t);
+                    ದ್ವಿಗುಣ t = 2*CV_PI*((ದ್ವಿಗುಣ)pp*k/r);
+                    cs[(pp-1)*h + (k-1)] = (T)ಕೋಜ್ಯಾ(t);
+                    sn[(pp-1)*h + (k-1)] = (T)ಜ್ಯಾ(t);
                 }
             st.cs = cs; st.sn = sn;
         }
     }
     p.rtw_re = p.rtw_im = p.dct_re = p.dct_im = 0;
-    if (need_rtw)
+    ಆದರೆ (need_rtw)
     {
         // W_n^k, k in [0, nc]
         T* wr = cur; T* wi = cur + (nc + 1);
         cur = wi + (nc + 1);
-        int step = M/n;
-        for (int k = 0; k <= nc; k++)
+        ಪೂರ್ಣಾಂಕ ಹೆಜ್ಜೆ = M/n;
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k <= nc; k++)
         {
-            double re, im;
-            gen.get(k*step, re, im);
+            ದ್ವಿಗುಣ re, im;
+            gen.get(k*ಹೆಜ್ಜೆ, re, im);
             wr[k] = (T)re; wi[k] = (T)im;
         }
         p.rtw_re = wr; p.rtw_im = wi;
     }
-    if (need_dct)
+    ಆದರೆ (need_dct)
     {
         // s*W_4n^k, k in [0, nc]; s = 2*sqrt(1/(2n)) forward, sqrt(1/(2n)) inverse (the original normalization)
         T* wr = cur; T* wi = cur + (nc + 1);
         cur = wi + (nc + 1);
-        double scale = (p.kind == DFT_KIND_DCT ? 2 : 1)*std::sqrt(1./(2*n));
-        int step = M/(4*n);
-        for (int k = 0; k <= nc; k++)
+        ದ್ವಿಗುಣ scale = (p.ಬಗೆ == DFT_ಬಗೆ_DCT ? 2 : 1)*std::ವರ್ಗಮೂಲ(1./(2*n));
+        ಪೂರ್ಣಾಂಕ ಹೆಜ್ಜೆ = M/(4*n);
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k = 0; k <= nc; k++)
         {
-            double re, im;
-            gen.get(k*step, re, im);
+            ದ್ವಿಗುಣ re, im;
+            gen.get(k*ಹೆಜ್ಜೆ, re, im);
             wr[k] = (T)(re*scale); wi[k] = (T)(im*scale);
         }
         p.dct_re = wr; p.dct_im = wi;
@@ -416,71 +416,71 @@ void DftPlan::fillTables(size_t ntw, bool need_rtw, bool need_dct)
 }
 
 // See dxt.hpp for the contract (in particular where `vl` must come from).
-void DftPlan::build(int _kind, int _n, int _depth, int _vl)
+ಶೂನ್ಯ DftPlan::build(ಪೂರ್ಣಾಂಕ ಬಗೆ_2, ಪೂರ್ಣಾಂಕ _n, ಪೂರ್ಣಾಂಕ ಆಳ_2, ಪೂರ್ಣಾಂಕ _vl)
 {
-    DftPlan& p = *this;
+    DftPlan& p = *ಇದು;
     CV_Assert(_n >= 1 && _vl >= 1);
-    CV_Assert(_depth == CV_32F || _depth == CV_64F);
-    bool real_kind = _kind != DFT_KIND_C2C;
-    bool dct_kind = _kind == DFT_KIND_DCT || _kind == DFT_KIND_IDCT;
-    if (dct_kind)
+    CV_Assert(ಆಳ_2 == CV_32F || ಆಳ_2 == CV_64F);
+    ತಾರ್ಕಿಕ real_ಬಗೆ = ಬಗೆ_2 != DFT_ಬಗೆ_C2_C;
+    ತಾರ್ಕಿಕ dct_ಬಗೆ = ಬಗೆ_2 == DFT_ಬಗೆ_DCT || ಬಗೆ_2 == DFT_ಬಗೆ_IDCT;
+    ಆದರೆ (dct_ಬಗೆ)
         CV_Assert(_n % 2 == 0);   // cv::dct() supports even n only (n == 1 is handled by the caller)
-    p.kind = _kind; p.n = _n; p.depth = _depth; p.vl = _vl;
-    p.nc = real_kind && _n % 2 == 0 ? _n/2 : _n;
+    p.ಬಗೆ = ಬಗೆ_2; p.n = _n; p.ಆಳ = ಆಳ_2; p.vl = _vl;
+    p.nc = real_ಬಗೆ && _n % 2 == 0 ? _n/2 : _n;
     CV_Assert(nc < (1 << 28));
-    size_t esz = depth == CV_32F ? sizeof(float) : sizeof(double);
-    p.real_input = kind == DFT_KIND_R2C && (n & 1) != 0;
-    p.need_tmp = kind == DFT_KIND_C2R || kind == DFT_KIND_DCT || kind == DFT_KIND_IDCT;
-    p.pingpong = false;
+    size_t esz = ಆಳ == CV_32F ? ಗಾತ್ರ(ದಶಮಾಂಶ) : ಗಾತ್ರ(ದ್ವಿಗುಣ);
+    p.real_ಒಳಹರಿವು = ಬಗೆ == DFT_ಬಗೆ_R2_C && (n & 1) != 0;
+    p.need_tmp = ಬಗೆ == DFT_ಬಗೆ_C2_R || ಬಗೆ == DFT_ಬಗೆ_DCT || ಬಗೆ == DFT_ಬಗೆ_IDCT;
+    p.pingpong = ಸುಳ್ಳು;
 
     // factorization: 2^k part first (fused first stage r0 + radix-4 stages), then 3s, 5s, other odd.
     // (A radix-8 middle stage was tried and measured slower on NEON: with per-leg twiddle tables it
     // does not save loads over two radix-4 stages and keeps 16 data vectors live.)
-    int k2 = 0, rest = nc;
-    while ((rest & 1) == 0) { rest >>= 1; k2++; }
-    int r0 = k2 == 0 ? 1 : k2 == 1 ? 2 : (k2 & 1) ? 8 : 4;
-    p.first_radix = r0;
-    int radices[DFT_MAX_STAGES], nst = 0;
-    for (int m = k2 - (r0 == 1 ? 0 : r0 == 2 ? 1 : r0 == 4 ? 2 : 3); m > 0; m -= 2) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 4; }
+    ಪೂರ್ಣಾಂಕ k2 = 0, rest = nc;
+    ಆಗ ((rest & 1) == 0) { rest >>= 1; k2++; }
+    ಪೂರ್ಣಾಂಕ r0 = k2 == 0 ? 1 : k2 == 1 ? 2 : (k2 & 1) ? 8 : 4;
+    p.ಮೊದಲ_radix = r0;
+    ಪೂರ್ಣಾಂಕ radices[DFT_MAX_STAGES], nst = 0;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ m = k2 - (r0 == 1 ? 0 : r0 == 2 ? 1 : r0 == 4 ? 2 : 3); m > 0; m -= 2) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 4; }
     rest = nc >> k2;
-    while (rest % 3 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 3; rest /= 3; }
-    while (rest % 5 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 5; rest /= 5; }
-    for (int f = 7; rest > 1; f += 2)
+    ಆಗ (rest % 3 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 3; rest /= 3; }
+    ಆಗ (rest % 5 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 5; rest /= 5; }
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ f = 7; rest > 1; f += 2)
     {
-        if (f*f > rest)
+        ಆದರೆ (f*f > rest)
         {
             CV_Assert(nst < DFT_MAX_STAGES);
             radices[nst++] = rest;
-            break;
+            ನಿಲ್ಲಿಸು;
         }
-        while (rest % f == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = f; rest /= f; }
+        ಆಗ (rest % f == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = f; rest /= f; }
     }
     p.nstages = nst;
 
     // stages
-    int L = r0, max_h = 0;
+    ಪೂರ್ಣಾಂಕ L = r0, max_h = 0;
     size_t ntw = 0;
-    for (int s = 0; s < nst; s++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ s = 0; s < nst; s++)
     {
         DftStage& st = p.stages[s];
-        int r = radices[s];
-        st.radix = r; st.span = L; st.ngroups = nc/(r*L); st.tw_stride = L;
-        if (vl > 1 && L >= vl)
+        ಪೂರ್ಣಾಂಕ r = radices[s];
+        st.radix = r; st.ಹರವು = L; st.ngroups = nc/(r*L); st.tw_stride = L;
+        ಆದರೆ (vl > 1 && L >= vl)
         {
-            st.mode = DFT_STAGE_FULL;
+            st.ಬಹುಲಕ = DFT_STAGE_ತುಂಬಿದ;
             st.nsteps = st.ngroups*((L + vl - 1)/vl);
-            if (L % vl != 0)
-                p.pingpong = true;   // back-off clamp => overlapping stores => must be out-of-place
+            ಆದರೆ (L % vl != 0)
+                p.pingpong = ನಿಜ;   // back-off clamp => overlapping stores => must be out-of-place
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            st.mode = DFT_STAGE_SCALAR;
+            st.ಬಹುಲಕ = DFT_STAGE_SCALAR;
             st.nsteps = st.ngroups*L;
         }
         ntw += 2*(size_t)(r - 1)*st.tw_stride;
-        if (r >= 7)
+        ಆದರೆ (r >= 7)
         {
-            int h = (r - 1)/2;
+            ಪೂರ್ಣಾಂಕ h = (r - 1)/2;
             ntw += 2*(size_t)h*h;
             max_h = std::max(max_h, h);
         }
@@ -494,93 +494,93 @@ void DftPlan::build(int _kind, int _n, int _depth, int _vl)
     //    scalar gather (im index unused when real_input);
     //  - r0 > 1: the r0 inputs of group g are the column x[base(g) + q*nc/r0]; itab[base(g)] = g*r0
     //    tells the transposed first stage where the outputs of column base(g) go.
-    int seq[DFT_MAX_STAGES + 1], nseq = 0;
-    if (r0 > 1) seq[nseq++] = r0;
-    for (int s = 0; s < nst; s++) seq[nseq++] = radices[s];
-    int digits[DFT_MAX_STAGES + 1], weights[DFT_MAX_STAGES + 1];
+    ಪೂರ್ಣಾಂಕ seq[DFT_MAX_STAGES + 1], nseq = 0;
+    ಆದರೆ (r0 > 1) seq[nseq++] = r0;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ s = 0; s < nst; s++) seq[nseq++] = radices[s];
+    ಪೂರ್ಣಾಂಕ digits[DFT_MAX_STAGES + 1], weights[DFT_MAX_STAGES + 1];
     {
-        int Ls = 1;
-        for (int s = 0; s < nseq; s++)
+        ಪೂರ್ಣಾಂಕ Ls = 1;
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ s = 0; s < nseq; s++)
         {
             digits[s] = 0;
             weights[s] = nc/(Ls*seq[s]);
             Ls *= seq[s];
         }
     }
-    if (r0 == 1)
+    ಆದರೆ (r0 == 1)
     {
         p.itab.allocate(nc*2);
-        int* it_all = p.itab.data();
+        ಪೂರ್ಣಾಂಕ* it_all = p.itab.ದತ್ತಾಂಶ();
         // the two lowest digits are enumerated by plain nested loops, the higher ones by a counter
-        int n_in = std::min(nseq, 2);
-        int r_0 = n_in > 0 ? seq[0] : 1, w_0 = n_in > 0 ? weights[0] : 0;
-        int r_1 = n_in > 1 ? seq[1] : 1, w_1 = n_in > 1 ? weights[1] : 0;
-        for (int pos = 0, rev_hi = 0; pos < nc; )
+        ಪೂರ್ಣಾಂಕ n_ಒಳ = std::min(nseq, 2);
+        ಪೂರ್ಣಾಂಕ r_0 = n_ಒಳ > 0 ? seq[0] : 1, w_0 = n_ಒಳ > 0 ? weights[0] : 0;
+        ಪೂರ್ಣಾಂಕ r_1 = n_ಒಳ > 1 ? seq[1] : 1, w_1 = n_ಒಳ > 1 ? weights[1] : 0;
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ pos = 0, rev_hi = 0; pos < nc; )
         {
-            for (int d1 = 0; d1 < r_1; d1++)
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ d1 = 0; d1 < r_1; d1++)
             {
-                int rev = rev_hi + d1*w_1;
-                int* it = it_all + pos*2;
-                if (p.real_input)
+                ಪೂರ್ಣಾಂಕ rev = rev_hi + d1*w_1;
+                ಪೂರ್ಣಾಂಕ* it = it_all + pos*2;
+                ಆದರೆ (p.real_ಒಳಹರಿವು)
                 {
-                    for (int d0 = 0; d0 < r_0; d0++, rev += w_0)
+                    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ d0 = 0; d0 < r_0; d0++, rev += w_0)
                     {
                         it[d0*2] = rev; it[d0*2+1] = rev;
                     }
                 }
-                else
+                ಇಲ್ಲದಿದ್ದರೆ
                 {
-                    for (int d0 = 0; d0 < r_0; d0++, rev += w_0)
+                    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ d0 = 0; d0 < r_0; d0++, rev += w_0)
                     {
                         it[d0*2] = rev*2; it[d0*2+1] = rev*2 + 1;
                     }
                 }
                 pos += r_0;
             }
-            for (int s = n_in; s < nseq; s++)
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ s = n_ಒಳ; s < nseq; s++)
             {
                 rev_hi += weights[s];
-                if (++digits[s] < seq[s])
-                    break;
+                ಆದರೆ (++digits[s] < seq[s])
+                    ನಿಲ್ಲಿಸು;
                 digits[s] = 0;
                 rev_hi -= seq[s]*weights[s];
             }
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         // gtab[base(g)] = g*r0, written in increasing base order (sequential stores): base is
         // counted up with the digits s = nseq-1 (base weight 1) .. 1 (base weight weights[1]),
         // g follows incrementally with the digit weights gw[s] = L_s/r0. The two fastest digits
         // are enumerated by plain nested loops.
-        int M = nc/r0;
+        ಪೂರ್ಣಾಂಕ M = nc/r0;
         p.itab.allocate(M);
-        int* gtab = p.itab.data();
-        int gw[DFT_MAX_STAGES + 1];
+        ಪೂರ್ಣಾಂಕ* gtab = p.itab.ದತ್ತಾಂಶ();
+        ಪೂರ್ಣಾಂಕ gw[DFT_MAX_STAGES + 1];
         {
-            int Ls = 1;
-            for (int s = 0; s < nseq; s++)
+            ಪೂರ್ಣಾಂಕ Ls = 1;
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ s = 0; s < nseq; s++)
             {
                 gw[s] = Ls/r0;      // valid for s >= 1 (L_s is a multiple of r0)
                 Ls *= seq[s];
             }
         }
-        int sa = nseq - 1, sb = nseq - 2;                  // fastest and second fastest digits
-        int r_a = sa >= 1 ? seq[sa] : 1, g_a = sa >= 1 ? gw[sa] : 0;
-        int r_b = sb >= 1 ? seq[sb] : 1, g_b = sb >= 1 ? gw[sb] : 0;
-        for (int base = 0, g_hi = 0; base < M; )
+        ಪೂರ್ಣಾಂಕ sa = nseq - 1, sb = nseq - 2;                  // fastest and second fastest digits
+        ಪೂರ್ಣಾಂಕ r_a = sa >= 1 ? seq[sa] : 1, g_a = sa >= 1 ? gw[sa] : 0;
+        ಪೂರ್ಣಾಂಕ r_b = sb >= 1 ? seq[sb] : 1, g_b = sb >= 1 ? gw[sb] : 0;
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ ತಳ = 0, g_hi = 0; ತಳ < M; )
         {
-            for (int db = 0; db < r_b; db++)
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ db = 0; db < r_b; db++)
             {
-                int g = (g_hi + db*g_b)*r0;
-                for (int da = 0; da < r_a; da++, g += g_a*r0)
-                    gtab[base++] = g;
+                ಪೂರ್ಣಾಂಕ g = (g_hi + db*g_b)*r0;
+                ಗಾಗಿ (ಪೂರ್ಣಾಂಕ da = 0; da < r_a; da++, g += g_a*r0)
+                    gtab[ತಳ++] = g;
             }
-            for (int s = sb - 1; s >= 1; s--)
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ s = sb - 1; s >= 1; s--)
             {
                 g_hi += gw[s];
-                if (++digits[s] < seq[s])
-                    break;
+                ಆದರೆ (++digits[s] < seq[s])
+                    ನಿಲ್ಲಿಸು;
                 digits[s] = 0;
                 g_hi -= seq[s]*gw[s];
             }
@@ -588,133 +588,133 @@ void DftPlan::build(int _kind, int _n, int _depth, int _vl)
     }
 
     // twiddle tables
-    bool need_rtw = real_kind && n % 2 == 0;
-    if (need_rtw) ntw += 2*(size_t)(nc + 1);
-    if (dct_kind) ntw += 2*(size_t)(nc + 1);
-    if (depth == CV_32F)
-        fillTables<float>(ntw, need_rtw, dct_kind);
-    else
-        fillTables<double>(ntw, need_rtw, dct_kind);
+    ತಾರ್ಕಿಕ need_rtw = real_ಬಗೆ && n % 2 == 0;
+    ಆದರೆ (need_rtw) ntw += 2*(size_t)(nc + 1);
+    ಆದರೆ (dct_ಬಗೆ) ntw += 2*(size_t)(nc + 1);
+    ಆದರೆ (ಆಳ == CV_32F)
+        fillTables<ದಶಮಾಂಶ>(ntw, need_rtw, dct_ಬಗೆ);
+    ಇಲ್ಲದಿದ್ದರೆ
+        fillTables<ದ್ವಿಗುಣ>(ntw, need_rtw, dct_ಬಗೆ);
 
     // workspace layout (from the 64-byte aligned base): pair0 (re, im), optional pair1 (re, im) or
     // the interleaved temp, radix-odd scratch (a[h], b[h] complex per lane).
-    size_t pair_bytes = 2*(size_t)nc*esz;
-    bool two_pairs = p.pingpong || p.need_tmp;
-    p.pair1_ofs = two_pairs ? pair_bytes : 0;
-    p.scratch_ofs = pair_bytes*(two_pairs ? 2 : 1);
-    size_t scratch_bytes = 4*(size_t)max_h*std::max(vl, 1)*esz;
-    p.ws_bytes = p.scratch_ofs + scratch_bytes + 64;
+    size_t pair_ಬೈಟುಗಳು = 2*(size_t)nc*esz;
+    ತಾರ್ಕಿಕ two_ಜೋಡಿಗಳು = p.pingpong || p.need_tmp;
+    p.pair1_ofs = two_ಜೋಡಿಗಳು ? pair_ಬೈಟುಗಳು : 0;
+    p.scratch_ofs = pair_ಬೈಟುಗಳು*(two_ಜೋಡಿಗಳು ? 2 : 1);
+    size_t scratch_ಬೈಟುಗಳು = 4*(size_t)max_h*std::max(vl, 1)*esz;
+    p.ws_ಬೈಟುಗಳು = p.scratch_ofs + scratch_ಬೈಟುಗಳು + 64;
 }
 
 // Runs the transform described by c.plan: A (preproc) -> B stages (ping-pong) -> C (postproc).
 // No allocations. sstep/dstep are in elements (used by DCT/IDCT only; 1 otherwise).
-static void runDft(const OcvDftOptions& c, const void* src, size_t sstep, void* dst, size_t dstep,
-                   bool complex_io)
+ಸ್ಥಿರ ಶೂನ್ಯ ಸತತ_Dft(ಸ್ಥಿರಾಂಕ OcvDftOptions& c, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* src, size_t sstep, ಶೂನ್ಯ* dst, size_t dstep,
+                   ತಾರ್ಕಿಕ complex_io)
 {
-    const DftPlan& p = *c.plan;
-    const DFTKernels& k = *c.kernels;
+    ಸ್ಥಿರಾಂಕ DftPlan& p = *c.plan;
+    ಸ್ಥಿರಾಂಕ DFTKernels& k = *c.kernels;
     CV_DbgAssert(p.vl == k.vlanes);
-    size_t esz = p.depth == CV_32F ? sizeof(float) : sizeof(double);
-    uchar* base = alignPtr(c.workspace, 64);
-    uchar* re0 = base;
+    size_t esz = p.ಆಳ == CV_32F ? ಗಾತ್ರ(ದಶಮಾಂಶ) : ಗಾತ್ರ(ದ್ವಿಗುಣ);
+    uchar* ತಳ = alignPtr(c.workspace, 64);
+    uchar* re0 = ತಳ;
     uchar* im0 = re0 + p.nc*esz;
-    uchar* re1 = base + p.pair1_ofs;
+    uchar* re1 = ತಳ + p.pair1_ofs;
     uchar* im1 = re1 + p.nc*esz;
-    uchar* scratch = base + p.scratch_ofs;
+    uchar* scratch = ತಳ + p.scratch_ofs;
 
-    const void* asrc = src;
+    ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* asrc = src;
     size_t astep = sstep;
-    bool conj = false;
-    if (p.kind == DFT_KIND_C2R)
+    ತಾರ್ಕಿಕ conj = ಸುಳ್ಳು;
+    ಆದರೆ (p.ಬಗೆ == DFT_ಬಗೆ_C2_R)
     {
         k.preprocCCS(p, src, re1, complex_io);
-        asrc = re1; astep = 1; conj = true;
+        asrc = re1; astep = 1; conj = ನಿಜ;
     }
-    else if (p.kind == DFT_KIND_IDCT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p.ಬಗೆ == DFT_ಬಗೆ_IDCT)
     {
         k.preprocIDCT(p, src, sstep, re1);
-        asrc = re1; astep = 1; conj = true;
+        asrc = re1; astep = 1; conj = ನಿಜ;
     }
-    else if (p.kind == DFT_KIND_DCT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p.ಬಗೆ == DFT_ಬಗೆ_DCT)
     {
         k.preprocDCT(p, src, sstep, re1);
         asrc = re1; astep = 1;
     }
-    else if (p.kind == DFT_KIND_C2C)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (p.ಬಗೆ == DFT_ಬಗೆ_C2_C)
         conj = c.isInverse;
-    CV_DbgAssert(astep == 1 || p.first_radix == 1);
+    CV_DbgAssert(astep == 1 || p.ಮೊದಲ_radix == 1);
 
-    DftPreprocFunc pre = p.first_radix == 1 ? k.preprocRadix0 : p.first_radix == 2 ? k.preprocRadix2 :
-                         p.first_radix == 4 ? k.preprocRadix4 : k.preprocRadix8;
+    DftPreprocFunc pre = p.ಮೊದಲ_radix == 1 ? k.preprocRadix0 : p.ಮೊದಲ_radix == 2 ? k.preprocRadix2 :
+                         p.ಮೊದಲ_radix == 4 ? k.preprocRadix4 : k.preprocRadix8;
     pre(p, asrc, astep, re0, im0, conj);
 
     uchar *sre = re0, *sim = im0, *dre = re1, *dim = im1;
-    for (int i = 0; i < p.nstages; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < p.nstages; i++)
     {
-        const DftStage& st = p.stages[i];
+        ಸ್ಥಿರಾಂಕ DftStage& st = p.stages[i];
         DftStageFunc fn = st.radix == 4 ? k.radix4 : st.radix == 3 ? k.radix3 :
                           st.radix == 5 ? k.radix5 : k.radixOdd;
-        if (p.pingpong)
+        ಆದರೆ (p.pingpong)
         {
             fn(st, sre, sim, dre, dim, scratch);
             std::swap(sre, dre); std::swap(sim, dim);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
             fn(st, sre, sim, sre, sim, scratch);
     }
 
-    double scale = c.scale;
-    switch (p.kind)
+    ದ್ವಿಗುಣ scale = c.scale;
+    ಆಯ್ಕೆ (p.ಬಗೆ)
     {
-    case DFT_KIND_C2C:
+    ಸ್ಥಿತಿ DFT_ಬಗೆ_C2_C:
         k.postprocDFT(p, sre, sim, dst, scale, c.isInverse ? -scale : scale);
-        break;
-    case DFT_KIND_R2C:
+        ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ DFT_ಬಗೆ_R2_C:
         k.postprocRealDFT(p, sre, sim, dst, scale, complex_io);
-        break;
-    case DFT_KIND_C2R:
-        if (p.nc == p.n)
+        ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ DFT_ಬಗೆ_C2_R:
+        ಆದರೆ (p.nc == p.n)
             k.postprocReal(p, sre, dst, scale);
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
             k.postprocDFT(p, sre, sim, dst, scale, -scale);
-        break;
-    case DFT_KIND_DCT:
+        ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ DFT_ಬಗೆ_DCT:
         k.postprocDCT(p, sre, sim, dst, dstep);
-        break;
-    default:
-        CV_Assert(p.kind == DFT_KIND_IDCT);
+        ನಿಲ್ಲಿಸು;
+    ಪೂರ್ವನಿಯೋಜಿತ:
+        CV_Assert(p.ಬಗೆ == DFT_ಬಗೆ_IDCT);
         k.postprocIDCT(p, sre, sim, dst, dstep);
     }
 }
 
 // mixed-radix complex discrete Fourier transform (forward or inverse)
-template<typename T> static void
-DFT(const OcvDftOptions & c, const Complex<T>* src, Complex<T>* dst)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ ಶೂನ್ಯ
+DFT(ಸ್ಥಿರಾಂಕ OcvDftOptions & c, ಸ್ಥಿರಾಂಕ Complex<T>* src, Complex<T>* dst)
 {
-    if( c.useIpp )
+    ಆದರೆ( c.useIpp )
     {
-#ifdef USE_IPP_DFT
-        if( !c.isInverse )
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
+        ಆದರೆ( !c.isInverse )
         {
-            if (ippsDFTFwd_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
+            ಆದರೆ (ippsDFTFwd_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
             {
-                CV_IMPL_ADD(CV_IMPL_IPP);
-                return;
+                CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP);
+                ಹಿಂತಿರುಗಿ;
             }
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            if (ippsDFTInv_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
+            ಆದರೆ (ippsDFTInv_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
             {
-                CV_IMPL_ADD(CV_IMPL_IPP);
-                return;
+                CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP);
+                ಹಿಂತಿರುಗಿ;
             }
         }
-        setIppErrorStatus();
-#endif
+        ಗಣ_Ipp_Error_ಸ್ಥಿತಿ();
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-    runDft(c, src, 1, dst, 1, false);
+    ಸತತ_Dft(c, src, 1, dst, 1, ಸುಳ್ಳು);
 }
 
 
@@ -722,99 +722,99 @@ DFT(const OcvDftOptions & c, const Complex<T>* src, Complex<T>* dst)
    output vector format:
      re(0), re(1), im(1), ... , re(n/2-1), im((n+1)/2-1) [, re((n+1)/2)] OR ...
      re(0), 0, re(1), im(1), ..., re(n/2-1), im((n+1)/2-1) [, re((n+1)/2), 0] */
-template<typename T> static void
-RealDFT(const OcvDftOptions & c, const T* src, T* dst)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ ಶೂನ್ಯ
+RealDFT(ಸ್ಥಿರಾಂಕ OcvDftOptions & c, ಸ್ಥಿರಾಂಕ T* src, T* dst)
 {
-    int complex_output = c.isComplex;
+    ಪೂರ್ಣಾಂಕ complex_output = c.isComplex;
 
-    if( c.useIpp )
+    ಆದರೆ( c.useIpp )
     {
-#ifdef USE_IPP_DFT
-        int n = c.n;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
+        ಪೂರ್ಣಾಂಕ n = c.n;
         T* ipp_dst = dst + complex_output;
-        if (ippsDFTFwd_RToPack( src, ipp_dst, c.ipp_spec, c.ipp_work ) >=0)
+        ಆದರೆ (ippsDFTFwd_RToPack( src, ipp_dst, c.ipp_spec, c.ipp_work ) >=0)
         {
-            if( complex_output )
+            ಆದರೆ( complex_output )
             {
                 ipp_dst[-1] = ipp_dst[0];
                 ipp_dst[0] = 0;
-                if( (n & 1) == 0 )
+                ಆದರೆ( (n & 1) == 0 )
                     ipp_dst[n] = 0;
             }
-            CV_IMPL_ADD(CV_IMPL_IPP);
-            return;
+            CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP);
+            ಹಿಂತಿರುಗಿ;
         }
-        setIppErrorStatus();
-#endif
+        ಗಣ_Ipp_Error_ಸ್ಥಿತಿ();
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    runDft(c, src, 1, dst, 1, complex_output != 0);
+    ಸತತ_Dft(c, src, 1, dst, 1, complex_output != 0);
 }
 
 /* Inverse FFT of complex conjugate-symmetric vector
    input vector format:
       re[0], re[1], im[1], ... , re[n/2-1], im[n/2-1], re[n/2] OR
       re(0), 0, re(1), im(1), ..., re(n/2-1), im((n+1)/2-1) [, re((n+1)/2), 0] */
-template<typename T> static void
-CCSIDFT(const OcvDftOptions & c, const T* src, T* dst)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ ಶೂನ್ಯ
+CCSIDFT(ಸ್ಥಿರಾಂಕ OcvDftOptions & c, ಸ್ಥಿರಾಂಕ T* src, T* dst)
 {
-    int complex_input = c.isComplex;
+    ಪೂರ್ಣಾಂಕ complex_ಒಳಹರಿವು = c.isComplex;
 
-    if( complex_input )
+    ಆದರೆ( complex_ಒಳಹರಿವು )
         CV_Assert( src != dst );
-    if( c.useIpp )
+    ಆದರೆ( c.useIpp )
     {
-#ifdef USE_IPP_DFT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
         // IPP expects the packed format; with complex input the packed spectrum is src+1 once
         // im(0) (always zero) is overwritten with re(0)
-        const T* ipp_src = src;
+        ಸ್ಥಿರಾಂಕ T* ipp_src = src;
         T save_s1 = 0;
-        if( complex_input )
+        ಆದರೆ( complex_ಒಳಹರಿವು )
         {
             save_s1 = src[1];
             ((T*)src)[1] = src[0];
             ipp_src = src + 1;
         }
-        IppStatus status = ippsDFTInv_PackToR( ipp_src, dst, c.ipp_spec, c.ipp_work );
-        if( complex_input )
+        Ipp_ಸ್ಥಿತಿ ಸ್ಥಿತಿ_2 = ipps_DFTInv_Pack_ಗಮ್ಯ_R( ipp_src, dst, c.ipp_spec, c.ipp_work );
+        ಆದರೆ( complex_ಒಳಹರಿವು )
             ((T*)src)[1] = save_s1;
-        if( status >= 0 )
+        ಆದರೆ( ಸ್ಥಿತಿ_2 >= 0 )
         {
-            CV_IMPL_ADD(CV_IMPL_IPP);
-            return;
+            CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP);
+            ಹಿಂತಿರುಗಿ;
         }
-        setIppErrorStatus();
-#endif
+        ಗಣ_Ipp_Error_ಸ್ಥಿತಿ();
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    runDft(c, src, 1, dst, 1, complex_input != 0);
+    ಸತತ_Dft(c, src, 1, dst, 1, complex_ಒಳಹರಿವು != 0);
 }
 
-static void
-CopyColumn( const uchar* _src, size_t src_step,
-            uchar* _dst, size_t dst_step,
-            int len, size_t elem_size )
+ಸ್ಥಿರ ಶೂನ್ಯ
+Copy_ಸ್ತಂಭ( ಸ್ಥಿರಾಂಕ uchar* _src, size_t src_ಹೆಜ್ಜೆ,
+            uchar* _dst, size_t dst_ಹೆಜ್ಜೆ,
+            ಪೂರ್ಣಾಂಕ len, size_t elem_ಗಾತ್ರ_2 )
 {
-    int i, t0, t1;
-    const int* src = (const int*)_src;
-    int* dst = (int*)_dst;
-    src_step /= sizeof(src[0]);
-    dst_step /= sizeof(dst[0]);
+    ಪೂರ್ಣಾಂಕ i, t0, t1;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* src = (ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ*)_src;
+    ಪೂರ್ಣಾಂಕ* dst = (ಪೂರ್ಣಾಂಕ*)_dst;
+    src_ಹೆಜ್ಜೆ /= ಗಾತ್ರ(src[0]);
+    dst_ಹೆಜ್ಜೆ /= ಗಾತ್ರ(dst[0]);
 
-    if( elem_size == sizeof(int) )
+    ಆದರೆ( elem_ಗಾತ್ರ_2 == ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ) )
     {
-        for( i = 0; i < len; i++, src += src_step, dst += dst_step )
+        ಗಾಗಿ( i = 0; i < len; i++, src += src_ಹೆಜ್ಜೆ, dst += dst_ಹೆಜ್ಜೆ )
             dst[0] = src[0];
     }
-    else if( elem_size == sizeof(int)*2 )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( elem_ಗಾತ್ರ_2 == ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ)*2 )
     {
-        for( i = 0; i < len; i++, src += src_step, dst += dst_step )
+        ಗಾಗಿ( i = 0; i < len; i++, src += src_ಹೆಜ್ಜೆ, dst += dst_ಹೆಜ್ಜೆ )
         {
             t0 = src[0]; t1 = src[1];
             dst[0] = t0; dst[1] = t1;
         }
     }
-    else if( elem_size == sizeof(int)*4 )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( elem_ಗಾತ್ರ_2 == ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ)*4 )
     {
-        for( i = 0; i < len; i++, src += src_step, dst += dst_step )
+        ಗಾಗಿ( i = 0; i < len; i++, src += src_ಹೆಜ್ಜೆ, dst += dst_ಹೆಜ್ಜೆ )
         {
             t0 = src[0]; t1 = src[1];
             dst[0] = t0; dst[1] = t1;
@@ -829,449 +829,449 @@ CopyColumn( const uchar* _src, size_t src_step,
 // into `ncols` contiguous column buffers of `len` elements each: dst + k*len*elem_size holds
 // column k. Row-wise: each source row is read once, sequentially. (Row steps are only
 // guaranteed to be multiples of the element size, hence the byte arithmetic.)
-template<typename T> static inline void
-copyFromColumns_( const uchar* src, size_t src_step, T* dst, int ncols, int len )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಶೂನ್ಯ
+copyFromColumns_( ಸ್ಥಿರಾಂಕ uchar* src, size_t src_ಹೆಜ್ಜೆ, T* dst, ಪೂರ್ಣಾಂಕ ncols, ಪೂರ್ಣಾಂಕ len )
 {
-    for( int i = 0; i < len; i++, src += src_step )
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < len; i++, src += src_ಹೆಜ್ಜೆ )
     {
-        const T* s = (const T*)src;
-        for( int k = 0; k < ncols; k++ )
+        ಸ್ಥಿರಾಂಕ T* s = (ಸ್ಥಿರಾಂಕ T*)src;
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ k = 0; k < ncols; k++ )
             dst[(size_t)k*len + i] = s[k];
     }
 }
 
-static void
-CopyFromColumns( const uchar* src, size_t src_step, uchar* dst, int ncols, int len, size_t elem_size )
+ಸ್ಥಿರ ಶೂನ್ಯ
+CopyFromColumns( ಸ್ಥಿರಾಂಕ uchar* src, size_t src_ಹೆಜ್ಜೆ, uchar* dst, ಪೂರ್ಣಾಂಕ ncols, ಪೂರ್ಣಾಂಕ len, size_t elem_ಗಾತ್ರ_2 )
 {
-    if( elem_size == sizeof(int) )
-        copyFromColumns_(src, src_step, (int*)dst, ncols, len);
-    else if( elem_size == sizeof(int64) )
-        copyFromColumns_(src, src_step, (int64*)dst, ncols, len);
-    else
+    ಆದರೆ( elem_ಗಾತ್ರ_2 == ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ) )
+        copyFromColumns_(src, src_ಹೆಜ್ಜೆ, (ಪೂರ್ಣಾಂಕ*)dst, ncols, len);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( elem_ಗಾತ್ರ_2 == ಗಾತ್ರ(int64) )
+        copyFromColumns_(src, src_ಹೆಜ್ಜೆ, (int64*)dst, ncols, len);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        CV_Assert( elem_size == sizeof(int64)*2 );
-        copyFromColumns_(src, src_step, (Vec<int64, 2>*)dst, ncols, len);
+        CV_Assert( elem_ಗಾತ್ರ_2 == ಗಾತ್ರ(int64)*2 );
+        copyFromColumns_(src, src_ಹೆಜ್ಜೆ, (Vec<int64, 2>*)dst, ncols, len);
     }
 }
 
 // The inverse of CopyFromColumns: `ncols` contiguous column buffers -> `ncols` adjacent columns
 // of `dst` (row step in bytes), written row by row.
-template<typename T> static inline void
-copyToColumns_( const T* src, uchar* dst, size_t dst_step, int ncols, int len )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಶೂನ್ಯ
+copy_ಗಮ್ಯ_Columns( ಸ್ಥಿರಾಂಕ T* src, uchar* dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ncols, ಪೂರ್ಣಾಂಕ len )
 {
-    for( int i = 0; i < len; i++, dst += dst_step )
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < len; i++, dst += dst_ಹೆಜ್ಜೆ )
     {
         T* d = (T*)dst;
-        for( int k = 0; k < ncols; k++ )
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ k = 0; k < ncols; k++ )
             d[k] = src[(size_t)k*len + i];
     }
 }
 
-static void
-CopyToColumns( const uchar* src, uchar* dst, size_t dst_step, int ncols, int len, size_t elem_size )
+ಸ್ಥಿರ ಶೂನ್ಯ
+Copy_ಗಮ್ಯ_Columns( ಸ್ಥಿರಾಂಕ uchar* src, uchar* dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ncols, ಪೂರ್ಣಾಂಕ len, size_t elem_ಗಾತ್ರ_2 )
 {
-    if( elem_size == sizeof(int) )
-        copyToColumns_((const int*)src, dst, dst_step, ncols, len);
-    else if( elem_size == sizeof(int64) )
-        copyToColumns_((const int64*)src, dst, dst_step, ncols, len);
-    else
+    ಆದರೆ( elem_ಗಾತ್ರ_2 == ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ) )
+        copy_ಗಮ್ಯ_Columns((ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ*)src, dst, dst_ಹೆಜ್ಜೆ, ncols, len);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( elem_ಗಾತ್ರ_2 == ಗಾತ್ರ(int64) )
+        copy_ಗಮ್ಯ_Columns((ಸ್ಥಿರಾಂಕ int64*)src, dst, dst_ಹೆಜ್ಜೆ, ncols, len);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        CV_Assert( elem_size == sizeof(int64)*2 );
-        copyToColumns_((const Vec<int64, 2>*)src, dst, dst_step, ncols, len);
+        CV_Assert( elem_ಗಾತ್ರ_2 == ಗಾತ್ರ(int64)*2 );
+        copy_ಗಮ್ಯ_Columns((ಸ್ಥಿರಾಂಕ Vec<int64, 2>*)src, dst, dst_ಹೆಜ್ಜೆ, ncols, len);
     }
 }
 
-static void
-ExpandCCS( uchar* _ptr, int n, int elem_size )
+ಸ್ಥಿರ ಶೂನ್ಯ
+ExpandCCS( uchar* _ptr, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ elem_ಗಾತ್ರ_2 )
 {
-    int i;
-    if( elem_size == (int)sizeof(float) )
+    ಪೂರ್ಣಾಂಕ i;
+    ಆದರೆ( elem_ಗಾತ್ರ_2 == (ಪೂರ್ಣಾಂಕ)ಗಾತ್ರ(ದಶಮಾಂಶ) )
     {
-        float* p = (float*)_ptr;
-        for( i = 1; i < (n+1)/2; i++ )
+        ದಶಮಾಂಶ* p = (ದಶಮಾಂಶ*)_ptr;
+        ಗಾಗಿ( i = 1; i < (n+1)/2; i++ )
         {
             p[(n-i)*2] = p[i*2-1];
             p[(n-i)*2+1] = -p[i*2];
         }
-        if( (n & 1) == 0 )
+        ಆದರೆ( (n & 1) == 0 )
         {
             p[n] = p[n-1];
             p[n+1] = 0.f;
             n--;
         }
-        for( i = n-1; i > 0; i-- )
+        ಗಾಗಿ( i = n-1; i > 0; i-- )
             p[i+1] = p[i];
         p[1] = 0.f;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        double* p = (double*)_ptr;
-        for( i = 1; i < (n+1)/2; i++ )
+        ದ್ವಿಗುಣ* p = (ದ್ವಿಗುಣ*)_ptr;
+        ಗಾಗಿ( i = 1; i < (n+1)/2; i++ )
         {
             p[(n-i)*2] = p[i*2-1];
             p[(n-i)*2+1] = -p[i*2];
         }
-        if( (n & 1) == 0 )
+        ಆದರೆ( (n & 1) == 0 )
         {
             p[n] = p[n-1];
             p[n+1] = 0.f;
             n--;
         }
-        for( i = n-1; i > 0; i-- )
+        ಗಾಗಿ( i = n-1; i > 0; i-- )
             p[i+1] = p[i];
         p[1] = 0.f;
     }
 }
 
-template<typename T, void (*fn)(const OcvDftOptions&, const T*, T*)>
-static void dftWrap(const OcvDftOptions & c, const void* src, void* dst)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T, ಶೂನ್ಯ (*fn)(ಸ್ಥಿರಾಂಕ OcvDftOptions&, ಸ್ಥಿರಾಂಕ T*, T*)>
+ಸ್ಥಿರ ಶೂನ್ಯ dftWrap(ಸ್ಥಿರಾಂಕ OcvDftOptions & c, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* src, ಶೂನ್ಯ* dst)
 {
-    fn(c, (const T*)src, (T*)dst);
+    fn(c, (ಸ್ಥಿರಾಂಕ T*)src, (T*)dst);
 }
 
 }
 
-#ifdef USE_IPP_DFT
-typedef IppStatus (CV_STDCALL* IppDFTGetSizeFunc)(int, int, IppHintAlgorithm, int*, int*, int*);
-typedef IppStatus (CV_STDCALL* IppDFTInitFunc)(int, int, IppHintAlgorithm, void*, uchar*);
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL* Ipp_DFTGet_ಗಾತ್ರ_Func)(ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ, IppHintAlgorithm, ಪೂರ್ಣಾಂಕ*, ಪೂರ್ಣಾಂಕ*, ಪೂರ್ಣಾಂಕ*);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL* IppDFTInitFunc)(ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ, IppHintAlgorithm, ಶೂನ್ಯ*, uchar*);
 
-template<typename SpecType, IppStatus (CV_STDCALL *init_fn)(int, int, IppHintAlgorithm, SpecType*, Ipp8u*)>
-static IppStatus CV_STDCALL ippDFTInitWrap(int n, int flags, IppHintAlgorithm hint, void* spec, Ipp8u* initbuf)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು SpecType, Ipp_ಸ್ಥಿತಿ (CV_STDCALL *init_fn)(ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ, IppHintAlgorithm, SpecType*, Ipp8u*)>
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ CV_STDCALL ippDFTInitWrap(ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ flags, IppHintAlgorithm hint, ಶೂನ್ಯ* spec, Ipp8u* initbuf)
 {
-    return init_fn(n, flags, hint, (SpecType*)spec, initbuf);
+    ಹಿಂತಿರುಗಿ init_fn(n, flags, hint, (SpecType*)spec, initbuf);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
-#if defined USE_IPP_DFT
+#ಆದರೆ defined USE_IPP_DFT
 
-typedef IppStatus (CV_STDCALL* ippiDFT_C_Func)(const Ipp32fc*, int, Ipp32fc*, int, const IppiDFTSpec_C_32fc*, Ipp8u*);
-typedef IppStatus (CV_STDCALL* ippiDFT_R_Func)(const Ipp32f* , int, Ipp32f* , int, const IppiDFTSpec_R_32f* , Ipp8u*);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL* ippiDFT_C_Func)(ಸ್ಥಿರಾಂಕ Ipp32fc*, ಪೂರ್ಣಾಂಕ, Ipp32fc*, ಪೂರ್ಣಾಂಕ, ಸ್ಥಿರಾಂಕ IppiDFTSpec_C_32fc*, Ipp8u*);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL* ippiDFT_R_Func)(ಸ್ಥಿರಾಂಕ Ipp32f* , ಪೂರ್ಣಾಂಕ, Ipp32f* , ಪೂರ್ಣಾಂಕ, ಸ್ಥಿರಾಂಕ IppiDFTSpec_R_32f* , Ipp8u*);
 
-template <typename Dft>
-class Dft_C_IPPLoop_Invoker : public ParallelLoopBody
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು Dft>
+ವರ್ಗ Dft_C_IPPLoop_Invoker : ಸಾರ್ವಜನಿಕ ParallelLoopBody
 {
-public:
+ಸಾರ್ವಜನಿಕ:
 
-    Dft_C_IPPLoop_Invoker(const uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, int _width,
-                          const Dft& _ippidft, int _norm_flag, bool *_ok) :
+    Dft_C_IPPLoop_Invoker(ಸ್ಥಿರಾಂಕ uchar * _src, size_t src_ಹೆಜ್ಜೆ_2, uchar * _dst, size_t dst_ಹೆಜ್ಜೆ_2, ಪೂರ್ಣಾಂಕ ಅಗಲ_3,
+                          ಸ್ಥಿರಾಂಕ Dft& _ippidft, ಪೂರ್ಣಾಂಕ _norm_flag, ತಾರ್ಕಿಕ *_ok) :
         ParallelLoopBody(),
-        src(_src), src_step(_src_step), dst(_dst), dst_step(_dst_step), width(_width),
+        src(_src), src_ಹೆಜ್ಜೆ(src_ಹೆಜ್ಜೆ_2), dst(_dst), dst_ಹೆಜ್ಜೆ(dst_ಹೆಜ್ಜೆ_2), ಅಗಲ(ಅಗಲ_3),
         ippidft(_ippidft), norm_flag(_norm_flag), ok(_ok)
     {
-        *ok = true;
+        *ok = ನಿಜ;
     }
 
-    virtual void operator()(const Range& range) const CV_OVERRIDE
+    ವಾಸ್ತವಿಕ ಶೂನ್ಯ ಕ್ರಿಯಾಕಾರಕ()(ಸ್ಥಿರಾಂಕ Range& range) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
     {
-        IppStatus status;
-        Ipp8u* pBuffer = 0;
+        Ipp_ಸ್ಥಿತಿ ಸ್ಥಿತಿ_2;
+        Ipp8u* p_ಬಫರ್ = 0;
         Ipp8u* pMemInit= 0;
-        int sizeBuffer=0;
-        int sizeSpec=0;
-        int sizeInit=0;
+        ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_ಬಫರ್=0;
+        ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_Spec=0;
+        ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_Init=0;
 
-        IppiSize srcRoiSize = {width, 1};
+        Ippi_ಗಾತ್ರ src_Roi_ಗಾತ್ರ = {ಅಗಲ, 1};
 
-        status = ippiDFTGetSize_C_32fc(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-        if ( status < 0 )
+        ಸ್ಥಿತಿ_2 = ippi_DFTGet_ಗಾತ್ರ_C_32fc(src_Roi_ಗಾತ್ರ, norm_flag, ippAlgHintNone, &ಗಾತ್ರ_Spec, &ಗಾತ್ರ_Init, &ಗಾತ್ರ_ಬಫರ್ );
+        ಆದರೆ ( ಸ್ಥಿತಿ_2 < 0 )
         {
-            *ok = false;
-            return;
+            *ok = ಸುಳ್ಳು;
+            ಹಿಂತಿರುಗಿ;
         }
 
-        IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( sizeSpec );
+        IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( ಗಾತ್ರ_Spec );
 
-        if ( sizeInit > 0 )
-            pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
+        ಆದರೆ ( ಗಾತ್ರ_Init > 0 )
+            pMemInit = (Ipp8u*)CV_IPP_MALLOC( ಗಾತ್ರ_Init );
 
-        if ( sizeBuffer > 0 )
-            pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
+        ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+            p_ಬಫರ್ = (Ipp8u*)CV_IPP_MALLOC( ಗಾತ್ರ_ಬಫರ್ );
 
-        status = ippiDFTInit_C_32fc( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
+        ಸ್ಥಿತಿ_2 = ippiDFTInit_C_32fc( src_Roi_ಗಾತ್ರ, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-        if ( sizeInit > 0 )
+        ಆದರೆ ( ಗಾತ್ರ_Init > 0 )
             ippFree( pMemInit );
 
-        if ( status < 0 )
+        ಆದರೆ ( ಸ್ಥಿತಿ_2 < 0 )
         {
             ippFree( pDFTSpec );
-            if ( sizeBuffer > 0 )
-                ippFree( pBuffer );
-            *ok = false;
-            return;
+            ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+                ippFree( p_ಬಫರ್ );
+            *ok = ಸುಳ್ಳು;
+            ಹಿಂತಿರುಗಿ;
         }
 
-        for( int i = range.start; i < range.end; ++i)
-            if(!ippidft((Ipp32fc*)(src + src_step * i), src_step, (Ipp32fc*)(dst + dst_step * i), dst_step,
-                        pDFTSpec, (Ipp8u*)pBuffer))
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = range.ಆರಂಭ; i < range.end; ++i)
+            ಆದರೆ(!ippidft((Ipp32fc*)(src + src_ಹೆಜ್ಜೆ * i), src_ಹೆಜ್ಜೆ, (Ipp32fc*)(dst + dst_ಹೆಜ್ಜೆ * i), dst_ಹೆಜ್ಜೆ,
+                        pDFTSpec, (Ipp8u*)p_ಬಫರ್))
             {
-                *ok = false;
+                *ok = ಸುಳ್ಳು;
             }
 
-        if ( sizeBuffer > 0 )
-            ippFree( pBuffer );
+        ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+            ippFree( p_ಬಫರ್ );
 
         ippFree( pDFTSpec );
-        CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
+        CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP|CV_IMPL_MT);
     }
 
-private:
-    const uchar * src;
-    size_t src_step;
+ಖಾಸಗಿ:
+    ಸ್ಥಿರಾಂಕ uchar * src;
+    size_t src_ಹೆಜ್ಜೆ;
     uchar * dst;
-    size_t dst_step;
-    int width;
-    const Dft& ippidft;
-    int norm_flag;
-    bool *ok;
+    size_t dst_ಹೆಜ್ಜೆ;
+    ಪೂರ್ಣಾಂಕ ಅಗಲ;
+    ಸ್ಥಿರಾಂಕ Dft& ippidft;
+    ಪೂರ್ಣಾಂಕ norm_flag;
+    ತಾರ್ಕಿಕ *ok;
 
-    const Dft_C_IPPLoop_Invoker& operator= (const Dft_C_IPPLoop_Invoker&);
+    ಸ್ಥಿರಾಂಕ Dft_C_IPPLoop_Invoker& ಕ್ರಿಯಾಕಾರಕ= (ಸ್ಥಿರಾಂಕ Dft_C_IPPLoop_Invoker&);
 };
 
-template <typename Dft>
-class Dft_R_IPPLoop_Invoker : public ParallelLoopBody
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು Dft>
+ವರ್ಗ Dft_R_IPPLoop_Invoker : ಸಾರ್ವಜನಿಕ ParallelLoopBody
 {
-public:
+ಸಾರ್ವಜನಿಕ:
 
-    Dft_R_IPPLoop_Invoker(const uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, int _width,
-                          const Dft& _ippidft, int _norm_flag, bool *_ok) :
+    Dft_R_IPPLoop_Invoker(ಸ್ಥಿರಾಂಕ uchar * _src, size_t src_ಹೆಜ್ಜೆ_2, uchar * _dst, size_t dst_ಹೆಜ್ಜೆ_2, ಪೂರ್ಣಾಂಕ ಅಗಲ_3,
+                          ಸ್ಥಿರಾಂಕ Dft& _ippidft, ಪೂರ್ಣಾಂಕ _norm_flag, ತಾರ್ಕಿಕ *_ok) :
         ParallelLoopBody(),
-        src(_src), src_step(_src_step), dst(_dst), dst_step(_dst_step), width(_width),
+        src(_src), src_ಹೆಜ್ಜೆ(src_ಹೆಜ್ಜೆ_2), dst(_dst), dst_ಹೆಜ್ಜೆ(dst_ಹೆಜ್ಜೆ_2), ಅಗಲ(ಅಗಲ_3),
         ippidft(_ippidft), norm_flag(_norm_flag), ok(_ok)
     {
-        *ok = true;
+        *ok = ನಿಜ;
     }
 
-    virtual void operator()(const Range& range) const CV_OVERRIDE
+    ವಾಸ್ತವಿಕ ಶೂನ್ಯ ಕ್ರಿಯಾಕಾರಕ()(ಸ್ಥಿರಾಂಕ Range& range) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
     {
-        IppStatus status;
-        Ipp8u* pBuffer = 0;
+        Ipp_ಸ್ಥಿತಿ ಸ್ಥಿತಿ_2;
+        Ipp8u* p_ಬಫರ್ = 0;
         Ipp8u* pMemInit= 0;
-        int sizeBuffer=0;
-        int sizeSpec=0;
-        int sizeInit=0;
+        ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_ಬಫರ್=0;
+        ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_Spec=0;
+        ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_Init=0;
 
-        IppiSize srcRoiSize = {width, 1};
+        Ippi_ಗಾತ್ರ src_Roi_ಗಾತ್ರ = {ಅಗಲ, 1};
 
-        status = ippiDFTGetSize_R_32f(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-        if ( status < 0 )
+        ಸ್ಥಿತಿ_2 = ippi_DFTGet_ಗಾತ್ರ_R_32f(src_Roi_ಗಾತ್ರ, norm_flag, ippAlgHintNone, &ಗಾತ್ರ_Spec, &ಗಾತ್ರ_Init, &ಗಾತ್ರ_ಬಫರ್ );
+        ಆದರೆ ( ಸ್ಥಿತಿ_2 < 0 )
         {
-            *ok = false;
-            return;
+            *ok = ಸುಳ್ಳು;
+            ಹಿಂತಿರುಗಿ;
         }
 
-        IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( sizeSpec );
+        IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( ಗಾತ್ರ_Spec );
 
-        if ( sizeInit > 0 )
-            pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
+        ಆದರೆ ( ಗಾತ್ರ_Init > 0 )
+            pMemInit = (Ipp8u*)CV_IPP_MALLOC( ಗಾತ್ರ_Init );
 
-        if ( sizeBuffer > 0 )
-            pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
+        ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+            p_ಬಫರ್ = (Ipp8u*)CV_IPP_MALLOC( ಗಾತ್ರ_ಬಫರ್ );
 
-        status = ippiDFTInit_R_32f( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
+        ಸ್ಥಿತಿ_2 = ippiDFTInit_R_32f( src_Roi_ಗಾತ್ರ, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-        if ( sizeInit > 0 )
+        ಆದರೆ ( ಗಾತ್ರ_Init > 0 )
             ippFree( pMemInit );
 
-        if ( status < 0 )
+        ಆದರೆ ( ಸ್ಥಿತಿ_2 < 0 )
         {
             ippFree( pDFTSpec );
-            if ( sizeBuffer > 0 )
-                ippFree( pBuffer );
-            *ok = false;
-            return;
+            ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+                ippFree( p_ಬಫರ್ );
+            *ok = ಸುಳ್ಳು;
+            ಹಿಂತಿರುಗಿ;
         }
 
-        for( int i = range.start; i < range.end; ++i)
-            if(!ippidft((float*)(src + src_step * i), src_step, (float*)(dst + dst_step * i), dst_step,
-                        pDFTSpec, (Ipp8u*)pBuffer))
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = range.ಆರಂಭ; i < range.end; ++i)
+            ಆದರೆ(!ippidft((ದಶಮಾಂಶ*)(src + src_ಹೆಜ್ಜೆ * i), src_ಹೆಜ್ಜೆ, (ದಶಮಾಂಶ*)(dst + dst_ಹೆಜ್ಜೆ * i), dst_ಹೆಜ್ಜೆ,
+                        pDFTSpec, (Ipp8u*)p_ಬಫರ್))
             {
-                *ok = false;
+                *ok = ಸುಳ್ಳು;
             }
 
-        if ( sizeBuffer > 0 )
-            ippFree( pBuffer );
+        ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+            ippFree( p_ಬಫರ್ );
 
         ippFree( pDFTSpec );
-        CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
+        CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP|CV_IMPL_MT);
     }
 
-private:
-    const uchar * src;
-    size_t src_step;
+ಖಾಸಗಿ:
+    ಸ್ಥಿರಾಂಕ uchar * src;
+    size_t src_ಹೆಜ್ಜೆ;
     uchar * dst;
-    size_t dst_step;
-    int width;
-    const Dft& ippidft;
-    int norm_flag;
-    bool *ok;
+    size_t dst_ಹೆಜ್ಜೆ;
+    ಪೂರ್ಣಾಂಕ ಅಗಲ;
+    ಸ್ಥಿರಾಂಕ Dft& ippidft;
+    ಪೂರ್ಣಾಂಕ norm_flag;
+    ತಾರ್ಕಿಕ *ok;
 
-    const Dft_R_IPPLoop_Invoker& operator= (const Dft_R_IPPLoop_Invoker&);
+    ಸ್ಥಿರಾಂಕ Dft_R_IPPLoop_Invoker& ಕ್ರಿಯಾಕಾರಕ= (ಸ್ಥಿರಾಂಕ Dft_R_IPPLoop_Invoker&);
 };
 
-template <typename Dft>
-bool Dft_C_IPPLoop(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, const Dft& ippidft, int norm_flag)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು Dft>
+ತಾರ್ಕಿಕ Dft_C_IPPLoop(ಸ್ಥಿರಾಂಕ uchar * src, size_t src_ಹೆಜ್ಜೆ, uchar * dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ Dft& ippidft, ಪೂರ್ಣಾಂಕ norm_flag)
 {
-    bool ok;
-    parallel_for_(Range(0, height), Dft_C_IPPLoop_Invoker<Dft>(src, src_step, dst, dst_step, width, ippidft, norm_flag, &ok), (width * height)/(double)(1<<16) );
-    return ok;
+    ತಾರ್ಕಿಕ ok;
+    parallel_for_(Range(0, ಎತ್ತರ), Dft_C_IPPLoop_Invoker<Dft>(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, ಅಗಲ, ippidft, norm_flag, &ok), (ಅಗಲ * ಎತ್ತರ)/(ದ್ವಿಗುಣ)(1<<16) );
+    ಹಿಂತಿರುಗಿ ok;
 }
 
-template <typename Dft>
-bool Dft_R_IPPLoop(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, const Dft& ippidft, int norm_flag)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು Dft>
+ತಾರ್ಕಿಕ Dft_R_IPPLoop(ಸ್ಥಿರಾಂಕ uchar * src, size_t src_ಹೆಜ್ಜೆ, uchar * dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ Dft& ippidft, ಪೂರ್ಣಾಂಕ norm_flag)
 {
-    bool ok;
-    parallel_for_(Range(0, height), Dft_R_IPPLoop_Invoker<Dft>(src, src_step, dst, dst_step, width, ippidft, norm_flag, &ok), (width * height)/(double)(1<<16) );
-    return ok;
+    ತಾರ್ಕಿಕ ok;
+    parallel_for_(Range(0, ಎತ್ತರ), Dft_R_IPPLoop_Invoker<Dft>(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, ಅಗಲ, ippidft, norm_flag, &ok), (ಅಗಲ * ಎತ್ತರ)/(ದ್ವಿಗುಣ)(1<<16) );
+    ಹಿಂತಿರುಗಿ ok;
 }
 
-struct IPPDFT_C_Functor
+ರಚನೆ IPPDFT_C_Functor
 {
     IPPDFT_C_Functor(ippiDFT_C_Func _func) : ippiDFT_CToC_32fc_C1R(_func){}
 
-    bool operator()(const Ipp32fc* src, size_t srcStep, Ipp32fc* dst, size_t dstStep, const IppiDFTSpec_C_32fc* pDFTSpec, Ipp8u* pBuffer) const
+    ತಾರ್ಕಿಕ ಕ್ರಿಯಾಕಾರಕ()(ಸ್ಥಿರಾಂಕ Ipp32fc* src, size_t src_ಹೆಜ್ಜೆ_3, Ipp32fc* dst, size_t dst_ಹೆಜ್ಜೆ_3, ಸ್ಥಿರಾಂಕ IppiDFTSpec_C_32fc* pDFTSpec, Ipp8u* p_ಬಫರ್) ಸ್ಥಿರಾಂಕ
     {
-        return ippiDFT_CToC_32fc_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_CToC_32fc_C1R, src, static_cast<int>(srcStep), dst, static_cast<int>(dstStep), pDFTSpec, pBuffer) >= 0 : false;
+        ಹಿಂತಿರುಗಿ ippiDFT_CToC_32fc_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_CToC_32fc_C1R, src, static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ_3), dst, static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ_3), pDFTSpec, p_ಬಫರ್) >= 0 : ಸುಳ್ಳು;
     }
-private:
+ಖಾಸಗಿ:
     ippiDFT_C_Func ippiDFT_CToC_32fc_C1R;
 };
 
-struct IPPDFT_R_Functor
+ರಚನೆ IPPDFT_R_Functor
 {
-    IPPDFT_R_Functor(ippiDFT_R_Func _func) : ippiDFT_PackToR_32f_C1R(_func){}
+    IPPDFT_R_Functor(ippiDFT_R_Func _func) : ippi_DFT_Pack_ಗಮ್ಯ_R_32f_C1_R(_func){}
 
-    bool operator()(const Ipp32f* src, size_t srcStep, Ipp32f* dst, size_t dstStep, const IppiDFTSpec_R_32f* pDFTSpec, Ipp8u* pBuffer) const
+    ತಾರ್ಕಿಕ ಕ್ರಿಯಾಕಾರಕ()(ಸ್ಥಿರಾಂಕ Ipp32f* src, size_t src_ಹೆಜ್ಜೆ_3, Ipp32f* dst, size_t dst_ಹೆಜ್ಜೆ_3, ಸ್ಥಿರಾಂಕ IppiDFTSpec_R_32f* pDFTSpec, Ipp8u* p_ಬಫರ್) ಸ್ಥಿರಾಂಕ
     {
-        return ippiDFT_PackToR_32f_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_PackToR_32f_C1R, src, static_cast<int>(srcStep), dst, static_cast<int>(dstStep), pDFTSpec, pBuffer) >= 0 : false;
+        ಹಿಂತಿರುಗಿ ippi_DFT_Pack_ಗಮ್ಯ_R_32f_C1_R ? CV_INSTRUMENT_FUN_IPP(ippi_DFT_Pack_ಗಮ್ಯ_R_32f_C1_R, src, static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ_3), dst, static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ_3), pDFTSpec, p_ಬಫರ್) >= 0 : ಸುಳ್ಳು;
     }
-private:
-    ippiDFT_R_Func ippiDFT_PackToR_32f_C1R;
+ಖಾಸಗಿ:
+    ippiDFT_R_Func ippi_DFT_Pack_ಗಮ್ಯ_R_32f_C1_R;
 };
 
-static bool ippi_DFT_C_32F(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv, int norm_flag)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ippi_DFT_C_32F(ಸ್ಥಿರಾಂಕ uchar * src, size_t src_ಹೆಜ್ಜೆ, uchar * dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ತಾರ್ಕಿಕ inv, ಪೂರ್ಣಾಂಕ norm_flag)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    IppStatus status;
-    Ipp8u* pBuffer = 0;
+    Ipp_ಸ್ಥಿತಿ ಸ್ಥಿತಿ_2;
+    Ipp8u* p_ಬಫರ್ = 0;
     Ipp8u* pMemInit= 0;
-    int sizeBuffer=0;
-    int sizeSpec=0;
-    int sizeInit=0;
+    ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_ಬಫರ್=0;
+    ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_Spec=0;
+    ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_Init=0;
 
-    IppiSize srcRoiSize = {width, height};
+    Ippi_ಗಾತ್ರ src_Roi_ಗಾತ್ರ = {ಅಗಲ, ಎತ್ತರ};
 
-    status = ippiDFTGetSize_C_32fc(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-    if ( status < 0 )
-        return false;
+    ಸ್ಥಿತಿ_2 = ippi_DFTGet_ಗಾತ್ರ_C_32fc(src_Roi_ಗಾತ್ರ, norm_flag, ippAlgHintNone, &ಗಾತ್ರ_Spec, &ಗಾತ್ರ_Init, &ಗಾತ್ರ_ಬಫರ್ );
+    ಆದರೆ ( ಸ್ಥಿತಿ_2 < 0 )
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( sizeSpec );
+    IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( ಗಾತ್ರ_Spec );
 
-    if ( sizeInit > 0 )
-        pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
+    ಆದರೆ ( ಗಾತ್ರ_Init > 0 )
+        pMemInit = (Ipp8u*)CV_IPP_MALLOC( ಗಾತ್ರ_Init );
 
-    if ( sizeBuffer > 0 )
-        pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
+    ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+        p_ಬಫರ್ = (Ipp8u*)CV_IPP_MALLOC( ಗಾತ್ರ_ಬಫರ್ );
 
-    status = ippiDFTInit_C_32fc( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
+    ಸ್ಥಿತಿ_2 = ippiDFTInit_C_32fc( src_Roi_ಗಾತ್ರ, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-    if ( sizeInit > 0 )
+    ಆದರೆ ( ಗಾತ್ರ_Init > 0 )
         ippFree( pMemInit );
 
-    if ( status < 0 )
+    ಆದರೆ ( ಸ್ಥಿತಿ_2 < 0 )
     {
         ippFree( pDFTSpec );
-        if ( sizeBuffer > 0 )
-            ippFree( pBuffer );
-        return false;
+        ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+            ippFree( p_ಬಫರ್ );
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
 
-    if (!inv)
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<int>(src_step), (Ipp32fc*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
-    else
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<int>(src_step), (Ipp32fc*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
+    ಆದರೆ (!inv)
+        ಸ್ಥಿತಿ_2 = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ), (Ipp32fc*)dst, static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ), pDFTSpec, p_ಬಫರ್);
+    ಇಲ್ಲದಿದ್ದರೆ
+        ಸ್ಥಿತಿ_2 = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ), (Ipp32fc*)dst, static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ), pDFTSpec, p_ಬಫರ್);
 
-    if ( sizeBuffer > 0 )
-        ippFree( pBuffer );
+    ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+        ippFree( p_ಬಫರ್ );
 
     ippFree( pDFTSpec );
 
-    if(status >= 0)
+    ಆದರೆ(ಸ್ಥಿತಿ_2 >= 0)
     {
-        CV_IMPL_ADD(CV_IMPL_IPP);
-        return true;
+        CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP);
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
-    return false;
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 }
 
-static bool ippi_DFT_R_32F(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv, int norm_flag)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ippi_DFT_R_32F(ಸ್ಥಿರಾಂಕ uchar * src, size_t src_ಹೆಜ್ಜೆ, uchar * dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ತಾರ್ಕಿಕ inv, ಪೂರ್ಣಾಂಕ norm_flag)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    IppStatus status;
-    Ipp8u* pBuffer = 0;
+    Ipp_ಸ್ಥಿತಿ ಸ್ಥಿತಿ_2;
+    Ipp8u* p_ಬಫರ್ = 0;
     Ipp8u* pMemInit= 0;
-    int sizeBuffer=0;
-    int sizeSpec=0;
-    int sizeInit=0;
+    ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_ಬಫರ್=0;
+    ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_Spec=0;
+    ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_Init=0;
 
-    IppiSize srcRoiSize = {width, height};
+    Ippi_ಗಾತ್ರ src_Roi_ಗಾತ್ರ = {ಅಗಲ, ಎತ್ತರ};
 
-    status = ippiDFTGetSize_R_32f(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-    if ( status < 0 )
-        return false;
+    ಸ್ಥಿತಿ_2 = ippi_DFTGet_ಗಾತ್ರ_R_32f(src_Roi_ಗಾತ್ರ, norm_flag, ippAlgHintNone, &ಗಾತ್ರ_Spec, &ಗಾತ್ರ_Init, &ಗಾತ್ರ_ಬಫರ್ );
+    ಆದರೆ ( ಸ್ಥಿತಿ_2 < 0 )
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( sizeSpec );
+    IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( ಗಾತ್ರ_Spec );
 
-    if ( sizeInit > 0 )
-        pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
+    ಆದರೆ ( ಗಾತ್ರ_Init > 0 )
+        pMemInit = (Ipp8u*)CV_IPP_MALLOC( ಗಾತ್ರ_Init );
 
-    if ( sizeBuffer > 0 )
-        pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
+    ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+        p_ಬಫರ್ = (Ipp8u*)CV_IPP_MALLOC( ಗಾತ್ರ_ಬಫರ್ );
 
-    status = ippiDFTInit_R_32f( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
+    ಸ್ಥಿತಿ_2 = ippiDFTInit_R_32f( src_Roi_ಗಾತ್ರ, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-    if ( sizeInit > 0 )
+    ಆದರೆ ( ಗಾತ್ರ_Init > 0 )
         ippFree( pMemInit );
 
-    if ( status < 0 )
+    ಆದರೆ ( ಸ್ಥಿತಿ_2 < 0 )
     {
         ippFree( pDFTSpec );
-        if ( sizeBuffer > 0 )
-            ippFree( pBuffer );
-        return false;
+        ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+            ippFree( p_ಬಫರ್ );
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
 
-    if (!inv)
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_RToPack_32f_C1R, (float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
-    else
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_PackToR_32f_C1R, (float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
+    ಆದರೆ (!inv)
+        ಸ್ಥಿತಿ_2 = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_RToPack_32f_C1R, (ದಶಮಾಂಶ*)src, static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ), (ದಶಮಾಂಶ*)dst, static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ), pDFTSpec, p_ಬಫರ್);
+    ಇಲ್ಲದಿದ್ದರೆ
+        ಸ್ಥಿತಿ_2 = CV_INSTRUMENT_FUN_IPP(ippi_DFTInv_Pack_ಗಮ್ಯ_R_32f_C1_R, (ದಶಮಾಂಶ*)src, static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ), (ದಶಮಾಂಶ*)dst, static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ), pDFTSpec, p_ಬಫರ್);
 
-    if ( sizeBuffer > 0 )
-        ippFree( pBuffer );
+    ಆದರೆ ( ಗಾತ್ರ_ಬಫರ್ > 0 )
+        ippFree( p_ಬಫರ್ );
 
     ippFree( pDFTSpec );
 
-    if(status >= 0)
+    ಆದರೆ(ಸ್ಥಿತಿ_2 >= 0)
     {
-        CV_IMPL_ADD(CV_IMPL_IPP);
-        return true;
+        CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP);
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
-    return false;
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-enum FftType
+ಎಣಿಕೆ FftType
 {
     R2R = 0, // real to CCS in case forward transform, CCS to real otherwise
     C2R = 1, // complex to real in case inverse transform
@@ -1279,61 +1279,61 @@ enum FftType
     C2C = 3  // complex to complex
 };
 
-struct OCL_FftPlan
+ರಚನೆ OCL_FftPlan
 {
-private:
+ಖಾಸಗಿ:
     UMat twiddles;
     String buildOptions;
-    int thread_count;
-    int dft_size;
-    int dft_depth;
-    bool status;
+    ಪೂರ್ಣಾಂಕ thread_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ dft_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ dft_ಆಳ;
+    ತಾರ್ಕಿಕ ಸ್ಥಿತಿ_2;
 
-public:
-    OCL_FftPlan(int _size, int _depth) : dft_size(_size), dft_depth(_depth), status(true)
+ಸಾರ್ವಜನಿಕ:
+    OCL_FftPlan(ಪೂರ್ಣಾಂಕ ಗಾತ್ರ_5, ಪೂರ್ಣಾಂಕ ಆಳ_2) : dft_ಗಾತ್ರ(ಗಾತ್ರ_5), dft_ಆಳ(ಆಳ_2), ಸ್ಥಿತಿ_2(ನಿಜ)
     {
-        CV_Assert( dft_depth == CV_32F || dft_depth == CV_64F );
+        CV_Assert( dft_ಆಳ == CV_32F || dft_ಆಳ == CV_64F );
 
-        int min_radix;
-        std::vector<int> radixes, blocks;
-        ocl_getRadixes(dft_size, radixes, blocks, min_radix);
-        thread_count = dft_size / min_radix;
+        ಪೂರ್ಣಾಂಕ min_radix;
+        std::vector<ಪೂರ್ಣಾಂಕ> radixes, ಖಂಡಗಳು;
+        ocl_getRadixes(dft_ಗಾತ್ರ, radixes, ಖಂಡಗಳು, min_radix);
+        thread_ಎಣಿಕೆ = dft_ಗಾತ್ರ / min_radix;
 
-        if (thread_count > (int) ocl::Device::getDefault().maxWorkGroupSize())
+        ಆದರೆ (thread_ಎಣಿಕೆ > (ಪೂರ್ಣಾಂಕ) ocl::Device::getDefault().max_Work_ಗುಂಪು_ಗಾತ್ರ())
         {
-            status = false;
-            return;
+            ಸ್ಥಿತಿ_2 = ಸುಳ್ಳು;
+            ಹಿಂತಿರುಗಿ;
         }
 
         // generate string with radix calls
         String radix_processing;
-        int n = 1, twiddle_size = 0;
-        for (size_t i=0; i<radixes.size(); i++)
+        ಪೂರ್ಣಾಂಕ n = 1, twiddle_ಗಾತ್ರ = 0;
+        ಗಾಗಿ (size_t i=0; i<radixes.size(); i++)
         {
-            int radix = radixes[i], block = blocks[i];
-            if (block > 1)
-                radix_processing += format("fft_radix%d_B%d(smem,twiddles+%d,ind,%d,%d);", radix, block, twiddle_size, n, dft_size/radix);
-            else
-                radix_processing += format("fft_radix%d(smem,twiddles+%d,ind,%d,%d);", radix, twiddle_size, n, dft_size/radix);
-            twiddle_size += (radix-1)*n;
+            ಪೂರ್ಣಾಂಕ radix = radixes[i], ಖಂಡ_2 = ಖಂಡಗಳು[i];
+            ಆದರೆ (ಖಂಡ_2 > 1)
+                radix_processing += format("fft_radix%d_B%d(smem,twiddles+%d,ind,%d,%d);", radix, ಖಂಡ_2, twiddle_ಗಾತ್ರ, n, dft_ಗಾತ್ರ/radix);
+            ಇಲ್ಲದಿದ್ದರೆ
+                radix_processing += format("fft_radix%d(smem,twiddles+%d,ind,%d,%d);", radix, twiddle_ಗಾತ್ರ, n, dft_ಗಾತ್ರ/radix);
+            twiddle_ಗಾತ್ರ += (radix-1)*n;
             n *= radix;
         }
 
-        twiddles.create(1, twiddle_size, CV_MAKE_TYPE(dft_depth, 2));
-        if (dft_depth == CV_32F)
-            fillRadixTable<float>(twiddles, radixes);
-        else
-            fillRadixTable<double>(twiddles, radixes);
+        twiddles.create(1, twiddle_ಗಾತ್ರ, CV_MAKE_TYPE(dft_ಆಳ, 2));
+        ಆದರೆ (dft_ಆಳ == CV_32F)
+            fill_Radix_ಕೋಷ್ಟಕ<ದಶಮಾಂಶ>(twiddles, radixes);
+        ಇಲ್ಲದಿದ್ದರೆ
+            fill_Radix_ಕೋಷ್ಟಕ<ದ್ವಿಗುಣ>(twiddles, radixes);
 
         buildOptions = format("-D LOCAL_SIZE=%d -D kercn=%d -D FT=%s -D CT=%s%s -D RADIX_PROCESS=%s",
-                              dft_size, min_radix, ocl::typeToStr(dft_depth), ocl::typeToStr(CV_MAKE_TYPE(dft_depth, 2)),
-                              dft_depth == CV_64F ? " -D DOUBLE_SUPPORT" : "", radix_processing.c_str());
+                              dft_ಗಾತ್ರ, min_radix, ocl::type_ಗಮ್ಯ_Str(dft_ಆಳ), ocl::type_ಗಮ್ಯ_Str(CV_MAKE_TYPE(dft_ಆಳ, 2)),
+                              dft_ಆಳ == CV_64F ? " -D DOUBLE_SUPPORT" : "", radix_processing.c_str());
     }
 
-    bool enqueueTransform(InputArray _src, OutputArray _dst, int num_dfts, int flags, int fftType, bool rows = true) const
+    ತಾರ್ಕಿಕ ಸರತಿಗೆ_ಸೇರಿಸು_Transform(ಒಳಹರಿವು_Array _src, OutputArray _dst, ಪೂರ್ಣಾಂಕ ಅಂಕೆ_dfts, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ fftType, ತಾರ್ಕಿಕ ಅಡ್ಡಸಾಲುಗಳು = ನಿಜ) ಸ್ಥಿರಾಂಕ
     {
-        if (!status)
-            return false;
+        ಆದರೆ (!ಸ್ಥಿತಿ_2)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
         UMat src = _src.getUMat();
         UMat dst = _dst.getUMat();
@@ -1342,24 +1342,24 @@ public:
         size_t localsize[2];
         String kernel_name;
 
-        bool is1d = (flags & DFT_ROWS) != 0 || num_dfts == 1;
-        bool inv = (flags & DFT_INVERSE) != 0;
+        ತಾರ್ಕಿಕ is1d = (flags & DFT_ಅಡ್ಡಸಾಲುಗಳು) != 0 || ಅಂಕೆ_dfts == 1;
+        ತಾರ್ಕಿಕ inv = (flags & DFT_INVERSE) != 0;
         String options = buildOptions;
 
-        if (rows)
+        ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು)
         {
-            globalsize[0] = thread_count; globalsize[1] = src.rows;
-            localsize[0] = thread_count; localsize[1] = 1;
+            globalsize[0] = thread_ಎಣಿಕೆ; globalsize[1] = src.ಅಡ್ಡಸಾಲುಗಳು;
+            localsize[0] = thread_ಎಣಿಕೆ; localsize[1] = 1;
             kernel_name = !inv ? "fft_multi_radix_rows" : "ifft_multi_radix_rows";
-            if ((is1d || inv) && (flags & DFT_SCALE))
+            ಆದರೆ ((is1d || inv) && (flags & DFT_SCALE))
                 options += " -D DFT_SCALE";
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            globalsize[0] = num_dfts; globalsize[1] = thread_count;
-            localsize[0] = 1; localsize[1] = thread_count;
+            globalsize[0] = ಅಂಕೆ_dfts; globalsize[1] = thread_ಎಣಿಕೆ;
+            localsize[0] = 1; localsize[1] = thread_ಎಣಿಕೆ;
             kernel_name = !inv ? "fft_multi_radix_cols" : "ifft_multi_radix_cols";
-            if (flags & DFT_SCALE)
+            ಆದರೆ (flags & DFT_SCALE)
                 options += " -D DFT_SCALE";
         }
 
@@ -1367,145 +1367,145 @@ public:
         options += dst.channels() == 1 ? " -D REAL_OUTPUT" : " -D COMPLEX_OUTPUT";
         options += is1d ? " -D IS_1D" : "";
 
-        if (!inv)
+        ಆದರೆ (!inv)
         {
-            if ((is1d && src.channels() == 1) || (rows && (fftType == R2R)))
+            ಆದರೆ ((is1d && src.channels() == 1) || (ಅಡ್ಡಸಾಲುಗಳು && (fftType == R2R)))
                 options += " -D NO_CONJUGATE";
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            if (rows && (fftType == C2R || fftType == R2R))
+            ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು && (fftType == C2R || fftType == R2R))
                 options += " -D NO_CONJUGATE";
-            if (dst.cols % 2 == 0)
+            ಆದರೆ (dst.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 2 == 0)
                 options += " -D EVEN";
         }
 
         ocl::Kernel k(kernel_name.c_str(), ocl::core::fft_oclsrc, options);
-        if (k.empty())
-            return false;
+        ಆದರೆ (k.empty())
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-        k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst), ocl::KernelArg::ReadOnlyNoSize(twiddles), thread_count, num_dfts);
-        return k.run(2, globalsize, localsize, false);
+        k.ವಾದಗಳು(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst), ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(twiddles), thread_ಎಣಿಕೆ, ಅಂಕೆ_dfts);
+        ಹಿಂತಿರುಗಿ k.ಸತತ(2, globalsize, localsize, ಸುಳ್ಳು);
     }
 
-private:
-    static void ocl_getRadixes(int cols, std::vector<int>& radixes, std::vector<int>& blocks, int& min_radix)
+ಖಾಸಗಿ:
+    ಸ್ಥಿರ ಶೂನ್ಯ ocl_getRadixes(ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, std::vector<ಪೂರ್ಣಾಂಕ>& radixes, std::vector<ಪೂರ್ಣಾಂಕ>& ಖಂಡಗಳು, ಪೂರ್ಣಾಂಕ& min_radix)
     {
-        int factors[34];
-        int nf = DFTFactorize(cols, factors);
+        ಪೂರ್ಣಾಂಕ factors[34];
+        ಪೂರ್ಣಾಂಕ nf = DFTFactorize(ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, factors);
 
-        int n = 1;
-        int factor_index = 0;
-        min_radix = INT_MAX;
+        ಪೂರ್ಣಾಂಕ n = 1;
+        ಪೂರ್ಣಾಂಕ ಗುಣಕ_ಸೂಚ್ಯಂಕ = 0;
+        min_radix = ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ;
 
         // 2^n transforms
-        if ((factors[factor_index] & 1) == 0)
+        ಆದರೆ ((factors[ಗುಣಕ_ಸೂಚ್ಯಂಕ] & 1) == 0)
         {
-            for( ; n < factors[factor_index];)
+            ಗಾಗಿ( ; n < factors[ಗುಣಕ_ಸೂಚ್ಯಂಕ];)
             {
-                int radix = 2, block = 1;
-                if (8*n <= factors[0])
+                ಪೂರ್ಣಾಂಕ radix = 2, ಖಂಡ_2 = 1;
+                ಆದರೆ (8*n <= factors[0])
                     radix = 8;
-                else if (4*n <= factors[0])
+                ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (4*n <= factors[0])
                 {
                     radix = 4;
-                    if (cols % 12 == 0)
-                        block = 3;
-                    else if (cols % 8 == 0)
-                        block = 2;
+                    ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 12 == 0)
+                        ಖಂಡ_2 = 3;
+                    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 8 == 0)
+                        ಖಂಡ_2 = 2;
                 }
-                else
+                ಇಲ್ಲದಿದ್ದರೆ
                 {
-                    if (cols % 10 == 0)
-                        block = 5;
-                    else if (cols % 8 == 0)
-                        block = 4;
-                    else if (cols % 6 == 0)
-                        block = 3;
-                    else if (cols % 4 == 0)
-                        block = 2;
+                    ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 10 == 0)
+                        ಖಂಡ_2 = 5;
+                    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 8 == 0)
+                        ಖಂಡ_2 = 4;
+                    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 6 == 0)
+                        ಖಂಡ_2 = 3;
+                    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 4 == 0)
+                        ಖಂಡ_2 = 2;
                 }
 
                 radixes.push_back(radix);
-                blocks.push_back(block);
-                min_radix = min(min_radix, block*radix);
+                ಖಂಡಗಳು.push_back(ಖಂಡ_2);
+                min_radix = min(min_radix, ಖಂಡ_2*radix);
                 n *= radix;
             }
-            factor_index++;
+            ಗುಣಕ_ಸೂಚ್ಯಂಕ++;
         }
 
         // all the other transforms
-        for( ; factor_index < nf; factor_index++)
+        ಗಾಗಿ( ; ಗುಣಕ_ಸೂಚ್ಯಂಕ < nf; ಗುಣಕ_ಸೂಚ್ಯಂಕ++)
         {
-            int radix = factors[factor_index], block = 1;
-            if (radix == 3)
+            ಪೂರ್ಣಾಂಕ radix = factors[ಗುಣಕ_ಸೂಚ್ಯಂಕ], ಖಂಡ_2 = 1;
+            ಆದರೆ (radix == 3)
             {
-                if (cols % 12 == 0)
-                    block = 4;
-                else if (cols % 9 == 0)
-                    block = 3;
-                else if (cols % 6 == 0)
-                    block = 2;
+                ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 12 == 0)
+                    ಖಂಡ_2 = 4;
+                ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 9 == 0)
+                    ಖಂಡ_2 = 3;
+                ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 6 == 0)
+                    ಖಂಡ_2 = 2;
             }
-            else if (radix == 5)
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (radix == 5)
             {
-                if (cols % 10 == 0)
-                    block = 2;
+                ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 10 == 0)
+                    ಖಂಡ_2 = 2;
             }
             radixes.push_back(radix);
-            blocks.push_back(block);
-            min_radix = min(min_radix, block*radix);
+            ಖಂಡಗಳು.push_back(ಖಂಡ_2);
+            min_radix = min(min_radix, ಖಂಡ_2*radix);
         }
     }
 
-    template <typename T>
-    static void fillRadixTable(UMat twiddles, const std::vector<int>& radixes)
+    ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T>
+    ಸ್ಥಿರ ಶೂನ್ಯ fill_Radix_ಕೋಷ್ಟಕ(UMat twiddles, ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& radixes)
     {
         Mat tw = twiddles.getMat(ACCESS_WRITE);
         T* ptr = tw.ptr<T>();
-        int ptr_index = 0;
+        ಪೂರ್ಣಾಂಕ ptr_ಸೂಚ್ಯಂಕ = 0;
 
-        int n = 1;
-        for (size_t i=0; i<radixes.size(); i++)
+        ಪೂರ್ಣಾಂಕ n = 1;
+        ಗಾಗಿ (size_t i=0; i<radixes.size(); i++)
         {
-            int radix = radixes[i];
+            ಪೂರ್ಣಾಂಕ radix = radixes[i];
             n *= radix;
 
-            for (int j=1; j<radix; j++)
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ j=1; j<radix; j++)
             {
-                double theta = -CV_2PI*j/n;
+                ದ್ವಿಗುಣ theta = -CV_2PI*j/n;
 
-                for (int k=0; k<(n/radix); k++)
+                ಗಾಗಿ (ಪೂರ್ಣಾಂಕ k=0; k<(n/radix); k++)
                 {
-                    ptr[ptr_index++] = (T) cos(k*theta);
-                    ptr[ptr_index++] = (T) sin(k*theta);
+                    ptr[ptr_ಸೂಚ್ಯಂಕ++] = (T) ಕೋಜ್ಯಾ(k*theta);
+                    ptr[ptr_ಸೂಚ್ಯಂಕ++] = (T) ಜ್ಯಾ(k*theta);
                 }
             }
         }
     }
 };
 
-class OCL_FftPlanCache
+ವರ್ಗ OCL_FftPlanCache
 {
-public:
-    static OCL_FftPlanCache & getInstance()
+ಸಾರ್ವಜನಿಕ:
+    ಸ್ಥಿರ OCL_FftPlanCache & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(OCL_FftPlanCache, new OCL_FftPlanCache())
+        CV_SINGLETON_LAZY_INIT_REF(OCL_FftPlanCache, ಹೊಸ OCL_FftPlanCache())
     }
 
-    Ptr<OCL_FftPlan> getFftPlan(int dft_size, int depth)
+    Ptr<OCL_FftPlan> getFftPlan(ಪೂರ್ಣಾಂಕ dft_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ ಆಳ)
     {
-        int key = (dft_size << 16) | (depth & 0xFFFF);
-        std::map<int, Ptr<OCL_FftPlan> >::iterator f = planStorage.find(key);
-        if (f != planStorage.end())
+        ಪೂರ್ಣಾಂಕ ಕೀಲಿ = (dft_ಗಾತ್ರ << 16) | (ಆಳ & 0xFFFF);
+        std::map<ಪೂರ್ಣಾಂಕ, Ptr<OCL_FftPlan> >::iterator f = planStorage.find(ಕೀಲಿ);
+        ಆದರೆ (f != planStorage.end())
         {
-            return f->second;
+            ಹಿಂತಿರುಗಿ f->second;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            Ptr<OCL_FftPlan> newPlan = Ptr<OCL_FftPlan>(new OCL_FftPlan(dft_size, depth));
-            planStorage[key] = newPlan;
-            return newPlan;
+            Ptr<OCL_FftPlan> newPlan = Ptr<OCL_FftPlan>(ಹೊಸ OCL_FftPlan(dft_ಗಾತ್ರ, ಆಳ));
+            planStorage[ಕೀಲಿ] = newPlan;
+            ಹಿಂತಿರುಗಿ newPlan;
         }
     }
 
@@ -1514,214 +1514,214 @@ public:
         planStorage.clear();
     }
 
-protected:
+ಸಂರಕ್ಷಿತ:
     OCL_FftPlanCache() :
         planStorage()
     {
     }
-    std::map<int, Ptr<OCL_FftPlan> > planStorage;
+    std::map<ಪೂರ್ಣಾಂಕ, Ptr<OCL_FftPlan> > planStorage;
 };
 
-static bool ocl_dft_rows(InputArray _src, OutputArray _dst, int nonzero_rows, int flags, int fftType)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_dft_ಅಡ್ಡಸಾಲುಗಳು(ಒಳಹರಿವು_Array _src, OutputArray _dst, ಪೂರ್ಣಾಂಕ nonzero_ಅಡ್ಡಸಾಲುಗಳು, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ fftType)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
-    Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.cols(), depth);
-    return plan->enqueueTransform(_src, _dst, nonzero_rows, flags, fftType, true);
+    ಪೂರ್ಣಾಂಕ type = _src.type(), ಆಳ = CV_MAT_ಆಳ(type);
+    Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(), ಆಳ);
+    ಹಿಂತಿರುಗಿ plan->ಸರತಿಗೆ_ಸೇರಿಸು_Transform(_src, _dst, nonzero_ಅಡ್ಡಸಾಲುಗಳು, flags, fftType, ನಿಜ);
 }
 
-static bool ocl_dft_cols(InputArray _src, OutputArray _dst, int nonzero_cols, int flags, int fftType)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_dft_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(ಒಳಹರಿವು_Array _src, OutputArray _dst, ಪೂರ್ಣಾಂಕ nonzero_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ fftType)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
-    Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.rows(), depth);
-    return plan->enqueueTransform(_src, _dst, nonzero_cols, flags, fftType, false);
+    ಪೂರ್ಣಾಂಕ type = _src.type(), ಆಳ = CV_MAT_ಆಳ(type);
+    Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.ಅಡ್ಡಸಾಲುಗಳು(), ಆಳ);
+    ಹಿಂತಿರುಗಿ plan->ಸರತಿಗೆ_ಸೇರಿಸು_Transform(_src, _dst, nonzero_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, flags, fftType, ಸುಳ್ಳು);
 }
 
-inline FftType determineFFTType(bool real_input, bool complex_input, bool real_output, bool complex_output, bool inv)
+ಸಾಲೊಳಗೆ FftType determineFFTType(ತಾರ್ಕಿಕ real_ಒಳಹರಿವು, ತಾರ್ಕಿಕ complex_ಒಳಹರಿವು, ತಾರ್ಕಿಕ real_output, ತಾರ್ಕಿಕ complex_output, ತಾರ್ಕಿಕ inv)
 {
     // output format is not specified
-    if (!real_output && !complex_output)
-        complex_output = true;
+    ಆದರೆ (!real_output && !complex_output)
+        complex_output = ನಿಜ;
 
     // input or output format is ambiguous
-    if (real_input == complex_input || real_output == complex_output)
+    ಆದರೆ (real_ಒಳಹರಿವು == complex_ಒಳಹರಿವು || real_output == complex_output)
         CV_Error(Error::StsBadArg, "Invalid FFT input or output format");
 
-    FftType result = real_input ? (real_output ? R2R : R2C) : (real_output ? C2R : C2C);
+    FftType ಫಲಿತಾಂಶ = real_ಒಳಹರಿವು ? (real_output ? R2R : R2C) : (real_output ? C2R : C2C);
 
     // Forward Complex to CCS not supported
-    if (result == C2R && !inv)
-        result = C2C;
+    ಆದರೆ (ಫಲಿತಾಂಶ == C2R && !inv)
+        ಫಲಿತಾಂಶ = C2C;
 
     // Inverse CCS to Complex not supported
-    if (result == R2C && inv)
-        result = R2R;
+    ಆದರೆ (ಫಲಿತಾಂಶ == R2C && inv)
+        ಫಲಿತಾಂಶ = R2R;
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-static bool ocl_dft(InputArray _src, OutputArray _dst, int flags, int nonzero_rows)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_dft(ಒಳಹರಿವು_Array _src, OutputArray _dst, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ nonzero_ಅಡ್ಡಸಾಲುಗಳು)
 {
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    Size ssize = _src.size();
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    ಪೂರ್ಣಾಂಕ type = _src.type(), cn = CV_MAT_CN(type), ಆಳ = CV_MAT_ಆಳ(type);
+    ಗಾತ್ರ_2 ssize = _src.size();
+    ತಾರ್ಕಿಕ doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (!(cn == 1 || cn == 2)
-        || !(depth == CV_32F || (depth == CV_64F && doubleSupport))
+    ಆದರೆ (!(cn == 1 || cn == 2)
+        || !(ಆಳ == CV_32F || (ಆಳ == CV_64F && doubleSupport))
         || ((flags & DFT_REAL_OUTPUT) && (flags & DFT_COMPLEX_OUTPUT)))
-        return false;
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     // if is not a multiplication of prime numbers { 2, 3, 5 }
-    if (ssize.area() != getOptimalDFTSize(ssize.area()))
-        return false;
+    ಆದರೆ (ssize.area() != getOptimalDFTSize(ssize.area()))
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     UMat src = _src.getUMat();
-    bool inv = (flags & DFT_INVERSE) != 0 ? 1 : 0;
+    ತಾರ್ಕಿಕ inv = (flags & DFT_INVERSE) != 0 ? 1 : 0;
 
-    if( nonzero_rows <= 0 || nonzero_rows > _src.rows() )
-        nonzero_rows = _src.rows();
-    bool is1d = (flags & DFT_ROWS) != 0 || nonzero_rows == 1;
+    ಆದರೆ( nonzero_ಅಡ್ಡಸಾಲುಗಳು <= 0 || nonzero_ಅಡ್ಡಸಾಲುಗಳು > _src.ಅಡ್ಡಸಾಲುಗಳು() )
+        nonzero_ಅಡ್ಡಸಾಲುಗಳು = _src.ಅಡ್ಡಸಾಲುಗಳು();
+    ತಾರ್ಕಿಕ is1d = (flags & DFT_ಅಡ್ಡಸಾಲುಗಳು) != 0 || nonzero_ಅಡ್ಡಸಾಲುಗಳು == 1;
 
     FftType fftType = determineFFTType(cn == 1, cn == 2,
         (flags & DFT_REAL_OUTPUT) != 0, (flags & DFT_COMPLEX_OUTPUT) != 0, inv);
 
     UMat output;
-    if (fftType == C2C || fftType == R2C)
+    ಆದರೆ (fftType == C2C || fftType == R2C)
     {
         // complex output
-        _dst.createSameSize(src, CV_MAKETYPE(depth, 2));
+        _dst.create_Same_ಗಾತ್ರ(src, CV_MAKETYPE(ಆಳ, 2));
         output = _dst.getUMat();
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         // real output
-        if (is1d)
+        ಆದರೆ (is1d)
         {
-            _dst.createSameSize(src, CV_MAKETYPE(depth, 1));
+            _dst.create_Same_ಗಾತ್ರ(src, CV_MAKETYPE(ಆಳ, 1));
             output = _dst.getUMat();
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            _dst.createSameSize(src, CV_MAKETYPE(depth, 1));
-            output.create(src.size, CV_MAKETYPE(depth, 2));
+            _dst.create_Same_ಗಾತ್ರ(src, CV_MAKETYPE(ಆಳ, 1));
+            output.create(src.size, CV_MAKETYPE(ಆಳ, 2));
         }
     }
 
-    bool result = false;
-    if (!inv)
+    ತಾರ್ಕಿಕ ಫಲಿತಾಂಶ = ಸುಳ್ಳು;
+    ಆದರೆ (!inv)
     {
-        int nonzero_cols = fftType == R2R ? output.cols/2 + 1 : output.cols;
-        result = ocl_dft_rows(src, output, nonzero_rows, flags, fftType);
-        if (!is1d)
-            result = result && ocl_dft_cols(output, _dst, nonzero_cols, flags, fftType);
+        ಪೂರ್ಣಾಂಕ nonzero_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = fftType == R2R ? output.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ/2 + 1 : output.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+        ಫಲಿತಾಂಶ = ocl_dft_ಅಡ್ಡಸಾಲುಗಳು(src, output, nonzero_ಅಡ್ಡಸಾಲುಗಳು, flags, fftType);
+        ಆದರೆ (!is1d)
+            ಫಲಿತಾಂಶ = ಫಲಿತಾಂಶ && ocl_dft_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(output, _dst, nonzero_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, flags, fftType);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if (fftType == C2C)
+        ಆದರೆ (fftType == C2C)
         {
             // complex output
-            result = ocl_dft_rows(src, output, nonzero_rows, flags, fftType);
-            if (!is1d)
-                result = result && ocl_dft_cols(output, output, output.cols, flags, fftType);
+            ಫಲಿತಾಂಶ = ocl_dft_ಅಡ್ಡಸಾಲುಗಳು(src, output, nonzero_ಅಡ್ಡಸಾಲುಗಳು, flags, fftType);
+            ಆದರೆ (!is1d)
+                ಫಲಿತಾಂಶ = ಫಲಿತಾಂಶ && ocl_dft_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(output, output, output.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, flags, fftType);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            if (is1d)
+            ಆದರೆ (is1d)
             {
-                result = ocl_dft_rows(src, output, nonzero_rows, flags, fftType);
+                ಫಲಿತಾಂಶ = ocl_dft_ಅಡ್ಡಸಾಲುಗಳು(src, output, nonzero_ಅಡ್ಡಸಾಲುಗಳು, flags, fftType);
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                int nonzero_cols = src.cols/2 + 1;
-                result = ocl_dft_cols(src, output, nonzero_cols, flags, fftType);
-                result = result && ocl_dft_rows(output, _dst, nonzero_rows, flags, fftType);
+                ಪೂರ್ಣಾಂಕ nonzero_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ/2 + 1;
+                ಫಲಿತಾಂಶ = ocl_dft_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(src, output, nonzero_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, flags, fftType);
+                ಫಲಿತಾಂಶ = ಫಲಿತಾಂಶ && ocl_dft_ಅಡ್ಡಸಾಲುಗಳು(output, _dst, nonzero_ಅಡ್ಡಸಾಲುಗಳು, flags, fftType);
             }
         }
     }
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 } // namespace cv;
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_CLAMDFFT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_CLAMDFFT
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-#define CLAMDDFT_Assert(func) \
+#ವ್ಯಾಖ್ಯಾನಿಸು CLAMDDFT_Assert(func) \
     { \
-        clfftStatus s = (func); \
+        clfft_ಸ್ಥಿತಿ s = (func); \
         CV_Assert(s == CLFFT_SUCCESS); \
     }
 
-class PlanCache
+ವರ್ಗ PlanCache
 {
-    struct FftPlan
+    ರಚನೆ FftPlan
     {
-        FftPlan(const Size & _dft_size, int _src_step, int _dst_step, bool _doubleFP, bool _inplace, int _flags, FftType _fftType) :
-            dft_size(_dft_size), src_step(_src_step), dst_step(_dst_step),
+        FftPlan(ಸ್ಥಿರಾಂಕ ಗಾತ್ರ_2 & dft_ಗಾತ್ರ_2, ಪೂರ್ಣಾಂಕ src_ಹೆಜ್ಜೆ_2, ಪೂರ್ಣಾಂಕ dst_ಹೆಜ್ಜೆ_2, ತಾರ್ಕಿಕ _doubleFP, ತಾರ್ಕಿಕ _inplace, ಪೂರ್ಣಾಂಕ _flags, FftType _fftType) :
+            dft_ಗಾತ್ರ(dft_ಗಾತ್ರ_2), src_ಹೆಜ್ಜೆ(src_ಹೆಜ್ಜೆ_2), dst_ಹೆಜ್ಜೆ(dst_ಹೆಜ್ಜೆ_2),
             doubleFP(_doubleFP), inplace(_inplace), flags(_flags), fftType(_fftType),
             context((cl_context)ocl::Context::getDefault().ptr()), plHandle(0)
         {
-            bool dft_inverse = (flags & DFT_INVERSE) != 0;
-            bool dft_scale = (flags & DFT_SCALE) != 0;
-            bool dft_rows = (flags & DFT_ROWS) != 0;
+            ತಾರ್ಕಿಕ dft_inverse = (flags & DFT_INVERSE) != 0;
+            ತಾರ್ಕಿಕ dft_scale = (flags & DFT_SCALE) != 0;
+            ತಾರ್ಕಿಕ dft_ಅಡ್ಡಸಾಲುಗಳು = (flags & DFT_ಅಡ್ಡಸಾಲುಗಳು) != 0;
 
-            clfftLayout inLayout = CLFFT_REAL, outLayout = CLFFT_REAL;
-            clfftDim dim = dft_size.height == 1 || dft_rows ? CLFFT_1D : CLFFT_2D;
+            clfftLayout ಒಳ_Layout = CLFFT_REAL, ಹೊರಹೋಗು_Layout = CLFFT_REAL;
+            clfftDim dim = dft_ಗಾತ್ರ.ಎತ್ತರ == 1 || dft_ಅಡ್ಡಸಾಲುಗಳು ? CLFFT_1D : CLFFT_2D;
 
-            size_t batchSize = dft_rows ? dft_size.height : 1;
-            size_t clLengthsIn[3] = { (size_t)dft_size.width, dft_rows ? 1 : (size_t)dft_size.height, 1 };
-            size_t clStridesIn[3] = { 1, 1, 1 };
-            size_t clStridesOut[3]  = { 1, 1, 1 };
-            int elemSize = doubleFP ? sizeof(double) : sizeof(float);
+            size_t batch_ಗಾತ್ರ = dft_ಅಡ್ಡಸಾಲುಗಳು ? dft_ಗಾತ್ರ.ಎತ್ತರ : 1;
+            size_t cl_Lengths_ಒಳ[3] = { (size_t)dft_ಗಾತ್ರ.ಅಗಲ, dft_ಅಡ್ಡಸಾಲುಗಳು ? 1 : (size_t)dft_ಗಾತ್ರ.ಎತ್ತರ, 1 };
+            size_t cl_Strides_ಒಳ[3] = { 1, 1, 1 };
+            size_t cl_Strides_ಹೊರಹೋಗು[3]  = { 1, 1, 1 };
+            ಪೂರ್ಣಾಂಕ elem_ಗಾತ್ರ = doubleFP ? ಗಾತ್ರ(ದ್ವಿಗುಣ) : ಗಾತ್ರ(ದಶಮಾಂಶ);
 
-            switch (fftType)
+            ಆಯ್ಕೆ (fftType)
             {
-            case C2C:
-                inLayout = CLFFT_COMPLEX_INTERLEAVED;
-                outLayout = CLFFT_COMPLEX_INTERLEAVED;
-                clStridesIn[1] = src_step / (elemSize << 1);
-                clStridesOut[1] = dst_step / (elemSize << 1);
-                break;
-            case R2C:
-                inLayout = CLFFT_REAL;
-                outLayout = CLFFT_HERMITIAN_INTERLEAVED;
-                clStridesIn[1] = src_step / elemSize;
-                clStridesOut[1] = dst_step / (elemSize << 1);
-                break;
-            case C2R:
-                inLayout = CLFFT_HERMITIAN_INTERLEAVED;
-                outLayout = CLFFT_REAL;
-                clStridesIn[1] = src_step / (elemSize << 1);
-                clStridesOut[1] = dst_step / elemSize;
-                break;
-            case R2R:
-            default:
+            ಸ್ಥಿತಿ C2C:
+                ಒಳ_Layout = CLFFT_COMPLEX_INTERLEAVED;
+                ಹೊರಹೋಗು_Layout = CLFFT_COMPLEX_INTERLEAVED;
+                cl_Strides_ಒಳ[1] = src_ಹೆಜ್ಜೆ / (elem_ಗಾತ್ರ << 1);
+                cl_Strides_ಹೊರಹೋಗು[1] = dst_ಹೆಜ್ಜೆ / (elem_ಗಾತ್ರ << 1);
+                ನಿಲ್ಲಿಸು;
+            ಸ್ಥಿತಿ R2C:
+                ಒಳ_Layout = CLFFT_REAL;
+                ಹೊರಹೋಗು_Layout = CLFFT_HERMITIAN_INTERLEAVED;
+                cl_Strides_ಒಳ[1] = src_ಹೆಜ್ಜೆ / elem_ಗಾತ್ರ;
+                cl_Strides_ಹೊರಹೋಗು[1] = dst_ಹೆಜ್ಜೆ / (elem_ಗಾತ್ರ << 1);
+                ನಿಲ್ಲಿಸು;
+            ಸ್ಥಿತಿ C2R:
+                ಒಳ_Layout = CLFFT_HERMITIAN_INTERLEAVED;
+                ಹೊರಹೋಗು_Layout = CLFFT_REAL;
+                cl_Strides_ಒಳ[1] = src_ಹೆಜ್ಜೆ / (elem_ಗಾತ್ರ << 1);
+                cl_Strides_ಹೊರಹೋಗು[1] = dst_ಹೆಜ್ಜೆ / elem_ಗಾತ್ರ;
+                ನಿಲ್ಲಿಸು;
+            ಸ್ಥಿತಿ R2R:
+            ಪೂರ್ವನಿಯೋಜಿತ:
                 CV_Error(Error::StsNotImplemented, "AMD Fft does not support this type");
-                break;
+                ನಿಲ್ಲಿಸು;
             }
 
-            clStridesIn[2] = dft_rows ? clStridesIn[1] : dft_size.width * clStridesIn[1];
-            clStridesOut[2] = dft_rows ? clStridesOut[1] : dft_size.width * clStridesOut[1];
+            cl_Strides_ಒಳ[2] = dft_ಅಡ್ಡಸಾಲುಗಳು ? cl_Strides_ಒಳ[1] : dft_ಗಾತ್ರ.ಅಗಲ * cl_Strides_ಒಳ[1];
+            cl_Strides_ಹೊರಹೋಗು[2] = dft_ಅಡ್ಡಸಾಲುಗಳು ? cl_Strides_ಹೊರಹೋಗು[1] : dft_ಗಾತ್ರ.ಅಗಲ * cl_Strides_ಹೊರಹೋಗು[1];
 
-            CLAMDDFT_Assert(clfftCreateDefaultPlan(&plHandle, (cl_context)ocl::Context::getDefault().ptr(), dim, clLengthsIn))
+            CLAMDDFT_Assert(clfftCreateDefaultPlan(&plHandle, (cl_context)ocl::Context::getDefault().ptr(), dim, cl_Lengths_ಒಳ))
 
             // setting plan properties
-            CLAMDDFT_Assert(clfftSetPlanPrecision(plHandle, doubleFP ? CLFFT_DOUBLE : CLFFT_SINGLE));
-            CLAMDDFT_Assert(clfftSetResultLocation(plHandle, inplace ? CLFFT_INPLACE : CLFFT_OUTOFPLACE))
-            CLAMDDFT_Assert(clfftSetLayout(plHandle, inLayout, outLayout))
-            CLAMDDFT_Assert(clfftSetPlanBatchSize(plHandle, batchSize))
-            CLAMDDFT_Assert(clfftSetPlanInStride(plHandle, dim, clStridesIn))
-            CLAMDDFT_Assert(clfftSetPlanOutStride(plHandle, dim, clStridesOut))
-            CLAMDDFT_Assert(clfftSetPlanDistance(plHandle, clStridesIn[dim], clStridesOut[dim]))
+            CLAMDDFT_Assert(clfft_ಗಣ_Plan_Precision(plHandle, doubleFP ? CLFFT_DOUBLE : CLFFT_SINGLE));
+            CLAMDDFT_Assert(clfft_ಗಣ_ಫಲಿತಾಂಶ_Location(plHandle, inplace ? CLFFT_INPLACE : CLFFT_OUTOFPLACE))
+            CLAMDDFT_Assert(clfft_ಗಣ_Layout(plHandle, ಒಳ_Layout, ಹೊರಹೋಗು_Layout))
+            CLAMDDFT_Assert(clfft_ಗಣ_Plan_Batch_ಗಾತ್ರ(plHandle, batch_ಗಾತ್ರ))
+            CLAMDDFT_Assert(clfft_ಗಣ_Plan_ಒಳ_Stride(plHandle, dim, cl_Strides_ಒಳ))
+            CLAMDDFT_Assert(clfft_ಗಣ_Plan_ಹೊರಹೋಗು_Stride(plHandle, dim, cl_Strides_ಹೊರಹೋಗು))
+            CLAMDDFT_Assert(clfft_ಗಣ_Plan_ದೂರ(plHandle, cl_Strides_ಒಳ[dim], cl_Strides_ಹೊರಹೋಗು[dim]))
 
-            float scale = dft_scale ? 1.0f / (dft_rows ? dft_size.width : dft_size.area()) : 1.0f;
-            CLAMDDFT_Assert(clfftSetPlanScale(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD, scale))
+            ದಶಮಾಂಶ scale = dft_scale ? 1.0f / (dft_ಅಡ್ಡಸಾಲುಗಳು ? dft_ಗಾತ್ರ.ಅಗಲ : dft_ಗಾತ್ರ.area()) : 1.0f;
+            CLAMDDFT_Assert(clfft_ಗಣ_Plan_Scale(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD, scale))
 
             // ready to bake
-            cl_command_queue queue = (cl_command_queue)ocl::Queue::getDefault().ptr();
-            CLAMDDFT_Assert(clfftBakePlan(plHandle, 1, &queue, NULL, NULL))
+            cl_command_ಸರತಿ ಸರತಿ_2 = (cl_command_ಸರತಿ)ocl::ಸರತಿ::getDefault().ptr();
+            CLAMDDFT_Assert(clfftBakePlan(plHandle, 1, &ಸರತಿ_2, ಖಾಲಿ, ಖಾಲಿ))
         }
 
         ~FftPlan()
@@ -1731,58 +1731,58 @@ class PlanCache
             /*clfftDestroyPlan(&plHandle);*/
         }
 
-        friend class PlanCache;
+        ಮಿತ್ರ ವರ್ಗ PlanCache;
 
-    private:
-        Size dft_size;
-        int src_step, dst_step;
-        bool doubleFP;
-        bool inplace;
-        int flags;
+    ಖಾಸಗಿ:
+        ಗಾತ್ರ_2 dft_ಗಾತ್ರ;
+        ಪೂರ್ಣಾಂಕ src_ಹೆಜ್ಜೆ, dst_ಹೆಜ್ಜೆ;
+        ತಾರ್ಕಿಕ doubleFP;
+        ತಾರ್ಕಿಕ inplace;
+        ಪೂರ್ಣಾಂಕ flags;
         FftType fftType;
 
         cl_context context;
         clfftPlanHandle plHandle;
     };
 
-public:
-    static PlanCache & getInstance()
+ಸಾರ್ವಜನಿಕ:
+    ಸ್ಥಿರ PlanCache & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(PlanCache, new PlanCache())
+        CV_SINGLETON_LAZY_INIT_REF(PlanCache, ಹೊಸ PlanCache())
     }
 
-    clfftPlanHandle getPlanHandle(const Size & dft_size, int src_step, int dst_step, bool doubleFP,
-                                  bool inplace, int flags, FftType fftType)
+    clfftPlanHandle getPlanHandle(ಸ್ಥಿರಾಂಕ ಗಾತ್ರ_2 & dft_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ src_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ dst_ಹೆಜ್ಜೆ, ತಾರ್ಕಿಕ doubleFP,
+                                  ತಾರ್ಕಿಕ inplace, ಪೂರ್ಣಾಂಕ flags, FftType fftType)
     {
         cl_context currentContext = (cl_context)ocl::Context::getDefault().ptr();
 
-        for (size_t i = 0, size = planStorage.size(); i < size; ++i)
+        ಗಾಗಿ (size_t i = 0, size = planStorage.size(); i < size; ++i)
         {
-            const FftPlan * const plan = planStorage[i];
+            ಸ್ಥಿರಾಂಕ FftPlan * ಸ್ಥಿರಾಂಕ plan = planStorage[i];
 
-            if (plan->dft_size == dft_size &&
+            ಆದರೆ (plan->dft_ಗಾತ್ರ == dft_ಗಾತ್ರ &&
                 plan->flags == flags &&
-                plan->src_step == src_step &&
-                plan->dst_step == dst_step &&
+                plan->src_ಹೆಜ್ಜೆ == src_ಹೆಜ್ಜೆ &&
+                plan->dst_ಹೆಜ್ಜೆ == dst_ಹೆಜ್ಜೆ &&
                 plan->doubleFP == doubleFP &&
                 plan->fftType == fftType &&
                 plan->inplace == inplace)
             {
-                if (plan->context != currentContext)
+                ಆದರೆ (plan->context != currentContext)
                 {
                     planStorage.erase(planStorage.begin() + i);
-                    break;
+                    ನಿಲ್ಲಿಸು;
                 }
 
-                return plan->plHandle;
+                ಹಿಂತಿರುಗಿ plan->plHandle;
             }
         }
 
         // no baked plan is found, so let's create a new one
-        Ptr<FftPlan> newPlan = Ptr<FftPlan>(new FftPlan(dft_size, src_step, dst_step, doubleFP, inplace, flags, fftType));
+        Ptr<FftPlan> newPlan = Ptr<FftPlan>(ಹೊಸ FftPlan(dft_ಗಾತ್ರ, src_ಹೆಜ್ಜೆ, dst_ಹೆಜ್ಜೆ, doubleFP, inplace, flags, fftType));
         planStorage.push_back(newPlan);
 
-        return newPlan->plHandle;
+        ಹಿಂತಿರುಗಿ newPlan->plHandle;
     }
 
     ~PlanCache()
@@ -1790,7 +1790,7 @@ public:
         planStorage.clear();
     }
 
-protected:
+ಸಂರಕ್ಷಿತ:
     PlanCache() :
         planStorage()
     {
@@ -1799,13 +1799,13 @@ protected:
     std::vector<Ptr<FftPlan> > planStorage;
 };
 
-extern "C" {
+ಬಾಹ್ಯ "C" {
 
-static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
+ಸ್ಥಿರ ಶೂನ್ಯ CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, ಶೂನ್ಯ *p)
 {
-    UMatData * u = (UMatData *)p;
+    UMat_ದತ್ತಾಂಶ * u = (UMat_ದತ್ತಾಂಶ *)p;
 
-    if( u && CV_XADD(&u->urefcount, -1) == 1 )
+    ಆದರೆ( u && CV_XADD(&u->urefcount, -1) == 1 )
         u->currAllocator->deallocate(u);
     u = 0;
 
@@ -1814,90 +1814,90 @@ static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
 
 }
 
-static bool ocl_dft_amdfft(InputArray _src, OutputArray _dst, int flags)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_dft_amdfft(ಒಳಹರಿವು_Array _src, OutputArray _dst, ಪೂರ್ಣಾಂಕ flags)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    Size ssize = _src.size();
+    ಪೂರ್ಣಾಂಕ type = _src.type(), ಆಳ = CV_MAT_ಆಳ(type), cn = CV_MAT_CN(type);
+    ಗಾತ್ರ_2 ssize = _src.size();
 
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
-    if ( (!doubleSupport && depth == CV_64F) ||
+    ತಾರ್ಕಿಕ doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    ಆದರೆ ( (!doubleSupport && ಆಳ == CV_64F) ||
          !(type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2) ||
          _src.offset() != 0)
-        return false;
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     // if is not a multiplication of prime numbers { 2, 3, 5 }
-    if (ssize.area() != getOptimalDFTSize(ssize.area()))
-        return false;
+    ಆದರೆ (ssize.area() != getOptimalDFTSize(ssize.area()))
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    int dst_complex_input = cn == 2 ? 1 : 0;
-    bool dft_inverse = (flags & DFT_INVERSE) != 0 ? 1 : 0;
-    int dft_complex_output = (flags & DFT_COMPLEX_OUTPUT) != 0;
-    bool dft_real_output = (flags & DFT_REAL_OUTPUT) != 0;
+    ಪೂರ್ಣಾಂಕ dst_complex_ಒಳಹರಿವು = cn == 2 ? 1 : 0;
+    ತಾರ್ಕಿಕ dft_inverse = (flags & DFT_INVERSE) != 0 ? 1 : 0;
+    ಪೂರ್ಣಾಂಕ dft_complex_output = (flags & DFT_COMPLEX_OUTPUT) != 0;
+    ತಾರ್ಕಿಕ dft_real_output = (flags & DFT_REAL_OUTPUT) != 0;
 
     CV_Assert(dft_complex_output + dft_real_output < 2);
-    FftType fftType = (FftType)(dst_complex_input << 0 | dft_complex_output << 1);
+    FftType fftType = (FftType)(dst_complex_ಒಳಹರಿವು << 0 | dft_complex_output << 1);
 
-    switch (fftType)
+    ಆಯ್ಕೆ (fftType)
     {
-    case C2C:
-        _dst.create(ssize.height, ssize.width, CV_MAKE_TYPE(depth, 2));
-        break;
-    case R2C: // TODO implement it if possible
-    case C2R: // TODO implement it if possible
-    case R2R: // AMD Fft does not support this type
-    default:
-        return false;
+    ಸ್ಥಿತಿ C2C:
+        _dst.create(ssize.ಎತ್ತರ, ssize.ಅಗಲ, CV_MAKE_TYPE(ಆಳ, 2));
+        ನಿಲ್ಲಿಸು;
+    ಸ್ಥಿತಿ R2C: // TODO implement it if possible
+    ಸ್ಥಿತಿ C2R: // TODO implement it if possible
+    ಸ್ಥಿತಿ R2R: // AMD Fft does not support this type
+    ಪೂರ್ವನಿಯೋಜಿತ:
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
 
     UMat src = _src.getUMat(), dst = _dst.getUMat();
-    if (!ocl::internal::isCLBuffer(src) || !ocl::internal::isCLBuffer(dst))
-        return false;
-    bool inplace = src.u == dst.u;
+    ಆದರೆ (!ocl::internal::isCLBuffer(src) || !ocl::internal::isCLBuffer(dst))
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ತಾರ್ಕಿಕ inplace = src.u == dst.u;
 
     clfftPlanHandle plHandle = PlanCache::getInstance().
-            getPlanHandle(ssize, (int)src.step, (int)dst.step,
-                          depth == CV_64F, inplace, flags, fftType);
+            getPlanHandle(ssize, (ಪೂರ್ಣಾಂಕ)src.ಹೆಜ್ಜೆ, (ಪೂರ್ಣಾಂಕ)dst.ಹೆಜ್ಜೆ,
+                          ಆಳ == CV_64F, inplace, flags, fftType);
 
     // get the bufferSize
-    size_t bufferSize = 0;
-    CLAMDDFT_Assert(clfftGetTmpBufSize(plHandle, &bufferSize))
-    UMat tmpBuffer(1, (int)bufferSize, CV_8UC1);
+    size_t ಬಫರ್_ಗಾತ್ರ = 0;
+    CLAMDDFT_Assert(clfft_Get_Tmp_Buf_ಗಾತ್ರ(plHandle, &ಬಫರ್_ಗಾತ್ರ))
+    UMat tmp_ಬಫರ್(1, (ಪೂರ್ಣಾಂಕ)ಬಫರ್_ಗಾತ್ರ, CV_8UC1);
 
     cl_mem srcarg = (cl_mem)src.handle(ACCESS_READ);
     cl_mem dstarg = (cl_mem)dst.handle(ACCESS_RW);
 
-    cl_command_queue queue = (cl_command_queue)ocl::Queue::getDefault().ptr();
+    cl_command_ಸರತಿ ಸರತಿ_2 = (cl_command_ಸರತಿ)ocl::ಸರತಿ::getDefault().ptr();
     cl_event e = 0;
 
-    CLAMDDFT_Assert(clfftEnqueueTransform(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD,
-                                          1, &queue, 0, NULL, &e,
-                                          &srcarg, &dstarg, (cl_mem)tmpBuffer.handle(ACCESS_RW)))
+    CLAMDDFT_Assert(clfft_ಸರತಿಗೆ_ಸೇರಿಸು_Transform(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD,
+                                          1, &ಸರತಿ_2, 0, ಖಾಲಿ, &e,
+                                          &srcarg, &dstarg, (cl_mem)tmp_ಬಫರ್.handle(ACCESS_RW)))
 
-    tmpBuffer.addref();
-    clSetEventCallback(e, CL_COMPLETE, oclCleanupCallback, tmpBuffer.u);
-    return true;
+    tmp_ಬಫರ್.addref();
+    cl_ಗಣ_Event_Callback(e, CL_COMPLETE, oclCleanupCallback, tmp_ಬಫರ್.u);
+    ಹಿಂತಿರುಗಿ ನಿಜ;
 }
 
-#undef DFT_ASSERT
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು DFT_ASSERT
 
 }
 
-#endif // HAVE_CLAMDFFT
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_CLAMDFFT
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-template <typename T>
-static void complementComplex(T * ptr, size_t step, int n, int len, int dft_dims)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T>
+ಸ್ಥಿರ ಶೂನ್ಯ complementComplex(T * ptr, size_t ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ dft_dims)
 {
     T* p0 = (T*)ptr;
-    size_t dstep = step/sizeof(p0[0]);
-    for(int i = 0; i < len; i++ )
+    size_t dstep = ಹೆಜ್ಜೆ/ಗಾತ್ರ(p0[0]);
+    ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = 0; i < len; i++ )
     {
         T* p = p0 + dstep*i;
         T* q = dft_dims == 1 || i == 0 || i*2 == len ? p : p0 + dstep*(len-i);
 
-        for( int j = 1; j < (n+1)/2; j++ )
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ j = 1; j < (n+1)/2; j++ )
         {
             p[(n-j)*2] = q[j*2];
             p[(n-j)*2+1] = -q[j*2+1];
@@ -1905,184 +1905,184 @@ static void complementComplex(T * ptr, size_t step, int n, int len, int dft_dims
     }
 }
 
-static void complementComplexOutput(int depth, uchar * ptr, size_t step, int count, int len, int dft_dims)
+ಸ್ಥಿರ ಶೂನ್ಯ complementComplexOutput(ಪೂರ್ಣಾಂಕ ಆಳ, uchar * ptr, size_t ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ dft_dims)
 {
-    if( depth == CV_32F )
-        complementComplex((float*)ptr, step, count, len, dft_dims);
-    else
-        complementComplex((double*)ptr, step, count, len, dft_dims);
+    ಆದರೆ( ಆಳ == CV_32F )
+        complementComplex((ದಶಮಾಂಶ*)ptr, ಹೆಜ್ಜೆ, ಎಣಿಕೆ_3, len, dft_dims);
+    ಇಲ್ಲದಿದ್ದರೆ
+        complementComplex((ದ್ವಿಗುಣ*)ptr, ಹೆಜ್ಜೆ, ಎಣಿಕೆ_3, len, dft_dims);
 }
 
-enum DftMode {
+ಎಣಿಕೆ Dft_ಬಹುಲಕ {
     InvalidDft = 0,
-    FwdRealToCCS,
-    FwdRealToComplex,
-    FwdComplexToComplex,
+    Fwd_Real_ಗಮ್ಯ_CCS,
+    Fwd_Real_ಗಮ್ಯ_Complex,
+    Fwd_Complex_ಗಮ್ಯ_Complex,
     InvCCSToReal,
-    InvComplexToReal,
-    InvComplexToComplex,
+    Inv_Complex_ಗಮ್ಯ_Real,
+    Inv_Complex_ಗಮ್ಯ_Complex,
 };
 
-enum DftDims {
+ಎಣಿಕೆ DftDims {
     InvalidDim = 0,
     OneDim,
-    OneDimColWise,
+    One_Dim_ಲಂಬಸಾಲು_Wise,
     TwoDims
 };
 
-inline const char * modeName(DftMode m)
+ಸಾಲೊಳಗೆ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * ಬಹುಲಕ_Name(Dft_ಬಹುಲಕ m)
 {
-    switch (m)
+    ಆಯ್ಕೆ (m)
     {
-    case InvalidDft: return "InvalidDft";
-    case FwdRealToCCS: return "FwdRealToCCS";
-    case FwdRealToComplex: return "FwdRealToComplex";
-    case FwdComplexToComplex: return "FwdComplexToComplex";
-    case InvCCSToReal: return "InvCCSToReal";
-    case InvComplexToReal: return "InvComplexToReal";
-    case InvComplexToComplex: return "InvComplexToComplex";
+    ಸ್ಥಿತಿ InvalidDft: ಹಿಂತಿರುಗಿ "InvalidDft";
+    ಸ್ಥಿತಿ Fwd_Real_ಗಮ್ಯ_CCS: ಹಿಂತಿರುಗಿ "FwdRealToCCS";
+    ಸ್ಥಿತಿ Fwd_Real_ಗಮ್ಯ_Complex: ಹಿಂತಿರುಗಿ "FwdRealToComplex";
+    ಸ್ಥಿತಿ Fwd_Complex_ಗಮ್ಯ_Complex: ಹಿಂತಿರುಗಿ "FwdComplexToComplex";
+    ಸ್ಥಿತಿ InvCCSToReal: ಹಿಂತಿರುಗಿ "InvCCSToReal";
+    ಸ್ಥಿತಿ Inv_Complex_ಗಮ್ಯ_Real: ಹಿಂತಿರುಗಿ "InvComplexToReal";
+    ಸ್ಥಿತಿ Inv_Complex_ಗಮ್ಯ_Complex: ಹಿಂತಿರುಗಿ "InvComplexToComplex";
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-inline const char * dimsName(DftDims d)
+ಸಾಲೊಳಗೆ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * dimsName(DftDims d)
 {
-    switch (d)
+    ಆಯ್ಕೆ (d)
     {
-    case InvalidDim: return "InvalidDim";
-    case OneDim: return "OneDim";
-    case OneDimColWise: return "OneDimColWise";
-    case TwoDims: return "TwoDims";
+    ಸ್ಥಿತಿ InvalidDim: ಹಿಂತಿರುಗಿ "InvalidDim";
+    ಸ್ಥಿತಿ OneDim: ಹಿಂತಿರುಗಿ "OneDim";
+    ಸ್ಥಿತಿ One_Dim_ಲಂಬಸಾಲು_Wise: ಹಿಂತಿರುಗಿ "OneDimColWise";
+    ಸ್ಥಿತಿ TwoDims: ಹಿಂತಿರುಗಿ "TwoDims";
     };
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
-template <typename T>
-inline bool isInv(T mode)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T>
+ಸಾಲೊಳಗೆ ತಾರ್ಕಿಕ isInv(T ಬಹುಲಕ)
 {
-    switch ((DftMode)mode)
+    ಆಯ್ಕೆ ((Dft_ಬಹುಲಕ)ಬಹುಲಕ)
     {
-        case InvCCSToReal:
-        case InvComplexToReal:
-        case InvComplexToComplex: return true;
-        default: return false;
+        ಸ್ಥಿತಿ InvCCSToReal:
+        ಸ್ಥಿತಿ Inv_Complex_ಗಮ್ಯ_Real:
+        ಸ್ಥಿತಿ Inv_Complex_ಗಮ್ಯ_Complex: ಹಿಂತಿರುಗಿ ನಿಜ;
+        ಪೂರ್ವನಿಯೋಜಿತ: ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
 }
 
-inline DftMode determineMode(bool inv, int cn1, int cn2)
+ಸಾಲೊಳಗೆ Dft_ಬಹುಲಕ determine_ಬಹುಲಕ(ತಾರ್ಕಿಕ inv, ಪೂರ್ಣಾಂಕ cn1, ಪೂರ್ಣಾಂಕ cn2)
 {
-    if (!inv)
+    ಆದರೆ (!inv)
     {
-        if (cn1 == 1 && cn2 == 1)
-            return FwdRealToCCS;
-        else if (cn1 == 1 && cn2 == 2)
-            return FwdRealToComplex;
-        else if (cn1 == 2 && cn2 == 2)
-            return FwdComplexToComplex;
+        ಆದರೆ (cn1 == 1 && cn2 == 1)
+            ಹಿಂತಿರುಗಿ Fwd_Real_ಗಮ್ಯ_CCS;
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cn1 == 1 && cn2 == 2)
+            ಹಿಂತಿರುಗಿ Fwd_Real_ಗಮ್ಯ_Complex;
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cn1 == 2 && cn2 == 2)
+            ಹಿಂತಿರುಗಿ Fwd_Complex_ಗಮ್ಯ_Complex;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if (cn1 == 1 && cn2 == 1)
-            return InvCCSToReal;
-        else if (cn1 == 2 && cn2 == 1)
-            return InvComplexToReal;
-        else if (cn1 == 2 && cn2 == 2)
-            return InvComplexToComplex;
+        ಆದರೆ (cn1 == 1 && cn2 == 1)
+            ಹಿಂತಿರುಗಿ InvCCSToReal;
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cn1 == 2 && cn2 == 1)
+            ಹಿಂತಿರುಗಿ Inv_Complex_ಗಮ್ಯ_Real;
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (cn1 == 2 && cn2 == 2)
+            ಹಿಂತಿರುಗಿ Inv_Complex_ಗಮ್ಯ_Complex;
     }
-    return InvalidDft;
+    ಹಿಂತಿರುಗಿ InvalidDft;
 }
 
 
-inline DftDims determineDims(int rows, int cols, bool isRowWise, bool isContinuous)
+ಸಾಲೊಳಗೆ DftDims determineDims(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ತಾರ್ಕಿಕ is_ಅಡ್ಡಸಾಲು_Wise, ತಾರ್ಕಿಕ isContinuous)
 {
     // printf("%d x %d (%d, %d)\n", rows, cols, isRowWise, isContinuous);
-    if (isRowWise)
-        return OneDim;
-    if (cols == 1 && rows > 1) // one-column-shaped input
+    ಆದರೆ (is_ಅಡ್ಡಸಾಲು_Wise)
+        ಹಿಂತಿರುಗಿ OneDim;
+    ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 && ಅಡ್ಡಸಾಲುಗಳು > 1) // one-column-shaped input
     {
-        if (isContinuous)
-            return OneDim;
-        else
-            return OneDimColWise;
+        ಆದರೆ (isContinuous)
+            ಹಿಂತಿರುಗಿ OneDim;
+        ಇಲ್ಲದಿದ್ದರೆ
+            ಹಿಂತಿರುಗಿ One_Dim_ಲಂಬಸಾಲು_Wise;
     }
-    if (rows == 1)
-        return OneDim;
-    if (cols > 1 && rows > 1)
-        return TwoDims;
-    return InvalidDim;
+    ಆದರೆ (ಅಡ್ಡಸಾಲುಗಳು == 1)
+        ಹಿಂತಿರುಗಿ OneDim;
+    ಆದರೆ (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ > 1 && ಅಡ್ಡಸಾಲುಗಳು > 1)
+        ಹಿಂತಿರುಗಿ TwoDims;
+    ಹಿಂತಿರುಗಿ InvalidDim;
 }
 
-class OcvDftBasicImpl CV_FINAL : public hal::DFT1D
+ವರ್ಗ OcvDftBasicImpl CV_FINAL : ಸಾರ್ವಜನಿಕ hal::DFT1D
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     OcvDftOptions opt;
     // the plan is built once in init(), the workspace is allocated once here and reused by
     // every apply() (zero allocations per transform)
     DftPlan plan;
-    AutoBuffer<uchar> ws;
-#ifdef USE_IPP_DFT
-    AutoBuffer<uchar> ippbuf;
-    AutoBuffer<uchar> ippworkbuf;
+    Auto_ಬಫರ್<uchar> ws;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
+    Auto_ಬಫರ್<uchar> ippbuf;
+    Auto_ಬಫರ್<uchar> ippworkbuf;
     size_t ipp_worksize;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-public:
+ಸಾರ್ವಜನಿಕ:
     OcvDftBasicImpl()
     {
-#ifdef USE_IPP_DFT
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
         ipp_worksize = 0;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     }
-    void init(int len, int count, int depth, int flags, bool *needBuffer)
+    ಶೂನ್ಯ init(ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ flags, ತಾರ್ಕಿಕ *need_ಬಫರ್)
     {
-        int stage = (flags & CV_HAL_DFT_STAGE_COLS) != 0 ? 1 : 0;
+        ಪೂರ್ಣಾಂಕ stage = (flags & CV_HAL_DFT_STAGE_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) != 0 ? 1 : 0;
         opt.isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
-        bool real_transform = (flags & CV_HAL_DFT_REAL_OUTPUT) != 0;
+        ತಾರ್ಕಿಕ real_transform = (flags & CV_HAL_DFT_REAL_OUTPUT) != 0;
         opt.isComplex = (stage == 0) && (flags & CV_HAL_DFT_COMPLEX_OUTPUT) != 0;
-        bool needAnotherStage = (flags & CV_HAL_DFT_TWO_STAGE) != 0;
+        ತಾರ್ಕಿಕ needAnotherStage = (flags & CV_HAL_DFT_TWO_STAGE) != 0;
 
         opt.scale = 1;
         opt.n = len;
 
-        opt.useIpp = false;
-    #ifdef USE_IPP_DFT
+        opt.useIpp = ಸುಳ್ಳು;
+    #ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
         opt.ipp_spec = 0;
         opt.ipp_work = 0;
 
-        if( CV_IPP_CHECK_COND && (opt.n*count >= 64) && !IPP_DISABLE_DFT32F) // use IPP DFT if available
+        ಆದರೆ( CV_IPP_CHECK_COND && (opt.n*ಎಣಿಕೆ_3 >= 64) && !IPP_DISABLE_DFT32F) // use IPP DFT if available
         {
-            int ipp_norm_flag = (flags & CV_HAL_DFT_SCALE) == 0 ? 8 : opt.isInverse ? 2 : 1;
-            int specsize=0, initsize=0, worksize=0;
-            IppDFTGetSizeFunc getSizeFunc = 0;
+            ಪೂರ್ಣಾಂಕ ipp_norm_flag = (flags & CV_HAL_DFT_SCALE) == 0 ? 8 : opt.isInverse ? 2 : 1;
+            ಪೂರ್ಣಾಂಕ specsize=0, initsize=0, worksize=0;
+            Ipp_DFTGet_ಗಾತ್ರ_Func get_ಗಾತ್ರ_Func = 0;
             IppDFTInitFunc initFunc = 0;
 
-            if( real_transform && stage == 0 )
+            ಆದರೆ( real_transform && stage == 0 )
             {
-                if( depth == CV_32F )
+                ಆದರೆ( ಆಳ == CV_32F )
                 {
-                    getSizeFunc = ippsDFTGetSize_R_32f;
+                    get_ಗಾತ್ರ_Func = ipps_DFTGet_ಗಾತ್ರ_R_32f;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_R_32f, ippsDFTInit_R_32f>;
                 }
-                else
+                ಇಲ್ಲದಿದ್ದರೆ
                 {
-                    getSizeFunc = ippsDFTGetSize_R_64f;
+                    get_ಗಾತ್ರ_Func = ipps_DFTGet_ಗಾತ್ರ_R_64f;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_R_64f, ippsDFTInit_R_64f>;
                 }
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                if( depth == CV_32F )
+                ಆದರೆ( ಆಳ == CV_32F )
                 {
-                    getSizeFunc = ippsDFTGetSize_C_32fc;
+                    get_ಗಾತ್ರ_Func = ipps_DFTGet_ಗಾತ್ರ_C_32fc;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_C_32fc, ippsDFTInit_C_32fc>;
                 }
-                else
+                ಇಲ್ಲದಿದ್ದರೆ
                 {
-                    getSizeFunc = ippsDFTGetSize_C_64fc;
+                    get_ಗಾತ್ರ_Func = ipps_DFTGet_ಗಾತ್ರ_C_64fc;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_C_64fc, ippsDFTInit_C_64fc>;
                 }
             }
-            if( getSizeFunc(opt.n, ipp_norm_flag, ippAlgHintNone, &specsize, &initsize, &worksize) >= 0 )
+            ಆದರೆ( get_ಗಾತ್ರ_Func(opt.n, ipp_norm_flag, ippAlgHintNone, &specsize, &initsize, &worksize) >= 0 )
             {
                 ippbuf.allocate(specsize + initsize + 64);
                 opt.ipp_spec = alignPtr(&ippbuf[0], 32);
@@ -2090,98 +2090,98 @@ public:
                 opt.ipp_work = alignPtr(&ippworkbuf[0], 32);
                 ipp_worksize = (size_t)worksize;
                 uchar* initbuf = alignPtr((uchar*)opt.ipp_spec + specsize, 32);
-                if( initFunc(opt.n, ipp_norm_flag, ippAlgHintNone, opt.ipp_spec, initbuf) >= 0 )
-                    opt.useIpp = true;
+                ಆದರೆ( initFunc(opt.n, ipp_norm_flag, ippAlgHintNone, opt.ipp_spec, initbuf) >= 0 )
+                    opt.useIpp = ನಿಜ;
             }
-            else
-                setIppErrorStatus();
+            ಇಲ್ಲದಿದ್ದರೆ
+                ಗಣ_Ipp_Error_ಸ್ಥಿತಿ();
         }
-    #endif
+    #ಆದರೆ_ಅಂತ್ಯ
 
         {
             // The plan is built even when IPP is enabled: the IPP calls fall back to the generic
             // code on failure.
-            const DFTKernels& kernels = getDFTKernels(depth);
-            int kind = stage == 0 && real_transform ? (opt.isInverse ? DFT_KIND_C2R : DFT_KIND_R2C)
-                                                    : DFT_KIND_C2C;
-            plan.build(kind, len, depth, kernels.vlanes);
-            ws.allocate(plan.ws_bytes);
+            ಸ್ಥಿರಾಂಕ DFTKernels& kernels = getDFTKernels(ಆಳ);
+            ಪೂರ್ಣಾಂಕ ಬಗೆ = stage == 0 && real_transform ? (opt.isInverse ? DFT_ಬಗೆ_C2_R : DFT_ಬಗೆ_R2_C)
+                                                    : DFT_ಬಗೆ_C2_C;
+            plan.build(ಬಗೆ, len, ಆಳ, kernels.vlanes);
+            ws.allocate(plan.ws_ಬೈಟುಗಳು);
             opt.plan = &plan;
             opt.kernels = &kernels;
-            opt.workspace = ws.data();
-            if (needBuffer)
-                *needBuffer = false;   // the engine supports in-place for every kind
+            opt.workspace = ws.ದತ್ತಾಂಶ();
+            ಆದರೆ (need_ಬಫರ್)
+                *need_ಬಫರ್ = ಸುಳ್ಳು;   // the engine supports in-place for every kind
         }
 
         {
-            static DFTFunc dft_tbl[6] =
+            ಸ್ಥಿರ DFTFunc dft_tbl[6] =
             {
-                dftWrap<Complexf, DFT<float>>,
-                dftWrap<float, RealDFT<float>>,
-                dftWrap<float, CCSIDFT<float>>,
-                dftWrap<Complexd, DFT<double>>,
-                dftWrap<double, RealDFT<double>>,
-                dftWrap<double, CCSIDFT<double>>
+                dftWrap<Complexf, DFT<ದಶಮಾಂಶ>>,
+                dftWrap<ದಶಮಾಂಶ, RealDFT<ದಶಮಾಂಶ>>,
+                dftWrap<ದಶಮಾಂಶ, CCSIDFT<ದಶಮಾಂಶ>>,
+                dftWrap<Complexd, DFT<ದ್ವಿಗುಣ>>,
+                dftWrap<ದ್ವಿಗುಣ, RealDFT<ದ್ವಿಗುಣ>>,
+                dftWrap<ದ್ವಿಗುಣ, CCSIDFT<ದ್ವಿಗುಣ>>
             };
-            int idx = 0;
-            if (stage == 0)
+            ಪೂರ್ಣಾಂಕ idx = 0;
+            ಆದರೆ (stage == 0)
             {
-                if (real_transform)
+                ಆದರೆ (real_transform)
                 {
-                    if (!opt.isInverse)
+                    ಆದರೆ (!opt.isInverse)
                         idx = 1;
-                    else
+                    ಇಲ್ಲದಿದ್ದರೆ
                         idx = 2;
                 }
             }
-            if (depth == CV_64F)
+            ಆದರೆ (ಆಳ == CV_64F)
                 idx += 3;
 
             opt.dft_func = dft_tbl[idx];
         }
 
-        if(!needAnotherStage && (flags & CV_HAL_DFT_SCALE) != 0)
+        ಆದರೆ(!needAnotherStage && (flags & CV_HAL_DFT_SCALE) != 0)
         {
-            int rowCount = count;
-            if (stage == 0 && (flags & CV_HAL_DFT_ROWS) != 0)
-                rowCount = 1;
-            opt.scale = 1./(len * rowCount);
+            ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲು_ಎಣಿಕೆ = ಎಣಿಕೆ_3;
+            ಆದರೆ (stage == 0 && (flags & CV_HAL_DFT_ಅಡ್ಡಸಾಲುಗಳು) != 0)
+                ಅಡ್ಡಸಾಲು_ಎಣಿಕೆ = 1;
+            opt.scale = 1./(len * ಅಡ್ಡಸಾಲು_ಎಣಿಕೆ);
         }
     }
 
-    void apply(const uchar *src, uchar *dst) CV_OVERRIDE
+    ಶೂನ್ಯ apply(ಸ್ಥಿರಾಂಕ uchar *src, uchar *dst) CV_OVERRIDE
     {
         opt.dft_func(opt, src, dst);
     }
 
     // Size of a private workspace for applyWithWorkspace(). It covers both the engine workspace
     // and, when IPP is used, the IPP work buffer (only one of them is touched per call).
-    size_t workspaceSize() const
+    size_t workspace_ಗಾತ್ರ() ಸ್ಥಿರಾಂಕ
     {
-        size_t sz = opt.plan ? plan.ws_bytes : 0;
-#ifdef USE_IPP_DFT
-        if (opt.useIpp)
+        size_t sz = opt.plan ? plan.ws_ಬೈಟುಗಳು : 0;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
+        ಆದರೆ (opt.useIpp)
             sz = std::max(sz, ipp_worksize + 64);
-#endif
-        return sz;
+#ಆದರೆ_ಅಂತ್ಯ
+        ಹಿಂತಿರುಗಿ sz;
     }
 
     // Same as apply(), but with a caller-provided workspace: several threads may run the same
     // transform as long as each of them uses its own workspace. The plan is immutable and the
     // IPP spec is read-only after init, so both are shared; the IPP work buffer is per call and
     // must therefore be private to the thread, too.
-    void applyWithWorkspace(const uchar *src, uchar *dst, uchar* workspace) const
+    ಶೂನ್ಯ applyWithWorkspace(ಸ್ಥಿರಾಂಕ uchar *src, uchar *dst, uchar* workspace) ಸ್ಥಿರಾಂಕ
     {
         OcvDftOptions opt_ = opt;
         opt_.workspace = workspace;
-#ifdef USE_IPP_DFT
-        if (opt_.useIpp)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ USE_IPP_DFT
+        ಆದರೆ (opt_.useIpp)
             opt_.ipp_work = alignPtr(workspace, 32);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
         opt_.dft_func(opt_, src, dst);
     }
 
-    void free() {}
+    ಶೂನ್ಯ ಬಿಡುಗಡೆ() {}
 };
 
 // 2D transforms (and the multi-row 1D batches) distribute the rows / the column pairs over
@@ -2194,603 +2194,603 @@ public:
 // accesses do not alias in the cache (which they do when columns are copied one or two at a
 // time and the row step is a multiple of a page). The batch is sized so that the column buffers
 // stay within DFT_COLS_BATCH_BYTES (~L1-resident), between DFT_COLS_BATCH_MIN and _MAX columns.
-static const int DFT_COLS_BATCH_MIN = 4;
-static const int DFT_COLS_BATCH_MAX = 16;
-static const size_t DFT_COLS_BATCH_BYTES = 1 << 17;
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ DFT_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_BATCH_MIN = 4;
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ DFT_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_BATCH_MAX = 16;
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ size_t DFT_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_BATCH_ಬೈಟುಗಳು = 1 << 17;
 
-static int dftColsBatch(int len, size_t complex_elem_size)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ dft_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_Batch(ಪೂರ್ಣಾಂಕ len, size_t complex_elem_ಗಾತ್ರ)
 {
-    int batch = (int)(DFT_COLS_BATCH_BYTES/((size_t)len*complex_elem_size));
-    return std::max(DFT_COLS_BATCH_MIN, std::min(DFT_COLS_BATCH_MAX, batch));
+    ಪೂರ್ಣಾಂಕ batch = (ಪೂರ್ಣಾಂಕ)(DFT_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_BATCH_ಬೈಟುಗಳು/((size_t)len*complex_elem_ಗಾತ್ರ));
+    ಹಿಂತಿರುಗಿ std::max(DFT_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_BATCH_MIN, std::min(DFT_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_BATCH_MAX, batch));
 }
 
-static double dftParallelStripes(int count, int len)
+ಸ್ಥಿರ ದ್ವಿಗುಣ dftParallelStripes(ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3, ಪೂರ್ಣಾಂಕ len)
 {
-    const double quantum = 0.5e6;
-    return (double)count*len*std::max(std::log((double)len)/std::log(2.), 1.)/quantum;
+    ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ ಕಾಲಾಂಶ = 0.5e6;
+    ಹಿಂತಿರುಗಿ (ದ್ವಿಗುಣ)ಎಣಿಕೆ_3*len*std::max(std::ಲಘುಗಣಕ((ದ್ವಿಗುಣ)len)/std::ಲಘುಗಣಕ(2.), 1.)/ಕಾಲಾಂಶ;
 }
 
-class OcvDftImpl CV_FINAL : public hal::DFT2D
+ವರ್ಗ OcvDftImpl CV_FINAL : ಸಾರ್ವಜನಿಕ hal::DFT2D
 {
-protected:
+ಸಂರಕ್ಷಿತ:
     Ptr<hal::DFT1D> contextA;
     Ptr<hal::DFT1D> contextB;
-    const OcvDftBasicImpl* basicA;   // contextA/contextB when they are our own implementation
-    const OcvDftBasicImpl* basicB;   // (parallel path); 0 for external HAL contexts
-    bool needBufferA;
-    bool needBufferB;
-    bool inv;
-    int width;
-    int height;
-    DftMode mode;
-    int elem_size;
-    int complex_elem_size;
-    int depth;
-    bool real_transform;
-    int nonzero_rows;
-    bool isRowTransform;
-    bool isScaled;
-    std::vector<int> stages;
-    bool useIpp;
-    int src_channels;
-    int dst_channels;
+    ಸ್ಥಿರಾಂಕ OcvDftBasicImpl* basicA;   // contextA/contextB when they are our own implementation
+    ಸ್ಥಿರಾಂಕ OcvDftBasicImpl* basicB;   // (parallel path); 0 for external HAL contexts
+    ತಾರ್ಕಿಕ need_ಬಫರ್_A;
+    ತಾರ್ಕಿಕ need_ಬಫರ್_B;
+    ತಾರ್ಕಿಕ inv;
+    ಪೂರ್ಣಾಂಕ ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ ಎತ್ತರ;
+    Dft_ಬಹುಲಕ ಬಹುಲಕ;
+    ಪೂರ್ಣಾಂಕ elem_ಗಾತ್ರ_2;
+    ಪೂರ್ಣಾಂಕ complex_elem_ಗಾತ್ರ;
+    ಪೂರ್ಣಾಂಕ ಆಳ;
+    ತಾರ್ಕಿಕ real_transform;
+    ಪೂರ್ಣಾಂಕ nonzero_ಅಡ್ಡಸಾಲುಗಳು;
+    ತಾರ್ಕಿಕ is_ಅಡ್ಡಸಾಲು_Transform;
+    ತಾರ್ಕಿಕ isScaled;
+    std::vector<ಪೂರ್ಣಾಂಕ> stages;
+    ತಾರ್ಕಿಕ useIpp;
+    ಪೂರ್ಣಾಂಕ src_channels;
+    ಪೂರ್ಣಾಂಕ dst_channels;
 
-    AutoBuffer<uchar> tmp_bufA;
-    AutoBuffer<uchar> tmp_bufB;
-    AutoBuffer<uchar> buf0;
-    AutoBuffer<uchar> buf1;
+    Auto_ಬಫರ್<uchar> tmp_bufA;
+    Auto_ಬಫರ್<uchar> tmp_bufB;
+    Auto_ಬಫರ್<uchar> buf0;
+    Auto_ಬಫರ್<uchar> buf1;
 
-public:
+ಸಾರ್ವಜನಿಕ:
     OcvDftImpl()
     {
         basicA = basicB = 0;
-        needBufferA = false;
-        needBufferB = false;
-        inv = false;
-        width = 0;
-        height = 0;
-        mode = InvalidDft;
-        elem_size = 0;
-        complex_elem_size = 0;
-        depth = 0;
-        real_transform = false;
-        nonzero_rows = 0;
-        isRowTransform = false;
-        isScaled = false;
-        useIpp = false;
+        need_ಬಫರ್_A = ಸುಳ್ಳು;
+        need_ಬಫರ್_B = ಸುಳ್ಳು;
+        inv = ಸುಳ್ಳು;
+        ಅಗಲ = 0;
+        ಎತ್ತರ = 0;
+        ಬಹುಲಕ = InvalidDft;
+        elem_ಗಾತ್ರ_2 = 0;
+        complex_elem_ಗಾತ್ರ = 0;
+        ಆಳ = 0;
+        real_transform = ಸುಳ್ಳು;
+        nonzero_ಅಡ್ಡಸಾಲುಗಳು = 0;
+        is_ಅಡ್ಡಸಾಲು_Transform = ಸುಳ್ಳು;
+        isScaled = ಸುಳ್ಳು;
+        useIpp = ಸುಳ್ಳು;
         src_channels = 0;
         dst_channels = 0;
     }
 
-    void init(int _width, int _height, int _depth, int _src_channels, int _dst_channels, int flags, int _nonzero_rows)
+    ಶೂನ್ಯ init(ಪೂರ್ಣಾಂಕ ಅಗಲ_3, ಪೂರ್ಣಾಂಕ ಎತ್ತರ_3, ಪೂರ್ಣಾಂಕ ಆಳ_2, ಪೂರ್ಣಾಂಕ _src_channels, ಪೂರ್ಣಾಂಕ _dst_channels, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ nonzero_ಅಡ್ಡಸಾಲುಗಳು_2)
     {
-        bool isComplex = _src_channels != _dst_channels;
-        nonzero_rows = _nonzero_rows;
-        width = _width;
-        height = _height;
-        depth = _depth;
+        ತಾರ್ಕಿಕ isComplex = _src_channels != _dst_channels;
+        nonzero_ಅಡ್ಡಸಾಲುಗಳು = nonzero_ಅಡ್ಡಸಾಲುಗಳು_2;
+        ಅಗಲ = ಅಗಲ_3;
+        ಎತ್ತರ = ಎತ್ತರ_3;
+        ಆಳ = ಆಳ_2;
         src_channels = _src_channels;
         dst_channels = _dst_channels;
-        bool isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
-        bool isInplace = (flags & CV_HAL_DFT_IS_INPLACE) != 0;
-        bool isContinuous = (flags & CV_HAL_DFT_IS_CONTINUOUS) != 0;
-        mode = determineMode(isInverse, _src_channels, _dst_channels);
+        ತಾರ್ಕಿಕ isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
+        ತಾರ್ಕಿಕ isInplace = (flags & CV_HAL_DFT_IS_INPLACE) != 0;
+        ತಾರ್ಕಿಕ isContinuous = (flags & CV_HAL_DFT_IS_CONTINUOUS) != 0;
+        ಬಹುಲಕ = determine_ಬಹುಲಕ(isInverse, _src_channels, _dst_channels);
         inv = isInverse;
-        isRowTransform = (flags & CV_HAL_DFT_ROWS) != 0;
+        is_ಅಡ್ಡಸಾಲು_Transform = (flags & CV_HAL_DFT_ಅಡ್ಡಸಾಲುಗಳು) != 0;
         isScaled = (flags & CV_HAL_DFT_SCALE) != 0;
-        needBufferA = false;
-        needBufferB = false;
-        real_transform = (mode != FwdComplexToComplex && mode != InvComplexToComplex);
+        need_ಬಫರ್_A = ಸುಳ್ಳು;
+        need_ಬಫರ್_B = ಸುಳ್ಳು;
+        real_transform = (ಬಹುಲಕ != Fwd_Complex_ಗಮ್ಯ_Complex && ಬಹುಲಕ != Inv_Complex_ಗಮ್ಯ_Complex);
 
-        elem_size = (depth == CV_32F) ? sizeof(float) : sizeof(double);
-        complex_elem_size = elem_size * 2;
-        if( !real_transform )
-            elem_size = complex_elem_size;
+        elem_ಗಾತ್ರ_2 = (ಆಳ == CV_32F) ? ಗಾತ್ರ(ದಶಮಾಂಶ) : ಗಾತ್ರ(ದ್ವಿಗುಣ);
+        complex_elem_ಗಾತ್ರ = elem_ಗಾತ್ರ_2 * 2;
+        ಆದರೆ( !real_transform )
+            elem_ಗಾತ್ರ_2 = complex_elem_ಗಾತ್ರ;
 
-#if defined USE_IPP_DFT
+#ಆದರೆ defined USE_IPP_DFT
         CV_IPP_CHECK()
         {
-            if (nonzero_rows == 0 && depth == CV_32F && ((width * height)>(int)(1<<6)))
+            ಆದರೆ (nonzero_ಅಡ್ಡಸಾಲುಗಳು == 0 && ಆಳ == CV_32F && ((ಅಗಲ * ಎತ್ತರ)>(ಪೂರ್ಣಾಂಕ)(1<<6)))
             {
-                if (mode == FwdComplexToComplex || mode == InvComplexToComplex || mode == FwdRealToCCS || mode == InvCCSToReal)
+                ಆದರೆ (ಬಹುಲಕ == Fwd_Complex_ಗಮ್ಯ_Complex || ಬಹುಲಕ == Inv_Complex_ಗಮ್ಯ_Complex || ಬಹುಲಕ == Fwd_Real_ಗಮ್ಯ_CCS || ಬಹುಲಕ == InvCCSToReal)
                 {
-                    useIpp = true;
-                    return;
+                    useIpp = ನಿಜ;
+                    ಹಿಂತಿರುಗಿ;
                 }
             }
         }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-        DftDims dims = determineDims(height, width, isRowTransform, isContinuous);
-        if (dims == TwoDims)
+        DftDims dims = determineDims(ಎತ್ತರ, ಅಗಲ, is_ಅಡ್ಡಸಾಲು_Transform, isContinuous);
+        ಆದರೆ (dims == TwoDims)
         {
             stages.resize(2);
-            if (mode == InvCCSToReal || mode == InvComplexToReal)
+            ಆದರೆ (ಬಹುಲಕ == InvCCSToReal || ಬಹುಲಕ == Inv_Complex_ಗಮ್ಯ_Real)
             {
                 stages[0] = 1;
                 stages[1] = 0;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
                 stages[0] = 0;
                 stages[1] = 1;
             }
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             stages.resize(1);
-            if (dims == OneDimColWise)
+            ಆದರೆ (dims == One_Dim_ಲಂಬಸಾಲು_Wise)
                 stages[0] = 1;
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
                 stages[0] = 0;
         }
 
-        for(uint stageIndex = 0; stageIndex < stages.size(); ++stageIndex)
+        ಗಾಗಿ(uint stage_ಸೂಚ್ಯಂಕ = 0; stage_ಸೂಚ್ಯಂಕ < stages.size(); ++stage_ಸೂಚ್ಯಂಕ)
         {
-            if (stageIndex == 1)
+            ಆದರೆ (stage_ಸೂಚ್ಯಂಕ == 1)
             {
-                isInplace = true;
-                isComplex = false;
+                isInplace = ನಿಜ;
+                isComplex = ಸುಳ್ಳು;
             }
 
-            int stage = stages[stageIndex];
-            bool isLastStage = (stageIndex + 1 == stages.size());
+            ಪೂರ್ಣಾಂಕ stage = stages[stage_ಸೂಚ್ಯಂಕ];
+            ತಾರ್ಕಿಕ is_ಕೊನೆಯ_Stage = (stage_ಸೂಚ್ಯಂಕ + 1 == stages.size());
 
-            int len, count;
+            ಪೂರ್ಣಾಂಕ len, ಎಣಿಕೆ_3;
 
-            int f = 0;
-            if (inv)
+            ಪೂರ್ಣಾಂಕ f = 0;
+            ಆದರೆ (inv)
                 f |= CV_HAL_DFT_INVERSE;
-            if (isScaled)
+            ಆದರೆ (isScaled)
                 f |= CV_HAL_DFT_SCALE;
-            if (isRowTransform)
-                f |= CV_HAL_DFT_ROWS;
-            if (isComplex)
+            ಆದರೆ (is_ಅಡ್ಡಸಾಲು_Transform)
+                f |= CV_HAL_DFT_ಅಡ್ಡಸಾಲುಗಳು;
+            ಆದರೆ (isComplex)
                 f |= CV_HAL_DFT_COMPLEX_OUTPUT;
-            if (real_transform)
+            ಆದರೆ (real_transform)
                 f |= CV_HAL_DFT_REAL_OUTPUT;
-            if (!isLastStage)
+            ಆದರೆ (!is_ಕೊನೆಯ_Stage)
                 f |= CV_HAL_DFT_TWO_STAGE;
 
-            if( stage == 0 ) // row-wise transform
+            ಆದರೆ( stage == 0 ) // row-wise transform
             {
-                if (width == 1 && !isRowTransform )
+                ಆದರೆ (ಅಗಲ == 1 && !is_ಅಡ್ಡಸಾಲು_Transform )
                 {
-                    len = height;
-                    count = width;
+                    len = ಎತ್ತರ;
+                    ಎಣಿಕೆ_3 = ಅಗಲ;
                 }
-                else
+                ಇಲ್ಲದಿದ್ದರೆ
                 {
-                    len = width;
-                    count = height;
+                    len = ಅಗಲ;
+                    ಎಣಿಕೆ_3 = ಎತ್ತರ;
                 }
-                needBufferA = isInplace;
-                contextA = hal::DFT1D::create(len, count, depth, f, &needBufferA);
-                basicA = dynamic_cast<const OcvDftBasicImpl*>(contextA.get());
-                if (needBufferA)
-                    tmp_bufA.allocate(len * complex_elem_size);
+                need_ಬಫರ್_A = isInplace;
+                contextA = hal::DFT1D::create(len, ಎಣಿಕೆ_3, ಆಳ, f, &need_ಬಫರ್_A);
+                basicA = dynamic_cast<ಸ್ಥಿರಾಂಕ OcvDftBasicImpl*>(contextA.get());
+                ಆದರೆ (need_ಬಫರ್_A)
+                    tmp_bufA.allocate(len * complex_elem_ಗಾತ್ರ);
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                len = height;
-                count = width;
-                f |= CV_HAL_DFT_STAGE_COLS;
-                needBufferB = isInplace;
-                contextB = hal::DFT1D::create(len, count, depth, f, &needBufferB);
-                basicB = dynamic_cast<const OcvDftBasicImpl*>(contextB.get());
-                if (needBufferB)
-                    tmp_bufB.allocate(len * complex_elem_size);
+                len = ಎತ್ತರ;
+                ಎಣಿಕೆ_3 = ಅಗಲ;
+                f |= CV_HAL_DFT_STAGE_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+                need_ಬಫರ್_B = isInplace;
+                contextB = hal::DFT1D::create(len, ಎಣಿಕೆ_3, ಆಳ, f, &need_ಬಫರ್_B);
+                basicB = dynamic_cast<ಸ್ಥಿರಾಂಕ OcvDftBasicImpl*>(contextB.get());
+                ಆದರೆ (need_ಬಫರ್_B)
+                    tmp_bufB.allocate(len * complex_elem_ಗಾತ್ರ);
 
-                buf0.allocate(len * complex_elem_size);
-                buf1.allocate(len * complex_elem_size);
+                buf0.allocate(len * complex_elem_ಗಾತ್ರ);
+                buf1.allocate(len * complex_elem_ಗಾತ್ರ);
             }
         }
     }
 
-    void apply(const uchar * src, size_t src_step, uchar * dst, size_t dst_step) CV_OVERRIDE
+    ಶೂನ್ಯ apply(ಸ್ಥಿರಾಂಕ uchar * src, size_t src_ಹೆಜ್ಜೆ, uchar * dst, size_t dst_ಹೆಜ್ಜೆ) CV_OVERRIDE
     {
-#if defined USE_IPP_DFT
-        if (useIpp)
+#ಆದರೆ defined USE_IPP_DFT
+        ಆದರೆ (useIpp)
         {
-            int ipp_norm_flag = !isScaled ? 8 : inv ? 2 : 1;
-            if (!isRowTransform)
+            ಪೂರ್ಣಾಂಕ ipp_norm_flag = !isScaled ? 8 : inv ? 2 : 1;
+            ಆದರೆ (!is_ಅಡ್ಡಸಾಲು_Transform)
             {
-                if (mode == FwdComplexToComplex || mode == InvComplexToComplex)
+                ಆದರೆ (ಬಹುಲಕ == Fwd_Complex_ಗಮ್ಯ_Complex || ಬಹುಲಕ == Inv_Complex_ಗಮ್ಯ_Complex)
                 {
-                    if (ippi_DFT_C_32F(src, src_step, dst, dst_step, width, height, inv, ipp_norm_flag))
+                    ಆದರೆ (ippi_DFT_C_32F(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, ಅಗಲ, ಎತ್ತರ, inv, ipp_norm_flag))
                     {
-                        CV_IMPL_ADD(CV_IMPL_IPP);
-                        return;
+                        CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP);
+                        ಹಿಂತಿರುಗಿ;
                     }
-                    setIppErrorStatus();
+                    ಗಣ_Ipp_Error_ಸ್ಥಿತಿ();
                 }
-                else if (mode == FwdRealToCCS || mode == InvCCSToReal)
+                ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಬಹುಲಕ == Fwd_Real_ಗಮ್ಯ_CCS || ಬಹುಲಕ == InvCCSToReal)
                 {
-                    if (ippi_DFT_R_32F(src, src_step, dst, dst_step, width, height, inv, ipp_norm_flag))
+                    ಆದರೆ (ippi_DFT_R_32F(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, ಅಗಲ, ಎತ್ತರ, inv, ipp_norm_flag))
                     {
-                        CV_IMPL_ADD(CV_IMPL_IPP);
-                        return;
+                        CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP);
+                        ಹಿಂತಿರುಗಿ;
                     }
-                    setIppErrorStatus();
+                    ಗಣ_Ipp_Error_ಸ್ಥಿತಿ();
                 }
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                if (mode == FwdComplexToComplex || mode == InvComplexToComplex)
+                ಆದರೆ (ಬಹುಲಕ == Fwd_Complex_ಗಮ್ಯ_Complex || ಬಹುಲಕ == Inv_Complex_ಗಮ್ಯ_Complex)
                 {
                     ippiDFT_C_Func ippiFunc = inv ? (ippiDFT_C_Func)ippiDFTInv_CToC_32fc_C1R : (ippiDFT_C_Func)ippiDFTFwd_CToC_32fc_C1R;
-                    if (Dft_C_IPPLoop(src, src_step, dst, dst_step, width, height, IPPDFT_C_Functor(ippiFunc),ipp_norm_flag))
+                    ಆದರೆ (Dft_C_IPPLoop(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, ಅಗಲ, ಎತ್ತರ, IPPDFT_C_Functor(ippiFunc),ipp_norm_flag))
                     {
-                        CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
-                        return;
+                        CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP|CV_IMPL_MT);
+                        ಹಿಂತಿರುಗಿ;
                     }
-                    setIppErrorStatus();
+                    ಗಣ_Ipp_Error_ಸ್ಥಿತಿ();
                 }
-                else if (mode == FwdRealToCCS || mode == InvCCSToReal)
+                ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಬಹುಲಕ == Fwd_Real_ಗಮ್ಯ_CCS || ಬಹುಲಕ == InvCCSToReal)
                 {
-                    ippiDFT_R_Func ippiFunc = inv ? (ippiDFT_R_Func)ippiDFTInv_PackToR_32f_C1R : (ippiDFT_R_Func)ippiDFTFwd_RToPack_32f_C1R;
-                    if (Dft_R_IPPLoop(src, src_step, dst, dst_step, width, height, IPPDFT_R_Functor(ippiFunc),ipp_norm_flag))
+                    ippiDFT_R_Func ippiFunc = inv ? (ippiDFT_R_Func)ippi_DFTInv_Pack_ಗಮ್ಯ_R_32f_C1_R : (ippiDFT_R_Func)ippiDFTFwd_RToPack_32f_C1R;
+                    ಆದರೆ (Dft_R_IPPLoop(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, ಅಗಲ, ಎತ್ತರ, IPPDFT_R_Functor(ippiFunc),ipp_norm_flag))
                     {
-                        CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
-                        return;
+                        CV_IMPL_ಕೂಡಿಸು(CV_IMPL_IPP|CV_IMPL_MT);
+                        ಹಿಂತಿರುಗಿ;
                     }
-                    setIppErrorStatus();
+                    ಗಣ_Ipp_Error_ಸ್ಥಿತಿ();
                 }
             }
-            return;
+            ಹಿಂತಿರುಗಿ;
         }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-        for(uint stageIndex = 0; stageIndex < stages.size(); ++stageIndex)
+        ಗಾಗಿ(uint stage_ಸೂಚ್ಯಂಕ = 0; stage_ಸೂಚ್ಯಂಕ < stages.size(); ++stage_ಸೂಚ್ಯಂಕ)
         {
-            int stage_src_channels = src_channels;
-            int stage_dst_channels = dst_channels;
+            ಪೂರ್ಣಾಂಕ stage_src_channels = src_channels;
+            ಪೂರ್ಣಾಂಕ stage_dst_channels = dst_channels;
 
-            if (stageIndex == 1)
+            ಆದರೆ (stage_ಸೂಚ್ಯಂಕ == 1)
             {
                 src = dst;
-                src_step = dst_step;
+                src_ಹೆಜ್ಜೆ = dst_ಹೆಜ್ಜೆ;
                 stage_src_channels = stage_dst_channels;
             }
 
-            int stage = stages[stageIndex];
-            bool isLastStage = (stageIndex + 1 == stages.size());
-            bool isComplex = stage_src_channels != stage_dst_channels;
+            ಪೂರ್ಣಾಂಕ stage = stages[stage_ಸೂಚ್ಯಂಕ];
+            ತಾರ್ಕಿಕ is_ಕೊನೆಯ_Stage = (stage_ಸೂಚ್ಯಂಕ + 1 == stages.size());
+            ತಾರ್ಕಿಕ isComplex = stage_src_channels != stage_dst_channels;
 
-            if( stage == 0 )
-                rowDft(src, src_step, dst, dst_step, isComplex, isLastStage);
-            else
-                colDft(src, src_step, dst, dst_step, stage_src_channels, stage_dst_channels, isLastStage);
+            ಆದರೆ( stage == 0 )
+                ಅಡ್ಡಸಾಲು_Dft(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, isComplex, is_ಕೊನೆಯ_Stage);
+            ಇಲ್ಲದಿದ್ದರೆ
+                ಲಂಬಸಾಲು_Dft(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, stage_src_channels, stage_dst_channels, is_ಕೊನೆಯ_Stage);
         }
     }
 
-protected:
+ಸಂರಕ್ಷಿತ:
 
-    void rowDft(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, bool isComplex, bool isLastStage)
+    ಶೂನ್ಯ ಅಡ್ಡಸಾಲು_Dft(ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ತಾರ್ಕಿಕ isComplex, ತಾರ್ಕಿಕ is_ಕೊನೆಯ_Stage)
     {
-        int len, count;
-        if (width == 1 && !isRowTransform )
+        ಪೂರ್ಣಾಂಕ len, ಎಣಿಕೆ_3;
+        ಆದರೆ (ಅಗಲ == 1 && !is_ಅಡ್ಡಸಾಲು_Transform )
         {
-            len = height;
-            count = width;
+            len = ಎತ್ತರ;
+            ಎಣಿಕೆ_3 = ಅಗಲ;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            len = width;
-            count = height;
+            len = ಅಗಲ;
+            ಎಣಿಕೆ_3 = ಎತ್ತರ;
         }
-        int dptr_offset = 0;
-        int dst_full_len = len*elem_size;
+        ಪೂರ್ಣಾಂಕ dptr_ಸ್ಥಾನಾಂತರ = 0;
+        ಪೂರ್ಣಾಂಕ dst_ತುಂಬಿದ_len = len*elem_ಗಾತ್ರ_2;
 
-        if( needBufferA )
+        ಆದರೆ( need_ಬಫರ್_A )
         {
-            if (mode == FwdRealToCCS && (len & 1) && len > 1)
-                dptr_offset = elem_size;
+            ಆದರೆ (ಬಹುಲಕ == Fwd_Real_ಗಮ್ಯ_CCS && (len & 1) && len > 1)
+                dptr_ಸ್ಥಾನಾಂತರ = elem_ಗಾತ್ರ_2;
         }
 
-        if( !inv && isComplex )
-            dst_full_len += (len & 1) ? elem_size : complex_elem_size;
+        ಆದರೆ( !inv && isComplex )
+            dst_ತುಂಬಿದ_len += (len & 1) ? elem_ಗಾತ್ರ_2 : complex_elem_ಗಾತ್ರ;
 
-        int nz = nonzero_rows;
-        if( nz <= 0 || nz > count )
-            nz = count;
+        ಪೂರ್ಣಾಂಕ nz = nonzero_ಅಡ್ಡಸಾಲುಗಳು;
+        ಆದರೆ( nz <= 0 || nz > ಎಣಿಕೆ_3 )
+            nz = ಎಣಿಕೆ_3;
 
-        size_t ws_size = basicA ? basicA->workspaceSize() : 0;
-        double nstripes = dftParallelStripes(nz, len);
-        if( ws_size > 0 && nz > 1 && nstripes >= 1.5 )
+        size_t ws_ಗಾತ್ರ = basicA ? basicA->workspace_ಗಾತ್ರ() : 0;
+        ದ್ವಿಗುಣ nstripes = dftParallelStripes(nz, len);
+        ಆದರೆ( ws_ಗಾತ್ರ > 0 && nz > 1 && nstripes >= 1.5 )
         {
             // every worker gets its own workspace (and row buffer) once per range
-            const OcvDftBasicImpl* ctx = basicA;
-            auto processRows = [&, ctx](const Range& range)
+            ಸ್ಥಿರಾಂಕ OcvDftBasicImpl* ctx = basicA;
+            ಸ್ವಯಂಚಾಲಿತ process_ಅಡ್ಡಸಾಲುಗಳು = [&, ctx](ಸ್ಥಿರಾಂಕ Range& range)
             {
-                AutoBuffer<uchar> ws(ws_size);
-                AutoBuffer<uchar> rowbuf(needBufferA ? len * complex_elem_size : 0);
-                for( int i = range.start; i < range.end; i++ )
+                Auto_ಬಫರ್<uchar> ws(ws_ಗಾತ್ರ);
+                Auto_ಬಫರ್<uchar> rowbuf(need_ಬಫರ್_A ? len * complex_elem_ಗಾತ್ರ : 0);
+                ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = range.ಆರಂಭ; i < range.end; i++ )
                 {
-                    const uchar* sptr = src_data + src_step * i;
-                    uchar* dptr0 = dst_data + dst_step * i;
-                    uchar* dptr = needBufferA ? rowbuf.data() : dptr0;
-                    ctx->applyWithWorkspace(sptr, dptr, ws.data());
-                    if( needBufferA )
-                        memcpy( dptr0, dptr + dptr_offset, dst_full_len );
+                    ಸ್ಥಿರಾಂಕ uchar* sptr = src_ದತ್ತಾಂಶ + src_ಹೆಜ್ಜೆ * i;
+                    uchar* dptr0 = dst_ದತ್ತಾಂಶ + dst_ಹೆಜ್ಜೆ * i;
+                    uchar* dptr = need_ಬಫರ್_A ? rowbuf.ದತ್ತಾಂಶ() : dptr0;
+                    ctx->applyWithWorkspace(sptr, dptr, ws.ದತ್ತಾಂಶ());
+                    ಆದರೆ( need_ಬಫರ್_A )
+                        ಸ್ಮರಣೆ_ನಕಲು( dptr0, dptr + dptr_ಸ್ಥಾನಾಂತರ, dst_ತುಂಬಿದ_len );
                 }
             };
-            parallel_for_(Range(0, nz), processRows, nstripes);
+            parallel_for_(Range(0, nz), process_ಅಡ್ಡಸಾಲುಗಳು, nstripes);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            for( int i = 0; i < nz; i++ )
+            ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < nz; i++ )
             {
-                const uchar* sptr = src_data + src_step * i;
-                uchar* dptr0 = dst_data + dst_step * i;
+                ಸ್ಥಿರಾಂಕ uchar* sptr = src_ದತ್ತಾಂಶ + src_ಹೆಜ್ಜೆ * i;
+                uchar* dptr0 = dst_ದತ್ತಾಂಶ + dst_ಹೆಜ್ಜೆ * i;
                 uchar* dptr = dptr0;
 
-                if( needBufferA )
-                    dptr = tmp_bufA.data();
+                ಆದರೆ( need_ಬಫರ್_A )
+                    dptr = tmp_bufA.ದತ್ತಾಂಶ();
 
                 contextA->apply(sptr, dptr);
 
-                if( needBufferA )
-                    memcpy( dptr0, dptr + dptr_offset, dst_full_len );
+                ಆದರೆ( need_ಬಫರ್_A )
+                    ಸ್ಮರಣೆ_ನಕಲು( dptr0, dptr + dptr_ಸ್ಥಾನಾಂತರ, dst_ತುಂಬಿದ_len );
             }
         }
 
-        for( int i = nz; i < count; i++ )
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = nz; i < ಎಣಿಕೆ_3; i++ )
         {
-            uchar* dptr0 = dst_data + dst_step * i;
-            memset( dptr0, 0, dst_full_len );
+            uchar* dptr0 = dst_ದತ್ತಾಂಶ + dst_ಹೆಜ್ಜೆ * i;
+            memset( dptr0, 0, dst_ತುಂಬಿದ_len );
         }
-        if(isLastStage &&  mode == FwdRealToComplex)
-            complementComplexOutput(depth, dst_data, dst_step, len, nz, 1);
+        ಆದರೆ(is_ಕೊನೆಯ_Stage &&  ಬಹುಲಕ == Fwd_Real_ಗಮ್ಯ_Complex)
+            complementComplexOutput(ಆಳ, dst_ದತ್ತಾಂಶ, dst_ಹೆಜ್ಜೆ, len, nz, 1);
     }
 
-    void colDft(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, int stage_src_channels, int stage_dst_channels, bool isLastStage)
+    ಶೂನ್ಯ ಲಂಬಸಾಲು_Dft(ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ stage_src_channels, ಪೂರ್ಣಾಂಕ stage_dst_channels, ತಾರ್ಕಿಕ is_ಕೊನೆಯ_Stage)
     {
-        int len = height;
-        int count = width;
-        int a = 0, b = count;
+        ಪೂರ್ಣಾಂಕ len = ಎತ್ತರ;
+        ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3 = ಅಗಲ;
+        ಪೂರ್ಣಾಂಕ a = 0, b = ಎಣಿಕೆ_3;
         uchar *dbuf0, *dbuf1;
-        const uchar* sptr0 = src_data;
-        uchar* dptr0 = dst_data;
+        ಸ್ಥಿರಾಂಕ uchar* sptr0 = src_ದತ್ತಾಂಶ;
+        uchar* dptr0 = dst_ದತ್ತಾಂಶ;
 
-        dbuf0 = buf0.data(), dbuf1 = buf1.data();
+        dbuf0 = buf0.ದತ್ತಾಂಶ(), dbuf1 = buf1.ದತ್ತಾಂಶ();
 
-        if( needBufferB )
+        ಆದರೆ( need_ಬಫರ್_B )
         {
-            dbuf1 = tmp_bufB.data();
-            dbuf0 = buf1.data();
+            dbuf1 = tmp_bufB.ದತ್ತಾಂಶ();
+            dbuf0 = buf1.ದತ್ತಾಂಶ();
         }
 
-        if( real_transform )
+        ಆದರೆ( real_transform )
         {
-            int even;
+            ಪೂರ್ಣಾಂಕ even;
             a = 1;
-            even = (count & 1) == 0;
-            b = (count+1)/2;
-            if( !inv )
+            even = (ಎಣಿಕೆ_3 & 1) == 0;
+            b = (ಎಣಿಕೆ_3+1)/2;
+            ಆದರೆ( !inv )
             {
-                memset( buf0.data(), 0, len*complex_elem_size );
-                CopyColumn( sptr0, src_step, buf0.data(), complex_elem_size, len, elem_size );
-                sptr0 += stage_dst_channels*elem_size;
-                if( even )
+                memset( buf0.ದತ್ತಾಂಶ(), 0, len*complex_elem_ಗಾತ್ರ );
+                Copy_ಸ್ತಂಭ( sptr0, src_ಹೆಜ್ಜೆ, buf0.ದತ್ತಾಂಶ(), complex_elem_ಗಾತ್ರ, len, elem_ಗಾತ್ರ_2 );
+                sptr0 += stage_dst_channels*elem_ಗಾತ್ರ_2;
+                ಆದರೆ( even )
                 {
-                    memset( buf1.data(), 0, len*complex_elem_size );
-                    CopyColumn( sptr0 + (count-2)*elem_size, src_step,
-                                buf1.data(), complex_elem_size, len, elem_size );
+                    memset( buf1.ದತ್ತಾಂಶ(), 0, len*complex_elem_ಗಾತ್ರ );
+                    Copy_ಸ್ತಂಭ( sptr0 + (ಎಣಿಕೆ_3-2)*elem_ಗಾತ್ರ_2, src_ಹೆಜ್ಜೆ,
+                                buf1.ದತ್ತಾಂಶ(), complex_elem_ಗಾತ್ರ, len, elem_ಗಾತ್ರ_2 );
                 }
             }
-            else if( stage_src_channels == 1 )
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( stage_src_channels == 1 )
             {
-                CopyColumn( sptr0, src_step, buf0.data(), elem_size, len, elem_size );
-                ExpandCCS( buf0.data(), len, elem_size );
-                if( even )
+                Copy_ಸ್ತಂಭ( sptr0, src_ಹೆಜ್ಜೆ, buf0.ದತ್ತಾಂಶ(), elem_ಗಾತ್ರ_2, len, elem_ಗಾತ್ರ_2 );
+                ExpandCCS( buf0.ದತ್ತಾಂಶ(), len, elem_ಗಾತ್ರ_2 );
+                ಆದರೆ( even )
                 {
-                    CopyColumn( sptr0 + (count-1)*elem_size, src_step,
-                                buf1.data(), elem_size, len, elem_size );
-                    ExpandCCS( buf1.data(), len, elem_size );
+                    Copy_ಸ್ತಂಭ( sptr0 + (ಎಣಿಕೆ_3-1)*elem_ಗಾತ್ರ_2, src_ಹೆಜ್ಜೆ,
+                                buf1.ದತ್ತಾಂಶ(), elem_ಗಾತ್ರ_2, len, elem_ಗಾತ್ರ_2 );
+                    ExpandCCS( buf1.ದತ್ತಾಂಶ(), len, elem_ಗಾತ್ರ_2 );
                 }
-                sptr0 += elem_size;
+                sptr0 += elem_ಗಾತ್ರ_2;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                CopyColumn( sptr0, src_step, buf0.data(), complex_elem_size, len, complex_elem_size );
-                if( even )
+                Copy_ಸ್ತಂಭ( sptr0, src_ಹೆಜ್ಜೆ, buf0.ದತ್ತಾಂಶ(), complex_elem_ಗಾತ್ರ, len, complex_elem_ಗಾತ್ರ );
+                ಆದರೆ( even )
                 {
-                    CopyColumn( sptr0 + b*complex_elem_size, src_step,
-                                   buf1.data(), complex_elem_size, len, complex_elem_size );
+                    Copy_ಸ್ತಂಭ( sptr0 + b*complex_elem_ಗಾತ್ರ, src_ಹೆಜ್ಜೆ,
+                                   buf1.ದತ್ತಾಂಶ(), complex_elem_ಗಾತ್ರ, len, complex_elem_ಗಾತ್ರ );
                 }
-                sptr0 += complex_elem_size;
+                sptr0 += complex_elem_ಗಾತ್ರ;
             }
 
-            if( even )
-                contextB->apply(buf1.data(), dbuf1);
-            contextB->apply(buf0.data(), dbuf0);
+            ಆದರೆ( even )
+                contextB->apply(buf1.ದತ್ತಾಂಶ(), dbuf1);
+            contextB->apply(buf0.ದತ್ತಾಂಶ(), dbuf0);
 
-            if( stage_dst_channels == 1 )
+            ಆದರೆ( stage_dst_channels == 1 )
             {
-                if( !inv )
+                ಆದರೆ( !inv )
                 {
                     // copy the half of output vector to the first/last column.
                     // before doing that, defgragment the vector
-                    memcpy( dbuf0 + elem_size, dbuf0, elem_size );
-                    CopyColumn( dbuf0 + elem_size, elem_size, dptr0,
-                                   dst_step, len, elem_size );
-                    if( even )
+                    ಸ್ಮರಣೆ_ನಕಲು( dbuf0 + elem_ಗಾತ್ರ_2, dbuf0, elem_ಗಾತ್ರ_2 );
+                    Copy_ಸ್ತಂಭ( dbuf0 + elem_ಗಾತ್ರ_2, elem_ಗಾತ್ರ_2, dptr0,
+                                   dst_ಹೆಜ್ಜೆ, len, elem_ಗಾತ್ರ_2 );
+                    ಆದರೆ( even )
                     {
-                        memcpy( dbuf1 + elem_size, dbuf1, elem_size );
-                        CopyColumn( dbuf1 + elem_size, elem_size,
-                                       dptr0 + (count-1)*elem_size,
-                                       dst_step, len, elem_size );
+                        ಸ್ಮರಣೆ_ನಕಲು( dbuf1 + elem_ಗಾತ್ರ_2, dbuf1, elem_ಗಾತ್ರ_2 );
+                        Copy_ಸ್ತಂಭ( dbuf1 + elem_ಗಾತ್ರ_2, elem_ಗಾತ್ರ_2,
+                                       dptr0 + (ಎಣಿಕೆ_3-1)*elem_ಗಾತ್ರ_2,
+                                       dst_ಹೆಜ್ಜೆ, len, elem_ಗಾತ್ರ_2 );
                     }
-                    dptr0 += elem_size;
+                    dptr0 += elem_ಗಾತ್ರ_2;
                 }
-                else
+                ಇಲ್ಲದಿದ್ದರೆ
                 {
                     // copy the real part of the complex vector to the first/last column
-                    CopyColumn( dbuf0, complex_elem_size, dptr0, dst_step, len, elem_size );
-                    if( even )
-                        CopyColumn( dbuf1, complex_elem_size, dptr0 + (count-1)*elem_size,
-                                       dst_step, len, elem_size );
-                    dptr0 += elem_size;
+                    Copy_ಸ್ತಂಭ( dbuf0, complex_elem_ಗಾತ್ರ, dptr0, dst_ಹೆಜ್ಜೆ, len, elem_ಗಾತ್ರ_2 );
+                    ಆದರೆ( even )
+                        Copy_ಸ್ತಂಭ( dbuf1, complex_elem_ಗಾತ್ರ, dptr0 + (ಎಣಿಕೆ_3-1)*elem_ಗಾತ್ರ_2,
+                                       dst_ಹೆಜ್ಜೆ, len, elem_ಗಾತ್ರ_2 );
+                    dptr0 += elem_ಗಾತ್ರ_2;
                 }
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
                 CV_Assert( !inv );
-                CopyColumn( dbuf0, complex_elem_size, dptr0,
-                               dst_step, len, complex_elem_size );
-                if( even )
-                    CopyColumn( dbuf1, complex_elem_size,
-                                   dptr0 + b*complex_elem_size,
-                                   dst_step, len, complex_elem_size );
-                dptr0 += complex_elem_size;
+                Copy_ಸ್ತಂಭ( dbuf0, complex_elem_ಗಾತ್ರ, dptr0,
+                               dst_ಹೆಜ್ಜೆ, len, complex_elem_ಗಾತ್ರ );
+                ಆದರೆ( even )
+                    Copy_ಸ್ತಂಭ( dbuf1, complex_elem_ಗಾತ್ರ,
+                                   dptr0 + b*complex_elem_ಗಾತ್ರ,
+                                   dst_ಹೆಜ್ಜೆ, len, complex_elem_ಗಾತ್ರ );
+                dptr0 += complex_elem_ಗಾತ್ರ;
             }
         }
 
         // the remaining columns are processed in batches of cols_batch columns: copied row-wise into
         // contiguous per-column buffers, transformed one by one, copied back row-wise
-        int ncols = b - a;
-        const int cols_batch = dftColsBatch(len, complex_elem_size);
-        int nbatches = (ncols + cols_batch - 1)/cols_batch;
-        size_t ws_size = basicB ? basicB->workspaceSize() : 0;
-        size_t colbuf_size = (size_t)len*complex_elem_size;
-        const OcvDftBasicImpl* ctx = basicB;
-        auto processBatches = [&, ctx](const Range& range)
+        ಪೂರ್ಣಾಂಕ ncols = b - a;
+        ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_batch = dft_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_Batch(len, complex_elem_ಗಾತ್ರ);
+        ಪೂರ್ಣಾಂಕ nbatches = (ncols + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_batch - 1)/ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_batch;
+        size_t ws_ಗಾತ್ರ = basicB ? basicB->workspace_ಗಾತ್ರ() : 0;
+        size_t colbuf_ಗಾತ್ರ = (size_t)len*complex_elem_ಗಾತ್ರ;
+        ಸ್ಥಿರಾಂಕ OcvDftBasicImpl* ctx = basicB;
+        ಸ್ವಯಂಚಾಲಿತ processBatches = [&, ctx](ಸ್ಥಿರಾಂಕ Range& range)
         {
-            AutoBuffer<uchar> ws(ws_size);
-            AutoBuffer<uchar> cbuf(colbuf_size*cols_batch*(needBufferB ? 2 : 1));
-            uchar* cbuf0 = cbuf.data();
-            uchar* cdbuf0 = needBufferB ? cbuf0 + colbuf_size*cols_batch : cbuf0;
-            for( int bi = range.start; bi < range.end; bi++ )
+            Auto_ಬಫರ್<uchar> ws(ws_ಗಾತ್ರ);
+            Auto_ಬಫರ್<uchar> cbuf(colbuf_ಗಾತ್ರ*ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_batch*(need_ಬಫರ್_B ? 2 : 1));
+            uchar* cbuf0 = cbuf.ದತ್ತಾಂಶ();
+            uchar* cdbuf0 = need_ಬಫರ್_B ? cbuf0 + colbuf_ಗಾತ್ರ*ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_batch : cbuf0;
+            ಗಾಗಿ( ಪೂರ್ಣಾಂಕ bi = range.ಆರಂಭ; bi < range.end; bi++ )
             {
-                int c0 = bi*cols_batch;
-                int nc = std::min(cols_batch, ncols - c0);
-                const uchar* sptr = sptr0 + (size_t)c0*complex_elem_size;
-                uchar* dptr = dptr0 + (size_t)c0*complex_elem_size;
-                CopyFromColumns( sptr, src_step, cbuf0, nc, len, complex_elem_size );
-                for( int k = 0; k < nc; k++ )
+                ಪೂರ್ಣಾಂಕ c0 = bi*ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_batch;
+                ಪೂರ್ಣಾಂಕ nc = std::min(ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_batch, ncols - c0);
+                ಸ್ಥಿರಾಂಕ uchar* sptr = sptr0 + (size_t)c0*complex_elem_ಗಾತ್ರ;
+                uchar* dptr = dptr0 + (size_t)c0*complex_elem_ಗಾತ್ರ;
+                CopyFromColumns( sptr, src_ಹೆಜ್ಜೆ, cbuf0, nc, len, complex_elem_ಗಾತ್ರ );
+                ಗಾಗಿ( ಪೂರ್ಣಾಂಕ k = 0; k < nc; k++ )
                 {
-                    if( ctx )
-                        ctx->applyWithWorkspace(cbuf0 + k*colbuf_size, cdbuf0 + k*colbuf_size, ws.data());
-                    else
-                        contextB->apply(cbuf0 + k*colbuf_size, cdbuf0 + k*colbuf_size);
+                    ಆದರೆ( ctx )
+                        ctx->applyWithWorkspace(cbuf0 + k*colbuf_ಗಾತ್ರ, cdbuf0 + k*colbuf_ಗಾತ್ರ, ws.ದತ್ತಾಂಶ());
+                    ಇಲ್ಲದಿದ್ದರೆ
+                        contextB->apply(cbuf0 + k*colbuf_ಗಾತ್ರ, cdbuf0 + k*colbuf_ಗಾತ್ರ);
                 }
-                CopyToColumns( cdbuf0, dptr, dst_step, nc, len, complex_elem_size );
+                Copy_ಗಮ್ಯ_Columns( cdbuf0, dptr, dst_ಹೆಜ್ಜೆ, nc, len, complex_elem_ಗಾತ್ರ );
             }
         };
-        double nstripes = dftParallelStripes(ncols, len);
-        if( ctx && nbatches > 1 && nstripes >= 1.5 )
+        ದ್ವಿಗುಣ nstripes = dftParallelStripes(ncols, len);
+        ಆದರೆ( ctx && nbatches > 1 && nstripes >= 1.5 )
             parallel_for_(Range(0, nbatches), processBatches, nstripes);
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
             processBatches(Range(0, nbatches));
-        if(isLastStage && mode == FwdRealToComplex)
-            complementComplexOutput(depth, dst_data, dst_step, count, len, 2);
+        ಆದರೆ(is_ಕೊನೆಯ_Stage && ಬಹುಲಕ == Fwd_Real_ಗಮ್ಯ_Complex)
+            complementComplexOutput(ಆಳ, dst_ದತ್ತಾಂಶ, dst_ಹೆಜ್ಜೆ, ಎಣಿಕೆ_3, len, 2);
     }
 };
 
-struct ReplacementDFT1D : public hal::DFT1D
+ರಚನೆ ReplacementDFT1D : ಸಾರ್ವಜನಿಕ hal::DFT1D
 {
     cvhalDFT *context;
-    bool isInitialized;
+    ತಾರ್ಕಿಕ isInitialized;
 
-    ReplacementDFT1D() : context(0), isInitialized(false) {}
-    bool init(int len, int count, int depth, int flags, bool *needBuffer)
+    ReplacementDFT1D() : context(0), isInitialized(ಸುಳ್ಳು) {}
+    ತಾರ್ಕಿಕ init(ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ flags, ತಾರ್ಕಿಕ *need_ಬಫರ್)
     {
-        int res = cv_hal_dftInit1D(&context, len, count, depth, flags, needBuffer);
+        ಪೂರ್ಣಾಂಕ res = cv_hal_dftInit1D(&context, len, ಎಣಿಕೆ_3, ಆಳ, flags, need_ಬಫರ್);
         isInitialized = (res == CV_HAL_ERROR_OK);
-        return isInitialized;
+        ಹಿಂತಿರುಗಿ isInitialized;
     }
-    void apply(const uchar *src, uchar *dst) CV_OVERRIDE
+    ಶೂನ್ಯ apply(ಸ್ಥಿರಾಂಕ uchar *src, uchar *dst) CV_OVERRIDE
     {
-        if (isInitialized)
+        ಆದರೆ (isInitialized)
         {
             CALL_HAL(dft1D, cv_hal_dft1D, context, src, dst);
         }
     }
     ~ReplacementDFT1D()
     {
-        if (isInitialized)
+        ಆದರೆ (isInitialized)
         {
             CALL_HAL(dftFree1D, cv_hal_dftFree1D, context);
         }
     }
 };
 
-struct ReplacementDFT2D : public hal::DFT2D
+ರಚನೆ ReplacementDFT2D : ಸಾರ್ವಜನಿಕ hal::DFT2D
 {
     cvhalDFT *context;
-    bool isInitialized;
+    ತಾರ್ಕಿಕ isInitialized;
 
-    ReplacementDFT2D() : context(0), isInitialized(false) {}
-    bool init(int width, int height, int depth,
-              int src_channels, int dst_channels,
-              int flags, int nonzero_rows)
+    ReplacementDFT2D() : context(0), isInitialized(ಸುಳ್ಳು) {}
+    ತಾರ್ಕಿಕ init(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ ಆಳ,
+              ಪೂರ್ಣಾಂಕ src_channels, ಪೂರ್ಣಾಂಕ dst_channels,
+              ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ nonzero_ಅಡ್ಡಸಾಲುಗಳು)
     {
-        int res = cv_hal_dftInit2D(&context, width, height, depth, src_channels, dst_channels, flags, nonzero_rows);
+        ಪೂರ್ಣಾಂಕ res = cv_hal_dftInit2D(&context, ಅಗಲ, ಎತ್ತರ, ಆಳ, src_channels, dst_channels, flags, nonzero_ಅಡ್ಡಸಾಲುಗಳು);
         isInitialized = (res == CV_HAL_ERROR_OK);
-        return isInitialized;
+        ಹಿಂತಿರುಗಿ isInitialized;
     }
-    void apply(const uchar *src, size_t src_step, uchar *dst, size_t dst_step) CV_OVERRIDE
+    ಶೂನ್ಯ apply(ಸ್ಥಿರಾಂಕ uchar *src, size_t src_ಹೆಜ್ಜೆ, uchar *dst, size_t dst_ಹೆಜ್ಜೆ) CV_OVERRIDE
     {
-        if (isInitialized)
+        ಆದರೆ (isInitialized)
         {
-            CALL_HAL(dft2D, cv_hal_dft2D, context, src, src_step, dst, dst_step);
+            CALL_HAL(dft2D, cv_hal_dft2D, context, src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ);
         }
     }
     ~ReplacementDFT2D()
     {
-        if (isInitialized)
+        ಆದರೆ (isInitialized)
         {
             CALL_HAL(dftFree2D, cv_hal_dftFree1D, context);
         }
     }
 };
 
-namespace hal {
+ನಾಮಾಕಾಶ hal {
 
 //================== 1D ======================
 
-Ptr<DFT1D> DFT1D::create(int len, int count, int depth, int flags, bool *needBuffer)
+Ptr<DFT1D> DFT1D::create(ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ flags, ತಾರ್ಕಿಕ *need_ಬಫರ್)
 {
     {
-        ReplacementDFT1D *impl = new ReplacementDFT1D();
-        if (impl->init(len, count, depth, flags, needBuffer))
+        ReplacementDFT1D *impl = ಹೊಸ ReplacementDFT1D();
+        ಆದರೆ (impl->init(len, ಎಣಿಕೆ_3, ಆಳ, flags, need_ಬಫರ್))
         {
-            return Ptr<DFT1D>(impl);
+            ಹಿಂತಿರುಗಿ Ptr<DFT1D>(impl);
         }
-        delete impl;
+        ಅಳಿಸು impl;
     }
     {
-        OcvDftBasicImpl *impl = new OcvDftBasicImpl();
-        impl->init(len, count, depth, flags, needBuffer);
-        return Ptr<DFT1D>(impl);
+        OcvDftBasicImpl *impl = ಹೊಸ OcvDftBasicImpl();
+        impl->init(len, ಎಣಿಕೆ_3, ಆಳ, flags, need_ಬಫರ್);
+        ಹಿಂತಿರುಗಿ Ptr<DFT1D>(impl);
     }
 }
 
 //================== 2D ======================
 
-Ptr<DFT2D> DFT2D::create(int width, int height, int depth,
-                         int src_channels, int dst_channels,
-                         int flags, int nonzero_rows)
+Ptr<DFT2D> DFT2D::create(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ ಆಳ,
+                         ಪೂರ್ಣಾಂಕ src_channels, ಪೂರ್ಣಾಂಕ dst_channels,
+                         ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ nonzero_ಅಡ್ಡಸಾಲುಗಳು)
 {
     {
-        ReplacementDFT2D *impl = new ReplacementDFT2D();
-        if (impl->init(width, height, depth, src_channels, dst_channels, flags, nonzero_rows))
+        ReplacementDFT2D *impl = ಹೊಸ ReplacementDFT2D();
+        ಆದರೆ (impl->init(ಅಗಲ, ಎತ್ತರ, ಆಳ, src_channels, dst_channels, flags, nonzero_ಅಡ್ಡಸಾಲುಗಳು))
         {
-            return Ptr<DFT2D>(impl);
+            ಹಿಂತಿರುಗಿ Ptr<DFT2D>(impl);
         }
-        delete impl;
+        ಅಳಿಸು impl;
     }
     {
-        if(width == 1 && nonzero_rows > 0 )
+        ಆದರೆ(ಅಗಲ == 1 && nonzero_ಅಡ್ಡಸಾಲುಗಳು > 0 )
         {
             CV_Error( cv::Error::StsNotImplemented,
             "This mode (using nonzero_rows with a single-column matrix) breaks the function's logic, so it is prohibited.\n"
             "For fast convolution/correlation use 2-column matrix or single-row matrix instead" );
         }
-        OcvDftImpl *impl = new OcvDftImpl();
-        impl->init(width, height, depth, src_channels, dst_channels, flags, nonzero_rows);
-        return Ptr<DFT2D>(impl);
+        OcvDftImpl *impl = ಹೊಸ OcvDftImpl();
+        impl->init(ಅಗಲ, ಎತ್ತರ, ಆಳ, src_channels, dst_channels, flags, nonzero_ಅಡ್ಡಸಾಲುಗಳು);
+        ಹಿಂತಿರುಗಿ Ptr<DFT2D>(impl);
     }
 }
 
@@ -2798,488 +2798,488 @@ Ptr<DFT2D> DFT2D::create(int width, int height, int depth,
 } // cv::
 
 
-void cv::dft( InputArray _src0, OutputArray _dst, int flags, int nonzero_rows )
+ಶೂನ್ಯ cv::dft( ಒಳಹರಿವು_Array _src0, OutputArray _dst, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ nonzero_ಅಡ್ಡಸಾಲುಗಳು )
 {
     CV_INSTRUMENT_REGION();
 
-#ifdef HAVE_CLAMDFFT
-    CV_OCL_RUN(ocl::haveAmdFft() && ocl::Device::getDefault().type() != ocl::Device::TYPE_CPU &&
-            _dst.isUMat() && _src0.dims() <= 2 && nonzero_rows == 0,
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_CLAMDFFT
+    CV_OCL_ಸತತ(ocl::haveAmdFft() && ocl::Device::getDefault().type() != ocl::Device::TYPE_CPU &&
+            _dst.isUMat() && _src0.dims() <= 2 && nonzero_ಅಡ್ಡಸಾಲುಗಳು == 0,
                ocl_dft_amdfft(_src0, _dst, flags))
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN(_dst.isUMat() && _src0.dims() <= 2,
-               ocl_dft(_src0, _dst, flags, nonzero_rows))
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
+    CV_OCL_ಸತತ(_dst.isUMat() && _src0.dims() <= 2,
+               ocl_dft(_src0, _dst, flags, nonzero_ಅಡ್ಡಸಾಲುಗಳು))
+#ಆದರೆ_ಅಂತ್ಯ
 
     Mat src0 = _src0.getMat(), src = src0;
-    if (src.empty())
+    ಆದರೆ (src.empty())
     {
         _dst.release();
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    bool inv = (flags & DFT_INVERSE) != 0;
-    int type = src.type();
-    int depth = src.depth();
+    ತಾರ್ಕಿಕ inv = (flags & DFT_INVERSE) != 0;
+    ಪೂರ್ಣಾಂಕ type = src.type();
+    ಪೂರ್ಣಾಂಕ ಆಳ = src.ಆಳ();
 
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
 
     // Fail if DFT_COMPLEX_INPUT is specified, but src is not 2 channels.
-    CV_Assert( !((flags & DFT_COMPLEX_INPUT) && src.channels() != 2) );
+    CV_Assert( !((flags & DFT_COMPLEX_ಒಳಹರಿವು) && src.channels() != 2) );
 
-    if( !inv && src.channels() == 1 && (flags & DFT_COMPLEX_OUTPUT) )
-        _dst.createSameSize( src, CV_MAKETYPE(depth, 2) );
-    else if( inv && src.channels() == 2 && (flags & DFT_REAL_OUTPUT) )
-        _dst.createSameSize( src, depth );
-    else
-        _dst.createSameSize( src, type );
+    ಆದರೆ( !inv && src.channels() == 1 && (flags & DFT_COMPLEX_OUTPUT) )
+        _dst.create_Same_ಗಾತ್ರ( src, CV_MAKETYPE(ಆಳ, 2) );
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( inv && src.channels() == 2 && (flags & DFT_REAL_OUTPUT) )
+        _dst.create_Same_ಗಾತ್ರ( src, ಆಳ );
+    ಇಲ್ಲದಿದ್ದರೆ
+        _dst.create_Same_ಗಾತ್ರ( src, type );
 
     Mat dst = _dst.getMat();
 
-    int f = 0;
-    if (src.isContinuous() && dst.isContinuous())
+    ಪೂರ್ಣಾಂಕ f = 0;
+    ಆದರೆ (src.isContinuous() && dst.isContinuous())
         f |= CV_HAL_DFT_IS_CONTINUOUS;
-    if (inv)
+    ಆದರೆ (inv)
         f |= CV_HAL_DFT_INVERSE;
-    if (flags & DFT_ROWS)
-        f |= CV_HAL_DFT_ROWS;
-    if (flags & DFT_SCALE)
+    ಆದರೆ (flags & DFT_ಅಡ್ಡಸಾಲುಗಳು)
+        f |= CV_HAL_DFT_ಅಡ್ಡಸಾಲುಗಳು;
+    ಆದರೆ (flags & DFT_SCALE)
         f |= CV_HAL_DFT_SCALE;
-    if (src.data == dst.data)
+    ಆದರೆ (src.ದತ್ತಾಂಶ == dst.ದತ್ತಾಂಶ)
         f |= CV_HAL_DFT_IS_INPLACE;
-    Ptr<hal::DFT2D> c = hal::DFT2D::create(src.cols, src.rows, depth, src.channels(), dst.channels(), f, nonzero_rows);
-    c->apply(src.data, src.step, dst.data, dst.step);
+    Ptr<hal::DFT2D> c = hal::DFT2D::create(src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, src.ಅಡ್ಡಸಾಲುಗಳು, ಆಳ, src.channels(), dst.channels(), f, nonzero_ಅಡ್ಡಸಾಲುಗಳು);
+    c->apply(src.ದತ್ತಾಂಶ, src.ಹೆಜ್ಜೆ, dst.ದತ್ತಾಂಶ, dst.ಹೆಜ್ಜೆ);
 }
 
 
-void cv::idft( InputArray src, OutputArray dst, int flags, int nonzero_rows )
+ಶೂನ್ಯ cv::idft( ಒಳಹರಿವು_Array src, OutputArray dst, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ nonzero_ಅಡ್ಡಸಾಲುಗಳು )
 {
     CV_INSTRUMENT_REGION();
 
-    dft( src, dst, flags | DFT_INVERSE, nonzero_rows );
+    dft( src, dst, flags | DFT_INVERSE, nonzero_ಅಡ್ಡಸಾಲುಗಳು );
 }
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-static bool ocl_mulSpectrums( InputArray _srcA, InputArray _srcB,
-                              OutputArray _dst, int flags, bool conjB )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_mulSpectrums( ಒಳಹರಿವು_Array _srcA, ಒಳಹರಿವು_Array _srcB,
+                              OutputArray _dst, ಪೂರ್ಣಾಂಕ flags, ತಾರ್ಕಿಕ conjB )
 {
-    int atype = _srcA.type(), btype = _srcB.type(),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    Size asize = _srcA.size(), bsize = _srcB.size();
+    ಪೂರ್ಣಾಂಕ atype = _srcA.type(), btype = _srcB.type(),
+            ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    ಗಾತ್ರ_2 asize = _srcA.size(), bsize = _srcB.size();
     CV_Assert(asize == bsize);
 
-    if ( !(atype == CV_32FC2 && btype == CV_32FC2) || flags != 0 )
-        return false;
+    ಆದರೆ ( !(atype == CV_32FC2 && btype == CV_32FC2) || flags != 0 )
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     UMat A = _srcA.getUMat(), B = _srcB.getUMat();
     CV_Assert(A.size() == B.size());
 
-    _dst.createSameSize(A, atype);
+    _dst.create_Same_ಗಾತ್ರ(A, atype);
     UMat dst = _dst.getUMat();
 
     ocl::Kernel k("mulAndScaleSpectrums",
                   ocl::core::mulspectrums_oclsrc,
                   format("%s", conjB ? "-D CONJ" : ""));
-    if (k.empty())
-        return false;
+    ಆದರೆ (k.empty())
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    k.args(ocl::KernelArg::ReadOnlyNoSize(A), ocl::KernelArg::ReadOnlyNoSize(B),
-           ocl::KernelArg::WriteOnly(dst), rowsPerWI);
+    k.ವಾದಗಳು(ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(A), ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(B),
+           ocl::KernelArg::WriteOnly(dst), ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI);
 
-    size_t globalsize[2] = { (size_t)asize.width, ((size_t)asize.height + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)asize.ಅಗಲ, ((size_t)asize.ಎತ್ತರ + ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI - 1) / ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI };
+    ಹಿಂತಿರುಗಿ k.ಸತತ(2, globalsize, ಖಾಲಿ, ಸುಳ್ಳು);
 }
 
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-namespace {
+ನಾಮಾಕಾಶ {
 
-#define VAL(buf, elem) (((T*)((char*)data ## buf + (step ## buf * (elem))))[0])
-#define MUL_SPECTRUMS_COL(A, B, C) \
+#ವ್ಯಾಖ್ಯಾನಿಸು VAL(buf, elem) (((T*)((ಅಕ್ಷರ*)ದತ್ತಾಂಶ ## buf + (ಹೆಜ್ಜೆ ## buf * (elem))))[0])
+#ವ್ಯಾಖ್ಯಾನಿಸು MUL_SPECTRUMS_ಲಂಬಸಾಲು(A, B, C) \
     VAL(C, 0) = VAL(A, 0) * VAL(B, 0); \
-    for (size_t j = 1; j <= rows - 2; j += 2) \
+    ಗಾಗಿ (size_t j = 1; j <= ಅಡ್ಡಸಾಲುಗಳು - 2; j += 2) \
     { \
-        double a_re = VAL(A, j), a_im = VAL(A, j + 1); \
-        double b_re = VAL(B, j), b_im = VAL(B, j + 1); \
-        if (conjB) b_im = -b_im; \
-        double c_re = a_re * b_re - a_im * b_im; \
-        double c_im = a_re * b_im + a_im * b_re; \
+        ದ್ವಿಗುಣ a_re = VAL(A, j), a_im = VAL(A, j + 1); \
+        ದ್ವಿಗುಣ b_re = VAL(B, j), b_im = VAL(B, j + 1); \
+        ಆದರೆ (conjB) b_im = -b_im; \
+        ದ್ವಿಗುಣ c_re = a_re * b_re - a_im * b_im; \
+        ದ್ವಿಗುಣ c_im = a_re * b_im + a_im * b_re; \
         VAL(C, j) = (T)c_re; VAL(C, j + 1) = (T)c_im; \
     } \
-    if ((rows & 1) == 0) \
-        VAL(C, rows-1) = VAL(A, rows-1) * VAL(B, rows-1)
+    ಆದರೆ ((ಅಡ್ಡಸಾಲುಗಳು & 1) == 0) \
+        VAL(C, ಅಡ್ಡಸಾಲುಗಳು-1) = VAL(A, ಅಡ್ಡಸಾಲುಗಳು-1) * VAL(B, ಅಡ್ಡಸಾಲುಗಳು-1)
 
-template <typename T, bool conjB> static inline
-void mulSpectrums_processCol_noinplace(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mul_Spectrums_process_ಲಂಬಸಾಲು_noinplace(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_A, ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_C, size_t ಹೆಜ್ಜೆ_A, size_t ಹೆಜ್ಜೆ_B, size_t ಹೆಜ್ಜೆ_C, size_t ಅಡ್ಡಸಾಲುಗಳು)
 {
-    MUL_SPECTRUMS_COL(A, B, C);
+    MUL_SPECTRUMS_ಲಂಬಸಾಲು(A, B, C);
 }
 
-template <typename T, bool conjB> static inline
-void mulSpectrums_processCol_inplaceA(const T* dataB, T* dataAC, size_t stepB, size_t stepAC, size_t rows)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mul_Spectrums_process_ಲಂಬಸಾಲು_inplace_A(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_AC, size_t ಹೆಜ್ಜೆ_B, size_t ಹೆಜ್ಜೆ_AC, size_t ಅಡ್ಡಸಾಲುಗಳು)
 {
-    MUL_SPECTRUMS_COL(AC, B, AC);
+    MUL_SPECTRUMS_ಲಂಬಸಾಲು(AC, B, AC);
 }
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processCol(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB, ತಾರ್ಕಿಕ inplaceA> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mul_Spectrums_process_ಲಂಬಸಾಲು(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_A, ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_C, size_t ಹೆಜ್ಜೆ_A, size_t ಹೆಜ್ಜೆ_B, size_t ಹೆಜ್ಜೆ_C, size_t ಅಡ್ಡಸಾಲುಗಳು)
 {
-    if (inplaceA)
-        mulSpectrums_processCol_inplaceA<T, conjB>(dataB, dataC, stepB, stepC, rows);
-    else
-        mulSpectrums_processCol_noinplace<T, conjB>(dataA, dataB, dataC, stepA, stepB, stepC, rows);
+    ಆದರೆ (inplaceA)
+        mul_Spectrums_process_ಲಂಬಸಾಲು_inplace_A<T, conjB>(ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, ಹೆಜ್ಜೆ_B, ಹೆಜ್ಜೆ_C, ಅಡ್ಡಸಾಲುಗಳು);
+    ಇಲ್ಲದಿದ್ದರೆ
+        mul_Spectrums_process_ಲಂಬಸಾಲು_noinplace<T, conjB>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, ಹೆಜ್ಜೆ_A, ಹೆಜ್ಜೆ_B, ಹೆಜ್ಜೆ_C, ಅಡ್ಡಸಾಲುಗಳು);
 }
-#undef MUL_SPECTRUMS_COL
-#undef VAL
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು MUL_SPECTRUMS_ಲಂಬಸಾಲು
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು VAL
 
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processCols(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB, ತಾರ್ಕಿಕ inplaceA> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mul_Spectrums_process_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_A, ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_C, size_t ಹೆಜ್ಜೆ_A, size_t ಹೆಜ್ಜೆ_B, size_t ಹೆಜ್ಜೆ_C, size_t ಅಡ್ಡಸಾಲುಗಳು, size_t ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)
 {
-    mulSpectrums_processCol<T, conjB, inplaceA>(dataA, dataB, dataC, stepA, stepB, stepC, rows);
-    if ((cols & 1) == 0)
+    mul_Spectrums_process_ಲಂಬಸಾಲು<T, conjB, inplaceA>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, ಹೆಜ್ಜೆ_A, ಹೆಜ್ಜೆ_B, ಹೆಜ್ಜೆ_C, ಅಡ್ಡಸಾಲುಗಳು);
+    ಆದರೆ ((ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ & 1) == 0)
     {
-        mulSpectrums_processCol<T, conjB, inplaceA>(dataA + cols - 1, dataB + cols - 1, dataC + cols - 1, stepA, stepB, stepC, rows);
+        mul_Spectrums_process_ಲಂಬಸಾಲು<T, conjB, inplaceA>(ದತ್ತಾಂಶ_A + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_B + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_C + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ಹೆಜ್ಜೆ_A, ಹೆಜ್ಜೆ_B, ಹೆಜ್ಜೆ_C, ಅಡ್ಡಸಾಲುಗಳು);
     }
 }
 
-#define VAL(buf, elem) (data ## buf[(elem)])
-#define MUL_SPECTRUMS_ROW(A, B, C) \
-    for (size_t j = j0; j < j1; j += 2) \
+#ವ್ಯಾಖ್ಯಾನಿಸು VAL(buf, elem) (ದತ್ತಾಂಶ ## buf[(elem)])
+#ವ್ಯಾಖ್ಯಾನಿಸು MUL_SPECTRUMS_ಅಡ್ಡಸಾಲು(A, B, C) \
+    ಗಾಗಿ (size_t j = j0; j < j1; j += 2) \
     { \
-        double a_re = VAL(A, j), a_im = VAL(A, j + 1); \
-        double b_re = VAL(B, j), b_im = VAL(B, j + 1); \
-        if (conjB) b_im = -b_im; \
-        double c_re = a_re * b_re - a_im * b_im; \
-        double c_im = a_re * b_im + a_im * b_re; \
+        ದ್ವಿಗುಣ a_re = VAL(A, j), a_im = VAL(A, j + 1); \
+        ದ್ವಿಗುಣ b_re = VAL(B, j), b_im = VAL(B, j + 1); \
+        ಆದರೆ (conjB) b_im = -b_im; \
+        ದ್ವಿಗುಣ c_re = a_re * b_re - a_im * b_im; \
+        ದ್ವಿಗುಣ c_im = a_re * b_im + a_im * b_re; \
         VAL(C, j) = (T)c_re; VAL(C, j + 1) = (T)c_im; \
     }
-template <typename T, bool conjB> static inline
-void mulSpectrums_processRow_noinplace(const T* dataA, const T* dataB, T* dataC, size_t j0, size_t j1)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mul_Spectrums_process_ಅಡ್ಡಸಾಲು_noinplace(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_A, ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_C, size_t j0, size_t j1)
 {
-    MUL_SPECTRUMS_ROW(A, B, C);
+    MUL_SPECTRUMS_ಅಡ್ಡಸಾಲು(A, B, C);
 }
-template <typename T, bool conjB> static inline
-void mulSpectrums_processRow_inplaceA(const T* dataB, T* dataAC, size_t j0, size_t j1)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mul_Spectrums_process_ಅಡ್ಡಸಾಲು_inplace_A(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_AC, size_t j0, size_t j1)
 {
-    MUL_SPECTRUMS_ROW(AC, B, AC);
+    MUL_SPECTRUMS_ಅಡ್ಡಸಾಲು(AC, B, AC);
 }
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processRow(const T* dataA, const T* dataB, T* dataC, size_t j0, size_t j1)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB, ತಾರ್ಕಿಕ inplaceA> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mul_Spectrums_process_ಅಡ್ಡಸಾಲು(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_A, ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_C, size_t j0, size_t j1)
 {
-    if (inplaceA)
-        mulSpectrums_processRow_inplaceA<T, conjB>(dataB, dataC, j0, j1);
-    else
-        mulSpectrums_processRow_noinplace<T, conjB>(dataA, dataB, dataC, j0, j1);
+    ಆದರೆ (inplaceA)
+        mul_Spectrums_process_ಅಡ್ಡಸಾಲು_inplace_A<T, conjB>(ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, j0, j1);
+    ಇಲ್ಲದಿದ್ದರೆ
+        mul_Spectrums_process_ಅಡ್ಡಸಾಲು_noinplace<T, conjB>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, j0, j1);
 }
-#undef MUL_SPECTRUMS_ROW
-#undef VAL
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು MUL_SPECTRUMS_ಅಡ್ಡಸಾಲು
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು VAL
 
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processRows(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, bool is_1d_CN1)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB, ತಾರ್ಕಿಕ inplaceA> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mul_Spectrums_process_ಅಡ್ಡಸಾಲುಗಳು(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_A, ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_C, size_t ಹೆಜ್ಜೆ_A, size_t ಹೆಜ್ಜೆ_B, size_t ಹೆಜ್ಜೆ_C, size_t ಅಡ್ಡಸಾಲುಗಳು, size_t ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, size_t j0, size_t j1, ತಾರ್ಕಿಕ is_1d_CN1)
 {
-    while (rows-- > 0)
+    ಆಗ (ಅಡ್ಡಸಾಲುಗಳು-- > 0)
     {
-        if (is_1d_CN1)
-            dataC[0] = dataA[0]*dataB[0];
-        mulSpectrums_processRow<T, conjB, inplaceA>(dataA, dataB, dataC, j0, j1);
-        if (is_1d_CN1 && (cols & 1) == 0)
-            dataC[j1] = dataA[j1]*dataB[j1];
+        ಆದರೆ (is_1d_CN1)
+            ದತ್ತಾಂಶ_C[0] = ದತ್ತಾಂಶ_A[0]*ದತ್ತಾಂಶ_B[0];
+        mul_Spectrums_process_ಅಡ್ಡಸಾಲು<T, conjB, inplaceA>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, j0, j1);
+        ಆದರೆ (is_1d_CN1 && (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ & 1) == 0)
+            ದತ್ತಾಂಶ_C[j1] = ದತ್ತಾಂಶ_A[j1]*ದತ್ತಾಂಶ_B[j1];
 
-        dataA = (const T*)(((char*)dataA) + stepA);
-        dataB = (const T*)(((char*)dataB) + stepB);
-        dataC =       (T*)(((char*)dataC) + stepC);
+        ದತ್ತಾಂಶ_A = (ಸ್ಥಿರಾಂಕ T*)(((ಅಕ್ಷರ*)ದತ್ತಾಂಶ_A) + ಹೆಜ್ಜೆ_A);
+        ದತ್ತಾಂಶ_B = (ಸ್ಥಿರಾಂಕ T*)(((ಅಕ್ಷರ*)ದತ್ತಾಂಶ_B) + ಹೆಜ್ಜೆ_B);
+        ದತ್ತಾಂಶ_C =       (T*)(((ಅಕ್ಷರ*)ದತ್ತಾಂಶ_C) + ಹೆಜ್ಜೆ_C);
     }
 }
 
 
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_Impl_(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, bool is_1d, bool isCN1)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB, ತಾರ್ಕಿಕ inplaceA> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mulSpectrums_Impl_(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_A, ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_C, size_t ಹೆಜ್ಜೆ_A, size_t ಹೆಜ್ಜೆ_B, size_t ಹೆಜ್ಜೆ_C, size_t ಅಡ್ಡಸಾಲುಗಳು, size_t ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, size_t j0, size_t j1, ತಾರ್ಕಿಕ is_1d, ತಾರ್ಕಿಕ isCN1)
 {
-    if (!is_1d && isCN1)
+    ಆದರೆ (!is_1d && isCN1)
     {
-        mulSpectrums_processCols<T, conjB, inplaceA>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols);
+        mul_Spectrums_process_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ<T, conjB, inplaceA>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, ಹೆಜ್ಜೆ_A, ಹೆಜ್ಜೆ_B, ಹೆಜ್ಜೆ_C, ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
     }
-    mulSpectrums_processRows<T, conjB, inplaceA>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d && isCN1);
+    mul_Spectrums_process_ಅಡ್ಡಸಾಲುಗಳು<T, conjB, inplaceA>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, ಹೆಜ್ಜೆ_A, ಹೆಜ್ಜೆ_B, ಹೆಜ್ಜೆ_C, ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, j0, j1, is_1d && isCN1);
 }
-template <typename T, bool conjB> static inline
-void mulSpectrums_Impl(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, bool is_1d, bool isCN1)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ತಾರ್ಕಿಕ conjB> ಸ್ಥಿರ ಸಾಲೊಳಗೆ
+ಶೂನ್ಯ mulSpectrums_Impl(ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_A, ಸ್ಥಿರಾಂಕ T* ದತ್ತಾಂಶ_B, T* ದತ್ತಾಂಶ_C, size_t ಹೆಜ್ಜೆ_A, size_t ಹೆಜ್ಜೆ_B, size_t ಹೆಜ್ಜೆ_C, size_t ಅಡ್ಡಸಾಲುಗಳು, size_t ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, size_t j0, size_t j1, ತಾರ್ಕಿಕ is_1d, ತಾರ್ಕಿಕ isCN1)
 {
-    if (dataA == dataC)
-        mulSpectrums_Impl_<T, conjB, true>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d, isCN1);
-    else
-        mulSpectrums_Impl_<T, conjB, false>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d, isCN1);
+    ಆದರೆ (ದತ್ತಾಂಶ_A == ದತ್ತಾಂಶ_C)
+        mulSpectrums_Impl_<T, conjB, ನಿಜ>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, ಹೆಜ್ಜೆ_A, ಹೆಜ್ಜೆ_B, ಹೆಜ್ಜೆ_C, ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, j0, j1, is_1d, isCN1);
+    ಇಲ್ಲದಿದ್ದರೆ
+        mulSpectrums_Impl_<T, conjB, ಸುಳ್ಳು>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, ಹೆಜ್ಜೆ_A, ಹೆಜ್ಜೆ_B, ಹೆಜ್ಜೆ_C, ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, j0, j1, is_1d, isCN1);
 }
 
 } // namespace
 
-void cv::mulSpectrums( InputArray _srcA, InputArray _srcB,
-                       OutputArray _dst, int flags, bool conjB )
+ಶೂನ್ಯ cv::mulSpectrums( ಒಳಹರಿವು_Array _srcA, ಒಳಹರಿವು_Array _srcB,
+                       OutputArray _dst, ಪೂರ್ಣಾಂಕ flags, ತಾರ್ಕಿಕ conjB )
 {
     CV_INSTRUMENT_REGION();
 
-    if (_srcA.empty() && _srcB.empty())
+    ಆದರೆ (_srcA.empty() && _srcB.empty())
     {
         _dst.release();
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
 
-    int type = _srcA.type();
+    ಪೂರ್ಣಾಂಕ type = _srcA.type();
     CV_Assert( type == _srcB.type() && _srcA.size() == _srcB.size() );
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
     CV_Assert( !_srcA.empty() && !_srcB.empty() );
 
-    CV_OCL_RUN(_dst.isUMat() && _srcA.dims() <= 2 && _srcB.dims() <= 2,
+    CV_OCL_ಸತತ(_dst.isUMat() && _srcA.dims() <= 2 && _srcB.dims() <= 2,
             ocl_mulSpectrums(_srcA, _srcB, _dst, flags, conjB))
 
     Mat srcA = _srcA.getMat(), srcB = _srcB.getMat();
-    int depth = srcA.depth(), cn = srcA.channels();
-    size_t rows = srcA.rows, cols = srcA.cols;
+    ಪೂರ್ಣಾಂಕ ಆಳ = srcA.ಆಳ(), cn = srcA.channels();
+    size_t ಅಡ್ಡಸಾಲುಗಳು = srcA.ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = srcA.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-    _dst.create( srcA.rows, srcA.cols, type );
+    _dst.create( srcA.ಅಡ್ಡಸಾಲುಗಳು, srcA.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type );
     Mat dst = _dst.getMat();
 
     // correct inplace support
     // Case 'dst.data == srcA.data' is handled by implementation,
     // because it is used frequently (filter2D, matchTemplate)
-    if (dst.data == srcB.data)
+    ಆದರೆ (dst.ದತ್ತಾಂಶ == srcB.ದತ್ತಾಂಶ)
         srcB = srcB.clone(); // workaround for B only
 
-    bool is_1d = (flags & DFT_ROWS)
-        || (rows == 1)
-        || (cols == 1 && srcA.isContinuous() && srcB.isContinuous() && dst.isContinuous());
+    ತಾರ್ಕಿಕ is_1d = (flags & DFT_ಅಡ್ಡಸಾಲುಗಳು)
+        || (ಅಡ್ಡಸಾಲುಗಳು == 1)
+        || (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 && srcA.isContinuous() && srcB.isContinuous() && dst.isContinuous());
 
-    if( is_1d && !(flags & DFT_ROWS) )
-        cols = cols + rows - 1, rows = 1;
+    ಆದರೆ( is_1d && !(flags & DFT_ಅಡ್ಡಸಾಲುಗಳು) )
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ + ಅಡ್ಡಸಾಲುಗಳು - 1, ಅಡ್ಡಸಾಲುಗಳು = 1;
 
-    bool isCN1 = cn == 1;
+    ತಾರ್ಕಿಕ isCN1 = cn == 1;
     size_t j0 = isCN1 ? 1 : 0;
-    size_t j1 = cols*cn - (((cols & 1) == 0 && cn == 1) ? 1 : 0);
+    size_t j1 = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ*cn - (((ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ & 1) == 0 && cn == 1) ? 1 : 0);
 
-    if (depth == CV_32F)
+    ಆದರೆ (ಆಳ == CV_32F)
     {
-        const float* dataA = srcA.ptr<float>();
-        const float* dataB = srcB.ptr<float>();
-        float* dataC = dst.ptr<float>();
-        if (!conjB)
-            mulSpectrums_Impl<float, false>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
-        else
-            mulSpectrums_Impl<float, true>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
+        ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* ದತ್ತಾಂಶ_A = srcA.ptr<ದಶಮಾಂಶ>();
+        ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* ದತ್ತಾಂಶ_B = srcB.ptr<ದಶಮಾಂಶ>();
+        ದಶಮಾಂಶ* ದತ್ತಾಂಶ_C = dst.ptr<ದಶಮಾಂಶ>();
+        ಆದರೆ (!conjB)
+            mulSpectrums_Impl<ದಶಮಾಂಶ, ಸುಳ್ಳು>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, srcA.ಹೆಜ್ಜೆ, srcB.ಹೆಜ್ಜೆ, dst.ಹೆಜ್ಜೆ, ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, j0, j1, is_1d, isCN1);
+        ಇಲ್ಲದಿದ್ದರೆ
+            mulSpectrums_Impl<ದಶಮಾಂಶ, ನಿಜ>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, srcA.ಹೆಜ್ಜೆ, srcB.ಹೆಜ್ಜೆ, dst.ಹೆಜ್ಜೆ, ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, j0, j1, is_1d, isCN1);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        const double* dataA = srcA.ptr<double>();
-        const double* dataB = srcB.ptr<double>();
-        double* dataC = dst.ptr<double>();
-        if (!conjB)
-            mulSpectrums_Impl<double, false>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
-        else
-            mulSpectrums_Impl<double, true>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
+        ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* ದತ್ತಾಂಶ_A = srcA.ptr<ದ್ವಿಗುಣ>();
+        ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* ದತ್ತಾಂಶ_B = srcB.ptr<ದ್ವಿಗುಣ>();
+        ದ್ವಿಗುಣ* ದತ್ತಾಂಶ_C = dst.ptr<ದ್ವಿಗುಣ>();
+        ಆದರೆ (!conjB)
+            mulSpectrums_Impl<ದ್ವಿಗುಣ, ಸುಳ್ಳು>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, srcA.ಹೆಜ್ಜೆ, srcB.ಹೆಜ್ಜೆ, dst.ಹೆಜ್ಜೆ, ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, j0, j1, is_1d, isCN1);
+        ಇಲ್ಲದಿದ್ದರೆ
+            mulSpectrums_Impl<ದ್ವಿಗುಣ, ನಿಜ>(ದತ್ತಾಂಶ_A, ದತ್ತಾಂಶ_B, ದತ್ತಾಂಶ_C, srcA.ಹೆಜ್ಜೆ, srcB.ಹೆಜ್ಜೆ, dst.ಹೆಜ್ಜೆ, ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, j0, j1, is_1d, isCN1);
     }
 }
 
-void cv::divSpectrums( InputArray _srcA, InputArray _srcB, OutputArray _dst, int flags, bool conjB)
+ಶೂನ್ಯ cv::divSpectrums( ಒಳಹರಿವು_Array _srcA, ಒಳಹರಿವು_Array _srcB, OutputArray _dst, ಪೂರ್ಣಾಂಕ flags, ತಾರ್ಕಿಕ conjB)
 {
     Mat srcA = _srcA.getMat(), srcB = _srcB.getMat();
-    if (srcA.empty() && srcB.empty())
+    ಆದರೆ (srcA.empty() && srcB.empty())
     {
         _dst.release();
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    int depth = srcA.depth(), cn = srcA.channels(), type = srcA.type();
-    int rows = srcA.rows, cols = srcA.cols;
-    int j, k;
+    ಪೂರ್ಣಾಂಕ ಆಳ = srcA.ಆಳ(), cn = srcA.channels(), type = srcA.type();
+    ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು = srcA.ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = srcA.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಪೂರ್ಣಾಂಕ j, k;
 
     CV_Assert( type == srcB.type() && srcA.size() == srcB.size() );
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
     CV_Assert( !srcA.empty() && !srcB.empty() );
 
-    _dst.create( srcA.rows, srcA.cols, type );
+    _dst.create( srcA.ಅಡ್ಡಸಾಲುಗಳು, srcA.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type );
     Mat dst = _dst.getMat();
 
-    CV_Assert(dst.data != srcA.data); // non-inplace check
-    CV_Assert(dst.data != srcB.data); // non-inplace check
+    CV_Assert(dst.ದತ್ತಾಂಶ != srcA.ದತ್ತಾಂಶ); // non-inplace check
+    CV_Assert(dst.ದತ್ತಾಂಶ != srcB.ದತ್ತಾಂಶ); // non-inplace check
 
-    bool is_1d = (flags & DFT_ROWS) || (rows == 1 || (cols == 1 &&
+    ತಾರ್ಕಿಕ is_1d = (flags & DFT_ಅಡ್ಡಸಾಲುಗಳು) || (ಅಡ್ಡಸಾಲುಗಳು == 1 || (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 &&
     srcA.isContinuous() && srcB.isContinuous() && dst.isContinuous()));
 
-    if( is_1d && !(flags & DFT_ROWS) )
-        cols = cols + rows - 1, rows = 1;
+    ಆದರೆ( is_1d && !(flags & DFT_ಅಡ್ಡಸಾಲುಗಳು) )
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ + ಅಡ್ಡಸಾಲುಗಳು - 1, ಅಡ್ಡಸಾಲುಗಳು = 1;
 
-    int ncols = cols*cn;
-    int j0 = cn == 1;
-    int j1 = ncols - (cols % 2 == 0 && cn == 1);
+    ಪೂರ್ಣಾಂಕ ncols = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ*cn;
+    ಪೂರ್ಣಾಂಕ j0 = cn == 1;
+    ಪೂರ್ಣಾಂಕ j1 = ncols - (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 2 == 0 && cn == 1);
 
-    if( depth == CV_32F )
+    ಆದರೆ( ಆಳ == CV_32F )
     {
-        const float* dataA = srcA.ptr<float>();
-        const float* dataB = srcB.ptr<float>();
-        float* dataC = dst.ptr<float>();
-        float eps = FLT_EPSILON; // prevent div0 problems
+        ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* ದತ್ತಾಂಶ_A = srcA.ptr<ದಶಮಾಂಶ>();
+        ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* ದತ್ತಾಂಶ_B = srcB.ptr<ದಶಮಾಂಶ>();
+        ದಶಮಾಂಶ* ದತ್ತಾಂಶ_C = dst.ptr<ದಶಮಾಂಶ>();
+        ದಶಮಾಂಶ eps = FLT_EPSILON; // prevent div0 problems
 
-        size_t stepA = srcA.step/sizeof(dataA[0]);
-        size_t stepB = srcB.step/sizeof(dataB[0]);
-        size_t stepC = dst.step/sizeof(dataC[0]);
+        size_t ಹೆಜ್ಜೆ_A = srcA.ಹೆಜ್ಜೆ/ಗಾತ್ರ(ದತ್ತಾಂಶ_A[0]);
+        size_t ಹೆಜ್ಜೆ_B = srcB.ಹೆಜ್ಜೆ/ಗಾತ್ರ(ದತ್ತಾಂಶ_B[0]);
+        size_t ಹೆಜ್ಜೆ_C = dst.ಹೆಜ್ಜೆ/ಗಾತ್ರ(ದತ್ತಾಂಶ_C[0]);
 
-        if( !is_1d && cn == 1 )
+        ಆದರೆ( !is_1d && cn == 1 )
         {
-            for( k = 0; k < (cols % 2 ? 1 : 2); k++ )
+            ಗಾಗಿ( k = 0; k < (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 2 ? 1 : 2); k++ )
             {
-                if( k == 1 )
-                    dataA += cols - 1, dataB += cols - 1, dataC += cols - 1;
-                dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( rows % 2 == 0 )
-                    dataC[(rows-1)*stepC] = dataA[(rows-1)*stepA] / (dataB[(rows-1)*stepB] + eps);
-                if( !conjB )
-                    for( j = 1; j <= rows - 2; j += 2 )
+                ಆದರೆ( k == 1 )
+                    ದತ್ತಾಂಶ_A += ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_B += ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_C += ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1;
+                ದತ್ತಾಂಶ_C[0] = ದತ್ತಾಂಶ_A[0] / (ದತ್ತಾಂಶ_B[0] + eps);
+                ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು % 2 == 0 )
+                    ದತ್ತಾಂಶ_C[(ಅಡ್ಡಸಾಲುಗಳು-1)*ಹೆಜ್ಜೆ_C] = ದತ್ತಾಂಶ_A[(ಅಡ್ಡಸಾಲುಗಳು-1)*ಹೆಜ್ಜೆ_A] / (ದತ್ತಾಂಶ_B[(ಅಡ್ಡಸಾಲುಗಳು-1)*ಹೆಜ್ಜೆ_B] + eps);
+                ಆದರೆ( !conjB )
+                    ಗಾಗಿ( j = 1; j <= ಅಡ್ಡಸಾಲುಗಳು - 2; j += 2 )
                     {
-                        double denom = (double)dataB[j*stepB]*dataB[j*stepB] +
-                        (double)dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + (double)eps;
+                        ದ್ವಿಗುಣ denom = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] +
+                        (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B] + (ದ್ವಿಗುಣ)eps;
 
-                        double re = (double)dataA[j*stepA]*dataB[j*stepB] +
-                        (double)dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                        ದ್ವಿಗುಣ re = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] +
+                        (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[(j+1)*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B];
 
-                        double im = (double)dataA[(j+1)*stepA]*dataB[j*stepB] -
-                        (double)dataA[j*stepA]*dataB[(j+1)*stepB];
+                        ದ್ವಿಗುಣ im = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[(j+1)*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] -
+                        (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B];
 
-                        dataC[j*stepC] = (float)(re / denom);
-                        dataC[(j+1)*stepC] = (float)(im / denom);
+                        ದತ್ತಾಂಶ_C[j*ಹೆಜ್ಜೆ_C] = (ದಶಮಾಂಶ)(re / denom);
+                        ದತ್ತಾಂಶ_C[(j+1)*ಹೆಜ್ಜೆ_C] = (ದಶಮಾಂಶ)(im / denom);
                     }
-                    else
-                        for( j = 1; j <= rows - 2; j += 2 )
+                    ಇಲ್ಲದಿದ್ದರೆ
+                        ಗಾಗಿ( j = 1; j <= ಅಡ್ಡಸಾಲುಗಳು - 2; j += 2 )
                         {
 
-                            double denom = (double)dataB[j*stepB]*dataB[j*stepB] +
-                            (double)dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + (double)eps;
+                            ದ್ವಿಗುಣ denom = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] +
+                            (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B] + (ದ್ವಿಗುಣ)eps;
 
-                            double re = (double)dataA[j*stepA]*dataB[j*stepB] -
-                            (double)dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                            ದ್ವಿಗುಣ re = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] -
+                            (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[(j+1)*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B];
 
-                            double im = (double)dataA[(j+1)*stepA]*dataB[j*stepB] +
-                            (double)dataA[j*stepA]*dataB[(j+1)*stepB];
+                            ದ್ವಿಗುಣ im = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[(j+1)*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] +
+                            (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B];
 
-                            dataC[j*stepC] = (float)(re / denom);
-                            dataC[(j+1)*stepC] = (float)(im / denom);
+                            ದತ್ತಾಂಶ_C[j*ಹೆಜ್ಜೆ_C] = (ದಶಮಾಂಶ)(re / denom);
+                            ದತ್ತಾಂಶ_C[(j+1)*ಹೆಜ್ಜೆ_C] = (ದಶಮಾಂಶ)(im / denom);
                         }
-                    if( k == 1 )
-                        dataA -= cols - 1, dataB -= cols - 1, dataC -= cols - 1;
+                    ಆದರೆ( k == 1 )
+                        ದತ್ತಾಂಶ_A -= ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_B -= ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_C -= ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1;
             }
         }
 
-        for( ; rows--; dataA += stepA, dataB += stepB, dataC += stepC )
+        ಗಾಗಿ( ; ಅಡ್ಡಸಾಲುಗಳು--; ದತ್ತಾಂಶ_A += ಹೆಜ್ಜೆ_A, ದತ್ತಾಂಶ_B += ಹೆಜ್ಜೆ_B, ದತ್ತಾಂಶ_C += ಹೆಜ್ಜೆ_C )
         {
-            if( is_1d && cn == 1 )
+            ಆದರೆ( is_1d && cn == 1 )
             {
-                dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( cols % 2 == 0 )
-                    dataC[j1] = dataA[j1] / (dataB[j1] + eps);
+                ದತ್ತಾಂಶ_C[0] = ದತ್ತಾಂಶ_A[0] / (ದತ್ತಾಂಶ_B[0] + eps);
+                ಆದರೆ( ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 2 == 0 )
+                    ದತ್ತಾಂಶ_C[j1] = ದತ್ತಾಂಶ_A[j1] / (ದತ್ತಾಂಶ_B[j1] + eps);
             }
 
-            if( !conjB )
-                for( j = j0; j < j1; j += 2 )
+            ಆದರೆ( !conjB )
+                ಗಾಗಿ( j = j0; j < j1; j += 2 )
                 {
-                    double denom = (double)dataB[j]*dataB[j] + (double)dataB[j+1]*dataB[j+1] + (double)eps;
-                    double re = (double)dataA[j]*dataB[j] + (double)dataA[j+1]*dataB[j+1];
-                    double im = (double)dataA[j+1]*dataB[j] - (double)dataA[j]*dataB[j+1];
-                    dataC[j] = (float)(re / denom);
-                    dataC[j+1] = (float)(im / denom);
+                    ದ್ವಿಗುಣ denom = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_B[j]*ದತ್ತಾಂಶ_B[j] + (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_B[j+1]*ದತ್ತಾಂಶ_B[j+1] + (ದ್ವಿಗುಣ)eps;
+                    ದ್ವಿಗುಣ re = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j]*ದತ್ತಾಂಶ_B[j] + (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j+1]*ದತ್ತಾಂಶ_B[j+1];
+                    ದ್ವಿಗುಣ im = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j+1]*ದತ್ತಾಂಶ_B[j] - (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j]*ದತ್ತಾಂಶ_B[j+1];
+                    ದತ್ತಾಂಶ_C[j] = (ದಶಮಾಂಶ)(re / denom);
+                    ದತ್ತಾಂಶ_C[j+1] = (ದಶಮಾಂಶ)(im / denom);
                 }
-                else
-                    for( j = j0; j < j1; j += 2 )
+                ಇಲ್ಲದಿದ್ದರೆ
+                    ಗಾಗಿ( j = j0; j < j1; j += 2 )
                     {
-                        double denom = (double)dataB[j]*dataB[j] + (double)dataB[j+1]*dataB[j+1] + (double)eps;
-                        double re = (double)dataA[j]*dataB[j] - (double)dataA[j+1]*dataB[j+1];
-                        double im = (double)dataA[j+1]*dataB[j] + (double)dataA[j]*dataB[j+1];
-                        dataC[j] = (float)(re / denom);
-                        dataC[j+1] = (float)(im / denom);
+                        ದ್ವಿಗುಣ denom = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_B[j]*ದತ್ತಾಂಶ_B[j] + (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_B[j+1]*ದತ್ತಾಂಶ_B[j+1] + (ದ್ವಿಗುಣ)eps;
+                        ದ್ವಿಗುಣ re = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j]*ದತ್ತಾಂಶ_B[j] - (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j+1]*ದತ್ತಾಂಶ_B[j+1];
+                        ದ್ವಿಗುಣ im = (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j+1]*ದತ್ತಾಂಶ_B[j] + (ದ್ವಿಗುಣ)ದತ್ತಾಂಶ_A[j]*ದತ್ತಾಂಶ_B[j+1];
+                        ದತ್ತಾಂಶ_C[j] = (ದಶಮಾಂಶ)(re / denom);
+                        ದತ್ತಾಂಶ_C[j+1] = (ದಶಮಾಂಶ)(im / denom);
                     }
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        const double* dataA = srcA.ptr<double>();
-        const double* dataB = srcB.ptr<double>();
-        double* dataC = dst.ptr<double>();
-        double eps = DBL_EPSILON; // prevent div0 problems
+        ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* ದತ್ತಾಂಶ_A = srcA.ptr<ದ್ವಿಗುಣ>();
+        ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* ದತ್ತಾಂಶ_B = srcB.ptr<ದ್ವಿಗುಣ>();
+        ದ್ವಿಗುಣ* ದತ್ತಾಂಶ_C = dst.ptr<ದ್ವಿಗುಣ>();
+        ದ್ವಿಗುಣ eps = DBL_EPSILON; // prevent div0 problems
 
-        size_t stepA = srcA.step/sizeof(dataA[0]);
-        size_t stepB = srcB.step/sizeof(dataB[0]);
-        size_t stepC = dst.step/sizeof(dataC[0]);
+        size_t ಹೆಜ್ಜೆ_A = srcA.ಹೆಜ್ಜೆ/ಗಾತ್ರ(ದತ್ತಾಂಶ_A[0]);
+        size_t ಹೆಜ್ಜೆ_B = srcB.ಹೆಜ್ಜೆ/ಗಾತ್ರ(ದತ್ತಾಂಶ_B[0]);
+        size_t ಹೆಜ್ಜೆ_C = dst.ಹೆಜ್ಜೆ/ಗಾತ್ರ(ದತ್ತಾಂಶ_C[0]);
 
-        if( !is_1d && cn == 1 )
+        ಆದರೆ( !is_1d && cn == 1 )
         {
-            for( k = 0; k < (cols % 2 ? 1 : 2); k++ )
+            ಗಾಗಿ( k = 0; k < (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 2 ? 1 : 2); k++ )
             {
-                if( k == 1 )
-                    dataA += cols - 1, dataB += cols - 1, dataC += cols - 1;
-                dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( rows % 2 == 0 )
-                    dataC[(rows-1)*stepC] = dataA[(rows-1)*stepA] / (dataB[(rows-1)*stepB] + eps);
-                if( !conjB )
-                    for( j = 1; j <= rows - 2; j += 2 )
+                ಆದರೆ( k == 1 )
+                    ದತ್ತಾಂಶ_A += ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_B += ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_C += ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1;
+                ದತ್ತಾಂಶ_C[0] = ದತ್ತಾಂಶ_A[0] / (ದತ್ತಾಂಶ_B[0] + eps);
+                ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು % 2 == 0 )
+                    ದತ್ತಾಂಶ_C[(ಅಡ್ಡಸಾಲುಗಳು-1)*ಹೆಜ್ಜೆ_C] = ದತ್ತಾಂಶ_A[(ಅಡ್ಡಸಾಲುಗಳು-1)*ಹೆಜ್ಜೆ_A] / (ದತ್ತಾಂಶ_B[(ಅಡ್ಡಸಾಲುಗಳು-1)*ಹೆಜ್ಜೆ_B] + eps);
+                ಆದರೆ( !conjB )
+                    ಗಾಗಿ( j = 1; j <= ಅಡ್ಡಸಾಲುಗಳು - 2; j += 2 )
                     {
-                        double denom = dataB[j*stepB]*dataB[j*stepB] +
-                        dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + eps;
+                        ದ್ವಿಗುಣ denom = ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] +
+                        ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B] + eps;
 
-                        double re = dataA[j*stepA]*dataB[j*stepB] +
-                        dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                        ದ್ವಿಗುಣ re = ದತ್ತಾಂಶ_A[j*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] +
+                        ದತ್ತಾಂಶ_A[(j+1)*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B];
 
-                        double im = dataA[(j+1)*stepA]*dataB[j*stepB] -
-                        dataA[j*stepA]*dataB[(j+1)*stepB];
+                        ದ್ವಿಗುಣ im = ದತ್ತಾಂಶ_A[(j+1)*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] -
+                        ದತ್ತಾಂಶ_A[j*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B];
 
-                        dataC[j*stepC] = re / denom;
-                        dataC[(j+1)*stepC] = im / denom;
+                        ದತ್ತಾಂಶ_C[j*ಹೆಜ್ಜೆ_C] = re / denom;
+                        ದತ್ತಾಂಶ_C[(j+1)*ಹೆಜ್ಜೆ_C] = im / denom;
                     }
-                    else
-                        for( j = 1; j <= rows - 2; j += 2 )
+                    ಇಲ್ಲದಿದ್ದರೆ
+                        ಗಾಗಿ( j = 1; j <= ಅಡ್ಡಸಾಲುಗಳು - 2; j += 2 )
                         {
-                            double denom = dataB[j*stepB]*dataB[j*stepB] +
-                            dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + eps;
+                            ದ್ವಿಗುಣ denom = ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] +
+                            ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B] + eps;
 
-                            double re = dataA[j*stepA]*dataB[j*stepB] -
-                            dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                            ದ್ವಿಗುಣ re = ದತ್ತಾಂಶ_A[j*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] -
+                            ದತ್ತಾಂಶ_A[(j+1)*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B];
 
-                            double im = dataA[(j+1)*stepA]*dataB[j*stepB] +
-                            dataA[j*stepA]*dataB[(j+1)*stepB];
+                            ದ್ವಿಗುಣ im = ದತ್ತಾಂಶ_A[(j+1)*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[j*ಹೆಜ್ಜೆ_B] +
+                            ದತ್ತಾಂಶ_A[j*ಹೆಜ್ಜೆ_A]*ದತ್ತಾಂಶ_B[(j+1)*ಹೆಜ್ಜೆ_B];
 
-                            dataC[j*stepC] = re / denom;
-                            dataC[(j+1)*stepC] = im / denom;
+                            ದತ್ತಾಂಶ_C[j*ಹೆಜ್ಜೆ_C] = re / denom;
+                            ದತ್ತಾಂಶ_C[(j+1)*ಹೆಜ್ಜೆ_C] = im / denom;
                         }
-                    if( k == 1 )
-                        dataA -= cols - 1, dataB -= cols - 1, dataC -= cols - 1;
+                    ಆದರೆ( k == 1 )
+                        ದತ್ತಾಂಶ_A -= ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_B -= ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1, ದತ್ತಾಂಶ_C -= ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1;
             }
         }
 
-        for( ; rows--; dataA += stepA, dataB += stepB, dataC += stepC )
+        ಗಾಗಿ( ; ಅಡ್ಡಸಾಲುಗಳು--; ದತ್ತಾಂಶ_A += ಹೆಜ್ಜೆ_A, ದತ್ತಾಂಶ_B += ಹೆಜ್ಜೆ_B, ದತ್ತಾಂಶ_C += ಹೆಜ್ಜೆ_C )
         {
-            if( is_1d && cn == 1 )
+            ಆದರೆ( is_1d && cn == 1 )
             {
-                dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( cols % 2 == 0 )
-                    dataC[j1] = dataA[j1] / (dataB[j1] + eps);
+                ದತ್ತಾಂಶ_C[0] = ದತ್ತಾಂಶ_A[0] / (ದತ್ತಾಂಶ_B[0] + eps);
+                ಆದರೆ( ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ % 2 == 0 )
+                    ದತ್ತಾಂಶ_C[j1] = ದತ್ತಾಂಶ_A[j1] / (ದತ್ತಾಂಶ_B[j1] + eps);
             }
 
-            if( !conjB )
-                for( j = j0; j < j1; j += 2 )
+            ಆದರೆ( !conjB )
+                ಗಾಗಿ( j = j0; j < j1; j += 2 )
                 {
-                    double denom = dataB[j]*dataB[j] + dataB[j+1]*dataB[j+1] + eps;
-                    double re = dataA[j]*dataB[j] + dataA[j+1]*dataB[j+1];
-                    double im = dataA[j+1]*dataB[j] - dataA[j]*dataB[j+1];
-                    dataC[j] = re / denom;
-                    dataC[j+1] = im / denom;
+                    ದ್ವಿಗುಣ denom = ದತ್ತಾಂಶ_B[j]*ದತ್ತಾಂಶ_B[j] + ದತ್ತಾಂಶ_B[j+1]*ದತ್ತಾಂಶ_B[j+1] + eps;
+                    ದ್ವಿಗುಣ re = ದತ್ತಾಂಶ_A[j]*ದತ್ತಾಂಶ_B[j] + ದತ್ತಾಂಶ_A[j+1]*ದತ್ತಾಂಶ_B[j+1];
+                    ದ್ವಿಗುಣ im = ದತ್ತಾಂಶ_A[j+1]*ದತ್ತಾಂಶ_B[j] - ದತ್ತಾಂಶ_A[j]*ದತ್ತಾಂಶ_B[j+1];
+                    ದತ್ತಾಂಶ_C[j] = re / denom;
+                    ದತ್ತಾಂಶ_C[j+1] = im / denom;
                 }
-                else
-                    for( j = j0; j < j1; j += 2 )
+                ಇಲ್ಲದಿದ್ದರೆ
+                    ಗಾಗಿ( j = j0; j < j1; j += 2 )
                     {
-                        double denom = dataB[j]*dataB[j] + dataB[j+1]*dataB[j+1] + eps;
-                        double re = dataA[j]*dataB[j] - dataA[j+1]*dataB[j+1];
-                        double im = dataA[j+1]*dataB[j] + dataA[j]*dataB[j+1];
-                        dataC[j] = re / denom;
-                        dataC[j+1] = im / denom;
+                        ದ್ವಿಗುಣ denom = ದತ್ತಾಂಶ_B[j]*ದತ್ತಾಂಶ_B[j] + ದತ್ತಾಂಶ_B[j+1]*ದತ್ತಾಂಶ_B[j+1] + eps;
+                        ದ್ವಿಗುಣ re = ದತ್ತಾಂಶ_A[j]*ದತ್ತಾಂಶ_B[j] - ದತ್ತಾಂಶ_A[j+1]*ದತ್ತಾಂಶ_B[j+1];
+                        ದ್ವಿಗುಣ im = ದತ್ತಾಂಶ_A[j+1]*ದತ್ತಾಂಶ_B[j] + ದತ್ತಾಂಶ_A[j]*ದತ್ತಾಂಶ_B[j+1];
+                        ದತ್ತಾಂಶ_C[j] = re / denom;
+                        ದತ್ತಾಂಶ_C[j+1] = im / denom;
                     }
         }
     }
@@ -3289,7 +3289,7 @@ void cv::divSpectrums( InputArray _srcA, InputArray _srcB, OutputArray _dst, int
                                Discrete Cosine Transform
 \****************************************************************************************/
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
 /* DCT is calculated using DFT, as described here:
@@ -3297,561 +3297,561 @@ namespace cv
 */
 // DCT-II / DCT-III through the new engine (plan kinds DFT_KIND_DCT / DFT_KIND_IDCT).
 // src_step / dst_step are in bytes.
-template<typename T> static void
-DCT( const OcvDftOptions & c, const T* src, size_t src_step, T* dst, size_t dst_step )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ ಶೂನ್ಯ
+DCT( ಸ್ಥಿರಾಂಕ OcvDftOptions & c, ಸ್ಥಿರಾಂಕ T* src, size_t src_ಹೆಜ್ಜೆ, T* dst, size_t dst_ಹೆಜ್ಜೆ )
 {
-    if( c.n == 1 )
+    ಆದರೆ( c.n == 1 )
     {
         dst[0] = src[0];
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    runDft(c, src, src_step/sizeof(T), dst, dst_step/sizeof(T), false);
+    ಸತತ_Dft(c, src, src_ಹೆಜ್ಜೆ/ಗಾತ್ರ(T), dst, dst_ಹೆಜ್ಜೆ/ಗಾತ್ರ(T), ಸುಳ್ಳು);
 }
 
-template<typename T> static void
-IDCT( const OcvDftOptions & c, const T* src, size_t src_step, T* dst, size_t dst_step )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ ಶೂನ್ಯ
+IDCT( ಸ್ಥಿರಾಂಕ OcvDftOptions & c, ಸ್ಥಿರಾಂಕ T* src, size_t src_ಹೆಜ್ಜೆ, T* dst, size_t dst_ಹೆಜ್ಜೆ )
 {
-    if( c.n == 1 )
+    ಆದರೆ( c.n == 1 )
     {
         dst[0] = src[0];
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    runDft(c, src, src_step/sizeof(T), dst, dst_step/sizeof(T), false);
+    ಸತತ_Dft(c, src, src_ಹೆಜ್ಜೆ/ಗಾತ್ರ(T), dst, dst_ಹೆಜ್ಜೆ/ಗಾತ್ರ(T), ಸುಳ್ಳು);
 }
 
-typedef void (*DCTFunc)(const OcvDftOptions & c, const void* src, size_t src_step,
-                        void* dst, size_t dst_step);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*DCTFunc)(ಸ್ಥಿರಾಂಕ OcvDftOptions & c, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* src, size_t src_ಹೆಜ್ಜೆ,
+                        ಶೂನ್ಯ* dst, size_t dst_ಹೆಜ್ಜೆ);
 
-template<typename T, void (*fn)(const OcvDftOptions&, const T*, size_t, T*, size_t)>
-static void dctWrap(const OcvDftOptions & c, const void* src, size_t src_step, void* dst, size_t dst_step)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T, ಶೂನ್ಯ (*fn)(ಸ್ಥಿರಾಂಕ OcvDftOptions&, ಸ್ಥಿರಾಂಕ T*, size_t, T*, size_t)>
+ಸ್ಥಿರ ಶೂನ್ಯ dctWrap(ಸ್ಥಿರಾಂಕ OcvDftOptions & c, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* src, size_t src_ಹೆಜ್ಜೆ, ಶೂನ್ಯ* dst, size_t dst_ಹೆಜ್ಜೆ)
 {
-    fn(c, (const T*)src, src_step, (T*)dst, dst_step);
+    fn(c, (ಸ್ಥಿರಾಂಕ T*)src, src_ಹೆಜ್ಜೆ, (T*)dst, dst_ಹೆಜ್ಜೆ);
 }
 
 }
 
-#ifdef HAVE_IPP
-namespace cv
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_IPP
+ನಾಮಾಕಾಶ cv
 {
 
-#if IPP_VERSION_X100 >= 900
-typedef IppStatus (CV_STDCALL * ippiDCTFunc)(const Ipp32f* pSrc, int srcStep, Ipp32f* pDst, int dstStep, const void* pDCTSpec, Ipp8u* pBuffer);
-typedef IppStatus (CV_STDCALL * ippiDCTInit)(void* pDCTSpec, IppiSize roiSize, Ipp8u* pMemInit );
-typedef IppStatus (CV_STDCALL * ippiDCTGetSize)(IppiSize roiSize, int* pSizeSpec, int* pSizeInit, int* pSizeBuf);
+#ಆದರೆ IPP_ಆವೃತ್ತಿ_X100 >= 900
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL * ippiDCTFunc)(ಸ್ಥಿರಾಂಕ Ipp32f* pSrc, ಪೂರ್ಣಾಂಕ src_ಹೆಜ್ಜೆ_3, Ipp32f* pDst, ಪೂರ್ಣಾಂಕ dst_ಹೆಜ್ಜೆ_3, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* pDCTSpec, Ipp8u* p_ಬಫರ್);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL * ippiDCTInit)(ಶೂನ್ಯ* pDCTSpec, Ippi_ಗಾತ್ರ roi_ಗಾತ್ರ, Ipp8u* pMemInit );
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL * ippi_DCTGet_ಗಾತ್ರ)(Ippi_ಗಾತ್ರ roi_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ* p_ಗಾತ್ರ_Spec, ಪೂರ್ಣಾಂಕ* p_ಗಾತ್ರ_Init, ಪೂರ್ಣಾಂಕ* p_ಗಾತ್ರ_Buf);
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(const Ipp32f*, int, Ipp32f*, int, const SpecType*, Ipp8u*)>
-static IppStatus CV_STDCALL ippiDCTWrap(const Ipp32f* pSrc, int srcStep, Ipp32f* pDst, int dstStep, const void* pDCTSpec, Ipp8u* pBuffer)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು SpecType, Ipp_ಸ್ಥಿತಿ (CV_STDCALL *fn)(ಸ್ಥಿರಾಂಕ Ipp32f*, ಪೂರ್ಣಾಂಕ, Ipp32f*, ಪೂರ್ಣಾಂಕ, ಸ್ಥಿರಾಂಕ SpecType*, Ipp8u*)>
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ CV_STDCALL ippiDCTWrap(ಸ್ಥಿರಾಂಕ Ipp32f* pSrc, ಪೂರ್ಣಾಂಕ src_ಹೆಜ್ಜೆ_3, Ipp32f* pDst, ಪೂರ್ಣಾಂಕ dst_ಹೆಜ್ಜೆ_3, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* pDCTSpec, Ipp8u* p_ಬಫರ್)
 {
-    return fn(pSrc, srcStep, pDst, dstStep, (const SpecType*)pDCTSpec, pBuffer);
+    ಹಿಂತಿರುಗಿ fn(pSrc, src_ಹೆಜ್ಜೆ_3, pDst, dst_ಹೆಜ್ಜೆ_3, (ಸ್ಥಿರಾಂಕ SpecType*)pDCTSpec, p_ಬಫರ್);
 }
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(SpecType*, IppiSize, Ipp8u*)>
-static IppStatus CV_STDCALL ippiDCTInitWrap(void* pDCTSpec, IppiSize roiSize, Ipp8u* pMemInit)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು SpecType, Ipp_ಸ್ಥಿತಿ (CV_STDCALL *fn)(SpecType*, Ippi_ಗಾತ್ರ, Ipp8u*)>
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ CV_STDCALL ippiDCTInitWrap(ಶೂನ್ಯ* pDCTSpec, Ippi_ಗಾತ್ರ roi_ಗಾತ್ರ, Ipp8u* pMemInit)
 {
-    return fn((SpecType*)pDCTSpec, roiSize, pMemInit);
+    ಹಿಂತಿರುಗಿ fn((SpecType*)pDCTSpec, roi_ಗಾತ್ರ, pMemInit);
 }
 
-template<IppStatus (CV_STDCALL *fn)(IppiSize, int*, int*, int*)>
-static IppStatus CV_STDCALL ippiDCTGetSizeWrap(IppiSize roiSize, int* pSizeSpec, int* pSizeInit, int* pSizeBuf)
+ಮಾದರಿ<Ipp_ಸ್ಥಿತಿ (CV_STDCALL *fn)(Ippi_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ*, ಪೂರ್ಣಾಂಕ*, ಪೂರ್ಣಾಂಕ*)>
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ CV_STDCALL ippi_DCTGet_ಗಾತ್ರ_Wrap(Ippi_ಗಾತ್ರ roi_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ* p_ಗಾತ್ರ_Spec, ಪೂರ್ಣಾಂಕ* p_ಗಾತ್ರ_Init, ಪೂರ್ಣಾಂಕ* p_ಗಾತ್ರ_Buf)
 {
-    return fn(roiSize, pSizeSpec, pSizeInit, pSizeBuf);
+    ಹಿಂತಿರುಗಿ fn(roi_ಗಾತ್ರ, p_ಗಾತ್ರ_Spec, p_ಗಾತ್ರ_Init, p_ಗಾತ್ರ_Buf);
 }
 
-#elif IPP_VERSION_X100 >= 700
-typedef IppStatus (CV_STDCALL * ippiDCTFunc)(const Ipp32f*, int, Ipp32f*, int, const void*, Ipp8u*);
-typedef IppStatus (CV_STDCALL * ippiDCTInitAlloc)(void**, IppiSize, IppHintAlgorithm);
-typedef IppStatus (CV_STDCALL * ippiDCTFree)(void* pDCTSpec);
-typedef IppStatus (CV_STDCALL * ippiDCTGetBufSize)(const void*, int*);
+#ಅಥವಾಆದರೆ IPP_ಆವೃತ್ತಿ_X100 >= 700
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL * ippiDCTFunc)(ಸ್ಥಿರಾಂಕ Ipp32f*, ಪೂರ್ಣಾಂಕ, Ipp32f*, ಪೂರ್ಣಾಂಕ, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ*, Ipp8u*);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL * ippiDCTInitAlloc)(ಶೂನ್ಯ**, Ippi_ಗಾತ್ರ, IppHintAlgorithm);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL * ippiDCTFree)(ಶೂನ್ಯ* pDCTSpec);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Ipp_ಸ್ಥಿತಿ (CV_STDCALL * ippi_DCTGet_Buf_ಗಾತ್ರ)(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ*, ಪೂರ್ಣಾಂಕ*);
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(const Ipp32f*, int, Ipp32f*, int, const SpecType*, Ipp8u*)>
-static IppStatus CV_STDCALL ippiDCTWrap(const Ipp32f* pSrc, int srcStep, Ipp32f* pDst, int dstStep, const void* pDCTSpec, Ipp8u* pBuffer)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು SpecType, Ipp_ಸ್ಥಿತಿ (CV_STDCALL *fn)(ಸ್ಥಿರಾಂಕ Ipp32f*, ಪೂರ್ಣಾಂಕ, Ipp32f*, ಪೂರ್ಣಾಂಕ, ಸ್ಥಿರಾಂಕ SpecType*, Ipp8u*)>
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ CV_STDCALL ippiDCTWrap(ಸ್ಥಿರಾಂಕ Ipp32f* pSrc, ಪೂರ್ಣಾಂಕ src_ಹೆಜ್ಜೆ_3, Ipp32f* pDst, ಪೂರ್ಣಾಂಕ dst_ಹೆಜ್ಜೆ_3, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* pDCTSpec, Ipp8u* p_ಬಫರ್)
 {
-    return fn(pSrc, srcStep, pDst, dstStep, (const SpecType*)pDCTSpec, pBuffer);
+    ಹಿಂತಿರುಗಿ fn(pSrc, src_ಹೆಜ್ಜೆ_3, pDst, dst_ಹೆಜ್ಜೆ_3, (ಸ್ಥಿರಾಂಕ SpecType*)pDCTSpec, p_ಬಫರ್);
 }
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(SpecType**, IppiSize, IppHintAlgorithm)>
-static IppStatus CV_STDCALL ippiDCTInitAllocWrap(void** pDCTSpec, IppiSize roiSize, IppHintAlgorithm hint)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು SpecType, Ipp_ಸ್ಥಿತಿ (CV_STDCALL *fn)(SpecType**, Ippi_ಗಾತ್ರ, IppHintAlgorithm)>
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ CV_STDCALL ippiDCTInitAllocWrap(ಶೂನ್ಯ** pDCTSpec, Ippi_ಗಾತ್ರ roi_ಗಾತ್ರ, IppHintAlgorithm hint)
 {
-    return fn((SpecType**)pDCTSpec, roiSize, hint);
+    ಹಿಂತಿರುಗಿ fn((SpecType**)pDCTSpec, roi_ಗಾತ್ರ, hint);
 }
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(SpecType*)>
-static IppStatus CV_STDCALL ippiDCTFreeWrap(void* pDCTSpec)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು SpecType, Ipp_ಸ್ಥಿತಿ (CV_STDCALL *fn)(SpecType*)>
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ CV_STDCALL ippiDCTFreeWrap(ಶೂನ್ಯ* pDCTSpec)
 {
-    return fn((SpecType*)pDCTSpec);
+    ಹಿಂತಿರುಗಿ fn((SpecType*)pDCTSpec);
 }
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(const SpecType*, int*)>
-static IppStatus CV_STDCALL ippiDCTGetBufSizeWrap(const void* pDCTSpec, int* pSize)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು SpecType, Ipp_ಸ್ಥಿತಿ (CV_STDCALL *fn)(ಸ್ಥಿರಾಂಕ SpecType*, ಪೂರ್ಣಾಂಕ*)>
+ಸ್ಥಿರ Ipp_ಸ್ಥಿತಿ CV_STDCALL ippi_DCTGet_Buf_ಗಾತ್ರ_Wrap(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* pDCTSpec, ಪೂರ್ಣಾಂಕ* p_ಗಾತ್ರ)
 {
-    return fn((const SpecType*)pDCTSpec, pSize);
+    ಹಿಂತಿರುಗಿ fn((ಸ್ಥಿರಾಂಕ SpecType*)pDCTSpec, p_ಗಾತ್ರ);
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-class DctIPPLoop_Invoker : public ParallelLoopBody
+ವರ್ಗ DctIPPLoop_Invoker : ಸಾರ್ವಜನಿಕ ParallelLoopBody
 {
-public:
-    DctIPPLoop_Invoker(const uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, int _width, bool _inv, bool *_ok) :
-        ParallelLoopBody(), src(_src), src_step(_src_step), dst(_dst), dst_step(_dst_step), width(_width), inv(_inv), ok(_ok)
+ಸಾರ್ವಜನಿಕ:
+    DctIPPLoop_Invoker(ಸ್ಥಿರಾಂಕ uchar * _src, size_t src_ಹೆಜ್ಜೆ_2, uchar * _dst, size_t dst_ಹೆಜ್ಜೆ_2, ಪೂರ್ಣಾಂಕ ಅಗಲ_3, ತಾರ್ಕಿಕ _inv, ತಾರ್ಕಿಕ *_ok) :
+        ParallelLoopBody(), src(_src), src_ಹೆಜ್ಜೆ(src_ಹೆಜ್ಜೆ_2), dst(_dst), dst_ಹೆಜ್ಜೆ(dst_ಹೆಜ್ಜೆ_2), ಅಗಲ(ಅಗಲ_3), inv(_inv), ok(_ok)
     {
-        *ok = true;
+        *ok = ನಿಜ;
     }
 
-    virtual void operator()(const Range& range) const CV_OVERRIDE
+    ವಾಸ್ತವಿಕ ಶೂನ್ಯ ಕ್ರಿಯಾಕಾರಕ()(ಸ್ಥಿರಾಂಕ Range& range) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
     {
-        if(*ok == false)
-            return;
+        ಆದರೆ(*ok == ಸುಳ್ಳು)
+            ಹಿಂತಿರುಗಿ;
 
-#if IPP_VERSION_X100 >= 900
-        IppiSize srcRoiSize = {width, 1};
+#ಆದರೆ IPP_ಆವೃತ್ತಿ_X100 >= 900
+        Ippi_ಗಾತ್ರ src_Roi_ಗಾತ್ರ = {ಅಗಲ, 1};
 
-        int specSize    = 0;
-        int initSize    = 0;
-        int bufferSize  = 0;
+        ಪೂರ್ಣಾಂಕ spec_ಗಾತ್ರ    = 0;
+        ಪೂರ್ಣಾಂಕ init_ಗಾತ್ರ    = 0;
+        ಪೂರ್ಣಾಂಕ ಬಫರ್_ಗಾತ್ರ  = 0;
 
-        Ipp8u* pDCTSpec = NULL;
-        Ipp8u* pBuffer  = NULL;
-        Ipp8u* pInitBuf = NULL;
+        Ipp8u* pDCTSpec = ಖಾಲಿ;
+        Ipp8u* p_ಬಫರ್  = ಖಾಲಿ;
+        Ipp8u* pInitBuf = ಖಾಲಿ;
 
-        #define IPP_RETURN              \
-            if(pDCTSpec)                \
+        #ವ್ಯಾಖ್ಯಾನಿಸು IPP_RETURN              \
+            ಆದರೆ(pDCTSpec)                \
                 ippFree(pDCTSpec);      \
-            if(pBuffer)                 \
-                ippFree(pBuffer);       \
-            if(pInitBuf)                \
+            ಆದರೆ(p_ಬಫರ್)                 \
+                ippFree(p_ಬಫರ್);       \
+            ಆದರೆ(pInitBuf)                \
                 ippFree(pInitBuf);      \
-            return;
+            ಹಿಂತಿರುಗಿ;
 
         ippiDCTFunc     ippiDCT_32f_C1R   = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R> : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInit     ippDctInit     = inv ? ippiDCTInitWrap<IppiDCTInvSpec_32f, ippiDCTInvInit_32f> : ippiDCTInitWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInit_32f>;
-        ippiDCTGetSize  ippDctGetSize  = inv ? ippiDCTGetSizeWrap<ippiDCTInvGetSize_32f> : ippiDCTGetSizeWrap<ippiDCTFwdGetSize_32f>;
+        ippi_DCTGet_ಗಾತ್ರ  ipp_Dct_Get_ಗಾತ್ರ  = inv ? ippi_DCTGet_ಗಾತ್ರ_Wrap<ippi_DCTInv_Get_ಗಾತ್ರ_32f> : ippi_DCTGet_ಗಾತ್ರ_Wrap<ippi_DCTFwd_Get_ಗಾತ್ರ_32f>;
 
-        if(ippDctGetSize(srcRoiSize, &specSize, &initSize, &bufferSize) < 0)
+        ಆದರೆ(ipp_Dct_Get_ಗಾತ್ರ(src_Roi_ಗಾತ್ರ, &spec_ಗಾತ್ರ, &init_ಗಾತ್ರ, &ಬಫರ್_ಗಾತ್ರ) < 0)
         {
-            *ok = false;
-            return;
+            *ok = ಸುಳ್ಳು;
+            ಹಿಂತಿರುಗಿ;
         }
 
-        pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(specSize);
-        if(!pDCTSpec && specSize)
+        pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(spec_ಗಾತ್ರ);
+        ಆದರೆ(!pDCTSpec && spec_ಗಾತ್ರ)
         {
-            *ok = false;
-            return;
+            *ok = ಸುಳ್ಳು;
+            ಹಿಂತಿರುಗಿ;
         }
 
-        pBuffer  = (Ipp8u*)CV_IPP_MALLOC(bufferSize);
-        if(!pBuffer && bufferSize)
+        p_ಬಫರ್  = (Ipp8u*)CV_IPP_MALLOC(ಬಫರ್_ಗಾತ್ರ);
+        ಆದರೆ(!p_ಬಫರ್ && ಬಫರ್_ಗಾತ್ರ)
         {
-            *ok = false;
+            *ok = ಸುಳ್ಳು;
             IPP_RETURN
         }
-        pInitBuf = (Ipp8u*)CV_IPP_MALLOC(initSize);
-        if(!pInitBuf && initSize)
+        pInitBuf = (Ipp8u*)CV_IPP_MALLOC(init_ಗಾತ್ರ);
+        ಆದರೆ(!pInitBuf && init_ಗಾತ್ರ)
         {
-            *ok = false;
-            IPP_RETURN
-        }
-
-        if(ippDctInit(pDCTSpec, srcRoiSize, pInitBuf) < 0)
-        {
-            *ok = false;
+            *ok = ಸುಳ್ಳು;
             IPP_RETURN
         }
 
-        for(int i = range.start; i < range.end; ++i)
+        ಆದರೆ(ippDctInit(pDCTSpec, src_Roi_ಗಾತ್ರ, pInitBuf) < 0)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (float*)(src + src_step * i), static_cast<int>(src_step), (float*)(dst + dst_step * i), static_cast<int>(dst_step), pDCTSpec, pBuffer) < 0)
+            *ok = ಸುಳ್ಳು;
+            IPP_RETURN
+        }
+
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = range.ಆರಂಭ; i < range.end; ++i)
+        {
+            ಆದರೆ(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (ದಶಮಾಂಶ*)(src + src_ಹೆಜ್ಜೆ * i), static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ), (ದಶಮಾಂಶ*)(dst + dst_ಹೆಜ್ಜೆ * i), static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ), pDCTSpec, p_ಬಫರ್) < 0)
             {
-                *ok = false;
+                *ok = ಸುಳ್ಳು;
                 IPP_RETURN
             }
         }
         IPP_RETURN
-#undef IPP_RETURN
-#elif IPP_VERSION_X100 >= 700
-        void* pDCTSpec;
-        AutoBuffer<uchar> buf;
-        uchar* pBuffer = 0;
-        int bufSize=0;
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು IPP_RETURN
+#ಅಥವಾಆದರೆ IPP_ಆವೃತ್ತಿ_X100 >= 700
+        ಶೂನ್ಯ* pDCTSpec;
+        Auto_ಬಫರ್<uchar> buf;
+        uchar* p_ಬಫರ್ = 0;
+        ಪೂರ್ಣಾಂಕ buf_ಗಾತ್ರ=0;
 
-        IppiSize srcRoiSize = {width, 1};
+        Ippi_ಗಾತ್ರ src_Roi_ಗಾತ್ರ = {ಅಗಲ, 1};
 
-        CV_SUPPRESS_DEPRECATED_START
+        CV_SUPPRESS_DEPRECATED_ಆರಂಭ
 
         ippiDCTFunc ippDctFun           = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R>             : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInitAlloc ippInitAlloc   = inv ? ippiDCTInitAllocWrap<IppiDCTInvSpec_32f, ippiDCTInvInitAlloc_32f>   : ippiDCTInitAllocWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInitAlloc_32f>;
         ippiDCTFree ippFree             = inv ? ippiDCTFreeWrap<IppiDCTInvSpec_32f, ippiDCTInvFree_32f>             : ippiDCTFreeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdFree_32f>;
-        ippiDCTGetBufSize ippGetBufSize = inv ? ippiDCTGetBufSizeWrap<IppiDCTInvSpec_32f, ippiDCTInvGetBufSize_32f> : ippiDCTGetBufSizeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdGetBufSize_32f>;
+        ippi_DCTGet_Buf_ಗಾತ್ರ ipp_Get_Buf_ಗಾತ್ರ = inv ? ippi_DCTGet_Buf_ಗಾತ್ರ_Wrap<IppiDCTInvSpec_32f, ippi_DCTInv_Get_Buf_ಗಾತ್ರ_32f> : ippi_DCTGet_Buf_ಗಾತ್ರ_Wrap<IppiDCTFwdSpec_32f, ippi_DCTFwd_Get_Buf_ಗಾತ್ರ_32f>;
 
-        if (ippInitAlloc(&pDCTSpec, srcRoiSize, ippAlgHintNone)>=0 && ippGetBufSize(pDCTSpec, &bufSize)>=0)
+        ಆದರೆ (ippInitAlloc(&pDCTSpec, src_Roi_ಗಾತ್ರ, ippAlgHintNone)>=0 && ipp_Get_Buf_ಗಾತ್ರ(pDCTSpec, &buf_ಗಾತ್ರ)>=0)
         {
-            buf.allocate( bufSize );
-            pBuffer = (uchar*)buf;
+            buf.allocate( buf_ಗಾತ್ರ );
+            p_ಬಫರ್ = (uchar*)buf;
 
-            for( int i = range.start; i < range.end; ++i)
+            ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = range.ಆರಂಭ; i < range.end; ++i)
             {
-                if(ippDctFun((float*)(src + src_step * i), static_cast<int>(src_step), (float*)(dst + dst_step * i), static_cast<int>(dst_step), pDCTSpec, (Ipp8u*)pBuffer) < 0)
+                ಆದರೆ(ippDctFun((ದಶಮಾಂಶ*)(src + src_ಹೆಜ್ಜೆ * i), static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ), (ದಶಮಾಂಶ*)(dst + dst_ಹೆಜ್ಜೆ * i), static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ), pDCTSpec, (Ipp8u*)p_ಬಫರ್) < 0)
                 {
-                    *ok = false;
-                    break;
+                    *ok = ಸುಳ್ಳು;
+                    ನಿಲ್ಲಿಸು;
                 }
             }
         }
-        else
-            *ok = false;
+        ಇಲ್ಲದಿದ್ದರೆ
+            *ok = ಸುಳ್ಳು;
 
-        if (pDCTSpec)
+        ಆದರೆ (pDCTSpec)
             ippFree(pDCTSpec);
 
-        CV_SUPPRESS_DEPRECATED_END
-#else
-        CV_UNUSED(range);
-        *ok = false;
-#endif
+        CV_SUPPRESS_DEPRECATED_ಕೊನೆ
+#ಇಲ್ಲದಿದ್ದರೆ
+        CV_ಬಳಸದ(range);
+        *ok = ಸುಳ್ಳು;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 
-private:
-    const uchar * src;
-    size_t src_step;
+ಖಾಸಗಿ:
+    ಸ್ಥಿರಾಂಕ uchar * src;
+    size_t src_ಹೆಜ್ಜೆ;
     uchar * dst;
-    size_t dst_step;
-    int width;
-    bool inv;
-    bool *ok;
+    size_t dst_ಹೆಜ್ಜೆ;
+    ಪೂರ್ಣಾಂಕ ಅಗಲ;
+    ತಾರ್ಕಿಕ inv;
+    ತಾರ್ಕಿಕ *ok;
 };
 
-static bool DctIPPLoop(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ DctIPPLoop(ಸ್ಥಿರಾಂಕ uchar * src, size_t src_ಹೆಜ್ಜೆ, uchar * dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ತಾರ್ಕಿಕ inv)
 {
-    bool ok;
-    parallel_for_(Range(0, height), DctIPPLoop_Invoker(src, src_step, dst, dst_step, width, inv, &ok), height/(double)(1<<4) );
-    return ok;
+    ತಾರ್ಕಿಕ ok;
+    parallel_for_(Range(0, ಎತ್ತರ), DctIPPLoop_Invoker(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, ಅಗಲ, inv, &ok), ಎತ್ತರ/(ದ್ವಿಗುಣ)(1<<4) );
+    ಹಿಂತಿರುಗಿ ok;
 }
 
-static bool ippi_DCT_32f(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv, bool row)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ippi_DCT_32f(ಸ್ಥಿರಾಂಕ uchar * src, size_t src_ಹೆಜ್ಜೆ, uchar * dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ತಾರ್ಕಿಕ inv, ತಾರ್ಕಿಕ ಅಡ್ಡಸಾಲು)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    if(row)
-        return DctIPPLoop(src, src_step, dst, dst_step, width, height, inv);
-    else
+    ಆದರೆ(ಅಡ್ಡಸಾಲು)
+        ಹಿಂತಿರುಗಿ DctIPPLoop(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, ಅಗಲ, ಎತ್ತರ, inv);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-#if IPP_VERSION_X100 >= 900
-        IppiSize srcRoiSize = {width, height};
+#ಆದರೆ IPP_ಆವೃತ್ತಿ_X100 >= 900
+        Ippi_ಗಾತ್ರ src_Roi_ಗಾತ್ರ = {ಅಗಲ, ಎತ್ತರ};
 
-        int specSize    = 0;
-        int initSize    = 0;
-        int bufferSize  = 0;
+        ಪೂರ್ಣಾಂಕ spec_ಗಾತ್ರ    = 0;
+        ಪೂರ್ಣಾಂಕ init_ಗಾತ್ರ    = 0;
+        ಪೂರ್ಣಾಂಕ ಬಫರ್_ಗಾತ್ರ  = 0;
 
-        Ipp8u* pDCTSpec = NULL;
-        Ipp8u* pBuffer  = NULL;
-        Ipp8u* pInitBuf = NULL;
+        Ipp8u* pDCTSpec = ಖಾಲಿ;
+        Ipp8u* p_ಬಫರ್  = ಖಾಲಿ;
+        Ipp8u* pInitBuf = ಖಾಲಿ;
 
-        #define IPP_RELEASE             \
-            if(pDCTSpec)                \
+        #ವ್ಯಾಖ್ಯಾನಿಸು IPP_RELEASE             \
+            ಆದರೆ(pDCTSpec)                \
                 ippFree(pDCTSpec);      \
-            if(pBuffer)                 \
-                ippFree(pBuffer);       \
-            if(pInitBuf)                \
+            ಆದರೆ(p_ಬಫರ್)                 \
+                ippFree(p_ಬಫರ್);       \
+            ಆದರೆ(pInitBuf)                \
                 ippFree(pInitBuf);      \
 
         ippiDCTFunc     ippiDCT_32f_C1R      = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R> : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInit     ippDctInit     = inv ? ippiDCTInitWrap<IppiDCTInvSpec_32f, ippiDCTInvInit_32f> : ippiDCTInitWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInit_32f>;
-        ippiDCTGetSize  ippDctGetSize  = inv ? ippiDCTGetSizeWrap<ippiDCTInvGetSize_32f> : ippiDCTGetSizeWrap<ippiDCTFwdGetSize_32f>;
+        ippi_DCTGet_ಗಾತ್ರ  ipp_Dct_Get_ಗಾತ್ರ  = inv ? ippi_DCTGet_ಗಾತ್ರ_Wrap<ippi_DCTInv_Get_ಗಾತ್ರ_32f> : ippi_DCTGet_ಗಾತ್ರ_Wrap<ippi_DCTFwd_Get_ಗಾತ್ರ_32f>;
 
-        if(ippDctGetSize(srcRoiSize, &specSize, &initSize, &bufferSize) < 0)
-            return false;
+        ಆದರೆ(ipp_Dct_Get_ಗಾತ್ರ(src_Roi_ಗಾತ್ರ, &spec_ಗಾತ್ರ, &init_ಗಾತ್ರ, &ಬಫರ್_ಗಾತ್ರ) < 0)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-        pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(specSize);
-        if(!pDCTSpec && specSize)
-            return false;
+        pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(spec_ಗಾತ್ರ);
+        ಆದರೆ(!pDCTSpec && spec_ಗಾತ್ರ)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-        pBuffer  = (Ipp8u*)CV_IPP_MALLOC(bufferSize);
-        if(!pBuffer && bufferSize)
+        p_ಬಫರ್  = (Ipp8u*)CV_IPP_MALLOC(ಬಫರ್_ಗಾತ್ರ);
+        ಆದರೆ(!p_ಬಫರ್ && ಬಫರ್_ಗಾತ್ರ)
         {
             IPP_RELEASE
-            return false;
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         }
-        pInitBuf = (Ipp8u*)CV_IPP_MALLOC(initSize);
-        if(!pInitBuf && initSize)
+        pInitBuf = (Ipp8u*)CV_IPP_MALLOC(init_ಗಾತ್ರ);
+        ಆದರೆ(!pInitBuf && init_ಗಾತ್ರ)
         {
             IPP_RELEASE
-            return false;
-        }
-
-        if(ippDctInit(pDCTSpec, srcRoiSize, pInitBuf) < 0)
-        {
-            IPP_RELEASE
-            return false;
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         }
 
-        if(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDCTSpec, pBuffer) < 0)
+        ಆದರೆ(ippDctInit(pDCTSpec, src_Roi_ಗಾತ್ರ, pInitBuf) < 0)
         {
             IPP_RELEASE
-            return false;
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+        }
+
+        ಆದರೆ(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (ದಶಮಾಂಶ*)src, static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ), (ದಶಮಾಂಶ*)dst, static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ), pDCTSpec, p_ಬಫರ್) < 0)
+        {
+            IPP_RELEASE
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         }
 
         IPP_RELEASE
-        return true;
-#undef IPP_RELEASE
-#elif IPP_VERSION_X100 >= 700
-        IppStatus status;
-        void* pDCTSpec;
-        AutoBuffer<uchar> buf;
-        uchar* pBuffer = 0;
-        int bufSize=0;
+        ಹಿಂತಿರುಗಿ ನಿಜ;
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು IPP_RELEASE
+#ಅಥವಾಆದರೆ IPP_ಆವೃತ್ತಿ_X100 >= 700
+        Ipp_ಸ್ಥಿತಿ ಸ್ಥಿತಿ_2;
+        ಶೂನ್ಯ* pDCTSpec;
+        Auto_ಬಫರ್<uchar> buf;
+        uchar* p_ಬಫರ್ = 0;
+        ಪೂರ್ಣಾಂಕ buf_ಗಾತ್ರ=0;
 
-        IppiSize srcRoiSize = {width, height};
+        Ippi_ಗಾತ್ರ src_Roi_ಗಾತ್ರ = {ಅಗಲ, ಎತ್ತರ};
 
-        CV_SUPPRESS_DEPRECATED_START
+        CV_SUPPRESS_DEPRECATED_ಆರಂಭ
 
         ippiDCTFunc ippDctFun           = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R>             : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInitAlloc ippInitAlloc   = inv ? ippiDCTInitAllocWrap<IppiDCTInvSpec_32f, ippiDCTInvInitAlloc_32f>   : ippiDCTInitAllocWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInitAlloc_32f>;
         ippiDCTFree ippFree             = inv ? ippiDCTFreeWrap<IppiDCTInvSpec_32f, ippiDCTInvFree_32f>             : ippiDCTFreeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdFree_32f>;
-        ippiDCTGetBufSize ippGetBufSize = inv ? ippiDCTGetBufSizeWrap<IppiDCTInvSpec_32f, ippiDCTInvGetBufSize_32f> : ippiDCTGetBufSizeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdGetBufSize_32f>;
+        ippi_DCTGet_Buf_ಗಾತ್ರ ipp_Get_Buf_ಗಾತ್ರ = inv ? ippi_DCTGet_Buf_ಗಾತ್ರ_Wrap<IppiDCTInvSpec_32f, ippi_DCTInv_Get_Buf_ಗಾತ್ರ_32f> : ippi_DCTGet_Buf_ಗಾತ್ರ_Wrap<IppiDCTFwdSpec_32f, ippi_DCTFwd_Get_Buf_ಗಾತ್ರ_32f>;
 
-        status = ippStsErr;
+        ಸ್ಥಿತಿ_2 = ippStsErr;
 
-        if (ippInitAlloc(&pDCTSpec, srcRoiSize, ippAlgHintNone)>=0 && ippGetBufSize(pDCTSpec, &bufSize)>=0)
+        ಆದರೆ (ippInitAlloc(&pDCTSpec, src_Roi_ಗಾತ್ರ, ippAlgHintNone)>=0 && ipp_Get_Buf_ಗಾತ್ರ(pDCTSpec, &buf_ಗಾತ್ರ)>=0)
         {
-            buf.allocate( bufSize );
-            pBuffer = (uchar*)buf;
+            buf.allocate( buf_ಗಾತ್ರ );
+            p_ಬಫರ್ = (uchar*)buf;
 
-            status = ippDctFun((float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDCTSpec, (Ipp8u*)pBuffer);
+            ಸ್ಥಿತಿ_2 = ippDctFun((ದಶಮಾಂಶ*)src, static_cast<ಪೂರ್ಣಾಂಕ>(src_ಹೆಜ್ಜೆ), (ದಶಮಾಂಶ*)dst, static_cast<ಪೂರ್ಣಾಂಕ>(dst_ಹೆಜ್ಜೆ), pDCTSpec, (Ipp8u*)p_ಬಫರ್);
         }
 
-        if (pDCTSpec)
+        ಆದರೆ (pDCTSpec)
             ippFree(pDCTSpec);
 
-        CV_SUPPRESS_DEPRECATED_END
+        CV_SUPPRESS_DEPRECATED_ಕೊನೆ
 
-        return status >= 0;
-#else
-        CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(inv); CV_UNUSED(row);
-        return false;
-#endif
+        ಹಿಂತಿರುಗಿ ಸ್ಥಿತಿ_2 >= 0;
+#ಇಲ್ಲದಿದ್ದರೆ
+        CV_ಬಳಸದ(src); CV_ಬಳಸದ(dst); CV_ಬಳಸದ(inv); CV_ಬಳಸದ(ಅಡ್ಡಸಾಲು);
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+#ಆದರೆ_ಅಂತ್ಯ
     }
 }
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-class OcvDctImpl CV_FINAL : public hal::DCT2D
+ವರ್ಗ OcvDctImpl CV_FINAL : ಸಾರ್ವಜನಿಕ hal::DCT2D
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     OcvDftOptions opt;
     DCTFunc dct_func;
     // per-stage plan + workspace, (re)built once per stage length, never per row
     DftPlan plan;
-    AutoBuffer<uchar> ws;
-    bool isRowTransform;
-    bool isInverse;
-    bool isContinuous;
-    int start_stage;
-    int end_stage;
-    int width;
-    int height;
-    int depth;
+    Auto_ಬಫರ್<uchar> ws;
+    ತಾರ್ಕಿಕ is_ಅಡ್ಡಸಾಲು_Transform;
+    ತಾರ್ಕಿಕ isInverse;
+    ತಾರ್ಕಿಕ isContinuous;
+    ಪೂರ್ಣಾಂಕ ಆರಂಭ_stage;
+    ಪೂರ್ಣಾಂಕ ಕೊನೆ_stage;
+    ಪೂರ್ಣಾಂಕ ಅಗಲ;
+    ಪೂರ್ಣಾಂಕ ಎತ್ತರ;
+    ಪೂರ್ಣಾಂಕ ಆಳ;
 
-    void init(int _width, int _height, int _depth, int flags)
+    ಶೂನ್ಯ init(ಪೂರ್ಣಾಂಕ ಅಗಲ_3, ಪೂರ್ಣಾಂಕ ಎತ್ತರ_3, ಪೂರ್ಣಾಂಕ ಆಳ_2, ಪೂರ್ಣಾಂಕ flags)
     {
-        width = _width;
-        height = _height;
-        depth = _depth;
+        ಅಗಲ = ಅಗಲ_3;
+        ಎತ್ತರ = ಎತ್ತರ_3;
+        ಆಳ = ಆಳ_2;
         isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
-        isRowTransform = (flags & CV_HAL_DFT_ROWS) != 0;
+        is_ಅಡ್ಡಸಾಲು_Transform = (flags & CV_HAL_DFT_ಅಡ್ಡಸಾಲುಗಳು) != 0;
         isContinuous = (flags & CV_HAL_DFT_IS_CONTINUOUS) != 0;
-        static DCTFunc dct_tbl[4] =
+        ಸ್ಥಿರ DCTFunc dct_tbl[4] =
         {
-            dctWrap<float, DCT<float>>,
-            dctWrap<float, IDCT<float>>,
-            dctWrap<double, DCT<double>>,
-            dctWrap<double, IDCT<double>>
+            dctWrap<ದಶಮಾಂಶ, DCT<ದಶಮಾಂಶ>>,
+            dctWrap<ದಶಮಾಂಶ, IDCT<ದಶಮಾಂಶ>>,
+            dctWrap<ದ್ವಿಗುಣ, DCT<ದ್ವಿಗುಣ>>,
+            dctWrap<ದ್ವಿಗುಣ, IDCT<ದ್ವಿಗುಣ>>
         };
-        dct_func = dct_tbl[(int)isInverse + (depth == CV_64F)*2];
-        opt.isComplex = false;
-        opt.isInverse = false;
+        dct_func = dct_tbl[(ಪೂರ್ಣಾಂಕ)isInverse + (ಆಳ == CV_64F)*2];
+        opt.isComplex = ಸುಳ್ಳು;
+        opt.isInverse = ಸುಳ್ಳು;
         opt.scale = 1.;
 
-        if (isRowTransform || height == 1 || (width == 1 && isContinuous))
+        ಆದರೆ (is_ಅಡ್ಡಸಾಲು_Transform || ಎತ್ತರ == 1 || (ಅಗಲ == 1 && isContinuous))
         {
-            start_stage = end_stage = 0;
+            ಆರಂಭ_stage = ಕೊನೆ_stage = 0;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            start_stage = (width == 1);
-            end_stage = 1;
+            ಆರಂಭ_stage = (ಅಗಲ == 1);
+            ಕೊನೆ_stage = 1;
         }
     }
-    void apply(const uchar *src, size_t src_step, uchar *dst, size_t dst_step) CV_OVERRIDE
+    ಶೂನ್ಯ apply(ಸ್ಥಿರಾಂಕ uchar *src, size_t src_ಹೆಜ್ಜೆ, uchar *dst, size_t dst_ಹೆಜ್ಜೆ) CV_OVERRIDE
     {
-        CV_IPP_RUN(IPP_VERSION_X100 >= 700 && depth == CV_32F, ippi_DCT_32f(src, src_step, dst, dst_step, width, height, isInverse, isRowTransform))
+        CV_IPP_ಸತತ(IPP_ಆವೃತ್ತಿ_X100 >= 700 && ಆಳ == CV_32F, ippi_DCT_32f(src, src_ಹೆಜ್ಜೆ, dst, dst_ಹೆಜ್ಜೆ, ಅಗಲ, ಎತ್ತರ, isInverse, is_ಅಡ್ಡಸಾಲು_Transform))
 
-        int prev_len = 0;
-        int elem_size = (depth == CV_32F) ? sizeof(float) : sizeof(double);
-        const DFTKernels& kernels = getDFTKernels(depth);
+        ಪೂರ್ಣಾಂಕ prev_len = 0;
+        ಪೂರ್ಣಾಂಕ elem_ಗಾತ್ರ_2 = (ಆಳ == CV_32F) ? ಗಾತ್ರ(ದಶಮಾಂಶ) : ಗಾತ್ರ(ದ್ವಿಗುಣ);
+        ಸ್ಥಿರಾಂಕ DFTKernels& kernels = getDFTKernels(ಆಳ);
 
-        for(int stage = start_stage ; stage <= end_stage; stage++ )
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ stage = ಆರಂಭ_stage ; stage <= ಕೊನೆ_stage; stage++ )
         {
-            const uchar* sptr = src;
+            ಸ್ಥಿರಾಂಕ uchar* sptr = src;
             uchar* dptr = dst;
             size_t sstep0, sstep1, dstep0, dstep1;
-            int len, count;
+            ಪೂರ್ಣಾಂಕ len, ಎಣಿಕೆ_3;
 
-            if( stage == 0 )
+            ಆದರೆ( stage == 0 )
             {
-                len = width;
-                count = height;
-                if( len == 1 && !isRowTransform )
+                len = ಅಗಲ;
+                ಎಣಿಕೆ_3 = ಎತ್ತರ;
+                ಆದರೆ( len == 1 && !is_ಅಡ್ಡಸಾಲು_Transform )
                 {
-                    len = height;
-                    count = 1;
+                    len = ಎತ್ತರ;
+                    ಎಣಿಕೆ_3 = 1;
                 }
-                sstep0 = src_step;
-                dstep0 = dst_step;
-                sstep1 = dstep1 = elem_size;
+                sstep0 = src_ಹೆಜ್ಜೆ;
+                dstep0 = dst_ಹೆಜ್ಜೆ;
+                sstep1 = dstep1 = elem_ಗಾತ್ರ_2;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                len = height;
-                count = width;
-                sstep1 = src_step;
-                dstep1 = dst_step;
-                sstep0 = dstep0 = elem_size;
+                len = ಎತ್ತರ;
+                ಎಣಿಕೆ_3 = ಅಗಲ;
+                sstep1 = src_ಹೆಜ್ಜೆ;
+                dstep1 = dst_ಹೆಜ್ಜೆ;
+                sstep0 = dstep0 = elem_ಗಾತ್ರ_2;
             }
 
             opt.n = len;
 
-            if( len != prev_len )
+            ಆದರೆ( len != prev_len )
             {
-                if( len > 1 && (len & 1) )
+                ಆದರೆ( len > 1 && (len & 1) )
                     CV_Error( cv::Error::StsNotImplemented, "Odd-size DCT\'s are not implemented" );
-                if( len > 1 )
+                ಆದರೆ( len > 1 )
                 {
-                    plan.build(isInverse ? DFT_KIND_IDCT : DFT_KIND_DCT, len, depth, kernels.vlanes);
-                    ws.allocate(plan.ws_bytes);
+                    plan.build(isInverse ? DFT_ಬಗೆ_IDCT : DFT_ಬಗೆ_DCT, len, ಆಳ, kernels.vlanes);
+                    ws.allocate(plan.ws_ಬೈಟುಗಳು);
                 }
                 opt.plan = &plan;
                 opt.kernels = &kernels;
-                opt.workspace = ws.data();
+                opt.workspace = ws.ದತ್ತಾಂಶ();
                 prev_len = len;
             }
             // otherwise reuse the plan built on the previous stage (same length, only the steps differ)
-            double nstripes = dftParallelStripes(count, len);
-            if( len > 1 && count > 1 && nstripes >= 1.5 )
+            ದ್ವಿಗುಣ nstripes = dftParallelStripes(ಎಣಿಕೆ_3, len);
+            ಆದರೆ( len > 1 && ಎಣಿಕೆ_3 > 1 && nstripes >= 1.5 )
             {
                 // the plan is shared, every worker gets its own workspace once per range
-                auto processLines = [&](const Range& range)
+                ಸ್ವಯಂಚಾಲಿತ process_ಸಾಲುಗಳು = [&](ಸ್ಥಿರಾಂಕ Range& range)
                 {
                     OcvDftOptions opt_ = opt;
-                    AutoBuffer<uchar> ws_(plan.ws_bytes);
-                    opt_.workspace = ws_.data();
-                    for( int i = range.start; i < range.end; i++ )
+                    Auto_ಬಫರ್<uchar> ws_(plan.ws_ಬೈಟುಗಳು);
+                    opt_.workspace = ws_.ದತ್ತಾಂಶ();
+                    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = range.ಆರಂಭ; i < range.end; i++ )
                         dct_func( opt_, sptr + i*sstep0, sstep1, dptr + i*dstep0, dstep1 );
                 };
-                parallel_for_(Range(0, count), processLines, nstripes);
+                parallel_for_(Range(0, ಎಣಿಕೆ_3), process_ಸಾಲುಗಳು, nstripes);
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                for(unsigned i = 0; i < static_cast<unsigned>(count); i++ )
+                ಗಾಗಿ(ಚಿಹ್ನೆರಹಿತ i = 0; i < static_cast<ಚಿಹ್ನೆರಹಿತ>(ಎಣಿಕೆ_3); i++ )
                     dct_func( opt, sptr + i*sstep0, sstep1, dptr + i*dstep0, dstep1 );
             }
             src = dst;
-            src_step = dst_step;
+            src_ಹೆಜ್ಜೆ = dst_ಹೆಜ್ಜೆ;
         }
     }
 };
 
-struct ReplacementDCT2D : public hal::DCT2D
+ರಚನೆ ReplacementDCT2D : ಸಾರ್ವಜನಿಕ hal::DCT2D
 {
     cvhalDFT *context;
-    bool isInitialized;
+    ತಾರ್ಕಿಕ isInitialized;
 
-    ReplacementDCT2D() : context(0), isInitialized(false) {}
-    bool init(int width, int height, int depth, int flags)
+    ReplacementDCT2D() : context(0), isInitialized(ಸುಳ್ಳು) {}
+    ತಾರ್ಕಿಕ init(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ flags)
     {
-        int res = cv_hal_dctInit2D(&context, width, height, depth, flags);
+        ಪೂರ್ಣಾಂಕ res = cv_hal_dctInit2D(&context, ಅಗಲ, ಎತ್ತರ, ಆಳ, flags);
         isInitialized = (res == CV_HAL_ERROR_OK);
-        return isInitialized;
+        ಹಿಂತಿರುಗಿ isInitialized;
     }
-    void apply(const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step) CV_OVERRIDE
+    ಶೂನ್ಯ apply(ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ) CV_OVERRIDE
     {
-        if (isInitialized)
+        ಆದರೆ (isInitialized)
         {
-            CALL_HAL(dct2D, cv_hal_dct2D, context, src_data, src_step, dst_data, dst_step);
+            CALL_HAL(dct2D, cv_hal_dct2D, context, src_ದತ್ತಾಂಶ, src_ಹೆಜ್ಜೆ, dst_ದತ್ತಾಂಶ, dst_ಹೆಜ್ಜೆ);
         }
     }
     ~ReplacementDCT2D()
     {
-        if (isInitialized)
+        ಆದರೆ (isInitialized)
         {
             CALL_HAL(dctFree2D, cv_hal_dctFree2D, context);
         }
     }
 };
 
-namespace hal {
+ನಾಮಾಕಾಶ hal {
 
-Ptr<DCT2D> DCT2D::create(int width, int height, int depth, int flags)
+Ptr<DCT2D> DCT2D::create(ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ flags)
 {
     {
-        ReplacementDCT2D *impl = new ReplacementDCT2D();
-        if (impl->init(width, height, depth, flags))
+        ReplacementDCT2D *impl = ಹೊಸ ReplacementDCT2D();
+        ಆದರೆ (impl->init(ಅಗಲ, ಎತ್ತರ, ಆಳ, flags))
         {
-            return Ptr<DCT2D>(impl);
+            ಹಿಂತಿರುಗಿ Ptr<DCT2D>(impl);
         }
-        delete impl;
+        ಅಳಿಸು impl;
     }
     {
-        OcvDctImpl *impl = new OcvDctImpl();
-        impl->init(width, height, depth, flags);
-        return Ptr<DCT2D>(impl);
+        OcvDctImpl *impl = ಹೊಸ OcvDctImpl();
+        impl->init(ಅಗಲ, ಎತ್ತರ, ಆಳ, flags);
+        ಹಿಂತಿರುಗಿ Ptr<DCT2D>(impl);
     }
 }
 
 } // cv::hal::
 } // cv::
 
-void cv::dct( InputArray _src0, OutputArray _dst, int flags )
+ಶೂನ್ಯ cv::dct( ಒಳಹರಿವು_Array _src0, OutputArray _dst, ಪೂರ್ಣಾಂಕ flags )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src0 = _src0.getMat(), src = src0;
-    if (src.empty())
+    ಆದರೆ (src.empty())
     {
         _dst.release();
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    int type = src.type(), depth = src.depth();
+    ಪೂರ್ಣಾಂಕ type = src.type(), ಆಳ = src.ಆಳ();
 
     CV_Assert( type == CV_32FC1 || type == CV_64FC1 );
-    _dst.create( src.rows, src.cols, type );
+    _dst.create( src.ಅಡ್ಡಸಾಲುಗಳು, src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, type );
     Mat dst = _dst.getMat();
 
-    int f = 0;
-    if ((flags & DFT_ROWS) != 0)
-        f |= CV_HAL_DFT_ROWS;
-    if ((flags & DCT_INVERSE) != 0)
+    ಪೂರ್ಣಾಂಕ f = 0;
+    ಆದರೆ ((flags & DFT_ಅಡ್ಡಸಾಲುಗಳು) != 0)
+        f |= CV_HAL_DFT_ಅಡ್ಡಸಾಲುಗಳು;
+    ಆದರೆ ((flags & DCT_INVERSE) != 0)
         f |= CV_HAL_DFT_INVERSE;
-    if (src.isContinuous() && dst.isContinuous())
+    ಆದರೆ (src.isContinuous() && dst.isContinuous())
         f |= CV_HAL_DFT_IS_CONTINUOUS;
 
-    Ptr<hal::DCT2D> c = hal::DCT2D::create(src.cols, src.rows, depth, f);
-    c->apply(src.data, src.step, dst.data, dst.step);
+    Ptr<hal::DCT2D> c = hal::DCT2D::create(src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, src.ಅಡ್ಡಸಾಲುಗಳು, ಆಳ, f);
+    c->apply(src.ದತ್ತಾಂಶ, src.ಹೆಜ್ಜೆ, dst.ದತ್ತಾಂಶ, dst.ಹೆಜ್ಜೆ);
 }
 
 
-void cv::idct( InputArray src, OutputArray dst, int flags )
+ಶೂನ್ಯ cv::idct( ಒಳಹರಿವು_Array src, OutputArray dst, ಪೂರ್ಣಾಂಕ flags )
 {
     CV_INSTRUMENT_REGION();
 
     dct( src, dst, flags | DCT_INVERSE );
 }
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-static const int optimalDFTSizeTab[] = {
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ optimalDFTSizeTab[] = {
 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 25, 27, 30, 32, 36, 40, 45, 48,
 50, 54, 60, 64, 72, 75, 80, 81, 90, 96, 100, 108, 120, 125, 128, 135, 144, 150, 160,
 162, 180, 192, 200, 216, 225, 240, 243, 250, 256, 270, 288, 300, 320, 324, 360, 375,
@@ -4034,21 +4034,21 @@ static const int optimalDFTSizeTab[] = {
 
 }
 
-int cv::getOptimalDFTSize( int size0 )
+ಪೂರ್ಣಾಂಕ cv::getOptimalDFTSize( ಪೂರ್ಣಾಂಕ size0 )
 {
-    int a = 0, b = sizeof(optimalDFTSizeTab)/sizeof(optimalDFTSizeTab[0]) - 1;
-    if( (unsigned)size0 >= (unsigned)optimalDFTSizeTab[b] )
-        return -1;
+    ಪೂರ್ಣಾಂಕ a = 0, b = ಗಾತ್ರ(optimalDFTSizeTab)/ಗಾತ್ರ(optimalDFTSizeTab[0]) - 1;
+    ಆದರೆ( (ಚಿಹ್ನೆರಹಿತ)size0 >= (ಚಿಹ್ನೆರಹಿತ)optimalDFTSizeTab[b] )
+        ಹಿಂತಿರುಗಿ -1;
 
-    while( a < b )
+    ಆಗ( a < b )
     {
-        int c = (a + b) >> 1;
-        if( size0 <= optimalDFTSizeTab[c] )
+        ಪೂರ್ಣಾಂಕ c = (a + b) >> 1;
+        ಆದರೆ( size0 <= optimalDFTSizeTab[c] )
             b = c;
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
             a = c+1;
     }
 
-    return optimalDFTSizeTab[b];
+    ಹಿಂತಿರುಗಿ optimalDFTSizeTab[b];
 }
 /* End of file. */

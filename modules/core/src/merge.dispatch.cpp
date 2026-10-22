@@ -3,15 +3,15 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "opencl_kernels_core.hpp"
 
-#include "merge.simd.hpp"
-#include "merge.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ಅನ್ತರ್ಭಾವ "merge.simd.hpp"
+#ಅನ್ತರ್ಭಾವ "merge.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ hal {
 
-void merge8u(const uchar** src, uchar* dst, int len, int cn )
+ಶೂನ್ಯ merge8u(ಸ್ಥಿರಾಂಕ uchar** src, uchar* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge8u, cv_hal_merge8u, src, dst, len, cn)
@@ -19,7 +19,7 @@ void merge8u(const uchar** src, uchar* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge16u(const ushort** src, ushort* dst, int len, int cn )
+ಶೂನ್ಯ merge16u(ಸ್ಥಿರಾಂಕ ushort** src, ushort* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge16u, cv_hal_merge16u, src, dst, len, cn)
@@ -27,7 +27,7 @@ void merge16u(const ushort** src, ushort* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge32s(const int** src, int* dst, int len, int cn )
+ಶೂನ್ಯ merge32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ** src, ಪೂರ್ಣಾಂಕ* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge32s, cv_hal_merge32s, src, dst, len, cn)
@@ -35,7 +35,7 @@ void merge32s(const int** src, int* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge64s(const int64** src, int64* dst, int len, int cn )
+ಶೂನ್ಯ merge64s(ಸ್ಥಿರಾಂಕ int64** src, int64* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge64s, cv_hal_merge64s, src, dst, len, cn)
@@ -46,198 +46,198 @@ void merge64s(const int64** src, int64* dst, int len, int cn )
 } // namespace cv::hal::
 
 
-typedef void (*MergeFunc)(const void** src, void* dst, int len, int cn);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*ವಿಲೀನ_Func)(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ** src, ಶೂನ್ಯ* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn);
 
-template<typename T, void (*fn)(const T**, T*, int, int)>
-static void mergeWrap(const void** src, void* dst, int len, int cn)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T, ಶೂನ್ಯ (*fn)(ಸ್ಥಿರಾಂಕ T**, T*, ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ)>
+ಸ್ಥಿರ ಶೂನ್ಯ ವಿಲೀನ_Wrap(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ** src, ಶೂನ್ಯ* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn)
 {
-    fn((const T**)src, (T*)dst, len, cn);
+    fn((ಸ್ಥಿರಾಂಕ T**)src, (T*)dst, len, cn);
 }
 
-static MergeFunc getMergeFunc(int depth)
+ಸ್ಥಿರ ವಿಲೀನ_Func get_ವಿಲೀನ_Func(ಪೂರ್ಣಾಂಕ ಆಳ)
 {
-    static MergeFunc mergeTab[CV_DEPTH_MAX] =
+    ಸ್ಥಿರ ವಿಲೀನ_Func ವಿಲೀನ_Tab[CV_ಆಳ_MAX] =
     {
-        mergeWrap<uchar, cv::hal::merge8u>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<ushort, cv::hal::merge16u>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<int, cv::hal::merge32s>,
-        mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<ushort, cv::hal::merge16u>,
-        mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<int64_t, cv::hal::merge64s>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<uchar, cv::hal::merge8u>, 0,
+        ವಿಲೀನ_Wrap<uchar, cv::hal::merge8u>, ವಿಲೀನ_Wrap<uchar, cv::hal::merge8u>,
+        ವಿಲೀನ_Wrap<ushort, cv::hal::merge16u>, ವಿಲೀನ_Wrap<ushort, cv::hal::merge16u>,
+        ವಿಲೀನ_Wrap<ಪೂರ್ಣಾಂಕ, cv::hal::merge32s>, ವಿಲೀನ_Wrap<ಪೂರ್ಣಾಂಕ, cv::hal::merge32s>,
+        ವಿಲೀನ_Wrap<int64_t, cv::hal::merge64s>, ವಿಲೀನ_Wrap<ushort, cv::hal::merge16u>,
+        ವಿಲೀನ_Wrap<ushort, cv::hal::merge16u>, ವಿಲೀನ_Wrap<uchar, cv::hal::merge8u>,
+        ವಿಲೀನ_Wrap<int64_t, cv::hal::merge64s>, ವಿಲೀನ_Wrap<int64_t, cv::hal::merge64s>,
+        ವಿಲೀನ_Wrap<ಪೂರ್ಣಾಂಕ, cv::hal::merge32s>, ವಿಲೀನ_Wrap<uchar, cv::hal::merge8u>,
+        ವಿಲೀನ_Wrap<uchar, cv::hal::merge8u>, 0,
     };
 
-    return mergeTab[depth];
+    ಹಿಂತಿರುಗಿ ವಿಲೀನ_Tab[ಆಳ];
 }
 
-#ifdef HAVE_IPP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_IPP
 
-static bool ipp_merge(const Mat* mv, Mat& dst, int channels)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ipp_ವಿಲೀನ(ಸ್ಥಿರಾಂಕ Mat* mv, Mat& dst, ಪೂರ್ಣಾಂಕ channels)
 {
-#ifdef HAVE_IPP_IW_LL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(channels != 3 && channels != 4)
-        return false;
+    ಆದರೆ(channels != 3 && channels != 4)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    if(mv[0].dims <= 2)
+    ಆದರೆ(mv[0].dims <= 2)
     {
-        IppiSize    size       = ippiSize(mv[0].size());
-        const void *srcPtrs[4] = {NULL};
-        size_t      srcStep    = mv[0].step;
-        for(int i = 0; i < channels; i++)
+        Ippi_ಗಾತ್ರ    size       = ippi_ಗಾತ್ರ(mv[0].size());
+        ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *srcPtrs[4] = {ಖಾಲಿ};
+        size_t      src_ಹೆಜ್ಜೆ_3    = mv[0].ಹೆಜ್ಜೆ;
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = 0; i < channels; i++)
         {
             srcPtrs[i] = mv[i].ptr();
-            if(srcStep != mv[i].step)
-                return false;
+            ಆದರೆ(src_ಹೆಜ್ಜೆ_3 != mv[i].ಹೆಜ್ಜೆ)
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         }
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, srcPtrs, (int)srcStep, dst.ptr(), (int)dst.step, size, (int)mv[0].elemSize1(), channels, 0) >= 0;
+        ಹಿಂತಿರುಗಿ CV_INSTRUMENT_FUN_IPP(llwi_Copy_ವಿಲೀನ, srcPtrs, (ಪೂರ್ಣಾಂಕ)src_ಹೆಜ್ಜೆ_3, dst.ptr(), (ಪೂರ್ಣಾಂಕ)dst.ಹೆಜ್ಜೆ, size, (ಪೂರ್ಣಾಂಕ)mv[0].elemSize1(), channels, 0) >= 0;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        const Mat *arrays[5] = {NULL};
-        uchar     *ptrs[5]   = {NULL};
+        ಸ್ಥಿರಾಂಕ Mat *arrays[5] = {ಖಾಲಿ};
+        uchar     *ptrs[5]   = {ಖಾಲಿ};
         arrays[0] = &dst;
 
-        for(int i = 1; i < channels; i++)
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = 1; i < channels; i++)
         {
             arrays[i] = &mv[i-1];
         }
 
         NAryMatIterator it(arrays, ptrs);
-        IppiSize size = { (int)it.size, 1 };
+        Ippi_ಗಾತ್ರ size = { (ಪೂರ್ಣಾಂಕ)it.size, 1 };
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ಗಾಗಿ( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, (const void**)&ptrs[1], 0, ptrs[0], 0, size, (int)mv[0].elemSize1(), channels, 0) < 0)
-                return false;
+            ಆದರೆ(CV_INSTRUMENT_FUN_IPP(llwi_Copy_ವಿಲೀನ, (ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ**)&ptrs[1], 0, ptrs[0], 0, size, (ಪೂರ್ಣಾಂಕ)mv[0].elemSize1(), channels, 0) < 0)
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         }
-        return true;
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
-#else
-    CV_UNUSED(dst); CV_UNUSED(mv); CV_UNUSED(channels);
-    return false;
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    CV_ಬಳಸದ(dst); CV_ಬಳಸದ(mv); CV_ಬಳಸದ(channels);
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+#ಆದರೆ_ಅಂತ್ಯ
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-void merge(const Mat* mv, size_t n, OutputArray _dst)
+ಶೂನ್ಯ ವಿಲೀನ(ಸ್ಥಿರಾಂಕ Mat* mv, size_t n, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert( mv && n > 0 );
     CV_Assert(!mv[0].empty());
 
-    int depth = mv[0].depth();
-    bool allch1 = true;
-    int k, cn = 0;
+    ಪೂರ್ಣಾಂಕ ಆಳ = mv[0].ಆಳ();
+    ತಾರ್ಕಿಕ allch1 = ನಿಜ;
+    ಪೂರ್ಣಾಂಕ k, cn = 0;
     size_t i;
 
-    for( i = 0; i < n; i++ )
+    ಗಾಗಿ( i = 0; i < n; i++ )
     {
-        CV_Assert(mv[i].size == mv[0].size && mv[i].depth() == depth);
+        CV_Assert(mv[i].size == mv[0].size && mv[i].ಆಳ() == ಆಳ);
         allch1 = allch1 && mv[i].channels() == 1;
         cn += mv[i].channels();
     }
 
     CV_Assert( 0 < cn && cn <= CV_CN_MAX );
-    _dst.create(mv[0].size, CV_MAKETYPE(depth, cn));
+    _dst.create(mv[0].size, CV_MAKETYPE(ಆಳ, cn));
     Mat dst = _dst.getMat();
 
-    if( n == 1 )
+    ಆದರೆ( n == 1 )
     {
-        mv[0].copyTo(dst);
-        return;
+        mv[0].copy_ಗಮ್ಯ(dst);
+        ಹಿಂತಿರುಗಿ;
     }
 
-    CV_IPP_RUN(allch1, ipp_merge(mv, dst, (int)n));
+    CV_IPP_ಸತತ(allch1, ipp_ವಿಲೀನ(mv, dst, (ಪೂರ್ಣಾಂಕ)n));
 
-    if( !allch1 )
+    ಆದರೆ( !allch1 )
     {
-        AutoBuffer<int> pairs(cn*2);
-        int j, ni=0;
+        Auto_ಬಫರ್<ಪೂರ್ಣಾಂಕ> ಜೋಡಿಗಳು(cn*2);
+        ಪೂರ್ಣಾಂಕ j, ni=0;
 
-        for( i = 0, j = 0; i < n; i++, j += ni )
+        ಗಾಗಿ( i = 0, j = 0; i < n; i++, j += ni )
         {
             ni = mv[i].channels();
-            for( k = 0; k < ni; k++ )
+            ಗಾಗಿ( k = 0; k < ni; k++ )
             {
-                pairs[(j+k)*2] = j + k;
-                pairs[(j+k)*2+1] = j + k;
+                ಜೋಡಿಗಳು[(j+k)*2] = j + k;
+                ಜೋಡಿಗಳು[(j+k)*2+1] = j + k;
             }
         }
-        mixChannels( mv, n, &dst, 1, &pairs[0], cn );
-        return;
+        mixChannels( mv, n, &dst, 1, &ಜೋಡಿಗಳು[0], cn );
+        ಹಿಂತಿರುಗಿ;
     }
 
-    MergeFunc func = getMergeFunc(depth);
+    ವಿಲೀನ_Func func = get_ವಿಲೀನ_Func(ಆಳ);
     CV_Assert( func != 0 );
 
-    size_t esz = dst.elemSize(), esz1 = dst.elemSize1();
-    size_t blocksize0 = (int)((BLOCK_SIZE + esz-1)/esz);
-    AutoBuffer<uchar> _buf((cn+1)*(sizeof(Mat*) + sizeof(uchar*)) + 16);
-    const Mat** arrays = (const Mat**)_buf.data();
+    size_t esz = dst.elem_ಗಾತ್ರ(), esz1 = dst.elemSize1();
+    size_t blocksize0 = (ಪೂರ್ಣಾಂಕ)((ಖಂಡ_ಗಾತ್ರ + esz-1)/esz);
+    Auto_ಬಫರ್<uchar> _buf((cn+1)*(ಗಾತ್ರ(Mat*) + ಗಾತ್ರ(uchar*)) + 16);
+    ಸ್ಥಿರಾಂಕ Mat** arrays = (ಸ್ಥಿರಾಂಕ Mat**)_buf.ದತ್ತಾಂಶ();
     uchar** ptrs = (uchar**)alignPtr(arrays + cn + 1, 16);
 
     arrays[0] = &dst;
-    for( k = 0; k < cn; k++ )
+    ಗಾಗಿ( k = 0; k < cn; k++ )
         arrays[k+1] = &mv[k];
 
     NAryMatIterator it(arrays, ptrs, cn+1);
-    size_t total = (int)it.size;
-    size_t blocksize = std::min((size_t)CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn), cn <= 4 ? total : std::min(total, blocksize0));
+    size_t ಒಟ್ಟು = (ಪೂರ್ಣಾಂಕ)it.size;
+    size_t blocksize = std::min((size_t)CV_ವಿಭಜಿಸು_ವಿಲೀನ_MAX_ಖಂಡ_ಗಾತ್ರ(cn), cn <= 4 ? ಒಟ್ಟು : std::min(ಒಟ್ಟು, blocksize0));
 
-    for( i = 0; i < it.nplanes; i++, ++it )
+    ಗಾಗಿ( i = 0; i < it.nplanes; i++, ++it )
     {
-        for( size_t j = 0; j < total; j += blocksize )
+        ಗಾಗಿ( size_t j = 0; j < ಒಟ್ಟು; j += blocksize )
         {
-            size_t bsz = std::min(total - j, blocksize);
-            func( (const void**)&ptrs[1], ptrs[0], (int)bsz, cn );
+            size_t bsz = std::min(ಒಟ್ಟು - j, blocksize);
+            func( (ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ**)&ptrs[1], ptrs[0], (ಪೂರ್ಣಾಂಕ)bsz, cn );
 
-            if( j + blocksize < total )
+            ಆದರೆ( j + blocksize < ಒಟ್ಟು )
             {
                 ptrs[0] += bsz*esz;
-                for( int t = 0; t < cn; t++ )
+                ಗಾಗಿ( ಪೂರ್ಣಾಂಕ t = 0; t < cn; t++ )
                     ptrs[t+1] += bsz*esz1;
             }
         }
     }
 }
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 
-static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_ವಿಲೀನ( ಒಳಹರಿವು_Array_ದ_Arrays _mv, OutputArray _dst )
 {
     std::vector<UMat> src, ksrc;
-    _mv.getUMatVector(src);
+    _mv.get_UMat_ಸದಿಶ(src);
     CV_Assert(!src.empty());
 
-    int type = src[0].type(), depth = CV_MAT_DEPTH(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    Size size = src[0].size();
+    ಪೂರ್ಣಾಂಕ type = src[0].type(), ಆಳ = CV_MAT_ಆಳ(type),
+            ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    ಗಾತ್ರ_2 size = src[0].size();
 
-    for (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
+    ಗಾಗಿ (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
     {
-        int itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_DEPTH(itype),
+        ಪೂರ್ಣಾಂಕ itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_ಆಳ(itype),
                 esz1 = CV_ELEM_SIZE1(idepth);
-        if (src[i].dims > 2)
-            return false;
+        ಆದರೆ (src[i].dims > 2)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-        CV_Assert(size == src[i].size() && depth == idepth);
+        CV_Assert(size == src[i].size() && ಆಳ == idepth);
 
-        for (int cn = 0; cn < icn; ++cn)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ cn = 0; cn < icn; ++cn)
         {
             UMat tsrc = src[i];
             tsrc.offset += cn * esz1;
             ksrc.push_back(tsrc);
         }
     }
-    int dcn = (int)ksrc.size();
+    ಪೂರ್ಣಾಂಕ dcn = (ಪೂರ್ಣಾಂಕ)ksrc.size();
 
     String srcargs, processelem, cndecl, indexdecl;
-    for (int i = 0; i < dcn; ++i)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dcn; ++i)
     {
         srcargs += format("DECLARE_SRC_PARAM(%d)", i);
         processelem += format("PROCESS_ELEM(%d)", i);
@@ -245,39 +245,39 @@ static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
         cndecl += format(" -D scn%d=%d", i, ksrc[i].channels());
     }
 
-    ocl::Kernel k("merge", ocl::core::split_merge_oclsrc,
+    ocl::Kernel k("merge", ocl::core::ವಿಭಜಿಸು_ವಿಲೀನ_oclsrc,
                   format("-D OP_MERGE -D cn=%d -D T=%s -D DECLARE_SRC_PARAMS_N=%s"
                          " -D DECLARE_INDEX_N=%s -D PROCESS_ELEMS_N=%s%s",
-                         dcn, ocl::memopTypeToStr(depth), srcargs.c_str(),
+                         dcn, ocl::memop_Type_ಗಮ್ಯ_Str(ಆಳ), srcargs.c_str(),
                          indexdecl.c_str(), processelem.c_str(), cndecl.c_str()));
-    if (k.empty())
-        return false;
+    ಆದರೆ (k.empty())
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    _dst.create(size, CV_MAKE_TYPE(depth, dcn));
+    _dst.create(size, CV_MAKE_TYPE(ಆಳ, dcn));
     UMat dst = _dst.getUMat();
 
-    int argidx = 0;
-    for (int i = 0; i < dcn; ++i)
-        argidx = k.set(argidx, ocl::KernelArg::ReadOnlyNoSize(ksrc[i]));
-    argidx = k.set(argidx, ocl::KernelArg::WriteOnly(dst));
-    k.set(argidx, rowsPerWI);
+    ಪೂರ್ಣಾಂಕ argidx = 0;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dcn; ++i)
+        argidx = k.ಗಣ(argidx, ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(ksrc[i]));
+    argidx = k.ಗಣ(argidx, ocl::KernelArg::WriteOnly(dst));
+    k.ಗಣ(argidx, ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI);
 
-    size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ((size_t)dst.ಅಡ್ಡಸಾಲುಗಳು + ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI - 1) / ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI };
+    ಹಿಂತಿರುಗಿ k.ಸತತ(2, globalsize, ಖಾಲಿ, ಸುಳ್ಳು);
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-void merge(InputArrayOfArrays _mv, OutputArray _dst)
+ಶೂನ್ಯ ವಿಲೀನ(ಒಳಹರಿವು_Array_ದ_Arrays _mv, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_OCL_RUN(_mv.isUMatVector() && _dst.isUMat(),
-               ocl_merge(_mv, _dst))
+    CV_OCL_ಸತತ(_mv.is_UMat_ಸದಿಶ() && _dst.isUMat(),
+               ocl_ವಿಲೀನ(_mv, _dst))
 
     std::vector<Mat> mv;
-    _mv.getMatVector(mv);
-    merge(!mv.empty() ? &mv[0] : 0, mv.size(), _dst);
+    _mv.get_Mat_ಸದಿಶ(mv);
+    ವಿಲೀನ(!mv.empty() ? &mv[0] : 0, mv.size(), _dst);
 }
 
 } // namespace

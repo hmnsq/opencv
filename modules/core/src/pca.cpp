@@ -41,380 +41,380 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
 /****************************************************************************************\
 *                                          PCA                                           *
 \****************************************************************************************/
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
 PCA::PCA() {}
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, int maxComponents)
+PCA::PCA(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ, ಒಳಹರಿವು_Array ಸರಾಸರಿ, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ maxComponents)
 {
-    operator()(data, _mean, flags, maxComponents);
+    ಕ್ರಿಯಾಕಾರಕ()(ದತ್ತಾಂಶ, ಸರಾಸರಿ, flags, maxComponents);
 }
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, double retainedVariance)
+PCA::PCA(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ, ಒಳಹರಿವು_Array ಸರಾಸರಿ, ಪೂರ್ಣಾಂಕ flags, ದ್ವಿಗುಣ retainedVariance)
 {
-    operator()(data, _mean, flags, retainedVariance);
+    ಕ್ರಿಯಾಕಾರಕ()(ದತ್ತಾಂಶ, ಸರಾಸರಿ, flags, retainedVariance);
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, int maxComponents)
+PCA& PCA::ಕ್ರಿಯಾಕಾರಕ()(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ_3, ಒಳಹರಿವು_Array __mean, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ maxComponents)
 {
-    Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
-    Size mean_sz;
+    Mat ದತ್ತಾಂಶ = ದತ್ತಾಂಶ_3.getMat(), ಸರಾಸರಿ = __mean.getMat();
+    ಪೂರ್ಣಾಂಕ covar_flags = cv::COVAR_SCALE;
+    ಪೂರ್ಣಾಂಕ len, ಒಳ_ಎಣಿಕೆ;
+    ಗಾತ್ರ_2 ಸರಾಸರಿ_sz;
 
-    CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    CV_Assert( ದತ್ತಾಂಶ.channels() == 1 );
+    ಆದರೆ( flags & PCA::ದತ್ತಾಂಶ_AS_ಲಂಬಸಾಲು )
     {
-        len = data.rows;
-        in_count = data.cols;
-        covar_flags |= cv::COVAR_COLS;
-        mean_sz = Size(1, len);
+        len = ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು;
+        ಒಳ_ಎಣಿಕೆ = ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+        covar_flags |= cv::COVAR_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+        ಸರಾಸರಿ_sz = ಗಾತ್ರ_2(1, len);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        len = data.cols;
-        in_count = data.rows;
-        covar_flags |= cv::COVAR_ROWS;
-        mean_sz = Size(len, 1);
+        len = ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+        ಒಳ_ಎಣಿಕೆ = ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು;
+        covar_flags |= cv::COVAR_ಅಡ್ಡಸಾಲುಗಳು;
+        ಸರಾಸರಿ_sz = ಗಾತ್ರ_2(len, 1);
     }
 
-    int count = std::min(len, in_count), out_count = count;
-    if( maxComponents > 0 )
-        out_count = std::min(count, maxComponents);
+    ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3 = std::min(len, ಒಳ_ಎಣಿಕೆ), ಹೊರಹೋಗು_ಎಣಿಕೆ = ಎಣಿಕೆ_3;
+    ಆದರೆ( maxComponents > 0 )
+        ಹೊರಹೋಗು_ಎಣಿಕೆ = std::min(ಎಣಿಕೆ_3, maxComponents);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
-        covar_flags |= cv::COVAR_NORMAL;
+    ಆದರೆ( len <= ಒಳ_ಎಣಿಕೆ )
+        covar_flags |= cv::COVAR_ಸಾಮಾನ್ಯ;
 
-    int ctype = std::max(CV_32F, data.depth());
-    mean.create( mean_sz, ctype );
+    ಪೂರ್ಣಾಂಕ ctype = std::max(CV_32F, ದತ್ತಾಂಶ.ಆಳ());
+    ಸರಾಸರಿ_2.create( ಸರಾಸರಿ_sz, ctype );
 
-    Mat covar( count, count, ctype );
+    Mat covar( ಎಣಿಕೆ_3, ಎಣಿಕೆ_3, ctype );
 
-    if( !_mean.empty() )
+    ಆದರೆ( !ಸರಾಸರಿ.empty() )
     {
-        CV_Assert( _mean.size() == mean_sz );
-        _mean.convertTo(mean, ctype);
+        CV_Assert( ಸರಾಸರಿ.size() == ಸರಾಸರಿ_sz );
+        ಸರಾಸರಿ.convert_ಗಮ್ಯ(ಸರಾಸರಿ_2, ctype);
         covar_flags |= cv::COVAR_USE_AVG;
     }
 
-    calcCovarMatrix( data, covar, mean, covar_flags, ctype );
+    calc_Covar_ಮಾತೃಕೆ( ದತ್ತಾಂಶ, covar, ಸರಾಸರಿ_2, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    ಆದರೆ( !(covar_flags & cv::COVAR_ಸಾಮಾನ್ಯ) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
-        Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        Mat tmp_ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ = repeat(ಸರಾಸರಿ_2, ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು/ಸರಾಸರಿ_2.ಅಡ್ಡಸಾಲುಗಳು, ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ/ಸರಾಸರಿ_2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+        ಆದರೆ( ದತ್ತಾಂಶ.type() != ctype || tmp_ಸರಾಸರಿ.ದತ್ತಾಂಶ == ಸರಾಸರಿ_2.ದತ್ತಾಂಶ )
         {
-            data.convertTo( tmp_data, ctype );
-            subtract( tmp_data, tmp_mean, tmp_data );
+            ದತ್ತಾಂಶ.convert_ಗಮ್ಯ( tmp_ದತ್ತಾಂಶ, ctype );
+            ಕಳೆ( tmp_ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ, tmp_ದತ್ತಾಂಶ );
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            subtract( data, tmp_mean, tmp_mean );
-            tmp_data = tmp_mean;
+            ಕಳೆ( ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ, tmp_ಸರಾಸರಿ );
+            tmp_ದತ್ತಾಂಶ = tmp_ಸರಾಸರಿ;
         }
 
-        Mat evects1(count, len, ctype);
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, evects1,
-            (flags & PCA::DATA_AS_COL) ? cv::GEMM_2_T : 0);
+        Mat evects1(ಎಣಿಕೆ_3, len, ctype);
+        gemm( eigenvectors, tmp_ದತ್ತಾಂಶ, 1, Mat(), 0, evects1,
+            (flags & PCA::ದತ್ತಾಂಶ_AS_ಲಂಬಸಾಲು) ? cv::GEMM_2_T : 0);
         eigenvectors = evects1;
 
         // normalize eigenvectors
-        int i;
-        for( i = 0; i < out_count; i++ )
+        ಪೂರ್ಣಾಂಕ i;
+        ಗಾಗಿ( i = 0; i < ಹೊರಹೋಗು_ಎಣಿಕೆ; i++ )
         {
-            Mat vec = eigenvectors.row(i);
+            Mat vec = eigenvectors.ಅಡ್ಡಸಾಲು(i);
             normalize(vec, vec);
         }
     }
 
-    if( count > out_count )
+    ಆದರೆ( ಎಣಿಕೆ_3 > ಹೊರಹೋಗು_ಎಣಿಕೆ )
     {
         // use clone() to physically copy the data and thus deallocate the original matrices
-        eigenvalues = eigenvalues.rowRange(0,out_count).clone();
-        eigenvectors = eigenvectors.rowRange(0,out_count).clone();
+        eigenvalues = eigenvalues.ಅಡ್ಡಸಾಲು_Range_2(0,ಹೊರಹೋಗು_ಎಣಿಕೆ).clone();
+        eigenvectors = eigenvectors.ಅಡ್ಡಸಾಲು_Range_2(0,ಹೊರಹೋಗು_ಎಣಿಕೆ).clone();
     }
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-void PCA::write(FileStorage& fs ) const
+ಶೂನ್ಯ PCA::ಲಿಖ(FileStorage& fs ) ಸ್ಥಿರಾಂಕ
 {
     CV_Assert( fs.isOpened() );
 
     fs << "name" << "PCA";
     fs << "vectors" << eigenvectors;
     fs << "values" << eigenvalues;
-    fs << "mean" << mean;
+    fs << "mean" << ಸರಾಸರಿ_2;
 }
 
-void PCA::read(const FileNode& fn)
+ಶೂನ್ಯ PCA::ಪಠ(ಸ್ಥಿರಾಂಕ File_ಗಂಟು& fn)
 {
     CV_Assert( !fn.empty() );
     CV_Assert( (String)fn["name"] == "PCA" );
 
-    cv::read(fn["vectors"], eigenvectors);
-    cv::read(fn["values"], eigenvalues);
-    cv::read(fn["mean"], mean);
+    cv::ಪಠ(fn["vectors"], eigenvectors);
+    cv::ಪಠ(fn["values"], eigenvalues);
+    cv::ಪಠ(fn["mean"], ಸರಾಸರಿ_2);
 }
 
-template <typename T>
-int computeCumulativeEnergy(const Mat& eigenvalues, double retainedVariance)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T>
+ಪೂರ್ಣಾಂಕ computeCumulativeEnergy(ಸ್ಥಿರಾಂಕ Mat& eigenvalues, ದ್ವಿಗುಣ retainedVariance)
 {
-    CV_DbgAssert( eigenvalues.type() == DataType<T>::type );
+    CV_DbgAssert( eigenvalues.type() == ದತ್ತಾಂಶ_Type_2<T>::type );
 
-    Mat g(eigenvalues.size(), DataType<T>::type);
+    Mat g(eigenvalues.size(), ದತ್ತಾಂಶ_Type_2<T>::type);
 
-    for(int ig = 0; ig < g.rows; ig++)
+    ಗಾಗಿ(ಪೂರ್ಣಾಂಕ ig = 0; ig < g.ಅಡ್ಡಸಾಲುಗಳು; ig++)
     {
         g.at<T>(ig, 0) = 0;
-        for(int im = 0; im <= ig; im++)
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ im = 0; im <= ig; im++)
         {
             g.at<T>(ig,0) += eigenvalues.at<T>(im,0);
         }
     }
 
-    int L;
+    ಪೂರ್ಣಾಂಕ L;
 
-    for(L = 0; L < eigenvalues.rows; L++)
+    ಗಾಗಿ(L = 0; L < eigenvalues.ಅಡ್ಡಸಾಲುಗಳು; L++)
     {
-        double energy = g.at<T>(L, 0) / g.at<T>(g.rows - 1, 0);
-        if(energy > retainedVariance)
-            break;
+        ದ್ವಿಗುಣ energy = g.at<T>(L, 0) / g.at<T>(g.ಅಡ್ಡಸಾಲುಗಳು - 1, 0);
+        ಆದರೆ(energy > retainedVariance)
+            ನಿಲ್ಲಿಸು;
     }
 
     L = std::max(2, L);
 
-    return L;
+    ಹಿಂತಿರುಗಿ L;
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double retainedVariance)
+PCA& PCA::ಕ್ರಿಯಾಕಾರಕ()(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ_3, ಒಳಹರಿವು_Array __mean, ಪೂರ್ಣಾಂಕ flags, ದ್ವಿಗುಣ retainedVariance)
 {
-    Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
-    Size mean_sz;
+    Mat ದತ್ತಾಂಶ = ದತ್ತಾಂಶ_3.getMat(), ಸರಾಸರಿ = __mean.getMat();
+    ಪೂರ್ಣಾಂಕ covar_flags = cv::COVAR_SCALE;
+    ಪೂರ್ಣಾಂಕ len, ಒಳ_ಎಣಿಕೆ;
+    ಗಾತ್ರ_2 ಸರಾಸರಿ_sz;
 
-    CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    CV_Assert( ದತ್ತಾಂಶ.channels() == 1 );
+    ಆದರೆ( flags & PCA::ದತ್ತಾಂಶ_AS_ಲಂಬಸಾಲು )
     {
-        len = data.rows;
-        in_count = data.cols;
-        covar_flags |= cv::COVAR_COLS;
-        mean_sz = Size(1, len);
+        len = ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು;
+        ಒಳ_ಎಣಿಕೆ = ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+        covar_flags |= cv::COVAR_ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+        ಸರಾಸರಿ_sz = ಗಾತ್ರ_2(1, len);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        len = data.cols;
-        in_count = data.rows;
-        covar_flags |= cv::COVAR_ROWS;
-        mean_sz = Size(len, 1);
+        len = ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+        ಒಳ_ಎಣಿಕೆ = ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು;
+        covar_flags |= cv::COVAR_ಅಡ್ಡಸಾಲುಗಳು;
+        ಸರಾಸರಿ_sz = ಗಾತ್ರ_2(len, 1);
     }
 
     CV_Assert( retainedVariance > 0 && retainedVariance <= 1 );
 
-    int count = std::min(len, in_count);
+    ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3 = std::min(len, ಒಳ_ಎಣಿಕೆ);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
-        covar_flags |= cv::COVAR_NORMAL;
+    ಆದರೆ( len <= ಒಳ_ಎಣಿಕೆ )
+        covar_flags |= cv::COVAR_ಸಾಮಾನ್ಯ;
 
-    int ctype = std::max(CV_32F, data.depth());
-    mean.create( mean_sz, ctype );
+    ಪೂರ್ಣಾಂಕ ctype = std::max(CV_32F, ದತ್ತಾಂಶ.ಆಳ());
+    ಸರಾಸರಿ_2.create( ಸರಾಸರಿ_sz, ctype );
 
-    Mat covar( count, count, ctype );
+    Mat covar( ಎಣಿಕೆ_3, ಎಣಿಕೆ_3, ctype );
 
-    if( !_mean.empty() )
+    ಆದರೆ( !ಸರಾಸರಿ.empty() )
     {
-        CV_Assert( _mean.size() == mean_sz );
-        _mean.convertTo(mean, ctype);
+        CV_Assert( ಸರಾಸರಿ.size() == ಸರಾಸರಿ_sz );
+        ಸರಾಸರಿ.convert_ಗಮ್ಯ(ಸರಾಸರಿ_2, ctype);
         covar_flags |= cv::COVAR_USE_AVG;
     }
 
-    calcCovarMatrix( data, covar, mean, covar_flags, ctype );
+    calc_Covar_ಮಾತೃಕೆ( ದತ್ತಾಂಶ, covar, ಸರಾಸರಿ_2, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    ಆದರೆ( !(covar_flags & cv::COVAR_ಸಾಮಾನ್ಯ) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
-        Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        Mat tmp_ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ = repeat(ಸರಾಸರಿ_2, ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು/ಸರಾಸರಿ_2.ಅಡ್ಡಸಾಲುಗಳು, ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ/ಸರಾಸರಿ_2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+        ಆದರೆ( ದತ್ತಾಂಶ.type() != ctype || tmp_ಸರಾಸರಿ.ದತ್ತಾಂಶ == ಸರಾಸರಿ_2.ದತ್ತಾಂಶ )
         {
-            data.convertTo( tmp_data, ctype );
-            subtract( tmp_data, tmp_mean, tmp_data );
+            ದತ್ತಾಂಶ.convert_ಗಮ್ಯ( tmp_ದತ್ತಾಂಶ, ctype );
+            ಕಳೆ( tmp_ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ, tmp_ದತ್ತಾಂಶ );
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            subtract( data, tmp_mean, tmp_mean );
-            tmp_data = tmp_mean;
+            ಕಳೆ( ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ, tmp_ಸರಾಸರಿ );
+            tmp_ದತ್ತಾಂಶ = tmp_ಸರಾಸರಿ;
         }
 
-        Mat evects1(count, len, ctype);
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, evects1,
-            (flags & PCA::DATA_AS_COL) ? cv::GEMM_2_T : 0);
+        Mat evects1(ಎಣಿಕೆ_3, len, ctype);
+        gemm( eigenvectors, tmp_ದತ್ತಾಂಶ, 1, Mat(), 0, evects1,
+            (flags & PCA::ದತ್ತಾಂಶ_AS_ಲಂಬಸಾಲು) ? cv::GEMM_2_T : 0);
         eigenvectors = evects1;
 
         // normalize all eigenvectors
-        int i;
-        for( i = 0; i < eigenvectors.rows; i++ )
+        ಪೂರ್ಣಾಂಕ i;
+        ಗಾಗಿ( i = 0; i < eigenvectors.ಅಡ್ಡಸಾಲುಗಳು; i++ )
         {
-            Mat vec = eigenvectors.row(i);
+            Mat vec = eigenvectors.ಅಡ್ಡಸಾಲು(i);
             normalize(vec, vec);
         }
     }
 
     // compute the cumulative energy content for each eigenvector
-    int L;
-    if (ctype == CV_32F)
-        L = computeCumulativeEnergy<float>(eigenvalues, retainedVariance);
-    else
-        L = computeCumulativeEnergy<double>(eigenvalues, retainedVariance);
+    ಪೂರ್ಣಾಂಕ L;
+    ಆದರೆ (ctype == CV_32F)
+        L = computeCumulativeEnergy<ದಶಮಾಂಶ>(eigenvalues, retainedVariance);
+    ಇಲ್ಲದಿದ್ದರೆ
+        L = computeCumulativeEnergy<ದ್ವಿಗುಣ>(eigenvalues, retainedVariance);
 
     // use clone() to physically copy the data and thus deallocate the original matrices
-    eigenvalues = eigenvalues.rowRange(0,L).clone();
-    eigenvectors = eigenvectors.rowRange(0,L).clone();
+    eigenvalues = eigenvalues.ಅಡ್ಡಸಾಲು_Range_2(0,L).clone();
+    eigenvectors = eigenvectors.ಅಡ್ಡಸಾಲು_Range_2(0,L).clone();
 
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-void PCA::project(InputArray _data, OutputArray result) const
+ಶೂನ್ಯ PCA::project(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ_3, OutputArray ಫಲಿತಾಂಶ) ಸ್ಥಿರಾಂಕ
 {
-    Mat data = _data.getMat();
-    CV_Assert( !mean.empty() && !eigenvectors.empty() &&
-        ((mean.rows == 1 && mean.cols == data.cols) || (mean.cols == 1 && mean.rows == data.rows)));
-    Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-    int ctype = mean.type();
-    if( data.type() != ctype || tmp_mean.data == mean.data )
+    Mat ದತ್ತಾಂಶ = ದತ್ತಾಂಶ_3.getMat();
+    CV_Assert( !ಸರಾಸರಿ_2.empty() && !eigenvectors.empty() &&
+        ((ಸರಾಸರಿ_2.ಅಡ್ಡಸಾಲುಗಳು == 1 && ಸರಾಸರಿ_2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) || (ಸರಾಸರಿ_2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 && ಸರಾಸರಿ_2.ಅಡ್ಡಸಾಲುಗಳು == ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು)));
+    Mat tmp_ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ = repeat(ಸರಾಸರಿ_2, ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು/ಸರಾಸರಿ_2.ಅಡ್ಡಸಾಲುಗಳು, ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ/ಸರಾಸರಿ_2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+    ಪೂರ್ಣಾಂಕ ctype = ಸರಾಸರಿ_2.type();
+    ಆದರೆ( ದತ್ತಾಂಶ.type() != ctype || tmp_ಸರಾಸರಿ.ದತ್ತಾಂಶ == ಸರಾಸರಿ_2.ದತ್ತಾಂಶ )
     {
-        data.convertTo( tmp_data, ctype );
-        subtract( tmp_data, tmp_mean, tmp_data );
+        ದತ್ತಾಂಶ.convert_ಗಮ್ಯ( tmp_ದತ್ತಾಂಶ, ctype );
+        ಕಳೆ( tmp_ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ, tmp_ದತ್ತಾಂಶ );
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        subtract( data, tmp_mean, tmp_mean );
-        tmp_data = tmp_mean;
+        ಕಳೆ( ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ, tmp_ಸರಾಸರಿ );
+        tmp_ದತ್ತಾಂಶ = tmp_ಸರಾಸರಿ;
     }
-    if( mean.rows == 1 )
-        gemm( tmp_data, eigenvectors, 1, Mat(), 0, result, GEMM_2_T );
-    else
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, result, 0 );
+    ಆದರೆ( ಸರಾಸರಿ_2.ಅಡ್ಡಸಾಲುಗಳು == 1 )
+        gemm( tmp_ದತ್ತಾಂಶ, eigenvectors, 1, Mat(), 0, ಫಲಿತಾಂಶ, GEMM_2_T );
+    ಇಲ್ಲದಿದ್ದರೆ
+        gemm( eigenvectors, tmp_ದತ್ತಾಂಶ, 1, Mat(), 0, ಫಲಿತಾಂಶ, 0 );
 }
 
-Mat PCA::project(InputArray data) const
+Mat PCA::project(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ) ಸ್ಥಿರಾಂಕ
 {
-    Mat result;
-    project(data, result);
-    return result;
+    Mat ಫಲಿತಾಂಶ;
+    project(ದತ್ತಾಂಶ, ಫಲಿತಾಂಶ);
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-void PCA::backProject(InputArray _data, OutputArray result) const
+ಶೂನ್ಯ PCA::ಹಿಂಭಾಗ_Project(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ_3, OutputArray ಫಲಿತಾಂಶ) ಸ್ಥಿರಾಂಕ
 {
-    Mat data = _data.getMat();
-    CV_Assert( !mean.empty() && !eigenvectors.empty() &&
-        ((mean.rows == 1 && eigenvectors.rows == data.cols) ||
-         (mean.cols == 1 && eigenvectors.rows == data.rows)));
+    Mat ದತ್ತಾಂಶ = ದತ್ತಾಂಶ_3.getMat();
+    CV_Assert( !ಸರಾಸರಿ_2.empty() && !eigenvectors.empty() &&
+        ((ಸರಾಸರಿ_2.ಅಡ್ಡಸಾಲುಗಳು == 1 && eigenvectors.ಅಡ್ಡಸಾಲುಗಳು == ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) ||
+         (ಸರಾಸರಿ_2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 && eigenvectors.ಅಡ್ಡಸಾಲುಗಳು == ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು)));
 
-    Mat tmp_data, tmp_mean;
-    data.convertTo(tmp_data, mean.type());
-    if( mean.rows == 1 )
+    Mat tmp_ದತ್ತಾಂಶ, tmp_ಸರಾಸರಿ;
+    ದತ್ತಾಂಶ.convert_ಗಮ್ಯ(tmp_ದತ್ತಾಂಶ, ಸರಾಸರಿ_2.type());
+    ಆದರೆ( ಸರಾಸರಿ_2.ಅಡ್ಡಸಾಲುಗಳು == 1 )
     {
-        tmp_mean = repeat(mean, data.rows, 1);
-        gemm( tmp_data, eigenvectors, 1, tmp_mean, 1, result, 0 );
+        tmp_ಸರಾಸರಿ = repeat(ಸರಾಸರಿ_2, ದತ್ತಾಂಶ.ಅಡ್ಡಸಾಲುಗಳು, 1);
+        gemm( tmp_ದತ್ತಾಂಶ, eigenvectors, 1, tmp_ಸರಾಸರಿ, 1, ಫಲಿತಾಂಶ, 0 );
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        tmp_mean = repeat(mean, 1, data.cols);
-        gemm( eigenvectors, tmp_data, 1, tmp_mean, 1, result, GEMM_1_T );
+        tmp_ಸರಾಸರಿ = repeat(ಸರಾಸರಿ_2, 1, ದತ್ತಾಂಶ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+        gemm( eigenvectors, tmp_ದತ್ತಾಂಶ, 1, tmp_ಸರಾಸರಿ, 1, ಫಲಿತಾಂಶ, GEMM_1_T );
     }
 }
 
-Mat PCA::backProject(InputArray data) const
+Mat PCA::ಹಿಂಭಾಗ_Project(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ) ಸ್ಥಿರಾಂಕ
 {
-    Mat result;
-    backProject(data, result);
-    return result;
+    Mat ಫಲಿತಾಂಶ;
+    ಹಿಂಭಾಗ_Project(ದತ್ತಾಂಶ, ಫಲಿತಾಂಶ);
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, int maxComponents)
+ಶೂನ್ಯ cv::PCACompute(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ, ಒಳಹರಿವು_Output_Array ಸರಾಸರಿ_2,
+                    OutputArray eigenvectors, ಪೂರ್ಣಾಂಕ maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, maxComponents);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
+    pca(ದತ್ತಾಂಶ, ಸರಾಸರಿ_2, 0, maxComponents);
+    pca.ಸರಾಸರಿ_2.copy_ಗಮ್ಯ(ಸರಾಸರಿ_2);
+    pca.eigenvectors.copy_ಗಮ್ಯ(eigenvectors);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
+ಶೂನ್ಯ cv::PCACompute(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ, ಒಳಹರಿವು_Output_Array ಸರಾಸರಿ_2,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    int maxComponents)
+                    ಪೂರ್ಣಾಂಕ maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, maxComponents);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
-    pca.eigenvalues.copyTo(eigenvalues);
+    pca(ದತ್ತಾಂಶ, ಸರಾಸರಿ_2, 0, maxComponents);
+    pca.ಸರಾಸರಿ_2.copy_ಗಮ್ಯ(ಸರಾಸರಿ_2);
+    pca.eigenvectors.copy_ಗಮ್ಯ(eigenvectors);
+    pca.eigenvalues.copy_ಗಮ್ಯ(eigenvalues);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, double retainedVariance)
+ಶೂನ್ಯ cv::PCACompute(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ, ಒಳಹರಿವು_Output_Array ಸರಾಸರಿ_2,
+                    OutputArray eigenvectors, ದ್ವಿಗುಣ retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, retainedVariance);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
+    pca(ದತ್ತಾಂಶ, ಸರಾಸರಿ_2, 0, retainedVariance);
+    pca.ಸರಾಸರಿ_2.copy_ಗಮ್ಯ(ಸರಾಸರಿ_2);
+    pca.eigenvectors.copy_ಗಮ್ಯ(eigenvectors);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
+ಶೂನ್ಯ cv::PCACompute(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ, ಒಳಹರಿವು_Output_Array ಸರಾಸರಿ_2,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    double retainedVariance)
+                    ದ್ವಿಗುಣ retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, retainedVariance);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
-    pca.eigenvalues.copyTo(eigenvalues);
+    pca(ದತ್ತಾಂಶ, ಸರಾಸರಿ_2, 0, retainedVariance);
+    pca.ಸರಾಸರಿ_2.copy_ಗಮ್ಯ(ಸರಾಸರಿ_2);
+    pca.eigenvectors.copy_ಗಮ್ಯ(eigenvectors);
+    pca.eigenvalues.copy_ಗಮ್ಯ(eigenvalues);
 }
 
-void cv::PCAProject(InputArray data, InputArray mean,
-                    InputArray eigenvectors, OutputArray result)
+ಶೂನ್ಯ cv::PCAProject(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ, ಒಳಹರಿವು_Array ಸರಾಸರಿ_2,
+                    ಒಳಹರಿವು_Array eigenvectors, OutputArray ಫಲಿತಾಂಶ)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca.mean = mean.getMat();
+    pca.ಸರಾಸರಿ_2 = ಸರಾಸರಿ_2.getMat();
     pca.eigenvectors = eigenvectors.getMat();
-    pca.project(data, result);
+    pca.project(ದತ್ತಾಂಶ, ಫಲಿತಾಂಶ);
 }
 
-void cv::PCABackProject(InputArray data, InputArray mean,
-                    InputArray eigenvectors, OutputArray result)
+ಶೂನ್ಯ cv::PCABackProject(ಒಳಹರಿವು_Array ದತ್ತಾಂಶ, ಒಳಹರಿವು_Array ಸರಾಸರಿ_2,
+                    ಒಳಹರಿವು_Array eigenvectors, OutputArray ಫಲಿತಾಂಶ)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca.mean = mean.getMat();
+    pca.ಸರಾಸರಿ_2 = ಸರಾಸರಿ_2.getMat();
     pca.eigenvectors = eigenvectors.getMat();
-    pca.backProject(data, result);
+    pca.ಹಿಂಭಾಗ_Project(ದತ್ತಾಂಶ, ಫಲಿತಾಂಶ);
 }

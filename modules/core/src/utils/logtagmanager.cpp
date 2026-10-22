@@ -2,40 +2,40 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
-#include "logtagmanager.hpp"
-#include "logtagconfigparser.hpp"
+#ಅನ್ತರ್ಭಾವ "../precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "logtagmanager.hpp"
+#ಅನ್ತರ್ಭಾವ "logtagconfigparser.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
-
-
-const char* LogTagManager::m_globalName = "global";
+ನಾಮಾಕಾಶ cv {
+ನಾಮಾಕಾಶ utils {
+ನಾಮಾಕಾಶ logging {
 
 
-LogTagManager::LogTagManager(LogLevel defaultUnconfiguredGlobalLevel)
+ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* Log_ಟ್ಯಾಗ್_Manager::m_globalName = "global";
+
+
+Log_ಟ್ಯಾಗ್_Manager::Log_ಟ್ಯಾಗ್_Manager(LogLevel defaultUnconfiguredGlobalLevel)
     : m_mutex()
-    , m_globalLogTag(new LogTag(m_globalName, defaultUnconfiguredGlobalLevel))
-    , m_config(std::make_shared<LogTagConfigParser>(defaultUnconfiguredGlobalLevel))
+    , m_global_Log_ಟ್ಯಾಗ್(ಹೊಸ Log_ಟ್ಯಾಗ್(m_globalName, defaultUnconfiguredGlobalLevel))
+    , m_config(std::make_shared<Log_ಟ್ಯಾಗ್_Config_Parser>(defaultUnconfiguredGlobalLevel))
 {
-    assign(m_globalName, m_globalLogTag.get());
+    assign(m_globalName, m_global_Log_ಟ್ಯಾಗ್.get());
 }
 
-LogTagManager::~LogTagManager()
+Log_ಟ್ಯಾಗ್_Manager::~Log_ಟ್ಯಾಗ್_Manager()
 {
 }
 
-void LogTagManager::setConfigString(const std::string& configString, bool apply /*true*/)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::ಗಣ_Config_String(ಸ್ಥಿರಾಂಕ std::string& configString, ತಾರ್ಕಿಕ apply /*true*/)
 {
     m_config->parse(configString);
-    if (m_config->hasMalformed())
+    ಆದರೆ (m_config->hasMalformed())
     {
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    if (!apply)
+    ಆದರೆ (!apply)
     {
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
     // The following code is arranged with "priority by overwriting",
     // where when the same log tag has multiple matches, the last code
@@ -46,383 +46,383 @@ void LogTagManager::setConfigString(const std::string& configString, bool apply 
     // Matching by any name part has moderate priority.
     // Matching by first name part (prefix) has lowest priority.
     //
-    const auto& globalConfig = m_config->getGlobalConfig();
-    m_globalLogTag->level = globalConfig.level;
-    for (const auto& config : m_config->getFirstPartConfigs())
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& globalConfig = m_config->getGlobalConfig();
+    m_global_Log_ಟ್ಯಾಗ್->level = globalConfig.level;
+    ಗಾಗಿ (ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& config : m_config->get_ಮೊದಲ_Part_Configs())
     {
-        setLevelByFirstPart(config.namePart, config.level);
+        ಗಣ_Level_By_ಮೊದಲ_Part(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getAnyPartConfigs())
+    ಗಾಗಿ (ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& config : m_config->getAnyPartConfigs())
     {
-        setLevelByAnyPart(config.namePart, config.level);
+        ಗಣ_Level_By_Any_Part(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getFullNameConfigs())
+    ಗಾಗಿ (ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& config : m_config->get_ತುಂಬಿದ_Name_Configs())
     {
-        setLevelByFullName(config.namePart, config.level);
+        ಗಣ_Level_By_ತುಂಬಿದ_Name(config.namePart, config.level);
     }
 }
 
-LogTagConfigParser& LogTagManager::getConfigParser() const
+Log_ಟ್ಯಾಗ್_Config_Parser& Log_ಟ್ಯಾಗ್_Manager::getConfigParser() ಸ್ಥಿರಾಂಕ
 {
-    return *m_config;
+    ಹಿಂತಿರುಗಿ *m_config;
 }
 
-void LogTagManager::assign(const std::string& fullName, LogTag* ptr)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::assign(ಸ್ಥಿರಾಂಕ std::string& ತುಂಬಿದ_Name, Log_ಟ್ಯಾಗ್* ptr)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    FullNameLookupResult result(fullName);
-    result.m_findCrossReferences = true;
-    m_nameTable.addOrLookupFullName(result);
-    FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
-    const bool isPtrChanged = (fullNameInfo.logTagPtr != ptr);
-    if (!isPtrChanged)
+    ಬೀಗ_Type lock(m_mutex);
+    ತುಂಬಿದ_Name_Lookup_ಫಲಿತಾಂಶ ಫಲಿತಾಂಶ(ತುಂಬಿದ_Name);
+    ಫಲಿತಾಂಶ.m_ಕಂಡುಹಿಡಿ_Cross_References = ನಿಜ;
+    m_name_ಕೋಷ್ಟಕ.ಕೂಡಿಸು_Or_Lookup_ತುಂಬಿದ_Name(ಫಲಿತಾಂಶ);
+    ತುಂಬಿದ_Name_Info& ತುಂಬಿದ_Name_Info_2 = *ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name_Info_Ptr;
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ is_Ptr_ಬದಲಾಯಿತು = (ತುಂಬಿದ_Name_Info_2.log_ಟ್ಯಾಗ್_Ptr != ptr);
+    ಆದರೆ (!is_Ptr_ಬದಲಾಯಿತು)
     {
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    fullNameInfo.logTagPtr = ptr;
-    if (!ptr)
+    ತುಂಬಿದ_Name_Info_2.log_ಟ್ಯಾಗ್_Ptr = ptr;
+    ಆದರೆ (!ptr)
     {
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    const bool hasAppliedFullNameConfig = internal_applyFullNameConfigToTag(fullNameInfo);
-    if (hasAppliedFullNameConfig)
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ has_Applied_ತುಂಬಿದ_Name_Config = ಆಂತರಿಕ_apply_ತುಂಬಿದ_Name_Config_ಗಮ್ಯ_ಟ್ಯಾಗ್(ತುಂಬಿದ_Name_Info_2);
+    ಆದರೆ (has_Applied_ತುಂಬಿದ_Name_Config)
     {
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    internal_applyNamePartConfigToSpecificTag(result);
+    ಆಂತರಿಕ_apply_Name_Part_Config_ಗಮ್ಯ_Specific_ಟ್ಯಾಗ್(ಫಲಿತಾಂಶ);
 }
 
-void LogTagManager::unassign(const std::string& fullName)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::unassign(ಸ್ಥಿರಾಂಕ std::string& ತುಂಬಿದ_Name)
 {
     // Lock is inside assign() method.
-    assign(fullName, nullptr);
+    assign(ತುಂಬಿದ_Name, ಶೂನ್ಯಸೂಚಕ);
 }
 
-LogTag* LogTagManager::get(const std::string& fullName)
+Log_ಟ್ಯಾಗ್* Log_ಟ್ಯಾಗ್_Manager::get(ಸ್ಥಿರಾಂಕ std::string& ತುಂಬಿದ_Name)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    FullNameInfo* fullNameInfoPtr = m_nameTable.getFullNameInfo(fullName);
-    if (fullNameInfoPtr && fullNameInfoPtr->logTagPtr)
+    ಬೀಗ_Type lock(m_mutex);
+    ತುಂಬಿದ_Name_Info* ತುಂಬಿದ_Name_Info_Ptr = m_name_ಕೋಷ್ಟಕ.get_ತುಂಬಿದ_Name_Info(ತುಂಬಿದ_Name);
+    ಆದರೆ (ತುಂಬಿದ_Name_Info_Ptr && ತುಂಬಿದ_Name_Info_Ptr->log_ಟ್ಯಾಗ್_Ptr)
     {
-        return fullNameInfoPtr->logTagPtr;
+        ಹಿಂತಿರುಗಿ ತುಂಬಿದ_Name_Info_Ptr->log_ಟ್ಯಾಗ್_Ptr;
     }
-    return nullptr;
+    ಹಿಂತಿರುಗಿ ಶೂನ್ಯಸೂಚಕ;
 }
 
-void LogTagManager::setLevelByFullName(const std::string& fullName, LogLevel level)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::ಗಣ_Level_By_ತುಂಬಿದ_Name(ಸ್ಥಿರಾಂಕ std::string& ತುಂಬಿದ_Name, LogLevel level)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    FullNameLookupResult result(fullName);
-    result.m_findCrossReferences = false;
-    m_nameTable.addOrLookupFullName(result);
-    FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full &&
-        fullNameInfo.parsedLevel.level == level)
+    ಬೀಗ_Type lock(m_mutex);
+    ತುಂಬಿದ_Name_Lookup_ಫಲಿತಾಂಶ ಫಲಿತಾಂಶ(ತುಂಬಿದ_Name);
+    ಫಲಿತಾಂಶ.m_ಕಂಡುಹಿಡಿ_Cross_References = ಸುಳ್ಳು;
+    m_name_ಕೋಷ್ಟಕ.ಕೂಡಿಸು_Or_Lookup_ತುಂಬಿದ_Name(ಫಲಿತಾಂಶ);
+    ತುಂಬಿದ_Name_Info& ತುಂಬಿದ_Name_Info_2 = *ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name_Info_Ptr;
+    ಆದರೆ (ತುಂಬಿದ_Name_Info_2.parsedLevel.scope == MatchingScope::ತುಂಬಿದ_2 &&
+        ತುಂಬಿದ_Name_Info_2.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
     // update the cached configured value.
-    fullNameInfo.parsedLevel.scope = MatchingScope::Full;
-    fullNameInfo.parsedLevel.level = level;
+    ತುಂಬಿದ_Name_Info_2.parsedLevel.scope = MatchingScope::ತುಂಬಿದ_2;
+    ತುಂಬಿದ_Name_Info_2.parsedLevel.level = level;
     // update the actual tag, if already registered.
-    LogTag* logTagPtr = fullNameInfo.logTagPtr;
-    if (logTagPtr)
+    Log_ಟ್ಯಾಗ್* log_ಟ್ಯಾಗ್_Ptr = ತುಂಬಿದ_Name_Info_2.log_ಟ್ಯಾಗ್_Ptr;
+    ಆದರೆ (log_ಟ್ಯಾಗ್_Ptr)
     {
-        logTagPtr->level = level;
+        log_ಟ್ಯಾಗ್_Ptr->level = level;
     }
 }
 
-void LogTagManager::setLevelByFirstPart(const std::string& firstPart, LogLevel level)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::ಗಣ_Level_By_ಮೊದಲ_Part(ಸ್ಥಿರಾಂಕ std::string& ಮೊದಲ_Part, LogLevel level)
 {
     // Lock is inside setLevelByNamePart() method.
-    setLevelByNamePart(firstPart, level, MatchingScope::FirstNamePart);
+    ಗಣ_Level_By_Name_Part(ಮೊದಲ_Part, level, MatchingScope::ಮೊದಲ_Name_Part);
 }
 
-void LogTagManager::setLevelByAnyPart(const std::string& anyPart, LogLevel level)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::ಗಣ_Level_By_Any_Part(ಸ್ಥಿರಾಂಕ std::string& anyPart, LogLevel level)
 {
     // Lock is inside setLevelByNamePart() method.
-    setLevelByNamePart(anyPart, level, MatchingScope::AnyNamePart);
+    ಗಣ_Level_By_Name_Part(anyPart, level, MatchingScope::AnyNamePart);
 }
 
-void LogTagManager::setLevelByNamePart(const std::string& namePart, LogLevel level, MatchingScope scope)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::ಗಣ_Level_By_Name_Part(ಸ್ಥಿರಾಂಕ std::string& namePart, LogLevel level, MatchingScope scope)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    NamePartLookupResult result(namePart);
-    result.m_findCrossReferences = true;
-    m_nameTable.addOrLookupNamePart(result);
-    NamePartInfo& namePartInfo = *result.m_namePartInfoPtr;
-    if (namePartInfo.parsedLevel.scope == scope &&
+    ಬೀಗ_Type lock(m_mutex);
+    Name_Part_Lookup_ಫಲಿತಾಂಶ ಫಲಿತಾಂಶ(namePart);
+    ಫಲಿತಾಂಶ.m_ಕಂಡುಹಿಡಿ_Cross_References = ನಿಜ;
+    m_name_ಕೋಷ್ಟಕ.ಕೂಡಿಸು_Or_Lookup_Name_Part(ಫಲಿತಾಂಶ);
+    NamePartInfo& namePartInfo = *ಫಲಿತಾಂಶ.m_namePartInfoPtr;
+    ಆದರೆ (namePartInfo.parsedLevel.scope == scope &&
         namePartInfo.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
     namePartInfo.parsedLevel.scope = scope;
     namePartInfo.parsedLevel.level = level;
-    internal_applyNamePartConfigToMatchingTags(result);
+    ಆಂತರಿಕ_apply_Name_Part_Config_ಗಮ್ಯ_Matching_ಟ್ಯಾಗುಗಳು(ಫಲಿತಾಂಶ);
 }
 
-std::vector<std::string> LogTagManager::splitNameParts(const std::string& fullName)
+std::vector<std::string> Log_ಟ್ಯಾಗ್_Manager::ವಿಭಜಿಸು_Name_Parts(ಸ್ಥಿರಾಂಕ std::string& ತುಂಬಿದ_Name)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = fullName.length();
+    ಸ್ಥಿರಾಂಕ size_t npos = std::string::npos;
+    ಸ್ಥಿರಾಂಕ size_t len = ತುಂಬಿದ_Name.length();
     std::vector<std::string> nameParts;
-    size_t start = 0u;
-    while (start < len)
+    size_t ಆರಂಭ = 0u;
+    ಆಗ (ಆರಂಭ < len)
     {
-        size_t nextPeriod = fullName.find('.', start);
-        if (nextPeriod == npos)
+        size_t ಮುಂದಿನ_Period = ತುಂಬಿದ_Name.find('.', ಆರಂಭ);
+        ಆದರೆ (ಮುಂದಿನ_Period == npos)
         {
-            nextPeriod = len;
+            ಮುಂದಿನ_Period = len;
         }
-        if (nextPeriod >= start + 1u)
+        ಆದರೆ (ಮುಂದಿನ_Period >= ಆರಂಭ + 1u)
         {
-            nameParts.emplace_back(fullName.substr(start, nextPeriod - start));
+            nameParts.emplace_back(ತುಂಬಿದ_Name.substr(ಆರಂಭ, ಮುಂದಿನ_Period - ಆರಂಭ));
         }
-        start = nextPeriod + 1u;
+        ಆರಂಭ = ಮುಂದಿನ_Period + 1u;
     }
-    return nameParts;
+    ಹಿಂತಿರುಗಿ nameParts;
 }
 
-bool LogTagManager::internal_isNamePartMatch(MatchingScope scope, size_t matchingPos)
+ತಾರ್ಕಿಕ Log_ಟ್ಯಾಗ್_Manager::ಆಂತರಿಕ_is_Name_Part_ಹೊಂದಿಕೆ(MatchingScope scope, size_t matchingPos)
 {
-    switch (scope)
+    ಆಯ್ಕೆ (scope)
     {
-    case MatchingScope::FirstNamePart:
-        return (matchingPos == 0u);
-    case MatchingScope::AnyNamePart:
-        return true;
-    case MatchingScope::None:
-    case MatchingScope::Full:
-    default:
-        return false;
+    ಸ್ಥಿತಿ MatchingScope::ಮೊದಲ_Name_Part:
+        ಹಿಂತಿರುಗಿ (matchingPos == 0u);
+    ಸ್ಥಿತಿ MatchingScope::AnyNamePart:
+        ಹಿಂತಿರುಗಿ ನಿಜ;
+    ಸ್ಥಿತಿ MatchingScope::None:
+    ಸ್ಥಿತಿ MatchingScope::ತುಂಬಿದ_2:
+    ಪೂರ್ವನಿಯೋಜಿತ:
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
 }
 
-bool LogTagManager::internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo)
+ತಾರ್ಕಿಕ Log_ಟ್ಯಾಗ್_Manager::ಆಂತರಿಕ_apply_ತುಂಬಿದ_Name_Config_ಗಮ್ಯ_ಟ್ಯಾಗ್(ತುಂಬಿದ_Name_Info& ತುಂಬಿದ_Name_Info_2)
 {
-    if (!fullNameInfo.logTagPtr)
+    ಆದರೆ (!ತುಂಬಿದ_Name_Info_2.log_ಟ್ಯಾಗ್_Ptr)
     {
-        return false;
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+    ಆದರೆ (ತುಂಬಿದ_Name_Info_2.parsedLevel.scope == MatchingScope::ತುಂಬಿದ_2)
     {
-        fullNameInfo.logTagPtr->level = fullNameInfo.parsedLevel.level;
-        return true;
+        ತುಂಬಿದ_Name_Info_2.log_ಟ್ಯಾಗ್_Ptr->level = ತುಂಬಿದ_Name_Info_2.parsedLevel.level;
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
-    return false;
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 }
 
-bool LogTagManager::internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult)
+ತಾರ್ಕಿಕ Log_ಟ್ಯಾಗ್_Manager::ಆಂತರಿಕ_apply_Name_Part_Config_ಗಮ್ಯ_Specific_ಟ್ಯಾಗ್(ತುಂಬಿದ_Name_Lookup_ಫಲಿತಾಂಶ& ತುಂಬಿದ_Name_ಫಲಿತಾಂಶ)
 {
-    const FullNameInfo& fullNameInfo = *fullNameResult.m_fullNameInfoPtr;
-    LogTag* const logTag = fullNameInfo.logTagPtr;
-    if (!logTag)
+    ಸ್ಥಿರಾಂಕ ತುಂಬಿದ_Name_Info& ತುಂಬಿದ_Name_Info_2 = *ತುಂಬಿದ_Name_ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name_Info_Ptr;
+    Log_ಟ್ಯಾಗ್* ಸ್ಥಿರಾಂಕ log_ಟ್ಯಾಗ್ = ತುಂಬಿದ_Name_Info_2.log_ಟ್ಯಾಗ್_Ptr;
+    ಆದರೆ (!log_ಟ್ಯಾಗ್)
     {
-        return false;
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
-    CV_Assert(fullNameResult.m_findCrossReferences);
-    const auto& crossReferences = fullNameResult.m_crossReferences;
-    const size_t matchingNamePartCount = crossReferences.size();
-    for (size_t k = 0u; k < matchingNamePartCount; ++k)
+    CV_Assert(ತುಂಬಿದ_Name_ಫಲಿತಾಂಶ.m_ಕಂಡುಹಿಡಿ_Cross_References);
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& crossReferences = ತುಂಬಿದ_Name_ಫಲಿತಾಂಶ.m_crossReferences;
+    ಸ್ಥಿರಾಂಕ size_t matching_Name_Part_ಎಣಿಕೆ = crossReferences.size();
+    ಗಾಗಿ (size_t k = 0u; k < matching_Name_Part_ಎಣಿಕೆ; ++k)
     {
-        const auto& match = crossReferences.at(k);
-        const auto& namePartInfo = *match.m_namePartInfo;
-        const auto& parsedLevel = namePartInfo.parsedLevel;
-        const auto scope = parsedLevel.scope;
-        const LogLevel level = parsedLevel.level;
-        const size_t matchingPos = match.m_matchingPos;
-        const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (isMatch)
+        ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& ಹೊಂದಿಕೆ = crossReferences.at(k);
+        ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& namePartInfo = *ಹೊಂದಿಕೆ.m_namePartInfo;
+        ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& parsedLevel = namePartInfo.parsedLevel;
+        ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ scope = parsedLevel.scope;
+        ಸ್ಥಿರಾಂಕ LogLevel level = parsedLevel.level;
+        ಸ್ಥಿರಾಂಕ size_t matchingPos = ಹೊಂದಿಕೆ.m_matchingPos;
+        ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ is_ಹೊಂದಿಕೆ = ಆಂತರಿಕ_is_Name_Part_ಹೊಂದಿಕೆ(scope, matchingPos);
+        ಆದರೆ (is_ಹೊಂದಿಕೆ)
         {
-            logTag->level = level;
-            return true;
+            log_ಟ್ಯಾಗ್->level = level;
+            ಹಿಂತಿರುಗಿ ನಿಜ;
         }
     }
-    return false;
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 }
 
-void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::ಆಂತರಿಕ_apply_Name_Part_Config_ಗಮ್ಯ_Matching_ಟ್ಯಾಗುಗಳು(Name_Part_Lookup_ಫಲಿತಾಂಶ& name_Part_ಫಲಿತಾಂಶ)
 {
-    CV_Assert(namePartResult.m_findCrossReferences);
-    const auto& crossReferences = namePartResult.m_crossReferences;
-    const size_t matchingFullNameCount = crossReferences.size();
-    NamePartInfo& namePartInfo = *namePartResult.m_namePartInfoPtr;
-    const MatchingScope scope = namePartInfo.parsedLevel.scope;
-    CV_Assert(scope != MatchingScope::Full);
-    if (scope == MatchingScope::None)
+    CV_Assert(name_Part_ಫಲಿತಾಂಶ.m_ಕಂಡುಹಿಡಿ_Cross_References);
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& crossReferences = name_Part_ಫಲಿತಾಂಶ.m_crossReferences;
+    ಸ್ಥಿರಾಂಕ size_t matching_ತುಂಬಿದ_Name_ಎಣಿಕೆ = crossReferences.size();
+    NamePartInfo& namePartInfo = *name_Part_ಫಲಿತಾಂಶ.m_namePartInfoPtr;
+    ಸ್ಥಿರಾಂಕ MatchingScope scope = namePartInfo.parsedLevel.scope;
+    CV_Assert(scope != MatchingScope::ತುಂಬಿದ_2);
+    ಆದರೆ (scope == MatchingScope::None)
     {
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    const LogLevel level = namePartInfo.parsedLevel.level;
-    for (size_t k = 0u; k < matchingFullNameCount; ++k)
+    ಸ್ಥಿರಾಂಕ LogLevel level = namePartInfo.parsedLevel.level;
+    ಗಾಗಿ (size_t k = 0u; k < matching_ತುಂಬಿದ_Name_ಎಣಿಕೆ; ++k)
     {
-        const auto& match = crossReferences.at(k);
-        FullNameInfo& fullNameInfo = *match.m_fullNameInfo;
-        LogTag* logTagPtr = fullNameInfo.logTagPtr;
-        if (!logTagPtr)
+        ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& ಹೊಂದಿಕೆ = crossReferences.at(k);
+        ತುಂಬಿದ_Name_Info& ತುಂಬಿದ_Name_Info_2 = *ಹೊಂದಿಕೆ.m_ತುಂಬಿದ_Name_Info;
+        Log_ಟ್ಯಾಗ್* log_ಟ್ಯಾಗ್_Ptr = ತುಂಬಿದ_Name_Info_2.log_ಟ್ಯಾಗ್_Ptr;
+        ಆದರೆ (!log_ಟ್ಯಾಗ್_Ptr)
         {
-            continue;
+            ಮುಂದುವರಿ;
         }
-        if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+        ಆದರೆ (ತುಂಬಿದ_Name_Info_2.parsedLevel.scope == MatchingScope::ತುಂಬಿದ_2)
         {
             // If the full name already has valid config, that full name config
             // has precedence over name part config.
-            continue;
+            ಮುಂದುವರಿ;
         }
-        const size_t matchingPos = match.m_matchingPos;
-        const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (!isMatch)
+        ಸ್ಥಿರಾಂಕ size_t matchingPos = ಹೊಂದಿಕೆ.m_matchingPos;
+        ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ is_ಹೊಂದಿಕೆ = ಆಂತರಿಕ_is_Name_Part_ಹೊಂದಿಕೆ(scope, matchingPos);
+        ಆದರೆ (!is_ಹೊಂದಿಕೆ)
         {
-            continue;
+            ಮುಂದುವರಿ;
         }
-        logTagPtr->level = level;
+        log_ಟ್ಯಾಗ್_Ptr->level = level;
     }
 }
 
-void LogTagManager::NameTable::addOrLookupFullName(FullNameLookupResult& result)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಕೂಡಿಸು_Or_Lookup_ತುಂಬಿದ_Name(ತುಂಬಿದ_Name_Lookup_ಫಲಿತಾಂಶ& ಫಲಿತಾಂಶ)
 {
-    const auto fullNameIdAndFlag = internal_addOrLookupFullName(result.m_fullName);
-    result.m_fullNameId = fullNameIdAndFlag.first;
-    result.m_nameParts = LogTagManager::splitNameParts(result.m_fullName);
-    internal_addOrLookupNameParts(result.m_nameParts, result.m_namePartIds);
-    const bool isNew = fullNameIdAndFlag.second;
-    if (isNew)
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ ತುಂಬಿದ_Name_Id_And_Flag = ಆಂತರಿಕ_ಕೂಡಿಸು_Or_Lookup_ತುಂಬಿದ_Name(ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name);
+    ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name_Id = ತುಂಬಿದ_Name_Id_And_Flag.first;
+    ಫಲಿತಾಂಶ.m_nameParts = Log_ಟ್ಯಾಗ್_Manager::ವಿಭಜಿಸು_Name_Parts(ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name);
+    ಆಂತರಿಕ_ಕೂಡಿಸು_Or_Lookup_Name_Parts(ಫಲಿತಾಂಶ.m_nameParts, ಫಲಿತಾಂಶ.m_namePartIds);
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ isNew = ತುಂಬಿದ_Name_Id_And_Flag.second;
+    ಆದರೆ (isNew)
     {
-        internal_addCrossReference(result.m_fullNameId, result.m_namePartIds);
+        ಆಂತರಿಕ_ಕೂಡಿಸು_Cross_Reference(ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name_Id, ಫಲಿತಾಂಶ.m_namePartIds);
     }
     // ====== IMPORTANT ====== Critical order-of-operation ======
     // The gathering of the pointers of FullNameInfo and NamePartInfo are performed
     // as the last step of the operation, so that these pointer are not invalidated
     // by the vector append operations earlier in this function.
     // ======
-    result.m_fullNameInfoPtr = internal_getFullNameInfo(result.m_fullNameId);
-    if (result.m_findCrossReferences)
+    ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name_Info_Ptr = ಆಂತರಿಕ_get_ತುಂಬಿದ_Name_Info(ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name_Id);
+    ಆದರೆ (ಫಲಿತಾಂಶ.m_ಕಂಡುಹಿಡಿ_Cross_References)
     {
-        internal_findMatchingNamePartsForFullName(result);
+        ಆಂತರಿಕ_ಕಂಡುಹಿಡಿ_Matching_Name_Parts_For_ತುಂಬಿದ_Name(ಫಲಿತಾಂಶ);
     }
 }
 
-void LogTagManager::NameTable::addOrLookupNamePart(NamePartLookupResult& result)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಕೂಡಿಸು_Or_Lookup_Name_Part(Name_Part_Lookup_ಫಲಿತಾಂಶ& ಫಲಿತಾಂಶ)
 {
-    result.m_namePartId = internal_addOrLookupNamePart(result.m_namePart);
-    result.m_namePartInfoPtr = internal_getNamePartInfo(result.m_namePartId);
-    if (result.m_findCrossReferences)
+    ಫಲಿತಾಂಶ.m_namePartId = ಆಂತರಿಕ_ಕೂಡಿಸು_Or_Lookup_Name_Part(ಫಲಿತಾಂಶ.m_namePart);
+    ಫಲಿತಾಂಶ.m_namePartInfoPtr = ಆಂತರಿಕ_get_Name_Part_Info(ಫಲಿತಾಂಶ.m_namePartId);
+    ಆದರೆ (ಫಲಿತಾಂಶ.m_ಕಂಡುಹಿಡಿ_Cross_References)
     {
-        internal_findMatchingFullNamesForNamePart(result);
+        ಆಂತರಿಕ_ಕಂಡುಹಿಡಿ_Matching_ತುಂಬಿದ_ಹೆಸರುಗಳು_For_Name_Part(ಫಲಿತಾಂಶ);
     }
 }
 
-std::pair<size_t, bool> LogTagManager::NameTable::internal_addOrLookupFullName(const std::string& fullName)
+std::pair<size_t, ತಾರ್ಕಿಕ> Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಆಂತರಿಕ_ಕೂಡಿಸು_Or_Lookup_ತುಂಬಿದ_Name(ಸ್ಥಿರಾಂಕ std::string& ತುಂಬಿದ_Name)
 {
-    const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter != m_fullNameIds.end())
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ ತುಂಬಿದ_Name_Id_Iter = m_ತುಂಬಿದ_Name_Ids.find(ತುಂಬಿದ_Name);
+    ಆದರೆ (ತುಂಬಿದ_Name_Id_Iter != m_ತುಂಬಿದ_Name_Ids.end())
     {
-        return std::make_pair(fullNameIdIter->second, false);
+        ಹಿಂತಿರುಗಿ std::make_pair(ತುಂಬಿದ_Name_Id_Iter->second, ಸುಳ್ಳು);
     }
-    const size_t fullNameId = m_fullNameInfos.size();
-    m_fullNameInfos.emplace_back(FullNameInfo{});
-    m_fullNameIds.emplace(fullName, fullNameId);
-    return std::make_pair(fullNameId, true);
+    ಸ್ಥಿರಾಂಕ size_t ತುಂಬಿದ_Name_Id = m_ತುಂಬಿದ_Name_Infos.size();
+    m_ತುಂಬಿದ_Name_Infos.emplace_back(ತುಂಬಿದ_Name_Info{});
+    m_ತುಂಬಿದ_Name_Ids.emplace(ತುಂಬಿದ_Name, ತುಂಬಿದ_Name_Id);
+    ಹಿಂತಿರುಗಿ std::make_pair(ತುಂಬಿದ_Name_Id, ನಿಜ);
 }
 
-void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<std::string>& nameParts,
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಆಂತರಿಕ_ಕೂಡಿಸು_Or_Lookup_Name_Parts(ಸ್ಥಿರಾಂಕ std::vector<std::string>& nameParts,
     std::vector<size_t>& namePartIds)
 {
-    const size_t namePartCount = nameParts.size();
-    namePartIds.resize(namePartCount, ~(size_t)0u);
-    for (size_t namePartIndex = 0u; namePartIndex < namePartCount; ++namePartIndex)
+    ಸ್ಥಿರಾಂಕ size_t name_Part_ಎಣಿಕೆ = nameParts.size();
+    namePartIds.resize(name_Part_ಎಣಿಕೆ, ~(size_t)0u);
+    ಗಾಗಿ (size_t name_Part_ಸೂಚ್ಯಂಕ = 0u; name_Part_ಸೂಚ್ಯಂಕ < name_Part_ಎಣಿಕೆ; ++name_Part_ಸೂಚ್ಯಂಕ)
     {
-        const std::string& namePart = nameParts.at(namePartIndex);
-        const size_t namePartId = internal_addOrLookupNamePart(namePart);
-        namePartIds.at(namePartIndex) = namePartId;
+        ಸ್ಥಿರಾಂಕ std::string& namePart = nameParts.at(name_Part_ಸೂಚ್ಯಂಕ);
+        ಸ್ಥಿರಾಂಕ size_t namePartId = ಆಂತರಿಕ_ಕೂಡಿಸು_Or_Lookup_Name_Part(namePart);
+        namePartIds.at(name_Part_ಸೂಚ್ಯಂಕ) = namePartId;
     }
 }
 
-size_t LogTagManager::NameTable::internal_addOrLookupNamePart(const std::string& namePart)
+size_t Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಆಂತರಿಕ_ಕೂಡಿಸು_Or_Lookup_Name_Part(ಸ್ಥಿರಾಂಕ std::string& namePart)
 {
-    const auto namePartIter = m_namePartIds.find(namePart);
-    if (namePartIter != m_namePartIds.end())
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ namePartIter = m_namePartIds.find(namePart);
+    ಆದರೆ (namePartIter != m_namePartIds.end())
     {
-        return namePartIter->second;
+        ಹಿಂತಿರುಗಿ namePartIter->second;
     }
-    const size_t namePartId = m_namePartInfos.size();
+    ಸ್ಥಿರಾಂಕ size_t namePartId = m_namePartInfos.size();
     m_namePartInfos.emplace_back(NamePartInfo{});
     m_namePartIds.emplace(namePart, namePartId);
-    return namePartId;
+    ಹಿಂತಿರುಗಿ namePartId;
 }
 
-void LogTagManager::NameTable::internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಆಂತರಿಕ_ಕೂಡಿಸು_Cross_Reference(size_t ತುಂಬಿದ_Name_Id, ಸ್ಥಿರಾಂಕ std::vector<size_t>& namePartIds)
 {
-    const size_t namePartCount = namePartIds.size();
-    for (size_t namePartPos = 0u; namePartPos < namePartCount; ++namePartPos)
+    ಸ್ಥಿರಾಂಕ size_t name_Part_ಎಣಿಕೆ = namePartIds.size();
+    ಗಾಗಿ (size_t namePartPos = 0u; namePartPos < name_Part_ಎಣಿಕೆ; ++namePartPos)
     {
-        const size_t namePartId = namePartIds.at(namePartPos);
-        m_fullNameToNamePartIds.emplace(fullNameId, std::make_pair(namePartId, namePartPos));
-        m_namePartToFullNameIds.emplace(namePartId, std::make_pair(fullNameId, namePartPos));
+        ಸ್ಥಿರಾಂಕ size_t namePartId = namePartIds.at(namePartPos);
+        m_ತುಂಬಿದ_Name_ಗಮ್ಯ_Name_Part_Ids.emplace(ತುಂಬಿದ_Name_Id, std::make_pair(namePartId, namePartPos));
+        m_name_Part_ಗಮ್ಯ_ತುಂಬಿದ_Name_Ids.emplace(namePartId, std::make_pair(ತುಂಬಿದ_Name_Id, namePartPos));
     }
 }
 
-LogTagManager::FullNameInfo* LogTagManager::NameTable::getFullNameInfo(const std::string& fullName)
+Log_ಟ್ಯಾಗ್_Manager::ತುಂಬಿದ_Name_Info* Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::get_ತುಂಬಿದ_Name_Info(ಸ್ಥಿರಾಂಕ std::string& ತುಂಬಿದ_Name)
 {
-    const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter == m_fullNameIds.end())
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ ತುಂಬಿದ_Name_Id_Iter = m_ತುಂಬಿದ_Name_Ids.find(ತುಂಬಿದ_Name);
+    ಆದರೆ (ತುಂಬಿದ_Name_Id_Iter == m_ತುಂಬಿದ_Name_Ids.end())
     {
-        return nullptr;
+        ಹಿಂತಿರುಗಿ ಶೂನ್ಯಸೂಚಕ;
     }
-    const size_t fullNameId = fullNameIdIter->second;
-    return internal_getFullNameInfo(fullNameId);
+    ಸ್ಥಿರಾಂಕ size_t ತುಂಬಿದ_Name_Id = ತುಂಬಿದ_Name_Id_Iter->second;
+    ಹಿಂತಿರುಗಿ ಆಂತರಿಕ_get_ತುಂಬಿದ_Name_Info(ತುಂಬಿದ_Name_Id);
 }
 
-LogTagManager::FullNameInfo* LogTagManager::NameTable::internal_getFullNameInfo(size_t fullNameId)
+Log_ಟ್ಯಾಗ್_Manager::ತುಂಬಿದ_Name_Info* Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಆಂತರಿಕ_get_ತುಂಬಿದ_Name_Info(size_t ತುಂಬಿದ_Name_Id)
 {
-    return std::addressof(m_fullNameInfos.at(fullNameId));
+    ಹಿಂತಿರುಗಿ std::addressof(m_ತುಂಬಿದ_Name_Infos.at(ತುಂಬಿದ_Name_Id));
 }
 
-LogTagManager::NamePartInfo* LogTagManager::NameTable::internal_getNamePartInfo(size_t namePartId)
+Log_ಟ್ಯಾಗ್_Manager::NamePartInfo* Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಆಂತರಿಕ_get_Name_Part_Info(size_t namePartId)
 {
-    return std::addressof(m_namePartInfos.at(namePartId));
+    ಹಿಂತಿರುಗಿ std::addressof(m_namePartInfos.at(namePartId));
 }
 
-void LogTagManager::NameTable::internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಆಂತರಿಕ_ಕಂಡುಹಿಡಿ_Matching_Name_Parts_For_ತುಂಬಿದ_Name(ತುಂಬಿದ_Name_Lookup_ಫಲಿತಾಂಶ& ತುಂಬಿದ_Name_ಫಲಿತಾಂಶ)
 {
-    const size_t fullNameId = fullNameResult.m_fullNameId;
-    FullNameInfo* fullNameInfo = fullNameResult.m_fullNameInfoPtr;
-    const auto& namePartIds = fullNameResult.m_namePartIds;
-    const size_t namePartCount = namePartIds.size();
-    auto& crossReferences = fullNameResult.m_crossReferences;
+    ಸ್ಥಿರಾಂಕ size_t ತುಂಬಿದ_Name_Id = ತುಂಬಿದ_Name_ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name_Id;
+    ತುಂಬಿದ_Name_Info* ತುಂಬಿದ_Name_Info_2 = ತುಂಬಿದ_Name_ಫಲಿತಾಂಶ.m_ತುಂಬಿದ_Name_Info_Ptr;
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& namePartIds = ತುಂಬಿದ_Name_ಫಲಿತಾಂಶ.m_namePartIds;
+    ಸ್ಥಿರಾಂಕ size_t name_Part_ಎಣಿಕೆ = namePartIds.size();
+    ಸ್ವಯಂಚಾಲಿತ& crossReferences = ತುಂಬಿದ_Name_ಫಲಿತಾಂಶ.m_crossReferences;
     crossReferences.clear();
-    crossReferences.reserve(namePartCount);
-    for (size_t matchingPos = 0u; matchingPos < namePartCount; ++matchingPos)
+    crossReferences.reserve(name_Part_ಎಣಿಕೆ);
+    ಗಾಗಿ (size_t matchingPos = 0u; matchingPos < name_Part_ಎಣಿಕೆ; ++matchingPos)
     {
-        const size_t namePartId = namePartIds.at(matchingPos);
-        NamePartInfo* namePartInfo = internal_getNamePartInfo(namePartId);
-        crossReferences.emplace_back(CrossReference(fullNameId, namePartId, matchingPos, fullNameInfo, namePartInfo));
+        ಸ್ಥಿರಾಂಕ size_t namePartId = namePartIds.at(matchingPos);
+        NamePartInfo* namePartInfo = ಆಂತರಿಕ_get_Name_Part_Info(namePartId);
+        crossReferences.emplace_back(CrossReference(ತುಂಬಿದ_Name_Id, namePartId, matchingPos, ತುಂಬಿದ_Name_Info_2, namePartInfo));
     }
 }
 
-void LogTagManager::NameTable::internal_findMatchingFullNamesForNamePart(NamePartLookupResult& result)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Manager::Name_ಕೋಷ್ಟಕ::ಆಂತರಿಕ_ಕಂಡುಹಿಡಿ_Matching_ತುಂಬಿದ_ಹೆಸರುಗಳು_For_Name_Part(Name_Part_Lookup_ಫಲಿತಾಂಶ& ಫಲಿತಾಂಶ)
 {
-    const size_t namePartId = result.m_namePartId;
-    NamePartInfo* namePartInfo = result.m_namePartInfoPtr;
-    const size_t matchingFullNameCount = m_namePartToFullNameIds.count(namePartId);
-    std::vector<CrossReference>& crossReferences = result.m_crossReferences;
+    ಸ್ಥಿರಾಂಕ size_t namePartId = ಫಲಿತಾಂಶ.m_namePartId;
+    NamePartInfo* namePartInfo = ಫಲಿತಾಂಶ.m_namePartInfoPtr;
+    ಸ್ಥಿರಾಂಕ size_t matching_ತುಂಬಿದ_Name_ಎಣಿಕೆ = m_name_Part_ಗಮ್ಯ_ತುಂಬಿದ_Name_Ids.ಎಣಿಕೆ_3(namePartId);
+    std::vector<CrossReference>& crossReferences = ಫಲಿತಾಂಶ.m_crossReferences;
     crossReferences.clear();
-    crossReferences.reserve(matchingFullNameCount);
-    const auto namePartToFullNameIterPair = m_namePartToFullNameIds.equal_range(result.m_namePartId);
-    const auto iterBegin = namePartToFullNameIterPair.first;
-    const auto iterEnd = namePartToFullNameIterPair.second;
-    for (auto iter = iterBegin; iter != iterEnd; ++iter)
+    crossReferences.reserve(matching_ತುಂಬಿದ_Name_ಎಣಿಕೆ);
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ name_Part_ಗಮ್ಯ_ತುಂಬಿದ_Name_Iter_Pair = m_name_Part_ಗಮ್ಯ_ತುಂಬಿದ_Name_Ids.equal_range(ಫಲಿತಾಂಶ.m_namePartId);
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ iterBegin = name_Part_ಗಮ್ಯ_ತುಂಬಿದ_Name_Iter_Pair.first;
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ iter_ಕೊನೆ = name_Part_ಗಮ್ಯ_ತುಂಬಿದ_Name_Iter_Pair.second;
+    ಗಾಗಿ (ಸ್ವಯಂಚಾಲಿತ iter = iterBegin; iter != iter_ಕೊನೆ; ++iter)
     {
-        const size_t fullNameId = iter->second.first;
-        const size_t matchingPos = iter->second.second;
-        FullNameInfo* fullNameInfo = internal_getFullNameInfo(fullNameId);
-        crossReferences.emplace_back(CrossReference(fullNameId, namePartId, matchingPos, fullNameInfo, namePartInfo));
+        ಸ್ಥಿರಾಂಕ size_t ತುಂಬಿದ_Name_Id = iter->second.first;
+        ಸ್ಥಿರಾಂಕ size_t matchingPos = iter->second.second;
+        ತುಂಬಿದ_Name_Info* ತುಂಬಿದ_Name_Info_2 = ಆಂತರಿಕ_get_ತುಂಬಿದ_Name_Info(ತುಂಬಿದ_Name_Id);
+        crossReferences.emplace_back(CrossReference(ತುಂಬಿದ_Name_Id, namePartId, matchingPos, ತುಂಬಿದ_Name_Info_2, namePartInfo));
     }
 }
 

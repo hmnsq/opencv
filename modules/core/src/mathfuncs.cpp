@@ -41,77 +41,77 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include <atomic>
-#include <limits>
-#include <iostream>
-#include <algorithm>
-#include <cmath>
-#include "mathfuncs.hpp"
-#include "arithm_expr.hpp"      // the element-wise engine: getMathFunc + TExpr for cv::exp/log/sqrt
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "opencl_kernels_core.hpp"
+#ಅನ್ತರ್ಭಾವ <atomic>
+#ಅನ್ತರ್ಭಾವ <limits>
+#ಅನ್ತರ್ಭಾವ <iostream>
+#ಅನ್ತರ್ಭಾವ <algorithm>
+#ಅನ್ತರ್ಭಾವ <cmath>
+#ಅನ್ತರ್ಭಾವ "mathfuncs.hpp"
+#ಅನ್ತರ್ಭಾವ "arithm_expr.hpp"      // the element-wise engine: getMathFunc + TExpr for cv::exp/log/sqrt
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-typedef void (*MathFunc)(const void* src, void* dst, int len);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*MathFunc)(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* src, ಶೂನ್ಯ* dst, ಪೂರ್ಣಾಂಕ len);
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 
-enum { OCL_OP_LOG=0, OCL_OP_EXP=1, OCL_OP_MAG=2, OCL_OP_PHASE_DEGREES=3, OCL_OP_PHASE_RADIANS=4 };
+ಎಣಿಕೆ { OCL_OP_LOG=0, OCL_OP_EXP=1, OCL_OP_MAG=2, OCL_OP_PHASE_DEGREES=3, OCL_OP_PHASE_RADIANS=4 };
 
-static const char* oclop2str[] = { "OP_LOG", "OP_EXP", "OP_MAG", "OP_PHASE_DEGREES", "OP_PHASE_RADIANS", 0 };
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* oclop2str[] = { "OP_LOG", "OP_EXP", "OP_MAG", "OP_PHASE_DEGREES", "OP_PHASE_RADIANS", 0 };
 
-static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, int oclop)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_math_op(ಒಳಹರಿವು_Array _src1, ಒಳಹರಿವು_Array _src2, OutputArray _dst, ಪೂರ್ಣಾಂಕ oclop)
 {
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    int kercn = oclop == OCL_OP_PHASE_DEGREES ||
-            oclop == OCL_OP_PHASE_RADIANS ? 1 : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
+    ಪೂರ್ಣಾಂಕ type = _src1.type(), ಆಳ = CV_MAT_ಆಳ(type), cn = CV_MAT_CN(type);
+    ಪೂರ್ಣಾಂಕ kercn = oclop == OCL_OP_PHASE_DEGREES ||
+            oclop == OCL_OP_PHASE_RADIANS ? 1 : ocl::predict_Optimal_ಸದಿಶ_ಅಗಲ(_src1, _src2, _dst);
 
-    const ocl::Device d = ocl::Device::getDefault();
-    bool double_support = d.doubleFPConfig() > 0;
-    if (!double_support && depth == CV_64F)
-        return false;
-    int rowsPerWI = d.isIntel() ? 4 : 1;
+    ಸ್ಥಿರಾಂಕ ocl::Device d = ocl::Device::getDefault();
+    ತಾರ್ಕಿಕ double_support = d.doubleFPConfig() > 0;
+    ಆದರೆ (!double_support && ಆಳ == CV_64F)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI = d.isIntel() ? 4 : 1;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D %s -D %s -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d%s", _src2.empty() ? "UNARY_OP" : "BINARY_OP",
-                         oclop2str[oclop], ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), depth, rowsPerWI,
+                         oclop2str[oclop], ocl::type_ಗಮ್ಯ_Str(CV_MAKE_TYPE(ಆಳ, kercn)), ಆಳ, ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI,
                          double_support ? " -D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    ಆದರೆ (k.empty())
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat();
-    _dst.createSameSize(src1, type);
+    _dst.create_Same_ಗಾತ್ರ(src1, type);
     UMat dst = _dst.getUMat();
 
-    ocl::KernelArg src1arg = ocl::KernelArg::ReadOnlyNoSize(src1),
-            src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
+    ocl::KernelArg src1arg = ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(src1),
+            src2arg = ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(src2),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (src2.empty())
-        k.args(src1arg, dstarg);
-    else
-        k.args(src1arg, src2arg, dstarg);
+    ಆದರೆ (src2.empty())
+        k.ವಾದಗಳು(src1arg, dstarg);
+    ಇಲ್ಲದಿದ್ದರೆ
+        k.ವಾದಗಳು(src1arg, src2arg, dstarg);
 
-    size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, 0, false);
+    size_t globalsize[] = { (size_t)src1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * cn / kercn, ((size_t)src1.ಅಡ್ಡಸಾಲುಗಳು + ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI - 1) / ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI };
+    ಹಿಂತಿರುಗಿ k.ಸತತ(2, globalsize, 0, ಸುಳ್ಳು);
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 /* ************************************************************************** *\
    Fast cube root by Ken Turkowski
    (http://www.worldserver.com/turk/computergraphics/papers.html)
 \* ************************************************************************** */
-CV_DISABLE_UBSAN float cubeRoot( float value )
+CV_DISABLE_UBSAN ದಶಮಾಂಶ cube_ಬೇರು( ದಶಮಾಂಶ value )
 {
     CV_INSTRUMENT_REGION();
 
-    float fr;
+    ದಶಮಾಂಶ fr;
     Cv32suf v, m;
-    int ix, s;
-    int ex, shx;
+    ಪೂರ್ಣಾಂಕ ix, s;
+    ಪೂರ್ಣಾಂಕ ex, shx;
 
     v.f = value;
     ix = v.i & 0x7fffffff;
@@ -125,7 +125,7 @@ CV_DISABLE_UBSAN float cubeRoot( float value )
 
     /* 0.125 <= fr < 1.0 */
     /* Use quartic rational polynomial with error < 2^(-24) */
-    fr = (float)(((((45.2548339756803022511987494 * fr +
+    fr = (ದಶಮಾಂಶ)(((((45.2548339756803022511987494 * fr +
     192.2798368355061050458134625) * fr +
     119.1654824285581628956914143) * fr +
     13.43250139086239872172837314) * fr +
@@ -140,84 +140,84 @@ CV_DISABLE_UBSAN float cubeRoot( float value )
     m.f = value;
     v.f = fr;
     v.i = (v.i + (ex << 23) + s) & (m.i*2 != 0 ? -1 : 0);
-    return v.f;
+    ಹಿಂತಿರುಗಿ v.f;
 }
 
 /****************************************************************************************\
 *                                  Cartezian -> Polar                                    *
 \****************************************************************************************/
 
-void magnitude( InputArray src1, InputArray src2, OutputArray dst )
+ಶೂನ್ಯ magnitude( ಒಳಹರಿವು_Array src1, ಒಳಹರಿವು_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = src1.type(), depth = src1.depth(), cn = src1.channels();
-    CV_Assert( src1.size() == src2.size() && type == src2.type() && (depth == CV_32F || depth == CV_64F));
+    ಪೂರ್ಣಾಂಕ type = src1.type(), ಆಳ = src1.ಆಳ(), cn = src1.channels();
+    CV_Assert( src1.size() == src2.size() && type == src2.type() && (ಆಳ == CV_32F || ಆಳ == CV_64F));
 
-    CV_OCL_RUN(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
+    CV_OCL_ಸತತ(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
                ocl_math_op(src1, src2, dst, OCL_OP_MAG))
 
     Mat X = src1.getMat(), Y = src2.getMat();
     dst.create(X.size, X.type());
     Mat Mag = dst.getMat();
 
-    const Mat* arrays[] = {&X, &Y, &Mag, 0};
+    ಸ್ಥಿರಾಂಕ Mat* arrays[] = {&X, &Y, &Mag, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)it.size*cn;
+    ಪೂರ್ಣಾಂಕ len = (ಪೂರ್ಣಾಂಕ)it.size*cn;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಗಾಗಿ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        if( depth == CV_32F )
+        ಆದರೆ( ಆಳ == CV_32F )
         {
-            const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
-            float *mag = (float*)ptrs[2];
+            ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *x = (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)ptrs[0], *y = (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)ptrs[1];
+            ದಶಮಾಂಶ *mag = (ದಶಮಾಂಶ*)ptrs[2];
             hal::magnitude32f( x, y, mag, len );
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
-            double *mag = (double*)ptrs[2];
+            ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *x = (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)ptrs[0], *y = (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)ptrs[1];
+            ದ್ವಿಗುಣ *mag = (ದ್ವಿಗುಣ*)ptrs[2];
             hal::magnitude64f( x, y, mag, len );
         }
     }
 }
 
-void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegrees )
+ಶೂನ್ಯ phase( ಒಳಹರಿವು_Array src1, ಒಳಹರಿವು_Array src2, OutputArray dst, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = src1.type(), depth = src1.depth(), cn = src1.channels();
-    CV_Assert( src1.size() == src2.size() && type == src2.type() && (depth == CV_32F || depth == CV_64F));
+    ಪೂರ್ಣಾಂಕ type = src1.type(), ಆಳ = src1.ಆಳ(), cn = src1.channels();
+    CV_Assert( src1.size() == src2.size() && type == src2.type() && (ಆಳ == CV_32F || ಆಳ == CV_64F));
 
-    CV_OCL_RUN(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
-               ocl_math_op(src1, src2, dst, angleInDegrees ? OCL_OP_PHASE_DEGREES : OCL_OP_PHASE_RADIANS))
+    CV_OCL_ಸತತ(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
+               ocl_math_op(src1, src2, dst, angle_ಒಳ_Degrees ? OCL_OP_PHASE_DEGREES : OCL_OP_PHASE_RADIANS))
 
     Mat X = src1.getMat(), Y = src2.getMat();
     dst.create( X.size, type );
     Mat Angle = dst.getMat();
 
-    const Mat* arrays[] = {&X, &Y, &Angle, 0};
+    ಸ್ಥಿರಾಂಕ Mat* arrays[] = {&X, &Y, &Angle, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = total;
+    ಪೂರ್ಣಾಂಕ j, ಒಟ್ಟು = (ಪೂರ್ಣಾಂಕ)(it.size*cn), ಖಂಡ_ಗಾತ್ರ_2 = ಒಟ್ಟು;
     size_t esz1 = X.elemSize1();
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಗಾಗಿ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ಗಾಗಿ( j = 0; j < ಒಟ್ಟು; j += ಖಂಡ_ಗಾತ್ರ_2 )
         {
-            int len = std::min(total - j, blockSize);
-            if( depth == CV_32F )
+            ಪೂರ್ಣಾಂಕ len = std::min(ಒಟ್ಟು - j, ಖಂಡ_ಗಾತ್ರ_2);
+            ಆದರೆ( ಆಳ == CV_32F )
             {
-                const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
-                float *angle = (float*)ptrs[2];
-                hal::fastAtan32f( y, x, angle, len, angleInDegrees );
+                ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *x = (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)ptrs[0], *y = (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)ptrs[1];
+                ದಶಮಾಂಶ *angle = (ದಶಮಾಂಶ*)ptrs[2];
+                hal::fastAtan32f( y, x, angle, len, angle_ಒಳ_Degrees );
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
-                double *angle = (double*)ptrs[2];
-                hal::fastAtan64f(y, x, angle, len, angleInDegrees);
+                ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *x = (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)ptrs[0], *y = (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)ptrs[1];
+                ದ್ವಿಗುಣ *angle = (ದ್ವಿಗುಣ*)ptrs[2];
+                hal::fastAtan64f(y, x, angle, len, angle_ಒಳ_Degrees);
             }
             ptrs[0] += len*esz1;
             ptrs[1] += len*esz1;
@@ -226,97 +226,97 @@ void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegre
     }
 }
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 
-static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
-                             OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_cart_ಗಮ್ಯ_Polar( ಒಳಹರಿವು_Array _src1, ಒಳಹರಿವು_Array _src2,
+                             OutputArray _dst1, OutputArray _dst2, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            rowsPerWI = d.isIntel() ? 4 : 1;
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    ಸ್ಥಿರಾಂಕ ocl::Device & d = ocl::Device::getDefault();
+    ಪೂರ್ಣಾಂಕ type = _src1.type(), ಆಳ = CV_MAT_ಆಳ(type), cn = CV_MAT_CN(type),
+            ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI = d.isIntel() ? 4 : 1;
+    ತಾರ್ಕಿಕ doubleSupport = d.doubleFPConfig() > 0;
 
-    const bool _src1IsDstMag = (_src1.getObj() == _dst1.getObj());
-    const bool _src1IsDstAngle = (_src1.getObj() == _dst2.getObj());
-    const bool _src2IsDstMag = (_src2.getObj() == _dst1.getObj());
-    const bool _src2IsDstAngle = (_src2.getObj() == _dst2.getObj());
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ _src1IsDstMag = (_src1.getObj() == _dst1.getObj());
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ _src1IsDstAngle = (_src1.getObj() == _dst2.getObj());
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ _src2IsDstMag = (_src2.getObj() == _dst1.getObj());
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ _src2IsDstAngle = (_src2.getObj() == _dst2.getObj());
 
-    if ( !(_src1.dims() <= 2 && _src2.dims() <= 2 &&
-           (depth == CV_32F || depth == CV_64F) && type == _src2.type()) ||
-         (depth == CV_64F && !doubleSupport) )
-        return false;
+    ಆದರೆ ( !(_src1.dims() <= 2 && _src2.dims() <= 2 &&
+           (ಆಳ == CV_32F || ಆಳ == CV_64F) && type == _src2.type()) ||
+         (ಆಳ == CV_64F && !doubleSupport) )
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D BINARY_OP -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D OP_CTP_%s%s%s%s%s%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, 1)), depth,
-                         rowsPerWI, angleInDegrees ? "AD" : "AR",
+                         ocl::type_ಗಮ್ಯ_Str(CV_MAKE_TYPE(ಆಳ, 1)), ಆಳ,
+                         ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI, angle_ಒಳ_Degrees ? "AD" : "AR",
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src1IsDstMag   ? " -D SRC1_IS_DST_MAG" : "",
                          _src1IsDstAngle ? " -D SRC1_IS_DST_ANGLE" : "",
                          _src2IsDstMag   ? " -D SRC2_IS_DST_MAG" : "",
                          _src2IsDstAngle ? " -D SRC2_IS_DST_ANGLE" : ""
                          ));
-    if (k.empty())
-        return false;
+    ಆದರೆ (k.empty())
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat();
-    Size size = src1.size();
+    ಗಾತ್ರ_2 size = src1.size();
     CV_Assert( size == src2.size() );
 
     _dst1.create(size, type);
     _dst2.create(size, type);
     UMat dst1 = _dst1.getUMat(), dst2 = _dst2.getUMat();
 
-    k.args(_src1IsDstMag || _src1IsDstAngle ? ocl::KernelArg::ReadWriteNoSize(src1) : ocl::KernelArg::ReadOnlyNoSize(src1),
-           _src2IsDstMag || _src2IsDstAngle ? ocl::KernelArg::ReadWriteNoSize(src2) : ocl::KernelArg::ReadOnlyNoSize(src2),
+    k.ವಾದಗಳು(_src1IsDstMag || _src1IsDstAngle ? ocl::KernelArg::Read_Write_No_ಗಾತ್ರ(src1) : ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(src1),
+           _src2IsDstMag || _src2IsDstAngle ? ocl::KernelArg::Read_Write_No_ಗಾತ್ರ(src2) : ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(src2),
            ocl::KernelArg::WriteOnly(dst1, cn),
-           ocl::KernelArg::WriteOnlyNoSize(dst2));
+           ocl::KernelArg::Write_Only_No_ಗಾತ್ರ(dst2));
 
-    size_t globalsize[2] = { (size_t)dst1.cols * cn, ((size_t)dst1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * cn, ((size_t)dst1.ಅಡ್ಡಸಾಲುಗಳು + ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI - 1) / ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI };
+    ಹಿಂತಿರುಗಿ k.ಸತತ(2, globalsize, ಖಾಲಿ, ಸುಳ್ಳು);
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-void cartToPolar( InputArray src1, InputArray src2,
-                  OutputArray dst1, OutputArray dst2, bool angleInDegrees )
+ಶೂನ್ಯ cart_ಗಮ್ಯ_Polar( ಒಳಹರಿವು_Array src1, ಒಳಹರಿವು_Array src2,
+                  OutputArray dst1, OutputArray dst2, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(dst1.getObj() != dst2.getObj());
 
-    CV_OCL_RUN(dst1.isUMat() && dst2.isUMat(),
-            ocl_cartToPolar(src1, src2, dst1, dst2, angleInDegrees))
+    CV_OCL_ಸತತ(dst1.isUMat() && dst2.isUMat(),
+            ocl_cart_ಗಮ್ಯ_Polar(src1, src2, dst1, dst2, angle_ಒಳ_Degrees))
 
     Mat X = src1.getMat(), Y = src2.getMat();
-    int type = X.type(), depth = X.depth(), cn = X.channels();
-    CV_Assert( X.size == Y.size && type == Y.type() && (depth == CV_32F || depth == CV_64F));
+    ಪೂರ್ಣಾಂಕ type = X.type(), ಆಳ = X.ಆಳ(), cn = X.channels();
+    CV_Assert( X.size == Y.size && type == Y.type() && (ಆಳ == CV_32F || ಆಳ == CV_64F));
     dst1.create( X.size, type );
     dst2.create( X.size, type );
     Mat Mag = dst1.getMat(), Angle = dst2.getMat();
 
-    const Mat* arrays[] = {&X, &Y, &Mag, &Angle, 0};
+    ಸ್ಥಿರಾಂಕ Mat* arrays[] = {&X, &Y, &Mag, &Angle, 0};
     uchar* ptrs[4] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
+    ಪೂರ್ಣಾಂಕ j, ಒಟ್ಟು = (ಪೂರ್ಣಾಂಕ)(it.size*cn), ಖಂಡ_ಗಾತ್ರ_2 = std::min(ಒಟ್ಟು, ((ಖಂಡ_ಗಾತ್ರ+cn-1)/cn)*cn);
     size_t esz1 = X.elemSize1();
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಗಾಗಿ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ಗಾಗಿ( j = 0; j < ಒಟ್ಟು; j += ಖಂಡ_ಗಾತ್ರ_2 )
         {
-            int len = std::min(total - j, blockSize);
-            if( depth == CV_32F )
+            ಪೂರ್ಣಾಂಕ len = std::min(ಒಟ್ಟು - j, ಖಂಡ_ಗಾತ್ರ_2);
+            ಆದರೆ( ಆಳ == CV_32F )
             {
-                const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
-                float *mag = (float*)ptrs[2], *angle = (float*)ptrs[3];
-                hal::cartToPolar32f( x, y, mag, angle, len, angleInDegrees );
+                ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *x = (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)ptrs[0], *y = (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)ptrs[1];
+                ದಶಮಾಂಶ *mag = (ದಶಮಾಂಶ*)ptrs[2], *angle = (ದಶಮಾಂಶ*)ptrs[3];
+                hal::cart_ಗಮ್ಯ_Polar32f( x, y, mag, angle, len, angle_ಒಳ_Degrees );
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
-                double *mag = (double*)ptrs[2], *angle = (double*)ptrs[3];
-                hal::cartToPolar64f(x, y, mag, angle, len, angleInDegrees);
+                ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *x = (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)ptrs[0], *y = (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)ptrs[1];
+                ದ್ವಿಗುಣ *mag = (ದ್ವಿಗುಣ*)ptrs[2], *angle = (ದ್ವಿಗುಣ*)ptrs[3];
+                hal::cart_ಗಮ್ಯ_Polar64f(x, y, mag, angle, len, angle_ಒಳ_Degrees);
             }
             ptrs[0] += len*esz1;
             ptrs[1] += len*esz1;
@@ -331,68 +331,68 @@ void cartToPolar( InputArray src1, InputArray src2,
 *                                  Polar -> Cartezian                                    *
 \****************************************************************************************/
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 
-static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
-                             OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_polar_ಗಮ್ಯ_Cart( ಒಳಹರಿವು_Array _mag, ಒಳಹರಿವು_Array _angle,
+                             OutputArray _dst1, OutputArray _dst2, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    int type = _angle.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            rowsPerWI = d.isIntel() ? 4 : 1;
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    ಸ್ಥಿರಾಂಕ ocl::Device & d = ocl::Device::getDefault();
+    ಪೂರ್ಣಾಂಕ type = _angle.type(), ಆಳ = CV_MAT_ಆಳ(type), cn = CV_MAT_CN(type),
+            ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI = d.isIntel() ? 4 : 1;
+    ತಾರ್ಕಿಕ doubleSupport = d.doubleFPConfig() > 0;
 
-    const bool _src1IsDstX = (_mag.getObj() == _dst1.getObj());
-    const bool _src1IsDstY = (_mag.getObj() == _dst2.getObj());
-    const bool _src2IsDstX = (_angle.getObj() == _dst1.getObj());
-    const bool _src2IsDstY = (_angle.getObj() == _dst2.getObj());
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ _src1IsDstX = (_mag.getObj() == _dst1.getObj());
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ _src1IsDstY = (_mag.getObj() == _dst2.getObj());
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ _src2IsDstX = (_angle.getObj() == _dst1.getObj());
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ _src2IsDstY = (_angle.getObj() == _dst2.getObj());
 
-    if ( !doubleSupport && depth == CV_64F )
-        return false;
+    ಆದರೆ ( !doubleSupport && ಆಳ == CV_64F )
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D BINARY_OP -D OP_PTC_%s%s%s%s%s%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, 1)), depth,
-                         rowsPerWI,
-                         angleInDegrees ? "AD" : "AR",
+                         ocl::type_ಗಮ್ಯ_Str(CV_MAKE_TYPE(ಆಳ, 1)), ಆಳ,
+                         ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI,
+                         angle_ಒಳ_Degrees ? "AD" : "AR",
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src1IsDstX   ? " -D SRC1_IS_DST_X" : "",
                          _src1IsDstY ? " -D SRC1_IS_DST_Y" : "",
                          _src2IsDstX   ? " -D SRC2_IS_DST_X" : "",
                          _src2IsDstY ? " -D SRC2_IS_DST_Y" : ""));
-    if (k.empty())
-        return false;
+    ಆದರೆ (k.empty())
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     UMat mag = _mag.getUMat(), angle = _angle.getUMat();
-    Size size = angle.size();
+    ಗಾತ್ರ_2 size = angle.size();
     CV_Assert(mag.size() == size);
 
     _dst1.create(size, type);
     _dst2.create(size, type);
     UMat dst1 = _dst1.getUMat(), dst2 = _dst2.getUMat();
 
-    k.args(_src1IsDstX || _src1IsDstY ? ocl::KernelArg::ReadWriteNoSize(mag) : ocl::KernelArg::ReadOnlyNoSize(mag),
-           _src2IsDstX || _src2IsDstY  ? ocl::KernelArg::ReadWriteNoSize(angle) : ocl::KernelArg::ReadOnlyNoSize(angle),
+    k.ವಾದಗಳು(_src1IsDstX || _src1IsDstY ? ocl::KernelArg::Read_Write_No_ಗಾತ್ರ(mag) : ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(mag),
+           _src2IsDstX || _src2IsDstY  ? ocl::KernelArg::Read_Write_No_ಗಾತ್ರ(angle) : ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(angle),
            ocl::KernelArg::WriteOnly(dst1, cn),
-           ocl::KernelArg::WriteOnlyNoSize(dst2));
+           ocl::KernelArg::Write_Only_No_ಗಾತ್ರ(dst2));
 
-    size_t globalsize[2] = { (size_t)dst1.cols * cn, ((size_t)dst1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * cn, ((size_t)dst1.ಅಡ್ಡಸಾಲುಗಳು + ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI - 1) / ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI };
+    ಹಿಂತಿರುಗಿ k.ಸತತ(2, globalsize, ಖಾಲಿ, ಸುಳ್ಳು);
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-void polarToCart( InputArray src1, InputArray src2,
-                  OutputArray dst1, OutputArray dst2, bool angleInDegrees )
+ಶೂನ್ಯ polar_ಗಮ್ಯ_Cart( ಒಳಹರಿವು_Array src1, ಒಳಹರಿವು_Array src2,
+                  OutputArray dst1, OutputArray dst2, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(dst1.getObj() != dst2.getObj());
 
-    int type = src2.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    CV_Assert((depth == CV_32F || depth == CV_64F) && (src1.empty() || src1.type() == type));
+    ಪೂರ್ಣಾಂಕ type = src2.type(), ಆಳ = CV_MAT_ಆಳ(type), cn = CV_MAT_CN(type);
+    CV_Assert((ಆಳ == CV_32F || ಆಳ == CV_64F) && (src1.empty() || src1.type() == type));
 
-    CV_OCL_RUN(!src1.empty() && src2.dims() <= 2 && dst1.isUMat() && dst2.isUMat(),
-               ocl_polarToCart(src1, src2, dst1, dst2, angleInDegrees))
+    CV_OCL_ಸತತ(!src1.empty() && src2.dims() <= 2 && dst1.isUMat() && dst2.isUMat(),
+               ocl_polar_ಗಮ್ಯ_Cart(src1, src2, dst1, dst2, angle_ಒಳ_Degrees))
 
     Mat Mag = src1.getMat(), Angle = src2.getMat();
     CV_Assert( Mag.empty() || Angle.size == Mag.size);
@@ -400,31 +400,31 @@ void polarToCart( InputArray src1, InputArray src2,
     dst2.create( Angle.size, type );
     Mat X = dst1.getMat(), Y = dst2.getMat();
 
-    const Mat* arrays[] = {&Mag, &Angle, &X, &Y, 0};
+    ಸ್ಥಿರಾಂಕ Mat* arrays[] = {&Mag, &Angle, &X, &Y, 0};
     uchar* ptrs[4] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
+    ಪೂರ್ಣಾಂಕ j, ಒಟ್ಟು = (ಪೂರ್ಣಾಂಕ)(it.size*cn), ಖಂಡ_ಗಾತ್ರ_2 = std::min(ಒಟ್ಟು, ((ಖಂಡ_ಗಾತ್ರ+cn-1)/cn)*cn);
     size_t esz1 = Angle.elemSize1();
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಗಾಗಿ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ಗಾಗಿ( j = 0; j < ಒಟ್ಟು; j += ಖಂಡ_ಗಾತ್ರ_2 )
         {
-            int len = std::min(total - j, blockSize);
-            if ( depth == CV_32F )
+            ಪೂರ್ಣಾಂಕ len = std::min(ಒಟ್ಟು - j, ಖಂಡ_ಗಾತ್ರ_2);
+            ಆದರೆ ( ಆಳ == CV_32F )
             {
-                const float *mag = (const float*)ptrs[0], *angle = (const float*)ptrs[1];
-                float *x = (float*)ptrs[2], *y = (float*)ptrs[3];
-                hal::polarToCart32f( mag, angle, x, y, len, angleInDegrees );
+                ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *mag = (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)ptrs[0], *angle = (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)ptrs[1];
+                ದಶಮಾಂಶ *x = (ದಶಮಾಂಶ*)ptrs[2], *y = (ದಶಮಾಂಶ*)ptrs[3];
+                hal::polar_ಗಮ್ಯ_Cart32f( mag, angle, x, y, len, angle_ಒಳ_Degrees );
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                const double *mag = (const double*)ptrs[0], *angle = (const double*)ptrs[1];
-                double *x = (double*)ptrs[2], *y = (double*)ptrs[3];
-                hal::polarToCart64f( mag, angle, x, y, len, angleInDegrees );
+                ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *mag = (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)ptrs[0], *angle = (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)ptrs[1];
+                ದ್ವಿಗುಣ *x = (ದ್ವಿಗುಣ*)ptrs[2], *y = (ದ್ವಿಗುಣ*)ptrs[3];
+                hal::polar_ಗಮ್ಯ_Cart64f( mag, angle, x, y, len, angle_ಒಳ_Degrees );
             }
 
-            if( ptrs[0] )
+            ಆದರೆ( ptrs[0] )
                 ptrs[0] += len*esz1;
             ptrs[1] += len*esz1;
             ptrs[2] += len*esz1;
@@ -445,46 +445,46 @@ void polarToCart( InputArray src1, InputArray src2,
 //    parallel_for machinery - their setup dominates at these sizes.
 //  - everything else (large arrays - worth parallelizing; ROIs - need real steps): the usual
 //    1-instruction program via compile()/exec().
-enum { MATH_OP_SMALL = 100000 };     // elements; tune with a benchmark if the crossover moves
+ಎಣಿಕೆ { MATH_OP_SMALL = 100000 };     // elements; tune with a benchmark if the crossover moves
 
-static void math_op(ew::TOp op, InputArray _src, OutputArray _dst)
+ಸ್ಥಿರ ಶೂನ್ಯ math_op(ew::ತುದಿ op, ಒಳಹರಿವು_Array _src, OutputArray _dst)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
-    CV_Assert(depth == CV_16F || depth == CV_16BF || depth == CV_32F || depth == CV_64F);
+    ಪೂರ್ಣಾಂಕ type = _src.type(), ಆಳ = CV_MAT_ಆಳ(type);
+    CV_Assert(ಆಳ == CV_16F || ಆಳ == CV_16BF || ಆಳ == CV_32F || ಆಳ == CV_64F);
 
     Mat src = _src.getMat();
-    _dst.createSameSize(_src, type);   // whole-shape transfer (layout & future metadata included)
+    _dst.create_Same_ಗಾತ್ರ(_src, type);   // whole-shape transfer (layout & future metadata included)
     Mat dst = _dst.getMat();
-    if (src.empty())
-        return;
+    ಆದರೆ (src.empty())
+        ಹಿಂತಿರುಗಿ;
 
-    const size_t total = src.total() * src.channels();
-    if (src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
+    ಸ್ಥಿರಾಂಕ size_t ಒಟ್ಟು = src.ಒಟ್ಟು() * src.channels();
+    ಆದರೆ (src.isContinuous() && dst.isContinuous() && ಒಟ್ಟು <= (size_t)MATH_OP_SMALL)
     {
-        ew::TKernel k = ew::getMathFunc(op, depth);
+        ew::TKernel k = ew::getMathFunc(op, ಆಳ);
         CV_Assert(k.fptr);
-        static const double noparams[4] = {};
-        k.fptr(src.data, 0, 1, nullptr, 0, 0, nullptr, 0, 0,
-               dst.data, 0, (int)total, 1, noparams, k.flags, k.userdata);
-        return;
+        ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ noparams[4] = {};
+        k.fptr(src.ದತ್ತಾಂಶ, 0, 1, ಶೂನ್ಯಸೂಚಕ, 0, 0, ಶೂನ್ಯಸೂಚಕ, 0, 0,
+               dst.ದತ್ತಾಂಶ, 0, (ಪೂರ್ಣಾಂಕ)ಒಟ್ಟು, 1, noparams, k.flags, k.userdata);
+        ಹಿಂತಿರುಗಿ;
     }
 
     ew::TExpr p;
-    const int a = p.addInput(depth);
-    const int out = p.addOutput(depth);
-    p.moveToOutput(p.emitUnary(op, a, depth), out);
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ a = p.ಕೂಡಿಸು_ಒಳಹರಿವು(ಆಳ);
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ out = p.ಕೂಡಿಸು_Output(ಆಳ);
+    p.move_ಗಮ್ಯ_Output(p.emitUnary(op, a, ಆಳ), out);
     p.compile();
-    const Mat* inputs[] = { &src };
+    ಸ್ಥಿರಾಂಕ Mat* inputs[] = { &src };
     p.exec(inputs, &dst);
 }
 
-void exp( InputArray _src, OutputArray _dst )
+ಶೂನ್ಯ ಘಾತಾಂಕ( ಒಳಹರಿವು_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    [[maybe_unused]] int depth = _src.depth();   // consumed by CV_OCL_RUN only
+    [[maybe_unused]] ಪೂರ್ಣಾಂಕ ಆಳ = _src.ಆಳ();   // consumed by CV_OCL_RUN only
 
-    CV_OCL_RUN(_dst.isUMat() && _src.dims() <= 2 && (depth == CV_32F || depth == CV_64F),
+    CV_OCL_ಸತತ(_dst.isUMat() && _src.dims() <= 2 && (ಆಳ == CV_32F || ಆಳ == CV_64F),
                ocl_math_op(_src, noArray(), _dst, OCL_OP_EXP))
 
     math_op(ew::OP_EXP, _src, _dst);
@@ -495,13 +495,13 @@ void exp( InputArray _src, OutputArray _dst )
 *                                          L O G                                         *
 \****************************************************************************************/
 
-void log( InputArray _src, OutputArray _dst )
+ಶೂನ್ಯ ಲಘುಗಣಕ( ಒಳಹರಿವು_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    [[maybe_unused]] int depth = _src.depth();   // consumed by CV_OCL_RUN only
+    [[maybe_unused]] ಪೂರ್ಣಾಂಕ ಆಳ = _src.ಆಳ();   // consumed by CV_OCL_RUN only
 
-    CV_OCL_RUN( _dst.isUMat() && _src.dims() <= 2 && (depth == CV_32F || depth == CV_64F),
+    CV_OCL_ಸತತ( _dst.isUMat() && _src.dims() <= 2 && (ಆಳ == CV_32F || ಆಳ == CV_64F),
                 ocl_math_op(_src, noArray(), _dst, OCL_OP_LOG))
 
     math_op(ew::OP_LOG, _src, _dst);
@@ -511,36 +511,36 @@ void log( InputArray _src, OutputArray _dst )
 *                                    P O W E R                                           *
 \****************************************************************************************/
 
-template <typename T, typename WT>
-struct iPow_SIMD
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T, ಬಗೆ_ಹೆಸರು WT>
+ರಚನೆ iPow_SIMD
 {
-    int operator() ( const T *, T *, int, int)
+    ಪೂರ್ಣಾಂಕ ಕ್ರಿಯಾಕಾರಕ() ( ಸ್ಥಿರಾಂಕ T *, T *, ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ)
     {
-        return 0;
+        ಹಿಂತಿರುಗಿ 0;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ಆದರೆ (CV_SIMD || CV_SIMD_SCALABLE)
 
-template <>
-struct iPow_SIMD<uchar, unsigned>
+ಮಾದರಿ <>
+ರಚನೆ iPow_SIMD<uchar, ಚಿಹ್ನೆರಹಿತ>
 {
-    int operator() ( const uchar * src, uchar * dst, int len, int power )
+    ಪೂರ್ಣಾಂಕ ಕ್ರಿಯಾಕಾರಕ() ( ಸ್ಥಿರಾಂಕ uchar * src, uchar * dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power )
     {
-        int i = 0;
+        ಪೂರ್ಣಾಂಕ i = 0;
         v_uint32 v_1 = vx_setall_u32(1u);
 
-        for ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
+        ಗಾಗಿ ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
         {
             v_uint32 v_a1 = v_1, v_a2 = v_1;
-            v_uint16 v = vx_load_expand(src + i);
+            v_uint16 v = vx_ತುಂಬು_expand(src + i);
             v_uint32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            ಪೂರ್ಣಾಂಕ p = power;
 
-            while( p > 1 )
+            ಆಗ( p > 1 )
             {
-                if (p & 1)
+                ಆದರೆ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -558,29 +558,29 @@ struct iPow_SIMD<uchar, unsigned>
         }
         vx_cleanup();
 
-        return i;
+        ಹಿಂತಿರುಗಿ i;
     }
 };
 
-template <>
-struct iPow_SIMD<schar, int>
+ಮಾದರಿ <>
+ರಚನೆ iPow_SIMD<schar, ಪೂರ್ಣಾಂಕ>
 {
-    int operator() ( const schar * src, schar * dst, int len, int power)
+    ಪೂರ್ಣಾಂಕ ಕ್ರಿಯಾಕಾರಕ() ( ಸ್ಥಿರಾಂಕ schar * src, schar * dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power)
     {
-        int i = 0;
+        ಪೂರ್ಣಾಂಕ i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
+        ಗಾಗಿ ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
-            v_int16 v = vx_load_expand(src + i);
+            v_int16 v = vx_ತುಂಬು_expand(src + i);
             v_int32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            ಪೂರ್ಣಾಂಕ p = power;
 
-            while( p > 1 )
+            ಆಗ( p > 1 )
             {
-                if (p & 1)
+                ಆದರೆ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -598,29 +598,29 @@ struct iPow_SIMD<schar, int>
         }
         vx_cleanup();
 
-        return i;
+        ಹಿಂತಿರುಗಿ i;
     }
 };
 
-template <>
-struct iPow_SIMD<ushort, unsigned>
+ಮಾದರಿ <>
+ರಚನೆ iPow_SIMD<ushort, ಚಿಹ್ನೆರಹಿತ>
 {
-    int operator() ( const ushort * src, ushort * dst, int len, int power)
+    ಪೂರ್ಣಾಂಕ ಕ್ರಿಯಾಕಾರಕ() ( ಸ್ಥಿರಾಂಕ ushort * src, ushort * dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power)
     {
-        int i = 0;
+        ಪೂರ್ಣಾಂಕ i = 0;
         v_uint32 v_1 = vx_setall_u32(1u);
 
-        for ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
+        ಗಾಗಿ ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
         {
             v_uint32 v_a1 = v_1, v_a2 = v_1;
-            v_uint16 v = vx_load(src + i);
+            v_uint16 v = vx_ತುಂಬು(src + i);
             v_uint32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            ಪೂರ್ಣಾಂಕ p = power;
 
-            while( p > 1 )
+            ಆಗ( p > 1 )
             {
-                if (p & 1)
+                ಆದರೆ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -638,29 +638,29 @@ struct iPow_SIMD<ushort, unsigned>
         }
         vx_cleanup();
 
-        return i;
+        ಹಿಂತಿರುಗಿ i;
     }
 };
 
-template <>
-struct iPow_SIMD<short, int>
+ಮಾದರಿ <>
+ರಚನೆ iPow_SIMD<ಗಿಡ್ಡ, ಪೂರ್ಣಾಂಕ>
 {
-    int operator() ( const short * src, short * dst, int len, int power)
+    ಪೂರ್ಣಾಂಕ ಕ್ರಿಯಾಕಾರಕ() ( ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ * src, ಗಿಡ್ಡ * dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power)
     {
-        int i = 0;
+        ಪೂರ್ಣಾಂಕ i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
+        ಗಾಗಿ ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
-            v_int16 v = vx_load(src + i);
+            v_int16 v = vx_ತುಂಬು(src + i);
             v_int32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            ಪೂರ್ಣಾಂಕ p = power;
 
-            while( p > 1 )
+            ಆಗ( p > 1 )
             {
-                if (p & 1)
+                ಆದರೆ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -678,27 +678,27 @@ struct iPow_SIMD<short, int>
         }
         vx_cleanup();
 
-        return i;
+        ಹಿಂತಿರುಗಿ i;
     }
 };
 
-template <>
-struct iPow_SIMD<int, int>
+ಮಾದರಿ <>
+ರಚನೆ iPow_SIMD<ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ>
 {
-    int operator() ( const int * src, int * dst, int len, int power)
+    ಪೂರ್ಣಾಂಕ ಕ್ರಿಯಾಕಾರಕ() ( ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ * src, ಪೂರ್ಣಾಂಕ * dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power)
     {
-        int i = 0;
+        ಪೂರ್ಣಾಂಕ i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int32>::vlanes()*2; i += VTraits<v_int32>::vlanes()*2)
+        ಗಾಗಿ ( ; i <= len - VTraits<v_int32>::vlanes()*2; i += VTraits<v_int32>::vlanes()*2)
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
-            v_int32 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_int32>::vlanes());
-            int p = power;
+            v_int32 v_b1 = vx_ತುಂಬು(src + i), v_b2 = vx_ತುಂಬು(src + i + VTraits<v_int32>::vlanes());
+            ಪೂರ್ಣಾಂಕ p = power;
 
-            while( p > 1 )
+            ಆಗ( p > 1 )
             {
-                if (p & 1)
+                ಆದರೆ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -716,32 +716,32 @@ struct iPow_SIMD<int, int>
         }
         vx_cleanup();
 
-        return i;
+        ಹಿಂತಿರುಗಿ i;
     }
 };
 
-template <>
-struct iPow_SIMD<float, float>
+ಮಾದರಿ <>
+ರಚನೆ iPow_SIMD<ದಶಮಾಂಶ, ದಶಮಾಂಶ>
 {
-    int operator() ( const float * src, float * dst, int len, int power)
+    ಪೂರ್ಣಾಂಕ ಕ್ರಿಯಾಕಾರಕ() ( ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ * src, ದಶಮಾಂಶ * dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power)
     {
-        int i = 0;
+        ಪೂರ್ಣಾಂಕ i = 0;
         v_float32 v_1 = vx_setall_f32(1.f);
 
-        for ( ; i <= len - VTraits<v_float32>::vlanes()*2; i += VTraits<v_float32>::vlanes()*2)
+        ಗಾಗಿ ( ; i <= len - VTraits<v_float32>::vlanes()*2; i += VTraits<v_float32>::vlanes()*2)
         {
             v_float32 v_a1 = v_1, v_a2 = v_1;
-            v_float32 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_float32>::vlanes());
-            int p = std::abs(power);
-            if( power < 0 )
+            v_float32 v_b1 = vx_ತುಂಬು(src + i), v_b2 = vx_ತುಂಬು(src + i + VTraits<v_float32>::vlanes());
+            ಪೂರ್ಣಾಂಕ p = std::ನಿರಪೇಕ್ಷ(power);
+            ಆದರೆ( power < 0 )
             {
                 v_b1 = v_div(v_1, v_b1);
                 v_b2 = v_div(v_1, v_b2);
             }
 
-            while( p > 1 )
+            ಆಗ( p > 1 )
             {
-                if (p & 1)
+                ಆದರೆ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -759,33 +759,33 @@ struct iPow_SIMD<float, float>
         }
         vx_cleanup();
 
-        return i;
+        ಹಿಂತಿರುಗಿ i;
     }
 };
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-template <>
-struct iPow_SIMD<double, double>
+#ಆದರೆ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+ಮಾದರಿ <>
+ರಚನೆ iPow_SIMD<ದ್ವಿಗುಣ, ದ್ವಿಗುಣ>
 {
-    int operator() ( const double * src, double * dst, int len, int power)
+    ಪೂರ್ಣಾಂಕ ಕ್ರಿಯಾಕಾರಕ() ( ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ * src, ದ್ವಿಗುಣ * dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power)
     {
-        int i = 0;
+        ಪೂರ್ಣಾಂಕ i = 0;
         v_float64 v_1 = vx_setall_f64(1.);
 
-        for ( ; i <= len - VTraits<v_float64>::vlanes()*2; i += VTraits<v_float64>::vlanes()*2)
+        ಗಾಗಿ ( ; i <= len - VTraits<v_float64>::vlanes()*2; i += VTraits<v_float64>::vlanes()*2)
         {
             v_float64 v_a1 = v_1, v_a2 = v_1;
-            v_float64 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_float64>::vlanes());
-            int p = std::abs(power);
-            if( power < 0 )
+            v_float64 v_b1 = vx_ತುಂಬು(src + i), v_b2 = vx_ತುಂಬು(src + i + VTraits<v_float64>::vlanes());
+            ಪೂರ್ಣಾಂಕ p = std::ನಿರಪೇಕ್ಷ(power);
+            ಆದರೆ( power < 0 )
             {
                 v_b1 = v_div(v_1, v_b1);
                 v_b2 = v_div(v_1, v_b2);
             }
 
-            while( p > 1 )
+            ಆಗ( p > 1 )
             {
-                if (p & 1)
+                ಆದರೆ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -803,44 +803,44 @@ struct iPow_SIMD<double, double>
         }
         vx_cleanup();
 
-        return i;
+        ಹಿಂತಿರುಗಿ i;
     }
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-template<typename T, typename WT>
-static void
-iPow_i( const void* _src, void* _dst, int len, int power )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T, ಬಗೆ_ಹೆಸರು WT>
+ಸ್ಥಿರ ಶೂನ್ಯ
+iPow_i( ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* _src, ಶೂನ್ಯ* _dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power )
 {
-    const T* src = (const T*)_src;
+    ಸ್ಥಿರಾಂಕ T* src = (ಸ್ಥಿರಾಂಕ T*)_src;
     T* dst = (T*)_dst;
-    if( power < 0 )
+    ಆದರೆ( power < 0 )
     {
         T tab[5] =
         {
             saturate_cast<T>(power == -1 ? -1 : 0), saturate_cast<T>((power & 1) ? -1 : 1),
             std::numeric_limits<T>::max(), 1, saturate_cast<T>(power == -1 ? 1 : 0)
         };
-        for( int i = 0; i < len; i++ )
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < len; i++ )
         {
             T val = src[i];
             dst[i] = cv_abs(val) <= 2 ? tab[val + 2] : (T)0;
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         iPow_SIMD<T, WT> vop;
-        int i = vop(src, dst, len, power);
+        ಪೂರ್ಣಾಂಕ i = vop(src, dst, len, power);
 
-        for( ; i < len; i++ )
+        ಗಾಗಿ( ; i < len; i++ )
         {
             WT a = 1, b = src[i];
-            int p = power;
-            while( p > 1 )
+            ಪೂರ್ಣಾಂಕ p = power;
+            ಆಗ( p > 1 )
             {
-                if( p & 1 )
+                ಆದರೆ( p & 1 )
                     a *= b;
                 b *= b;
                 p >>= 1;
@@ -852,26 +852,26 @@ iPow_i( const void* _src, void* _dst, int len, int power )
     }
 }
 
-template<typename T>
-static void
-iPow_f( const void* _src, void* _dst, int len, int power0 )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T>
+ಸ್ಥಿರ ಶೂನ್ಯ
+iPow_f( ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* _src, ಶೂನ್ಯ* _dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power0 )
 {
-    const T* src = (const T*)_src;
+    ಸ್ಥಿರಾಂಕ T* src = (ಸ್ಥಿರಾಂಕ T*)_src;
     T* dst = (T*)_dst;
     iPow_SIMD<T, T> vop;
-    int i = vop(src, dst, len, power0);
-    int power = std::abs(power0);
+    ಪೂರ್ಣಾಂಕ i = vop(src, dst, len, power0);
+    ಪೂರ್ಣಾಂಕ power = std::ನಿರಪೇಕ್ಷ(power0);
 
-    for( ; i < len; i++ )
+    ಗಾಗಿ( ; i < len; i++ )
     {
         T a = 1, b = src[i];
-        int p = power;
-        if( power0 < 0 )
+        ಪೂರ್ಣಾಂಕ p = power;
+        ಆದರೆ( power0 < 0 )
             b = 1/b;
 
-        while( p > 1 )
+        ಆಗ( p > 1 )
         {
-            if( p & 1 )
+            ಆದರೆ( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -882,282 +882,282 @@ iPow_f( const void* _src, void* _dst, int len, int power0 )
     }
 }
 
-typedef void (*IPowFunc)( const void* src, void* dst, int len, int power );
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*IPowFunc)( ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* src, ಶೂನ್ಯ* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ power );
 
-static IPowFunc ipowTab[CV_DEPTH_MAX] =
+ಸ್ಥಿರ IPowFunc ipowTab[CV_ಆಳ_MAX] =
 {
-    iPow_i<uchar, unsigned>, iPow_i<schar, int>, iPow_i<ushort, unsigned>, iPow_i<short, int>,
-    iPow_i<int, int>, iPow_f<float>, iPow_f<double>, 0
+    iPow_i<uchar, ಚಿಹ್ನೆರಹಿತ>, iPow_i<schar, ಪೂರ್ಣಾಂಕ>, iPow_i<ushort, ಚಿಹ್ನೆರಹಿತ>, iPow_i<ಗಿಡ್ಡ, ಪೂರ್ಣಾಂಕ>,
+    iPow_i<ಪೂರ್ಣಾಂಕ, ಪೂರ್ಣಾಂಕ>, iPow_f<ದಶಮಾಂಶ>, iPow_f<ದ್ವಿಗುಣ>, 0
 };
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 
-static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
-                    bool is_ipower, int ipower)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_pow(ಒಳಹರಿವು_Array _src, ದ್ವಿಗುಣ power, OutputArray _dst,
+                    ತಾರ್ಕಿಕ is_ipower, ಪೂರ್ಣಾಂಕ ipower)
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            rowsPerWI = d.isIntel() ? 4 : 1;
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    ಸ್ಥಿರಾಂಕ ocl::Device & d = ocl::Device::getDefault();
+    ಪೂರ್ಣಾಂಕ type = _src.type(), ಆಳ = CV_MAT_ಆಳ(type), cn = CV_MAT_CN(type),
+            ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI = d.isIntel() ? 4 : 1;
+    ತಾರ್ಕಿಕ doubleSupport = d.doubleFPConfig() > 0;
 
-    _dst.createSameSize(_src, type);
-    if (is_ipower)
+    _dst.create_Same_ಗಾತ್ರ(_src, type);
+    ಆದರೆ (is_ipower)
     {
-        if( ipower < 0 )
+        ಆದರೆ( ipower < 0 )
         {
-            if( depth == CV_32F || depth == CV_64F )
-                is_ipower = false;
-            else
-                return false;
+            ಆದರೆ( ಆಳ == CV_32F || ಆಳ == CV_64F )
+                is_ipower = ಸುಳ್ಳು;
+            ಇಲ್ಲದಿದ್ದರೆ
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         }
     }
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    ಆದರೆ (ಆಳ == CV_64F && !doubleSupport)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    bool issqrt = std::abs(power - 0.5) < DBL_EPSILON;
-    const char * const op = issqrt ? "OP_SQRT" : is_ipower ? "OP_POWN" : "OP_POW";
+    ತಾರ್ಕಿಕ issqrt = std::ನಿರಪೇಕ್ಷ(power - 0.5) < DBL_EPSILON;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * ಸ್ಥಿರಾಂಕ op = issqrt ? "OP_SQRT" : is_ipower ? "OP_POWN" : "OP_POW";
 
     // Note: channels are unrolled
 
     std::string extra_opts ="";
-    if (is_ipower)
+    ಆದರೆ (is_ipower)
     {
-        int wdepth = CV_32F;
-        if (depth == CV_64F)
+        ಪೂರ್ಣಾಂಕ wdepth = CV_32F;
+        ಆದರೆ (ಆಳ == CV_64F)
             wdepth = CV_64F;
-        else if (depth == CV_16F)
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಆಳ == CV_16F)
             wdepth = CV_16F;
 
-        char cvt[2][50];
+        ಅಕ್ಷರ cvt[2][50];
         extra_opts = format(
             " -D srcT1=%s -DsrcT1_C1=%s"
             " -D srcT2=int -D workST=int"
             " -D workT=%s -D wdepth=%d -D convertToWT1=%s"
             " -D convertToDT=%s"
             " -D workT1=%s",
-            ocl::typeToStr(CV_MAKE_TYPE(depth, 1)),
-            ocl::typeToStr(CV_MAKE_TYPE(depth, 1)),
-            ocl::typeToStr(CV_MAKE_TYPE(wdepth, 1)),
+            ocl::type_ಗಮ್ಯ_Str(CV_MAKE_TYPE(ಆಳ, 1)),
+            ocl::type_ಗಮ್ಯ_Str(CV_MAKE_TYPE(ಆಳ, 1)),
+            ocl::type_ಗಮ್ಯ_Str(CV_MAKE_TYPE(wdepth, 1)),
             wdepth,
-            ocl::convertTypeStr(depth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-            ocl::convertTypeStr(wdepth, depth, 1, cvt[1], sizeof(cvt[1])),
-            ocl::typeToStr(wdepth)
+            ocl::convertTypeStr(ಆಳ, wdepth, 1, cvt[0], ಗಾತ್ರ(cvt[0])),
+            ocl::convertTypeStr(wdepth, ಆಳ, 1, cvt[1], ಗಾತ್ರ(cvt[1])),
+            ocl::type_ಗಮ್ಯ_Str(wdepth)
         );
     }
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D cn=%d -D dstT=%s -D dstT_C1=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D %s%s%s%s",
                          1,
-                         ocl::typeToStr(depth), ocl::typeToStr(depth), depth, rowsPerWI, op,
+                         ocl::type_ಗಮ್ಯ_Str(ಆಳ), ocl::type_ಗಮ್ಯ_Str(ಆಳ), ಆಳ, ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI, op,
                          " -D UNARY_OP=1",
                          extra_opts.empty() ? "" : extra_opts.c_str(),
                          doubleSupport ? " -D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    ಆದರೆ (k.empty())
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     UMat src = _src.getUMat();
-    _dst.createSameSize(src, type);
+    _dst.create_Same_ಗಾತ್ರ(src, type);
     UMat dst = _dst.getUMat();
 
-    ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+    ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_ಗಾತ್ರ(src),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn);
 
-    if (issqrt)
-        k.args(srcarg, dstarg);
-    else if (is_ipower)
-        k.args(srcarg, dstarg, ipower);
-    else
+    ಆದರೆ (issqrt)
+        k.ವಾದಗಳು(srcarg, dstarg);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (is_ipower)
+        k.ವಾದಗಳು(srcarg, dstarg, ipower);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if (depth == CV_32F)
-            k.args(srcarg, dstarg, (float)power);
-        else
-            k.args(srcarg, dstarg, power);
+        ಆದರೆ (ಆಳ == CV_32F)
+            k.ವಾದಗಳು(srcarg, dstarg, (ದಶಮಾಂಶ)power);
+        ಇಲ್ಲದಿದ್ದರೆ
+            k.ವಾದಗಳು(srcarg, dstarg, power);
     }
 
-    size_t globalsize[2] = { (size_t)dst.cols *  cn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ *  cn, ((size_t)dst.ಅಡ್ಡಸಾಲುಗಳು + ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI - 1) / ಅಡ್ಡಸಾಲುಗಳು_ಪ್ರತಿ_WI };
+    ಹಿಂತಿರುಗಿ k.ಸತತ(2, globalsize, ಖಾಲಿ, ಸುಳ್ಳು);
 }
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-void pow( InputArray _src, double power, OutputArray _dst )
+ಶೂನ್ಯ ಘಾತ( ಒಳಹರಿವು_Array _src, ದ್ವಿಗುಣ power, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type),
-            cn = CV_MAT_CN(type), ipower = cvRound(power);
-    bool is_ipower = fabs(ipower - power) < DBL_EPSILON;
-#ifdef HAVE_OPENCL
-    bool useOpenCL = _dst.isUMat() && _src.dims() <= 2;
-#endif
+    ಪೂರ್ಣಾಂಕ type = _src.type(), ಆಳ = CV_MAT_ಆಳ(type),
+            cn = CV_MAT_CN(type), ipower = cv_ಸುತ್ತು(power);
+    ತಾರ್ಕಿಕ is_ipower = fabs(ipower - power) < DBL_EPSILON;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
+    ತಾರ್ಕಿಕ useOpenCL = _dst.isUMat() && _src.dims() <= 2;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (is_ipower)
+    ಆದರೆ (is_ipower)
     {
-        switch( ipower )
+        ಆಯ್ಕೆ( ipower )
         {
-        case 0:
-            _dst.createSameSize(_src, type);
-            _dst.setTo(Scalar::all(1));
-            return;
-        case 1:
-            _src.copyTo(_dst);
-            return;
-        case 2:
+        ಸ್ಥಿತಿ 0:
+            _dst.create_Same_ಗಾತ್ರ(_src, type);
+            _dst.ಗಣ_ಗಮ್ಯ(Scalar::all(1));
+            ಹಿಂತಿರುಗಿ;
+        ಸ್ಥಿತಿ 1:
+            _src.copy_ಗಮ್ಯ(_dst);
+            ಹಿಂತಿರುಗಿ;
+        ಸ್ಥಿತಿ 2:
             multiply(_src, _src, _dst);
-            return;
+            ಹಿಂತಿರುಗಿ;
         }
     }
 
-    CV_OCL_RUN(useOpenCL, ocl_pow(_src, power, _dst, is_ipower, ipower))
+    CV_OCL_ಸತತ(useOpenCL, ocl_pow(_src, power, _dst, is_ipower, ipower))
 
-    const bool floatDepth = depth == CV_16F || depth == CV_16BF || depth == CV_32F || depth == CV_64F;
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ float_ಆಳ = ಆಳ == CV_16F || ಆಳ == CV_16BF || ಆಳ == CV_32F || ಆಳ == CV_64F;
 
     // INTEGER array ** INTEGER power: keep the classic iPow kernels (an exact multiply chain with
     // the classic wrap-around semantics) - full bit-exact compatibility for whoever relies on it.
     // Everything else - any power on a float array, a fractional power on an integer one (computed
     // in the float domain and saturated back), plus the 32U/64-bit depths iPow never supported -
     // goes through the engine below.
-    if( is_ipower && !floatDepth && ipowTab[depth] )
+    ಆದರೆ( is_ipower && !float_ಆಳ && ipowTab[ಆಳ] )
     {
         Mat src = _src.getMat();
-        _dst.createSameSize(_src, type);
+        _dst.create_Same_ಗಾತ್ರ(_src, type);
         Mat dst = _dst.getMat();
 
-        const Mat* arrays[] = {&src, &dst, 0};
+        ಸ್ಥಿರಾಂಕ Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int len = (int)(it.size*cn);
-        IPowFunc func = ipowTab[depth];
+        ಪೂರ್ಣಾಂಕ len = (ಪೂರ್ಣಾಂಕ)(it.size*cn);
+        IPowFunc func = ipowTab[ಆಳ];
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ಗಾಗಿ( size_t i = 0; i < it.nplanes; i++, ++it )
             func( ptrs[0], ptrs[1], len, ipower );
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
 
     // The engine path, two tiers like math_op: the pow kernel special-cases the exponents
     // 3/0.5 (2/1/0 never reach here) per row and vectorizes the general exp(p*log x) with an exact
     // std::pow patch for non-positive bases (0^negative -> inf, negative^fractional -> NaN).
     Mat src = _src.getMat();
-    _dst.createSameSize(_src, type);
+    _dst.create_Same_ಗಾತ್ರ(_src, type);
     Mat dst = _dst.getMat();
-    if (src.empty())
-        return;
+    ಆದರೆ (src.empty())
+        ಹಿಂತಿರುಗಿ;
 
-    const size_t total = src.total() * cn;
-    if (floatDepth && src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
+    ಸ್ಥಿರಾಂಕ size_t ಒಟ್ಟು = src.ಒಟ್ಟು() * cn;
+    ಆದರೆ (float_ಆಳ && src.isContinuous() && dst.isContinuous() && ಒಟ್ಟು <= (size_t)MATH_OP_SMALL)
     {
-        ew::TKernel k = ew::getPowFunc(depth, depth);
-        if (k.fptr)
+        ew::TKernel k = ew::getPowFunc(ಆಳ, ಆಳ);
+        ಆದರೆ (k.fptr)
         {
-            double pvstore;                    // the broadcast exponent, stored as T
-            void* pv = &pvstore;
-            switch (depth)
+            ದ್ವಿಗುಣ pvstore;                    // the broadcast exponent, stored as T
+            ಶೂನ್ಯ* pv = &pvstore;
+            ಆಯ್ಕೆ (ಆಳ)
             {
-            case CV_16F:  *(hfloat*)pv = saturate_cast<hfloat>(power); break;
-            case CV_16BF: *(bfloat*)pv = saturate_cast<bfloat>(power); break;
-            case CV_32F:  *(float*)pv = (float)power; break;
-            default:      pvstore = power; break;
+            ಸ್ಥಿತಿ CV_16F:  *(hfloat*)pv = saturate_cast<hfloat>(power); ನಿಲ್ಲಿಸು;
+            ಸ್ಥಿತಿ CV_16BF: *(bfloat*)pv = saturate_cast<bfloat>(power); ನಿಲ್ಲಿಸು;
+            ಸ್ಥಿತಿ CV_32F:  *(ದಶಮಾಂಶ*)pv = (ದಶಮಾಂಶ)power; ನಿಲ್ಲಿಸು;
+            ಪೂರ್ವನಿಯೋಜಿತ:      pvstore = power; ನಿಲ್ಲಿಸು;
             }
-            static const double noparams[4] = {};
-            k.fptr(src.data, 0, 1, pv, 0, 0, nullptr, 0, 0,
-                   dst.data, 0, (int)total, 1, noparams, k.flags, k.userdata);
-            return;
+            ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ noparams[4] = {};
+            k.fptr(src.ದತ್ತಾಂಶ, 0, 1, pv, 0, 0, ಶೂನ್ಯಸೂಚಕ, 0, 0,
+                   dst.ದತ್ತಾಂಶ, 0, (ಪೂರ್ಣಾಂಕ)ಒಟ್ಟು, 1, noparams, k.flags, k.userdata);
+            ಹಿಂತಿರುಗಿ;
         }
     }
 
     ew::TExpr prog;
-    const int a = prog.addInput(depth);
-    const int c = prog.addConst(ew::EW_DEPTH_NONE, Scalar(power), 1);
-    const int out = prog.addOutput(depth);
-    prog.moveToOutput(prog.emitBinary(ew::OP_POW, a, c, depth), out);
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ a = prog.ಕೂಡಿಸು_ಒಳಹರಿವು(ಆಳ);
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ c = prog.ಕೂಡಿಸು_Const(ew::EW_ಆಳ_NONE, Scalar(power), 1);
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ out = prog.ಕೂಡಿಸು_Output(ಆಳ);
+    prog.move_ಗಮ್ಯ_Output(prog.emit_ದ್ವಿಮಾನ(ew::OP_POW, a, c, ಆಳ), out);
     prog.compile();
-    const Mat* inputs[] = { &src };
+    ಸ್ಥಿರಾಂಕ Mat* inputs[] = { &src };
     prog.exec(inputs, &dst);
 }
 
-void sqrt(InputArray a, OutputArray b)
+ಶೂನ್ಯ ವರ್ಗಮೂಲ(ಒಳಹರಿವು_Array a, OutputArray b)
 {
     CV_INSTRUMENT_REGION();
 
-    if (b.isUMat() && a.dims() <= 2)     // the OpenCL route (via ocl_pow) is unchanged
+    ಆದರೆ (b.isUMat() && a.dims() <= 2)     // the OpenCL route (via ocl_pow) is unchanged
     {
-        cv::pow(a, 0.5, b);
-        return;
+        cv::ಘಾತ(a, 0.5, b);
+        ಹಿಂತಿರುಗಿ;
     }
     math_op(ew::OP_SQRT, a, b);
 }
 
 /************************** CheckArray for NaN's, Inf's *********************************/
 
-template<int cv_mat_type> struct mat_type_assotiations{};
+ಮಾದರಿ<ಪೂರ್ಣಾಂಕ cv_mat_type> ರಚನೆ mat_type_assotiations{};
 
-template<> struct mat_type_assotiations<CV_8U>
+ಮಾದರಿ<> ರಚನೆ mat_type_assotiations<CV_8U>
 {
-    typedef unsigned char type;
-    static const type min_allowable = 0x0;
-    static const type max_allowable = 0xFF;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ type;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type min_allowable = 0x0;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type max_allowable = 0xFF;
 };
 
-template<> struct mat_type_assotiations<CV_8S>
+ಮಾದರಿ<> ರಚನೆ mat_type_assotiations<CV_8S>
 {
-    typedef signed char type;
-    static const type min_allowable = SCHAR_MIN;
-    static const type max_allowable = SCHAR_MAX;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆಯುಳ್ಳ ಅಕ್ಷರ type;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type min_allowable = SCHAR_MIN;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type max_allowable = SCHAR_MAX;
 };
 
-template<> struct mat_type_assotiations<CV_16U>
+ಮಾದರಿ<> ರಚನೆ mat_type_assotiations<CV_16U>
 {
-    typedef unsigned short type;
-    static const type min_allowable = 0x0;
-    static const type max_allowable = USHRT_MAX;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆರಹಿತ ಗಿಡ್ಡ type;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type min_allowable = 0x0;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type max_allowable = USHRT_MAX;
 };
-template<> struct mat_type_assotiations<CV_16S>
+ಮಾದರಿ<> ರಚನೆ mat_type_assotiations<CV_16S>
 {
-    typedef signed short type;
-    static const type min_allowable = SHRT_MIN;
-    static const type max_allowable = SHRT_MAX;
-};
-
-template<> struct mat_type_assotiations<CV_32S>
-{
-    typedef int type;
-    static const type min_allowable = (-INT_MAX - 1);
-    static const type max_allowable = INT_MAX;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಚಿಹ್ನೆಯುಳ್ಳ ಗಿಡ್ಡ type;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type min_allowable = SHRT_MIN;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type max_allowable = SHRT_MAX;
 };
 
-template<int depth>
-static bool checkIntegerRange(cv::Mat src, Point& bad_pt, int minVal, int maxVal)
+ಮಾದರಿ<> ರಚನೆ mat_type_assotiations<CV_32S>
 {
-    typedef mat_type_assotiations<depth> type_ass;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಪೂರ್ಣಾಂಕ type;
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type min_allowable = (-ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ - 1);
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ type max_allowable = ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ;
+};
 
-    if (minVal < type_ass::min_allowable && maxVal > type_ass::max_allowable)
+ಮಾದರಿ<ಪೂರ್ಣಾಂಕ ಆಳ>
+ಸ್ಥಿರ ತಾರ್ಕಿಕ checkIntegerRange(cv::Mat src, ಬಿಂದು& bad_pt, ಪೂರ್ಣಾಂಕ minVal, ಪೂರ್ಣಾಂಕ maxVal)
+{
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ mat_type_assotiations<ಆಳ> type_ass;
+
+    ಆದರೆ (minVal < type_ass::min_allowable && maxVal > type_ass::max_allowable)
     {
-        return true;
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
-    else if (minVal > type_ass::max_allowable || maxVal < type_ass::min_allowable || maxVal < minVal)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (minVal > type_ass::max_allowable || maxVal < type_ass::min_allowable || maxVal < minVal)
     {
-        bad_pt = cv::Point(0,0);
-        return false;
+        bad_pt = cv::ಬಿಂದು(0,0);
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
     cv::Mat as_one_channel = src.reshape(1,0);
 
-    for (int j = 0; j < as_one_channel.rows; ++j)
-        for (int i = 0; i < as_one_channel.cols; ++i)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ j = 0; j < as_one_channel.ಅಡ್ಡಸಾಲುಗಳು; ++j)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < as_one_channel.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; ++i)
         {
-            typename type_ass::type v = as_one_channel.at<typename type_ass::type>(j ,i);
-            if (v < minVal || v > maxVal)
+            ಬಗೆ_ಹೆಸರು type_ass::type v = as_one_channel.at<ಬಗೆ_ಹೆಸರು type_ass::type>(j ,i);
+            ಆದರೆ (v < minVal || v > maxVal)
             {
                 bad_pt.y = j;
                 bad_pt.x = i / src.channels();
-                return false;
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
             }
         }
 
-    return true;
+    ಹಿಂತಿರುಗಿ ನಿಜ;
 }
 
-typedef bool (*check_range_function)(cv::Mat src, Point& bad_pt, int minVal, int maxVal);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ತಾರ್ಕಿಕ (*check_range_function)(cv::Mat src, ಬಿಂದು& bad_pt, ಪೂರ್ಣಾಂಕ minVal, ಪೂರ್ಣಾಂಕ maxVal);
 
 check_range_function check_range_functions[] =
 {
@@ -1168,113 +1168,113 @@ check_range_function check_range_functions[] =
     &checkIntegerRange<CV_32S>
 };
 
-template<typename T>
-static void checkTypedRange(Mat& src, Point& badPt, double minVal, double maxVal)
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T>
+ಸ್ಥಿರ ಶೂನ್ಯ checkTypedRange(Mat& src, ಬಿಂದು& badPt, ದ್ವಿಗುಣ minVal, ದ್ವಿಗುಣ maxVal)
 {
-    int loc = 0;
-    int cn = src.channels();
-    Size size = getContinuousSize2D(src, cn);
-    const T* isrc = src.ptr<T>();
-    size_t step = src.step / sizeof(isrc[0]);
+    ಪೂರ್ಣಾಂಕ loc = 0;
+    ಪೂರ್ಣಾಂಕ cn = src.channels();
+    ಗಾತ್ರ_2 size = getContinuousSize2D(src, cn);
+    ಸ್ಥಿರಾಂಕ T* isrc = src.ptr<T>();
+    size_t ಹೆಜ್ಜೆ = src.ಹೆಜ್ಜೆ / ಗಾತ್ರ(isrc[0]);
 
-    for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+    ಗಾಗಿ( ; badPt.x < 0 && size.ಎತ್ತರ--; loc += size.ಅಗಲ, isrc += ಹೆಜ್ಜೆ )
     {
-        for( int i = 0; i < size.width; i++ )
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < size.ಅಗಲ; i++ )
         {
-            double val = (double)isrc[i];
-            if( !(val >= minVal && val < maxVal) )
+            ದ್ವಿಗುಣ val = (ದ್ವಿಗುಣ)isrc[i];
+            ಆದರೆ( !(val >= minVal && val < maxVal) )
             {
-                int pixelId = (loc + i) / cn;
-                badPt = Point(pixelId % src.cols, pixelId / src.cols);
-                break;
+                ಪೂರ್ಣಾಂಕ pixelId = (loc + i) / cn;
+                badPt = ಬಿಂದು(pixelId % src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, pixelId / src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+                ನಿಲ್ಲಿಸು;
             }
         }
     }
 }
 
-bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double maxVal)
+ತಾರ್ಕಿಕ checkRange(ಒಳಹರಿವು_Array _src, ತಾರ್ಕಿಕ quiet, ಬಿಂದು* pt, ದ್ವಿಗುಣ minVal, ದ್ವಿಗುಣ maxVal)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
 
-    if ( src.dims > 2 )
+    ಆದರೆ ( src.dims > 2 )
     {
-        CV_Assert(pt == NULL); // no way to provide location info
+        CV_Assert(pt == ಖಾಲಿ); // no way to provide location info
 
-        const Mat* arrays[] = {&src, 0};
+        ಸ್ಥಿರಾಂಕ Mat* arrays[] = {&src, 0};
         Mat planes[1];
         NAryMatIterator it(arrays, planes);
 
-        for ( size_t i = 0; i < it.nplanes; i++, ++it )
+        ಗಾಗಿ ( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if (!checkRange( it.planes[0], quiet, NULL, minVal, maxVal ))
+            ಆದರೆ (!checkRange( it.planes[0], quiet, ಖಾಲಿ, minVal, maxVal ))
             {
-                return false;
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
             }
         }
-        return true;
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
 
-    int depth = src.depth();
-    Point badPt(-1, -1);
+    ಪೂರ್ಣಾಂಕ ಆಳ = src.ಆಳ();
+    ಬಿಂದು badPt(-1, -1);
 
-    if (depth < CV_32F)
+    ಆದರೆ (ಆಳ < CV_32F)
     {
-        int minVali = minVal <= INT_MIN ? INT_MIN : cvFloor(minVal);
-        int maxVali = maxVal > INT_MAX ? INT_MAX : cvCeil(maxVal) - 1;
+        ಪೂರ್ಣಾಂಕ minVali = minVal <= INT_MIN ? INT_MIN : cvFloor(minVal);
+        ಪೂರ್ಣಾಂಕ maxVali = maxVal > ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ ? ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ : cvCeil(maxVal) - 1;
 
-        (check_range_functions[depth])(src, badPt, minVali, maxVali);
+        (check_range_functions[ಆಳ])(src, badPt, minVali, maxVali);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        int i, loc = 0;
-        int cn = src.channels();
-        Size size = getContinuousSize2D(src, cn);
+        ಪೂರ್ಣಾಂಕ i, loc = 0;
+        ಪೂರ್ಣಾಂಕ cn = src.channels();
+        ಗಾತ್ರ_2 size = getContinuousSize2D(src, cn);
 
-        if( depth == CV_16F )
+        ಆದರೆ( ಆಳ == CV_16F )
         {
             checkTypedRange<hfloat>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_16BF )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಆಳ == CV_16BF )
         {
             checkTypedRange<bfloat>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_32F )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಆಳ == CV_32F )
         {
             Cv32suf a, b;
-            int ia, ib;
-            const int* isrc = src.ptr<int>();
-            size_t step = src.step/sizeof(isrc[0]);
+            ಪೂರ್ಣಾಂಕ ia, ib;
+            ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* isrc = src.ptr<ಪೂರ್ಣಾಂಕ>();
+            size_t ಹೆಜ್ಜೆ = src.ಹೆಜ್ಜೆ/ಗಾತ್ರ(isrc[0]);
 
-            a.f = (float)std::max(minVal, (double)-FLT_MAX);
-            b.f = (float)std::min(maxVal, (double)FLT_MAX);
+            a.f = (ದಶಮಾಂಶ)std::max(minVal, (ದ್ವಿಗುಣ)-FLT_MAX);
+            b.f = (ದಶಮಾಂಶ)std::min(maxVal, (ದ್ವಿಗುಣ)FLT_MAX);
 
             ia = CV_TOGGLE_FLT(a.i);
             ib = CV_TOGGLE_FLT(b.i);
 
-            for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+            ಗಾಗಿ( ; badPt.x < 0 && size.ಎತ್ತರ--; loc += size.ಅಗಲ, isrc += ಹೆಜ್ಜೆ )
             {
-                for( i = 0; i < size.width; i++ )
+                ಗಾಗಿ( i = 0; i < size.ಅಗಲ; i++ )
                 {
-                    int val = isrc[i];
+                    ಪೂರ್ಣಾಂಕ val = isrc[i];
                     val = CV_TOGGLE_FLT(val);
 
-                    if( val < ia || val >= ib )
+                    ಆದರೆ( val < ia || val >= ib )
                     {
-                        int pixelId = (loc + i) / cn;
-                        badPt = Point(pixelId % src.cols, pixelId / src.cols);
-                        break;
+                        ಪೂರ್ಣಾಂಕ pixelId = (loc + i) / cn;
+                        badPt = ಬಿಂದು(pixelId % src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, pixelId / src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+                        ನಿಲ್ಲಿಸು;
                     }
                 }
             }
         }
-        else if( depth == CV_64F )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಆಳ == CV_64F )
         {
             Cv64suf a, b;
             int64 ia, ib;
-            const int64* isrc = src.ptr<int64>();
-            size_t step = src.step/sizeof(isrc[0]);
+            ಸ್ಥಿರಾಂಕ int64* isrc = src.ptr<int64>();
+            size_t ಹೆಜ್ಜೆ = src.ಹೆಜ್ಜೆ/ಗಾತ್ರ(isrc[0]);
 
             a.f = minVal;
             b.f = maxVal;
@@ -1282,58 +1282,58 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
             ia = CV_TOGGLE_DBL(a.i);
             ib = CV_TOGGLE_DBL(b.i);
 
-            for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+            ಗಾಗಿ( ; badPt.x < 0 && size.ಎತ್ತರ--; loc += size.ಅಗಲ, isrc += ಹೆಜ್ಜೆ )
             {
-                for( i = 0; i < size.width; i++ )
+                ಗಾಗಿ( i = 0; i < size.ಅಗಲ; i++ )
                 {
                     int64 val = isrc[i];
                     val = CV_TOGGLE_DBL(val);
 
-                    if( val < ia || val >= ib )
+                    ಆದರೆ( val < ia || val >= ib )
                     {
-                        int pixelId = (loc + i) / cn;
-                        badPt = Point(pixelId % src.cols, pixelId / src.cols);
-                        break;
+                        ಪೂರ್ಣಾಂಕ pixelId = (loc + i) / cn;
+                        badPt = ಬಿಂದು(pixelId % src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, pixelId / src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+                        ನಿಲ್ಲಿಸು;
                     }
                 }
             }
         }
-        else if( depth == CV_Bool )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಆಳ == CV_Bool )
         {
             checkTypedRange<uchar>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_32U )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಆಳ == CV_32U )
         {
             checkTypedRange<uint32_t>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_64U )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಆಳ == CV_64U )
         {
             checkTypedRange<uint64_t>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_64S )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಆಳ == CV_64S )
         {
             checkTypedRange<int64_t>(src, badPt, minVal, maxVal);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             CV_Error(Error::StsUnsupportedFormat, "Unsupported matrix depth in checkRange");
         }
     }
 
-    if( badPt.x >= 0 )
+    ಆದರೆ( badPt.x >= 0 )
     {
-        if( pt )
+        ಆದರೆ( pt )
             *pt = badPt;
-        if( !quiet )
+        ಆದರೆ( !quiet )
         {
-            cv::String value_str;
-            value_str << src(cv::Range(badPt.y, badPt.y + 1), cv::Range(badPt.x, badPt.x + 1));
-            CV_Error_( cv::Error::StsOutOfRange,
-            ("the value at (%d, %d)=%s is out of range [%f, %f)", badPt.x, badPt.y, value_str.c_str(), minVal, maxVal));
+            cv::String ಮೌಲ್ಯ_str;
+            ಮೌಲ್ಯ_str << src(cv::Range(badPt.y, badPt.y + 1), cv::Range(badPt.x, badPt.x + 1));
+            CV_Error_( cv::Error::Sts_ಹೊರಹೋಗು_ದ_Range,
+            ("the value at (%d, %d)=%s is out of range [%f, %f)", badPt.x, badPt.y, ಮೌಲ್ಯ_str.c_str(), minVal, maxVal));
         }
-        return false;
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
-    return true;
+    ಹಿಂತಿರುಗಿ ನಿಜ;
 }
 
 } // namespace cv
@@ -1362,84 +1362,84 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
   -----------------------------------------------------------------------
 */
 
-int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
+ಪೂರ್ಣಾಂಕ cv::solveCubic( ಒಳಹರಿವು_Array _coeffs, OutputArray _roots )
 {
     CV_INSTRUMENT_REGION();
 
-    const int n0 = 3;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ n0 = 3;
     Mat coeffs = _coeffs.getMat();
-    int ctype = coeffs.type();
+    ಪೂರ್ಣಾಂಕ ctype = coeffs.type();
 
     CV_Assert( ctype == CV_32F || ctype == CV_64F );
-    CV_Assert( (coeffs.size() == Size(n0, 1) ||
-                coeffs.size() == Size(n0+1, 1) ||
-                coeffs.size() == Size(1, n0) ||
-                coeffs.size() == Size(1, n0+1)) );
+    CV_Assert( (coeffs.size() == ಗಾತ್ರ_2(n0, 1) ||
+                coeffs.size() == ಗಾತ್ರ_2(n0+1, 1) ||
+                coeffs.size() == ಗಾತ್ರ_2(1, n0) ||
+                coeffs.size() == ಗಾತ್ರ_2(1, n0+1)) );
 
-    _roots.create(n0, 1, ctype, -1, true, _OutputArray::DEPTH_MASK_FLT);
+    _roots.create(n0, 1, ctype, -1, ನಿಜ, _OutputArray::ಆಳ_ಮುಖವಾಡ_FLT);
     Mat roots = _roots.getMat();
 
-    int i = -1, n = 0;
-    double a0 = 1., a1, a2, a3;
-    double x0 = 0., x1 = 0., x2 = 0.;
-    int ncoeffs = coeffs.rows + coeffs.cols - 1;
+    ಪೂರ್ಣಾಂಕ i = -1, n = 0;
+    ದ್ವಿಗುಣ a0 = 1., a1, a2, a3;
+    ದ್ವಿಗುಣ x0 = 0., x1 = 0., x2 = 0.;
+    ಪೂರ್ಣಾಂಕ ncoeffs = coeffs.ಅಡ್ಡಸಾಲುಗಳು + coeffs.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1;
 
-    if( ctype == CV_32FC1 )
+    ಆದರೆ( ctype == CV_32FC1 )
     {
-        if( ncoeffs == 4 )
-            a0 = coeffs.at<float>(++i);
+        ಆದರೆ( ncoeffs == 4 )
+            a0 = coeffs.at<ದಶಮಾಂಶ>(++i);
 
-        a1 = coeffs.at<float>(i+1);
-        a2 = coeffs.at<float>(i+2);
-        a3 = coeffs.at<float>(i+3);
+        a1 = coeffs.at<ದಶಮಾಂಶ>(i+1);
+        a2 = coeffs.at<ದಶಮಾಂಶ>(i+2);
+        a3 = coeffs.at<ದಶಮಾಂಶ>(i+3);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if( ncoeffs == 4 )
-            a0 = coeffs.at<double>(++i);
+        ಆದರೆ( ncoeffs == 4 )
+            a0 = coeffs.at<ದ್ವಿಗುಣ>(++i);
 
-        a1 = coeffs.at<double>(i+1);
-        a2 = coeffs.at<double>(i+2);
-        a3 = coeffs.at<double>(i+3);
+        a1 = coeffs.at<ದ್ವಿಗುಣ>(i+1);
+        a2 = coeffs.at<ದ್ವಿಗುಣ>(i+2);
+        a3 = coeffs.at<ದ್ವಿಗುಣ>(i+3);
     }
 
     // Fix for Issue #27748: Normalize coefficients to avoid overflow/underflow
     // and correctly detect negligible cubic terms.
-    double max_coeff = std::max({std::abs(a0), std::abs(a1), std::abs(a2), std::abs(a3)});
+    ದ್ವಿಗುಣ max_coeff = std::max({std::ನಿರಪೇಕ್ಷ(a0), std::ನಿರಪೇಕ್ಷ(a1), std::ನಿರಪೇಕ್ಷ(a2), std::ನಿರಪೇಕ್ಷ(a3)});
 
     // If max_coeff is effectively zero, the equation is 0=0
-    if (max_coeff < std::numeric_limits<double>::epsilon())
-        return -1;
+    ಆದರೆ (max_coeff < std::numeric_limits<ದ್ವಿಗುಣ>::epsilon())
+        ಹಿಂತಿರುಗಿ -1;
 
     // Check if the cubic term is negligible relative to the largest coefficient
-    if( std::abs(a0) < std::numeric_limits<double>::epsilon() * max_coeff )
+    ಆದರೆ( std::ನಿರಪೇಕ್ಷ(a0) < std::numeric_limits<ದ್ವಿಗುಣ>::epsilon() * max_coeff )
     {
-        if( std::abs(a1) < std::numeric_limits<double>::epsilon() * max_coeff )
+        ಆದರೆ( std::ನಿರಪೇಕ್ಷ(a1) < std::numeric_limits<ದ್ವಿಗುಣ>::epsilon() * max_coeff )
         {
-            if( std::abs(a2) < std::numeric_limits<double>::epsilon() * max_coeff )
-                n = std::abs(a3) < std::numeric_limits<double>::epsilon() * max_coeff ? -1 : 0;
-            else
+            ಆದರೆ( std::ನಿರಪೇಕ್ಷ(a2) < std::numeric_limits<ದ್ವಿಗುಣ>::epsilon() * max_coeff )
+                n = std::ನಿರಪೇಕ್ಷ(a3) < std::numeric_limits<ದ್ವಿಗುಣ>::epsilon() * max_coeff ? -1 : 0;
+            ಇಲ್ಲದಿದ್ದರೆ
             {
                 // linear equation
                 x0 = -a3/a2;
                 n = 1;
             }
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             // quadratic equation
-            double d = a2*a2 - 4*a1*a3;
-            if( d >= 0 )
+            ದ್ವಿಗುಣ d = a2*a2 - 4*a1*a3;
+            ಆದರೆ( d >= 0 )
             {
-                d = std::sqrt(d);
-                double q1 = (-a2 + d) * 0.5;
-                double q2 = (a2 + d) * -0.5;
-                if( std::abs(q1) > std::abs(q2) )
+                d = std::ವರ್ಗಮೂಲ(d);
+                ದ್ವಿಗುಣ q1 = (-a2 + d) * 0.5;
+                ದ್ವಿಗುಣ q2 = (a2 + d) * -0.5;
+                ಆದರೆ( std::ನಿರಪೇಕ್ಷ(q1) > std::ನಿರಪೇಕ್ಷ(q2) )
                 {
                     x0 = q1 / a1;
                     x1 = a3 / q1;
                 }
-                else
+                ಇಲ್ಲದಿದ್ದರೆ
                 {
                     x0 = q2 / a1;
                     x1 = a3 / q2;
@@ -1448,11 +1448,11 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
             }
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         // cubic equation
         // Normalize coefficients in-place to prevent overflow/instability
-        double scale = 1.0 / max_coeff;
+        ದ್ವಿಗುಣ scale = 1.0 / max_coeff;
         a0 *= scale;
         a1 *= scale;
         a2 *= scale;
@@ -1463,9 +1463,9 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
         a2 *= a0;
         a3 *= a0;
 
-        double Q = (a1 * a1 - 3 * a2) * (1./9);
-        double R = (a1 * (2 * a1 * a1 - 9 * a2) + 27 * a3) * (1./54);
-        double Qcubed = Q * Q * Q;
+        ದ್ವಿಗುಣ Q = (a1 * a1 - 3 * a2) * (1./9);
+        ದ್ವಿಗುಣ R = (a1 * (2 * a1 * a1 - 9 * a2) + 27 * a3) * (1./54);
+        ದ್ವಿಗುಣ Qcubed = Q * Q * Q;
 
         /*
           Here we expand expression `Qcubed - R * R` for `d` variable
@@ -1474,21 +1474,21 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
 
           And then we additionally group terms to further reduce rounding error.
         */
-        double d = (a1 * a1 * (a2 * a2 - 4 * a1 * a3) + 2 * a2 * (9 * a1 * a3 - 2 * a2 * a2) - 27 * a3 * a3) * (1./108);
+        ದ್ವಿಗುಣ d = (a1 * a1 * (a2 * a2 - 4 * a1 * a3) + 2 * a2 * (9 * a1 * a3 - 2 * a2 * a2) - 27 * a3 * a3) * (1./108);
 
-        if( d > 0 )
+        ಆದರೆ( d > 0 )
         {
-            double theta = acos(R / sqrt(Qcubed));
-            double sqrtQ = sqrt(Q);
-            double t0 = -2 * sqrtQ;
-            double t1 = theta * (1./3);
-            double t2 = a1 * (1./3);
-            x0 = t0 * cos(t1) - t2;
-            x1 = t0 * cos(t1 + (2.*CV_PI/3)) - t2;
-            x2 = t0 * cos(t1 + (4.*CV_PI/3)) - t2;
+            ದ್ವಿಗುಣ theta = acos(R / ವರ್ಗಮೂಲ(Qcubed));
+            ದ್ವಿಗುಣ sqrtQ = ವರ್ಗಮೂಲ(Q);
+            ದ್ವಿಗುಣ t0 = -2 * sqrtQ;
+            ದ್ವಿಗುಣ t1 = theta * (1./3);
+            ದ್ವಿಗುಣ t2 = a1 * (1./3);
+            x0 = t0 * ಕೋಜ್ಯಾ(t1) - t2;
+            x1 = t0 * ಕೋಜ್ಯಾ(t1 + (2.*CV_PI/3)) - t2;
+            x2 = t0 * ಕೋಜ್ಯಾ(t1 + (4.*CV_PI/3)) - t2;
             n = 3;
         }
-        else if( d == 0 )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( d == 0 )
         {
             x0 = -2*std::cbrt(R) - a1/3;
             x1 = std::cbrt(R) - a1/3;
@@ -1496,189 +1496,189 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
             n = x0 == x1 ? 1 : 2;
             x1 = x0 == x1 ? 0 : x1;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            double e;
-            d = sqrt(-d);
+            ದ್ವಿಗುಣ e;
+            d = ವರ್ಗಮೂಲ(-d);
             e = std::cbrt(d + fabs(R));
-            if( R > 0 )
+            ಆದರೆ( R > 0 )
                 e = -e;
             x0 = (e + Q / e) - a1 * (1./3);
             n = 1;
         }
     }
 
-    if( roots.type() == CV_32FC1 )
+    ಆದರೆ( roots.type() == CV_32FC1 )
     {
-        roots.at<float>(0) = (float)x0;
-        roots.at<float>(1) = (float)x1;
-        roots.at<float>(2) = (float)x2;
+        roots.at<ದಶಮಾಂಶ>(0) = (ದಶಮಾಂಶ)x0;
+        roots.at<ದಶಮಾಂಶ>(1) = (ದಶಮಾಂಶ)x1;
+        roots.at<ದಶಮಾಂಶ>(2) = (ದಶಮಾಂಶ)x2;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        roots.at<double>(0) = x0;
-        roots.at<double>(1) = x1;
-        roots.at<double>(2) = x2;
+        roots.at<ದ್ವಿಗುಣ>(0) = x0;
+        roots.at<ದ್ವಿಗುಣ>(1) = x1;
+        roots.at<ದ್ವಿಗುಣ>(2) = x2;
     }
 
-    return n;
+    ಹಿಂತಿರುಗಿ n;
 }
 
 /* finds complex roots of a polynomial using Durand-Kerner method:
    http://en.wikipedia.org/wiki/Durand%E2%80%93Kerner_method */
-double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
+ದ್ವಿಗುಣ cv::solvePoly( ಒಳಹರಿವು_Array _coeffs0, OutputArray _roots0, ಪೂರ್ಣಾಂಕ maxIters )
 {
     CV_INSTRUMENT_REGION();
 
-    typedef Complex<double> C;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ Complex<ದ್ವಿಗುಣ> C;
 
-    double maxDiff = 0;
-    int iter, i, j;
+    ದ್ವಿಗುಣ maxDiff = 0;
+    ಪೂರ್ಣಾಂಕ iter, i, j;
     Mat coeffs0 = _coeffs0.getMat();
-    int ctype = _coeffs0.type();
-    int cdepth = CV_MAT_DEPTH(ctype);
+    ಪೂರ್ಣಾಂಕ ctype = _coeffs0.type();
+    ಪೂರ್ಣಾಂಕ cdepth = CV_MAT_ಆಳ(ctype);
 
-    CV_Assert( CV_MAT_DEPTH(ctype) >= CV_32F && CV_MAT_CN(ctype) <= 2 );
-    CV_Assert( (coeffs0.rows == 1 || coeffs0.cols == 1) && coeffs0.total() >= 2 );
+    CV_Assert( CV_MAT_ಆಳ(ctype) >= CV_32F && CV_MAT_CN(ctype) <= 2 );
+    CV_Assert( (coeffs0.ಅಡ್ಡಸಾಲುಗಳು == 1 || coeffs0.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1) && coeffs0.ಒಟ್ಟು() >= 2 );
 
-    int n0 = coeffs0.cols + coeffs0.rows - 2, n = n0;
+    ಪೂರ್ಣಾಂಕ n0 = coeffs0.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ + coeffs0.ಅಡ್ಡಸಾಲುಗಳು - 2, n = n0;
 
-    _roots0.create(n, 1, CV_MAKETYPE(cdepth, 2), -1, true, _OutputArray::DEPTH_MASK_FLT);
+    _roots0.create(n, 1, CV_MAKETYPE(cdepth, 2), -1, ನಿಜ, _OutputArray::ಆಳ_ಮುಖವಾಡ_FLT);
     Mat roots0 = _roots0.getMat();
 
-    AutoBuffer<C> buf(n*2+2);
-    C *coeffs = buf.data(), *roots = coeffs + n + 1;
+    Auto_ಬಫರ್<C> buf(n*2+2);
+    C *coeffs = buf.ದತ್ತಾಂಶ(), *roots = coeffs + n + 1;
     Mat coeffs1(coeffs0.size(), CV_MAKETYPE(CV_64F, coeffs0.channels()), coeffs0.channels() == 2 ? coeffs : roots);
-    coeffs0.convertTo(coeffs1, coeffs1.type());
-    if( coeffs0.channels() == 1 )
+    coeffs0.convert_ಗಮ್ಯ(coeffs1, coeffs1.type());
+    ಆದರೆ( coeffs0.channels() == 1 )
     {
-        const double* rcoeffs = (const double*)roots;
-        for( i = 0; i <= n; i++ )
+        ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* rcoeffs = (ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)roots;
+        ಗಾಗಿ( i = 0; i <= n; i++ )
             coeffs[i] = C(rcoeffs[i], 0);
     }
 
-    for( ; n > 1; n-- )
+    ಗಾಗಿ( ; n > 1; n-- )
     {
-        if( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON )
-            break;
+        ಆದರೆ( std::ನಿರಪೇಕ್ಷ(coeffs[n].re) + std::ನಿರಪೇಕ್ಷ(coeffs[n].im) > DBL_EPSILON )
+            ನಿಲ್ಲಿಸು;
     }
-    CV_Assert( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON );
+    CV_Assert( std::ನಿರಪೇಕ್ಷ(coeffs[n].re) + std::ನಿರಪೇಕ್ಷ(coeffs[n].im) > DBL_EPSILON );
 
     // Related issue: https://github.com/opencv/opencv/issues/23644,
     // This the initialization scheme of "Initial approximations in Durand-Kerner's root finding method" by Guggenheimer.
     // https://link.springer.com/article/10.1007/BF01935059
     // We put the initial points equidistantly on a circle on the complex plane. This code computes the circle radius as in the paper.
     Mat absCoeffs(n + 1, 1, CV_64F);
-    for( i = 0; i <= n; i++ )
-        absCoeffs.at<double>(i) = abs(coeffs[i]);
+    ಗಾಗಿ( i = 0; i <= n; i++ )
+        absCoeffs.at<ದ್ವಿಗುಣ>(i) = ನಿರಪೇಕ್ಷ(coeffs[i]);
 
-    int nonZeroCoeffs = 0;
+    ಪೂರ್ಣಾಂಕ nonZeroCoeffs = 0;
     Mat u(n, 1, CV_64F, Scalar(0)), v(n, 1, CV_64F, Scalar(0));
-    for( i = 0; i <= n; i++ )
+    ಗಾಗಿ( i = 0; i <= n; i++ )
     {
-        double coeff = absCoeffs.at<double>(i);
-        if( coeff > DBL_EPSILON )
+        ದ್ವಿಗುಣ coeff = absCoeffs.at<ದ್ವಿಗುಣ>(i);
+        ಆದರೆ( coeff > DBL_EPSILON )
         {
-            if( i != n )
-                u.at<double>(i) = 2.0 * pow(coeff / absCoeffs.at<double>(n), 1.0 / (n - i));
-            if( i != 0 )
-                v.at<double>(i - 1) = 0.5 * pow(absCoeffs.at<double>(0) / coeff, 1.0 / i);
+            ಆದರೆ( i != n )
+                u.at<ದ್ವಿಗುಣ>(i) = 2.0 * ಘಾತ(coeff / absCoeffs.at<ದ್ವಿಗುಣ>(n), 1.0 / (n - i));
+            ಆದರೆ( i != 0 )
+                v.at<ದ್ವಿಗುಣ>(i - 1) = 0.5 * ಘಾತ(absCoeffs.at<ದ್ವಿಗುಣ>(0) / coeff, 1.0 / i);
             nonZeroCoeffs++;
         }
     }
-    double scale = 1;
-    if( nonZeroCoeffs > 2 )
+    ದ್ವಿಗುಣ scale = 1;
+    ಆದರೆ( nonZeroCoeffs > 2 )
     {
-        Point maxU, minV;
-        minMaxLoc(u, nullptr, nullptr, nullptr, &maxU);
-        minMaxLoc(v, nullptr, nullptr, &minV);
-        u.at<double>(maxU) = 0;
-        v.at<double>(minV) = 0;
-        scale = (sum(u).val[0] + sum(v).val[0]) / (2 * nonZeroCoeffs - 2);
+        ಬಿಂದು maxU, minV;
+        minMaxLoc(u, ಶೂನ್ಯಸೂಚಕ, ಶೂನ್ಯಸೂಚಕ, ಶೂನ್ಯಸೂಚಕ, &maxU);
+        minMaxLoc(v, ಶೂನ್ಯಸೂಚಕ, ಶೂನ್ಯಸೂಚಕ, &minV);
+        u.at<ದ್ವಿಗುಣ>(maxU) = 0;
+        v.at<ದ್ವಿಗುಣ>(minV) = 0;
+        scale = (ಮೊತ್ತ(u).val[0] + ಮೊತ್ತ(v).val[0]) / (2 * nonZeroCoeffs - 2);
     }
 
-    C p(scale, 0), r(cos(CV_2PI / n), sin(CV_2PI / n));
+    C p(scale, 0), r(ಕೋಜ್ಯಾ(CV_2PI / n), ಜ್ಯಾ(CV_2PI / n));
 
-    for( i = 0; i < n; i++ )
+    ಗಾಗಿ( i = 0; i < n; i++ )
     {
         roots[i] = p;
         p = p * r;
     }
 
     maxIters = maxIters <= 0 ? 1000 : maxIters;
-    for( iter = 0; iter < maxIters; iter++ )
+    ಗಾಗಿ( iter = 0; iter < maxIters; iter++ )
     {
         maxDiff = 0;
-        for( i = 0; i < n; i++ )
+        ಗಾಗಿ( i = 0; i < n; i++ )
         {
             p = roots[i];
             C num = coeffs[n], denom = coeffs[n];
-            int num_same_root = 1;
-            for( j = 0; j < n; j++ )
+            ಪೂರ್ಣಾಂಕ ಅಂಕೆ_same_ಬೇರು = 1;
+            ಗಾಗಿ( j = 0; j < n; j++ )
             {
                 num = num*p + coeffs[n-j-1];
-                if( j != i )
+                ಆದರೆ( j != i )
                 {
-                    if ( (p - roots[j]).re != 0 || (p - roots[j]).im != 0 )
+                    ಆದರೆ ( (p - roots[j]).re != 0 || (p - roots[j]).im != 0 )
                         denom = denom * (p - roots[j]);
-                    else
-                        num_same_root++;
+                    ಇಲ್ಲದಿದ್ದರೆ
+                        ಅಂಕೆ_same_ಬೇರು++;
                 }
             }
             num /= denom;
-            if( num_same_root > 1)
+            ಆದರೆ( ಅಂಕೆ_same_ಬೇರು > 1)
             {
-                double old_num_re = num.re;
-                double old_num_im = num.im;
-                int square_root_times = num_same_root % 2 == 0 ? num_same_root / 2 : num_same_root / 2 - 1;
+                ದ್ವಿಗುಣ old_ಅಂಕೆ_re = num.re;
+                ದ್ವಿಗುಣ old_ಅಂಕೆ_im = num.im;
+                ಪೂರ್ಣಾಂಕ ವರ್ಗಫಲ_ಬೇರು_times = ಅಂಕೆ_same_ಬೇರು % 2 == 0 ? ಅಂಕೆ_same_ಬೇರು / 2 : ಅಂಕೆ_same_ಬೇರು / 2 - 1;
 
-                for( j = 0; j < square_root_times; j++)
+                ಗಾಗಿ( j = 0; j < ವರ್ಗಫಲ_ಬೇರು_times; j++)
                 {
-                    num.re = old_num_re*old_num_re + old_num_im*old_num_im;
-                    num.re = sqrt(num.re);
-                    num.re += old_num_re;
-                    num.im = num.re - old_num_re;
+                    num.re = old_ಅಂಕೆ_re*old_ಅಂಕೆ_re + old_ಅಂಕೆ_im*old_ಅಂಕೆ_im;
+                    num.re = ವರ್ಗಮೂಲ(num.re);
+                    num.re += old_ಅಂಕೆ_re;
+                    num.im = num.re - old_ಅಂಕೆ_re;
                     num.re /= 2;
-                    num.re = sqrt(num.re);
+                    num.re = ವರ್ಗಮೂಲ(num.re);
 
                     num.im /= 2;
-                    num.im = sqrt(num.im);
-                    if( old_num_re < 0 ) num.im = -num.im;
+                    num.im = ವರ್ಗಮೂಲ(num.im);
+                    ಆದರೆ( old_ಅಂಕೆ_re < 0 ) num.im = -num.im;
                 }
 
-                if( num_same_root % 2 != 0){
+                ಆದರೆ( ಅಂಕೆ_same_ಬೇರು % 2 != 0){
                     Mat cube_coefs(4, 1, CV_64FC1);
                     Mat cube_roots(3, 1, CV_64FC2);
-                    cube_coefs.at<double>(3) = -(std::pow(old_num_re, 3));
-                    cube_coefs.at<double>(2) = -(15*std::pow(old_num_re, 2) + 27*std::pow(old_num_im, 2));
-                    cube_coefs.at<double>(1) = -48*old_num_re;
-                    cube_coefs.at<double>(0) = 64;
+                    cube_coefs.at<ದ್ವಿಗುಣ>(3) = -(std::ಘಾತ(old_ಅಂಕೆ_re, 3));
+                    cube_coefs.at<ದ್ವಿಗುಣ>(2) = -(15*std::ಘಾತ(old_ಅಂಕೆ_re, 2) + 27*std::ಘಾತ(old_ಅಂಕೆ_im, 2));
+                    cube_coefs.at<ದ್ವಿಗುಣ>(1) = -48*old_ಅಂಕೆ_re;
+                    cube_coefs.at<ದ್ವಿಗುಣ>(0) = 64;
                     solveCubic(cube_coefs, cube_roots);
 
-                    num.re = std::cbrt(cube_roots.at<double>(0));
-                    num.im = sqrt(std::pow(num.re, 2) / 3 - old_num_re / (3*num.re));
+                    num.re = std::cbrt(cube_roots.at<ದ್ವಿಗುಣ>(0));
+                    num.im = ವರ್ಗಮೂಲ(std::ಘಾತ(num.re, 2) / 3 - old_ಅಂಕೆ_re / (3*num.re));
                 }
             }
             roots[i] = p - num;
-            maxDiff = std::max(maxDiff, cv::abs(num));
+            maxDiff = std::max(maxDiff, cv::ನಿರಪೇಕ್ಷ(num));
         }
-        if( maxDiff <= 0 )
-            break;
+        ಆದರೆ( maxDiff <= 0 )
+            ನಿಲ್ಲಿಸು;
     }
 
-    if( coeffs0.channels() == 1 )
+    ಆದರೆ( coeffs0.channels() == 1 )
     {
-        const double verySmallEps = 1e-100;
-        for( i = 0; i < n; i++ )
-            if( fabs(roots[i].im) < verySmallEps )
+        ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ verySmallEps = 1e-100;
+        ಗಾಗಿ( i = 0; i < n; i++ )
+            ಆದರೆ( fabs(roots[i].im) < verySmallEps )
                 roots[i].im = 0;
     }
 
-    for( ; n < n0; n++ )
+    ಗಾಗಿ( ; n < n0; n++ )
         roots[n+1] = roots[n];
 
-    Mat(roots0.size(), CV_64FC2, roots).convertTo(roots0, roots0.type());
-    return maxDiff;
+    Mat(roots0.size(), CV_64FC2, roots).convert_ಗಮ್ಯ(roots0, roots0.type());
+    ಹಿಂತಿರುಗಿ maxDiff;
 }
 
 

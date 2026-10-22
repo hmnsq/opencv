@@ -5,98 +5,98 @@
 // Copyright (C) 2015, Itseez, Inc., all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-#include <opencv2/core/utils/logger.hpp>
+#ಅನ್ತರ್ಭಾವ <opencv2/core/utils/logger.hpp>
 
-#ifdef HAVE_VA
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_VA
 #  include <va/va.h>
-#else  // HAVE_VA
+#ಇಲ್ಲದಿದ್ದರೆ  // HAVE_VA
 #  define NO_VA_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without VA support (libva)")
-#endif // HAVE_VA
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_VA
 
-using namespace cv;
+ಬಳಸಿ ನಾಮಾಕಾಶ cv;
 
 ////////////////////////////////////////////////////////////////////////
 // CL-VA Interoperability
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 #  include "opencv2/core/opencl/runtime/opencl_core.hpp"
 #  include "opencv2/core.hpp"
 #  include "opencv2/core/ocl.hpp"
 #  include "opencl_kernels_core.hpp"
-#endif // HAVE_OPENCL
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_OPENCL
 
-#ifdef HAVE_VA_INTEL
-#ifdef HAVE_VA_INTEL_OLD_HEADER
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_VA_INTEL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_VA_INTEL_OLD_ಶೀರ್ಷಿಕೆ
 #  include <CL/va_ext.h>
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
 #  include <CL/cl_va_api_media_sharing_intel.h>
-#endif
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_VA
-#ifndef OPENCV_LIBVA_LINK
-#include "va_wrapper.impl.hpp"
-#else
-namespace cv { namespace detail {
-static void init_libva() { /* nothing */ }
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_VA
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_LIBVA_LINK
+#ಅನ್ತರ್ಭಾವ "va_wrapper.impl.hpp"
+#ಇಲ್ಲದಿದ್ದರೆ
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ detail {
+ಸ್ಥಿರ ಶೂನ್ಯ init_libva() { /* nothing */ }
 }}  // namespace
-#endif
-using namespace cv::detail;
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
+ಬಳಸಿ ನಾಮಾಕಾಶ cv::detail;
+#ಆದರೆ_ಅಂತ್ಯ
 
-namespace cv { namespace va_intel {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ va_intel {
 
-#ifdef HAVE_VA_INTEL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_VA_INTEL
 
-class VAAPIInterop : public ocl::Context::UserContext
+ವರ್ಗ VAAPIInterop : ಸಾರ್ವಜನಿಕ ocl::Context::UserContext
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     VAAPIInterop(cl_platform_id platform) {
         clCreateFromVA_APIMediaSurfaceINTEL       = (clCreateFromVA_APIMediaSurfaceINTEL_fn)
-                clGetExtensionFunctionAddressForPlatform(platform, "clCreateFromVA_APIMediaSurfaceINTEL");
-        clEnqueueAcquireVA_APIMediaSurfacesINTEL  = (clEnqueueAcquireVA_APIMediaSurfacesINTEL_fn)
-                clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueAcquireVA_APIMediaSurfacesINTEL");
-        clEnqueueReleaseVA_APIMediaSurfacesINTEL  = (clEnqueueReleaseVA_APIMediaSurfacesINTEL_fn)
-                clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueReleaseVA_APIMediaSurfacesINTEL");
-        if (!clCreateFromVA_APIMediaSurfaceINTEL ||
-            !clEnqueueAcquireVA_APIMediaSurfacesINTEL ||
-            !clEnqueueReleaseVA_APIMediaSurfacesINTEL) {
+                cl_Get_Extension_Function_ವಿಳಾಸ_For_Platform(platform, "clCreateFromVA_APIMediaSurfaceINTEL");
+        cl_ಸರತಿಗೆ_ಸೇರಿಸು_Acquire_VA_APIMedia_Surfaces_INTEL  = (cl_ಸರತಿಗೆ_ಸೇರಿಸು_Acquire_VA_APIMedia_Surfaces_INTEL_fn)
+                cl_Get_Extension_Function_ವಿಳಾಸ_For_Platform(platform, "clEnqueueAcquireVA_APIMediaSurfacesINTEL");
+        cl_ಸರತಿಗೆ_ಸೇರಿಸು_Release_VA_APIMedia_Surfaces_INTEL  = (cl_ಸರತಿಗೆ_ಸೇರಿಸು_Release_VA_APIMedia_Surfaces_INTEL_fn)
+                cl_Get_Extension_Function_ವಿಳಾಸ_For_Platform(platform, "clEnqueueReleaseVA_APIMediaSurfacesINTEL");
+        ಆದರೆ (!clCreateFromVA_APIMediaSurfaceINTEL ||
+            !cl_ಸರತಿಗೆ_ಸೇರಿಸು_Acquire_VA_APIMedia_Surfaces_INTEL ||
+            !cl_ಸರತಿಗೆ_ಸೇರಿಸು_Release_VA_APIMedia_Surfaces_INTEL) {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get extension function for VA-API interop");
         }
     }
-    virtual ~VAAPIInterop() {
+    ವಾಸ್ತವಿಕ ~VAAPIInterop() {
     }
     clCreateFromVA_APIMediaSurfaceINTEL_fn       clCreateFromVA_APIMediaSurfaceINTEL;
-    clEnqueueAcquireVA_APIMediaSurfacesINTEL_fn  clEnqueueAcquireVA_APIMediaSurfacesINTEL;
-    clEnqueueReleaseVA_APIMediaSurfacesINTEL_fn  clEnqueueReleaseVA_APIMediaSurfacesINTEL;
+    cl_ಸರತಿಗೆ_ಸೇರಿಸು_Acquire_VA_APIMedia_Surfaces_INTEL_fn  cl_ಸರತಿಗೆ_ಸೇರಿಸು_Acquire_VA_APIMedia_Surfaces_INTEL;
+    cl_ಸರತಿಗೆ_ಸೇರಿಸು_Release_VA_APIMedia_Surfaces_INTEL_fn  cl_ಸರತಿಗೆ_ಸೇರಿಸು_Release_VA_APIMedia_Surfaces_INTEL;
 };
 
-#endif // HAVE_VA_INTEL
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_VA_INTEL
 
-namespace ocl {
+ನಾಮಾಕಾಶ ocl {
 
-Context& initializeContextFromVA(VADisplay display, bool tryInterop)
+Context& initializeContextFromVA(VADisplay display, ತಾರ್ಕಿಕ tryInterop)
 {
-    CV_UNUSED(display); CV_UNUSED(tryInterop);
-#if !defined(HAVE_VA)
+    CV_ಬಳಸದ(display); CV_ಬಳಸದ(tryInterop);
+#ಆದರೆ !defined(HAVE_VA)
     NO_VA_SUPPORT_ERROR;
-#else  // !HAVE_VA
+#ಇಲ್ಲದಿದ್ದರೆ  // !HAVE_VA
 
 #   ifdef HAVE_VA_INTEL
-    if (tryInterop)
+    ಆದರೆ (tryInterop)
     {
-        cl_uint numPlatforms;
-        cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
-        if (status != CL_SUCCESS)
+        cl_uint ಅಂಕೆ_Platforms;
+        cl_int ಸ್ಥಿತಿ_2 = clGetPlatformIDs(0, ಖಾಲಿ, &ಅಂಕೆ_Platforms);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-        if (numPlatforms == 0)
+        ಆದರೆ (ಅಂಕೆ_Platforms == 0)
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-        std::vector<cl_platform_id> platforms(numPlatforms);
-        status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
-        if (status != CL_SUCCESS)
+        std::vector<cl_platform_id> platforms(ಅಂಕೆ_Platforms);
+        ಸ್ಥಿತಿ_2 = clGetPlatformIDs(ಅಂಕೆ_Platforms, &platforms[0], ಖಾಲಿ);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platform Id list");
 
         // For CL-VA interop, we must find platform/device with "cl_intel_va_api_media_sharing" extension.
@@ -106,34 +106,34 @@ Context& initializeContextFromVA(VADisplay display, bool tryInterop)
         // Note that we must obtain function pointers using specific platform ID, and can't provide pointers in advance.
         // So, we iterate and select the first platform, for which we got non-NULL pointers, device, and CL context.
 
-        int found = -1;
+        ಪೂರ್ಣಾಂಕ ಸಿಕ್ಕಿತು = -1;
         cl_context context = 0;
         cl_device_id device = 0;
 
-        for (int i = 0; i < (int)numPlatforms; ++i)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < (ಪೂರ್ಣಾಂಕ)ಅಂಕೆ_Platforms; ++i)
         {
             // Get extension function pointers
             clGetDeviceIDsFromVA_APIMediaAdapterINTEL_fn clGetDeviceIDsFromVA_APIMediaAdapterINTEL;
             clGetDeviceIDsFromVA_APIMediaAdapterINTEL = (clGetDeviceIDsFromVA_APIMediaAdapterINTEL_fn)
-                clGetExtensionFunctionAddressForPlatform(platforms[i], "clGetDeviceIDsFromVA_APIMediaAdapterINTEL");
-            if ((void*)clGetDeviceIDsFromVA_APIMediaAdapterINTEL == NULL)
+                cl_Get_Extension_Function_ವಿಳಾಸ_For_Platform(platforms[i], "clGetDeviceIDsFromVA_APIMediaAdapterINTEL");
+            ಆದರೆ ((ಶೂನ್ಯ*)clGetDeviceIDsFromVA_APIMediaAdapterINTEL == ಖಾಲಿ)
             {
-                continue;
+                ಮುಂದುವರಿ;
             }
 
             // Query device list
 
-            cl_uint numDevices = 0;
+            cl_uint ಅಂಕೆ_Devices = 0;
 
-            status = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
-                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, 0, NULL, &numDevices);
-            if ((status != CL_SUCCESS) || !(numDevices > 0))
-                continue;
-            numDevices = 1; // OpenCV expects only 1 device
-            status = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
-                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, numDevices, &device, NULL);
-            if (status != CL_SUCCESS)
-                continue;
+            ಸ್ಥಿತಿ_2 = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
+                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, 0, ಖಾಲಿ, &ಅಂಕೆ_Devices);
+            ಆದರೆ ((ಸ್ಥಿತಿ_2 != CL_SUCCESS) || !(ಅಂಕೆ_Devices > 0))
+                ಮುಂದುವರಿ;
+            ಅಂಕೆ_Devices = 1; // OpenCV expects only 1 device
+            ಸ್ಥಿತಿ_2 = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
+                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, ಅಂಕೆ_Devices, &device, ಖಾಲಿ);
+            ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
+                ಮುಂದುವರಿ;
 
             // Creating CL-VA media sharing OpenCL context
 
@@ -143,86 +143,86 @@ Context& initializeContextFromVA(VADisplay display, bool tryInterop)
                 0
             };
 
-            context = clCreateContext(props, numDevices, &device, NULL, NULL, &status);
-            if (status != CL_SUCCESS)
+            context = clCreateContext(props, ಅಂಕೆ_Devices, &device, ಖಾಲಿ, ಖಾಲಿ, &ಸ್ಥಿತಿ_2);
+            ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             {
                 clReleaseDevice(device);
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                found = i;
-                break;
+                ಸಿಕ್ಕಿತು = i;
+                ನಿಲ್ಲಿಸು;
             }
         }
 
-        if (found >= 0)
+        ಆದರೆ (ಸಿಕ್ಕಿತು >= 0)
         {
-            cl_platform_id platform = platforms[found];
+            cl_platform_id platform = platforms[ಸಿಕ್ಕಿತು];
             std::string platformName = PlatformInfo(&platform).name();
 
             OpenCLExecutionContext clExecCtx;
-            try
+            ಪ್ರಯತ್ನಿಸು
             {
                 clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, device);
-                clExecCtx.getContext().setUserContext(std::make_shared<VAAPIInterop>(platform));
+                clExecCtx.getContext().ಗಣ_User_Context(std::make_shared<VAAPIInterop>(platform));
             }
-            catch (...)
+            ಹಿಡಿ (...)
             {
                 clReleaseDevice(device);
                 clReleaseContext(context);
-                throw;
+                ಎಸೆ;
             }
             clExecCtx.bind();
-            return const_cast<Context&>(clExecCtx.getContext());
+            ಹಿಂತಿರುಗಿ const_cast<Context&>(clExecCtx.getContext());
         }
     }
 # endif // HAVE_VA_INTEL
     {
         Context& ctx = Context::getDefault();
-        return ctx;
+        ಹಿಂತಿರುಗಿ ctx;
     }
-#endif  // !HAVE_VA
+#ಆದರೆ_ಅಂತ್ಯ  // !HAVE_VA
 }
 
-#ifdef HAVE_VA_INTEL
-static bool ocl_convert_nv12_to_bgr(cl_mem clImageY, cl_mem clImageUV, cl_mem clBuffer, int step, int cols, int rows)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_VA_INTEL
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_convert_nv12_ಗಮ್ಯ_bgr(cl_mem clImageY, cl_mem clImageUV, cl_mem cl_ಬಫರ್, ಪೂರ್ಣಾಂಕ ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು)
 {
     ocl::Kernel k;
     k.create("YUV2BGR_NV12_8u", cv::ocl::core::cvtclr_dx_oclsrc, "");
-    if (k.empty())
-        return false;
+    ಆದರೆ (k.empty())
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    k.args(clImageY, clImageUV, clBuffer, step, cols, rows);
+    k.ವಾದಗಳು(clImageY, clImageUV, cl_ಬಫರ್, ಹೆಜ್ಜೆ, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಅಡ್ಡಸಾಲುಗಳು);
 
-    size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
-    return k.run(2, globalsize, 0, false);
+    size_t globalsize[] = { (size_t)ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ/2, (size_t)ಅಡ್ಡಸಾಲುಗಳು/2 };
+    ಹಿಂತಿರುಗಿ k.ಸತತ(2, globalsize, 0, ಸುಳ್ಳು);
 }
 
-static bool ocl_convert_bgr_to_nv12(cl_mem clBuffer, int step, int cols, int rows, cl_mem clImageY, cl_mem clImageUV)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_convert_bgr_ಗಮ್ಯ_nv12(cl_mem cl_ಬಫರ್, ಪೂರ್ಣಾಂಕ ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು, cl_mem clImageY, cl_mem clImageUV)
 {
     ocl::Kernel k;
     k.create("BGR2YUV_NV12_8u", cv::ocl::core::cvtclr_dx_oclsrc, "");
-    if (k.empty())
-        return false;
+    ಆದರೆ (k.empty())
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    k.args(clBuffer, step, cols, rows, clImageY, clImageUV);
+    k.ವಾದಗಳು(cl_ಬಫರ್, ಹೆಜ್ಜೆ, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಅಡ್ಡಸಾಲುಗಳು, clImageY, clImageUV);
 
-    size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
-    return k.run(2, globalsize, 0, false);
+    size_t globalsize[] = { (size_t)ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ/2, (size_t)ಅಡ್ಡಸಾಲುಗಳು/2 };
+    ಹಿಂತಿರುಗಿ k.ಸತತ(2, globalsize, 0, ಸುಳ್ಳು);
 }
-#endif // HAVE_VA_INTEL
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_VA_INTEL
 
 } // namespace cv::va_intel::ocl
 
-#if defined(HAVE_VA)
-const int NCHANNELS = 3;
+#ಆದರೆ defined(HAVE_VA)
+ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ NCHANNELS = 3;
 
-static void copy_convert_nv12_to_bgr(const VAImage& image, const unsigned char* buffer, Mat& bgr)
+ಸ್ಥಿರ ಶೂನ್ಯ copy_convert_nv12_ಗಮ್ಯ_bgr(ಸ್ಥಿರಾಂಕ VAImage& image, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* ಬಫರ್, Mat& bgr)
 {
-    const float d1 = 16.0f;
-    const float d2 = 128.0f;
+    ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ d1 = 16.0f;
+    ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ d2 = 128.0f;
 
-    static const float coeffs[5] =
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ coeffs[5] =
         {
             1.163999557f,
             2.017999649f,
@@ -231,143 +231,143 @@ static void copy_convert_nv12_to_bgr(const VAImage& image, const unsigned char* 
             1.5959997177f
         };
 
-    const size_t srcOffsetY = image.offsets[0];
-    const size_t srcOffsetUV = image.offsets[1];
+    ಸ್ಥಿರಾಂಕ size_t src_ಸ್ಥಾನಾಂತರ_Y = image.offsets[0];
+    ಸ್ಥಿರಾಂಕ size_t src_ಸ್ಥಾನಾಂತರ_UV = image.offsets[1];
 
-    const size_t srcStepY = image.pitches[0];
-    const size_t srcStepUV = image.pitches[1];
+    ಸ್ಥಿರಾಂಕ size_t src_ಹೆಜ್ಜೆ_Y = image.pitches[0];
+    ಸ್ಥಿರಾಂಕ size_t src_ಹೆಜ್ಜೆ_UV = image.pitches[1];
 
-    const size_t dstStep = bgr.step;
+    ಸ್ಥಿರಾಂಕ size_t dst_ಹೆಜ್ಜೆ_3 = bgr.ಹೆಜ್ಜೆ;
 
-    const unsigned char* srcY0 = buffer + srcOffsetY;
-    const unsigned char* srcUV = buffer + srcOffsetUV;
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcY0 = ಬಫರ್ + src_ಸ್ಥಾನಾಂತರ_Y;
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcUV = ಬಫರ್ + src_ಸ್ಥಾನಾಂತರ_UV;
 
-    unsigned char* dst0 = bgr.data;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dst0 = bgr.ದತ್ತಾಂಶ;
 
-    for (int y = 0; y < bgr.rows; y += 2)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ y = 0; y < bgr.ಅಡ್ಡಸಾಲುಗಳು; y += 2)
     {
-        const unsigned char* srcY1 = srcY0 + srcStepY;
-        unsigned char *dst1 = dst0 + dstStep;
+        ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcY1 = srcY0 + src_ಹೆಜ್ಜೆ_Y;
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *dst1 = dst0 + dst_ಹೆಜ್ಜೆ_3;
 
-        for (int x = 0; x < bgr.cols; x += 2)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ x = 0; x < bgr.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; x += 2)
         {
-            float Y0 = float(srcY0[x+0]);
-            float Y1 = float(srcY0[x+1]);
-            float Y2 = float(srcY1[x+0]);
-            float Y3 = float(srcY1[x+1]);
+            ದಶಮಾಂಶ Y0 = ದಶಮಾಂಶ(srcY0[x+0]);
+            ದಶಮಾಂಶ Y1 = ದಶಮಾಂಶ(srcY0[x+1]);
+            ದಶಮಾಂಶ Y2 = ದಶಮಾಂಶ(srcY1[x+0]);
+            ದಶಮಾಂಶ Y3 = ದಶಮಾಂಶ(srcY1[x+1]);
 
-            float U = float(srcUV[2*(x/2)+0]) - d2;
-            float V = float(srcUV[2*(x/2)+1]) - d2;
+            ದಶಮಾಂಶ U = ದಶಮಾಂಶ(srcUV[2*(x/2)+0]) - d2;
+            ದಶಮಾಂಶ V = ದಶಮಾಂಶ(srcUV[2*(x/2)+1]) - d2;
 
             Y0 = std::max(0.0f, Y0 - d1) * coeffs[0];
             Y1 = std::max(0.0f, Y1 - d1) * coeffs[0];
             Y2 = std::max(0.0f, Y2 - d1) * coeffs[0];
             Y3 = std::max(0.0f, Y3 - d1) * coeffs[0];
 
-            float ruv = coeffs[4]*V;
-            float guv = coeffs[3]*V + coeffs[2]*U;
-            float buv = coeffs[1]*U;
+            ದಶಮಾಂಶ ruv = coeffs[4]*V;
+            ದಶಮಾಂಶ guv = coeffs[3]*V + coeffs[2]*U;
+            ದಶಮಾಂಶ buv = coeffs[1]*U;
 
-            dst0[(x+0)*NCHANNELS+0] = saturate_cast<unsigned char>(Y0 + buv);
-            dst0[(x+0)*NCHANNELS+1] = saturate_cast<unsigned char>(Y0 + guv);
-            dst0[(x+0)*NCHANNELS+2] = saturate_cast<unsigned char>(Y0 + ruv);
+            dst0[(x+0)*NCHANNELS+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y0 + buv);
+            dst0[(x+0)*NCHANNELS+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y0 + guv);
+            dst0[(x+0)*NCHANNELS+2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y0 + ruv);
 
-            dst0[(x+1)*NCHANNELS+0] = saturate_cast<unsigned char>(Y1 + buv);
-            dst0[(x+1)*NCHANNELS+1] = saturate_cast<unsigned char>(Y1 + guv);
-            dst0[(x+1)*NCHANNELS+2] = saturate_cast<unsigned char>(Y1 + ruv);
+            dst0[(x+1)*NCHANNELS+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y1 + buv);
+            dst0[(x+1)*NCHANNELS+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y1 + guv);
+            dst0[(x+1)*NCHANNELS+2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y1 + ruv);
 
-            dst1[(x+0)*NCHANNELS+0] = saturate_cast<unsigned char>(Y2 + buv);
-            dst1[(x+0)*NCHANNELS+1] = saturate_cast<unsigned char>(Y2 + guv);
-            dst1[(x+0)*NCHANNELS+2] = saturate_cast<unsigned char>(Y2 + ruv);
+            dst1[(x+0)*NCHANNELS+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y2 + buv);
+            dst1[(x+0)*NCHANNELS+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y2 + guv);
+            dst1[(x+0)*NCHANNELS+2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y2 + ruv);
 
-            dst1[(x+1)*NCHANNELS+0] = saturate_cast<unsigned char>(Y3 + buv);
-            dst1[(x+1)*NCHANNELS+1] = saturate_cast<unsigned char>(Y3 + guv);
-            dst1[(x+1)*NCHANNELS+2] = saturate_cast<unsigned char>(Y3 + ruv);
+            dst1[(x+1)*NCHANNELS+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y3 + buv);
+            dst1[(x+1)*NCHANNELS+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y3 + guv);
+            dst1[(x+1)*NCHANNELS+2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y3 + ruv);
         }
 
-        srcY0 = srcY1 + srcStepY;
-        srcUV += srcStepUV;
-        dst0 = dst1 + dstStep;
+        srcY0 = srcY1 + src_ಹೆಜ್ಜೆ_Y;
+        srcUV += src_ಹೆಜ್ಜೆ_UV;
+        dst0 = dst1 + dst_ಹೆಜ್ಜೆ_3;
     }
 }
 
-static void copy_convert_bgr_to_nv12(const VAImage& image, const Mat& bgr, unsigned char* buffer)
+ಸ್ಥಿರ ಶೂನ್ಯ copy_convert_bgr_ಗಮ್ಯ_nv12(ಸ್ಥಿರಾಂಕ VAImage& image, ಸ್ಥಿರಾಂಕ Mat& bgr, ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* ಬಫರ್)
 {
-    const float d1 = 16.0f;
-    const float d2 = 128.0f;
+    ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ d1 = 16.0f;
+    ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ d2 = 128.0f;
 
-    static const float coeffs[8] =
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ coeffs[8] =
         {
             0.256999969f,  0.50399971f,   0.09799957f,   -0.1479988098f,
             -0.2909994125f, 0.438999176f, -0.3679990768f, -0.0709991455f
         };
 
-    const size_t dstOffsetY = image.offsets[0];
-    const size_t dstOffsetUV = image.offsets[1];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಸ್ಥಾನಾಂತರ_Y = image.offsets[0];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಸ್ಥಾನಾಂತರ_UV = image.offsets[1];
 
-    const size_t dstStepY = image.pitches[0];
-    const size_t dstStepUV = image.pitches[1];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಹೆಜ್ಜೆ_Y = image.pitches[0];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಹೆಜ್ಜೆ_UV = image.pitches[1];
 
-    const size_t srcStep = bgr.step;
+    ಸ್ಥಿರಾಂಕ size_t src_ಹೆಜ್ಜೆ_3 = bgr.ಹೆಜ್ಜೆ;
 
-    const unsigned char* src0 = bgr.data;
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* src0 = bgr.ದತ್ತಾಂಶ;
 
-    unsigned char* dstY0 = buffer + dstOffsetY;
-    unsigned char* dstUV = buffer + dstOffsetUV;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstY0 = ಬಫರ್ + dst_ಸ್ಥಾನಾಂತರ_Y;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstUV = ಬಫರ್ + dst_ಸ್ಥಾನಾಂತರ_UV;
 
-    for (int y = 0; y < bgr.rows; y += 2)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ y = 0; y < bgr.ಅಡ್ಡಸಾಲುಗಳು; y += 2)
     {
-        const unsigned char *src1 = src0 + srcStep;
-        unsigned char* dstY1 = dstY0 + dstStepY;
+        ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ *src1 = src0 + src_ಹೆಜ್ಜೆ_3;
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstY1 = dstY0 + dst_ಹೆಜ್ಜೆ_Y;
 
-        for (int x = 0; x < bgr.cols; x += 2)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ x = 0; x < bgr.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; x += 2)
         {
-            float B0 = float(src0[(x+0)*NCHANNELS+0]);
-            float G0 = float(src0[(x+0)*NCHANNELS+1]);
-            float R0 = float(src0[(x+0)*NCHANNELS+2]);
+            ದಶಮಾಂಶ B0 = ದಶಮಾಂಶ(src0[(x+0)*NCHANNELS+0]);
+            ದಶಮಾಂಶ G0 = ದಶಮಾಂಶ(src0[(x+0)*NCHANNELS+1]);
+            ದಶಮಾಂಶ R0 = ದಶಮಾಂಶ(src0[(x+0)*NCHANNELS+2]);
 
-            float B1 = float(src0[(x+1)*NCHANNELS+0]);
-            float G1 = float(src0[(x+1)*NCHANNELS+1]);
-            float R1 = float(src0[(x+1)*NCHANNELS+2]);
+            ದಶಮಾಂಶ B1 = ದಶಮಾಂಶ(src0[(x+1)*NCHANNELS+0]);
+            ದಶಮಾಂಶ G1 = ದಶಮಾಂಶ(src0[(x+1)*NCHANNELS+1]);
+            ದಶಮಾಂಶ R1 = ದಶಮಾಂಶ(src0[(x+1)*NCHANNELS+2]);
 
-            float B2 = float(src1[(x+0)*NCHANNELS+0]);
-            float G2 = float(src1[(x+0)*NCHANNELS+1]);
-            float R2 = float(src1[(x+0)*NCHANNELS+2]);
+            ದಶಮಾಂಶ B2 = ದಶಮಾಂಶ(src1[(x+0)*NCHANNELS+0]);
+            ದಶಮಾಂಶ G2 = ದಶಮಾಂಶ(src1[(x+0)*NCHANNELS+1]);
+            ದಶಮಾಂಶ R2 = ದಶಮಾಂಶ(src1[(x+0)*NCHANNELS+2]);
 
-            float B3 = float(src1[(x+1)*NCHANNELS+0]);
-            float G3 = float(src1[(x+1)*NCHANNELS+1]);
-            float R3 = float(src1[(x+1)*NCHANNELS+2]);
+            ದಶಮಾಂಶ B3 = ದಶಮಾಂಶ(src1[(x+1)*NCHANNELS+0]);
+            ದಶಮಾಂಶ G3 = ದಶಮಾಂಶ(src1[(x+1)*NCHANNELS+1]);
+            ದಶಮಾಂಶ R3 = ದಶಮಾಂಶ(src1[(x+1)*NCHANNELS+2]);
 
-            float Y0 = coeffs[0]*R0 + coeffs[1]*G0 + coeffs[2]*B0 + d1;
-            float Y1 = coeffs[0]*R1 + coeffs[1]*G1 + coeffs[2]*B1 + d1;
-            float Y2 = coeffs[0]*R2 + coeffs[1]*G2 + coeffs[2]*B2 + d1;
-            float Y3 = coeffs[0]*R3 + coeffs[1]*G3 + coeffs[2]*B3 + d1;
+            ದಶಮಾಂಶ Y0 = coeffs[0]*R0 + coeffs[1]*G0 + coeffs[2]*B0 + d1;
+            ದಶಮಾಂಶ Y1 = coeffs[0]*R1 + coeffs[1]*G1 + coeffs[2]*B1 + d1;
+            ದಶಮಾಂಶ Y2 = coeffs[0]*R2 + coeffs[1]*G2 + coeffs[2]*B2 + d1;
+            ದಶಮಾಂಶ Y3 = coeffs[0]*R3 + coeffs[1]*G3 + coeffs[2]*B3 + d1;
 
-            float U = coeffs[3]*R0 + coeffs[4]*G0 + coeffs[5]*B0 + d2;
-            float V = coeffs[5]*R0 + coeffs[6]*G0 + coeffs[7]*B0 + d2;
+            ದಶಮಾಂಶ U = coeffs[3]*R0 + coeffs[4]*G0 + coeffs[5]*B0 + d2;
+            ದಶಮಾಂಶ V = coeffs[5]*R0 + coeffs[6]*G0 + coeffs[7]*B0 + d2;
 
-            dstY0[x+0] = saturate_cast<unsigned char>(Y0);
-            dstY0[x+1] = saturate_cast<unsigned char>(Y1);
-            dstY1[x+0] = saturate_cast<unsigned char>(Y2);
-            dstY1[x+1] = saturate_cast<unsigned char>(Y3);
+            dstY0[x+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y0);
+            dstY0[x+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y1);
+            dstY1[x+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y2);
+            dstY1[x+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y3);
 
-            dstUV[2*(x/2)+0] = saturate_cast<unsigned char>(U);
-            dstUV[2*(x/2)+1] = saturate_cast<unsigned char>(V);
+            dstUV[2*(x/2)+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(U);
+            dstUV[2*(x/2)+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(V);
         }
 
-        src0 = src1 + srcStep;
-        dstY0 = dstY1 + dstStepY;
-        dstUV += dstStepUV;
+        src0 = src1 + src_ಹೆಜ್ಜೆ_3;
+        dstY0 = dstY1 + dst_ಹೆಜ್ಜೆ_Y;
+        dstUV += dst_ಹೆಜ್ಜೆ_UV;
     }
 }
 
 
-static void copy_convert_yv12_to_bgr(const VAImage& image, const unsigned char* buffer, Mat& bgr)
+ಸ್ಥಿರ ಶೂನ್ಯ copy_convert_yv12_ಗಮ್ಯ_bgr(ಸ್ಥಿರಾಂಕ VAImage& image, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* ಬಫರ್, Mat& bgr)
 {
-    const float d1 = 16.0f;
-    const float d2 = 128.0f;
+    ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ d1 = 16.0f;
+    ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ d2 = 128.0f;
 
-    static const float coeffs[5] =
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ coeffs[5] =
         {
             1.163999557f,
             2.017999649f,
@@ -377,176 +377,176 @@ static void copy_convert_yv12_to_bgr(const VAImage& image, const unsigned char* 
         };
 
     CV_CheckEQ((size_t)image.format.fourcc, (size_t)VA_FOURCC_YV12, "Unexpected image format");
-    CV_CheckEQ((size_t)image.num_planes, (size_t)3, "");
+    CV_CheckEQ((size_t)image.ಅಂಕೆ_planes, (size_t)3, "");
 
-    const size_t srcOffsetY = image.offsets[0];
-    const size_t srcOffsetV = image.offsets[1];
-    const size_t srcOffsetU = image.offsets[2];
+    ಸ್ಥಿರಾಂಕ size_t src_ಸ್ಥಾನಾಂತರ_Y = image.offsets[0];
+    ಸ್ಥಿರಾಂಕ size_t src_ಸ್ಥಾನಾಂತರ_V = image.offsets[1];
+    ಸ್ಥಿರಾಂಕ size_t src_ಸ್ಥಾನಾಂತರ_U = image.offsets[2];
 
-    const size_t srcStepY = image.pitches[0];
-    const size_t srcStepU = image.pitches[1];
-    const size_t srcStepV = image.pitches[2];
+    ಸ್ಥಿರಾಂಕ size_t src_ಹೆಜ್ಜೆ_Y = image.pitches[0];
+    ಸ್ಥಿರಾಂಕ size_t src_ಹೆಜ್ಜೆ_U = image.pitches[1];
+    ಸ್ಥಿರಾಂಕ size_t src_ಹೆಜ್ಜೆ_V = image.pitches[2];
 
-    const size_t dstStep = bgr.step;
+    ಸ್ಥಿರಾಂಕ size_t dst_ಹೆಜ್ಜೆ_3 = bgr.ಹೆಜ್ಜೆ;
 
-    const unsigned char* srcY_ = buffer + srcOffsetY;
-    const unsigned char* srcV_ = buffer + srcOffsetV;
-    const unsigned char* srcU_ = buffer + srcOffsetU;
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcY_ = ಬಫರ್ + src_ಸ್ಥಾನಾಂತರ_Y;
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcV_ = ಬಫರ್ + src_ಸ್ಥಾನಾಂತರ_V;
+    ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcU_ = ಬಫರ್ + src_ಸ್ಥಾನಾಂತರ_U;
 
-    for (int y = 0; y < bgr.rows; y += 2)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ y = 0; y < bgr.ಅಡ್ಡಸಾಲುಗಳು; y += 2)
     {
-        const unsigned char* srcY0 = srcY_ + (srcStepY) * y;
-        const unsigned char* srcY1 = srcY0 + srcStepY;
+        ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcY0 = srcY_ + (src_ಹೆಜ್ಜೆ_Y) * y;
+        ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcY1 = srcY0 + src_ಹೆಜ್ಜೆ_Y;
 
-        const unsigned char* srcV = srcV_ + (srcStepV) * y / 2;
-        const unsigned char* srcU = srcU_ + (srcStepU) * y / 2;
+        ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcV = srcV_ + (src_ಹೆಜ್ಜೆ_V) * y / 2;
+        ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* srcU = srcU_ + (src_ಹೆಜ್ಜೆ_U) * y / 2;
 
-        unsigned char* dst0 = bgr.data + (dstStep) * y;
-        unsigned char* dst1 = dst0 + dstStep;
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dst0 = bgr.ದತ್ತಾಂಶ + (dst_ಹೆಜ್ಜೆ_3) * y;
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dst1 = dst0 + dst_ಹೆಜ್ಜೆ_3;
 
-        for (int x = 0; x < bgr.cols; x += 2)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ x = 0; x < bgr.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; x += 2)
         {
-            float Y0 = float(srcY0[x+0]);
-            float Y1 = float(srcY0[x+1]);
-            float Y2 = float(srcY1[x+0]);
-            float Y3 = float(srcY1[x+1]);
+            ದಶಮಾಂಶ Y0 = ದಶಮಾಂಶ(srcY0[x+0]);
+            ದಶಮಾಂಶ Y1 = ದಶಮಾಂಶ(srcY0[x+1]);
+            ದಶಮಾಂಶ Y2 = ದಶಮಾಂಶ(srcY1[x+0]);
+            ದಶಮಾಂಶ Y3 = ದಶಮಾಂಶ(srcY1[x+1]);
 
-            float U = float(srcU[x/2]) - d2;
-            float V = float(srcV[x/2]) - d2;
+            ದಶಮಾಂಶ U = ದಶಮಾಂಶ(srcU[x/2]) - d2;
+            ದಶಮಾಂಶ V = ದಶಮಾಂಶ(srcV[x/2]) - d2;
 
             Y0 = std::max(0.0f, Y0 - d1) * coeffs[0];
             Y1 = std::max(0.0f, Y1 - d1) * coeffs[0];
             Y2 = std::max(0.0f, Y2 - d1) * coeffs[0];
             Y3 = std::max(0.0f, Y3 - d1) * coeffs[0];
 
-            float ruv = coeffs[4]*V;
-            float guv = coeffs[3]*V + coeffs[2]*U;
-            float buv = coeffs[1]*U;
+            ದಶಮಾಂಶ ruv = coeffs[4]*V;
+            ದಶಮಾಂಶ guv = coeffs[3]*V + coeffs[2]*U;
+            ದಶಮಾಂಶ buv = coeffs[1]*U;
 
-            dst0[(x+0)*NCHANNELS+0] = saturate_cast<unsigned char>(Y0 + buv);
-            dst0[(x+0)*NCHANNELS+1] = saturate_cast<unsigned char>(Y0 + guv);
-            dst0[(x+0)*NCHANNELS+2] = saturate_cast<unsigned char>(Y0 + ruv);
+            dst0[(x+0)*NCHANNELS+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y0 + buv);
+            dst0[(x+0)*NCHANNELS+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y0 + guv);
+            dst0[(x+0)*NCHANNELS+2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y0 + ruv);
 
-            dst0[(x+1)*NCHANNELS+0] = saturate_cast<unsigned char>(Y1 + buv);
-            dst0[(x+1)*NCHANNELS+1] = saturate_cast<unsigned char>(Y1 + guv);
-            dst0[(x+1)*NCHANNELS+2] = saturate_cast<unsigned char>(Y1 + ruv);
+            dst0[(x+1)*NCHANNELS+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y1 + buv);
+            dst0[(x+1)*NCHANNELS+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y1 + guv);
+            dst0[(x+1)*NCHANNELS+2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y1 + ruv);
 
-            dst1[(x+0)*NCHANNELS+0] = saturate_cast<unsigned char>(Y2 + buv);
-            dst1[(x+0)*NCHANNELS+1] = saturate_cast<unsigned char>(Y2 + guv);
-            dst1[(x+0)*NCHANNELS+2] = saturate_cast<unsigned char>(Y2 + ruv);
+            dst1[(x+0)*NCHANNELS+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y2 + buv);
+            dst1[(x+0)*NCHANNELS+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y2 + guv);
+            dst1[(x+0)*NCHANNELS+2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y2 + ruv);
 
-            dst1[(x+1)*NCHANNELS+0] = saturate_cast<unsigned char>(Y3 + buv);
-            dst1[(x+1)*NCHANNELS+1] = saturate_cast<unsigned char>(Y3 + guv);
-            dst1[(x+1)*NCHANNELS+2] = saturate_cast<unsigned char>(Y3 + ruv);
+            dst1[(x+1)*NCHANNELS+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y3 + buv);
+            dst1[(x+1)*NCHANNELS+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y3 + guv);
+            dst1[(x+1)*NCHANNELS+2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y3 + ruv);
         }
     }
 }
 
-static void copy_convert_bgr_to_yv12(const VAImage& image, const Mat& bgr, unsigned char* buffer)
+ಸ್ಥಿರ ಶೂನ್ಯ copy_convert_bgr_ಗಮ್ಯ_yv12(ಸ್ಥಿರಾಂಕ VAImage& image, ಸ್ಥಿರಾಂಕ Mat& bgr, ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* ಬಫರ್)
 {
-    const float d1 = 16.0f;
-    const float d2 = 128.0f;
+    ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ d1 = 16.0f;
+    ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ d2 = 128.0f;
 
-    static const float coeffs[8] =
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ coeffs[8] =
         {
             0.256999969f,  0.50399971f,   0.09799957f,   -0.1479988098f,
             -0.2909994125f, 0.438999176f, -0.3679990768f, -0.0709991455f
         };
 
     CV_CheckEQ((size_t)image.format.fourcc, (size_t)VA_FOURCC_YV12, "Unexpected image format");
-    CV_CheckEQ((size_t)image.num_planes, (size_t)3, "");
+    CV_CheckEQ((size_t)image.ಅಂಕೆ_planes, (size_t)3, "");
 
-    const size_t dstOffsetY = image.offsets[0];
-    const size_t dstOffsetV = image.offsets[1];
-    const size_t dstOffsetU = image.offsets[2];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಸ್ಥಾನಾಂತರ_Y = image.offsets[0];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಸ್ಥಾನಾಂತರ_V = image.offsets[1];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಸ್ಥಾನಾಂತರ_U = image.offsets[2];
 
-    const size_t dstStepY = image.pitches[0];
-    const size_t dstStepU = image.pitches[1];
-    const size_t dstStepV = image.pitches[2];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಹೆಜ್ಜೆ_Y = image.pitches[0];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಹೆಜ್ಜೆ_U = image.pitches[1];
+    ಸ್ಥಿರಾಂಕ size_t dst_ಹೆಜ್ಜೆ_V = image.pitches[2];
 
-    unsigned char* dstY_ = buffer + dstOffsetY;
-    unsigned char* dstV_ = buffer + dstOffsetV;
-    unsigned char* dstU_ = buffer + dstOffsetU;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstY_ = ಬಫರ್ + dst_ಸ್ಥಾನಾಂತರ_Y;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstV_ = ಬಫರ್ + dst_ಸ್ಥಾನಾಂತರ_V;
+    ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstU_ = ಬಫರ್ + dst_ಸ್ಥಾನಾಂತರ_U;
 
-    const size_t srcStep = bgr.step;
+    ಸ್ಥಿರಾಂಕ size_t src_ಹೆಜ್ಜೆ_3 = bgr.ಹೆಜ್ಜೆ;
 
-    for (int y = 0; y < bgr.rows; y += 2)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ y = 0; y < bgr.ಅಡ್ಡಸಾಲುಗಳು; y += 2)
     {
-        unsigned char* dstY0 = dstY_ + (dstStepY) * y;
-        unsigned char* dstY1 = dstY0 + dstStepY;
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstY0 = dstY_ + (dst_ಹೆಜ್ಜೆ_Y) * y;
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstY1 = dstY0 + dst_ಹೆಜ್ಜೆ_Y;
 
-        unsigned char* dstV = dstV_ + (dstStepV) * y / 2;
-        unsigned char* dstU = dstU_ + (dstStepU) * y / 2;
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstV = dstV_ + (dst_ಹೆಜ್ಜೆ_V) * y / 2;
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* dstU = dstU_ + (dst_ಹೆಜ್ಜೆ_U) * y / 2;
 
-        const unsigned char* src0 = bgr.data + (srcStep) * y;
-        const unsigned char* src1 = src0 + srcStep;
+        ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* src0 = bgr.ದತ್ತಾಂಶ + (src_ಹೆಜ್ಜೆ_3) * y;
+        ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* src1 = src0 + src_ಹೆಜ್ಜೆ_3;
 
-        for (int x = 0; x < bgr.cols; x += 2)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ x = 0; x < bgr.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; x += 2)
         {
-            float B0 = float(src0[(x+0)*NCHANNELS+0]);
-            float G0 = float(src0[(x+0)*NCHANNELS+1]);
-            float R0 = float(src0[(x+0)*NCHANNELS+2]);
+            ದಶಮಾಂಶ B0 = ದಶಮಾಂಶ(src0[(x+0)*NCHANNELS+0]);
+            ದಶಮಾಂಶ G0 = ದಶಮಾಂಶ(src0[(x+0)*NCHANNELS+1]);
+            ದಶಮಾಂಶ R0 = ದಶಮಾಂಶ(src0[(x+0)*NCHANNELS+2]);
 
-            float B1 = float(src0[(x+1)*NCHANNELS+0]);
-            float G1 = float(src0[(x+1)*NCHANNELS+1]);
-            float R1 = float(src0[(x+1)*NCHANNELS+2]);
+            ದಶಮಾಂಶ B1 = ದಶಮಾಂಶ(src0[(x+1)*NCHANNELS+0]);
+            ದಶಮಾಂಶ G1 = ದಶಮಾಂಶ(src0[(x+1)*NCHANNELS+1]);
+            ದಶಮಾಂಶ R1 = ದಶಮಾಂಶ(src0[(x+1)*NCHANNELS+2]);
 
-            float B2 = float(src1[(x+0)*NCHANNELS+0]);
-            float G2 = float(src1[(x+0)*NCHANNELS+1]);
-            float R2 = float(src1[(x+0)*NCHANNELS+2]);
+            ದಶಮಾಂಶ B2 = ದಶಮಾಂಶ(src1[(x+0)*NCHANNELS+0]);
+            ದಶಮಾಂಶ G2 = ದಶಮಾಂಶ(src1[(x+0)*NCHANNELS+1]);
+            ದಶಮಾಂಶ R2 = ದಶಮಾಂಶ(src1[(x+0)*NCHANNELS+2]);
 
-            float B3 = float(src1[(x+1)*NCHANNELS+0]);
-            float G3 = float(src1[(x+1)*NCHANNELS+1]);
-            float R3 = float(src1[(x+1)*NCHANNELS+2]);
+            ದಶಮಾಂಶ B3 = ದಶಮಾಂಶ(src1[(x+1)*NCHANNELS+0]);
+            ದಶಮಾಂಶ G3 = ದಶಮಾಂಶ(src1[(x+1)*NCHANNELS+1]);
+            ದಶಮಾಂಶ R3 = ದಶಮಾಂಶ(src1[(x+1)*NCHANNELS+2]);
 
-            float Y0 = coeffs[0]*R0 + coeffs[1]*G0 + coeffs[2]*B0 + d1;
-            float Y1 = coeffs[0]*R1 + coeffs[1]*G1 + coeffs[2]*B1 + d1;
-            float Y2 = coeffs[0]*R2 + coeffs[1]*G2 + coeffs[2]*B2 + d1;
-            float Y3 = coeffs[0]*R3 + coeffs[1]*G3 + coeffs[2]*B3 + d1;
+            ದಶಮಾಂಶ Y0 = coeffs[0]*R0 + coeffs[1]*G0 + coeffs[2]*B0 + d1;
+            ದಶಮಾಂಶ Y1 = coeffs[0]*R1 + coeffs[1]*G1 + coeffs[2]*B1 + d1;
+            ದಶಮಾಂಶ Y2 = coeffs[0]*R2 + coeffs[1]*G2 + coeffs[2]*B2 + d1;
+            ದಶಮಾಂಶ Y3 = coeffs[0]*R3 + coeffs[1]*G3 + coeffs[2]*B3 + d1;
 
-            float U = coeffs[3]*R0 + coeffs[4]*G0 + coeffs[5]*B0 + d2;
-            float V = coeffs[5]*R0 + coeffs[6]*G0 + coeffs[7]*B0 + d2;
+            ದಶಮಾಂಶ U = coeffs[3]*R0 + coeffs[4]*G0 + coeffs[5]*B0 + d2;
+            ದಶಮಾಂಶ V = coeffs[5]*R0 + coeffs[6]*G0 + coeffs[7]*B0 + d2;
 
-            dstY0[x+0] = saturate_cast<unsigned char>(Y0);
-            dstY0[x+1] = saturate_cast<unsigned char>(Y1);
-            dstY1[x+0] = saturate_cast<unsigned char>(Y2);
-            dstY1[x+1] = saturate_cast<unsigned char>(Y3);
+            dstY0[x+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y0);
+            dstY0[x+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y1);
+            dstY1[x+0] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y2);
+            dstY1[x+1] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(Y3);
 
-            dstU[x/2] = saturate_cast<unsigned char>(U);
-            dstV[x/2] = saturate_cast<unsigned char>(V);
+            dstU[x/2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(U);
+            dstV[x/2] = saturate_cast<ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ>(V);
         }
     }
 }
-#endif // HAVE_VA
+#ಆದರೆ_ಅಂತ್ಯ // HAVE_VA
 
-void convertToVASurface(VADisplay display, InputArray src, VASurfaceID surface, Size size)
+ಶೂನ್ಯ convert_ಗಮ್ಯ_VASurface(VADisplay display, ಒಳಹರಿವು_Array src, VASurfaceID surface, ಗಾತ್ರ_2 size)
 {
-    CV_UNUSED(display); CV_UNUSED(src); CV_UNUSED(surface); CV_UNUSED(size);
-#if !defined(HAVE_VA)
+    CV_ಬಳಸದ(display); CV_ಬಳಸದ(src); CV_ಬಳಸದ(surface); CV_ಬಳಸದ(size);
+#ಆದರೆ !defined(HAVE_VA)
     NO_VA_SUPPORT_ERROR;
-#else  // !HAVE_VA
+#ಇಲ್ಲದಿದ್ದರೆ  // !HAVE_VA
 
-    const int stype = CV_8UC3;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ stype = CV_8UC3;
 
-    int srcType = src.type();
+    ಪೂರ್ಣಾಂಕ srcType = src.type();
     CV_Assert(srcType == stype);
 
-    Size srcSize = src.size();
-    CV_Assert(srcSize.width == size.width && srcSize.height == size.height);
+    ಗಾತ್ರ_2 src_ಗಾತ್ರ = src.size();
+    CV_Assert(src_ಗಾತ್ರ.ಅಗಲ == size.ಅಗಲ && src_ಗಾತ್ರ.ಎತ್ತರ == size.ಎತ್ತರ);
 
-#ifdef HAVE_VA_INTEL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_VA_INTEL
     ocl::OpenCLExecutionContext& ocl_context = ocl::OpenCLExecutionContext::getCurrent();
     VAAPIInterop* interop = ocl_context.getContext().getUserContext<VAAPIInterop>().get();
-    CV_LOG_IF_DEBUG(NULL, !interop,
+    CV_LOG_IF_DEBUG(ಖಾಲಿ, !interop,
         "OpenCL/VA_INTEL: Can't interop with current OpenCL context - missing VAAPIInterop API. "
         "OpenCL context should be created through initializeContextFromVA()");
-    void* context_display = ocl_context.getContext().getOpenCLContextProperty(CL_CONTEXT_VA_API_DISPLAY_INTEL);
-    CV_LOG_IF_INFO(NULL, interop && !context_display,
+    ಶೂನ್ಯ* context_display = ocl_context.getContext().getOpenCLContextProperty(CL_CONTEXT_VA_API_DISPLAY_INTEL);
+    CV_LOG_IF_INFO(ಖಾಲಿ, interop && !context_display,
         "OpenCL/VA_INTEL: Can't interop with current OpenCL context - missing VA display, context re-creation is required");
-    bool isValidContextDisplay = (display == context_display);
-    CV_LOG_IF_INFO(NULL, interop && context_display && !isValidContextDisplay,
-        "OpenCL/VA_INTEL: Can't interop with current OpenCL context - VA display mismatch: " << context_display << "(context) vs " << (void*)display << "(surface)");
-    if (isValidContextDisplay && interop)
+    ತಾರ್ಕಿಕ isValidContextDisplay = (display == context_display);
+    CV_LOG_IF_INFO(ಖಾಲಿ, interop && context_display && !isValidContextDisplay,
+        "OpenCL/VA_INTEL: Can't interop with current OpenCL context - VA display mismatch: " << context_display << "(context) vs " << (ಶೂನ್ಯ*)display << "(surface)");
+    ಆದರೆ (isValidContextDisplay && interop)
     {
         UMat u = src.getUMat();
 
@@ -554,136 +554,136 @@ void convertToVASurface(VADisplay display, InputArray src, VASurfaceID surface, 
         CV_Assert(u.offset == 0);
         CV_Assert(u.isContinuous());
 
-        cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+        cl_mem cl_ಬಫರ್ = (cl_mem)u.handle(ACCESS_READ);
 
         cl_context context = (cl_context)ocl_context.getContext().ptr();
 
-        cl_int status = 0;
+        cl_int ಸ್ಥಿತಿ_2 = 0;
 
-        cl_mem clImageY = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_WRITE_ONLY, &surface, 0, &status);
-        if (status != CL_SUCCESS)
+        cl_mem clImageY = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_WRITE_ONLY, &surface, 0, &ಸ್ಥಿತಿ_2);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromVA_APIMediaSurfaceINTEL failed (Y plane)");
-        cl_mem clImageUV = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_WRITE_ONLY, &surface, 1, &status);
-        if (status != CL_SUCCESS)
+        cl_mem clImageUV = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_WRITE_ONLY, &surface, 1, &ಸ್ಥಿತಿ_2);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromVA_APIMediaSurfaceINTEL failed (UV plane)");
 
-        cl_command_queue q = (cl_command_queue)ocl_context.getQueue().ptr();
+        cl_command_ಸರತಿ q = (cl_command_ಸರತಿ)ocl_context.get_ಸರತಿ().ptr();
 
         cl_mem images[2] = { clImageY, clImageUV };
-        status = interop->clEnqueueAcquireVA_APIMediaSurfacesINTEL(q, 2, images, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        ಸ್ಥಿತಿ_2 = interop->cl_ಸರತಿಗೆ_ಸೇರಿಸು_Acquire_VA_APIMedia_Surfaces_INTEL(q, 2, images, 0, ಖಾಲಿ, ಖಾಲಿ);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireVA_APIMediaSurfacesINTEL failed");
-        if (!ocl::ocl_convert_bgr_to_nv12(clBuffer, (int)u.step[0], u.cols, u.rows, clImageY, clImageUV))
+        ಆದರೆ (!ocl::ocl_convert_bgr_ಗಮ್ಯ_nv12(cl_ಬಫರ್, (ಪೂರ್ಣಾಂಕ)u.ಹೆಜ್ಜೆ[0], u.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, u.ಅಡ್ಡಸಾಲುಗಳು, clImageY, clImageUV))
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: ocl_convert_bgr_to_nv12 failed");
-        interop->clEnqueueReleaseVA_APIMediaSurfacesINTEL(q, 2, images, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        interop->cl_ಸರತಿಗೆ_ಸೇರಿಸು_Release_VA_APIMedia_Surfaces_INTEL(q, 2, images, 0, ಖಾಲಿ, ಖಾಲಿ);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseVA_APIMediaSurfacesINTEL failed");
 
-        status = clFinish(q); // TODO Use events
-        if (status != CL_SUCCESS)
+        ಸ್ಥಿತಿ_2 = cl_ಮುಕ್ತಾಯ(q); // TODO Use events
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-        status = clReleaseMemObject(clImageY); // TODO RAII
-        if (status != CL_SUCCESS)
+        ಸ್ಥಿತಿ_2 = clReleaseMemObject(clImageY); // TODO RAII
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed (Y plane)");
-        status = clReleaseMemObject(clImageUV);
-        if (status != CL_SUCCESS)
+        ಸ್ಥಿತಿ_2 = clReleaseMemObject(clImageUV);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed (UV plane)");
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif // HAVE_VA_INTEL
     {
         init_libva();
         Mat m = src.getMat();
 
         // TODO Add support for roi
-        CV_Assert(m.data == m.datastart);
+        CV_Assert(m.ದತ್ತಾಂಶ == m.datastart);
         CV_Assert(m.isContinuous());
 
-        VAStatus status = 0;
+        VAStatus ಸ್ಥಿತಿ_2 = 0;
 
-        status = vaSyncSurface(display, surface);
-        if (status != VA_STATUS_SUCCESS)
+        ಸ್ಥಿತಿ_2 = vaSyncSurface(display, surface);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaSyncSurface failed");
 
-        bool indirect_buffer = false;
+        ತಾರ್ಕಿಕ ಪರೋಕ್ಷ_ಬಫರ್ = ಸುಳ್ಳು;
         VAImage image;
-        status = vaDeriveImage(display, surface, &image);
-        if (status != VA_STATUS_SUCCESS){
+        ಸ್ಥಿತಿ_2 = vaDeriveImage(display, surface, &image);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS){
             //try vaCreateImage + vaPutImage
             //pick a format
-            indirect_buffer = true;
-            int num_formats = vaMaxNumImageFormats(display);
-            if (num_formats <= 0)
+            ಪರೋಕ್ಷ_ಬಫರ್ = ನಿಜ;
+            ಪೂರ್ಣಾಂಕ ಅಂಕೆ_formats = va_Max_ಅಂಕೆ_Image_Formats(display);
+            ಆದರೆ (ಅಂಕೆ_formats <= 0)
                 CV_Error(cv::Error::StsError, "VA-API: vaMaxNumImageFormats failed");
-            std::vector<VAImageFormat> fmt_list(num_formats);
+            std::vector<VAImageFormat> fmt_list(ಅಂಕೆ_formats);
 
-            status = vaQueryImageFormats(display, fmt_list.data(), &num_formats);
-            if (status != VA_STATUS_SUCCESS)
+            ಸ್ಥಿತಿ_2 = vaQueryImageFormats(display, fmt_list.ದತ್ತಾಂಶ(), &ಅಂಕೆ_formats);
+            ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats failed");
-            VAImageFormat *selected_format = nullptr;
-            for (auto &fmt : fmt_list){
-                if (fmt.fourcc == VA_FOURCC_NV12 || fmt.fourcc == VA_FOURCC_YV12){
+            VAImageFormat *selected_format = ಶೂನ್ಯಸೂಚಕ;
+            ಗಾಗಿ (ಸ್ವಯಂಚಾಲಿತ &fmt : fmt_list){
+                ಆದರೆ (fmt.fourcc == VA_FOURCC_NV12 || fmt.fourcc == VA_FOURCC_YV12){
                     selected_format = &fmt;
-                    break;
+                    ನಿಲ್ಲಿಸು;
                 }
             }
-            if (selected_format == nullptr)
+            ಆದರೆ (selected_format == ಶೂನ್ಯಸೂಚಕ)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats did not return a supported format");
 
-            status = vaCreateImage(display, selected_format, size.width, size.height, &image);
-            if (status != VA_STATUS_SUCCESS)
+            ಸ್ಥಿತಿ_2 = vaCreateImage(display, selected_format, size.ಅಗಲ, size.ಎತ್ತರ, &image);
+            ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaCreateImage failed");
 
         }
 
-        unsigned char* buffer = 0;
-        status = vaMapBuffer(display, image.buf, (void **)&buffer);
-        if (status != VA_STATUS_SUCCESS)
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* ಬಫರ್ = 0;
+        ಸ್ಥಿತಿ_2 = va_Map_ಬಫರ್(display, image.buf, (ಶೂನ್ಯ **)&ಬಫರ್);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaMapBuffer failed");
 
-        if (image.format.fourcc == VA_FOURCC_NV12)
-            copy_convert_bgr_to_nv12(image, m, buffer);
-        if (image.format.fourcc == VA_FOURCC_YV12)
-            copy_convert_bgr_to_yv12(image, m, buffer);
-        else
-            CV_Check((int)image.format.fourcc, image.format.fourcc == VA_FOURCC_NV12 || image.format.fourcc == VA_FOURCC_YV12, "Unexpected image format");
+        ಆದರೆ (image.format.fourcc == VA_FOURCC_NV12)
+            copy_convert_bgr_ಗಮ್ಯ_nv12(image, m, ಬಫರ್);
+        ಆದರೆ (image.format.fourcc == VA_FOURCC_YV12)
+            copy_convert_bgr_ಗಮ್ಯ_yv12(image, m, ಬಫರ್);
+        ಇಲ್ಲದಿದ್ದರೆ
+            CV_Check((ಪೂರ್ಣಾಂಕ)image.format.fourcc, image.format.fourcc == VA_FOURCC_NV12 || image.format.fourcc == VA_FOURCC_YV12, "Unexpected image format");
 
-        status = vaUnmapBuffer(display, image.buf);
-        if (status != VA_STATUS_SUCCESS)
+        ಸ್ಥಿತಿ_2 = va_Unmap_ಬಫರ್(display, image.buf);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaUnmapBuffer failed");
 
-        if (indirect_buffer){
-            status = vaPutImage(display, surface, image.image_id, 0, 0, size.width, size.height, 0, 0, size.width, size.height);
-            if (status != VA_STATUS_SUCCESS){
+        ಆದರೆ (ಪರೋಕ್ಷ_ಬಫರ್){
+            ಸ್ಥಿತಿ_2 = vaPutImage(display, surface, image.image_id, 0, 0, size.ಅಗಲ, size.ಎತ್ತರ, 0, 0, size.ಅಗಲ, size.ಎತ್ತರ);
+            ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS){
                 vaDestroyImage(display, image.image_id);
                 CV_Error(cv::Error::StsError, "VA-API: vaPutImage failed");
             }
         }
 
-        status = vaDestroyImage(display, image.image_id);
-        if (status != VA_STATUS_SUCCESS)
+        ಸ್ಥಿತಿ_2 = vaDestroyImage(display, image.image_id);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaDestroyImage failed");
     }
-#endif  // !HAVE_VA
+#ಆದರೆ_ಅಂತ್ಯ  // !HAVE_VA
 }
 
-void convertFromVASurface(VADisplay display, VASurfaceID surface, Size size, OutputArray dst)
+ಶೂನ್ಯ convertFromVASurface(VADisplay display, VASurfaceID surface, ಗಾತ್ರ_2 size, OutputArray dst)
 {
-    CV_UNUSED(display); CV_UNUSED(surface); CV_UNUSED(dst); CV_UNUSED(size);
-#if !defined(HAVE_VA)
+    CV_ಬಳಸದ(display); CV_ಬಳಸದ(surface); CV_ಬಳಸದ(dst); CV_ಬಳಸದ(size);
+#ಆದರೆ !defined(HAVE_VA)
     NO_VA_SUPPORT_ERROR;
-#else  // !HAVE_VA
+#ಇಲ್ಲದಿದ್ದರೆ  // !HAVE_VA
 
-    const int dtype = CV_8UC3;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ dtype = CV_8UC3;
 
     // TODO Need to specify ACCESS_WRITE here somehow to prevent useless data copying!
     dst.create(size, dtype);
 
-#ifdef HAVE_VA_INTEL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_VA_INTEL
     ocl::OpenCLExecutionContext& ocl_context = ocl::OpenCLExecutionContext::getCurrent();
     VAAPIInterop* interop = ocl_context.getContext().getUserContext<VAAPIInterop>().get();
-    if (display == ocl_context.getContext().getOpenCLContextProperty(CL_CONTEXT_VA_API_DISPLAY_INTEL) && interop)
+    ಆದರೆ (display == ocl_context.getContext().getOpenCLContextProperty(CL_CONTEXT_VA_API_DISPLAY_INTEL) && interop)
     {
         UMat u = dst.getUMat();
 
@@ -691,113 +691,113 @@ void convertFromVASurface(VADisplay display, VASurfaceID surface, Size size, Out
         CV_Assert(u.offset == 0);
         CV_Assert(u.isContinuous());
 
-        cl_mem clBuffer = (cl_mem)u.handle(ACCESS_WRITE);
+        cl_mem cl_ಬಫರ್ = (cl_mem)u.handle(ACCESS_WRITE);
 
         cl_context context = (cl_context)ocl_context.getContext().ptr();
 
-        cl_int status = 0;
+        cl_int ಸ್ಥಿತಿ_2 = 0;
 
-        cl_mem clImageY = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_READ_ONLY, &surface, 0, &status);
-        if (status != CL_SUCCESS)
+        cl_mem clImageY = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_READ_ONLY, &surface, 0, &ಸ್ಥಿತಿ_2);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromVA_APIMediaSurfaceINTEL failed (Y plane)");
-        cl_mem clImageUV = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_READ_ONLY, &surface, 1, &status);
-        if (status != CL_SUCCESS)
+        cl_mem clImageUV = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_READ_ONLY, &surface, 1, &ಸ್ಥಿತಿ_2);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromVA_APIMediaSurfaceINTEL failed (UV plane)");
 
-        cl_command_queue q = (cl_command_queue)ocl_context.getQueue().ptr();
+        cl_command_ಸರತಿ q = (cl_command_ಸರತಿ)ocl_context.get_ಸರತಿ().ptr();
 
         cl_mem images[2] = { clImageY, clImageUV };
-        status = interop->clEnqueueAcquireVA_APIMediaSurfacesINTEL(q, 2, images, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        ಸ್ಥಿತಿ_2 = interop->cl_ಸರತಿಗೆ_ಸೇರಿಸು_Acquire_VA_APIMedia_Surfaces_INTEL(q, 2, images, 0, ಖಾಲಿ, ಖಾಲಿ);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireVA_APIMediaSurfacesINTEL failed");
-        if (!ocl::ocl_convert_nv12_to_bgr(clImageY, clImageUV, clBuffer, (int)u.step[0], u.cols, u.rows))
+        ಆದರೆ (!ocl::ocl_convert_nv12_ಗಮ್ಯ_bgr(clImageY, clImageUV, cl_ಬಫರ್, (ಪೂರ್ಣಾಂಕ)u.ಹೆಜ್ಜೆ[0], u.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, u.ಅಡ್ಡಸಾಲುಗಳು))
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: ocl_convert_nv12_to_bgr failed");
-        status = interop->clEnqueueReleaseVA_APIMediaSurfacesINTEL(q, 2, images, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        ಸ್ಥಿತಿ_2 = interop->cl_ಸರತಿಗೆ_ಸೇರಿಸು_Release_VA_APIMedia_Surfaces_INTEL(q, 2, images, 0, ಖಾಲಿ, ಖಾಲಿ);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseVA_APIMediaSurfacesINTEL failed");
 
-        status = clFinish(q); // TODO Use events
-        if (status != CL_SUCCESS)
+        ಸ್ಥಿತಿ_2 = cl_ಮುಕ್ತಾಯ(q); // TODO Use events
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-        status = clReleaseMemObject(clImageY); // TODO RAII
-        if (status != CL_SUCCESS)
+        ಸ್ಥಿತಿ_2 = clReleaseMemObject(clImageY); // TODO RAII
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed (Y plane)");
-        status = clReleaseMemObject(clImageUV);
-        if (status != CL_SUCCESS)
+        ಸ್ಥಿತಿ_2 = clReleaseMemObject(clImageUV);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed (UV plane)");
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
 # endif // HAVE_VA_INTEL
     {
         init_libva();
         Mat m = dst.getMat();
 
         // TODO Add support for roi
-        CV_Assert(m.data == m.datastart);
+        CV_Assert(m.ದತ್ತಾಂಶ == m.datastart);
         CV_Assert(m.isContinuous());
 
-        VAStatus status = 0;
+        VAStatus ಸ್ಥಿತಿ_2 = 0;
 
-        status = vaSyncSurface(display, surface);
-        if (status != VA_STATUS_SUCCESS)
+        ಸ್ಥಿತಿ_2 = vaSyncSurface(display, surface);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaSyncSurface failed");
 
         VAImage image;
-        status = vaDeriveImage(display, surface, &image);
-        if (status != VA_STATUS_SUCCESS){
+        ಸ್ಥಿತಿ_2 = vaDeriveImage(display, surface, &image);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS){
             //try vaCreateImage + vaGetImage
             //pick a format
-            int num_formats = vaMaxNumImageFormats(display);
-            if (num_formats <= 0)
+            ಪೂರ್ಣಾಂಕ ಅಂಕೆ_formats = va_Max_ಅಂಕೆ_Image_Formats(display);
+            ಆದರೆ (ಅಂಕೆ_formats <= 0)
                 CV_Error(cv::Error::StsError, "VA-API: vaMaxNumImageFormats failed");
-            std::vector<VAImageFormat> fmt_list(num_formats);
+            std::vector<VAImageFormat> fmt_list(ಅಂಕೆ_formats);
 
-            status = vaQueryImageFormats(display, fmt_list.data(), &num_formats);
-            if (status != VA_STATUS_SUCCESS)
+            ಸ್ಥಿತಿ_2 = vaQueryImageFormats(display, fmt_list.ದತ್ತಾಂಶ(), &ಅಂಕೆ_formats);
+            ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats failed");
-            VAImageFormat *selected_format = nullptr;
-            for (auto &fmt : fmt_list){
-                if (fmt.fourcc == VA_FOURCC_NV12 || fmt.fourcc == VA_FOURCC_YV12){
+            VAImageFormat *selected_format = ಶೂನ್ಯಸೂಚಕ;
+            ಗಾಗಿ (ಸ್ವಯಂಚಾಲಿತ &fmt : fmt_list){
+                ಆದರೆ (fmt.fourcc == VA_FOURCC_NV12 || fmt.fourcc == VA_FOURCC_YV12){
                     selected_format = &fmt;
-                    break;
+                    ನಿಲ್ಲಿಸು;
                 }
             }
-            if (selected_format == nullptr)
+            ಆದರೆ (selected_format == ಶೂನ್ಯಸೂಚಕ)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats did not return a supported format");
 
-            status = vaCreateImage(display, selected_format, size.width, size.height, &image);
-            if (status != VA_STATUS_SUCCESS)
+            ಸ್ಥಿತಿ_2 = vaCreateImage(display, selected_format, size.ಅಗಲ, size.ಎತ್ತರ, &image);
+            ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaCreateImage failed");
 
-            status = vaGetImage(display, surface, 0, 0, size.width, size.height, image.image_id);
-            if (status != VA_STATUS_SUCCESS){
+            ಸ್ಥಿತಿ_2 = vaGetImage(display, surface, 0, 0, size.ಅಗಲ, size.ಎತ್ತರ, image.image_id);
+            ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS){
                 vaDestroyImage(display, image.image_id);
                 CV_Error(cv::Error::StsError, "VA-API: vaPutImage failed");
             }
         }
 
-        unsigned char* buffer = 0;
-        status = vaMapBuffer(display, image.buf, (void **)&buffer);
-        if (status != VA_STATUS_SUCCESS)
+        ಚಿಹ್ನೆರಹಿತ ಅಕ್ಷರ* ಬಫರ್ = 0;
+        ಸ್ಥಿತಿ_2 = va_Map_ಬಫರ್(display, image.buf, (ಶೂನ್ಯ **)&ಬಫರ್);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaMapBuffer failed");
 
-        if (image.format.fourcc == VA_FOURCC_NV12)
-            copy_convert_nv12_to_bgr(image, buffer, m);
-        if (image.format.fourcc == VA_FOURCC_YV12)
-            copy_convert_yv12_to_bgr(image, buffer, m);
-        else
-            CV_Check((int)image.format.fourcc, image.format.fourcc == VA_FOURCC_NV12 || image.format.fourcc == VA_FOURCC_YV12, "Unexpected image format");
+        ಆದರೆ (image.format.fourcc == VA_FOURCC_NV12)
+            copy_convert_nv12_ಗಮ್ಯ_bgr(image, ಬಫರ್, m);
+        ಆದರೆ (image.format.fourcc == VA_FOURCC_YV12)
+            copy_convert_yv12_ಗಮ್ಯ_bgr(image, ಬಫರ್, m);
+        ಇಲ್ಲದಿದ್ದರೆ
+            CV_Check((ಪೂರ್ಣಾಂಕ)image.format.fourcc, image.format.fourcc == VA_FOURCC_NV12 || image.format.fourcc == VA_FOURCC_YV12, "Unexpected image format");
 
-        status = vaUnmapBuffer(display, image.buf);
-        if (status != VA_STATUS_SUCCESS)
+        ಸ್ಥಿತಿ_2 = va_Unmap_ಬಫರ್(display, image.buf);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaUnmapBuffer failed");
 
-        status = vaDestroyImage(display, image.image_id);
-        if (status != VA_STATUS_SUCCESS)
+        ಸ್ಥಿತಿ_2 = vaDestroyImage(display, image.image_id);
+        ಆದರೆ (ಸ್ಥಿತಿ_2 != VA_ಸ್ಥಿತಿ_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaDestroyImage failed");
     }
-#endif  // !HAVE_VA
+#ಆದರೆ_ಅಂತ್ಯ  // !HAVE_VA
 }
 
 }} // namespace cv::va_intel

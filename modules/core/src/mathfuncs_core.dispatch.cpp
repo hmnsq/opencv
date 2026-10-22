@@ -2,108 +2,108 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "arithm_expr.hpp"      // ew::mathSpanEngine - the engine fallback for exp/log
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "arithm_expr.hpp"      // ew::mathSpanEngine - the engine fallback for exp/log
 
-#include "mathfuncs_core.simd.hpp"
-#include "mathfuncs_core.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ಅನ್ತರ್ಭಾವ "mathfuncs_core.simd.hpp"
+#ಅನ್ತರ್ಭಾವ "mathfuncs_core.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ hal {
 
-void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, int len, bool angleInDegrees)
+ಶೂನ್ಯ cart_ಗಮ್ಯ_Polar32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* x, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* y, ದಶಮಾಂಶ* mag, ದಶಮಾಂಶ* angle, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees)
 {
     CV_INSTRUMENT_REGION();
 
-    CALL_HAL(cartToPolar32f, cv_hal_cartToPolar32f, x, y, mag, angle, len, angleInDegrees);
+    CALL_HAL(cart_ಗಮ್ಯ_Polar32f, cv_hal_cart_ಗಮ್ಯ_Polar32f, x, y, mag, angle, len, angle_ಒಳ_Degrees);
 
-    CV_CPU_DISPATCH(cartToPolar32f, (x, y, mag, angle, len, angleInDegrees),
+    CV_CPU_DISPATCH(cart_ಗಮ್ಯ_Polar32f, (x, y, mag, angle, len, angle_ಒಳ_Degrees),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void cartToPolar64f(const double* x, const double* y, double* mag, double* angle, int len, bool angleInDegrees)
+ಶೂನ್ಯ cart_ಗಮ್ಯ_Polar64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* x, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* y, ದ್ವಿಗುಣ* mag, ದ್ವಿಗುಣ* angle, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees)
 {
     CV_INSTRUMENT_REGION();
 
-    CALL_HAL(cartToPolar64f, cv_hal_cartToPolar64f, x, y, mag, angle, len, angleInDegrees);
+    CALL_HAL(cart_ಗಮ್ಯ_Polar64f, cv_hal_cart_ಗಮ್ಯ_Polar64f, x, y, mag, angle, len, angle_ಒಳ_Degrees);
 
-    CV_CPU_DISPATCH(cartToPolar64f, (x, y, mag, angle, len, angleInDegrees),
+    CV_CPU_DISPATCH(cart_ಗಮ್ಯ_Polar64f, (x, y, mag, angle, len, angle_ಒಳ_Degrees),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart32f(const float* mag, const float* angle, float* x, float* y, int len, bool angleInDegrees)
+ಶೂನ್ಯ polar_ಗಮ್ಯ_Cart32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* mag, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* angle, ದಶಮಾಂಶ* x, ದಶಮಾಂಶ* y, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees)
 {
     CV_INSTRUMENT_REGION();
 
-    CALL_HAL(polarToCart32f, cv_hal_polarToCart32f, mag, angle, x, y, len, angleInDegrees);
+    CALL_HAL(polar_ಗಮ್ಯ_Cart32f, cv_hal_polar_ಗಮ್ಯ_Cart32f, mag, angle, x, y, len, angle_ಒಳ_Degrees);
 
-    CV_CPU_DISPATCH(polarToCart32f, (mag, angle, x, y, len, angleInDegrees),
+    CV_CPU_DISPATCH(polar_ಗಮ್ಯ_Cart32f, (mag, angle, x, y, len, angle_ಒಳ_Degrees),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart64f(const double* mag, const double* angle, double* x, double* y, int len, bool angleInDegrees)
+ಶೂನ್ಯ polar_ಗಮ್ಯ_Cart64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* mag, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* angle, ದ್ವಿಗುಣ* x, ದ್ವಿಗುಣ* y, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees)
 {
     CV_INSTRUMENT_REGION();
 
-    CALL_HAL(polarToCart64f, cv_hal_polarToCart64f, mag, angle, x, y, len, angleInDegrees);
+    CALL_HAL(polar_ಗಮ್ಯ_Cart64f, cv_hal_polar_ಗಮ್ಯ_Cart64f, mag, angle, x, y, len, angle_ಒಳ_Degrees);
 
-    CV_CPU_DISPATCH(polarToCart64f, (mag, angle, x, y, len, angleInDegrees),
+    CV_CPU_DISPATCH(polar_ಗಮ್ಯ_Cart64f, (mag, angle, x, y, len, angle_ಒಳ_Degrees),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ಶೂನ್ಯ fastAtan32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *Y, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *X, ದಶಮಾಂಶ *angle, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees )
 {
     CV_INSTRUMENT_REGION();
 
-    CALL_HAL(fastAtan32f, cv_hal_fastAtan32f, Y, X, angle, len, angleInDegrees);
+    CALL_HAL(fastAtan32f, cv_hal_fastAtan32f, Y, X, angle, len, angle_ಒಳ_Degrees);
 
-    CV_CPU_DISPATCH(fastAtan32f, (Y, X, angle, len, angleInDegrees),
+    CV_CPU_DISPATCH(fastAtan32f, (Y, X, angle, len, angle_ಒಳ_Degrees),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees)
+ಶೂನ್ಯ fastAtan64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *Y, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *X, ದ್ವಿಗುಣ *angle, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees)
 {
     CV_INSTRUMENT_REGION();
 
-    CALL_HAL(fastAtan64f, cv_hal_fastAtan64f, Y, X, angle, len, angleInDegrees);
+    CALL_HAL(fastAtan64f, cv_hal_fastAtan64f, Y, X, angle, len, angle_ಒಳ_Degrees);
 
-    CV_CPU_DISPATCH(fastAtan64f, (Y, X, angle, len, angleInDegrees),
+    CV_CPU_DISPATCH(fastAtan64f, (Y, X, angle, len, angle_ಒಳ_Degrees),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // deprecated
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ಶೂನ್ಯ fastAtan2(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *Y, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *X, ದಶಮಾಂಶ *angle, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees )
 {
     CV_INSTRUMENT_REGION();
 
-    fastAtan32f(Y, X, angle, len, angleInDegrees);
+    fastAtan32f(Y, X, angle, len, angle_ಒಳ_Degrees);
 }
 
-void magnitude32f(const float* x, const float* y, float* mag, int len)
+ಶೂನ್ಯ magnitude32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* x, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* y, ದಶಮಾಂಶ* mag, ಪೂರ್ಣಾಂಕ len)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(magnitude32f, cv_hal_magnitude32f, x, y, mag, len);
     // SSE42 performance issues
-    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::getIppTopFeatures() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_32f, x, y, mag, len) >= 0);
+    CV_IPP_ಸತತ(IPP_ಆವೃತ್ತಿ_X100 > 201800 || cv::ipp::get_Ipp_ತುದಿ_Features() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_32f, x, y, mag, len) >= 0);
 
     CV_CPU_DISPATCH(magnitude32f, (x, y, mag, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void magnitude64f(const double* x, const double* y, double* mag, int len)
+ಶೂನ್ಯ magnitude64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* x, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* y, ದ್ವಿಗುಣ* mag, ಪೂರ್ಣಾಂಕ len)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(magnitude64f, cv_hal_magnitude64f, x, y, mag, len);
     // SSE42 performance issues
-    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::getIppTopFeatures() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_64f, x, y, mag, len) >= 0);
+    CV_IPP_ಸತತ(IPP_ಆವೃತ್ತಿ_X100 > 201800 || cv::ipp::get_Ipp_ತುದಿ_Features() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_64f, x, y, mag, len) >= 0);
 
     CV_CPU_DISPATCH(magnitude64f, (x, y, mag, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 
-void invSqrt32f(const float* src, float* dst, int len)
+ಶೂನ್ಯ invSqrt32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -114,7 +114,7 @@ void invSqrt32f(const float* src, float* dst, int len)
 }
 
 
-void invSqrt64f(const double* src, double* dst, int len)
+ಶೂನ್ಯ invSqrt64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -125,7 +125,7 @@ void invSqrt64f(const double* src, double* dst, int len)
 }
 
 
-void sqrt32f(const float* src, float* dst, int len)
+ಶೂನ್ಯ sqrt32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -136,7 +136,7 @@ void sqrt32f(const float* src, float* dst, int len)
 }
 
 
-void sqrt64f(const double* src, double* dst, int len)
+ಶೂನ್ಯ sqrt64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -146,103 +146,103 @@ void sqrt64f(const double* src, double* dst, int len)
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void exp32f(const float *src, float *dst, int n)
+ಶೂನ್ಯ exp32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src, ದಶಮಾಂಶ *dst, ಪೂರ್ಣಾಂಕ n)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(exp32f, cv_hal_exp32f, src, dst, n);
 
-    ew::mathSpanEngine(ew::OP_EXP, CV_32F, src, dst, n);   // the engine's vector kernel (the old
+    ew::math_ಹರವು_Engine(ew::OP_EXP, CV_32F, src, dst, n);   // the engine's vector kernel (the old
                                                        // table implementation is removed)
 }
 
-void exp64f(const double *src, double *dst, int n)
+ಶೂನ್ಯ exp64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src, ದ್ವಿಗುಣ *dst, ಪೂರ್ಣಾಂಕ n)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(exp64f, cv_hal_exp64f, src, dst, n);
 
-    ew::mathSpanEngine(ew::OP_EXP, CV_64F, src, dst, n);   // the engine's vector kernel (the old
+    ew::math_ಹರವು_Engine(ew::OP_EXP, CV_64F, src, dst, n);   // the engine's vector kernel (the old
                                                        // table implementation is removed)
 }
 
-void log32f(const float *src, float *dst, int n)
+ಶೂನ್ಯ log32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src, ದಶಮಾಂಶ *dst, ಪೂರ್ಣಾಂಕ n)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(log32f, cv_hal_log32f, src, dst, n);
 
-    ew::mathSpanEngine(ew::OP_LOG, CV_32F, src, dst, n);   // the engine's vector kernel (the old
+    ew::math_ಹರವು_Engine(ew::OP_LOG, CV_32F, src, dst, n);   // the engine's vector kernel (the old
                                                        // table implementation is removed)
 }
 
-void log64f(const double *src, double *dst, int n)
+ಶೂನ್ಯ log64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src, ದ್ವಿಗುಣ *dst, ಪೂರ್ಣಾಂಕ n)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(log64f, cv_hal_log64f, src, dst, n);
 
-    ew::mathSpanEngine(ew::OP_LOG, CV_64F, src, dst, n);   // the engine's vector kernel (the old
+    ew::math_ಹರವು_Engine(ew::OP_LOG, CV_64F, src, dst, n);   // the engine's vector kernel (the old
                                                        // table implementation is removed)
 }
 
 //=============================================================================
 // for compatibility with 3.0
 
-void exp(const float* src, float* dst, int n)
+ಶೂನ್ಯ ಘಾತಾಂಕ(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ n)
 {
     exp32f(src, dst, n);
 }
 
-void exp(const double* src, double* dst, int n)
+ಶೂನ್ಯ ಘಾತಾಂಕ(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ n)
 {
     exp64f(src, dst, n);
 }
 
-void log(const float* src, float* dst, int n)
+ಶೂನ್ಯ ಲಘುಗಣಕ(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ n)
 {
     log32f(src, dst, n);
 }
 
-void log(const double* src, double* dst, int n)
+ಶೂನ್ಯ ಲಘುಗಣಕ(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ n)
 {
     log64f(src, dst, n);
 }
 
-void magnitude(const float* x, const float* y, float* dst, int n)
+ಶೂನ್ಯ magnitude(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* x, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* y, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ n)
 {
     magnitude32f(x, y, dst, n);
 }
 
-void magnitude(const double* x, const double* y, double* dst, int n)
+ಶೂನ್ಯ magnitude(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* x, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* y, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ n)
 {
     magnitude64f(x, y, dst, n);
 }
 
-void sqrt(const float* src, float* dst, int len)
+ಶೂನ್ಯ ವರ್ಗಮೂಲ(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ len)
 {
     sqrt32f(src, dst, len);
 }
 
-void sqrt(const double* src, double* dst, int len)
+ಶೂನ್ಯ ವರ್ಗಮೂಲ(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ len)
 {
     sqrt64f(src, dst, len);
 }
 
-void invSqrt(const float* src, float* dst, int len)
+ಶೂನ್ಯ invSqrt(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ len)
 {
     invSqrt32f(src, dst, len);
 }
 
-void invSqrt(const double* src, double* dst, int len)
+ಶೂನ್ಯ invSqrt(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ len)
 {
     invSqrt64f(src, dst, len);
 }
 
 }} // namespace cv::hal::
 
-float cv::fastAtan2( float y, float x )
+ದಶಮಾಂಶ cv::fastAtan2( ದಶಮಾಂಶ y, ದಶಮಾಂಶ x )
 {
-    using namespace cv::hal;
+    ಬಳಸಿ ನಾಮಾಕಾಶ cv::hal;
     CV_CPU_CALL_BASELINE(fastAtan2, (y, x));
 }

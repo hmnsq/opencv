@@ -3,19 +3,19 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-namespace cv { namespace hal {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ hal {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-void merge8u(const uchar** src, uchar* dst, int len, int cn);
-void merge16u(const ushort** src, ushort* dst, int len, int cn);
-void merge32s(const int** src, int* dst, int len, int cn);
-void merge64s(const int64** src, int64* dst, int len, int cn);
+ಶೂನ್ಯ merge8u(ಸ್ಥಿರಾಂಕ uchar** src, uchar* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn);
+ಶೂನ್ಯ merge16u(ಸ್ಥಿರಾಂಕ ushort** src, ushort* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn);
+ಶೂನ್ಯ merge32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ** src, ಪೂರ್ಣಾಂಕ* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn);
+ಶೂನ್ಯ merge64s(ಸ್ಥಿರಾಂಕ int64** src, int64* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ಆದರೆ (CV_SIMD || CV_SIMD_SCALABLE)
 /*
   The trick with STORE_UNALIGNED/STORE_ALIGNED_NOCACHE is the following:
   on IA there are instructions movntps and such to which
@@ -35,134 +35,134 @@ void merge64s(const int64** src, int64* dst, int len, int cn);
   In principle there can be very poorly aligned data where there is no main part.
   For that we set i0=0 and use unaligned stores for the whole array.
 */
-template<typename T, typename VecT> static void
-vecmerge_( const T** src, T* dst, int len, int cn )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T, ಬಗೆ_ಹೆಸರು VecT> ಸ್ಥಿರ ಶೂನ್ಯ
+vecmerge_( ಸ್ಥಿರಾಂಕ T** src, T* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
-    const int VECSZ = VTraits<VecT>::vlanes();
-    int i, i0 = 0;
-    const T* src0 = src[0];
-    const T* src1 = src[1];
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ VECSZ = VTraits<VecT>::vlanes();
+    ಪೂರ್ಣಾಂಕ i, i0 = 0;
+    ಸ್ಥಿರಾಂಕ T* src0 = src[0];
+    ಸ್ಥಿರಾಂಕ T* src1 = src[1];
 
-    const int dstElemSize = cn * sizeof(T);
-    int r = (int)((size_t)(void*)dst % (VECSZ*sizeof(T)));
-    hal::StoreMode mode = hal::STORE_ALIGNED_NOCACHE;
-    if( r != 0 )
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ dst_Elem_ಗಾತ್ರ = cn * ಗಾತ್ರ(T);
+    ಪೂರ್ಣಾಂಕ r = (ಪೂರ್ಣಾಂಕ)((size_t)(ಶೂನ್ಯ*)dst % (VECSZ*ಗಾತ್ರ(T)));
+    hal::Store_ಬಹುಲಕ ಬಹುಲಕ = hal::STORE_ALIGNED_NOCACHE;
+    ಆದರೆ( r != 0 )
     {
-        mode = hal::STORE_UNALIGNED;
-        if (r % dstElemSize == 0 && len > VECSZ*2)
-            i0 = VECSZ - (r / dstElemSize);
+        ಬಹುಲಕ = hal::STORE_UNALIGNED;
+        ಆದರೆ (r % dst_Elem_ಗಾತ್ರ == 0 && len > VECSZ*2)
+            i0 = VECSZ - (r / dst_Elem_ಗಾತ್ರ);
     }
 
-    if( cn == 2 )
+    ಆದರೆ( cn == 2 )
     {
-        for( i = 0; i < len; i += VECSZ )
+        ಗಾಗಿ( i = 0; i < len; i += VECSZ )
         {
-            if( i > len - VECSZ )
+            ಆದರೆ( i > len - VECSZ )
             {
                 i = len - VECSZ;
-                mode = hal::STORE_UNALIGNED;
+                ಬಹುಲಕ = hal::STORE_UNALIGNED;
             }
-            VecT a = vx_load(src0 + i), b = vx_load(src1 + i);
-            v_store_interleave(dst + i*cn, a, b, mode);
-            if( i < i0 )
+            VecT a = vx_ತುಂಬು(src0 + i), b = vx_ತುಂಬು(src1 + i);
+            v_store_interleave(dst + i*cn, a, b, ಬಹುಲಕ);
+            ಆದರೆ( i < i0 )
             {
                 i = i0 - VECSZ;
-                mode = hal::STORE_ALIGNED_NOCACHE;
+                ಬಹುಲಕ = hal::STORE_ALIGNED_NOCACHE;
             }
         }
     }
-    else if( cn == 3 )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( cn == 3 )
     {
-        const T* src2 = src[2];
-        for( i = 0; i < len; i += VECSZ )
+        ಸ್ಥಿರಾಂಕ T* src2 = src[2];
+        ಗಾಗಿ( i = 0; i < len; i += VECSZ )
         {
-            if( i > len - VECSZ )
+            ಆದರೆ( i > len - VECSZ )
             {
                 i = len - VECSZ;
-                mode = hal::STORE_UNALIGNED;
+                ಬಹುಲಕ = hal::STORE_UNALIGNED;
             }
-            VecT a = vx_load(src0 + i), b = vx_load(src1 + i), c = vx_load(src2 + i);
-            v_store_interleave(dst + i*cn, a, b, c, mode);
-            if( i < i0 )
+            VecT a = vx_ತುಂಬು(src0 + i), b = vx_ತುಂಬು(src1 + i), c = vx_ತುಂಬು(src2 + i);
+            v_store_interleave(dst + i*cn, a, b, c, ಬಹುಲಕ);
+            ಆದರೆ( i < i0 )
             {
                 i = i0 - VECSZ;
-                mode = hal::STORE_ALIGNED_NOCACHE;
+                ಬಹುಲಕ = hal::STORE_ALIGNED_NOCACHE;
             }
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         CV_Assert( cn == 4 );
-        const T* src2 = src[2];
-        const T* src3 = src[3];
-        for( i = 0; i < len; i += VECSZ )
+        ಸ್ಥಿರಾಂಕ T* src2 = src[2];
+        ಸ್ಥಿರಾಂಕ T* src3 = src[3];
+        ಗಾಗಿ( i = 0; i < len; i += VECSZ )
         {
-            if( i > len - VECSZ )
+            ಆದರೆ( i > len - VECSZ )
             {
                 i = len - VECSZ;
-                mode = hal::STORE_UNALIGNED;
+                ಬಹುಲಕ = hal::STORE_UNALIGNED;
             }
-            VecT a = vx_load(src0 + i), b = vx_load(src1 + i);
-            VecT c = vx_load(src2 + i), d = vx_load(src3 + i);
-            v_store_interleave(dst + i*cn, a, b, c, d, mode);
-            if( i < i0 )
+            VecT a = vx_ತುಂಬು(src0 + i), b = vx_ತುಂಬು(src1 + i);
+            VecT c = vx_ತುಂಬು(src2 + i), d = vx_ತುಂಬು(src3 + i);
+            v_store_interleave(dst + i*cn, a, b, c, d, ಬಹುಲಕ);
+            ಆದರೆ( i < i0 )
             {
                 i = i0 - VECSZ;
-                mode = hal::STORE_ALIGNED_NOCACHE;
+                ಬಹುಲಕ = hal::STORE_ALIGNED_NOCACHE;
             }
         }
     }
     vx_cleanup();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-template<typename T> static void
-merge_( const T** src, T* dst, int len, int cn )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ ಶೂನ್ಯ
+ವಿಲೀನ_2( ಸ್ಥಿರಾಂಕ T** src, T* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
-    int k = cn % 4 ? cn % 4 : 4;
-    int i, j;
-    if( k == 1 )
+    ಪೂರ್ಣಾಂಕ k = cn % 4 ? cn % 4 : 4;
+    ಪೂರ್ಣಾಂಕ i, j;
+    ಆದರೆ( k == 1 )
     {
-        const T* src0 = src[0];
-        for( i = j = 0; i < len; i++, j += cn )
+        ಸ್ಥಿರಾಂಕ T* src0 = src[0];
+        ಗಾಗಿ( i = j = 0; i < len; i++, j += cn )
             dst[j] = src0[i];
     }
-    else if( k == 2 )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( k == 2 )
     {
-        const T *src0 = src[0], *src1 = src[1];
+        ಸ್ಥಿರಾಂಕ T *src0 = src[0], *src1 = src[1];
         i = j = 0;
-        for( ; i < len; i++, j += cn )
+        ಗಾಗಿ( ; i < len; i++, j += cn )
         {
             dst[j] = src0[i];
             dst[j+1] = src1[i];
         }
     }
-    else if( k == 3 )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( k == 3 )
     {
-        const T *src0 = src[0], *src1 = src[1], *src2 = src[2];
+        ಸ್ಥಿರಾಂಕ T *src0 = src[0], *src1 = src[1], *src2 = src[2];
         i = j = 0;
-        for( ; i < len; i++, j += cn )
+        ಗಾಗಿ( ; i < len; i++, j += cn )
         {
             dst[j] = src0[i];
             dst[j+1] = src1[i];
             dst[j+2] = src2[i];
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        const T *src0 = src[0], *src1 = src[1], *src2 = src[2], *src3 = src[3];
+        ಸ್ಥಿರಾಂಕ T *src0 = src[0], *src1 = src[1], *src2 = src[2], *src3 = src[3];
         i = j = 0;
-        for( ; i < len; i++, j += cn )
+        ಗಾಗಿ( ; i < len; i++, j += cn )
         {
             dst[j] = src0[i]; dst[j+1] = src1[i];
             dst[j+2] = src2[i]; dst[j+3] = src3[i];
         }
     }
 
-    for( ; k < cn; k += 4 )
+    ಗಾಗಿ( ; k < cn; k += 4 )
     {
-        const T *src0 = src[k], *src1 = src[k+1], *src2 = src[k+2], *src3 = src[k+3];
-        for( i = 0, j = k; i < len; i++, j += cn )
+        ಸ್ಥಿರಾಂಕ T *src0 = src[k], *src1 = src[k+1], *src2 = src[k+2], *src3 = src[k+3];
+        ಗಾಗಿ( i = 0, j = k; i < len; i++, j += cn )
         {
             dst[j] = src0[i]; dst[j+1] = src1[i];
             dst[j+2] = src2[i]; dst[j+3] = src3[i];
@@ -170,50 +170,50 @@ merge_( const T** src, T* dst, int len, int cn )
     }
 }
 
-void merge8u(const uchar** src, uchar* dst, int len, int cn )
+ಶೂನ್ಯ merge8u(ಸ್ಥಿರಾಂಕ uchar** src, uchar* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_uint8>::vlanes() && 2 <= cn && cn <= 4 )
+#ಆದರೆ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಆದರೆ( len >= VTraits<v_uint8>::vlanes() && 2 <= cn && cn <= 4 )
         vecmerge_<uchar, v_uint8>(src, dst, len, cn);
-    else
-#endif
-        merge_(src, dst, len, cn);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+        ವಿಲೀನ_2(src, dst, len, cn);
 }
 
-void merge16u(const ushort** src, ushort* dst, int len, int cn )
+ಶೂನ್ಯ merge16u(ಸ್ಥಿರಾಂಕ ushort** src, ushort* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_uint16>::vlanes() && 2 <= cn && cn <= 4 )
+#ಆದರೆ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಆದರೆ( len >= VTraits<v_uint16>::vlanes() && 2 <= cn && cn <= 4 )
         vecmerge_<ushort, v_uint16>(src, dst, len, cn);
-    else
-#endif
-        merge_(src, dst, len, cn);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+        ವಿಲೀನ_2(src, dst, len, cn);
 }
 
-void merge32s(const int** src, int* dst, int len, int cn )
+ಶೂನ್ಯ merge32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ** src, ಪೂರ್ಣಾಂಕ* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_int32>::vlanes() && 2 <= cn && cn <= 4 )
-        vecmerge_<int, v_int32>(src, dst, len, cn);
-    else
-#endif
-        merge_(src, dst, len, cn);
+#ಆದರೆ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಆದರೆ( len >= VTraits<v_int32>::vlanes() && 2 <= cn && cn <= 4 )
+        vecmerge_<ಪೂರ್ಣಾಂಕ, v_int32>(src, dst, len, cn);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+        ವಿಲೀನ_2(src, dst, len, cn);
 }
 
-void merge64s(const int64** src, int64* dst, int len, int cn )
+ಶೂನ್ಯ merge64s(ಸ್ಥಿರಾಂಕ int64** src, int64* dst, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_int64>::vlanes() && 2 <= cn && cn <= 4 )
+#ಆದರೆ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಆದರೆ( len >= VTraits<v_int64>::vlanes() && 2 <= cn && cn <= 4 )
         vecmerge_<int64, v_int64>(src, dst, len, cn);
-    else
-#endif
-        merge_(src, dst, len, cn);
+    ಇಲ್ಲದಿದ್ದರೆ
+#ಆದರೆ_ಅಂತ್ಯ
+        ವಿಲೀನ_2(src, dst, len, cn);
 }
 
-#endif
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+#ಆದರೆ_ಅಂತ್ಯ
+CV_CPU_OPTIMIZATION_NAMESPACE_ಕೊನೆ
 }} // namespace

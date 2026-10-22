@@ -40,302 +40,302 @@
 //
 //M*/
 
-#ifndef __OPENCV_PRECOMP_H__
-#define __OPENCV_PRECOMP_H__
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ __OPENCV_PRECOMP_H__
+#ವ್ಯಾಖ್ಯಾನಿಸು __OPENCV_PRECOMP_H__
 
-#ifdef _MSC_VER
-#  define _SILENCE_CXX17_C_HEADER_DEPRECATION_WARNING
-#  define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
-#endif
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ _MSC_VER
+#  define SILENCE_CXX17_C_ಶೀರ್ಷಿಕೆ_DEPRECATION_WARNING
+#  define SILENCE_CXX17_CODECVT_ಶೀರ್ಷಿಕೆ_DEPRECATION_WARNING
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef BUILD_PLUGIN
-#include "opencv2/core/utility.hpp"
-#else  // BUILD_PLUGIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BUILD_PLUGIN
+#ಅನ್ತರ್ಭಾವ "opencv2/core/utility.hpp"
+#ಇಲ್ಲದಿದ್ದರೆ  // BUILD_PLUGIN
 
-#include "opencv2/opencv_modules.hpp"
-#include "cvconfig.h"
+#ಅನ್ತರ್ಭಾವ "opencv2/opencv_modules.hpp"
+#ಅನ್ತರ್ಭಾವ "cvconfig.h"
 
-#include "opencv2/core/utility.hpp"
-#include "opencv2/core/cuda.hpp"
-#include "opencv2/core/opengl.hpp"
-#include "opencv2/core/va_intel.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/utility.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/cuda.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/opengl.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/va_intel.hpp"
 
-#include "opencv2/core/private.hpp"
-#include "opencv2/core/private.cuda.hpp"
-#ifdef HAVE_OPENCL
-#include "opencv2/core/ocl.hpp"
-#endif
+#ಅನ್ತರ್ಭಾವ "opencv2/core/private.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/private.cuda.hpp"
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
+#ಅನ್ತರ್ಭಾವ "opencv2/core/ocl.hpp"
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include <ctype.h>
-#include <float.h>
-#include <limits.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#ಅನ್ತರ್ಭಾವ <ctype.h>
+#ಅನ್ತರ್ಭಾವ <float.h>
+#ಅನ್ತರ್ಭಾವ <limits.h>
+#ಅನ್ತರ್ಭಾವ <math.h>
+#ಅನ್ತರ್ಭಾವ <stdarg.h>
+#ಅನ್ತರ್ಭಾವ <stdio.h>
+#ಅನ್ತರ್ಭಾವ <stdlib.h>
+#ಅನ್ತರ್ಭಾವ <string.h>
 
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
-#include <limits>
-#include <float.h>
-#include <cstring>
-#include <cassert>
+#ಅನ್ತರ್ಭಾವ <algorithm>
+#ಅನ್ತರ್ಭಾವ <cmath>
+#ಅನ್ತರ್ಭಾವ <cstdlib>
+#ಅನ್ತರ್ಭಾವ <limits>
+#ಅನ್ತರ್ಭಾವ <float.h>
+#ಅನ್ತರ್ಭಾವ <cstring>
+#ಅನ್ತರ್ಭಾವ <cassert>
 
-#define USE_SSE2  (cv::checkHardwareSupport(CV_CPU_SSE2))
-#define USE_SSE4_2  (cv::checkHardwareSupport(CV_CPU_SSE4_2))
-#define USE_AVX  (cv::checkHardwareSupport(CV_CPU_AVX))
-#define USE_AVX2  (cv::checkHardwareSupport(CV_CPU_AVX2))
+#ವ್ಯಾಖ್ಯಾನಿಸು USE_SSE2  (cv::checkHardwareSupport(CV_CPU_SSE2))
+#ವ್ಯಾಖ್ಯಾನಿಸು USE_SSE4_2  (cv::checkHardwareSupport(CV_CPU_SSE4_2))
+#ವ್ಯಾಖ್ಯಾನಿಸು USE_AVX  (cv::checkHardwareSupport(CV_CPU_AVX))
+#ವ್ಯಾಖ್ಯಾನಿಸು USE_AVX2  (cv::checkHardwareSupport(CV_CPU_AVX2))
 
-#include "opencv2/core/hal/hal.hpp"
-#include "opencv2/core/hal/intrin.hpp"
-#include "opencv2/core/neon_utils.hpp"
-#include "opencv2/core/vsx_utils.hpp"
-#include "hal_replacement.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/hal/hal.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/hal/intrin.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/neon_utils.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/vsx_utils.hpp"
+#ಅನ್ತರ್ಭಾವ "hal_replacement.hpp"
 
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
 // -128.f ... 255.f
-extern const float g_8x32fTab[];
-#define CV_8TO32F(x)  cv::g_8x32fTab[(x)+128]
+ಬಾಹ್ಯ ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ g_8x32fTab[];
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_8TO32F(x)  cv::g_8x32fTab[(x)+128]
 
-extern const ushort g_8x16uSqrTab[];
-#define CV_SQR_8U(x)  cv::g_8x16uSqrTab[(x)+255]
+ಬಾಹ್ಯ ಸ್ಥಿರಾಂಕ ushort g_8x16uSqrTab[];
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_SQR_8U(x)  cv::g_8x16uSqrTab[(x)+255]
 
-extern const uchar g_Saturate8u[];
-#define CV_FAST_CAST_8U(t)   (assert(-256 <= (t) && (t) <= 512), cv::g_Saturate8u[(t)+256])
-#define CV_MIN_8U(a,b)       ((a) - CV_FAST_CAST_8U((a) - (b)))
-#define CV_MAX_8U(a,b)       ((a) + CV_FAST_CAST_8U((b) - (a)))
+ಬಾಹ್ಯ ಸ್ಥಿರಾಂಕ uchar g_Saturate8u[];
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_FAST_CAST_8U(t)   (ಪ್ರತಿಜ್ಞಾ(-256 <= (t) && (t) <= 512), cv::g_Saturate8u[(t)+256])
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_MIN_8U(a,b)       ((a) - CV_FAST_CAST_8U((a) - (b)))
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_MAX_8U(a,b)       ((a) + CV_FAST_CAST_8U((b) - (a)))
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpNop
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T1, ಬಗೆ_ಹೆಸರು T2=T1, ಬಗೆ_ಹೆಸರು T3=T1> ರಚನೆ OpNop
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a) const { return saturate_cast<T3>(a); }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T1 type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T2 type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T3 rtype;
+    T3 ಕ್ರಿಯಾಕಾರಕ ()(ಸ್ಥಿರಾಂಕ T1 a) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ saturate_cast<T3>(a); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpSqr
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T1, ಬಗೆ_ಹೆಸರು T2=T1, ಬಗೆ_ಹೆಸರು T3=T1> ರಚನೆ OpSqr
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a) const { return saturate_cast<T3>(a)*saturate_cast<T3>(a); }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T1 type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T2 type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T3 rtype;
+    T3 ಕ್ರಿಯಾಕಾರಕ ()(ಸ್ಥಿರಾಂಕ T1 a) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ saturate_cast<T3>(a)*saturate_cast<T3>(a); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpAdd
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T1, ಬಗೆ_ಹೆಸರು T2=T1, ಬಗೆ_ಹೆಸರು T3=T1> ರಚನೆ Op_ಕೂಡಿಸು
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a + b); }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T1 type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T2 type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T3 rtype;
+    T3 ಕ್ರಿಯಾಕಾರಕ ()(ಸ್ಥಿರಾಂಕ T1 a, ಸ್ಥಿರಾಂಕ T2 b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ saturate_cast<T3>(a + b); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpAddSqr
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T1, ಬಗೆ_ಹೆಸರು T2=T1, ಬಗೆ_ಹೆಸರು T3=T1> ರಚನೆ Op_ಕೂಡಿಸು_Sqr
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a + saturate_cast<T3>(b)*saturate_cast<T3>(b)); }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T1 type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T2 type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T3 rtype;
+    T3 ಕ್ರಿಯಾಕಾರಕ ()(ಸ್ಥಿರಾಂಕ T1 a, ಸ್ಥಿರಾಂಕ T2 b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ saturate_cast<T3>(a + saturate_cast<T3>(b)*saturate_cast<T3>(b)); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpSub
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T1, ಬಗೆ_ಹೆಸರು T2=T1, ಬಗೆ_ಹೆಸರು T3=T1> ರಚನೆ OpSub
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a - b); }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T1 type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T2 type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T3 rtype;
+    T3 ಕ್ರಿಯಾಕಾರಕ ()(ಸ್ಥಿರಾಂಕ T1 a, ಸ್ಥಿರಾಂಕ T2 b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ saturate_cast<T3>(a - b); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpRSub
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T1, ಬಗೆ_ಹೆಸರು T2=T1, ಬಗೆ_ಹೆಸರು T3=T1> ರಚನೆ OpRSub
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(b - a); }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T1 type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T2 type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T3 rtype;
+    T3 ಕ್ರಿಯಾಕಾರಕ ()(ಸ್ಥಿರಾಂಕ T1 a, ಸ್ಥಿರಾಂಕ T2 b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ saturate_cast<T3>(b - a); }
 };
 
-template<typename T> struct OpMin
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ರಚನೆ OpMin
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator ()(const T a, const T b) const { return std::min(a, b); }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T rtype;
+    T ಕ್ರಿಯಾಕಾರಕ ()(ಸ್ಥಿರಾಂಕ T a, ಸ್ಥಿರಾಂಕ T b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ std::min(a, b); }
 };
 
-template<typename T> struct OpMax
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ರಚನೆ OpMax
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator ()(const T a, const T b) const { return std::max(a, b); }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T rtype;
+    T ಕ್ರಿಯಾಕಾರಕ ()(ಸ್ಥಿರಾಂಕ T a, ಸ್ಥಿರಾಂಕ T b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ std::max(a, b); }
 };
 
-template<typename T> struct OpAbsDiff
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ರಚನೆ OpAbsDiff
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()(T a, T b) const { return a > b ? a - b : b - a; }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T rtype;
+    T ಕ್ರಿಯಾಕಾರಕ()(T a, T b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ a > b ? a - b : b - a; }
 };
 
 // specializations to prevent "-0" results
-template<> struct OpAbsDiff<float>
+ಮಾದರಿ<> ರಚನೆ OpAbsDiff<ದಶಮಾಂಶ>
 {
-    typedef float type1;
-    typedef float type2;
-    typedef float rtype;
-    float operator()(float a, float b) const { return std::abs(a - b); }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದಶಮಾಂಶ type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದಶಮಾಂಶ type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದಶಮಾಂಶ rtype;
+    ದಶಮಾಂಶ ಕ್ರಿಯಾಕಾರಕ()(ದಶಮಾಂಶ a, ದಶಮಾಂಶ b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ std::ನಿರಪೇಕ್ಷ(a - b); }
 };
-template<> struct OpAbsDiff<double>
+ಮಾದರಿ<> ರಚನೆ OpAbsDiff<ದ್ವಿಗುಣ>
 {
-    typedef double type1;
-    typedef double type2;
-    typedef double rtype;
-    double operator()(double a, double b) const { return std::abs(a - b); }
-};
-
-template<typename T> struct OpAnd
-{
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()( T a, T b ) const { return a & b; }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದ್ವಿಗುಣ type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದ್ವಿಗುಣ type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ದ್ವಿಗುಣ rtype;
+    ದ್ವಿಗುಣ ಕ್ರಿಯಾಕಾರಕ()(ದ್ವಿಗುಣ a, ದ್ವಿಗುಣ b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ std::ನಿರಪೇಕ್ಷ(a - b); }
 };
 
-template<typename T> struct OpOr
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ರಚನೆ OpAnd
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()( T a, T b ) const { return a | b; }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T rtype;
+    T ಕ್ರಿಯಾಕಾರಕ()( T a, T b ) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ a & b; }
 };
 
-template<typename T> struct OpXor
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ರಚನೆ OpOr
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()( T a, T b ) const { return a ^ b; }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T rtype;
+    T ಕ್ರಿಯಾಕಾರಕ()( T a, T b ) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ a | b; }
 };
 
-template<typename T> struct OpNot
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ರಚನೆ OpXor
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()( T a, T ) const { return ~a; }
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T rtype;
+    T ಕ್ರಿಯಾಕಾರಕ()( T a, T b ) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ a ^ b; }
 };
 
-template<> inline uchar OpAdd<uchar>::operator ()(uchar a, uchar b) const
-{ return CV_FAST_CAST_8U(a + b); }
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ರಚನೆ OpNot
+{
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type1;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T type2;
+    ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ T rtype;
+    T ಕ್ರಿಯಾಕಾರಕ()( T a, T ) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ ~a; }
+};
 
-template<> inline uchar OpSub<uchar>::operator ()(uchar a, uchar b) const
-{ return CV_FAST_CAST_8U(a - b); }
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ uchar Op_ಕೂಡಿಸು<uchar>::ಕ್ರಿಯಾಕಾರಕ ()(uchar a, uchar b) ಸ್ಥಿರಾಂಕ
+{ ಹಿಂತಿರುಗಿ CV_FAST_CAST_8U(a + b); }
 
-template<> inline short OpAbsDiff<short>::operator ()(short a, short b) const
-{ return saturate_cast<short>(std::abs(a - b)); }
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ uchar OpSub<uchar>::ಕ್ರಿಯಾಕಾರಕ ()(uchar a, uchar b) ಸ್ಥಿರಾಂಕ
+{ ಹಿಂತಿರುಗಿ CV_FAST_CAST_8U(a - b); }
 
-template<> inline schar OpAbsDiff<schar>::operator ()(schar a, schar b) const
-{ return saturate_cast<schar>(std::abs(a - b)); }
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ ಗಿಡ್ಡ OpAbsDiff<ಗಿಡ್ಡ>::ಕ್ರಿಯಾಕಾರಕ ()(ಗಿಡ್ಡ a, ಗಿಡ್ಡ b) ಸ್ಥಿರಾಂಕ
+{ ಹಿಂತಿರುಗಿ saturate_cast<ಗಿಡ್ಡ>(std::ನಿರಪೇಕ್ಷ(a - b)); }
 
-template<> inline uchar OpMin<uchar>::operator ()(uchar a, uchar b) const { return CV_MIN_8U(a, b); }
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ schar OpAbsDiff<schar>::ಕ್ರಿಯಾಕಾರಕ ()(schar a, schar b) ಸ್ಥಿರಾಂಕ
+{ ಹಿಂತಿರುಗಿ saturate_cast<schar>(std::ನಿರಪೇಕ್ಷ(a - b)); }
 
-template<> inline uchar OpMax<uchar>::operator ()(uchar a, uchar b) const { return CV_MAX_8U(a, b); }
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ uchar OpMin<uchar>::ಕ್ರಿಯಾಕಾರಕ ()(uchar a, uchar b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ CV_MIN_8U(a, b); }
 
-typedef void (*UnaryFunc)(const uchar* src1, size_t step1,
-                       uchar* dst, size_t step, Size sz,
-                       void*);
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ uchar OpMax<uchar>::ಕ್ರಿಯಾಕಾರಕ ()(uchar a, uchar b) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ CV_MAX_8U(a, b); }
 
-typedef void (*BinaryFunc)(const uchar* src1, size_t step1,
-                       const uchar* src2, size_t step2,
-                       uchar* dst, size_t step, Size sz,
-                       void*);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*UnaryFunc)(ಸ್ಥಿರಾಂಕ uchar* src1, size_t step1,
+                       uchar* dst, size_t ಹೆಜ್ಜೆ, ಗಾತ್ರ_2 sz,
+                       ಶೂನ್ಯ*);
 
-typedef void (*BinaryFuncC)(const void* src1, size_t step1,
-                       const void* src2, size_t step2,
-                       void* dst, size_t step, int width, int height,
-                       void*);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*ದ್ವಿಮಾನ_Func)(ಸ್ಥಿರಾಂಕ uchar* src1, size_t step1,
+                       ಸ್ಥಿರಾಂಕ uchar* src2, size_t step2,
+                       uchar* dst, size_t ಹೆಜ್ಜೆ, ಗಾತ್ರ_2 sz,
+                       ಶೂನ್ಯ*);
+
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*ದ್ವಿಮಾನ_Func_C)(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* src1, size_t step1,
+                       ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* src2, size_t step2,
+                       ಶೂನ್ಯ* dst, size_t ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+                       ಶೂನ್ಯ*);
 
 // Exported so the new element-wise expression engine can reuse the already-optimized,
 // CPU-dispatched convert / convert-scale kernels through a thin ElemwiseFunc adapter,
 // instead of re-implementing the whole cast matrix. (Prototype: declarations are mirrored
 // engine-side; relocate into a public core header at integration time.)
-CV_EXPORTS BinaryFunc getConvertFunc(int sdepth, int ddepth);
-CV_EXPORTS BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
-BinaryFunc getCopyMaskFunc(size_t esz);
+CV_EXPORTS ದ್ವಿಮಾನ_Func getConvertFunc(ಪೂರ್ಣಾಂಕ sdepth, ಪೂರ್ಣಾಂಕ ddepth);
+CV_EXPORTS ದ್ವಿಮಾನ_Func getConvertScaleFunc(ಪೂರ್ಣಾಂಕ sdepth, ಪೂರ್ಣಾಂಕ ddepth);
+ದ್ವಿಮಾನ_Func get_Copy_ಮುಖವಾಡ_Func(size_t esz);
 
 /* default memory block for sparse array elements */
-#define  CV_SPARSE_MAT_BLOCK     (1<<12)
+#ವ್ಯಾಖ್ಯಾನಿಸು  CV_SPARSE_MAT_ಖಂಡ     (1<<12)
 
 /* initial hash table size */
-#define  CV_SPARSE_HASH_SIZE0    (1<<10)
+#ವ್ಯಾಖ್ಯಾನಿಸು  CV_SPARSE_HASH_SIZE0    (1<<10)
 
 /* maximal average node_count/hash_size ratio beyond which hash table is resized */
-#define  CV_SPARSE_HASH_RATIO    3
+#ವ್ಯಾಖ್ಯಾನಿಸು  CV_SPARSE_HASH_ಅನುಪಾತ    3
 
 // There is some mess in code with vectors representation.
 // Both vector-column / vector-rows are used with dims=2 (as Mat2D always).
 // Reshape matrices if necessary (in case of vectors) and returns size with scaled width.
-Size getContinuousSize2D(Mat& m1, int widthScale=1);
-Size getContinuousSize2D(Mat& m1, Mat& m2, int widthScale=1);
-Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, int widthScale=1);
+ಗಾತ್ರ_2 getContinuousSize2D(Mat& m1, ಪೂರ್ಣಾಂಕ ಅಗಲ_Scale=1);
+ಗಾತ್ರ_2 getContinuousSize2D(Mat& m1, Mat& m2, ಪೂರ್ಣಾಂಕ ಅಗಲ_Scale=1);
+ಗಾತ್ರ_2 getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, ಪೂರ್ಣಾಂಕ ಅಗಲ_Scale=1);
 
-void setSize( Mat& m, int _dims, const int* _sz, const size_t* _steps, bool autoSteps=false );
-void finalizeHdr(Mat& m);
-int updateContinuityFlag(int flags, int dims, const int* size, const size_t* step);
+ಶೂನ್ಯ ಗಣ_ಗಾತ್ರ( Mat& m, ಪೂರ್ಣಾಂಕ _dims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* _sz, ಸ್ಥಿರಾಂಕ size_t* ಹೆಜ್ಜೆಗಳು_2, ತಾರ್ಕಿಕ auto_ಹೆಜ್ಜೆಗಳು=ಸುಳ್ಳು );
+ಶೂನ್ಯ finalizeHdr(Mat& m);
+ಪೂರ್ಣಾಂಕ updateContinuityFlag(ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ dims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* size, ಸ್ಥಿರಾಂಕ size_t* ಹೆಜ್ಜೆ);
 
-struct NoVec
+ರಚನೆ NoVec
 {
-    size_t operator()(const void*, const void*, void*, size_t) const { return 0; }
+    size_t ಕ್ರಿಯಾಕಾರಕ()(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ*, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ*, ಶೂನ್ಯ*, size_t) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ 0; }
 };
 
-#define CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn) ((INT_MAX/4)/(cn)) // HAL implementation accepts 'int' len, so INT_MAX doesn't work here
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_ವಿಭಜಿಸು_ವಿಲೀನ_MAX_ಖಂಡ_ಗಾತ್ರ(cn) ((ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ/4)/(cn)) // HAL implementation accepts 'int' len, so INT_MAX doesn't work here
 
-enum { BLOCK_SIZE = 1024 };
+ಎಣಿಕೆ { ಖಂಡ_ಗಾತ್ರ = 1024 };
 
-#if defined HAVE_IPP && (IPP_VERSION_X100 >= 700)
-#define ARITHM_USE_IPP 1
-#else
-#define ARITHM_USE_IPP 0
-#endif
+#ಆದರೆ defined HAVE_IPP && (IPP_ಆವೃತ್ತಿ_X100 >= 700)
+#ವ್ಯಾಖ್ಯಾನಿಸು ARITHM_USE_IPP 1
+#ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು ARITHM_USE_IPP 0
+#ಆದರೆ_ಅಂತ್ಯ
 
-inline bool checkScalar(const Mat& sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+ಸಾಲೊಳಗೆ ತಾರ್ಕಿಕ checkScalar(ಸ್ಥಿರಾಂಕ Mat& sc, ಪೂರ್ಣಾಂಕ atype, ಒಳಹರಿವು_Array_2::ಬಗೆ_Flag sckind, ಒಳಹರಿವು_Array_2::ಬಗೆ_Flag akind)
 {
-    if( sc.dims > 2 || !sc.isContinuous() )
-        return false;
-    Size sz = sc.size();
-    if(sz.width != 1 && sz.height != 1)
-        return false;
-    int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
-        return false;
-    return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
-           (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
+    ಆದರೆ( sc.dims > 2 || !sc.isContinuous() )
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಗಾತ್ರ_2 sz = sc.size();
+    ಆದರೆ(sz.ಅಗಲ != 1 && sz.ಎತ್ತರ != 1)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಪೂರ್ಣಾಂಕ cn = CV_MAT_CN(atype);
+    ಆದರೆ( akind == ಒಳಹರಿವು_Array_2::MATX && sckind != ಒಳಹರಿವು_Array_2::MATX )
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಹಿಂತಿರುಗಿ sz == ಗಾತ್ರ_2(1, 1) || sz == ಗಾತ್ರ_2(1, cn) || sz == ಗಾತ್ರ_2(cn, 1) ||
+           (sz == ಗಾತ್ರ_2(1, 4) && sc.type() == CV_64F && cn <= 4);
 }
 
-inline bool checkScalar(InputArray sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+ಸಾಲೊಳಗೆ ತಾರ್ಕಿಕ checkScalar(ಒಳಹರಿವು_Array sc, ಪೂರ್ಣಾಂಕ atype, ಒಳಹರಿವು_Array_2::ಬಗೆ_Flag sckind, ಒಳಹರಿವು_Array_2::ಬಗೆ_Flag akind)
 {
-    if( sc.dims() > 2 || !sc.isContinuous() )
-        return false;
-    Size sz = sc.size();
-    if(sz.width != 1 && sz.height != 1)
-        return false;
-    int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
-        return false;
-    return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
-           (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
+    ಆದರೆ( sc.dims() > 2 || !sc.isContinuous() )
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಗಾತ್ರ_2 sz = sc.size();
+    ಆದರೆ(sz.ಅಗಲ != 1 && sz.ಎತ್ತರ != 1)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಪೂರ್ಣಾಂಕ cn = CV_MAT_CN(atype);
+    ಆದರೆ( akind == ಒಳಹರಿವು_Array_2::MATX && sckind != ಒಳಹರಿವು_Array_2::MATX )
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಹಿಂತಿರುಗಿ sz == ಗಾತ್ರ_2(1, 1) || sz == ಗಾತ್ರ_2(1, cn) || sz == ಗಾತ್ರ_2(cn, 1) ||
+           (sz == ಗಾತ್ರ_2(1, 4) && sc.type() == CV_64F && cn <= 4);
 }
 
 // Does the OTHER operand `arr` have exactly the same shape as the scalar candidate `sc`, with the
 // single channel.
-inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
+ಸಾಲೊಳಗೆ ತಾರ್ಕಿಕ sameShapeAsArg(ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2& sc, ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2& arr)
 {
-    return arr.channels() == 1 && sc.sameSize(arr);
+    ಹಿಂತಿರುಗಿ arr.channels() == 1 && sc.same_ಗಾತ್ರ(arr);
 }
 
 // New element-wise engine scalar handling. A genuine number / Scalar / Vec / Matx operand to an
@@ -348,22 +348,22 @@ inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
 // (but see isScalarLikeMat below for the shape-incompatible compat fallback).
 // `arr` is the OTHER operand: its channel count decides what a MATX scalar may broadcast over, its
 // shape whether the bindings-style column below is a scalar at all.
-inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
+ಸಾಲೊಳಗೆ ತಾರ್ಕಿಕ isScalarArg(ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2& sc, ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2& arr)
 {
-    const _InputArray::KindFlag kind = sc.kind();
-    const int cn = arr.channels();
-    if (kind == _InputArray::MATX)
+    ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2::ಬಗೆ_Flag ಬಗೆ = sc.ಬಗೆ();
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ cn = arr.channels();
+    ಆದರೆ (ಬಗೆ == ಒಳಹರಿವು_Array_2::MATX)
     {
-        Size sz = sc.getSz();
-        int scn0 = sz.width * sz.height;
+        ಗಾತ್ರ_2 sz = sc.getSz();
+        ಪೂರ್ಣಾಂಕ scn0 = sz.ಅಗಲ * sz.ಎತ್ತರ;
         // A genuine scalar is a 1D MATX (a Vec/Scalar/number: one of width/height is 1). A 2D MATX
         // (e.g. a Matx33) is a real matrix operand and rides broadcasting - never a scalar.
-        if (scn0 != sz.width + sz.height - 1)
-            return false;
+        ಆದರೆ (scn0 != sz.ಅಗಲ + sz.ಎತ್ತರ - 1)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         // Per-channel match (incl. Vec<_,N> for an N-channel array), a 4-elem Scalar on a <4-channel
         // array, or a single broadcast value. No 4-channel cap: a multichannel scalar rides as a 0-dim
         // per-channel CONST over the caller's data (not squeezed into a 4-slot Scalar).
-        return scn0 == cn || (cn < 4 && scn0 == 4) || scn0 == 1;
+        ಹಿಂತಿರುಗಿ scn0 == cn || (cn < 4 && scn0 == 4) || scn0 == 1;
     }
     // the bindings-style Scalar column. dims must be exactly 2: a 1-D [4] CV_64F array is an honest
     // broadcast operand. Direct field reads (no _InputArray getter dispatch) - this runs on EVERY
@@ -372,19 +372,19 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
     // element-wise, exactly as in 4.x (see sameShapeAsArg). That covers both the non-continuous
     // partner that fails this very test (e.g. P.col(0)) and a genuine Scalar partner, which keeps
     // its per-channel semantics because only the Mat/UMat side is demoted.
-    if (kind == _InputArray::MAT)
+    ಆದರೆ (ಬಗೆ == ಒಳಹರಿವು_Array_2::MAT)
     {
-        const Mat& m = *(const Mat*)sc.getObj();
-        return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
+        ಸ್ಥಿರಾಂಕ Mat& m = *(ಸ್ಥಿರಾಂಕ Mat*)sc.getObj();
+        ಹಿಂತಿರುಗಿ m.ಅಡ್ಡಸಾಲುಗಳು == 4 && m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 && cn <= 4 && m.dims == 2 &&
                m.type() == CV_64F && m.isContinuous() && !sameShapeAsArg(sc, arr);
     }
-    if (kind == _InputArray::UMAT)
+    ಆದರೆ (ಬಗೆ == ಒಳಹರಿವು_Array_2::UMAT)
     {
-        const UMat& m = *(const UMat*)sc.getObj();
-        return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
+        ಸ್ಥಿರಾಂಕ UMat& m = *(ಸ್ಥಿರಾಂಕ UMat*)sc.getObj();
+        ಹಿಂತಿರುಗಿ m.ಅಡ್ಡಸಾಲುಗಳು == 4 && m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 && cn <= 4 && m.dims == 2 &&
                m.type() == CV_64F && m.isContinuous() && !sameShapeAsArg(sc, arr);
     }
-    return false;
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 }
 
 // The remaining old arithm_op checkScalar geometry: a real Mat/UMat that LOOKS like a scalar - 1x1
@@ -392,127 +392,127 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
 // arithm_op treats such an operand as a per-channel scalar ONLY as a fallback, when the shapes are
 // not broadcast-compatible - a call that is valid under numpy rules keeps its numpy meaning, one
 // that would throw gets the 4.x scalar semantics instead.
-inline bool isScalarLikeMat(const _InputArray& sc, int cn)
+ಸಾಲೊಳಗೆ ತಾರ್ಕಿಕ isScalarLikeMat(ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2& sc, ಪೂರ್ಣಾಂಕ cn)
 {
     // direct field reads, like isScalarArg: this probe also runs per engine call (see arithm_op's
     // compat fallback). `rows != 1 && cols != 1` exits in two inline compares for ordinary arrays.
-    int rows, cols, nval;
-    bool continuous;
-    const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, nval;
+    ತಾರ್ಕಿಕ continuous;
+    ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2::ಬಗೆ_Flag ಬಗೆ = sc.ಬಗೆ();
+    ಆದರೆ (ಬಗೆ == ಒಳಹರಿವು_Array_2::MAT)
     {
-        const Mat& m = *(const Mat*)sc.getObj();
-        if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
-        rows = m.rows; cols = m.cols; nval = rows * cols * m.channels(); continuous = m.isContinuous();
+        ಸ್ಥಿರಾಂಕ Mat& m = *(ಸ್ಥಿರಾಂಕ Mat*)sc.getObj();
+        ಆದರೆ ((m.ಅಡ್ಡಸಾಲುಗಳು != 1 && m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ != 1) || m.dims > 2) ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+        ಅಡ್ಡಸಾಲುಗಳು = m.ಅಡ್ಡಸಾಲುಗಳು; ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; nval = ಅಡ್ಡಸಾಲುಗಳು * ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * m.channels(); continuous = m.isContinuous();
     }
-    else if (kind == _InputArray::UMAT)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಬಗೆ == ಒಳಹರಿವು_Array_2::UMAT)
     {
-        const UMat& m = *(const UMat*)sc.getObj();
-        if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
-        rows = m.rows; cols = m.cols; nval = rows * cols * m.channels(); continuous = m.isContinuous();
+        ಸ್ಥಿರಾಂಕ UMat& m = *(ಸ್ಥಿರಾಂಕ UMat*)sc.getObj();
+        ಆದರೆ ((m.ಅಡ್ಡಸಾಲುಗಳು != 1 && m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ != 1) || m.dims > 2) ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+        ಅಡ್ಡಸಾಲುಗಳು = m.ಅಡ್ಡಸಾಲುಗಳು; ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; nval = ಅಡ್ಡಸಾಲುಗಳು * ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * m.channels(); continuous = m.isContinuous();
     }
-    else
-        return false;
-    if (!continuous || nval > 4 || (nval != 1 && nval != cn))
-        return false;
-    return (rows == 1 && cols == 1) || (rows == cn && cols == 1) || (rows == 1 && cols == cn);
+    ಇಲ್ಲದಿದ್ದರೆ
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಆದರೆ (!continuous || nval > 4 || (nval != 1 && nval != cn))
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಹಿಂತಿರುಗಿ (ಅಡ್ಡಸಾಲುಗಳು == 1 && ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1) || (ಅಡ್ಡಸಾಲುಗಳು == cn && ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1) || (ಅಡ್ಡಸಾಲುಗಳು == 1 && ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == cn);
 }
 
 // The size of the caller-provided stack buffer for scalarArgElems (4 slots of the widest depth).
 // A scalar is <= 4 values by contract, so it NEVER touches the heap.
-enum { EW_SCALAR_BUF_SIZE = 4 * sizeof(double) };
+ಎಣಿಕೆ { EW_SCALAR_BUF_ಗಾತ್ರ = 4 * ಗಾತ್ರ(ದ್ವಿಗುಣ) };
 
 // A scalar operand's raw payload: the MATX inline storage or the Mat data, both returned in place.
 // A UMAT scalar's values are copied device->host into `scbuf` (>= EW_SCALAR_BUF_SIZE bytes, on the
 // CALLER's stack - no heap, no UMat::getMat mapping machinery for 32 bytes of data).
 // p/d receive the data pointer and depth; returns the value count (elems x channels).
-inline int scalarArgElems(const _InputArray& sc, const uchar*& p, int& d, uchar* scbuf)
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ scalarArgElems(ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2& sc, ಸ್ಥಿರಾಂಕ uchar*& p, ಪೂರ್ಣಾಂಕ& d, uchar* scbuf)
 {
-    const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2::ಬಗೆ_Flag ಬಗೆ = sc.ಬಗೆ();
+    ಆದರೆ (ಬಗೆ == ಒಳಹರಿವು_Array_2::MAT)
     {
-        const Mat& m = *(const Mat*)sc.getObj();
-        p = m.data;
-        d = m.depth();
-        return (int)m.total() * m.channels();
+        ಸ್ಥಿರಾಂಕ Mat& m = *(ಸ್ಥಿರಾಂಕ Mat*)sc.getObj();
+        p = m.ದತ್ತಾಂಶ;
+        d = m.ಆಳ();
+        ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ)m.ಒಟ್ಟು() * m.channels();
     }
-    if (kind == _InputArray::UMAT)
+    ಆದರೆ (ಬಗೆ == ಒಳಹರಿವು_Array_2::UMAT)
     {
-        const UMat& u = *(const UMat*)sc.getObj();
-        d = u.depth();
-        int n = (int)u.total() * u.channels();
-        CV_Assert(n * (int)CV_ELEM_SIZE1(d) <= (int)EW_SCALAR_BUF_SIZE);
-        Mat header(u.dims, u.size.p, u.type(), scbuf);   // header over the caller's stack buffer
-        u.copyTo(header);                                // create() is a no-op (exact match) -> the
+        ಸ್ಥಿರಾಂಕ UMat& u = *(ಸ್ಥಿರಾಂಕ UMat*)sc.getObj();
+        d = u.ಆಳ();
+        ಪೂರ್ಣಾಂಕ n = (ಪೂರ್ಣಾಂಕ)u.ಒಟ್ಟು() * u.channels();
+        CV_Assert(n * (ಪೂರ್ಣಾಂಕ)CV_ELEM_SIZE1(d) <= (ಪೂರ್ಣಾಂಕ)EW_SCALAR_BUF_ಗಾತ್ರ);
+        Mat ಶೀರ್ಷಿಕೆ(u.dims, u.size.p, u.type(), scbuf);   // header over the caller's stack buffer
+        u.copy_ಗಮ್ಯ(ಶೀರ್ಷಿಕೆ);                                // create() is a no-op (exact match) -> the
         p = scbuf;                                       // copy lands straight in scbuf
-        return n;
+        ಹಿಂತಿರುಗಿ n;
     }
-    p = (const uchar*)sc.getObj();
-    d = sc.depth();
-    Size sz = sc.getSz();
-    return sz.width * sz.height;
+    p = (ಸ್ಥಿರಾಂಕ uchar*)sc.getObj();
+    d = sc.ಆಳ();
+    ಗಾತ್ರ_2 sz = sc.getSz();
+    ಹಿಂತಿರುಗಿ sz.ಅಗಲ * sz.ಎತ್ತರ;
 }
 
 // Read one element of depth `d` at p as a double (no Mat, no convertTo, no dispatcher).
-inline double elemToDouble(int d, const uchar* p)
+ಸಾಲೊಳಗೆ ದ್ವಿಗುಣ elem_ಗಮ್ಯ_Double(ಪೂರ್ಣಾಂಕ d, ಸ್ಥಿರಾಂಕ uchar* p)
 {
-    switch (d)
+    ಆಯ್ಕೆ (d)
     {
-    case CV_8U:   return *(const uchar*)p;
-    case CV_8S:   return *(const schar*)p;
-    case CV_16U:  return *(const ushort*)p;
-    case CV_16S:  return *(const short*)p;
-    case CV_32U:  return *(const unsigned*)p;
-    case CV_32S:  return *(const int*)p;
-    case CV_64U:  return (double)*(const uint64_t*)p;
-    case CV_64S:  return (double)*(const int64_t*)p;
-    case CV_16F:  return (float)*(const hfloat*)p;
-    case CV_16BF: return (float)*(const bfloat*)p;
-    case CV_32F:  return *(const float*)p;
-    case CV_64F:  return *(const double*)p;
-    default:      CV_Error(Error::StsUnsupportedFormat, "unsupported scalar depth");
+    ಸ್ಥಿತಿ CV_8U:   ಹಿಂತಿರುಗಿ *(ಸ್ಥಿರಾಂಕ uchar*)p;
+    ಸ್ಥಿತಿ CV_8S:   ಹಿಂತಿರುಗಿ *(ಸ್ಥಿರಾಂಕ schar*)p;
+    ಸ್ಥಿತಿ CV_16U:  ಹಿಂತಿರುಗಿ *(ಸ್ಥಿರಾಂಕ ushort*)p;
+    ಸ್ಥಿತಿ CV_16S:  ಹಿಂತಿರುಗಿ *(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ*)p;
+    ಸ್ಥಿತಿ CV_32U:  ಹಿಂತಿರುಗಿ *(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ*)p;
+    ಸ್ಥಿತಿ CV_32S:  ಹಿಂತಿರುಗಿ *(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ*)p;
+    ಸ್ಥಿತಿ CV_64U:  ಹಿಂತಿರುಗಿ (ದ್ವಿಗುಣ)*(ಸ್ಥಿರಾಂಕ uint64_t*)p;
+    ಸ್ಥಿತಿ CV_64S:  ಹಿಂತಿರುಗಿ (ದ್ವಿಗುಣ)*(ಸ್ಥಿರಾಂಕ int64_t*)p;
+    ಸ್ಥಿತಿ CV_16F:  ಹಿಂತಿರುಗಿ (ದಶಮಾಂಶ)*(ಸ್ಥಿರಾಂಕ hfloat*)p;
+    ಸ್ಥಿತಿ CV_16BF: ಹಿಂತಿರುಗಿ (ದಶಮಾಂಶ)*(ಸ್ಥಿರಾಂಕ bfloat*)p;
+    ಸ್ಥಿತಿ CV_32F:  ಹಿಂತಿರುಗಿ *(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*)p;
+    ಸ್ಥಿತಿ CV_64F:  ಹಿಂತಿರುಗಿ *(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)p;
+    ಪೂರ್ವನಿಯೋಜಿತ:      CV_Error(Error::StsUnsupportedFormat, "unsupported scalar depth");
     }
 }
 
 // Extract a scalar operand's values (see isScalarArg) as up to 4 doubles, straight from its
 // storage. Returns the element count.
-inline int readScalarArg(const _InputArray& sc, Scalar& out)
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ readScalarArg(ಸ್ಥಿರಾಂಕ ಒಳಹರಿವು_Array_2& sc, Scalar& out)
 {
     out = Scalar();                      // unused channels stay 0 (independent of the caller's Scalar)
-    const uchar* p; int d; uchar scbuf[EW_SCALAR_BUF_SIZE];
-    int n = scalarArgElems(sc, p, d, scbuf);
+    ಸ್ಥಿರಾಂಕ uchar* p; ಪೂರ್ಣಾಂಕ d; uchar scbuf[EW_SCALAR_BUF_ಗಾತ್ರ];
+    ಪೂರ್ಣಾಂಕ n = scalarArgElems(sc, p, d, scbuf);
     CV_Assert(n <= 4);                   // Scalar holds 4 slots; isScalarArg admits more only for MATX
     size_t esz = CV_ELEM_SIZE1(d);
-    for (int i = 0; i < n; i++)
-        out[i] = elemToDouble(d, p + (size_t)i * esz);
-    return n;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < n; i++)
+        out[i] = elem_ಗಮ್ಯ_Double(d, p + (size_t)i * esz);
+    ಹಿಂತಿರುಗಿ n;
 }
 
-void convertAndUnrollScalar( const Mat& sc, int buftype, uchar* scbuf, size_t blocksize );
+ಶೂನ್ಯ convertAndUnrollScalar( ಸ್ಥಿರಾಂಕ Mat& sc, ಪೂರ್ಣಾಂಕ buftype, uchar* scbuf, size_t blocksize );
 
-#ifdef CV_COLLECT_IMPL_DATA
-struct ImplCollector
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ CV_COLLECT_IMPL_ದತ್ತಾಂಶ
+ರಚನೆ ImplCollector
 {
     ImplCollector()
     {
-        useCollection   = false;
+        useCollection   = ಸುಳ್ಳು;
         implFlags       = 0;
     }
-    bool useCollection; // enable/disable impl data collection
+    ತಾರ್ಕಿಕ useCollection; // enable/disable impl data collection
 
-    int implFlags;
-    std::vector<int>    implCode;
+    ಪೂರ್ಣಾಂಕ implFlags;
+    std::vector<ಪೂರ್ಣಾಂಕ>    impl_ಸಂಕೇತ;
     std::vector<String> implFun;
 
     cv::Mutex mutex;
 };
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-struct CoreTLSData
+ರಚನೆ CoreTLSData
 {
     CoreTLSData() :
 //#ifdef HAVE_OPENCL
-        oclExecutionContextInitialized(false), useOpenCL(-1),
+        oclExecutionContextInitialized(ಸುಳ್ಳು), useOpenCL(-1),
 //#endif
         useIPP(-1),
         useIPP_NE(-1)
@@ -521,29 +521,29 @@ struct CoreTLSData
     RNG rng;
 //#ifdef HAVE_OPENCL
     ocl::OpenCLExecutionContext oclExecutionContext;
-    bool oclExecutionContextInitialized;
-    int useOpenCL; // 1 - use, 0 - do not use, -1 - auto/not initialized
+    ತಾರ್ಕಿಕ oclExecutionContextInitialized;
+    ಪೂರ್ಣಾಂಕ useOpenCL; // 1 - use, 0 - do not use, -1 - auto/not initialized
 //#endif
-    int useIPP;    // 1 - use, 0 - do not use, -1 - auto/not initialized
-    int useIPP_NE; // 1 - use, 0 - do not use, -1 - auto/not initialized
+    ಪೂರ್ಣಾಂಕ useIPP;    // 1 - use, 0 - do not use, -1 - auto/not initialized
+    ಪೂರ್ಣಾಂಕ useIPP_NE; // 1 - use, 0 - do not use, -1 - auto/not initialized
 };
 
-CoreTLSData& getCoreTlsData();
+CoreTLSData& get_Core_Tls_ದತ್ತಾಂಶ();
 
-#if defined(BUILD_SHARED_LIBS)
-#if defined _WIN32 || defined WINCE
-#define CL_RUNTIME_EXPORT __declspec(dllexport)
-#elif defined __GNUC__
-#define CL_RUNTIME_EXPORT __attribute__ ((visibility ("default")))
-#else
-#define CL_RUNTIME_EXPORT
-#endif
-#else
-#define CL_RUNTIME_EXPORT
-#endif
+#ಆದರೆ defined(BUILD_SHARED_LIBS)
+#ಆದರೆ defined _WIN32 || defined WINCE
+#ವ್ಯಾಖ್ಯಾನಿಸು CL_RUNTIME_EXPORT __declspec(dllexport)
+#ಅಥವಾಆದರೆ defined __GNUC__
+#ವ್ಯಾಖ್ಯಾನಿಸು CL_RUNTIME_EXPORT __attribute__ ((visibility ("default")))
+#ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು CL_RUNTIME_EXPORT
+#ಆದರೆ_ಅಂತ್ಯ
+#ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು CL_RUNTIME_EXPORT
+#ಆದರೆ_ಅಂತ್ಯ
 
-extern CV_EXPORTS
-bool __termination;  // skip some cleanups, because process is terminating
+ಬಾಹ್ಯ CV_EXPORTS
+ತಾರ್ಕಿಕ __termination;  // skip some cleanups, because process is terminating
                      // (for example, if ExitProcess() was already called)
 
 CV_EXPORTS
@@ -553,18 +553,18 @@ cv::Mutex& getInitializationMutex();
 int64 getTimestampNS();
 
 
-#define CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, RET_VALUE) \
-    static TYPE* const instance = INITIALIZER; \
-    return RET_VALUE;
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, RET_ಮೌಲ್ಯ) \
+    ಸ್ಥಿರ TYPE* ಸ್ಥಿರಾಂಕ instance = INITIALIZER; \
+    ಹಿಂತಿರುಗಿ RET_ಮೌಲ್ಯ;
 
-#define CV_SINGLETON_LAZY_INIT(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, instance)
-#define CV_SINGLETON_LAZY_INIT_REF(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, *instance)
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_SINGLETON_LAZY_INIT(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, instance)
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_SINGLETON_LAZY_INIT_REF(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, *instance)
 
-CV_EXPORTS void releaseTlsStorageThread();
+CV_EXPORTS ಶೂನ್ಯ releaseTlsStorageThread();
 
-int cv_snprintf(char* buf, int len, const char* fmt, ...);
-int cv_vsnprintf(char* buf, int len, const char* fmt, va_list args);
+ಪೂರ್ಣಾಂಕ cv_snprintf(ಅಕ್ಷರ* buf, ಪೂರ್ಣಾಂಕ len, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt, ...);
+ಪೂರ್ಣಾಂಕ cv_vsnprintf(ಅಕ್ಷರ* buf, ಪೂರ್ಣಾಂಕ len, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* fmt, va_list ವಾದಗಳು);
 }
 
-#endif  // BUILD_PLUGIN
-#endif  // __OPENCV_PRECOMP_H__
+#ಆದರೆ_ಅಂತ್ಯ  // BUILD_PLUGIN
+#ಆದರೆ_ಅಂತ್ಯ  // __OPENCV_PRECOMP_H__

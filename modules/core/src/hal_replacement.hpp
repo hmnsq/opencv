@@ -42,21 +42,21 @@
 //
 //M*/
 
-#ifndef OPENCV_CORE_HAL_REPLACEMENT_HPP
-#define OPENCV_CORE_HAL_REPLACEMENT_HPP
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_CORE_HAL_REPLACEMENT_HPP
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENCV_CORE_HAL_REPLACEMENT_HPP
 
-#include "opencv2/core/hal/interface.h"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/hal/interface.h"
 
-#if defined(__clang__)  // clang or MSVC clang
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#elif defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4100)
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
+#ಆದರೆ defined(__clang__)  // clang or MSVC clang
+#ಸೂಚನೆ clang diagnostic push
+#ಸೂಚನೆ clang diagnostic ignored "-Wunused-parameter"
+#ಅಥವಾಆದರೆ defined(_MSC_VER)
+#ಸೂಚನೆ warning(push)
+#ಸೂಚನೆ warning(disable : 4100)
+#ಅಥವಾಆದರೆ defined(__GNUC__)
+#ಸೂಚನೆ GCC diagnostic push
+#ಸೂಚನೆ GCC diagnostic ignored "-Wunused-parameter"
+#ಆದರೆ_ಅಂತ್ಯ
 
 //! @addtogroup core_hal_interface
 //! @note Define your functions to override default implementations:
@@ -80,34 +80,34 @@ Sub: _dst[i] = src1[i] - src2[i]_
 */
 //! @addtogroup core_hal_interface_addsub Element-wise add and subtract
 //! @{
-inline int hal_ni_add8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add8s(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, schar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add16u(ಸ್ಥಿರಾಂಕ ushort *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ushort *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ushort *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಚಿಹ್ನೆರಹಿತ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add64u(ಸ್ಥಿರಾಂಕ uint64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uint64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uint64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add64s(ಸ್ಥಿರಾಂಕ int64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ int64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, int64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_f16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_f16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_add16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_bf16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
-inline int hal_ni_sub8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub8s(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, schar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub16u(ಸ್ಥಿರಾಂಕ ushort *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ushort *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ushort *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಚಿಹ್ನೆರಹಿತ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub64u(ಸ್ಥಿರಾಂಕ uint64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uint64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uint64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub64s(ಸ್ಥಿರಾಂಕ int64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ int64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, int64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_f16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_f16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_bf16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
-inline int hal_ni_sub8u32f(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub8s32f(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub8u32f(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sub8s32f(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 /**
 Add scalar: _dst[i] = src[i] + scalar
@@ -121,8 +121,8 @@ Add scalar: _dst[i] = src[i] + scalar
 @param scalar_data pointer to scalar value
 @param nChannels number of channels per element
 */
-inline int hal_ni_addScalar32f32f(const float*   src_data, size_t src_step, float*   dst_data, size_t dst_step, int width, int height, const float*   scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addScalar16s16s(const int16_t* src_data, size_t src_step, int16_t* dst_data, size_t dst_step, int width, int height, const int16_t* scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Scalar32f32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*   src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ*   dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ*   scalar_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ nChannels) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Scalar16s16s(ಸ್ಥಿರಾಂಕ int16_t* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, int16_t* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ int16_t* scalar_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ nChannels) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -139,31 +139,31 @@ Maximum: _dst[i] = max(src1[i], src2[i])_
 */
 //! @addtogroup core_hal_interface_minmax Element-wise minimum or maximum
 //! @{
-inline int hal_ni_max8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max8s(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, schar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max16u(ಸ್ಥಿರಾಂಕ ushort *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ushort *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ushort *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಚಿಹ್ನೆರಹಿತ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max64u(ಸ್ಥಿರಾಂಕ uint64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uint64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uint64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max64s(ಸ್ಥಿರಾಂಕ int64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ int64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, int64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_f16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_f16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_max16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_bf16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
-inline int hal_ni_min8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min8s(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, schar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min16u(ಸ್ಥಿರಾಂಕ ushort *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ushort *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ushort *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಚಿಹ್ನೆರಹಿತ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min64u(ಸ್ಥಿರಾಂಕ uint64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uint64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uint64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min64s(ಸ್ಥಿರಾಂಕ int64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ int64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, int64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_f16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_f16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_bf16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -179,18 +179,18 @@ Absolute difference: _dst[i] = | src1[i] - src2[i] |_
 */
 //! @addtogroup core_hal_interface_absdiff Element-wise absolute difference
 //! @{
-inline int hal_ni_absdiff8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff8s(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, schar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff16u(ಸ್ಥಿರಾಂಕ ushort *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ushort *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ushort *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಚಿಹ್ನೆರಹಿತ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff64u(ಸ್ಥಿರಾಂಕ uint64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uint64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uint64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff64s(ಸ್ಥಿರಾಂಕ int64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ int64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, int64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_f16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_f16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absdiff16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_bf16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 /*
 Absolute difference with scalar: _dst[i] = | src[i] - scalar |_
@@ -204,9 +204,9 @@ Absolute difference with scalar: _dst[i] = | src[i] - scalar |_
 @param scalar_data pointer to scalar value
 @param nChannels number of channels per element
 */
-inline int hal_ni_absDiffScalar32f32f(const float* src_data, size_t src_step, float*    dst_data, size_t dst_step, int width, int height, const float* scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absDiffScalar32s32u(const int*   src_data, size_t src_step, uint32_t* dst_data, size_t dst_step, int width, int height, const int*   scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absDiffScalar8u8u  (const uchar* src_data, size_t src_step, uchar*    dst_data, size_t dst_step, int width, int height, const uchar* scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absDiffScalar32f32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ*    dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* scalar_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ nChannels) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absDiffScalar32s32u(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ*   src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uint32_t* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ*   scalar_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ nChannels) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_absDiffScalar8u8u  (ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar*    dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ uchar* scalar_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ nChannels) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @}
 
@@ -226,84 +226,84 @@ Bitwise NOT: _dst[i] = ~src[i]_
  */
 //! @addtogroup core_hal_interface_logical Bitwise logical operations
 //! @{
-inline int hal_ni_and8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_or8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_xor8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_not8u(const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_and8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_or8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_xor8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_not8u(ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_add8u hal_ni_add8u
-#define cv_hal_add8s hal_ni_add8s
-#define cv_hal_add16u hal_ni_add16u
-#define cv_hal_add16s hal_ni_add16s
-#define cv_hal_add32u hal_ni_add32u
-#define cv_hal_add32s hal_ni_add32s
-#define cv_hal_add64u hal_ni_add64u
-#define cv_hal_add64s hal_ni_add64s
-#define cv_hal_add32f hal_ni_add32f
-#define cv_hal_add64f hal_ni_add64f
-#define cv_hal_add16f hal_ni_add16f
-#define cv_hal_add16bf hal_ni_add16bf
-#define cv_hal_sub8u hal_ni_sub8u
-#define cv_hal_sub8s hal_ni_sub8s
-#define cv_hal_sub16u hal_ni_sub16u
-#define cv_hal_sub16s hal_ni_sub16s
-#define cv_hal_sub32u hal_ni_sub32u
-#define cv_hal_sub32s hal_ni_sub32s
-#define cv_hal_sub64u hal_ni_sub64u
-#define cv_hal_sub64s hal_ni_sub64s
-#define cv_hal_sub32f hal_ni_sub32f
-#define cv_hal_sub64f hal_ni_sub64f
-#define cv_hal_sub8u32f hal_ni_sub8u32f
-#define cv_hal_sub8s32f hal_ni_sub8s32f
-#define cv_hal_sub16f hal_ni_sub16f
-#define cv_hal_sub16bf hal_ni_sub16bf
-#define cv_hal_addScalar32f32f hal_ni_addScalar32f32f
-#define cv_hal_addScalar16s16s hal_ni_addScalar16s16s
-#define cv_hal_max8u hal_ni_max8u
-#define cv_hal_max8s hal_ni_max8s
-#define cv_hal_max16u hal_ni_max16u
-#define cv_hal_max16s hal_ni_max16s
-#define cv_hal_max32u hal_ni_max32u
-#define cv_hal_max32s hal_ni_max32s
-#define cv_hal_max64u hal_ni_max64u
-#define cv_hal_max64s hal_ni_max64s
-#define cv_hal_max32f hal_ni_max32f
-#define cv_hal_max64f hal_ni_max64f
-#define cv_hal_max16f hal_ni_max16f
-#define cv_hal_max16bf hal_ni_max16bf
-#define cv_hal_min8u hal_ni_min8u
-#define cv_hal_min8s hal_ni_min8s
-#define cv_hal_min16u hal_ni_min16u
-#define cv_hal_min16s hal_ni_min16s
-#define cv_hal_min32u hal_ni_min32u
-#define cv_hal_min32s hal_ni_min32s
-#define cv_hal_min64u hal_ni_min64u
-#define cv_hal_min64s hal_ni_min64s
-#define cv_hal_min32f hal_ni_min32f
-#define cv_hal_min64f hal_ni_min64f
-#define cv_hal_min16f hal_ni_min16f
-#define cv_hal_min16bf hal_ni_min16bf
-#define cv_hal_absdiff8u hal_ni_absdiff8u
-#define cv_hal_absdiff8s hal_ni_absdiff8s
-#define cv_hal_absdiff16u hal_ni_absdiff16u
-#define cv_hal_absdiff16s hal_ni_absdiff16s
-#define cv_hal_absdiff32u hal_ni_absdiff32u
-#define cv_hal_absdiff32s hal_ni_absdiff32s
-#define cv_hal_absdiff64u hal_ni_absdiff64u
-#define cv_hal_absdiff64s hal_ni_absdiff64s
-#define cv_hal_absdiff32f hal_ni_absdiff32f
-#define cv_hal_absdiff64f hal_ni_absdiff64f
-#define cv_hal_absdiff16f hal_ni_absdiff16f
-#define cv_hal_absdiff16bf hal_ni_absdiff16bf
-#define cv_hal_absDiffScalar32f32f hal_ni_absDiffScalar32f32f
-#define cv_hal_absDiffScalar32s32u hal_ni_absDiffScalar32s32u
-#define cv_hal_absDiffScalar8u8u   hal_ni_absDiffScalar8u8u
-#define cv_hal_and8u hal_ni_and8u
-#define cv_hal_or8u hal_ni_or8u
-#define cv_hal_xor8u hal_ni_xor8u
-#define cv_hal_not8u hal_ni_not8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add8u hal_ni_add8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add8s hal_ni_add8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add16u hal_ni_add16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add16s hal_ni_add16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add32u hal_ni_add32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add32s hal_ni_add32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add64u hal_ni_add64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add64s hal_ni_add64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add32f hal_ni_add32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add64f hal_ni_add64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add16f hal_ni_add16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_add16bf hal_ni_add16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub8u hal_ni_sub8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub8s hal_ni_sub8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub16u hal_ni_sub16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub16s hal_ni_sub16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub32u hal_ni_sub32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub32s hal_ni_sub32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub64u hal_ni_sub64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub64s hal_ni_sub64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub32f hal_ni_sub32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub64f hal_ni_sub64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub8u32f hal_ni_sub8u32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub8s32f hal_ni_sub8s32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub16f hal_ni_sub16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sub16bf hal_ni_sub16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Scalar32f32f hal_ni_ಕೂಡಿಸು_Scalar32f32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Scalar16s16s hal_ni_ಕೂಡಿಸು_Scalar16s16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max8u hal_ni_max8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max8s hal_ni_max8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max16u hal_ni_max16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max16s hal_ni_max16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max32u hal_ni_max32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max32s hal_ni_max32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max64u hal_ni_max64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max64s hal_ni_max64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max32f hal_ni_max32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max64f hal_ni_max64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max16f hal_ni_max16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_max16bf hal_ni_max16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min8u hal_ni_min8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min8s hal_ni_min8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min16u hal_ni_min16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min16s hal_ni_min16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min32u hal_ni_min32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min32s hal_ni_min32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min64u hal_ni_min64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min64s hal_ni_min64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min32f hal_ni_min32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min64f hal_ni_min64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min16f hal_ni_min16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min16bf hal_ni_min16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff8u hal_ni_absdiff8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff8s hal_ni_absdiff8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff16u hal_ni_absdiff16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff16s hal_ni_absdiff16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff32u hal_ni_absdiff32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff32s hal_ni_absdiff32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff64u hal_ni_absdiff64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff64s hal_ni_absdiff64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff32f hal_ni_absdiff32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff64f hal_ni_absdiff64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff16f hal_ni_absdiff16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absdiff16bf hal_ni_absdiff16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absDiffScalar32f32f hal_ni_absDiffScalar32f32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absDiffScalar32s32u hal_ni_absDiffScalar32s32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_absDiffScalar8u8u   hal_ni_absDiffScalar8u8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_and8u hal_ni_and8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_or8u hal_ni_or8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_xor8u hal_ni_xor8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_not8u hal_ni_not8u
 //! @endcond
 
 /**
@@ -325,11 +325,11 @@ Destination should have the same element type and number of channels as lookup t
 */
 //! @addtogroup core_hal_interface_lut Lookup table
 //! @{
-inline int hal_ni_lut(const uchar *src_data, size_t src_step, size_t src_type, const uchar* lut_data, size_t lut_channel_size, size_t lut_channels, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_lut(ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, size_t src_type, ಸ್ಥಿರಾಂಕ uchar* lut_ದತ್ತಾಂಶ, size_t lut_channel_ಗಾತ್ರ, size_t lut_channels, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_lut hal_ni_lut
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_lut hal_ni_lut
 //! @endcond
 
 /**
@@ -351,11 +351,11 @@ Destination should have the same element type and number of channels as lookup t
 */
 //! @addtogroup core_hal_interface_lut16 Lookup table for 16 bit index
 //! @{
-inline int hal_ni_lut16(const ushort *src_data, size_t src_step, size_t src_type, const uchar* lut_data, size_t lut_channel_size, size_t lut_channels, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_lut16(ಸ್ಥಿರಾಂಕ ushort *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, size_t src_type, ಸ್ಥಿರಾಂಕ uchar* lut_ದತ್ತಾಂಶ, size_t lut_channel_ಗಾತ್ರ, size_t lut_channels, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_lut16 hal_ni_lut16
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_lut16 hal_ni_lut16
 //! @endcond
 
 /**
@@ -367,7 +367,7 @@ Hamming norm of a vector
 */
 //! @addtogroup core_hal_interface_hamming Hamming distance
 //! @{
-inline int hal_ni_normHamming8u(const uchar* a, int n, int cellSize, int* result) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_normHamming8u(ಸ್ಥಿರಾಂಕ uchar* a, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ cell_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ* ಫಲಿತಾಂಶ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -380,7 +380,7 @@ Hamming distance between two vectors
 */
 //! @addtogroup core_hal_interface_hamming Hamming distance
 //! @{
-inline int hal_ni_normHammingDiff8u(const uchar* a, const uchar* b, int n, int cellSize, int* result) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_normHammingDiff8u(ಸ್ಥಿರಾಂಕ uchar* a, ಸ್ಥಿರಾಂಕ uchar* b, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ cell_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ* ಫಲಿತಾಂಶ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -397,8 +397,8 @@ inline int hal_ni_normHammingDiff8u(const uchar* a, const uchar* b, int n, int c
 */
 //! @addtogroup core_hal_interface_norm Absolute norm
 //! @{
-inline int hal_ni_norm(const uchar* src, size_t src_step, const uchar* mask, size_t mask_step, int width,
-                       int height, int type, int norm_type, double* result) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_norm(ಸ್ಥಿರಾಂಕ uchar* src, size_t src_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar* ಮುಖವಾಡ, size_t ಮುಖವಾಡ_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ,
+                       ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ type, ಪೂರ್ಣಾಂಕ norm_type, ದ್ವಿಗುಣ* ಫಲಿತಾಂಶ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -417,8 +417,8 @@ inline int hal_ni_norm(const uchar* src, size_t src_step, const uchar* mask, siz
 */
 //! @addtogroup core_hal_interface_norm Absolute norm
 //! @{
-inline int hal_ni_normDiff(const uchar* src1, size_t src1_step, const uchar* src2, size_t src2_step, const uchar* mask,
-                           size_t mask_step, int width, int height, int type, int norm_type, double* result) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_normDiff(ಸ್ಥಿರಾಂಕ uchar* src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar* src2, size_t src2_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar* ಮುಖವಾಡ,
+                           size_t ಮುಖವಾಡ_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ type, ಪೂರ್ಣಾಂಕ norm_type, ದ್ವಿಗುಣ* ಫಲಿತಾಂಶ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -436,16 +436,16 @@ inline int hal_ni_normDiff(const uchar* src1, size_t src1_step, const uchar* src
 */
 //! @addtogroup core_hal_interface_convert Array convert
 //! @{
-inline int hal_ni_convertScale(const uchar* src, size_t src_step, uchar* dst, size_t dst_step, int width, int height,
-                               int sdepth, int ddepth, double alpha, double beta) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_convertScale(ಸ್ಥಿರಾಂಕ uchar* src, size_t src_ಹೆಜ್ಜೆ, uchar* dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+                               ಪೂರ್ಣಾಂಕ sdepth, ಪೂರ್ಣಾಂಕ ddepth, ದ್ವಿಗುಣ alpha, ದ್ವಿಗುಣ beta) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_normHamming8u hal_ni_normHamming8u
-#define cv_hal_normHammingDiff8u hal_ni_normHammingDiff8u
-#define cv_hal_norm hal_ni_norm
-#define cv_hal_normDiff hal_ni_normDiff
-#define cv_hal_convertScale hal_ni_convertScale
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_normHamming8u hal_ni_normHamming8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_normHammingDiff8u hal_ni_normHammingDiff8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_norm hal_ni_norm
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_normDiff hal_ni_normDiff
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_convertScale hal_ni_convertScale
 //! @endcond
 
 /**
@@ -462,33 +462,33 @@ Compare: _dst[i] = src1[i] op src2[i]_
 */
 //! @addtogroup core_hal_interface_compare Element-wise compare
 //! @{
-inline int hal_ni_cmp8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp8s(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp16u(ಸ್ಥಿರಾಂಕ ushort *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ushort *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp64u(ಸ್ಥಿರಾಂಕ uint64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uint64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp64s(ಸ್ಥಿರಾಂಕ int64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ int64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_f16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cmp16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ operation) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_cmp8u hal_ni_cmp8u
-#define cv_hal_cmp8s hal_ni_cmp8s
-#define cv_hal_cmp16u hal_ni_cmp16u
-#define cv_hal_cmp16s hal_ni_cmp16s
-#define cv_hal_cmp32u hal_ni_cmp32u
-#define cv_hal_cmp32s hal_ni_cmp32s
-#define cv_hal_cmp64u hal_ni_cmp64u
-#define cv_hal_cmp64s hal_ni_cmp64s
-#define cv_hal_cmp32f hal_ni_cmp32f
-#define cv_hal_cmp64f hal_ni_cmp64f
-#define cv_hal_cmp16f hal_ni_cmp16f
-#define cv_hal_cmp16bf hal_ni_cmp16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp8u hal_ni_cmp8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp8s hal_ni_cmp8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp16u hal_ni_cmp16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp16s hal_ni_cmp16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp32u hal_ni_cmp32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp32s hal_ni_cmp32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp64u hal_ni_cmp64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp64s hal_ni_cmp64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp32f hal_ni_cmp32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp64f hal_ni_cmp64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp16f hal_ni_cmp16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cmp16bf hal_ni_cmp16bf
 //! @endcond
 
 /**
@@ -505,20 +505,20 @@ Multiply: _dst[i] = scale * src1[i] * src2[i]_
 */
 //! @addtogroup core_hal_interface_multiply Element-wise multiply
 //! @{
-inline int hal_ni_mul8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul8u16u(const uchar* src1_data, size_t src1_step, const uchar* src2_data, size_t src2_step, ushort* dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul8s16s(const schar* src1_data, size_t src1_step, const schar* src2_data, size_t src2_step, short* dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul8s(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, schar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul16u(ಸ್ಥಿರಾಂಕ ushort *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ushort *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ushort *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಚಿಹ್ನೆರಹಿತ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul8u16u(ಸ್ಥಿರಾಂಕ uchar* src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar* src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ushort* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul8s16s(ಸ್ಥಿರಾಂಕ schar* src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar* src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul64u(ಸ್ಥಿರಾಂಕ uint64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uint64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uint64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul64s(ಸ್ಥಿರಾಂಕ int64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ int64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, int64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_f16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_f16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_mul16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_bf16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -535,18 +535,18 @@ Divide: _dst[i] = scale * src1[i] / src2[i]_
 */
 //! @addtogroup core_hal_interface_divide Element-wise divide
 //! @{
-inline int hal_ni_div8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div8s(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, schar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div16u(ಸ್ಥಿರಾಂಕ ushort *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ushort *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ushort *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಚಿಹ್ನೆರಹಿತ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div64u(ಸ್ಥಿರಾಂಕ uint64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uint64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uint64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div64s(ಸ್ಥಿರಾಂಕ int64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ int64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, int64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_f16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_f16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_div16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_bf16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -561,59 +561,59 @@ Computes reciprocal: _dst[i] = scale / src[i]_
  */
 //! @addtogroup core_hal_interface_reciprocal Element-wise reciprocal
 //! @{
-inline int hal_ni_recip8u(const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip8s(const schar *src_data, size_t src_step, schar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip16u(const ushort *src_data, size_t src_step, ushort *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip16s(const short *src_data, size_t src_step, short *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip32u(const unsigned *src_data, size_t src_step, unsigned *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip32s(const int *src_data, size_t src_step, int *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip32f(const float *src_data, size_t src_step, float *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip64f(const double *src_data, size_t src_step, double *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip64u(const uint64 *src_data, size_t src_step, uint64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip64s(const int64 *src_data, size_t src_step, int64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip16f(const cv_hal_f16 *src_data, size_t src_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip16bf(const cv_hal_bf16 *src_data, size_t src_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip8u(ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip8s(ಸ್ಥಿರಾಂಕ schar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, schar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip16u(ಸ್ಥಿರಾಂಕ ushort *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ushort *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ಚಿಹ್ನೆರಹಿತ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip64u(ಸ್ಥಿರಾಂಕ uint64 *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uint64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip64s(ಸ್ಥಿರಾಂಕ int64 *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, int64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, cv_hal_f16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_recip16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, cv_hal_bf16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ scale) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_mul8u hal_ni_mul8u
-#define cv_hal_mul8s hal_ni_mul8s
-#define cv_hal_mul16u hal_ni_mul16u
-#define cv_hal_mul16s hal_ni_mul16s
-#define cv_hal_mul32u hal_ni_mul32u
-#define cv_hal_mul32s hal_ni_mul32s
-#define cv_hal_mul64u hal_ni_mul64u
-#define cv_hal_mul64s hal_ni_mul64s
-#define cv_hal_mul32f hal_ni_mul32f
-#define cv_hal_mul64f hal_ni_mul64f
-#define cv_hal_mul8u16u hal_ni_mul8u16u
-#define cv_hal_mul8s16s hal_ni_mul8s16s
-#define cv_hal_mul16f hal_ni_mul16f
-#define cv_hal_mul16bf hal_ni_mul16bf
-#define cv_hal_div8u hal_ni_div8u
-#define cv_hal_div8s hal_ni_div8s
-#define cv_hal_div16u hal_ni_div16u
-#define cv_hal_div16s hal_ni_div16s
-#define cv_hal_div32u hal_ni_div32u
-#define cv_hal_div32s hal_ni_div32s
-#define cv_hal_div64u hal_ni_div64u
-#define cv_hal_div64s hal_ni_div64s
-#define cv_hal_div32f hal_ni_div32f
-#define cv_hal_div64f hal_ni_div64f
-#define cv_hal_div16f hal_ni_div16f
-#define cv_hal_div16bf hal_ni_div16bf
-#define cv_hal_recip8u hal_ni_recip8u
-#define cv_hal_recip8s hal_ni_recip8s
-#define cv_hal_recip16u hal_ni_recip16u
-#define cv_hal_recip16s hal_ni_recip16s
-#define cv_hal_recip32u hal_ni_recip32u
-#define cv_hal_recip32s hal_ni_recip32s
-#define cv_hal_recip64u hal_ni_recip64u
-#define cv_hal_recip64s hal_ni_recip64s
-#define cv_hal_recip32f hal_ni_recip32f
-#define cv_hal_recip64f hal_ni_recip64f
-#define cv_hal_recip16f hal_ni_recip16f
-#define cv_hal_recip16bf hal_ni_recip16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul8u hal_ni_mul8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul8s hal_ni_mul8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul16u hal_ni_mul16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul16s hal_ni_mul16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul32u hal_ni_mul32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul32s hal_ni_mul32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul64u hal_ni_mul64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul64s hal_ni_mul64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul32f hal_ni_mul32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul64f hal_ni_mul64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul8u16u hal_ni_mul8u16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul8s16s hal_ni_mul8s16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul16f hal_ni_mul16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_mul16bf hal_ni_mul16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div8u hal_ni_div8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div8s hal_ni_div8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div16u hal_ni_div16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div16s hal_ni_div16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div32u hal_ni_div32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div32s hal_ni_div32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div64u hal_ni_div64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div64s hal_ni_div64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div32f hal_ni_div32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div64f hal_ni_div64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div16f hal_ni_div16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_div16bf hal_ni_div16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip8u hal_ni_recip8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip8s hal_ni_recip8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip16u hal_ni_recip16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip16s hal_ni_recip16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip32u hal_ni_recip32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip32s hal_ni_recip32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip64u hal_ni_recip64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip64s hal_ni_recip64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip32f hal_ni_recip32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip64f hal_ni_recip64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip16f hal_ni_recip16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_recip16bf hal_ni_recip16bf
 //! @endcond
 
 /**
@@ -630,33 +630,33 @@ Computes weighted sum of two arrays using formula: _dst[i] = a * src1[i] + b * s
  */
 //! @addtogroup core_hal_interface_addWeighted Element-wise weighted sum
 //! @{
-inline int hal_ni_addWeighted8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted8u(ಸ್ಥಿರಾಂಕ uchar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted8s(ಸ್ಥಿರಾಂಕ schar *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ schar *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, schar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted16u(ಸ್ಥಿರಾಂಕ ushort *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ushort *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ushort *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted16s(ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಗಿಡ್ಡ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಗಿಡ್ಡ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted32u(ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಚಿಹ್ನೆರಹಿತ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಚಿಹ್ನೆರಹಿತ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted64u(ಸ್ಥಿರಾಂಕ uint64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uint64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, uint64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted64s(ಸ್ಥಿರಾಂಕ int64 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ int64 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, int64 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted16f(ಸ್ಥಿರಾಂಕ cv_hal_f16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_f16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_f16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಕೂಡಿಸು_Weighted16bf(ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src1_ದತ್ತಾಂಶ, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ cv_hal_bf16 *src2_ದತ್ತಾಂಶ, size_t src2_ಹೆಜ್ಜೆ, cv_hal_bf16 *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ scalars[3]) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_addWeighted8u hal_ni_addWeighted8u
-#define cv_hal_addWeighted8s hal_ni_addWeighted8s
-#define cv_hal_addWeighted16u hal_ni_addWeighted16u
-#define cv_hal_addWeighted16s hal_ni_addWeighted16s
-#define cv_hal_addWeighted32u hal_ni_addWeighted32u
-#define cv_hal_addWeighted32s hal_ni_addWeighted32s
-#define cv_hal_addWeighted64u hal_ni_addWeighted64u
-#define cv_hal_addWeighted64s hal_ni_addWeighted64s
-#define cv_hal_addWeighted32f hal_ni_addWeighted32f
-#define cv_hal_addWeighted64f hal_ni_addWeighted64f
-#define cv_hal_addWeighted16f hal_ni_addWeighted16f
-#define cv_hal_addWeighted16bf hal_ni_addWeighted16bf
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted8u hal_ni_ಕೂಡಿಸು_Weighted8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted8s hal_ni_ಕೂಡಿಸು_Weighted8s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted16u hal_ni_ಕೂಡಿಸು_Weighted16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted16s hal_ni_ಕೂಡಿಸು_Weighted16s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted32u hal_ni_ಕೂಡಿಸು_Weighted32u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted32s hal_ni_ಕೂಡಿಸು_Weighted32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted64u hal_ni_ಕೂಡಿಸು_Weighted64u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted64s hal_ni_ಕೂಡಿಸು_Weighted64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted32f hal_ni_ಕೂಡಿಸು_Weighted32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted64f hal_ni_ಕೂಡಿಸು_Weighted64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted16f hal_ni_ಕೂಡಿಸು_Weighted16f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಕೂಡಿಸು_Weighted16bf hal_ni_ಕೂಡಿಸು_Weighted16bf
 //! @endcond
 
 /**
@@ -667,17 +667,17 @@ inline int hal_ni_addWeighted16bf(const cv_hal_bf16 *src1_data, size_t src1_step
  */
 //! @addtogroup core_hal_interface_split Channel split
 //! @{
-inline int hal_ni_split8u(const uchar *src_data, uchar **dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_split16u(const ushort *src_data, ushort **dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_split32s(const int *src_data, int **dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_split64s(const int64 *src_data, int64 **dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_split8u(ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, uchar **dst_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_split16u(ಸ್ಥಿರಾಂಕ ushort *src_ದತ್ತಾಂಶ, ushort **dst_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_split32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ *src_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ **dst_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_split64s(ಸ್ಥಿರಾಂಕ int64 *src_ದತ್ತಾಂಶ, int64 **dst_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_split8u hal_ni_split8u
-#define cv_hal_split16u hal_ni_split16u
-#define cv_hal_split32s hal_ni_split32s
-#define cv_hal_split64s hal_ni_split64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_split8u hal_ni_split8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_split16u hal_ni_split16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_split32s hal_ni_split32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_split64s hal_ni_split64s
 //! @endcond
 
 /**
@@ -688,17 +688,17 @@ inline int hal_ni_split64s(const int64 *src_data, int64 **dst_data, int len, int
  */
 //! @addtogroup core_hal_interface_merge Channel merge
 //! @{
-inline int hal_ni_merge8u(const uchar **src_data, uchar *dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_merge16u(const ushort **src_data, ushort *dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_merge32s(const int **src_data, int *dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_merge64s(const int64 **src_data, int64 *dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_merge8u(ಸ್ಥಿರಾಂಕ uchar **src_ದತ್ತಾಂಶ, uchar *dst_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_merge16u(ಸ್ಥಿರಾಂಕ ushort **src_ದತ್ತಾಂಶ, ushort *dst_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_merge32s(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ **src_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ *dst_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_merge64s(ಸ್ಥಿರಾಂಕ int64 **src_ದತ್ತಾಂಶ, int64 *dst_ದತ್ತಾಂಶ, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ cn) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_merge8u hal_ni_merge8u
-#define cv_hal_merge16u hal_ni_merge16u
-#define cv_hal_merge32s hal_ni_merge32s
-#define cv_hal_merge64s hal_ni_merge64s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_merge8u hal_ni_merge8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_merge16u hal_ni_merge16u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_merge32s hal_ni_merge32s
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_merge64s hal_ni_merge64s
 //! @endcond
 
 /**
@@ -711,13 +711,13 @@ inline int hal_ni_merge64s(const int64 **src_data, int64 *dst_data, int len, int
 */
 //! @addtogroup core_hal_interface_fastAtan Atan calculation
 //! @{
-inline int hal_ni_cartToPolar32f(const float* x, const float* y, float* mag, float* angle, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cartToPolar64f(const double* x, const double* y, double* mag, double* angle, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cart_ಗಮ್ಯ_Polar32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* x, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* y, ದಶಮಾಂಶ* mag, ದಶಮಾಂಶ* angle, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_cart_ಗಮ್ಯ_Polar64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* x, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* y, ದ್ವಿಗುಣ* mag, ದ್ವಿಗುಣ* angle, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_cartToPolar32f hal_ni_cartToPolar32f
-#define cv_hal_cartToPolar64f hal_ni_cartToPolar64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cart_ಗಮ್ಯ_Polar32f hal_ni_cart_ಗಮ್ಯ_Polar32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_cart_ಗಮ್ಯ_Polar64f hal_ni_cart_ಗಮ್ಯ_Polar64f
 //! @endcond
 
 /**
@@ -729,13 +729,13 @@ inline int hal_ni_cartToPolar64f(const double* x, const double* y, double* mag, 
  */
 //! @addtogroup core_hal_interface_fastAtan Atan calculation
 //! @{
-inline int hal_ni_fastAtan32f(const float* y, const float* x, float* dst, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_fastAtan64f(const double* y, const double* x, double* dst, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_fastAtan32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* y, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* x, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_fastAtan64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* y, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* x, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_fastAtan32f hal_ni_fastAtan32f
-#define cv_hal_fastAtan64f hal_ni_fastAtan64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_fastAtan32f hal_ni_fastAtan32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_fastAtan64f hal_ni_fastAtan64f
 //! @endcond
 
 
@@ -747,13 +747,13 @@ inline int hal_ni_fastAtan64f(const double* y, const double* x, double* dst, int
  */
 //! @addtogroup core_hal_interface_magnitude Magnitude calculation
 //! @{
-inline int hal_ni_magnitude32f(const float *x, const float *y, float *dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_magnitude64f(const double *x, const double  *y, double *dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_magnitude32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *x, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *y, ದಶಮಾಂಶ *dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_magnitude64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *x, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ  *y, ದ್ವಿಗುಣ *dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_magnitude32f hal_ni_magnitude32f
-#define cv_hal_magnitude64f hal_ni_magnitude64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_magnitude32f hal_ni_magnitude32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_magnitude64f hal_ni_magnitude64f
 //! @endcond
 
 /**
@@ -766,13 +766,13 @@ inline int hal_ni_magnitude64f(const double *x, const double  *y, double *dst, i
 */
 //! @addtogroup core_hal_interface_fastAtan Atan calculation
 //! @{
-inline int hal_ni_polarToCart32f(const float* mag, const float* angle, float* x, float* y, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_polarToCart64f(const double* mag, const double* angle, double* x, double* y, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_polar_ಗಮ್ಯ_Cart32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* mag, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* angle, ದಶಮಾಂಶ* x, ದಶಮಾಂಶ* y, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_polar_ಗಮ್ಯ_Cart64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* mag, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* angle, ದ್ವಿಗುಣ* x, ದ್ವಿಗುಣ* y, ಪೂರ್ಣಾಂಕ len, ತಾರ್ಕಿಕ angle_ಒಳ_Degrees) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_polarToCart32f hal_ni_polarToCart32f
-#define cv_hal_polarToCart64f hal_ni_polarToCart64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_polar_ಗಮ್ಯ_Cart32f hal_ni_polar_ಗಮ್ಯ_Cart32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_polar_ಗಮ್ಯ_Cart64f hal_ni_polar_ಗಮ್ಯ_Cart64f
 //! @endcond
 
 /**
@@ -782,13 +782,13 @@ inline int hal_ni_polarToCart64f(const double* mag, const double* angle, double*
  */
 //! @addtogroup core_hal_interface_invSqrt Inverse square root calculation
 //! @{
-inline int hal_ni_invSqrt32f(const float* src, float* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_invSqrt64f(const double* src, double* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_invSqrt32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_invSqrt64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_invSqrt32f hal_ni_invSqrt32f
-#define cv_hal_invSqrt64f hal_ni_invSqrt64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_invSqrt32f hal_ni_invSqrt32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_invSqrt64f hal_ni_invSqrt64f
 //! @endcond
 
 
@@ -799,13 +799,13 @@ inline int hal_ni_invSqrt64f(const double* src, double* dst, int len) { return C
  */
 //! @addtogroup core_hal_interface_sqrt Square root calculation
 //! @{
-inline int hal_ni_sqrt32f(const float* src, float* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sqrt64f(const double* src, double* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sqrt32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_sqrt64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_sqrt32f hal_ni_sqrt32f
-#define cv_hal_sqrt64f hal_ni_sqrt64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sqrt32f hal_ni_sqrt32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_sqrt64f hal_ni_sqrt64f
 //! @endcond
 
 
@@ -816,13 +816,13 @@ inline int hal_ni_sqrt64f(const double* src, double* dst, int len) { return CV_H
  */
 //! @addtogroup core_hal_interface_log Natural logarithm calculation
 //! @{
-inline int hal_ni_log32f(const float* src, float* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_log64f(const double* src, double* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_log32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_log64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_log32f hal_ni_log32f
-#define cv_hal_log64f hal_ni_log64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_log32f hal_ni_log32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_log64f hal_ni_log64f
 //! @endcond
 
 
@@ -833,13 +833,13 @@ inline int hal_ni_log64f(const double* src, double* dst, int len) { return CV_HA
  */
 //! @addtogroup core_hal_interface_exp Exponent calculation
 //! @{
-inline int hal_ni_exp32f(const float* src, float* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_exp64f(const double* src, double* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_exp32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_exp64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ len) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_exp32f hal_ni_exp32f
-#define cv_hal_exp64f hal_ni_exp64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_exp32f hal_ni_exp32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_exp64f hal_ni_exp64f
 //! @endcond
 
 
@@ -860,7 +860,7 @@ int my_hal_dftFree2D(cvhalDFT *context) {
 }
 @endcode
  */
-struct cvhalDFT {};
+ರಚನೆ cvhalDFT {};
 
 /**
 @param context double pointer to context storing all necessary data
@@ -870,17 +870,17 @@ struct cvhalDFT {};
 @param flags algorithm options (combination of CV_HAL_DFT_INVERSE, CV_HAL_DFT_SCALE, ...)
 @param needBuffer pointer to boolean variable, if valid pointer provided, then variable value should be set to true to signal that additional memory buffer is needed for operations
  */
-inline int hal_ni_dftInit1D(cvhalDFT **context, int len, int count, int depth, int flags, bool *needBuffer) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dftInit1D(cvhalDFT **context, ಪೂರ್ಣಾಂಕ len, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ flags, ತಾರ್ಕಿಕ *need_ಬಫರ್) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
 @param src source data
 @param dst destination data
  */
-inline int hal_ni_dft1D(cvhalDFT *context, const uchar *src, uchar *dst) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dft1D(cvhalDFT *context, ಸ್ಥಿರಾಂಕ uchar *src, uchar *dst) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
  */
-inline int hal_ni_dftFree1D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dftFree1D(cvhalDFT *context) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 /**
 @param src source data
@@ -896,14 +896,14 @@ inline int hal_ni_dftFree1D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEME
 @param isInverse OcvDftOptions data
 @param noPermute OcvDftOptions data
  */
-inline int hal_ni_dft(const uchar* src, uchar* dst, int depth, int nf, int *factors, double scale, int* itab, void* wave,
-                         int tab_size, int n, bool isInverse, bool noPermute) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dft(ಸ್ಥಿರಾಂಕ uchar* src, uchar* dst, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ nf, ಪೂರ್ಣಾಂಕ *factors, ದ್ವಿಗುಣ scale, ಪೂರ್ಣಾಂಕ* itab, ಶೂನ್ಯ* wave,
+                         ಪೂರ್ಣಾಂಕ tab_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ n, ತಾರ್ಕಿಕ isInverse, ತಾರ್ಕಿಕ no_ಕ್ರಮಬದಲಾವಣೆ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_dftInit1D hal_ni_dftInit1D
-#define cv_hal_dft1D hal_ni_dft1D
-#define cv_hal_dftFree1D hal_ni_dftFree1D
-#define cv_hal_dft hal_ni_dft
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dftInit1D hal_ni_dftInit1D
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dft1D hal_ni_dft1D
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dftFree1D hal_ni_dftFree1D
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dft hal_ni_dft
 //! @endcond
 
 /**
@@ -916,7 +916,7 @@ inline int hal_ni_dft(const uchar* src, uchar* dst, int depth, int nf, int *fact
 @param flags algorithm options (combination of CV_HAL_DFT_INVERSE, ...)
 @param nonzero_rows number of nonzero rows in image, can be used for optimization
  */
-inline int hal_ni_dftInit2D(cvhalDFT **context, int width, int height, int depth, int src_channels, int dst_channels, int flags, int nonzero_rows) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dftInit2D(cvhalDFT **context, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ src_channels, ಪೂರ್ಣಾಂಕ dst_channels, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ nonzero_ಅಡ್ಡಸಾಲುಗಳು) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
 @param src_data source image data
@@ -924,16 +924,16 @@ inline int hal_ni_dftInit2D(cvhalDFT **context, int width, int height, int depth
 @param dst_data destination image data
 @param dst_step destination image step
  */
-inline int hal_ni_dft2D(cvhalDFT *context, const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dft2D(cvhalDFT *context, ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
  */
-inline int hal_ni_dftFree2D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dftFree2D(cvhalDFT *context) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_dftInit2D hal_ni_dftInit2D
-#define cv_hal_dft2D hal_ni_dft2D
-#define cv_hal_dftFree2D hal_ni_dftFree2D
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dftInit2D hal_ni_dftInit2D
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dft2D hal_ni_dft2D
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dftFree2D hal_ni_dftFree2D
 //! @endcond
 
 /**
@@ -943,7 +943,7 @@ inline int hal_ni_dftFree2D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEME
 @param depth image type (CV_32F or CV_64F)
 @param flags algorithm options (combination of CV_HAL_DFT_INVERSE, ...)
  */
-inline int hal_ni_dctInit2D(cvhalDFT **context, int width, int height, int depth, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dctInit2D(cvhalDFT **context, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ ಆಳ, ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
 @param src_data source image data
@@ -951,16 +951,16 @@ inline int hal_ni_dctInit2D(cvhalDFT **context, int width, int height, int depth
 @param dst_data destination image data
 @param dst_step destination image step
  */
-inline int hal_ni_dct2D(cvhalDFT *context, const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dct2D(cvhalDFT *context, ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
  */
-inline int hal_ni_dctFree2D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dctFree2D(cvhalDFT *context) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_dctInit2D hal_ni_dctInit2D
-#define cv_hal_dct2D hal_ni_dct2D
-#define cv_hal_dctFree2D hal_ni_dctFree2D
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dctInit2D hal_ni_dctInit2D
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dct2D hal_ni_dct2D
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dctFree2D hal_ni_dctFree2D
 //! @endcond
 
 
@@ -979,8 +979,8 @@ If src2 is null pointer only \f$LU\f$ decomposition will be performed. After fin
  */
 //! @addtogroup core_hal_interface_decomp_lu LU matrix decomposition
 //! @{
-inline int hal_ni_LU32f(float* src1, size_t src1_step, int m, float* src2, size_t src2_step, int n, int* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_LU64f(double* src1, size_t src1_step, int m, double* src2, size_t src2_step, int n, int* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_LU32f(ದಶಮಾಂಶ* src1, size_t src1_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ದಶಮಾಂಶ* src2, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ* info) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_LU64f(ದ್ವಿಗುಣ* src1, size_t src1_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ದ್ವಿಗುಣ* src2, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ* info) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -997,8 +997,8 @@ If src2 is null pointer only Cholesky decomposition will be performed. After fin
 
 //! @addtogroup core_hal_interface_decomp_cholesky Cholesky matrix decomposition
 //! @{
-inline int hal_ni_Cholesky32f(float* src1, size_t src1_step, int m, float* src2, size_t src2_step, int n, bool* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_Cholesky64f(double* src1, size_t src1_step, int m, double* src2, size_t src2_step, int n, bool* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_Cholesky32f(ದಶಮಾಂಶ* src1, size_t src1_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ದಶಮಾಂಶ* src2, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ತಾರ್ಕಿಕ* info) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_Cholesky64f(ದ್ವಿಗುಣ* src1, size_t src1_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ದ್ವಿಗುಣ* src2, size_t src2_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ತಾರ್ಕಿಕ* info) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -1017,8 +1017,8 @@ After finish of work src will be filled with rows of \f$U\f$ or not modified (de
  */
 //! @addtogroup core_hal_interface_decomp_svd Singular value matrix decomposition
 //! @{
-inline int hal_ni_SVD32f(float* src, size_t src_step, float* w, float* u, size_t u_step, float* vt, size_t vt_step, int m, int n, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_SVD64f(double* src, size_t src_step, double* w, double* u, size_t u_step, double* vt, size_t vt_step, int m, int n, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_SVD32f(ದಶಮಾಂಶ* src, size_t src_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ* w, ದಶಮಾಂಶ* u, size_t u_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ* vt, size_t vt_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_SVD64f(ದ್ವಿಗುಣ* src, size_t src_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ* w, ದ್ವಿಗುಣ* u, size_t u_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ* vt, size_t vt_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -1038,21 +1038,21 @@ after finish of work src2 contains solution \f$X\f$ of system \f$A*X=B\f$.
 */
 //! @addtogroup core_hal_interface_decomp_qr QR matrix decomposition
 //! @{
-inline int hal_ni_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_QR32f(ದಶಮಾಂಶ* src1, size_t src1_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ದಶಮಾಂಶ* src2, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ* info) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_QR64f(ದ್ವಿಗುಣ* src1, size_t src1_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ದ್ವಿಗುಣ* src2, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ* info) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 
 
 //! @cond IGNORED
-#define cv_hal_LU32f hal_ni_LU32f
-#define cv_hal_LU64f hal_ni_LU64f
-#define cv_hal_Cholesky32f hal_ni_Cholesky32f
-#define cv_hal_Cholesky64f hal_ni_Cholesky64f
-#define cv_hal_SVD32f hal_ni_SVD32f
-#define cv_hal_SVD64f hal_ni_SVD64f
-#define cv_hal_QR32f hal_ni_QR32f
-#define cv_hal_QR64f hal_ni_QR64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_LU32f hal_ni_LU32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_LU64f hal_ni_LU64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_Cholesky32f hal_ni_Cholesky32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_Cholesky64f hal_ni_Cholesky64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_SVD32f hal_ni_SVD32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_SVD64f hal_ni_SVD64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_QR32f hal_ni_QR32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_QR64f hal_ni_QR64f
 //! @endcond
 
 
@@ -1078,25 +1078,25 @@ The function performs generalized matrix multiplication similar to the gemm func
 
 //! @addtogroup core_hal_interface_matrix_multiplication Matrix multiplication
 //! @{
-inline int hal_ni_gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                          float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                          int m, int n, int k, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                          double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                          int m, int n, int k, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                          float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                          int m, int n, int k, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                          double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                          int m, int n, int k, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_gemm32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src2, size_t src2_ಹೆಜ್ಜೆ,
+                          ದಶಮಾಂಶ alpha, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src3, size_t src3_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ beta, ದಶಮಾಂಶ* dst, size_t dst_ಹೆಜ್ಜೆ,
+                          ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_gemm64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src2, size_t src2_ಹೆಜ್ಜೆ,
+                          ದ್ವಿಗುಣ alpha, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src3, size_t src3_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ beta, ದ್ವಿಗುಣ* dst, size_t dst_ಹೆಜ್ಜೆ,
+                          ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_gemm32fc(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src2, size_t src2_ಹೆಜ್ಜೆ,
+                          ದಶಮಾಂಶ alpha, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* src3, size_t src3_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ beta, ದಶಮಾಂಶ* dst, size_t dst_ಹೆಜ್ಜೆ,
+                          ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_gemm64fc(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src2, size_t src2_ಹೆಜ್ಜೆ,
+                          ದ್ವಿಗುಣ alpha, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* src3, size_t src3_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ beta, ದ್ವಿಗುಣ* dst, size_t dst_ಹೆಜ್ಜೆ,
+                          ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_gemm32f hal_ni_gemm32f
-#define cv_hal_gemm64f hal_ni_gemm64f
-#define cv_hal_gemm32fc hal_ni_gemm32fc
-#define cv_hal_gemm64fc hal_ni_gemm64fc
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_gemm32f hal_ni_gemm32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_gemm64f hal_ni_gemm64f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_gemm32fc hal_ni_gemm32fc
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_gemm64fc hal_ni_gemm64fc
 //! @endcond
 
 /**
@@ -1112,8 +1112,8 @@ inline int hal_ni_gemm64fc(const double* src1, size_t src1_step, const double* s
    @param maxIdx Pointer to the returned minimum and maximum location.
    @param mask Specified array region.
 */
-inline int hal_ni_minMaxIdx(const uchar* src_data, size_t src_step, int width, int height, int depth, double* minVal, double* maxVal,
-                            int* minIdx, int* maxIdx, uchar* mask) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_minMaxIdx(ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ ಆಳ, ದ್ವಿಗುಣ* minVal, ದ್ವಿಗುಣ* maxVal,
+                            ಪೂರ್ಣಾಂಕ* minIdx, ಪೂರ್ಣಾಂಕ* maxIdx, uchar* ಮುಖವಾಡ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 /**
    @brief Finds the global minimum and maximum in an array.
@@ -1129,12 +1129,12 @@ inline int hal_ni_minMaxIdx(const uchar* src_data, size_t src_step, int width, i
    @param mask Specified array region.
    @param mask_step Mask array step.
 */
-inline int hal_ni_minMaxIdxMaskStep(const uchar* src_data, size_t src_step, int width, int height, int depth, double* minVal, double* maxVal,
-                                    int* minIdx, int* maxIdx, uchar* mask, size_t mask_step) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_min_Max_Idx_ಮುಖವಾಡ_ಹೆಜ್ಜೆ(ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ ಆಳ, ದ್ವಿಗುಣ* minVal, ದ್ವಿಗುಣ* maxVal,
+                                    ಪೂರ್ಣಾಂಕ* minIdx, ಪೂರ್ಣಾಂಕ* maxIdx, uchar* ಮುಖವಾಡ, size_t ಮುಖವಾಡ_ಹೆಜ್ಜೆ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_minMaxIdx hal_ni_minMaxIdx
-#define cv_hal_minMaxIdxMaskStep hal_ni_minMaxIdxMaskStep
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_minMaxIdx hal_ni_minMaxIdx
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_min_Max_Idx_ಮುಖವಾಡ_ಹೆಜ್ಜೆ hal_ni_min_Max_Idx_ಮುಖವಾಡ_ಹೆಜ್ಜೆ
 //! @endcond
 
 /**
@@ -1150,12 +1150,12 @@ inline int hal_ni_minMaxIdxMaskStep(const uchar* src_data, size_t src_step, int 
    @param mask_step Mask array step.
    @sa meanStdDev
 */
-inline int hal_ni_meanStdDev(const uchar* src_data, size_t src_step, int width, int height,
-                             int src_type, double* mean_val, double* stddev_val, uchar* mask, size_t mask_step)
-{ return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಸರಾಸರಿ_Std_Dev(ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+                             ಪೂರ್ಣಾಂಕ src_type, ದ್ವಿಗುಣ* ಸರಾಸರಿ_val, ದ್ವಿಗುಣ* stddev_val, uchar* ಮುಖವಾಡ, size_t ಮುಖವಾಡ_ಹೆಜ್ಜೆ)
+{ ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_meanStdDev hal_ni_meanStdDev
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಸರಾಸರಿ_Std_Dev hal_ni_ಸರಾಸರಿ_Std_Dev
 //! @endcond
 
 /**
@@ -1171,12 +1171,12 @@ inline int hal_ni_meanStdDev(const uchar* src_data, size_t src_step, int width, 
  * @param dot_val Pointer to resulting dot product value
  * @return int
  */
-inline int hal_ni_dotProduct(const uchar* a_data, size_t a_step, const uchar* b_data, size_t b_step, int width, int height,
-                             int type, double *dot_val)
-{ return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_dot_ಗುಣಲಬ್ಧ(ಸ್ಥಿರಾಂಕ uchar* a_ದತ್ತಾಂಶ, size_t a_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ uchar* b_ದತ್ತಾಂಶ, size_t b_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+                             ಪೂರ್ಣಾಂಕ type, ದ್ವಿಗುಣ *dot_val)
+{ ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_dotProduct hal_ni_dotProduct
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_dot_ಗುಣಲಬ್ಧ hal_ni_dot_ಗುಣಲಬ್ಧ
 //! @endcond
 
 /**
@@ -1190,11 +1190,11 @@ inline int hal_ni_dotProduct(const uchar* a_data, size_t a_step, const uchar* b_
    @param dst_step destination image step
    @param flip_mode 0 flips around x-axis, positive around y-axis, negative both
  */
-inline int hal_ni_flip(int src_type, const uchar* src_data, size_t src_step, int src_width, int src_height,
-                       uchar* dst_data, size_t dst_step, int flip_mode) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_flip(ಪೂರ್ಣಾಂಕ src_type, ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ src_ಅಗಲ, ಪೂರ್ಣಾಂಕ src_ಎತ್ತರ,
+                       uchar* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ flip_ಬಹುಲಕ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_flip hal_ni_flip
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_flip hal_ni_flip
 //! @endcond
 
 /**
@@ -1212,11 +1212,11 @@ inline int hal_ni_flip(int src_type, const uchar* src_data, size_t src_step, int
    @param dst_step destination image step
    @param angle clockwise angle for rotation in degrees from set [90, 180, 270]
  */
-inline int hal_ni_rotate90(int src_type, const uchar* src_data, size_t src_step, int src_width, int src_height,
-                           uchar* dst_data, size_t dst_step, int angle) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_rotate90(ಪೂರ್ಣಾಂಕ src_type, ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ src_ಅಗಲ, ಪೂರ್ಣಾಂಕ src_ಎತ್ತರ,
+                           uchar* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ angle) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_rotate90 hal_ni_rotate90
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_rotate90 hal_ni_rotate90
 //! @endcond
 
 /**
@@ -1226,11 +1226,11 @@ inline int hal_ni_rotate90(int src_type, const uchar* src_data, size_t src_step,
    @param src_width,src_height Source image dimensions
    @param element_size Size of an element in bytes
 */
-inline int hal_ni_transpose2d(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, int src_width,
-                              int src_height, int element_size) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_transpose2d(ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ src_ಅಗಲ,
+                              ಪೂರ್ಣಾಂಕ src_ಎತ್ತರ, ಪೂರ್ಣಾಂಕ element_ಗಾತ್ರ) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_transpose2d hal_ni_transpose2d
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_transpose2d hal_ni_transpose2d
 //! @endcond
 
 /**
@@ -1241,12 +1241,12 @@ inline int hal_ni_transpose2d(const uchar* src_data, size_t src_step, uchar* dst
     @param type Type of source and destination images, for example CV_8UC1 or CV_32FC3
     @param mask_data, mask_step, mask_type Mask
 */
-inline int hal_ni_copyToMasked(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, int width, int height,
-                             int type, const uchar* mask_data, size_t mask_step, int mask_type)
-{ return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_copy_ಗಮ್ಯ_Masked(ಸ್ಥಿರಾಂಕ uchar* src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, uchar* dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ,
+                             ಪೂರ್ಣಾಂಕ type, ಸ್ಥಿರಾಂಕ uchar* ಮುಖವಾಡ_ದತ್ತಾಂಶ, size_t ಮುಖವಾಡ_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಮುಖವಾಡ_type)
+{ ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_copyToMasked hal_ni_copyToMasked
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_copy_ಗಮ್ಯ_Masked hal_ni_copy_ಗಮ್ಯ_Masked
 //! @endcond
 
 /**
@@ -1257,11 +1257,11 @@ inline int hal_ni_copyToMasked(const uchar* src_data, size_t src_step, uchar* ds
  @param width, height Source image dimensions
  @param result Pointer to save the sum result to.
  */
-inline int hal_ni_sum(const uchar *src_data, size_t src_step, int src_type, int width, int height, double *result)
-{ return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಮೊತ್ತ(ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ src_type, ಪೂರ್ಣಾಂಕ ಅಗಲ, ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ದ್ವಿಗುಣ *ಫಲಿತಾಂಶ)
+{ ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_sum hal_ni_sum
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಮೊತ್ತ hal_ni_ಮೊತ್ತ
 //! @endcond
 
 /**
@@ -1277,9 +1277,9 @@ inline int hal_ni_sum(const uchar *src_data, size_t src_step, int src_type, int 
    @param lower_bound Range lower bound
    @param upper_bound Range upper bound
 */
-inline int hal_ni_inRange8u(const uchar *src_data, size_t src_step,
-              uchar *dst_data, size_t dst_step, int dst_depth, int width,
-              int height, int cn, uchar lower_bound, uchar upper_bound) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಒಳ_Range8u(ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ,
+              uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ dst_ಆಳ_2, ಪೂರ್ಣಾಂಕ ಅಗಲ,
+              ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ cn, uchar lower_bound, uchar upper_bound) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
    @brief inRange (lower_bound <= src_value) && (src_value <= upper_bound) ? 255 : 0
    @param src_data Source image data
@@ -1293,46 +1293,46 @@ inline int hal_ni_inRange8u(const uchar *src_data, size_t src_step,
    @param lower_bound Range lower bound
    @param upper_bound Range upper bound
 */
-inline int hal_ni_inRange32f(const uchar *src_data, size_t src_step,
-              uchar *dst_data, size_t dst_step, int dst_depth, int width,
-              int height, int cn, double lower_bound, double upper_bound) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ hal_ni_ಒಳ_Range32f(ಸ್ಥಿರಾಂಕ uchar *src_ದತ್ತಾಂಶ, size_t src_ಹೆಜ್ಜೆ,
+              uchar *dst_ದತ್ತಾಂಶ, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ dst_ಆಳ_2, ಪೂರ್ಣಾಂಕ ಅಗಲ,
+              ಪೂರ್ಣಾಂಕ ಎತ್ತರ, ಪೂರ್ಣಾಂಕ cn, ದ್ವಿಗುಣ lower_bound, ದ್ವಿಗುಣ upper_bound) { ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_inRange8u hal_ni_inRange8u
-#define cv_hal_inRange32f hal_ni_inRange32f
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಒಳ_Range8u hal_ni_ಒಳ_Range8u
+#ವ್ಯಾಖ್ಯಾನಿಸು cv_hal_ಒಳ_Range32f hal_ni_ಒಳ_Range32f
 //! @endcond
 
 //! @}
 
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(_MSC_VER)
-#pragma warning(pop)
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+#ಆದರೆ defined(__clang__)
+#ಸೂಚನೆ clang diagnostic pop
+#ಅಥವಾಆದರೆ defined(_MSC_VER)
+#ಸೂಚನೆ warning(pop)
+#ಅಥವಾಆದರೆ defined(__GNUC__)
+#ಸೂಚನೆ GCC diagnostic pop
+#ಆದರೆ_ಅಂತ್ಯ
 
-#include "hal_internal.hpp"
-#include "custom_hal.hpp"
+#ಅನ್ತರ್ಭಾವ "hal_internal.hpp"
+#ಅನ್ತರ್ಭಾವ "custom_hal.hpp"
 
 //! @cond IGNORED
 
-#define CALL_HAL_RET2(name, fun, retval, ...) \
+#ವ್ಯಾಖ್ಯಾನಿಸು CALL_HAL_RET2(name, fun, retval, ...) \
 { \
-    int res = __CV_EXPAND(fun(__VA_ARGS__)); \
-    if (res == CV_HAL_ERROR_OK) \
-        return retval; \
-    else if (res != CV_HAL_ERROR_NOT_IMPLEMENTED) \
-        CV_Error_(cv::Error::StsInternal, \
+    ಪೂರ್ಣಾಂಕ res = __CV_EXPAND(fun(__VA_ARGS__)); \
+    ಆದರೆ (res == CV_HAL_ERROR_OK) \
+        ಹಿಂತಿರುಗಿ retval; \
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (res != CV_HAL_ERROR_NOT_IMPLEMENTED) \
+        CV_Error_(cv::Error::Sts_ಆಂತರಿಕ, \
         ("HAL implementation " CVAUX_STR(name) " ==> " CVAUX_STR(fun) " returned %d (0x%08x)", res, res)); \
 }
 
-#define CALL_HAL_RET(name, fun, retval, ...) \
+#ವ್ಯಾಖ್ಯಾನಿಸು CALL_HAL_RET(name, fun, retval, ...) \
 CALL_HAL_RET2(name, fun, retval, __VA_ARGS__, &retval)
 
-#define CALL_HAL(name, fun, ...) \
+#ವ್ಯಾಖ್ಯಾನಿಸು CALL_HAL(name, fun, ...) \
 CALL_HAL_RET2(name, fun, ,__VA_ARGS__)
 
 //! @endcond
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

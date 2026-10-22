@@ -40,11 +40,11 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <limits>
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ <limits>
 
-#ifdef HAVE_EIGEN
-#  if defined(_MSC_VER)
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_EIGEN
+#  ಆದರೆ defined(_MSC_VER)
 #    pragma warning(push)
 #    pragma warning(disable:4701)  // potentially uninitialized local variable
 #    pragma warning(disable:4702)  // unreachable code
@@ -52,136 +52,136 @@
 #  endif
 #  include <Eigen/Core>
 #  include <Eigen/Eigenvalues>
-#  if defined(_MSC_VER)
+#  ಆದರೆ defined(_MSC_VER)
 #    pragma warning(pop)
 #  endif
 #  include "opencv2/core/eigen.hpp"
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-int LU(float* A, size_t astep, int m, float* b, size_t bstep, int n)
-{
-    CV_INSTRUMENT_REGION();
-
-    return hal::LU32f(A, astep, m, b, bstep, n);
-}
-
-int LU(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+ಪೂರ್ಣಾಂಕ LU(ದಶಮಾಂಶ* A, size_t astep, ಪೂರ್ಣಾಂಕ m, ದಶಮಾಂಶ* b, size_t bstep, ಪೂರ್ಣಾಂಕ n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::LU64f(A, astep, m, b, bstep, n);
+    ಹಿಂತಿರುಗಿ hal::LU32f(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+ಪೂರ್ಣಾಂಕ LU(ದ್ವಿಗುಣ* A, size_t astep, ಪೂರ್ಣಾಂಕ m, ದ್ವಿಗುಣ* b, size_t bstep, ಪೂರ್ಣಾಂಕ n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::Cholesky32f(A, astep, m, b, bstep, n);
+    ಹಿಂತಿರುಗಿ hal::LU64f(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+ತಾರ್ಕಿಕ Cholesky(ದಶಮಾಂಶ* A, size_t astep, ಪೂರ್ಣಾಂಕ m, ದಶಮಾಂಶ* b, size_t bstep, ಪೂರ್ಣಾಂಕ n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::Cholesky64f(A, astep, m, b, bstep, n);
+    ಹಿಂತಿರುಗಿ hal::Cholesky32f(A, astep, m, b, bstep, n);
 }
 
-template<typename _Tp> static inline _Tp hypot(_Tp a, _Tp b)
+ತಾರ್ಕಿಕ Cholesky(ದ್ವಿಗುಣ* A, size_t astep, ಪೂರ್ಣಾಂಕ m, ದ್ವಿಗುಣ* b, size_t bstep, ಪೂರ್ಣಾಂಕ n)
 {
-    a = std::abs(a);
-    b = std::abs(b);
-    if( a > b )
+    CV_INSTRUMENT_REGION();
+
+    ಹಿಂತಿರುಗಿ hal::Cholesky64f(A, astep, m, b, bstep, n);
+}
+
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು _Tp> ಸ್ಥಿರ ಸಾಲೊಳಗೆ _Tp hypot(_Tp a, _Tp b)
+{
+    a = std::ನಿರಪೇಕ್ಷ(a);
+    b = std::ನಿರಪೇಕ್ಷ(b);
+    ಆದರೆ( a > b )
     {
         b /= a;
-        return a*std::sqrt(1 + b*b);
+        ಹಿಂತಿರುಗಿ a*std::ವರ್ಗಮೂಲ(1 + b*b);
     }
-    if( b > 0 )
+    ಆದರೆ( b > 0 )
     {
         a /= b;
-        return b*std::sqrt(1 + a*a);
+        ಹಿಂತಿರುಗಿ b*std::ವರ್ಗಮೂಲ(1 + a*a);
     }
-    return 0;
+    ಹಿಂತಿರುಗಿ 0;
 }
 
 
-template<typename _Tp> bool
-JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* buf )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು _Tp> ತಾರ್ಕಿಕ
+JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, ಪೂರ್ಣಾಂಕ n, uchar* buf )
 {
-    const _Tp eps = std::numeric_limits<_Tp>::epsilon();
-    int i, j, k, m;
+    ಸ್ಥಿರಾಂಕ _Tp eps = std::numeric_limits<_Tp>::epsilon();
+    ಪೂರ್ಣಾಂಕ i, j, k, m;
 
-    astep /= sizeof(A[0]);
-    if( V )
+    astep /= ಗಾತ್ರ(A[0]);
+    ಆದರೆ( V )
     {
-        vstep /= sizeof(V[0]);
-        for( i = 0; i < n; i++ )
+        vstep /= ಗಾತ್ರ(V[0]);
+        ಗಾಗಿ( i = 0; i < n; i++ )
         {
-            for( j = 0; j < n; j++ )
+            ಗಾಗಿ( j = 0; j < n; j++ )
                 V[i*vstep + j] = (_Tp)0;
             V[i*vstep + i] = (_Tp)1;
         }
     }
 
-    int iters, maxIters = n*n*30;
+    ಪೂರ್ಣಾಂಕ iters, maxIters = n*n*30;
 
-    int* indR = (int*)alignPtr(buf, sizeof(int));
-    int* indC = indR + n;
+    ಪೂರ್ಣಾಂಕ* indR = (ಪೂರ್ಣಾಂಕ*)alignPtr(buf, ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ));
+    ಪೂರ್ಣಾಂಕ* indC = indR + n;
     _Tp mv = (_Tp)0;
 
-    for( k = 0; k < n; k++ )
+    ಗಾಗಿ( k = 0; k < n; k++ )
     {
         W[k] = A[(astep + 1)*k];
-        if( k < n - 1 )
+        ಆದರೆ( k < n - 1 )
         {
-            for( m = k+1, mv = std::abs(A[astep*k + m]), i = k+2; i < n; i++ )
+            ಗಾಗಿ( m = k+1, mv = std::ನಿರಪೇಕ್ಷ(A[astep*k + m]), i = k+2; i < n; i++ )
             {
-                _Tp val = std::abs(A[astep*k+i]);
-                if( mv < val )
+                _Tp val = std::ನಿರಪೇಕ್ಷ(A[astep*k+i]);
+                ಆದರೆ( mv < val )
                     mv = val, m = i;
             }
             indR[k] = m;
         }
-        if( k > 0 )
+        ಆದರೆ( k > 0 )
         {
-            for( m = 0, mv = std::abs(A[k]), i = 1; i < k; i++ )
+            ಗಾಗಿ( m = 0, mv = std::ನಿರಪೇಕ್ಷ(A[k]), i = 1; i < k; i++ )
             {
-                _Tp val = std::abs(A[astep*i+k]);
-                if( mv < val )
+                _Tp val = std::ನಿರಪೇಕ್ಷ(A[astep*i+k]);
+                ಆದರೆ( mv < val )
                     mv = val, m = i;
             }
             indC[k] = m;
         }
     }
 
-    if( n > 1 ) for( iters = 0; iters < maxIters; iters++ )
+    ಆದರೆ( n > 1 ) ಗಾಗಿ( iters = 0; iters < maxIters; iters++ )
     {
         // find index (k,l) of pivot p
-        for( k = 0, mv = std::abs(A[indR[0]]), i = 1; i < n-1; i++ )
+        ಗಾಗಿ( k = 0, mv = std::ನಿರಪೇಕ್ಷ(A[indR[0]]), i = 1; i < n-1; i++ )
         {
-            _Tp val = std::abs(A[astep*i + indR[i]]);
-            if( mv < val )
+            _Tp val = std::ನಿರಪೇಕ್ಷ(A[astep*i + indR[i]]);
+            ಆದರೆ( mv < val )
                 mv = val, k = i;
         }
-        int l = indR[k];
-        for( i = 1; i < n; i++ )
+        ಪೂರ್ಣಾಂಕ l = indR[k];
+        ಗಾಗಿ( i = 1; i < n; i++ )
         {
-            _Tp val = std::abs(A[astep*indC[i] + i]);
-            if( mv < val )
+            _Tp val = std::ನಿರಪೇಕ್ಷ(A[astep*indC[i] + i]);
+            ಆದರೆ( mv < val )
                 mv = val, k = indC[i], l = i;
         }
 
         _Tp p = A[astep*k + l];
-        if( std::abs(p) <= eps )
-            break;
+        ಆದರೆ( std::ನಿರಪೇಕ್ಷ(p) <= eps )
+            ನಿಲ್ಲಿಸು;
         _Tp y = (_Tp)((W[l] - W[k])*0.5);
-        _Tp t = std::abs(y) + hypot(p, y);
+        _Tp t = std::ನಿರಪೇಕ್ಷ(y) + hypot(p, y);
         _Tp s = hypot(p, t);
         _Tp c = t/s;
         s = p/s; t = (p/t)*p;
-        if( y < 0 )
+        ಆದರೆ( y < 0 )
             s = -s, t = -t;
         A[astep*k + l] = 0;
 
@@ -190,43 +190,43 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
 
         _Tp a0, b0;
 
-#undef rotate
-#define rotate(v0, v1) a0 = v0, b0 = v1, v0 = a0*c - b0*s, v1 = a0*s + b0*c
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು rotate
+#ವ್ಯಾಖ್ಯಾನಿಸು rotate(v0, v1) a0 = v0, b0 = v1, v0 = a0*c - b0*s, v1 = a0*s + b0*c
 
         // rotate rows and columns k and l
-        for( i = 0; i < k; i++ )
+        ಗಾಗಿ( i = 0; i < k; i++ )
             rotate(A[astep*i+k], A[astep*i+l]);
-        for( i = k+1; i < l; i++ )
+        ಗಾಗಿ( i = k+1; i < l; i++ )
             rotate(A[astep*k+i], A[astep*i+l]);
-        for( i = l+1; i < n; i++ )
+        ಗಾಗಿ( i = l+1; i < n; i++ )
             rotate(A[astep*k+i], A[astep*l+i]);
 
         // rotate eigenvectors
-        if( V )
-            for( i = 0; i < n; i++ )
+        ಆದರೆ( V )
+            ಗಾಗಿ( i = 0; i < n; i++ )
                 rotate(V[vstep*k+i], V[vstep*l+i]);
 
-#undef rotate
+#ವ್ಯಾಖ್ಯಾನ_ರದ್ದು rotate
 
-        for( j = 0; j < 2; j++ )
+        ಗಾಗಿ( j = 0; j < 2; j++ )
         {
-            int idx = j == 0 ? k : l;
-            if( idx < n - 1 )
+            ಪೂರ್ಣಾಂಕ idx = j == 0 ? k : l;
+            ಆದರೆ( idx < n - 1 )
             {
-                for( m = idx+1, mv = std::abs(A[astep*idx + m]), i = idx+2; i < n; i++ )
+                ಗಾಗಿ( m = idx+1, mv = std::ನಿರಪೇಕ್ಷ(A[astep*idx + m]), i = idx+2; i < n; i++ )
                 {
-                    _Tp val = std::abs(A[astep*idx+i]);
-                    if( mv < val )
+                    _Tp val = std::ನಿರಪೇಕ್ಷ(A[astep*idx+i]);
+                    ಆದರೆ( mv < val )
                         mv = val, m = i;
                 }
                 indR[idx] = m;
             }
-            if( idx > 0 )
+            ಆದರೆ( idx > 0 )
             {
-                for( m = 0, mv = std::abs(A[idx]), i = 1; i < idx; i++ )
+                ಗಾಗಿ( m = 0, mv = std::ನಿರಪೇಕ್ಷ(A[idx]), i = 1; i < idx; i++ )
                 {
-                    _Tp val = std::abs(A[astep*i+idx]);
-                    if( mv < val )
+                    _Tp val = std::ನಿರಪೇಕ್ಷ(A[astep*i+idx]);
+                    ಆದರೆ( mv < val )
                         mv = val, m = i;
                 }
                 indC[idx] = m;
@@ -235,205 +235,205 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
     }
 
     // sort eigenvalues & eigenvectors
-    for( k = 0; k < n-1; k++ )
+    ಗಾಗಿ( k = 0; k < n-1; k++ )
     {
         m = k;
-        for( i = k+1; i < n; i++ )
+        ಗಾಗಿ( i = k+1; i < n; i++ )
         {
-            if( W[m] < W[i] )
+            ಆದರೆ( W[m] < W[i] )
                 m = i;
         }
-        if( k != m )
+        ಆದರೆ( k != m )
         {
             std::swap(W[m], W[k]);
-            if( V )
-                for( i = 0; i < n; i++ )
+            ಆದರೆ( V )
+                ಗಾಗಿ( i = 0; i < n; i++ )
                     std::swap(V[vstep*m + i], V[vstep*k + i]);
         }
     }
 
-    return true;
+    ಹಿಂತಿರುಗಿ ನಿಜ;
 }
 
-static bool Jacobi( float* S, size_t sstep, float* e, float* E, size_t estep, int n, uchar* buf )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ Jacobi( ದಶಮಾಂಶ* S, size_t sstep, ದಶಮಾಂಶ* e, ದಶಮಾಂಶ* E, size_t estep, ಪೂರ್ಣಾಂಕ n, uchar* buf )
 {
-    return JacobiImpl_(S, sstep, e, E, estep, n, buf);
+    ಹಿಂತಿರುಗಿ JacobiImpl_(S, sstep, e, E, estep, n, buf);
 }
 
-static bool Jacobi( double* S, size_t sstep, double* e, double* E, size_t estep, int n, uchar* buf )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ Jacobi( ದ್ವಿಗುಣ* S, size_t sstep, ದ್ವಿಗುಣ* e, ದ್ವಿಗುಣ* E, size_t estep, ಪೂರ್ಣಾಂಕ n, uchar* buf )
 {
-    return JacobiImpl_(S, sstep, e, E, estep, n, buf);
+    ಹಿಂತಿರುಗಿ JacobiImpl_(S, sstep, e, E, estep, n, buf);
 }
 
 
-template<typename T> struct VBLAS
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ರಚನೆ VBLAS
 {
-    int dot(const T*, const T*, int, T*) const { return 0; }
-    int givens(T*, T*, int, T, T) const { return 0; }
+    ಪೂರ್ಣಾಂಕ dot(ಸ್ಥಿರಾಂಕ T*, ಸ್ಥಿರಾಂಕ T*, ಪೂರ್ಣಾಂಕ, T*) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ 0; }
+    ಪೂರ್ಣಾಂಕ givens(T*, T*, ಪೂರ್ಣಾಂಕ, T, T) ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ 0; }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-template<> inline int VBLAS<float>::dot(const float* a, const float* b, int n, float* result) const
+#ಆದರೆ (CV_SIMD || CV_SIMD_SCALABLE)
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ VBLAS<ದಶಮಾಂಶ>::dot(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* a, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* b, ಪೂರ್ಣಾಂಕ n, ದಶಮಾಂಶ* ಫಲಿತಾಂಶ) ಸ್ಥಿರಾಂಕ
 {
-    if( n < 2*VTraits<v_float32>::vlanes() )
-        return 0;
-    int k = 0;
+    ಆದರೆ( n < 2*VTraits<v_float32>::vlanes() )
+        ಹಿಂತಿರುಗಿ 0;
+    ಪೂರ್ಣಾಂಕ k = 0;
     v_float32 s0 = vx_setzero_f32();
-    for( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
+    ಗಾಗಿ( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
     {
-        v_float32 a0 = vx_load(a + k);
-        v_float32 b0 = vx_load(b + k);
+        v_float32 a0 = vx_ತುಂಬು(a + k);
+        v_float32 b0 = vx_ತುಂಬು(b + k);
 
-        s0 = v_add(s0, v_mul(a0, b0));
+        s0 = v_ಕೂಡಿಸು(s0, v_mul(a0, b0));
     }
-    *result = v_reduce_sum(s0);
+    *ಫಲಿತಾಂಶ = v_reduce_ಮೊತ್ತ(s0);
     vx_cleanup();
-    return k;
+    ಹಿಂತಿರುಗಿ k;
 }
 
 
-template<> inline int VBLAS<float>::givens(float* a, float* b, int n, float c, float s) const
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ VBLAS<ದಶಮಾಂಶ>::givens(ದಶಮಾಂಶ* a, ದಶಮಾಂಶ* b, ಪೂರ್ಣಾಂಕ n, ದಶಮಾಂಶ c, ದಶಮಾಂಶ s) ಸ್ಥಿರಾಂಕ
 {
-    if( n < VTraits<v_float32>::vlanes())
-        return 0;
-    int k = 0;
+    ಆದರೆ( n < VTraits<v_float32>::vlanes())
+        ಹಿಂತಿರುಗಿ 0;
+    ಪೂರ್ಣಾಂಕ k = 0;
     v_float32 c4 = vx_setall_f32(c), s4 = vx_setall_f32(s);
     v_float32 ns4 = vx_setall_f32(-s);
-    for( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
+    ಗಾಗಿ( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
     {
-        v_float32 a0 = vx_load(a + k);
-        v_float32 b0 = vx_load(b + k);
+        v_float32 a0 = vx_ತುಂಬು(a + k);
+        v_float32 b0 = vx_ತುಂಬು(b + k);
         v_float32 t0 = v_fma(a0, c4, v_mul(b0, s4));
         v_float32 t1 = v_fma(a0, ns4, v_mul(b0, c4));
         v_store(a + k, t0);
         v_store(b + k, t1);
     }
     vx_cleanup();
-    return k;
+    ಹಿಂತಿರುಗಿ k;
 }
 
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-template<> inline int VBLAS<double>::dot(const double* a, const double* b, int n, double* result) const
+#ಆದರೆ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ VBLAS<ದ್ವಿಗುಣ>::dot(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* a, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* b, ಪೂರ್ಣಾಂಕ n, ದ್ವಿಗುಣ* ಫಲಿತಾಂಶ) ಸ್ಥಿರಾಂಕ
 {
-    if( n < 2*VTraits<v_float64>::vlanes() )
-        return 0;
-    int k = 0;
+    ಆದರೆ( n < 2*VTraits<v_float64>::vlanes() )
+        ಹಿಂತಿರುಗಿ 0;
+    ಪೂರ್ಣಾಂಕ k = 0;
     v_float64 s0 = vx_setzero_f64();
-    for( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
+    ಗಾಗಿ( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
     {
-        v_float64 a0 = vx_load(a + k);
-        v_float64 b0 = vx_load(b + k);
+        v_float64 a0 = vx_ತುಂಬು(a + k);
+        v_float64 b0 = vx_ತುಂಬು(b + k);
 
-        s0 = v_add(s0, v_mul(a0, b0));
+        s0 = v_ಕೂಡಿಸು(s0, v_mul(a0, b0));
     }
-    *result = v_reduce_sum(s0);
+    *ಫಲಿತಾಂಶ = v_reduce_ಮೊತ್ತ(s0);
     vx_cleanup();
-    return k;
+    ಹಿಂತಿರುಗಿ k;
 }
 
 
-template<> inline int VBLAS<double>::givens(double* a, double* b, int n, double c, double s) const
+ಮಾದರಿ<> ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ VBLAS<ದ್ವಿಗುಣ>::givens(ದ್ವಿಗುಣ* a, ದ್ವಿಗುಣ* b, ಪೂರ್ಣಾಂಕ n, ದ್ವಿಗುಣ c, ದ್ವಿಗುಣ s) ಸ್ಥಿರಾಂಕ
 {
-    int k = 0;
+    ಪೂರ್ಣಾಂಕ k = 0;
     v_float64 c2 = vx_setall_f64(c), s2 = vx_setall_f64(s);
     v_float64 ns2 = vx_setall_f64(-s);
-    for( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
+    ಗಾಗಿ( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
     {
-        v_float64 a0 = vx_load(a + k);
-        v_float64 b0 = vx_load(b + k);
+        v_float64 a0 = vx_ತುಂಬು(a + k);
+        v_float64 b0 = vx_ತುಂಬು(b + k);
         v_float64 t0 = v_fma(a0, c2, v_mul(b0, s2));
         v_float64 t1 = v_fma(a0, ns2, v_mul(b0, c2));
         v_store(a + k, t0);
         v_store(b + k, t1);
     }
     vx_cleanup();
-    return k;
+    ಹಿಂತಿರುಗಿ k;
 }
 
 
-#endif // (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-#endif // (CV_SIMD || CV_SIMD_SCALABLE)
+#ಆದರೆ_ಅಂತ್ಯ // (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#ಆದರೆ_ಅಂತ್ಯ // (CV_SIMD || CV_SIMD_SCALABLE)
 
-template<typename _Tp> void
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು _Tp> ಶೂನ್ಯ
 JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
-               int m, int n, int n1, double minval, _Tp eps)
+               ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ n1, ದ್ವಿಗುಣ minval, _Tp eps)
 {
     VBLAS<_Tp> vblas;
-    AutoBuffer<double> Wbuf(n);
-    double* W = Wbuf.data();
-    int i, j, k, iter, max_iter = std::max(m, 30);
+    Auto_ಬಫರ್<ದ್ವಿಗುಣ> Wbuf(n);
+    ದ್ವಿಗುಣ* W = Wbuf.ದತ್ತಾಂಶ();
+    ಪೂರ್ಣಾಂಕ i, j, k, iter, max_iter = std::max(m, 30);
     _Tp c, s;
-    double sd;
-    astep /= sizeof(At[0]);
-    vstep /= sizeof(Vt[0]);
+    ದ್ವಿಗುಣ sd;
+    astep /= ಗಾತ್ರ(At[0]);
+    vstep /= ಗಾತ್ರ(Vt[0]);
 
-    for( i = 0; i < n; i++ )
+    ಗಾಗಿ( i = 0; i < n; i++ )
     {
-        for( k = 0, sd = 0; k < m; k++ )
+        ಗಾಗಿ( k = 0, sd = 0; k < m; k++ )
         {
             _Tp t = At[i*astep + k];
-            sd += (double)t*t;
+            sd += (ದ್ವಿಗುಣ)t*t;
         }
         W[i] = sd;
 
-        if( Vt )
+        ಆದರೆ( Vt )
         {
-            for( k = 0; k < n; k++ )
+            ಗಾಗಿ( k = 0; k < n; k++ )
                 Vt[i*vstep + k] = 0;
             Vt[i*vstep + i] = 1;
         }
     }
 
-    for( iter = 0; iter < max_iter; iter++ )
+    ಗಾಗಿ( iter = 0; iter < max_iter; iter++ )
     {
-        bool changed = false;
+        ತಾರ್ಕಿಕ ಬದಲಾಯಿತು = ಸುಳ್ಳು;
 
-        for( i = 0; i < n-1; i++ )
-            for( j = i+1; j < n; j++ )
+        ಗಾಗಿ( i = 0; i < n-1; i++ )
+            ಗಾಗಿ( j = i+1; j < n; j++ )
             {
                 _Tp *Ai = At + i*astep, *Aj = At + j*astep;
-                double a = W[i], p = 0, b = W[j];
+                ದ್ವಿಗುಣ a = W[i], p = 0, b = W[j];
 
-                for( k = 0; k < m; k++ )
-                    p += (double)Ai[k]*Aj[k];
+                ಗಾಗಿ( k = 0; k < m; k++ )
+                    p += (ದ್ವಿಗುಣ)Ai[k]*Aj[k];
 
-                if( std::abs(p) <= eps*std::sqrt((double)a*b) )
-                    continue;
+                ಆದರೆ( std::ನಿರಪೇಕ್ಷ(p) <= eps*std::ವರ್ಗಮೂಲ((ದ್ವಿಗುಣ)a*b) )
+                    ಮುಂದುವರಿ;
 
                 p *= 2;
-                double beta = a - b, gamma = hypot((double)p, beta);
-                if( beta < 0 )
+                ದ್ವಿಗುಣ beta = a - b, gamma = hypot((ದ್ವಿಗುಣ)p, beta);
+                ಆದರೆ( beta < 0 )
                 {
-                    double delta = (gamma - beta)*0.5;
-                    s = (_Tp)std::sqrt(delta/gamma);
+                    ದ್ವಿಗುಣ delta = (gamma - beta)*0.5;
+                    s = (_Tp)std::ವರ್ಗಮೂಲ(delta/gamma);
                     c = (_Tp)(p/(gamma*s*2));
                 }
-                else
+                ಇಲ್ಲದಿದ್ದರೆ
                 {
-                    c = (_Tp)std::sqrt((gamma + beta)/(gamma*2));
+                    c = (_Tp)std::ವರ್ಗಮೂಲ((gamma + beta)/(gamma*2));
                     s = (_Tp)(p/(gamma*c*2));
                 }
 
                 a = b = 0;
-                for( k = 0; k < m; k++ )
+                ಗಾಗಿ( k = 0; k < m; k++ )
                 {
                     _Tp t0 = c*Ai[k] + s*Aj[k];
                     _Tp t1 = -s*Ai[k] + c*Aj[k];
                     Ai[k] = t0; Aj[k] = t1;
 
-                    a += (double)t0*t0; b += (double)t1*t1;
+                    a += (ದ್ವಿಗುಣ)t0*t0; b += (ದ್ವಿಗುಣ)t1*t1;
                 }
                 W[i] = a; W[j] = b;
 
-                changed = true;
+                ಬದಲಾಯಿತು = ನಿಜ;
 
-                if( Vt )
+                ಆದರೆ( Vt )
                 {
                     _Tp *Vi = Vt + i*vstep, *Vj = Vt + j*vstep;
                     k = vblas.givens(Vi, Vj, n, c, s);
 
-                    for( ; k < n; k++ )
+                    ಗಾಗಿ( ; k < n; k++ )
                     {
                         _Tp t0 = c*Vi[k] + s*Vj[k];
                         _Tp t1 = -s*Vi[k] + c*Vj[k];
@@ -441,154 +441,154 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
                     }
                 }
             }
-        if( !changed )
-            break;
+        ಆದರೆ( !ಬದಲಾಯಿತು )
+            ನಿಲ್ಲಿಸು;
     }
 
-    for( i = 0; i < n; i++ )
+    ಗಾಗಿ( i = 0; i < n; i++ )
     {
-        for( k = 0, sd = 0; k < m; k++ )
+        ಗಾಗಿ( k = 0, sd = 0; k < m; k++ )
         {
             _Tp t = At[i*astep + k];
-            sd += (double)t*t;
+            sd += (ದ್ವಿಗುಣ)t*t;
         }
-        W[i] = std::sqrt(sd);
+        W[i] = std::ವರ್ಗಮೂಲ(sd);
     }
 
-    for( i = 0; i < n-1; i++ )
+    ಗಾಗಿ( i = 0; i < n-1; i++ )
     {
         j = i;
-        for( k = i+1; k < n; k++ )
+        ಗಾಗಿ( k = i+1; k < n; k++ )
         {
-            if( W[j] < W[k] )
+            ಆದರೆ( W[j] < W[k] )
                 j = k;
         }
-        if( i != j )
+        ಆದರೆ( i != j )
         {
             std::swap(W[i], W[j]);
-            if( Vt )
+            ಆದರೆ( Vt )
             {
-                for( k = 0; k < m; k++ )
+                ಗಾಗಿ( k = 0; k < m; k++ )
                     std::swap(At[i*astep + k], At[j*astep + k]);
 
-                for( k = 0; k < n; k++ )
+                ಗಾಗಿ( k = 0; k < n; k++ )
                     std::swap(Vt[i*vstep + k], Vt[j*vstep + k]);
             }
         }
     }
 
-    for( i = 0; i < n; i++ )
+    ಗಾಗಿ( i = 0; i < n; i++ )
         _W[i] = (_Tp)W[i];
 
-    if( !Vt )
-        return;
+    ಆದರೆ( !Vt )
+        ಹಿಂತಿರುಗಿ;
 
     RNG rng(0x12345678);
-    for( i = 0; i < n1; i++ )
+    ಗಾಗಿ( i = 0; i < n1; i++ )
     {
         sd = i < n ? W[i] : 0;
 
-        for( int ii = 0; ii < 100 && sd <= minval; ii++ )
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ ii = 0; ii < 100 && sd <= minval; ii++ )
         {
             // if we got a zero singular value, then in order to get the corresponding left singular vector
             // we generate a random vector, project it to the previously computed left singular vectors,
             // subtract the projection and normalize the difference.
-            const _Tp val0 = (_Tp)(1./m);
-            for( k = 0; k < m; k++ )
+            ಸ್ಥಿರಾಂಕ _Tp val0 = (_Tp)(1./m);
+            ಗಾಗಿ( k = 0; k < m; k++ )
             {
                 _Tp val = (rng.next() & 256) != 0 ? val0 : -val0;
                 At[i*astep + k] = val;
             }
-            for( iter = 0; iter < 2; iter++ )
+            ಗಾಗಿ( iter = 0; iter < 2; iter++ )
             {
-                for( j = 0; j < i; j++ )
+                ಗಾಗಿ( j = 0; j < i; j++ )
                 {
                     sd = 0;
-                    for( k = 0; k < m; k++ )
+                    ಗಾಗಿ( k = 0; k < m; k++ )
                         sd += At[i*astep + k]*At[j*astep + k];
                     _Tp asum = 0;
-                    for( k = 0; k < m; k++ )
+                    ಗಾಗಿ( k = 0; k < m; k++ )
                     {
                         _Tp t = (_Tp)(At[i*astep + k] - sd*At[j*astep + k]);
                         At[i*astep + k] = t;
-                        asum += std::abs(t);
+                        asum += std::ನಿರಪೇಕ್ಷ(t);
                     }
                     asum = asum > eps*100 ? 1/asum : 0;
-                    for( k = 0; k < m; k++ )
+                    ಗಾಗಿ( k = 0; k < m; k++ )
                         At[i*astep + k] *= asum;
                 }
             }
             sd = 0;
-            for( k = 0; k < m; k++ )
+            ಗಾಗಿ( k = 0; k < m; k++ )
             {
                 _Tp t = At[i*astep + k];
-                sd += (double)t*t;
+                sd += (ದ್ವಿಗುಣ)t*t;
             }
-            sd = std::sqrt(sd);
+            sd = std::ವರ್ಗಮೂಲ(sd);
         }
 
         s = (_Tp)(sd > minval ? 1/sd : 0.);
-        for( k = 0; k < m; k++ )
+        ಗಾಗಿ( k = 0; k < m; k++ )
             At[i*astep + k] *= s;
     }
 }
 
 
-static void JacobiSVD(float* At, size_t astep, float* W, float* Vt, size_t vstep, int m, int n, int n1=-1)
+ಸ್ಥಿರ ಶೂನ್ಯ JacobiSVD(ದಶಮಾಂಶ* At, size_t astep, ದಶಮಾಂಶ* W, ದಶಮಾಂಶ* Vt, size_t vstep, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ n1=-1)
 {
-    hal::SVD32f(At, astep, W, NULL, astep, Vt, vstep, m, n, n1);
+    hal::SVD32f(At, astep, W, ಖಾಲಿ, astep, Vt, vstep, m, n, n1);
 }
 
-static void JacobiSVD(double* At, size_t astep, double* W, double* Vt, size_t vstep, int m, int n, int n1=-1)
+ಸ್ಥಿರ ಶೂನ್ಯ JacobiSVD(ದ್ವಿಗುಣ* At, size_t astep, ದ್ವಿಗುಣ* W, ದ್ವಿಗುಣ* Vt, size_t vstep, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ n1=-1)
 {
-    hal::SVD64f(At, astep, W, NULL, astep, Vt, vstep, m, n, n1);
+    hal::SVD64f(At, astep, W, ಖಾಲಿ, astep, Vt, vstep, m, n, n1);
 }
 
-template <typename fptype> static inline int
-decodeSVDParameters(const fptype* U, const fptype* Vt, int m, int n, int n1)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ
+decodeSVDParameters(ಸ್ಥಿರಾಂಕ fptype* U, ಸ್ಥಿರಾಂಕ fptype* Vt, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ n1)
 {
-    int halSVDFlag = 0;
-    if(Vt == NULL)
+    ಪೂರ್ಣಾಂಕ halSVDFlag = 0;
+    ಆದರೆ(Vt == ಖಾಲಿ)
         halSVDFlag = CV_HAL_SVD_NO_UV;
-    else if(n1 <= 0 || n1 == n)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(n1 <= 0 || n1 == n)
     {
         halSVDFlag = CV_HAL_SVD_SHORT_UV;
-        if(U == NULL)
+        ಆದರೆ(U == ಖಾಲಿ)
             halSVDFlag |= CV_HAL_SVD_MODIFY_A;
     }
-    else if(n1 == m)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(n1 == m)
     {
-        halSVDFlag = CV_HAL_SVD_FULL_UV;
-        if(U == NULL)
+        halSVDFlag = CV_HAL_SVD_ತುಂಬಿದ_UV;
+        ಆದರೆ(U == ಖಾಲಿ)
             halSVDFlag |= CV_HAL_SVD_MODIFY_A;
     }
-    return halSVDFlag;
+    ಹಿಂತಿರುಗಿ halSVDFlag;
 }
 
-void hal::SVD32f(float* At, size_t astep, float* W, float* U, size_t ustep, float* Vt, size_t vstep, int m, int n, int n1)
+ಶೂನ್ಯ hal::SVD32f(ದಶಮಾಂಶ* At, size_t astep, ದಶಮಾಂಶ* W, ದಶಮಾಂಶ* U, size_t ustep, ದಶಮಾಂಶ* Vt, size_t vstep, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ n1)
 {
     CALL_HAL(SVD32f, cv_hal_SVD32f, At, astep, W, U, ustep, Vt, vstep, m, n, decodeSVDParameters(U, Vt, m, n, n1))
     JacobiSVDImpl_(At, astep, W, Vt, vstep, m, n, !Vt ? 0 : n1 < 0 ? n : n1, FLT_MIN, FLT_EPSILON*2);
 }
 
-void hal::SVD64f(double* At, size_t astep, double* W, double* U, size_t ustep, double* Vt, size_t vstep, int m, int n, int n1)
+ಶೂನ್ಯ hal::SVD64f(ದ್ವಿಗುಣ* At, size_t astep, ದ್ವಿಗುಣ* W, ದ್ವಿಗುಣ* U, size_t ustep, ದ್ವಿಗುಣ* Vt, size_t vstep, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ n1)
 {
     CALL_HAL(SVD64f, cv_hal_SVD64f, At, astep, W, U, ustep, Vt, vstep, m, n, decodeSVDParameters(U, Vt, m, n, n1))
     JacobiSVDImpl_(At, astep, W, Vt, vstep, m, n, !Vt ? 0 : n1 < 0 ? n : n1, DBL_MIN, DBL_EPSILON*10);
 }
 
 /* y[0:m,0:n] += diag(a[0:1,0:m]) * x[0:m,0:n] */
-template<typename T1, typename T2, typename T3> static void
-MatrAXPY( int m, int n, const T1* x, int dx,
-         const T2* a, int inca, T3* y, int dy )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T1, ಬಗೆ_ಹೆಸರು T2, ಬಗೆ_ಹೆಸರು T3> ಸ್ಥಿರ ಶೂನ್ಯ
+MatrAXPY( ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಸ್ಥಿರಾಂಕ T1* x, ಪೂರ್ಣಾಂಕ dx,
+         ಸ್ಥಿರಾಂಕ T2* a, ಪೂರ್ಣಾಂಕ inca, T3* y, ಪೂರ್ಣಾಂಕ dy )
 {
-    int i;
-    for( i = 0; i < m; i++, x += dx, y += dy )
+    ಪೂರ್ಣಾಂಕ i;
+    ಗಾಗಿ( i = 0; i < m; i++, x += dx, y += dy )
     {
         T2 s = a[i*inca];
-        int j = 0;
-         #if CV_ENABLE_UNROLLED
-        for(; j <= n - 4; j += 4 )
+        ಪೂರ್ಣಾಂಕ j = 0;
+         #ಆದರೆ CV_ENABLE_UNROLLED
+        ಗಾಗಿ(; j <= n - 4; j += 4 )
         {
             T3 t0 = (T3)(y[j]   + s*x[j]);
             T3 t1 = (T3)(y[j+1] + s*x[j+1]);
@@ -599,303 +599,303 @@ MatrAXPY( int m, int n, const T1* x, int dx,
             y[j+2] = t0;
             y[j+3] = t1;
         }
-        #endif
-        for( ; j < n; j++ )
+        #ಆದರೆ_ಅಂತ್ಯ
+        ಗಾಗಿ( ; j < n; j++ )
             y[j] = (T3)(y[j] + s*x[j]);
     }
 }
 
-template<typename T> static void
-SVBkSbImpl_( int m, int n, const T* w, int incw,
-       const T* u, int ldu, bool uT,
-       const T* v, int ldv, bool vT,
-       const T* b, int ldb, int nb,
-       T* x, int ldx, double* buffer, T eps )
+ಮಾದರಿ<ಬಗೆ_ಹೆಸರು T> ಸ್ಥಿರ ಶೂನ್ಯ
+SVBkSbImpl_( ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಸ್ಥಿರಾಂಕ T* w, ಪೂರ್ಣಾಂಕ incw,
+       ಸ್ಥಿರಾಂಕ T* u, ಪೂರ್ಣಾಂಕ ldu, ತಾರ್ಕಿಕ uT,
+       ಸ್ಥಿರಾಂಕ T* v, ಪೂರ್ಣಾಂಕ ldv, ತಾರ್ಕಿಕ vT,
+       ಸ್ಥಿರಾಂಕ T* b, ಪೂರ್ಣಾಂಕ ldb, ಪೂರ್ಣಾಂಕ nb,
+       T* x, ಪೂರ್ಣಾಂಕ ldx, ದ್ವಿಗುಣ* ಬಫರ್, T eps )
 {
-    double threshold = 0;
-    int udelta0 = uT ? ldu : 1, udelta1 = uT ? 1 : ldu;
-    int vdelta0 = vT ? ldv : 1, vdelta1 = vT ? 1 : ldv;
-    int i, j, nm = std::min(m, n);
+    ದ್ವಿಗುಣ ಮಿತಿ = 0;
+    ಪೂರ್ಣಾಂಕ udelta0 = uT ? ldu : 1, udelta1 = uT ? 1 : ldu;
+    ಪೂರ್ಣಾಂಕ vdelta0 = vT ? ldv : 1, vdelta1 = vT ? 1 : ldv;
+    ಪೂರ್ಣಾಂಕ i, j, nm = std::min(m, n);
 
-    if( !b )
+    ಆದರೆ( !b )
         nb = m;
 
-    for( i = 0; i < n; i++ )
-        for( j = 0; j < nb; j++ )
+    ಗಾಗಿ( i = 0; i < n; i++ )
+        ಗಾಗಿ( j = 0; j < nb; j++ )
             x[i*ldx + j] = 0;
 
-    for( i = 0; i < nm; i++ )
-        threshold += w[i*incw];
-    threshold *= eps;
+    ಗಾಗಿ( i = 0; i < nm; i++ )
+        ಮಿತಿ += w[i*incw];
+    ಮಿತಿ *= eps;
 
     // v * inv(w) * uT * b
-    for( i = 0; i < nm; i++, u += udelta0, v += vdelta0 )
+    ಗಾಗಿ( i = 0; i < nm; i++, u += udelta0, v += vdelta0 )
     {
-        double wi = w[i*incw];
-        if( (double)std::abs(wi) <= threshold )
-            continue;
+        ದ್ವಿಗುಣ wi = w[i*incw];
+        ಆದರೆ( (ದ್ವಿಗುಣ)std::ನಿರಪೇಕ್ಷ(wi) <= ಮಿತಿ )
+            ಮುಂದುವರಿ;
         wi = 1/wi;
 
-        if( nb == 1 )
+        ಆದರೆ( nb == 1 )
         {
-            double s = 0;
-            if( b )
-                for( j = 0; j < m; j++ )
+            ದ್ವಿಗುಣ s = 0;
+            ಆದರೆ( b )
+                ಗಾಗಿ( j = 0; j < m; j++ )
                     s += u[j*udelta1]*b[j*ldb];
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
                 s = u[0];
             s *= wi;
 
-            for( j = 0; j < n; j++ )
+            ಗಾಗಿ( j = 0; j < n; j++ )
                 x[j*ldx] = (T)(x[j*ldx] + s*v[j*vdelta1]);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            if( b )
+            ಆದರೆ( b )
             {
-                for( j = 0; j < nb; j++ )
-                    buffer[j] = 0;
-                MatrAXPY( m, nb, b, ldb, u, udelta1, buffer, 0 );
-                for( j = 0; j < nb; j++ )
-                    buffer[j] *= wi;
+                ಗಾಗಿ( j = 0; j < nb; j++ )
+                    ಬಫರ್[j] = 0;
+                MatrAXPY( m, nb, b, ldb, u, udelta1, ಬಫರ್, 0 );
+                ಗಾಗಿ( j = 0; j < nb; j++ )
+                    ಬಫರ್[j] *= wi;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                for( j = 0; j < nb; j++ )
-                    buffer[j] = u[j*udelta1]*wi;
+                ಗಾಗಿ( j = 0; j < nb; j++ )
+                    ಬಫರ್[j] = u[j*udelta1]*wi;
             }
-            MatrAXPY( n, nb, buffer, 0, v, vdelta1, x, ldx );
+            MatrAXPY( n, nb, ಬಫರ್, 0, v, vdelta1, x, ldx );
         }
     }
 }
 
-static void
-SVBkSb( int m, int n, const float* w, size_t wstep,
-        const float* u, size_t ustep, bool uT,
-        const float* v, size_t vstep, bool vT,
-        const float* b, size_t bstep, int nb,
-        float* x, size_t xstep, uchar* buffer )
+ಸ್ಥಿರ ಶೂನ್ಯ
+SVBkSb( ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* w, size_t wstep,
+        ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* u, size_t ustep, ತಾರ್ಕಿಕ uT,
+        ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* v, size_t vstep, ತಾರ್ಕಿಕ vT,
+        ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ* b, size_t bstep, ಪೂರ್ಣಾಂಕ nb,
+        ದಶಮಾಂಶ* x, size_t xstep, uchar* ಬಫರ್ )
 {
-    SVBkSbImpl_(m, n, w, wstep ? (int)(wstep/sizeof(w[0])) : 1,
-                u, (int)(ustep/sizeof(u[0])), uT,
-                v, (int)(vstep/sizeof(v[0])), vT,
-                b, (int)(bstep/sizeof(b[0])), nb,
-                x, (int)(xstep/sizeof(x[0])),
-                (double*)alignPtr(buffer, sizeof(double)), (float)(DBL_EPSILON*2) );
+    SVBkSbImpl_(m, n, w, wstep ? (ಪೂರ್ಣಾಂಕ)(wstep/ಗಾತ್ರ(w[0])) : 1,
+                u, (ಪೂರ್ಣಾಂಕ)(ustep/ಗಾತ್ರ(u[0])), uT,
+                v, (ಪೂರ್ಣಾಂಕ)(vstep/ಗಾತ್ರ(v[0])), vT,
+                b, (ಪೂರ್ಣಾಂಕ)(bstep/ಗಾತ್ರ(b[0])), nb,
+                x, (ಪೂರ್ಣಾಂಕ)(xstep/ಗಾತ್ರ(x[0])),
+                (ದ್ವಿಗುಣ*)alignPtr(ಬಫರ್, ಗಾತ್ರ(ದ್ವಿಗುಣ)), (ದಶಮಾಂಶ)(DBL_EPSILON*2) );
 }
 
-static void
-SVBkSb( int m, int n, const double* w, size_t wstep,
-       const double* u, size_t ustep, bool uT,
-       const double* v, size_t vstep, bool vT,
-       const double* b, size_t bstep, int nb,
-       double* x, size_t xstep, uchar* buffer )
+ಸ್ಥಿರ ಶೂನ್ಯ
+SVBkSb( ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* w, size_t wstep,
+       ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* u, size_t ustep, ತಾರ್ಕಿಕ uT,
+       ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* v, size_t vstep, ತಾರ್ಕಿಕ vT,
+       ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* b, size_t bstep, ಪೂರ್ಣಾಂಕ nb,
+       ದ್ವಿಗುಣ* x, size_t xstep, uchar* ಬಫರ್ )
 {
-    SVBkSbImpl_(m, n, w, wstep ? (int)(wstep/sizeof(w[0])) : 1,
-                u, (int)(ustep/sizeof(u[0])), uT,
-                v, (int)(vstep/sizeof(v[0])), vT,
-                b, (int)(bstep/sizeof(b[0])), nb,
-                x, (int)(xstep/sizeof(x[0])),
-                (double*)alignPtr(buffer, sizeof(double)), DBL_EPSILON*2 );
+    SVBkSbImpl_(m, n, w, wstep ? (ಪೂರ್ಣಾಂಕ)(wstep/ಗಾತ್ರ(w[0])) : 1,
+                u, (ಪೂರ್ಣಾಂಕ)(ustep/ಗಾತ್ರ(u[0])), uT,
+                v, (ಪೂರ್ಣಾಂಕ)(vstep/ಗಾತ್ರ(v[0])), vT,
+                b, (ಪೂರ್ಣಾಂಕ)(bstep/ಗಾತ್ರ(b[0])), nb,
+                x, (ಪೂರ್ಣಾಂಕ)(xstep/ಗಾತ್ರ(x[0])),
+                (ದ್ವಿಗುಣ*)alignPtr(ಬಫರ್, ಗಾತ್ರ(ದ್ವಿಗುಣ)), DBL_EPSILON*2 );
 }
 
 /****************************************************************************************\
 *                                 Determinant of the matrix                              *
 \****************************************************************************************/
 
-#define det2(m)   ((double)m(0,0)*m(1,1) - (double)m(0,1)*m(1,0))
-#define det3(m)   (m(0,0)*((double)m(1,1)*m(2,2) - (double)m(1,2)*m(2,1)) -  \
-                   m(0,1)*((double)m(1,0)*m(2,2) - (double)m(1,2)*m(2,0)) +  \
-                   m(0,2)*((double)m(1,0)*m(2,1) - (double)m(1,1)*m(2,0)))
+#ವ್ಯಾಖ್ಯಾನಿಸು det2(m)   ((ದ್ವಿಗುಣ)m(0,0)*m(1,1) - (ದ್ವಿಗುಣ)m(0,1)*m(1,0))
+#ವ್ಯಾಖ್ಯಾನಿಸು det3(m)   (m(0,0)*((ದ್ವಿಗುಣ)m(1,1)*m(2,2) - (ದ್ವಿಗುಣ)m(1,2)*m(2,1)) -  \
+                   m(0,1)*((ದ್ವಿಗುಣ)m(1,0)*m(2,2) - (ದ್ವಿಗುಣ)m(1,2)*m(2,0)) +  \
+                   m(0,2)*((ದ್ವಿಗುಣ)m(1,0)*m(2,1) - (ದ್ವಿಗುಣ)m(1,1)*m(2,0)))
 
-double determinant( InputArray _mat )
+ದ್ವಿಗುಣ ನಿರ್ಧಾರಕ( ಒಳಹರಿವು_Array _mat )
 {
     CV_INSTRUMENT_REGION();
 
     Mat mat = _mat.getMat();
-    double result = 0;
-    int type = mat.type(), rows = mat.rows;
-    size_t step = mat.step;
-    const uchar* m = mat.ptr();
+    ದ್ವಿಗುಣ ಫಲಿತಾಂಶ = 0;
+    ಪೂರ್ಣಾಂಕ type = mat.type(), ಅಡ್ಡಸಾಲುಗಳು = mat.ಅಡ್ಡಸಾಲುಗಳು;
+    size_t ಹೆಜ್ಜೆ = mat.ಹೆಜ್ಜೆ;
+    ಸ್ಥಿರಾಂಕ uchar* m = mat.ptr();
 
     CV_Assert( !mat.empty() );
-    CV_Assert( mat.rows == mat.cols && (type == CV_32F || type == CV_64F));
+    CV_Assert( mat.ಅಡ್ಡಸಾಲುಗಳು == mat.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ && (type == CV_32F || type == CV_64F));
 
-    #define Mf(y, x) ((float*)(m + y*step))[x]
-    #define Md(y, x) ((double*)(m + y*step))[x]
+    #ವ್ಯಾಖ್ಯಾನಿಸು Mf(y, x) ((ದಶಮಾಂಶ*)(m + y*ಹೆಜ್ಜೆ))[x]
+    #ವ್ಯಾಖ್ಯಾನಿಸು Md(y, x) ((ದ್ವಿಗುಣ*)(m + y*ಹೆಜ್ಜೆ))[x]
 
-    if( type == CV_32F )
+    ಆದರೆ( type == CV_32F )
     {
-        if( rows == 2 )
-            result = det2(Mf);
-        else if( rows == 3 )
-            result = det3(Mf);
-        else if( rows == 1 )
-            result = Mf(0,0);
-        else
+        ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು == 2 )
+            ಫಲಿತಾಂಶ = det2(Mf);
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು == 3 )
+            ಫಲಿತಾಂಶ = det3(Mf);
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು == 1 )
+            ಫಲಿತಾಂಶ = Mf(0,0);
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            size_t bufSize = rows*rows*sizeof(float);
-            AutoBuffer<uchar> buffer(bufSize);
-            Mat a(rows, rows, CV_32F, buffer.data());
-            mat.copyTo(a);
+            size_t buf_ಗಾತ್ರ = ಅಡ್ಡಸಾಲುಗಳು*ಅಡ್ಡಸಾಲುಗಳು*ಗಾತ್ರ(ದಶಮಾಂಶ);
+            Auto_ಬಫರ್<uchar> ಬಫರ್(buf_ಗಾತ್ರ);
+            Mat a(ಅಡ್ಡಸಾಲುಗಳು, ಅಡ್ಡಸಾಲುಗಳು, CV_32F, ಬಫರ್.ದತ್ತಾಂಶ());
+            mat.copy_ಗಮ್ಯ(a);
 
-            result = hal::LU32f(a.ptr<float>(), a.step, rows, 0, 0, 0);
-            if( result )
+            ಫಲಿತಾಂಶ = hal::LU32f(a.ptr<ದಶಮಾಂಶ>(), a.ಹೆಜ್ಜೆ, ಅಡ್ಡಸಾಲುಗಳು, 0, 0, 0);
+            ಆದರೆ( ಫಲಿತಾಂಶ )
             {
-                for( int i = 0; i < rows; i++ )
-                    result *= a.at<float>(i,i);
+                ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < ಅಡ್ಡಸಾಲುಗಳು; i++ )
+                    ಫಲಿತಾಂಶ *= a.at<ದಶಮಾಂಶ>(i,i);
             }
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if( rows == 2 )
-            result = det2(Md);
-        else if( rows == 3 )
-            result = det3(Md);
-        else if( rows == 1 )
-            result = Md(0,0);
-        else
+        ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು == 2 )
+            ಫಲಿತಾಂಶ = det2(Md);
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು == 3 )
+            ಫಲಿತಾಂಶ = det3(Md);
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು == 1 )
+            ಫಲಿತಾಂಶ = Md(0,0);
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            size_t bufSize = rows*rows*sizeof(double);
-            AutoBuffer<uchar> buffer(bufSize);
-            Mat a(rows, rows, CV_64F, buffer.data());
-            mat.copyTo(a);
+            size_t buf_ಗಾತ್ರ = ಅಡ್ಡಸಾಲುಗಳು*ಅಡ್ಡಸಾಲುಗಳು*ಗಾತ್ರ(ದ್ವಿಗುಣ);
+            Auto_ಬಫರ್<uchar> ಬಫರ್(buf_ಗಾತ್ರ);
+            Mat a(ಅಡ್ಡಸಾಲುಗಳು, ಅಡ್ಡಸಾಲುಗಳು, CV_64F, ಬಫರ್.ದತ್ತಾಂಶ());
+            mat.copy_ಗಮ್ಯ(a);
 
-            result = hal::LU64f(a.ptr<double>(), a.step, rows, 0, 0, 0);
-            if( result )
+            ಫಲಿತಾಂಶ = hal::LU64f(a.ptr<ದ್ವಿಗುಣ>(), a.ಹೆಜ್ಜೆ, ಅಡ್ಡಸಾಲುಗಳು, 0, 0, 0);
+            ಆದರೆ( ಫಲಿತಾಂಶ )
             {
-                for( int i = 0; i < rows; i++ )
-                    result *= a.at<double>(i,i);
+                ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < ಅಡ್ಡಸಾಲುಗಳು; i++ )
+                    ಫಲಿತಾಂಶ *= a.at<ದ್ವಿಗುಣ>(i,i);
             }
         }
     }
 
-    #undef Mf
-    #undef Md
+    #ವ್ಯಾಖ್ಯಾನ_ರದ್ದು Mf
+    #ವ್ಯಾಖ್ಯಾನ_ರದ್ದು Md
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 /****************************************************************************************\
 *                          Inverse (or pseudo-inverse) of a matrix                       *
 \****************************************************************************************/
 
-#define Sf( y, x ) ((float*)(srcdata + y*srcstep))[x]
-#define Sd( y, x ) ((double*)(srcdata + y*srcstep))[x]
-#define Df( y, x ) ((float*)(dstdata + y*dststep))[x]
-#define Dd( y, x ) ((double*)(dstdata + y*dststep))[x]
+#ವ್ಯಾಖ್ಯಾನಿಸು Sf( y, x ) ((ದಶಮಾಂಶ*)(srcdata + y*srcstep))[x]
+#ವ್ಯಾಖ್ಯಾನಿಸು Sd( y, x ) ((ದ್ವಿಗುಣ*)(srcdata + y*srcstep))[x]
+#ವ್ಯಾಖ್ಯಾನಿಸು Df( y, x ) ((ದಶಮಾಂಶ*)(dstdata + y*dststep))[x]
+#ವ್ಯಾಖ್ಯಾನಿಸು Dd( y, x ) ((ದ್ವಿಗುಣ*)(dstdata + y*dststep))[x]
 
-double invert( InputArray _src, OutputArray _dst, int method )
+ದ್ವಿಗುಣ invert( ಒಳಹರಿವು_Array _src, OutputArray _dst, ಪೂರ್ಣಾಂಕ ವಿಧಾನ )
 {
     CV_INSTRUMENT_REGION();
 
-    bool result = false;
+    ತಾರ್ಕಿಕ ಫಲಿತಾಂಶ = ಸುಳ್ಳು;
     Mat src = _src.getMat();
-    int type = src.type();
+    ಪೂರ್ಣಾಂಕ type = src.type();
 
     CV_Assert(type == CV_32F || type == CV_64F);
 
-    size_t esz = CV_ELEM_SIZE(type);
-    int m = src.rows, n = src.cols;
+    size_t esz = CV_ELEM_ಗಾತ್ರ(type);
+    ಪೂರ್ಣಾಂಕ m = src.ಅಡ್ಡಸಾಲುಗಳು, n = src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-    if( method == DECOMP_SVD )
+    ಆದರೆ( ವಿಧಾನ == DECOMP_SVD )
     {
-        int nm = std::min(m, n);
+        ಪೂರ್ಣಾಂಕ nm = std::min(m, n);
 
-        AutoBuffer<uchar> _buf((m*nm + nm + nm*n)*esz + sizeof(double));
-        uchar* buf = alignPtr((uchar*)_buf.data(), (int)esz);
+        Auto_ಬಫರ್<uchar> _buf((m*nm + nm + nm*n)*esz + ಗಾತ್ರ(ದ್ವಿಗುಣ));
+        uchar* buf = alignPtr((uchar*)_buf.ದತ್ತಾಂಶ(), (ಪೂರ್ಣಾಂಕ)esz);
         Mat u(m, nm, type, buf);
         Mat w(nm, 1, type, u.ptr() + m*nm*esz);
         Mat vt(nm, n, type, w.ptr() + nm*esz);
 
         SVD::compute(src, w, u, vt);
-        SVD::backSubst(w, u, vt, Mat(), _dst);
-        return type == CV_32F ?
-            (w.ptr<float>()[0] >= FLT_EPSILON ?
-             w.ptr<float>()[n-1]/w.ptr<float>()[0] : 0) :
-            (w.ptr<double>()[0] >= DBL_EPSILON ?
-             w.ptr<double>()[n-1]/w.ptr<double>()[0] : 0);
+        SVD::ಹಿಂಭಾಗ_Subst(w, u, vt, Mat(), _dst);
+        ಹಿಂತಿರುಗಿ type == CV_32F ?
+            (w.ptr<ದಶಮಾಂಶ>()[0] >= FLT_EPSILON ?
+             w.ptr<ದಶಮಾಂಶ>()[n-1]/w.ptr<ದಶಮಾಂಶ>()[0] : 0) :
+            (w.ptr<ದ್ವಿಗುಣ>()[0] >= DBL_EPSILON ?
+             w.ptr<ದ್ವಿಗುಣ>()[n-1]/w.ptr<ದ್ವಿಗುಣ>()[0] : 0);
     }
 
     CV_Assert( m == n );
 
-    if( method == DECOMP_EIG )
+    ಆದರೆ( ವಿಧಾನ == DECOMP_EIG )
     {
-        AutoBuffer<uchar> _buf((n*n*2 + n)*esz + sizeof(double));
-        uchar* buf = alignPtr((uchar*)_buf.data(), (int)esz);
+        Auto_ಬಫರ್<uchar> _buf((n*n*2 + n)*esz + ಗಾತ್ರ(ದ್ವಿಗುಣ));
+        uchar* buf = alignPtr((uchar*)_buf.ದತ್ತಾಂಶ(), (ಪೂರ್ಣಾಂಕ)esz);
         Mat u(n, n, type, buf);
         Mat w(n, 1, type, u.ptr() + n*n*esz);
         Mat vt(n, n, type, w.ptr() + n*esz);
 
         eigen(src, w, vt);
         transpose(vt, u);
-        SVD::backSubst(w, u, vt, Mat(), _dst);
-        return type == CV_32F ?
-        (w.ptr<float>()[0] >= FLT_EPSILON ?
-         w.ptr<float>()[n-1]/w.ptr<float>()[0] : 0) :
-        (w.ptr<double>()[0] >= DBL_EPSILON ?
-         w.ptr<double>()[n-1]/w.ptr<double>()[0] : 0);
+        SVD::ಹಿಂಭಾಗ_Subst(w, u, vt, Mat(), _dst);
+        ಹಿಂತಿರುಗಿ type == CV_32F ?
+        (w.ptr<ದಶಮಾಂಶ>()[0] >= FLT_EPSILON ?
+         w.ptr<ದಶಮಾಂಶ>()[n-1]/w.ptr<ದಶಮಾಂಶ>()[0] : 0) :
+        (w.ptr<ದ್ವಿಗುಣ>()[0] >= DBL_EPSILON ?
+         w.ptr<ದ್ವಿಗುಣ>()[n-1]/w.ptr<ದ್ವಿಗುಣ>()[0] : 0);
     }
 
-    CV_Assert( method == DECOMP_LU || method == DECOMP_CHOLESKY );
+    CV_Assert( ವಿಧಾನ == DECOMP_LU || ವಿಧಾನ == DECOMP_CHOLESKY );
 
     _dst.create( n, n, type );
     Mat dst = _dst.getMat();
 
-    if( n <= 3 )
+    ಆದರೆ( n <= 3 )
     {
-        const uchar* srcdata = src.ptr();
+        ಸ್ಥಿರಾಂಕ uchar* srcdata = src.ptr();
         uchar* dstdata = dst.ptr();
-        size_t srcstep = src.step;
-        size_t dststep = dst.step;
+        size_t srcstep = src.ಹೆಜ್ಜೆ;
+        size_t dststep = dst.ಹೆಜ್ಜೆ;
 
-        if( n == 2 )
+        ಆದರೆ( n == 2 )
         {
-            if( type == CV_32FC1 )
+            ಆದರೆ( type == CV_32FC1 )
             {
-                double d = det2(Sf);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = det2(Sf);
+                ಆದರೆ( d != 0. )
                 {
-                    result = true;
+                    ಫಲಿತಾಂಶ = ನಿಜ;
                     d = 1./d;
-                #if CV_SIMD128
-                    const float d_32f = (float)d;
-                    const v_float32x4 d_vec(d_32f, -d_32f, -d_32f, d_32f);
-                    v_float32x4 s0 = v_mul(v_load_halves((const float *)srcdata, (const float *)(srcdata + srcstep)), d_vec);//0123//3120
-                    s0 = v_extract<3>(s0, v_combine_low(v_rotate_right<1>(s0), s0));
-                    v_store_low((float*)dstdata, s0);
-                    v_store_high((float*)(dstdata + dststep), s0);
-                #else
-                    double t0, t1;
+                #ಆದರೆ CV_SIMD128
+                    ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ d_32f = (ದಶಮಾಂಶ)d;
+                    ಸ್ಥಿರಾಂಕ v_float32x4 d_vec(d_32f, -d_32f, -d_32f, d_32f);
+                    v_float32x4 s0 = v_mul(v_ತುಂಬು_halves((ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *)srcdata, (ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *)(srcdata + srcstep)), d_vec);//0123//3120
+                    s0 = v_ಹೊರತೆಗೆ<3>(s0, v_combine_ಕೆಳಗಿನ(v_rotate_ಬಲ<1>(s0), s0));
+                    v_store_ಕೆಳಗಿನ((ದಶಮಾಂಶ*)dstdata, s0);
+                    v_store_ಮೇಲಿನ((ದಶಮಾಂಶ*)(dstdata + dststep), s0);
+                #ಇಲ್ಲದಿದ್ದರೆ
+                    ದ್ವಿಗುಣ t0, t1;
                     t0 = Sf(0,0)*d;
                     t1 = Sf(1,1)*d;
-                    Df(1,1) = (float)t0;
-                    Df(0,0) = (float)t1;
+                    Df(1,1) = (ದಶಮಾಂಶ)t0;
+                    Df(0,0) = (ದಶಮಾಂಶ)t1;
                     t0 = -Sf(0,1)*d;
                     t1 = -Sf(1,0)*d;
-                    Df(0,1) = (float)t0;
-                    Df(1,0) = (float)t1;
-                #endif
+                    Df(0,1) = (ದಶಮಾಂಶ)t0;
+                    Df(1,0) = (ದಶಮಾಂಶ)t1;
+                #ಆದರೆ_ಅಂತ್ಯ
                 }
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                double d = det2(Sd);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = det2(Sd);
+                ಆದರೆ( d != 0. )
                 {
-                    result = true;
+                    ಫಲಿತಾಂಶ = ನಿಜ;
                     d = 1./d;
-                #if CV_SIMD128_64F
+                #ಆದರೆ CV_SIMD128_64F
                     v_float64x2 det = v_setall_f64(d);
-                    v_float64x2 s0 = v_mul(v_load((const double *)srcdata), det);
-                    v_float64x2 s1 = v_mul(v_load((const double *)(srcdata + srcstep)), det);
-                    v_float64x2 sm = v_extract<1>(s1, s0);//30
-                    v_float64x2 ss = v_sub(v_setall<double>(0), v_extract<1>(s0, s1));//12
-                    v_store((double*)dstdata, v_combine_low(sm, ss));//31
-                    v_store((double*)(dstdata + dststep), v_combine_high(ss, sm));//20
-                #else
-                    double t0, t1;
+                    v_float64x2 s0 = v_mul(v_ತುಂಬು((ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *)srcdata), det);
+                    v_float64x2 s1 = v_mul(v_ತುಂಬು((ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *)(srcdata + srcstep)), det);
+                    v_float64x2 sm = v_ಹೊರತೆಗೆ<1>(s1, s0);//30
+                    v_float64x2 ss = v_sub(v_setall<ದ್ವಿಗುಣ>(0), v_ಹೊರತೆಗೆ<1>(s0, s1));//12
+                    v_store((ದ್ವಿಗುಣ*)dstdata, v_combine_ಕೆಳಗಿನ(sm, ss));//31
+                    v_store((ದ್ವಿಗುಣ*)(dstdata + dststep), v_combine_ಮೇಲಿನ(ss, sm));//20
+                #ಇಲ್ಲದಿದ್ದರೆ
+                    ದ್ವಿಗುಣ t0, t1;
                     t0 = Sd(0,0)*d;
                     t1 = Sd(1,1)*d;
                     Dd(1,1) = t0;
@@ -904,47 +904,47 @@ double invert( InputArray _src, OutputArray _dst, int method )
                     t1 = -Sd(1,0)*d;
                     Dd(0,1) = t0;
                     Dd(1,0) = t1;
-                #endif
+                #ಆದರೆ_ಅಂತ್ಯ
                 }
             }
         }
-        else if( n == 3 )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( n == 3 )
         {
-            if( type == CV_32FC1 )
+            ಆದರೆ( type == CV_32FC1 )
             {
-                double d = det3(Sf);
+                ದ್ವಿಗುಣ d = det3(Sf);
 
-                if( d != 0. )
+                ಆದರೆ( d != 0. )
                 {
-                    double t[12];
+                    ದ್ವಿಗುಣ t[12];
 
-                    result = true;
+                    ಫಲಿತಾಂಶ = ನಿಜ;
                     d = 1./d;
-                    t[0] = (((double)Sf(1,1) * Sf(2,2) - (double)Sf(1,2) * Sf(2,1)) * d);
-                    t[1] = (((double)Sf(0,2) * Sf(2,1) - (double)Sf(0,1) * Sf(2,2)) * d);
-                    t[2] = (((double)Sf(0,1) * Sf(1,2) - (double)Sf(0,2) * Sf(1,1)) * d);
+                    t[0] = (((ದ್ವಿಗುಣ)Sf(1,1) * Sf(2,2) - (ದ್ವಿಗುಣ)Sf(1,2) * Sf(2,1)) * d);
+                    t[1] = (((ದ್ವಿಗುಣ)Sf(0,2) * Sf(2,1) - (ದ್ವಿಗುಣ)Sf(0,1) * Sf(2,2)) * d);
+                    t[2] = (((ದ್ವಿಗುಣ)Sf(0,1) * Sf(1,2) - (ದ್ವಿಗುಣ)Sf(0,2) * Sf(1,1)) * d);
 
-                    t[3] = (((double)Sf(1,2) * Sf(2,0) - (double)Sf(1,0) * Sf(2,2)) * d);
-                    t[4] = (((double)Sf(0,0) * Sf(2,2) - (double)Sf(0,2) * Sf(2,0)) * d);
-                    t[5] = (((double)Sf(0,2) * Sf(1,0) - (double)Sf(0,0) * Sf(1,2)) * d);
+                    t[3] = (((ದ್ವಿಗುಣ)Sf(1,2) * Sf(2,0) - (ದ್ವಿಗುಣ)Sf(1,0) * Sf(2,2)) * d);
+                    t[4] = (((ದ್ವಿಗುಣ)Sf(0,0) * Sf(2,2) - (ದ್ವಿಗುಣ)Sf(0,2) * Sf(2,0)) * d);
+                    t[5] = (((ದ್ವಿಗುಣ)Sf(0,2) * Sf(1,0) - (ದ್ವಿಗುಣ)Sf(0,0) * Sf(1,2)) * d);
 
-                    t[6] = (((double)Sf(1,0) * Sf(2,1) - (double)Sf(1,1) * Sf(2,0)) * d);
-                    t[7] = (((double)Sf(0,1) * Sf(2,0) - (double)Sf(0,0) * Sf(2,1)) * d);
-                    t[8] = (((double)Sf(0,0) * Sf(1,1) - (double)Sf(0,1) * Sf(1,0)) * d);
+                    t[6] = (((ದ್ವಿಗುಣ)Sf(1,0) * Sf(2,1) - (ದ್ವಿಗುಣ)Sf(1,1) * Sf(2,0)) * d);
+                    t[7] = (((ದ್ವಿಗುಣ)Sf(0,1) * Sf(2,0) - (ದ್ವಿಗುಣ)Sf(0,0) * Sf(2,1)) * d);
+                    t[8] = (((ದ್ವಿಗುಣ)Sf(0,0) * Sf(1,1) - (ದ್ವಿಗುಣ)Sf(0,1) * Sf(1,0)) * d);
 
-                    Df(0,0) = (float)t[0]; Df(0,1) = (float)t[1]; Df(0,2) = (float)t[2];
-                    Df(1,0) = (float)t[3]; Df(1,1) = (float)t[4]; Df(1,2) = (float)t[5];
-                    Df(2,0) = (float)t[6]; Df(2,1) = (float)t[7]; Df(2,2) = (float)t[8];
+                    Df(0,0) = (ದಶಮಾಂಶ)t[0]; Df(0,1) = (ದಶಮಾಂಶ)t[1]; Df(0,2) = (ದಶಮಾಂಶ)t[2];
+                    Df(1,0) = (ದಶಮಾಂಶ)t[3]; Df(1,1) = (ದಶಮಾಂಶ)t[4]; Df(1,2) = (ದಶಮಾಂಶ)t[5];
+                    Df(2,0) = (ದಶಮಾಂಶ)t[6]; Df(2,1) = (ದಶಮಾಂಶ)t[7]; Df(2,2) = (ದಶಮಾಂಶ)t[8];
                 }
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                double d = det3(Sd);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = det3(Sd);
+                ಆದರೆ( d != 0. )
                 {
-                    result = true;
+                    ಫಲಿತಾಂಶ = ನಿಜ;
                     d = 1./d;
-                    double t[9];
+                    ದ್ವಿಗುಣ t[9];
 
                     t[0] = (Sd(1,1) * Sd(2,2) - Sd(1,2) * Sd(2,1)) * d;
                     t[1] = (Sd(0,2) * Sd(2,1) - Sd(0,1) * Sd(2,2)) * d;
@@ -964,60 +964,60 @@ double invert( InputArray _src, OutputArray _dst, int method )
                 }
             }
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             CV_Assert( n == 1 );
 
-            if( type == CV_32FC1 )
+            ಆದರೆ( type == CV_32FC1 )
             {
-                double d = Sf(0,0);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = Sf(0,0);
+                ಆದರೆ( d != 0. )
                 {
-                    result = true;
-                    Df(0,0) = (float)(1./d);
+                    ಫಲಿತಾಂಶ = ನಿಜ;
+                    Df(0,0) = (ದಶಮಾಂಶ)(1./d);
                 }
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                double d = Sd(0,0);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = Sd(0,0);
+                ಆದರೆ( d != 0. )
                 {
-                    result = true;
+                    ಫಲಿತಾಂಶ = ನಿಜ;
                     Dd(0,0) = 1./d;
                 }
             }
         }
-        if( !result )
+        ಆದರೆ( !ಫಲಿತಾಂಶ )
             dst = Scalar(0);
-        return result;
+        ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
     }
 
-   int elem_size = CV_ELEM_SIZE(type);
-    AutoBuffer<uchar> buf(n*n*elem_size);
-    Mat src1(n, n, type, buf.data());
-    src.copyTo(src1);
-    setIdentity(dst);
+   ಪೂರ್ಣಾಂಕ elem_ಗಾತ್ರ_2 = CV_ELEM_ಗಾತ್ರ(type);
+    Auto_ಬಫರ್<uchar> buf(n*n*elem_ಗಾತ್ರ_2);
+    Mat src1(n, n, type, buf.ದತ್ತಾಂಶ());
+    src.copy_ಗಮ್ಯ(src1);
+    ಗಣ_ತಟಸ್ಥ(dst);
 
-    if( method == DECOMP_LU && type == CV_32F )
-        result = hal::LU32f(src1.ptr<float>(), src1.step, n, dst.ptr<float>(), dst.step, n) != 0;
-    else if( method == DECOMP_LU && type == CV_64F )
-        result = hal::LU64f(src1.ptr<double>(), src1.step, n, dst.ptr<double>(), dst.step, n) != 0;
-    else if( method == DECOMP_CHOLESKY && type == CV_32F )
-        result = hal::Cholesky32f(src1.ptr<float>(), src1.step, n, dst.ptr<float>(), dst.step, n);
-    else
-        result = hal::Cholesky64f(src1.ptr<double>(), src1.step, n, dst.ptr<double>(), dst.step, n);
+    ಆದರೆ( ವಿಧಾನ == DECOMP_LU && type == CV_32F )
+        ಫಲಿತಾಂಶ = hal::LU32f(src1.ptr<ದಶಮಾಂಶ>(), src1.ಹೆಜ್ಜೆ, n, dst.ptr<ದಶಮಾಂಶ>(), dst.ಹೆಜ್ಜೆ, n) != 0;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ವಿಧಾನ == DECOMP_LU && type == CV_64F )
+        ಫಲಿತಾಂಶ = hal::LU64f(src1.ptr<ದ್ವಿಗುಣ>(), src1.ಹೆಜ್ಜೆ, n, dst.ptr<ದ್ವಿಗುಣ>(), dst.ಹೆಜ್ಜೆ, n) != 0;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ವಿಧಾನ == DECOMP_CHOLESKY && type == CV_32F )
+        ಫಲಿತಾಂಶ = hal::Cholesky32f(src1.ptr<ದಶಮಾಂಶ>(), src1.ಹೆಜ್ಜೆ, n, dst.ptr<ದಶಮಾಂಶ>(), dst.ಹೆಜ್ಜೆ, n);
+    ಇಲ್ಲದಿದ್ದರೆ
+        ಫಲಿತಾಂಶ = hal::Cholesky64f(src1.ptr<ದ್ವಿಗುಣ>(), src1.ಹೆಜ್ಜೆ, n, dst.ptr<ದ್ವಿಗುಣ>(), dst.ಹೆಜ್ಜೆ, n);
 
-    if( !result )
+    ಆದರೆ( !ಫಲಿತಾಂಶ )
         dst = Scalar(0);
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-UMat UMat::inv(int method) const
+UMat UMat::inv(ಪೂರ್ಣಾಂಕ ವಿಧಾನ) ಸ್ಥಿರಾಂಕ
 {
     UMat m;
-    invert(*this, m, method);
-    return m;
+    invert(*ಇದು, m, ವಿಧಾನ);
+    ಹಿಂತಿರುಗಿ m;
 }
 
 
@@ -1025,110 +1025,110 @@ UMat UMat::inv(int method) const
 *                              Solving a linear system                                   *
 \****************************************************************************************/
 
-bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
+ತಾರ್ಕಿಕ solve( ಒಳಹರಿವು_Array _src, ಒಳಹರಿವು_Array _src2arg, OutputArray _dst, ಪೂರ್ಣಾಂಕ ವಿಧಾನ )
 {
     CV_INSTRUMENT_REGION();
 
-    bool result = true;
+    ತಾರ್ಕಿಕ ಫಲಿತಾಂಶ = ನಿಜ;
     Mat src = _src.getMat(), _src2 = _src2arg.getMat();
-    int type = src.type();
-    bool is_normal = (method & DECOMP_NORMAL) != 0;
+    ಪೂರ್ಣಾಂಕ type = src.type();
+    ತಾರ್ಕಿಕ is_ಸಾಮಾನ್ಯ = (ವಿಧಾನ & DECOMP_ಸಾಮಾನ್ಯ) != 0;
 
     CV_Assert( type == _src2.type() && (type == CV_32F || type == CV_64F) );
 
-    method &= ~DECOMP_NORMAL;
-    CV_Check(method, method == DECOMP_LU || method == DECOMP_SVD || method == DECOMP_EIG ||
-                     method == DECOMP_CHOLESKY || method == DECOMP_QR,
+    ವಿಧಾನ &= ~DECOMP_ಸಾಮಾನ್ಯ;
+    CV_Check(ವಿಧಾನ, ವಿಧಾನ == DECOMP_LU || ವಿಧಾನ == DECOMP_SVD || ವಿಧಾನ == DECOMP_EIG ||
+                     ವಿಧಾನ == DECOMP_CHOLESKY || ವಿಧಾನ == DECOMP_QR,
              "Unsupported method, see #DecompTypes");
-    CV_Assert( (method != DECOMP_LU && method != DECOMP_CHOLESKY) ||
-        is_normal || src.rows == src.cols );
+    CV_Assert( (ವಿಧಾನ != DECOMP_LU && ವಿಧಾನ != DECOMP_CHOLESKY) ||
+        is_ಸಾಮಾನ್ಯ || src.ಅಡ್ಡಸಾಲುಗಳು == src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ );
 
     // check case of a single equation and small matrix
-    if( (method == DECOMP_LU || method == DECOMP_CHOLESKY) && !is_normal &&
-        src.rows <= 3 && src.rows == src.cols && _src2.cols == 1 )
+    ಆದರೆ( (ವಿಧಾನ == DECOMP_LU || ವಿಧಾನ == DECOMP_CHOLESKY) && !is_ಸಾಮಾನ್ಯ &&
+        src.ಅಡ್ಡಸಾಲುಗಳು <= 3 && src.ಅಡ್ಡಸಾಲುಗಳು == src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ && _src2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 )
     {
-        _dst.create( src.cols, _src2.cols, src.type() );
+        _dst.create( src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, _src2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, src.type() );
         Mat dst = _dst.getMat();
 
-        #define bf(y) ((float*)(bdata + y*src2step))[0]
-        #define bd(y) ((double*)(bdata + y*src2step))[0]
+        #ವ್ಯಾಖ್ಯಾನಿಸು bf(y) ((ದಶಮಾಂಶ*)(bdata + y*src2step))[0]
+        #ವ್ಯಾಖ್ಯಾನಿಸು bd(y) ((ದ್ವಿಗುಣ*)(bdata + y*src2step))[0]
 
-        const uchar* srcdata = src.ptr();
-        const uchar* bdata = _src2.ptr();
+        ಸ್ಥಿರಾಂಕ uchar* srcdata = src.ptr();
+        ಸ್ಥಿರಾಂಕ uchar* bdata = _src2.ptr();
         uchar* dstdata = dst.ptr();
-        size_t srcstep = src.step;
-        size_t src2step = _src2.step;
-        size_t dststep = dst.step;
+        size_t srcstep = src.ಹೆಜ್ಜೆ;
+        size_t src2step = _src2.ಹೆಜ್ಜೆ;
+        size_t dststep = dst.ಹೆಜ್ಜೆ;
 
-        if( src.rows == 2 )
+        ಆದರೆ( src.ಅಡ್ಡಸಾಲುಗಳು == 2 )
         {
-            if( type == CV_32FC1 )
+            ಆದರೆ( type == CV_32FC1 )
             {
-                double d = det2(Sf);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = det2(Sf);
+                ಆದರೆ( d != 0. )
                 {
-                    double t;
+                    ದ್ವಿಗುಣ t;
                     d = 1./d;
-                    t = (float)(((double)bf(0)*Sf(1,1) - (double)bf(1)*Sf(0,1))*d);
-                    Df(1,0) = (float)(((double)bf(1)*Sf(0,0) - (double)bf(0)*Sf(1,0))*d);
-                    Df(0,0) = (float)t;
+                    t = (ದಶಮಾಂಶ)(((ದ್ವಿಗುಣ)bf(0)*Sf(1,1) - (ದ್ವಿಗುಣ)bf(1)*Sf(0,1))*d);
+                    Df(1,0) = (ದಶಮಾಂಶ)(((ದ್ವಿಗುಣ)bf(1)*Sf(0,0) - (ದ್ವಿಗುಣ)bf(0)*Sf(1,0))*d);
+                    Df(0,0) = (ದಶಮಾಂಶ)t;
                 }
-                else
-                    result = false;
+                ಇಲ್ಲದಿದ್ದರೆ
+                    ಫಲಿತಾಂಶ = ಸುಳ್ಳು;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                double d = det2(Sd);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = det2(Sd);
+                ಆದರೆ( d != 0. )
                 {
-                    double t;
+                    ದ್ವಿಗುಣ t;
                     d = 1./d;
                     t = (bd(0)*Sd(1,1) - bd(1)*Sd(0,1))*d;
                     Dd(1,0) = (bd(1)*Sd(0,0) - bd(0)*Sd(1,0))*d;
                     Dd(0,0) = t;
                 }
-                else
-                    result = false;
+                ಇಲ್ಲದಿದ್ದರೆ
+                    ಫಲಿತಾಂಶ = ಸುಳ್ಳು;
             }
         }
-        else if( src.rows == 3 )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( src.ಅಡ್ಡಸಾಲುಗಳು == 3 )
         {
-            if( type == CV_32FC1 )
+            ಆದರೆ( type == CV_32FC1 )
             {
-                double d = det3(Sf);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = det3(Sf);
+                ಆದರೆ( d != 0. )
                 {
-                    float t[3];
+                    ದಶಮಾಂಶ t[3];
                     d = 1./d;
 
-                    t[0] = (float)(d*
-                           (bf(0)*((double)Sf(1,1)*Sf(2,2) - (double)Sf(1,2)*Sf(2,1)) -
-                            Sf(0,1)*((double)bf(1)*Sf(2,2) - (double)Sf(1,2)*bf(2)) +
-                            Sf(0,2)*((double)bf(1)*Sf(2,1) - (double)Sf(1,1)*bf(2))));
+                    t[0] = (ದಶಮಾಂಶ)(d*
+                           (bf(0)*((ದ್ವಿಗುಣ)Sf(1,1)*Sf(2,2) - (ದ್ವಿಗುಣ)Sf(1,2)*Sf(2,1)) -
+                            Sf(0,1)*((ದ್ವಿಗುಣ)bf(1)*Sf(2,2) - (ದ್ವಿಗುಣ)Sf(1,2)*bf(2)) +
+                            Sf(0,2)*((ದ್ವಿಗುಣ)bf(1)*Sf(2,1) - (ದ್ವಿಗುಣ)Sf(1,1)*bf(2))));
 
-                    t[1] = (float)(d*
-                           (Sf(0,0)*(double)(bf(1)*Sf(2,2) - (double)Sf(1,2)*bf(2)) -
-                            bf(0)*((double)Sf(1,0)*Sf(2,2) - (double)Sf(1,2)*Sf(2,0)) +
-                            Sf(0,2)*((double)Sf(1,0)*bf(2) - (double)bf(1)*Sf(2,0))));
+                    t[1] = (ದಶಮಾಂಶ)(d*
+                           (Sf(0,0)*(ದ್ವಿಗುಣ)(bf(1)*Sf(2,2) - (ದ್ವಿಗುಣ)Sf(1,2)*bf(2)) -
+                            bf(0)*((ದ್ವಿಗುಣ)Sf(1,0)*Sf(2,2) - (ದ್ವಿಗುಣ)Sf(1,2)*Sf(2,0)) +
+                            Sf(0,2)*((ದ್ವಿಗುಣ)Sf(1,0)*bf(2) - (ದ್ವಿಗುಣ)bf(1)*Sf(2,0))));
 
-                    t[2] = (float)(d*
-                           (Sf(0,0)*((double)Sf(1,1)*bf(2) - (double)bf(1)*Sf(2,1)) -
-                            Sf(0,1)*((double)Sf(1,0)*bf(2) - (double)bf(1)*Sf(2,0)) +
-                            bf(0)*((double)Sf(1,0)*Sf(2,1) - (double)Sf(1,1)*Sf(2,0))));
+                    t[2] = (ದಶಮಾಂಶ)(d*
+                           (Sf(0,0)*((ದ್ವಿಗುಣ)Sf(1,1)*bf(2) - (ದ್ವಿಗುಣ)bf(1)*Sf(2,1)) -
+                            Sf(0,1)*((ದ್ವಿಗುಣ)Sf(1,0)*bf(2) - (ದ್ವಿಗುಣ)bf(1)*Sf(2,0)) +
+                            bf(0)*((ದ್ವಿಗುಣ)Sf(1,0)*Sf(2,1) - (ದ್ವಿಗುಣ)Sf(1,1)*Sf(2,0))));
 
                     Df(0,0) = t[0];
                     Df(1,0) = t[1];
                     Df(2,0) = t[2];
                 }
-                else
-                    result = false;
+                ಇಲ್ಲದಿದ್ದರೆ
+                    ಫಲಿತಾಂಶ = ಸುಳ್ಳು;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                double d = det3(Sd);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = det3(Sd);
+                ಆದರೆ( d != 0. )
                 {
-                    double t[9];
+                    ದ್ವಿಗುಣ t[9];
 
                     d = 1./d;
 
@@ -1148,92 +1148,92 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
                     Dd(1,0) = t[1];
                     Dd(2,0) = t[2];
                 }
-                else
-                    result = false;
+                ಇಲ್ಲದಿದ್ದರೆ
+                    ಫಲಿತಾಂಶ = ಸುಳ್ಳು;
             }
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            CV_Assert( src.rows == 1 );
+            CV_Assert( src.ಅಡ್ಡಸಾಲುಗಳು == 1 );
 
-            if( type == CV_32FC1 )
+            ಆದರೆ( type == CV_32FC1 )
             {
-                double d = Sf(0,0);
-                if( d != 0. )
-                    Df(0,0) = (float)(bf(0)/d);
-                else
-                    result = false;
+                ದ್ವಿಗುಣ d = Sf(0,0);
+                ಆದರೆ( d != 0. )
+                    Df(0,0) = (ದಶಮಾಂಶ)(bf(0)/d);
+                ಇಲ್ಲದಿದ್ದರೆ
+                    ಫಲಿತಾಂಶ = ಸುಳ್ಳು;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                double d = Sd(0,0);
-                if( d != 0. )
+                ದ್ವಿಗುಣ d = Sd(0,0);
+                ಆದರೆ( d != 0. )
                     Dd(0,0) = (bd(0)/d);
-                else
-                    result = false;
+                ಇಲ್ಲದಿದ್ದರೆ
+                    ಫಲಿತಾಂಶ = ಸುಳ್ಳು;
             }
         }
-        return result;
+        ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
     }
 
-    int m = src.rows, m_ = m, n = src.cols, nb = _src2.cols;
-    size_t esz = CV_ELEM_SIZE(type), bufsize = 0;
-    size_t vstep = alignSize(n*esz, 16);
-    size_t astep = method == DECOMP_SVD && !is_normal ? alignSize(m*esz, 16) : vstep;
-    AutoBuffer<uchar> buffer;
+    ಪೂರ್ಣಾಂಕ m = src.ಅಡ್ಡಸಾಲುಗಳು, m_ = m, n = src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, nb = _src2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    size_t esz = CV_ELEM_ಗಾತ್ರ(type), bufsize = 0;
+    size_t vstep = align_ಗಾತ್ರ(n*esz, 16);
+    size_t astep = ವಿಧಾನ == DECOMP_SVD && !is_ಸಾಮಾನ್ಯ ? align_ಗಾತ್ರ(m*esz, 16) : vstep;
+    Auto_ಬಫರ್<uchar> ಬಫರ್;
 
     Mat src2 = _src2;
-    _dst.create( src.cols, src2.cols, src.type() );
+    _dst.create( src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, src2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, src.type() );
     Mat dst = _dst.getMat();
 
-    if( m < n )
+    ಆದರೆ( m < n )
         CV_Error(cv::Error::StsBadArg, "The function can not solve under-determined linear systems" );
 
-    if( m == n )
-        is_normal = false;
-    else if( is_normal )
+    ಆದರೆ( m == n )
+        is_ಸಾಮಾನ್ಯ = ಸುಳ್ಳು;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( is_ಸಾಮಾನ್ಯ )
     {
         m_ = n;
-        if( method == DECOMP_SVD )
-            method = DECOMP_EIG;
+        ಆದರೆ( ವಿಧಾನ == DECOMP_SVD )
+            ವಿಧಾನ = DECOMP_EIG;
     }
 
-    CV_Assert(m == src2.rows);
-    size_t asize = astep*(method == DECOMP_SVD || is_normal ? n : m);
+    CV_Assert(m == src2.ಅಡ್ಡಸಾಲುಗಳು);
+    size_t asize = astep*(ವಿಧಾನ == DECOMP_SVD || is_ಸಾಮಾನ್ಯ ? n : m);
     bufsize += asize + 32;
 
-    if( is_normal )
+    ಆದರೆ( is_ಸಾಮಾನ್ಯ )
         bufsize += n*nb*esz;
-    if( method == DECOMP_SVD || method == DECOMP_EIG )
-        bufsize += n*5*esz + n*vstep + nb*sizeof(double) + 32;
+    ಆದರೆ( ವಿಧಾನ == DECOMP_SVD || ವಿಧಾನ == DECOMP_EIG )
+        bufsize += n*5*esz + n*vstep + nb*ಗಾತ್ರ(ದ್ವಿಗುಣ) + 32;
 
-    buffer.allocate(bufsize);
-    uchar* ptr = alignPtr(buffer.data(), 16);
+    ಬಫರ್.allocate(bufsize);
+    uchar* ptr = alignPtr(ಬಫರ್.ದತ್ತಾಂಶ(), 16);
 
     Mat a(m_, n, type, ptr, astep);
 
-    if( is_normal )
-        mulTransposed(src, a, true);
-    else if( method != DECOMP_SVD )
-        src.copyTo(a);
-    else
+    ಆದರೆ( is_ಸಾಮಾನ್ಯ )
+        mulTransposed(src, a, ನಿಜ);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ವಿಧಾನ != DECOMP_SVD )
+        src.copy_ಗಮ್ಯ(a);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         a = Mat(n, m_, type, ptr, astep);
         transpose(src, a);
     }
     ptr += asize;
 
-    if( !is_normal )
+    ಆದರೆ( !is_ಸಾಮಾನ್ಯ )
     {
-        if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
-            src2.copyTo(dst);
+        ಆದರೆ( ವಿಧಾನ == DECOMP_LU || ವಿಧಾನ == DECOMP_CHOLESKY )
+            src2.copy_ಗಮ್ಯ(dst);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         // a'*b
-        if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
+        ಆದರೆ( ವಿಧಾನ == DECOMP_LU || ವಿಧಾನ == DECOMP_CHOLESKY )
             gemm( src, src2, 1, Mat(), 0, dst, GEMM_1_T );
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             Mat tmp(n, nb, type, ptr);
             ptr += n*nb*esz;
@@ -1242,305 +1242,305 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
         }
     }
 
-    if( method == DECOMP_LU )
+    ಆದರೆ( ವಿಧಾನ == DECOMP_LU )
     {
-        if( type == CV_32F )
-            result = hal::LU32f(a.ptr<float>(), a.step, n, dst.ptr<float>(), dst.step, nb) != 0;
-        else
-            result = hal::LU64f(a.ptr<double>(), a.step, n, dst.ptr<double>(), dst.step, nb) != 0;
+        ಆದರೆ( type == CV_32F )
+            ಫಲಿತಾಂಶ = hal::LU32f(a.ptr<ದಶಮಾಂಶ>(), a.ಹೆಜ್ಜೆ, n, dst.ptr<ದಶಮಾಂಶ>(), dst.ಹೆಜ್ಜೆ, nb) != 0;
+        ಇಲ್ಲದಿದ್ದರೆ
+            ಫಲಿತಾಂಶ = hal::LU64f(a.ptr<ದ್ವಿಗುಣ>(), a.ಹೆಜ್ಜೆ, n, dst.ptr<ದ್ವಿಗುಣ>(), dst.ಹೆಜ್ಜೆ, nb) != 0;
     }
-    else if( method == DECOMP_CHOLESKY )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ವಿಧಾನ == DECOMP_CHOLESKY )
     {
-        if( type == CV_32F )
-            result = hal::Cholesky32f(a.ptr<float>(), a.step, n, dst.ptr<float>(), dst.step, nb);
-        else
-            result = hal::Cholesky64f(a.ptr<double>(), a.step, n, dst.ptr<double>(), dst.step, nb);
+        ಆದರೆ( type == CV_32F )
+            ಫಲಿತಾಂಶ = hal::Cholesky32f(a.ptr<ದಶಮಾಂಶ>(), a.ಹೆಜ್ಜೆ, n, dst.ptr<ದಶಮಾಂಶ>(), dst.ಹೆಜ್ಜೆ, nb);
+        ಇಲ್ಲದಿದ್ದರೆ
+            ಫಲಿತಾಂಶ = hal::Cholesky64f(a.ptr<ದ್ವಿಗುಣ>(), a.ಹೆಜ್ಜೆ, n, dst.ptr<ದ್ವಿಗುಣ>(), dst.ಹೆಜ್ಜೆ, nb);
     }
-    else if( method == DECOMP_QR )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ವಿಧಾನ == DECOMP_QR )
     {
         Mat rhsMat;
-        if( is_normal || m == n )
+        ಆದರೆ( is_ಸಾಮಾನ್ಯ || m == n )
         {
-            src2.copyTo(dst);
+            src2.copy_ಗಮ್ಯ(dst);
             rhsMat = dst;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             rhsMat = Mat(m, nb, type);
-            src2.copyTo(rhsMat);
+            src2.copy_ಗಮ್ಯ(rhsMat);
         }
 
-        if( type == CV_32F )
-            result = hal::QR32f(a.ptr<float>(), a.step, a.rows, a.cols, rhsMat.cols, rhsMat.ptr<float>(), rhsMat.step, NULL) != 0;
-        else
-            result = hal::QR64f(a.ptr<double>(), a.step, a.rows, a.cols, rhsMat.cols, rhsMat.ptr<double>(), rhsMat.step, NULL) != 0;
+        ಆದರೆ( type == CV_32F )
+            ಫಲಿತಾಂಶ = hal::QR32f(a.ptr<ದಶಮಾಂಶ>(), a.ಹೆಜ್ಜೆ, a.ಅಡ್ಡಸಾಲುಗಳು, a.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, rhsMat.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, rhsMat.ptr<ದಶಮಾಂಶ>(), rhsMat.ಹೆಜ್ಜೆ, ಖಾಲಿ) != 0;
+        ಇಲ್ಲದಿದ್ದರೆ
+            ಫಲಿತಾಂಶ = hal::QR64f(a.ptr<ದ್ವಿಗುಣ>(), a.ಹೆಜ್ಜೆ, a.ಅಡ್ಡಸಾಲುಗಳು, a.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, rhsMat.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, rhsMat.ptr<ದ್ವಿಗುಣ>(), rhsMat.ಹೆಜ್ಜೆ, ಖಾಲಿ) != 0;
 
-        if (rhsMat.rows != dst.rows)
-            rhsMat.rowRange(0, dst.rows).copyTo(dst);
+        ಆದರೆ (rhsMat.ಅಡ್ಡಸಾಲುಗಳು != dst.ಅಡ್ಡಸಾಲುಗಳು)
+            rhsMat.ಅಡ್ಡಸಾಲು_Range_2(0, dst.ಅಡ್ಡಸಾಲುಗಳು).copy_ಗಮ್ಯ(dst);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         ptr = alignPtr(ptr, 16);
         Mat v(n, n, type, ptr, vstep), w(n, 1, type, ptr + vstep*n), u;
         ptr += n*(vstep + esz);
 
-        if( method == DECOMP_EIG )
+        ಆದರೆ( ವಿಧಾನ == DECOMP_EIG )
         {
-            if( type == CV_32F )
-                Jacobi(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, n, ptr);
-            else
-                Jacobi(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, n, ptr);
+            ಆದರೆ( type == CV_32F )
+                Jacobi(a.ptr<ದಶಮಾಂಶ>(), a.ಹೆಜ್ಜೆ, w.ptr<ದಶಮಾಂಶ>(), v.ptr<ದಶಮಾಂಶ>(), v.ಹೆಜ್ಜೆ, n, ptr);
+            ಇಲ್ಲದಿದ್ದರೆ
+                Jacobi(a.ptr<ದ್ವಿಗುಣ>(), a.ಹೆಜ್ಜೆ, w.ptr<ದ್ವಿಗುಣ>(), v.ptr<ದ್ವಿಗುಣ>(), v.ಹೆಜ್ಜೆ, n, ptr);
             u = v;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            if( type == CV_32F )
-                JacobiSVD(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, m_, n);
-            else
-                JacobiSVD(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, m_, n);
+            ಆದರೆ( type == CV_32F )
+                JacobiSVD(a.ptr<ದಶಮಾಂಶ>(), a.ಹೆಜ್ಜೆ, w.ptr<ದಶಮಾಂಶ>(), v.ptr<ದಶಮಾಂಶ>(), v.ಹೆಜ್ಜೆ, m_, n);
+            ಇಲ್ಲದಿದ್ದರೆ
+                JacobiSVD(a.ptr<ದ್ವಿಗುಣ>(), a.ಹೆಜ್ಜೆ, w.ptr<ದ್ವಿಗುಣ>(), v.ptr<ದ್ವಿಗುಣ>(), v.ಹೆಜ್ಜೆ, m_, n);
             u = a;
         }
 
-        if( type == CV_32F )
+        ಆದರೆ( type == CV_32F )
         {
-            SVBkSb(m_, n, w.ptr<float>(), 0, u.ptr<float>(), u.step, true,
-                   v.ptr<float>(), v.step, true, src2.ptr<float>(),
-                   src2.step, nb, dst.ptr<float>(), dst.step, ptr);
+            SVBkSb(m_, n, w.ptr<ದಶಮಾಂಶ>(), 0, u.ptr<ದಶಮಾಂಶ>(), u.ಹೆಜ್ಜೆ, ನಿಜ,
+                   v.ptr<ದಶಮಾಂಶ>(), v.ಹೆಜ್ಜೆ, ನಿಜ, src2.ptr<ದಶಮಾಂಶ>(),
+                   src2.ಹೆಜ್ಜೆ, nb, dst.ptr<ದಶಮಾಂಶ>(), dst.ಹೆಜ್ಜೆ, ptr);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            SVBkSb(m_, n, w.ptr<double>(), 0, u.ptr<double>(), u.step, true,
-                   v.ptr<double>(), v.step, true, src2.ptr<double>(),
-                   src2.step, nb, dst.ptr<double>(), dst.step, ptr);
+            SVBkSb(m_, n, w.ptr<ದ್ವಿಗುಣ>(), 0, u.ptr<ದ್ವಿಗುಣ>(), u.ಹೆಜ್ಜೆ, ನಿಜ,
+                   v.ptr<ದ್ವಿಗುಣ>(), v.ಹೆಜ್ಜೆ, ನಿಜ, src2.ptr<ದ್ವಿಗುಣ>(),
+                   src2.ಹೆಜ್ಜೆ, nb, dst.ptr<ದ್ವಿಗುಣ>(), dst.ಹೆಜ್ಜೆ, ptr);
         }
-        result = true;
+        ಫಲಿತಾಂಶ = ನಿಜ;
     }
 
-    if( !result )
+    ಆದರೆ( !ಫಲಿತಾಂಶ )
         dst = Scalar(0);
 
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 
 /////////////////// finding eigenvalues and eigenvectors of a symmetric matrix ///////////////
 
-bool eigen( InputArray _src, OutputArray _evals, OutputArray _evects )
+ತಾರ್ಕಿಕ eigen( ಒಳಹರಿವು_Array _src, OutputArray _evals, OutputArray _evects )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    int type = src.type();
-    int n = src.rows;
+    ಪೂರ್ಣಾಂಕ type = src.type();
+    ಪೂರ್ಣಾಂಕ n = src.ಅಡ್ಡಸಾಲುಗಳು;
 
-    CV_Assert( src.rows == src.cols );
+    CV_Assert( src.ಅಡ್ಡಸಾಲುಗಳು == src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ );
     CV_Assert (type == CV_32F || type == CV_64F);
 
     Mat v;
-    if( _evects.needed() )
+    ಆದರೆ( _evects.needed() )
     {
         _evects.create(n, n, type);
         v = _evects.getMat();
     }
 
-#ifdef HAVE_EIGEN
-    const bool evecNeeded = _evects.needed();
-    const int esOptions = evecNeeded ? Eigen::ComputeEigenvectors : Eigen::EigenvaluesOnly;
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_EIGEN
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ evecNeeded = _evects.needed();
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ esOptions = evecNeeded ? Eigen::ComputeEigenvectors : Eigen::EigenvaluesOnly;
     _evals.create(n, 1, type);
     Mat evals = _evals.getMat();
-    if ( type == CV_64F )
+    ಆದರೆ ( type == CV_64F )
     {
-        Eigen::MatrixXd src_eig, zeros_eig;
+        Eigen::ಮಾತೃಕೆ_Xd src_eig, zeros_eig;
         cv::cv2eigen(src, src_eig);
 
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es;
+        Eigen::SelfAdjointEigenSolver<Eigen::ಮಾತೃಕೆ_Xd> es;
         es.compute(src_eig, esOptions);
-        if ( es.info() == Eigen::Success )
+        ಆದರೆ ( es.info() == Eigen::Success )
         {
             cv::eigen2cv(es.eigenvalues().reverse().eval(), evals);
-            if ( evecNeeded )
+            ಆದರೆ ( evecNeeded )
             {
                 cv::Mat evects = _evects.getMat();
                 cv::eigen2cv(es.eigenvectors().rowwise().reverse().transpose().eval(), v);
             }
-            return true;
+            ಹಿಂತಿರುಗಿ ನಿಜ;
         }
-    } else { // CV_32F
-        Eigen::MatrixXf src_eig, zeros_eig;
+    } ಇಲ್ಲದಿದ್ದರೆ { // CV_32F
+        Eigen::ಮಾತೃಕೆ_Xf src_eig, zeros_eig;
         cv::cv2eigen(src, src_eig);
 
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXf> es;
+        Eigen::SelfAdjointEigenSolver<Eigen::ಮಾತೃಕೆ_Xf> es;
         es.compute(src_eig, esOptions);
-        if ( es.info() == Eigen::Success )
+        ಆದರೆ ( es.info() == Eigen::Success )
         {
             cv::eigen2cv(es.eigenvalues().reverse().eval(), evals);
-            if ( evecNeeded )
+            ಆದರೆ ( evecNeeded )
             {
                 cv::eigen2cv(es.eigenvectors().rowwise().reverse().transpose().eval(), v);
             }
-            return true;
+            ಹಿಂತಿರುಗಿ ನಿಜ;
         }
     }
-    return false;
-#else
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+#ಇಲ್ಲದಿದ್ದರೆ
 
-    size_t elemSize = src.elemSize(), astep = alignSize(n*elemSize, 16);
-    AutoBuffer<uchar> buf(n*astep + n*5*elemSize + 32);
-    uchar* ptr = alignPtr(buf.data(), 16);
+    size_t elem_ಗಾತ್ರ = src.elem_ಗಾತ್ರ(), astep = align_ಗಾತ್ರ(n*elem_ಗಾತ್ರ, 16);
+    Auto_ಬಫರ್<uchar> buf(n*astep + n*5*elem_ಗಾತ್ರ + 32);
+    uchar* ptr = alignPtr(buf.ದತ್ತಾಂಶ(), 16);
     Mat a(n, n, type, ptr, astep), w(n, 1, type, ptr + astep*n);
-    ptr += astep*n + elemSize*n;
-    src.copyTo(a);
-    bool ok = type == CV_32F ?
-        Jacobi(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, n, ptr) :
-        Jacobi(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, n, ptr);
+    ptr += astep*n + elem_ಗಾತ್ರ*n;
+    src.copy_ಗಮ್ಯ(a);
+    ತಾರ್ಕಿಕ ok = type == CV_32F ?
+        Jacobi(a.ptr<ದಶಮಾಂಶ>(), a.ಹೆಜ್ಜೆ, w.ptr<ದಶಮಾಂಶ>(), v.ptr<ದಶಮಾಂಶ>(), v.ಹೆಜ್ಜೆ, n, ptr) :
+        Jacobi(a.ptr<ದ್ವಿಗುಣ>(), a.ಹೆಜ್ಜೆ, w.ptr<ದ್ವಿಗುಣ>(), v.ptr<ದ್ವಿಗುಣ>(), v.ಹೆಜ್ಜೆ, n, ptr);
 
-    w.copyTo(_evals);
-    return ok;
-#endif
+    w.copy_ಗಮ್ಯ(_evals);
+    ಹಿಂತಿರುಗಿ ok;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-static void _SVDcompute( InputArray _aarr, OutputArray _w,
-                         OutputArray _u, OutputArray _vt, int flags )
+ಸ್ಥಿರ ಶೂನ್ಯ _SVDcompute( ಒಳಹರಿವು_Array _aarr, OutputArray _w,
+                         OutputArray _u, OutputArray _vt, ಪೂರ್ಣಾಂಕ flags )
 {
     Mat src = _aarr.getMat();
-    int m = src.rows, n = src.cols;
-    int type = src.type();
-    bool compute_uv = _u.needed() || _vt.needed();
-    bool full_uv = (flags & SVD::FULL_UV) != 0;
+    ಪೂರ್ಣಾಂಕ m = src.ಅಡ್ಡಸಾಲುಗಳು, n = src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಪೂರ್ಣಾಂಕ type = src.type();
+    ತಾರ್ಕಿಕ compute_uv = _u.needed() || _vt.needed();
+    ತಾರ್ಕಿಕ ತುಂಬಿದ_uv = (flags & SVD::ತುಂಬಿದ_UV) != 0;
 
     CV_Assert( type == CV_32F || type == CV_64F );
 
-    if( flags & SVD::NO_UV )
+    ಆದರೆ( flags & SVD::NO_UV )
     {
         _u.release();
         _vt.release();
-        compute_uv = full_uv = false;
+        compute_uv = ತುಂಬಿದ_uv = ಸುಳ್ಳು;
     }
 
-    bool at = false;
-    if( m < n )
+    ತಾರ್ಕಿಕ at = ಸುಳ್ಳು;
+    ಆದರೆ( m < n )
     {
         std::swap(m, n);
-        at = true;
+        at = ನಿಜ;
     }
 
-    int urows = full_uv ? m : n;
-    size_t esz = src.elemSize(), astep = alignSize(m*esz, 16), vstep = alignSize(n*esz, 16);
-    AutoBuffer<uchar> _buf(urows*astep + n*vstep + n*esz + 32);
-    uchar* buf = alignPtr(_buf.data(), 16);
-    Mat temp_a(n, m, type, buf, astep);
-    Mat temp_w(n, 1, type, buf + urows*astep);
-    Mat temp_u(urows, m, type, buf, astep), temp_v;
+    ಪೂರ್ಣಾಂಕ urows = ತುಂಬಿದ_uv ? m : n;
+    size_t esz = src.elem_ಗಾತ್ರ(), astep = align_ಗಾತ್ರ(m*esz, 16), vstep = align_ಗಾತ್ರ(n*esz, 16);
+    Auto_ಬಫರ್<uchar> _buf(urows*astep + n*vstep + n*esz + 32);
+    uchar* buf = alignPtr(_buf.ದತ್ತಾಂಶ(), 16);
+    Mat ತಾತ್ಕಾಲಿಕ_a(n, m, type, buf, astep);
+    Mat ತಾತ್ಕಾಲಿಕ_w(n, 1, type, buf + urows*astep);
+    Mat ತಾತ್ಕಾಲಿಕ_u(urows, m, type, buf, astep), ತಾತ್ಕಾಲಿಕ_v;
 
-    if( compute_uv )
-        temp_v = Mat(n, n, type, alignPtr(buf + urows*astep + n*esz, 16), vstep);
+    ಆದರೆ( compute_uv )
+        ತಾತ್ಕಾಲಿಕ_v = Mat(n, n, type, alignPtr(buf + urows*astep + n*esz, 16), vstep);
 
-    if( urows > n )
-        temp_u = Scalar::all(0);
+    ಆದರೆ( urows > n )
+        ತಾತ್ಕಾಲಿಕ_u = Scalar::all(0);
 
-    if( !at )
-        transpose(src, temp_a);
-    else
-        src.copyTo(temp_a);
+    ಆದರೆ( !at )
+        transpose(src, ತಾತ್ಕಾಲಿಕ_a);
+    ಇಲ್ಲದಿದ್ದರೆ
+        src.copy_ಗಮ್ಯ(ತಾತ್ಕಾಲಿಕ_a);
 
-    if( type == CV_32F )
+    ಆದರೆ( type == CV_32F )
     {
-        JacobiSVD(temp_a.ptr<float>(), temp_u.step, temp_w.ptr<float>(),
-              temp_v.ptr<float>(), temp_v.step, m, n, compute_uv ? urows : 0);
+        JacobiSVD(ತಾತ್ಕಾಲಿಕ_a.ptr<ದಶಮಾಂಶ>(), ತಾತ್ಕಾಲಿಕ_u.ಹೆಜ್ಜೆ, ತಾತ್ಕಾಲಿಕ_w.ptr<ದಶಮಾಂಶ>(),
+              ತಾತ್ಕಾಲಿಕ_v.ptr<ದಶಮಾಂಶ>(), ತಾತ್ಕಾಲಿಕ_v.ಹೆಜ್ಜೆ, m, n, compute_uv ? urows : 0);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        JacobiSVD(temp_a.ptr<double>(), temp_u.step, temp_w.ptr<double>(),
-              temp_v.ptr<double>(), temp_v.step, m, n, compute_uv ? urows : 0);
+        JacobiSVD(ತಾತ್ಕಾಲಿಕ_a.ptr<ದ್ವಿಗುಣ>(), ತಾತ್ಕಾಲಿಕ_u.ಹೆಜ್ಜೆ, ತಾತ್ಕಾಲಿಕ_w.ptr<ದ್ವಿಗುಣ>(),
+              ತಾತ್ಕಾಲಿಕ_v.ptr<ದ್ವಿಗುಣ>(), ತಾತ್ಕಾಲಿಕ_v.ಹೆಜ್ಜೆ, m, n, compute_uv ? urows : 0);
     }
-    temp_w.copyTo(_w);
-    if( compute_uv )
+    ತಾತ್ಕಾಲಿಕ_w.copy_ಗಮ್ಯ(_w);
+    ಆದರೆ( compute_uv )
     {
-        if( !at )
+        ಆದರೆ( !at )
         {
-            if( _u.needed() )
-                transpose(temp_u, _u);
-            if( _vt.needed() )
-                temp_v.copyTo(_vt);
+            ಆದರೆ( _u.needed() )
+                transpose(ತಾತ್ಕಾಲಿಕ_u, _u);
+            ಆದರೆ( _vt.needed() )
+                ತಾತ್ಕಾಲಿಕ_v.copy_ಗಮ್ಯ(_vt);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            if( _u.needed() )
-                transpose(temp_v, _u);
-            if( _vt.needed() )
-                temp_u.copyTo(_vt);
+            ಆದರೆ( _u.needed() )
+                transpose(ತಾತ್ಕಾಲಿಕ_v, _u);
+            ಆದರೆ( _vt.needed() )
+                ತಾತ್ಕಾಲಿಕ_u.copy_ಗಮ್ಯ(_vt);
         }
     }
 }
 
 
-void SVD::compute( InputArray a, OutputArray w, OutputArray u, OutputArray vt, int flags )
+ಶೂನ್ಯ SVD::compute( ಒಳಹರಿವು_Array a, OutputArray w, OutputArray u, OutputArray vt, ಪೂರ್ಣಾಂಕ flags )
 {
     CV_INSTRUMENT_REGION();
 
     _SVDcompute(a, w, u, vt, flags);
 }
 
-void SVD::compute( InputArray a, OutputArray w, int flags )
+ಶೂನ್ಯ SVD::compute( ಒಳಹರಿವು_Array a, OutputArray w, ಪೂರ್ಣಾಂಕ flags )
 {
     CV_INSTRUMENT_REGION();
 
     _SVDcompute(a, w, noArray(), noArray(), flags);
 }
 
-void SVD::backSubst( InputArray _w, InputArray _u, InputArray _vt,
-                     InputArray _rhs, OutputArray _dst )
+ಶೂನ್ಯ SVD::ಹಿಂಭಾಗ_Subst( ಒಳಹರಿವು_Array _w, ಒಳಹರಿವು_Array _u, ಒಳಹರಿವು_Array _vt,
+                     ಒಳಹರಿವು_Array _rhs, OutputArray _dst )
 {
     Mat w = _w.getMat(), u = _u.getMat(), vt = _vt.getMat(), rhs = _rhs.getMat();
-    int type = w.type(), esz = (int)w.elemSize();
-    int m = u.rows, n = vt.cols, nb = rhs.data ? rhs.cols : m, nm = std::min(m, n);
-    size_t wstep = w.rows == 1 ? (size_t)esz : w.cols == 1 ? (size_t)w.step : (size_t)w.step + esz;
-    AutoBuffer<uchar> buffer(nb*sizeof(double) + 16);
-    CV_Assert( w.type() == u.type() && u.type() == vt.type() && u.data && vt.data && w.data );
-    CV_Assert( u.cols >= nm && vt.rows >= nm &&
-              (w.size() == Size(nm, 1) || w.size() == Size(1, nm) || w.size() == Size(vt.rows, u.cols)) );
-    CV_Assert( rhs.data == 0 || (rhs.type() == type && rhs.rows == m) );
+    ಪೂರ್ಣಾಂಕ type = w.type(), esz = (ಪೂರ್ಣಾಂಕ)w.elem_ಗಾತ್ರ();
+    ಪೂರ್ಣಾಂಕ m = u.ಅಡ್ಡಸಾಲುಗಳು, n = vt.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, nb = rhs.ದತ್ತಾಂಶ ? rhs.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ : m, nm = std::min(m, n);
+    size_t wstep = w.ಅಡ್ಡಸಾಲುಗಳು == 1 ? (size_t)esz : w.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 ? (size_t)w.ಹೆಜ್ಜೆ : (size_t)w.ಹೆಜ್ಜೆ + esz;
+    Auto_ಬಫರ್<uchar> ಬಫರ್(nb*ಗಾತ್ರ(ದ್ವಿಗುಣ) + 16);
+    CV_Assert( w.type() == u.type() && u.type() == vt.type() && u.ದತ್ತಾಂಶ && vt.ದತ್ತಾಂಶ && w.ದತ್ತಾಂಶ );
+    CV_Assert( u.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ >= nm && vt.ಅಡ್ಡಸಾಲುಗಳು >= nm &&
+              (w.size() == ಗಾತ್ರ_2(nm, 1) || w.size() == ಗಾತ್ರ_2(1, nm) || w.size() == ಗಾತ್ರ_2(vt.ಅಡ್ಡಸಾಲುಗಳು, u.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)) );
+    CV_Assert( rhs.ದತ್ತಾಂಶ == 0 || (rhs.type() == type && rhs.ಅಡ್ಡಸಾಲುಗಳು == m) );
 
     _dst.create( n, nb, type );
     Mat dst = _dst.getMat();
-    if( type == CV_32F )
-        SVBkSb(m, n, w.ptr<float>(), wstep, u.ptr<float>(), u.step, false,
-               vt.ptr<float>(), vt.step, true, rhs.ptr<float>(), rhs.step, nb,
-               dst.ptr<float>(), dst.step, buffer.data());
-    else if( type == CV_64F )
-        SVBkSb(m, n, w.ptr<double>(), wstep, u.ptr<double>(), u.step, false,
-               vt.ptr<double>(), vt.step, true, rhs.ptr<double>(), rhs.step, nb,
-               dst.ptr<double>(), dst.step, buffer.data());
-    else
+    ಆದರೆ( type == CV_32F )
+        SVBkSb(m, n, w.ptr<ದಶಮಾಂಶ>(), wstep, u.ptr<ದಶಮಾಂಶ>(), u.ಹೆಜ್ಜೆ, ಸುಳ್ಳು,
+               vt.ptr<ದಶಮಾಂಶ>(), vt.ಹೆಜ್ಜೆ, ನಿಜ, rhs.ptr<ದಶಮಾಂಶ>(), rhs.ಹೆಜ್ಜೆ, nb,
+               dst.ptr<ದಶಮಾಂಶ>(), dst.ಹೆಜ್ಜೆ, ಬಫರ್.ದತ್ತಾಂಶ());
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( type == CV_64F )
+        SVBkSb(m, n, w.ptr<ದ್ವಿಗುಣ>(), wstep, u.ptr<ದ್ವಿಗುಣ>(), u.ಹೆಜ್ಜೆ, ಸುಳ್ಳು,
+               vt.ptr<ದ್ವಿಗುಣ>(), vt.ಹೆಜ್ಜೆ, ನಿಜ, rhs.ptr<ದ್ವಿಗುಣ>(), rhs.ಹೆಜ್ಜೆ, nb,
+               dst.ptr<ದ್ವಿಗುಣ>(), dst.ಹೆಜ್ಜೆ, ಬಫರ್.ದತ್ತಾಂಶ());
+    ಇಲ್ಲದಿದ್ದರೆ
         CV_Error( cv::Error::StsUnsupportedFormat, "" );
 }
 
 
-SVD& SVD::operator ()(InputArray a, int flags)
+SVD& SVD::ಕ್ರಿಯಾಕಾರಕ ()(ಒಳಹರಿವು_Array a, ಪೂರ್ಣಾಂಕ flags)
 {
     _SVDcompute(a, w, u, vt, flags);
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
 
-void SVD::backSubst( InputArray rhs, OutputArray dst ) const
+ಶೂನ್ಯ SVD::ಹಿಂಭಾಗ_Subst( ಒಳಹರಿವು_Array rhs, OutputArray dst ) ಸ್ಥಿರಾಂಕ
 {
-    backSubst( w, u, vt, rhs, dst );
+    ಹಿಂಭಾಗ_Subst( w, u, vt, rhs, dst );
 }
 
 }
 
 
-void cv::SVDecomp(InputArray src, OutputArray w, OutputArray u, OutputArray vt, int flags)
+ಶೂನ್ಯ cv::SVDecomp(ಒಳಹರಿವು_Array src, OutputArray w, OutputArray u, OutputArray vt, ಪೂರ್ಣಾಂಕ flags)
 {
     CV_INSTRUMENT_REGION();
 
     SVD::compute(src, w, u, vt, flags);
 }
 
-void cv::SVBackSubst(InputArray w, InputArray u, InputArray vt, InputArray rhs, OutputArray dst)
+ಶೂನ್ಯ cv::SVBackSubst(ಒಳಹರಿವು_Array w, ಒಳಹರಿವು_Array u, ಒಳಹರಿವು_Array vt, ಒಳಹರಿವು_Array rhs, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
-    SVD::backSubst(w, u, vt, rhs, dst);
+    SVD::ಹಿಂಭಾಗ_Subst(w, u, vt, rhs, dst);
 }

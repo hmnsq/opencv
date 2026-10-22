@@ -8,42 +8,42 @@
 // and slice.
 // Each of them only describes a source and a destination view; channels stay inside the element.
 
-#ifndef OPENCV_CORE_ND_COPY_HPP
-#define OPENCV_CORE_ND_COPY_HPP
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_CORE_ND_COPY_HPP
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENCV_CORE_ND_COPY_HPP
 
-namespace cv { namespace nd {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ nd {
 
-enum { MAX_VIEW_DIMS = CV_MAX_DIM };
+ಎಣಿಕೆ { MAX_VIEW_DIMS = CV_MAX_DIM };
 
-struct View
+ರಚನೆ View
 {
-    uchar* data = nullptr;
-    int dims = 0;
+    uchar* ದತ್ತಾಂಶ = ಶೂನ್ಯಸೂಚಕ;
+    ಪೂರ್ಣಾಂಕ dims = 0;
     size_t esz = 0;                    // element size in bytes, channels included
-    int size[MAX_VIEW_DIMS];
-    ptrdiff_t step[MAX_VIEW_DIMS];     // in bytes; 0 = broadcast, negative = reversed
+    ಪೂರ್ಣಾಂಕ size[MAX_VIEW_DIMS];
+    ptrdiff_t ಹೆಜ್ಜೆ[MAX_VIEW_DIMS];     // in bytes; 0 = broadcast, negative = reversed
 };
 
-View viewOf(const Mat& m);
+View view_ದ(ಸ್ಥಿರಾಂಕ Mat& m);
 
 // The i-th axis of the result is the order[i]-th axis of v.
-View permute(const View& v, const int* order);
+View ಕ್ರಮಬದಲಾವಣೆ(ಸ್ಥಿರಾಂಕ View& v, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* ಕ್ರಮ);
 
-void flip(View& v, int axis);
+ಶೂನ್ಯ flip(View& v, ಪೂರ್ಣಾಂಕ axis);
 
 // Keep `count` elements along the axis, starting at `start`; `step` may be negative.
-void slice(View& v, int axis, int start, int step, int count);
+ಶೂನ್ಯ ತುಂಡು_2(View& v, ಪೂರ್ಣಾಂಕ axis, ಪೂರ್ಣಾಂಕ ಆರಂಭ, ಪೂರ್ಣಾಂಕ ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3);
 
 // The views must have the same dims, sizes and esz. Overlapping views are allowed.
-void copy(const View& src, const View& dst);
+ಶೂನ್ಯ copy(ಸ್ಥಿರಾಂಕ View& src, ಸ್ಥಿರಾಂಕ View& dst);
 
 // n independent copies executed in one parallel pass.
-void copyBatch(const View* src, const View* dst, int n);
+ಶೂನ್ಯ copyBatch(ಸ್ಥಿರಾಂಕ View* src, ಸ್ಥಿರಾಂಕ View* dst, ಪೂರ್ಣಾಂಕ n);
 
 // cv::transpose kernel for the element size, or nullptr; defined in matrix_transform.cpp.
-typedef void (*TransposeFunc)(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz);
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಶೂನ್ಯ (*TransposeFunc)(ಸ್ಥಿರಾಂಕ uchar* src, size_t sstep, uchar* dst, size_t dstep, ಗಾತ್ರ_2 sz);
 TransposeFunc getTransposeFunc(size_t esz);
 
 }} // namespace cv::nd
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

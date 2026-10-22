@@ -39,166 +39,166 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-#define dprintf(x)
-#define print_matrix(x)
+#ವ್ಯಾಖ್ಯಾನಿಸು dprintf(x)
+#ವ್ಯಾಖ್ಯಾನಿಸು print_ಮಾತೃಕೆ(x)
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
-    double MinProblemSolver::Function::getGradientEps() const { return 1e-3; }
-    void MinProblemSolver::Function::getGradient(const double* x, double* grad)
+    ದ್ವಿಗುಣ MinProblemSolver::Function::getGradientEps() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ 1e-3; }
+    ಶೂನ್ಯ MinProblemSolver::Function::getGradient(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* x, ದ್ವಿಗುಣ* grad)
     {
-        double eps = getGradientEps();
-        int i, n = getDims();
-        AutoBuffer<double> x_buf(n);
-        double* x_ = x_buf.data();
-        for( i = 0; i < n; i++ )
+        ದ್ವಿಗುಣ eps = getGradientEps();
+        ಪೂರ್ಣಾಂಕ i, n = getDims();
+        Auto_ಬಫರ್<ದ್ವಿಗುಣ> x_buf(n);
+        ದ್ವಿಗುಣ* x_ = x_buf.ದತ್ತಾಂಶ();
+        ಗಾಗಿ( i = 0; i < n; i++ )
             x_[i] = x[i];
-        for( i = 0; i < n; i++ )
+        ಗಾಗಿ( i = 0; i < n; i++ )
         {
             x_[i] = x[i] + eps;
-            double y1 = calc(x_);
+            ದ್ವಿಗುಣ y1 = calc(x_);
             x_[i] = x[i] - eps;
-            double y0 = calc(x_);
+            ದ್ವಿಗುಣ y0 = calc(x_);
             grad[i] = (y1 - y0)/(2*eps);
             x_[i] = x[i];
         }
     }
 
-#define SEC_METHOD_ITERATIONS 4
-#define INITIAL_SEC_METHOD_SIGMA 0.1
-    class ConjGradSolverImpl CV_FINAL : public ConjGradSolver
+#ವ್ಯಾಖ್ಯಾನಿಸು SEC_ವಿಧಾನ_ITERATIONS 4
+#ವ್ಯಾಖ್ಯಾನಿಸು INITIAL_SEC_ವಿಧಾನ_SIGMA 0.1
+    ವರ್ಗ ConjGradSolverImpl CV_FINAL : ಸಾರ್ವಜನಿಕ ConjGradSolver
     {
-    public:
-        Ptr<Function> getFunction() const CV_OVERRIDE;
-        void setFunction(const Ptr<Function>& f) CV_OVERRIDE;
-        TermCriteria getTermCriteria() const CV_OVERRIDE;
+    ಸಾರ್ವಜನಿಕ:
+        Ptr<Function> getFunction() ಸ್ಥಿರಾಂಕ CV_OVERRIDE;
+        ಶೂನ್ಯ ಗಣ_Function(ಸ್ಥಿರಾಂಕ Ptr<Function>& f) CV_OVERRIDE;
+        ಪದ_Criteria get_ಪದ_Criteria() ಸ್ಥಿರಾಂಕ CV_OVERRIDE;
         ConjGradSolverImpl();
-        void setTermCriteria(const TermCriteria& termcrit) CV_OVERRIDE;
-        double minimize(InputOutputArray x) CV_OVERRIDE;
-    protected:
+        ಶೂನ್ಯ ಗಣ_ಪದ_Criteria(ಸ್ಥಿರಾಂಕ ಪದ_Criteria& termcrit) CV_OVERRIDE;
+        ದ್ವಿಗುಣ minimize(ಒಳಹರಿವು_Output_Array x) CV_OVERRIDE;
+    ಸಂರಕ್ಷಿತ:
         Ptr<MinProblemSolver::Function> _Function;
-        TermCriteria _termcrit;
-        Mat_<double> d,r,buf_x,r_old;
-        Mat_<double> minimizeOnTheLine_buf1,minimizeOnTheLine_buf2;
-    private:
-        static void minimizeOnTheLine(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,Mat_<double>& buf2);
+        ಪದ_Criteria _termcrit;
+        Mat_<ದ್ವಿಗುಣ> d,r,buf_x,r_old;
+        Mat_<ದ್ವಿಗುಣ> minimize_On_The_ಸಾಲು_buf1,minimize_On_The_ಸಾಲು_buf2;
+    ಖಾಸಗಿ:
+        ಸ್ಥಿರ ಶೂನ್ಯ minimize_On_The_ಸಾಲು(Ptr<MinProblemSolver::Function> _f,Mat_<ದ್ವಿಗುಣ>& x,ಸ್ಥಿರಾಂಕ Mat_<ದ್ವಿಗುಣ>& d,Mat_<ದ್ವಿಗುಣ>& buf1,Mat_<ದ್ವಿಗುಣ>& buf2);
     };
 
-    void ConjGradSolverImpl::minimizeOnTheLine(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,
-            Mat_<double>& buf2){
-        double sigma=INITIAL_SEC_METHOD_SIGMA;
+    ಶೂನ್ಯ ConjGradSolverImpl::minimize_On_The_ಸಾಲು(Ptr<MinProblemSolver::Function> _f,Mat_<ದ್ವಿಗುಣ>& x,ಸ್ಥಿರಾಂಕ Mat_<ದ್ವಿಗುಣ>& d,Mat_<ದ್ವಿಗುಣ>& buf1,
+            Mat_<ದ್ವಿಗುಣ>& buf2){
+        ದ್ವಿಗುಣ sigma=INITIAL_SEC_ವಿಧಾನ_SIGMA;
         buf1=0.0;
         buf2=0.0;
 
         dprintf(("before minimizeOnTheLine\n"));
         dprintf(("x:\n"));
-        print_matrix(x);
+        print_ಮಾತೃಕೆ(x);
         dprintf(("d:\n"));
-        print_matrix(d);
+        print_ಮಾತೃಕೆ(d);
 
-        for(int i=0;i<SEC_METHOD_ITERATIONS;i++){
-            _f->getGradient((double*)x.data,(double*)buf1.data);
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i=0;i<SEC_ವಿಧಾನ_ITERATIONS;i++){
+            _f->getGradient((ದ್ವಿಗುಣ*)x.ದತ್ತಾಂಶ,(ದ್ವಿಗುಣ*)buf1.ದತ್ತಾಂಶ);
             dprintf(("buf1:\n"));
-            print_matrix(buf1);
+            print_ಮಾತೃಕೆ(buf1);
             x=x+sigma*d;
-            _f->getGradient((double*)x.data,(double*)buf2.data);
+            _f->getGradient((ದ್ವಿಗುಣ*)x.ದತ್ತಾಂಶ,(ದ್ವಿಗುಣ*)buf2.ದತ್ತಾಂಶ);
             dprintf(("buf2:\n"));
-            print_matrix(buf2);
-            double d1=buf1.dot(d), d2=buf2.dot(d);
-            if((d1-d2)==0){
-                break;
+            print_ಮಾತೃಕೆ(buf2);
+            ದ್ವಿಗುಣ d1=buf1.dot(d), d2=buf2.dot(d);
+            ಆದರೆ((d1-d2)==0){
+                ನಿಲ್ಲಿಸು;
             }
-            double alpha=-sigma*d1/(d2-d1);
+            ದ್ವಿಗುಣ alpha=-sigma*d1/(d2-d1);
             dprintf(("(buf2.dot(d)-buf1.dot(d))=%f\nalpha=%f\n",(buf2.dot(d)-buf1.dot(d)),alpha));
             x=x+(alpha-sigma)*d;
             sigma=-alpha;
         }
 
         dprintf(("after minimizeOnTheLine\n"));
-        print_matrix(x);
+        print_ಮಾತೃಕೆ(x);
     }
 
-    double ConjGradSolverImpl::minimize(InputOutputArray x){
-        CV_Assert(_Function.empty()==false);
-        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.maxCount,_termcrit.epsilon));
+    ದ್ವಿಗುಣ ConjGradSolverImpl::minimize(ಒಳಹರಿವು_Output_Array x){
+        CV_Assert(_Function.empty()==ಸುಳ್ಳು);
+        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.max_ಎಣಿಕೆ,_termcrit.epsilon));
 
         Mat x_mat=x.getMat();
-        CV_Assert(MIN(x_mat.rows,x_mat.cols)==1);
-        int ndim=MAX(x_mat.rows,x_mat.cols);
+        CV_Assert(MIN(x_mat.ಅಡ್ಡಸಾಲುಗಳು,x_mat.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)==1);
+        ಪೂರ್ಣಾಂಕ ndim=MAX(x_mat.ಅಡ್ಡಸಾಲುಗಳು,x_mat.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
         CV_Assert(x_mat.type()==CV_64FC1);
 
-        if(d.cols!=ndim){
+        ಆದರೆ(d.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ!=ndim){
             d.create(1,ndim);
             r.create(1,ndim);
             r_old.create(1,ndim);
-            minimizeOnTheLine_buf1.create(1,ndim);
-            minimizeOnTheLine_buf2.create(1,ndim);
+            minimize_On_The_ಸಾಲು_buf1.create(1,ndim);
+            minimize_On_The_ಸಾಲು_buf2.create(1,ndim);
         }
 
-        Mat_<double> proxy_x;
-        if(x_mat.rows>1){
+        Mat_<ದ್ವಿಗುಣ> proxy_x;
+        ಆದರೆ(x_mat.ಅಡ್ಡಸಾಲುಗಳು>1){
             buf_x.create(1,ndim);
-            Mat_<double> proxy(ndim,1,buf_x.ptr<double>());
-            x_mat.copyTo(proxy);
+            Mat_<ದ್ವಿಗುಣ> proxy(ndim,1,buf_x.ptr<ದ್ವಿಗುಣ>());
+            x_mat.copy_ಗಮ್ಯ(proxy);
             proxy_x=buf_x;
-        }else{
+        }ಇಲ್ಲದಿದ್ದರೆ{
             proxy_x=x_mat;
         }
-        _Function->getGradient(proxy_x.ptr<double>(),d.ptr<double>());
+        _Function->getGradient(proxy_x.ptr<ದ್ವಿಗುಣ>(),d.ptr<ದ್ವಿಗುಣ>());
         d*=-1.0;
-        d.copyTo(r);
+        d.copy_ಗಮ್ಯ(r);
 
         //here everything goes. check that everything is set properly
-        dprintf(("proxy_x\n"));print_matrix(proxy_x);
-        dprintf(("d first time\n"));print_matrix(d);
-        dprintf(("r\n"));print_matrix(r);
+        dprintf(("proxy_x\n"));print_ಮಾತೃಕೆ(proxy_x);
+        dprintf(("d first time\n"));print_ಮಾತೃಕೆ(d);
+        dprintf(("r\n"));print_ಮಾತೃಕೆ(r);
 
-        for(int count=0;count<_termcrit.maxCount;count++){
-            minimizeOnTheLine(_Function,proxy_x,d,minimizeOnTheLine_buf1,minimizeOnTheLine_buf2);
-            r.copyTo(r_old);
-            _Function->getGradient(proxy_x.ptr<double>(),r.ptr<double>());
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3=0;ಎಣಿಕೆ_3<_termcrit.max_ಎಣಿಕೆ;ಎಣಿಕೆ_3++){
+            minimize_On_The_ಸಾಲು(_Function,proxy_x,d,minimize_On_The_ಸಾಲು_buf1,minimize_On_The_ಸಾಲು_buf2);
+            r.copy_ಗಮ್ಯ(r_old);
+            _Function->getGradient(proxy_x.ptr<ದ್ವಿಗುಣ>(),r.ptr<ದ್ವಿಗುಣ>());
             r*=-1.0;
-            double r_norm_sq=norm(r);
-            if(_termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && r_norm_sq<_termcrit.epsilon){
-                break;
+            ದ್ವಿಗುಣ r_norm_sq=norm(r);
+            ಆದರೆ(_termcrit.type==(ಪದ_Criteria::MAX_ITER+ಪದ_Criteria::EPS) && r_norm_sq<_termcrit.epsilon){
+                ನಿಲ್ಲಿಸು;
             }
             r_norm_sq=r_norm_sq*r_norm_sq;
-            double beta=MAX(0.0,(r_norm_sq-r.dot(r_old))/r_norm_sq);
+            ದ್ವಿಗುಣ beta=MAX(0.0,(r_norm_sq-r.dot(r_old))/r_norm_sq);
             d=r+beta*d;
         }
 
 
 
-        if(x_mat.rows>1){
-            Mat(ndim, 1, CV_64F, proxy_x.ptr<double>()).copyTo(x);
+        ಆದರೆ(x_mat.ಅಡ್ಡಸಾಲುಗಳು>1){
+            Mat(ndim, 1, CV_64F, proxy_x.ptr<ದ್ವಿಗುಣ>()).copy_ಗಮ್ಯ(x);
         }
-        return _Function->calc(proxy_x.ptr<double>());
+        ಹಿಂತಿರುಗಿ _Function->calc(proxy_x.ptr<ದ್ವಿಗುಣ>());
     }
 
     ConjGradSolverImpl::ConjGradSolverImpl(){
         _Function=Ptr<Function>();
     }
-    Ptr<MinProblemSolver::Function> ConjGradSolverImpl::getFunction()const{
-        return _Function;
+    Ptr<MinProblemSolver::Function> ConjGradSolverImpl::getFunction()ಸ್ಥಿರಾಂಕ{
+        ಹಿಂತಿರುಗಿ _Function;
     }
-    void ConjGradSolverImpl::setFunction(const Ptr<Function>& f){
+    ಶೂನ್ಯ ConjGradSolverImpl::ಗಣ_Function(ಸ್ಥಿರಾಂಕ Ptr<Function>& f){
         _Function=f;
     }
-    TermCriteria ConjGradSolverImpl::getTermCriteria()const{
-        return _termcrit;
+    ಪದ_Criteria ConjGradSolverImpl::get_ಪದ_Criteria()ಸ್ಥಿರಾಂಕ{
+        ಹಿಂತಿರುಗಿ _termcrit;
     }
-    void ConjGradSolverImpl::setTermCriteria(const TermCriteria& termcrit){
-        CV_Assert((termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && termcrit.epsilon>0 && termcrit.maxCount>0) ||
-                ((termcrit.type==TermCriteria::MAX_ITER) && termcrit.maxCount>0));
+    ಶೂನ್ಯ ConjGradSolverImpl::ಗಣ_ಪದ_Criteria(ಸ್ಥಿರಾಂಕ ಪದ_Criteria& termcrit){
+        CV_Assert((termcrit.type==(ಪದ_Criteria::MAX_ITER+ಪದ_Criteria::EPS) && termcrit.epsilon>0 && termcrit.max_ಎಣಿಕೆ>0) ||
+                ((termcrit.type==ಪದ_Criteria::MAX_ITER) && termcrit.max_ಎಣಿಕೆ>0));
         _termcrit=termcrit;
     }
     // both minRange & minError are specified by termcrit.epsilon; In addition, user may specify the number of iterations that the algorithm does.
-    Ptr<ConjGradSolver> ConjGradSolver::create(const Ptr<MinProblemSolver::Function>& f, TermCriteria termcrit){
+    Ptr<ConjGradSolver> ConjGradSolver::create(ಸ್ಥಿರಾಂಕ Ptr<MinProblemSolver::Function>& f, ಪದ_Criteria termcrit){
         Ptr<ConjGradSolver> CG = makePtr<ConjGradSolverImpl>();
-        CG->setFunction(f);
-        CG->setTermCriteria(termcrit);
-        return CG;
+        CG->ಗಣ_Function(f);
+        CG->ಗಣ_ಪದ_Criteria(termcrit);
+        ಹಿಂತಿರುಗಿ CG;
     }
 }

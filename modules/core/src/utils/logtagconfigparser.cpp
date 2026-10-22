@@ -2,303 +2,303 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
-#include "logtagconfigparser.hpp"
+#ಅನ್ತರ್ಭಾವ "../precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "logtagconfigparser.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+ನಾಮಾಕಾಶ cv {
+ನಾಮಾಕಾಶ utils {
+ನಾಮಾಕಾಶ logging {
 
-LogTagConfigParser::LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel)
+Log_ಟ್ಯಾಗ್_Config_Parser::Log_ಟ್ಯಾಗ್_Config_Parser(LogLevel defaultUnconfiguredGlobalLevel)
 {
     m_parsedGlobal.namePart = "global";
-    m_parsedGlobal.isGlobal = true;
-    m_parsedGlobal.hasPrefixWildcard = false;
-    m_parsedGlobal.hasSuffixWildcard = false;
+    m_parsedGlobal.isGlobal = ನಿಜ;
+    m_parsedGlobal.has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard = ಸುಳ್ಳು;
+    m_parsedGlobal.hasSuffixWildcard = ಸುಳ್ಳು;
     m_parsedGlobal.level = defaultUnconfiguredGlobalLevel;
 }
 
-LogTagConfigParser::LogTagConfigParser(const std::string& input)
+Log_ಟ್ಯಾಗ್_Config_Parser::Log_ಟ್ಯಾಗ್_Config_Parser(ಸ್ಥಿರಾಂಕ std::string& ಒಳಹರಿವು_2)
 {
-    parse(input);
+    parse(ಒಳಹರಿವು_2);
 }
 
-LogTagConfigParser::~LogTagConfigParser()
+Log_ಟ್ಯಾಗ್_Config_Parser::~Log_ಟ್ಯಾಗ್_Config_Parser()
 {
 }
 
-bool LogTagConfigParser::parse(const std::string& input)
+ತಾರ್ಕಿಕ Log_ಟ್ಯಾಗ್_Config_Parser::parse(ಸ್ಥಿರಾಂಕ std::string& ಒಳಹರಿವು_2)
 {
-    m_input = input;
-    segmentTokens();
-    return (m_malformed.empty());
+    m_ಒಳಹರಿವು = ಒಳಹರಿವು_2;
+    segment_ಟೋಕನುಗಳು();
+    ಹಿಂತಿರುಗಿ (m_malformed.empty());
 }
 
-bool LogTagConfigParser::hasMalformed() const
+ತಾರ್ಕಿಕ Log_ಟ್ಯಾಗ್_Config_Parser::hasMalformed() ಸ್ಥಿರಾಂಕ
 {
-    return !m_malformed.empty();
+    ಹಿಂತಿರುಗಿ !m_malformed.empty();
 }
 
-const LogTagConfig& LogTagConfigParser::getGlobalConfig() const
+ಸ್ಥಿರಾಂಕ Log_ಟ್ಯಾಗ್_Config& Log_ಟ್ಯಾಗ್_Config_Parser::getGlobalConfig() ಸ್ಥಿರಾಂಕ
 {
-    return m_parsedGlobal;
+    ಹಿಂತಿರುಗಿ m_parsedGlobal;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFullNameConfigs() const
+ಸ್ಥಿರಾಂಕ std::vector<Log_ಟ್ಯಾಗ್_Config>& Log_ಟ್ಯಾಗ್_Config_Parser::get_ತುಂಬಿದ_Name_Configs() ಸ್ಥಿರಾಂಕ
 {
-    return m_parsedFullName;
+    ಹಿಂತಿರುಗಿ m_parsed_ತುಂಬಿದ_Name;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFirstPartConfigs() const
+ಸ್ಥಿರಾಂಕ std::vector<Log_ಟ್ಯಾಗ್_Config>& Log_ಟ್ಯಾಗ್_Config_Parser::get_ಮೊದಲ_Part_Configs() ಸ್ಥಿರಾಂಕ
 {
-    return m_parsedFirstPart;
+    ಹಿಂತಿರುಗಿ m_parsed_ಮೊದಲ_Part;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getAnyPartConfigs() const
+ಸ್ಥಿರಾಂಕ std::vector<Log_ಟ್ಯಾಗ್_Config>& Log_ಟ್ಯಾಗ್_Config_Parser::getAnyPartConfigs() ಸ್ಥಿರಾಂಕ
 {
-    return m_parsedAnyPart;
+    ಹಿಂತಿರುಗಿ m_parsedAnyPart;
 }
 
-const std::vector<std::string>& LogTagConfigParser::getMalformed() const
+ಸ್ಥಿರಾಂಕ std::vector<std::string>& Log_ಟ್ಯಾಗ್_Config_Parser::getMalformed() ಸ್ಥಿರಾಂಕ
 {
-    return m_malformed;
+    ಹಿಂತಿರುಗಿ m_malformed;
 }
 
-void LogTagConfigParser::segmentTokens()
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Config_Parser::segment_ಟೋಕನುಗಳು()
 {
-    const size_t len = m_input.length();
-    std::vector<std::pair<size_t, size_t>> startStops;
-    bool wasSeparator = true;
-    for (size_t pos = 0u; pos < len; ++pos)
+    ಸ್ಥಿರಾಂಕ size_t len = m_ಒಳಹರಿವು.length();
+    std::vector<std::pair<size_t, size_t>> ಆರಂಭ_Stops;
+    ತಾರ್ಕಿಕ wasSeparator = ನಿಜ;
+    ಗಾಗಿ (size_t pos = 0u; pos < len; ++pos)
     {
-        char c = m_input[pos];
-        bool isSeparator = (c == ' ' || c == '\t' || c == ';');
-        if (!isSeparator)
+        ಅಕ್ಷರ c = m_ಒಳಹರಿವು[pos];
+        ತಾರ್ಕಿಕ isSeparator = (c == ' ' || c == '\t' || c == ';');
+        ಆದರೆ (!isSeparator)
         {
-            if (wasSeparator)
+            ಆದರೆ (wasSeparator)
             {
-                startStops.emplace_back(pos, pos + 1u);
+                ಆರಂಭ_Stops.emplace_back(pos, pos + 1u);
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                startStops.back().second = pos + 1u;
+                ಆರಂಭ_Stops.back().second = pos + 1u;
             }
         }
         wasSeparator = isSeparator;
     }
-    for (const auto& startStop : startStops)
+    ಗಾಗಿ (ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ& ಆರಂಭ_Stop : ಆರಂಭ_Stops)
     {
-        const auto s = m_input.substr(startStop.first, startStop.second - startStop.first);
+        ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ s = m_ಒಳಹರಿವು.substr(ಆರಂಭ_Stop.first, ಆರಂಭ_Stop.second - ಆರಂಭ_Stop.first);
         parseNameAndLevel(s);
     }
 }
 
-void LogTagConfigParser::parseNameAndLevel(const std::string& s)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Config_Parser::parseNameAndLevel(ಸ್ಥಿರಾಂಕ std::string& s)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = s.length();
+    ಸ್ಥಿರಾಂಕ size_t npos = std::string::npos;
+    ಸ್ಥಿರಾಂಕ size_t len = s.length();
     size_t colonIdx = s.find_first_of(":=");
-    if (colonIdx == npos)
+    ಆದರೆ (colonIdx == npos)
     {
         // See if the whole string is a log level
-        auto parsedLevel = parseLogLevel(s);
-        if (parsedLevel.second)
+        ಸ್ವಯಂಚಾಲಿತ parsedLevel = parseLogLevel(s);
+        ಆದರೆ (parsedLevel.second)
         {
             // If it is, assume the log level is for global
             parseWildcard("", parsedLevel.first);
-            return;
+            ಹಿಂತಿರುಗಿ;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             // not sure what to do.
             m_malformed.push_back(s);
-            return;
+            ಹಿಂತಿರುಗಿ;
         }
     }
-    if (colonIdx == 0u || colonIdx + 1u == len)
+    ಆದರೆ (colonIdx == 0u || colonIdx + 1u == len)
     {
         // malformed (colon or equal sign at beginning or end), cannot do anything
         m_malformed.push_back(s);
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
     size_t colonIdx2 = s.find_first_of(":=", colonIdx + 1u);
-    if (colonIdx2 != npos)
+    ಆದರೆ (colonIdx2 != npos)
     {
         // malformed (more than one colon or equal sign), cannot do anything
         m_malformed.push_back(s);
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    auto parsedLevel = parseLogLevel(s.substr(colonIdx + 1u));
-    if (parsedLevel.second)
+    ಸ್ವಯಂಚಾಲಿತ parsedLevel = parseLogLevel(s.substr(colonIdx + 1u));
+    ಆದರೆ (parsedLevel.second)
     {
         parseWildcard(s.substr(0u, colonIdx), parsedLevel.first);
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         // Cannot recognize the right side of the colon or equal sign.
         // Not sure what to do.
         m_malformed.push_back(s);
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
 }
 
-void LogTagConfigParser::parseWildcard(const std::string& name, LogLevel level)
+ಶೂನ್ಯ Log_ಟ್ಯಾಗ್_Config_Parser::parseWildcard(ಸ್ಥಿರಾಂಕ std::string& name, LogLevel level)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = name.length();
-    if (len == 0u)
+    ಸ್ಥಿರಾಂಕ size_t npos = std::string::npos;
+    ಸ್ಥಿರಾಂಕ size_t len = name.length();
+    ಆದರೆ (len == 0u)
     {
         m_parsedGlobal.level = level;
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    const bool hasPrefixWildcard = (name[0u] == '*');
-    if (hasPrefixWildcard && len == 1u)
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard = (name[0u] == '*');
+    ಆದರೆ (has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard && len == 1u)
     {
         m_parsedGlobal.level = level;
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    const size_t firstNonWildcard = name.find_first_not_of("*.");
-    if (hasPrefixWildcard && firstNonWildcard == npos)
+    ಸ್ಥಿರಾಂಕ size_t ಮೊದಲ_Non_Wildcard = name.find_first_not_of("*.");
+    ಆದರೆ (has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard && ಮೊದಲ_Non_Wildcard == npos)
     {
         m_parsedGlobal.level = level;
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    const bool hasSuffixWildcard = (name[len - 1u] == '*');
-    const size_t lastNonWildcard = name.find_last_not_of("*.");
-    std::string trimmedNamePart = name.substr(firstNonWildcard, lastNonWildcard - firstNonWildcard + 1u);
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ hasSuffixWildcard = (name[len - 1u] == '*');
+    ಸ್ಥಿರಾಂಕ size_t ಕೊನೆಯ_Non_Wildcard = name.find_last_not_of("*.");
+    std::string trimmedNamePart = name.substr(ಮೊದಲ_Non_Wildcard, ಕೊನೆಯ_Non_Wildcard - ಮೊದಲ_Non_Wildcard + 1u);
     // The case of a single asterisk has been handled above;
     // here we only handle the explicit use of "global" in the log config string.
-    const bool isGlobal = (trimmedNamePart == "global");
-    if (isGlobal)
+    ಸ್ಥಿರಾಂಕ ತಾರ್ಕಿಕ isGlobal = (trimmedNamePart == "global");
+    ಆದರೆ (isGlobal)
     {
         m_parsedGlobal.level = level;
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    LogTagConfig result(trimmedNamePart, level, false, hasPrefixWildcard, hasSuffixWildcard);
-    if (hasPrefixWildcard)
+    Log_ಟ್ಯಾಗ್_Config ಫಲಿತಾಂಶ(trimmedNamePart, level, ಸುಳ್ಳು, has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard, hasSuffixWildcard);
+    ಆದರೆ (has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard)
     {
-        m_parsedAnyPart.emplace_back(std::move(result));
+        m_parsedAnyPart.emplace_back(std::move(ಫಲಿತಾಂಶ));
     }
-    else if (hasSuffixWildcard)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (hasSuffixWildcard)
     {
-        m_parsedFirstPart.emplace_back(std::move(result));
+        m_parsed_ಮೊದಲ_Part.emplace_back(std::move(ಫಲಿತಾಂಶ));
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        m_parsedFullName.emplace_back(std::move(result));
+        m_parsed_ತುಂಬಿದ_Name.emplace_back(std::move(ಫಲಿತಾಂಶ));
     }
 }
 
-std::pair<LogLevel, bool> LogTagConfigParser::parseLogLevel(const std::string& s)
+std::pair<LogLevel, ತಾರ್ಕಿಕ> Log_ಟ್ಯಾಗ್_Config_Parser::parseLogLevel(ಸ್ಥಿರಾಂಕ std::string& s)
 {
-    const auto falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, false);
-    const auto make_parsed_result = [](LogLevel lev) -> std::pair<LogLevel, bool>
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, ಸುಳ್ಳು);
+    ಸ್ಥಿರಾಂಕ ಸ್ವಯಂಚಾಲಿತ make_parsed_ಫಲಿತಾಂಶ = [](LogLevel lev) -> std::pair<LogLevel, ತಾರ್ಕಿಕ>
     {
-        return std::make_pair(lev, true);
+        ಹಿಂತಿರುಗಿ std::make_pair(lev, ನಿಜ);
     };
-    const size_t len = s.length();
-    if (len >= 1u)
+    ಸ್ಥಿರಾಂಕ size_t len = s.length();
+    ಆದರೆ (len >= 1u)
     {
-        const char c = (char)std::toupper(s[0]);
-        switch (c)
+        ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ c = (ಅಕ್ಷರ)std::ದೊಡ್ಡ_ಅಕ್ಷರ(s[0]);
+        ಆಯ್ಕೆ (c)
         {
-        case '0':
-            if (len == 1u)
+        ಸ್ಥಿತಿ '0':
+            ಆದರೆ (len == 1u)
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'D':
-            if (len == 1u ||
-                (len == 5u && cv::toUpperCase(s) == "DEBUG"))
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 'D':
+            ಆದರೆ (len == 1u ||
+                (len == 5u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "DEBUG"))
             {
-                return make_parsed_result(LOG_LEVEL_DEBUG);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_DEBUG);
             }
-            if ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
-                (len == 8u && cv::toUpperCase(s) == "DISABLED"))
+            ಆದರೆ ((len == 7u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "DISABLE") ||
+                (len == 8u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "DISABLED"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'E':
-            if (len == 1u ||
-                (len == 5u && cv::toUpperCase(s) == "ERROR"))
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 'E':
+            ಆದರೆ (len == 1u ||
+                (len == 5u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "ERROR"))
             {
-                return make_parsed_result(LOG_LEVEL_ERROR);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_ERROR);
             }
-            break;
-        case 'F':
-            if (len == 1u ||
-                (len == 5u && cv::toUpperCase(s) == "FATAL"))
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 'F':
+            ಆದರೆ (len == 1u ||
+                (len == 5u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "FATAL"))
             {
-                return make_parsed_result(LOG_LEVEL_FATAL);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_FATAL);
             }
-            break;
-        case 'I':
-            if (len == 1u ||
-                (len == 4u && cv::toUpperCase(s) == "INFO"))
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 'I':
+            ಆದರೆ (len == 1u ||
+                (len == 4u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "INFO"))
             {
-                return make_parsed_result(LOG_LEVEL_INFO);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_INFO);
             }
-            break;
-        case 'O':
-            if (len == 3u && cv::toUpperCase(s) == "OFF")
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 'O':
+            ಆದರೆ (len == 3u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "OFF")
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'S':
-            if (len == 1u ||
-                (len == 6u && cv::toUpperCase(s) == "SILENT"))
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 'S':
+            ಆದರೆ (len == 1u ||
+                (len == 6u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "SILENT"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'V':
-            if (len == 1u ||
-                (len == 7u && cv::toUpperCase(s) == "VERBOSE"))
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 'V':
+            ಆದರೆ (len == 1u ||
+                (len == 7u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "VERBOSE"))
             {
-                return make_parsed_result(LOG_LEVEL_VERBOSE);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_VERBOSE);
             }
-            break;
-        case 'W':
-            if (len == 1u ||
-                (len == 4u && cv::toUpperCase(s) == "WARN") ||
-                (len == 7u && cv::toUpperCase(s) == "WARNING") ||
-                (len == 8u && cv::toUpperCase(s) == "WARNINGS"))
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ 'W':
+            ಆದರೆ (len == 1u ||
+                (len == 4u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "WARN") ||
+                (len == 7u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "WARNING") ||
+                (len == 8u && cv::ಗಮ್ಯ_ಊರ್ಧ್ವ_Case(s) == "WARNINGS"))
             {
-                return make_parsed_result(LOG_LEVEL_WARNING);
+                ಹಿಂತಿರುಗಿ make_parsed_ಫಲಿತಾಂಶ(LOG_LEVEL_WARNING);
             }
-            break;
-        default:
-            break;
+            ನಿಲ್ಲಿಸು;
+        ಪೂರ್ವನಿಯೋಜಿತ:
+            ನಿಲ್ಲಿಸು;
         }
         // fall through
     }
-    return falseDontCare;
+    ಹಿಂತಿರುಗಿ falseDontCare;
 }
 
-std::string LogTagConfigParser::toString(LogLevel level)
+std::string Log_ಟ್ಯಾಗ್_Config_Parser::ಗಮ್ಯ_String(LogLevel level)
 {
-    switch (level)
+    ಆಯ್ಕೆ (level)
     {
-    case LOG_LEVEL_SILENT:
-        return "SILENT";
-    case LOG_LEVEL_FATAL:
-        return "FATAL";
-    case LOG_LEVEL_ERROR:
-        return "ERROR";
-    case LOG_LEVEL_WARNING:
-        return "WARNING";
-    case LOG_LEVEL_INFO:
-        return "INFO";
-    case LOG_LEVEL_DEBUG:
-        return "DEBUG";
-    case LOG_LEVEL_VERBOSE:
-        return "VERBOSE";
-    default:
-        return std::to_string((int)level);
+    ಸ್ಥಿತಿ LOG_LEVEL_SILENT:
+        ಹಿಂತಿರುಗಿ "SILENT";
+    ಸ್ಥಿತಿ LOG_LEVEL_FATAL:
+        ಹಿಂತಿರುಗಿ "FATAL";
+    ಸ್ಥಿತಿ LOG_LEVEL_ERROR:
+        ಹಿಂತಿರುಗಿ "ERROR";
+    ಸ್ಥಿತಿ LOG_LEVEL_WARNING:
+        ಹಿಂತಿರುಗಿ "WARNING";
+    ಸ್ಥಿತಿ LOG_LEVEL_INFO:
+        ಹಿಂತಿರುಗಿ "INFO";
+    ಸ್ಥಿತಿ LOG_LEVEL_DEBUG:
+        ಹಿಂತಿರುಗಿ "DEBUG";
+    ಸ್ಥಿತಿ LOG_LEVEL_VERBOSE:
+        ಹಿಂತಿರುಗಿ "VERBOSE";
+    ಪೂರ್ವನಿಯೋಜಿತ:
+        ಹಿಂತಿರುಗಿ std::to_string((ಪೂರ್ಣಾಂಕ)level);
     }
 }
 

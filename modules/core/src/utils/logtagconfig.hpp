@@ -2,50 +2,50 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGCONFIG_HPP
-#define OPENCV_CORE_LOGTAGCONFIG_HPP
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_CORE_LOGTAGCONFIG_HPP
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENCV_CORE_LOGTAGCONFIG_HPP
 
-#if 1 // if not already in precompiled headers
-#include <opencv2/core/utils/logger.defines.hpp>
-#include <string>
-#endif
+#ಆದರೆ 1 // if not already in precompiled headers
+#ಅನ್ತರ್ಭಾವ <opencv2/core/utils/logger.defines.hpp>
+#ಅನ್ತರ್ಭಾವ <string>
+#ಆದರೆ_ಅಂತ್ಯ
 
-namespace cv {
-namespace utils {
-namespace logging {
+ನಾಮಾಕಾಶ cv {
+ನಾಮಾಕಾಶ utils {
+ನಾಮಾಕಾಶ logging {
 
-struct LogTagConfig
+ರಚನೆ Log_ಟ್ಯಾಗ್_Config
 {
     std::string namePart;
     LogLevel level;
-    bool isGlobal;
-    bool hasPrefixWildcard;
-    bool hasSuffixWildcard;
+    ತಾರ್ಕಿಕ isGlobal;
+    ತಾರ್ಕಿಕ has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard;
+    ತಾರ್ಕಿಕ hasSuffixWildcard;
 
-    LogTagConfig()
+    Log_ಟ್ಯಾಗ್_Config()
         : namePart()
         , level()
         , isGlobal()
-        , hasPrefixWildcard()
+        , has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard()
         , hasSuffixWildcard()
     {
     }
 
-    LogTagConfig(const std::string& _namePart, LogLevel _level, bool _isGlobal = false,
-        bool _hasPrefixWildcard = false, bool _hasSuffixWildcard = false)
+    Log_ಟ್ಯಾಗ್_Config(ಸ್ಥಿರಾಂಕ std::string& _namePart, LogLevel _level, ತಾರ್ಕಿಕ _isGlobal = ಸುಳ್ಳು,
+        ತಾರ್ಕಿಕ has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard_2 = ಸುಳ್ಳು, ತಾರ್ಕಿಕ _hasSuffixWildcard = ಸುಳ್ಳು)
         : namePart(_namePart)
         , level(_level)
         , isGlobal(_isGlobal)
-        , hasPrefixWildcard(_hasPrefixWildcard)
+        , has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard(has_ಪೂರ್ವಪ್ರತ್ಯಯ_Wildcard_2)
         , hasSuffixWildcard(_hasSuffixWildcard)
     {
     }
 
-    LogTagConfig(const LogTagConfig&) = default;
-    LogTagConfig(LogTagConfig&&) = default;
-    ~LogTagConfig() = default;
+    Log_ಟ್ಯಾಗ್_Config(ಸ್ಥಿರಾಂಕ Log_ಟ್ಯಾಗ್_Config&) = ಪೂರ್ವನಿಯೋಜಿತ;
+    Log_ಟ್ಯಾಗ್_Config(Log_ಟ್ಯಾಗ್_Config&&) = ಪೂರ್ವನಿಯೋಜಿತ;
+    ~Log_ಟ್ಯಾಗ್_Config() = ಪೂರ್ವನಿಯೋಜಿತ;
 };
 
 }}}
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

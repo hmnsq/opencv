@@ -8,68 +8,68 @@
 // Each piece is reduced by the existing serial code (including the HAL), and the results are
 // combined in piece order.
 
-#ifndef OPENCV_CORE_STAT_PARALLEL_HPP
-#define OPENCV_CORE_STAT_PARALLEL_HPP
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_CORE_STAT_PARALLEL_HPP
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENCV_CORE_STAT_PARALLEL_HPP
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-struct StatChunk
+ರಚನೆ StatChunk
 {
-    Mat src, mask;
-    size_t firstElem;   // row-major index of the first element of the piece in the whole array
+    Mat src, ಮುಖವಾಡ;
+    size_t ಮೊದಲ_Elem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ ತಾರ್ಕಿಕ ವಿಭಜಿಸು_For_Parallel_Stat(ಸ್ಥಿರಾಂಕ Mat& src, ಸ್ಥಿರಾಂಕ Mat& ಮುಖವಾಡ, std::vector<StatChunk>& chunks)
 {
-    const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    ಸ್ಥಿರಾಂಕ size_t ಒಟ್ಟು = src.ಒಟ್ಟು(), work = ಒಟ್ಟು*src.channels();
+    ಆದರೆ (work < ((size_t)1 << 18))
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ nthreads = get_ಅಂಕೆ_ಎಳೆಗಳು();
+    ಆದರೆ (nthreads <= 1)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ n = (ಪೂರ್ಣಾಂಕ)std::min((size_t)nthreads*2, work >> 16);
+    ಆದರೆ (n < 2)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    ಆದರೆ (src.dims <= 2 && src.ಅಡ್ಡಸಾಲುಗಳು >= n)
     {
-        for (int i = 0; i < n; i++)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            ಪೂರ್ಣಾಂಕ r0 = (ಪೂರ್ಣಾಂಕ)((int64)src.ಅಡ್ಡಸಾಲುಗಳು*i/n), r1 = (ಪೂರ್ಣಾಂಕ)((int64)src.ಅಡ್ಡಸಾಲುಗಳು*(i + 1)/n);
             StatChunk c;
-            c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
-                c.mask = mask.rowRange(r0, r1);
-            c.firstElem = (size_t)r0*src.cols;
+            c.src = src.ಅಡ್ಡಸಾಲು_Range_2(r0, r1);
+            ಆದರೆ (!ಮುಖವಾಡ.empty())
+                c.ಮುಖವಾಡ = ಮುಖವಾಡ.ಅಡ್ಡಸಾಲು_Range_2(r0, r1);
+            c.ಮೊದಲ_Elem = (size_t)r0*src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
             chunks.push_back(c);
         }
-        return true;
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    ಆದರೆ (src.isContinuous() && (ಮುಖವಾಡ.empty() || ಮುಖವಾಡ.isContinuous()) && ಒಟ್ಟು <= (size_t)ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ)
     {
-        for (int i = 0; i < n; i++)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < n; i++)
         {
-            size_t e0 = total*i/n, e1 = total*(i + 1)/n;
+            size_t e0 = ಒಟ್ಟು*i/n, e1 = ಒಟ್ಟು*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
-            c.firstElem = e0;
+            c.src = Mat(1, (ಪೂರ್ಣಾಂಕ)(e1 - e0), src.type(), (ಶೂನ್ಯ*)(src.ದತ್ತಾಂಶ + e0*src.elem_ಗಾತ್ರ()));
+            ಆದರೆ (!ಮುಖವಾಡ.empty())
+                c.ಮುಖವಾಡ = Mat(1, (ಪೂರ್ಣಾಂಕ)(e1 - e0), ಮುಖವಾಡ.type(), (ಶೂನ್ಯ*)(ಮುಖವಾಡ.ದತ್ತಾಂಶ + e0*ಮುಖವಾಡ.elem_ಗಾತ್ರ()));
+            c.ಮೊದಲ_Elem = e0;
             chunks.push_back(c);
         }
-        return true;
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
-    return false;
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ size_t chunk_ಸೂಚ್ಯಂಕ_ಗಮ್ಯ_Elem(ಸ್ಥಿರಾಂಕ StatChunk& c, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    ಹಿಂತಿರುಗಿ c.ಮೊದಲ_Elem + (size_t)idx[0]*c.src.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ + idx[1];
 }
 
 } // namespace cv
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

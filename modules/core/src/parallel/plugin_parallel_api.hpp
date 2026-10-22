@@ -2,38 +2,38 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef PARALLEL_PLUGIN_API_HPP
-#define PARALLEL_PLUGIN_API_HPP
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ PARALLEL_PLUGIN_API_HPP
+#ವ್ಯಾಖ್ಯಾನಿಸು PARALLEL_PLUGIN_API_HPP
 
-#include <opencv2/core/cvdef.h>
-#include <opencv2/core/llapi/llapi.h>
+#ಅನ್ತರ್ಭಾವ <opencv2/core/cvdef.h>
+#ಅನ್ತರ್ಭಾವ <opencv2/core/llapi/llapi.h>
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/parallel/parallel_backend.hpp"
 
-#if !defined(BUILD_PLUGIN)
+#ಆದರೆ !defined(BUILD_PLUGIN)
 
 /// increased for backward-compatible changes, e.g. add new function
 /// Caller API <= Plugin API -> plugin is fully compatible
 /// Caller API > Plugin API -> plugin is not fully compatible, caller should use extra checks to use plugins with older API
-#define API_VERSION 0 // preview
+#ವ್ಯಾಖ್ಯಾನಿಸು API_ಆವೃತ್ತಿ 0 // preview
 
 /// increased for incompatible changes, e.g. remove function argument
 /// Caller ABI == Plugin ABI -> plugin is compatible
 /// Caller ABI > Plugin ABI -> plugin is not compatible, caller should use shim code to use old ABI plugins (caller may know how lower ABI works, so it is possible)
 /// Caller ABI < Plugin ABI -> plugin can't be used (plugin should provide interface with lower ABI to handle that)
-#define ABI_VERSION 0 // preview
+#ವ್ಯಾಖ್ಯಾನಿಸು ABI_ಆವೃತ್ತಿ 0 // preview
 
-#else // !defined(BUILD_PLUGIN)
+#ಇಲ್ಲದಿದ್ದರೆ // !defined(BUILD_PLUGIN)
 
-#if !defined(ABI_VERSION) || !defined(API_VERSION)
-#error "Plugin must define ABI_VERSION and API_VERSION before including parallel_plugin_api.hpp"
-#endif
+#ಆದರೆ !defined(ABI_ಆವೃತ್ತಿ) || !defined(API_ಆವೃತ್ತಿ)
+#ದೋಷ "Plugin must define ABI_VERSION and API_VERSION before including parallel_plugin_api.hpp"
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif // !defined(BUILD_PLUGIN)
+#ಆದರೆ_ಅಂತ್ಯ // !defined(BUILD_PLUGIN)
 
-typedef cv::parallel::ParallelForAPI* CvPluginParallelBackendAPI;
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ cv::parallel::ParallelForAPI* CvPluginParallelBackendAPI;
 
-struct OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
+ರಚನೆ OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
 {
     /** @brief Get parallel backend API instance
 
@@ -41,32 +41,32 @@ struct OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
 
     @note API-CALL 1, API-Version == 0
      */
-    CvResult (CV_API_CALL *getInstance)(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT;
+    Cv_ಫಲಿತಾಂಶ (CV_API_CALL *getInstance)(CV_ಹೊರಹೋಗು CvPluginParallelBackendAPI* handle) CV_NOEXCEPT;
 }; // OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
 
-typedef struct OpenCV_Core_Parallel_Plugin_API_v0
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ರಚನೆ OpenCV_Core_Parallel_Plugin_API_v0
 {
-    OpenCV_API_Header api_header;
-    struct OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries v0;
+    Open_CV_API_ಶೀರ್ಷಿಕೆ api_ಶೀರ್ಷಿಕೆ;
+    ರಚನೆ OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries v0;
 } OpenCV_Core_Parallel_Plugin_API_v0;
 
-#if ABI_VERSION == 0 && API_VERSION == 0
-typedef OpenCV_Core_Parallel_Plugin_API_v0 OpenCV_Core_Parallel_Plugin_API;
-#else
-#error "Not supported configuration: check ABI_VERSION/API_VERSION"
-#endif
+#ಆದರೆ ABI_ಆವೃತ್ತಿ == 0 && API_ಆವೃತ್ತಿ == 0
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ OpenCV_Core_Parallel_Plugin_API_v0 OpenCV_Core_Parallel_Plugin_API;
+#ಇಲ್ಲದಿದ್ದರೆ
+#ದೋಷ "Not supported configuration: check ABI_VERSION/API_VERSION"
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef BUILD_PLUGIN
-extern "C" {
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BUILD_PLUGIN
+ಬಾಹ್ಯ "C" {
 
 CV_PLUGIN_EXPORTS
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0
-        (int requested_abi_version, int requested_api_version, void* reserved /*NULL*/) CV_NOEXCEPT;
+ಸ್ಥಿರಾಂಕ OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0
+        (ಪೂರ್ಣಾಂಕ requested_abi_ಆವೃತ್ತಿ, ಪೂರ್ಣಾಂಕ requested_api_ಆವೃತ್ತಿ, ಶೂನ್ಯ* reserved /*NULL*/) CV_NOEXCEPT;
 
 }  // extern "C"
-#else  // BUILD_PLUGIN
-typedef const OpenCV_Core_Parallel_Plugin_API* (CV_API_CALL *FN_opencv_core_parallel_plugin_init_t)
-        (int requested_abi_version, int requested_api_version, void* reserved /*NULL*/);
-#endif  // BUILD_PLUGIN
+#ಇಲ್ಲದಿದ್ದರೆ  // BUILD_PLUGIN
+ಪ್ರಕಾರವ್ಯಾಖ್ಯೆ ಸ್ಥಿರಾಂಕ OpenCV_Core_Parallel_Plugin_API* (CV_API_CALL *FN_opencv_core_parallel_plugin_init_t)
+        (ಪೂರ್ಣಾಂಕ requested_abi_ಆವೃತ್ತಿ, ಪೂರ್ಣಾಂಕ requested_api_ಆವೃತ್ತಿ, ಶೂನ್ಯ* reserved /*NULL*/);
+#ಆದರೆ_ಅಂತ್ಯ  // BUILD_PLUGIN
 
-#endif // PARALLEL_PLUGIN_API_HPP
+#ಆದರೆ_ಅಂತ್ಯ // PARALLEL_PLUGIN_API_HPP

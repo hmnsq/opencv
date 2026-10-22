@@ -6,168 +6,168 @@
 // Not a standalone header, part of parallel.cpp
 //
 
-#include "opencv2/core/utils/filesystem.private.hpp"  // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಅನ್ತರ್ಭಾವ "opencv2/core/utils/filesystem.private.hpp"  // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-namespace cv { namespace parallel {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ parallel {
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
-#define DECLARE_DYNAMIC_BACKEND(name) \
+#ಆದರೆ OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#ವ್ಯಾಖ್ಯಾನಿಸು DECLARE_DYNAMIC_BACKEND(name) \
 ParallelBackendInfo { \
     1000, name, createPluginParallelBackendFactory(name) \
 },
-#else
-#define DECLARE_DYNAMIC_BACKEND(name) /* nothing */
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು DECLARE_DYNAMIC_BACKEND(name) /* nothing */
+#ಆದರೆ_ಅಂತ್ಯ
 
-#define DECLARE_STATIC_BACKEND(name, createBackendAPI) \
+#ವ್ಯಾಖ್ಯಾನಿಸು DECLARE_STATIC_BACKEND(name, createBackendAPI) \
 ParallelBackendInfo { \
-    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { return createBackendAPI(); }) \
+    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { ಹಿಂತಿರುಗಿ createBackendAPI(); }) \
 },
 
-static
+ಸ್ಥಿರ
 std::vector<ParallelBackendInfo>& getBuiltinParallelBackendsInfo()
 {
-    static std::vector<ParallelBackendInfo> g_backends
+    ಸ್ಥಿರ std::vector<ParallelBackendInfo> g_backends
     {
-#ifdef HAVE_TBB
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TBB
         DECLARE_STATIC_BACKEND("TBB", createParallelBackendTBB)
-#elif defined(PARALLEL_ENABLE_PLUGINS)
+#ಅಥವಾಆದರೆ defined(PARALLEL_ENABLE_PLUGINS)
         DECLARE_DYNAMIC_BACKEND("ONETBB")   // dedicated oneTBB plugin (interface >= 12000, binary incompatibe with TBB 2017-2020)
         DECLARE_DYNAMIC_BACKEND("TBB")      // generic TBB plugins
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
-#ifdef HAVE_OPENMP
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENMP
         DECLARE_STATIC_BACKEND("OPENMP", createParallelBackendOpenMP)
-#elif defined(PARALLEL_ENABLE_PLUGINS)
+#ಅಥವಾಆದರೆ defined(PARALLEL_ENABLE_PLUGINS)
         DECLARE_DYNAMIC_BACKEND("OPENMP")  // TODO Intel OpenMP?
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     };
-    return g_backends;
+    ಹಿಂತಿರುಗಿ g_backends;
 }
 
-static
-bool sortByPriority(const ParallelBackendInfo &lhs, const ParallelBackendInfo &rhs)
+ಸ್ಥಿರ
+ತಾರ್ಕಿಕ ವಿಂಗಡಿಸು_By_ಆದ್ಯತೆ(ಸ್ಥಿರಾಂಕ ParallelBackendInfo &lhs, ಸ್ಥಿರಾಂಕ ParallelBackendInfo &rhs)
 {
-    return lhs.priority > rhs.priority;
+    ಹಿಂತಿರುಗಿ lhs.ಆದ್ಯತೆ > rhs.ಆದ್ಯತೆ;
 }
 
 /** @brief Manages list of enabled backends
  */
-class ParallelBackendRegistry
+ವರ್ಗ ParallelBackendRegistry
 {
-protected:
+ಸಂರಕ್ಷಿತ:
     std::vector<ParallelBackendInfo> enabledBackends;
     ParallelBackendRegistry()
     {
         enabledBackends = getBuiltinParallelBackendsInfo();
-        int N = (int)enabledBackends.size();
-        for (int i = 0; i < N; i++)
+        ಪೂರ್ಣಾಂಕ N = (ಪೂರ್ಣಾಂಕ)enabledBackends.size();
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[i];
-            info.priority = 1000 - i * 10;
+            info.ಆದ್ಯತೆ = 1000 - i * 10;
         }
-        CV_LOG_DEBUG(NULL, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
-        if (readPrioritySettings())
+        CV_LOG_DEBUG(ಖಾಲಿ, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
+        ಆದರೆ (read_ಆದ್ಯತೆ_Settings())
         {
-            CV_LOG_INFO(NULL, "core(parallel): Updated backends priorities: " << dumpBackends());
-            N = (int)enabledBackends.size();
+            CV_LOG_INFO(ಖಾಲಿ, "core(parallel): Updated backends priorities: " << dumpBackends());
+            N = (ಪೂರ್ಣಾಂಕ)enabledBackends.size();
         }
-        int enabled = 0;
-        for (int i = 0; i < N; i++)
+        ಪೂರ್ಣಾಂಕ enabled = 0;
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[enabled];
-            if (enabled != i)
+            ಆದರೆ (enabled != i)
                 info = enabledBackends[i];
-            size_t param_priority = utils::getConfigurationParameterSizeT(cv::format("OPENCV_PARALLEL_PRIORITY_%s", info.name.c_str()).c_str(), (size_t)info.priority);
-            CV_Assert(param_priority == (size_t)(int)param_priority); // overflow check
-            if (param_priority > 0)
+            size_t param_ಆದ್ಯತೆ = utils::get_Configuration_Parameter_ಗಾತ್ರ_T(cv::format("OPENCV_PARALLEL_PRIORITY_%s", info.name.c_str()).c_str(), (size_t)info.ಆದ್ಯತೆ);
+            CV_Assert(param_ಆದ್ಯತೆ == (size_t)(ಪೂರ್ಣಾಂಕ)param_ಆದ್ಯತೆ); // overflow check
+            ಆದರೆ (param_ಆದ್ಯತೆ > 0)
             {
-                info.priority = (int)param_priority;
+                info.ಆದ್ಯತೆ = (ಪೂರ್ಣಾಂಕ)param_ಆದ್ಯತೆ;
                 enabled++;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                CV_LOG_INFO(NULL, "core(parallel): Disable backend: " << info.name);
+                CV_LOG_INFO(ಖಾಲಿ, "core(parallel): Disable backend: " << info.name);
             }
         }
         enabledBackends.resize(enabled);
-        CV_LOG_DEBUG(NULL, "core(parallel): Available backends(" << enabled << "): " << dumpBackends());
-        std::sort(enabledBackends.begin(), enabledBackends.end(), sortByPriority);
-        CV_LOG_INFO(NULL, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
+        CV_LOG_DEBUG(ಖಾಲಿ, "core(parallel): Available backends(" << enabled << "): " << dumpBackends());
+        std::sort(enabledBackends.begin(), enabledBackends.end(), ವಿಂಗಡಿಸು_By_ಆದ್ಯತೆ);
+        CV_LOG_INFO(ಖಾಲಿ, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
     }
 
-    static std::vector<std::string> tokenize_string(const std::string& input, char token)
+    ಸ್ಥಿರ std::vector<std::string> tokenize_string(ಸ್ಥಿರಾಂಕ std::string& ಒಳಹರಿವು_2, ಅಕ್ಷರ token)
     {
-        std::vector<std::string> result;
+        std::vector<std::string> ಫಲಿತಾಂಶ;
         std::string::size_type prev_pos = 0, pos = 0;
-        while((pos = input.find(token, pos)) != std::string::npos)
+        ಆಗ((pos = ಒಳಹರಿವು_2.find(token, pos)) != std::string::npos)
         {
-            result.push_back(input.substr(prev_pos, pos-prev_pos));
+            ಫಲಿತಾಂಶ.push_back(ಒಳಹರಿವು_2.substr(prev_pos, pos-prev_pos));
             prev_pos = ++pos;
         }
-        result.push_back(input.substr(prev_pos));
-        return result;
+        ಫಲಿತಾಂಶ.push_back(ಒಳಹರಿವು_2.substr(prev_pos));
+        ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
     }
-    bool readPrioritySettings()
+    ತಾರ್ಕಿಕ read_ಆದ್ಯತೆ_Settings()
     {
-        bool hasChanges = false;
+        ತಾರ್ಕಿಕ hasChanges = ಸುಳ್ಳು;
         cv::String prioritized_backends = utils::getConfigurationParameterString("OPENCV_PARALLEL_PRIORITY_LIST");
-        if (prioritized_backends.empty())
-            return hasChanges;
-        CV_LOG_INFO(NULL, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
-        const std::vector<std::string> names = tokenize_string(prioritized_backends, ',');
-        for (size_t i = 0; i < names.size(); i++)
+        ಆದರೆ (prioritized_backends.empty())
+            ಹಿಂತಿರುಗಿ hasChanges;
+        CV_LOG_INFO(ಖಾಲಿ, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
+        ಸ್ಥಿರಾಂಕ std::vector<std::string> ಹೆಸರುಗಳು_2 = tokenize_string(prioritized_backends, ',');
+        ಗಾಗಿ (size_t i = 0; i < ಹೆಸರುಗಳು_2.size(); i++)
         {
-            const std::string& name = names[i];
-            int priority = (int)(100000 + (names.size() - i) * 1000);
-            bool found = false;
-            for (size_t k = 0; k < enabledBackends.size(); k++)
+            ಸ್ಥಿರಾಂಕ std::string& name = ಹೆಸರುಗಳು_2[i];
+            ಪೂರ್ಣಾಂಕ ಆದ್ಯತೆ = (ಪೂರ್ಣಾಂಕ)(100000 + (ಹೆಸರುಗಳು_2.size() - i) * 1000);
+            ತಾರ್ಕಿಕ ಸಿಕ್ಕಿತು = ಸುಳ್ಳು;
+            ಗಾಗಿ (size_t k = 0; k < enabledBackends.size(); k++)
             {
                 ParallelBackendInfo& info = enabledBackends[k];
-                if (name == info.name)
+                ಆದರೆ (name == info.name)
                 {
-                    info.priority = priority;
-                    CV_LOG_DEBUG(NULL, "core(parallel): New backend priority: '" << name << "' => " << info.priority);
-                    found = true;
-                    hasChanges = true;
-                    break;
+                    info.ಆದ್ಯತೆ = ಆದ್ಯತೆ;
+                    CV_LOG_DEBUG(ಖಾಲಿ, "core(parallel): New backend priority: '" << name << "' => " << info.ಆದ್ಯತೆ);
+                    ಸಿಕ್ಕಿತು = ನಿಜ;
+                    hasChanges = ನಿಜ;
+                    ನಿಲ್ಲಿಸು;
                 }
             }
-            if (!found)
+            ಆದರೆ (!ಸಿಕ್ಕಿತು)
             {
-                CV_LOG_INFO(NULL, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
-                enabledBackends.push_back(ParallelBackendInfo{priority, name, createPluginParallelBackendFactory(name)});
-                hasChanges = true;
+                CV_LOG_INFO(ಖಾಲಿ, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
+                enabledBackends.push_back(ParallelBackendInfo{ಆದ್ಯತೆ, name, createPluginParallelBackendFactory(name)});
+                hasChanges = ನಿಜ;
             }
         }
-        return hasChanges;
+        ಹಿಂತಿರುಗಿ hasChanges;
     }
-public:
-    std::string dumpBackends() const
+ಸಾರ್ವಜನಿಕ:
+    std::string dumpBackends() ಸ್ಥಿರಾಂಕ
     {
         std::ostringstream os;
-        for (size_t i = 0; i < enabledBackends.size(); i++)
+        ಗಾಗಿ (size_t i = 0; i < enabledBackends.size(); i++)
         {
-            if (i > 0) os << "; ";
-            const ParallelBackendInfo& info = enabledBackends[i];
-            os << info.name << '(' << info.priority << ')';
+            ಆದರೆ (i > 0) os << "; ";
+            ಸ್ಥಿರಾಂಕ ParallelBackendInfo& info = enabledBackends[i];
+            os << info.name << '(' << info.ಆದ್ಯತೆ << ')';
         }
-        return os.str();
+        ಹಿಂತಿರುಗಿ os.str();
     }
 
-    static ParallelBackendRegistry& getInstance()
+    ಸ್ಥಿರ ParallelBackendRegistry& getInstance()
     {
-        static ParallelBackendRegistry g_instance;
-        return g_instance;
+        ಸ್ಥಿರ ParallelBackendRegistry g_instance;
+        ಹಿಂತಿರುಗಿ g_instance;
     }
 
-    inline const std::vector<ParallelBackendInfo>& getEnabledBackends() const { return enabledBackends; }
+    ಸಾಲೊಳಗೆ ಸ್ಥಿರಾಂಕ std::vector<ParallelBackendInfo>& getEnabledBackends() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ enabledBackends; }
 };
 
 
-const std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
+ಸ್ಥಿರಾಂಕ std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
 {
-    return cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
+    ಹಿಂತಿರುಗಿ cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
 }
 
 }} // namespace

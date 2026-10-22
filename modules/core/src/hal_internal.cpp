@@ -42,325 +42,325 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "hal_internal.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "hal_internal.hpp"
 
-#ifdef HAVE_LAPACK
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_LAPACK
 
-#include "opencv_lapack.h"
+#ಅನ್ತರ್ಭಾವ "opencv_lapack.h"
 
-#include <cmath>
-#include <algorithm>
-#include <typeinfo>
-#include <limits>
-#include <complex>
-#include <vector>
+#ಅನ್ತರ್ಭಾವ <cmath>
+#ಅನ್ತರ್ಭಾವ <algorithm>
+#ಅನ್ತರ್ಭಾವ <typeinfo>
+#ಅನ್ತರ್ಭಾವ <limits>
+#ಅನ್ತರ್ಭಾವ <complex>
+#ಅನ್ತರ್ಭಾವ <vector>
 
-#define HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH 100
-#define HAL_GEMM_SMALL_MATRIX_THRESH 100
-#define HAL_SVD_SMALL_MATRIX_THRESH 25
-#define HAL_QR_SMALL_MATRIX_THRESH 30
-#define HAL_LU_SMALL_MATRIX_THRESH 100
-#define HAL_CHOLESKY_SMALL_MATRIX_THRESH 100
+#ವ್ಯಾಖ್ಯಾನಿಸು HAL_GEMM_SMALL_COMPLEX_ಮಾತೃಕೆ_THRESH 100
+#ವ್ಯಾಖ್ಯಾನಿಸು HAL_GEMM_SMALL_ಮಾತೃಕೆ_THRESH 100
+#ವ್ಯಾಖ್ಯಾನಿಸು HAL_SVD_SMALL_ಮಾತೃಕೆ_THRESH 25
+#ವ್ಯಾಖ್ಯಾನಿಸು HAL_QR_SMALL_ಮಾತೃಕೆ_THRESH 30
+#ವ್ಯಾಖ್ಯಾನಿಸು HAL_LU_SMALL_ಮಾತೃಕೆ_THRESH 100
+#ವ್ಯಾಖ್ಯಾನಿಸು HAL_CHOLESKY_SMALL_ಮಾತೃಕೆ_THRESH 100
 
-#if defined(__clang__) && defined(__has_feature)
-#if __has_feature(memory_sanitizer)
-#include <sanitizer/msan_interface.h>
-#define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) \
+#ಆದರೆ defined(__clang__) && defined(__has_feature)
+#ಆದರೆ __has_feature(ಸ್ಮರಣೆ_sanitizer)
+#ಅನ್ತರ್ಭಾವ <sanitizer/msan_interface.h>
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(address, size) \
 __msan_unpoison(address, size)
-#define CV_ANNOTATE_NO_SANITIZE_MEMORY __attribute__((no_sanitize("memory")))
-#endif
-#endif
-#ifndef CV_ANNOTATE_MEMORY_IS_INITIALIZED
-#define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) do { } while(0)
-#define CV_ANNOTATE_NO_SANITIZE_MEMORY
-#endif
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_ANNOTATE_NO_SANITIZE_ಸ್ಮರಣೆ __attribute__((no_sanitize("memory")))
+#ಆದರೆ_ಅಂತ್ಯ
+#ಆದರೆ_ಅಂತ್ಯ
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(address, size) ಮಾಡು { } ಆಗ(0)
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_ANNOTATE_NO_SANITIZE_ಸ್ಮರಣೆ
+#ಆದರೆ_ಅಂತ್ಯ
 
-#if defined(__APPLE__) && defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#endif
+#ಆದರೆ defined(__APPLE__) && defined(__clang__)
+#ಸೂಚನೆ clang diagnostic push
+#ಸೂಚನೆ clang diagnostic ignored "-Wdeprecated-declarations"
+#ಆದರೆ_ಅಂತ್ಯ
 
 //lapack stores matrices in column-major order so transposing is needed everywhere
-template <typename fptype> static inline void
-transpose_square_inplace(fptype *src, size_t src_ld, size_t m)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಶೂನ್ಯ
+transpose_ವರ್ಗಫಲ_inplace(fptype *src, size_t src_ld, size_t m)
 {
-    for(size_t i = 0; i < m - 1; i++)
-        for(size_t j = i + 1; j < m; j++)
+    ಗಾಗಿ(size_t i = 0; i < m - 1; i++)
+        ಗಾಗಿ(size_t j = i + 1; j < m; j++)
             std::swap(src[j*src_ld + i], src[i*src_ld + j]);
 }
 
-template <typename fptype> static inline void
-transpose(const fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಶೂನ್ಯ
+transpose(ಸ್ಥಿರಾಂಕ fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    ಗಾಗಿ(size_t i = 0; i < m; i++)
+        ಗಾಗಿ(size_t j = 0; j < n; j++)
             dst[j*dst_ld + i] = src[i*src_ld + j];
 }
 
-template <typename fptype> static inline void
-copy_matrix(const fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಶೂನ್ಯ
+copy_ಮಾತೃಕೆ(ಸ್ಥಿರಾಂಕ fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    ಗಾಗಿ(size_t i = 0; i < m; i++)
+        ಗಾಗಿ(size_t j = 0; j < n; j++)
             dst[i*dst_ld + j] = src[i*src_ld + j];
 }
 
-template <typename fptype> static inline void
-set_value(fptype *dst, size_t dst_ld, fptype value, size_t m, size_t n)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಶೂನ್ಯ
+ಗಣ_ಮೌಲ್ಯ_2(fptype *dst, size_t dst_ld, fptype value, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    ಗಾಗಿ(size_t i = 0; i < m; i++)
+        ಗಾಗಿ(size_t j = 0; j < n; j++)
             dst[i*dst_ld + j] = value;
 }
 
 // MSAN can't see that the fortran LAPACK functions initialize `info`
-template <typename fptype> static inline int
-CV_ANNOTATE_NO_SANITIZE_MEMORY lapack_LU(fptype* a, size_t a_step, int m, fptype* b, size_t b_step, int n, int* info)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ
+CV_ANNOTATE_NO_SANITIZE_ಸ್ಮರಣೆ lapack_LU(fptype* a, size_t a_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, fptype* b, size_t b_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    cv::AutoBuffer<long> piv_buff(m);
-    long lda = (long)(a_step / sizeof(fptype));
-    long _m = static_cast<long>(m), _n = static_cast<long>(n);
-    long _info[1];
-#else
-    cv::AutoBuffer<int> piv_buff(m);
-    int lda = (int)(a_step / sizeof(fptype));
-    int _m = m, _n = n;
-    int* _info = info;
-#endif
-    auto piv = piv_buff.data();
+#ಆದರೆ defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    cv::Auto_ಬಫರ್<ದೀರ್ಘ> piv_buff(m);
+    ದೀರ್ಘ lda = (ದೀರ್ಘ)(a_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ದೀರ್ಘ _m = static_cast<ದೀರ್ಘ>(m), _n = static_cast<ದೀರ್ಘ>(n);
+    ದೀರ್ಘ _info[1];
+#ಇಲ್ಲದಿದ್ದರೆ
+    cv::Auto_ಬಫರ್<ಪೂರ್ಣಾಂಕ> piv_buff(m);
+    ಪೂರ್ಣಾಂಕ lda = (ಪೂರ್ಣಾಂಕ)(a_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ಪೂರ್ಣಾಂಕ _m = m, _n = n;
+    ಪೂರ್ಣಾಂಕ* _info = info;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಸ್ವಯಂಚಾಲಿತ piv = piv_buff.ದತ್ತಾಂಶ();
 
-    transpose_square_inplace(a, lda, m);
+    transpose_ವರ್ಗಫಲ_inplace(a, lda, m);
 
-    if(b)
+    ಆದರೆ(b)
     {
-        if(n == 1 && b_step == sizeof(fptype))
+        ಆದರೆ(n == 1 && b_ಹೆಜ್ಜೆ == ಗಾತ್ರ(fptype))
         {
-            if(typeid(fptype) == typeid(float))
-                sgesv_(&_m, &_n, (float*)a, &lda, piv, (float*)b, &_m, _info);
-            else if(typeid(fptype) == typeid(double))
-                dgesv_(&_m, &_n, (double*)a, &lda, piv, (double*)b, &_m, _info);
+            ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+                sgesv_(&_m, &_n, (ದಶಮಾಂಶ*)a, &lda, piv, (ದಶಮಾಂಶ*)b, &_m, _info);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+                dgesv_(&_m, &_n, (ದ್ವಿಗುಣ*)a, &lda, piv, (ದ್ವಿಗುಣ*)b, &_m, _info);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            int ldb = (int)(b_step / sizeof(fptype));
+            ಪೂರ್ಣಾಂಕ ldb = (ಪೂರ್ಣಾಂಕ)(b_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
             std::vector<fptype> tmpB(m*n+1);
 
             transpose(b, ldb, &tmpB[0], m, m, n);
 
-            if(typeid(fptype) == typeid(float))
-                sgesv_(&_m, &_n, (float*)a, &lda, piv, (float*)&tmpB[0], &_m, _info);
-            else if(typeid(fptype) == typeid(double))
-                dgesv_(&_m, &_n, (double*)a, &lda, piv, (double*)&tmpB[0], &_m, _info);
+            ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+                sgesv_(&_m, &_n, (ದಶಮಾಂಶ*)a, &lda, piv, (ದಶಮಾಂಶ*)&tmpB[0], &_m, _info);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+                dgesv_(&_m, &_n, (ದ್ವಿಗುಣ*)a, &lda, piv, (ದ್ವಿಗುಣ*)&tmpB[0], &_m, _info);
 
             transpose(&tmpB[0], m, b, ldb, n, m);
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if(typeid(fptype) == typeid(float))
-            sgetrf_(&_m, &_m, (float*)a, &lda, piv, _info);
-        else if(typeid(fptype) == typeid(double))
-            dgetrf_(&_m, &_m, (double*)a, &lda, piv, _info);
+        ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+            sgetrf_(&_m, &_m, (ದಶಮಾಂಶ*)a, &lda, piv, _info);
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+            dgetrf_(&_m, &_m, (ದ್ವಿಗುಣ*)a, &lda, piv, _info);
     }
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
-#endif
-    int retcode = *info >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
+#ಆದರೆ defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<ಪೂರ್ಣಾಂಕ>(_info[0]);
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ retcode = *info >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-    int sign = 0;
-    if(*info == 0)
+    ಪೂರ್ಣಾಂಕ sign = 0;
+    ಆದರೆ(*info == 0)
     {
-        for(int i = 0; i < m; i++)
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = 0; i < m; i++)
             sign ^= piv[i] != i + 1;
         *info = sign ? -1 : 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
         *info = 0; //in opencv LU function zero means error
 
-    return retcode;
+    ಹಿಂತಿರುಗಿ retcode;
 }
 
-template <typename fptype> static inline int
-lapack_Cholesky(fptype* a, size_t a_step, int m, fptype* b, size_t b_step, int n, bool* info)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ
+lapack_Cholesky(fptype* a, size_t a_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, fptype* b, size_t b_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ತಾರ್ಕಿಕ* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    long _m = static_cast<long>(m), _n = static_cast<long>(n);
-    long lapackStatus = 0;
-    long lda = (long)(a_step / sizeof(fptype));
-#else
-    int _m = m, _n = n;
-    int lapackStatus = 0;
-    int lda = (int)(a_step / sizeof(fptype));
-#endif
-    char L[] = {'L', '\0'};
+#ಆದರೆ defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    ದೀರ್ಘ _m = static_cast<ದೀರ್ಘ>(m), _n = static_cast<ದೀರ್ಘ>(n);
+    ದೀರ್ಘ lapack_ಸ್ಥಿತಿ = 0;
+    ದೀರ್ಘ lda = (ದೀರ್ಘ)(a_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಪೂರ್ಣಾಂಕ _m = m, _n = n;
+    ಪೂರ್ಣಾಂಕ lapack_ಸ್ಥಿತಿ = 0;
+    ಪೂರ್ಣಾಂಕ lda = (ಪೂರ್ಣಾಂಕ)(a_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+#ಆದರೆ_ಅಂತ್ಯ
+    ಅಕ್ಷರ L[] = {'L', '\0'};
 
-    if(b)
+    ಆದರೆ(b)
     {
-        if(n == 1 && b_step == sizeof(fptype))
+        ಆದರೆ(n == 1 && b_ಹೆಜ್ಜೆ == ಗಾತ್ರ(fptype))
         {
-            if(typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (float*)a, &lda, (float*)b, &_m, &lapackStatus);
-            else if(typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (double*)a, &lda, (double*)b, &_m, &lapackStatus);
+            ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (ದಶಮಾಂಶ*)a, &lda, (ದಶಮಾಂಶ*)b, &_m, &lapack_ಸ್ಥಿತಿ);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (ದ್ವಿಗುಣ*)a, &lda, (ದ್ವಿಗುಣ*)b, &_m, &lapack_ಸ್ಥಿತಿ);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            int ldb = (int)(b_step / sizeof(fptype));
-            fptype* tmpB = new fptype[m*n];
+            ಪೂರ್ಣಾಂಕ ldb = (ಪೂರ್ಣಾಂಕ)(b_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+            fptype* tmpB = ಹೊಸ fptype[m*n];
             transpose(b, ldb, tmpB, m, m, n);
 
-            if(typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (float*)a, &lda, (float*)tmpB, &_m, &lapackStatus);
-            else if(typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (double*)a, &lda, (double*)tmpB, &_m, &lapackStatus);
+            ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (ದಶಮಾಂಶ*)a, &lda, (ದಶಮಾಂಶ*)tmpB, &_m, &lapack_ಸ್ಥಿತಿ);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (ದ್ವಿಗುಣ*)a, &lda, (ದ್ವಿಗುಣ*)tmpB, &_m, &lapack_ಸ್ಥಿತಿ);
 
             transpose(tmpB, m, b, ldb, n, m);
-            delete[] tmpB;
+            ಅಳಿಸು[] tmpB;
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if(typeid(fptype) == typeid(float))
-            OCV_LAPACK_FUNC(spotrf)(L, &_m, (float*)a, &lda, &lapackStatus);
-        else if(typeid(fptype) == typeid(double))
-            OCV_LAPACK_FUNC(dpotrf)(L, &_m, (double*)a, &lda, &lapackStatus);
+        ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+            OCV_LAPACK_FUNC(spotrf)(L, &_m, (ದಶಮಾಂಶ*)a, &lda, &lapack_ಸ್ಥಿತಿ);
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+            OCV_LAPACK_FUNC(dpotrf)(L, &_m, (ದ್ವಿಗುಣ*)a, &lda, &lapack_ಸ್ಥಿತಿ);
     }
 
-    if(lapackStatus == 0) *info = true;
-    else *info = false; //in opencv Cholesky function false means error
+    ಆದರೆ(lapack_ಸ್ಥಿತಿ == 0) *info = ನಿಜ;
+    ಇಲ್ಲದಿದ್ದರೆ *info = ಸುಳ್ಳು; //in opencv Cholesky function false means error
 
-    return lapackStatus >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_ಸ್ಥಿತಿ >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
 }
 
-template <typename fptype> static inline int
-lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype* vt, size_t v_step, int m, int n, int flags, int* info)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ
+lapack_SVD(fptype* a, size_t a_ಹೆಜ್ಜೆ, fptype *w, fptype* u, size_t u_ಹೆಜ್ಜೆ, fptype* vt, size_t v_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    long _m = static_cast<long>(m), _n = static_cast<long>(n);
-    long _info[1];
-    long lda = (long)(a_step / sizeof(fptype));
-    long ldv = (long)(v_step / sizeof(fptype));
-    long ldu = (long)(u_step / sizeof(fptype));
-    long lwork = -1;
-    cv::AutoBuffer<long> iworkBuf_(8 * std::min(m, n));
-#else
-    int _m = m, _n = n;
-    int* _info = info;
-    int lda = (int)(a_step / sizeof(fptype));
-    int ldv = (int)(v_step / sizeof(fptype));
-    int ldu = (int)(u_step / sizeof(fptype));
-    int lwork = -1;
-    cv::AutoBuffer<int> iworkBuf_(8 * std::min(m, n));
-#endif
-    auto iworkBuf = iworkBuf_.data();
+#ಆದರೆ defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    ದೀರ್ಘ _m = static_cast<ದೀರ್ಘ>(m), _n = static_cast<ದೀರ್ಘ>(n);
+    ದೀರ್ಘ _info[1];
+    ದೀರ್ಘ lda = (ದೀರ್ಘ)(a_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ದೀರ್ಘ ldv = (ದೀರ್ಘ)(v_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ದೀರ್ಘ ldu = (ದೀರ್ಘ)(u_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ದೀರ್ಘ lwork = -1;
+    cv::Auto_ಬಫರ್<ದೀರ್ಘ> iworkBuf_(8 * std::min(m, n));
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಪೂರ್ಣಾಂಕ _m = m, _n = n;
+    ಪೂರ್ಣಾಂಕ* _info = info;
+    ಪೂರ್ಣಾಂಕ lda = (ಪೂರ್ಣಾಂಕ)(a_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ಪೂರ್ಣಾಂಕ ldv = (ಪೂರ್ಣಾಂಕ)(v_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ಪೂರ್ಣಾಂಕ ldu = (ಪೂರ್ಣಾಂಕ)(u_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ಪೂರ್ಣಾಂಕ lwork = -1;
+    cv::Auto_ಬಫರ್<ಪೂರ್ಣಾಂಕ> iworkBuf_(8 * std::min(m, n));
+#ಆದರೆ_ಅಂತ್ಯ
+    ಸ್ವಯಂಚಾಲಿತ iworkBuf = iworkBuf_.ದತ್ತಾಂಶ();
     std::vector<fptype> ubuf;
     fptype work1 = 0;
 
     //A already transposed and m>=n
-    char mode[] = { ' ', '\0'};
-    if(flags & CV_HAL_SVD_NO_UV)
+    ಅಕ್ಷರ ಬಹುಲಕ[] = { ' ', '\0'};
+    ಆದರೆ(flags & CV_HAL_SVD_NO_UV)
     {
         ldv = 1;
-        mode[0] = 'N';
+        ಬಹುಲಕ[0] = 'N';
     }
-    else if((flags & CV_HAL_SVD_SHORT_UV) && (flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in a
-        mode[0] = 'O';
-    else if((flags & CV_HAL_SVD_SHORT_UV) && !(flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in u if m>=n
-        mode[0] = 'S';
-    else if(flags & CV_HAL_SVD_FULL_UV) //full SVD, U stored in u or in a
-        mode[0] = 'A';
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ((flags & CV_HAL_SVD_SHORT_UV) && (flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in a
+        ಬಹುಲಕ[0] = 'O';
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ((flags & CV_HAL_SVD_SHORT_UV) && !(flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in u if m>=n
+        ಬಹುಲಕ[0] = 'S';
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(flags & CV_HAL_SVD_ತುಂಬಿದ_UV) //full SVD, U stored in u or in a
+        ಬಹುಲಕ[0] = 'A';
 
-    if((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV)) //U stored in a
+    ಆದರೆ((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_ತುಂಬಿದ_UV)) //U stored in a
     {
         ubuf.resize(m*m);
         u = &ubuf[0];
         ldu = m;
     }
 
-    if(typeid(fptype) == typeid(float))
-        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (float*)a, &lda, (float*)w, (float*)u, &ldu, (float*)vt, &ldv, (float*)&work1, &lwork, iworkBuf, _info);
-    else if(typeid(fptype) == typeid(double))
-        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (double*)a, &lda, (double*)w, (double*)u, &ldu, (double*)vt, &ldv, (double*)&work1, &lwork, iworkBuf, _info);
+    ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+        OCV_LAPACK_FUNC(sgesdd)(ಬಹುಲಕ, &_m, &_n, (ದಶಮಾಂಶ*)a, &lda, (ದಶಮಾಂಶ*)w, (ದಶಮಾಂಶ*)u, &ldu, (ದಶಮಾಂಶ*)vt, &ldv, (ದಶಮಾಂಶ*)&work1, &lwork, iworkBuf, _info);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+        OCV_LAPACK_FUNC(dgesdd)(ಬಹುಲಕ, &_m, &_n, (ದ್ವಿಗುಣ*)a, &lda, (ದ್ವಿಗುಣ*)w, (ದ್ವಿಗುಣ*)u, &ldu, (ದ್ವಿಗುಣ*)vt, &ldv, (ದ್ವಿಗುಣ*)&work1, &lwork, iworkBuf, _info);
 
-    if(*info < 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಆದರೆ(*info < 0)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-    lwork = (int)round(work1); //optimal buffer size
-    std::vector<fptype> buffer(lwork + 1);
+    lwork = (ಪೂರ್ಣಾಂಕ)round(work1); //optimal buffer size
+    std::vector<fptype> ಬಫರ್(lwork + 1);
 
     // Make sure MSAN sees the memory as having been written.
     // MSAN does not think it has been written because a different language is called.
     // Note: we do this here because if dgesdd is C++, MSAN errors can be reported within it.
-    CV_ANNOTATE_MEMORY_IS_INITIALIZED(buffer.data(), sizeof(fptype) * (lwork + 1));
+    CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(ಬಫರ್.ದತ್ತಾಂಶ(), ಗಾತ್ರ(fptype) * (lwork + 1));
 
-    if(typeid(fptype) == typeid(float))
-        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (float*)a, &lda, (float*)w, (float*)u, &ldu, (float*)vt, &ldv, (float*)&buffer[0], &lwork, iworkBuf, _info);
-    else if(typeid(fptype) == typeid(double))
-        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (double*)a, &lda, (double*)w, (double*)u, &ldu, (double*)vt, &ldv, (double*)&buffer[0], &lwork, iworkBuf, _info);
+    ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+        OCV_LAPACK_FUNC(sgesdd)(ಬಹುಲಕ, &_m, &_n, (ದಶಮಾಂಶ*)a, &lda, (ದಶಮಾಂಶ*)w, (ದಶಮಾಂಶ*)u, &ldu, (ದಶಮಾಂಶ*)vt, &ldv, (ದಶಮಾಂಶ*)&ಬಫರ್[0], &lwork, iworkBuf, _info);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+        OCV_LAPACK_FUNC(dgesdd)(ಬಹುಲಕ, &_m, &_n, (ದ್ವಿಗುಣ*)a, &lda, (ದ್ವಿಗುಣ*)w, (ದ್ವಿಗುಣ*)u, &ldu, (ದ್ವಿಗುಣ*)vt, &ldv, (ದ್ವಿಗುಣ*)&ಬಫರ್[0], &lwork, iworkBuf, _info);
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
-#endif
+#ಆದರೆ defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<ಪೂರ್ಣಾಂಕ>(_info[0]);
+#ಆದರೆ_ಅಂತ್ಯ
 
     // Make sure MSAN sees the memory as having been written.
     // MSAN does not think it has been written because a different language was called.
-    CV_ANNOTATE_MEMORY_IS_INITIALIZED(a, a_step * n);
-    if (u)
-      CV_ANNOTATE_MEMORY_IS_INITIALIZED(u, u_step * m);
-    if (vt)
-      CV_ANNOTATE_MEMORY_IS_INITIALIZED(vt, v_step * n);
-    if (w)
-      CV_ANNOTATE_MEMORY_IS_INITIALIZED(w, sizeof(fptype) * std::min(m, n));
+    CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(a, a_ಹೆಜ್ಜೆ * n);
+    ಆದರೆ (u)
+      CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(u, u_ಹೆಜ್ಜೆ * m);
+    ಆದರೆ (vt)
+      CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(vt, v_ಹೆಜ್ಜೆ * n);
+    ಆದರೆ (w)
+      CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(w, ಗಾತ್ರ(fptype) * std::min(m, n));
 
-    if(!(flags & CV_HAL_SVD_NO_UV))
-        transpose_square_inplace(vt, ldv, n);
+    ಆದರೆ(!(flags & CV_HAL_SVD_NO_UV))
+        transpose_ವರ್ಗಫಲ_inplace(vt, ldv, n);
 
-    if((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV))
+    ಆದರೆ((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_ತುಂಬಿದ_UV))
     {
-        for(int i = 0; i < m; i++)
-            for(int j = 0; j < m; j++)
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = 0; i < m; i++)
+            ಗಾಗಿ(ಪೂರ್ಣಾಂಕ j = 0; j < m; j++)
                 a[i*lda + j] = u[i*m + j];
     }
 
-    if(*info < 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return CV_HAL_ERROR_OK;
+    ಆದರೆ(*info < 0)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_QR(fptype* a, size_t a_step, int m, int n, int k, fptype* b, size_t b_step, fptype* dst, int* info)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ
+lapack_QR(fptype* a, size_t a_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, fptype* b, size_t b_ಹೆಜ್ಜೆ, fptype* dst, ಪೂರ್ಣಾಂಕ* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    long _m = static_cast<long>(m), _n = static_cast<long>(n), _k = static_cast<long>(k);
-    long _info[1];
-    long lda = (long)(a_step / sizeof(fptype));
-    long lwork = -1;
-    long ldtmpA;
-#else
-    int _m = m, _n = n, _k = k;
-    int* _info = info;
-    int lda = (int)(a_step / sizeof(fptype));
-    int lwork = -1;
-    int ldtmpA;
-#endif
+#ಆದರೆ defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    ದೀರ್ಘ _m = static_cast<ದೀರ್ಘ>(m), _n = static_cast<ದೀರ್ಘ>(n), _k = static_cast<ದೀರ್ಘ>(k);
+    ದೀರ್ಘ _info[1];
+    ದೀರ್ಘ lda = (ದೀರ್ಘ)(a_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ದೀರ್ಘ lwork = -1;
+    ದೀರ್ಘ ldtmpA;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಪೂರ್ಣಾಂಕ _m = m, _n = n, _k = k;
+    ಪೂರ್ಣಾಂಕ* _info = info;
+    ಪೂರ್ಣಾಂಕ lda = (ಪೂರ್ಣಾಂಕ)(a_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ಪೂರ್ಣಾಂಕ lwork = -1;
+    ಪೂರ್ಣಾಂಕ ldtmpA;
+#ಆದರೆ_ಅಂತ್ಯ
 
-    char mode[] = { 'N', '\0' };
-    if(m < n)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಅಕ್ಷರ ಬಹುಲಕ[] = { 'N', '\0' };
+    ಆದರೆ(m < n)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
 
     std::vector<fptype> tmpAMemHolder;
     fptype* tmpA;
 
-    if (m == n)
+    ಆದರೆ (m == n)
     {
-        transpose_square_inplace(a, lda, m);
+        transpose_ವರ್ಗಫಲ_inplace(a, lda, m);
         tmpA = a;
         ldtmpA = lda;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         tmpAMemHolder.resize(m*n);
         tmpA = &tmpAMemHolder.front();
@@ -370,358 +370,358 @@ lapack_QR(fptype* a, size_t a_step, int m, int n, int k, fptype* b, size_t b_ste
 
     fptype work1 = 0.;
 
-    if (b)
+    ಆದರೆ (b)
     {
-        if (k == 1 && b_step == sizeof(fptype))
+        ಆದರೆ (k == 1 && b_ಹೆಜ್ಜೆ == ಗಾತ್ರ(fptype))
         {
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)b, &_m, (float*)&work1, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)b, &_m, (double*)&work1, &lwork, _info);
+            ಆದರೆ (typeid(fptype) == typeid(ದಶಮಾಂಶ))
+                OCV_LAPACK_FUNC(sgels)(ಬಹುಲಕ, &_m, &_n, &_k, (ದಶಮಾಂಶ*)tmpA, &ldtmpA, (ದಶಮಾಂಶ*)b, &_m, (ದಶಮಾಂಶ*)&work1, &lwork, _info);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+                OCV_LAPACK_FUNC(dgels)(ಬಹುಲಕ, &_m, &_n, &_k, (ದ್ವಿಗುಣ*)tmpA, &ldtmpA, (ದ್ವಿಗುಣ*)b, &_m, (ದ್ವಿಗುಣ*)&work1, &lwork, _info);
 
-            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-            if (*info < 0)
-                return CV_HAL_ERROR_NOT_IMPLEMENTED;
+            CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(info, ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ));
+            ಆದರೆ (*info < 0)
+                ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-            lwork = cvRound(work1); //optimal buffer size
+            lwork = cv_ಸುತ್ತು(work1); //optimal buffer size
             std::vector<fptype> workBufMemHolder(lwork + 1);
-            fptype* buffer = &workBufMemHolder.front();
+            fptype* ಬಫರ್ = &workBufMemHolder.front();
 
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)b, &_m, (float*)buffer, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)b, &_m, (double*)buffer, &lwork, _info);
+            ಆದರೆ (typeid(fptype) == typeid(ದಶಮಾಂಶ))
+                OCV_LAPACK_FUNC(sgels)(ಬಹುಲಕ, &_m, &_n, &_k, (ದಶಮಾಂಶ*)tmpA, &ldtmpA, (ದಶಮಾಂಶ*)b, &_m, (ದಶಮಾಂಶ*)ಬಫರ್, &lwork, _info);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+                OCV_LAPACK_FUNC(dgels)(ಬಹುಲಕ, &_m, &_n, &_k, (ದ್ವಿಗುಣ*)tmpA, &ldtmpA, (ದ್ವಿಗುಣ*)b, &_m, (ದ್ವಿಗುಣ*)ಬಫರ್, &lwork, _info);
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             std::vector<fptype> tmpBMemHolder(m*k);
             fptype* tmpB = &tmpBMemHolder.front();
-            int ldb = (int)(b_step / sizeof(fptype));
+            ಪೂರ್ಣಾಂಕ ldb = (ಪೂರ್ಣಾಂಕ)(b_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
             transpose(b, ldb, tmpB, m, m, k);
 
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)tmpB, &_m, (float*)&work1, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)tmpB, &_m, (double*)&work1, &lwork, _info);
+            ಆದರೆ (typeid(fptype) == typeid(ದಶಮಾಂಶ))
+                OCV_LAPACK_FUNC(sgels)(ಬಹುಲಕ, &_m, &_n, &_k, (ದಶಮಾಂಶ*)tmpA, &ldtmpA, (ದಶಮಾಂಶ*)tmpB, &_m, (ದಶಮಾಂಶ*)&work1, &lwork, _info);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+                OCV_LAPACK_FUNC(dgels)(ಬಹುಲಕ, &_m, &_n, &_k, (ದ್ವಿಗುಣ*)tmpA, &ldtmpA, (ದ್ವಿಗುಣ*)tmpB, &_m, (ದ್ವಿಗುಣ*)&work1, &lwork, _info);
 
-            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-            if (*info < 0)
-                return CV_HAL_ERROR_NOT_IMPLEMENTED;
+            CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(info, ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ));
+            ಆದರೆ (*info < 0)
+                ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-            lwork = cvRound(work1); //optimal buffer size
+            lwork = cv_ಸುತ್ತು(work1); //optimal buffer size
             std::vector<fptype> workBufMemHolder(lwork + 1);
-            fptype* buffer = &workBufMemHolder.front();
+            fptype* ಬಫರ್ = &workBufMemHolder.front();
 
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)tmpB, &_m, (float*)buffer, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)tmpB, &_m, (double*)buffer, &lwork, _info);
+            ಆದರೆ (typeid(fptype) == typeid(ದಶಮಾಂಶ))
+                OCV_LAPACK_FUNC(sgels)(ಬಹುಲಕ, &_m, &_n, &_k, (ದಶಮಾಂಶ*)tmpA, &ldtmpA, (ದಶಮಾಂಶ*)tmpB, &_m, (ದಶಮಾಂಶ*)ಬಫರ್, &lwork, _info);
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+                OCV_LAPACK_FUNC(dgels)(ಬಹುಲಕ, &_m, &_n, &_k, (ದ್ವಿಗುಣ*)tmpA, &ldtmpA, (ದ್ವಿಗುಣ*)tmpB, &_m, (ದ್ವಿಗುಣ*)ಬಫರ್, &lwork, _info);
 
             transpose(tmpB, m, b, ldb, k, m);
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if (typeid(fptype) == typeid(float))
-            sgeqrf_(&_m, &_n, (float*)tmpA, &ldtmpA, (float*)dst, (float*)&work1, &lwork, _info);
-        else if (typeid(fptype) == typeid(double))
-            dgeqrf_(&_m, &_n, (double*)tmpA, &ldtmpA, (double*)dst, (double*)&work1, &lwork, _info);
+        ಆದರೆ (typeid(fptype) == typeid(ದಶಮಾಂಶ))
+            sgeqrf_(&_m, &_n, (ದಶಮಾಂಶ*)tmpA, &ldtmpA, (ದಶಮಾಂಶ*)dst, (ದಶಮಾಂಶ*)&work1, &lwork, _info);
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+            dgeqrf_(&_m, &_n, (ದ್ವಿಗುಣ*)tmpA, &ldtmpA, (ದ್ವಿಗುಣ*)dst, (ದ್ವಿಗುಣ*)&work1, &lwork, _info);
 
-        CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-        if (*info < 0)
-            return CV_HAL_ERROR_NOT_IMPLEMENTED;
+        CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(info, ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ));
+        ಆದರೆ (*info < 0)
+            ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-        lwork = cvRound(work1); //optimal buffer size
+        lwork = cv_ಸುತ್ತು(work1); //optimal buffer size
         std::vector<fptype> workBufMemHolder(lwork + 1);
-        fptype* buffer = &workBufMemHolder.front();
+        fptype* ಬಫರ್ = &workBufMemHolder.front();
 
-        if (typeid(fptype) == typeid(float))
-            sgeqrf_(&_m, &_n, (float*)tmpA, &ldtmpA, (float*)dst, (float*)buffer, &lwork, _info);
-        else if (typeid(fptype) == typeid(double))
-            dgeqrf_(&_m, &_n, (double*)tmpA, &ldtmpA, (double*)dst, (double*)buffer, &lwork, _info);
+        ಆದರೆ (typeid(fptype) == typeid(ದಶಮಾಂಶ))
+            sgeqrf_(&_m, &_n, (ದಶಮಾಂಶ*)tmpA, &ldtmpA, (ದಶಮಾಂಶ*)dst, (ದಶಮಾಂಶ*)ಬಫರ್, &lwork, _info);
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+            dgeqrf_(&_m, &_n, (ದ್ವಿಗುಣ*)tmpA, &ldtmpA, (ದ್ವಿಗುಣ*)dst, (ದ್ವಿಗುಣ*)ಬಫರ್, &lwork, _info);
     }
 
-    CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-    if (m == n)
-        transpose_square_inplace(a, lda, m);
-    else
+    CV_ANNOTATE_ಸ್ಮರಣೆ_IS_INITIALIZED(info, ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ));
+    ಆದರೆ (m == n)
+        transpose_ವರ್ಗಫಲ_inplace(a, lda, m);
+    ಇಲ್ಲದಿದ್ದರೆ
         transpose(tmpA, m, a, lda, n, m);
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
-#endif
+#ಆದರೆ defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<ಪೂರ್ಣಾಂಕ>(_info[0]);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    if (*info != 0)
+    ಆದರೆ (*info != 0)
         *info = 0;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
         *info = 1;
 
-    return CV_HAL_ERROR_OK;
+    ಹಿಂತಿರುಗಿ CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_gemm(const fptype *src1, size_t src1_step, const fptype *src2, size_t src2_step, fptype alpha,
-            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, int a_m, int a_n, int d_n, int flags)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ
+lapack_gemm(ಸ್ಥಿರಾಂಕ fptype *src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ fptype *src2, size_t src2_ಹೆಜ್ಜೆ, fptype alpha,
+            ಸ್ಥಿರಾಂಕ fptype *src3, size_t src3_ಹೆಜ್ಜೆ, fptype beta, fptype *dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ a_m, ಪೂರ್ಣಾಂಕ a_n, ಪೂರ್ಣಾಂಕ d_n, ಪೂರ್ಣಾಂಕ flags)
 {
-    int ldsrc1 = (int)(src1_step / sizeof(fptype));
-    int ldsrc2 = (int)(src2_step / sizeof(fptype));
-    int ldsrc3 = (int)(src3_step / sizeof(fptype));
-    int lddst = (int)(dst_step / sizeof(fptype));
-    int c_m, c_n, d_m;
+    ಪೂರ್ಣಾಂಕ ldsrc1 = (ಪೂರ್ಣಾಂಕ)(src1_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ಪೂರ್ಣಾಂಕ ldsrc2 = (ಪೂರ್ಣಾಂಕ)(src2_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ಪೂರ್ಣಾಂಕ ldsrc3 = (ಪೂರ್ಣಾಂಕ)(src3_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ಪೂರ್ಣಾಂಕ lddst = (ಪೂರ್ಣಾಂಕ)(dst_ಹೆಜ್ಜೆ / ಗಾತ್ರ(fptype));
+    ಪೂರ್ಣಾಂಕ c_m, c_n, d_m;
     CBLAS_TRANSPOSE transA, transB;
 
-    if(flags & CV_HAL_GEMM_2_T)
+    ಆದರೆ(flags & CV_HAL_GEMM_2_T)
     {
         transB = CblasTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        ಆದರೆ(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             d_m = a_m;
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         transB = CblasNoTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        ಆದರೆ(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             d_m = a_m;
         }
     }
 
-    if(flags & CV_HAL_GEMM_3_T)
+    ಆದರೆ(flags & CV_HAL_GEMM_3_T)
     {
         c_m = d_n;
         c_n = d_m;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         c_m = d_m;
         c_n = d_n;
     }
 
-    if(flags & CV_HAL_GEMM_1_T )
+    ಆದರೆ(flags & CV_HAL_GEMM_1_T )
     {
         transA = CblasTrans;
         std::swap(a_n, a_m);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         transA = CblasNoTrans;
     }
 
-    if(src3 != dst && beta != 0.0 && src3_step != 0) {
-        if(flags & CV_HAL_GEMM_3_T)
+    ಆದರೆ(src3 != dst && beta != 0.0 && src3_ಹೆಜ್ಜೆ != 0) {
+        ಆದರೆ(flags & CV_HAL_GEMM_3_T)
             transpose(src3, ldsrc3, dst, lddst, c_m, c_n);
-        else
-            copy_matrix(src3, ldsrc3, dst, lddst, c_m, c_n);
+        ಇಲ್ಲದಿದ್ದರೆ
+            copy_ಮಾತೃಕೆ(src3, ldsrc3, dst, lddst, c_m, c_n);
     }
-    else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    else if(src3_step == 0 && beta != 0.0)
-        set_value(dst, lddst, (fptype)0.0, d_m, d_n);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(src3_ಹೆಜ್ಜೆ == 0 && beta != 0.0)
+        ಗಣ_ಮೌಲ್ಯ_2(dst, lddst, (fptype)0.0, d_m, d_n);
 
-    if(typeid(fptype) == typeid(float))
-        cblas_sgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (float)alpha, (float*)src1, ldsrc1, (float*)src2, ldsrc2, (float)beta, (float*)dst, lddst);
-    else if(typeid(fptype) == typeid(double))
-        cblas_dgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (double)alpha, (double*)src1, ldsrc1, (double*)src2, ldsrc2, (double)beta, (double*)dst, lddst);
+    ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+        cblas_sgemm(Cblas_ಅಡ್ಡಸಾಲು_Major, transA, transB, a_m, d_n, a_n, (ದಶಮಾಂಶ)alpha, (ದಶಮಾಂಶ*)src1, ldsrc1, (ದಶಮಾಂಶ*)src2, ldsrc2, (ದಶಮಾಂಶ)beta, (ದಶಮಾಂಶ*)dst, lddst);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+        cblas_dgemm(Cblas_ಅಡ್ಡಸಾಲು_Major, transA, transB, a_m, d_n, a_n, (ದ್ವಿಗುಣ)alpha, (ದ್ವಿಗುಣ*)src1, ldsrc1, (ದ್ವಿಗುಣ*)src2, ldsrc2, (ದ್ವಿಗುಣ)beta, (ದ್ವಿಗುಣ*)dst, lddst);
 
-    return CV_HAL_ERROR_OK;
+    ಹಿಂತಿರುಗಿ CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_gemm_c(const fptype *src1, size_t src1_step, const fptype *src2, size_t src2_step, fptype alpha,
-            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, int a_m, int a_n, int d_n, int flags)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು fptype> ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ
+lapack_gemm_c(ಸ್ಥಿರಾಂಕ fptype *src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ fptype *src2, size_t src2_ಹೆಜ್ಜೆ, fptype alpha,
+            ಸ್ಥಿರಾಂಕ fptype *src3, size_t src3_ಹೆಜ್ಜೆ, fptype beta, fptype *dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ a_m, ಪೂರ್ಣಾಂಕ a_n, ಪೂರ್ಣಾಂಕ d_n, ಪೂರ್ಣಾಂಕ flags)
 {
-    int ldsrc1 = (int)(src1_step / sizeof(std::complex<fptype>));
-    int ldsrc2 = (int)(src2_step / sizeof(std::complex<fptype>));
-    int ldsrc3 = (int)(src3_step / sizeof(std::complex<fptype>));
-    int lddst = (int)(dst_step / sizeof(std::complex<fptype>));
-    int c_m, c_n, d_m;
+    ಪೂರ್ಣಾಂಕ ldsrc1 = (ಪೂರ್ಣಾಂಕ)(src1_ಹೆಜ್ಜೆ / ಗಾತ್ರ(std::complex<fptype>));
+    ಪೂರ್ಣಾಂಕ ldsrc2 = (ಪೂರ್ಣಾಂಕ)(src2_ಹೆಜ್ಜೆ / ಗಾತ್ರ(std::complex<fptype>));
+    ಪೂರ್ಣಾಂಕ ldsrc3 = (ಪೂರ್ಣಾಂಕ)(src3_ಹೆಜ್ಜೆ / ಗಾತ್ರ(std::complex<fptype>));
+    ಪೂರ್ಣಾಂಕ lddst = (ಪೂರ್ಣಾಂಕ)(dst_ಹೆಜ್ಜೆ / ಗಾತ್ರ(std::complex<fptype>));
+    ಪೂರ್ಣಾಂಕ c_m, c_n, d_m;
     CBLAS_TRANSPOSE transA, transB;
     std::complex<fptype> cAlpha(alpha, 0.0);
     std::complex<fptype> cBeta(beta, 0.0);
 
-    if(flags & CV_HAL_GEMM_2_T)
+    ಆದರೆ(flags & CV_HAL_GEMM_2_T)
     {
         transB = CblasTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        ಆದರೆ(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             d_m = a_m;
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         transB = CblasNoTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        ಆದರೆ(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             d_m = a_m;
         }
     }
 
-    if(flags & CV_HAL_GEMM_3_T)
+    ಆದರೆ(flags & CV_HAL_GEMM_3_T)
     {
         c_m = d_n;
         c_n = d_m;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         c_m = d_m;
         c_n = d_n;
     }
 
-    if(flags & CV_HAL_GEMM_1_T )
+    ಆದರೆ(flags & CV_HAL_GEMM_1_T )
     {
         transA = CblasTrans;
         std::swap(a_n, a_m);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         transA = CblasNoTrans;
     }
 
-    if(src3 != dst && beta != 0.0 && src3_step != 0) {
-        if(flags & CV_HAL_GEMM_3_T)
+    ಆದರೆ(src3 != dst && beta != 0.0 && src3_ಹೆಜ್ಜೆ != 0) {
+        ಆದರೆ(flags & CV_HAL_GEMM_3_T)
             transpose((std::complex<fptype>*)src3, ldsrc3, (std::complex<fptype>*)dst, lddst, c_m, c_n);
-        else
-            copy_matrix((std::complex<fptype>*)src3, ldsrc3, (std::complex<fptype>*)dst, lddst, c_m, c_n);
+        ಇಲ್ಲದಿದ್ದರೆ
+            copy_ಮಾತೃಕೆ((std::complex<fptype>*)src3, ldsrc3, (std::complex<fptype>*)dst, lddst, c_m, c_n);
     }
-    else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    else if(src3_step == 0 && beta != 0.0)
-        set_value((std::complex<fptype>*)dst, lddst, std::complex<fptype>(0.0, 0.0), d_m, d_n);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(src3_ಹೆಜ್ಜೆ == 0 && beta != 0.0)
+        ಗಣ_ಮೌಲ್ಯ_2((std::complex<fptype>*)dst, lddst, std::complex<fptype>(0.0, 0.0), d_m, d_n);
 
     // FIXME: this is a workaround. Support ILP64 in HAL API.
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    int M = a_m, N = d_n, K = a_n;
-    if(typeid(fptype) == typeid(float)) {
-        auto src1_cast = (std::complex<float>*)(src1);
-        auto src2_cast = (std::complex<float>*)(src2);
-        auto dst_cast = (std::complex<float>*)(dst);
-        long lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
-        cblas_cgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<float>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<float>*)&cBeta, dst_cast, ldc);
+#ಆದರೆ defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    ಪೂರ್ಣಾಂಕ M = a_m, N = d_n, K = a_n;
+    ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ)) {
+        ಸ್ವಯಂಚಾಲಿತ src1_cast = (std::complex<ದಶಮಾಂಶ>*)(src1);
+        ಸ್ವಯಂಚಾಲಿತ src2_cast = (std::complex<ದಶಮಾಂಶ>*)(src2);
+        ಸ್ವಯಂಚಾಲಿತ dst_cast = (std::complex<ದಶಮಾಂಶ>*)(dst);
+        ದೀರ್ಘ lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
+        cblas_cgemm(Cblas_ಅಡ್ಡಸಾಲು_Major, transA, transB, M, N, K, (std::complex<ದಶಮಾಂಶ>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<ದಶಮಾಂಶ>*)&cBeta, dst_cast, ldc);
     }
-    else if(typeid(fptype) == typeid(double)) {
-        auto src1_cast = (std::complex<double>*)(src1);
-        auto src2_cast = (std::complex<double>*)(src2);
-        auto dst_cast = (std::complex<double>*)(dst);
-        long lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
-        cblas_zgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<double>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<double>*)&cBeta, dst_cast, ldc);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ)) {
+        ಸ್ವಯಂಚಾಲಿತ src1_cast = (std::complex<ದ್ವಿಗುಣ>*)(src1);
+        ಸ್ವಯಂಚಾಲಿತ src2_cast = (std::complex<ದ್ವಿಗುಣ>*)(src2);
+        ಸ್ವಯಂಚಾಲಿತ dst_cast = (std::complex<ದ್ವಿಗುಣ>*)(dst);
+        ದೀರ್ಘ lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
+        cblas_zgemm(Cblas_ಅಡ್ಡಸಾಲು_Major, transA, transB, M, N, K, (std::complex<ದ್ವಿಗುಣ>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<ದ್ವಿಗುಣ>*)&cBeta, dst_cast, ldc);
     }
-#else
-    if(typeid(fptype) == typeid(float))
-        cblas_cgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (float*)reinterpret_cast<fptype(&)[2]>(cAlpha), (float*)src1, ldsrc1, (float*)src2, ldsrc2, (float*)reinterpret_cast<fptype(&)[2]>(cBeta), (float*)dst, lddst);
-    else if(typeid(fptype) == typeid(double))
-        cblas_zgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (double*)reinterpret_cast<fptype(&)[2]>(cAlpha), (double*)src1, ldsrc1, (double*)src2, ldsrc2, (double*)reinterpret_cast<fptype(&)[2]>(cBeta), (double*)dst, lddst);
-#endif
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಆದರೆ(typeid(fptype) == typeid(ದಶಮಾಂಶ))
+        cblas_cgemm(Cblas_ಅಡ್ಡಸಾಲು_Major, transA, transB, a_m, d_n, a_n, (ದಶಮಾಂಶ*)reinterpret_cast<fptype(&)[2]>(cAlpha), (ದಶಮಾಂಶ*)src1, ldsrc1, (ದಶಮಾಂಶ*)src2, ldsrc2, (ದಶಮಾಂಶ*)reinterpret_cast<fptype(&)[2]>(cBeta), (ದಶಮಾಂಶ*)dst, lddst);
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(typeid(fptype) == typeid(ದ್ವಿಗುಣ))
+        cblas_zgemm(Cblas_ಅಡ್ಡಸಾಲು_Major, transA, transB, a_m, d_n, a_n, (ದ್ವಿಗುಣ*)reinterpret_cast<fptype(&)[2]>(cAlpha), (ದ್ವಿಗುಣ*)src1, ldsrc1, (ದ್ವಿಗುಣ*)src2, ldsrc2, (ದ್ವಿಗುಣ*)reinterpret_cast<fptype(&)[2]>(cBeta), (ದ್ವಿಗುಣ*)dst, lddst);
+#ಆದರೆ_ಅಂತ್ಯ
 
-    return CV_HAL_ERROR_OK;
+    ಹಿಂತಿರುಗಿ CV_HAL_ERROR_OK;
 }
-int lapack_LU32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, int* info)
+ಪೂರ್ಣಾಂಕ lapack_LU32f(ದಶಮಾಂಶ* a, size_t a_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ದಶಮಾಂಶ* b, size_t b_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ* info)
 {
-    if(m < HAL_LU_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_LU(a, a_step, m, b, b_step, n, info);
+    ಆದರೆ(m < HAL_LU_SMALL_ಮಾತೃಕೆ_THRESH)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_LU(a, a_ಹೆಜ್ಜೆ, m, b, b_ಹೆಜ್ಜೆ, n, info);
 }
 
-int lapack_LU64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, int* info)
+ಪೂರ್ಣಾಂಕ lapack_LU64f(ದ್ವಿಗುಣ* a, size_t a_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ದ್ವಿಗುಣ* b, size_t b_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ* info)
 {
-    if(m < HAL_LU_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_LU(a, a_step, m, b, b_step, n, info);
+    ಆದರೆ(m < HAL_LU_SMALL_ಮಾತೃಕೆ_THRESH)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_LU(a, a_ಹೆಜ್ಜೆ, m, b, b_ಹೆಜ್ಜೆ, n, info);
 }
 
-int lapack_Cholesky32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, bool *info)
+ಪೂರ್ಣಾಂಕ lapack_Cholesky32f(ದಶಮಾಂಶ* a, size_t a_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ದಶಮಾಂಶ* b, size_t b_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ತಾರ್ಕಿಕ *info)
 {
-    if(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_Cholesky(a, a_step, m, b, b_step, n, info);
+    ಆದರೆ(m < HAL_CHOLESKY_SMALL_ಮಾತೃಕೆ_THRESH)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_Cholesky(a, a_ಹೆಜ್ಜೆ, m, b, b_ಹೆಜ್ಜೆ, n, info);
 }
 
-int lapack_Cholesky64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, bool *info)
+ಪೂರ್ಣಾಂಕ lapack_Cholesky64f(ದ್ವಿಗುಣ* a, size_t a_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ದ್ವಿಗುಣ* b, size_t b_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ n, ತಾರ್ಕಿಕ *info)
 {
-    if(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_Cholesky(a, a_step, m, b, b_step, n, info);
+    ಆದರೆ(m < HAL_CHOLESKY_SMALL_ಮಾತೃಕೆ_THRESH)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_Cholesky(a, a_ಹೆಜ್ಜೆ, m, b, b_ಹೆಜ್ಜೆ, n, info);
 }
 
-int lapack_SVD32f(float* a, size_t a_step, float *w, float* u, size_t u_step, float* vt, size_t v_step, int m, int n, int flags)
+ಪೂರ್ಣಾಂಕ lapack_SVD32f(ದಶಮಾಂಶ* a, size_t a_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ *w, ದಶಮಾಂಶ* u, size_t u_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ* vt, size_t v_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ flags)
 {
-    if(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    int info = 0;
-    return lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
+    ಆದರೆ(m < HAL_SVD_SMALL_ಮಾತೃಕೆ_THRESH || n <= 0)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಪೂರ್ಣಾಂಕ info = 0;
+    ಹಿಂತಿರುಗಿ lapack_SVD(a, a_ಹೆಜ್ಜೆ, w, u, u_ಹೆಜ್ಜೆ, vt, v_ಹೆಜ್ಜೆ, m, n, flags, &info);
 }
 
-int lapack_SVD64f(double* a, size_t a_step, double *w, double* u, size_t u_step, double* vt, size_t v_step, int m, int n, int flags)
+ಪೂರ್ಣಾಂಕ lapack_SVD64f(ದ್ವಿಗುಣ* a, size_t a_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ *w, ದ್ವಿಗುಣ* u, size_t u_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ* vt, size_t v_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ flags)
 {
-    if(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    int info = 0;
-    return lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
+    ಆದರೆ(m < HAL_SVD_SMALL_ಮಾತೃಕೆ_THRESH || n <= 0)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಪೂರ್ಣಾಂಕ info = 0;
+    ಹಿಂತಿರುಗಿ lapack_SVD(a, a_ಹೆಜ್ಜೆ, w, u, u_ಹೆಜ್ಜೆ, vt, v_ಹೆಜ್ಜೆ, m, n, flags, &info);
 }
 
-int lapack_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info)
+ಪೂರ್ಣಾಂಕ lapack_QR32f(ದಶಮಾಂಶ* src1, size_t src1_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ದಶಮಾಂಶ* src2, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ* dst, ಪೂರ್ಣಾಂಕ* info)
 {
-    if (m < HAL_QR_SMALL_MATRIX_THRESH)
-      return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
+    ಆದರೆ (m < HAL_QR_SMALL_ಮಾತೃಕೆ_THRESH)
+      ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_QR(src1, src1_ಹೆಜ್ಜೆ, m, n, k, src2, src2_ಹೆಜ್ಜೆ, dst, info);
 }
 
-int lapack_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info)
+ಪೂರ್ಣಾಂಕ lapack_QR64f(ದ್ವಿಗುಣ* src1, size_t src1_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ದ್ವಿಗುಣ* src2, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಂಕ* info)
 {
-    if (m < HAL_QR_SMALL_MATRIX_THRESH)
-      return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
+    ಆದರೆ (m < HAL_QR_SMALL_ಮಾತೃಕೆ_THRESH)
+      ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_QR(src1, src1_ಹೆಜ್ಜೆ, m, n, k, src2, src2_ಹೆಜ್ಜೆ, dst, info);
 }
 
-int lapack_gemm32f(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
-                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, int m, int n, int k, int flags)
+ಪೂರ್ಣಾಂಕ lapack_gemm32f(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ alpha,
+                   ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src3, size_t src3_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ beta, ದಶಮಾಂಶ *dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ಪೂರ್ಣಾಂಕ flags)
 {
-    if(m < HAL_GEMM_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    ಆದರೆ(m < HAL_GEMM_SMALL_ಮಾತೃಕೆ_THRESH)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_gemm(src1, src1_ಹೆಜ್ಜೆ, src2, src2_ಹೆಜ್ಜೆ, alpha, src3, src3_ಹೆಜ್ಜೆ, beta, dst, dst_ಹೆಜ್ಜೆ, m, n, k, flags);
 }
 
-int lapack_gemm64f(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
-                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, int m, int n, int k, int flags)
+ಪೂರ್ಣಾಂಕ lapack_gemm64f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ alpha,
+                   ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src3, size_t src3_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ beta, ದ್ವಿಗುಣ *dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ಪೂರ್ಣಾಂಕ flags)
 {
-    if(m < HAL_GEMM_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    ಆದರೆ(m < HAL_GEMM_SMALL_ಮಾತೃಕೆ_THRESH)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_gemm(src1, src1_ಹೆಜ್ಜೆ, src2, src2_ಹೆಜ್ಜೆ, alpha, src3, src3_ಹೆಜ್ಜೆ, beta, dst, dst_ಹೆಜ್ಜೆ, m, n, k, flags);
 }
 
-int lapack_gemm32fc(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
-                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, int m, int n, int k, int flags)
+ಪೂರ್ಣಾಂಕ lapack_gemm32fc(ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src2, size_t src2_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ alpha,
+                   ಸ್ಥಿರಾಂಕ ದಶಮಾಂಶ *src3, size_t src3_ಹೆಜ್ಜೆ, ದಶಮಾಂಶ beta, ದಶಮಾಂಶ *dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ಪೂರ್ಣಾಂಕ flags)
 {
-    if(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    ಆದರೆ(m < HAL_GEMM_SMALL_COMPLEX_ಮಾತೃಕೆ_THRESH)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_gemm_c(src1, src1_ಹೆಜ್ಜೆ, src2, src2_ಹೆಜ್ಜೆ, alpha, src3, src3_ಹೆಜ್ಜೆ, beta, dst, dst_ಹೆಜ್ಜೆ, m, n, k, flags);
 }
-int lapack_gemm64fc(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
-                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, int m, int n, int k, int flags)
+ಪೂರ್ಣಾಂಕ lapack_gemm64fc(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src1, size_t src1_ಹೆಜ್ಜೆ, ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src2, size_t src2_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ alpha,
+                   ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ *src3, size_t src3_ಹೆಜ್ಜೆ, ದ್ವಿಗುಣ beta, ದ್ವಿಗುಣ *dst, size_t dst_ಹೆಜ್ಜೆ, ಪೂರ್ಣಾಂಕ m, ಪೂರ್ಣಾಂಕ n, ಪೂರ್ಣಾಂಕ k, ಪೂರ್ಣಾಂಕ flags)
 {
-    if(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    ಆದರೆ(m < HAL_GEMM_SMALL_COMPLEX_ಮಾತೃಕೆ_THRESH)
+        ಹಿಂತಿರುಗಿ CV_HAL_ERROR_NOT_IMPLEMENTED;
+    ಹಿಂತಿರುಗಿ lapack_gemm_c(src1, src1_ಹೆಜ್ಜೆ, src2, src2_ಹೆಜ್ಜೆ, alpha, src3, src3_ಹೆಜ್ಜೆ, beta, dst, dst_ಹೆಜ್ಜೆ, m, n, k, flags);
 }
 
-#if defined(__APPLE__) && defined(__clang__)
-#pragma clang diagnostic pop
-#endif
+#ಆದರೆ defined(__APPLE__) && defined(__clang__)
+#ಸೂಚನೆ clang diagnostic pop
+#ಆದರೆ_ಅಂತ್ಯ
 
-#endif //HAVE_LAPACK
+#ಆದರೆ_ಅಂತ್ಯ //HAVE_LAPACK

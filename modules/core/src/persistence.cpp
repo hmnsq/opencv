@@ -2,410 +2,410 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
-#include "persistence_impl.hpp"
-#include "persistence_base64_encoding.hpp"
-#include <unordered_map>
-#include <iterator>
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "persistence.hpp"
+#ಅನ್ತರ್ಭಾವ "persistence_impl.hpp"
+#ಅನ್ತರ್ಭಾವ "persistence_base64_encoding.hpp"
+#ಅನ್ತರ್ಭಾವ <unordered_map>
+#ಅನ್ತರ್ಭಾವ <iterator>
 
-#include <opencv2/core/utils/logger.hpp>
+#ಅನ್ತರ್ಭಾವ <opencv2/core/utils/logger.hpp>
 
-#define CV_SEQ_ELTYPE_PTR            CV_MAKE_TYPE(CV_8U, 8 /*sizeof(void*)*/)
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_SEQ_ELTYPE_PTR            CV_MAKE_TYPE(CV_8U, 8 /*sizeof(void*)*/)
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-namespace fs
+ನಾಮಾಕಾಶ fs
 {
 
-int strcasecmp(const char* s1, const char* s2)
+ಪೂರ್ಣಾಂಕ strcasecmp(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* s1, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* s2)
 {
-    const char* dummy="";
-    if(!s1) s1=dummy;
-    if(!s2) s2=dummy;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* dummy="";
+    ಆದರೆ(!s1) s1=dummy;
+    ಆದರೆ(!s2) s2=dummy;
 
-    size_t len1 = strlen(s1);
-    size_t len2 = strlen(s2);
+    size_t len1 = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(s1);
+    size_t len2 = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(s2);
     size_t i, len = std::min(len1, len2);
-    for( i = 0; i < len; i++ )
+    ಗಾಗಿ( i = 0; i < len; i++ )
     {
-        int d = tolower((int)s1[i]) - tolower((int)s2[i]);
-        if( d != 0 )
-            return d;
+        ಪೂರ್ಣಾಂಕ d = tolower((ಪೂರ್ಣಾಂಕ)s1[i]) - tolower((ಪೂರ್ಣಾಂಕ)s2[i]);
+        ಆದರೆ( d != 0 )
+            ಹಿಂತಿರುಗಿ d;
     }
-    return len1 < len2 ? -1 : len1 > len2 ? 1 : 0;
+    ಹಿಂತಿರುಗಿ len1 < len2 ? -1 : len1 > len2 ? 1 : 0;
 }
 
-char* itoa( int _val, char* buffer, int /*radix*/ )
+ಅಕ್ಷರ* itoa( ಪೂರ್ಣಾಂಕ _val, ಅಕ್ಷರ* ಬಫರ್, ಪೂರ್ಣಾಂಕ /*radix*/ )
 {
-    const int radix = 10;
-    char* ptr=buffer + 23 /* enough even for 64-bit integers */;
-    unsigned val = abs(_val);
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ radix = 10;
+    ಅಕ್ಷರ* ptr=ಬಫರ್ + 23 /* enough even for 64-bit integers */;
+    ಚಿಹ್ನೆರಹಿತ val = ನಿರಪೇಕ್ಷ(_val);
 
     *ptr = '\0';
-    do
+    ಮಾಡು
     {
-        unsigned r = val / radix;
-        *--ptr = (char)(val - (r*radix) + '0');
+        ಚಿಹ್ನೆರಹಿತ r = val / radix;
+        *--ptr = (ಅಕ್ಷರ)(val - (r*radix) + '0');
         val = r;
     }
-    while( val != 0 );
+    ಆಗ( val != 0 );
 
-    if( _val < 0 )
+    ಆದರೆ( _val < 0 )
         *--ptr = '-';
 
-    return ptr;
+    ಹಿಂತಿರುಗಿ ptr;
 }
 
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed)
+ಅಕ್ಷರ* itoa( int64_t _val, ಅಕ್ಷರ* ಬಫರ್, ಪೂರ್ಣಾಂಕ /*radix*/, ತಾರ್ಕಿಕ _signed)
 {
-    const int radix = 10;
-    char* ptr=buffer + 23 /* enough even for 64-bit integers */;
-    int sign = _signed && _val < 0 ? -1 : 1;
-    uint64_t val = !_signed ? (uint64_t)_val : abs(_val);
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ radix = 10;
+    ಅಕ್ಷರ* ptr=ಬಫರ್ + 23 /* enough even for 64-bit integers */;
+    ಪೂರ್ಣಾಂಕ sign = _signed && _val < 0 ? -1 : 1;
+    uint64_t val = !_signed ? (uint64_t)_val : ನಿರಪೇಕ್ಷ(_val);
 
     *ptr = '\0';
-    do
+    ಮಾಡು
     {
         uint64_t r = val / radix;
-        *--ptr = (char)(val - (r*radix) + '0');
+        *--ptr = (ಅಕ್ಷರ)(val - (r*radix) + '0');
         val = r;
     }
-    while( val != 0 );
+    ಆಗ( val != 0 );
 
-    if( sign < 0 )
+    ಆದರೆ( sign < 0 )
         *--ptr = '-';
 
-    return ptr;
+    ಹಿಂತಿರುಗಿ ptr;
 }
 
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero )
+ಅಕ್ಷರ* double_ಗಮ್ಯ_String( ಅಕ್ಷರ* buf, size_t buf_ಗಾತ್ರ, ದ್ವಿಗುಣ value, ತಾರ್ಕಿಕ explicitZero )
 {
     Cv64suf val;
-    unsigned ieee754_hi;
+    ಚಿಹ್ನೆರಹಿತ ieee754_hi;
 
     val.f = value;
-    ieee754_hi = (unsigned)(val.u >> 32);
+    ieee754_hi = (ಚಿಹ್ನೆರಹಿತ)(val.u >> 32);
 
-    if( (ieee754_hi & 0x7ff00000) != 0x7ff00000 )
+    ಆದರೆ( (ieee754_hi & 0x7ff00000) != 0x7ff00000 )
     {
-        int ivalue = cvRound(value);
-        if( ivalue == value )
+        ಪೂರ್ಣಾಂಕ ivalue = cv_ಸುತ್ತು(value);
+        ಆದರೆ( ivalue == value )
         {
-            if( explicitZero )
-                snprintf( buf, bufSize, "%d.0", ivalue );
-            else
-                snprintf( buf, bufSize, "%d.", ivalue );
+            ಆದರೆ( explicitZero )
+                snprintf( buf, buf_ಗಾತ್ರ, "%d.0", ivalue );
+            ಇಲ್ಲದಿದ್ದರೆ
+                snprintf( buf, buf_ಗಾತ್ರ, "%d.", ivalue );
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
             // binary64 has 52 bit fraction with hidden bit.
             // 53 * log_10(2) is 15.955. So "%.16f" should be fine, but its test fails.
-            snprintf( buf, bufSize, "%.17g", value );
+            snprintf( buf, buf_ಗಾತ್ರ, "%.17g", value );
 
-            char* ptr = buf;
-            if( *ptr == '+' || *ptr == '-' )
+            ಅಕ್ಷರ* ptr = buf;
+            ಆದರೆ( *ptr == '+' || *ptr == '-' )
                 ptr++;
-            for( ; cv_isdigit(*ptr); ptr++ )
+            ಗಾಗಿ( ; cv_isdigit(*ptr); ptr++ )
                 ;
-            if( *ptr == ',' )
+            ಆದರೆ( *ptr == ',' )
                 *ptr = '.';
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        unsigned ieee754_lo = (unsigned)val.u;
-        if( (ieee754_hi & 0x7fffffff) + (ieee754_lo != 0) > 0x7ff00000 )
+        ಚಿಹ್ನೆರಹಿತ ieee754_lo = (ಚಿಹ್ನೆರಹಿತ)val.u;
+        ಆದರೆ( (ieee754_hi & 0x7fffffff) + (ieee754_lo != 0) > 0x7ff00000 )
             strcpy( buf, ".Nan" );
-        else
-            strcpy( buf, (int)ieee754_hi < 0 ? "-.Inf" : ".Inf" );
+        ಇಲ್ಲದಿದ್ದರೆ
+            strcpy( buf, (ಪೂರ್ಣಾಂಕ)ieee754_hi < 0 ? "-.Inf" : ".Inf" );
     }
 
-    return buf;
+    ಹಿಂತಿರುಗಿ buf;
 }
 
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero )
+ಅಕ್ಷರ* float_ಗಮ್ಯ_String( ಅಕ್ಷರ* buf, size_t buf_ಗಾತ್ರ, ದಶಮಾಂಶ value, ತಾರ್ಕಿಕ halfprecision, ತಾರ್ಕಿಕ explicitZero )
 {
     Cv32suf val;
-    unsigned ieee754;
+    ಚಿಹ್ನೆರಹಿತ ieee754;
     val.f = value;
     ieee754 = val.u;
 
-    if( (ieee754 & 0x7f800000) != 0x7f800000 )
+    ಆದರೆ( (ieee754 & 0x7f800000) != 0x7f800000 )
     {
-        int ivalue = cvRound(value);
-        if( ivalue == value )
+        ಪೂರ್ಣಾಂಕ ivalue = cv_ಸುತ್ತು(value);
+        ಆದರೆ( ivalue == value )
         {
-            if( explicitZero )
-                snprintf( buf, bufSize, "%d.0", ivalue );
-            else
-                snprintf( buf, bufSize, "%d.", ivalue );
+            ಆದರೆ( explicitZero )
+                snprintf( buf, buf_ಗಾತ್ರ, "%d.0", ivalue );
+            ಇಲ್ಲದಿದ್ದರೆ
+                snprintf( buf, buf_ಗಾತ್ರ, "%d.", ivalue );
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            if (halfprecision)
+            ಆದರೆ (halfprecision)
             {
                 // bfloat16 has 7 bit fraction with hidden bit.
                 // binary16 has 10 bit fraction with hidden bit.
                 // 11 * log_10(2) is 3.311. So "%.4f" should be fine, but its test fails.
-                snprintf(buf, bufSize, "%.5g", value);
+                snprintf(buf, buf_ಗಾತ್ರ, "%.5g", value);
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
                 // binray32 has 23 bit fraction with hidden bit.
                 // 24 * log_10(2) is 7.225. So "%.8f" should be fine, but its test fails.
-                snprintf(buf, bufSize, "%.9g", value);
+                snprintf(buf, buf_ಗಾತ್ರ, "%.9g", value);
             }
 
-            char* ptr = buf;
-            if( *ptr == '+' || *ptr == '-' )
+            ಅಕ್ಷರ* ptr = buf;
+            ಆದರೆ( *ptr == '+' || *ptr == '-' )
                 ptr++;
-            for( ; cv_isdigit(*ptr); ptr++ )
+            ಗಾಗಿ( ; cv_isdigit(*ptr); ptr++ )
                 ;
-            if( *ptr == ',' )
+            ಆದರೆ( *ptr == ',' )
                 *ptr = '.';
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if( (ieee754 & 0x7fffffff) != 0x7f800000 )
+        ಆದರೆ( (ieee754 & 0x7fffffff) != 0x7f800000 )
             strcpy( buf, ".Nan" );
-        else
-            strcpy( buf, (int)ieee754 < 0 ? "-.Inf" : ".Inf" );
+        ಇಲ್ಲದಿದ್ದರೆ
+            strcpy( buf, (ಪೂರ್ಣಾಂಕ)ieee754 < 0 ? "-.Inf" : ".Inf" );
     }
 
-    return buf;
+    ಹಿಂತಿರುಗಿ buf;
 }
 
-static const char symbols[] = "ucwsifdhHbUIneE";
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ symbols[] = "ucwsifdhHbUIneE";
 
-static char typeSymbol(int depth)
+ಸ್ಥಿರ ಅಕ್ಷರ type_ಚಿಹ್ನೆ(ಪೂರ್ಣಾಂಕ ಆಳ)
 {
     CV_StaticAssert(CV_64F == 6, "");
-    CV_CheckDepth(depth, depth >= 0 && depth <= CV_8F_E4M3FNUZ, "");
-    return symbols[depth];
+    CV_Check_ಆಳ(ಆಳ, ಆಳ >= 0 && ಆಳ <= CV_8F_E4M3FNUZ, "");
+    ಹಿಂತಿರುಗಿ symbols[ಆಳ];
 }
 
-static int symbolToType(char c)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ ಚಿಹ್ನೆ_ಗಮ್ಯ_Type(ಅಕ್ಷರ c)
 {
-    if (c == 'r')
-        return CV_SEQ_ELTYPE_PTR;
-    const char* pos = strchr( symbols, c );
-    if( !pos )
+    ಆದರೆ (c == 'r')
+        ಹಿಂತಿರುಗಿ CV_SEQ_ELTYPE_PTR;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* pos = strchr( symbols, c );
+    ಆದರೆ( !pos )
         CV_Error( cv::Error::StsBadArg, "Invalid data type specification" );
-    return static_cast<int>(pos - symbols);
+    ಹಿಂತಿರುಗಿ static_cast<ಪೂರ್ಣಾಂಕ>(pos - symbols);
 }
 
-char* encodeFormat(int elem_type, char* dt, size_t dt_len)
+ಅಕ್ಷರ* encodeFormat(ಪೂರ್ಣಾಂಕ elem_type, ಅಕ್ಷರ* dt, size_t dt_len)
 {
-    int cn = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 1 : CV_MAT_CN(elem_type);
-    char symbol = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : typeSymbol(CV_MAT_DEPTH(elem_type));
-    snprintf(dt, dt_len, "%d%c", cn, symbol);
-    return dt + (cn == 1 ? 1 : 0);
+    ಪೂರ್ಣಾಂಕ cn = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 1 : CV_MAT_CN(elem_type);
+    ಅಕ್ಷರ ಚಿಹ್ನೆ = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : type_ಚಿಹ್ನೆ(CV_MAT_ಆಳ(elem_type));
+    snprintf(dt, dt_len, "%d%c", cn, ಚಿಹ್ನೆ);
+    ಹಿಂತಿರುಗಿ dt + (cn == 1 ? 1 : 0);
 }
 
 // Deprecated due to size of dt buffer being unknowable.
-char* encodeFormat(int elem_type, char* dt)
+ಅಕ್ಷರ* encodeFormat(ಪೂರ್ಣಾಂಕ elem_type, ಅಕ್ಷರ* dt)
 {
     constexpr size_t max = 20+1+1; // UINT64_MAX + one char + nul termination.
-    return encodeFormat(elem_type, dt, max);
+    ಹಿಂತಿರುಗಿ encodeFormat(elem_type, dt, max);
 }
 
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len )
+ಪೂರ್ಣಾಂಕ decodeFormat( ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* dt, ಪೂರ್ಣಾಂಕ* fmt_ಜೋಡಿಗಳು, ಪೂರ್ಣಾಂಕ max_len )
 {
-    int fmt_pair_count = 0;
-    int i = 0, k = 0, len = dt ? (int)strlen(dt) : 0;
+    ಪೂರ್ಣಾಂಕ fmt_pair_ಎಣಿಕೆ = 0;
+    ಪೂರ್ಣಾಂಕ i = 0, k = 0, len = dt ? (ಪೂರ್ಣಾಂಕ)ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(dt) : 0;
 
-    if( !dt || !len )
-        return 0;
+    ಆದರೆ( !dt || !len )
+        ಹಿಂತಿರುಗಿ 0;
 
-    CV_Assert( fmt_pairs != 0 && max_len > 0 );
-    fmt_pairs[0] = 0;
+    CV_Assert( fmt_ಜೋಡಿಗಳು != 0 && max_len > 0 );
+    fmt_ಜೋಡಿಗಳು[0] = 0;
     max_len *= 2;
 
-    for( ; k < len; k++ )
+    ಗಾಗಿ( ; k < len; k++ )
     {
-        char c = dt[k];
+        ಅಕ್ಷರ c = dt[k];
 
-        if( cv_isdigit(c) )
+        ಆದರೆ( cv_isdigit(c) )
         {
-            int count = c - '0';
-            if( cv_isdigit(dt[k+1]) )
+            ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3 = c - '0';
+            ಆದರೆ( cv_isdigit(dt[k+1]) )
             {
-                char* endptr = 0;
-                count = (int)strtol( dt+k, &endptr, 10 );
-                k = (int)(endptr - dt) - 1;
+                ಅಕ್ಷರ* endptr = 0;
+                ಎಣಿಕೆ_3 = (ಪೂರ್ಣಾಂಕ)strtol( dt+k, &endptr, 10 );
+                k = (ಪೂರ್ಣಾಂಕ)(endptr - dt) - 1;
             }
 
-            if( count <= 0 )
+            ಆದರೆ( ಎಣಿಕೆ_3 <= 0 )
                 CV_Error( cv::Error::StsBadArg, "Invalid data type specification" );
 
-            fmt_pairs[i] = count;
+            fmt_ಜೋಡಿಗಳು[i] = ಎಣಿಕೆ_3;
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            int depth = symbolToType(c);
-            if( fmt_pairs[i] == 0 )
-                fmt_pairs[i] = 1;
-            fmt_pairs[i+1] = depth;
-            if( i > 0 && fmt_pairs[i+1] == fmt_pairs[i-1] )
-                fmt_pairs[i-2] += fmt_pairs[i];
-            else
+            ಪೂರ್ಣಾಂಕ ಆಳ = ಚಿಹ್ನೆ_ಗಮ್ಯ_Type(c);
+            ಆದರೆ( fmt_ಜೋಡಿಗಳು[i] == 0 )
+                fmt_ಜೋಡಿಗಳು[i] = 1;
+            fmt_ಜೋಡಿಗಳು[i+1] = ಆಳ;
+            ಆದರೆ( i > 0 && fmt_ಜೋಡಿಗಳು[i+1] == fmt_ಜೋಡಿಗಳು[i-1] )
+                fmt_ಜೋಡಿಗಳು[i-2] += fmt_ಜೋಡಿಗಳು[i];
+            ಇಲ್ಲದಿದ್ದರೆ
             {
                 i += 2;
-                if( i >= max_len )
+                ಆದರೆ( i >= max_len )
                     CV_Error( cv::Error::StsBadArg, "Too long data type specification" );
             }
-            fmt_pairs[i] = 0;
+            fmt_ಜೋಡಿಗಳು[i] = 0;
         }
     }
 
-    fmt_pair_count = i/2;
-    return fmt_pair_count;
+    fmt_pair_ಎಣಿಕೆ = i/2;
+    ಹಿಂತಿರುಗಿ fmt_pair_ಎಣಿಕೆ;
 }
 
-int calcElemSize( const char* dt, int initial_size )
+ಪೂರ್ಣಾಂಕ calc_Elem_ಗಾತ್ರ( ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* dt, ಪೂರ್ಣಾಂಕ initial_ಗಾತ್ರ )
 {
-    int size = 0;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], i, fmt_pair_count;
-    int comp_size;
+    ಪೂರ್ಣಾಂಕ size = 0;
+    ಪೂರ್ಣಾಂಕ fmt_ಜೋಡಿಗಳು[CV_FS_MAX_FMT_ಜೋಡಿಗಳು*2], i, fmt_pair_ಎಣಿಕೆ;
+    ಪೂರ್ಣಾಂಕ comp_ಗಾತ್ರ;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    fmt_pair_count *= 2;
-    for( i = 0, size = initial_size; i < fmt_pair_count; i += 2 )
+    fmt_pair_ಎಣಿಕೆ = decodeFormat( dt, fmt_ಜೋಡಿಗಳು, CV_FS_MAX_FMT_ಜೋಡಿಗಳು );
+    fmt_pair_ಎಣಿಕೆ *= 2;
+    ಗಾಗಿ( i = 0, size = initial_ಗಾತ್ರ; i < fmt_pair_ಎಣಿಕೆ; i += 2 )
     {
-        comp_size = CV_ELEM_SIZE(fmt_pairs[i+1]);
-        size = cvAlign( size, comp_size );
-        size += comp_size * fmt_pairs[i];
+        comp_ಗಾತ್ರ = CV_ELEM_ಗಾತ್ರ(fmt_ಜೋಡಿಗಳು[i+1]);
+        size = cvAlign( size, comp_ಗಾತ್ರ );
+        size += comp_ಗಾತ್ರ * fmt_ಜೋಡಿಗಳು[i];
     }
-    if( initial_size == 0 )
+    ಆದರೆ( initial_ಗಾತ್ರ == 0 )
     {
-        comp_size = CV_ELEM_SIZE(fmt_pairs[1]);
-        size = cvAlign( size, comp_size );
+        comp_ಗಾತ್ರ = CV_ELEM_ಗಾತ್ರ(fmt_ಜೋಡಿಗಳು[1]);
+        size = cvAlign( size, comp_ಗಾತ್ರ );
     }
-    return size;
+    ಹಿಂತಿರುಗಿ size;
 }
 
 
-int calcStructSize( const char* dt, int initial_size )
+ಪೂರ್ಣಾಂಕ calc_Struct_ಗಾತ್ರ( ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* dt, ಪೂರ್ಣಾಂಕ initial_ಗಾತ್ರ )
 {
-    int size = calcElemSize( dt, initial_size );
-    size_t elem_max_size = 0;
-    for ( const char * type = dt; *type != '\0'; type++ )
+    ಪೂರ್ಣಾಂಕ size = calc_Elem_ಗಾತ್ರ( dt, initial_ಗಾತ್ರ );
+    size_t elem_max_ಗಾತ್ರ = 0;
+    ಗಾಗಿ ( ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * type = dt; *type != '\0'; type++ )
     {
-        char v = *type;
-        if (v >= '0' && v <= '9')
-            continue;  // skip vector size
-        switch (v)
+        ಅಕ್ಷರ v = *type;
+        ಆದರೆ (v >= '0' && v <= '9')
+            ಮುಂದುವರಿ;  // skip vector size
+        ಆಯ್ಕೆ (v)
         {
-        case 'u': { elem_max_size = std::max( elem_max_size, sizeof(uchar ) ); break; }
-        case 'b': { elem_max_size = std::max( elem_max_size, sizeof(bool  ) ); break; }
-        case 'c': { elem_max_size = std::max( elem_max_size, sizeof(schar ) ); break; }
-        case 'w': { elem_max_size = std::max( elem_max_size, sizeof(ushort) ); break; }
-        case 's': { elem_max_size = std::max( elem_max_size, sizeof(short ) ); break; }
-        case 'i': { elem_max_size = std::max( elem_max_size, sizeof(int   ) ); break; }
-        case 'n': { elem_max_size = std::max( elem_max_size, sizeof(unsigned) ); break; }
-        case 'f': { elem_max_size = std::max( elem_max_size, sizeof(float ) ); break; }
-        case 'd': { elem_max_size = std::max( elem_max_size, sizeof(double) ); break; }
-        case 'h': { elem_max_size = std::max( elem_max_size, sizeof(hfloat)); break; }
-        case 'H': { elem_max_size = std::max( elem_max_size, sizeof(bfloat)); break; }
-        case 'e': { elem_max_size = std::max( elem_max_size, sizeof(fp8_t) ); break; }
-        case 'E': { elem_max_size = std::max( elem_max_size, sizeof(fp8a_t)); break; }
-        case 'I': { elem_max_size = std::max( elem_max_size, sizeof(int64_t)); break; }
-        case 'U': { elem_max_size = std::max( elem_max_size, sizeof(uint64_t)); break; }
-        default:
-            CV_Error_(Error::StsNotImplemented, ("Unknown type identifier: '%c' in '%s'", (char)(*type), dt));
+        ಸ್ಥಿತಿ 'u': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(uchar ) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'b': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(ತಾರ್ಕಿಕ  ) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'c': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(schar ) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'w': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(ushort) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 's': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(ಗಿಡ್ಡ ) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'i': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ   ) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'n': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(ಚಿಹ್ನೆರಹಿತ) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'f': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(ದಶಮಾಂಶ ) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'd': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(ದ್ವಿಗುಣ) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'h': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(hfloat)); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'H': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(bfloat)); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'e': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(fp8_t) ); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'E': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(fp8a_t)); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'I': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(int64_t)); ನಿಲ್ಲಿಸು; }
+        ಸ್ಥಿತಿ 'U': { elem_max_ಗಾತ್ರ = std::max( elem_max_ಗಾತ್ರ, ಗಾತ್ರ(uint64_t)); ನಿಲ್ಲಿಸು; }
+        ಪೂರ್ವನಿಯೋಜಿತ:
+            CV_Error_(Error::StsNotImplemented, ("Unknown type identifier: '%c' in '%s'", (ಅಕ್ಷರ)(*type), dt));
         }
     }
-    size = cvAlign( size, static_cast<int>(elem_max_size) );
-    return size;
+    size = cvAlign( size, static_cast<ಪೂರ್ಣಾಂಕ>(elem_max_ಗಾತ್ರ) );
+    ಹಿಂತಿರುಗಿ size;
 }
 
-int decodeSimpleFormat( const char* dt )
+ಪೂರ್ಣಾಂಕ decodeSimpleFormat( ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* dt )
 {
-    int elem_type = -1;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], fmt_pair_count;
+    ಪೂರ್ಣಾಂಕ elem_type = -1;
+    ಪೂರ್ಣಾಂಕ fmt_ಜೋಡಿಗಳು[CV_FS_MAX_FMT_ಜೋಡಿಗಳು*2], fmt_pair_ಎಣಿಕೆ;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    if( fmt_pair_count != 1 || fmt_pairs[0] >= CV_CN_MAX)
+    fmt_pair_ಎಣಿಕೆ = decodeFormat( dt, fmt_ಜೋಡಿಗಳು, CV_FS_MAX_FMT_ಜೋಡಿಗಳು );
+    ಆದರೆ( fmt_pair_ಎಣಿಕೆ != 1 || fmt_ಜೋಡಿಗಳು[0] >= CV_CN_MAX)
         CV_Error( cv::Error::StsError, "Too complex format for the matrix" );
 
-    elem_type = CV_MAKETYPE( fmt_pairs[1], fmt_pairs[0] );
+    elem_type = CV_MAKETYPE( fmt_ಜೋಡಿಗಳು[1], fmt_ಜೋಡಿಗಳು[0] );
 
-    return elem_type;
+    ಹಿಂತಿರುಗಿ elem_type;
 }
 
 }
 
-#if defined __i386__ || defined(_M_IX86) || defined __x86_64__ || defined(_M_X64) || \
+#ಆದರೆ defined __i386__ || defined(_M_IX86) || defined __x86_64__ || defined(_M_X64) || \
     (defined (__LITTLE_ENDIAN__) && __LITTLE_ENDIAN__)
-#define CV_LITTLE_ENDIAN_MEM_ACCESS 1
-#else
-#define CV_LITTLE_ENDIAN_MEM_ACCESS 0
-#endif
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_LITTLE_ENDIAN_MEM_ACCESS 1
+#ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು CV_LITTLE_ENDIAN_MEM_ACCESS 0
+#ಆದರೆ_ಅಂತ್ಯ
 
-static inline int readInt(const uchar* p)
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಪೂರ್ಣಾಂಕ readInt(ಸ್ಥಿರಾಂಕ uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    int val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
-    int val = (int)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
-    return val;
-#endif
+#ಆದರೆ CV_LITTLE_ENDIAN_MEM_ACCESS
+    ಪೂರ್ಣಾಂಕ val;
+    ಸ್ಮರಣೆ_ನಕಲು(&val, p, ಗಾತ್ರ(val));
+    ಹಿಂತಿರುಗಿ val;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಪೂರ್ಣಾಂಕ val = (ಪೂರ್ಣಾಂಕ)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
+    ಹಿಂತಿರುಗಿ val;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-static inline int64_t readLong(const uchar* p)
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ int64_t readLong(ಸ್ಥಿರಾಂಕ uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
+#ಆದರೆ CV_LITTLE_ENDIAN_MEM_ACCESS
     int64_t val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
-    unsigned val0 = (unsigned)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
-    unsigned val1 = (unsigned)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
-    return val0 | ((int64_t)val1 << 32);
-#endif
+    ಸ್ಮರಣೆ_ನಕಲು(&val, p, ಗಾತ್ರ(val));
+    ಹಿಂತಿರುಗಿ val;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಚಿಹ್ನೆರಹಿತ val0 = (ಚಿಹ್ನೆರಹಿತ)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
+    ಚಿಹ್ನೆರಹಿತ val1 = (ಚಿಹ್ನೆರಹಿತ)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
+    ಹಿಂತಿರುಗಿ val0 | ((int64_t)val1 << 32);
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-static inline double readReal(const uchar* p)
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ ದ್ವಿಗುಣ readReal(ಸ್ಥಿರಾಂಕ uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    double val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
-    unsigned val0 = (unsigned)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
-    unsigned val1 = (unsigned)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
+#ಆದರೆ CV_LITTLE_ENDIAN_MEM_ACCESS
+    ದ್ವಿಗುಣ val;
+    ಸ್ಮರಣೆ_ನಕಲು(&val, p, ಗಾತ್ರ(val));
+    ಹಿಂತಿರುಗಿ val;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಚಿಹ್ನೆರಹಿತ val0 = (ಚಿಹ್ನೆರಹಿತ)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
+    ಚಿಹ್ನೆರಹಿತ val1 = (ಚಿಹ್ನೆರಹಿತ)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
     Cv64suf val;
     val.u = val0 | ((uint64)val1 << 32);
-    return val.f;
-#endif
+    ಹಿಂತಿರುಗಿ val.f;
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-template <typename T>
-static inline void writeInt(uchar* p, T ival)
+ಮಾದರಿ <ಬಗೆ_ಹೆಸರು T>
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಶೂನ್ಯ writeInt(uchar* p, T ival)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    memcpy(p, &ival, sizeof(ival));
-#else
-    for (size_t i = 0, j = 0; i < sizeof(ival); ++i, j += 8)
+#ಆದರೆ CV_LITTLE_ENDIAN_MEM_ACCESS
+    ಸ್ಮರಣೆ_ನಕಲು(p, &ival, ಗಾತ್ರ(ival));
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಗಾಗಿ (size_t i = 0, j = 0; i < ಗಾತ್ರ(ival); ++i, j += 8)
         p[i] = (uchar)(ival >> j);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
-static inline void writeReal(uchar* p, double fval)
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಶೂನ್ಯ writeReal(uchar* p, ದ್ವಿಗುಣ fval)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    memcpy(p, &fval, sizeof(fval));
-#else
+#ಆದರೆ CV_LITTLE_ENDIAN_MEM_ACCESS
+    ಸ್ಮರಣೆ_ನಕಲು(p, &fval, ಗಾತ್ರ(fval));
+#ಇಲ್ಲದಿದ್ದರೆ
     Cv64suf v;
     v.f = fval;
     p[0] = (uchar)v.u;
@@ -416,48 +416,48 @@ static inline void writeReal(uchar* p, double fval)
     p[5] = (uchar)(v.u >> 40);
     p[6] = (uchar)(v.u >> 48);
     p[7] = (uchar)(v.u >> 56);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 }
 
 
 
-void FileStorage::Impl::init() {
+ಶೂನ್ಯ FileStorage::Impl::init() {
     flags = 0;
-    buffer.clear();
+    ಬಫರ್.clear();
     bufofs = 0;
     state = UNDEFINED;
-    is_using_base64 = false;
-    state_of_writing_base64 = FileStorage_API::Base64State::Uncertain;
-    is_write_struct_delayed = false;
-    delayed_struct_key = nullptr;
+    is_using_base64 = ಸುಳ್ಳು;
+    state_ದ_writing_base64 = FileStorage_API::Base64State::Uncertain;
+    is_write_struct_delayed = ಸುಳ್ಳು;
+    delayed_struct_ಕೀಲಿ = ಶೂನ್ಯಸೂಚಕ;
     delayed_struct_flags = 0;
-    delayed_type_name = nullptr;
-    base64_writer = nullptr;
-    is_opened = false;
-    dummy_eof = false;
-    write_mode = false;
-    mem_mode = false;
+    delayed_type_name = ಶೂನ್ಯಸೂಚಕ;
+    base64_writer = ಶೂನ್ಯಸೂಚಕ;
+    is_opened = ಸುಳ್ಳು;
+    dummy_eof = ಸುಳ್ಳು;
+    write_ಬಹುಲಕ = ಸುಳ್ಳು;
+    mem_ಬಹುಲಕ = ಸುಳ್ಳು;
     space = 0;
     wrap_margin = 71;
     fmt = 0;
     file = 0;
     gzfile = 0;
-    empty_stream = true;
+    ಖಾಲಿಗಳು_ಹರಿವು = ನಿಜ;
 
     strbufv.clear();
     strbuf = 0;
     strbufsize = strbufpos = 0;
     roots.clear();
 
-    fs_data.clear();
-    fs_data_ptrs.clear();
-    fs_data_blksz.clear();
+    fs_ದತ್ತಾಂಶ.clear();
+    fs_ದತ್ತಾಂಶ_ptrs.clear();
+    fs_ದತ್ತಾಂಶ_blksz.clear();
     freeSpaceOfs = 0;
 
     str_hash.clear();
-    str_hash_data.clear();
-    str_hash_data.resize(1);
-    str_hash_data[0] = '\0';
+    str_hash_ದತ್ತಾಂಶ.clear();
+    str_hash_ದತ್ತಾಂಶ.resize(1);
+    str_hash_ದತ್ತಾಂಶ[0] = '\0';
 
     filename.clear();
     lineno = 0;
@@ -472,21 +472,21 @@ FileStorage::Impl::~Impl() {
     release();
 }
 
-void FileStorage::Impl::release(String *out) {
-    if (is_opened) {
-        if (out)
+ಶೂನ್ಯ FileStorage::Impl::release(String *out) {
+    ಆದರೆ (is_opened) {
+        ಆದರೆ (out)
             out->clear();
-        if (write_mode) {
-            while (write_stack.size() > 1) {
-                endWriteStruct();
+        ಆದರೆ (write_ಬಹುಲಕ) {
+            ಆಗ (write_ರಾಶಿ.size() > 1) {
+                ಕೊನೆ_Write_Struct();
             }
             flush();
-            if (fmt == FileStorage::FORMAT_XML)
+            ಆದರೆ (fmt == FileStorage::FORMAT_XML)
                 puts("</opencv_storage>\n");
-            else if (fmt == FileStorage::FORMAT_JSON)
+            ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fmt == FileStorage::FORMAT_JSON)
                 puts("}\n");
         }
-        if (mem_mode && out) {
+        ಆದರೆ (mem_ಬಹುಲಕ && out) {
             *out = cv::String(outbuf.begin(), outbuf.end());
         }
     }
@@ -494,140 +494,140 @@ void FileStorage::Impl::release(String *out) {
     init();
 }
 
-void FileStorage::Impl::analyze_file_name(const std::string &file_name, std::vector<std::string> &params) {
+ಶೂನ್ಯ FileStorage::Impl::analyze_file_name(ಸ್ಥಿರಾಂಕ std::string &file_name, std::vector<std::string> &params) {
     params.clear();
-    static const char not_file_name = '\n';
-    static const char parameter_begin = '?';
-    static const char parameter_separator = '&';
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ not_file_name = '\n';
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ parameter_begin = '?';
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ parameter_separator = '&';
 
-    if (file_name.find(not_file_name, (size_t) 0) != std::string::npos)
-        return;
+    ಆದರೆ (file_name.find(not_file_name, (size_t) 0) != std::string::npos)
+        ಹಿಂತಿರುಗಿ;
 
     size_t beg = file_name.find_last_of(parameter_begin);
     params.push_back(file_name.substr((size_t) 0, beg));
 
-    if (beg != std::string::npos) {
+    ಆದರೆ (beg != std::string::npos) {
         size_t end = file_name.size();
         beg++;
-        for (size_t param_beg = beg, param_end = beg;
-             param_end < end;
-             param_beg = param_end + 1) {
-            param_end = file_name.find_first_of(parameter_separator, param_beg);
-            if ((param_end == std::string::npos || param_end != param_beg) && param_beg + 1 < end) {
-                params.push_back(file_name.substr(param_beg, param_end - param_beg));
+        ಗಾಗಿ (size_t param_beg = beg, param_ಕೊನೆ = beg;
+             param_ಕೊನೆ < end;
+             param_beg = param_ಕೊನೆ + 1) {
+            param_ಕೊನೆ = file_name.find_first_of(parameter_separator, param_beg);
+            ಆದರೆ ((param_ಕೊನೆ == std::string::npos || param_ಕೊನೆ != param_beg) && param_beg + 1 < end) {
+                params.push_back(file_name.substr(param_beg, param_ಕೊನೆ - param_beg));
             }
         }
     }
 }
 
-bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char *encoding) {
-    bool ok = true;
+ತಾರ್ಕಿಕ FileStorage::Impl::open(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *filename_or_buf, ಪೂರ್ಣಾಂಕ _flags, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *encoding) {
+    ತಾರ್ಕಿಕ ok = ನಿಜ;
     release();
 
-    bool append = (_flags & 3) == FileStorage::APPEND;
-    mem_mode = (_flags & FileStorage::MEMORY) != 0;
+    ತಾರ್ಕಿಕ append = (_flags & 3) == FileStorage::APPEND;
+    mem_ಬಹುಲಕ = (_flags & FileStorage::ಸ್ಮರಣೆ) != 0;
 
-    write_mode = (_flags & 3) != 0;
-    bool write_base64 = (write_mode || append) && (_flags & FileStorage::BASE64) != 0;
+    write_ಬಹುಲಕ = (_flags & 3) != 0;
+    ತಾರ್ಕಿಕ write_base64 = (write_ಬಹುಲಕ || append) && (_flags & FileStorage::BASE64) != 0;
 
-    bool isGZ = false;
+    ತಾರ್ಕಿಕ isGZ = ಸುಳ್ಳು;
 
     std::vector<std::string> params;
     //if ( !mem_mode )
     {
         analyze_file_name(filename_or_buf, params);
-        if (!params.empty())
+        ಆದರೆ (!params.empty())
             filename = params[0];
 
-        if (!write_base64 && params.size() >= 2 &&
+        ಆದರೆ (!write_base64 && params.size() >= 2 &&
             std::find(params.begin() + 1, params.end(), std::string("base64")) != params.end())
-            write_base64 = (write_mode || append);
+            write_base64 = (write_ಬಹುಲಕ || append);
     }
 
-    if (filename.size() == 0 && !mem_mode && !write_mode)
+    ಆದರೆ (filename.size() == 0 && !mem_ಬಹುಲಕ && !write_ಬಹುಲಕ)
         CV_Error(cv::Error::StsNullPtr, "NULL or empty filename");
 
-    if (mem_mode && append)
+    ಆದರೆ (mem_ಬಹುಲಕ && append)
         CV_Error(cv::Error::StsBadFlag, "FileStorage::APPEND and FileStorage::MEMORY are not currently compatible");
 
     flags = _flags;
 
-    if (!mem_mode) {
+    ಆದರೆ (!mem_ಬಹುಲಕ) {
         size_t dot_idx = filename.find_last_of('.');
-        char compression = '\0';
+        ಅಕ್ಷರ compression = '\0';
 
-        if (dot_idx != std::string::npos)
+        ಆದರೆ (dot_idx != std::string::npos)
         {
             std::string ext = filename.substr(dot_idx);
 
             // Instead of `ext.starts_with(".gz")
-            if (ext.size() >= 3 && (ext[1] == 'g') && (ext[2] == 'z') )
+            ಆದರೆ (ext.size() >= 3 && (ext[1] == 'g') && (ext[2] == 'z') )
             {
-                if (ext.size() == 3)
+                ಆದರೆ (ext.size() == 3)
                 {
                     // ".gz"
-                    isGZ = true;
+                    isGZ = ನಿಜ;
                 }
 
-                else if(ext.size() == 4 && cv_isdigit(ext[3]))
+                ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(ext.size() == 4 && cv_isdigit(ext[3]))
                 {
                     // ".gz[0-9]"
-                    isGZ = true;
+                    isGZ = ನಿಜ;
                     compression = ext[3];
                     filename.pop_back(); // Replace `gz[0-9]' to 'gz'.
                 }
             }
         }
 
-        if (!isGZ) {
-            file = fopen(filename.c_str(), !write_mode ? "rt" : !append ? "wt" : "a+t");
-            if (!file)
+        ಆದರೆ (!isGZ) {
+            file = fopen(filename.c_str(), !write_ಬಹುಲಕ ? "rt" : !append ? "wt" : "a+t");
+            ಆದರೆ (!file)
             {
-                CV_LOG_ERROR(NULL, "Can't open file: '" << filename << "' in " << (!write_mode ? "read" : !append ? "write" : "append") << " mode");
-                return false;
+                CV_LOG_ERROR(ಖಾಲಿ, "Can't open file: '" << filename << "' in " << (!write_ಬಹುಲಕ ? "read" : !append ? "write" : "append") << " mode");
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
             }
-        } else {
-#if USE_ZLIB
-            if (append) {
+        } ಇಲ್ಲದಿದ್ದರೆ {
+#ಆದರೆ USE_ZLIB
+            ಆದರೆ (append) {
                 CV_Error(cv::Error::StsNotImplemented, "Appending data to compressed file is not implemented");
             }
-            char mode[] = {write_mode ? 'w' : 'r', 'b', compression ? compression : '3', '\0'};
-            gzfile = gzopen(filename.c_str(), mode);
-            if (!gzfile)
+            ಅಕ್ಷರ ಬಹುಲಕ[] = {write_ಬಹುಲಕ ? 'w' : 'r', 'b', compression ? compression : '3', '\0'};
+            gzfile = gzopen(filename.c_str(), ಬಹುಲಕ);
+            ಆದರೆ (!gzfile)
             {
-                CV_LOG_ERROR(NULL, "Can't open archive: '" << filename << "' mode=" << mode);
-                return false;
+                CV_LOG_ERROR(ಖಾಲಿ, "Can't open archive: '" << filename << "' mode=" << ಬಹುಲಕ);
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
             }
-#else
+#ಇಲ್ಲದಿದ್ದರೆ
             CV_Error(cv::Error::StsNotImplemented, "There is no compressed file storage support in this configuration");
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
         }
     }
 
     // FIXIT release() must do that, use CV_Assert() here instead
     roots.clear();
-    fs_data.clear();
+    fs_ದತ್ತಾಂಶ.clear();
 
     wrap_margin = 71;
     fmt = FileStorage::FORMAT_AUTO;
 
-    if (write_mode) {
-        fmt = flags & FileStorage::FORMAT_MASK;
+    ಆದರೆ (write_ಬಹುಲಕ) {
+        fmt = flags & FileStorage::FORMAT_ಮುಖವಾಡ;
 
-        if (mem_mode)
+        ಆದರೆ (mem_ಬಹುಲಕ)
             outbuf.clear();
 
-        if (fmt == FileStorage::FORMAT_AUTO && !filename.empty()) {
-            const char *dot_pos = NULL;
-            const char *dot_pos2 = NULL;
+        ಆದರೆ (fmt == FileStorage::FORMAT_AUTO && !filename.empty()) {
+            ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *dot_pos = ಖಾಲಿ;
+            ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *dot_pos2 = ಖಾಲಿ;
             // like strrchr() implementation, but save two last positions simultaneously
-            for (const char *pos = &filename[0]; pos[0] != 0; pos++) {
-                if (pos[0] == '.') {
+            ಗಾಗಿ (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *pos = &filename[0]; pos[0] != 0; pos++) {
+                ಆದರೆ (pos[0] == '.') {
                     dot_pos2 = dot_pos;
                     dot_pos = pos;
                 }
             }
-            if (fs::strcasecmp(dot_pos, ".gz") == 0 && dot_pos2 != NULL) {
+            ಆದರೆ (fs::strcasecmp(dot_pos, ".gz") == 0 && dot_pos2 != ಖಾಲಿ) {
                 dot_pos = dot_pos2;
             }
             fmt = (fs::strcasecmp(dot_pos, ".xml") == 0 || fs::strcasecmp(dot_pos, ".xml.gz") == 0)
@@ -635,913 +635,913 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                   : (fs::strcasecmp(dot_pos, ".json") == 0 || fs::strcasecmp(dot_pos, ".json.gz") == 0)
                     ? FileStorage::FORMAT_JSON
                     : FileStorage::FORMAT_YAML;
-        } else if (fmt == FileStorage::FORMAT_AUTO) {
+        } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fmt == FileStorage::FORMAT_AUTO) {
             fmt = FileStorage::FORMAT_XML;
         }
 
         // we use factor=6 for XML (the longest characters (' and ") are encoded with 6 bytes (&apos; and &quot;)
         // and factor=4 for YAML ( as we use 4 bytes for non ASCII characters (e.g. \xAB))
-        int buf_size = CV_FS_MAX_LEN * (fmt == FileStorage::FORMAT_XML ? 6 : 4) + 1024;
+        ಪೂರ್ಣಾಂಕ buf_ಗಾತ್ರ_2 = CV_FS_MAX_LEN * (fmt == FileStorage::FORMAT_XML ? 6 : 4) + 1024;
 
-        if (append) {
+        ಆದರೆ (append) {
             fseek(file, 0, SEEK_END);
-            if (ftell(file) == 0)
-                append = false;
+            ಆದರೆ (ftell(file) == 0)
+                append = ಸುಳ್ಳು;
         }
 
-        write_stack.clear();
-        empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::MAP | FileNode::EMPTY, 0));
-        buffer.reserve(buf_size + 1024);
-        buffer.resize(buf_size);
+        write_ರಾಶಿ.clear();
+        ಖಾಲಿಗಳು_ಹರಿವು = ನಿಜ;
+        write_ರಾಶಿ.push_back(FStruct_ದತ್ತಾಂಶ("", File_ಗಂಟು::MAP | File_ಗಂಟು::ಖಾಲಿಗಳು_2, 0));
+        ಬಫರ್.reserve(buf_ಗಾತ್ರ_2 + 1024);
+        ಬಫರ್.resize(buf_ಗಾತ್ರ_2);
         bufofs = 0;
         is_using_base64 = write_base64;
-        state_of_writing_base64 = FileStorage_API::Base64State::Uncertain;
+        state_ದ_writing_base64 = FileStorage_API::Base64State::Uncertain;
 
-        if (fmt == FileStorage::FORMAT_XML) {
-            size_t file_size = file ? (size_t) ftell(file) : (size_t) 0;
-            if (!append || file_size == 0) {
-                if (encoding && *encoding != '\0') {
-                    if (fs::strcasecmp(encoding, "UTF-16") == 0) {
+        ಆದರೆ (fmt == FileStorage::FORMAT_XML) {
+            size_t file_ಗಾತ್ರ_2 = file ? (size_t) ftell(file) : (size_t) 0;
+            ಆದರೆ (!append || file_ಗಾತ್ರ_2 == 0) {
+                ಆದರೆ (encoding && *encoding != '\0') {
+                    ಆದರೆ (fs::strcasecmp(encoding, "UTF-16") == 0) {
                         release();
                         CV_Error(cv::Error::StsBadArg, "UTF-16 XML encoding is not supported! Use 8-bit encoding\n");
                     }
 
-                    CV_Assert(strlen(encoding) < 1000);
-                    char buf[1100];
-                    snprintf(buf, sizeof(buf), "<?xml version=\"1.0\" encoding=\"%s\"?>\n", encoding);
+                    CV_Assert(ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(encoding) < 1000);
+                    ಅಕ್ಷರ buf[1100];
+                    snprintf(buf, ಗಾತ್ರ(buf), "<?xml version=\"1.0\" encoding=\"%s\"?>\n", encoding);
                     puts(buf);
-                } else
+                } ಇಲ್ಲದಿದ್ದರೆ
                     puts("<?xml version=\"1.0\"?>\n");
                 puts("<opencv_storage>\n");
-            } else {
-                int xml_buf_size = 1 << 10;
-                char substr[] = "</opencv_storage>";
-                int last_occurrence = -1;
-                xml_buf_size = MIN(xml_buf_size, int(file_size));
-                fseek(file, -xml_buf_size, SEEK_END);
+            } ಇಲ್ಲದಿದ್ದರೆ {
+                ಪೂರ್ಣಾಂಕ xml_buf_ಗಾತ್ರ = 1 << 10;
+                ಅಕ್ಷರ substr[] = "</opencv_storage>";
+                ಪೂರ್ಣಾಂಕ ಕೊನೆಯ_occurrence = -1;
+                xml_buf_ಗಾತ್ರ = MIN(xml_buf_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ(file_ಗಾತ್ರ_2));
+                fseek(file, -xml_buf_ಗಾತ್ರ, SEEK_END);
                 // find the last occurrence of </opencv_storage>
-                for (;;) {
-                    int line_offset = (int) ftell(file);
-                    const char *ptr0 = this->gets(xml_buf_size);
-                    const char *ptr = NULL;
-                    if (!ptr0)
-                        break;
+                ಗಾಗಿ (;;) {
+                    ಪೂರ್ಣಾಂಕ ಸಾಲು_ಸ್ಥಾನಾಂತರ = (ಪೂರ್ಣಾಂಕ) ftell(file);
+                    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ptr0 = ಇದು->gets(xml_buf_ಗಾತ್ರ);
+                    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ptr = ಖಾಲಿ;
+                    ಆದರೆ (!ptr0)
+                        ನಿಲ್ಲಿಸು;
                     ptr = ptr0;
-                    for (;;) {
-                        ptr = strstr(ptr, substr);
-                        if (!ptr)
-                            break;
-                        last_occurrence = line_offset + (int) (ptr - ptr0);
-                        ptr += strlen(substr);
+                    ಗಾಗಿ (;;) {
+                        ptr = ಅಕ್ಷರಸರಣಿ_ಹುಡುಕು(ptr, substr);
+                        ಆದರೆ (!ptr)
+                            ನಿಲ್ಲಿಸು;
+                        ಕೊನೆಯ_occurrence = ಸಾಲು_ಸ್ಥಾನಾಂತರ + (ಪೂರ್ಣಾಂಕ) (ptr - ptr0);
+                        ptr += ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(substr);
                     }
                 }
-                if (last_occurrence < 0) {
+                ಆದರೆ (ಕೊನೆಯ_occurrence < 0) {
                     release();
                     CV_Error(cv::Error::StsError, "Could not find </opencv_storage> in the end of file.\n");
                 }
                 closeFile();
                 file = fopen(filename.c_str(), "r+t");
                 CV_Assert(file != 0);
-                fseek(file, last_occurrence, SEEK_SET);
+                fseek(file, ಕೊನೆಯ_occurrence, SEEK_SET);
                 // replace the last "</opencv_storage>" with " <!-- resumed -->", which has the same length
                 puts(" <!-- resumed -->");
                 fseek(file, 0, SEEK_END);
                 puts("\n");
             }
 
-            emitter_do_not_use_direct_dereference = createXMLEmitter(this);
-        } else if (fmt == FileStorage::FORMAT_YAML || fmt == FileStorage::FORMAT_YAML_1_0) {
-                if (!append) {
-                    if (fmt == FileStorage::FORMAT_YAML_1_0)
+            emitter_do_not_use_ನೇರ_dereference = createXMLEmitter(ಇದು);
+        } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (fmt == FileStorage::FORMAT_YAML || fmt == FileStorage::FORMAT_YAML_1_0) {
+                ಆದರೆ (!append) {
+                    ಆದರೆ (fmt == FileStorage::FORMAT_YAML_1_0)
                         puts("%YAML:1.0\n---\n"); // Legacy Flag -> Legacy Header
-                    else
+                    ಇಲ್ಲದಿದ್ದರೆ
                         puts("%YAML 1.2\n---\n"); // Default -> Modern Header
                 }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
                 puts("...\n---\n");
 
-            emitter_do_not_use_direct_dereference = createYAMLEmitter(this);
-        } else {
+            emitter_do_not_use_ನೇರ_dereference = createYAMLEmitter(ಇದು);
+        } ಇಲ್ಲದಿದ್ದರೆ {
             CV_Assert(fmt == FileStorage::FORMAT_JSON);
-            if (!append)
+            ಆದರೆ (!append)
                 puts("{\n");
-            else {
-                bool valid = false;
-                long roffset = 0;
-                for (;
+            ಇಲ್ಲದಿದ್ದರೆ {
+                ತಾರ್ಕಿಕ valid = ಸುಳ್ಳು;
+                ದೀರ್ಘ roffset = 0;
+                ಗಾಗಿ (;
                         fseek(file, roffset, SEEK_END) == 0;
                         roffset -= 1) {
-                    const char end_mark = '}';
-                    if (fgetc(file) == end_mark) {
+                    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ ಕೊನೆ_mark = '}';
+                    ಆದರೆ (fgetc(file) == ಕೊನೆ_mark) {
                         fseek(file, roffset, SEEK_END);
-                        valid = true;
-                        break;
+                        valid = ನಿಜ;
+                        ನಿಲ್ಲಿಸು;
                     }
                 }
 
-                if (valid) {
+                ಆದರೆ (valid) {
                     closeFile();
                     file = fopen(filename.c_str(), "r+t");
                     CV_Assert(file != 0);
                     fseek(file, roffset, SEEK_END);
                     fputs(",", file);
-                } else {
+                } ಇಲ್ಲದಿದ್ದರೆ {
                     CV_Error(cv::Error::StsError, "Could not find '}' in the end of file.\n");
                 }
             }
-            write_stack.back().indent = 4;
-            emitter_do_not_use_direct_dereference = createJSONEmitter(this);
+            write_ರಾಶಿ.back().indent = 4;
+            emitter_do_not_use_ನೇರ_dereference = createJSONEmitter(ಇದು);
         }
-        is_opened = true;
-    } else {
-        const size_t buf_size0 = 40;
-        buffer.resize(buf_size0);
-        if (mem_mode) {
-            strbuf = (char *) filename_or_buf;
-            strbufsize = strlen(strbuf);
+        is_opened = ನಿಜ;
+    } ಇಲ್ಲದಿದ್ದರೆ {
+        ಸ್ಥಿರಾಂಕ size_t buf_size0 = 40;
+        ಬಫರ್.resize(buf_size0);
+        ಆದರೆ (mem_ಬಹುಲಕ) {
+            strbuf = (ಅಕ್ಷರ *) filename_or_buf;
+            strbufsize = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(strbuf);
         }
 
-        const char *yaml_signature = "%YAML";
-        const char *json_signature = "{";
-        const char *xml_signature = "<?xml";
-        char *buf = this->gets(16);
+        ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *yaml_signature = "%YAML";
+        ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *json_signature = "{";
+        ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *xml_signature = "<?xml";
+        ಅಕ್ಷರ *buf = ಇದು->gets(16);
         CV_Assert(buf);
-        char *bufPtr = cv_skip_BOM(buf);
-        size_t bufOffset = bufPtr - buf;
+        ಅಕ್ಷರ *bufPtr = cv_skip_BOM(buf);
+        size_t buf_ಸ್ಥಾನಾಂತರ = bufPtr - buf;
 
         // NOTE: Yaml 1.2 allows to skip header. Data without type signature is read as YAML
-        if (strncmp(bufPtr, yaml_signature, strlen(yaml_signature)) == 0)
+        ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(bufPtr, yaml_signature, ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(yaml_signature)) == 0)
             fmt = FileStorage::FORMAT_YAML;
-        else if (strncmp(bufPtr, json_signature, strlen(json_signature)) == 0)
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(bufPtr, json_signature, ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(json_signature)) == 0)
             fmt = FileStorage::FORMAT_JSON;
-        else if (strncmp(bufPtr, xml_signature, strlen(xml_signature)) == 0)
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(bufPtr, xml_signature, ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(xml_signature)) == 0)
             fmt = FileStorage::FORMAT_XML;
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
             fmt = FileStorage::FORMAT_YAML;
 
         rewind();
-        strbufpos = bufOffset;
+        strbufpos = buf_ಸ್ಥಾನಾಂತರ;
         bufofs = 0;
 
-        try {
-            char *ptr = bufferStart();
+        ಪ್ರಯತ್ನಿಸು {
+            ಅಕ್ಷರ *ptr = ಬಫರ್_ಆರಂಭ();
             ptr[0] = ptr[1] = ptr[2] = '\0';
-            FileNode root_nodes(fs_ext, 0, 0);
+            File_ಗಂಟು ಬೇರು_nodes(fs_ext, 0, 0);
 
-            uchar *rptr = reserveNodeSpace(root_nodes, 9);
-            *rptr = FileNode::SEQ;
+            uchar *rptr = reserve_ಗಂಟು_Space(ಬೇರು_nodes, 9);
+            *rptr = File_ಗಂಟು::SEQ;
             writeInt(rptr + 1, 4);
             writeInt(rptr + 5, 0);
 
             roots.clear();
 
-            switch (fmt) {
-                case FileStorage::FORMAT_XML:
-                    parser_do_not_use_direct_dereference = createXMLParser(this);
-                    break;
-                case FileStorage::FORMAT_YAML:
-                case FileStorage::FORMAT_YAML_1_0:
-                    parser_do_not_use_direct_dereference = createYAMLParser(this);
-                    break;
-                case FileStorage::FORMAT_JSON:
-                    parser_do_not_use_direct_dereference = createJSONParser(this);
-                    break;
-                default:
-                    parser_do_not_use_direct_dereference = Ptr<FileStorageParser>();
+            ಆಯ್ಕೆ (fmt) {
+                ಸ್ಥಿತಿ FileStorage::FORMAT_XML:
+                    parser_do_not_use_ನೇರ_dereference = createXMLParser(ಇದು);
+                    ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ FileStorage::FORMAT_YAML:
+                ಸ್ಥಿತಿ FileStorage::FORMAT_YAML_1_0:
+                    parser_do_not_use_ನೇರ_dereference = createYAMLParser(ಇದು);
+                    ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ FileStorage::FORMAT_JSON:
+                    parser_do_not_use_ನೇರ_dereference = createJSONParser(ಇದು);
+                    ನಿಲ್ಲಿಸು;
+                ಪೂರ್ವನಿಯೋಜಿತ:
+                    parser_do_not_use_ನೇರ_dereference = Ptr<FileStorageParser>();
             }
 
-            if (!parser_do_not_use_direct_dereference.empty()) {
+            ಆದರೆ (!parser_do_not_use_ನೇರ_dereference.empty()) {
                 ok = getParser().parse(ptr);
-                if (ok) {
-                    finalizeCollection(root_nodes);
+                ಆದರೆ (ok) {
+                    finalizeCollection(ಬೇರು_nodes);
 
-                    CV_Assert(!fs_data_ptrs.empty());
-                    FileNode roots_node(fs_ext, 0, 0);
-                    size_t i, nroots = roots_node.size();
-                    FileNodeIterator it = roots_node.begin();
+                    CV_Assert(!fs_ದತ್ತಾಂಶ_ptrs.empty());
+                    File_ಗಂಟು roots_ಗಂಟು(fs_ext, 0, 0);
+                    size_t i, nroots = roots_ಗಂಟು.size();
+                    File_ಗಂಟು_Iterator it = roots_ಗಂಟು.begin();
 
-                    for (i = 0; i < nroots; i++, ++it)
+                    ಗಾಗಿ (i = 0; i < nroots; i++, ++it)
                         roots.push_back(*it);
                 }
             }
         }
-        catch (...)
+        ಹಿಡಿ (...)
         {
             // FIXIT log error message
-            is_opened = true;
+            is_opened = ನಿಜ;
             release();
-            throw;
+            ಎಸೆ;
         }
 
         // release resources that we do not need anymore
         closeFile();
-        is_opened = true;
-        std::vector<char> tmpbuf;
-        std::swap(buffer, tmpbuf);
+        is_opened = ನಿಜ;
+        std::vector<ಅಕ್ಷರ> tmpbuf;
+        std::swap(ಬಫರ್, tmpbuf);
         bufofs = 0;
     }
-    return ok;
+    ಹಿಂತಿರುಗಿ ok;
 }
 
-void FileStorage::Impl::puts(const char *str) {
-    CV_Assert(write_mode);
-    if (mem_mode)
-        std::copy(str, str + strlen(str), std::back_inserter(outbuf));
-    else if (file)
+ಶೂನ್ಯ FileStorage::Impl::puts(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *str) {
+    CV_Assert(write_ಬಹುಲಕ);
+    ಆದರೆ (mem_ಬಹುಲಕ)
+        std::copy(str, str + ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(str), std::back_inserter(outbuf));
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (file)
         fputs(str, file);
-#if USE_ZLIB
-    else if (gzfile)
+#ಆದರೆ USE_ZLIB
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (gzfile)
         gzputs(gzfile, str);
-#endif
-    else
+#ಆದರೆ_ಅಂತ್ಯ
+    ಇಲ್ಲದಿದ್ದರೆ
         CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::getsFromFile(char *buf, int count) {
-    if (file)
-        return fgets(buf, count, file);
-#if USE_ZLIB
-    if (gzfile)
-        return gzgets(gzfile, buf, count);
-#endif
+ಅಕ್ಷರ *FileStorage::Impl::getsFromFile(ಅಕ್ಷರ *buf, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3) {
+    ಆದರೆ (file)
+        ಹಿಂತಿರುಗಿ fgets(buf, ಎಣಿಕೆ_3, file);
+#ಆದರೆ USE_ZLIB
+    ಆದರೆ (gzfile)
+        ಹಿಂತಿರುಗಿ gzgets(gzfile, buf, ಎಣಿಕೆ_3);
+#ಆದರೆ_ಅಂತ್ಯ
     CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::gets(size_t maxCount) {
-    if (strbuf) {
+ಅಕ್ಷರ *FileStorage::Impl::gets(size_t max_ಎಣಿಕೆ) {
+    ಆದರೆ (strbuf) {
         size_t i = strbufpos, len = strbufsize;
-        const char *instr = strbuf;
-        for (; i < len; i++) {
-            char c = instr[i];
-            if (c == '\0' || c == '\n') {
-                if (c == '\n')
+        ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *instr = strbuf;
+        ಗಾಗಿ (; i < len; i++) {
+            ಅಕ್ಷರ c = instr[i];
+            ಆದರೆ (c == '\0' || c == '\n') {
+                ಆದರೆ (c == '\n')
                     i++;
-                break;
+                ನಿಲ್ಲಿಸು;
             }
         }
-        size_t count = i - strbufpos;
-        if (maxCount == 0 || maxCount > count)
-            maxCount = count;
-        buffer.resize(std::max(buffer.size(), maxCount + 8));
-        memcpy(&buffer[0], instr + strbufpos, maxCount);
-        buffer[maxCount] = '\0';
+        size_t ಎಣಿಕೆ_3 = i - strbufpos;
+        ಆದರೆ (max_ಎಣಿಕೆ == 0 || max_ಎಣಿಕೆ > ಎಣಿಕೆ_3)
+            max_ಎಣಿಕೆ = ಎಣಿಕೆ_3;
+        ಬಫರ್.resize(std::max(ಬಫರ್.size(), max_ಎಣಿಕೆ + 8));
+        ಸ್ಮರಣೆ_ನಕಲು(&ಬಫರ್[0], instr + strbufpos, max_ಎಣಿಕೆ);
+        ಬಫರ್[max_ಎಣಿಕೆ] = '\0';
         strbufpos = i;
-        return maxCount > 0 ? &buffer[0] : 0;
+        ಹಿಂತಿರುಗಿ max_ಎಣಿಕೆ > 0 ? &ಬಫರ್[0] : 0;
     }
 
-    const size_t MAX_BLOCK_SIZE = INT_MAX / 2; // hopefully, that will be enough
-    if (maxCount == 0)
-        maxCount = MAX_BLOCK_SIZE;
-    else
-        CV_Assert(maxCount < MAX_BLOCK_SIZE);
+    ಸ್ಥಿರಾಂಕ size_t MAX_ಖಂಡ_ಗಾತ್ರ = ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ / 2; // hopefully, that will be enough
+    ಆದರೆ (max_ಎಣಿಕೆ == 0)
+        max_ಎಣಿಕೆ = MAX_ಖಂಡ_ಗಾತ್ರ;
+    ಇಲ್ಲದಿದ್ದರೆ
+        CV_Assert(max_ಎಣಿಕೆ < MAX_ಖಂಡ_ಗಾತ್ರ);
     size_t ofs = 0;
 
-    for (;;) {
-        int count = (int) std::min(buffer.size() - ofs - 16, maxCount);
-        char *ptr = getsFromFile(&buffer[ofs], count + 1);
-        if (!ptr)
-            break;
-        int delta = (int) strlen(ptr);
+    ಗಾಗಿ (;;) {
+        ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3 = (ಪೂರ್ಣಾಂಕ) std::min(ಬಫರ್.size() - ofs - 16, max_ಎಣಿಕೆ);
+        ಅಕ್ಷರ *ptr = getsFromFile(&ಬಫರ್[ofs], ಎಣಿಕೆ_3 + 1);
+        ಆದರೆ (!ptr)
+            ನಿಲ್ಲಿಸು;
+        ಪೂರ್ಣಾಂಕ delta = (ಪೂರ್ಣಾಂಕ) ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ptr);
         ofs += delta;
-        maxCount -= delta;
-        if (delta == 0 || ptr[delta - 1] == '\n' || maxCount == 0)
-            break;
-        if (delta == count)
-            buffer.resize((size_t) (buffer.size() * 1.5));
+        max_ಎಣಿಕೆ -= delta;
+        ಆದರೆ (delta == 0 || ptr[delta - 1] == '\n' || max_ಎಣಿಕೆ == 0)
+            ನಿಲ್ಲಿಸು;
+        ಆದರೆ (delta == ಎಣಿಕೆ_3)
+            ಬಫರ್.resize((size_t) (ಬಫರ್.size() * 1.5));
     }
-    return ofs > 0 ? &buffer[0] : 0;
+    ಹಿಂತಿರುಗಿ ofs > 0 ? &ಬಫರ್[0] : 0;
 }
 
-char *FileStorage::Impl::gets() {
-    char *ptr = this->gets(0);
-    if (!ptr) {
-        ptr = bufferStart();  // FIXIT Why do we need this hack? What is about other parsers JSON/YAML?
+ಅಕ್ಷರ *FileStorage::Impl::gets() {
+    ಅಕ್ಷರ *ptr = ಇದು->gets(0);
+    ಆದರೆ (!ptr) {
+        ptr = ಬಫರ್_ಆರಂಭ();  // FIXIT Why do we need this hack? What is about other parsers JSON/YAML?
         *ptr = '\0';
-        setEof();
-        return 0;
-    } else {
-        size_t l = strlen(ptr);
-        if (l > 0 && ptr[l - 1] != '\n' && ptr[l - 1] != '\r' && !eof()) {
+        ಗಣ_Eof();
+        ಹಿಂತಿರುಗಿ 0;
+    } ಇಲ್ಲದಿದ್ದರೆ {
+        size_t l = ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ptr);
+        ಆದರೆ (l > 0 && ptr[l - 1] != '\n' && ptr[l - 1] != '\r' && !eof()) {
             ptr[l] = '\n';
             ptr[l + 1] = '\0';
         }
     }
     lineno++;
-    return ptr;
+    ಹಿಂತಿರುಗಿ ptr;
 }
 
-bool FileStorage::Impl::eof() {
-    if (dummy_eof)
-        return true;
-    if (strbuf)
-        return strbufpos >= strbufsize;
-    if (file)
-        return feof(file) != 0;
-#if USE_ZLIB
-    if (gzfile)
-        return gzeof(gzfile) != 0;
-#endif
-    return false;
+ತಾರ್ಕಿಕ FileStorage::Impl::eof() {
+    ಆದರೆ (dummy_eof)
+        ಹಿಂತಿರುಗಿ ನಿಜ;
+    ಆದರೆ (strbuf)
+        ಹಿಂತಿರುಗಿ strbufpos >= strbufsize;
+    ಆದರೆ (file)
+        ಹಿಂತಿರುಗಿ feof(file) != 0;
+#ಆದರೆ USE_ZLIB
+    ಆದರೆ (gzfile)
+        ಹಿಂತಿರುಗಿ gzeof(gzfile) != 0;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 }
 
-void FileStorage::Impl::setEof() {
-    dummy_eof = true;
+ಶೂನ್ಯ FileStorage::Impl::ಗಣ_Eof() {
+    dummy_eof = ನಿಜ;
 }
 
-void FileStorage::Impl::closeFile() {
-    if (file)
+ಶೂನ್ಯ FileStorage::Impl::closeFile() {
+    ಆದರೆ (file)
         fclose(file);
-#if USE_ZLIB
-    else if (gzfile)
+#ಆದರೆ USE_ZLIB
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (gzfile)
         gzclose(gzfile);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     file = 0;
     gzfile = 0;
     strbuf = 0;
     strbufpos = 0;
-    is_opened = false;
+    is_opened = ಸುಳ್ಳು;
 }
 
-void FileStorage::Impl::rewind() {
-    if (file)
+ಶೂನ್ಯ FileStorage::Impl::rewind() {
+    ಆದರೆ (file)
         ::rewind(file);
-#if USE_ZLIB
-    else if (gzfile)
+#ಆದರೆ USE_ZLIB
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (gzfile)
         gzrewind(gzfile);
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
     strbufpos = 0;
 }
 
-char *FileStorage::Impl::resizeWriteBuffer(char *ptr, int len) {
-    const char *buffer_end = &buffer[0] + buffer.size();
-    if (ptr + len < buffer_end)
-        return ptr;
+ಅಕ್ಷರ *FileStorage::Impl::resize_Write_ಬಫರ್(ಅಕ್ಷರ *ptr, ಪೂರ್ಣಾಂಕ len) {
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಬಫರ್_ಕೊನೆ = &ಬಫರ್[0] + ಬಫರ್.size();
+    ಆದರೆ (ptr + len < ಬಫರ್_ಕೊನೆ)
+        ಹಿಂತಿರುಗಿ ptr;
 
-    const char *buffer_start = &buffer[0];
-    int written_len = (int) (ptr - buffer_start);
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಬಫರ್_ಆರಂಭ_2 = &ಬಫರ್[0];
+    ಪೂರ್ಣಾಂಕ written_len = (ಪೂರ್ಣಾಂಕ) (ptr - ಬಫರ್_ಆರಂಭ_2);
 
-    CV_Assert(written_len <= (int) buffer.size());
-    int new_size = (int) ((buffer_end - buffer_start) * 3 / 2);
-    new_size = MAX(written_len + len, new_size);
-    buffer.reserve(new_size + 256);
-    buffer.resize(new_size);
+    CV_Assert(written_len <= (ಪೂರ್ಣಾಂಕ) ಬಫರ್.size());
+    ಪೂರ್ಣಾಂಕ new_ಗಾತ್ರ_2 = (ಪೂರ್ಣಾಂಕ) ((ಬಫರ್_ಕೊನೆ - ಬಫರ್_ಆರಂಭ_2) * 3 / 2);
+    new_ಗಾತ್ರ_2 = MAX(written_len + len, new_ಗಾತ್ರ_2);
+    ಬಫರ್.reserve(new_ಗಾತ್ರ_2 + 256);
+    ಬಫರ್.resize(new_ಗಾತ್ರ_2);
     bufofs = written_len;
-    return &buffer[0] + bufofs;
+    ಹಿಂತಿರುಗಿ &ಬಫರ್[0] + bufofs;
 }
 
-char *FileStorage::Impl::flush() {
-    char *buffer_start = &buffer[0];
-    char *ptr = buffer_start + bufofs;
+ಅಕ್ಷರ *FileStorage::Impl::flush() {
+    ಅಕ್ಷರ *ಬಫರ್_ಆರಂಭ_2 = &ಬಫರ್[0];
+    ಅಕ್ಷರ *ptr = ಬಫರ್_ಆರಂಭ_2 + bufofs;
 
-    if (ptr > buffer_start + space) {
+    ಆದರೆ (ptr > ಬಫರ್_ಆರಂಭ_2 + space) {
         ptr[0] = '\n';
         ptr[1] = '\0';
-        puts(buffer_start);
+        puts(ಬಫರ್_ಆರಂಭ_2);
         bufofs = 0;
     }
 
-    int indent = write_stack.back().indent;
+    ಪೂರ್ಣಾಂಕ indent = write_ರಾಶಿ.back().indent;
 
-    if (space != indent) {
-        memset(buffer_start, ' ', indent);
+    ಆದರೆ (space != indent) {
+        memset(ಬಫರ್_ಆರಂಭ_2, ' ', indent);
         space = indent;
     }
     bufofs = space;
-    ptr = buffer_start + bufofs;
+    ptr = ಬಫರ್_ಆರಂಭ_2 + bufofs;
 
-    return ptr;
+    ಹಿಂತಿರುಗಿ ptr;
 }
 
-void FileStorage::Impl::endWriteStruct() {
-    CV_Assert(write_mode);
+ಶೂನ್ಯ FileStorage::Impl::ಕೊನೆ_Write_Struct() {
+    CV_Assert(write_ಬಹುಲಕ);
 
-    check_if_write_struct_is_delayed(false);
-    if (state_of_writing_base64 != FileStorage_API::Uncertain)
-        switch_to_Base64_state(FileStorage_API::Uncertain);
+    check_if_write_struct_is_delayed(ಸುಳ್ಳು);
+    ಆದರೆ (state_ದ_writing_base64 != FileStorage_API::Uncertain)
+        switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Uncertain);
 
-    CV_Assert(!write_stack.empty());
+    CV_Assert(!write_ರಾಶಿ.empty());
 
-    FStructData &current_struct = write_stack.back();
-    if (fmt == FileStorage::FORMAT_JSON && !FileNode::isFlow(current_struct.flags) && write_stack.size() > 1)
-        current_struct.indent = write_stack[write_stack.size() - 2].indent;
+    FStruct_ದತ್ತಾಂಶ &current_struct = write_ರಾಶಿ.back();
+    ಆದರೆ (fmt == FileStorage::FORMAT_JSON && !File_ಗಂಟು::isFlow(current_struct.flags) && write_ರಾಶಿ.size() > 1)
+        current_struct.indent = write_ರಾಶಿ[write_ರಾಶಿ.size() - 2].indent;
 
-    getEmitter().endWriteStruct(current_struct);
+    getEmitter().ಕೊನೆ_Write_Struct(current_struct);
 
-    write_stack.pop_back();
-    if (!write_stack.empty())
-        write_stack.back().flags &= ~FileNode::EMPTY;
+    write_ರಾಶಿ.pop_back();
+    ಆದರೆ (!write_ರಾಶಿ.empty())
+        write_ರಾಶಿ.back().flags &= ~File_ಗಂಟು::ಖಾಲಿಗಳು_2;
 }
 
-void FileStorage::Impl::startWriteStruct_helper(const char *key, int struct_flags,
-                                                const char *type_name) {
-    CV_Assert(write_mode);
+ಶೂನ್ಯ FileStorage::Impl::ಆರಂಭ_Write_Struct_helper(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ struct_flags,
+                                                ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *type_name) {
+    CV_Assert(write_ಬಹುಲಕ);
 
-    struct_flags = (struct_flags & (FileNode::TYPE_MASK | FileNode::FLOW)) | FileNode::EMPTY;
-    if (!FileNode::isCollection(struct_flags))
+    struct_flags = (struct_flags & (File_ಗಂಟು::TYPE_ಮುಖವಾಡ | File_ಗಂಟು::FLOW)) | File_ಗಂಟು::ಖಾಲಿಗಳು_2;
+    ಆದರೆ (!File_ಗಂಟು::isCollection(struct_flags))
         CV_Error(cv::Error::StsBadArg,
                  "Some collection type: FileNode::SEQ or FileNode::MAP must be specified");
 
-    if (type_name && type_name[0] == '\0')
+    ಆದರೆ (type_name && type_name[0] == '\0')
         type_name = 0;
 
-    FStructData s = getEmitter().startWriteStruct(write_stack.back(), key, struct_flags, type_name);
+    FStruct_ದತ್ತಾಂಶ s = getEmitter().ಆರಂಭ_Write_Struct(write_ರಾಶಿ.back(), ಕೀಲಿ, struct_flags, type_name);
 
-    write_stack.push_back(s);
-    size_t write_stack_size = write_stack.size();
-    if (write_stack_size > 1)
-        write_stack[write_stack_size - 2].flags &= ~FileNode::EMPTY;
+    write_ರಾಶಿ.push_back(s);
+    size_t write_ರಾಶಿ_ಗಾತ್ರ = write_ರಾಶಿ.size();
+    ಆದರೆ (write_ರಾಶಿ_ಗಾತ್ರ > 1)
+        write_ರಾಶಿ[write_ರಾಶಿ_ಗಾತ್ರ - 2].flags &= ~File_ಗಂಟು::ಖಾಲಿಗಳು_2;
 
-    if (fmt != FileStorage::FORMAT_JSON && !FileNode::isFlow(s.flags))
+    ಆದರೆ (fmt != FileStorage::FORMAT_JSON && !File_ಗಂಟು::isFlow(s.flags))
         flush();
 
-    if (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && FileNode::isMap(struct_flags)) {
-        getEmitter().write("type_id", type_name, false);
+    ಆದರೆ (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && File_ಗಂಟು::isMap(struct_flags)) {
+        getEmitter().ಲಿಖ("type_id", type_name, ಸುಳ್ಳು);
     }
 }
 
-void FileStorage::Impl::startWriteStruct(const char *key, int struct_flags,
-                                         const char *type_name) {
-    check_if_write_struct_is_delayed(false);
-    if (state_of_writing_base64 == FileStorage_API::NotUse)
-        switch_to_Base64_state(FileStorage_API::Uncertain);
+ಶೂನ್ಯ FileStorage::Impl::ಆರಂಭ_Write_Struct(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ struct_flags,
+                                         ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *type_name) {
+    check_if_write_struct_is_delayed(ಸುಳ್ಳು);
+    ಆದರೆ (state_ದ_writing_base64 == FileStorage_API::NotUse)
+        switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Uncertain);
 
-    if (state_of_writing_base64 == FileStorage_API::Uncertain && FileNode::isSeq(struct_flags)
+    ಆದರೆ (state_ದ_writing_base64 == FileStorage_API::Uncertain && File_ಗಂಟು::isSeq(struct_flags)
         && is_using_base64 && type_name == 0) {
         /* Uncertain whether output Base64 data */
-        make_write_struct_delayed(key, struct_flags, type_name);
-    } else if (type_name && memcmp(type_name, "binary", 6) == 0) {
+        make_write_struct_delayed(ಕೀಲಿ, struct_flags, type_name);
+    } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (type_name && memcmp(type_name, "binary", 6) == 0) {
         /* Must output Base64 data */
-        if ((FileNode::TYPE_MASK & struct_flags) != FileNode::SEQ)
+        ಆದರೆ ((File_ಗಂಟು::TYPE_ಮುಖವಾಡ & struct_flags) != File_ಗಂಟು::SEQ)
             CV_Error(cv::Error::StsBadArg, "must set 'struct_flags |= CV_NODE_SEQ' if using Base64.");
-        else if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (state_ದ_writing_base64 != FileStorage_API::Uncertain)
             CV_Error(cv::Error::StsError, "function \'cvStartWriteStruct\' calls cannot be nested if using Base64.");
 
-        startWriteStruct_helper(key, struct_flags, "binary");
+        ಆರಂಭ_Write_Struct_helper(ಕೀಲಿ, struct_flags, "binary");
 
-        if (state_of_writing_base64 != FileStorage_API::Uncertain)
-            switch_to_Base64_state(FileStorage_API::Uncertain);
-        switch_to_Base64_state(FileStorage_API::InUse);
-    } else {
+        ಆದರೆ (state_ದ_writing_base64 != FileStorage_API::Uncertain)
+            switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Uncertain);
+        switch_ಗಮ್ಯ_Base64_state(FileStorage_API::ಒಳ_Use);
+    } ಇಲ್ಲದಿದ್ದರೆ {
         /* Won't output Base64 data */
-        if (state_of_writing_base64 == FileStorage_API::InUse)
+        ಆದರೆ (state_ದ_writing_base64 == FileStorage_API::ಒಳ_Use)
             CV_Error(cv::Error::StsError, "At the end of the output Base64, `cvEndWriteStruct` is needed.");
 
-        startWriteStruct_helper(key, struct_flags, type_name);
+        ಆರಂಭ_Write_Struct_helper(ಕೀಲಿ, struct_flags, type_name);
 
-        if (state_of_writing_base64 != FileStorage_API::Uncertain)
-            switch_to_Base64_state(FileStorage_API::Uncertain);
-        switch_to_Base64_state(FileStorage_API::NotUse);
+        ಆದರೆ (state_ದ_writing_base64 != FileStorage_API::Uncertain)
+            switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Uncertain);
+        switch_ಗಮ್ಯ_Base64_state(FileStorage_API::NotUse);
     }
 }
 
-void FileStorage::Impl::writeComment(const char *comment, bool eol_comment) {
-    CV_Assert(write_mode);
+ಶೂನ್ಯ FileStorage::Impl::writeComment(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *comment, ತಾರ್ಕಿಕ eol_comment) {
+    CV_Assert(write_ಬಹುಲಕ);
     getEmitter().writeComment(comment, eol_comment);
 }
 
-void FileStorage::Impl::startNextStream() {
-    CV_Assert(write_mode);
-    if (!empty_stream) {
-        while (!write_stack.empty())
-            endWriteStruct();
+ಶೂನ್ಯ FileStorage::Impl::ಆರಂಭ_ಮುಂದಿನ_ಹರಿವು() {
+    CV_Assert(write_ಬಹುಲಕ);
+    ಆದರೆ (!ಖಾಲಿಗಳು_ಹರಿವು) {
+        ಆಗ (!write_ರಾಶಿ.empty())
+            ಕೊನೆ_Write_Struct();
         flush();
-        getEmitter().startNextStream();
-        empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::EMPTY, 0));
+        getEmitter().ಆರಂಭ_ಮುಂದಿನ_ಹರಿವು();
+        ಖಾಲಿಗಳು_ಹರಿವು = ನಿಜ;
+        write_ರಾಶಿ.push_back(FStruct_ದತ್ತಾಂಶ("", File_ಗಂಟು::ಖಾಲಿಗಳು_2, 0));
         bufofs = 0;
     }
 }
 
-void FileStorage::Impl::write(const String &key, int value) {
-    CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+ಶೂನ್ಯ FileStorage::Impl::ಲಿಖ(ಸ್ಥಿರಾಂಕ String &ಕೀಲಿ, ಪೂರ್ಣಾಂಕ value) {
+    CV_Assert(write_ಬಹುಲಕ);
+    getEmitter().ಲಿಖ(ಕೀಲಿ.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, int64_t value) {
-    CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+ಶೂನ್ಯ FileStorage::Impl::ಲಿಖ(ಸ್ಥಿರಾಂಕ String &ಕೀಲಿ, int64_t value) {
+    CV_Assert(write_ಬಹುಲಕ);
+    getEmitter().ಲಿಖ(ಕೀಲಿ.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, double value) {
-    CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+ಶೂನ್ಯ FileStorage::Impl::ಲಿಖ(ಸ್ಥಿರಾಂಕ String &ಕೀಲಿ, ದ್ವಿಗುಣ value) {
+    CV_Assert(write_ಬಹುಲಕ);
+    getEmitter().ಲಿಖ(ಕೀಲಿ.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, const String &value) {
-    CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value.c_str(), false);
+ಶೂನ್ಯ FileStorage::Impl::ಲಿಖ(ಸ್ಥಿರಾಂಕ String &ಕೀಲಿ, ಸ್ಥಿರಾಂಕ String &value) {
+    CV_Assert(write_ಬಹುಲಕ);
+    getEmitter().ಲಿಖ(ಕೀಲಿ.c_str(), value.c_str(), ಸುಳ್ಳು);
 }
 
-void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, size_t len) {
-    CV_Assert(write_mode);
+ಶೂನ್ಯ FileStorage::Impl::write_Raw_ದತ್ತಾಂಶ(ಸ್ಥಿರಾಂಕ std::string &dt, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *ದತ್ತಾಂಶ_3, size_t len) {
+    CV_Assert(write_ಬಹುಲಕ);
 
-    if (is_using_base64 || state_of_writing_base64 == FileStorage_API::Base64State::InUse) {
-        writeRawDataBase64(_data, len, dt.c_str());
-        return;
-    } else if (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
-        switch_to_Base64_state(FileStorage_API::Base64State::NotUse);
+    ಆದರೆ (is_using_base64 || state_ದ_writing_base64 == FileStorage_API::Base64State::ಒಳ_Use) {
+        write_Raw_ದತ್ತಾಂಶ_Base64(ದತ್ತಾಂಶ_3, len, dt.c_str());
+        ಹಿಂತಿರುಗಿ;
+    } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (state_ದ_writing_base64 == FileStorage_API::Base64State::Uncertain) {
+        switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Base64State::NotUse);
     }
 
-    size_t elemSize = fs::calcStructSize(dt.c_str(), 0);
-    CV_Assert(elemSize);
-    CV_Assert(len % elemSize == 0);
-    len /= elemSize;
+    size_t elem_ಗಾತ್ರ = fs::calc_Struct_ಗಾತ್ರ(dt.c_str(), 0);
+    CV_Assert(elem_ಗಾತ್ರ);
+    CV_Assert(len % elem_ಗಾತ್ರ == 0);
+    len /= elem_ಗಾತ್ರ;
 
-    bool explicitZero = fmt == FileStorage::FORMAT_JSON;
-    const uchar *data0 = (const uchar *) _data;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2], k, fmt_pair_count;
-    char buf[256] = "";
+    ತಾರ್ಕಿಕ explicitZero = fmt == FileStorage::FORMAT_JSON;
+    ಸ್ಥಿರಾಂಕ uchar *data0 = (ಸ್ಥಿರಾಂಕ uchar *) ದತ್ತಾಂಶ_3;
+    ಪೂರ್ಣಾಂಕ fmt_ಜೋಡಿಗಳು[CV_FS_MAX_FMT_ಜೋಡಿಗಳು * 2], k, fmt_pair_ಎಣಿಕೆ;
+    ಅಕ್ಷರ buf[256] = "";
 
-    fmt_pair_count = fs::decodeFormat(dt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    fmt_pair_ಎಣಿಕೆ = fs::decodeFormat(dt.c_str(), fmt_ಜೋಡಿಗಳು, CV_FS_MAX_FMT_ಜೋಡಿಗಳು);
 
-    if (!len)
-        return;
+    ಆದರೆ (!len)
+        ಹಿಂತಿರುಗಿ;
 
-    if (!data0)
+    ಆದರೆ (!data0)
         CV_Error(cv::Error::StsNullPtr, "Null data pointer");
 
-    if (fmt_pair_count == 1) {
-        fmt_pairs[0] *= (int) len;
+    ಆದರೆ (fmt_pair_ಎಣಿಕೆ == 1) {
+        fmt_ಜೋಡಿಗಳು[0] *= (ಪೂರ್ಣಾಂಕ) len;
         len = 1;
     }
 
-    for (; len--; data0 += elemSize) {
-        int offset = 0;
-        for (k = 0; k < fmt_pair_count; k++) {
-            int i, count = fmt_pairs[k * 2];
-            int elem_type = fmt_pairs[k * 2 + 1];
-            int elem_size = CV_ELEM_SIZE(elem_type);
-            const char *ptr;
+    ಗಾಗಿ (; len--; data0 += elem_ಗಾತ್ರ) {
+        ಪೂರ್ಣಾಂಕ offset = 0;
+        ಗಾಗಿ (k = 0; k < fmt_pair_ಎಣಿಕೆ; k++) {
+            ಪೂರ್ಣಾಂಕ i, ಎಣಿಕೆ_3 = fmt_ಜೋಡಿಗಳು[k * 2];
+            ಪೂರ್ಣಾಂಕ elem_type = fmt_ಜೋಡಿಗಳು[k * 2 + 1];
+            ಪೂರ್ಣಾಂಕ elem_ಗಾತ್ರ_2 = CV_ELEM_ಗಾತ್ರ(elem_type);
+            ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ptr;
 
-            offset = cvAlign(offset, elem_size);
-            const uchar *data = data0 + offset;
+            offset = cvAlign(offset, elem_ಗಾತ್ರ_2);
+            ಸ್ಥಿರಾಂಕ uchar *ದತ್ತಾಂಶ = data0 + offset;
 
-            for (i = 0; i < count; i++) {
-                switch (elem_type) {
-                    case CV_8U:
-                        ptr = fs::itoa(*(uchar *) data, buf, 10);
-                        data++;
-                        break;
-                    case CV_Bool:
-                        ptr = fs::itoa(*(uchar *) data != 0, buf, 10);
-                        data++;
-                        break;
-                    case CV_8S:
-                        ptr = fs::itoa(*(char *) data, buf, 10);
-                        data++;
-                        break;
-                    case CV_16U:
-                        ptr = fs::itoa(*(ushort *) data, buf, 10);
-                        data += sizeof(ushort);
-                        break;
-                    case CV_16S:
-                        ptr = fs::itoa(*(short *) data, buf, 10);
-                        data += sizeof(short);
-                        break;
-                    case CV_32U:
-                        ptr = fs::itoa((int64_t)*(unsigned*) data, buf, 10, false);
-                        data += sizeof(unsigned);
-                        break;
-                    case CV_32S:
-                        ptr = fs::itoa(*(int *) data, buf, 10);
-                        data += sizeof(int);
-                        break;
-                    case CV_64U:
-                        ptr = fs::itoa(*(uint64_t*) data, buf, 10, false);
-                        data += sizeof(uint64_t);
-                        break;
-                    case CV_64S:
-                        ptr = fs::itoa(*(int64_t*) data, buf, 10, true);
-                        data += sizeof(int64_t);
-                        break;
-                    case CV_32F:
-                        ptr = fs::floatToString(buf, sizeof(buf), *(float *) data, false, explicitZero);
-                        data += sizeof(float);
-                        break;
-                    case CV_64F:
-                        ptr = fs::doubleToString(buf, sizeof(buf), *(double *) data, explicitZero);
-                        data += sizeof(double);
-                        break;
-                    case CV_16F:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(hfloat *) data, true, explicitZero);
-                        data += sizeof(hfloat);
-                        break;
-                    case CV_16BF:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(bfloat *) data, true, explicitZero);
-                        data += sizeof(bfloat);
-                        break;
-                    case CV_8F_E4M3FN:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(fp8_t *) data, true, explicitZero);
-                        data += sizeof(fp8_t);
-                        break;
-                    case CV_8F_E4M3FNUZ:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(fp8a_t *) data, true, explicitZero);
-                        data += sizeof(fp8a_t);
-                        break;
-                    default:
+            ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_3; i++) {
+                ಆಯ್ಕೆ (elem_type) {
+                    ಸ್ಥಿತಿ CV_8U:
+                        ptr = fs::itoa(*(uchar *) ದತ್ತಾಂಶ, buf, 10);
+                        ದತ್ತಾಂಶ++;
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_Bool:
+                        ptr = fs::itoa(*(uchar *) ದತ್ತಾಂಶ != 0, buf, 10);
+                        ದತ್ತಾಂಶ++;
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_8S:
+                        ptr = fs::itoa(*(ಅಕ್ಷರ *) ದತ್ತಾಂಶ, buf, 10);
+                        ದತ್ತಾಂಶ++;
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_16U:
+                        ptr = fs::itoa(*(ushort *) ದತ್ತಾಂಶ, buf, 10);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(ushort);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_16S:
+                        ptr = fs::itoa(*(ಗಿಡ್ಡ *) ದತ್ತಾಂಶ, buf, 10);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(ಗಿಡ್ಡ);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_32U:
+                        ptr = fs::itoa((int64_t)*(ಚಿಹ್ನೆರಹಿತ*) ದತ್ತಾಂಶ, buf, 10, ಸುಳ್ಳು);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(ಚಿಹ್ನೆರಹಿತ);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_32S:
+                        ptr = fs::itoa(*(ಪೂರ್ಣಾಂಕ *) ದತ್ತಾಂಶ, buf, 10);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_64U:
+                        ptr = fs::itoa(*(uint64_t*) ದತ್ತಾಂಶ, buf, 10, ಸುಳ್ಳು);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(uint64_t);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_64S:
+                        ptr = fs::itoa(*(int64_t*) ದತ್ತಾಂಶ, buf, 10, ನಿಜ);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(int64_t);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_32F:
+                        ptr = fs::float_ಗಮ್ಯ_String(buf, ಗಾತ್ರ(buf), *(ದಶಮಾಂಶ *) ದತ್ತಾಂಶ, ಸುಳ್ಳು, explicitZero);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(ದಶಮಾಂಶ);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_64F:
+                        ptr = fs::double_ಗಮ್ಯ_String(buf, ಗಾತ್ರ(buf), *(ದ್ವಿಗುಣ *) ದತ್ತಾಂಶ, explicitZero);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(ದ್ವಿಗುಣ);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_16F:
+                        ptr = fs::float_ಗಮ್ಯ_String(buf, ಗಾತ್ರ(buf), (ದಶಮಾಂಶ) *(hfloat *) ದತ್ತಾಂಶ, ನಿಜ, explicitZero);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(hfloat);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_16BF:
+                        ptr = fs::float_ಗಮ್ಯ_String(buf, ಗಾತ್ರ(buf), (ದಶಮಾಂಶ) *(bfloat *) ದತ್ತಾಂಶ, ನಿಜ, explicitZero);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(bfloat);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_8F_E4M3FN:
+                        ptr = fs::float_ಗಮ್ಯ_String(buf, ಗಾತ್ರ(buf), (ದಶಮಾಂಶ) *(fp8_t *) ದತ್ತಾಂಶ, ನಿಜ, explicitZero);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(fp8_t);
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_8F_E4M3FNUZ:
+                        ptr = fs::float_ಗಮ್ಯ_String(buf, ಗಾತ್ರ(buf), (ದಶಮಾಂಶ) *(fp8a_t *) ದತ್ತಾಂಶ, ನಿಜ, explicitZero);
+                        ದತ್ತಾಂಶ += ಗಾತ್ರ(fp8a_t);
+                        ನಿಲ್ಲಿಸು;
+                    ಪೂರ್ವನಿಯೋಜಿತ:
                         CV_Error(cv::Error::StsUnsupportedFormat, "Unsupported type");
-                        return;
+                        ಹಿಂತಿರುಗಿ;
                 }
 
                 getEmitter().writeScalar(0, ptr);
             }
 
-            offset = (int) (data - data0);
+            offset = (ಪೂರ್ಣಾಂಕ) (ದತ್ತಾಂಶ - data0);
         }
     }
 }
 
-void FileStorage::Impl::workaround() {
-    check_if_write_struct_is_delayed(false);
+ಶೂನ್ಯ FileStorage::Impl::workaround() {
+    check_if_write_struct_is_delayed(ಸುಳ್ಳು);
 
-    if (state_of_writing_base64 != FileStorage_API::Base64State::Uncertain)
-        switch_to_Base64_state(FileStorage_API::Base64State::Uncertain);
+    ಆದರೆ (state_ದ_writing_base64 != FileStorage_API::Base64State::Uncertain)
+        switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Base64State::Uncertain);
 }
 
-void FileStorage::Impl::switch_to_Base64_state(FileStorage_API::Base64State new_state) {
-    const char *err_unkonwn_state = "Unexpected error, unable to determine the Base64 state.";
-    const char *err_unable_to_switch = "Unexpected error, unable to switch to this state.";
+ಶೂನ್ಯ FileStorage::Impl::switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Base64State new_state) {
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *err_unkonwn_state = "Unexpected error, unable to determine the Base64 state.";
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *err_unable_ಗಮ್ಯ_switch = "Unexpected error, unable to switch to this state.";
 
     /* like a finite state machine */
-    switch (state_of_writing_base64) {
-        case FileStorage_API::Base64State::Uncertain:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
+    ಆಯ್ಕೆ (state_ದ_writing_base64) {
+        ಸ್ಥಿತಿ FileStorage_API::Base64State::Uncertain:
+            ಆಯ್ಕೆ (new_state) {
+                ಸ್ಥಿತಿ FileStorage_API::Base64State::ಒಳ_Use:
                 {
                     CV_DbgAssert(base64_writer == 0);
-                    bool can_indent = (fmt != cv::FileStorage::Mode::FORMAT_JSON);
-                    base64_writer = new base64::Base64Writer(*this, can_indent);
-                    if (!can_indent) {
-                        char *ptr = bufferPtr();
+                    ತಾರ್ಕಿಕ can_indent = (fmt != cv::FileStorage::ಬಹುಲಕ_2::FORMAT_JSON);
+                    base64_writer = ಹೊಸ base64::Base64Writer(*ಇದು, can_indent);
+                    ಆದರೆ (!can_indent) {
+                        ಅಕ್ಷರ *ptr = ಬಫರ್_Ptr();
                         *ptr++ = '\0';
-                        puts(bufferStart());
-                        setBufferPtr(bufferStart());
-                        memset(bufferStart(), 0, static_cast<int>(space));
+                        puts(ಬಫರ್_ಆರಂಭ());
+                        ಗಣ_ಬಫರ್_Ptr(ಬಫರ್_ಆರಂಭ());
+                        memset(ಬಫರ್_ಆರಂಭ(), 0, static_cast<ಪೂರ್ಣಾಂಕ>(space));
                         puts("\"$base64$");
                     }
-                    break;
+                    ನಿಲ್ಲಿಸು;
                 }
-                case FileStorage_API::Base64State::Uncertain:
-                    break;
-                case FileStorage_API::Base64State::NotUse:
-                    break;
-                default:
+                ಸ್ಥಿತಿ FileStorage_API::Base64State::Uncertain:
+                    ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ FileStorage_API::Base64State::NotUse:
+                    ನಿಲ್ಲಿಸು;
+                ಪೂರ್ವನಿಯೋಜಿತ:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    ನಿಲ್ಲಿಸು;
             }
-            break;
-        case FileStorage_API::Base64State::InUse:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
-                case FileStorage_API::Base64State::NotUse:
-                    CV_Error(cv::Error::StsError, err_unable_to_switch);
-                    break;
-                case FileStorage_API::Base64State::Uncertain:
-                    delete base64_writer;
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ FileStorage_API::Base64State::ಒಳ_Use:
+            ಆಯ್ಕೆ (new_state) {
+                ಸ್ಥಿತಿ FileStorage_API::Base64State::ಒಳ_Use:
+                ಸ್ಥಿತಿ FileStorage_API::Base64State::NotUse:
+                    CV_Error(cv::Error::StsError, err_unable_ಗಮ್ಯ_switch);
+                    ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ FileStorage_API::Base64State::Uncertain:
+                    ಅಳಿಸು base64_writer;
                     base64_writer = 0;
-                    if ( fmt == cv::FileStorage::FORMAT_JSON )
+                    ಆದರೆ ( fmt == cv::FileStorage::FORMAT_JSON )
                     {
                         puts("\"");
-                        setBufferPtr(bufferStart());
+                        ಗಣ_ಬಫರ್_Ptr(ಬಫರ್_ಆರಂಭ());
                         flush();
-                        memset(bufferStart(), 0, static_cast<int>(space) );
-                        setBufferPtr(bufferStart());
+                        memset(ಬಫರ್_ಆರಂಭ(), 0, static_cast<ಪೂರ್ಣಾಂಕ>(space) );
+                        ಗಣ_ಬಫರ್_Ptr(ಬಫರ್_ಆರಂಭ());
                     }
-                    break;
-                default:
+                    ನಿಲ್ಲಿಸು;
+                ಪೂರ್ವನಿಯೋಜಿತ:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    ನಿಲ್ಲಿಸು;
             }
-            break;
-        case FileStorage_API::Base64State::NotUse:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
-                case FileStorage_API::Base64State::NotUse:
-                    CV_Error(cv::Error::StsError, err_unable_to_switch);
-                    break;
-                case FileStorage_API::Base64State::Uncertain:
-                    break;
-                default:
+            ನಿಲ್ಲಿಸು;
+        ಸ್ಥಿತಿ FileStorage_API::Base64State::NotUse:
+            ಆಯ್ಕೆ (new_state) {
+                ಸ್ಥಿತಿ FileStorage_API::Base64State::ಒಳ_Use:
+                ಸ್ಥಿತಿ FileStorage_API::Base64State::NotUse:
+                    CV_Error(cv::Error::StsError, err_unable_ಗಮ್ಯ_switch);
+                    ನಿಲ್ಲಿಸು;
+                ಸ್ಥಿತಿ FileStorage_API::Base64State::Uncertain:
+                    ನಿಲ್ಲಿಸು;
+                ಪೂರ್ವನಿಯೋಜಿತ:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    ನಿಲ್ಲಿಸು;
             }
-            break;
-        default:
+            ನಿಲ್ಲಿಸು;
+        ಪೂರ್ವನಿಯೋಜಿತ:
             CV_Error(cv::Error::StsError, err_unkonwn_state);
-            break;
+            ನಿಲ್ಲಿಸು;
     }
 
-    state_of_writing_base64 = new_state;
+    state_ದ_writing_base64 = new_state;
 }
 
-void FileStorage::Impl::make_write_struct_delayed(const char *key, int struct_flags, const char *type_name) {
-    CV_Assert(is_write_struct_delayed == false);
-    CV_DbgAssert(delayed_struct_key == nullptr);
+ಶೂನ್ಯ FileStorage::Impl::make_write_struct_delayed(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಕೀಲಿ, ಪೂರ್ಣಾಂಕ struct_flags, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *type_name) {
+    CV_Assert(is_write_struct_delayed == ಸುಳ್ಳು);
+    CV_DbgAssert(delayed_struct_ಕೀಲಿ == ಶೂನ್ಯಸೂಚಕ);
     CV_DbgAssert(delayed_struct_flags == 0);
-    CV_DbgAssert(delayed_type_name == nullptr);
+    CV_DbgAssert(delayed_type_name == ಶೂನ್ಯಸೂಚಕ);
 
     delayed_struct_flags = struct_flags;
 
-    if (key != nullptr) {
-        delayed_struct_key = new char[strlen(key) + 1U];
-        strcpy(delayed_struct_key, key);
+    ಆದರೆ (ಕೀಲಿ != ಶೂನ್ಯಸೂಚಕ) {
+        delayed_struct_ಕೀಲಿ = ಹೊಸ ಅಕ್ಷರ[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(ಕೀಲಿ) + 1U];
+        strcpy(delayed_struct_ಕೀಲಿ, ಕೀಲಿ);
     }
 
-    if (type_name != nullptr) {
-        delayed_type_name = new char[strlen(type_name) + 1U];
+    ಆದರೆ (type_name != ಶೂನ್ಯಸೂಚಕ) {
+        delayed_type_name = ಹೊಸ ಅಕ್ಷರ[ಅಕ್ಷರಸರಣಿ_ಉದ್ದ(type_name) + 1U];
         strcpy(delayed_type_name, type_name);
     }
 
-    is_write_struct_delayed = true;
+    is_write_struct_delayed = ನಿಜ;
 }
 
-void FileStorage::Impl::check_if_write_struct_is_delayed(bool change_type_to_base64) {
-    if (is_write_struct_delayed) {
+ಶೂನ್ಯ FileStorage::Impl::check_if_write_struct_is_delayed(ತಾರ್ಕಿಕ change_type_ಗಮ್ಯ_base64) {
+    ಆದರೆ (is_write_struct_delayed) {
         /* save data to prevent recursive call errors */
-        std::string struct_key;
+        std::string struct_ಕೀಲಿ;
         std::string type_name;
-        int struct_flags = delayed_struct_flags;
+        ಪೂರ್ಣಾಂಕ struct_flags = delayed_struct_flags;
 
-        if (delayed_struct_key != nullptr && *delayed_struct_key != '\0') {
-            struct_key.assign(delayed_struct_key);
+        ಆದರೆ (delayed_struct_ಕೀಲಿ != ಶೂನ್ಯಸೂಚಕ && *delayed_struct_ಕೀಲಿ != '\0') {
+            struct_ಕೀಲಿ.assign(delayed_struct_ಕೀಲಿ);
         }
-        if (delayed_type_name != nullptr && *delayed_type_name != '\0') {
+        ಆದರೆ (delayed_type_name != ಶೂನ್ಯಸೂಚಕ && *delayed_type_name != '\0') {
             type_name.assign(delayed_type_name);
         }
 
         /* reset */
-        delete[] delayed_struct_key;
-        delete[] delayed_type_name;
-        delayed_struct_key = nullptr;
+        ಅಳಿಸು[] delayed_struct_ಕೀಲಿ;
+        ಅಳಿಸು[] delayed_type_name;
+        delayed_struct_ಕೀಲಿ = ಶೂನ್ಯಸೂಚಕ;
         delayed_struct_flags = 0;
-        delayed_type_name = nullptr;
+        delayed_type_name = ಶೂನ್ಯಸೂಚಕ;
 
-        is_write_struct_delayed = false;
+        is_write_struct_delayed = ಸುಳ್ಳು;
 
         /* call */
-        if (change_type_to_base64) {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, "binary");
-            if (state_of_writing_base64 != FileStorage_API::Uncertain)
-                switch_to_Base64_state(FileStorage_API::Uncertain);
-            switch_to_Base64_state(FileStorage_API::InUse);
-        } else {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, type_name.c_str());
-            if (state_of_writing_base64 != FileStorage_API::Uncertain)
-                switch_to_Base64_state(FileStorage_API::Uncertain);
-            switch_to_Base64_state(FileStorage_API::NotUse);
+        ಆದರೆ (change_type_ಗಮ್ಯ_base64) {
+            ಆರಂಭ_Write_Struct_helper(struct_ಕೀಲಿ.c_str(), struct_flags, "binary");
+            ಆದರೆ (state_ದ_writing_base64 != FileStorage_API::Uncertain)
+                switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Uncertain);
+            switch_ಗಮ್ಯ_Base64_state(FileStorage_API::ಒಳ_Use);
+        } ಇಲ್ಲದಿದ್ದರೆ {
+            ಆರಂಭ_Write_Struct_helper(struct_ಕೀಲಿ.c_str(), struct_flags, type_name.c_str());
+            ಆದರೆ (state_ದ_writing_base64 != FileStorage_API::Uncertain)
+                switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Uncertain);
+            switch_ಗಮ್ಯ_Base64_state(FileStorage_API::NotUse);
         }
     }
 }
 
-void FileStorage::Impl::writeRawDataBase64(const void *_data, size_t len, const char *dt) {
-    CV_Assert(write_mode);
+ಶೂನ್ಯ FileStorage::Impl::write_Raw_ದತ್ತಾಂಶ_Base64(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *ದತ್ತಾಂಶ_3, size_t len, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *dt) {
+    CV_Assert(write_ಬಹುಲಕ);
 
-    check_if_write_struct_is_delayed(true);
+    check_if_write_struct_is_delayed(ನಿಜ);
 
-    if (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
-        switch_to_Base64_state(FileStorage_API::Base64State::InUse);
-    } else if (state_of_writing_base64 != FileStorage_API::Base64State::InUse) {
+    ಆದರೆ (state_ದ_writing_base64 == FileStorage_API::Base64State::Uncertain) {
+        switch_ಗಮ್ಯ_Base64_state(FileStorage_API::Base64State::ಒಳ_Use);
+    } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (state_ದ_writing_base64 != FileStorage_API::Base64State::ಒಳ_Use) {
         CV_Error(cv::Error::StsError, "Base64 should not be used at present.");
     }
 
-    base64_writer->write(_data, len, dt);
+    base64_writer->ಲಿಖ(ದತ್ತಾಂಶ_3, len, dt);
 }
 
-FileNode FileStorage::Impl::getFirstTopLevelNode() const {
-    return roots.empty() ? FileNode() : roots[0];
+File_ಗಂಟು FileStorage::Impl::get_ಮೊದಲ_ತುದಿ_Level_ಗಂಟು() ಸ್ಥಿರಾಂಕ {
+    ಹಿಂತಿರುಗಿ roots.empty() ? File_ಗಂಟು() : roots[0];
 }
 
-FileNode FileStorage::Impl::root(int streamIdx) const {
-    return streamIdx >= 0 && streamIdx < (int) roots.size() ? roots[streamIdx] : FileNode();
+File_ಗಂಟು FileStorage::Impl::ಬೇರು(ಪೂರ್ಣಾಂಕ ಹರಿವು_Idx) ಸ್ಥಿರಾಂಕ {
+    ಹಿಂತಿರುಗಿ ಹರಿವು_Idx >= 0 && ಹರಿವು_Idx < (ಪೂರ್ಣಾಂಕ) roots.size() ? roots[ಹರಿವು_Idx] : File_ಗಂಟು();
 }
 
-FileNode FileStorage::Impl::operator[](const String &nodename) const {
-    return this->operator[](nodename.c_str());
+File_ಗಂಟು FileStorage::Impl::ಕ್ರಿಯಾಕಾರಕ[](ಸ್ಥಿರಾಂಕ String &nodename) ಸ್ಥಿರಾಂಕ {
+    ಹಿಂತಿರುಗಿ ಇದು->ಕ್ರಿಯಾಕಾರಕ[](nodename.c_str());
 }
 
-FileNode FileStorage::Impl::operator[](const char * /*nodename*/) const {
-    return FileNode();
+File_ಗಂಟು FileStorage::Impl::ಕ್ರಿಯಾಕಾರಕ[](ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ * /*nodename*/) ಸ್ಥಿರಾಂಕ {
+    ಹಿಂತಿರುಗಿ File_ಗಂಟು();
 }
 
-int FileStorage::Impl::getFormat() const { return fmt; }
+ಪೂರ್ಣಾಂಕ FileStorage::Impl::getFormat() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ fmt; }
 
-char *FileStorage::Impl::bufferPtr() const { return (char *) (&buffer[0] + bufofs); }
+ಅಕ್ಷರ *FileStorage::Impl::ಬಫರ್_Ptr() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ (ಅಕ್ಷರ *) (&ಬಫರ್[0] + bufofs); }
 
-char *FileStorage::Impl::bufferStart() const { return (char *) &buffer[0]; }
+ಅಕ್ಷರ *FileStorage::Impl::ಬಫರ್_ಆರಂಭ() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ (ಅಕ್ಷರ *) &ಬಫರ್[0]; }
 
-char *FileStorage::Impl::bufferEnd() const { return (char *) (&buffer[0] + buffer.size()); }
+ಅಕ್ಷರ *FileStorage::Impl::ಬಫರ್_ಕೊನೆ_2() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ (ಅಕ್ಷರ *) (&ಬಫರ್[0] + ಬಫರ್.size()); }
 
-void FileStorage::Impl::setBufferPtr(char *ptr) {
-    char *bufferstart = bufferStart();
-    CV_Assert(ptr >= bufferstart && ptr <= bufferEnd());
+ಶೂನ್ಯ FileStorage::Impl::ಗಣ_ಬಫರ್_Ptr(ಅಕ್ಷರ *ptr) {
+    ಅಕ್ಷರ *bufferstart = ಬಫರ್_ಆರಂಭ();
+    CV_Assert(ptr >= bufferstart && ptr <= ಬಫರ್_ಕೊನೆ_2());
     bufofs = ptr - bufferstart;
 }
 
-int FileStorage::Impl::wrapMargin() const { return wrap_margin; }
+ಪೂರ್ಣಾಂಕ FileStorage::Impl::wrapMargin() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ wrap_margin; }
 
-FStructData &FileStorage::Impl::getCurrentStruct() {
-    CV_Assert(!write_stack.empty());
-    return write_stack.back();
+FStruct_ದತ್ತಾಂಶ &FileStorage::Impl::getCurrentStruct() {
+    CV_Assert(!write_ರಾಶಿ.empty());
+    ಹಿಂತಿರುಗಿ write_ರಾಶಿ.back();
 }
 
-void FileStorage::Impl::setNonEmpty() {
-    empty_stream = false;
+ಶೂನ್ಯ FileStorage::Impl::ಗಣ_Non_ಖಾಲಿಗಳು() {
+    ಖಾಲಿಗಳು_ಹರಿವು = ಸುಳ್ಳು;
 }
 
-void FileStorage::Impl::processSpecialDouble(char *buf, double *value, char **endptr) {
-    FileStorage_API *fs = this;
-    char c = buf[0];
-    int inf_hi = 0x7ff00000;
+ಶೂನ್ಯ FileStorage::Impl::processSpecialDouble(ಅಕ್ಷರ *buf, ದ್ವಿಗುಣ *value, ಅಕ್ಷರ **endptr) {
+    FileStorage_API *fs = ಇದು;
+    ಅಕ್ಷರ c = buf[0];
+    ಪೂರ್ಣಾಂಕ inf_hi = 0x7ff00000;
 
-    if (c == '-' || c == '+') {
+    ಆದರೆ (c == '-' || c == '+') {
         inf_hi = c == '-' ? 0xfff00000 : 0x7ff00000;
         c = *++buf;
     }
 
-    if (c != '.')
+    ಆದರೆ (c != '.')
         CV_PARSE_ERROR_CPP("Bad format of floating-point constant");
 
     Cv64suf v;
     v.f = 0.;
-    if (toupper(buf[1]) == 'I' && toupper(buf[2]) == 'N' && toupper(buf[3]) == 'F')
+    ಆದರೆ (ದೊಡ್ಡ_ಅಕ್ಷರ(buf[1]) == 'I' && ದೊಡ್ಡ_ಅಕ್ಷರ(buf[2]) == 'N' && ದೊಡ್ಡ_ಅಕ್ಷರ(buf[3]) == 'F')
         v.u = (uint64) inf_hi << 32;
-    else if (toupper(buf[1]) == 'N' && toupper(buf[2]) == 'A' && toupper(buf[3]) == 'N')
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ದೊಡ್ಡ_ಅಕ್ಷರ(buf[1]) == 'N' && ದೊಡ್ಡ_ಅಕ್ಷರ(buf[2]) == 'A' && ದೊಡ್ಡ_ಅಕ್ಷರ(buf[3]) == 'N')
         v.u = (uint64) -1;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
         CV_PARSE_ERROR_CPP("Bad format of floating-point constant");
     *value = v.f;
     *endptr = buf + 4;
 }
 
-double FileStorage::Impl::strtod(char *ptr, char **endptr) {
-    double fval = ::strtod(ptr, endptr);
-    if (**endptr == '.') {
-        char *dot_pos = *endptr;
+ದ್ವಿಗುಣ FileStorage::Impl::strtod(ಅಕ್ಷರ *ptr, ಅಕ್ಷರ **endptr) {
+    ದ್ವಿಗುಣ fval = ::strtod(ptr, endptr);
+    ಆದರೆ (**endptr == '.') {
+        ಅಕ್ಷರ *dot_pos = *endptr;
         *dot_pos = ',';
-        double fval2 = ::strtod(ptr, endptr);
+        ದ್ವಿಗುಣ fval2 = ::strtod(ptr, endptr);
         *dot_pos = '.';
-        if (*endptr > dot_pos)
+        ಆದರೆ (*endptr > dot_pos)
             fval = fval2;
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
             *endptr = dot_pos;
     }
 
-    if (*endptr == ptr || cv_isalpha(**endptr))
+    ಆದರೆ (*endptr == ptr || cv_isalpha(**endptr))
         processSpecialDouble(ptr, &fval, endptr);
 
-    return fval;
+    ಹಿಂತಿರುಗಿ fval;
 }
 
-void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
-    CV_Assert(type == FileNode::SEQ || type == FileNode::MAP);
+ಶೂನ್ಯ FileStorage::Impl::convert_ಗಮ್ಯ_Collection(ಪೂರ್ಣಾಂಕ type, File_ಗಂಟು &ಗಂಟು) {
+    CV_Assert(type == File_ಗಂಟು::SEQ || type == File_ಗಂಟು::MAP);
 
-    int node_type = node.type();
-    if (node_type == type)
-        return;
+    ಪೂರ್ಣಾಂಕ ಗಂಟು_type = ಗಂಟು.type();
+    ಆದರೆ (ಗಂಟು_type == type)
+        ಹಿಂತಿರುಗಿ;
 
-    bool named = node.isNamed();
-    uchar *ptr = node.ptr() + 1 + (named ? 4 : 0);
+    ತಾರ್ಕಿಕ named = ಗಂಟು.isNamed();
+    uchar *ptr = ಗಂಟು.ptr() + 1 + (named ? 4 : 0);
 
     int64_t ival = 0;
-    double fval = 0;
+    ದ್ವಿಗುಣ fval = 0;
     std::string sval;
-    bool add_first_scalar = false;
+    ತಾರ್ಕಿಕ ಕೂಡಿಸು_ಮೊದಲ_scalar = ಸುಳ್ಳು;
 
-    if (node_type != FileNode::NONE) {
+    ಆದರೆ (ಗಂಟು_type != File_ಗಂಟು::NONE) {
         // scalar nodes can only be converted to sequences, e.g. in XML:
         // <a>5[parser_position]... => create 5 with name "a"
         // <a>5 6[parser_position]... => 5 is converted to [5] and then 6 is added to it
         //
         // otherwise we don't know where to get the element names from
-        CV_Assert(type == FileNode::SEQ);
-        if (node_type == FileNode::INT) {
+        CV_Assert(type == File_ಗಂಟು::SEQ);
+        ಆದರೆ (ಗಂಟು_type == File_ಗಂಟು::INT) {
             ival = readLong(ptr);
-            add_first_scalar = true;
-        } else if (node_type == FileNode::REAL) {
+            ಕೂಡಿಸು_ಮೊದಲ_scalar = ನಿಜ;
+        } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಗಂಟು_type == File_ಗಂಟು::REAL) {
             fval = readReal(ptr);
-            add_first_scalar = true;
-        } else if (node_type == FileNode::STRING) {
-            sval = std::string(node);
-            add_first_scalar = true;
-        } else
-            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", node_type));
+            ಕೂಡಿಸು_ಮೊದಲ_scalar = ನಿಜ;
+        } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಗಂಟು_type == File_ಗಂಟು::STRING) {
+            sval = std::string(ಗಂಟು);
+            ಕೂಡಿಸು_ಮೊದಲ_scalar = ನಿಜ;
+        } ಇಲ್ಲದಿದ್ದರೆ
+            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", ಗಂಟು_type));
     }
 
-    ptr = reserveNodeSpace(node, 1 + (named ? 4 : 0) + 4 + 4);
-    *ptr++ = (uchar) (type | (named ? FileNode::NAMED : 0));
+    ptr = reserve_ಗಂಟು_Space(ಗಂಟು, 1 + (named ? 4 : 0) + 4 + 4);
+    *ptr++ = (uchar) (type | (named ? File_ಗಂಟು::NAMED : 0));
     // name has been copied automatically
-    if (named)
+    ಆದರೆ (named)
         ptr += 4;
     // set raw_size(collection)==4, nelems(collection)==1
     writeInt(ptr, 4);
     writeInt(ptr + 4, 0);
 
-    if (add_first_scalar)
-        addNode(node, std::string(), node_type,
-                node_type == FileNode::INT ? (const void *) &ival :
-                node_type == FileNode::REAL ? (const void *) &fval :
-                node_type == FileNode::STRING ? (const void *) sval.c_str() : 0,
+    ಆದರೆ (ಕೂಡಿಸು_ಮೊದಲ_scalar)
+        ಕೂಡಿಸು_ಗಂಟು(ಗಂಟು, std::string(), ಗಂಟು_type,
+                ಗಂಟು_type == File_ಗಂಟು::INT ? (ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *) &ival :
+                ಗಂಟು_type == File_ಗಂಟು::REAL ? (ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *) &fval :
+                ಗಂಟು_type == File_ಗಂಟು::STRING ? (ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *) sval.c_str() : 0,
                 -1);
 }
 
@@ -1552,58 +1552,58 @@ void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
 //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
 // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
 // In the case (b) the existing tag and the name are copied automatically.
-uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
-    bool shrinkBlock = false;
-    size_t shrinkBlockIdx = 0, shrinkSize = 0;
+uchar *FileStorage::Impl::reserve_ಗಂಟು_Space(File_ಗಂಟು &ಗಂಟು, size_t sz) {
+    ತಾರ್ಕಿಕ shrink_ಖಂಡ = ಸುಳ್ಳು;
+    size_t shrink_ಖಂಡ_Idx = 0, shrink_ಗಾತ್ರ = 0;
 
-    uchar *ptr = 0, *blockEnd = 0;
+    uchar *ptr = 0, *ಖಂಡ_ಕೊನೆ = 0;
 
-    if (!fs_data_ptrs.empty()) {
-        size_t blockIdx = node.blockIdx;
-        size_t ofs = node.ofs;
-        CV_Assert(blockIdx == fs_data_ptrs.size() - 1);
-        CV_Assert(ofs <= fs_data_blksz[blockIdx]);
-        CV_Assert(freeSpaceOfs <= fs_data_blksz[blockIdx]);
+    ಆದರೆ (!fs_ದತ್ತಾಂಶ_ptrs.empty()) {
+        size_t ಖಂಡ_Idx = ಗಂಟು.ಖಂಡ_Idx;
+        size_t ofs = ಗಂಟು.ofs;
+        CV_Assert(ಖಂಡ_Idx == fs_ದತ್ತಾಂಶ_ptrs.size() - 1);
+        CV_Assert(ofs <= fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx]);
+        CV_Assert(freeSpaceOfs <= fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx]);
         //CV_Assert( freeSpaceOfs <= ofs + sz );
 
-        ptr = fs_data_ptrs[blockIdx] + ofs;
-        blockEnd = fs_data_ptrs[blockIdx] + fs_data_blksz[blockIdx];
+        ptr = fs_ದತ್ತಾಂಶ_ptrs[ಖಂಡ_Idx] + ofs;
+        ಖಂಡ_ಕೊನೆ = fs_ದತ್ತಾಂಶ_ptrs[ಖಂಡ_Idx] + fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx];
 
-        CV_Assert(ptr >= fs_data_ptrs[blockIdx] && ptr <= blockEnd);
-        if (ptr + sz <= blockEnd) {
+        CV_Assert(ptr >= fs_ದತ್ತಾಂಶ_ptrs[ಖಂಡ_Idx] && ptr <= ಖಂಡ_ಕೊನೆ);
+        ಆದರೆ (ptr + sz <= ಖಂಡ_ಕೊನೆ) {
             freeSpaceOfs = ofs + sz;
-            return ptr;
+            ಹಿಂತಿರುಗಿ ptr;
         }
 
-        if (ofs ==
+        ಆದರೆ (ofs ==
             0)  // FileNode is a first component of this block. Resize current block instead of allocation of new one.
         {
-            fs_data[blockIdx]->resize(sz);
-            ptr = &fs_data[blockIdx]->at(0);
-            fs_data_ptrs[blockIdx] = ptr;
-            fs_data_blksz[blockIdx] = sz;
+            fs_ದತ್ತಾಂಶ[ಖಂಡ_Idx]->resize(sz);
+            ptr = &fs_ದತ್ತಾಂಶ[ಖಂಡ_Idx]->at(0);
+            fs_ದತ್ತಾಂಶ_ptrs[ಖಂಡ_Idx] = ptr;
+            fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx] = sz;
             freeSpaceOfs = sz;
-            return ptr;
+            ಹಿಂತಿರುಗಿ ptr;
         }
 
-        shrinkBlock = true;
-        shrinkBlockIdx = blockIdx;
-        shrinkSize = ofs;
+        shrink_ಖಂಡ = ನಿಜ;
+        shrink_ಖಂಡ_Idx = ಖಂಡ_Idx;
+        shrink_ಗಾತ್ರ = ofs;
     }
 
-    size_t blockSize = std::max((size_t) CV_FS_MAX_LEN * 4 - 256, sz) + 256;
-    Ptr<std::vector<uchar> > pv = makePtr<std::vector<uchar> >(blockSize);
-    fs_data.push_back(pv);
+    size_t ಖಂಡ_ಗಾತ್ರ_2 = std::max((size_t) CV_FS_MAX_LEN * 4 - 256, sz) + 256;
+    Ptr<std::vector<uchar> > pv = makePtr<std::vector<uchar> >(ಖಂಡ_ಗಾತ್ರ_2);
+    fs_ದತ್ತಾಂಶ.push_back(pv);
     uchar *new_ptr = &pv->at(0);
-    fs_data_ptrs.push_back(new_ptr);
-    fs_data_blksz.push_back(blockSize);
-    node.blockIdx = fs_data_ptrs.size() - 1;
-    node.ofs = 0;
+    fs_ದತ್ತಾಂಶ_ptrs.push_back(new_ptr);
+    fs_ದತ್ತಾಂಶ_blksz.push_back(ಖಂಡ_ಗಾತ್ರ_2);
+    ಗಂಟು.ಖಂಡ_Idx = fs_ದತ್ತಾಂಶ_ptrs.size() - 1;
+    ಗಂಟು.ofs = 0;
     freeSpaceOfs = sz;
 
-    if (ptr && ptr + 5 <= blockEnd) {
+    ಆದರೆ (ptr && ptr + 5 <= ಖಂಡ_ಕೊನೆ) {
         new_ptr[0] = ptr[0];
-        if (ptr[0] & FileNode::NAMED) {
+        ಆದರೆ (ptr[0] & File_ಗಂಟು::NAMED) {
             new_ptr[1] = ptr[1];
             new_ptr[2] = ptr[2];
             new_ptr[3] = ptr[3];
@@ -1611,114 +1611,114 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
         }
     }
 
-    if (shrinkBlock) {
-        fs_data[shrinkBlockIdx]->resize(shrinkSize);
-        fs_data_blksz[shrinkBlockIdx] = shrinkSize;
+    ಆದರೆ (shrink_ಖಂಡ) {
+        fs_ದತ್ತಾಂಶ[shrink_ಖಂಡ_Idx]->resize(shrink_ಗಾತ್ರ);
+        fs_ದತ್ತಾಂಶ_blksz[shrink_ಖಂಡ_Idx] = shrink_ಗಾತ್ರ;
     }
 
-    return new_ptr;
+    ಹಿಂತಿರುಗಿ new_ptr;
 }
 
-unsigned FileStorage::Impl::getStringOfs(const std::string &key) const {
-    str_hash_t::const_iterator it = str_hash.find(key);
-    return it != str_hash.end() ? it->second : 0;
+ಚಿಹ್ನೆರಹಿತ FileStorage::Impl::getStringOfs(ಸ್ಥಿರಾಂಕ std::string &ಕೀಲಿ) ಸ್ಥಿರಾಂಕ {
+    str_hash_t::const_iterator it = str_hash.find(ಕೀಲಿ);
+    ಹಿಂತಿರುಗಿ it != str_hash.end() ? it->second : 0;
 }
 
-FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key,
-                                    int elem_type, const void *value, int len) {
-    FileStorage_API *fs = this;
-    bool noname = key.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(key.c_str(), "_") == 0);
-    convertToCollection(noname ? FileNode::SEQ : FileNode::MAP, collection);
+File_ಗಂಟು FileStorage::Impl::ಕೂಡಿಸು_ಗಂಟು(File_ಗಂಟು &collection, ಸ್ಥಿರಾಂಕ std::string &ಕೀಲಿ,
+                                    ಪೂರ್ಣಾಂಕ elem_type, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ *value, ಪೂರ್ಣಾಂಕ len) {
+    FileStorage_API *fs = ಇದು;
+    ತಾರ್ಕಿಕ noname = ಕೀಲಿ.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(ಕೀಲಿ.c_str(), "_") == 0);
+    convert_ಗಮ್ಯ_Collection(noname ? File_ಗಂಟು::SEQ : File_ಗಂಟು::MAP, collection);
 
-    bool isseq = collection.empty() ? false : collection.isSeq();
-    if (noname != isseq)
+    ತಾರ್ಕಿಕ isseq = collection.empty() ? ಸುಳ್ಳು : collection.isSeq();
+    ಆದರೆ (noname != isseq)
         CV_PARSE_ERROR_CPP(noname ? "Map element should have a name" :
                            "Sequence element should not have name (use <_></_>)");
-    unsigned strofs = 0;
-    if (!noname) {
-        strofs = getStringOfs(key);
-        if (!strofs) {
-            strofs = (unsigned) str_hash_data.size();
-            size_t keysize = key.size() + 1;
-            str_hash_data.resize(strofs + keysize);
-            memcpy(&str_hash_data[0] + strofs, &key[0], keysize);
-            str_hash.insert(std::make_pair(key, strofs));
+    ಚಿಹ್ನೆರಹಿತ strofs = 0;
+    ಆದರೆ (!noname) {
+        strofs = getStringOfs(ಕೀಲಿ);
+        ಆದರೆ (!strofs) {
+            strofs = (ಚಿಹ್ನೆರಹಿತ) str_hash_ದತ್ತಾಂಶ.size();
+            size_t keysize = ಕೀಲಿ.size() + 1;
+            str_hash_ದತ್ತಾಂಶ.resize(strofs + keysize);
+            ಸ್ಮರಣೆ_ನಕಲು(&str_hash_ದತ್ತಾಂಶ[0] + strofs, &ಕೀಲಿ[0], keysize);
+            str_hash.insert(std::make_pair(ಕೀಲಿ, strofs));
         }
     }
 
     uchar *cp = collection.ptr();
 
-    size_t blockIdx = fs_data_ptrs.size() - 1;
+    size_t ಖಂಡ_Idx = fs_ದತ್ತಾಂಶ_ptrs.size() - 1;
     size_t ofs = freeSpaceOfs;
-    FileNode node(fs_ext, blockIdx, ofs);
+    File_ಗಂಟು ಗಂಟು(fs_ext, ಖಂಡ_Idx, ofs);
 
     size_t sz0 = 1 + (noname ? 0 : 4) + 8;
-    uchar *ptr = reserveNodeSpace(node, sz0);
+    uchar *ptr = reserve_ಗಂಟು_Space(ಗಂಟು, sz0);
 
-    *ptr++ = (uchar) (elem_type | (noname ? 0 : FileNode::NAMED));
-    if (elem_type == FileNode::NONE)
+    *ptr++ = (uchar) (elem_type | (noname ? 0 : File_ಗಂಟು::NAMED));
+    ಆದರೆ (elem_type == File_ಗಂಟು::NONE)
         freeSpaceOfs -= 8;
 
-    if (!noname) {
-        writeInt(ptr, (int) strofs);
+    ಆದರೆ (!noname) {
+        writeInt(ptr, (ಪೂರ್ಣಾಂಕ) strofs);
         ptr += 4;
     }
 
-    if (elem_type == FileNode::SEQ || elem_type == FileNode::MAP) {
+    ಆದರೆ (elem_type == File_ಗಂಟು::SEQ || elem_type == File_ಗಂಟು::MAP) {
         writeInt(ptr, 4);
         writeInt(ptr, 0);
     }
 
-    if (value)
-        node.setValue(elem_type, value, len);
+    ಆದರೆ (value)
+        ಗಂಟು.ಗಣ_ಮೌಲ್ಯ(elem_type, value, len);
 
-    if (collection.isNamed())
+    ಆದರೆ (collection.isNamed())
         cp += 4;
-    int nelems = readInt(cp + 5);
+    ಪೂರ್ಣಾಂಕ nelems = readInt(cp + 5);
     writeInt(cp + 5, nelems + 1);
 
-    return node;
+    ಹಿಂತಿರುಗಿ ಗಂಟು;
 }
 
-void FileStorage::Impl::finalizeCollection(FileNode &collection) {
-    if (!collection.isSeq() && !collection.isMap())
-        return;
+ಶೂನ್ಯ FileStorage::Impl::finalizeCollection(File_ಗಂಟು &collection) {
+    ಆದರೆ (!collection.isSeq() && !collection.isMap())
+        ಹಿಂತಿರುಗಿ;
     uchar *ptr0 = collection.ptr(), *ptr = ptr0 + 1;
-    if (*ptr0 & FileNode::NAMED)
+    ಆದರೆ (*ptr0 & File_ಗಂಟು::NAMED)
         ptr += 4;
-    size_t blockIdx = collection.blockIdx;
+    size_t ಖಂಡ_Idx = collection.ಖಂಡ_Idx;
     size_t ofs = collection.ofs + (size_t) (ptr + 8 - ptr0);
-    size_t rawSize = 4;
-    unsigned sz = (unsigned) readInt(ptr + 4);
-    if (sz > 0) {
-        size_t lastBlockIdx = fs_data_ptrs.size() - 1;
+    size_t raw_ಗಾತ್ರ = 4;
+    ಚಿಹ್ನೆರಹಿತ sz = (ಚಿಹ್ನೆರಹಿತ) readInt(ptr + 4);
+    ಆದರೆ (sz > 0) {
+        size_t ಕೊನೆಯ_ಖಂಡ_Idx = fs_ದತ್ತಾಂಶ_ptrs.size() - 1;
 
-        for (; blockIdx < lastBlockIdx; blockIdx++) {
-            rawSize += fs_data_blksz[blockIdx] - ofs;
+        ಗಾಗಿ (; ಖಂಡ_Idx < ಕೊನೆಯ_ಖಂಡ_Idx; ಖಂಡ_Idx++) {
+            raw_ಗಾತ್ರ += fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx] - ofs;
             ofs = 0;
         }
     }
-    rawSize += freeSpaceOfs - ofs;
-    writeInt(ptr, (int) rawSize);
+    raw_ಗಾತ್ರ += freeSpaceOfs - ofs;
+    writeInt(ptr, (ಪೂರ್ಣಾಂಕ) raw_ಗಾತ್ರ);
 }
 
-void FileStorage::Impl::normalizeNodeOfs(size_t &blockIdx, size_t &ofs) const {
-    while (ofs >= fs_data_blksz[blockIdx]) {
-        if (blockIdx == fs_data_blksz.size() - 1) {
-            CV_Assert(ofs == fs_data_blksz[blockIdx]);
-            break;
+ಶೂನ್ಯ FileStorage::Impl::normalize_ಗಂಟು_Ofs(size_t &ಖಂಡ_Idx, size_t &ofs) ಸ್ಥಿರಾಂಕ {
+    ಆಗ (ofs >= fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx]) {
+        ಆದರೆ (ಖಂಡ_Idx == fs_ದತ್ತಾಂಶ_blksz.size() - 1) {
+            CV_Assert(ofs == fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx]);
+            ನಿಲ್ಲಿಸು;
         }
-        ofs -= fs_data_blksz[blockIdx];
-        blockIdx++;
+        ofs -= fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx];
+        ಖಂಡ_Idx++;
     }
 }
 
-FileStorage::Impl::Base64State FileStorage::Impl::get_state_of_writing_base64() {
-    return state_of_writing_base64;
+FileStorage::Impl::Base64State FileStorage::Impl::get_state_ದ_writing_base64() {
+    ಹಿಂತಿರುಗಿ state_ದ_writing_base64;
 }
 
-int FileStorage::Impl::get_space() {
-    return space;
+ಪೂರ್ಣಾಂಕ FileStorage::Impl::get_space() {
+    ಹಿಂತಿರುಗಿ space;
 }
 
 
@@ -1727,22 +1727,22 @@ FileStorage::Impl::Base64Decoder::Base64Decoder() {
     ptr = 0;
     indent = 0;
     totalchars = 0;
-    eos = true;
+    eos = ನಿಜ;
 }
 
-void FileStorage::Impl::Base64Decoder::init(const Ptr<FileStorageParser> &_parser, char *_ptr, int _indent) {
-    parser_do_not_use_direct_dereference = _parser;
+ಶೂನ್ಯ FileStorage::Impl::Base64Decoder::init(ಸ್ಥಿರಾಂಕ Ptr<FileStorageParser> &_parser, ಅಕ್ಷರ *_ptr, ಪೂರ್ಣಾಂಕ _indent) {
+    parser_do_not_use_ನೇರ_dereference = _parser;
     ptr = _ptr;
     indent = _indent;
     encoded.clear();
     decoded.clear();
     ofs = 0;
     totalchars = 0;
-    eos = false;
+    eos = ಸುಳ್ಳು;
 }
 
-bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
-    static const uchar base64tab[] =
+ತಾರ್ಕಿಕ FileStorage::Impl::Base64Decoder::read_ಇನ್ನಷ್ಟು(ಪೂರ್ಣಾಂಕ needed) {
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ uchar base64tab[] =
             {
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1762,43 +1762,43 @@ bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };
 
-    if (eos)
-        return false;
+    ಆದರೆ (eos)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
     size_t sz = decoded.size();
     CV_Assert(ofs <= sz);
     sz -= ofs;
-    for (size_t i = 0; i < sz; i++)
+    ಗಾಗಿ (size_t i = 0; i < sz; i++)
         decoded[i] = decoded[ofs + i];
 
     decoded.resize(sz);
     ofs = 0;
 
     CV_Assert(ptr);
-    char *beg = 0, *end = 0;
-    bool ok = getParser().getBase64Row(ptr, indent, beg, end);
+    ಅಕ್ಷರ *beg = 0, *end = 0;
+    ತಾರ್ಕಿಕ ok = getParser().get_Base64_ಅಡ್ಡಸಾಲು(ptr, indent, beg, end);
     ptr = end;
     std::copy(beg, end, std::back_inserter(encoded));
     totalchars += end - beg;
 
-    if (!ok || beg == end) {
+    ಆದರೆ (!ok || beg == end) {
         // in the end of base64 sequence pad it with '=' characters so that
         // its total length is multiple of
-        eos = true;
+        eos = ನಿಜ;
         size_t tc = totalchars;
-        for (; tc % 4 != 0; tc++)
+        ಗಾಗಿ (; tc % 4 != 0; tc++)
             encoded.push_back('=');
     }
 
-    int i = 0, j, n = (int) encoded.size();
-    if (n > 0) {
-        const uchar *tab = base64tab;
-        char *src = &encoded[0];
+    ಪೂರ್ಣಾಂಕ i = 0, j, n = (ಪೂರ್ಣಾಂಕ) encoded.size();
+    ಆದರೆ (n > 0) {
+        ಸ್ಥಿರಾಂಕ uchar *tab = base64tab;
+        ಅಕ್ಷರ *src = &encoded[0];
 
-        for (; i <= n - 4; i += 4) {
+        ಗಾಗಿ (; i <= n - 4; i += 4) {
             // dddddd cccccc bbbbbb aaaaaa => ddddddcc ccccbbbb bbaaaaaa
-            uchar d = tab[(int) (uchar) src[i]], c = tab[(int) (uchar) src[i + 1]];
-            uchar b = tab[(int) (uchar) src[i + 2]], a = tab[(int) (uchar) src[i + 3]];
+            uchar d = tab[(ಪೂರ್ಣಾಂಕ) (uchar) src[i]], c = tab[(ಪೂರ್ಣಾಂಕ) (uchar) src[i + 1]];
+            uchar b = tab[(ಪೂರ್ಣಾಂಕ) (uchar) src[i + 2]], a = tab[(ಪೂರ್ಣಾಂಕ) (uchar) src[i + 3]];
 
             decoded.push_back((uchar) ((d << 2) | (c >> 4)));
             decoded.push_back((uchar) ((c << 4) | (b >> 2)));
@@ -1806,218 +1806,218 @@ bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
         }
     }
 
-    if (i > 0 && encoded[i - 1] == '=') {
-        if (i > 1 && encoded[i - 2] == '=' && !decoded.empty())
+    ಆದರೆ (i > 0 && encoded[i - 1] == '=') {
+        ಆದರೆ (i > 1 && encoded[i - 2] == '=' && !decoded.empty())
             decoded.pop_back();
-        if (!decoded.empty())
+        ಆದರೆ (!decoded.empty())
             decoded.pop_back();
     }
 
     n -= i;
-    for (j = 0; j < n; j++)
+    ಗಾಗಿ (j = 0; j < n; j++)
         encoded[j] = encoded[i + j];
     encoded.resize(n);
 
-    return (int) decoded.size() >= needed;
+    ಹಿಂತಿರುಗಿ (ಪೂರ್ಣಾಂಕ) decoded.size() >= needed;
 }
 
 uchar FileStorage::Impl::Base64Decoder::getUInt8() {
     size_t sz = decoded.size();
-    if (ofs >= sz && !readMore(1))
-        return (uchar) 0;
-    return decoded[ofs++];
+    ಆದರೆ (ofs >= sz && !read_ಇನ್ನಷ್ಟು(1))
+        ಹಿಂತಿರುಗಿ (uchar) 0;
+    ಹಿಂತಿರುಗಿ decoded[ofs++];
 }
 
 ushort FileStorage::Impl::Base64Decoder::getUInt16() {
     size_t sz = decoded.size();
-    if (ofs + 2 > sz && !readMore(2))
-        return (ushort) 0;
+    ಆದರೆ (ofs + 2 > sz && !read_ಇನ್ನಷ್ಟು(2))
+        ಹಿಂತಿರುಗಿ (ushort) 0;
     ushort val = (decoded[ofs] + (decoded[ofs + 1] << 8));
     ofs += 2;
-    return val;
+    ಹಿಂತಿರುಗಿ val;
 }
 
-int FileStorage::Impl::Base64Decoder::getInt32() {
+ಪೂರ್ಣಾಂಕ FileStorage::Impl::Base64Decoder::getInt32() {
     size_t sz = decoded.size();
-    if (ofs + 4 > sz && !readMore(4))
-        return 0;
-    int ival = readInt(&decoded[ofs]);
+    ಆದರೆ (ofs + 4 > sz && !read_ಇನ್ನಷ್ಟು(4))
+        ಹಿಂತಿರುಗಿ 0;
+    ಪೂರ್ಣಾಂಕ ival = readInt(&decoded[ofs]);
     ofs += 4;
-    return ival;
+    ಹಿಂತಿರುಗಿ ival;
 }
 
 int64_t FileStorage::Impl::Base64Decoder::getInt64() {
     size_t sz = decoded.size();
-    if (ofs + 8 > sz && !readMore(8))
-        return 0;
+    ಆದರೆ (ofs + 8 > sz && !read_ಇನ್ನಷ್ಟು(8))
+        ಹಿಂತಿರುಗಿ 0;
     int64_t ival = readLong(&decoded[ofs]);
     ofs += 8;
-    return ival;
+    ಹಿಂತಿರುಗಿ ival;
 }
 
-double FileStorage::Impl::Base64Decoder::getFloat64() {
+ದ್ವಿಗುಣ FileStorage::Impl::Base64Decoder::getFloat64() {
     size_t sz = decoded.size();
-    if (ofs + 8 > sz && !readMore(8))
-        return 0;
-    double fval = readReal(&decoded[ofs]);
+    ಆದರೆ (ofs + 8 > sz && !read_ಇನ್ನಷ್ಟು(8))
+        ಹಿಂತಿರುಗಿ 0;
+    ದ್ವಿಗುಣ fval = readReal(&decoded[ofs]);
     ofs += 8;
-    return fval;
+    ಹಿಂತಿರುಗಿ fval;
 }
 
-bool FileStorage::Impl::Base64Decoder::endOfStream() const { return eos; }
+ತಾರ್ಕಿಕ FileStorage::Impl::Base64Decoder::ಕೊನೆ_ದ_ಹರಿವು() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ eos; }
 
-char *FileStorage::Impl::Base64Decoder::getPtr() const { return ptr; }
+ಅಕ್ಷರ *FileStorage::Impl::Base64Decoder::getPtr() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ ptr; }
 
 
-char *FileStorage::Impl::parseBase64(char *ptr, int indent, FileNode &collection) {
-    const int BASE64_HDR_SIZE = 24;
-    char dt[BASE64_HDR_SIZE + 1] = {0};
-    base64decoder.init(parser_do_not_use_direct_dereference, ptr, indent);
+ಅಕ್ಷರ *FileStorage::Impl::parseBase64(ಅಕ್ಷರ *ptr, ಪೂರ್ಣಾಂಕ indent, File_ಗಂಟು &collection) {
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ BASE64_HDR_ಗಾತ್ರ = 24;
+    ಅಕ್ಷರ dt[BASE64_HDR_ಗಾತ್ರ + 1] = {0};
+    base64decoder.init(parser_do_not_use_ನೇರ_dereference, ptr, indent);
 
-    int i, k;
+    ಪೂರ್ಣಾಂಕ i, k;
 
-    for (i = 0; i < BASE64_HDR_SIZE; i++)
-        dt[i] = (char) base64decoder.getUInt8();
-    for (i = 0; i < BASE64_HDR_SIZE; i++)
-        if (isspace(dt[i]))
-            break;
+    ಗಾಗಿ (i = 0; i < BASE64_HDR_ಗಾತ್ರ; i++)
+        dt[i] = (ಅಕ್ಷರ) base64decoder.getUInt8();
+    ಗಾಗಿ (i = 0; i < BASE64_HDR_ಗಾತ್ರ; i++)
+        ಆದರೆ (ಖಾಲಿಯೇ(dt[i]))
+            ನಿಲ್ಲಿಸು;
     dt[i] = '\0';
 
-    CV_Assert(!base64decoder.endOfStream());
+    CV_Assert(!base64decoder.ಕೊನೆ_ದ_ಹರಿವು());
 
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2];
-    int fmt_pair_count = fs::decodeFormat(dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    ಪೂರ್ಣಾಂಕ fmt_ಜೋಡಿಗಳು[CV_FS_MAX_FMT_ಜೋಡಿಗಳು * 2];
+    ಪೂರ್ಣಾಂಕ fmt_pair_ಎಣಿಕೆ = fs::decodeFormat(dt, fmt_ಜೋಡಿಗಳು, CV_FS_MAX_FMT_ಜೋಡಿಗಳು);
     int64_t ival = 0;
-    double fval = 0;
+    ದ್ವಿಗುಣ fval = 0;
 
-    for (;;) {
-        for (k = 0; k < fmt_pair_count; k++) {
-            int elem_type = fmt_pairs[k * 2 + 1];
-            int count = fmt_pairs[k * 2];
+    ಗಾಗಿ (;;) {
+        ಗಾಗಿ (k = 0; k < fmt_pair_ಎಣಿಕೆ; k++) {
+            ಪೂರ್ಣಾಂಕ elem_type = fmt_ಜೋಡಿಗಳು[k * 2 + 1];
+            ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3 = fmt_ಜೋಡಿಗಳು[k * 2];
 
-            for (i = 0; i < count; i++) {
-                int node_type = FileNode::INT;
-                switch (elem_type) {
-                    case CV_8U:
+            ಗಾಗಿ (i = 0; i < ಎಣಿಕೆ_3; i++) {
+                ಪೂರ್ಣಾಂಕ ಗಂಟು_type = File_ಗಂಟು::INT;
+                ಆಯ್ಕೆ (elem_type) {
+                    ಸ್ಥಿತಿ CV_8U:
                         ival = base64decoder.getUInt8();
-                        break;
-                    case CV_8S:
-                        ival = (char) base64decoder.getUInt8();
-                        break;
-                    case CV_Bool:
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_8S:
+                        ival = (ಅಕ್ಷರ) base64decoder.getUInt8();
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_Bool:
                         ival = base64decoder.getUInt8() != 0;
-                        break;
-                    case CV_16U:
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_16U:
                         ival = base64decoder.getUInt16();
-                        break;
-                    case CV_16S:
-                        ival = (short) base64decoder.getUInt16();
-                        break;
-                    case CV_32U:
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_16S:
+                        ival = (ಗಿಡ್ಡ) base64decoder.getUInt16();
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_32U:
                         ival = base64decoder.getInt32();
-                        break;
-                    case CV_32S:
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_32S:
                         ival = base64decoder.getInt32();
-                        break;
-                    case CV_64U:
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_64U:
                         ival = base64decoder.getInt64();
-                        break;
-                    case CV_64S:
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_64S:
                         ival = base64decoder.getInt64();
-                        break;
-                    case CV_32F: {
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_32F: {
                         Cv32suf v;
                         v.i = base64decoder.getInt32();
                         fval = v.f;
-                        node_type = FileNode::REAL;
+                        ಗಂಟು_type = File_ಗಂಟು::REAL;
                     }
-                        break;
-                    case CV_64F:
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_64F:
                         fval = base64decoder.getFloat64();
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_16F:
-                        fval = float(hfloatFromBits(base64decoder.getUInt16()));
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_8F_E4M3FN:
+                        ಗಂಟು_type = File_ಗಂಟು::REAL;
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_16F:
+                        fval = ದಶಮಾಂಶ(hfloat_From_ಬಿಟ್ಟುಗಳು(base64decoder.getUInt16()));
+                        ಗಂಟು_type = File_ಗಂಟು::REAL;
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_8F_E4M3FN:
                         fval = fp8_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_8F_E4M3FNUZ:
+                        ಗಂಟು_type = File_ಗಂಟು::REAL;
+                        ನಿಲ್ಲಿಸು;
+                    ಸ್ಥಿತಿ CV_8F_E4M3FNUZ:
                         fval = fp8a_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
-                        break;
-                    default:
+                        ಗಂಟು_type = File_ಗಂಟು::REAL;
+                        ನಿಲ್ಲಿಸು;
+                    ಪೂರ್ವನಿಯೋಜಿತ:
                         CV_Error(Error::StsUnsupportedFormat, "Unsupported type");
                 }
 
-                if (base64decoder.endOfStream())
-                    break;
-                addNode(collection, std::string(), node_type,
-                        node_type == FileNode::INT ? (void *) &ival : (void *) &fval, -1);
+                ಆದರೆ (base64decoder.ಕೊನೆ_ದ_ಹರಿವು())
+                    ನಿಲ್ಲಿಸು;
+                ಕೂಡಿಸು_ಗಂಟು(collection, std::string(), ಗಂಟು_type,
+                        ಗಂಟು_type == File_ಗಂಟು::INT ? (ಶೂನ್ಯ *) &ival : (ಶೂನ್ಯ *) &fval, -1);
             }
         }
-        if (base64decoder.endOfStream())
-            break;
+        ಆದರೆ (base64decoder.ಕೊನೆ_ದ_ಹರಿವು())
+            ನಿಲ್ಲಿಸು;
     }
 
     finalizeCollection(collection);
-    return base64decoder.getPtr();
+    ಹಿಂತಿರುಗಿ base64decoder.getPtr();
 }
 
-void FileStorage::Impl::parseError(const char *func_name, const std::string &err_msg, const char *source_file,
-                                   int source_line) {
-    std::string msg = format("%s(%d): %s", filename.c_str(), lineno, err_msg.c_str());
-    error(Error::StsParseError, func_name, msg.c_str(), source_file, source_line);
+ಶೂನ್ಯ FileStorage::Impl::parseError(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *func_name, ಸ್ಥಿರಾಂಕ std::string &err_ಸಂದೇಶ, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ *ಮೂಲ_file,
+                                   ಪೂರ್ಣಾಂಕ ಮೂಲ_ಸಾಲು) {
+    std::string ಸಂದೇಶ = format("%s(%d): %s", filename.c_str(), lineno, err_ಸಂದೇಶ.c_str());
+    error(Error::StsParseError, func_name, ಸಂದೇಶ.c_str(), ಮೂಲ_file, ಮೂಲ_ಸಾಲು);
 }
 
-const uchar *FileStorage::Impl::getNodePtr(size_t blockIdx, size_t ofs) const {
-    CV_Assert(blockIdx < fs_data_ptrs.size());
-    CV_Assert(ofs < fs_data_blksz[blockIdx]);
+ಸ್ಥಿರಾಂಕ uchar *FileStorage::Impl::get_ಗಂಟು_Ptr(size_t ಖಂಡ_Idx, size_t ofs) ಸ್ಥಿರಾಂಕ {
+    CV_Assert(ಖಂಡ_Idx < fs_ದತ್ತಾಂಶ_ptrs.size());
+    CV_Assert(ofs < fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx]);
 
-    return fs_data_ptrs[blockIdx] + ofs;
+    ಹಿಂತಿರುಗಿ fs_ದತ್ತಾಂಶ_ptrs[ಖಂಡ_Idx] + ofs;
 }
 
-std::string FileStorage::Impl::getName(size_t nameofs) const {
-    CV_Assert(nameofs < str_hash_data.size());
-    return std::string(&str_hash_data[nameofs]);
+std::string FileStorage::Impl::getName(size_t nameofs) ಸ್ಥಿರಾಂಕ {
+    CV_Assert(nameofs < str_hash_ದತ್ತಾಂಶ.size());
+    ಹಿಂತಿರುಗಿ std::string(&str_hash_ದತ್ತಾಂಶ[nameofs]);
 }
 
-FileStorage *FileStorage::Impl::getFS() { return fs_ext; }
+FileStorage *FileStorage::Impl::getFS() { ಹಿಂತಿರುಗಿ fs_ext; }
 
 
 FileStorage::FileStorage()
     : state(0)
 {
-    p = makePtr<FileStorage::Impl>(this);
+    p = makePtr<FileStorage::Impl>(ಇದು);
 }
 
-FileStorage::FileStorage(const String& filename, int flags, const String& encoding)
+FileStorage::FileStorage(ಸ್ಥಿರಾಂಕ String& filename, ಪೂರ್ಣಾಂಕ flags, ಸ್ಥಿರಾಂಕ String& encoding)
     : state(0)
 {
-    p = makePtr<FileStorage::Impl>(this);
-    bool ok = p->open(filename.c_str(), flags, encoding.c_str());
-    if(ok)
+    p = makePtr<FileStorage::Impl>(ಇದು);
+    ತಾರ್ಕಿಕ ok = p->open(filename.c_str(), flags, encoding.c_str());
+    ಆದರೆ(ok)
         state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
 }
 
-void FileStorage::startWriteStruct(const String& name, int struct_flags, const String& typeName)
+ಶೂನ್ಯ FileStorage::ಆರಂಭ_Write_Struct(ಸ್ಥಿರಾಂಕ String& name, ಪೂರ್ಣಾಂಕ struct_flags, ಸ್ಥಿರಾಂಕ String& typeName)
 {
-    p->startWriteStruct(name.size() ? name.c_str() : 0, struct_flags, typeName.size() ? typeName.c_str() : 0);
+    p->ಆರಂಭ_Write_Struct(name.size() ? name.c_str() : 0, struct_flags, typeName.size() ? typeName.c_str() : 0);
     elname = String();
-    if ((struct_flags & FileNode::TYPE_MASK) == FileNode::SEQ)
-        state = FileStorage::VALUE_EXPECTED;
-    else
+    ಆದರೆ ((struct_flags & File_ಗಂಟು::TYPE_ಮುಖವಾಡ) == File_ಗಂಟು::SEQ)
+        state = FileStorage::ಮೌಲ್ಯ_EXPECTED;
+    ಇಲ್ಲದಿದ್ದರೆ
         state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
 }
 
-void FileStorage::endWriteStruct()
+ಶೂನ್ಯ FileStorage::ಕೊನೆ_Write_Struct()
 {
-    p->endWriteStruct();
-    state = p->write_stack.empty() || FileNode::isMap(p->write_stack.back().flags) ?
+    p->ಕೊನೆ_Write_Struct();
+    state = p->write_ರಾಶಿ.empty() || File_ಗಂಟು::isMap(p->write_ರಾಶಿ.back().flags) ?
         FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP :
-        FileStorage::VALUE_EXPECTED;
+        FileStorage::ಮೌಲ್ಯ_EXPECTED;
     elname = String();
 }
 
@@ -2025,963 +2025,963 @@ FileStorage::~FileStorage()
 {
 }
 
-bool FileStorage::open(const String& filename, int flags, const String& encoding)
+ತಾರ್ಕಿಕ FileStorage::open(ಸ್ಥಿರಾಂಕ String& filename, ಪೂರ್ಣಾಂಕ flags, ಸ್ಥಿರಾಂಕ String& encoding)
 {
-    try
+    ಪ್ರಯತ್ನಿಸು
     {
-        bool ok = p->open(filename.c_str(), flags, encoding.c_str());
-        if(ok)
+        ತಾರ್ಕಿಕ ok = p->open(filename.c_str(), flags, encoding.c_str());
+        ಆದರೆ(ok)
             state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
-        return ok;
+        ಹಿಂತಿರುಗಿ ok;
     }
-    catch (...)
+    ಹಿಡಿ (...)
     {
         release();
-        throw;  // re-throw
+        ಎಸೆ;  // re-throw
     }
 }
 
-bool FileStorage::isOpened() const { return p->is_opened; }
+ತಾರ್ಕಿಕ FileStorage::isOpened() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ p->is_opened; }
 
-void FileStorage::release()
+ಶೂನ್ಯ FileStorage::release()
 {
     p->release();
 }
 
-FileNode FileStorage::root(int i) const
+File_ಗಂಟು FileStorage::ಬೇರು(ಪೂರ್ಣಾಂಕ i) ಸ್ಥಿರಾಂಕ
 {
-    if( p.empty() || p->roots.empty() || i < 0 || i >= (int)p->roots.size() )
-        return FileNode();
+    ಆದರೆ( p.empty() || p->roots.empty() || i < 0 || i >= (ಪೂರ್ಣಾಂಕ)p->roots.size() )
+        ಹಿಂತಿರುಗಿ File_ಗಂಟು();
 
-    return p->roots[i];
+    ಹಿಂತಿರುಗಿ p->roots[i];
 }
 
-FileNode FileStorage::getFirstTopLevelNode() const
+File_ಗಂಟು FileStorage::get_ಮೊದಲ_ತುದಿ_Level_ಗಂಟು() ಸ್ಥಿರಾಂಕ
 {
-    FileNode r = root();
-    FileNodeIterator it = r.begin();
-    return it != r.end() ? *it : FileNode();
+    File_ಗಂಟು r = ಬೇರು();
+    File_ಗಂಟು_Iterator it = r.begin();
+    ಹಿಂತಿರುಗಿ it != r.end() ? *it : File_ಗಂಟು();
 }
 
-std::string FileStorage::getDefaultObjectName(const std::string& _filename)
+std::string FileStorage::getDefaultObjectName(ಸ್ಥಿರಾಂಕ std::string& _filename)
 {
-    static const char* stubname = "unnamed";
-    const char* filename = _filename.c_str();
-    const char* ptr2 = filename + _filename.size();
-    const char* ptr = ptr2 - 1;
-    cv::AutoBuffer<char> name_buf(_filename.size()+1);
+    ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* stubname = "unnamed";
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* filename = _filename.c_str();
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* ptr2 = filename + _filename.size();
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* ptr = ptr2 - 1;
+    cv::Auto_ಬಫರ್<ಅಕ್ಷರ> name_buf(_filename.size()+1);
 
-    while( ptr >= filename && *ptr != '\\' && *ptr != '/' && *ptr != ':' )
+    ಆಗ( ptr >= filename && *ptr != '\\' && *ptr != '/' && *ptr != ':' )
     {
-        if( *ptr == '.' && (!*ptr2 || strncmp(ptr2, ".gz", 3) == 0) )
+        ಆದರೆ( *ptr == '.' && (!*ptr2 || ಅಕ್ಷರಸರಣಿ_ಹೋಲಿಕೆ(ptr2, ".gz", 3) == 0) )
             ptr2 = ptr;
         ptr--;
     }
     ptr++;
-    if( ptr == ptr2 )
+    ಆದರೆ( ptr == ptr2 )
         CV_Error( cv::Error::StsBadArg, "Invalid filename" );
 
-    char* name = name_buf.data();
+    ಅಕ್ಷರ* name = name_buf.ದತ್ತಾಂಶ();
 
     // name must start with letter or '_'
-    if( !cv_isalpha(*ptr) && *ptr!= '_' ){
+    ಆದರೆ( !cv_isalpha(*ptr) && *ptr!= '_' ){
         *name++ = '_';
     }
 
-    while( ptr < ptr2 )
+    ಆಗ( ptr < ptr2 )
     {
-        char c = *ptr++;
-        if( !cv_isalnum(c) && c != '-' && c != '_' )
+        ಅಕ್ಷರ c = *ptr++;
+        ಆದರೆ( !cv_isalnum(c) && c != '-' && c != '_' )
             c = '_';
         *name++ = c;
     }
     *name = '\0';
-    name = name_buf.data();
-    if( strcmp( name, "_" ) == 0 )
+    name = name_buf.ದತ್ತಾಂಶ();
+    ಆದರೆ( strcmp( name, "_" ) == 0 )
         strcpy( name, stubname );
-    return name;
+    ಹಿಂತಿರುಗಿ name;
 }
 
 
-int FileStorage::getFormat() const
+ಪೂರ್ಣಾಂಕ FileStorage::getFormat() ಸ್ಥಿರಾಂಕ
 {
-    return p->fmt;
+    ಹಿಂತಿರುಗಿ p->fmt;
 }
 
-FileNode FileStorage::operator [](const char* key) const
+File_ಗಂಟು FileStorage::ಕ್ರಿಯಾಕಾರಕ [](ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* ಕೀಲಿ) ಸ್ಥಿರಾಂಕ
 {
-    return this->operator[](std::string(key));
+    ಹಿಂತಿರುಗಿ ಇದು->ಕ್ರಿಯಾಕಾರಕ[](std::string(ಕೀಲಿ));
 }
 
-FileNode FileStorage::operator [](const std::string& key) const
+File_ಗಂಟು FileStorage::ಕ್ರಿಯಾಕಾರಕ [](ಸ್ಥಿರಾಂಕ std::string& ಕೀಲಿ) ಸ್ಥಿರಾಂಕ
 {
-    FileNode res;
-    for (size_t i = 0; i < p->roots.size(); i++)
+    File_ಗಂಟು res;
+    ಗಾಗಿ (size_t i = 0; i < p->roots.size(); i++)
     {
-        res = p->roots[i][key];
-        if (!res.empty())
-            break;
+        res = p->roots[i][ಕೀಲಿ];
+        ಆದರೆ (!res.empty())
+            ನಿಲ್ಲಿಸು;
     }
-    return res;
+    ಹಿಂತಿರುಗಿ res;
 }
 
 String FileStorage::releaseAndGetString()
 {
     String buf;
     p->release(&buf);
-    return buf;
+    ಹಿಂತಿರುಗಿ buf;
 }
 
-void FileStorage::writeRaw( const String& fmt, const void* vec, size_t len )
+ಶೂನ್ಯ FileStorage::writeRaw( ಸ್ಥಿರಾಂಕ String& fmt, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* vec, size_t len )
 {
-    p->writeRawData(fmt, (const uchar*)vec, len);
+    p->write_Raw_ದತ್ತಾಂಶ(fmt, (ಸ್ಥಿರಾಂಕ uchar*)vec, len);
 }
 
-void FileStorage::writeComment( const String& comment, bool eol_comment )
+ಶೂನ್ಯ FileStorage::writeComment( ಸ್ಥಿರಾಂಕ String& comment, ತಾರ್ಕಿಕ eol_comment )
 {
     p->writeComment(comment.c_str(), eol_comment);
 }
 
-void writeScalar( FileStorage& fs, int value )
+ಶೂನ್ಯ writeScalar( FileStorage& fs, ಪೂರ್ಣಾಂಕ value )
 {
-    fs.p->write(String(), value);
+    fs.p->ಲಿಖ(String(), value);
 }
 
-void writeScalar( FileStorage& fs, int64_t value )
+ಶೂನ್ಯ writeScalar( FileStorage& fs, int64_t value )
 {
-    fs.p->write(String(), value);
+    fs.p->ಲಿಖ(String(), value);
 }
 
-void writeScalar( FileStorage& fs, float value )
+ಶೂನ್ಯ writeScalar( FileStorage& fs, ದಶಮಾಂಶ value )
 {
-    fs.p->write(String(), (double)value);
+    fs.p->ಲಿಖ(String(), (ದ್ವಿಗುಣ)value);
 }
 
-void writeScalar( FileStorage& fs, double value )
+ಶೂನ್ಯ writeScalar( FileStorage& fs, ದ್ವಿಗುಣ value )
 {
-    fs.p->write(String(), value);
+    fs.p->ಲಿಖ(String(), value);
 }
 
-void writeScalar( FileStorage& fs, const String& value )
+ಶೂನ್ಯ writeScalar( FileStorage& fs, ಸ್ಥಿರಾಂಕ String& value )
 {
-    fs.p->write(String(), value);
+    fs.p->ಲಿಖ(String(), value);
 }
 
-void write( FileStorage& fs, const String& name, int value )
+ಶೂನ್ಯ ಲಿಖ( FileStorage& fs, ಸ್ಥಿರಾಂಕ String& name, ಪೂರ್ಣಾಂಕ value )
 {
-    fs.p->write(name, value);
+    fs.p->ಲಿಖ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, int64_t value )
+ಶೂನ್ಯ ಲಿಖ( FileStorage& fs, ಸ್ಥಿರಾಂಕ String& name, int64_t value )
 {
-    fs.p->write(name, value);
+    fs.p->ಲಿಖ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, float value )
+ಶೂನ್ಯ ಲಿಖ( FileStorage& fs, ಸ್ಥಿರಾಂಕ String& name, ದಶಮಾಂಶ value )
 {
-    fs.p->write(name, (double)value);
+    fs.p->ಲಿಖ(name, (ದ್ವಿಗುಣ)value);
 }
 
-void write( FileStorage& fs, const String& name, double value )
+ಶೂನ್ಯ ಲಿಖ( FileStorage& fs, ಸ್ಥಿರಾಂಕ String& name, ದ್ವಿಗುಣ value )
 {
-    fs.p->write(name, value);
+    fs.p->ಲಿಖ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, const String& value )
+ಶೂನ್ಯ ಲಿಖ( FileStorage& fs, ಸ್ಥಿರಾಂಕ String& name, ಸ್ಥಿರಾಂಕ String& value )
 {
-    fs.p->write(name, value);
+    fs.p->ಲಿಖ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, bool value )
+ಶೂನ್ಯ ಲಿಖ( FileStorage& fs, ಸ್ಥಿರಾಂಕ String& name, ತಾರ್ಕಿಕ value )
 {
-    fs.p->write(name, value);
+    fs.p->ಲಿಖ(name, value);
 }
 
-void FileStorage::write(const String& name, int val) { p->write(name, val); }
-void FileStorage::write(const String& name, bool val) { p->write(name, val); }
-void FileStorage::write(const String& name, int64_t val) { p->write(name, val); }
-void FileStorage::write(const String& name, double val) { p->write(name, val); }
-void FileStorage::write(const String& name, const String& val) { p->write(name, val); }
-void FileStorage::write(const String& name, const Mat& val) { cv::write(*this, name, val); }
-void FileStorage::write(const String& name, const std::vector<String>& val) { cv::write(*this, name, val); }
+ಶೂನ್ಯ FileStorage::ಲಿಖ(ಸ್ಥಿರಾಂಕ String& name, ಪೂರ್ಣಾಂಕ val) { p->ಲಿಖ(name, val); }
+ಶೂನ್ಯ FileStorage::ಲಿಖ(ಸ್ಥಿರಾಂಕ String& name, ತಾರ್ಕಿಕ val) { p->ಲಿಖ(name, val); }
+ಶೂನ್ಯ FileStorage::ಲಿಖ(ಸ್ಥಿರಾಂಕ String& name, int64_t val) { p->ಲಿಖ(name, val); }
+ಶೂನ್ಯ FileStorage::ಲಿಖ(ಸ್ಥಿರಾಂಕ String& name, ದ್ವಿಗುಣ val) { p->ಲಿಖ(name, val); }
+ಶೂನ್ಯ FileStorage::ಲಿಖ(ಸ್ಥಿರಾಂಕ String& name, ಸ್ಥಿರಾಂಕ String& val) { p->ಲಿಖ(name, val); }
+ಶೂನ್ಯ FileStorage::ಲಿಖ(ಸ್ಥಿರಾಂಕ String& name, ಸ್ಥಿರಾಂಕ Mat& val) { cv::ಲಿಖ(*ಇದು, name, val); }
+ಶೂನ್ಯ FileStorage::ಲಿಖ(ಸ್ಥಿರಾಂಕ String& name, ಸ್ಥಿರಾಂಕ std::vector<String>& val) { cv::ಲಿಖ(*ಇದು, name, val); }
 
-FileStorage& operator << (FileStorage& fs, const String& str)
+FileStorage& ಕ್ರಿಯಾಕಾರಕ << (FileStorage& fs, ಸ್ಥಿರಾಂಕ String& str)
 {
-    enum { NAME_EXPECTED = FileStorage::NAME_EXPECTED,
-        VALUE_EXPECTED = FileStorage::VALUE_EXPECTED,
+    ಎಣಿಕೆ { NAME_EXPECTED = FileStorage::NAME_EXPECTED,
+        ಮೌಲ್ಯ_EXPECTED = FileStorage::ಮೌಲ್ಯ_EXPECTED,
         INSIDE_MAP = FileStorage::INSIDE_MAP };
-    const char* _str = str.c_str();
-    if( !fs.isOpened() || !_str )
-        return fs;
+    ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* _str = str.c_str();
+    ಆದರೆ( !fs.isOpened() || !_str )
+        ಹಿಂತಿರುಗಿ fs;
     Ptr<FileStorage::Impl>& fs_impl = fs.p;
-    char c = *_str;
+    ಅಕ್ಷರ c = *_str;
 
-    if( c == '}' || c == ']' )
+    ಆದರೆ( c == '}' || c == ']' )
     {
-        if( fs_impl->write_stack.empty() )
+        ಆದರೆ( fs_impl->write_ರಾಶಿ.empty() )
             CV_Error_( cv::Error::StsError, ("Extra closing '%c'", *_str) );
 
         fs_impl->workaround();
 
-        int struct_flags = fs_impl->write_stack.back().flags;
-        char expected_bracket = FileNode::isMap(struct_flags) ? '}' : ']';
-        if( c != expected_bracket )
+        ಪೂರ್ಣಾಂಕ struct_flags = fs_impl->write_ರಾಶಿ.back().flags;
+        ಅಕ್ಷರ expected_bracket = File_ಗಂಟು::isMap(struct_flags) ? '}' : ']';
+        ಆದರೆ( c != expected_bracket )
             CV_Error_( cv::Error::StsError, ("The closing '%c' does not match the opening '%c'", c, expected_bracket));
-        fs_impl->endWriteStruct();
-        CV_Assert(!fs_impl->write_stack.empty());
-        struct_flags = fs_impl->write_stack.back().flags;
-        fs.state = FileNode::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+        fs_impl->ಕೊನೆ_Write_Struct();
+        CV_Assert(!fs_impl->write_ರಾಶಿ.empty());
+        struct_flags = fs_impl->write_ರಾಶಿ.back().flags;
+        fs.state = File_ಗಂಟು::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : ಮೌಲ್ಯ_EXPECTED;
         fs.elname = String();
     }
-    else if( fs.state == NAME_EXPECTED + INSIDE_MAP )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( fs.state == NAME_EXPECTED + INSIDE_MAP )
     {
-        if (!cv_isalpha(c) && c != '_')
+        ಆದರೆ (!cv_isalpha(c) && c != '_')
             CV_Error_( cv::Error::StsError, ("Incorrect element name %s; should start with a letter or '_'", _str) );
         fs.elname = str;
-        fs.state = VALUE_EXPECTED + INSIDE_MAP;
+        fs.state = ಮೌಲ್ಯ_EXPECTED + INSIDE_MAP;
     }
-    else if( (fs.state & 3) == VALUE_EXPECTED )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( (fs.state & 3) == ಮೌಲ್ಯ_EXPECTED )
     {
-        if( c == '{' || c == '[' )
+        ಆದರೆ( c == '{' || c == '[' )
         {
-            int struct_flags = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            fs.state = struct_flags == FileNode::MAP ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+            ಪೂರ್ಣಾಂಕ struct_flags = c == '{' ? File_ಗಂಟು::MAP : File_ಗಂಟು::SEQ;
+            fs.state = struct_flags == File_ಗಂಟು::MAP ? INSIDE_MAP + NAME_EXPECTED : ಮೌಲ್ಯ_EXPECTED;
             _str++;
-            if( *_str == ':' )
+            ಆದರೆ( *_str == ':' )
             {
                 _str++;
-                if( !*_str )
-                    struct_flags |= FileNode::FLOW;
+                ಆದರೆ( !*_str )
+                    struct_flags |= File_ಗಂಟು::FLOW;
             }
-            fs_impl->startWriteStruct(!fs.elname.empty() ? fs.elname.c_str() : 0, struct_flags, *_str ? _str : 0 );
+            fs_impl->ಆರಂಭ_Write_Struct(!fs.elname.empty() ? fs.elname.c_str() : 0, struct_flags, *_str ? _str : 0 );
             fs.elname = String();
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            write( fs, fs.elname, (c == '\\' && (_str[1] == '{' || _str[1] == '}' ||
+            ಲಿಖ( fs, fs.elname, (c == '\\' && (_str[1] == '{' || _str[1] == '}' ||
                                 _str[1] == '[' || _str[1] == ']')) ? String(_str+1) : str );
-            if( fs.state == INSIDE_MAP + VALUE_EXPECTED )
+            ಆದರೆ( fs.state == INSIDE_MAP + ಮೌಲ್ಯ_EXPECTED )
                 fs.state = INSIDE_MAP + NAME_EXPECTED;
         }
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
         CV_Error( cv::Error::StsError, "Invalid fs.state" );
-    return fs;
+    ಹಿಂತಿರುಗಿ fs;
 }
 
 
-FileNode::FileNode()
-    : fs(NULL)
+File_ಗಂಟು::File_ಗಂಟು()
+    : fs(ಖಾಲಿ)
 {
-    blockIdx = ofs = 0;
+    ಖಂಡ_Idx = ofs = 0;
 }
 
-FileNode::FileNode(FileStorage::Impl* _fs, size_t _blockIdx, size_t _ofs)
+File_ಗಂಟು::File_ಗಂಟು(FileStorage::Impl* _fs, size_t ಖಂಡ_Idx_2, size_t _ofs)
     : fs(_fs)
 {
-    blockIdx = _blockIdx;
+    ಖಂಡ_Idx = ಖಂಡ_Idx_2;
     ofs = _ofs;
 }
 
-FileNode::FileNode(const FileStorage* _fs, size_t _blockIdx, size_t _ofs)
-    : FileNode(_fs->p.get(), _blockIdx, _ofs)
+File_ಗಂಟು::File_ಗಂಟು(ಸ್ಥಿರಾಂಕ FileStorage* _fs, size_t ಖಂಡ_Idx_2, size_t _ofs)
+    : File_ಗಂಟು(_fs->p.get(), ಖಂಡ_Idx_2, _ofs)
 {
     // nothing
 }
 
-FileNode::FileNode(const FileNode& node)
+File_ಗಂಟು::File_ಗಂಟು(ಸ್ಥಿರಾಂಕ File_ಗಂಟು& ಗಂಟು)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
+    fs = ಗಂಟು.fs;
+    ಖಂಡ_Idx = ಗಂಟು.ಖಂಡ_Idx;
+    ofs = ಗಂಟು.ofs;
 }
 
-FileNode& FileNode::operator=(const FileNode& node)
+File_ಗಂಟು& File_ಗಂಟು::ಕ್ರಿಯಾಕಾರಕ=(ಸ್ಥಿರಾಂಕ File_ಗಂಟು& ಗಂಟು)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
-    return *this;
+    fs = ಗಂಟು.fs;
+    ಖಂಡ_Idx = ಗಂಟು.ಖಂಡ_Idx;
+    ofs = ಗಂಟು.ofs;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-FileNode FileNode::operator[](const std::string& nodename) const
+File_ಗಂಟು File_ಗಂಟು::ಕ್ರಿಯಾಕಾರಕ[](ಸ್ಥಿರಾಂಕ std::string& nodename) ಸ್ಥಿರಾಂಕ
 {
-    if(!fs)
-        return FileNode();
+    ಆದರೆ(!fs)
+        ಹಿಂತಿರುಗಿ File_ಗಂಟು();
 
     CV_Assert( isMap() );
 
-    unsigned key = fs->getStringOfs(nodename);
+    ಚಿಹ್ನೆರಹಿತ ಕೀಲಿ = fs->getStringOfs(nodename);
     size_t i, sz = size();
-    FileNodeIterator it = begin();
+    File_ಗಂಟು_Iterator it = begin();
 
-    for( i = 0; i < sz; i++, ++it )
+    ಗಾಗಿ( i = 0; i < sz; i++, ++it )
     {
-        FileNode n = *it;
-        const uchar* p = n.ptr();
-        unsigned key2 = (unsigned)readInt(p + 1);
-        CV_Assert( key2 < fs->str_hash_data.size() );
-        if( key == key2 )
-            return n;
+        File_ಗಂಟು n = *it;
+        ಸ್ಥಿರಾಂಕ uchar* p = n.ptr();
+        ಚಿಹ್ನೆರಹಿತ key2 = (ಚಿಹ್ನೆರಹಿತ)readInt(p + 1);
+        CV_Assert( key2 < fs->str_hash_ದತ್ತಾಂಶ.size() );
+        ಆದರೆ( ಕೀಲಿ == key2 )
+            ಹಿಂತಿರುಗಿ n;
     }
-    return FileNode();
+    ಹಿಂತಿರುಗಿ File_ಗಂಟು();
 }
 
-FileNode FileNode::operator[](const char* nodename) const
+File_ಗಂಟು File_ಗಂಟು::ಕ್ರಿಯಾಕಾರಕ[](ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* nodename) ಸ್ಥಿರಾಂಕ
 {
-    return this->operator[](std::string(nodename));
+    ಹಿಂತಿರುಗಿ ಇದು->ಕ್ರಿಯಾಕಾರಕ[](std::string(nodename));
 }
 
-FileNode FileNode::operator[](int i) const
+File_ಗಂಟು File_ಗಂಟು::ಕ್ರಿಯಾಕಾರಕ[](ಪೂರ್ಣಾಂಕ i) ಸ್ಥಿರಾಂಕ
 {
-    if(!fs)
-        return FileNode();
+    ಆದರೆ(!fs)
+        ಹಿಂತಿರುಗಿ File_ಗಂಟು();
 
     CV_Assert( isSeq() );
 
-    int sz = (int)size();
+    ಪೂರ್ಣಾಂಕ sz = (ಪೂರ್ಣಾಂಕ)size();
     CV_Assert( 0 <= i && i < sz );
 
-    FileNodeIterator it = begin();
+    File_ಗಂಟು_Iterator it = begin();
     it += i;
 
-    return *it;
+    ಹಿಂತಿರುಗಿ *it;
 }
 
-std::vector<String> FileNode::keys() const
+std::vector<String> File_ಗಂಟು::ಕೀಲಿಗಳು() ಸ್ಥಿರಾಂಕ
 {
     CV_Assert(isMap());
 
     std::vector<String> res;
     res.reserve(size());
-    for (FileNodeIterator it = begin(); it != end(); ++it)
+    ಗಾಗಿ (File_ಗಂಟು_Iterator it = begin(); it != end(); ++it)
     {
         res.push_back((*it).name());
     }
-    return res;
+    ಹಿಂತಿರುಗಿ res;
 }
 
-int FileNode::type() const
+ಪೂರ್ಣಾಂಕ File_ಗಂಟು::type() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p = ptr();
-    if(!p)
-        return NONE;
-    return (*p & TYPE_MASK);
+    ಸ್ಥಿರಾಂಕ uchar* p = ptr();
+    ಆದರೆ(!p)
+        ಹಿಂತಿರುಗಿ NONE;
+    ಹಿಂತಿರುಗಿ (*p & TYPE_ಮುಖವಾಡ);
 }
 
-bool FileNode::isMap(int flags) { return (flags & TYPE_MASK) == MAP; }
-bool FileNode::isSeq(int flags) { return (flags & TYPE_MASK) == SEQ; }
-bool FileNode::isCollection(int flags) { return isMap(flags) || isSeq(flags); }
-bool FileNode::isFlow(int flags) { return (flags & FLOW) != 0; }
-bool FileNode::isEmptyCollection(int flags) { return (flags & EMPTY) != 0; }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isMap(ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ (flags & TYPE_ಮುಖವಾಡ) == MAP; }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isSeq(ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ (flags & TYPE_ಮುಖವಾಡ) == SEQ; }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isCollection(ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ isMap(flags) || isSeq(flags); }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isFlow(ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ (flags & FLOW) != 0; }
+ತಾರ್ಕಿಕ File_ಗಂಟು::is_ಖಾಲಿಗಳು_Collection(ಪೂರ್ಣಾಂಕ flags) { ಹಿಂತಿರುಗಿ (flags & ಖಾಲಿಗಳು_2) != 0; }
 
-bool FileNode::empty() const   { return fs == 0; }
-bool FileNode::isNone() const  { return type() == NONE; }
-bool FileNode::isSeq() const   { return type() == SEQ; }
-bool FileNode::isMap() const   { return type() == MAP; }
-bool FileNode::isInt() const   { return type() == INT;  }
-bool FileNode::isReal() const  { return type() == REAL; }
-bool FileNode::isString() const { return type() == STRING;  }
-bool FileNode::isNamed() const
+ತಾರ್ಕಿಕ File_ಗಂಟು::empty() ಸ್ಥಿರಾಂಕ   { ಹಿಂತಿರುಗಿ fs == 0; }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isNone() ಸ್ಥಿರಾಂಕ  { ಹಿಂತಿರುಗಿ type() == NONE; }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isSeq() ಸ್ಥಿರಾಂಕ   { ಹಿಂತಿರುಗಿ type() == SEQ; }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isMap() ಸ್ಥಿರಾಂಕ   { ಹಿಂತಿರುಗಿ type() == MAP; }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isInt() ಸ್ಥಿರಾಂಕ   { ಹಿಂತಿರುಗಿ type() == INT;  }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isReal() ಸ್ಥಿರಾಂಕ  { ಹಿಂತಿರುಗಿ type() == REAL; }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isString() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ type() == STRING;  }
+ತಾರ್ಕಿಕ File_ಗಂಟು::isNamed() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p = ptr();
-    if(!p)
-        return false;
-    return (*p & NAMED) != 0;
+    ಸ್ಥಿರಾಂಕ uchar* p = ptr();
+    ಆದರೆ(!p)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಹಿಂತಿರುಗಿ (*p & NAMED) != 0;
 }
 
-std::string FileNode::name() const
+std::string File_ಗಂಟು::name() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p = ptr();
-    if(!p)
-        return std::string();
+    ಸ್ಥಿರಾಂಕ uchar* p = ptr();
+    ಆದರೆ(!p)
+        ಹಿಂತಿರುಗಿ std::string();
     size_t nameofs = p[1] | (p[2]<<8) | (p[3]<<16) | (p[4]<<24);
-    return fs->getName(nameofs);
+    ಹಿಂತಿರುಗಿ fs->getName(nameofs);
 }
 
-FileNode::operator int() const
+File_ಗಂಟು::ಕ್ರಿಯಾಕಾರಕ ಪೂರ್ಣಾಂಕ() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
-    p += (tag & NAMED) ? 5 : 1;
+    ಸ್ಥಿರಾಂಕ uchar* p = ptr();
+    ಆದರೆ(!p)
+        ಹಿಂತಿರುಗಿ 0;
+    ಪೂರ್ಣಾಂಕ ಟ್ಯಾಗ್ = *p;
+    ಪೂರ್ಣಾಂಕ type = (ಟ್ಯಾಗ್ & TYPE_ಮುಖವಾಡ);
+    p += (ಟ್ಯಾಗ್ & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    ಆದರೆ( type == INT )
     {
-        return readInt(p);
+        ಹಿಂತಿರುಗಿ readInt(p);
     }
-    else if( type == REAL )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( type == REAL )
     {
-        return cvRound(readReal(p));
+        ಹಿಂತಿರುಗಿ cv_ಸುತ್ತು(readReal(p));
     }
-    else
-        return 0x7fffffff;
+    ಇಲ್ಲದಿದ್ದರೆ
+        ಹಿಂತಿರುಗಿ 0x7fffffff;
 }
 
-FileNode::operator int64_t() const
+File_ಗಂಟು::ಕ್ರಿಯಾಕಾರಕ int64_t() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
-    p += (tag & NAMED) ? 5 : 1;
+    ಸ್ಥಿರಾಂಕ uchar* p = ptr();
+    ಆದರೆ(!p)
+        ಹಿಂತಿರುಗಿ 0;
+    ಪೂರ್ಣಾಂಕ ಟ್ಯಾಗ್ = *p;
+    ಪೂರ್ಣಾಂಕ type = (ಟ್ಯಾಗ್ & TYPE_ಮುಖವಾಡ);
+    p += (ಟ್ಯಾಗ್ & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    ಆದರೆ( type == INT )
     {
-        return readLong(p);
+        ಹಿಂತಿರುಗಿ readLong(p);
     }
-    else if( type == REAL )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( type == REAL )
     {
-        return cvRound(readReal(p));
+        ಹಿಂತಿರುಗಿ cv_ಸುತ್ತು(readReal(p));
     }
-    else
-        return 0x7fffffff;
+    ಇಲ್ಲದಿದ್ದರೆ
+        ಹಿಂತಿರುಗಿ 0x7fffffff;
 }
 
-FileNode::operator float() const
+File_ಗಂಟು::ಕ್ರಿಯಾಕಾರಕ ದಶಮಾಂಶ() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0.f;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
-    p += (tag & NAMED) ? 5 : 1;
+    ಸ್ಥಿರಾಂಕ uchar* p = ptr();
+    ಆದರೆ(!p)
+        ಹಿಂತಿರುಗಿ 0.f;
+    ಪೂರ್ಣಾಂಕ ಟ್ಯಾಗ್ = *p;
+    ಪೂರ್ಣಾಂಕ type = (ಟ್ಯಾಗ್ & TYPE_ಮುಖವಾಡ);
+    p += (ಟ್ಯಾಗ್ & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    ಆದರೆ( type == INT )
     {
-        return (float)readLong(p);
+        ಹಿಂತಿರುಗಿ (ದಶಮಾಂಶ)readLong(p);
     }
-    else if( type == REAL )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( type == REAL )
     {
-        return (float)readReal(p);
+        ಹಿಂತಿರುಗಿ (ದಶಮಾಂಶ)readReal(p);
     }
-    else
-        return FLT_MAX;
+    ಇಲ್ಲದಿದ್ದರೆ
+        ಹಿಂತಿರುಗಿ FLT_MAX;
 }
 
-FileNode::operator double() const
+File_ಗಂಟು::ಕ್ರಿಯಾಕಾರಕ ದ್ವಿಗುಣ() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0.f;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
-    p += (tag & NAMED) ? 5 : 1;
+    ಸ್ಥಿರಾಂಕ uchar* p = ptr();
+    ಆದರೆ(!p)
+        ಹಿಂತಿರುಗಿ 0.f;
+    ಪೂರ್ಣಾಂಕ ಟ್ಯಾಗ್ = *p;
+    ಪೂರ್ಣಾಂಕ type = (ಟ್ಯಾಗ್ & TYPE_ಮುಖವಾಡ);
+    p += (ಟ್ಯಾಗ್ & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    ಆದರೆ( type == INT )
     {
-        return (double)readLong(p);
+        ಹಿಂತಿರುಗಿ (ದ್ವಿಗುಣ)readLong(p);
     }
-    else if( type == REAL )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( type == REAL )
     {
-        return readReal(p);
+        ಹಿಂತಿರುಗಿ readReal(p);
     }
-    else
-        return DBL_MAX;
+    ಇಲ್ಲದಿದ್ದರೆ
+        ಹಿಂತಿರುಗಿ DBL_MAX;
 }
 
-double FileNode::real() const  { return double(*this); }
+ದ್ವಿಗುಣ File_ಗಂಟು::real() ಸ್ಥಿರಾಂಕ  { ಹಿಂತಿರುಗಿ ದ್ವಿಗುಣ(*ಇದು); }
 
-std::string FileNode::string() const
+std::string File_ಗಂಟು::string() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p = ptr();
-    if( !p || (*p & TYPE_MASK) != STRING )
-        return std::string();
+    ಸ್ಥಿರಾಂಕ uchar* p = ptr();
+    ಆದರೆ( !p || (*p & TYPE_ಮುಖವಾಡ) != STRING )
+        ಹಿಂತಿರುಗಿ std::string();
     p += (*p & NAMED) ? 5 : 1;
-    size_t sz = (size_t)(unsigned)readInt(p);
-    return std::string((const char*)(p + 4), sz - 1);
+    size_t sz = (size_t)(ಚಿಹ್ನೆರಹಿತ)readInt(p);
+    ಹಿಂತಿರುಗಿ std::string((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*)(p + 4), sz - 1);
 }
-Mat FileNode::mat() const { Mat value; read(*this, value, Mat()); return value; }
+Mat File_ಗಂಟು::mat() ಸ್ಥಿರಾಂಕ { Mat value; ಪಠ(*ಇದು, value, Mat()); ಹಿಂತಿರುಗಿ value; }
 
-FileNodeIterator FileNode::begin() const { return FileNodeIterator(*this, false); }
-FileNodeIterator FileNode::end() const   { return FileNodeIterator(*this, true); }
+File_ಗಂಟು_Iterator File_ಗಂಟು::begin() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ File_ಗಂಟು_Iterator(*ಇದು, ಸುಳ್ಳು); }
+File_ಗಂಟು_Iterator File_ಗಂಟು::end() ಸ್ಥಿರಾಂಕ   { ಹಿಂತಿರುಗಿ File_ಗಂಟು_Iterator(*ಇದು, ನಿಜ); }
 
-void FileNode::readRaw( const std::string& fmt, void* vec, size_t len ) const
+ಶೂನ್ಯ File_ಗಂಟು::readRaw( ಸ್ಥಿರಾಂಕ std::string& fmt, ಶೂನ್ಯ* vec, size_t len ) ಸ್ಥಿರಾಂಕ
 {
-    FileNodeIterator it = begin();
+    File_ಗಂಟು_Iterator it = begin();
     it.readRaw( fmt, vec, len );
 }
 
-size_t FileNode::size() const
+size_t File_ಗಂಟು::size() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p = ptr();
-    if( !p )
-        return 0;
-    int tag = *p;
-    int tp = tag & TYPE_MASK;
-    if( tp == MAP || tp == SEQ )
+    ಸ್ಥಿರಾಂಕ uchar* p = ptr();
+    ಆದರೆ( !p )
+        ಹಿಂತಿರುಗಿ 0;
+    ಪೂರ್ಣಾಂಕ ಟ್ಯಾಗ್ = *p;
+    ಪೂರ್ಣಾಂಕ tp = ಟ್ಯಾಗ್ & TYPE_ಮುಖವಾಡ;
+    ಆದರೆ( tp == MAP || tp == SEQ )
     {
-        if( tag & NAMED )
+        ಆದರೆ( ಟ್ಯಾಗ್ & NAMED )
             p += 4;
-        return (size_t)(unsigned)readInt(p + 5);
+        ಹಿಂತಿರುಗಿ (size_t)(ಚಿಹ್ನೆರಹಿತ)readInt(p + 5);
     }
-    return tp != NONE;
+    ಹಿಂತಿರುಗಿ tp != NONE;
 }
 
-size_t FileNode::rawSize() const
+size_t File_ಗಂಟು::raw_ಗಾತ್ರ() ಸ್ಥಿರಾಂಕ
 {
-    const uchar* p0 = ptr(), *p = p0;
-    if( !p )
-        return 0;
-    int tag = *p++;
-    int tp = tag & TYPE_MASK;
-    if( tag & NAMED )
+    ಸ್ಥಿರಾಂಕ uchar* p0 = ptr(), *p = p0;
+    ಆದರೆ( !p )
+        ಹಿಂತಿರುಗಿ 0;
+    ಪೂರ್ಣಾಂಕ ಟ್ಯಾಗ್ = *p++;
+    ಪೂರ್ಣಾಂಕ tp = ಟ್ಯಾಗ್ & TYPE_ಮುಖವಾಡ;
+    ಆದರೆ( ಟ್ಯಾಗ್ & NAMED )
         p += 4;
     size_t sz0 = (size_t)(p - p0);
-    if( tp == INT )
-        return sz0 + 8;
-    if( tp == REAL )
-        return sz0 + 8;
-    if( tp == NONE )
-        return sz0;
+    ಆದರೆ( tp == INT )
+        ಹಿಂತಿರುಗಿ sz0 + 8;
+    ಆದರೆ( tp == REAL )
+        ಹಿಂತಿರುಗಿ sz0 + 8;
+    ಆದರೆ( tp == NONE )
+        ಹಿಂತಿರುಗಿ sz0;
     CV_Assert( tp == STRING || tp == SEQ || tp == MAP );
-    return sz0 + 4 + readInt(p);
+    ಹಿಂತಿರುಗಿ sz0 + 4 + readInt(p);
 }
 
-uchar* FileNode::ptr()
+uchar* File_ಗಂಟು::ptr()
 {
-    return !fs ? 0 : (uchar*)fs->getNodePtr(blockIdx, ofs);
+    ಹಿಂತಿರುಗಿ !fs ? 0 : (uchar*)fs->get_ಗಂಟು_Ptr(ಖಂಡ_Idx, ofs);
 }
 
-const uchar* FileNode::ptr() const
+ಸ್ಥಿರಾಂಕ uchar* File_ಗಂಟು::ptr() ಸ್ಥಿರಾಂಕ
 {
-    return !fs ? 0 : fs->getNodePtr(blockIdx, ofs);
+    ಹಿಂತಿರುಗಿ !fs ? 0 : fs->get_ಗಂಟು_Ptr(ಖಂಡ_Idx, ofs);
 }
 
-void FileNode::setValue( int type, const void* value, int len )
+ಶೂನ್ಯ File_ಗಂಟು::ಗಣ_ಮೌಲ್ಯ( ಪೂರ್ಣಾಂಕ type, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* value, ಪೂರ್ಣಾಂಕ len )
 {
     uchar *p = ptr();
     CV_Assert(p != 0);
 
-    int tag = *p;
-    int current_type = tag & TYPE_MASK;
+    ಪೂರ್ಣಾಂಕ ಟ್ಯಾಗ್ = *p;
+    ಪೂರ್ಣಾಂಕ current_type = ಟ್ಯಾಗ್ & TYPE_ಮುಖವಾಡ;
     CV_Assert( current_type == NONE || current_type == type );
 
-    int sz = 1;
+    ಪೂರ್ಣಾಂಕ sz = 1;
 
-    if( tag & NAMED )
+    ಆದರೆ( ಟ್ಯಾಗ್ & NAMED )
         sz += 4;
 
-    if( type == INT )
+    ಆದರೆ( type == INT )
         sz += 8;
-    else if( type == REAL )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( type == REAL )
         sz += 8;
-    else if( type == STRING )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( type == STRING )
     {
-        if( len < 0 )
-            len = (int)strlen((const char*)value);
+        ಆದರೆ( len < 0 )
+            len = (ಪೂರ್ಣಾಂಕ)ಅಕ್ಷರಸರಣಿ_ಉದ್ದ((ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*)value);
         sz += 4 + len + 1; // besides the string content,
                            // take the size (4 bytes) and the final '\0' into account
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
         CV_Error(Error::StsNotImplemented, "Only scalar types can be dynamically assigned to a file node");
 
-    p = fs->reserveNodeSpace(*this, sz);
-    *p++ = (uchar)(type | (tag & NAMED));
-    if( tag & NAMED )
+    p = fs->reserve_ಗಂಟು_Space(*ಇದು, sz);
+    *p++ = (uchar)(type | (ಟ್ಯಾಗ್ & NAMED));
+    ಆದರೆ( ಟ್ಯಾಗ್ & NAMED )
         p += 4;
 
-    if( type == INT )
+    ಆದರೆ( type == INT )
     {
-        int64_t ival = *(const int64_t*)value;
+        int64_t ival = *(ಸ್ಥಿರಾಂಕ int64_t*)value;
         writeInt(p, ival);
     }
-    else if( type == REAL )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( type == REAL )
     {
-        double dbval = *(const double*)value;
+        ದ್ವಿಗುಣ dbval = *(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ*)value;
         writeReal(p, dbval);
     }
-    else if( type == STRING )
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( type == STRING )
     {
-        const char* str = (const char*)value;
+        ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* str = (ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ*)value;
         writeInt(p, len + 1);
-        memcpy(p + 4, str, len);
+        ಸ್ಮರಣೆ_ನಕಲು(p + 4, str, len);
         p[4 + len] = (uchar)'\0';
     }
 }
 
-FileNodeIterator::FileNodeIterator()
+File_ಗಂಟು_Iterator::File_ಗಂಟು_Iterator()
 {
     fs = 0;
-    blockIdx = 0;
+    ಖಂಡ_Idx = 0;
     ofs = 0;
-    blockSize = 0;
-    nodeNElems = 0;
+    ಖಂಡ_ಗಾತ್ರ_2 = 0;
+    ಗಂಟು_NElems = 0;
     idx = 0;
 }
 
-FileNodeIterator::FileNodeIterator( const FileNode& node, bool seekEnd )
+File_ಗಂಟು_Iterator::File_ಗಂಟು_Iterator( ಸ್ಥಿರಾಂಕ File_ಗಂಟು& ಗಂಟು, ತಾರ್ಕಿಕ seek_ಕೊನೆ )
 {
-    fs = node.fs;
+    fs = ಗಂಟು.fs;
     idx = 0;
-    if( !fs )
-        blockIdx = ofs = blockSize = nodeNElems = 0;
-    else
+    ಆದರೆ( !fs )
+        ಖಂಡ_Idx = ofs = ಖಂಡ_ಗಾತ್ರ_2 = ಗಂಟು_NElems = 0;
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        blockIdx = node.blockIdx;
-        ofs = node.ofs;
+        ಖಂಡ_Idx = ಗಂಟು.ಖಂಡ_Idx;
+        ofs = ಗಂಟು.ofs;
 
-        bool collection = node.isSeq() || node.isMap();
-        if( node.isNone() )
+        ತಾರ್ಕಿಕ collection = ಗಂಟು.isSeq() || ಗಂಟು.isMap();
+        ಆದರೆ( ಗಂಟು.isNone() )
         {
-            nodeNElems = 0;
+            ಗಂಟು_NElems = 0;
         }
-        else if( !collection )
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( !collection )
         {
-            nodeNElems = 1;
-            if( seekEnd )
+            ಗಂಟು_NElems = 1;
+            ಆದರೆ( seek_ಕೊನೆ )
             {
                 idx = 1;
-                ofs += node.rawSize();
+                ofs += ಗಂಟು.raw_ಗಾತ್ರ();
             }
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            nodeNElems = node.size();
-            const uchar* p0 = node.ptr(), *p = p0 + 1;
-            if(*p0 & FileNode::NAMED )
+            ಗಂಟು_NElems = ಗಂಟು.size();
+            ಸ್ಥಿರಾಂಕ uchar* p0 = ಗಂಟು.ptr(), *p = p0 + 1;
+            ಆದರೆ(*p0 & File_ಗಂಟು::NAMED )
                 p += 4;
-            if( !seekEnd )
+            ಆದರೆ( !seek_ಕೊನೆ )
                 ofs += (p - p0) + 8;
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
-                size_t rawsz = (size_t)(unsigned)readInt(p);
+                size_t rawsz = (size_t)(ಚಿಹ್ನೆರಹಿತ)readInt(p);
                 ofs += (p - p0) + 4 + rawsz;
-                idx = nodeNElems;
+                idx = ಗಂಟು_NElems;
             }
         }
-        fs->normalizeNodeOfs(blockIdx, ofs);
-        blockSize = fs->fs_data_blksz[blockIdx];
+        fs->normalize_ಗಂಟು_Ofs(ಖಂಡ_Idx, ofs);
+        ಖಂಡ_ಗಾತ್ರ_2 = fs->fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx];
     }
 }
 
-FileNodeIterator::FileNodeIterator(const FileNodeIterator& it)
+File_ಗಂಟು_Iterator::File_ಗಂಟು_Iterator(ಸ್ಥಿರಾಂಕ File_ಗಂಟು_Iterator& it)
 {
     fs = it.fs;
-    blockIdx = it.blockIdx;
+    ಖಂಡ_Idx = it.ಖಂಡ_Idx;
     ofs = it.ofs;
-    blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    ಖಂಡ_ಗಾತ್ರ_2 = it.ಖಂಡ_ಗಾತ್ರ_2;
+    ಗಂಟು_NElems = it.ಗಂಟು_NElems;
     idx = it.idx;
 }
 
-FileNodeIterator& FileNodeIterator::operator=(const FileNodeIterator& it)
+File_ಗಂಟು_Iterator& File_ಗಂಟು_Iterator::ಕ್ರಿಯಾಕಾರಕ=(ಸ್ಥಿರಾಂಕ File_ಗಂಟು_Iterator& it)
 {
     fs = it.fs;
-    blockIdx = it.blockIdx;
+    ಖಂಡ_Idx = it.ಖಂಡ_Idx;
     ofs = it.ofs;
-    blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    ಖಂಡ_ಗಾತ್ರ_2 = it.ಖಂಡ_ಗಾತ್ರ_2;
+    ಗಂಟು_NElems = it.ಗಂಟು_NElems;
     idx = it.idx;
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-FileNode FileNodeIterator::operator *() const
+File_ಗಂಟು File_ಗಂಟು_Iterator::ಕ್ರಿಯಾಕಾರಕ *() ಸ್ಥಿರಾಂಕ
 {
-    return FileNode(idx < nodeNElems ? fs : NULL, blockIdx, ofs);
+    ಹಿಂತಿರುಗಿ File_ಗಂಟು(idx < ಗಂಟು_NElems ? fs : ಖಾಲಿ, ಖಂಡ_Idx, ofs);
 }
 
-FileNodeIterator& FileNodeIterator::operator ++ ()
+File_ಗಂಟು_Iterator& File_ಗಂಟು_Iterator::ಕ್ರಿಯಾಕಾರಕ ++ ()
 {
-    if( idx == nodeNElems || !fs )
-        return *this;
+    ಆದರೆ( idx == ಗಂಟು_NElems || !fs )
+        ಹಿಂತಿರುಗಿ *ಇದು;
     idx++;
-    FileNode n(fs, blockIdx, ofs);
-    ofs += n.rawSize();
-    if( ofs >= blockSize )
+    File_ಗಂಟು n(fs, ಖಂಡ_Idx, ofs);
+    ofs += n.raw_ಗಾತ್ರ();
+    ಆದರೆ( ofs >= ಖಂಡ_ಗಾತ್ರ_2 )
     {
-        fs->normalizeNodeOfs(blockIdx, ofs);
-        blockSize = fs->fs_data_blksz[blockIdx];
+        fs->normalize_ಗಂಟು_Ofs(ಖಂಡ_Idx, ofs);
+        ಖಂಡ_ಗಾತ್ರ_2 = fs->fs_ದತ್ತಾಂಶ_blksz[ಖಂಡ_Idx];
     }
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-FileNodeIterator FileNodeIterator::operator ++ (int)
+File_ಗಂಟು_Iterator File_ಗಂಟು_Iterator::ಕ್ರಿಯಾಕಾರಕ ++ (ಪೂರ್ಣಾಂಕ)
 {
-    FileNodeIterator it = *this;
-    ++(*this);
-    return it;
+    File_ಗಂಟು_Iterator it = *ಇದು;
+    ++(*ಇದು);
+    ಹಿಂತಿರುಗಿ it;
 }
 
-FileNodeIterator& FileNodeIterator::operator += (int _ofs)
+File_ಗಂಟು_Iterator& File_ಗಂಟು_Iterator::ಕ್ರಿಯಾಕಾರಕ += (ಪೂರ್ಣಾಂಕ _ofs)
 {
     CV_Assert( _ofs >= 0 );
-    for( ; _ofs > 0; _ofs-- )
-        this->operator ++();
-    return *this;
+    ಗಾಗಿ( ; _ofs > 0; _ofs-- )
+        ಇದು->ಕ್ರಿಯಾಕಾರಕ ++();
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-FileNodeIterator& FileNodeIterator::readRaw( const String& fmt, void* _data0, size_t maxsz)
+File_ಗಂಟು_Iterator& File_ಗಂಟು_Iterator::readRaw( ಸ್ಥಿರಾಂಕ String& fmt, ಶೂನ್ಯ* _data0, size_t maxsz)
 {
-    if( fs && idx < nodeNElems )
+    ಆದರೆ( fs && idx < ಗಂಟು_NElems )
     {
         uchar* data0 = (uchar*)_data0;
-        int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2];
-        int fmt_pair_count = fs::decodeFormat( fmt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-        size_t esz = fs::calcStructSize( fmt.c_str(), 0 );
+        ಪೂರ್ಣಾಂಕ fmt_ಜೋಡಿಗಳು[CV_FS_MAX_FMT_ಜೋಡಿಗಳು*2];
+        ಪೂರ್ಣಾಂಕ fmt_pair_ಎಣಿಕೆ = fs::decodeFormat( fmt.c_str(), fmt_ಜೋಡಿಗಳು, CV_FS_MAX_FMT_ಜೋಡಿಗಳು );
+        size_t esz = fs::calc_Struct_ಗಾತ್ರ( fmt.c_str(), 0 );
 
         CV_Assert( maxsz % esz == 0 );
         maxsz /= esz;
 
-        for( ; maxsz > 0; maxsz--, data0 += esz )
+        ಗಾಗಿ( ; maxsz > 0; maxsz--, data0 += esz )
         {
             size_t offset = 0;
-            for( int k = 0; k < fmt_pair_count; k++ )
+            ಗಾಗಿ( ಪೂರ್ಣಾಂಕ k = 0; k < fmt_pair_ಎಣಿಕೆ; k++ )
             {
-                int elem_type = fmt_pairs[k*2+1];
-                int elem_size = CV_ELEM_SIZE(elem_type);
+                ಪೂರ್ಣಾಂಕ elem_type = fmt_ಜೋಡಿಗಳು[k*2+1];
+                ಪೂರ್ಣಾಂಕ elem_ಗಾತ್ರ_2 = CV_ELEM_ಗಾತ್ರ(elem_type);
 
-                int count = fmt_pairs[k*2];
-                offset = alignSize( offset, elem_size );
-                uchar* data = data0 + offset;
+                ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3 = fmt_ಜೋಡಿಗಳು[k*2];
+                offset = align_ಗಾತ್ರ( offset, elem_ಗಾತ್ರ_2 );
+                uchar* ದತ್ತಾಂಶ = data0 + offset;
 
-                for( int i = 0; i < count; i++, ++(*this) )
+                ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < ಎಣಿಕೆ_3; i++, ++(*ಇದು) )
                 {
-                    FileNode node = *(*this);
-                    if( node.isInt() )
+                    File_ಗಂಟು ಗಂಟು = *(*ಇದು);
+                    ಆದರೆ( ಗಂಟು.isInt() )
                     {
-                        int64_t ival = static_cast<int64_t>(elem_size == 8 ? (int64_t)node : (int)node);
-                        switch( elem_type )
+                        int64_t ival = static_cast<int64_t>(elem_ಗಾತ್ರ_2 == 8 ? (int64_t)ಗಂಟು : (ಪೂರ್ಣಾಂಕ)ಗಂಟು);
+                        ಆಯ್ಕೆ( elem_type )
                         {
-                        case CV_8U:
-                            *(uchar*)data = saturate_cast<uchar>(ival);
-                            data++;
-                            break;
-                        case CV_8S:
-                            *(char*)data = saturate_cast<schar>(ival);
-                            data++;
-                            break;
-                        case CV_Bool:
-                            *(bool*)data = ival != 0;
-                            data++;
-                            break;
-                        case CV_16U:
-                            *(ushort*)data = saturate_cast<ushort>(ival);
-                            data += sizeof(ushort);
-                            break;
-                        case CV_16S:
-                            *(short*)data = saturate_cast<short>(ival);
-                            data += sizeof(short);
-                            break;
-                        case CV_32U:
-                            *(unsigned*)data = (unsigned)std::max(ival, (int64_t)0);
-                            data += sizeof(unsigned);
-                            break;
-                        case CV_32S:
-                            *(int*)data = (int)ival;
-                            data += sizeof(int);
-                            break;
-                        case CV_32F:
-                            *(float*)data = (float)ival;
-                            data += sizeof(float);
-                            break;
-                        case CV_64U:
-                            *(uint64_t*)data = (uint64_t)ival;
-                            data += sizeof(uint64_t);
-                            break;
-                        case CV_64S:
-                            *(int64_t*)data = (int64_t)ival;
-                            data += sizeof(int64_t);
-                            break;
-                        case CV_64F:
-                            *(double*)data = (double)ival;
-                            data += sizeof(double);
-                            break;
-                        case CV_16F:
-                            *(hfloat*)data = hfloat((float)ival);
-                            data += sizeof(hfloat);
-                            break;
-                        case CV_16BF:
-                            *(bfloat*)data = bfloat((float)ival);
-                            data += sizeof(bfloat);
-                            break;
-                        case CV_8F_E4M3FN:
-                            *(fp8_t*)data = fp8_t((float)ival);
-                            data += sizeof(fp8_t);
-                            break;
-                        case CV_8F_E4M3FNUZ:
-                            *(fp8a_t*)data = fp8a_t((float)ival);
-                            data += sizeof(fp8a_t);
-                            break;
-                        default:
+                        ಸ್ಥಿತಿ CV_8U:
+                            *(uchar*)ದತ್ತಾಂಶ = saturate_cast<uchar>(ival);
+                            ದತ್ತಾಂಶ++;
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_8S:
+                            *(ಅಕ್ಷರ*)ದತ್ತಾಂಶ = saturate_cast<schar>(ival);
+                            ದತ್ತಾಂಶ++;
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_Bool:
+                            *(ತಾರ್ಕಿಕ*)ದತ್ತಾಂಶ = ival != 0;
+                            ದತ್ತಾಂಶ++;
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_16U:
+                            *(ushort*)ದತ್ತಾಂಶ = saturate_cast<ushort>(ival);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ushort);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_16S:
+                            *(ಗಿಡ್ಡ*)ದತ್ತಾಂಶ = saturate_cast<ಗಿಡ್ಡ>(ival);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ಗಿಡ್ಡ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_32U:
+                            *(ಚಿಹ್ನೆರಹಿತ*)ದತ್ತಾಂಶ = (ಚಿಹ್ನೆರಹಿತ)std::max(ival, (int64_t)0);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ಚಿಹ್ನೆರಹಿತ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_32S:
+                            *(ಪೂರ್ಣಾಂಕ*)ದತ್ತಾಂಶ = (ಪೂರ್ಣಾಂಕ)ival;
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_32F:
+                            *(ದಶಮಾಂಶ*)ದತ್ತಾಂಶ = (ದಶಮಾಂಶ)ival;
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ದಶಮಾಂಶ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_64U:
+                            *(uint64_t*)ದತ್ತಾಂಶ = (uint64_t)ival;
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(uint64_t);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_64S:
+                            *(int64_t*)ದತ್ತಾಂಶ = (int64_t)ival;
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(int64_t);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_64F:
+                            *(ದ್ವಿಗುಣ*)ದತ್ತಾಂಶ = (ದ್ವಿಗುಣ)ival;
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ದ್ವಿಗುಣ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_16F:
+                            *(hfloat*)ದತ್ತಾಂಶ = hfloat((ದಶಮಾಂಶ)ival);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(hfloat);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_16BF:
+                            *(bfloat*)ದತ್ತಾಂಶ = bfloat((ದಶಮಾಂಶ)ival);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(bfloat);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_8F_E4M3FN:
+                            *(fp8_t*)ದತ್ತಾಂಶ = fp8_t((ದಶಮಾಂಶ)ival);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(fp8_t);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_8F_E4M3FNUZ:
+                            *(fp8a_t*)ದತ್ತಾಂಶ = fp8a_t((ದಶಮಾಂಶ)ival);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(fp8a_t);
+                            ನಿಲ್ಲಿಸು;
+                        ಪೂರ್ವನಿಯೋಜಿತ:
                             CV_Error( Error::StsUnsupportedFormat, "Unsupported type" );
                         }
                     }
-                    else if( node.isReal() )
+                    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ( ಗಂಟು.isReal() )
                     {
-                        double fval = (double)node;
+                        ದ್ವಿಗುಣ fval = (ದ್ವಿಗುಣ)ಗಂಟು;
 
-                        switch( elem_type )
+                        ಆಯ್ಕೆ( elem_type )
                         {
-                        case CV_8U:
-                            *(uchar*)data = saturate_cast<uchar>(fval);
-                            data++;
-                            break;
-                        case CV_8S:
-                            *(char*)data = saturate_cast<schar>(fval);
-                            data++;
-                            break;
-                        case CV_16U:
-                            *(ushort*)data = saturate_cast<ushort>(fval);
-                            data += sizeof(ushort);
-                            break;
-                        case CV_16S:
-                            *(short*)data = saturate_cast<short>(fval);
-                            data += sizeof(short);
-                            break;
-                        case CV_32U:
-                            *(int*)data = saturate_cast<unsigned>(fval);
-                            data += sizeof(int);
-                            break;
-                        case CV_32S:
-                            *(int*)data = saturate_cast<int>(fval);
-                            data += sizeof(int);
-                            break;
-                        case CV_32F:
-                            *(float*)data = (float)fval;
-                            data += sizeof(float);
-                            break;
-                        case CV_64U:
-                            *(uint64_t*)data = (uint64_t)round(std::max(fval, 0.));
-                            data += sizeof(uint64_t);
-                            break;
-                        case CV_64S:
-                            *(int64_t*)data = (int64_t)round(std::max(fval, 0.));
-                            data += sizeof(int64_t);
-                            break;
-                        case CV_64F:
-                            *(double*)data = fval;
-                            data += sizeof(double);
-                            break;
-                        case CV_16F:
-                            *(hfloat*)data = hfloat((float)fval);
-                            data += sizeof(hfloat);
-                            break;
-                        case CV_16BF:
-                            *(bfloat*)data = bfloat((float)fval);
-                            data += sizeof(bfloat);
-                            break;
-                        case CV_8F_E4M3FN:
-                            *(fp8_t*)data = fp8_t((float)fval);
-                            data += sizeof(fp8_t);
-                            break;
-                        case CV_8F_E4M3FNUZ:
-                            *(fp8a_t*)data = fp8a_t((float)fval);
-                            data += sizeof(fp8a_t);
-                            break;
-                        default:
+                        ಸ್ಥಿತಿ CV_8U:
+                            *(uchar*)ದತ್ತಾಂಶ = saturate_cast<uchar>(fval);
+                            ದತ್ತಾಂಶ++;
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_8S:
+                            *(ಅಕ್ಷರ*)ದತ್ತಾಂಶ = saturate_cast<schar>(fval);
+                            ದತ್ತಾಂಶ++;
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_16U:
+                            *(ushort*)ದತ್ತಾಂಶ = saturate_cast<ushort>(fval);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ushort);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_16S:
+                            *(ಗಿಡ್ಡ*)ದತ್ತಾಂಶ = saturate_cast<ಗಿಡ್ಡ>(fval);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ಗಿಡ್ಡ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_32U:
+                            *(ಪೂರ್ಣಾಂಕ*)ದತ್ತಾಂಶ = saturate_cast<ಚಿಹ್ನೆರಹಿತ>(fval);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_32S:
+                            *(ಪೂರ್ಣಾಂಕ*)ದತ್ತಾಂಶ = saturate_cast<ಪೂರ್ಣಾಂಕ>(fval);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_32F:
+                            *(ದಶಮಾಂಶ*)ದತ್ತಾಂಶ = (ದಶಮಾಂಶ)fval;
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ದಶಮಾಂಶ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_64U:
+                            *(uint64_t*)ದತ್ತಾಂಶ = (uint64_t)round(std::max(fval, 0.));
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(uint64_t);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_64S:
+                            *(int64_t*)ದತ್ತಾಂಶ = (int64_t)round(std::max(fval, 0.));
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(int64_t);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_64F:
+                            *(ದ್ವಿಗುಣ*)ದತ್ತಾಂಶ = fval;
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(ದ್ವಿಗುಣ);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_16F:
+                            *(hfloat*)ದತ್ತಾಂಶ = hfloat((ದಶಮಾಂಶ)fval);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(hfloat);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_16BF:
+                            *(bfloat*)ದತ್ತಾಂಶ = bfloat((ದಶಮಾಂಶ)fval);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(bfloat);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_8F_E4M3FN:
+                            *(fp8_t*)ದತ್ತಾಂಶ = fp8_t((ದಶಮಾಂಶ)fval);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(fp8_t);
+                            ನಿಲ್ಲಿಸು;
+                        ಸ್ಥಿತಿ CV_8F_E4M3FNUZ:
+                            *(fp8a_t*)ದತ್ತಾಂಶ = fp8a_t((ದಶಮಾಂಶ)fval);
+                            ದತ್ತಾಂಶ += ಗಾತ್ರ(fp8a_t);
+                            ನಿಲ್ಲಿಸು;
+                        ಪೂರ್ವನಿಯೋಜಿತ:
                             CV_Error( Error::StsUnsupportedFormat, "Unsupported type" );
                         }
                     }
-                    else
+                    ಇಲ್ಲದಿದ್ದರೆ
                         CV_Error( Error::StsError, "readRawData can only be used to read plain sequences of numbers" );
                 }
-                offset = (int)(data - data0);
+                offset = (ಪೂರ್ಣಾಂಕ)(ದತ್ತಾಂಶ - data0);
             }
         }
     }
 
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-bool FileNodeIterator::equalTo(const FileNodeIterator& it) const
+ತಾರ್ಕಿಕ File_ಗಂಟು_Iterator::equal_ಗಮ್ಯ(ಸ್ಥಿರಾಂಕ File_ಗಂಟು_Iterator& it) ಸ್ಥಿರಾಂಕ
 {
-    return fs == it.fs && blockIdx == it.blockIdx && ofs == it.ofs &&
-           idx == it.idx && nodeNElems == it.nodeNElems;
+    ಹಿಂತಿರುಗಿ fs == it.fs && ಖಂಡ_Idx == it.ಖಂಡ_Idx && ofs == it.ofs &&
+           idx == it.idx && ಗಂಟು_NElems == it.ಗಂಟು_NElems;
 }
 
-size_t FileNodeIterator::remaining() const
+size_t File_ಗಂಟು_Iterator::ಉಳಿದ() ಸ್ಥಿರಾಂಕ
 {
-    return nodeNElems - idx;
+    ಹಿಂತಿರುಗಿ ಗಂಟು_NElems - idx;
 }
 
-bool operator == ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+ತಾರ್ಕಿಕ ಕ್ರಿಯಾಕಾರಕ == ( ಸ್ಥಿರಾಂಕ File_ಗಂಟು_Iterator& it1, ಸ್ಥಿರಾಂಕ File_ಗಂಟು_Iterator& it2 )
 {
-    return it1.equalTo(it2);
+    ಹಿಂತಿರುಗಿ it1.equal_ಗಮ್ಯ(it2);
 }
 
-bool operator != ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+ತಾರ್ಕಿಕ ಕ್ರಿಯಾಕಾರಕ != ( ಸ್ಥಿರಾಂಕ File_ಗಂಟು_Iterator& it1, ಸ್ಥಿರಾಂಕ File_ಗಂಟು_Iterator& it2 )
 {
-    return !it1.equalTo(it2);
+    ಹಿಂತಿರುಗಿ !it1.equal_ಗಮ್ಯ(it2);
 }
 
-void read(const FileNode& node, int& val, int default_val)
+ಶೂನ್ಯ ಪಠ(ಸ್ಥಿರಾಂಕ File_ಗಂಟು& ಗಂಟು, ಪೂರ್ಣಾಂಕ& val, ಪೂರ್ಣಾಂಕ default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    ಆದರೆ( !ಗಂಟು.empty() )
     {
-        val = (int)node;
+        val = (ಪೂರ್ಣಾಂಕ)ಗಂಟು;
     }
 }
 
-void read(const FileNode& node, int64_t& val, int64_t default_val)
+ಶೂನ್ಯ ಪಠ(ಸ್ಥಿರಾಂಕ File_ಗಂಟು& ಗಂಟು, int64_t& val, int64_t default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    ಆದರೆ( !ಗಂಟು.empty() )
     {
-        val = (int64_t)node;
+        val = (int64_t)ಗಂಟು;
     }
 }
 
-void read(const FileNode& node, double& val, double default_val)
+ಶೂನ್ಯ ಪಠ(ಸ್ಥಿರಾಂಕ File_ಗಂಟು& ಗಂಟು, ದ್ವಿಗುಣ& val, ದ್ವಿಗುಣ default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    ಆದರೆ( !ಗಂಟು.empty() )
     {
-        val = (double)node;
+        val = (ದ್ವಿಗುಣ)ಗಂಟು;
     }
 }
 
-void read(const FileNode& node, float& val, float default_val)
+ಶೂನ್ಯ ಪಠ(ಸ್ಥಿರಾಂಕ File_ಗಂಟು& ಗಂಟು, ದಶಮಾಂಶ& val, ದಶಮಾಂಶ default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    ಆದರೆ( !ಗಂಟು.empty() )
     {
-        val = (float)node;
+        val = (ದಶಮಾಂಶ)ಗಂಟು;
     }
 }
 
-void read(const FileNode& node, std::string& val, const std::string& default_val)
+ಶೂನ್ಯ ಪಠ(ಸ್ಥಿರಾಂಕ File_ಗಂಟು& ಗಂಟು, std::string& val, ಸ್ಥಿರಾಂಕ std::string& default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    ಆದರೆ( !ಗಂಟು.empty() )
     {
-        val = (std::string)node;
+        val = (std::string)ಗಂಟು;
     }
 }
-void FileStorage::Impl::write(const String &key, bool value)
+ಶೂನ್ಯ FileStorage::Impl::ಲಿಖ(ಸ್ಥಿರಾಂಕ String &ಕೀಲಿ, ತಾರ್ಕಿಕ value)
 {
-    CV_Assert(write_mode);
-    if (fmt != FileStorage::FORMAT_YAML)
+    CV_Assert(write_ಬಹುಲಕ);
+    ಆದರೆ (fmt != FileStorage::FORMAT_YAML)
     {
         // Legacy behavior: Write as integer 1 or 0
-        getEmitter().write(key.c_str(), (int)value);
+        getEmitter().ಲಿಖ(ಕೀಲಿ.c_str(), (ಪೂರ್ಣಾಂಕ)value);
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
         // Default/Modern behavior: Write as "true" or "false"
-        getEmitter().write(key.c_str(), value ? "true" : "false", false);
+        getEmitter().ಲಿಖ(ಕೀಲಿ.c_str(), value ? "true" : "false", ಸುಳ್ಳು);
     }
 }
 
 FileStorage_API::~FileStorage_API() {}
 
-namespace internal
+ನಾಮಾಕಾಶ internal
 {
 
-WriteStructContext::WriteStructContext(FileStorage& _fs, const std::string& name,
-                                       int flags, const std::string& typeName)
+WriteStructContext::WriteStructContext(FileStorage& _fs, ಸ್ಥಿರಾಂಕ std::string& name,
+                                       ಪೂರ್ಣಾಂಕ flags, ಸ್ಥಿರಾಂಕ std::string& typeName)
 {
     fs = &_fs;
-    fs->startWriteStruct(name, flags, typeName);
+    fs->ಆರಂಭ_Write_Struct(name, flags, typeName);
 }
 
 WriteStructContext::~WriteStructContext()
 {
-    fs->endWriteStruct();
+    fs->ಕೊನೆ_Write_Struct();
 }
 
 }

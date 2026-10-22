@@ -2,28 +2,28 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_PARALLEL_FACTORY_HPP
-#define OPENCV_CORE_PARALLEL_FACTORY_HPP
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ OPENCV_CORE_PARALLEL_FACTORY_HPP
+#ವ್ಯಾಖ್ಯಾನಿಸು OPENCV_CORE_PARALLEL_FACTORY_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ parallel {
 
-class IParallelBackendFactory
+ವರ್ಗ IParallelBackendFactory
 {
-public:
-    virtual ~IParallelBackendFactory() {}
-    virtual std::shared_ptr<cv::parallel::ParallelForAPI> create() const = 0;
+ಸಾರ್ವಜನಿಕ:
+    ವಾಸ್ತವಿಕ ~IParallelBackendFactory() {}
+    ವಾಸ್ತವಿಕ std::shared_ptr<cv::parallel::ParallelForAPI> create() ಸ್ಥಿರಾಂಕ = 0;
 };
 
 
-class StaticBackendFactory CV_FINAL: public IParallelBackendFactory
+ವರ್ಗ StaticBackendFactory CV_FINAL: ಸಾರ್ವಜನಿಕ IParallelBackendFactory
 {
-protected:
-    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)> create_fn_;
+ಸಂರಕ್ಷಿತ:
+    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(ಶೂನ್ಯ)> create_fn_;
 
-public:
-    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)>&& create_fn)
+ಸಾರ್ವಜನಿಕ:
+    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(ಶೂನ್ಯ)>&& create_fn)
         : create_fn_(create_fn)
     {
         // nothing
@@ -31,9 +31,9 @@ public:
 
     ~StaticBackendFactory() CV_OVERRIDE {}
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() ಸ್ಥಿರಾಂಕ CV_OVERRIDE
     {
-        return create_fn_();
+        ಹಿಂತಿರುಗಿ create_fn_();
     }
 };
 
@@ -41,8 +41,8 @@ public:
 // PluginBackendFactory is implemented in plugin_wrapper.cpp
 //
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName);
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(ಸ್ಥಿರಾಂಕ std::string& ತಳ_Name);
 
 }}  // namespace
 
-#endif  // OPENCV_CORE_PARALLEL_FACTORY_HPP
+#ಆದರೆ_ಅಂತ್ಯ  // OPENCV_CORE_PARALLEL_FACTORY_HPP

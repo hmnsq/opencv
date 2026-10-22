@@ -22,149 +22,149 @@
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifdef HAVE_OPENCL
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_OPENCL
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-static bool intel_gpu_gemm(
-    UMat A, Size sizeA,
-    UMat B, Size sizeB,
-    UMat D, Size sizeD,
-    double alpha, double beta,
-    bool atrans, bool btrans,
-    bool& isPropagatedC2D
+ಸ್ಥಿರ ತಾರ್ಕಿಕ intel_gpu_gemm(
+    UMat A, ಗಾತ್ರ_2 ಗಾತ್ರ_A,
+    UMat B, ಗಾತ್ರ_2 ಗಾತ್ರ_B,
+    UMat D, ಗಾತ್ರ_2 ಗಾತ್ರ_D,
+    ದ್ವಿಗುಣ alpha, ದ್ವಿಗುಣ beta,
+    ತಾರ್ಕಿಕ atrans, ತಾರ್ಕಿಕ btrans,
+    ತಾರ್ಕಿಕ& isPropagatedC2D
 )
 {
-    CV_UNUSED(sizeB);
+    CV_ಬಳಸದ(ಗಾತ್ರ_B);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    ಪೂರ್ಣಾಂಕ M = ಗಾತ್ರ_D.ಎತ್ತರ, N = ಗಾತ್ರ_D.ಅಗಲ, K = ((atrans)? ಗಾತ್ರ_A.ಎತ್ತರ : ಗಾತ್ರ_A.ಅಗಲ);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    ಆದರೆ (M < 4 || N < 4 || K < 4)  // vload4
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 
-    CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
+    CV_LOG_VERBOSE(ಖಾಲಿ, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ lx = 8, ly = 4;
+    ಚಿಹ್ನೆರಹಿತ ಪೂರ್ಣಾಂಕ dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    ಆದರೆ(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        ಆದರೆ (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            if (M % 2 != 0)
-                return false;
+            ಆದರೆ (M % 2 != 0)
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            ಆದರೆ (N % (4*8) != 0)
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        ಆದರೆ (M % 32 != 0)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+        ಆದರೆ (N % 32 != 0)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        ಆದರೆ (K % 4 != 0)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        ಆದರೆ (M % 32 != 0)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+        ಆದರೆ (N % 32 != 0)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+        ಆದರೆ (K % 16 != 0)
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
-    CV_LOG_DEBUG(NULL, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
+    CV_LOG_DEBUG(ಖಾಲಿ, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
 
-    const size_t gx = divUp((size_t)N, dx);
-    const size_t gy = divUp((size_t)M, dy);
+    ಸ್ಥಿರಾಂಕ size_t gx = div_ಮೇಲೆ((size_t)N, dx);
+    ಸ್ಥಿರಾಂಕ size_t gy = div_ಮೇಲೆ((size_t)M, dy);
 
     size_t local[] = {lx, ly, 1};
-    size_t global[] = {roundUp(gx, lx), roundUp(gy, ly), 1};
+    size_t global[] = {ಸುತ್ತು_ಮೇಲೆ(gx, lx), ಸುತ್ತು_ಮೇಲೆ(gy, ly), 1};
 
-    ocl::Queue q;
+    ocl::ಸರತಿ q;
     String errmsg;
-    const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
+    ಸ್ಥಿರಾಂಕ ocl::ಕಾರ್ಯಕ್ರಮ_2 ಕಾರ್ಯಕ್ರಮ = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    ಆದರೆ(!atrans && btrans)
     {
-        ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        ocl::Kernel k(kernelName.c_str(), ಕಾರ್ಯಕ್ರಮ);
+        ಆದರೆ (k.empty())
         {
-            return false;
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
         }
 
-        k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+        k.ವಾದಗಳು(ocl::KernelArg::PtrReadOnly(A),
+               (ಪೂರ್ಣಾಂಕ) (A.offset / ಗಾತ್ರ(ದಶಮಾಂಶ)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (ಪೂರ್ಣಾಂಕ) (B.offset / ಗಾತ್ರ(ದಶಮಾಂಶ)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (ಪೂರ್ಣಾಂಕ) (D.offset / ಗಾತ್ರ(ದಶಮಾಂಶ)),
                M, N, K,
-               (float)alpha,
-               (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (ದಶಮಾಂಶ)alpha,
+               (ದಶಮಾಂಶ)beta,
+               (ಪೂರ್ಣಾಂಕ)(A.ಹೆಜ್ಜೆ / ಗಾತ್ರ(ದಶಮಾಂಶ)),
+               (ಪೂರ್ಣಾಂಕ)(B.ಹೆಜ್ಜೆ / ಗಾತ್ರ(ದಶಮಾಂಶ)),
+               (ಪೂರ್ಣಾಂಕ)(D.ಹೆಜ್ಜೆ / ಗಾತ್ರ(ದಶಮಾಂಶ))
         );
 
-        bool ret = k.run(2, global, local, false, q);
-        return ret;
+        ತಾರ್ಕಿಕ ret = k.ಸತತ(2, global, local, ಸುಳ್ಳು, q);
+        ಹಿಂತಿರುಗಿ ret;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        ಪೂರ್ಣಾಂಕ stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        ಗಾಗಿ(ಪೂರ್ಣಾಂಕ ಆರಂಭ_ಸೂಚ್ಯಂಕ = 0; ಆರಂಭ_ಸೂಚ್ಯಂಕ < K; ಆರಂಭ_ಸೂಚ್ಯಂಕ += stride)
         {
-             ocl::Kernel k(kernelName.c_str(), program);
-             k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+             ocl::Kernel k(kernelName.c_str(), ಕಾರ್ಯಕ್ರಮ);
+             k.ವಾದಗಳು(ocl::KernelArg::PtrReadOnly(A),
+                    (ಪೂರ್ಣಾಂಕ) (A.offset / ಗಾತ್ರ(ದಶಮಾಂಶ)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (ಪೂರ್ಣಾಂಕ) (B.offset / ಗಾತ್ರ(ದಶಮಾಂಶ)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (ಪೂರ್ಣಾಂಕ) (D.offset / ಗಾತ್ರ(ದಶಮಾಂಶ)),
                     M, N, K,
-                    (float)alpha,
-                    (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (ದಶಮಾಂಶ)alpha,
+                    (ದಶಮಾಂಶ)beta,
+                    (ಪೂರ್ಣಾಂಕ)(A.ಹೆಜ್ಜೆ / ಗಾತ್ರ(ದಶಮಾಂಶ)),
+                    (ಪೂರ್ಣಾಂಕ)(B.ಹೆಜ್ಜೆ / ಗಾತ್ರ(ದಶಮಾಂಶ)),
+                    (ಪೂರ್ಣಾಂಕ)(D.ಹೆಜ್ಜೆ / ಗಾತ್ರ(ದಶಮಾಂಶ)),
+                    (ಪೂರ್ಣಾಂಕ) ಆರಂಭ_ಸೂಚ್ಯಂಕ,                          // 14 start_index
                     stride);
 
-            bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            ತಾರ್ಕಿಕ ret = k.ಸತತ(2, global, local, ಸುಳ್ಳು, q);
+            ಆದರೆ (!ret)
             {
-                if (start_index != 0)
-                    isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                ಆದರೆ (ಆರಂಭ_ಸೂಚ್ಯಂಕ != 0)
+                    isPropagatedC2D = ಸುಳ್ಳು;  // D array content is changed, need to rewrite
+                ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
             }
         }
-        return true;
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
 }
 
 } // namespace cv
 
-#endif
+#ಆದರೆ_ಅಂತ್ಯ

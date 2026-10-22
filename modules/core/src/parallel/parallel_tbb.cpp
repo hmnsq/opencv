@@ -1,74 +1,74 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "../precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "../precomp.hpp"
 
-#include "factory_parallel.hpp"
+#ಅನ್ತರ್ಭಾವ "factory_parallel.hpp"
 
-#ifdef HAVE_TBB
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ HAVE_TBB
 
-#include "parallel.hpp"
-#include "opencv2/core/parallel/backend/parallel_for.tbb.hpp"
+#ಅನ್ತರ್ಭಾವ "parallel.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/parallel/backend/parallel_for.tbb.hpp"
 
-namespace cv { namespace parallel {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ parallel {
 
-static
+ಸ್ಥಿರ
 std::shared_ptr<cv::parallel::tbb::ParallelForBackend>& getInstance()
 {
-    static std::shared_ptr<cv::parallel::tbb::ParallelForBackend> g_instance = std::make_shared<cv::parallel::tbb::ParallelForBackend>();
-    return g_instance;
+    ಸ್ಥಿರ std::shared_ptr<cv::parallel::tbb::ParallelForBackend> g_instance = std::make_shared<cv::parallel::tbb::ParallelForBackend>();
+    ಹಿಂತಿರುಗಿ g_instance;
 }
 
-#ifndef BUILD_PLUGIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾಗದಿದ್ದರೆ BUILD_PLUGIN
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendTBB()
 {
-    return getInstance();
+    ಹಿಂತಿರುಗಿ getInstance();
 }
-#endif
+#ಆದರೆ_ಅಂತ್ಯ
 
 }}  // namespace
 
-#ifdef BUILD_PLUGIN
+#ವ್ಯಾಖ್ಯಾನಿತವಾದರೆ BUILD_PLUGIN
 
-#define ABI_VERSION 0
-#define API_VERSION 0
-#include "plugin_parallel_api.hpp"
+#ವ್ಯಾಖ್ಯಾನಿಸು ABI_ಆವೃತ್ತಿ 0
+#ವ್ಯಾಖ್ಯಾನಿಸು API_ಆವೃತ್ತಿ 0
+#ಅನ್ತರ್ಭಾವ "plugin_parallel_api.hpp"
 
-static
-CvResult cv_getInstance(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
+ಸ್ಥಿರ
+Cv_ಫಲಿತಾಂಶ cv_getInstance(CV_ಹೊರಹೋಗು CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
 {
-    try
+    ಪ್ರಯತ್ನಿಸು
     {
-        if (!handle)
-            return CV_ERROR_FAIL;
+        ಆದರೆ (!handle)
+            ಹಿಂತಿರುಗಿ CV_ERROR_FAIL;
         *handle = cv::parallel::getInstance().get();
-        return CV_ERROR_OK;
+        ಹಿಂತಿರುಗಿ CV_ERROR_OK;
     }
-    catch (...)
+    ಹಿಡಿ (...)
     {
-        return CV_ERROR_FAIL;
+        ಹಿಂತಿರುಗಿ CV_ERROR_FAIL;
     }
 }
 
-static const OpenCV_Core_Parallel_Plugin_API plugin_api =
+ಸ್ಥಿರ ಸ್ಥಿರಾಂಕ OpenCV_Core_Parallel_Plugin_API plugin_api =
 {
     {
-        sizeof(OpenCV_Core_Parallel_Plugin_API), ABI_VERSION, API_VERSION,
-        CV_VERSION_MAJOR, CV_VERSION_MINOR, CV_VERSION_REVISION, CV_VERSION_STATUS,
-        "TBB (interface " CVAUX_STR(TBB_INTERFACE_VERSION) ") OpenCV parallel plugin"
+        ಗಾತ್ರ(OpenCV_Core_Parallel_Plugin_API), ABI_ಆವೃತ್ತಿ, API_ಆವೃತ್ತಿ,
+        CV_ಆವೃತ್ತಿ_MAJOR, CV_ಆವೃತ್ತಿ_MINOR, CV_ಆವೃತ್ತಿ_REVISION, CV_ಆವೃತ್ತಿ_ಸ್ಥಿತಿ,
+        "TBB (interface " CVAUX_STR(TBB_INTERFACE_ಆವೃತ್ತಿ) ") OpenCV parallel plugin"
     },
     {
         /*  1*/cv_getInstance
     }
 };
 
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(int requested_abi_version, int requested_api_version, void* /*reserved=NULL*/) CV_NOEXCEPT
+ಸ್ಥಿರಾಂಕ OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(ಪೂರ್ಣಾಂಕ requested_abi_ಆವೃತ್ತಿ, ಪೂರ್ಣಾಂಕ requested_api_ಆವೃತ್ತಿ, ಶೂನ್ಯ* /*reserved=NULL*/) CV_NOEXCEPT
 {
-    if (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
-        return &plugin_api;
-    return NULL;
+    ಆದರೆ (requested_abi_ಆವೃತ್ತಿ == ABI_ಆವೃತ್ತಿ && requested_api_ಆವೃತ್ತಿ <= API_ಆವೃತ್ತಿ)
+        ಹಿಂತಿರುಗಿ &plugin_api;
+    ಹಿಂತಿರುಗಿ ಖಾಲಿ;
 }
 
-#endif  // BUILD_PLUGIN
+#ಆದರೆ_ಅಂತ್ಯ  // BUILD_PLUGIN
 
-#endif  // HAVE_TBB
+#ಆದರೆ_ಅಂತ್ಯ  // HAVE_TBB

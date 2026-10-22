@@ -4,62 +4,62 @@
 // Copyright (C) 2026, BigVision LLC, all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
 // In place (dst shares the data of a continuous src) only the header changes; otherwise the
 // elements are copied into dst.
-static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
+ಸ್ಥಿರ ಶೂನ್ಯ reshape_ಗಮ್ಯ(ಒಳಹರಿವು_Array _src, OutputArray _dst, ಸ್ಥಿರಾಂಕ MatShape& shape)
 {
     Mat src = _src.getMat();
-    CV_Assert(shape.total() == src.total());
-    if (_dst.kind() == _InputArray::MAT && src.isContinuous())
+    CV_Assert(shape.ಒಟ್ಟು() == src.ಒಟ್ಟು());
+    ಆದರೆ (_dst.ಬಗೆ() == ಒಳಹರಿವು_Array_2::MAT && src.isContinuous())
     {
         Mat& dst = _dst.getMatRef();
-        if (dst.data && dst.data == src.data)
+        ಆದರೆ (dst.ದತ್ತಾಂಶ && dst.ದತ್ತಾಂಶ == src.ದತ್ತಾಂಶ)
         {
             dst = src.reshape(0, shape);
-            return;
+            ಹಿಂತಿರುಗಿ;
         }
     }
     _dst.create(shape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data)
-        return;
-    if (dst.isContinuous())
+    ಆದರೆ (dst.ದತ್ತಾಂಶ == src.ದತ್ತಾಂಶ)
+        ಹಿಂತಿರುಗಿ;
+    ಆದರೆ (dst.isContinuous())
     {
-        src.copyTo(Mat(src.dims, src.size.p, src.type(), dst.data));
-        return;
+        src.copy_ಗಮ್ಯ(Mat(src.dims, src.size.p, src.type(), dst.ದತ್ತಾಂಶ));
+        ಹಿಂತಿರುಗಿ;
     }
     // create() keeps a preallocated destination of the right shape even when it is strided
     Mat tmp;
-    src.copyTo(tmp);
-    Mat(shape.dims, shape.p, src.type(), tmp.data).copyTo(dst);
+    src.copy_ಗಮ್ಯ(tmp);
+    Mat(shape.dims, shape.p, src.type(), tmp.ದತ್ತಾಂಶ).copy_ಗಮ್ಯ(dst);
 }
 
-void squeeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+ಶೂನ್ಯ squeeze(ಒಳಹರಿವು_Array src, OutputArray dst, ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& axes)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().squeeze(axes));
+    reshape_ಗಮ್ಯ(src, dst, src.shape().squeeze(axes));
 }
 
-void unsqueeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+ಶೂನ್ಯ unsqueeze(ಒಳಹರಿವು_Array src, OutputArray dst, ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& axes)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().unsqueeze(axes));
+    reshape_ಗಮ್ಯ(src, dst, src.shape().unsqueeze(axes));
 }
 
-void flatten(InputArray src, OutputArray dst, int startAxis, int endAxis)
+ಶೂನ್ಯ flatten(ಒಳಹರಿವು_Array src, OutputArray dst, ಪೂರ್ಣಾಂಕ ಆರಂಭ_Axis, ಪೂರ್ಣಾಂಕ ಕೊನೆ_Axis)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().flatten(startAxis, endAxis));
+    reshape_ಗಮ್ಯ(src, dst, src.shape().flatten(ಆರಂಭ_Axis, ಕೊನೆ_Axis));
 }
 
-void reshape(InputArray src, OutputArray dst, const std::vector<int>& newShape, bool allowZero)
+ಶೂನ್ಯ reshape(ಒಳಹರಿವು_Array src, OutputArray dst, ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& newShape, ತಾರ್ಕಿಕ allowZero)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().reshape(MatShape(newShape), allowZero));
+    reshape_ಗಮ್ಯ(src, dst, src.shape().reshape(MatShape(newShape), allowZero));
 }
 
 } // namespace cv

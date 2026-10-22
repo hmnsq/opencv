@@ -2,232 +2,232 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "bufferpool.impl.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "bufferpool.impl.hpp"
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-std::string layoutToString(DataLayout layout)
+std::string layout_ಗಮ್ಯ_String(ದತ್ತಾಂಶ_Layout layout)
 {
-    return
-        layout == DATA_LAYOUT_ND ? "ND" :
-        layout == DATA_LAYOUT_NCHW ? "NCHW" :
-        layout == DATA_LAYOUT_NHWC ? "NHWC" :
-        layout == DATA_LAYOUT_BLOCK ? "BLOCK" :
-        layout == DATA_LAYOUT_NCDHW ? "NCDHW" :
-        layout == DATA_LAYOUT_NDHWC ? "NDHWC" :
-        layout == DATA_LAYOUT_PLANAR ? "PLANAR" :
-        layout == DATA_LAYOUT_UNKNOWN ? "Unknown" : "???";
+    ಹಿಂತಿರುಗಿ
+        layout == ದತ್ತಾಂಶ_LAYOUT_ND ? "ND" :
+        layout == ದತ್ತಾಂಶ_LAYOUT_NCHW ? "NCHW" :
+        layout == ದತ್ತಾಂಶ_LAYOUT_NHWC ? "NHWC" :
+        layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ ? "BLOCK" :
+        layout == ದತ್ತಾಂಶ_LAYOUT_NCDHW ? "NCDHW" :
+        layout == ದತ್ತಾಂಶ_LAYOUT_NDHWC ? "NDHWC" :
+        layout == ದತ್ತಾಂಶ_LAYOUT_PLANAR ? "PLANAR" :
+        layout == ದತ್ತಾಂಶ_LAYOUT_UNKNOWN ? "Unknown" : "???";
 }
 
-bool operator == (const MatShape& size1, const MatShape& size2)
+ತಾರ್ಕಿಕ ಕ್ರಿಯಾಕಾರಕ == (ಸ್ಥಿರಾಂಕ MatShape& size1, ಸ್ಥಿರಾಂಕ MatShape& size2)
 {
-    if (size1.dims != size2.dims)
-        return false;
-    if (size1.layout != size2.layout &&
-        size1.layout != DATA_LAYOUT_UNKNOWN &&
-        size2.layout != DATA_LAYOUT_UNKNOWN)
-        return false;
-    if (size1.layout == DATA_LAYOUT_BLOCK &&
-        size2.layout == DATA_LAYOUT_BLOCK &&
+    ಆದರೆ (size1.dims != size2.dims)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಆದರೆ (size1.layout != size2.layout &&
+        size1.layout != ದತ್ತಾಂಶ_LAYOUT_UNKNOWN &&
+        size2.layout != ದತ್ತಾಂಶ_LAYOUT_UNKNOWN)
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಆದರೆ (size1.layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ &&
+        size2.layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ &&
         size1.C != size2.C)
-        return false;
-    for (int i = 0; i < size1.dims; i++) {
-        if (size1.p[i] != size2.p[i])
-            return false;
+        ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < size1.dims; i++) {
+        ಆದರೆ (size1.p[i] != size2.p[i])
+            ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
     }
-    return true;
+    ಹಿಂತಿರುಗಿ ನಿಜ;
 }
 
-bool operator != (const MatShape& size1, const MatShape& size2)
+ತಾರ್ಕಿಕ ಕ್ರಿಯಾಕಾರಕ != (ಸ್ಥಿರಾಂಕ MatShape& size1, ಸ್ಥಿರಾಂಕ MatShape& size2)
 {
-    return !(size1 == size2);
+    ಹಿಂತಿರುಗಿ !(size1 == size2);
 }
 
 /////////////////////////// MatShape ////////////////////////////////
 
 MatShape MatShape::scalar()
 {
-    return MatShape(0);
+    ಹಿಂತಿರುಗಿ MatShape(0);
 }
 
-void MatShape::clear()
+ಶೂನ್ಯ MatShape::clear()
 {
     dims = -1;
-    layout = DATA_LAYOUT_UNKNOWN;
+    layout = ದತ್ತಾಂಶ_LAYOUT_UNKNOWN;
     C = 0;
-    for (int i = 0; i < MAX_DIMS; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < MAX_DIMS; i++)
         p[i] = 0;
 }
 
-void MatShape::resize(size_t newSize, int value)
+ಶೂನ್ಯ MatShape::resize(size_t new_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ value)
 {
-    CV_Assert(newSize < (size_t)MAX_DIMS);
-    int old_dims = std::max(dims, 0);
-    dims = (int)newSize;
-    for (int i = old_dims; i < dims; i++)
+    CV_Assert(new_ಗಾತ್ರ < (size_t)MAX_DIMS);
+    ಪೂರ್ಣಾಂಕ old_dims = std::max(dims, 0);
+    dims = (ಪೂರ್ಣಾಂಕ)new_ಗಾತ್ರ;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = old_dims; i < dims; i++)
         p[i] = value;
 }
 
-void MatShape::reserve(size_t)
+ಶೂನ್ಯ MatShape::reserve(size_t)
 {
     // no op; maybe need to add a check for overflow, but we check it anyway in other operations
 }
 
-void MatShape::assign(size_t newSize, int value)
+ಶೂನ್ಯ MatShape::assign(size_t new_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ value)
 {
-    CV_Assert(newSize < (size_t)MAX_DIMS);
-    dims = (int)newSize;
-    for (int i = 0; i < dims; i++)
+    CV_Assert(new_ಗಾತ್ರ < (size_t)MAX_DIMS);
+    dims = (ಪೂರ್ಣಾಂಕ)new_ಗಾತ್ರ;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++)
         p[i] = value;
 }
 
-void MatShape::assign(int newSize, int value)
+ಶೂನ್ಯ MatShape::assign(ಪೂರ್ಣಾಂಕ new_ಗಾತ್ರ, ಪೂರ್ಣಾಂಕ value)
 {
-    assign((size_t)newSize, value);
+    assign((size_t)new_ಗಾತ್ರ, value);
 }
 
-void MatShape::assign(const int* begin, const int* end)
+ಶೂನ್ಯ MatShape::assign(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* begin, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* end)
 {
-    assign_(begin, end);
+    ನಿಯೋಜಿಸು(begin, end);
 }
 
-void MatShape::assign_(const int* begin, const int* end)
+ಶೂನ್ಯ MatShape::ನಿಯೋಜಿಸು(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* begin, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* end)
 {
-    ptrdiff_t newSize = end - begin;
-    CV_Assert(0 <= newSize && newSize < (ptrdiff_t)MAX_DIMS);
-    dims = (int)newSize;
-    for (int i = 0; i < dims; i++)
+    ptrdiff_t new_ಗಾತ್ರ = end - begin;
+    CV_Assert(0 <= new_ಗಾತ್ರ && new_ಗಾತ್ರ < (ptrdiff_t)MAX_DIMS);
+    dims = (ಪೂರ್ಣಾಂಕ)new_ಗಾತ್ರ;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++)
         p[i] = begin[i];
 }
 
-int* MatShape::begin() { return p; }
-const int* MatShape::begin() const { return p; }
-int* MatShape::end() { return p + std::max(dims, 0); }
-const int* MatShape::end() const { return p + std::max(dims, 0); }
-int& MatShape::back() { return p[std::max(dims-1, 0)]; }
-const int& MatShape::back() const { return p[std::max(dims-1, 0)]; }
+ಪೂರ್ಣಾಂಕ* MatShape::begin() { ಹಿಂತಿರುಗಿ p; }
+ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* MatShape::begin() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ p; }
+ಪೂರ್ಣಾಂಕ* MatShape::end() { ಹಿಂತಿರುಗಿ p + std::max(dims, 0); }
+ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* MatShape::end() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ p + std::max(dims, 0); }
+ಪೂರ್ಣಾಂಕ& MatShape::back() { ಹಿಂತಿರುಗಿ p[std::max(dims-1, 0)]; }
+ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ& MatShape::back() ಸ್ಥಿರಾಂಕ { ಹಿಂತಿರುಗಿ p[std::max(dims-1, 0)]; }
 
-void MatShape::push_back(int value)
+ಶೂನ್ಯ MatShape::push_back(ಪೂರ್ಣಾಂಕ value)
 {
     CV_Assert(dims+1 < MAX_DIMS);
     dims = std::max(dims+1, 1);
     p[dims-1] = value;
 }
 
-void MatShape::emplace_back(int value)
+ಶೂನ್ಯ MatShape::emplace_back(ಪೂರ್ಣಾಂಕ value)
 {
     push_back(value);
 }
 
-void MatShape::insert(int* where, int value)
+ಶೂನ್ಯ MatShape::insert(ಪೂರ್ಣಾಂಕ* where, ಪೂರ್ಣಾಂಕ value)
 {
-    int old_dims = std::max(dims, 0);
+    ಪೂರ್ಣಾಂಕ old_dims = std::max(dims, 0);
     CV_Assert(old_dims+1 < MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
     dims = old_dims+1;
-    for (int i = old_dims-1; i >= (int)ofs; i--)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = old_dims-1; i >= (ಪೂರ್ಣಾಂಕ)ofs; i--)
         p[i+1] = p[i];
     p[ofs] = value;
 }
 
-void MatShape::insert(int* where, size_t count, int value)
+ಶೂನ್ಯ MatShape::insert(ಪೂರ್ಣಾಂಕ* where, size_t ಎಣಿಕೆ_3, ಪೂರ್ಣಾಂಕ value)
 {
-    int old_dims = std::max(dims, 0);
-    CV_Assert((size_t)(old_dims+count) < (size_t)MAX_DIMS);
+    ಪೂರ್ಣಾಂಕ old_dims = std::max(dims, 0);
+    CV_Assert((size_t)(old_dims+ಎಣಿಕೆ_3) < (size_t)MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
-    dims = (int)(old_dims+count);
-    for (int i = old_dims-1; i >= (int)ofs; i--)
-        p[i+count] = p[i];
-    for (int i = 0; i < (int)count; i++)
+    dims = (ಪೂರ್ಣಾಂಕ)(old_dims+ಎಣಿಕೆ_3);
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = old_dims-1; i >= (ಪೂರ್ಣಾಂಕ)ofs; i--)
+        p[i+ಎಣಿಕೆ_3] = p[i];
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < (ಪೂರ್ಣಾಂಕ)ಎಣಿಕೆ_3; i++)
         p[i+ofs] = value;
 }
 
-void MatShape::insert(int* where, int count, int value)
+ಶೂನ್ಯ MatShape::insert(ಪೂರ್ಣಾಂಕ* where, ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3, ಪೂರ್ಣಾಂಕ value)
 {
-    insert(where, (size_t)count, value);
+    insert(where, (size_t)ಎಣಿಕೆ_3, value);
 }
 
-void MatShape::insert(int* where, const int* begin, const int* end)
+ಶೂನ್ಯ MatShape::insert(ಪೂರ್ಣಾಂಕ* where, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* begin, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* end)
 {
-    insert_(where, begin, end);
+    ಸೇರಿಸು(where, begin, end);
 }
 
-void MatShape::insert_(int* where, const int* begin, const int* end)
+ಶೂನ್ಯ MatShape::ಸೇರಿಸು(ಪೂರ್ಣಾಂಕ* where, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* begin, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* end)
 {
-    int old_dims = std::max(dims, 0);
+    ಪೂರ್ಣಾಂಕ old_dims = std::max(dims, 0);
     ptrdiff_t delta = end - begin;
     CV_Assert(0 <= delta && old_dims+delta < MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
-    dims = (int)(old_dims+delta);
-    for (int i = old_dims-1; i >= (int)ofs; i--)
+    dims = (ಪೂರ್ಣಾಂಕ)(old_dims+delta);
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = old_dims-1; i >= (ಪೂರ್ಣಾಂಕ)ofs; i--)
         p[i+delta] = p[i];
-    for (int i = 0; i < (int)delta; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < (ಪೂರ್ಣಾಂಕ)delta; i++)
         p[i+ofs] = begin[i];
 }
 
-void MatShape::erase(int* where)
+ಶೂನ್ಯ MatShape::erase(ಪೂರ್ಣಾಂಕ* where)
 {
     CV_Assert(dims > 0);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= dims);
-    if (ofs == dims)
-        return;
+    ಆದರೆ (ofs == dims)
+        ಹಿಂತಿರುಗಿ;
     dims--;
-    for (int i = (int)ofs+1; i <= dims; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = (ಪೂರ್ಣಾಂಕ)ofs+1; i <= dims; i++)
         p[i-1] = p[i];
 }
 
-size_t MatShape::total() const
+size_t MatShape::ಒಟ್ಟು() ಸ್ಥಿರಾಂಕ
 {
-    size_t result = 1;
-    if (dims < 0)
-        return 0;
-    for (int i = 0; i < dims; i++)
-        result *= p[i];
-    return result;
+    size_t ಫಲಿತಾಂಶ = 1;
+    ಆದರೆ (dims < 0)
+        ಹಿಂತಿರುಗಿ 0;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++)
+        ಫಲಿತಾಂಶ *= p[i];
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-std::vector<int> MatShape::vec() const
+std::vector<ಪೂರ್ಣಾಂಕ> MatShape::vec() ಸ್ಥಿರಾಂಕ
 {
-    if (dims < 0)
-        return std::vector<int>(1, 0);
-    return std::vector<int>(p, p + dims);
+    ಆದರೆ (dims < 0)
+        ಹಿಂತಿರುಗಿ std::vector<ಪೂರ್ಣಾಂಕ>(1, 0);
+    ಹಿಂತಿರುಗಿ std::vector<ಪೂರ್ಣಾಂಕ>(p, p + dims);
 }
 
-std::string MatShape::str() const
+std::string MatShape::str() ಸ್ಥಿರಾಂಕ
 {
     std::stringstream sstrm;
-    if (empty()) {
+    ಆದರೆ (empty()) {
         sstrm << "<empty>";
-    } else if (dims == 0) {
+    } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dims == 0) {
         sstrm << "<scalar>";
-    } else {
+    } ಇಲ್ಲದಿದ್ದರೆ {
         sstrm << "[";
-        for (int i = 0; i < dims; i++) {
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++) {
             sstrm << (i > 0 ? " x " : "") << p[i];
         }
         sstrm << "]";
     }
-    return sstrm.str();
+    ಹಿಂತಿರುಗಿ sstrm.str();
 }
 
-static void finalizeBlockLayout(MatShape& size, int C=0)
+ಸ್ಥಿರ ಶೂನ್ಯ finalize_ಖಂಡ_Layout(MatShape& size, ಪೂರ್ಣಾಂಕ C=0)
 {
-    if (size.layout == DATA_LAYOUT_BLOCK) {
+    ಆದರೆ (size.layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ) {
         CV_Assert(size.dims >= 4);
-        int C0 = size.p[size.dims-1];
+        ಪೂರ್ಣಾಂಕ C0 = size.p[size.dims-1];
         CV_Assert(C0 > 1 && (C0 & (C0-1)) == 0);
         size.C = C > 0 ? C : size.p[1]*size.p[size.dims-1];
-    } else {
+    } ಇಲ್ಲದಿದ್ದರೆ {
         size.C = 0;
     }
-    for (int i = std::max(size.dims, 0); i < MatShape::MAX_DIMS; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = std::max(size.dims, 0); i < MatShape::MAX_DIMS; i++)
         size.p[i] = 0;
-    if (size.dims == 0)
+    ಆದರೆ (size.dims == 0)
         size.p[0] = 1;
 }
 
@@ -236,792 +236,792 @@ MatShape::MatShape()
     clear();
 }
 
-MatShape::MatShape(size_t dims_, const int* size_, DataLayout layout_, int C_)
+MatShape::MatShape(size_t dims_, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* ಗಾತ್ರ_4, ದತ್ತಾಂಶ_Layout layout_, ಪೂರ್ಣಾಂಕ C_)
 {
     layout = layout_;
     CV_Assert(dims_ <= (size_t)MAX_DIMS);
-    dims = (int)dims_;
-    for (int i = 0; i < dims; i++) {
-        p[i] = size_ ? size_[i] : 0;
+    dims = (ಪೂರ್ಣಾಂಕ)dims_;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++) {
+        p[i] = ಗಾತ್ರ_4 ? ಗಾತ್ರ_4[i] : 0;
     }
-    finalizeBlockLayout(*this, C_);
+    finalize_ಖಂಡ_Layout(*ಇದು, C_);
 }
 
-MatShape::MatShape(size_t dims_, int value, DataLayout layout_)
+MatShape::MatShape(size_t dims_, ಪೂರ್ಣಾಂಕ value, ದತ್ತಾಂಶ_Layout layout_)
 {
     layout = layout_;
     CV_Assert(dims_ <= (size_t)MAX_DIMS);
-    dims = (int)dims_;
-    for (int i = 0; i < dims; i++) {
+    dims = (ಪೂರ್ಣಾಂಕ)dims_;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++) {
         p[i] = value;
     }
-    finalizeBlockLayout(*this, 0);
+    finalize_ಖಂಡ_Layout(*ಇದು, 0);
 }
 
-MatShape::MatShape(std::initializer_list<int> shape)
+MatShape::MatShape(std::initializer_list<ಪೂರ್ಣಾಂಕ> shape)
 {
-    layout = DATA_LAYOUT_UNKNOWN;
+    layout = ದತ್ತಾಂಶ_LAYOUT_UNKNOWN;
     CV_Assert(shape.size() <= (size_t)MAX_DIMS);
-    dims = (int)shape.size();
-    auto it = shape.begin();
-    for (int i = 0; i < dims; i++, ++it) {
+    dims = (ಪೂರ್ಣಾಂಕ)shape.size();
+    ಸ್ವಯಂಚಾಲಿತ it = shape.begin();
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++, ++it) {
         p[i] = *it;
     }
-    finalizeBlockLayout(*this, 0);
+    finalize_ಖಂಡ_Layout(*ಇದು, 0);
 }
 
-MatShape::MatShape(int dims_, int value, DataLayout layout_)
+MatShape::MatShape(ಪೂರ್ಣಾಂಕ dims_, ಪೂರ್ಣಾಂಕ value, ದತ್ತಾಂಶ_Layout layout_)
 {
     layout = layout_;
     CV_Assert(dims_ <= MAX_DIMS);
     dims = dims_;
-    for (int i = 0; i < dims; i++) {
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++) {
         p[i] = value;
     }
-    finalizeBlockLayout(*this, 0);
+    finalize_ಖಂಡ_Layout(*ಇದು, 0);
 }
 
-MatShape::MatShape(const std::vector<int>& shape_, DataLayout layout_, int C_)
+MatShape::MatShape(ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& shape_, ದತ್ತಾಂಶ_Layout layout_, ಪೂರ್ಣಾಂಕ C_)
 {
     layout = layout_;
-    size_t shape_size = shape_.size();
-    CV_Assert(shape_size < (size_t)MAX_DIMS);
-    dims = (int)shape_size;
-    for (int i = 0; i < dims; i++) {
+    size_t shape_ಗಾತ್ರ = shape_.size();
+    CV_Assert(shape_ಗಾತ್ರ < (size_t)MAX_DIMS);
+    dims = (ಪೂರ್ಣಾಂಕ)shape_ಗಾತ್ರ;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++) {
         p[i] = shape_[i];
     }
-    finalizeBlockLayout(*this, C_);
+    finalize_ಖಂಡ_Layout(*ಇದು, C_);
 }
 
-MatShape::MatShape(const int* begin, const int* end, DataLayout layout_, int C_)
+MatShape::MatShape(ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* begin, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* end, ದತ್ತಾಂಶ_Layout layout_, ಪೂರ್ಣಾಂಕ C_)
 {
     layout = layout_;
-    ptrdiff_t shape_size = end - begin;
-    CV_Assert(0 <= shape_size && shape_size < MAX_DIMS);
-    dims = (int)shape_size;
-    for (int i = 0; i < dims; i++) {
+    ptrdiff_t shape_ಗಾತ್ರ = end - begin;
+    CV_Assert(0 <= shape_ಗಾತ್ರ && shape_ಗಾತ್ರ < MAX_DIMS);
+    dims = (ಪೂರ್ಣಾಂಕ)shape_ಗಾತ್ರ;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++) {
         p[i] = begin[i];
     }
-    finalizeBlockLayout(*this, C_);
+    finalize_ಖಂಡ_Layout(*ಇದು, C_);
 }
 
-MatShape::MatShape(const MatShape& shape)
+MatShape::MatShape(ಸ್ಥಿರಾಂಕ MatShape& shape)
 {
     dims = shape.dims;
     layout = shape.layout;
     C = shape.C;
-    for (int i = 0; i < MAX_DIMS; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < MAX_DIMS; i++)
         p[i] = shape.p[i];
 }
 
-MatShape& MatShape::operator = (const MatShape& shape)
+MatShape& MatShape::ಕ್ರಿಯಾಕಾರಕ = (ಸ್ಥಿರಾಂಕ MatShape& shape)
 {
-    if (this != &shape) {
+    ಆದರೆ (ಇದು != &shape) {
         dims = shape.dims;
         layout = shape.layout;
         C = shape.C;
-        for (int i = 0; i < MAX_DIMS; i++)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < MAX_DIMS; i++)
             p[i] = shape.p[i];
     }
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-bool MatShape::hasSymbols() const
+ತಾರ್ಕಿಕ MatShape::hasSymbols() ಸ್ಥಿರಾಂಕ
 {
-    for (int i = 0; i < dims; i++) {
-        if (p[i] < 0)
-            return true;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++) {
+        ಆದರೆ (p[i] < 0)
+            ಹಿಂತಿರುಗಿ ನಿಜ;
     }
-    return false;
+    ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
 }
 
-int MatShape::channels() const
+ಪೂರ್ಣಾಂಕ MatShape::channels() ಸ್ಥಿರಾಂಕ
 {
-    CV_Assert(layout == DATA_LAYOUT_BLOCK || layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC);
-    return layout == DATA_LAYOUT_BLOCK ? C : p[layout == DATA_LAYOUT_NCHW ? 1 : dims-1];
+    CV_Assert(layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ || layout == ದತ್ತಾಂಶ_LAYOUT_NCHW || layout == ದತ್ತಾಂಶ_LAYOUT_NHWC);
+    ಹಿಂತಿರುಗಿ layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ ? C : p[layout == ದತ್ತಾಂಶ_LAYOUT_NCHW ? 1 : dims-1];
 }
 
-MatShape MatShape::toLayout(DataLayout newLayout, int C0) const
+MatShape MatShape::ಗಮ್ಯ_Layout(ದತ್ತಾಂಶ_Layout newLayout, ಪೂರ್ಣಾಂಕ C0) ಸ್ಥಿರಾಂಕ
 {
-    CV_Assert(layout == DATA_LAYOUT_BLOCK || layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC);
-    CV_Assert(newLayout == DATA_LAYOUT_BLOCK || newLayout == DATA_LAYOUT_NCHW || newLayout == DATA_LAYOUT_NHWC);
+    CV_Assert(layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ || layout == ದತ್ತಾಂಶ_LAYOUT_NCHW || layout == ದತ್ತಾಂಶ_LAYOUT_NHWC);
+    CV_Assert(newLayout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ || newLayout == ದತ್ತಾಂಶ_LAYOUT_NCHW || newLayout == ದತ್ತಾಂಶ_LAYOUT_NHWC);
 
-    MatShape newsize = *this;
+    MatShape newsize = *ಇದು;
     newsize.layout = newLayout;
 
-    if (newLayout == DATA_LAYOUT_BLOCK) {
+    ಆದರೆ (newLayout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ) {
         // any => BLOCK
         CV_Assert_N(C0 > 1, (C0 & (C0-1)) == 0);
-        int Corig = channels();
+        ಪೂರ್ಣಾಂಕ Corig = channels();
         newsize.C = Corig;
 
-        if (layout == DATA_LAYOUT_NHWC) {
-            for (int i = 2; i < dims; i++) {
+        ಆದರೆ (layout == ದತ್ತಾಂಶ_LAYOUT_NHWC) {
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 2; i < dims; i++) {
                 newsize.p[i] = p[i-1];
             }
         }
 
-        newsize.dims += layout != DATA_LAYOUT_BLOCK;
+        newsize.dims += layout != ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ;
         newsize.p[1] = (Corig + C0 - 1)/C0;
         newsize.p[newsize.dims-1] = C0;
-    } else if (layout == DATA_LAYOUT_BLOCK) {
+    } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ) {
         // BLOCK => any (except for BLOCK, which is handled above)
         newsize.C = 0;
-        if (newLayout == DATA_LAYOUT_NHWC) {
-            for (int i = 2; i < dims; i++) {
+        ಆದರೆ (newLayout == ದತ್ತಾಂಶ_LAYOUT_NHWC) {
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 2; i < dims; i++) {
                 newsize.p[i-1] = p[i];
             }
         }
-        newsize.p[newLayout == DATA_LAYOUT_NCHW ? 1 : dims-2] = C;
+        newsize.p[newLayout == ದತ್ತಾಂಶ_LAYOUT_NCHW ? 1 : dims-2] = C;
         newsize.dims--;
-    } else {
+    } ಇಲ್ಲದಿದ್ದರೆ {
         CV_Assert_N(C0 <= 1);
 
-        if (newLayout == layout)
-            return newsize;
+        ಆದರೆ (newLayout == layout)
+            ಹಿಂತಿರುಗಿ newsize;
 
         // NHWC => NCHW
-        if (newLayout == DATA_LAYOUT_NCHW) {
-            for (int i = 2; i < dims; i++)
+        ಆದರೆ (newLayout == ದತ್ತಾಂಶ_LAYOUT_NCHW) {
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 2; i < dims; i++)
                 newsize.p[i] = p[i-1];
             newsize.p[1] = p[dims-1];
-        } else {
+        } ಇಲ್ಲದಿದ್ದರೆ {
             // NCHW => NHWC
-            for (int i = 2; i < dims; i++)
+            ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 2; i < dims; i++)
                 newsize.p[i-1] = p[i];
             newsize.p[dims-1] = p[1];
         }
     }
 
-    return newsize;
+    ಹಿಂತಿರುಗಿ newsize;
 }
 
-static int normalizeShapeAxis(int axis, int dims)
+ಸ್ಥಿರ ಪೂರ್ಣಾಂಕ normalizeShapeAxis(ಪೂರ್ಣಾಂಕ axis, ಪೂರ್ಣಾಂಕ dims)
 {
     CV_CheckGE(axis, -dims, "axis is out of range");
     CV_CheckLT(axis, dims, "axis is out of range");
-    return axis < 0 ? axis + dims : axis;
+    ಹಿಂತಿರುಗಿ axis < 0 ? axis + dims : axis;
 }
 
 // The semantic NCHW form {N, C, spatial...} of a block ('NC1HWC0') shape, so that axes and
 // element counts are the logical ones rather than the C0-padded ones.
-static MatShape toSemantic(const MatShape& shape)
+ಸ್ಥಿರ MatShape ಗಮ್ಯ_Semantic(ಸ್ಥಿರಾಂಕ MatShape& shape)
 {
     CV_CheckGE(shape.dims, 3, "a block shape is {N, C1, spatial..., C0}");
-    return shape.toLayout(DATA_LAYOUT_NCHW);
+    ಹಿಂತಿರುಗಿ shape.ಗಮ್ಯ_Layout(ದತ್ತಾಂಶ_LAYOUT_NCHW);
 }
 
 // Blocks such a result again. Once N or C changes, elements cross the padded C0 lanes and
 // the data needs a repack, which a shape operation cannot express.
-static MatShape toBlockOf(MatShape result, const MatShape& src, const char* op)
+ಸ್ಥಿರ MatShape ಗಮ್ಯ_ಖಂಡ_ದ(MatShape ಫಲಿತಾಂಶ, ಸ್ಥಿರಾಂಕ MatShape& src, ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* op)
 {
-    if (result.dims < 2 || result.p[0] != src.p[0] || result.p[1] != src.C)
+    ಆದರೆ (ಫಲಿತಾಂಶ.dims < 2 || ಫಲಿತಾಂಶ.p[0] != src.p[0] || ಫಲಿತಾಂಶ.p[1] != src.C)
         CV_Error_(Error::StsNotImplemented,
                   ("%s: the block layout is kept only when the batch and the channel axes stay "
                    "unchanged; convert the shape with toLayout() first", op));
-    CV_CheckLE(result.dims + 1, (int)MatShape::MAX_DIMS, "too many dimensions");
-    result.layout = DATA_LAYOUT_NCHW;
-    return result.toLayout(DATA_LAYOUT_BLOCK, src.p[src.dims-1]);
+    CV_CheckLE(ಫಲಿತಾಂಶ.dims + 1, (ಪೂರ್ಣಾಂಕ)MatShape::MAX_DIMS, "too many dimensions");
+    ಫಲಿತಾಂಶ.layout = ದತ್ತಾಂಶ_LAYOUT_NCHW;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ.ಗಮ್ಯ_Layout(ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ, src.p[src.dims-1]);
 }
 
-MatShape MatShape::squeeze(const std::vector<int>& axes) const
+MatShape MatShape::squeeze(ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& axes) ಸ್ಥಿರಾಂಕ
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).squeeze(axes), *this, "squeeze");
-    bool remove[MAX_DIMS] = {false};
-    if (axes.empty())
+    ಆದರೆ (layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ)
+        ಹಿಂತಿರುಗಿ ಗಮ್ಯ_ಖಂಡ_ದ(ಗಮ್ಯ_Semantic(*ಇದು).squeeze(axes), *ಇದು, "squeeze");
+    ತಾರ್ಕಿಕ remove[MAX_DIMS] = {ಸುಳ್ಳು};
+    ಆದರೆ (axes.empty())
     {
-        for (int i = 0; i < dims; i++)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++)
             remove[i] = p[i] == 1;
     }
-    for (int a : axes)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ a : axes)
     {
-        int i = normalizeShapeAxis(a, dims);
+        ಪೂರ್ಣಾಂಕ i = normalizeShapeAxis(a, dims);
         CV_Check(a, !remove[i], "squeeze: duplicate axis");
         CV_Check(p[i], p[i] == 1, "squeeze: the size of a squeezed axis must be 1");
-        remove[i] = true;
+        remove[i] = ನಿಜ;
     }
     // a new number of axes: the layout of this shape does not apply
-    MatShape result;
-    result.dims = 0;
-    for (int i = 0; i < dims; i++)
-        if (!remove[i])
-            result.p[result.dims++] = p[i];
-    return result;
+    MatShape ಫಲಿತಾಂಶ;
+    ಫಲಿತಾಂಶ.dims = 0;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++)
+        ಆದರೆ (!remove[i])
+            ಫಲಿತಾಂಶ.p[ಫಲಿತಾಂಶ.dims++] = p[i];
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-MatShape MatShape::unsqueeze(const std::vector<int>& axes) const
+MatShape MatShape::unsqueeze(ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& axes) ಸ್ಥಿರಾಂಕ
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).unsqueeze(axes), *this, "unsqueeze");
-    const int outDims = dims + (int)axes.size();
-    CV_CheckLE(outDims, (int)MAX_DIMS, "unsqueeze: too many dimensions");
-    bool insert[MAX_DIMS] = {false};
-    for (int a : axes)
+    ಆದರೆ (layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ)
+        ಹಿಂತಿರುಗಿ ಗಮ್ಯ_ಖಂಡ_ದ(ಗಮ್ಯ_Semantic(*ಇದು).unsqueeze(axes), *ಇದು, "unsqueeze");
+    ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ ಹೊರಹೋಗು_Dims = dims + (ಪೂರ್ಣಾಂಕ)axes.size();
+    CV_CheckLE(ಹೊರಹೋಗು_Dims, (ಪೂರ್ಣಾಂಕ)MAX_DIMS, "unsqueeze: too many dimensions");
+    ತಾರ್ಕಿಕ insert[MAX_DIMS] = {ಸುಳ್ಳು};
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ a : axes)
     {
-        int i = normalizeShapeAxis(a, outDims);
+        ಪೂರ್ಣಾಂಕ i = normalizeShapeAxis(a, ಹೊರಹೋಗು_Dims);
         CV_Check(a, !insert[i], "unsqueeze: duplicate axis");
-        insert[i] = true;
+        insert[i] = ನಿಜ;
     }
     // a new number of axes: the layout of this shape does not apply
-    MatShape result;
-    result.dims = outDims;
-    for (int i = 0, j = 0; i < outDims; i++)
-        result.p[i] = insert[i] ? 1 : p[j++];
-    return result;
+    MatShape ಫಲಿತಾಂಶ;
+    ಫಲಿತಾಂಶ.dims = ಹೊರಹೋಗು_Dims;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0, j = 0; i < ಹೊರಹೋಗು_Dims; i++)
+        ಫಲಿತಾಂಶ.p[i] = insert[i] ? 1 : p[j++];
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-MatShape MatShape::flatten(int startAxis, int endAxis) const
+MatShape MatShape::flatten(ಪೂರ್ಣಾಂಕ ಆರಂಭ_Axis, ಪೂರ್ಣಾಂಕ ಕೊನೆ_Axis) ಸ್ಥಿರಾಂಕ
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).flatten(startAxis, endAxis), *this, "flatten");
-    if (dims == 0)
+    ಆದರೆ (layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ)
+        ಹಿಂತಿರುಗಿ ಗಮ್ಯ_ಖಂಡ_ದ(ಗಮ್ಯ_Semantic(*ಇದು).flatten(ಆರಂಭ_Axis, ಕೊನೆ_Axis), *ಇದು, "flatten");
+    ಆದರೆ (dims == 0)
     {
-        CV_Check(startAxis, startAxis == 0 || startAxis == -1, "flatten: axis is out of range");
-        CV_Check(endAxis, endAxis == 0 || endAxis == -1, "flatten: axis is out of range");
-        return MatShape({1});
+        CV_Check(ಆರಂಭ_Axis, ಆರಂಭ_Axis == 0 || ಆರಂಭ_Axis == -1, "flatten: axis is out of range");
+        CV_Check(ಕೊನೆ_Axis, ಕೊನೆ_Axis == 0 || ಕೊನೆ_Axis == -1, "flatten: axis is out of range");
+        ಹಿಂತಿರುಗಿ MatShape({1});
     }
-    int start = normalizeShapeAxis(startAxis, dims), end = normalizeShapeAxis(endAxis, dims);
-    CV_CheckLE(start, end, "flatten: startAxis must not follow endAxis");
+    ಪೂರ್ಣಾಂಕ ಆರಂಭ = normalizeShapeAxis(ಆರಂಭ_Axis, dims), end = normalizeShapeAxis(ಕೊನೆ_Axis, dims);
+    CV_CheckLE(ಆರಂಭ, end, "flatten: startAxis must not follow endAxis");
     int64 merged = 1;
-    for (int i = start; i <= end; i++)
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = ಆರಂಭ; i <= end; i++)
         merged *= p[i];
-    CV_CheckLE((double)merged, (double)INT_MAX, "flatten: the result is too big");
+    CV_CheckLE((ದ್ವಿಗುಣ)merged, (ದ್ವಿಗುಣ)ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ, "flatten: the result is too big");
     // a new number of axes: the layout of this shape does not apply
-    MatShape result;
-    result.dims = 0;
-    for (int i = 0; i < dims; i++)
+    MatShape ಫಲಿತಾಂಶ;
+    ಫಲಿತಾಂಶ.dims = 0;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++)
     {
-        if (i == start)
-            result.p[result.dims++] = (int)merged;
-        else if (i < start || i > end)
-            result.p[result.dims++] = p[i];
+        ಆದರೆ (i == ಆರಂಭ)
+            ಫಲಿತಾಂಶ.p[ಫಲಿತಾಂಶ.dims++] = (ಪೂರ್ಣಾಂಕ)merged;
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (i < ಆರಂಭ || i > end)
+            ಫಲಿತಾಂಶ.p[ಫಲಿತಾಂಶ.dims++] = p[i];
     }
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-MatShape MatShape::reshape(const MatShape& newShape, bool allowZero) const
+MatShape MatShape::reshape(ಸ್ಥಿರಾಂಕ MatShape& newShape, ತಾರ್ಕಿಕ allowZero) ಸ್ಥಿರಾಂಕ
 {
     CV_Assert(dims >= 0 && newShape.dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).reshape(newShape, allowZero), *this, "reshape");
+    ಆದರೆ (layout == ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ)
+        ಹಿಂತಿರುಗಿ ಗಮ್ಯ_ಖಂಡ_ದ(ಗಮ್ಯ_Semantic(*ಇದು).reshape(newShape, allowZero), *ಇದು, "reshape");
     // a new number of axes: neither the layout of this shape nor the one of the spec applies
-    MatShape result;
-    result.dims = newShape.dims;
-    std::copy(newShape.p, newShape.p + newShape.dims, result.p);
-    int inferred = -1;
-    int64 known = 1;
-    for (int i = 0; i < result.dims; i++)
+    MatShape ಫಲಿತಾಂಶ;
+    ಫಲಿತಾಂಶ.dims = newShape.dims;
+    std::copy(newShape.p, newShape.p + newShape.dims, ಫಲಿತಾಂಶ.p);
+    ಪೂರ್ಣಾಂಕ inferred = -1;
+    int64 ತಿಳಿದ = 1;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < ಫಲಿತಾಂಶ.dims; i++)
     {
-        int& sz = result.p[i];
-        if (sz == -1)
+        ಪೂರ್ಣಾಂಕ& sz = ಫಲಿತಾಂಶ.p[i];
+        ಆದರೆ (sz == -1)
         {
             CV_Check(i, inferred < 0, "reshape: at most one axis may be -1");
             inferred = i;
-            continue;
+            ಮುಂದುವರಿ;
         }
         CV_Check(sz, sz >= 0, "reshape: sizes must be -1 or non-negative");
-        if (sz == 0 && !allowZero)
+        ಆದರೆ (sz == 0 && !allowZero)
         {
             CV_Check(i, i < dims, "reshape: 0 refers to an axis the source does not have");
             sz = p[i];
         }
-        known *= sz;
+        ತಿಳಿದ *= sz;
     }
-    const int64 total_ = (int64)total();
-    if (inferred >= 0)
+    ಸ್ಥಿರಾಂಕ int64 ಒಟ್ಟು_2 = (int64)ಒಟ್ಟು();
+    ಆದರೆ (inferred >= 0)
     {
-        CV_Check((double)known, known != 0, "reshape: cannot infer the -1 axis next to a zero-size axis");
-        CV_Check((double)total_, total_ % known == 0, "reshape: the number of elements does not match");
-        CV_CheckLE((double)(total_/known), (double)INT_MAX, "reshape: the result is too big");
-        result.p[inferred] = (int)(total_/known);
+        CV_Check((ದ್ವಿಗುಣ)ತಿಳಿದ, ತಿಳಿದ != 0, "reshape: cannot infer the -1 axis next to a zero-size axis");
+        CV_Check((ದ್ವಿಗುಣ)ಒಟ್ಟು_2, ಒಟ್ಟು_2 % ತಿಳಿದ == 0, "reshape: the number of elements does not match");
+        CV_CheckLE((ದ್ವಿಗುಣ)(ಒಟ್ಟು_2/ತಿಳಿದ), (ದ್ವಿಗುಣ)ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ, "reshape: the result is too big");
+        ಫಲಿತಾಂಶ.p[inferred] = (ಪೂರ್ಣಾಂಕ)(ಒಟ್ಟು_2/ತಿಳಿದ);
     }
-    else if (known != total_)
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ತಿಳಿದ != ಒಟ್ಟು_2)
         CV_Error_(Error::StsBadArg, ("reshape: the number of elements does not match: %lld vs %lld",
-                                     (long long)known, (long long)total_));
-    return result;
+                                     (ದೀರ್ಘ ದೀರ್ಘ)ತಿಳಿದ, (ದೀರ್ಘ ದೀರ್ಘ)ಒಟ್ಟು_2));
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
-MatShape MatShape::expand(const MatShape& another) const
+MatShape MatShape::expand(ಸ್ಥಿರಾಂಕ MatShape& another) ಸ್ಥಿರಾಂಕ
 {
-    if (dims == 0)
-        return another;
-    if (another.dims == 0)
-        return *this;
+    ಆದರೆ (dims == 0)
+        ಹಿಂತಿರುಗಿ another;
+    ಆದರೆ (another.dims == 0)
+        ಹಿಂತಿರುಗಿ *ಇದು;
 
-    if ((layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC) &&
-        (another.layout == DATA_LAYOUT_NCHW || another.layout == DATA_LAYOUT_NHWC)) {
+    ಆದರೆ ((layout == ದತ್ತಾಂಶ_LAYOUT_NCHW || layout == ದತ್ತಾಂಶ_LAYOUT_NHWC) &&
+        (another.layout == ದತ್ತಾಂಶ_LAYOUT_NCHW || another.layout == ದತ್ತಾಂಶ_LAYOUT_NHWC)) {
         CV_Assert(layout == another.layout);
     }
     // [TODO] support block layout
-    CV_Assert(layout != DATA_LAYOUT_BLOCK && another.layout != DATA_LAYOUT_BLOCK);
+    CV_Assert(layout != ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ && another.layout != ದತ್ತಾಂಶ_LAYOUT_ಖಂಡ);
 
-    MatShape result;
+    MatShape ಫಲಿತಾಂಶ;
 
-    if (dims < 0 || another.dims < 0)
-        return result;
+    ಆದರೆ (dims < 0 || another.dims < 0)
+        ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 
-    result = *this;
-    result.dims = std::max(dims, another.dims);
-    result.layout = layout == DATA_LAYOUT_UNKNOWN ? another.layout :
-        layout == DATA_LAYOUT_ND && (another.layout == DATA_LAYOUT_NCHW ||
-        another.layout == DATA_LAYOUT_NHWC) ? another.layout : layout;
-    for (int i = result.dims-1; i >= 0; i--) {
-        int i1 = i - (result.dims - dims);
-        int i2 = i - (result.dims - another.dims);
-        int sz1 = i1 < 0 ? 1 : p[i1];
-        int sz2 = i2 < 0 ? 1 : another.p[i2];
+    ಫಲಿತಾಂಶ = *ಇದು;
+    ಫಲಿತಾಂಶ.dims = std::max(dims, another.dims);
+    ಫಲಿತಾಂಶ.layout = layout == ದತ್ತಾಂಶ_LAYOUT_UNKNOWN ? another.layout :
+        layout == ದತ್ತಾಂಶ_LAYOUT_ND && (another.layout == ದತ್ತಾಂಶ_LAYOUT_NCHW ||
+        another.layout == ದತ್ತಾಂಶ_LAYOUT_NHWC) ? another.layout : layout;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = ಫಲಿತಾಂಶ.dims-1; i >= 0; i--) {
+        ಪೂರ್ಣಾಂಕ i1 = i - (ಫಲಿತಾಂಶ.dims - dims);
+        ಪೂರ್ಣಾಂಕ i2 = i - (ಫಲಿತಾಂಶ.dims - another.dims);
+        ಪೂರ್ಣಾಂಕ sz1 = i1 < 0 ? 1 : p[i1];
+        ಪೂರ್ಣಾಂಕ sz2 = i2 < 0 ? 1 : another.p[i2];
         CV_Assert(sz1 == sz2 || sz1 == 1 || sz2 == 1);
         // [TODO] handle symbolic shapes
-        result.p[i] = sz1 != 1 ? sz1 : sz2;
+        ಫಲಿತಾಂಶ.p[i] = sz1 != 1 ? sz1 : sz2;
     }
-    return result;
+    ಹಿಂತಿರುಗಿ ಫಲಿತಾಂಶ;
 }
 
 /////////////////////////// MatAllocator ////////////////////////////
 
-void MatAllocator::map(UMatData*, AccessFlag) const
+ಶೂನ್ಯ MatAllocator::map(UMat_ದತ್ತಾಂಶ*, AccessFlag) ಸ್ಥಿರಾಂಕ
 {
 }
 
-void MatAllocator::unmap(UMatData* u) const
+ಶೂನ್ಯ MatAllocator::unmap(UMat_ದತ್ತಾಂಶ* u) ಸ್ಥಿರಾಂಕ
 {
-    if(u->urefcount == 0 && u->refcount == 0)
+    ಆದರೆ(u->urefcount == 0 && u->refcount == 0)
     {
         deallocate(u);
     }
 }
 
-void MatAllocator::download(UMatData* u, void* dstptr,
-         int dims, const size_t sz[],
-         const size_t srcofs[], const size_t srcstep[],
-         const size_t dststep[]) const
+ಶೂನ್ಯ MatAllocator::download(UMat_ದತ್ತಾಂಶ* u, ಶೂನ್ಯ* dstptr,
+         ಪೂರ್ಣಾಂಕ dims, ಸ್ಥಿರಾಂಕ size_t sz[],
+         ಸ್ಥಿರಾಂಕ size_t srcofs[], ಸ್ಥಿರಾಂಕ size_t srcstep[],
+         ಸ್ಥಿರಾಂಕ size_t dststep[]) ಸ್ಥಿರಾಂಕ
 {
-    if(!u)
-        return;
-    int isz[CV_MAX_DIM];
-    uchar* srcptr = u->data;
-    for( int i = 0; i < dims; i++ )
+    ಆದರೆ(!u)
+        ಹಿಂತಿರುಗಿ;
+    ಪೂರ್ಣಾಂಕ isz[CV_MAX_DIM];
+    uchar* srcptr = u->ದತ್ತಾಂಶ;
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++ )
     {
-        CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( srcofs )
+        CV_Assert( sz[i] <= (size_t)ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ );
+        ಆದರೆ( sz[i] == 0 )
+            ಹಿಂತಿರುಗಿ;
+        ಆದರೆ( srcofs )
             srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (ಪೂರ್ಣಾಂಕ)sz[i];
     }
 
     Mat src(dims, isz, CV_8U, srcptr, srcstep);
     Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-    const Mat* arrays[] = { &src, &dst };
+    ಸ್ಥಿರಾಂಕ Mat* arrays[] = { &src, &dst };
     uchar* ptrs[2];
     NAryMatIterator it(arrays, ptrs, 2);
     size_t planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
-        memcpy(ptrs[1], ptrs[0], planesz);
+    ಗಾಗಿ( size_t j = 0; j < it.nplanes; j++, ++it )
+        ಸ್ಮರಣೆ_ನಕಲು(ptrs[1], ptrs[0], planesz);
 }
 
 
-void MatAllocator::upload(UMatData* u, const void* srcptr, int dims, const size_t sz[],
-                    const size_t dstofs[], const size_t dststep[],
-                    const size_t srcstep[]) const
+ಶೂನ್ಯ MatAllocator::upload(UMat_ದತ್ತಾಂಶ* u, ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* srcptr, ಪೂರ್ಣಾಂಕ dims, ಸ್ಥಿರಾಂಕ size_t sz[],
+                    ಸ್ಥಿರಾಂಕ size_t dstofs[], ಸ್ಥಿರಾಂಕ size_t dststep[],
+                    ಸ್ಥಿರಾಂಕ size_t srcstep[]) ಸ್ಥಿರಾಂಕ
 {
-    if(!u)
-        return;
-    int isz[CV_MAX_DIM];
-    uchar* dstptr = u->data;
-    for( int i = 0; i < dims; i++ )
+    ಆದರೆ(!u)
+        ಹಿಂತಿರುಗಿ;
+    ಪೂರ್ಣಾಂಕ isz[CV_MAX_DIM];
+    uchar* dstptr = u->ದತ್ತಾಂಶ;
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++ )
     {
-        CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( dstofs )
+        CV_Assert( sz[i] <= (size_t)ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ );
+        ಆದರೆ( sz[i] == 0 )
+            ಹಿಂತಿರುಗಿ;
+        ಆದರೆ( dstofs )
             dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (ಪೂರ್ಣಾಂಕ)sz[i];
     }
 
-    Mat src(dims, isz, CV_8U, (void*)srcptr, srcstep);
+    Mat src(dims, isz, CV_8U, (ಶೂನ್ಯ*)srcptr, srcstep);
     Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-    const Mat* arrays[] = { &src, &dst };
+    ಸ್ಥಿರಾಂಕ Mat* arrays[] = { &src, &dst };
     uchar* ptrs[2];
     NAryMatIterator it(arrays, ptrs, 2);
     size_t planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
-        memcpy(ptrs[1], ptrs[0], planesz);
+    ಗಾಗಿ( size_t j = 0; j < it.nplanes; j++, ++it )
+        ಸ್ಮರಣೆ_ನಕಲು(ptrs[1], ptrs[0], planesz);
 }
 
-void MatAllocator::copy(UMatData* usrc, UMatData* udst, int dims, const size_t sz[],
-                  const size_t srcofs[], const size_t srcstep[],
-                  const size_t dstofs[], const size_t dststep[], bool /*sync*/) const
+ಶೂನ್ಯ MatAllocator::copy(UMat_ದತ್ತಾಂಶ* usrc, UMat_ದತ್ತಾಂಶ* udst, ಪೂರ್ಣಾಂಕ dims, ಸ್ಥಿರಾಂಕ size_t sz[],
+                  ಸ್ಥಿರಾಂಕ size_t srcofs[], ಸ್ಥಿರಾಂಕ size_t srcstep[],
+                  ಸ್ಥಿರಾಂಕ size_t dstofs[], ಸ್ಥಿರಾಂಕ size_t dststep[], ತಾರ್ಕಿಕ /*sync*/) ಸ್ಥಿರಾಂಕ
 {
     CV_INSTRUMENT_REGION();
 
-    if(!usrc || !udst)
-        return;
-    int isz[CV_MAX_DIM];
-    uchar* srcptr = usrc->data;
-    uchar* dstptr = udst->data;
-    for( int i = 0; i < dims; i++ )
+    ಆದರೆ(!usrc || !udst)
+        ಹಿಂತಿರುಗಿ;
+    ಪೂರ್ಣಾಂಕ isz[CV_MAX_DIM];
+    uchar* srcptr = usrc->ದತ್ತಾಂಶ;
+    uchar* dstptr = udst->ದತ್ತಾಂಶ;
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++ )
     {
-        CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( srcofs )
+        CV_Assert( sz[i] <= (size_t)ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ );
+        ಆದರೆ( sz[i] == 0 )
+            ಹಿಂತಿರುಗಿ;
+        ಆದರೆ( srcofs )
             srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-        if( dstofs )
+        ಆದರೆ( dstofs )
             dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (ಪೂರ್ಣಾಂಕ)sz[i];
     }
 
     Mat src(dims, isz, CV_8U, srcptr, srcstep);
     Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-    const Mat* arrays[] = { &src, &dst };
+    ಸ್ಥಿರಾಂಕ Mat* arrays[] = { &src, &dst };
     uchar* ptrs[2];
     NAryMatIterator it(arrays, ptrs, 2);
     size_t planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
-        memcpy(ptrs[1], ptrs[0], planesz);
+    ಗಾಗಿ( size_t j = 0; j < it.nplanes; j++, ++it )
+        ಸ್ಮರಣೆ_ನಕಲು(ptrs[1], ptrs[0], planesz);
 }
 
-BufferPoolController* MatAllocator::getBufferPoolController(const char* id) const
+ಬಫರ್_Pool_Controller* MatAllocator::get_ಬಫರ್_Pool_Controller(ಸ್ಥಿರಾಂಕ ಅಕ್ಷರ* id) ಸ್ಥಿರಾಂಕ
 {
-    CV_UNUSED(id);
-    static DummyBufferPoolController dummy;
-    return &dummy;
+    CV_ಬಳಸದ(id);
+    ಸ್ಥಿರ Dummy_ಬಫರ್_Pool_Controller dummy;
+    ಹಿಂತಿರುಗಿ &dummy;
 }
 
-class StdMatAllocator CV_FINAL : public MatAllocator
+ವರ್ಗ StdMatAllocator CV_FINAL : ಸಾರ್ವಜನಿಕ MatAllocator
 {
-public:
-    UMatData* allocate(int dims, const int* sizes, int type,
-                       void* data0, size_t* step, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+ಸಾರ್ವಜನಿಕ:
+    UMat_ದತ್ತಾಂಶ* allocate(ಪೂರ್ಣಾಂಕ dims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* sizes, ಪೂರ್ಣಾಂಕ type,
+                       ಶೂನ್ಯ* data0, size_t* ಹೆಜ್ಜೆ, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
     {
-        size_t total = CV_ELEM_SIZE(type);
-        for( int i = dims-1; i >= 0; i-- )
+        size_t ಒಟ್ಟು = CV_ELEM_ಗಾತ್ರ(type);
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = dims-1; i >= 0; i-- )
         {
-            if( step )
+            ಆದರೆ( ಹೆಜ್ಜೆ )
             {
-                if( data0 && step[i] != CV_AUTOSTEP )
+                ಆದರೆ( data0 && ಹೆಜ್ಜೆ[i] != CV_AUTOSTEP )
                 {
-                    CV_Assert(total <= step[i]);
-                    total = step[i];
+                    CV_Assert(ಒಟ್ಟು <= ಹೆಜ್ಜೆ[i]);
+                    ಒಟ್ಟು = ಹೆಜ್ಜೆ[i];
                 }
-                else
-                    step[i] = total;
+                ಇಲ್ಲದಿದ್ದರೆ
+                    ಹೆಜ್ಜೆ[i] = ಒಟ್ಟು;
             }
-            total *= sizes[i];
+            ಒಟ್ಟು *= sizes[i];
         }
-        uchar* data = data0 ? (uchar*)data0 : (uchar*)fastMalloc(total);
-        UMatData* u = new UMatData(this);
-        u->data = u->origdata = data;
-        u->size = total;
-        if(data0)
-            u->flags |= UMatData::USER_ALLOCATED;
+        uchar* ದತ್ತಾಂಶ = data0 ? (uchar*)data0 : (uchar*)fastMalloc(ಒಟ್ಟು);
+        UMat_ದತ್ತಾಂಶ* u = ಹೊಸ UMat_ದತ್ತಾಂಶ(ಇದು);
+        u->ದತ್ತಾಂಶ = u->origdata = ದತ್ತಾಂಶ;
+        u->size = ಒಟ್ಟು;
+        ಆದರೆ(data0)
+            u->flags |= UMat_ದತ್ತಾಂಶ::USER_ALLOCATED;
 
-        return u;
+        ಹಿಂತಿರುಗಿ u;
     }
 
-    bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    ತಾರ್ಕಿಕ allocate(UMat_ದತ್ತಾಂಶ* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
     {
-        if(!u) return false;
-        return true;
+        ಆದರೆ(!u) ಹಿಂತಿರುಗಿ ಸುಳ್ಳು;
+        ಹಿಂತಿರುಗಿ ನಿಜ;
     }
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    ಶೂನ್ಯ deallocate(UMat_ದತ್ತಾಂಶ* u) ಸ್ಥಿರಾಂಕ CV_OVERRIDE
     {
-        if(!u)
-            return;
+        ಆದರೆ(!u)
+            ಹಿಂತಿರುಗಿ;
 
         CV_Assert(u->urefcount == 0);
         CV_Assert(u->refcount == 0);
-        if( !(u->flags & UMatData::USER_ALLOCATED) )
+        ಆದರೆ( !(u->flags & UMat_ದತ್ತಾಂಶ::USER_ALLOCATED) )
         {
             fastFree(u->origdata);
             u->origdata = 0;
         }
-        delete u;
+        ಅಳಿಸು u;
     }
 };
 
-static
+ಸ್ಥಿರ
 MatAllocator*& getDefaultAllocatorMatRef()
 {
-    static MatAllocator* g_matAllocator = Mat::getStdAllocator();
-    return g_matAllocator;
+    ಸ್ಥಿರ MatAllocator* g_matAllocator = Mat::getStdAllocator();
+    ಹಿಂತಿರುಗಿ g_matAllocator;
 }
 
 MatAllocator* Mat::getDefaultAllocator()
 {
-    return getDefaultAllocatorMatRef();
+    ಹಿಂತಿರುಗಿ getDefaultAllocatorMatRef();
 }
 
-void Mat::setDefaultAllocator(MatAllocator* allocator)
+ಶೂನ್ಯ Mat::ಗಣ_Default_Allocator(MatAllocator* allocator)
 {
     getDefaultAllocatorMatRef() = allocator;
 }
 
 MatAllocator* Mat::getStdAllocator()
 {
-    CV_SINGLETON_LAZY_INIT(MatAllocator, new StdMatAllocator())
+    CV_SINGLETON_LAZY_INIT(MatAllocator, ಹೊಸ StdMatAllocator())
 }
 
 //==================================================================================================
 
-void setSize( Mat& m, int _dims, const int* _sz, const size_t* _steps, bool autoSteps)
+ಶೂನ್ಯ ಗಣ_ಗಾತ್ರ( Mat& m, ಪೂರ್ಣಾಂಕ _dims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* _sz, ಸ್ಥಿರಾಂಕ size_t* ಹೆಜ್ಜೆಗಳು_2, ತಾರ್ಕಿಕ auto_ಹೆಜ್ಜೆಗಳು)
 {
     CV_Assert( 0 <= _dims && _dims <= CV_MAX_DIM && _dims <= MatShape::MAX_DIMS);
 
     m.dims = _dims;
     m.size = MatShape(_dims, _sz);
-    m.step[std::max(_dims-1, 0)] = CV_ELEM_SIZE(m.flags);
-    for (int i = _dims-2; i >= 0; i--) {
-        size_t autostep = m.size[i+1]*m.step[i+1];
-        if (_steps) {
-            m.step[i] = _steps[i];
+    m.ಹೆಜ್ಜೆ[std::max(_dims-1, 0)] = CV_ELEM_ಗಾತ್ರ(m.flags);
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = _dims-2; i >= 0; i--) {
+        size_t autostep = m.size[i+1]*m.ಹೆಜ್ಜೆ[i+1];
+        ಆದರೆ (ಹೆಜ್ಜೆಗಳು_2) {
+            m.ಹೆಜ್ಜೆ[i] = ಹೆಜ್ಜೆಗಳು_2[i];
             //CV_Assert(m.step[i] >= autostep);
-        } else if (autoSteps) {
-            m.step[i] = autostep;
-        } else {
-            m.step[i] = 0;
+        } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (auto_ಹೆಜ್ಜೆಗಳು) {
+            m.ಹೆಜ್ಜೆ[i] = autostep;
+        } ಇಲ್ಲದಿದ್ದರೆ {
+            m.ಹೆಜ್ಜೆ[i] = 0;
         }
     }
 
-    if( _dims <= 2 )
+    ಆದರೆ( _dims <= 2 )
     {
-        m.cols = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
-        m.rows = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
-    } else {
-        m.cols = m.rows = -1;
+        m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
+        m.ಅಡ್ಡಸಾಲುಗಳು = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
+    } ಇಲ್ಲದಿದ್ದರೆ {
+        m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = m.ಅಡ್ಡಸಾಲುಗಳು = -1;
     }
 }
 
-int updateContinuityFlag(int flags, int dims, const int* size, const size_t* step)
+ಪೂರ್ಣಾಂಕ updateContinuityFlag(ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ dims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* size, ಸ್ಥಿರಾಂಕ size_t* ಹೆಜ್ಜೆ)
 {
-    int i, j;
-    if (dims <= 1)
-        return flags | Mat::CONTINUOUS_FLAG;
-    for( i = 0; i < dims; i++ )
+    ಪೂರ್ಣಾಂಕ i, j;
+    ಆದರೆ (dims <= 1)
+        ಹಿಂತಿರುಗಿ flags | Mat::CONTINUOUS_FLAG;
+    ಗಾಗಿ( i = 0; i < dims; i++ )
     {
-        if( size[i] > 1 )
-            break;
+        ಆದರೆ( size[i] > 1 )
+            ನಿಲ್ಲಿಸು;
     }
 
     uint64 t = (uint64)size[std::min(i, dims-1)]*CV_MAT_CN(flags);
-    for( j = dims-1; j > i; j-- )
+    ಗಾಗಿ( j = dims-1; j > i; j-- )
     {
         t *= size[j];
-        if( step[j]*size[j] < step[j-1] )
-            break;
+        ಆದರೆ( ಹೆಜ್ಜೆ[j]*size[j] < ಹೆಜ್ಜೆ[j-1] )
+            ನಿಲ್ಲಿಸು;
     }
 
-    if( j <= i && t == (uint64)(int)t )
-        return flags | Mat::CONTINUOUS_FLAG;
-    return flags & ~Mat::CONTINUOUS_FLAG;
+    ಆದರೆ( j <= i && t == (uint64)(ಪೂರ್ಣಾಂಕ)t )
+        ಹಿಂತಿರುಗಿ flags | Mat::CONTINUOUS_FLAG;
+    ಹಿಂತಿರುಗಿ flags & ~Mat::CONTINUOUS_FLAG;
 }
 
-void Mat::updateContinuityFlag()
+ಶೂನ್ಯ Mat::updateContinuityFlag()
 {
-    flags = cv::updateContinuityFlag(flags, dims, size.p, step.p);
+    flags = cv::updateContinuityFlag(flags, dims, size.p, ಹೆಜ್ಜೆ.p);
 }
 
-void finalizeHdr(Mat& m)
+ಶೂನ್ಯ finalizeHdr(Mat& m)
 {
     m.updateContinuityFlag();
-    int d = m.dims;
-    if( d > 2 )
-        m.rows = m.cols = -1;
-    if(m.u)
-        m.datastart = m.data = m.u->data;
-    if( m.data && d > 0 )
+    ಪೂರ್ಣಾಂಕ d = m.dims;
+    ಆದರೆ( d > 2 )
+        m.ಅಡ್ಡಸಾಲುಗಳು = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = -1;
+    ಆದರೆ(m.u)
+        m.datastart = m.ದತ್ತಾಂಶ = m.u->ದತ್ತಾಂಶ;
+    ಆದರೆ( m.ದತ್ತಾಂಶ && d > 0 )
     {
-        m.datalimit = m.datastart + m.size[0]*m.step[0];
-        if( m.size[0] > 0 )
+        m.datalimit = m.datastart + m.size[0]*m.ಹೆಜ್ಜೆ[0];
+        ಆದರೆ( m.size[0] > 0 )
         {
-            int lastdim = d > 0 ? d - 1 : 0;
-            m.dataend = m.ptr() + m.size[lastdim]*m.step[lastdim];
-            for( int i = 0; i < d-1; i++ )
-                m.dataend += (m.size[i] - 1)*m.step[i];
+            ಪೂರ್ಣಾಂಕ lastdim = d > 0 ? d - 1 : 0;
+            m.dataend = m.ptr() + m.size[lastdim]*m.ಹೆಜ್ಜೆ[lastdim];
+            ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < d-1; i++ )
+                m.dataend += (m.size[i] - 1)*m.ಹೆಜ್ಜೆ[i];
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
             m.dataend = m.datalimit;
     }
-    else
-        m.dataend = m.datalimit = m.data;
+    ಇಲ್ಲದಿದ್ದರೆ
+        m.dataend = m.datalimit = m.ದತ್ತಾಂಶ;
 }
 
 //======================================= Mat ======================================================
 
 Mat::Mat() CV_NOEXCEPT
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {}
 
-Mat::Mat(int _rows, int _cols, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_3, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, ಪೂರ್ಣಾಂಕ _type)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    create(_rows, _cols, _type);
+    create(ಅಡ್ಡಸಾಲುಗಳು_3, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, _type);
 }
 
-Mat::Mat(int _rows, int _cols, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_3, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, ಪೂರ್ಣಾಂಕ _type, ಸ್ಥಿರಾಂಕ Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    create(_rows, _cols, _type);
-    *this = _s;
+    create(ಅಡ್ಡಸಾಲುಗಳು_3, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, _type);
+    *ಇದು = _s;
 }
 
-Mat::Mat(Size _sz, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಗಾತ್ರ_2 _sz, ಪೂರ್ಣಾಂಕ _type)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    create( _sz.height, _sz.width, _type );
+    create( _sz.ಎತ್ತರ, _sz.ಅಗಲ, _type );
 }
 
-Mat::Mat(Size _sz, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಗಾತ್ರ_2 _sz, ಪೂರ್ಣಾಂಕ _type, ಸ್ಥಿರಾಂಕ Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    create(_sz.height, _sz.width, _type);
-    *this = _s;
+    create(_sz.ಎತ್ತರ, _sz.ಅಗಲ, _type);
+    *ಇದು = _s;
 }
 
-Mat::Mat(int _dims, const int* _sz, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
-      datalimit(0), allocator(0), u(0)
-{
-    create(_dims, _sz, _type);
-}
-
-Mat::Mat(int _dims, const int* _sz, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಪೂರ್ಣಾಂಕ _dims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* _sz, ಪೂರ್ಣಾಂಕ _type)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_dims, _sz, _type);
-    *this = _s;
 }
 
-Mat::Mat(const std::vector<int>& _sz, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಪೂರ್ಣಾಂಕ _dims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* _sz, ಪೂರ್ಣಾಂಕ _type, ಸ್ಥಿರಾಂಕ Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
+      datalimit(0), allocator(0), u(0)
+{
+    create(_dims, _sz, _type);
+    *ಇದು = _s;
+}
+
+Mat::Mat(ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& _sz, ಪೂರ್ಣಾಂಕ _type)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_sz, _type);
 }
 
-Mat::Mat(const std::vector<int>& _sz, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& _sz, ಪೂರ್ಣಾಂಕ _type, ಸ್ಥಿರಾಂಕ Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_sz, _type);
-    *this = _s;
+    *ಇದು = _s;
 }
 
-Mat::Mat(const MatShape& _shape, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಸ್ಥಿರಾಂಕ MatShape& _shape, ಪೂರ್ಣಾಂಕ _type)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(std::initializer_list<ಪೂರ್ಣಾಂಕ> _shape, ಪೂರ್ಣಾಂಕ _type)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
 }
 
-Mat::Mat(const MatShape& _shape, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಸ್ಥಿರಾಂಕ MatShape& _shape, ಪೂರ್ಣಾಂಕ _type, ಸ್ಥಿರಾಂಕ Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
-    *this = _s;
+    *ಇದು = _s;
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(std::initializer_list<ಪೂರ್ಣಾಂಕ> _shape, ಪೂರ್ಣಾಂಕ _type, ಸ್ಥಿರಾಂಕ Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
-    *this = _s;
+    *ಇದು = _s;
 }
 
-Mat::Mat(const Mat& m)
-    : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), data(m.data),
+Mat::Mat(ಸ್ಥಿರಾಂಕ Mat& m)
+    : flags(m.flags), dims(m.dims), ಅಡ್ಡಸಾಲುಗಳು(m.ಅಡ್ಡಸಾಲುಗಳು), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ), ದತ್ತಾಂಶ(m.ದತ್ತಾಂಶ),
       datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit), allocator(m.allocator),
-      u(m.u), size(m.size), step(m.step)
+      u(m.u), size(m.size), ಹೆಜ್ಜೆ(m.ಹೆಜ್ಜೆ)
 {
-    if( u )
+    ಆದರೆ( u )
         CV_XADD(&u->refcount, 1);
 }
 
-Mat::Mat(int _rows, int _cols, int _type, void* _data, size_t _step)
-    : flags(MAGIC_VAL + (_type & TYPE_MASK)), dims(2), rows(_rows), cols(_cols),
-      data((uchar*)_data), datastart((uchar*)_data), dataend(0), datalimit(0),
+Mat::Mat(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_3, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, ಪೂರ್ಣಾಂಕ _type, ಶೂನ್ಯ* ದತ್ತಾಂಶ_3, size_t ಹೆಜ್ಜೆ_3)
+    : flags(MAGIC_VAL + (_type & TYPE_ಮುಖವಾಡ)), dims(2), ಅಡ್ಡಸಾಲುಗಳು(ಅಡ್ಡಸಾಲುಗಳು_3), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3),
+      ದತ್ತಾಂಶ((uchar*)ದತ್ತಾಂಶ_3), datastart((uchar*)ದತ್ತಾಂಶ_3), dataend(0), datalimit(0),
       allocator(0), u(0), size(2)
 {
-    CV_Assert(total() == 0 || data != NULL);
+    CV_Assert(ಒಟ್ಟು() == 0 || ದತ್ತಾಂಶ != ಖಾಲಿ);
 
-    size_t esz = CV_ELEM_SIZE(_type), esz1 = CV_ELEM_SIZE1(_type);
-    size_t minstep = cols * esz;
-    if( _step == AUTO_STEP )
+    size_t esz = CV_ELEM_ಗಾತ್ರ(_type), esz1 = CV_ELEM_SIZE1(_type);
+    size_t minstep = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * esz;
+    ಆದರೆ( ಹೆಜ್ಜೆ_3 == AUTO_ಹೆಜ್ಜೆ )
     {
-        _step = minstep;
+        ಹೆಜ್ಜೆ_3 = minstep;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        CV_Assert( _step >= minstep );
-        if (_step % esz1 != 0)
+        CV_Assert( ಹೆಜ್ಜೆ_3 >= minstep );
+        ಆದರೆ (ಹೆಜ್ಜೆ_3 % esz1 != 0)
         {
-            CV_Error(Error::BadStep, "Step must be a multiple of esz1");
+            CV_Error(Error::Bad_ಹೆಜ್ಜೆ, "Step must be a multiple of esz1");
         }
     }
-    size[0] = rows;
-    size[1] = cols;
-    step[0] = _step;
-    step[1] = esz;
-    datalimit = datastart + _step * rows;
-    dataend = datalimit - _step + minstep;
+    size[0] = ಅಡ್ಡಸಾಲುಗಳು;
+    size[1] = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಹೆಜ್ಜೆ[0] = ಹೆಜ್ಜೆ_3;
+    ಹೆಜ್ಜೆ[1] = esz;
+    datalimit = datastart + ಹೆಜ್ಜೆ_3 * ಅಡ್ಡಸಾಲುಗಳು;
+    dataend = datalimit - ಹೆಜ್ಜೆ_3 + minstep;
     updateContinuityFlag();
 }
 
-Mat::Mat(Size _sz, int _type, void* _data, size_t _step)
-    : flags(MAGIC_VAL + (_type & TYPE_MASK)), dims(2), rows(_sz.height), cols(_sz.width),
-      data((uchar*)_data), datastart((uchar*)_data), dataend(0), datalimit(0),
+Mat::Mat(ಗಾತ್ರ_2 _sz, ಪೂರ್ಣಾಂಕ _type, ಶೂನ್ಯ* ದತ್ತಾಂಶ_3, size_t ಹೆಜ್ಜೆ_3)
+    : flags(MAGIC_VAL + (_type & TYPE_ಮುಖವಾಡ)), dims(2), ಅಡ್ಡಸಾಲುಗಳು(_sz.ಎತ್ತರ), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(_sz.ಅಗಲ),
+      ದತ್ತಾಂಶ((uchar*)ದತ್ತಾಂಶ_3), datastart((uchar*)ದತ್ತಾಂಶ_3), dataend(0), datalimit(0),
       allocator(0), u(0), size(2)
 {
-    CV_Assert(total() == 0 || data != NULL);
+    CV_Assert(ಒಟ್ಟು() == 0 || ದತ್ತಾಂಶ != ಖಾಲಿ);
 
-    size_t esz = CV_ELEM_SIZE(_type), esz1 = CV_ELEM_SIZE1(_type);
-    size_t minstep = cols*esz;
-    if( _step == AUTO_STEP || (_step < minstep && rows == 1))
+    size_t esz = CV_ELEM_ಗಾತ್ರ(_type), esz1 = CV_ELEM_SIZE1(_type);
+    size_t minstep = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ*esz;
+    ಆದರೆ( ಹೆಜ್ಜೆ_3 == AUTO_ಹೆಜ್ಜೆ || (ಹೆಜ್ಜೆ_3 < minstep && ಅಡ್ಡಸಾಲುಗಳು == 1))
     {
-        _step = minstep;
+        ಹೆಜ್ಜೆ_3 = minstep;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        CV_CheckGE(_step, minstep, "");
+        CV_CheckGE(ಹೆಜ್ಜೆ_3, minstep, "");
 
-        if (_step % esz1 != 0)
+        ಆದರೆ (ಹೆಜ್ಜೆ_3 % esz1 != 0)
         {
-            CV_Error(Error::BadStep, "Step must be a multiple of esz1");
+            CV_Error(Error::Bad_ಹೆಜ್ಜೆ, "Step must be a multiple of esz1");
         }
     }
-    size[0] = rows;
-    size[1] = cols;
-    step[0] = _step;
-    step[1] = esz;
-    datalimit = datastart + _step*rows;
-    dataend = datalimit - _step + minstep;
+    size[0] = ಅಡ್ಡಸಾಲುಗಳು;
+    size[1] = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಹೆಜ್ಜೆ[0] = ಹೆಜ್ಜೆ_3;
+    ಹೆಜ್ಜೆ[1] = esz;
+    datalimit = datastart + ಹೆಜ್ಜೆ_3*ಅಡ್ಡಸಾಲುಗಳು;
+    dataend = datalimit - ಹೆಜ್ಜೆ_3 + minstep;
     updateContinuityFlag();
 }
 
@@ -1031,1060 +1031,1060 @@ Mat::~Mat()
     release();
 }
 
-Mat& Mat::operator = (const Mat& m)
+Mat& Mat::ಕ್ರಿಯಾಕಾರಕ = (ಸ್ಥಿರಾಂಕ Mat& m)
 {
-    if( this != &m )
+    ಆದರೆ( ಇದು != &m )
     {
-        if( m.u )
+        ಆದರೆ( m.u )
             CV_XADD(&m.u->refcount, 1);
         release();
         flags = m.flags;
         dims = m.dims;
-        rows = m.rows;
-        cols = m.cols;
+        ಅಡ್ಡಸಾಲುಗಳು = m.ಅಡ್ಡಸಾಲುಗಳು;
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
         size = m.size;
-        step = m.step;
-        data = m.data;
+        ಹೆಜ್ಜೆ = m.ಹೆಜ್ಜೆ;
+        ದತ್ತಾಂಶ = m.ದತ್ತಾಂಶ;
         datastart = m.datastart;
         dataend = m.dataend;
         datalimit = m.datalimit;
         allocator = m.allocator;
         u = m.u;
     }
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-Mat Mat::clone() const
+Mat Mat::clone() ಸ್ಥಿರಾಂಕ
 {
     Mat m;
-    copyTo(m);
-    return m;
+    copy_ಗಮ್ಯ(m);
+    ಹಿಂತಿರುಗಿ m;
 }
 
-void Mat::assignTo( Mat& m, int _type ) const
+ಶೂನ್ಯ Mat::ನಿಯೋಜಿಸು_ಗಮ್ಯ( Mat& m, ಪೂರ್ಣಾಂಕ _type ) ಸ್ಥಿರಾಂಕ
 {
-    if( _type < 0 )
-        m = *this;
-    else
-        convertTo(m, _type);
+    ಆದರೆ( _type < 0 )
+        m = *ಇದು;
+    ಇಲ್ಲದಿದ್ದರೆ
+        convert_ಗಮ್ಯ(m, _type);
 }
 
-void Mat::create(int _rows, int _cols, int _type)
+ಶೂನ್ಯ Mat::create(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_3, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, ಪೂರ್ಣಾಂಕ _type)
 {
-    _type &= TYPE_MASK;
-    if( dims <= 2 && rows == _rows && cols == _cols && type() == _type && data )
-        return;
-    int sz[] = {_rows, _cols};
+    _type &= TYPE_ಮುಖವಾಡ;
+    ಆದರೆ( dims <= 2 && ಅಡ್ಡಸಾಲುಗಳು == ಅಡ್ಡಸಾಲುಗಳು_3 && ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3 && type() == _type && ದತ್ತಾಂಶ )
+        ಹಿಂತಿರುಗಿ;
+    ಪೂರ್ಣಾಂಕ sz[] = {ಅಡ್ಡಸಾಲುಗಳು_3, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3};
     create(2, sz, _type);
 }
 
-void Mat::create(Size _sz, int _type)
+ಶೂನ್ಯ Mat::create(ಗಾತ್ರ_2 _sz, ಪೂರ್ಣಾಂಕ _type)
 {
-    create(_sz.height, _sz.width, _type);
+    create(_sz.ಎತ್ತರ, _sz.ಅಗಲ, _type);
 }
 
-void Mat::createSameSize(InputArray m, int type)
+ಶೂನ್ಯ Mat::create_Same_ಗಾತ್ರ(ಒಳಹರಿವು_Array m, ಪೂರ್ಣಾಂಕ type)
 {
     MatShape msize = m.shape();
     create(msize, type);
 }
 
-void Mat::fit(int _dims, const int* _sizes, int _type)
+ಶೂನ್ಯ Mat::fit(ಪೂರ್ಣಾಂಕ _dims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* _sizes, ಪೂರ್ಣಾಂಕ _type)
 {
-    size_t oldTotalBytes = u ? u->size : 0;
-    size_t esz = CV_ELEM_SIZE(_type), newTotal = _dims >= 0;
-    for (int i = 0; i < _dims; i++)
-        newTotal *= _sizes[i];
-    size_t newTotalBytes = newTotal*esz;
-    if (newTotalBytes > 0 && (!isContinuous() ||
-                              newTotalBytes > oldTotalBytes ||
-                              data != datastart)) {
+    size_t old_ಒಟ್ಟು_ಬೈಟುಗಳು = u ? u->size : 0;
+    size_t esz = CV_ELEM_ಗಾತ್ರ(_type), new_ಒಟ್ಟು = _dims >= 0;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < _dims; i++)
+        new_ಒಟ್ಟು *= _sizes[i];
+    size_t new_ಒಟ್ಟು_ಬೈಟುಗಳು = new_ಒಟ್ಟು*esz;
+    ಆದರೆ (new_ಒಟ್ಟು_ಬೈಟುಗಳು > 0 && (!isContinuous() ||
+                              new_ಒಟ್ಟು_ಬೈಟುಗಳು > old_ಒಟ್ಟು_ಬೈಟುಗಳು ||
+                              ದತ್ತಾಂಶ != datastart)) {
         create(_dims, _sizes, _type);
-    } else {
-        flags = (flags & ~Mat::TYPE_MASK) | CV_MAT_TYPE(_type);
-        int _dummy_size = 0;
-        setSize(*this, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, true);
-        finalizeHdr(*this);
+    } ಇಲ್ಲದಿದ್ದರೆ {
+        flags = (flags & ~Mat::TYPE_ಮುಖವಾಡ) | CV_MAT_TYPE(_type);
+        ಪೂರ್ಣಾಂಕ dummy_ಗಾತ್ರ = 0;
+        ಗಣ_ಗಾತ್ರ(*ಇದು, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &dummy_ಗಾತ್ರ), ಶೂನ್ಯಸೂಚಕ, ನಿಜ);
+        finalizeHdr(*ಇದು);
     }
 }
 
-void Mat::fit(const std::vector<int>& _shape, int _type)
+ಶೂನ್ಯ Mat::fit(ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& _shape, ಪೂರ್ಣಾಂಕ _type)
 {
-    fit((int)_shape.size(), _shape.data(), _type);
+    fit((ಪೂರ್ಣಾಂಕ)_shape.size(), _shape.ದತ್ತಾಂಶ(), _type);
 }
 
-void Mat::fit(const MatShape& _shape, int _type)
+ಶೂನ್ಯ Mat::fit(ಸ್ಥಿರಾಂಕ MatShape& _shape, ಪೂರ್ಣಾಂಕ _type)
 {
     fit(_shape.dims, _shape.p, _type);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void Mat::fit(std::initializer_list<int> _shape, int _type)
+ಶೂನ್ಯ Mat::fit(std::initializer_list<ಪೂರ್ಣಾಂಕ> _shape, ಪೂರ್ಣಾಂಕ _type)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int new_ndims = (int)_shape.size();
+    ಪೂರ್ಣಾಂಕ new_shape[MatShape::MAX_DIMS];
+    ಪೂರ್ಣಾಂಕ new_ndims = (ಪೂರ್ಣಾಂಕ)_shape.size();
     CV_Assert(new_ndims <= MatShape::MAX_DIMS);
-    auto it = _shape.begin();
-    for (int i = 0; i < new_ndims; i++, ++it)
+    ಸ್ವಯಂಚಾಲಿತ it = _shape.begin();
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < new_ndims; i++, ++it)
         new_shape[i] = *it;
     fit(new_ndims, new_shape, _type);
 }
 
-void Mat::fit(int _rows, int _cols, int _type)
+ಶೂನ್ಯ Mat::fit(ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು_3, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3, ಪೂರ್ಣಾಂಕ _type)
 {
-    _type &= TYPE_MASK;
-    int sz[] = {_rows, _cols};
+    _type &= TYPE_ಮುಖವಾಡ;
+    ಪೂರ್ಣಾಂಕ sz[] = {ಅಡ್ಡಸಾಲುಗಳು_3, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ_3};
     fit(2, sz, _type);
 }
 
-void Mat::fit(Size _sz, int _type)
+ಶೂನ್ಯ Mat::fit(ಗಾತ್ರ_2 _sz, ಪೂರ್ಣಾಂಕ _type)
 {
-    fit(_sz.height, _sz.width, _type);
+    fit(_sz.ಎತ್ತರ, _sz.ಅಗಲ, _type);
 }
 
-void Mat::fitSameSize(InputArray m, int _type)
+ಶೂನ್ಯ Mat::fit_Same_ಗಾತ್ರ(ಒಳಹರಿವು_Array m, ಪೂರ್ಣಾಂಕ _type)
 {
     fit(m.shape(), _type);
 }
 
-void Mat::addref()
+ಶೂನ್ಯ Mat::addref()
 {
-    if( u )
+    ಆದರೆ( u )
         CV_XADD(&u->refcount, 1);
 }
 
-void Mat::release()
+ಶೂನ್ಯ Mat::release()
 {
-    if( u && CV_XADD(&u->refcount, -1) == 1 )
+    ಆದರೆ( u && CV_XADD(&u->refcount, -1) == 1 )
         deallocate();
-    u = NULL;
-    datastart = dataend = datalimit = data = 0;
-    for(int i = 0; i < dims; i++)
+    u = ಖಾಲಿ;
+    datastart = dataend = datalimit = ದತ್ತಾಂಶ = 0;
+    ಗಾಗಿ(ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++)
         size.p[i] = 0;
-    flags = (flags & CV_MAT_TYPE_MASK) | MAGIC_VAL;
-    dims = rows = cols = 0;
+    flags = (flags & CV_MAT_TYPE_ಮುಖವಾಡ) | MAGIC_VAL;
+    dims = ಅಡ್ಡಸಾಲುಗಳು = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 0;
     size.clear();
 }
 
-size_t Mat::step1(int i) const
+size_t Mat::step1(ಪೂರ್ಣಾಂಕ i) ಸ್ಥಿರಾಂಕ
 {
-    return step.p[i] / elemSize1();
+    ಹಿಂತಿರುಗಿ ಹೆಜ್ಜೆ.p[i] / elemSize1();
 }
 
-bool Mat::empty() const
+ತಾರ್ಕಿಕ Mat::empty() ಸ್ಥಿರಾಂಕ
 {
-    return data == 0 || total() == 0;
+    ಹಿಂತಿರುಗಿ ದತ್ತಾಂಶ == 0 || ಒಟ್ಟು() == 0;
 }
 
-size_t Mat::total() const
+size_t Mat::ಒಟ್ಟು() ಸ್ಥಿರಾಂಕ
 {
-    if( dims <= 2 )
-        return (size_t)rows * cols;
+    ಆದರೆ( dims <= 2 )
+        ಹಿಂತಿರುಗಿ (size_t)ಅಡ್ಡಸಾಲುಗಳು * ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
     size_t p = 1;
-    for( int i = 0; i < dims; i++ )
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < dims; i++ )
         p *= size[i];
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
-size_t Mat::total(int startDim, int endDim) const
+size_t Mat::ಒಟ್ಟು(ಪೂರ್ಣಾಂಕ ಆರಂಭ_Dim, ಪೂರ್ಣಾಂಕ ಕೊನೆ_Dim) ಸ್ಥಿರಾಂಕ
 {
-    CV_Assert( 0 <= startDim && startDim <= endDim);
+    CV_Assert( 0 <= ಆರಂಭ_Dim && ಆರಂಭ_Dim <= ಕೊನೆ_Dim);
     size_t p = 1;
-    int endDim_ = endDim <= dims ? endDim : dims;
-    for( int i = startDim; i < endDim_; i++ )
+    ಪೂರ್ಣಾಂಕ ಕೊನೆ_Dim_2 = ಕೊನೆ_Dim <= dims ? ಕೊನೆ_Dim : dims;
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = ಆರಂಭ_Dim; i < ಕೊನೆ_Dim_2; i++ )
         p *= size[i];
-    return p;
+    ಹಿಂತಿರುಗಿ p;
 }
 
 Mat::Mat(Mat&& m) CV_NOEXCEPT
-    : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), data(m.data),
+    : flags(m.flags), dims(m.dims), ಅಡ್ಡಸಾಲುಗಳು(m.ಅಡ್ಡಸಾಲುಗಳು), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ), ದತ್ತಾಂಶ(m.ದತ್ತಾಂಶ),
       datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit), allocator(m.allocator),
-      u(m.u), size(m.size), step(m.step)
+      u(m.u), size(m.size), ಹೆಜ್ಜೆ(m.ಹೆಜ್ಜೆ)
 {
-    m.flags = MAGIC_VAL; m.dims = m.rows = m.cols = 0;
-    m.size.clear(); m.step.clear();
-    m.data = NULL; m.datastart = NULL; m.dataend = NULL; m.datalimit = NULL;
-    m.allocator = NULL;
-    m.u = NULL;
+    m.flags = MAGIC_VAL; m.dims = m.ಅಡ್ಡಸಾಲುಗಳು = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 0;
+    m.size.clear(); m.ಹೆಜ್ಜೆ.clear();
+    m.ದತ್ತಾಂಶ = ಖಾಲಿ; m.datastart = ಖಾಲಿ; m.dataend = ಖಾಲಿ; m.datalimit = ಖಾಲಿ;
+    m.allocator = ಖಾಲಿ;
+    m.u = ಖಾಲಿ;
 }
 
 
-Mat& Mat::operator = (Mat&& m)
+Mat& Mat::ಕ್ರಿಯಾಕಾರಕ = (Mat&& m)
 {
-    if (this == &m)
-      return *this;
+    ಆದರೆ (ಇದು == &m)
+      ಹಿಂತಿರುಗಿ *ಇದು;
 
     release();
-    flags = m.flags; dims = m.dims; rows = m.rows; cols = m.cols; data = m.data;
-    size = m.size; step = m.step;
+    flags = m.flags; dims = m.dims; ಅಡ್ಡಸಾಲುಗಳು = m.ಅಡ್ಡಸಾಲುಗಳು; ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ; ದತ್ತಾಂಶ = m.ದತ್ತಾಂಶ;
+    size = m.size; ಹೆಜ್ಜೆ = m.ಹೆಜ್ಜೆ;
     datastart = m.datastart; dataend = m.dataend; datalimit = m.datalimit; allocator = m.allocator;
     u = m.u;
-    m.flags = MAGIC_VAL; m.dims = m.rows = m.cols = 0;
-    m.size.clear(); m.step.clear();
-    m.data = NULL; m.datastart = NULL; m.dataend = NULL; m.datalimit = NULL;
-    m.allocator = NULL;
-    m.u = NULL;
-    return *this;
+    m.flags = MAGIC_VAL; m.dims = m.ಅಡ್ಡಸಾಲುಗಳು = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 0;
+    m.size.clear(); m.ಹೆಜ್ಜೆ.clear();
+    m.ದತ್ತಾಂಶ = ಖಾಲಿ; m.datastart = ಖಾಲಿ; m.dataend = ಖಾಲಿ; m.datalimit = ಖಾಲಿ;
+    m.allocator = ಖಾಲಿ;
+    m.u = ಖಾಲಿ;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
 
-void Mat::create(int d0, const int* _sizes, int _type)
+ಶೂನ್ಯ Mat::create(ಪೂರ್ಣಾಂಕ d0, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* _sizes, ಪೂರ್ಣಾಂಕ _type)
 {
-    int sz1 = 1, d = d0;
-    int i;
-    if (d == 0) {
+    ಪೂರ್ಣಾಂಕ sz1 = 1, d = d0;
+    ಪೂರ್ಣಾಂಕ i;
+    ಆದರೆ (d == 0) {
         d = 1;
-        _sizes = (const int*)&sz1;
+        _sizes = (ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ*)&sz1;
     }
     CV_Assert(0 <= d && d <= CV_MAX_DIM && _sizes);
     _type = CV_MAT_TYPE(_type);
 
-    if( data && d == dims && _type == type() )
+    ಆದರೆ( ದತ್ತಾಂಶ && d == dims && _type == type() )
     {
-        for( i = 0; i < d; i++ )
-            if( size[i] != _sizes[i] )
-                break;
-        if( i == d )
-            return;
+        ಗಾಗಿ( i = 0; i < d; i++ )
+            ಆದರೆ( size[i] != _sizes[i] )
+                ನಿಲ್ಲಿಸು;
+        ಆದರೆ( i == d )
+            ಹಿಂತಿರುಗಿ;
     }
 
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (_sizes == (this->size.p))
+    ಪೂರ್ಣಾಂಕ _sizes_backup[CV_MAX_DIM]; // #5991
+    ಆದರೆ (_sizes == (ಇದು->size.p))
     {
-        for(i = 0; i < d; i++ )
+        ಗಾಗಿ(i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
 
     release();
-    if( d == 0 )
-        return;
-    flags = (_type & CV_MAT_TYPE_MASK) | MAGIC_VAL;
-    setSize(*this, d, _sizes, 0, true);
+    ಆದರೆ( d == 0 )
+        ಹಿಂತಿರುಗಿ;
+    flags = (_type & CV_MAT_TYPE_ಮುಖವಾಡ) | MAGIC_VAL;
+    ಗಣ_ಗಾತ್ರ(*ಇದು, d, _sizes, 0, ನಿಜ);
 
-    if( total() > 0 )
+    ಆದರೆ( ಒಟ್ಟು() > 0 )
     {
         MatAllocator *a = allocator, *a0 = getDefaultAllocator();
-        if(!a)
+        ಆದರೆ(!a)
             a = a0;
-        try
+        ಪ್ರಯತ್ನಿಸು
         {
-            u = a->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
+            u = a->allocate(dims, size.p, _type, 0, ಹೆಜ್ಜೆ.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
             CV_Assert(u != 0);
             allocator = a;
         }
-        catch (...)
+        ಹಿಡಿ (...)
         {
-            if (a == a0)
-                throw;
-            u = a0->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
+            ಆದರೆ (a == a0)
+                ಎಸೆ;
+            u = a0->allocate(dims, size.p, _type, 0, ಹೆಜ್ಜೆ.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
             CV_Assert(u != 0);
             allocator = a0;
         }
-        CV_Assert( step[dims-1] == (size_t)CV_ELEM_SIZE(flags) );
+        CV_Assert( ಹೆಜ್ಜೆ[dims-1] == (size_t)CV_ELEM_ಗಾತ್ರ(flags) );
     }
 
     addref();
-    finalizeHdr(*this);
+    finalizeHdr(*ಇದು);
     size.dims = dims = d0;
 }
 
-void Mat::create(const std::vector<int>& _sizes, int _type)
+ಶೂನ್ಯ Mat::create(ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& _sizes, ಪೂರ್ಣಾಂಕ _type)
 {
-    create((int)_sizes.size(), _sizes.data(), _type);
+    create((ಪೂರ್ಣಾಂಕ)_sizes.size(), _sizes.ದತ್ತಾಂಶ(), _type);
 }
 
-void Mat::create(const MatShape& _shape, int _type)
+ಶೂನ್ಯ Mat::create(ಸ್ಥಿರಾಂಕ MatShape& _shape, ಪೂರ್ಣಾಂಕ _type)
 {
-    if (_shape.dims < 0) {
+    ಆದರೆ (_shape.dims < 0) {
         release();
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
     create(_shape.dims, _shape.p, _type);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void Mat::create(std::initializer_list<int> _shape, int _type)
+ಶೂನ್ಯ Mat::create(std::initializer_list<ಪೂರ್ಣಾಂಕ> _shape, ಪೂರ್ಣಾಂಕ _type)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int new_ndims = (int)_shape.size();
+    ಪೂರ್ಣಾಂಕ new_shape[MatShape::MAX_DIMS];
+    ಪೂರ್ಣಾಂಕ new_ndims = (ಪೂರ್ಣಾಂಕ)_shape.size();
     CV_Assert(new_ndims <= MatShape::MAX_DIMS);
-    auto it = _shape.begin();
-    for (int i = 0; i < new_ndims; i++, ++it)
+    ಸ್ವಯಂಚಾಲಿತ it = _shape.begin();
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < new_ndims; i++, ++it)
         new_shape[i] = *it;
 
     create(new_ndims, new_shape, _type);
 }
 
-void Mat::copySize(const Mat& m)
+ಶೂನ್ಯ Mat::copy_ಗಾತ್ರ(ಸ್ಥಿರಾಂಕ Mat& m)
 {
     dims = m.dims;
-    cols = m.cols;
-    rows = m.rows;
+    ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಅಡ್ಡಸಾಲುಗಳು = m.ಅಡ್ಡಸಾಲುಗಳು;
     size = m.size;
-    step = m.step;
+    ಹೆಜ್ಜೆ = m.ಹೆಜ್ಜೆ;
 }
 
-void Mat::deallocate()
+ಶೂನ್ಯ Mat::deallocate()
 {
-    if(u)
+    ಆದರೆ(u)
     {
-        UMatData* u_ = u;
-        u = NULL;
+        UMat_ದತ್ತಾಂಶ* u_ = u;
+        u = ಖಾಲಿ;
         (u_->currAllocator ? u_->currAllocator : allocator ? allocator : getDefaultAllocator())->unmap(u_);
     }
 }
 
-Mat::Mat(const Mat& m, const Range& _rowRange, const Range& _colRange)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಸ್ಥಿರಾಂಕ Mat& m, ಸ್ಥಿರಾಂಕ Range& ಅಡ್ಡಸಾಲು_Range_3, ಸ್ಥಿರಾಂಕ Range& ಲಂಬಸಾಲು_Range_3)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     CV_Assert(m.dims <= MatShape::MAX_DIMS);
     CV_Assert(m.dims >= 2 ||
-              (m.dims == 1 && (_rowRange == Range::all() ||
-                               _rowRange == Range(0, m.rows))));
-    if( m.dims > 2 )
+              (m.dims == 1 && (ಅಡ್ಡಸಾಲು_Range_3 == Range::all() ||
+                               ಅಡ್ಡಸಾಲು_Range_3 == Range(0, m.ಅಡ್ಡಸಾಲುಗಳು))));
+    ಆದರೆ( m.dims > 2 )
     {
         Range rs[MatShape::MAX_DIMS];
-        rs[0] = _rowRange;
-        rs[1] = _colRange;
-        for( int i = 2; i < m.dims; i++ )
+        rs[0] = ಅಡ್ಡಸಾಲು_Range_3;
+        rs[1] = ಲಂಬಸಾಲು_Range_3;
+        ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 2; i < m.dims; i++ )
             rs[i] = Range::all();
-        *this = m(rs);
-        return;
+        *ಇದು = m(rs);
+        ಹಿಂತಿರುಗಿ;
     }
 
-    *this = m;
-    try
+    *ಇದು = m;
+    ಪ್ರಯತ್ನಿಸು
     {
-        if( _rowRange != Range::all() && _rowRange != Range(0,rows) )
+        ಆದರೆ( ಅಡ್ಡಸಾಲು_Range_3 != Range::all() && ಅಡ್ಡಸಾಲು_Range_3 != Range(0,ಅಡ್ಡಸಾಲುಗಳು) )
         {
-            CV_Assert( 0 <= _rowRange.start && _rowRange.start <= _rowRange.end
-                       && _rowRange.end <= m.rows );
-            size[0] = rows = _rowRange.size();
-            data += step*_rowRange.start;
+            CV_Assert( 0 <= ಅಡ್ಡಸಾಲು_Range_3.ಆರಂಭ && ಅಡ್ಡಸಾಲು_Range_3.ಆರಂಭ <= ಅಡ್ಡಸಾಲು_Range_3.end
+                       && ಅಡ್ಡಸಾಲು_Range_3.end <= m.ಅಡ್ಡಸಾಲುಗಳು );
+            size[0] = ಅಡ್ಡಸಾಲುಗಳು = ಅಡ್ಡಸಾಲು_Range_3.size();
+            ದತ್ತಾಂಶ += ಹೆಜ್ಜೆ*ಅಡ್ಡಸಾಲು_Range_3.ಆರಂಭ;
             flags |= SUBMATRIX_FLAG;
         }
 
-        if( _colRange != Range::all() && _colRange != Range(0,cols) )
+        ಆದರೆ( ಲಂಬಸಾಲು_Range_3 != Range::all() && ಲಂಬಸಾಲು_Range_3 != Range(0,ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ) )
         {
-            CV_Assert( 0 <= _colRange.start && _colRange.start <= _colRange.end
-                       && _colRange.end <= m.cols );
-            size[dims > 1] = cols = _colRange.size();
-            data += _colRange.start*elemSize();
+            CV_Assert( 0 <= ಲಂಬಸಾಲು_Range_3.ಆರಂಭ && ಲಂಬಸಾಲು_Range_3.ಆರಂಭ <= ಲಂಬಸಾಲು_Range_3.end
+                       && ಲಂಬಸಾಲು_Range_3.end <= m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ );
+            size[dims > 1] = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = ಲಂಬಸಾಲು_Range_3.size();
+            ದತ್ತಾಂಶ += ಲಂಬಸಾಲು_Range_3.ಆರಂಭ*elem_ಗಾತ್ರ();
             flags |= SUBMATRIX_FLAG;
         }
     }
-    catch(...)
+    ಹಿಡಿ(...)
     {
         release();
-        throw;
+        ಎಸೆ;
     }
 
     updateContinuityFlag();
 
-    if( rows <= 0 || cols <= 0 )
+    ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು <= 0 || ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ <= 0 )
     {
         release();
-        rows = cols = 0;
+        ಅಡ್ಡಸಾಲುಗಳು = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 0;
     }
 }
 
 
-Mat::Mat(const Mat& m, const Rect& roi)
-    : flags(m.flags), dims(2), rows(roi.height), cols(roi.width),
-    data(m.data + roi.y*m.step[0]),
+Mat::Mat(ಸ್ಥಿರಾಂಕ Mat& m, ಸ್ಥಿರಾಂಕ Rect& roi)
+    : flags(m.flags), dims(2), ಅಡ್ಡಸಾಲುಗಳು(roi.ಎತ್ತರ), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(roi.ಅಗಲ),
+    ದತ್ತಾಂಶ(m.ದತ್ತಾಂಶ + roi.y*m.ಹೆಜ್ಜೆ[0]),
     datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit),
     allocator(m.allocator), u(m.u), size(2)
 {
     CV_Assert( m.dims <= 2 );
 
-    size_t esz = CV_ELEM_SIZE(flags);
-    data += roi.x*esz;
-    CV_Assert( 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols &&
-              0 <= roi.y && 0 <= roi.height && roi.y + roi.height <= m.rows );
-    if( roi.width < m.cols || roi.height < m.rows )
+    size_t esz = CV_ELEM_ಗಾತ್ರ(flags);
+    ದತ್ತಾಂಶ += roi.x*esz;
+    CV_Assert( 0 <= roi.x && 0 <= roi.ಅಗಲ && roi.x + roi.ಅಗಲ <= m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ &&
+              0 <= roi.y && 0 <= roi.ಎತ್ತರ && roi.y + roi.ಎತ್ತರ <= m.ಅಡ್ಡಸಾಲುಗಳು );
+    ಆದರೆ( roi.ಅಗಲ < m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ || roi.ಎತ್ತರ < m.ಅಡ್ಡಸಾಲುಗಳು )
         flags |= SUBMATRIX_FLAG;
 
-    size[0] = rows;
-    size[1] = cols;
-    step[0] = m.step[0];
-    step[1] = esz;
+    size[0] = ಅಡ್ಡಸಾಲುಗಳು;
+    size[1] = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    ಹೆಜ್ಜೆ[0] = m.ಹೆಜ್ಜೆ[0];
+    ಹೆಜ್ಜೆ[1] = esz;
     updateContinuityFlag();
 
     addref();
-    if( rows <= 0 || cols <= 0 )
+    ಆದರೆ( ಅಡ್ಡಸಾಲುಗಳು <= 0 || ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ <= 0 )
     {
-        rows = cols = 0;
+        ಅಡ್ಡಸಾಲುಗಳು = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 0;
         release();
     }
 }
 
 
-Mat::Mat(int _dims, const int* _sizes, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಪೂರ್ಣಾಂಕ _dims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* _sizes, ಪೂರ್ಣಾಂಕ _type, ಶೂನ್ಯ* ದತ್ತಾಂಶ_3, ಸ್ಥಿರಾಂಕ size_t* ಹೆಜ್ಜೆಗಳು_2)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    if (_dims > 0 || _data != nullptr)
-        setSize(*this, _dims, _sizes, _steps, true);
-    finalizeHdr(*this);
+    datastart = ದತ್ತಾಂಶ = (uchar*)ದತ್ತಾಂಶ_3;
+    ಆದರೆ (_dims > 0 || ದತ್ತಾಂಶ_3 != ಶೂನ್ಯಸೂಚಕ)
+        ಗಣ_ಗಾತ್ರ(*ಇದು, _dims, _sizes, ಹೆಜ್ಜೆಗಳು_2, ನಿಜ);
+    finalizeHdr(*ಇದು);
 }
 
 
-Mat::Mat(const std::vector<int>& _sizes, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& _sizes, ಪೂರ್ಣಾಂಕ _type, ಶೂನ್ಯ* ದತ್ತಾಂಶ_3, ಸ್ಥಿರಾಂಕ size_t* ಹೆಜ್ಜೆಗಳು_2)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    int _dims = (int)_sizes.size();
-    if (_dims > 0 || _data != nullptr)
-        setSize(*this, _dims, _sizes.data(), _steps, true);
-    finalizeHdr(*this);
+    datastart = ದತ್ತಾಂಶ = (uchar*)ದತ್ತಾಂಶ_3;
+    ಪೂರ್ಣಾಂಕ _dims = (ಪೂರ್ಣಾಂಕ)_sizes.size();
+    ಆದರೆ (_dims > 0 || ದತ್ತಾಂಶ_3 != ಶೂನ್ಯಸೂಚಕ)
+        ಗಣ_ಗಾತ್ರ(*ಇದು, _dims, _sizes.ದತ್ತಾಂಶ(), ಹೆಜ್ಜೆಗಳು_2, ನಿಜ);
+    finalizeHdr(*ಇದು);
 }
 
-Mat::Mat(const MatShape& _shape, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಸ್ಥಿರಾಂಕ MatShape& _shape, ಪೂರ್ಣಾಂಕ _type, ಶೂನ್ಯ* ದತ್ತಾಂಶ_3, ಸ್ಥಿರಾಂಕ size_t* ಹೆಜ್ಜೆಗಳು_2)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    if (_shape.dims >= 0) {
-        setSize(*this, _shape.dims, _shape.p, _steps, true);
+    datastart = ದತ್ತಾಂಶ = (uchar*)ದತ್ತಾಂಶ_3;
+    ಆದರೆ (_shape.dims >= 0) {
+        ಗಣ_ಗಾತ್ರ(*ಇದು, _shape.dims, _shape.p, ಹೆಜ್ಜೆಗಳು_2, ನಿಜ);
     }
-    else {
-        CV_Assert(!data);
+    ಇಲ್ಲದಿದ್ದರೆ {
+        CV_Assert(!ದತ್ತಾಂಶ);
     }
-    finalizeHdr(*this);
+    finalizeHdr(*ಇದು);
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(std::initializer_list<ಪೂರ್ಣಾಂಕ> _shape, ಪೂರ್ಣಾಂಕ _type, ಶೂನ್ಯ* ದತ್ತಾಂಶ_3, ಸ್ಥಿರಾಂಕ size_t* ಹೆಜ್ಜೆಗಳು_2)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int _dims = (int)_shape.size();
+    ಪೂರ್ಣಾಂಕ new_shape[MatShape::MAX_DIMS];
+    ಪೂರ್ಣಾಂಕ _dims = (ಪೂರ್ಣಾಂಕ)_shape.size();
     CV_Assert(_dims <= MatShape::MAX_DIMS);
-    auto it = _shape.begin();
-    for (int i = 0; i < _dims; i++, ++it)
+    ಸ್ವಯಂಚಾಲಿತ it = _shape.begin();
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < _dims; i++, ++it)
         new_shape[i] = *it;
 
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    if (_dims > 0 || _data != nullptr)
-        setSize(*this, _dims, new_shape, _steps, true);
-    finalizeHdr(*this);
+    datastart = ದತ್ತಾಂಶ = (uchar*)ದತ್ತಾಂಶ_3;
+    ಆದರೆ (_dims > 0 || ದತ್ತಾಂಶ_3 != ಶೂನ್ಯಸೂಚಕ)
+        ಗಣ_ಗಾತ್ರ(*ಇದು, _dims, new_shape, ಹೆಜ್ಜೆಗಳು_2, ನಿಜ);
+    finalizeHdr(*ಇದು);
 }
 
-Mat::Mat(const Mat& m, const Range* ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಸ್ಥಿರಾಂಕ Mat& m, ಸ್ಥಿರಾಂಕ Range* ranges)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    int d = m.dims;
+    ಪೂರ್ಣಾಂಕ d = m.dims;
 
     CV_Assert(ranges);
-    for( int i = 0; i < d; i++ )
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        CV_Assert( r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]) );
+        CV_Assert( r == Range::all() || (0 <= r.ಆರಂಭ && r.ಆರಂಭ < r.end && r.end <= m.size[i]) );
     }
-    *this = m;
-    for( int i = 0; i < d; i++ )
+    *ಇದು = m;
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        if( r != Range::all() && r != Range(0, size.p[i]))
+        ಆದರೆ( r != Range::all() && r != Range(0, size.p[i]))
         {
-            size.p[i] = r.end - r.start;
-            data += r.start*step.p[i];
+            size.p[i] = r.end - r.ಆರಂಭ;
+            ದತ್ತಾಂಶ += r.ಆರಂಭ*ಹೆಜ್ಜೆ.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
-        rows = d == 2 ? size[0] : 1;
-        cols = d <= 0 ? (d >= 0) : size[d > 1];
+    ಆದರೆ (d <= 2) {
+        ಅಡ್ಡಸಾಲುಗಳು = d == 2 ? size[0] : 1;
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-Mat::Mat(const Mat& m, const std::vector<Range>& ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(ಸ್ಥಿರಾಂಕ Mat& m, ಸ್ಥಿರಾಂಕ std::vector<Range>& ranges)
+    : flags(MAGIC_VAL), dims(0), ಅಡ್ಡಸಾಲುಗಳು(0), ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ(0), ದತ್ತಾಂಶ(0), datastart(0), dataend(0),
     datalimit(0), allocator(0), u(0)
 {
-    int d = m.dims;
+    ಪೂರ್ಣಾಂಕ d = m.dims;
 
-    CV_Assert((int)ranges.size() == d);
-    for (int i = 0; i < d; i++)
+    CV_Assert((ಪೂರ್ಣಾಂಕ)ranges.size() == d);
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]));
+        CV_Assert(r == Range::all() || (0 <= r.ಆರಂಭ && r.ಆರಂಭ < r.end && r.end <= m.size[i]));
     }
-    *this = m;
-    for (int i = 0; i < d; i++)
+    *ಇದು = m;
+    ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, size.p[i]))
+        ಆದರೆ (r != Range::all() && r != Range(0, size.p[i]))
         {
-            size.p[i] = r.end - r.start;
-            data += r.start*step.p[i];
+            size.p[i] = r.end - r.ಆರಂಭ;
+            ದತ್ತಾಂಶ += r.ಆರಂಭ*ಹೆಜ್ಜೆ.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
-        rows = d == 2 ? size[0] : 1;
-        cols = d <= 0 ? (d >= 0) : size[d > 1];
+    ಆದರೆ (d <= 2) {
+        ಅಡ್ಡಸಾಲುಗಳು = d == 2 ? size[0] : 1;
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
 
-Mat Mat::diag(int d) const
+Mat Mat::diag(ಪೂರ್ಣಾಂಕ d) ಸ್ಥಿರಾಂಕ
 {
     CV_Assert( dims == 2 );
-    Mat m = *this;
-    size_t esz = elemSize();
-    int len;
+    Mat m = *ಇದು;
+    size_t esz = elem_ಗಾತ್ರ();
+    ಪೂರ್ಣಾಂಕ len;
 
-    if( d >= 0 )
+    ಆದರೆ( d >= 0 )
     {
-        len = std::min(cols - d, rows);
-        m.data += esz*d;
+        len = std::min(ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - d, ಅಡ್ಡಸಾಲುಗಳು);
+        m.ದತ್ತಾಂಶ += esz*d;
     }
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        len = std::min(rows + d, cols);
-        m.data -= step[0]*d;
+        len = std::min(ಅಡ್ಡಸಾಲುಗಳು + d, ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
+        m.ದತ್ತಾಂಶ -= ಹೆಜ್ಜೆ[0]*d;
     }
     CV_DbgAssert( len > 0 );
 
-    m.size[0] = m.rows = len;
-    m.size[1] = m.cols = 1;
-    m.step[0] += (len > 1 ? esz : 0);
+    m.size[0] = m.ಅಡ್ಡಸಾಲುಗಳು = len;
+    m.size[1] = m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = 1;
+    m.ಹೆಜ್ಜೆ[0] += (len > 1 ? esz : 0);
 
     m.updateContinuityFlag();
 
-    if( size() != Size(1,1) )
+    ಆದರೆ( size() != ಗಾತ್ರ_2(1,1) )
         m.flags |= SUBMATRIX_FLAG;
 
-    return m;
+    ಹಿಂತಿರುಗಿ m;
 }
 
 
-void Mat::pop_back(size_t nelems)
+ಶೂನ್ಯ Mat::pop_back(size_t nelems)
 {
     CV_Assert( nelems <= (size_t)size.p[0] );
     CV_Assert( dims >= 1 );
 
-    if( isSubmatrix() )
-        *this = rowRange(0, size.p[0] - (int)nelems);
-    else
+    ಆದರೆ( isSubmatrix() )
+        *ಇದು = ಅಡ್ಡಸಾಲು_Range_2(0, size.p[0] - (ಪೂರ್ಣಾಂಕ)nelems);
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        size.p[0] -= (int)nelems;
-        if (dims == 2)
-            rows = size.p[0];
-        else if (dims == 1)
-            cols = size.p[0];
-        dataend -= nelems*step.p[0];
+        size.p[0] -= (ಪೂರ್ಣಾಂಕ)nelems;
+        ಆದರೆ (dims == 2)
+            ಅಡ್ಡಸಾಲುಗಳು = size.p[0];
+        ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dims == 1)
+            ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = size.p[0];
+        dataend -= nelems*ಹೆಜ್ಜೆ.p[0];
     }
 }
 
 
-void Mat::push_back_(const void* elem)
+ಶೂನ್ಯ Mat::ತಳ್ಳು_ಹಿಂಭಾಗ(ಸ್ಥಿರಾಂಕ ಶೂನ್ಯ* elem)
 {
     size_t r = size.p[0];
-    if( isSubmatrix() || dataend + step.p[0] > datalimit )
+    ಆದರೆ( isSubmatrix() || dataend + ಹೆಜ್ಜೆ.p[0] > datalimit )
         reserve( std::max(r + 1, (r*3+1)/2) );
 
-    size_t esz = elemSize();
-    memcpy(data + r*step.p[0], elem, esz);
-    size.p[0] = int(r + 1);
-    if (dims == 2)
-        rows = size.p[0];
-    else if (dims == 1)
-        cols = size.p[0];
-    dataend += step.p[0];
+    size_t esz = elem_ಗಾತ್ರ();
+    ಸ್ಮರಣೆ_ನಕಲು(ದತ್ತಾಂಶ + r*ಹೆಜ್ಜೆ.p[0], elem, esz);
+    size.p[0] = ಪೂರ್ಣಾಂಕ(r + 1);
+    ಆದರೆ (dims == 2)
+        ಅಡ್ಡಸಾಲುಗಳು = size.p[0];
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dims == 1)
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = size.p[0];
+    dataend += ಹೆಜ್ಜೆ.p[0];
     uint64 tsz = size.p[0];
-    for( int i = 1; i < dims; i++ )
+    ಗಾಗಿ( ಪೂರ್ಣಾಂಕ i = 1; i < dims; i++ )
         tsz *= size.p[i];
-    if( esz < step.p[0] || tsz != (uint64)(int)tsz )
+    ಆದರೆ( esz < ಹೆಜ್ಜೆ.p[0] || tsz != (uint64)(ಪೂರ್ಣಾಂಕ)tsz )
         flags &= ~CONTINUOUS_FLAG;
 }
 
 
-void Mat::reserve(size_t nelems)
+ಶೂನ್ಯ Mat::reserve(size_t nelems)
 {
-    const size_t MIN_SIZE = 64;
+    ಸ್ಥಿರಾಂಕ size_t MIN_ಗಾತ್ರ = 64;
 
-    CV_Assert( (int)nelems >= 0 );
-    if( !isSubmatrix() && step.p[0] != 0 && data + step.p[0]*nelems <= datalimit )
-        return;
+    CV_Assert( (ಪೂರ್ಣಾಂಕ)nelems >= 0 );
+    ಆದರೆ( !isSubmatrix() && ಹೆಜ್ಜೆ.p[0] != 0 && ದತ್ತಾಂಶ + ಹೆಜ್ಜೆ.p[0]*nelems <= datalimit )
+        ಹಿಂತಿರುಗಿ;
 
-    int r = size.p[0];
-    if( (size_t)r >= nelems)
-        return;
+    ಪೂರ್ಣಾಂಕ r = size.p[0];
+    ಆದರೆ( (size_t)r >= nelems)
+        ಹಿಂತಿರುಗಿ;
 
     MatShape newsize = size;
-    size_t esz = elemSize();
+    size_t esz = elem_ಗಾತ್ರ();
     newsize.dims = std::max(newsize.dims, 1);
-    if (dims > 1 && r == 0 && step.p[0] == 0) {
-        step.p[0] = size.p[1] * (dims == 2 ? esz : step.p[1]);
+    ಆದರೆ (dims > 1 && r == 0 && ಹೆಜ್ಜೆ.p[0] == 0) {
+        ಹೆಜ್ಜೆ.p[0] = size.p[1] * (dims == 2 ? esz : ಹೆಜ್ಜೆ.p[1]);
     }
-    newsize.p[0] = (int)nelems;
-    size_t newbytes = newsize.total() * esz;
-    if (newbytes < MIN_SIZE) {
+    newsize.p[0] = (ಪೂರ್ಣಾಂಕ)nelems;
+    size_t newbytes = newsize.ಒಟ್ಟು() * esz;
+    ಆದರೆ (newbytes < MIN_ಗಾತ್ರ) {
         newsize.p[0] = 1;
-        newsize.p[0] = int(MIN_SIZE / newsize.total() / esz);
+        newsize.p[0] = ಪೂರ್ಣಾಂಕ(MIN_ಗಾತ್ರ / newsize.ಒಟ್ಟು() / esz);
     }
 
     Mat m(newsize, type());
-    if( r > 0)
+    ಆದರೆ( r > 0)
     {
-        Mat mpart = m.rowRange(0, r);
-        copyTo(mpart);
+        Mat mpart = m.ಅಡ್ಡಸಾಲು_Range_2(0, r);
+        copy_ಗಮ್ಯ(mpart);
     }
 
-    *this = m;
+    *ಇದು = m;
     size.p[0] = r;
 
-    if (dims == 2)
-        rows = size.p[0];
-    else if (dims == 1)
-        cols = size.p[0];
-    dataend = data + step.p[0]*r;
+    ಆದರೆ (dims == 2)
+        ಅಡ್ಡಸಾಲುಗಳು = size.p[0];
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dims == 1)
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = size.p[0];
+    dataend = ದತ್ತಾಂಶ + ಹೆಜ್ಜೆ.p[0]*r;
 }
 
 
-void Mat::reserveBuffer(size_t nbytes)
+ಶೂನ್ಯ Mat::reserve_ಬಫರ್(size_t nbytes)
 {
     size_t esz = 1;
-    int mtype = CV_8UC1;
-    if (!empty())
+    ಪೂರ್ಣಾಂಕ mtype = CV_8UC1;
+    ಆದರೆ (!empty())
     {
-        if (!isSubmatrix() && data + nbytes <= dataend)//Should it be datalimit?
-            return;
-        esz = elemSize();
+        ಆದರೆ (!isSubmatrix() && ದತ್ತಾಂಶ + nbytes <= dataend)//Should it be datalimit?
+            ಹಿಂತಿರುಗಿ;
+        esz = elem_ಗಾತ್ರ();
         mtype = type();
     }
 
     size_t nelems = (nbytes - 1) / esz + 1;
 
-#if SIZE_MAX > UINT_MAX
-    CV_Assert(nelems <= size_t(INT_MAX)*size_t(INT_MAX));
-    int newrows = nelems > size_t(INT_MAX) ? nelems > 0x400*size_t(INT_MAX) ? nelems > 0x100000 * size_t(INT_MAX) ? nelems > 0x40000000 * size_t(INT_MAX) ?
-                  size_t(INT_MAX) : 0x40000000 : 0x100000 : 0x400 : 1;
-#else
-    int newrows = nelems > size_t(INT_MAX) ? 2 : 1;
-#endif
-    int newcols = (int)((nelems - 1) / newrows + 1);
+#ಆದರೆ SIZE_MAX > UINT_MAX
+    CV_Assert(nelems <= size_t(ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ)*size_t(ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ));
+    ಪೂರ್ಣಾಂಕ newrows = nelems > size_t(ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ) ? nelems > 0x400*size_t(ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ) ? nelems > 0x100000 * size_t(ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ) ? nelems > 0x40000000 * size_t(ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ) ?
+                  size_t(ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ) : 0x40000000 : 0x100000 : 0x400 : 1;
+#ಇಲ್ಲದಿದ್ದರೆ
+    ಪೂರ್ಣಾಂಕ newrows = nelems > size_t(ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ) ? 2 : 1;
+#ಆದರೆ_ಅಂತ್ಯ
+    ಪೂರ್ಣಾಂಕ newcols = (ಪೂರ್ಣಾಂಕ)((nelems - 1) / newrows + 1);
 
     create(newrows, newcols, mtype);
 }
 
 
-void Mat::resize(size_t nelems)
+ಶೂನ್ಯ Mat::resize(size_t nelems)
 {
-    int r = size.p[0];
-    if( r == (int)nelems )
-        return;
-    CV_Assert( (int)nelems >= 0 );
+    ಪೂರ್ಣಾಂಕ r = size.p[0];
+    ಆದರೆ( r == (ಪೂರ್ಣಾಂಕ)nelems )
+        ಹಿಂತಿರುಗಿ;
+    CV_Assert( (ಪೂರ್ಣಾಂಕ)nelems >= 0 );
 
-    if( isSubmatrix() || data + step.p[0]*nelems > datalimit )
+    ಆದರೆ( isSubmatrix() || ದತ್ತಾಂಶ + ಹೆಜ್ಜೆ.p[0]*nelems > datalimit )
         reserve(nelems);
 
-    size.p[0] = (int)nelems;
-    if (dims == 2)
-        rows = size.p[0];
-    else if (dims == 1)
-        cols = size.p[0];
-    dataend += (size.p[0] - r)*(int64_t)step.p[0];
+    size.p[0] = (ಪೂರ್ಣಾಂಕ)nelems;
+    ಆದರೆ (dims == 2)
+        ಅಡ್ಡಸಾಲುಗಳು = size.p[0];
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dims == 1)
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = size.p[0];
+    dataend += (size.p[0] - r)*(int64_t)ಹೆಜ್ಜೆ.p[0];
 
     //updateContinuityFlag(*this);
 }
 
 
-void Mat::resize(size_t nelems, const Scalar& s)
+ಶೂನ್ಯ Mat::resize(size_t nelems, ಸ್ಥಿರಾಂಕ Scalar& s)
 {
-    int saveRows = size.p[0];
+    ಪೂರ್ಣಾಂಕ save_ಅಡ್ಡಸಾಲುಗಳು = size.p[0];
     resize(nelems);
 
-    if( size.p[0] > saveRows )
+    ಆದರೆ( size.p[0] > save_ಅಡ್ಡಸಾಲುಗಳು )
     {
-        Mat part = rowRange(saveRows, size.p[0]);
+        Mat part = ಅಡ್ಡಸಾಲು_Range_2(save_ಅಡ್ಡಸಾಲುಗಳು, size.p[0]);
         part = s;
     }
 }
 
-void Mat::push_back(const Mat& elems)
+ಶೂನ್ಯ Mat::push_back(ಸ್ಥಿರಾಂಕ Mat& elems)
 {
     size_t r = size.p[0];
     size_t delta = elems.size.p[0];
-    if( delta == 0 )
-        return;
-    if( this == &elems )
+    ಆದರೆ( delta == 0 )
+        ಹಿಂತಿರುಗಿ;
+    ಆದರೆ( ಇದು == &elems )
     {
         Mat tmp = elems;
         push_back(tmp);
-        return;
+        ಹಿಂತಿರುಗಿ;
     }
-    if( !data )
+    ಆದರೆ( !ದತ್ತಾಂಶ )
     {
-        *this = elems.clone();
-        return;
+        *ಇದು = elems.clone();
+        ಹಿಂತಿರುಗಿ;
     }
     CV_Assert(dims > 0);
 
     size.p[0] = elems.size.p[0];
-    bool eq = size == elems.size;
-    size.p[0] = int(r);
-    if( !eq )
+    ತಾರ್ಕಿಕ eq = size == elems.size;
+    size.p[0] = ಪೂರ್ಣಾಂಕ(r);
+    ಆದರೆ( !eq )
         CV_Error(cv::Error::StsUnmatchedSizes, "Pushed vector length is not equal to matrix row length");
-    if( type() != elems.type() )
+    ಆದರೆ( type() != elems.type() )
         CV_Error(cv::Error::StsUnmatchedFormats, "Pushed vector type is not the same as matrix type");
-    size_t esz = elemSize();
-    size_t minstep = dims <= 1 ? esz : size.p[1] * (dims == 2 ? esz : step.p[1]);
-    size_t step0 = step.p[0];
-    if (step0 < minstep) {
-        if (size.p[0] <= 1)
-            step.p[0] = step0 = minstep;
+    size_t esz = elem_ಗಾತ್ರ();
+    size_t minstep = dims <= 1 ? esz : size.p[1] * (dims == 2 ? esz : ಹೆಜ್ಜೆ.p[1]);
+    size_t step0 = ಹೆಜ್ಜೆ.p[0];
+    ಆದರೆ (step0 < minstep) {
+        ಆದರೆ (size.p[0] <= 1)
+            ಹೆಜ್ಜೆ.p[0] = step0 = minstep;
     }
 
-    if( isSubmatrix() || dataend + step0*delta > datalimit )
+    ಆದರೆ( isSubmatrix() || dataend + step0*delta > datalimit )
         reserve( std::max(r + delta, (r*3+1)/2) );
 
-    size.p[0] += int(delta);
-    if (dims == 2)
-        rows = size.p[0];
-    else if (dims == 1)
-        cols = size.p[0];
+    size.p[0] += ಪೂರ್ಣಾಂಕ(delta);
+    ಆದರೆ (dims == 2)
+        ಅಡ್ಡಸಾಲುಗಳು = size.p[0];
+    ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (dims == 1)
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = size.p[0];
     dataend += step0*delta;
 
     //updateContinuityFlag(*this);
 
-    if( isContinuous() && elems.isContinuous() )
-        memcpy(data + r*step0, elems.data, elems.total()*elems.elemSize());
-    else
+    ಆದರೆ( isContinuous() && elems.isContinuous() )
+        ಸ್ಮರಣೆ_ನಕಲು(ದತ್ತಾಂಶ + r*step0, elems.ದತ್ತಾಂಶ, elems.ಒಟ್ಟು()*elems.elem_ಗಾತ್ರ());
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        Mat part = rowRange(int(r), int(r + delta));
-        elems.copyTo(part);
+        Mat part = ಅಡ್ಡಸಾಲು_Range_2(ಪೂರ್ಣಾಂಕ(r), ಪೂರ್ಣಾಂಕ(r + delta));
+        elems.copy_ಗಮ್ಯ(part);
     }
 }
 
 
-void Mat::locateROI( Size& wholeSize, Point& ofs ) const
+ಶೂನ್ಯ Mat::locateROI( ಗಾತ್ರ_2& ಸಂಪೂರ್ಣ_ಗಾತ್ರ, ಬಿಂದು& ofs ) ಸ್ಥಿರಾಂಕ
 {
-    CV_Assert( dims <= 2 && step[0] > 0 );
-    size_t esz = elemSize(), minstep;
-    ptrdiff_t delta1 = data - datastart, delta2 = dataend - datastart;
+    CV_Assert( dims <= 2 && ಹೆಜ್ಜೆ[0] > 0 );
+    size_t esz = elem_ಗಾತ್ರ(), minstep;
+    ptrdiff_t delta1 = ದತ್ತಾಂಶ - datastart, delta2 = dataend - datastart;
 
-    if( delta1 == 0 )
+    ಆದರೆ( delta1 == 0 )
         ofs.x = ofs.y = 0;
-    else
+    ಇಲ್ಲದಿದ್ದರೆ
     {
-        ofs.y = (int)(delta1/step[0]);
-        ofs.x = (int)((delta1 - step[0]*ofs.y)/esz);
-        CV_DbgAssert( data == datastart + ofs.y*step[0] + ofs.x*esz );
+        ofs.y = (ಪೂರ್ಣಾಂಕ)(delta1/ಹೆಜ್ಜೆ[0]);
+        ofs.x = (ಪೂರ್ಣಾಂಕ)((delta1 - ಹೆಜ್ಜೆ[0]*ofs.y)/esz);
+        CV_DbgAssert( ದತ್ತಾಂಶ == datastart + ofs.y*ಹೆಜ್ಜೆ[0] + ofs.x*esz );
     }
-    minstep = (ofs.x + cols)*esz;
-    wholeSize.height = (int)((delta2 - minstep)/step[0] + 1);
-    wholeSize.height = std::max(wholeSize.height, ofs.y + rows);
-    wholeSize.width = (int)((delta2 - step*(wholeSize.height-1))/esz);
-    wholeSize.width = std::max(wholeSize.width, ofs.x + cols);
+    minstep = (ofs.x + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ)*esz;
+    ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ = (ಪೂರ್ಣಾಂಕ)((delta2 - minstep)/ಹೆಜ್ಜೆ[0] + 1);
+    ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ = std::max(ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ, ofs.y + ಅಡ್ಡಸಾಲುಗಳು);
+    ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಅಗಲ = (ಪೂರ್ಣಾಂಕ)((delta2 - ಹೆಜ್ಜೆ*(ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ-1))/esz);
+    ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಅಗಲ = std::max(ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಅಗಲ, ofs.x + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ);
 }
 
-Mat& Mat::adjustROI( int dtop, int dbottom, int dleft, int dright )
+Mat& Mat::adjustROI( ಪೂರ್ಣಾಂಕ dtop, ಪೂರ್ಣಾಂಕ dbottom, ಪೂರ್ಣಾಂಕ dleft, ಪೂರ್ಣಾಂಕ dright )
 {
-    CV_Assert( dims <= 2 && step[0] > 0 );
-    Size wholeSize; Point ofs;
-    size_t esz = elemSize();
-    locateROI( wholeSize, ofs );
-    int row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
-    int col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
-    if(row1 > row2)
+    CV_Assert( dims <= 2 && ಹೆಜ್ಜೆ[0] > 0 );
+    ಗಾತ್ರ_2 ಸಂಪೂರ್ಣ_ಗಾತ್ರ; ಬಿಂದು ofs;
+    size_t esz = elem_ಗಾತ್ರ();
+    locateROI( ಸಂಪೂರ್ಣ_ಗಾತ್ರ, ofs );
+    ಪೂರ್ಣಾಂಕ row1 = std::min(std::max(ofs.y - dtop, 0), ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ), row2 = std::max(0, std::min(ofs.y + ಅಡ್ಡಸಾಲುಗಳು + dbottom, ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಎತ್ತರ));
+    ಪೂರ್ಣಾಂಕ col1 = std::min(std::max(ofs.x - dleft, 0), ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಅಗಲ), col2 = std::max(0, std::min(ofs.x + ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ + dright, ಸಂಪೂರ್ಣ_ಗಾತ್ರ.ಅಗಲ));
+    ಆದರೆ(row1 > row2)
         std::swap(row1, row2);
-    if(col1 > col2)
+    ಆದರೆ(col1 > col2)
         std::swap(col1, col2);
 
-    if (dims == 1) {
-        data += (col1 - ofs.x)*(std::ptrdiff_t)esz;
-        cols = col2 - col1;
-        size.p[0] = cols;
-    } else {
-        data += (row1 - ofs.y)*(std::ptrdiff_t)step + (col1 - ofs.x)*(std::ptrdiff_t)esz;
-        rows = row2 - row1; cols = col2 - col1;
-        size.p[0] = rows; size.p[1] = cols;
+    ಆದರೆ (dims == 1) {
+        ದತ್ತಾಂಶ += (col1 - ofs.x)*(std::ptrdiff_t)esz;
+        ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = col2 - col1;
+        size.p[0] = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+    } ಇಲ್ಲದಿದ್ದರೆ {
+        ದತ್ತಾಂಶ += (row1 - ofs.y)*(std::ptrdiff_t)ಹೆಜ್ಜೆ + (col1 - ofs.x)*(std::ptrdiff_t)esz;
+        ಅಡ್ಡಸಾಲುಗಳು = row2 - row1; ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = col2 - col1;
+        size.p[0] = ಅಡ್ಡಸಾಲುಗಳು; size.p[1] = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
         updateContinuityFlag();
     }
-    return *this;
+    ಹಿಂತಿರುಗಿ *ಇದು;
 }
 
-Mat Mat::reshape(int new_cn, int new_rows) const
+Mat Mat::reshape(ಪೂರ್ಣಾಂಕ new_cn, ಪೂರ್ಣಾಂಕ new_ಅಡ್ಡಸಾಲುಗಳು) ಸ್ಥಿರಾಂಕ
 {
-    int cn = channels();
-    Mat hdr = *this;
+    ಪೂರ್ಣಾಂಕ cn = channels();
+    Mat hdr = *ಇದು;
 
-    if( new_cn == 0 )
+    ಆದರೆ( new_cn == 0 )
         new_cn = cn;
 
-    if( dims > 2 )
+    ಆದರೆ( dims > 2 )
     {
-        if( new_rows == 0 )
+        ಆದರೆ( new_ಅಡ್ಡಸಾಲುಗಳು == 0 )
         {
             // special case: just change the number of channnels; retain the same shape,
             // except for the last, innermost dimension
             CV_Assert(size[dims-1]*cn % new_cn == 0);
-            hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-            hdr.step[dims-1] = CV_ELEM_SIZE(hdr.flags);
+            hdr.flags = (hdr.flags & ~CV_MAT_CN_ಮುಖವಾಡ) | ((new_cn-1) << CV_CN_ಸರಿಸು);
+            hdr.ಹೆಜ್ಜೆ[dims-1] = CV_ELEM_ಗಾತ್ರ(hdr.flags);
             hdr.size[dims-1] = hdr.size[dims-1]*cn / new_cn;
-            return hdr;
+            ಹಿಂತಿರುಗಿ hdr;
         }
-        CV_Assert( new_rows > 0 );
-        int sz[] = { new_rows, (int)(total()*cn/new_rows) };
-        return reshape(new_cn, 2, sz);
+        CV_Assert( new_ಅಡ್ಡಸಾಲುಗಳು > 0 );
+        ಪೂರ್ಣಾಂಕ sz[] = { new_ಅಡ್ಡಸಾಲುಗಳು, (ಪೂರ್ಣಾಂಕ)(ಒಟ್ಟು()*cn/new_ಅಡ್ಡಸಾಲುಗಳು) };
+        ಹಿಂತಿರುಗಿ reshape(new_cn, 2, sz);
     }
 
-    int total_width = cols * cn;
+    ಪೂರ್ಣಾಂಕ ಒಟ್ಟು_ಅಗಲ = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * cn;
 
-    if( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
-        new_rows = rows * total_width / new_cn;
+    ಆದರೆ( (new_cn > ಒಟ್ಟು_ಅಗಲ || ಒಟ್ಟು_ಅಗಲ % new_cn != 0) && new_ಅಡ್ಡಸಾಲುಗಳು == 0 )
+        new_ಅಡ್ಡಸಾಲುಗಳು = ಅಡ್ಡಸಾಲುಗಳು * ಒಟ್ಟು_ಅಗಲ / new_cn;
 
-    if( new_rows != 0 && new_rows != rows )
+    ಆದರೆ( new_ಅಡ್ಡಸಾಲುಗಳು != 0 && new_ಅಡ್ಡಸಾಲುಗಳು != ಅಡ್ಡಸಾಲುಗಳು )
     {
-        int total_size = total_width * rows;
-        if( !isContinuous() )
-            CV_Error( cv::Error::BadStep,
+        ಪೂರ್ಣಾಂಕ ಒಟ್ಟು_ಗಾತ್ರ_2 = ಒಟ್ಟು_ಅಗಲ * ಅಡ್ಡಸಾಲುಗಳು;
+        ಆದರೆ( !isContinuous() )
+            CV_Error( cv::Error::Bad_ಹೆಜ್ಜೆ,
             "The matrix is not continuous, thus its number of rows can not be changed" );
 
-        total_width = total_size / new_rows;
+        ಒಟ್ಟು_ಅಗಲ = ಒಟ್ಟು_ಗಾತ್ರ_2 / new_ಅಡ್ಡಸಾಲುಗಳು;
 
-        if( total_width * new_rows != total_size )
+        ಆದರೆ( ಒಟ್ಟು_ಅಗಲ * new_ಅಡ್ಡಸಾಲುಗಳು != ಒಟ್ಟು_ಗಾತ್ರ_2 )
             CV_Error( cv::Error::StsBadArg, "The total number of matrix elements "
                                     "is not divisible by the new number of rows" );
 
-        hdr.size[0] = hdr.rows = new_rows;
-        hdr.step[0] = total_width * elemSize1();
-    } else {
-        hdr.size[0] = hdr.rows = rows;
-        if (dims <= 1)
-            hdr.step[0] = cols * CV_ELEM_SIZE(flags);
+        hdr.size[0] = hdr.ಅಡ್ಡಸಾಲುಗಳು = new_ಅಡ್ಡಸಾಲುಗಳು;
+        hdr.ಹೆಜ್ಜೆ[0] = ಒಟ್ಟು_ಅಗಲ * elemSize1();
+    } ಇಲ್ಲದಿದ್ದರೆ {
+        hdr.size[0] = hdr.ಅಡ್ಡಸಾಲುಗಳು = ಅಡ್ಡಸಾಲುಗಳು;
+        ಆದರೆ (dims <= 1)
+            hdr.ಹೆಜ್ಜೆ[0] = ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * CV_ELEM_ಗಾತ್ರ(flags);
     }
 
-    int new_width = total_width / new_cn;
+    ಪೂರ್ಣಾಂಕ new_ಅಗಲ = ಒಟ್ಟು_ಅಗಲ / new_cn;
 
-    if( new_width * new_cn != total_width )
-        CV_Error( cv::Error::BadNumChannels,
+    ಆದರೆ( new_ಅಗಲ * new_cn != ಒಟ್ಟು_ಅಗಲ )
+        CV_Error( cv::Error::Bad_ಅಂಕೆ_Channels,
         "The total width is not divisible by the new number of channels" );
 
     hdr.size.dims = hdr.dims = 2;
-    hdr.size[1] = hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-    hdr.step[1] = CV_ELEM_SIZE(hdr.flags);
-    return hdr;
+    hdr.size[1] = hdr.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ = new_ಅಗಲ;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_ಮುಖವಾಡ) | ((new_cn-1) << CV_CN_ಸರಿಸು);
+    hdr.ಹೆಜ್ಜೆ[1] = CV_ELEM_ಗಾತ್ರ(hdr.flags);
+    ಹಿಂತಿರುಗಿ hdr;
 }
 
-Mat Mat::reshape(int _cn, int _newndims, const int* _newsz) const
+Mat Mat::reshape(ಪೂರ್ಣಾಂಕ _cn, ಪೂರ್ಣಾಂಕ _newndims, ಸ್ಥಿರಾಂಕ ಪೂರ್ಣಾಂಕ* _newsz) ಸ್ಥಿರಾಂಕ
 {
-    if(_newndims == dims)
+    ಆದರೆ(_newndims == dims)
     {
-        if(_newsz == 0)
-            return reshape(_cn);
-        if(_newndims == 2)
-            return reshape(_cn, _newsz[0]);
+        ಆದರೆ(_newsz == 0)
+            ಹಿಂತಿರುಗಿ reshape(_cn);
+        ಆದರೆ(_newndims == 2)
+            ಹಿಂತಿರುಗಿ reshape(_cn, _newsz[0]);
     }
 
-    if (isContinuous())
+    ಆದರೆ (isContinuous())
     {
         CV_Assert(_cn >= 0 && _newndims >= 0 && _newndims <= CV_MAX_DIM && (_newndims == 0 || _newsz != 0));
 
-        if (_cn == 0)
-            _cn = this->channels();
-        else
+        ಆದರೆ (_cn == 0)
+            _cn = ಇದು->channels();
+        ಇಲ್ಲದಿದ್ದರೆ
             CV_Assert(_cn <= CV_CN_MAX);
 
-        size_t total_elem1_ref = this->total() * this->channels();
-        size_t total_elem1 = _cn;
+        size_t ಒಟ್ಟು_elem1_ref = ಇದು->ಒಟ್ಟು() * ಇದು->channels();
+        size_t ಒಟ್ಟು_elem1 = _cn;
 
-        AutoBuffer<int, 4> newsz_buf( (size_t)_newndims );
+        Auto_ಬಫರ್<ಪೂರ್ಣಾಂಕ, 4> newsz_buf( (size_t)_newndims );
 
-        int m1_idx = -1;
+        ಪೂರ್ಣಾಂಕ m1_idx = -1;
 
-        for (int i = 0; i < _newndims; i++)
+        ಗಾಗಿ (ಪೂರ್ಣಾಂಕ i = 0; i < _newndims; i++)
         {
-            if (_newsz[i] >= 0) {
-                if (_newsz[i] == 0 && i < dims)
+            ಆದರೆ (_newsz[i] >= 0) {
+                ಆದರೆ (_newsz[i] == 0 && i < dims)
                     newsz_buf[i] = size.p[i];
-                else
+                ಇಲ್ಲದಿದ್ದರೆ
                     newsz_buf[i] = _newsz[i];
-                total_elem1 *= (size_t)newsz_buf[i];
-            } else {
-                if (m1_idx >= 0)
-                    CV_Error(cv::Error::StsBadSize, "More than one '-1' occured in the new shape");
+                ಒಟ್ಟು_elem1 *= (size_t)newsz_buf[i];
+            } ಇಲ್ಲದಿದ್ದರೆ {
+                ಆದರೆ (m1_idx >= 0)
+                    CV_Error(cv::Error::Sts_Bad_ಗಾತ್ರ, "More than one '-1' occured in the new shape");
                 m1_idx = i;
             }
         }
 
-        if (m1_idx >= 0) {
-            if (total_elem1 == 0) {
-                CV_Assert(total_elem1_ref == 0);
-                total_elem1 = 1;
+        ಆದರೆ (m1_idx >= 0) {
+            ಆದರೆ (ಒಟ್ಟು_elem1 == 0) {
+                CV_Assert(ಒಟ್ಟು_elem1_ref == 0);
+                ಒಟ್ಟು_elem1 = 1;
             }
-            CV_Assert(total_elem1_ref % total_elem1 == 0);
-            newsz_buf[m1_idx] = (int)(total_elem1_ref / total_elem1);
-        } else if (total_elem1 != total_elem1_ref) {
+            CV_Assert(ಒಟ್ಟು_elem1_ref % ಒಟ್ಟು_elem1 == 0);
+            newsz_buf[m1_idx] = (ಪೂರ್ಣಾಂಕ)(ಒಟ್ಟು_elem1_ref / ಒಟ್ಟು_elem1);
+        } ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (ಒಟ್ಟು_elem1 != ಒಟ್ಟು_elem1_ref) {
             CV_Error(cv::Error::StsUnmatchedSizes, "Requested and source matrices have different count of elements");
         }
 
-        Mat hdr = *this;
-        hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((_cn-1) << CV_CN_SHIFT);
-        setSize(hdr, _newndims, newsz_buf.data(), NULL, true);
+        Mat hdr = *ಇದು;
+        hdr.flags = (hdr.flags & ~CV_MAT_CN_ಮುಖವಾಡ) | ((_cn-1) << CV_CN_ಸರಿಸು);
+        ಗಣ_ಗಾತ್ರ(hdr, _newndims, newsz_buf.ದತ್ತಾಂಶ(), ಖಾಲಿ, ನಿಜ);
 
-        return hdr;
+        ಹಿಂತಿರುಗಿ hdr;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "Reshaping of n-dimensional non-continuous matrices is not supported yet");
     // TBD
 }
 
-Mat Mat::reshape(int _cn, const std::vector<int>& _newshape) const
+Mat Mat::reshape(ಪೂರ್ಣಾಂಕ _cn, ಸ್ಥಿರಾಂಕ std::vector<ಪೂರ್ಣಾಂಕ>& _newshape) ಸ್ಥಿರಾಂಕ
 {
-    int newdims = (int)_newshape.size();
-    if(newdims == 0 && empty())
+    ಪೂರ್ಣಾಂಕ newdims = (ಪೂರ್ಣಾಂಕ)_newshape.size();
+    ಆದರೆ(newdims == 0 && empty())
     {
-        return *this;
+        ಹಿಂತಿರುಗಿ *ಇದು;
     }
 
-    return reshape(_cn, newdims, newdims > 0 ? &_newshape[0] : 0);
+    ಹಿಂತಿರುಗಿ reshape(_cn, newdims, newdims > 0 ? &_newshape[0] : 0);
 }
 
-Mat Mat::reshape(int _cn, const MatShape& _newshape) const
+Mat Mat::reshape(ಪೂರ್ಣಾಂಕ _cn, ಸ್ಥಿರಾಂಕ MatShape& _newshape) ಸ್ಥಿರಾಂಕ
 {
-    if (_newshape.dims < 0) {
-        int newshape[] = {0};
-        return reshape(_cn, 1, newshape);
+    ಆದರೆ (_newshape.dims < 0) {
+        ಪೂರ್ಣಾಂಕ newshape[] = {0};
+        ಹಿಂತಿರುಗಿ reshape(_cn, 1, newshape);
     }
-    return reshape(_cn, _newshape.dims, _newshape.p);
+    ಹಿಂತಿರುಗಿ reshape(_cn, _newshape.dims, _newshape.p);
 }
 
-Mat Mat::reshape(int _cn, std::initializer_list<int> newshape_) const
+Mat Mat::reshape(ಪೂರ್ಣಾಂಕ _cn, std::initializer_list<ಪೂರ್ಣಾಂಕ> newshape_) ಸ್ಥಿರಾಂಕ
 {
-    int newshape[MatShape::MAX_DIMS];
+    ಪೂರ್ಣಾಂಕ newshape[MatShape::MAX_DIMS];
     size_t i, newshape_dims = newshape_.size();
     CV_Assert(newshape_dims <= (size_t)MatShape::MAX_DIMS);
-    auto it = newshape_.begin();
-    for (i = 0; i < newshape_dims; i++, ++it)
+    ಸ್ವಯಂಚಾಲಿತ it = newshape_.begin();
+    ಗಾಗಿ (i = 0; i < newshape_dims; i++, ++it)
         newshape[i] = *it;
-    return reshape(_cn, (int)newshape_dims, newshape);
+    ಹಿಂತಿರುಗಿ reshape(_cn, (ಪೂರ್ಣಾಂಕ)newshape_dims, newshape);
 }
 
-Mat Mat::reinterpret(int type) const
+Mat Mat::reinterpret(ಪೂರ್ಣಾಂಕ type) ಸ್ಥಿರಾಂಕ
 {
     type = CV_MAT_TYPE(type);
-    CV_Assert(CV_ELEM_SIZE(this->type()) == CV_ELEM_SIZE(type));
-    Mat m = *this;
-    m.flags = (m.flags & ~CV_MAT_TYPE_MASK) | type;
+    CV_Assert(CV_ELEM_ಗಾತ್ರ(ಇದು->type()) == CV_ELEM_ಗಾತ್ರ(type));
+    Mat m = *ಇದು;
+    m.flags = (m.flags & ~CV_MAT_TYPE_ಮುಖವಾಡ) | type;
     m.updateContinuityFlag();
-    return m;
+    ಹಿಂತಿರುಗಿ m;
 }
 
-Mat Mat::diag(const Mat& d)
+Mat Mat::diag(ಸ್ಥಿರಾಂಕ Mat& d)
 {
-    CV_Assert( d.cols == 1 || d.rows == 1 );
-    int len = d.rows + d.cols - 1;
+    CV_Assert( d.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 || d.ಅಡ್ಡಸಾಲುಗಳು == 1 );
+    ಪೂರ್ಣಾಂಕ len = d.ಅಡ್ಡಸಾಲುಗಳು + d.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ - 1;
     Mat m(len, len, d.type(), Scalar(0));
     Mat md = m.diag();
-    if( d.cols == 1 )
-        d.copyTo(md);
-    else
+    ಆದರೆ( d.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 )
+        d.copy_ಗಮ್ಯ(md);
+    ಇಲ್ಲದಿದ್ದರೆ
         transpose(d, md);
-    return m;
+    ಹಿಂತಿರುಗಿ m;
 }
 
-int Mat::checkVector(int _elemChannels, int _depth, bool _requireContinuous) const
+ಪೂರ್ಣಾಂಕ Mat::check_ಸದಿಶ(ಪೂರ್ಣಾಂಕ _elemChannels, ಪೂರ್ಣಾಂಕ ಆಳ_2, ತಾರ್ಕಿಕ _requireContinuous) ಸ್ಥಿರಾಂಕ
 {
-    return data && (depth() == _depth || _depth <= 0) &&
+    ಹಿಂತಿರುಗಿ ದತ್ತಾಂಶ && (ಆಳ() == ಆಳ_2 || ಆಳ_2 <= 0) &&
         (isContinuous() || !_requireContinuous) &&
-        ((dims <= 2 && (((rows == 1 || cols == 1) && channels() == _elemChannels) ||
-                        (cols == _elemChannels && channels() == 1))) ||
+        ((dims <= 2 && (((ಅಡ್ಡಸಾಲುಗಳು == 1 || ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1) && channels() == _elemChannels) ||
+                        (ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == _elemChannels && channels() == 1))) ||
         (dims == 3 && channels() == 1 && size.p[2] == _elemChannels && (size.p[0] == 1 || size.p[1] == 1) &&
-         (isContinuous() || step.p[1] == step.p[2]*size.p[2])))
-    ? (int)(total()*channels()/_elemChannels) : -1;
+         (isContinuous() || ಹೆಜ್ಜೆ.p[1] == ಹೆಜ್ಜೆ.p[2]*size.p[2])))
+    ? (ಪೂರ್ಣಾಂಕ)(ಒಟ್ಟು()*channels()/_elemChannels) : -1;
 }
 
 
-static inline Size getContinuousSize_(int flags, int cols, int rows, int widthScale)
+ಸ್ಥಿರ ಸಾಲೊಳಗೆ ಗಾತ್ರ_2 get_Continuous_ಗಾತ್ರ(ಪೂರ್ಣಾಂಕ flags, ಪೂರ್ಣಾಂಕ ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಪೂರ್ಣಾಂಕ ಅಡ್ಡಸಾಲುಗಳು, ಪೂರ್ಣಾಂಕ ಅಗಲ_Scale)
 {
-    int64 sz = (int64)cols * rows * widthScale;
-    bool has_int_overflow = sz >= INT_MAX;
-    bool isContiguous = (flags & Mat::CONTINUOUS_FLAG) != 0;
-    return (isContiguous && !has_int_overflow)
-            ? Size((int)sz, 1)
-            : Size(cols * widthScale, rows);
+    int64 sz = (int64)ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * ಅಡ್ಡಸಾಲುಗಳು * ಅಗಲ_Scale;
+    ತಾರ್ಕಿಕ has_int_ಅತಿಪ್ರವಾಹ = sz >= ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ;
+    ತಾರ್ಕಿಕ isContiguous = (flags & Mat::CONTINUOUS_FLAG) != 0;
+    ಹಿಂತಿರುಗಿ (isContiguous && !has_int_ಅತಿಪ್ರವಾಹ)
+            ? ಗಾತ್ರ_2((ಪೂರ್ಣಾಂಕ)sz, 1)
+            : ಗಾತ್ರ_2(ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * ಅಗಲ_Scale, ಅಡ್ಡಸಾಲುಗಳು);
 }
 
-Size getContinuousSize2D(Mat& m1, int widthScale)
+ಗಾತ್ರ_2 getContinuousSize2D(Mat& m1, ಪೂರ್ಣಾಂಕ ಅಗಲ_Scale)
 {
     CV_CheckLE(m1.dims, 2, "");
-    return getContinuousSize_(m1.flags,
-                              m1.cols, m1.rows, widthScale);
+    ಹಿಂತಿರುಗಿ get_Continuous_ಗಾತ್ರ(m1.flags,
+                              m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, m1.ಅಡ್ಡಸಾಲುಗಳು, ಅಗಲ_Scale);
 }
-Size getContinuousSize2D(Mat& m1, Mat& m2, int widthScale)
+ಗಾತ್ರ_2 getContinuousSize2D(Mat& m1, Mat& m2, ಪೂರ್ಣಾಂಕ ಅಗಲ_Scale)
 {
     CV_CheckLE(m1.dims, 2, "");
     CV_CheckLE(m2.dims, 2, "");
-    const Size sz1 = m1.size();
-    if (sz1 != m2.size())  // reshape all matrixes to the same size (#4159)
+    ಸ್ಥಿರಾಂಕ ಗಾತ್ರ_2 sz1 = m1.size();
+    ಆದರೆ (sz1 != m2.size())  // reshape all matrixes to the same size (#4159)
     {
-        size_t total_sz = m1.total();
-        CV_CheckEQ(total_sz, m2.total(), "");
-        bool is_m1_vector = m1.cols == 1 || m1.rows == 1;
-        bool is_m2_vector = m2.cols == 1 || m2.rows == 1;
-        CV_Assert(is_m1_vector); CV_Assert(is_m2_vector);
-        int total = (int)total_sz;  // vector-column
-        bool isContiguous = ((m1.flags & m2.flags) & Mat::CONTINUOUS_FLAG) != 0;
-        bool has_int_overflow = ((int64)total_sz * widthScale) >= INT_MAX;
-        if (isContiguous && !has_int_overflow)
-            total = 1; // vector-row
-        m1 = m1.reshape(0, total);
-        m2 = m2.reshape(0, total);
-        CV_Assert(m1.cols == m2.cols && m1.rows == m2.rows);
-        return Size(m1.cols * widthScale, m1.rows);
+        size_t ಒಟ್ಟು_sz = m1.ಒಟ್ಟು();
+        CV_CheckEQ(ಒಟ್ಟು_sz, m2.ಒಟ್ಟು(), "");
+        ತಾರ್ಕಿಕ is_m1_ಸದಿಶ = m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 || m1.ಅಡ್ಡಸಾಲುಗಳು == 1;
+        ತಾರ್ಕಿಕ is_m2_ಸದಿಶ = m2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 || m2.ಅಡ್ಡಸಾಲುಗಳು == 1;
+        CV_Assert(is_m1_ಸದಿಶ); CV_Assert(is_m2_ಸದಿಶ);
+        ಪೂರ್ಣಾಂಕ ಒಟ್ಟು = (ಪೂರ್ಣಾಂಕ)ಒಟ್ಟು_sz;  // vector-column
+        ತಾರ್ಕಿಕ isContiguous = ((m1.flags & m2.flags) & Mat::CONTINUOUS_FLAG) != 0;
+        ತಾರ್ಕಿಕ has_int_ಅತಿಪ್ರವಾಹ = ((int64)ಒಟ್ಟು_sz * ಅಗಲ_Scale) >= ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ;
+        ಆದರೆ (isContiguous && !has_int_ಅತಿಪ್ರವಾಹ)
+            ಒಟ್ಟು = 1; // vector-row
+        m1 = m1.reshape(0, ಒಟ್ಟು);
+        m2 = m2.reshape(0, ಒಟ್ಟು);
+        CV_Assert(m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == m2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ && m1.ಅಡ್ಡಸಾಲುಗಳು == m2.ಅಡ್ಡಸಾಲುಗಳು);
+        ಹಿಂತಿರುಗಿ ಗಾತ್ರ_2(m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * ಅಗಲ_Scale, m1.ಅಡ್ಡಸಾಲುಗಳು);
     }
-    return getContinuousSize_(m1.flags & m2.flags,
-                              m1.cols, m1.rows, widthScale);
+    ಹಿಂತಿರುಗಿ get_Continuous_ಗಾತ್ರ(m1.flags & m2.flags,
+                              m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, m1.ಅಡ್ಡಸಾಲುಗಳು, ಅಗಲ_Scale);
 }
 
-Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, int widthScale)
+ಗಾತ್ರ_2 getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, ಪೂರ್ಣಾಂಕ ಅಗಲ_Scale)
 {
     CV_CheckLE(m1.dims, 2, "");
     CV_CheckLE(m2.dims, 2, "");
     CV_CheckLE(m3.dims, 2, "");
-    const Size sz1 = m1.size();
-    if (sz1 != m2.size() || sz1 != m3.size())  // reshape all matrixes to the same size (#4159)
+    ಸ್ಥಿರಾಂಕ ಗಾತ್ರ_2 sz1 = m1.size();
+    ಆದರೆ (sz1 != m2.size() || sz1 != m3.size())  // reshape all matrixes to the same size (#4159)
     {
-        size_t total_sz = m1.total();
-        CV_CheckEQ(total_sz, m2.total(), "");
-        CV_CheckEQ(total_sz, m3.total(), "");
-        bool is_m1_vector = m1.cols == 1 || m1.rows == 1;
-        bool is_m2_vector = m2.cols == 1 || m2.rows == 1;
-        bool is_m3_vector = m3.cols == 1 || m3.rows == 1;
-        CV_Assert(is_m1_vector); CV_Assert(is_m2_vector); CV_Assert(is_m3_vector);
-        int total = (int)total_sz;  // vector-column
-        bool isContiguous = ((m1.flags & m2.flags & m3.flags) & Mat::CONTINUOUS_FLAG) != 0;
-        bool has_int_overflow = ((int64)total_sz * widthScale) >= INT_MAX;
-        if (isContiguous && !has_int_overflow)
-            total = 1; // vector-row
-        m1 = m1.reshape(0, total);
-        m2 = m2.reshape(0, total);
-        m3 = m3.reshape(0, total);
-        CV_Assert(m1.cols == m2.cols && m1.rows == m2.rows && m1.cols == m3.cols && m1.rows == m3.rows);
-        return Size(m1.cols * widthScale, m1.rows);
+        size_t ಒಟ್ಟು_sz = m1.ಒಟ್ಟು();
+        CV_CheckEQ(ಒಟ್ಟು_sz, m2.ಒಟ್ಟು(), "");
+        CV_CheckEQ(ಒಟ್ಟು_sz, m3.ಒಟ್ಟು(), "");
+        ತಾರ್ಕಿಕ is_m1_ಸದಿಶ = m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 || m1.ಅಡ್ಡಸಾಲುಗಳು == 1;
+        ತಾರ್ಕಿಕ is_m2_ಸದಿಶ = m2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 || m2.ಅಡ್ಡಸಾಲುಗಳು == 1;
+        ತಾರ್ಕಿಕ is_m3_ಸದಿಶ = m3.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 || m3.ಅಡ್ಡಸಾಲುಗಳು == 1;
+        CV_Assert(is_m1_ಸದಿಶ); CV_Assert(is_m2_ಸದಿಶ); CV_Assert(is_m3_ಸದಿಶ);
+        ಪೂರ್ಣಾಂಕ ಒಟ್ಟು = (ಪೂರ್ಣಾಂಕ)ಒಟ್ಟು_sz;  // vector-column
+        ತಾರ್ಕಿಕ isContiguous = ((m1.flags & m2.flags & m3.flags) & Mat::CONTINUOUS_FLAG) != 0;
+        ತಾರ್ಕಿಕ has_int_ಅತಿಪ್ರವಾಹ = ((int64)ಒಟ್ಟು_sz * ಅಗಲ_Scale) >= ಗರಿಷ್ಠ_ಪೂರ್ಣಾಂಕ;
+        ಆದರೆ (isContiguous && !has_int_ಅತಿಪ್ರವಾಹ)
+            ಒಟ್ಟು = 1; // vector-row
+        m1 = m1.reshape(0, ಒಟ್ಟು);
+        m2 = m2.reshape(0, ಒಟ್ಟು);
+        m3 = m3.reshape(0, ಒಟ್ಟು);
+        CV_Assert(m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == m2.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ && m1.ಅಡ್ಡಸಾಲುಗಳು == m2.ಅಡ್ಡಸಾಲುಗಳು && m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == m3.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ && m1.ಅಡ್ಡಸಾಲುಗಳು == m3.ಅಡ್ಡಸಾಲುಗಳು);
+        ಹಿಂತಿರುಗಿ ಗಾತ್ರ_2(m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ * ಅಗಲ_Scale, m1.ಅಡ್ಡಸಾಲುಗಳು);
     }
-    return getContinuousSize_(m1.flags & m2.flags & m3.flags,
-                              m1.cols, m1.rows, widthScale);
+    ಹಿಂತಿರುಗಿ get_Continuous_ಗಾತ್ರ(m1.flags & m2.flags & m3.flags,
+                              m1.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, m1.ಅಡ್ಡಸಾಲುಗಳು, ಅಗಲ_Scale);
 }
 
 } // cv::

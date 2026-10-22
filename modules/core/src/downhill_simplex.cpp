@@ -38,15 +38,15 @@
 // the use of this software, even if advised of the possibility of such damage.
 //
 //M*/
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-#if 0
-#define dprintf(x) printf x
-#define print_matrix(x) print(x)
-#else
-#define dprintf(x)
-#define print_matrix(x)
-#endif
+#ಆದರೆ 0
+#ವ್ಯಾಖ್ಯಾನಿಸು dprintf(x) ಬರೆ x
+#ವ್ಯಾಖ್ಯಾನಿಸು print_ಮಾತೃಕೆ(x) print(x)
+#ಇಲ್ಲದಿದ್ದರೆ
+#ವ್ಯಾಖ್ಯಾನಿಸು dprintf(x)
+#ವ್ಯಾಖ್ಯಾನಿಸು print_ಮಾತೃಕೆ(x)
+#ಆದರೆ_ಅಂತ್ಯ
 
 /*
 
@@ -137,129 +137,129 @@ multiple lines in three dimensions as not all lines intersect in three dimension
 
 */
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-class DownhillSolverImpl CV_FINAL : public DownhillSolver
+ವರ್ಗ DownhillSolverImpl CV_FINAL : ಸಾರ್ವಜನಿಕ DownhillSolver
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     DownhillSolverImpl()
     {
         _Function=Ptr<Function>();
-        _step=Mat_<double>();
+        ಹೆಜ್ಜೆ_3=Mat_<ದ್ವಿಗುಣ>();
     }
 
-    void getInitStep(OutputArray step) const CV_OVERRIDE { _step.copyTo(step); }
-    void setInitStep(InputArray step) CV_OVERRIDE
+    ಶೂನ್ಯ get_Init_ಹೆಜ್ಜೆ(OutputArray ಹೆಜ್ಜೆ) ಸ್ಥಿರಾಂಕ CV_OVERRIDE { ಹೆಜ್ಜೆ_3.copy_ಗಮ್ಯ(ಹೆಜ್ಜೆ); }
+    ಶೂನ್ಯ ಗಣ_Init_ಹೆಜ್ಜೆ(ಒಳಹರಿವು_Array ಹೆಜ್ಜೆ) CV_OVERRIDE
     {
         // set dimensionality and make a deep copy of step
-        Mat m = step.getMat();
-        dprintf(("m.cols=%d\nm.rows=%d\n", m.cols, m.rows));
-        if( m.rows == 1 )
-            m.copyTo(_step);
-        else
-            transpose(m, _step);
+        Mat m = ಹೆಜ್ಜೆ.getMat();
+        dprintf(("m.cols=%d\nm.rows=%d\n", m.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, m.ಅಡ್ಡಸಾಲುಗಳು));
+        ಆದರೆ( m.ಅಡ್ಡಸಾಲುಗಳು == 1 )
+            m.copy_ಗಮ್ಯ(ಹೆಜ್ಜೆ_3);
+        ಇಲ್ಲದಿದ್ದರೆ
+            transpose(m, ಹೆಜ್ಜೆ_3);
     }
 
-    Ptr<MinProblemSolver::Function> getFunction() const CV_OVERRIDE { return _Function; }
+    Ptr<MinProblemSolver::Function> getFunction() ಸ್ಥಿರಾಂಕ CV_OVERRIDE { ಹಿಂತಿರುಗಿ _Function; }
 
-    void setFunction(const Ptr<Function>& f) CV_OVERRIDE { _Function=f; }
+    ಶೂನ್ಯ ಗಣ_Function(ಸ್ಥಿರಾಂಕ Ptr<Function>& f) CV_OVERRIDE { _Function=f; }
 
-    TermCriteria getTermCriteria() const CV_OVERRIDE { return _termcrit; }
+    ಪದ_Criteria get_ಪದ_Criteria() ಸ್ಥಿರಾಂಕ CV_OVERRIDE { ಹಿಂತಿರುಗಿ _termcrit; }
 
-    void setTermCriteria( const TermCriteria& termcrit ) CV_OVERRIDE
+    ಶೂನ್ಯ ಗಣ_ಪದ_Criteria( ಸ್ಥಿರಾಂಕ ಪದ_Criteria& termcrit ) CV_OVERRIDE
     {
-        CV_Assert( termcrit.type == (TermCriteria::MAX_ITER + TermCriteria::EPS) &&
+        CV_Assert( termcrit.type == (ಪದ_Criteria::MAX_ITER + ಪದ_Criteria::EPS) &&
                    termcrit.epsilon > 0 &&
-                   termcrit.maxCount > 0 );
+                   termcrit.max_ಎಣಿಕೆ > 0 );
         _termcrit=termcrit;
     }
 
-    double minimize( InputOutputArray x_ ) CV_OVERRIDE
+    ದ್ವಿಗುಣ minimize( ಒಳಹರಿವು_Output_Array x_ ) CV_OVERRIDE
     {
         dprintf(("hi from minimize\n"));
         CV_Assert( !_Function.empty() );
-        CV_Assert( std::min(_step.cols, _step.rows) == 1 &&
-                  std::max(_step.cols, _step.rows) >= 2 &&
-                  _step.type() == CV_64FC1 );
-        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.maxCount,_termcrit.epsilon));
+        CV_Assert( std::min(ಹೆಜ್ಜೆ_3.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಹೆಜ್ಜೆ_3.ಅಡ್ಡಸಾಲುಗಳು) == 1 &&
+                  std::max(ಹೆಜ್ಜೆ_3.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, ಹೆಜ್ಜೆ_3.ಅಡ್ಡಸಾಲುಗಳು) >= 2 &&
+                  ಹೆಜ್ಜೆ_3.type() == CV_64FC1 );
+        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.max_ಎಣಿಕೆ,_termcrit.epsilon));
         dprintf(("step\n"));
-        print_matrix(_step);
+        print_ಮಾತೃಕೆ(ಹೆಜ್ಜೆ_3);
 
         Mat x = x_.getMat(), simplex;
 
-        createInitialSimplex(x, simplex, _step);
-        int count = 0;
-        double res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
-                                          count, _termcrit.maxCount);
-        dprintf(("%d iterations done\n",count));
+        createInitialSimplex(x, simplex, ಹೆಜ್ಜೆ_3);
+        ಪೂರ್ಣಾಂಕ ಎಣಿಕೆ_3 = 0;
+        ದ್ವಿಗುಣ res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
+                                          ಎಣಿಕೆ_3, _termcrit.max_ಎಣಿಕೆ);
+        dprintf(("%d iterations done\n",ಎಣಿಕೆ_3));
 
-        if( !x.empty() )
+        ಆದರೆ( !x.empty() )
         {
-            Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<double>());
-            simplex_0m.convertTo(x, x.type());
+            Mat simplex_0m(x.ಅಡ್ಡಸಾಲುಗಳು, x.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, CV_64F, simplex.ptr<ದ್ವಿಗುಣ>());
+            simplex_0m.convert_ಗಮ್ಯ(x, x.type());
         }
-        else
+        ಇಲ್ಲದಿದ್ದರೆ
         {
-            int x_type = x_.fixedType() ? x_.type() : CV_64F;
-            simplex.row(0).convertTo(x_, x_type);
+            ಪೂರ್ಣಾಂಕ x_type = x_.fixedType() ? x_.type() : CV_64F;
+            simplex.ಅಡ್ಡಸಾಲು(0).convert_ಗಮ್ಯ(x_, x_type);
         }
-        return res;
+        ಹಿಂತಿರುಗಿ res;
     }
-protected:
+ಸಂರಕ್ಷಿತ:
     Ptr<MinProblemSolver::Function> _Function;
-    TermCriteria _termcrit;
-    Mat _step;
+    ಪದ_Criteria _termcrit;
+    Mat ಹೆಜ್ಜೆ_3;
 
-    inline void updateCoordSum(const Mat& p, Mat& coord_sum)
+    ಸಾಲೊಳಗೆ ಶೂನ್ಯ update_Coord_ಮೊತ್ತ(ಸ್ಥಿರಾಂಕ Mat& p, Mat& coord_ಮೊತ್ತ)
     {
-        int i, j, m = p.rows, n = p.cols;
-        double* coord_sum_ = coord_sum.ptr<double>();
-        CV_Assert( coord_sum.cols == n && coord_sum.rows == 1 );
+        ಪೂರ್ಣಾಂಕ i, j, m = p.ಅಡ್ಡಸಾಲುಗಳು, n = p.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+        ದ್ವಿಗುಣ* coord_ಮೊತ್ತ_2 = coord_ಮೊತ್ತ.ptr<ದ್ವಿಗುಣ>();
+        CV_Assert( coord_ಮೊತ್ತ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == n && coord_ಮೊತ್ತ.ಅಡ್ಡಸಾಲುಗಳು == 1 );
 
-        for( j = 0; j < n; j++ )
-            coord_sum_[j] = 0.;
+        ಗಾಗಿ( j = 0; j < n; j++ )
+            coord_ಮೊತ್ತ_2[j] = 0.;
 
-        for( i = 0; i < m; i++ )
+        ಗಾಗಿ( i = 0; i < m; i++ )
         {
-            const double* p_i = p.ptr<double>(i);
-            for( j = 0; j < n; j++ )
-                coord_sum_[j] += p_i[j];
+            ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* p_i = p.ptr<ದ್ವಿಗುಣ>(i);
+            ಗಾಗಿ( j = 0; j < n; j++ )
+                coord_ಮೊತ್ತ_2[j] += p_i[j];
         }
 
         dprintf(("\nupdated coord sum:\n"));
-        print_matrix(coord_sum);
+        print_ಮಾತೃಕೆ(coord_ಮೊತ್ತ);
 
     }
 
-    inline void createInitialSimplex( const Mat& x0, Mat& simplex, Mat& step )
+    ಸಾಲೊಳಗೆ ಶೂನ್ಯ createInitialSimplex( ಸ್ಥಿರಾಂಕ Mat& x0, Mat& simplex, Mat& ಹೆಜ್ಜೆ )
     {
-        int i, j, ndim = step.cols;
+        ಪೂರ್ಣಾಂಕ i, j, ndim = ಹೆಜ್ಜೆ.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
         CV_Assert( _Function->getDims() == ndim );
         Mat x = x0;
-        if( x0.empty() )
+        ಆದರೆ( x0.empty() )
             x = Mat::zeros(1, ndim, CV_64F);
-        CV_Assert( (x.cols == 1 && x.rows == ndim) || (x.cols == ndim && x.rows == 1) );
+        CV_Assert( (x.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == 1 && x.ಅಡ್ಡಸಾಲುಗಳು == ndim) || (x.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ == ndim && x.ಅಡ್ಡಸಾಲುಗಳು == 1) );
         CV_Assert( x.type() == CV_32F || x.type() == CV_64F );
 
         simplex.create(ndim + 1, ndim, CV_64F);
-        Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<double>());
+        Mat simplex_0m(x.ಅಡ್ಡಸಾಲುಗಳು, x.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ, CV_64F, simplex.ptr<ದ್ವಿಗುಣ>());
 
-        x.convertTo(simplex_0m, CV_64F);
-        double* simplex_0 = simplex.ptr<double>();
-        const double* step_ = step.ptr<double>();
-        for( i = 1; i <= ndim; i++ )
+        x.convert_ಗಮ್ಯ(simplex_0m, CV_64F);
+        ದ್ವಿಗುಣ* simplex_0 = simplex.ptr<ದ್ವಿಗುಣ>();
+        ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* ಹೆಜ್ಜೆ_2 = ಹೆಜ್ಜೆ.ptr<ದ್ವಿಗುಣ>();
+        ಗಾಗಿ( i = 1; i <= ndim; i++ )
         {
-            double* simplex_i = simplex.ptr<double>(i);
-            for( j = 0; j < ndim; j++ )
+            ದ್ವಿಗುಣ* simplex_i = simplex.ptr<ದ್ವಿಗುಣ>(i);
+            ಗಾಗಿ( j = 0; j < ndim; j++ )
                 simplex_i[j] = simplex_0[j];
-            simplex_i[i-1] += 0.5*step_[i-1];
+            simplex_i[i-1] += 0.5*ಹೆಜ್ಜೆ_2[i-1];
         }
-        for( j = 0; j < ndim; j++ )
-            simplex_0[j] -= 0.5*step_[j];
+        ಗಾಗಿ( j = 0; j < ndim; j++ )
+            simplex_0[j] -= 0.5*ಹೆಜ್ಜೆ_2[j];
 
         dprintf(("\nthis is simplex\n"));
-        print_matrix(simplex);
+        print_ಮಾತೃಕೆ(simplex);
     }
 
     /*
@@ -269,197 +269,197 @@ protected:
      form a simplex - each row is an ndim vector.
      On output, fcount gives the number of function evaluations taken.
     */
-    double innerDownhillSimplex( Mat& p, double MinRange, double MinError, int& fcount, int nmax )
+    ದ್ವಿಗುಣ innerDownhillSimplex( Mat& p, ದ್ವಿಗುಣ MinRange, ದ್ವಿಗುಣ MinError, ಪೂರ್ಣಾಂಕ& fcount, ಪೂರ್ಣಾಂಕ nmax )
     {
-        int i, j, ndim = p.cols;
-        Mat coord_sum(1, ndim, CV_64F), buf(1, ndim, CV_64F), y(1, ndim+1, CV_64F);
-        double* y_ = y.ptr<double>();
+        ಪೂರ್ಣಾಂಕ i, j, ndim = p.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
+        Mat coord_ಮೊತ್ತ(1, ndim, CV_64F), buf(1, ndim, CV_64F), y(1, ndim+1, CV_64F);
+        ದ್ವಿಗುಣ* y_ = y.ptr<ದ್ವಿಗುಣ>();
 
         fcount = ndim+1;
-        for( i = 0; i <= ndim; i++ )
-            y_[i] = calc_f(p.ptr<double>(i));
+        ಗಾಗಿ( i = 0; i <= ndim; i++ )
+            y_[i] = calc_f(p.ptr<ದ್ವಿಗುಣ>(i));
 
-        updateCoordSum(p, coord_sum);
+        update_Coord_ಮೊತ್ತ(p, coord_ಮೊತ್ತ);
 
-        for (;;)
+        ಗಾಗಿ (;;)
         {
             // find highest (worst), next-to-worst, and lowest
             // (best) points by going through all of them.
-            int ilo = 0, ihi, inhi;
-            if( y_[0] > y_[1] )
+            ಪೂರ್ಣಾಂಕ ilo = 0, ihi, inhi;
+            ಆದರೆ( y_[0] > y_[1] )
             {
                 ihi = 0; inhi = 1;
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
                 ihi = 1; inhi = 0;
             }
-            for( i = 0; i <= ndim; i++ )
+            ಗಾಗಿ( i = 0; i <= ndim; i++ )
             {
-                double yval = y_[i];
-                if (yval <= y_[ilo])
+                ದ್ವಿಗುಣ yval = y_[i];
+                ಆದರೆ (yval <= y_[ilo])
                     ilo = i;
-                if (yval > y_[ihi])
+                ಆದರೆ (yval > y_[ihi])
                 {
                     inhi = ihi;
                     ihi = i;
                 }
-                else if (yval > y_[inhi] && i != ihi)
+                ಇಲ್ಲದಿದ್ದರೆ ಆದರೆ (yval > y_[inhi] && i != ihi)
                     inhi = i;
             }
             CV_Assert( ihi != inhi );
-            if( ilo == inhi || ilo == ihi )
+            ಆದರೆ( ilo == inhi || ilo == ihi )
             {
-                for( i = 0; i <= ndim; i++ )
+                ಗಾಗಿ( i = 0; i <= ndim; i++ )
                 {
-                    double yval = y_[i];
-                    if( yval == y_[ilo] && i != ihi && i != inhi )
+                    ದ್ವಿಗುಣ yval = y_[i];
+                    ಆದರೆ( yval == y_[ilo] && i != ihi && i != inhi )
                     {
                         ilo = i;
-                        break;
+                        ನಿಲ್ಲಿಸು;
                     }
                 }
             }
             dprintf(("\nthis is y on iteration %d:\n",fcount));
-            print_matrix(y);
+            print_ಮಾತೃಕೆ(y);
 
             // check stop criterion
-            double error = fabs(y_[ihi] - y_[ilo]);
-            double range = 0;
-            for( j = 0; j < ndim; j++ )
+            ದ್ವಿಗುಣ error = fabs(y_[ihi] - y_[ilo]);
+            ದ್ವಿಗುಣ range = 0;
+            ಗಾಗಿ( j = 0; j < ndim; j++ )
             {
-                double minval, maxval;
-                minval = maxval = p.at<double>(0, j);
-                for( i = 1; i <= ndim; i++ )
+                ದ್ವಿಗುಣ minval, maxval;
+                minval = maxval = p.at<ದ್ವಿಗುಣ>(0, j);
+                ಗಾಗಿ( i = 1; i <= ndim; i++ )
                 {
-                    double pval = p.at<double>(i, j);
+                    ದ್ವಿಗುಣ pval = p.at<ದ್ವಿಗುಣ>(i, j);
                     minval = std::min(minval, pval);
                     maxval = std::max(maxval, pval);
                 }
                 range = std::max(range, fabs(maxval - minval));
             }
 
-            if( range <= MinRange || error <= MinError || fcount >= nmax )
+            ಆದರೆ( range <= MinRange || error <= MinError || fcount >= nmax )
             {
                 // Put best point and value in first slot.
                 std::swap(y_[0], y_[ilo]);
-                for( j = 0; j < ndim; j++ )
+                ಗಾಗಿ( j = 0; j < ndim; j++ )
                 {
-                    std::swap(p.at<double>(0, j), p.at<double>(ilo, j));
+                    std::swap(p.at<ದ್ವಿಗುಣ>(0, j), p.at<ದ್ವಿಗುಣ>(ilo, j));
                 }
-                break;
+                ನಿಲ್ಲಿಸು;
             }
 
-            double y_lo = y_[ilo], y_nhi = y_[inhi], y_hi = y_[ihi];
+            ದ್ವಿಗುಣ y_lo = y_[ilo], y_nhi = y_[inhi], y_hi = y_[ihi];
             // Begin a new iteration. First, reflect the worst point about the centroid of others
-            double alpha = -1.0;
-            double y_alpha = tryNewPoint(p, coord_sum, ihi, alpha, buf, fcount);
+            ದ್ವಿಗುಣ alpha = -1.0;
+            ದ್ವಿಗುಣ y_alpha = try_New_ಬಿಂದು(p, coord_ಮೊತ್ತ, ihi, alpha, buf, fcount);
 
             dprintf(("\ny_lo=%g, y_nhi=%g, y_hi=%g, y_alpha=%g, p_alpha:\n", y_lo, y_nhi, y_hi, y_alpha));
-            print_matrix(buf);
+            print_ಮಾತೃಕೆ(buf);
 
-            if( y_alpha < y_nhi )
+            ಆದರೆ( y_alpha < y_nhi )
             {
-                if( y_alpha < y_lo )
+                ಆದರೆ( y_alpha < y_lo )
                 {
                     // If that's better than the best point, go twice as far in that direction
-                    double beta = -2.0;
-                    double y_beta = tryNewPoint(p, coord_sum, ihi, beta, buf, fcount);
+                    ದ್ವಿಗುಣ beta = -2.0;
+                    ದ್ವಿಗುಣ y_beta = try_New_ಬಿಂದು(p, coord_ಮೊತ್ತ, ihi, beta, buf, fcount);
                     dprintf(("\ny_beta=%g, p_beta:\n", y_beta));
-                    print_matrix(buf);
-                    if( y_beta < y_alpha )
+                    print_ಮಾತೃಕೆ(buf);
+                    ಆದರೆ( y_beta < y_alpha )
                     {
                         alpha = beta;
                         y_alpha = y_beta;
                     }
                 }
-                replacePoint(p, coord_sum, y, ihi, alpha, y_alpha);
+                replace_ಬಿಂದು(p, coord_ಮೊತ್ತ, y, ihi, alpha, y_alpha);
             }
-            else
+            ಇಲ್ಲದಿದ್ದರೆ
             {
                 // The new point is worse than the second-highest,
                 // do not go so far in that direction
-                double gamma = 0.5;
-                double y_gamma = tryNewPoint(p, coord_sum, ihi, gamma, buf, fcount);
+                ದ್ವಿಗುಣ gamma = 0.5;
+                ದ್ವಿಗುಣ y_gamma = try_New_ಬಿಂದು(p, coord_ಮೊತ್ತ, ihi, gamma, buf, fcount);
                 dprintf(("\ny_gamma=%g, p_gamma:\n", y_gamma));
-                print_matrix(buf);
-                if( y_gamma < y_hi )
-                    replacePoint(p, coord_sum, y, ihi, gamma, y_gamma);
-                else
+                print_ಮಾತೃಕೆ(buf);
+                ಆದರೆ( y_gamma < y_hi )
+                    replace_ಬಿಂದು(p, coord_ಮೊತ್ತ, y, ihi, gamma, y_gamma);
+                ಇಲ್ಲದಿದ್ದರೆ
                 {
                     // Can't seem to improve things.
                     // Contract the simplex to good point
                     // in hope to find a simplex landscape.
-                    for( i = 0; i <= ndim; i++ )
+                    ಗಾಗಿ( i = 0; i <= ndim; i++ )
                     {
-                        if (i != ilo)
+                        ಆದರೆ (i != ilo)
                         {
-                            for( j = 0; j < ndim; j++ )
-                                p.at<double>(i, j) = 0.5*(p.at<double>(i, j) + p.at<double>(ilo, j));
-                            y_[i] = calc_f(p.ptr<double>(i));
+                            ಗಾಗಿ( j = 0; j < ndim; j++ )
+                                p.at<ದ್ವಿಗುಣ>(i, j) = 0.5*(p.at<ದ್ವಿಗುಣ>(i, j) + p.at<ದ್ವಿಗುಣ>(ilo, j));
+                            y_[i] = calc_f(p.ptr<ದ್ವಿಗುಣ>(i));
                         }
                     }
                     fcount += ndim;
-                    updateCoordSum(p, coord_sum);
+                    update_Coord_ಮೊತ್ತ(p, coord_ಮೊತ್ತ);
                 }
             }
             dprintf(("\nthis is simplex on iteration %d\n",fcount));
-            print_matrix(p);
+            print_ಮಾತೃಕೆ(p);
         }
-        return y_[0];
+        ಹಿಂತಿರುಗಿ y_[0];
     }
 
-    inline double calc_f(const double* ptr)
+    ಸಾಲೊಳಗೆ ದ್ವಿಗುಣ calc_f(ಸ್ಥಿರಾಂಕ ದ್ವಿಗುಣ* ptr)
     {
-        double res = _Function->calc(ptr);
+        ದ್ವಿಗುಣ res = _Function->calc(ptr);
         CV_Assert( !cvIsNaN(res) && !cvIsInf(res) );
-        return res;
+        ಹಿಂತಿರುಗಿ res;
     }
 
-    double tryNewPoint( Mat& p, Mat& coord_sum, int ihi, double alpha_, Mat& ptry, int& fcount )
+    ದ್ವಿಗುಣ try_New_ಬಿಂದು( Mat& p, Mat& coord_ಮೊತ್ತ, ಪೂರ್ಣಾಂಕ ihi, ದ್ವಿಗುಣ alpha_, Mat& ptry, ಪೂರ್ಣಾಂಕ& fcount )
     {
-        int j, ndim = p.cols;
+        ಪೂರ್ಣಾಂಕ j, ndim = p.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-        double alpha = (1.0 - alpha_)/ndim;
-        double beta = alpha - alpha_;
-        double* p_ihi = p.ptr<double>(ihi);
-        double* ptry_ = ptry.ptr<double>();
-        double* coord_sum_ = coord_sum.ptr<double>();
+        ದ್ವಿಗುಣ alpha = (1.0 - alpha_)/ndim;
+        ದ್ವಿಗುಣ beta = alpha - alpha_;
+        ದ್ವಿಗುಣ* p_ihi = p.ptr<ದ್ವಿಗುಣ>(ihi);
+        ದ್ವಿಗುಣ* ptry_ = ptry.ptr<ದ್ವಿಗುಣ>();
+        ದ್ವಿಗುಣ* coord_ಮೊತ್ತ_2 = coord_ಮೊತ್ತ.ptr<ದ್ವಿಗುಣ>();
 
-        for( j = 0; j < ndim; j++ )
-            ptry_[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
+        ಗಾಗಿ( j = 0; j < ndim; j++ )
+            ptry_[j] = coord_ಮೊತ್ತ_2[j]*alpha - p_ihi[j]*beta;
 
         fcount++;
-        return calc_f(ptry_);
+        ಹಿಂತಿರುಗಿ calc_f(ptry_);
     }
 
-    void replacePoint( Mat& p, Mat& coord_sum, Mat& y, int ihi, double alpha_, double ytry )
+    ಶೂನ್ಯ replace_ಬಿಂದು( Mat& p, Mat& coord_ಮೊತ್ತ, Mat& y, ಪೂರ್ಣಾಂಕ ihi, ದ್ವಿಗುಣ alpha_, ದ್ವಿಗುಣ ytry )
     {
-        int j, ndim = p.cols;
+        ಪೂರ್ಣಾಂಕ j, ndim = p.ಲಂಬಸಾಲು_ಸಂಖ್ಯೆ;
 
-        double alpha = (1.0 - alpha_)/ndim;
-        double beta = alpha - alpha_;
-        double* p_ihi = p.ptr<double>(ihi);
-        double* coord_sum_ = coord_sum.ptr<double>();
+        ದ್ವಿಗುಣ alpha = (1.0 - alpha_)/ndim;
+        ದ್ವಿಗುಣ beta = alpha - alpha_;
+        ದ್ವಿಗುಣ* p_ihi = p.ptr<ದ್ವಿಗುಣ>(ihi);
+        ದ್ವಿಗುಣ* coord_ಮೊತ್ತ_2 = coord_ಮೊತ್ತ.ptr<ದ್ವಿಗುಣ>();
 
-        for( j = 0; j < ndim; j++ )
-            p_ihi[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
-        y.at<double>(ihi) = ytry;
-        updateCoordSum(p, coord_sum);
+        ಗಾಗಿ( j = 0; j < ndim; j++ )
+            p_ihi[j] = coord_ಮೊತ್ತ_2[j]*alpha - p_ihi[j]*beta;
+        y.at<ದ್ವಿಗುಣ>(ihi) = ytry;
+        update_Coord_ಮೊತ್ತ(p, coord_ಮೊತ್ತ);
     }
 };
 
 
 // both minRange & minError are specified by termcrit.epsilon;
 // In addition, user may specify the number of iterations that the algorithm does.
-Ptr<DownhillSolver> DownhillSolver::create( const Ptr<MinProblemSolver::Function>& f,
-                                            InputArray initStep, TermCriteria termcrit )
+Ptr<DownhillSolver> DownhillSolver::create( ಸ್ಥಿರಾಂಕ Ptr<MinProblemSolver::Function>& f,
+                                            ಒಳಹರಿವು_Array init_ಹೆಜ್ಜೆ, ಪದ_Criteria termcrit )
 {
     Ptr<DownhillSolver> DS = makePtr<DownhillSolverImpl>();
-    DS->setFunction(f);
-    DS->setInitStep(initStep);
-    DS->setTermCriteria(termcrit);
-    return DS;
+    DS->ಗಣ_Function(f);
+    DS->ಗಣ_Init_ಹೆಜ್ಜೆ(init_ಹೆಜ್ಜೆ);
+    DS->ಗಣ_ಪದ_Criteria(termcrit);
+    ಹಿಂತಿರುಗಿ DS;
 }
 
 }
