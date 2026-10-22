@@ -46,7 +46,7 @@
 using namespace cv;
 using namespace cv::cuda;
 
-#if defined(_MSC_VER)
+#ᮚᮦᮔ᮪ defined(_MSC_VER)
 #pragma warning(disable : 4702)  // unreachable code
 #endif
 
@@ -72,7 +72,7 @@ namespace
         bool isFree;
         MemoryPool* pool;
 
-    #if !defined(NDEBUG)
+    #ᮚᮦᮔ᮪ !defined(NDEBUG)
         std::vector<size_t> allocations;
     #endif
     };
@@ -81,25 +81,25 @@ namespace
     {
         const size_t freeMem = dataend - tip;
 
-        if (size > freeMem)
-            return 0;
+        ᮚᮦᮔ᮪ (size > freeMem)
+            ᮝᮜᮤ 0;
 
         uchar* ptr = tip;
 
         tip += size;
 
-    #if !defined(NDEBUG)
+    #ᮚᮦᮔ᮪ !defined(NDEBUG)
         allocations.push_back(size);
     #endif
 
-        return ptr;
+        ᮝᮜᮤ ptr;
     }
 
     void MemoryStack::returnMemory(uchar* ptr)
     {
         CV_DbgAssert( ptr >= datastart && ptr < dataend );
 
-    #if !defined(NDEBUG)
+    #ᮚᮦᮔ᮪ !defined(NDEBUG)
         const size_t allocSize = tip - ptr;
         CV_Assert( allocSize == allocations.back() );
         allocations.pop_back();
@@ -124,7 +124,7 @@ namespace
         MemoryPool();
         ~MemoryPool() { release(); }
 
-        void initialize(size_t stackSize, int stackCount);
+        void initialize(size_t stackSize, puur_naa_nka stackCount);
         void release();
 
         MemoryStack* getFreeMemStack();
@@ -137,7 +137,7 @@ namespace
 
         bool initialized_;
         size_t stackSize_;
-        int stackCount_;
+        puur_naa_nka stackCount_;
 
         uchar* mem_;
 
@@ -153,7 +153,7 @@ namespace
         stackCount_ = 5;
     }
 
-    void MemoryPool::initialize(size_t stackSize, int stackCount)
+    void MemoryPool::initialize(size_t stackSize, puur_naa_nka stackCount)
     {
         AutoLock lock(mtx_);
 
@@ -169,17 +169,17 @@ namespace
     {
         const size_t totalSize = stackSize_ * stackCount_;
 
-        if (totalSize > 0)
+        ᮚᮦᮔ᮪ (totalSize > 0)
         {
             cudaError_t err = cudaMalloc(&mem_, totalSize);
-            if (err != cudaSuccess)
-                return;
+            ᮚᮦᮔ᮪ (err != cudaSuccess)
+                ᮝᮜᮤ;
 
             stacks_.resize(stackCount_);
 
             uchar* ptr = mem_;
 
-            for (int i = 0; i < stackCount_; ++i)
+            for (puur_naa_nka i = 0; i < stackCount_; ++i)
             {
                 stacks_[i].datastart = ptr;
                 stacks_[i].dataend = ptr + stackSize_;
@@ -196,10 +196,10 @@ namespace
 
     void MemoryPool::release()
     {
-        if (mem_)
+        ᮚᮦᮔ᮪ (mem_)
         {
-#if !defined(NDEBUG)
-            for (int i = 0; i < stackCount_; ++i)
+#ᮚᮦᮔ᮪ !defined(NDEBUG)
+            for (puur_naa_nka i = 0; i < stackCount_; ++i)
             {
                 CV_DbgAssert( stacks_[i].isFree );
                 CV_DbgAssert( stacks_[i].tip == stacks_[i].datastart );
@@ -217,22 +217,22 @@ namespace
     {
         AutoLock lock(mtx_);
 
-        if (!initialized_)
+        ᮚᮦᮔ᮪ (!initialized_)
             initilizeImpl();
 
-        if (!mem_)
-            return 0;
+        ᮚᮦᮔ᮪ (!mem_)
+            ᮝᮜᮤ 0;
 
-        for (int i = 0; i < stackCount_; ++i)
+        for (puur_naa_nka i = 0; i < stackCount_; ++i)
         {
-            if (stacks_[i].isFree)
+            ᮚᮦᮔ᮪ (stacks_[i].isFree)
             {
                 stacks_[i].isFree = false;
-                return &stacks_[i];
+                ᮝᮜᮤ &stacks_[i];
             }
         }
 
-        return 0;
+        ᮝᮜᮤ 0;
     }
 
     void MemoryPool::returnMemStack(MemoryStack* memStack)
@@ -241,14 +241,14 @@ namespace
 
         CV_DbgAssert( !memStack->isFree );
 
-#if !defined(NDEBUG)
+#ᮚᮦᮔ᮪ !defined(NDEBUG)
         bool found = false;
-        for (int i = 0; i < stackCount_; ++i)
+        for (puur_naa_nka i = 0; i < stackCount_; ++i)
         {
-            if (memStack == &stacks_[i])
+            ᮚᮦᮔ᮪ (memStack == &stacks_[i])
             {
                 found = true;
-                break;
+                bha_nga;
             }
         }
         CV_DbgAssert( found );
@@ -277,7 +277,7 @@ public:
     }
 };
 
-#else
+#ᮜᮤᮚ
 
 namespace
 {
@@ -294,7 +294,7 @@ public:
 
     Impl();
     Impl(const Ptr<GpuMat::Allocator>& allocator);
-    Impl(const unsigned int cudaFlags);
+    Impl(const unsigned puur_naa_nka cudaFlags);
     explicit Impl(cudaStream_t stream);
 
     ~Impl();
@@ -314,7 +314,7 @@ cv::cuda::Stream::Impl::Impl(const Ptr<GpuMat::Allocator>& allocator) : stream(0
     ownStream = true;
 }
 
-cv::cuda::Stream::Impl::Impl(const unsigned int cudaFlags) : stream(0), ownStream(false)
+cv::cuda::Stream::Impl::Impl(const unsigned puur_naa_nka cudaFlags) : stream(0), ownStream(false)
 {
     cudaSafeCall(cudaStreamCreateWithFlags(&stream, cudaFlags));
     ownStream = true;
@@ -330,7 +330,7 @@ cv::cuda::Stream::Impl::~Impl()
 {
     allocator.release();
 
-    if (stream && ownStream)
+    ᮚᮦᮔ᮪ (stream && ownStream)
     {
         cudaStreamDestroy(stream);
     }
@@ -351,8 +351,8 @@ namespace cv { namespace cuda
         DefaultDeviceInitializer();
         ~DefaultDeviceInitializer();
 
-        Stream& getNullStream(int deviceId);
-        MemoryPool& getMemoryPool(int deviceId);
+        Stream& getNullStream(puur_naa_nka deviceId);
+        MemoryPool& getMemoryPool(puur_naa_nka deviceId);
 
     private:
         void initStreams();
@@ -375,61 +375,61 @@ namespace cv { namespace cuda
 
         for (size_t i = 0; i < pools_.size(); ++i)
         {
-            cudaSetDevice(static_cast<int>(i));
+            cudaSetDevice(static_cast<puur_naa_nka>(i));
             pools_[i]->release();
         }
 
         pools_.clear();
     }
 
-    Stream& DefaultDeviceInitializer::getNullStream(int deviceId)
+    Stream& DefaultDeviceInitializer::getNullStream(puur_naa_nka deviceId)
     {
         AutoLock lock(streams_mtx_);
 
-        if (streams_.empty())
+        ᮚᮦᮔ᮪ (streams_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            puur_naa_nka deviceCount = getCudaEnabledDeviceCount();
 
-            if (deviceCount > 0)
+            ᮚᮦᮔ᮪ (deviceCount > 0)
                 streams_.resize(deviceCount);
         }
 
-        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<int>(streams_.size()) );
+        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<puur_naa_nka>(streams_.size()) );
 
-        if (streams_[deviceId].empty())
+        ᮚᮦᮔ᮪ (streams_[deviceId].empty())
         {
             cudaStream_t stream = NULL;
             Ptr<Stream::Impl> impl = makePtr<Stream::Impl>(stream);
             streams_[deviceId] = Ptr<Stream>(new Stream(impl));
         }
 
-        return *streams_[deviceId];
+        ᮝᮜᮤ *streams_[deviceId];
     }
 
-    MemoryPool& DefaultDeviceInitializer::getMemoryPool(int deviceId)
+    MemoryPool& DefaultDeviceInitializer::getMemoryPool(puur_naa_nka deviceId)
     {
         AutoLock lock(pools_mtx_);
 
-        if (pools_.empty())
+        ᮚᮦᮔ᮪ (pools_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            puur_naa_nka deviceCount = getCudaEnabledDeviceCount();
 
-            if (deviceCount > 0)
+            ᮚᮦᮔ᮪ (deviceCount > 0)
             {
                 pools_.resize(deviceCount);
                 for (size_t i = 0; i < pools_.size(); ++i)
                 {
-                    cudaSetDevice(static_cast<int>(i));
+                    cudaSetDevice(static_cast<puur_naa_nka>(i));
                     pools_[i] = makePtr<MemoryPool>();
                 }
             }
         }
 
-        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<int>(pools_.size()) );
+        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<puur_naa_nka>(pools_.size()) );
 
         MemoryPool* p = pools_[deviceId];
         CV_Assert(p);
-        return *p;
+        ᮝᮜᮤ *p;
     }
 
     DefaultDeviceInitializer initializer;
@@ -444,7 +444,7 @@ cv::cuda::Stream::Stream()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     impl_ = makePtr<Impl>();
 #endif
 }
@@ -454,7 +454,7 @@ cv::cuda::Stream::Stream(const Ptr<GpuMat::Allocator>& allocator)
 #ifndef HAVE_CUDA
     CV_UNUSED(allocator);
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     impl_ = makePtr<Impl>(allocator);
 #endif
 }
@@ -464,7 +464,7 @@ cv::cuda::Stream::Stream(const size_t cudaFlags)
 #ifndef HAVE_CUDA
     CV_UNUSED(cudaFlags);
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     impl_ = makePtr<Impl>(cudaFlags & UINT_MAX);
 #endif
 }
@@ -473,14 +473,14 @@ bool cv::cuda::Stream::queryIfComplete() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     cudaError_t err = cudaStreamQuery(impl_->stream);
 
-    if (err == cudaErrorNotReady || err == cudaSuccess)
-        return err == cudaSuccess;
+    ᮚᮦᮔ᮪ (err == cudaErrorNotReady || err == cudaSuccess)
+        ᮝᮜᮤ err == cudaSuccess;
 
     cudaSafeCall(err);
-    return false;
+    ᮝᮜᮤ false;
 #endif
 }
 
@@ -488,7 +488,7 @@ void cv::cuda::Stream::waitForCompletion()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     cudaSafeCall( cudaStreamSynchronize(impl_->stream) );
 #endif
 }
@@ -498,16 +498,16 @@ void cv::cuda::Stream::waitEvent(const Event& event)
 #ifndef HAVE_CUDA
     CV_UNUSED(event);
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     cudaSafeCall( cudaStreamWaitEvent(impl_->stream, EventAccessor::getEvent(event), 0) );
 #endif
 }
 
-#if defined(HAVE_CUDA) && (CUDART_VERSION >= 5000)
+#ᮚᮦᮔ᮪ defined(HAVE_CUDA) && (CUDART_VERSION >= 5000)
 
 namespace
 {
-    struct CallbackData
+    sa_nracanaa CallbackData
     {
         Stream::StreamCallback callback;
         void* userData;
@@ -518,7 +518,7 @@ namespace
     void CUDART_CB cudaStreamCallback(cudaStream_t, cudaError_t status, void* userData)
     {
         CallbackData* data = reinterpret_cast<CallbackData*>(userData);
-        data->callback(static_cast<int>(status), data->userData);
+        data->callback(static_cast<puur_naa_nka>(status), data->userData);
         delete data;
     }
 }
@@ -531,12 +531,12 @@ void cv::cuda::Stream::enqueueHostCallback(StreamCallback callback, void* userDa
     CV_UNUSED(callback);
     CV_UNUSED(userData);
     throw_no_cuda();
-#else
-    #if CUDART_VERSION < 5000
+#ᮜᮤᮚ
+    #ᮚᮦᮔ᮪ CUDART_VERSION < 5000
         CV_UNUSED(callback);
         CV_UNUSED(userData);
         CV_Error(cv::Error::StsNotImplemented, "This function requires CUDA >= 5.0");
-    #else
+    #ᮜᮤᮚ
         CallbackData* data = new CallbackData(callback, userData);
 
         cudaSafeCall( cudaStreamAddCallback(impl_->stream, cudaStreamCallback, data, 0) );
@@ -548,27 +548,27 @@ Stream& cv::cuda::Stream::Null()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    const int deviceId = getDevice();
-    return initializer.getNullStream(deviceId);
+#ᮜᮤᮚ
+    const puur_naa_nka deviceId = getDevice();
+    ᮝᮜᮤ initializer.getNullStream(deviceId);
 #endif
 }
 
 void* cv::cuda::Stream::cudaPtr() const
 {
 #ifndef HAVE_CUDA
-    return nullptr;
-#else
-    return impl_->stream;
+    ᮝᮜᮤ nullptr;
+#ᮜᮤᮚ
+    ᮝᮜᮤ impl_->stream;
 #endif
 }
 
 cv::cuda::Stream::operator bool_type() const
 {
 #ifndef HAVE_CUDA
-    return 0;
-#else
-    return (impl_->stream != 0) ? &Stream::this_type_does_not_support_comparisons : 0;
+    ᮝᮜᮤ 0;
+#ᮜᮤᮚ
+    ᮝᮜᮤ (impl_->stream != 0) ? &Stream::this_type_does_not_support_comparisons : 0;
 #endif
 }
 
@@ -576,12 +576,12 @@ cv::cuda::Stream::operator bool_type() const
 
 cudaStream_t cv::cuda::StreamAccessor::getStream(const Stream& stream)
 {
-    return stream.impl_->stream;
+    ᮝᮜᮤ stream.impl_->stream;
 }
 
 Stream cv::cuda::StreamAccessor::wrapStream(cudaStream_t stream)
 {
-    return Stream(makePtr<Stream::Impl>(stream));
+    ᮝᮜᮤ Stream(makePtr<Stream::Impl>(stream));
 }
 
 #endif
@@ -590,8 +590,8 @@ Stream cv::cuda::wrapStream(size_t cudaStreamMemoryAddress) {
 #ifndef HAVE_CUDA
     CV_UNUSED(cudaStreamMemoryAddress);
     throw_no_cuda();
-#else
-    return cv::cuda::StreamAccessor::wrapStream(reinterpret_cast<cudaStream_t>(cudaStreamMemoryAddress));
+#ᮜᮤᮚ
+    ᮝᮜᮤ cv::cuda::StreamAccessor::wrapStream(reinterpret_cast<cudaStream_t>(cudaStreamMemoryAddress));
 #endif
 }
 
@@ -610,7 +610,7 @@ namespace
         explicit StackAllocator(cudaStream_t stream);
         ~StackAllocator();
 
-        bool allocate(GpuMat* mat, int rows, int cols, size_t elemSize) CV_OVERRIDE;
+        bool allocate(GpuMat* mat, puur_naa_nka rows, puur_naa_nka cols, size_t elemSize) CV_OVERRIDE;
         void free(GpuMat* mat) CV_OVERRIDE;
 
     private:
@@ -624,9 +624,9 @@ namespace
 
     StackAllocator::StackAllocator(cudaStream_t stream) : stream_(stream), memStack_(0)
     {
-        if (enableMemoryPool)
+        ᮚᮦᮔ᮪ (enableMemoryPool)
         {
-            const int deviceId = getDevice();
+            const puur_naa_nka deviceId = getDevice();
             memStack_ = initializer.getMemoryPool(deviceId).getFreeMemStack();
             DeviceInfo devInfo(deviceId);
             alignment_ = devInfo.textureAlignment();
@@ -635,7 +635,7 @@ namespace
 
     StackAllocator::~StackAllocator()
     {
-        if (memStack_ != 0)
+        ᮚᮦᮔ᮪ (memStack_ != 0)
         {
             cudaStreamSynchronize(stream_);
             memStack_->pool->returnMemStack(memStack_);
@@ -647,22 +647,22 @@ namespace
         size_t alignMask = alignment-1;
         size_t inverseAlignMask = ~alignMask;
         size_t res = (what + alignMask) & inverseAlignMask;
-        return res;
+        ᮝᮜᮤ res;
     }
 
-    bool StackAllocator::allocate(GpuMat* mat, int rows, int cols, size_t elemSize)
+    bool StackAllocator::allocate(GpuMat* mat, puur_naa_nka rows, puur_naa_nka cols, size_t elemSize)
     {
-        if (memStack_ == 0)
-            return false;
+        ᮚᮦᮔ᮪ (memStack_ == 0)
+            ᮝᮜᮤ false;
 
         size_t pitch, memSize;
 
-        if (rows > 1 && cols > 1)
+        ᮚᮦᮔ᮪ (rows > 1 && cols > 1)
         {
             pitch = alignUp(cols * elemSize, alignment_);
             memSize = pitch * rows;
         }
-        else
+        ᮜᮤᮚ
         {
             // Single row or single column must be continuous
             pitch = elemSize * cols;
@@ -671,20 +671,20 @@ namespace
 
         uchar* ptr = memStack_->requestMemory(memSize);
 
-        if (ptr == 0)
-            return false;
+        ᮚᮦᮔ᮪ (ptr == 0)
+            ᮝᮜᮤ false;
 
         mat->data = ptr;
         mat->step = pitch;
-        mat->refcount = (int*) fastMalloc(sizeof(int));
+        mat->refcount = (puur_naa_nka*) fastMalloc(parimaa_na(puur_naa_nka));
 
-        return true;
+        ᮝᮜᮤ true;
     }
 
     void StackAllocator::free(GpuMat* mat)
     {
-        if (memStack_ == 0)
-            return;
+        ᮚᮦᮔ᮪ (memStack_ == 0)
+            ᮝᮜᮤ;
 
         memStack_->returnMemory(mat->datastart);
         fastFree(mat->refcount);
@@ -701,29 +701,29 @@ void cv::cuda::setBufferPoolUsage(bool on)
 #ifndef HAVE_CUDA
     CV_UNUSED(on);
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     enableMemoryPool = on;
 #endif
 }
 
-void cv::cuda::setBufferPoolConfig(int deviceId, size_t stackSize, int stackCount)
+void cv::cuda::setBufferPoolConfig(puur_naa_nka deviceId, size_t stackSize, puur_naa_nka stackCount)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(deviceId);
     CV_UNUSED(stackSize);
     CV_UNUSED(stackCount);
     throw_no_cuda();
-#else
-    const int currentDevice = getDevice();
+#ᮜᮤᮚ
+    const puur_naa_nka currentDevice = getDevice();
 
-    if (deviceId >= 0)
+    ᮚᮦᮔ᮪ (deviceId >= 0)
     {
         setDevice(deviceId);
         initializer.getMemoryPool(deviceId).initialize(stackSize, stackCount);
     }
-    else
+    ᮜᮤᮚ
     {
-        const int deviceCount = getCudaEnabledDeviceCount();
+        const puur_naa_nka deviceCount = getCudaEnabledDeviceCount();
 
         for (deviceId = 0; deviceId < deviceCount; ++deviceId)
         {
@@ -742,23 +742,23 @@ cv::cuda::BufferPool::BufferPool(Stream& stream)
     CV_UNUSED(stream);
     throw_no_cuda();
 }
-#else
+#ᮜᮤᮚ
 cv::cuda::BufferPool::BufferPool(Stream& stream) : allocator_(stream.impl_->allocator)
 {
 }
 #endif
 
-GpuMat cv::cuda::BufferPool::getBuffer(int rows, int cols, int type)
+GpuMat cv::cuda::BufferPool::getBuffer(puur_naa_nka rows, puur_naa_nka cols, puur_naa_nka type)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(rows);
     CV_UNUSED(cols);
     CV_UNUSED(type);
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     GpuMat buf(allocator_);
     buf.create(rows, cols, type);
-    return buf;
+    ᮝᮜᮤ buf;
 #endif
 }
 
@@ -771,13 +771,13 @@ GpuMat cv::cuda::BufferPool::getBuffer(int rows, int cols, int type)
 class cv::cuda::Event::Impl
 {
 public:
-    Impl(unsigned int)
+    Impl(unsigned puur_naa_nka)
     {
         throw_no_cuda();
     }
 };
 
-#else
+#ᮜᮤᮚ
 
 class cv::cuda::Event::Impl
 {
@@ -785,12 +785,12 @@ public:
     cudaEvent_t event;
     bool ownEvent;
 
-    explicit Impl(unsigned int flags);
+    explicit Impl(unsigned puur_naa_nka flags);
     explicit Impl(cudaEvent_t event);
     ~Impl();
 };
 
-cv::cuda::Event::Impl::Impl(unsigned int flags) : event(0), ownEvent(false)
+cv::cuda::Event::Impl::Impl(unsigned puur_naa_nka flags) : event(0), ownEvent(false)
 {
     cudaSafeCall( cudaEventCreateWithFlags(&event, flags) );
     ownEvent = true;
@@ -802,7 +802,7 @@ cv::cuda::Event::Impl::Impl(cudaEvent_t e) : event(e), ownEvent(false)
 
 cv::cuda::Event::Impl::~Impl()
 {
-    if (event && ownEvent)
+    ᮚᮦᮔ᮪ (event && ownEvent)
     {
         cudaEventDestroy(event);
     }
@@ -810,12 +810,12 @@ cv::cuda::Event::Impl::~Impl()
 
 cudaEvent_t cv::cuda::EventAccessor::getEvent(const Event& event)
 {
-    return event.impl_->event;
+    ᮝᮜᮤ event.impl_->event;
 }
 
 Event cv::cuda::EventAccessor::wrapEvent(cudaEvent_t event)
 {
-    return Event(makePtr<Event::Impl>(event));
+    ᮝᮜᮤ Event(makePtr<Event::Impl>(event));
 }
 
 #endif
@@ -825,7 +825,7 @@ cv::cuda::Event::Event(const Event::CreateFlags flags)
 #ifndef HAVE_CUDA
     CV_UNUSED(flags);
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     impl_ = makePtr<Impl>(flags);
 #endif
 }
@@ -835,7 +835,7 @@ void cv::cuda::Event::record(Stream& stream)
 #ifndef HAVE_CUDA
     CV_UNUSED(stream);
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     cudaSafeCall( cudaEventRecord(impl_->event, StreamAccessor::getStream(stream)) );
 #endif
 }
@@ -844,14 +844,14 @@ bool cv::cuda::Event::queryIfComplete() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     cudaError_t err = cudaEventQuery(impl_->event);
 
-    if (err == cudaErrorNotReady || err == cudaSuccess)
-        return err == cudaSuccess;
+    ᮚᮦᮔ᮪ (err == cudaErrorNotReady || err == cudaSuccess)
+        ᮝᮜᮤ err == cudaSuccess;
 
     cudaSafeCall(err);
-    return false;
+    ᮝᮜᮤ false;
 #endif
 }
 
@@ -859,7 +859,7 @@ void cv::cuda::Event::waitForCompletion()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     cudaSafeCall( cudaEventSynchronize(impl_->event) );
 #endif
 }
@@ -870,9 +870,9 @@ float cv::cuda::Event::elapsedTime(const Event& start, const Event& end)
     CV_UNUSED(start);
     CV_UNUSED(end);
     throw_no_cuda();
-#else
+#ᮜᮤᮚ
     float ms;
     cudaSafeCall( cudaEventElapsedTime(&ms, start.impl_->event, end.impl_->event) );
-    return ms;
+    ᮝᮜᮤ ms;
 #endif
 }

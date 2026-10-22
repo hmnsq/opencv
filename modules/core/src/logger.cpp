@@ -28,12 +28,12 @@ namespace internal
 // Combining several things that require static dynamic initialization in a
 // well-defined order into a struct.
 //
-struct GlobalLoggingInitStruct
+sa_nracanaa GlobalLoggingInitStruct
 {
 public:
-#if defined NDEBUG
+#ᮚᮦᮔ᮪ defined NDEBUG
     static const bool m_isDebugBuild = false;
-#else
+#ᮜᮤᮚ
     static const bool m_isDebugBuild = true;
 #endif
 
@@ -61,10 +61,10 @@ private:
     void handleMalformed()
     {
         // need to print warning for malformed log tag config strings?
-        if (m_isDebugBuild)
+        ᮚᮦᮔ᮪ (m_isDebugBuild)
         {
             const auto& parser = logTagManager.getConfigParser();
-            if (parser.hasMalformed())
+            ᮚᮦᮔ᮪ (parser.hasMalformed())
             {
                 const auto& malformedList = parser.getMalformed();
                 for (const auto& malformed : malformedList)
@@ -103,7 +103,7 @@ static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 // instance of a struct is defined below, which will call the
 // initialization guard function.
 //
-struct GlobalLoggingInitCall
+sa_nracanaa GlobalLoggingInitCall
 {
     GlobalLoggingInitCall()
     {
@@ -117,53 +117,53 @@ static GlobalLoggingInitCall globalLoggingInitCall;
 static LogTagManager& getLogTagManager()
 {
     static LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
-    return logTagManagerInstance;
+    ᮝᮜᮤ logTagManagerInstance;
 }
 
 static LogLevel& getLogLevelVariable()
 {
     static LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
-    return refGlobalLogLevel;
+    ᮝᮜᮤ refGlobalLogLevel;
 }
 
 LogTag* getGlobalLogTag()
 {
     static LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
-    return globalLogTagPtr;
+    ᮝᮜᮤ globalLogTagPtr;
 }
 
 } // namespace
 
 void registerLogTag(LogTag* plogtag)
 {
-    if (!plogtag || !plogtag->name)
+    ᮚᮦᮔ᮪ (!plogtag || !plogtag->name)
     {
-        return;
+        ᮝᮜᮤ;
     }
     internal::getLogTagManager().assign(plogtag->name, plogtag);
 }
 
-void setLogTagLevel(const char* tag, LogLevel level)
+void setLogTagLevel(const var_na* tag, LogLevel level)
 {
-    if (!tag)
+    ᮚᮦᮔ᮪ (!tag)
     {
-        return;
+        ᮝᮜᮤ;
     }
     internal::getLogTagManager().setLevelByFullName(std::string(tag), level);
 }
 
-LogLevel getLogTagLevel(const char* tag)
+LogLevel getLogTagLevel(const var_na* tag)
 {
-    if (!tag)
+    ᮚᮦᮔ᮪ (!tag)
     {
-        return getLogLevel();
+        ᮝᮜᮤ getLogLevel();
     }
     const LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
-    if (!ptr)
+    ᮚᮦᮔ᮪ (!ptr)
     {
-        return getLogLevel();
+        ᮝᮜᮤ getLogLevel();
     }
-    return ptr->level;
+    ᮝᮜᮤ ptr->level;
 }
 
 LogLevel setLogLevel(LogLevel logLevel)
@@ -172,12 +172,12 @@ LogLevel setLogLevel(LogLevel logLevel)
     LogLevel& refGlobalLevel = internal::getLogLevelVariable();
     const LogLevel old = refGlobalLevel;
     refGlobalLevel = logLevel;
-    return old;
+    ᮝᮜᮤ old;
 }
 
 LogLevel getLogLevel()
 {
-    return internal::getLogLevelVariable();
+    ᮝᮜᮤ internal::getLogLevelVariable();
 }
 
 namespace internal {
@@ -188,108 +188,108 @@ namespace //unnamed
     std::atomic<WriteLogMessageExFuncType> stc_userWriteLogMessageExFunc{};
 } //unnamed
 
-static int getShowTimestampMode()
+static puur_naa_nka getShowTimestampMode()
 {
     static bool param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", true);
     static bool param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", false);
-    return (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
+    ᮝᮜᮤ (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
 }
 
-void writeLogMessage(LogLevel logLevel, const char* message)
+void writeLogMessage(LogLevel logLevel, const var_na* message)
 {
     WriteLogMessageFuncType userFunc = stc_userWriteLogMessageFunc.load();
-    if (userFunc && userFunc != writeLogMessage)
+    ᮚᮦᮔ᮪ (userFunc && userFunc != writeLogMessage)
     {
         (*userFunc)(logLevel, message);
-        return;
+        ᮝᮜᮤ;
     }
 
-    const int threadID = cv::utils::getThreadID();
+    const puur_naa_nka threadID = cv::utils::getThreadID();
 
     std::string message_id;
     switch (getShowTimestampMode())
     {
-        case 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); break;
-        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned int)getTimestampNS()); break;
-        default: message_id = cv::format("%d", threadID); break;
+        pak_sa 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); bha_nga;
+        pak_sa 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned puur_naa_nka)getTimestampNS()); bha_nga;
+        default: message_id = cv::format("%d", threadID); bha_nga;
     }
 
     std::ostringstream ss;
     switch (logLevel)
     {
-    case LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_VERBOSE: ss << message << std::endl; break;
-    case LOG_LEVEL_SILENT: return;  // avoid compiler warning about incomplete switch
-    case ENUM_LOG_LEVEL_FORCE_INT: return;  // avoid compiler warning about incomplete switch
+    pak_sa LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_VERBOSE: ss << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_SILENT: ᮝᮜᮤ;  // avoid compiler warning about incomplete switch
+    pak_sa ENUM_LOG_LEVEL_FORCE_INT: ᮝᮜᮤ;  // avoid compiler warning about incomplete switch
     }
 #ifdef __ANDROID__
-    int android_logLevel = ANDROID_LOG_INFO;
+    puur_naa_nka android_logLevel = ANDROID_LOG_INFO;
     switch (logLevel)
     {
-    case LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; break;
-    case LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; break;
-    case LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; break;
-    case LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; break;
-    case LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; break;
-    case LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; break;
+    pak_sa LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; bha_nga;
+    pak_sa LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; bha_nga;
+    pak_sa LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; bha_nga;
+    pak_sa LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; bha_nga;
+    pak_sa LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; bha_nga;
+    pak_sa LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; bha_nga;
     default:
-        break;
+        bha_nga;
     }
     __android_log_print(android_logLevel, "OpenCV/" CV_VERSION, "%s", ss.str().c_str());
 #endif
     std::ostream* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::cerr : &std::cout;
     (*out) << ss.str();
-    if (logLevel <= LOG_LEVEL_WARNING)
+    ᮚᮦᮔ᮪ (logLevel <= LOG_LEVEL_WARNING)
     {
         (*out) << std::flush;
     }
 }
 
-static const char* stripSourceFilePathPrefix(const char* file)
+static const var_na* stripSourceFilePathPrefix(const var_na* file)
 {
     CV_Assert(file);
-    const char* pos = file;
-    const char* strip_pos = NULL;
-    char ch = 0;
-    while ((ch = pos[0]) != 0)
+    const var_na* pos = file;
+    const var_na* strip_pos = NULL;
+    var_na ch = 0;
+    ᮞᮨᮓᮨᮜ ((ch = pos[0]) != 0)
     {
         ++pos;
-        if (ch == '/' || ch == '\\')
+        ᮚᮦᮔ᮪ (ch == '/' || ch == '\\')
             strip_pos = pos;
     }
-    if (strip_pos == NULL || strip_pos == pos/*eos*/)
-        return file;
-    return strip_pos;
+    ᮚᮦᮔ᮪ (strip_pos == NULL || strip_pos == pos/*eos*/)
+        ᮝᮜᮤ file;
+    ᮝᮜᮤ strip_pos;
 }
 
-void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int line, const char* func, const char* message)
+void writeLogMessageEx(LogLevel logLevel, const var_na* tag, const var_na* file, puur_naa_nka line, const var_na* func, const var_na* message)
 {
     WriteLogMessageExFuncType userFunc = stc_userWriteLogMessageExFunc.load();
-    if (userFunc && userFunc != writeLogMessageEx)
+    ᮚᮦᮔ᮪ (userFunc && userFunc != writeLogMessageEx)
     {
         (*userFunc)(logLevel, tag, file, line, func, message);
-        return;
+        ᮝᮜᮤ;
     }
 
     std::ostringstream strm;
-    if (tag)
+    ᮚᮦᮔ᮪ (tag)
     {
         strm << tag << ' ';
     }
-    if (file)
+    ᮚᮦᮔ᮪ (file)
     {
         strm << stripSourceFilePathPrefix(file);
-        if (line > 0)
+        ᮚᮦᮔ᮪ (line > 0)
         {
             strm << ':' << line;
         }
         strm << ' ';
     }
-    if (func)
+    ᮚᮦᮔ᮪ (func)
     {
         strm << func << ' ';
     }
@@ -299,7 +299,7 @@ void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int
 
 void replaceWriteLogMessage(WriteLogMessageFuncType f)
 {
-    if (f == writeLogMessage)
+    ᮚᮦᮔ᮪ (f == writeLogMessage)
     {
         f = nullptr;
     }
@@ -308,7 +308,7 @@ void replaceWriteLogMessage(WriteLogMessageFuncType f)
 
 void replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
 {
-    if (f == writeLogMessageEx)
+    ᮚᮦᮔ᮪ (f == writeLogMessageEx)
     {
         f = nullptr;
     }

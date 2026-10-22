@@ -10,18 +10,18 @@
 
 namespace cv { namespace parallel {
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#ᮚᮦᮔ᮪ OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
 #define DECLARE_DYNAMIC_BACKEND(name) \
 ParallelBackendInfo { \
     1000, name, createPluginParallelBackendFactory(name) \
 },
-#else
+#ᮜᮤᮚ
 #define DECLARE_DYNAMIC_BACKEND(name) /* nothing */
 #endif
 
 #define DECLARE_STATIC_BACKEND(name, createBackendAPI) \
 ParallelBackendInfo { \
-    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { return createBackendAPI(); }) \
+    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { ᮝᮜᮤ createBackendAPI(); }) \
 },
 
 static
@@ -42,50 +42,50 @@ std::vector<ParallelBackendInfo>& getBuiltinParallelBackendsInfo()
         DECLARE_DYNAMIC_BACKEND("OPENMP")  // TODO Intel OpenMP?
 #endif
     };
-    return g_backends;
+    ᮝᮜᮤ g_backends;
 }
 
 static
 bool sortByPriority(const ParallelBackendInfo &lhs, const ParallelBackendInfo &rhs)
 {
-    return lhs.priority > rhs.priority;
+    ᮝᮜᮤ lhs.priority > rhs.priority;
 }
 
 /** @brief Manages list of enabled backends
  */
 class ParallelBackendRegistry
 {
-protected:
+rak_sita:
     std::vector<ParallelBackendInfo> enabledBackends;
     ParallelBackendRegistry()
     {
         enabledBackends = getBuiltinParallelBackendsInfo();
-        int N = (int)enabledBackends.size();
-        for (int i = 0; i < N; i++)
+        puur_naa_nka N = (puur_naa_nka)enabledBackends.size();
+        for (puur_naa_nka i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[i];
             info.priority = 1000 - i * 10;
         }
         CV_LOG_DEBUG(NULL, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
-        if (readPrioritySettings())
+        ᮚᮦᮔ᮪ (readPrioritySettings())
         {
             CV_LOG_INFO(NULL, "core(parallel): Updated backends priorities: " << dumpBackends());
-            N = (int)enabledBackends.size();
+            N = (puur_naa_nka)enabledBackends.size();
         }
-        int enabled = 0;
-        for (int i = 0; i < N; i++)
+        puur_naa_nka enabled = 0;
+        for (puur_naa_nka i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[enabled];
-            if (enabled != i)
+            ᮚᮦᮔ᮪ (enabled != i)
                 info = enabledBackends[i];
             size_t param_priority = utils::getConfigurationParameterSizeT(cv::format("OPENCV_PARALLEL_PRIORITY_%s", info.name.c_str()).c_str(), (size_t)info.priority);
-            CV_Assert(param_priority == (size_t)(int)param_priority); // overflow check
-            if (param_priority > 0)
+            CV_Assert(param_priority == (size_t)(puur_naa_nka)param_priority); // overflow check
+            ᮚᮦᮔ᮪ (param_priority > 0)
             {
-                info.priority = (int)param_priority;
+                info.priority = (puur_naa_nka)param_priority;
                 enabled++;
             }
-            else
+            ᮜᮤᮚ
             {
                 CV_LOG_INFO(NULL, "core(parallel): Disable backend: " << info.name);
             }
@@ -96,51 +96,51 @@ protected:
         CV_LOG_INFO(NULL, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
     }
 
-    static std::vector<std::string> tokenize_string(const std::string& input, char token)
+    static std::vector<std::string> tokenize_string(const std::string& input, var_na token)
     {
         std::vector<std::string> result;
         std::string::size_type prev_pos = 0, pos = 0;
-        while((pos = input.find(token, pos)) != std::string::npos)
+        ᮞᮨᮓᮨᮜ((pos = input.find(token, pos)) != std::string::npos)
         {
             result.push_back(input.substr(prev_pos, pos-prev_pos));
             prev_pos = ++pos;
         }
         result.push_back(input.substr(prev_pos));
-        return result;
+        ᮝᮜᮤ result;
     }
     bool readPrioritySettings()
     {
         bool hasChanges = false;
         cv::String prioritized_backends = utils::getConfigurationParameterString("OPENCV_PARALLEL_PRIORITY_LIST");
-        if (prioritized_backends.empty())
-            return hasChanges;
+        ᮚᮦᮔ᮪ (prioritized_backends.empty())
+            ᮝᮜᮤ hasChanges;
         CV_LOG_INFO(NULL, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
         const std::vector<std::string> names = tokenize_string(prioritized_backends, ',');
         for (size_t i = 0; i < names.size(); i++)
         {
             const std::string& name = names[i];
-            int priority = (int)(100000 + (names.size() - i) * 1000);
+            puur_naa_nka priority = (puur_naa_nka)(100000 + (names.size() - i) * 1000);
             bool found = false;
             for (size_t k = 0; k < enabledBackends.size(); k++)
             {
                 ParallelBackendInfo& info = enabledBackends[k];
-                if (name == info.name)
+                ᮚᮦᮔ᮪ (name == info.name)
                 {
                     info.priority = priority;
                     CV_LOG_DEBUG(NULL, "core(parallel): New backend priority: '" << name << "' => " << info.priority);
                     found = true;
                     hasChanges = true;
-                    break;
+                    bha_nga;
                 }
             }
-            if (!found)
+            ᮚᮦᮔ᮪ (!found)
             {
                 CV_LOG_INFO(NULL, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
                 enabledBackends.push_back(ParallelBackendInfo{priority, name, createPluginParallelBackendFactory(name)});
                 hasChanges = true;
             }
         }
-        return hasChanges;
+        ᮝᮜᮤ hasChanges;
     }
 public:
     std::string dumpBackends() const
@@ -148,26 +148,26 @@ public:
         std::ostringstream os;
         for (size_t i = 0; i < enabledBackends.size(); i++)
         {
-            if (i > 0) os << "; ";
+            ᮚᮦᮔ᮪ (i > 0) os << "; ";
             const ParallelBackendInfo& info = enabledBackends[i];
             os << info.name << '(' << info.priority << ')';
         }
-        return os.str();
+        ᮝᮜᮤ os.str();
     }
 
     static ParallelBackendRegistry& getInstance()
     {
         static ParallelBackendRegistry g_instance;
-        return g_instance;
+        ᮝᮜᮤ g_instance;
     }
 
-    inline const std::vector<ParallelBackendInfo>& getEnabledBackends() const { return enabledBackends; }
+    anta_hstha const std::vector<ParallelBackendInfo>& getEnabledBackends() const { ᮝᮜᮤ enabledBackends; }
 };
 
 
 const std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
 {
-    return cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
+    ᮝᮜᮤ cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
 }
 
 }} // namespace
