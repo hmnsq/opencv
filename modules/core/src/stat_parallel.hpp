@@ -23,51 +23,51 @@ struct StatChunk
 static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
 {
     const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    ако (work < ((size_t)1 << 18))
+        върни false;
+    const цяло nthreads = getNumThreads();
+    ако (nthreads <= 1)
+        върни false;
+    const цяло n = (цяло)std::min((size_t)nthreads*2, work >> 16);
+    ако (n < 2)
+        върни false;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    ако (src.dims <= 2 && src.rows >= n)
     {
-        for (int i = 0; i < n; i++)
+        за (цяло i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            цяло r0 = (цяло)((int64)src.rows*i/n), r1 = (цяло)((int64)src.rows*(i + 1)/n);
             StatChunk c;
             c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
+            ако (!mask.empty())
                 c.mask = mask.rowRange(r0, r1);
             c.firstElem = (size_t)r0*src.cols;
             chunks.push_back(c);
         }
-        return true;
+        върни true;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    ако (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
     {
-        for (int i = 0; i < n; i++)
+        за (цяло i = 0; i < n; i++)
         {
             size_t e0 = total*i/n, e1 = total*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
+            c.src = Mat(1, (цяло)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
+            ако (!mask.empty())
+                c.mask = Mat(1, (цяло)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
             c.firstElem = e0;
             chunks.push_back(c);
         }
-        return true;
+        върни true;
     }
-    return false;
+    върни false;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+static inline size_t chunkIndexToElem(const StatChunk& c, const цяло* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    върни c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
 }
 
 } // namespace cv

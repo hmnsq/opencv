@@ -12,41 +12,41 @@ namespace cv {
 
 namespace {
 
-typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, int, int, int );
-typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, int, int, int );
+typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, цяло, цяло, цяло );
+typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, цяло, цяло, цяло );
 
 static LUT8uFunc resolveLUT8uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT8u_;
+#ако CV_TRY_AVX512_ICL
+    ако (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        върни opt_AVX512_ICL::LUT8u_;
 #endif
-    return cpu_baseline::LUT8u_;
+    върни cpu_baseline::LUT8u_;
 }
 
 static LUT16uFunc resolveLUT16uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT16u_;
+#ако CV_TRY_AVX512_ICL
+    ако (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        върни opt_AVX512_ICL::LUT16u_;
 #endif
-    return cpu_baseline::LUT16u_;
+    върни cpu_baseline::LUT16u_;
 }
 
 } // namespace
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
+void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, цяло len, цяло cn, цяло lutcn );
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn )
+void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, цяло len, цяло cn, цяло lutcn )
 {
     CV_INSTRUMENT_REGION();
     static LUT8uFunc fn = resolveLUT8uFunc();
     fn(src, lut, dst, len, cn, lutcn);
 }
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, цяло len, цяло cn, цяло lutcn );
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn )
+void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, цяло len, цяло cn, цяло lutcn )
 {
     CV_INSTRUMENT_REGION();
     static LUT16uFunc fn = resolveLUT16uFunc();

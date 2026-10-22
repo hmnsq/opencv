@@ -9,8 +9,8 @@
 namespace cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getCvtScaleAbsFunc(int depth);
-BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
+BinaryFunc getCvtScaleAbsFunc(цяло depth);
+BinaryFunc getConvertScaleFunc(цяло sdepth, цяло ddepth);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
@@ -22,31 +22,31 @@ template<typename _Ts, typename _Td> inline void
 cvtabs_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
             Size size, float a, float b )
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ако (CV_SIMD || CV_SIMD_SCALABLE)
     v_float32 va = vx_setall_f32(a), vb = vx_setall_f32(b);
-    const int VECSZ = VTraits<v_float32>::vlanes()*2;
+    const цяло VECSZ = VTraits<v_float32>::vlanes()*2;
     // GCC miscompiles this scalable block only on VLEN=128 RVV (opencv/issues/26936);
     // use scalar there, keep SIMD on wider vectors. Ask the hardware for VLEN directly:
     // vlanes() would depend on the LMUL the universal intrinsics happen to use.
-#if (CV_RVV && CV_SIMD_SCALABLE && defined(__GNUC__) && !defined(__clang__))
+#ако (CV_RVV && CV_SIMD_SCALABLE && defined(__GNUC__) && !defined(__clang__))
     const bool useSIMD = __riscv_vlenb()*8 != 128;
-#else
+#иначе
     const bool useSIMD = true;
 #endif
 #endif
     sstep /= sizeof(src[0]);
     dstep /= sizeof(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    за( цяло i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        if( useSIMD )
-        for( ; j < size.width; j += VECSZ )
+        цяло j = 0;
+#ако (CV_SIMD || CV_SIMD_SCALABLE)
+        ако( useSIMD )
+        за( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            ако( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
+                ако( j == 0 || src == (_Ts*)dst )
                     break;
                 j = size.width - VECSZ;
             }
@@ -57,7 +57,7 @@ cvtabs_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
             v_store_pair_as(dst + j, v_abs(v0), v_abs(v1));
         }
 #endif
-        for( ; j < size.width; j++ )
+        за( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(std::abs(src[j]*a + b));
     }
 }
@@ -70,9 +70,9 @@ cvtabs_32f( const bool* src_, size_t sstep,
     const uchar* src = (const uchar*)src_;
     uchar v0 = saturate_cast<uchar>(std::abs(b));
     uchar v1 = saturate_cast<uchar>(std::abs(a + b));
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    за( цяло i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        for (int j = 0; j < size.width; j++)
+        за (цяло j = 0; j < size.width; j++)
             dst[j] = src[j] != 0 ? v1 : v0;
     }
 }
@@ -81,23 +81,23 @@ template<typename _Ts, typename _Td> inline void
 cvt_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
          Size size, float a, float b )
 {
-#if (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
+#ако (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
     v_float32 va = vx_setall_f32(a), vb = vx_setall_f32(b);
-    const int VECSZ = VTraits<v_float32>::vlanes()*2;
+    const цяло VECSZ = VTraits<v_float32>::vlanes()*2;
 #endif
     sstep /= sizeof(src[0]);
     dstep /= sizeof(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    за( цяло i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
+        цяло j = 0;
 // Excluding GNU in CV_SIMD_SCALABLE because of "opencv/issues/26936"
-#if (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
-        for( ; j < size.width; j += VECSZ )
+#ако (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
+        за( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            ако( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
+                ако( j == 0 || src == (_Ts*)dst )
                     break;
                 j = size.width - VECSZ;
             }
@@ -108,7 +108,7 @@ cvt_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
             v_store_pair_as(dst + j, v0, v1);
         }
 #endif
-        for( ; j < size.width; j++ )
+        за( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(src[j]*a + b);
     }
 }
@@ -118,22 +118,22 @@ template<typename _Ts, typename _Td> inline void
 cvt1_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
           Size size, float a, float b )
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ако (CV_SIMD || CV_SIMD_SCALABLE)
     v_float32 va = vx_setall_f32(a), vb = vx_setall_f32(b);
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    const цяло VECSZ = VTraits<v_float32>::vlanes();
 #endif
     sstep /= sizeof(src[0]);
     dstep /= sizeof(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    за( цяло i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; j < size.width; j += VECSZ )
+        цяло j = 0;
+#ако (CV_SIMD || CV_SIMD_SCALABLE)
+        за( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            ако( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
+                ако( j == 0 || src == (_Ts*)dst )
                     break;
                 j = size.width - VECSZ;
             }
@@ -143,7 +143,7 @@ cvt1_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
             v_store_as(dst + j, v0);
         }
 #endif
-        for( ; j < size.width; j++ )
+        за( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(src[j]*a + b);
     }
 }
@@ -153,23 +153,23 @@ template<typename _Ts, typename _Td> inline void
 cvt_64f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
          Size size, double a, double b )
 {
-#if (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
+#ако (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
     v_float64 va = vx_setall_f64(a), vb = vx_setall_f64(b);
-    const int VECSZ = VTraits<v_float64>::vlanes()*2;
+    const цяло VECSZ = VTraits<v_float64>::vlanes()*2;
 #endif
     sstep /= sizeof(src[0]);
     dstep /= sizeof(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    за( цяло i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
+        цяло j = 0;
 // Excluding GNU in CV_SIMD_SCALABLE because of "opencv/issues/26936"
-#if (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
-        for( ; j < size.width; j += VECSZ )
+#ако (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
+        за( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            ако( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
+                ако( j == 0 || src == (_Ts*)dst )
                     break;
                 j = size.width - VECSZ;
             }
@@ -180,7 +180,7 @@ cvt_64f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
             v_store_pair_as(dst + j, v0, v1);
         }
 #endif
-        for( ; j < size.width; j++ )
+        за( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(src[j]*a + b);
     }
 }
@@ -216,8 +216,8 @@ static void cvtScale##suffix( const uchar* src_, size_t sstep, const uchar*, siz
     const double* scale = (const double*)scale_; \
     wtype a = (wtype)scale[0], b = (wtype)scale[1]; \
     sstep /= sizeof(src[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
+    за( цяло i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
+        за (цяло j = 0; j < size.width; j++) \
             dst[j] = (bool)((wtype)src[j]*a + b != 0); \
 }
 
@@ -230,8 +230,8 @@ static void cvtScale##suffix( const uchar* src, size_t sstep, const uchar*, size
     wtype a = (wtype)scale[0], b = (wtype)scale[1]; \
     dtype v0 = saturate_cast<dtype>(b), v1 = saturate_cast<dtype>(a + b); \
     dstep /= sizeof(dst[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
+    за( цяло i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
+        за (цяло j = 0; j < size.width; j++) \
             dst[j] = src[j] != 0 ? v1 : v0; \
 }
 
@@ -241,7 +241,7 @@ DEF_CVT_SCALE_ABS_FUNC(8b8u,  cvtabs_32f, bool,  uchar, float)
 DEF_CVT_SCALE_ABS_FUNC(16u8u, cvtabs_32f, ushort, uchar, float)
 DEF_CVT_SCALE_ABS_FUNC(16s8u, cvtabs_32f, short,  uchar, float)
 DEF_CVT_SCALE_ABS_FUNC(32u8u, cvtabs_32f, unsigned, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(32s8u, cvtabs_32f, int,    uchar, float)
+DEF_CVT_SCALE_ABS_FUNC(32s8u, cvtabs_32f, цяло,    uchar, float)
 DEF_CVT_SCALE_ABS_FUNC(32f8u, cvtabs_32f, float,  uchar, float)
 DEF_CVT_SCALE_ABS_FUNC(64u8u, cvtabs_32f, uint64_t, uchar, float)
 DEF_CVT_SCALE_ABS_FUNC(64s8u, cvtabs_32f, int64_t, uchar, float)
@@ -254,7 +254,7 @@ DEF_CVT_SCALE_FUNC(8s8u,   cvt_32f, schar,  uchar, float)
 DEF_CVT_SCALE_FUNC(16u8u,  cvt_32f, ushort, uchar, float)
 DEF_CVT_SCALE_FUNC(16s8u,  cvt_32f, short,  uchar, float)
 DEF_CVT_SCALE_FUNC(32u8u,  cvt_32f, unsigned, uchar, float)
-DEF_CVT_SCALE_FUNC(32s8u,  cvt_32f, int,    uchar, float)
+DEF_CVT_SCALE_FUNC(32s8u,  cvt_32f, цяло,    uchar, float)
 DEF_CVT_SCALE_FUNC(32f8u,  cvt_32f, float,  uchar, float)
 DEF_CVT_SCALE_FUNC(64f8u,  cvt_32f, double, uchar, float)
 DEF_CVT_SCALE_FUNC(64u8u,  cvt_32f, uint64_t, uchar, float)
@@ -267,7 +267,7 @@ DEF_CVT_SCALE_FUNC(8s,     cvt_32f, schar,  schar, float)
 DEF_CVT_SCALE_FUNC(16u8s,  cvt_32f, ushort, schar, float)
 DEF_CVT_SCALE_FUNC(16s8s,  cvt_32f, short,  schar, float)
 DEF_CVT_SCALE_FUNC(32u8s,  cvt_32f, unsigned, schar, float)
-DEF_CVT_SCALE_FUNC(32s8s,  cvt_32f, int,    schar, float)
+DEF_CVT_SCALE_FUNC(32s8s,  cvt_32f, цяло,    schar, float)
 DEF_CVT_SCALE_FUNC(32f8s,  cvt_32f, float,  schar, float)
 DEF_CVT_SCALE_FUNC(64f8s,  cvt_32f, double, schar, float)
 DEF_CVT_SCALE_FUNC(64u8s,  cvt_32f, uint64_t, schar, float)
@@ -280,7 +280,7 @@ DEF_CVT_SCALE2BOOL_FUNC(8s8b, schar, float)
 DEF_CVT_SCALE2BOOL_FUNC(16u8b, ushort, float)
 DEF_CVT_SCALE2BOOL_FUNC(16s8b, short, float)
 DEF_CVT_SCALE2BOOL_FUNC(32u8b, unsigned, float)
-DEF_CVT_SCALE2BOOL_FUNC(32s8b, int, float)
+DEF_CVT_SCALE2BOOL_FUNC(32s8b, цяло, float)
 DEF_CVT_SCALE2BOOL_FUNC(32f8b, float, float)
 DEF_CVT_SCALE2BOOL_FUNC(64f8b, double, float)
 DEF_CVT_SCALE2BOOL_FUNC(64u8b, uint64_t, float)
@@ -293,7 +293,7 @@ DEF_CVT_SCALE_FUNC(8s16u,  cvt_32f, schar,  ushort, float)
 DEF_CVT_SCALE_FUNC(16u,    cvt_32f, ushort, ushort, float)
 DEF_CVT_SCALE_FUNC(16s16u, cvt_32f, short,  ushort, float)
 DEF_CVT_SCALE_FUNC(32u16u, cvt_32f, unsigned, ushort, float)
-DEF_CVT_SCALE_FUNC(32s16u, cvt_32f, int,    ushort, float)
+DEF_CVT_SCALE_FUNC(32s16u, cvt_32f, цяло,    ushort, float)
 DEF_CVT_SCALE_FUNC(32f16u, cvt_32f, float,  ushort, float)
 DEF_CVT_SCALE_FUNC(64f16u, cvt_32f, double, ushort, float)
 DEF_CVT_SCALE_FUNC(64u16u, cvt_32f, uint64_t, ushort, float)
@@ -306,7 +306,7 @@ DEF_CVT_SCALE_FUNC(8s16s,  cvt_32f, schar,  short, float)
 DEF_CVT_SCALE_FUNC(16u16s, cvt_32f, ushort, short, float)
 DEF_CVT_SCALE_FUNC(16s,    cvt_32f, short,  short, float)
 DEF_CVT_SCALE_FUNC(32u16s, cvt_32f, unsigned, short, float)
-DEF_CVT_SCALE_FUNC(32s16s, cvt_32f, int,    short, float)
+DEF_CVT_SCALE_FUNC(32s16s, cvt_32f, цяло,    short, float)
 DEF_CVT_SCALE_FUNC(32f16s, cvt_32f, float,  short, float)
 DEF_CVT_SCALE_FUNC(64f16s, cvt_32f, double, short, float)
 DEF_CVT_SCALE_FUNC(64u16s, cvt_32f, uint64_t, short, float)
@@ -319,7 +319,7 @@ DEF_CVT_SCALE_FUNC(8s32u,  cvt_32f, schar,  unsigned, float)
 DEF_CVT_SCALE_FUNC(16u32u, cvt_32f, ushort, unsigned, float)
 DEF_CVT_SCALE_FUNC(16s32u, cvt_32f, short,  unsigned, float)
 DEF_CVT_SCALE_FUNC(32u, cvt_32f, unsigned, unsigned, float)
-DEF_CVT_SCALE_FUNC(32s32u, cvt_64f, int,    unsigned, double)
+DEF_CVT_SCALE_FUNC(32s32u, cvt_64f, цяло,    unsigned, double)
 DEF_CVT_SCALE_FUNC(32f32u, cvt_32f, float,  unsigned, float)
 DEF_CVT_SCALE_FUNC(64f32u, cvt_64f, double, unsigned, double)
 DEF_CVT_SCALE_FUNC(64u32u, cvt_32f, uint64_t, unsigned, float)
@@ -327,25 +327,25 @@ DEF_CVT_SCALE_FUNC(64s32u, cvt_32f, int64_t, unsigned, float)
 DEF_CVT_SCALE_FUNC(16f32u, cvt1_32f, hfloat, unsigned, float)
 DEF_CVT_SCALE_FUNC(16bf32u, cvt1_32f, bfloat, unsigned, float)
 
-DEF_CVT_SCALE_FUNC(8u32s,  cvt_32f, uchar,  int, float)
-DEF_CVT_SCALE_FUNC(8s32s,  cvt_32f, schar,  int, float)
-DEF_CVT_SCALE_FUNC(16u32s, cvt_32f, ushort, int, float)
-DEF_CVT_SCALE_FUNC(16s32s, cvt_32f, short,  int, float)
-DEF_CVT_SCALE_FUNC(32u32s, cvt_32f, unsigned, int, float)
-DEF_CVT_SCALE_FUNC(32s,    cvt_64f, int,    int, double)
-DEF_CVT_SCALE_FUNC(32f32s, cvt_32f, float,  int, float)
-DEF_CVT_SCALE_FUNC(64f32s, cvt_64f, double, int, double)
-DEF_CVT_SCALE_FUNC(64u32s, cvt_32f, uint64_t, int, float)
-DEF_CVT_SCALE_FUNC(64s32s, cvt_32f, int64_t, int, float)
-DEF_CVT_SCALE_FUNC(16f32s, cvt1_32f, hfloat, int, float)
-DEF_CVT_SCALE_FUNC(16bf32s, cvt1_32f, bfloat, int, float)
+DEF_CVT_SCALE_FUNC(8u32s,  cvt_32f, uchar,  цяло, float)
+DEF_CVT_SCALE_FUNC(8s32s,  cvt_32f, schar,  цяло, float)
+DEF_CVT_SCALE_FUNC(16u32s, cvt_32f, ushort, цяло, float)
+DEF_CVT_SCALE_FUNC(16s32s, cvt_32f, short,  цяло, float)
+DEF_CVT_SCALE_FUNC(32u32s, cvt_32f, unsigned, цяло, float)
+DEF_CVT_SCALE_FUNC(32s,    cvt_64f, цяло,    цяло, double)
+DEF_CVT_SCALE_FUNC(32f32s, cvt_32f, float,  цяло, float)
+DEF_CVT_SCALE_FUNC(64f32s, cvt_64f, double, цяло, double)
+DEF_CVT_SCALE_FUNC(64u32s, cvt_32f, uint64_t, цяло, float)
+DEF_CVT_SCALE_FUNC(64s32s, cvt_32f, int64_t, цяло, float)
+DEF_CVT_SCALE_FUNC(16f32s, cvt1_32f, hfloat, цяло, float)
+DEF_CVT_SCALE_FUNC(16bf32s, cvt1_32f, bfloat, цяло, float)
 
 DEF_CVT_SCALE_FUNC(8u32f,  cvt_32f, uchar,  float, float)
 DEF_CVT_SCALE_FUNC(8s32f,  cvt_32f, schar,  float, float)
 DEF_CVT_SCALE_FUNC(16u32f, cvt_32f, ushort, float, float)
 DEF_CVT_SCALE_FUNC(16s32f, cvt_32f, short,  float, float)
 DEF_CVT_SCALE_FUNC(32u32f, cvt_32f, unsigned, float, float)
-DEF_CVT_SCALE_FUNC(32s32f, cvt_32f, int,    float, float)
+DEF_CVT_SCALE_FUNC(32s32f, cvt_32f, цяло,    float, float)
 DEF_CVT_SCALE_FUNC(32f,    cvt_32f, float,  float, float)
 DEF_CVT_SCALE_FUNC(64f32f, cvt_64f, double, float, double)
 DEF_CVT_SCALE_FUNC(64u32f, cvt_32f, uint64_t, float, float)
@@ -358,7 +358,7 @@ DEF_CVT_SCALE_FUNC(8s64f,  cvt_64f, schar,  double, double)
 DEF_CVT_SCALE_FUNC(16u64f, cvt_64f, ushort, double, double)
 DEF_CVT_SCALE_FUNC(16s64f, cvt_64f, short,  double, double)
 DEF_CVT_SCALE_FUNC(32u64f, cvt_64f, unsigned, double, double)
-DEF_CVT_SCALE_FUNC(32s64f, cvt_64f, int,    double, double)
+DEF_CVT_SCALE_FUNC(32s64f, cvt_64f, цяло,    double, double)
 DEF_CVT_SCALE_FUNC(32f64f, cvt_64f, float,  double, double)
 DEF_CVT_SCALE_FUNC(64f,    cvt_64f, double, double, double)
 DEF_CVT_SCALE_FUNC(64u64f, cvt_64f, uint64_t, double, double)
@@ -371,7 +371,7 @@ DEF_CVT_SCALE_FUNC(8s64u,  cvt_64f, schar,  uint64_t, double)
 DEF_CVT_SCALE_FUNC(16u64u, cvt_64f, ushort, uint64_t, double)
 DEF_CVT_SCALE_FUNC(16s64u, cvt_64f, short,  uint64_t, double)
 DEF_CVT_SCALE_FUNC(32u64u, cvt_64f, unsigned, uint64_t, double)
-DEF_CVT_SCALE_FUNC(32s64u, cvt_64f, int,    uint64_t, double)
+DEF_CVT_SCALE_FUNC(32s64u, cvt_64f, цяло,    uint64_t, double)
 DEF_CVT_SCALE_FUNC(32f64u, cvt_64f, float,  uint64_t, double)
 DEF_CVT_SCALE_FUNC(64f64u, cvt_64f, double, uint64_t, double)
 DEF_CVT_SCALE_FUNC(64u, cvt_64f, uint64_t, uint64_t, double)
@@ -384,7 +384,7 @@ DEF_CVT_SCALE_FUNC(8s64s,  cvt_64f, schar,  int64_t, double)
 DEF_CVT_SCALE_FUNC(16u64s, cvt_64f, ushort, int64_t, double)
 DEF_CVT_SCALE_FUNC(16s64s, cvt_64f, short,  int64_t, double)
 DEF_CVT_SCALE_FUNC(32u64s, cvt_64f, unsigned, int64_t, double)
-DEF_CVT_SCALE_FUNC(32s64s, cvt_64f, int,    int64_t, double)
+DEF_CVT_SCALE_FUNC(32s64s, cvt_64f, цяло,    int64_t, double)
 DEF_CVT_SCALE_FUNC(32f64s, cvt_64f, float,  int64_t, double)
 DEF_CVT_SCALE_FUNC(64f64s, cvt_64f, double, int64_t, double)
 DEF_CVT_SCALE_FUNC(64u64s, cvt_64f, uint64_t, int64_t, double)
@@ -397,7 +397,7 @@ DEF_CVT_SCALE_FUNC(8s16f,  cvt1_32f, schar,  hfloat, float)
 DEF_CVT_SCALE_FUNC(16u16f, cvt1_32f, ushort, hfloat, float)
 DEF_CVT_SCALE_FUNC(16s16f, cvt1_32f, short,  hfloat, float)
 DEF_CVT_SCALE_FUNC(32u16f, cvt1_32f, unsigned, hfloat, float)
-DEF_CVT_SCALE_FUNC(32s16f, cvt1_32f, int,    hfloat, float)
+DEF_CVT_SCALE_FUNC(32s16f, cvt1_32f, цяло,    hfloat, float)
 DEF_CVT_SCALE_FUNC(32f16f, cvt1_32f, float,  hfloat, float)
 DEF_CVT_SCALE_FUNC(64f16f, cvt1_32f, double, hfloat, float)
 DEF_CVT_SCALE_FUNC(64u16f, cvt1_32f, uint64_t, hfloat, float)
@@ -410,7 +410,7 @@ DEF_CVT_SCALE_FUNC(8s16bf,  cvt1_32f, schar,  bfloat, float)
 DEF_CVT_SCALE_FUNC(16u16bf, cvt1_32f, ushort, bfloat, float)
 DEF_CVT_SCALE_FUNC(16s16bf, cvt1_32f, short,  bfloat, float)
 DEF_CVT_SCALE_FUNC(32u16bf, cvt1_32f, unsigned, bfloat, float)
-DEF_CVT_SCALE_FUNC(32s16bf, cvt1_32f, int,    bfloat, float)
+DEF_CVT_SCALE_FUNC(32s16bf, cvt1_32f, цяло,    bfloat, float)
 DEF_CVT_SCALE_FUNC(32f16bf, cvt1_32f, float,  bfloat, float)
 DEF_CVT_SCALE_FUNC(64f16bf, cvt1_32f, double, bfloat, float)
 DEF_CVT_SCALE_FUNC(64u16bf, cvt1_32f, uint64_t, bfloat, float)
@@ -424,7 +424,7 @@ DEF_CVT_SCALEBOOL2_FUNC(8b, bool, float)
 DEF_CVT_SCALEBOOL2_FUNC(8b16u, ushort, float)
 DEF_CVT_SCALEBOOL2_FUNC(8b16s, short, float)
 DEF_CVT_SCALEBOOL2_FUNC(8b32u, unsigned, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b32s, int, float)
+DEF_CVT_SCALEBOOL2_FUNC(8b32s, цяло, float)
 DEF_CVT_SCALEBOOL2_FUNC(8b32f, float, float)
 DEF_CVT_SCALEBOOL2_FUNC(8b64u, uint64_t, double)
 DEF_CVT_SCALEBOOL2_FUNC(8b64s, int64_t, double)
@@ -441,14 +441,14 @@ static void cvtScaleAbs##suffix( const uchar* src_, size_t sstep, const uchar*, 
     const double* scale = (const double*)scale_; \
     float a = (float)scale[0], b = (float)scale[1]; \
     sstep /= sizeof(src[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
+    за( цяло i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
+        за (цяло j = 0; j < size.width; j++) \
             dst[j] = saturate_cast<uchar>(std::abs((float)src[j]*a + b)); \
 }
 DEF_CVT_SCALE_ABS_SCALAR_FUNC(8fe4m3u8u, fp8a_t)
 DEF_CVT_SCALE_ABS_SCALAR_FUNC(8fe4m38u,  fp8_t)
 
-BinaryFunc getCvtScaleAbsFunc(int depth)
+BinaryFunc getCvtScaleAbsFunc(цяло depth)
 {
     BinaryFunc func =
         depth == CV_8F_E4M3FN ? (BinaryFunc)cvtScaleAbs8fe4m38u :
@@ -467,7 +467,7 @@ BinaryFunc getCvtScaleAbsFunc(int depth)
         depth == CV_64S ? (BinaryFunc)cvtScaleAbs64s8u :
         depth == CV_64F ? (BinaryFunc)cvtScaleAbs64f8u : 0;
     CV_Assert(func != 0);
-    return func;
+    върни func;
 }
 
 //////////////////// FP8 scaled conversions — scalar via saturate_cast(src*a+b) ////////////////////
@@ -479,8 +479,8 @@ static void cvtScale##suffix( const uchar* src_, size_t sstep, const uchar*, siz
     const double* scale = (const double*)scale_; \
     wtype a = (wtype)scale[0], b = (wtype)scale[1]; \
     sstep /= sizeof(src[0]); dstep /= sizeof(dst[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
+    за( цяло i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
+        за (цяло j = 0; j < size.width; j++) \
             dst[j] = saturate_cast<dtype>((wtype)src[j]*a + b); \
 }
 
@@ -491,7 +491,7 @@ static void cvtScale##suffix( const uchar* src_, size_t sstep, const uchar*, siz
     DEF_CVT_SCALE_SCALAR_FUNC(S##16u,  T, ushort, double)    DEF_CVT_SCALE_SCALAR_FUNC(16u##S,  ushort, T, double) \
     DEF_CVT_SCALE_SCALAR_FUNC(S##16s,  T, short, double)     DEF_CVT_SCALE_SCALAR_FUNC(16s##S,  short, T, double) \
     DEF_CVT_SCALE_SCALAR_FUNC(S##32u,  T, unsigned, double)  DEF_CVT_SCALE_SCALAR_FUNC(32u##S,  unsigned, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##32s,  T, int, double)       DEF_CVT_SCALE_SCALAR_FUNC(32s##S,  int, T, double) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##32s,  T, цяло, double)       DEF_CVT_SCALE_SCALAR_FUNC(32s##S,  цяло, T, double) \
     DEF_CVT_SCALE_SCALAR_FUNC(S##32f,  T, float, double) \
     DEF_CVT_SCALE_SCALAR_FUNC(S##64f,  T, double, double)    DEF_CVT_SCALE_SCALAR_FUNC(64f##S,  double, T, double) \
     DEF_CVT_SCALE_SCALAR_FUNC(S##16f,  T, hfloat, double)    DEF_CVT_SCALE_SCALAR_FUNC(16f##S,  hfloat, T, double) \
@@ -506,7 +506,7 @@ DEF_CVT_SCALE_FP8(8fe4m3u, fp8a_t)
 
 // convertTo(dst, depth, alpha, beta) path -- real quantization. Reuses convert.hpp's fast path.
 // Double precision here matches the scalar reference (wtype)x*a+b bit-for-bit.
-template<int bias, bool fnuz> static void
+template<цяло bias, bool fnuz> static void
 cvtScaleF32ToFp8(const uchar* src_, size_t sstep, const uchar*, size_t,
                  uchar* dst, size_t dstep, Size size, void* scale_)
 {
@@ -516,15 +516,15 @@ cvtScaleF32ToFp8(const uchar* src_, size_t sstep, const uchar*, size_t,
     double a = scale[0], b = scale[1];
     sstep /= sizeof(src[0]);
 
-    for (int i = 0; i < size.height; i++, src += sstep, dst += dstep)
+    за (цяло i = 0; i < size.height; i++, src += sstep, dst += dstep)
     {
-        int j = 0;
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+        цяло j = 0;
+#ако (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
         v_float64 va = vx_setall_f64(a), vb = vx_setall_f64(b);
-        const int LANES32 = VTraits<v_float32>::vlanes();
-        const int VECSZ = LANES32 * 4;
+        const цяло LANES32 = VTraits<v_float32>::vlanes();
+        const цяло VECSZ = LANES32 * 4;
         float scaled[VTraits<v_float32>::max_nlanes * 4];
-        for (; j <= size.width - VECSZ; j += VECSZ)
+        за (; j <= size.width - VECSZ; j += VECSZ)
         {
             v_float32 vf0, vf1, vf2, vf3;
             v_float64 d0, d1;
@@ -557,7 +557,7 @@ cvtScaleF32ToFp8(const uchar* src_, size_t sstep, const uchar*, size_t,
         }
         vx_cleanup();
 #endif
-        for (; j < size.width; j++)
+        за (; j < size.width; j++)
             dst[j] = fp8_detail::encodeE4M3((float)((double)src[j]*a + b), bias, fnuz);
     }
 }
@@ -566,10 +566,10 @@ static void cvtScale32f8fe4m3(const uchar* s, size_t ss, const uchar* p, size_t 
 static void cvtScale32f8fe4m3u(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
 { cvtScaleF32ToFp8<8, true>(s, ss, p, ps, d, ds, sz, x); }
 
-BinaryFunc getConvertScaleFunc(int sdepth_, int ddepth_)
+BinaryFunc getConvertScaleFunc(цяло sdepth_, цяло ddepth_)
 {
-    int sdepth = CV_MAT_DEPTH(sdepth_);
-    int ddepth = CV_MAT_DEPTH(ddepth_);
+    цяло sdepth = CV_MAT_DEPTH(sdepth_);
+    цяло ddepth = CV_MAT_DEPTH(ddepth_);
     BinaryFunc func =
         ddepth == CV_8U ? (
             sdepth == CV_8U ? cvtScale8u :
@@ -828,7 +828,7 @@ BinaryFunc getConvertScaleFunc(int sdepth_, int ddepth_)
             0) :
         0;
     CV_Assert(func != 0);
-    return func;
+    върни func;
 }
 
 #endif

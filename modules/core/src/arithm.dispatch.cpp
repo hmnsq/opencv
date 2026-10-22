@@ -16,123 +16,123 @@
 namespace cv { namespace ew {
 
 // ---- tier 2: pick the kernel optimized for the current CPU ---------------------------------------
-TKernel getAddFunc(int T, int R)            { CV_CPU_DISPATCH(getAddFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getSubFunc(int T, int R)            { CV_CPU_DISPATCH(getSubFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getMulFunc(int T, int R)            { CV_CPU_DISPATCH(getMulFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getDivFunc(int T, int R, bool chk)  { CV_CPU_DISPATCH(getDivFunc_,     (T, R, chk),     CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getMinFunc(int T, int R)            { CV_CPU_DISPATCH(getMinFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getMaxFunc(int T, int R)            { CV_CPU_DISPATCH(getMaxFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getAbsdiffFunc(int T, int R)        { CV_CPU_DISPATCH(getAbsdiffFunc_, (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getHypotFunc(int T, int R)          { CV_CPU_DISPATCH(getHypotFunc_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getAtan2Func(int T, int R)          { CV_CPU_DISPATCH(getAtan2Func_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getCmpFunc(TOp op, int T)           { CV_CPU_DISPATCH(getCmpFunc_,     (op, T),         CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getBitwiseFunc(TOp op, int esz)     { CV_CPU_DISPATCH(getBitwiseFunc_, (op, esz),       CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getNotFunc(int esz)                 { CV_CPU_DISPATCH(getNotFunc_,     (esz),           CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getAddWeightedFunc(int T, int R)    { CV_CPU_DISPATCH(getAddWeightedFunc_, (T, R),      CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getSelectFunc(int mdepth, int T)    { CV_CPU_DISPATCH(getSelectFunc_,  (mdepth, T),     CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getClampFunc(int T)                 { CV_CPU_DISPATCH(getClampFunc_,   (T),             CV_CPU_DISPATCH_MODES_ALL); }
-static TKernel getCastFunc(int sd, int dd, bool scaled)
+TKernel getAddFunc(цяло T, цяло R)            { CV_CPU_DISPATCH(getAddFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getSubFunc(цяло T, цяло R)            { CV_CPU_DISPATCH(getSubFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getMulFunc(цяло T, цяло R)            { CV_CPU_DISPATCH(getMulFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getDivFunc(цяло T, цяло R, bool chk)  { CV_CPU_DISPATCH(getDivFunc_,     (T, R, chk),     CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getMinFunc(цяло T, цяло R)            { CV_CPU_DISPATCH(getMinFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getMaxFunc(цяло T, цяло R)            { CV_CPU_DISPATCH(getMaxFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getAbsdiffFunc(цяло T, цяло R)        { CV_CPU_DISPATCH(getAbsdiffFunc_, (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getHypotFunc(цяло T, цяло R)          { CV_CPU_DISPATCH(getHypotFunc_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getAtan2Func(цяло T, цяло R)          { CV_CPU_DISPATCH(getAtan2Func_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getCmpFunc(TOp op, цяло T)           { CV_CPU_DISPATCH(getCmpFunc_,     (op, T),         CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getBitwiseFunc(TOp op, цяло esz)     { CV_CPU_DISPATCH(getBitwiseFunc_, (op, esz),       CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getNotFunc(цяло esz)                 { CV_CPU_DISPATCH(getNotFunc_,     (esz),           CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getAddWeightedFunc(цяло T, цяло R)    { CV_CPU_DISPATCH(getAddWeightedFunc_, (T, R),      CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getSelectFunc(цяло mdepth, цяло T)    { CV_CPU_DISPATCH(getSelectFunc_,  (mdepth, T),     CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getClampFunc(цяло T)                 { CV_CPU_DISPATCH(getClampFunc_,   (T),             CV_CPU_DISPATCH_MODES_ALL); }
+static TKernel getCastFunc(цяло sd, цяло dd, bool scaled)
                                             { CV_CPU_DISPATCH(getCastFunc_,    (sd, dd, scaled),CV_CPU_DISPATCH_MODES_ALL); }
 
 // ---- tier 3: op-level dispatcher used by the compiler --------------------------------------------
-TKernel getElemwiseFunc(TOp op, int depth0, int depth1, int depth2, int rdepth)
+TKernel getElemwiseFunc(TOp op, цяло depth0, цяло depth1, цяло depth2, цяло rdepth)
 {
     (void)depth2;
 
-    if (op == OP_CAST)          return getCastFunc(depth0, rdepth, false);
-    if (op == OP_CONVERT_SCALE) return getCastFunc(depth0, rdepth, true);
+    ако (op == OP_CAST)          върни getCastFunc(depth0, rdepth, false);
+    ако (op == OP_CONVERT_SCALE) върни getCastFunc(depth0, rdepth, true);
 
-    if (op == OP_ADD || op == OP_SUB)
+    ако (op == OP_ADD || op == OP_SUB)
     {
-        if (depth0 != depth1) return {};   // operands must be the same type
-        return op == OP_ADD ? getAddFunc(depth0, rdepth) : getSubFunc(depth0, rdepth);
+        ако (depth0 != depth1) върни {};   // operands must be the same type
+        върни op == OP_ADD ? getAddFunc(depth0, rdepth) : getSubFunc(depth0, rdepth);
     }
 
     // OP_ADDW (addWeighted): a*alpha+b*beta+gamma; operands same type T, result R (T/f32 for small ints
     // + f16/bf16/f32, f64 otherwise). alpha/beta/gamma travel in the instruction's params.
-    if (op == OP_ADDW)
+    ако (op == OP_ADDW)
     {
-        if (depth0 != depth1) return {};
-        return getAddWeightedFunc(depth0, rdepth);
+        ако (depth0 != depth1) върни {};
+        върни getAddWeightedFunc(depth0, rdepth);
     }
 
     // OP_MUL / OP_DIV / OP_POW: operands same type T; compute in the float work type (rdepth).
-    if (op == OP_MUL || op == OP_DIV || op == OP_POW)
+    ако (op == OP_MUL || op == OP_DIV || op == OP_POW)
     {
-        if (depth0 != depth1) return {};
-        if (op == OP_MUL) return getMulFunc(depth0, rdepth);
-        if (op == OP_POW) return getPowFunc(depth0, rdepth);
+        ако (depth0 != depth1) върни {};
+        ако (op == OP_MUL) върни getMulFunc(depth0, rdepth);
+        ако (op == OP_POW) върни getPowFunc(depth0, rdepth);
         // integer inputs guard divide-by-zero (-> 0); floats do not (a/0 -> inf, matching cv::divide).
         const bool isflt = depth0==CV_16F || depth0==CV_16BF || depth0==CV_32F || depth0==CV_64F;
-        return getDivFunc(depth0, rdepth, !isflt);
+        върни getDivFunc(depth0, rdepth, !isflt);
     }
 
     // OP_MIN / OP_MAX: T x T -> T.
-    if (op == OP_MIN || op == OP_MAX)
+    ако (op == OP_MIN || op == OP_MAX)
     {
-        if (depth0 != depth1 || rdepth != depth0) return {};
-        return op == OP_MIN ? getMinFunc(depth0, rdepth) : getMaxFunc(depth0, rdepth);
+        ако (depth0 != depth1 || rdepth != depth0) върни {};
+        върни op == OP_MIN ? getMinFunc(depth0, rdepth) : getMaxFunc(depth0, rdepth);
     }
 
     // OP_ABSDIFF: result is absdiffResultDepth(T) (unsigned same width for signed).
-    if (op == OP_ABSDIFF)
+    ако (op == OP_ABSDIFF)
     {
-        if (depth0 != depth1) return {};
-        return getAbsdiffFunc(depth0, rdepth);
+        ако (depth0 != depth1) върни {};
+        върни getAbsdiffFunc(depth0, rdepth);
     }
 
     // OP_CMP_*: T x T -> u8 mask (0 / 1 / 255, value via TKernel::flags).
-    if (opCategory(op) == CAT_COMPARE)
+    ако (opCategory(op) == CAT_COMPARE)
     {
-        if (depth0 != depth1 || rdepth != CV_8U) return {};
-        return getCmpFunc(op, depth0);
+        ако (depth0 != depth1 || rdepth != CV_8U) върни {};
+        върни getCmpFunc(op, depth0);
     }
 
     // OP_AND / OP_OR / OP_XOR: bit-pattern op, T x T -> T (same depth), dispatched by element size.
-    if (op == OP_AND || op == OP_OR || op == OP_XOR)
+    ако (op == OP_AND || op == OP_OR || op == OP_XOR)
     {
-        if (depth0 != depth1 || rdepth != depth0) return {};
-        return getBitwiseFunc(op, CV_ELEM_SIZE1(depth0));
+        ако (depth0 != depth1 || rdepth != depth0) върни {};
+        върни getBitwiseFunc(op, CV_ELEM_SIZE1(depth0));
     }
 
     // OP_NOT: ~x, one input, T -> T (same depth), dispatched by element size.
-    if (op == OP_NOT)
+    ако (op == OP_NOT)
     {
-        if (rdepth != depth0) return {};
-        return getNotFunc(CV_ELEM_SIZE1(depth0));
+        ако (rdepth != depth0) върни {};
+        върни getNotFunc(CV_ELEM_SIZE1(depth0));
     }
 
     // OP_HYPOT / OP_ATAN2: T x T -> T over the float depths (integer inputs are the compiler's job).
-    if (op == OP_HYPOT || op == OP_ATAN2)
+    ако (op == OP_HYPOT || op == OP_ATAN2)
     {
-        if (depth0 != depth1) return {};
-        return op == OP_HYPOT ? getHypotFunc(depth0, rdepth) : getAtan2Func(depth0, rdepth);
+        ако (depth0 != depth1) върни {};
+        върни op == OP_HYPOT ? getHypotFunc(depth0, rdepth) : getAtan2Func(depth0, rdepth);
     }
 
     // unary math: T -> T over the float depths (math.simd.hpp). Anything else - integer input,
     // widening/narrowing result - is the compiler's job (cast to a float working type first).
-    if (op == OP_SQRT || op == OP_EXP || op == OP_LOG || op == OP_SIN || op == OP_COS ||
+    ако (op == OP_SQRT || op == OP_EXP || op == OP_LOG || op == OP_SIN || op == OP_COS ||
         op == OP_TANH || op == OP_ERF || op == OP_RELU)
     {
-        if (rdepth != depth0) return {};
-        return getMathFunc(op, depth0);
+        ако (rdepth != depth0) върни {};
+        върни getMathFunc(op, depth0);
     }
 
     // OP_SELECT: depth0 is the (1-byte, never cast) mask; both branches and dst share one depth.
-    if (op == OP_SELECT)
+    ако (op == OP_SELECT)
     {
-        if (depth1 != depth2 || rdepth != depth1) return {};
-        return getSelectFunc(depth0, rdepth);
+        ако (depth1 != depth2 || rdepth != depth1) върни {};
+        върни getSelectFunc(depth0, rdepth);
     }
 
     // OP_CLAMP: x, lo, hi and dst all share one depth (emitTernary unifies them).
-    if (op == OP_CLAMP)
+    ако (op == OP_CLAMP)
     {
-        if (depth1 != depth0 || depth2 != depth0 || rdepth != depth0) return {};
-        return getClampFunc(rdepth);
+        ако (depth1 != depth0 || depth2 != depth0 || rdepth != depth0) върни {};
+        върни getClampFunc(rdepth);
     }
 
-    return {};
+    върни {};
 }
 
 }} // namespace cv::ew
@@ -143,7 +143,7 @@ namespace cv { namespace hal {
 // G-API fluid backend in opencv_contrib calls it directly): forward to the element-wise engine's
 // u8 multiply kernel. `scale` is a pointer to a double, as in the old contract.
 void mul8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-           uchar* dst, size_t step, int width, int height, void* scale)
+           uchar* dst, size_t step, цяло width, цяло height, void* scale)
 {
     const double params[] = { scale ? *(const double*)scale : 1.0 };
     ew::TKernel k = ew::getMulFunc(CV_8U, CV_8U);
@@ -155,7 +155,7 @@ void mul8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
 // (e.g. opencv_objdetect's aruco) and external code: forward to the element-wise engine's byte-wise
 // bitwise kernels. No scalar params - bitwise ops ignore them.
 static void bitwise8u(ew::TOp op, const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                      uchar* dst, size_t step, int width, int height)
+                      uchar* dst, size_t step, цяло width, цяло height)
 {
     const double noparams[4] = {};
     ew::TKernel k = ew::getBitwiseFunc(op, 1);
@@ -165,19 +165,19 @@ static void bitwise8u(ew::TOp op, const uchar* src1, size_t step1, const uchar* 
 }
 
 void and8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-           uchar* dst, size_t step, int width, int height, void*)
+           uchar* dst, size_t step, цяло width, цяло height, void*)
 { bitwise8u(ew::OP_AND, src1, step1, src2, step2, dst, step, width, height); }
 
 void or8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-          uchar* dst, size_t step, int width, int height, void*)
+          uchar* dst, size_t step, цяло width, цяло height, void*)
 { bitwise8u(ew::OP_OR, src1, step1, src2, step2, dst, step, width, height); }
 
 void xor8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-           uchar* dst, size_t step, int width, int height, void*)
+           uchar* dst, size_t step, цяло width, цяло height, void*)
 { bitwise8u(ew::OP_XOR, src1, step1, src2, step2, dst, step, width, height); }
 
 void not8u(const uchar* src1, size_t step1, const uchar* /*src2*/, size_t /*step2*/,
-           uchar* dst, size_t step, int width, int height, void*)
+           uchar* dst, size_t step, цяло width, цяло height, void*)
 {
     const double noparams[4] = {};
     ew::TKernel k = ew::getNotFunc(1);

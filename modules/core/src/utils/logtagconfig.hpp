@@ -5,7 +5,7 @@
 #ifndef OPENCV_CORE_LOGTAGCONFIG_HPP
 #define OPENCV_CORE_LOGTAGCONFIG_HPP
 
-#if 1 // if not already in precompiled headers
+#ако 1 // if not already in precompiled headers
 #include <opencv2/core/utils/logger.defines.hpp>
 #include <string>
 #endif
