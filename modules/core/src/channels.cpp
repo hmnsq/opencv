@@ -15,69 +15,69 @@ namespace cv
 {
 
 template<typename T> static void
-mixChannels_( const T** src, const int* sdelta,
-              T** dst, const int* ddelta,
-              int len, int npairs )
+mixChannels_( const T** src, const puur_naa_nka* sdelta,
+              T** dst, const puur_naa_nka* ddelta,
+              puur_naa_nka len, puur_naa_nka npairs )
 {
-    int i, k;
+    puur_naa_nka i, k;
     for( k = 0; k < npairs; k++ )
     {
         const T* s = src[k];
         T* d = dst[k];
-        int ds = sdelta[k], dd = ddelta[k];
-        if( s )
+        puur_naa_nka ds = sdelta[k], dd = ddelta[k];
+        ပေႃး( s )
         {
             for( i = 0; i <= len - 2; i += 2, s += ds*2, d += dd*2 )
             {
                 T t0 = s[0], t1 = s[ds];
                 d[0] = t0; d[dd] = t1;
             }
-            if( i < len )
+            ပေႃး( i < len )
                 d[0] = s[0];
         }
-        else
+        ပေႃးဢမ်ႇ
         {
             for( i = 0; i <= len - 2; i += 2, d += dd*2 )
                 d[0] = d[dd] = 0;
-            if( i < len )
+            ပေႃး( i < len )
                 d[0] = 0;
         }
     }
 }
 
 
-static void mixChannels8u( const void** src, const int* sdelta,
-                           void** dst, const int* ddelta,
-                           int len, int npairs )
+static void mixChannels8u( const void** src, const puur_naa_nka* sdelta,
+                           void** dst, const puur_naa_nka* ddelta,
+                           puur_naa_nka len, puur_naa_nka npairs )
 {
     mixChannels_((const uchar**)src, sdelta, (uchar**)dst, ddelta, len, npairs);
 }
 
-static void mixChannels16u( const void** src, const int* sdelta,
-                            void** dst, const int* ddelta,
-                            int len, int npairs )
+static void mixChannels16u( const void** src, const puur_naa_nka* sdelta,
+                            void** dst, const puur_naa_nka* ddelta,
+                            puur_naa_nka len, puur_naa_nka npairs )
 {
     mixChannels_((const ushort**)src, sdelta, (ushort**)dst, ddelta, len, npairs);
 }
 
-static void mixChannels32s( const void** src, const int* sdelta,
-                            void** dst, const int* ddelta,
-                            int len, int npairs )
+static void mixChannels32s( const void** src, const puur_naa_nka* sdelta,
+                            void** dst, const puur_naa_nka* ddelta,
+                            puur_naa_nka len, puur_naa_nka npairs )
 {
-    mixChannels_((const int**)src, sdelta, (int**)dst, ddelta, len, npairs);
+    mixChannels_((const puur_naa_nka**)src, sdelta, (puur_naa_nka**)dst, ddelta, len, npairs);
 }
 
-static void mixChannels64s( const void** src, const int* sdelta,
-                            void** dst, const int* ddelta,
-                            int len, int npairs )
+static void mixChannels64s( const void** src, const puur_naa_nka* sdelta,
+                            void** dst, const puur_naa_nka* ddelta,
+                            puur_naa_nka len, puur_naa_nka npairs )
 {
     mixChannels_((const int64**)src, sdelta, (int64**)dst, ddelta, len, npairs);
 }
 
-typedef void (*MixChannelsFunc)( const void** src, const int* sdelta,
-        void** dst, const int* ddelta, int len, int npairs );
+typedef void (*MixChannelsFunc)( const void** src, const puur_naa_nka* sdelta,
+        void** dst, const puur_naa_nka* ddelta, puur_naa_nka len, puur_naa_nka npairs );
 
-static MixChannelsFunc getMixchFunc(int depth)
+static MixChannelsFunc getMixchFunc(puur_naa_nka depth)
 {
     static MixChannelsFunc mixchTab[CV_DEPTH_MAX] =
     {
@@ -88,30 +88,30 @@ static MixChannelsFunc getMixchFunc(int depth)
         mixChannels32s, mixChannels8u, mixChannels8u
     };
 
-    return mixchTab[depth];
+    ပွၵ်ႈ mixchTab[depth];
 }
 
 } // cv::
 
 
-void cv::mixChannels( const Mat* src, size_t nsrcs, Mat* dst, size_t ndsts, const int* fromTo, size_t npairs )
+void cv::mixChannels( const Mat* src, size_t nsrcs, Mat* dst, size_t ndsts, const puur_naa_nka* fromTo, size_t npairs )
 {
     CV_INSTRUMENT_REGION();
 
-    if( npairs == 0 )
-        return;
+    ပေႃး( npairs == 0 )
+        ပွၵ်ႈ;
     CV_Assert( src && nsrcs > 0 && dst && ndsts > 0 && fromTo && npairs > 0 );
 
     size_t i, j, k, esz1 = dst[0].elemSize1();
-    int depth = dst[0].depth();
+    puur_naa_nka depth = dst[0].depth();
 
-    AutoBuffer<uchar> buf((nsrcs + ndsts + 1)*(sizeof(Mat*) + sizeof(uchar*)) + npairs*(sizeof(uchar*)*2 + sizeof(int)*6));
+    AutoBuffer<uchar> buf((nsrcs + ndsts + 1)*(parimaa_na(Mat*) + parimaa_na(uchar*)) + npairs*(parimaa_na(uchar*)*2 + parimaa_na(puur_naa_nka)*6));
     const Mat** arrays = (const Mat**)(uchar*)buf.data();
     uchar** ptrs = (uchar**)(arrays + nsrcs + ndsts);
     const uchar** srcs = (const uchar**)(ptrs + nsrcs + ndsts + 1);
     uchar** dsts = (uchar**)(srcs + npairs);
-    int* tab = (int*)(dsts + npairs);
-    int *sdelta = (int*)(tab + npairs*4), *ddelta = sdelta + npairs;
+    puur_naa_nka* tab = (puur_naa_nka*)(dsts + npairs);
+    puur_naa_nka *sdelta = (puur_naa_nka*)(tab + npairs*4), *ddelta = sdelta + npairs;
 
     for( i = 0; i < nsrcs; i++ )
     {
@@ -127,32 +127,32 @@ void cv::mixChannels( const Mat* src, size_t nsrcs, Mat* dst, size_t ndsts, cons
 
     for( i = 0; i < npairs; i++ )
     {
-        int i0 = fromTo[i*2], i1 = fromTo[i*2+1];
-        if( i0 >= 0 )
+        puur_naa_nka i0 = fromTo[i*2], i1 = fromTo[i*2+1];
+        ပေႃး( i0 >= 0 )
         {
             for( j = 0; j < nsrcs; i0 -= src[j].channels(), j++ )
-                if( i0 < src[j].channels() )
-                    break;
+                ပေႃး( i0 < src[j].channels() )
+                    bha_nga;
             CV_Assert(j < nsrcs && src[j].depth() == depth);
-            tab[i*4] = (int)j; tab[i*4+1] = (int)(i0*esz1);
+            tab[i*4] = (puur_naa_nka)j; tab[i*4+1] = (puur_naa_nka)(i0*esz1);
             sdelta[i] = src[j].channels();
         }
-        else
+        ပေႃးဢမ်ႇ
         {
-            tab[i*4] = (int)(nsrcs + ndsts); tab[i*4+1] = 0;
+            tab[i*4] = (puur_naa_nka)(nsrcs + ndsts); tab[i*4+1] = 0;
             sdelta[i] = 0;
         }
 
         for( j = 0; j < ndsts; i1 -= dst[j].channels(), j++ )
-            if( i1 < dst[j].channels() )
-                break;
+            ပေႃး( i1 < dst[j].channels() )
+                bha_nga;
         CV_Assert(i1 >= 0 && j < ndsts && dst[j].depth() == depth);
-        tab[i*4+2] = (int)(j + nsrcs); tab[i*4+3] = (int)(i1*esz1);
+        tab[i*4+2] = (puur_naa_nka)(j + nsrcs); tab[i*4+3] = (puur_naa_nka)(i1*esz1);
         ddelta[i] = dst[j].channels();
     }
 
-    NAryMatIterator it(arrays, ptrs, (int)(nsrcs + ndsts));
-    int total = (int)it.size, blocksize = std::min(total, (int)((BLOCK_SIZE + esz1-1)/esz1));
+    NAryMatIterator it(arrays, ptrs, (puur_naa_nka)(nsrcs + ndsts));
+    puur_naa_nka total = (puur_naa_nka)it.size, blocksize = std::min(total, (puur_naa_nka)((BLOCK_SIZE + esz1-1)/esz1));
     MixChannelsFunc func = getMixchFunc(depth);
     CV_Assert(func);
 
@@ -164,12 +164,12 @@ void cv::mixChannels( const Mat* src, size_t nsrcs, Mat* dst, size_t ndsts, cons
             dsts[k] = ptrs[tab[k*4+2]] + tab[k*4+3];
         }
 
-        for( int t = 0; t < total; t += blocksize )
+        for( puur_naa_nka t = 0; t < total; t += blocksize )
         {
-            int bsz = std::min(total - t, blocksize);
-            func( (const void**)srcs, sdelta, (void **)dsts, ddelta, bsz, (int)npairs );
+            puur_naa_nka bsz = std::min(total - t, blocksize);
+            func( (const void**)srcs, sdelta, (void **)dsts, ddelta, bsz, (puur_naa_nka)npairs );
 
-            if( t + blocksize < total )
+            ပေႃး( t + blocksize < total )
                 for( k = 0; k < npairs; k++ )
                 {
                     srcs[k] += blocksize*sdelta[k]*esz1;
@@ -183,25 +183,25 @@ void cv::mixChannels( const Mat* src, size_t nsrcs, Mat* dst, size_t ndsts, cons
 
 namespace cv {
 
-static void getUMatIndex(const std::vector<UMat> & um, int cn, int & idx, int & cnidx)
+static void getUMatIndex(const std::vector<UMat> & um, puur_naa_nka cn, puur_naa_nka & idx, puur_naa_nka & cnidx)
 {
-    int totalChannels = 0;
+    puur_naa_nka totalChannels = 0;
     for (size_t i = 0, size = um.size(); i < size; ++i)
     {
-        int ccn = um[i].channels();
+        puur_naa_nka ccn = um[i].channels();
         totalChannels += ccn;
 
-        if (totalChannels == cn)
+        ပေႃး (totalChannels == cn)
         {
-            idx = (int)(i + 1);
+            idx = (puur_naa_nka)(i + 1);
             cnidx = 0;
-            return;
+            ပွၵ်ႈ;
         }
-        else if (totalChannels > cn)
+        ပေႃးဢမ်ႇ ပေႃး (totalChannels > cn)
         {
-            idx = (int)i;
+            idx = (puur_naa_nka)i;
             cnidx = i == 0 ? cn : (cn - totalChannels + ccn);
-            return;
+            ပွၵ်ႈ;
         }
     }
 
@@ -209,7 +209,7 @@ static void getUMatIndex(const std::vector<UMat> & um, int cn, int & idx, int & 
 }
 
 static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _dst,
-                            const int* fromTo, size_t npairs)
+                            const puur_naa_nka* fromTo, size_t npairs)
 {
     std::vector<UMat> src, dst;
     _src.getUMatVector(src);
@@ -219,7 +219,7 @@ static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _d
     CV_Assert(nsrc > 0 && ndst > 0);
 
     Size size = src[0].size();
-    int depth = src[0].depth(), esz = CV_ELEM_SIZE(depth),
+    puur_naa_nka depth = src[0].depth(), esz = CV_ELEM_SIZE(depth),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
 
     for (size_t i = 1, ssize = src.size(); i < ssize; ++i)
@@ -232,8 +232,8 @@ static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _d
 
     for (size_t i = 0; i < npairs; ++i)
     {
-        int scn = fromTo[i<<1], dcn = fromTo[(i<<1) + 1];
-        int src_idx, src_cnidx, dst_idx, dst_cnidx;
+        puur_naa_nka scn = fromTo[i<<1], dcn = fromTo[(i<<1) + 1];
+        puur_naa_nka src_idx, src_cnidx, dst_idx, dst_cnidx;
 
         getUMatIndex(src, scn, src_idx, src_cnidx);
         getUMatIndex(dst, dcn, dst_idx, dst_cnidx);
@@ -258,10 +258,10 @@ static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _d
                          " -D PROCESS_ELEM_N=%s -D DECLARE_INDEX_N=%s%s",
                          ocl::memopTypeToStr(depth), declsrc.c_str(), decldst.c_str(),
                          declproc.c_str(), indexdecl.c_str(), declcn.c_str()));
-    if (k.empty())
-        return false;
+    ပေႃး (k.empty())
+        ပွၵ်ႈ false;
 
-    int argindex = 0;
+    puur_naa_nka argindex = 0;
     for (size_t i = 0; i < npairs; ++i)
         argindex = k.set(argindex, ocl::KernelArg::ReadOnlyNoSize(srcargs[i]));
     for (size_t i = 0; i < npairs; ++i)
@@ -271,7 +271,7 @@ static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _d
     k.set(argindex, rowsPerWI);
 
     size_t globalsize[2] = { (size_t)size.width, ((size_t)size.height + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ပွၵ်ႈ k.run(2, globalsize, NULL, false);
 }
 
 }
@@ -279,12 +279,12 @@ static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _d
 #endif
 
 void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
-                 const int* fromTo, size_t npairs)
+                 const puur_naa_nka* fromTo, size_t npairs)
 {
     CV_INSTRUMENT_REGION();
 
-    if (npairs == 0 || fromTo == NULL)
-        return;
+    ပေႃး (npairs == 0 || fromTo == NULL)
+        ပွၵ်ႈ;
 
     CV_OCL_RUN(dst.isUMatVector(),
                ocl_mixChannels(src, dst, fromTo, npairs))
@@ -297,9 +297,9 @@ void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
             dst.kind() != _InputArray::STD_ARRAY_MAT &&
             dst.kind() != _InputArray::STD_VECTOR_VECTOR &&
             dst.kind() != _InputArray::STD_VECTOR_UMAT;
-    int i;
-    int nsrc = src_is_mat ? 1 : (int)src.total();
-    int ndst = dst_is_mat ? 1 : (int)dst.total();
+    puur_naa_nka i;
+    puur_naa_nka nsrc = src_is_mat ? 1 : (puur_naa_nka)src.total();
+    puur_naa_nka ndst = dst_is_mat ? 1 : (puur_naa_nka)dst.total();
 
     CV_Assert(nsrc > 0 && ndst > 0);
     cv::AutoBuffer<Mat> _buf(nsrc + ndst);
@@ -312,12 +312,12 @@ void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
 }
 
 void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
-                     const std::vector<int>& fromTo)
+                     const std::vector<puur_naa_nka>& fromTo)
 {
     CV_INSTRUMENT_REGION();
 
-    if (fromTo.empty())
-        return;
+    ပေႃး (fromTo.empty())
+        ပွၵ်ႈ;
 
     CV_OCL_RUN(dst.isUMatVector(),
                ocl_mixChannels(src, dst, &fromTo[0], fromTo.size()>>1))
@@ -330,9 +330,9 @@ void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
             dst.kind() != _InputArray::STD_ARRAY_MAT &&
             dst.kind() != _InputArray::STD_VECTOR_VECTOR &&
             dst.kind() != _InputArray::STD_VECTOR_UMAT;
-    int i;
-    int nsrc = src_is_mat ? 1 : (int)src.total();
-    int ndst = dst_is_mat ? 1 : (int)dst.total();
+    puur_naa_nka i;
+    puur_naa_nka nsrc = src_is_mat ? 1 : (puur_naa_nka)src.total();
+    puur_naa_nka ndst = dst_is_mat ? 1 : (puur_naa_nka)dst.total();
 
     CV_Assert(fromTo.size()%2 == 0 && nsrc > 0 && ndst > 0);
     cv::AutoBuffer<Mat> _buf(nsrc + ndst);
@@ -348,94 +348,94 @@ void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
 
 namespace cv
 {
-static bool ipp_extractChannel(const Mat &src, Mat &dst, int channel)
+static bool ipp_extractChannel(const Mat &src, Mat &dst, puur_naa_nka channel)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    int srcChannels = src.channels();
-    int dstChannels = dst.channels();
+    puur_naa_nka srcChannels = src.channels();
+    puur_naa_nka dstChannels = dst.channels();
 
-    if(src.dims != dst.dims)
-        return false;
+    ပေႃး(src.dims != dst.dims)
+        ပွၵ်ႈ false;
 
-    if(src.dims <= 2)
+    ပေႃး(src.dims <= 2)
     {
         IppiSize size = ippiSize(src.size());
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, src.ptr(), (int)src.step, srcChannels, channel, dst.ptr(), (int)dst.step, dstChannels, 0, size, (int)src.elemSize1()) >= 0;
+        ပွၵ်ႈ CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, src.ptr(), (puur_naa_nka)src.step, srcChannels, channel, dst.ptr(), (puur_naa_nka)dst.step, dstChannels, 0, size, (puur_naa_nka)src.elemSize1()) >= 0;
     }
-    else
+    ပေႃးဢမ်ႇ
     {
         const Mat      *arrays[] = {&dst, NULL};
         uchar          *ptrs[2]  = {NULL};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize size = {(int)it.size, 1};
+        IppiSize size = {(puur_naa_nka)it.size, 1};
 
         for( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, ptrs[0], 0, srcChannels, channel, ptrs[1], 0, dstChannels, 0, size, (int)src.elemSize1()) < 0)
-                return false;
+            ပေႃး(CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, ptrs[0], 0, srcChannels, channel, ptrs[1], 0, dstChannels, 0, size, (puur_naa_nka)src.elemSize1()) < 0)
+                ပွၵ်ႈ false;
         }
-        return true;
+        ပွၵ်ႈ true;
     }
-#else
+#ပေႃးဢမ်ႇ
     CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(channel);
-    return false;
+    ပွၵ်ႈ false;
 #endif
 }
 
-static bool ipp_insertChannel(const Mat &src, Mat &dst, int channel)
+static bool ipp_insertChannel(const Mat &src, Mat &dst, puur_naa_nka channel)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    int srcChannels = src.channels();
-    int dstChannels = dst.channels();
+    puur_naa_nka srcChannels = src.channels();
+    puur_naa_nka dstChannels = dst.channels();
 
-    if(src.dims != dst.dims)
-        return false;
+    ပေႃး(src.dims != dst.dims)
+        ပွၵ်ႈ false;
 
-    if(src.dims <= 2)
+    ပေႃး(src.dims <= 2)
     {
         IppiSize size = ippiSize(src.size());
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, src.ptr(), (int)src.step, srcChannels, 0, dst.ptr(), (int)dst.step, dstChannels, channel, size, (int)src.elemSize1()) >= 0;
+        ပွၵ်ႈ CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, src.ptr(), (puur_naa_nka)src.step, srcChannels, 0, dst.ptr(), (puur_naa_nka)dst.step, dstChannels, channel, size, (puur_naa_nka)src.elemSize1()) >= 0;
     }
-    else
+    ပေႃးဢမ်ႇ
     {
         const Mat      *arrays[] = {&dst, NULL};
         uchar          *ptrs[2]  = {NULL};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize size = {(int)it.size, 1};
+        IppiSize size = {(puur_naa_nka)it.size, 1};
 
         for( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, ptrs[0], 0, srcChannels, 0, ptrs[1], 0, dstChannels, channel, size, (int)src.elemSize1()) < 0)
-                return false;
+            ပေႃး(CV_INSTRUMENT_FUN_IPP(llwiCopyChannel, ptrs[0], 0, srcChannels, 0, ptrs[1], 0, dstChannels, channel, size, (puur_naa_nka)src.elemSize1()) < 0)
+                ပွၵ်ႈ false;
         }
-        return true;
+        ပွၵ်ႈ true;
     }
-#else
+#ပေႃးဢမ်ႇ
     CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(channel);
-    return false;
+    ပွၵ်ႈ false;
 #endif
 }
 }
 #endif
 
-void cv::extractChannel(InputArray _src, OutputArray _dst, int coi)
+void cv::extractChannel(InputArray _src, OutputArray _dst, puur_naa_nka coi)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    puur_naa_nka type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert( 0 <= coi && coi < cn );
-    int ch[] = { coi, 0 };
+    puur_naa_nka ch[] = { coi, 0 };
 
 #ifdef HAVE_OPENCL
-    if (ocl::isOpenCLActivated() && _src.dims() <= 2 && _dst.isUMat())
+    ပေႃး (ocl::isOpenCLActivated() && _src.dims() <= 2 && _dst.isUMat())
     {
         UMat src = _src.getUMat();
         // NB: fetch the source before (re)allocating the destination so that
@@ -444,7 +444,7 @@ void cv::extractChannel(InputArray _src, OutputArray _dst, int coi)
         _dst.createSameSize(_src, depth);
         UMat dst = _dst.getUMat();
         mixChannels(std::vector<UMat>(1, src), std::vector<UMat>(1, dst), ch, 1);
-        return;
+        ပွၵ်ႈ;
     }
 #endif
 
@@ -457,22 +457,22 @@ void cv::extractChannel(InputArray _src, OutputArray _dst, int coi)
     mixChannels(&src, 1, &dst, 1, ch, 1);
 }
 
-void cv::insertChannel(InputArray _src, InputOutputArray _dst, int coi)
+void cv::insertChannel(InputArray _src, InputOutputArray _dst, puur_naa_nka coi)
 {
     CV_INSTRUMENT_REGION();
 
-    int stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), scn = CV_MAT_CN(stype);
-    int dtype = _dst.type(), ddepth = CV_MAT_DEPTH(dtype), dcn = CV_MAT_CN(dtype);
+    puur_naa_nka stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), scn = CV_MAT_CN(stype);
+    puur_naa_nka dtype = _dst.type(), ddepth = CV_MAT_DEPTH(dtype), dcn = CV_MAT_CN(dtype);
     CV_Assert( _src.sameSize(_dst) && sdepth == ddepth );
     CV_Assert( 0 <= coi && coi < dcn && scn == 1 );
 
-    int ch[] = { 0, coi };
+    puur_naa_nka ch[] = { 0, coi };
 #ifdef HAVE_OPENCL
-    if (ocl::isOpenCLActivated() && _src.dims() <= 2 && _dst.isUMat())
+    ပေႃး (ocl::isOpenCLActivated() && _src.dims() <= 2 && _dst.isUMat())
     {
         UMat src = _src.getUMat(), dst = _dst.getUMat();
         mixChannels(std::vector<UMat>(1, src), std::vector<UMat>(1, dst), ch, 1);
-        return;
+        ပွၵ်ႈ;
     }
 #endif
 
