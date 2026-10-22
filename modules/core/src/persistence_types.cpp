@@ -2,335 +2,335 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#ضمن "precomp.hpp"
+#ضمن "persistence.hpp"
 
-namespace cv
+نطاق cv
 {
 
-void write( FileStorage& fs, const String& name, const Mat& m )
+فراغ اكتب( FileStorage& fs, ثابت String& name, ثابت Mat& m )
 {
-    char dt[22];
+    حرف dt[22];
 
-    if( m.dims == 2 || m.empty() )
+    إذا( m.dims == 2 || m.empty() )
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-matrix"));
-        fs << "rows" << m.rows;
-        fs << "cols" << m.cols;
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs.شروع_Write_Struct(name, File_گره::MAP, String("opencv-matrix"));
+        fs << "rows" << m.ردیفها;
+        fs << "cols" << m.تعداد_ستون;
+        fs << "dt" << fs::encodeFormat( m.type(), dt, حجم(dt) );
         fs << "data" << "[:";
-        for( int i = 0; i < m.rows; i++ )
-            fs.writeRaw(dt, m.ptr(i), m.cols*m.elemSize());
+        لكل( صحيح i = 0; i < m.ردیفها; i++ )
+            fs.writeRaw(dt, m.ptr(i), m.تعداد_ستون*m.elem_اندازه());
         fs << "]";
-        fs.endWriteStruct();
+        fs.انتها_Write_Struct();
     }
-    else
+    وإلا
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-nd-matrix"));
+        fs.شروع_Write_Struct(name, File_گره::MAP, String("opencv-nd-matrix"));
         fs << "sizes" << "[:";
-        fs.writeRaw( "i", m.size.p, m.dims*sizeof(int) );
+        fs.writeRaw( "i", m.size.p, m.dims*حجم(صحيح) );
         fs << "]";
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, حجم(dt) );
         fs << "data" << "[:";
-        const Mat* arrays[] = {&m, 0};
+        ثابت Mat* arrays[] = {&m, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
-        size_t total = it.size*m.elemSize();
+        size_t مجموع = it.size*m.elem_اندازه();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
-            fs.writeRaw( dt, ptrs[0], total );
+        لكل( size_t i = 0; i < it.nplanes; i++, ++it )
+            fs.writeRaw( dt, ptrs[0], مجموع );
         fs << "]";
-        fs.endWriteStruct();
+        fs.انتها_Write_Struct();
     }
 }
 
-struct SparseNodeCmp
+بنية Sparse_گره_Cmp
 {
-    SparseNodeCmp(int _dims) : dims(_dims) {}
-    bool operator()(const SparseMat::Node* a, const SparseMat::Node* b)
+    Sparse_گره_Cmp(صحيح _dims) : dims(_dims) {}
+    منطقي عملگر()(ثابت SparseMat::Node* a, ثابت SparseMat::Node* b)
     {
-        for( int i = 0; i < dims; i++ )
+        لكل( صحيح i = 0; i < dims; i++ )
         {
-            int d = a->idx[i] - b->idx[i];
-            if(d)
-                return d < 0;
+            صحيح d = a->idx[i] - b->idx[i];
+            إذا(d)
+                أرجع d < 0;
         }
-        return false;
+        أرجع خطأ;
     }
 
-    int dims;
+    صحيح dims;
 };
 
-void write( FileStorage& fs, const String& name, const SparseMat& m )
+فراغ اكتب( FileStorage& fs, ثابت String& name, ثابت SparseMat& m )
 {
-    char dt[22];
+    حرف dt[22];
 
-    fs.startWriteStruct(name, FileNode::MAP, String("opencv-sparse-matrix"));
+    fs.شروع_Write_Struct(name, File_گره::MAP, String("opencv-sparse-matrix"));
     fs << "sizes" << "[:";
-    int dims = m.dims();
-    if( dims > 0 )
-        fs.writeRaw("i", m.hdr->size, dims*sizeof(int) );
+    صحيح dims = m.dims();
+    إذا( dims > 0 )
+        fs.writeRaw("i", m.hdr->size, dims*حجم(صحيح) );
     fs << "]";
-    fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+    fs << "dt" << fs::encodeFormat( m.type(), dt, حجم(dt) );
     fs << "data" << "[:";
 
     size_t i = 0, n = m.nzcount();
-    AutoBuffer<const SparseMat::Node*> elems(n);
-    SparseMatConstIterator it = m.begin(), it_end = m.end();
+    Auto_میانگیر<ثابت SparseMat::Node*> elems(n);
+    SparseMatConstIterator it = m.begin(), it_انتها = m.end();
 
-    for( ; it != it_end; ++it )
+    لكل( ; it != it_انتها; ++it )
     {
-        CV_Assert(it.node() != 0);
-        elems[i++] = it.node();
+        CV_Assert(it.گره() != 0);
+        elems[i++] = it.گره();
     }
 
-    std::sort(elems.begin(), elems.end(), SparseNodeCmp(dims));
-    const SparseMat::Node* prev_node = 0;
-    size_t esz = m.elemSize();
+    std::sort(elems.begin(), elems.end(), Sparse_گره_Cmp(dims));
+    ثابت SparseMat::Node* prev_گره = 0;
+    size_t esz = m.elem_اندازه();
 
-    for( i = 0; i < n; i++ )
+    لكل( i = 0; i < n; i++ )
     {
-        const SparseMat::Node* node = elems[i];
-        int k = 0;
+        ثابت SparseMat::Node* گره = elems[i];
+        صحيح k = 0;
 
-        if( prev_node )
+        إذا( prev_گره )
         {
-            for( ; k < dims; k++ )
-                if( node->idx[k] != prev_node->idx[k] )
-                    break;
+            لكل( ; k < dims; k++ )
+                إذا( گره->idx[k] != prev_گره->idx[k] )
+                    اكسر;
             CV_Assert( k < dims );
-            if( k < dims - 1 )
+            إذا( k < dims - 1 )
                 writeScalar( fs, k - dims + 1 );
         }
-        for( ; k < dims; k++ )
-            writeScalar( fs, node->idx[k] );
-        prev_node = node;
+        لكل( ; k < dims; k++ )
+            writeScalar( fs, گره->idx[k] );
+        prev_گره = گره;
 
-        const uchar* value = &m.value<uchar>(node);
+        ثابت uchar* value = &m.value<uchar>(گره);
         fs.writeRaw(dt, value, esz);
     }
 
     fs << "]" << "}";
 }
 
-void read(const FileNode& node, Mat& m, const Mat& default_mat)
+فراغ اقرأ(ثابت File_گره& گره, Mat& m, ثابت Mat& default_mat)
 {
-    if( node.empty() )
+    إذا( گره.empty() )
     {
-        default_mat.copyTo(m);
-        return;
+        default_mat.copy_مقصد(m);
+        أرجع;
     }
 
     std::string dt;
-    int rows, cols, elem_type;
+    صحيح ردیفها, تعداد_ستون, elem_type;
 
-    read(node["dt"], dt, std::string());
+    اقرأ(گره["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
     elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    read(node["rows"], rows, -1);
-    if( rows >= 0 )
+    اقرأ(گره["rows"], ردیفها, -1);
+    إذا( ردیفها >= 0 )
     {
-        read(node["cols"], cols, -1);
-        m.create(rows, cols, elem_type);
+        اقرأ(گره["cols"], تعداد_ستون, -1);
+        m.create(ردیفها, تعداد_ستون, elem_type);
     }
-    else
+    وإلا
     {
-        int sizes[CV_MAX_DIM] = {0}, dims;
-        FileNode sizes_node = node["sizes"];
-        CV_Assert( !sizes_node.empty() );
+        صحيح sizes[CV_MAX_DIM] = {0}, dims;
+        File_گره sizes_گره = گره["sizes"];
+        CV_Assert( !sizes_گره.empty() );
 
-        dims = (int)sizes_node.size();
+        dims = (صحيح)sizes_گره.size();
         CV_Assert( dims >= 0 && dims <= CV_MAX_DIM );
-        sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+        sizes_گره.readRaw("i", sizes, dims*حجم(sizes[0]));
 
         m.create(dims, sizes, elem_type);
     }
 
-    FileNode data_node = node["data"];
-    CV_Assert(!data_node.empty());
+    File_گره داده_گره = گره["data"];
+    CV_Assert(!داده_گره.empty());
 
-    size_t nelems = data_node.size();
-    if (nelems == 0)
+    size_t nelems = داده_گره.size();
+    إذا (nelems == 0)
     {
         m = Mat();
-        return;
+        أرجع;
     }
-    CV_Assert(nelems == m.total()*m.channels());
+    CV_Assert(nelems == m.مجموع()*m.channels());
 
-    data_node.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
+    داده_گره.readRaw(dt, (uchar*)m.ptr(), m.مجموع()*m.elem_اندازه());
 }
 
-void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
+فراغ اقرأ( ثابت File_گره& گره, SparseMat& m, ثابت SparseMat& default_mat )
 {
-    if( node.empty() )
+    إذا( گره.empty() )
     {
-        default_mat.copyTo(m);
-        return;
+        default_mat.copy_مقصد(m);
+        أرجع;
     }
 
     std::string dt;
-    read(node["dt"], dt, std::string());
+    اقرأ(گره["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
-    int elem_type = fs::decodeSimpleFormat( dt.c_str() );
+    صحيح elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    int sizes[CV_MAX_DIM] = {0};
-    FileNode sizes_node = node["sizes"];
-    CV_Assert( !sizes_node.empty() );
+    صحيح sizes[CV_MAX_DIM] = {0};
+    File_گره sizes_گره = گره["sizes"];
+    CV_Assert( !sizes_گره.empty() );
 
-    int dims = (int)sizes_node.size();
+    صحيح dims = (صحيح)sizes_گره.size();
     CV_Assert( dims > 0 && dims <= CV_MAX_DIM );
-    sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+    sizes_گره.readRaw("i", sizes, dims*حجم(sizes[0]));
 
     m.create(dims, sizes, elem_type);
 
-    FileNode data = node["data"];
-    CV_Assert( data.isSeq() );
+    File_گره داده = گره["data"];
+    CV_Assert( داده.isSeq() );
 
-    int cn = CV_MAT_CN(elem_type);
-    int idx[CV_MAX_DIM] = {0};
-    size_t i, sz = data.size();
-    size_t esz = m.elemSize();
-    FileNodeIterator it = data.begin();
+    صحيح cn = CV_MAT_CN(elem_type);
+    صحيح idx[CV_MAX_DIM] = {0};
+    size_t i, sz = داده.size();
+    size_t esz = m.elem_اندازه();
+    File_گره_Iterator it = داده.begin();
 
-    for( i = 0; i < sz; )
+    لكل( i = 0; i < sz; )
     {
-        FileNode n = *it;
-        int k = (int)n;
-        if( i > 0 && k >= 0 )
+        File_گره n = *it;
+        صحيح k = (صحيح)n;
+        إذا( i > 0 && k >= 0 )
         {
             CV_Assert( k < sizes[dims-1] );
             idx[dims-1] = k;
         }
-        else
+        وإلا
         {
-            if( i > 0 )
+            إذا( i > 0 )
             {
                 // write() stores the first changed dimension as k - dims + 1
                 k = dims + k - 1;
                 CV_Assert( k >= 0 );
             }
-            else
+            وإلا
             {
                 CV_Assert( k >= 0 && k < sizes[0] );
                 idx[0] = k, k = 1;
             }
-            for( ; k < dims; k++ )
+            لكل( ; k < dims; k++ )
             {
                 ++it;
                 i++;
                 n = *it;
                 CV_Assert( n.isInt() );
-                int idx_k = (int)n;
+                صحيح idx_k = (صحيح)n;
                 CV_Assert( idx_k >= 0 && idx_k < sizes[k] );
                 idx[k] = idx_k;
             }
         }
         ++it;
         i++;
-        uchar* valptr = m.ptr(idx, true);
+        uchar* valptr = m.ptr(idx, درست);
         it.readRaw(dt, valptr, esz);
         i += cn;
     }
 }
 
-void read(const FileNode& node, KeyPoint& value, const KeyPoint& default_value)
+فراغ اقرأ(ثابت File_گره& گره, کلید_نقطه& value, ثابت کلید_نقطه& default_مقدار)
 {
-    if( node.empty() )
+    إذا( گره.empty() )
     {
-        value = default_value;
-        return;
+        value = default_مقدار;
+        أرجع;
     }
-    node >> value;
+    گره >> value;
 }
 
-void read(const FileNode& node, DMatch& value, const DMatch& default_value)
+فراغ اقرأ(ثابت File_گره& گره, DMatch& value, ثابت DMatch& default_مقدار)
 {
-    if( node.empty() )
+    إذا( گره.empty() )
     {
-        value = default_value;
-        return;
+        value = default_مقدار;
+        أرجع;
     }
-    node >> value;
+    گره >> value;
 }
 
-#ifdef CV__LEGACY_PERSISTENCE
-void write( FileStorage& fs, const std::string& name, const std::vector<KeyPoint>& vec)
+#اگر_تعریف_شده CV__LEGACY_PERSISTENCE
+فراغ اكتب( FileStorage& fs, ثابت std::string& name, ثابت std::vector<کلید_نقطه>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_گره::SEQ);
+    اكتب(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
+فراغ اقرأ(ثابت File_گره& گره, std::vector<کلید_نقطه>& keypoints)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_گره اولی_گره = *(گره.begin());
+    إذا (اولی_گره.isSeq())
     {
         // modern scheme
-#ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
-        size_t total = (size_t)it.remaining;
-        keypoints.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+#اگر_تعریف_شده OPENCV_TRAITS_ENABLE_DEPRECATED
+        File_گره_Iterator it = گره.begin();
+        size_t مجموع = (size_t)it.مانده;
+        keypoints.resize(مجموع);
+        لكل (size_t i = 0; i < مجموع; ++i, ++it)
         {
             (*it) >> keypoints[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#وإلا
+        File_گره_Iterator it = گره.begin();
         it >> keypoints;
-#endif
-        return;
+#پایان_اگر
+        أرجع;
     }
     keypoints.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_گره_Iterator it = گره.begin(), it_انتها = گره.end();
+    لكل( ; it != it_انتها; )
     {
-        KeyPoint kpt;
+        کلید_نقطه kpt;
         it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
         keypoints.push_back(kpt);
     }
 }
 
-void write( FileStorage& fs, const std::string& name, const std::vector<DMatch>& vec)
+فراغ اكتب( FileStorage& fs, ثابت std::string& name, ثابت std::vector<DMatch>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_گره::SEQ);
+    اكتب(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<DMatch>& matches)
+فراغ اقرأ(ثابت File_گره& گره, std::vector<DMatch>& matches)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_گره اولی_گره = *(گره.begin());
+    إذا (اولی_گره.isSeq())
     {
         // modern scheme
-#ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
-        size_t total = (size_t)it.remaining;
-        matches.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+#اگر_تعریف_شده OPENCV_TRAITS_ENABLE_DEPRECATED
+        File_گره_Iterator it = گره.begin();
+        size_t مجموع = (size_t)it.مانده;
+        matches.resize(مجموع);
+        لكل (size_t i = 0; i < مجموع; ++i, ++it)
         {
             (*it) >> matches[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#وإلا
+        File_گره_Iterator it = گره.begin();
         it >> matches;
-#endif
-        return;
+#پایان_اگر
+        أرجع;
     }
     matches.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_گره_Iterator it = گره.begin(), it_انتها = گره.end();
+    لكل( ; it != it_انتها; )
     {
         DMatch m;
         it >> m.queryIdx >> m.trainIdx >> m.imgIdx >> m.distance;
         matches.push_back(m);
     }
 }
-#endif
+#پایان_اگر
 
 
 }

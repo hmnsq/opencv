@@ -42,21 +42,21 @@
 //
 //M*/
 
-#ifndef OPENCV_CORE_HAL_REPLACEMENT_HPP
-#define OPENCV_CORE_HAL_REPLACEMENT_HPP
+#اگر_تعریف_نشده OPENCV_CORE_HAL_REPLACEMENT_HPP
+#تعریف_کن OPENCV_CORE_HAL_REPLACEMENT_HPP
 
-#include "opencv2/core/hal/interface.h"
+#ضمن "opencv2/core/hal/interface.h"
 
-#if defined(__clang__)  // clang or MSVC clang
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#elif defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable : 4100)
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
+#إذا defined(__clang__)  // clang or MSVC clang
+#رهنمود clang diagnostic push
+#رهنمود clang diagnostic ignored "-Wunused-parameter"
+#وإلاإذا defined(_MSC_VER)
+#رهنمود warning(push)
+#رهنمود warning(disable : 4100)
+#وإلاإذا defined(__GNUC__)
+#رهنمود GCC diagnostic push
+#رهنمود GCC diagnostic ignored "-Wunused-parameter"
+#پایان_اگر
 
 //! @addtogroup core_hal_interface
 //! @note Define your functions to override default implementations:
@@ -80,34 +80,34 @@ Sub: _dst[i] = src1[i] - src2[i]_
 */
 //! @addtogroup core_hal_interface_addsub Element-wise add and subtract
 //! @{
-inline int hal_ni_add8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_add16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add8s(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, schar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add16u(ثابت ushort *src1_داده, size_t src1_گام, ثابت ushort *src2_داده, size_t src2_گام, ushort *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add16s(ثابت کوتاه *src1_داده, size_t src1_گام, ثابت کوتاه *src2_داده, size_t src2_گام, کوتاه *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add32u(ثابت بیعلامت *src1_داده, size_t src1_گام, ثابت بیعلامت *src2_داده, size_t src2_گام, بیعلامت *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add32s(ثابت صحيح *src1_داده, size_t src1_گام, ثابت صحيح *src2_داده, size_t src2_گام, صحيح *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add32f(ثابت عائم *src1_داده, size_t src1_گام, ثابت عائم *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add64f(ثابت مزدوج *src1_داده, size_t src1_گام, ثابت مزدوج *src2_داده, size_t src2_گام, مزدوج *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add64u(ثابت uint64 *src1_داده, size_t src1_گام, ثابت uint64 *src2_داده, size_t src2_گام, uint64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add64s(ثابت int64 *src1_داده, size_t src1_گام, ثابت int64 *src2_داده, size_t src2_گام, int64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add16f(ثابت cv_hal_f16 *src1_داده, size_t src1_گام, ثابت cv_hal_f16 *src2_داده, size_t src2_گام, cv_hal_f16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_add16bf(ثابت cv_hal_bf16 *src1_داده, size_t src1_گام, ثابت cv_hal_bf16 *src2_داده, size_t src2_گام, cv_hal_bf16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
-inline int hal_ni_sub8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub8s(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, schar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub16u(ثابت ushort *src1_داده, size_t src1_گام, ثابت ushort *src2_داده, size_t src2_گام, ushort *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub16s(ثابت کوتاه *src1_داده, size_t src1_گام, ثابت کوتاه *src2_داده, size_t src2_گام, کوتاه *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub32u(ثابت بیعلامت *src1_داده, size_t src1_گام, ثابت بیعلامت *src2_داده, size_t src2_گام, بیعلامت *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub32s(ثابت صحيح *src1_داده, size_t src1_گام, ثابت صحيح *src2_داده, size_t src2_گام, صحيح *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub32f(ثابت عائم *src1_داده, size_t src1_گام, ثابت عائم *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub64f(ثابت مزدوج *src1_داده, size_t src1_گام, ثابت مزدوج *src2_داده, size_t src2_گام, مزدوج *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub64u(ثابت uint64 *src1_داده, size_t src1_گام, ثابت uint64 *src2_داده, size_t src2_گام, uint64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub64s(ثابت int64 *src1_داده, size_t src1_گام, ثابت int64 *src2_داده, size_t src2_گام, int64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub16f(ثابت cv_hal_f16 *src1_داده, size_t src1_گام, ثابت cv_hal_f16 *src2_داده, size_t src2_گام, cv_hal_f16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub16bf(ثابت cv_hal_bf16 *src1_داده, size_t src1_گام, ثابت cv_hal_bf16 *src2_داده, size_t src2_گام, cv_hal_bf16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
-inline int hal_ni_sub8u32f(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sub8s32f(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub8u32f(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sub8s32f(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 /**
 Add scalar: _dst[i] = src[i] + scalar
@@ -121,8 +121,8 @@ Add scalar: _dst[i] = src[i] + scalar
 @param scalar_data pointer to scalar value
 @param nChannels number of channels per element
 */
-inline int hal_ni_addScalar32f32f(const float*   src_data, size_t src_step, float*   dst_data, size_t dst_step, int width, int height, const float*   scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addScalar16s16s(const int16_t* src_data, size_t src_step, int16_t* dst_data, size_t dst_step, int width, int height, const int16_t* scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Scalar32f32f(ثابت عائم*   src_داده, size_t src_گام, عائم*   dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت عائم*   scalar_داده, صحيح nChannels) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Scalar16s16s(ثابت int16_t* src_داده, size_t src_گام, int16_t* dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت int16_t* scalar_داده, صحيح nChannels) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -139,31 +139,31 @@ Maximum: _dst[i] = max(src1[i], src2[i])_
 */
 //! @addtogroup core_hal_interface_minmax Element-wise minimum or maximum
 //! @{
-inline int hal_ni_max8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_max16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max8s(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, schar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max16u(ثابت ushort *src1_داده, size_t src1_گام, ثابت ushort *src2_داده, size_t src2_گام, ushort *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max16s(ثابت کوتاه *src1_داده, size_t src1_گام, ثابت کوتاه *src2_داده, size_t src2_گام, کوتاه *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max32u(ثابت بیعلامت *src1_داده, size_t src1_گام, ثابت بیعلامت *src2_داده, size_t src2_گام, بیعلامت *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max32s(ثابت صحيح *src1_داده, size_t src1_گام, ثابت صحيح *src2_داده, size_t src2_گام, صحيح *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max32f(ثابت عائم *src1_داده, size_t src1_گام, ثابت عائم *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max64f(ثابت مزدوج *src1_داده, size_t src1_گام, ثابت مزدوج *src2_داده, size_t src2_گام, مزدوج *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max64u(ثابت uint64 *src1_داده, size_t src1_گام, ثابت uint64 *src2_داده, size_t src2_گام, uint64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max64s(ثابت int64 *src1_داده, size_t src1_گام, ثابت int64 *src2_داده, size_t src2_گام, int64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max16f(ثابت cv_hal_f16 *src1_داده, size_t src1_گام, ثابت cv_hal_f16 *src2_داده, size_t src2_گام, cv_hal_f16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_max16bf(ثابت cv_hal_bf16 *src1_داده, size_t src1_گام, ثابت cv_hal_bf16 *src2_داده, size_t src2_گام, cv_hal_bf16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
-inline int hal_ni_min8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_min16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min8s(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, schar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min16u(ثابت ushort *src1_داده, size_t src1_گام, ثابت ushort *src2_داده, size_t src2_گام, ushort *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min16s(ثابت کوتاه *src1_داده, size_t src1_گام, ثابت کوتاه *src2_داده, size_t src2_گام, کوتاه *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min32u(ثابت بیعلامت *src1_داده, size_t src1_گام, ثابت بیعلامت *src2_داده, size_t src2_گام, بیعلامت *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min32s(ثابت صحيح *src1_داده, size_t src1_گام, ثابت صحيح *src2_داده, size_t src2_گام, صحيح *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min32f(ثابت عائم *src1_داده, size_t src1_گام, ثابت عائم *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min64f(ثابت مزدوج *src1_داده, size_t src1_گام, ثابت مزدوج *src2_داده, size_t src2_گام, مزدوج *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min64u(ثابت uint64 *src1_داده, size_t src1_گام, ثابت uint64 *src2_داده, size_t src2_گام, uint64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min64s(ثابت int64 *src1_داده, size_t src1_گام, ثابت int64 *src2_داده, size_t src2_گام, int64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min16f(ثابت cv_hal_f16 *src1_داده, size_t src1_گام, ثابت cv_hal_f16 *src2_داده, size_t src2_گام, cv_hal_f16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min16bf(ثابت cv_hal_bf16 *src1_داده, size_t src1_گام, ثابت cv_hal_bf16 *src2_داده, size_t src2_گام, cv_hal_bf16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -179,18 +179,18 @@ Absolute difference: _dst[i] = | src1[i] - src2[i] |_
 */
 //! @addtogroup core_hal_interface_absdiff Element-wise absolute difference
 //! @{
-inline int hal_ni_absdiff8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absdiff16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff8s(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, schar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff16u(ثابت ushort *src1_داده, size_t src1_گام, ثابت ushort *src2_داده, size_t src2_گام, ushort *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff16s(ثابت کوتاه *src1_داده, size_t src1_گام, ثابت کوتاه *src2_داده, size_t src2_گام, کوتاه *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff32u(ثابت بیعلامت *src1_داده, size_t src1_گام, ثابت بیعلامت *src2_داده, size_t src2_گام, بیعلامت *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff32s(ثابت صحيح *src1_داده, size_t src1_گام, ثابت صحيح *src2_داده, size_t src2_گام, صحيح *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff32f(ثابت عائم *src1_داده, size_t src1_گام, ثابت عائم *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff64f(ثابت مزدوج *src1_داده, size_t src1_گام, ثابت مزدوج *src2_داده, size_t src2_گام, مزدوج *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff64u(ثابت uint64 *src1_داده, size_t src1_گام, ثابت uint64 *src2_داده, size_t src2_گام, uint64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff64s(ثابت int64 *src1_داده, size_t src1_گام, ثابت int64 *src2_داده, size_t src2_گام, int64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff16f(ثابت cv_hal_f16 *src1_داده, size_t src1_گام, ثابت cv_hal_f16 *src2_داده, size_t src2_گام, cv_hal_f16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absdiff16bf(ثابت cv_hal_bf16 *src1_داده, size_t src1_گام, ثابت cv_hal_bf16 *src2_داده, size_t src2_گام, cv_hal_bf16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 /*
 Absolute difference with scalar: _dst[i] = | src[i] - scalar |_
@@ -204,9 +204,9 @@ Absolute difference with scalar: _dst[i] = | src[i] - scalar |_
 @param scalar_data pointer to scalar value
 @param nChannels number of channels per element
 */
-inline int hal_ni_absDiffScalar32f32f(const float* src_data, size_t src_step, float*    dst_data, size_t dst_step, int width, int height, const float* scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absDiffScalar32s32u(const int*   src_data, size_t src_step, uint32_t* dst_data, size_t dst_step, int width, int height, const int*   scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_absDiffScalar8u8u  (const uchar* src_data, size_t src_step, uchar*    dst_data, size_t dst_step, int width, int height, const uchar* scalar_data, int nChannels) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absDiffScalar32f32f(ثابت عائم* src_داده, size_t src_گام, عائم*    dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت عائم* scalar_داده, صحيح nChannels) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absDiffScalar32s32u(ثابت صحيح*   src_داده, size_t src_گام, uint32_t* dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت صحيح*   scalar_داده, صحيح nChannels) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_absDiffScalar8u8u  (ثابت uchar* src_داده, size_t src_گام, uchar*    dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت uchar* scalar_داده, صحيح nChannels) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @}
 
@@ -226,84 +226,84 @@ Bitwise NOT: _dst[i] = ~src[i]_
  */
 //! @addtogroup core_hal_interface_logical Bitwise logical operations
 //! @{
-inline int hal_ni_and8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_or8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_xor8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_not8u(const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_and8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_or8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_xor8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_not8u(ثابت uchar *src_داده, size_t src_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_add8u hal_ni_add8u
-#define cv_hal_add8s hal_ni_add8s
-#define cv_hal_add16u hal_ni_add16u
-#define cv_hal_add16s hal_ni_add16s
-#define cv_hal_add32u hal_ni_add32u
-#define cv_hal_add32s hal_ni_add32s
-#define cv_hal_add64u hal_ni_add64u
-#define cv_hal_add64s hal_ni_add64s
-#define cv_hal_add32f hal_ni_add32f
-#define cv_hal_add64f hal_ni_add64f
-#define cv_hal_add16f hal_ni_add16f
-#define cv_hal_add16bf hal_ni_add16bf
-#define cv_hal_sub8u hal_ni_sub8u
-#define cv_hal_sub8s hal_ni_sub8s
-#define cv_hal_sub16u hal_ni_sub16u
-#define cv_hal_sub16s hal_ni_sub16s
-#define cv_hal_sub32u hal_ni_sub32u
-#define cv_hal_sub32s hal_ni_sub32s
-#define cv_hal_sub64u hal_ni_sub64u
-#define cv_hal_sub64s hal_ni_sub64s
-#define cv_hal_sub32f hal_ni_sub32f
-#define cv_hal_sub64f hal_ni_sub64f
-#define cv_hal_sub8u32f hal_ni_sub8u32f
-#define cv_hal_sub8s32f hal_ni_sub8s32f
-#define cv_hal_sub16f hal_ni_sub16f
-#define cv_hal_sub16bf hal_ni_sub16bf
-#define cv_hal_addScalar32f32f hal_ni_addScalar32f32f
-#define cv_hal_addScalar16s16s hal_ni_addScalar16s16s
-#define cv_hal_max8u hal_ni_max8u
-#define cv_hal_max8s hal_ni_max8s
-#define cv_hal_max16u hal_ni_max16u
-#define cv_hal_max16s hal_ni_max16s
-#define cv_hal_max32u hal_ni_max32u
-#define cv_hal_max32s hal_ni_max32s
-#define cv_hal_max64u hal_ni_max64u
-#define cv_hal_max64s hal_ni_max64s
-#define cv_hal_max32f hal_ni_max32f
-#define cv_hal_max64f hal_ni_max64f
-#define cv_hal_max16f hal_ni_max16f
-#define cv_hal_max16bf hal_ni_max16bf
-#define cv_hal_min8u hal_ni_min8u
-#define cv_hal_min8s hal_ni_min8s
-#define cv_hal_min16u hal_ni_min16u
-#define cv_hal_min16s hal_ni_min16s
-#define cv_hal_min32u hal_ni_min32u
-#define cv_hal_min32s hal_ni_min32s
-#define cv_hal_min64u hal_ni_min64u
-#define cv_hal_min64s hal_ni_min64s
-#define cv_hal_min32f hal_ni_min32f
-#define cv_hal_min64f hal_ni_min64f
-#define cv_hal_min16f hal_ni_min16f
-#define cv_hal_min16bf hal_ni_min16bf
-#define cv_hal_absdiff8u hal_ni_absdiff8u
-#define cv_hal_absdiff8s hal_ni_absdiff8s
-#define cv_hal_absdiff16u hal_ni_absdiff16u
-#define cv_hal_absdiff16s hal_ni_absdiff16s
-#define cv_hal_absdiff32u hal_ni_absdiff32u
-#define cv_hal_absdiff32s hal_ni_absdiff32s
-#define cv_hal_absdiff64u hal_ni_absdiff64u
-#define cv_hal_absdiff64s hal_ni_absdiff64s
-#define cv_hal_absdiff32f hal_ni_absdiff32f
-#define cv_hal_absdiff64f hal_ni_absdiff64f
-#define cv_hal_absdiff16f hal_ni_absdiff16f
-#define cv_hal_absdiff16bf hal_ni_absdiff16bf
-#define cv_hal_absDiffScalar32f32f hal_ni_absDiffScalar32f32f
-#define cv_hal_absDiffScalar32s32u hal_ni_absDiffScalar32s32u
-#define cv_hal_absDiffScalar8u8u   hal_ni_absDiffScalar8u8u
-#define cv_hal_and8u hal_ni_and8u
-#define cv_hal_or8u hal_ni_or8u
-#define cv_hal_xor8u hal_ni_xor8u
-#define cv_hal_not8u hal_ni_not8u
+#تعریف_کن cv_hal_add8u hal_ni_add8u
+#تعریف_کن cv_hal_add8s hal_ni_add8s
+#تعریف_کن cv_hal_add16u hal_ni_add16u
+#تعریف_کن cv_hal_add16s hal_ni_add16s
+#تعریف_کن cv_hal_add32u hal_ni_add32u
+#تعریف_کن cv_hal_add32s hal_ni_add32s
+#تعریف_کن cv_hal_add64u hal_ni_add64u
+#تعریف_کن cv_hal_add64s hal_ni_add64s
+#تعریف_کن cv_hal_add32f hal_ni_add32f
+#تعریف_کن cv_hal_add64f hal_ni_add64f
+#تعریف_کن cv_hal_add16f hal_ni_add16f
+#تعریف_کن cv_hal_add16bf hal_ni_add16bf
+#تعریف_کن cv_hal_sub8u hal_ni_sub8u
+#تعریف_کن cv_hal_sub8s hal_ni_sub8s
+#تعریف_کن cv_hal_sub16u hal_ni_sub16u
+#تعریف_کن cv_hal_sub16s hal_ni_sub16s
+#تعریف_کن cv_hal_sub32u hal_ni_sub32u
+#تعریف_کن cv_hal_sub32s hal_ni_sub32s
+#تعریف_کن cv_hal_sub64u hal_ni_sub64u
+#تعریف_کن cv_hal_sub64s hal_ni_sub64s
+#تعریف_کن cv_hal_sub32f hal_ni_sub32f
+#تعریف_کن cv_hal_sub64f hal_ni_sub64f
+#تعریف_کن cv_hal_sub8u32f hal_ni_sub8u32f
+#تعریف_کن cv_hal_sub8s32f hal_ni_sub8s32f
+#تعریف_کن cv_hal_sub16f hal_ni_sub16f
+#تعریف_کن cv_hal_sub16bf hal_ni_sub16bf
+#تعریف_کن cv_hal_جمع_کن_Scalar32f32f hal_ni_جمع_کن_Scalar32f32f
+#تعریف_کن cv_hal_جمع_کن_Scalar16s16s hal_ni_جمع_کن_Scalar16s16s
+#تعریف_کن cv_hal_max8u hal_ni_max8u
+#تعریف_کن cv_hal_max8s hal_ni_max8s
+#تعریف_کن cv_hal_max16u hal_ni_max16u
+#تعریف_کن cv_hal_max16s hal_ni_max16s
+#تعریف_کن cv_hal_max32u hal_ni_max32u
+#تعریف_کن cv_hal_max32s hal_ni_max32s
+#تعریف_کن cv_hal_max64u hal_ni_max64u
+#تعریف_کن cv_hal_max64s hal_ni_max64s
+#تعریف_کن cv_hal_max32f hal_ni_max32f
+#تعریف_کن cv_hal_max64f hal_ni_max64f
+#تعریف_کن cv_hal_max16f hal_ni_max16f
+#تعریف_کن cv_hal_max16bf hal_ni_max16bf
+#تعریف_کن cv_hal_min8u hal_ni_min8u
+#تعریف_کن cv_hal_min8s hal_ni_min8s
+#تعریف_کن cv_hal_min16u hal_ni_min16u
+#تعریف_کن cv_hal_min16s hal_ni_min16s
+#تعریف_کن cv_hal_min32u hal_ni_min32u
+#تعریف_کن cv_hal_min32s hal_ni_min32s
+#تعریف_کن cv_hal_min64u hal_ni_min64u
+#تعریف_کن cv_hal_min64s hal_ni_min64s
+#تعریف_کن cv_hal_min32f hal_ni_min32f
+#تعریف_کن cv_hal_min64f hal_ni_min64f
+#تعریف_کن cv_hal_min16f hal_ni_min16f
+#تعریف_کن cv_hal_min16bf hal_ni_min16bf
+#تعریف_کن cv_hal_absdiff8u hal_ni_absdiff8u
+#تعریف_کن cv_hal_absdiff8s hal_ni_absdiff8s
+#تعریف_کن cv_hal_absdiff16u hal_ni_absdiff16u
+#تعریف_کن cv_hal_absdiff16s hal_ni_absdiff16s
+#تعریف_کن cv_hal_absdiff32u hal_ni_absdiff32u
+#تعریف_کن cv_hal_absdiff32s hal_ni_absdiff32s
+#تعریف_کن cv_hal_absdiff64u hal_ni_absdiff64u
+#تعریف_کن cv_hal_absdiff64s hal_ni_absdiff64s
+#تعریف_کن cv_hal_absdiff32f hal_ni_absdiff32f
+#تعریف_کن cv_hal_absdiff64f hal_ni_absdiff64f
+#تعریف_کن cv_hal_absdiff16f hal_ni_absdiff16f
+#تعریف_کن cv_hal_absdiff16bf hal_ni_absdiff16bf
+#تعریف_کن cv_hal_absDiffScalar32f32f hal_ni_absDiffScalar32f32f
+#تعریف_کن cv_hal_absDiffScalar32s32u hal_ni_absDiffScalar32s32u
+#تعریف_کن cv_hal_absDiffScalar8u8u   hal_ni_absDiffScalar8u8u
+#تعریف_کن cv_hal_and8u hal_ni_and8u
+#تعریف_کن cv_hal_or8u hal_ni_or8u
+#تعریف_کن cv_hal_xor8u hal_ni_xor8u
+#تعریف_کن cv_hal_not8u hal_ni_not8u
 //! @endcond
 
 /**
@@ -325,11 +325,11 @@ Destination should have the same element type and number of channels as lookup t
 */
 //! @addtogroup core_hal_interface_lut Lookup table
 //! @{
-inline int hal_ni_lut(const uchar *src_data, size_t src_step, size_t src_type, const uchar* lut_data, size_t lut_channel_size, size_t lut_channels, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_lut(ثابت uchar *src_داده, size_t src_گام, size_t src_type, ثابت uchar* lut_داده, size_t lut_channel_اندازه, size_t lut_channels, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_lut hal_ni_lut
+#تعریف_کن cv_hal_lut hal_ni_lut
 //! @endcond
 
 /**
@@ -351,11 +351,11 @@ Destination should have the same element type and number of channels as lookup t
 */
 //! @addtogroup core_hal_interface_lut16 Lookup table for 16 bit index
 //! @{
-inline int hal_ni_lut16(const ushort *src_data, size_t src_step, size_t src_type, const uchar* lut_data, size_t lut_channel_size, size_t lut_channels, uchar *dst_data, size_t dst_step, int width, int height) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_lut16(ثابت ushort *src_داده, size_t src_گام, size_t src_type, ثابت uchar* lut_داده, size_t lut_channel_اندازه, size_t lut_channels, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_lut16 hal_ni_lut16
+#تعریف_کن cv_hal_lut16 hal_ni_lut16
 //! @endcond
 
 /**
@@ -367,7 +367,7 @@ Hamming norm of a vector
 */
 //! @addtogroup core_hal_interface_hamming Hamming distance
 //! @{
-inline int hal_ni_normHamming8u(const uchar* a, int n, int cellSize, int* result) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_normHamming8u(ثابت uchar* a, صحيح n, صحيح cell_اندازه, صحيح* نتیجه) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -380,7 +380,7 @@ Hamming distance between two vectors
 */
 //! @addtogroup core_hal_interface_hamming Hamming distance
 //! @{
-inline int hal_ni_normHammingDiff8u(const uchar* a, const uchar* b, int n, int cellSize, int* result) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_normHammingDiff8u(ثابت uchar* a, ثابت uchar* b, صحيح n, صحيح cell_اندازه, صحيح* نتیجه) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -397,8 +397,8 @@ inline int hal_ni_normHammingDiff8u(const uchar* a, const uchar* b, int n, int c
 */
 //! @addtogroup core_hal_interface_norm Absolute norm
 //! @{
-inline int hal_ni_norm(const uchar* src, size_t src_step, const uchar* mask, size_t mask_step, int width,
-                       int height, int type, int norm_type, double* result) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_norm(ثابت uchar* src, size_t src_گام, ثابت uchar* ماسک, size_t ماسک_گام, صحيح عرض,
+                       صحيح ارتفاع, صحيح type, صحيح norm_type, مزدوج* نتیجه) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -417,8 +417,8 @@ inline int hal_ni_norm(const uchar* src, size_t src_step, const uchar* mask, siz
 */
 //! @addtogroup core_hal_interface_norm Absolute norm
 //! @{
-inline int hal_ni_normDiff(const uchar* src1, size_t src1_step, const uchar* src2, size_t src2_step, const uchar* mask,
-                           size_t mask_step, int width, int height, int type, int norm_type, double* result) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_normDiff(ثابت uchar* src1, size_t src1_گام, ثابت uchar* src2, size_t src2_گام, ثابت uchar* ماسک,
+                           size_t ماسک_گام, صحيح عرض, صحيح ارتفاع, صحيح type, صحيح norm_type, مزدوج* نتیجه) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -436,16 +436,16 @@ inline int hal_ni_normDiff(const uchar* src1, size_t src1_step, const uchar* src
 */
 //! @addtogroup core_hal_interface_convert Array convert
 //! @{
-inline int hal_ni_convertScale(const uchar* src, size_t src_step, uchar* dst, size_t dst_step, int width, int height,
-                               int sdepth, int ddepth, double alpha, double beta) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_convertScale(ثابت uchar* src, size_t src_گام, uchar* dst, size_t dst_گام, صحيح عرض, صحيح ارتفاع,
+                               صحيح sdepth, صحيح ddepth, مزدوج alpha, مزدوج beta) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_normHamming8u hal_ni_normHamming8u
-#define cv_hal_normHammingDiff8u hal_ni_normHammingDiff8u
-#define cv_hal_norm hal_ni_norm
-#define cv_hal_normDiff hal_ni_normDiff
-#define cv_hal_convertScale hal_ni_convertScale
+#تعریف_کن cv_hal_normHamming8u hal_ni_normHamming8u
+#تعریف_کن cv_hal_normHammingDiff8u hal_ni_normHammingDiff8u
+#تعریف_کن cv_hal_norm hal_ni_norm
+#تعریف_کن cv_hal_normDiff hal_ni_normDiff
+#تعریف_کن cv_hal_convertScale hal_ni_convertScale
 //! @endcond
 
 /**
@@ -462,33 +462,33 @@ Compare: _dst[i] = src1[i] op src2[i]_
 */
 //! @addtogroup core_hal_interface_compare Element-wise compare
 //! @{
-inline int hal_ni_cmp8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cmp16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, int operation) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp8s(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp16u(ثابت ushort *src1_داده, size_t src1_گام, ثابت ushort *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp16s(ثابت کوتاه *src1_داده, size_t src1_گام, ثابت کوتاه *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp32u(ثابت بیعلامت *src1_داده, size_t src1_گام, ثابت بیعلامت *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp32s(ثابت صحيح *src1_داده, size_t src1_گام, ثابت صحيح *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp32f(ثابت عائم *src1_داده, size_t src1_گام, ثابت عائم *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp64f(ثابت مزدوج *src1_داده, size_t src1_گام, ثابت مزدوج *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp64u(ثابت uint64 *src1_داده, size_t src1_گام, ثابت uint64 *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp64s(ثابت int64 *src1_داده, size_t src1_گام, ثابت int64 *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp16f(ثابت cv_hal_f16 *src1_داده, size_t src1_گام, ثابت cv_hal_f16 *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cmp16bf(ثابت cv_hal_bf16 *src1_داده, size_t src1_گام, ثابت cv_hal_bf16 *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, صحيح operation) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_cmp8u hal_ni_cmp8u
-#define cv_hal_cmp8s hal_ni_cmp8s
-#define cv_hal_cmp16u hal_ni_cmp16u
-#define cv_hal_cmp16s hal_ni_cmp16s
-#define cv_hal_cmp32u hal_ni_cmp32u
-#define cv_hal_cmp32s hal_ni_cmp32s
-#define cv_hal_cmp64u hal_ni_cmp64u
-#define cv_hal_cmp64s hal_ni_cmp64s
-#define cv_hal_cmp32f hal_ni_cmp32f
-#define cv_hal_cmp64f hal_ni_cmp64f
-#define cv_hal_cmp16f hal_ni_cmp16f
-#define cv_hal_cmp16bf hal_ni_cmp16bf
+#تعریف_کن cv_hal_cmp8u hal_ni_cmp8u
+#تعریف_کن cv_hal_cmp8s hal_ni_cmp8s
+#تعریف_کن cv_hal_cmp16u hal_ni_cmp16u
+#تعریف_کن cv_hal_cmp16s hal_ni_cmp16s
+#تعریف_کن cv_hal_cmp32u hal_ni_cmp32u
+#تعریف_کن cv_hal_cmp32s hal_ni_cmp32s
+#تعریف_کن cv_hal_cmp64u hal_ni_cmp64u
+#تعریف_کن cv_hal_cmp64s hal_ni_cmp64s
+#تعریف_کن cv_hal_cmp32f hal_ni_cmp32f
+#تعریف_کن cv_hal_cmp64f hal_ni_cmp64f
+#تعریف_کن cv_hal_cmp16f hal_ni_cmp16f
+#تعریف_کن cv_hal_cmp16bf hal_ni_cmp16bf
 //! @endcond
 
 /**
@@ -505,20 +505,20 @@ Multiply: _dst[i] = scale * src1[i] * src2[i]_
 */
 //! @addtogroup core_hal_interface_multiply Element-wise multiply
 //! @{
-inline int hal_ni_mul8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul8u16u(const uchar* src1_data, size_t src1_step, const uchar* src2_data, size_t src2_step, ushort* dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul8s16s(const schar* src1_data, size_t src1_step, const schar* src2_data, size_t src2_step, short* dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_mul16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul8s(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, schar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul16u(ثابت ushort *src1_داده, size_t src1_گام, ثابت ushort *src2_داده, size_t src2_گام, ushort *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul16s(ثابت کوتاه *src1_داده, size_t src1_گام, ثابت کوتاه *src2_داده, size_t src2_گام, کوتاه *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul32u(ثابت بیعلامت *src1_داده, size_t src1_گام, ثابت بیعلامت *src2_داده, size_t src2_گام, بیعلامت *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul32s(ثابت صحيح *src1_داده, size_t src1_گام, ثابت صحيح *src2_داده, size_t src2_گام, صحيح *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul32f(ثابت عائم *src1_داده, size_t src1_گام, ثابت عائم *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul64f(ثابت مزدوج *src1_داده, size_t src1_گام, ثابت مزدوج *src2_داده, size_t src2_گام, مزدوج *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul8u16u(ثابت uchar* src1_داده, size_t src1_گام, ثابت uchar* src2_داده, size_t src2_گام, ushort* dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul8s16s(ثابت schar* src1_داده, size_t src1_گام, ثابت schar* src2_داده, size_t src2_گام, کوتاه* dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul64u(ثابت uint64 *src1_داده, size_t src1_گام, ثابت uint64 *src2_داده, size_t src2_گام, uint64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul64s(ثابت int64 *src1_داده, size_t src1_گام, ثابت int64 *src2_داده, size_t src2_گام, int64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul16f(ثابت cv_hal_f16 *src1_داده, size_t src1_گام, ثابت cv_hal_f16 *src2_داده, size_t src2_گام, cv_hal_f16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_mul16bf(ثابت cv_hal_bf16 *src1_داده, size_t src1_گام, ثابت cv_hal_bf16 *src2_داده, size_t src2_گام, cv_hal_bf16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -535,18 +535,18 @@ Divide: _dst[i] = scale * src1[i] / src2[i]_
 */
 //! @addtogroup core_hal_interface_divide Element-wise divide
 //! @{
-inline int hal_ni_div8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_div16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div8s(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, schar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div16u(ثابت ushort *src1_داده, size_t src1_گام, ثابت ushort *src2_داده, size_t src2_گام, ushort *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div16s(ثابت کوتاه *src1_داده, size_t src1_گام, ثابت کوتاه *src2_داده, size_t src2_گام, کوتاه *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div32u(ثابت بیعلامت *src1_داده, size_t src1_گام, ثابت بیعلامت *src2_داده, size_t src2_گام, بیعلامت *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div32s(ثابت صحيح *src1_داده, size_t src1_گام, ثابت صحيح *src2_داده, size_t src2_گام, صحيح *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div32f(ثابت عائم *src1_داده, size_t src1_گام, ثابت عائم *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div64f(ثابت مزدوج *src1_داده, size_t src1_گام, ثابت مزدوج *src2_داده, size_t src2_گام, مزدوج *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div64u(ثابت uint64 *src1_داده, size_t src1_گام, ثابت uint64 *src2_داده, size_t src2_گام, uint64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div64s(ثابت int64 *src1_داده, size_t src1_گام, ثابت int64 *src2_داده, size_t src2_گام, int64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div16f(ثابت cv_hal_f16 *src1_داده, size_t src1_گام, ثابت cv_hal_f16 *src2_داده, size_t src2_گام, cv_hal_f16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_div16bf(ثابت cv_hal_bf16 *src1_داده, size_t src1_گام, ثابت cv_hal_bf16 *src2_داده, size_t src2_گام, cv_hal_bf16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -561,59 +561,59 @@ Computes reciprocal: _dst[i] = scale / src[i]_
  */
 //! @addtogroup core_hal_interface_reciprocal Element-wise reciprocal
 //! @{
-inline int hal_ni_recip8u(const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip8s(const schar *src_data, size_t src_step, schar *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip16u(const ushort *src_data, size_t src_step, ushort *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip16s(const short *src_data, size_t src_step, short *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip32u(const unsigned *src_data, size_t src_step, unsigned *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip32s(const int *src_data, size_t src_step, int *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip32f(const float *src_data, size_t src_step, float *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip64f(const double *src_data, size_t src_step, double *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip64u(const uint64 *src_data, size_t src_step, uint64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip64s(const int64 *src_data, size_t src_step, int64 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip16f(const cv_hal_f16 *src_data, size_t src_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_recip16bf(const cv_hal_bf16 *src_data, size_t src_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height, double scale) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip8u(ثابت uchar *src_داده, size_t src_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip8s(ثابت schar *src_داده, size_t src_گام, schar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip16u(ثابت ushort *src_داده, size_t src_گام, ushort *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip16s(ثابت کوتاه *src_داده, size_t src_گام, کوتاه *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip32u(ثابت بیعلامت *src_داده, size_t src_گام, بیعلامت *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip32s(ثابت صحيح *src_داده, size_t src_گام, صحيح *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip32f(ثابت عائم *src_داده, size_t src_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip64f(ثابت مزدوج *src_داده, size_t src_گام, مزدوج *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip64u(ثابت uint64 *src_داده, size_t src_گام, uint64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip64s(ثابت int64 *src_داده, size_t src_گام, int64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip16f(ثابت cv_hal_f16 *src_داده, size_t src_گام, cv_hal_f16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_recip16bf(ثابت cv_hal_bf16 *src_داده, size_t src_گام, cv_hal_bf16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, مزدوج scale) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_mul8u hal_ni_mul8u
-#define cv_hal_mul8s hal_ni_mul8s
-#define cv_hal_mul16u hal_ni_mul16u
-#define cv_hal_mul16s hal_ni_mul16s
-#define cv_hal_mul32u hal_ni_mul32u
-#define cv_hal_mul32s hal_ni_mul32s
-#define cv_hal_mul64u hal_ni_mul64u
-#define cv_hal_mul64s hal_ni_mul64s
-#define cv_hal_mul32f hal_ni_mul32f
-#define cv_hal_mul64f hal_ni_mul64f
-#define cv_hal_mul8u16u hal_ni_mul8u16u
-#define cv_hal_mul8s16s hal_ni_mul8s16s
-#define cv_hal_mul16f hal_ni_mul16f
-#define cv_hal_mul16bf hal_ni_mul16bf
-#define cv_hal_div8u hal_ni_div8u
-#define cv_hal_div8s hal_ni_div8s
-#define cv_hal_div16u hal_ni_div16u
-#define cv_hal_div16s hal_ni_div16s
-#define cv_hal_div32u hal_ni_div32u
-#define cv_hal_div32s hal_ni_div32s
-#define cv_hal_div64u hal_ni_div64u
-#define cv_hal_div64s hal_ni_div64s
-#define cv_hal_div32f hal_ni_div32f
-#define cv_hal_div64f hal_ni_div64f
-#define cv_hal_div16f hal_ni_div16f
-#define cv_hal_div16bf hal_ni_div16bf
-#define cv_hal_recip8u hal_ni_recip8u
-#define cv_hal_recip8s hal_ni_recip8s
-#define cv_hal_recip16u hal_ni_recip16u
-#define cv_hal_recip16s hal_ni_recip16s
-#define cv_hal_recip32u hal_ni_recip32u
-#define cv_hal_recip32s hal_ni_recip32s
-#define cv_hal_recip64u hal_ni_recip64u
-#define cv_hal_recip64s hal_ni_recip64s
-#define cv_hal_recip32f hal_ni_recip32f
-#define cv_hal_recip64f hal_ni_recip64f
-#define cv_hal_recip16f hal_ni_recip16f
-#define cv_hal_recip16bf hal_ni_recip16bf
+#تعریف_کن cv_hal_mul8u hal_ni_mul8u
+#تعریف_کن cv_hal_mul8s hal_ni_mul8s
+#تعریف_کن cv_hal_mul16u hal_ni_mul16u
+#تعریف_کن cv_hal_mul16s hal_ni_mul16s
+#تعریف_کن cv_hal_mul32u hal_ni_mul32u
+#تعریف_کن cv_hal_mul32s hal_ni_mul32s
+#تعریف_کن cv_hal_mul64u hal_ni_mul64u
+#تعریف_کن cv_hal_mul64s hal_ni_mul64s
+#تعریف_کن cv_hal_mul32f hal_ni_mul32f
+#تعریف_کن cv_hal_mul64f hal_ni_mul64f
+#تعریف_کن cv_hal_mul8u16u hal_ni_mul8u16u
+#تعریف_کن cv_hal_mul8s16s hal_ni_mul8s16s
+#تعریف_کن cv_hal_mul16f hal_ni_mul16f
+#تعریف_کن cv_hal_mul16bf hal_ni_mul16bf
+#تعریف_کن cv_hal_div8u hal_ni_div8u
+#تعریف_کن cv_hal_div8s hal_ni_div8s
+#تعریف_کن cv_hal_div16u hal_ni_div16u
+#تعریف_کن cv_hal_div16s hal_ni_div16s
+#تعریف_کن cv_hal_div32u hal_ni_div32u
+#تعریف_کن cv_hal_div32s hal_ni_div32s
+#تعریف_کن cv_hal_div64u hal_ni_div64u
+#تعریف_کن cv_hal_div64s hal_ni_div64s
+#تعریف_کن cv_hal_div32f hal_ni_div32f
+#تعریف_کن cv_hal_div64f hal_ni_div64f
+#تعریف_کن cv_hal_div16f hal_ni_div16f
+#تعریف_کن cv_hal_div16bf hal_ni_div16bf
+#تعریف_کن cv_hal_recip8u hal_ni_recip8u
+#تعریف_کن cv_hal_recip8s hal_ni_recip8s
+#تعریف_کن cv_hal_recip16u hal_ni_recip16u
+#تعریف_کن cv_hal_recip16s hal_ni_recip16s
+#تعریف_کن cv_hal_recip32u hal_ni_recip32u
+#تعریف_کن cv_hal_recip32s hal_ni_recip32s
+#تعریف_کن cv_hal_recip64u hal_ni_recip64u
+#تعریف_کن cv_hal_recip64s hal_ni_recip64s
+#تعریف_کن cv_hal_recip32f hal_ni_recip32f
+#تعریف_کن cv_hal_recip64f hal_ni_recip64f
+#تعریف_کن cv_hal_recip16f hal_ni_recip16f
+#تعریف_کن cv_hal_recip16bf hal_ni_recip16bf
 //! @endcond
 
 /**
@@ -630,33 +630,33 @@ Computes weighted sum of two arrays using formula: _dst[i] = a * src1[i] + b * s
  */
 //! @addtogroup core_hal_interface_addWeighted Element-wise weighted sum
 //! @{
-inline int hal_ni_addWeighted8u(const uchar *src1_data, size_t src1_step, const uchar *src2_data, size_t src2_step, uchar *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted8s(const schar *src1_data, size_t src1_step, const schar *src2_data, size_t src2_step, schar *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted16u(const ushort *src1_data, size_t src1_step, const ushort *src2_data, size_t src2_step, ushort *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted16s(const short *src1_data, size_t src1_step, const short *src2_data, size_t src2_step, short *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted32u(const unsigned *src1_data, size_t src1_step, const unsigned *src2_data, size_t src2_step, unsigned *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted32s(const int *src1_data, size_t src1_step, const int *src2_data, size_t src2_step, int *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted32f(const float *src1_data, size_t src1_step, const float *src2_data, size_t src2_step, float *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted64f(const double *src1_data, size_t src1_step, const double *src2_data, size_t src2_step, double *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted64u(const uint64 *src1_data, size_t src1_step, const uint64 *src2_data, size_t src2_step, uint64 *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted64s(const int64 *src1_data, size_t src1_step, const int64 *src2_data, size_t src2_step, int64 *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted16f(const cv_hal_f16 *src1_data, size_t src1_step, const cv_hal_f16 *src2_data, size_t src2_step, cv_hal_f16 *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_addWeighted16bf(const cv_hal_bf16 *src1_data, size_t src1_step, const cv_hal_bf16 *src2_data, size_t src2_step, cv_hal_bf16 *dst_data, size_t dst_step, int width, int height, const double scalars[3]) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted8u(ثابت uchar *src1_داده, size_t src1_گام, ثابت uchar *src2_داده, size_t src2_گام, uchar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted8s(ثابت schar *src1_داده, size_t src1_گام, ثابت schar *src2_داده, size_t src2_گام, schar *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted16u(ثابت ushort *src1_داده, size_t src1_گام, ثابت ushort *src2_داده, size_t src2_گام, ushort *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted16s(ثابت کوتاه *src1_داده, size_t src1_گام, ثابت کوتاه *src2_داده, size_t src2_گام, کوتاه *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted32u(ثابت بیعلامت *src1_داده, size_t src1_گام, ثابت بیعلامت *src2_داده, size_t src2_گام, بیعلامت *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted32s(ثابت صحيح *src1_داده, size_t src1_گام, ثابت صحيح *src2_داده, size_t src2_گام, صحيح *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted32f(ثابت عائم *src1_داده, size_t src1_گام, ثابت عائم *src2_داده, size_t src2_گام, عائم *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted64f(ثابت مزدوج *src1_داده, size_t src1_گام, ثابت مزدوج *src2_داده, size_t src2_گام, مزدوج *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted64u(ثابت uint64 *src1_داده, size_t src1_گام, ثابت uint64 *src2_داده, size_t src2_گام, uint64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted64s(ثابت int64 *src1_داده, size_t src1_گام, ثابت int64 *src2_داده, size_t src2_گام, int64 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted16f(ثابت cv_hal_f16 *src1_داده, size_t src1_گام, ثابت cv_hal_f16 *src2_داده, size_t src2_گام, cv_hal_f16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع_کن_Weighted16bf(ثابت cv_hal_bf16 *src1_داده, size_t src1_گام, ثابت cv_hal_bf16 *src2_داده, size_t src2_گام, cv_hal_bf16 *dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع, ثابت مزدوج scalars[3]) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_addWeighted8u hal_ni_addWeighted8u
-#define cv_hal_addWeighted8s hal_ni_addWeighted8s
-#define cv_hal_addWeighted16u hal_ni_addWeighted16u
-#define cv_hal_addWeighted16s hal_ni_addWeighted16s
-#define cv_hal_addWeighted32u hal_ni_addWeighted32u
-#define cv_hal_addWeighted32s hal_ni_addWeighted32s
-#define cv_hal_addWeighted64u hal_ni_addWeighted64u
-#define cv_hal_addWeighted64s hal_ni_addWeighted64s
-#define cv_hal_addWeighted32f hal_ni_addWeighted32f
-#define cv_hal_addWeighted64f hal_ni_addWeighted64f
-#define cv_hal_addWeighted16f hal_ni_addWeighted16f
-#define cv_hal_addWeighted16bf hal_ni_addWeighted16bf
+#تعریف_کن cv_hal_جمع_کن_Weighted8u hal_ni_جمع_کن_Weighted8u
+#تعریف_کن cv_hal_جمع_کن_Weighted8s hal_ni_جمع_کن_Weighted8s
+#تعریف_کن cv_hal_جمع_کن_Weighted16u hal_ni_جمع_کن_Weighted16u
+#تعریف_کن cv_hal_جمع_کن_Weighted16s hal_ni_جمع_کن_Weighted16s
+#تعریف_کن cv_hal_جمع_کن_Weighted32u hal_ni_جمع_کن_Weighted32u
+#تعریف_کن cv_hal_جمع_کن_Weighted32s hal_ni_جمع_کن_Weighted32s
+#تعریف_کن cv_hal_جمع_کن_Weighted64u hal_ni_جمع_کن_Weighted64u
+#تعریف_کن cv_hal_جمع_کن_Weighted64s hal_ni_جمع_کن_Weighted64s
+#تعریف_کن cv_hal_جمع_کن_Weighted32f hal_ni_جمع_کن_Weighted32f
+#تعریف_کن cv_hal_جمع_کن_Weighted64f hal_ni_جمع_کن_Weighted64f
+#تعریف_کن cv_hal_جمع_کن_Weighted16f hal_ni_جمع_کن_Weighted16f
+#تعریف_کن cv_hal_جمع_کن_Weighted16bf hal_ni_جمع_کن_Weighted16bf
 //! @endcond
 
 /**
@@ -667,17 +667,17 @@ inline int hal_ni_addWeighted16bf(const cv_hal_bf16 *src1_data, size_t src1_step
  */
 //! @addtogroup core_hal_interface_split Channel split
 //! @{
-inline int hal_ni_split8u(const uchar *src_data, uchar **dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_split16u(const ushort *src_data, ushort **dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_split32s(const int *src_data, int **dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_split64s(const int64 *src_data, int64 **dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_split8u(ثابت uchar *src_داده, uchar **dst_داده, صحيح len, صحيح cn) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_split16u(ثابت ushort *src_داده, ushort **dst_داده, صحيح len, صحيح cn) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_split32s(ثابت صحيح *src_داده, صحيح **dst_داده, صحيح len, صحيح cn) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_split64s(ثابت int64 *src_داده, int64 **dst_داده, صحيح len, صحيح cn) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_split8u hal_ni_split8u
-#define cv_hal_split16u hal_ni_split16u
-#define cv_hal_split32s hal_ni_split32s
-#define cv_hal_split64s hal_ni_split64s
+#تعریف_کن cv_hal_split8u hal_ni_split8u
+#تعریف_کن cv_hal_split16u hal_ni_split16u
+#تعریف_کن cv_hal_split32s hal_ni_split32s
+#تعریف_کن cv_hal_split64s hal_ni_split64s
 //! @endcond
 
 /**
@@ -688,17 +688,17 @@ inline int hal_ni_split64s(const int64 *src_data, int64 **dst_data, int len, int
  */
 //! @addtogroup core_hal_interface_merge Channel merge
 //! @{
-inline int hal_ni_merge8u(const uchar **src_data, uchar *dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_merge16u(const ushort **src_data, ushort *dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_merge32s(const int **src_data, int *dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_merge64s(const int64 **src_data, int64 *dst_data, int len, int cn) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_merge8u(ثابت uchar **src_داده, uchar *dst_داده, صحيح len, صحيح cn) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_merge16u(ثابت ushort **src_داده, ushort *dst_داده, صحيح len, صحيح cn) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_merge32s(ثابت صحيح **src_داده, صحيح *dst_داده, صحيح len, صحيح cn) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_merge64s(ثابت int64 **src_داده, int64 *dst_داده, صحيح len, صحيح cn) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_merge8u hal_ni_merge8u
-#define cv_hal_merge16u hal_ni_merge16u
-#define cv_hal_merge32s hal_ni_merge32s
-#define cv_hal_merge64s hal_ni_merge64s
+#تعریف_کن cv_hal_merge8u hal_ni_merge8u
+#تعریف_کن cv_hal_merge16u hal_ni_merge16u
+#تعریف_کن cv_hal_merge32s hal_ni_merge32s
+#تعریف_کن cv_hal_merge64s hal_ni_merge64s
 //! @endcond
 
 /**
@@ -711,13 +711,13 @@ inline int hal_ni_merge64s(const int64 **src_data, int64 *dst_data, int len, int
 */
 //! @addtogroup core_hal_interface_fastAtan Atan calculation
 //! @{
-inline int hal_ni_cartToPolar32f(const float* x, const float* y, float* mag, float* angle, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_cartToPolar64f(const double* x, const double* y, double* mag, double* angle, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cart_مقصد_Polar32f(ثابت عائم* x, ثابت عائم* y, عائم* mag, عائم* angle, صحيح len, منطقي angle_درون_Degrees) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_cart_مقصد_Polar64f(ثابت مزدوج* x, ثابت مزدوج* y, مزدوج* mag, مزدوج* angle, صحيح len, منطقي angle_درون_Degrees) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_cartToPolar32f hal_ni_cartToPolar32f
-#define cv_hal_cartToPolar64f hal_ni_cartToPolar64f
+#تعریف_کن cv_hal_cart_مقصد_Polar32f hal_ni_cart_مقصد_Polar32f
+#تعریف_کن cv_hal_cart_مقصد_Polar64f hal_ni_cart_مقصد_Polar64f
 //! @endcond
 
 /**
@@ -729,13 +729,13 @@ inline int hal_ni_cartToPolar64f(const double* x, const double* y, double* mag, 
  */
 //! @addtogroup core_hal_interface_fastAtan Atan calculation
 //! @{
-inline int hal_ni_fastAtan32f(const float* y, const float* x, float* dst, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_fastAtan64f(const double* y, const double* x, double* dst, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_fastAtan32f(ثابت عائم* y, ثابت عائم* x, عائم* dst, صحيح len, منطقي angle_درون_Degrees) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_fastAtan64f(ثابت مزدوج* y, ثابت مزدوج* x, مزدوج* dst, صحيح len, منطقي angle_درون_Degrees) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_fastAtan32f hal_ni_fastAtan32f
-#define cv_hal_fastAtan64f hal_ni_fastAtan64f
+#تعریف_کن cv_hal_fastAtan32f hal_ni_fastAtan32f
+#تعریف_کن cv_hal_fastAtan64f hal_ni_fastAtan64f
 //! @endcond
 
 
@@ -747,13 +747,13 @@ inline int hal_ni_fastAtan64f(const double* y, const double* x, double* dst, int
  */
 //! @addtogroup core_hal_interface_magnitude Magnitude calculation
 //! @{
-inline int hal_ni_magnitude32f(const float *x, const float *y, float *dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_magnitude64f(const double *x, const double  *y, double *dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_magnitude32f(ثابت عائم *x, ثابت عائم *y, عائم *dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_magnitude64f(ثابت مزدوج *x, ثابت مزدوج  *y, مزدوج *dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_magnitude32f hal_ni_magnitude32f
-#define cv_hal_magnitude64f hal_ni_magnitude64f
+#تعریف_کن cv_hal_magnitude32f hal_ni_magnitude32f
+#تعریف_کن cv_hal_magnitude64f hal_ni_magnitude64f
 //! @endcond
 
 /**
@@ -766,13 +766,13 @@ inline int hal_ni_magnitude64f(const double *x, const double  *y, double *dst, i
 */
 //! @addtogroup core_hal_interface_fastAtan Atan calculation
 //! @{
-inline int hal_ni_polarToCart32f(const float* mag, const float* angle, float* x, float* y, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_polarToCart64f(const double* mag, const double* angle, double* x, double* y, int len, bool angleInDegrees) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_polar_مقصد_Cart32f(ثابت عائم* mag, ثابت عائم* angle, عائم* x, عائم* y, صحيح len, منطقي angle_درون_Degrees) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_polar_مقصد_Cart64f(ثابت مزدوج* mag, ثابت مزدوج* angle, مزدوج* x, مزدوج* y, صحيح len, منطقي angle_درون_Degrees) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_polarToCart32f hal_ni_polarToCart32f
-#define cv_hal_polarToCart64f hal_ni_polarToCart64f
+#تعریف_کن cv_hal_polar_مقصد_Cart32f hal_ni_polar_مقصد_Cart32f
+#تعریف_کن cv_hal_polar_مقصد_Cart64f hal_ni_polar_مقصد_Cart64f
 //! @endcond
 
 /**
@@ -782,13 +782,13 @@ inline int hal_ni_polarToCart64f(const double* mag, const double* angle, double*
  */
 //! @addtogroup core_hal_interface_invSqrt Inverse square root calculation
 //! @{
-inline int hal_ni_invSqrt32f(const float* src, float* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_invSqrt64f(const double* src, double* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_invSqrt32f(ثابت عائم* src, عائم* dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_invSqrt64f(ثابت مزدوج* src, مزدوج* dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_invSqrt32f hal_ni_invSqrt32f
-#define cv_hal_invSqrt64f hal_ni_invSqrt64f
+#تعریف_کن cv_hal_invSqrt32f hal_ni_invSqrt32f
+#تعریف_کن cv_hal_invSqrt64f hal_ni_invSqrt64f
 //! @endcond
 
 
@@ -799,13 +799,13 @@ inline int hal_ni_invSqrt64f(const double* src, double* dst, int len) { return C
  */
 //! @addtogroup core_hal_interface_sqrt Square root calculation
 //! @{
-inline int hal_ni_sqrt32f(const float* src, float* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_sqrt64f(const double* src, double* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sqrt32f(ثابت عائم* src, عائم* dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_sqrt64f(ثابت مزدوج* src, مزدوج* dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_sqrt32f hal_ni_sqrt32f
-#define cv_hal_sqrt64f hal_ni_sqrt64f
+#تعریف_کن cv_hal_sqrt32f hal_ni_sqrt32f
+#تعریف_کن cv_hal_sqrt64f hal_ni_sqrt64f
 //! @endcond
 
 
@@ -816,13 +816,13 @@ inline int hal_ni_sqrt64f(const double* src, double* dst, int len) { return CV_H
  */
 //! @addtogroup core_hal_interface_log Natural logarithm calculation
 //! @{
-inline int hal_ni_log32f(const float* src, float* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_log64f(const double* src, double* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_log32f(ثابت عائم* src, عائم* dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_log64f(ثابت مزدوج* src, مزدوج* dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_log32f hal_ni_log32f
-#define cv_hal_log64f hal_ni_log64f
+#تعریف_کن cv_hal_log32f hal_ni_log32f
+#تعریف_کن cv_hal_log64f hal_ni_log64f
 //! @endcond
 
 
@@ -833,13 +833,13 @@ inline int hal_ni_log64f(const double* src, double* dst, int len) { return CV_HA
  */
 //! @addtogroup core_hal_interface_exp Exponent calculation
 //! @{
-inline int hal_ni_exp32f(const float* src, float* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_exp64f(const double* src, double* dst, int len) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_exp32f(ثابت عائم* src, عائم* dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_exp64f(ثابت مزدوج* src, مزدوج* dst, صحيح len) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_exp32f hal_ni_exp32f
-#define cv_hal_exp64f hal_ni_exp64f
+#تعریف_کن cv_hal_exp32f hal_ni_exp32f
+#تعریف_کن cv_hal_exp64f hal_ni_exp64f
 //! @endcond
 
 
@@ -860,7 +860,7 @@ int my_hal_dftFree2D(cvhalDFT *context) {
 }
 @endcode
  */
-struct cvhalDFT {};
+بنية cvhalDFT {};
 
 /**
 @param context double pointer to context storing all necessary data
@@ -870,17 +870,17 @@ struct cvhalDFT {};
 @param flags algorithm options (combination of CV_HAL_DFT_INVERSE, CV_HAL_DFT_SCALE, ...)
 @param needBuffer pointer to boolean variable, if valid pointer provided, then variable value should be set to true to signal that additional memory buffer is needed for operations
  */
-inline int hal_ni_dftInit1D(cvhalDFT **context, int len, int count, int depth, int flags, bool *needBuffer) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dftInit1D(cvhalDFT **context, صحيح len, صحيح شمار_2, صحيح عمق, صحيح flags, منطقي *need_میانگیر) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
 @param src source data
 @param dst destination data
  */
-inline int hal_ni_dft1D(cvhalDFT *context, const uchar *src, uchar *dst) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dft1D(cvhalDFT *context, ثابت uchar *src, uchar *dst) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
  */
-inline int hal_ni_dftFree1D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dftFree1D(cvhalDFT *context) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 /**
 @param src source data
@@ -896,14 +896,14 @@ inline int hal_ni_dftFree1D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEME
 @param isInverse OcvDftOptions data
 @param noPermute OcvDftOptions data
  */
-inline int hal_ni_dft(const uchar* src, uchar* dst, int depth, int nf, int *factors, double scale, int* itab, void* wave,
-                         int tab_size, int n, bool isInverse, bool noPermute) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dft(ثابت uchar* src, uchar* dst, صحيح عمق, صحيح nf, صحيح *factors, مزدوج scale, صحيح* itab, فراغ* wave,
+                         صحيح tab_اندازه, صحيح n, منطقي isInverse, منطقي no_جایگشت) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_dftInit1D hal_ni_dftInit1D
-#define cv_hal_dft1D hal_ni_dft1D
-#define cv_hal_dftFree1D hal_ni_dftFree1D
-#define cv_hal_dft hal_ni_dft
+#تعریف_کن cv_hal_dftInit1D hal_ni_dftInit1D
+#تعریف_کن cv_hal_dft1D hal_ni_dft1D
+#تعریف_کن cv_hal_dftFree1D hal_ni_dftFree1D
+#تعریف_کن cv_hal_dft hal_ni_dft
 //! @endcond
 
 /**
@@ -916,7 +916,7 @@ inline int hal_ni_dft(const uchar* src, uchar* dst, int depth, int nf, int *fact
 @param flags algorithm options (combination of CV_HAL_DFT_INVERSE, ...)
 @param nonzero_rows number of nonzero rows in image, can be used for optimization
  */
-inline int hal_ni_dftInit2D(cvhalDFT **context, int width, int height, int depth, int src_channels, int dst_channels, int flags, int nonzero_rows) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dftInit2D(cvhalDFT **context, صحيح عرض, صحيح ارتفاع, صحيح عمق, صحيح src_channels, صحيح dst_channels, صحيح flags, صحيح nonzero_ردیفها) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
 @param src_data source image data
@@ -924,16 +924,16 @@ inline int hal_ni_dftInit2D(cvhalDFT **context, int width, int height, int depth
 @param dst_data destination image data
 @param dst_step destination image step
  */
-inline int hal_ni_dft2D(cvhalDFT *context, const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dft2D(cvhalDFT *context, ثابت uchar *src_داده, size_t src_گام, uchar *dst_داده, size_t dst_گام) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
  */
-inline int hal_ni_dftFree2D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dftFree2D(cvhalDFT *context) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_dftInit2D hal_ni_dftInit2D
-#define cv_hal_dft2D hal_ni_dft2D
-#define cv_hal_dftFree2D hal_ni_dftFree2D
+#تعریف_کن cv_hal_dftInit2D hal_ni_dftInit2D
+#تعریف_کن cv_hal_dft2D hal_ni_dft2D
+#تعریف_کن cv_hal_dftFree2D hal_ni_dftFree2D
 //! @endcond
 
 /**
@@ -943,7 +943,7 @@ inline int hal_ni_dftFree2D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEME
 @param depth image type (CV_32F or CV_64F)
 @param flags algorithm options (combination of CV_HAL_DFT_INVERSE, ...)
  */
-inline int hal_ni_dctInit2D(cvhalDFT **context, int width, int height, int depth, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dctInit2D(cvhalDFT **context, صحيح عرض, صحيح ارتفاع, صحيح عمق, صحيح flags) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
 @param src_data source image data
@@ -951,16 +951,16 @@ inline int hal_ni_dctInit2D(cvhalDFT **context, int width, int height, int depth
 @param dst_data destination image data
 @param dst_step destination image step
  */
-inline int hal_ni_dct2D(cvhalDFT *context, const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dct2D(cvhalDFT *context, ثابت uchar *src_داده, size_t src_گام, uchar *dst_داده, size_t dst_گام) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
 @param context pointer to context storing all necessary data
  */
-inline int hal_ni_dctFree2D(cvhalDFT *context) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dctFree2D(cvhalDFT *context) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_dctInit2D hal_ni_dctInit2D
-#define cv_hal_dct2D hal_ni_dct2D
-#define cv_hal_dctFree2D hal_ni_dctFree2D
+#تعریف_کن cv_hal_dctInit2D hal_ni_dctInit2D
+#تعریف_کن cv_hal_dct2D hal_ni_dct2D
+#تعریف_کن cv_hal_dctFree2D hal_ni_dctFree2D
 //! @endcond
 
 
@@ -979,8 +979,8 @@ If src2 is null pointer only \f$LU\f$ decomposition will be performed. After fin
  */
 //! @addtogroup core_hal_interface_decomp_lu LU matrix decomposition
 //! @{
-inline int hal_ni_LU32f(float* src1, size_t src1_step, int m, float* src2, size_t src2_step, int n, int* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_LU64f(double* src1, size_t src1_step, int m, double* src2, size_t src2_step, int n, int* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_LU32f(عائم* src1, size_t src1_گام, صحيح m, عائم* src2, size_t src2_گام, صحيح n, صحيح* info) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_LU64f(مزدوج* src1, size_t src1_گام, صحيح m, مزدوج* src2, size_t src2_گام, صحيح n, صحيح* info) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -997,8 +997,8 @@ If src2 is null pointer only Cholesky decomposition will be performed. After fin
 
 //! @addtogroup core_hal_interface_decomp_cholesky Cholesky matrix decomposition
 //! @{
-inline int hal_ni_Cholesky32f(float* src1, size_t src1_step, int m, float* src2, size_t src2_step, int n, bool* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_Cholesky64f(double* src1, size_t src1_step, int m, double* src2, size_t src2_step, int n, bool* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_Cholesky32f(عائم* src1, size_t src1_گام, صحيح m, عائم* src2, size_t src2_گام, صحيح n, منطقي* info) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_Cholesky64f(مزدوج* src1, size_t src1_گام, صحيح m, مزدوج* src2, size_t src2_گام, صحيح n, منطقي* info) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -1017,8 +1017,8 @@ After finish of work src will be filled with rows of \f$U\f$ or not modified (de
  */
 //! @addtogroup core_hal_interface_decomp_svd Singular value matrix decomposition
 //! @{
-inline int hal_ni_SVD32f(float* src, size_t src_step, float* w, float* u, size_t u_step, float* vt, size_t vt_step, int m, int n, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_SVD64f(double* src, size_t src_step, double* w, double* u, size_t u_step, double* vt, size_t vt_step, int m, int n, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_SVD32f(عائم* src, size_t src_گام, عائم* w, عائم* u, size_t u_گام, عائم* vt, size_t vt_گام, صحيح m, صحيح n, صحيح flags) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_SVD64f(مزدوج* src, size_t src_گام, مزدوج* w, مزدوج* u, size_t u_گام, مزدوج* vt, size_t vt_گام, صحيح m, صحيح n, صحيح flags) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 /**
@@ -1038,21 +1038,21 @@ after finish of work src2 contains solution \f$X\f$ of system \f$A*X=B\f$.
 */
 //! @addtogroup core_hal_interface_decomp_qr QR matrix decomposition
 //! @{
-inline int hal_ni_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_QR32f(عائم* src1, size_t src1_گام, صحيح m, صحيح n, صحيح k, عائم* src2, size_t src2_گام, عائم* dst, صحيح* info) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_QR64f(مزدوج* src1, size_t src1_گام, صحيح m, صحيح n, صحيح k, مزدوج* src2, size_t src2_گام, مزدوج* dst, صحيح* info) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 
 
 //! @cond IGNORED
-#define cv_hal_LU32f hal_ni_LU32f
-#define cv_hal_LU64f hal_ni_LU64f
-#define cv_hal_Cholesky32f hal_ni_Cholesky32f
-#define cv_hal_Cholesky64f hal_ni_Cholesky64f
-#define cv_hal_SVD32f hal_ni_SVD32f
-#define cv_hal_SVD64f hal_ni_SVD64f
-#define cv_hal_QR32f hal_ni_QR32f
-#define cv_hal_QR64f hal_ni_QR64f
+#تعریف_کن cv_hal_LU32f hal_ni_LU32f
+#تعریف_کن cv_hal_LU64f hal_ni_LU64f
+#تعریف_کن cv_hal_Cholesky32f hal_ni_Cholesky32f
+#تعریف_کن cv_hal_Cholesky64f hal_ni_Cholesky64f
+#تعریف_کن cv_hal_SVD32f hal_ni_SVD32f
+#تعریف_کن cv_hal_SVD64f hal_ni_SVD64f
+#تعریف_کن cv_hal_QR32f hal_ni_QR32f
+#تعریف_کن cv_hal_QR64f hal_ni_QR64f
 //! @endcond
 
 
@@ -1078,25 +1078,25 @@ The function performs generalized matrix multiplication similar to the gemm func
 
 //! @addtogroup core_hal_interface_matrix_multiplication Matrix multiplication
 //! @{
-inline int hal_ni_gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                          float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                          int m, int n, int k, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                          double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                          int m, int n, int k, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                          float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                          int m, int n, int k, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
-inline int hal_ni_gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                          double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                          int m, int n, int k, int flags) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_gemm32f(ثابت عائم* src1, size_t src1_گام, ثابت عائم* src2, size_t src2_گام,
+                          عائم alpha, ثابت عائم* src3, size_t src3_گام, عائم beta, عائم* dst, size_t dst_گام,
+                          صحيح m, صحيح n, صحيح k, صحيح flags) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_gemm64f(ثابت مزدوج* src1, size_t src1_گام, ثابت مزدوج* src2, size_t src2_گام,
+                          مزدوج alpha, ثابت مزدوج* src3, size_t src3_گام, مزدوج beta, مزدوج* dst, size_t dst_گام,
+                          صحيح m, صحيح n, صحيح k, صحيح flags) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_gemm32fc(ثابت عائم* src1, size_t src1_گام, ثابت عائم* src2, size_t src2_گام,
+                          عائم alpha, ثابت عائم* src3, size_t src3_گام, عائم beta, عائم* dst, size_t dst_گام,
+                          صحيح m, صحيح n, صحيح k, صحيح flags) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_gemm64fc(ثابت مزدوج* src1, size_t src1_گام, ثابت مزدوج* src2, size_t src2_گام,
+                          مزدوج alpha, ثابت مزدوج* src3, size_t src3_گام, مزدوج beta, مزدوج* dst, size_t dst_گام,
+                          صحيح m, صحيح n, صحيح k, صحيح flags) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 //! @}
 
 //! @cond IGNORED
-#define cv_hal_gemm32f hal_ni_gemm32f
-#define cv_hal_gemm64f hal_ni_gemm64f
-#define cv_hal_gemm32fc hal_ni_gemm32fc
-#define cv_hal_gemm64fc hal_ni_gemm64fc
+#تعریف_کن cv_hal_gemm32f hal_ni_gemm32f
+#تعریف_کن cv_hal_gemm64f hal_ni_gemm64f
+#تعریف_کن cv_hal_gemm32fc hal_ni_gemm32fc
+#تعریف_کن cv_hal_gemm64fc hal_ni_gemm64fc
 //! @endcond
 
 /**
@@ -1112,8 +1112,8 @@ inline int hal_ni_gemm64fc(const double* src1, size_t src1_step, const double* s
    @param maxIdx Pointer to the returned minimum and maximum location.
    @param mask Specified array region.
 */
-inline int hal_ni_minMaxIdx(const uchar* src_data, size_t src_step, int width, int height, int depth, double* minVal, double* maxVal,
-                            int* minIdx, int* maxIdx, uchar* mask) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_minMaxIdx(ثابت uchar* src_داده, size_t src_گام, صحيح عرض, صحيح ارتفاع, صحيح عمق, مزدوج* minVal, مزدوج* maxVal,
+                            صحيح* minIdx, صحيح* maxIdx, uchar* ماسک) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 /**
    @brief Finds the global minimum and maximum in an array.
@@ -1129,12 +1129,12 @@ inline int hal_ni_minMaxIdx(const uchar* src_data, size_t src_step, int width, i
    @param mask Specified array region.
    @param mask_step Mask array step.
 */
-inline int hal_ni_minMaxIdxMaskStep(const uchar* src_data, size_t src_step, int width, int height, int depth, double* minVal, double* maxVal,
-                                    int* minIdx, int* maxIdx, uchar* mask, size_t mask_step) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_min_Max_Idx_ماسک_گام(ثابت uchar* src_داده, size_t src_گام, صحيح عرض, صحيح ارتفاع, صحيح عمق, مزدوج* minVal, مزدوج* maxVal,
+                                    صحيح* minIdx, صحيح* maxIdx, uchar* ماسک, size_t ماسک_گام) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_minMaxIdx hal_ni_minMaxIdx
-#define cv_hal_minMaxIdxMaskStep hal_ni_minMaxIdxMaskStep
+#تعریف_کن cv_hal_minMaxIdx hal_ni_minMaxIdx
+#تعریف_کن cv_hal_min_Max_Idx_ماسک_گام hal_ni_min_Max_Idx_ماسک_گام
 //! @endcond
 
 /**
@@ -1150,12 +1150,12 @@ inline int hal_ni_minMaxIdxMaskStep(const uchar* src_data, size_t src_step, int 
    @param mask_step Mask array step.
    @sa meanStdDev
 */
-inline int hal_ni_meanStdDev(const uchar* src_data, size_t src_step, int width, int height,
-                             int src_type, double* mean_val, double* stddev_val, uchar* mask, size_t mask_step)
-{ return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_میانگین_Std_Dev(ثابت uchar* src_داده, size_t src_گام, صحيح عرض, صحيح ارتفاع,
+                             صحيح src_type, مزدوج* میانگین_val, مزدوج* stddev_val, uchar* ماسک, size_t ماسک_گام)
+{ أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_meanStdDev hal_ni_meanStdDev
+#تعریف_کن cv_hal_میانگین_Std_Dev hal_ni_میانگین_Std_Dev
 //! @endcond
 
 /**
@@ -1171,12 +1171,12 @@ inline int hal_ni_meanStdDev(const uchar* src_data, size_t src_step, int width, 
  * @param dot_val Pointer to resulting dot product value
  * @return int
  */
-inline int hal_ni_dotProduct(const uchar* a_data, size_t a_step, const uchar* b_data, size_t b_step, int width, int height,
-                             int type, double *dot_val)
-{ return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_dot_حاصلضرب(ثابت uchar* a_داده, size_t a_گام, ثابت uchar* b_داده, size_t b_گام, صحيح عرض, صحيح ارتفاع,
+                             صحيح type, مزدوج *dot_val)
+{ أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_dotProduct hal_ni_dotProduct
+#تعریف_کن cv_hal_dot_حاصلضرب hal_ni_dot_حاصلضرب
 //! @endcond
 
 /**
@@ -1190,11 +1190,11 @@ inline int hal_ni_dotProduct(const uchar* a_data, size_t a_step, const uchar* b_
    @param dst_step destination image step
    @param flip_mode 0 flips around x-axis, positive around y-axis, negative both
  */
-inline int hal_ni_flip(int src_type, const uchar* src_data, size_t src_step, int src_width, int src_height,
-                       uchar* dst_data, size_t dst_step, int flip_mode) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_flip(صحيح src_type, ثابت uchar* src_داده, size_t src_گام, صحيح src_عرض, صحيح src_ارتفاع,
+                       uchar* dst_داده, size_t dst_گام, صحيح flip_نما) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_flip hal_ni_flip
+#تعریف_کن cv_hal_flip hal_ni_flip
 //! @endcond
 
 /**
@@ -1212,11 +1212,11 @@ inline int hal_ni_flip(int src_type, const uchar* src_data, size_t src_step, int
    @param dst_step destination image step
    @param angle clockwise angle for rotation in degrees from set [90, 180, 270]
  */
-inline int hal_ni_rotate90(int src_type, const uchar* src_data, size_t src_step, int src_width, int src_height,
-                           uchar* dst_data, size_t dst_step, int angle) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_rotate90(صحيح src_type, ثابت uchar* src_داده, size_t src_گام, صحيح src_عرض, صحيح src_ارتفاع,
+                           uchar* dst_داده, size_t dst_گام, صحيح angle) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_rotate90 hal_ni_rotate90
+#تعریف_کن cv_hal_rotate90 hal_ni_rotate90
 //! @endcond
 
 /**
@@ -1226,11 +1226,11 @@ inline int hal_ni_rotate90(int src_type, const uchar* src_data, size_t src_step,
    @param src_width,src_height Source image dimensions
    @param element_size Size of an element in bytes
 */
-inline int hal_ni_transpose2d(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, int src_width,
-                              int src_height, int element_size) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_transpose2d(ثابت uchar* src_داده, size_t src_گام, uchar* dst_داده, size_t dst_گام, صحيح src_عرض,
+                              صحيح src_ارتفاع, صحيح element_اندازه) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_transpose2d hal_ni_transpose2d
+#تعریف_کن cv_hal_transpose2d hal_ni_transpose2d
 //! @endcond
 
 /**
@@ -1241,12 +1241,12 @@ inline int hal_ni_transpose2d(const uchar* src_data, size_t src_step, uchar* dst
     @param type Type of source and destination images, for example CV_8UC1 or CV_32FC3
     @param mask_data, mask_step, mask_type Mask
 */
-inline int hal_ni_copyToMasked(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, int width, int height,
-                             int type, const uchar* mask_data, size_t mask_step, int mask_type)
-{ return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_copy_مقصد_Masked(ثابت uchar* src_داده, size_t src_گام, uchar* dst_داده, size_t dst_گام, صحيح عرض, صحيح ارتفاع,
+                             صحيح type, ثابت uchar* ماسک_داده, size_t ماسک_گام, صحيح ماسک_type)
+{ أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_copyToMasked hal_ni_copyToMasked
+#تعریف_کن cv_hal_copy_مقصد_Masked hal_ni_copy_مقصد_Masked
 //! @endcond
 
 /**
@@ -1257,11 +1257,11 @@ inline int hal_ni_copyToMasked(const uchar* src_data, size_t src_step, uchar* ds
  @param width, height Source image dimensions
  @param result Pointer to save the sum result to.
  */
-inline int hal_ni_sum(const uchar *src_data, size_t src_step, int src_type, int width, int height, double *result)
-{ return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_جمع(ثابت uchar *src_داده, size_t src_گام, صحيح src_type, صحيح عرض, صحيح ارتفاع, مزدوج *نتیجه)
+{ أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_sum hal_ni_sum
+#تعریف_کن cv_hal_جمع hal_ni_جمع
 //! @endcond
 
 /**
@@ -1277,9 +1277,9 @@ inline int hal_ni_sum(const uchar *src_data, size_t src_step, int src_type, int 
    @param lower_bound Range lower bound
    @param upper_bound Range upper bound
 */
-inline int hal_ni_inRange8u(const uchar *src_data, size_t src_step,
-              uchar *dst_data, size_t dst_step, int dst_depth, int width,
-              int height, int cn, uchar lower_bound, uchar upper_bound) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_درون_Range8u(ثابت uchar *src_داده, size_t src_گام,
+              uchar *dst_داده, size_t dst_گام, صحيح dst_عمق_2, صحيح عرض,
+              صحيح ارتفاع, صحيح cn, uchar lower_bound, uchar upper_bound) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 /**
    @brief inRange (lower_bound <= src_value) && (src_value <= upper_bound) ? 255 : 0
    @param src_data Source image data
@@ -1293,46 +1293,46 @@ inline int hal_ni_inRange8u(const uchar *src_data, size_t src_step,
    @param lower_bound Range lower bound
    @param upper_bound Range upper bound
 */
-inline int hal_ni_inRange32f(const uchar *src_data, size_t src_step,
-              uchar *dst_data, size_t dst_step, int dst_depth, int width,
-              int height, int cn, double lower_bound, double upper_bound) { return CV_HAL_ERROR_NOT_IMPLEMENTED; }
+مضمن صحيح hal_ni_درون_Range32f(ثابت uchar *src_داده, size_t src_گام,
+              uchar *dst_داده, size_t dst_گام, صحيح dst_عمق_2, صحيح عرض,
+              صحيح ارتفاع, صحيح cn, مزدوج lower_bound, مزدوج upper_bound) { أرجع CV_HAL_ERROR_NOT_IMPLEMENTED; }
 
 //! @cond IGNORED
-#define cv_hal_inRange8u hal_ni_inRange8u
-#define cv_hal_inRange32f hal_ni_inRange32f
+#تعریف_کن cv_hal_درون_Range8u hal_ni_درون_Range8u
+#تعریف_کن cv_hal_درون_Range32f hal_ni_درون_Range32f
 //! @endcond
 
 //! @}
 
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(_MSC_VER)
-#pragma warning(pop)
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+#إذا defined(__clang__)
+#رهنمود clang diagnostic pop
+#وإلاإذا defined(_MSC_VER)
+#رهنمود warning(pop)
+#وإلاإذا defined(__GNUC__)
+#رهنمود GCC diagnostic pop
+#پایان_اگر
 
-#include "hal_internal.hpp"
-#include "custom_hal.hpp"
+#ضمن "hal_internal.hpp"
+#ضمن "custom_hal.hpp"
 
 //! @cond IGNORED
 
-#define CALL_HAL_RET2(name, fun, retval, ...) \
+#تعریف_کن CALL_HAL_RET2(name, fun, retval, ...) \
 { \
-    int res = __CV_EXPAND(fun(__VA_ARGS__)); \
-    if (res == CV_HAL_ERROR_OK) \
-        return retval; \
-    else if (res != CV_HAL_ERROR_NOT_IMPLEMENTED) \
-        CV_Error_(cv::Error::StsInternal, \
+    صحيح res = __CV_EXPAND(fun(__VA_ARGS__)); \
+    إذا (res == CV_HAL_ERROR_OK) \
+        أرجع retval; \
+    وإلا إذا (res != CV_HAL_ERROR_NOT_IMPLEMENTED) \
+        CV_Error_(cv::Error::Sts_داخلی, \
         ("HAL implementation " CVAUX_STR(name) " ==> " CVAUX_STR(fun) " returned %d (0x%08x)", res, res)); \
 }
 
-#define CALL_HAL_RET(name, fun, retval, ...) \
+#تعریف_کن CALL_HAL_RET(name, fun, retval, ...) \
 CALL_HAL_RET2(name, fun, retval, __VA_ARGS__, &retval)
 
-#define CALL_HAL(name, fun, ...) \
+#تعریف_کن CALL_HAL(name, fun, ...) \
 CALL_HAL_RET2(name, fun, ,__VA_ARGS__)
 
 //! @endcond
 
-#endif
+#پایان_اگر

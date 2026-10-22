@@ -3,245 +3,245 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#ضمن "precomp.hpp"
+#ضمن "opencl_kernels_core.hpp"
+#ضمن "stat.hpp"
 
-#include "count_non_zero.simd.hpp"
-#include "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ضمن "count_non_zero.simd.hpp"
+#ضمن "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+نطاق cv {
 
-static CountNonZeroFunc getCountNonZeroTab(int depth)
+ساكن شمار_Non_Zero_Func get_شمار_Non_Zero_Tab(صحيح عمق)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getCountNonZeroTab, (depth),
+    CV_CPU_DISPATCH(get_شمار_Non_Zero_Tab, (عمق),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
-static bool ocl_countNonZero( InputArray _src, int & res )
+#اگر_تعریف_شده HAVE_OPENCL
+ساكن منطقي ocl_شمار_Non_Zero( درون_داد_Array _src, صحيح & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    صحيح type = _src.type(), عمق = CV_MAT_عمق(type), kercn = ocl::predict_Optimal_وکتور_عرض(_src);
+    منطقي doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    إذا (عمق == CV_64F && !doubleSupport)
+        أرجع خطأ;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
-    size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
+    صحيح dbsize = ocl::Device::getDefault().maxComputeUnits();
+    size_t wgs = ocl::Device::getDefault().max_Work_گروه_اندازه();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    صحيح wgs2_aligned = 1;
+    طالما (wgs2_aligned < (صحيح)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc,
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::type_مقصد_Str(CV_MAKE_TYPE(عمق, kercn)),
+                         ocl::type_مقصد_Str(عمق), (صحيح)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.آرگومانها(ocl::KernelArg::Read_Only_No_اندازه(src), src.تعداد_ستون, (صحيح)src.مجموع(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0]), true;
-    return false;
+    إذا (k.پیاپی(1, &globalsize, &wgs, درست))
+        أرجع res = saturate_cast<صحيح>(cv::جمع(db.getMat(ACCESS_READ))[0]), درست;
+    أرجع خطأ;
 }
-#endif
+#پایان_اگر
 
-#if defined HAVE_IPP
-static bool ipp_countNonZero( Mat &src, int &res )
+#إذا defined HAVE_IPP
+ساكن منطقي ipp_شمار_Non_Zero( Mat &src, صحيح &res )
 {
     CV_INSTRUMENT_REGION_IPP();
 
-#if IPP_VERSION_X100 < 201801
+#إذا IPP_نسخه_X100 < 201801
     // Poor performance of SSE42
-    if(cv::ipp::getIppTopFeatures() == ippCPUID_SSE42)
-        return false;
-#endif
+    إذا(cv::ipp::get_Ipp_بالاترین_Features() == ippCPUID_SSE42)
+        أرجع خطأ;
+#پایان_اگر
 
-    Ipp32s  count = 0;
-    int     depth = src.depth();
+    Ipp32s  شمار_2 = 0;
+    صحيح     عمق = src.عمق();
 
-    if(src.dims <= 2)
+    إذا(src.dims <= 2)
     {
-        IppStatus status;
-        IppiSize  size = {src.cols*src.channels(), src.rows};
+        Ipp_وضعیت وضعیت;
+        Ippi_اندازه  size = {src.تعداد_ستون*src.channels(), src.ردیفها};
 
-        if(depth == CV_8U)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, (const Ipp8u *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else if(depth == CV_32F)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, (const Ipp32f *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else
-            return false;
+        إذا(عمق == CV_8U)
+            وضعیت = CV_INSTRUMENT_FUN_IPP(ippi_شمار_درون_Range_8u_C1_R, (ثابت Ipp8u *)src.ptr(), (صحيح)src.گام, size, &شمار_2, 0, 0);
+        وإلا إذا(عمق == CV_32F)
+            وضعیت = CV_INSTRUMENT_FUN_IPP(ippi_شمار_درون_Range_32f_C1_R, (ثابت Ipp32f *)src.ptr(), (صحيح)src.گام, size, &شمار_2, 0, 0);
+        وإلا
+            أرجع خطأ;
 
-        if(status < 0)
-            return false;
+        إذا(وضعیت < 0)
+            أرجع خطأ;
 
-        res = size.width*size.height - count;
+        res = size.عرض*size.ارتفاع - شمار_2;
     }
-    else
+    وإلا
     {
-        IppStatus       status;
-        const Mat      *arrays[] = {&src, NULL};
+        Ipp_وضعیت       وضعیت;
+        ثابت Mat      *arrays[] = {&src, عدم};
         Mat            planes[1];
         NAryMatIterator it(arrays, planes, 1);
-        IppiSize        size  = {(int)it.size*src.channels(), 1};
+        Ippi_اندازه        size  = {(صحيح)it.size*src.channels(), 1};
         res = 0;
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        لكل (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(depth == CV_8U)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, it.planes->ptr<Ipp8u>(), (int)it.planes->step, size, &count, 0, 0);
-            else if(depth == CV_32F)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, it.planes->ptr<Ipp32f>(), (int)it.planes->step, size, &count, 0, 0);
-            else
-                return false;
+            إذا(عمق == CV_8U)
+                وضعیت = CV_INSTRUMENT_FUN_IPP(ippi_شمار_درون_Range_8u_C1_R, it.planes->ptr<Ipp8u>(), (صحيح)it.planes->گام, size, &شمار_2, 0, 0);
+            وإلا إذا(عمق == CV_32F)
+                وضعیت = CV_INSTRUMENT_FUN_IPP(ippi_شمار_درون_Range_32f_C1_R, it.planes->ptr<Ipp32f>(), (صحيح)it.planes->گام, size, &شمار_2, 0, 0);
+            وإلا
+                أرجع خطأ;
 
-            if(status < 0 || (int)it.planes->total()*src.channels() < count)
-                return false;
+            إذا(وضعیت < 0 || (صحيح)it.planes->مجموع()*src.channels() < شمار_2)
+                أرجع خطأ;
 
-            res += (int)it.planes->total()*src.channels() - count;
+            res += (صحيح)it.planes->مجموع()*src.channels() - شمار_2;
         }
     }
 
-    return true;
+    أرجع درست;
 }
-#endif
+#پایان_اگر
 
-int countNonZero(InputArray _src)
+صحيح شمار_Non_Zero(درون_داد_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    صحيح type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-#if defined HAVE_OPENCL || defined HAVE_IPP
-    int res = -1;
-#endif
+#إذا defined HAVE_OPENCL || defined HAVE_IPP
+    صحيح res = -1;
+#پایان_اگر
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_countNonZero(_src, res),
+#اگر_تعریف_شده HAVE_OPENCL
+    CV_OCL_پیاپی_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+                ocl_شمار_Non_Zero(_src, res),
                 res)
-#endif
+#پایان_اگر
 
     Mat src = _src.getMat();
-    CV_IPP_RUN_FAST(ipp_countNonZero(src, res), res);
+    CV_IPP_پیاپی_FAST(ipp_شمار_Non_Zero(src, res), res);
 
-    CountNonZeroFunc func = getCountNonZeroTab(src.depth());
+    شمار_Non_Zero_Func func = get_شمار_Non_Zero_Tab(src.عمق());
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, 0};
+    ثابت Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, nz = 0;
+    صحيح مجموع = (صحيح)it.size, nz = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
-        nz += func( ptrs[0], total );
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it )
+        nz += func( ptrs[0], مجموع );
 
-    return nz;
+    أرجع nz;
 }
 
-void findNonZero(InputArray _src, OutputArray _idx)
+فراغ پیدا_کن_Non_Zero(درون_داد_Array _src, OutputArray _idx)
 {
     Mat src = _src.getMat();
     CV_Assert( src.channels() == 1 && src.dims == 2 );
 
-    int depth = src.depth();
-    std::vector<Point> idxvec;
-    int rows = src.rows, cols = src.cols;
-    AutoBuffer<int> buf_(cols + 1);
-    int* buf = buf_.data();
+    صحيح عمق = src.عمق();
+    std::vector<نقطه> idxvec;
+    صحيح ردیفها = src.ردیفها, تعداد_ستون = src.تعداد_ستون;
+    Auto_میانگیر<صحيح> buf_(تعداد_ستون + 1);
+    صحيح* buf = buf_.داده();
 
-    for( int i = 0; i < rows; i++ )
+    لكل( صحيح i = 0; i < ردیفها; i++ )
     {
-        int j, k = 0;
-        const uchar* ptr8 = src.ptr(i);
-        if( depth == CV_8U || depth == CV_8S || depth == CV_Bool || depth == CV_8F_E4M3FNUZ )
+        صحيح j, k = 0;
+        ثابت uchar* ptr8 = src.ptr(i);
+        إذا( عمق == CV_8U || عمق == CV_8S || عمق == CV_Bool || عمق == CV_8F_E4M3FNUZ )
         {
             j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
             // skip whole SIMD blocks of zeros; only scan blocks that contain a non-zero byte
-            const int vlanes = VTraits<v_uint8>::vlanes();
-            const v_uint8 vzero = vx_setzero_u8();
-            for( ; j <= cols - vlanes; j += vlanes )
+            ثابت صحيح vlanes = VTraits<v_uint8>::vlanes();
+            ثابت v_uint8 vzero = vx_setzero_u8();
+            لكل( ; j <= تعداد_ستون - vlanes; j += vlanes )
             {
-                if( !v_check_any(v_ne(vx_load(ptr8 + j), vzero)) )
-                    continue;
-                for( int t = j; t < j + vlanes; t++ )
-                    if( ptr8[t] != 0 ) buf[k++] = t;
+                إذا( !v_check_any(v_ne(vx_بارگیری(ptr8 + j), vzero)) )
+                    استمر;
+                لكل( صحيح t = j; t < j + vlanes; t++ )
+                    إذا( ptr8[t] != 0 ) buf[k++] = t;
             }
-#endif
-            for( ; j < cols; j++ )
-                if( ptr8[j] != 0 ) buf[k++] = j;
+#پایان_اگر
+            لكل( ; j < تعداد_ستون; j++ )
+                إذا( ptr8[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16U || depth == CV_16S )
+        وإلا إذا( عمق == CV_16U || عمق == CV_16S )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr16[j] != 0 ) buf[k++] = j;
+            ثابت ushort* ptr16 = (ثابت ushort*)ptr8;
+            لكل( j = 0; j < تعداد_ستون; j++ )
+                إذا( ptr16[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32S || depth == CV_32U )
+        وإلا إذا( عمق == CV_32S || عمق == CV_32U )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr32s[j] != 0 ) buf[k++] = j;
+            ثابت صحيح* ptr32s = (ثابت صحيح*)ptr8;
+            لكل( j = 0; j < تعداد_ستون; j++ )
+                إذا( ptr32s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_64S || depth == CV_64U )
+        وإلا إذا( عمق == CV_64S || عمق == CV_64U )
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr64s[j] != 0 ) buf[k++] = j;
+            ثابت int64* ptr64s = (ثابت int64*)ptr8;
+            لكل( j = 0; j < تعداد_ستون; j++ )
+                إذا( ptr64s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32F )
+        وإلا إذا( عمق == CV_32F )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
+            ثابت صحيح* ptr32s = (ثابت صحيح*)ptr8;
+            لكل( j = 0; j < تعداد_ستون; j++ )
+                إذا( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16F || depth == CV_16BF )
+        وإلا إذا( عمق == CV_16F || عمق == CV_16BF )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
+            ثابت ushort* ptr16 = (ثابت ushort*)ptr8;
+            لكل( j = 0; j < تعداد_ستون; j++ )
                 // mask sign bit so -0 (0x8000) is treated as zero; cannot use <<1 here
                 // because ushort is promoted to int and the sign bit would not be discarded
-                if( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
+                إذا( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_8F_E4M3FN )
+        وإلا إذا( عمق == CV_8F_E4M3FN )
         {
-            for( j = 0; j < cols; j++ )
+            لكل( j = 0; j < تعداد_ستون; j++ )
                 // mask sign bit so -0 (0x80) is treated as zero
-                if( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
+                إذا( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
         }
-        else
+        وإلا
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
+            ثابت int64* ptr64s = (ثابت int64*)ptr8;
+            لكل( j = 0; j < تعداد_ستون; j++ )
+                إذا( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
         }
 
-        if( k > 0 )
+        إذا( k > 0 )
         {
             size_t sz = idxvec.size();
             idxvec.resize(sz + k);
-            for( j = 0; j < k; j++ )
-                idxvec[sz + j] = Point(buf[j], i);
+            لكل( j = 0; j < k; j++ )
+                idxvec[sz + j] = نقطه(buf[j], i);
         }
     }
 
-    if( idxvec.empty() || (_idx.kind() == _InputArray::MAT && !_idx.getMatRef().isContinuous()) )
+    إذا( idxvec.empty() || (_idx.نوع() == درون_داد_Array_2::MAT && !_idx.getMatRef().isContinuous()) )
         _idx.release();
 
-    if( !idxvec.empty() )
-        Mat(idxvec).copyTo(_idx);
+    إذا( !idxvec.empty() )
+        Mat(idxvec).copy_مقصد(_idx);
 }
 
 } // namespace

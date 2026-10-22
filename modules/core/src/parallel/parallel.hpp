@@ -1,29 +1,29 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#ifndef OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
-#define OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
+#اگر_تعریف_نشده OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
+#تعریف_کن OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#ضمن "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+نطاق cv { نطاق parallel {
 
-extern int numThreads;
+خارجي صحيح رقم_نخها;
 
 std::shared_ptr<ParallelForAPI>& getCurrentParallelForAPI();
 
-#ifndef BUILD_PLUGIN
+#اگر_تعریف_نشده BUILD_PLUGIN
 
-#ifdef HAVE_TBB
+#اگر_تعریف_شده HAVE_TBB
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendTBB();
-#endif
+#پایان_اگر
 
-#ifdef HAVE_OPENMP
+#اگر_تعریف_شده HAVE_OPENMP
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendOpenMP();
-#endif
+#پایان_اگر
 
-#endif  // BUILD_PLUGIN
+#پایان_اگر  // BUILD_PLUGIN
 
 }}  // namespace
 
-#endif // OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
+#پایان_اگر // OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP

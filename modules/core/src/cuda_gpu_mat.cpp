@@ -41,515 +41,515 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+استفاده نطاق cv;
+استفاده نطاق cv::cuda;
 
-void cv::cuda::GpuMat::updateContinuityFlag()
+فراغ cv::cuda::GpuMat::updateContinuityFlag()
 {
-    int sz[] = { rows, cols };
-    size_t steps[] = { step, elemSize() };
-    flags = cv::updateContinuityFlag(flags, 2, sz, steps);
+    صحيح sz[] = { ردیفها, تعداد_ستون };
+    size_t گامها[] = { گام, elem_اندازه() };
+    flags = cv::updateContinuityFlag(flags, 2, sz, گامها);
 }
 
-cv::cuda::GpuMat::GpuMat(int rows_, int cols_, int type_, void* data_, size_t step_) :
-    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(rows_), cols(cols_),
-    step(step_), data((uchar*)data_), refcount(0),
-    datastart((uchar*)data_), dataend((const uchar*)data_),
+cv::cuda::GpuMat::GpuMat(صحيح ردیفها_2, صحيح تعداد_ستون_2, صحيح type_, فراغ* داده_2, size_t گام_2) :
+    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_ماسک)), ردیفها(ردیفها_2), تعداد_ستون(تعداد_ستون_2),
+    گام(گام_2), داده((uchar*)داده_2), refcount(0),
+    datastart((uchar*)داده_2), dataend((ثابت uchar*)داده_2),
     allocator(defaultAllocator())
 {
-    size_t minstep = cols * elemSize();
+    size_t minstep = تعداد_ستون * elem_اندازه();
 
-    if (step == Mat::AUTO_STEP)
+    إذا (گام == Mat::AUTO_گام)
     {
-        step = minstep;
+        گام = minstep;
     }
-    else
+    وإلا
     {
-        if (rows == 1)
-            step = minstep;
+        إذا (ردیفها == 1)
+            گام = minstep;
 
-        CV_DbgAssert( step >= minstep );
+        CV_DbgAssert( گام >= minstep );
     }
 
-    dataend += step * (rows - 1) + minstep;
+    dataend += گام * (ردیفها - 1) + minstep;
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(Size size_, int type_, void* data_, size_t step_) :
-    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(size_.height), cols(size_.width),
-    step(step_), data((uchar*)data_), refcount(0),
-    datastart((uchar*)data_), dataend((const uchar*)data_),
+cv::cuda::GpuMat::GpuMat(اندازه اندازه_3, صحيح type_, فراغ* داده_2, size_t گام_2) :
+    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_ماسک)), ردیفها(اندازه_3.ارتفاع), تعداد_ستون(اندازه_3.عرض),
+    گام(گام_2), داده((uchar*)داده_2), refcount(0),
+    datastart((uchar*)داده_2), dataend((ثابت uchar*)داده_2),
     allocator(defaultAllocator())
 {
-    size_t minstep = cols * elemSize();
+    size_t minstep = تعداد_ستون * elem_اندازه();
 
-    if (step == Mat::AUTO_STEP)
+    إذا (گام == Mat::AUTO_گام)
     {
-        step = minstep;
+        گام = minstep;
     }
-    else
+    وإلا
     {
-        if (rows == 1)
-            step = minstep;
+        إذا (ردیفها == 1)
+            گام = minstep;
 
-        CV_DbgAssert( step >= minstep );
+        CV_DbgAssert( گام >= minstep );
     }
 
-    dataend += step * (rows - 1) + minstep;
+    dataend += گام * (ردیفها - 1) + minstep;
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(const GpuMat& m, Range rowRange_, Range colRange_)
+cv::cuda::GpuMat::GpuMat(ثابت GpuMat& m, Range ردیف_Range, Range ستون_Range)
 {
     flags = m.flags;
-    step = m.step; refcount = m.refcount;
-    data = m.data; datastart = m.datastart; dataend = m.dataend;
+    گام = m.گام; refcount = m.refcount;
+    داده = m.داده; datastart = m.datastart; dataend = m.dataend;
     allocator = m.allocator;
 
-    if (rowRange_ == Range::all())
+    إذا (ردیف_Range == Range::all())
     {
-        rows = m.rows;
+        ردیفها = m.ردیفها;
     }
-    else
+    وإلا
     {
-        CV_Assert( 0 <= rowRange_.start && rowRange_.start <= rowRange_.end && rowRange_.end <= m.rows );
+        CV_Assert( 0 <= ردیف_Range.شروع && ردیف_Range.شروع <= ردیف_Range.end && ردیف_Range.end <= m.ردیفها );
 
-        rows = rowRange_.size();
-        data += step*rowRange_.start;
-    }
-
-    if (colRange_ == Range::all())
-    {
-        cols = m.cols;
-    }
-    else
-    {
-        CV_Assert( 0 <= colRange_.start && colRange_.start <= colRange_.end && colRange_.end <= m.cols );
-
-        cols = colRange_.size();
-        data += colRange_.start*elemSize();
+        ردیفها = ردیف_Range.size();
+        داده += گام*ردیف_Range.شروع;
     }
 
-    if (refcount)
+    إذا (ستون_Range == Range::all())
+    {
+        تعداد_ستون = m.تعداد_ستون;
+    }
+    وإلا
+    {
+        CV_Assert( 0 <= ستون_Range.شروع && ستون_Range.شروع <= ستون_Range.end && ستون_Range.end <= m.تعداد_ستون );
+
+        تعداد_ستون = ستون_Range.size();
+        داده += ستون_Range.شروع*elem_اندازه();
+    }
+
+    إذا (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
-        rows = cols = 0;
+    إذا (ردیفها <= 0 || تعداد_ستون <= 0)
+        ردیفها = تعداد_ستون = 0;
 
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(const GpuMat& m, Rect roi) :
-    flags(m.flags), rows(roi.height), cols(roi.width),
-    step(m.step), data(m.data + roi.y*step), refcount(m.refcount),
+cv::cuda::GpuMat::GpuMat(ثابت GpuMat& m, Rect roi) :
+    flags(m.flags), ردیفها(roi.ارتفاع), تعداد_ستون(roi.عرض),
+    گام(m.گام), داده(m.داده + roi.y*گام), refcount(m.refcount),
     datastart(m.datastart), dataend(m.dataend),
     allocator(m.allocator)
 {
-    data += roi.x * elemSize();
+    داده += roi.x * elem_اندازه();
 
-    CV_Assert( 0 <= roi.x && 0 <= roi.width &&
-               roi.x + roi.width <= m.cols &&
-               0 <= roi.y && 0 <= roi.height &&
-               roi.y + roi.height <= m.rows );
+    CV_Assert( 0 <= roi.x && 0 <= roi.عرض &&
+               roi.x + roi.عرض <= m.تعداد_ستون &&
+               0 <= roi.y && 0 <= roi.ارتفاع &&
+               roi.y + roi.ارتفاع <= m.ردیفها );
 
-    if (refcount)
+    إذا (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
-        rows = cols = 0;
+    إذا (ردیفها <= 0 || تعداد_ستون <= 0)
+        ردیفها = تعداد_ستون = 0;
     updateContinuityFlag();
 }
 
-GpuMat cv::cuda::GpuMat::reshape(int new_cn, int new_rows) const
+GpuMat cv::cuda::GpuMat::reshape(صحيح new_cn, صحيح new_ردیفها) ثابت
 {
-    GpuMat hdr = *this;
+    GpuMat hdr = *هذا;
 
-    int cn = channels();
-    if (new_cn == 0)
+    صحيح cn = channels();
+    إذا (new_cn == 0)
         new_cn = cn;
 
-    int total_width = cols * cn;
+    صحيح مجموع_عرض = تعداد_ستون * cn;
 
-    if ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
-        new_rows = rows * total_width / new_cn;
+    إذا ((new_cn > مجموع_عرض || مجموع_عرض % new_cn != 0) && new_ردیفها == 0)
+        new_ردیفها = ردیفها * مجموع_عرض / new_cn;
 
-    if (new_rows != 0 && new_rows != rows)
+    إذا (new_ردیفها != 0 && new_ردیفها != ردیفها)
     {
-        int total_size = total_width * rows;
+        صحيح مجموع_اندازه_2 = مجموع_عرض * ردیفها;
 
-        if (!isContinuous())
-            CV_Error(cv::Error::BadStep, "The matrix is not continuous, thus its number of rows can not be changed");
+        إذا (!isContinuous())
+            CV_Error(cv::Error::Bad_گام, "The matrix is not continuous, thus its number of rows can not be changed");
 
-        if ((unsigned)new_rows > (unsigned)total_size)
-            CV_Error(cv::Error::StsOutOfRange, "Bad new number of rows");
+        إذا ((بیعلامت)new_ردیفها > (بیعلامت)مجموع_اندازه_2)
+            CV_Error(cv::Error::Sts_بیرون_از_Range, "Bad new number of rows");
 
-        total_width = total_size / new_rows;
+        مجموع_عرض = مجموع_اندازه_2 / new_ردیفها;
 
-        if (total_width * new_rows != total_size)
+        إذا (مجموع_عرض * new_ردیفها != مجموع_اندازه_2)
             CV_Error(cv::Error::StsBadArg, "The total number of matrix elements is not divisible by the new number of rows");
 
-        hdr.rows = new_rows;
-        hdr.step = total_width * elemSize1();
+        hdr.ردیفها = new_ردیفها;
+        hdr.گام = مجموع_عرض * elemSize1();
     }
 
-    int new_width = total_width / new_cn;
+    صحيح new_عرض = مجموع_عرض / new_cn;
 
-    if (new_width * new_cn != total_width)
-        CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
+    إذا (new_عرض * new_cn != مجموع_عرض)
+        CV_Error(cv::Error::Bad_رقم_Channels, "The total width is not divisible by the new number of channels");
 
-    hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
+    hdr.تعداد_ستون = new_عرض;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_ماسک) | ((new_cn - 1) << CV_CN_لغزش);
 
-    return hdr;
+    أرجع hdr;
 }
 
-void cv::cuda::GpuMat::locateROI(Size& wholeSize, Point& ofs) const
+فراغ cv::cuda::GpuMat::locateROI(اندازه& کامل_اندازه, نقطه& ofs) ثابت
 {
-    CV_DbgAssert( step > 0 );
+    CV_DbgAssert( گام > 0 );
 
-    size_t esz = elemSize();
-    ptrdiff_t delta1 = data - datastart;
+    size_t esz = elem_اندازه();
+    ptrdiff_t delta1 = داده - datastart;
     ptrdiff_t delta2 = dataend - datastart;
 
-    if (delta1 == 0)
+    إذا (delta1 == 0)
     {
         ofs.x = ofs.y = 0;
     }
-    else
+    وإلا
     {
-        ofs.y = static_cast<int>(delta1 / step);
-        ofs.x = static_cast<int>((delta1 - step * ofs.y) / esz);
+        ofs.y = static_cast<صحيح>(delta1 / گام);
+        ofs.x = static_cast<صحيح>((delta1 - گام * ofs.y) / esz);
 
-        CV_DbgAssert( data == datastart + ofs.y * step + ofs.x * esz );
+        CV_DbgAssert( داده == datastart + ofs.y * گام + ofs.x * esz );
     }
 
-    size_t minstep = (ofs.x + cols) * esz;
+    size_t minstep = (ofs.x + تعداد_ستون) * esz;
 
-    wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / step + 1), ofs.y + rows);
-    wholeSize.width = std::max(static_cast<int>((delta2 - step * (wholeSize.height - 1)) / esz), ofs.x + cols);
+    کامل_اندازه.ارتفاع = std::max(static_cast<صحيح>((delta2 - minstep) / گام + 1), ofs.y + ردیفها);
+    کامل_اندازه.عرض = std::max(static_cast<صحيح>((delta2 - گام * (کامل_اندازه.ارتفاع - 1)) / esz), ofs.x + تعداد_ستون);
 }
 
-GpuMat& cv::cuda::GpuMat::adjustROI(int dtop, int dbottom, int dleft, int dright)
+GpuMat& cv::cuda::GpuMat::adjustROI(صحيح dtop, صحيح dbottom, صحيح dleft, صحيح dright)
 {
-    Size wholeSize;
-    Point ofs;
-    locateROI(wholeSize, ofs);
+    اندازه کامل_اندازه;
+    نقطه ofs;
+    locateROI(کامل_اندازه, ofs);
 
-    size_t esz = elemSize();
+    size_t esz = elem_اندازه();
 
-    int row1 = std::max(ofs.y - dtop, 0);
-    int row2 = std::min(ofs.y + rows + dbottom, wholeSize.height);
+    صحيح row1 = std::max(ofs.y - dtop, 0);
+    صحيح row2 = std::min(ofs.y + ردیفها + dbottom, کامل_اندازه.ارتفاع);
 
-    int col1 = std::max(ofs.x - dleft, 0);
-    int col2 = std::min(ofs.x + cols + dright, wholeSize.width);
+    صحيح col1 = std::max(ofs.x - dleft, 0);
+    صحيح col2 = std::min(ofs.x + تعداد_ستون + dright, کامل_اندازه.عرض);
 
-    data += (row1 - ofs.y) * step + (col1 - ofs.x) * esz;
-    rows = row2 - row1;
-    cols = col2 - col1;
+    داده += (row1 - ofs.y) * گام + (col1 - ofs.x) * esz;
+    ردیفها = row2 - row1;
+    تعداد_ستون = col2 - col1;
 
     updateContinuityFlag();
-    return *this;
+    أرجع *هذا;
 }
 
-namespace
+نطاق
 {
-    template <class ObjType>
-    void createContinuousImpl(int rows, int cols, int type, ObjType& obj)
+    قالب <صنف ObjType>
+    فراغ createContinuousImpl(صحيح ردیفها, صحيح تعداد_ستون, صحيح type, ObjType& obj)
     {
-        const int area = rows * cols;
+        ثابت صحيح area = ردیفها * تعداد_ستون;
 
-        if (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
+        إذا (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
             obj.create(1, area, type);
 
-        obj = obj.reshape(obj.channels(), rows);
+        obj = obj.reshape(obj.channels(), ردیفها);
     }
 }
 
-void cv::cuda::createContinuous(int rows, int cols, int type, OutputArray arr)
+فراغ cv::cuda::createContinuous(صحيح ردیفها, صحيح تعداد_ستون, صحيح type, OutputArray arr)
 {
-    switch (arr.kind())
+    بدل (arr.نوع())
     {
-    case _InputArray::MAT:
-        ::createContinuousImpl(rows, cols, type, arr.getMatRef());
-        break;
+    حالة درون_داد_Array_2::MAT:
+        ::createContinuousImpl(ردیفها, تعداد_ستون, type, arr.getMatRef());
+        اكسر;
 
-    case _InputArray::CUDA_GPU_MAT:
-        ::createContinuousImpl(rows, cols, type, arr.getGpuMatRef());
-        break;
+    حالة درون_داد_Array_2::CUDA_GPU_MAT:
+        ::createContinuousImpl(ردیفها, تعداد_ستون, type, arr.getGpuMatRef());
+        اكسر;
 
-    case _InputArray::CUDA_HOST_MEM:
-        ::createContinuousImpl(rows, cols, type, arr.getHostMemRef());
-        break;
+    حالة درون_داد_Array_2::CUDA_HOST_MEM:
+        ::createContinuousImpl(ردیفها, تعداد_ستون, type, arr.getHostMemRef());
+        اكسر;
 
-    default:
-        arr.create(rows, cols, type);
+    افتراضي:
+        arr.create(ردیفها, تعداد_ستون, type);
     }
 }
 
-namespace
+نطاق
 {
-    template <class ObjType>
-    void ensureSizeIsEnoughImpl(int rows, int cols, int type, ObjType& obj)
+    قالب <صنف ObjType>
+    فراغ ensure_اندازه_Is_Enough_Impl(صحيح ردیفها, صحيح تعداد_ستون, صحيح type, ObjType& obj)
     {
-        if (obj.empty() || obj.type() != type || obj.data != obj.datastart)
+        إذا (obj.empty() || obj.type() != type || obj.داده != obj.datastart)
         {
-            obj.create(rows, cols, type);
+            obj.create(ردیفها, تعداد_ستون, type);
         }
-        else
+        وإلا
         {
-            const size_t esz = obj.elemSize();
-            const ptrdiff_t delta2 = obj.dataend - obj.datastart;
+            ثابت size_t esz = obj.elem_اندازه();
+            ثابت ptrdiff_t delta2 = obj.dataend - obj.datastart;
 
-            const size_t minstep = obj.cols * esz;
+            ثابت size_t minstep = obj.تعداد_ستون * esz;
 
-            Size wholeSize;
-            wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / static_cast<size_t>(obj.step) + 1), obj.rows);
-            wholeSize.width = std::max(static_cast<int>((delta2 - static_cast<size_t>(obj.step) * (wholeSize.height - 1)) / esz), obj.cols);
+            اندازه کامل_اندازه;
+            کامل_اندازه.ارتفاع = std::max(static_cast<صحيح>((delta2 - minstep) / static_cast<size_t>(obj.گام) + 1), obj.ردیفها);
+            کامل_اندازه.عرض = std::max(static_cast<صحيح>((delta2 - static_cast<size_t>(obj.گام) * (کامل_اندازه.ارتفاع - 1)) / esz), obj.تعداد_ستون);
 
-            if (wholeSize.height < rows || wholeSize.width < cols)
+            إذا (کامل_اندازه.ارتفاع < ردیفها || کامل_اندازه.عرض < تعداد_ستون)
             {
-                obj.create(rows, cols, type);
+                obj.create(ردیفها, تعداد_ستون, type);
             }
-            else
+            وإلا
             {
-                obj.cols = cols;
-                obj.rows = rows;
+                obj.تعداد_ستون = تعداد_ستون;
+                obj.ردیفها = ردیفها;
             }
         }
     }
 }
 
-void cv::cuda::ensureSizeIsEnough(int rows, int cols, int type, OutputArray arr)
+فراغ cv::cuda::ensure_اندازه_Is_Enough(صحيح ردیفها, صحيح تعداد_ستون, صحيح type, OutputArray arr)
 {
-    switch (arr.kind())
+    بدل (arr.نوع())
     {
-    case _InputArray::MAT:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getMatRef());
-        break;
+    حالة درون_داد_Array_2::MAT:
+        ::ensure_اندازه_Is_Enough_Impl(ردیفها, تعداد_ستون, type, arr.getMatRef());
+        اكسر;
 
-    case _InputArray::CUDA_GPU_MAT:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getGpuMatRef());
-        break;
+    حالة درون_داد_Array_2::CUDA_GPU_MAT:
+        ::ensure_اندازه_Is_Enough_Impl(ردیفها, تعداد_ستون, type, arr.getGpuMatRef());
+        اكسر;
 
-    case _InputArray::CUDA_HOST_MEM:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getHostMemRef());
-        break;
+    حالة درون_داد_Array_2::CUDA_HOST_MEM:
+        ::ensure_اندازه_Is_Enough_Impl(ردیفها, تعداد_ستون, type, arr.getHostMemRef());
+        اكسر;
 
-    default:
-        arr.create(rows, cols, type);
+    افتراضي:
+        arr.create(ردیفها, تعداد_ستون, type);
     }
 }
 
-GpuMat cv::cuda::getInputMat(InputArray _src, Stream& stream)
+GpuMat cv::cuda::get_درون_داد_Mat(درون_داد_Array _src, جریان& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(_src);
-    CV_UNUSED(stream);
+#اگر_تعریف_نشده HAVE_CUDA
+    CV_استفادهنشده(_src);
+    CV_استفادهنشده(stream);
     throw_no_cuda();
-#else
+#وإلا
     GpuMat src;
-    if (_src.kind() == _InputArray::CUDA_GPU_MAT)
+    إذا (_src.نوع() == درون_داد_Array_2::CUDA_GPU_MAT)
     {
         src = _src.getGpuMat();
     }
-    else if (!_src.empty())
+    وإلا إذا (!_src.empty())
     {
-        BufferPool pool(stream);
-        src = pool.getBuffer(_src.size(), _src.type());
+        میانگیر_Pool pool(stream);
+        src = pool.get_میانگیر(_src.size(), _src.type());
         src.upload(_src, stream);
     }
-    return src;
-#endif
+    أرجع src;
+#پایان_اگر
 }
 
-GpuMat cv::cuda::getOutputMat(OutputArray _dst, int rows, int cols, int type, Stream& stream)
+GpuMat cv::cuda::getOutputMat(OutputArray _dst, صحيح ردیفها, صحيح تعداد_ستون, صحيح type, جریان& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(_dst);
-    CV_UNUSED(rows);
-    CV_UNUSED(cols);
-    CV_UNUSED(type);
-    CV_UNUSED(stream);
+#اگر_تعریف_نشده HAVE_CUDA
+    CV_استفادهنشده(_dst);
+    CV_استفادهنشده(ردیفها);
+    CV_استفادهنشده(تعداد_ستون);
+    CV_استفادهنشده(type);
+    CV_استفادهنشده(stream);
     throw_no_cuda();
-#else
+#وإلا
     GpuMat dst;
-    if (_dst.kind() == _InputArray::CUDA_GPU_MAT)
+    إذا (_dst.نوع() == درون_داد_Array_2::CUDA_GPU_MAT)
     {
-        _dst.create(rows, cols, type);
+        _dst.create(ردیفها, تعداد_ستون, type);
         dst = _dst.getGpuMat();
     }
-    else
+    وإلا
     {
-        BufferPool pool(stream);
-        dst = pool.getBuffer(rows, cols, type);
+        میانگیر_Pool pool(stream);
+        dst = pool.get_میانگیر(ردیفها, تعداد_ستون, type);
     }
-    return dst;
-#endif
+    أرجع dst;
+#پایان_اگر
 }
 
-void cv::cuda::syncOutput(const GpuMat& dst, OutputArray _dst, Stream& stream)
+فراغ cv::cuda::syncOutput(ثابت GpuMat& dst, OutputArray _dst, جریان& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(dst);
-    CV_UNUSED(_dst);
-    CV_UNUSED(stream);
+#اگر_تعریف_نشده HAVE_CUDA
+    CV_استفادهنشده(dst);
+    CV_استفادهنشده(_dst);
+    CV_استفادهنشده(stream);
     throw_no_cuda();
-#else
-    if (_dst.kind() != _InputArray::CUDA_GPU_MAT)
+#وإلا
+    إذا (_dst.نوع() != درون_داد_Array_2::CUDA_GPU_MAT)
     {
-        if (stream)
+        إذا (stream)
             dst.download(_dst, stream);
-        else
+        وإلا
             dst.download(_dst);
     }
-#endif
+#پایان_اگر
 }
 
-#ifndef HAVE_CUDA
+#اگر_تعریف_نشده HAVE_CUDA
 
 GpuMat::Allocator* cv::cuda::GpuMat::defaultAllocator()
 {
-    return 0;
+    أرجع 0;
 }
 
-void cv::cuda::GpuMat::setDefaultAllocator(Allocator* allocator)
+فراغ cv::cuda::GpuMat::مجموعه_Default_Allocator(Allocator* allocator)
 {
-    CV_UNUSED(allocator);
+    CV_استفادهنشده(allocator);
     throw_no_cuda();
 }
 
 GpuMat::Allocator* cv::cuda::GpuMat::getStdAllocator()
 {
-    return 0;
+    أرجع 0;
 }
 
-void cv::cuda::GpuMat::create(int _rows, int _cols, int _type)
+فراغ cv::cuda::GpuMat::create(صحيح ردیفها_3, صحيح تعداد_ستون_3, صحيح _type)
 {
-    CV_UNUSED(_rows);
-    CV_UNUSED(_cols);
-    CV_UNUSED(_type);
+    CV_استفادهنشده(ردیفها_3);
+    CV_استفادهنشده(تعداد_ستون_3);
+    CV_استفادهنشده(_type);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::release()
+فراغ cv::cuda::GpuMat::release()
 {
-    if( refcount && CV_XADD(refcount, -1) == 1 )
-        defaultAllocator()->free(this);
-    dataend = datastart = data = 0;
-    step = 0;
+    إذا( refcount && CV_XADD(refcount, -1) == 1 )
+        defaultAllocator()->حرر(هذا);
+    dataend = datastart = داده = 0;
+    گام = 0;
     refcount = 0;
-    flags &= ~Mat::MAGIC_MASK;
+    flags &= ~Mat::MAGIC_ماسک;
 }
 
-void cv::cuda::GpuMat::fit(int _rows, int _cols, int _type)
+فراغ cv::cuda::GpuMat::fit(صحيح ردیفها_3, صحيح تعداد_ستون_3, صحيح _type)
 {
     // Emulate Mat::fit semantics for GPU: avoid reallocation when possible
-    size_t oldTotalBytes = (datastart && dataend) ? (size_t)(dataend - datastart) : 0;
-    size_t esz = CV_ELEM_SIZE(_type);
-    size_t newTotalBytes = (size_t)_rows * (size_t)_cols * esz;
+    size_t old_مجموع_بایتها = (datastart && dataend) ? (size_t)(dataend - datastart) : 0;
+    size_t esz = CV_ELEM_اندازه(_type);
+    size_t new_مجموع_بایتها = (size_t)ردیفها_3 * (size_t)تعداد_ستون_3 * esz;
 
     // Reallocate if:
     // - need non-contiguous layout (GPU pitch) or ROI, or
     // - requested bytes exceed current capacity, or
     // - data pointer is not at the start (ROI)
-    if (newTotalBytes > 0 && (!isContinuous() || newTotalBytes > oldTotalBytes || data != datastart))
+    إذا (new_مجموع_بایتها > 0 && (!isContinuous() || new_مجموع_بایتها > old_مجموع_بایتها || داده != datastart))
     {
-        create(_rows, _cols, _type);
-        return;
+        create(ردیفها_3, تعداد_ستون_3, _type);
+        أرجع;
     }
 
     // Reuse existing allocation, just adjust header/type
-    flags = (flags & ~Mat::TYPE_MASK) | CV_MAKETYPE(CV_MAT_DEPTH(_type), CV_MAT_CN(_type));
-    rows = _rows;
-    cols = _cols;
-    step = (size_t)cols * esz;
+    flags = (flags & ~Mat::TYPE_ماسک) | CV_MAKETYPE(CV_MAT_عمق(_type), CV_MAT_CN(_type));
+    ردیفها = ردیفها_3;
+    تعداد_ستون = تعداد_ستون_3;
+    گام = (size_t)تعداد_ستون * esz;
 }
 
-void cv::cuda::GpuMat::fit(Size _sz, int _type)
+فراغ cv::cuda::GpuMat::fit(اندازه _sz, صحيح _type)
 {
-    fit(_sz.height, _sz.width, _type);
+    fit(_sz.ارتفاع, _sz.عرض, _type);
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr)
+فراغ cv::cuda::GpuMat::upload(درون_داد_Array arr)
 {
-    CV_UNUSED(arr);
+    CV_استفادهنشده(arr);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr, Stream& _stream)
+فراغ cv::cuda::GpuMat::upload(درون_داد_Array arr, جریان& جریان_2)
 {
-    CV_UNUSED(arr);
-    CV_UNUSED(_stream);
+    CV_استفادهنشده(arr);
+    CV_استفادهنشده(جریان_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::download(OutputArray _dst) const
+فراغ cv::cuda::GpuMat::download(OutputArray _dst) ثابت
 {
-    CV_UNUSED(_dst);
+    CV_استفادهنشده(_dst);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::download(OutputArray _dst, Stream& _stream) const
+فراغ cv::cuda::GpuMat::download(OutputArray _dst, جریان& جریان_2) ثابت
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_stream);
+    CV_استفادهنشده(_dst);
+    CV_استفادهنشده(جریان_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst) const
+فراغ cv::cuda::GpuMat::copy_مقصد(OutputArray _dst) ثابت
 {
-    CV_UNUSED(_dst);
+    CV_استفادهنشده(_dst);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst, Stream& _stream) const
+فراغ cv::cuda::GpuMat::copy_مقصد(OutputArray _dst, جریان& جریان_2) ثابت
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_stream);
+    CV_استفادهنشده(_dst);
+    CV_استفادهنشده(جریان_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst, InputArray _mask, Stream& _stream) const
+فراغ cv::cuda::GpuMat::copy_مقصد(OutputArray _dst, درون_داد_Array ماسک_2, جریان& جریان_2) ثابت
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_mask);
-    CV_UNUSED(_stream);
+    CV_استفادهنشده(_dst);
+    CV_استفادهنشده(ماسک_2);
+    CV_استفادهنشده(جریان_2);
     throw_no_cuda();
 }
 
-GpuMat& cv::cuda::GpuMat::setTo(Scalar s, Stream& _stream)
+GpuMat& cv::cuda::GpuMat::مجموعه_مقصد(Scalar s, جریان& جریان_2)
 {
-    CV_UNUSED(s);
-    CV_UNUSED(_stream);
+    CV_استفادهنشده(s);
+    CV_استفادهنشده(جریان_2);
     throw_no_cuda();
 }
 
-GpuMat& cv::cuda::GpuMat::setTo(Scalar s, InputArray _mask, Stream& _stream)
+GpuMat& cv::cuda::GpuMat::مجموعه_مقصد(Scalar s, درون_داد_Array ماسک_2, جریان& جریان_2)
 {
-    CV_UNUSED(s);
-    CV_UNUSED(_mask);
-    CV_UNUSED(_stream);
+    CV_استفادهنشده(s);
+    CV_استفادهنشده(ماسک_2);
+    CV_استفادهنشده(جریان_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, Stream& _stream) const
+فراغ cv::cuda::GpuMat::convert_مقصد(OutputArray _dst, صحيح rtype, جریان& جریان_2) ثابت
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(rtype);
-    CV_UNUSED(_stream);
+    CV_استفادهنشده(_dst);
+    CV_استفادهنشده(rtype);
+    CV_استفادهنشده(جریان_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, double alpha, double beta, Stream& _stream) const
+فراغ cv::cuda::GpuMat::convert_مقصد(OutputArray _dst, صحيح rtype, مزدوج alpha, مزدوج beta, جریان& جریان_2) ثابت
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(rtype);
-    CV_UNUSED(alpha);
-    CV_UNUSED(beta);
-    CV_UNUSED(_stream);
+    CV_استفادهنشده(_dst);
+    CV_استفادهنشده(rtype);
+    CV_استفادهنشده(alpha);
+    CV_استفادهنشده(beta);
+    CV_استفادهنشده(جریان_2);
     throw_no_cuda();
 }
 
-#endif
+#پایان_اگر

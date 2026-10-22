@@ -3,574 +3,574 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "convert.hpp"
+#ضمن "precomp.hpp"
+#ضمن "convert.hpp"
 
-namespace cv {
+نطاق cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getCvtScaleAbsFunc(int depth);
-BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
+دودویی_Func getCvtScaleAbsFunc(صحيح عمق);
+دودویی_Func getConvertScaleFunc(صحيح sdepth, صحيح ddepth);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#اگر_تعریف_نشده CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
 /****************************************************************************************\
 *                                convertScale[Abs]                                       *
 \****************************************************************************************/
 
-template<typename _Ts, typename _Td> inline void
-cvtabs_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
-            Size size, float a, float b )
+قالب<نام_نوع _Ts, نام_نوع _Td> مضمن فراغ
+cvtabs_32f( ثابت _Ts* src, size_t sstep, _Td* dst, size_t dstep,
+            اندازه size, عائم a, عائم b )
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
     v_float32 va = vx_setall_f32(a), vb = vx_setall_f32(b);
-    const int VECSZ = VTraits<v_float32>::vlanes()*2;
+    ثابت صحيح VECSZ = VTraits<v_float32>::vlanes()*2;
     // GCC miscompiles this scalable block only on VLEN=128 RVV (opencv/issues/26936);
     // use scalar there, keep SIMD on wider vectors. Ask the hardware for VLEN directly:
     // vlanes() would depend on the LMUL the universal intrinsics happen to use.
-#if (CV_RVV && CV_SIMD_SCALABLE && defined(__GNUC__) && !defined(__clang__))
-    const bool useSIMD = __riscv_vlenb()*8 != 128;
-#else
-    const bool useSIMD = true;
-#endif
-#endif
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+#إذا (CV_RVV && CV_SIMD_SCALABLE && defined(__GNUC__) && !defined(__clang__))
+    ثابت منطقي useSIMD = __riscv_vlenb()*8 != 128;
+#وإلا
+    ثابت منطقي useSIMD = درست;
+#پایان_اگر
+#پایان_اگر
+    sstep /= حجم(src[0]);
+    dstep /= حجم(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    لكل( صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        if( useSIMD )
-        for( ; j < size.width; j += VECSZ )
+        صحيح j = 0;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+        إذا( useSIMD )
+        لكل( ; j < size.عرض; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            إذا( j > size.عرض - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
-                j = size.width - VECSZ;
+                إذا( j == 0 || src == (_Ts*)dst )
+                    اكسر;
+                j = size.عرض - VECSZ;
             }
             v_float32 v0, v1;
-            vx_load_pair_as(src + j, v0, v1);
+            vx_بارگیری_pair_as(src + j, v0, v1);
             v0 = v_fma(v0, va, vb);
             v1 = v_fma(v1, va, vb);
             v_store_pair_as(dst + j, v_abs(v0), v_abs(v1));
         }
-#endif
-        for( ; j < size.width; j++ )
-            dst[j] = saturate_cast<_Td>(std::abs(src[j]*a + b));
+#پایان_اگر
+        لكل( ; j < size.عرض; j++ )
+            dst[j] = saturate_cast<_Td>(std::قدر_مطلق(src[j]*a + b));
     }
 }
 
-static void
-cvtabs_32f( const bool* src_, size_t sstep,
+ساكن فراغ
+cvtabs_32f( ثابت منطقي* src_, size_t sstep,
             uchar* dst, size_t dstep,
-            Size size, float a, float b )
+            اندازه size, عائم a, عائم b )
 {
-    const uchar* src = (const uchar*)src_;
-    uchar v0 = saturate_cast<uchar>(std::abs(b));
-    uchar v1 = saturate_cast<uchar>(std::abs(a + b));
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    ثابت uchar* src = (ثابت uchar*)src_;
+    uchar v0 = saturate_cast<uchar>(std::قدر_مطلق(b));
+    uchar v1 = saturate_cast<uchar>(std::قدر_مطلق(a + b));
+    لكل( صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep )
     {
-        for (int j = 0; j < size.width; j++)
+        لكل (صحيح j = 0; j < size.عرض; j++)
             dst[j] = src[j] != 0 ? v1 : v0;
     }
 }
 
-template<typename _Ts, typename _Td> inline void
-cvt_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
-         Size size, float a, float b )
+قالب<نام_نوع _Ts, نام_نوع _Td> مضمن فراغ
+cvt_32f( ثابت _Ts* src, size_t sstep, _Td* dst, size_t dstep,
+         اندازه size, عائم a, عائم b )
 {
-#if (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
+#إذا (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
     v_float32 va = vx_setall_f32(a), vb = vx_setall_f32(b);
-    const int VECSZ = VTraits<v_float32>::vlanes()*2;
-#endif
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    ثابت صحيح VECSZ = VTraits<v_float32>::vlanes()*2;
+#پایان_اگر
+    sstep /= حجم(src[0]);
+    dstep /= حجم(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    لكل( صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
+        صحيح j = 0;
 // Excluding GNU in CV_SIMD_SCALABLE because of "opencv/issues/26936"
-#if (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
-        for( ; j < size.width; j += VECSZ )
+#إذا (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
+        لكل( ; j < size.عرض; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            إذا( j > size.عرض - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
-                j = size.width - VECSZ;
+                إذا( j == 0 || src == (_Ts*)dst )
+                    اكسر;
+                j = size.عرض - VECSZ;
             }
             v_float32 v0, v1;
-            vx_load_pair_as(src + j, v0, v1);
+            vx_بارگیری_pair_as(src + j, v0, v1);
             v0 = v_fma(v0, va, vb);
             v1 = v_fma(v1, va, vb);
             v_store_pair_as(dst + j, v0, v1);
         }
-#endif
-        for( ; j < size.width; j++ )
+#پایان_اگر
+        لكل( ; j < size.عرض; j++ )
             dst[j] = saturate_cast<_Td>(src[j]*a + b);
     }
 }
 
 // variant for conversions 16f <-> ... w/o unrolling
-template<typename _Ts, typename _Td> inline void
-cvt1_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
-          Size size, float a, float b )
+قالب<نام_نوع _Ts, نام_نوع _Td> مضمن فراغ
+cvt1_32f( ثابت _Ts* src, size_t sstep, _Td* dst, size_t dstep,
+          اندازه size, عائم a, عائم b )
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
     v_float32 va = vx_setall_f32(a), vb = vx_setall_f32(b);
-    const int VECSZ = VTraits<v_float32>::vlanes();
-#endif
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    ثابت صحيح VECSZ = VTraits<v_float32>::vlanes();
+#پایان_اگر
+    sstep /= حجم(src[0]);
+    dstep /= حجم(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    لكل( صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; j < size.width; j += VECSZ )
+        صحيح j = 0;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+        لكل( ; j < size.عرض; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            إذا( j > size.عرض - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
-                j = size.width - VECSZ;
+                إذا( j == 0 || src == (_Ts*)dst )
+                    اكسر;
+                j = size.عرض - VECSZ;
             }
             v_float32 v0;
-            vx_load_as(src + j, v0);
+            vx_بارگیری_as(src + j, v0);
             v0 = v_fma(v0, va, vb);
             v_store_as(dst + j, v0);
         }
-#endif
-        for( ; j < size.width; j++ )
+#پایان_اگر
+        لكل( ; j < size.عرض; j++ )
             dst[j] = saturate_cast<_Td>(src[j]*a + b);
     }
 }
 
 
-template<typename _Ts, typename _Td> inline void
-cvt_64f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
-         Size size, double a, double b )
+قالب<نام_نوع _Ts, نام_نوع _Td> مضمن فراغ
+cvt_64f( ثابت _Ts* src, size_t sstep, _Td* dst, size_t dstep,
+         اندازه size, مزدوج a, مزدوج b )
 {
-#if (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
+#إذا (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
     v_float64 va = vx_setall_f64(a), vb = vx_setall_f64(b);
-    const int VECSZ = VTraits<v_float64>::vlanes()*2;
-#endif
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    ثابت صحيح VECSZ = VTraits<v_float64>::vlanes()*2;
+#پایان_اگر
+    sstep /= حجم(src[0]);
+    dstep /= حجم(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    لكل( صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
+        صحيح j = 0;
 // Excluding GNU in CV_SIMD_SCALABLE because of "opencv/issues/26936"
-#if (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
-        for( ; j < size.width; j += VECSZ )
+#إذا (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
+        لكل( ; j < size.عرض; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            إذا( j > size.عرض - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
-                j = size.width - VECSZ;
+                إذا( j == 0 || src == (_Ts*)dst )
+                    اكسر;
+                j = size.عرض - VECSZ;
             }
             v_float64 v0, v1;
-            vx_load_pair_as(src + j, v0, v1);
+            vx_بارگیری_pair_as(src + j, v0, v1);
             v0 = v_fma(v0, va, vb);
             v1 = v_fma(v1, va, vb);
             v_store_pair_as(dst + j, v0, v1);
         }
-#endif
-        for( ; j < size.width; j++ )
+#پایان_اگر
+        لكل( ; j < size.عرض; j++ )
             dst[j] = saturate_cast<_Td>(src[j]*a + b);
     }
 }
 
 //==================================================================================================
 
-#define DEF_CVT_SCALE_ABS_FUNC(suffix, cvt, stype, dtype, wtype) \
-static void cvtScaleAbs##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                                 uchar* dst_, size_t dstep, Size size, void* scale_) \
+#تعریف_کن DEF_CVT_SCALE_ABS_FUNC(suffix, cvt, stype, dtype, wtype) \
+ساكن فراغ cvtScaleAbs##suffix( ثابت uchar* src_, size_t sstep, ثابت uchar*, size_t, \
+                                 uchar* dst_, size_t dstep, اندازه size, فراغ* scale_) \
 { \
-    const stype* src = (const stype*)src_; \
+    ثابت stype* src = (ثابت stype*)src_; \
     dtype* dst = (dtype*)dst_; \
-    double* scale = (double*)scale_; \
+    مزدوج* scale = (مزدوج*)scale_; \
     cvt(src, sstep, dst, dstep, size, (wtype)scale[0], (wtype)scale[1]); \
 }
 
 
-#define DEF_CVT_SCALE_FUNC(suffix, cvt, stype, dtype, wtype) \
-static void cvtScale##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                              uchar* dst_, size_t dstep, Size size, void* scale_) \
+#تعریف_کن DEF_CVT_SCALE_FUNC(suffix, cvt, stype, dtype, wtype) \
+ساكن فراغ cvtScale##suffix( ثابت uchar* src_, size_t sstep, ثابت uchar*, size_t, \
+                              uchar* dst_, size_t dstep, اندازه size, فراغ* scale_) \
 { \
-    const stype* src = (const stype*)src_; \
+    ثابت stype* src = (ثابت stype*)src_; \
     dtype* dst = (dtype*)dst_; \
-    double* scale = (double*)scale_; \
+    مزدوج* scale = (مزدوج*)scale_; \
     cvt(src, sstep, dst, dstep, size, (wtype)scale[0], (wtype)scale[1]); \
 }
 
-#define DEF_CVT_SCALE2BOOL_FUNC(suffix, stype, wtype) \
-static void cvtScale##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                              uchar* dst, size_t dstep, Size size, void* scale_) \
+#تعریف_کن DEF_CVT_SCALE2BOOL_FUNC(suffix, stype, wtype) \
+ساكن فراغ cvtScale##suffix( ثابت uchar* src_, size_t sstep, ثابت uchar*, size_t, \
+                              uchar* dst, size_t dstep, اندازه size, فراغ* scale_) \
 { \
-    const stype* src = (const stype*)src_; \
-    const double* scale = (const double*)scale_; \
+    ثابت stype* src = (ثابت stype*)src_; \
+    ثابت مزدوج* scale = (ثابت مزدوج*)scale_; \
     wtype a = (wtype)scale[0], b = (wtype)scale[1]; \
-    sstep /= sizeof(src[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
-            dst[j] = (bool)((wtype)src[j]*a + b != 0); \
+    sstep /= حجم(src[0]); \
+    لكل( صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep ) \
+        لكل (صحيح j = 0; j < size.عرض; j++) \
+            dst[j] = (منطقي)((wtype)src[j]*a + b != 0); \
 }
 
-#define DEF_CVT_SCALEBOOL2_FUNC(suffix, dtype, wtype) \
-static void cvtScale##suffix( const uchar* src, size_t sstep, const uchar*, size_t, \
-                              uchar* dst_, size_t dstep, Size size, void* scale_) \
+#تعریف_کن DEF_CVT_SCALEBOOL2_FUNC(suffix, dtype, wtype) \
+ساكن فراغ cvtScale##suffix( ثابت uchar* src, size_t sstep, ثابت uchar*, size_t, \
+                              uchar* dst_, size_t dstep, اندازه size, فراغ* scale_) \
 { \
     dtype* dst = (dtype*)dst_; \
-    const double* scale = (const double*)scale_; \
+    ثابت مزدوج* scale = (ثابت مزدوج*)scale_; \
     wtype a = (wtype)scale[0], b = (wtype)scale[1]; \
     dtype v0 = saturate_cast<dtype>(b), v1 = saturate_cast<dtype>(a + b); \
-    dstep /= sizeof(dst[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
+    dstep /= حجم(dst[0]); \
+    لكل( صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep ) \
+        لكل (صحيح j = 0; j < size.عرض; j++) \
             dst[j] = src[j] != 0 ? v1 : v0; \
 }
 
-DEF_CVT_SCALE_ABS_FUNC(8u,    cvtabs_32f, uchar,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(8s8u,  cvtabs_32f, schar,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(8b8u,  cvtabs_32f, bool,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(16u8u, cvtabs_32f, ushort, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(16s8u, cvtabs_32f, short,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(32u8u, cvtabs_32f, unsigned, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(32s8u, cvtabs_32f, int,    uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(32f8u, cvtabs_32f, float,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(64u8u, cvtabs_32f, uint64_t, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(64s8u, cvtabs_32f, int64_t, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(64f8u, cvtabs_32f, double, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(16f8u, cvtabs_32f, hfloat, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(16bf8u, cvtabs_32f, bfloat, uchar, float)
+DEF_CVT_SCALE_ABS_FUNC(8u,    cvtabs_32f, uchar,  uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(8s8u,  cvtabs_32f, schar,  uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(8b8u,  cvtabs_32f, منطقي,  uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(16u8u, cvtabs_32f, ushort, uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(16s8u, cvtabs_32f, کوتاه,  uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(32u8u, cvtabs_32f, بیعلامت, uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(32s8u, cvtabs_32f, صحيح,    uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(32f8u, cvtabs_32f, عائم,  uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(64u8u, cvtabs_32f, uint64_t, uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(64s8u, cvtabs_32f, int64_t, uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(64f8u, cvtabs_32f, مزدوج, uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(16f8u, cvtabs_32f, hfloat, uchar, عائم)
+DEF_CVT_SCALE_ABS_FUNC(16bf8u, cvtabs_32f, bfloat, uchar, عائم)
 
-DEF_CVT_SCALE_FUNC(8u,     cvt_32f, uchar,  uchar, float)
-DEF_CVT_SCALE_FUNC(8s8u,   cvt_32f, schar,  uchar, float)
-DEF_CVT_SCALE_FUNC(16u8u,  cvt_32f, ushort, uchar, float)
-DEF_CVT_SCALE_FUNC(16s8u,  cvt_32f, short,  uchar, float)
-DEF_CVT_SCALE_FUNC(32u8u,  cvt_32f, unsigned, uchar, float)
-DEF_CVT_SCALE_FUNC(32s8u,  cvt_32f, int,    uchar, float)
-DEF_CVT_SCALE_FUNC(32f8u,  cvt_32f, float,  uchar, float)
-DEF_CVT_SCALE_FUNC(64f8u,  cvt_32f, double, uchar, float)
-DEF_CVT_SCALE_FUNC(64u8u,  cvt_32f, uint64_t, uchar, float)
-DEF_CVT_SCALE_FUNC(64s8u,  cvt_32f, int64_t, uchar, float)
-DEF_CVT_SCALE_FUNC(16f8u,  cvt_32f, hfloat, uchar, float)
-DEF_CVT_SCALE_FUNC(16bf8u, cvt_32f, bfloat, uchar, float)
+DEF_CVT_SCALE_FUNC(8u,     cvt_32f, uchar,  uchar, عائم)
+DEF_CVT_SCALE_FUNC(8s8u,   cvt_32f, schar,  uchar, عائم)
+DEF_CVT_SCALE_FUNC(16u8u,  cvt_32f, ushort, uchar, عائم)
+DEF_CVT_SCALE_FUNC(16s8u,  cvt_32f, کوتاه,  uchar, عائم)
+DEF_CVT_SCALE_FUNC(32u8u,  cvt_32f, بیعلامت, uchar, عائم)
+DEF_CVT_SCALE_FUNC(32s8u,  cvt_32f, صحيح,    uchar, عائم)
+DEF_CVT_SCALE_FUNC(32f8u,  cvt_32f, عائم,  uchar, عائم)
+DEF_CVT_SCALE_FUNC(64f8u,  cvt_32f, مزدوج, uchar, عائم)
+DEF_CVT_SCALE_FUNC(64u8u,  cvt_32f, uint64_t, uchar, عائم)
+DEF_CVT_SCALE_FUNC(64s8u,  cvt_32f, int64_t, uchar, عائم)
+DEF_CVT_SCALE_FUNC(16f8u,  cvt_32f, hfloat, uchar, عائم)
+DEF_CVT_SCALE_FUNC(16bf8u, cvt_32f, bfloat, uchar, عائم)
 
-DEF_CVT_SCALE_FUNC(8u8s,   cvt_32f, uchar,  schar, float)
-DEF_CVT_SCALE_FUNC(8s,     cvt_32f, schar,  schar, float)
-DEF_CVT_SCALE_FUNC(16u8s,  cvt_32f, ushort, schar, float)
-DEF_CVT_SCALE_FUNC(16s8s,  cvt_32f, short,  schar, float)
-DEF_CVT_SCALE_FUNC(32u8s,  cvt_32f, unsigned, schar, float)
-DEF_CVT_SCALE_FUNC(32s8s,  cvt_32f, int,    schar, float)
-DEF_CVT_SCALE_FUNC(32f8s,  cvt_32f, float,  schar, float)
-DEF_CVT_SCALE_FUNC(64f8s,  cvt_32f, double, schar, float)
-DEF_CVT_SCALE_FUNC(64u8s,  cvt_32f, uint64_t, schar, float)
-DEF_CVT_SCALE_FUNC(64s8s,  cvt_32f, int64_t, schar, float)
-DEF_CVT_SCALE_FUNC(16f8s,  cvt_32f, hfloat, schar, float)
-DEF_CVT_SCALE_FUNC(16bf8s, cvt_32f, bfloat, schar, float)
+DEF_CVT_SCALE_FUNC(8u8s,   cvt_32f, uchar,  schar, عائم)
+DEF_CVT_SCALE_FUNC(8s,     cvt_32f, schar,  schar, عائم)
+DEF_CVT_SCALE_FUNC(16u8s,  cvt_32f, ushort, schar, عائم)
+DEF_CVT_SCALE_FUNC(16s8s,  cvt_32f, کوتاه,  schar, عائم)
+DEF_CVT_SCALE_FUNC(32u8s,  cvt_32f, بیعلامت, schar, عائم)
+DEF_CVT_SCALE_FUNC(32s8s,  cvt_32f, صحيح,    schar, عائم)
+DEF_CVT_SCALE_FUNC(32f8s,  cvt_32f, عائم,  schar, عائم)
+DEF_CVT_SCALE_FUNC(64f8s,  cvt_32f, مزدوج, schar, عائم)
+DEF_CVT_SCALE_FUNC(64u8s,  cvt_32f, uint64_t, schar, عائم)
+DEF_CVT_SCALE_FUNC(64s8s,  cvt_32f, int64_t, schar, عائم)
+DEF_CVT_SCALE_FUNC(16f8s,  cvt_32f, hfloat, schar, عائم)
+DEF_CVT_SCALE_FUNC(16bf8s, cvt_32f, bfloat, schar, عائم)
 
-DEF_CVT_SCALE2BOOL_FUNC(8u8b, uchar, float)
-DEF_CVT_SCALE2BOOL_FUNC(8s8b, schar, float)
-DEF_CVT_SCALE2BOOL_FUNC(16u8b, ushort, float)
-DEF_CVT_SCALE2BOOL_FUNC(16s8b, short, float)
-DEF_CVT_SCALE2BOOL_FUNC(32u8b, unsigned, float)
-DEF_CVT_SCALE2BOOL_FUNC(32s8b, int, float)
-DEF_CVT_SCALE2BOOL_FUNC(32f8b, float, float)
-DEF_CVT_SCALE2BOOL_FUNC(64f8b, double, float)
-DEF_CVT_SCALE2BOOL_FUNC(64u8b, uint64_t, float)
-DEF_CVT_SCALE2BOOL_FUNC(64s8b, int64_t, float)
-DEF_CVT_SCALE2BOOL_FUNC(16f8b, hfloat, float)
-DEF_CVT_SCALE2BOOL_FUNC(16bf8b, bfloat, float)
+DEF_CVT_SCALE2BOOL_FUNC(8u8b, uchar, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(8s8b, schar, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(16u8b, ushort, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(16s8b, کوتاه, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(32u8b, بیعلامت, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(32s8b, صحيح, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(32f8b, عائم, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(64f8b, مزدوج, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(64u8b, uint64_t, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(64s8b, int64_t, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(16f8b, hfloat, عائم)
+DEF_CVT_SCALE2BOOL_FUNC(16bf8b, bfloat, عائم)
 
-DEF_CVT_SCALE_FUNC(8u16u,  cvt_32f, uchar,  ushort, float)
-DEF_CVT_SCALE_FUNC(8s16u,  cvt_32f, schar,  ushort, float)
-DEF_CVT_SCALE_FUNC(16u,    cvt_32f, ushort, ushort, float)
-DEF_CVT_SCALE_FUNC(16s16u, cvt_32f, short,  ushort, float)
-DEF_CVT_SCALE_FUNC(32u16u, cvt_32f, unsigned, ushort, float)
-DEF_CVT_SCALE_FUNC(32s16u, cvt_32f, int,    ushort, float)
-DEF_CVT_SCALE_FUNC(32f16u, cvt_32f, float,  ushort, float)
-DEF_CVT_SCALE_FUNC(64f16u, cvt_32f, double, ushort, float)
-DEF_CVT_SCALE_FUNC(64u16u, cvt_32f, uint64_t, ushort, float)
-DEF_CVT_SCALE_FUNC(64s16u, cvt_32f, int64_t, ushort, float)
-DEF_CVT_SCALE_FUNC(16f16u, cvt1_32f, hfloat, ushort, float)
-DEF_CVT_SCALE_FUNC(16bf16u, cvt1_32f, bfloat, ushort, float)
+DEF_CVT_SCALE_FUNC(8u16u,  cvt_32f, uchar,  ushort, عائم)
+DEF_CVT_SCALE_FUNC(8s16u,  cvt_32f, schar,  ushort, عائم)
+DEF_CVT_SCALE_FUNC(16u,    cvt_32f, ushort, ushort, عائم)
+DEF_CVT_SCALE_FUNC(16s16u, cvt_32f, کوتاه,  ushort, عائم)
+DEF_CVT_SCALE_FUNC(32u16u, cvt_32f, بیعلامت, ushort, عائم)
+DEF_CVT_SCALE_FUNC(32s16u, cvt_32f, صحيح,    ushort, عائم)
+DEF_CVT_SCALE_FUNC(32f16u, cvt_32f, عائم,  ushort, عائم)
+DEF_CVT_SCALE_FUNC(64f16u, cvt_32f, مزدوج, ushort, عائم)
+DEF_CVT_SCALE_FUNC(64u16u, cvt_32f, uint64_t, ushort, عائم)
+DEF_CVT_SCALE_FUNC(64s16u, cvt_32f, int64_t, ushort, عائم)
+DEF_CVT_SCALE_FUNC(16f16u, cvt1_32f, hfloat, ushort, عائم)
+DEF_CVT_SCALE_FUNC(16bf16u, cvt1_32f, bfloat, ushort, عائم)
 
-DEF_CVT_SCALE_FUNC(8u16s,  cvt_32f, uchar,  short, float)
-DEF_CVT_SCALE_FUNC(8s16s,  cvt_32f, schar,  short, float)
-DEF_CVT_SCALE_FUNC(16u16s, cvt_32f, ushort, short, float)
-DEF_CVT_SCALE_FUNC(16s,    cvt_32f, short,  short, float)
-DEF_CVT_SCALE_FUNC(32u16s, cvt_32f, unsigned, short, float)
-DEF_CVT_SCALE_FUNC(32s16s, cvt_32f, int,    short, float)
-DEF_CVT_SCALE_FUNC(32f16s, cvt_32f, float,  short, float)
-DEF_CVT_SCALE_FUNC(64f16s, cvt_32f, double, short, float)
-DEF_CVT_SCALE_FUNC(64u16s, cvt_32f, uint64_t, short, float)
-DEF_CVT_SCALE_FUNC(64s16s, cvt_32f, int64_t, short, float)
-DEF_CVT_SCALE_FUNC(16f16s, cvt1_32f, hfloat, short, float)
-DEF_CVT_SCALE_FUNC(16bf16s, cvt1_32f, bfloat, short, float)
+DEF_CVT_SCALE_FUNC(8u16s,  cvt_32f, uchar,  کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(8s16s,  cvt_32f, schar,  کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(16u16s, cvt_32f, ushort, کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(16s,    cvt_32f, کوتاه,  کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(32u16s, cvt_32f, بیعلامت, کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(32s16s, cvt_32f, صحيح,    کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(32f16s, cvt_32f, عائم,  کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(64f16s, cvt_32f, مزدوج, کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(64u16s, cvt_32f, uint64_t, کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(64s16s, cvt_32f, int64_t, کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(16f16s, cvt1_32f, hfloat, کوتاه, عائم)
+DEF_CVT_SCALE_FUNC(16bf16s, cvt1_32f, bfloat, کوتاه, عائم)
 
-DEF_CVT_SCALE_FUNC(8u32u,  cvt_32f, uchar,  unsigned, float)
-DEF_CVT_SCALE_FUNC(8s32u,  cvt_32f, schar,  unsigned, float)
-DEF_CVT_SCALE_FUNC(16u32u, cvt_32f, ushort, unsigned, float)
-DEF_CVT_SCALE_FUNC(16s32u, cvt_32f, short,  unsigned, float)
-DEF_CVT_SCALE_FUNC(32u, cvt_32f, unsigned, unsigned, float)
-DEF_CVT_SCALE_FUNC(32s32u, cvt_64f, int,    unsigned, double)
-DEF_CVT_SCALE_FUNC(32f32u, cvt_32f, float,  unsigned, float)
-DEF_CVT_SCALE_FUNC(64f32u, cvt_64f, double, unsigned, double)
-DEF_CVT_SCALE_FUNC(64u32u, cvt_32f, uint64_t, unsigned, float)
-DEF_CVT_SCALE_FUNC(64s32u, cvt_32f, int64_t, unsigned, float)
-DEF_CVT_SCALE_FUNC(16f32u, cvt1_32f, hfloat, unsigned, float)
-DEF_CVT_SCALE_FUNC(16bf32u, cvt1_32f, bfloat, unsigned, float)
+DEF_CVT_SCALE_FUNC(8u32u,  cvt_32f, uchar,  بیعلامت, عائم)
+DEF_CVT_SCALE_FUNC(8s32u,  cvt_32f, schar,  بیعلامت, عائم)
+DEF_CVT_SCALE_FUNC(16u32u, cvt_32f, ushort, بیعلامت, عائم)
+DEF_CVT_SCALE_FUNC(16s32u, cvt_32f, کوتاه,  بیعلامت, عائم)
+DEF_CVT_SCALE_FUNC(32u, cvt_32f, بیعلامت, بیعلامت, عائم)
+DEF_CVT_SCALE_FUNC(32s32u, cvt_64f, صحيح,    بیعلامت, مزدوج)
+DEF_CVT_SCALE_FUNC(32f32u, cvt_32f, عائم,  بیعلامت, عائم)
+DEF_CVT_SCALE_FUNC(64f32u, cvt_64f, مزدوج, بیعلامت, مزدوج)
+DEF_CVT_SCALE_FUNC(64u32u, cvt_32f, uint64_t, بیعلامت, عائم)
+DEF_CVT_SCALE_FUNC(64s32u, cvt_32f, int64_t, بیعلامت, عائم)
+DEF_CVT_SCALE_FUNC(16f32u, cvt1_32f, hfloat, بیعلامت, عائم)
+DEF_CVT_SCALE_FUNC(16bf32u, cvt1_32f, bfloat, بیعلامت, عائم)
 
-DEF_CVT_SCALE_FUNC(8u32s,  cvt_32f, uchar,  int, float)
-DEF_CVT_SCALE_FUNC(8s32s,  cvt_32f, schar,  int, float)
-DEF_CVT_SCALE_FUNC(16u32s, cvt_32f, ushort, int, float)
-DEF_CVT_SCALE_FUNC(16s32s, cvt_32f, short,  int, float)
-DEF_CVT_SCALE_FUNC(32u32s, cvt_32f, unsigned, int, float)
-DEF_CVT_SCALE_FUNC(32s,    cvt_64f, int,    int, double)
-DEF_CVT_SCALE_FUNC(32f32s, cvt_32f, float,  int, float)
-DEF_CVT_SCALE_FUNC(64f32s, cvt_64f, double, int, double)
-DEF_CVT_SCALE_FUNC(64u32s, cvt_32f, uint64_t, int, float)
-DEF_CVT_SCALE_FUNC(64s32s, cvt_32f, int64_t, int, float)
-DEF_CVT_SCALE_FUNC(16f32s, cvt1_32f, hfloat, int, float)
-DEF_CVT_SCALE_FUNC(16bf32s, cvt1_32f, bfloat, int, float)
+DEF_CVT_SCALE_FUNC(8u32s,  cvt_32f, uchar,  صحيح, عائم)
+DEF_CVT_SCALE_FUNC(8s32s,  cvt_32f, schar,  صحيح, عائم)
+DEF_CVT_SCALE_FUNC(16u32s, cvt_32f, ushort, صحيح, عائم)
+DEF_CVT_SCALE_FUNC(16s32s, cvt_32f, کوتاه,  صحيح, عائم)
+DEF_CVT_SCALE_FUNC(32u32s, cvt_32f, بیعلامت, صحيح, عائم)
+DEF_CVT_SCALE_FUNC(32s,    cvt_64f, صحيح,    صحيح, مزدوج)
+DEF_CVT_SCALE_FUNC(32f32s, cvt_32f, عائم,  صحيح, عائم)
+DEF_CVT_SCALE_FUNC(64f32s, cvt_64f, مزدوج, صحيح, مزدوج)
+DEF_CVT_SCALE_FUNC(64u32s, cvt_32f, uint64_t, صحيح, عائم)
+DEF_CVT_SCALE_FUNC(64s32s, cvt_32f, int64_t, صحيح, عائم)
+DEF_CVT_SCALE_FUNC(16f32s, cvt1_32f, hfloat, صحيح, عائم)
+DEF_CVT_SCALE_FUNC(16bf32s, cvt1_32f, bfloat, صحيح, عائم)
 
-DEF_CVT_SCALE_FUNC(8u32f,  cvt_32f, uchar,  float, float)
-DEF_CVT_SCALE_FUNC(8s32f,  cvt_32f, schar,  float, float)
-DEF_CVT_SCALE_FUNC(16u32f, cvt_32f, ushort, float, float)
-DEF_CVT_SCALE_FUNC(16s32f, cvt_32f, short,  float, float)
-DEF_CVT_SCALE_FUNC(32u32f, cvt_32f, unsigned, float, float)
-DEF_CVT_SCALE_FUNC(32s32f, cvt_32f, int,    float, float)
-DEF_CVT_SCALE_FUNC(32f,    cvt_32f, float,  float, float)
-DEF_CVT_SCALE_FUNC(64f32f, cvt_64f, double, float, double)
-DEF_CVT_SCALE_FUNC(64u32f, cvt_32f, uint64_t, float, float)
-DEF_CVT_SCALE_FUNC(64s32f, cvt_32f, int64_t, float, float)
-DEF_CVT_SCALE_FUNC(16f32f, cvt1_32f, hfloat, float, float)
-DEF_CVT_SCALE_FUNC(16bf32f, cvt1_32f, bfloat, float, float)
+DEF_CVT_SCALE_FUNC(8u32f,  cvt_32f, uchar,  عائم, عائم)
+DEF_CVT_SCALE_FUNC(8s32f,  cvt_32f, schar,  عائم, عائم)
+DEF_CVT_SCALE_FUNC(16u32f, cvt_32f, ushort, عائم, عائم)
+DEF_CVT_SCALE_FUNC(16s32f, cvt_32f, کوتاه,  عائم, عائم)
+DEF_CVT_SCALE_FUNC(32u32f, cvt_32f, بیعلامت, عائم, عائم)
+DEF_CVT_SCALE_FUNC(32s32f, cvt_32f, صحيح,    عائم, عائم)
+DEF_CVT_SCALE_FUNC(32f,    cvt_32f, عائم,  عائم, عائم)
+DEF_CVT_SCALE_FUNC(64f32f, cvt_64f, مزدوج, عائم, مزدوج)
+DEF_CVT_SCALE_FUNC(64u32f, cvt_32f, uint64_t, عائم, عائم)
+DEF_CVT_SCALE_FUNC(64s32f, cvt_32f, int64_t, عائم, عائم)
+DEF_CVT_SCALE_FUNC(16f32f, cvt1_32f, hfloat, عائم, عائم)
+DEF_CVT_SCALE_FUNC(16bf32f, cvt1_32f, bfloat, عائم, عائم)
 
-DEF_CVT_SCALE_FUNC(8u64f,  cvt_64f, uchar,  double, double)
-DEF_CVT_SCALE_FUNC(8s64f,  cvt_64f, schar,  double, double)
-DEF_CVT_SCALE_FUNC(16u64f, cvt_64f, ushort, double, double)
-DEF_CVT_SCALE_FUNC(16s64f, cvt_64f, short,  double, double)
-DEF_CVT_SCALE_FUNC(32u64f, cvt_64f, unsigned, double, double)
-DEF_CVT_SCALE_FUNC(32s64f, cvt_64f, int,    double, double)
-DEF_CVT_SCALE_FUNC(32f64f, cvt_64f, float,  double, double)
-DEF_CVT_SCALE_FUNC(64f,    cvt_64f, double, double, double)
-DEF_CVT_SCALE_FUNC(64u64f, cvt_64f, uint64_t, double, double)
-DEF_CVT_SCALE_FUNC(64s64f, cvt_64f, int64_t, double, double)
-DEF_CVT_SCALE_FUNC(16f64f, cvt_64f, hfloat, double, double)
-DEF_CVT_SCALE_FUNC(16bf64f, cvt_64f, bfloat, double, double)
+DEF_CVT_SCALE_FUNC(8u64f,  cvt_64f, uchar,  مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(8s64f,  cvt_64f, schar,  مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(16u64f, cvt_64f, ushort, مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(16s64f, cvt_64f, کوتاه,  مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(32u64f, cvt_64f, بیعلامت, مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(32s64f, cvt_64f, صحيح,    مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(32f64f, cvt_64f, عائم,  مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(64f,    cvt_64f, مزدوج, مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(64u64f, cvt_64f, uint64_t, مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(64s64f, cvt_64f, int64_t, مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(16f64f, cvt_64f, hfloat, مزدوج, مزدوج)
+DEF_CVT_SCALE_FUNC(16bf64f, cvt_64f, bfloat, مزدوج, مزدوج)
 
-DEF_CVT_SCALE_FUNC(8u64u,  cvt_64f, uchar,  uint64_t, double)
-DEF_CVT_SCALE_FUNC(8s64u,  cvt_64f, schar,  uint64_t, double)
-DEF_CVT_SCALE_FUNC(16u64u, cvt_64f, ushort, uint64_t, double)
-DEF_CVT_SCALE_FUNC(16s64u, cvt_64f, short,  uint64_t, double)
-DEF_CVT_SCALE_FUNC(32u64u, cvt_64f, unsigned, uint64_t, double)
-DEF_CVT_SCALE_FUNC(32s64u, cvt_64f, int,    uint64_t, double)
-DEF_CVT_SCALE_FUNC(32f64u, cvt_64f, float,  uint64_t, double)
-DEF_CVT_SCALE_FUNC(64f64u, cvt_64f, double, uint64_t, double)
-DEF_CVT_SCALE_FUNC(64u, cvt_64f, uint64_t, uint64_t, double)
-DEF_CVT_SCALE_FUNC(64s64u, cvt_64f, int64_t, uint64_t, double)
-DEF_CVT_SCALE_FUNC(16f64u, cvt_64f, hfloat, uint64_t, double)
-DEF_CVT_SCALE_FUNC(16bf64u, cvt_64f, bfloat, uint64_t, double)
+DEF_CVT_SCALE_FUNC(8u64u,  cvt_64f, uchar,  uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(8s64u,  cvt_64f, schar,  uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(16u64u, cvt_64f, ushort, uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(16s64u, cvt_64f, کوتاه,  uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(32u64u, cvt_64f, بیعلامت, uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(32s64u, cvt_64f, صحيح,    uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(32f64u, cvt_64f, عائم,  uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(64f64u, cvt_64f, مزدوج, uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(64u, cvt_64f, uint64_t, uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(64s64u, cvt_64f, int64_t, uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(16f64u, cvt_64f, hfloat, uint64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(16bf64u, cvt_64f, bfloat, uint64_t, مزدوج)
 
-DEF_CVT_SCALE_FUNC(8u64s,  cvt_64f, uchar,  int64_t, double)
-DEF_CVT_SCALE_FUNC(8s64s,  cvt_64f, schar,  int64_t, double)
-DEF_CVT_SCALE_FUNC(16u64s, cvt_64f, ushort, int64_t, double)
-DEF_CVT_SCALE_FUNC(16s64s, cvt_64f, short,  int64_t, double)
-DEF_CVT_SCALE_FUNC(32u64s, cvt_64f, unsigned, int64_t, double)
-DEF_CVT_SCALE_FUNC(32s64s, cvt_64f, int,    int64_t, double)
-DEF_CVT_SCALE_FUNC(32f64s, cvt_64f, float,  int64_t, double)
-DEF_CVT_SCALE_FUNC(64f64s, cvt_64f, double, int64_t, double)
-DEF_CVT_SCALE_FUNC(64u64s, cvt_64f, uint64_t, int64_t, double)
-DEF_CVT_SCALE_FUNC(64s, cvt_64f, int64_t, int64_t, double)
-DEF_CVT_SCALE_FUNC(16f64s, cvt_64f, hfloat, int64_t, double)
-DEF_CVT_SCALE_FUNC(16bf64s, cvt_64f, bfloat, int64_t, double)
+DEF_CVT_SCALE_FUNC(8u64s,  cvt_64f, uchar,  int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(8s64s,  cvt_64f, schar,  int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(16u64s, cvt_64f, ushort, int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(16s64s, cvt_64f, کوتاه,  int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(32u64s, cvt_64f, بیعلامت, int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(32s64s, cvt_64f, صحيح,    int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(32f64s, cvt_64f, عائم,  int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(64f64s, cvt_64f, مزدوج, int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(64u64s, cvt_64f, uint64_t, int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(64s, cvt_64f, int64_t, int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(16f64s, cvt_64f, hfloat, int64_t, مزدوج)
+DEF_CVT_SCALE_FUNC(16bf64s, cvt_64f, bfloat, int64_t, مزدوج)
 
-DEF_CVT_SCALE_FUNC(8u16f,  cvt1_32f, uchar,  hfloat, float)
-DEF_CVT_SCALE_FUNC(8s16f,  cvt1_32f, schar,  hfloat, float)
-DEF_CVT_SCALE_FUNC(16u16f, cvt1_32f, ushort, hfloat, float)
-DEF_CVT_SCALE_FUNC(16s16f, cvt1_32f, short,  hfloat, float)
-DEF_CVT_SCALE_FUNC(32u16f, cvt1_32f, unsigned, hfloat, float)
-DEF_CVT_SCALE_FUNC(32s16f, cvt1_32f, int,    hfloat, float)
-DEF_CVT_SCALE_FUNC(32f16f, cvt1_32f, float,  hfloat, float)
-DEF_CVT_SCALE_FUNC(64f16f, cvt1_32f, double, hfloat, float)
-DEF_CVT_SCALE_FUNC(64u16f, cvt1_32f, uint64_t, hfloat, float)
-DEF_CVT_SCALE_FUNC(64s16f, cvt1_32f, int64_t, hfloat, float)
-DEF_CVT_SCALE_FUNC(16f,    cvt1_32f, hfloat, hfloat, float)
-DEF_CVT_SCALE_FUNC(16bf16f, cvt1_32f, bfloat, hfloat, float)
+DEF_CVT_SCALE_FUNC(8u16f,  cvt1_32f, uchar,  hfloat, عائم)
+DEF_CVT_SCALE_FUNC(8s16f,  cvt1_32f, schar,  hfloat, عائم)
+DEF_CVT_SCALE_FUNC(16u16f, cvt1_32f, ushort, hfloat, عائم)
+DEF_CVT_SCALE_FUNC(16s16f, cvt1_32f, کوتاه,  hfloat, عائم)
+DEF_CVT_SCALE_FUNC(32u16f, cvt1_32f, بیعلامت, hfloat, عائم)
+DEF_CVT_SCALE_FUNC(32s16f, cvt1_32f, صحيح,    hfloat, عائم)
+DEF_CVT_SCALE_FUNC(32f16f, cvt1_32f, عائم,  hfloat, عائم)
+DEF_CVT_SCALE_FUNC(64f16f, cvt1_32f, مزدوج, hfloat, عائم)
+DEF_CVT_SCALE_FUNC(64u16f, cvt1_32f, uint64_t, hfloat, عائم)
+DEF_CVT_SCALE_FUNC(64s16f, cvt1_32f, int64_t, hfloat, عائم)
+DEF_CVT_SCALE_FUNC(16f,    cvt1_32f, hfloat, hfloat, عائم)
+DEF_CVT_SCALE_FUNC(16bf16f, cvt1_32f, bfloat, hfloat, عائم)
 
-DEF_CVT_SCALE_FUNC(8u16bf,  cvt1_32f, uchar,  bfloat, float)
-DEF_CVT_SCALE_FUNC(8s16bf,  cvt1_32f, schar,  bfloat, float)
-DEF_CVT_SCALE_FUNC(16u16bf, cvt1_32f, ushort, bfloat, float)
-DEF_CVT_SCALE_FUNC(16s16bf, cvt1_32f, short,  bfloat, float)
-DEF_CVT_SCALE_FUNC(32u16bf, cvt1_32f, unsigned, bfloat, float)
-DEF_CVT_SCALE_FUNC(32s16bf, cvt1_32f, int,    bfloat, float)
-DEF_CVT_SCALE_FUNC(32f16bf, cvt1_32f, float,  bfloat, float)
-DEF_CVT_SCALE_FUNC(64f16bf, cvt1_32f, double, bfloat, float)
-DEF_CVT_SCALE_FUNC(64u16bf, cvt1_32f, uint64_t, bfloat, float)
-DEF_CVT_SCALE_FUNC(64s16bf, cvt1_32f, int64_t, bfloat, float)
-DEF_CVT_SCALE_FUNC(16f16bf, cvt1_32f, hfloat, bfloat, float)
-DEF_CVT_SCALE_FUNC(16bf, cvt1_32f, bfloat, bfloat, float)
+DEF_CVT_SCALE_FUNC(8u16bf,  cvt1_32f, uchar,  bfloat, عائم)
+DEF_CVT_SCALE_FUNC(8s16bf,  cvt1_32f, schar,  bfloat, عائم)
+DEF_CVT_SCALE_FUNC(16u16bf, cvt1_32f, ushort, bfloat, عائم)
+DEF_CVT_SCALE_FUNC(16s16bf, cvt1_32f, کوتاه,  bfloat, عائم)
+DEF_CVT_SCALE_FUNC(32u16bf, cvt1_32f, بیعلامت, bfloat, عائم)
+DEF_CVT_SCALE_FUNC(32s16bf, cvt1_32f, صحيح,    bfloat, عائم)
+DEF_CVT_SCALE_FUNC(32f16bf, cvt1_32f, عائم,  bfloat, عائم)
+DEF_CVT_SCALE_FUNC(64f16bf, cvt1_32f, مزدوج, bfloat, عائم)
+DEF_CVT_SCALE_FUNC(64u16bf, cvt1_32f, uint64_t, bfloat, عائم)
+DEF_CVT_SCALE_FUNC(64s16bf, cvt1_32f, int64_t, bfloat, عائم)
+DEF_CVT_SCALE_FUNC(16f16bf, cvt1_32f, hfloat, bfloat, عائم)
+DEF_CVT_SCALE_FUNC(16bf, cvt1_32f, bfloat, bfloat, عائم)
 
-DEF_CVT_SCALEBOOL2_FUNC(8b8u, uchar, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b8s, schar, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b, bool, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b16u, ushort, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b16s, short, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b32u, unsigned, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b32s, int, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b32f, float, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b64u, uint64_t, double)
-DEF_CVT_SCALEBOOL2_FUNC(8b64s, int64_t, double)
-DEF_CVT_SCALEBOOL2_FUNC(8b64f, double, double)
-DEF_CVT_SCALEBOOL2_FUNC(8b16f, hfloat, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b16bf, bfloat, float)
+DEF_CVT_SCALEBOOL2_FUNC(8b8u, uchar, عائم)
+DEF_CVT_SCALEBOOL2_FUNC(8b8s, schar, عائم)
+DEF_CVT_SCALEBOOL2_FUNC(8b, منطقي, عائم)
+DEF_CVT_SCALEBOOL2_FUNC(8b16u, ushort, عائم)
+DEF_CVT_SCALEBOOL2_FUNC(8b16s, کوتاه, عائم)
+DEF_CVT_SCALEBOOL2_FUNC(8b32u, بیعلامت, عائم)
+DEF_CVT_SCALEBOOL2_FUNC(8b32s, صحيح, عائم)
+DEF_CVT_SCALEBOOL2_FUNC(8b32f, عائم, عائم)
+DEF_CVT_SCALEBOOL2_FUNC(8b64u, uint64_t, مزدوج)
+DEF_CVT_SCALEBOOL2_FUNC(8b64s, int64_t, مزدوج)
+DEF_CVT_SCALEBOOL2_FUNC(8b64f, مزدوج, مزدوج)
+DEF_CVT_SCALEBOOL2_FUNC(8b16f, hfloat, عائم)
+DEF_CVT_SCALEBOOL2_FUNC(8b16bf, bfloat, عائم)
 
 // FP8 src -> CV_8U abs|scale|shift (scalar)
-#define DEF_CVT_SCALE_ABS_SCALAR_FUNC(suffix, stype) \
-static void cvtScaleAbs##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                                 uchar* dst, size_t dstep, Size size, void* scale_) \
+#تعریف_کن DEF_CVT_SCALE_ABS_SCALAR_FUNC(suffix, stype) \
+ساكن فراغ cvtScaleAbs##suffix( ثابت uchar* src_, size_t sstep, ثابت uchar*, size_t, \
+                                 uchar* dst, size_t dstep, اندازه size, فراغ* scale_) \
 { \
-    const stype* src = (const stype*)src_; \
-    const double* scale = (const double*)scale_; \
-    float a = (float)scale[0], b = (float)scale[1]; \
-    sstep /= sizeof(src[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
-            dst[j] = saturate_cast<uchar>(std::abs((float)src[j]*a + b)); \
+    ثابت stype* src = (ثابت stype*)src_; \
+    ثابت مزدوج* scale = (ثابت مزدوج*)scale_; \
+    عائم a = (عائم)scale[0], b = (عائم)scale[1]; \
+    sstep /= حجم(src[0]); \
+    لكل( صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep ) \
+        لكل (صحيح j = 0; j < size.عرض; j++) \
+            dst[j] = saturate_cast<uchar>(std::قدر_مطلق((عائم)src[j]*a + b)); \
 }
 DEF_CVT_SCALE_ABS_SCALAR_FUNC(8fe4m3u8u, fp8a_t)
 DEF_CVT_SCALE_ABS_SCALAR_FUNC(8fe4m38u,  fp8_t)
 
-BinaryFunc getCvtScaleAbsFunc(int depth)
+دودویی_Func getCvtScaleAbsFunc(صحيح عمق)
 {
-    BinaryFunc func =
-        depth == CV_8F_E4M3FN ? (BinaryFunc)cvtScaleAbs8fe4m38u :
-        depth == CV_8F_E4M3FNUZ ? (BinaryFunc)cvtScaleAbs8fe4m3u8u :
-        depth == CV_8U ? (BinaryFunc)cvtScaleAbs8u :
-        depth == CV_8S ? (BinaryFunc)cvtScaleAbs8s8u :
-        depth == CV_Bool ? (BinaryFunc)cvtScaleAbs8b8u :
-        depth == CV_16U ? (BinaryFunc)cvtScaleAbs16u8u :
-        depth == CV_16S ? (BinaryFunc)cvtScaleAbs16s8u :
-        depth == CV_16F ? (BinaryFunc)cvtScaleAbs16f8u :
-        depth == CV_16BF ? (BinaryFunc)cvtScaleAbs16bf8u :
-        depth == CV_32U ? (BinaryFunc)cvtScaleAbs32u8u :
-        depth == CV_32S ? (BinaryFunc)cvtScaleAbs32s8u :
-        depth == CV_32F ? (BinaryFunc)cvtScaleAbs32f8u :
-        depth == CV_64U ? (BinaryFunc)cvtScaleAbs64u8u :
-        depth == CV_64S ? (BinaryFunc)cvtScaleAbs64s8u :
-        depth == CV_64F ? (BinaryFunc)cvtScaleAbs64f8u : 0;
+    دودویی_Func func =
+        عمق == CV_8F_E4M3FN ? (دودویی_Func)cvtScaleAbs8fe4m38u :
+        عمق == CV_8F_E4M3FNUZ ? (دودویی_Func)cvtScaleAbs8fe4m3u8u :
+        عمق == CV_8U ? (دودویی_Func)cvtScaleAbs8u :
+        عمق == CV_8S ? (دودویی_Func)cvtScaleAbs8s8u :
+        عمق == CV_Bool ? (دودویی_Func)cvtScaleAbs8b8u :
+        عمق == CV_16U ? (دودویی_Func)cvtScaleAbs16u8u :
+        عمق == CV_16S ? (دودویی_Func)cvtScaleAbs16s8u :
+        عمق == CV_16F ? (دودویی_Func)cvtScaleAbs16f8u :
+        عمق == CV_16BF ? (دودویی_Func)cvtScaleAbs16bf8u :
+        عمق == CV_32U ? (دودویی_Func)cvtScaleAbs32u8u :
+        عمق == CV_32S ? (دودویی_Func)cvtScaleAbs32s8u :
+        عمق == CV_32F ? (دودویی_Func)cvtScaleAbs32f8u :
+        عمق == CV_64U ? (دودویی_Func)cvtScaleAbs64u8u :
+        عمق == CV_64S ? (دودویی_Func)cvtScaleAbs64s8u :
+        عمق == CV_64F ? (دودویی_Func)cvtScaleAbs64f8u : 0;
     CV_Assert(func != 0);
-    return func;
+    أرجع func;
 }
 
 //////////////////// FP8 scaled conversions — scalar via saturate_cast(src*a+b) ////////////////////
-#define DEF_CVT_SCALE_SCALAR_FUNC(suffix, stype, dtype, wtype) \
-static void cvtScale##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                              uchar* dst_, size_t dstep, Size size, void* scale_) \
+#تعریف_کن DEF_CVT_SCALE_SCALAR_FUNC(suffix, stype, dtype, wtype) \
+ساكن فراغ cvtScale##suffix( ثابت uchar* src_, size_t sstep, ثابت uchar*, size_t, \
+                              uchar* dst_, size_t dstep, اندازه size, فراغ* scale_) \
 { \
-    const stype* src = (const stype*)src_; dtype* dst = (dtype*)dst_; \
-    const double* scale = (const double*)scale_; \
+    ثابت stype* src = (ثابت stype*)src_; dtype* dst = (dtype*)dst_; \
+    ثابت مزدوج* scale = (ثابت مزدوج*)scale_; \
     wtype a = (wtype)scale[0], b = (wtype)scale[1]; \
-    sstep /= sizeof(src[0]); dstep /= sizeof(dst[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
+    sstep /= حجم(src[0]); dstep /= حجم(dst[0]); \
+    لكل( صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep ) \
+        لكل (صحيح j = 0; j < size.عرض; j++) \
             dst[j] = saturate_cast<dtype>((wtype)src[j]*a + b); \
 }
 
 // double intermediate so coarse FP8 grids round identically to the (double-precision) reference
-#define DEF_CVT_SCALE_FP8(S, T) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##8u,   T, uchar, double)     DEF_CVT_SCALE_SCALAR_FUNC(8u##S,   uchar, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##8s,   T, schar, double)     DEF_CVT_SCALE_SCALAR_FUNC(8s##S,   schar, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##16u,  T, ushort, double)    DEF_CVT_SCALE_SCALAR_FUNC(16u##S,  ushort, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##16s,  T, short, double)     DEF_CVT_SCALE_SCALAR_FUNC(16s##S,  short, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##32u,  T, unsigned, double)  DEF_CVT_SCALE_SCALAR_FUNC(32u##S,  unsigned, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##32s,  T, int, double)       DEF_CVT_SCALE_SCALAR_FUNC(32s##S,  int, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##32f,  T, float, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##64f,  T, double, double)    DEF_CVT_SCALE_SCALAR_FUNC(64f##S,  double, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##16f,  T, hfloat, double)    DEF_CVT_SCALE_SCALAR_FUNC(16f##S,  hfloat, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##16bf, T, bfloat, double)    DEF_CVT_SCALE_SCALAR_FUNC(16bf##S, bfloat, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##64u,  T, uint64_t, double)  DEF_CVT_SCALE_SCALAR_FUNC(64u##S,  uint64_t, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##64s,  T, int64_t, double)   DEF_CVT_SCALE_SCALAR_FUNC(64s##S,  int64_t, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##8b,   T, bool, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##8fe4m3,  T, fp8_t, double)   DEF_CVT_SCALE_SCALAR_FUNC(S##8fe4m3u, T, fp8a_t, double)
+#تعریف_کن DEF_CVT_SCALE_FP8(S, T) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##8u,   T, uchar, مزدوج)     DEF_CVT_SCALE_SCALAR_FUNC(8u##S,   uchar, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##8s,   T, schar, مزدوج)     DEF_CVT_SCALE_SCALAR_FUNC(8s##S,   schar, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##16u,  T, ushort, مزدوج)    DEF_CVT_SCALE_SCALAR_FUNC(16u##S,  ushort, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##16s,  T, کوتاه, مزدوج)     DEF_CVT_SCALE_SCALAR_FUNC(16s##S,  کوتاه, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##32u,  T, بیعلامت, مزدوج)  DEF_CVT_SCALE_SCALAR_FUNC(32u##S,  بیعلامت, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##32s,  T, صحيح, مزدوج)       DEF_CVT_SCALE_SCALAR_FUNC(32s##S,  صحيح, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##32f,  T, عائم, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##64f,  T, مزدوج, مزدوج)    DEF_CVT_SCALE_SCALAR_FUNC(64f##S,  مزدوج, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##16f,  T, hfloat, مزدوج)    DEF_CVT_SCALE_SCALAR_FUNC(16f##S,  hfloat, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##16bf, T, bfloat, مزدوج)    DEF_CVT_SCALE_SCALAR_FUNC(16bf##S, bfloat, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##64u,  T, uint64_t, مزدوج)  DEF_CVT_SCALE_SCALAR_FUNC(64u##S,  uint64_t, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##64s,  T, int64_t, مزدوج)   DEF_CVT_SCALE_SCALAR_FUNC(64s##S,  int64_t, T, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##8b,   T, منطقي, مزدوج) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##8fe4m3,  T, fp8_t, مزدوج)   DEF_CVT_SCALE_SCALAR_FUNC(S##8fe4m3u, T, fp8a_t, مزدوج)
 
 DEF_CVT_SCALE_FP8(8fe4m3,  fp8_t)
 DEF_CVT_SCALE_FP8(8fe4m3u, fp8a_t)
 
 // convertTo(dst, depth, alpha, beta) path -- real quantization. Reuses convert.hpp's fast path.
 // Double precision here matches the scalar reference (wtype)x*a+b bit-for-bit.
-template<int bias, bool fnuz> static void
-cvtScaleF32ToFp8(const uchar* src_, size_t sstep, const uchar*, size_t,
-                 uchar* dst, size_t dstep, Size size, void* scale_)
+قالب<صحيح bias, منطقي fnuz> ساكن فراغ
+cvt_Scale_F32_مقصد_Fp8(ثابت uchar* src_, size_t sstep, ثابت uchar*, size_t,
+                 uchar* dst, size_t dstep, اندازه size, فراغ* scale_)
 {
     CV_INSTRUMENT_REGION();
-    const float* src = (const float*)src_;
-    const double* scale = (const double*)scale_;
-    double a = scale[0], b = scale[1];
-    sstep /= sizeof(src[0]);
+    ثابت عائم* src = (ثابت عائم*)src_;
+    ثابت مزدوج* scale = (ثابت مزدوج*)scale_;
+    مزدوج a = scale[0], b = scale[1];
+    sstep /= حجم(src[0]);
 
-    for (int i = 0; i < size.height; i++, src += sstep, dst += dstep)
+    لكل (صحيح i = 0; i < size.ارتفاع; i++, src += sstep, dst += dstep)
     {
-        int j = 0;
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+        صحيح j = 0;
+#إذا (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
         v_float64 va = vx_setall_f64(a), vb = vx_setall_f64(b);
-        const int LANES32 = VTraits<v_float32>::vlanes();
-        const int VECSZ = LANES32 * 4;
-        float scaled[VTraits<v_float32>::max_nlanes * 4];
-        for (; j <= size.width - VECSZ; j += VECSZ)
+        ثابت صحيح LANES32 = VTraits<v_float32>::vlanes();
+        ثابت صحيح VECSZ = LANES32 * 4;
+        عائم scaled[VTraits<v_float32>::max_nlanes * 4];
+        لكل (; j <= size.عرض - VECSZ; j += VECSZ)
         {
             v_float32 vf0, vf1, vf2, vf3;
             v_float64 d0, d1;
 
-            vx_load_pair_as(src + j + 0 * LANES32, d0, d1);
-            d0 = v_add(v_mul(d0, va), vb);
-            d1 = v_add(v_mul(d1, va), vb);
+            vx_بارگیری_pair_as(src + j + 0 * LANES32, d0, d1);
+            d0 = v_جمع_کن(v_mul(d0, va), vb);
+            d1 = v_جمع_کن(v_mul(d1, va), vb);
             vf0 = v_cvt_f32(d0, d1);
             v_store(scaled + 0 * LANES32, vf0);
 
-            vx_load_pair_as(src + j + 1 * LANES32, d0, d1);
-            d0 = v_add(v_mul(d0, va), vb);
-            d1 = v_add(v_mul(d1, va), vb);
+            vx_بارگیری_pair_as(src + j + 1 * LANES32, d0, d1);
+            d0 = v_جمع_کن(v_mul(d0, va), vb);
+            d1 = v_جمع_کن(v_mul(d1, va), vb);
             vf1 = v_cvt_f32(d0, d1);
             v_store(scaled + 1 * LANES32, vf1);
 
-            vx_load_pair_as(src + j + 2 * LANES32, d0, d1);
-            d0 = v_add(v_mul(d0, va), vb);
-            d1 = v_add(v_mul(d1, va), vb);
+            vx_بارگیری_pair_as(src + j + 2 * LANES32, d0, d1);
+            d0 = v_جمع_کن(v_mul(d0, va), vb);
+            d1 = v_جمع_کن(v_mul(d1, va), vb);
             vf2 = v_cvt_f32(d0, d1);
             v_store(scaled + 2 * LANES32, vf2);
 
-            vx_load_pair_as(src + j + 3 * LANES32, d0, d1);
-            d0 = v_add(v_mul(d0, va), vb);
-            d1 = v_add(v_mul(d1, va), vb);
+            vx_بارگیری_pair_as(src + j + 3 * LANES32, d0, d1);
+            d0 = v_جمع_کن(v_mul(d0, va), vb);
+            d1 = v_جمع_کن(v_mul(d1, va), vb);
             vf3 = v_cvt_f32(d0, d1);
             v_store(scaled + 3 * LANES32, vf3);
 
             encodeFp8Vec4<bias, fnuz>(vf0, vf1, vf2, vf3, scaled, VECSZ, dst + j);
         }
         vx_cleanup();
-#endif
-        for (; j < size.width; j++)
-            dst[j] = fp8_detail::encodeE4M3((float)((double)src[j]*a + b), bias, fnuz);
+#پایان_اگر
+        لكل (; j < size.عرض; j++)
+            dst[j] = fp8_detail::encodeE4M3((عائم)((مزدوج)src[j]*a + b), bias, fnuz);
     }
 }
-static void cvtScale32f8fe4m3(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtScaleF32ToFp8<7, false>(s, ss, p, ps, d, ds, sz, x); }
-static void cvtScale32f8fe4m3u(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtScaleF32ToFp8<8, true>(s, ss, p, ps, d, ds, sz, x); }
+ساكن فراغ cvtScale32f8fe4m3(ثابت uchar* s, size_t ss, ثابت uchar* p, size_t ps, uchar* d, size_t ds, اندازه sz, فراغ* x)
+{ cvt_Scale_F32_مقصد_Fp8<7, خطأ>(s, ss, p, ps, d, ds, sz, x); }
+ساكن فراغ cvtScale32f8fe4m3u(ثابت uchar* s, size_t ss, ثابت uchar* p, size_t ps, uchar* d, size_t ds, اندازه sz, فراغ* x)
+{ cvt_Scale_F32_مقصد_Fp8<8, درست>(s, ss, p, ps, d, ds, sz, x); }
 
-BinaryFunc getConvertScaleFunc(int sdepth_, int ddepth_)
+دودویی_Func getConvertScaleFunc(صحيح sdepth_, صحيح ddepth_)
 {
-    int sdepth = CV_MAT_DEPTH(sdepth_);
-    int ddepth = CV_MAT_DEPTH(ddepth_);
-    BinaryFunc func =
+    صحيح sdepth = CV_MAT_عمق(sdepth_);
+    صحيح ddepth = CV_MAT_عمق(ddepth_);
+    دودویی_Func func =
         ddepth == CV_8U ? (
             sdepth == CV_8U ? cvtScale8u :
             sdepth == CV_8S ? cvtScale8s8u :
@@ -828,10 +828,10 @@ BinaryFunc getConvertScaleFunc(int sdepth_, int ddepth_)
             0) :
         0;
     CV_Assert(func != 0);
-    return func;
+    أرجع func;
 }
 
-#endif
+#پایان_اگر
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_انتها
 } // namespace

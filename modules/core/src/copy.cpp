@@ -47,175 +47,175 @@
 //
 // */
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#ضمن "precomp.hpp"
+#ضمن "opencl_kernels_core.hpp"
 
-namespace cv
+نطاق cv
 {
 
-template <typename T> static inline
-void scalarToRawData_(const Scalar& s, T * const buf, const int cn, const int unroll_to)
+قالب <نام_نوع T> ساكن مضمن
+فراغ scalar_مقصد_Raw_داده_2(ثابت Scalar& s, T * ثابت buf, ثابت صحيح cn, ثابت صحيح unroll_مقصد)
 {
-    int i = 0;
-    for(; i < cn; i++)
+    صحيح i = 0;
+    لكل(; i < cn; i++)
         buf[i] = saturate_cast<T>(s.val[i]);
-    for(; i < unroll_to; i++)
+    لكل(; i < unroll_مقصد; i++)
         buf[i] = buf[i-cn];
 }
 
-void scalarToRawData(const Scalar& s, void* _buf, int type, int unroll_to)
+فراغ scalar_مقصد_Raw_داده(ثابت Scalar& s, فراغ* _buf, صحيح type, صحيح unroll_مقصد)
 {
     CV_INSTRUMENT_REGION();
 
-    const int depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    ثابت صحيح عمق = CV_MAT_عمق(type), cn = CV_MAT_CN(type);
     CV_Assert(cn <= 4);
-    switch(depth)
+    بدل(عمق)
     {
-    case CV_8U:
-        scalarToRawData_(s, (uchar*)_buf, cn, unroll_to);
-        break;
-    case CV_8S:
-        scalarToRawData_(s, (schar*)_buf, cn, unroll_to);
-        break;
-    case CV_Bool:
-        scalarToRawData_(s, (bool*)_buf, cn, unroll_to);
-        break;
-    case CV_16U:
-        scalarToRawData_(s, (ushort*)_buf, cn, unroll_to);
-        break;
-    case CV_16S:
-        scalarToRawData_(s, (short*)_buf, cn, unroll_to);
-        break;
-    case CV_16F:
-        scalarToRawData_(s, (hfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_16BF:
-        scalarToRawData_(s, (bfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FN:
-        scalarToRawData_(s, (fp8_t*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FNUZ:
-        scalarToRawData_(s, (fp8a_t*)_buf, cn, unroll_to);
-        break;
-    case CV_32U:
-        scalarToRawData_(s, (unsigned*)_buf, cn, unroll_to);
-        break;
-    case CV_32S:
-        scalarToRawData_(s, (int*)_buf, cn, unroll_to);
-        break;
-    case CV_32F:
-        scalarToRawData_(s, (float*)_buf, cn, unroll_to);
-        break;
-    case CV_64U:
-        scalarToRawData_(s, (uint64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64S:
-        scalarToRawData_(s, (int64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64F:
-        scalarToRawData_(s, (double*)_buf, cn, unroll_to);
-        break;
-    default:
+    حالة CV_8U:
+        scalar_مقصد_Raw_داده_2(s, (uchar*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_8S:
+        scalar_مقصد_Raw_داده_2(s, (schar*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_Bool:
+        scalar_مقصد_Raw_داده_2(s, (منطقي*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_16U:
+        scalar_مقصد_Raw_داده_2(s, (ushort*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_16S:
+        scalar_مقصد_Raw_داده_2(s, (کوتاه*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_16F:
+        scalar_مقصد_Raw_داده_2(s, (hfloat*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_16BF:
+        scalar_مقصد_Raw_داده_2(s, (bfloat*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_8F_E4M3FN:
+        scalar_مقصد_Raw_داده_2(s, (fp8_t*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_8F_E4M3FNUZ:
+        scalar_مقصد_Raw_داده_2(s, (fp8a_t*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_32U:
+        scalar_مقصد_Raw_داده_2(s, (بیعلامت*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_32S:
+        scalar_مقصد_Raw_داده_2(s, (صحيح*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_32F:
+        scalar_مقصد_Raw_داده_2(s, (عائم*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_64U:
+        scalar_مقصد_Raw_داده_2(s, (uint64_t*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_64S:
+        scalar_مقصد_Raw_داده_2(s, (int64_t*)_buf, cn, unroll_مقصد);
+        اكسر;
+    حالة CV_64F:
+        scalar_مقصد_Raw_داده_2(s, (مزدوج*)_buf, cn, unroll_مقصد);
+        اكسر;
+    افتراضي:
         CV_Error(cv::Error::StsUnsupportedFormat,"");
     }
 }
 
-void convertAndUnrollScalar( const Mat& sc, int buftype, uchar* scbuf, size_t blocksize )
+فراغ convertAndUnrollScalar( ثابت Mat& sc, صحيح buftype, uchar* scbuf, size_t blocksize )
 {
-    int scn = (int)sc.total(), cn = CV_MAT_CN(buftype);
-    size_t esz = CV_ELEM_SIZE(buftype);
-    BinaryFunc cvtFn = getConvertFunc(sc.depth(), buftype);
+    صحيح scn = (صحيح)sc.مجموع(), cn = CV_MAT_CN(buftype);
+    size_t esz = CV_ELEM_اندازه(buftype);
+    دودویی_Func cvtFn = getConvertFunc(sc.عمق(), buftype);
     CV_Assert(cvtFn);
-    cvtFn(sc.ptr(), 1, 0, 1, scbuf, 1, Size(std::min(cn, scn), 1), 0);
+    cvtFn(sc.ptr(), 1, 0, 1, scbuf, 1, اندازه(std::min(cn, scn), 1), 0);
     // unroll the scalar
-    if( scn < cn )
+    إذا( scn < cn )
     {
         CV_Assert( scn == 1 );
         size_t esz1 = CV_ELEM_SIZE1(buftype);
-        for( size_t i = esz1; i < esz; i++ )
+        لكل( size_t i = esz1; i < esz; i++ )
             scbuf[i] = scbuf[i - esz1];
     }
-    for( size_t i = esz; i < blocksize*esz; i++ )
+    لكل( size_t i = esz; i < blocksize*esz; i++ )
         scbuf[i] = scbuf[i - esz];
 }
 
-template<typename T> static void
-copyMask_(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+قالب<نام_نوع T> ساكن فراغ
+copy_ماسک(ثابت uchar* _src, size_t sstep, ثابت uchar* ماسک, size_t mstep, uchar* _dst, size_t dstep, اندازه size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    لكل( ; size.ارتفاع--; ماسک += mstep, _src += sstep, _dst += dstep )
     {
-        const T* src = (const T*)_src;
+        ثابت T* src = (ثابت T*)_src;
         T* dst = (T*)_dst;
-        int x = 0;
-         #if CV_ENABLE_UNROLLED
-        for( ; x <= size.width - 4; x += 4 )
+        صحيح x = 0;
+         #إذا CV_ENABLE_UNROLLED
+        لكل( ; x <= size.عرض - 4; x += 4 )
         {
-            if( mask[x] )
+            إذا( ماسک[x] )
                 dst[x] = src[x];
-            if( mask[x+1] )
+            إذا( ماسک[x+1] )
                 dst[x+1] = src[x+1];
-            if( mask[x+2] )
+            إذا( ماسک[x+2] )
                 dst[x+2] = src[x+2];
-            if( mask[x+3] )
+            إذا( ماسک[x+3] )
                 dst[x+3] = src[x+3];
         }
-        #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        #پایان_اگر
+        لكل( ; x < size.عرض; x++ )
+            إذا( ماسک[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<uchar>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+قالب<> فراغ
+copy_ماسک<uchar>(ثابت uchar* _src, size_t sstep, ثابت uchar* ماسک, size_t mstep, uchar* _dst, size_t dstep, اندازه size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (int)sstep, _dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_پیاپی_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (صحيح)sstep, _dst, (صحيح)dstep, ippi_اندازه(size), ماسک, (صحيح)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    لكل( ; size.ارتفاع--; ماسک += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        ثابت uchar* src = (ثابت uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        صحيح x = 0;
+        #إذا (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            لكل( ; x <= size.عرض - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
-                v_uint8 v_src   = vx_load(src  + x),
-                        v_dst   = vx_load(dst  + x),
-                        v_nmask = v_eq(vx_load(mask + x), v_zero);
+                v_uint8 v_src   = vx_بارگیری(src  + x),
+                        v_dst   = vx_بارگیری(dst  + x),
+                        v_nmask = v_eq(vx_بارگیری(ماسک + x), v_zero);
 
                 v_dst = v_select(v_nmask, v_dst, v_src);
                 v_store(dst + x, v_dst);
             }
         }
         vx_cleanup();
-        #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        #پایان_اگر
+        لكل( ; x < size.عرض; x++ )
+            إذا( ماسک[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+قالب<> فراغ
+copy_ماسک<Vec3b>(ثابت uchar* _src, size_t sstep, ثابت uchar* ماسک, size_t mstep, uchar* _dst, size_t dstep, اندازه size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    لكل( ; size.ارتفاع--; ماسک += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        ثابت uchar* src = (ثابت uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        صحيح x = 0;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+        لكل( ; x <= size.عرض - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
-            v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
+            v_uint8 v_nmask = v_eq(vx_بارگیری(ماسک + x), vx_setzero_u8());
 
             v_uint8 v_src0, v_src1, v_src2;
             v_uint8 v_dst0, v_dst1, v_dst2;
-            v_load_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
-            v_load_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
+            v_بارگیری_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
+            v_بارگیری_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
 
             v_dst0 = v_select(v_nmask, v_dst0, v_src0);
             v_dst1 = v_select(v_nmask, v_dst1, v_src1);
@@ -224,9 +224,9 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
             v_store_interleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
         }
         vx_cleanup();
-#endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+#پایان_اگر
+        لكل( ; x < size.عرض; x++ )
+            إذا( ماسک[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -234,27 +234,27 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+قالب<> فراغ
+copy_ماسک<ushort>(ثابت uchar* _src, size_t sstep, ثابت uchar* ماسک, size_t mstep, uchar* _dst, size_t dstep, اندازه size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (const Ipp16u *)_src, (int)sstep, (Ipp16u *)_dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_پیاپی_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (ثابت Ipp16u *)_src, (صحيح)sstep, (Ipp16u *)_dst, (صحيح)dstep, ippi_اندازه(size), ماسک, (صحيح)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    لكل( ; size.ارتفاع--; ماسک += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        ثابت ushort* src = (ثابت ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        صحيح x = 0;
+        #إذا (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            لكل( ; x <= size.عرض - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
-                v_uint16 v_src1 = vx_load(src + x), v_src2 = vx_load(src + x + VTraits<v_uint16>::vlanes()),
-                         v_dst1 = vx_load(dst + x), v_dst2 = vx_load(dst + x + VTraits<v_uint16>::vlanes());
+                v_uint16 v_src1 = vx_بارگیری(src + x), v_src2 = vx_بارگیری(src + x + VTraits<v_uint16>::vlanes()),
+                         v_dst1 = vx_بارگیری(dst + x), v_dst2 = vx_بارگیری(dst + x + VTraits<v_uint16>::vlanes());
 
                 v_uint8 v_nmask1, v_nmask2;
-                v_uint8 v_nmask = v_eq(vx_load(mask + x), v_zero);
+                v_uint8 v_nmask = v_eq(vx_بارگیری(ماسک + x), v_zero);
                 v_zip(v_nmask, v_nmask, v_nmask1, v_nmask2);
 
                 v_dst1 = v_select(v_reinterpret_as_u16(v_nmask1), v_dst1, v_src1);
@@ -264,36 +264,36 @@ copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mst
             }
         }
         vx_cleanup();
-        #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        #پایان_اگر
+        لكل( ; x < size.عرض; x++ )
+            إذا( ماسک[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+قالب<> فراغ
+copy_ماسک<Vec3s>(ثابت uchar* _src, size_t sstep, ثابت uchar* ماسک, size_t mstep, uchar* _dst, size_t dstep, اندازه size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    لكل( ; size.ارتفاع--; ماسک += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        ثابت ushort* src = (ثابت ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        صحيح x = 0;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+        لكل( ; x <= size.عرض - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
-            v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
+            v_uint8 v_nmask = v_eq(vx_بارگیری(ماسک + x), vx_setzero_u8());
             v_uint8 v_nmask0, v_nmask1;
             v_zip(v_nmask, v_nmask, v_nmask0, v_nmask1);
 
             v_uint16 v_src0, v_src1, v_src2;
             v_uint16 v_dst0, v_dst1, v_dst2;
-            v_load_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
-            v_load_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
+            v_بارگیری_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
+            v_بارگیری_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
             v_uint16 v_src3, v_src4, v_src5;
             v_uint16 v_dst3, v_dst4, v_dst5;
-            v_load_deinterleave(src + 3 * (x + VTraits<v_uint16>::vlanes()), v_src3, v_src4, v_src5);
-            v_load_deinterleave(dst + 3 * (x + VTraits<v_uint16>::vlanes()), v_dst3, v_dst4, v_dst5);
+            v_بارگیری_deinterleave(src + 3 * (x + VTraits<v_uint16>::vlanes()), v_src3, v_src4, v_src5);
+            v_بارگیری_deinterleave(dst + 3 * (x + VTraits<v_uint16>::vlanes()), v_dst3, v_dst4, v_dst5);
 
             v_dst0 = v_select(v_reinterpret_as_u16(v_nmask0), v_dst0, v_src0);
             v_dst1 = v_select(v_reinterpret_as_u16(v_nmask0), v_dst1, v_src1);
@@ -306,9 +306,9 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
             v_store_interleave(dst + 3 * (x + VTraits<v_uint16>::vlanes()), v_dst3, v_dst4, v_dst5);
         }
         vx_cleanup();
-#endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+#پایان_اگر
+        لكل( ; x < size.عرض; x++ )
+            إذا( ماسک[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -316,23 +316,23 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+قالب<> فراغ
+copy_ماسک<صحيح>(ثابت uchar* _src, size_t sstep, ثابت uchar* ماسک, size_t mstep, uchar* _dst, size_t dstep, اندازه size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    لكل( ; size.ارتفاع--; ماسک += mstep, _src += sstep, _dst += dstep )
     {
-        const int* src = (const int*)_src;
-        int* dst = (int*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for (; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
+        ثابت صحيح* src = (ثابت صحيح*)_src;
+        صحيح* dst = (صحيح*)_dst;
+        صحيح x = 0;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+        لكل (; x <= size.عرض - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
         {
-            v_int32 v_src0 = vx_load(src + x), v_dst0 = vx_load(dst + x);
-            v_int32 v_src1 = vx_load(src + x +     VTraits<v_int32>::vlanes()), v_dst1 = vx_load(dst + x +     VTraits<v_int32>::vlanes());
-            v_int32 v_src2 = vx_load(src + x + 2 * VTraits<v_int32>::vlanes()), v_dst2 = vx_load(dst + x + 2 * VTraits<v_int32>::vlanes());
-            v_int32 v_src3 = vx_load(src + x + 3 * VTraits<v_int32>::vlanes()), v_dst3 = vx_load(dst + x + 3 * VTraits<v_int32>::vlanes());
+            v_int32 v_src0 = vx_بارگیری(src + x), v_dst0 = vx_بارگیری(dst + x);
+            v_int32 v_src1 = vx_بارگیری(src + x +     VTraits<v_int32>::vlanes()), v_dst1 = vx_بارگیری(dst + x +     VTraits<v_int32>::vlanes());
+            v_int32 v_src2 = vx_بارگیری(src + x + 2 * VTraits<v_int32>::vlanes()), v_dst2 = vx_بارگیری(dst + x + 2 * VTraits<v_int32>::vlanes());
+            v_int32 v_src3 = vx_بارگیری(src + x + 3 * VTraits<v_int32>::vlanes()), v_dst3 = vx_بارگیری(dst + x + 3 * VTraits<v_int32>::vlanes());
 
-            v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
+            v_uint8 v_nmask = v_eq(vx_بارگیری(ماسک + x), vx_setzero_u8());
             v_uint8 v_nmask0, v_nmask1;
             v_zip(v_nmask, v_nmask, v_nmask0, v_nmask1);
             v_uint8 v_nmask00, v_nmask01, v_nmask10, v_nmask11;
@@ -350,74 +350,74 @@ copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep,
             vx_store(dst + x + 3 * VTraits<v_int32>::vlanes(), v_dst3);
         }
         vx_cleanup();
-#endif
-        for (; x < size.width; x++)
-            if ( mask[x] )
+#پایان_اگر
+        لكل (; x < size.عرض; x++)
+            إذا ( ماسک[x] )
                 dst[x] = src[x];
     }
 }
 
-static void
-copyMaskGeneric(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size, void* _esz)
+ساكن فراغ
+copy_ماسک_Generic(ثابت uchar* _src, size_t sstep, ثابت uchar* ماسک, size_t mstep, uchar* _dst, size_t dstep, اندازه size, فراغ* _esz)
 {
     size_t k, esz = *(size_t*)_esz;
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    لكل( ; size.ارتفاع--; ماسک += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = _src;
+        ثابت uchar* src = _src;
         uchar* dst = _dst;
-        int x = 0;
-        for( ; x < size.width; x++, src += esz, dst += esz )
+        صحيح x = 0;
+        لكل( ; x < size.عرض; x++, src += esz, dst += esz )
         {
-            if( !mask[x] )
-                continue;
-            for( k = 0; k < esz; k++ )
+            إذا( !ماسک[x] )
+                استمر;
+            لكل( k = 0; k < esz; k++ )
                 dst[k] = src[k];
         }
     }
 }
 
 
-#define DEF_COPY_MASK(suffix, type) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+#تعریف_کن DEF_COPY_ماسک(suffix, type) \
+ساكن فراغ copy_ماسک_2##suffix(ثابت uchar* src, size_t sstep, ثابت uchar* ماسک, size_t mstep, \
+                             uchar* dst, size_t dstep, اندازه size, فراغ*) \
 { \
-    copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
+    copy_ماسک<type>(src, sstep, ماسک, mstep, dst, dstep, size); \
 }
 
-#if defined HAVE_IPP
-#define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+#إذا defined HAVE_IPP
+#تعریف_کن DEF_COPY_ماسک_F(suffix, type, ippfavor, ipptype) \
+ساكن فراغ copy_ماسک_2##suffix(ثابت uchar* src, size_t sstep, ثابت uchar* ماسک, size_t mstep, \
+                             uchar* dst, size_t dstep, اندازه size, فراغ*) \
 { \
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (const ipptype *)src, (int)sstep, (ipptype *)dst, (int)dstep, ippiSize(size), (const Ipp8u *)mask, (int)mstep) >= 0)\
-    copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
+    CV_IPP_پیاپی_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (ثابت ipptype *)src, (صحيح)sstep, (ipptype *)dst, (صحيح)dstep, ippi_اندازه(size), (ثابت Ipp8u *)ماسک, (صحيح)mstep) >= 0)\
+    copy_ماسک<type>(src, sstep, ماسک, mstep, dst, dstep, size); \
 }
-#else
-#define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+#وإلا
+#تعریف_کن DEF_COPY_ماسک_F(suffix, type, ippfavor, ipptype) \
+ساكن فراغ copy_ماسک_2##suffix(ثابت uchar* src, size_t sstep, ثابت uchar* ماسک, size_t mstep, \
+                             uchar* dst, size_t dstep, اندازه size, فراغ*) \
 { \
-    copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
+    copy_ماسک<type>(src, sstep, ماسک, mstep, dst, dstep, size); \
 }
-#endif
+#پایان_اگر
 
-#if IPP_VERSION_X100 == 901 // bug in IPP 9.0.1
-DEF_COPY_MASK(32sC3, Vec3i)
-DEF_COPY_MASK(8uC3, Vec3b)
-#else
-DEF_COPY_MASK_F(8uC3, Vec3b, 8u_C3MR, Ipp8u)
-DEF_COPY_MASK_F(32sC3, Vec3i, 32s_C3MR, Ipp32s)
-#endif
-DEF_COPY_MASK(8u, uchar)
-DEF_COPY_MASK(16u, ushort)
-DEF_COPY_MASK_F(32s, int, 32s_C1MR, Ipp32s)
-DEF_COPY_MASK_F(16uC3, Vec3s, 16u_C3MR, Ipp16u)
-DEF_COPY_MASK(32sC2, Vec2i)
-DEF_COPY_MASK_F(32sC4, Vec4i, 32s_C4MR, Ipp32s)
-DEF_COPY_MASK(32sC6, Vec6i)
-DEF_COPY_MASK(32sC8, Vec8i)
+#إذا IPP_نسخه_X100 == 901 // bug in IPP 9.0.1
+DEF_COPY_ماسک(32sC3, Vec3i)
+DEF_COPY_ماسک(8uC3, Vec3b)
+#وإلا
+DEF_COPY_ماسک_F(8uC3, Vec3b, 8u_C3MR, Ipp8u)
+DEF_COPY_ماسک_F(32sC3, Vec3i, 32s_C3MR, Ipp32s)
+#پایان_اگر
+DEF_COPY_ماسک(8u, uchar)
+DEF_COPY_ماسک(16u, ushort)
+DEF_COPY_ماسک_F(32s, صحيح, 32s_C1MR, Ipp32s)
+DEF_COPY_ماسک_F(16uC3, Vec3s, 16u_C3MR, Ipp16u)
+DEF_COPY_ماسک(32sC2, Vec2i)
+DEF_COPY_ماسک_F(32sC4, Vec4i, 32s_C4MR, Ipp32s)
+DEF_COPY_ماسک(32sC6, Vec6i)
+DEF_COPY_ماسک(32sC8, Vec8i)
 
-BinaryFunc copyMaskTab[] =
+دودویی_Func copy_ماسک_Tab[] =
 {
     0,
     copyMask8u,
@@ -438,164 +438,164 @@ BinaryFunc copyMaskTab[] =
     copyMask32sC8
 };
 
-BinaryFunc getCopyMaskFunc(size_t esz)
+دودویی_Func get_Copy_ماسک_Func(size_t esz)
 {
-    return esz <= 32 && copyMaskTab[esz] ? copyMaskTab[esz] : copyMaskGeneric;
+    أرجع esz <= 32 && copy_ماسک_Tab[esz] ? copy_ماسک_Tab[esz] : copy_ماسک_Generic;
 }
 
 /* dst = src */
-void Mat::copyTo( OutputArray _dst ) const
+فراغ Mat::copy_مقصد( OutputArray _dst ) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-#ifdef HAVE_CUDA
-    if (_dst.isGpuMat())
+#اگر_تعریف_شده HAVE_CUDA
+    إذا (_dst.isGpuMat())
     {
-        _dst.getGpuMat().upload(*this);
-        return;
+        _dst.getGpuMat().upload(*هذا);
+        أرجع;
     }
-#endif
+#پایان_اگر
 
-    int stype = type();
-    int dtype = _dst.type();
-    if( _dst.fixedType() && dtype != stype )
+    صحيح stype = type();
+    صحيح dtype = _dst.type();
+    إذا( _dst.fixedType() && dtype != stype )
     {
         CV_Assert( CV_MAT_CN(stype) == CV_MAT_CN(dtype) );
-        convertTo( _dst, dtype );
-        return;
+        convert_مقصد( _dst, dtype );
+        أرجع;
     }
 
-    if( dims == 0 && empty() )
+    إذا( dims == 0 && empty() )
     {
         _dst.release();
-        void* obj = _dst.getObj();
-        if (_dst.isMat())
+        فراغ* obj = _dst.getObj();
+        إذا (_dst.isMat())
             reinterpret_cast<Mat*>(obj)->flags = Mat::MAGIC_VAL | Mat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isUMat())
+        وإلا إذا (_dst.isUMat())
             reinterpret_cast<UMat*>(obj)->flags = UMat::MAGIC_VAL | UMat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isGpuMat())
+        وإلا إذا (_dst.isGpuMat())
             reinterpret_cast<cuda::GpuMat*>(obj)->flags = stype;
-        return;
+        أرجع;
     }
 
-    bool allowTransposed = dims == 1 ||
-        _dst.kind() == _InputArray::STD_VECTOR ||
-        (_dst.fixedSize() && _dst.dims() == 1);
-    if( _dst.isUMat() )
+    منطقي allowTransposed = dims == 1 ||
+        _dst.نوع() == درون_داد_Array_2::STD_وکتور ||
+        (_dst.fixed_اندازه() && _dst.dims() == 1);
+    إذا( _dst.isUMat() )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
-        if (empty())
-            return;
+        إذا (empty())
+            أرجع;
         UMat dst = _dst.getUMat();
-        CV_Assert(dst.u != NULL);
-        size_t i, sz[CV_MAX_DIM] = {1}, dstofs[CV_MAX_DIM] = {0}, esz = CV_ELEM_SIZE(stype);
+        CV_Assert(dst.u != عدم);
+        size_t i, sz[CV_MAX_DIM] = {1}, dstofs[CV_MAX_DIM] = {0}, esz = CV_ELEM_اندازه(stype);
         CV_Assert(dims >= 0 && dims < CV_MAX_DIM);
-        for( i = 0; i < (size_t)dims; i++ )
+        لكل( i = 0; i < (size_t)dims; i++ )
             sz[i] = size.p[i];
-        int lastdim = dims >= 1 ? dims-1 : 0;
+        صحيح lastdim = dims >= 1 ? dims-1 : 0;
         sz[lastdim] *= esz;
         dst.ndoffset(dstofs);
         dstofs[lastdim] *= esz;
-        dst.u->currAllocator->upload(dst.u, data, std::max(dims, 1), sz, dstofs, dst.step.p, step.p);
-        return;
+        dst.u->currAllocator->upload(dst.u, داده, std::max(dims, 1), sz, dstofs, dst.گام.p, گام.p);
+        أرجع;
     }
 
-    if( dims <= 2 )
+    إذا( dims <= 2 )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
         Mat dst = _dst.getMat();
-        if( data == dst.data )
-            return;
+        إذا( داده == dst.داده )
+            أرجع;
 
-        if( rows > 0 && cols > 0 )
+        إذا( ردیفها > 0 && تعداد_ستون > 0 )
         {
-            Mat src = *this;
-            Size sz = getContinuousSize2D(src, dst, (int)elemSize());
-            CV_CheckGE(sz.width, 0, "");
+            Mat src = *هذا;
+            اندازه sz = getContinuousSize2D(src, dst, (صحيح)elem_اندازه());
+            CV_CheckGE(sz.عرض, 0, "");
 
-            const uchar* sptr = src.data;
-            uchar* dptr = dst.data;
+            ثابت uchar* sptr = src.داده;
+            uchar* dptr = dst.داده;
 
-#if IPP_VERSION_X100 >= 201700
-            CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (int)src.step, dptr, (int)dst.step, ippiSizeL(sz.width, sz.height)) >= 0)
-#endif
+#إذا IPP_نسخه_X100 >= 201700
+            CV_IPP_پیاپی_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (صحيح)src.گام, dptr, (صحيح)dst.گام, ippi_اندازه_L(sz.عرض, sz.ارتفاع)) >= 0)
+#پایان_اگر
 
-            for (; sz.height--; sptr += src.step, dptr += dst.step)
-                memcpy(dptr, sptr, sz.width);
+            لكل (; sz.ارتفاع--; sptr += src.گام, dptr += dst.گام)
+                کپی_حافظه(dptr, sptr, sz.عرض);
         }
-        return;
+        أرجع;
     }
 
     _dst.create( size, stype );
     Mat dst = _dst.getMat();
-    if( data == dst.data )
-        return;
+    إذا( داده == dst.داده )
+        أرجع;
 
-    if( total() != 0 )
+    إذا( مجموع() != 0 )
     {
-        const Mat* arrays[] = { this, &dst };
+        ثابت Mat* arrays[] = { هذا, &dst };
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs, 2);
-        size_t sz = it.size*elemSize();
+        size_t sz = it.size*elem_اندازه();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
-            memcpy(ptrs[1], ptrs[0], sz);
+        لكل( size_t i = 0; i < it.nplanes; i++, ++it )
+            کپی_حافظه(ptrs[1], ptrs[0], sz);
     }
 }
 
-#ifdef HAVE_IPP
-static bool ipp_copyTo(const Mat &src, Mat &dst, const Mat &mask)
+#اگر_تعریف_شده HAVE_IPP
+ساكن منطقي ipp_copy_مقصد(ثابت Mat &src, Mat &dst, ثابت Mat &ماسک)
 {
-#ifdef HAVE_IPP_IW_LL
+#اگر_تعریف_شده HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.channels() > 1 || mask.depth() != CV_8U)
-        return false;
+    إذا(ماسک.channels() > 1 || ماسک.عمق() != CV_8U)
+        أرجع خطأ;
 
-    if (src.dims <= 2)
+    إذا (src.dims <= 2)
     {
-        IppiSize size = ippiSize(src.size());
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMask, src.ptr(), (int)src.step, dst.ptr(), (int)dst.step, size, (int)src.elemSize1(), src.channels(), mask.ptr(), (int)mask.step) >= 0;
+        Ippi_اندازه size = ippi_اندازه(src.size());
+        أرجع CV_INSTRUMENT_FUN_IPP(llwi_Copy_ماسک, src.ptr(), (صحيح)src.گام, dst.ptr(), (صحيح)dst.گام, size, (صحيح)src.elemSize1(), src.channels(), ماسک.ptr(), (صحيح)ماسک.گام) >= 0;
     }
-    else
+    وإلا
     {
-        const Mat      *arrays[] = {&src, &dst, &mask, NULL};
-        uchar          *ptrs[3]  = {NULL};
+        ثابت Mat      *arrays[] = {&src, &dst, &ماسک, عدم};
+        uchar          *ptrs[3]  = {عدم};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize size = ippiSize(it.size, 1);
+        Ippi_اندازه size = ippi_اندازه(it.size, 1);
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        لكل (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMask, ptrs[0], 0, ptrs[1], 0, size, (int)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
-                return false;
+            إذا(CV_INSTRUMENT_FUN_IPP(llwi_Copy_ماسک, ptrs[0], 0, ptrs[1], 0, size, (صحيح)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
+                أرجع خطأ;
         }
-        return true;
+        أرجع درست;
     }
-#else
-    CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(mask);
-    return false;
-#endif
+#وإلا
+    CV_استفادهنشده(src); CV_استفادهنشده(dst); CV_استفادهنشده(ماسک);
+    أرجع خطأ;
+#پایان_اگر
 }
-#endif
+#پایان_اگر
 
-void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
+فراغ Mat::copy_مقصد( OutputArray _dst, درون_داد_Array ماسک_2 ) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    Mat mask = _mask.getMat();
-    if( !mask.data )
+    Mat ماسک = ماسک_2.getMat();
+    إذا( !ماسک.داده )
     {
-        copyTo(_dst);
-        return;
+        copy_مقصد(_dst);
+        أرجع;
     }
 
-    int cn = channels(), mcn = mask.channels();
-    CV_Assert( (mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) && (mcn == 1 || mcn == cn) );
-    bool colorMask = mcn > 1;
-    if( dims <= 2 )
+    صحيح cn = channels(), mcn = ماسک.channels();
+    CV_Assert( (ماسک.عمق() == CV_8U || ماسک.عمق() == CV_8S || ماسک.عمق() == CV_Bool) && (mcn == 1 || mcn == cn) );
+    منطقي color_ماسک = mcn > 1;
+    إذا( dims <= 2 )
     {
-        CV_Assert( size() == mask.size() );
+        CV_Assert( size() == ماسک.size() );
     }
 
     Mat dst;
@@ -604,52 +604,52 @@ void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
         _dst.create(size, type()); // TODO Prohibit 'dst' re-creation, user should pass it explicitly with correct size/type or empty
         dst = _dst.getMat();
 
-        if (dst.data != dst0.data) // re-allocation happened
+        إذا (dst.داده != dst0.داده) // re-allocation happened
         {
-#ifdef OPENCV_FUTURE
+#اگر_تعریف_شده OPENCV_FUTURE
             CV_Assert(dst0.empty() &&
                 "copyTo(): dst size/type mismatch (looks like a bug) - use dst.release() before copyTo() call to suppress this message");
-#endif
+#پایان_اگر
             dst = Scalar(0); // do not leave dst uninitialized
         }
     }
 
-    CV_IPP_RUN_FAST(ipp_copyTo(*this, dst, mask))
-    if ( this->dims <= 2 ) {
-        if ( this->size() == dst.size() && this->size() == dst.size() ) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, this->step, dst.data, dst.step, this->cols, this->rows, this->type(), mask.data, mask.step, mask.type());
+    CV_IPP_پیاپی_FAST(ipp_copy_مقصد(*هذا, dst, ماسک))
+    إذا ( هذا->dims <= 2 ) {
+        إذا ( هذا->size() == dst.size() && هذا->size() == dst.size() ) {
+            CALL_HAL(copy_مقصد_ماسک, cv_hal_copy_مقصد_Masked, هذا->داده, هذا->گام, dst.داده, dst.گام, هذا->تعداد_ستون, هذا->ردیفها, هذا->type(), ماسک.داده, ماسک.گام, ماسک.type());
         }
     }
-    else if ( this->isContinuous() && dst.isContinuous() && mask.isContinuous() )
+    وإلا إذا ( هذا->isContinuous() && dst.isContinuous() && ماسک.isContinuous() )
     {
-        size_t sz = this->total();
-        if (sz < INT_MAX) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, 0, dst.data, 0, (int)sz, 1, this->type(), mask.data, 0, mask.type());
+        size_t sz = هذا->مجموع();
+        إذا (sz < بیشترین_صحیح) {
+            CALL_HAL(copy_مقصد_ماسک, cv_hal_copy_مقصد_Masked, هذا->داده, 0, dst.داده, 0, (صحيح)sz, 1, هذا->type(), ماسک.داده, 0, ماسک.type());
         }
     }
 
-    size_t esz = colorMask ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    size_t esz = color_ماسک ? elemSize1() : elem_اندازه();
+    دودویی_Func copymask = get_Copy_ماسک_Func(esz);
 
-    if( dims <= 2 )
+    إذا( dims <= 2 )
     {
-        Mat src = *this;
-        Size sz = getContinuousSize2D(src, dst, mask, mcn);
-        copymask(src.data, src.step, mask.data, mask.step, dst.data, dst.step, sz, &esz);
-        return;
+        Mat src = *هذا;
+        اندازه sz = getContinuousSize2D(src, dst, ماسک, mcn);
+        copymask(src.داده, src.گام, ماسک.داده, ماسک.گام, dst.داده, dst.گام, sz, &esz);
+        أرجع;
     }
 
-    const Mat* arrays[] = { this, &dst, &mask, 0 };
+    ثابت Mat* arrays[] = { هذا, &dst, &ماسک, 0 };
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    Size sz((int)(it.size*mcn), 1);
+    اندازه sz((صحيح)(it.size*mcn), 1);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it )
         copymask(ptrs[0], 0, ptrs[2], 0, ptrs[1], 0, sz, &esz);
 }
 
 /* dst = src */
-void Mat::copyAt( OutputArray _dst ) const
+فراغ Mat::copyAt( OutputArray _dst ) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -657,9 +657,9 @@ void Mat::copyAt( OutputArray _dst ) const
     CV_CheckTrue( !dst.empty(), "dst must not be empty" );
     CV_CheckTypeEQ(type(), dst.type(), "Make the type of dst the same as src");
     CV_CheckEQ(size(), dst.size(), "Make the size of dst the same as src");
-    copyTo(_dst);
+    copy_مقصد(_dst);
 }
-void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
+فراغ Mat::copyAt( OutputArray _dst, درون_داد_Array ماسک_2 ) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -667,241 +667,241 @@ void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
     CV_CheckTrue( !dst.empty(), "dst must not be empty" );
     CV_CheckTypeEQ(type(), dst.type(), "Make the type of dst the same as src");
     CV_CheckEQ(size(), dst.size(), "Make the size of dst the same as src");
-    copyTo(_dst, _mask);
+    copy_مقصد(_dst, ماسک_2);
 }
 
 
-static bool can_apply_memset(const Mat &mat, const Scalar &s, int &fill_value)
+ساكن منطقي can_apply_memset(ثابت Mat &mat, ثابت Scalar &s, صحيح &fill_مقدار)
 {
     // check if depth is 1 byte.
-    switch (mat.depth())
+    بدل (mat.عمق())
     {
-    case CV_8U: fill_value = saturate_cast<uchar>( s.val[0] ); break;
-    case CV_8S: fill_value = saturate_cast<schar>( s.val[0] ); break;
-    default: return false;
+    حالة CV_8U: fill_مقدار = saturate_cast<uchar>( s.val[0] ); اكسر;
+    حالة CV_8S: fill_مقدار = saturate_cast<schar>( s.val[0] ); اكسر;
+    افتراضي: أرجع خطأ;
     }
 
     // check if all element is same.
-    const int64* is = (const int64*)&s.val[0];
-    switch (mat.channels())
+    ثابت int64* is = (ثابت int64*)&s.val[0];
+    بدل (mat.channels())
     {
-    case 1: return true;
-    case 2: return (is[0] == is[1]);
-    case 3: return (is[0] == is[1] && is[1] == is[2]);
-    case 4: return (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
-    default: return false;
+    حالة 1: أرجع درست;
+    حالة 2: أرجع (is[0] == is[1]);
+    حالة 3: أرجع (is[0] == is[1] && is[1] == is[2]);
+    حالة 4: أرجع (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
+    افتراضي: أرجع خطأ;
     }
 }
 
-Mat& Mat::operator = (const Scalar& s)
+Mat& Mat::عملگر = (ثابت Scalar& s)
 {
     CV_INSTRUMENT_REGION();
 
-    if (this->empty())
-        return *this;
+    إذا (هذا->empty())
+        أرجع *هذا;
 
-    const Mat* arrays[] = { this };
+    ثابت Mat* arrays[] = { هذا };
     uchar* dptr;
     NAryMatIterator it(arrays, &dptr, 1);
-    size_t elsize = it.size*elemSize();
-    const int64* is = (const int64*)&s.val[0];
+    size_t elsize = it.size*elem_اندازه();
+    ثابت int64* is = (ثابت int64*)&s.val[0];
 
-    if( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
+    إذا( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
     {
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        لكل( size_t i = 0; i < it.nplanes; i++, ++it )
             memset( dptr, 0, elsize );
     }
-    else
+    وإلا
     {
-        int fill_value = 0;
-        if ( can_apply_memset(*this, s, fill_value) )
+        صحيح fill_مقدار = 0;
+        إذا ( can_apply_memset(*هذا, s, fill_مقدار) )
         {
-            for (size_t i = 0; i < it.nplanes; i++, ++it)
-                memset(dptr, fill_value, elsize);
-            return *this;
+            لكل (size_t i = 0; i < it.nplanes; i++, ++it)
+                memset(dptr, fill_مقدار, elsize);
+            أرجع *هذا;
         }
 
-        if( it.nplanes > 0 )
+        إذا( it.nplanes > 0 )
         {
-            double scalar[12];
-            scalarToRawData(s, scalar, type(), 12);
-            size_t blockSize = 12*elemSize1();
+            مزدوج scalar[12];
+            scalar_مقصد_Raw_داده(s, scalar, type(), 12);
+            size_t بلوک_اندازه_2 = 12*elemSize1();
 
-            for( size_t j = 0; j < elsize; j += blockSize )
+            لكل( size_t j = 0; j < elsize; j += بلوک_اندازه_2 )
             {
-                size_t sz = MIN(blockSize, elsize - j);
-                CV_Assert(sz <= sizeof(scalar));
-                memcpy( dptr + j, scalar, sz );
+                size_t sz = MIN(بلوک_اندازه_2, elsize - j);
+                CV_Assert(sz <= حجم(scalar));
+                کپی_حافظه( dptr + j, scalar, sz );
             }
         }
 
-        for( size_t i = 1; i < it.nplanes; i++ )
+        لكل( size_t i = 1; i < it.nplanes; i++ )
         {
             ++it;
-            memcpy( dptr, data, elsize );
+            کپی_حافظه( dptr, داده, elsize );
         }
     }
-    return *this;
+    أرجع *هذا;
 }
 
-#ifdef HAVE_IPP
-static bool ipp_Mat_setTo_Mat(Mat &dst, Mat &_val, Mat &mask)
+#اگر_تعریف_شده HAVE_IPP
+ساكن منطقي ipp_Mat_مجموعه_مقصد_Mat(Mat &dst, Mat &_val, Mat &ماسک)
 {
-#ifdef HAVE_IPP_IW_LL
+#اگر_تعریف_شده HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.empty())
-        return false;
+    إذا(ماسک.empty())
+        أرجع خطأ;
 
-    if(mask.depth() != CV_8U || mask.channels() > 1)
-        return false;
+    إذا(ماسک.عمق() != CV_8U || ماسک.channels() > 1)
+        أرجع خطأ;
 
-    if(dst.channels() > 4)
-        return false;
+    إذا(dst.channels() > 4)
+        أرجع خطأ;
 
-    if (dst.depth() == CV_32F)
+    إذا (dst.عمق() == CV_32F)
     {
-        for (int i = 0; i < (int)(_val.total()); i++)
+        لكل (صحيح i = 0; i < (صحيح)(_val.مجموع()); i++)
         {
-            float v = (float)(_val.at<double>(i));  // cast to float
-            if (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
-                return false;
+            عائم v = (عائم)(_val.at<مزدوج>(i));  // cast to float
+            إذا (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
+                أرجع خطأ;
         }
     }
 
-    if(dst.dims <= 2)
+    إذا(dst.dims <= 2)
     {
-        IppiSize            size     = ippiSize(dst.size());
-        IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        Ippi_اندازه            size     = ippi_اندازه(dst.size());
+        Ipp_داده_Type         داده_Type = ippi_Get_داده_Type(dst.عمق());
+        ::ipp::Iw_مقدار_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        return CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, dst.ptr(), (int)dst.step, size, dataType, dst.channels(), mask.ptr(), (int)mask.step) >= 0;
+        أرجع CV_INSTRUMENT_FUN_IPP(llwi_مجموعه_ماسک, s, dst.ptr(), (صحيح)dst.گام, size, داده_Type, dst.channels(), ماسک.ptr(), (صحيح)ماسک.گام) >= 0;
     }
-    else
+    وإلا
     {
-        const Mat      *arrays[] = {&dst, mask.empty()?NULL:&mask, NULL};
-        uchar          *ptrs[2]  = {NULL};
+        ثابت Mat      *arrays[] = {&dst, ماسک.empty()?عدم:&ماسک, عدم};
+        uchar          *ptrs[2]  = {عدم};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize            size     = {(int)it.size, 1};
-        IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        Ippi_اندازه            size     = {(صحيح)it.size, 1};
+        Ipp_داده_Type         داده_Type = ippi_Get_داده_Type(dst.عمق());
+        ::ipp::Iw_مقدار_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it)
+        لكل( size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, ptrs[0], 0, size, dataType, dst.channels(), ptrs[1], 0) < 0)
-                return false;
+            إذا(CV_INSTRUMENT_FUN_IPP(llwi_مجموعه_ماسک, s, ptrs[0], 0, size, داده_Type, dst.channels(), ptrs[1], 0) < 0)
+                أرجع خطأ;
         }
-        return true;
+        أرجع درست;
     }
-#else
-    CV_UNUSED(dst); CV_UNUSED(_val); CV_UNUSED(mask);
-    return false;
-#endif
+#وإلا
+    CV_استفادهنشده(dst); CV_استفادهنشده(_val); CV_استفادهنشده(ماسک);
+    أرجع خطأ;
+#پایان_اگر
 }
-#endif
+#پایان_اگر
 
-Mat& Mat::setTo(InputArray _value, InputArray _mask)
+Mat& Mat::مجموعه_مقصد(درون_داد_Array مقدار, درون_داد_Array ماسک_2)
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    إذا( empty() )
+        أرجع *هذا;
 
-    Mat value = _value.getMat(), mask = _mask.getMat();
+    Mat value = مقدار.getMat(), ماسک = ماسک_2.getMat();
 
-    CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::MAT ));
-    int cn = channels(), mcn = mask.channels();
-    CV_Assert( mask.empty() || ((mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) &&
-               (mcn == 1 || mcn == cn) && size == mask.size) );
+    CV_Assert( checkScalar(value, type(), مقدار.نوع(), درون_داد_Array_2::MAT ));
+    صحيح cn = channels(), mcn = ماسک.channels();
+    CV_Assert( ماسک.empty() || ((ماسک.عمق() == CV_8U || ماسک.عمق() == CV_8S || ماسک.عمق() == CV_Bool) &&
+               (mcn == 1 || mcn == cn) && size == ماسک.size) );
 
-    CV_IPP_RUN_FAST(ipp_Mat_setTo_Mat(*this, value, mask), *this)
+    CV_IPP_پیاپی_FAST(ipp_Mat_مجموعه_مقصد_Mat(*هذا, value, ماسک), *هذا)
 
-    size_t esz = mcn > 1 ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    size_t esz = mcn > 1 ? elemSize1() : elem_اندازه();
+    دودویی_Func copymask = get_Copy_ماسک_Func(esz);
 
-    const Mat* arrays[] = { this, !mask.empty() ? &mask : 0, 0 };
+    ثابت Mat* arrays[] = { هذا, !ماسک.empty() ? &ماسک : 0, 0 };
     uchar* ptrs[2]={0,0};
     NAryMatIterator it(arrays, ptrs);
-    int totalsz = (int)it.size*mcn;
-    int blockSize0 = std::min(totalsz, (int)((BLOCK_SIZE + esz-1)/esz));
-    blockSize0 -= blockSize0 % mcn;    // must be divisible without remainder for unrolling and advancing
-    AutoBuffer<uchar> _scbuf(blockSize0*esz + 32);
-    uchar* scbuf = alignPtr((uchar*)_scbuf.data(), (int)sizeof(double));
-    convertAndUnrollScalar( value, type(), scbuf, blockSize0/mcn );
+    صحيح totalsz = (صحيح)it.size*mcn;
+    صحيح بلوک_Size0 = std::min(totalsz, (صحيح)((بلوک_اندازه + esz-1)/esz));
+    بلوک_Size0 -= بلوک_Size0 % mcn;    // must be divisible without remainder for unrolling and advancing
+    Auto_میانگیر<uchar> _scbuf(بلوک_Size0*esz + 32);
+    uchar* scbuf = alignPtr((uchar*)_scbuf.داده(), (صحيح)حجم(مزدوج));
+    convertAndUnrollScalar( value, type(), scbuf, بلوک_Size0/mcn );
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( int j = 0; j < totalsz; j += blockSize0 )
+        لكل( صحيح j = 0; j < totalsz; j += بلوک_Size0 )
         {
-            Size sz(std::min(blockSize0, totalsz - j), 1);
-            size_t blockSize = sz.width*esz;
-            if( ptrs[1] )
+            اندازه sz(std::min(بلوک_Size0, totalsz - j), 1);
+            size_t بلوک_اندازه_2 = sz.عرض*esz;
+            إذا( ptrs[1] )
             {
                 copymask(scbuf, 0, ptrs[1], 0, ptrs[0], 0, sz, &esz);
-                ptrs[1] += sz.width;
+                ptrs[1] += sz.عرض;
             }
-            else
-                memcpy(ptrs[0], scbuf, blockSize);
-            ptrs[0] += blockSize;
+            وإلا
+                کپی_حافظه(ptrs[0], scbuf, بلوک_اندازه_2);
+            ptrs[0] += بلوک_اندازه_2;
         }
     }
-    return *this;
+    أرجع *هذا;
 }
 
 
-Mat& Mat::setZero()
+Mat& Mat::مجموعه_Zero()
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    إذا( empty() )
+        أرجع *هذا;
 
-    size_t esz = elemSize();
+    size_t esz = elem_اندازه();
 
-    const Mat* arrays[] = { this, 0 };
+    ثابت Mat* arrays[] = { هذا, 0 };
     uchar* ptrs[]={0};
     NAryMatIterator it(arrays, ptrs);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it )
         memset(ptrs[0], 0, esz*it.size);
-    return *this;
+    أرجع *هذا;
 }
 
 
-#if defined HAVE_OPENCL && !defined __APPLE__
+#إذا defined HAVE_OPENCL && !defined __APPLE__
 
-static bool ocl_repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+ساكن منطقي ocl_repeat(درون_داد_Array _src, صحيح ny, صحيح nx, OutputArray _dst)
 {
-    if (ny == 1 && nx == 1)
+    إذا (ny == 1 && nx == 1)
     {
-        _src.copyTo(_dst);
-        return true;
+        _src.copy_مقصد(_dst);
+        أرجع درست;
     }
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1,
-            kercn = ocl::predictOptimalVectorWidth(_src, _dst);
+    صحيح type = _src.type(), عمق = CV_MAT_عمق(type), cn = CV_MAT_CN(type),
+            ردیفها_در_هر_WI = ocl::Device::getDefault().isIntel() ? 4 : 1,
+            kercn = ocl::predict_Optimal_وکتور_عرض(_src, _dst);
 
     ocl::Kernel k("repeat", ocl::core::repeat_oclsrc,
                   format("-D T=%s -D nx=%d -D ny=%d -D rowsPerWI=%d -D cn=%d",
-                         ocl::memopTypeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         nx, ny, rowsPerWI, kercn));
-    if (k.empty())
-        return false;
+                         ocl::memop_Type_مقصد_Str(CV_MAKE_TYPE(عمق, kercn)),
+                         nx, ny, ردیفها_در_هر_WI, kercn));
+    إذا (k.empty())
+        أرجع خطأ;
 
     UMat src = _src.getUMat(), dst = _dst.getUMat();
-    k.args(ocl::KernelArg::ReadOnly(src, cn, kercn), ocl::KernelArg::WriteOnlyNoSize(dst));
+    k.آرگومانها(ocl::KernelArg::ReadOnly(src, cn, kercn), ocl::KernelArg::Write_Only_No_اندازه(dst));
 
-    size_t globalsize[] = { (size_t)src.cols * cn / kercn, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[] = { (size_t)src.تعداد_ستون * cn / kercn, ((size_t)src.ردیفها + ردیفها_در_هر_WI - 1) / ردیفها_در_هر_WI };
+    أرجع k.پیاپی(2, globalsize, عدم, خطأ);
 }
 
-#endif
+#پایان_اگر
 
-void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+فراغ repeat(درون_داد_Array _src, صحيح ny, صحيح nx, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -909,43 +909,43 @@ void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
     CV_Assert( _src.dims() <= 2 );
     CV_Assert( ny > 0 && nx > 0 );
 
-    Size ssize = _src.size();
-    if( ssize.empty() )
+    اندازه ssize = _src.size();
+    إذا( ssize.empty() )
     {
         _dst.create(0, 0, _src.type());
-        return;
+        أرجع;
     }
-    CV_Assert( (int64_t)ssize.height * ny <= INT_MAX && (int64_t)ssize.width * nx <= INT_MAX );
-    _dst.create(ssize.height*ny, ssize.width*nx, _src.type());
+    CV_Assert( (int64_t)ssize.ارتفاع * ny <= بیشترین_صحیح && (int64_t)ssize.عرض * nx <= بیشترین_صحیح );
+    _dst.create(ssize.ارتفاع*ny, ssize.عرض*nx, _src.type());
 
-#if !defined __APPLE__
-    CV_OCL_RUN(_dst.isUMat(),
+#إذا !defined __APPLE__
+    CV_OCL_پیاپی(_dst.isUMat(),
                ocl_repeat(_src, ny, nx, _dst))
-#endif
+#پایان_اگر
 
     Mat src = _src.getMat(), dst = _dst.getMat();
-    Size dsize = dst.size();
-    int esz = (int)src.elemSize();
-    int x, y;
-    ssize.width *= esz; dsize.width *= esz;
+    اندازه dsize = dst.size();
+    صحيح esz = (صحيح)src.elem_اندازه();
+    صحيح x, y;
+    ssize.عرض *= esz; dsize.عرض *= esz;
 
-    for( y = 0; y < ssize.height; y++ )
+    لكل( y = 0; y < ssize.ارتفاع; y++ )
     {
-        for( x = 0; x < dsize.width; x += ssize.width )
-            memcpy( dst.ptr(y) + x, src.ptr(y), ssize.width );
+        لكل( x = 0; x < dsize.عرض; x += ssize.عرض )
+            کپی_حافظه( dst.ptr(y) + x, src.ptr(y), ssize.عرض );
     }
 
-    for( ; y < dsize.height; y++ )
-        memcpy( dst.ptr(y), dst.ptr(y - ssize.height), dsize.width );
+    لكل( ; y < dsize.ارتفاع; y++ )
+        کپی_حافظه( dst.ptr(y), dst.ptr(y - ssize.ارتفاع), dsize.عرض );
 }
 
-Mat repeat(const Mat& src, int ny, int nx)
+Mat repeat(ثابت Mat& src, صحيح ny, صحيح nx)
 {
-    if( nx == 1 && ny == 1 )
-        return src;
+    إذا( nx == 1 && ny == 1 )
+        أرجع src;
     Mat dst;
     repeat(src, ny, nx, dst);
-    return dst;
+    أرجع dst;
 }
 
 
@@ -961,346 +961,346 @@ Mat repeat(const Mat& src, int ny, int nx)
  * BORDER_WRAP:          cdefgh|abcdefgh|abcdefg
  * BORDER_CONSTANT:      iiiiii|abcdefgh|iiiiiii  with some specified 'i'
  */
-int cv::borderInterpolate( int p, int len, int borderType )
+صحيح cv::borderInterpolate( صحيح p, صحيح len, صحيح borderType )
 {
     CV_TRACE_FUNCTION_VERBOSE();
 
     CV_DbgAssert(len > 0);
 
-#ifdef CV_STATIC_ANALYSIS
-    if(p >= 0 && p < len)
-#else
-    if( (unsigned)p < (unsigned)len )
-#endif
+#اگر_تعریف_شده CV_STATIC_ANALYSIS
+    إذا(p >= 0 && p < len)
+#وإلا
+    إذا( (بیعلامت)p < (بیعلامت)len )
+#پایان_اگر
         ;
-    else if( borderType == BORDER_REPLICATE )
+    وإلا إذا( borderType == BORDER_REPLICATE )
         p = p < 0 ? 0 : len - 1;
-    else if( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
+    وإلا إذا( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
     {
-        int delta = borderType == BORDER_REFLECT_101;
-        if( len == 1 )
-            return 0;
-        do
+        صحيح delta = borderType == BORDER_REFLECT_101;
+        إذا( len == 1 )
+            أرجع 0;
+        افعل
         {
-            if( p < 0 )
+            إذا( p < 0 )
                 p = -p - 1 + delta;
-            else
+            وإلا
                 p = len - 1 - (p - len) - delta;
         }
-#ifdef CV_STATIC_ANALYSIS
-        while(p < 0 || p >= len);
-#else
-        while( (unsigned)p >= (unsigned)len );
-#endif
+#اگر_تعریف_شده CV_STATIC_ANALYSIS
+        طالما(p < 0 || p >= len);
+#وإلا
+        طالما( (بیعلامت)p >= (بیعلامت)len );
+#پایان_اگر
     }
-    else if( borderType == BORDER_WRAP )
+    وإلا إذا( borderType == BORDER_WRAP )
     {
         CV_Assert(len > 0);
-        if( p < 0 || p >= len )
+        إذا( p < 0 || p >= len )
         {
             int64_t p64 = p;
             p64 %= (int64_t)len;
-            if( p64 < 0 )
+            إذا( p64 < 0 )
                 p64 += len;
-            p = (int)p64;
+            p = (صحيح)p64;
         }
     }
-    else if( borderType == BORDER_CONSTANT )
+    وإلا إذا( borderType == BORDER_CONSTANT )
         p = -1;
-    else
+    وإلا
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported border type" );
-    return p;
+    أرجع p;
 }
 
-namespace
+نطاق
 {
 
-void copyMakeBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
-                        uchar* dst, size_t dststep, cv::Size dstroi,
-                        int top, int left, int cn, int borderType )
+فراغ copyMakeBorder_8u( ثابت uchar* src, size_t srcstep, cv::اندازه srcroi,
+                        uchar* dst, size_t dststep, cv::اندازه dstroi,
+                        صحيح بالاترین_2, صحيح چپ, صحيح cn, صحيح borderType )
 {
-    const int isz = (int)sizeof(int);
-    int i, j, k, elemSize = 1;
-    bool intMode = false;
+    ثابت صحيح isz = (صحيح)حجم(صحيح);
+    صحيح i, j, k, elem_اندازه = 1;
+    منطقي int_نما = خطأ;
 
-    if( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
+    إذا( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
     {
         cn /= isz;
-        elemSize = isz;
-        intMode = true;
+        elem_اندازه = isz;
+        int_نما = درست;
     }
 
-    cv::AutoBuffer<int> _tab((dstroi.width - srcroi.width)*cn);
-    int* tab = _tab.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    cv::Auto_میانگیر<صحيح> _tab((dstroi.عرض - srcroi.عرض)*cn);
+    صحيح* tab = _tab.داده();
+    صحيح راست = dstroi.عرض - srcroi.عرض - چپ;
+    صحيح bottom = dstroi.ارتفاع - srcroi.ارتفاع - بالاترین_2;
 
-    for( i = 0; i < left; i++ )
+    لكل( i = 0; i < چپ; i++ )
     {
-        j = cv::borderInterpolate(i - left, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
+        j = cv::borderInterpolate(i - چپ, srcroi.عرض, borderType)*cn;
+        لكل( k = 0; k < cn; k++ )
             tab[i*cn + k] = j + k;
     }
 
-    for( i = 0; i < right; i++ )
+    لكل( i = 0; i < راست; i++ )
     {
-        j = cv::borderInterpolate(srcroi.width + i, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
-            tab[(i+left)*cn + k] = j + k;
+        j = cv::borderInterpolate(srcroi.عرض + i, srcroi.عرض, borderType)*cn;
+        لكل( k = 0; k < cn; k++ )
+            tab[(i+چپ)*cn + k] = j + k;
     }
 
-    srcroi.width *= cn;
-    dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    srcroi.عرض *= cn;
+    dstroi.عرض *= cn;
+    چپ *= cn;
+    راست *= cn;
 
-    uchar* dstInner = dst + dststep*top + left*elemSize;
+    uchar* dstInner = dst + dststep*بالاترین_2 + چپ*elem_اندازه;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    لكل( i = 0; i < srcroi.ارتفاع; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
-            memcpy(dstInner, src, srcroi.width*elemSize);
+        إذا( dstInner != src )
+            کپی_حافظه(dstInner, src, srcroi.عرض*elem_اندازه);
 
-        if( intMode )
+        إذا( int_نما )
         {
-            const int* isrc = (int*)src;
-            int* idstInner = (int*)dstInner;
-            for( j = 0; j < left; j++ )
-                idstInner[j - left] = isrc[tab[j]];
-            for( j = 0; j < right; j++ )
-                idstInner[j + srcroi.width] = isrc[tab[j + left]];
+            ثابت صحيح* isrc = (صحيح*)src;
+            صحيح* idstInner = (صحيح*)dstInner;
+            لكل( j = 0; j < چپ; j++ )
+                idstInner[j - چپ] = isrc[tab[j]];
+            لكل( j = 0; j < راست; j++ )
+                idstInner[j + srcroi.عرض] = isrc[tab[j + چپ]];
         }
-        else
+        وإلا
         {
-            for( j = 0; j < left; j++ )
-                dstInner[j - left] = src[tab[j]];
-            for( j = 0; j < right; j++ )
-                dstInner[j + srcroi.width] = src[tab[j + left]];
+            لكل( j = 0; j < چپ; j++ )
+                dstInner[j - چپ] = src[tab[j]];
+            لكل( j = 0; j < راست; j++ )
+                dstInner[j + srcroi.عرض] = src[tab[j + چپ]];
         }
     }
 
-    dstroi.width *= elemSize;
+    dstroi.عرض *= elem_اندازه;
 
-    for( i = 0; i < top; i++ )
+    لكل( i = 0; i < بالاترین_2; i++ )
     {
-        j = cv::borderInterpolate(i - top, srcroi.height, borderType);
-        memcpy(dst + i*dststep, dst + (top+j)*dststep, dstroi.width);
+        j = cv::borderInterpolate(i - بالاترین_2, srcroi.ارتفاع, borderType);
+        کپی_حافظه(dst + i*dststep, dst + (بالاترین_2+j)*dststep, dstroi.عرض);
     }
 
-    dst += dststep*top;
-    for( i = 0; i < bottom; i++ )
+    dst += dststep*بالاترین_2;
+    لكل( i = 0; i < bottom; i++ )
     {
-        j = cv::borderInterpolate(i + srcroi.height, srcroi.height, borderType);
-        memcpy(dst + (i + srcroi.height)*dststep, dst + j*dststep, dstroi.width);
+        j = cv::borderInterpolate(i + srcroi.ارتفاع, srcroi.ارتفاع, borderType);
+        کپی_حافظه(dst + (i + srcroi.ارتفاع)*dststep, dst + j*dststep, dstroi.عرض);
     }
 }
 
 
-void copyMakeConstBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
-                             uchar* dst, size_t dststep, cv::Size dstroi,
-                             int top, int left, int cn, const uchar* value )
+فراغ copyMakeConstBorder_8u( ثابت uchar* src, size_t srcstep, cv::اندازه srcroi,
+                             uchar* dst, size_t dststep, cv::اندازه dstroi,
+                             صحيح بالاترین_2, صحيح چپ, صحيح cn, ثابت uchar* value )
 {
-    int i, j;
-    cv::AutoBuffer<uchar> _constBuf(dstroi.width*cn);
-    uchar* constBuf = _constBuf.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    صحيح i, j;
+    cv::Auto_میانگیر<uchar> _constBuf(dstroi.عرض*cn);
+    uchar* constBuf = _constBuf.داده();
+    صحيح راست = dstroi.عرض - srcroi.عرض - چپ;
+    صحيح bottom = dstroi.ارتفاع - srcroi.ارتفاع - بالاترین_2;
 
-    for( i = 0; i < dstroi.width; i++ )
+    لكل( i = 0; i < dstroi.عرض; i++ )
     {
-        for( j = 0; j < cn; j++ )
+        لكل( j = 0; j < cn; j++ )
             constBuf[i*cn + j] = value[j];
     }
 
-    srcroi.width *= cn;
-    dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    srcroi.عرض *= cn;
+    dstroi.عرض *= cn;
+    چپ *= cn;
+    راست *= cn;
 
-    uchar* dstInner = dst + dststep*top + left;
+    uchar* dstInner = dst + dststep*بالاترین_2 + چپ;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    لكل( i = 0; i < srcroi.ارتفاع; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
-            memcpy( dstInner, src, srcroi.width );
-        memcpy( dstInner - left, constBuf, left );
-        memcpy( dstInner + srcroi.width, constBuf, right );
+        إذا( dstInner != src )
+            کپی_حافظه( dstInner, src, srcroi.عرض );
+        کپی_حافظه( dstInner - چپ, constBuf, چپ );
+        کپی_حافظه( dstInner + srcroi.عرض, constBuf, راست );
     }
 
-    for( i = 0; i < top; i++ )
-        memcpy(dst + i * dststep, constBuf, dstroi.width);
+    لكل( i = 0; i < بالاترین_2; i++ )
+        کپی_حافظه(dst + i * dststep, constBuf, dstroi.عرض);
 
-    dst += (top + srcroi.height) * dststep;
-    for( i = 0; i < bottom; i++ )
-        memcpy(dst + i * dststep, constBuf, dstroi.width);
+    dst += (بالاترین_2 + srcroi.ارتفاع) * dststep;
+    لكل( i = 0; i < bottom; i++ )
+        کپی_حافظه(dst + i * dststep, constBuf, dstroi.عرض);
 }
 
 }
 
-#ifdef HAVE_OPENCL
+#اگر_تعریف_شده HAVE_OPENCL
 
-namespace cv {
+نطاق cv {
 
-static bool ocl_copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                                int left, int right, int borderType, const Scalar& value )
+ساكن منطقي ocl_copyMakeBorder( درون_داد_Array _src, OutputArray _dst, صحيح بالاترین_2, صحيح bottom,
+                                صحيح چپ, صحيح راست, صحيح borderType, ثابت Scalar& value )
 {
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    bool isolated = (borderType & BORDER_ISOLATED) != 0;
+    صحيح type = _src.type(), cn = CV_MAT_CN(type), عمق = CV_MAT_عمق(type),
+            ردیفها_در_هر_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    منطقي isolated = (borderType & BORDER_ISOLATED) != 0;
     borderType &= ~cv::BORDER_ISOLATED;
 
-    if ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
+    إذا ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
            borderType == BORDER_WRAP || borderType == BORDER_REFLECT_101) ||
          cn > 4)
-        return false;
+        أرجع خطأ;
 
-    const char * const borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
-    int scalarcn = cn == 3 ? 4 : cn;
-    int sctype = CV_MAKETYPE(depth, scalarcn);
+    ثابت حرف * ثابت borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
+    صحيح scalarcn = cn == 3 ? 4 : cn;
+    صحيح sctype = CV_MAKETYPE(عمق, scalarcn);
     String buildOptions = format("-D T=%s -D %s -D T1=%s -D cn=%d -D ST=%s -D rowsPerWI=%d",
-                                 ocl::memopTypeToStr(type), borderMap[borderType],
-                                 ocl::memopTypeToStr(depth), cn,
-                                 ocl::memopTypeToStr(sctype), rowsPerWI);
+                                 ocl::memop_Type_مقصد_Str(type), borderMap[borderType],
+                                 ocl::memop_Type_مقصد_Str(عمق), cn,
+                                 ocl::memop_Type_مقصد_Str(sctype), ردیفها_در_هر_WI);
 
     ocl::Kernel k("copyMakeBorder", ocl::core::copymakeborder_oclsrc, buildOptions);
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
     UMat src = _src.getUMat();
-    if( src.isSubmatrix() && !isolated )
+    إذا( src.isSubmatrix() && !isolated )
     {
-        Size wholeSize;
-        Point ofs;
-        src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        اندازه کامل_اندازه;
+        نقطه ofs;
+        src.locateROI(کامل_اندازه, ofs);
+        صحيح dtop = std::min(ofs.y, بالاترین_2);
+        صحيح dbottom = std::min(کامل_اندازه.ارتفاع - src.ردیفها - ofs.y, bottom);
+        صحيح dleft = std::min(ofs.x, چپ);
+        صحيح dright = std::min(کامل_اندازه.عرض - src.تعداد_ستون - ofs.x, راست);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        بالاترین_2 -= dtop;
+        چپ -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        راست -= dright;
     }
 
-    _dst.create(src.rows + top + bottom, src.cols + left + right, type);
+    _dst.create(src.ردیفها + بالاترین_2 + bottom, src.تعداد_ستون + چپ + راست, type);
     UMat dst = _dst.getUMat();
 
-    if (top == 0 && left == 0 && bottom == 0 && right == 0)
+    إذا (بالاترین_2 == 0 && چپ == 0 && bottom == 0 && راست == 0)
     {
-        if(src.u != dst.u || src.step != dst.step)
-            src.copyTo(dst);
-        return true;
+        إذا(src.u != dst.u || src.گام != dst.گام)
+            src.copy_مقصد(dst);
+        أرجع درست;
     }
 
-    k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst),
-           top, left, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
+    k.آرگومانها(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst),
+           بالاترین_2, چپ, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
 
-    size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.تعداد_ستون, ((size_t)dst.ردیفها + ردیفها_در_هر_WI - 1) / ردیفها_در_هر_WI };
+    أرجع k.پیاپی(2, globalsize, عدم, خطأ);
 }
 
 }
-#endif
+#پایان_اگر
 
-#ifdef HAVE_IPP
-namespace cv {
+#اگر_تعریف_شده HAVE_IPP
+نطاق cv {
 
-static bool ipp_copyMakeBorder( Mat &_src, Mat &_dst, int top, int bottom,
-                                int left, int right, int _borderType, const Scalar& value )
+ساكن منطقي ipp_copyMakeBorder( Mat &_src, Mat &_dst, صحيح بالاترین_2, صحيح bottom,
+                                صحيح چپ, صحيح راست, صحيح _borderType, ثابت Scalar& value )
 {
-#if defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
+#إذا defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
     CV_INSTRUMENT_REGION_IPP();
 
-    ::ipp::IwiBorderSize borderSize(left, top, right, bottom);
-    ::ipp::IwiSize       size(_src.cols, _src.rows);
-    IppDataType          dataType   = ippiGetDataType(_src.depth());
+    ::ipp::Iwi_Border_اندازه border_اندازه(چپ, بالاترین_2, راست, bottom);
+    ::ipp::Iwi_اندازه       size(_src.تعداد_ستون, _src.ردیفها);
+    Ipp_داده_Type          داده_Type   = ippi_Get_داده_Type(_src.عمق());
     IppiBorderType       borderType = ippiGetBorderType(_borderType);
-    if((int)borderType == -1)
-        return false;
+    إذا((صحيح)borderType == -1)
+        أرجع خطأ;
 
-    if(_src.dims > 2)
-        return false;
+    إذا(_src.dims > 2)
+        أرجع خطأ;
 
-    Rect dstRect(borderSize.left, borderSize.top,
-        _dst.cols - borderSize.right - borderSize.left,
-        _dst.rows - borderSize.bottom - borderSize.top);
+    Rect dstRect(border_اندازه.چپ, border_اندازه.بالاترین_2,
+        _dst.تعداد_ستون - border_اندازه.راست - border_اندازه.چپ,
+        _dst.ردیفها - border_اندازه.bottom - border_اندازه.بالاترین_2);
     Mat  subDst = Mat(_dst, dstRect);
     Mat *pSrc   = &_src;
 
-    return CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->step, subDst.ptr(), subDst.step, size, dataType, _src.channels(), borderSize, borderType, &value[0]) >= 0;
-#else
-    CV_UNUSED(_src); CV_UNUSED(_dst); CV_UNUSED(top); CV_UNUSED(bottom); CV_UNUSED(left); CV_UNUSED(right);
-    CV_UNUSED(_borderType); CV_UNUSED(value);
-    return false;
-#endif
+    أرجع CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->گام, subDst.ptr(), subDst.گام, size, داده_Type, _src.channels(), border_اندازه, borderType, &value[0]) >= 0;
+#وإلا
+    CV_استفادهنشده(_src); CV_استفادهنشده(_dst); CV_استفادهنشده(بالاترین_2); CV_استفادهنشده(bottom); CV_استفادهنشده(چپ); CV_استفادهنشده(راست);
+    CV_استفادهنشده(_borderType); CV_استفادهنشده(value);
+    أرجع خطأ;
+#پایان_اگر
 }
 }
-#endif
+#پایان_اگر
 
-void cv::copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                         int left, int right, int borderType, const Scalar& value )
+فراغ cv::copyMakeBorder( درون_داد_Array _src, OutputArray _dst, صحيح بالاترین_2, صحيح bottom,
+                         صحيح چپ, صحيح راست, صحيح borderType, ثابت Scalar& value )
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert( top >= 0 && bottom >= 0 && left >= 0 && right >= 0 && _src.dims() <= 2 );
+    CV_Assert( بالاترین_2 >= 0 && bottom >= 0 && چپ >= 0 && راست >= 0 && _src.dims() <= 2 );
     CV_Assert( !_src.empty() );
 
     Mat src = _src.getMat();
-    CV_Assert( (int64_t)src.rows + top + bottom <= INT_MAX );
-    CV_Assert( (int64_t)src.cols + left + right <= INT_MAX );
+    CV_Assert( (int64_t)src.ردیفها + بالاترین_2 + bottom <= بیشترین_صحیح );
+    CV_Assert( (int64_t)src.تعداد_ستون + چپ + راست <= بیشترین_صحیح );
 
-    CV_OCL_RUN(_dst.isUMat(),
-               ocl_copyMakeBorder(_src, _dst, top, bottom, left, right, borderType, value))
-    int type = src.type();
+    CV_OCL_پیاپی(_dst.isUMat(),
+               ocl_copyMakeBorder(_src, _dst, بالاترین_2, bottom, چپ, راست, borderType, value))
+    صحيح type = src.type();
 
-    if( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
+    إذا( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
     {
-        Size wholeSize;
-        Point ofs;
-        src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        اندازه کامل_اندازه;
+        نقطه ofs;
+        src.locateROI(کامل_اندازه, ofs);
+        صحيح dtop = std::min(ofs.y, بالاترین_2);
+        صحيح dbottom = std::min(کامل_اندازه.ارتفاع - src.ردیفها - ofs.y, bottom);
+        صحيح dleft = std::min(ofs.x, چپ);
+        صحيح dright = std::min(کامل_اندازه.عرض - src.تعداد_ستون - ofs.x, راست);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        بالاترین_2 -= dtop;
+        چپ -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        راست -= dright;
     }
 
-    _dst.create( src.rows + top + bottom, src.cols + left + right, type );
+    _dst.create( src.ردیفها + بالاترین_2 + bottom, src.تعداد_ستون + چپ + راست, type );
     Mat dst = _dst.getMat();
 
-    if(top == 0 && left == 0 && bottom == 0 && right == 0)
+    إذا(بالاترین_2 == 0 && چپ == 0 && bottom == 0 && راست == 0)
     {
-        if(src.data != dst.data || src.step != dst.step)
-            src.copyTo(dst);
-        return;
+        إذا(src.داده != dst.داده || src.گام != dst.گام)
+            src.copy_مقصد(dst);
+        أرجع;
     }
 
     borderType &= ~BORDER_ISOLATED;
 
-    CV_IPP_RUN_FAST(ipp_copyMakeBorder(src, dst, top, bottom, left, right, borderType, value))
+    CV_IPP_پیاپی_FAST(ipp_copyMakeBorder(src, dst, بالاترین_2, bottom, چپ, راست, borderType, value))
 
-    if( borderType != BORDER_CONSTANT )
-        copyMakeBorder_8u( src.ptr(), src.step, src.size(),
-                           dst.ptr(), dst.step, dst.size(),
-                           top, left, (int)src.elemSize(), borderType );
-    else
+    إذا( borderType != BORDER_CONSTANT )
+        copyMakeBorder_8u( src.ptr(), src.گام, src.size(),
+                           dst.ptr(), dst.گام, dst.size(),
+                           بالاترین_2, چپ, (صحيح)src.elem_اندازه(), borderType );
+    وإلا
     {
-        int cn = src.channels(), cn1 = cn;
-        AutoBuffer<double> buf(cn);
-        if( cn > 4 )
+        صحيح cn = src.channels(), cn1 = cn;
+        Auto_میانگیر<مزدوج> buf(cn);
+        إذا( cn > 4 )
         {
             CV_Assert( value[0] == value[1] && value[0] == value[2] && value[0] == value[3] );
             cn1 = 1;
         }
-        scalarToRawData(value, buf.data(), CV_MAKETYPE(src.depth(), cn1), cn);
-        copyMakeConstBorder_8u( src.ptr(), src.step, src.size(),
-                                dst.ptr(), dst.step, dst.size(),
-                                top, left, (int)src.elemSize(), (uchar*)buf.data() );
+        scalar_مقصد_Raw_داده(value, buf.داده(), CV_MAKETYPE(src.عمق(), cn1), cn);
+        copyMakeConstBorder_8u( src.ptr(), src.گام, src.size(),
+                                dst.ptr(), dst.گام, dst.size(),
+                                بالاترین_2, چپ, (صحيح)src.elem_اندازه(), (uchar*)buf.داده() );
     }
 }
 /* End of file. */

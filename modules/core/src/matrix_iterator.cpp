@@ -2,32 +2,32 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
+#ضمن "precomp.hpp"
+#ضمن "opencv2/core/mat.hpp"
 
-namespace cv {
+نطاق cv {
 
 NAryMatIterator::NAryMatIterator()
     : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, Mat* _planes, int _narrays)
+NAryMatIterator::NAryMatIterator(ثابت Mat** _arrays, Mat* _planes, صحيح _narrays)
 : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, _planes, 0, _narrays);
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, uchar** _ptrs, int _narrays)
+NAryMatIterator::NAryMatIterator(ثابت Mat** _arrays, uchar** _ptrs, صحيح _narrays)
     : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, 0, _ptrs, _narrays);
 }
 
-void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int _narrays)
+فراغ NAryMatIterator::init(ثابت Mat** _arrays, Mat* _planes, uchar** _ptrs, صحيح _narrays)
 {
     CV_Assert( _arrays && (_ptrs || _planes) );
-    int i, j, d1=0, i0 = -1, d = -1;
+    صحيح i, j, d1=0, i0 = -1, d = -1;
 
     arrays = _arrays;
     ptrs = _ptrs;
@@ -36,9 +36,9 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
     nplanes = 0;
     size = 0;
 
-    if( narrays < 0 )
+    إذا( narrays < 0 )
     {
-        for( i = 0; _arrays[i] != 0; i++ )
+        لكل( i = 0; _arrays[i] != 0; i++ )
             ;
         narrays = i;
         CV_Assert(narrays <= 1000);
@@ -46,261 +46,261 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
 
     iterdepth = 0;
 
-    for( i = 0; i < narrays; i++ )
+    لكل( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
-        const Mat& A = *arrays[i];
-        if( ptrs )
-            ptrs[i] = A.data;
+        ثابت Mat& A = *arrays[i];
+        إذا( ptrs )
+            ptrs[i] = A.داده;
 
-        if( !A.data )
-            continue;
+        إذا( !A.داده )
+            استمر;
 
-        if( i0 < 0 )
+        إذا( i0 < 0 )
         {
             i0 = i;
             d = A.dims;
 
             // find the first dimensionality which is different from 1;
             // in any of the arrays the first "d1" step do not affect the continuity
-            for( d1 = 0; d1 < d; d1++ )
-                if( A.size[d1] > 1 )
-                    break;
+            لكل( d1 = 0; d1 < d; d1++ )
+                إذا( A.size[d1] > 1 )
+                    اكسر;
         }
-        else
+        وإلا
             CV_Assert( A.size == arrays[i0]->size );
 
-        if( !A.isContinuous() )
+        إذا( !A.isContinuous() )
         {
-            CV_Assert( A.step[d-1] == A.elemSize() );
-            for( j = d-1; j > d1; j-- )
-                if( A.step[j]*A.size[j] < A.step[j-1] )
-                    break;
+            CV_Assert( A.گام[d-1] == A.elem_اندازه() );
+            لكل( j = d-1; j > d1; j-- )
+                إذا( A.گام[j]*A.size[j] < A.گام[j-1] )
+                    اكسر;
             iterdepth = std::max(iterdepth, j);
         }
     }
 
-    if( i0 >= 0 )
+    إذا( i0 >= 0 )
     {
         size = arrays[i0]->size[std::max(d-1, 0)];
-        for( j = d-1; j > iterdepth; j-- )
+        لكل( j = d-1; j > iterdepth; j-- )
         {
             int64 total1 = (int64)size*arrays[i0]->size[j-1];
-            if( total1 != (int)total1 )
-                break;
-            size = (int)total1;
+            إذا( total1 != (صحيح)total1 )
+                اكسر;
+            size = (صحيح)total1;
         }
 
         iterdepth = j;
-        if( iterdepth == d1 )
+        إذا( iterdepth == d1 )
             iterdepth = 0;
 
         nplanes = 1;
-        for( j = iterdepth-1; j >= 0; j-- )
+        لكل( j = iterdepth-1; j >= 0; j-- )
             nplanes *= arrays[i0]->size[j];
     }
-    else
+    وإلا
         iterdepth = 0;
 
     idx = 0;
 
-    if( !planes )
-        return;
+    إذا( !planes )
+        أرجع;
 
-    for( i = 0; i < narrays; i++ )
+    لكل( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
-        const Mat& A = *arrays[i];
+        ثابت Mat& A = *arrays[i];
 
-        if( !A.data )
+        إذا( !A.داده )
         {
             planes[i] = Mat();
-            continue;
+            استمر;
         }
 
-        planes[i] = Mat(1, (int)size, A.type(), A.data);
+        planes[i] = Mat(1, (صحيح)size, A.type(), A.داده);
     }
 }
 
 
-NAryMatIterator& NAryMatIterator::operator ++()
+NAryMatIterator& NAryMatIterator::عملگر ++()
 {
-    if( idx >= nplanes-1 )
-        return *this;
+    إذا( idx >= nplanes-1 )
+        أرجع *هذا;
     ++idx;
 
-    if( iterdepth == 1 )
+    إذا( iterdepth == 1 )
     {
-        if( ptrs )
+        إذا( ptrs )
         {
-            for( int i = 0; i < narrays; i++ )
+            لكل( صحيح i = 0; i < narrays; i++ )
             {
-                if( !ptrs[i] )
-                    continue;
-                ptrs[i] = arrays[i]->data + arrays[i]->step[0]*idx;
+                إذا( !ptrs[i] )
+                    استمر;
+                ptrs[i] = arrays[i]->داده + arrays[i]->گام[0]*idx;
             }
         }
-        if( planes )
+        إذا( planes )
         {
-            for( int i = 0; i < narrays; i++ )
+            لكل( صحيح i = 0; i < narrays; i++ )
             {
-                if( !planes[i].data )
-                    continue;
-                planes[i].data = arrays[i]->data + arrays[i]->step[0]*idx;
+                إذا( !planes[i].داده )
+                    استمر;
+                planes[i].داده = arrays[i]->داده + arrays[i]->گام[0]*idx;
             }
         }
     }
-    else
+    وإلا
     {
-        for( int i = 0; i < narrays; i++ )
+        لكل( صحيح i = 0; i < narrays; i++ )
         {
-            const Mat& A = *arrays[i];
-            if( !A.data )
-                continue;
-            int _idx = (int)idx;
-            uchar* data = A.data;
-            for( int j = iterdepth-1; j >= 0 && _idx > 0; j-- )
+            ثابت Mat& A = *arrays[i];
+            إذا( !A.داده )
+                استمر;
+            صحيح _idx = (صحيح)idx;
+            uchar* داده = A.داده;
+            لكل( صحيح j = iterdepth-1; j >= 0 && _idx > 0; j-- )
             {
-                int szi = A.size[j], t = _idx/szi;
-                data += (_idx - t * szi)*A.step[j];
+                صحيح szi = A.size[j], t = _idx/szi;
+                داده += (_idx - t * szi)*A.گام[j];
                 _idx = t;
             }
-            if( ptrs )
-                ptrs[i] = data;
-            if( planes )
-                planes[i].data = data;
+            إذا( ptrs )
+                ptrs[i] = داده;
+            إذا( planes )
+                planes[i].داده = داده;
         }
     }
 
-    return *this;
+    أرجع *هذا;
 }
 
-NAryMatIterator NAryMatIterator::operator ++(int)
+NAryMatIterator NAryMatIterator::عملگر ++(صحيح)
 {
-    NAryMatIterator it = *this;
-    ++*this;
-    return it;
+    NAryMatIterator it = *هذا;
+    ++*هذا;
+    أرجع it;
 }
 
 //==================================================================================================
 
-Point MatConstIterator::pos() const
+نقطه MatConstIterator::pos() ثابت
 {
-    if( !m )
-        return Point();
+    إذا( !m )
+        أرجع نقطه();
     CV_DbgAssert(m->dims <= 2);
 
     ptrdiff_t ofs = ptr - m->ptr();
-    int y = (int)(ofs/m->step[0]);
-    return Point((int)((ofs - y*m->step[0])/elemSize), y);
+    صحيح y = (صحيح)(ofs/m->گام[0]);
+    أرجع نقطه((صحيح)((ofs - y*m->گام[0])/elem_اندازه), y);
 }
 
-void MatConstIterator::pos(int* _idx) const
+فراغ MatConstIterator::pos(صحيح* _idx) ثابت
 {
     CV_Assert(m != 0 && _idx);
     ptrdiff_t ofs = ptr - m->ptr();
-    for( int i = 0; i < m->dims; i++ )
+    لكل( صحيح i = 0; i < m->dims; i++ )
     {
-        size_t s = m->step[i], v = ofs/s;
+        size_t s = m->گام[i], v = ofs/s;
         ofs -= v*s;
-        _idx[i] = (int)v;
+        _idx[i] = (صحيح)v;
     }
 }
 
-ptrdiff_t MatConstIterator::lpos() const
+ptrdiff_t MatConstIterator::lpos() ثابت
 {
-    if(!m)
-        return 0;
-    if( m->isContinuous() )
-        return (ptr - sliceStart)/elemSize;
+    إذا(!m)
+        أرجع 0;
+    إذا( m->isContinuous() )
+        أرجع (ptr - برش_شروع)/elem_اندازه;
     ptrdiff_t ofs = ptr - m->ptr();
-    int i, d = m->dims;
-    if( d == 2 )
+    صحيح i, d = m->dims;
+    إذا( d == 2 )
     {
-        ptrdiff_t y = ofs/m->step[0];
-        return y*m->cols + (ofs - y*m->step[0])/elemSize;
+        ptrdiff_t y = ofs/m->گام[0];
+        أرجع y*m->تعداد_ستون + (ofs - y*m->گام[0])/elem_اندازه;
     }
-    ptrdiff_t result = 0;
-    for( i = 0; i < d; i++ )
+    ptrdiff_t نتیجه = 0;
+    لكل( i = 0; i < d; i++ )
     {
-        size_t s = m->step[i], v = ofs/s;
+        size_t s = m->گام[i], v = ofs/s;
         ofs -= v*s;
-        result = result*m->size[i] + v;
+        نتیجه = نتیجه*m->size[i] + v;
     }
-    return result;
+    أرجع نتیجه;
 }
 
-void MatConstIterator::seek(ptrdiff_t ofs, bool relative)
+فراغ MatConstIterator::seek(ptrdiff_t ofs, منطقي relative)
 {
-    if( m->isContinuous() )
+    إذا( m->isContinuous() )
     {
-        ptr = (relative ? ptr : sliceStart) + ofs*elemSize;
-        if( ptr < sliceStart )
-            ptr = sliceStart;
-        else if( ptr > sliceEnd )
-            ptr = sliceEnd;
-        return;
+        ptr = (relative ? ptr : برش_شروع) + ofs*elem_اندازه;
+        إذا( ptr < برش_شروع )
+            ptr = برش_شروع;
+        وإلا إذا( ptr > برش_انتها )
+            ptr = برش_انتها;
+        أرجع;
     }
 
-    int d = m->dims;
-    if( d == 2 )
+    صحيح d = m->dims;
+    إذا( d == 2 )
     {
         ptrdiff_t ofs0, y;
-        if( relative )
+        إذا( relative )
         {
             ofs0 = ptr - m->ptr();
-            y = ofs0/m->step[0];
-            ofs += y*m->cols + (ofs0 - y*m->step[0])/elemSize;
+            y = ofs0/m->گام[0];
+            ofs += y*m->تعداد_ستون + (ofs0 - y*m->گام[0])/elem_اندازه;
         }
-        y = ofs/m->cols;
-        int y1 = std::min(std::max((int)y, 0), m->rows-1);
-        sliceStart = m->ptr(y1);
-        sliceEnd = sliceStart + m->cols*elemSize;
-        ptr = y < 0 ? sliceStart : y >= m->rows ? sliceEnd :
-            sliceStart + (ofs - y*m->cols)*elemSize;
-        return;
+        y = ofs/m->تعداد_ستون;
+        صحيح y1 = std::min(std::max((صحيح)y, 0), m->ردیفها-1);
+        برش_شروع = m->ptr(y1);
+        برش_انتها = برش_شروع + m->تعداد_ستون*elem_اندازه;
+        ptr = y < 0 ? برش_شروع : y >= m->ردیفها ? برش_انتها :
+            برش_شروع + (ofs - y*m->تعداد_ستون)*elem_اندازه;
+        أرجع;
     }
 
-    if( relative )
+    إذا( relative )
         ofs += lpos();
 
-    if( ofs < 0 )
+    إذا( ofs < 0 )
         ofs = 0;
 
-    int szi = m->size[d-1];
+    صحيح szi = m->size[d-1];
     ptrdiff_t t = ofs/szi;
-    int v = (int)(ofs - t*szi);
+    صحيح v = (صحيح)(ofs - t*szi);
     ofs = t;
-    ptr = m->ptr() + v*elemSize;
-    sliceStart = m->ptr();
+    ptr = m->ptr() + v*elem_اندازه;
+    برش_شروع = m->ptr();
 
-    for( int i = d-2; i >= 0; i-- )
+    لكل( صحيح i = d-2; i >= 0; i-- )
     {
         szi = m->size[i];
         t = ofs/szi;
-        v = (int)(ofs - t*szi);
+        v = (صحيح)(ofs - t*szi);
         ofs = t;
-        sliceStart += v*m->step[i];
+        برش_شروع += v*m->گام[i];
     }
 
-    sliceEnd = sliceStart + m->size[d-1]*elemSize;
-    if( ofs > 0 )
-        ptr = sliceEnd;
-    else
-        ptr = sliceStart + (ptr - m->ptr());
+    برش_انتها = برش_شروع + m->size[d-1]*elem_اندازه;
+    إذا( ofs > 0 )
+        ptr = برش_انتها;
+    وإلا
+        ptr = برش_شروع + (ptr - m->ptr());
 }
 
-void MatConstIterator::seek(const int* _idx, bool relative)
+فراغ MatConstIterator::seek(ثابت صحيح* _idx, منطقي relative)
 {
-    int d = m->dims;
+    صحيح d = m->dims;
     ptrdiff_t ofs = 0;
-    if( !_idx )
+    إذا( !_idx )
         ;
-    else if( d == 2 )
+    وإلا إذا( d == 2 )
         ofs = _idx[0]*m->size[1] + _idx[1];
-    else
+    وإلا
     {
-        for( int i = 0; i < d; i++ )
+        لكل( صحيح i = 0; i < d; i++ )
             ofs = ofs*m->size[i] + _idx[i];
     }
     seek(ofs, relative);
@@ -308,50 +308,50 @@ void MatConstIterator::seek(const int* _idx, bool relative)
 
 //==================================================================================================
 
-SparseMatConstIterator::SparseMatConstIterator(const SparseMat* _m) : m((SparseMat*)_m), hashidx(0), ptr(0)
+SparseMatConstIterator::SparseMatConstIterator(ثابت SparseMat* _m) : m((SparseMat*)_m), hashidx(0), ptr(0)
 {
-    if(!_m || !_m->hdr)
-        return;
+    إذا(!_m || !_m->hdr)
+        أرجع;
     SparseMat::Hdr& hdr = *m->hdr;
-    const std::vector<size_t>& htab = hdr.hashtab;
+    ثابت std::vector<size_t>& htab = hdr.hashtab;
     size_t i, hsize = htab.size();
-    for( i = 0; i < hsize; i++ )
+    لكل( i = 0; i < hsize; i++ )
     {
         size_t nidx = htab[i];
-        if( nidx )
+        إذا( nidx )
         {
             hashidx = i;
-            ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return;
+            ptr = &hdr.pool[nidx] + hdr.مقدار_جابه_جایی;
+            أرجع;
         }
     }
 }
 
-SparseMatConstIterator& SparseMatConstIterator::operator ++()
+SparseMatConstIterator& SparseMatConstIterator::عملگر ++()
 {
-    if( !ptr || !m || !m->hdr )
-        return *this;
+    إذا( !ptr || !m || !m->hdr )
+        أرجع *هذا;
     SparseMat::Hdr& hdr = *m->hdr;
-    size_t next = ((const SparseMat::Node*)(ptr - hdr.valueOffset))->next;
-    if( next )
+    size_t next = ((ثابت SparseMat::Node*)(ptr - hdr.مقدار_جابه_جایی))->next;
+    إذا( next )
     {
-        ptr = &hdr.pool[next] + hdr.valueOffset;
-        return *this;
+        ptr = &hdr.pool[next] + hdr.مقدار_جابه_جایی;
+        أرجع *هذا;
     }
     size_t i = hashidx + 1, sz = hdr.hashtab.size();
-    for( ; i < sz; i++ )
+    لكل( ; i < sz; i++ )
     {
         size_t nidx = hdr.hashtab[i];
-        if( nidx )
+        إذا( nidx )
         {
             hashidx = i;
-            ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return *this;
+            ptr = &hdr.pool[nidx] + hdr.مقدار_جابه_جایی;
+            أرجع *هذا;
         }
     }
     hashidx = sz;
     ptr = 0;
-    return *this;
+    أرجع *هذا;
 }
 
 } // cv::

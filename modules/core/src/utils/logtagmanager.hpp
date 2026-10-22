@@ -2,27 +2,27 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGMANAGER_HPP
-#define OPENCV_CORE_LOGTAGMANAGER_HPP
+#اگر_تعریف_نشده OPENCV_CORE_LOGTAGMANAGER_HPP
+#تعریف_کن OPENCV_CORE_LOGTAGMANAGER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <unordered_map>
-#include <mutex>
-#include <memory>
-#endif
+#إذا 1 // if not already in precompiled headers
+#ضمن <string>
+#ضمن <algorithm>
+#ضمن <functional>
+#ضمن <unordered_map>
+#ضمن <mutex>
+#ضمن <memory>
+#پایان_اگر
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#ضمن <opencv2/core/utils/logtag.hpp>
+#ضمن "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+نطاق cv {
+نطاق utils {
+نطاق logging {
 
 // forward declaration
-class LogTagConfigParser;
+صنف Log_برچسب_Config_Parser;
 
 // A lookup table of LogTags using full name, first part of name, and any part of name.
 // The name parts of a LogTag is delimited by period.
@@ -30,25 +30,25 @@ class LogTagConfigParser;
 // This class does not handle wildcard characters. The name-matching method can only be
 // selected by calling the appropriate function.
 //
-class LogTagManager
+صنف Log_برچسب_Manager
 {
-private:
+خاص:
     // Current implementation does not seem to require recursive mutex;
     // also, extensible functions (accepting user-provided callback) are not allowed
     // to call LogTagManger (to prevent iterator invalidation), which needs enforced
     // with a non-recursive mutex.
-    using MutexType = cv::Mutex;
-    using LockType = cv::AutoLock;
+    استفاده MutexType = cv::Mutex;
+    استفاده قفل_Type = cv::Auto_قفل;
 
-    enum class MatchingScope
+    تعداد صنف MatchingScope
     {
         None,
-        Full,
-        FirstNamePart,
+        پر_2,
+        اولی_Name_Part,
         AnyNamePart
     };
 
-    struct ParsedLevel
+    بنية ParsedLevel
     {
         LogLevel level;
         MatchingScope scope;
@@ -60,75 +60,75 @@ private:
         }
     };
 
-    struct FullNameInfo
+    بنية پر_Name_Info
     {
-        LogTag* logTagPtr;
+        Log_برچسب* log_برچسب_Ptr;
         ParsedLevel parsedLevel;
     };
 
-    struct NamePartInfo
+    بنية NamePartInfo
     {
         ParsedLevel parsedLevel;
     };
 
-    struct CrossReference
+    بنية CrossReference
     {
-        size_t m_fullNameId;
+        size_t m_پر_Name_Id;
         size_t m_namePartId;
         size_t m_matchingPos;
-        FullNameInfo* m_fullNameInfo;
+        پر_Name_Info* m_پر_Name_Info;
         NamePartInfo* m_namePartInfo;
 
-        explicit CrossReference(size_t fullNameId, size_t namePartId, size_t matchingPos,
-            FullNameInfo* fullNameInfo, NamePartInfo* namePartInfo)
-            : m_fullNameId(fullNameId)
+        صریح CrossReference(size_t پر_Name_Id, size_t namePartId, size_t matchingPos,
+            پر_Name_Info* پر_Name_Info_2, NamePartInfo* namePartInfo)
+            : m_پر_Name_Id(پر_Name_Id)
             , m_namePartId(namePartId)
             , m_matchingPos(matchingPos)
-            , m_fullNameInfo(fullNameInfo)
+            , m_پر_Name_Info(پر_Name_Info_2)
             , m_namePartInfo(namePartInfo)
         {
         }
     };
 
-    struct FullNameLookupResult
+    بنية پر_Name_Lookup_نتیجه
     {
         // The full name being looked up
-        std::string m_fullName;
+        std::string m_پر_Name;
 
         // The full name being broken down into name parts
         std::vector<std::string> m_nameParts;
 
         // The full name ID that is added or looked up from the table
-        size_t m_fullNameId;
+        size_t m_پر_Name_Id;
 
         // The name part IDs that are added to or looked up from the table
         // listed in the same order as m_nameParts
         std::vector<size_t> m_namePartIds;
 
         // The information struct for the full name
-        FullNameInfo* m_fullNameInfoPtr;
+        پر_Name_Info* m_پر_Name_Info_Ptr;
 
         // Specifies whether cross references (full names that match the name part)
         // should be computed.
-        bool m_findCrossReferences;
+        منطقي m_پیدا_کن_Cross_References;
 
         // List of all full names that match the given name part.
         // This field is computed only if m_findCrossReferences is true.
         std::vector<CrossReference> m_crossReferences;
 
-        explicit FullNameLookupResult(const std::string& fullName)
-            : m_fullName(fullName)
+        صریح پر_Name_Lookup_نتیجه(ثابت std::string& پر_Name)
+            : m_پر_Name(پر_Name)
             , m_nameParts()
-            , m_fullNameId()
+            , m_پر_Name_Id()
             , m_namePartIds()
-            , m_fullNameInfoPtr()
-            , m_findCrossReferences()
+            , m_پر_Name_Info_Ptr()
+            , m_پیدا_کن_Cross_References()
             , m_crossReferences()
         {
         }
     };
 
-    struct NamePartLookupResult
+    بنية Name_Part_Lookup_نتیجه
     {
         // The name part being looked up
         std::string m_namePart;
@@ -140,30 +140,30 @@ private:
         NamePartInfo* m_namePartInfoPtr;
 
         // Specifies whether cross references (full names that match the name part) should be computed.
-        bool m_findCrossReferences;
+        منطقي m_پیدا_کن_Cross_References;
 
         // List of all full names that match the given name part.
         // This field is computed only if m_findCrossReferences is true.
         std::vector<CrossReference> m_crossReferences;
 
-        explicit NamePartLookupResult(const std::string& namePart)
+        صریح Name_Part_Lookup_نتیجه(ثابت std::string& namePart)
             : m_namePart(namePart)
             , m_namePartId()
             , m_namePartInfoPtr()
-            , m_findCrossReferences()
+            , m_پیدا_کن_Cross_References()
             , m_crossReferences()
         {
         }
     };
 
-    struct NameTable
+    بنية Name_جدول
     {
         // All data structures in this class are append-only. The item count
         // is being used as an incrementing integer key.
 
-    public:
+    عام:
         // Full name information struct.
-        std::vector<FullNameInfo> m_fullNameInfos;
+        std::vector<پر_Name_Info> m_پر_Name_Infos;
 
         // Name part information struct.
         std::vector<NamePartInfo> m_namePartInfos;
@@ -173,7 +173,7 @@ private:
         // .... (index into the vector of m_fullNameInfos)
         // .... (key into m_fullNameToNamePartIds)
         // .... (value.second in m_namePartToFullNameIds)
-        std::unordered_map<std::string, size_t> m_fullNameIds;
+        std::unordered_map<std::string, size_t> m_پر_Name_Ids;
 
         // key: name part (string)
         // value: name part ID
@@ -185,100 +185,100 @@ private:
         // key: full name ID
         // value.first: name part ID
         // value.second: occurrence position of name part in the full name
-        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_fullNameToNamePartIds;
+        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_پر_Name_مقصد_Name_Part_Ids;
 
         // key: name part ID
         // value.first: full name ID
         // value.second: occurrence position of name part in the full name
-        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_namePartToFullNameIds;
+        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_name_Part_مقصد_پر_Name_Ids;
 
-    public:
-        void addOrLookupFullName(FullNameLookupResult& result);
-        void addOrLookupNamePart(NamePartLookupResult& result);
-        FullNameInfo* getFullNameInfo(const std::string& fullName);
+    عام:
+        فراغ جمع_کن_Or_Lookup_پر_Name(پر_Name_Lookup_نتیجه& نتیجه);
+        فراغ جمع_کن_Or_Lookup_Name_Part(Name_Part_Lookup_نتیجه& نتیجه);
+        پر_Name_Info* get_پر_Name_Info(ثابت std::string& پر_Name);
 
-    private:
+    خاص:
         // Add or get full name. Does not compute name parts or access them in the table.
         // Returns the full name ID, and a bool indicating if the full name is new.
-        std::pair<size_t, bool> internal_addOrLookupFullName(const std::string& fullName);
+        std::pair<size_t, منطقي> داخلی_جمع_کن_Or_Lookup_پر_Name(ثابت std::string& پر_Name);
 
         // Add or get multiple name parts. Saves name part IDs into a vector.
-        void internal_addOrLookupNameParts(const std::vector<std::string>& nameParts, std::vector<size_t>& namePartIds);
+        فراغ داخلی_جمع_کن_Or_Lookup_Name_Parts(ثابت std::vector<std::string>& nameParts, std::vector<size_t>& namePartIds);
 
         // Add or get name part. Returns namePartId.
-        size_t internal_addOrLookupNamePart(const std::string& namePart);
+        size_t داخلی_جمع_کن_Or_Lookup_Name_Part(ثابت std::string& namePart);
 
         // For each name part ID, insert the tuples (full name, name part ID, name part position)
         // into the cross reference table
-        void internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds);
+        فراغ داخلی_جمع_کن_Cross_Reference(size_t پر_Name_Id, ثابت std::vector<size_t>& namePartIds);
 
         // Gather pointer for full name info struct.
         // Note: The pointer is interior to the table vector. The pointers are invalidated
         // if the table is modified.
-        FullNameInfo* internal_getFullNameInfo(size_t fullNameId);
+        پر_Name_Info* داخلی_get_پر_Name_Info(size_t پر_Name_Id);
 
         // Gather pointers for name part info struct.
         // Note: The pointers are interior to the table vector. The pointers are invalidated
         // if the table is modified.
-        NamePartInfo* internal_getNamePartInfo(size_t namePartId);
+        NamePartInfo* داخلی_get_Name_Part_Info(size_t namePartId);
 
-        void internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult);
-        void internal_findMatchingFullNamesForNamePart(NamePartLookupResult& result);
+        فراغ داخلی_پیدا_کن_Matching_Name_Parts_For_پر_Name(پر_Name_Lookup_نتیجه& پر_Name_نتیجه);
+        فراغ داخلی_پیدا_کن_Matching_پر_نامها_For_Name_Part(Name_Part_Lookup_نتیجه& نتیجه);
     };
 
-public:
-    LogTagManager(LogLevel defaultUnconfiguredGlobalLevel);
-    ~LogTagManager();
+عام:
+    Log_برچسب_Manager(LogLevel defaultUnconfiguredGlobalLevel);
+    ~Log_برچسب_Manager();
 
-public:
+عام:
     // Parse and apply the config string.
-    void setConfigString(const std::string& configString, bool apply = true);
+    فراغ مجموعه_Config_String(ثابت std::string& configString, منطقي apply = درست);
 
     // Gets the config parser. This is necessary to retrieve the list of malformed strings.
-    LogTagConfigParser& getConfigParser() const;
+    Log_برچسب_Config_Parser& getConfigParser() ثابت;
 
     // Add (register) the log tag.
     // Note, passing in nullptr as value is equivalent to unassigning.
-    void assign(const std::string& fullName, LogTag* ptr);
+    فراغ assign(ثابت std::string& پر_Name, Log_برچسب* ptr);
 
     // Unassign the log tag. This is equivalent to calling assign with nullptr value.
-    void unassign(const std::string& fullName);
+    فراغ unassign(ثابت std::string& پر_Name);
 
     // Retrieve the log tag by exact name.
-    LogTag* get(const std::string& fullName);
+    Log_برچسب* get(ثابت std::string& پر_Name);
 
     // Changes the log level of the tag having the exact full name.
-    void setLevelByFullName(const std::string& fullName, LogLevel level);
+    فراغ مجموعه_Level_By_پر_Name(ثابت std::string& پر_Name, LogLevel level);
 
     // Changes the log level of the tags matching the first part of the name.
-    void setLevelByFirstPart(const std::string& firstPart, LogLevel level);
+    فراغ مجموعه_Level_By_اولی_Part(ثابت std::string& اولی_Part, LogLevel level);
 
     // Changes the log level of the tags matching any part of the name.
-    void setLevelByAnyPart(const std::string& anyPart, LogLevel level);
+    فراغ مجموعه_Level_By_Any_Part(ثابت std::string& anyPart, LogLevel level);
 
     // Changes the log level of the tags with matching name part according
     // to the specified scope.
-    void setLevelByNamePart(const std::string& namePart, LogLevel level, MatchingScope scope);
+    فراغ مجموعه_Level_By_Name_Part(ثابت std::string& namePart, LogLevel level, MatchingScope scope);
 
-private:
-    bool internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo);
-    bool internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult);
-    void internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult);
+خاص:
+    منطقي داخلی_apply_پر_Name_Config_مقصد_برچسب(پر_Name_Info& پر_Name_Info_2);
+    منطقي داخلی_apply_Name_Part_Config_مقصد_Specific_برچسب(پر_Name_Lookup_نتیجه& پر_Name_نتیجه);
+    فراغ داخلی_apply_Name_Part_Config_مقصد_Matching_برچسبها(Name_Part_Lookup_نتیجه& name_Part_نتیجه);
 
-private:
-    static std::vector<std::string> splitNameParts(const std::string& fullName);
-    static bool internal_isNamePartMatch(MatchingScope scope, size_t matchingPos);
+خاص:
+    ساكن std::vector<std::string> تقسیم_Name_Parts(ثابت std::string& پر_Name);
+    ساكن منطقي داخلی_is_Name_Part_تطابق(MatchingScope scope, size_t matchingPos);
 
-private:
-    static const char* m_globalName;
+خاص:
+    ساكن ثابت حرف* m_globalName;
 
-private:
-    mutable MutexType m_mutex;
-    std::unique_ptr<LogTag> m_globalLogTag;
-    NameTable m_nameTable;
-    std::shared_ptr<LogTagConfigParser> m_config;
+خاص:
+    تغییرپذیر MutexType m_mutex;
+    std::unique_ptr<Log_برچسب> m_global_Log_برچسب;
+    Name_جدول m_name_جدول;
+    std::shared_ptr<Log_برچسب_Config_Parser> m_config;
 };
 
 }}} //namespace
 
-#endif //OPENCV_CORE_LOGTAGMANAGER_HPP
+#پایان_اگر //OPENCV_CORE_LOGTAGMANAGER_HPP
