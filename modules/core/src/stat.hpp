@@ -6,37 +6,37 @@
 #ifndef SRC_STAT_HPP
 #define SRC_STAT_HPP
 
-#include "opencv2/core/mat.hpp"
+#अन्तर्भाव "opencv2/core/mat.hpp"
 
-namespace cv {
+नामाकाश cv {
 
 #ifdef HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
-                     InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+गणना { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
+तार्किक ocl_sum( आदान_Array _src, Scalar & res, पूर्णाङ्क sum_op, आदान_Array _mask = noArray(),
+                     आदान_Array _src2 = noArray(), तार्किक calc2 = असत्य, ध्रुव Scalar & res2 = Scalar() );
+तार्किक ocl_minMaxIdx( आदान_Array _src, द्विगुण* minVal, द्विगुण* maxVal, पूर्णाङ्क* minLoc, पूर्णाङ्क* maxLoc, आदान_Array _mask,
+                           पूर्णाङ्क ddepth = -1, तार्किक abs_मूल्ये = असत्य, आदान_Array _src2 = noArray(), द्विगुण * maxVal2 = रिक्त);
 
 template <typename T> Scalar ocl_part_sum(Mat m)
 {
     CV_Assert(m.rows == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
-    const T * const ptr = m.ptr<T>(0);
+    पूर्णाङ्क cn = m.channels();
+    ध्रुव T * ध्रुव ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    प्रति (पूर्णाङ्क x = 0, w = m.cols * cn; x < w; )
+        प्रति (पूर्णाङ्क c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    प्रत्यागम s;
 }
 
 #endif
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+प्रकारनिर्देश पूर्णाङ्क (*SumFunc)(ध्रुव uchar*, ध्रुव uchar* mask, uchar*, पूर्णाङ्क, पूर्णाङ्क);
+SumFunc getSumFunc(पूर्णाङ्क depth);
 
 }
 

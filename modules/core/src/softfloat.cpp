@@ -63,27 +63,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * ====================================================
  */
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-#include "opencv2/core/softfloat.hpp"
+#अन्तर्भाव "opencv2/core/softfloat.hpp"
 
-namespace cv
+नामाकाश cv
 {
 
 /*----------------------------------------------------------------------------
 | Software floating-point underflow tininess-detection mode.
 *----------------------------------------------------------------------------*/
-enum {
+गणना {
     tininess_beforeRounding = 0,
     tininess_afterRounding  = 1
 };
 //fixed to make softfloat code stateless
-static const uint_fast8_t globalDetectTininess = tininess_afterRounding;
+स्थिर ध्रुव uint_fast8_t globalDetectTininess = tininess_afterRounding;
 
 /*----------------------------------------------------------------------------
 | Software floating-point exception flags.
 *----------------------------------------------------------------------------*/
-enum {
+गणना {
     flag_inexact   =  1,
     flag_underflow =  2,
     flag_overflow  =  4,
@@ -93,7 +93,7 @@ enum {
 
 // Disabled to make softfloat code stateless
 // This function may be changed in the future for better error handling
-static inline void raiseFlags( uint_fast8_t /* flags */)
+स्थिर अन्तःस्थ शून्य raiseFlags( uint_fast8_t /* flags */)
 {
     //exceptionFlags |= flags;
 }
@@ -101,7 +101,7 @@ static inline void raiseFlags( uint_fast8_t /* flags */)
 /*----------------------------------------------------------------------------
 | Software floating-point rounding mode.
 *----------------------------------------------------------------------------*/
-enum {
+गणना {
     round_near_even   = 0, // round to nearest, with ties to even
     round_minMag      = 1, // round to minimum magnitude (toward zero)
     round_min         = 2, // round to minimum (down)
@@ -116,7 +116,7 @@ enum {
  */
 
 //fixed to make softfloat code stateless
-static const uint_fast8_t globalRoundingMode = round_near_even;
+स्थिर ध्रुव uint_fast8_t globalRoundingMode = round_near_even;
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
@@ -146,161 +146,161 @@ static const uint_fast8_t globalRoundingMode = round_near_even;
 | the types below may, if desired, be defined as aliases for the native types
 | (typically 'float' and 'double').
 *----------------------------------------------------------------------------*/
-typedef softfloat float32_t;
-typedef softdouble float64_t;
+प्रकारनिर्देश softfloat float32_t;
+प्रकारनिर्देश softdouble float64_t;
 
 /*----------------------------------------------------------------------------
 | Integer-to-floating-point conversion routines.
 *----------------------------------------------------------------------------*/
-static float32_t ui32_to_f32( uint32_t );
-static float64_t ui32_to_f64( uint32_t );
-static float32_t ui64_to_f32( uint64_t );
-static float64_t ui64_to_f64( uint64_t );
-static float32_t i32_to_f32( int32_t );
-static float64_t i32_to_f64( int32_t );
-static float32_t i64_to_f32( int64_t );
-static float64_t i64_to_f64( int64_t );
+स्थिर float32_t ui32_to_f32( uint32_t );
+स्थिर float64_t ui32_to_f64( uint32_t );
+स्थिर float32_t ui64_to_f32( uint64_t );
+स्थिर float64_t ui64_to_f64( uint64_t );
+स्थिर float32_t i32_to_f32( int32_t );
+स्थिर float64_t i32_to_f64( int32_t );
+स्थिर float32_t i64_to_f32( int64_t );
+स्थिर float64_t i64_to_f64( int64_t );
 
 /*----------------------------------------------------------------------------
 | 32-bit (single-precision) floating-point operations.
 *----------------------------------------------------------------------------*/
-static int_fast32_t f32_to_i32( float32_t, uint_fast8_t, bool );
-static int_fast32_t f32_to_i32_r_minMag( float32_t, bool );
-static float64_t f32_to_f64( float32_t );
-static float32_t f32_roundToInt( float32_t, uint_fast8_t, bool );
-static float32_t f32_add( float32_t, float32_t );
-static float32_t f32_sub( float32_t, float32_t );
-static float32_t f32_mul( float32_t, float32_t );
-static float32_t f32_mulAdd( float32_t, float32_t, float32_t );
-static float32_t f32_div( float32_t, float32_t );
-static float32_t f32_rem( float32_t, float32_t );
-static float32_t f32_sqrt( float32_t );
-static bool f32_eq( float32_t, float32_t );
-static bool f32_le( float32_t, float32_t );
-static bool f32_lt( float32_t, float32_t );
+स्थिर int_fast32_t f32_to_i32( float32_t, uint_fast8_t, तार्किक );
+स्थिर int_fast32_t f32_to_i32_r_minMag( float32_t, तार्किक );
+स्थिर float64_t f32_to_f64( float32_t );
+स्थिर float32_t f32_roundToInt( float32_t, uint_fast8_t, तार्किक );
+स्थिर float32_t f32_add( float32_t, float32_t );
+स्थिर float32_t f32_sub( float32_t, float32_t );
+स्थिर float32_t f32_mul( float32_t, float32_t );
+स्थिर float32_t f32_mulAdd( float32_t, float32_t, float32_t );
+स्थिर float32_t f32_div( float32_t, float32_t );
+स्थिर float32_t f32_rem( float32_t, float32_t );
+स्थिर float32_t f32_sqrt( float32_t );
+स्थिर तार्किक f32_eq( float32_t, float32_t );
+स्थिर तार्किक f32_le( float32_t, float32_t );
+स्थिर तार्किक f32_lt( float32_t, float32_t );
 
 /*----------------------------------------------------------------------------
 | 64-bit (double-precision) floating-point operations.
 *----------------------------------------------------------------------------*/
-static int_fast32_t f64_to_i32( float64_t, uint_fast8_t, bool );
-static int_fast64_t f64_to_i64( float64_t, uint_fast8_t, bool );
-static int_fast32_t f64_to_i32_r_minMag( float64_t, bool );
-static float32_t f64_to_f32( float64_t );
-static float64_t f64_roundToInt( float64_t, uint_fast8_t, bool );
-static float64_t f64_add( float64_t, float64_t );
-static float64_t f64_sub( float64_t, float64_t );
-static float64_t f64_mul( float64_t, float64_t );
-static float64_t f64_mulAdd( float64_t, float64_t, float64_t );
-static float64_t f64_div( float64_t, float64_t );
-static float64_t f64_rem( float64_t, float64_t );
-static float64_t f64_sqrt( float64_t );
-static bool f64_eq( float64_t, float64_t );
-static bool f64_le( float64_t, float64_t );
-static bool f64_lt( float64_t, float64_t );
+स्थिर int_fast32_t f64_to_i32( float64_t, uint_fast8_t, तार्किक );
+स्थिर int_fast64_t f64_to_i64( float64_t, uint_fast8_t, तार्किक );
+स्थिर int_fast32_t f64_to_i32_r_minMag( float64_t, तार्किक );
+स्थिर float32_t f64_to_f32( float64_t );
+स्थिर float64_t f64_roundToInt( float64_t, uint_fast8_t, तार्किक );
+स्थिर float64_t f64_add( float64_t, float64_t );
+स्थिर float64_t f64_sub( float64_t, float64_t );
+स्थिर float64_t f64_mul( float64_t, float64_t );
+स्थिर float64_t f64_mulAdd( float64_t, float64_t, float64_t );
+स्थिर float64_t f64_div( float64_t, float64_t );
+स्थिर float64_t f64_rem( float64_t, float64_t );
+स्थिर float64_t f64_sqrt( float64_t );
+स्थिर तार्किक f64_eq( float64_t, float64_t );
+स्थिर तार्किक f64_le( float64_t, float64_t );
+स्थिर तार्किक f64_lt( float64_t, float64_t );
 
 /*----------------------------------------------------------------------------
 | Ported from OpenCV and fdlibm and added for usability
 *----------------------------------------------------------------------------*/
 
-static float32_t f32_powi( float32_t x, int y);
-static float64_t f64_powi( float64_t x, int y);
-static float64_t f64_sin_kernel(float64_t x);
-static float64_t f64_cos_kernel(float64_t x);
-static void f64_sincos_reduce(const float64_t& x, float64_t& y, int& n);
+स्थिर float32_t f32_powi( float32_t x, पूर्णाङ्क y);
+स्थिर float64_t f64_powi( float64_t x, पूर्णाङ्क y);
+स्थिर float64_t f64_sin_kernel(float64_t x);
+स्थिर float64_t f64_cos_kernel(float64_t x);
+स्थिर शून्य f64_sincos_reduce(ध्रुव float64_t& x, float64_t& y, पूर्णाङ्क& n);
 
-static float32_t f32_exp( float32_t x);
-static float64_t f64_exp(float64_t x);
-static float32_t f32_log(float32_t x);
-static float64_t f64_log(float64_t x);
-static float32_t f32_cbrt(float32_t x);
-static float32_t f32_pow( float32_t x, float32_t y);
-static float64_t f64_pow( float64_t x, float64_t y);
-static float64_t f64_sin( float64_t x );
-static float64_t f64_cos( float64_t x );
+स्थिर float32_t f32_exp( float32_t x);
+स्थिर float64_t f64_exp(float64_t x);
+स्थिर float32_t f32_log(float32_t x);
+स्थिर float64_t f64_log(float64_t x);
+स्थिर float32_t f32_cbrt(float32_t x);
+स्थिर float32_t f32_pow( float32_t x, float32_t y);
+स्थिर float64_t f64_pow( float64_t x, float64_t y);
+स्थिर float64_t f64_sin( float64_t x );
+स्थिर float64_t f64_cos( float64_t x );
 
 /*----------------------------------------------------------------------------
 | softfloat and softdouble methods and members
 *----------------------------------------------------------------------------*/
 
-softfloat::softfloat( const uint32_t a ) { *this = ui32_to_f32(a); }
-softfloat::softfloat( const uint64_t a ) { *this = ui64_to_f32(a); }
-softfloat::softfloat( const  int32_t a ) { *this =  i32_to_f32(a); }
-softfloat::softfloat( const  int64_t a ) { *this =  i64_to_f32(a); }
+softfloat::softfloat( ध्रुव uint32_t a ) { *एतत् = ui32_to_f32(a); }
+softfloat::softfloat( ध्रुव uint64_t a ) { *एतत् = ui64_to_f32(a); }
+softfloat::softfloat( ध्रुव  int32_t a ) { *एतत् =  i32_to_f32(a); }
+softfloat::softfloat( ध्रुव  int64_t a ) { *एतत् =  i64_to_f32(a); }
 
-softfloat::operator softdouble() const { return f32_to_f64(*this); }
+softfloat::operator softdouble() ध्रुव { प्रत्यागम f32_to_f64(*एतत्); }
 
-softfloat softfloat::operator + (const softfloat& a) const { return f32_add(*this, a); }
-softfloat softfloat::operator - (const softfloat& a) const { return f32_sub(*this, a); }
-softfloat softfloat::operator * (const softfloat& a) const { return f32_mul(*this, a); }
-softfloat softfloat::operator / (const softfloat& a) const { return f32_div(*this, a); }
-softfloat softfloat::operator % (const softfloat& a) const { return f32_rem(*this, a); }
+softfloat softfloat::operator + (ध्रुव softfloat& a) ध्रुव { प्रत्यागम f32_add(*एतत्, a); }
+softfloat softfloat::operator - (ध्रुव softfloat& a) ध्रुव { प्रत्यागम f32_sub(*एतत्, a); }
+softfloat softfloat::operator * (ध्रुव softfloat& a) ध्रुव { प्रत्यागम f32_mul(*एतत्, a); }
+softfloat softfloat::operator / (ध्रुव softfloat& a) ध्रुव { प्रत्यागम f32_div(*एतत्, a); }
+softfloat softfloat::operator % (ध्रुव softfloat& a) ध्रुव { प्रत्यागम f32_rem(*एतत्, a); }
 
-bool softfloat::operator == ( const softfloat& a ) const { return  f32_eq(*this, a); }
-bool softfloat::operator != ( const softfloat& a ) const { return !f32_eq(*this, a); }
-bool softfloat::operator >  ( const softfloat& a ) const { return  f32_lt(a, *this); }
-bool softfloat::operator >= ( const softfloat& a ) const { return  f32_le(a, *this); }
-bool softfloat::operator <  ( const softfloat& a ) const { return  f32_lt(*this, a); }
-bool softfloat::operator <= ( const softfloat& a ) const { return  f32_le(*this, a); }
+तार्किक softfloat::operator == ( ध्रुव softfloat& a ) ध्रुव { प्रत्यागम  f32_eq(*एतत्, a); }
+तार्किक softfloat::operator != ( ध्रुव softfloat& a ) ध्रुव { प्रत्यागम !f32_eq(*एतत्, a); }
+तार्किक softfloat::operator >  ( ध्रुव softfloat& a ) ध्रुव { प्रत्यागम  f32_lt(a, *एतत्); }
+तार्किक softfloat::operator >= ( ध्रुव softfloat& a ) ध्रुव { प्रत्यागम  f32_le(a, *एतत्); }
+तार्किक softfloat::operator <  ( ध्रुव softfloat& a ) ध्रुव { प्रत्यागम  f32_lt(*एतत्, a); }
+तार्किक softfloat::operator <= ( ध्रुव softfloat& a ) ध्रुव { प्रत्यागम  f32_le(*एतत्, a); }
 
-softdouble::softdouble( const uint32_t a ) { *this = ui32_to_f64(a); }
-softdouble::softdouble( const uint64_t a ) { *this = ui64_to_f64(a); }
-softdouble::softdouble( const  int32_t a ) { *this =  i32_to_f64(a); }
-softdouble::softdouble( const  int64_t a ) { *this =  i64_to_f64(a); }
+softdouble::softdouble( ध्रुव uint32_t a ) { *एतत् = ui32_to_f64(a); }
+softdouble::softdouble( ध्रुव uint64_t a ) { *एतत् = ui64_to_f64(a); }
+softdouble::softdouble( ध्रुव  int32_t a ) { *एतत् =  i32_to_f64(a); }
+softdouble::softdouble( ध्रुव  int64_t a ) { *एतत् =  i64_to_f64(a); }
 
 }
 
-int cvTrunc(const cv::softfloat& a) { return cv::f32_to_i32_r_minMag(a, false); }
-int cvRound(const cv::softfloat& a) { return cv::f32_to_i32(a, cv::round_near_even, false); }
-int cvFloor(const cv::softfloat& a) { return cv::f32_to_i32(a, cv::round_min, false); }
-int cvCeil (const cv::softfloat& a) { return cv::f32_to_i32(a, cv::round_max, false); }
+पूर्णाङ्क cvTrunc(ध्रुव cv::softfloat& a) { प्रत्यागम cv::f32_to_i32_r_minMag(a, असत्य); }
+पूर्णाङ्क cvRound(ध्रुव cv::softfloat& a) { प्रत्यागम cv::f32_to_i32(a, cv::round_near_even, असत्य); }
+पूर्णाङ्क cvFloor(ध्रुव cv::softfloat& a) { प्रत्यागम cv::f32_to_i32(a, cv::round_min, असत्य); }
+पूर्णाङ्क cvCeil (ध्रुव cv::softfloat& a) { प्रत्यागम cv::f32_to_i32(a, cv::round_max, असत्य); }
 
-int cvTrunc(const cv::softdouble& a) { return cv::f64_to_i32_r_minMag(a, false); }
-int cvRound(const cv::softdouble& a) { return cv::f64_to_i32(a, cv::round_near_even, false); }
-int cvFloor(const cv::softdouble& a) { return cv::f64_to_i32(a, cv::round_min, false); }
-int cvCeil (const cv::softdouble& a) { return cv::f64_to_i32(a, cv::round_max, false); }
+पूर्णाङ्क cvTrunc(ध्रुव cv::softdouble& a) { प्रत्यागम cv::f64_to_i32_r_minMag(a, असत्य); }
+पूर्णाङ्क cvRound(ध्रुव cv::softdouble& a) { प्रत्यागम cv::f64_to_i32(a, cv::round_near_even, असत्य); }
+पूर्णाङ्क cvFloor(ध्रुव cv::softdouble& a) { प्रत्यागम cv::f64_to_i32(a, cv::round_min, असत्य); }
+पूर्णाङ्क cvCeil (ध्रुव cv::softdouble& a) { प्रत्यागम cv::f64_to_i32(a, cv::round_max, असत्य); }
 
-int64_t cvRound64(const cv::softdouble& a) { return cv::f64_to_i64(a, cv::round_near_even, false); }
+int64_t cvRound64(ध्रुव cv::softdouble& a) { प्रत्यागम cv::f64_to_i64(a, cv::round_near_even, असत्य); }
 
-namespace cv
+नामाकाश cv
 {
-softdouble::operator softfloat() const { return f64_to_f32(*this); }
+softdouble::operator softfloat() ध्रुव { प्रत्यागम f64_to_f32(*एतत्); }
 
-softdouble softdouble::operator + (const softdouble& a) const { return f64_add(*this, a); }
-softdouble softdouble::operator - (const softdouble& a) const { return f64_sub(*this, a); }
-softdouble softdouble::operator * (const softdouble& a) const { return f64_mul(*this, a); }
-softdouble softdouble::operator / (const softdouble& a) const { return f64_div(*this, a); }
-softdouble softdouble::operator % (const softdouble& a) const { return f64_rem(*this, a); }
+softdouble softdouble::operator + (ध्रुव softdouble& a) ध्रुव { प्रत्यागम f64_add(*एतत्, a); }
+softdouble softdouble::operator - (ध्रुव softdouble& a) ध्रुव { प्रत्यागम f64_sub(*एतत्, a); }
+softdouble softdouble::operator * (ध्रुव softdouble& a) ध्रुव { प्रत्यागम f64_mul(*एतत्, a); }
+softdouble softdouble::operator / (ध्रुव softdouble& a) ध्रुव { प्रत्यागम f64_div(*एतत्, a); }
+softdouble softdouble::operator % (ध्रुव softdouble& a) ध्रुव { प्रत्यागम f64_rem(*एतत्, a); }
 
-bool softdouble::operator == (const softdouble& a) const { return  f64_eq(*this, a); }
-bool softdouble::operator != (const softdouble& a) const { return !f64_eq(*this, a); }
-bool softdouble::operator >  (const softdouble& a) const { return  f64_lt(a, *this); }
-bool softdouble::operator >= (const softdouble& a) const { return  f64_le(a, *this); }
-bool softdouble::operator <  (const softdouble& a) const { return  f64_lt(*this, a); }
-bool softdouble::operator <= (const softdouble& a) const { return  f64_le(*this, a); }
+तार्किक softdouble::operator == (ध्रुव softdouble& a) ध्रुव { प्रत्यागम  f64_eq(*एतत्, a); }
+तार्किक softdouble::operator != (ध्रुव softdouble& a) ध्रुव { प्रत्यागम !f64_eq(*एतत्, a); }
+तार्किक softdouble::operator >  (ध्रुव softdouble& a) ध्रुव { प्रत्यागम  f64_lt(a, *एतत्); }
+तार्किक softdouble::operator >= (ध्रुव softdouble& a) ध्रुव { प्रत्यागम  f64_le(a, *एतत्); }
+तार्किक softdouble::operator <  (ध्रुव softdouble& a) ध्रुव { प्रत्यागम  f64_lt(*एतत्, a); }
+तार्किक softdouble::operator <= (ध्रुव softdouble& a) ध्रुव { प्रत्यागम  f64_le(*एतत्, a); }
 
 /*----------------------------------------------------------------------------
 | Overloads for math functions
 *----------------------------------------------------------------------------*/
 
-softfloat  mulAdd( const softfloat&  a, const softfloat&  b, const softfloat & c) { return f32_mulAdd(a, b, c); }
-softdouble mulAdd( const softdouble& a, const softdouble& b, const softdouble& c) { return f64_mulAdd(a, b, c); }
+softfloat  mulAdd( ध्रुव softfloat&  a, ध्रुव softfloat&  b, ध्रुव softfloat & c) { प्रत्यागम f32_mulAdd(a, b, c); }
+softdouble mulAdd( ध्रुव softdouble& a, ध्रुव softdouble& b, ध्रुव softdouble& c) { प्रत्यागम f64_mulAdd(a, b, c); }
 
-softfloat  sqrt( const softfloat&  a ) { return f32_sqrt(a); }
-softdouble sqrt( const softdouble& a ) { return f64_sqrt(a); }
+softfloat  sqrt( ध्रुव softfloat&  a ) { प्रत्यागम f32_sqrt(a); }
+softdouble sqrt( ध्रुव softdouble& a ) { प्रत्यागम f64_sqrt(a); }
 
-softfloat  exp( const softfloat&  a) { return f32_exp(a); }
-softdouble exp( const softdouble& a) { return f64_exp(a); }
+softfloat  exp( ध्रुव softfloat&  a) { प्रत्यागम f32_exp(a); }
+softdouble exp( ध्रुव softdouble& a) { प्रत्यागम f64_exp(a); }
 
-softfloat  log( const softfloat&  a ) { return f32_log(a); }
-softdouble log( const softdouble& a ) { return f64_log(a); }
+softfloat  log( ध्रुव softfloat&  a ) { प्रत्यागम f32_log(a); }
+softdouble log( ध्रुव softdouble& a ) { प्रत्यागम f64_log(a); }
 
-softfloat  pow( const softfloat&  a, const softfloat&  b) { return f32_pow(a, b); }
-softdouble pow( const softdouble& a, const softdouble& b) { return f64_pow(a, b); }
+softfloat  pow( ध्रुव softfloat&  a, ध्रुव softfloat&  b) { प्रत्यागम f32_pow(a, b); }
+softdouble pow( ध्रुव softdouble& a, ध्रुव softdouble& b) { प्रत्यागम f64_pow(a, b); }
 
-softfloat cbrt(const softfloat& a) { return f32_cbrt(a); }
+softfloat cbrt(ध्रुव softfloat& a) { प्रत्यागम f32_cbrt(a); }
 
-softdouble sin(const softdouble& a) { return f64_sin(a); }
-softdouble cos(const softdouble& a) { return f64_cos(a); }
+softdouble sin(ध्रुव softdouble& a) { प्रत्यागम f64_sin(a); }
+softdouble cos(ध्रुव softdouble& a) { प्रत्यागम f64_cos(a); }
 
 /*----------------------------------------------------------------------------
 | The values to return on conversions to 32-bit integer formats that raise an
@@ -324,11 +324,11 @@ softdouble cos(const softdouble& a) { return f64_cos(a); }
 | "Common NaN" structure, used to transfer NaN representations from one format
 | to another.
 *----------------------------------------------------------------------------*/
-struct commonNaN {
-    bool sign;
-#ifndef WORDS_BIGENDIAN
+संरचना commonNaN {
+    तार्किक sign;
+#ifndef शब्द_BIGENDIAN
     uint64_t v0, v64;
-#else
+#अन्यथा
     uint64_t v64, v0;
 #endif
 };
@@ -351,13 +351,13 @@ struct commonNaN {
 | location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 | exception is raised.
 *----------------------------------------------------------------------------*/
-static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, struct commonNaN *zPtr );
+स्थिर शून्य softfloat_f32UIToCommonNaN( uint_fast32_t uiA, संरचना commonNaN *zPtr );
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-static uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr );
+स्थिर uint_fast32_t softfloat_commonNaNToF32UI( ध्रुव संरचना commonNaN *aPtr );
 
 /*----------------------------------------------------------------------------
 | Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
@@ -365,7 +365,7 @@ static uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr );
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-static uint_fast32_t softfloat_propagateNaNF32UI( uint_fast32_t uiA, uint_fast32_t uiB );
+स्थिर uint_fast32_t softfloat_propagateNaNF32UI( uint_fast32_t uiA, uint_fast32_t uiB );
 
 /*----------------------------------------------------------------------------
 | The bit pattern for a default generated 64-bit floating-point NaN.
@@ -387,13 +387,13 @@ static uint_fast32_t softfloat_propagateNaNF32UI( uint_fast32_t uiA, uint_fast32
 | location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 | exception is raised.
 *----------------------------------------------------------------------------*/
-static void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPtr );
+स्थिर शून्य softfloat_f64UIToCommonNaN( uint_fast64_t uiA, संरचना commonNaN *zPtr );
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into a 64-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-static uint_fast64_t softfloat_commonNaNToF64UI( const struct commonNaN *aPtr );
+स्थिर uint_fast64_t softfloat_commonNaNToF64UI( ध्रुव संरचना commonNaN *aPtr );
 
 /*----------------------------------------------------------------------------
 | Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
@@ -401,53 +401,53 @@ static uint_fast64_t softfloat_commonNaNToF64UI( const struct commonNaN *aPtr );
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-static uint_fast64_t softfloat_propagateNaNF64UI( uint_fast64_t uiA, uint_fast64_t uiB );
+स्थिर uint_fast64_t softfloat_propagateNaNF64UI( uint_fast64_t uiA, uint_fast64_t uiB );
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
 
-#ifndef WORDS_BIGENDIAN
-struct uint128 { uint64_t v0, v64; };
-struct uint64_extra { uint64_t extra, v; };
-struct uint128_extra { uint64_t extra; struct uint128 v; };
-#else
-struct uint128 { uint64_t v64, v0; };
-struct uint64_extra { uint64_t v, extra; };
-struct uint128_extra { struct uint128 v; uint64_t extra; };
+#ifndef शब्द_BIGENDIAN
+संरचना uint128 { uint64_t v0, v64; };
+संरचना uint64_extra { uint64_t extra, v; };
+संरचना uint128_extra { uint64_t extra; संरचना uint128 v; };
+#अन्यथा
+संरचना uint128 { uint64_t v64, v0; };
+संरचना uint64_extra { uint64_t v, extra; };
+संरचना uint128_extra { संरचना uint128 v; uint64_t extra; };
 #endif
 
-enum {
+गणना {
     softfloat_mulAdd_subC    = 1,
     softfloat_mulAdd_subProd = 2
 };
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
-static int_fast32_t softfloat_roundToI32( bool, uint_fast64_t, uint_fast8_t, bool );
+स्थिर int_fast32_t softfloat_roundToI32( तार्किक, uint_fast64_t, uint_fast8_t, तार्किक );
 
-struct exp16_sig32 { int_fast16_t exp; uint_fast32_t sig; };
-static struct exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t );
+संरचना exp16_sig32 { int_fast16_t exp; uint_fast32_t sig; };
+स्थिर संरचना exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t );
 
-static float32_t softfloat_roundPackToF32( bool, int_fast16_t, uint_fast32_t );
-static float32_t softfloat_normRoundPackToF32( bool, int_fast16_t, uint_fast32_t );
+स्थिर float32_t softfloat_roundPackToF32( तार्किक, int_fast16_t, uint_fast32_t );
+स्थिर float32_t softfloat_normRoundPackToF32( तार्किक, int_fast16_t, uint_fast32_t );
 
-static float32_t softfloat_addMagsF32( uint_fast32_t, uint_fast32_t );
-static float32_t softfloat_subMagsF32( uint_fast32_t, uint_fast32_t );
-static float32_t softfloat_mulAddF32(uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast8_t );
+स्थिर float32_t softfloat_addMagsF32( uint_fast32_t, uint_fast32_t );
+स्थिर float32_t softfloat_subMagsF32( uint_fast32_t, uint_fast32_t );
+स्थिर float32_t softfloat_mulAddF32(uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast8_t );
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
-static int_fast64_t softfloat_roundToI64( bool, uint_fast64_t, uint_fast64_t, uint_fast8_t, bool);
+स्थिर int_fast64_t softfloat_roundToI64( तार्किक, uint_fast64_t, uint_fast64_t, uint_fast8_t, तार्किक);
 
-struct exp16_sig64 { int_fast16_t exp; uint_fast64_t sig; };
-static struct exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t );
+संरचना exp16_sig64 { int_fast16_t exp; uint_fast64_t sig; };
+स्थिर संरचना exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t );
 
-static float64_t softfloat_roundPackToF64( bool, int_fast16_t, uint_fast64_t );
-static float64_t softfloat_normRoundPackToF64( bool, int_fast16_t, uint_fast64_t );
+स्थिर float64_t softfloat_roundPackToF64( तार्किक, int_fast16_t, uint_fast64_t );
+स्थिर float64_t softfloat_normRoundPackToF64( तार्किक, int_fast16_t, uint_fast64_t );
 
-static float64_t softfloat_addMagsF64( uint_fast64_t, uint_fast64_t, bool );
-static float64_t softfloat_subMagsF64( uint_fast64_t, uint_fast64_t, bool );
-static float64_t softfloat_mulAddF64( uint_fast64_t, uint_fast64_t, uint_fast64_t, uint_fast8_t );
+स्थिर float64_t softfloat_addMagsF64( uint_fast64_t, uint_fast64_t, तार्किक );
+स्थिर float64_t softfloat_subMagsF64( uint_fast64_t, uint_fast64_t, तार्किक );
+स्थिर float64_t softfloat_mulAddF64( uint_fast64_t, uint_fast64_t, uint_fast64_t, uint_fast8_t );
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
@@ -459,8 +459,8 @@ static float64_t softfloat_mulAddF64( uint_fast64_t, uint_fast64_t, uint_fast64_
 | significant bit to 1.  This shifted-and-jammed value is returned.
 *----------------------------------------------------------------------------*/
 
-static inline uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist )
-{ return a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0); }
+स्थिर अन्तःस्थ uint64_t softfloat_short_Shift_उजवा_Jam64( uint64_t a, uint_fast8_t dist )
+{ प्रत्यागम a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0); }
 
 /*----------------------------------------------------------------------------
 | Shifts 'a' right by the number of bits given in 'dist', which must not
@@ -472,10 +472,10 @@ static inline uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t 
 | is zero or nonzero.
 *----------------------------------------------------------------------------*/
 
-static inline uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist )
+स्थिर अन्तःस्थ uint32_t softfloat_shift_उजवा_Jam32( uint32_t a, uint_fast16_t dist )
 {
     //fixed unsigned unary minus: -x == ~x + 1
-    return (dist < 31) ? a>>dist | ((uint32_t) (a<<((~dist + 1) & 31)) != 0) : (a != 0);
+    प्रत्यागम (dist < 31) ? a>>dist | ((uint32_t) (a<<((~dist + 1) & 31)) != 0) : (a != 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -487,10 +487,10 @@ static inline uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist
 | greater than 64, the result will be either 0 or 1, depending on whether 'a'
 | is zero or nonzero.
 *----------------------------------------------------------------------------*/
-static inline uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist )
+स्थिर अन्तःस्थ uint64_t softfloat_shift_उजवा_Jam64( uint64_t a, uint_fast32_t dist )
 {
     //fixed unsigned unary minus: -x == ~x + 1
-    return (dist < 63) ? a>>dist | ((uint64_t) (a<<((~dist + 1) & 63)) != 0) : (a != 0);
+    प्रत्यागम (dist < 63) ? a>>dist | ((uint64_t) (a<<((~dist + 1) & 63)) != 0) : (a != 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -498,7 +498,7 @@ static inline uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist
 | into the number of leading 0 bits before the most-significant 1 of that
 | integer.  For integer zero (index 0), the corresponding table element is 8.
 *----------------------------------------------------------------------------*/
-static const uint_least8_t softfloat_countLeadingZeros8[256] = {
+स्थिर ध्रुव uint_least8_t softfloat_मोजणी_Leading_Zeros8[256] = {
     8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -521,26 +521,26 @@ static const uint_least8_t softfloat_countLeadingZeros8[256] = {
 | Returns the number of leading 0 bits before the most-significant 1 bit of
 | 'a'.  If 'a' is zero, 32 is returned.
 *----------------------------------------------------------------------------*/
-static inline uint_fast8_t softfloat_countLeadingZeros32( uint32_t a )
+स्थिर अन्तःस्थ uint_fast8_t softfloat_मोजणी_Leading_Zeros32( uint32_t a )
 {
-    uint_fast8_t count = 0;
-    if ( a < 0x10000 ) {
-        count = 16;
+    uint_fast8_t मोजणी_2 = 0;
+    यदि ( a < 0x10000 ) {
+        मोजणी_2 = 16;
         a <<= 16;
     }
-    if ( a < 0x1000000 ) {
-        count += 8;
+    यदि ( a < 0x1000000 ) {
+        मोजणी_2 += 8;
         a <<= 8;
     }
-    count += softfloat_countLeadingZeros8[a>>24];
-    return count;
+    मोजणी_2 += softfloat_मोजणी_Leading_Zeros8[a>>24];
+    प्रत्यागम मोजणी_2;
 }
 
 /*----------------------------------------------------------------------------
 | Returns the number of leading 0 bits before the most-significant 1 bit of
 | 'a'.  If 'a' is zero, 64 is returned.
 *----------------------------------------------------------------------------*/
-static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a );
+स्थिर uint_fast8_t softfloat_मोजणी_Leading_Zeros64( uint64_t a );
 
 /*----------------------------------------------------------------------------
 | Returns an approximation to the reciprocal of the number represented by 'a',
@@ -573,13 +573,13 @@ static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a );
 | returned is also always within the range 0.5 to 1; thus, the most-
 | significant bit of the result is always set.
 *----------------------------------------------------------------------------*/
-static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a );
+स्थिर uint32_t softfloat_approxRecipSqrt32_1( unsigned पूर्णाङ्क oddExpA, uint32_t a );
 
-static const uint16_t softfloat_approxRecipSqrt_1k0s[16] = {
+स्थिर ध्रुव uint16_t softfloat_approxRecipSqrt_1k0s[16] = {
     0xB4C9, 0xFFAB, 0xAA7D, 0xF11C, 0xA1C5, 0xE4C7, 0x9A43, 0xDA29,
     0x93B5, 0xD0E5, 0x8DED, 0xC8B7, 0x88C6, 0xC16D, 0x8424, 0xBAE1
 };
-static const uint16_t softfloat_approxRecipSqrt_1k1s[16] = {
+स्थिर ध्रुव uint16_t softfloat_approxRecipSqrt_1k1s[16] = {
     0xA5A5, 0xEA42, 0x8C21, 0xC62D, 0x788F, 0xAA7F, 0x6928, 0x94B6,
     0x5CC7, 0x8335, 0x52A6, 0x74E2, 0x4A3E, 0x68FE, 0x432B, 0x5EFD
 };
@@ -588,12 +588,12 @@ static const uint16_t softfloat_approxRecipSqrt_1k1s[16] = {
 | Shifts the 128 bits formed by concatenating 'a64' and 'a0' left by the
 | number of bits given in 'dist', which must be in the range 1 to 63.
 *----------------------------------------------------------------------------*/
-static inline struct uint128 softfloat_shortShiftLeft128( uint64_t a64, uint64_t a0, uint_fast8_t dist )
+स्थिर अन्तःस्थ संरचना uint128 softfloat_shortShiftLeft128( uint64_t a64, uint64_t a0, uint_fast8_t dist )
 {
-    struct uint128 z;
+    संरचना uint128 z;
     z.v64 = a64<<dist | a0>>(-dist & 63);
     z.v0 = a0<<dist;
-    return z;
+    प्रत्यागम z;
 }
 
 /*----------------------------------------------------------------------------
@@ -603,15 +603,15 @@ static inline struct uint128 softfloat_shortShiftLeft128( uint64_t a64, uint64_t
 | bit of the shifted value by setting the least-significant bit to 1.  This
 | shifted-and-jammed value is returned.
 *----------------------------------------------------------------------------*/
-static inline struct uint128 softfloat_shortShiftRightJam128(uint64_t a64, uint64_t a0, uint_fast8_t dist )
+स्थिर अन्तःस्थ संरचना uint128 softfloat_short_Shift_उजवा_Jam128(uint64_t a64, uint64_t a0, uint_fast8_t dist )
 {
     uint_fast8_t negDist = -dist;
-    struct uint128 z;
+    संरचना uint128 z;
     z.v64 = a64>>dist;
     z.v0 =
         a64<<(negDist & 63) | a0>>dist
             | ((uint64_t) (a0<<(negDist & 63)) != 0);
-    return z;
+    प्रत्यागम z;
 }
 
 /*----------------------------------------------------------------------------
@@ -624,19 +624,19 @@ static inline struct uint128 softfloat_shortShiftRightJam128(uint64_t a64, uint6
 | greater than 128, the result will be either 0 or 1, depending on whether the
 | original 128 bits are all zeros.
 *----------------------------------------------------------------------------*/
-static struct uint128 softfloat_shiftRightJam128( uint64_t a64, uint64_t a0, uint_fast32_t dist );
+स्थिर संरचना uint128 softfloat_shift_उजवा_Jam128( uint64_t a64, uint64_t a0, uint_fast32_t dist );
 
 /*----------------------------------------------------------------------------
 | Returns the sum of the 128-bit integer formed by concatenating 'a64' and
 | 'a0' and the 128-bit integer formed by concatenating 'b64' and 'b0'.  The
 | addition is modulo 2^128, so any carry out is lost.
 *----------------------------------------------------------------------------*/
-static inline struct uint128 softfloat_add128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
+स्थिर अन्तःस्थ संरचना uint128 softfloat_add128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
 {
-    struct uint128 z;
+    संरचना uint128 z;
     z.v0 = a0 + b0;
     z.v64 = a64 + b64 + (z.v0 < a0);
-    return z;
+    प्रत्यागम z;
 }
 
 /*----------------------------------------------------------------------------
@@ -644,49 +644,49 @@ static inline struct uint128 softfloat_add128( uint64_t a64, uint64_t a0, uint64
 | and 'a0' and the 128-bit integer formed by concatenating 'b64' and 'b0'.
 | The subtraction is modulo 2^128, so any borrow out (carry out) is lost.
 *----------------------------------------------------------------------------*/
-static inline struct uint128 softfloat_sub128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
+स्थिर अन्तःस्थ संरचना uint128 softfloat_sub128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
 {
-    struct uint128 z;
+    संरचना uint128 z;
     z.v0 = a0 - b0;
     z.v64 = a64 - b64;
     z.v64 -= (a0 < b0);
-    return z;
+    प्रत्यागम z;
 }
 
 /*----------------------------------------------------------------------------
 | Returns the 128-bit product of 'a' and 'b'.
 *----------------------------------------------------------------------------*/
-static struct uint128 softfloat_mul64To128( uint64_t a, uint64_t b );
+स्थिर संरचना uint128 softfloat_mul64To128( uint64_t a, uint64_t b );
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
 
-static float32_t f32_add( float32_t a, float32_t b )
+स्थिर float32_t f32_add( float32_t a, float32_t b )
 {
     uint_fast32_t uiA = a.v;
     uint_fast32_t uiB = b.v;
 
-    if ( signF32UI( uiA ^ uiB ) ) {
-        return softfloat_subMagsF32( uiA, uiB );
-    } else {
-        return softfloat_addMagsF32( uiA, uiB );
+    यदि ( signF32UI( uiA ^ uiB ) ) {
+        प्रत्यागम softfloat_subMagsF32( uiA, uiB );
+    } अन्यथा {
+        प्रत्यागम softfloat_addMagsF32( uiA, uiB );
     }
 }
 
-static float32_t f32_div( float32_t a, float32_t b )
+स्थिर float32_t f32_div( float32_t a, float32_t b )
 {
     uint_fast32_t uiA;
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast32_t sigA;
     uint_fast32_t uiB;
-    bool signB;
+    तार्किक signB;
     int_fast16_t expB;
     uint_fast32_t sigB;
-    bool signZ;
-    struct exp16_sig32 normExpSig;
+    तार्किक signZ;
+    संरचना exp16_sig32 normExpSig;
     int_fast16_t expZ;
     uint_fast64_t sig64A;
     uint_fast32_t sigZ;
@@ -705,32 +705,32 @@ static float32_t f32_div( float32_t a, float32_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA ) goto propagateNaN;
-        if ( expB == 0xFF ) {
-            if ( sigB ) goto propagateNaN;
-            goto invalid;
+    यदि ( expA == 0xFF ) {
+        यदि ( sigA ) गच्छ propagateNaN;
+        यदि ( expB == 0xFF ) {
+            यदि ( sigB ) गच्छ propagateNaN;
+            गच्छ invalid;
         }
-        goto infinity;
+        गच्छ infinity;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
-        goto zero;
+    यदि ( expB == 0xFF ) {
+        यदि ( sigB ) गच्छ propagateNaN;
+        गच्छ zero;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) {
-            if ( ! (expA | sigA) ) goto invalid;
+    यदि ( ! expB ) {
+        यदि ( ! sigB ) {
+            यदि ( ! (expA | sigA) ) गच्छ invalid;
             raiseFlags( flag_infinite );
-            goto infinity;
+            गच्छ infinity;
         }
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) गच्छ zero;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -740,93 +740,93 @@ static float32_t f32_div( float32_t a, float32_t b )
     expZ = expA - expB + 0x7E;
     sigA |= 0x00800000;
     sigB |= 0x00800000;
-    if ( sigA < sigB ) {
+    यदि ( sigA < sigB ) {
         --expZ;
         sig64A = (uint_fast64_t) sigA<<31;
-    } else {
+    } अन्यथा {
         sig64A = (uint_fast64_t) sigA<<30;
     }
     sigZ = (uint_fast32_t)(sig64A / sigB); // fixed warning on type cast
-    if ( ! (sigZ & 0x3F) ) sigZ |= ((uint_fast64_t) sigB * sigZ != sig64A);
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    यदि ( ! (sigZ & 0x3F) ) sigZ |= ((uint_fast64_t) sigB * sigZ != sig64A);
+    प्रत्यागम softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infinity:
     uiZ = packToF32UI( signZ, 0xFF, 0 );
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  zero:
     uiZ = packToF32UI( signZ, 0, 0 );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static bool f32_eq( float32_t a, float32_t b )
+स्थिर तार्किक f32_eq( float32_t a, float32_t b )
 {
     uint_fast32_t uiA;
     uint_fast32_t uiB;
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
+    यदि ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
     {
-        if (softfloat_isSigNaNF32UI( uiA ) || softfloat_isSigNaNF32UI( uiB ) )
+        यदि (softfloat_isSigNaNF32UI( uiA ) || softfloat_isSigNaNF32UI( uiB ) )
             raiseFlags( flag_invalid );
-        return false;
+        प्रत्यागम असत्य;
     }
-    return (uiA == uiB) || ! (uint32_t) ((uiA | uiB)<<1);
+    प्रत्यागम (uiA == uiB) || ! (uint32_t) ((uiA | uiB)<<1);
 }
 
-static bool f32_le( float32_t a, float32_t b )
+स्थिर तार्किक f32_le( float32_t a, float32_t b )
 {
     uint_fast32_t uiA;
     uint_fast32_t uiB;
-    bool signA, signB;
+    तार्किक signA, signB;
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
+    यदि ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
     {
         raiseFlags( flag_invalid );
-        return false;
+        प्रत्यागम असत्य;
     }
     signA = signF32UI( uiA );
     signB = signF32UI( uiB );
-    return (signA != signB) ? signA || ! (uint32_t) ((uiA | uiB)<<1)
+    प्रत्यागम (signA != signB) ? signA || ! (uint32_t) ((uiA | uiB)<<1)
                             : (uiA == uiB) || (signA ^ (uiA < uiB));
 }
 
-static bool f32_lt( float32_t a, float32_t b )
+स्थिर तार्किक f32_lt( float32_t a, float32_t b )
 {
     uint_fast32_t uiA;
     uint_fast32_t uiB;
-    bool signA, signB;
+    तार्किक signA, signB;
 
     uiA = a.v; uiB = b.v;
-    if ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
+    यदि ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
     {
         raiseFlags( flag_invalid );
-        return false;
+        प्रत्यागम असत्य;
     }
     signA = signF32UI( uiA );
     signB = signF32UI( uiB );
-    return (signA != signB) ? signA && ((uint32_t) ((uiA | uiB)<<1) != 0)
+    प्रत्यागम (signA != signB) ? signA && ((uint32_t) ((uiA | uiB)<<1) != 0)
                             : (uiA != uiB) && (signA ^ (uiA < uiB));
 }
 
-static float32_t f32_mulAdd( float32_t a, float32_t b, float32_t c )
+स्थिर float32_t f32_mulAdd( float32_t a, float32_t b, float32_t c )
 {
     uint_fast32_t uiA;
     uint_fast32_t uiB;
@@ -835,22 +835,22 @@ static float32_t f32_mulAdd( float32_t a, float32_t b, float32_t c )
     uiA = a.v;
     uiB = b.v;
     uiC = c.v;
-    return softfloat_mulAddF32( uiA, uiB, uiC, 0 );
+    प्रत्यागम softfloat_mulAddF32( uiA, uiB, uiC, 0 );
 }
 
-static float32_t f32_mul( float32_t a, float32_t b )
+स्थिर float32_t f32_mul( float32_t a, float32_t b )
 {
     uint_fast32_t uiA;
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast32_t sigA;
     uint_fast32_t uiB;
-    bool signB;
+    तार्किक signB;
     int_fast16_t expB;
     uint_fast32_t sigB;
-    bool signZ;
+    तार्किक signZ;
     uint_fast32_t magBits;
-    struct exp16_sig32 normExpSig;
+    संरचना exp16_sig32 normExpSig;
     int_fast16_t expZ;
     uint_fast32_t sigZ, uiZ;
 
@@ -867,26 +867,26 @@ static float32_t f32_mul( float32_t a, float32_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
+    यदि ( expA == 0xFF ) {
+        यदि ( sigA || ((expB == 0xFF) && sigB) ) गच्छ propagateNaN;
         magBits = expB | sigB;
-        goto infArg;
+        गच्छ infArg;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
+    यदि ( expB == 0xFF ) {
+        यदि ( sigB ) गच्छ propagateNaN;
         magBits = expA | sigA;
-        goto infArg;
+        गच्छ infArg;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) गच्छ zero;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zero;
+    यदि ( ! expB ) {
+        यदि ( ! sigB ) गच्छ zero;
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -896,49 +896,49 @@ static float32_t f32_mul( float32_t a, float32_t b )
     expZ = expA + expB - 0x7F;
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<8;
-    sigZ = (uint_fast32_t)softfloat_shortShiftRightJam64( (uint_fast64_t) sigA * sigB, 32 ); //fixed warning on type cast
-    if ( sigZ < 0x40000000 ) {
+    sigZ = (uint_fast32_t)softfloat_short_Shift_उजवा_Jam64( (uint_fast64_t) sigA * sigB, 32 ); //fixed warning on type cast
+    यदि ( sigZ < 0x40000000 ) {
         --expZ;
         sigZ <<= 1;
     }
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    प्रत्यागम softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infArg:
-    if ( ! magBits ) {
+    यदि ( ! magBits ) {
         raiseFlags( flag_invalid );
         uiZ = defaultNaNF32UI;
-    } else {
+    } अन्यथा {
         uiZ = packToF32UI( signZ, 0xFF, 0 );
     }
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  zero:
     uiZ = packToF32UI( signZ, 0, 0 );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static float32_t f32_rem( float32_t a, float32_t b )
+स्थिर float32_t f32_rem( float32_t a, float32_t b )
 {
     uint_fast32_t uiA;
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast32_t sigA;
     uint_fast32_t uiB;
     int_fast16_t expB;
     uint_fast32_t sigB;
-    struct exp16_sig32 normExpSig;
+    संरचना exp16_sig32 normExpSig;
     uint32_t rem;
     int_fast16_t expDiff;
     uint32_t q, recip32, altRem, meanRem;
-    bool signRem;
+    तार्किक signRem;
     uint_fast32_t uiZ;
 
     /*------------------------------------------------------------------------
@@ -952,24 +952,24 @@ static float32_t f32_rem( float32_t a, float32_t b )
     sigB = fracF32UI( uiB );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
-        goto invalid;
+    यदि ( expA == 0xFF ) {
+        यदि ( sigA || ((expB == 0xFF) && sigB) ) गच्छ propagateNaN;
+        गच्छ invalid;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
-        return a;
+    यदि ( expB == 0xFF ) {
+        यदि ( sigB ) गच्छ propagateNaN;
+        प्रत्यागम a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) goto invalid;
+    यदि ( ! expB ) {
+        यदि ( ! sigB ) गच्छ invalid;
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) प्रत्यागम a;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -979,18 +979,18 @@ static float32_t f32_rem( float32_t a, float32_t b )
     rem = sigA | 0x00800000;
     sigB |= 0x00800000;
     expDiff = expA - expB;
-    if ( expDiff < 1 ) {
-        if ( expDiff < -1 ) return a;
+    यदि ( expDiff < 1 ) {
+        यदि ( expDiff < -1 ) प्रत्यागम a;
         sigB <<= 6;
-        if ( expDiff ) {
+        यदि ( expDiff ) {
             rem <<= 5;
             q = 0;
-        } else {
+        } अन्यथा {
             rem <<= 6;
             q = (sigB <= rem);
-            if ( q ) rem -= sigB;
+            यदि ( q ) rem -= sigB;
         }
-    } else {
+    } अन्यथा {
         recip32 = softfloat_approxRecip32_1( sigB<<8 );
         /*--------------------------------------------------------------------
         | Changing the shift of `rem' here requires also changing the initial
@@ -1004,9 +1004,9 @@ static float32_t f32_rem( float32_t a, float32_t b )
         | which is believed to be the maximum possible.
         *--------------------------------------------------------------------*/
         sigB <<= 6;
-        for (;;) {
+        प्रति (;;) {
             q = (rem * (uint_fast64_t) recip32)>>32;
-            if ( expDiff < 0 ) break;
+            यदि ( expDiff < 0 ) भङ्ग;
             //fixed unsigned unary minus: -x == ~x + 1
             rem = ~(q * (uint32_t) sigB) + 1;
             expDiff -= 29;
@@ -1019,33 +1019,33 @@ static float32_t f32_rem( float32_t a, float32_t b )
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    do {
+    कुरु {
         altRem = rem;
         ++q;
         rem -= sigB;
-    } while ( ! (rem & 0x80000000) );
+    } यावत् ( ! (rem & 0x80000000) );
     meanRem = rem + altRem;
-    if ( (meanRem & 0x80000000) || (! meanRem && (q & 1)) ) rem = altRem;
+    यदि ( (meanRem & 0x80000000) || (! meanRem && (q & 1)) ) rem = altRem;
     signRem = signA;
-    if ( 0x80000000 <= rem ) {
+    यदि ( 0x80000000 <= rem ) {
         signRem = ! signRem;
         //fixed unsigned unary minus: -x == ~x + 1
         rem = ~rem + 1;
     }
-    return softfloat_normRoundPackToF32( signRem, expB, rem );
+    प्रत्यागम softfloat_normRoundPackToF32( signRem, expB, rem );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
-    goto uiZ;
+    गच्छ uiZ;
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static float32_t f32_roundToInt( float32_t a, uint_fast8_t roundingMode, bool exact )
+स्थिर float32_t f32_roundToInt( float32_t a, uint_fast8_t roundingMode, तार्किक exact )
 {
     uint_fast32_t uiA;
     int_fast16_t exp;
@@ -1057,66 +1057,66 @@ static float32_t f32_roundToInt( float32_t a, uint_fast8_t roundingMode, bool ex
     exp = expF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp <= 0x7E ) {
-        if ( ! (uint32_t) (uiA<<1) ) return a;
-        if ( exact ) raiseFlags(flag_inexact);
+    यदि ( exp <= 0x7E ) {
+        यदि ( ! (uint32_t) (uiA<<1) ) प्रत्यागम a;
+        यदि ( exact ) raiseFlags(flag_inexact);
         uiZ = uiA & packToF32UI( 1, 0, 0 );
-        switch ( roundingMode ) {
-         case round_near_even:
-            if ( ! fracF32UI( uiA ) ) break;
+        विकल्प ( roundingMode ) {
+         पक्ष round_near_even:
+            यदि ( ! fracF32UI( uiA ) ) भङ्ग;
             [[fallthrough]];
-         case round_near_maxMag:
-            if ( exp == 0x7E ) uiZ |= packToF32UI( 0, 0x7F, 0 );
-            break;
-         case round_min:
-            if ( uiZ ) uiZ = packToF32UI( 1, 0x7F, 0 );
-            break;
-         case round_max:
-            if ( ! uiZ ) uiZ = packToF32UI( 0, 0x7F, 0 );
-            break;
+         पक्ष round_near_maxMag:
+            यदि ( exp == 0x7E ) uiZ |= packToF32UI( 0, 0x7F, 0 );
+            भङ्ग;
+         पक्ष round_min:
+            यदि ( uiZ ) uiZ = packToF32UI( 1, 0x7F, 0 );
+            भङ्ग;
+         पक्ष round_max:
+            यदि ( ! uiZ ) uiZ = packToF32UI( 0, 0x7F, 0 );
+            भङ्ग;
         }
-        goto uiZ;
+        गच्छ uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x96 <= exp ) {
-        if ( (exp == 0xFF) && fracF32UI( uiA ) ) {
+    यदि ( 0x96 <= exp ) {
+        यदि ( (exp == 0xFF) && fracF32UI( uiA ) ) {
             uiZ = softfloat_propagateNaNF32UI( uiA, 0 );
-            goto uiZ;
+            गच्छ uiZ;
         }
-        return a;
+        प्रत्यागम a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiZ = uiA;
     lastBitMask = (uint_fast32_t) 1<<(0x96 - exp);
     roundBitsMask = lastBitMask - 1;
-    if ( roundingMode == round_near_maxMag ) {
+    यदि ( roundingMode == round_near_maxMag ) {
         uiZ += lastBitMask>>1;
-    } else if ( roundingMode == round_near_even ) {
+    } अन्यथा यदि ( roundingMode == round_near_even ) {
         uiZ += lastBitMask>>1;
-        if ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
-    } else if (
+        यदि ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
+    } अन्यथा यदि (
         roundingMode
             == (signF32UI( uiZ ) ? round_min : round_max)
     ) {
         uiZ += roundBitsMask;
     }
     uiZ &= ~roundBitsMask;
-    if ( exact && (uiZ != uiA) ) {
+    यदि ( exact && (uiZ != uiA) ) {
         raiseFlags(flag_inexact);
     }
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static float32_t f32_sqrt( float32_t a )
+स्थिर float32_t f32_sqrt( float32_t a )
 {
     uint_fast32_t uiA;
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast32_t sigA, uiZ;
-    struct exp16_sig32 normExpSig;
+    संरचना exp16_sig32 normExpSig;
     int_fast16_t expZ;
     uint_fast32_t sigZ, shiftedSigZ;
     uint32_t negRem;
@@ -1129,24 +1129,24 @@ static float32_t f32_sqrt( float32_t a )
     sigA  = fracF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA ) {
+    यदि ( expA == 0xFF ) {
+        यदि ( sigA ) {
             uiZ = softfloat_propagateNaNF32UI( uiA, 0 );
-            goto uiZ;
+            गच्छ uiZ;
         }
-        if ( ! signA ) return a;
-        goto invalid;
+        यदि ( ! signA ) प्रत्यागम a;
+        गच्छ invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( signA ) {
-        if ( ! (expA | sigA) ) return a;
-        goto invalid;
+    यदि ( signA ) {
+        यदि ( ! (expA | sigA) ) प्रत्यागम a;
+        गच्छ invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) प्रत्यागम a;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1159,53 +1159,53 @@ static float32_t f32_sqrt( float32_t a )
     sigZ =
         ((uint_fast64_t) sigA * softfloat_approxRecipSqrt32_1( expA, sigA ))
             >>32;
-    if ( expA ) sigZ >>= 1;
+    यदि ( expA ) sigZ >>= 1;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sigZ += 2;
-    if ( (sigZ & 0x3F) < 2 ) {
+    यदि ( (sigZ & 0x3F) < 2 ) {
         shiftedSigZ = sigZ>>2;
         negRem = shiftedSigZ * shiftedSigZ;
         sigZ &= ~3;
-        if ( negRem & 0x80000000 ) {
+        यदि ( negRem & 0x80000000 ) {
             sigZ |= 1;
-        } else {
-            if ( negRem ) --sigZ;
+        } अन्यथा {
+            यदि ( negRem ) --sigZ;
         }
     }
-    return softfloat_roundPackToF32( 0, expZ, sigZ );
+    प्रत्यागम softfloat_roundPackToF32( 0, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static float32_t f32_sub( float32_t a, float32_t b )
+स्थिर float32_t f32_sub( float32_t a, float32_t b )
 {
     uint_fast32_t uiA;
     uint_fast32_t uiB;
 
     uiA = a.v;
     uiB = b.v;
-    if ( signF32UI( uiA ^ uiB ) ) {
-        return softfloat_addMagsF32( uiA, uiB );
-    } else {
-        return softfloat_subMagsF32( uiA, uiB );
+    यदि ( signF32UI( uiA ^ uiB ) ) {
+        प्रत्यागम softfloat_addMagsF32( uiA, uiB );
+    } अन्यथा {
+        प्रत्यागम softfloat_subMagsF32( uiA, uiB );
     }
 }
 
-static float64_t f32_to_f64( float32_t a )
+स्थिर float64_t f32_to_f64( float32_t a )
 {
     uint_fast32_t uiA;
-    bool sign;
+    तार्किक sign;
     int_fast16_t exp;
     uint_fast32_t frac;
-    struct commonNaN commonNaN;
+    संरचना commonNaN commonNaN;
     uint_fast64_t uiZ;
-    struct exp16_sig32 normExpSig;
+    संरचना exp16_sig32 normExpSig;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
@@ -1215,21 +1215,21 @@ static float64_t f32_to_f64( float32_t a )
     frac = fracF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp == 0xFF ) {
-        if ( frac ) {
+    यदि ( exp == 0xFF ) {
+        यदि ( frac ) {
             softfloat_f32UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToF64UI( &commonNaN );
-        } else {
+        } अन्यथा {
             uiZ = packToF64UI( sign, 0x7FF, 0 );
         }
-        goto uiZ;
+        गच्छ uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! exp ) {
-        if ( ! frac ) {
+    यदि ( ! exp ) {
+        यदि ( ! frac ) {
             uiZ = packToF64UI( sign, 0, 0 );
-            goto uiZ;
+            गच्छ uiZ;
         }
         normExpSig = softfloat_normSubnormalF32Sig( frac );
         exp = normExpSig.exp - 1;
@@ -1239,13 +1239,13 @@ static float64_t f32_to_f64( float32_t a )
     *------------------------------------------------------------------------*/
     uiZ = packToF64UI( sign, exp + 0x380, (uint_fast64_t) frac<<29 );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static int_fast32_t f32_to_i32( float32_t a, uint_fast8_t roundingMode, bool exact )
+स्थिर int_fast32_t f32_to_i32( float32_t a, uint_fast8_t roundingMode, तार्किक exact )
 {
     uint_fast32_t uiA;
-    bool sign;
+    तार्किक sign;
     int_fast16_t exp;
     uint_fast32_t sig;
     uint_fast64_t sig64;
@@ -1259,34 +1259,34 @@ static int_fast32_t f32_to_i32( float32_t a, uint_fast8_t roundingMode, bool exa
     sig  = fracF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
-    if ( (exp == 0xFF) && sig ) {
-#if (i32_fromNaN == i32_fromPosOverflow)
+#यदि (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
+    यदि ( (exp == 0xFF) && sig ) {
+#यदि (i32_fromNaN == i32_fromPosOverflow)
         sign = 0;
-#elif (i32_fromNaN == i32_fromNegOverflow)
+#नोचेद्यदि (i32_fromNaN == i32_fromNegOverflow)
         sign = 1;
-#else
+#अन्यथा
         raiseFlags( flag_invalid );
-        return i32_fromNaN;
+        प्रत्यागम i32_fromNaN;
 #endif
     }
 #endif
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp ) sig |= 0x00800000;
+    यदि ( exp ) sig |= 0x00800000;
     sig64 = (uint_fast64_t) sig<<32;
     shiftDist = 0xAA - exp;
-    if ( 0 < shiftDist ) sig64 = softfloat_shiftRightJam64( sig64, shiftDist );
-    return softfloat_roundToI32( sign, sig64, roundingMode, exact );
+    यदि ( 0 < shiftDist ) sig64 = softfloat_shift_उजवा_Jam64( sig64, shiftDist );
+    प्रत्यागम softfloat_roundToI32( sign, sig64, roundingMode, exact );
 }
 
-static int_fast32_t f32_to_i32_r_minMag( float32_t a, bool exact )
+स्थिर int_fast32_t f32_to_i32_r_minMag( float32_t a, तार्किक exact )
 {
     uint_fast32_t uiA;
     int_fast16_t exp;
     uint_fast32_t sig;
     int_fast16_t shiftDist;
-    bool sign;
+    तार्किक sign;
     int_fast32_t absZ;
 
     /*------------------------------------------------------------------------
@@ -1297,19 +1297,19 @@ static int_fast32_t f32_to_i32_r_minMag( float32_t a, bool exact )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     shiftDist = 0x9E - exp;
-    if ( 32 <= shiftDist ) {
-        if ( exact && (exp | sig) ) {
+    यदि ( 32 <= shiftDist ) {
+        यदि ( exact && (exp | sig) ) {
             raiseFlags(flag_inexact);
         }
-        return 0;
+        प्रत्यागम 0;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sign = signF32UI( uiA );
-    if ( shiftDist <= 0 ) {
-        if ( uiA == packToF32UI( 1, 0x9E, 0 ) ) return -0x7FFFFFFF - 1;
+    यदि ( shiftDist <= 0 ) {
+        यदि ( uiA == packToF32UI( 1, 0x9E, 0 ) ) प्रत्यागम -0x7FFFFFFF - 1;
         raiseFlags( flag_invalid );
-        return
+        प्रत्यागम
             (exp == 0xFF) && sig ? i32_fromNaN
                 : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
@@ -1317,42 +1317,42 @@ static int_fast32_t f32_to_i32_r_minMag( float32_t a, bool exact )
     *------------------------------------------------------------------------*/
     sig = (sig | 0x00800000)<<8;
     absZ = sig>>shiftDist;
-    if ( exact && ((uint_fast32_t) absZ<<shiftDist != sig) ) {
+    यदि ( exact && ((uint_fast32_t) absZ<<shiftDist != sig) ) {
         raiseFlags(flag_inexact);
     }
-    return sign ? -absZ : absZ;
+    प्रत्यागम sign ? -absZ : absZ;
 }
 
-static float64_t f64_add( float64_t a, float64_t b )
+स्थिर float64_t f64_add( float64_t a, float64_t b )
 {
     uint_fast64_t uiA;
-    bool signA;
+    तार्किक signA;
     uint_fast64_t uiB;
-    bool signB;
+    तार्किक signB;
 
     uiA = a.v;
     signA = signF64UI( uiA );
     uiB = b.v;
     signB = signF64UI( uiB );
-    if ( signA == signB ) {
-        return softfloat_addMagsF64( uiA, uiB, signA );
-    } else {
-        return softfloat_subMagsF64( uiA, uiB, signA );
+    यदि ( signA == signB ) {
+        प्रत्यागम softfloat_addMagsF64( uiA, uiB, signA );
+    } अन्यथा {
+        प्रत्यागम softfloat_subMagsF64( uiA, uiB, signA );
     }
 }
 
-static float64_t f64_div( float64_t a, float64_t b )
+स्थिर float64_t f64_div( float64_t a, float64_t b )
 {
     uint_fast64_t uiA;
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast64_t sigA;
     uint_fast64_t uiB;
-    bool signB;
+    तार्किक signB;
     int_fast16_t expB;
     uint_fast64_t sigB;
-    bool signZ;
-    struct exp16_sig64 normExpSig;
+    तार्किक signZ;
+    संरचना exp16_sig64 normExpSig;
     int_fast16_t expZ;
     uint32_t recip32, sig32Z, doubleTerm;
     uint_fast64_t rem;
@@ -1373,32 +1373,32 @@ static float64_t f64_div( float64_t a, float64_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA ) goto propagateNaN;
-        if ( expB == 0x7FF ) {
-            if ( sigB ) goto propagateNaN;
-            goto invalid;
+    यदि ( expA == 0x7FF ) {
+        यदि ( sigA ) गच्छ propagateNaN;
+        यदि ( expB == 0x7FF ) {
+            यदि ( sigB ) गच्छ propagateNaN;
+            गच्छ invalid;
         }
-        goto infinity;
+        गच्छ infinity;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
-        goto zero;
+    यदि ( expB == 0x7FF ) {
+        यदि ( sigB ) गच्छ propagateNaN;
+        गच्छ zero;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) {
-            if ( ! (expA | sigA) ) goto invalid;
+    यदि ( ! expB ) {
+        यदि ( ! sigB ) {
+            यदि ( ! (expA | sigA) ) गच्छ invalid;
             raiseFlags( flag_infinite );
-            goto infinity;
+            गच्छ infinity;
         }
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) गच्छ zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1408,10 +1408,10 @@ static float64_t f64_div( float64_t a, float64_t b )
     expZ = expA - expB + 0x3FE;
     sigA |= UINT64_C( 0x0010000000000000 );
     sigB |= UINT64_C( 0x0010000000000000 );
-    if ( sigA < sigB ) {
+    यदि ( sigA < sigB ) {
         --expZ;
         sigA <<= 11;
-    } else {
+    } अन्यथा {
         sigA <<= 10;
     }
     sigB <<= 11;
@@ -1425,97 +1425,97 @@ static float64_t f64_div( float64_t a, float64_t b )
     sigZ = ((uint_fast64_t) sig32Z<<32) + ((uint_fast64_t) q<<4);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( (sigZ & 0x1FF) < 4<<4 ) {
+    यदि ( (sigZ & 0x1FF) < 4<<4 ) {
         q &= ~7;
         sigZ &= ~(uint_fast64_t) 0x7F;
         doubleTerm = q<<1;
         rem =
             ((rem - (uint_fast64_t) doubleTerm * (uint32_t) (sigB>>32))<<28)
                 - (uint_fast64_t) doubleTerm * ((uint32_t) sigB>>4);
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+        यदि ( rem & UINT64_C( 0x8000000000000000 ) ) {
             sigZ -= 1<<7;
-        } else {
-            if ( rem ) sigZ |= 1;
+        } अन्यथा {
+            यदि ( rem ) sigZ |= 1;
         }
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    प्रत्यागम softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infinity:
     uiZ = packToF64UI( signZ, 0x7FF, 0 );
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  zero:
     uiZ = packToF64UI( signZ, 0, 0 );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static bool f64_eq( float64_t a, float64_t b )
+स्थिर तार्किक f64_eq( float64_t a, float64_t b )
 {
     uint_fast64_t uiA;
     uint_fast64_t uiB;
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) )
+    यदि ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) )
     {
-        if ( softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB ) )
+        यदि ( softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB ) )
             raiseFlags( flag_invalid );
-        return false;
+        प्रत्यागम असत्य;
     }
-    return (uiA == uiB) || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ));
+    प्रत्यागम (uiA == uiB) || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ));
 }
 
-static bool f64_le( float64_t a, float64_t b )
+स्थिर तार्किक f64_le( float64_t a, float64_t b )
 {
     uint_fast64_t uiA;
     uint_fast64_t uiB;
-    bool signA, signB;
+    तार्किक signA, signB;
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
+    यदि ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        return false;
+        प्रत्यागम असत्य;
     }
     signA = signF64UI( uiA );
     signB = signF64UI( uiB );
-    return (signA != signB) ? signA || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
+    प्रत्यागम (signA != signB) ? signA || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                             : (uiA == uiB) || (signA ^ (uiA < uiB));
 }
 
-static bool f64_lt( float64_t a, float64_t b )
+स्थिर तार्किक f64_lt( float64_t a, float64_t b )
 {
     uint_fast64_t uiA;
     uint_fast64_t uiB;
-    bool signA, signB;
+    तार्किक signA, signB;
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
+    यदि ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        return false;
+        प्रत्यागम असत्य;
     }
     signA = signF64UI( uiA );
     signB = signF64UI( uiB );
-    return (signA != signB) ? signA && ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
+    प्रत्यागम (signA != signB) ? signA && ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                             : (uiA != uiB) && (signA ^ (uiA < uiB));
 }
 
-static float64_t f64_mulAdd( float64_t a, float64_t b, float64_t c )
+स्थिर float64_t f64_mulAdd( float64_t a, float64_t b, float64_t c )
 {
     uint_fast64_t uiA;
     uint_fast64_t uiB;
@@ -1524,24 +1524,24 @@ static float64_t f64_mulAdd( float64_t a, float64_t b, float64_t c )
     uiA = a.v;
     uiB = b.v;
     uiC = c.v;
-    return softfloat_mulAddF64( uiA, uiB, uiC, 0 );
+    प्रत्यागम softfloat_mulAddF64( uiA, uiB, uiC, 0 );
 }
 
-static float64_t f64_mul( float64_t a, float64_t b )
+स्थिर float64_t f64_mul( float64_t a, float64_t b )
 {
     uint_fast64_t uiA;
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast64_t sigA;
     uint_fast64_t uiB;
-    bool signB;
+    तार्किक signB;
     int_fast16_t expB;
     uint_fast64_t sigB;
-    bool signZ;
+    तार्किक signZ;
     uint_fast64_t magBits;
-    struct exp16_sig64 normExpSig;
+    संरचना exp16_sig64 normExpSig;
     int_fast16_t expZ;
-    struct uint128 sig128Z;
+    संरचना uint128 sig128Z;
     uint_fast64_t sigZ, uiZ;
 
     /*------------------------------------------------------------------------
@@ -1557,26 +1557,26 @@ static float64_t f64_mul( float64_t a, float64_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
+    यदि ( expA == 0x7FF ) {
+        यदि ( sigA || ((expB == 0x7FF) && sigB) ) गच्छ propagateNaN;
         magBits = expB | sigB;
-        goto infArg;
+        गच्छ infArg;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
+    यदि ( expB == 0x7FF ) {
+        यदि ( sigB ) गच्छ propagateNaN;
         magBits = expA | sigA;
-        goto infArg;
+        गच्छ infArg;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) गच्छ zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zero;
+    यदि ( ! expB ) {
+        यदि ( ! sigB ) गच्छ zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -1589,50 +1589,50 @@ static float64_t f64_mul( float64_t a, float64_t b )
     sig128Z = softfloat_mul64To128( sigA, sigB );
     sigZ = sig128Z.v64 | (sig128Z.v0 != 0);
 
-    if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+    यदि ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
         --expZ;
         sigZ <<= 1;
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    प्रत्यागम softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infArg:
-    if ( ! magBits ) {
+    यदि ( ! magBits ) {
         raiseFlags( flag_invalid );
         uiZ = defaultNaNF64UI;
-    } else {
+    } अन्यथा {
         uiZ = packToF64UI( signZ, 0x7FF, 0 );
     }
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  zero:
     uiZ = packToF64UI( signZ, 0, 0 );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static float64_t f64_rem( float64_t a, float64_t b )
+स्थिर float64_t f64_rem( float64_t a, float64_t b )
 {
     uint_fast64_t uiA;
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast64_t sigA;
     uint_fast64_t uiB;
     int_fast16_t expB;
     uint_fast64_t sigB;
-    struct exp16_sig64 normExpSig;
+    संरचना exp16_sig64 normExpSig;
     uint64_t rem;
     int_fast16_t expDiff;
     uint32_t q, recip32;
     uint_fast64_t q64;
     uint64_t altRem, meanRem;
-    bool signRem;
+    तार्किक signRem;
     uint_fast64_t uiZ;
 
     /*------------------------------------------------------------------------
@@ -1646,27 +1646,27 @@ static float64_t f64_rem( float64_t a, float64_t b )
     sigB = fracF64UI( uiB );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
-        goto invalid;
+    यदि ( expA == 0x7FF ) {
+        यदि ( sigA || ((expB == 0x7FF) && sigB) ) गच्छ propagateNaN;
+        गच्छ invalid;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
-        return a;
+    यदि ( expB == 0x7FF ) {
+        यदि ( sigB ) गच्छ propagateNaN;
+        प्रत्यागम a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA < expB - 1 ) return a;
+    यदि ( expA < expB - 1 ) प्रत्यागम a;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) goto invalid;
+    यदि ( ! expB ) {
+        यदि ( ! sigB ) गच्छ invalid;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) प्रत्यागम a;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1676,18 +1676,18 @@ static float64_t f64_rem( float64_t a, float64_t b )
     rem = sigA | UINT64_C( 0x0010000000000000 );
     sigB |= UINT64_C( 0x0010000000000000 );
     expDiff = expA - expB;
-    if ( expDiff < 1 ) {
-        if ( expDiff < -1 ) return a;
+    यदि ( expDiff < 1 ) {
+        यदि ( expDiff < -1 ) प्रत्यागम a;
         sigB <<= 9;
-        if ( expDiff ) {
+        यदि ( expDiff ) {
             rem <<= 8;
             q = 0;
-        } else {
+        } अन्यथा {
             rem <<= 9;
             q = (sigB <= rem);
-            if ( q ) rem -= sigB;
+            यदि ( q ) rem -= sigB;
         }
-    } else {
+    } अन्यथा {
         recip32 = softfloat_approxRecip32_1( sigB>>21 );
         /*--------------------------------------------------------------------
         | Changing the shift of `rem' here requires also changing the initial
@@ -1701,13 +1701,13 @@ static float64_t f64_rem( float64_t a, float64_t b )
         | the maximum possible.
         *--------------------------------------------------------------------*/
         sigB <<= 9;
-        for (;;) {
+        प्रति (;;) {
             q64 = (uint32_t) (rem>>32) * (uint_fast64_t) recip32;
-            if ( expDiff < 0 ) break;
+            यदि ( expDiff < 0 ) भङ्ग;
             q = (q64 + 0x80000000)>>32;
             rem <<= 29;
             rem -= q * (uint64_t) sigB;
-            if ( rem & UINT64_C( 0x8000000000000000 ) ) rem += sigB;
+            यदि ( rem & UINT64_C( 0x8000000000000000 ) ) rem += sigB;
             expDiff -= 29;
         }
         /*--------------------------------------------------------------------
@@ -1715,45 +1715,45 @@ static float64_t f64_rem( float64_t a, float64_t b )
         *--------------------------------------------------------------------*/
         q = (uint32_t) (q64>>32)>>(~expDiff & 31);
         rem = (rem<<(expDiff + 30)) - q * (uint64_t) sigB;
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+        यदि ( rem & UINT64_C( 0x8000000000000000 ) ) {
             altRem = rem + sigB;
-            goto selectRem;
+            गच्छ selectRem;
         }
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    do {
+    कुरु {
         altRem = rem;
         ++q;
         rem -= sigB;
-    } while ( ! (rem & UINT64_C( 0x8000000000000000 )) );
+    } यावत् ( ! (rem & UINT64_C( 0x8000000000000000 )) );
  selectRem:
     meanRem = rem + altRem;
-    if (
+    यदि (
         (meanRem & UINT64_C( 0x8000000000000000 )) || (! meanRem && (q & 1))
     ) {
         rem = altRem;
     }
     signRem = signA;
-    if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+    यदि ( rem & UINT64_C( 0x8000000000000000 ) ) {
         signRem = ! signRem;
         //fixed unsigned unary minus: -x == ~x + 1
         rem = ~rem + 1;
     }
-    return softfloat_normRoundPackToF64( signRem, expB, rem );
+    प्रत्यागम softfloat_normRoundPackToF64( signRem, expB, rem );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
-    goto uiZ;
+    गच्छ uiZ;
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static float64_t f64_roundToInt( float64_t a, uint_fast8_t roundingMode, bool exact )
+स्थिर float64_t f64_roundToInt( float64_t a, uint_fast8_t roundingMode, तार्किक exact )
 {
     uint_fast64_t uiA;
     int_fast16_t exp;
@@ -1765,66 +1765,66 @@ static float64_t f64_roundToInt( float64_t a, uint_fast8_t roundingMode, bool ex
     exp = expF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp <= 0x3FE ) {
-        if ( ! (uiA & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) return a;
-        if ( exact ) raiseFlags(flag_inexact);
+    यदि ( exp <= 0x3FE ) {
+        यदि ( ! (uiA & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) प्रत्यागम a;
+        यदि ( exact ) raiseFlags(flag_inexact);
         uiZ = uiA & packToF64UI( 1, 0, 0 );
-        switch ( roundingMode ) {
-         case round_near_even:
-            if ( ! fracF64UI( uiA ) ) break;
+        विकल्प ( roundingMode ) {
+         पक्ष round_near_even:
+            यदि ( ! fracF64UI( uiA ) ) भङ्ग;
             [[fallthrough]];
-         case round_near_maxMag:
-            if ( exp == 0x3FE ) uiZ |= packToF64UI( 0, 0x3FF, 0 );
-            break;
-         case round_min:
-            if ( uiZ ) uiZ = packToF64UI( 1, 0x3FF, 0 );
-            break;
-         case round_max:
-            if ( ! uiZ ) uiZ = packToF64UI( 0, 0x3FF, 0 );
-            break;
+         पक्ष round_near_maxMag:
+            यदि ( exp == 0x3FE ) uiZ |= packToF64UI( 0, 0x3FF, 0 );
+            भङ्ग;
+         पक्ष round_min:
+            यदि ( uiZ ) uiZ = packToF64UI( 1, 0x3FF, 0 );
+            भङ्ग;
+         पक्ष round_max:
+            यदि ( ! uiZ ) uiZ = packToF64UI( 0, 0x3FF, 0 );
+            भङ्ग;
         }
-        goto uiZ;
+        गच्छ uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x433 <= exp ) {
-        if ( (exp == 0x7FF) && fracF64UI( uiA ) ) {
+    यदि ( 0x433 <= exp ) {
+        यदि ( (exp == 0x7FF) && fracF64UI( uiA ) ) {
             uiZ = softfloat_propagateNaNF64UI( uiA, 0 );
-            goto uiZ;
+            गच्छ uiZ;
         }
-        return a;
+        प्रत्यागम a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiZ = uiA;
     lastBitMask = (uint_fast64_t) 1<<(0x433 - exp);
     roundBitsMask = lastBitMask - 1;
-    if ( roundingMode == round_near_maxMag ) {
+    यदि ( roundingMode == round_near_maxMag ) {
         uiZ += lastBitMask>>1;
-    } else if ( roundingMode == round_near_even ) {
+    } अन्यथा यदि ( roundingMode == round_near_even ) {
         uiZ += lastBitMask>>1;
-        if ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
-    } else if (
+        यदि ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
+    } अन्यथा यदि (
         roundingMode
             == (signF64UI( uiZ ) ? round_min : round_max)
     ) {
         uiZ += roundBitsMask;
     }
     uiZ &= ~roundBitsMask;
-    if ( exact && (uiZ != uiA) ) {
+    यदि ( exact && (uiZ != uiA) ) {
         raiseFlags(flag_inexact);
     }
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static float64_t f64_sqrt( float64_t a )
+स्थिर float64_t f64_sqrt( float64_t a )
 {
     uint_fast64_t uiA;
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast64_t sigA, uiZ;
-    struct exp16_sig64 normExpSig;
+    संरचना exp16_sig64 normExpSig;
     int_fast16_t expZ;
     uint32_t sig32A, recipSqrt32, sig32Z;
     uint_fast64_t rem;
@@ -1839,24 +1839,24 @@ static float64_t f64_sqrt( float64_t a )
     sigA  = fracF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA ) {
+    यदि ( expA == 0x7FF ) {
+        यदि ( sigA ) {
             uiZ = softfloat_propagateNaNF64UI( uiA, 0 );
-            goto uiZ;
+            गच्छ uiZ;
         }
-        if ( ! signA ) return a;
-        goto invalid;
+        यदि ( ! signA ) प्रत्यागम a;
+        गच्छ invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( signA ) {
-        if ( ! (expA | sigA) ) return a;
-        goto invalid;
+    यदि ( signA ) {
+        यदि ( ! (expA | sigA) ) प्रत्यागम a;
+        गच्छ invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) प्रत्यागम a;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1872,10 +1872,10 @@ static float64_t f64_sqrt( float64_t a )
     sig32A = (uint32_t)(sigA>>21); //fixed warning on type cast
     recipSqrt32 = softfloat_approxRecipSqrt32_1( expA, sig32A );
     sig32Z = ((uint_fast64_t) sig32A * recipSqrt32)>>32;
-    if ( expA ) {
+    यदि ( expA ) {
         sigA <<= 8;
         sig32Z >>= 1;
-    } else {
+    } अन्यथा {
         sigA <<= 9;
     }
     rem = sigA - (uint_fast64_t) sig32Z * sig32Z;
@@ -1883,52 +1883,52 @@ static float64_t f64_sqrt( float64_t a )
     sigZ = ((uint_fast64_t) sig32Z<<32 | 1<<5) + ((uint_fast64_t) q<<3);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( (sigZ & 0x1FF) < 0x22 ) {
+    यदि ( (sigZ & 0x1FF) < 0x22 ) {
         sigZ &= ~(uint_fast64_t) 0x3F;
         shiftedSigZ = sigZ>>6;
         rem = (sigA<<52) - shiftedSigZ * shiftedSigZ;
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+        यदि ( rem & UINT64_C( 0x8000000000000000 ) ) {
             --sigZ;
-        } else {
-            if ( rem ) sigZ |= 1;
+        } अन्यथा {
+            यदि ( rem ) sigZ |= 1;
         }
     }
-    return softfloat_roundPackToF64( 0, expZ, sigZ );
+    प्रत्यागम softfloat_roundPackToF64( 0, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static float64_t f64_sub( float64_t a, float64_t b )
+स्थिर float64_t f64_sub( float64_t a, float64_t b )
 {
     uint_fast64_t uiA;
-    bool signA;
+    तार्किक signA;
     uint_fast64_t uiB;
-    bool signB;
+    तार्किक signB;
 
     uiA = a.v;
     signA = signF64UI( uiA );
     uiB = b.v;
     signB = signF64UI( uiB );
 
-    if ( signA == signB ) {
-        return softfloat_subMagsF64( uiA, uiB, signA );
-    } else {
-        return softfloat_addMagsF64( uiA, uiB, signA );
+    यदि ( signA == signB ) {
+        प्रत्यागम softfloat_subMagsF64( uiA, uiB, signA );
+    } अन्यथा {
+        प्रत्यागम softfloat_addMagsF64( uiA, uiB, signA );
     }
 }
 
-static float32_t f64_to_f32( float64_t a )
+स्थिर float32_t f64_to_f32( float64_t a )
 {
     uint_fast64_t uiA;
-    bool sign;
+    तार्किक sign;
     int_fast16_t exp;
     uint_fast64_t frac;
-    struct commonNaN commonNaN;
+    संरचना commonNaN commonNaN;
     uint_fast32_t uiZ, frac32;
 
     /*------------------------------------------------------------------------
@@ -1939,33 +1939,33 @@ static float32_t f64_to_f32( float64_t a )
     frac = fracF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp == 0x7FF ) {
-        if ( frac ) {
+    यदि ( exp == 0x7FF ) {
+        यदि ( frac ) {
             softfloat_f64UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToF32UI( &commonNaN );
-        } else {
+        } अन्यथा {
             uiZ = packToF32UI( sign, 0xFF, 0 );
         }
-        goto uiZ;
+        गच्छ uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    frac32 = (uint_fast32_t)softfloat_shortShiftRightJam64( frac, 22 ); //fixed warning on type cast
-    if ( ! (exp | frac32) ) {
+    frac32 = (uint_fast32_t)softfloat_short_Shift_उजवा_Jam64( frac, 22 ); //fixed warning on type cast
+    यदि ( ! (exp | frac32) ) {
         uiZ = packToF32UI( sign, 0, 0 );
-        goto uiZ;
+        गच्छ uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    return softfloat_roundPackToF32( sign, exp - 0x381, frac32 | 0x40000000 );
+    प्रत्यागम softfloat_roundPackToF32( sign, exp - 0x381, frac32 | 0x40000000 );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static int_fast32_t f64_to_i32( float64_t a, uint_fast8_t roundingMode, bool exact )
+स्थिर int_fast32_t f64_to_i32( float64_t a, uint_fast8_t roundingMode, तार्किक exact )
 {
     uint_fast64_t uiA;
-    bool sign;
+    तार्किक sign;
     int_fast16_t exp;
     uint_fast64_t sig;
     int_fast16_t shiftDist;
@@ -1978,30 +1978,30 @@ static int_fast32_t f64_to_i32( float64_t a, uint_fast8_t roundingMode, bool exa
     sig  = fracF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
-    if ( (exp == 0x7FF) && sig ) {
-#if (i32_fromNaN == i32_fromPosOverflow)
+#यदि (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
+    यदि ( (exp == 0x7FF) && sig ) {
+#यदि (i32_fromNaN == i32_fromPosOverflow)
         sign = 0;
-#elif (i32_fromNaN == i32_fromNegOverflow)
+#नोचेद्यदि (i32_fromNaN == i32_fromNegOverflow)
         sign = 1;
-#else
+#अन्यथा
         raiseFlags( flag_invalid );
-        return i32_fromNaN;
+        प्रत्यागम i32_fromNaN;
 #endif
     }
 #endif
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp ) sig |= UINT64_C( 0x0010000000000000 );
+    यदि ( exp ) sig |= UINT64_C( 0x0010000000000000 );
     shiftDist = 0x427 - exp;
-    if ( 0 < shiftDist ) sig = softfloat_shiftRightJam64( sig, shiftDist );
-    return softfloat_roundToI32( sign, sig, roundingMode, exact );
+    यदि ( 0 < shiftDist ) sig = softfloat_shift_उजवा_Jam64( sig, shiftDist );
+    प्रत्यागम softfloat_roundToI32( sign, sig, roundingMode, exact );
 }
 
-static int_fast64_t f64_to_i64(float64_t a, uint_fast8_t roundingMode, bool exact )
+स्थिर int_fast64_t f64_to_i64(float64_t a, uint_fast8_t roundingMode, तार्किक exact )
 {
     uint_fast64_t uiA;
-    bool sign;
+    तार्किक sign;
     int_fast16_t exp;
     uint_fast64_t sig;
     int_fast16_t shiftDist;
@@ -2014,54 +2014,54 @@ static int_fast64_t f64_to_i64(float64_t a, uint_fast8_t roundingMode, bool exac
     sig = fracF64UI(uiA);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if (i64_fromNaN != i64_fromPosOverflow) || (i64_fromNaN != i64_fromNegOverflow)
-    if ((exp == 0x7FF) && sig) {
-#if (i64_fromNaN == i64_fromPosOverflow)
+#यदि (i64_fromNaN != i64_fromPosOverflow) || (i64_fromNaN != i64_fromNegOverflow)
+    यदि ((exp == 0x7FF) && sig) {
+#यदि (i64_fromNaN == i64_fromPosOverflow)
         sign = 0;
-#elif (i64_fromNaN == i64_fromNegOverflow)
+#नोचेद्यदि (i64_fromNaN == i64_fromNegOverflow)
         sign = 1;
-#else
+#अन्यथा
         raiseFlags(flag_invalid);
-        return i64_fromNaN;
+        प्रत्यागम i64_fromNaN;
 #endif
     }
 #endif
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if (exp) sig |= UINT64_C(0x0010000000000000);
+    यदि (exp) sig |= UINT64_C(0x0010000000000000);
     shiftDist = 0x433 - exp;
-    if (shiftDist <= 0) {
-        bool isValid = shiftDist >= -11;
-        if (isValid)
+    यदि (shiftDist <= 0) {
+        तार्किक isValid = shiftDist >= -11;
+        यदि (isValid)
         {
             uint_fast64_t z = sig << -shiftDist;
-            if (0 == (z & UINT64_C(0x8000000000000000)))
+            यदि (0 == (z & UINT64_C(0x8000000000000000)))
             {
-                return sign ? -(int_fast64_t)z : (int_fast64_t)z;
+                प्रत्यागम sign ? -(int_fast64_t)z : (int_fast64_t)z;
             }
         }
         raiseFlags(flag_invalid);
-        return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+        प्रत्यागम sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
-    else {
-        if (shiftDist < 64)
-            return
+    अन्यथा {
+        यदि (shiftDist < 64)
+            प्रत्यागम
                 softfloat_roundToI64(
                     sign, sig >> shiftDist, sig << (-shiftDist & 63), roundingMode, exact);
-        else
-            return
+        अन्यथा
+            प्रत्यागम
                 softfloat_roundToI64(
                     sign, 0, (shiftDist == 64) ? sig : (sig != 0), roundingMode, exact);
     }
 }
 
-static int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
+स्थिर int_fast32_t f64_to_i32_r_minMag( float64_t a, तार्किक exact )
 {
     uint_fast64_t uiA;
     int_fast16_t exp;
     uint_fast64_t sig;
     int_fast16_t shiftDist;
-    bool sign;
+    तार्किक sign;
     int_fast32_t absZ;
 
     /*------------------------------------------------------------------------
@@ -2072,26 +2072,26 @@ static int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     shiftDist = 0x433 - exp;
-    if ( 53 <= shiftDist ) {
-        if ( exact && (exp | sig) ) {
+    यदि ( 53 <= shiftDist ) {
+        यदि ( exact && (exp | sig) ) {
             raiseFlags(flag_inexact);
         }
-        return 0;
+        प्रत्यागम 0;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sign = signF64UI( uiA );
-    if ( shiftDist < 22 ) {
-        if (
+    यदि ( shiftDist < 22 ) {
+        यदि (
             sign && (exp == 0x41E) && (sig < UINT64_C( 0x0000000000200000 ))
         ) {
-            if ( exact && sig ) {
+            यदि ( exact && sig ) {
                 raiseFlags(flag_inexact);
             }
-            return -0x7FFFFFFF - 1;
+            प्रत्यागम -0x7FFFFFFF - 1;
         }
         raiseFlags( flag_invalid );
-        return
+        प्रत्यागम
             (exp == 0x7FF) && sig ? i32_fromNaN
                 : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
@@ -2099,50 +2099,50 @@ static int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
     *------------------------------------------------------------------------*/
     sig |= UINT64_C( 0x0010000000000000 );
     absZ = (int_fast32_t)(sig>>shiftDist); //fixed warning on type cast
-    if ( exact && ((uint_fast64_t) (uint_fast32_t) absZ<<shiftDist != sig) ) {
+    यदि ( exact && ((uint_fast64_t) (uint_fast32_t) absZ<<shiftDist != sig) ) {
         raiseFlags(flag_inexact);
     }
-    return sign ? -absZ : absZ;
+    प्रत्यागम sign ? -absZ : absZ;
 }
 
-static float32_t i32_to_f32( int32_t a )
+स्थिर float32_t i32_to_f32( int32_t a )
 {
-    bool sign;
+    तार्किक sign;
     uint_fast32_t absA;
 
     sign = (a < 0);
-    if ( ! (a & 0x7FFFFFFF) ) {
-        return float32_t::fromRaw(sign ? packToF32UI( 1, 0x9E, 0 ) : 0);
+    यदि ( ! (a & 0x7FFFFFFF) ) {
+        प्रत्यागम float32_t::fromRaw(sign ? packToF32UI( 1, 0x9E, 0 ) : 0);
     }
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast32_t) a + 1) : (uint_fast32_t) a;
-    return softfloat_normRoundPackToF32( sign, 0x9C, absA );
+    प्रत्यागम softfloat_normRoundPackToF32( sign, 0x9C, absA );
 }
 
-static float64_t i32_to_f64( int32_t a )
+स्थिर float64_t i32_to_f64( int32_t a )
 {
     uint_fast64_t uiZ;
-    bool sign;
+    तार्किक sign;
     uint_fast32_t absA;
     int_fast8_t shiftDist;
 
-    if ( ! a ) {
+    यदि ( ! a ) {
         uiZ = 0;
-    } else {
+    } अन्यथा {
         sign = (a < 0);
         //fixed unsigned unary minus: -x == ~x + 1
         absA = sign ? (~(uint_fast32_t) a + 1) : (uint_fast32_t) a;
-        shiftDist = softfloat_countLeadingZeros32( absA ) + 21;
+        shiftDist = softfloat_मोजणी_Leading_Zeros32( absA ) + 21;
         uiZ =
             packToF64UI(
                 sign, 0x432 - shiftDist, (uint_fast64_t) absA<<shiftDist );
     }
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static float32_t i64_to_f32( int64_t a )
+स्थिर float32_t i64_to_f32( int64_t a )
 {
-    bool sign;
+    तार्किक sign;
     uint_fast64_t absA;
     int_fast8_t shiftDist;
     uint_fast32_t sig;
@@ -2150,34 +2150,34 @@ static float32_t i64_to_f32( int64_t a )
     sign = (a < 0);
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast64_t) a + 1) : (uint_fast64_t) a;
-    shiftDist = softfloat_countLeadingZeros64( absA ) - 40;
-    if ( 0 <= shiftDist ) {
-        return float32_t::fromRaw(a ? packToF32UI(sign, 0x95 - shiftDist, (uint_fast32_t) absA<<shiftDist ) : 0);
-    } else {
+    shiftDist = softfloat_मोजणी_Leading_Zeros64( absA ) - 40;
+    यदि ( 0 <= shiftDist ) {
+        प्रत्यागम float32_t::fromRaw(a ? packToF32UI(sign, 0x95 - shiftDist, (uint_fast32_t) absA<<shiftDist ) : 0);
+    } अन्यथा {
         shiftDist += 7;
         sig =
             (shiftDist < 0)
-                ? (uint_fast32_t) softfloat_shortShiftRightJam64( absA, -shiftDist ) //fixed warning on type cast
+                ? (uint_fast32_t) softfloat_short_Shift_उजवा_Jam64( absA, -shiftDist ) //fixed warning on type cast
                 : (uint_fast32_t) absA<<shiftDist;
-        return softfloat_roundPackToF32( sign, 0x9C - shiftDist, sig );
+        प्रत्यागम softfloat_roundPackToF32( sign, 0x9C - shiftDist, sig );
     }
 }
 
-static float64_t i64_to_f64( int64_t a )
+स्थिर float64_t i64_to_f64( int64_t a )
 {
-    bool sign;
+    तार्किक sign;
     uint_fast64_t absA;
 
     sign = (a < 0);
-    if ( ! (a & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
-        return float64_t::fromRaw(sign ? packToF64UI( 1, 0x43E, 0 ) : 0);
+    यदि ( ! (a & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
+        प्रत्यागम float64_t::fromRaw(sign ? packToF64UI( 1, 0x43E, 0 ) : 0);
     }
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast64_t) a + 1) : (uint_fast64_t) a;
-    return softfloat_normRoundPackToF64( sign, 0x43C, absA );
+    प्रत्यागम softfloat_normRoundPackToF64( sign, 0x43C, absA );
 }
 
-static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
+स्थिर float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
 {
     int_fast16_t expA;
     uint_fast32_t sigA;
@@ -2185,7 +2185,7 @@ static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
     uint_fast32_t sigB;
     int_fast16_t expDiff;
     uint_fast32_t uiZ;
-    bool signZ;
+    तार्किक signZ;
     int_fast16_t expZ;
     uint_fast32_t sigZ;
 
@@ -2198,68 +2198,68 @@ static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    यदि ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( ! expA ) {
+        यदि ( ! expA ) {
             uiZ = uiA + sigB;
-            goto uiZ;
+            गच्छ uiZ;
         }
-        if ( expA == 0xFF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        यदि ( expA == 0xFF ) {
+            यदि ( sigA | sigB ) गच्छ propagateNaN;
             uiZ = uiA;
-            goto uiZ;
+            गच्छ uiZ;
         }
         signZ = signF32UI( uiA );
         expZ = expA;
         sigZ = 0x01000000 + sigA + sigB;
-        if ( ! (sigZ & 1) && (expZ < 0xFE) ) {
+        यदि ( ! (sigZ & 1) && (expZ < 0xFE) ) {
             uiZ = packToF32UI( signZ, expZ, sigZ>>1 );
-            goto uiZ;
+            गच्छ uiZ;
         }
         sigZ <<= 6;
-    } else {
+    } अन्यथा {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         signZ = signF32UI( uiA );
         sigA <<= 6;
         sigB <<= 6;
-        if ( expDiff < 0 ) {
-            if ( expB == 0xFF ) {
-                if ( sigB ) goto propagateNaN;
+        यदि ( expDiff < 0 ) {
+            यदि ( expB == 0xFF ) {
+                यदि ( sigB ) गच्छ propagateNaN;
                 uiZ = packToF32UI( signZ, 0xFF, 0 );
-                goto uiZ;
+                गच्छ uiZ;
             }
             expZ = expB;
             sigA += expA ? 0x20000000 : sigA;
-            sigA = softfloat_shiftRightJam32( sigA, -expDiff );
-        } else {
-            if ( expA == 0xFF ) {
-                if ( sigA ) goto propagateNaN;
+            sigA = softfloat_shift_उजवा_Jam32( sigA, -expDiff );
+        } अन्यथा {
+            यदि ( expA == 0xFF ) {
+                यदि ( sigA ) गच्छ propagateNaN;
                 uiZ = uiA;
-                goto uiZ;
+                गच्छ uiZ;
             }
             expZ = expA;
             sigB += expB ? 0x20000000 : sigB;
-            sigB = softfloat_shiftRightJam32( sigB, expDiff );
+            sigB = softfloat_shift_उजवा_Jam32( sigB, expDiff );
         }
         sigZ = 0x20000000 + sigA + sigB;
-        if ( sigZ < 0x40000000 ) {
+        यदि ( sigZ < 0x40000000 ) {
             --expZ;
             sigZ <<= 1;
         }
     }
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    प्रत्यागम softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static float64_t
- softfloat_addMagsF64( uint_fast64_t uiA, uint_fast64_t uiB, bool signZ )
+स्थिर float64_t
+ softfloat_addMagsF64( uint_fast64_t uiA, uint_fast64_t uiB, तार्किक signZ )
 {
     int_fast16_t expA;
     uint_fast64_t sigA;
@@ -2279,71 +2279,71 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    यदि ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( ! expA ) {
+        यदि ( ! expA ) {
             uiZ = uiA + sigB;
-            goto uiZ;
+            गच्छ uiZ;
         }
-        if ( expA == 0x7FF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        यदि ( expA == 0x7FF ) {
+            यदि ( sigA | sigB ) गच्छ propagateNaN;
             uiZ = uiA;
-            goto uiZ;
+            गच्छ uiZ;
         }
         expZ = expA;
         sigZ = UINT64_C( 0x0020000000000000 ) + sigA + sigB;
         sigZ <<= 9;
-    } else {
+    } अन्यथा {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         sigA <<= 9;
         sigB <<= 9;
-        if ( expDiff < 0 ) {
-            if ( expB == 0x7FF ) {
-                if ( sigB ) goto propagateNaN;
+        यदि ( expDiff < 0 ) {
+            यदि ( expB == 0x7FF ) {
+                यदि ( sigB ) गच्छ propagateNaN;
                 uiZ = packToF64UI( signZ, 0x7FF, 0 );
-                goto uiZ;
+                गच्छ uiZ;
             }
             expZ = expB;
-            if ( expA ) {
+            यदि ( expA ) {
                 sigA += UINT64_C( 0x2000000000000000 );
-            } else {
+            } अन्यथा {
                 sigA <<= 1;
             }
-            sigA = softfloat_shiftRightJam64( sigA, -expDiff );
-        } else {
-            if ( expA == 0x7FF ) {
-                if ( sigA ) goto propagateNaN;
+            sigA = softfloat_shift_उजवा_Jam64( sigA, -expDiff );
+        } अन्यथा {
+            यदि ( expA == 0x7FF ) {
+                यदि ( sigA ) गच्छ propagateNaN;
                 uiZ = uiA;
-                goto uiZ;
+                गच्छ uiZ;
             }
             expZ = expA;
-            if ( expB ) {
+            यदि ( expB ) {
                 sigB += UINT64_C( 0x2000000000000000 );
-            } else {
+            } अन्यथा {
                 sigB <<= 1;
             }
-            sigB = softfloat_shiftRightJam64( sigB, expDiff );
+            sigB = softfloat_shift_उजवा_Jam64( sigB, expDiff );
         }
         sigZ = UINT64_C( 0x2000000000000000 ) + sigA + sigB;
-        if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+        यदि ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
             --expZ;
             sigZ <<= 1;
         }
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    प्रत्यागम softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a )
+स्थिर uint32_t softfloat_approxRecipSqrt32_1( unsigned पूर्णाङ्क oddExpA, uint32_t a )
 {
-    int index;
+    पूर्णाङ्क index;
     uint16_t eps, r0;
     uint_fast32_t ESqrR0;
     uint32_t sigma0;
@@ -2356,61 +2356,61 @@ static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a 
              - ((softfloat_approxRecipSqrt_1k1s[index] * (uint_fast32_t) eps)
                     >>20);
     ESqrR0 = (uint_fast32_t) r0 * r0;
-    if ( ! oddExpA ) ESqrR0 <<= 1;
+    यदि ( ! oddExpA ) ESqrR0 <<= 1;
     sigma0 = ~(uint_fast32_t) (((uint32_t) ESqrR0 * (uint_fast64_t) a)>>23);
     r = (uint_fast32_t)(((uint_fast32_t) r0<<16) + ((r0 * (uint_fast64_t) sigma0)>>25)); //fixed warning on type cast
     sqrSigma0 = ((uint_fast64_t) sigma0 * sigma0)>>32;
     r += ((uint32_t) ((r>>1) + (r>>3) - ((uint_fast32_t) r0<<14))
               * (uint_fast64_t) sqrSigma0)
              >>48;
-    if ( ! (r & 0x80000000) ) r = 0x80000000;
-    return r;
+    यदि ( ! (r & 0x80000000) ) r = 0x80000000;
+    प्रत्यागम r;
 }
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-static uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr )
+स्थिर uint_fast32_t softfloat_commonNaNToF32UI( ध्रुव संरचना commonNaN *aPtr )
 {
-    return (uint_fast32_t) aPtr->sign<<31 | 0x7FC00000 | aPtr->v64>>41;
+    प्रत्यागम (uint_fast32_t) aPtr->sign<<31 | 0x7FC00000 | aPtr->v64>>41;
 }
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into a 64-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-static uint_fast64_t softfloat_commonNaNToF64UI( const struct commonNaN *aPtr )
+स्थिर uint_fast64_t softfloat_commonNaNToF64UI( ध्रुव संरचना commonNaN *aPtr )
 {
-    return
+    प्रत्यागम
         (uint_fast64_t) aPtr->sign<<63 | UINT64_C( 0x7FF8000000000000 )
             | aPtr->v64>>12;
 }
 
-static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
+स्थिर uint_fast8_t softfloat_मोजणी_Leading_Zeros64( uint64_t a )
 {
-    uint_fast8_t count;
+    uint_fast8_t मोजणी_2;
     uint32_t a32;
 
-    count = 0;
+    मोजणी_2 = 0;
     a32 = a>>32;
-    if ( ! a32 ) {
-        count = 32;
+    यदि ( ! a32 ) {
+        मोजणी_2 = 32;
         a32 = (uint32_t) a; //fixed warning on type cast
     }
     /*------------------------------------------------------------------------
     | From here, result is current count + count leading zeros of `a32'.
     *------------------------------------------------------------------------*/
-    if ( a32 < 0x10000 ) {
-        count += 16;
+    यदि ( a32 < 0x10000 ) {
+        मोजणी_2 += 16;
         a32 <<= 16;
     }
-    if ( a32 < 0x1000000 ) {
-        count += 8;
+    यदि ( a32 < 0x1000000 ) {
+        मोजणी_2 += 8;
         a32 <<= 8;
     }
-    count += softfloat_countLeadingZeros8[a32>>24];
-    return count;
+    मोजणी_2 += softfloat_मोजणी_Leading_Zeros8[a32>>24];
+    प्रत्यागम मोजणी_2;
 }
 
 /*----------------------------------------------------------------------------
@@ -2419,9 +2419,9 @@ static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
 | location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 | exception is raised.
 *----------------------------------------------------------------------------*/
-static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, struct commonNaN *zPtr )
+स्थिर शून्य softfloat_f32UIToCommonNaN( uint_fast32_t uiA, संरचना commonNaN *zPtr )
 {
-    if ( softfloat_isSigNaNF32UI( uiA ) ) {
+    यदि ( softfloat_isSigNaNF32UI( uiA ) ) {
         raiseFlags( flag_invalid );
     }
     zPtr->sign = (uiA>>31) != 0;
@@ -2435,9 +2435,9 @@ static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, struct commonNaN *zPt
 | location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 | exception is raised.
 *----------------------------------------------------------------------------*/
-static void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPtr )
+स्थिर शून्य softfloat_f64UIToCommonNaN( uint_fast64_t uiA, संरचना commonNaN *zPtr )
 {
-    if ( softfloat_isSigNaNF64UI( uiA ) ) {
+    यदि ( softfloat_isSigNaNF64UI( uiA ) ) {
         raiseFlags( flag_invalid );
     }
     zPtr->sign = (uiA>>63) != 0;
@@ -2445,10 +2445,10 @@ static void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPt
     zPtr->v0   = 0;
 }
 
-static struct uint128 softfloat_mul64To128( uint64_t a, uint64_t b )
+स्थिर संरचना uint128 softfloat_mul64To128( uint64_t a, uint64_t b )
 {
     uint32_t a32, a0, b32, b0;
-    struct uint128 z;
+    संरचना uint128 z;
     uint64_t mid1, mid;
 
     a32 = a>>32;
@@ -2463,28 +2463,28 @@ static struct uint128 softfloat_mul64To128( uint64_t a, uint64_t b )
     mid <<= 32;
     z.v0 += mid;
     z.v64 += (z.v0 < mid);
-    return z;
+    प्रत्यागम z;
 }
 
-static float32_t
+स्थिर float32_t
  softfloat_mulAddF32(
      uint_fast32_t uiA, uint_fast32_t uiB, uint_fast32_t uiC, uint_fast8_t op )
 {
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast32_t sigA;
-    bool signB;
+    तार्किक signB;
     int_fast16_t expB;
     uint_fast32_t sigB;
-    bool signC;
+    तार्किक signC;
     int_fast16_t expC;
     uint_fast32_t sigC;
-    bool signProd;
+    तार्किक signProd;
     uint_fast32_t magBits, uiZ;
-    struct exp16_sig32 normExpSig;
+    संरचना exp16_sig32 normExpSig;
     int_fast16_t expProd;
     uint_fast64_t sigProd;
-    bool signZ;
+    तार्किक signZ;
     int_fast16_t expZ;
     uint_fast32_t sigZ;
     int_fast16_t expDiff;
@@ -2505,34 +2505,34 @@ static float32_t
     signProd = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN_ABC;
+    यदि ( expA == 0xFF ) {
+        यदि ( sigA || ((expB == 0xFF) && sigB) ) गच्छ propagateNaN_ABC;
         magBits = expB | sigB;
-        goto infProdArg;
+        गच्छ infProdArg;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN_ABC;
+    यदि ( expB == 0xFF ) {
+        यदि ( sigB ) गच्छ propagateNaN_ABC;
         magBits = expA | sigA;
-        goto infProdArg;
+        गच्छ infProdArg;
     }
-    if ( expC == 0xFF ) {
-        if ( sigC ) {
+    यदि ( expC == 0xFF ) {
+        यदि ( sigC ) {
             uiZ = 0;
-            goto propagateNaN_ZC;
+            गच्छ propagateNaN_ZC;
         }
         uiZ = uiC;
-        goto uiZ;
+        गच्छ uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zeroProd;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) गच्छ zeroProd;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zeroProd;
+    यदि ( ! expB ) {
+        यदि ( ! sigB ) गच्छ zeroProd;
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -2543,16 +2543,16 @@ static float32_t
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<7;
     sigProd = (uint_fast64_t) sigA * sigB;
-    if ( sigProd < UINT64_C( 0x2000000000000000 ) ) {
+    यदि ( sigProd < UINT64_C( 0x2000000000000000 ) ) {
         --expProd;
         sigProd <<= 1;
     }
     signZ = signProd;
-    if ( ! expC ) {
-        if ( ! sigC ) {
+    यदि ( ! expC ) {
+        यदि ( ! sigC ) {
             expZ = expProd - 1;
-            sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sigProd, 31 ); //fixed warning on type cast
-            goto roundPack;
+            sigZ = (uint_fast32_t) softfloat_short_Shift_उजवा_Jam64( sigProd, 31 ); //fixed warning on type cast
+            गच्छ roundPack;
         }
         normExpSig = softfloat_normSubnormalF32Sig( sigC );
         expC = normExpSig.exp;
@@ -2562,109 +2562,109 @@ static float32_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expProd - expC;
-    if ( signProd == signC ) {
+    यदि ( signProd == signC ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff <= 0 ) {
+        यदि ( expDiff <= 0 ) {
             expZ = expC;
-            sigZ = sigC + (uint_fast32_t) softfloat_shiftRightJam64( sigProd, 32 - expDiff ); //fixed warning on type cast
-        } else {
+            sigZ = sigC + (uint_fast32_t) softfloat_shift_उजवा_Jam64( sigProd, 32 - expDiff ); //fixed warning on type cast
+        } अन्यथा {
             expZ = expProd;
             sig64Z =
                 sigProd
-                    + softfloat_shiftRightJam64(
+                    + softfloat_shift_उजवा_Jam64(
                           (uint_fast64_t) sigC<<32, expDiff );
-            sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sig64Z, 32 ); //fixed warning on type cast
+            sigZ = (uint_fast32_t) softfloat_short_Shift_उजवा_Jam64( sig64Z, 32 ); //fixed warning on type cast
         }
-        if ( sigZ < 0x40000000 ) {
+        यदि ( sigZ < 0x40000000 ) {
             --expZ;
             sigZ <<= 1;
         }
-    } else {
+    } अन्यथा {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         sig64C = (uint_fast64_t) sigC<<32;
-        if ( expDiff < 0 ) {
+        यदि ( expDiff < 0 ) {
             signZ = signC;
             expZ = expC;
-            sig64Z = sig64C - softfloat_shiftRightJam64( sigProd, -expDiff );
-        } else if ( ! expDiff ) {
+            sig64Z = sig64C - softfloat_shift_उजवा_Jam64( sigProd, -expDiff );
+        } अन्यथा यदि ( ! expDiff ) {
             expZ = expProd;
             sig64Z = sigProd - sig64C;
-            if ( ! sig64Z ) goto completeCancellation;
-            if ( sig64Z & UINT64_C( 0x8000000000000000 ) ) {
+            यदि ( ! sig64Z ) गच्छ completeCancellation;
+            यदि ( sig64Z & UINT64_C( 0x8000000000000000 ) ) {
                 signZ = ! signZ;
                 //fixed unsigned unary minus: -x == ~x + 1
                 sig64Z = ~sig64Z + 1;
             }
-        } else {
+        } अन्यथा {
             expZ = expProd;
-            sig64Z = sigProd - softfloat_shiftRightJam64( sig64C, expDiff );
+            sig64Z = sigProd - softfloat_shift_उजवा_Jam64( sig64C, expDiff );
         }
-        shiftDist = softfloat_countLeadingZeros64( sig64Z ) - 1;
+        shiftDist = softfloat_मोजणी_Leading_Zeros64( sig64Z ) - 1;
         expZ -= shiftDist;
         shiftDist -= 32;
-        if ( shiftDist < 0 ) {
-            sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sig64Z, -shiftDist ); //fixed warning on type cast
-        } else {
+        यदि ( shiftDist < 0 ) {
+            sigZ = (uint_fast32_t) softfloat_short_Shift_उजवा_Jam64( sig64Z, -shiftDist ); //fixed warning on type cast
+        } अन्यथा {
             sigZ = (uint_fast32_t) sig64Z<<shiftDist;
         }
     }
  roundPack:
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    प्रत्यागम softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN_ABC:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
-    goto propagateNaN_ZC;
+    गच्छ propagateNaN_ZC;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infProdArg:
-    if ( magBits ) {
+    यदि ( magBits ) {
         uiZ = packToF32UI( signProd, 0xFF, 0 );
-        if ( expC != 0xFF ) goto uiZ;
-        if ( sigC ) goto propagateNaN_ZC;
-        if ( signProd == signC ) goto uiZ;
+        यदि ( expC != 0xFF ) गच्छ uiZ;
+        यदि ( sigC ) गच्छ propagateNaN_ZC;
+        यदि ( signProd == signC ) गच्छ uiZ;
     }
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
  propagateNaN_ZC:
     uiZ = softfloat_propagateNaNF32UI( uiZ, uiC );
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  zeroProd:
     uiZ = uiC;
-    if ( ! (expC | sigC) && (signProd != signC) ) {
+    यदि ( ! (expC | sigC) && (signProd != signC) ) {
  completeCancellation:
         uiZ =
             packToF32UI((globalRoundingMode == round_min), 0, 0 );
     }
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static float64_t
+स्थिर float64_t
  softfloat_mulAddF64(
      uint_fast64_t uiA, uint_fast64_t uiB, uint_fast64_t uiC, uint_fast8_t op )
 {
-    bool signA;
+    तार्किक signA;
     int_fast16_t expA;
     uint_fast64_t sigA;
-    bool signB;
+    तार्किक signB;
     int_fast16_t expB;
     uint_fast64_t sigB;
-    bool signC;
+    तार्किक signC;
     int_fast16_t expC;
     uint_fast64_t sigC;
-    bool signZ;
+    तार्किक signZ;
     uint_fast64_t magBits, uiZ;
-    struct exp16_sig64 normExpSig;
+    संरचना exp16_sig64 normExpSig;
     int_fast16_t expZ;
-    struct uint128 sig128Z;
+    संरचना uint128 sig128Z;
     uint_fast64_t sigZ;
     int_fast16_t expDiff;
-    struct uint128 sig128C;
+    संरचना uint128 sig128C;
     int_fast8_t shiftDist;
 
     /*------------------------------------------------------------------------
@@ -2681,34 +2681,34 @@ static float64_t
     signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN_ABC;
+    यदि ( expA == 0x7FF ) {
+        यदि ( sigA || ((expB == 0x7FF) && sigB) ) गच्छ propagateNaN_ABC;
         magBits = expB | sigB;
-        goto infProdArg;
+        गच्छ infProdArg;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN_ABC;
+    यदि ( expB == 0x7FF ) {
+        यदि ( sigB ) गच्छ propagateNaN_ABC;
         magBits = expA | sigA;
-        goto infProdArg;
+        गच्छ infProdArg;
     }
-    if ( expC == 0x7FF ) {
-        if ( sigC ) {
+    यदि ( expC == 0x7FF ) {
+        यदि ( sigC ) {
             uiZ = 0;
-            goto propagateNaN_ZC;
+            गच्छ propagateNaN_ZC;
         }
         uiZ = uiC;
-        goto uiZ;
+        गच्छ uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zeroProd;
+    यदि ( ! expA ) {
+        यदि ( ! sigA ) गच्छ zeroProd;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zeroProd;
+    यदि ( ! expB ) {
+        यदि ( ! sigB ) गच्छ zeroProd;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -2719,17 +2719,17 @@ static float64_t
     sigA = (sigA | UINT64_C( 0x0010000000000000 ))<<10;
     sigB = (sigB | UINT64_C( 0x0010000000000000 ))<<10;
     sig128Z = softfloat_mul64To128( sigA, sigB );
-    if ( sig128Z.v64 < UINT64_C( 0x2000000000000000 ) ) {
+    यदि ( sig128Z.v64 < UINT64_C( 0x2000000000000000 ) ) {
         --expZ;
         sig128Z =
             softfloat_add128(
                 sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0 );
     }
-    if ( ! expC ) {
-        if ( ! sigC ) {
+    यदि ( ! expC ) {
+        यदि ( ! sigC ) {
             --expZ;
             sigZ = sig128Z.v64<<1 | (sig128Z.v0 != 0);
-            goto roundPack;
+            गच्छ roundPack;
         }
         normExpSig = softfloat_normSubnormalF64Sig( sigC );
         expC = normExpSig.exp;
@@ -2741,64 +2741,64 @@ static float64_t
     //fixed initialization
     sig128C.v0 = sig128C.v64 = 0;
     expDiff = expZ - expC;
-    if ( expDiff < 0 ) {
+    यदि ( expDiff < 0 ) {
         expZ = expC;
-        if ( (signZ == signC) || (expDiff < -1) ) {
-            sig128Z.v64 = softfloat_shiftRightJam64( sig128Z.v64, -expDiff );
-        } else {
+        यदि ( (signZ == signC) || (expDiff < -1) ) {
+            sig128Z.v64 = softfloat_shift_उजवा_Jam64( sig128Z.v64, -expDiff );
+        } अन्यथा {
             sig128Z =
-                softfloat_shortShiftRightJam128( sig128Z.v64, sig128Z.v0, 1 );
+                softfloat_short_Shift_उजवा_Jam128( sig128Z.v64, sig128Z.v0, 1 );
         }
-    } else if ( expDiff ) {
-        sig128C = softfloat_shiftRightJam128( sigC, 0, expDiff );
+    } अन्यथा यदि ( expDiff ) {
+        sig128C = softfloat_shift_उजवा_Jam128( sigC, 0, expDiff );
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( signZ == signC ) {
+    यदि ( signZ == signC ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff <= 0 ) {
+        यदि ( expDiff <= 0 ) {
             sigZ = (sigC + sig128Z.v64) | (sig128Z.v0 != 0);
-        } else {
+        } अन्यथा {
             sig128Z =
                 softfloat_add128(
                     sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0 );
             sigZ = sig128Z.v64 | (sig128Z.v0 != 0);
         }
-        if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+        यदि ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
             --expZ;
             sigZ <<= 1;
         }
-    } else {
+    } अन्यथा {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff < 0 ) {
+        यदि ( expDiff < 0 ) {
             signZ = signC;
             sig128Z = softfloat_sub128( sigC, 0, sig128Z.v64, sig128Z.v0 );
-        } else if ( ! expDiff ) {
+        } अन्यथा यदि ( ! expDiff ) {
             sig128Z.v64 = sig128Z.v64 - sigC;
-            if ( ! (sig128Z.v64 | sig128Z.v0) ) goto completeCancellation;
-            if ( sig128Z.v64 & UINT64_C( 0x8000000000000000 ) ) {
+            यदि ( ! (sig128Z.v64 | sig128Z.v0) ) गच्छ completeCancellation;
+            यदि ( sig128Z.v64 & UINT64_C( 0x8000000000000000 ) ) {
                 signZ = ! signZ;
                 sig128Z = softfloat_sub128( 0, 0, sig128Z.v64, sig128Z.v0 );
             }
-        } else {
+        } अन्यथा {
             sig128Z =
                 softfloat_sub128(
                     sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0 );
         }
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( ! sig128Z.v64 ) {
+        यदि ( ! sig128Z.v64 ) {
             expZ -= 64;
             sig128Z.v64 = sig128Z.v0;
             sig128Z.v0 = 0;
         }
-        shiftDist = softfloat_countLeadingZeros64( sig128Z.v64 ) - 1;
+        shiftDist = softfloat_मोजणी_Leading_Zeros64( sig128Z.v64 ) - 1;
         expZ -= shiftDist;
-        if ( shiftDist < 0 ) {
-            sigZ = softfloat_shortShiftRightJam64( sig128Z.v64, -shiftDist );
-        } else {
+        यदि ( shiftDist < 0 ) {
+            sigZ = softfloat_short_Shift_उजवा_Jam64( sig128Z.v64, -shiftDist );
+        } अन्यथा {
             sig128Z =
                 softfloat_shortShiftLeft128(
                     sig128Z.v64, sig128Z.v0, shiftDist );
@@ -2807,87 +2807,87 @@ static float64_t
         sigZ |= (sig128Z.v0 != 0);
     }
  roundPack:
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    प्रत्यागम softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN_ABC:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
-    goto propagateNaN_ZC;
+    गच्छ propagateNaN_ZC;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infProdArg:
-    if ( magBits ) {
+    यदि ( magBits ) {
         uiZ = packToF64UI( signZ, 0x7FF, 0 );
-        if ( expC != 0x7FF ) goto uiZ;
-        if ( sigC ) goto propagateNaN_ZC;
-        if ( signZ == signC ) goto uiZ;
+        यदि ( expC != 0x7FF ) गच्छ uiZ;
+        यदि ( sigC ) गच्छ propagateNaN_ZC;
+        यदि ( signZ == signC ) गच्छ uiZ;
     }
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
  propagateNaN_ZC:
     uiZ = softfloat_propagateNaNF64UI( uiZ, uiC );
-    goto uiZ;
+    गच्छ uiZ;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  zeroProd:
     uiZ = uiC;
-    if ( ! (expC | sigC) && (signZ != signC) ) {
+    यदि ( ! (expC | sigC) && (signZ != signC) ) {
  completeCancellation:
         uiZ =
             packToF64UI((globalRoundingMode == round_min), 0, 0 );
     }
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static float32_t
- softfloat_normRoundPackToF32( bool sign, int_fast16_t exp, uint_fast32_t sig )
+स्थिर float32_t
+ softfloat_normRoundPackToF32( तार्किक sign, int_fast16_t exp, uint_fast32_t sig )
 {
     int_fast8_t shiftDist;
 
-    shiftDist = softfloat_countLeadingZeros32( sig ) - 1;
+    shiftDist = softfloat_मोजणी_Leading_Zeros32( sig ) - 1;
     exp -= shiftDist;
-    if ( (7 <= shiftDist) && ((unsigned int) exp < 0xFD) ) {
-        return float32_t::fromRaw(packToF32UI( sign, sig ? exp : 0, sig<<(shiftDist - 7) ));
-    } else {
-        return softfloat_roundPackToF32( sign, exp, sig<<shiftDist );
+    यदि ( (7 <= shiftDist) && ((unsigned पूर्णाङ्क) exp < 0xFD) ) {
+        प्रत्यागम float32_t::fromRaw(packToF32UI( sign, sig ? exp : 0, sig<<(shiftDist - 7) ));
+    } अन्यथा {
+        प्रत्यागम softfloat_roundPackToF32( sign, exp, sig<<shiftDist );
     }
 }
 
-static float64_t
- softfloat_normRoundPackToF64( bool sign, int_fast16_t exp, uint_fast64_t sig )
+स्थिर float64_t
+ softfloat_normRoundPackToF64( तार्किक sign, int_fast16_t exp, uint_fast64_t sig )
 {
     int_fast8_t shiftDist;
 
-    shiftDist = softfloat_countLeadingZeros64( sig ) - 1;
+    shiftDist = softfloat_मोजणी_Leading_Zeros64( sig ) - 1;
     exp -= shiftDist;
-    if ( (10 <= shiftDist) && ((unsigned int) exp < 0x7FD) ) {
-        return float64_t::fromRaw(packToF64UI( sign, sig ? exp : 0, sig<<(shiftDist - 10) ));
-    } else {
-        return softfloat_roundPackToF64( sign, exp, sig<<shiftDist );
+    यदि ( (10 <= shiftDist) && ((unsigned पूर्णाङ्क) exp < 0x7FD) ) {
+        प्रत्यागम float64_t::fromRaw(packToF64UI( sign, sig ? exp : 0, sig<<(shiftDist - 10) ));
+    } अन्यथा {
+        प्रत्यागम softfloat_roundPackToF64( sign, exp, sig<<shiftDist );
     }
 }
 
-static struct exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t sig )
+स्थिर संरचना exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t sig )
 {
     int_fast8_t shiftDist;
-    struct exp16_sig32 z;
+    संरचना exp16_sig32 z;
 
-    shiftDist = softfloat_countLeadingZeros32( sig ) - 8;
+    shiftDist = softfloat_मोजणी_Leading_Zeros32( sig ) - 8;
     z.exp = 1 - shiftDist;
     z.sig = sig<<shiftDist;
-    return z;
+    प्रत्यागम z;
 }
 
-static struct exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t sig )
+स्थिर संरचना exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t sig )
 {
     int_fast8_t shiftDist;
-    struct exp16_sig64 z;
+    संरचना exp16_sig64 z;
 
-    shiftDist = softfloat_countLeadingZeros64( sig ) - 11;
+    shiftDist = softfloat_मोजणी_Leading_Zeros64( sig ) - 11;
     z.exp = 1 - shiftDist;
     z.sig = sig<<shiftDist;
-    return z;
+    प्रत्यागम z;
 }
 
 /*----------------------------------------------------------------------------
@@ -2896,17 +2896,17 @@ static struct exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t sig )
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-static uint_fast32_t
+स्थिर uint_fast32_t
  softfloat_propagateNaNF32UI( uint_fast32_t uiA, uint_fast32_t uiB )
 {
-    bool isSigNaNA;
+    तार्किक isSigNaNA;
 
     isSigNaNA = softfloat_isSigNaNF32UI( uiA );
-    if ( isSigNaNA || softfloat_isSigNaNF32UI( uiB ) ) {
+    यदि ( isSigNaNA || softfloat_isSigNaNF32UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        if ( isSigNaNA ) return uiA | 0x00400000;
+        यदि ( isSigNaNA ) प्रत्यागम uiA | 0x00400000;
     }
-    return (isNaNF32UI( uiA ) ? uiA : uiB) | 0x00400000;
+    प्रत्यागम (isNaNF32UI( uiA ) ? uiA : uiB) | 0x00400000;
 }
 
 /*----------------------------------------------------------------------------
@@ -2915,26 +2915,26 @@ static uint_fast32_t
 | the combined NaN result.  If either `uiA' or `uiB' has the pattern of a
 | signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
-static uint_fast64_t
+स्थिर uint_fast64_t
  softfloat_propagateNaNF64UI( uint_fast64_t uiA, uint_fast64_t uiB )
 {
-    bool isSigNaNA;
+    तार्किक isSigNaNA;
 
     isSigNaNA = softfloat_isSigNaNF64UI( uiA );
-    if ( isSigNaNA || softfloat_isSigNaNF64UI( uiB ) ) {
+    यदि ( isSigNaNA || softfloat_isSigNaNF64UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        if ( isSigNaNA ) return uiA | UINT64_C( 0x0008000000000000 );
+        यदि ( isSigNaNA ) प्रत्यागम uiA | UINT64_C( 0x0008000000000000 );
     }
-    return (isNaNF64UI( uiA ) ? uiA : uiB) | UINT64_C( 0x0008000000000000 );
+    प्रत्यागम (isNaNF64UI( uiA ) ? uiA : uiB) | UINT64_C( 0x0008000000000000 );
 }
 
-static float32_t
- softfloat_roundPackToF32( bool sign, int_fast16_t exp, uint_fast32_t sig )
+स्थिर float32_t
+ softfloat_roundPackToF32( तार्किक sign, int_fast16_t exp, uint_fast32_t sig )
 {
     uint_fast8_t roundingMode;
-    bool roundNearEven;
+    तार्किक roundNearEven;
     uint_fast8_t roundIncrement, roundBits;
-    bool isTiny;
+    तार्किक isTiny;
     uint_fast32_t uiZ;
 
     /*------------------------------------------------------------------------
@@ -2942,7 +2942,7 @@ static float32_t
     roundingMode = globalRoundingMode;
     roundNearEven = (roundingMode == round_near_even);
     roundIncrement = 0x40;
-    if ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
+    यदि ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? round_min : round_max))
@@ -2952,55 +2952,55 @@ static float32_t
     roundBits = sig & 0x7F;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0xFD <= (unsigned int) exp ) {
-        if ( exp < 0 ) {
+    यदि ( 0xFD <= (unsigned पूर्णाङ्क) exp ) {
+        यदि ( exp < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             isTiny =
                 (globalDetectTininess == tininess_beforeRounding)
                     || (exp < -1) || (sig + roundIncrement < 0x80000000);
-            sig = softfloat_shiftRightJam32( sig, -exp );
+            sig = softfloat_shift_उजवा_Jam32( sig, -exp );
             exp = 0;
             roundBits = sig & 0x7F;
-            if ( isTiny && roundBits ) {
+            यदि ( isTiny && roundBits ) {
                 raiseFlags( flag_underflow );
             }
-        } else if ( (0xFD < exp) || (0x80000000 <= sig + roundIncrement) ) {
+        } अन्यथा यदि ( (0xFD < exp) || (0x80000000 <= sig + roundIncrement) ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             raiseFlags(
                 flag_overflow | flag_inexact );
             uiZ = packToF32UI( sign, 0xFF, 0 ) - ! roundIncrement;
-            goto uiZ;
+            गच्छ uiZ;
         }
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sig = (sig + roundIncrement)>>7;
-    if ( roundBits ) {
+    यदि ( roundBits ) {
         raiseFlags(flag_inexact);
-        if ( roundingMode == round_odd ) {
+        यदि ( roundingMode == round_odd ) {
             sig |= 1;
-            goto packReturn;
+            गच्छ packReturn;
         }
     }
     sig &= ~(uint_fast32_t) (! (roundBits ^ 0x40) & roundNearEven);
-    if ( ! sig ) exp = 0;
+    यदि ( ! sig ) exp = 0;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  packReturn:
     uiZ = packToF32UI( sign, exp, sig );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static float64_t
- softfloat_roundPackToF64( bool sign, int_fast16_t exp, uint_fast64_t sig )
+स्थिर float64_t
+ softfloat_roundPackToF64( तार्किक sign, int_fast16_t exp, uint_fast64_t sig )
 {
     uint_fast8_t roundingMode;
-    bool roundNearEven;
+    तार्किक roundNearEven;
     uint_fast16_t roundIncrement, roundBits;
-    bool isTiny;
+    तार्किक isTiny;
     uint_fast64_t uiZ;
 
     /*------------------------------------------------------------------------
@@ -3008,7 +3008,7 @@ static float64_t
     roundingMode = globalRoundingMode;
     roundNearEven = (roundingMode == round_near_even);
     roundIncrement = 0x200;
-    if ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
+    यदि ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? round_min : round_max))
@@ -3018,21 +3018,21 @@ static float64_t
     roundBits = sig & 0x3FF;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x7FD <= (uint16_t) exp ) {
-        if ( exp < 0 ) {
+    यदि ( 0x7FD <= (uint16_t) exp ) {
+        यदि ( exp < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             isTiny =
                 (globalDetectTininess == tininess_beforeRounding)
                     || (exp < -1)
                     || (sig + roundIncrement < UINT64_C( 0x8000000000000000 ));
-            sig = softfloat_shiftRightJam64( sig, -exp );
+            sig = softfloat_shift_उजवा_Jam64( sig, -exp );
             exp = 0;
             roundBits = sig & 0x3FF;
-            if ( isTiny && roundBits ) {
+            यदि ( isTiny && roundBits ) {
                 raiseFlags( flag_underflow );
             }
-        } else if (
+        } अन्यथा यदि (
             (0x7FD < exp)
                 || (UINT64_C( 0x8000000000000000 ) <= sig + roundIncrement)
         ) {
@@ -3041,44 +3041,44 @@ static float64_t
             raiseFlags(
                 flag_overflow | flag_inexact );
             uiZ = packToF64UI( sign, 0x7FF, 0 ) - ! roundIncrement;
-            goto uiZ;
+            गच्छ uiZ;
         }
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sig = (sig + roundIncrement)>>10;
-    if ( roundBits ) {
+    यदि ( roundBits ) {
         raiseFlags(flag_inexact);
-        if ( roundingMode == round_odd ) {
+        यदि ( roundingMode == round_odd ) {
             sig |= 1;
-            goto packReturn;
+            गच्छ packReturn;
         }
     }
     sig &= ~(uint_fast64_t) (! (roundBits ^ 0x200) & roundNearEven);
-    if ( ! sig ) exp = 0;
+    यदि ( ! sig ) exp = 0;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  packReturn:
     uiZ = packToF64UI( sign, exp, sig );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static int_fast32_t
+स्थिर int_fast32_t
  softfloat_roundToI32(
-     bool sign, uint_fast64_t sig, uint_fast8_t roundingMode, bool exact )
+     तार्किक sign, uint_fast64_t sig, uint_fast8_t roundingMode, तार्किक exact )
 {
-    bool roundNearEven;
+    तार्किक roundNearEven;
     uint_fast16_t roundIncrement, roundBits;
     uint_fast32_t sig32;
-    union { uint32_t ui; int32_t i; } uZ;
+    सङ्घ { uint32_t ui; int32_t i; } uZ;
     int_fast32_t z;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     roundNearEven = (roundingMode == round_near_even);
     roundIncrement = 0x800;
-    if ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
+    यदि ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? round_min : round_max))
@@ -3087,45 +3087,45 @@ static int_fast32_t
     }
     roundBits = sig & 0xFFF;
     sig += roundIncrement;
-    if ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
+    यदि ( sig & UINT64_C( 0xFFFFF00000000000 ) ) गच्छ invalid;
     sig32 = (uint_fast32_t)(sig>>12); //fixed warning on type cast
     sig32 &= ~(uint_fast32_t) (! (roundBits ^ 0x800) & roundNearEven);
     //fixed unsigned unary minus: -x == ~x + 1
     uZ.ui = sign ? (~sig32 + 1) : sig32;
     z = uZ.i;
-    if ( z && ((z < 0) ^ sign) ) goto invalid;
-    if ( exact && roundBits ) {
+    यदि ( z && ((z < 0) ^ sign) ) गच्छ invalid;
+    यदि ( exact && roundBits ) {
         raiseFlags(flag_inexact);
     }
-    return z;
+    प्रत्यागम z;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
-    return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    प्रत्यागम sign ? i32_fromNegOverflow : i32_fromPosOverflow;
 }
 
-static int_fast64_t
+स्थिर int_fast64_t
  softfloat_roundToI64(
-    bool sign, uint_fast64_t sig, uint_fast64_t sigExtra, uint_fast8_t roundingMode, bool exact )
+    तार्किक sign, uint_fast64_t sig, uint_fast64_t sigExtra, uint_fast8_t roundingMode, तार्किक exact )
 {
-    bool roundNearEven, doIncrement;
-    union { uint64_t ui; int64_t i; } uZ;
+    तार्किक roundNearEven, doIncrement;
+    सङ्घ { uint64_t ui; int64_t i; } uZ;
     int_fast64_t z;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     roundNearEven = (roundingMode == round_near_even);
     doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
-    if (!roundNearEven && (roundingMode != round_near_maxMag)) {
+    यदि (!roundNearEven && (roundingMode != round_near_maxMag)) {
         doIncrement =
             (roundingMode
                 == (sign ? round_min : round_max))
             && sigExtra;
     }
-    if (doIncrement) {
+    यदि (doIncrement) {
         ++sig;
-        if (!sig) goto invalid;
+        यदि (!sig) गच्छ invalid;
         sig &=
             ~(uint_fast64_t)
             (!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF))
@@ -3133,32 +3133,32 @@ static int_fast64_t
     }
     uZ.ui = sign ? (~sig + 1) : sig;
     z = uZ.i;
-    if (z && ((z < 0) ^ sign)) goto invalid;
-    if (exact && sigExtra) {
+    यदि (z && ((z < 0) ^ sign)) गच्छ invalid;
+    यदि (exact && sigExtra) {
         raiseFlags(flag_inexact);
     }
-    return z;
+    प्रत्यागम z;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
 invalid:
     raiseFlags(flag_invalid);
-    return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+    प्रत्यागम sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 }
 
-static struct uint128
- softfloat_shiftRightJam128( uint64_t a64, uint64_t a0, uint_fast32_t dist )
+स्थिर संरचना uint128
+ softfloat_shift_उजवा_Jam128( uint64_t a64, uint64_t a0, uint_fast32_t dist )
 {
     uint_fast8_t u8NegDist;
-    struct uint128 z;
+    संरचना uint128 z;
 
-    if ( dist < 64 ) {
+    यदि ( dist < 64 ) {
         //fixed unsigned unary minus: -x == ~x + 1 , fixed type cast
         u8NegDist = (uint_fast8_t)(~dist + 1);
         z.v64 = a64>>dist;
         z.v0 =
             a64<<(u8NegDist & 63) | a0>>dist
                 | ((uint64_t) (a0<<(u8NegDist & 63)) != 0);
-    } else {
+    } अन्यथा {
         z.v64 = 0;
         z.v0 =
             (dist < 127)
@@ -3167,10 +3167,10 @@ static struct uint128
                              != 0)
                 : ((a64 | a0) != 0);
     }
-    return z;
+    प्रत्यागम z;
 }
 
-static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
+स्थिर float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
 {
     int_fast16_t expA;
     uint_fast32_t sigA;
@@ -3179,7 +3179,7 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
     int_fast16_t expDiff;
     uint_fast32_t uiZ;
     int_fast32_t sigDiff;
-    bool signZ;
+    तार्किक signZ;
     int_fast8_t shiftDist;
     int_fast16_t expZ;
     uint_fast32_t sigX, sigY;
@@ -3193,70 +3193,70 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    यदि ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expA == 0xFF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        यदि ( expA == 0xFF ) {
+            यदि ( sigA | sigB ) गच्छ propagateNaN;
             raiseFlags( flag_invalid );
             uiZ = defaultNaNF32UI;
-            goto uiZ;
+            गच्छ uiZ;
         }
         sigDiff = sigA - sigB;
-        if ( ! sigDiff ) {
+        यदि ( ! sigDiff ) {
             uiZ =
                 packToF32UI(
                     (globalRoundingMode == round_min), 0, 0 );
-            goto uiZ;
+            गच्छ uiZ;
         }
-        if ( expA ) --expA;
+        यदि ( expA ) --expA;
         signZ = signF32UI( uiA );
-        if ( sigDiff < 0 ) {
+        यदि ( sigDiff < 0 ) {
             signZ = ! signZ;
             sigDiff = -sigDiff;
         }
-        shiftDist = softfloat_countLeadingZeros32( sigDiff ) - 8;
+        shiftDist = softfloat_मोजणी_Leading_Zeros32( sigDiff ) - 8;
         expZ = expA - shiftDist;
-        if ( expZ < 0 ) {
+        यदि ( expZ < 0 ) {
             shiftDist = (int_fast8_t)expA; //fixed type cast
             expZ = 0;
         }
         uiZ = packToF32UI( signZ, expZ, sigDiff<<shiftDist );
-        goto uiZ;
-    } else {
+        गच्छ uiZ;
+    } अन्यथा {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         signZ = signF32UI( uiA );
         sigA <<= 7;
         sigB <<= 7;
-        if ( expDiff < 0 ) {
+        यदि ( expDiff < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             signZ = ! signZ;
-            if ( expB == 0xFF ) {
-                if ( sigB ) goto propagateNaN;
+            यदि ( expB == 0xFF ) {
+                यदि ( sigB ) गच्छ propagateNaN;
                 uiZ = packToF32UI( signZ, 0xFF, 0 );
-                goto uiZ;
+                गच्छ uiZ;
             }
             expZ = expB - 1;
             sigX = sigB | 0x40000000;
             sigY = sigA + (expA ? 0x40000000 : sigA);
             expDiff = -expDiff;
-        } else {
+        } अन्यथा {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
-            if ( expA == 0xFF ) {
-                if ( sigA ) goto propagateNaN;
+            यदि ( expA == 0xFF ) {
+                यदि ( sigA ) गच्छ propagateNaN;
                 uiZ = uiA;
-                goto uiZ;
+                गच्छ uiZ;
             }
             expZ = expA - 1;
             sigX = sigA | 0x40000000;
             sigY = sigB + (expB ? 0x40000000 : sigB);
         }
-        return
+        प्रत्यागम
             softfloat_normRoundPackToF32(
-                signZ, expZ, sigX - softfloat_shiftRightJam32( sigY, expDiff )
+                signZ, expZ, sigX - softfloat_shift_उजवा_Jam32( sigY, expDiff )
             );
     }
     /*------------------------------------------------------------------------
@@ -3264,11 +3264,11 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    प्रत्यागम float32_t::fromRaw(uiZ);
 }
 
-static float64_t
- softfloat_subMagsF64( uint_fast64_t uiA, uint_fast64_t uiB, bool signZ )
+स्थिर float64_t
+ softfloat_subMagsF64( uint_fast64_t uiA, uint_fast64_t uiB, तार्किक signZ )
 {
     int_fast16_t expA;
     uint_fast64_t sigA;
@@ -3290,133 +3290,133 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    यदि ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expA == 0x7FF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        यदि ( expA == 0x7FF ) {
+            यदि ( sigA | sigB ) गच्छ propagateNaN;
             raiseFlags( flag_invalid );
             uiZ = defaultNaNF64UI;
-            goto uiZ;
+            गच्छ uiZ;
         }
         sigDiff = sigA - sigB;
-        if ( ! sigDiff ) {
+        यदि ( ! sigDiff ) {
             uiZ =
                 packToF64UI(
                     (globalRoundingMode == round_min), 0, 0 );
-            goto uiZ;
+            गच्छ uiZ;
         }
-        if ( expA ) --expA;
-        if ( sigDiff < 0 ) {
+        यदि ( expA ) --expA;
+        यदि ( sigDiff < 0 ) {
             signZ = ! signZ;
             sigDiff = -sigDiff;
         }
-        shiftDist = softfloat_countLeadingZeros64( sigDiff ) - 11;
+        shiftDist = softfloat_मोजणी_Leading_Zeros64( sigDiff ) - 11;
         expZ = expA - shiftDist;
-        if ( expZ < 0 ) {
+        यदि ( expZ < 0 ) {
             shiftDist = (int_fast8_t)expA; //fixed type cast
             expZ = 0;
         }
         uiZ = packToF64UI( signZ, expZ, sigDiff<<shiftDist );
-        goto uiZ;
-    } else {
+        गच्छ uiZ;
+    } अन्यथा {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         sigA <<= 10;
         sigB <<= 10;
-        if ( expDiff < 0 ) {
+        यदि ( expDiff < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             signZ = ! signZ;
-            if ( expB == 0x7FF ) {
-                if ( sigB ) goto propagateNaN;
+            यदि ( expB == 0x7FF ) {
+                यदि ( sigB ) गच्छ propagateNaN;
                 uiZ = packToF64UI( signZ, 0x7FF, 0 );
-                goto uiZ;
+                गच्छ uiZ;
             }
             sigA += expA ? UINT64_C( 0x4000000000000000 ) : sigA;
-            sigA = softfloat_shiftRightJam64( sigA, -expDiff );
+            sigA = softfloat_shift_उजवा_Jam64( sigA, -expDiff );
             sigB |= UINT64_C( 0x4000000000000000 );
             expZ = expB;
             sigZ = sigB - sigA;
-        } else {
+        } अन्यथा {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
-            if ( expA == 0x7FF ) {
-                if ( sigA ) goto propagateNaN;
+            यदि ( expA == 0x7FF ) {
+                यदि ( sigA ) गच्छ propagateNaN;
                 uiZ = uiA;
-                goto uiZ;
+                गच्छ uiZ;
             }
             sigB += expB ? UINT64_C( 0x4000000000000000 ) : sigB;
-            sigB = softfloat_shiftRightJam64( sigB, expDiff );
+            sigB = softfloat_shift_उजवा_Jam64( sigB, expDiff );
             sigA |= UINT64_C( 0x4000000000000000 );
             expZ = expA;
             sigZ = sigA - sigB;
         }
-        return softfloat_normRoundPackToF64( signZ, expZ - 1, sigZ );
+        प्रत्यागम softfloat_normRoundPackToF64( signZ, expZ - 1, sigZ );
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static float32_t ui32_to_f32( uint32_t a )
+स्थिर float32_t ui32_to_f32( uint32_t a )
 {
-    if ( ! a ) {
-        return float32_t::fromRaw(0);
+    यदि ( ! a ) {
+        प्रत्यागम float32_t::fromRaw(0);
     }
-    if ( a & 0x80000000 ) {
-        return softfloat_roundPackToF32( 0, 0x9D, a>>1 | (a & 1) );
-    } else {
-        return softfloat_normRoundPackToF32( 0, 0x9C, a );
+    यदि ( a & 0x80000000 ) {
+        प्रत्यागम softfloat_roundPackToF32( 0, 0x9D, a>>1 | (a & 1) );
+    } अन्यथा {
+        प्रत्यागम softfloat_normRoundPackToF32( 0, 0x9C, a );
     }
 }
 
-static float64_t ui32_to_f64( uint32_t a )
+स्थिर float64_t ui32_to_f64( uint32_t a )
 {
     uint_fast64_t uiZ;
     int_fast8_t shiftDist;
 
-    if ( ! a ) {
+    यदि ( ! a ) {
         uiZ = 0;
-    } else {
-        shiftDist = softfloat_countLeadingZeros32( a ) + 21;
+    } अन्यथा {
+        shiftDist = softfloat_मोजणी_Leading_Zeros32( a ) + 21;
         uiZ =
             packToF64UI( 0, 0x432 - shiftDist, (uint_fast64_t) a<<shiftDist );
     }
-    return float64_t::fromRaw(uiZ);
+    प्रत्यागम float64_t::fromRaw(uiZ);
 }
 
-static float32_t ui64_to_f32( uint64_t a )
+स्थिर float32_t ui64_to_f32( uint64_t a )
 {
     int_fast8_t shiftDist;
     uint_fast32_t sig;
 
-    shiftDist = softfloat_countLeadingZeros64( a ) - 40;
-    if ( 0 <= shiftDist ) {
-        return float32_t::fromRaw(a ? packToF32UI(0, 0x95 - shiftDist, (uint_fast32_t) a<<shiftDist ) : 0);
-    } else {
+    shiftDist = softfloat_मोजणी_Leading_Zeros64( a ) - 40;
+    यदि ( 0 <= shiftDist ) {
+        प्रत्यागम float32_t::fromRaw(a ? packToF32UI(0, 0x95 - shiftDist, (uint_fast32_t) a<<shiftDist ) : 0);
+    } अन्यथा {
         shiftDist += 7;
         sig =
-            (shiftDist < 0) ? (uint_fast32_t) softfloat_shortShiftRightJam64( a, -shiftDist ) //fixed warning on type cast
+            (shiftDist < 0) ? (uint_fast32_t) softfloat_short_Shift_उजवा_Jam64( a, -shiftDist ) //fixed warning on type cast
                 : (uint_fast32_t) a<<shiftDist;
-        return softfloat_roundPackToF32( 0, 0x9C - shiftDist, sig );
+        प्रत्यागम softfloat_roundPackToF32( 0, 0x9C - shiftDist, sig );
     }
 }
 
-static float64_t ui64_to_f64( uint64_t a )
+स्थिर float64_t ui64_to_f64( uint64_t a )
 {
-    if ( ! a ) {
-        return float64_t::fromRaw(0);
+    यदि ( ! a ) {
+        प्रत्यागम float64_t::fromRaw(0);
     }
-    if ( a & UINT64_C( 0x8000000000000000 ) ) {
-        return
+    यदि ( a & UINT64_C( 0x8000000000000000 ) ) {
+        प्रत्यागम
             softfloat_roundPackToF64(
-                0, 0x43D, softfloat_shortShiftRightJam64( a, 1 ) );
-    } else {
-        return softfloat_normRoundPackToF64( 0, 0x43C, a );
+                0, 0x43D, softfloat_short_Shift_उजवा_Jam64( a, 1 ) );
+    } अन्यथा {
+        प्रत्यागम softfloat_normRoundPackToF64( 0, 0x43C, a );
     }
 }
 
@@ -3430,9 +3430,9 @@ static float64_t ui64_to_f64( uint64_t a )
 #define EXPTAB_MASK  ((1 << EXPTAB_SCALE) - 1)
 
 // .9670371139572337719125840413672004409288e-2
-static const softdouble EXPPOLY_32F_A0 = float64_t::fromRaw(0x3f83ce0f3e46f431);
+स्थिर ध्रुव softdouble EXPPOLY_32F_A0 = float64_t::fromRaw(0x3f83ce0f3e46f431);
 
-static const uint64_t expTab[] = {
+स्थिर ध्रुव uint64_t expTab[] = {
     0x3ff0000000000000, // 1.000000
     0x3ff02c9a3e778061, // 1.010889
     0x3ff059b0d3158574, // 1.021897
@@ -3500,45 +3500,45 @@ static const uint64_t expTab[] = {
 };
 
 // 1 / ln(2) * (1 << EXPTAB_SCALE) == 1.4426950408889634073599246810019 * (1 << EXPTAB_SCALE)
-static const float64_t exp_prescale = float64_t::fromRaw(0x3ff71547652b82fe) * float64_t(1 << EXPTAB_SCALE);
-static const float64_t exp_postscale = float64_t::one()/float64_t(1 << EXPTAB_SCALE);
-static const float64_t exp_max_val(3000*(1 << EXPTAB_SCALE)); // log10(DBL_MAX) < 3000
+स्थिर ध्रुव float64_t exp_prescale = float64_t::fromRaw(0x3ff71547652b82fe) * float64_t(1 << EXPTAB_SCALE);
+स्थिर ध्रुव float64_t exp_postscale = float64_t::one()/float64_t(1 << EXPTAB_SCALE);
+स्थिर ध्रुव float64_t exp_max_val(3000*(1 << EXPTAB_SCALE)); // log10(DBL_MAX) < 3000
 
-static float32_t f32_exp( float32_t x)
+स्थिर float32_t f32_exp( float32_t x)
 {
     //special cases
-    if(x.isNaN()) return float32_t::nan();
-    if(x.isInf()) return (x == float32_t::inf()) ? x : float32_t::zero();
+    यदि(x.isNaN()) प्रत्यागम float32_t::nan();
+    यदि(x.isInf()) प्रत्यागम (x == float32_t::inf()) ? x : float32_t::zero();
 
-    static const float64_t
+    स्थिर ध्रुव float64_t
         A4 = float64_t::one() / EXPPOLY_32F_A0,
         A3 = float64_t::fromRaw(0x3fe62e42fef9277b) / EXPPOLY_32F_A0, // .6931471805521448196800669615864773144641 / EXPPOLY_32F_A0,
         A2 = float64_t::fromRaw(0x3fcebfbe081585e7) / EXPPOLY_32F_A0, // .2402265109513301490103372422686535526573 / EXPPOLY_32F_A0,
         A1 = float64_t::fromRaw(0x3fac6af0d93cf576) / EXPPOLY_32F_A0; // .5550339366753125211915322047004666939128e-1 / EXPPOLY_32F_A0;
 
     float64_t x0;
-    if(expF32UI(x.v) > 127 + 10)
+    यदि(expF32UI(x.v) > 127 + 10)
         x0 = signF32UI(x.v) ? -exp_max_val : exp_max_val;
-    else
+    अन्यथा
         x0 = f32_to_f64(x) * exp_prescale;
 
-    int val0 = f64_to_i32(x0, round_near_even, false);
-    int t = (val0 >> EXPTAB_SCALE) + 1023;
+    पूर्णाङ्क val0 = f64_to_i32(x0, round_near_even, असत्य);
+    पूर्णाङ्क t = (val0 >> EXPTAB_SCALE) + 1023;
     t = t < 0 ? 0 : (t > 2047 ? 2047 : t);
     float64_t buf; buf.v = packToF64UI(0, t, 0);
 
-    x0 = (x0 - f64_roundToInt(x0, round_near_even, false)) * exp_postscale;
+    x0 = (x0 - f64_roundToInt(x0, round_near_even, असत्य)) * exp_postscale;
 
-    return (buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * ((((x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4));
+    प्रत्यागम (buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * ((((x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4));
 }
 
-static float64_t f64_exp(float64_t x)
+स्थिर float64_t f64_exp(float64_t x)
 {
     //special cases
-    if(x.isNaN()) return float64_t::nan();
-    if(x.isInf()) return (x == float64_t::inf()) ? x : float64_t::zero();
+    यदि(x.isNaN()) प्रत्यागम float64_t::nan();
+    यदि(x.isInf()) प्रत्यागम (x == float64_t::inf()) ? x : float64_t::zero();
 
-    static const float64_t
+    स्थिर ध्रुव float64_t
         A5 = float64_t::one() / EXPPOLY_32F_A0,
         A4 = float64_t::fromRaw(0x3fe62e42fefa39f1) / EXPPOLY_32F_A0, // .69314718055994546743029643825322 / EXPPOLY_32F_A0
         A3 = float64_t::fromRaw(0x3fcebfbdff82a45a) / EXPPOLY_32F_A0, // .24022650695886477918181338054308 / EXPPOLY_32F_A0
@@ -3547,19 +3547,19 @@ static float64_t f64_exp(float64_t x)
         A0 = float64_t::fromRaw(0x3f55e7aa1566c2a4) / EXPPOLY_32F_A0; // .13369713757180123244806654839424e-2 / EXPPOLY_32F_A0
 
     float64_t x0;
-    if(expF64UI(x.v) > 1023 + 10)
+    यदि(expF64UI(x.v) > 1023 + 10)
         x0 = signF64UI(x.v) ? -exp_max_val : exp_max_val;
-    else
+    अन्यथा
         x0 = x * exp_prescale;
 
-    int val0 = cvRound(x0);
-    int t = (val0 >> EXPTAB_SCALE) + 1023;
+    पूर्णाङ्क val0 = cvRound(x0);
+    पूर्णाङ्क t = (val0 >> EXPTAB_SCALE) + 1023;
     t = t < 0 ? 0 : (t > 2047 ? 2047 : t);
     float64_t buf; buf.v = packToF64UI(0, t, 0);
 
-    x0 = (x0 - f64_roundToInt(x0, round_near_even, false)) * exp_postscale;
+    x0 = (x0 - f64_roundToInt(x0, round_near_even, असत्य)) * exp_postscale;
 
-    return buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * (((((A0*x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4)*x0 + A5);
+    प्रत्यागम buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * (((((A0*x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4)*x0 + A5);
 }
 
 #undef EXPTAB_SCALE
@@ -3570,7 +3570,7 @@ static float64_t f64_exp(float64_t x)
 
 #define LOGTAB_SCALE    8
 
-static const uint64_t CV_DECL_ALIGNED(16) icvLogTab[] = {
+स्थिर ध्रुव uint64_t CV_DECL_ALIGNED(16) icvLogTab[] = {
     0, 0x3ff0000000000000, // 0.000000, 1.000000
     0x3f6ff00aa2b10bc0, 0x3fefe01fe01fe020, // 0.003899, 0.996109
     0x3f7fe02a6b106788, 0x3fefc07f01fc07f0, // 0.007782, 0.992248
@@ -3830,16 +3830,16 @@ static const uint64_t CV_DECL_ALIGNED(16) icvLogTab[] = {
 };
 
 // 0.69314718055994530941723212145818
-static const float64_t ln_2 = float64_t::fromRaw(0x3fe62e42fefa39ef);
+स्थिर ध्रुव float64_t ln_2 = float64_t::fromRaw(0x3fe62e42fefa39ef);
 
-static float32_t f32_log(float32_t x)
+स्थिर float32_t f32_log(float32_t x)
 {
     //special cases
-    if(x.isNaN() || x < float32_t::zero()) return float32_t::nan();
-    if(x == float32_t::zero()) return -float32_t::inf();
+    यदि(x.isNaN() || x < float32_t::zero()) प्रत्यागम float32_t::nan();
+    यदि(x == float32_t::zero()) प्रत्यागम -float32_t::inf();
 
     //first 8 bits of mantissa
-    int h0 = (x.v >> (23 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
+    पूर्णाङ्क h0 = (x.v >> (23 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
     //buf == 0.00000000_the_rest_mantissa_bits
     float64_t buf; buf.v = packToF64UI(0, 1023, ((uint64_t)x.v << 29) & ((1LL << (52 - LOGTAB_SCALE)) - 1));
     buf -= float64_t::one();
@@ -3849,20 +3849,20 @@ static float32_t f32_log(float32_t x)
 
     float64_t x0 = buf * tab1;
     //if last elements of icvLogTab
-    if(h0 == 255) x0 += float64_t(-float64_t::one() / float64_t(512));
+    यदि(h0 == 255) x0 += float64_t(-float64_t::one() / float64_t(512));
 
     float64_t y0 = ln_2 * float64_t(expF32UI(x.v) - 127) + tab0 + x0*x0*x0/float64_t(3) - x0*x0/float64_t(2) + x0;
 
-    return y0;
+    प्रत्यागम y0;
 }
 
-static float64_t f64_log(float64_t x)
+स्थिर float64_t f64_log(float64_t x)
 {
     //special cases
-    if(x.isNaN() || x < float64_t::zero()) return float64_t::nan();
-    if(x == float64_t::zero()) return -float64_t::inf();
+    यदि(x.isNaN() || x < float64_t::zero()) प्रत्यागम float64_t::nan();
+    यदि(x == float64_t::zero()) प्रत्यागम -float64_t::inf();
 
-    static const float64_t
+    स्थिर ध्रुव float64_t
     A7(1),
     A6(-float64_t::one() / float64_t(2)),
     A5( float64_t::one() / float64_t(3)),
@@ -3873,7 +3873,7 @@ static float64_t f64_log(float64_t x)
     A0(-float64_t::one() / float64_t(8));
 
     //first 8 bits of mantissa
-    int h0 = (x.v >> (52 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
+    पूर्णाङ्क h0 = (x.v >> (52 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
     //buf == 0.00000000_the_rest_mantissa_bits
     float64_t buf; buf.v = packToF64UI(0, 1023, x.v & ((1LL << (52 - LOGTAB_SCALE)) - 1));
     buf -= float64_t::one();
@@ -3883,10 +3883,10 @@ static float64_t f64_log(float64_t x)
 
     float64_t x0 = buf * tab1;
     //if last elements of icvLogTab
-    if(h0 == 255) x0 += float64_t(-float64_t::one()/float64_t(512));
+    यदि(h0 == 255) x0 += float64_t(-float64_t::one()/float64_t(512));
     float64_t xq = x0*x0;
 
-    return ln_2 * float64_t( expF64UI(x.v) - 1023) + tab0 + (((A0*xq + A2)*xq + A4)*xq + A6)*xq +
+    प्रत्यागम ln_2 * float64_t( expF64UI(x.v) - 1023) + tab0 + (((A0*xq + A2)*xq + A4)*xq + A6)*xq +
            (((A1*xq + A3)*xq + A5)*xq + A7)*x0;
 }
 
@@ -3894,31 +3894,31 @@ static float64_t f64_log(float64_t x)
    Fast cube root by Ken Turkowski
    (http://www.worldserver.com/turk/computergraphics/papers.html)
 \* ************************************************************************** */
-static float32_t f32_cbrt(float32_t x)
+स्थिर float32_t f32_cbrt(float32_t x)
 {
     //special cases
-    if (x.isNaN()) return float32_t::nan();
-    if (x.isInf()) return x;
+    यदि (x.isNaN()) प्रत्यागम float32_t::nan();
+    यदि (x.isInf()) प्रत्यागम x;
 
-    int s = signF32UI(x.v);
-    int ex = expF32UI(x.v) - 127;
-    int shx = ex % 3;
+    पूर्णाङ्क s = signF32UI(x.v);
+    पूर्णाङ्क ex = expF32UI(x.v) - 127;
+    पूर्णाङ्क shx = ex % 3;
     shx -= shx >= 0 ? 3 : 0;
     ex = (ex - shx) / 3 - 1; /* exponent of cube root */
     float64_t fr; fr.v = packToF64UI(0, shx + 1023, ((uint64_t)fracF32UI(x.v)) << 29);
 
     /* 0.125 <= fr < 1.0 */
     /* Use quartic rational polynomial with error < 2^(-24) */
-    const float64_t A1 = float64_t::fromRaw(0x4046a09e6653ba70); //  45.2548339756803022511987494
-    const float64_t A2 = float64_t::fromRaw(0x406808f46c6116e0); // 192.2798368355061050458134625
-    const float64_t A3 = float64_t::fromRaw(0x405dca97439cae14); // 119.1654824285581628956914143
-    const float64_t A4 = float64_t::fromRaw(0x402add70d2827500); //  13.43250139086239872172837314
-    const float64_t A5 = float64_t::fromRaw(0x3fc4f15f83f55d2d); //   0.1636161226585754240958355063
-    const float64_t A6 = float64_t::fromRaw(0x402d9e20660edb21); //  14.80884093219134573786480845
-    const float64_t A7 = float64_t::fromRaw(0x4062ff15c0285815); // 151.9714051044435648658557668
-    const float64_t A8 = float64_t::fromRaw(0x406510d06a8112ce); // 168.5254414101568283957668343
-    const float64_t A9 = float64_t::fromRaw(0x4040fecbc9e2c375); //  33.9905941350215598754191872
-    const float64_t A10 = float64_t::one();
+    ध्रुव float64_t A1 = float64_t::fromRaw(0x4046a09e6653ba70); //  45.2548339756803022511987494
+    ध्रुव float64_t A2 = float64_t::fromRaw(0x406808f46c6116e0); // 192.2798368355061050458134625
+    ध्रुव float64_t A3 = float64_t::fromRaw(0x405dca97439cae14); // 119.1654824285581628956914143
+    ध्रुव float64_t A4 = float64_t::fromRaw(0x402add70d2827500); //  13.43250139086239872172837314
+    ध्रुव float64_t A5 = float64_t::fromRaw(0x3fc4f15f83f55d2d); //   0.1636161226585754240958355063
+    ध्रुव float64_t A6 = float64_t::fromRaw(0x402d9e20660edb21); //  14.80884093219134573786480845
+    ध्रुव float64_t A7 = float64_t::fromRaw(0x4062ff15c0285815); // 151.9714051044435648658557668
+    ध्रुव float64_t A8 = float64_t::fromRaw(0x406510d06a8112ce); // 168.5254414101568283957668343
+    ध्रुव float64_t A9 = float64_t::fromRaw(0x4040fecbc9e2c375); //  33.9905941350215598754191872
+    ध्रुव float64_t A10 = float64_t::one();
 
     fr = ((((A1 * fr + A2) * fr + A3) * fr + A4) * fr + A5)/
          ((((A6 * fr + A7) * fr + A8) * fr + A9) * fr + A10);
@@ -3926,83 +3926,83 @@ static float32_t f32_cbrt(float32_t x)
 
     // checks for "+0" and "-0", reset sign bit
     float32_t y; y.v = ((x.v & ((1u << 31) - 1)) != 0) ? packToF32UI(s, ex + 127, (uint32_t)(fracF64UI(fr.v) >> 29)) : 0;
-    return y;
+    प्रत्यागम y;
 }
 
 /// POW functions ///
 
-static float32_t f32_pow( float32_t x, float32_t y)
+स्थिर float32_t f32_pow( float32_t x, float32_t y)
 {
-    static const float32_t zero = float32_t::zero(), one = float32_t::one(), inf = float32_t::inf(), nan = float32_t::nan();
-    bool xinf = x.isInf(), yinf = y.isInf(), xnan = x.isNaN(), ynan = y.isNaN();
+    स्थिर ध्रुव float32_t zero = float32_t::zero(), one = float32_t::one(), inf = float32_t::inf(), nan = float32_t::nan();
+    तार्किक xinf = x.isInf(), yinf = y.isInf(), xnan = x.isNaN(), ynan = y.isNaN();
     float32_t ax = abs(x);
-    bool useInf = (y > zero) == (ax > one);
+    तार्किक useInf = (y > zero) == (ax > one);
     float32_t v;
     //special cases
-    if(ynan) v = nan;
-    else if(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
-    else if(y == zero) v = one;
-    else if(y == one ) v = x;
-    else //here y is ok
+    यदि(ynan) v = nan;
+    अन्यथा यदि(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
+    अन्यथा यदि(y == zero) v = one;
+    अन्यथा यदि(y == one ) v = x;
+    अन्यथा //here y is ok
     {
-        if(xnan) v = nan;
-        else if(xinf) v = (y < zero) ? zero : inf;
-        else if(y == f32_roundToInt(y, round_near_even, false)) v = f32_powi(x, f32_to_i32(y, round_near_even, false));
-        else if(x  < zero) v = nan;
+        यदि(xnan) v = nan;
+        अन्यथा यदि(xinf) v = (y < zero) ? zero : inf;
+        अन्यथा यदि(y == f32_roundToInt(y, round_near_even, असत्य)) v = f32_powi(x, f32_to_i32(y, round_near_even, असत्य));
+        अन्यथा यदि(x  < zero) v = nan;
         // (0 ** 0) == 1
-        else if(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
+        अन्यथा यदि(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
         // here x and y are ok
-        else v = f32_exp(y * f32_log(x));
+        अन्यथा v = f32_exp(y * f32_log(x));
     }
 
-    return v;
+    प्रत्यागम v;
 }
 
-static float64_t f64_pow( float64_t x, float64_t y)
+स्थिर float64_t f64_pow( float64_t x, float64_t y)
 {
-    static const float64_t zero = float64_t::zero(), one = float64_t::one(), inf = float64_t::inf(), nan = float64_t::nan();
-    bool xinf = x.isInf(), yinf = y.isInf(), xnan = x.isNaN(), ynan = y.isNaN();
+    स्थिर ध्रुव float64_t zero = float64_t::zero(), one = float64_t::one(), inf = float64_t::inf(), nan = float64_t::nan();
+    तार्किक xinf = x.isInf(), yinf = y.isInf(), xnan = x.isNaN(), ynan = y.isNaN();
     float64_t ax = abs(x);
-    bool useInf = (y > zero) == (ax > one);
+    तार्किक useInf = (y > zero) == (ax > one);
     float64_t v;
     //special cases
-    if(ynan) v = nan;
-    else if(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
-    else if(y == zero) v = one;
-    else if(y == one ) v = x;
-    else //here y is ok
+    यदि(ynan) v = nan;
+    अन्यथा यदि(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
+    अन्यथा यदि(y == zero) v = one;
+    अन्यथा यदि(y == one ) v = x;
+    अन्यथा //here y is ok
     {
-        if(xnan) v = nan;
-        else if(xinf) v = (y < zero) ? zero : inf;
-        else if(y == f64_roundToInt(y, round_near_even, false)) v = f64_powi(x, f64_to_i32(y, round_near_even, false));
-        else if(x  < zero) v = nan;
+        यदि(xnan) v = nan;
+        अन्यथा यदि(xinf) v = (y < zero) ? zero : inf;
+        अन्यथा यदि(y == f64_roundToInt(y, round_near_even, असत्य)) v = f64_powi(x, f64_to_i32(y, round_near_even, असत्य));
+        अन्यथा यदि(x  < zero) v = nan;
         // (0 ** 0) == 1
-        else if(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
+        अन्यथा यदि(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
         // here x and y are ok
-        else v = f64_exp(y * f64_log(x));
+        अन्यथा v = f64_exp(y * f64_log(x));
     }
 
-    return v;
+    प्रत्यागम v;
 }
 
 // These functions are for internal use only
 
-static float32_t f32_powi( float32_t x, int y)
+स्थिर float32_t f32_powi( float32_t x, पूर्णाङ्क y)
 {
     float32_t v;
     //special case: (0 ** 0) == 1
-    if(x == float32_t::zero())
+    यदि(x == float32_t::zero())
         v = (y < 0) ? float32_t::inf() : (y == 0 ? float32_t::one() : float32_t::zero());
     // here x and y are ok
-    else
+    अन्यथा
     {
         float32_t a = float32_t::one(), b = x;
-        int p = std::abs(y);
-        if( y < 0 )
+        पूर्णाङ्क p = std::abs(y);
+        यदि( y < 0 )
             b = float32_t::one()/b;
-        while( p > 1 )
+        यावत्( p > 1 )
         {
-            if( p & 1 )
+            यदि( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -4010,25 +4010,25 @@ static float32_t f32_powi( float32_t x, int y)
         v = a * b;
     }
 
-    return v;
+    प्रत्यागम v;
 }
 
-static float64_t f64_powi( float64_t x, int y)
+स्थिर float64_t f64_powi( float64_t x, पूर्णाङ्क y)
 {
     float64_t v;
     //special case: (0 ** 0) == 1
-    if(x == float64_t::zero())
+    यदि(x == float64_t::zero())
         v = (y < 0) ? float64_t::inf() : (y == 0 ? float64_t::one() : float64_t::zero());
     // here x and y are ok
-    else
+    अन्यथा
     {
         float64_t a = float64_t::one(), b = x;
-        int p = std::abs(y);
-        if( y < 0 )
+        पूर्णाङ्क p = std::abs(y);
+        यदि( y < 0 )
             b = float64_t::one()/b;
-        while( p > 1 )
+        यावत्( p > 1 )
         {
-            if( p & 1 )
+            यदि( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -4036,7 +4036,7 @@ static float64_t f64_powi( float64_t x, int y)
         v = a * b;
     }
 
-    return v;
+    प्रत्यागम v;
 }
 
 /*
@@ -4044,11 +4044,11 @@ static float64_t f64_powi( float64_t x, int y)
  * (edited where needed)
  */
 
-static const float64_t pi2   = float64_t::pi().setExp(2);
-static const float64_t piby2 = float64_t::pi().setExp(0);
-static const float64_t piby4 = float64_t::pi().setExp(-1);
-static const float64_t half  = float64_t::one()/float64_t(2);
-static const float64_t third = float64_t::one()/float64_t(3);
+स्थिर ध्रुव float64_t pi2   = float64_t::pi().setExp(2);
+स्थिर ध्रुव float64_t piby2 = float64_t::pi().setExp(0);
+स्थिर ध्रुव float64_t piby4 = float64_t::pi().setExp(-1);
+स्थिर ध्रुव float64_t half  = float64_t::one()/float64_t(2);
+स्थिर ध्रुव float64_t third = float64_t::one()/float64_t(3);
 
 /* __kernel_sin( x, y, iy)
  * N.B. from OpenCV side: y and iy removed, simplified to polynomial
@@ -4080,7 +4080,7 @@ static const float64_t third = float64_t::one()/float64_t(3);
  *      sin(x) = x + (S1*x + (x *(r-y/2)+y))
  */
 
-static const float64_t
+स्थिर ध्रुव float64_t
 // -1/3!  = -1/6
 S1  = float64_t::fromRaw( 0xBFC5555555555549 ),
 //  1/5!  =  1/120
@@ -4094,16 +4094,16 @@ S5  = float64_t::fromRaw( 0xBE5AE5E68A2B9CEB ),
 //  1/13! =  1/6227020800
 S6  = float64_t::fromRaw( 0x3DE5D93A5ACFD57C );
 
-static float64_t f64_sin_kernel(float64_t x)
+स्थिर float64_t f64_sin_kernel(float64_t x)
 {
-    if(x.getExp() < -27)
+    यदि(x.getExp() < -27)
     {
-        if(x != x.zero()) raiseFlags(flag_inexact);
-        return x;
+        यदि(x != x.zero()) raiseFlags(flag_inexact);
+        प्रत्यागम x;
     }
 
     float64_t z = x*x;
-    return x*mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
+    प्रत्यागम x*mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
                     S6, S5), S4), S3), S2), S1), x.one());
 }
 
@@ -4147,7 +4147,7 @@ static float64_t f64_sin_kernel(float64_t x)
  *     thus, reducing the rounding error in the subtraction.
  */
 
-static const float64_t
+स्थिर ध्रुव float64_t
 //  1/4!  =  1/24
 C1  = float64_t::fromRaw( 0x3FA555555555554C ),
 // -1/6!  = -1/720
@@ -4161,42 +4161,42 @@ C5  = float64_t::fromRaw( 0x3E21EE9EBDB4B1C4 ),
 // -1/14! = -1/87178291200
 C6  = float64_t::fromRaw( 0xBDA8FAE9BE8838D4 );
 
-static float64_t f64_cos_kernel(float64_t x)
+स्थिर float64_t f64_cos_kernel(float64_t x)
 {
-    if(x.getExp() < -27)
+    यदि(x.getExp() < -27)
     {
-        if(x != x.zero()) raiseFlags(flag_inexact);
-        return x.one();
+        यदि(x != x.zero()) raiseFlags(flag_inexact);
+        प्रत्यागम x.one();
     }
 
     float64_t z = x*x;
-    return mulAdd(mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
+    प्रत्यागम mulAdd(mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
                   C6, C5), C4), C3), C2), C1), -half), z, x.one());
 }
 
-static void f64_sincos_reduce(const float64_t& x, float64_t& y, int& n)
+स्थिर शून्य f64_sincos_reduce(ध्रुव float64_t& x, float64_t& y, पूर्णाङ्क& n)
 {
-    if(abs(x) < piby4)
+    यदि(abs(x) < piby4)
     {
         n = 0, y = x;
     }
-    else
+    अन्यथा
     {
         /* argument reduction needed */
         float64_t p = f64_rem(x, pi2);
         float64_t v = p - float64_t::eps().setExp(-10);
-        if(abs(v) <= piby4)
+        यदि(abs(v) <= piby4)
         {
             n = 0; y = p;
         }
-        else if(abs(v) <= (float64_t(3)*piby4))
+        अन्यथा यदि(abs(v) <= (float64_t(3)*piby4))
         {
             n = (p > 0) ? 1 : 3;
             y = (p > 0) ? p - piby2 : p + piby2;
-            if(p > 0) n = 1, y = p - piby2;
-            else      n = 3, y = p + piby2;
+            यदि(p > 0) n = 1, y = p - piby2;
+            अन्यथा      n = 3, y = p + piby2;
         }
-        else
+        अन्यथा
         {
             n = 2;
             y = (p > 0) ? p - p.pi() : p + p.pi();
@@ -4234,18 +4234,18 @@ static void f64_sincos_reduce(const float64_t& x, float64_t& y, int& n)
  *  TRIG(x) returns trig(x) nearly rounded
  */
 
-static float64_t f64_sin( float64_t x )
+स्थिर float64_t f64_sin( float64_t x )
 {
-    if(x.isInf() || x.isNaN()) return x.nan();
+    यदि(x.isInf() || x.isNaN()) प्रत्यागम x.nan();
 
-    float64_t y; int n;
+    float64_t y; पूर्णाङ्क n;
     f64_sincos_reduce(x, y, n);
-    switch (n)
+    विकल्प (n)
     {
-    case 0:  return  f64_sin_kernel(y);
-    case 1:  return  f64_cos_kernel(y);
-    case 2:  return -f64_sin_kernel(y);
-    default: return -f64_cos_kernel(y);
+    पक्ष 0:  प्रत्यागम  f64_sin_kernel(y);
+    पक्ष 1:  प्रत्यागम  f64_cos_kernel(y);
+    पक्ष 2:  प्रत्यागम -f64_sin_kernel(y);
+    स्वभाव: प्रत्यागम -f64_cos_kernel(y);
     }
 }
 
@@ -4279,18 +4279,18 @@ static float64_t f64_sin( float64_t x )
  *  TRIG(x) returns trig(x) nearly rounded
  */
 
-static float64_t f64_cos( float64_t x )
+स्थिर float64_t f64_cos( float64_t x )
 {
-    if(x.isInf() || x.isNaN()) return x.nan();
+    यदि(x.isInf() || x.isNaN()) प्रत्यागम x.nan();
 
-    float64_t y; int n;
+    float64_t y; पूर्णाङ्क n;
     f64_sincos_reduce(x, y, n);
-    switch (n)
+    विकल्प (n)
     {
-    case 0:  return  f64_cos_kernel(y);
-    case 1:  return -f64_sin_kernel(y);
-    case 2:  return -f64_cos_kernel(y);
-    default: return  f64_sin_kernel(y);
+    पक्ष 0:  प्रत्यागम  f64_cos_kernel(y);
+    पक्ष 1:  प्रत्यागम -f64_sin_kernel(y);
+    पक्ष 2:  प्रत्यागम -f64_cos_kernel(y);
+    स्वभाव: प्रत्यागम  f64_sin_kernel(y);
     }
 }
 

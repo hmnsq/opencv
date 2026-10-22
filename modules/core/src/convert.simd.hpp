@@ -2,136 +2,136 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "convert.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "convert.hpp"
 
-#if !defined(OPENCV_SUPRESS_WARNING_AVX2_WITHOUT_FP16C) && \
+#यदि !defined(OPENCV_SUPRESS_WARNING_AVX2_WITHOUT_FP16C) && \
     (defined(__GNUC__) && defined(__AVX2__) && !defined(__F16C__))
 #warning "Non-optimal compiler flags: AVX2 without FP16. Generated code is very slow. Consider adding '-mf16c' compiler option."
 #endif
 
-namespace cv {
-namespace hal {
+नामाकाश cv {
+नामाकाश hal {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-void cvt16f32f(const hfloat* src, float* dst, int len);
-void cvt32f16f(const float* src, hfloat* dst, int len);
-void cvt16bf32f(const bfloat* src, float* dst, int len);
-void cvt32f16bf(const float* src, bfloat* dst, int len);
-void addRNGBias32f(float* arr, const float* scaleBiasPairs, int len, int cn);
-void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn);
+शून्य cvt16f32f(ध्रुव hfloat* src, भिन्न* dst, पूर्णाङ्क len);
+शून्य cvt32f16f(ध्रुव भिन्न* src, hfloat* dst, पूर्णाङ्क len);
+शून्य cvt16bf32f(ध्रुव bfloat* src, भिन्न* dst, पूर्णाङ्क len);
+शून्य cvt32f16bf(ध्रुव भिन्न* src, bfloat* dst, पूर्णाङ्क len);
+शून्य addRNGBias32f(भिन्न* arr, ध्रुव भिन्न* scaleBiasPairs, पूर्णाङ्क len, पूर्णाङ्क cn);
+शून्य addRNGBias64f(द्विगुण* arr, ध्रुव द्विगुण* scaleBiasPairs, पूर्णाङ्क len, पूर्णाङ्क cn);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_END
 } // namespace cv::hal
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth);
+द्विमान_Func getConvertFunc(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_END
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-namespace hal {
+नामाकाश hal {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth);
+द्विमान_Func getConvertFunc(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth);
 
-void cvt16f32f( const hfloat* src, float* dst, int len )
+शून्य cvt16f32f( ध्रुव hfloat* src, भिन्न* dst, पूर्णाङ्क len )
 {
     CV_INSTRUMENT_REGION();
-    int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; j < len; j += VECSZ )
+    पूर्णाङ्क j = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+    ध्रुव पूर्णाङ्क VECSZ = VTraits<v_float32>::vlanes();
+    प्रति( ; j < len; j += VECSZ )
     {
-        if( j > len - VECSZ )
+        यदि( j > len - VECSZ )
         {
-            if( j == 0 )
-                break;
+            यदि( j == 0 )
+                भङ्ग;
             j = len - VECSZ;
         }
         v_store(dst + j, vx_load_expand(src + j));
     }
 #endif
-    for( ; j < len; j++ )
-        dst[j] = (float)src[j];
+    प्रति( ; j < len; j++ )
+        dst[j] = (भिन्न)src[j];
 }
 
-void cvt32f16f( const float* src, hfloat* dst, int len )
+शून्य cvt32f16f( ध्रुव भिन्न* src, hfloat* dst, पूर्णाङ्क len )
 {
     CV_INSTRUMENT_REGION();
-    int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; j < len; j += VECSZ )
+    पूर्णाङ्क j = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+    ध्रुव पूर्णाङ्क VECSZ = VTraits<v_float32>::vlanes();
+    प्रति( ; j < len; j += VECSZ )
     {
-        if( j > len - VECSZ )
+        यदि( j > len - VECSZ )
         {
-            if( j == 0 )
-                break;
+            यदि( j == 0 )
+                भङ्ग;
             j = len - VECSZ;
         }
         v_pack_store(dst + j, vx_load(src + j));
     }
 #endif
-    for( ; j < len; j++ )
+    प्रति( ; j < len; j++ )
         dst[j] = hfloat(src[j]);
 }
 
-void cvt32f16bf( const float* src, bfloat* dst, int len )
+शून्य cvt32f16bf( ध्रुव भिन्न* src, bfloat* dst, पूर्णाङ्क len )
 {
     CV_INSTRUMENT_REGION();
-    int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; j < len; j += VECSZ )
+    पूर्णाङ्क j = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+    ध्रुव पूर्णाङ्क VECSZ = VTraits<v_float32>::vlanes();
+    प्रति( ; j < len; j += VECSZ )
     {
-        if( j > len - VECSZ )
+        यदि( j > len - VECSZ )
         {
-            if( j == 0 )
-                break;
+            यदि( j == 0 )
+                भङ्ग;
             j = len - VECSZ;
         }
         v_pack_store(dst + j, vx_load(src + j));
     }
 #endif
-    for( ; j < len; j++ )
+    प्रति( ; j < len; j++ )
         dst[j] = bfloat(src[j]);
 }
 
-void addRNGBias32f( float* arr, const float* scaleBiasPairs, int len, int cn )
+शून्य addRNGBias32f( भिन्न* arr, ध्रुव भिन्न* scaleBiasPairs, पूर्णाङ्क len, पूर्णाङ्क cn )
 {
     CV_INSTRUMENT_REGION();
-    if (cn == 1) {
-        float bias = scaleBiasPairs[1];
-        for( int i = 0; i < len; i++ ) {
+    यदि (cn == 1) {
+        भिन्न bias = scaleBiasPairs[1];
+        प्रति( पूर्णाङ्क i = 0; i < len; i++ ) {
             arr[i] += bias;
         }
-    } else {
-        int k = 0;
+    } अन्यथा {
+        पूर्णाङ्क k = 0;
         len *= cn;
         cn--;
-        for( int i = 0; i < len; i++ ) {
+        प्रति( पूर्णाङ्क i = 0; i < len; i++ ) {
             arr[i] += scaleBiasPairs[k*2 + 1];
             k = (k + 1) & ((k >= cn) - 1);
         }
     }
 }
 
-void addRNGBias64f( double* arr, const double* scaleBiasPairs, int len, int cn )
+शून्य addRNGBias64f( द्विगुण* arr, ध्रुव द्विगुण* scaleBiasPairs, पूर्णाङ्क len, पूर्णाङ्क cn )
 {
     CV_INSTRUMENT_REGION();
-    if (cn == 1) {
-        double bias = scaleBiasPairs[1];
-        for( int i = 0; i < len; i++ ) {
+    यदि (cn == 1) {
+        द्विगुण bias = scaleBiasPairs[1];
+        प्रति( पूर्णाङ्क i = 0; i < len; i++ ) {
             arr[i] += bias;
         }
-    } else {
-        int k = 0;
+    } अन्यथा {
+        पूर्णाङ्क k = 0;
         len *= cn;
         cn--;
-        for( int i = 0; i < len; i++ ) {
+        प्रति( पूर्णाङ्क i = 0; i < len; i++ ) {
             arr[i] += scaleBiasPairs[k*2 + 1];
             k = (k + 1) & ((k >= cn) - 1);
         }
@@ -144,24 +144,24 @@ CV_CPU_OPTIMIZATION_NAMESPACE_END
 // cv::
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-template<typename _Ts, typename _Td, typename _Twvec> static inline void
-cvt_( const _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
+template<typename _Ts, typename _Td, typename _Twvec> स्थिर अन्तःस्थ शून्य
+cvt_( ध्रुव _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
 {
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= परिमाण(src[0]);
+    dstep /= परिमाण(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    प्रति( पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
+        पूर्णाङ्क j = 0;
 // Excluding GNU in CV_SIMD_SCALABLE because of "opencv/issues/26936"
-#if (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
-        const int VECSZ = VTraits<_Twvec>::vlanes()*2;
-        for( ; j < size.width; j += VECSZ )
+#यदि (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
+        ध्रुव पूर्णाङ्क VECSZ = VTraits<_Twvec>::vlanes()*2;
+        प्रति( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            यदि( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
+                यदि( j == 0 || src == (_Ts*)dst )
+                    भङ्ग;
                 j = size.width - VECSZ;
             }
             _Twvec v0, v1;
@@ -169,28 +169,28 @@ cvt_( const _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
             v_store_pair_as(dst + j, v0, v1);
         }
 #endif
-        for( ; j < size.width; j++ )
+        प्रति( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(src[j]);
     }
 }
 
-template<typename _Ts, typename _Td, typename dummy> static inline void
-cvt_64f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
+template<typename _Ts, typename _Td, typename dummy> स्थिर अन्तःस्थ शून्य
+cvt_64f( ध्रुव _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
 {
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= परिमाण(src[0]);
+    dstep /= परिमाण(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    प्रति( पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-        const int VECSZ = VTraits<v_float64>::vlanes()*2;
-        for( ; j < size.width; j += VECSZ )
+        पूर्णाङ्क j = 0;
+#यदि (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+        ध्रुव पूर्णाङ्क VECSZ = VTraits<v_float64>::vlanes()*2;
+        प्रति( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            यदि( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
+                यदि( j == 0 || src == (_Ts*)dst )
+                    भङ्ग;
                 j = size.width - VECSZ;
             }
             v_float64 v0, v1;
@@ -198,30 +198,30 @@ cvt_64f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
             v_store_pair_as(dst + j, v0, v1);
         }
 #endif
-        for( ; j < size.width; j++ )
+        प्रति( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(src[j]);
     }
 }
 
 // in order to reduce the code size, for (16f <-> ...) conversions
 // we add a conversion function without loop unrolling
-template<typename _Ts, typename _Td, typename _Twvec> static inline void
-cvt1_( const _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
+template<typename _Ts, typename _Td, typename _Twvec> स्थिर अन्तःस्थ शून्य
+cvt1_( ध्रुव _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
 {
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= परिमाण(src[0]);
+    dstep /= परिमाण(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    प्रति( पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        const int VECSZ = VTraits<_Twvec>::vlanes();
-        for( ; j < size.width; j += VECSZ )
+        पूर्णाङ्क j = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+        ध्रुव पूर्णाङ्क VECSZ = VTraits<_Twvec>::vlanes();
+        प्रति( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            यदि( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
+                यदि( j == 0 || src == (_Ts*)dst )
+                    भङ्ग;
                 j = size.width - VECSZ;
             }
             _Twvec v;
@@ -230,87 +230,87 @@ cvt1_( const _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
         }
         vx_cleanup();
 #endif
-        for( ; j < size.width; j++ )
+        प्रति( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(src[j]);
     }
 }
 
-static void cvtCopy( const uchar* src, size_t sstep,
+स्थिर शून्य cvtCopy( ध्रुव uchar* src, size_t sstep,
                      uchar* dst, size_t dstep, Size size, size_t elemsize)
 {
     size_t len = size.width*elemsize;
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    प्रति( पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
         memcpy( dst, src, len );
     }
 }
 
 #define DEF_CVT_FUNC(suffix, cvtfunc, _Ts, _Td, _Twvec) \
-static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
-                        uchar* dst_, size_t dstep, Size size, void*) \
+स्थिर शून्य cvt##suffix(ध्रुव uchar* src_, size_t sstep, ध्रुव uchar*, size_t, \
+                        uchar* dst_, size_t dstep, Size size, शून्य*) \
 { \
     CV_INSTRUMENT_REGION(); \
-    const _Ts* src = (const _Ts*)src_; \
+    ध्रुव _Ts* src = (ध्रुव _Ts*)src_; \
     _Td* dst = (_Td*)dst_; \
     cvtfunc<_Ts, _Td, _Twvec>(src, sstep, dst, dstep, size); \
 }
 
 #define DEF_CVT2BOOL_FUNC(suffix, _Ts, shift) \
-static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
-                        uchar* dst, size_t dstep, Size size, void*) \
+स्थिर शून्य cvt##suffix(ध्रुव uchar* src_, size_t sstep, ध्रुव uchar*, size_t, \
+                        uchar* dst, size_t dstep, Size size, शून्य*) \
 { \
     CV_INSTRUMENT_REGION(); \
-    const _Ts* src = (const _Ts*)src_; \
-    sstep /= sizeof(src[0]); \
+    ध्रुव _Ts* src = (ध्रुव _Ts*)src_; \
+    sstep /= परिमाण(src[0]); \
     \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
-        for ( int j = 0; j < size.width; j++ ) \
+    प्रति( पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
+        प्रति ( पूर्णाङ्क j = 0; j < size.width; j++ ) \
             dst[j] = (src[j]<<shift) != 0; \
     } \
 }
 
 #define DEF_CVTBOOL2_FUNC(suffix, _Td, scale) \
-static void cvt##suffix(const uchar* src, size_t sstep, const uchar*, size_t, \
-                        uchar* dst_, size_t dstep, Size size, void*) \
+स्थिर शून्य cvt##suffix(ध्रुव uchar* src, size_t sstep, ध्रुव uchar*, size_t, \
+                        uchar* dst_, size_t dstep, Size size, शून्य*) \
 { \
     CV_INSTRUMENT_REGION(); \
     _Td* dst = (_Td*)dst_; \
-    dstep /= sizeof(dst[0]); \
+    dstep /= परिमाण(dst[0]); \
     \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
-        for ( int j = 0; j < size.width; j++ ) \
+    प्रति( पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
+        प्रति ( पूर्णाङ्क j = 0; j < size.width; j++ ) \
             dst[j] = (_Td)((src[j] != 0)*scale); \
     } \
 }
 
 #define DEF_CVT_SCALAR_FUNC(suffix, _Ts, _Td) \
-static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
-                        uchar* dst_, size_t dstep, Size size, void*) \
+स्थिर शून्य cvt##suffix(ध्रुव uchar* src_, size_t sstep, ध्रुव uchar*, size_t, \
+                        uchar* dst_, size_t dstep, Size size, शून्य*) \
 { \
     CV_INSTRUMENT_REGION(); \
-    const _Ts* src = (const _Ts*)src_; \
+    ध्रुव _Ts* src = (ध्रुव _Ts*)src_; \
     _Td* dst = (_Td*)dst_; \
-    sstep /= sizeof(src[0]); \
-    dstep /= sizeof(dst[0]); \
+    sstep /= परिमाण(src[0]); \
+    dstep /= परिमाण(dst[0]); \
     \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
-        for ( int j = 0; j < size.width; j++ ) \
+    प्रति( पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
+        प्रति ( पूर्णाङ्क j = 0; j < size.width; j++ ) \
             dst[j] = saturate_cast<_Td>(src[j]); \
     } \
 }
 
 #define DEF_CVT_SCALAR_FUNC_S2U(suffix, _Ts, _Td, _Tw) \
-static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
-                        uchar* dst_, size_t dstep, Size size, void*) \
+स्थिर शून्य cvt##suffix(ध्रुव uchar* src_, size_t sstep, ध्रुव uchar*, size_t, \
+                        uchar* dst_, size_t dstep, Size size, शून्य*) \
 { \
     CV_INSTRUMENT_REGION(); \
-    const _Ts* src = (const _Ts*)src_; \
+    ध्रुव _Ts* src = (ध्रुव _Ts*)src_; \
     _Td* dst = (_Td*)dst_; \
-    sstep /= sizeof(src[0]); \
-    dstep /= sizeof(dst[0]); \
+    sstep /= परिमाण(src[0]); \
+    dstep /= परिमाण(dst[0]); \
     \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
-        for ( int j = 0; j < size.width; j++ ) \
+    प्रति( पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
+        प्रति ( पूर्णाङ्क j = 0; j < size.width; j++ ) \
             dst[j] = saturate_cast<_Td>(std::max((_Tw)src[j], (_Tw)0)); \
     } \
 }
@@ -319,9 +319,9 @@ static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
 
 DEF_CVT_FUNC(8u8s,  cvt_,  uchar, schar,    v_int16)
 DEF_CVT_FUNC(8u16s, cvt_,  uchar, short,    v_int16)
-DEF_CVT_FUNC(8u32s, cvt_,  uchar, int,      v_int32)
-DEF_CVT_FUNC(8u32f, cvt_,  uchar, float,    v_float32)
-DEF_CVT_FUNC(8u64f, cvt_,  uchar, double,   v_int32)
+DEF_CVT_FUNC(8u32s, cvt_,  uchar, पूर्णाङ्क,      v_int32)
+DEF_CVT_FUNC(8u32f, cvt_,  uchar, भिन्न,    v_float32)
+DEF_CVT_FUNC(8u64f, cvt_,  uchar, द्विगुण,   v_int32)
 DEF_CVT_SCALAR_FUNC(8u64s, uchar, int64_t)
 DEF_CVT_FUNC(8u16f, cvt1_, uchar, hfloat, v_float32)
 DEF_CVT_FUNC(8u16bf, cvt1_, uchar, bfloat, v_float32)
@@ -333,9 +333,9 @@ DEF_CVT_FUNC(8s8u,  cvt_,  schar, uchar,    v_int16)
 DEF_CVT_FUNC(8s16u, cvt_,  schar, ushort,   v_uint16)
 DEF_CVT_FUNC(8s16s, cvt_,  schar, short,    v_int16)
 DEF_CVT_FUNC(8s32u, cvt_,  schar, unsigned, v_uint32)
-DEF_CVT_FUNC(8s32s, cvt_,  schar, int,      v_int32)
-DEF_CVT_FUNC(8s32f, cvt_,  schar, float,    v_float32)
-DEF_CVT_FUNC(8s64f, cvt_,  schar, double,   v_int32)
+DEF_CVT_FUNC(8s32s, cvt_,  schar, पूर्णाङ्क,      v_int32)
+DEF_CVT_FUNC(8s32f, cvt_,  schar, भिन्न,    v_float32)
+DEF_CVT_FUNC(8s64f, cvt_,  schar, द्विगुण,   v_int32)
 DEF_CVT_FUNC(8s64u, cvt_,  schar, uint64_t, v_uint32)
 DEF_CVT_FUNC(8s64s, cvt_,  schar, int64_t,  v_int32)
 DEF_CVT_FUNC(8s16f, cvt1_, schar, hfloat, v_float32)
@@ -345,9 +345,9 @@ DEF_CVT_FUNC(8s16bf, cvt1_, schar, bfloat, v_float32)
 
 DEF_CVTBOOL2_FUNC(8b8u,  uchar, 1)
 DEF_CVTBOOL2_FUNC(8b16s, short, 1)
-DEF_CVTBOOL2_FUNC(8b32s, int, 1)
-DEF_CVTBOOL2_FUNC(8b32f, float, 1)
-DEF_CVTBOOL2_FUNC(8b64f, double, 1)
+DEF_CVTBOOL2_FUNC(8b32s, पूर्णाङ्क, 1)
+DEF_CVTBOOL2_FUNC(8b32f, भिन्न, 1)
+DEF_CVTBOOL2_FUNC(8b64f, द्विगुण, 1)
 DEF_CVTBOOL2_FUNC(8b64s, int64_t, 1)
 DEF_CVTBOOL2_FUNC(8b16f, uint16_t, 0x3c00) // hfloat(1.0f)
 DEF_CVTBOOL2_FUNC(8b16bf, uint16_t, 0x3f80) // bfloat(1.0f)
@@ -357,9 +357,9 @@ DEF_CVTBOOL2_FUNC(8b16bf, uint16_t, 0x3f80) // bfloat(1.0f)
 DEF_CVT_FUNC(16u8u,  cvt_, ushort, uchar,  v_uint16)
 DEF_CVT_FUNC(16u8s,  cvt_, ushort, schar,  v_uint16)
 DEF_CVT_FUNC(16u16s, cvt_, ushort, short,  v_int32)
-DEF_CVT_FUNC(16u32s, cvt_, ushort, int,    v_int32)
-DEF_CVT_FUNC(16u32f, cvt_, ushort, float,  v_float32)
-DEF_CVT_FUNC(16u64f, cvt_, ushort, double, v_int32)
+DEF_CVT_FUNC(16u32s, cvt_, ushort, पूर्णाङ्क,    v_int32)
+DEF_CVT_FUNC(16u32f, cvt_, ushort, भिन्न,  v_float32)
+DEF_CVT_FUNC(16u64f, cvt_, ushort, द्विगुण, v_int32)
 DEF_CVT_SCALAR_FUNC(16u64s, ushort, int64_t)
 DEF_CVT_FUNC(16u16f, cvt1_,ushort, hfloat, v_float32)
 DEF_CVT_FUNC(16u16bf, cvt1_, ushort, bfloat, v_float32)
@@ -370,9 +370,9 @@ DEF_CVT_FUNC(16s8u,  cvt_, short, uchar,  v_int16)
 DEF_CVT_FUNC(16s8s,  cvt_, short, schar,  v_int16)
 DEF_CVT_FUNC(16s16u, cvt_, short, ushort, v_int32)
 DEF_CVT_FUNC(16s32u, cvt_, short, unsigned, v_uint32)
-DEF_CVT_FUNC(16s32s, cvt_, short, int,    v_int32)
-DEF_CVT_FUNC(16s32f, cvt_, short, float,  v_float32)
-DEF_CVT_FUNC(16s64f, cvt_, short, double, v_int32)
+DEF_CVT_FUNC(16s32s, cvt_, short, पूर्णाङ्क,    v_int32)
+DEF_CVT_FUNC(16s32f, cvt_, short, भिन्न,  v_float32)
+DEF_CVT_FUNC(16s64f, cvt_, short, द्विगुण, v_int32)
 DEF_CVT_FUNC(16s64u, cvt_, short, uint64_t, v_uint32)
 DEF_CVT_FUNC(16s64s, cvt_, short, int64_t, v_int32)
 DEF_CVT_FUNC(16s16f, cvt1_,short, hfloat, v_float32)
@@ -385,9 +385,9 @@ DEF_CVT_FUNC(32u8u,  cvt_, unsigned, uchar,  v_uint32)
 DEF_CVT_FUNC(32u8s,  cvt_, unsigned, schar,  v_int32)
 DEF_CVT_FUNC(32u16u, cvt_, unsigned, ushort, v_uint32)
 DEF_CVT_FUNC(32u16s, cvt_, unsigned, short,  v_int32)
-DEF_CVT_SCALAR_FUNC(32u32s, unsigned, int)
-DEF_CVT_FUNC(32u32f, cvt_, unsigned, float,  v_float32)
-DEF_CVT_FUNC(32u64f, cvt_64f, unsigned, double, v_float64)
+DEF_CVT_SCALAR_FUNC(32u32s, unsigned, पूर्णाङ्क)
+DEF_CVT_FUNC(32u32f, cvt_, unsigned, भिन्न,  v_float32)
+DEF_CVT_FUNC(32u64f, cvt_64f, unsigned, द्विगुण, v_float64)
 DEF_CVT_SCALAR_FUNC(32u64s, unsigned, int64_t)
 DEF_CVT_SCALAR_FUNC(64u64s, uint64_t, int64_t)
 DEF_CVT_FUNC(32u16f, cvt1_, unsigned, hfloat, v_float32)
@@ -395,47 +395,47 @@ DEF_CVT_FUNC(32u16bf, cvt1_, unsigned, bfloat, v_float32)
 
 ////////////////////// 32s -> ... ////////////////////////
 
-DEF_CVT_FUNC(32s8u,  cvt_, int, uchar,  v_int32)
-DEF_CVT_FUNC(32s8s,  cvt_, int, schar,  v_int32)
-DEF_CVT_FUNC(32s16u, cvt_, int, ushort, v_int32)
-DEF_CVT_FUNC(32s16s, cvt_, int, short,  v_int32)
-DEF_CVT_FUNC(32s32u, cvt_, int, unsigned, v_uint32)
-DEF_CVT_FUNC(32s32f, cvt_, int, float,  v_float32)
-DEF_CVT_FUNC(32s64f, cvt_, int, double, v_int32)
-DEF_CVT_FUNC(32s64u, cvt_, int, uint64_t, v_uint32)
-DEF_CVT_FUNC(32s64s, cvt_, int, int64_t, v_int32)
-DEF_CVT_FUNC(32s16f, cvt1_,int, hfloat, v_float32)
-DEF_CVT_FUNC(32s16bf, cvt1_, int, bfloat, v_float32)
-DEF_CVT2BOOL_FUNC(32s8b, int, 0)
+DEF_CVT_FUNC(32s8u,  cvt_, पूर्णाङ्क, uchar,  v_int32)
+DEF_CVT_FUNC(32s8s,  cvt_, पूर्णाङ्क, schar,  v_int32)
+DEF_CVT_FUNC(32s16u, cvt_, पूर्णाङ्क, ushort, v_int32)
+DEF_CVT_FUNC(32s16s, cvt_, पूर्णाङ्क, short,  v_int32)
+DEF_CVT_FUNC(32s32u, cvt_, पूर्णाङ्क, unsigned, v_uint32)
+DEF_CVT_FUNC(32s32f, cvt_, पूर्णाङ्क, भिन्न,  v_float32)
+DEF_CVT_FUNC(32s64f, cvt_, पूर्णाङ्क, द्विगुण, v_int32)
+DEF_CVT_FUNC(32s64u, cvt_, पूर्णाङ्क, uint64_t, v_uint32)
+DEF_CVT_FUNC(32s64s, cvt_, पूर्णाङ्क, int64_t, v_int32)
+DEF_CVT_FUNC(32s16f, cvt1_,पूर्णाङ्क, hfloat, v_float32)
+DEF_CVT_FUNC(32s16bf, cvt1_, पूर्णाङ्क, bfloat, v_float32)
+DEF_CVT2BOOL_FUNC(32s8b, पूर्णाङ्क, 0)
 
 ////////////////////// 32f -> ... ////////////////////////
 
-DEF_CVT_FUNC(32f8u,  cvt_, float, uchar,  v_float32)
-DEF_CVT_FUNC(32f8s,  cvt_, float, schar,  v_float32)
-DEF_CVT_FUNC(32f16u, cvt_, float, ushort, v_float32)
-DEF_CVT_FUNC(32f16s, cvt_, float, short,  v_float32)
-DEF_CVT_FUNC(32f32u, cvt_, float, unsigned, v_float32)
-DEF_CVT_FUNC(32f32s, cvt_, float, int,    v_float32)
-DEF_CVT_FUNC(32f64f, cvt_, float, double, v_float32)
-DEF_CVT_FUNC(32f64u, cvt_64f, float, uint64_t, v_float64)
-DEF_CVT_FUNC(32f64s, cvt_64f, float, int64_t, v_float64)
-DEF_CVT_FUNC(32f16f, cvt1_,float, hfloat, v_float32)
-DEF_CVT_FUNC(32f16bf, cvt1_,float, bfloat, v_float32)
-DEF_CVT2BOOL_FUNC(32f8b, int, 1)
+DEF_CVT_FUNC(32f8u,  cvt_, भिन्न, uchar,  v_float32)
+DEF_CVT_FUNC(32f8s,  cvt_, भिन्न, schar,  v_float32)
+DEF_CVT_FUNC(32f16u, cvt_, भिन्न, ushort, v_float32)
+DEF_CVT_FUNC(32f16s, cvt_, भिन्न, short,  v_float32)
+DEF_CVT_FUNC(32f32u, cvt_, भिन्न, unsigned, v_float32)
+DEF_CVT_FUNC(32f32s, cvt_, भिन्न, पूर्णाङ्क,    v_float32)
+DEF_CVT_FUNC(32f64f, cvt_, भिन्न, द्विगुण, v_float32)
+DEF_CVT_FUNC(32f64u, cvt_64f, भिन्न, uint64_t, v_float64)
+DEF_CVT_FUNC(32f64s, cvt_64f, भिन्न, int64_t, v_float64)
+DEF_CVT_FUNC(32f16f, cvt1_,भिन्न, hfloat, v_float32)
+DEF_CVT_FUNC(32f16bf, cvt1_,भिन्न, bfloat, v_float32)
+DEF_CVT2BOOL_FUNC(32f8b, पूर्णाङ्क, 1)
 
 ////////////////////// 64f -> ... ////////////////////////
 
-DEF_CVT_FUNC(64f8u,  cvt_, double, uchar,  v_int32)
-DEF_CVT_FUNC(64f8s,  cvt_, double, schar,  v_int32)
-DEF_CVT_FUNC(64f16u, cvt_, double, ushort, v_int32)
-DEF_CVT_FUNC(64f16s, cvt_, double, short,  v_int32)
-DEF_CVT_FUNC(64f32u, cvt_64f, double, unsigned, v_float32)
-DEF_CVT_FUNC(64f32s, cvt_, double, int,    v_int32)
-DEF_CVT_FUNC(64f32f, cvt_, double, float,  v_float32)
-DEF_CVT_FUNC(64f64u, cvt_64f, double, uint64_t, v_float64)
-DEF_CVT_FUNC(64f64s, cvt_64f, double, int64_t, v_float64)
-DEF_CVT_FUNC(64f16f, cvt1_,double, hfloat, v_float32)
-DEF_CVT_FUNC(64f16bf, cvt1_,double, bfloat, v_float32)
+DEF_CVT_FUNC(64f8u,  cvt_, द्विगुण, uchar,  v_int32)
+DEF_CVT_FUNC(64f8s,  cvt_, द्विगुण, schar,  v_int32)
+DEF_CVT_FUNC(64f16u, cvt_, द्विगुण, ushort, v_int32)
+DEF_CVT_FUNC(64f16s, cvt_, द्विगुण, short,  v_int32)
+DEF_CVT_FUNC(64f32u, cvt_64f, द्विगुण, unsigned, v_float32)
+DEF_CVT_FUNC(64f32s, cvt_, द्विगुण, पूर्णाङ्क,    v_int32)
+DEF_CVT_FUNC(64f32f, cvt_, द्विगुण, भिन्न,  v_float32)
+DEF_CVT_FUNC(64f64u, cvt_64f, द्विगुण, uint64_t, v_float64)
+DEF_CVT_FUNC(64f64s, cvt_64f, द्विगुण, int64_t, v_float64)
+DEF_CVT_FUNC(64f16f, cvt1_,द्विगुण, hfloat, v_float32)
+DEF_CVT_FUNC(64f16bf, cvt1_,द्विगुण, bfloat, v_float32)
 DEF_CVT2BOOL_FUNC(64f8b, int64_t, 1)
 
 ////////////////////// 16f -> ... ////////////////////////
@@ -445,9 +445,9 @@ DEF_CVT_FUNC(16f8s,  cvt_,  hfloat, schar,  v_float32)
 DEF_CVT_FUNC(16f16u, cvt1_, hfloat, ushort, v_float32)
 DEF_CVT_FUNC(16f16s, cvt1_, hfloat, short,  v_float32)
 DEF_CVT_FUNC(16f32u, cvt1_, hfloat, unsigned, v_float32)
-DEF_CVT_FUNC(16f32s, cvt1_, hfloat, int,    v_float32)
-DEF_CVT_FUNC(16f32f, cvt1_, hfloat, float,  v_float32)
-DEF_CVT_FUNC(16f64f, cvt1_, hfloat, double, v_float32)
+DEF_CVT_FUNC(16f32s, cvt1_, hfloat, पूर्णाङ्क,    v_float32)
+DEF_CVT_FUNC(16f32f, cvt1_, hfloat, भिन्न,  v_float32)
+DEF_CVT_FUNC(16f64f, cvt1_, hfloat, द्विगुण, v_float32)
 DEF_CVT_FUNC(16f64u, cvt1_, hfloat, uint64_t, v_float32)
 DEF_CVT_FUNC(16f64s, cvt1_, hfloat, int64_t, v_float32)
 DEF_CVT_FUNC(16f16bf, cvt1_, hfloat, bfloat, v_float32)
@@ -460,9 +460,9 @@ DEF_CVT_FUNC(16bf8s,  cvt_,  bfloat, schar,  v_float32)
 DEF_CVT_FUNC(16bf16u, cvt1_, bfloat, ushort, v_float32)
 DEF_CVT_FUNC(16bf16s, cvt1_, bfloat, short,  v_float32)
 DEF_CVT_FUNC(16bf32u, cvt1_, bfloat, unsigned, v_float32)
-DEF_CVT_FUNC(16bf32s, cvt1_, bfloat, int,    v_float32)
-DEF_CVT_FUNC(16bf32f, cvt1_, bfloat, float,  v_float32)
-DEF_CVT_FUNC(16bf64f, cvt1_, bfloat, double, v_float32)
+DEF_CVT_FUNC(16bf32s, cvt1_, bfloat, पूर्णाङ्क,    v_float32)
+DEF_CVT_FUNC(16bf32f, cvt1_, bfloat, भिन्न,  v_float32)
+DEF_CVT_FUNC(16bf64f, cvt1_, bfloat, द्विगुण, v_float32)
 DEF_CVT_FUNC(16bf64u, cvt1_, bfloat, uint64_t, v_float32)
 DEF_CVT_FUNC(16bf64s, cvt1_, bfloat, int64_t, v_float32)
 DEF_CVT_FUNC(16bf16f, cvt1_, bfloat, hfloat, v_float32)
@@ -474,9 +474,9 @@ DEF_CVT_FUNC(64s8s,  cvt_, int64_t, schar,  v_int32)
 DEF_CVT_FUNC(64s16u, cvt_, int64_t, ushort, v_int32)
 DEF_CVT_FUNC(64s16s, cvt_, int64_t, short,  v_int32)
 DEF_CVT_FUNC(64s32u, cvt_, int64_t, unsigned, v_uint32)
-DEF_CVT_FUNC(64s32s, cvt_, int64_t, int,    v_int32)
-DEF_CVT_FUNC(64s32f, cvt_64f, int64_t, float,  v_float32)
-DEF_CVT_FUNC(64s64f, cvt_64f, int64_t, double,  v_float64)
+DEF_CVT_FUNC(64s32s, cvt_, int64_t, पूर्णाङ्क,    v_int32)
+DEF_CVT_FUNC(64s32f, cvt_64f, int64_t, भिन्न,  v_float32)
+DEF_CVT_FUNC(64s64f, cvt_64f, int64_t, द्विगुण,  v_float64)
 DEF_CVT_FUNC(64s64u, cvt_, int64_t, uint64_t, v_uint64)
 DEF_CVT_FUNC(64s16f, cvt1_,int64_t, hfloat, v_float32)
 DEF_CVT_FUNC(64s16bf, cvt1_, int64_t, bfloat, v_float32)
@@ -489,25 +489,25 @@ DEF_CVT_FUNC(64u8s,  cvt_, uint64_t, schar,  v_int32)
 DEF_CVT_FUNC(64u16u, cvt_, uint64_t, ushort, v_int32)
 DEF_CVT_FUNC(64u16s, cvt_, uint64_t, short,  v_int32)
 DEF_CVT_FUNC(64u32u, cvt_, uint64_t, unsigned, v_uint32)
-DEF_CVT_FUNC(64u32s, cvt_, uint64_t, int,   v_int32)
-DEF_CVT_FUNC(64u32f, cvt_64f, uint64_t, float,  v_float64)
-DEF_CVT_FUNC(64u64f, cvt_64f, uint64_t, double,  v_float64)
+DEF_CVT_FUNC(64u32s, cvt_, uint64_t, पूर्णाङ्क,   v_int32)
+DEF_CVT_FUNC(64u32f, cvt_64f, uint64_t, भिन्न,  v_float64)
+DEF_CVT_FUNC(64u64f, cvt_64f, uint64_t, द्विगुण,  v_float64)
 DEF_CVT_FUNC(64u16f, cvt1_,uint64_t, hfloat, v_float32)
 DEF_CVT_FUNC(64u16bf, cvt1_, uint64_t, bfloat, v_float32)
 
 ///////////// "conversion" w/o conversion ///////////////
 
-static void cvt8u(const uchar* src, size_t sstep, const uchar*, size_t, uchar* dst, size_t dstep, Size size, void*)
+स्थिर शून्य cvt8u(ध्रुव uchar* src, size_t sstep, ध्रुव uchar*, size_t, uchar* dst, size_t dstep, Size size, शून्य*)
 { CV_INSTRUMENT_REGION(); cvtCopy(src, sstep, dst, dstep, size, 1); }
 
-static void cvt16u(const uchar* src, size_t sstep, const uchar*, size_t, uchar* dst, size_t dstep, Size size, void*)
-{ CV_INSTRUMENT_REGION(); cvtCopy((const uchar*)src, sstep, (uchar*)dst, dstep, size, 2); }
+स्थिर शून्य cvt16u(ध्रुव uchar* src, size_t sstep, ध्रुव uchar*, size_t, uchar* dst, size_t dstep, Size size, शून्य*)
+{ CV_INSTRUMENT_REGION(); cvtCopy((ध्रुव uchar*)src, sstep, (uchar*)dst, dstep, size, 2); }
 
-static void cvt32s(const uchar* src, size_t sstep, const uchar*, size_t, uchar* dst, size_t dstep, Size size, void*)
-{ CV_INSTRUMENT_REGION(); cvtCopy((const uchar*)src, sstep, (uchar*)dst, dstep, size, 4); }
+स्थिर शून्य cvt32s(ध्रुव uchar* src, size_t sstep, ध्रुव uchar*, size_t, uchar* dst, size_t dstep, Size size, शून्य*)
+{ CV_INSTRUMENT_REGION(); cvtCopy((ध्रुव uchar*)src, sstep, (uchar*)dst, dstep, size, 4); }
 
-static void cvt64s(const uchar* src, size_t sstep, const uchar*, size_t, uchar* dst, size_t dstep, Size size, void*)
-{ CV_INSTRUMENT_REGION(); cvtCopy((const uchar*)src, sstep, (uchar*)dst, dstep, size, 8); }
+स्थिर शून्य cvt64s(ध्रुव uchar* src, size_t sstep, ध्रुव uchar*, size_t, uchar* dst, size_t dstep, Size size, शून्य*)
+{ CV_INSTRUMENT_REGION(); cvtCopy((ध्रुव uchar*)src, sstep, (uchar*)dst, dstep, size, 8); }
 
 //////////////////// FP8 (1-byte float) conversions — scalar via saturate_cast ////////////////////
 // Suffixes: 8fe4m3 (E4M3FN), 8fe4m3u (E4M3FNUZ).
@@ -517,13 +517,13 @@ static void cvt64s(const uchar* src, size_t sstep, const uchar*, size_t, uchar* 
     DEF_CVT_SCALAR_FUNC(S##16u,  T, ushort)    DEF_CVT_SCALAR_FUNC(16u##S,  ushort, T) \
     DEF_CVT_SCALAR_FUNC(S##16s,  T, short)     DEF_CVT_SCALAR_FUNC(16s##S,  short, T) \
     DEF_CVT_SCALAR_FUNC(S##32u,  T, unsigned)  DEF_CVT_SCALAR_FUNC(32u##S,  unsigned, T) \
-    DEF_CVT_SCALAR_FUNC(S##32s,  T, int)       DEF_CVT_SCALAR_FUNC(32s##S,  int, T) \
-    DEF_CVT_SCALAR_FUNC(S##64f,  T, double)    DEF_CVT_SCALAR_FUNC(64f##S,  double, T) \
+    DEF_CVT_SCALAR_FUNC(S##32s,  T, पूर्णाङ्क)       DEF_CVT_SCALAR_FUNC(32s##S,  पूर्णाङ्क, T) \
+    DEF_CVT_SCALAR_FUNC(S##64f,  T, द्विगुण)    DEF_CVT_SCALAR_FUNC(64f##S,  द्विगुण, T) \
     DEF_CVT_SCALAR_FUNC(S##16f,  T, hfloat)    DEF_CVT_SCALAR_FUNC(16f##S,  hfloat, T) \
     DEF_CVT_SCALAR_FUNC(S##16bf, T, bfloat)    DEF_CVT_SCALAR_FUNC(16bf##S, bfloat, T) \
     DEF_CVT_SCALAR_FUNC(S##64u,  T, uint64_t)  DEF_CVT_SCALAR_FUNC(64u##S,  uint64_t, T) \
     DEF_CVT_SCALAR_FUNC(S##64s,  T, int64_t)   DEF_CVT_SCALAR_FUNC(64s##S,  int64_t, T) \
-    DEF_CVT_SCALAR_FUNC(S##8b,   T, bool)
+    DEF_CVT_SCALAR_FUNC(S##8b,   T, तार्किक)
 
 DEF_CVT_FP8(8fe4m3,  fp8_t)
 DEF_CVT_FP8(8fe4m3u, fp8a_t)
@@ -533,21 +533,21 @@ DEF_CVT_SCALAR_FUNC(8fe4m38fe4m3u, fp8_t,   fp8a_t)
 DEF_CVT_SCALAR_FUNC(8fe4m3u8fe4m3, fp8a_t, fp8_t)
 
 // float32 -> FP8 encode via the shared building blocks in convert.hpp.
-template<int bias, bool fnuz> static void
-cvtF32ToFp8(const uchar* src_, size_t sstep, const uchar*, size_t,
-            uchar* dst, size_t dstep, Size size, void*)
+template<पूर्णाङ्क bias, तार्किक fnuz> स्थिर शून्य
+cvtF32ToFp8(ध्रुव uchar* src_, size_t sstep, ध्रुव uchar*, size_t,
+            uchar* dst, size_t dstep, Size size, शून्य*)
 {
     CV_INSTRUMENT_REGION();
-    const float* src = (const float*)src_;
-    sstep /= sizeof(src[0]);
+    ध्रुव भिन्न* src = (ध्रुव भिन्न*)src_;
+    sstep /= परिमाण(src[0]);
 
-    for (int i = 0; i < size.height; i++, src += sstep, dst += dstep)
+    प्रति (पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep)
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        const int LANES32 = VTraits<v_int32>::vlanes();
-        const int VECSZ = LANES32 * 4;
-        for (; j <= size.width - VECSZ; j += VECSZ)
+        पूर्णाङ्क j = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+        ध्रुव पूर्णाङ्क LANES32 = VTraits<v_int32>::vlanes();
+        ध्रुव पूर्णाङ्क VECSZ = LANES32 * 4;
+        प्रति (; j <= size.width - VECSZ; j += VECSZ)
         {
             v_float32 vf0 = vx_load(src + j);
             v_float32 vf1 = vx_load(src + j + LANES32);
@@ -557,45 +557,45 @@ cvtF32ToFp8(const uchar* src_, size_t sstep, const uchar*, size_t,
         }
         vx_cleanup();
 #endif
-        for (; j < size.width; j++)
+        प्रति (; j < size.width; j++)
             dst[j] = fp8_detail::encodeE4M3(src[j], bias, fnuz);
     }
 }
-static void cvt32f8fe4m3(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtF32ToFp8<7, false>(s, ss, p, ps, d, ds, sz, x); }
-static void cvt32f8fe4m3u(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtF32ToFp8<8, true>(s, ss, p, ps, d, ds, sz, x); }
+स्थिर शून्य cvt32f8fe4m3(ध्रुव uchar* s, size_t ss, ध्रुव uchar* p, size_t ps, uchar* d, size_t ds, Size sz, शून्य* x)
+{ cvtF32ToFp8<7, असत्य>(s, ss, p, ps, d, ds, sz, x); }
+स्थिर शून्य cvt32f8fe4m3u(ध्रुव uchar* s, size_t ss, ध्रुव uchar* p, size_t ps, uchar* d, size_t ds, Size sz, शून्य* x)
+{ cvtF32ToFp8<8, सत्य>(s, ss, p, ps, d, ds, sz, x); }
 
 // FP8 -> float32: 256-entry decode table gathered via universal intrinsics (same table as scalar)
 template<typename FP8>
-static void cvtFp8ToF32(const uchar* src, size_t sstep, const uchar*, size_t,
-                        uchar* dst_, size_t dstep, Size size, void*)
+स्थिर शून्य cvtFp8ToF32(ध्रुव uchar* src, size_t sstep, ध्रुव uchar*, size_t,
+                        uchar* dst_, size_t dstep, Size size, शून्य*)
 {
     CV_INSTRUMENT_REGION();
-    float* dst = (float*)dst_;
-    const float* tab = FP8::decodeLUT();
-    dstep /= sizeof(dst[0]);
-    for (int i = 0; i < size.height; i++, src += sstep, dst += dstep)
+    भिन्न* dst = (भिन्न*)dst_;
+    ध्रुव भिन्न* tab = FP8::decodeLUT();
+    dstep /= परिमाण(dst[0]);
+    प्रति (पूर्णाङ्क i = 0; i < size.height; i++, src += sstep, dst += dstep)
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        const int VECSZ = VTraits<v_float32>::vlanes();
-        for (; j <= size.width - VECSZ; j += VECSZ)
+        पूर्णाङ्क j = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+        ध्रुव पूर्णाङ्क VECSZ = VTraits<v_float32>::vlanes();
+        प्रति (; j <= size.width - VECSZ; j += VECSZ)
             v_store(dst + j, v_lut(tab, v_reinterpret_as_s32(vx_load_expand_q(src + j))));
 #endif
-        for (; j < size.width; j++) dst[j] = tab[src[j]];
+        प्रति (; j < size.width; j++) dst[j] = tab[src[j]];
     }
 }
-static void cvt8fe4m332f(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
+स्थिर शून्य cvt8fe4m332f(ध्रुव uchar* s, size_t ss, ध्रुव uchar* p, size_t ps, uchar* d, size_t ds, Size sz, शून्य* x)
 { cvtFp8ToF32<fp8_t>(s, ss, p, ps, d, ds, sz, x); }
-static void cvt8fe4m3u32f(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
+स्थिर शून्य cvt8fe4m3u32f(ध्रुव uchar* s, size_t ss, ध्रुव uchar* p, size_t ps, uchar* d, size_t ds, Size sz, शून्य* x)
 { cvtFp8ToF32<fp8a_t>(s, ss, p, ps, d, ds, sz, x); }
 
-BinaryFunc getConvertFunc(int sdepth_, int ddepth_)
+द्विमान_Func getConvertFunc(पूर्णाङ्क sdepth_, पूर्णाङ्क ddepth_)
 {
-    int sdepth = CV_MAT_DEPTH(sdepth_);
-    int ddepth = CV_MAT_DEPTH(ddepth_);
-    BinaryFunc func =
+    पूर्णाङ्क sdepth = CV_MAT_DEPTH(sdepth_);
+    पूर्णाङ्क ddepth = CV_MAT_DEPTH(ddepth_);
+    द्विमान_Func func =
         ddepth == CV_8U ? (
             sdepth == CV_8U ? cvt8u :
             sdepth == CV_8S ? cvt8s8u :
@@ -853,7 +853,7 @@ BinaryFunc getConvertFunc(int sdepth_, int ddepth_)
             0) :
         0;
     CV_Assert(func != 0);
-    return func;
+    प्रत्यागम func;
 }
 
 CV_CPU_OPTIMIZATION_NAMESPACE_END
