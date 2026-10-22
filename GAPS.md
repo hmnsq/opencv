@@ -1,0 +1,625 @@
+# What is still missing
+
+76 languages. Each line says in how many languages it is missing.
+
+## Files in languages BURP cannot read yet
+
+- `.sh`: 1 files
+
+## Keywords with no word in a language's table
+
+- shraeni:get: 75
+- shraeni:clear: 75
+- shraeni:ins: 75
+- shraeni:flush: 75
+- shraeni:fail: 75
+- shraeni:binary: 75
+- soochee:join: 75
+- shraeni:ios: 75
+- shraeni:ostream: 75
+- shraeni:eof: 75
+- shraeni:hex: 75
+- shraeni:ws: 75
+- shraeni:__FILE__: 75
+- shraeni:fstream: 75
+- shraeni:put: 75
+- shraeni:seekg: 75
+- shraeni:ifstream: 75
+- shraeni:outs: 75
+- shraeni:ends: 75
+- shraeni:ofstream: 75
+- shraeni:cerr: 75
+- shraeni:showpoint: 75
+- soochee:getParameter: 75
+- soochee:args: 75
+- shraeni:trunc: 75
+- shraeni:ate: 75
+- shraeni:fixed: 75
+- shraeni:setprecision: 75
+- shraeni:seekp: 75
+- shraeni:getline: 75
+- soochee:replace: 75
+- soochee:io: 75
+- shraeni:size_t: 71
+- shraeni:ptrdiff_t: 71
+- shraeni:DBL_EPSILON: 71
+- shraeni:memcmp: 71
+- shraeni:stderr: 71
+- shraeni:fprintf: 71
+- shraeni:fabs: 71
+- shraeni:DBL_MAX: 71
+- shraeni:gets: 71
+- shraeni:fflush: 71
+- shraeni:FLT_EPSILON: 71
+- shraeni:wchar_t: 71
+- shraeni:FLT_MAX: 71
+- shraeni:DIR: 71
+- shraeni:strtod: 71
+- shraeni:strchr: 71
+- shraeni:NDEBUG: 71
+- shraeni:close: 71
+- shraeni:stdout: 71
+- shraeni:remove: 71
+- shraeni:asm: 71
+- shraeni:fseek: 71
+- shraeni:floor: 71
+- shraeni:SEEK_END: 71
+- shraeni:INT_MIN: 71
+- shraeni:atoi: 71
+- soochee:close: 71
+- shraeni:rewind: 71
+- shraeni:va_list: 71
+- shraeni:fopen: 71
+- shraeni:SEEK_SET: 71
+- shraeni:ceil: 71
+- shraeni:UINT_MAX: 71
+- shraeni:closedir: 71
+- shraeni:FLT_MIN: 71
+- shraeni:abort: 71
+- shraeni:strtol: 71
+- shraeni:ftell: 71
+- shraeni:va_start: 71
+- shraeni:va_end: 71
+- shraeni:SCHAR_MIN: 71
+- shraeni:SCHAR_MAX: 71
+- shraeni:USHRT_MAX: 71
+- shraeni:SHRT_MIN: 71
+- shraeni:SHRT_MAX: 71
+- shraeni:opendir: 71
+- shraeni:readdir: 71
+- shraeni:tolower: 71
+- shraeni:fputs: 71
+- shraeni:fclose: 71
+- shraeni:FILE: 71
+- shraeni:strrchr: 71
+- shraeni:UCHAR_MAX: 71
+- shraeni:DBL_MIN: 71
+- shraeni:fgetc: 71
+- shraeni:fgets: 71
+- shraeni:feof: 71
+- shraeni:CHAR_BIT: 71
+- shraeni:getenv: 71
+- shraeni:rmdir: 71
+- shraeni:errno: 71
+- shraeni:ERANGE: 71
+- shraeni:mkdir: 71
+- shraeni:puts: 70
+- shraeni:memset: 70
+- shraeni:open: 70
+- shraeni:strcmp: 70
+- shraeni:strcpy: 70
+- shraeni:wait: 70
+- shraeni:typename: 67
+- shraeni:nullptr: 67
+- shraeni:exp: 67
+- shraeni:using: 67
+- soochee:print: 67
+- soochee:len: 67
+- soochee:def: 67
+- shraeni:mutable: 67
+- shraeni:log: 67
+- shraeni:explicit: 67
+- shraeni:cos: 67
+- shraeni:sin: 67
+- soochee:del: 67
+- soochee:range: 67
+- soochee:is: 67
+- soochee:None: 67
+- shraeni:#endif: 66
+- shraeni:#define: 66
+- shraeni:#ifdef: 66
+- shraeni:#ifndef: 66
+- shraeni:#undef: 66
+- shraeni:left: 66
+- shraeni:endl: 66
+- shraeni:right: 66
+- shraeni:delete: 66
+- shraeni:#pragma: 66
+- shraeni:cout: 66
+- shraeni:#error: 66
+- shraeni:template: 62
+- shraeni:unsigned: 62
+- shraeni:operator: 62
+- shraeni:short: 62
+- shraeni:long: 62
+- shraeni:abs: 62
+- shraeni:auto: 62
+- shraeni:memcpy: 62
+- shraeni:printf: 62
+- shraeni:INT_MAX: 62
+- shraeni:sqrt: 62
+- shraeni:strlen: 62
+- shraeni:pow: 62
+- shraeni:signed: 62
+- shraeni:friend: 62
+- shraeni:toupper: 62
+- shraeni:strncmp: 62
+- shraeni:isdigit: 62
+- shraeni:isspace: 62
+- shraeni:strstr: 62
+- shraeni:malloc: 62
+- shraeni:sscanf: 62
+- shraeni:isalpha: 62
+- shraeni:isalnum: 62
+- shraeni:virtual: 40
+- shraeni:true: 38
+- shraeni:bool: 26
+- shraeni:false: 26
+- shraeni:namespace: 26
+- shraeni:sync: 26
+- soochee:True: 26
+- soochee:assert: 26
+- soochee:or: 26
+- soochee:except: 26
+- soochee:False: 26
+- soochee:lambda: 26
+- shraeni:const: 25
+- shraeni:void: 25
+- shraeni:static: 25
+- shraeni:float: 25
+- shraeni:NULL: 25
+- shraeni:typedef: 25
+- shraeni:this: 25
+- shraeni:extern: 25
+- shraeni:public: 25
+- shraeni:class: 25
+- shraeni:#elif: 25
+- shraeni:goto: 25
+- shraeni:switch: 25
+- shraeni:new: 25
+- shraeni:default: 25
+- shraeni:write: 25
+- shraeni:continue: 25
+- shraeni:private: 25
+- shraeni:do: 25
+- shraeni:try: 25
+- shraeni:read: 25
+- soochee:import: 25
+- shraeni:free: 25
+- soochee:try: 25
+- soochee:write: 25
+- soochee:continue: 25
+- shraeni:assert: 25
+- soochee:in: 10
+- soochee:from: 10
+- soochee:and: 10
+- soochee:not: 10
+- shraeni:for: 9
+- soochee:for: 9
+- shraeni:double: 9
+- shraeni:case: 9
+
+## Names with no dictionary entry (the most common first)
+
+- `i`: 76
+- `j`: 76
+- `src`: 76
+- `k`: 76
+- `dst`: 76
+- `m`: 76
+- `a`: 76
+- `p`: 76
+- `x`: 76
+- `ptr`: 76
+- `cv`: 76
+- `T`: 76
+- `uchar`: 76
+- `len`: 76
+- `b`: 76
+- `cn`: 76
+- `Mat`: 76
+- `n`: 76
+- `s`: 76
+- `CV_Assert`: 76
+- `d`: 76
+- `u`: 76
+- `vlanes`: 76
+- `CODEGEN_FUNCPTR`: 76
+- `v`: 76
+- `c`: 76
+- `dims`: 76
+- `flags`: 76
+- `e`: 76
+- `f`: 76
+- `src1`: 76
+- `GLenum`: 76
+- `VTraits`: 76
+- `sdepth`: 76
+- `buf`: 76
+- `v_float32`: 76
+- `ocl`: 76
+- `defined`: 76
+- `src2`: 76
+- `String`: 76
+- `GLint`: 76
+- `y`: 76
+- `GLuint`: 76
+- `Error`: 76
+- `_dst`: 76
+- `fs`: 76
+- `ctx`: 76
+- `Impl`: 76
+- `op`: 76
+- `it`: 76
+- `v_float64`: 76
+- `_src`: 76
+- `A`: 76
+- `CV_Error`: 76
+- `sz`: 76
+- `ID`: 76
+- `handle`: 76
+- `r`: 76
+- `UMat`: 76
+- `cl_int`: 76
+- `GLsizei`: 76
+- `esz`: 76
+- `res`: 76
+- `alpha`: 76
+- `CV_INSTRUMENT_REGION`: 76
+- `V`: 76
+- `v_int32`: 76
+- `CV_64F`: 76
+- `v_store`: 76
+- `Device`: 76
+- `CV_32F`: 76
+- `func`: 76
+- `int64`: 76
+- `q`: 76
+- `VECSZ`: 76
+- `v_uint32`: 76
+- `ST`: 76
+- `getMat`: 76
+- `float64_t`: 76
+- `cl_mem`: 76
+- `ddepth`: 76
+- `v_uint8`: 76
+- `v0`: 76
+- `cuda`: 76
+- `s1`: 76
+- `beta`: 76
+- `obj`: 76
+- `cl_uint`: 76
+- `sstep`: 76
+- `ptrs`: 76
+- `CL_API_CALL`: 76
+- `schar`: 76
+- `p1`: 76
+- `ofs`: 76
+- `val`: 76
+- `WT`: 76
+- `v_uint16`: 76
+- `format`: 76
+- `channels`: 76
+- `v1`: 76
+- `uint64_t`: 76
+- `gl`: 76
+- `uiA`: 76
+- `saturate_cast`: 76
+- `ogl`: 76
+- `scale`: 76
+- `dstep`: 76
+- `s2`: 76
+- `_R`: 76
+- `uiZ`: 76
+- `s0`: 76
+- `int64_t`: 76
+- `Context`: 76
+- `CV_HAL_ERROR_NOT_IMPLEMENTED`: 76
+- `cl_event`: 76
+- `v_mul`: 76
+- `acc`: 76
+- `VT`: 76
+- `hdr`: 76
+- `_type`: 76
+- `idx`: 76
+- `r0`: 76
+- `p2`: 76
+- `t0`: 76
+- `src0`: 76
+- `impl`: 76
+- `params`: 76
+- `KernelArg`: 76
+- `z`: 76
+- `FileStorage`: 76
+- `vstep`: 76
+- `t1`: 76
+- `R`: 76
+- `arr`: 76
+- `OutputArray`: 76
+- `a0`: 76
+- `v_and`: 76
+- `CL_SUCCESS`: 76
+- `w`: 76
+- `ss`: 76
+- `n1`: 76
+- `CV_8U`: 76
+- `p3`: 76
+- `L`: 76
+- `fn`: 76
+- `Scalar`: 76
+- `r1`: 76
+- `utils`: 76
+- `dtype`: 76
+- `isContinuous`: 76
+- `MatShape`: 76
+- `v_int16`: 76
+- `Range`: 76
+- `pl`: 76
+- `CV_32S`: 76
+- `v_fma`: 76
+- `Op`: 76
+- `device`: 76
+- `W`: 76
+- `HAVE_CUDA`: 76
+- `location`: 76
+- `vec`: 76
+- `v_expand`: 76
+- `H`: 76
+- `arrays`: 76
+- `i0`: 76
+- `vv`: 76
+- `sigB`: 76
+- `N`: 76
+- `GLfloat`: 76
+- `pos`: 76
+- `v2`: 76
+- `context`: 76
+- `re`: 76
+- `float32_t`: 76
+- `sigA`: 76
+- `hfloat`: 76
+- `hal`: 76
+- `DEF_CVT_SCALE_FUNC`: 76
+- `elem`: 76
+- `astep`: 76
+- `m1`: 76
+- `fptr`: 76
+- `fptype`: 76
+- `srcmat`: 76
+- `g`: 76
+- `e1`: 76
+- `p4`: 76
+- `a1`: 76
+- `CV_SIMD_SCALABLE`: 76
+- `B`: 76
+- `level`: 76
+- `cl_context`: 76
+- `OpenCLApiCallError`: 76
+- `kercn`: 76
+- `range`: 76
+- `e2`: 76
+- `uiB`: 76
+- `v_cvt_f32`: 76
+- `v_max`: 76
+- `x0`: 76
+- `CV_SIMD`: 76
+- `uint32_t`: 76
+- `l`: 76
+- `have`: 76
+- `getDefault`: 76
+- `src3`: 76
+- `p5`: 76
+- `throw_no_cuda`: 76
+- `bfloat`: 76
+- `sig`: 76
+- `h`: 76
+- `normType`: 76
+- `pname`: 76
+- `DEF_CVT_FUNC`: 76
+- `getUMat`: 76
+- `sizes`: 76
+- `CV_PARSE_ERROR_CPP`: 76
+- `vx_setzero_f64`: 76
+- `im`: 76
+- `_src2`: 76
+- `Kernel`: 76
+- `CV_OVERRIDE`: 76
+- `hi`: 76
+- `expA`: 76
+- `mtype`: 76
+- `Ptr`: 76
+- `GpuMat`: 76
+- `GLvoid`: 76
+- `step2`: 76
+- `CV_16S`: 76
+- `v_sub`: 76
+- `_m`: 76
+- `CV_8S`: 76
+- `lo`: 76
+- `CV_DbgAssert`: 76
+- `svm`: 76
+- `CV_16U`: 76
+- `m2`: 76
+- `prog`: 76
+- `K`: 76
+- `HAVE_OPENGL`: 76
+- `m0`: 76
+- `st`: 76
+- `uint64`: 76
+- `impl_`: 76
+- `cl_device_id`: 76
+- `CL_RUNTIME_EXPORT`: 76
+- `autoRelease`: 76
+- `v_reinterpret_as_s32`: 76
+- `GLboolean`: 76
+- `sqsum`: 76
+- `TKernel`: 76
+- `scn`: 76
+- `stype`: 76
+- `dcn`: 76
+- `_src1`: 76
+- `delta`: 76
+- `CV_16F`: 76
+- `state`: 76
+- `globalsize`: 76
+- `at`: 76
+- `sign`: 76
+- `p6`: 76
+- `HAVE_OPENCL`: 76
+- `i1`: 76
+- `nd`: 76
+- `nc`: 76
+- `allocator`: 76
+- `C`: 76
+- `plan`: 76
+- `dist`: 76
+- `info`: 76
+- `v_int8`: 76
+- `m3`: 76
+- `v_absdiff`: 76
+- `b0`: 76
+- `OpenCLExecutionContext`: 76
+- `tmp`: 76
+- `ew`: 76
+- `StsNotImplemented`: 76
+- `step1`: 76
+- `arginfo`: 76
+- `M`: 76
+- `angle`: 76
+- `vx_setall_f32`: 76
+- `CV_NOEXCEPT`: 76
+- `v_cvt_f64`: 76
+- `dt`: 76
+- `d1`: 76
+- `v_pack`: 76
+- `Sd`: 76
+- `expB`: 76
+- `ok`: 76
+- `struct_flags`: 76
+- `CV_Bool`: 76
+- `region`: 76
+- `v_muladd`: 76
+- `v_zip`: 76
+- `coeffs`: 76
+
+## Comments with no translation
+
+- This file is part of OpenCV project.: 76
+- namespace: 76
+- ***************************************************************************************\
+*          : 76
+- ! @cond IGNORED: 76
+- ! @endcond: 76
+- static: 76
+- nothing: 76
+- OPENCV_HAVE_FILESYSTEM_SUPPORT: 76
+- namespace cv: 76
+- fixed warning on type cast: 76
+- TODO Add support for roi: 76
+- TODO: 76
+- HAVE_OPENGL: 76
+- defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content: 76
+- TODO Use events: 76
+- TODO RAII: 76
+- fixed unsigned unary minus: -x == ~x + 1: 76
+- End of file.: 76
+- HAVE_OPENCL: 76
+- CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY: 76
+- disabled: 76
+- generated by parser_cl.py: 76
+- CV_USE_FLS: 76
+- _WIN32: 76
+- OPENCV_DISABLE_THREAD_SUPPORT: 76
+- BUILD_PLUGIN: 76
+- special cases: 76
+- namespace cv::ew: 76
+- usageFlags: 76
+- TODO Need to specify ACCESS_WRITE here somehow to prevent useless data copying!: 76
+- Legacy: 76
+- AUTOGENERATED, DO NOT EDIT: 76
+- !HAVE_VA: 76
+- flags: 76
+- TODO Filter platforms by name from OPENCV_OPENCL_DEVICE: 76
+- CV_SIMD || CV_SIMD_SCALABLE: 76
+- Extension: 1.1: 76
+- Extension: 1.2: 76
+- Extension: 1.3: 76
+- Extension: 1.4: 76
+- Extension: 1.5: 76
+- Extension: 2.0: 76
+- Extension: 2.1: 76
+- Extension: ARB_vertex_array_object: 76
+- Extension: ARB_map_buffer_range: 76
+- Extension: ARB_framebuffer_object: 76
+- Extension: 3.0: 76
+- Extension: ARB_uniform_buffer_object: 76
+- Extension: ARB_copy_buffer: 76
+- Extension: 3.1: 76
+- On little endian CPUs, both branches produce the same result. On big endian, only the else branch do: 76
+- nothing in OPENCV_DISABLE_THREAD_SUPPORT mode: 76
+- HAVE_VA_INTEL: 76
+- oclop=: 76
+- muldiv=: 76
+- muldiv: 76
+- namespace cv::hal: 76
+- cv::hal::: 76
+- bool stored as 0/1 byte -> reuse uchar path: 76
+- unreachable code: 76
+- optimal buffer size: 76
+- *
+@param src source array
+@param dst destination array
+@param len length of arrays: 76
+- Allocates memory.: 76
+- deprecated: 76
+- the engine's vector kernel (the old: 76
+- table implementation is removed): 76
+- forward declarations: 76
+- ignored: 76
+- TODO check u.getMat(): 76
+- same object (see dnn::Layer::forward_fallback): 76
+- serial implementation, also used for the pieces of the parallel version: 76
+- CV_SIMD_64F: 76
+- 2nd arg is useless: 76
+- TSAN false positive: see #27638: 76
+- CV_Bool: 76
+- generated by parser_clblas.py: 76
+- generated by parser_clfft.py: 76
+- HAVE_OPENCL_STATIC: 76
+- pthread_cond_signal: 76
+- radix: 76
+- ----------------------------------------------------------------------------
+| Assuming `uiA' has th: 76
+- ----------------------------------------------------------------------------
+| Converts the common N: 76
+- ----------------------------------------------------------------------------
+| Interpreting `uiA' an: 76
+- here x and y are ok: 76
+- anonymous namespace: 76
+- 0.f or (float)(-(1 << 31)): 76
+- subtract 0 or a large negative number: 76
+- Excluding GNU in CV_SIMD_SCALABLE because of "opencv/issues/26936": 76
+- accessFlags: 76
+- namespace cv::ocl: 76
+- ***************************************************************************************\
+           : 76
+- ! @addtogroup core_hal_interface_fastAtan Atan calculation: 76
+- *
+@param context pointer to context storing all necessary data: 76
+- namespace cv::hal::: 76
+- if it's inplace operation, we cannot repeatedly process: 76
+- the tail for the second time, so we have to use the: 76
+- scalar code: 76
+- CV_SIMD128: 76
+- a new number of axes: the layout of this shape does not apply: 76
+- cv::hal: 76
