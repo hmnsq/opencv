@@ -10,25 +10,25 @@
 namespace cv {
 
 typedef void (*ReduceSumFunc)(const Mat& src, Mat& dst);
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth);
+ReduceSumFunc getReduceCSumFunc(පූර්ණ_සංඛ්‍යා sdepth, පූර්ණ_සංඛ්‍යා ddepth);
+ReduceSumFunc getReduceRSumFunc(පූර්ණ_සංඛ්‍යා sdepth, පූර්ණ_සංඛ්‍යා ddepth);
+ReduceSumFunc getReduceRSum2Func(පූර්ණ_සංඛ්‍යා sdepth, පූර්ණ_සංඛ්‍යා ddepth);
 
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth)
+ReduceSumFunc getReduceCSumFunc(පූර්ණ_සංඛ්‍යා sdepth, පූර්ණ_සංඛ්‍යා ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceCSumFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth)
+ReduceSumFunc getReduceRSumFunc(පූර්ණ_සංඛ්‍යා sdepth, පූර්ණ_සංඛ්‍යා ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceRSumFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth)
+ReduceSumFunc getReduceRSum2Func(පූර්ණ_සංඛ්‍යා sdepth, පූර්ණ_සංඛ්‍යා ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceRSum2Func, (sdepth, ddepth),

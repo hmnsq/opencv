@@ -9,9 +9,9 @@
 
 namespace cv { namespace parallel {
 
-struct ParallelBackendInfo
+sa_nracanaa ParallelBackendInfo
 {
-    int priority;     // 1000-<index*10> - default builtin priority
+    පූර්ණ_සංඛ්‍යා priority;     // 1000-<index*10> - default builtin priority
                       // 0 - disabled (OPENCV_PARALLEL_PRIORITY_<name> = 0)
                       // >10000 - prioritized list (OPENCV_PARALLEL_PRIORITY_LIST)
     std::string name;
