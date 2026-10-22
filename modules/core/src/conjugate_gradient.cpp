@@ -42,7 +42,7 @@
 #include "precomp.hpp"
 
 #define dprintf(x)
-#define print_matrix(x)
+#define इलिम्बाग_matrix(x)
 
 namespace cv
 {
@@ -76,17 +76,17 @@ namespace cv
         TermCriteria getTermCriteria() const CV_OVERRIDE;
         ConjGradSolverImpl();
         void setTermCriteria(const TermCriteria& termcrit) CV_OVERRIDE;
-        double minimize(InputOutputArray x) CV_OVERRIDE;
+        double minimize(पासोक_Output_Array x) CV_OVERRIDE;
     protected:
         Ptr<MinProblemSolver::Function> _Function;
         TermCriteria _termcrit;
         Mat_<double> d,r,buf_x,r_old;
-        Mat_<double> minimizeOnTheLine_buf1,minimizeOnTheLine_buf2;
+        Mat_<double> minimize_On_The_लिन्या_buf1,minimize_On_The_लिन्या_buf2;
     private:
-        static void minimizeOnTheLine(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,Mat_<double>& buf2);
+        static void minimize_On_The_लिन्या(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,Mat_<double>& buf2);
     };
 
-    void ConjGradSolverImpl::minimizeOnTheLine(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,
+    void ConjGradSolverImpl::minimize_On_The_लिन्या(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,
             Mat_<double>& buf2){
         double sigma=INITIAL_SEC_METHOD_SIGMA;
         buf1=0.0;
@@ -94,18 +94,18 @@ namespace cv
 
         dprintf(("before minimizeOnTheLine\n"));
         dprintf(("x:\n"));
-        print_matrix(x);
+        इलिम्बाग_matrix(x);
         dprintf(("d:\n"));
-        print_matrix(d);
+        इलिम्बाग_matrix(d);
 
         for(int i=0;i<SEC_METHOD_ITERATIONS;i++){
             _f->getGradient((double*)x.data,(double*)buf1.data);
             dprintf(("buf1:\n"));
-            print_matrix(buf1);
+            इलिम्बाग_matrix(buf1);
             x=x+sigma*d;
             _f->getGradient((double*)x.data,(double*)buf2.data);
             dprintf(("buf2:\n"));
-            print_matrix(buf2);
+            इलिम्बाग_matrix(buf2);
             double d1=buf1.dot(d), d2=buf2.dot(d);
             if((d1-d2)==0){
                 break;
@@ -117,12 +117,12 @@ namespace cv
         }
 
         dprintf(("after minimizeOnTheLine\n"));
-        print_matrix(x);
+        इलिम्बाग_matrix(x);
     }
 
-    double ConjGradSolverImpl::minimize(InputOutputArray x){
+    double ConjGradSolverImpl::minimize(पासोक_Output_Array x){
         CV_Assert(_Function.empty()==false);
-        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.maxCount,_termcrit.epsilon));
+        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.max_बिलांग,_termcrit.epsilon));
 
         Mat x_mat=x.getMat();
         CV_Assert(MIN(x_mat.rows,x_mat.cols)==1);
@@ -133,8 +133,8 @@ namespace cv
             d.create(1,ndim);
             r.create(1,ndim);
             r_old.create(1,ndim);
-            minimizeOnTheLine_buf1.create(1,ndim);
-            minimizeOnTheLine_buf2.create(1,ndim);
+            minimize_On_The_लिन्या_buf1.create(1,ndim);
+            minimize_On_The_लिन्या_buf2.create(1,ndim);
         }
 
         Mat_<double> proxy_x;
@@ -151,12 +151,12 @@ namespace cv
         d.copyTo(r);
 
         //here everything goes. check that everything is set properly
-        dprintf(("proxy_x\n"));print_matrix(proxy_x);
-        dprintf(("d first time\n"));print_matrix(d);
-        dprintf(("r\n"));print_matrix(r);
+        dprintf(("proxy_x\n"));इलिम्बाग_matrix(proxy_x);
+        dprintf(("d first time\n"));इलिम्बाग_matrix(d);
+        dprintf(("r\n"));इलिम्बाग_matrix(r);
 
-        for(int count=0;count<_termcrit.maxCount;count++){
-            minimizeOnTheLine(_Function,proxy_x,d,minimizeOnTheLine_buf1,minimizeOnTheLine_buf2);
+        for(int बिलांग_2=0;बिलांग_2<_termcrit.max_बिलांग;बिलांग_2++){
+            minimize_On_The_लिन्या(_Function,proxy_x,d,minimize_On_The_लिन्या_buf1,minimize_On_The_लिन्या_buf2);
             r.copyTo(r_old);
             _Function->getGradient(proxy_x.ptr<double>(),r.ptr<double>());
             r*=-1.0;
@@ -190,8 +190,8 @@ namespace cv
         return _termcrit;
     }
     void ConjGradSolverImpl::setTermCriteria(const TermCriteria& termcrit){
-        CV_Assert((termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && termcrit.epsilon>0 && termcrit.maxCount>0) ||
-                ((termcrit.type==TermCriteria::MAX_ITER) && termcrit.maxCount>0));
+        CV_Assert((termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && termcrit.epsilon>0 && termcrit.max_बिलांग>0) ||
+                ((termcrit.type==TermCriteria::MAX_ITER) && termcrit.max_बिलांग>0));
         _termcrit=termcrit;
     }
     // both minRange & minError are specified by termcrit.epsilon; In addition, user may specify the number of iterations that the algorithm does.

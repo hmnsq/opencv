@@ -18,7 +18,7 @@
 
 namespace cv { namespace hal {
 
-extern const uchar popCountTable[256] =
+extern const uchar आलिसिन_बिलांग_Table[256] =
 {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
@@ -30,7 +30,7 @@ extern const uchar popCountTable[256] =
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 };
 
-static const uchar popCountTable2[] =
+static const uchar आलिसिन_बिलांग_Table2[] =
 {
     0, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3,
     1, 2, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 1, 2, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3,
@@ -42,7 +42,7 @@ static const uchar popCountTable2[] =
     2, 3, 3, 3, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4, 4, 4, 2, 3, 3, 3, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4, 4, 4
 };
 
-static const uchar popCountTable4[] =
+static const uchar आलिसिन_बिलांग_Table4[] =
 {
     0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -64,9 +64,9 @@ int normHamming(const uchar* a, int n, int cellSize)
         return normHamming(a, n);
     const uchar* tab = 0;
     if( cellSize == 2 )
-        tab = popCountTable2;
+        tab = आलिसिन_बिलांग_Table2;
     else if( cellSize == 4 )
-        tab = popCountTable4;
+        tab = आलिसिन_बिलांग_Table4;
     else
         return -1;
     int i = 0;
@@ -113,9 +113,9 @@ int normHamming(const uchar* a, const uchar* b, int n, int cellSize)
         return normHamming(a, b, n);
     const uchar* tab = 0;
     if( cellSize == 2 )
-        tab = popCountTable2;
+        tab = आलिसिन_बिलांग_Table2;
     else if( cellSize == 4 )
-        tab = popCountTable4;
+        tab = आलिसिन_बिलांग_Table4;
     else
         return -1;
     int i = 0;
@@ -239,7 +239,7 @@ typedef int (*NormDiffFunc)(const uchar*, const uchar*, const uchar*, uchar*, in
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_norm( InputArray _src, int normType, InputArray _mask, double & result )
+static bool ocl_norm( पासोक_Array _src, int normType, पासोक_Array _mask, double & result )
 {
     const ocl::Device & d = ocl::Device::getDefault();
 
@@ -252,7 +252,7 @@ static bool ocl_norm( InputArray _src, int normType, InputArray _mask, double & 
         return false;
     int type = _src.type(), depth = CV_MAT_DEPTH(type);
     bool doubleSupport = d.doubleFPConfig() > 0,
-            haveMask = _mask.kind() != _InputArray::NONE;
+            haveMask = _mask.kind() != पासोक_Array_2::NONE;
 
     if (depth >= CV_16F)
         return false;  // TODO: support FP16
@@ -299,7 +299,7 @@ static NormDiffFunc getNormDiffFunc(int normType, int depth) {
     CV_CPU_DISPATCH(getNormDiffFunc, (normType, depth), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-double norm( InputArray _src, int normType, InputArray _mask )
+double norm( पासोक_Array _src, int normType, पासोक_Array _mask )
 {
     CV_INSTRUMENT_REGION();
 
@@ -432,7 +432,7 @@ double norm( InputArray _src, int normType, InputArray _mask )
             float f;
         } blocksum;
         blocksum.i = 0;
-        int count = 0;
+        int बिलांग_2 = 0;
 
         for (size_t i = 0; i < it.nplanes; i++, ++it)
         {
@@ -440,12 +440,12 @@ double norm( InputArray _src, int normType, InputArray _mask )
             {
                 int bsz = std::min(total - j, blockSize);
                 func(ptrs[0], ptrs[1], (uchar*)&blocksum, bsz, cn);
-                count += bsz;
-                if (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
+                बिलांग_2 += bsz;
+                if (बिलांग_2 + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
                 {
                     result.d += is_fp16 ? (double)blocksum.f : (double)blocksum.i;
                     blocksum.i = 0;
-                    count = 0;
+                    बिलांग_2 = 0;
                 }
                 ptrs[0] += bsz*esz;
                 if (ptrs[1])
@@ -480,7 +480,7 @@ double norm( InputArray _src, int normType, InputArray _mask )
 //==================================================================================================
 
 #ifdef HAVE_OPENCL
-static bool ocl_norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask, double & result )
+static bool ocl_norm( पासोक_Array _src1, पासोक_Array _src2, int normType, पासोक_Array _mask, double & result )
 {
 #ifdef __ANDROID__
     if (ocl::Device::getDefault().isNVidia())
@@ -537,7 +537,7 @@ static bool ocl_norm( InputArray _src1, InputArray _src2, int normType, InputArr
 }  // ocl_norm()
 #endif  // HAVE_OPENCL
 
-double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask )
+double norm( पासोक_Array _src1, पासोक_Array _src2, int normType, पासोक_Array _mask )
 {
     CV_INSTRUMENT_REGION();
 
@@ -667,7 +667,7 @@ double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask 
             float f;
         } blocksum;
         blocksum.i = 0;
-        int count = 0;
+        int बिलांग_2 = 0;
 
         for (size_t i = 0; i < it.nplanes; i++, ++it)
         {
@@ -675,12 +675,12 @@ double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask 
             {
                 int bsz = std::min(total - j, blockSize);
                 func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&blocksum, bsz, cn);
-                count += bsz;
-                if (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
+                बिलांग_2 += bsz;
+                if (बिलांग_2 + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
                 {
                     result.d += is_fp16 ? (double)blocksum.f : (double)blocksum.i;
                     blocksum.i = 0;
-                    count = 0;
+                    बिलांग_2 = 0;
                 }
                 ptrs[0] += bsz*esz;
                 ptrs[1] += bsz*esz;
@@ -718,7 +718,7 @@ cv::Hamming::ResultType Hamming::operator()( const unsigned char* a, const unsig
     return cv::hal::normHamming(a, b, size);
 }
 
-double PSNR(InputArray _src1, InputArray _src2, double R)
+double PSNR(पासोक_Array _src1, पासोक_Array _src2, double R)
 {
     CV_INSTRUMENT_REGION();
 
@@ -731,7 +731,7 @@ double PSNR(InputArray _src1, InputArray _src2, double R)
 
 
 #ifdef HAVE_OPENCL
-static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _mask, int dtype,
+static bool ocl_normalize( पासोक_Array _src, पासोक_Output_Array _dst, पासोक_Array _mask, int dtype,
                            double scale, double delta )
 {
     UMat src = _src.getUMat();
@@ -791,16 +791,16 @@ static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _m
         if (haveScale)
         {
             if (haveDelta)
-                k.args(srcarg, maskarg, dstarg, fscale, fdelta);
+                k.मगा_कातविरान(srcarg, maskarg, dstarg, fscale, fdelta);
             else
-                k.args(srcarg, maskarg, dstarg, fscale);
+                k.मगा_कातविरान(srcarg, maskarg, dstarg, fscale);
         }
         else
         {
             if (haveDelta)
-                k.args(srcarg, maskarg, dstarg, fdelta);
+                k.मगा_कातविरान(srcarg, maskarg, dstarg, fdelta);
             else
-                k.args(srcarg, maskarg, dstarg);
+                k.मगा_कातविरान(srcarg, maskarg, dstarg);
         }
 
         size_t globalsize[2] = { (size_t)src.cols, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
@@ -817,8 +817,8 @@ static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _m
 }  // ocl_normalize
 #endif  // HAVE_OPENCL
 
-void normalize(InputArray _src, InputOutputArray _dst, double a, double b,
-               int norm_type, int rtype, InputArray _mask)
+void normalize(पासोक_Array _src, पासोक_Output_Array _dst, double a, double b,
+               int norm_type, int rtype, पासोक_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 

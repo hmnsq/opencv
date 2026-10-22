@@ -235,9 +235,9 @@ struct BatchDistInvoker : public ParallelLoopBody
 
 }
 
-void cv::batchDistance( InputArray _src1, InputArray _src2,
+void cv::batchDistance( पासोक_Array _src1, पासोक_Array _src2,
                         OutputArray _dist, int dtype, OutputArray _nidx,
-                        int normType, int K, InputArray _mask,
+                        int normType, int K, पासोक_Array _mask,
                         int update, bool crosscheck )
 {
     CV_INSTRUMENT_REGION();

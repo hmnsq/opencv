@@ -43,7 +43,7 @@
 #include <algorithm>
 
 #define dprintf(x)
-#define print_matrix(x)
+#define इलिम्बाग_matrix(x)
 
 namespace cv
 {
@@ -51,27 +51,27 @@ namespace cv
 using std::vector;
 
 #ifdef ALEX_DEBUG
-static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::vector<int> N,const std::vector<int> B){
+static void इलिम्बाग_simplex_state(const Mat& c,const Mat& b,double v,const std::vector<int> N,const std::vector<int> B){
     printf("\tprint simplex state\n");
 
     printf("v=%g\n",v);
 
     printf("here c goes\n");
-    print_matrix(c);
+    इलिम्बाग_matrix(c);
 
     printf("non-basic: ");
     print(Mat(N));
     printf("\n");
 
     printf("here b goes\n");
-    print_matrix(b);
+    इलिम्बाग_matrix(b);
     printf("basic: ");
 
     print(Mat(B));
     printf("\n");
 }
 #else
-#define print_simplex_state(c,b,v,N,B)
+#define इलिम्बाग_simplex_state(c,b,v,N,B)
 #endif
 
 /**Due to technical considerations, the format of input b and c is somewhat special:
@@ -90,7 +90,7 @@ static void swap_columns(Mat_<double>& A,int col1,int col2);
 #define SWAP(type,a,b) {type tmp=(a);(a)=(b);(b)=tmp;}
 
 //return codes:-2 (no_sol - unbdd),-1(no_sol - unfsbl), 0(single_sol), 1(multiple_sol=>least_l2_norm)
-int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_eps)
+int solveLP(पासोक_Array Func_, पासोक_Array Constr_, OutputArray z_, double constr_eps)
 {
     dprintf(("call to solveLP\n"));
 
@@ -147,9 +147,9 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     //check constraints feasibility
     Mat prod = Constr(Rect(0, 0, Constr.cols - 1, Constr.rows)) * z;
     Mat constr_check = Constr.col(Constr.cols - 1) - prod;
-    double min_value = 0.0;
-    minMaxIdx(constr_check, &min_value);
-    if (min_value < -constr_eps)
+    double min_हालागा = 0.0;
+    minMaxIdx(constr_check, &min_हालागा);
+    if (min_हालागा < -constr_eps)
     {
         return SOLVELP_LOST;
     }
@@ -157,7 +157,7 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     return res;
 }
 
-int solveLP(InputArray Func, InputArray Constr, OutputArray z)
+int solveLP(पासोक_Array Func, पासोक_Array Constr, OutputArray z)
 {
     return solveLP(Func, Constr, z, 1e-12);
 }
@@ -206,17 +206,17 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
         b(i,0)=-1;
     }
 
-    print_simplex_state(c,b,v,N,B);
+    इलिम्बाग_simplex_state(c,b,v,N,B);
 
     dprintf(("\tWE MAKE PIVOT\n"));
     pivot(c,b,v,N,B,k,0,indexToRow);
 
-    print_simplex_state(c,b,v,N,B);
+    इलिम्बाग_simplex_state(c,b,v,N,B);
 
     inner_simplex(c,b,v,N,B,indexToRow);
 
     dprintf(("\tAFTER INNER_SIMPLEX\n"));
-    print_simplex_state(c,b,v,N,B);
+    इलिम्बाग_simplex_state(c,b,v,N,B);
 
     unsigned int nsize = (unsigned int)N.size();
     if(indexToRow[0]>=nsize){
@@ -238,7 +238,7 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     }
 
     dprintf(("after swaps\n"));
-    print_simplex_state(c,b,v,N,B);
+    इलिम्बाग_simplex_state(c,b,v,N,B);
 
     //start from 1, because we ignore x_0
     c=0;
@@ -248,18 +248,18 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
             dprintf(("I=%d from nonbasic\n",I));
             int iterator_offset=indexToRow[I];
             c(0,iterator_offset)+=old_c(0,I);
-            print_matrix(c);
+            इलिम्बाग_matrix(c);
         }else{
             dprintf(("I=%d from basic\n",I));
             int iterator_offset=indexToRow[I]-nsize;
             c-=old_c(0,I)*b.row(iterator_offset).colRange(0,b.cols-1);
             v+=old_c(0,I)*b(iterator_offset,b.cols-1);
-            print_matrix(c);
+            इलिम्बाग_matrix(c);
         }
     }
 
     dprintf(("after restore\n"));
-    print_simplex_state(c,b,v,N,B);
+    इलिम्बाग_simplex_state(c,b,v,N,B);
 
     N.erase(N.begin());
     for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
@@ -287,7 +287,7 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
         }
         if(e==-1){
             dprintf(("hello from e==-1\n"));
-            print_matrix(c);
+            इलिम्बाग_matrix(c);
             if(all_nonzero==true){
                 return SOLVELP_SINGLE;
             }else{
@@ -321,13 +321,13 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
         pivot(c,b,v,N,B,l,e,indexToRow);
 
         dprintf(("objective, v=%g\n",v));
-        print_matrix(c);
+        इलिम्बाग_matrix(c);
         dprintf(("constraints\n"));
-        print_matrix(b);
+        इलिम्बाग_matrix(b);
         dprintf(("non-basic: "));
-        print_matrix(Mat(N));
+        इलिम्बाग_matrix(Mat(N));
         dprintf(("basic: "));
-        print_matrix(Mat(B));
+        इलिम्बाग_matrix(Mat(B));
     }
 }
 

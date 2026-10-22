@@ -250,12 +250,12 @@ typedef void (*UnaryFunc)(const uchar* src1, size_t step1,
                        uchar* dst, size_t step, Size sz,
                        void*);
 
-typedef void (*BinaryFunc)(const uchar* src1, size_t step1,
+typedef void (*दालावाहान_Func)(const uchar* src1, size_t step1,
                        const uchar* src2, size_t step2,
                        uchar* dst, size_t step, Size sz,
                        void*);
 
-typedef void (*BinaryFuncC)(const void* src1, size_t step1,
+typedef void (*दालावाहान_Func_C)(const void* src1, size_t step1,
                        const void* src2, size_t step2,
                        void* dst, size_t step, int width, int height,
                        void*);
@@ -264,9 +264,9 @@ typedef void (*BinaryFuncC)(const void* src1, size_t step1,
 // CPU-dispatched convert / convert-scale kernels through a thin ElemwiseFunc adapter,
 // instead of re-implementing the whole cast matrix. (Prototype: declarations are mirrored
 // engine-side; relocate into a public core header at integration time.)
-CV_EXPORTS BinaryFunc getConvertFunc(int sdepth, int ddepth);
-CV_EXPORTS BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
-BinaryFunc getCopyMaskFunc(size_t esz);
+CV_EXPORTS दालावाहान_Func getConvertFunc(int sdepth, int ddepth);
+CV_EXPORTS दालावाहान_Func getConvertScaleFunc(int sdepth, int ddepth);
+दालावाहान_Func getCopyMaskFunc(size_t esz);
 
 /* default memory block for sparse array elements */
 #define  CV_SPARSE_MAT_BLOCK     (1<<12)
@@ -303,7 +303,7 @@ enum { BLOCK_SIZE = 1024 };
 #define ARITHM_USE_IPP 0
 #endif
 
-inline bool checkScalar(const Mat& sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+inline bool checkScalar(const Mat& sc, int atype, पासोक_Array_2::KindFlag sckind, पासोक_Array_2::KindFlag akind)
 {
     if( sc.dims > 2 || !sc.isContinuous() )
         return false;
@@ -311,13 +311,13 @@ inline bool checkScalar(const Mat& sc, int atype, _InputArray::KindFlag sckind, 
     if(sz.width != 1 && sz.height != 1)
         return false;
     int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
+    if( akind == पासोक_Array_2::MATX && sckind != पासोक_Array_2::MATX )
         return false;
     return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
            (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
 }
 
-inline bool checkScalar(InputArray sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+inline bool checkScalar(पासोक_Array sc, int atype, पासोक_Array_2::KindFlag sckind, पासोक_Array_2::KindFlag akind)
 {
     if( sc.dims() > 2 || !sc.isContinuous() )
         return false;
@@ -325,7 +325,7 @@ inline bool checkScalar(InputArray sc, int atype, _InputArray::KindFlag sckind, 
     if(sz.width != 1 && sz.height != 1)
         return false;
     int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
+    if( akind == पासोक_Array_2::MATX && sckind != पासोक_Array_2::MATX )
         return false;
     return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
            (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
@@ -333,7 +333,7 @@ inline bool checkScalar(InputArray sc, int atype, _InputArray::KindFlag sckind, 
 
 // Does the OTHER operand `arr` have exactly the same shape as the scalar candidate `sc`, with the
 // single channel.
-inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
+inline bool sameShapeAsArg(const पासोक_Array_2& sc, const पासोक_Array_2& arr)
 {
     return arr.channels() == 1 && sc.sameSize(arr);
 }
@@ -348,11 +348,11 @@ inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
 // (but see isScalarLikeMat below for the shape-incompatible compat fallback).
 // `arr` is the OTHER operand: its channel count decides what a MATX scalar may broadcast over, its
 // shape whether the bindings-style column below is a scalar at all.
-inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
+inline bool isScalarArg(const पासोक_Array_2& sc, const पासोक_Array_2& arr)
 {
-    const _InputArray::KindFlag kind = sc.kind();
+    const पासोक_Array_2::KindFlag kind = sc.kind();
     const int cn = arr.channels();
-    if (kind == _InputArray::MATX)
+    if (kind == पासोक_Array_2::MATX)
     {
         Size sz = sc.getSz();
         int scn0 = sz.width * sz.height;
@@ -372,13 +372,13 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
     // element-wise, exactly as in 4.x (see sameShapeAsArg). That covers both the non-continuous
     // partner that fails this very test (e.g. P.col(0)) and a genuine Scalar partner, which keeps
     // its per-channel semantics because only the Mat/UMat side is demoted.
-    if (kind == _InputArray::MAT)
+    if (kind == पासोक_Array_2::MAT)
     {
         const Mat& m = *(const Mat*)sc.getObj();
         return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
                m.type() == CV_64F && m.isContinuous() && !sameShapeAsArg(sc, arr);
     }
-    if (kind == _InputArray::UMAT)
+    if (kind == पासोक_Array_2::UMAT)
     {
         const UMat& m = *(const UMat*)sc.getObj();
         return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
@@ -392,20 +392,20 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
 // arithm_op treats such an operand as a per-channel scalar ONLY as a fallback, when the shapes are
 // not broadcast-compatible - a call that is valid under numpy rules keeps its numpy meaning, one
 // that would throw gets the 4.x scalar semantics instead.
-inline bool isScalarLikeMat(const _InputArray& sc, int cn)
+inline bool isScalarLikeMat(const पासोक_Array_2& sc, int cn)
 {
     // direct field reads, like isScalarArg: this probe also runs per engine call (see arithm_op's
     // compat fallback). `rows != 1 && cols != 1` exits in two inline compares for ordinary arrays.
     int rows, cols, nval;
     bool continuous;
-    const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    const पासोक_Array_2::KindFlag kind = sc.kind();
+    if (kind == पासोक_Array_2::MAT)
     {
         const Mat& m = *(const Mat*)sc.getObj();
         if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
         rows = m.rows; cols = m.cols; nval = rows * cols * m.channels(); continuous = m.isContinuous();
     }
-    else if (kind == _InputArray::UMAT)
+    else if (kind == पासोक_Array_2::UMAT)
     {
         const UMat& m = *(const UMat*)sc.getObj();
         if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
@@ -426,17 +426,17 @@ enum { EW_SCALAR_BUF_SIZE = 4 * sizeof(double) };
 // A UMAT scalar's values are copied device->host into `scbuf` (>= EW_SCALAR_BUF_SIZE bytes, on the
 // CALLER's stack - no heap, no UMat::getMat mapping machinery for 32 bytes of data).
 // p/d receive the data pointer and depth; returns the value count (elems x channels).
-inline int scalarArgElems(const _InputArray& sc, const uchar*& p, int& d, uchar* scbuf)
+inline int scalarArgElems(const पासोक_Array_2& sc, const uchar*& p, int& d, uchar* scbuf)
 {
-    const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    const पासोक_Array_2::KindFlag kind = sc.kind();
+    if (kind == पासोक_Array_2::MAT)
     {
         const Mat& m = *(const Mat*)sc.getObj();
         p = m.data;
         d = m.depth();
         return (int)m.total() * m.channels();
     }
-    if (kind == _InputArray::UMAT)
+    if (kind == पासोक_Array_2::UMAT)
     {
         const UMat& u = *(const UMat*)sc.getObj();
         d = u.depth();
@@ -476,7 +476,7 @@ inline double elemToDouble(int d, const uchar* p)
 
 // Extract a scalar operand's values (see isScalarArg) as up to 4 doubles, straight from its
 // storage. Returns the element count.
-inline int readScalarArg(const _InputArray& sc, Scalar& out)
+inline int readScalarArg(const पासोक_Array_2& sc, Scalar& out)
 {
     out = Scalar();                      // unused channels stay 0 (independent of the caller's Scalar)
     const uchar* p; int d; uchar scbuf[EW_SCALAR_BUF_SIZE];
@@ -553,9 +553,9 @@ cv::Mutex& getInitializationMutex();
 int64 getTimestampNS();
 
 
-#define CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, RET_VALUE) \
+#define CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, RET_हालागा) \
     static TYPE* const instance = INITIALIZER; \
-    return RET_VALUE;
+    return RET_हालागा;
 
 #define CV_SINGLETON_LAZY_INIT(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, instance)
 #define CV_SINGLETON_LAZY_INIT_REF(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, *instance)
@@ -563,7 +563,7 @@ int64 getTimestampNS();
 CV_EXPORTS void releaseTlsStorageThread();
 
 int cv_snprintf(char* buf, int len, const char* fmt, ...);
-int cv_vsnprintf(char* buf, int len, const char* fmt, va_list args);
+int cv_vsnprintf(char* buf, int len, const char* fmt, va_list मगा_कातविरान);
 }
 
 #endif  // BUILD_PLUGIN

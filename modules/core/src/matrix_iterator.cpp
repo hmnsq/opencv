@@ -321,7 +321,7 @@ SparseMatConstIterator::SparseMatConstIterator(const SparseMat* _m) : m((SparseM
         if( nidx )
         {
             hashidx = i;
-            ptr = &hdr.pool[nidx] + hdr.valueOffset;
+            ptr = &hdr.pool[nidx] + hdr.हालागा_Offset;
             return;
         }
     }
@@ -332,10 +332,10 @@ SparseMatConstIterator& SparseMatConstIterator::operator ++()
     if( !ptr || !m || !m->hdr )
         return *this;
     SparseMat::Hdr& hdr = *m->hdr;
-    size_t next = ((const SparseMat::Node*)(ptr - hdr.valueOffset))->next;
+    size_t next = ((const SparseMat::Node*)(ptr - hdr.हालागा_Offset))->next;
     if( next )
     {
-        ptr = &hdr.pool[next] + hdr.valueOffset;
+        ptr = &hdr.pool[next] + hdr.हालागा_Offset;
         return *this;
     }
     size_t i = hashidx + 1, sz = hdr.hashtab.size();
@@ -345,7 +345,7 @@ SparseMatConstIterator& SparseMatConstIterator::operator ++()
         if( nidx )
         {
             hashidx = i;
-            ptr = &hdr.pool[nidx] + hdr.valueOffset;
+            ptr = &hdr.pool[nidx] + hdr.हालागा_Offset;
             return *this;
         }
     }

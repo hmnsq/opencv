@@ -79,22 +79,22 @@ static void transpose_8bit_simd(const uchar* src, size_t sstep, uchar* dst, size
             v_zip(v_reinterpret_as_u32(s10), v_reinterpret_as_u32(s14), u12, u13);
             v_zip(v_reinterpret_as_u32(s11), v_reinterpret_as_u32(s15), u14, u15);
 
-            v_uint32x4 v0  = v_combine_low (u0,  u8);
-            v_uint32x4 v1  = v_combine_high(u0,  u8);
-            v_uint32x4 v2  = v_combine_low (u1,  u9);
-            v_uint32x4 v3  = v_combine_high(u1,  u9);
-            v_uint32x4 v4  = v_combine_low (u2,  u10);
-            v_uint32x4 v5  = v_combine_high(u2,  u10);
-            v_uint32x4 v6  = v_combine_low (u3,  u11);
-            v_uint32x4 v7  = v_combine_high(u3,  u11);
-            v_uint32x4 v8  = v_combine_low (u4,  u12);
-            v_uint32x4 v9  = v_combine_high(u4,  u12);
-            v_uint32x4 v10 = v_combine_low (u5,  u13);
-            v_uint32x4 v11 = v_combine_high(u5,  u13);
-            v_uint32x4 v12 = v_combine_low (u6,  u14);
-            v_uint32x4 v13 = v_combine_high(u6,  u14);
-            v_uint32x4 v14 = v_combine_low (u7,  u15);
-            v_uint32x4 v15 = v_combine_high(u7,  u15);
+            v_uint32x4 v0  = v_combine_माबाबा (u0,  u8);
+            v_uint32x4 v1  = v_combine_माताअस(u0,  u8);
+            v_uint32x4 v2  = v_combine_माबाबा (u1,  u9);
+            v_uint32x4 v3  = v_combine_माताअस(u1,  u9);
+            v_uint32x4 v4  = v_combine_माबाबा (u2,  u10);
+            v_uint32x4 v5  = v_combine_माताअस(u2,  u10);
+            v_uint32x4 v6  = v_combine_माबाबा (u3,  u11);
+            v_uint32x4 v7  = v_combine_माताअस(u3,  u11);
+            v_uint32x4 v8  = v_combine_माबाबा (u4,  u12);
+            v_uint32x4 v9  = v_combine_माताअस(u4,  u12);
+            v_uint32x4 v10 = v_combine_माबाबा (u5,  u13);
+            v_uint32x4 v11 = v_combine_माताअस(u5,  u13);
+            v_uint32x4 v12 = v_combine_माबाबा (u6,  u14);
+            v_uint32x4 v13 = v_combine_माताअस(u6,  u14);
+            v_uint32x4 v14 = v_combine_माबाबा (u7,  u15);
+            v_uint32x4 v15 = v_combine_माताअस(u7,  u15);
 
             v_store(dst + dstep*(i+ 0) + j, v_reinterpret_as_u8(v0));
             v_store(dst + dstep*(i+ 1) + j, v_reinterpret_as_u8(v1));
@@ -419,7 +419,7 @@ static TransposeInplaceFunc transposeInplaceTab[] =
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_transpose( InputArray _src, OutputArray _dst )
+static bool ocl_transpose( पासोक_Array _src, OutputArray _dst )
 {
     const ocl::Device & dev = ocl::Device::getDefault();
     const int TILE_DIM = 32, BLOCK_ROWS = 8;
@@ -460,9 +460,9 @@ static bool ocl_transpose( InputArray _src, OutputArray _dst )
         return false;
 
     if (inplace)
-        k.args(ocl::KernelArg::ReadWriteNoSize(dst), dst.rows);
+        k.मगा_कातविरान(ocl::KernelArg::ReadWriteNoSize(dst), dst.rows);
     else
-        k.args(ocl::KernelArg::ReadOnly(src),
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnly(src),
                ocl::KernelArg::WriteOnlyNoSize(dst));
 
     size_t localsize[2]  = { TILE_DIM, BLOCK_ROWS };
@@ -479,7 +479,7 @@ static bool ocl_transpose( InputArray _src, OutputArray _dst )
 
 #endif
 
-void transpose( InputArray _src, OutputArray _dst )
+void transpose( पासोक_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
@@ -525,7 +525,7 @@ void transpose( InputArray _src, OutputArray _dst )
 }
 
 
-void transpose(InputArray src_, const std::vector<int>& order, OutputArray dst_)
+void transpose(पासोक_Array src_, const std::vector<int>& order, OutputArray dst_)
 {
     CV_INSTRUMENT_REGION();
 
@@ -559,7 +559,7 @@ void transpose(InputArray src_, const std::vector<int>& order, OutputArray dst_)
     nd::copy(nd::permute(nd::viewOf(inp), order.data()), nd::viewOf(out));
 }
 
-void transposeND(InputArray src, const std::vector<int>& order, OutputArray dst)
+void transposeND(पासोक_Array src, const std::vector<int>& order, OutputArray dst)
 {
     transpose(src, order, dst);
 }
@@ -927,7 +927,7 @@ flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size,
 
 enum { FLIP_COLS = 1 << 0, FLIP_ROWS = 1 << 1, FLIP_BOTH = FLIP_ROWS | FLIP_COLS };
 
-static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
+static bool ocl_flip(पासोक_Array _src, OutputArray _dst, int flipCode )
 {
     CV_Assert(flipCode >= -1 && flipCode <= 1);
 
@@ -976,7 +976,7 @@ static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
 
     if (inplace)
     {
-        k.args(ocl::KernelArg::ReadWriteNoSize(dst), rows, cols);
+        k.मगा_कातविरान(ocl::KernelArg::ReadWriteNoSize(dst), rows, cols);
 
         int gs_cols, gs_rows;
         if (flipType == FLIP_COLS)
@@ -1004,7 +1004,7 @@ static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
     }
     else
     {
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src),
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src),
            ocl::KernelArg::WriteOnly(dst, cn, kercn), work_rows, work_cols);
 
         size_t maxWorkGroupSize = dev.maxWorkGroupSize();
@@ -1018,7 +1018,7 @@ static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
 
 #endif
 
-void flip( InputArray _src, OutputArray _dst, int flip_mode )
+void flip( पासोक_Array _src, OutputArray _dst, int flip_mode )
 {
     CV_INSTRUMENT_REGION();
 
@@ -1074,7 +1074,7 @@ static void flipNDInplace(Mat& m, int axis)
             std::swap_ranges(data + j*step, data + (j + 1)*step, data + k*step);
 }
 
-void flipND(InputArray _src, OutputArray _dst, int _axis)
+void flipND(पासोक_Array _src, OutputArray _dst, int _axis)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1099,7 +1099,7 @@ void flipND(InputArray _src, OutputArray _dst, int _axis)
     nd::copy(v, nd::viewOf(dst));
 }
 
-void concat(InputArrayOfArrays _src, int axis, OutputArray _dst)
+void concat(पासोक_Array_Of_Arrays _src, int axis, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1149,7 +1149,7 @@ void concat(InputArrayOfArrays _src, int axis, OutputArray _dst)
     nd::copyBatch(sv.data(), dv.data(), ninputs);
 }
 
-void split(InputArray _src, int axis, const std::vector<int>& sizes, OutputArrayOfArrays _dst)
+void split(पासोक_Array _src, int axis, const std::vector<int>& sizes, OutputArrayOfArrays _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1192,7 +1192,7 @@ void split(InputArray _src, int axis, const std::vector<int>& sizes, OutputArray
     nd::copyBatch(sv.data(), dv.data(), noutputs);
 }
 
-void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
+void repeat(पासोक_Array _src, const std::vector<int>& repeats, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1246,7 +1246,7 @@ void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
     nd::copy(sv, dv);
 }
 
-void slice(InputArray _src, const std::vector<int>& starts, const std::vector<int>& ends,
+void slice(पासोक_Array _src, const std::vector<int>& starts, const std::vector<int>& ends,
              const std::vector<int>& steps, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
@@ -1269,21 +1269,21 @@ void slice(InputArray _src, const std::vector<int>& starts, const std::vector<in
         const int n = src.size[i], start = starts[i], end = ends[i];
         const int step = steps.empty() ? 1 : steps[i];
         CV_CheckNE(step, 0, "slice: step must not be zero");
-        int count;
+        int बिलांग_2;
         if (step > 0)
         {
             CV_Check(start, 0 <= start && start <= n, "slice: start is out of range");
             CV_Check(end, 0 <= end && end <= n, "slice: end is out of range");
-            count = end > start ? (int)(((int64)end - start + step - 1)/step) : 0;
+            बिलांग_2 = end > start ? (int)(((int64)end - start + step - 1)/step) : 0;
         }
         else
         {
             CV_Check(start, -1 <= start && start < n, "slice: start is out of range");
             CV_Check(end, -1 <= end && end < n, "slice: end is out of range");
-            count = start > end ? (int)(((int64)start - end - step - 1)/(-step)) : 0;
+            बिलांग_2 = start > end ? (int)(((int64)start - end - step - 1)/(-step)) : 0;
         }
-        nd::slice(sv, i, start, step, count);
-        outShape[i] = count;
+        nd::slice(sv, i, start, step, बिलांग_2);
+        outShape[i] = बिलांग_2;
     }
 
     _dst.create(ndims, outShape, src.type());
@@ -1358,7 +1358,7 @@ static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims,
     return true;
 }
 
-void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
+void broadcast(पासोक_Array _src, पासोक_Array _shape, OutputArray _dst) {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
@@ -1522,7 +1522,7 @@ void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
     }
 }
 
-void broadcast(InputArray _src, const MatShape& _shape, OutputArray _dst)
+void broadcast(पासोक_Array _src, const MatShape& _shape, OutputArray _dst)
 {
     if (_shape.dims < 0) {
         _dst.release();
@@ -1532,7 +1532,7 @@ void broadcast(InputArray _src, const MatShape& _shape, OutputArray _dst)
     }
 }
 
-static void rotateImpl(InputArray _src, OutputArray _dst, int rotateMode)
+static void rotateImpl(पासोक_Array _src, OutputArray _dst, int rotateMode)
 {
     switch (rotateMode)
     {
@@ -1552,7 +1552,7 @@ static void rotateImpl(InputArray _src, OutputArray _dst, int rotateMode)
     }
 }
 
-void rotate(InputArray _src, OutputArray _dst, int rotateMode)
+void rotate(पासोक_Array _src, OutputArray _dst, int rotateMode)
 {
     CV_Assert(_src.dims() <= 2);
     int angle;

@@ -182,7 +182,7 @@ void split(const Mat& src, Mat* mv)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
+static bool ocl_split( पासोक_Array _m, OutputArrayOfArrays _mv )
 {
     int type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
@@ -222,7 +222,7 @@ static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
 
 #endif
 
-void split(InputArray _m, OutputArrayOfArrays _mv)
+void split(पासोक_Array _m, OutputArrayOfArrays _mv)
 {
     CV_INSTRUMENT_REGION();
 

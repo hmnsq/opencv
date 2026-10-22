@@ -241,8 +241,8 @@ private:
 
 }
 
-double cv::kmeans( InputArray _data, int K,
-                   InputOutputArray _bestLabels,
+double cv::kmeans( पासोक_Array _data, int K,
+                   पासोक_Output_Array _bestLabels,
                    TermCriteria criteria, int attempts,
                    int flags, OutputArray _centers )
 {
@@ -300,15 +300,15 @@ double cv::kmeans( InputArray _data, int K,
         criteria.epsilon = FLT_EPSILON;
     criteria.epsilon *= criteria.epsilon;
 
-    if (criteria.type & TermCriteria::COUNT)
-        criteria.maxCount = std::min(std::max(criteria.maxCount, 2), 100);
+    if (criteria.type & TermCriteria::बिलांग_3)
+        criteria.max_बिलांग = std::min(std::max(criteria.max_बिलांग, 2), 100);
     else
-        criteria.maxCount = 100;
+        criteria.max_बिलांग = 100;
 
     if (K == 1)
     {
         attempts = 1;
-        criteria.maxCount = 2;
+        criteria.max_बिलांग = 2;
     }
 
     cv::AutoBuffer<Vec2f, 64> box(dims);
@@ -448,7 +448,7 @@ double cv::kmeans( InputArray _data, int K,
                 }
             }
 
-            bool isLastIter = (++iter == MAX(criteria.maxCount, 2) || max_center_shift <= criteria.epsilon);
+            bool isLastIter = (++iter == MAX(criteria.max_बिलांग, 2) || max_center_shift <= criteria.epsilon);
 
             if (isLastIter)
             {

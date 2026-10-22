@@ -13,7 +13,7 @@ CL_RUNTIME_EXPORT cl_mem (CL_API_CALL*clCreateImage2D_pfn)(cl_context, cl_mem_fl
 CL_RUNTIME_EXPORT cl_mem (CL_API_CALL*clCreateImage3D_pfn)(cl_context, cl_mem_flags, const cl_image_format*, size_t, size_t, size_t, size_t, size_t, void*, cl_int*) = clCreateImage3D;
 CL_RUNTIME_EXPORT cl_kernel (CL_API_CALL*clCreateKernel_pfn)(cl_program, const char*, cl_int*) = clCreateKernel;
 CL_RUNTIME_EXPORT cl_int (CL_API_CALL*clCreateKernelsInProgram_pfn)(cl_program, cl_uint, cl_kernel*, cl_uint*) = clCreateKernelsInProgram;
-CL_RUNTIME_EXPORT cl_program (CL_API_CALL*clCreateProgramWithBinary_pfn)(cl_context, cl_uint, const cl_device_id*, const size_t*, const unsigned char**, cl_int*, cl_int*) = clCreateProgramWithBinary;
+CL_RUNTIME_EXPORT cl_program (CL_API_CALL*cl_Create_Program_With_दालावाहान_pfn)(cl_context, cl_uint, const cl_device_id*, const size_t*, const unsigned char**, cl_int*, cl_int*) = cl_Create_Program_With_दालावाहान;
 CL_RUNTIME_EXPORT cl_program (CL_API_CALL*clCreateProgramWithBuiltInKernels_pfn)(cl_context, cl_uint, const cl_device_id*, const char*, cl_int*) = clCreateProgramWithBuiltInKernels;
 CL_RUNTIME_EXPORT cl_program (CL_API_CALL*clCreateProgramWithSource_pfn)(cl_context, cl_uint, const char**, const size_t*, cl_int*) = clCreateProgramWithSource;
 CL_RUNTIME_EXPORT cl_sampler (CL_API_CALL*clCreateSampler_pfn)(cl_context, cl_bool, cl_addressing_mode, cl_filter_mode, cl_int*) = clCreateSampler;

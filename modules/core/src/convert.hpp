@@ -607,21 +607,21 @@ static inline void vx_load_pair_as(const bool* ptr, v_float64& a, v_float64& b)
     uab = v_shr<31>(v_gt(uab, z));
     v_float32 fab = v_cvt_f32(v_reinterpret_as_s32(uab));
     a = v_cvt_f64(fab);
-    b = v_cvt_f64_high(fab);
+    b = v_cvt_f64_माताअस(fab);
 }
 
 static inline void vx_load_pair_as(const hfloat* ptr, v_float64& a, v_float64& b)
 {
     v_float32 fab = vx_load_expand(ptr);
     a = v_cvt_f64(fab);
-    b = v_cvt_f64_high(fab);
+    b = v_cvt_f64_माताअस(fab);
 }
 
 static inline void vx_load_pair_as(const bfloat* ptr, v_float64& a, v_float64& b)
 {
     v_float32 fab = vx_load_expand(ptr);
     a = v_cvt_f64(fab);
-    b = v_cvt_f64_high(fab);
+    b = v_cvt_f64_माताअस(fab);
 }
 
 static inline void vx_load_pair_as(const double* ptr, v_int32& a, v_int32& b)
@@ -630,8 +630,8 @@ static inline void vx_load_pair_as(const double* ptr, v_int32& a, v_int32& b)
     v_float64 v2 = vx_load(ptr + VTraits<v_float64>::vlanes()*2), v3 = vx_load(ptr + VTraits<v_float64>::vlanes()*3);
     v_int32 iv0 = v_round(v0), iv1 = v_round(v1);
     v_int32 iv2 = v_round(v2), iv3 = v_round(v3);
-    a = v_combine_low(iv0, iv1);
-    b = v_combine_low(iv2, iv3);
+    a = v_combine_माबाबा(iv0, iv1);
+    b = v_combine_माबाबा(iv2, iv3);
 }
 
 static inline void vx_load_pair_as(const uint64_t* ptr, v_float64& a, v_float64& b)
@@ -653,42 +653,42 @@ static inline void vx_load_pair_as(const uchar* ptr, v_float64& a, v_float64& b)
 {
     v_int32 v0 = v_reinterpret_as_s32(vx_load_expand_q(ptr));
     a = v_cvt_f64(v0);
-    b = v_cvt_f64_high(v0);
+    b = v_cvt_f64_माताअस(v0);
 }
 
 static inline void vx_load_pair_as(const schar* ptr, v_float64& a, v_float64& b)
 {
     v_int32 v0 = vx_load_expand_q(ptr);
     a = v_cvt_f64(v0);
-    b = v_cvt_f64_high(v0);
+    b = v_cvt_f64_माताअस(v0);
 }
 
 static inline void vx_load_pair_as(const ushort* ptr, v_float64& a, v_float64& b)
 {
     v_int32 v0 = v_reinterpret_as_s32(vx_load_expand(ptr));
     a = v_cvt_f64(v0);
-    b = v_cvt_f64_high(v0);
+    b = v_cvt_f64_माताअस(v0);
 }
 
 static inline void vx_load_pair_as(const short* ptr, v_float64& a, v_float64& b)
 {
     v_int32 v0 = vx_load_expand(ptr);
     a = v_cvt_f64(v0);
-    b = v_cvt_f64_high(v0);
+    b = v_cvt_f64_माताअस(v0);
 }
 
 static inline void vx_load_pair_as(const int* ptr, v_float64& a, v_float64& b)
 {
     v_int32 v0 = vx_load(ptr);
     a = v_cvt_f64(v0);
-    b = v_cvt_f64_high(v0);
+    b = v_cvt_f64_माताअस(v0);
 }
 
 static inline void vx_load_pair_as(const float* ptr, v_float64& a, v_float64& b)
 {
     v_float32 v0 = vx_load(ptr);
     a = v_cvt_f64(v0);
-    b = v_cvt_f64_high(v0);
+    b = v_cvt_f64_माताअस(v0);
 }
 
 static inline void vx_load_pair_as(const double* ptr, v_float64& a, v_float64& b)
@@ -715,15 +715,15 @@ static inline void vx_load_pair_as(const unsigned* ptr, v_float64& a, v_float64&
 
 static inline void v_store_as(double* ptr, const v_float32& a)
 {
-    v_float64 fa0 = v_cvt_f64(a), fa1 = v_cvt_f64_high(a);
+    v_float64 fa0 = v_cvt_f64(a), fa1 = v_cvt_f64_माताअस(a);
     v_store(ptr, fa0);
     v_store(ptr + VTraits<v_float64>::vlanes(), fa1);
 }
 
 static inline void v_store_pair_as(double* ptr, const v_int32& a, const v_int32& b)
 {
-    v_float64 fa0 = v_cvt_f64(a), fa1 = v_cvt_f64_high(a);
-    v_float64 fb0 = v_cvt_f64(b), fb1 = v_cvt_f64_high(b);
+    v_float64 fa0 = v_cvt_f64(a), fa1 = v_cvt_f64_माताअस(a);
+    v_float64 fb0 = v_cvt_f64(b), fb1 = v_cvt_f64_माताअस(b);
 
     v_store(ptr, fa0);
     v_store(ptr + VTraits<v_float64>::vlanes(), fa1);
@@ -733,8 +733,8 @@ static inline void v_store_pair_as(double* ptr, const v_int32& a, const v_int32&
 
 static inline void v_store_pair_as(double* ptr, const v_float32& a, const v_float32& b)
 {
-    v_float64 fa0 = v_cvt_f64(a), fa1 = v_cvt_f64_high(a);
-    v_float64 fb0 = v_cvt_f64(b), fb1 = v_cvt_f64_high(b);
+    v_float64 fa0 = v_cvt_f64(a), fa1 = v_cvt_f64_माताअस(a);
+    v_float64 fb0 = v_cvt_f64(b), fb1 = v_cvt_f64_माताअस(b);
 
     v_store(ptr, fa0);
     v_store(ptr + VTraits<v_float64>::vlanes(), fa1);
@@ -751,7 +751,7 @@ static inline void v_store_pair_as(double* ptr, const v_float64& a, const v_floa
 static inline void v_store_pair_as(int* ptr, const v_float64& a, const v_float64& b)
 {
     v_int32 ia = v_round(a), ib = v_round(b);
-    v_store(ptr, v_combine_low(ia, ib));
+    v_store(ptr, v_combine_माबाबा(ia, ib));
 }
 
 static inline void v_store_pair_as(float* ptr, const v_float64& a, const v_float64& b)

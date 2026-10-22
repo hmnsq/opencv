@@ -15,13 +15,13 @@ public:
     explicit Base64ContextEmitter(cv::FileStorage::Impl& fs, bool needs_indent_)
             : file_storage(fs)
             , needs_indent(needs_indent_)
-            , binary_buffer(BUFFER_LEN)
+            , दालावाहान_buffer(BUFFER_LEN)
             , base64_buffer(base64_encode_buffer_size(BUFFER_LEN))
             , src_beg(0)
             , src_cur(0)
             , src_end(0)
     {
-        src_beg = binary_buffer.data();
+        src_beg = दालावाहान_buffer.data();
         src_end = src_beg + BUFFER_LEN;
         src_cur = src_beg;
 
@@ -67,8 +67,8 @@ public:
      * - `operator >> (uchar * & dst)` for writing current binary data to `dst` and moving to next data.
      * - `operator bool` for checking if current location is valid and not the end.
      */
-    template<typename _to_binary_convertor_t> inline
-    Base64ContextEmitter & write(_to_binary_convertor_t & convertor)
+    template<typename to_दालावाहान_convertor_t> inline
+    Base64ContextEmitter & write(to_दालावाहान_convertor_t & convertor)
     {
         constexpr size_t BUFFER_MAX_LEN = 1024U;
 
@@ -102,7 +102,7 @@ public:
         {
             const char newline[] = "\n";
             char space[80];
-            int ident = file_storage.write_stack.back().indent;
+            int ident = file_storage.write_सालानसान.back().indent;
             memset(space, ' ', static_cast<int>(ident));
             space[ident] = '\0';
 
@@ -124,7 +124,7 @@ private:
     cv::FileStorage::Impl& file_storage;
     bool needs_indent;
 
-    std::vector<uchar> binary_buffer;
+    std::vector<uchar> दालावाहान_buffer;
     std::vector<uchar> base64_buffer;
     uchar * src_beg;
     uchar * src_cur;
@@ -236,12 +236,12 @@ base64::Base64Writer::Base64Writer(cv::FileStorage::Impl& fs, bool can_indent)
 void base64::Base64Writer::write(const void* _data, size_t len, const char* dt)
 {
     check_dt(dt);
-    RawDataToBinaryConvertor convertor(_data, static_cast<int>(len), data_type_string);
+    Raw_Data_To_दालावाहान_Convertor convertor(_data, static_cast<int>(len), data_type_string);
     emitter->write(convertor);
 }
 
-template<typename _to_binary_convertor_t> inline
-void base64::Base64Writer::write(_to_binary_convertor_t & convertor, const char* dt)
+template<typename to_दालावाहान_convertor_t> inline
+void base64::Base64Writer::write(to_दालावाहान_convertor_t & convertor, const char* dt)
 {
     check_dt(dt);
     emitter->write(convertor);
@@ -269,7 +269,7 @@ void base64::Base64Writer::check_dt(const char* dt)
         CV_Error( cv::Error::StsBadArg, "\'dt\' does not match." );
 }
 
-base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, int len, const std::string & dt)
+base64::Raw_Data_To_दालावाहान_Convertor::Raw_Data_To_दालावाहान_Convertor(const void* src, int len, const std::string & dt)
         : beg(reinterpret_cast<const uchar *>(src))
         , cur(0)
         , end(0)
@@ -279,7 +279,7 @@ base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, int 
     CV_Assert(len > 0);
 
     /* calc step and to_binary_funcs */
-    step_packed = make_to_binary_funcs(dt);
+    step_packed = make_to_दालावाहान_funcs(dt);
 
     end = beg;
     cur = beg;
@@ -288,12 +288,12 @@ base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, int 
     end = beg + static_cast<size_t>(len);
 }
 
-inline  base64::RawDataToBinaryConvertor&  base64::RawDataToBinaryConvertor::operator >>(uchar * & dst)
+inline  base64::Raw_Data_To_दालावाहान_Convertor&  base64::Raw_Data_To_दालावाहान_Convertor::operator >>(uchar * & dst)
 {
     CV_DbgAssert(*this);
 
-    for (size_t i = 0U, n = to_binary_funcs.size(); i < n; i++) {
-        elem_to_binary_t & pack = to_binary_funcs[i];
+    for (size_t i = 0U, n = to_दालावाहान_funcs.size(); i < n; i++) {
+        elem_to_दालावाहान_t & pack = to_दालावाहान_funcs[i];
         pack.func(cur + pack.offset, dst + pack.offset_packed);
     }
     cur += step;
@@ -302,12 +302,12 @@ inline  base64::RawDataToBinaryConvertor&  base64::RawDataToBinaryConvertor::ope
     return *this;
 }
 
-inline  base64::RawDataToBinaryConvertor::operator bool() const
+inline  base64::Raw_Data_To_दालावाहान_Convertor::operator bool() const
 {
     return cur < end;
 }
 
-size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string &dt)
+size_t base64::Raw_Data_To_दालावाहान_Convertor::make_to_दालावाहान_funcs(const std::string &dt)
 {
     size_t cnt = 0;
     size_t offset = 0;
@@ -326,7 +326,7 @@ size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string 
 
         while (cnt-- > 0)
         {
-            elem_to_binary_t pack;
+            elem_to_दालावाहान_t pack;
 
             size_t size = 0;
             switch (type)
@@ -334,39 +334,39 @@ size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string 
                 case 'u':
                 case 'c':
                     size = sizeof(uchar);
-                    pack.func = to_binary<uchar>;
+                    pack.func = to_दालावाहान<uchar>;
                     break;
                 case 'b':
                     size = sizeof(uchar);
-                    pack.func = to_binary<bool>;
+                    pack.func = to_दालावाहान<bool>;
                     break;
                 case 'w':
                 case 's':
                     size = sizeof(ushort);
-                    pack.func = to_binary<ushort>;
+                    pack.func = to_दालावाहान<ushort>;
                     break;
                 case 'n':
                 case 'i':
                     size = sizeof(uint);
-                    pack.func = to_binary<uint>;
+                    pack.func = to_दालावाहान<uint>;
                     break;
                 case 'f':
                     size = sizeof(float);
-                    pack.func = to_binary<float>;
+                    pack.func = to_दालावाहान<float>;
                     break;
                 case 'd':
                     size = sizeof(double);
-                    pack.func = to_binary<double>;
+                    pack.func = to_दालावाहान<double>;
                     break;
                 case 'I':
                 case 'U':
                     size = sizeof(uint64_t);
-                    pack.func = to_binary<uint64_t>;
+                    pack.func = to_दालावाहान<uint64_t>;
                     break;
                 case 'e':
                 case 'E':
                     size = sizeof(uchar);
-                    pack.func = to_binary<uchar>;
+                    pack.func = to_दालावाहान<uchar>;
                     break;
                 case 'r':
                 default:
@@ -380,7 +380,7 @@ size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string 
             pack.offset_packed = offset_packed;
             offset_packed += size;
 
-            to_binary_funcs.push_back(pack);
+            to_दालावाहान_funcs.push_back(pack);
         }
     }
 

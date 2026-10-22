@@ -20,7 +20,7 @@ static HasNonZeroFunc getHasNonZeroFunc(int depth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_hasNonZero( InputArray _src, bool & res )
+static bool ocl_hasNonZero( पासोक_Array _src, bool & res )
 {
     int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
     bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
@@ -47,7 +47,7 @@ static bool ocl_hasNonZero( InputArray _src, bool & res )
         return false;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
@@ -57,7 +57,7 @@ static bool ocl_hasNonZero( InputArray _src, bool & res )
 }
 #endif
 
-bool hasNonZero(InputArray _src)
+bool hasNonZero(पासोक_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
@@ -82,7 +82,7 @@ bool hasNonZero(InputArray _src)
         if (src.isContinuous())
             res |= func(src.ptr<uchar>(0), src.total());
         else
-            for(int row = 0, rowsCount = src.rows ; !res && (row<rowsCount) ; ++row)
+            for(int row = 0, rows_बिलांग = src.rows ; !res && (row<rows_बिलांग) ; ++row)
                 res |= func(src.ptr<uchar>(row), src.cols);
     }
     else//if (src.dims != 2)
@@ -96,7 +96,7 @@ bool hasNonZero(InputArray _src)
             if (plane.isContinuous())
                 res |= func(plane.ptr<uchar>(0), plane.total());
             else
-              for(int row = 0, rowsCount = plane.rows ; !res && (row<rowsCount) ; ++row)
+              for(int row = 0, rows_बिलांग = plane.rows ; !res && (row<rows_बिलांग) ; ++row)
                   res |= func(plane.ptr<uchar>(row), plane.cols);
         }
     }

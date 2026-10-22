@@ -18,18 +18,18 @@ LogTagConfigParser::LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel)
     m_parsedGlobal.level = defaultUnconfiguredGlobalLevel;
 }
 
-LogTagConfigParser::LogTagConfigParser(const std::string& input)
+LogTagConfigParser::LogTagConfigParser(const std::string& पासोक_2)
 {
-    parse(input);
+    parse(पासोक_2);
 }
 
 LogTagConfigParser::~LogTagConfigParser()
 {
 }
 
-bool LogTagConfigParser::parse(const std::string& input)
+bool LogTagConfigParser::parse(const std::string& पासोक_2)
 {
-    m_input = input;
+    m_पासोक = पासोक_2;
     segmentTokens();
     return (m_malformed.empty());
 }
@@ -66,12 +66,12 @@ const std::vector<std::string>& LogTagConfigParser::getMalformed() const
 
 void LogTagConfigParser::segmentTokens()
 {
-    const size_t len = m_input.length();
+    const size_t len = m_पासोक.length();
     std::vector<std::pair<size_t, size_t>> startStops;
     bool wasSeparator = true;
     for (size_t pos = 0u; pos < len; ++pos)
     {
-        char c = m_input[pos];
+        char c = m_पासोक[pos];
         bool isSeparator = (c == ' ' || c == '\t' || c == ';');
         if (!isSeparator)
         {
@@ -88,7 +88,7 @@ void LogTagConfigParser::segmentTokens()
     }
     for (const auto& startStop : startStops)
     {
-        const auto s = m_input.substr(startStop.first, startStop.second - startStop.first);
+        const auto s = m_पासोक.substr(startStop.first, startStop.second - startStop.first);
         parseNameAndLevel(s);
     }
 }

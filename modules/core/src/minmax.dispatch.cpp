@@ -146,8 +146,8 @@ void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
 typedef void (*getMinMaxResFunc)(const Mat & db, double * minVal, double * maxVal,
                                  int * minLoc, int *maxLoc, int gropunum, int cols, double * maxVal2);
 
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                   int ddepth, bool absValues, InputArray _src2, double * maxVal2)
+bool ocl_minMaxIdx( पासोक_Array _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, पासोक_Array _mask,
+                   int ddepth, bool abs_मगा_हालागा, पासोक_Array _src2, double * maxVal2)
 {
     const ocl::Device & dev = ocl::Device::getDefault();
 
@@ -163,7 +163,7 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
     }
 
     bool doubleSupport = dev.doubleFPConfig() > 0, haveMask = !_mask.empty(),
-    haveSrc2 = _src2.kind() != _InputArray::NONE;
+    haveSrc2 = _src2.kind() != पासोक_Array_2::NONE;
     int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
     kercn = haveMask ? cn : std::min(4, ocl::predictOptimalVectorWidth(_src, _src2));
 
@@ -224,7 +224,7 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
                          needMinLoc ? " -D NEED_MINLOC" : "", needMaxLoc ? " -D NEED_MAXLOC" : "",
                          ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKE_TYPE(ddepth, kercn)),
                          ocl::convertTypeStr(depth, ddepth, kercn, cvt[0], sizeof(cvt[0])),
-                         absValues ? " -D OP_ABS" : "",
+                         abs_मगा_हालागा ? " -D OP_ABS" : "",
                          haveSrc2 ? " -D HAVE_SRC2" : "", maxVal2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "", ddepth,
                          depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], sizeof(cvt[1])) : "noconvert",
@@ -250,20 +250,20 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
     if (haveSrc2)
     {
         if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+            k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(src2));
         else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+            k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask),
                    ocl::KernelArg::ReadOnlyNoSize(src2));
     }
     else
     {
         if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+            k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db));
         else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+            k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask));
     }
 
@@ -299,9 +299,9 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
 }
 
 // serial implementation, also used for the pieces of the parallel version
-static void minMaxIdx_(cv::InputArray _src, double* minVal,
+static void minMaxIdx_(cv::पासोक_Array _src, double* minVal,
                        double* maxVal, int* minIdx, int* maxIdx,
-                       cv::InputArray _mask)
+                       cv::पासोक_Array _mask)
 {
     using namespace cv;
     int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
@@ -391,9 +391,9 @@ static void minMaxIdx_(cv::InputArray _src, double* minVal,
         ofs2idx(src, maxidx, maxIdx);
 }
 
-void cv::minMaxIdx(InputArray _src, double* minVal,
+void cv::minMaxIdx(पासोक_Array _src, double* minVal,
                    double* maxVal, int* minIdx, int* maxIdx,
-                   InputArray _mask)
+                   पासोक_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -402,10 +402,10 @@ void cv::minMaxIdx(InputArray _src, double* minVal,
     {
         Mat src = _src.getMat(), mask = _mask.getMat();
         const int cn = src.channels();
-        const bool argsOk = (cn == 1 && (mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S ||
+        const bool मगा_कातविरान_Ok = (cn == 1 && (mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S ||
                              mask.type() == CV_Bool) && src.size == mask.size))) ||
                             (cn > 1 && mask.empty() && !minIdx && !maxIdx);
-        if (argsOk && splitForParallelStat(src, mask, chunks))
+        if (मगा_कातविरान_Ok && splitForParallelStat(src, mask, chunks))
         {
             const int n = (int)chunks.size();
             std::vector<double> mn(n), mx(n);
@@ -446,8 +446,8 @@ void cv::minMaxIdx(InputArray _src, double* minVal,
     minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, _mask);
 }
 
-void cv::minMaxLoc( InputArray _img, double* minVal, double* maxVal,
-                    Point* minLoc, Point* maxLoc, InputArray mask )
+void cv::minMaxLoc( पासोक_Array _img, double* minVal, double* maxVal,
+                    Point* minLoc, Point* maxLoc, पासोक_Array mask )
 {
     CV_INSTRUMENT_REGION();
 
@@ -541,7 +541,7 @@ struct reduceMinMaxImpl
     }
 };
 
-static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mode, int axis)
+static void reduceMinMax(cv::पासोक_Array src, cv::OutputArray dst, ReduceMode mode, int axis)
 {
     CV_INSTRUMENT_REGION();
 
@@ -578,12 +578,12 @@ static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mod
     }
 }
 
-void cv::reduceArgMin(InputArray src, OutputArray dst, int axis, bool lastIndex)
+void cv::reduceArgMin(पासोक_Array src, OutputArray dst, int axis, bool lastIndex)
 {
     reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MIN : ReduceMode::FIRST_MIN, axis);
 }
 
-void cv::reduceArgMax(InputArray src, OutputArray dst, int axis, bool lastIndex)
+void cv::reduceArgMax(पासोक_Array src, OutputArray dst, int axis, bool lastIndex)
 {
     reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MAX : ReduceMode::FIRST_MAX, axis);
 }

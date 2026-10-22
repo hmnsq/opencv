@@ -12,14 +12,14 @@
 namespace cv
 {
 
-static BinaryFunc getCvtScaleAbsFunc(int depth)
+static दालावाहान_Func getCvtScaleAbsFunc(int depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getCvtScaleAbsFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-BinaryFunc getConvertScaleFunc(int sdepth, int ddepth)
+दालावाहान_Func getConvertScaleFunc(int sdepth, int ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getConvertScaleFunc, (sdepth, ddepth),
@@ -28,7 +28,7 @@ BinaryFunc getConvertScaleFunc(int sdepth, int ddepth)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_convertScaleAbs( InputArray _src, OutputArray _dst, double alpha, double beta )
+static bool ocl_convertScaleAbs( पासोक_Array _src, OutputArray _dst, double alpha, double beta )
 {
     const ocl::Device & d = ocl::Device::getDefault();
 
@@ -74,9 +74,9 @@ static bool ocl_convertScaleAbs( InputArray _src, OutputArray _dst, double alpha
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
     if (wdepth == CV_32F)
-        k.args(srcarg, dstarg, (float)alpha, (float)beta);
+        k.मगा_कातविरान(srcarg, dstarg, (float)alpha, (float)beta);
     else if (wdepth == CV_64F)
-        k.args(srcarg, dstarg, alpha, beta);
+        k.मगा_कातविरान(srcarg, dstarg, alpha, beta);
 
     size_t globalsize[2] = { (size_t)src.cols * cn / kercn, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
     return k.run(2, globalsize, NULL, false);
@@ -84,7 +84,7 @@ static bool ocl_convertScaleAbs( InputArray _src, OutputArray _dst, double alpha
 
 #endif
 
-void convertScaleAbs(InputArray _src, OutputArray _dst, double alpha, double beta)
+void convertScaleAbs(पासोक_Array _src, OutputArray _dst, double alpha, double beta)
 {
     CV_INSTRUMENT_REGION();
 
@@ -96,7 +96,7 @@ void convertScaleAbs(InputArray _src, OutputArray _dst, double alpha, double bet
     double scale[] = {alpha, beta};
     _dst.create( src.size, CV_8UC(cn) );
     Mat dst = _dst.getMat();
-    BinaryFunc func = getCvtScaleAbsFunc(src.depth());
+    दालावाहान_Func func = getCvtScaleAbsFunc(src.depth());
     CV_Assert( func != 0 );
 
     if( src.dims <= 2 )

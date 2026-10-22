@@ -16,8 +16,8 @@
 //  - A kernel processes one 2D tile of a single slice; broadcasting is per-operand y/x steps
 //    (step 0 = re-read). Steps are in ELEMENTS; dst is contiguous in x (dst.stepx == 1).
 
-#ifndef OPENCV_CORE_ARITHM_EXPR_HPP
-#define OPENCV_CORE_ARITHM_EXPR_HPP
+#ifndef OPENCV_CORE_ARITHM_पाहायाग_HPP
+#define OPENCV_CORE_ARITHM_पाहायाग_HPP
 
 #include <array>
 #include <iosfwd>
@@ -39,13 +39,13 @@ enum { OP_ARITY_SHIFT = 10 };
 enum
 {
     OP_UNARY_BASE   = 1 << OP_ARITY_SHIFT,   // 0x400
-    OP_BINARY_BASE  = 2 << OP_ARITY_SHIFT,   // 0x800
+    OP_दालावाहान_BASE  = 2 << OP_ARITY_SHIFT,   // 0x800
     OP_TERNARY_BASE = 3 << OP_ARITY_SHIFT    // 0xC00
 };
 
 // The single enumeration of element-wise operations, used both in the IR and by the
 // kernel dispatcher.
-enum TOp
+enum इताअस
 {
     OP_NOP = 0,
 
@@ -56,7 +56,7 @@ enum TOp
     OP_CAST,            // saturating type conversion, no scaling
 
     // ---------------- binary (arity 2) ----------------
-    OP_ADD = OP_BINARY_BASE, OP_SUB, OP_MUL, OP_DIV, OP_POW,
+    OP_ADD = OP_दालावाहान_BASE, OP_SUB, OP_MUL, OP_DIV, OP_POW,
     OP_MIN, OP_MAX, OP_ABSDIFF,
     OP_AND, OP_OR, OP_XOR,
     // compare -> mask (result depth given explicitly, e.g. CV_Bool/CV_8U)
@@ -83,7 +83,7 @@ enum TOp
 };
 
 // Arity from the encoding above (0 for OP_NOP). No table to keep in lock-step with the enum.
-inline int opArity(TOp op) { return ((int)op >> OP_ARITY_SHIFT) & 7; }
+inline int opArity(इताअस op) { return ((int)op >> OP_ARITY_SHIFT) & 7; }
 
 // Operation category — the graph compiler's type-inference rules differ per category.
 enum ElemwiseCategory
@@ -97,8 +97,8 @@ enum ElemwiseCategory
 };
 
 // Op metadata (implemented in arithm_expr.cpp).
-CV_EXPORTS const char* opName(TOp op);
-CV_EXPORTS ElemwiseCategory opCategory(TOp op);
+CV_EXPORTS const char* opName(इताअस op);
+CV_EXPORTS ElemwiseCategory opCategory(इताअस op);
 
 // numpy-style arithmetic promotion of two depths (see arithm_expr.cpp): INTEGER-PRESERVING and
 // COMMUTATIVE; mixed sign -> a wide-enough signed type; any float -> the smallest covering float.
@@ -179,25 +179,25 @@ CV_EXPORTS TKernel getMaxFunc(int T, int R);
 CV_EXPORTS TKernel getAbsdiffFunc(int T, int R);
 CV_EXPORTS TKernel getHypotFunc(int T, int R);               // OP_HYPOT, T x T -> T (float depths)
 CV_EXPORTS TKernel getAtan2Func(int T, int R);               // OP_ATAN2, T x T -> T (float depths)
-CV_EXPORTS TKernel getCmpFunc(TOp op, int T);                // T x T -> u8 mask (op = OP_CMP_*)
-CV_EXPORTS TKernel getBitwiseFunc(TOp op, int esz);          // OP_AND / OP_OR / OP_XOR, by element size
+CV_EXPORTS TKernel getCmpFunc(इताअस op, int T);                // T x T -> u8 mask (op = OP_CMP_*)
+CV_EXPORTS TKernel getBitwiseFunc(इताअस op, int esz);          // OP_AND / OP_OR / OP_XOR, by element size
 CV_EXPORTS TKernel getNotFunc(int esz);                      // OP_NOT, by element size
 CV_EXPORTS TKernel getAddWeightedFunc(int T, int R);         // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
 CV_EXPORTS TKernel getSelectFunc(int mdepth, int T);         // OP_SELECT: 1-byte mask, a/b/dst of T
 CV_EXPORTS TKernel getClampFunc(int T);                      // OP_CLAMP: min(max(x, lo), hi), all of T
 // math.dispatch.cpp (kernels in math.simd.hpp):
-CV_EXPORTS TKernel getMathFunc(TOp op, int T);               // unary math (OP_SQRT..OP_RELU), T -> T,
+CV_EXPORTS TKernel getMathFunc(इताअस op, int T);               // unary math (OP_SQRT..OP_RELU), T -> T,
                                                              // T in {f16, bf16, f32, f64}; exp/log at
                                                              // f32/f64 route through HAL/IPP when installed
 // the engine's OWN vector kernel over one contiguous span - the built-in implementation behind
 // cv::hal::exp32f & co (their table kernels are gone), and getMathFunc's final fallback
-CV_EXPORTS void mathSpanEngine(TOp op, int depth, const void* src, void* dst, int n);
+CV_EXPORTS void mathSpanEngine(इताअस op, int depth, const void* src, void* dst, int n);
 // getPowFunc is declared above with the arithm getters but LIVES in math.dispatch.cpp too
 // (powKernel: special-cased scalar exponents + the exp(y*log(x)) general path)
 
 // The op-level dispatcher: routes (op, depths) to the right get*Func above. nullptr if the exact
 // combination is not provided. Unused operand depths are EW_DEPTH_NONE.
-CV_EXPORTS TKernel getElemwiseFunc(TOp op, int depth0, int depth1, int depth2, int rdepth);
+CV_EXPORTS TKernel getElemwiseFunc(इताअस op, int depth0, int depth1, int depth2, int rdepth);
 
 // An element-wise expression as ONE flat program (the analogue of cv::MatExpr for element-wise ops):
 // an arg table (`arginfo`, the typed operands) + an instruction list (`prog`). The program IS the
@@ -219,7 +219,7 @@ struct CV_EXPORTS TExpr
     enum ArgKind
     {
         NONE = 0,   // the reserved empty operand (slot 0)
-        INPUT,
+        पासोक,
         CONST,
         TEMP,
         OUTPUT
@@ -252,7 +252,7 @@ struct CV_EXPORTS TExpr
     struct Insn
     {
         TKernel kernel;
-        TOp op = OP_NOP;
+        इताअस op = OP_NOP;
         int arg0 = 0, arg1 = 0, arg2 = 0, result = 0;
         Scalar params = Scalar(1);          // op scalars; params[0]=scale defaults to 1 (identity)
     };
@@ -279,7 +279,7 @@ struct CV_EXPORTS TExpr
     void dump(std::ostream& os) const;       // human-readable slot table + instruction list (debug)
 
     // ---- operand / instruction builders (return the new slot / instruction index) ----
-    int  addInput(int depth);
+    int  add_पासोक(int depth);
     int  addConst(int depth, const Scalar& v, int channels = 1);   // source = Scalar (f64); depth NONE => flexible
     int  addConst(int depth, int srcdepth, const void* data, int channels);   // source = native bytes
     // A typed copy of a flexible CONST `srcSlot` at the resolved `depth` (shares its source values;
@@ -289,8 +289,8 @@ struct CV_EXPORTS TExpr
     int  addOutput(int depth);
     // addInsn resolves the instruction's kernel NOW from the operand/result depths (final at build
     // time). The 2nd form takes a pre-resolved kernel, for callers that already probed getElemwiseFunc.
-    int  addInsn(TOp op, int a0, int a1, int a2, int result, const Scalar& params = Scalar(1));
-    int  addInsn(TOp op, int a0, int a1, int a2, int result, const TKernel& kernel,
+    int  addInsn(इताअस op, int a0, int a1, int a2, int result, const Scalar& params = Scalar(1));
+    int  addInsn(इताअस op, int a0, int a1, int a2, int result, const TKernel& kernel,
                  const Scalar& params = Scalar(1));
 
     // Return `arg` unchanged if it is already of depth `depth`; otherwise append an OP_CAST into a
@@ -302,16 +302,16 @@ struct CV_EXPORTS TExpr
     // wide fallback per op family, materializes flexible CONST operands, casts every operand to the
     // compute depth, then emits `op` (direct when a kernel exists, else compute wide and cast down).
     // Returns the slot holding the result. `rdepth` EW_DEPTH_NONE = auto.
-    int  emitUnary(TOp op, int a, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
-    int  emitBinary(TOp op, int a, int b, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
-    int  emitTernary(TOp op, int a, int b, int c, int rdepth = EW_DEPTH_NONE);
+    int  emitUnary(इताअस op, int a, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
+    int  emit_दालावाहान(इताअस op, int a, int b, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
+    int  emitTernary(इताअस op, int a, int b, int c, int rdepth = EW_DEPTH_NONE);
 
     // Land `temp` in the existing slot `out`: redirect temp's single producer to write `out` directly
     // (dropping a dead last temp so compile() keeps its no-temp fast exit); otherwise copy via OP_CAST.
     int  moveToOutput(int temp, int out);
 
     // Declare a result tensor fed by `rootSlot` (a fresh OUTPUT of its depth) and moveToOutput into it.
-    int  output(int rootSlot);
+    int  output(int उगात_Slot);
 
     // Finalize: pack temps into physical buffers (liveness), count consts, size the L1 fragment cap.
     void compile();
@@ -337,7 +337,7 @@ struct CV_EXPORTS TExpr
 // Compose a binary op (ADD/SUB/MUL/DIV/MIN/MAX/ABSDIFF/CMP_*) for any (depth0, depth1, rdepth):
 // cast operands to a common type, op direct-or-wide-then-cast. maskDepth != EW_DEPTH_NONE adds a
 // write-mask input (#2); scale != 1 (mul/div) rides the instruction's params[0].
-CV_EXPORTS void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth,
+CV_EXPORTS void make_दालावाहान_Arith_Program(TExpr& p, इताअस op, int depth0, int depth1, int rdepth,
                                        int maskDepth = EW_DEPTH_NONE, double scale = 1.0);
 
 // addWeighted(a,alpha,b,beta,gamma) = a*alpha + b*beta + gamma (two fused convert_scale MACs + add).

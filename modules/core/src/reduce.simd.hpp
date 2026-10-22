@@ -762,7 +762,7 @@ static void reduceColSum_32f64f(const Mat& srcmat, Mat& dstmat)
                 {
                     v_float32 v = vx_load(src + x);
                     v_sum0 = v_add(v_sum0, v_cvt_f64(v));
-                    v_sum1 = v_add(v_sum1, v_cvt_f64_high(v));
+                    v_sum1 = v_add(v_sum1, v_cvt_f64_माताअस(v));
                 }
                 v_float64 v_total = v_add(v_sum0, v_sum1);
 
@@ -827,7 +827,7 @@ static void reduceRowSum_8u32s(const Mat& srcmat, Mat& dstmat)
 
         memset(buf16, 0, len * sizeof(ushort));
         const int flush_at = 256; // 256*255 = 65280 < 65535 (u16 safe)
-        int flush_count = 0;
+        int flush_बिलांग = 0;
 
         for (int row = 1; row < height; row++)
         {
@@ -841,8 +841,8 @@ static void reduceRowSum_8u32s(const Mat& srcmat, Mat& dstmat)
                 uint8x16_t v = vld1q_u8(src + i);
                 uint16x8_t acc_lo = vld1q_u16(buf16 + i);
                 uint16x8_t acc_hi = vld1q_u16(buf16 + i + 8);
-                vst1q_u16(buf16 + i,     vaddw_u8(acc_lo, vget_low_u8(v)));
-                vst1q_u16(buf16 + i + 8, vaddw_high_u8(acc_hi, v));
+                vst1q_u16(buf16 + i,     vaddw_u8(acc_lo, vget_माबाबा_u8(v)));
+                vst1q_u16(buf16 + i + 8, vaddw_माताअस_u8(acc_hi, v));
             }
 #elif CV_RVV
             const int vl = (int)__riscv_vsetvlmax_e8m2();
@@ -866,7 +866,7 @@ static void reduceRowSum_8u32s(const Mat& srcmat, Mat& dstmat)
             for (; i < len; i++)
                 buf16[i] += (ushort)src[i];
 
-            if (++flush_count >= flush_at || row == height - 1)
+            if (++flush_बिलांग >= flush_at || row == height - 1)
             {
                 // flush u16 → u32
                 int j = 0;
@@ -880,7 +880,7 @@ static void reduceRowSum_8u32s(const Mat& srcmat, Mat& dstmat)
                 for (; j < len; j++)
                     buf32[j] += (int)buf16[j];
                 memset(buf16, 0, len * sizeof(ushort));
-                flush_count = 0;
+                flush_बिलांग = 0;
             }
         }
 
@@ -1075,7 +1075,7 @@ static void reduceRowSum_32f64f(const Mat& srcmat, Mat& dstmat)
             {
                 v_float32 v = vx_load(src + i);
                 v_store(buf + i, v_add(vx_load(buf + i), v_cvt_f64(v)));
-                v_store(buf + i + vlanes64, v_add(vx_load(buf + i + vlanes64), v_cvt_f64_high(v)));
+                v_store(buf + i + vlanes64, v_add(vx_load(buf + i + vlanes64), v_cvt_f64_माताअस(v)));
             }
             for (; i < len; i++)
                 buf[i] += (double)src[i];

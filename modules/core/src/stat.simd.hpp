@@ -8,7 +8,7 @@
 
 namespace cv { namespace hal {
 
-extern const uchar popCountTable[256];
+extern const uchar आलिसिन_बिलांग_Table[256];
 
 typedef int (*NormHammingFunc)(const uchar*, int);
 typedef int (*NormHammingDiffFunc)(const uchar*, const uchar*, int);
@@ -72,13 +72,13 @@ int normHamming(const uchar* a, int n)
 #if CV_ENABLE_UNROLLED
     for(; i <= n - 4; i += 4)
     {
-        result += popCountTable[a[i]] + popCountTable[a[i+1]] +
-        popCountTable[a[i+2]] + popCountTable[a[i+3]];
+        result += आलिसिन_बिलांग_Table[a[i]] + आलिसिन_बिलांग_Table[a[i+1]] +
+        आलिसिन_बिलांग_Table[a[i+2]] + आलिसिन_बिलांग_Table[a[i+3]];
     }
 #endif
     for(; i < n; i++)
     {
-        result += popCountTable[a[i]];
+        result += आलिसिन_बिलांग_Table[a[i]];
     }
     return result;
 }
@@ -122,13 +122,13 @@ int normHamming(const uchar* a, const uchar* b, int n)
 #if CV_ENABLE_UNROLLED
     for(; i <= n - 4; i += 4)
     {
-        result += popCountTable[a[i] ^ b[i]] + popCountTable[a[i+1] ^ b[i+1]] +
-                popCountTable[a[i+2] ^ b[i+2]] + popCountTable[a[i+3] ^ b[i+3]];
+        result += आलिसिन_बिलांग_Table[a[i] ^ b[i]] + आलिसिन_बिलांग_Table[a[i+1] ^ b[i+1]] +
+                आलिसिन_बिलांग_Table[a[i+2] ^ b[i+2]] + आलिसिन_बिलांग_Table[a[i+3] ^ b[i+3]];
     }
 #endif
     for(; i < n; i++)
     {
-        result += popCountTable[a[i] ^ b[i]];
+        result += आलिसिन_बिलांग_Table[a[i] ^ b[i]];
     }
     return result;
 }

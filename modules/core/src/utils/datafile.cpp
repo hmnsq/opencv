@@ -36,36 +36,36 @@
 
 namespace cv { namespace utils {
 
-static cv::Ptr< std::vector<cv::String> > g_data_search_path;
-static cv::Ptr< std::vector<cv::String> > g_data_search_subdir;
+static cv::Ptr< std::vector<cv::String> > g_data_हानाप_path;
+static cv::Ptr< std::vector<cv::String> > g_data_हानाप_subdir;
 
-static std::vector<cv::String>& _getDataSearchPath()
+static std::vector<cv::String>& get_Data_हानाप_Path()
 {
-    if (g_data_search_path.empty())
-        g_data_search_path.reset(new std::vector<cv::String>());
-    return *(g_data_search_path.get());
+    if (g_data_हानाप_path.empty())
+        g_data_हानाप_path.reset(new std::vector<cv::String>());
+    return *(g_data_हानाप_path.get());
 }
 
-static std::vector<cv::String>& _getDataSearchSubDirectory()
+static std::vector<cv::String>& get_Data_हानाप_Sub_Directory()
 {
-    if (g_data_search_subdir.empty())
+    if (g_data_हानाप_subdir.empty())
     {
-        g_data_search_subdir.reset(new std::vector<cv::String>());
-        g_data_search_subdir->push_back("data");
-        g_data_search_subdir->push_back("");
+        g_data_हानाप_subdir.reset(new std::vector<cv::String>());
+        g_data_हानाप_subdir->push_back("data");
+        g_data_हानाप_subdir->push_back("");
     }
-    return *(g_data_search_subdir.get());
+    return *(g_data_हानाप_subdir.get());
 }
 
 
-CV_EXPORTS void addDataSearchPath(const cv::String& path)
+CV_EXPORTS void add_Data_हानाप_Path(const cv::String& path)
 {
     if (!path.empty() && utils::fs::isDirectory(path))
-        _getDataSearchPath().push_back(path);
+        get_Data_हानाप_Path().push_back(path);
 }
-CV_EXPORTS void addDataSearchSubDirectory(const cv::String& subdir)
+CV_EXPORTS void add_Data_हानाप_Sub_Directory(const cv::String& subdir)
 {
-    _getDataSearchSubDirectory().push_back(subdir);
+    get_Data_हानाप_Sub_Directory().push_back(subdir);
 }
 
 #if OPENCV_HAVE_FILESYSTEM_SUPPORT
@@ -189,7 +189,7 @@ bool getBinLocation(std::wstring& dst)
 
 cv::String findDataFile(const cv::String& relative_path,
                         const char* configuration_parameter,
-                        const std::vector<String>* search_paths,
+                        const std::vector<String>* हानाप_paths,
                         const std::vector<String>* subdir_paths)
 {
 #if OPENCV_HAVE_FILESYSTEM_SUPPORT
@@ -213,31 +213,31 @@ cv::String findDataFile(const cv::String& relative_path,
 
 
     // Step 1
-    const std::vector<cv::String>& search_path = search_paths ? *search_paths : _getDataSearchPath();
-    for(size_t i = search_path.size(); i > 0; i--)
+    const std::vector<cv::String>& हानाप_path = हानाप_paths ? *हानाप_paths : get_Data_हानाप_Path();
+    for(size_t i = हानाप_path.size(); i > 0; i--)
     {
-        const cv::String& prefix = search_path[i - 1];
+        const cv::String& prefix = हानाप_path[i - 1];
         TRY_FILE_WITH_PREFIX(prefix);
     }
 
-    const std::vector<cv::String>& search_subdir = subdir_paths ? *subdir_paths : _getDataSearchSubDirectory();
+    const std::vector<cv::String>& हानाप_subdir = subdir_paths ? *subdir_paths : get_Data_हानाप_Sub_Directory();
 
 
     // Step 2
     const cv::String configuration_parameter_s(configuration_parameter ? configuration_parameter : "");
-    const cv::utils::Paths& search_hint = configuration_parameter_s.empty() ? cv::utils::Paths()
+    const cv::utils::Paths& हानाप_hint = configuration_parameter_s.empty() ? cv::utils::Paths()
                                           : getConfigurationParameterPaths((configuration_parameter_s + "_HINT").c_str());
-    for (size_t k = 0; k < search_hint.size(); k++)
+    for (size_t k = 0; k < हानाप_hint.size(); k++)
     {
-        cv::String datapath = search_hint[k];
+        cv::String datapath = हानाप_hint[k];
         if (datapath.empty())
             continue;
         if (utils::fs::isDirectory(datapath))
         {
             CV_LOG_DEBUG(NULL, "utils::findDataFile(): trying " << configuration_parameter << "_HINT=" << datapath);
-            for(size_t i = search_subdir.size(); i > 0; i--)
+            for(size_t i = हानाप_subdir.size(); i > 0; i--)
             {
-                const cv::String& subdir = search_subdir[i - 1];
+                const cv::String& subdir = हानाप_subdir[i - 1];
                 cv::String prefix = utils::fs::join(datapath, subdir);
                 TRY_FILE_WITH_PREFIX(prefix);
             }
@@ -260,9 +260,9 @@ cv::String findDataFile(const cv::String& relative_path,
         if (utils::fs::isDirectory(datapath))
         {
             CV_LOG_DEBUG(NULL, "utils::findDataFile(): trying " << configuration_parameter << "=" << datapath);
-            for(size_t i = search_subdir.size(); i > 0; i--)
+            for(size_t i = हानाप_subdir.size(); i > 0; i--)
             {
-                const cv::String& subdir = search_subdir[i - 1];
+                const cv::String& subdir = हानाप_subdir[i - 1];
                 cv::String prefix = utils::fs::join(datapath, subdir);
                 TRY_FILE_WITH_PREFIX(prefix);
             }
@@ -286,16 +286,16 @@ cv::String findDataFile(const cv::String& relative_path,
     if (isSubDirectory(build_dir, cwd) || isSubDirectory(utils::fs::canonical(build_dir), utils::fs::canonical(cwd)))
     {
         CV_LOG_DEBUG(NULL, "utils::findDataFile(): the current directory is build sub-directory: " << cwd);
-        const char* build_subdirs[] = { OPENCV_DATA_BUILD_DIR_SEARCH_PATHS };
+        const char* build_subdirs[] = { OPENCV_DATA_BUILD_DIR_हानाप_PATHS };
         for (size_t k = 0; k < sizeof(build_subdirs)/sizeof(build_subdirs[0]); k++)
         {
             CV_LOG_DEBUG(NULL, "utils::findDataFile(): <build>/" << build_subdirs[k]);
             cv::String datapath = utils::fs::join(build_dir, build_subdirs[k]);
             if (utils::fs::isDirectory(datapath))
             {
-                for(size_t i = search_subdir.size(); i > 0; i--)
+                for(size_t i = हानाप_subdir.size(); i > 0; i--)
                 {
-                    const cv::String& subdir = search_subdir[i - 1];
+                    const cv::String& subdir = हानाप_subdir[i - 1];
                     cv::String prefix = utils::fs::join(datapath, subdir);
                     TRY_FILE_WITH_PREFIX(prefix);
                 }
@@ -322,9 +322,9 @@ cv::String findDataFile(const cv::String& relative_path,
         cv::String datapath = source_dir;
         if (utils::fs::isDirectory(datapath))
         {
-            for(size_t i = search_subdir.size(); i > 0; i--)
+            for(size_t i = हानाप_subdir.size(); i > 0; i--)
             {
-                const cv::String& subdir = search_subdir[i - 1];
+                const cv::String& subdir = हानाप_subdir[i - 1];
                 cv::String prefix = utils::fs::join(datapath, subdir);
                 TRY_FILE_WITH_PREFIX(prefix);
             }
@@ -346,16 +346,16 @@ cv::String findDataFile(const cv::String& relative_path,
     )
     {
         CV_LOG_DEBUG(NULL, "utils::findDataFile(): the binary module directory is build sub-directory: " << module_path);
-        const char* build_subdirs[] = { OPENCV_DATA_BUILD_DIR_SEARCH_PATHS };
+        const char* build_subdirs[] = { OPENCV_DATA_BUILD_DIR_हानाप_PATHS };
         for (size_t k = 0; k < sizeof(build_subdirs)/sizeof(build_subdirs[0]); k++)
         {
             CV_LOG_DEBUG(NULL, "utils::findDataFile(): <build>/" << build_subdirs[k]);
             cv::String datapath = utils::fs::join(build_dir, build_subdirs[k]);
             if (utils::fs::isDirectory(datapath))
             {
-                for(size_t i = search_subdir.size(); i > 0; i--)
+                for(size_t i = हानाप_subdir.size(); i > 0; i--)
                 {
-                    const cv::String& subdir = search_subdir[i - 1];
+                    const cv::String& subdir = हानाप_subdir[i - 1];
                     cv::String prefix = utils::fs::join(datapath, subdir);
                     TRY_FILE_WITH_PREFIX(prefix);
                 }
@@ -377,9 +377,9 @@ cv::String findDataFile(const cv::String& relative_path,
             CV_LOG_DEBUG(NULL, "utils::findDataFile(): trying install path (from binary path): " << datapath);
             if (utils::fs::isDirectory(datapath))
             {
-                for(size_t i = search_subdir.size(); i > 0; i--)
+                for(size_t i = हानाप_subdir.size(); i > 0; i--)
                 {
-                    const cv::String& subdir = search_subdir[i - 1];
+                    const cv::String& subdir = हानाप_subdir[i - 1];
                     cv::String prefix = utils::fs::join(datapath, subdir);
                     TRY_FILE_WITH_PREFIX(prefix);
                 }
@@ -404,9 +404,9 @@ cv::String findDataFile(const cv::String& relative_path,
         if (utils::fs::isDirectory(datapath))
         {
             CV_LOG_DEBUG(NULL, "utils::findDataFile(): trying install path: " << datapath);
-            for(size_t i = search_subdir.size(); i > 0; i--)
+            for(size_t i = हानाप_subdir.size(); i > 0; i--)
             {
-                const cv::String& subdir = search_subdir[i - 1];
+                const cv::String& subdir = हानाप_subdir[i - 1];
                 cv::String prefix = utils::fs::join(datapath, subdir);
                 TRY_FILE_WITH_PREFIX(prefix);
             }
@@ -418,7 +418,7 @@ cv::String findDataFile(const cv::String& relative_path,
 #else // OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_UNUSED(relative_path);
     CV_UNUSED(configuration_parameter);
-    CV_UNUSED(search_paths);
+    CV_UNUSED(हानाप_paths);
     CV_UNUSED(subdir_paths);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT

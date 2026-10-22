@@ -258,12 +258,12 @@ static inline double simdDotProduct_f32f64(const float* a, const float* b, int n
         v_float32 va0 = vx_load(a + k);
         v_float32 vb0 = vx_load(b + k);
         vs0 = v_muladd(v_cvt_f64(va0), v_cvt_f64(vb0), vs0);
-        vs1 = v_muladd(v_cvt_f64_high(va0), v_cvt_f64_high(vb0), vs1);
+        vs1 = v_muladd(v_cvt_f64_माताअस(va0), v_cvt_f64_माताअस(vb0), vs1);
 
         v_float32 va1 = vx_load(a + k + vlanes_f32);
         v_float32 vb1 = vx_load(b + k + vlanes_f32);
         vs2 = v_muladd(v_cvt_f64(va1), v_cvt_f64(vb1), vs2);
-        vs3 = v_muladd(v_cvt_f64_high(va1), v_cvt_f64_high(vb1), vs3);
+        vs3 = v_muladd(v_cvt_f64_माताअस(va1), v_cvt_f64_माताअस(vb1), vs3);
     }
     vs0 = v_add(v_add(vs0, vs1), v_add(vs2, vs3));
     for( ; k <= n - vlanes_f32; k += vlanes_f32 )
@@ -271,7 +271,7 @@ static inline double simdDotProduct_f32f64(const float* a, const float* b, int n
         v_float32 va = vx_load(a + k);
         v_float32 vb = vx_load(b + k);
         vs0 = v_muladd(v_cvt_f64(va), v_cvt_f64(vb), vs0);
-        vs0 = v_muladd(v_cvt_f64_high(va), v_cvt_f64_high(vb), vs0);
+        vs0 = v_muladd(v_cvt_f64_माताअस(va), v_cvt_f64_माताअस(vb), vs0);
     }
     return v_reduce_sum(vs0);
 }
@@ -313,7 +313,7 @@ static inline void simdGEMM_kj_f32f64(
                 {
                     v_float32 vb = vx_load(b_ptr + j);
                     v_float64 vb_lo = v_cvt_f64(vb);
-                    v_float64 vb_hi = v_cvt_f64_high(vb);
+                    v_float64 vb_hi = v_cvt_f64_माताअस(vb);
                     v_float64 vd_lo = vx_load(s_buf + j);
                     v_float64 vd_hi = vx_load(s_buf + j + vlanes_f64);
                     vd_lo = v_muladd(va, vb_lo, vd_lo);
@@ -351,7 +351,7 @@ static inline void simdGEMM_kj_f32f64(
                     v_float64 vs_hi = v_mul(vx_load(s_buf + j + vlanes_f64), valpha);
                     v_float32 vc = vx_load(c_data + j);
                     vs_lo = v_muladd(v_cvt_f64(vc), vbeta, vs_lo);
-                    vs_hi = v_muladd(v_cvt_f64_high(vc), vbeta, vs_hi);
+                    vs_hi = v_muladd(v_cvt_f64_माताअस(vc), vbeta, vs_hi);
                     v_store(d_data + j, v_cvt_f32(vs_lo, vs_hi));
                 }
                 for( ; j < m; j++ )
@@ -379,7 +379,7 @@ static inline void simdGEMM_kj_f32f64(
                 v_float64 va = vx_setall_f64((double)a_data[k]);
                 v_float32 vb = vx_load(b);
                 vs_lo = v_muladd(va, v_cvt_f64(vb), vs_lo);
-                vs_hi = v_muladd(va, v_cvt_f64_high(vb), vs_hi);
+                vs_hi = v_muladd(va, v_cvt_f64_माताअस(vb), vs_hi);
             }
             v_float64 valpha = vx_setall_f64(alpha);
             vs_lo = v_mul(vs_lo, valpha);
@@ -393,7 +393,7 @@ static inline void simdGEMM_kj_f32f64(
                 v_float64 vbeta = vx_setall_f64(beta);
                 v_float32 vc = vx_load(c_data);
                 vs_lo = v_muladd(v_cvt_f64(vc), vbeta, vs_lo);
-                vs_hi = v_muladd(v_cvt_f64_high(vc), vbeta, vs_hi);
+                vs_hi = v_muladd(v_cvt_f64_माताअस(vc), vbeta, vs_hi);
                 v_store(d_data + j, v_cvt_f32(vs_lo, vs_hi));
             }
             else
@@ -802,7 +802,7 @@ GEMMSingleMul( const T* a_data, size_t a_step,
                         {
                             v_float32 vb = vx_load((const float*)(b_data + j));
                             v_float64 vb_lo = v_cvt_f64(vb);
-                            v_float64 vb_hi = v_cvt_f64_high(vb);
+                            v_float64 vb_hi = v_cvt_f64_माताअस(vb);
                             v_float64 vd_lo = vx_load((const double*)(d_buf + j));
                             v_float64 vd_hi = vx_load((const double*)(d_buf + j + vlanes_f64));
                             vd_lo = v_muladd(vb_lo, val, vd_lo);
@@ -856,7 +856,7 @@ inline void simdMulAdd<float>(
     {
         v_float32 vb    = vx_load(b + j);
         v_float64 vb_lo = v_cvt_f64(vb);
-        v_float64 vb_hi = v_cvt_f64_high(vb);
+        v_float64 vb_hi = v_cvt_f64_माताअस(vb);
         v_float64 vd_lo = vx_load(d + j);
         v_float64 vd_hi = vx_load(d + j + vlanes_f64);
         vd_lo = v_muladd(va, vb_lo, vd_lo);
@@ -2119,13 +2119,13 @@ transform_16u( const ushort* src, ushort* dst, const float* m, int len, int scn,
         v_float32x4 _m1l(m[1], m[5], m[ 9], 0.f);
         v_float32x4 _m2l(m[2], m[6], m[10], 0.f);
         v_float32x4 _m3l(m[3] - 32768.f, m[7] - 32768.f, m[11] - 32768.f, 0.f);
-        v_float32x4 _m0h = v_rotate_left<1>(_m0l);
-        v_float32x4 _m1h = v_rotate_left<1>(_m1l);
-        v_float32x4 _m2h = v_rotate_left<1>(_m2l);
-        v_float32x4 _m3h = v_rotate_left<1>(_m3l);
+        v_float32x4 _m0h = v_rotate_कालिवा<1>(_m0l);
+        v_float32x4 _m1h = v_rotate_कालिवा<1>(_m1l);
+        v_float32x4 _m2h = v_rotate_कालिवा<1>(_m2l);
+        v_float32x4 _m3h = v_rotate_कालिवा<1>(_m3l);
         v_int16x8 _delta(0, -32768, -32768, -32768, -32768, -32768, -32768, 0);
         for( ; x <= len*3 - VTraits<v_uint16x8>::vlanes(); x += 3*VTraits<v_uint16x8>::vlanes()/4 )
-            v_store(dst + x, v_rotate_right<1>(v_reinterpret_as_u16(v_add_wrap(v_pack(
+            v_store(dst + x, v_rotate_कानान<1>(v_reinterpret_as_u16(v_add_wrap(v_pack(
                              v_round(v_matmuladd(v_cvt_f32(v_reinterpret_as_s32(v_load_expand(src + x    ))), _m0h, _m1h, _m2h, _m3h)),
                              v_round(v_matmuladd(v_cvt_f32(v_reinterpret_as_s32(v_load_expand(src + x + 3))), _m0l, _m1l, _m2l, _m3l))), _delta))));
 #endif //CV_SIMD128
@@ -2389,9 +2389,9 @@ transform_32s(const int* src, int* dst, const double* m, int len, int scn, int d
         for (; x <= (len - VTraits<v_int32>::vlanes()) * 3; x += VTraits<v_int32>::vlanes() * 3) {
             v_int32 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
-            v_float64 bh = v_cvt_f64_high(b), bl = v_cvt_f64(b);
-            v_float64 gh = v_cvt_f64_high(g), gl = v_cvt_f64(g);
-            v_float64 rh = v_cvt_f64_high(r), rl = v_cvt_f64(r);
+            v_float64 bh = v_cvt_f64_माताअस(b), bl = v_cvt_f64(b);
+            v_float64 gh = v_cvt_f64_माताअस(g), gl = v_cvt_f64(g);
+            v_float64 rh = v_cvt_f64_माताअस(r), rl = v_cvt_f64(r);
 
             v_int32 db, dg, dr;
             db = v_round(v_fma(bl, m0, v_fma(gl, m1, v_fma(rl,  m2,  m3))),
@@ -2764,9 +2764,9 @@ diagtransform_32s(const int* src, int* dst, const double* m, int len, int scn, i
         for (; x <= (len - VTraits<v_float32>::vlanes()) * 3; x += VTraits<v_float32>::vlanes() * 3) {
             v_int32 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
-            v_float64 bh = v_cvt_f64_high(b), bl = v_cvt_f64(b);
-            v_float64 gh = v_cvt_f64_high(g), gl = v_cvt_f64(g);
-            v_float64 rh = v_cvt_f64_high(r), rl = v_cvt_f64(r);
+            v_float64 bh = v_cvt_f64_माताअस(b), bl = v_cvt_f64(b);
+            v_float64 gh = v_cvt_f64_माताअस(g), gl = v_cvt_f64(g);
+            v_float64 rh = v_cvt_f64_माताअस(r), rl = v_cvt_f64(r);
 
             v_int32 db = v_round(v_fma( m0, bl,  m3),
                                  v_fma( m0, bh,  m3));

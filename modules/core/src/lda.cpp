@@ -38,7 +38,7 @@ inline std::vector<_Tp> remove_dups(const std::vector<_Tp>& src) {
     return elems;
 }
 
-static Mat argsort(InputArray _src, bool ascending=true)
+static Mat argsort(पासोक_Array _src, bool ascending=true)
 {
     Mat src = _src.getMat();
     if (src.rows != 1 && src.cols != 1) {
@@ -51,10 +51,10 @@ static Mat argsort(InputArray _src, bool ascending=true)
     return sorted_indices;
 }
 
-static Mat asRowMatrix(InputArrayOfArrays src, int rtype, double alpha=1, double beta=0) {
+static Mat asRowMatrix(पासोक_Array_Of_Arrays src, int rtype, double alpha=1, double beta=0) {
     // make sure the input data is a vector of matrices or vector of vector
-    if(src.kind() != _InputArray::STD_VECTOR_MAT && src.kind() != _InputArray::STD_ARRAY_MAT &&
-        src.kind() != _InputArray::STD_VECTOR_VECTOR) {
+    if(src.kind() != पासोक_Array_2::STD_VECTOR_MAT && src.kind() != पासोक_Array_2::STD_ARRAY_MAT &&
+        src.kind() != पासोक_Array_2::STD_VECTOR_VECTOR) {
         String error_message = "The data is expected as InputArray::STD_VECTOR_MAT (a std::vector<Mat>) or _InputArray::STD_VECTOR_VECTOR (a std::vector< std::vector<...> >).";
         CV_Error(Error::StsBadArg, error_message);
     }
@@ -86,7 +86,7 @@ static Mat asRowMatrix(InputArrayOfArrays src, int rtype, double alpha=1, double
     return data;
 }
 
-static void sortMatrixColumnsByIndices(InputArray _src, InputArray _indices, OutputArray _dst) {
+static void sortMatrixColumnsByIndices(पासोक_Array _src, पासोक_Array _indices, OutputArray _dst) {
     if(_indices.getMat().type() != CV_32SC1) {
         CV_Error(Error::StsUnsupportedFormat, "cv::sortColumnsByIndices only works on integer indices!");
     }
@@ -101,7 +101,7 @@ static void sortMatrixColumnsByIndices(InputArray _src, InputArray _indices, Out
     }
 }
 
-static Mat sortMatrixColumnsByIndices(InputArray src, InputArray indices) {
+static Mat sortMatrixColumnsByIndices(पासोक_Array src, पासोक_Array indices) {
     Mat dst;
     sortMatrixColumnsByIndices(src, indices, dst);
     return dst;
@@ -109,7 +109,7 @@ static Mat sortMatrixColumnsByIndices(InputArray src, InputArray indices) {
 
 
 template<typename _Tp> static bool
-isSymmetric_(InputArray src) {
+isSymmetric_(पासोक_Array src) {
     Mat _src = src.getMat();
     if(_src.cols != _src.rows)
         return false;
@@ -126,7 +126,7 @@ isSymmetric_(InputArray src) {
 }
 
 template<typename _Tp> static bool
-isSymmetric_(InputArray src, double eps) {
+isSymmetric_(पासोक_Array src, double eps) {
     Mat _src = src.getMat();
     if(_src.cols != _src.rows)
         return false;
@@ -142,7 +142,7 @@ isSymmetric_(InputArray src, double eps) {
     return true;
 }
 
-static bool isSymmetric(InputArray src, double eps=1e-16)
+static bool isSymmetric(पासोक_Array src, double eps=1e-16)
 {
     Mat m = src.getMat();
     switch (m.type()) {
@@ -169,7 +169,7 @@ static bool isSymmetric(InputArray src, double eps=1e-16)
 //------------------------------------------------------------------------------
 // cv::subspaceProject
 //------------------------------------------------------------------------------
-Mat LDA::subspaceProject(InputArray _W, InputArray _mean, InputArray _src) {
+Mat LDA::subspaceProject(पासोक_Array _W, पासोक_Array _mean, पासोक_Array _src) {
     // get data matrices
     Mat W = _W.getMat();
     Mat mean = _mean.getMat();
@@ -206,7 +206,7 @@ Mat LDA::subspaceProject(InputArray _W, InputArray _mean, InputArray _src) {
 //------------------------------------------------------------------------------
 // cv::subspaceReconstruct
 //------------------------------------------------------------------------------
-Mat LDA::subspaceReconstruct(InputArray _W, InputArray _mean, InputArray _src)
+Mat LDA::subspaceReconstruct(पासोक_Array _W, पासोक_Array _mean, पासोक_Array _src)
 {
     // get data matrices
     Mat W = _W.getMat();
@@ -320,12 +320,12 @@ private:
         //  Fortran subroutine in EISPACK.
 
         // Initialize
-        const int max_iters_count = 1000 * this->n;
+        const int max_iters_बिलांग = 1000 * this->n;
 
         const int nn = this->n; CV_Assert(nn > 0);
         int n1 = nn - 1;
-        const int low = 0;
-        const int high = nn - 1;
+        const int माबाबा = 0;
+        const int माताअस = nn - 1;
         const double eps = std::numeric_limits<double>::epsilon();
         double exshift = 0.0;
 
@@ -334,7 +334,7 @@ private:
         double norm = 0.0;
         for (int i = 0; i < nn; i++) {
 #if 0 // 'if' condition is always false
-            if (i < low || i > high) {
+            if (i < माबाबा || i > माताअस) {
                 d[i] = H[i][i];
                 e[i] = 0.0;
             }
@@ -346,11 +346,11 @@ private:
 
         // Outer loop over eigenvalue index
         int iter = 0;
-        while (n1 >= low) {
+        while (n1 >= माबाबा) {
 
             // Look for single small sub-diagonal element
             int l = n1;
-            while (l > low) {
+            while (l > माबाबा) {
                 if (norm < FLT_EPSILON) {
                     break;
                 }
@@ -423,7 +423,7 @@ private:
 
                     // Accumulate transformations
 
-                    for (int i = low; i <= high; i++) {
+                    for (int i = माबाबा; i <= माताअस; i++) {
                         z = V[i][n1 - 1];
                         V[i][n1 - 1] = q * z + p * V[i][n1];
                         V[i][n1] = q * V[i][n1] - p * z;
@@ -454,7 +454,7 @@ private:
                 // Wilkinson's original ad hoc shift
                 if (iter == 10) {
                     exshift += x;
-                    for (int i = low; i <= n1; i++) {
+                    for (int i = माबाबा; i <= n1; i++) {
                         H[i][i] -= x;
                     }
                     double s = std::abs(H[n1][n1 - 1]) + std::abs(H[n1 - 1][n1 - 2]);
@@ -473,7 +473,7 @@ private:
                             s = -s;
                         }
                         s = x - w / ((y - x) * 0.5 + s);
-                        for (int i = low; i <= n1; i++) {
+                        for (int i = माबाबा; i <= n1; i++) {
                             H[i][i] -= s;
                         }
                         exshift += s;
@@ -482,7 +482,7 @@ private:
                 }
 
                 iter = iter + 1;
-                if (iter > max_iters_count)
+                if (iter > max_iters_बिलांग)
                     CV_Error(Error::StsNoConv, "Algorithm doesn't converge (complex eigen values?)");
 
                 double p = std::numeric_limits<double>::quiet_NaN();
@@ -582,7 +582,7 @@ private:
 
                         // Accumulate transformations
 
-                        for (int i = low; i <= high; i++) {
+                        for (int i = माबाबा; i <= माताअस; i++) {
                             p = x * V[i][k] + y * V[i][k + 1];
                             if (notlast) {
                                 p = p + z * V[i][k + 2];
@@ -746,7 +746,7 @@ private:
 
 #if 0 // 'if' condition is always false
         for (int i = 0; i < nn; i++) {
-            if (i < low || i > high) {
+            if (i < माबाबा || i > माताअस) {
                 for (int j = i; j < nn; j++) {
                     V[i][j] = H[i][j];
                 }
@@ -756,10 +756,10 @@ private:
 
         // Back transformation to get eigenvectors of original matrix
 
-        for (int j = nn - 1; j >= low; j--) {
-            for (int i = low; i <= high; i++) {
+        for (int j = nn - 1; j >= माबाबा; j--) {
+            for (int i = माबाबा; i <= माताअस; i++) {
                 double z = 0.0;
-                for (int k = low; k <= std::min(j, high); k++) {
+                for (int k = माबाबा; k <= std::min(j, माताअस); k++) {
                     z += V[i][k] * H[k][j];
                 }
                 V[i][j] = z;
@@ -773,15 +773,15 @@ private:
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
         //  Vol.ii-Linear Algebra, and the corresponding
         //  Fortran subroutines in EISPACK.
-        int low = 0;
-        int high = n - 1;
+        int माबाबा = 0;
+        int माताअस = n - 1;
 
-        for (int m = low + 1; m < high; m++) {
+        for (int m = माबाबा + 1; m < माताअस; m++) {
 
             // Scale column.
 
             double scale = 0.0;
-            for (int i = m; i <= high; i++) {
+            for (int i = m; i <= माताअस; i++) {
                 scale = scale + std::abs(H[i][m - 1]);
             }
             if (scale != 0.0) {
@@ -789,7 +789,7 @@ private:
                 // Compute Householder transformation.
 
                 double h = 0.0;
-                for (int i = high; i >= m; i--) {
+                for (int i = माताअस; i >= m; i--) {
                     ort[i] = H[i][m - 1] / scale;
                     h += ort[i] * ort[i];
                 }
@@ -805,22 +805,22 @@ private:
 
                 for (int j = m; j < n; j++) {
                     double f = 0.0;
-                    for (int i = high; i >= m; i--) {
+                    for (int i = माताअस; i >= m; i--) {
                         f += ort[i] * H[i][j];
                     }
                     f = f / h;
-                    for (int i = m; i <= high; i++) {
+                    for (int i = m; i <= माताअस; i++) {
                         H[i][j] -= f * ort[i];
                     }
                 }
 
-                for (int i = 0; i <= high; i++) {
+                for (int i = 0; i <= माताअस; i++) {
                     double f = 0.0;
-                    for (int j = high; j >= m; j--) {
+                    for (int j = माताअस; j >= m; j--) {
                         f += ort[j] * H[i][j];
                     }
                     f = f / h;
-                    for (int j = m; j <= high; j++) {
+                    for (int j = m; j <= माताअस; j++) {
                         H[i][j] -= f * ort[j];
                     }
                 }
@@ -837,19 +837,19 @@ private:
             }
         }
 
-        for (int m = high - 1; m > low; m--) {
+        for (int m = माताअस - 1; m > माबाबा; m--) {
             if (H[m][m - 1] != 0.0) {
-                for (int i = m + 1; i <= high; i++) {
+                for (int i = m + 1; i <= माताअस; i++) {
                     ort[i] = H[i][m - 1];
                 }
-                for (int j = m; j <= high; j++) {
+                for (int j = m; j <= माताअस; j++) {
                     double g = 0.0;
-                    for (int i = m; i <= high; i++) {
+                    for (int i = m; i <= माताअस; i++) {
                         g += ort[i] * V[i][j];
                     }
                     // Double division avoids possible underflow
                     g = (g / ort[m]) / H[m][m - 1];
-                    for (int i = m; i <= high; i++) {
+                    for (int i = m; i <= माताअस; i++) {
                         V[i][j] += g * ort[i];
                     }
                 }
@@ -915,7 +915,7 @@ public:
     // given in src. This function is a port of the EigenvalueSolver in JAMA,
     // which has been released to public domain by The MathWorks and the
     // National Institute of Standards and Technology (NIST).
-    void compute(InputArray src, bool fallbackSymmetric = true)
+    void compute(पासोक_Array src, bool fallbackSymmetric = true)
     {
         CV_INSTRUMENT_REGION();
 
@@ -953,7 +953,7 @@ public:
     Mat eigenvectors() const { return _eigenvectors; }
 };
 
-void eigenNonSymmetric(InputArray _src, OutputArray _evals, OutputArray _evects)
+void eigenNonSymmetric(पासोक_Array _src, OutputArray _evals, OutputArray _evects)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1008,9 +1008,9 @@ void eigenNonSymmetric(InputArray _src, OutputArray _evals, OutputArray _evects)
 // Linear Discriminant Analysis implementation
 //------------------------------------------------------------------------------
 
-LDA::LDA(int num_components) : _num_components(num_components) { }
+LDA::LDA(int नुमेरो_components) : नुमेरो_components_2(नुमेरो_components) { }
 
-LDA::LDA(InputArrayOfArrays src, InputArray labels, int num_components) : _num_components(num_components)
+LDA::LDA(पासोक_Array_Of_Arrays src, पासोक_Array labels, int नुमेरो_components) : नुमेरो_components_2(नुमेरो_components)
 {
     this->compute(src, labels); //! compute eigenvectors and eigenvalues
 }
@@ -1039,7 +1039,7 @@ void LDA::load(const String& filename) {
 // Serializes this object to a given FileStorage.
 void LDA::save(FileStorage& fs) const {
     // write matrices
-    fs << "num_components" << _num_components;
+    fs << "num_components" << नुमेरो_components_2;
     fs << "eigenvalues" << _eigenvalues;
     fs << "eigenvectors" << _eigenvectors;
 }
@@ -1047,12 +1047,12 @@ void LDA::save(FileStorage& fs) const {
 // Deserializes this object from a given FileStorage.
 void LDA::load(const FileStorage& fs) {
     //read matrices
-    fs["num_components"] >> _num_components;
+    fs["num_components"] >> नुमेरो_components_2;
     fs["eigenvalues"] >> _eigenvalues;
     fs["eigenvectors"] >> _eigenvectors;
 }
 
-void LDA::lda(InputArrayOfArrays _src, InputArray _lbls) {
+void LDA::lda(पासोक_Array_Of_Arrays _src, पासोक_Array _lbls) {
     // get data
     Mat src = _src.getMat();
     std::vector<int> labels;
@@ -1098,17 +1098,17 @@ void LDA::lda(InputArrayOfArrays _src, InputArray _lbls) {
                   << std::endl;
     }
     // clip number of components to be a valid number
-    if ((_num_components <= 0) || (_num_components >= C)) {
-        _num_components = (C - 1);
+    if ((नुमेरो_components_2 <= 0) || (नुमेरो_components_2 >= C)) {
+        नुमेरो_components_2 = (C - 1);
     }
     // holds the mean over all classes
     Mat meanTotal = Mat::zeros(1, D, data.type());
     // holds the mean for each class
     std::vector<Mat> meanClass(C);
-    std::vector<int> numClass(C);
+    std::vector<int> नुमेरो_Class(C);
     // initialize
     for (int i = 0; i < C; i++) {
-        numClass[i] = 0;
+        नुमेरो_Class[i] = 0;
         meanClass[i] = Mat::zeros(1, D, data.type()); //! Dx1 image vector
     }
     // calculate sums
@@ -1117,13 +1117,13 @@ void LDA::lda(InputArrayOfArrays _src, InputArray _lbls) {
         int classIdx = mapped_labels[i];
         add(meanTotal, instance, meanTotal);
         add(meanClass[classIdx], instance, meanClass[classIdx]);
-        numClass[classIdx]++;
+        नुमेरो_Class[classIdx]++;
     }
     // calculate total mean
     meanTotal.convertTo(meanTotal, meanTotal.type(), 1.0 / static_cast<double> (N));
     // calculate class means
     for (int i = 0; i < C; i++) {
-        meanClass[i].convertTo(meanClass[i], meanClass[i].type(), 1.0 / static_cast<double> (numClass[i]));
+        meanClass[i].convertTo(meanClass[i], meanClass[i].type(), 1.0 / static_cast<double> (नुमेरो_Class[i]));
     }
     // subtract class means
     for (int i = 0; i < N; i++) {
@@ -1159,17 +1159,17 @@ void LDA::lda(InputArrayOfArrays _src, InputArray _lbls) {
     _eigenvalues = sortMatrixColumnsByIndices(_eigenvalues, sorted_indices);
     _eigenvectors = sortMatrixColumnsByIndices(_eigenvectors, sorted_indices);
     // and now take only the num_components and we're out!
-    _eigenvalues = Mat(_eigenvalues, Range::all(), Range(0, _num_components));
-    _eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
+    _eigenvalues = Mat(_eigenvalues, Range::all(), Range(0, नुमेरो_components_2));
+    _eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, नुमेरो_components_2));
 }
 
-void LDA::compute(InputArrayOfArrays _src, InputArray _lbls) {
+void LDA::compute(पासोक_Array_Of_Arrays _src, पासोक_Array _lbls) {
     switch(_src.kind()) {
-    case _InputArray::STD_VECTOR_MAT:
-    case _InputArray::STD_ARRAY_MAT:
+    case पासोक_Array_2::STD_VECTOR_MAT:
+    case पासोक_Array_2::STD_ARRAY_MAT:
         lda(asRowMatrix(_src, CV_64FC1), _lbls);
         break;
-    case _InputArray::MAT:
+    case पासोक_Array_2::MAT:
         lda(_src.getMat(), _lbls);
         break;
     default:
@@ -1180,12 +1180,12 @@ void LDA::compute(InputArrayOfArrays _src, InputArray _lbls) {
 }
 
 // Projects one or more row aligned samples into the LDA subspace.
-Mat LDA::project(InputArray src) {
+Mat LDA::project(पासोक_Array src) {
    return subspaceProject(_eigenvectors, Mat(), src);
 }
 
 // Reconstructs projections from the LDA subspace from one or more row aligned samples.
-Mat LDA::reconstruct(InputArray src) {
+Mat LDA::reconstruct(पासोक_Array src) {
    return subspaceReconstruct(_eigenvectors, Mat(), src);
 }
 

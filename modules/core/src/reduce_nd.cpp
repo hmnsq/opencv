@@ -100,19 +100,19 @@ template<typename A> struct OpProd
 // unary minus is never compiled for an unsigned A (MSVC C4146).
 template<typename A, bool hasInf = std::numeric_limits<A>::has_infinity> struct Extremes
 {
-    static A low() { return std::numeric_limits<A>::lowest(); }
-    static A high() { return std::numeric_limits<A>::max(); }
+    static A माबाबा() { return std::numeric_limits<A>::lowest(); }
+    static A माताअस() { return std::numeric_limits<A>::max(); }
 };
 
 template<typename A> struct Extremes<A, true>
 {
-    static A low() { return -std::numeric_limits<A>::infinity(); }
-    static A high() { return std::numeric_limits<A>::infinity(); }
+    static A माबाबा() { return -std::numeric_limits<A>::infinity(); }
+    static A माताअस() { return std::numeric_limits<A>::infinity(); }
 };
 
 template<typename A> struct OpMax
 {
-    static A init() { return Extremes<A>::low(); }
+    static A init() { return Extremes<A>::माबाबा(); }
     static A apply(A a, A x) { return a < x ? x : a; }
     static A combine(A a, A b) { return a < b ? b : a; }
     static A finalize(A a, int64) { return a; }
@@ -122,7 +122,7 @@ template<typename A> struct OpMax
 
 template<typename A> struct OpMin
 {
-    static A init() { return Extremes<A>::high(); }
+    static A init() { return Extremes<A>::माताअस(); }
     static A apply(A a, A x) { return x < a ? x : a; }
     static A combine(A a, A b) { return b < a ? b : a; }
     static A finalize(A a, int64) { return a; }
@@ -223,9 +223,9 @@ struct Plan
     const uchar* src;
     int sdepth, adepth;     // source depth and accumulator depth
     size_t sesz1;
-    int64 count;            // reduced elements per output
+    int64 बिलांग_2;            // reduced elements per output
     int64 nout;             // number of outputs
-    BinaryFunc cvt;         // source -> accumulator conversion, or nullptr
+    दालावाहान_Func cvt;         // source -> accumulator conversion, or nullptr
 };
 
 // iterator over the flat index space of some axes, tracking a byte offset and an element offset
@@ -335,7 +335,7 @@ template<typename A, class Op, class OpM> static void runHorizontal(const Plan& 
                 ko.init(pl.nk, pl.ksize, pl.ksstep, pl.kdstep, o);
             const uchar* base = pl.src + ko.soff;
             const A m = mbuf ? mbuf[ko.doff] : A(0);
-            int64 a = s*pl.count/nsplit, b = (s + 1)*pl.count/nsplit;
+            int64 a = s*pl.बिलांग_2/nsplit, b = (s + 1)*pl.बिलांग_2/nsplit;
             A acc = Op::init();
             if (a < b)
             {
@@ -353,7 +353,7 @@ template<typename A, class Op, class OpM> static void runHorizontal(const Plan& 
             }
             if (nsplit == 1)
             {
-                res[ko.doff] = OpM::finalize(acc, pl.count, m);
+                res[ko.doff] = OpM::finalize(acc, pl.बिलांग_2, m);
                 ko.next();
             }
             else
@@ -411,7 +411,7 @@ template<typename A, class Op, class OpM> static void runVertical(const Plan& pl
             }
             if (nsplit == 1)
                 for (int64 i = 0; i < len; i++)
-                    res[doff + i] = OpM::finalize(acc[i], pl.count, mrow ? mrow[i] : A(0));
+                    res[doff + i] = OpM::finalize(acc[i], pl.बिलांग_2, mrow ? mrow[i] : A(0));
             else
                 for (int64 i = 0; i < len; i++)
                     partial[s*pl.nout + doff + i] = acc[i];
@@ -429,7 +429,7 @@ template<typename A, class Op> struct Plain
 {
     static A run(A acc, const A* x, int64 n, A) { return HRow<Op, A>::run(acc, x, n); }
     static void vrun(A* acc, const A* x, int64 n, const A*) { VRow<Op, A>::run(acc, x, n); }
-    static A finalize(A a, int64 count, A) { return Op::finalize(a, count); }
+    static A finalize(A a, int64 बिलांग_2, A) { return Op::finalize(a, बिलांग_2); }
 };
 
 template<typename A> struct ShiftedExp
@@ -451,28 +451,28 @@ template<typename A> struct ShiftedExp
 
 template<typename A, class Op, class OpM> static void runPass(const Plan& pl, A* res, const A* mbuf)
 {
-    const double work = (double)pl.nout*(double)std::max(pl.count, (int64)1);
-    const int nthreads = work < RND_SERIAL_WORK ? 1 : getNumThreads();
+    const double work = (double)pl.nout*(double)std::max(pl.बिलांग_2, (int64)1);
+    const int nthreads = work < RND_SERIAL_WORK ? 1 : get_नुमेरो_Threads();
     Work w;
     w.serial = nthreads <= 1;
     w.nsplit = 1;
-    int64 items;
+    int64 मगा_बागाय;
     if (pl.innerReduced)
-        items = pl.nout;
+        मगा_बागाय = pl.nout;
     else
     {
         int64 nouter = pl.nout/pl.ksize[pl.nk - 1];
-        items = nouter*((pl.ksize[pl.nk - 1] + RND_VCHUNK - 1)/RND_VCHUNK);
+        मगा_बागाय = nouter*((pl.ksize[pl.nk - 1] + RND_VCHUNK - 1)/RND_VCHUNK);
     }
     // too few outputs to keep all the threads busy: split the reduction as well
     const int64 want = 4*(int64)nthreads;
-    if (!w.serial && items < want && pl.count > 1)
+    if (!w.serial && मगा_बागाय < want && pl.बिलांग_2 > 1)
     {
-        int64 rows = pl.innerReduced ? pl.count/4096 : pl.count/16;
-        w.nsplit = std::max((int64)1, std::min((want + items - 1)/items, std::min(rows, (int64)256)));
+        int64 rows = pl.innerReduced ? pl.बिलांग_2/4096 : pl.बिलांग_2/16;
+        w.nsplit = std::max((int64)1, std::min((want + मगा_बागाय - 1)/मगा_बागाय, std::min(rows, (int64)256)));
         w.nsplit = std::min(w.nsplit, std::max((int64)1, (int64)(4 << 20)/std::max(pl.nout, (int64)1)));
     }
-    w.nitems = items*w.nsplit;
+    w.nitems = मगा_बागाय*w.nsplit;
     w.nstripes = std::min((double)w.nitems, std::max(1.0, work/RND_STRIPE_WORK));
     CV_Assert(w.nitems <= INT_MAX);
 
@@ -489,7 +489,7 @@ template<typename A, class Op, class OpM> static void runPass(const Plan& pl, A*
             A acc = partial[(size_t)o];
             for (int64 s = 1; s < w.nsplit; s++)
                 acc = Op::combine(acc, partial[(size_t)(s*pl.nout + o)]);
-            res[o] = OpM::finalize(acc, pl.count, mbuf ? mbuf[o] : A(0));
+            res[o] = OpM::finalize(acc, pl.बिलांग_2, mbuf ? mbuf[o] : A(0));
         }
     }
 }
@@ -502,7 +502,7 @@ template<typename A> static void fillResult(A* res, int64 n, A v)
 
 template<typename A> static void runOp(const Plan& pl, int op, A* res)
 {
-    if (pl.count == 0)
+    if (pl.बिलांग_2 == 0)
     {
         // empty reduction: the identity of the operation
         A v = op == REDUCE_MAX ? OpMax<A>::init() : op == REDUCE_MIN ? OpMin<A>::init() :
@@ -534,7 +534,7 @@ template<typename A> static void runOp(const Plan& pl, int op, A* res)
 
 template<typename A> static void runMinMax(const Plan& pl, int op, A* res)
 {
-    if (pl.count == 0)
+    if (pl.बिलांग_2 == 0)
         fillResult(res, pl.nout, op == REDUCE_MAX ? OpMax<A>::init() : OpMin<A>::init());
     else if (op == REDUCE_MAX)
         runPass<A, OpMax<A>, Plain<A, OpMax<A> > >(pl, res, nullptr);
@@ -586,7 +586,7 @@ ReduceParams::ReduceParams(int _rtype, const std::vector<int>& _axes, bool _keep
 {
 }
 
-void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
+void reduce(पासोक_Array _src, OutputArray _dst, const ReduceParams& params)
 {
     CV_INSTRUMENT_REGION();
 
@@ -647,11 +647,11 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
         dsteps[i] = dcur;
         dcur *= keepShape[i];
     }
-    pl.count = 1;
+    pl.बिलांग_2 = 1;
     for (int i = 0; i < dims; i++)
     {
         if (reduced[i])
-            pl.count *= src.size[i];
+            pl.बिलांग_2 *= src.size[i];
         size[n] = src.size[i];
         sstep[n] = (ptrdiff_t)src.step[i];
         dstep[n] = reduced[i] ? 0 : dsteps[i];
@@ -688,7 +688,7 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
             // empty source along this axis
             if (red[i])
             {
-                pl.count = 0;
+                pl.बिलांग_2 = 0;
                 continue;
             }
             return;

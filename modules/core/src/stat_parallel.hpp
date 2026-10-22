@@ -25,7 +25,7 @@ static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::ve
     const size_t total = src.total(), work = total*src.channels();
     if (work < ((size_t)1 << 18))
         return false;
-    const int nthreads = getNumThreads();
+    const int nthreads = get_नुमेरो_Threads();
     if (nthreads <= 1)
         return false;
     const int n = (int)std::min((size_t)nthreads*2, work >> 16);

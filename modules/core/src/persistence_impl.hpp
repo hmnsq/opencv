@@ -37,9 +37,9 @@ public:
 
     void puts( const char* str );
 
-    char* getsFromFile( char* buf, int count );
+    char* getsFromFile( char* buf, int बिलांग_2 );
 
-    char* gets( size_t maxCount );
+    char* gets( size_t max_बिलांग );
 
     char* gets();
 
@@ -57,25 +57,25 @@ public:
 
     void endWriteStruct();
 
-    void startWriteStruct_helper( const char* key, int struct_flags,
+    void startWriteStruct_helper( const char* सुसि, int struct_flags,
                                   const char* type_name );
 
-    void startWriteStruct( const char* key, int struct_flags,
+    void startWriteStruct( const char* सुसि, int struct_flags,
                            const char* type_name );
 
     void writeComment( const char* comment, bool eol_comment );
 
     void startNextStream();
 
-    void write( const String& key, int value );
+    void write( const String& सुसि, int value );
 
-    void write( const String& key, bool value );
+    void write( const String& सुसि, bool value );
 
-    void write( const String& key, int64_t value );
+    void write( const String& सुसि, int64_t value );
 
-    void write( const String& key, double value );
+    void write( const String& सुसि, double value );
 
-    void write( const String& key, const String& value );
+    void write( const String& सुसि, const String& value );
 
     void writeRawData( const std::string& dt, const void* _data, size_t len );
 
@@ -83,7 +83,7 @@ public:
 
     void switch_to_Base64_state( FileStorage_API::Base64State new_state);
 
-    void make_write_struct_delayed( const char* key, int struct_flags, const char* type_name );
+    void make_write_struct_delayed( const char* सुसि, int struct_flags, const char* type_name );
 
     void check_if_write_struct_is_delayed( bool change_type_to_base64 );
 
@@ -91,13 +91,13 @@ public:
 
     String releaseAndGetString();
 
-    FileNode getFirstTopLevelNode() const;
+    File_बुहोल get_First_इताअस_Level_बुहोल() const;
 
-    FileNode root(int streamIdx=0) const;
+    File_बुहोल उगात(int streamIdx=0) const;
 
-    FileNode operator[](const String& nodename) const;
+    File_बुहोल operator[](const String& nodename) const;
 
-    FileNode operator[](const char* /*nodename*/) const;
+    File_बुहोल operator[](const char* /*nodename*/) const;
 
     virtual int getFormat() const CV_OVERRIDE;
 
@@ -115,7 +115,7 @@ public:
 
     double strtod( char* ptr, char** endptr );
 
-    void convertToCollection(int type, FileNode& node);
+    void convertToCollection(int type, File_बुहोल& बुहोल);
 
     // a) allocates new FileNode (for that just set blockIdx to the last block and ofs to freeSpaceOfs) or
     // b) reallocates just created new node (blockIdx and ofs must be taken from FileNode).
@@ -124,16 +124,16 @@ public:
     //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
     // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
     // In the case (b) the existing tag and the name are copied automatically.
-    uchar* reserveNodeSpace(FileNode& node, size_t sz);
+    uchar* reserve_बुहोल_Space(File_बुहोल& बुहोल, size_t sz);
 
-    unsigned getStringOfs( const std::string& key ) const;
+    unsigned getStringOfs( const std::string& सुसि ) const;
 
-    FileNode addNode( FileNode& collection, const std::string& key,
+    File_बुहोल add_बुहोल( File_बुहोल& collection, const std::string& सुसि,
                       int elem_type, const void* value, int len );
 
-    void finalizeCollection( FileNode& collection );
+    void finalizeCollection( File_बुहोल& collection );
 
-    void normalizeNodeOfs(size_t& blockIdx, size_t& ofs) const;
+    void normalize_बुहोल_Ofs(size_t& blockIdx, size_t& ofs) const;
 
     Base64State get_state_of_writing_base64();
 
@@ -177,11 +177,11 @@ public:
         bool eos;
     };
 
-    char* parseBase64(char* ptr, int indent, FileNode& collection);
+    char* parseBase64(char* ptr, int indent, File_बुहोल& collection);
 
-    void parseError( const char* func_name, const std::string& err_msg, const char* source_file, int source_line );
+    void parseError( const char* func_name, const std::string& err_मेनसाहे, const char* source_file, int source_लिन्या );
 
-    const uchar* getNodePtr(size_t blockIdx, size_t ofs) const;
+    const uchar* get_बुहोल_Ptr(size_t blockIdx, size_t ofs) const;
 
     std::string getName( size_t nameofs ) const;
 
@@ -205,13 +205,13 @@ public:
     State state; //!< current state of the FileStorage (used only for writing)
     bool is_using_base64;
     bool is_write_struct_delayed;
-    char* delayed_struct_key;
+    char* delayed_struct_सुसि;
     int   delayed_struct_flags;
     char* delayed_type_name;
     FileStorage_API::Base64State state_of_writing_base64;
 
     int space, wrap_margin;
-    std::deque<FStructData> write_stack;
+    std::deque<FStructData> write_सालानसान;
     std::vector<char> buffer;
     size_t bufofs;
 
@@ -234,7 +234,7 @@ public:
     Base64Decoder base64decoder;
     base64::Base64Writer* base64_writer;
 
-    std::vector<FileNode> roots;
+    std::vector<File_बुहोल> roots;
     std::vector<Ptr<std::vector<uchar> > > fs_data;
     std::vector<uchar*> fs_data_ptrs;
     std::vector<size_t> fs_data_blksz;

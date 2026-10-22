@@ -468,7 +468,7 @@ namespace gl
     PFNCULLFACEPROC CullFace;
     PFNFRONTFACEPROC FrontFace;
     PFNHINTPROC Hint;
-    PFNLINEWIDTHPROC LineWidth;
+    PFNLINEWIDTHPROC लिन्या_Width;
     PFNPOINTSIZEPROC PointSize;
     PFNPOLYGONMODEPROC PolygonMode;
     PFNSCISSORPROC Scissor;
@@ -794,10 +794,10 @@ namespace gl
         Hint(target, mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_LineWidth(GLfloat width)
+    static void CODEGEN_FUNCPTR Switch_लिन्या_Width(GLfloat width)
     {
-        LineWidth = (PFNLINEWIDTHPROC)IntGetProcAddress("glLineWidth");
-        LineWidth(width);
+        लिन्या_Width = (PFNLINEWIDTHPROC)IntGetProcAddress("glLineWidth");
+        लिन्या_Width(width);
     }
 
     static void CODEGEN_FUNCPTR Switch_PointSize(GLfloat size)
@@ -1064,16 +1064,16 @@ namespace gl
         Viewport(x, y, width, height);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawArrays(GLenum mode, GLint first, GLsizei count)
+    static void CODEGEN_FUNCPTR Switch_DrawArrays(GLenum mode, GLint first, GLsizei बिलांग_2)
     {
         DrawArrays = (PFNDRAWARRAYSPROC)IntGetProcAddress("glDrawArrays");
-        DrawArrays(mode, first, count);
+        DrawArrays(mode, first, बिलांग_2);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices)
+    static void CODEGEN_FUNCPTR Switch_DrawElements(GLenum mode, GLsizei बिलांग_2, GLenum type, const GLvoid *indices)
     {
         DrawElements = (PFNDRAWELEMENTSPROC)IntGetProcAddress("glDrawElements");
-        DrawElements(mode, count, type, indices);
+        DrawElements(mode, बिलांग_2, type, indices);
     }
 
     static void CODEGEN_FUNCPTR Switch_GetPointerv(GLenum pname, GLvoid* *params)
@@ -1174,10 +1174,10 @@ namespace gl
         BlendEquation(mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices)
+    static void CODEGEN_FUNCPTR Switch_DrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei बिलांग_2, GLenum type, const GLvoid *indices)
     {
         DrawRangeElements = (PFNDRAWRANGEELEMENTSPROC)IntGetProcAddress("glDrawRangeElements");
-        DrawRangeElements(mode, start, end, count, type, indices);
+        DrawRangeElements(mode, start, end, बिलांग_2, type, indices);
     }
 
     static void CODEGEN_FUNCPTR Switch_TexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid *pixels)
@@ -1256,16 +1256,16 @@ namespace gl
         BlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_MultiDrawArrays(GLenum mode, const GLint *first, const GLsizei *count, GLsizei drawcount)
+    static void CODEGEN_FUNCPTR Switch_MultiDrawArrays(GLenum mode, const GLint *first, const GLsizei *बिलांग_2, GLsizei drawcount)
     {
         MultiDrawArrays = (PFNMULTIDRAWARRAYSPROC)IntGetProcAddress("glMultiDrawArrays");
-        MultiDrawArrays(mode, first, count, drawcount);
+        MultiDrawArrays(mode, first, बिलांग_2, drawcount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_MultiDrawElements(GLenum mode, const GLsizei *count, GLenum type, const GLvoid* const *indices, GLsizei drawcount)
+    static void CODEGEN_FUNCPTR Switch_MultiDrawElements(GLenum mode, const GLsizei *बिलांग_2, GLenum type, const GLvoid* const *indices, GLsizei drawcount)
     {
         MultiDrawElements = (PFNMULTIDRAWELEMENTSPROC)IntGetProcAddress("glMultiDrawElements");
-        MultiDrawElements(mode, count, type, indices, drawcount);
+        MultiDrawElements(mode, बिलांग_2, type, indices, drawcount);
     }
 
     static void CODEGEN_FUNCPTR Switch_PointParameterf(GLenum pname, GLfloat param)
@@ -1512,10 +1512,10 @@ namespace gl
         GetActiveUniform(program, index, bufSize, length, size, type, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetAttachedShaders(GLuint program, GLsizei maxCount, GLsizei *count, GLuint *obj)
+    static void CODEGEN_FUNCPTR Switch_GetAttachedShaders(GLuint program, GLsizei max_बिलांग, GLsizei *बिलांग_2, GLuint *obj)
     {
         GetAttachedShaders = (PFNGETATTACHEDSHADERSPROC)IntGetProcAddress("glGetAttachedShaders");
-        GetAttachedShaders(program, maxCount, count, obj);
+        GetAttachedShaders(program, max_बिलांग, बिलांग_2, obj);
     }
 
     static GLint CODEGEN_FUNCPTR Switch_GetAttribLocation(GLuint program, const GLchar *name)
@@ -1614,10 +1614,10 @@ namespace gl
         LinkProgram(program);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ShaderSource(GLuint shader, GLsizei count, const GLchar* const *string, const GLint *length)
+    static void CODEGEN_FUNCPTR Switch_ShaderSource(GLuint shader, GLsizei बिलांग_2, const GLchar* const *string, const GLint *length)
     {
         ShaderSource = (PFNSHADERSOURCEPROC)IntGetProcAddress("glShaderSource");
-        ShaderSource(shader, count, string, length);
+        ShaderSource(shader, बिलांग_2, string, length);
     }
 
     static void CODEGEN_FUNCPTR Switch_UseProgram(GLuint program)
@@ -1674,70 +1674,70 @@ namespace gl
         Uniform4i(location, v0, v1, v2, v3);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1fv(GLint location, GLsizei count, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform1fv(GLint location, GLsizei बिलांग_2, const GLfloat *value)
     {
         Uniform1fv = (PFNUNIFORM1FVPROC)IntGetProcAddress("glUniform1fv");
-        Uniform1fv(location, count, value);
+        Uniform1fv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2fv(GLint location, GLsizei count, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform2fv(GLint location, GLsizei बिलांग_2, const GLfloat *value)
     {
         Uniform2fv = (PFNUNIFORM2FVPROC)IntGetProcAddress("glUniform2fv");
-        Uniform2fv(location, count, value);
+        Uniform2fv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3fv(GLint location, GLsizei count, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform3fv(GLint location, GLsizei बिलांग_2, const GLfloat *value)
     {
         Uniform3fv = (PFNUNIFORM3FVPROC)IntGetProcAddress("glUniform3fv");
-        Uniform3fv(location, count, value);
+        Uniform3fv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4fv(GLint location, GLsizei count, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform4fv(GLint location, GLsizei बिलांग_2, const GLfloat *value)
     {
         Uniform4fv = (PFNUNIFORM4FVPROC)IntGetProcAddress("glUniform4fv");
-        Uniform4fv(location, count, value);
+        Uniform4fv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1iv(GLint location, GLsizei count, const GLint *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform1iv(GLint location, GLsizei बिलांग_2, const GLint *value)
     {
         Uniform1iv = (PFNUNIFORM1IVPROC)IntGetProcAddress("glUniform1iv");
-        Uniform1iv(location, count, value);
+        Uniform1iv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2iv(GLint location, GLsizei count, const GLint *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform2iv(GLint location, GLsizei बिलांग_2, const GLint *value)
     {
         Uniform2iv = (PFNUNIFORM2IVPROC)IntGetProcAddress("glUniform2iv");
-        Uniform2iv(location, count, value);
+        Uniform2iv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3iv(GLint location, GLsizei count, const GLint *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform3iv(GLint location, GLsizei बिलांग_2, const GLint *value)
     {
         Uniform3iv = (PFNUNIFORM3IVPROC)IntGetProcAddress("glUniform3iv");
-        Uniform3iv(location, count, value);
+        Uniform3iv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4iv(GLint location, GLsizei count, const GLint *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform4iv(GLint location, GLsizei बिलांग_2, const GLint *value)
     {
         Uniform4iv = (PFNUNIFORM4IVPROC)IntGetProcAddress("glUniform4iv");
-        Uniform4iv(location, count, value);
+        Uniform4iv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_UniformMatrix2fv(GLint location, GLsizei बिलांग_2, GLboolean transpose, const GLfloat *value)
     {
         UniformMatrix2fv = (PFNUNIFORMMATRIX2FVPROC)IntGetProcAddress("glUniformMatrix2fv");
-        UniformMatrix2fv(location, count, transpose, value);
+        UniformMatrix2fv(location, बिलांग_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_UniformMatrix3fv(GLint location, GLsizei बिलांग_2, GLboolean transpose, const GLfloat *value)
     {
         UniformMatrix3fv = (PFNUNIFORMMATRIX3FVPROC)IntGetProcAddress("glUniformMatrix3fv");
-        UniformMatrix3fv(location, count, transpose, value);
+        UniformMatrix3fv(location, बिलांग_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_UniformMatrix4fv(GLint location, GLsizei बिलांग_2, GLboolean transpose, const GLfloat *value)
     {
         UniformMatrix4fv = (PFNUNIFORMMATRIX4FVPROC)IntGetProcAddress("glUniformMatrix4fv");
-        UniformMatrix4fv(location, count, transpose, value);
+        UniformMatrix4fv(location, बिलांग_2, transpose, value);
     }
 
     static void CODEGEN_FUNCPTR Switch_ValidateProgram(GLuint program)
@@ -1754,40 +1754,40 @@ namespace gl
 
     // Extension: 2.1
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix2x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_UniformMatrix2x3fv(GLint location, GLsizei बिलांग_2, GLboolean transpose, const GLfloat *value)
     {
         UniformMatrix2x3fv = (PFNUNIFORMMATRIX2X3FVPROC)IntGetProcAddress("glUniformMatrix2x3fv");
-        UniformMatrix2x3fv(location, count, transpose, value);
+        UniformMatrix2x3fv(location, बिलांग_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix3x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_UniformMatrix3x2fv(GLint location, GLsizei बिलांग_2, GLboolean transpose, const GLfloat *value)
     {
         UniformMatrix3x2fv = (PFNUNIFORMMATRIX3X2FVPROC)IntGetProcAddress("glUniformMatrix3x2fv");
-        UniformMatrix3x2fv(location, count, transpose, value);
+        UniformMatrix3x2fv(location, बिलांग_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix2x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_UniformMatrix2x4fv(GLint location, GLsizei बिलांग_2, GLboolean transpose, const GLfloat *value)
     {
         UniformMatrix2x4fv = (PFNUNIFORMMATRIX2X4FVPROC)IntGetProcAddress("glUniformMatrix2x4fv");
-        UniformMatrix2x4fv(location, count, transpose, value);
+        UniformMatrix2x4fv(location, बिलांग_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix4x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_UniformMatrix4x2fv(GLint location, GLsizei बिलांग_2, GLboolean transpose, const GLfloat *value)
     {
         UniformMatrix4x2fv = (PFNUNIFORMMATRIX4X2FVPROC)IntGetProcAddress("glUniformMatrix4x2fv");
-        UniformMatrix4x2fv(location, count, transpose, value);
+        UniformMatrix4x2fv(location, बिलांग_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix3x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_UniformMatrix3x4fv(GLint location, GLsizei बिलांग_2, GLboolean transpose, const GLfloat *value)
     {
         UniformMatrix3x4fv = (PFNUNIFORMMATRIX3X4FVPROC)IntGetProcAddress("glUniformMatrix3x4fv");
-        UniformMatrix3x4fv(location, count, transpose, value);
+        UniformMatrix3x4fv(location, बिलांग_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    static void CODEGEN_FUNCPTR Switch_UniformMatrix4x3fv(GLint location, GLsizei बिलांग_2, GLboolean transpose, const GLfloat *value)
     {
         UniformMatrix4x3fv = (PFNUNIFORMMATRIX4X3FVPROC)IntGetProcAddress("glUniformMatrix4x3fv");
-        UniformMatrix4x3fv(location, count, transpose, value);
+        UniformMatrix4x3fv(location, बिलांग_2, transpose, value);
     }
 
     // Extension: ARB_vertex_array_object
@@ -2014,10 +2014,10 @@ namespace gl
         BindBufferBase(target, index, buffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TransformFeedbackVaryings(GLuint program, GLsizei count, const GLchar* const *varyings, GLenum bufferMode)
+    static void CODEGEN_FUNCPTR Switch_TransformFeedbackVaryings(GLuint program, GLsizei बिलांग_2, const GLchar* const *varyings, GLenum bufferMode)
     {
         TransformFeedbackVaryings = (PFNTRANSFORMFEEDBACKVARYINGSPROC)IntGetProcAddress("glTransformFeedbackVaryings");
-        TransformFeedbackVaryings(program, count, varyings, bufferMode);
+        TransformFeedbackVaryings(program, बिलांग_2, varyings, bufferMode);
     }
 
     static void CODEGEN_FUNCPTR Switch_GetTransformFeedbackVarying(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLsizei *size, GLenum *type, GLchar *name)
@@ -2224,28 +2224,28 @@ namespace gl
         Uniform4ui(location, v0, v1, v2, v3);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1uiv(GLint location, GLsizei count, const GLuint *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform1uiv(GLint location, GLsizei बिलांग_2, const GLuint *value)
     {
         Uniform1uiv = (PFNUNIFORM1UIVPROC)IntGetProcAddress("glUniform1uiv");
-        Uniform1uiv(location, count, value);
+        Uniform1uiv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2uiv(GLint location, GLsizei count, const GLuint *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform2uiv(GLint location, GLsizei बिलांग_2, const GLuint *value)
     {
         Uniform2uiv = (PFNUNIFORM2UIVPROC)IntGetProcAddress("glUniform2uiv");
-        Uniform2uiv(location, count, value);
+        Uniform2uiv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3uiv(GLint location, GLsizei count, const GLuint *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform3uiv(GLint location, GLsizei बिलांग_2, const GLuint *value)
     {
         Uniform3uiv = (PFNUNIFORM3UIVPROC)IntGetProcAddress("glUniform3uiv");
-        Uniform3uiv(location, count, value);
+        Uniform3uiv(location, बिलांग_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4uiv(GLint location, GLsizei count, const GLuint *value)
+    static void CODEGEN_FUNCPTR Switch_Uniform4uiv(GLint location, GLsizei बिलांग_2, const GLuint *value)
     {
         Uniform4uiv = (PFNUNIFORM4UIVPROC)IntGetProcAddress("glUniform4uiv");
-        Uniform4uiv(location, count, value);
+        Uniform4uiv(location, बिलांग_2, value);
     }
 
     static void CODEGEN_FUNCPTR Switch_TexParameterIiv(GLenum target, GLenum pname, const GLint *params)
@@ -2304,16 +2304,16 @@ namespace gl
 
     // Extension: ARB_uniform_buffer_object
 
-    static void CODEGEN_FUNCPTR Switch_GetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar* const *uniformNames, GLuint *uniformIndices)
+    static void CODEGEN_FUNCPTR Switch_GetUniformIndices(GLuint program, GLsizei uniform_बिलांग, const GLchar* const *uniformNames, GLuint *uniformIndices)
     {
         GetUniformIndices = (PFNGETUNIFORMINDICESPROC)IntGetProcAddress("glGetUniformIndices");
-        GetUniformIndices(program, uniformCount, uniformNames, uniformIndices);
+        GetUniformIndices(program, uniform_बिलांग, uniformNames, uniformIndices);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniformsiv(GLuint program, GLsizei uniformCount, const GLuint *uniformIndices, GLenum pname, GLint *params)
+    static void CODEGEN_FUNCPTR Switch_GetActiveUniformsiv(GLuint program, GLsizei uniform_बिलांग, const GLuint *uniformIndices, GLenum pname, GLint *params)
     {
         GetActiveUniformsiv = (PFNGETACTIVEUNIFORMSIVPROC)IntGetProcAddress("glGetActiveUniformsiv");
-        GetActiveUniformsiv(program, uniformCount, uniformIndices, pname, params);
+        GetActiveUniformsiv(program, uniform_बिलांग, uniformIndices, pname, params);
     }
 
     static void CODEGEN_FUNCPTR Switch_GetActiveUniformName(GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformName)
@@ -2356,16 +2356,16 @@ namespace gl
 
     // Extension: 3.1
 
-    static void CODEGEN_FUNCPTR Switch_DrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instancecount)
+    static void CODEGEN_FUNCPTR Switch_DrawArraysInstanced(GLenum mode, GLint first, GLsizei बिलांग_2, GLsizei instancecount)
     {
         DrawArraysInstanced = (PFNDRAWARRAYSINSTANCEDPROC)IntGetProcAddress("glDrawArraysInstanced");
-        DrawArraysInstanced(mode, first, count, instancecount);
+        DrawArraysInstanced(mode, first, बिलांग_2, instancecount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices, GLsizei instancecount)
+    static void CODEGEN_FUNCPTR Switch_DrawElementsInstanced(GLenum mode, GLsizei बिलांग_2, GLenum type, const GLvoid *indices, GLsizei instancecount)
     {
         DrawElementsInstanced = (PFNDRAWELEMENTSINSTANCEDPROC)IntGetProcAddress("glDrawElementsInstanced");
-        DrawElementsInstanced(mode, count, type, indices, instancecount);
+        DrawElementsInstanced(mode, बिलांग_2, type, indices, instancecount);
     }
 
     static void CODEGEN_FUNCPTR Switch_TexBuffer(GLenum target, GLenum internalformat, GLuint buffer)
@@ -2436,10 +2436,10 @@ namespace gl
         LoadIdentity();
     }
 
-    static void CODEGEN_FUNCPTR Switch_Ortho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val)
+    static void CODEGEN_FUNCPTR Switch_Ortho(GLdouble कालिवा, GLdouble कानान, GLdouble bottom, GLdouble इताअस_2, GLdouble near_val, GLdouble far_val)
     {
         Ortho = (PFNORTHOPROC)IntGetProcAddress("glOrtho");
-        Ortho(left, right, bottom, top, near_val, far_val);
+        Ortho(कालिवा, कानान, bottom, इताअस_2, near_val, far_val);
     }
 
     static void CODEGEN_FUNCPTR Switch_Color3d(GLdouble red, GLdouble green, GLdouble blue)
@@ -2456,7 +2456,7 @@ namespace gl
             CullFace = Switch_CullFace;
             FrontFace = Switch_FrontFace;
             Hint = Switch_Hint;
-            LineWidth = Switch_LineWidth;
+            लिन्या_Width = Switch_लिन्या_Width;
             PointSize = Switch_PointSize;
             PolygonMode = Switch_PolygonMode;
             Scissor = Switch_Scissor;

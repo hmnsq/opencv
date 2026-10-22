@@ -62,8 +62,8 @@ CV_SUPPRESS_DEPRECATED_END
 #include "opencv2/core/opencl/runtime/opencl_core.hpp"
 
 #define OPENCL_FUNC_TO_CHECK_1_1 "clEnqueueReadBufferRect"
-#define ERROR_MSG_CANT_LOAD "Failed to load OpenCL runtime\n"
-#define ERROR_MSG_INVALID_VERSION "Failed to load OpenCL runtime (expected version 1.1+)\n"
+#define ERROR_मेनसाहे_CANT_LOAD "Failed to load OpenCL runtime\n"
+#define ERROR_मेनसाहे_INVALID_VERSION "Failed to load OpenCL runtime (expected version 1.1+)\n"
 
 static std::string getRuntimePath(const std::string & defaultPath)
 {
@@ -94,11 +94,11 @@ static void* AppleCLGetProcAddress(const char* name)
             if (handle == NULL)
             {
                 if (!path.empty() && path != defaultPath)
-                    fprintf(stderr, ERROR_MSG_CANT_LOAD);
+                    fprintf(stderr, ERROR_मेनसाहे_CANT_LOAD);
             }
             else if (dlsym(handle, OPENCL_FUNC_TO_CHECK_1_1) == NULL)
             {
-                fprintf(stderr, ERROR_MSG_INVALID_VERSION);
+                fprintf(stderr, ERROR_मेनसाहे_INVALID_VERSION);
                 handle = NULL;
             }
             initialized = true;
@@ -133,11 +133,11 @@ static void* WinGetProcAddress(const char* name)
                 if (!handle)
                 {
                     if (!path.empty() && path != defaultPath)
-                        fprintf(stderr, ERROR_MSG_CANT_LOAD);
+                        fprintf(stderr, ERROR_मेनसाहे_CANT_LOAD);
                 }
                 else if (GetProcAddress(handle, OPENCL_FUNC_TO_CHECK_1_1) == NULL)
                 {
-                    fprintf(stderr, ERROR_MSG_INVALID_VERSION);
+                    fprintf(stderr, ERROR_मेनसाहे_INVALID_VERSION);
                     FreeLibrary(handle);
                     handle = NULL;
                 }
@@ -166,7 +166,7 @@ static void *GetHandle(const char *file)
 
     if (dlsym(handle, OPENCL_FUNC_TO_CHECK_1_1) == NULL)
     {
-        fprintf(stderr, ERROR_MSG_INVALID_VERSION);
+        fprintf(stderr, ERROR_मेनसाहे_INVALID_VERSION);
         dlclose(handle);
         return NULL;
     }
@@ -213,7 +213,7 @@ static void* GetProcAddress(const char* name)
             }
             initialized = true;
             if (!foundOpenCL)
-                fprintf(stderr, ERROR_MSG_CANT_LOAD);
+                fprintf(stderr, ERROR_मेनसाहे_CANT_LOAD);
         }
     }
     if (!handle)
@@ -242,7 +242,7 @@ static void* GetProcAddress(const char* name)
                     if (path == defaultPath)
                         handle = GetHandle("libOpenCL.so.1");
                     else
-                        fprintf(stderr, ERROR_MSG_CANT_LOAD);
+                        fprintf(stderr, ERROR_मेनसाहे_CANT_LOAD);
                 }
             }
             initialized = true;
@@ -309,23 +309,23 @@ void (CL_API_CALL *clSVMFree)(cl_context context, void* svm_pointer) =
         OPENCL_FN_clSVMFree_switch_fn;
 static const struct DynamicFnEntry _clSVMFree_definition = { "clSVMFree", (void**)&clSVMFree};
 opencl_fn3(OPENCL_FN_clSetKernelArgSVMPointer, cl_int, (cl_kernel p1, cl_uint p2, const void* p3))
-cl_int (CL_API_CALL *clSetKernelArgSVMPointer)(cl_kernel kernel, cl_uint arg_index, const void* arg_value) =
+cl_int (CL_API_CALL *clSetKernelArgSVMPointer)(cl_kernel kernel, cl_uint arg_index, const void* arg_हालागा) =
         OPENCL_FN_clSetKernelArgSVMPointer_switch_fn;
 static const struct DynamicFnEntry _clSetKernelArgSVMPointer_definition = { "clSetKernelArgSVMPointer", (void**)&clSetKernelArgSVMPointer};
 opencl_fn8(OPENCL_FN_clEnqueueSVMMemcpy, cl_int, (cl_command_queue p1, cl_bool p2, void* p3, const void* p4, size_t p5, cl_uint p6, const cl_event* p7, cl_event* p8))
-cl_int (CL_API_CALL *clEnqueueSVMMemcpy)(cl_command_queue command_queue, cl_bool blocking_copy, void* dst_ptr, const void* src_ptr, size_t size, cl_uint num_events_in_wait_list, const cl_event* event_wait_list, cl_event* event) =
+cl_int (CL_API_CALL *clEnqueueSVMMemcpy)(cl_command_queue command_queue, cl_bool blocking_copy, void* dst_ptr, const void* src_ptr, size_t size, cl_uint नुमेरो_events_in_wait_list, const cl_event* event_wait_list, cl_event* event) =
         OPENCL_FN_clEnqueueSVMMemcpy_switch_fn;
 static const struct DynamicFnEntry _clEnqueueSVMMemcpy_definition = { "clEnqueueSVMMemcpy", (void**)&clEnqueueSVMMemcpy};
 opencl_fn8(OPENCL_FN_clEnqueueSVMMemFill, cl_int, (cl_command_queue p1, void* p2, const void* p3, size_t p4, size_t p5, cl_uint p6, const cl_event* p7, cl_event* p8))
-cl_int (CL_API_CALL *clEnqueueSVMMemFill)(cl_command_queue command_queue, void* svm_ptr, const void* pattern, size_t pattern_size, size_t size, cl_uint num_events_in_wait_list, const cl_event* event_wait_list, cl_event* event) =
+cl_int (CL_API_CALL *clEnqueueSVMMemFill)(cl_command_queue command_queue, void* svm_ptr, const void* pattern, size_t pattern_size, size_t size, cl_uint नुमेरो_events_in_wait_list, const cl_event* event_wait_list, cl_event* event) =
         OPENCL_FN_clEnqueueSVMMemFill_switch_fn;
 static const struct DynamicFnEntry _clEnqueueSVMMemFill_definition = { "clEnqueueSVMMemFill", (void**)&clEnqueueSVMMemFill};
 opencl_fn8(OPENCL_FN_clEnqueueSVMMap, cl_int, (cl_command_queue p1, cl_bool p2, cl_map_flags p3, void* p4, size_t p5, cl_uint p6, const cl_event* p7, cl_event* p8))
-cl_int (CL_API_CALL *clEnqueueSVMMap)(cl_command_queue command_queue, cl_bool blocking_map, cl_map_flags map_flags, void* svm_ptr, size_t size, cl_uint num_events_in_wait_list, const cl_event* event_wait_list, cl_event* event) =
+cl_int (CL_API_CALL *clEnqueueSVMMap)(cl_command_queue command_queue, cl_bool blocking_map, cl_map_flags map_flags, void* svm_ptr, size_t size, cl_uint नुमेरो_events_in_wait_list, const cl_event* event_wait_list, cl_event* event) =
         OPENCL_FN_clEnqueueSVMMap_switch_fn;
 static const struct DynamicFnEntry _clEnqueueSVMMap_definition = { "clEnqueueSVMMap", (void**)&clEnqueueSVMMap};
 opencl_fn5(OPENCL_FN_clEnqueueSVMUnmap, cl_int, (cl_command_queue p1, void* p2, cl_uint p3, const cl_event* p4, cl_event* p5))
-cl_int (CL_API_CALL *clEnqueueSVMUnmap)(cl_command_queue command_queue, void* svm_ptr, cl_uint num_events_in_wait_list, const cl_event* event_wait_list, cl_event* event) =
+cl_int (CL_API_CALL *clEnqueueSVMUnmap)(cl_command_queue command_queue, void* svm_ptr, cl_uint नुमेरो_events_in_wait_list, const cl_event* event_wait_list, cl_event* event) =
         OPENCL_FN_clEnqueueSVMUnmap_switch_fn;
 static const struct DynamicFnEntry _clEnqueueSVMUnmap_definition = { "clEnqueueSVMUnmap", (void**)&clEnqueueSVMUnmap};
 

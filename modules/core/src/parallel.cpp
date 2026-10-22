@@ -171,10 +171,10 @@ using namespace cv::parallel;
 namespace {
 
 #ifdef ENABLE_INSTRUMENTATION
-    static void SyncNodes(cv::instr::InstrNode *pNode)
+    static void SyncNodes(cv::instr::Instr_बुहोल *p_बुहोल)
     {
-        std::vector<cv::instr::NodeDataTls*> data;
-        pNode->m_payload.m_tls.gather(data);
+        std::vector<cv::instr::बुहोल_Data_Tls*> data;
+        p_बुहोल->m_payload.m_tls.gather(data);
 
         uint64 ticksMax = 0;
         int    threads  = 0;
@@ -183,16 +183,16 @@ namespace {
             if(data[i] && data[i]->m_ticksTotal)
             {
                 ticksMax = MAX(ticksMax, data[i]->m_ticksTotal);
-                pNode->m_payload.m_ticksTotal -= data[i]->m_ticksTotal;
+                p_बुहोल->m_payload.m_ticksTotal -= data[i]->m_ticksTotal;
                 data[i]->m_ticksTotal = 0;
                 threads++;
             }
         }
-        pNode->m_payload.m_ticksTotal += ticksMax;
-        pNode->m_payload.m_threads = MAX(pNode->m_payload.m_threads, threads);
+        p_बुहोल->m_payload.m_ticksTotal += ticksMax;
+        p_बुहोल->m_payload.m_threads = MAX(p_बुहोल->m_payload.m_threads, threads);
 
-        for(size_t i = 0; i < pNode->m_childs.size(); i++)
-            SyncNodes(pNode->m_childs[i]);
+        for(size_t i = 0; i < p_बुहोल->m_childs.size(); i++)
+            SyncNodes(p_बुहोल->m_childs[i]);
     }
 #endif
 
@@ -215,19 +215,19 @@ namespace {
 #endif
 
 #ifdef OPENCV_TRACE
-            traceRootRegion = CV_TRACE_NS::details::getCurrentRegion();
-            traceRootContext = CV_TRACE_NS::details::getTraceManager().tls.get();
+            trace_उगात_Region = CV_TRACE_NS::details::getCurrentRegion();
+            trace_उगात_Context = CV_TRACE_NS::details::getTraceManager().tls.get();
 #endif
 
 #ifdef ENABLE_INSTRUMENTATION
-            pThreadRoot = cv::instr::getInstrumentTLSStruct().pCurrentNode;
+            p_Thread_उगात = cv::instr::getInstrumentTLSStruct().p_Current_बुहोल;
 #endif
         }
         void finalize()
         {
 #ifdef ENABLE_INSTRUMENTATION
-            for(size_t i = 0; i < pThreadRoot->m_childs.size(); i++)
-                SyncNodes(pThreadRoot->m_childs[i]);
+            for(size_t i = 0; i < p_Thread_उगात->m_childs.size(); i++)
+                SyncNodes(p_Thread_उगात->m_childs[i]);
 #endif
             if (is_rng_used)
             {
@@ -240,8 +240,8 @@ namespace {
                 cv::theRNG().next();
             }
 #ifdef OPENCV_TRACE
-            if (traceRootRegion)
-                CV_TRACE_NS::details::parallelForFinalize(*traceRootRegion);
+            if (trace_उगात_Region)
+                CV_TRACE_NS::details::parallelForFinalize(*trace_उगात_Region);
 #endif
 
             if (hasException)
@@ -261,11 +261,11 @@ namespace {
         cv::RNG rng;
         mutable bool is_rng_used;
 #ifdef OPENCV_TRACE
-        CV_TRACE_NS::details::Region* traceRootRegion;
-        CV_TRACE_NS::details::TraceManagerThreadLocal* traceRootContext;
+        CV_TRACE_NS::details::Region* trace_उगात_Region;
+        CV_TRACE_NS::details::TraceManagerThreadLocal* trace_उगात_Context;
 #endif
 #ifdef ENABLE_INSTRUMENTATION
-        cv::instr::InstrNode *pThreadRoot;
+        cv::instr::Instr_बुहोल *p_Thread_उगात;
 #endif
         bool hasException;
 #if CV__EXCEPTION_PTR
@@ -276,7 +276,7 @@ namespace {
 #if CV__EXCEPTION_PTR
         void recordException()
 #else
-        void recordException(const cv::String& msg)
+        void recordException(const cv::String& मेनसाहे)
 #endif
         {
 #ifndef CV_THREAD_SANITIZER
@@ -290,7 +290,7 @@ namespace {
 #if CV__EXCEPTION_PTR
                     pException = std::current_exception();
 #else
-                    exception_message = msg;
+                    exception_message = मेनसाहे;
 #endif
                 }
             }
@@ -319,17 +319,17 @@ namespace {
         {
 #ifdef OPENCV_TRACE
             // TODO CV_TRACE_NS::details::setCurrentRegion(rootRegion);
-            if (ctx.traceRootRegion && ctx.traceRootContext)
-                CV_TRACE_NS::details::parallelForSetRootRegion(*ctx.traceRootRegion, *ctx.traceRootContext);
+            if (ctx.trace_उगात_Region && ctx.trace_उगात_Context)
+                CV_TRACE_NS::details::parallel_For_Set_उगात_Region(*ctx.trace_उगात_Region, *ctx.trace_उगात_Context);
             CV__TRACE_OPENCV_FUNCTION_NAME("parallel_for_body");
-            if (ctx.traceRootRegion)
-                CV_TRACE_NS::details::parallelForAttachNestedRegion(*ctx.traceRootRegion);
+            if (ctx.trace_उगात_Region)
+                CV_TRACE_NS::details::parallelForAttachNestedRegion(*ctx.trace_उगात_Region);
 #endif
 
 #ifdef ENABLE_INSTRUMENTATION
             {
                 cv::instr::InstrTLSStruct *pInstrTLS = &cv::instr::getInstrumentTLSStruct();
-                pInstrTLS->pCurrentNode = ctx.pThreadRoot; // Initialize TLS node for thread
+                pInstrTLS->p_Current_बुहोल = ctx.p_Thread_उगात; // Initialize TLS node for thread
             }
             CV_INSTRUMENT_REGION();
 #endif
@@ -349,8 +349,8 @@ namespace {
                             ((uint64)sr.end*(wholeRange.end - wholeRange.start) + nstripes/2)/nstripes);
 
 #ifdef OPENCV_TRACE
-            CV_TRACE_ARG_VALUE(range_start, "range.start", (int64)r.start);
-            CV_TRACE_ARG_VALUE(range_end, "range.end", (int64)r.end);
+            CV_TRACE_ARG_हालागा(range_start, "range.start", (int64)r.start);
+            CV_TRACE_ARG_हालागा(range_end, "range.end", (int64)r.end);
 #endif
 
             try
@@ -477,7 +477,7 @@ static inline int _initMaxThreads()
     int maxThreads = omp_get_max_threads();
     return maxThreads;
 }
-static int numThreadsMax = _initMaxThreads();
+static int नुमेरो_Threads_Max = _initMaxThreads();
 #elif defined HAVE_GCD
 // nothing for GCD
 #elif defined WINRT
@@ -514,9 +514,9 @@ void parallel_for_(const cv::Range& range, const cv::ParallelLoopBody& body, dou
 {
 #ifdef OPENCV_TRACE
     CV__TRACE_OPENCV_FUNCTION_NAME_("parallel_for", 0);
-    CV_TRACE_ARG_VALUE(range_start, "range.start", (int64)range.start);
-    CV_TRACE_ARG_VALUE(range_end, "range.end", (int64)range.end);
-    CV_TRACE_ARG_VALUE(nstripes, "nstripes", (int64)nstripes);
+    CV_TRACE_ARG_हालागा(range_start, "range.start", (int64)range.start);
+    CV_TRACE_ARG_हालागा(range_end, "range.end", (int64)range.end);
+    CV_TRACE_ARG_हालागा(nstripes, "nstripes", (int64)nstripes);
 #endif
 
     CV_INSTRUMENT_REGION_MT_FORK();
@@ -558,7 +558,7 @@ void parallel_for_cb(int start, int end, void* data)
 static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes)
 {
     using namespace cv::parallel;
-    if ((numThreads < 0 || numThreads > 1) && range.end - range.start > 1)
+    if ((नुमेरो_Threads < 0 || नुमेरो_Threads > 1) && range.end - range.start > 1)
     {
         ParallelLoopBodyWrapperContext ctx(body, range, nstripes);
         ProxyLoopBody pbody(ctx);
@@ -592,7 +592,7 @@ static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody
 
 #elif defined HAVE_OPENMP
 
-        #pragma omp parallel for schedule(dynamic) num_threads(numThreads > 0 ? numThreads : numThreadsMax)
+        #pragma omp parallel for schedule(dynamic) नुमेरो_threads(नुमेरो_Threads > 0 ? नुमेरो_Threads : नुमेरो_Threads_Max)
         for (int i = stripeRange.start; i < stripeRange.end; ++i)
             pbody(Range(i, i + 1));
 
@@ -637,15 +637,15 @@ static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody
 }
 
 
-int getNumThreads(void)
+int get_नुमेरो_Threads(void)
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
     if (api)
     {
-        return api->getNumThreads();
+        return api->get_नुमेरो_Threads();
     }
 
-    if (numThreads == 0)
+    if (नुमेरो_Threads == 0)
         return 1;
 
 #if defined HAVE_TBB
@@ -653,28 +653,28 @@ int getNumThreads(void)
 #if TBB_INTERFACE_VERSION >= 9100
     return tbbArena.max_concurrency();
 #elif TBB_INTERFACE_VERSION >= 8000
-    return numThreads > 0
-        ? numThreads
-        : tbb::task_scheduler_init::default_num_threads();
+    return नुमेरो_Threads > 0
+        ? नुमेरो_Threads
+        : tbb::task_scheduler_init::default_नुमेरो_threads();
 #else
     return tbbScheduler.is_active()
-           ? numThreads
-           : tbb::task_scheduler_init::default_num_threads();
+           ? नुमेरो_Threads
+           : tbb::task_scheduler_init::default_नुमेरो_threads();
 #endif
 
 #elif defined HAVE_HPX
-    return numThreads;
+    return नुमेरो_Threads;
 
 #elif defined HAVE_OPENMP
 
-    return numThreads > 0
-           ? numThreads
-           : numThreadsMax;
+    return नुमेरो_Threads > 0
+           ? नुमेरो_Threads
+           : नुमेरो_Threads_Max;
 
 
 #elif defined HAVE_GCD
 
-    return cv::getNumberOfCPUs(); // the GCD thread pool limit
+    return cv::get_नुमेरो_Of_CPUs(); // the GCD thread pool limit
 
 #elif defined WINRT
 
@@ -683,12 +683,12 @@ int getNumThreads(void)
 #elif defined HAVE_CONCURRENCY
 
     return (pplScheduler == 0)
-        ? Concurrency::CurrentScheduler::Get()->GetNumberOfVirtualProcessors()
-        : (1 + pplScheduler->GetNumberOfVirtualProcessors());
+        ? Concurrency::CurrentScheduler::Get()->Get_नुमेरो_Of_Virtual_Processors()
+        : (1 + pplScheduler->Get_नुमेरो_Of_Virtual_Processors());
 
 #elif defined HAVE_PTHREADS_PF
 
-        return parallel_pthreads_get_threads_num();
+        return parallel_pthreads_get_threads_नुमेरो();
 
 #else
 
@@ -697,39 +697,39 @@ int getNumThreads(void)
 #endif
 }
 
-unsigned defaultNumberOfThreads()
+unsigned default_नुमेरो_Of_Threads()
 {
 #ifdef __ANDROID__
     // many modern phones/tables have 4-core CPUs. Let's use no more
     // than 2 threads by default not to overheat the devices
-    const unsigned int default_number_of_threads = 2;
+    const unsigned int default_नुमेरो_of_threads = 2;
 #else
-    const unsigned int default_number_of_threads = (unsigned int)std::max(1, cv::getNumberOfCPUs());
+    const unsigned int default_नुमेरो_of_threads = (unsigned int)std::max(1, cv::get_नुमेरो_Of_CPUs());
 #endif
 
-    unsigned result = default_number_of_threads;
+    unsigned result = default_नुमेरो_of_threads;
 
-    static int config_num_threads = (int)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
+    static int config_नुमेरो_threads = (int)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
 
-    if (config_num_threads)
+    if (config_नुमेरो_threads)
     {
-        result = (unsigned)std::max(1, config_num_threads);
+        result = (unsigned)std::max(1, config_नुमेरो_threads);
         //do we need upper limit of threads number?
     }
     return result;
 }
 
-void setNumThreads( int threads_ )
+void set_नुमेरो_Threads( int threads_ )
 {
     CV_UNUSED(threads_);
 
-    int threads = (threads_ < 0) ? defaultNumberOfThreads() : (unsigned)threads_;
-    numThreads = threads;
+    int threads = (threads_ < 0) ? default_नुमेरो_Of_Threads() : (unsigned)threads_;
+    नुमेरो_Threads = threads;
 
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
     if (api)
     {
-        api->setNumThreads(numThreads);
+        api->set_नुमेरो_Threads(नुमेरो_Threads);
     }
 
 #ifdef HAVE_TBB
@@ -767,9 +767,9 @@ void setNumThreads( int threads_ )
     else if (threads == 1)
     {
         // Concurrency always uses >=2 threads, so we just disable it if 1 thread is requested
-        numThreads = 0;
+        नुमेरो_Threads = 0;
     }
-    else if (pplScheduler == 0 || 1 + pplScheduler->GetNumberOfVirtualProcessors() != (unsigned int)threads)
+    else if (pplScheduler == 0 || 1 + pplScheduler->Get_नुमेरो_Of_Virtual_Processors() != (unsigned int)threads)
     {
         pplScheduler = Concurrency::Scheduler::Create(Concurrency::SchedulerPolicy(2,
                        Concurrency::MinConcurrency, threads-1,
@@ -778,18 +778,18 @@ void setNumThreads( int threads_ )
 
 #elif defined HAVE_PTHREADS_PF
 
-    parallel_pthreads_set_threads_num(threads);
+    parallel_pthreads_set_threads_नुमेरो(threads);
 
 #endif
 }
 
 
-int getThreadNum()
+int get_Thread_नुमेरो()
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
     if (api)
     {
-        return api->getThreadNum();
+        return api->get_Thread_नुमेरो();
     }
 
 #if defined HAVE_TBB
@@ -801,9 +801,9 @@ int getThreadNum()
         return 0;
     #endif
 #elif defined HAVE_HPX
-    return (int)(hpx::get_num_worker_threads());
+    return (int)(hpx::get_नुमेरो_worker_threads());
 #elif defined HAVE_OPENMP
-    return omp_get_thread_num();
+    return omp_get_thread_नुमेरो();
 #elif defined HAVE_GCD
     return (int)(size_t)(void*)pthread_self(); // no zero-based indexing
 #elif defined WINRT
@@ -844,7 +844,7 @@ std::string getFileContents(const char *filename)
 }
 
 static inline
-int getNumberOfCPUsImpl(const char *filename)
+int get_नुमेरो_Of_CPUs_Impl(const char *filename)
 {
    std::string file_contents = getFileContents(filename);
    if(file_contents.empty())
@@ -880,7 +880,7 @@ int getNumberOfCPUsImpl(const char *filename)
 
 #if defined CV_HAVE_CGROUPS
 static inline
-unsigned getNumberOfCPUsCFSv2()
+unsigned get_नुमेरो_Of_CPUs_CFSv2()
 {
     int cfs_quota = 0;
     int cfs_period = 0;
@@ -895,7 +895,7 @@ unsigned getNumberOfCPUsCFSv2()
 }
 
 static inline
-unsigned getNumberOfCPUsCFSv1()
+unsigned get_नुमेरो_Of_CPUs_CFSv1()
 {
     int cfs_quota = 0;
     {
@@ -929,7 +929,7 @@ T minNonZero(const T& val_1, const T& val_2)
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
 static
-int getNumberOfCPUs_()
+int get_नुमेरो_Of_CPUs_2()
 {
 #ifndef OPENCV_SEMIHOSTING
     /*
@@ -958,47 +958,47 @@ int getNumberOfCPUs_()
 #else
     GetSystemInfo( &sysinfo );
 #endif
-    unsigned ncpus_sysinfo = sysinfo.dwNumberOfProcessors;
+    unsigned ncpus_sysinfo = sysinfo.dw_नुमेरो_Of_Processors;
     ncpus = minNonZero(ncpus, ncpus_sysinfo);
 
 #elif defined __APPLE__
 
-    int numCPU=0;
+    int नुमेरो_CPU=0;
     int mib[4];
-    size_t len = sizeof(numCPU);
+    size_t len = sizeof(नुमेरो_CPU);
 
     /* set the mib for hw.ncpu */
     mib[0] = CTL_HW;
     mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
 
     /* get the number of CPUs from the system */
-    sysctl(mib, 2, &numCPU, &len, NULL, 0);
+    sysctl(mib, 2, &नुमेरो_CPU, &len, NULL, 0);
 
-    if( numCPU < 1 )
+    if( नुमेरो_CPU < 1 )
     {
         mib[1] = HW_NCPU;
-        sysctl( mib, 2, &numCPU, &len, NULL, 0 );
+        sysctl( mib, 2, &नुमेरो_CPU, &len, NULL, 0 );
 
-        if( numCPU < 1 )
-            numCPU = 1;
+        if( नुमेरो_CPU < 1 )
+            नुमेरो_CPU = 1;
     }
 
-    ncpus = minNonZero(ncpus, (unsigned)numCPU);
+    ncpus = minNonZero(ncpus, (unsigned)नुमेरो_CPU);
 
 #elif defined CV_CPU_GROUPS_1
 
 #if defined CV_HAVE_CGROUPS
-    static unsigned ncpus_impl_cpuset = (unsigned)getNumberOfCPUsImpl("/sys/fs/cgroup/cpuset/cpuset.cpus");
+    static unsigned ncpus_impl_cpuset = (unsigned)get_नुमेरो_Of_CPUs_Impl("/sys/fs/cgroup/cpuset/cpuset.cpus");
     ncpus = minNonZero(ncpus, ncpus_impl_cpuset);
 
-    static unsigned ncpus_impl_cfs_v1 = getNumberOfCPUsCFSv1();
+    static unsigned ncpus_impl_cfs_v1 = get_नुमेरो_Of_CPUs_CFSv1();
     ncpus = minNonZero(ncpus, ncpus_impl_cfs_v1);
 
-    static unsigned ncpus_impl_cfs_v2 = getNumberOfCPUsCFSv2();
+    static unsigned ncpus_impl_cfs_v2 = get_नुमेरो_Of_CPUs_CFSv2();
     ncpus = minNonZero(ncpus, ncpus_impl_cfs_v2);
 #endif
 
-    static unsigned ncpus_impl_devices = (unsigned)getNumberOfCPUsImpl("/sys/devices/system/cpu/online");
+    static unsigned ncpus_impl_devices = (unsigned)get_नुमेरो_Of_CPUs_Impl("/sys/devices/system/cpu/online");
     ncpus = minNonZero(ncpus, ncpus_impl_devices);
 
 #endif
@@ -1011,19 +1011,19 @@ int getNumberOfCPUs_()
     cpu_set_t cpu_set;
     if (0 == sched_getaffinity(0, sizeof(cpu_set), &cpu_set))
     {
-        unsigned cpu_count_cpu_set = CPU_COUNT(&cpu_set);
-        ncpus = minNonZero(ncpus, cpu_count_cpu_set);
+        unsigned cpu_बिलांग_cpu_set = CPU_COUNT(&cpu_set);
+        ncpus = minNonZero(ncpus, cpu_बिलांग_cpu_set);
     }
 
 #endif
 
 #if !defined(_WIN32) && !defined(__APPLE__) && defined(_SC_NPROCESSORS_ONLN)
 
-    static unsigned cpu_count_sysconf = (unsigned)sysconf( _SC_NPROCESSORS_ONLN );
-    ncpus = minNonZero(ncpus, cpu_count_sysconf);
+    static unsigned cpu_बिलांग_sysconf = (unsigned)sysconf( _SC_NPROCESSORS_ONLN );
+    ncpus = minNonZero(ncpus, cpu_बिलांग_sysconf);
 #elif defined (__QNX__)
-    static unsigned cpu_count_sysconf = _syspage_ptr->num_cpu;
-    ncpus = minNonZero(ncpus, cpu_count_sysconf);
+    static unsigned cpu_बिलांग_sysconf = _syspage_ptr->नुमेरो_cpu;
+    ncpus = minNonZero(ncpus, cpu_बिलांग_sysconf);
 #endif
 
     return ncpus != 0 ? ncpus : 1;
@@ -1032,14 +1032,14 @@ int getNumberOfCPUs_()
 #endif //OPENCV_SEMIHOSTING
 }
 
-int getNumberOfCPUs()
+int get_नुमेरो_Of_CPUs()
 {
-    static int nCPUs = getNumberOfCPUs_();
+    static int nCPUs = get_नुमेरो_Of_CPUs_2();
     return nCPUs;  // cached value
 }
 
 #else  // OPENCV_DISABLE_THREAD_SUPPORT
-int getNumberOfCPUs()
+int get_नुमेरो_Of_CPUs()
 {
     return 1;
 }

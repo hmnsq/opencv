@@ -40,10 +40,10 @@ public:
     MatOp_Identity() {}
     virtual ~MatOp_Identity() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    bool elementWise(const Mat_पाहायाग& /*पाहायाग*/) const CV_OVERRIDE { return true; }
+    void assign(const Mat_पाहायाग& पाहायाग, Mat& m, int type=-1) const CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    static void make_पाहायाग(Mat_पाहायाग& res, const Mat& m);
 };
 
 static MatOp_Identity g_MatOp_Identity;
@@ -54,18 +54,18 @@ public:
     MatOp_AddEx() {}
     virtual ~MatOp_AddEx() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    bool elementWise(const Mat_पाहायाग& /*पाहायाग*/) const CV_OVERRIDE { return true; }
+    void assign(const Mat_पाहायाग& पाहायाग, Mat& m, int type=-1) const CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    void add(const Mat_पाहायाग& e1, const Scalar& s, Mat_पाहायाग& res) const CV_OVERRIDE;
+    void subtract(const Scalar& s, const Mat_पाहायाग& पाहायाग, Mat_पाहायाग& res) const CV_OVERRIDE;
+    void multiply(const Mat_पाहायाग& e1, double s, Mat_पाहायाग& res) const CV_OVERRIDE;
+    void divide(double s, const Mat_पाहायाग& e, Mat_पाहायाग& res) const CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    void transpose(const Mat_पाहायाग& e1, Mat_पाहायाग& res) const CV_OVERRIDE;
+    void abs(const Mat_पाहायाग& पाहायाग, Mat_पाहायाग& res) const CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    static void make_पाहायाग(Mat_पाहायाग& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
 };
 
 static MatOp_AddEx g_MatOp_AddEx;
@@ -76,14 +76,14 @@ public:
     MatOp_Bin() {}
     virtual ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    bool elementWise(const Mat_पाहायाग& /*पाहायाग*/) const CV_OVERRIDE { return true; }
+    void assign(const Mat_पाहायाग& पाहायाग, Mat& m, int type=-1) const CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    void multiply(const Mat_पाहायाग& e1, double s, Mat_पाहायाग& res) const CV_OVERRIDE;
+    void divide(double s, const Mat_पाहायाग& e, Mat_पाहायाग& res) const CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    static void make_पाहायाग(Mat_पाहायाग& res, char op, const Mat& a, const Mat& b, double scale=1);
+    static void make_पाहायाग(Mat_पाहायाग& res, char op, const Mat& a, const Scalar& s);
 };
 
 static MatOp_Bin g_MatOp_Bin;
@@ -94,11 +94,11 @@ public:
     MatOp_Cmp() {}
     virtual ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    bool elementWise(const Mat_पाहायाग& /*पाहायाग*/) const CV_OVERRIDE { return true; }
+    void assign(const Mat_पाहायाग& पाहायाग, Mat& m, int type=-1) const CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    static void make_पाहायाग(Mat_पाहायाग& res, int cmpop, const Mat& a, const Mat& b);
+    static void make_पाहायाग(Mat_पाहायाग& res, int cmpop, const Mat& a, double alpha);
 };
 
 static MatOp_Cmp g_MatOp_Cmp;
@@ -109,24 +109,24 @@ public:
     MatOp_GEMM() {}
     virtual ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    bool elementWise(const Mat_पाहायाग& /*पाहायाग*/) const CV_OVERRIDE { return false; }
+    void assign(const Mat_पाहायाग& पाहायाग, Mat& m, int type=-1) const CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    void add(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res) const CV_OVERRIDE;
+    void subtract(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res) const CV_OVERRIDE;
+    void multiply(const Mat_पाहायाग& e, double s, Mat_पाहायाग& res) const CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    void transpose(const Mat_पाहायाग& पाहायाग, Mat_पाहायाग& res) const CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    Size size(const Mat_पाहायाग& पाहायाग) const CV_OVERRIDE
     {
         return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+            (पाहायाग.flags & GEMM_2_T) ? पाहायाग.b.rows : पाहायाग.b.cols,
+            (पाहायाग.flags & GEMM_1_T) ? पाहायाग.a.cols : पाहायाग.a.rows
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
+    static void make_पाहायाग(Mat_पाहायाग& res, int flags, const Mat& a, const Mat& b,
                          double alpha=1, const Mat& c=Mat(), double beta=1);
 
 };
@@ -139,12 +139,12 @@ public:
     MatOp_Invert() {}
     virtual ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    bool elementWise(const Mat_पाहायाग& /*पाहायाग*/) const CV_OVERRIDE { return false; }
+    void assign(const Mat_पाहायाग& पाहायाग, Mat& m, int type=-1) const CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    void matmul(const Mat_पाहायाग& expr1, const Mat_पाहायाग& expr2, Mat_पाहायाग& res) const CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    static void make_पाहायाग(Mat_पाहायाग& res, int method, const Mat& m);
 };
 
 static MatOp_Invert g_MatOp_Invert;
@@ -155,13 +155,13 @@ public:
     MatOp_T() {}
     virtual ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    bool elementWise(const Mat_पाहायाग& /*पाहायाग*/) const CV_OVERRIDE { return false; }
+    void assign(const Mat_पाहायाग& पाहायाग, Mat& m, int type=-1) const CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    void multiply(const Mat_पाहायाग& e1, double s, Mat_पाहायाग& res) const CV_OVERRIDE;
+    void transpose(const Mat_पाहायाग& पाहायाग, Mat_पाहायाग& res) const CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    static void make_पाहायाग(Mat_पाहायाग& res, const Mat& a, double alpha=1);
 };
 
 static MatOp_T g_MatOp_T;
@@ -172,10 +172,10 @@ public:
     MatOp_Solve() {}
     virtual ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    bool elementWise(const Mat_पाहायाग& /*पाहायाग*/) const CV_OVERRIDE { return false; }
+    void assign(const Mat_पाहायाग& पाहायाग, Mat& m, int type=-1) const CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    static void make_पाहायाग(Mat_पाहायाग& res, int method, const Mat& a, const Mat& b);
 };
 
 static MatOp_Solve g_MatOp_Solve;
@@ -186,13 +186,13 @@ public:
     MatOp_Initializer() {}
     virtual ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    bool elementWise(const Mat_पाहायाग& /*पाहायाग*/) const CV_OVERRIDE { return false; }
+    void assign(const Mat_पाहायाग& पाहायाग, Mat& m, int type=-1) const CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    void multiply(const Mat_पाहायाग& e, double s, Mat_पाहायाग& res) const CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    static void make_पाहायाग(Mat_पाहायाग& res, int method, Size sz, int type, double alpha=1);
+    static void make_पाहायाग(Mat_पाहायाग& res, int method, int ndims, const int* sizes, int type, double alpha=1);
 };
 
 static MatOp_Initializer* getGlobalMatOpInitializer()
@@ -200,18 +200,18 @@ static MatOp_Initializer* getGlobalMatOpInitializer()
     CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+static inline bool isIdentity(const Mat_पाहायाग& e) { return e.op == &g_MatOp_Identity; }
+static inline bool isAddEx(const Mat_पाहायाग& e) { return e.op == &g_MatOp_AddEx; }
+static inline bool isScaled(const Mat_पाहायाग& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
+static inline bool isBin(const Mat_पाहायाग& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
+static inline bool isCmp(const Mat_पाहायाग& e) { return e.op == &g_MatOp_Cmp; }
+static inline bool isReciprocal(const Mat_पाहायाग& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
+static inline bool isT(const Mat_पाहायाग& e) { return e.op == &g_MatOp_T; }
+static inline bool isInv(const Mat_पाहायाग& e) { return e.op == &g_MatOp_Invert; }
+static inline bool isSolve(const Mat_पाहायाग& e) { return e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+static inline bool isMatProd(const Mat_पाहायाग& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
+static inline bool isInitializer(const Mat_पाहायाग& e) { return e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,111 +219,111 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+bool MatOp::elementWise(const Mat_पाहायाग& /*पाहायाग*/) const
 {
     return false;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+void MatOp::roi(const Mat_पाहायाग& पाहायाग, const Range& rowRange, const Range& colRange, Mat_पाहायाग& e) const
 {
-    if( elementWise(expr) )
+    if( elementWise(पाहायाग) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_पाहायाग(पाहायाग.op, पाहायाग.flags, Mat(), Mat(), Mat(),
+                    पाहायाग.alpha, पाहायाग.beta, पाहायाग.s);
+        if(पाहायाग.a.data)
+            e.a = पाहायाग.a(rowRange, colRange);
+        if(पाहायाग.b.data)
+            e.b = पाहायाग.b(rowRange, colRange);
+        if(पाहायाग.c.data)
+            e.c = पाहायाग.c(rowRange, colRange);
     }
     else
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
+        पाहायाग.op->assign(पाहायाग, m);
+        e = Mat_पाहायाग(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
     }
 }
 
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
+void MatOp::diag(const Mat_पाहायाग& पाहायाग, int d, Mat_पाहायाग& e) const
 {
-    if( elementWise(expr) )
+    if( elementWise(पाहायाग) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
+        e = Mat_पाहायाग(पाहायाग.op, पाहायाग.flags, Mat(), Mat(), Mat(),
+                    पाहायाग.alpha, पाहायाग.beta, पाहायाग.s);
+        if(पाहायाग.a.data)
+            e.a = पाहायाग.a.diag(d);
+        if(पाहायाग.b.data)
+            e.b = पाहायाग.b.diag(d);
+        if(पाहायाग.c.data)
+            e.c = पाहायाग.c.diag(d);
     }
     else
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        पाहायाग.op->assign(पाहायाग, m);
+        e = Mat_पाहायाग(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+void MatOp::augAssignAdd(const Mat_पाहायाग& पाहायाग, Mat& m) const
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    पाहायाग.op->assign(पाहायाग, temp);
     m += temp;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+void MatOp::augAssignSubtract(const Mat_पाहायाग& पाहायाग, Mat& m) const
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    पाहायाग.op->assign(पाहायाग, temp);
     m -= temp;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+void MatOp::augAssignMultiply(const Mat_पाहायाग& पाहायाग, Mat& m) const
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    पाहायाग.op->assign(पाहायाग, temp);
     m *= temp;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+void MatOp::augAssignDivide(const Mat_पाहायाग& पाहायाग, Mat& m) const
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    पाहायाग.op->assign(पाहायाग, temp);
     m /= temp;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+void MatOp::augAssignAnd(const Mat_पाहायाग& पाहायाग, Mat& m) const
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    पाहायाग.op->assign(पाहायाग, temp);
     m &= temp;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+void MatOp::augAssignOr(const Mat_पाहायाग& पाहायाग, Mat& m) const
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    पाहायाग.op->assign(पाहायाग, temp);
     m |= temp;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+void MatOp::augAssignXor(const Mat_पाहायाग& पाहायाग, Mat& m) const
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    पाहायाग.op->assign(पाहायाग, temp);
     m ^= temp;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+void MatOp::add(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -349,24 +349,24 @@ void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
         }
         else
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_पाहायाग(res, m1, m2, alpha, beta, s);
     }
     else
         e2.op->add(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+void MatOp::add(const Mat_पाहायाग& expr1, const Scalar& s, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    MatOp_AddEx::make_पाहायाग(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+void MatOp::subtract(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -392,24 +392,24 @@ void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
         }
         else
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_पाहायाग(res, m1, m2, alpha, beta, s);
     }
     else
         e2.op->subtract(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+void MatOp::subtract(const Scalar& s, const Mat_पाहायाग& पाहायाग, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    पाहायाग.op->assign(पाहायाग, m);
+    MatOp_AddEx::make_पाहायाग(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+void MatOp::multiply(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res, double scale) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -427,7 +427,7 @@ void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double 
             else
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_पाहायाग(res, '/', m2, e1.a, scale/e1.alpha);
         }
         else
         {
@@ -454,7 +454,7 @@ void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double 
             else
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_पाहायाग(res, op, m1, m2, scale);
         }
     }
     else
@@ -462,24 +462,24 @@ void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double 
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+void MatOp::multiply(const Mat_पाहायाग& पाहायाग, double s, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    पाहायाग.op->assign(पाहायाग, m);
+    MatOp_AddEx::make_पाहायाग(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+void MatOp::divide(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res, double scale) const
 {
     CV_INSTRUMENT_REGION();
 
     if( this == e2.op )
     {
         if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+            MatOp_Bin::make_पाहायाग(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
         else
         {
             Mat m1, m2;
@@ -506,7 +506,7 @@ void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double sc
             }
             else
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_पाहायाग(res, op, m1, m2, scale);
         }
     }
     else
@@ -514,37 +514,37 @@ void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double sc
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+void MatOp::divide(double s, const Mat_पाहायाग& पाहायाग, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    पाहायाग.op->assign(पाहायाग, m);
+    MatOp_Bin::make_पाहायाग(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+void MatOp::abs(const Mat_पाहायाग& पाहायाग, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    पाहायाग.op->assign(पाहायाग, m);
+    MatOp_Bin::make_पाहायाग(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+void MatOp::transpose(const Mat_पाहायाग& पाहायाग, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    पाहायाग.op->assign(पाहायाग, m);
+    MatOp_T::make_पाहायाग(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+void MatOp::matmul(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res) const
 {
     if( this == e2.op )
     {
@@ -580,673 +580,673 @@ void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
         else
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_पाहायाग(res, flags, m1, m2, scale);
     }
     else
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+void MatOp::invert(const Mat_पाहायाग& पाहायाग, int method, Mat_पाहायाग& res) const
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    पाहायाग.op->assign(पाहायाग, m);
+    MatOp_Invert::make_पाहायाग(res, method, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+Size MatOp::size(const Mat_पाहायाग& पाहायाग) const
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    return !पाहायाग.a.empty() ? पाहायाग.a.size() : पाहायाग.b.empty() ? पाहायाग.b.size() : पाहायाग.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+int MatOp::type(const Mat_पाहायाग& पाहायाग) const
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    return !पाहायाग.a.empty() ? पाहायाग.a.type() : पाहायाग.b.empty() ? पाहायाग.b.type() : पाहायाग.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_पाहायाग::Mat_पाहायाग(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_पाहायाग Mat_पाहायाग::row(int y) const
 {
-    MatExpr e;
+    Mat_पाहायाग e;
     op->roi(*this, Range(y, y+1), Range::all(), e);
     return e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_पाहायाग Mat_पाहायाग::col(int x) const
 {
-    MatExpr e;
+    Mat_पाहायाग e;
     op->roi(*this, Range::all(), Range(x, x+1), e);
     return e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_पाहायाग Mat_पाहायाग::diag(int d) const
 {
-    MatExpr e;
+    Mat_पाहायाग e;
     op->diag(*this, d, e);
     return e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_पाहायाग Mat_पाहायाग::operator()( const Range& rowRange, const Range& colRange ) const
 {
-    MatExpr e;
+    Mat_पाहायाग e;
     op->roi(*this, rowRange, colRange, e);
     return e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_पाहायाग Mat_पाहायाग::operator()( const Rect& roi ) const
 {
-    MatExpr e;
+    Mat_पाहायाग e;
     op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
     return e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_पाहायाग::cross(const Mat& m) const
 {
     return ((Mat)*this).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+double Mat_पाहायाग::dot(const Mat& m) const
 {
     return ((Mat)*this).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_पाहायाग Mat_पाहायाग::t() const
 {
-    MatExpr e;
+    Mat_पाहायाग e;
     op->transpose(*this, e);
     return e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_पाहायाग Mat_पाहायाग::inv(int method) const
 {
-    MatExpr e;
+    Mat_पाहायाग e;
     op->invert(*this, method, e);
     return e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_पाहायाग Mat_पाहायाग::mul(const Mat_पाहायाग& e, double scale) const
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     op->multiply(*this, e, en, scale);
     return en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_पाहायाग Mat_पाहायाग::mul(const Mat& m, double scale) const
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
+    Mat_पाहायाग e;
+    op->multiply(*this, Mat_पाहायाग(m), e, scale);
     return e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_पाहायाग operator + (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, a, b, 1, 1);
     return e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_पाहायाग operator + (const Mat& a, const Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, a, Mat(), 1, 0, s);
     return e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_पाहायाग operator + (const Scalar& s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, a, Mat(), 1, 0, s);
     return e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_पाहायाग operator + (const Mat_पाहायाग& e, const Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
+    Mat_पाहायाग en;
+    e.op->add(e, Mat_पाहायाग(m), en);
     return en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_पाहायाग operator + (const Mat& m, const Mat_पाहायाग& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
+    Mat_पाहायाग en;
+    e.op->add(e, Mat_पाहायाग(m), en);
     return en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_पाहायाग operator + (const Mat_पाहायाग& e, const Scalar& s)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->add(e, s, en);
     return en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_पाहायाग operator + (const Scalar& s, const Mat_पाहायाग& e)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->add(e, s, en);
     return en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_पाहायाग operator + (const Mat_पाहायाग& e1, const Mat_पाहायाग& e2)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e1.op->add(e1, e2, en);
     return en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_पाहायाग operator - (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, a, b, 1, -1);
     return e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_पाहायाग operator - (const Mat& a, const Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, a, Mat(), 1, 0, -s);
     return e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_पाहायाग operator - (const Scalar& s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, a, Mat(), -1, 0, s);
     return e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_पाहायाग operator - (const Mat_पाहायाग& e, const Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
+    Mat_पाहायाग en;
+    e.op->subtract(e, Mat_पाहायाग(m), en);
     return en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_पाहायाग operator - (const Mat& m, const Mat_पाहायाग& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
+    Mat_पाहायाग en;
+    e.op->subtract(Mat_पाहायाग(m), e, en);
     return en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_पाहायाग operator - (const Mat_पाहायाग& e, const Scalar& s)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->add(e, -s, en);
     return en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_पाहायाग operator - (const Scalar& s, const Mat_पाहायाग& e)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->subtract(s, e, en);
     return en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_पाहायाग operator - (const Mat_पाहायाग& e1, const Mat_पाहायाग& e2)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e1.op->subtract(e1, e2, en);
     return en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_पाहायाग operator - (const Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, m, Mat(), -1, 0);
     return e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_पाहायाग operator - (const Mat_पाहायाग& e)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->subtract(Scalar(0), e, en);
     return en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_पाहायाग operator * (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
+    Mat_पाहायाग e;
+    MatOp_GEMM::make_पाहायाग(e, 0, a, b);
     return e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_पाहायाग operator * (const Mat& a, double s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, a, Mat(), s, 0);
     return e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_पाहायाग operator * (double s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, a, Mat(), s, 0);
     return e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_पाहायाग operator * (const Mat_पाहायाग& e, const Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
+    Mat_पाहायाग en;
+    e.op->matmul(e, Mat_पाहायाग(m), en);
     return en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_पाहायाग operator * (const Mat& m, const Mat_पाहायाग& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
+    Mat_पाहायाग en;
+    e.op->matmul(Mat_पाहायाग(m), e, en);
     return en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_पाहायाग operator * (const Mat_पाहायाग& e, double s)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->multiply(e, s, en);
     return en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_पाहायाग operator * (double s, const Mat_पाहायाग& e)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->multiply(e, s, en);
     return en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_पाहायाग operator * (const Mat_पाहायाग& e1, const Mat_पाहायाग& e2)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e1.op->matmul(e1, e2, en);
     return en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_पाहायाग operator / (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '/', a, b);
     return e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_पाहायाग operator / (const Mat& a, double s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
+    Mat_पाहायाग e;
+    MatOp_AddEx::make_पाहायाग(e, a, Mat(), 1./s, 0);
     return e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_पाहायाग operator / (double s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '/', a, Mat(), s);
     return e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_पाहायाग operator / (const Mat_पाहायाग& e, const Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
+    Mat_पाहायाग en;
+    e.op->divide(e, Mat_पाहायाग(m), en);
     return en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_पाहायाग operator / (const Mat& m, const Mat_पाहायाग& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
+    Mat_पाहायाग en;
+    e.op->divide(Mat_पाहायाग(m), e, en);
     return en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_पाहायाग operator / (const Mat_पाहायाग& e, double s)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->multiply(e, 1./s, en);
     return en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_पाहायाग operator / (double s, const Mat_पाहायाग& e)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->divide(s, e, en);
     return en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_पाहायाग operator / (const Mat_पाहायाग& e1, const Mat_पाहायाग& e2)
 {
-    MatExpr en;
+    Mat_पाहायाग en;
     e1.op->divide(e1, e2, en);
     return en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_पाहायाग operator < (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_LT, a, b);
     return e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_पाहायाग operator < (const Mat& a, double s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_LT, a, s);
     return e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_पाहायाग operator < (double s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_GT, a, s);
     return e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_पाहायाग operator <= (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_LE, a, b);
     return e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_पाहायाग operator <= (const Mat& a, double s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_LE, a, s);
     return e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_पाहायाग operator <= (double s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_GE, a, s);
     return e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_पाहायाग operator == (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_EQ, a, b);
     return e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_पाहायाग operator == (const Mat& a, double s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_EQ, a, s);
     return e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_पाहायाग operator == (double s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_EQ, a, s);
     return e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_पाहायाग operator != (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_NE, a, b);
     return e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_पाहायाग operator != (const Mat& a, double s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_NE, a, s);
     return e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_पाहायाग operator != (double s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_NE, a, s);
     return e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_पाहायाग operator >= (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_GE, a, b);
     return e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_पाहायाग operator >= (const Mat& a, double s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_GE, a, s);
     return e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_पाहायाग operator >= (double s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_LE, a, s);
     return e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_पाहायाग operator > (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_GT, a, b);
     return e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_पाहायाग operator > (const Mat& a, double s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_GT, a, s);
     return e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_पाहायाग operator > (double s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
+    Mat_पाहायाग e;
+    MatOp_Cmp::make_पाहायाग(e, cv::CMP_LT, a, s);
     return e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_पाहायाग min(const Mat& a, const Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, 'm', a, b);
     return e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_पाहायाग min(const Mat& a, double s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, 'n', a, s);
     return e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_पाहायाग min(double s, const Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, 'n', a, s);
     return e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_पाहायाग max(const Mat& a, const Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, 'M', a, b);
     return e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_पाहायाग max(const Mat& a, double s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, 'N', a, s);
     return e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_पाहायाग max(double s, const Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, 'N', a, s);
     return e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_पाहायाग operator & (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '&', a, b);
     return e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_पाहायाग operator & (const Mat& a, const Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '&', a, s);
     return e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_पाहायाग operator & (const Scalar& s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '&', a, s);
     return e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_पाहायाग operator | (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '|', a, b);
     return e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_पाहायाग operator | (const Mat& a, const Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '|', a, s);
     return e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_पाहायाग operator | (const Scalar& s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '|', a, s);
     return e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_पाहायाग operator ^ (const Mat& a, const Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '^', a, b);
     return e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_पाहायाग operator ^ (const Mat& a, const Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '^', a, s);
     return e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_पाहायाग operator ^ (const Scalar& s, const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '^', a, s);
     return e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_पाहायाग operator ~(const Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '~', a, Scalar());
     return e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_पाहायाग abs(const Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, 'a', a, Scalar());
     return e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_पाहायाग abs(const Mat_पाहायाग& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
+    Mat_पाहायाग en;
     e.op->abs(e, en);
     return en;
 }
 
 
-Size MatExpr::size() const
+Size Mat_पाहायाग::size() const
 {
     if( isT(*this) || isInv(*this) )
         return Size(a.rows, a.cols);
@@ -1258,7 +1258,7 @@ Size MatExpr::size() const
 }
 
 
-int MatExpr::type() const
+int Mat_पाहायाग::type() const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1272,7 +1272,7 @@ int MatExpr::type() const
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+void MatOp_Identity::assign(const Mat_पाहायाग& e, Mat& m, int _type) const
 {
     if( _type == -1 || _type == e.a.type() )
         m = e.a;
@@ -1283,14 +1283,14 @@ void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+inline void MatOp_Identity::make_पाहायाग(Mat_पाहायाग& res, const Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_पाहायाग(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+void MatOp_AddEx::assign(const Mat_पाहायाग& e, Mat& m, int _type) const
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
     if( e.b.data )
@@ -1350,7 +1350,7 @@ void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+void MatOp_AddEx::add(const Mat_पाहायाग& e, const Scalar& s, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+void MatOp_AddEx::subtract(const Scalar& s, const Mat_पाहायाग& e, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+void MatOp_AddEx::multiply(const Mat_पाहायाग& e, double s, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,47 +1379,47 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+void MatOp_AddEx::divide(double s, const Mat_पाहायाग& e, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
+        MatOp_Bin::make_पाहायाग(res, '/', e.a, Mat(), s/e.alpha);
     else
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+void MatOp_AddEx::transpose(const Mat_पाहायाग& e, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
+        MatOp_T::make_पाहायाग(res, e.a, e.alpha);
     else
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+void MatOp_AddEx::abs(const Mat_पाहायाग& e, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
+        MatOp_Bin::make_पाहायाग(res, 'a', e.a, -e.s*e.alpha);
     else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
+        MatOp_Bin::make_पाहायाग(res, 'a', e.a, e.b);
     else
         MatOp::abs(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+inline void MatOp_AddEx::make_पाहायाग(Mat_पाहायाग& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_पाहायाग(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+void MatOp_Bin::assign(const Mat_पाहायाग& e, Mat& m, int _type) const
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
 
@@ -1462,7 +1462,7 @@ void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
         dst.convertTo(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+void MatOp_Bin::multiply(const Mat_पाहायाग& e, double s, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1475,29 +1475,29 @@ void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+void MatOp_Bin::divide(double s, const Mat_पाहायाग& e, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
+        MatOp_AddEx::make_पाहायाग(res, e.a, Mat(), s/e.alpha, 0);
     else
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+inline void MatOp_Bin::make_पाहायाग(Mat_पाहायाग& res, char op, const Mat& a, const Mat& b, double scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_पाहायाग(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+inline void MatOp_Bin::make_पाहायाग(Mat_पाहायाग& res, char op, const Mat& a, const Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_पाहायाग(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+void MatOp_Cmp::assign(const Mat_पाहायाग& e, Mat& m, int _type) const
 {
     Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
 
@@ -1510,19 +1510,19 @@ void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+inline void MatOp_Cmp::make_पाहायाग(Mat_पाहायाग& res, int cmpop, const Mat& a, const Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_पाहायाग(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+inline void MatOp_Cmp::make_पाहायाग(Mat_पाहायाग& res, int cmpop, const Mat& a, double alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_पाहायाग(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+void MatOp_T::assign(const Mat_पाहायाग& e, Mat& m, int _type) const
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
@@ -1532,7 +1532,7 @@ void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
         dst.convertTo(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+void MatOp_T::multiply(const Mat_पाहायाग& e, double s, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,24 +1540,24 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+void MatOp_T::transpose(const Mat_पाहायाग& e, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
     if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
+        MatOp_Identity::make_पाहायाग(res, e.a);
     else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+        MatOp_AddEx::make_पाहायाग(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+inline void MatOp_T::make_पाहायाग(Mat_पाहायाग& res, const Mat& a, double alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_पाहायाग(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+void MatOp_GEMM::assign(const Mat_पाहायाग& e, Mat& m, int _type) const
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
@@ -1566,7 +1566,7 @@ void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
         dst.convertTo(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+void MatOp_GEMM::add(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1574,10 +1574,10 @@ void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
     double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
     if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+        MatOp_GEMM::make_पाहायाग(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
     else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+        MatOp_GEMM::make_पाहायाग(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
     else if( this == e2.op )
         MatOp::add(e1, e2, res);
@@ -1585,7 +1585,7 @@ void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
         e2.op->add(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+void MatOp_GEMM::subtract(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1593,10 +1593,10 @@ void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) co
     double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
     if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+        MatOp_GEMM::make_पाहायाग(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
     else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+        MatOp_GEMM::make_पाहायाग(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
     else if( this == e2.op )
         MatOp::subtract(e1, e2, res);
@@ -1604,7 +1604,7 @@ void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) co
         e2.op->subtract(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+void MatOp_GEMM::multiply(const Mat_पाहायाग& e, double s, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+void MatOp_GEMM::transpose(const Mat_पाहायाग& e, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,15 +1624,15 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
+inline void MatOp_GEMM::make_पाहायाग(Mat_पाहायाग& res, int flags, const Mat& a, const Mat& b,
                                  double alpha, const Mat& c, double beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_पाहायाग(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+void MatOp_Invert::assign(const Mat_पाहायाग& e, Mat& m, int _type) const
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
@@ -1641,24 +1641,24 @@ void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
         dst.convertTo(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+void MatOp_Invert::matmul(const Mat_पाहायाग& e1, const Mat_पाहायाग& e2, Mat_पाहायाग& res) const
 {
     if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
+        MatOp_Solve::make_पाहायाग(res, e1.flags, e1.a, e2.a);
     else if( this == e2.op )
         MatOp::matmul(e1, e2, res);
     else
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+inline void MatOp_Invert::make_पाहायाग(Mat_पाहायाग& res, int method, const Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_पाहायाग(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+void MatOp_Solve::assign(const Mat_पाहायाग& e, Mat& m, int _type) const
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
@@ -1667,14 +1667,14 @@ void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+inline void MatOp_Solve::make_पाहायाग(Mat_पाहायाग& res, int method, const Mat& a, const Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_पाहायाग(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+void MatOp_Initializer::assign(const Mat_पाहायाग& e, Mat& m, int _type) const
 {
     if( _type == -1 )
         _type = e.a.type();
@@ -1691,7 +1691,7 @@ void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+void MatOp_Initializer::multiply(const Mat_पाहायाग& e, double s, Mat_पाहायाग& res) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+inline void MatOp_Initializer::make_पाहायाग(Mat_पाहायाग& res, int method, Size sz, int type, double alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_पाहायाग(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+inline void MatOp_Initializer::make_पाहायाग(Mat_पाहायाग& res, int method, int ndims, const int* sizes, int type, double alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_पाहायाग(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_पाहायाग Mat::t() const
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
+    Mat_पाहायाग e;
+    MatOp_T::make_पाहायाग(e, *this);
     return e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_पाहायाग Mat::inv(int method) const
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
+    Mat_पाहायाग e;
+    MatOp_Invert::make_पाहायाग(e, method, *this);
     return e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_पाहायाग Mat::mul(पासोक_Array m, double scale) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1743,102 +1743,102 @@ MatExpr Mat::mul(InputArray m, double scale) const
     if( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
+    Mat_पाहायाग e;
+    MatOp_Bin::make_पाहायाग(e, '*', *this, b, scale);
     return e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_पाहायाग Mat::zeros(int rows, int cols, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, '0', Size(cols, rows), type);
     return e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_पाहायाग Mat::zeros(Size size, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, '0', size, type);
     return e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_पाहायाग Mat::zeros(int ndims, const int* sizes, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, '0', ndims, sizes, type);
     return e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_पाहायाग Mat::zeros(const MatShape& shape, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, '0', shape.dims, shape.p, type);
     return e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_पाहायाग Mat::ones(int rows, int cols, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, '1', Size(cols, rows), type);
     return e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_पाहायाग Mat::ones(Size size, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, '1', size, type);
     return e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_पाहायाग Mat::ones(int ndims, const int* sizes, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, '1', ndims, sizes, type);
     return e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_पाहायाग Mat::ones(const MatShape& shape, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, '1', shape.dims, shape.p, type);
     return e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_पाहायाग Mat::eye(int rows, int cols, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, 'I', Size(cols, rows), type);
     return e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_पाहायाग Mat::eye(Size size, int type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
+    Mat_पाहायाग e;
+    MatOp_Initializer::make_पाहायाग(e, 'I', size, type);
     return e;
 }
 
-void MatExpr::swap(MatExpr& other)
+void Mat_पाहायाग::swap(Mat_पाहायाग& other)
 {
     using std::swap;
 
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+पासोक_Array_2::पासोक_Array_2(const Mat_पाहायाग& पाहायाग)
 {
-    if (!isIdentity(expr))
+    if (!isIdentity(पाहायाग))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat result = पाहायाग;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_पाहायाग result_पाहायाग(result);
+        swap(const_cast<Mat_पाहायाग&>(पाहायाग), result_पाहायाग);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(isIdentity(पाहायाग));
+    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &पाहायाग.a);
 }
 
 } // cv::

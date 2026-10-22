@@ -283,16 +283,16 @@ struct FileLock::Impl
     Impl(const char* fname)
     {
         // http://support.microsoft.com/kb/316609
-        int numRetries = 5;
+        int नुमेरो_Retries = 5;
         do
         {
             handle = ::CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-            if (INVALID_HANDLE_VALUE == handle)
+            if (INVALID_HANDLE_हालागा == handle)
             {
                 if (ERROR_SHARING_VIOLATION == GetLastError())
                 {
-                    numRetries--;
+                    नुमेरो_Retries--;
                     Sleep(250);
                     continue;
                 }
@@ -302,11 +302,11 @@ struct FileLock::Impl
                 }
             }
             break;
-        } while (numRetries > 0);
+        } while (नुमेरो_Retries > 0);
     }
     ~Impl()
     {
-        if (INVALID_HANDLE_VALUE != handle)
+        if (INVALID_HANDLE_हालागा != handle)
         {
             ::CloseHandle(handle);
         }

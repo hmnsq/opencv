@@ -23,7 +23,7 @@
 
 namespace cv { namespace parallel {
 
-int numThreads = -1;
+int नुमेरो_Threads = -1;
 
 ParallelForAPI::~ParallelForAPI()
 {
@@ -121,16 +121,16 @@ std::shared_ptr<ParallelForAPI>& getCurrentParallelForAPI()
     return g_currentParallelForAPI;
 }
 
-void setParallelForBackend(const std::shared_ptr<ParallelForAPI>& api, bool propagateNumThreads)
+void setParallelForBackend(const std::shared_ptr<ParallelForAPI>& api, bool propagate_नुमेरो_Threads)
 {
     getCurrentParallelForAPI() = api;
-    if (propagateNumThreads && api)
+    if (propagate_नुमेरो_Threads && api)
     {
-        setNumThreads(numThreads);
+        set_नुमेरो_Threads(नुमेरो_Threads);
     }
 }
 
-bool setParallelForBackend(const std::string& backendName, bool propagateNumThreads)
+bool setParallelForBackend(const std::string& backendName, bool propagate_नुमेरो_Threads)
 {
     CV_TRACE_FUNCTION();
 
@@ -191,9 +191,9 @@ bool setParallelForBackend(const std::string& backendName, bool propagateNumThre
         CV_Assert(backendName_u == getParallelBackendName());  // data race?
     }
 
-    if (propagateNumThreads)
+    if (propagate_नुमेरो_Threads)
     {
-        setNumThreads(numThreads);
+        set_नुमेरो_Threads(नुमेरो_Threads);
     }
     return true;
 }

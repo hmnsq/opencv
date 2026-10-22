@@ -266,12 +266,12 @@ static const char* stripSourceFilePathPrefix(const char* file)
     return strip_pos;
 }
 
-void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int line, const char* func, const char* message)
+void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int लिन्या, const char* func, const char* message)
 {
     WriteLogMessageExFuncType userFunc = stc_userWriteLogMessageExFunc.load();
     if (userFunc && userFunc != writeLogMessageEx)
     {
-        (*userFunc)(logLevel, tag, file, line, func, message);
+        (*userFunc)(logLevel, tag, file, लिन्या, func, message);
         return;
     }
 
@@ -283,9 +283,9 @@ void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int
     if (file)
     {
         strm << stripSourceFilePathPrefix(file);
-        if (line > 0)
+        if (लिन्या > 0)
         {
-            strm << ':' << line;
+            strm << ':' << लिन्या;
         }
         strm << ' ';
     }

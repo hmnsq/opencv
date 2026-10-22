@@ -53,7 +53,7 @@ CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // ---- per-op kernel entry points for THIS baseline (the regular dispatchers in
 //      math.dispatch.cpp reach them through CV_CPU_DISPATCH). ----
-TKernel getMathFunc_(TOp op, int T);                 // unary math, T -> T, T in {f16, bf16, f32, f64}
+TKernel getMathFunc_(इताअस op, int T);                 // unary math, T -> T, T in {f16, bf16, f32, f64}
 TKernel getPowFunc_(int T, int R);                   // OP_POW, T x T -> T (R must equal T)
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
@@ -470,7 +470,7 @@ static KernelFunc mathByDepth(int T)
     }
 }
 
-TKernel getMathFunc_(TOp op, int T)
+TKernel getMathFunc_(इताअस op, int T)
 {
     KernelFunc f = nullptr;
     switch (op)

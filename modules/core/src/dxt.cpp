@@ -245,13 +245,13 @@ struct DftTwiddleGen
 
     // re[i] + i*im[i] = w^i, i in [0, count), w = (wr, wi) = exp(i*stepAngle); the rotation
     // recurrence is re-seeded with exact sin/cos every 16 entries
-    static void fillTable(double* re, double* im, int count, double wr, double wi, double stepAngle)
+    static void fillTable(double* re, double* im, int बिलांग_2, double wr, double wi, double stepAngle)
     {
-        for (int i0 = 0; i0 < count; i0 += 16)
+        for (int i0 = 0; i0 < बिलांग_2; i0 += 16)
         {
             double t0 = stepAngle*i0;
             double cr = i0 == 0 ? 1 : cos(t0), ci = i0 == 0 ? 0 : sin(t0);
-            int i1 = std::min(i0 + 16, count);
+            int i1 = std::min(i0 + 16, बिलांग_2);
             for (int i = i0; i < i1; i++)
             {
                 re[i] = cr; im[i] = ci;
@@ -429,7 +429,7 @@ void DftPlan::build(int _kind, int _n, int _depth, int _vl)
     p.nc = real_kind && _n % 2 == 0 ? _n/2 : _n;
     CV_Assert(nc < (1 << 28));
     size_t esz = depth == CV_32F ? sizeof(float) : sizeof(double);
-    p.real_input = kind == DFT_KIND_R2C && (n & 1) != 0;
+    p.real_पासोक = kind == DFT_KIND_R2C && (n & 1) != 0;
     p.need_tmp = kind == DFT_KIND_C2R || kind == DFT_KIND_DCT || kind == DFT_KIND_IDCT;
     p.pingpong = false;
 
@@ -521,7 +521,7 @@ void DftPlan::build(int _kind, int _n, int _depth, int _vl)
             {
                 int rev = rev_hi + d1*w_1;
                 int* it = it_all + pos*2;
-                if (p.real_input)
+                if (p.real_पासोक)
                 {
                     for (int d0 = 0; d0 < r_0; d0++, rev += w_0)
                     {
@@ -757,9 +757,9 @@ RealDFT(const OcvDftOptions & c, const T* src, T* dst)
 template<typename T> static void
 CCSIDFT(const OcvDftOptions & c, const T* src, T* dst)
 {
-    int complex_input = c.isComplex;
+    int complex_पासोक = c.isComplex;
 
-    if( complex_input )
+    if( complex_पासोक )
         CV_Assert( src != dst );
     if( c.useIpp )
     {
@@ -768,14 +768,14 @@ CCSIDFT(const OcvDftOptions & c, const T* src, T* dst)
         // im(0) (always zero) is overwritten with re(0)
         const T* ipp_src = src;
         T save_s1 = 0;
-        if( complex_input )
+        if( complex_पासोक )
         {
             save_s1 = src[1];
             ((T*)src)[1] = src[0];
             ipp_src = src + 1;
         }
         IppStatus status = ippsDFTInv_PackToR( ipp_src, dst, c.ipp_spec, c.ipp_work );
-        if( complex_input )
+        if( complex_पासोक )
             ((T*)src)[1] = save_s1;
         if( status >= 0 )
         {
@@ -785,7 +785,7 @@ CCSIDFT(const OcvDftOptions & c, const T* src, T* dst)
         setIppErrorStatus();
 #endif
     }
-    runDft(c, src, 1, dst, 1, complex_input != 0);
+    runDft(c, src, 1, dst, 1, complex_पासोक != 0);
 }
 
 static void
@@ -1284,7 +1284,7 @@ struct OCL_FftPlan
 private:
     UMat twiddles;
     String buildOptions;
-    int thread_count;
+    int thread_बिलांग;
     int dft_size;
     int dft_depth;
     bool status;
@@ -1297,9 +1297,9 @@ public:
         int min_radix;
         std::vector<int> radixes, blocks;
         ocl_getRadixes(dft_size, radixes, blocks, min_radix);
-        thread_count = dft_size / min_radix;
+        thread_बिलांग = dft_size / min_radix;
 
-        if (thread_count > (int) ocl::Device::getDefault().maxWorkGroupSize())
+        if (thread_बिलांग > (int) ocl::Device::getDefault().maxWorkGroupSize())
         {
             status = false;
             return;
@@ -1330,7 +1330,7 @@ public:
                               dft_depth == CV_64F ? " -D DOUBLE_SUPPORT" : "", radix_processing.c_str());
     }
 
-    bool enqueueTransform(InputArray _src, OutputArray _dst, int num_dfts, int flags, int fftType, bool rows = true) const
+    bool enqueueTransform(पासोक_Array _src, OutputArray _dst, int नुमेरो_dfts, int flags, int fftType, bool rows = true) const
     {
         if (!status)
             return false;
@@ -1342,22 +1342,22 @@ public:
         size_t localsize[2];
         String kernel_name;
 
-        bool is1d = (flags & DFT_ROWS) != 0 || num_dfts == 1;
+        bool is1d = (flags & DFT_ROWS) != 0 || नुमेरो_dfts == 1;
         bool inv = (flags & DFT_INVERSE) != 0;
         String options = buildOptions;
 
         if (rows)
         {
-            globalsize[0] = thread_count; globalsize[1] = src.rows;
-            localsize[0] = thread_count; localsize[1] = 1;
+            globalsize[0] = thread_बिलांग; globalsize[1] = src.rows;
+            localsize[0] = thread_बिलांग; localsize[1] = 1;
             kernel_name = !inv ? "fft_multi_radix_rows" : "ifft_multi_radix_rows";
             if ((is1d || inv) && (flags & DFT_SCALE))
                 options += " -D DFT_SCALE";
         }
         else
         {
-            globalsize[0] = num_dfts; globalsize[1] = thread_count;
-            localsize[0] = 1; localsize[1] = thread_count;
+            globalsize[0] = नुमेरो_dfts; globalsize[1] = thread_बिलांग;
+            localsize[0] = 1; localsize[1] = thread_बिलांग;
             kernel_name = !inv ? "fft_multi_radix_cols" : "ifft_multi_radix_cols";
             if (flags & DFT_SCALE)
                 options += " -D DFT_SCALE";
@@ -1384,7 +1384,7 @@ public:
         if (k.empty())
             return false;
 
-        k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst), ocl::KernelArg::ReadOnlyNoSize(twiddles), thread_count, num_dfts);
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst), ocl::KernelArg::ReadOnlyNoSize(twiddles), thread_बिलांग, नुमेरो_dfts);
         return k.run(2, globalsize, localsize, false);
     }
 
@@ -1495,8 +1495,8 @@ public:
 
     Ptr<OCL_FftPlan> getFftPlan(int dft_size, int depth)
     {
-        int key = (dft_size << 16) | (depth & 0xFFFF);
-        std::map<int, Ptr<OCL_FftPlan> >::iterator f = planStorage.find(key);
+        int सुसि = (dft_size << 16) | (depth & 0xFFFF);
+        std::map<int, Ptr<OCL_FftPlan> >::iterator f = planStorage.find(सुसि);
         if (f != planStorage.end())
         {
             return f->second;
@@ -1504,7 +1504,7 @@ public:
         else
         {
             Ptr<OCL_FftPlan> newPlan = Ptr<OCL_FftPlan>(new OCL_FftPlan(dft_size, depth));
-            planStorage[key] = newPlan;
+            planStorage[सुसि] = newPlan;
             return newPlan;
         }
     }
@@ -1522,31 +1522,31 @@ protected:
     std::map<int, Ptr<OCL_FftPlan> > planStorage;
 };
 
-static bool ocl_dft_rows(InputArray _src, OutputArray _dst, int nonzero_rows, int flags, int fftType)
+static bool ocl_dft_rows(पासोक_Array _src, OutputArray _dst, int nonzero_rows, int flags, int fftType)
 {
     int type = _src.type(), depth = CV_MAT_DEPTH(type);
     Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.cols(), depth);
     return plan->enqueueTransform(_src, _dst, nonzero_rows, flags, fftType, true);
 }
 
-static bool ocl_dft_cols(InputArray _src, OutputArray _dst, int nonzero_cols, int flags, int fftType)
+static bool ocl_dft_cols(पासोक_Array _src, OutputArray _dst, int nonzero_cols, int flags, int fftType)
 {
     int type = _src.type(), depth = CV_MAT_DEPTH(type);
     Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.rows(), depth);
     return plan->enqueueTransform(_src, _dst, nonzero_cols, flags, fftType, false);
 }
 
-inline FftType determineFFTType(bool real_input, bool complex_input, bool real_output, bool complex_output, bool inv)
+inline FftType determineFFTType(bool real_पासोक, bool complex_पासोक, bool real_output, bool complex_output, bool inv)
 {
     // output format is not specified
     if (!real_output && !complex_output)
         complex_output = true;
 
     // input or output format is ambiguous
-    if (real_input == complex_input || real_output == complex_output)
+    if (real_पासोक == complex_पासोक || real_output == complex_output)
         CV_Error(Error::StsBadArg, "Invalid FFT input or output format");
 
-    FftType result = real_input ? (real_output ? R2R : R2C) : (real_output ? C2R : C2C);
+    FftType result = real_पासोक ? (real_output ? R2R : R2C) : (real_output ? C2R : C2C);
 
     // Forward Complex to CCS not supported
     if (result == C2R && !inv)
@@ -1559,7 +1559,7 @@ inline FftType determineFFTType(bool real_input, bool complex_input, bool real_o
     return result;
 }
 
-static bool ocl_dft(InputArray _src, OutputArray _dst, int flags, int nonzero_rows)
+static bool ocl_dft(पासोक_Array _src, OutputArray _dst, int flags, int nonzero_rows)
 {
     int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
     Size ssize = _src.size();
@@ -1814,7 +1814,7 @@ static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
 
 }
 
-static bool ocl_dft_amdfft(InputArray _src, OutputArray _dst, int flags)
+static bool ocl_dft_amdfft(पासोक_Array _src, OutputArray _dst, int flags)
 {
     int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     Size ssize = _src.size();
@@ -1829,13 +1829,13 @@ static bool ocl_dft_amdfft(InputArray _src, OutputArray _dst, int flags)
     if (ssize.area() != getOptimalDFTSize(ssize.area()))
         return false;
 
-    int dst_complex_input = cn == 2 ? 1 : 0;
+    int dst_complex_पासोक = cn == 2 ? 1 : 0;
     bool dft_inverse = (flags & DFT_INVERSE) != 0 ? 1 : 0;
     int dft_complex_output = (flags & DFT_COMPLEX_OUTPUT) != 0;
     bool dft_real_output = (flags & DFT_REAL_OUTPUT) != 0;
 
     CV_Assert(dft_complex_output + dft_real_output < 2);
-    FftType fftType = (FftType)(dst_complex_input << 0 | dft_complex_output << 1);
+    FftType fftType = (FftType)(dst_complex_पासोक << 0 | dft_complex_output << 1);
 
     switch (fftType)
     {
@@ -1905,12 +1905,12 @@ static void complementComplex(T * ptr, size_t step, int n, int len, int dft_dims
     }
 }
 
-static void complementComplexOutput(int depth, uchar * ptr, size_t step, int count, int len, int dft_dims)
+static void complementComplexOutput(int depth, uchar * ptr, size_t step, int बिलांग_2, int len, int dft_dims)
 {
     if( depth == CV_32F )
-        complementComplex((float*)ptr, step, count, len, dft_dims);
+        complementComplex((float*)ptr, step, बिलांग_2, len, dft_dims);
     else
-        complementComplex((double*)ptr, step, count, len, dft_dims);
+        complementComplex((double*)ptr, step, बिलांग_2, len, dft_dims);
 }
 
 enum DftMode {
@@ -2033,7 +2033,7 @@ public:
         ipp_worksize = 0;
 #endif
     }
-    void init(int len, int count, int depth, int flags, bool *needBuffer)
+    void init(int len, int बिलांग_2, int depth, int flags, bool *needBuffer)
     {
         int stage = (flags & CV_HAL_DFT_STAGE_COLS) != 0 ? 1 : 0;
         opt.isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
@@ -2049,7 +2049,7 @@ public:
         opt.ipp_spec = 0;
         opt.ipp_work = 0;
 
-        if( CV_IPP_CHECK_COND && (opt.n*count >= 64) && !IPP_DISABLE_DFT32F) // use IPP DFT if available
+        if( CV_IPP_CHECK_COND && (opt.n*बिलांग_2 >= 64) && !IPP_DISABLE_DFT32F) // use IPP DFT if available
         {
             int ipp_norm_flag = (flags & CV_HAL_DFT_SCALE) == 0 ? 8 : opt.isInverse ? 2 : 1;
             int specsize=0, initsize=0, worksize=0;
@@ -2142,10 +2142,10 @@ public:
 
         if(!needAnotherStage && (flags & CV_HAL_DFT_SCALE) != 0)
         {
-            int rowCount = count;
+            int row_बिलांग = बिलांग_2;
             if (stage == 0 && (flags & CV_HAL_DFT_ROWS) != 0)
-                rowCount = 1;
-            opt.scale = 1./(len * rowCount);
+                row_बिलांग = 1;
+            opt.scale = 1./(len * row_बिलांग);
         }
     }
 
@@ -2204,10 +2204,10 @@ static int dftColsBatch(int len, size_t complex_elem_size)
     return std::max(DFT_COLS_BATCH_MIN, std::min(DFT_COLS_BATCH_MAX, batch));
 }
 
-static double dftParallelStripes(int count, int len)
+static double dftParallelStripes(int बिलांग_2, int len)
 {
     const double quantum = 0.5e6;
-    return (double)count*len*std::max(std::log((double)len)/std::log(2.), 1.)/quantum;
+    return (double)बिलांग_2*len*std::max(std::log((double)len)/std::log(2.), 1.)/quantum;
 }
 
 class OcvDftImpl CV_FINAL : public hal::DFT2D
@@ -2336,7 +2336,7 @@ public:
             int stage = stages[stageIndex];
             bool isLastStage = (stageIndex + 1 == stages.size());
 
-            int len, count;
+            int len, बिलांग_2;
 
             int f = 0;
             if (inv)
@@ -2357,15 +2357,15 @@ public:
                 if (width == 1 && !isRowTransform )
                 {
                     len = height;
-                    count = width;
+                    बिलांग_2 = width;
                 }
                 else
                 {
                     len = width;
-                    count = height;
+                    बिलांग_2 = height;
                 }
                 needBufferA = isInplace;
-                contextA = hal::DFT1D::create(len, count, depth, f, &needBufferA);
+                contextA = hal::DFT1D::create(len, बिलांग_2, depth, f, &needBufferA);
                 basicA = dynamic_cast<const OcvDftBasicImpl*>(contextA.get());
                 if (needBufferA)
                     tmp_bufA.allocate(len * complex_elem_size);
@@ -2373,10 +2373,10 @@ public:
             else
             {
                 len = height;
-                count = width;
+                बिलांग_2 = width;
                 f |= CV_HAL_DFT_STAGE_COLS;
                 needBufferB = isInplace;
-                contextB = hal::DFT1D::create(len, count, depth, f, &needBufferB);
+                contextB = hal::DFT1D::create(len, बिलांग_2, depth, f, &needBufferB);
                 basicB = dynamic_cast<const OcvDftBasicImpl*>(contextB.get());
                 if (needBufferB)
                     tmp_bufB.allocate(len * complex_elem_size);
@@ -2468,16 +2468,16 @@ protected:
 
     void rowDft(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, bool isComplex, bool isLastStage)
     {
-        int len, count;
+        int len, बिलांग_2;
         if (width == 1 && !isRowTransform )
         {
             len = height;
-            count = width;
+            बिलांग_2 = width;
         }
         else
         {
             len = width;
-            count = height;
+            बिलांग_2 = height;
         }
         int dptr_offset = 0;
         int dst_full_len = len*elem_size;
@@ -2492,8 +2492,8 @@ protected:
             dst_full_len += (len & 1) ? elem_size : complex_elem_size;
 
         int nz = nonzero_rows;
-        if( nz <= 0 || nz > count )
-            nz = count;
+        if( nz <= 0 || nz > बिलांग_2 )
+            nz = बिलांग_2;
 
         size_t ws_size = basicA ? basicA->workspaceSize() : 0;
         double nstripes = dftParallelStripes(nz, len);
@@ -2535,7 +2535,7 @@ protected:
             }
         }
 
-        for( int i = nz; i < count; i++ )
+        for( int i = nz; i < बिलांग_2; i++ )
         {
             uchar* dptr0 = dst_data + dst_step * i;
             memset( dptr0, 0, dst_full_len );
@@ -2547,8 +2547,8 @@ protected:
     void colDft(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, int stage_src_channels, int stage_dst_channels, bool isLastStage)
     {
         int len = height;
-        int count = width;
-        int a = 0, b = count;
+        int बिलांग_2 = width;
+        int a = 0, b = बिलांग_2;
         uchar *dbuf0, *dbuf1;
         const uchar* sptr0 = src_data;
         uchar* dptr0 = dst_data;
@@ -2565,8 +2565,8 @@ protected:
         {
             int even;
             a = 1;
-            even = (count & 1) == 0;
-            b = (count+1)/2;
+            even = (बिलांग_2 & 1) == 0;
+            b = (बिलांग_2+1)/2;
             if( !inv )
             {
                 memset( buf0.data(), 0, len*complex_elem_size );
@@ -2575,7 +2575,7 @@ protected:
                 if( even )
                 {
                     memset( buf1.data(), 0, len*complex_elem_size );
-                    CopyColumn( sptr0 + (count-2)*elem_size, src_step,
+                    CopyColumn( sptr0 + (बिलांग_2-2)*elem_size, src_step,
                                 buf1.data(), complex_elem_size, len, elem_size );
                 }
             }
@@ -2585,7 +2585,7 @@ protected:
                 ExpandCCS( buf0.data(), len, elem_size );
                 if( even )
                 {
-                    CopyColumn( sptr0 + (count-1)*elem_size, src_step,
+                    CopyColumn( sptr0 + (बिलांग_2-1)*elem_size, src_step,
                                 buf1.data(), elem_size, len, elem_size );
                     ExpandCCS( buf1.data(), len, elem_size );
                 }
@@ -2619,7 +2619,7 @@ protected:
                     {
                         memcpy( dbuf1 + elem_size, dbuf1, elem_size );
                         CopyColumn( dbuf1 + elem_size, elem_size,
-                                       dptr0 + (count-1)*elem_size,
+                                       dptr0 + (बिलांग_2-1)*elem_size,
                                        dst_step, len, elem_size );
                     }
                     dptr0 += elem_size;
@@ -2629,7 +2629,7 @@ protected:
                     // copy the real part of the complex vector to the first/last column
                     CopyColumn( dbuf0, complex_elem_size, dptr0, dst_step, len, elem_size );
                     if( even )
-                        CopyColumn( dbuf1, complex_elem_size, dptr0 + (count-1)*elem_size,
+                        CopyColumn( dbuf1, complex_elem_size, dptr0 + (बिलांग_2-1)*elem_size,
                                        dst_step, len, elem_size );
                     dptr0 += elem_size;
                 }
@@ -2684,7 +2684,7 @@ protected:
         else
             processBatches(Range(0, nbatches));
         if(isLastStage && mode == FwdRealToComplex)
-            complementComplexOutput(depth, dst_data, dst_step, count, len, 2);
+            complementComplexOutput(depth, dst_data, dst_step, बिलांग_2, len, 2);
     }
 };
 
@@ -2694,9 +2694,9 @@ struct ReplacementDFT1D : public hal::DFT1D
     bool isInitialized;
 
     ReplacementDFT1D() : context(0), isInitialized(false) {}
-    bool init(int len, int count, int depth, int flags, bool *needBuffer)
+    bool init(int len, int बिलांग_2, int depth, int flags, bool *needBuffer)
     {
-        int res = cv_hal_dftInit1D(&context, len, count, depth, flags, needBuffer);
+        int res = cv_hal_dftInit1D(&context, len, बिलांग_2, depth, flags, needBuffer);
         isInitialized = (res == CV_HAL_ERROR_OK);
         return isInitialized;
     }
@@ -2750,11 +2750,11 @@ namespace hal {
 
 //================== 1D ======================
 
-Ptr<DFT1D> DFT1D::create(int len, int count, int depth, int flags, bool *needBuffer)
+Ptr<DFT1D> DFT1D::create(int len, int बिलांग_2, int depth, int flags, bool *needBuffer)
 {
     {
         ReplacementDFT1D *impl = new ReplacementDFT1D();
-        if (impl->init(len, count, depth, flags, needBuffer))
+        if (impl->init(len, बिलांग_2, depth, flags, needBuffer))
         {
             return Ptr<DFT1D>(impl);
         }
@@ -2762,7 +2762,7 @@ Ptr<DFT1D> DFT1D::create(int len, int count, int depth, int flags, bool *needBuf
     }
     {
         OcvDftBasicImpl *impl = new OcvDftBasicImpl();
-        impl->init(len, count, depth, flags, needBuffer);
+        impl->init(len, बिलांग_2, depth, flags, needBuffer);
         return Ptr<DFT1D>(impl);
     }
 }
@@ -2798,7 +2798,7 @@ Ptr<DFT2D> DFT2D::create(int width, int height, int depth,
 } // cv::
 
 
-void cv::dft( InputArray _src0, OutputArray _dst, int flags, int nonzero_rows )
+void cv::dft( पासोक_Array _src0, OutputArray _dst, int flags, int nonzero_rows )
 {
     CV_INSTRUMENT_REGION();
 
@@ -2826,7 +2826,7 @@ void cv::dft( InputArray _src0, OutputArray _dst, int flags, int nonzero_rows )
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
 
     // Fail if DFT_COMPLEX_INPUT is specified, but src is not 2 channels.
-    CV_Assert( !((flags & DFT_COMPLEX_INPUT) && src.channels() != 2) );
+    CV_Assert( !((flags & DFT_COMPLEX_पासोक) && src.channels() != 2) );
 
     if( !inv && src.channels() == 1 && (flags & DFT_COMPLEX_OUTPUT) )
         _dst.createSameSize( src, CV_MAKETYPE(depth, 2) );
@@ -2853,7 +2853,7 @@ void cv::dft( InputArray _src0, OutputArray _dst, int flags, int nonzero_rows )
 }
 
 
-void cv::idft( InputArray src, OutputArray dst, int flags, int nonzero_rows )
+void cv::idft( पासोक_Array src, OutputArray dst, int flags, int nonzero_rows )
 {
     CV_INSTRUMENT_REGION();
 
@@ -2864,7 +2864,7 @@ void cv::idft( InputArray src, OutputArray dst, int flags, int nonzero_rows )
 
 namespace cv {
 
-static bool ocl_mulSpectrums( InputArray _srcA, InputArray _srcB,
+static bool ocl_mulSpectrums( पासोक_Array _srcA, पासोक_Array _srcB,
                               OutputArray _dst, int flags, bool conjB )
 {
     int atype = _srcA.type(), btype = _srcB.type(),
@@ -2887,7 +2887,7 @@ static bool ocl_mulSpectrums( InputArray _srcA, InputArray _srcB,
     if (k.empty())
         return false;
 
-    k.args(ocl::KernelArg::ReadOnlyNoSize(A), ocl::KernelArg::ReadOnlyNoSize(B),
+    k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(A), ocl::KernelArg::ReadOnlyNoSize(B),
            ocl::KernelArg::WriteOnly(dst), rowsPerWI);
 
     size_t globalsize[2] = { (size_t)asize.width, ((size_t)asize.height + rowsPerWI - 1) / rowsPerWI };
@@ -3017,7 +3017,7 @@ void mulSpectrums_Impl(const T* dataA, const T* dataB, T* dataC, size_t stepA, s
 
 } // namespace
 
-void cv::mulSpectrums( InputArray _srcA, InputArray _srcB,
+void cv::mulSpectrums( पासोक_Array _srcA, पासोक_Array _srcB,
                        OutputArray _dst, int flags, bool conjB )
 {
     CV_INSTRUMENT_REGION();
@@ -3082,7 +3082,7 @@ void cv::mulSpectrums( InputArray _srcA, InputArray _srcB,
     }
 }
 
-void cv::divSpectrums( InputArray _srcA, InputArray _srcB, OutputArray _dst, int flags, bool conjB)
+void cv::divSpectrums( पासोक_Array _srcA, पासोक_Array _srcB, OutputArray _dst, int flags, bool conjB)
 {
     Mat srcA = _srcA.getMat(), srcB = _srcB.getMat();
     if (srcA.empty() && srcB.empty())
@@ -3696,16 +3696,16 @@ public:
             const uchar* sptr = src;
             uchar* dptr = dst;
             size_t sstep0, sstep1, dstep0, dstep1;
-            int len, count;
+            int len, बिलांग_2;
 
             if( stage == 0 )
             {
                 len = width;
-                count = height;
+                बिलांग_2 = height;
                 if( len == 1 && !isRowTransform )
                 {
                     len = height;
-                    count = 1;
+                    बिलांग_2 = 1;
                 }
                 sstep0 = src_step;
                 dstep0 = dst_step;
@@ -3714,7 +3714,7 @@ public:
             else
             {
                 len = height;
-                count = width;
+                बिलांग_2 = width;
                 sstep1 = src_step;
                 dstep1 = dst_step;
                 sstep0 = dstep0 = elem_size;
@@ -3737,11 +3737,11 @@ public:
                 prev_len = len;
             }
             // otherwise reuse the plan built on the previous stage (same length, only the steps differ)
-            double nstripes = dftParallelStripes(count, len);
-            if( len > 1 && count > 1 && nstripes >= 1.5 )
+            double nstripes = dftParallelStripes(बिलांग_2, len);
+            if( len > 1 && बिलांग_2 > 1 && nstripes >= 1.5 )
             {
                 // the plan is shared, every worker gets its own workspace once per range
-                auto processLines = [&](const Range& range)
+                auto process_मगा_लिन्या = [&](const Range& range)
                 {
                     OcvDftOptions opt_ = opt;
                     AutoBuffer<uchar> ws_(plan.ws_bytes);
@@ -3749,11 +3749,11 @@ public:
                     for( int i = range.start; i < range.end; i++ )
                         dct_func( opt_, sptr + i*sstep0, sstep1, dptr + i*dstep0, dstep1 );
                 };
-                parallel_for_(Range(0, count), processLines, nstripes);
+                parallel_for_(Range(0, बिलांग_2), process_मगा_लिन्या, nstripes);
             }
             else
             {
-                for(unsigned i = 0; i < static_cast<unsigned>(count); i++ )
+                for(unsigned i = 0; i < static_cast<unsigned>(बिलांग_2); i++ )
                     dct_func( opt, sptr + i*sstep0, sstep1, dptr + i*dstep0, dstep1 );
             }
             src = dst;
@@ -3812,7 +3812,7 @@ Ptr<DCT2D> DCT2D::create(int width, int height, int depth, int flags)
 } // cv::hal::
 } // cv::
 
-void cv::dct( InputArray _src0, OutputArray _dst, int flags )
+void cv::dct( पासोक_Array _src0, OutputArray _dst, int flags )
 {
     CV_INSTRUMENT_REGION();
 
@@ -3841,7 +3841,7 @@ void cv::dct( InputArray _src0, OutputArray _dst, int flags )
 }
 
 
-void cv::idct( InputArray src, OutputArray dst, int flags )
+void cv::idct( पासोक_Array src, OutputArray dst, int flags )
 {
     CV_INSTRUMENT_REGION();
 

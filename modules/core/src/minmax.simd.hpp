@@ -96,9 +96,9 @@ minMaxIdx_( const T* src, const uchar* mask, WT* _minVal, WT* _maxVal,
 
 #undef SIMD_ONLY
 #if (CV_SIMD || CV_SIMD_SCALABLE)
-#define SIMD_ONLY(expr) expr
+#define SIMD_ONLY(पाहायाग) पाहायाग
 #else
-#define SIMD_ONLY(expr)
+#define SIMD_ONLY(पाहायाग)
 #endif
 
 static int minMaxInit(const uchar* mask, int len)

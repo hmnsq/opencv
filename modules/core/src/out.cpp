@@ -48,8 +48,8 @@ namespace cv
     class FormattedImpl CV_FINAL : public Formatted
     {
         enum { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
-               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_VALUE, STATE_FINISHED,
-               STATE_LINE_SEPARATOR, STATE_CN_SEPARATOR, STATE_VALUE_SEPARATOR };
+               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_हालागा, STATE_FINISHED,
+               STATE_लिन्या_SEPARATOR, STATE_CN_SEPARATOR, STATE_हालागा_SEPARATOR };
         enum {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
 
         char floatFormat[8];
@@ -57,7 +57,7 @@ namespace cv
 
         Mat mtx;
         int mcn; // == mtx.channels()
-        bool singleLine;
+        bool single_लिन्या;
         bool alignOrder;    // true when cn first order
 
         int state;
@@ -69,27 +69,27 @@ namespace cv
         String epilogue;
         char braces[5];
 
-        void (FormattedImpl::*valueToStr)();
-        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
-        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
-        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
-        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
-        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
-        void valueToStr32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
-        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
-        void valueToStr32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
-        void valueToStr64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
-        void valueToStr64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
-        void valueToStr64s() { snprintf(buf, sizeof(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
-        void valueToStr16f() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<hfloat>(row, col)[cn]); }
-        void valueToStr16bf() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<bfloat>(row, col)[cn]); }
-        void valueToStr8f()   { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8_t>(row, col)[cn]); }
-        void valueToStr8fnuz() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8a_t>(row, col)[cn]); }
-        void valueToStrOther() { buf[0] = 0; }
+        void (FormattedImpl::*हालागा_To_Str)();
+        void हालागा_To_Str_Bool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
+        void हालागा_To_Str8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
+        void हालागा_To_Str8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
+        void हालागा_To_Str16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
+        void हालागा_To_Str16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
+        void हालागा_To_Str32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
+        void हालागा_To_Str32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
+        void हालागा_To_Str32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
+        void हालागा_To_Str64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
+        void हालागा_To_Str64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
+        void हालागा_To_Str64s() { snprintf(buf, sizeof(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
+        void हालागा_To_Str16f() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<hfloat>(row, col)[cn]); }
+        void हालागा_To_Str16bf() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<bfloat>(row, col)[cn]); }
+        void हालागा_To_Str8f()   { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8_t>(row, col)[cn]); }
+        void हालागा_To_Str8fnuz() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8a_t>(row, col)[cn]); }
+        void हालागा_To_Str_Other() { buf[0] = 0; }
 
     public:
 
-        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, int precision)
+        FormattedImpl(String pl, String el, Mat m, char br[5], bool s_लिन्या, bool aOrder, int precision)
         {
             CV_Assert(m.dims <= 2);
 
@@ -99,7 +99,7 @@ namespace cv
             mcn = m.channels();
             memcpy(braces, br, 5);
             state = STATE_PROLOGUE;
-            singleLine = sLine;
+            single_लिन्या = s_लिन्या;
             alignOrder = aOrder;
             row = col = cn =0;
 
@@ -116,21 +116,21 @@ namespace cv
 
             switch(mtx.depth())
             {
-                case CV_8U:  valueToStr = &FormattedImpl::valueToStr8u; break;
-                case CV_8S:  valueToStr = &FormattedImpl::valueToStr8s; break;
-                case CV_Bool: valueToStr = &FormattedImpl::valueToStrBool; break;
-                case CV_16U: valueToStr = &FormattedImpl::valueToStr16u; break;
-                case CV_16S: valueToStr = &FormattedImpl::valueToStr16s; break;
-                case CV_32U: valueToStr = &FormattedImpl::valueToStr32u; break;
-                case CV_32S: valueToStr = &FormattedImpl::valueToStr32s; break;
-                case CV_32F: valueToStr = &FormattedImpl::valueToStr32f; break;
-                case CV_64F: valueToStr = &FormattedImpl::valueToStr64f; break;
-                case CV_64U: valueToStr = &FormattedImpl::valueToStr64u; break;
-                case CV_64S: valueToStr = &FormattedImpl::valueToStr64s; break;
-                case CV_16F: valueToStr = &FormattedImpl::valueToStr16f; break;
-                case CV_16BF: valueToStr = &FormattedImpl::valueToStr16bf; break;
-                case CV_8F_E4M3FN:   valueToStr = &FormattedImpl::valueToStr8f; break;
-                case CV_8F_E4M3FNUZ: valueToStr = &FormattedImpl::valueToStr8fnuz; break;
+                case CV_8U:  हालागा_To_Str = &FormattedImpl::हालागा_To_Str8u; break;
+                case CV_8S:  हालागा_To_Str = &FormattedImpl::हालागा_To_Str8s; break;
+                case CV_Bool: हालागा_To_Str = &FormattedImpl::हालागा_To_Str_Bool; break;
+                case CV_16U: हालागा_To_Str = &FormattedImpl::हालागा_To_Str16u; break;
+                case CV_16S: हालागा_To_Str = &FormattedImpl::हालागा_To_Str16s; break;
+                case CV_32U: हालागा_To_Str = &FormattedImpl::हालागा_To_Str32u; break;
+                case CV_32S: हालागा_To_Str = &FormattedImpl::हालागा_To_Str32s; break;
+                case CV_32F: हालागा_To_Str = &FormattedImpl::हालागा_To_Str32f; break;
+                case CV_64F: हालागा_To_Str = &FormattedImpl::हालागा_To_Str64f; break;
+                case CV_64U: हालागा_To_Str = &FormattedImpl::हालागा_To_Str64u; break;
+                case CV_64S: हालागा_To_Str = &FormattedImpl::हालागा_To_Str64s; break;
+                case CV_16F: हालागा_To_Str = &FormattedImpl::हालागा_To_Str16f; break;
+                case CV_16BF: हालागा_To_Str = &FormattedImpl::हालागा_To_Str16bf; break;
+                case CV_8F_E4M3FN:   हालागा_To_Str = &FormattedImpl::हालागा_To_Str8f; break;
+                case CV_8F_E4M3FNUZ: हालागा_To_Str = &FormattedImpl::हालागा_To_Str8fnuz; break;
                 default:
                     CV_Error_(Error::StsError, ("unsupported matrix type %d\n", mtx.depth()));
             }
@@ -190,7 +190,7 @@ namespace cv
                     }
                     return buf;
                 case STATE_ROW_CLOSE:
-                    state = STATE_LINE_SEPARATOR;
+                    state = STATE_लिन्या_SEPARATOR;
                     ++row;
                     if (braces[BRACE_ROW_CLOSE])
                     {
@@ -207,7 +207,7 @@ namespace cv
                     }
                     return next();
                 case STATE_CN_OPEN:
-                    state = STATE_VALUE;
+                    state = STATE_हालागा;
                     if (!alignOrder)
                         cn = 0;
                     if (mcn > 1 && braces[BRACE_CN_OPEN])
@@ -230,17 +230,17 @@ namespace cv
                         return buf;
                     }
                     return next();
-                case STATE_VALUE:
-                    (this->*valueToStr)();
+                case STATE_हालागा:
+                    (this->*हालागा_To_Str)();
                     state = STATE_CN_CLOSE;
                     if (alignOrder)
                         return buf;
                     if (++cn < mcn)
-                        state = STATE_VALUE_SEPARATOR;
+                        state = STATE_हालागा_SEPARATOR;
                     return buf;
                 case STATE_FINISHED:
                     return 0;
-                case STATE_LINE_SEPARATOR:
+                case STATE_लिन्या_SEPARATOR:
                     if (row >= mtx.rows)
                     {
                         if (alignOrder)
@@ -250,7 +250,7 @@ namespace cv
                         return next();
                     }
                     state = STATE_ROW_OPEN;
-                    buf[0] = singleLine ? ' ' : '\n';
+                    buf[0] = single_लिन्या ? ' ' : '\n';
                     buf[1] = 0;
                     return buf;
                 case STATE_CN_SEPARATOR:
@@ -259,8 +259,8 @@ namespace cv
                     buf[1] = ' ';
                     buf[2] = 0;
                     return buf;
-                case STATE_VALUE_SEPARATOR:
-                    state = STATE_VALUE;
+                case STATE_हालागा_SEPARATOR:
+                    state = STATE_हालागा;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
@@ -539,8 +539,8 @@ namespace cv
             bool dots = false;
             for (i = 0; i < ndump; i++) {
                 if (i > 0 && !dots) {
-                    int nempty_lines = ndims - 2 - d;
-                    for (int k = 0; k < nempty_lines; k++)
+                    int nempty_मगा_लिन्या = ndims - 2 - d;
+                    for (int k = 0; k < nempty_मगा_लिन्या; k++)
                         strm << "\n";
                 }
                 if (i > 0)
@@ -557,7 +557,7 @@ namespace cv
         }
     }
 
-    std::ostream& pprint(std::ostream& strm, InputArray array,
+    std::ostream& pprint(std::ostream& strm, पासोक_Array array,
                          int /*indent*/, int edge_,
                          int wholeTensorThreshold,
                          char parens)

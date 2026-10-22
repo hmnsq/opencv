@@ -228,8 +228,8 @@ bool LogTagManager::internal_applyNamePartConfigToSpecificTag(FullNameLookupResu
     }
     CV_Assert(fullNameResult.m_findCrossReferences);
     const auto& crossReferences = fullNameResult.m_crossReferences;
-    const size_t matchingNamePartCount = crossReferences.size();
-    for (size_t k = 0u; k < matchingNamePartCount; ++k)
+    const size_t matching_Name_Part_बिलांग = crossReferences.size();
+    for (size_t k = 0u; k < matching_Name_Part_बिलांग; ++k)
     {
         const auto& match = crossReferences.at(k);
         const auto& namePartInfo = *match.m_namePartInfo;
@@ -251,7 +251,7 @@ void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupRes
 {
     CV_Assert(namePartResult.m_findCrossReferences);
     const auto& crossReferences = namePartResult.m_crossReferences;
-    const size_t matchingFullNameCount = crossReferences.size();
+    const size_t matching_Full_Name_बिलांग = crossReferences.size();
     NamePartInfo& namePartInfo = *namePartResult.m_namePartInfoPtr;
     const MatchingScope scope = namePartInfo.parsedLevel.scope;
     CV_Assert(scope != MatchingScope::Full);
@@ -260,7 +260,7 @@ void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupRes
         return;
     }
     const LogLevel level = namePartInfo.parsedLevel.level;
-    for (size_t k = 0u; k < matchingFullNameCount; ++k)
+    for (size_t k = 0u; k < matching_Full_Name_बिलांग; ++k)
     {
         const auto& match = crossReferences.at(k);
         FullNameInfo& fullNameInfo = *match.m_fullNameInfo;
@@ -334,9 +334,9 @@ std::pair<size_t, bool> LogTagManager::NameTable::internal_addOrLookupFullName(c
 void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<std::string>& nameParts,
     std::vector<size_t>& namePartIds)
 {
-    const size_t namePartCount = nameParts.size();
-    namePartIds.resize(namePartCount, ~(size_t)0u);
-    for (size_t namePartIndex = 0u; namePartIndex < namePartCount; ++namePartIndex)
+    const size_t name_Part_बिलांग = nameParts.size();
+    namePartIds.resize(name_Part_बिलांग, ~(size_t)0u);
+    for (size_t namePartIndex = 0u; namePartIndex < name_Part_बिलांग; ++namePartIndex)
     {
         const std::string& namePart = nameParts.at(namePartIndex);
         const size_t namePartId = internal_addOrLookupNamePart(namePart);
@@ -359,8 +359,8 @@ size_t LogTagManager::NameTable::internal_addOrLookupNamePart(const std::string&
 
 void LogTagManager::NameTable::internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds)
 {
-    const size_t namePartCount = namePartIds.size();
-    for (size_t namePartPos = 0u; namePartPos < namePartCount; ++namePartPos)
+    const size_t name_Part_बिलांग = namePartIds.size();
+    for (size_t namePartPos = 0u; namePartPos < name_Part_बिलांग; ++namePartPos)
     {
         const size_t namePartId = namePartIds.at(namePartPos);
         m_fullNameToNamePartIds.emplace(fullNameId, std::make_pair(namePartId, namePartPos));
@@ -394,11 +394,11 @@ void LogTagManager::NameTable::internal_findMatchingNamePartsForFullName(FullNam
     const size_t fullNameId = fullNameResult.m_fullNameId;
     FullNameInfo* fullNameInfo = fullNameResult.m_fullNameInfoPtr;
     const auto& namePartIds = fullNameResult.m_namePartIds;
-    const size_t namePartCount = namePartIds.size();
+    const size_t name_Part_बिलांग = namePartIds.size();
     auto& crossReferences = fullNameResult.m_crossReferences;
     crossReferences.clear();
-    crossReferences.reserve(namePartCount);
-    for (size_t matchingPos = 0u; matchingPos < namePartCount; ++matchingPos)
+    crossReferences.reserve(name_Part_बिलांग);
+    for (size_t matchingPos = 0u; matchingPos < name_Part_बिलांग; ++matchingPos)
     {
         const size_t namePartId = namePartIds.at(matchingPos);
         NamePartInfo* namePartInfo = internal_getNamePartInfo(namePartId);
@@ -410,10 +410,10 @@ void LogTagManager::NameTable::internal_findMatchingFullNamesForNamePart(NamePar
 {
     const size_t namePartId = result.m_namePartId;
     NamePartInfo* namePartInfo = result.m_namePartInfoPtr;
-    const size_t matchingFullNameCount = m_namePartToFullNameIds.count(namePartId);
+    const size_t matching_Full_Name_बिलांग = m_namePartToFullNameIds.बिलांग_2(namePartId);
     std::vector<CrossReference>& crossReferences = result.m_crossReferences;
     crossReferences.clear();
-    crossReferences.reserve(matchingFullNameCount);
+    crossReferences.reserve(matching_Full_Name_बिलांग);
     const auto namePartToFullNameIterPair = m_namePartToFullNameIds.equal_range(result.m_namePartId);
     const auto iterBegin = namePartToFullNameIterPair.first;
     const auto iterEnd = namePartToFullNameIterPair.second;

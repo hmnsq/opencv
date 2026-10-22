@@ -16,13 +16,13 @@ public:
     }
     virtual ~JSONEmitter() {}
 
-    FStructData startWriteStruct( const FStructData& parent, const char* key,
+    FStructData startWriteStruct( const FStructData& parent, const char* सुसि,
                                   int struct_flags, const char* type_name=0 )
     {
         char data[CV_FS_MAX_LEN + 1024];
 
-        struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        struct_flags = (struct_flags & (File_बुहोल::TYPE_MASK|File_बुहोल::FLOW)) | File_बुहोल::EMPTY;
+        if( !File_बुहोल::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
@@ -32,19 +32,19 @@ public:
         bool is_real_collection = true;
         if (type_name && memcmp(type_name, "binary", 6) == 0)
         {
-            struct_flags = FileNode::STR;
+            struct_flags = File_बुहोल::STR;
             data[0] = '\0';
             is_real_collection = false;
         }
 
         if ( is_real_collection )
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
+            char c = File_बुहोल::isMap(struct_flags) ? '{' : '[';
             data[0] = c;
             data[1] = '\0';
         }
 
-        writeScalar( key, data );
+        writeScalar( सुसि, data );
         FStructData current_struct("", struct_flags, parent.indent + 4);
 
         return current_struct;
@@ -54,8 +54,8 @@ public:
     {
         int struct_flags = current_struct.flags;
 
-        if (FileNode::isCollection(struct_flags)) {
-            if (!FileNode::isFlow(struct_flags)) {
+        if (File_बुहोल::isCollection(struct_flags)) {
+            if (!File_बुहोल::isFlow(struct_flags)) {
                 if (fs->bufferPtr() <= fs->bufferStart() + fs->get_space()) {
                     /* some bad code for base64_writer... */
                     char *ptr = fs->bufferPtr();
@@ -68,32 +68,32 @@ public:
             }
 
             char *ptr = fs->bufferPtr();
-            if (ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags))
+            if (ptr > fs->bufferStart() + current_struct.indent && !File_बुहोल::isEmptyCollection(struct_flags))
                 *ptr++ = ' ';
-            *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
+            *ptr++ = File_बुहोल::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
     }
 
-    void write(const char* key, int value)
+    void write(const char* सुसि, int value)
     {
         char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10 ));
+        writeScalar( सुसि, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    void write(const char* सुसि, int64_t value)
     {
         char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10, true ));
+        writeScalar( सुसि, fs::itoa( value, buf, 10, true ));
     }
 
-    void write( const char* key, double value )
+    void write( const char* सुसि, double value )
     {
         char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, true ));
+        writeScalar( सुसि, fs::doubleToString( buf, sizeof(buf), value, true ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    void write(const char* सुसि, const char* str, bool quote)
     {
         char buf[CV_FS_MAX_LEN*6+16];
         char* data = (char*)str;
@@ -143,10 +143,10 @@ public:
             data = buf + !need_quote;
         }
 
-        writeScalar( key, data);
+        writeScalar( सुसि, data);
     }
 
-    void writeScalar(const char* key, const char* data)
+    void writeScalar(const char* सुसि, const char* data)
     {
         /* check write_struct */
 
@@ -162,15 +162,15 @@ public:
 
         /* check parameters */
 
-        size_t key_len = 0u;
-        if( key && *key == '\0' )
-            key = 0;
-        if ( key )
+        size_t सुसि_len = 0u;
+        if( सुसि && *सुसि == '\0' )
+            सुसि = 0;
+        if ( सुसि )
         {
-            key_len = strlen(key);
-            if ( key_len == 0u )
+            सुसि_len = strlen(सुसि);
+            if ( सुसि_len == 0u )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
-            else if ( static_cast<int>(key_len) > CV_FS_MAX_LEN )
+            else if ( static_cast<int>(सुसि_len) > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
@@ -180,26 +180,26 @@ public:
 
         FStructData& current_struct = fs->getCurrentStruct();
         int struct_flags = current_struct.flags;
-        if( FileNode::isCollection(struct_flags) )
+        if( File_बुहोल::isCollection(struct_flags) )
         {
-            if ( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            if ( (File_बुहोल::isMap(struct_flags) ^ (सुसि != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
         } else {
             fs->setNonEmpty();
-            struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
+            struct_flags = File_बुहोल::EMPTY | (सुसि ? File_बुहोल::MAP : File_बुहोल::SEQ);
         }
 
         // start to write
         char* ptr = 0;
 
-        if( FileNode::isFlow(struct_flags) )
+        if( File_बुहोल::isFlow(struct_flags) )
         {
             int new_offset;
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            if( !File_बुहोल::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
-            new_offset = static_cast<int>(ptr - fs->bufferStart() + key_len + data_len);
+            new_offset = static_cast<int>(ptr - fs->bufferStart() + सुसि_len + data_len);
             if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
             {
                 fs->setBufferPtr(ptr);
@@ -210,7 +210,7 @@ public:
         }
         else
         {
-            if ( !FileNode::isEmptyCollection(struct_flags) )
+            if ( !File_बुहोल::isEmptyCollection(struct_flags) )
             {
                 ptr = fs->bufferPtr();
                 *ptr++ = ',';
@@ -222,24 +222,24 @@ public:
             ptr = fs->flush();
         }
 
-        if( key )
+        if( सुसि )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            if( !cv_isalpha(सुसि[0]) && सुसि[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
-            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(key_len) );
+            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(सुसि_len) );
             *ptr++ = '\"';
 
-            for( size_t i = 0u; i < key_len; i++ )
+            for( size_t i = 0u; i < सुसि_len; i++ )
             {
-                char c = key[i];
+                char c = सुसि[i];
 
                 ptr[i] = c;
                 if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
-            ptr += key_len;
+            ptr += सुसि_len;
             *ptr++ = '\"';
             *ptr++ = ':';
             *ptr++ = ' ';
@@ -253,7 +253,7 @@ public:
         }
 
         fs->setBufferPtr(ptr);
-        current_struct.flags &= ~FileNode::EMPTY;
+        current_struct.flags &= ~File_बुहोल::EMPTY;
     }
 
     void writeComment(const char* comment, bool eol_comment)
@@ -468,17 +468,17 @@ public:
             if (ptr[0] != '\\' || ptr[1] != 'u')
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
             ptr += 2;
-            uint32_t low = parseUnicodeEscape(ptr);
-            if (low < 0xDC00 || low > 0xDFFF)
+            uint32_t माबाबा = parseUnicodeEscape(ptr);
+            if (माबाबा < 0xDC00 || माबाबा > 0xDFFF)
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
-            codepoint = 0x10000u + ((codepoint - 0xD800u) << 10) + (low - 0xDC00u);
+            codepoint = 0x10000u + ((codepoint - 0xD800u) << 10) + (माबाबा - 0xDC00u);
         }
         else if (codepoint >= 0xDC00 && codepoint <= 0xDFFF)
             CV_PARSE_ERROR_CPP("unpaired \\uXXXX low surrogate");
         appendUtf8(out, codepoint);
     }
 
-    char* parseKey( char* ptr, FileNode& collection, FileNode& value_placeholder )
+    char* parse_सुसि( char* ptr, File_बुहोल& collection, File_बुहोल& हालागा_placeholder )
     {
         if (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
@@ -487,20 +487,20 @@ public:
             CV_PARSE_ERROR_CPP( "Key must start with \'\"\'" );
 
         char * beg = ptr + 1;
-        std::string key_name;
+        std::string सुसि_name;
         do {
             if (*ptr == '\\') { // skip the next character if current is back slash
                 ++ptr;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
                 if (*ptr == 'u') {
                     ++ptr;
-                    parseUnicodeEscapeToUtf8(ptr, key_name);
+                    parseUnicodeEscapeToUtf8(ptr, सुसि_name);
                     continue;
                 }
-                key_name += *ptr;
+                सुसि_name += *ptr;
             } else if (*ptr != '"') {
                 // normal byte: append current, do NOT skip ahead first
-                key_name += *ptr;
+                सुसि_name += *ptr;
             }
             ++ptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
@@ -511,7 +511,7 @@ public:
 
         if( ptr == beg )
             CV_PARSE_ERROR_CPP( "Key is empty" );
-        value_placeholder = fs->addNode(collection, key_name, FileNode::NONE);
+        हालागा_placeholder = fs->add_बुहोल(collection, सुसि_name, File_बुहोल::NONE);
 
         ptr++;
         ptr = skipSpaces( ptr );
@@ -540,7 +540,7 @@ public:
         return true;
     }
 
-    char* parseValue( char* ptr, FileNode& node )
+    char* parse_हालागा( char* ptr, File_बुहोल& बुहोल )
     {
         if (!ptr)
             CV_PARSE_ERROR_CPP("Invalid value input");
@@ -560,7 +560,7 @@ public:
             if ((len >= 8u) && (memcmp( beg, "$base64$", 8u ) == 0) )
             {   /**************** Base64 string ****************/
                 ptr = beg + 8;
-                ptr = fs->parseBase64(ptr, 0, node);
+                ptr = fs->parseBase64(ptr, 0, बुहोल);
 
                 if ( *ptr != '\"' )
                     CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
@@ -668,7 +668,7 @@ public:
                 else
                     ptr++;
 
-                node.setValue(FileNode::STRING, buf, i);
+                बुहोल.set_हालागा(File_बुहोल::STRING, buf, i);
             }
         }
         else if ( cv_isdigit(*ptr) || *ptr == '-' || *ptr == '+' || *ptr == '.' )
@@ -689,14 +689,14 @@ public:
                 double fval = fs->strtod( beg, &ptr );
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
-                node.setValue(FileNode::REAL, &fval);
+                बुहोल.set_हालागा(File_बुहोल::REAL, &fval);
             }
             else
             {
                 int64_t ival = strtoll( beg, &ptr, 0 );
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
-                node.setValue(FileNode::INT, &ival);
+                बुहोल.set_हालागा(File_बुहोल::INT, &ival);
             }
 
             if ( beg >= ptr )
@@ -719,7 +719,7 @@ public:
                      (len == 5 && memcmp( beg, "false", 5 ) == 0) )
             {
                 int64_t ival = *beg == 't' ? 1 : 0;
-                node.setValue(FileNode::INT, &ival);
+                बुहोल.set_हालागा(File_बुहोल::INT, &ival);
             }
             else
             {
@@ -730,7 +730,7 @@ public:
         return ptr;
     }
 
-    char* parseSeq( char* ptr, FileNode& node, int depth = 0 )
+    char* parseSeq( char* ptr, File_बुहोल& बुहोल, int depth = 0 )
     {
         if (!ptr)
             CV_PARSE_ERROR_CPP( "ptr is NULL" );
@@ -743,7 +743,7 @@ public:
         else
             ptr++;
 
-        fs->convertToCollection(FileNode::SEQ, node);
+        fs->convertToCollection(File_बुहोल::SEQ, बुहोल);
 
         for (;;)
         {
@@ -753,14 +753,14 @@ public:
 
             if ( *ptr != ']' )
             {
-                FileNode child = fs->addNode(node, std::string(), FileNode::NONE );
+                File_बुहोल child = fs->add_बुहोल(बुहोल, std::string(), File_बुहोल::NONE );
 
                 if ( *ptr == '[' )
                     ptr = parseSeq( ptr, child, depth + 1 );
                 else if ( *ptr == '{' )
                     ptr = parseMap( ptr, child, depth + 1 );
                 else
-                    ptr = parseValue( ptr, child );
+                    ptr = parse_हालागा( ptr, child );
             }
 
             ptr = skipSpaces( ptr );
@@ -783,11 +783,11 @@ public:
         else
             ptr++;
 
-        fs->finalizeCollection(node);
+        fs->finalizeCollection(बुहोल);
         return ptr;
     }
 
-    char* parseMap( char* ptr, FileNode& node, int depth = 0 )
+    char* parseMap( char* ptr, File_बुहोल& बुहोल, int depth = 0 )
     {
         if (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
@@ -800,7 +800,7 @@ public:
         else
             ptr++;
 
-        fs->convertToCollection(FileNode::MAP, node);
+        fs->convertToCollection(File_बुहोल::MAP, बुहोल);
 
         for( ;; )
         {
@@ -810,8 +810,8 @@ public:
 
             if ( *ptr == '"' )
             {
-                FileNode child;
-                ptr = parseKey( ptr, node, child );
+                File_बुहोल child;
+                ptr = parse_सुसि( ptr, बुहोल, child );
                 if( !ptr || !*ptr )
                     break;
                 ptr = skipSpaces( ptr );
@@ -823,7 +823,7 @@ public:
                 else if ( *ptr == '{' )
                     ptr = parseMap( ptr, child, depth + 1 );
                 else
-                    ptr = parseValue( ptr, child );
+                    ptr = parse_हालागा( ptr, child );
             }
 
             ptr = skipSpaces( ptr );
@@ -848,7 +848,7 @@ public:
         else
             ptr++;
 
-        fs->finalizeCollection(node);
+        fs->finalizeCollection(बुहोल);
         return ptr;
     }
 
@@ -861,17 +861,17 @@ public:
         if ( !ptr || !*ptr )
             return false;
 
-        FileNode root_collection(fs->getFS(), 0, 0);
+        File_बुहोल उगात_collection(fs->getFS(), 0, 0);
 
         if( *ptr == '{' )
         {
-            FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::MAP);
-            parseMap( ptr, root_node );
+            File_बुहोल उगात_बुहोल = fs->add_बुहोल(उगात_collection, std::string(), File_बुहोल::MAP);
+            parseMap( ptr, उगात_बुहोल );
         }
         else if ( *ptr == '[' )
         {
-            FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::SEQ);
-            parseSeq( ptr, root_node );
+            File_बुहोल उगात_बुहोल = fs->add_बुहोल(उगात_collection, std::string(), File_बुहोल::SEQ);
+            parseSeq( ptr, उगात_बुहोल );
         }
         else
         {

@@ -10,11 +10,11 @@ namespace cv {
 
 // In place (dst shares the data of a continuous src) only the header changes; otherwise the
 // elements are copied into dst.
-static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
+static void reshapeTo(पासोक_Array _src, OutputArray _dst, const MatShape& shape)
 {
     Mat src = _src.getMat();
     CV_Assert(shape.total() == src.total());
-    if (_dst.kind() == _InputArray::MAT && src.isContinuous())
+    if (_dst.kind() == पासोक_Array_2::MAT && src.isContinuous())
     {
         Mat& dst = _dst.getMatRef();
         if (dst.data && dst.data == src.data)
@@ -38,25 +38,25 @@ static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
     Mat(shape.dims, shape.p, src.type(), tmp.data).copyTo(dst);
 }
 
-void squeeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+void squeeze(पासोक_Array src, OutputArray dst, const std::vector<int>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().squeeze(axes));
 }
 
-void unsqueeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+void unsqueeze(पासोक_Array src, OutputArray dst, const std::vector<int>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().unsqueeze(axes));
 }
 
-void flatten(InputArray src, OutputArray dst, int startAxis, int endAxis)
+void flatten(पासोक_Array src, OutputArray dst, int startAxis, int endAxis)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().flatten(startAxis, endAxis));
 }
 
-void reshape(InputArray src, OutputArray dst, const std::vector<int>& newShape, bool allowZero)
+void reshape(पासोक_Array src, OutputArray dst, const std::vector<int>& newShape, bool allowZero)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().reshape(MatShape(newShape), allowZero));

@@ -30,40 +30,40 @@ public:
     }
     virtual ~XMLEmitter() {}
 
-    void writeTag( const char* key, int tag_type, const std::vector<std::string>& attrlist=std::vector<std::string>() )
+    void writeTag( const char* सुसि, int tag_type, const std::vector<std::string>& attrlist=std::vector<std::string>() )
     {
         char* ptr = fs->bufferPtr();
         int i, len = 0;
         FStructData& current_struct = fs->getCurrentStruct();
         int struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
-            key = 0;
+        if( सुसि && सुसि[0] == '\0' )
+            सुसि = 0;
 
         if( tag_type == CV_XML_OPENING_TAG || tag_type == CV_XML_EMPTY_TAG )
         {
-            if( FileNode::isCollection(struct_flags) )
+            if( File_बुहोल::isCollection(struct_flags) )
             {
-                if( FileNode::isMap(struct_flags) ^ (key != 0) )
+                if( File_बुहोल::isMap(struct_flags) ^ (सुसि != 0) )
                     CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                              "or add element with key to sequence" );
             }
             else
             {
-                struct_flags = FileNode::EMPTY + (key ? FileNode::MAP : FileNode::SEQ);
+                struct_flags = File_बुहोल::EMPTY + (सुसि ? File_बुहोल::MAP : File_बुहोल::SEQ);
                 //fs->is_first = 0;
             }
 
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            if( !File_बुहोल::isEmptyCollection(struct_flags) )
                 ptr = fs->flush();
         }
 
-        if( !key )
-            key = "_";
-        else if( key[0] == '_' && key[1] == '\0' )
+        if( !सुसि )
+            सुसि = "_";
+        else if( सुसि[0] == '_' && सुसि[1] == '\0' )
             CV_Error( cv::Error::StsBadArg, "A single _ is a reserved tag name" );
 
-        len = (int)strlen( key );
+        len = (int)strlen( सुसि );
         *ptr++ = '<';
         if( tag_type == CV_XML_CLOSING_TAG )
         {
@@ -72,13 +72,13 @@ public:
             *ptr++ = '/';
         }
 
-        if( !cv_isalpha(key[0]) && key[0] != '_' )
+        if( !cv_isalpha(सुसि[0]) && सुसि[0] != '_' )
             CV_Error( cv::Error::StsBadArg, "Key should start with a letter or _" );
 
         ptr = fs->resizeWriteBuffer( ptr, len );
         for( i = 0; i < len; i++ )
         {
-            char c = key[i];
+            char c = सुसि[i];
             if( !cv_isalnum(c) && c != '_' && c != '-' )
                 CV_Error( cv::Error::StsBadArg, "Key name may only contain alphanumeric characters [a-zA-Z0-9], '-' and '_'" );
             ptr[i] = c;
@@ -111,10 +111,10 @@ public:
             *ptr++ = '/';
         *ptr++ = '>';
         fs->setBufferPtr(ptr);
-        current_struct.flags = struct_flags & ~FileNode::EMPTY;
+        current_struct.flags = struct_flags & ~File_बुहोल::EMPTY;
     }
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
+    FStructData startWriteStruct(const FStructData& parent, const char* सुसि,
                                  int struct_flags, const char* type_name=0)
     {
         std::vector<std::string> attrlist;
@@ -124,10 +124,10 @@ public:
             attrlist.push_back(type_name);
         }
 
-        writeTag( key, CV_XML_OPENING_TAG, attrlist );
+        writeTag( सुसि, CV_XML_OPENING_TAG, attrlist );
 
         FStructData current_struct;
-        current_struct.tag = key ? std::string(key) : std::string();
+        current_struct.tag = सुसि ? std::string(सुसि) : std::string();
         current_struct.flags = struct_flags;
         current_struct.indent = parent.indent + CV_XML_INDENT;
 
@@ -139,25 +139,25 @@ public:
         writeTag( current_struct.tag.c_str(), CV_XML_CLOSING_TAG );
     }
 
-    void write(const char* key, int value)
+    void write(const char* सुसि, int value)
     {
         char buf[128], *ptr = fs::itoa( value, buf, 10 );
-        writeScalar( key, ptr);
+        writeScalar( सुसि, ptr);
     }
 
-    void write(const char* key, int64_t value)
+    void write(const char* सुसि, int64_t value)
     {
         char buf[128], *ptr = fs::itoa( value, buf, 10, true );
-        writeScalar( key, ptr);
+        writeScalar( सुसि, ptr);
     }
 
-    void write( const char* key, double value )
+    void write( const char* सुसि, double value )
     {
         char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ) );
+        writeScalar( सुसि, fs::doubleToString( buf, sizeof(buf), value, false ) );
     }
 
-    void write(const char* key, const char* str, bool quote)
+    void write(const char* सुसि, const char* str, bool quote)
     {
         char buf[CV_FS_MAX_LEN*6+16];
         char* data = (char*)str;
@@ -234,10 +234,10 @@ public:
             data = buf + (int)!need_quote;
         }
 
-        writeScalar( key, data );
+        writeScalar( सुसि, data );
     }
 
-    void writeScalar(const char* key, const char* data)
+    void writeScalar(const char* सुसि, const char* data)
     {
         fs->check_if_write_struct_is_delayed(false);
         if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
@@ -250,30 +250,30 @@ public:
         }
 
         int len = (int)strlen(data);
-        if( key && *key == '\0' )
-            key = 0;
+        if( सुसि && *सुसि == '\0' )
+            सुसि = 0;
 
         FStructData& current_struct = fs->getCurrentStruct();
         int struct_flags = current_struct.flags;
 
-        if( FileNode::isMap(struct_flags) ||
-           (!FileNode::isCollection(struct_flags) && key) )
+        if( File_बुहोल::isMap(struct_flags) ||
+           (!File_बुहोल::isCollection(struct_flags) && सुसि) )
         {
-            writeTag( key, CV_XML_OPENING_TAG );
+            writeTag( सुसि, CV_XML_OPENING_TAG );
             char* ptr = fs->resizeWriteBuffer( fs->bufferPtr(), len );
             memcpy( ptr, data, len );
             fs->setBufferPtr( ptr + len );
-            writeTag( key, CV_XML_CLOSING_TAG );
+            writeTag( सुसि, CV_XML_CLOSING_TAG );
         }
         else
         {
             char* ptr = fs->bufferPtr();
             int new_offset = (int)(ptr - fs->bufferStart()) + len;
 
-            if( key )
+            if( सुसि )
                 CV_Error( cv::Error::StsBadArg, "elements with keys can not be written to sequence" );
 
-            current_struct.flags = FileNode::SEQ;
+            current_struct.flags = File_बुहोल::SEQ;
 
             if( (new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10) ||
                (ptr > fs->bufferStart() && ptr[-1] == '>') )
@@ -458,7 +458,7 @@ public:
         return true;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int depth = 0 )
+    char* parse_हालागा( char* ptr, File_बुहोल& बुहोल, int depth = 0 )
     {
         if (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
@@ -466,10 +466,10 @@ public:
         if( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        FileNode new_elem;
+        File_बुहोल new_elem;
         bool have_space = true;
-        int value_type = node.type();
-        std::string key, key2, type_name;
+        int value_type = बुहोल.type();
+        std::string सुसि, key2, type_name;
 
         for(;;)
         {
@@ -492,12 +492,12 @@ public:
             if( c =='<' || c == '\0' )
             {
                 int tag_type = 0;
-                int elem_type = FileNode::NONE;
+                int elem_type = File_बुहोल::NONE;
 
                 if( d == '/' || c == '\0' )
                     break;
 
-                ptr = parseTag( ptr, key, type_name, tag_type );
+                ptr = parseTag( ptr, सुसि, type_name, tag_type );
 
                 if( tag_type == CV_XML_DIRECTIVE_TAG )
                     CV_PARSE_ERROR_CPP( "Directive tags are not allowed here" );
@@ -507,24 +507,24 @@ public:
                 CV_Assert(tag_type == CV_XML_OPENING_TAG);
 
                 /* for base64 string */
-                bool binary_string = false;
+                bool दालावाहान_string = false;
 
                 if( !type_name.empty() )
                 {
                     const char* tn = type_name.c_str();
                     if( strcmp(tn, "str") == 0 )
-                        elem_type = FileNode::STRING;
+                        elem_type = File_बुहोल::STRING;
                     else if( strcmp( tn, "map" ) == 0 )
-                        elem_type = FileNode::MAP;
+                        elem_type = File_बुहोल::MAP;
                     else if( strcmp( tn, "seq" ) == 0 )
-                        elem_type = FileNode::SEQ;
+                        elem_type = File_बुहोल::SEQ;
                     else if( strcmp( tn, "binary") == 0)
-                        binary_string = true;
+                        दालावाहान_string = true;
                 }
 
-                new_elem = fs->addNode(node, key, elem_type, 0);
-                if (!binary_string)
-                    ptr = parseValue(ptr, new_elem, depth + 1);
+                new_elem = fs->add_बुहोल(बुहोल, सुसि, elem_type, 0);
+                if (!दालावाहान_string)
+                    ptr = parse_हालागा(ptr, new_elem, depth + 1);
                 else
                 {
                     ptr = fs->parseBase64( ptr, 0, new_elem);
@@ -534,7 +534,7 @@ public:
                 }
 
                 ptr = parseTag( ptr, key2, type_name, tag_type );
-                if( tag_type != CV_XML_CLOSING_TAG || key2 != key )
+                if( tag_type != CV_XML_CLOSING_TAG || key2 != सुसि )
                     CV_PARSE_ERROR_CPP( "Mismatched closing tag" );
                 have_space = true;
             }
@@ -543,15 +543,15 @@ public:
                 if( !have_space )
                     CV_PARSE_ERROR_CPP( "There should be space between literals" );
 
-                FileNode* elem = &node;
-                if( node.type() != FileNode::NONE )
+                File_बुहोल* elem = &बुहोल;
+                if( बुहोल.type() != File_बुहोल::NONE )
                 {
-                    fs->convertToCollection( FileNode::SEQ, node );
-                    new_elem = fs->addNode(node, std::string(), FileNode::NONE, 0);
+                    fs->convertToCollection( File_बुहोल::SEQ, बुहोल );
+                    new_elem = fs->add_बुहोल(बुहोल, std::string(), File_बुहोल::NONE, 0);
                     elem = &new_elem;
                 }
 
-                if( value_type != FileNode::STRING &&
+                if( value_type != File_बुहोल::STRING &&
                    (cv_isdigit(c) || ((c == '-' || c == '+') &&
                    (cv_isdigit(d) || d == '.')) || (c == '.' && cv_isalnum(d))) ) // a number
                 {
@@ -561,12 +561,12 @@ public:
                     if( *endptr == '.' || *endptr == 'e' )
                     {
                         double fval = fs->strtod( ptr, &endptr );
-                        elem->setValue(FileNode::REAL, &fval);
+                        elem->set_हालागा(File_बुहोल::REAL, &fval);
                     }
                     else
                     {
                         int64_t ival = strtoll( ptr, &endptr, 0 );
-                        elem->setValue(FileNode::INT, &ival);
+                        elem->set_हालागा(File_बुहोल::INT, &ival);
                     }
 
                     if( endptr == ptr )
@@ -660,15 +660,15 @@ public:
                             CV_PARSE_ERROR_CPP("Too long string literal");
                         strbuf[i++] = c;
                     }
-                    elem->setValue(FileNode::STRING, strbuf, i);
+                    elem->set_हालागा(File_बुहोल::STRING, strbuf, i);
                 }
 
-                if( value_type != FileNode::NONE && value_type != FileNode::SEQ && value_type != FileNode::MAP )
+                if( value_type != File_बुहोल::NONE && value_type != File_बुहोल::SEQ && value_type != File_बुहोल::MAP )
                     break;
                 have_space = false;
             }
         }
-        fs->finalizeCollection(node);
+        fs->finalizeCollection(बुहोल);
 
         return ptr;
     }
@@ -815,7 +815,7 @@ public:
     {
         CV_Assert( fs != 0 );
 
-        std::string key, key2, type_name;
+        std::string सुसि, key2, type_name;
         int tag_type = 0;
         bool ok = false;
 
@@ -827,8 +827,8 @@ public:
         if( memcmp( ptr, "<?xml", 5 ) != 0 )  // FIXIT ptr[1..] - out of bounds read without check
             CV_PARSE_ERROR_CPP( "Valid XML should start with \'<?xml ...?>\'" );
 
-        ptr = parseTag( ptr, key, type_name, tag_type );
-        FileNode root_collection(fs->getFS(), 0, 0);
+        ptr = parseTag( ptr, सुसि, type_name, tag_type );
+        File_बुहोल उगात_collection(fs->getFS(), 0, 0);
 
         while( ptr && *ptr != '\0' )
         {
@@ -838,13 +838,13 @@ public:
 
             if( *ptr != '\0' )
             {
-                ptr = parseTag( ptr, key, type_name, tag_type );
-                if( tag_type != CV_XML_OPENING_TAG || key != "opencv_storage" )
+                ptr = parseTag( ptr, सुसि, type_name, tag_type );
+                if( tag_type != CV_XML_OPENING_TAG || सुसि != "opencv_storage" )
                     CV_PARSE_ERROR_CPP( "<opencv_storage> tag is missing" );
-                FileNode root = fs->addNode(root_collection, std::string(), FileNode::MAP, 0);
-                ptr = parseValue( ptr, root );
+                File_बुहोल उगात = fs->add_बुहोल(उगात_collection, std::string(), File_बुहोल::MAP, 0);
+                ptr = parse_हालागा( ptr, उगात );
                 ptr = parseTag( ptr, key2, type_name, tag_type );
-                if( tag_type != CV_XML_CLOSING_TAG || key != key2 )
+                if( tag_type != CV_XML_CLOSING_TAG || सुसि != key2 )
                     CV_PARSE_ERROR_CPP( "</opencv_storage> tag is missing" );
                 ptr = skipSpaces( ptr, 0 );
                 ok = true;

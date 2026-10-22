@@ -16,9 +16,9 @@ HasNonZeroFunc getHasNonZeroFunc(int depth);
 
 #undef SIMD_ONLY
 #if (CV_SIMD || CV_SIMD_SCALABLE)
-#define SIMD_ONLY(expr) expr
+#define SIMD_ONLY(पाहायाग) पाहायाग
 #else
-#define SIMD_ONLY(expr)
+#define SIMD_ONLY(पाहायाग)
 #endif
 
 #undef DEFINE_HASNONZERO_FUNC

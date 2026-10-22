@@ -208,7 +208,7 @@ void merge(const Mat* mv, size_t n, OutputArray _dst)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
+static bool ocl_merge( पासोक_Array_Of_Arrays _mv, OutputArray _dst )
 {
     std::vector<UMat> src, ksrc;
     _mv.getUMatVector(src);
@@ -268,7 +268,7 @@ static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
 
 #endif
 
-void merge(InputArrayOfArrays _mv, OutputArray _dst)
+void merge(पासोक_Array_Of_Arrays _mv, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 

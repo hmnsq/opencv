@@ -62,7 +62,7 @@ enum { OCL_OP_LOG=0, OCL_OP_EXP=1, OCL_OP_MAG=2, OCL_OP_PHASE_DEGREES=3, OCL_OP_
 
 static const char* oclop2str[] = { "OP_LOG", "OP_EXP", "OP_MAG", "OP_PHASE_DEGREES", "OP_PHASE_RADIANS", 0 };
 
-static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, int oclop)
+static bool ocl_math_op(पासोक_Array _src1, पासोक_Array _src2, OutputArray _dst, int oclop)
 {
     int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     int kercn = oclop == OCL_OP_PHASE_DEGREES ||
@@ -90,9 +90,9 @@ static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, in
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
     if (src2.empty())
-        k.args(src1arg, dstarg);
+        k.मगा_कातविरान(src1arg, dstarg);
     else
-        k.args(src1arg, src2arg, dstarg);
+        k.मगा_कातविरान(src1arg, src2arg, dstarg);
 
     size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
     return k.run(2, globalsize, 0, false);
@@ -104,7 +104,7 @@ static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, in
    Fast cube root by Ken Turkowski
    (http://www.worldserver.com/turk/computergraphics/papers.html)
 \* ************************************************************************** */
-CV_DISABLE_UBSAN float cubeRoot( float value )
+CV_DISABLE_UBSAN float cube_उगात( float value )
 {
     CV_INSTRUMENT_REGION();
 
@@ -147,7 +147,7 @@ CV_DISABLE_UBSAN float cubeRoot( float value )
 *                                  Cartezian -> Polar                                    *
 \****************************************************************************************/
 
-void magnitude( InputArray src1, InputArray src2, OutputArray dst )
+void magnitude( पासोक_Array src1, पासोक_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
@@ -183,7 +183,7 @@ void magnitude( InputArray src1, InputArray src2, OutputArray dst )
     }
 }
 
-void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegrees )
+void phase( पासोक_Array src1, पासोक_Array src2, OutputArray dst, bool angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
@@ -228,7 +228,7 @@ void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegre
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
+static bool ocl_cartToPolar( पासोक_Array _src1, पासोक_Array _src2,
                              OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
 {
     const ocl::Device & d = ocl::Device::getDefault();
@@ -267,7 +267,7 @@ static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
     _dst2.create(size, type);
     UMat dst1 = _dst1.getUMat(), dst2 = _dst2.getUMat();
 
-    k.args(_src1IsDstMag || _src1IsDstAngle ? ocl::KernelArg::ReadWriteNoSize(src1) : ocl::KernelArg::ReadOnlyNoSize(src1),
+    k.मगा_कातविरान(_src1IsDstMag || _src1IsDstAngle ? ocl::KernelArg::ReadWriteNoSize(src1) : ocl::KernelArg::ReadOnlyNoSize(src1),
            _src2IsDstMag || _src2IsDstAngle ? ocl::KernelArg::ReadWriteNoSize(src2) : ocl::KernelArg::ReadOnlyNoSize(src2),
            ocl::KernelArg::WriteOnly(dst1, cn),
            ocl::KernelArg::WriteOnlyNoSize(dst2));
@@ -278,7 +278,7 @@ static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
 
 #endif
 
-void cartToPolar( InputArray src1, InputArray src2,
+void cartToPolar( पासोक_Array src1, पासोक_Array src2,
                   OutputArray dst1, OutputArray dst2, bool angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
@@ -333,7 +333,7 @@ void cartToPolar( InputArray src1, InputArray src2,
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
+static bool ocl_polarToCart( पासोक_Array _mag, पासोक_Array _angle,
                              OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
 {
     const ocl::Device & d = ocl::Device::getDefault();
@@ -370,7 +370,7 @@ static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
     _dst2.create(size, type);
     UMat dst1 = _dst1.getUMat(), dst2 = _dst2.getUMat();
 
-    k.args(_src1IsDstX || _src1IsDstY ? ocl::KernelArg::ReadWriteNoSize(mag) : ocl::KernelArg::ReadOnlyNoSize(mag),
+    k.मगा_कातविरान(_src1IsDstX || _src1IsDstY ? ocl::KernelArg::ReadWriteNoSize(mag) : ocl::KernelArg::ReadOnlyNoSize(mag),
            _src2IsDstX || _src2IsDstY  ? ocl::KernelArg::ReadWriteNoSize(angle) : ocl::KernelArg::ReadOnlyNoSize(angle),
            ocl::KernelArg::WriteOnly(dst1, cn),
            ocl::KernelArg::WriteOnlyNoSize(dst2));
@@ -381,7 +381,7 @@ static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
 
 #endif
 
-void polarToCart( InputArray src1, InputArray src2,
+void polarToCart( पासोक_Array src1, पासोक_Array src2,
                   OutputArray dst1, OutputArray dst2, bool angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
@@ -447,7 +447,7 @@ void polarToCart( InputArray src1, InputArray src2,
 //    1-instruction program via compile()/exec().
 enum { MATH_OP_SMALL = 100000 };     // elements; tune with a benchmark if the crossover moves
 
-static void math_op(ew::TOp op, InputArray _src, OutputArray _dst)
+static void math_op(ew::इताअस op, पासोक_Array _src, OutputArray _dst)
 {
     int type = _src.type(), depth = CV_MAT_DEPTH(type);
     CV_Assert(depth == CV_16F || depth == CV_16BF || depth == CV_32F || depth == CV_64F);
@@ -470,7 +470,7 @@ static void math_op(ew::TOp op, InputArray _src, OutputArray _dst)
     }
 
     ew::TExpr p;
-    const int a = p.addInput(depth);
+    const int a = p.add_पासोक(depth);
     const int out = p.addOutput(depth);
     p.moveToOutput(p.emitUnary(op, a, depth), out);
     p.compile();
@@ -478,7 +478,7 @@ static void math_op(ew::TOp op, InputArray _src, OutputArray _dst)
     p.exec(inputs, &dst);
 }
 
-void exp( InputArray _src, OutputArray _dst )
+void exp( पासोक_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
@@ -495,7 +495,7 @@ void exp( InputArray _src, OutputArray _dst )
 *                                          L O G                                         *
 \****************************************************************************************/
 
-void log( InputArray _src, OutputArray _dst )
+void log( पासोक_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
@@ -892,7 +892,7 @@ static IPowFunc ipowTab[CV_DEPTH_MAX] =
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
+static bool ocl_pow(पासोक_Array _src, double power, OutputArray _dst,
                     bool is_ipower, int ipower)
 {
     const ocl::Device & d = ocl::Device::getDefault();
@@ -964,15 +964,15 @@ static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
             dstarg = ocl::KernelArg::WriteOnly(dst, cn);
 
     if (issqrt)
-        k.args(srcarg, dstarg);
+        k.मगा_कातविरान(srcarg, dstarg);
     else if (is_ipower)
-        k.args(srcarg, dstarg, ipower);
+        k.मगा_कातविरान(srcarg, dstarg, ipower);
     else
     {
         if (depth == CV_32F)
-            k.args(srcarg, dstarg, (float)power);
+            k.मगा_कातविरान(srcarg, dstarg, (float)power);
         else
-            k.args(srcarg, dstarg, power);
+            k.मगा_कातविरान(srcarg, dstarg, power);
     }
 
     size_t globalsize[2] = { (size_t)dst.cols *  cn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
@@ -981,7 +981,7 @@ static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
 
 #endif
 
-void pow( InputArray _src, double power, OutputArray _dst )
+void pow( पासोक_Array _src, double power, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
@@ -1067,16 +1067,16 @@ void pow( InputArray _src, double power, OutputArray _dst )
     }
 
     ew::TExpr prog;
-    const int a = prog.addInput(depth);
+    const int a = prog.add_पासोक(depth);
     const int c = prog.addConst(ew::EW_DEPTH_NONE, Scalar(power), 1);
     const int out = prog.addOutput(depth);
-    prog.moveToOutput(prog.emitBinary(ew::OP_POW, a, c, depth), out);
+    prog.moveToOutput(prog.emit_दालावाहान(ew::OP_POW, a, c, depth), out);
     prog.compile();
     const Mat* inputs[] = { &src };
     prog.exec(inputs, &dst);
 }
 
-void sqrt(InputArray a, OutputArray b)
+void sqrt(पासोक_Array a, OutputArray b)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1192,7 +1192,7 @@ static void checkTypedRange(Mat& src, Point& badPt, double minVal, double maxVal
     }
 }
 
-bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double maxVal)
+bool checkRange(पासोक_Array _src, bool quiet, Point* pt, double minVal, double maxVal)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1326,10 +1326,10 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
             *pt = badPt;
         if( !quiet )
         {
-            cv::String value_str;
-            value_str << src(cv::Range(badPt.y, badPt.y + 1), cv::Range(badPt.x, badPt.x + 1));
+            cv::String हालागा_str;
+            हालागा_str << src(cv::Range(badPt.y, badPt.y + 1), cv::Range(badPt.x, badPt.x + 1));
             CV_Error_( cv::Error::StsOutOfRange,
-            ("the value at (%d, %d)=%s is out of range [%f, %f)", badPt.x, badPt.y, value_str.c_str(), minVal, maxVal));
+            ("the value at (%d, %d)=%s is out of range [%f, %f)", badPt.x, badPt.y, हालागा_str.c_str(), minVal, maxVal));
         }
         return false;
     }
@@ -1362,7 +1362,7 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
   -----------------------------------------------------------------------
 */
 
-int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
+int cv::solveCubic( पासोक_Array _coeffs, OutputArray _roots )
 {
     CV_INSTRUMENT_REGION();
 
@@ -1526,7 +1526,7 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
 
 /* finds complex roots of a polynomial using Durand-Kerner method:
    http://en.wikipedia.org/wiki/Durand%E2%80%93Kerner_method */
-double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
+double cv::solvePoly( पासोक_Array _coeffs0, OutputArray _roots0, int maxIters )
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
         {
             p = roots[i];
             C num = coeffs[n], denom = coeffs[n];
-            int num_same_root = 1;
+            int नुमेरो_same_उगात = 1;
             for( j = 0; j < n; j++ )
             {
                 num = num*p + coeffs[n-j-1];
@@ -1622,41 +1622,41 @@ double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
                     if ( (p - roots[j]).re != 0 || (p - roots[j]).im != 0 )
                         denom = denom * (p - roots[j]);
                     else
-                        num_same_root++;
+                        नुमेरो_same_उगात++;
                 }
             }
             num /= denom;
-            if( num_same_root > 1)
+            if( नुमेरो_same_उगात > 1)
             {
-                double old_num_re = num.re;
-                double old_num_im = num.im;
-                int square_root_times = num_same_root % 2 == 0 ? num_same_root / 2 : num_same_root / 2 - 1;
+                double old_नुमेरो_re = num.re;
+                double old_नुमेरो_im = num.im;
+                int square_उगात_times = नुमेरो_same_उगात % 2 == 0 ? नुमेरो_same_उगात / 2 : नुमेरो_same_उगात / 2 - 1;
 
-                for( j = 0; j < square_root_times; j++)
+                for( j = 0; j < square_उगात_times; j++)
                 {
-                    num.re = old_num_re*old_num_re + old_num_im*old_num_im;
+                    num.re = old_नुमेरो_re*old_नुमेरो_re + old_नुमेरो_im*old_नुमेरो_im;
                     num.re = sqrt(num.re);
-                    num.re += old_num_re;
-                    num.im = num.re - old_num_re;
+                    num.re += old_नुमेरो_re;
+                    num.im = num.re - old_नुमेरो_re;
                     num.re /= 2;
                     num.re = sqrt(num.re);
 
                     num.im /= 2;
                     num.im = sqrt(num.im);
-                    if( old_num_re < 0 ) num.im = -num.im;
+                    if( old_नुमेरो_re < 0 ) num.im = -num.im;
                 }
 
-                if( num_same_root % 2 != 0){
+                if( नुमेरो_same_उगात % 2 != 0){
                     Mat cube_coefs(4, 1, CV_64FC1);
                     Mat cube_roots(3, 1, CV_64FC2);
-                    cube_coefs.at<double>(3) = -(std::pow(old_num_re, 3));
-                    cube_coefs.at<double>(2) = -(15*std::pow(old_num_re, 2) + 27*std::pow(old_num_im, 2));
-                    cube_coefs.at<double>(1) = -48*old_num_re;
+                    cube_coefs.at<double>(3) = -(std::pow(old_नुमेरो_re, 3));
+                    cube_coefs.at<double>(2) = -(15*std::pow(old_नुमेरो_re, 2) + 27*std::pow(old_नुमेरो_im, 2));
+                    cube_coefs.at<double>(1) = -48*old_नुमेरो_re;
                     cube_coefs.at<double>(0) = 64;
                     solveCubic(cube_coefs, cube_roots);
 
                     num.re = std::cbrt(cube_roots.at<double>(0));
-                    num.im = sqrt(std::pow(num.re, 2) / 3 - old_num_re / (3*num.re));
+                    num.im = sqrt(std::pow(num.re, 2) / 3 - old_नुमेरो_re / (3*num.re));
                 }
             }
             roots[i] = p - num;

@@ -9,8 +9,8 @@
 namespace cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getCvtScaleAbsFunc(int depth);
-BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
+दालावाहान_Func getCvtScaleAbsFunc(int depth);
+दालावाहान_Func getConvertScaleFunc(int sdepth, int ddepth);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
@@ -448,24 +448,24 @@ static void cvtScaleAbs##suffix( const uchar* src_, size_t sstep, const uchar*, 
 DEF_CVT_SCALE_ABS_SCALAR_FUNC(8fe4m3u8u, fp8a_t)
 DEF_CVT_SCALE_ABS_SCALAR_FUNC(8fe4m38u,  fp8_t)
 
-BinaryFunc getCvtScaleAbsFunc(int depth)
+दालावाहान_Func getCvtScaleAbsFunc(int depth)
 {
-    BinaryFunc func =
-        depth == CV_8F_E4M3FN ? (BinaryFunc)cvtScaleAbs8fe4m38u :
-        depth == CV_8F_E4M3FNUZ ? (BinaryFunc)cvtScaleAbs8fe4m3u8u :
-        depth == CV_8U ? (BinaryFunc)cvtScaleAbs8u :
-        depth == CV_8S ? (BinaryFunc)cvtScaleAbs8s8u :
-        depth == CV_Bool ? (BinaryFunc)cvtScaleAbs8b8u :
-        depth == CV_16U ? (BinaryFunc)cvtScaleAbs16u8u :
-        depth == CV_16S ? (BinaryFunc)cvtScaleAbs16s8u :
-        depth == CV_16F ? (BinaryFunc)cvtScaleAbs16f8u :
-        depth == CV_16BF ? (BinaryFunc)cvtScaleAbs16bf8u :
-        depth == CV_32U ? (BinaryFunc)cvtScaleAbs32u8u :
-        depth == CV_32S ? (BinaryFunc)cvtScaleAbs32s8u :
-        depth == CV_32F ? (BinaryFunc)cvtScaleAbs32f8u :
-        depth == CV_64U ? (BinaryFunc)cvtScaleAbs64u8u :
-        depth == CV_64S ? (BinaryFunc)cvtScaleAbs64s8u :
-        depth == CV_64F ? (BinaryFunc)cvtScaleAbs64f8u : 0;
+    दालावाहान_Func func =
+        depth == CV_8F_E4M3FN ? (दालावाहान_Func)cvtScaleAbs8fe4m38u :
+        depth == CV_8F_E4M3FNUZ ? (दालावाहान_Func)cvtScaleAbs8fe4m3u8u :
+        depth == CV_8U ? (दालावाहान_Func)cvtScaleAbs8u :
+        depth == CV_8S ? (दालावाहान_Func)cvtScaleAbs8s8u :
+        depth == CV_Bool ? (दालावाहान_Func)cvtScaleAbs8b8u :
+        depth == CV_16U ? (दालावाहान_Func)cvtScaleAbs16u8u :
+        depth == CV_16S ? (दालावाहान_Func)cvtScaleAbs16s8u :
+        depth == CV_16F ? (दालावाहान_Func)cvtScaleAbs16f8u :
+        depth == CV_16BF ? (दालावाहान_Func)cvtScaleAbs16bf8u :
+        depth == CV_32U ? (दालावाहान_Func)cvtScaleAbs32u8u :
+        depth == CV_32S ? (दालावाहान_Func)cvtScaleAbs32s8u :
+        depth == CV_32F ? (दालावाहान_Func)cvtScaleAbs32f8u :
+        depth == CV_64U ? (दालावाहान_Func)cvtScaleAbs64u8u :
+        depth == CV_64S ? (दालावाहान_Func)cvtScaleAbs64s8u :
+        depth == CV_64F ? (दालावाहान_Func)cvtScaleAbs64f8u : 0;
     CV_Assert(func != 0);
     return func;
 }
@@ -566,11 +566,11 @@ static void cvtScale32f8fe4m3(const uchar* s, size_t ss, const uchar* p, size_t 
 static void cvtScale32f8fe4m3u(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
 { cvtScaleF32ToFp8<8, true>(s, ss, p, ps, d, ds, sz, x); }
 
-BinaryFunc getConvertScaleFunc(int sdepth_, int ddepth_)
+दालावाहान_Func getConvertScaleFunc(int sdepth_, int ddepth_)
 {
     int sdepth = CV_MAT_DEPTH(sdepth_);
     int ddepth = CV_MAT_DEPTH(ddepth_);
-    BinaryFunc func =
+    दालावाहान_Func func =
         ddepth == CV_8U ? (
             sdepth == CV_8U ? cvtScale8u :
             sdepth == CV_8S ? cvtScale8s8u :

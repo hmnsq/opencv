@@ -165,13 +165,13 @@ GpuMatND GpuMatND::clone(Stream& stream) const
     throw_no_cuda();
 }
 
-void GpuMatND::upload(InputArray src)
+void GpuMatND::upload(पासोक_Array src)
 {
     CV_UNUSED(src);
     throw_no_cuda();
 }
 
-void GpuMatND::upload(InputArray src, Stream& stream)
+void GpuMatND::upload(पासोक_Array src, Stream& stream)
 {
     CV_UNUSED(src);
     CV_UNUSED(stream);

@@ -42,16 +42,16 @@ DynamicLib::~DynamicLib()
     }
 }
 
-void* DynamicLib::getSymbol(const char* symbolName) const
+void* DynamicLib::get_सिम्बोलो(const char* सिम्बोलो_Name) const
 {
     if (!handle)
     {
         return 0;
     }
-    void* res = getSymbol_(handle, symbolName);
+    void* res = get_सिम्बोलो_2(handle, सिम्बोलो_Name);
     if (!res)
     {
-        CV_LOG_DEBUG(NULL, "No symbol '" << symbolName << "' in " << toPrintablePath(fname));
+        CV_LOG_DEBUG(NULL, "No symbol '" << सिम्बोलो_Name << "' in " << toPrintablePath(fname));
     }
     return res;
 }

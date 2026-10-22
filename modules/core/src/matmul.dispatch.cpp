@@ -61,11 +61,11 @@ namespace cv
 
 #ifdef HAVE_CLAMDBLAS
 
-static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
-                      InputArray matC, double beta, OutputArray matD, int flags )
+static bool ocl_gemm_amdblas( पासोक_Array matA, पासोक_Array matB, double alpha,
+                      पासोक_Array matC, double beta, OutputArray matD, int flags )
 {
     int type = matA.type(), esz = CV_ELEM_SIZE(type);
-    bool haveC = matC.kind() != cv::_InputArray::NONE;
+    bool haveC = matC.kind() != cv::पासोक_Array_2::NONE;
     Size sizeA = matA.size(), sizeB = matB.size(), sizeC = haveC ? matC.size() : Size(0, 0);
     bool atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
 
@@ -154,8 +154,8 @@ static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
 #endif
 
 #ifdef HAVE_OPENCL
-static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
-                      InputArray matC, double beta, OutputArray matD, int flags )
+static bool ocl_gemm( पासोक_Array matA, पासोक_Array matB, double alpha,
+                      पासोक_Array matC, double beta, OutputArray matD, int flags )
 {
     int type = matA.type();
     int depth = CV_MAT_DEPTH(type);
@@ -170,7 +170,7 @@ static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
     if (!doubleSupport && depth == CV_64F)
         return false;
 
-    bool haveC = matC.kind() != cv::_InputArray::NONE;
+    bool haveC = matC.kind() != cv::पासोक_Array_2::NONE;
     Size sizeA = matA.size(), sizeB = matB.size(), sizeC = haveC ? matC.size() : Size(0, 0);
     bool atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
 
@@ -257,12 +257,12 @@ static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
         return false;
 
     if (depth == CV_64F)
-        k.args(ocl::KernelArg::ReadOnlyNoSize(A),
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(A),
                ocl::KernelArg::ReadOnlyNoSize(B, cn, kercn),
                ocl::KernelArg::ReadWrite(D, cn, kercn),
                sizeA.width, alpha, beta);
     else
-        k.args(ocl::KernelArg::ReadOnlyNoSize(A),
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(A),
                ocl::KernelArg::ReadOnlyNoSize(B, cn, kercn),
                ocl::KernelArg::ReadWrite(D, cn, kercn),
                sizeA.width, (float)alpha, (float)beta);
@@ -335,8 +335,8 @@ void gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t s
 
 } // namespace hal
 
-void gemm(InputArray matA, InputArray matB, double alpha,
-          InputArray matC, double beta, OutputArray _matD, int flags)
+void gemm(पासोक_Array matA, पासोक_Array matB, double alpha,
+          पासोक_Array matC, double beta, OutputArray _matD, int flags)
 {
 #ifdef HAVE_CLAMDBLAS
     CV_OCL_RUN(ocl::haveAmdBlas() && matA.dims() <= 2 && matB.dims() <= 2 && matC.dims() <= 2 && _matD.isUMat() &&
@@ -449,7 +449,7 @@ static TransformFunc getDiagTransformFunc(int depth)
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void transform(InputArray _src, OutputArray _dst, InputArray _mtx)
+void transform(पासोक_Array _src, OutputArray _dst, पासोक_Array _mtx)
 {
     CV_INSTRUMENT_REGION();
 
@@ -541,7 +541,7 @@ static TransformFunc getPerspectiveTransform(int depth)
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void perspectiveTransform(InputArray _src, OutputArray _dst, InputArray _mtx)
+void perspectiveTransform(पासोक_Array _src, OutputArray _dst, पासोक_Array _mtx)
 {
     CV_INSTRUMENT_REGION();
 
@@ -584,7 +584,7 @@ void perspectiveTransform(InputArray _src, OutputArray _dst, InputArray _mtx)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_scaleAdd( InputArray _src1, double alpha, InputArray _src2, OutputArray _dst, int type )
+static bool ocl_scaleAdd( पासोक_Array _src1, double alpha, पासोक_Array _src2, OutputArray _dst, int type )
 {
     const ocl::Device & d = ocl::Device::getDefault();
 
@@ -620,9 +620,9 @@ static bool ocl_scaleAdd( InputArray _src1, double alpha, InputArray _src2, Outp
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
     if (wdepth == CV_32F)
-        k.args(src1arg, src2arg, dstarg, (float)alpha);
+        k.मगा_कातविरान(src1arg, src2arg, dstarg, (float)alpha);
     else
-        k.args(src1arg, src2arg, dstarg, alpha);
+        k.मगा_कातविरान(src1arg, src2arg, dstarg, alpha);
 
     size_t globalsize[2] = { (size_t)dst.cols * cn / kercn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
     return k.run(2, globalsize, NULL, false);
@@ -637,7 +637,7 @@ static ScaleAddFunc getScaleAddFunc(int depth)
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void scaleAdd(InputArray _src1, double alpha, InputArray _src2, OutputArray _dst)
+void scaleAdd(पासोक_Array _src1, double alpha, पासोक_Array _src2, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -727,11 +727,11 @@ void calcCovarMatrix( const Mat* data, int nsamples, Mat& covar, Mat& _mean, int
         _mean = mean.reshape(1, size.height);
 }
 
-void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mean, int flags, int ctype )
+void calcCovarMatrix( पासोक_Array _src, OutputArray _covar, पासोक_Output_Array _mean, int flags, int ctype )
 {
     CV_INSTRUMENT_REGION();
 
-    if(_src.kind() == _InputArray::STD_VECTOR_MAT || _src.kind() == _InputArray::STD_ARRAY_MAT)
+    if(_src.kind() == पासोक_Array_2::STD_VECTOR_MAT || _src.kind() == पासोक_Array_2::STD_ARRAY_MAT)
     {
         std::vector<cv::Mat> src;
         _src.getMatVector(src);
@@ -828,7 +828,7 @@ static MahalanobisImplFunc getMahalanobisImplFunc(int depth)
 }
 
 
-double Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
+double Mahalanobis(पासोक_Array _v1, पासोक_Array _v2, पासोक_Array _icovar)
 {
     CV_INSTRUMENT_REGION();
 
@@ -872,8 +872,8 @@ static MulTransposedFunc getMulTransposedFunc(int stype, int dtype, bool ata)
 #endif
 }
 
-void mulTransposed(InputArray _src, OutputArray _dst, bool ata,
-                   InputArray _delta, double scale, int dtype)
+void mulTransposed(पासोक_Array _src, OutputArray _dst, bool ata,
+                   पासोक_Array _delta, double scale, int dtype)
 {
     CV_INSTRUMENT_REGION();
 
@@ -988,7 +988,7 @@ static DotProdFunc getDotProdFunc(int depth)
     return dotProdTab[depth];
 }
 
-double Mat::dot(InputArray _mat) const
+double Mat::dot(पासोक_Array _mat) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1028,7 +1028,7 @@ double Mat::dot(InputArray _mat) const
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_dot( InputArray _src1, InputArray _src2, double & res )
+static bool ocl_dot( पासोक_Array _src1, पासोक_Array _src2, double & res )
 {
     UMat src1 = _src1.getUMat().reshape(1), src2 = _src2.getUMat().reshape(1);
 
@@ -1067,7 +1067,7 @@ static bool ocl_dot( InputArray _src1, InputArray _src2, double & res )
             src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
             dbarg = ocl::KernelArg::PtrWriteOnly(db);
 
-    k.args(src1arg, src1.cols, (int)src1.total(), dbsize, dbarg, src2arg);
+    k.मगा_कातविरान(src1arg, src1.cols, (int)src1.total(), dbsize, dbarg, src2arg);
 
     size_t globalsize = dbsize * wgs;
     if (k.run(1, &globalsize, &wgs, true))
@@ -1080,7 +1080,7 @@ static bool ocl_dot( InputArray _src1, InputArray _src2, double & res )
 
 #endif
 
-double UMat::dot(InputArray m) const
+double UMat::dot(पासोक_Array m) const
 {
     CV_INSTRUMENT_REGION();
 

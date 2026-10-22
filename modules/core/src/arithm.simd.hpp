@@ -96,38 +96,38 @@ static inline v_uint32 v_sub_sat(const v_uint32& a, const v_uint32& b) { return 
 #define EW_HAVE_MULSAT32 1
 static inline v_uint8 v_mul_sat(const v_uint8& a, const v_uint8& b)
 {
-    uint16x8_t p0 = vmull_u8(vget_low_u8(a.val), vget_low_u8(b.val));
-    uint16x8_t p1 = vmull_u8(vget_high_u8(a.val), vget_high_u8(b.val));
+    uint16x8_t p0 = vmull_u8(vget_माबाबा_u8(a.val), vget_माबाबा_u8(b.val));
+    uint16x8_t p1 = vmull_u8(vget_माताअस_u8(a.val), vget_माताअस_u8(b.val));
     return v_uint8(vcombine_u8(vqmovn_u16(p0), vqmovn_u16(p1)));
 }
 static inline v_int8 v_mul_sat(const v_int8& a, const v_int8& b)
 {
-    int16x8_t p0 = vmull_s8(vget_low_s8(a.val), vget_low_s8(b.val));
-    int16x8_t p1 = vmull_s8(vget_high_s8(a.val), vget_high_s8(b.val));
+    int16x8_t p0 = vmull_s8(vget_माबाबा_s8(a.val), vget_माबाबा_s8(b.val));
+    int16x8_t p1 = vmull_s8(vget_माताअस_s8(a.val), vget_माताअस_s8(b.val));
     return v_int8(vcombine_s8(vqmovn_s16(p0), vqmovn_s16(p1)));
 }
 static inline v_uint16 v_mul_sat(const v_uint16& a, const v_uint16& b)
 {
-    uint32x4_t p0 = vmull_u16(vget_low_u16(a.val), vget_low_u16(b.val));
-    uint32x4_t p1 = vmull_u16(vget_high_u16(a.val), vget_high_u16(b.val));
+    uint32x4_t p0 = vmull_u16(vget_माबाबा_u16(a.val), vget_माबाबा_u16(b.val));
+    uint32x4_t p1 = vmull_u16(vget_माताअस_u16(a.val), vget_माताअस_u16(b.val));
     return v_uint16(vcombine_u16(vqmovn_u32(p0), vqmovn_u32(p1)));
 }
 static inline v_int16 v_mul_sat(const v_int16& a, const v_int16& b)
 {
-    int32x4_t p0 = vmull_s16(vget_low_s16(a.val), vget_low_s16(b.val));
-    int32x4_t p1 = vmull_s16(vget_high_s16(a.val), vget_high_s16(b.val));
+    int32x4_t p0 = vmull_s16(vget_माबाबा_s16(a.val), vget_माबाबा_s16(b.val));
+    int32x4_t p1 = vmull_s16(vget_माताअस_s16(a.val), vget_माताअस_s16(b.val));
     return v_int16(vcombine_s16(vqmovn_s32(p0), vqmovn_s32(p1)));
 }
 static inline v_uint32 v_mul_sat(const v_uint32& a, const v_uint32& b)
 {
-    uint64x2_t p0 = vmull_u32(vget_low_u32(a.val), vget_low_u32(b.val));
-    uint64x2_t p1 = vmull_u32(vget_high_u32(a.val), vget_high_u32(b.val));
+    uint64x2_t p0 = vmull_u32(vget_माबाबा_u32(a.val), vget_माबाबा_u32(b.val));
+    uint64x2_t p1 = vmull_u32(vget_माताअस_u32(a.val), vget_माताअस_u32(b.val));
     return v_uint32(vcombine_u32(vqmovn_u64(p0), vqmovn_u64(p1)));
 }
 static inline v_int32 v_mul_sat(const v_int32& a, const v_int32& b)
 {
-    int64x2_t p0 = vmull_s32(vget_low_s32(a.val), vget_low_s32(b.val));
-    int64x2_t p1 = vmull_s32(vget_high_s32(a.val), vget_high_s32(b.val));
+    int64x2_t p0 = vmull_s32(vget_माबाबा_s32(a.val), vget_माबाबा_s32(b.val));
+    int64x2_t p1 = vmull_s32(vget_माताअस_s32(a.val), vget_माताअस_s32(b.val));
     return v_int32(vcombine_s32(vqmovn_s64(p0), vqmovn_s64(p1)));
 }
 #else
@@ -306,8 +306,8 @@ TKernel getMaxFunc_(int T, int R);
 TKernel getAbsdiffFunc_(int T, int R);
 TKernel getHypotFunc_(int T, int R);         // hypot = sqrt(x^2+y^2), float depths, T x T -> T
 TKernel getAtan2Func_(int T, int R);         // atan2(y, x), radians (-pi, pi], float depths
-TKernel getCmpFunc_(TOp op, int T);
-TKernel getBitwiseFunc_(TOp op, int esz);                    // OP_AND / OP_OR / OP_XOR, by element size
+TKernel getCmpFunc_(इताअस op, int T);
+TKernel getBitwiseFunc_(इताअस op, int esz);                    // OP_AND / OP_OR / OP_XOR, by element size
 TKernel getNotFunc_(int esz);                                // OP_NOT, by element size
 TKernel getAddWeightedFunc_(int T, int R);                   // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
 TKernel getSelectFunc_(int mdepth, int T);   // OP_SELECT: 1-byte mask, a/b/dst of T (by esz)
@@ -563,7 +563,7 @@ struct EwXor {
 //   use_simd = compile-time switch; false => pure scalar (32/64-bit widened outputs, f64).
 // stepx in {0,1}; dst contiguous. In-place safe (see file header).
 template<typename T, typename Tr, typename WT, class Op, typename ST=WT>
-static int scalarBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
+static int scalar_दालावाहान_Kernel(const void* src0_, size_t s0y, size_t s0x,
                               const void* src1_, size_t s1y, size_t s1x,
                               const void*, size_t, size_t, void* dst_, size_t dsty,
                               int width, int height, const double* params, int, void*)
@@ -766,7 +766,7 @@ static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
                     Uvec r0,r1,r2; EW_CMPR(r0,A0,B0); EW_CMPR(r1,A1,B1); EW_CMPR(r2,A2,B2); \
                     v_uint8 b0=v_pack(r0,r1), b1=v_pack(r2,r2); \
                     v_uint8 o0=v_or(v_and(b0,M0),V0), o1=v_or(v_and(b1,M1),V1); \
-                    v_store(dst, o0); v_store_low(dst+VECSZ8, o1); }
+                    v_store(dst, o0); v_store_माबाबा(dst+VECSZ8, o1); }
             if (bc0) EW_ROW2(sc0,vx_load(src), sc1,vx_load(src+VECSZ), sc2,vx_load(src+VECSZ*2))
             else     EW_ROW2(vx_load(src),sc0, vx_load(src+VECSZ),sc1, vx_load(src+VECSZ*2),sc2)
             #undef EW_ROW2
@@ -790,7 +790,7 @@ static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
                     v_uint16 p0=v_pack(r0,r1), p1=v_pack(r2,r3), p2=v_pack(r4,r5); \
                     v_uint8 q0=v_pack(p0,p1), q1=v_pack(p2,p2); \
                     v_uint8 o0=v_or(v_and(q0,M0),V0), o1=v_or(v_and(q1,M1),V1); \
-                    v_store(dst, o0); v_store_low(dst+VECSZ8, o1); }
+                    v_store(dst, o0); v_store_माबाबा(dst+VECSZ8, o1); }
             if (bc0) EW_ROW4(sc0,vx_load(src),sc1,vx_load(src+VECSZ),sc2,vx_load(src+VECSZ*2),
                              sc3,vx_load(src+VECSZ*3),sc4,vx_load(src+VECSZ*4),sc5,vx_load(src+VECSZ*5))
             else     EW_ROW4(vx_load(src),sc0,vx_load(src+VECSZ),sc1,vx_load(src+VECSZ*2),sc2,
@@ -830,7 +830,7 @@ static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
             } else { /* sizeof==8: 4 u64 -> 2 u32 -> 1 u16 -> u8 (low half), 4*VECSZ elems -> store_low */ \
                 v_uint16 g=v_pack(v_pack(m0,m1),v_pack(m2,m3)); \
                 v_uint8 o0=v_and(v_pack(g,g),vT); \
-                v_store_low((D),o0); \
+                v_store_माबाबा((D),o0); \
             } } while(0)
         if (s0x == 1u && s1x == 1u)
         {
@@ -904,7 +904,7 @@ static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
 //   use_simd = compile-time switch; false => pure scalar (32/64-bit widened outputs, f64).
 // stepx in {0,1}; dst contiguous. In-place safe (see file header).
 template<typename T, typename Tr, typename Wvec, typename WT, class Op, typename ST=WT, typename Wvec1=Wvec>
-static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
+static int vec_दालावाहान_Kernel(const void* src0_, size_t s0y, size_t s0x,
                          const void* src1_, size_t s1y, size_t s1x,
                          const void*, size_t, size_t,
                          void* dst_, size_t dsty, int width, int height,
@@ -1070,68 +1070,68 @@ TKernel getAddSubFunc(int T, int R)
     switch (T)
     {
     case CV_8U:
-        fptr = R == CV_8U ? vecBinaryKernel<uchar, uchar, v_uint8, short, Op, uchar> :
-               R == CV_16S ? vecBinaryKernel<uchar, short, v_int16, short, Op, short> :
-               R == CV_32S ? vecBinaryKernel<uchar, int, v_int16, short, Op, short> :
-               R == CV_32F ? vecBinaryKernel<uchar, float, v_int16, short, Op, short> : nullptr;
+        fptr = R == CV_8U ? vec_दालावाहान_Kernel<uchar, uchar, v_uint8, short, Op, uchar> :
+               R == CV_16S ? vec_दालावाहान_Kernel<uchar, short, v_int16, short, Op, short> :
+               R == CV_32S ? vec_दालावाहान_Kernel<uchar, int, v_int16, short, Op, short> :
+               R == CV_32F ? vec_दालावाहान_Kernel<uchar, float, v_int16, short, Op, short> : nullptr;
         break;
     case CV_8S:
         fptr =
-            R == CV_8S ? vecBinaryKernel<schar, schar, v_int8, short, Op, schar> :
-            R == CV_16S ? vecBinaryKernel<schar, short, v_int16, short, Op, short> :
-            R == CV_32S ? vecBinaryKernel<schar, int, v_int16, short, Op, short> :
-            R == CV_32F ? vecBinaryKernel<schar, float, v_int16, short, Op, short> : nullptr;
+            R == CV_8S ? vec_दालावाहान_Kernel<schar, schar, v_int8, short, Op, schar> :
+            R == CV_16S ? vec_दालावाहान_Kernel<schar, short, v_int16, short, Op, short> :
+            R == CV_32S ? vec_दालावाहान_Kernel<schar, int, v_int16, short, Op, short> :
+            R == CV_32F ? vec_दालावाहान_Kernel<schar, float, v_int16, short, Op, short> : nullptr;
         break;
     case CV_16U:
-        fptr = R == CV_16U ? vecBinaryKernel<ushort, ushort, v_uint16, int, Op, ushort> :
-               R == CV_32S ? vecBinaryKernel<ushort, int, v_int32, int, Op, int> :
-               R == CV_32F ? vecBinaryKernel<ushort, float, v_int32, int, Op, int> : nullptr;
+        fptr = R == CV_16U ? vec_दालावाहान_Kernel<ushort, ushort, v_uint16, int, Op, ushort> :
+               R == CV_32S ? vec_दालावाहान_Kernel<ushort, int, v_int32, int, Op, int> :
+               R == CV_32F ? vec_दालावाहान_Kernel<ushort, float, v_int32, int, Op, int> : nullptr;
         break;
     case CV_16S:
-        fptr = R == CV_16S ? vecBinaryKernel<short, short, v_int16, int, Op, short> :
-               R == CV_32S ? vecBinaryKernel<short, int,   v_int32, int, Op, int> :
-               R == CV_32F ? vecBinaryKernel<short, float, v_int32, int, Op, int> : nullptr;
+        fptr = R == CV_16S ? vec_दालावाहान_Kernel<short, short, v_int16, int, Op, short> :
+               R == CV_32S ? vec_दालावाहान_Kernel<short, int,   v_int32, int, Op, int> :
+               R == CV_32F ? vec_दालावाहान_Kernel<short, float, v_int32, int, Op, int> : nullptr;
         break;
     case CV_32U:
-        fptr = R == CV_32U ? vecBinaryKernel<unsigned, unsigned, v_uint32, int64_t, Op, unsigned> :
-                R == CV_64S ? scalarBinaryKernel<unsigned, int64_t, int64_t, Op> :
-                R == CV_64F ? scalarBinaryKernel<unsigned, double, int64_t, Op> : nullptr;
+        fptr = R == CV_32U ? vec_दालावाहान_Kernel<unsigned, unsigned, v_uint32, int64_t, Op, unsigned> :
+                R == CV_64S ? scalar_दालावाहान_Kernel<unsigned, int64_t, int64_t, Op> :
+                R == CV_64F ? scalar_दालावाहान_Kernel<unsigned, double, int64_t, Op> : nullptr;
         break;
     case CV_32S:
-        fptr = R == CV_32S ? vecBinaryKernel<int, int, v_int32, int64_t, Op, int> :
-               R == CV_64S ? scalarBinaryKernel<int, int64_t, int64_t, Op> :
-               R == CV_64F ? scalarBinaryKernel<int, double, int64_t, Op> : nullptr;
+        fptr = R == CV_32S ? vec_दालावाहान_Kernel<int, int, v_int32, int64_t, Op, int> :
+               R == CV_64S ? scalar_दालावाहान_Kernel<int, int64_t, int64_t, Op> :
+               R == CV_64F ? scalar_दालावाहान_Kernel<int, double, int64_t, Op> : nullptr;
         break;
     case CV_64U:
-        fptr = R == CV_64U ? scalarBinaryKernel<uint64_t, uint64_t, uint64_t, Op> :
-               R == CV_64F ? scalarBinaryKernel<uint64_t, double, double, Op> : nullptr;
+        fptr = R == CV_64U ? scalar_दालावाहान_Kernel<uint64_t, uint64_t, uint64_t, Op> :
+               R == CV_64F ? scalar_दालावाहान_Kernel<uint64_t, double, double, Op> : nullptr;
         break;
     case CV_64S:
-        fptr = R == CV_64S ? scalarBinaryKernel<int64_t, int64_t, int64_t, Op> :
-               R == CV_64F ? scalarBinaryKernel<int64_t, double, double, Op> : nullptr;
+        fptr = R == CV_64S ? scalar_दालावाहान_Kernel<int64_t, int64_t, int64_t, Op> :
+               R == CV_64F ? scalar_दालावाहान_Kernel<int64_t, double, double, Op> : nullptr;
         break;
     case CV_16F:
         fptr =
         #if CV_SIMD_16F
-        R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float16, float, Op, hfloat> :
+        R == CV_16F ? vec_दालावाहान_Kernel<hfloat, hfloat, v_float16, float, Op, hfloat> :
         #else
-        R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float32, float, Op, float> :
+        R == CV_16F ? vec_दालावाहान_Kernel<hfloat, hfloat, v_float32, float, Op, float> :
         #endif
-        R == CV_32F ? vecBinaryKernel<hfloat, float, v_float32, float, Op, float> : nullptr;
+        R == CV_32F ? vec_दालावाहान_Kernel<hfloat, float, v_float32, float, Op, float> : nullptr;
         break;
     case CV_16BF:
         fptr =
-            R == CV_16BF ? vecBinaryKernel<bfloat, bfloat, v_float32, float, Op, float> :
-            R == CV_32F ? vecBinaryKernel<bfloat, float,  v_float32, float, Op, float> : nullptr;
+            R == CV_16BF ? vec_दालावाहान_Kernel<bfloat, bfloat, v_float32, float, Op, float> :
+            R == CV_32F ? vec_दालावाहान_Kernel<bfloat, float,  v_float32, float, Op, float> : nullptr;
         break;
     case CV_32F:
-        fptr = R == CV_32F ? vecBinaryKernel<float, float, v_float32, float, Op, float> : nullptr;
+        fptr = R == CV_32F ? vec_दालावाहान_Kernel<float, float, v_float32, float, Op, float> : nullptr;
         break;
     case CV_64F:
         #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-        fptr = R == CV_64F ? vecBinaryKernel<double, double, v_float64, double, Op> : nullptr;
+        fptr = R == CV_64F ? vec_दालावाहान_Kernel<double, double, v_float64, double, Op> : nullptr;
         #else
-        fptr = R == CV_64F ? scalarBinaryKernel<double, double, double, Op> : nullptr;
+        fptr = R == CV_64F ? scalar_दालावाहान_Kernel<double, double, double, Op> : nullptr;
         #endif
         break;
     default:
@@ -1147,75 +1147,75 @@ TKernel getMulFunc_(int T, int R)
     {
     case CV_8U:
         fptr =   // scale==1 fast path: whole u8 registers, v_mul_sat widens+clamps inside; Wvec=f32 for scale
-            R == CV_8U ? vecBinaryKernel<uchar, uchar, v_float32, float, EwMul, float, v_uint8> :
-            R == CV_32F ? vecBinaryKernel<uchar, float, v_float32, float, EwMul> : nullptr;
+            R == CV_8U ? vec_दालावाहान_Kernel<uchar, uchar, v_float32, float, EwMul, float, v_uint8> :
+            R == CV_32F ? vec_दालावाहान_Kernel<uchar, float, v_float32, float, EwMul> : nullptr;
         break;
     case CV_8S:
         fptr =   // scale==1 fast path: whole s8 registers via v_mul_sat; Wvec=f32 for scale
-            R == CV_8S ? vecBinaryKernel<schar, schar, v_float32, float, EwMul, float, v_int8> :
-            R == CV_32F ? vecBinaryKernel<schar, float, v_float32, float, EwMul> : nullptr;
+            R == CV_8S ? vec_दालावाहान_Kernel<schar, schar, v_float32, float, EwMul, float, v_int8> :
+            R == CV_32F ? vec_दालावाहान_Kernel<schar, float, v_float32, float, EwMul> : nullptr;
         break;
     case CV_16U:
         fptr =   // scale==1 fast path: whole u16 registers via v_mul_sat; Wvec=f32 for scale
-            R == CV_16U ? vecBinaryKernel<ushort, ushort, v_float32, float, EwMul, float, v_uint16> :
-            R == CV_32F ? vecBinaryKernel<ushort, float,  v_float32, float, EwMul> : nullptr;
+            R == CV_16U ? vec_दालावाहान_Kernel<ushort, ushort, v_float32, float, EwMul, float, v_uint16> :
+            R == CV_32F ? vec_दालावाहान_Kernel<ushort, float,  v_float32, float, EwMul> : nullptr;
         break;
     case CV_16S:
         fptr =   // scale==1 fast path: whole s16 registers via v_mul_sat; Wvec=f32 for scale
-            R == CV_16S ? vecBinaryKernel<short, short, v_float32, float, EwMul, float, v_int16> :
-            R == CV_32F ? vecBinaryKernel<short, float, v_float32, float, EwMul> : nullptr;
+            R == CV_16S ? vec_दालावाहान_Kernel<short, short, v_float32, float, EwMul, float, v_int16> :
+            R == CV_32F ? vec_दालावाहान_Kernel<short, float, v_float32, float, EwMul> : nullptr;
         break;
     case CV_16F:
         fptr =
-            R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float32, float, EwMul> :
-            R == CV_32F ? vecBinaryKernel<hfloat, float,  v_float32, float, EwMul> : nullptr;
+            R == CV_16F ? vec_दालावाहान_Kernel<hfloat, hfloat, v_float32, float, EwMul> :
+            R == CV_32F ? vec_दालावाहान_Kernel<hfloat, float,  v_float32, float, EwMul> : nullptr;
         break;
     case CV_16BF:
         fptr =
-            R == CV_16BF ? vecBinaryKernel<bfloat, bfloat, v_float32, float, EwMul> :
-            R == CV_32F ? vecBinaryKernel<bfloat, float,  v_float32, float, EwMul> : nullptr;
+            R == CV_16BF ? vec_दालावाहान_Kernel<bfloat, bfloat, v_float32, float, EwMul> :
+            R == CV_32F ? vec_दालावाहान_Kernel<bfloat, float,  v_float32, float, EwMul> : nullptr;
         break;
     case CV_32F:
-        fptr = R == CV_32F ? vecBinaryKernel<float, float, v_float32, float, EwMul> : nullptr;
+        fptr = R == CV_32F ? vec_दालावाहान_Kernel<float, float, v_float32, float, EwMul> : nullptr;
         break;
     case CV_32U:
         fptr =   // scale==1 fast path (where v_mul_sat32 exists): whole u32 registers, widening
                  // multiply + saturating narrow; the f64 work vector serves the scale path
         #if defined(EW_HAVE_MULSAT32) && (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-            R == CV_32U ? vecBinaryKernel<unsigned, unsigned, v_float64, double, EwMul, double, v_uint32> :
-            R == CV_64F ? vecBinaryKernel<unsigned, double,   v_float64, double, EwMul> : nullptr;
+            R == CV_32U ? vec_दालावाहान_Kernel<unsigned, unsigned, v_float64, double, EwMul, double, v_uint32> :
+            R == CV_64F ? vec_दालावाहान_Kernel<unsigned, double,   v_float64, double, EwMul> : nullptr;
         #elif CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-            R == CV_32U ? vecBinaryKernel<unsigned, unsigned, v_float64, double, EwMul> :
-            R == CV_64F ? vecBinaryKernel<unsigned, double,   v_float64, double, EwMul> : nullptr;
+            R == CV_32U ? vec_दालावाहान_Kernel<unsigned, unsigned, v_float64, double, EwMul> :
+            R == CV_64F ? vec_दालावाहान_Kernel<unsigned, double,   v_float64, double, EwMul> : nullptr;
         #else
-            R == CV_32U ? scalarBinaryKernel<unsigned, unsigned, double, EwMul> :
-            R == CV_64F ? scalarBinaryKernel<unsigned, double,   double, EwMul> : nullptr;
+            R == CV_32U ? scalar_दालावाहान_Kernel<unsigned, unsigned, double, EwMul> :
+            R == CV_64F ? scalar_दालावाहान_Kernel<unsigned, double,   double, EwMul> : nullptr;
         #endif
         break;
     case CV_32S:
         fptr =   // scale==1 fast path: see CV_32U
         #if defined(EW_HAVE_MULSAT32) && (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-            R == CV_32S ? vecBinaryKernel<int, int,    v_float64, double, EwMul, double, v_int32> :
-            R == CV_64F ? vecBinaryKernel<int, double, v_float64, double, EwMul> : nullptr;
+            R == CV_32S ? vec_दालावाहान_Kernel<int, int,    v_float64, double, EwMul, double, v_int32> :
+            R == CV_64F ? vec_दालावाहान_Kernel<int, double, v_float64, double, EwMul> : nullptr;
         #elif CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-            R == CV_32S ? vecBinaryKernel<int, int,    v_float64, double, EwMul> :
-            R == CV_64F ? vecBinaryKernel<int, double, v_float64, double, EwMul> : nullptr;
+            R == CV_32S ? vec_दालावाहान_Kernel<int, int,    v_float64, double, EwMul> :
+            R == CV_64F ? vec_दालावाहान_Kernel<int, double, v_float64, double, EwMul> : nullptr;
         #else
-            R == CV_32S ? scalarBinaryKernel<int, int,    double, EwMul> :
-            R == CV_64F ? scalarBinaryKernel<int, double, double, EwMul> : nullptr;
+            R == CV_32S ? scalar_दालावाहान_Kernel<int, int,    double, EwMul> :
+            R == CV_64F ? scalar_दालावाहान_Kernel<int, double, double, EwMul> : nullptr;
         #endif
         break;
     case CV_64U:
-        fptr = R == CV_64F ? scalarBinaryKernel<uint64_t, double, double, EwMul> : nullptr;
+        fptr = R == CV_64F ? scalar_दालावाहान_Kernel<uint64_t, double, double, EwMul> : nullptr;
         break;
     case CV_64S:
-        fptr = R == CV_64F ? scalarBinaryKernel<int64_t,  double, double, EwMul> : nullptr;
+        fptr = R == CV_64F ? scalar_दालावाहान_Kernel<int64_t,  double, double, EwMul> : nullptr;
         break;
     case CV_64F:
         #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-        fptr = R == CV_64F ? vecBinaryKernel<double, double, v_float64, double, EwMul> : nullptr;
+        fptr = R == CV_64F ? vec_दालावाहान_Kernel<double, double, v_float64, double, EwMul> : nullptr;
         #else
-        fptr = R == CV_64F ? scalarBinaryKernel<double,   double, double, EwMul> : nullptr;
+        fptr = R == CV_64F ? scalar_दालावाहान_Kernel<double,   double, double, EwMul> : nullptr;
         #endif
         break;
     default:
@@ -1236,13 +1236,13 @@ TKernel getDivFunc_(int T, int R, bool checked)
     // saturates on cast) / EwDivInt (v_select guards b==0 -> 0 post-facto). Prefer a DIRECT T->T kernel
     // (1 pass, saturate on store) - emitBinary probes result==T first; a T->f32/f64 kernel serves an
     // explicit float dtype. Work type: f32 for <=16-bit/f16/bf16/f32; f64 for 32/64-bit.
-    #define DIV(T_, Tr_, Wv_, W_) (checked ? vecBinaryKernel<T_, Tr_, Wv_, W_, EwDivInt> \
-                                           : vecBinaryKernel<T_, Tr_, Wv_, W_, EwDivFlt>)
+    #define DIV(T_, Tr_, Wv_, W_) (checked ? vec_दालावाहान_Kernel<T_, Tr_, Wv_, W_, EwDivInt> \
+                                           : vec_दालावाहान_Kernel<T_, Tr_, Wv_, W_, EwDivFlt>)
 #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
     #define DIVW(T_, Tr_) DIV(T_, Tr_, v_float64, double)                 // 32/64-bit, f64 SIMD
 #else
-    #define DIVW(T_, Tr_) (checked ? scalarBinaryKernel<T_, Tr_, double, EwDivInt> \
-                                    : scalarBinaryKernel<T_, Tr_, double, EwDivFlt>)
+    #define DIVW(T_, Tr_) (checked ? scalar_दालावाहान_Kernel<T_, Tr_, double, EwDivInt> \
+                                    : scalar_दालावाहान_Kernel<T_, Tr_, double, EwDivFlt>)
 #endif
     switch (T)
     {
@@ -1274,27 +1274,27 @@ static TKernel getMinMaxFunc(int T)
     KernelFunc fptr = nullptr;
     switch (T)
     {
-    case CV_8U:   fptr = vecBinaryKernel<uchar,    uchar,    v_uint8,   short,   Op, uchar>; break;
-    case CV_8S:   fptr = vecBinaryKernel<schar,    schar,    v_int8,    short,   Op, schar>; break;
-    case CV_16U:  fptr = vecBinaryKernel<ushort,   ushort,   v_uint16,  int,     Op, ushort>; break;
-    case CV_16S:  fptr = vecBinaryKernel<short,    short,    v_int16,   int,     Op, short>; break;
-    case CV_32U:  fptr = vecBinaryKernel<unsigned, unsigned, v_uint32,  int64_t, Op, unsigned>; break;
-    case CV_32S:  fptr = vecBinaryKernel<int,      int,      v_int32,   int64_t, Op, int>; break;
+    case CV_8U:   fptr = vec_दालावाहान_Kernel<uchar,    uchar,    v_uint8,   short,   Op, uchar>; break;
+    case CV_8S:   fptr = vec_दालावाहान_Kernel<schar,    schar,    v_int8,    short,   Op, schar>; break;
+    case CV_16U:  fptr = vec_दालावाहान_Kernel<ushort,   ushort,   v_uint16,  int,     Op, ushort>; break;
+    case CV_16S:  fptr = vec_दालावाहान_Kernel<short,    short,    v_int16,   int,     Op, short>; break;
+    case CV_32U:  fptr = vec_दालावाहान_Kernel<unsigned, unsigned, v_uint32,  int64_t, Op, unsigned>; break;
+    case CV_32S:  fptr = vec_दालावाहान_Kernel<int,      int,      v_int32,   int64_t, Op, int>; break;
     case CV_16F:
         #if CV_SIMD_16F
-        fptr = vecBinaryKernel<hfloat,   hfloat,   v_float16, float,   Op, hfloat>;
+        fptr = vec_दालावाहान_Kernel<hfloat,   hfloat,   v_float16, float,   Op, hfloat>;
         #else
-        fptr = vecBinaryKernel<hfloat,   hfloat,   v_float32, float,   Op, float>;
+        fptr = vec_दालावाहान_Kernel<hfloat,   hfloat,   v_float32, float,   Op, float>;
         #endif
         break;
-    case CV_16BF: fptr = vecBinaryKernel<bfloat, bfloat, v_float32, float, Op, float>; break;
-    case CV_32F:  fptr = vecBinaryKernel<float, float, v_float32, float, Op, float>; break;
-    case CV_64U:  fptr = scalarBinaryKernel<uint64_t, uint64_t, uint64_t, Op>; break;
-    case CV_64S:  fptr = scalarBinaryKernel<int64_t,  int64_t,  int64_t,  Op>; break;
+    case CV_16BF: fptr = vec_दालावाहान_Kernel<bfloat, bfloat, v_float32, float, Op, float>; break;
+    case CV_32F:  fptr = vec_दालावाहान_Kernel<float, float, v_float32, float, Op, float>; break;
+    case CV_64U:  fptr = scalar_दालावाहान_Kernel<uint64_t, uint64_t, uint64_t, Op>; break;
+    case CV_64S:  fptr = scalar_दालावाहान_Kernel<int64_t,  int64_t,  int64_t,  Op>; break;
     #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  fptr = vecBinaryKernel<double, double, v_float64, double, Op, double>; break;
+    case CV_64F:  fptr = vec_दालावाहान_Kernel<double, double, v_float64, double, Op, double>; break;
     #else
-    case CV_64F:  fptr = scalarBinaryKernel<double,   double,   double,   Op>; break;
+    case CV_64F:  fptr = scalar_दालावाहान_Kernel<double,   double,   double,   Op>; break;
     #endif
     default:      ;
     }
@@ -1311,29 +1311,29 @@ TKernel getAbsdiffFunc_(int T, int R)
     KernelFunc fptr = nullptr;
     switch (T)
     {
-    case CV_8U:   fptr = R == CV_8U  ? vecBinaryKernel<uchar,  uchar,  v_uint8,  short,   EwAbsdiff, uchar>  : nullptr; break;
-    case CV_16U:  fptr = R == CV_16U ? vecBinaryKernel<ushort, ushort, v_uint16, int,     EwAbsdiff, ushort> : nullptr; break;
-    case CV_32U:  fptr = R == CV_32U ? vecBinaryKernel<unsigned, unsigned, v_uint32, int64_t, EwAbsdiff, unsigned> : nullptr; break;
-    case CV_8S:   fptr = R == CV_8S  ? vecBinaryKernel<schar, schar, v_int8,  short,   EwAbsdiffS, schar> :
-                         R == CV_8U  ? vecBinaryKernel<schar, uchar, v_int8,  short,   EwAbsdiff,  schar> : nullptr; break;
-    case CV_16S:  fptr = R == CV_16S ? vecBinaryKernel<short, short, v_int16, int,     EwAbsdiffS, short> :
-                         R == CV_16U ? vecBinaryKernel<short, ushort, v_int16, int,     EwAbsdiff,  short> : nullptr; break;
-    case CV_32S:  fptr = R == CV_32S ? vecBinaryKernel<int,   int,   v_int32, int64_t, EwAbsdiffS, int> :
-                         R == CV_32U ? vecBinaryKernel<int, unsigned, v_int32, int64_t, EwAbsdiff,  int> : nullptr; break;
+    case CV_8U:   fptr = R == CV_8U  ? vec_दालावाहान_Kernel<uchar,  uchar,  v_uint8,  short,   EwAbsdiff, uchar>  : nullptr; break;
+    case CV_16U:  fptr = R == CV_16U ? vec_दालावाहान_Kernel<ushort, ushort, v_uint16, int,     EwAbsdiff, ushort> : nullptr; break;
+    case CV_32U:  fptr = R == CV_32U ? vec_दालावाहान_Kernel<unsigned, unsigned, v_uint32, int64_t, EwAbsdiff, unsigned> : nullptr; break;
+    case CV_8S:   fptr = R == CV_8S  ? vec_दालावाहान_Kernel<schar, schar, v_int8,  short,   EwAbsdiffS, schar> :
+                         R == CV_8U  ? vec_दालावाहान_Kernel<schar, uchar, v_int8,  short,   EwAbsdiff,  schar> : nullptr; break;
+    case CV_16S:  fptr = R == CV_16S ? vec_दालावाहान_Kernel<short, short, v_int16, int,     EwAbsdiffS, short> :
+                         R == CV_16U ? vec_दालावाहान_Kernel<short, ushort, v_int16, int,     EwAbsdiff,  short> : nullptr; break;
+    case CV_32S:  fptr = R == CV_32S ? vec_दालावाहान_Kernel<int,   int,   v_int32, int64_t, EwAbsdiffS, int> :
+                         R == CV_32U ? vec_दालावाहान_Kernel<int, unsigned, v_int32, int64_t, EwAbsdiff,  int> : nullptr; break;
     #if CV_SIMD_16F
-    case CV_16F:  fptr = R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float16, float, EwAbsdiff, hfloat> : nullptr; break;
+    case CV_16F:  fptr = R == CV_16F ? vec_दालावाहान_Kernel<hfloat, hfloat, v_float16, float, EwAbsdiff, hfloat> : nullptr; break;
     #else
-    case CV_16F:  fptr = R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float32, float, EwAbsdiff, float>  : nullptr; break;
+    case CV_16F:  fptr = R == CV_16F ? vec_दालावाहान_Kernel<hfloat, hfloat, v_float32, float, EwAbsdiff, float>  : nullptr; break;
     #endif
-    case CV_16BF: fptr = R == CV_16BF ? vecBinaryKernel<bfloat, bfloat, v_float32, float, EwAbsdiff, float> : nullptr; break;
-    case CV_32F:  fptr = R == CV_32F  ? vecBinaryKernel<float,  float,  v_float32, float, EwAbsdiff, float> : nullptr; break;
-    case CV_64U:  fptr = R == CV_64U  ? scalarBinaryKernel<uint64_t, uint64_t, uint64_t, EwAbsdiff> : nullptr; break;
-    case CV_64S:  fptr = R == CV_64S  ? scalarBinaryKernel<int64_t,  int64_t,  int64_t,  EwAbsdiffS> :
-                         R == CV_64U  ? scalarBinaryKernel<int64_t,  uint64_t, int64_t,  EwAbsdiff> : nullptr; break;
+    case CV_16BF: fptr = R == CV_16BF ? vec_दालावाहान_Kernel<bfloat, bfloat, v_float32, float, EwAbsdiff, float> : nullptr; break;
+    case CV_32F:  fptr = R == CV_32F  ? vec_दालावाहान_Kernel<float,  float,  v_float32, float, EwAbsdiff, float> : nullptr; break;
+    case CV_64U:  fptr = R == CV_64U  ? scalar_दालावाहान_Kernel<uint64_t, uint64_t, uint64_t, EwAbsdiff> : nullptr; break;
+    case CV_64S:  fptr = R == CV_64S  ? scalar_दालावाहान_Kernel<int64_t,  int64_t,  int64_t,  EwAbsdiffS> :
+                         R == CV_64U  ? scalar_दालावाहान_Kernel<int64_t,  uint64_t, int64_t,  EwAbsdiff> : nullptr; break;
     #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  fptr = R == CV_64F  ? vecBinaryKernel<double, double, v_float64, double, EwAbsdiff, double> : nullptr; break;
+    case CV_64F:  fptr = R == CV_64F  ? vec_दालावाहान_Kernel<double, double, v_float64, double, EwAbsdiff, double> : nullptr; break;
     #else
-    case CV_64F:  fptr = R == CV_64F  ? scalarBinaryKernel<double, double, double, EwAbsdiff> : nullptr; break;
+    case CV_64F:  fptr = R == CV_64F  ? scalar_दालावाहान_Kernel<double, double, double, EwAbsdiff> : nullptr; break;
     #endif
     default:      ;
     }
@@ -1372,7 +1372,7 @@ static KernelFunc compareByType(int T)
     }
 }
 
-TKernel getCmpFunc_(TOp op, int T)
+TKernel getCmpFunc_(इताअस op, int T)
 {
     // Only 4 physical kernels (eq/ne/gt/ge): LT/LE reuse GT/GE with the operands swapped
     // (a<b == b>a, a<=b == b>=a) via the EW_KERNEL_SWAP01 flag, honored by the executor.
@@ -1435,15 +1435,15 @@ static KernelFunc bitwiseByEsz(int esz)
 {
     switch (esz)
     {
-    case 1: return vecBinaryKernel<uint8_t,  uint8_t,  v_uint8,  uint8_t,  Op, uint8_t>;
-    case 2: return vecBinaryKernel<uint16_t, uint16_t, v_uint16, uint16_t, Op, uint16_t>;
-    case 4: return vecBinaryKernel<uint32_t, uint32_t, v_uint32, uint32_t, Op, uint32_t>;
-    case 8: return scalarBinaryKernel<uint64_t, uint64_t, uint64_t, Op>;
+    case 1: return vec_दालावाहान_Kernel<uint8_t,  uint8_t,  v_uint8,  uint8_t,  Op, uint8_t>;
+    case 2: return vec_दालावाहान_Kernel<uint16_t, uint16_t, v_uint16, uint16_t, Op, uint16_t>;
+    case 4: return vec_दालावाहान_Kernel<uint32_t, uint32_t, v_uint32, uint32_t, Op, uint32_t>;
+    case 8: return scalar_दालावाहान_Kernel<uint64_t, uint64_t, uint64_t, Op>;
     default: return nullptr;
     }
 }
 
-TKernel getBitwiseFunc_(TOp op, int esz)
+TKernel getBitwiseFunc_(इताअस op, int esz)
 {
     KernelFunc f = nullptr;
     switch (op)
@@ -1899,7 +1899,7 @@ static int castKernel(const void* src0_, size_t s0y, size_t s0x,
                       void* dst_, size_t dsty, int width, int height,
                       const double* params, int esz1, void* userdata)
 {
-    BinaryFunc castfunc = (BinaryFunc)userdata;
+    दालावाहान_Func castfunc = (दालावाहान_Func)userdata;
     castfunc((const uchar*)src0_, s0y, nullptr, 0, (uchar*)dst_, dsty,
              Size((s0x > 0u ? width : 1), (s0y > 0u ? height : 1)), (void*)params);
     return expandKernel(s0y, s0x, dst_, dsty, width, height, esz1);
@@ -1914,7 +1914,7 @@ static int castKernel(const void* src0_, size_t s0y, size_t s0x,
 // castKernel, which runs it over the distinct sub-region and then expands across broadcast axes.
 TKernel getCastFunc_(int sdepth, int ddepth, bool scaled)
 {
-    BinaryFunc cvt = scaled ? getConvertScaleFunc(sdepth, ddepth) : getConvertFunc(sdepth, ddepth);
+    दालावाहान_Func cvt = scaled ? getConvertScaleFunc(sdepth, ddepth) : getConvertFunc(sdepth, ddepth);
     return {castKernel, (void*)cvt, CV_ELEM_SIZE1(ddepth)};
 }
 
@@ -1932,13 +1932,13 @@ TKernel getHypotFunc_(int T, int R)
     KernelFunc fptr = nullptr;
     switch (T)
     {
-    case CV_16F:  fptr = vecBinaryKernel<hfloat, hfloat, v_float32, float, EwHypot>; break;
-    case CV_16BF: fptr = vecBinaryKernel<bfloat, bfloat, v_float32, float, EwHypot>; break;
-    case CV_32F:  fptr = vecBinaryKernel<float,  float,  v_float32, float, EwHypot>; break;
+    case CV_16F:  fptr = vec_दालावाहान_Kernel<hfloat, hfloat, v_float32, float, EwHypot>; break;
+    case CV_16BF: fptr = vec_दालावाहान_Kernel<bfloat, bfloat, v_float32, float, EwHypot>; break;
+    case CV_32F:  fptr = vec_दालावाहान_Kernel<float,  float,  v_float32, float, EwHypot>; break;
 #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  fptr = vecBinaryKernel<double, double, v_float64, double, EwHypot>; break;
+    case CV_64F:  fptr = vec_दालावाहान_Kernel<double, double, v_float64, double, EwHypot>; break;
 #else
-    case CV_64F:  fptr = scalarBinaryKernel<double, double, double, EwHypot>; break;
+    case CV_64F:  fptr = scalar_दालावाहान_Kernel<double, double, double, EwHypot>; break;
 #endif
     default: ;
     }
@@ -1952,10 +1952,10 @@ TKernel getAtan2Func_(int T, int R)
     KernelFunc fptr = nullptr;
     switch (T)
     {
-    case CV_16F:  fptr = vecBinaryKernel<hfloat, hfloat, v_float32, float, EwAtan2>; break;
-    case CV_16BF: fptr = vecBinaryKernel<bfloat, bfloat, v_float32, float, EwAtan2>; break;
-    case CV_32F:  fptr = vecBinaryKernel<float,  float,  v_float32, float, EwAtan2>; break;
-    case CV_64F:  fptr = scalarBinaryKernel<double, double, double, EwAtan2>; break;   // exact std::atan2
+    case CV_16F:  fptr = vec_दालावाहान_Kernel<hfloat, hfloat, v_float32, float, EwAtan2>; break;
+    case CV_16BF: fptr = vec_दालावाहान_Kernel<bfloat, bfloat, v_float32, float, EwAtan2>; break;
+    case CV_32F:  fptr = vec_दालावाहान_Kernel<float,  float,  v_float32, float, EwAtan2>; break;
+    case CV_64F:  fptr = scalar_दालावाहान_Kernel<double, double, double, EwAtan2>; break;   // exact std::atan2
     default: ;
     }
     return {fptr, nullptr, 0};

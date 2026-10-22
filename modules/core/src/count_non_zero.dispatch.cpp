@@ -12,15 +12,15 @@
 
 namespace cv {
 
-static CountNonZeroFunc getCountNonZeroTab(int depth)
+static बिलांग_Non_Zero_Func get_बिलांग_Non_Zero_Tab(int depth)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getCountNonZeroTab, (depth),
+    CV_CPU_DISPATCH(get_बिलांग_Non_Zero_Tab, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_countNonZero( InputArray _src, int & res )
+static bool ocl_बिलांग_Non_Zero( पासोक_Array _src, int & res )
 {
     int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
     bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
@@ -47,7 +47,7 @@ static bool ocl_countNonZero( InputArray _src, int & res )
         return false;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
@@ -58,17 +58,17 @@ static bool ocl_countNonZero( InputArray _src, int & res )
 #endif
 
 #if defined HAVE_IPP
-static bool ipp_countNonZero( Mat &src, int &res )
+static bool ipp_बिलांग_Non_Zero( Mat &src, int &res )
 {
     CV_INSTRUMENT_REGION_IPP();
 
 #if IPP_VERSION_X100 < 201801
     // Poor performance of SSE42
-    if(cv::ipp::getIppTopFeatures() == ippCPUID_SSE42)
+    if(cv::ipp::get_Ipp_इताअस_Features() == ippCPUID_SSE42)
         return false;
 #endif
 
-    Ipp32s  count = 0;
+    Ipp32s  बिलांग_2 = 0;
     int     depth = src.depth();
 
     if(src.dims <= 2)
@@ -77,16 +77,16 @@ static bool ipp_countNonZero( Mat &src, int &res )
         IppiSize  size = {src.cols*src.channels(), src.rows};
 
         if(depth == CV_8U)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, (const Ipp8u *)src.ptr(), (int)src.step, size, &count, 0, 0);
+            status = CV_INSTRUMENT_FUN_IPP(ippi_बिलांग_In_Range_8u_C1_R, (const Ipp8u *)src.ptr(), (int)src.step, size, &बिलांग_2, 0, 0);
         else if(depth == CV_32F)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, (const Ipp32f *)src.ptr(), (int)src.step, size, &count, 0, 0);
+            status = CV_INSTRUMENT_FUN_IPP(ippi_बिलांग_In_Range_32f_C1_R, (const Ipp32f *)src.ptr(), (int)src.step, size, &बिलांग_2, 0, 0);
         else
             return false;
 
         if(status < 0)
             return false;
 
-        res = size.width*size.height - count;
+        res = size.width*size.height - बिलांग_2;
     }
     else
     {
@@ -99,16 +99,16 @@ static bool ipp_countNonZero( Mat &src, int &res )
         for (size_t i = 0; i < it.nplanes; i++, ++it)
         {
             if(depth == CV_8U)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, it.planes->ptr<Ipp8u>(), (int)it.planes->step, size, &count, 0, 0);
+                status = CV_INSTRUMENT_FUN_IPP(ippi_बिलांग_In_Range_8u_C1_R, it.planes->ptr<Ipp8u>(), (int)it.planes->step, size, &बिलांग_2, 0, 0);
             else if(depth == CV_32F)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, it.planes->ptr<Ipp32f>(), (int)it.planes->step, size, &count, 0, 0);
+                status = CV_INSTRUMENT_FUN_IPP(ippi_बिलांग_In_Range_32f_C1_R, it.planes->ptr<Ipp32f>(), (int)it.planes->step, size, &बिलांग_2, 0, 0);
             else
                 return false;
 
-            if(status < 0 || (int)it.planes->total()*src.channels() < count)
+            if(status < 0 || (int)it.planes->total()*src.channels() < बिलांग_2)
                 return false;
 
-            res += (int)it.planes->total()*src.channels() - count;
+            res += (int)it.planes->total()*src.channels() - बिलांग_2;
         }
     }
 
@@ -116,7 +116,7 @@ static bool ipp_countNonZero( Mat &src, int &res )
 }
 #endif
 
-int countNonZero(InputArray _src)
+int बिलांग_Non_Zero(पासोक_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
@@ -129,14 +129,14 @@ int countNonZero(InputArray _src)
 
 #ifdef HAVE_OPENCL
     CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_countNonZero(_src, res),
+                ocl_बिलांग_Non_Zero(_src, res),
                 res)
 #endif
 
     Mat src = _src.getMat();
-    CV_IPP_RUN_FAST(ipp_countNonZero(src, res), res);
+    CV_IPP_RUN_FAST(ipp_बिलांग_Non_Zero(src, res), res);
 
-    CountNonZeroFunc func = getCountNonZeroTab(src.depth());
+    बिलांग_Non_Zero_Func func = get_बिलांग_Non_Zero_Tab(src.depth());
     CV_Assert( func != 0 );
 
     const Mat* arrays[] = {&src, 0};
@@ -150,7 +150,7 @@ int countNonZero(InputArray _src)
     return nz;
 }
 
-void findNonZero(InputArray _src, OutputArray _idx)
+void findNonZero(पासोक_Array _src, OutputArray _idx)
 {
     Mat src = _src.getMat();
     CV_Assert( src.channels() == 1 && src.dims == 2 );
@@ -237,7 +237,7 @@ void findNonZero(InputArray _src, OutputArray _idx)
         }
     }
 
-    if( idxvec.empty() || (_idx.kind() == _InputArray::MAT && !_idx.getMatRef().isContinuous()) )
+    if( idxvec.empty() || (_idx.kind() == पासोक_Array_2::MAT && !_idx.getMatRef().isContinuous()) )
         _idx.release();
 
     if( !idxvec.empty() )

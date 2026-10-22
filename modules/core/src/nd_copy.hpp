@@ -32,7 +32,7 @@ View permute(const View& v, const int* order);
 void flip(View& v, int axis);
 
 // Keep `count` elements along the axis, starting at `start`; `step` may be negative.
-void slice(View& v, int axis, int start, int step, int count);
+void slice(View& v, int axis, int start, int step, int बिलांग_2);
 
 // The views must have the same dims, sizes and esz. Overlapping views are allowed.
 void copy(const View& src, const View& dst);

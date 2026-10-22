@@ -197,7 +197,7 @@ GpuMat cv::cuda::GpuMat::reshape(int new_cn, int new_rows) const
     int new_width = total_width / new_cn;
 
     if (new_width * new_cn != total_width)
-        CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
+        CV_Error(cv::Error::Bad_नुमेरो_Channels, "The total width is not divisible by the new number of channels");
 
     hdr.cols = new_width;
     hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
@@ -271,15 +271,15 @@ void cv::cuda::createContinuous(int rows, int cols, int type, OutputArray arr)
 {
     switch (arr.kind())
     {
-    case _InputArray::MAT:
+    case पासोक_Array_2::MAT:
         ::createContinuousImpl(rows, cols, type, arr.getMatRef());
         break;
 
-    case _InputArray::CUDA_GPU_MAT:
+    case पासोक_Array_2::CUDA_GPU_MAT:
         ::createContinuousImpl(rows, cols, type, arr.getGpuMatRef());
         break;
 
-    case _InputArray::CUDA_HOST_MEM:
+    case पासोक_Array_2::CUDA_HOST_MEM:
         ::createContinuousImpl(rows, cols, type, arr.getHostMemRef());
         break;
 
@@ -325,15 +325,15 @@ void cv::cuda::ensureSizeIsEnough(int rows, int cols, int type, OutputArray arr)
 {
     switch (arr.kind())
     {
-    case _InputArray::MAT:
+    case पासोक_Array_2::MAT:
         ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getMatRef());
         break;
 
-    case _InputArray::CUDA_GPU_MAT:
+    case पासोक_Array_2::CUDA_GPU_MAT:
         ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getGpuMatRef());
         break;
 
-    case _InputArray::CUDA_HOST_MEM:
+    case पासोक_Array_2::CUDA_HOST_MEM:
         ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getHostMemRef());
         break;
 
@@ -342,7 +342,7 @@ void cv::cuda::ensureSizeIsEnough(int rows, int cols, int type, OutputArray arr)
     }
 }
 
-GpuMat cv::cuda::getInputMat(InputArray _src, Stream& stream)
+GpuMat cv::cuda::get_पासोक_Mat(पासोक_Array _src, Stream& stream)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(_src);
@@ -350,7 +350,7 @@ GpuMat cv::cuda::getInputMat(InputArray _src, Stream& stream)
     throw_no_cuda();
 #else
     GpuMat src;
-    if (_src.kind() == _InputArray::CUDA_GPU_MAT)
+    if (_src.kind() == पासोक_Array_2::CUDA_GPU_MAT)
     {
         src = _src.getGpuMat();
     }
@@ -375,7 +375,7 @@ GpuMat cv::cuda::getOutputMat(OutputArray _dst, int rows, int cols, int type, St
     throw_no_cuda();
 #else
     GpuMat dst;
-    if (_dst.kind() == _InputArray::CUDA_GPU_MAT)
+    if (_dst.kind() == पासोक_Array_2::CUDA_GPU_MAT)
     {
         _dst.create(rows, cols, type);
         dst = _dst.getGpuMat();
@@ -397,7 +397,7 @@ void cv::cuda::syncOutput(const GpuMat& dst, OutputArray _dst, Stream& stream)
     CV_UNUSED(stream);
     throw_no_cuda();
 #else
-    if (_dst.kind() != _InputArray::CUDA_GPU_MAT)
+    if (_dst.kind() != पासोक_Array_2::CUDA_GPU_MAT)
     {
         if (stream)
             dst.download(_dst, stream);
@@ -472,13 +472,13 @@ void cv::cuda::GpuMat::fit(Size _sz, int _type)
     fit(_sz.height, _sz.width, _type);
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr)
+void cv::cuda::GpuMat::upload(पासोक_Array arr)
 {
     CV_UNUSED(arr);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr, Stream& _stream)
+void cv::cuda::GpuMat::upload(पासोक_Array arr, Stream& _stream)
 {
     CV_UNUSED(arr);
     CV_UNUSED(_stream);
@@ -511,7 +511,7 @@ void cv::cuda::GpuMat::copyTo(OutputArray _dst, Stream& _stream) const
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst, InputArray _mask, Stream& _stream) const
+void cv::cuda::GpuMat::copyTo(OutputArray _dst, पासोक_Array _mask, Stream& _stream) const
 {
     CV_UNUSED(_dst);
     CV_UNUSED(_mask);
@@ -526,7 +526,7 @@ GpuMat& cv::cuda::GpuMat::setTo(Scalar s, Stream& _stream)
     throw_no_cuda();
 }
 
-GpuMat& cv::cuda::GpuMat::setTo(Scalar s, InputArray _mask, Stream& _stream)
+GpuMat& cv::cuda::GpuMat::setTo(Scalar s, पासोक_Array _mask, Stream& _stream)
 {
     CV_UNUSED(s);
     CV_UNUSED(_mask);

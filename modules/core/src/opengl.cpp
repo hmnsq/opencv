@@ -76,30 +76,30 @@ namespace
 #ifndef HAVE_OPENGL
 inline static CV_NORETURN void throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
 #elif defined _DEBUG
-inline static bool checkError(const char* file, const int line, const char* func = 0)
+inline static bool checkError(const char* file, const int लिन्या, const char* func = 0)
 {
     GLenum err = gl::GetError();
     if (err != gl::NO_ERROR_)
     {
-        const char* msg;
+        const char* मेनसाहे;
         switch (err)
         {
         case gl::INVALID_ENUM:
-            msg = "An unacceptable value is specified for an enumerated argument";
+            मेनसाहे = "An unacceptable value is specified for an enumerated argument";
             break;
-        case gl::INVALID_VALUE:
-            msg = "A numeric argument is out of range";
+        case gl::INVALID_हालागा:
+            मेनसाहे = "A numeric argument is out of range";
             break;
         case gl::INVALID_OPERATION:
-            msg = "The specified operation is not allowed in the current state";
+            मेनसाहे = "The specified operation is not allowed in the current state";
             break;
         case gl::OUT_OF_MEMORY:
-            msg = "There is not enough memory left to execute the command";
+            मेनसाहे = "There is not enough memory left to execute the command";
             break;
         default:
-            msg = "Unknown error";
+            मेनसाहे = "Unknown error";
         };
-        cv::error(Error::OpenGlApiCallError, func, msg, file, line);
+        cv::error(Error::OpenGlApiCallError, func, मेनसाहे, file, लिन्या);
     }
     return true;
 }
@@ -518,7 +518,7 @@ cv::ogl::Buffer::Buffer(Size asize, int atype, unsigned int abufId, bool autoRel
 #endif
 }
 
-cv::ogl::Buffer::Buffer(InputArray arr, Target target, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::Buffer::Buffer(पासोक_Array arr, Target target, bool autoRelease) : rows_(0), cols_(0), type_(0)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
@@ -530,8 +530,8 @@ cv::ogl::Buffer::Buffer(InputArray arr, Target target, bool autoRelease) : rows_
 
     switch (kind)
     {
-    case _InputArray::OPENGL_BUFFER:
-    case _InputArray::CUDA_GPU_MAT:
+    case पासोक_Array_2::OPENGL_BUFFER:
+    case पासोक_Array_2::CUDA_GPU_MAT:
         copyFrom(arr, target, autoRelease);
         break;
 
@@ -600,7 +600,7 @@ void cv::ogl::Buffer::setAutoRelease(bool flag)
 #endif
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
+void cv::ogl::Buffer::copyFrom(पासोक_Array arr, Target target, bool autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
@@ -616,14 +616,14 @@ void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
 
     switch (kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    case पासोक_Array_2::OPENGL_BUFFER:
         {
             ogl::Buffer buf = arr.getOGlBuffer();
             impl_->copyFrom(buf.bufId(), asize.area() * CV_ELEM_SIZE(atype));
             break;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    case पासोक_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
@@ -645,7 +645,7 @@ void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
 #endif
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, cuda::Stream& stream, Target target, bool autoRelease)
+void cv::ogl::Buffer::copyFrom(पासोक_Array arr, cuda::Stream& stream, Target target, bool autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
@@ -680,13 +680,13 @@ void cv::ogl::Buffer::copyTo(OutputArray arr) const
 
     switch (kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    case पासोक_Array_2::OPENGL_BUFFER:
         {
             arr.getOGlBufferRef().copyFrom(*this);
             break;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    case पासोक_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
@@ -1002,7 +1002,7 @@ cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned int atexId, b
 #endif
 }
 
-cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(पासोक_Array arr, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
@@ -1031,7 +1031,7 @@ cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols
 
     switch (kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    case पासोक_Array_2::OPENGL_BUFFER:
         {
             ogl::Buffer buf = arr.getOGlBuffer();
             buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
@@ -1040,7 +1040,7 @@ cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols
             break;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    case पासोक_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
@@ -1114,7 +1114,7 @@ void cv::ogl::Texture2D::setAutoRelease(bool flag)
 #endif
 }
 
-void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
+void cv::ogl::Texture2D::copyFrom(पासोक_Array arr, bool autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
@@ -1145,7 +1145,7 @@ void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
 
     switch(kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    case पासोक_Array_2::OPENGL_BUFFER:
         {
             ogl::Buffer buf = arr.getOGlBuffer();
             buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
@@ -1154,7 +1154,7 @@ void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
             break;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    case पासोक_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
@@ -1196,7 +1196,7 @@ void cv::ogl::Texture2D::copyTo(OutputArray arr, int ddepth, bool autoRelease) c
 
     switch(kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    case पासोक_Array_2::OPENGL_BUFFER:
         {
             ogl::Buffer& buf = arr.getOGlBufferRef();
             buf.create(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER, autoRelease);
@@ -1206,7 +1206,7 @@ void cv::ogl::Texture2D::copyTo(OutputArray arr, int ddepth, bool autoRelease) c
             break;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    case पासोक_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
@@ -1422,7 +1422,7 @@ unsigned int cv::ogl::TextureBuffer::texId() const
 ////////////////////////////////////////////////////////////////////////
 // ogl::Arrays
 
-void cv::ogl::Arrays::setVertexArray(InputArray vertex)
+void cv::ogl::Arrays::setVertexArray(पासोक_Array vertex)
 {
     const int cn = vertex.channels();
     const int depth = vertex.depth();
@@ -1430,7 +1430,7 @@ void cv::ogl::Arrays::setVertexArray(InputArray vertex)
     CV_Assert( cn == 2 || cn == 3 || cn == 4 );
     CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
 
-    if (vertex.kind() == _InputArray::OPENGL_BUFFER)
+    if (vertex.kind() == पासोक_Array_2::OPENGL_BUFFER)
         vertex_ = vertex.getOGlBuffer();
     else
         vertex_.copyFrom(vertex);
@@ -1444,13 +1444,13 @@ void cv::ogl::Arrays::resetVertexArray()
     size_ = 0;
 }
 
-void cv::ogl::Arrays::setColorArray(InputArray color)
+void cv::ogl::Arrays::setColorArray(पासोक_Array color)
 {
     const int cn = color.channels();
 
     CV_Assert( cn == 3 || cn == 4 );
 
-    if (color.kind() == _InputArray::OPENGL_BUFFER)
+    if (color.kind() == पासोक_Array_2::OPENGL_BUFFER)
         color_ = color.getOGlBuffer();
     else
         color_.copyFrom(color);
@@ -1461,7 +1461,7 @@ void cv::ogl::Arrays::resetColorArray()
     color_.release();
 }
 
-void cv::ogl::Arrays::setNormalArray(InputArray normal)
+void cv::ogl::Arrays::setNormalArray(पासोक_Array normal)
 {
     const int cn = normal.channels();
     const int depth = normal.depth();
@@ -1469,7 +1469,7 @@ void cv::ogl::Arrays::setNormalArray(InputArray normal)
     CV_Assert( cn == 3 );
     CV_Assert( depth == CV_8S || depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
 
-    if (normal.kind() == _InputArray::OPENGL_BUFFER)
+    if (normal.kind() == पासोक_Array_2::OPENGL_BUFFER)
         normal_ = normal.getOGlBuffer();
     else
         normal_.copyFrom(normal);
@@ -1480,7 +1480,7 @@ void cv::ogl::Arrays::resetNormalArray()
     normal_.release();
 }
 
-void cv::ogl::Arrays::setTexCoordArray(InputArray texCoord)
+void cv::ogl::Arrays::setTexCoordArray(पासोक_Array texCoord)
 {
     const int cn = texCoord.channels();
     const int depth = texCoord.depth();
@@ -1488,7 +1488,7 @@ void cv::ogl::Arrays::setTexCoordArray(InputArray texCoord)
     CV_Assert( cn >= 1 && cn <= 4 );
     CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
 
-    if (texCoord.kind() == _InputArray::OPENGL_BUFFER)
+    if (texCoord.kind() == पासोक_Array_2::OPENGL_BUFFER)
         texCoord_ = texCoord.getOGlBuffer();
     else
         texCoord_.copyFrom(texCoord);
@@ -2278,7 +2278,7 @@ void cv::ogl::render(const ogl::Arrays& arr, int mode, Scalar color)
 #endif
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scalar color)
+void cv::ogl::render(const ogl::Arrays& arr, पासोक_Array indices, int mode, Scalar color)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
@@ -2297,7 +2297,7 @@ void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scala
 
         switch (kind)
         {
-        case _InputArray::OPENGL_BUFFER :
+        case पासोक_Array_2::OPENGL_BUFFER :
             {
                 ogl::Buffer buf = indices.getOGlBuffer();
 
@@ -2373,33 +2373,33 @@ void cv::ogl::clearDepth(float depth)
 #endif // HAVE_OPENGL
 }
 
-void cv::ogl::drawArrays(int first, int count, int mode)
+void cv::ogl::drawArrays(int first, int बिलांग_2, int mode)
 {
 #ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(mode);
+    CV_UNUSED(first); CV_UNUSED(बिलांग_2); CV_UNUSED(mode);
     throw_no_ogl();
 #else
-    gl::DrawArrays(mode, first, count);
+    gl::DrawArrays(mode, first, बिलांग_2);
 #endif // HAVE_OPENGL
 }
 
-void cv::ogl::drawElements(int first, int count, int type, int mode)
+void cv::ogl::drawElements(int first, int बिलांग_2, int type, int mode)
 {
 #ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode);
+    CV_UNUSED(first); CV_UNUSED(बिलांग_2); CV_UNUSED(type); CV_UNUSED(mode);
     throw_no_ogl();
 #else
-    gl::DrawElements(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)));
+    gl::DrawElements(mode, बिलांग_2, type, reinterpret_cast<const void*>(static_cast<size_t>(first)));
 #endif
 }
 
-void cv::ogl::drawElementsInstanced(int first, int count, int type, int mode, int instanceCount)
+void cv::ogl::drawElementsInstanced(int first, int बिलांग_2, int type, int mode, int instance_बिलांग)
 {
 #ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode); CV_UNUSED(instanceCount);
+    CV_UNUSED(first); CV_UNUSED(बिलांग_2); CV_UNUSED(type); CV_UNUSED(mode); CV_UNUSED(instance_बिलांग);
     throw_no_ogl();
 #else
-    gl::DrawElementsInstanced(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)), instanceCount);
+    gl::DrawElementsInstanced(mode, बिलांग_2, type, reinterpret_cast<const void*>(static_cast<size_t>(first)), instance_बिलांग);
     CV_CheckGlError();
 #endif
 }
@@ -2592,7 +2592,7 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)cglShareGroup,
                     0
                 };
-                context = clCreateContext(props, 0,0, NULL, NULL, &ciErrNum);
+                context = clCreateContext(props, 0,0, NULL, NULL, &ci_Err_नुमेरो);
 #elif defined(__ANDROID__)
                 cl_context_properties props[] =
                 {
@@ -2643,7 +2643,7 @@ Context& initializeContextFromGL()
 
 } // namespace cv::ogl::ocl
 
-void convertToGLTexture2D(InputArray src, Texture2D& texture)
+void convertToGLTexture2D(पासोक_Array src, Texture2D& texture)
 {
     CV_UNUSED(src); CV_UNUSED(texture);
 #if !defined(HAVE_OPENGL)

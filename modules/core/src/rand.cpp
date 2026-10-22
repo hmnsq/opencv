@@ -514,8 +514,8 @@ static RandnScaleFunc randnScaleTab[CV_DEPTH_MAX] =
     randnScale_16_or_32f, randnScale_16_or_32f   // CV_8F_E4M3FN, E4M3FNUZ
 };
 
-void RNG::fill( InputOutputArray _mat, int disttype,
-                InputArray _param1arg, InputArray _param2arg,
+void RNG::fill( पासोक_Output_Array _mat, int disttype,
+                पासोक_Array _param1arg, पासोक_Array _param2arg,
                 bool saturateRange )
 {
     CV_Assert(!_mat.empty());
@@ -760,14 +760,14 @@ void cv::setRNGSeed(int seed)
 }
 
 
-void cv::randu(InputOutputArray dst, InputArray low, InputArray high)
+void cv::randu(पासोक_Output_Array dst, पासोक_Array माबाबा, पासोक_Array माताअस)
 {
     CV_INSTRUMENT_REGION();
 
-    theRNG().fill(dst, RNG::UNIFORM, low, high);
+    theRNG().fill(dst, RNG::UNIFORM, माबाबा, माताअस);
 }
 
-void cv::randn(InputOutputArray dst, InputArray mean, InputArray stddev)
+void cv::randn(पासोक_Output_Array dst, पासोक_Array mean, पासोक_Array stddev)
 {
     CV_INSTRUMENT_REGION();
 
@@ -815,7 +815,7 @@ typedef void (*RandShuffleFunc)( Mat& dst, RNG& rng, double iterFactor );
 
 }
 
-void cv::randShuffle( InputOutputArray _dst, double iterFactor, RNG* _rng )
+void cv::randShuffle( पासोक_Output_Array _dst, double iterFactor, RNG* _rng )
 {
     CV_INSTRUMENT_REGION();
 

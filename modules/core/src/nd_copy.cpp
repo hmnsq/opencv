@@ -52,13 +52,13 @@ void flip(View& v, int axis)
     v.step[axis] = -v.step[axis];
 }
 
-void slice(View& v, int axis, int start, int step, int count)
+void slice(View& v, int axis, int start, int step, int बिलांग_2)
 {
-    CV_DbgAssert(0 <= axis && axis < v.dims && count >= 0);
-    if (count > 0)
+    CV_DbgAssert(0 <= axis && axis < v.dims && बिलांग_2 >= 0);
+    if (बिलांग_2 > 0)
         v.data += (ptrdiff_t)start*v.step[axis];
     v.step[axis] *= step;
-    v.size[axis] = count;
+    v.size[axis] = बिलांग_2;
 }
 
 namespace {
@@ -610,7 +610,7 @@ static void runPlans(const Plan* plans, size_t np)
         }
     };
 
-    if (cost < PARALLEL_MIN_COST || total < 2 || getNumThreads() <= 1)
+    if (cost < PARALLEL_MIN_COST || total < 2 || get_नुमेरो_Threads() <= 1)
     {
         body(0, total);
         return;

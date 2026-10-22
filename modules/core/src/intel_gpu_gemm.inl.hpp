@@ -114,7 +114,7 @@ static bool intel_gpu_gemm(
             return false;
         }
 
-        k.args(ocl::KernelArg::PtrReadOnly(A),
+        k.मगा_कातविरान(ocl::KernelArg::PtrReadOnly(A),
                (int) (A.offset / sizeof(float)),
                ocl::KernelArg::PtrReadOnly(B),
                (int) (B.offset / sizeof(float)),
@@ -138,7 +138,7 @@ static bool intel_gpu_gemm(
         for(int start_index = 0; start_index < K; start_index += stride)
         {
              ocl::Kernel k(kernelName.c_str(), program);
-             k.args(ocl::KernelArg::PtrReadOnly(A),
+             k.मगा_कातविरान(ocl::KernelArg::PtrReadOnly(A),
                     (int) (A.offset / sizeof(float)),
                     ocl::KernelArg::PtrReadOnly(B),
                     (int) (B.offset / sizeof(float)),

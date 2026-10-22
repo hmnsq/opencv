@@ -84,7 +84,7 @@ void preprocRadix0_(const DftPlan& plan, const void* _src, size_t sstep, void* _
     T* re = (T*)_re; T* im = (T*)_im;
     const int* itab = plan.itab.data();
     int nc = plan.nc;
-    if (plan.real_input)
+    if (plan.real_पासोक)
     {
         for (int i = 0; i < nc; i++)
         {
@@ -428,7 +428,7 @@ static inline void ccsUntangleInv(const DftPlan& plan, T X0, T Xnc, const T* x, 
 }
 
 template<typename T, typename VT, bool haveSIMD>
-void preprocCCS_(const DftPlan& plan, const void* _src, void* _tmp, bool complex_input)
+void preprocCCS_(const DftPlan& plan, const void* _src, void* _tmp, bool complex_पासोक)
 {
     const T* src = (const T*)_src;
     T* tmp = (T*)_tmp;
@@ -437,7 +437,7 @@ void preprocCCS_(const DftPlan& plan, const void* _src, void* _tmp, bool complex
     {
         // odd n: expand the packed half-spectrum into the full conjugate-symmetric spectrum
         tmp[0] = src[0]; tmp[1] = 0;
-        const T* x = complex_input ? src + 2 : src + 1;   // X[k] = (x[2(k-1)], x[2(k-1)+1])
+        const T* x = complex_पासोक ? src + 2 : src + 1;   // X[k] = (x[2(k-1)], x[2(k-1)+1])
         for (int k = 1; k <= (n-1)/2; k++)
         {
             T xr = x[(k-1)*2], xi = x[(k-1)*2+1];
@@ -446,9 +446,9 @@ void preprocCCS_(const DftPlan& plan, const void* _src, void* _tmp, bool complex
         }
         return;
     }
-    T X0 = src[0], Xnc = complex_input ? src[n] : src[n-1];
+    T X0 = src[0], Xnc = complex_पासोक ? src[n] : src[n-1];
     // CCS: X[k] = (src[2k-1], src[2k]); complex: X[k] = (src[2k], src[2k+1])
-    ccsUntangleInv<T, VT, haveSIMD>(plan, X0, Xnc, complex_input ? src : src - 1, tmp);
+    ccsUntangleInv<T, VT, haveSIMD>(plan, X0, Xnc, complex_पासोक ? src : src - 1, tmp);
 }
 
 template<typename T, typename VT, bool haveSIMD>

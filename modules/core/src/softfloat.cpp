@@ -326,7 +326,7 @@ softdouble cos(const softdouble& a) { return f64_cos(a); }
 *----------------------------------------------------------------------------*/
 struct commonNaN {
     bool sign;
-#ifndef WORDS_BIGENDIAN
+#ifndef मगा_सालिता_BIGENDIAN
     uint64_t v0, v64;
 #else
     uint64_t v64, v0;
@@ -406,7 +406,7 @@ static uint_fast64_t softfloat_propagateNaNF64UI( uint_fast64_t uiA, uint_fast64
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
 
-#ifndef WORDS_BIGENDIAN
+#ifndef मगा_सालिता_BIGENDIAN
 struct uint128 { uint64_t v0, v64; };
 struct uint64_extra { uint64_t extra, v; };
 struct uint128_extra { uint64_t extra; struct uint128 v; };
@@ -459,7 +459,7 @@ static float64_t softfloat_mulAddF64( uint_fast64_t, uint_fast64_t, uint_fast64_
 | significant bit to 1.  This shifted-and-jammed value is returned.
 *----------------------------------------------------------------------------*/
 
-static inline uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist )
+static inline uint64_t softfloat_short_Shift_कानान_Jam64( uint64_t a, uint_fast8_t dist )
 { return a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0); }
 
 /*----------------------------------------------------------------------------
@@ -472,7 +472,7 @@ static inline uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t 
 | is zero or nonzero.
 *----------------------------------------------------------------------------*/
 
-static inline uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist )
+static inline uint32_t softfloat_shift_कानान_Jam32( uint32_t a, uint_fast16_t dist )
 {
     //fixed unsigned unary minus: -x == ~x + 1
     return (dist < 31) ? a>>dist | ((uint32_t) (a<<((~dist + 1) & 31)) != 0) : (a != 0);
@@ -487,7 +487,7 @@ static inline uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist
 | greater than 64, the result will be either 0 or 1, depending on whether 'a'
 | is zero or nonzero.
 *----------------------------------------------------------------------------*/
-static inline uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist )
+static inline uint64_t softfloat_shift_कानान_Jam64( uint64_t a, uint_fast32_t dist )
 {
     //fixed unsigned unary minus: -x == ~x + 1
     return (dist < 63) ? a>>dist | ((uint64_t) (a<<((~dist + 1) & 63)) != 0) : (a != 0);
@@ -498,7 +498,7 @@ static inline uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist
 | into the number of leading 0 bits before the most-significant 1 of that
 | integer.  For integer zero (index 0), the corresponding table element is 8.
 *----------------------------------------------------------------------------*/
-static const uint_least8_t softfloat_countLeadingZeros8[256] = {
+static const uint_least8_t softfloat_बिलांग_Leading_Zeros8[256] = {
     8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -521,26 +521,26 @@ static const uint_least8_t softfloat_countLeadingZeros8[256] = {
 | Returns the number of leading 0 bits before the most-significant 1 bit of
 | 'a'.  If 'a' is zero, 32 is returned.
 *----------------------------------------------------------------------------*/
-static inline uint_fast8_t softfloat_countLeadingZeros32( uint32_t a )
+static inline uint_fast8_t softfloat_बिलांग_Leading_Zeros32( uint32_t a )
 {
-    uint_fast8_t count = 0;
+    uint_fast8_t बिलांग_2 = 0;
     if ( a < 0x10000 ) {
-        count = 16;
+        बिलांग_2 = 16;
         a <<= 16;
     }
     if ( a < 0x1000000 ) {
-        count += 8;
+        बिलांग_2 += 8;
         a <<= 8;
     }
-    count += softfloat_countLeadingZeros8[a>>24];
-    return count;
+    बिलांग_2 += softfloat_बिलांग_Leading_Zeros8[a>>24];
+    return बिलांग_2;
 }
 
 /*----------------------------------------------------------------------------
 | Returns the number of leading 0 bits before the most-significant 1 bit of
 | 'a'.  If 'a' is zero, 64 is returned.
 *----------------------------------------------------------------------------*/
-static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a );
+static uint_fast8_t softfloat_बिलांग_Leading_Zeros64( uint64_t a );
 
 /*----------------------------------------------------------------------------
 | Returns an approximation to the reciprocal of the number represented by 'a',
@@ -603,7 +603,7 @@ static inline struct uint128 softfloat_shortShiftLeft128( uint64_t a64, uint64_t
 | bit of the shifted value by setting the least-significant bit to 1.  This
 | shifted-and-jammed value is returned.
 *----------------------------------------------------------------------------*/
-static inline struct uint128 softfloat_shortShiftRightJam128(uint64_t a64, uint64_t a0, uint_fast8_t dist )
+static inline struct uint128 softfloat_short_Shift_कानान_Jam128(uint64_t a64, uint64_t a0, uint_fast8_t dist )
 {
     uint_fast8_t negDist = -dist;
     struct uint128 z;
@@ -624,7 +624,7 @@ static inline struct uint128 softfloat_shortShiftRightJam128(uint64_t a64, uint6
 | greater than 128, the result will be either 0 or 1, depending on whether the
 | original 128 bits are all zeros.
 *----------------------------------------------------------------------------*/
-static struct uint128 softfloat_shiftRightJam128( uint64_t a64, uint64_t a0, uint_fast32_t dist );
+static struct uint128 softfloat_shift_कानान_Jam128( uint64_t a64, uint64_t a0, uint_fast32_t dist );
 
 /*----------------------------------------------------------------------------
 | Returns the sum of the 128-bit integer formed by concatenating 'a64' and
@@ -896,7 +896,7 @@ static float32_t f32_mul( float32_t a, float32_t b )
     expZ = expA + expB - 0x7F;
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<8;
-    sigZ = (uint_fast32_t)softfloat_shortShiftRightJam64( (uint_fast64_t) sigA * sigB, 32 ); //fixed warning on type cast
+    sigZ = (uint_fast32_t)softfloat_short_Shift_कानान_Jam64( (uint_fast64_t) sigA * sigB, 32 ); //fixed warning on type cast
     if ( sigZ < 0x40000000 ) {
         --expZ;
         sigZ <<= 1;
@@ -1276,7 +1276,7 @@ static int_fast32_t f32_to_i32( float32_t a, uint_fast8_t roundingMode, bool exa
     if ( exp ) sig |= 0x00800000;
     sig64 = (uint_fast64_t) sig<<32;
     shiftDist = 0xAA - exp;
-    if ( 0 < shiftDist ) sig64 = softfloat_shiftRightJam64( sig64, shiftDist );
+    if ( 0 < shiftDist ) sig64 = softfloat_shift_कानान_Jam64( sig64, shiftDist );
     return softfloat_roundToI32( sign, sig64, roundingMode, exact );
 }
 
@@ -1950,7 +1950,7 @@ static float32_t f64_to_f32( float64_t a )
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    frac32 = (uint_fast32_t)softfloat_shortShiftRightJam64( frac, 22 ); //fixed warning on type cast
+    frac32 = (uint_fast32_t)softfloat_short_Shift_कानान_Jam64( frac, 22 ); //fixed warning on type cast
     if ( ! (exp | frac32) ) {
         uiZ = packToF32UI( sign, 0, 0 );
         goto uiZ;
@@ -1994,7 +1994,7 @@ static int_fast32_t f64_to_i32( float64_t a, uint_fast8_t roundingMode, bool exa
     *------------------------------------------------------------------------*/
     if ( exp ) sig |= UINT64_C( 0x0010000000000000 );
     shiftDist = 0x427 - exp;
-    if ( 0 < shiftDist ) sig = softfloat_shiftRightJam64( sig, shiftDist );
+    if ( 0 < shiftDist ) sig = softfloat_shift_कानान_Jam64( sig, shiftDist );
     return softfloat_roundToI32( sign, sig, roundingMode, exact );
 }
 
@@ -2132,7 +2132,7 @@ static float64_t i32_to_f64( int32_t a )
         sign = (a < 0);
         //fixed unsigned unary minus: -x == ~x + 1
         absA = sign ? (~(uint_fast32_t) a + 1) : (uint_fast32_t) a;
-        shiftDist = softfloat_countLeadingZeros32( absA ) + 21;
+        shiftDist = softfloat_बिलांग_Leading_Zeros32( absA ) + 21;
         uiZ =
             packToF64UI(
                 sign, 0x432 - shiftDist, (uint_fast64_t) absA<<shiftDist );
@@ -2150,14 +2150,14 @@ static float32_t i64_to_f32( int64_t a )
     sign = (a < 0);
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast64_t) a + 1) : (uint_fast64_t) a;
-    shiftDist = softfloat_countLeadingZeros64( absA ) - 40;
+    shiftDist = softfloat_बिलांग_Leading_Zeros64( absA ) - 40;
     if ( 0 <= shiftDist ) {
         return float32_t::fromRaw(a ? packToF32UI(sign, 0x95 - shiftDist, (uint_fast32_t) absA<<shiftDist ) : 0);
     } else {
         shiftDist += 7;
         sig =
             (shiftDist < 0)
-                ? (uint_fast32_t) softfloat_shortShiftRightJam64( absA, -shiftDist ) //fixed warning on type cast
+                ? (uint_fast32_t) softfloat_short_Shift_कानान_Jam64( absA, -shiftDist ) //fixed warning on type cast
                 : (uint_fast32_t) absA<<shiftDist;
         return softfloat_roundPackToF32( sign, 0x9C - shiftDist, sig );
     }
@@ -2232,7 +2232,7 @@ static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
             }
             expZ = expB;
             sigA += expA ? 0x20000000 : sigA;
-            sigA = softfloat_shiftRightJam32( sigA, -expDiff );
+            sigA = softfloat_shift_कानान_Jam32( sigA, -expDiff );
         } else {
             if ( expA == 0xFF ) {
                 if ( sigA ) goto propagateNaN;
@@ -2241,7 +2241,7 @@ static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
             }
             expZ = expA;
             sigB += expB ? 0x20000000 : sigB;
-            sigB = softfloat_shiftRightJam32( sigB, expDiff );
+            sigB = softfloat_shift_कानान_Jam32( sigB, expDiff );
         }
         sigZ = 0x20000000 + sigA + sigB;
         if ( sigZ < 0x40000000 ) {
@@ -2311,7 +2311,7 @@ static float64_t
             } else {
                 sigA <<= 1;
             }
-            sigA = softfloat_shiftRightJam64( sigA, -expDiff );
+            sigA = softfloat_shift_कानान_Jam64( sigA, -expDiff );
         } else {
             if ( expA == 0x7FF ) {
                 if ( sigA ) goto propagateNaN;
@@ -2324,7 +2324,7 @@ static float64_t
             } else {
                 sigB <<= 1;
             }
-            sigB = softfloat_shiftRightJam64( sigB, expDiff );
+            sigB = softfloat_shift_कानान_Jam64( sigB, expDiff );
         }
         sigZ = UINT64_C( 0x2000000000000000 ) + sigA + sigB;
         if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
@@ -2387,30 +2387,30 @@ static uint_fast64_t softfloat_commonNaNToF64UI( const struct commonNaN *aPtr )
             | aPtr->v64>>12;
 }
 
-static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
+static uint_fast8_t softfloat_बिलांग_Leading_Zeros64( uint64_t a )
 {
-    uint_fast8_t count;
+    uint_fast8_t बिलांग_2;
     uint32_t a32;
 
-    count = 0;
+    बिलांग_2 = 0;
     a32 = a>>32;
     if ( ! a32 ) {
-        count = 32;
+        बिलांग_2 = 32;
         a32 = (uint32_t) a; //fixed warning on type cast
     }
     /*------------------------------------------------------------------------
     | From here, result is current count + count leading zeros of `a32'.
     *------------------------------------------------------------------------*/
     if ( a32 < 0x10000 ) {
-        count += 16;
+        बिलांग_2 += 16;
         a32 <<= 16;
     }
     if ( a32 < 0x1000000 ) {
-        count += 8;
+        बिलांग_2 += 8;
         a32 <<= 8;
     }
-    count += softfloat_countLeadingZeros8[a32>>24];
-    return count;
+    बिलांग_2 += softfloat_बिलांग_Leading_Zeros8[a32>>24];
+    return बिलांग_2;
 }
 
 /*----------------------------------------------------------------------------
@@ -2551,7 +2551,7 @@ static float32_t
     if ( ! expC ) {
         if ( ! sigC ) {
             expZ = expProd - 1;
-            sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sigProd, 31 ); //fixed warning on type cast
+            sigZ = (uint_fast32_t) softfloat_short_Shift_कानान_Jam64( sigProd, 31 ); //fixed warning on type cast
             goto roundPack;
         }
         normExpSig = softfloat_normSubnormalF32Sig( sigC );
@@ -2567,14 +2567,14 @@ static float32_t
         *--------------------------------------------------------------------*/
         if ( expDiff <= 0 ) {
             expZ = expC;
-            sigZ = sigC + (uint_fast32_t) softfloat_shiftRightJam64( sigProd, 32 - expDiff ); //fixed warning on type cast
+            sigZ = sigC + (uint_fast32_t) softfloat_shift_कानान_Jam64( sigProd, 32 - expDiff ); //fixed warning on type cast
         } else {
             expZ = expProd;
             sig64Z =
                 sigProd
-                    + softfloat_shiftRightJam64(
+                    + softfloat_shift_कानान_Jam64(
                           (uint_fast64_t) sigC<<32, expDiff );
-            sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sig64Z, 32 ); //fixed warning on type cast
+            sigZ = (uint_fast32_t) softfloat_short_Shift_कानान_Jam64( sig64Z, 32 ); //fixed warning on type cast
         }
         if ( sigZ < 0x40000000 ) {
             --expZ;
@@ -2587,7 +2587,7 @@ static float32_t
         if ( expDiff < 0 ) {
             signZ = signC;
             expZ = expC;
-            sig64Z = sig64C - softfloat_shiftRightJam64( sigProd, -expDiff );
+            sig64Z = sig64C - softfloat_shift_कानान_Jam64( sigProd, -expDiff );
         } else if ( ! expDiff ) {
             expZ = expProd;
             sig64Z = sigProd - sig64C;
@@ -2599,13 +2599,13 @@ static float32_t
             }
         } else {
             expZ = expProd;
-            sig64Z = sigProd - softfloat_shiftRightJam64( sig64C, expDiff );
+            sig64Z = sigProd - softfloat_shift_कानान_Jam64( sig64C, expDiff );
         }
-        shiftDist = softfloat_countLeadingZeros64( sig64Z ) - 1;
+        shiftDist = softfloat_बिलांग_Leading_Zeros64( sig64Z ) - 1;
         expZ -= shiftDist;
         shiftDist -= 32;
         if ( shiftDist < 0 ) {
-            sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sig64Z, -shiftDist ); //fixed warning on type cast
+            sigZ = (uint_fast32_t) softfloat_short_Shift_कानान_Jam64( sig64Z, -shiftDist ); //fixed warning on type cast
         } else {
             sigZ = (uint_fast32_t) sig64Z<<shiftDist;
         }
@@ -2744,13 +2744,13 @@ static float64_t
     if ( expDiff < 0 ) {
         expZ = expC;
         if ( (signZ == signC) || (expDiff < -1) ) {
-            sig128Z.v64 = softfloat_shiftRightJam64( sig128Z.v64, -expDiff );
+            sig128Z.v64 = softfloat_shift_कानान_Jam64( sig128Z.v64, -expDiff );
         } else {
             sig128Z =
-                softfloat_shortShiftRightJam128( sig128Z.v64, sig128Z.v0, 1 );
+                softfloat_short_Shift_कानान_Jam128( sig128Z.v64, sig128Z.v0, 1 );
         }
     } else if ( expDiff ) {
-        sig128C = softfloat_shiftRightJam128( sigC, 0, expDiff );
+        sig128C = softfloat_shift_कानान_Jam128( sigC, 0, expDiff );
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
@@ -2794,10 +2794,10 @@ static float64_t
             sig128Z.v64 = sig128Z.v0;
             sig128Z.v0 = 0;
         }
-        shiftDist = softfloat_countLeadingZeros64( sig128Z.v64 ) - 1;
+        shiftDist = softfloat_बिलांग_Leading_Zeros64( sig128Z.v64 ) - 1;
         expZ -= shiftDist;
         if ( shiftDist < 0 ) {
-            sigZ = softfloat_shortShiftRightJam64( sig128Z.v64, -shiftDist );
+            sigZ = softfloat_short_Shift_कानान_Jam64( sig128Z.v64, -shiftDist );
         } else {
             sig128Z =
                 softfloat_shortShiftLeft128(
@@ -2845,7 +2845,7 @@ static float32_t
 {
     int_fast8_t shiftDist;
 
-    shiftDist = softfloat_countLeadingZeros32( sig ) - 1;
+    shiftDist = softfloat_बिलांग_Leading_Zeros32( sig ) - 1;
     exp -= shiftDist;
     if ( (7 <= shiftDist) && ((unsigned int) exp < 0xFD) ) {
         return float32_t::fromRaw(packToF32UI( sign, sig ? exp : 0, sig<<(shiftDist - 7) ));
@@ -2859,7 +2859,7 @@ static float64_t
 {
     int_fast8_t shiftDist;
 
-    shiftDist = softfloat_countLeadingZeros64( sig ) - 1;
+    shiftDist = softfloat_बिलांग_Leading_Zeros64( sig ) - 1;
     exp -= shiftDist;
     if ( (10 <= shiftDist) && ((unsigned int) exp < 0x7FD) ) {
         return float64_t::fromRaw(packToF64UI( sign, sig ? exp : 0, sig<<(shiftDist - 10) ));
@@ -2873,7 +2873,7 @@ static struct exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t sig )
     int_fast8_t shiftDist;
     struct exp16_sig32 z;
 
-    shiftDist = softfloat_countLeadingZeros32( sig ) - 8;
+    shiftDist = softfloat_बिलांग_Leading_Zeros32( sig ) - 8;
     z.exp = 1 - shiftDist;
     z.sig = sig<<shiftDist;
     return z;
@@ -2884,7 +2884,7 @@ static struct exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t sig )
     int_fast8_t shiftDist;
     struct exp16_sig64 z;
 
-    shiftDist = softfloat_countLeadingZeros64( sig ) - 11;
+    shiftDist = softfloat_बिलांग_Leading_Zeros64( sig ) - 11;
     z.exp = 1 - shiftDist;
     z.sig = sig<<shiftDist;
     return z;
@@ -2959,7 +2959,7 @@ static float32_t
             isTiny =
                 (globalDetectTininess == tininess_beforeRounding)
                     || (exp < -1) || (sig + roundIncrement < 0x80000000);
-            sig = softfloat_shiftRightJam32( sig, -exp );
+            sig = softfloat_shift_कानान_Jam32( sig, -exp );
             exp = 0;
             roundBits = sig & 0x7F;
             if ( isTiny && roundBits ) {
@@ -3026,7 +3026,7 @@ static float64_t
                 (globalDetectTininess == tininess_beforeRounding)
                     || (exp < -1)
                     || (sig + roundIncrement < UINT64_C( 0x8000000000000000 ));
-            sig = softfloat_shiftRightJam64( sig, -exp );
+            sig = softfloat_shift_कानान_Jam64( sig, -exp );
             exp = 0;
             roundBits = sig & 0x3FF;
             if ( isTiny && roundBits ) {
@@ -3146,7 +3146,7 @@ invalid:
 }
 
 static struct uint128
- softfloat_shiftRightJam128( uint64_t a64, uint64_t a0, uint_fast32_t dist )
+ softfloat_shift_कानान_Jam128( uint64_t a64, uint64_t a0, uint_fast32_t dist )
 {
     uint_fast8_t u8NegDist;
     struct uint128 z;
@@ -3215,7 +3215,7 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
             signZ = ! signZ;
             sigDiff = -sigDiff;
         }
-        shiftDist = softfloat_countLeadingZeros32( sigDiff ) - 8;
+        shiftDist = softfloat_बिलांग_Leading_Zeros32( sigDiff ) - 8;
         expZ = expA - shiftDist;
         if ( expZ < 0 ) {
             shiftDist = (int_fast8_t)expA; //fixed type cast
@@ -3256,7 +3256,7 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
         }
         return
             softfloat_normRoundPackToF32(
-                signZ, expZ, sigX - softfloat_shiftRightJam32( sigY, expDiff )
+                signZ, expZ, sigX - softfloat_shift_कानान_Jam32( sigY, expDiff )
             );
     }
     /*------------------------------------------------------------------------
@@ -3311,7 +3311,7 @@ static float64_t
             signZ = ! signZ;
             sigDiff = -sigDiff;
         }
-        shiftDist = softfloat_countLeadingZeros64( sigDiff ) - 11;
+        shiftDist = softfloat_बिलांग_Leading_Zeros64( sigDiff ) - 11;
         expZ = expA - shiftDist;
         if ( expZ < 0 ) {
             shiftDist = (int_fast8_t)expA; //fixed type cast
@@ -3334,7 +3334,7 @@ static float64_t
                 goto uiZ;
             }
             sigA += expA ? UINT64_C( 0x4000000000000000 ) : sigA;
-            sigA = softfloat_shiftRightJam64( sigA, -expDiff );
+            sigA = softfloat_shift_कानान_Jam64( sigA, -expDiff );
             sigB |= UINT64_C( 0x4000000000000000 );
             expZ = expB;
             sigZ = sigB - sigA;
@@ -3347,7 +3347,7 @@ static float64_t
                 goto uiZ;
             }
             sigB += expB ? UINT64_C( 0x4000000000000000 ) : sigB;
-            sigB = softfloat_shiftRightJam64( sigB, expDiff );
+            sigB = softfloat_shift_कानान_Jam64( sigB, expDiff );
             sigA |= UINT64_C( 0x4000000000000000 );
             expZ = expA;
             sigZ = sigA - sigB;
@@ -3382,7 +3382,7 @@ static float64_t ui32_to_f64( uint32_t a )
     if ( ! a ) {
         uiZ = 0;
     } else {
-        shiftDist = softfloat_countLeadingZeros32( a ) + 21;
+        shiftDist = softfloat_बिलांग_Leading_Zeros32( a ) + 21;
         uiZ =
             packToF64UI( 0, 0x432 - shiftDist, (uint_fast64_t) a<<shiftDist );
     }
@@ -3394,13 +3394,13 @@ static float32_t ui64_to_f32( uint64_t a )
     int_fast8_t shiftDist;
     uint_fast32_t sig;
 
-    shiftDist = softfloat_countLeadingZeros64( a ) - 40;
+    shiftDist = softfloat_बिलांग_Leading_Zeros64( a ) - 40;
     if ( 0 <= shiftDist ) {
         return float32_t::fromRaw(a ? packToF32UI(0, 0x95 - shiftDist, (uint_fast32_t) a<<shiftDist ) : 0);
     } else {
         shiftDist += 7;
         sig =
-            (shiftDist < 0) ? (uint_fast32_t) softfloat_shortShiftRightJam64( a, -shiftDist ) //fixed warning on type cast
+            (shiftDist < 0) ? (uint_fast32_t) softfloat_short_Shift_कानान_Jam64( a, -shiftDist ) //fixed warning on type cast
                 : (uint_fast32_t) a<<shiftDist;
         return softfloat_roundPackToF32( 0, 0x9C - shiftDist, sig );
     }
@@ -3414,7 +3414,7 @@ static float64_t ui64_to_f64( uint64_t a )
     if ( a & UINT64_C( 0x8000000000000000 ) ) {
         return
             softfloat_roundPackToF64(
-                0, 0x43D, softfloat_shortShiftRightJam64( a, 1 ) );
+                0, 0x43D, softfloat_short_Shift_कानान_Jam64( a, 1 ) );
     } else {
         return softfloat_normRoundPackToF64( 0, 0x43C, a );
     }

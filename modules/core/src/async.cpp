@@ -156,14 +156,14 @@ struct AsyncArray::Impl
         return result;
     }
 
-    void setValue(InputArray value)
+    void set_हालागा(पासोक_Array value)
     {
         if (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
         int k = value.kind();
-        if (k == _InputArray::UMAT)
+        if (k == पासोक_Array_2::UMAT)
         {
             result_umat = makePtr<UMat>();
             value.copyTo(*result_umat.get());
@@ -322,13 +322,13 @@ struct AsyncArray::Impl
         return result;
     }
 
-    void setValue(InputArray value)
+    void set_हालागा(पासोक_Array value)
     {
         if (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
         int k = value.kind();
-        if (k == _InputArray::UMAT)
+        if (k == पासोक_Array_2::UMAT)
         {
             result_umat = makePtr<UMat>();
             value.copyTo(*result_umat.get());
@@ -476,10 +476,10 @@ AsyncArray AsyncPromise::getArrayResult()
     return p->getArrayResult();
 }
 
-void AsyncPromise::setValue(InputArray value)
+void AsyncPromise::set_हालागा(पासोक_Array value)
 {
     CV_Assert(p);
-    return p->setValue(value);
+    return p->set_हालागा(value);
 }
 
 void AsyncPromise::setException(const cv::Exception& exception)

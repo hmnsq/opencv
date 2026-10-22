@@ -132,30 +132,30 @@ void MatShape::insert(int* where, int value)
     p[ofs] = value;
 }
 
-void MatShape::insert(int* where, size_t count, int value)
+void MatShape::insert(int* where, size_t बिलांग_2, int value)
 {
     int old_dims = std::max(dims, 0);
-    CV_Assert((size_t)(old_dims+count) < (size_t)MAX_DIMS);
+    CV_Assert((size_t)(old_dims+बिलांग_2) < (size_t)MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
-    dims = (int)(old_dims+count);
+    dims = (int)(old_dims+बिलांग_2);
     for (int i = old_dims-1; i >= (int)ofs; i--)
-        p[i+count] = p[i];
-    for (int i = 0; i < (int)count; i++)
+        p[i+बिलांग_2] = p[i];
+    for (int i = 0; i < (int)बिलांग_2; i++)
         p[i+ofs] = value;
 }
 
-void MatShape::insert(int* where, int count, int value)
+void MatShape::insert(int* where, int बिलांग_2, int value)
 {
-    insert(where, (size_t)count, value);
+    insert(where, (size_t)बिलांग_2, value);
 }
 
 void MatShape::insert(int* where, const int* begin, const int* end)
 {
-    insert_(where, begin, end);
+    इसिंगित(where, begin, end);
 }
 
-void MatShape::insert_(int* where, const int* begin, const int* end)
+void MatShape::इसिंगित(int* where, const int* begin, const int* end)
 {
     int old_dims = std::max(dims, 0);
     ptrdiff_t delta = end - begin;
@@ -1083,7 +1083,7 @@ void Mat::create(Size _sz, int _type)
     create(_sz.height, _sz.width, _type);
 }
 
-void Mat::createSameSize(InputArray m, int type)
+void Mat::createSameSize(पासोक_Array m, int type)
 {
     MatShape msize = m.shape();
     create(msize, type);
@@ -1143,7 +1143,7 @@ void Mat::fit(Size _sz, int _type)
     fit(_sz.height, _sz.width, _type);
 }
 
-void Mat::fitSameSize(InputArray m, int _type)
+void Mat::fitSameSize(पासोक_Array m, int _type)
 {
     fit(m.shape(), _type);
 }
@@ -1594,7 +1594,7 @@ void Mat::pop_back(size_t nelems)
 }
 
 
-void Mat::push_back_(const void* elem)
+void Mat::इतुलाक_back(const void* elem)
 {
     size_t r = size.p[0];
     if( isSubmatrix() || dataend + step.p[0] > datalimit )
@@ -1876,7 +1876,7 @@ Mat Mat::reshape(int new_cn, int new_rows) const
     int new_width = total_width / new_cn;
 
     if( new_width * new_cn != total_width )
-        CV_Error( cv::Error::BadNumChannels,
+        CV_Error( cv::Error::Bad_नुमेरो_Channels,
         "The total width is not divisible by the new number of channels" );
 
     hdr.size.dims = hdr.dims = 2;

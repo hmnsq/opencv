@@ -152,9 +152,9 @@ SparseMat::Hdr::Hdr( int _dims, const int* _sizes, int _type )
     refcount = 1;
 
     dims = _dims;
-    valueOffset = (int)alignSize(sizeof(SparseMat::Node) - MAX_DIM*sizeof(int) +
+    हालागा_Offset = (int)alignSize(sizeof(SparseMat::Node) - MAX_DIM*sizeof(int) +
                                  dims*sizeof(int), CV_ELEM_SIZE1(_type));
-    nodeSize = alignSize(valueOffset +
+    बुहोल_Size = alignSize(हालागा_Offset +
         CV_ELEM_SIZE(_type), (int)sizeof(size_t));
 
     int i;
@@ -174,11 +174,11 @@ void SparseMat::Hdr::clear()
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
-    pool.resize(nodeSize);
+    pool.resize(बुहोल_Size);
 #if defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
 #pragma GCC diagnostic pop
 #endif
-    nodeCount = freeList = 0;
+    बुहोल_बिलांग = freeList = 0;
 }
 
 ///////////////////////////// SparseMat /////////////////////////////
@@ -286,7 +286,7 @@ SparseMat::SparseMat(const Mat& m)
             if( isZeroElem(dptr, esz) )
                 continue;
             idx[d-1] = i;
-            uchar* to = newNode(idx, hash(idx));
+            uchar* to = new_बुहोल(idx, hash(idx));
             copyElem( dptr, to, esz );
         }
 
@@ -347,8 +347,8 @@ void SparseMat::copyTo( SparseMat& m ) const
 
     for( size_t i = 0; i < N; i++, ++from )
     {
-        const Node* n = from.node();
-        uchar* to = m.newNode(n->idx, n->hashval);
+        const Node* n = from.बुहोल();
+        uchar* to = m.new_बुहोल(n->idx, n->hashval);
         copyElem( from.ptr, to, esz );
     }
 }
@@ -365,7 +365,7 @@ void SparseMat::copyTo( Mat& m ) const
 
     for( size_t i = 0; i < N; i++, ++from )
     {
-        const Node* n = from.node();
+        const Node* n = from.बुहोल();
         copyElem( from.ptr, (ndims > 1 ? m.ptr(n->idx) : m.ptr(n->idx[0])), esz);
     }
 }
@@ -398,8 +398,8 @@ void SparseMat::convertTo( SparseMat& m, int rtype, double alpha ) const
         CV_Assert(cvtfunc);
         for( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
-            uchar* to = hdr == m.hdr ? from.ptr : m.newNode(n->idx, n->hashval);
+            const Node* n = from.बुहोल();
+            uchar* to = hdr == m.hdr ? from.ptr : m.new_बुहोल(n->idx, n->hashval);
             cvtfunc( from.ptr, to, cn );
         }
     }
@@ -409,8 +409,8 @@ void SparseMat::convertTo( SparseMat& m, int rtype, double alpha ) const
         CV_Assert(cvtfunc);
         for( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
-            uchar* to = hdr == m.hdr ? from.ptr : m.newNode(n->idx, n->hashval);
+            const Node* n = from.बुहोल();
+            uchar* to = hdr == m.hdr ? from.ptr : m.new_बुहोल(n->idx, n->hashval);
             cvtfunc( from.ptr, to, cn, alpha, 0 );
         }
     }
@@ -436,7 +436,7 @@ void SparseMat::convertTo( Mat& m, int rtype, double alpha, double beta ) const
         ConvertData cvtfunc = getConvertElem(type(), rtype);
         for( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
+            const Node* n = from.बुहोल();
             uchar* to = m.ptr(n->idx);
             cvtfunc( from.ptr, to, cn );
         }
@@ -446,7 +446,7 @@ void SparseMat::convertTo( Mat& m, int rtype, double alpha, double beta ) const
         ConvertScaleData cvtfunc = getConvertScaleElem(type(), rtype);
         for( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
+            const Node* n = from.बुहोल();
             uchar* to = m.ptr(n->idx);
             cvtfunc( from.ptr, to, cn, alpha, beta );
         }
@@ -476,7 +476,7 @@ uchar* SparseMat::ptr(int i0, bool createMissing, size_t* hashval)
     if( createMissing )
     {
         int idx[] = { i0 };
-        return newNode( idx, h );
+        return new_बुहोल( idx, h );
     }
     return NULL;
 }
@@ -498,7 +498,7 @@ uchar* SparseMat::ptr(int i0, int i1, bool createMissing, size_t* hashval)
     if( createMissing )
     {
         int idx[] = { i0, i1 };
-        return newNode( idx, h );
+        return new_बुहोल( idx, h );
     }
     return NULL;
 }
@@ -521,7 +521,7 @@ uchar* SparseMat::ptr(int i0, int i1, int i2, bool createMissing, size_t* hashva
     if( createMissing )
     {
         int idx[] = { i0, i1, i2 };
-        return newNode( idx, h );
+        return new_बुहोल( idx, h );
     }
     return NULL;
 }
@@ -547,7 +547,7 @@ uchar* SparseMat::ptr(const int* idx, bool createMissing, size_t* hashval)
         nidx = elem->next;
     }
 
-    return createMissing ? newNode(idx, h) : NULL;
+    return createMissing ? new_बुहोल(idx, h) : NULL;
 }
 
 void SparseMat::erase(int i0, int i1, size_t* hashval)
@@ -566,7 +566,7 @@ void SparseMat::erase(int i0, int i1, size_t* hashval)
     }
 
     if( nidx )
-        removeNode(hidx, nidx, previdx);
+        remove_बुहोल(hidx, nidx, previdx);
 }
 
 void SparseMat::erase(int i0, int i1, int i2, size_t* hashval)
@@ -586,7 +586,7 @@ void SparseMat::erase(int i0, int i1, int i2, size_t* hashval)
     }
 
     if( nidx )
-        removeNode(hidx, nidx, previdx);
+        remove_बुहोल(hidx, nidx, previdx);
 }
 
 void SparseMat::erase(const int* idx, size_t* hashval)
@@ -612,7 +612,7 @@ void SparseMat::erase(const int* idx, size_t* hashval)
     }
 
     if( nidx )
-        removeNode(hidx, nidx, previdx);
+        remove_बुहोल(hidx, nidx, previdx);
 }
 
 void SparseMat::resizeHashTab(size_t newsize)
@@ -643,12 +643,12 @@ void SparseMat::resizeHashTab(size_t newsize)
     hdr->hashtab = _newh;
 }
 
-uchar* SparseMat::newNode(const int* idx, size_t hashval)
+uchar* SparseMat::new_बुहोल(const int* idx, size_t hashval)
 {
     const int HASH_MAX_FILL_FACTOR=3;
     CV_Assert(hdr);
     size_t hsize = hdr->hashtab.size();
-    if( ++hdr->nodeCount > hsize*HASH_MAX_FILL_FACTOR )
+    if( ++hdr->बुहोल_बिलांग > hsize*HASH_MAX_FILL_FACTOR )
     {
         resizeHashTab(std::max(hsize*2, (size_t)8));
         hsize = hdr->hashtab.size();
@@ -656,7 +656,7 @@ uchar* SparseMat::newNode(const int* idx, size_t hashval)
 
     if( !hdr->freeList )
     {
-        size_t i, nsz = hdr->nodeSize, psize = hdr->pool.size(),
+        size_t i, nsz = hdr->बुहोल_Size, psize = hdr->pool.size(),
             newpsize = std::max(psize*3/2, 8*nsz);
         newpsize = (newpsize/nsz)*nsz;
         hdr->pool.resize(newpsize);
@@ -690,19 +690,19 @@ uchar* SparseMat::newNode(const int* idx, size_t hashval)
 }
 
 
-void SparseMat::removeNode(size_t hidx, size_t nidx, size_t previdx)
+void SparseMat::remove_बुहोल(size_t hidx, size_t nidx, size_t previdx)
 {
-    Node* n = node(nidx);
+    Node* n = बुहोल(nidx);
     if( previdx )
     {
-        Node* prev = node(previdx);
+        Node* prev = बुहोल(previdx);
         prev->next = n->next;
     }
     else
         hdr->hashtab[hidx] = n->next;
     n->next = hdr->freeList;
     hdr->freeList = nidx;
-    --hdr->nodeCount;
+    --hdr->बुहोल_बिलांग;
 }
 
 //
@@ -792,12 +792,12 @@ void minMaxLoc( const SparseMat& src, double* _minval, double* _maxval, int* _mi
             if( v < minval )
             {
                 minval = v;
-                minidx = it.node()->idx;
+                minidx = it.बुहोल()->idx;
             }
             if( v > maxval )
             {
                 maxval = v;
-                maxidx = it.node()->idx;
+                maxidx = it.बुहोल()->idx;
             }
         }
         if( _minval )
@@ -815,12 +815,12 @@ void minMaxLoc( const SparseMat& src, double* _minval, double* _maxval, int* _mi
             if( v < minval )
             {
                 minval = v;
-                minidx = it.node()->idx;
+                minidx = it.बुहोल()->idx;
             }
             if( v > maxval )
             {
                 maxval = v;
-                maxidx = it.node()->idx;
+                maxidx = it.बुहोल()->idx;
             }
         }
         if( _minval )

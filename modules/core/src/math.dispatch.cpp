@@ -69,13 +69,13 @@ static TKernel probeHalUnary(HalFunc fn)
 // The engine's OWN kernel for (op, T) - v_exp/v_log & co, no HAL/IPP tiers. The final fallback of
 // getMathFunc, and what hal::exp32f & co use as THEIR built-in implementation (the former table
 // kernels are gone), via mathSpanEngine below.
-static TKernel getEngineMathFunc(TOp op, int T)
+static TKernel getEngineMathFunc(इताअस op, int T)
 {
     CV_CPU_DISPATCH(getMathFunc_,   (op, T),      CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // run the engine's own math kernel over one contiguous span (the shape hal::exp32f & co need)
-void mathSpanEngine(TOp op, int depth, const void* src, void* dst, int n)
+void mathSpanEngine(इताअस op, int depth, const void* src, void* dst, int n)
 {
     TKernel k = getEngineMathFunc(op, depth);
     CV_Assert(k.fptr);
@@ -83,7 +83,7 @@ void mathSpanEngine(TOp op, int depth, const void* src, void* dst, int n)
     k.fptr(src, 0, 1, nullptr, 0, 0, nullptr, 0, 0, dst, 0, n, 1, noparams, k.flags, k.userdata);
 }
 
-TKernel getMathFunc(TOp op, int T)
+TKernel getMathFunc(इताअस op, int T)
 {
     if ((op == OP_EXP || op == OP_LOG) && (T == CV_32F || T == CV_64F))
     {

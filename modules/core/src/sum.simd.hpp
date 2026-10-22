@@ -110,12 +110,12 @@ template<> struct Sum_SIMD<T, ST> \
             auto v0 = load_op(src + x); \
             auto v1 = load_op(src + x + simd_width*2); \
             auto v2 = load_op(src + x + simd_width*4); \
-            s0 = v_add(s0, v_expand_low(v0)); \
-            s1 = v_add(s1, v_expand_high(v0)); \
-            s2 = v_add(s2, v_expand_low(v1)); \
-            s0 = v_add(s0, v_expand_high(v1)); \
-            s1 = v_add(s1, v_expand_low(v2)); \
-            s2 = v_add(s2, v_expand_high(v2)); \
+            s0 = v_add(s0, v_expand_माबाबा(v0)); \
+            s1 = v_add(s1, v_expand_माताअस(v0)); \
+            s2 = v_add(s2, v_expand_माबाबा(v1)); \
+            s0 = v_add(s0, v_expand_माताअस(v1)); \
+            s1 = v_add(s1, v_expand_माबाबा(v2)); \
+            s2 = v_add(s2, v_expand_माताअस(v2)); \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
@@ -214,11 +214,11 @@ template<> struct Sum_SIMD<T, ST> \
             auto v1 = vx_load(src + x + simd_width*2); \
             auto v2 = vx_load(src + x + simd_width*4); \
             s0 = v_add(s0, v_cvt_f64(v0)); \
-            s1 = v_add(s1, v_cvt_f64_high(v0)); \
+            s1 = v_add(s1, v_cvt_f64_माताअस(v0)); \
             s2 = v_add(s2, v_cvt_f64(v1)); \
-            s0 = v_add(s0, v_cvt_f64_high(v1)); \
+            s0 = v_add(s0, v_cvt_f64_माताअस(v1)); \
             s1 = v_add(s1, v_cvt_f64(v2)); \
-            s2 = v_add(s2, v_cvt_f64_high(v2)); \
+            s2 = v_add(s2, v_cvt_f64_माताअस(v2)); \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \

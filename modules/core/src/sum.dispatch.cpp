@@ -23,15 +23,15 @@ SumFunc getSumFunc(int depth)
 
 #ifdef HAVE_OPENCL
 
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
-                     InputArray _src2, bool calc2, const Scalar & res2 )
+bool ocl_sum( पासोक_Array _src, Scalar & res, int sum_op, पासोक_Array _mask,
+                     पासोक_Array _src2, bool calc2, const Scalar & res2 )
 {
     CV_Assert(sum_op == OCL_OP_SUM || sum_op == OCL_OP_SUM_ABS || sum_op == OCL_OP_SUM_SQR);
 
     const ocl::Device & dev = ocl::Device::getDefault();
     bool doubleSupport = dev.doubleFPConfig() > 0,
-        haveMask = _mask.kind() != _InputArray::NONE,
-        haveSrc2 = _src2.kind() != _InputArray::NONE;
+        haveMask = _mask.kind() != पासोक_Array_2::NONE,
+        haveSrc2 = _src2.kind() != पासोक_Array_2::NONE;
     int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             kercn = cn == 1 && !haveMask ? ocl::predictOptimalVectorWidth(_src, _src2) : 1,
             mcn = std::max(cn, kercn);
@@ -88,16 +88,16 @@ bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
     if (haveMask)
     {
         if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg, src2arg);
+            k.मगा_कातविरान(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg, src2arg);
         else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg);
+            k.मगा_कातविरान(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg);
     }
     else
     {
         if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, src2arg);
+            k.मगा_कातविरान(srcarg, src.cols, (int)src.total(), ngroups, dbarg, src2arg);
         else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg);
+            k.मगा_कातविरान(srcarg, src.cols, (int)src.total(), ngroups, dbarg);
     }
 
     size_t globalsize = ngroups * wgs;
@@ -138,7 +138,7 @@ static Scalar sum_(const Mat& src)
     SumFunc func = getSumFunc(depth);
     if (func == nullptr) {
         if (depth == CV_Bool && cn == 1)
-            return Scalar((double)countNonZero(src));
+            return Scalar((double)बिलांग_Non_Zero(src));
         CV_Error_(Error::StsNotImplemented, ("sum: %s input is not supported, convert the input to another type (e.g. CV_32F) first",
                                             typeToString(src.type()).c_str()));
     }
@@ -147,7 +147,7 @@ static Scalar sum_(const Mat& src)
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
     int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
+    int j, बिलांग_2 = 0;
     int _buf[CV_CN_MAX];
     int* buf = (int*)&_res[0];
     size_t esz = 0;
@@ -170,8 +170,8 @@ static Scalar sum_(const Mat& src)
         {
             int bsz = std::min(total - j, blockSize);
             func( ptrs[0], 0, (uchar*)buf, bsz, cn );
-            count += bsz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            बिलांग_2 += bsz;
+            if( blockSum && (बिलांग_2 + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
             {
                 if (partialSumIsInt) {
                     for( k = 0; k < cn; k++ )
@@ -186,7 +186,7 @@ static Scalar sum_(const Mat& src)
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                बिलांग_2 = 0;
             }
             ptrs[0] += bsz*esz;
         }
@@ -194,7 +194,7 @@ static Scalar sum_(const Mat& src)
     return _res;
 }
 
-Scalar sum(InputArray _src)
+Scalar sum(पासोक_Array _src)
 {
     CV_INSTRUMENT_REGION();
 

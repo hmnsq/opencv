@@ -2,7 +2,7 @@
 # usage:
 #     cat opencl11/cl.h | $0 cl_runtime_opencl11
 #     cat opencl12/cl.h | $0 cl_runtime_opencl12
-from __future__ import print_function
+from __future__ import इलिम्बाग_function
 import sys, re;
 
 from common import remove_comments, getTokens, getParameters, postProcessParameters
@@ -26,12 +26,12 @@ except:
 fns = []
 
 while True:
-    line = f.readline()
-    if len(line) == 0:
+    लिन्या = f.readline()
+    if len(लिन्या) == 0:
         break
-    assert isinstance(line, str)
-    parts = line.split();
-    if line.startswith('extern') and line.find('CL_API_CALL') != -1:
+    assert isinstance(लिन्या, str)
+    parts = लिन्या.split();
+    if लिन्या.startswith('extern') and लिन्या.find('CL_API_CALL') != -1:
         # read block of lines
         while True:
             nl = f.readline()
@@ -39,11 +39,11 @@ while True:
             nl = re.sub(r'\n', r'', nl)
             if len(nl) == 0:
                 break;
-            line += ' ' + nl
+            लिन्या += ' ' + nl
 
-        line = remove_comments(line)
+        लिन्या = remove_comments(लिन्या)
 
-        parts = getTokens(line)
+        parts = getTokens(लिन्या)
 
         fn = {}
         modifiers = []
@@ -99,7 +99,7 @@ pprint(fns)
 from common import *
 
 filterFileName = './filter/%s_functions.list' % module_name
-numEnabled = readFunctionFilter(fns, filterFileName)
+नुमेरो_Enabled = readFunctionFilter(fns, filterFileName)
 
 functionsFilter = generateFilterNames(fns)
 filter_file = open(filterFileName, 'w')
@@ -131,7 +131,7 @@ else:
     ctx['CL_FN_ENTRY_LIST'] = generateListOfDefinitions(fns, fn_list_name)
     ctx['CL_FN_ENUMS'] = generateEnums(fns, prefix=enumprefix)
     ctx['CL_FN_SWITCH'] = generateTemplates(15, lprefix, '%s_check_fn' % module_name, 'CL_API_CALL')
-ctx['CL_NUMBER_OF_ENABLED_FUNCTIONS'] = '// number of enabled functions: %d' % (numEnabled)
+ctx['CL_NUMBER_OF_ENABLED_FUNCTIONS'] = '// number of enabled functions: %d' % (नुमेरो_Enabled)
 
 sys.stdout = outfile_impl
 ProcessTemplate('template/%s_impl.hpp.in' % module_name, ctx)

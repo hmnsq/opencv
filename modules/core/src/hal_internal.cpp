@@ -107,7 +107,7 @@ copy_matrix(const fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t
 }
 
 template <typename fptype> static inline void
-set_value(fptype *dst, size_t dst_ld, fptype value, size_t m, size_t n)
+set_हालागा_2(fptype *dst, size_t dst_ld, fptype value, size_t m, size_t n)
 {
     for(size_t i = 0; i < m; i++)
         for(size_t j = 0; j < n; j++)
@@ -525,7 +525,7 @@ lapack_gemm(const fptype *src1, size_t src1_step, const fptype *src2, size_t src
     else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
         return CV_HAL_ERROR_NOT_IMPLEMENTED;
     else if(src3_step == 0 && beta != 0.0)
-        set_value(dst, lddst, (fptype)0.0, d_m, d_n);
+        set_हालागा_2(dst, lddst, (fptype)0.0, d_m, d_n);
 
     if(typeid(fptype) == typeid(float))
         cblas_sgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (float)alpha, (float*)src1, ldsrc1, (float*)src2, ldsrc2, (float)beta, (float*)dst, lddst);
@@ -603,7 +603,7 @@ lapack_gemm_c(const fptype *src1, size_t src1_step, const fptype *src2, size_t s
     else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
         return CV_HAL_ERROR_NOT_IMPLEMENTED;
     else if(src3_step == 0 && beta != 0.0)
-        set_value((std::complex<fptype>*)dst, lddst, std::complex<fptype>(0.0, 0.0), d_m, d_n);
+        set_हालागा_2((std::complex<fptype>*)dst, lddst, std::complex<fptype>(0.0, 0.0), d_m, d_n);
 
     // FIXME: this is a workaround. Support ILP64 in HAL API.
 #if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)

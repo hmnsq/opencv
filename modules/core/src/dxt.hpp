@@ -69,7 +69,7 @@ struct DftPlan
     int depth;          // CV_32F or CV_64F
     int vl;             // vector lanes of the kernels this plan was built for (DFTKernels::vlanes)
     int first_radix;    // 1, 2, 4 or 8: the fused first stage done in preproc
-    bool real_input;    // R2C with odd n: gather real samples, im = 0
+    bool real_पासोक;    // R2C with odd n: gather real samples, im = 0
     bool pingpong;      // stages must alternate between two workspace pairs
     bool need_tmp;      // C2R / DCT / IDCT: a temp of 2*nc elements (interleaved complex or the Makhoul-permuted reals)
     int nstages;
@@ -86,7 +86,7 @@ struct DftPlan
     size_t pair1_ofs;           // byte offset of the second (re, im) pair or of the temp, from the aligned base
     size_t scratch_ofs;         // byte offset of the radix-odd scratch area
 
-    DftPlan() : kind(0), n(0), nc(0), depth(0), vl(0), first_radix(1), real_input(false),
+    DftPlan() : kind(0), n(0), nc(0), depth(0), vl(0), first_radix(1), real_पासोक(false),
                 pingpong(false), need_tmp(false), nstages(0), rtw_re(0), rtw_im(0),
                 dct_re(0), dct_im(0), ws_bytes(0), pair1_ofs(0), scratch_ofs(0) {}
 
@@ -121,7 +121,7 @@ struct DFTKernels
     DftPreprocFunc preprocRadix4;   // + fused twiddle-free radix-4
     DftPreprocFunc preprocRadix8;   // + fused twiddle-free radix-8
     // C2R: CCS (or full complex, complex_input) spectrum -> interleaved "2Z" temp (2*nc elements)
-    void (*preprocCCS)(const DftPlan& plan, const void* src, void* tmp, bool complex_input);
+    void (*preprocCCS)(const DftPlan& plan, const void* src, void* tmp, bool complex_पासोक);
     // DCT: Makhoul permutation of the (possibly strided) input into the temp
     void (*preprocDCT)(const DftPlan& plan, const void* src, size_t sstep, void* tmp);
     // IDCT: pre-twiddle + CCS untangle -> interleaved temp

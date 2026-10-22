@@ -71,7 +71,7 @@ void check_failed_auto_(const T& v1, const T& v2, const CheckContext& ctx)
         ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
     }
     ss  << "    '" << ctx.p2_str << "' is " << v2;
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.लिन्या);
 }
 void check_failed_MatDepth(const int v1, const int v2, const CheckContext& ctx)
 {
@@ -83,7 +83,7 @@ void check_failed_MatDepth(const int v1, const int v2, const CheckContext& ctx)
         ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
     }
     ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << depthToString(v2) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.लिन्या);
 }
 void check_failed_MatType(const int v1, const int v2, const CheckContext& ctx)
 {
@@ -95,7 +95,7 @@ void check_failed_MatType(const int v1, const int v2, const CheckContext& ctx)
         ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
     }
     ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << typeToString(v2) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.लिन्या);
 }
 void check_failed_MatChannels(const int v1, const int v2, const CheckContext& ctx)
 {
@@ -135,7 +135,7 @@ void check_failed_auto_(const T& v, const CheckContext& ctx)
         << "    '" << ctx.p2_str << "'" << std::endl
         << "where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v;
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.लिन्या);
 }
 void check_failed_MatDepth(const int v, const CheckContext& ctx)
 {
@@ -144,7 +144,7 @@ void check_failed_MatDepth(const int v, const CheckContext& ctx)
         << "    '" << ctx.p2_str << "'" << std::endl
         << "where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v << " (" << depthToString(v) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.लिन्या);
 }
 void check_failed_MatType(const int v, const CheckContext& ctx)
 {
@@ -153,7 +153,7 @@ void check_failed_MatType(const int v, const CheckContext& ctx)
         << "    '" << ctx.p2_str << "'" << std::endl
         << "where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v << " (" << typeToString(v) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.लिन्या);
 }
 void check_failed_MatChannels(const int v, const CheckContext& ctx)
 {
@@ -162,7 +162,7 @@ void check_failed_MatChannels(const int v, const CheckContext& ctx)
         << "    '" << ctx.p2_str << "'" << std::endl
         << "where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v;
-    cv::error(cv::Error::BadNumChannels, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::Bad_नुमेरो_Channels, ss.str(), ctx.func, ctx.file, ctx.लिन्या);
 }
 void check_failed_true(const bool v, const CheckContext& ctx)
 {
@@ -170,7 +170,7 @@ void check_failed_true(const bool v, const CheckContext& ctx)
     std::stringstream ss;
     ss  << ctx.message << ":" << std::endl
         << "    '" << ctx.p1_str << "' must be 'true'";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.लिन्या);
 }
 void check_failed_false(const bool v, const CheckContext& ctx)
 {
@@ -178,7 +178,7 @@ void check_failed_false(const bool v, const CheckContext& ctx)
     std::stringstream ss;
     ss  << ctx.message << ":" << std::endl
         << "    '" << ctx.p1_str << "' must be 'false'";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.लिन्या);
 }
 void check_failed_auto(const int v, const CheckContext& ctx)
 {

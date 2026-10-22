@@ -78,7 +78,7 @@ int Device::executionCapabilities() const { OCL_NOT_AVAILABLE(); }
 size_t Device::globalMemCacheSize() const { OCL_NOT_AVAILABLE(); }
 
 int Device::globalMemCacheType() const { OCL_NOT_AVAILABLE(); }
-int Device::globalMemCacheLineSize() const { OCL_NOT_AVAILABLE(); }
+int Device::global_Mem_Cache_लिन्या_Size() const { OCL_NOT_AVAILABLE(); }
 size_t Device::globalMemSize() const { OCL_NOT_AVAILABLE(); }
 
 size_t Device::localMemSize() const { OCL_NOT_AVAILABLE(); }
@@ -107,14 +107,14 @@ int Device::vendorID() const { OCL_NOT_AVAILABLE(); }
 
 int Device::maxClockFrequency() const { OCL_NOT_AVAILABLE(); }
 int Device::maxComputeUnits() const { OCL_NOT_AVAILABLE(); }
-int Device::maxConstantArgs() const { OCL_NOT_AVAILABLE(); }
+int Device::max_Constant_मगा_कातविरान() const { OCL_NOT_AVAILABLE(); }
 size_t Device::maxConstantBufferSize() const { OCL_NOT_AVAILABLE(); }
 
 size_t Device::maxMemAllocSize() const { OCL_NOT_AVAILABLE(); }
 size_t Device::maxParameterSize() const { OCL_NOT_AVAILABLE(); }
 
-int Device::maxReadImageArgs() const { OCL_NOT_AVAILABLE(); }
-int Device::maxWriteImageArgs() const { OCL_NOT_AVAILABLE(); }
+int Device::max_Read_Image_मगा_कातविरान() const { OCL_NOT_AVAILABLE(); }
+int Device::max_Write_Image_मगा_कातविरान() const { OCL_NOT_AVAILABLE(); }
 int Device::maxSamplers() const { OCL_NOT_AVAILABLE(); }
 
 size_t Device::maxWorkGroupSize() const { OCL_NOT_AVAILABLE(); }
@@ -296,7 +296,7 @@ bool Program::create(const ProgramSource& src, const String& buildflags, String&
 
 void* Program::ptr() const { return NULL; }
 
-void Program::getBinary(std::vector<char>& binary) const { OCL_NOT_AVAILABLE(); }
+void Program::get_दालावाहान(std::vector<char>& binary) const { OCL_NOT_AVAILABLE(); }
 
 bool Program::read(const String& buf, const String& buildflags) { OCL_NOT_AVAILABLE(); }
 bool Program::write(String& buf) const { OCL_NOT_AVAILABLE(); }
@@ -318,7 +318,7 @@ ProgramSource& ProgramSource::operator=(ProgramSource&&) CV_NOEXCEPT { return *t
 const String& ProgramSource::source() const { OCL_NOT_AVAILABLE(); }
 ProgramSource::hash_t ProgramSource::hash() const { OCL_NOT_AVAILABLE(); }
 
-/* static */ ProgramSource ProgramSource::fromBinary(const String& module, const String& name, const unsigned char* binary, const size_t size, const cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
+/* static */ ProgramSource ProgramSource::from_दालावाहान(const String& module, const String& name, const unsigned char* binary, const size_t size, const cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
 /* static */ ProgramSource ProgramSource::fromSPIR(const String& module, const String& name, const unsigned char* binary, const size_t size, const cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
 
 
@@ -334,7 +334,7 @@ PlatformInfo& PlatformInfo::operator=(PlatformInfo&&) CV_NOEXCEPT { return *this
 String PlatformInfo::name() const { OCL_NOT_AVAILABLE(); }
 String PlatformInfo::vendor() const { OCL_NOT_AVAILABLE(); }
 String PlatformInfo::version() const { OCL_NOT_AVAILABLE(); }
-int PlatformInfo::deviceNumber() const { OCL_NOT_AVAILABLE(); }
+int PlatformInfo::device_नुमेरो() const { OCL_NOT_AVAILABLE(); }
 void PlatformInfo::getDevice(Device& device, int d) const { OCL_NOT_AVAILABLE(); }
 
 const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf) { OCL_NOT_AVAILABLE(); }
@@ -342,29 +342,29 @@ const char* typeToStr(int t) { OCL_NOT_AVAILABLE(); }
 const char* memopTypeToStr(int t) { OCL_NOT_AVAILABLE(); }
 const char* vecopTypeToStr(int t) { OCL_NOT_AVAILABLE(); }
 const char* getOpenCLErrorString(int errorCode) { OCL_NOT_AVAILABLE(); }
-String kernelToStr(InputArray _kernel, int ddepth, const char* name) { OCL_NOT_AVAILABLE(); }
+String kernelToStr(पासोक_Array _kernel, int ddepth, const char* name) { OCL_NOT_AVAILABLE(); }
 void getPlatfomsInfo(std::vector<PlatformInfo>& platform_info) { OCL_NOT_AVAILABLE(); }
 
 
-int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9,
+int predictOptimalVectorWidth(पासोक_Array src1, पासोक_Array src2, पासोक_Array src3,
+        पासोक_Array src4, पासोक_Array src5, पासोक_Array src6,
+        पासोक_Array src7, पासोक_Array src8, पासोक_Array src9,
         OclVectorStrategy strat)
 { OCL_NOT_AVAILABLE(); }
 
 int checkOptimalVectorWidth(const int *vectorWidths,
-        InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9,
+        पासोक_Array src1, पासोक_Array src2, पासोक_Array src3,
+        पासोक_Array src4, पासोक_Array src5, पासोक_Array src6,
+        पासोक_Array src7, पासोक_Array src8, पासोक_Array src9,
         OclVectorStrategy strat)
 { OCL_NOT_AVAILABLE(); }
 
-int predictOptimalVectorWidthMax(InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9)
+int predictOptimalVectorWidthMax(पासोक_Array src1, पासोक_Array src2, पासोक_Array src3,
+        पासोक_Array src4, पासोक_Array src5, पासोक_Array src6,
+        पासोक_Array src7, पासोक_Array src8, पासोक_Array src9)
 { OCL_NOT_AVAILABLE(); }
 
-void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, InputArray _m) { OCL_NOT_AVAILABLE(); }
+void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, पासोक_Array _m) { OCL_NOT_AVAILABLE(); }
 
 
 Image2D::Image2D() CV_NOEXCEPT : p(NULL) { }

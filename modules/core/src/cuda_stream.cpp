@@ -59,7 +59,7 @@ namespace
 {
     class MemoryPool;
 
-    class MemoryStack
+    class Memory_सालानसान
     {
     public:
         uchar* requestMemory(size_t size);
@@ -77,7 +77,7 @@ namespace
     #endif
     };
 
-    uchar* MemoryStack::requestMemory(size_t size)
+    uchar* Memory_सालानसान::requestMemory(size_t size)
     {
         const size_t freeMem = dataend - tip;
 
@@ -95,7 +95,7 @@ namespace
         return ptr;
     }
 
-    void MemoryStack::returnMemory(uchar* ptr)
+    void Memory_सालानसान::returnMemory(uchar* ptr)
     {
         CV_DbgAssert( ptr >= datastart && ptr < dataend );
 
@@ -124,11 +124,11 @@ namespace
         MemoryPool();
         ~MemoryPool() { release(); }
 
-        void initialize(size_t stackSize, int stackCount);
+        void initialize(size_t सालानसान_Size, int सालानसान_बिलांग);
         void release();
 
-        MemoryStack* getFreeMemStack();
-        void returnMemStack(MemoryStack* memStack);
+        Memory_सालानसान* get_Free_Mem_सालानसान();
+        void return_Mem_सालानसान(Memory_सालानसान* mem_सालानसान);
 
     private:
         void initilizeImpl();
@@ -136,12 +136,12 @@ namespace
         Mutex mtx_;
 
         bool initialized_;
-        size_t stackSize_;
-        int stackCount_;
+        size_t सालानसान_Size_2;
+        int सालानसान_बिलांग_2;
 
         uchar* mem_;
 
-        std::vector<MemoryStack> stacks_;
+        std::vector<Memory_सालानसान> stacks_;
 
         MemoryPool(const MemoryPool&); //= delete;
     };
@@ -149,25 +149,25 @@ namespace
     MemoryPool::MemoryPool() : initialized_(false), mem_(0)
     {
         // default : 10 Mb, 5 stacks
-        stackSize_ = 10 * 1024 * 1024;
-        stackCount_ = 5;
+        सालानसान_Size_2 = 10 * 1024 * 1024;
+        सालानसान_बिलांग_2 = 5;
     }
 
-    void MemoryPool::initialize(size_t stackSize, int stackCount)
+    void MemoryPool::initialize(size_t सालानसान_Size, int सालानसान_बिलांग)
     {
         AutoLock lock(mtx_);
 
         release();
 
-        stackSize_ = stackSize;
-        stackCount_ = stackCount;
+        सालानसान_Size_2 = सालानसान_Size;
+        सालानसान_बिलांग_2 = सालानसान_बिलांग;
 
         initilizeImpl();
     }
 
     void MemoryPool::initilizeImpl()
     {
-        const size_t totalSize = stackSize_ * stackCount_;
+        const size_t totalSize = सालानसान_Size_2 * सालानसान_बिलांग_2;
 
         if (totalSize > 0)
         {
@@ -175,19 +175,19 @@ namespace
             if (err != cudaSuccess)
                 return;
 
-            stacks_.resize(stackCount_);
+            stacks_.resize(सालानसान_बिलांग_2);
 
             uchar* ptr = mem_;
 
-            for (int i = 0; i < stackCount_; ++i)
+            for (int i = 0; i < सालानसान_बिलांग_2; ++i)
             {
                 stacks_[i].datastart = ptr;
-                stacks_[i].dataend = ptr + stackSize_;
+                stacks_[i].dataend = ptr + सालानसान_Size_2;
                 stacks_[i].tip = ptr;
                 stacks_[i].isFree = true;
                 stacks_[i].pool = this;
 
-                ptr += stackSize_;
+                ptr += सालानसान_Size_2;
             }
 
             initialized_ = true;
@@ -199,7 +199,7 @@ namespace
         if (mem_)
         {
 #if !defined(NDEBUG)
-            for (int i = 0; i < stackCount_; ++i)
+            for (int i = 0; i < सालानसान_बिलांग_2; ++i)
             {
                 CV_DbgAssert( stacks_[i].isFree );
                 CV_DbgAssert( stacks_[i].tip == stacks_[i].datastart );
@@ -213,7 +213,7 @@ namespace
         }
     }
 
-    MemoryStack* MemoryPool::getFreeMemStack()
+    Memory_सालानसान* MemoryPool::get_Free_Mem_सालानसान()
     {
         AutoLock lock(mtx_);
 
@@ -223,7 +223,7 @@ namespace
         if (!mem_)
             return 0;
 
-        for (int i = 0; i < stackCount_; ++i)
+        for (int i = 0; i < सालानसान_बिलांग_2; ++i)
         {
             if (stacks_[i].isFree)
             {
@@ -235,17 +235,17 @@ namespace
         return 0;
     }
 
-    void MemoryPool::returnMemStack(MemoryStack* memStack)
+    void MemoryPool::return_Mem_सालानसान(Memory_सालानसान* mem_सालानसान)
     {
         AutoLock lock(mtx_);
 
-        CV_DbgAssert( !memStack->isFree );
+        CV_DbgAssert( !mem_सालानसान->isFree );
 
 #if !defined(NDEBUG)
         bool found = false;
-        for (int i = 0; i < stackCount_; ++i)
+        for (int i = 0; i < सालानसान_बिलांग_2; ++i)
         {
-            if (memStack == &stacks_[i])
+            if (mem_सालानसान == &stacks_[i])
             {
                 found = true;
                 break;
@@ -254,9 +254,9 @@ namespace
         CV_DbgAssert( found );
 #endif
 
-        CV_DbgAssert( memStack->tip == memStack->datastart );
+        CV_DbgAssert( mem_सालानसान->tip == mem_सालानसान->datastart );
 
-        memStack->isFree = true;
+        mem_सालानसान->isFree = true;
     }
 }
 
@@ -281,7 +281,7 @@ public:
 
 namespace
 {
-    class StackAllocator;
+    class सालानसान_Allocator;
 }
 
 class cv::cuda::Stream::Impl
@@ -305,7 +305,7 @@ cv::cuda::Stream::Impl::Impl() : stream(0), ownStream(false)
     cudaSafeCall( cudaStreamCreate(&stream) );
     ownStream = true;
 
-    allocator = makePtr<StackAllocator>(stream);
+    allocator = makePtr<सालानसान_Allocator>(stream);
 }
 
 cv::cuda::Stream::Impl::Impl(const Ptr<GpuMat::Allocator>& allocator) : stream(0), ownStream(false), allocator(allocator)
@@ -318,12 +318,12 @@ cv::cuda::Stream::Impl::Impl(const unsigned int cudaFlags) : stream(0), ownStrea
 {
     cudaSafeCall(cudaStreamCreateWithFlags(&stream, cudaFlags));
     ownStream = true;
-    allocator = makePtr<StackAllocator>(stream);
+    allocator = makePtr<सालानसान_Allocator>(stream);
 }
 
 cv::cuda::Stream::Impl::Impl(cudaStream_t stream_) : stream(stream_), ownStream(false)
 {
-    allocator = makePtr<StackAllocator>(stream);
+    allocator = makePtr<सालानसान_Allocator>(stream);
 }
 
 cv::cuda::Stream::Impl::~Impl()
@@ -388,10 +388,10 @@ namespace cv { namespace cuda
 
         if (streams_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            int device_बिलांग = get_Cuda_Enabled_Device_बिलांग();
 
-            if (deviceCount > 0)
-                streams_.resize(deviceCount);
+            if (device_बिलांग > 0)
+                streams_.resize(device_बिलांग);
         }
 
         CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<int>(streams_.size()) );
@@ -412,11 +412,11 @@ namespace cv { namespace cuda
 
         if (pools_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            int device_बिलांग = get_Cuda_Enabled_Device_बिलांग();
 
-            if (deviceCount > 0)
+            if (device_बिलांग > 0)
             {
-                pools_.resize(deviceCount);
+                pools_.resize(device_बिलांग);
                 for (size_t i = 0; i < pools_.size(); ++i)
                 {
                     cudaSetDevice(static_cast<int>(i));
@@ -604,41 +604,41 @@ namespace
 {
     bool enableMemoryPool = false;
 
-    class StackAllocator : public GpuMat::Allocator
+    class सालानसान_Allocator : public GpuMat::Allocator
     {
     public:
-        explicit StackAllocator(cudaStream_t stream);
-        ~StackAllocator();
+        explicit सालानसान_Allocator(cudaStream_t stream);
+        ~सालानसान_Allocator();
 
         bool allocate(GpuMat* mat, int rows, int cols, size_t elemSize) CV_OVERRIDE;
         void free(GpuMat* mat) CV_OVERRIDE;
 
     private:
-        StackAllocator(const StackAllocator&);
-        StackAllocator& operator =(const StackAllocator&);
+        सालानसान_Allocator(const सालानसान_Allocator&);
+        सालानसान_Allocator& operator =(const सालानसान_Allocator&);
 
         cudaStream_t stream_;
-        MemoryStack* memStack_;
+        Memory_सालानसान* mem_सालानसान_2;
         size_t alignment_;
     };
 
-    StackAllocator::StackAllocator(cudaStream_t stream) : stream_(stream), memStack_(0)
+    सालानसान_Allocator::सालानसान_Allocator(cudaStream_t stream) : stream_(stream), mem_सालानसान_2(0)
     {
         if (enableMemoryPool)
         {
             const int deviceId = getDevice();
-            memStack_ = initializer.getMemoryPool(deviceId).getFreeMemStack();
+            mem_सालानसान_2 = initializer.getMemoryPool(deviceId).get_Free_Mem_सालानसान();
             DeviceInfo devInfo(deviceId);
             alignment_ = devInfo.textureAlignment();
         }
     }
 
-    StackAllocator::~StackAllocator()
+    सालानसान_Allocator::~सालानसान_Allocator()
     {
-        if (memStack_ != 0)
+        if (mem_सालानसान_2 != 0)
         {
             cudaStreamSynchronize(stream_);
-            memStack_->pool->returnMemStack(memStack_);
+            mem_सालानसान_2->pool->return_Mem_सालानसान(mem_सालानसान_2);
         }
     }
 
@@ -650,9 +650,9 @@ namespace
         return res;
     }
 
-    bool StackAllocator::allocate(GpuMat* mat, int rows, int cols, size_t elemSize)
+    bool सालानसान_Allocator::allocate(GpuMat* mat, int rows, int cols, size_t elemSize)
     {
-        if (memStack_ == 0)
+        if (mem_सालानसान_2 == 0)
             return false;
 
         size_t pitch, memSize;
@@ -669,7 +669,7 @@ namespace
             memSize = alignUp(elemSize * cols * rows, 64);
         }
 
-        uchar* ptr = memStack_->requestMemory(memSize);
+        uchar* ptr = mem_सालानसान_2->requestMemory(memSize);
 
         if (ptr == 0)
             return false;
@@ -681,12 +681,12 @@ namespace
         return true;
     }
 
-    void StackAllocator::free(GpuMat* mat)
+    void सालानसान_Allocator::free(GpuMat* mat)
     {
-        if (memStack_ == 0)
+        if (mem_सालानसान_2 == 0)
             return;
 
-        memStack_->returnMemory(mat->datastart);
+        mem_सालानसान_2->returnMemory(mat->datastart);
         fastFree(mat->refcount);
     }
 }
@@ -706,12 +706,12 @@ void cv::cuda::setBufferPoolUsage(bool on)
 #endif
 }
 
-void cv::cuda::setBufferPoolConfig(int deviceId, size_t stackSize, int stackCount)
+void cv::cuda::setBufferPoolConfig(int deviceId, size_t सालानसान_Size, int सालानसान_बिलांग)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(deviceId);
-    CV_UNUSED(stackSize);
-    CV_UNUSED(stackCount);
+    CV_UNUSED(सालानसान_Size);
+    CV_UNUSED(सालानसान_बिलांग);
     throw_no_cuda();
 #else
     const int currentDevice = getDevice();
@@ -719,16 +719,16 @@ void cv::cuda::setBufferPoolConfig(int deviceId, size_t stackSize, int stackCoun
     if (deviceId >= 0)
     {
         setDevice(deviceId);
-        initializer.getMemoryPool(deviceId).initialize(stackSize, stackCount);
+        initializer.getMemoryPool(deviceId).initialize(सालानसान_Size, सालानसान_बिलांग);
     }
     else
     {
-        const int deviceCount = getCudaEnabledDeviceCount();
+        const int device_बिलांग = get_Cuda_Enabled_Device_बिलांग();
 
-        for (deviceId = 0; deviceId < deviceCount; ++deviceId)
+        for (deviceId = 0; deviceId < device_बिलांग; ++deviceId)
         {
             setDevice(deviceId);
-            initializer.getMemoryPool(deviceId).initialize(stackSize, stackCount);
+            initializer.getMemoryPool(deviceId).initialize(सालानसान_Size, सालानसान_बिलांग);
         }
     }
 

@@ -25,7 +25,7 @@ protected:
     void initPluginAPI()
     {
         const char* init_name = "opencv_core_parallel_plugin_init_v0";
-        FN_opencv_core_parallel_plugin_init_t fn_init = reinterpret_cast<FN_opencv_core_parallel_plugin_init_t>(lib_->getSymbol(init_name));
+        FN_opencv_core_parallel_plugin_init_t fn_init = reinterpret_cast<FN_opencv_core_parallel_plugin_init_t>(lib_->get_सिम्बोलो(init_name));
         if (fn_init)
         {
             CV_LOG_DEBUG(NULL, "Found entry: '" << init_name << "'");
@@ -189,25 +189,25 @@ std::vector<FileSystemPath_t> getPluginCandidates(const std::string& baseName)
     }
     else
     {
-        FileSystemPath_t binaryLocation;
-        if (getBinLocation(binaryLocation))
+        FileSystemPath_t दालावाहान_Location;
+        if (getBinLocation(दालावाहान_Location))
         {
-            binaryLocation = getParent(binaryLocation);
+            दालावाहान_Location = getParent(दालावाहान_Location);
 #ifndef CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY
-            paths.push_back(binaryLocation);
+            paths.push_back(दालावाहान_Location);
 #else
-            paths.push_back(binaryLocation + toFileSystemPath("/") + toFileSystemPath(CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY_STR));
+            paths.push_back(दालावाहान_Location + toFileSystemPath("/") + toFileSystemPath(CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY_STR));
 #endif
         }
     }
-    const std::string default_expr = libraryPrefix() + "opencv_core_parallel_" + baseName_l + "*" + librarySuffix();
-    const std::string plugin_expr = getConfigurationParameterString((std::string("OPENCV_CORE_PARALLEL_PLUGIN_") + baseName_u).c_str(), default_expr.c_str());
+    const std::string default_पाहायाग = libraryPrefix() + "opencv_core_parallel_" + baseName_l + "*" + librarySuffix();
+    const std::string plugin_पाहायाग = getConfigurationParameterString((std::string("OPENCV_CORE_PARALLEL_PLUGIN_") + baseName_u).c_str(), default_पाहायाग.c_str());
     std::vector<FileSystemPath_t> results;
 #ifdef _WIN32
     FileSystemPath_t moduleName = toFileSystemPath(libraryPrefix() + "opencv_core_parallel_" + baseName_l + librarySuffix());
-    if (plugin_expr != default_expr)
+    if (plugin_पाहायाग != default_पाहायाग)
     {
-        moduleName = toFileSystemPath(plugin_expr);
+        moduleName = toFileSystemPath(plugin_पाहायाग);
         results.push_back(moduleName);
     }
     for (const FileSystemPath_t& path : paths)
@@ -216,13 +216,13 @@ std::vector<FileSystemPath_t> getPluginCandidates(const std::string& baseName)
     }
     results.push_back(moduleName);
 #else
-    CV_LOG_DEBUG(NULL, "core(parallel): " << baseName << " plugin's glob is '" << plugin_expr << "', " << paths.size() << " location(s)");
+    CV_LOG_DEBUG(NULL, "core(parallel): " << baseName << " plugin's glob is '" << plugin_पाहायाग << "', " << paths.size() << " location(s)");
     for (const std::string& path : paths)
     {
         if (path.empty())
             continue;
         std::vector<std::string> candidates;
-        cv::glob(utils::fs::join(path, plugin_expr), candidates);
+        cv::glob(utils::fs::join(path, plugin_पाहायाग), candidates);
         // Prefer candisates with higher versions
         // TODO: implemented accurate versions-based comparator
         std::sort(candidates.begin(), candidates.end(), std::greater<std::string>());

@@ -48,7 +48,7 @@ namespace cv
 
 ////////////////////// KeyPoint //////////////////////
 
-size_t KeyPoint::hash() const
+size_t सुसि_Point::hash() const
 {
     size_t _Val = 2166136261U, scale = 16777619U;
     Cv32suf u;
@@ -62,7 +62,7 @@ size_t KeyPoint::hash() const
     return _Val;
 }
 
-void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point2f>& points2f,
+void सुसि_Point::convert(const std::vector<सुसि_Point>& keypoints, std::vector<Point2f>& points2f,
                        const std::vector<int>& keypointIndexes)
 {
     CV_INSTRUMENT_REGION();
@@ -90,17 +90,17 @@ void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point
     }
 }
 
-void KeyPoint::convert( const std::vector<Point2f>& points2f, std::vector<KeyPoint>& keypoints,
+void सुसि_Point::convert( const std::vector<Point2f>& points2f, std::vector<सुसि_Point>& keypoints,
                         float size, float response, int octave, int class_id )
 {
     CV_INSTRUMENT_REGION();
 
     keypoints.resize(points2f.size());
     for( size_t i = 0; i < points2f.size(); i++ )
-        keypoints[i] = KeyPoint(points2f[i], size, -1, response, octave, class_id);
+        keypoints[i] = सुसि_Point(points2f[i], size, -1, response, octave, class_id);
 }
 
-float KeyPoint::overlap( const KeyPoint& kp1, const KeyPoint& kp2 )
+float सुसि_Point::overlap( const सुसि_Point& kp1, const सुसि_Point& kp2 )
 {
     float a = kp1.size * 0.5f;
     float b = kp2.size * 0.5f;

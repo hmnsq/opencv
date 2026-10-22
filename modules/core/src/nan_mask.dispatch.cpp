@@ -12,7 +12,7 @@ namespace cv {
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_patchNaNs( InputOutputArray _a, double value )
+static bool ocl_patchNaNs( पासोक_Output_Array _a, double value )
 {
     int ftype = _a.depth();
 
@@ -37,11 +37,11 @@ static bool ocl_patchNaNs( InputOutputArray _a, double value )
     // to pass float or double to args
     if (ftype == CV_32F)
     {
-        k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), (float)value);
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), (float)value);
     }
     else // CV_64F
     {
-        k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), value);
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), value);
     }
 
     size_t globalsize[2] = { (size_t)a.cols * cn, ((size_t)a.rows + rowsPerWI - 1) / rowsPerWI };
@@ -56,7 +56,7 @@ static PatchNanFunc getPatchNanFunc(bool isDouble)
     CV_CPU_DISPATCH(getPatchNanFunc, (isDouble), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void patchNaNs( InputOutputArray _a, double _val )
+void patchNaNs( पासोक_Output_Array _a, double _val )
 {
     CV_INSTRUMENT_REGION();
     CV_Assert( _a.depth() == CV_32F || _a.depth() == CV_64F);
@@ -101,7 +101,7 @@ static bool ocl_finiteMask(const UMat img, UMat mask)
     if (k.empty())
         return false;
 
-    k.args(ocl::KernelArg::ReadOnlyNoSize(img), ocl::KernelArg::WriteOnly(mask));
+    k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(img), ocl::KernelArg::WriteOnly(mask));
 
     size_t globalsize[2] = { (size_t)img.cols, ((size_t)img.rows + rowsPerWI - 1) / rowsPerWI };
     return k.run(2, globalsize, NULL, false);
@@ -115,7 +115,7 @@ static FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn)
     CV_CPU_DISPATCH(getFiniteMaskFunc, (isDouble, cn), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void finiteMask(InputArray _src, OutputArray _mask)
+void finiteMask(पासोक_Array _src, OutputArray _mask)
 {
     CV_INSTRUMENT_REGION();
 

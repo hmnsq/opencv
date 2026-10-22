@@ -208,7 +208,7 @@ static double solveTyped(const Mat& src, bool transposed, std::vector<int>& assi
     return total;
 }
 
-double linearAssignment(InputArray _cost, std::vector<int>& assignment, double costThreshold)
+double linearAssignment(पासोक_Array _cost, std::vector<int>& assignment, double costThreshold)
 {
     CV_INSTRUMENT_REGION();
 

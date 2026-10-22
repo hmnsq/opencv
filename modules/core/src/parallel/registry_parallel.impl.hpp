@@ -96,16 +96,16 @@ protected:
         CV_LOG_INFO(NULL, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
     }
 
-    static std::vector<std::string> tokenize_string(const std::string& input, char token)
+    static std::vector<std::string> tokenize_string(const std::string& पासोक_2, char token)
     {
         std::vector<std::string> result;
         std::string::size_type prev_pos = 0, pos = 0;
-        while((pos = input.find(token, pos)) != std::string::npos)
+        while((pos = पासोक_2.find(token, pos)) != std::string::npos)
         {
-            result.push_back(input.substr(prev_pos, pos-prev_pos));
+            result.push_back(पासोक_2.substr(prev_pos, pos-prev_pos));
             prev_pos = ++pos;
         }
-        result.push_back(input.substr(prev_pos));
+        result.push_back(पासोक_2.substr(prev_pos));
         return result;
     }
     bool readPrioritySettings()

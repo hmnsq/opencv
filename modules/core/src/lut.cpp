@@ -98,7 +98,7 @@ static LUTFunc getLUTFunc(const int srcDepth, const int dstDepth)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_LUT(InputArray _src, InputArray _lut, OutputArray _dst)
+static bool ocl_LUT(पासोक_Array _src, पासोक_Array _lut, OutputArray _dst)
 {
     int lcn = _lut.channels(), dcn = _src.channels(), ddepth = _lut.depth();
 
@@ -113,7 +113,7 @@ static bool ocl_LUT(InputArray _src, InputArray _lut, OutputArray _dst)
     if (k.empty())
         return false;
 
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::ReadOnlyNoSize(lut),
+    k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::ReadOnlyNoSize(lut),
         ocl::KernelArg::WriteOnly(dst, dcn, kercn));
 
     size_t globalSize[2] = { (size_t)dst.cols * dcn / kercn, ((size_t)dst.rows + 3) / 4 };
@@ -162,7 +162,7 @@ private:
 
 } // cv::
 
-void cv::LUT( InputArray _src, InputArray _lut, OutputArray _dst )
+void cv::LUT( पासोक_Array _src, पासोक_Array _lut, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 

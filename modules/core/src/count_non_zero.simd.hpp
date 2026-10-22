@@ -6,16 +6,16 @@
 
 namespace cv {
 
-typedef int (*CountNonZeroFunc)(const void*, int);
+typedef int (*बिलांग_Non_Zero_Func)(const void*, int);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-CountNonZeroFunc getCountNonZeroTab(int depth);
+बिलांग_Non_Zero_Func get_बिलांग_Non_Zero_Tab(int depth);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
 template<typename T>
-static int countNonZero_(const T* src, int len )
+static int बिलांग_Non_Zero_2(const T* src, int len )
 {
     int nz = 0;
     for( int i = 0; i < len; i++ )
@@ -25,9 +25,9 @@ static int countNonZero_(const T* src, int len )
 
 #undef SIMD_ONLY
 #if (CV_SIMD || CV_SIMD_SCALABLE)
-#define SIMD_ONLY(expr) expr
+#define SIMD_ONLY(पाहायाग) पाहायाग
 #else
-#define SIMD_ONLY(expr)
+#define SIMD_ONLY(पाहायाग)
 #endif
 
 // AVX-512 exposes wide per-lane mask registers, so counting zero lanes with
@@ -66,8 +66,8 @@ static inline int cnz_popcount64(uint64 x)
 #endif
 }
 
-static inline int cnz_lane_pop(int m) { return cnz_popcount32((unsigned)m); }
-static inline int cnz_lane_pop(int64 m) { return cnz_popcount64((uint64)m); }
+static inline int cnz_lane_आलिसिन(int m) { return cnz_popcount32((unsigned)m); }
+static inline int cnz_lane_आलिसिन(int64 m) { return cnz_popcount64((uint64)m); }
 #endif // CV_COUNTNONZERO_AVX512
 
 // SIMD body of the countNonZero kernels. The AVX-512 variant counts zero lanes
@@ -80,12 +80,12 @@ static inline int cnz_lane_pop(int64 m) { return cnz_popcount64((uint64)m); }
     int nzeros = 0; \
     for (; i <= len - vlanes*2; i += vlanes*2) \
     { \
-        nzeros += cnz_lane_pop(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_load(src + i), v_zero)))); \
-        nzeros += cnz_lane_pop(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_load(src + i + vlanes), v_zero)))); \
+        nzeros += cnz_lane_आलिसिन(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_load(src + i), v_zero)))); \
+        nzeros += cnz_lane_आलिसिन(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_load(src + i + vlanes), v_zero)))); \
     } \
     for (; i <= len - vlanes; i += vlanes) \
     { \
-        nzeros += cnz_lane_pop(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_load(src + i), v_zero)))); \
+        nzeros += cnz_lane_आलिसिन(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_load(src + i), v_zero)))); \
     } \
     nz += i - nzeros; \
     v_cleanup();
@@ -162,41 +162,41 @@ static int funcname( const void* src_ptr, int len ) \
 
 #undef UPDATE_SUM_U8
 #define UPDATE_SUM_U8(v_sum0, v_sum1, x0) \
-    v_uint16 w0 = v_expand_low(x0); \
-    v_uint16 w1 = v_expand_high(x0); \
-    v_sum0 = v_add(v_sum0, v_expand_low(w0)); \
-    v_sum1 = v_add(v_sum1, v_expand_high(w0)); \
-    v_sum0 = v_add(v_sum0, v_expand_low(w1)); \
-    v_sum1 = v_add(v_sum1, v_expand_high(w1))
+    v_uint16 w0 = v_expand_माबाबा(x0); \
+    v_uint16 w1 = v_expand_माताअस(x0); \
+    v_sum0 = v_add(v_sum0, v_expand_माबाबा(w0)); \
+    v_sum1 = v_add(v_sum1, v_expand_माताअस(w0)); \
+    v_sum0 = v_add(v_sum0, v_expand_माबाबा(w1)); \
+    v_sum1 = v_add(v_sum1, v_expand_माताअस(w1))
 
 #undef UPDATE_SUM_U16
 #define UPDATE_SUM_U16(v_sum0, v_sum1, x0) \
-    v_sum0 = v_add(v_sum0, v_expand_low(x0)); \
-    v_sum1 = v_add(v_sum1, v_expand_high(x0))
+    v_sum0 = v_add(v_sum0, v_expand_माबाबा(x0)); \
+    v_sum1 = v_add(v_sum1, v_expand_माताअस(x0))
 
 #undef UPDATE_SUM_S32
 #define UPDATE_SUM_S32(v_sum0, v_sum1, x0) \
     v_sum0 = v_add(v_sum0, x0)
 
-DEFINE_NONZERO_FUNC(countNonZero8u, u8, u32, s8, uchar, v_uint8, v_uint32, v_eq, v_add_wrap, UPDATE_SUM_U8, CHECK_NZ_INT)
-DEFINE_NONZERO_FUNC(countNonZero16u, u16, u32, s16, ushort, v_uint16, v_uint32, v_eq, v_add_wrap, UPDATE_SUM_U16, CHECK_NZ_INT)
-DEFINE_NONZERO_FUNC(countNonZero32s, s32, s32, s32, int, v_int32, v_int32, v_eq, v_add, UPDATE_SUM_S32, CHECK_NZ_INT)
-DEFINE_NONZERO_FUNC(countNonZero32f, u32, u32, s32, uint, v_uint32, v_uint32, VEC_CMP_EQ_Z_FP, v_add, UPDATE_SUM_S32, CHECK_NZ_FP)
-DEFINE_NONZERO_FUNC(countNonZero16f, u16, u32, s16, ushort, v_uint16, v_uint32, VEC_CMP_EQ_Z_FP16, v_add_wrap, UPDATE_SUM_U16, CHECK_NZ_FP16)
+DEFINE_NONZERO_FUNC(बिलांग_Non_Zero8u, u8, u32, s8, uchar, v_uint8, v_uint32, v_eq, v_add_wrap, UPDATE_SUM_U8, CHECK_NZ_INT)
+DEFINE_NONZERO_FUNC(बिलांग_Non_Zero16u, u16, u32, s16, ushort, v_uint16, v_uint32, v_eq, v_add_wrap, UPDATE_SUM_U16, CHECK_NZ_INT)
+DEFINE_NONZERO_FUNC(बिलांग_Non_Zero32s, s32, s32, s32, int, v_int32, v_int32, v_eq, v_add, UPDATE_SUM_S32, CHECK_NZ_INT)
+DEFINE_NONZERO_FUNC(बिलांग_Non_Zero32f, u32, u32, s32, uint, v_uint32, v_uint32, VEC_CMP_EQ_Z_FP, v_add, UPDATE_SUM_S32, CHECK_NZ_FP)
+DEFINE_NONZERO_FUNC(बिलांग_Non_Zero16f, u16, u32, s16, ushort, v_uint16, v_uint32, VEC_CMP_EQ_Z_FP16, v_add_wrap, UPDATE_SUM_U16, CHECK_NZ_FP16)
 
 #undef DEFINE_NONZERO_FUNC_NOSIMD
 #define DEFINE_NONZERO_FUNC_NOSIMD(funcname, T) \
 static int funcname(const void* src, int len) \
 { \
-    return countNonZero_(static_cast<const T*>(src), len); \
+    return बिलांग_Non_Zero_2(static_cast<const T*>(src), len); \
 }
 
-DEFINE_NONZERO_FUNC_NOSIMD(countNonZero64s, int64)
+DEFINE_NONZERO_FUNC_NOSIMD(बिलांग_Non_Zero64s, int64)
 
 #if CV_COUNTNONZERO_AVX512 && (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 // 64-bit floats: FP compare against zero treats -0.0 as zero, matching the
 // scalar `src[i] != 0` path.
-static int countNonZero64f( const void* src_ptr, int len )
+static int बिलांग_Non_Zero64f( const void* src_ptr, int len )
 {
     const double* src = static_cast<const double*>(src_ptr);
     int i = 0, nz = 0;
@@ -205,11 +205,11 @@ static int countNonZero64f( const void* src_ptr, int len )
     int nzeros = 0;
     for (; i <= len - vlanes*2; i += vlanes*2)
     {
-        nzeros += cnz_lane_pop(v_signmask(v_eq(vx_load(src + i), v_zero)));
-        nzeros += cnz_lane_pop(v_signmask(v_eq(vx_load(src + i + vlanes), v_zero)));
+        nzeros += cnz_lane_आलिसिन(v_signmask(v_eq(vx_load(src + i), v_zero)));
+        nzeros += cnz_lane_आलिसिन(v_signmask(v_eq(vx_load(src + i + vlanes), v_zero)));
     }
     for (; i <= len - vlanes; i += vlanes)
-        nzeros += cnz_lane_pop(v_signmask(v_eq(vx_load(src + i), v_zero)));
+        nzeros += cnz_lane_आलिसिन(v_signmask(v_eq(vx_load(src + i), v_zero)));
     nz += i - nzeros;
     v_cleanup();
     for (; i < len; i++)
@@ -217,30 +217,30 @@ static int countNonZero64f( const void* src_ptr, int len )
     return nz;
 }
 #else
-DEFINE_NONZERO_FUNC_NOSIMD(countNonZero64f, double)
+DEFINE_NONZERO_FUNC_NOSIMD(बिलांग_Non_Zero64f, double)
 #endif
 
-CountNonZeroFunc getCountNonZeroTab(int depth)
+बिलांग_Non_Zero_Func get_बिलांग_Non_Zero_Tab(int depth)
 {
-    static CountNonZeroFunc countNonZeroTab[CV_DEPTH_MAX] =
+    static बिलांग_Non_Zero_Func बिलांग_Non_Zero_Tab[CV_DEPTH_MAX] =
     {
-        countNonZero8u,
-        countNonZero8u,
-        countNonZero16u,
-        countNonZero16u,
-        countNonZero32s,
-        countNonZero32f,
-        countNonZero64f,
-        countNonZero16f,
-        countNonZero16f, // for bf16 it's the same code as for f16
-        countNonZero8u,
-        countNonZero64s,
-        countNonZero64s,
-        countNonZero32s,
+        बिलांग_Non_Zero8u,
+        बिलांग_Non_Zero8u,
+        बिलांग_Non_Zero16u,
+        बिलांग_Non_Zero16u,
+        बिलांग_Non_Zero32s,
+        बिलांग_Non_Zero32f,
+        बिलांग_Non_Zero64f,
+        बिलांग_Non_Zero16f,
+        बिलांग_Non_Zero16f, // for bf16 it's the same code as for f16
+        बिलांग_Non_Zero8u,
+        बिलांग_Non_Zero64s,
+        बिलांग_Non_Zero64s,
+        बिलांग_Non_Zero32s,
         0
     };
 
-    return countNonZeroTab[depth];
+    return बिलांग_Non_Zero_Tab[depth];
 }
 
 #endif

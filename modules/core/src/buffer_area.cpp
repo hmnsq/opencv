@@ -17,13 +17,13 @@ namespace cv { namespace utils {
 class BufferArea::Block
 {
 private:
-    inline size_t reserve_count() const
+    inline size_t reserve_बिलांग() const
     {
         return alignment / type_size - 1;
     }
 public:
-    Block(void **ptr_, ushort type_size_, size_t count_, ushort alignment_)
-        : ptr(ptr_), raw_mem(0), count(count_), type_size(type_size_), alignment(alignment_)
+    Block(void **ptr_, ushort type_size_, size_t बिलांग, ushort alignment_)
+        : ptr(ptr_), raw_mem(0), बिलांग_2(बिलांग), type_size(type_size_), alignment(alignment_)
     {
         CV_Assert(ptr && *ptr == NULL);
     }
@@ -33,20 +33,20 @@ public:
         if (raw_mem)
             fastFree(raw_mem);
     }
-    size_t getByteCount() const
+    size_t get_Byte_बिलांग() const
     {
-        return type_size * (count + reserve_count());
+        return type_size * (बिलांग_2 + reserve_बिलांग());
     }
     void real_allocate()
     {
         CV_Assert(ptr && *ptr == NULL);
-        const size_t allocated_count = count + reserve_count();
-        raw_mem = fastMalloc(type_size * allocated_count);
+        const size_t allocated_बिलांग = बिलांग_2 + reserve_बिलांग();
+        raw_mem = fastMalloc(type_size * allocated_बिलांग);
         if (alignment != type_size)
         {
             *ptr = alignPtr(raw_mem, alignment);
             CV_Assert(reinterpret_cast<size_t>(*ptr) % alignment == 0);
-            CV_Assert(static_cast<uchar*>(*ptr) + type_size * count <= static_cast<uchar*>(raw_mem) + type_size * allocated_count);
+            CV_Assert(static_cast<uchar*>(*ptr) + type_size * बिलांग_2 <= static_cast<uchar*>(raw_mem) + type_size * allocated_बिलांग);
         }
         else
         {
@@ -60,7 +60,7 @@ public:
         buf = alignPtr(buf, alignment);
         CV_Assert(reinterpret_cast<size_t>(buf) % alignment == 0);
         *ptr = buf;
-        return static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * count);
+        return static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * बिलांग_2);
     }
 #endif
     bool operator==(void **other) const
@@ -71,12 +71,12 @@ public:
     void zeroFill() const
     {
         CV_Assert(ptr && *ptr);
-        memset(static_cast<uchar*>(*ptr), 0, count * type_size);
+        memset(static_cast<uchar*>(*ptr), 0, बिलांग_2 * type_size);
     }
 private:
     void **ptr;
     void * raw_mem;
-    size_t count;
+    size_t बिलांग_2;
     ushort type_size;
     ushort alignment;
 };
@@ -103,13 +103,13 @@ BufferArea::~BufferArea()
     release();
 }
 
-void BufferArea::allocate_(void **ptr, ushort type_size, size_t count, ushort alignment)
+void BufferArea::allocate_(void **ptr, ushort type_size, size_t बिलांग_2, ushort alignment)
 {
-    blocks.push_back(Block(ptr, type_size, count, alignment));
+    blocks.push_back(Block(ptr, type_size, बिलांग_2, alignment));
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
     if (!safe)
     {
-        totalSize += blocks.back().getByteCount();
+        totalSize += blocks.back().get_Byte_बिलांग();
     }
     else
 #endif

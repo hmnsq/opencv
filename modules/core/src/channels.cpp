@@ -208,7 +208,7 @@ static void getUMatIndex(const std::vector<UMat> & um, int cn, int & idx, int & 
     idx = cnidx = -1;
 }
 
-static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _dst,
+static bool ocl_mixChannels(पासोक_Array_Of_Arrays _src, पासोक_Output_Array_Of_Arrays _dst,
                             const int* fromTo, size_t npairs)
 {
     std::vector<UMat> src, dst;
@@ -278,7 +278,7 @@ static bool ocl_mixChannels(InputArrayOfArrays _src, InputOutputArrayOfArrays _d
 
 #endif
 
-void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
+void cv::mixChannels(पासोक_Array_Of_Arrays src, पासोक_Output_Array_Of_Arrays dst,
                  const int* fromTo, size_t npairs)
 {
     CV_INSTRUMENT_REGION();
@@ -289,14 +289,14 @@ void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
     CV_OCL_RUN(dst.isUMatVector(),
                ocl_mixChannels(src, dst, fromTo, npairs))
 
-    bool src_is_mat = src.kind() != _InputArray::STD_VECTOR_MAT &&
-            src.kind() != _InputArray::STD_ARRAY_MAT &&
-            src.kind() != _InputArray::STD_VECTOR_VECTOR &&
-            src.kind() != _InputArray::STD_VECTOR_UMAT;
-    bool dst_is_mat = dst.kind() != _InputArray::STD_VECTOR_MAT &&
-            dst.kind() != _InputArray::STD_ARRAY_MAT &&
-            dst.kind() != _InputArray::STD_VECTOR_VECTOR &&
-            dst.kind() != _InputArray::STD_VECTOR_UMAT;
+    bool src_is_mat = src.kind() != पासोक_Array_2::STD_VECTOR_MAT &&
+            src.kind() != पासोक_Array_2::STD_ARRAY_MAT &&
+            src.kind() != पासोक_Array_2::STD_VECTOR_VECTOR &&
+            src.kind() != पासोक_Array_2::STD_VECTOR_UMAT;
+    bool dst_is_mat = dst.kind() != पासोक_Array_2::STD_VECTOR_MAT &&
+            dst.kind() != पासोक_Array_2::STD_ARRAY_MAT &&
+            dst.kind() != पासोक_Array_2::STD_VECTOR_VECTOR &&
+            dst.kind() != पासोक_Array_2::STD_VECTOR_UMAT;
     int i;
     int nsrc = src_is_mat ? 1 : (int)src.total();
     int ndst = dst_is_mat ? 1 : (int)dst.total();
@@ -311,7 +311,7 @@ void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
     mixChannels(&buf[0], nsrc, &buf[nsrc], ndst, fromTo, npairs);
 }
 
-void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
+void cv::mixChannels(पासोक_Array_Of_Arrays src, पासोक_Output_Array_Of_Arrays dst,
                      const std::vector<int>& fromTo)
 {
     CV_INSTRUMENT_REGION();
@@ -322,14 +322,14 @@ void cv::mixChannels(InputArrayOfArrays src, InputOutputArrayOfArrays dst,
     CV_OCL_RUN(dst.isUMatVector(),
                ocl_mixChannels(src, dst, &fromTo[0], fromTo.size()>>1))
 
-    bool src_is_mat = src.kind() != _InputArray::STD_VECTOR_MAT &&
-            src.kind() != _InputArray::STD_ARRAY_MAT &&
-            src.kind() != _InputArray::STD_VECTOR_VECTOR &&
-            src.kind() != _InputArray::STD_VECTOR_UMAT;
-    bool dst_is_mat = dst.kind() != _InputArray::STD_VECTOR_MAT &&
-            dst.kind() != _InputArray::STD_ARRAY_MAT &&
-            dst.kind() != _InputArray::STD_VECTOR_VECTOR &&
-            dst.kind() != _InputArray::STD_VECTOR_UMAT;
+    bool src_is_mat = src.kind() != पासोक_Array_2::STD_VECTOR_MAT &&
+            src.kind() != पासोक_Array_2::STD_ARRAY_MAT &&
+            src.kind() != पासोक_Array_2::STD_VECTOR_VECTOR &&
+            src.kind() != पासोक_Array_2::STD_VECTOR_UMAT;
+    bool dst_is_mat = dst.kind() != पासोक_Array_2::STD_VECTOR_MAT &&
+            dst.kind() != पासोक_Array_2::STD_ARRAY_MAT &&
+            dst.kind() != पासोक_Array_2::STD_VECTOR_VECTOR &&
+            dst.kind() != पासोक_Array_2::STD_VECTOR_UMAT;
     int i;
     int nsrc = src_is_mat ? 1 : (int)src.total();
     int ndst = dst_is_mat ? 1 : (int)dst.total();
@@ -386,7 +386,7 @@ static bool ipp_extractChannel(const Mat &src, Mat &dst, int channel)
 #endif
 }
 
-static bool ipp_insertChannel(const Mat &src, Mat &dst, int channel)
+static bool ipp_इसिंगित_Channel(const Mat &src, Mat &dst, int channel)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
@@ -426,7 +426,7 @@ static bool ipp_insertChannel(const Mat &src, Mat &dst, int channel)
 }
 #endif
 
-void cv::extractChannel(InputArray _src, OutputArray _dst, int coi)
+void cv::extractChannel(पासोक_Array _src, OutputArray _dst, int coi)
 {
     CV_INSTRUMENT_REGION();
 
@@ -457,7 +457,7 @@ void cv::extractChannel(InputArray _src, OutputArray _dst, int coi)
     mixChannels(&src, 1, &dst, 1, ch, 1);
 }
 
-void cv::insertChannel(InputArray _src, InputOutputArray _dst, int coi)
+void cv::इसिंगित_Channel(पासोक_Array _src, पासोक_Output_Array _dst, int coi)
 {
     CV_INSTRUMENT_REGION();
 
@@ -478,7 +478,7 @@ void cv::insertChannel(InputArray _src, InputOutputArray _dst, int coi)
 
     Mat src = _src.getMat(), dst = _dst.getMat();
 
-    CV_IPP_RUN_FAST(ipp_insertChannel(src, dst, coi))
+    CV_IPP_RUN_FAST(ipp_इसिंगित_Channel(src, dst, coi))
 
     mixChannels(&src, 1, &dst, 1, ch, 1);
 }

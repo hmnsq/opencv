@@ -48,7 +48,7 @@ static Scalar mean_(const Mat& src, const Mat& mask)
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
     int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
+    int j, बिलांग_2 = 0;
     int _buf[CV_CN_MAX];
     int* buf = (int*)&s[0];
     bool partialSumIsInt = depth < CV_32S;
@@ -71,9 +71,9 @@ static Scalar mean_(const Mat& src, const Mat& mask)
         {
             int bsz = std::min(total - j, blockSize);
             int nz = func( ptrs[0], ptrs[1], (uchar*)buf, bsz, cn );
-            count += nz;
+            बिलांग_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            if( blockSum && (बिलांग_2 + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
             {
                 if (partialSumIsInt) {
                     for( k = 0; k < cn; k++ )
@@ -88,7 +88,7 @@ static Scalar mean_(const Mat& src, const Mat& mask)
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                बिलांग_2 = 0;
             }
             ptrs[0] += bsz*esz;
             if( ptrs[1] )
@@ -99,12 +99,12 @@ static Scalar mean_(const Mat& src, const Mat& mask)
 }
 
 // number of elements a piece contributes to the mean
-static double statCount(const StatChunk& c)
+static double stat_बिलांग(const StatChunk& c)
 {
-    return c.mask.empty() ? (double)c.src.total() : (double)countNonZero(c.mask);
+    return c.mask.empty() ? (double)c.src.total() : (double)बिलांग_Non_Zero(c.mask);
 }
 
-Scalar mean(InputArray _src, InputArray _mask)
+Scalar mean(पासोक_Array _src, पासोक_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -123,7 +123,7 @@ Scalar mean(InputArray _src, InputArray _mask)
         for (int i = r.start; i < r.end; i++)
         {
             part[i] = mean_(chunks[i].src, chunks[i].mask);
-            cnt[i] = statCount(chunks[i]);
+            cnt[i] = stat_बिलांग(chunks[i]);
         }
     });
     Scalar s = Scalar::all(0.0);
@@ -144,11 +144,11 @@ static SumSqrFunc getSumSqrFunc(int depth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_meanStdDev( InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask )
+static bool ocl_meanStdDev( पासोक_Array _src, OutputArray _mean, OutputArray _sdv, पासोक_Array _mask )
 {
     CV_INSTRUMENT_REGION_OPENCL();
 
-    bool haveMask = _mask.kind() != _InputArray::NONE;
+    bool haveMask = _mask.kind() != पासोक_Array_2::NONE;
     int nz = haveMask ? -1 : (int)_src.total();
     Scalar mean(0), stddev(0);
     const int cn = _src.channels();
@@ -209,9 +209,9 @@ static bool ocl_meanStdDev( InputArray _src, OutputArray _mean, OutputArray _sdv
                 maskarg = ocl::KernelArg::ReadOnlyNoSize(mask);
 
         if (haveMask)
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg, maskarg);
+            k.मगा_कातविरान(srcarg, src.cols, (int)src.total(), groups, dbarg, maskarg);
         else
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg);
+            k.मगा_कातविरान(srcarg, src.cols, (int)src.total(), groups, dbarg);
 
         size_t globalsize = groups * wgs;
 
@@ -264,7 +264,7 @@ static bool ocl_meanStdDev( InputArray _src, OutputArray _mean, OutputArray _sdv
 #endif
 
 // serial implementation, also used for the pieces of the parallel version
-static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+static void meanStdDev_(पासोक_Array _src, OutputArray _mean, OutputArray _sdv, पासोक_Array _mask)
 {
     CV_Assert(!_src.empty());
     CV_Assert( _mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool );
@@ -337,7 +337,7 @@ static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, In
     NAryMatIterator it(arrays, ptrs);
     int total = (int)it.size, blockSize = total, partialBlockSize = 0;
     int j;
-    int64_t count = 0, nz0 = 0;
+    int64_t बिलांग_2 = 0, nz0 = 0;
     double _buf[CV_CN_MAX*4];
     double *s = _buf, *sq = s + cn;
     int *sbuf = (int*)s, *sqbuf = (int*)sq;
@@ -367,9 +367,9 @@ static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, In
         {
             int bsz = std::min(total - j, blockSize);
             int nz = func( ptrs[0], ptrs[1], (uchar*)sbuf, (uchar*)sqbuf, bsz, cn );
-            count += nz;
+            बिलांग_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            if( blockSum && (बिलांग_2 + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
             {
                 if (partialSumIsInt) {
                     for( k = 0; k < cn; k++ )
@@ -392,7 +392,7 @@ static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, In
                         sqbuf[k] = 0;
                     }
                 }
-                count = 0;
+                बिलांग_2 = 0;
             }
             ptrs[0] += bsz*esz;
             if( ptrs[1] )
@@ -438,7 +438,7 @@ static void writeStatResult(OutputArray _dst, int cn, const Scalar& v)
         p[k] = k < cn ? v[k] : 0;
 }
 
-void meanStdDev(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+void meanStdDev(पासोक_Array _src, OutputArray _mean, OutputArray _sdv, पासोक_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -465,7 +465,7 @@ void meanStdDev(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray
                         m[i][k] = mi.at<double>(k);
                         sd[i][k] = si.at<double>(k);
                     }
-                    cnt[i] = statCount(chunks[i]);
+                    cnt[i] = stat_बिलांग(chunks[i]);
                 }
             });
             // combine the pieces: the variance is the mean of the piece variances plus the

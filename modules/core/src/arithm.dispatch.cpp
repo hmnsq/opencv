@@ -25,8 +25,8 @@ TKernel getMaxFunc(int T, int R)            { CV_CPU_DISPATCH(getMaxFunc_,     (
 TKernel getAbsdiffFunc(int T, int R)        { CV_CPU_DISPATCH(getAbsdiffFunc_, (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
 TKernel getHypotFunc(int T, int R)          { CV_CPU_DISPATCH(getHypotFunc_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
 TKernel getAtan2Func(int T, int R)          { CV_CPU_DISPATCH(getAtan2Func_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getCmpFunc(TOp op, int T)           { CV_CPU_DISPATCH(getCmpFunc_,     (op, T),         CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getBitwiseFunc(TOp op, int esz)     { CV_CPU_DISPATCH(getBitwiseFunc_, (op, esz),       CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getCmpFunc(इताअस op, int T)           { CV_CPU_DISPATCH(getCmpFunc_,     (op, T),         CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getBitwiseFunc(इताअस op, int esz)     { CV_CPU_DISPATCH(getBitwiseFunc_, (op, esz),       CV_CPU_DISPATCH_MODES_ALL); }
 TKernel getNotFunc(int esz)                 { CV_CPU_DISPATCH(getNotFunc_,     (esz),           CV_CPU_DISPATCH_MODES_ALL); }
 TKernel getAddWeightedFunc(int T, int R)    { CV_CPU_DISPATCH(getAddWeightedFunc_, (T, R),      CV_CPU_DISPATCH_MODES_ALL); }
 TKernel getSelectFunc(int mdepth, int T)    { CV_CPU_DISPATCH(getSelectFunc_,  (mdepth, T),     CV_CPU_DISPATCH_MODES_ALL); }
@@ -35,7 +35,7 @@ static TKernel getCastFunc(int sd, int dd, bool scaled)
                                             { CV_CPU_DISPATCH(getCastFunc_,    (sd, dd, scaled),CV_CPU_DISPATCH_MODES_ALL); }
 
 // ---- tier 3: op-level dispatcher used by the compiler --------------------------------------------
-TKernel getElemwiseFunc(TOp op, int depth0, int depth1, int depth2, int rdepth)
+TKernel getElemwiseFunc(इताअस op, int depth0, int depth1, int depth2, int rdepth)
 {
     (void)depth2;
 
@@ -154,7 +154,7 @@ void mul8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
 // Legacy cv::hal bitwise entry points, still declared in core/hal/hal.hpp and used by other modules
 // (e.g. opencv_objdetect's aruco) and external code: forward to the element-wise engine's byte-wise
 // bitwise kernels. No scalar params - bitwise ops ignore them.
-static void bitwise8u(ew::TOp op, const uchar* src1, size_t step1, const uchar* src2, size_t step2,
+static void bitwise8u(ew::इताअस op, const uchar* src1, size_t step1, const uchar* src2, size_t step2,
                       uchar* dst, size_t step, int width, int height)
 {
     const double noparams[4] = {};

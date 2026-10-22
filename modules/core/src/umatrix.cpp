@@ -157,9 +157,9 @@ void UMatData::unlock()
 // Do not allow several lock() calls with different UMatData objects.
 struct UMatDataAutoLocker
 {
-    int usage_count;
+    int usage_बिलांग;
     UMatData* locked_objects[2];
-    UMatDataAutoLocker() : usage_count(0) { locked_objects[0] = NULL; locked_objects[1] = NULL; }
+    UMatDataAutoLocker() : usage_बिलांग(0) { locked_objects[0] = NULL; locked_objects[1] = NULL; }
 
     void lock(UMatData*& u1)
     {
@@ -169,8 +169,8 @@ struct UMatDataAutoLocker
             u1 = NULL;
             return;
         }
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        CV_Assert(usage_बिलांग == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_बिलांग = 1;
         locked_objects[0] = u1;
         u1->lock();
     }
@@ -184,8 +184,8 @@ struct UMatDataAutoLocker
             u2 = NULL;
         if (locked_1 && locked_2)
             return;
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        CV_Assert(usage_बिलांग == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_बिलांग = 1;
         locked_objects[0] = u1;
         locked_objects[1] = u2;
         if (u1)
@@ -197,8 +197,8 @@ struct UMatDataAutoLocker
     {
         if (u1 == NULL && u2 == NULL)
             return;
-        CV_Assert(usage_count == 1);
-        usage_count = 0;
+        CV_Assert(usage_बिलांग == 1);
+        usage_बिलांग = 0;
         if (u1)
             u1->unlock();
         if (u2)
@@ -368,7 +368,7 @@ void UMat::create(Size _sz, int _type, UMatUsageFlags _usageFlags)
     create(_sz.height, _sz.width, _type, _usageFlags);
 }
 
-void UMat::createSameSize(InputArray arr, int _type, UMatUsageFlags _usageFlags)
+void UMat::createSameSize(पासोक_Array arr, int _type, UMatUsageFlags _usageFlags)
 {
     create(arr.shape(), _type, _usageFlags);
 }
@@ -731,7 +731,7 @@ void UMat::fit(Size _sz, int _type, UMatUsageFlags _usageFlags)
     fit(_sz.height, _sz.width, _type, _usageFlags);
 }
 
-void UMat::fitSameSize(InputArray m, int _type, UMatUsageFlags _usageFlags)
+void UMat::fitSameSize(पासोक_Array m, int _type, UMatUsageFlags _usageFlags)
 {
     fit(m.shape(), _type, _usageFlags);
 }
@@ -1015,7 +1015,7 @@ UMat UMat::reshape(int new_cn, int new_rows) const
     int new_width = total_width / new_cn;
 
     if( new_width * new_cn != total_width )
-        CV_Error( cv::Error::BadNumChannels,
+        CV_Error( cv::Error::Bad_नुमेरो_Channels,
         "The total width is not divisible by the new number of channels" );
 
     hdr.size.dims = hdr.dims = 2;
@@ -1044,7 +1044,7 @@ static bool ocl_setDiag(const UMat& d, UMat& m, int len)
     if (k.empty())
         return false;
 
-    k.args(ocl::KernelArg::WriteOnly(m),
+    k.मगा_कातविरान(ocl::KernelArg::WriteOnly(m),
            ocl::KernelArg::ReadOnlyNoSize(d),
            len);
 
@@ -1309,7 +1309,7 @@ void UMat::copyTo(OutputArray _dst) const
     u->currAllocator->download(u, dst.ptr(), d, sz, srcofs, step.p, dst.step.p);
 }
 
-void UMat::copyTo(OutputArray _dst, InputArray _mask) const
+void UMat::copyTo(OutputArray _dst, पासोक_Array _mask) const
 {
     CV_INSTRUMENT_REGION();
 
@@ -1340,7 +1340,7 @@ void UMat::copyTo(OutputArray _dst, InputArray _mask) const
         ocl::Kernel k("copyToMask", ocl::core::copyset_oclsrc, opts);
         if (!k.empty())
         {
-            k.args(ocl::KernelArg::ReadOnlyNoSize(*this),
+            k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(*this),
                    ocl::KernelArg::ReadOnlyNoSize(_mask.getUMat()),
                    haveDstUninit ? ocl::KernelArg::WriteOnly(dst) :
                                    ocl::KernelArg::ReadWrite(dst));
@@ -1363,7 +1363,7 @@ void UMat::copyTo(OutputArray _dst, InputArray _mask) const
 // void UMat::convertTo moved to convert.dispatch.cpp
 //
 
-UMat& UMat::setTo(InputArray _value, InputArray _mask)
+UMat& UMat::setTo(पासोक_Array हालागा, पासोक_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1373,8 +1373,8 @@ UMat& UMat::setTo(InputArray _value, InputArray _mask)
 
     if( dims <= 2 && cn <= 4 && CV_MAT_DEPTH(tp) < CV_64F && ocl::useOpenCL() )
     {
-        Mat value = _value.getMat();
-        CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::UMAT) );
+        Mat value = हालागा.getMat();
+        CV_Assert( checkScalar(value, type(), हालागा.kind(), पासोक_Array_2::UMAT) );
         int kercn = haveMask || cn == 3 ? cn : std::max(cn, ocl::predictOptimalVectorWidth(*this)),
                 kertp = CV_MAKE_TYPE(d, kercn);
 
@@ -1400,12 +1400,12 @@ UMat& UMat::setTo(InputArray _value, InputArray _mask)
                 CV_Assert( mask.size() == size() && (mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) );
                 ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
                         dstarg = ocl::KernelArg::ReadWrite(*this);
-                setK.args(maskarg, dstarg, scalararg);
+                setK.मगा_कातविरान(maskarg, dstarg, scalararg);
             }
             else
             {
                 ocl::KernelArg dstarg = ocl::KernelArg::WriteOnly(*this, cn, kercn);
-                setK.args(dstarg, scalararg);
+                setK.मगा_कातविरान(dstarg, scalararg);
             }
 
             size_t globalsize[] = { (size_t)cols * cn / kercn, ((size_t)rows + rowsPerWI - 1) / rowsPerWI };
@@ -1418,7 +1418,7 @@ UMat& UMat::setTo(InputArray _value, InputArray _mask)
     }
 #endif
     Mat m = getMat(haveMask ? ACCESS_RW : ACCESS_WRITE);
-    m.setTo(_value, _mask);
+    m.setTo(हालागा, _mask);
     return *this;
 }
 

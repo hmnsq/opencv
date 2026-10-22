@@ -16,7 +16,7 @@ static inline std::ostream& operator<<(std::ostream& os, const Rect& rect)
 }
 namespace utils {
 
-String dumpInputArray(InputArray argument)
+String dump_पासोक_Array(पासोक_Array argument)
 {
     if (&argument == &noArray())
         return "InputArray: noArray()";
@@ -67,7 +67,7 @@ String dumpInputArray(InputArray argument)
     return ss.str();
 }
 
-CV_EXPORTS_W String dumpInputArrayOfArrays(InputArrayOfArrays argument)
+CV_EXPORTS_W String dump_पासोक_Array_Of_Arrays(पासोक_Array_Of_Arrays argument)
 {
     if (&argument == &noArray())
         return "InputArrayOfArrays: noArray()";
@@ -124,7 +124,7 @@ CV_EXPORTS_W String dumpInputArrayOfArrays(InputArrayOfArrays argument)
     return ss.str();
 }
 
-CV_EXPORTS_W String dumpInputOutputArray(InputOutputArray argument)
+CV_EXPORTS_W String dump_पासोक_Output_Array(पासोक_Output_Array argument)
 {
     if (&argument == &noArray())
         return "InputOutputArray: noArray()";
@@ -175,7 +175,7 @@ CV_EXPORTS_W String dumpInputOutputArray(InputOutputArray argument)
     return ss.str();
 }
 
-CV_EXPORTS_W String dumpInputOutputArrayOfArrays(InputOutputArrayOfArrays argument)
+CV_EXPORTS_W String dump_पासोक_Output_Array_Of_Arrays(पासोक_Output_Array_Of_Arrays argument)
 {
     if (&argument == &noArray())
         return "InputOutputArrayOfArrays: noArray()";

@@ -65,11 +65,11 @@ enum { OCL_OP_ADD=0, OCL_OP_SUB=1, OCL_OP_RSUB=2, OCL_OP_ABSDIFF=3, OCL_OP_MUL=4
 
 // The unified entry point for every element-wise binary op (empty + UMat/OpenCL + CPU engine). Defined
 // lower down (near cv::add); forward-declared here so cv::min/cv::max (above it) can use it too.
-static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray dst,
-                      InputArray mask, int dtype, int oclop, bool muldiv, const Scalar& params = Scalar(1));
+static void arithm_op(ew::इताअस op, पासोक_Array src1, पासोक_Array src2, OutputArray dst,
+                      पासोक_Array mask, int dtype, int oclop, bool muldiv, const Scalar& params = Scalar(1));
 
 // The unary counterpart (bitwise NOT, unary math later). Forward-declared for the same reason.
-static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mask,
+static void unary_op(ew::इताअस op, पासोक_Array src, OutputArray dst, पासोक_Array mask,
                      int dtype, const Scalar& params = Scalar());
 
 #ifdef HAVE_OPENCL
@@ -84,8 +84,8 @@ static inline bool noOclType(int depth)
     return depth == CV_16BF || depth == CV_Bool || depth == CV_8F_E4M3FN || depth == CV_8F_E4M3FNUZ;
 }
 
-static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
-                          InputArray _mask, bool bitwise, int oclop, bool haveScalar )
+static bool ocl_दालावाहान_op(पासोक_Array _src1, पासोक_Array _src2, OutputArray _dst,
+                          पासोक_Array _mask, bool bitwise, int oclop, bool haveScalar )
 {
     bool haveMask = !_mask.empty();
     int srctype = _src1.type();
@@ -144,9 +144,9 @@ static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
         ocl::KernelArg scalararg = ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, esz);
 
         if( !haveMask )
-            k.args(src1arg, dstarg, scalararg);
+            k.मगा_कातविरान(src1arg, dstarg, scalararg);
         else
-            k.args(src1arg, maskarg, dstarg, scalararg);
+            k.मगा_कातविरान(src1arg, maskarg, dstarg, scalararg);
     }
     else
     {
@@ -154,9 +154,9 @@ static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
         ocl::KernelArg src2arg = ocl::KernelArg::ReadOnlyNoSize(src2, cn, kercn);
 
         if( !haveMask )
-            k.args(src1arg, src2arg, dstarg);
+            k.मगा_कातविरान(src1arg, src2arg, dstarg);
         else
-            k.args(src1arg, src2arg, maskarg, dstarg);
+            k.मगा_कातविरान(src1arg, src2arg, maskarg, dstarg);
     }
 
     size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
@@ -170,17 +170,17 @@ static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
 // true if OpenCL handled the op, false to fall through to the CPU engine. NOT arrives unary
 // (src2 == src1, forced-scalar). The caller gates this on a UMat operand + dims <= 2 (via CV_OCL_RUN).
 #ifdef HAVE_OPENCL
-static bool bitwise_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
-                           InputArray _mask, int oclop)
+static bool bitwise_op_ocl(पासोक_Array _src1, पासोक_Array _src2, OutputArray _dst,
+                           पासोक_Array _mask, int oclop)
 {
-    const _InputArray *psrc1 = &_src1, *psrc2 = &_src2;
-    _InputArray::KindFlag kind1 = psrc1->kind(), kind2 = psrc2->kind();
+    const पासोक_Array_2 *psrc1 = &_src1, *psrc2 = &_src2;
+    पासोक_Array_2::KindFlag kind1 = psrc1->kind(), kind2 = psrc2->kind();
     int type1 = psrc1->type(), type2 = psrc2->type();
     bool haveScalar = false;
 
     if( oclop == OCL_OP_NOT )
         haveScalar = true;
-    else if( (kind1 == _InputArray::MATX) + (kind2 == _InputArray::MATX) == 1 ||
+    else if( (kind1 == पासोक_Array_2::MATX) + (kind2 == पासोक_Array_2::MATX) == 1 ||
              !psrc1->sameSize(*psrc2) || type1 != type2 )
     {
         if( checkScalar(*psrc1, type2, kind1, kind2) )
@@ -190,7 +190,7 @@ static bool bitwise_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
         haveScalar = true;
     }
     _dst.createSameSize(*psrc1, type1);
-    return ocl_binary_op(*psrc1, *psrc2, _dst, _mask, true, oclop, haveScalar);
+    return ocl_दालावाहान_op(*psrc1, *psrc2, _dst, _mask, true, oclop, haveScalar);
 }
 #endif  // HAVE_OPENCL
 
@@ -199,7 +199,7 @@ static bool bitwise_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
 // bitwise and/or/xor: OpenCL runs the shared bitwise kernel (via bitwise_op_ocl); the CPU path is the
 // element-wise engine (OP_AND/OR/XOR, T x T -> T dispatched by element size). oclop = -1 tells
 // arithm_op the OpenCL path was already tried, so it only runs the CPU engine. NOT is unary.
-void cv::bitwise_and(InputArray a, InputArray b, OutputArray c, InputArray mask)
+void cv::bitwise_and(पासोक_Array a, पासोक_Array b, OutputArray c, पासोक_Array mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -208,7 +208,7 @@ void cv::bitwise_and(InputArray a, InputArray b, OutputArray c, InputArray mask)
     arithm_op(ew::OP_AND, a, b, c, mask, -1, /*oclop=*/-1, /*muldiv=*/false);
 }
 
-void cv::bitwise_or(InputArray a, InputArray b, OutputArray c, InputArray mask)
+void cv::bitwise_or(पासोक_Array a, पासोक_Array b, OutputArray c, पासोक_Array mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -217,7 +217,7 @@ void cv::bitwise_or(InputArray a, InputArray b, OutputArray c, InputArray mask)
     arithm_op(ew::OP_OR, a, b, c, mask, -1, /*oclop=*/-1, /*muldiv=*/false);
 }
 
-void cv::bitwise_xor(InputArray a, InputArray b, OutputArray c, InputArray mask)
+void cv::bitwise_xor(पासोक_Array a, पासोक_Array b, OutputArray c, पासोक_Array mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -226,7 +226,7 @@ void cv::bitwise_xor(InputArray a, InputArray b, OutputArray c, InputArray mask)
     arithm_op(ew::OP_XOR, a, b, c, mask, -1, /*oclop=*/-1, /*muldiv=*/false);
 }
 
-void cv::bitwise_not(InputArray a, OutputArray c, InputArray mask)
+void cv::bitwise_not(पासोक_Array a, OutputArray c, पासोक_Array mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -235,14 +235,14 @@ void cv::bitwise_not(InputArray a, OutputArray c, InputArray mask)
     unary_op(ew::OP_NOT, a, c, mask, -1);
 }
 
-void cv::max( InputArray src1, InputArray src2, OutputArray dst )
+void cv::max( पासोक_Array src1, पासोक_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
     arithm_op(ew::OP_MAX, src1, src2, dst, noArray(), -1, OCL_OP_MAX, false);
 }
 
-void cv::min( InputArray src1, InputArray src2, OutputArray dst )
+void cv::min( पासोक_Array src1, पासोक_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
@@ -318,8 +318,8 @@ static int coerceTypes(int depth1, int depth2, bool muldiv)
         ((CV_ELEM_SIZE1(depth1) > 4) | (CV_ELEM_SIZE1(depth2) > 4)) != 0 ? CV_64F : CV_32F;
 }
 
-static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
-                          InputArray _mask, int wtype,
+static bool ocl_arithm_op(पासोक_Array _src1, पासोक_Array _src2, OutputArray _dst,
+                          पासोक_Array _mask, int wtype,
                           void* usrdata, int oclop,
                           bool haveScalar )
 {
@@ -407,15 +407,15 @@ static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
         if( !haveMask )
         {
             if(n == 0)
-                k.args(src1arg, dstarg, scalararg);
+                k.मगा_कातविरान(src1arg, dstarg, scalararg);
             else if(n == 1)
-                k.args(src1arg, dstarg, scalararg,
+                k.मगा_कातविरान(src1arg, dstarg, scalararg,
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p, usrdata_esz));
             else
                 CV_Error(Error::StsNotImplemented, "unsupported number of extra parameters");
         }
         else
-            k.args(src1arg, maskarg, dstarg, scalararg);
+            k.मगा_कातविरान(src1arg, maskarg, dstarg, scalararg);
     }
     else
     {
@@ -425,12 +425,12 @@ static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
         if( !haveMask )
         {
             if (n == 0)
-                k.args(src1arg, src2arg, dstarg);
+                k.मगा_कातविरान(src1arg, src2arg, dstarg);
             else if (n == 1)
-                k.args(src1arg, src2arg, dstarg,
+                k.मगा_कातविरान(src1arg, src2arg, dstarg,
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p, usrdata_esz));
             else if (n == 3)
-                k.args(src1arg, src2arg, dstarg,
+                k.मगा_कातविरान(src1arg, src2arg, dstarg,
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p, usrdata_esz),
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p + usrdata_esz, usrdata_esz),
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p + usrdata_esz*2, usrdata_esz));
@@ -438,7 +438,7 @@ static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
                 CV_Error(Error::StsNotImplemented, "unsupported number of extra parameters");
         }
         else
-            k.args(src1arg, src2arg, maskarg, dstarg);
+            k.मगा_कातविरान(src1arg, src2arg, maskarg, dstarg);
     }
 
     size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
@@ -453,16 +453,16 @@ static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
 // kernel with a coerced working type. `usrdata` carries the mul/div/addWeighted scale block, `oclop`
 // the kernel id. Only reached for a UMat dst; sizes/types that don't fit the scalar/same-size pattern
 // (e.g. a broadcast) decline (return false) so the engine handles them on the CPU.
-static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
-                          InputArray _mask, int dtype, int oclop, bool muldiv, void* usrdata)
+static bool arithm_op_ocl(पासोक_Array _src1, पासोक_Array _src2, OutputArray _dst,
+                          पासोक_Array _mask, int dtype, int oclop, bool muldiv, void* usrdata)
 {
 #ifndef HAVE_OPENCL
     CV_UNUSED(_src1); CV_UNUSED(_src2); CV_UNUSED(_dst); CV_UNUSED(_mask);
     CV_UNUSED(dtype); CV_UNUSED(oclop); CV_UNUSED(muldiv); CV_UNUSED(usrdata);
     return false;
 #else
-    const _InputArray *psrc1 = &_src1, *psrc2 = &_src2;
-    _InputArray::KindFlag kind1 = psrc1->kind(), kind2 = psrc2->kind();
+    const पासोक_Array_2 *psrc1 = &_src1, *psrc2 = &_src2;
+    पासोक_Array_2::KindFlag kind1 = psrc1->kind(), kind2 = psrc2->kind();
     bool haveMask = !_mask.empty();
     bool reallocate = false;
     int type1 = psrc1->type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1);
@@ -478,7 +478,7 @@ static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
     if (oclop == OCL_OP_MIN || oclop == OCL_OP_MAX)
     {
         bool haveScalar = false;
-        if ((kind1 == _InputArray::MATX) + (kind2 == _InputArray::MATX) == 1 ||
+        if ((kind1 == पासोक_Array_2::MATX) + (kind2 == पासोक_Array_2::MATX) == 1 ||
             !psrc1->sameSize(*psrc2) || type1 != type2)
         {
             if (checkScalar(*psrc1, type2, kind1, kind2))
@@ -488,7 +488,7 @@ static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
             haveScalar = true;
         }
         _dst.createSameSize(*psrc1, type1);
-        return ocl_binary_op(*psrc1, *psrc2, _dst, _mask, false, oclop, haveScalar);
+        return ocl_दालावाहान_op(*psrc1, *psrc2, _dst, _mask, false, oclop, haveScalar);
     }
 
     // reciprocal (scale/src): the OpenCL kernel is unary on src - use src2 for both operands (the CPU
@@ -504,8 +504,8 @@ static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
     bool haveScalar = false;
 
     if (dims1 != dims2 || sz1 != sz2 || cn != cn2 ||
-        (kind1 == _InputArray::MATX && (sz1 == Size(1,4) || sz1 == Size(1,1))) ||
-        (kind2 == _InputArray::MATX && (sz2 == Size(1,4) || sz2 == Size(1,1))))
+        (kind1 == पासोक_Array_2::MATX && (sz1 == Size(1,4) || sz1 == Size(1,1))) ||
+        (kind2 == पासोक_Array_2::MATX && (sz2 == Size(1,4) || sz2 == Size(1,1))))
     {
         if ((type1 == CV_64F && (sz1.height == 1 || sz1.height == 4)) && src1Scalar)
         {
@@ -609,7 +609,7 @@ static bool outArrayMatches(const _OutputArray& a, const MatShape& shp, int type
 // Are two operands' iteration shapes (spatial dims + channels innermost, exactly how the engine
 // iterates) numpy-broadcast-compatible? Powers the scalar-like-Mat compat fallback in arithm_op.
 // Cheap by design: sizend copies the dim arrays inline - no Mat headers, no allocations.
-static bool shapesBroadcastCompat(InputArray a, int acn, InputArray b, int bcn)
+static bool shapesBroadcastCompat(पासोक_Array a, int acn, पासोक_Array b, int bcn)
 {
     int asz[MatShape::MAX_DIMS + 1], bsz[MatShape::MAX_DIMS + 1];
     int ad = a.sizend(asz), bd = b.sizend(bsz);
@@ -630,8 +630,8 @@ static bool shapesBroadcastCompat(InputArray a, int acn, InputArray b, int bcn)
 // kernel call instead. Same tier boundary as math_op's MATH_OP_SMALL for cv::exp.
 enum { ARITHM_SMALL_DIRECT = 100000 };
 
-static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray dst,
-                      InputArray mask, int dtype, int oclop, bool muldiv, const Scalar& params)
+static void arithm_op(ew::इताअस op, पासोक_Array src1, पासोक_Array src2, OutputArray dst,
+                      पासोक_Array mask, int dtype, int oclop, bool muldiv, const Scalar& params)
 {
     if (src1.empty() || src2.empty())          // empty inputs -> empty result
     {
@@ -666,9 +666,9 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // A 4x1 CV_64F Mat/UMat pseudo-scalar (see isScalarArg) is hijacked only against a REAL array:
     // when the partner is itself a tiny scalar-shaped array (e.g. compare(Mat 4x1, Mat 1x1) -
     // issue #8999), both are honest data and ride the broadcast. A genuine MATX Scalar never demotes.
-    else if (s1 && src1.kind() != _InputArray::MATX && isScalarLikeMat(src2, cn1))
+    else if (s1 && src1.kind() != पासोक_Array_2::MATX && isScalarLikeMat(src2, cn1))
         s1 = false;
-    else if (s2 && src2.kind() != _InputArray::MATX && isScalarLikeMat(src1, cn2))
+    else if (s2 && src2.kind() != पासोक_Array_2::MATX && isScalarLikeMat(src1, cn2))
         s2 = false;
 
     // Compat fallback: Java/Python/user code passes scalars as real little Mats (the classic 4x1
@@ -692,11 +692,11 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // two-scalar operand handled as an array) is mapped once into a local. EXCEPTION - in-place with a
     // realloc: if dst IS one of the sources, dst.create() may free that source's data mid-op, so take a
     // header copy (increfs, keeping the old data alive) of the sources in that case only.
-    const void* dstObj = (dst.kind() == _InputArray::MAT) ? dst.getObj() : nullptr;
+    const void* dstObj = (dst.kind() == पासोक_Array_2::MAT) ? dst.getObj() : nullptr;
     const bool aliased = dstObj && (dstObj == src1.getObj() || dstObj == src2.getObj());
     Mat m1loc, m2loc, mloc;
-    auto asMat = [&](InputArray a, Mat& loc) -> const Mat* {
-        if (a.kind() == _InputArray::MAT && !aliased) return (const Mat*)a.getObj();
+    auto asMat = [&](पासोक_Array a, Mat& loc) -> const Mat* {
+        if (a.kind() == पासोक_Array_2::MAT && !aliased) return (const Mat*)a.getObj();
         loc = a.getMat(); return &loc;
     };
     const Mat* pm1 = s1 ? nullptr : asMat(src1, m1loc);
@@ -741,7 +741,7 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
         {
             dst.createSameSize(src1, pm1->type());   // whole-shape transfer, not piecemeal dims+sizes
             Mat dloc;
-            Mat* pd = (dst.kind() == _InputArray::MAT) ? (Mat*)dst.getObj() : &(dloc = dst.getMat());
+            Mat* pd = (dst.kind() == पासोक_Array_2::MAT) ? (Mat*)dst.getObj() : &(dloc = dst.getMat());
             if (pd->isContinuous())     // a reused non-continuous dst view falls through to the engine
             {
                 k.fptr(pm1->data, 0, 1, pm2->data, 0, 1, nullptr, 0, 0,
@@ -754,9 +754,9 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // operand order = (src1, src2): an array becomes an INPUT, a scalar a flexible per-channel CONST
     // read straight from the caller's inline storage (getObj()), no Mat / convertTo.
     ew::TExpr p;
-    auto addOperand = [&](InputArray src, bool isScalar, const Mat* m, int otherCn) -> int {
+    auto addOperand = [&](पासोक_Array src, bool isScalar, const Mat* m, int otherCn) -> int {
         if (!isScalar)
-            return p.addInput(m->depth());
+            return p.add_पासोक(m->depth());
         const uchar* sp; int sd;
         uchar scbuf[EW_SCALAR_BUF_SIZE];   // stack room for a UMAT scalar; addConst copies the values out
         const int scn0 = scalarArgElems(src, sp, sd, scbuf), cn = otherCn;
@@ -777,10 +777,10 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     {
         CV_Assert(mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
         pmask = asMat(mask, mloc);
-        sMask = p.addInput(pmask->depth());
+        sMask = p.add_पासोक(pmask->depth());
     }
     const int sOut = p.addOutput(rdepth);               // output BEFORE emit -> moveToOutput drops the
-    const int r = p.emitBinary(op, a0, a1, rdepth, params);   // result temp (mask-free => none); scale
+    const int r = p.emit_दालावाहान(op, a0, a1, rdepth, params);   // result temp (mask-free => none); scale
                                                         // rides params[0] (mul/div), {a,b,g} for addW
     if (haveMask)
         p.addInsn(ew::OP_SELECT, sMask, r, sOut, sOut);
@@ -808,7 +808,7 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     const bool reused = haveMask && outArrayMatches(dst, oshape, otype);
     dst.create(oshape, otype);
     Mat dstloc;
-    Mat* pdst = (dst.kind() == _InputArray::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
+    Mat* pdst = (dst.kind() == पासोक_Array_2::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
     if (haveMask && !reused)
         pdst->setZero();                          // setZero (not setTo, which caps at 4 channels)
     p.exec(inputs, pdst);
@@ -818,7 +818,7 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
 // optional write-mask; result depth = dtype (>=0), else a fixed-type dst's depth, else the input
 // depth. Mirrors arithm_op's build/mask/exec tail with a single input and no scalar operand. OpenCL is
 // run by the caller (bitwise_op_ocl), so this is the CPU engine only.
-static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mask,
+static void unary_op(ew::इताअस op, पासोक_Array src, OutputArray dst, पासोक_Array mask,
                      int dtype, const Scalar& params)
 {
     if (src.empty())
@@ -833,23 +833,23 @@ static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mas
     // in-place (dst aliases src): keep a header copy so a shape/type-changing dst.create() can't free
     // src's data mid-op (matches arithm_op). A fixed-size/type dst never reallocs, so this is only for
     // an explicit dtype change.
-    const void* dstObj = (dst.kind() == _InputArray::MAT) ? dst.getObj() : nullptr;
-    const bool aliased = dstObj && src.kind() == _InputArray::MAT && dstObj == src.getObj();
+    const void* dstObj = (dst.kind() == पासोक_Array_2::MAT) ? dst.getObj() : nullptr;
+    const bool aliased = dstObj && src.kind() == पासोक_Array_2::MAT && dstObj == src.getObj();
     Mat sloc, mloc;
-    const Mat* psrc = (src.kind() == _InputArray::MAT && !aliased) ? (const Mat*)src.getObj()
+    const Mat* psrc = (src.kind() == पासोक_Array_2::MAT && !aliased) ? (const Mat*)src.getObj()
                                                                    : &(sloc = src.getMat());
     const int rdepth = dtype >= 0 ? CV_MAT_DEPTH(dtype)
                      : (dst.fixedType() ? dst.depth() : psrc->depth());
 
     ew::TExpr p;
-    const int a0 = p.addInput(psrc->depth());
+    const int a0 = p.add_पासोक(psrc->depth());
     int sMask = 0;
     const Mat* pmask = nullptr;
     if (haveMask)
     {
         CV_Assert(mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
-        pmask = (mask.kind() == _InputArray::MAT) ? (const Mat*)mask.getObj() : &(mloc = mask.getMat());
-        sMask = p.addInput(pmask->depth());
+        pmask = (mask.kind() == पासोक_Array_2::MAT) ? (const Mat*)mask.getObj() : &(mloc = mask.getMat());
+        sMask = p.add_पासोक(pmask->depth());
     }
     const int sOut = p.addOutput(rdepth);
     const int r = p.emitUnary(op, a0, rdepth, params);
@@ -869,7 +869,7 @@ static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mas
     const bool reused = haveMask && outArrayMatches(dst, oshape, otype);
     dst.create(oshape, otype);
     Mat dstloc;
-    Mat* pdst = (dst.kind() == _InputArray::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
+    Mat* pdst = (dst.kind() == पासोक_Array_2::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
     if (haveMask && !reused)
         pdst->setZero();
     p.exec(inputs, pdst);
@@ -877,30 +877,30 @@ static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mas
 
 }
 
-void cv::add( InputArray src1, InputArray src2, OutputArray dst,
-          InputArray mask, int dtype )
+void cv::add( पासोक_Array src1, पासोक_Array src2, OutputArray dst,
+          पासोक_Array mask, int dtype )
 {
     CV_INSTRUMENT_REGION();
 
     arithm_op(ew::OP_ADD, src1, src2, dst, mask, dtype, OCL_OP_ADD, false);
 }
 
-void cv::subtract( InputArray src1, InputArray src2, OutputArray dst,
-                   InputArray mask, int dtype )
+void cv::subtract( पासोक_Array src1, पासोक_Array src2, OutputArray dst,
+                   पासोक_Array mask, int dtype )
 {
     CV_INSTRUMENT_REGION();
 
     arithm_op(ew::OP_SUB, src1, src2, dst, mask, dtype, OCL_OP_SUB, false);
 }
 
-void cv::absdiff( InputArray src1, InputArray src2, OutputArray dst )
+void cv::absdiff( पासोक_Array src1, पासोक_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
     arithm_op(ew::OP_ABSDIFF, src1, src2, dst, noArray(), -1, OCL_OP_ABSDIFF, false);
 }
 
-void cv::copyTo(InputArray _src, OutputArray _dst, InputArray _mask)
+void cv::copyTo(पासोक_Array _src, OutputArray _dst, पासोक_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -914,7 +914,7 @@ void cv::copyTo(InputArray _src, OutputArray _dst, InputArray _mask)
 namespace cv
 {
 
-void multiply(InputArray src1, InputArray src2,
+void multiply(पासोक_Array src1, पासोक_Array src2,
               OutputArray dst, double scale, int dtype)
 {
     CV_INSTRUMENT_REGION();
@@ -923,7 +923,7 @@ void multiply(InputArray src1, InputArray src2,
     arithm_op(ew::OP_MUL, src1, src2, dst, noArray(), dtype, oclop, /*muldiv*/ true, Scalar(scale));
 }
 
-void divide(InputArray src1, InputArray src2,
+void divide(पासोक_Array src1, पासोक_Array src2,
                 OutputArray dst, double scale, int dtype)
 {
     CV_INSTRUMENT_REGION();
@@ -931,7 +931,7 @@ void divide(InputArray src1, InputArray src2,
     arithm_op(ew::OP_DIV, src1, src2, dst, noArray(), dtype, OCL_OP_DIV_SCALE, /*muldiv*/ true, Scalar(scale));
 }
 
-void divide(double scale, InputArray src2,
+void divide(double scale, पासोक_Array src2,
                 OutputArray dst, int dtype)
 {
     CV_INSTRUMENT_REGION();
@@ -955,7 +955,7 @@ void divide(double scale, InputArray src2,
     arithm_op(ew::OP_DIV, numerator, src2, dst, noArray(), rtype, OCL_OP_RECIP_SCALE, /*muldiv*/ true, Scalar(scale));
 }
 
-UMat UMat::mul(InputArray m, double scale) const
+UMat UMat::mul(पासोक_Array m, double scale) const
 {
     UMat dst;
     multiply(*this, m, dst, scale);
@@ -968,7 +968,7 @@ UMat UMat::mul(InputArray m, double scale) const
 
 }
 
-void cv::addWeighted( InputArray src1, double alpha, InputArray src2,
+void cv::addWeighted( पासोक_Array src1, double alpha, पासोक_Array src2,
                       double beta, double gamma, OutputArray dst, int dtype )
 {
     CV_INSTRUMENT_REGION();
@@ -1007,7 +1007,7 @@ static double getMaxVal(int depth)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op, bool haveScalar)
+static bool ocl_compare(पासोक_Array _src1, पासोक_Array _src2, OutputArray _dst, int op, bool haveScalar)
 {
     const ocl::Device& dev = ocl::Device::getDefault();
     bool doubleSupport = dev.doubleFPConfig() > 0;
@@ -1104,14 +1104,14 @@ static bool ocl_compare(InputArray _src1, InputArray _src2, OutputArray _dst, in
 
         ocl::KernelArg scalararg = ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, esz);
 
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src1, cn, kercn),
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src1, cn, kercn),
                ocl::KernelArg::WriteOnly(dst, cn, kercn), scalararg);
     }
     else
     {
         UMat src2 = _src2.getUMat();
 
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src1),
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src1),
                ocl::KernelArg::ReadOnlyNoSize(src2),
                ocl::KernelArg::WriteOnly(dst, cn, kercn));
     }
@@ -1124,7 +1124,7 @@ static bool ocl_compare(InputArray _src1, InputArray _src2, OutputArray _dst, in
 
 }
 
-void cv::compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op)
+void cv::compare(पासोक_Array _src1, पासोक_Array _src2, OutputArray _dst, int op)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1174,7 +1174,7 @@ void cv::compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op)
     // threshold promotes both operands to float - matching the classic ceil/floor threshold logic).
     // The scalar / broadcast / mixed-shape cases are handled inside arithm_op. oclop = -1 tells it the
     // OpenCL path was already tried above (via ocl_compare), so it only runs the CPU engine.
-    ew::TOp cmpOp = op == CMP_EQ ? ew::OP_CMP_EQ : op == CMP_NE ? ew::OP_CMP_NE :
+    ew::इताअस cmpOp = op == CMP_EQ ? ew::OP_CMP_EQ : op == CMP_NE ? ew::OP_CMP_NE :
                     op == CMP_LT ? ew::OP_CMP_LT : op == CMP_LE ? ew::OP_CMP_LE :
                     op == CMP_GT ? ew::OP_CMP_GT : ew::OP_CMP_GE;
     arithm_op(cmpOp, _src1, _src2, _dst, noArray(), CV_8U, /*oclop=*/-1, /*muldiv=*/false);
@@ -1212,10 +1212,10 @@ struct InRange_SIMD<uchar>
         for (; x <= len - width; x += width)
         {
             v_uint8 values = vx_load(src1 + x);
-            v_uint8 low = vx_load(src2 + x);
-            v_uint8 high = vx_load(src3 + x);
+            v_uint8 माबाबा = vx_load(src2 + x);
+            v_uint8 माताअस = vx_load(src3 + x);
 
-            v_store(dst + x, v_and(v_ge(values, low), v_ge(high, values)));
+            v_store(dst + x, v_and(v_ge(values, माबाबा), v_ge(माताअस, values)));
         }
         vx_cleanup();
         return x;
@@ -1234,10 +1234,10 @@ struct InRange_SIMD<schar>
         for (; x <= len - width; x += width)
         {
             v_int8 values = vx_load(src1 + x);
-            v_int8 low = vx_load(src2 + x);
-            v_int8 high = vx_load(src3 + x);
+            v_int8 माबाबा = vx_load(src2 + x);
+            v_int8 माताअस = vx_load(src3 + x);
 
-            v_store((schar*)(dst + x), v_and(v_ge(values, low), v_ge(high, values)));
+            v_store((schar*)(dst + x), v_and(v_ge(values, माबाबा), v_ge(माताअस, values)));
         }
         vx_cleanup();
         return x;
@@ -1561,18 +1561,18 @@ static InRangeFunc getInRangeFunc(int depth)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_inRange( InputArray _src, InputArray _lowerb,
-                         InputArray _upperb, OutputArray _dst )
+static bool ocl_inRange( पासोक_Array _src, पासोक_Array _lowerb,
+                         पासोक_Array _upperb, OutputArray _dst )
 {
     const ocl::Device & d = ocl::Device::getDefault();
-    _InputArray::KindFlag skind = _src.kind(), lkind = _lowerb.kind(), ukind = _upperb.kind();
+    पासोक_Array_2::KindFlag skind = _src.kind(), lkind = _lowerb.kind(), ukind = _upperb.kind();
     Size ssize = _src.size(), lsize = _lowerb.size(), usize = _upperb.size();
     int stype = _src.type(), ltype = _lowerb.type(), utype = _upperb.type();
     int sdepth = CV_MAT_DEPTH(stype), ldepth = CV_MAT_DEPTH(ltype), udepth = CV_MAT_DEPTH(utype);
     int cn = CV_MAT_CN(stype), rowsPerWI = d.isIntel() ? 4 : 1;
     bool lbScalar = false, ubScalar = false;
 
-    if( (lkind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    if( (lkind == पासोक_Array_2::MATX && skind != पासोक_Array_2::MATX) ||
         ssize != lsize || stype != ltype )
     {
         if( !checkScalar(_lowerb, stype, lkind, skind) )
@@ -1581,7 +1581,7 @@ static bool ocl_inRange( InputArray _src, InputArray _lowerb,
         lbScalar = true;
     }
 
-    if( (ukind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    if( (ukind == पासोक_Array_2::MATX && skind != पासोक_Array_2::MATX) ||
         ssize != usize || stype != utype )
     {
         if( !checkScalar(_upperb, stype, ukind, skind) )
@@ -1633,7 +1633,7 @@ static bool ocl_inRange( InputArray _src, InputArray _lowerb,
             int* ilbuf = (int*)alignPtr(buf + blocksize*esz, 16);
             int* iubuf = ilbuf + cn;
 
-            BinaryFunc sccvtfunc = getConvertFunc(ldepth, CV_32S);
+            दालावाहान_Func sccvtfunc = getConvertFunc(ldepth, CV_32S);
             sccvtfunc(lscalar.ptr(), 1, 0, 1, (uchar*)ilbuf, 1, Size(cn, 1), 0);
             sccvtfunc(uscalar.ptr(), 1, 0, 1, (uchar*)iubuf, 1, Size(cn, 1), 0);
             int minval = cvRound(getMinVal(sdepth)), maxval = cvRound(getMaxVal(sdepth));
@@ -1664,11 +1664,11 @@ static bool ocl_inRange( InputArray _src, InputArray _lowerb,
         lscalar.copyTo(lscalaru);
         uscalar.copyTo(uscalaru);
 
-        ker.args(srcarg, dstarg, ocl::KernelArg::PtrReadOnly(lscalaru),
+        ker.मगा_कातविरान(srcarg, dstarg, ocl::KernelArg::PtrReadOnly(lscalaru),
                ocl::KernelArg::PtrReadOnly(uscalaru), rowsPerWI);
     }
     else
-        ker.args(srcarg, dstarg, ocl::KernelArg::ReadOnlyNoSize(lscalaru),
+        ker.मगा_कातविरान(srcarg, dstarg, ocl::KernelArg::ReadOnlyNoSize(lscalaru),
                ocl::KernelArg::ReadOnlyNoSize(uscalaru), rowsPerWI);
 
     size_t globalsize[2] = { (size_t)ssize.width / colsPerWI, ((size_t)ssize.height + rowsPerWI - 1) / rowsPerWI };
@@ -1679,8 +1679,8 @@ static bool ocl_inRange( InputArray _src, InputArray _lowerb,
 
 }
 
-void cv::inRange(InputArray _src, InputArray _lowerb,
-                 InputArray _upperb, OutputArray _dst)
+void cv::inRange(पासोक_Array _src, पासोक_Array _lowerb,
+                 पासोक_Array _upperb, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1693,12 +1693,12 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
                _upperb.dims() <= 2 && OCL_PERFORMANCE_CHECK(_dst.isUMat()),
                ocl_inRange(_src, _lowerb, _upperb, _dst))
 
-    _InputArray::KindFlag skind = _src.kind(), lkind = _lowerb.kind(), ukind = _upperb.kind();
+    पासोक_Array_2::KindFlag skind = _src.kind(), lkind = _lowerb.kind(), ukind = _upperb.kind();
     Mat src = _src.getMat(), lb = _lowerb.getMat(), ub = _upperb.getMat();
 
     bool lbScalar = false, ubScalar = false;
 
-    if( (lkind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    if( (lkind == पासोक_Array_2::MATX && skind != पासोक_Array_2::MATX) ||
         src.size != lb.size || src.type() != lb.type() )
     {
         if( !checkScalar(lb, src.type(), lkind, skind) )
@@ -1707,7 +1707,7 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
         lbScalar = true;
     }
 
-    if( (ukind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    if( (ukind == पासोक_Array_2::MATX && skind != पासोक_Array_2::MATX) ||
         src.size != ub.size || src.type() != ub.type() )
     {
         if( !checkScalar(ub, src.type(), ukind, skind) )
@@ -1751,7 +1751,7 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
             int* ilbuf = (int*)alignPtr(buf + blocksize*esz, 16);
             int* iubuf = ilbuf + cn;
 
-            BinaryFunc sccvtfunc = getConvertFunc(scdepth, CV_32S);
+            दालावाहान_Func sccvtfunc = getConvertFunc(scdepth, CV_32S);
             sccvtfunc(lb.ptr(), 1, 0, 1, (uchar*)ilbuf, 1, Size(cn, 1), 0);
             sccvtfunc(ub.ptr(), 1, 0, 1, (uchar*)iubuf, 1, Size(cn, 1), 0);
             int minval = cvRound(getMinVal(depth)), maxval = cvRound(getMaxVal(depth));

@@ -163,7 +163,7 @@ int finiteMaskSIMD_<float, 2>(const float *fsrc, uchar *dst, size_t utotal)
         v_uint16 vfinite = v_eq(v_reinterpret_as_u16(velems), vmaskBoth);
 
         // 2nd argument in vfinite is useless
-        v_store_low(dst + i, v_pack(vfinite, vfinite));
+        v_store_माबाबा(dst + i, v_pack(vfinite, vfinite));
     }
 
     return i;
@@ -246,7 +246,7 @@ int finiteMaskSIMD_<float, 4>(const float *fsrc, uchar *dst, size_t utotal)
         // last 2 args are useless
         v_uint8 vres = v_pack_b(vresWide0, vresWide1, vresWide0, vresWide1);
 
-        v_store_low(dst + i, vres);
+        v_store_माबाबा(dst + i, vres);
     }
 
     return i;
@@ -274,7 +274,7 @@ int finiteMaskSIMD_<double, 1>(const double *dsrc, uchar *dst, size_t utotal)
 
         v_uint8 v = v_pack_b(vv0, vv1, vv2, vv3, z, z, z, z);
 
-        v_store_low(dst + i, v);
+        v_store_माबाबा(dst + i, v);
     }
 
     return i;
@@ -308,7 +308,7 @@ int finiteMaskSIMD_<double, 2>(const double *dsrc, uchar *dst, size_t utotal)
 
         // 2nd arg is useless
         v_uint8 vres = v_pack(vfinite0, vfinite0);
-        v_store_low(dst + i, vres);
+        v_store_माबाबा(dst + i, vres);
     }
 
     return i;
@@ -382,7 +382,7 @@ int finiteMaskSIMD_<double, 4>(const double *dsrc, uchar *dst, size_t utotal)
 
         // 2nd arg is useless
         v_uint8 vres = v_pack(vp16, vp16);
-        v_store_low(dst, vres);
+        v_store_माबाबा(dst, vres);
 
         src += npixels * 4;
         dst += npixels;

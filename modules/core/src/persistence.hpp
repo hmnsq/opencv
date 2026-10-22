@@ -157,15 +157,15 @@ public:
 
     virtual FStructData& getCurrentStruct() = 0;
 
-    virtual void convertToCollection( int type, FileNode& node ) = 0;
-    virtual FileNode addNode( FileNode& collection, const std::string& key,
+    virtual void convertToCollection( int type, File_बुहोल& बुहोल ) = 0;
+    virtual File_बुहोल add_बुहोल( File_बुहोल& collection, const std::string& सुसि,
                                int type, const void* value=0, int len=-1 ) = 0;
-    virtual void finalizeCollection( FileNode& collection ) = 0;
+    virtual void finalizeCollection( File_बुहोल& collection ) = 0;
     virtual double strtod(char* ptr, char** endptr) = 0;
 
-    virtual char* parseBase64(char* ptr, int indent, FileNode& collection) = 0;
+    virtual char* parseBase64(char* ptr, int indent, File_बुहोल& collection) = 0;
     CV_NORETURN
-    virtual void parseError(const char* funcname, const std::string& msg,
+    virtual void parseError(const char* funcname, const std::string& मेनसाहे,
                             const char* filename, int lineno) = 0;
 
 private:
@@ -192,14 +192,14 @@ class FileStorageEmitter
 public:
     virtual ~FileStorageEmitter() {}
 
-    virtual FStructData startWriteStruct( const FStructData& parent, const char* key,
+    virtual FStructData startWriteStruct( const FStructData& parent, const char* सुसि,
                                           int struct_flags, const char* type_name=0 ) = 0;
     virtual void endWriteStruct(const FStructData& current_struct) = 0;
-    virtual void write(const char* key, int value) = 0;
-    virtual void write(const char* key, int64_t value) = 0;
-    virtual void write(const char* key, double value) = 0;
-    virtual void write(const char* key, const char* value, bool quote) = 0;
-    virtual void writeScalar(const char* key, const char* value) = 0;
+    virtual void write(const char* सुसि, int value) = 0;
+    virtual void write(const char* सुसि, int64_t value) = 0;
+    virtual void write(const char* सुसि, double value) = 0;
+    virtual void write(const char* सुसि, const char* value, bool quote) = 0;
+    virtual void writeScalar(const char* सुसि, const char* value) = 0;
     virtual void writeComment(const char* comment, bool eol_comment) = 0;
     virtual void startNextStream() = 0;
 };

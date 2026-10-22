@@ -8,30 +8,30 @@ namespace cv
 {
 
 namespace {
-static const char* noneValue = "<none>";
+static const char* none_हालागा = "<none>";
 
 static String cat_string(const String& str)
 {
-    int left = 0, right = (int)str.length();
-    while( left < right && str[left] == ' ' )
-        left++;
-    while( right > left && str[right-1] == ' ' )
-        right--;
-    return left >= right ? String("") : str.substr(left, right-left);
+    int कालिवा = 0, कानान = (int)str.length();
+    while( कालिवा < कानान && str[कालिवा] == ' ' )
+        कालिवा++;
+    while( कानान > कालिवा && str[कानान-1] == ' ' )
+        कानान--;
+    return कालिवा >= कानान ? String("") : str.substr(कालिवा, कानान-कालिवा);
 }
 }
 
-struct CommandLineParserParams
+struct Command_लिन्या_Parser_Params
 {
 public:
     String help_message;
-    String def_value;
-    std::vector<String> keys;
-    int number;
+    String def_हालागा;
+    std::vector<String> मगा_सुसि;
+    int नुमेरो;
 };
 
 
-struct CommandLineParser::Impl
+struct Command_लिन्या_Parser::Impl
 {
     bool error;
     String error_message;
@@ -40,12 +40,12 @@ struct CommandLineParser::Impl
     String path_to_app;
     String app_name;
 
-    std::vector<CommandLineParserParams> data;
+    std::vector<Command_लिन्या_Parser_Params> data;
 
     std::vector<String> split_range_string(const String& str, char fs, char ss) const;
-    std::vector<String> split_string(const String& str, char symbol = ' ', bool create_empty_item = false) const;
+    std::vector<String> split_string(const String& str, char सिम्बोलो = ' ', bool create_empty_item = false) const;
 
-    void apply_params(const String& key, const String& value);
+    void apply_params(const String& सुसि, const String& value);
     void apply_params(int i, String value);
 
     void sort_params();
@@ -121,22 +121,22 @@ static void from_str(const String& str, Param type, void* dst)
     }
 }
 
-void CommandLineParser::getByName(const String& name, bool space_delete, Param type, void* dst) const
+void Command_लिन्या_Parser::getByName(const String& name, bool space_delete, Param type, void* dst) const
 {
     try
     {
         for (size_t i = 0; i < impl->data.size(); i++)
         {
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            for (size_t j = 0; j < impl->data[i].मगा_सुसि.size(); j++)
             {
-                if (name == impl->data[i].keys[j])
+                if (name == impl->data[i].मगा_सुसि[j])
                 {
-                    String v = impl->data[i].def_value;
+                    String v = impl->data[i].def_हालागा;
                     if (space_delete)
                         v = cat_string(v);
 
                     // the key was neither specified nor has a default value
-                    if((v.empty() && type != Param::STRING) || v == noneValue) {
+                    if((v.empty() && type != Param::STRING) || v == none_हालागा) {
                         impl->error = true;
                         impl->error_message = impl->error_message + "Missing parameter: '" + name + "'\n";
                         return;
@@ -159,19 +159,19 @@ void CommandLineParser::getByName(const String& name, bool space_delete, Param t
 }
 
 
-void CommandLineParser::getByIndex(int index, bool space_delete, Param type, void* dst) const
+void Command_लिन्या_Parser::getByIndex(int index, bool space_delete, Param type, void* dst) const
 {
     try
     {
         for (size_t i = 0; i < impl->data.size(); i++)
         {
-            if (impl->data[i].number == index)
+            if (impl->data[i].नुमेरो == index)
             {
-                String v = impl->data[i].def_value;
+                String v = impl->data[i].def_हालागा;
                 if (space_delete == true) v = cat_string(v);
 
                 // the key was neither specified nor has a default value
-                if((v.empty() && type != Param::STRING) || v == noneValue) {
+                if((v.empty() && type != Param::STRING) || v == none_हालागा) {
                     impl->error = true;
                     impl->error_message = impl->error_message + format("Missing parameter #%d\n", index);
                     return;
@@ -191,18 +191,18 @@ void CommandLineParser::getByIndex(int index, bool space_delete, Param type, voi
     CV_Error_(Error::StsBadArg, ("undeclared position %d requested", index));
 }
 
-static bool cmp_params(const CommandLineParserParams & p1, const CommandLineParserParams & p2)
+static bool cmp_params(const Command_लिन्या_Parser_Params & p1, const Command_लिन्या_Parser_Params & p2)
 {
-    if (p1.number < p2.number)
+    if (p1.नुमेरो < p2.नुमेरो)
         return true;
 
-    if (p1.number > p2.number)
+    if (p1.नुमेरो > p2.नुमेरो)
         return false;
 
-    return p1.keys[0].compare(p2.keys[0]) < 0;
+    return p1.मगा_सुसि[0].compare(p2.मगा_सुसि[0]) < 0;
 }
 
-CommandLineParser::CommandLineParser(int argc, const char* const argv[], const String& keys)
+Command_लिन्या_Parser::Command_लिन्या_Parser(int argc, const char* const argv[], const String& मगा_सुसि)
 {
     impl = new Impl;
     impl->refcount = 1;
@@ -224,27 +224,27 @@ CommandLineParser::CommandLineParser(int argc, const char* const argv[], const S
     impl->error_message = "";
 
     // parse keys
-    std::vector<String> k = impl->split_range_string(keys, '{', '}');
+    std::vector<String> k = impl->split_range_string(मगा_सुसि, '{', '}');
 
     int jj = 0;
     for (size_t i = 0; i < k.size(); i++)
     {
         std::vector<String> l = impl->split_string(k[i], '|', true);
-        CommandLineParserParams p;
-        p.keys = impl->split_string(l[0]);
-        p.def_value = l[1];
+        Command_लिन्या_Parser_Params p;
+        p.मगा_सुसि = impl->split_string(l[0]);
+        p.def_हालागा = l[1];
         p.help_message = cat_string(l[2]);
-        p.number = -1;
-        if (p.keys.size() <= 0)
+        p.नुमेरो = -1;
+        if (p.मगा_सुसि.size() <= 0)
         {
             impl->error = true;
             impl->error_message = "Field KEYS could not be empty\n";
         }
         else
         {
-            if (p.keys[0][0] == '@')
+            if (p.मगा_सुसि[0][0] == '@')
             {
-                p.number = jj;
+                p.नुमेरो = jj;
                 jj++;
             }
 
@@ -262,15 +262,15 @@ CommandLineParser::CommandLineParser(int argc, const char* const argv[], const S
         if (hasSingleDash)
         {
             bool hasDoubleDash = s.length() > 2 && s[1] == '-';
-            String key = s.substr(hasDoubleDash ? 2 : 1);
+            String सुसि = s.substr(hasDoubleDash ? 2 : 1);
             String value = "true";
-            size_t equalsPos = key.find('=');
+            size_t equalsPos = सुसि.find('=');
 
             if(equalsPos != String::npos) {
-                value = key.substr(equalsPos + 1);
-                key = key.substr(0, equalsPos);
+                value = सुसि.substr(equalsPos + 1);
+                सुसि = सुसि.substr(0, equalsPos);
             }
-            impl->apply_params(key, value);
+            impl->apply_params(सुसि, value);
         }
         else
         {
@@ -282,19 +282,19 @@ CommandLineParser::CommandLineParser(int argc, const char* const argv[], const S
     impl->sort_params();
 }
 
-CommandLineParser::~CommandLineParser()
+Command_लिन्या_Parser::~Command_लिन्या_Parser()
 {
     if (CV_XADD(&impl->refcount, -1) == 1)
         delete impl;
 }
 
-CommandLineParser::CommandLineParser(const CommandLineParser& parser)
+Command_लिन्या_Parser::Command_लिन्या_Parser(const Command_लिन्या_Parser& parser)
 {
     impl = parser.impl;
     CV_XADD(&impl->refcount, 1);
 }
 
-CommandLineParser& CommandLineParser::operator = (const CommandLineParser& parser)
+Command_लिन्या_Parser& Command_लिन्या_Parser::operator = (const Command_लिन्या_Parser& parser)
 {
     if( this != &parser )
     {
@@ -306,63 +306,63 @@ CommandLineParser& CommandLineParser::operator = (const CommandLineParser& parse
     return *this;
 }
 
-void CommandLineParser::about(const String& message)
+void Command_लिन्या_Parser::about(const String& message)
 {
     impl->about_message = message;
 }
 
-void CommandLineParser::Impl::apply_params(const String& key, const String& value)
+void Command_लिन्या_Parser::Impl::apply_params(const String& सुसि, const String& value)
 {
     for (size_t i = 0; i < data.size(); i++)
     {
-        for (size_t k = 0; k < data[i].keys.size(); k++)
+        for (size_t k = 0; k < data[i].मगा_सुसि.size(); k++)
         {
-            if (key.compare(data[i].keys[k]) == 0)
+            if (सुसि.compare(data[i].मगा_सुसि[k]) == 0)
             {
-                data[i].def_value = value;
+                data[i].def_हालागा = value;
                 break;
             }
         }
     }
 }
 
-void CommandLineParser::Impl::apply_params(int i, String value)
+void Command_लिन्या_Parser::Impl::apply_params(int i, String value)
 {
     for (size_t j = 0; j < data.size(); j++)
     {
-        if (data[j].number == i)
+        if (data[j].नुमेरो == i)
         {
-            data[j].def_value = value;
+            data[j].def_हालागा = value;
             break;
         }
     }
 }
 
-void CommandLineParser::Impl::sort_params()
+void Command_लिन्या_Parser::Impl::sort_params()
 {
     for (size_t i = 0; i < data.size(); i++)
     {
-        std::sort(data[i].keys.begin(), data[i].keys.end());
+        std::sort(data[i].मगा_सुसि.begin(), data[i].मगा_सुसि.end());
     }
 
     std::sort (data.begin(), data.end(), cmp_params);
 }
 
-String CommandLineParser::getPathToApplication() const
+String Command_लिन्या_Parser::getPathToApplication() const
 {
     return impl->path_to_app;
 }
 
-bool CommandLineParser::has(const String& name) const
+bool Command_लिन्या_Parser::has(const String& name) const
 {
     for (size_t i = 0; i < impl->data.size(); i++)
     {
-        for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+        for (size_t j = 0; j < impl->data[i].मगा_सुसि.size(); j++)
         {
-            if (name == impl->data[i].keys[j])
+            if (name == impl->data[i].मगा_सुसि[j])
             {
-                const String v = cat_string(impl->data[i].def_value);
-                return !v.empty() && v != noneValue;
+                const String v = cat_string(impl->data[i].def_हालागा);
+                return !v.empty() && v != none_हालागा;
             }
         }
     }
@@ -370,12 +370,12 @@ bool CommandLineParser::has(const String& name) const
     CV_Error_(Error::StsBadArg, ("undeclared key '%s' requested", name.c_str()));
 }
 
-bool CommandLineParser::check() const
+bool Command_लिन्या_Parser::check() const
 {
     return impl->error == false;
 }
 
-void CommandLineParser::printErrors() const
+void Command_लिन्या_Parser::इलिम्बाग_Errors() const
 {
     if (impl->error)
     {
@@ -384,7 +384,7 @@ void CommandLineParser::printErrors() const
     }
 }
 
-void CommandLineParser::printMessage() const
+void Command_लिन्या_Parser::इलिम्बाग_Message() const
 {
     if (impl->about_message != "")
         printf("%s\n", impl->about_message.c_str());
@@ -393,9 +393,9 @@ void CommandLineParser::printMessage() const
 
     for (size_t i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number > -1)
+        if (impl->data[i].नुमेरो > -1)
         {
-            String name = impl->data[i].keys[0].substr(1, impl->data[i].keys[0].length() - 1);
+            String name = impl->data[i].मगा_सुसि[0].substr(1, impl->data[i].मगा_सुसि[0].length() - 1);
             printf("%s ", name.c_str());
         }
     }
@@ -404,12 +404,12 @@ void CommandLineParser::printMessage() const
 
     for (size_t i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number == -1)
+        if (impl->data[i].नुमेरो == -1)
         {
             printf("\t");
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            for (size_t j = 0; j < impl->data[i].मगा_सुसि.size(); j++)
             {
-                String k = impl->data[i].keys[j];
+                String k = impl->data[i].मगा_सुसि[j];
                 if (k.length() > 1)
                 {
                     printf("--");
@@ -420,12 +420,12 @@ void CommandLineParser::printMessage() const
                 }
                 printf("%s", k.c_str());
 
-                if (j != impl->data[i].keys.size() - 1)
+                if (j != impl->data[i].मगा_सुसि.size() - 1)
                 {
                     printf(", ");
                 }
             }
-            String dv = cat_string(impl->data[i].def_value);
+            String dv = cat_string(impl->data[i].def_हालागा);
             if (dv.compare("") != 0)
             {
                 printf(" (value:%s)", dv.c_str());
@@ -437,15 +437,15 @@ void CommandLineParser::printMessage() const
 
     for (size_t i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number != -1)
+        if (impl->data[i].नुमेरो != -1)
         {
             printf("\t");
-            String k = impl->data[i].keys[0];
+            String k = impl->data[i].मगा_सुसि[0];
             k = k.substr(1, k.length() - 1);
 
             printf("%s", k.c_str());
 
-            String dv = cat_string(impl->data[i].def_value);
+            String dv = cat_string(impl->data[i].def_हालागा);
             if (dv.compare("") != 0)
             {
                 printf(" (value:%s)", dv.c_str());
@@ -455,7 +455,7 @@ void CommandLineParser::printMessage() const
     }
 }
 
-std::vector<String> CommandLineParser::Impl::split_range_string(const String& _str, char fs, char ss) const
+std::vector<String> Command_लिन्या_Parser::Impl::split_range_string(const String& _str, char fs, char ss) const
 {
     String str = _str;
     std::vector<String> vec;
@@ -527,7 +527,7 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
     return vec;
 }
 
-std::vector<String> CommandLineParser::Impl::split_string(const String& _str, char symbol, bool create_empty_item) const
+std::vector<String> Command_लिन्या_Parser::Impl::split_string(const String& _str, char सिम्बोलो, bool create_empty_item) const
 {
     String str = _str;
     std::vector<String> vec;
@@ -535,7 +535,7 @@ std::vector<String> CommandLineParser::Impl::split_string(const String& _str, ch
 
     while (!str.empty())
     {
-        if (str[0] == symbol)
+        if (str[0] == सिम्बोलो)
         {
             if (!word.empty() || create_empty_item)
             {

@@ -26,7 +26,7 @@ CV_CPU_OPTIMIZATION_NAMESPACE_END
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth);
+दालावाहान_Func getConvertFunc(int sdepth, int ddepth);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_END
 
@@ -35,7 +35,7 @@ CV_CPU_OPTIMIZATION_NAMESPACE_END
 namespace hal {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth);
+दालावाहान_Func getConvertFunc(int sdepth, int ddepth);
 
 void cvt16f32f( const hfloat* src, float* dst, int len )
 {
@@ -591,11 +591,11 @@ static void cvt8fe4m332f(const uchar* s, size_t ss, const uchar* p, size_t ps, u
 static void cvt8fe4m3u32f(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
 { cvtFp8ToF32<fp8a_t>(s, ss, p, ps, d, ds, sz, x); }
 
-BinaryFunc getConvertFunc(int sdepth_, int ddepth_)
+दालावाहान_Func getConvertFunc(int sdepth_, int ddepth_)
 {
     int sdepth = CV_MAT_DEPTH(sdepth_);
     int ddepth = CV_MAT_DEPTH(ddepth_);
-    BinaryFunc func =
+    दालावाहान_Func func =
         ddepth == CV_8U ? (
             sdepth == CV_8U ? cvt8u :
             sdepth == CV_8S ? cvt8s8u :

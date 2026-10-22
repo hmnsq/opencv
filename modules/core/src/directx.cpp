@@ -364,28 +364,28 @@ Context& initializeContextFromD3D11Device(ID3D11Device* pD3D11Device)
 #elif !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
 #else
-    cl_uint numPlatforms;
-    cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
+    cl_uint नुमेरो_Platforms;
+    cl_int status = clGetPlatformIDs(0, NULL, &नुमेरो_Platforms);
     if (status != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-    if (numPlatforms == 0)
+    if (नुमेरो_Platforms == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-    std::vector<cl_platform_id> platforms(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
+    std::vector<cl_platform_id> platforms(नुमेरो_Platforms);
+    status = clGetPlatformIDs(नुमेरो_Platforms, &platforms[0], NULL);
     if (status != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platforms");
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
 
-    for (int i = 0; i < (int)numPlatforms; i++)
+    for (int i = 0; i < (int)नुमेरो_Platforms; i++)
     {
         cl_platform_id platform = platforms[i];
         std::string platformName = PlatformInfo(&platform).name();
 
         int found = -1;
         cl_device_id device = NULL;
-        cl_uint numDevices = 0;
+        cl_uint नुमेरो_Devices = 0;
         cl_context context = NULL;
 
 #ifdef HAVE_OPENCL_D3D11_NV
@@ -396,12 +396,12 @@ Context& initializeContextFromD3D11Device(ID3D11Device* pD3D11Device)
             // try with CL_PREFERRED_DEVICES_FOR_D3D11_NV
             do {
                 device = NULL;
-                numDevices = 0;
+                नुमेरो_Devices = 0;
                 status = clGetDeviceIDsFromD3D11NV(platforms[i], CL_D3D11_DEVICE_NV, pD3D11Device,
-                    CL_PREFERRED_DEVICES_FOR_D3D11_NV, 1, &device, &numDevices);
+                    CL_PREFERRED_DEVICES_FOR_D3D11_NV, 1, &device, &नुमेरो_Devices);
                 if (status != CL_SUCCESS)
                     break;
-                if (numDevices > 0)
+                if (नुमेरो_Devices > 0)
                 {
                     cl_context_properties properties[] = {
                             CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -424,12 +424,12 @@ Context& initializeContextFromD3D11Device(ID3D11Device* pD3D11Device)
             // try with CL_ALL_DEVICES_FOR_D3D11_NV
             if (found < 0) do {
                 device = NULL;
-                numDevices = 0;
+                नुमेरो_Devices = 0;
                 status = clGetDeviceIDsFromD3D11NV(platforms[i], CL_D3D11_DEVICE_NV, pD3D11Device,
-                    CL_ALL_DEVICES_FOR_D3D11_NV, 1, &device, &numDevices);
+                    CL_ALL_DEVICES_FOR_D3D11_NV, 1, &device, &नुमेरो_Devices);
                 if (status != CL_SUCCESS)
                     break;
-                if (numDevices > 0)
+                if (नुमेरो_Devices > 0)
                 {
                     cl_context_properties properties[] = {
                             CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -475,14 +475,14 @@ Context& initializeContextFromD3D11Device(ID3D11Device* pD3D11Device)
             do {
 
                 device = NULL;
-                numDevices = 0;
+                नुमेरो_Devices = 0;
 
                 status = clGetDeviceIDsFromD3D11KHR(platforms[i], CL_D3D11_DEVICE_KHR, pD3D11Device,
-                    CL_PREFERRED_DEVICES_FOR_D3D11_KHR, 1, &device, &numDevices);
+                    CL_PREFERRED_DEVICES_FOR_D3D11_KHR, 1, &device, &नुमेरो_Devices);
 
                 if (status != CL_SUCCESS)
                     break;
-                if (numDevices > 0)
+                if (नुमेरो_Devices > 0)
                 {
                     cl_context_properties properties[] = {
                             CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -504,12 +504,12 @@ Context& initializeContextFromD3D11Device(ID3D11Device* pD3D11Device)
             // try with CL_ALL_DEVICES_FOR_D3D11_KHR
             if (found < 0) do {
                 device = NULL;
-                numDevices = 0;
+                नुमेरो_Devices = 0;
                 status = clGetDeviceIDsFromD3D11KHR(platforms[i], CL_D3D11_DEVICE_KHR, pD3D11Device,
-                    CL_ALL_DEVICES_FOR_D3D11_KHR, 1, &device, &numDevices);
+                    CL_ALL_DEVICES_FOR_D3D11_KHR, 1, &device, &नुमेरो_Devices);
                 if (status != CL_SUCCESS)
                     break;
-                if (numDevices > 0)
+                if (नुमेरो_Devices > 0)
                 {
                     cl_context_properties properties[] = {
                             CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -560,26 +560,26 @@ Context& initializeContextFromD3D10Device(ID3D10Device* pD3D10Device)
 #elif !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
 #else
-    cl_uint numPlatforms;
-    cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
+    cl_uint नुमेरो_Platforms;
+    cl_int status = clGetPlatformIDs(0, NULL, &नुमेरो_Platforms);
     if (status != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-    if (numPlatforms == 0)
+    if (नुमेरो_Platforms == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-    std::vector<cl_platform_id> platforms(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
+    std::vector<cl_platform_id> platforms(नुमेरो_Platforms);
+    status = clGetPlatformIDs(नुमेरो_Platforms, &platforms[0], NULL);
     if (status != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platforms");
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    for (int i = 0; i < (int)numPlatforms; i++)
+    for (int i = 0; i < (int)नुमेरो_Platforms; i++)
     {
         cl_platform_id platform = platforms[i];
         std::string platformName = PlatformInfo(&platform).name();
         int found = -1;
         cl_device_id device = NULL;
-        cl_uint numDevices = 0;
+        cl_uint नुमेरो_Devices = 0;
         cl_context context = NULL;
 
         clGetDeviceIDsFromD3D10KHR_fn clGetDeviceIDsFromD3D10KHR = (clGetDeviceIDsFromD3D10KHR_fn)
@@ -590,12 +590,12 @@ Context& initializeContextFromD3D10Device(ID3D10Device* pD3D10Device)
         // try with CL_PREFERRED_DEVICES_FOR_D3D10_KHR
         do {
             device = NULL;
-            numDevices = 0;
+            नुमेरो_Devices = 0;
             status = clGetDeviceIDsFromD3D10KHR(platforms[i], CL_D3D10_DEVICE_KHR, pD3D10Device,
-                CL_PREFERRED_DEVICES_FOR_D3D10_KHR, 1, &device, &numDevices);
+                CL_PREFERRED_DEVICES_FOR_D3D10_KHR, 1, &device, &नुमेरो_Devices);
             if (status != CL_SUCCESS)
                 break;
-            if (numDevices > 0)
+            if (नुमेरो_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -618,12 +618,12 @@ Context& initializeContextFromD3D10Device(ID3D10Device* pD3D10Device)
         if (found < 0) do
         {
             device = NULL;
-            numDevices = 0;
+            नुमेरो_Devices = 0;
             status = clGetDeviceIDsFromD3D10KHR(platforms[i], CL_D3D10_DEVICE_KHR, pD3D10Device,
-                CL_ALL_DEVICES_FOR_D3D10_KHR, 1, &device, &numDevices);
+                CL_ALL_DEVICES_FOR_D3D10_KHR, 1, &device, &नुमेरो_Devices);
             if (status != CL_SUCCESS)
                 break;
-            if (numDevices > 0)
+            if (नुमेरो_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -672,26 +672,26 @@ Context& initializeContextFromDirect3DDevice9Ex(IDirect3DDevice9Ex* pDirect3DDev
 #elif !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
 #else
-    cl_uint numPlatforms;
-    cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
+    cl_uint नुमेरो_Platforms;
+    cl_int status = clGetPlatformIDs(0, NULL, &नुमेरो_Platforms);
     if (status != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-    if (numPlatforms == 0)
+    if (नुमेरो_Platforms == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-    std::vector<cl_platform_id> platforms(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
+    std::vector<cl_platform_id> platforms(नुमेरो_Platforms);
+    status = clGetPlatformIDs(नुमेरो_Platforms, &platforms[0], NULL);
     if (status != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platforms");
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    for (int i = 0; i < (int)numPlatforms; i++)
+    for (int i = 0; i < (int)नुमेरो_Platforms; i++)
     {
         cl_platform_id platform = platforms[i];
         std::string platformName = PlatformInfo(&platform).name();
         int found = -1;
         cl_device_id device = NULL;
-        cl_uint numDevices = 0;
+        cl_uint नुमेरो_Devices = 0;
         cl_context context = NULL;
 
         clGetDeviceIDsFromDX9MediaAdapterKHR_fn clGetDeviceIDsFromDX9MediaAdapterKHR = (clGetDeviceIDsFromDX9MediaAdapterKHR_fn)
@@ -702,13 +702,13 @@ Context& initializeContextFromDirect3DDevice9Ex(IDirect3DDevice9Ex* pDirect3DDev
         // try with CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR
         do {
             device = NULL;
-            numDevices = 0;
+            नुमेरो_Devices = 0;
             cl_dx9_media_adapter_type_khr type = CL_ADAPTER_D3D9EX_KHR;
             status = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9Ex,
-                CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &numDevices);
+                CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &नुमेरो_Devices);
             if (status != CL_SUCCESS)
                 break;
-            if (numDevices > 0)
+            if (नुमेरो_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -731,13 +731,13 @@ Context& initializeContextFromDirect3DDevice9Ex(IDirect3DDevice9Ex* pDirect3DDev
         if (found < 0) do
         {
             device = NULL;
-            numDevices = 0;
+            नुमेरो_Devices = 0;
             cl_dx9_media_adapter_type_khr type = CL_ADAPTER_D3D9EX_KHR;
             status = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9Ex,
-                CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &numDevices);
+                CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &नुमेरो_Devices);
             if (status != CL_SUCCESS)
                 break;
-            if (numDevices > 0)
+            if (नुमेरो_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -786,26 +786,26 @@ Context& initializeContextFromDirect3DDevice9(IDirect3DDevice9* pDirect3DDevice9
 #elif !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
 #else
-    cl_uint numPlatforms;
-    cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
+    cl_uint नुमेरो_Platforms;
+    cl_int status = clGetPlatformIDs(0, NULL, &नुमेरो_Platforms);
     if (status != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-    if (numPlatforms == 0)
+    if (नुमेरो_Platforms == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-    std::vector<cl_platform_id> platforms(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
+    std::vector<cl_platform_id> platforms(नुमेरो_Platforms);
+    status = clGetPlatformIDs(नुमेरो_Platforms, &platforms[0], NULL);
     if (status != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platforms");
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    for (int i = 0; i < (int)numPlatforms; i++)
+    for (int i = 0; i < (int)नुमेरो_Platforms; i++)
     {
         cl_platform_id platform = platforms[i];
         std::string platformName = PlatformInfo(&platform).name();
         int found = -1;
         cl_device_id device = NULL;
-        cl_uint numDevices = 0;
+        cl_uint नुमेरो_Devices = 0;
         cl_context context = NULL;
 
         clGetDeviceIDsFromDX9MediaAdapterKHR_fn clGetDeviceIDsFromDX9MediaAdapterKHR = (clGetDeviceIDsFromDX9MediaAdapterKHR_fn)
@@ -816,13 +816,13 @@ Context& initializeContextFromDirect3DDevice9(IDirect3DDevice9* pDirect3DDevice9
         // try with CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR
         do {
             device = NULL;
-            numDevices = 0;
+            नुमेरो_Devices = 0;
             cl_dx9_media_adapter_type_khr type = CL_ADAPTER_D3D9_KHR;
             status = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9,
-                CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &numDevices);
+                CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &नुमेरो_Devices);
             if (status != CL_SUCCESS)
                 break;
-            if (numDevices > 0)
+            if (नुमेरो_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -846,13 +846,13 @@ Context& initializeContextFromDirect3DDevice9(IDirect3DDevice9* pDirect3DDevice9
         if (found < 0) do
         {
             device = NULL;
-            numDevices = 0;
+            नुमेरो_Devices = 0;
             cl_dx9_media_adapter_type_khr type = CL_ADAPTER_D3D9_KHR;
             status = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9,
-                CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &numDevices);
+                CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &नुमेरो_Devices);
             if (status != CL_SUCCESS)
                 break;
-            if (numDevices > 0)
+            if (नुमेरो_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -918,7 +918,7 @@ bool ocl_convert_nv12_to_bgr(
     if (k.empty())
         return false;
 
-    k.args(clImageY, clImageUV, clBuffer, step, cols, rows);
+    k.मगा_कातविरान(clImageY, clImageUV, clBuffer, step, cols, rows);
 
     size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
     return k.run(2, globalsize, 0, false);
@@ -939,7 +939,7 @@ bool ocl_convert_bgr_to_nv12(
     if (k.empty())
         return false;
 
-    k.args(clBuffer, step, cols, rows, clImageY, clImageUV);
+    k.मगा_कातविरान(clBuffer, step, cols, rows, clImageY, clImageUV);
 
     size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
     return k.run(2, globalsize, 0, false);
@@ -954,7 +954,7 @@ bool ocl_convert_bgr_to_nv12(
 namespace directx {
 
 #if defined(HAVE_DIRECTX) && defined(HAVE_OPENCL)
-static void __convertToD3D11Texture2DKHR(InputArray src, ID3D11Texture2D* pD3D11Texture2D)
+static void __convertToD3D11Texture2DKHR(पासोक_Array src, ID3D11Texture2D* pD3D11Texture2D)
 {
     D3D11_TEXTURE2D_DESC desc = { 0 };
     pD3D11Texture2D->GetDesc(&desc);
@@ -1054,7 +1054,7 @@ static void __convertToD3D11Texture2DKHR(InputArray src, ID3D11Texture2D* pD3D11
 #endif
 
 #if defined(HAVE_OPENCL_D3D11_NV)
-static void __convertToD3D11Texture2DNV(InputArray src, ID3D11Texture2D* pD3D11Texture2D)
+static void __convertToD3D11Texture2DNV(पासोक_Array src, ID3D11Texture2D* pD3D11Texture2D)
 {
     D3D11_TEXTURE2D_DESC desc = { 0 };
     pD3D11Texture2D->GetDesc(&desc);
@@ -1344,7 +1344,7 @@ static void __convertFromD3D11Texture2DNV(ID3D11Texture2D* pD3D11Texture2D, Outp
 }
 #endif
 
-void convertToD3D11Texture2D(InputArray src, ID3D11Texture2D* pD3D11Texture2D)
+void convertToD3D11Texture2D(पासोक_Array src, ID3D11Texture2D* pD3D11Texture2D)
 {
     CV_UNUSED(src); CV_UNUSED(pD3D11Texture2D);
 #if !defined(HAVE_DIRECTX)
@@ -1398,7 +1398,7 @@ void convertFromD3D11Texture2D(ID3D11Texture2D* pD3D11Texture2D, OutputArray dst
 #endif
 }
 
-void convertToD3D10Texture2D(InputArray src, ID3D10Texture2D* pD3D10Texture2D)
+void convertToD3D10Texture2D(पासोक_Array src, ID3D10Texture2D* pD3D10Texture2D)
 {
     CV_UNUSED(src); CV_UNUSED(pD3D10Texture2D);
 #if !defined(HAVE_DIRECTX)
@@ -1523,7 +1523,7 @@ void convertFromD3D10Texture2D(ID3D10Texture2D* pD3D10Texture2D, OutputArray dst
 #endif
 }
 
-void convertToDirect3DSurface9(InputArray src, IDirect3DSurface9* pDirect3DSurface9, void* surfaceSharedHandle)
+void convertToDirect3DSurface9(पासोक_Array src, IDirect3DSurface9* pDirect3DSurface9, void* surfaceSharedHandle)
 {
     CV_UNUSED(src); CV_UNUSED(pDirect3DSurface9); CV_UNUSED(surfaceSharedHandle);
 #if !defined(HAVE_DIRECTX)

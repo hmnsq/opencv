@@ -45,13 +45,13 @@
 using namespace cv;
 using namespace cv::cuda;
 
-int cv::cuda::getCudaEnabledDeviceCount()
+int cv::cuda::get_Cuda_Enabled_Device_बिलांग()
 {
 #ifndef HAVE_CUDA
     return 0;
 #else
-    int count;
-    cudaError_t error = cudaGetDeviceCount(&count);
+    int बिलांग_2;
+    cudaError_t error = cuda_Get_Device_बिलांग(&बिलांग_2);
 
     if (error == cudaErrorInsufficientDriver)
         return -1;
@@ -60,7 +60,7 @@ int cv::cuda::getCudaEnabledDeviceCount()
         return 0;
 
     cudaSafeCall( error );
-    return count;
+    return बिलांग_2;
 #endif
 }
 
@@ -208,12 +208,12 @@ namespace
             }
             else
             {
-                int cur_value;
+                int cur_हालागा;
                 int chars_read;
-                int args_read = sscanf(set_as_str + pos, "%d%n", &cur_value, &chars_read);
-                CV_Assert( args_read == 1 );
+                int मगा_कातविरान_read = sscanf(set_as_str + pos, "%d%n", &cur_हालागा, &chars_read);
+                CV_Assert( मगा_कातविरान_read == 1 );
 
-                arr.push_back(cur_value);
+                arr.push_back(cur_हालागा);
                 pos += chars_read;
             }
         }
@@ -309,13 +309,13 @@ namespace
 
     DeviceProps::DeviceProps()
     {
-        int count = getCudaEnabledDeviceCount();
+        int बिलांग_2 = get_Cuda_Enabled_Device_बिलांग();
 
-        if (count > 0)
+        if (बिलांग_2 > 0)
         {
-            props_.resize(count);
+            props_.resize(बिलांग_2);
 
-            for (int devID = 0; devID < count; ++devID)
+            for (int devID = 0; devID < बिलांग_2; ++devID)
             {
                 cudaSafeCall( cudaGetDeviceProperties(&props_[devID], devID) );
             }
@@ -475,12 +475,12 @@ size_t cv::cuda::DeviceInfo::texturePitchAlignment() const
 #endif
 }
 
-int cv::cuda::DeviceInfo::multiProcessorCount() const
+int cv::cuda::DeviceInfo::multi_Processor_बिलांग() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
 #else
-    return deviceProps().get(device_id_)->multiProcessorCount;
+    return deviceProps().get(device_id_)->multi_Processor_बिलांग;
 #endif
 }
 
@@ -783,12 +783,12 @@ bool cv::cuda::DeviceInfo::tccDriver() const
 #endif
 }
 
-int cv::cuda::DeviceInfo::asyncEngineCount() const
+int cv::cuda::DeviceInfo::async_Engine_बिलांग() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
 #else
-    return deviceProps().get(device_id_)->asyncEngineCount;
+    return deviceProps().get(device_id_)->async_Engine_बिलांग;
 #endif
 }
 
@@ -906,20 +906,20 @@ namespace
 
 #endif
 
-void cv::cuda::printCudaDeviceInfo(int device)
+void cv::cuda::इलिम्बाग_Cuda_Device_Info(int device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
 #else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+    int बिलांग_2 = get_Cuda_Enabled_Device_बिलांग();
+    bool valid = (device >= 0) && (device < बिलांग_2);
 
     int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    int end = valid ? device+1 : बिलांग_2;
 
     printf("*** CUDA Device Query (Runtime API) version (CUDART static linking) *** \n\n");
-    printf("Device count: %d\n", count);
+    printf("Device count: %d\n", बिलांग_2);
 
     int driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
@@ -946,7 +946,7 @@ void cv::cuda::printCudaDeviceInfo(int device)
 
         int cores = convertSMVer2Cores(prop.major, prop.minor);
         if (cores > 0)
-            printf("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multiProcessorCount, cores, cores * prop.multiProcessorCount);
+            printf("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multi_Processor_बिलांग, cores, cores * prop.multi_Processor_बिलांग);
 
         int clockRate;
         cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, dev));
@@ -969,7 +969,7 @@ void cv::cuda::printCudaDeviceInfo(int device)
         printf("  Maximum memory pitch:                          %u bytes\n", (int)prop.memPitch);
         printf("  Texture alignment:                             %u bytes\n", (int)prop.textureAlignment);
 
-        printf("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.asyncEngineCount ? "Yes" : "No"), prop.asyncEngineCount);
+        printf("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.async_Engine_बिलांग ? "Yes" : "No"), prop.async_Engine_बिलांग);
         int kernelExecTimeoutEnabled;
         cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, dev));
         printf("  Run time limit on kernels:                     %s\n", kernelExecTimeoutEnabled ? "Yes" : "No");
@@ -993,23 +993,23 @@ void cv::cuda::printCudaDeviceInfo(int device)
     printf("deviceQuery, CUDA Driver = CUDART");
     printf(", CUDA Driver Version  = %d.%d", driverVersion / 1000, driverVersion % 100);
     printf(", CUDA Runtime Version = %d.%d", runtimeVersion/1000, runtimeVersion%100);
-    printf(", NumDevs = %d\n\n", count);
+    printf(", NumDevs = %d\n\n", बिलांग_2);
 
     fflush(stdout);
 #endif
 }
 
-void cv::cuda::printShortCudaDeviceInfo(int device)
+void cv::cuda::इलिम्बाग_Short_Cuda_Device_Info(int device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
 #else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+    int बिलांग_2 = get_Cuda_Enabled_Device_बिलांग();
+    bool valid = (device >= 0) && (device < बिलांग_2);
 
     int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    int end = valid ? device+1 : बिलांग_2;
 
     int driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
@@ -1026,7 +1026,7 @@ void cv::cuda::printShortCudaDeviceInfo(int device)
 
         int cores = convertSMVer2Cores(prop.major, prop.minor);
         if (cores > 0)
-            printf(", %d cores", cores * prop.multiProcessorCount);
+            printf(", %d cores", cores * prop.multi_Processor_बिलांग);
 
         printf(", Driver/Runtime ver.%d.%d/%d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
     }
@@ -1071,9 +1071,9 @@ namespace
         error_entry( NPP_MEMFREE_ERR ),
         error_entry( NPP_MEMSET_ERR ),
         error_entry( NPP_MEM_ALLOC_ERR ),
-        error_entry( NPP_HISTO_NUMBER_OF_LEVELS_ERROR ),
+        error_entry( NPP_HISTO_नुमेरो_OF_LEVELS_ERROR ),
         error_entry( NPP_MIRROR_FLIP_ERR ),
-        error_entry( NPP_INVALID_INPUT ),
+        error_entry( NPP_INVALID_पासोक ),
         error_entry( NPP_POINTER_ERROR ),
         error_entry( NPP_WARNING ),
         error_entry( NPP_ODD_ROI_WARNING ),
@@ -1085,15 +1085,15 @@ namespace
         error_entry( NPP_MEMFREE_ERROR ),
         error_entry( NPP_MEMSET_ERROR ),
         error_entry( NPP_QUALITY_INDEX_ERROR ),
-        error_entry( NPP_HISTOGRAM_NUMBER_OF_LEVELS_ERROR ),
+        error_entry( NPP_HISTOGRAM_नुमेरो_OF_LEVELS_ERROR ),
         error_entry( NPP_CHANNEL_ORDER_ERROR ),
-        error_entry( NPP_ZERO_MASK_VALUE_ERROR ),
+        error_entry( NPP_ZERO_MASK_हालागा_ERROR ),
         error_entry( NPP_QUADRANGLE_ERROR ),
         error_entry( NPP_RECTANGLE_ERROR ),
         error_entry( NPP_COEFFICIENT_ERROR ),
-        error_entry( NPP_NUMBER_OF_CHANNELS_ERROR ),
+        error_entry( NPP_नुमेरो_OF_CHANNELS_ERROR ),
         error_entry( NPP_COI_ERROR ),
-        error_entry( NPP_DIVISOR_ERROR ),
+        error_entry( NPP_पांगहाति_ERROR ),
         error_entry( NPP_CHANNEL_ERROR ),
         error_entry( NPP_STRIDE_ERROR ),
         error_entry( NPP_ANCHOR_ERROR ),
@@ -1122,7 +1122,7 @@ namespace
         error_entry( NPP_NOT_SUPPORTED_MODE_ERROR ),
         error_entry( NPP_ROUND_MODE_NOT_SUPPORTED_ERROR ),
         error_entry( NPP_RESIZE_NO_OPERATION_ERROR ),
-        error_entry( NPP_LUT_NUMBER_OF_LEVELS_ERROR ),
+        error_entry( NPP_LUT_नुमेरो_OF_LEVELS_ERROR ),
         error_entry( NPP_TEXTURE_BIND_ERROR ),
         error_entry( NPP_WRONG_INTERSECTION_ROI_ERROR ),
         error_entry( NPP_NOT_EVEN_STEP_ERROR ),
@@ -1145,12 +1145,12 @@ namespace
         error_entry( NPP_DOUBLE_SIZE_WARNING )
     };
 
-    const size_t npp_error_num = sizeof(npp_errors) / sizeof(npp_errors[0]);
+    const size_t npp_error_नुमेरो = sizeof(npp_errors) / sizeof(npp_errors[0]);
 
     const ErrorEntry cu_errors [] =
     {
         error_entry( CUDA_SUCCESS                              ),
-        error_entry( CUDA_ERROR_INVALID_VALUE                  ),
+        error_entry( CUDA_ERROR_INVALID_हालागा                  ),
         error_entry( CUDA_ERROR_OUT_OF_MEMORY                  ),
         error_entry( CUDA_ERROR_NOT_INITIALIZED                ),
         error_entry( CUDA_ERROR_DEINITIALIZED                  ),
@@ -1167,7 +1167,7 @@ namespace
         error_entry( CUDA_ERROR_UNMAP_FAILED                   ),
         error_entry( CUDA_ERROR_ARRAY_IS_MAPPED                ),
         error_entry( CUDA_ERROR_ALREADY_MAPPED                 ),
-        error_entry( CUDA_ERROR_NO_BINARY_FOR_GPU              ),
+        error_entry( CUDA_ERROR_NO_दालावाहान_FOR_GPU              ),
         error_entry( CUDA_ERROR_ALREADY_ACQUIRED               ),
         error_entry( CUDA_ERROR_NOT_MAPPED                     ),
         error_entry( CUDA_ERROR_NOT_MAPPED_AS_ARRAY            ),
@@ -1177,7 +1177,7 @@ namespace
         error_entry( CUDA_ERROR_CONTEXT_ALREADY_IN_USE         ),
         error_entry( CUDA_ERROR_INVALID_SOURCE                 ),
         error_entry( CUDA_ERROR_FILE_NOT_FOUND                 ),
-        error_entry( CUDA_ERROR_SHARED_OBJECT_SYMBOL_NOT_FOUND ),
+        error_entry( CUDA_ERROR_SHARED_OBJECT_सिम्बोलो_NOT_FOUND ),
         error_entry( CUDA_ERROR_SHARED_OBJECT_INIT_FAILED      ),
         error_entry( CUDA_ERROR_OPERATING_SYSTEM               ),
         error_entry( CUDA_ERROR_INVALID_HANDLE                 ),
@@ -1198,14 +1198,14 @@ namespace
         error_entry( CUDA_ERROR_UNKNOWN                        )
     };
 
-    const size_t cu_errors_num = sizeof(cu_errors) / sizeof(cu_errors[0]);
+    const size_t cu_errors_नुमेरो = sizeof(cu_errors) / sizeof(cu_errors[0]);
 
     cv::String getErrorString(int code, const ErrorEntry* errors, size_t n)
     {
         size_t idx = std::find_if(errors, errors + n, ErrorEntryComparer(code)) - errors;
 
-        const char* msg = (idx != n) ? errors[idx].str : "Unknown error code";
-        cv::String str = cv::format("%s [Code = %d]", msg, code);
+        const char* मेनसाहे = (idx != n) ? errors[idx].str : "Unknown error code";
+        cv::String str = cv::format("%s [Code = %d]", मेनसाहे, code);
 
         return str;
     }
@@ -1219,7 +1219,7 @@ String cv::cuda::getNppErrorMessage(int code)
     CV_UNUSED(code);
     return String();
 #else
-    return getErrorString(code, npp_errors, npp_error_num);
+    return getErrorString(code, npp_errors, npp_error_नुमेरो);
 #endif
 }
 
@@ -1229,6 +1229,6 @@ String cv::cuda::getCudaDriverApiErrorMessage(int code)
     CV_UNUSED(code);
     return String();
 #else
-    return getErrorString(code, cu_errors, cu_errors_num);
+    return getErrorString(code, cu_errors, cu_errors_नुमेरो);
 #endif
 }

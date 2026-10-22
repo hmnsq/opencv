@@ -86,12 +86,12 @@ namespace
         size_t copied = mbstowcs(wfull_path, full_path.c_str(), MAX_PATH);
         CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
         dir->handle = ::FindFirstFileExW(wfull_path, FindExInfoStandard,
-                        &dir->data, FindExSearchNameMatch, NULL, 0);
+                        &dir->data, Find_Ex_हानाप_Name_Match, NULL, 0);
 #else
         dir->handle = ::FindFirstFileExA((cv::String(path) + "\\*").c_str(),
-            FindExInfoStandard, &dir->data, FindExSearchNameMatch, NULL, 0);
+            FindExInfoStandard, &dir->data, Find_Ex_हानाप_Name_Match, NULL, 0);
 #endif
-        if(dir->handle == INVALID_HANDLE_VALUE)
+        if(dir->handle == INVALID_HANDLE_हालागा)
         {
             /*closedir will do all cleanup*/
             delete dir;

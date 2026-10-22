@@ -56,9 +56,9 @@ typedef Vec<int, 128> Vec128i;
                                         Input/Output Array
 \*************************************************************************************************/
 
-Mat _InputArray::getMat_(int i) const
+Mat पासोक_Array_2::getMat_(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
     if( k == MAT )
@@ -179,9 +179,9 @@ Mat _InputArray::getMat_(int i) const
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-UMat _InputArray::getUMat(int i) const
+UMat पासोक_Array_2::getUMat(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
     if( k == UMAT )
@@ -211,9 +211,9 @@ UMat _InputArray::getUMat(int i) const
     return getMat(i).getUMat(accessFlags);
 }
 
-void _InputArray::getMatVector(std::vector<Mat>& mv) const
+void पासोक_Array_2::getMatVector(std::vector<Mat>& mv) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
     if( k == MAT )
@@ -318,9 +318,9 @@ void _InputArray::getMatVector(std::vector<Mat>& mv) const
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _InputArray::getUMatVector(std::vector<UMat>& umv) const
+void पासोक_Array_2::getUMatVector(std::vector<UMat>& umv) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
     if( k == NONE )
@@ -380,10 +380,10 @@ void _InputArray::getUMatVector(std::vector<UMat>& umv) const
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-cuda::GpuMat _InputArray::getGpuMat() const
+cuda::GpuMat पासोक_Array_2::getGpuMat() const
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if (k == CUDA_GPU_MAT)
     {
@@ -410,10 +410,10 @@ cuda::GpuMat _InputArray::getGpuMat() const
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-void _InputArray::getGpuMatVector(std::vector<cuda::GpuMat>& gpumv) const
+void पासोक_Array_2::getGpuMatVector(std::vector<cuda::GpuMat>& gpumv) const
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if (k == STD_VECTOR_CUDA_GPU_MAT)
     {
         gpumv = *(std::vector<cuda::GpuMat>*)obj;
@@ -423,10 +423,10 @@ void _InputArray::getGpuMatVector(std::vector<cuda::GpuMat>& gpumv) const
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-void _InputArray::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) const
+void पासोक_Array_2::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) const
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
         gpumv = *(std::vector<cuda::GpuMatND>*)obj;
@@ -436,10 +436,10 @@ void _InputArray::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) const
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-cuda::GpuMatND _InputArray::getGpuMatND() const
+cuda::GpuMatND पासोक_Array_2::getGpuMatND() const
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if (k == CUDA_GPU_MATND)
     {
@@ -452,9 +452,9 @@ cuda::GpuMatND _InputArray::getGpuMatND() const
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-ogl::Buffer _InputArray::getOGlBuffer() const
+ogl::Buffer पासोक_Array_2::getOGlBuffer() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     CV_Assert(k == OPENGL_BUFFER);
 
@@ -462,10 +462,10 @@ ogl::Buffer _InputArray::getOGlBuffer() const
     return *gl_buf;
 }
 
-int _InputArray::rows_(int i) const
+int पासोक_Array_2::rows_(int i) const
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if (k == CUDA_GPU_MATND)
     {
         const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
@@ -476,10 +476,10 @@ int _InputArray::rows_(int i) const
     return size_(i).height;
 }
 
-int _InputArray::cols_(int i) const
+int पासोक_Array_2::cols_(int i) const
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if (k == CUDA_GPU_MATND)
     {
         const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
@@ -490,9 +490,9 @@ int _InputArray::cols_(int i) const
     return size_(i).width;
 }
 
-Size _InputArray::size_(int i) const
+Size पासोक_Array_2::size_(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
     {
@@ -629,10 +629,10 @@ Size _InputArray::size_(int i) const
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::sizend(int* arrsz, int i) const
+int पासोक_Array_2::sizend(int* arrsz, int i) const
 {
     int j, d = 0;
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == NONE )
         ;
@@ -709,9 +709,9 @@ int _InputArray::sizend(int* arrsz, int i) const
     return d;
 }
 
-bool _InputArray::empty(int i) const
+bool पासोक_Array_2::empty(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if (i >= 0) {
         if (k == STD_VECTOR_MAT) {
             auto mv = reinterpret_cast<const std::vector<Mat>*>(obj);
@@ -733,9 +733,9 @@ bool _InputArray::empty(int i) const
     return empty();
 }
 
-MatShape _InputArray::shape(int i) const
+MatShape पासोक_Array_2::shape(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     MatShape shape;
 
     if( k == NONE )
@@ -783,9 +783,9 @@ MatShape _InputArray::shape(int i) const
     return shape;
 }
 
-bool _InputArray::sameSize(const _InputArray& arr) const
+bool पासोक_Array_2::sameSize(const पासोक_Array_2& arr) const
 {
-    _InputArray::KindFlag k1 = kind(), k2 = arr.kind();
+    पासोक_Array_2::KindFlag k1 = kind(), k2 = arr.kind();
     Size sz1;
 
     if( k1 == MAT )
@@ -822,9 +822,9 @@ bool _InputArray::sameSize(const _InputArray& arr) const
     return sz1 == arr.size();
 }
 
-int _InputArray::dims_(int i) const
+int पासोक_Array_2::dims_(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
     {
@@ -918,9 +918,9 @@ int _InputArray::dims_(int i) const
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-size_t _InputArray::total(int i) const
+size_t पासोक_Array_2::total(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
     {
@@ -1001,9 +1001,9 @@ size_t _InputArray::total(int i) const
     return size(i).area();
 }
 
-int _InputArray::type_(int i) const
+int पासोक_Array_2::type_(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
         return ((const Mat*)obj)->type();
@@ -1100,14 +1100,14 @@ int _InputArray::type_(int i) const
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::depth_(int i) const
+int पासोक_Array_2::depth_(int i) const
 {
     return CV_MAT_DEPTH(type(i));
 }
 
-bool _InputArray::empty_() const
+bool पासोक_Array_2::empty_() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
         return ((const Mat*)obj)->empty();
@@ -1171,9 +1171,9 @@ bool _InputArray::empty_() const
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isContinuous(int i) const
+bool पासोक_Array_2::isContinuous(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
         return i < 0 ? ((const Mat*)obj)->isContinuous() : true;
@@ -1215,9 +1215,9 @@ bool _InputArray::isContinuous(int i) const
     CV_Error(cv::Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isSubmatrix(int i) const
+bool पासोक_Array_2::isSubmatrix(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
         return i < 0 ? ((const Mat*)obj)->isSubmatrix() : false;
@@ -1265,9 +1265,9 @@ bool _InputArray::isSubmatrix(int i) const
     CV_Error(cv::Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::offset(int i) const
+size_t पासोक_Array_2::offset(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
     {
@@ -1325,9 +1325,9 @@ size_t _InputArray::offset(int i) const
     CV_Error(Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::step(int i) const
+size_t पासोक_Array_2::step(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
     {
@@ -1396,9 +1396,9 @@ size_t _InputArray::step(int i) const
     CV_Error(Error::StsNotImplemented, "");
 }
 
-void _InputArray::copyTo(const _OutputArray& arr) const
+void पासोक_Array_2::copyTo(const _OutputArray& arr) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == NONE )
         arr.release();
@@ -1417,9 +1417,9 @@ void _InputArray::copyTo(const _OutputArray& arr) const
         CV_Error(Error::StsNotImplemented, "");
 }
 
-void _InputArray::copyTo(const _OutputArray& arr, const _InputArray & mask) const
+void पासोक_Array_2::copyTo(const _OutputArray& arr, const पासोक_Array_2 & mask) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == NONE )
         arr.release();
@@ -1450,7 +1450,7 @@ bool _OutputArray::fixedType() const
 
 void _OutputArray::create_(Size _sz, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == _sz);
@@ -1516,7 +1516,7 @@ void _OutputArray::create_(Size _sz, int mtype, int i, bool allowTransposed, _Ou
 
 void _OutputArray::create_(int _rows, int _cols, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == Size(_cols, _rows));
@@ -1584,7 +1584,7 @@ void _OutputArray::create(int d, const int* sizes, int mtype, int i,
                           bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
     int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     mtype = CV_MAT_TYPE(mtype);
 
     if( k == MAT )
@@ -1936,7 +1936,7 @@ Mat _OutputArray::reinterpret(int mtype) const
     return getMat().reinterpret(mtype);
 }
 
-void _OutputArray::createSameSize(const _InputArray& arr, int mtype) const
+void _OutputArray::createSameSize(const पासोक_Array_2& arr, int mtype) const
 {
     create(arr.shape(), mtype);
 }
@@ -1965,7 +1965,7 @@ void _OutputArray::fit(const MatShape& shape, int mtype, int i,
     fit(shape.dims, shape.p, mtype, i, allowTransposed, fixedDepthMask);
 
     // fit(dims, sizes) resets the layout, so carry it over the same way Mat::fit(const MatShape&) does
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if ((k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0)) {
         MatSize& msize = getMatRef(i).size;
         msize.layout = shape.layout;
@@ -1977,7 +1977,7 @@ void _OutputArray::fit(const MatShape& shape, int mtype, int i,
     }
 }
 
-void _OutputArray::fitSameSize(const _InputArray& arr, int mtype) const
+void _OutputArray::fitSameSize(const पासोक_Array_2& arr, int mtype) const
 {
     fit(arr.shape(), mtype);
 }
@@ -1986,7 +1986,7 @@ void _OutputArray::fit(int d, const int* sizes, int mtype, int i,
                        bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
     int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     mtype = CV_MAT_TYPE(mtype);
 
     if( (k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0) )
@@ -2068,7 +2068,7 @@ void _OutputArray::release() const
 {
     CV_Assert(!fixedSize());
 
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
     {
@@ -2183,7 +2183,7 @@ void _OutputArray::release() const
 
 void _OutputArray::clear() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == MAT )
     {
@@ -2202,7 +2202,7 @@ bool _OutputArray::needed() const
 
 Mat& _OutputArray::getMatRef(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if( i < 0 )
     {
         CV_Assert( k == MAT );
@@ -2227,7 +2227,7 @@ Mat& _OutputArray::getMatRef(int i) const
 
 UMat& _OutputArray::getUMatRef(int i) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if( i < 0 )
     {
         CV_Assert( k == UMAT );
@@ -2244,47 +2244,47 @@ UMat& _OutputArray::getUMatRef(int i) const
 
 cuda::GpuMat& _OutputArray::getGpuMatRef() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     CV_Assert( k == CUDA_GPU_MAT );
     return *(cuda::GpuMat*)obj;
 }
 std::vector<cuda::GpuMat>& _OutputArray::getGpuMatVecRef() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT);
     return *(std::vector<cuda::GpuMat>*)obj;
 }
 cuda::GpuMatND& _OutputArray::getGpuMatNDRef() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     CV_Assert( k == CUDA_GPU_MATND );
     return *(cuda::GpuMatND*)obj;
 }
 
 std::vector<cuda::GpuMatND>& _OutputArray::getGpuMatNDVecRef() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT_ND);
     return *(std::vector<cuda::GpuMatND>*)obj;
 }
 
 ogl::Buffer& _OutputArray::getOGlBufferRef() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     CV_Assert( k == OPENGL_BUFFER );
     return *(ogl::Buffer*)obj;
 }
 
 cuda::HostMem& _OutputArray::getHostMemRef() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     CV_Assert( k == CUDA_HOST_MEM );
     return *(cuda::HostMem*)obj;
 }
 
-void _OutputArray::setTo(const _InputArray& arr, const _InputArray & mask) const
+void _OutputArray::setTo(const पासोक_Array_2& arr, const पासोक_Array_2 & mask) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == NONE )
         ;
@@ -2299,7 +2299,7 @@ void _OutputArray::setTo(const _InputArray& arr, const _InputArray & mask) const
     {
 #ifdef HAVE_CUDA
         Mat value = arr.getMat();
-        CV_Assert( checkScalar(value, type(), arr.kind(), _InputArray::CUDA_GPU_MAT) );
+        CV_Assert( checkScalar(value, type(), arr.kind(), पासोक_Array_2::CUDA_GPU_MAT) );
         ((cuda::GpuMat*)obj)->setTo(Scalar(Vec<double, 4>(value.ptr<double>())), mask);
 #else
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
@@ -2311,7 +2311,7 @@ void _OutputArray::setTo(const _InputArray& arr, const _InputArray & mask) const
 
 void _OutputArray::setZero() const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
 
     if( k == NONE )
         ;
@@ -2328,7 +2328,7 @@ void _OutputArray::setZero() const
 
 void _OutputArray::assign(const UMat& u) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if (k == UMAT)
     {
         *(UMat*)obj = u;
@@ -2350,7 +2350,7 @@ void _OutputArray::assign(const UMat& u) const
 
 void _OutputArray::assign(const Mat& m) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if (k == UMAT)
     {
         m.copyTo(*(UMat*)obj); // TODO check m.getUMat()
@@ -2432,7 +2432,7 @@ void _OutputArray::move(Mat& m) const
 
 void _OutputArray::assign(const std::vector<UMat>& v) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if (k == STD_VECTOR_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
@@ -2470,7 +2470,7 @@ void _OutputArray::assign(const std::vector<UMat>& v) const
 
 void _OutputArray::assign(const std::vector<Mat>& v) const
 {
-    _InputArray::KindFlag k = kind();
+    पासोक_Array_2::KindFlag k = kind();
     if (k == STD_VECTOR_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
@@ -2506,7 +2506,7 @@ void _OutputArray::assign(const std::vector<Mat>& v) const
 }
 
 
-static _InputOutputArray _none;
-InputOutputArray noArray() { return _none; }
+static पासोक_Output_Array_2 _none;
+पासोक_Output_Array noArray() { return _none; }
 
 } // cv::

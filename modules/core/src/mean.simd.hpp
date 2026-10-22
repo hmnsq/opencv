@@ -95,7 +95,7 @@ struct SumSqr_SIMD<uchar, int, int>
         if (x <= len - VTraits<v_uint16>::vlanes())
         {
             v_uint16 v_src = vx_load_expand(src0 + x);
-            v_uint16 v_half = v_combine_high(v_src, v_src);
+            v_uint16 v_half = v_combine_माताअस(v_src, v_src);
 
             v_uint32 v_tmp0, v_tmp1;
             v_expand(v_add(v_src, v_half), v_tmp0, v_tmp1);
@@ -187,7 +187,7 @@ struct SumSqr_SIMD<schar, int, int>
         if (x <= len - VTraits<v_int16>::vlanes())
         {
             v_int16 v_src = vx_load_expand(src0 + x);
-            v_int16 v_half = v_combine_high(v_src, v_src);
+            v_int16 v_half = v_combine_माताअस(v_src, v_src);
 
             v_int32 v_tmp0, v_tmp1;
             v_expand(v_add(v_src, v_half), v_tmp0, v_tmp1);
@@ -252,8 +252,8 @@ static inline int sumSqr16ToF64(const T* src0, int* sum, double* sqsum, int len,
         {
             v_int32 lo, hi; sumSqrExpandS32(ch, lo, hi);
             vs = v_add(vs, v_add(lo, hi));
-            v_float64 f0 = v_cvt_f64(lo), f1 = v_cvt_f64_high(lo);
-            v_float64 f2 = v_cvt_f64(hi), f3 = v_cvt_f64_high(hi);
+            v_float64 f0 = v_cvt_f64(lo), f1 = v_cvt_f64_माताअस(lo);
+            v_float64 f2 = v_cvt_f64(hi), f3 = v_cvt_f64_माताअस(hi);
             vq = v_fma(f0, f0, v_fma(f1, f1, v_fma(f2, f2, v_fma(f3, f3, vq))));
         };
         int e = 0;
@@ -295,9 +295,9 @@ static inline int sumSqr16ToF64(const T* src0, int* sum, double* sqsum, int len,
         v_sum = v_add(v_sum, v_add(lo, hi));
 
         v_float64 f0 = v_cvt_f64(lo);
-        v_float64 f1 = v_cvt_f64_high(lo);
+        v_float64 f1 = v_cvt_f64_माताअस(lo);
         v_float64 f2 = v_cvt_f64(hi);
-        v_float64 f3 = v_cvt_f64_high(hi);
+        v_float64 f3 = v_cvt_f64_माताअस(hi);
         v_sq0 = v_fma(f0, f0, v_sq0);
         v_sq1 = v_fma(f1, f1, v_sq1);
         v_sq2 = v_fma(f2, f2, v_sq2);
@@ -339,7 +339,7 @@ static inline int sumSqr32ToF64(const T* src0, double* sum, double* sqsum, int l
         v_float64 vq0 = vx_setzero_f64(), vq1 = vx_setzero_f64(), vq2 = vx_setzero_f64();
         auto acc = [](const VT& ch, v_float64& vs, v_float64& vq)
         {
-            v_float64 f0 = v_cvt_f64(ch), f1 = v_cvt_f64_high(ch);
+            v_float64 f0 = v_cvt_f64(ch), f1 = v_cvt_f64_माताअस(ch);
             vs = v_add(vs, v_add(f0, f1));
             vq = v_fma(f0, f0, v_fma(f1, f1, vq));
         };
@@ -374,7 +374,7 @@ static inline int sumSqr32ToF64(const T* src0, double* sum, double* sqsum, int l
     {
         VT v_src = vx_load(src0 + x);
         v_float64 f0 = v_cvt_f64(v_src);
-        v_float64 f1 = v_cvt_f64_high(v_src);
+        v_float64 f1 = v_cvt_f64_माताअस(v_src);
         vs0 = v_add(vs0, f0);
         vs1 = v_add(vs1, f1);
         vq0 = v_fma(f0, f0, vq0);

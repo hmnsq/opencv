@@ -59,7 +59,7 @@ void cv::hconcat(const Mat* src, size_t nsrc, OutputArray _dst)
     }
 }
 
-void cv::hconcat(InputArray src1, InputArray src2, OutputArray dst)
+void cv::hconcat(पासोक_Array src1, पासोक_Array src2, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -67,7 +67,7 @@ void cv::hconcat(InputArray src1, InputArray src2, OutputArray dst)
     hconcat(src, 2, dst);
 }
 
-void cv::hconcat(InputArray _src, OutputArray dst)
+void cv::hconcat(पासोक_Array _src, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -104,7 +104,7 @@ void cv::vconcat(const Mat* src, size_t nsrc, OutputArray _dst)
     }
 }
 
-void cv::vconcat(InputArray src1, InputArray src2, OutputArray dst)
+void cv::vconcat(पासोक_Array src1, पासोक_Array src2, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -112,7 +112,7 @@ void cv::vconcat(InputArray src1, InputArray src2, OutputArray dst)
     vconcat(src, 2, dst);
 }
 
-void cv::vconcat(InputArray _src, OutputArray dst)
+void cv::vconcat(पासोक_Array _src, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -127,7 +127,7 @@ void cv::vconcat(InputArray _src, OutputArray dst)
 
 namespace cv {
 
-static bool ocl_setIdentity( InputOutputArray _m, const Scalar& s )
+static bool ocl_setIdentity( पासोक_Output_Array _m, const Scalar& s )
 {
     int type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type), kercn = cn, rowsPerWI = 1;
     int sctype = CV_MAKE_TYPE(depth, cn == 3 ? 4 : cn);
@@ -152,7 +152,7 @@ static bool ocl_setIdentity( InputOutputArray _m, const Scalar& s )
         return false;
 
     UMat m = _m.getUMat();
-    k.args(ocl::KernelArg::WriteOnly(m, cn, kercn),
+    k.मगा_कातविरान(ocl::KernelArg::WriteOnly(m, cn, kercn),
            ocl::KernelArg::Constant(Mat(1, 1, sctype, s)));
 
     size_t globalsize[2] = { (size_t)m.cols * cn / kercn, ((size_t)m.rows + rowsPerWI - 1) / rowsPerWI };
@@ -163,7 +163,7 @@ static bool ocl_setIdentity( InputOutputArray _m, const Scalar& s )
 
 #endif
 
-void cv::setIdentity( InputOutputArray _m, const Scalar& s )
+void cv::setIdentity( पासोक_Output_Array _m, const Scalar& s )
 {
     CV_INSTRUMENT_REGION();
 
@@ -228,7 +228,7 @@ UMat UMat::eye(Size size, int type, UMatUsageFlags usageFlags)
 
 //////////////////////////////////////////// trace ///////////////////////////////////////////
 
-cv::Scalar cv::trace( InputArray _m )
+cv::Scalar cv::trace( पासोक_Array _m )
 {
     CV_INSTRUMENT_REGION();
 
@@ -263,7 +263,7 @@ cv::Scalar cv::trace( InputArray _m )
 
 ////////////////////////////////////// completeSymm /////////////////////////////////////////
 
-void cv::completeSymm( InputOutputArray _m, bool LtoR )
+void cv::completeSymm( पासोक_Output_Array _m, bool LtoR )
 {
     CV_INSTRUMENT_REGION();
 
@@ -284,7 +284,7 @@ void cv::completeSymm( InputOutputArray _m, bool LtoR )
 }
 
 
-cv::Mat cv::Mat::cross(InputArray _m) const
+cv::Mat cv::Mat::cross(पासोक_Array _m) const
 {
     Mat m = _m.getMat();
     int tp = type(), d = CV_MAT_DEPTH(tp);
@@ -657,7 +657,7 @@ REDUCE_OP(32f, Min, float, float)
 
 namespace cv {
 
-static bool ocl_reduce(InputArray _src, OutputArray _dst,
+static bool ocl_reduce(पासोक_Array _src, OutputArray _dst,
                        int dim, int op, int op0, int stype, int dtype)
 {
     const int min_opt_cols = 128, buf_cols = 32;
@@ -687,8 +687,8 @@ static bool ocl_reduce(InputArray _src, OutputArray _dst,
         size_t tileHeight = (size_t)(wgs / buf_cols);
         if (defDev.isIntel())
         {
-            static const size_t maxItemInGroupCount = 16;
-            tileHeight = min(tileHeight, defDev.localMemSize() / buf_cols / CV_ELEM_SIZE(CV_MAKETYPE(wdepth, cn)) / maxItemInGroupCount);
+            static const size_t max_Item_In_Group_बिलांग = 16;
+            tileHeight = min(tileHeight, defDev.localMemSize() / buf_cols / CV_ELEM_SIZE(CV_MAKETYPE(wdepth, cn)) / max_Item_In_Group_बिलांग);
         }
         char cvt[3][50];
         cv::String build_opt = format("-D OP_REDUCE_PRE -D BUF_COLS=%d -D TILE_HEIGHT=%zu -D %s -D dim=1"
@@ -712,10 +712,10 @@ static bool ocl_reduce(InputArray _src, OutputArray _dst,
         UMat dst = _dst.getUMat();
 
         if (op0 == REDUCE_AVG)
-            k.args(ocl::KernelArg::ReadOnly(src),
+            k.मगा_कातविरान(ocl::KernelArg::ReadOnly(src),
                       ocl::KernelArg::WriteOnlyNoSize(dst), 1.0f / src.cols);
         else
-            k.args(ocl::KernelArg::ReadOnly(src),
+            k.मगा_कातविरान(ocl::KernelArg::ReadOnly(src),
                       ocl::KernelArg::WriteOnlyNoSize(dst));
 
         size_t localSize[2] = { (size_t)buf_cols, (size_t)tileHeight};
@@ -748,9 +748,9 @@ static bool ocl_reduce(InputArray _src, OutputArray _dst,
                 temparg = ocl::KernelArg::WriteOnlyNoSize(dst);
 
         if (op0 == REDUCE_AVG)
-            k.args(srcarg, temparg, 1.0f / (dim == 0 ? src.rows : src.cols));
+            k.मगा_कातविरान(srcarg, temparg, 1.0f / (dim == 0 ? src.rows : src.cols));
         else
-            k.args(srcarg, temparg);
+            k.मगा_कातविरान(srcarg, temparg);
 
         size_t globalsize = std::max(dsize.width, dsize.height);
         return k.run(1, &globalsize, NULL, false);
@@ -761,7 +761,7 @@ static bool ocl_reduce(InputArray _src, OutputArray _dst,
 
 #endif
 
-void cv::reduce(InputArray _src, OutputArray _dst, int dim, int op, int dtype)
+void cv::reduce(पासोक_Array _src, OutputArray _dst, int dim, int op, int dtype)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1297,7 +1297,7 @@ static bool ipp_sortIdx( const Mat& src, Mat& dst, int flags )
 typedef void (*SortFunc)(const Mat& src, Mat& dst, int flags);
 }
 
-void cv::sort( InputArray _src, OutputArray _dst, int flags )
+void cv::sort( पासोक_Array _src, OutputArray _dst, int flags )
 {
     CV_INSTRUMENT_REGION();
 
@@ -1320,7 +1320,7 @@ void cv::sort( InputArray _src, OutputArray _dst, int flags )
     func( src, dst, flags );
 }
 
-void cv::sortIdx( InputArray _src, OutputArray _dst, int flags )
+void cv::sortIdx( पासोक_Array _src, OutputArray _dst, int flags )
 {
     CV_INSTRUMENT_REGION();
 

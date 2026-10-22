@@ -777,8 +777,8 @@ struct NormL1_SIMD<int, double> {
             // Widen to double before taking the magnitude: exact over the whole int32 range,
             // INT_MIN included, which a float intermediate would not be above 2^24.
             v_int32 i0 = vx_load(src + j), i1 = vx_load(src + j + VTraits<v_int32>::vlanes());
-            r00 = v_add(r00, v_abs(v_cvt_f64(i0))); r01 = v_add(r01, v_abs(v_cvt_f64_high(i0)));
-            r10 = v_add(r10, v_abs(v_cvt_f64(i1))); r11 = v_add(r11, v_abs(v_cvt_f64_high(i1)));
+            r00 = v_add(r00, v_abs(v_cvt_f64(i0))); r01 = v_add(r01, v_abs(v_cvt_f64_माताअस(i0)));
+            r10 = v_add(r10, v_abs(v_cvt_f64(i1))); r11 = v_add(r11, v_abs(v_cvt_f64_माताअस(i1)));
         }
         s += v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
         for (; j < n; j++) {
@@ -799,12 +799,12 @@ struct NormL1_SIMD<float, double> {
         v_float64 r30 = vx_setzero_f64(), r31 = vx_setzero_f64();
         for (; j <= n - 4 * VTraits<v_float32>::vlanes(); j += 4 * VTraits<v_float32>::vlanes()) {
             v_float32 v0 = v_abs(vx_load(src + j)), v1 = v_abs(vx_load(src + j + VTraits<v_float32>::vlanes()));
-            r00 = v_add(r00, v_cvt_f64(v0)); r01 = v_add(r01, v_cvt_f64_high(v0));
-            r10 = v_add(r10, v_cvt_f64(v1)); r11 = v_add(r11, v_cvt_f64_high(v1));
+            r00 = v_add(r00, v_cvt_f64(v0)); r01 = v_add(r01, v_cvt_f64_माताअस(v0));
+            r10 = v_add(r10, v_cvt_f64(v1)); r11 = v_add(r11, v_cvt_f64_माताअस(v1));
 
             v_float32 v2 = v_abs(vx_load(src + j + 2 * VTraits<v_float32>::vlanes())), v3 = v_abs(vx_load(src + j + 3 * VTraits<v_float32>::vlanes()));
-            r20 = v_add(r20, v_cvt_f64(v2)); r21 = v_add(r21, v_cvt_f64_high(v2));
-            r30 = v_add(r30, v_cvt_f64(v3)); r31 = v_add(r31, v_cvt_f64_high(v3));
+            r20 = v_add(r20, v_cvt_f64(v2)); r21 = v_add(r21, v_cvt_f64_माताअस(v2));
+            r30 = v_add(r30, v_cvt_f64(v3)); r31 = v_add(r31, v_cvt_f64_माताअस(v3));
         }
         s += v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
         s += v_reduce_sum(v_add(v_add(v_add(r20, r21), r30), r31));
@@ -892,8 +892,8 @@ struct NormL2_SIMD<float, double> {
         v_float64 r10 = vx_setzero_f64(), r11 = vx_setzero_f64();
         for (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
             v_float32 v0 = vx_load(src + j), v1 = vx_load(src + j + VTraits<v_float32>::vlanes());
-            v_float64 v00 = v_cvt_f64(v0), v01 = v_cvt_f64_high(v0);
-            v_float64 v10 = v_cvt_f64(v1), v11 = v_cvt_f64_high(v1);
+            v_float64 v00 = v_cvt_f64(v0), v01 = v_cvt_f64_माताअस(v0);
+            v_float64 v10 = v_cvt_f64(v1), v11 = v_cvt_f64_माताअस(v1);
             r00 = v_fma(v00, v00, r00); r01 = v_fma(v01, v01, r01);
             r10 = v_fma(v10, v10, r10); r11 = v_fma(v11, v11, r11);
         }
@@ -993,12 +993,12 @@ struct NormDiffL1_SIMD<float, double> {
         for (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
             v_float32 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_float32 v0 = v_absdiff(v01, v02);
-            r0 = v_add(r0, v_cvt_f64(v0)); r1 = v_add(r1, v_cvt_f64_high(v0));
+            r0 = v_add(r0, v_cvt_f64(v0)); r1 = v_add(r1, v_cvt_f64_माताअस(v0));
 
             v_float32 v11 = vx_load(src1 + j + VTraits<v_float32>::vlanes()),
                       v12 = vx_load(src2 + j + VTraits<v_float32>::vlanes());
             v_float32 v1 = v_absdiff(v11, v12);
-            r2 = v_add(r2, v_cvt_f64(v1)); r3 = v_add(r3, v_cvt_f64_high(v1));
+            r2 = v_add(r2, v_cvt_f64(v1)); r3 = v_add(r3, v_cvt_f64_माताअस(v1));
         }
         s += v_reduce_sum(v_add(v_add(v_add(r0, r1), r2), r3));
         for (; j < n; j++) {
@@ -1119,13 +1119,13 @@ struct NormDiffL2_SIMD<float, double> {
         for (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
             v_float32 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_float32 v0 = v_absdiff(v01, v02);
-            v_float64 f01 = v_cvt_f64(v0), f02 = v_cvt_f64_high(v0);
+            v_float64 f01 = v_cvt_f64(v0), f02 = v_cvt_f64_माताअस(v0);
             r0 = v_fma(f01, f01, r0); r1 = v_fma(f02, f02, r1);
 
             v_float32 v11 = vx_load(src1 + j + VTraits<v_float32>::vlanes()),
                       v12 = vx_load(src2 + j + VTraits<v_float32>::vlanes());
             v_float32 v1 = v_absdiff(v11, v12);
-            v_float64 f11 = v_cvt_f64(v1), f12 = v_cvt_f64_high(v1);
+            v_float64 f11 = v_cvt_f64(v1), f12 = v_cvt_f64_माताअस(v1);
             r2 = v_fma(f11, f11, r2); r3 = v_fma(f12, f12, r3);
         }
         s += v_reduce_sum(v_add(v_add(v_add(r0, r1), r2), r3));
@@ -1365,15 +1365,15 @@ struct MaskedNormL1_SIMD<float, double> {
                 v_float32 s1 = v_and(v_abs(vx_load(src + i + vstep)),
                                      v_reinterpret_as_f32(v_normmask_u32(mask + i + vstep)));
                 acc0 = v_add(acc0, v_cvt_f64(s0));
-                acc1 = v_add(acc1, v_cvt_f64_high(s0));
+                acc1 = v_add(acc1, v_cvt_f64_माताअस(s0));
                 acc2 = v_add(acc2, v_cvt_f64(s1));
-                acc3 = v_add(acc3, v_cvt_f64_high(s1));
+                acc3 = v_add(acc3, v_cvt_f64_माताअस(s1));
             }
             for (; i <= len - vstep; i += vstep) {
                 v_float32 s = v_and(v_abs(vx_load(src + i)),
                                     v_reinterpret_as_f32(v_normmask_u32(mask + i)));
                 acc0 = v_add(acc0, v_cvt_f64(s));
-                acc1 = v_add(acc1, v_cvt_f64_high(s));
+                acc1 = v_add(acc1, v_cvt_f64_माताअस(s));
             }
             result = v_reduce_sum(v_add(v_add(acc0, acc1), v_add(acc2, acc3)));
 
@@ -1393,7 +1393,7 @@ struct MaskedNormL1_SIMD<float, double> {
                     for (; k <= cn - vstep; k += vstep) {
                         v_float32 s = v_abs(vx_load(elem + k));
                         acc = v_add(acc, v_cvt_f64(s));
-                        acc = v_add(acc, v_cvt_f64_high(s));
+                        acc = v_add(acc, v_cvt_f64_माताअस(s));
                     }
 
                     result += v_reduce_sum(acc);
@@ -1421,7 +1421,7 @@ struct MaskedNormL2_SIMD<float, double> {
             for (; i <= len - vstep; i += vstep, flush += vstep) {
                 if (flush >= 64) {
                     dacc = v_add(dacc, v_cvt_f64(facc));
-                    dacc = v_add(dacc, v_cvt_f64_high(facc));
+                    dacc = v_add(dacc, v_cvt_f64_माताअस(facc));
                     facc = vx_setzero_f32();
                     flush = 0;
                 }
@@ -1431,7 +1431,7 @@ struct MaskedNormL2_SIMD<float, double> {
             }
 
             dacc = v_add(dacc, v_cvt_f64(facc));
-            dacc = v_add(dacc, v_cvt_f64_high(facc));
+            dacc = v_add(dacc, v_cvt_f64_माताअस(facc));
             result = v_reduce_sum(dacc);
 
             for (; i < len; i++) {
@@ -1454,7 +1454,7 @@ struct MaskedNormL2_SIMD<float, double> {
                         facc = v_add(facc, v_mul(s, s));
                     }
 
-                    v_float64 dacc = v_add(v_cvt_f64(facc), v_cvt_f64_high(facc));
+                    v_float64 dacc = v_add(v_cvt_f64(facc), v_cvt_f64_माताअस(facc));
                     result += v_reduce_sum(dacc);
 
                     for (; k < cn; k++) {
@@ -2005,7 +2005,7 @@ struct MaskedNormL1_SIMD<int, double> {
                 v_int32 s = v_reinterpret_as_s32(v_and(v_reinterpret_as_u32(vx_load(src + i)),
                                                        v_normmask_u32(mask + i)));
                 acc0 = v_add(acc0, v_abs(v_cvt_f64(s)));
-                acc1 = v_add(acc1, v_abs(v_cvt_f64_high(s)));
+                acc1 = v_add(acc1, v_abs(v_cvt_f64_माताअस(s)));
             }
             result = v_reduce_sum(v_add(acc0, acc1));
             for (; i < len; i++)
@@ -2560,7 +2560,7 @@ template<> struct MaskedNormDiffL1_SIMD<float, double> {
             v_float32 m  = v_reinterpret_as_f32(v_gt(vx_load_expand_q(mask + i), vx_setzero_u32()));
             v_float32 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
             acc0 = v_add(acc0, v_cvt_f64(ad));
-            acc1 = v_add(acc1, v_cvt_f64_high(ad));
+            acc1 = v_add(acc1, v_cvt_f64_माताअस(ad));
         }
         double result = v_reduce_sum(v_add(acc0, acc1));
         for (; i < len; i++) if (mask[i]) result += (double)cv_absdiff(s1[i], s2[i]);
@@ -2615,7 +2615,7 @@ template<> struct MaskedNormDiffL2_SIMD<float, double> {
         for (; i <= len - vstep; i += vstep) {
             v_float32 m  = v_reinterpret_as_f32(v_gt(vx_load_expand_q(mask + i), vx_setzero_u32()));
             v_float32 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
-            v_float64 f0 = v_cvt_f64(ad), f1 = v_cvt_f64_high(ad);
+            v_float64 f0 = v_cvt_f64(ad), f1 = v_cvt_f64_माताअस(ad);
             r0 = v_fma(f0, f0, r0); r1 = v_fma(f1, f1, r1);
         }
         double result = v_reduce_sum(v_add(r0, r1));

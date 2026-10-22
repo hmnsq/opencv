@@ -180,14 +180,14 @@ char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision,
 
 static const char symbols[] = "ucwsifdhHbUIneE";
 
-static char typeSymbol(int depth)
+static char type_सिम्बोलो(int depth)
 {
     CV_StaticAssert(CV_64F == 6, "");
     CV_CheckDepth(depth, depth >= 0 && depth <= CV_8F_E4M3FNUZ, "");
     return symbols[depth];
 }
 
-static int symbolToType(char c)
+static int सिम्बोलो_To_Type(char c)
 {
     if (c == 'r')
         return CV_SEQ_ELTYPE_PTR;
@@ -200,8 +200,8 @@ static int symbolToType(char c)
 char* encodeFormat(int elem_type, char* dt, size_t dt_len)
 {
     int cn = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 1 : CV_MAT_CN(elem_type);
-    char symbol = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : typeSymbol(CV_MAT_DEPTH(elem_type));
-    snprintf(dt, dt_len, "%d%c", cn, symbol);
+    char सिम्बोलो = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : type_सिम्बोलो(CV_MAT_DEPTH(elem_type));
+    snprintf(dt, dt_len, "%d%c", cn, सिम्बोलो);
     return dt + (cn == 1 ? 1 : 0);
 }
 
@@ -214,7 +214,7 @@ char* encodeFormat(int elem_type, char* dt)
 
 int decodeFormat( const char* dt, int* fmt_pairs, int max_len )
 {
-    int fmt_pair_count = 0;
+    int fmt_pair_बिलांग = 0;
     int i = 0, k = 0, len = dt ? (int)strlen(dt) : 0;
 
     if( !dt || !len )
@@ -230,22 +230,22 @@ int decodeFormat( const char* dt, int* fmt_pairs, int max_len )
 
         if( cv_isdigit(c) )
         {
-            int count = c - '0';
+            int बिलांग_2 = c - '0';
             if( cv_isdigit(dt[k+1]) )
             {
                 char* endptr = 0;
-                count = (int)strtol( dt+k, &endptr, 10 );
+                बिलांग_2 = (int)strtol( dt+k, &endptr, 10 );
                 k = (int)(endptr - dt) - 1;
             }
 
-            if( count <= 0 )
+            if( बिलांग_2 <= 0 )
                 CV_Error( cv::Error::StsBadArg, "Invalid data type specification" );
 
-            fmt_pairs[i] = count;
+            fmt_pairs[i] = बिलांग_2;
         }
         else
         {
-            int depth = symbolToType(c);
+            int depth = सिम्बोलो_To_Type(c);
             if( fmt_pairs[i] == 0 )
                 fmt_pairs[i] = 1;
             fmt_pairs[i+1] = depth;
@@ -261,19 +261,19 @@ int decodeFormat( const char* dt, int* fmt_pairs, int max_len )
         }
     }
 
-    fmt_pair_count = i/2;
-    return fmt_pair_count;
+    fmt_pair_बिलांग = i/2;
+    return fmt_pair_बिलांग;
 }
 
 int calcElemSize( const char* dt, int initial_size )
 {
     int size = 0;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], i, fmt_pair_count;
+    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], i, fmt_pair_बिलांग;
     int comp_size;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    fmt_pair_count *= 2;
-    for( i = 0, size = initial_size; i < fmt_pair_count; i += 2 )
+    fmt_pair_बिलांग = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+    fmt_pair_बिलांग *= 2;
+    for( i = 0, size = initial_size; i < fmt_pair_बिलांग; i += 2 )
     {
         comp_size = CV_ELEM_SIZE(fmt_pairs[i+1]);
         size = cvAlign( size, comp_size );
@@ -325,10 +325,10 @@ int calcStructSize( const char* dt, int initial_size )
 int decodeSimpleFormat( const char* dt )
 {
     int elem_type = -1;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], fmt_pair_count;
+    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], fmt_pair_बिलांग;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    if( fmt_pair_count != 1 || fmt_pairs[0] >= CV_CN_MAX)
+    fmt_pair_बिलांग = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+    if( fmt_pair_बिलांग != 1 || fmt_pairs[0] >= CV_CN_MAX)
         CV_Error( cv::Error::StsError, "Too complex format for the matrix" );
 
     elem_type = CV_MAKETYPE( fmt_pairs[1], fmt_pairs[0] );
@@ -429,7 +429,7 @@ void FileStorage::Impl::init() {
     is_using_base64 = false;
     state_of_writing_base64 = FileStorage_API::Base64State::Uncertain;
     is_write_struct_delayed = false;
-    delayed_struct_key = nullptr;
+    delayed_struct_सुसि = nullptr;
     delayed_struct_flags = 0;
     delayed_type_name = nullptr;
     base64_writer = nullptr;
@@ -477,7 +477,7 @@ void FileStorage::Impl::release(String *out) {
         if (out)
             out->clear();
         if (write_mode) {
-            while (write_stack.size() > 1) {
+            while (write_सालानसान.size() > 1) {
                 endWriteStruct();
             }
             flush();
@@ -649,9 +649,9 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                 append = false;
         }
 
-        write_stack.clear();
+        write_सालानसान.clear();
         empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::MAP | FileNode::EMPTY, 0));
+        write_सालानसान.push_back(FStructData("", File_बुहोल::MAP | File_बुहोल::EMPTY, 0));
         buffer.reserve(buf_size + 1024);
         buffer.resize(buf_size);
         bufofs = 0;
@@ -682,7 +682,7 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                 fseek(file, -xml_buf_size, SEEK_END);
                 // find the last occurrence of </opencv_storage>
                 for (;;) {
-                    int line_offset = (int) ftell(file);
+                    int लिन्या_offset = (int) ftell(file);
                     const char *ptr0 = this->gets(xml_buf_size);
                     const char *ptr = NULL;
                     if (!ptr0)
@@ -692,7 +692,7 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                         ptr = strstr(ptr, substr);
                         if (!ptr)
                             break;
-                        last_occurrence = line_offset + (int) (ptr - ptr0);
+                        last_occurrence = लिन्या_offset + (int) (ptr - ptr0);
                         ptr += strlen(substr);
                     }
                 }
@@ -750,7 +750,7 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                     CV_Error(cv::Error::StsError, "Could not find '}' in the end of file.\n");
                 }
             }
-            write_stack.back().indent = 4;
+            write_सालानसान.back().indent = 4;
             emitter_do_not_use_direct_dereference = createJSONEmitter(this);
         }
         is_opened = true;
@@ -787,10 +787,10 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
         try {
             char *ptr = bufferStart();
             ptr[0] = ptr[1] = ptr[2] = '\0';
-            FileNode root_nodes(fs_ext, 0, 0);
+            File_बुहोल उगात_nodes(fs_ext, 0, 0);
 
-            uchar *rptr = reserveNodeSpace(root_nodes, 9);
-            *rptr = FileNode::SEQ;
+            uchar *rptr = reserve_बुहोल_Space(उगात_nodes, 9);
+            *rptr = File_बुहोल::SEQ;
             writeInt(rptr + 1, 4);
             writeInt(rptr + 5, 0);
 
@@ -814,12 +814,12 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
             if (!parser_do_not_use_direct_dereference.empty()) {
                 ok = getParser().parse(ptr);
                 if (ok) {
-                    finalizeCollection(root_nodes);
+                    finalizeCollection(उगात_nodes);
 
                     CV_Assert(!fs_data_ptrs.empty());
-                    FileNode roots_node(fs_ext, 0, 0);
-                    size_t i, nroots = roots_node.size();
-                    FileNodeIterator it = roots_node.begin();
+                    File_बुहोल roots_बुहोल(fs_ext, 0, 0);
+                    size_t i, nroots = roots_बुहोल.size();
+                    File_बुहोल_Iterator it = roots_बुहोल.begin();
 
                     for (i = 0; i < nroots; i++, ++it)
                         roots.push_back(*it);
@@ -858,17 +858,17 @@ void FileStorage::Impl::puts(const char *str) {
         CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::getsFromFile(char *buf, int count) {
+char *FileStorage::Impl::getsFromFile(char *buf, int बिलांग_2) {
     if (file)
-        return fgets(buf, count, file);
+        return fgets(buf, बिलांग_2, file);
 #if USE_ZLIB
     if (gzfile)
-        return gzgets(gzfile, buf, count);
+        return gzgets(gzfile, buf, बिलांग_2);
 #endif
     CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::gets(size_t maxCount) {
+char *FileStorage::Impl::gets(size_t max_बिलांग) {
     if (strbuf) {
         size_t i = strbufpos, len = strbufsize;
         const char *instr = strbuf;
@@ -880,34 +880,34 @@ char *FileStorage::Impl::gets(size_t maxCount) {
                 break;
             }
         }
-        size_t count = i - strbufpos;
-        if (maxCount == 0 || maxCount > count)
-            maxCount = count;
-        buffer.resize(std::max(buffer.size(), maxCount + 8));
-        memcpy(&buffer[0], instr + strbufpos, maxCount);
-        buffer[maxCount] = '\0';
+        size_t बिलांग_2 = i - strbufpos;
+        if (max_बिलांग == 0 || max_बिलांग > बिलांग_2)
+            max_बिलांग = बिलांग_2;
+        buffer.resize(std::max(buffer.size(), max_बिलांग + 8));
+        memcpy(&buffer[0], instr + strbufpos, max_बिलांग);
+        buffer[max_बिलांग] = '\0';
         strbufpos = i;
-        return maxCount > 0 ? &buffer[0] : 0;
+        return max_बिलांग > 0 ? &buffer[0] : 0;
     }
 
     const size_t MAX_BLOCK_SIZE = INT_MAX / 2; // hopefully, that will be enough
-    if (maxCount == 0)
-        maxCount = MAX_BLOCK_SIZE;
+    if (max_बिलांग == 0)
+        max_बिलांग = MAX_BLOCK_SIZE;
     else
-        CV_Assert(maxCount < MAX_BLOCK_SIZE);
+        CV_Assert(max_बिलांग < MAX_BLOCK_SIZE);
     size_t ofs = 0;
 
     for (;;) {
-        int count = (int) std::min(buffer.size() - ofs - 16, maxCount);
-        char *ptr = getsFromFile(&buffer[ofs], count + 1);
+        int बिलांग_2 = (int) std::min(buffer.size() - ofs - 16, max_बिलांग);
+        char *ptr = getsFromFile(&buffer[ofs], बिलांग_2 + 1);
         if (!ptr)
             break;
         int delta = (int) strlen(ptr);
         ofs += delta;
-        maxCount -= delta;
-        if (delta == 0 || ptr[delta - 1] == '\n' || maxCount == 0)
+        max_बिलांग -= delta;
+        if (delta == 0 || ptr[delta - 1] == '\n' || max_बिलांग == 0)
             break;
-        if (delta == count)
+        if (delta == बिलांग_2)
             buffer.resize((size_t) (buffer.size() * 1.5));
     }
     return ofs > 0 ? &buffer[0] : 0;
@@ -1001,7 +1001,7 @@ char *FileStorage::Impl::flush() {
         bufofs = 0;
     }
 
-    int indent = write_stack.back().indent;
+    int indent = write_सालानसान.back().indent;
 
     if (space != indent) {
         memset(buffer_start, ' ', indent);
@@ -1020,64 +1020,64 @@ void FileStorage::Impl::endWriteStruct() {
     if (state_of_writing_base64 != FileStorage_API::Uncertain)
         switch_to_Base64_state(FileStorage_API::Uncertain);
 
-    CV_Assert(!write_stack.empty());
+    CV_Assert(!write_सालानसान.empty());
 
-    FStructData &current_struct = write_stack.back();
-    if (fmt == FileStorage::FORMAT_JSON && !FileNode::isFlow(current_struct.flags) && write_stack.size() > 1)
-        current_struct.indent = write_stack[write_stack.size() - 2].indent;
+    FStructData &current_struct = write_सालानसान.back();
+    if (fmt == FileStorage::FORMAT_JSON && !File_बुहोल::isFlow(current_struct.flags) && write_सालानसान.size() > 1)
+        current_struct.indent = write_सालानसान[write_सालानसान.size() - 2].indent;
 
     getEmitter().endWriteStruct(current_struct);
 
-    write_stack.pop_back();
-    if (!write_stack.empty())
-        write_stack.back().flags &= ~FileNode::EMPTY;
+    write_सालानसान.pop_back();
+    if (!write_सालानसान.empty())
+        write_सालानसान.back().flags &= ~File_बुहोल::EMPTY;
 }
 
-void FileStorage::Impl::startWriteStruct_helper(const char *key, int struct_flags,
+void FileStorage::Impl::startWriteStruct_helper(const char *सुसि, int struct_flags,
                                                 const char *type_name) {
     CV_Assert(write_mode);
 
-    struct_flags = (struct_flags & (FileNode::TYPE_MASK | FileNode::FLOW)) | FileNode::EMPTY;
-    if (!FileNode::isCollection(struct_flags))
+    struct_flags = (struct_flags & (File_बुहोल::TYPE_MASK | File_बुहोल::FLOW)) | File_बुहोल::EMPTY;
+    if (!File_बुहोल::isCollection(struct_flags))
         CV_Error(cv::Error::StsBadArg,
                  "Some collection type: FileNode::SEQ or FileNode::MAP must be specified");
 
     if (type_name && type_name[0] == '\0')
         type_name = 0;
 
-    FStructData s = getEmitter().startWriteStruct(write_stack.back(), key, struct_flags, type_name);
+    FStructData s = getEmitter().startWriteStruct(write_सालानसान.back(), सुसि, struct_flags, type_name);
 
-    write_stack.push_back(s);
-    size_t write_stack_size = write_stack.size();
-    if (write_stack_size > 1)
-        write_stack[write_stack_size - 2].flags &= ~FileNode::EMPTY;
+    write_सालानसान.push_back(s);
+    size_t write_सालानसान_size = write_सालानसान.size();
+    if (write_सालानसान_size > 1)
+        write_सालानसान[write_सालानसान_size - 2].flags &= ~File_बुहोल::EMPTY;
 
-    if (fmt != FileStorage::FORMAT_JSON && !FileNode::isFlow(s.flags))
+    if (fmt != FileStorage::FORMAT_JSON && !File_बुहोल::isFlow(s.flags))
         flush();
 
-    if (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && FileNode::isMap(struct_flags)) {
+    if (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && File_बुहोल::isMap(struct_flags)) {
         getEmitter().write("type_id", type_name, false);
     }
 }
 
-void FileStorage::Impl::startWriteStruct(const char *key, int struct_flags,
+void FileStorage::Impl::startWriteStruct(const char *सुसि, int struct_flags,
                                          const char *type_name) {
     check_if_write_struct_is_delayed(false);
     if (state_of_writing_base64 == FileStorage_API::NotUse)
         switch_to_Base64_state(FileStorage_API::Uncertain);
 
-    if (state_of_writing_base64 == FileStorage_API::Uncertain && FileNode::isSeq(struct_flags)
+    if (state_of_writing_base64 == FileStorage_API::Uncertain && File_बुहोल::isSeq(struct_flags)
         && is_using_base64 && type_name == 0) {
         /* Uncertain whether output Base64 data */
-        make_write_struct_delayed(key, struct_flags, type_name);
+        make_write_struct_delayed(सुसि, struct_flags, type_name);
     } else if (type_name && memcmp(type_name, "binary", 6) == 0) {
         /* Must output Base64 data */
-        if ((FileNode::TYPE_MASK & struct_flags) != FileNode::SEQ)
+        if ((File_बुहोल::TYPE_MASK & struct_flags) != File_बुहोल::SEQ)
             CV_Error(cv::Error::StsBadArg, "must set 'struct_flags |= CV_NODE_SEQ' if using Base64.");
         else if (state_of_writing_base64 != FileStorage_API::Uncertain)
             CV_Error(cv::Error::StsError, "function \'cvStartWriteStruct\' calls cannot be nested if using Base64.");
 
-        startWriteStruct_helper(key, struct_flags, "binary");
+        startWriteStruct_helper(सुसि, struct_flags, "binary");
 
         if (state_of_writing_base64 != FileStorage_API::Uncertain)
             switch_to_Base64_state(FileStorage_API::Uncertain);
@@ -1087,7 +1087,7 @@ void FileStorage::Impl::startWriteStruct(const char *key, int struct_flags,
         if (state_of_writing_base64 == FileStorage_API::InUse)
             CV_Error(cv::Error::StsError, "At the end of the output Base64, `cvEndWriteStruct` is needed.");
 
-        startWriteStruct_helper(key, struct_flags, type_name);
+        startWriteStruct_helper(सुसि, struct_flags, type_name);
 
         if (state_of_writing_base64 != FileStorage_API::Uncertain)
             switch_to_Base64_state(FileStorage_API::Uncertain);
@@ -1103,34 +1103,34 @@ void FileStorage::Impl::writeComment(const char *comment, bool eol_comment) {
 void FileStorage::Impl::startNextStream() {
     CV_Assert(write_mode);
     if (!empty_stream) {
-        while (!write_stack.empty())
+        while (!write_सालानसान.empty())
             endWriteStruct();
         flush();
         getEmitter().startNextStream();
         empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::EMPTY, 0));
+        write_सालानसान.push_back(FStructData("", File_बुहोल::EMPTY, 0));
         bufofs = 0;
     }
 }
 
-void FileStorage::Impl::write(const String &key, int value) {
+void FileStorage::Impl::write(const String &सुसि, int value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().write(सुसि.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, int64_t value) {
+void FileStorage::Impl::write(const String &सुसि, int64_t value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().write(सुसि.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, double value) {
+void FileStorage::Impl::write(const String &सुसि, double value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().write(सुसि.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, const String &value) {
+void FileStorage::Impl::write(const String &सुसि, const String &value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value.c_str(), false);
+    getEmitter().write(सुसि.c_str(), value.c_str(), false);
 }
 
 void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, size_t len) {
@@ -1150,10 +1150,10 @@ void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, s
 
     bool explicitZero = fmt == FileStorage::FORMAT_JSON;
     const uchar *data0 = (const uchar *) _data;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2], k, fmt_pair_count;
+    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2], k, fmt_pair_बिलांग;
     char buf[256] = "";
 
-    fmt_pair_count = fs::decodeFormat(dt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    fmt_pair_बिलांग = fs::decodeFormat(dt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS);
 
     if (!len)
         return;
@@ -1161,15 +1161,15 @@ void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, s
     if (!data0)
         CV_Error(cv::Error::StsNullPtr, "Null data pointer");
 
-    if (fmt_pair_count == 1) {
+    if (fmt_pair_बिलांग == 1) {
         fmt_pairs[0] *= (int) len;
         len = 1;
     }
 
     for (; len--; data0 += elemSize) {
         int offset = 0;
-        for (k = 0; k < fmt_pair_count; k++) {
-            int i, count = fmt_pairs[k * 2];
+        for (k = 0; k < fmt_pair_बिलांग; k++) {
+            int i, बिलांग_2 = fmt_pairs[k * 2];
             int elem_type = fmt_pairs[k * 2 + 1];
             int elem_size = CV_ELEM_SIZE(elem_type);
             const char *ptr;
@@ -1177,7 +1177,7 @@ void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, s
             offset = cvAlign(offset, elem_size);
             const uchar *data = data0 + offset;
 
-            for (i = 0; i < count; i++) {
+            for (i = 0; i < बिलांग_2; i++) {
                 switch (elem_type) {
                     case CV_8U:
                         ptr = fs::itoa(*(uchar *) data, buf, 10);
@@ -1335,17 +1335,17 @@ void FileStorage::Impl::switch_to_Base64_state(FileStorage_API::Base64State new_
     state_of_writing_base64 = new_state;
 }
 
-void FileStorage::Impl::make_write_struct_delayed(const char *key, int struct_flags, const char *type_name) {
+void FileStorage::Impl::make_write_struct_delayed(const char *सुसि, int struct_flags, const char *type_name) {
     CV_Assert(is_write_struct_delayed == false);
-    CV_DbgAssert(delayed_struct_key == nullptr);
+    CV_DbgAssert(delayed_struct_सुसि == nullptr);
     CV_DbgAssert(delayed_struct_flags == 0);
     CV_DbgAssert(delayed_type_name == nullptr);
 
     delayed_struct_flags = struct_flags;
 
-    if (key != nullptr) {
-        delayed_struct_key = new char[strlen(key) + 1U];
-        strcpy(delayed_struct_key, key);
+    if (सुसि != nullptr) {
+        delayed_struct_सुसि = new char[strlen(सुसि) + 1U];
+        strcpy(delayed_struct_सुसि, सुसि);
     }
 
     if (type_name != nullptr) {
@@ -1359,21 +1359,21 @@ void FileStorage::Impl::make_write_struct_delayed(const char *key, int struct_fl
 void FileStorage::Impl::check_if_write_struct_is_delayed(bool change_type_to_base64) {
     if (is_write_struct_delayed) {
         /* save data to prevent recursive call errors */
-        std::string struct_key;
+        std::string struct_सुसि;
         std::string type_name;
         int struct_flags = delayed_struct_flags;
 
-        if (delayed_struct_key != nullptr && *delayed_struct_key != '\0') {
-            struct_key.assign(delayed_struct_key);
+        if (delayed_struct_सुसि != nullptr && *delayed_struct_सुसि != '\0') {
+            struct_सुसि.assign(delayed_struct_सुसि);
         }
         if (delayed_type_name != nullptr && *delayed_type_name != '\0') {
             type_name.assign(delayed_type_name);
         }
 
         /* reset */
-        delete[] delayed_struct_key;
+        delete[] delayed_struct_सुसि;
         delete[] delayed_type_name;
-        delayed_struct_key = nullptr;
+        delayed_struct_सुसि = nullptr;
         delayed_struct_flags = 0;
         delayed_type_name = nullptr;
 
@@ -1381,12 +1381,12 @@ void FileStorage::Impl::check_if_write_struct_is_delayed(bool change_type_to_bas
 
         /* call */
         if (change_type_to_base64) {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, "binary");
+            startWriteStruct_helper(struct_सुसि.c_str(), struct_flags, "binary");
             if (state_of_writing_base64 != FileStorage_API::Uncertain)
                 switch_to_Base64_state(FileStorage_API::Uncertain);
             switch_to_Base64_state(FileStorage_API::InUse);
         } else {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, type_name.c_str());
+            startWriteStruct_helper(struct_सुसि.c_str(), struct_flags, type_name.c_str());
             if (state_of_writing_base64 != FileStorage_API::Uncertain)
                 switch_to_Base64_state(FileStorage_API::Uncertain);
             switch_to_Base64_state(FileStorage_API::NotUse);
@@ -1408,20 +1408,20 @@ void FileStorage::Impl::writeRawDataBase64(const void *_data, size_t len, const 
     base64_writer->write(_data, len, dt);
 }
 
-FileNode FileStorage::Impl::getFirstTopLevelNode() const {
-    return roots.empty() ? FileNode() : roots[0];
+File_बुहोल FileStorage::Impl::get_First_इताअस_Level_बुहोल() const {
+    return roots.empty() ? File_बुहोल() : roots[0];
 }
 
-FileNode FileStorage::Impl::root(int streamIdx) const {
-    return streamIdx >= 0 && streamIdx < (int) roots.size() ? roots[streamIdx] : FileNode();
+File_बुहोल FileStorage::Impl::उगात(int streamIdx) const {
+    return streamIdx >= 0 && streamIdx < (int) roots.size() ? roots[streamIdx] : File_बुहोल();
 }
 
-FileNode FileStorage::Impl::operator[](const String &nodename) const {
+File_बुहोल FileStorage::Impl::operator[](const String &nodename) const {
     return this->operator[](nodename.c_str());
 }
 
-FileNode FileStorage::Impl::operator[](const char * /*nodename*/) const {
-    return FileNode();
+File_बुहोल FileStorage::Impl::operator[](const char * /*nodename*/) const {
+    return File_बुहोल();
 }
 
 int FileStorage::Impl::getFormat() const { return fmt; }
@@ -1441,8 +1441,8 @@ void FileStorage::Impl::setBufferPtr(char *ptr) {
 int FileStorage::Impl::wrapMargin() const { return wrap_margin; }
 
 FStructData &FileStorage::Impl::getCurrentStruct() {
-    CV_Assert(!write_stack.empty());
-    return write_stack.back();
+    CV_Assert(!write_सालानसान.empty());
+    return write_सालानसान.back();
 }
 
 void FileStorage::Impl::setNonEmpty() {
@@ -1493,43 +1493,43 @@ double FileStorage::Impl::strtod(char *ptr, char **endptr) {
     return fval;
 }
 
-void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
-    CV_Assert(type == FileNode::SEQ || type == FileNode::MAP);
+void FileStorage::Impl::convertToCollection(int type, File_बुहोल &बुहोल) {
+    CV_Assert(type == File_बुहोल::SEQ || type == File_बुहोल::MAP);
 
-    int node_type = node.type();
-    if (node_type == type)
+    int बुहोल_type = बुहोल.type();
+    if (बुहोल_type == type)
         return;
 
-    bool named = node.isNamed();
-    uchar *ptr = node.ptr() + 1 + (named ? 4 : 0);
+    bool named = बुहोल.isNamed();
+    uchar *ptr = बुहोल.ptr() + 1 + (named ? 4 : 0);
 
     int64_t ival = 0;
     double fval = 0;
     std::string sval;
     bool add_first_scalar = false;
 
-    if (node_type != FileNode::NONE) {
+    if (बुहोल_type != File_बुहोल::NONE) {
         // scalar nodes can only be converted to sequences, e.g. in XML:
         // <a>5[parser_position]... => create 5 with name "a"
         // <a>5 6[parser_position]... => 5 is converted to [5] and then 6 is added to it
         //
         // otherwise we don't know where to get the element names from
-        CV_Assert(type == FileNode::SEQ);
-        if (node_type == FileNode::INT) {
+        CV_Assert(type == File_बुहोल::SEQ);
+        if (बुहोल_type == File_बुहोल::INT) {
             ival = readLong(ptr);
             add_first_scalar = true;
-        } else if (node_type == FileNode::REAL) {
+        } else if (बुहोल_type == File_बुहोल::REAL) {
             fval = readReal(ptr);
             add_first_scalar = true;
-        } else if (node_type == FileNode::STRING) {
-            sval = std::string(node);
+        } else if (बुहोल_type == File_बुहोल::STRING) {
+            sval = std::string(बुहोल);
             add_first_scalar = true;
         } else
-            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", node_type));
+            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", बुहोल_type));
     }
 
-    ptr = reserveNodeSpace(node, 1 + (named ? 4 : 0) + 4 + 4);
-    *ptr++ = (uchar) (type | (named ? FileNode::NAMED : 0));
+    ptr = reserve_बुहोल_Space(बुहोल, 1 + (named ? 4 : 0) + 4 + 4);
+    *ptr++ = (uchar) (type | (named ? File_बुहोल::NAMED : 0));
     // name has been copied automatically
     if (named)
         ptr += 4;
@@ -1538,10 +1538,10 @@ void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
     writeInt(ptr + 4, 0);
 
     if (add_first_scalar)
-        addNode(node, std::string(), node_type,
-                node_type == FileNode::INT ? (const void *) &ival :
-                node_type == FileNode::REAL ? (const void *) &fval :
-                node_type == FileNode::STRING ? (const void *) sval.c_str() : 0,
+        add_बुहोल(बुहोल, std::string(), बुहोल_type,
+                बुहोल_type == File_बुहोल::INT ? (const void *) &ival :
+                बुहोल_type == File_बुहोल::REAL ? (const void *) &fval :
+                बुहोल_type == File_बुहोल::STRING ? (const void *) sval.c_str() : 0,
                 -1);
 }
 
@@ -1552,15 +1552,15 @@ void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
 //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
 // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
 // In the case (b) the existing tag and the name are copied automatically.
-uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
+uchar *FileStorage::Impl::reserve_बुहोल_Space(File_बुहोल &बुहोल, size_t sz) {
     bool shrinkBlock = false;
     size_t shrinkBlockIdx = 0, shrinkSize = 0;
 
     uchar *ptr = 0, *blockEnd = 0;
 
     if (!fs_data_ptrs.empty()) {
-        size_t blockIdx = node.blockIdx;
-        size_t ofs = node.ofs;
+        size_t blockIdx = बुहोल.blockIdx;
+        size_t ofs = बुहोल.ofs;
         CV_Assert(blockIdx == fs_data_ptrs.size() - 1);
         CV_Assert(ofs <= fs_data_blksz[blockIdx]);
         CV_Assert(freeSpaceOfs <= fs_data_blksz[blockIdx]);
@@ -1597,13 +1597,13 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
     uchar *new_ptr = &pv->at(0);
     fs_data_ptrs.push_back(new_ptr);
     fs_data_blksz.push_back(blockSize);
-    node.blockIdx = fs_data_ptrs.size() - 1;
-    node.ofs = 0;
+    बुहोल.blockIdx = fs_data_ptrs.size() - 1;
+    बुहोल.ofs = 0;
     freeSpaceOfs = sz;
 
     if (ptr && ptr + 5 <= blockEnd) {
         new_ptr[0] = ptr[0];
-        if (ptr[0] & FileNode::NAMED) {
+        if (ptr[0] & File_बुहोल::NAMED) {
             new_ptr[1] = ptr[1];
             new_ptr[2] = ptr[2];
             new_ptr[3] = ptr[3];
@@ -1619,16 +1619,16 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
     return new_ptr;
 }
 
-unsigned FileStorage::Impl::getStringOfs(const std::string &key) const {
-    str_hash_t::const_iterator it = str_hash.find(key);
+unsigned FileStorage::Impl::getStringOfs(const std::string &सुसि) const {
+    str_hash_t::const_iterator it = str_hash.find(सुसि);
     return it != str_hash.end() ? it->second : 0;
 }
 
-FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key,
+File_बुहोल FileStorage::Impl::add_बुहोल(File_बुहोल &collection, const std::string &सुसि,
                                     int elem_type, const void *value, int len) {
     FileStorage_API *fs = this;
-    bool noname = key.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(key.c_str(), "_") == 0);
-    convertToCollection(noname ? FileNode::SEQ : FileNode::MAP, collection);
+    bool noname = सुसि.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(सुसि.c_str(), "_") == 0);
+    convertToCollection(noname ? File_बुहोल::SEQ : File_बुहोल::MAP, collection);
 
     bool isseq = collection.empty() ? false : collection.isSeq();
     if (noname != isseq)
@@ -1636,13 +1636,13 @@ FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key
                            "Sequence element should not have name (use <_></_>)");
     unsigned strofs = 0;
     if (!noname) {
-        strofs = getStringOfs(key);
+        strofs = getStringOfs(सुसि);
         if (!strofs) {
             strofs = (unsigned) str_hash_data.size();
-            size_t keysize = key.size() + 1;
+            size_t keysize = सुसि.size() + 1;
             str_hash_data.resize(strofs + keysize);
-            memcpy(&str_hash_data[0] + strofs, &key[0], keysize);
-            str_hash.insert(std::make_pair(key, strofs));
+            memcpy(&str_hash_data[0] + strofs, &सुसि[0], keysize);
+            str_hash.insert(std::make_pair(सुसि, strofs));
         }
     }
 
@@ -1650,13 +1650,13 @@ FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key
 
     size_t blockIdx = fs_data_ptrs.size() - 1;
     size_t ofs = freeSpaceOfs;
-    FileNode node(fs_ext, blockIdx, ofs);
+    File_बुहोल बुहोल(fs_ext, blockIdx, ofs);
 
     size_t sz0 = 1 + (noname ? 0 : 4) + 8;
-    uchar *ptr = reserveNodeSpace(node, sz0);
+    uchar *ptr = reserve_बुहोल_Space(बुहोल, sz0);
 
-    *ptr++ = (uchar) (elem_type | (noname ? 0 : FileNode::NAMED));
-    if (elem_type == FileNode::NONE)
+    *ptr++ = (uchar) (elem_type | (noname ? 0 : File_बुहोल::NAMED));
+    if (elem_type == File_बुहोल::NONE)
         freeSpaceOfs -= 8;
 
     if (!noname) {
@@ -1664,27 +1664,27 @@ FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key
         ptr += 4;
     }
 
-    if (elem_type == FileNode::SEQ || elem_type == FileNode::MAP) {
+    if (elem_type == File_बुहोल::SEQ || elem_type == File_बुहोल::MAP) {
         writeInt(ptr, 4);
         writeInt(ptr, 0);
     }
 
     if (value)
-        node.setValue(elem_type, value, len);
+        बुहोल.set_हालागा(elem_type, value, len);
 
     if (collection.isNamed())
         cp += 4;
     int nelems = readInt(cp + 5);
     writeInt(cp + 5, nelems + 1);
 
-    return node;
+    return बुहोल;
 }
 
-void FileStorage::Impl::finalizeCollection(FileNode &collection) {
+void FileStorage::Impl::finalizeCollection(File_बुहोल &collection) {
     if (!collection.isSeq() && !collection.isMap())
         return;
     uchar *ptr0 = collection.ptr(), *ptr = ptr0 + 1;
-    if (*ptr0 & FileNode::NAMED)
+    if (*ptr0 & File_बुहोल::NAMED)
         ptr += 4;
     size_t blockIdx = collection.blockIdx;
     size_t ofs = collection.ofs + (size_t) (ptr + 8 - ptr0);
@@ -1702,7 +1702,7 @@ void FileStorage::Impl::finalizeCollection(FileNode &collection) {
     writeInt(ptr, (int) rawSize);
 }
 
-void FileStorage::Impl::normalizeNodeOfs(size_t &blockIdx, size_t &ofs) const {
+void FileStorage::Impl::normalize_बुहोल_Ofs(size_t &blockIdx, size_t &ofs) const {
     while (ofs >= fs_data_blksz[blockIdx]) {
         if (blockIdx == fs_data_blksz.size() - 1) {
             CV_Assert(ofs == fs_data_blksz[blockIdx]);
@@ -1869,7 +1869,7 @@ bool FileStorage::Impl::Base64Decoder::endOfStream() const { return eos; }
 char *FileStorage::Impl::Base64Decoder::getPtr() const { return ptr; }
 
 
-char *FileStorage::Impl::parseBase64(char *ptr, int indent, FileNode &collection) {
+char *FileStorage::Impl::parseBase64(char *ptr, int indent, File_बुहोल &collection) {
     const int BASE64_HDR_SIZE = 24;
     char dt[BASE64_HDR_SIZE + 1] = {0};
     base64decoder.init(parser_do_not_use_direct_dereference, ptr, indent);
@@ -1886,17 +1886,17 @@ char *FileStorage::Impl::parseBase64(char *ptr, int indent, FileNode &collection
     CV_Assert(!base64decoder.endOfStream());
 
     int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2];
-    int fmt_pair_count = fs::decodeFormat(dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    int fmt_pair_बिलांग = fs::decodeFormat(dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS);
     int64_t ival = 0;
     double fval = 0;
 
     for (;;) {
-        for (k = 0; k < fmt_pair_count; k++) {
+        for (k = 0; k < fmt_pair_बिलांग; k++) {
             int elem_type = fmt_pairs[k * 2 + 1];
-            int count = fmt_pairs[k * 2];
+            int बिलांग_2 = fmt_pairs[k * 2];
 
-            for (i = 0; i < count; i++) {
-                int node_type = FileNode::INT;
+            for (i = 0; i < बिलांग_2; i++) {
+                int बुहोल_type = File_बुहोल::INT;
                 switch (elem_type) {
                     case CV_8U:
                         ival = base64decoder.getUInt8();
@@ -1929,24 +1929,24 @@ char *FileStorage::Impl::parseBase64(char *ptr, int indent, FileNode &collection
                         Cv32suf v;
                         v.i = base64decoder.getInt32();
                         fval = v.f;
-                        node_type = FileNode::REAL;
+                        बुहोल_type = File_बुहोल::REAL;
                     }
                         break;
                     case CV_64F:
                         fval = base64decoder.getFloat64();
-                        node_type = FileNode::REAL;
+                        बुहोल_type = File_बुहोल::REAL;
                         break;
                     case CV_16F:
                         fval = float(hfloatFromBits(base64decoder.getUInt16()));
-                        node_type = FileNode::REAL;
+                        बुहोल_type = File_बुहोल::REAL;
                         break;
                     case CV_8F_E4M3FN:
                         fval = fp8_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
+                        बुहोल_type = File_बुहोल::REAL;
                         break;
                     case CV_8F_E4M3FNUZ:
                         fval = fp8a_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
+                        बुहोल_type = File_बुहोल::REAL;
                         break;
                     default:
                         CV_Error(Error::StsUnsupportedFormat, "Unsupported type");
@@ -1954,8 +1954,8 @@ char *FileStorage::Impl::parseBase64(char *ptr, int indent, FileNode &collection
 
                 if (base64decoder.endOfStream())
                     break;
-                addNode(collection, std::string(), node_type,
-                        node_type == FileNode::INT ? (void *) &ival : (void *) &fval, -1);
+                add_बुहोल(collection, std::string(), बुहोल_type,
+                        बुहोल_type == File_बुहोल::INT ? (void *) &ival : (void *) &fval, -1);
             }
         }
         if (base64decoder.endOfStream())
@@ -1966,13 +1966,13 @@ char *FileStorage::Impl::parseBase64(char *ptr, int indent, FileNode &collection
     return base64decoder.getPtr();
 }
 
-void FileStorage::Impl::parseError(const char *func_name, const std::string &err_msg, const char *source_file,
-                                   int source_line) {
-    std::string msg = format("%s(%d): %s", filename.c_str(), lineno, err_msg.c_str());
-    error(Error::StsParseError, func_name, msg.c_str(), source_file, source_line);
+void FileStorage::Impl::parseError(const char *func_name, const std::string &err_मेनसाहे, const char *source_file,
+                                   int source_लिन्या) {
+    std::string मेनसाहे = format("%s(%d): %s", filename.c_str(), lineno, err_मेनसाहे.c_str());
+    error(Error::StsParseError, func_name, मेनसाहे.c_str(), source_file, source_लिन्या);
 }
 
-const uchar *FileStorage::Impl::getNodePtr(size_t blockIdx, size_t ofs) const {
+const uchar *FileStorage::Impl::get_बुहोल_Ptr(size_t blockIdx, size_t ofs) const {
     CV_Assert(blockIdx < fs_data_ptrs.size());
     CV_Assert(ofs < fs_data_blksz[blockIdx]);
 
@@ -2006,8 +2006,8 @@ void FileStorage::startWriteStruct(const String& name, int struct_flags, const S
 {
     p->startWriteStruct(name.size() ? name.c_str() : 0, struct_flags, typeName.size() ? typeName.c_str() : 0);
     elname = String();
-    if ((struct_flags & FileNode::TYPE_MASK) == FileNode::SEQ)
-        state = FileStorage::VALUE_EXPECTED;
+    if ((struct_flags & File_बुहोल::TYPE_MASK) == File_बुहोल::SEQ)
+        state = FileStorage::हालागा_EXPECTED;
     else
         state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
 }
@@ -2015,9 +2015,9 @@ void FileStorage::startWriteStruct(const String& name, int struct_flags, const S
 void FileStorage::endWriteStruct()
 {
     p->endWriteStruct();
-    state = p->write_stack.empty() || FileNode::isMap(p->write_stack.back().flags) ?
+    state = p->write_सालानसान.empty() || File_बुहोल::isMap(p->write_सालानसान.back().flags) ?
         FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP :
-        FileStorage::VALUE_EXPECTED;
+        FileStorage::हालागा_EXPECTED;
     elname = String();
 }
 
@@ -2048,19 +2048,19 @@ void FileStorage::release()
     p->release();
 }
 
-FileNode FileStorage::root(int i) const
+File_बुहोल FileStorage::उगात(int i) const
 {
     if( p.empty() || p->roots.empty() || i < 0 || i >= (int)p->roots.size() )
-        return FileNode();
+        return File_बुहोल();
 
     return p->roots[i];
 }
 
-FileNode FileStorage::getFirstTopLevelNode() const
+File_बुहोल FileStorage::get_First_इताअस_Level_बुहोल() const
 {
-    FileNode r = root();
-    FileNodeIterator it = r.begin();
-    return it != r.end() ? *it : FileNode();
+    File_बुहोल r = उगात();
+    File_बुहोल_Iterator it = r.begin();
+    return it != r.end() ? *it : File_बुहोल();
 }
 
 std::string FileStorage::getDefaultObjectName(const std::string& _filename)
@@ -2108,17 +2108,17 @@ int FileStorage::getFormat() const
     return p->fmt;
 }
 
-FileNode FileStorage::operator [](const char* key) const
+File_बुहोल FileStorage::operator [](const char* सुसि) const
 {
-    return this->operator[](std::string(key));
+    return this->operator[](std::string(सुसि));
 }
 
-FileNode FileStorage::operator [](const std::string& key) const
+File_बुहोल FileStorage::operator [](const std::string& सुसि) const
 {
-    FileNode res;
+    File_बुहोल res;
     for (size_t i = 0; i < p->roots.size(); i++)
     {
-        res = p->roots[i][key];
+        res = p->roots[i][सुसि];
         if (!res.empty())
             break;
     }
@@ -2208,7 +2208,7 @@ void FileStorage::write(const String& name, const std::vector<String>& val) { cv
 FileStorage& operator << (FileStorage& fs, const String& str)
 {
     enum { NAME_EXPECTED = FileStorage::NAME_EXPECTED,
-        VALUE_EXPECTED = FileStorage::VALUE_EXPECTED,
+        हालागा_EXPECTED = FileStorage::हालागा_EXPECTED,
         INSIDE_MAP = FileStorage::INSIDE_MAP };
     const char* _str = str.c_str();
     if( !fs.isOpened() || !_str )
@@ -2218,19 +2218,19 @@ FileStorage& operator << (FileStorage& fs, const String& str)
 
     if( c == '}' || c == ']' )
     {
-        if( fs_impl->write_stack.empty() )
+        if( fs_impl->write_सालानसान.empty() )
             CV_Error_( cv::Error::StsError, ("Extra closing '%c'", *_str) );
 
         fs_impl->workaround();
 
-        int struct_flags = fs_impl->write_stack.back().flags;
-        char expected_bracket = FileNode::isMap(struct_flags) ? '}' : ']';
+        int struct_flags = fs_impl->write_सालानसान.back().flags;
+        char expected_bracket = File_बुहोल::isMap(struct_flags) ? '}' : ']';
         if( c != expected_bracket )
             CV_Error_( cv::Error::StsError, ("The closing '%c' does not match the opening '%c'", c, expected_bracket));
         fs_impl->endWriteStruct();
-        CV_Assert(!fs_impl->write_stack.empty());
-        struct_flags = fs_impl->write_stack.back().flags;
-        fs.state = FileNode::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+        CV_Assert(!fs_impl->write_सालानसान.empty());
+        struct_flags = fs_impl->write_सालानसान.back().flags;
+        fs.state = File_बुहोल::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : हालागा_EXPECTED;
         fs.elname = String();
     }
     else if( fs.state == NAME_EXPECTED + INSIDE_MAP )
@@ -2238,20 +2238,20 @@ FileStorage& operator << (FileStorage& fs, const String& str)
         if (!cv_isalpha(c) && c != '_')
             CV_Error_( cv::Error::StsError, ("Incorrect element name %s; should start with a letter or '_'", _str) );
         fs.elname = str;
-        fs.state = VALUE_EXPECTED + INSIDE_MAP;
+        fs.state = हालागा_EXPECTED + INSIDE_MAP;
     }
-    else if( (fs.state & 3) == VALUE_EXPECTED )
+    else if( (fs.state & 3) == हालागा_EXPECTED )
     {
         if( c == '{' || c == '[' )
         {
-            int struct_flags = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            fs.state = struct_flags == FileNode::MAP ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+            int struct_flags = c == '{' ? File_बुहोल::MAP : File_बुहोल::SEQ;
+            fs.state = struct_flags == File_बुहोल::MAP ? INSIDE_MAP + NAME_EXPECTED : हालागा_EXPECTED;
             _str++;
             if( *_str == ':' )
             {
                 _str++;
                 if( !*_str )
-                    struct_flags |= FileNode::FLOW;
+                    struct_flags |= File_बुहोल::FLOW;
             }
             fs_impl->startWriteStruct(!fs.elname.empty() ? fs.elname.c_str() : 0, struct_flags, *_str ? _str : 0 );
             fs.elname = String();
@@ -2260,7 +2260,7 @@ FileStorage& operator << (FileStorage& fs, const String& str)
         {
             write( fs, fs.elname, (c == '\\' && (_str[1] == '{' || _str[1] == '}' ||
                                 _str[1] == '[' || _str[1] == ']')) ? String(_str+1) : str );
-            if( fs.state == INSIDE_MAP + VALUE_EXPECTED )
+            if( fs.state == INSIDE_MAP + हालागा_EXPECTED )
                 fs.state = INSIDE_MAP + NAME_EXPECTED;
         }
     }
@@ -2270,98 +2270,98 @@ FileStorage& operator << (FileStorage& fs, const String& str)
 }
 
 
-FileNode::FileNode()
+File_बुहोल::File_बुहोल()
     : fs(NULL)
 {
     blockIdx = ofs = 0;
 }
 
-FileNode::FileNode(FileStorage::Impl* _fs, size_t _blockIdx, size_t _ofs)
+File_बुहोल::File_बुहोल(FileStorage::Impl* _fs, size_t _blockIdx, size_t _ofs)
     : fs(_fs)
 {
     blockIdx = _blockIdx;
     ofs = _ofs;
 }
 
-FileNode::FileNode(const FileStorage* _fs, size_t _blockIdx, size_t _ofs)
-    : FileNode(_fs->p.get(), _blockIdx, _ofs)
+File_बुहोल::File_बुहोल(const FileStorage* _fs, size_t _blockIdx, size_t _ofs)
+    : File_बुहोल(_fs->p.get(), _blockIdx, _ofs)
 {
     // nothing
 }
 
-FileNode::FileNode(const FileNode& node)
+File_बुहोल::File_बुहोल(const File_बुहोल& बुहोल)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
+    fs = बुहोल.fs;
+    blockIdx = बुहोल.blockIdx;
+    ofs = बुहोल.ofs;
 }
 
-FileNode& FileNode::operator=(const FileNode& node)
+File_बुहोल& File_बुहोल::operator=(const File_बुहोल& बुहोल)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
+    fs = बुहोल.fs;
+    blockIdx = बुहोल.blockIdx;
+    ofs = बुहोल.ofs;
     return *this;
 }
 
-FileNode FileNode::operator[](const std::string& nodename) const
+File_बुहोल File_बुहोल::operator[](const std::string& nodename) const
 {
     if(!fs)
-        return FileNode();
+        return File_बुहोल();
 
     CV_Assert( isMap() );
 
-    unsigned key = fs->getStringOfs(nodename);
+    unsigned सुसि = fs->getStringOfs(nodename);
     size_t i, sz = size();
-    FileNodeIterator it = begin();
+    File_बुहोल_Iterator it = begin();
 
     for( i = 0; i < sz; i++, ++it )
     {
-        FileNode n = *it;
+        File_बुहोल n = *it;
         const uchar* p = n.ptr();
         unsigned key2 = (unsigned)readInt(p + 1);
         CV_Assert( key2 < fs->str_hash_data.size() );
-        if( key == key2 )
+        if( सुसि == key2 )
             return n;
     }
-    return FileNode();
+    return File_बुहोल();
 }
 
-FileNode FileNode::operator[](const char* nodename) const
+File_बुहोल File_बुहोल::operator[](const char* nodename) const
 {
     return this->operator[](std::string(nodename));
 }
 
-FileNode FileNode::operator[](int i) const
+File_बुहोल File_बुहोल::operator[](int i) const
 {
     if(!fs)
-        return FileNode();
+        return File_बुहोल();
 
     CV_Assert( isSeq() );
 
     int sz = (int)size();
     CV_Assert( 0 <= i && i < sz );
 
-    FileNodeIterator it = begin();
+    File_बुहोल_Iterator it = begin();
     it += i;
 
     return *it;
 }
 
-std::vector<String> FileNode::keys() const
+std::vector<String> File_बुहोल::मगा_सुसि() const
 {
     CV_Assert(isMap());
 
     std::vector<String> res;
     res.reserve(size());
-    for (FileNodeIterator it = begin(); it != end(); ++it)
+    for (File_बुहोल_Iterator it = begin(); it != end(); ++it)
     {
         res.push_back((*it).name());
     }
     return res;
 }
 
-int FileNode::type() const
+int File_बुहोल::type() const
 {
     const uchar* p = ptr();
     if(!p)
@@ -2369,20 +2369,20 @@ int FileNode::type() const
     return (*p & TYPE_MASK);
 }
 
-bool FileNode::isMap(int flags) { return (flags & TYPE_MASK) == MAP; }
-bool FileNode::isSeq(int flags) { return (flags & TYPE_MASK) == SEQ; }
-bool FileNode::isCollection(int flags) { return isMap(flags) || isSeq(flags); }
-bool FileNode::isFlow(int flags) { return (flags & FLOW) != 0; }
-bool FileNode::isEmptyCollection(int flags) { return (flags & EMPTY) != 0; }
+bool File_बुहोल::isMap(int flags) { return (flags & TYPE_MASK) == MAP; }
+bool File_बुहोल::isSeq(int flags) { return (flags & TYPE_MASK) == SEQ; }
+bool File_बुहोल::isCollection(int flags) { return isMap(flags) || isSeq(flags); }
+bool File_बुहोल::isFlow(int flags) { return (flags & FLOW) != 0; }
+bool File_बुहोल::isEmptyCollection(int flags) { return (flags & EMPTY) != 0; }
 
-bool FileNode::empty() const   { return fs == 0; }
-bool FileNode::isNone() const  { return type() == NONE; }
-bool FileNode::isSeq() const   { return type() == SEQ; }
-bool FileNode::isMap() const   { return type() == MAP; }
-bool FileNode::isInt() const   { return type() == INT;  }
-bool FileNode::isReal() const  { return type() == REAL; }
-bool FileNode::isString() const { return type() == STRING;  }
-bool FileNode::isNamed() const
+bool File_बुहोल::empty() const   { return fs == 0; }
+bool File_बुहोल::isNone() const  { return type() == NONE; }
+bool File_बुहोल::isSeq() const   { return type() == SEQ; }
+bool File_बुहोल::isMap() const   { return type() == MAP; }
+bool File_बुहोल::isInt() const   { return type() == INT;  }
+bool File_बुहोल::isReal() const  { return type() == REAL; }
+bool File_बुहोल::isString() const { return type() == STRING;  }
+bool File_बुहोल::isNamed() const
 {
     const uchar* p = ptr();
     if(!p)
@@ -2390,7 +2390,7 @@ bool FileNode::isNamed() const
     return (*p & NAMED) != 0;
 }
 
-std::string FileNode::name() const
+std::string File_बुहोल::name() const
 {
     const uchar* p = ptr();
     if(!p)
@@ -2399,7 +2399,7 @@ std::string FileNode::name() const
     return fs->getName(nameofs);
 }
 
-FileNode::operator int() const
+File_बुहोल::operator int() const
 {
     const uchar* p = ptr();
     if(!p)
@@ -2420,7 +2420,7 @@ FileNode::operator int() const
         return 0x7fffffff;
 }
 
-FileNode::operator int64_t() const
+File_बुहोल::operator int64_t() const
 {
     const uchar* p = ptr();
     if(!p)
@@ -2441,7 +2441,7 @@ FileNode::operator int64_t() const
         return 0x7fffffff;
 }
 
-FileNode::operator float() const
+File_बुहोल::operator float() const
 {
     const uchar* p = ptr();
     if(!p)
@@ -2462,7 +2462,7 @@ FileNode::operator float() const
         return FLT_MAX;
 }
 
-FileNode::operator double() const
+File_बुहोल::operator double() const
 {
     const uchar* p = ptr();
     if(!p)
@@ -2483,9 +2483,9 @@ FileNode::operator double() const
         return DBL_MAX;
 }
 
-double FileNode::real() const  { return double(*this); }
+double File_बुहोल::real() const  { return double(*this); }
 
-std::string FileNode::string() const
+std::string File_बुहोल::string() const
 {
     const uchar* p = ptr();
     if( !p || (*p & TYPE_MASK) != STRING )
@@ -2494,18 +2494,18 @@ std::string FileNode::string() const
     size_t sz = (size_t)(unsigned)readInt(p);
     return std::string((const char*)(p + 4), sz - 1);
 }
-Mat FileNode::mat() const { Mat value; read(*this, value, Mat()); return value; }
+Mat File_बुहोल::mat() const { Mat value; read(*this, value, Mat()); return value; }
 
-FileNodeIterator FileNode::begin() const { return FileNodeIterator(*this, false); }
-FileNodeIterator FileNode::end() const   { return FileNodeIterator(*this, true); }
+File_बुहोल_Iterator File_बुहोल::begin() const { return File_बुहोल_Iterator(*this, false); }
+File_बुहोल_Iterator File_बुहोल::end() const   { return File_बुहोल_Iterator(*this, true); }
 
-void FileNode::readRaw( const std::string& fmt, void* vec, size_t len ) const
+void File_बुहोल::readRaw( const std::string& fmt, void* vec, size_t len ) const
 {
-    FileNodeIterator it = begin();
+    File_बुहोल_Iterator it = begin();
     it.readRaw( fmt, vec, len );
 }
 
-size_t FileNode::size() const
+size_t File_बुहोल::size() const
 {
     const uchar* p = ptr();
     if( !p )
@@ -2521,7 +2521,7 @@ size_t FileNode::size() const
     return tp != NONE;
 }
 
-size_t FileNode::rawSize() const
+size_t File_बुहोल::rawSize() const
 {
     const uchar* p0 = ptr(), *p = p0;
     if( !p )
@@ -2541,17 +2541,17 @@ size_t FileNode::rawSize() const
     return sz0 + 4 + readInt(p);
 }
 
-uchar* FileNode::ptr()
+uchar* File_बुहोल::ptr()
 {
-    return !fs ? 0 : (uchar*)fs->getNodePtr(blockIdx, ofs);
+    return !fs ? 0 : (uchar*)fs->get_बुहोल_Ptr(blockIdx, ofs);
 }
 
-const uchar* FileNode::ptr() const
+const uchar* File_बुहोल::ptr() const
 {
-    return !fs ? 0 : fs->getNodePtr(blockIdx, ofs);
+    return !fs ? 0 : fs->get_बुहोल_Ptr(blockIdx, ofs);
 }
 
-void FileNode::setValue( int type, const void* value, int len )
+void File_बुहोल::set_हालागा( int type, const void* value, int len )
 {
     uchar *p = ptr();
     CV_Assert(p != 0);
@@ -2579,7 +2579,7 @@ void FileNode::setValue( int type, const void* value, int len )
     else
         CV_Error(Error::StsNotImplemented, "Only scalar types can be dynamically assigned to a file node");
 
-    p = fs->reserveNodeSpace(*this, sz);
+    p = fs->reserve_बुहोल_Space(*this, sz);
     *p++ = (uchar)(type | (tag & NAMED));
     if( tag & NAMED )
         p += 4;
@@ -2603,46 +2603,46 @@ void FileNode::setValue( int type, const void* value, int len )
     }
 }
 
-FileNodeIterator::FileNodeIterator()
+File_बुहोल_Iterator::File_बुहोल_Iterator()
 {
     fs = 0;
     blockIdx = 0;
     ofs = 0;
     blockSize = 0;
-    nodeNElems = 0;
+    बुहोल_NElems = 0;
     idx = 0;
 }
 
-FileNodeIterator::FileNodeIterator( const FileNode& node, bool seekEnd )
+File_बुहोल_Iterator::File_बुहोल_Iterator( const File_बुहोल& बुहोल, bool seekEnd )
 {
-    fs = node.fs;
+    fs = बुहोल.fs;
     idx = 0;
     if( !fs )
-        blockIdx = ofs = blockSize = nodeNElems = 0;
+        blockIdx = ofs = blockSize = बुहोल_NElems = 0;
     else
     {
-        blockIdx = node.blockIdx;
-        ofs = node.ofs;
+        blockIdx = बुहोल.blockIdx;
+        ofs = बुहोल.ofs;
 
-        bool collection = node.isSeq() || node.isMap();
-        if( node.isNone() )
+        bool collection = बुहोल.isSeq() || बुहोल.isMap();
+        if( बुहोल.isNone() )
         {
-            nodeNElems = 0;
+            बुहोल_NElems = 0;
         }
         else if( !collection )
         {
-            nodeNElems = 1;
+            बुहोल_NElems = 1;
             if( seekEnd )
             {
                 idx = 1;
-                ofs += node.rawSize();
+                ofs += बुहोल.rawSize();
             }
         }
         else
         {
-            nodeNElems = node.size();
-            const uchar* p0 = node.ptr(), *p = p0 + 1;
-            if(*p0 & FileNode::NAMED )
+            बुहोल_NElems = बुहोल.size();
+            const uchar* p0 = बुहोल.ptr(), *p = p0 + 1;
+            if(*p0 & File_बुहोल::NAMED )
                 p += 4;
             if( !seekEnd )
                 ofs += (p - p0) + 8;
@@ -2650,63 +2650,63 @@ FileNodeIterator::FileNodeIterator( const FileNode& node, bool seekEnd )
             {
                 size_t rawsz = (size_t)(unsigned)readInt(p);
                 ofs += (p - p0) + 4 + rawsz;
-                idx = nodeNElems;
+                idx = बुहोल_NElems;
             }
         }
-        fs->normalizeNodeOfs(blockIdx, ofs);
+        fs->normalize_बुहोल_Ofs(blockIdx, ofs);
         blockSize = fs->fs_data_blksz[blockIdx];
     }
 }
 
-FileNodeIterator::FileNodeIterator(const FileNodeIterator& it)
+File_बुहोल_Iterator::File_बुहोल_Iterator(const File_बुहोल_Iterator& it)
 {
     fs = it.fs;
     blockIdx = it.blockIdx;
     ofs = it.ofs;
     blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    बुहोल_NElems = it.बुहोल_NElems;
     idx = it.idx;
 }
 
-FileNodeIterator& FileNodeIterator::operator=(const FileNodeIterator& it)
+File_बुहोल_Iterator& File_बुहोल_Iterator::operator=(const File_बुहोल_Iterator& it)
 {
     fs = it.fs;
     blockIdx = it.blockIdx;
     ofs = it.ofs;
     blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    बुहोल_NElems = it.बुहोल_NElems;
     idx = it.idx;
     return *this;
 }
 
-FileNode FileNodeIterator::operator *() const
+File_बुहोल File_बुहोल_Iterator::operator *() const
 {
-    return FileNode(idx < nodeNElems ? fs : NULL, blockIdx, ofs);
+    return File_बुहोल(idx < बुहोल_NElems ? fs : NULL, blockIdx, ofs);
 }
 
-FileNodeIterator& FileNodeIterator::operator ++ ()
+File_बुहोल_Iterator& File_बुहोल_Iterator::operator ++ ()
 {
-    if( idx == nodeNElems || !fs )
+    if( idx == बुहोल_NElems || !fs )
         return *this;
     idx++;
-    FileNode n(fs, blockIdx, ofs);
+    File_बुहोल n(fs, blockIdx, ofs);
     ofs += n.rawSize();
     if( ofs >= blockSize )
     {
-        fs->normalizeNodeOfs(blockIdx, ofs);
+        fs->normalize_बुहोल_Ofs(blockIdx, ofs);
         blockSize = fs->fs_data_blksz[blockIdx];
     }
     return *this;
 }
 
-FileNodeIterator FileNodeIterator::operator ++ (int)
+File_बुहोल_Iterator File_बुहोल_Iterator::operator ++ (int)
 {
-    FileNodeIterator it = *this;
+    File_बुहोल_Iterator it = *this;
     ++(*this);
     return it;
 }
 
-FileNodeIterator& FileNodeIterator::operator += (int _ofs)
+File_बुहोल_Iterator& File_बुहोल_Iterator::operator += (int _ofs)
 {
     CV_Assert( _ofs >= 0 );
     for( ; _ofs > 0; _ofs-- )
@@ -2714,13 +2714,13 @@ FileNodeIterator& FileNodeIterator::operator += (int _ofs)
     return *this;
 }
 
-FileNodeIterator& FileNodeIterator::readRaw( const String& fmt, void* _data0, size_t maxsz)
+File_बुहोल_Iterator& File_बुहोल_Iterator::readRaw( const String& fmt, void* _data0, size_t maxsz)
 {
-    if( fs && idx < nodeNElems )
+    if( fs && idx < बुहोल_NElems )
     {
         uchar* data0 = (uchar*)_data0;
         int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2];
-        int fmt_pair_count = fs::decodeFormat( fmt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+        int fmt_pair_बिलांग = fs::decodeFormat( fmt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS );
         size_t esz = fs::calcStructSize( fmt.c_str(), 0 );
 
         CV_Assert( maxsz % esz == 0 );
@@ -2729,21 +2729,21 @@ FileNodeIterator& FileNodeIterator::readRaw( const String& fmt, void* _data0, si
         for( ; maxsz > 0; maxsz--, data0 += esz )
         {
             size_t offset = 0;
-            for( int k = 0; k < fmt_pair_count; k++ )
+            for( int k = 0; k < fmt_pair_बिलांग; k++ )
             {
                 int elem_type = fmt_pairs[k*2+1];
                 int elem_size = CV_ELEM_SIZE(elem_type);
 
-                int count = fmt_pairs[k*2];
+                int बिलांग_2 = fmt_pairs[k*2];
                 offset = alignSize( offset, elem_size );
                 uchar* data = data0 + offset;
 
-                for( int i = 0; i < count; i++, ++(*this) )
+                for( int i = 0; i < बिलांग_2; i++, ++(*this) )
                 {
-                    FileNode node = *(*this);
-                    if( node.isInt() )
+                    File_बुहोल बुहोल = *(*this);
+                    if( बुहोल.isInt() )
                     {
-                        int64_t ival = static_cast<int64_t>(elem_size == 8 ? (int64_t)node : (int)node);
+                        int64_t ival = static_cast<int64_t>(elem_size == 8 ? (int64_t)बुहोल : (int)बुहोल);
                         switch( elem_type )
                         {
                         case CV_8U:
@@ -2810,9 +2810,9 @@ FileNodeIterator& FileNodeIterator::readRaw( const String& fmt, void* _data0, si
                             CV_Error( Error::StsUnsupportedFormat, "Unsupported type" );
                         }
                     }
-                    else if( node.isReal() )
+                    else if( बुहोल.isReal() )
                     {
-                        double fval = (double)node;
+                        double fval = (double)बुहोल;
 
                         switch( elem_type )
                         {
@@ -2887,83 +2887,83 @@ FileNodeIterator& FileNodeIterator::readRaw( const String& fmt, void* _data0, si
     return *this;
 }
 
-bool FileNodeIterator::equalTo(const FileNodeIterator& it) const
+bool File_बुहोल_Iterator::equalTo(const File_बुहोल_Iterator& it) const
 {
     return fs == it.fs && blockIdx == it.blockIdx && ofs == it.ofs &&
-           idx == it.idx && nodeNElems == it.nodeNElems;
+           idx == it.idx && बुहोल_NElems == it.बुहोल_NElems;
 }
 
-size_t FileNodeIterator::remaining() const
+size_t File_बुहोल_Iterator::remaining() const
 {
-    return nodeNElems - idx;
+    return बुहोल_NElems - idx;
 }
 
-bool operator == ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+bool operator == ( const File_बुहोल_Iterator& it1, const File_बुहोल_Iterator& it2 )
 {
     return it1.equalTo(it2);
 }
 
-bool operator != ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+bool operator != ( const File_बुहोल_Iterator& it1, const File_बुहोल_Iterator& it2 )
 {
     return !it1.equalTo(it2);
 }
 
-void read(const FileNode& node, int& val, int default_val)
+void read(const File_बुहोल& बुहोल, int& val, int default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    if( !बुहोल.empty() )
     {
-        val = (int)node;
+        val = (int)बुहोल;
     }
 }
 
-void read(const FileNode& node, int64_t& val, int64_t default_val)
+void read(const File_बुहोल& बुहोल, int64_t& val, int64_t default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    if( !बुहोल.empty() )
     {
-        val = (int64_t)node;
+        val = (int64_t)बुहोल;
     }
 }
 
-void read(const FileNode& node, double& val, double default_val)
+void read(const File_बुहोल& बुहोल, double& val, double default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    if( !बुहोल.empty() )
     {
-        val = (double)node;
+        val = (double)बुहोल;
     }
 }
 
-void read(const FileNode& node, float& val, float default_val)
+void read(const File_बुहोल& बुहोल, float& val, float default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    if( !बुहोल.empty() )
     {
-        val = (float)node;
+        val = (float)बुहोल;
     }
 }
 
-void read(const FileNode& node, std::string& val, const std::string& default_val)
+void read(const File_बुहोल& बुहोल, std::string& val, const std::string& default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    if( !बुहोल.empty() )
     {
-        val = (std::string)node;
+        val = (std::string)बुहोल;
     }
 }
-void FileStorage::Impl::write(const String &key, bool value)
+void FileStorage::Impl::write(const String &सुसि, bool value)
 {
     CV_Assert(write_mode);
     if (fmt != FileStorage::FORMAT_YAML)
     {
         // Legacy behavior: Write as integer 1 or 0
-        getEmitter().write(key.c_str(), (int)value);
+        getEmitter().write(सुसि.c_str(), (int)value);
     }
     else
     {
         // Default/Modern behavior: Write as "true" or "false"
-        getEmitter().write(key.c_str(), value ? "true" : "false", false);
+        getEmitter().write(सुसि.c_str(), value ? "true" : "false", false);
     }
 }
 

@@ -22,11 +22,11 @@ class LogTagConfigParser
 {
 public:
     LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
-    explicit LogTagConfigParser(const std::string& input);
+    explicit LogTagConfigParser(const std::string& पासोक_2);
     ~LogTagConfigParser();
 
 public:
-    bool parse(const std::string& input);
+    bool parse(const std::string& पासोक_2);
     bool hasMalformed() const;
     const LogTagConfig& getGlobalConfig() const;
     const std::vector<LogTagConfig>& getFullNameConfigs() const;
@@ -42,7 +42,7 @@ private:
     static std::string toString(LogLevel level);
 
 private:
-    std::string m_input;
+    std::string m_पासोक;
     LogTagConfig m_parsedGlobal;
     std::vector<LogTagConfig> m_parsedFullName;
     std::vector<LogTagConfig> m_parsedFirstPart;

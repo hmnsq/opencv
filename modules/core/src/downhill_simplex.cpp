@@ -42,10 +42,10 @@
 
 #if 0
 #define dprintf(x) printf x
-#define print_matrix(x) print(x)
+#define इलिम्बाग_matrix(x) print(x)
 #else
 #define dprintf(x)
-#define print_matrix(x)
+#define इलिम्बाग_matrix(x)
 #endif
 
 /*
@@ -150,7 +150,7 @@ public:
     }
 
     void getInitStep(OutputArray step) const CV_OVERRIDE { _step.copyTo(step); }
-    void setInitStep(InputArray step) CV_OVERRIDE
+    void setInitStep(पासोक_Array step) CV_OVERRIDE
     {
         // set dimensionality and make a deep copy of step
         Mat m = step.getMat();
@@ -171,28 +171,28 @@ public:
     {
         CV_Assert( termcrit.type == (TermCriteria::MAX_ITER + TermCriteria::EPS) &&
                    termcrit.epsilon > 0 &&
-                   termcrit.maxCount > 0 );
+                   termcrit.max_बिलांग > 0 );
         _termcrit=termcrit;
     }
 
-    double minimize( InputOutputArray x_ ) CV_OVERRIDE
+    double minimize( पासोक_Output_Array x_ ) CV_OVERRIDE
     {
         dprintf(("hi from minimize\n"));
         CV_Assert( !_Function.empty() );
         CV_Assert( std::min(_step.cols, _step.rows) == 1 &&
                   std::max(_step.cols, _step.rows) >= 2 &&
                   _step.type() == CV_64FC1 );
-        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.maxCount,_termcrit.epsilon));
+        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.max_बिलांग,_termcrit.epsilon));
         dprintf(("step\n"));
-        print_matrix(_step);
+        इलिम्बाग_matrix(_step);
 
         Mat x = x_.getMat(), simplex;
 
         createInitialSimplex(x, simplex, _step);
-        int count = 0;
+        int बिलांग_2 = 0;
         double res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
-                                          count, _termcrit.maxCount);
-        dprintf(("%d iterations done\n",count));
+                                          बिलांग_2, _termcrit.max_बिलांग);
+        dprintf(("%d iterations done\n",बिलांग_2));
 
         if( !x.empty() )
         {
@@ -228,7 +228,7 @@ protected:
         }
 
         dprintf(("\nupdated coord sum:\n"));
-        print_matrix(coord_sum);
+        इलिम्बाग_matrix(coord_sum);
 
     }
 
@@ -259,7 +259,7 @@ protected:
             simplex_0[j] -= 0.5*step_[j];
 
         dprintf(("\nthis is simplex\n"));
-        print_matrix(simplex);
+        इलिम्बाग_matrix(simplex);
     }
 
     /*
@@ -321,7 +321,7 @@ protected:
                 }
             }
             dprintf(("\nthis is y on iteration %d:\n",fcount));
-            print_matrix(y);
+            इलिम्बाग_matrix(y);
 
             // check stop criterion
             double error = fabs(y_[ihi] - y_[ilo]);
@@ -356,7 +356,7 @@ protected:
             double y_alpha = tryNewPoint(p, coord_sum, ihi, alpha, buf, fcount);
 
             dprintf(("\ny_lo=%g, y_nhi=%g, y_hi=%g, y_alpha=%g, p_alpha:\n", y_lo, y_nhi, y_hi, y_alpha));
-            print_matrix(buf);
+            इलिम्बाग_matrix(buf);
 
             if( y_alpha < y_nhi )
             {
@@ -366,7 +366,7 @@ protected:
                     double beta = -2.0;
                     double y_beta = tryNewPoint(p, coord_sum, ihi, beta, buf, fcount);
                     dprintf(("\ny_beta=%g, p_beta:\n", y_beta));
-                    print_matrix(buf);
+                    इलिम्बाग_matrix(buf);
                     if( y_beta < y_alpha )
                     {
                         alpha = beta;
@@ -382,7 +382,7 @@ protected:
                 double gamma = 0.5;
                 double y_gamma = tryNewPoint(p, coord_sum, ihi, gamma, buf, fcount);
                 dprintf(("\ny_gamma=%g, p_gamma:\n", y_gamma));
-                print_matrix(buf);
+                इलिम्बाग_matrix(buf);
                 if( y_gamma < y_hi )
                     replacePoint(p, coord_sum, y, ihi, gamma, y_gamma);
                 else
@@ -404,7 +404,7 @@ protected:
                 }
             }
             dprintf(("\nthis is simplex on iteration %d\n",fcount));
-            print_matrix(p);
+            इलिम्बाग_matrix(p);
         }
         return y_[0];
     }
@@ -453,7 +453,7 @@ protected:
 // both minRange & minError are specified by termcrit.epsilon;
 // In addition, user may specify the number of iterations that the algorithm does.
 Ptr<DownhillSolver> DownhillSolver::create( const Ptr<MinProblemSolver::Function>& f,
-                                            InputArray initStep, TermCriteria termcrit )
+                                            पासोक_Array initStep, TermCriteria termcrit )
 {
     Ptr<DownhillSolver> DS = makePtr<DownhillSolverImpl>();
     DS->setFunction(f);

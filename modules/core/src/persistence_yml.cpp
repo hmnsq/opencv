@@ -22,7 +22,7 @@ public:
     }
     virtual ~YAMLEmitter() {}
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
+    FStructData startWriteStruct(const FStructData& parent, const char* सुसि,
                                  int struct_flags, const char* type_name=0)
     {
         char buf[CV_FS_MAX_LEN + 1024];
@@ -31,22 +31,22 @@ public:
         if ( type_name && *type_name == '\0' )
             type_name = 0;
 
-        struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        struct_flags = (struct_flags & (File_बुहोल::TYPE_MASK|File_बुहोल::FLOW)) | File_बुहोल::EMPTY;
+        if( !File_बुहोल::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
         if (type_name && memcmp(type_name, "binary", 6) == 0)
         {
             /* reset struct flag. in order not to print ']' */
-            struct_flags = FileNode::SEQ;
+            struct_flags = File_बुहोल::SEQ;
             snprintf(buf, sizeof(buf), "!!binary |");
             data = buf;
         }
-        else if( FileNode::isFlow(struct_flags))
+        else if( File_बुहोल::isFlow(struct_flags))
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
-            struct_flags |= FileNode::FLOW;
+            char c = File_बुहोल::isMap(struct_flags) ? '{' : '[';
+            struct_flags |= File_बुहोल::FLOW;
 
             if( type_name )
                 snprintf( buf, sizeof(buf), "!!%s %c", type_name, c );
@@ -63,14 +63,14 @@ public:
             data = buf;
         }
 
-        writeScalar( key, data );
+        writeScalar( सुसि, data );
 
         FStructData fsd;
         fsd.indent = parent.indent;
         fsd.flags = struct_flags;
 
-        if( !FileNode::isFlow(parent.flags) )
-            fsd.indent += CV_YML_INDENT + FileNode::isFlow(struct_flags);
+        if( !File_बुहोल::isFlow(parent.flags) )
+            fsd.indent += CV_YML_INDENT + File_बुहोल::isFlow(struct_flags);
 
         return fsd;
     }
@@ -81,18 +81,18 @@ public:
 
         int struct_flags = current_struct.flags;
 
-        if( FileNode::isFlow(struct_flags) )
+        if( File_बुहोल::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
+            if( ptr > fs->bufferStart() + current_struct.indent && !File_बुहोल::isEmptyCollection(struct_flags) )
                 *ptr++ = ' ';
-            *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
+            *ptr++ = File_बुहोल::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
-        else if( FileNode::isEmptyCollection(struct_flags) )
+        else if( File_बुहोल::isEmptyCollection(struct_flags) )
         {
             ptr = fs->flush();
-            memcpy( ptr, FileNode::isMap(struct_flags) ? "{}" : "[]", 2 );
+            memcpy( ptr, File_बुहोल::isMap(struct_flags) ? "{}" : "[]", 2 );
             fs->setBufferPtr(ptr + 2);
         }
         /*
@@ -101,25 +101,25 @@ public:
         CV_Assert( fs->struct_indent >= 0 );*/
     }
 
-    void write(const char* key, int value)
+    void write(const char* सुसि, int value)
     {
         char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10 ));
+        writeScalar( सुसि, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    void write(const char* सुसि, int64_t value)
     {
         char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10, true ));
+        writeScalar( सुसि, fs::itoa( value, buf, 10, true ));
     }
 
-    void write( const char* key, double value )
+    void write( const char* सुसि, double value )
     {
         char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ));
+        writeScalar( सुसि, fs::doubleToString( buf, sizeof(buf), value, false ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    void write(const char* सुसि, const char* str, bool quote)
     {
         char buf[CV_FS_MAX_LEN*4+16];
         char* data = (char*)str;
@@ -175,10 +175,10 @@ public:
             data = buf + !need_quote;
         }
 
-        writeScalar( key, data);
+        writeScalar( सुसि, data);
     }
 
-    void writeScalar(const char* key, const char* data)
+    void writeScalar(const char* सुसि, const char* data)
     {
         fs->check_if_write_struct_is_delayed(false);
         if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
@@ -198,24 +198,24 @@ public:
 
         int struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
-            key = 0;
+        if( सुसि && सुसि[0] == '\0' )
+            सुसि = 0;
 
-        if( FileNode::isCollection(struct_flags) )
+        if( File_बुहोल::isCollection(struct_flags) )
         {
-            if( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            if( (File_बुहोल::isMap(struct_flags) ^ (सुसि != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
         }
         else
         {
             fs->setNonEmpty();
-            struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
+            struct_flags = File_बुहोल::EMPTY | (सुसि ? File_बुहोल::MAP : File_बुहोल::SEQ);
         }
 
-        if( key )
+        if( सुसि )
         {
-            keylen = (int)strlen(key);
+            keylen = (int)strlen(सुसि);
             if( keylen == 0 )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
 
@@ -226,10 +226,10 @@ public:
         if( data )
             datalen = (int)strlen(data);
 
-        if( FileNode::isFlow(struct_flags) )
+        if( File_बुहोल::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            if( !File_बुहोल::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
             int new_offset = (int)(ptr - fs->bufferStart()) + keylen + datalen;
             if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
@@ -243,7 +243,7 @@ public:
         else
         {
             ptr = fs->flush();
-            if( !FileNode::isMap(struct_flags) )
+            if( !File_बुहोल::isMap(struct_flags) )
             {
                 *ptr++ = '-';
                 if( data )
@@ -251,16 +251,16 @@ public:
             }
         }
 
-        if( key )
+        if( सुसि )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            if( !cv_isalpha(सुसि[0]) && सुसि[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
             ptr = fs->resizeWriteBuffer( ptr, keylen );
 
             for( i = 0; i < keylen; i++ )
             {
-                char c = key[i];
+                char c = सुसि[i];
 
                 ptr[i] = c;
                 if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
@@ -269,7 +269,7 @@ public:
 
             ptr += keylen;
             *ptr++ = ':';
-            if( !FileNode::isFlow(struct_flags) && data )
+            if( !File_बुहोल::isFlow(struct_flags) && data )
                 *ptr++ = ' ';
         }
 
@@ -281,7 +281,7 @@ public:
         }
 
         fs->setBufferPtr(ptr);
-        current_struct.flags &= ~FileNode::EMPTY;
+        current_struct.flags &= ~File_बुहोल::EMPTY;
     }
 
     void writeComment(const char* comment, bool eol_comment)
@@ -414,7 +414,7 @@ public:
     }
 
 
-    char* parseKey( char* ptr, FileNode& map_node, FileNode& value_placeholder )
+    char* parse_सुसि( char* ptr, File_बुहोल& map_बुहोल, File_बुहोल& हालागा_placeholder )
     {
         if (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
@@ -440,13 +440,13 @@ public:
 
         ++endptr;
 
-        value_placeholder = fs->addNode(map_node, std::string(ptr, endptr - ptr), FileNode::NONE);
+        हालागा_placeholder = fs->add_बुहोल(map_बुहोल, std::string(ptr, endptr - ptr), File_बुहोल::NONE);
         ptr = saveptr;
 
         return ptr;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int min_indent, bool is_parent_flow, int depth = 0 )
+    char* parse_हालागा( char* ptr, File_बुहोल& बुहोल, int min_indent, bool is_parent_flow, int depth = 0 )
     {
         if (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
@@ -456,9 +456,9 @@ public:
 
         char* endptr = 0;
         char c = ptr[0], d = ptr[1];
-        int value_type = FileNode::NONE;
+        int value_type = File_बुहोल::NONE;
         int len;
-        bool is_binary_string = false;
+        bool is_दालावाहान_string = false;
         bool is_user = false;
 
         if( c == '!' ) // handle explicit type specification
@@ -503,24 +503,24 @@ public:
             if( len == 3 && !is_user )
             {
                 if( memcmp( ptr, "str", 3 ) == 0 )
-                    value_type = FileNode::STRING;
+                    value_type = File_बुहोल::STRING;
                 else if( memcmp( ptr, "int", 3 ) == 0 )
-                    value_type = FileNode::INT;
+                    value_type = File_बुहोल::INT;
                 else if( memcmp( ptr, "seq", 3 ) == 0 )
-                    value_type = FileNode::SEQ;
+                    value_type = File_बुहोल::SEQ;
                 else if( memcmp( ptr, "map", 3 ) == 0 )
-                    value_type = FileNode::MAP;
+                    value_type = File_बुहोल::MAP;
             }
             else if( len == 5 && !is_user )
             {
                 if( memcmp( ptr, "float", 5 ) == 0 )
-                    value_type = FileNode::REAL;
+                    value_type = File_बुहोल::REAL;
             }
             else if (len == 6 && is_user)
             {
                 if( memcmp( ptr, "binary", 6 ) == 0 ) {
-                    value_type = FileNode::SEQ;
-                    is_binary_string = true;
+                    value_type = File_बुहोल::SEQ;
+                    is_दालावाहान_string = true;
 
                     /* for ignore '|' */
 
@@ -547,19 +547,19 @@ public:
 
             if( !is_user )
             {
-                if (value_type == FileNode::STRING && c != '\'' && c != '\"')
+                if (value_type == File_बुहोल::STRING && c != '\'' && c != '\"')
                     goto force_string;
-                if( value_type == FileNode::INT )
+                if( value_type == File_बुहोल::INT )
                     goto force_int;
-                if( value_type == FileNode::REAL )
+                if( value_type == File_बुहोल::REAL )
                     goto force_real;
             }
         }
 
-        if (is_binary_string)
+        if (is_दालावाहान_string)
         {
             int indent = static_cast<int>(ptr - fs->bufferStart());
-            ptr = fs->parseBase64(ptr, indent, node);
+            ptr = fs->parseBase64(ptr, indent, बुहोल);
         }
         else if( cv_isdigit(c) ||
                 ((c == '-' || c == '+') && (cv_isdigit(d) || d == '.')) ||
@@ -572,13 +572,13 @@ public:
             {
             force_real:
                 double fval = fs->strtod( ptr, &endptr );
-                node.setValue(FileNode::REAL, &fval);
+                बुहोल.set_हालागा(File_बुहोल::REAL, &fval);
             }
             else
             {
             force_int:
                 int64_t ival = strtoll( ptr, &endptr, 0 );
-                node.setValue(FileNode::INT, &ival);
+                बुहोल.set_हालागा(File_बुहोल::INT, &ival);
             }
 
             if( !endptr || endptr == ptr )
@@ -652,20 +652,20 @@ public:
             if( len >= CV_FS_MAX_LEN )
                 CV_PARSE_ERROR_CPP( "Too long string literal" );
 
-            node.setValue(FileNode::STRING, buf, len);
+            बुहोल.set_हालागा(File_बुहोल::STRING, buf, len);
         }
         else if( c == '[' || c == '{' ) // collection as a flow
         {
             int new_min_indent = min_indent + !is_parent_flow;
-            int struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
+            int struct_type = c == '{' ? File_बुहोल::MAP : File_बुहोल::SEQ;
             int nelems = 0;
 
-            fs->convertToCollection(struct_type, node);
+            fs->convertToCollection(struct_type, बुहोल);
             d = c == '[' ? ']' : '}';
 
             for( ++ptr ;; nelems++ )
             {
-                FileNode elem;
+                File_बुहोल elem;
 
                 ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
                 if (!ptr)
@@ -687,20 +687,20 @@ public:
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
-                if( struct_type == FileNode::MAP )
+                if( struct_type == File_बुहोल::MAP )
                 {
-                    ptr = parseKey( ptr, node, elem );
+                    ptr = parse_सुसि( ptr, बुहोल, elem );
                     ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
                 }
                 else
                 {
                     if( *ptr == ']' )
                         break;
-                    elem = fs->addNode(node, std::string(), FileNode::NONE);
+                    elem = fs->add_बुहोल(बुहोल, std::string(), File_बुहोल::NONE);
                 }
-                ptr = parseValue( ptr, elem, new_min_indent, true, depth + 1 );
+                ptr = parse_हालागा( ptr, elem, new_min_indent, true, depth + 1 );
             }
-            fs->finalizeCollection(node);
+            fs->finalizeCollection(बुहोल);
         }
         else
         {
@@ -723,7 +723,7 @@ public:
                 do c = *++endptr;
                 while( cv_isprint(c) &&
                       (!is_parent_flow || (c != ',' && c != '}' && c != ']')) &&
-                      (is_parent_flow || c != ':' || value_type == FileNode::STRING));
+                      (is_parent_flow || c != ':' || value_type == File_बुहोल::STRING));
 
                 if( endptr == ptr )
                     CV_PARSE_ERROR_CPP( "Invalid character" );
@@ -739,13 +739,13 @@ public:
                         size_t llen = str_end - ptr;
                         if (llen == 4 && memcmp(ptr, "true", 4) == 0) {
                             int64_t ival = 1;
-                            node.setValue(FileNode::INT, &ival);
+                            बुहोल.set_हालागा(File_बुहोल::INT, &ival);
                             ptr = endptr;
                             return ptr;
                         }
                         else if (llen == 5 && memcmp(ptr, "false", 5) == 0) {
                             int64_t ival = 0;
-                            node.setValue(FileNode::INT, &ival);
+                            बुहोल.set_हालागा(File_बुहोल::INT, &ival);
                             ptr = endptr;
                             return ptr;
                         }
@@ -755,25 +755,25 @@ public:
                         }
                     }
 
-                    node.setValue(FileNode::STRING, ptr, (int)(str_end - ptr));
+                    बुहोल.set_हालागा(File_बुहोल::STRING, ptr, (int)(str_end - ptr));
                     ptr = endptr;
                     return ptr;
                 }
-                struct_type = FileNode::MAP;
+                struct_type = File_बुहोल::MAP;
             }
             else
-                struct_type = FileNode::SEQ;
+                struct_type = File_बुहोल::SEQ;
 
-            fs->convertToCollection( struct_type, node );
+            fs->convertToCollection( struct_type, बुहोल );
             indent = (int)(ptr - fs->bufferStart());
 
             for(;;)
             {
-                FileNode elem;
+                File_बुहोल elem;
 
-                if( struct_type == FileNode::MAP )
+                if( struct_type == File_बुहोल::MAP )
                 {
-                    ptr = parseKey( ptr, node, elem );
+                    ptr = parse_सुसि( ptr, बुहोल, elem );
                 }
                 else
                 {
@@ -781,10 +781,10 @@ public:
                     if( c != '-' )
                         CV_PARSE_ERROR_CPP( "Block sequence elements must be preceded with \'-\'" );
 
-                    elem = fs->addNode(node, std::string(), FileNode::NONE);
+                    elem = fs->add_बुहोल(बुहोल, std::string(), File_बुहोल::NONE);
                 }
                 ptr = skipSpaces( ptr, indent + 1, INT_MAX );
-                ptr = parseValue( ptr, elem, indent + 1, false, depth + 1 );
+                ptr = parse_हालागा( ptr, elem, indent + 1, false, depth + 1 );
                 ptr = skipSpaces( ptr, 0, INT_MAX );
                 if( ptr - fs->bufferStart() != indent )
                 {
@@ -796,7 +796,7 @@ public:
                 if( memcmp( ptr, "...", 3 ) == 0 )
                     break;
             }
-            fs->finalizeCollection(node);
+            fs->finalizeCollection(बुहोल);
         }
 
         return ptr;
@@ -809,7 +809,7 @@ public:
 
         bool first = true;
         bool ok = true;
-        FileNode root_collection(fs->getFS(), 0, 0);
+        File_बुहोल उगात_collection(fs->getFS(), 0, 0);
 
         for(;;)
         {
@@ -864,10 +864,10 @@ public:
             if( memcmp( ptr, "...", 3 ) != 0 )
             {
                 // 2. parse the collection
-                FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::NONE);
+                File_बुहोल उगात_बुहोल = fs->add_बुहोल(उगात_collection, std::string(), File_बुहोल::NONE);
 
-                ptr = parseValue( ptr, root_node, 0, false );
-                if( !root_node.isMap() && !root_node.isSeq() )
+                ptr = parse_हालागा( ptr, उगात_बुहोल, 0, false );
+                if( !उगात_बुहोल.isMap() && !उगात_बुहोल.isSeq() )
                     CV_PARSE_ERROR_CPP( "Only collections as YAML streams are supported by this parser" );
 
                 // 3. parse until the end of file or next collection

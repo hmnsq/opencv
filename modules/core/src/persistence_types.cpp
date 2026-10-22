@@ -14,7 +14,7 @@ void write( FileStorage& fs, const String& name, const Mat& m )
 
     if( m.dims == 2 || m.empty() )
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-matrix"));
+        fs.startWriteStruct(name, File_बुहोल::MAP, String("opencv-matrix"));
         fs << "rows" << m.rows;
         fs << "cols" << m.cols;
         fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
@@ -26,7 +26,7 @@ void write( FileStorage& fs, const String& name, const Mat& m )
     }
     else
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-nd-matrix"));
+        fs.startWriteStruct(name, File_बुहोल::MAP, String("opencv-nd-matrix"));
         fs << "sizes" << "[:";
         fs.writeRaw( "i", m.size.p, m.dims*sizeof(int) );
         fs << "]";
@@ -44,9 +44,9 @@ void write( FileStorage& fs, const String& name, const Mat& m )
     }
 }
 
-struct SparseNodeCmp
+struct Sparse_बुहोल_Cmp
 {
-    SparseNodeCmp(int _dims) : dims(_dims) {}
+    Sparse_बुहोल_Cmp(int _dims) : dims(_dims) {}
     bool operator()(const SparseMat::Node* a, const SparseMat::Node* b)
     {
         for( int i = 0; i < dims; i++ )
@@ -65,7 +65,7 @@ void write( FileStorage& fs, const String& name, const SparseMat& m )
 {
     char dt[22];
 
-    fs.startWriteStruct(name, FileNode::MAP, String("opencv-sparse-matrix"));
+    fs.startWriteStruct(name, File_बुहोल::MAP, String("opencv-sparse-matrix"));
     fs << "sizes" << "[:";
     int dims = m.dims();
     if( dims > 0 )
@@ -80,42 +80,42 @@ void write( FileStorage& fs, const String& name, const SparseMat& m )
 
     for( ; it != it_end; ++it )
     {
-        CV_Assert(it.node() != 0);
-        elems[i++] = it.node();
+        CV_Assert(it.बुहोल() != 0);
+        elems[i++] = it.बुहोल();
     }
 
-    std::sort(elems.begin(), elems.end(), SparseNodeCmp(dims));
-    const SparseMat::Node* prev_node = 0;
+    std::sort(elems.begin(), elems.end(), Sparse_बुहोल_Cmp(dims));
+    const SparseMat::Node* prev_बुहोल = 0;
     size_t esz = m.elemSize();
 
     for( i = 0; i < n; i++ )
     {
-        const SparseMat::Node* node = elems[i];
+        const SparseMat::Node* बुहोल = elems[i];
         int k = 0;
 
-        if( prev_node )
+        if( prev_बुहोल )
         {
             for( ; k < dims; k++ )
-                if( node->idx[k] != prev_node->idx[k] )
+                if( बुहोल->idx[k] != prev_बुहोल->idx[k] )
                     break;
             CV_Assert( k < dims );
             if( k < dims - 1 )
                 writeScalar( fs, k - dims + 1 );
         }
         for( ; k < dims; k++ )
-            writeScalar( fs, node->idx[k] );
-        prev_node = node;
+            writeScalar( fs, बुहोल->idx[k] );
+        prev_बुहोल = बुहोल;
 
-        const uchar* value = &m.value<uchar>(node);
+        const uchar* value = &m.value<uchar>(बुहोल);
         fs.writeRaw(dt, value, esz);
     }
 
     fs << "]" << "}";
 }
 
-void read(const FileNode& node, Mat& m, const Mat& default_mat)
+void read(const File_बुहोल& बुहोल, Mat& m, const Mat& default_mat)
 {
-    if( node.empty() )
+    if( बुहोल.empty() )
     {
         default_mat.copyTo(m);
         return;
@@ -124,34 +124,34 @@ void read(const FileNode& node, Mat& m, const Mat& default_mat)
     std::string dt;
     int rows, cols, elem_type;
 
-    read(node["dt"], dt, std::string());
+    read(बुहोल["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
     elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    read(node["rows"], rows, -1);
+    read(बुहोल["rows"], rows, -1);
     if( rows >= 0 )
     {
-        read(node["cols"], cols, -1);
+        read(बुहोल["cols"], cols, -1);
         m.create(rows, cols, elem_type);
     }
     else
     {
         int sizes[CV_MAX_DIM] = {0}, dims;
-        FileNode sizes_node = node["sizes"];
-        CV_Assert( !sizes_node.empty() );
+        File_बुहोल sizes_बुहोल = बुहोल["sizes"];
+        CV_Assert( !sizes_बुहोल.empty() );
 
-        dims = (int)sizes_node.size();
+        dims = (int)sizes_बुहोल.size();
         CV_Assert( dims >= 0 && dims <= CV_MAX_DIM );
-        sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+        sizes_बुहोल.readRaw("i", sizes, dims*sizeof(sizes[0]));
 
         m.create(dims, sizes, elem_type);
     }
 
-    FileNode data_node = node["data"];
-    CV_Assert(!data_node.empty());
+    File_बुहोल data_बुहोल = बुहोल["data"];
+    CV_Assert(!data_बुहोल.empty());
 
-    size_t nelems = data_node.size();
+    size_t nelems = data_बुहोल.size();
     if (nelems == 0)
     {
         m = Mat();
@@ -159,45 +159,45 @@ void read(const FileNode& node, Mat& m, const Mat& default_mat)
     }
     CV_Assert(nelems == m.total()*m.channels());
 
-    data_node.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
+    data_बुहोल.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
 }
 
-void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
+void read( const File_बुहोल& बुहोल, SparseMat& m, const SparseMat& default_mat )
 {
-    if( node.empty() )
+    if( बुहोल.empty() )
     {
         default_mat.copyTo(m);
         return;
     }
 
     std::string dt;
-    read(node["dt"], dt, std::string());
+    read(बुहोल["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
     int elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
     int sizes[CV_MAX_DIM] = {0};
-    FileNode sizes_node = node["sizes"];
-    CV_Assert( !sizes_node.empty() );
+    File_बुहोल sizes_बुहोल = बुहोल["sizes"];
+    CV_Assert( !sizes_बुहोल.empty() );
 
-    int dims = (int)sizes_node.size();
+    int dims = (int)sizes_बुहोल.size();
     CV_Assert( dims > 0 && dims <= CV_MAX_DIM );
-    sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+    sizes_बुहोल.readRaw("i", sizes, dims*sizeof(sizes[0]));
 
     m.create(dims, sizes, elem_type);
 
-    FileNode data = node["data"];
+    File_बुहोल data = बुहोल["data"];
     CV_Assert( data.isSeq() );
 
     int cn = CV_MAT_CN(elem_type);
     int idx[CV_MAX_DIM] = {0};
     size_t i, sz = data.size();
     size_t esz = m.elemSize();
-    FileNodeIterator it = data.begin();
+    File_बुहोल_Iterator it = data.begin();
 
     for( i = 0; i < sz; )
     {
-        FileNode n = *it;
+        File_बुहोल n = *it;
         int k = (int)n;
         if( i > 0 && k >= 0 )
         {
@@ -236,42 +236,42 @@ void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
     }
 }
 
-void read(const FileNode& node, KeyPoint& value, const KeyPoint& default_value)
+void read(const File_बुहोल& बुहोल, सुसि_Point& value, const सुसि_Point& default_हालागा)
 {
-    if( node.empty() )
+    if( बुहोल.empty() )
     {
-        value = default_value;
+        value = default_हालागा;
         return;
     }
-    node >> value;
+    बुहोल >> value;
 }
 
-void read(const FileNode& node, DMatch& value, const DMatch& default_value)
+void read(const File_बुहोल& बुहोल, DMatch& value, const DMatch& default_हालागा)
 {
-    if( node.empty() )
+    if( बुहोल.empty() )
     {
-        value = default_value;
+        value = default_हालागा;
         return;
     }
-    node >> value;
+    बुहोल >> value;
 }
 
 #ifdef CV__LEGACY_PERSISTENCE
-void write( FileStorage& fs, const std::string& name, const std::vector<KeyPoint>& vec)
+void write( FileStorage& fs, const std::string& name, const std::vector<सुसि_Point>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
+    cv::internal::WriteStructContext ws(fs, name, File_बुहोल::SEQ);
     write(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
+void read(const File_बुहोल& बुहोल, std::vector<सुसि_Point>& keypoints)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_बुहोल first_बुहोल = *(बुहोल.begin());
+    if (first_बुहोल.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
+        File_बुहोल_Iterator it = बुहोल.begin();
         size_t total = (size_t)it.remaining;
         keypoints.resize(total);
         for (size_t i = 0; i < total; ++i, ++it)
@@ -279,16 +279,16 @@ void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
             (*it) >> keypoints[i];
         }
 #else
-        FileNodeIterator it = node.begin();
+        File_बुहोल_Iterator it = बुहोल.begin();
         it >> keypoints;
 #endif
         return;
     }
     keypoints.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
+    File_बुहोल_Iterator it = बुहोल.begin(), it_end = बुहोल.end();
     for( ; it != it_end; )
     {
-        KeyPoint kpt;
+        सुसि_Point kpt;
         it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
         keypoints.push_back(kpt);
     }
@@ -297,18 +297,18 @@ void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
 void write( FileStorage& fs, const std::string& name, const std::vector<DMatch>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
+    cv::internal::WriteStructContext ws(fs, name, File_बुहोल::SEQ);
     write(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<DMatch>& matches)
+void read(const File_बुहोल& बुहोल, std::vector<DMatch>& matches)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_बुहोल first_बुहोल = *(बुहोल.begin());
+    if (first_बुहोल.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
+        File_बुहोल_Iterator it = बुहोल.begin();
         size_t total = (size_t)it.remaining;
         matches.resize(total);
         for (size_t i = 0; i < total; ++i, ++it)
@@ -316,13 +316,13 @@ void read(const FileNode& node, std::vector<DMatch>& matches)
             (*it) >> matches[i];
         }
 #else
-        FileNodeIterator it = node.begin();
+        File_बुहोल_Iterator it = बुहोल.begin();
         it >> matches;
 #endif
         return;
     }
     matches.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
+    File_बुहोल_Iterator it = बुहोल.begin(), it_end = बुहोल.end();
     for( ; it != it_end; )
     {
         DMatch m;

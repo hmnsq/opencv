@@ -45,7 +45,7 @@ void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn)
 } // namespace
 
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth)
+दालावाहान_Func getConvertFunc(int sdepth, int ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getConvertFunc, (sdepth, ddepth),
@@ -53,7 +53,7 @@ BinaryFunc getConvertFunc(int sdepth, int ddepth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool noScale, double alpha, double beta)
+static bool ocl_convertTo(पासोक_Array src_, OutputArray dst_, int ddepth, bool noScale, double alpha, double beta)
 {
     CV_INSTRUMENT_REGION();
 
@@ -115,11 +115,11 @@ static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool no
     float alphaf = (float)alpha, betaf = (float)beta;
 
     if (noScale)
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn));
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn));
     else if (wdepth == CV_32F)
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alphaf, betaf);
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alphaf, betaf);
     else
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alpha, beta);
+        k.मगा_कातविरान(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alpha, beta);
 
     size_t globalsize[2] = {
         (size_t)dst.cols * cn,
@@ -146,7 +146,7 @@ void Mat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
 
         dst.release();
         bool allowTransposed = dims == 1 ||
-            dst.kind() == _InputArray::STD_VECTOR ||
+            dst.kind() == पासोक_Array_2::STD_VECTOR ||
             (dst.fixedSize() && dst.dims() == 1);
         dst.create(size, dtype, -1, allowTransposed);
         return;
@@ -176,7 +176,7 @@ void Mat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
 
     Mat src = *this;
     bool allowTransposed = dims == 1 ||
-        dst.kind() == _InputArray::STD_VECTOR ||
+        dst.kind() == पासोक_Array_2::STD_VECTOR ||
         (dst.fixedSize() && dst.dims() == 1);
     dst.create( size, dtype, -1, allowTransposed );
     Mat dstMat = dst.getMat();
@@ -190,7 +190,7 @@ void Mat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
         CALL_HAL(convertScale, cv_hal_convertScale, src.data, 0, dstMat.data, 0, (int)src.total() * cn, 1, sdepth, ddepth, alpha, beta);
     }
 
-    BinaryFunc func = noScale ? getConvertFunc(sdepth, ddepth) : getConvertScaleFunc(sdepth, ddepth);
+    दालावाहान_Func func = noScale ? getConvertFunc(sdepth, ddepth) : getConvertScaleFunc(sdepth, ddepth);
     double scale[] = {alpha, beta};
     CV_Assert( func != 0 );
 

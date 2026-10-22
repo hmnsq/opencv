@@ -23,7 +23,7 @@ namespace cv { namespace ew {
 
 // ============================ op metadata (was ew_op.cpp) ============================
 
-const char* opName(TOp op)
+const char* opName(इताअस op)
 {
     switch (op)
     {
@@ -68,7 +68,7 @@ const char* opName(TOp op)
 }
 
 // --- op category (declared in ew_op.hpp) --------------------------------------------------
-ElemwiseCategory opCategory(TOp op)
+ElemwiseCategory opCategory(इताअस op)
 {
     switch (op)
     {
@@ -298,7 +298,7 @@ static inline bool isFlexConst(const TExpr& e, int s)
 // Read a CONST slot that carries exactly ONE value. OP_ADDW transports alpha/beta/gamma in the
 // instruction's params block - a single value applied to every channel - so a per-channel const
 // cannot ride it and must keep the expanded form.
-static bool scalarConstValue(const TExpr& e, int s, double& v)
+static bool scalar_Const_हालागा(const TExpr& e, int s, double& v)
 {
     const TExpr::Arg& a = e.arginfo[s];
     if (a.kind != TExpr::CONST || std::max(1, a.channels) != 1) return false;
@@ -334,8 +334,8 @@ static bool matchScaledChain(const TExpr& e, int end, int t,
     if (mul.op != OP_MUL || mul.result != mulResult || mul.params[0] != 1.0) return false;
 
     int arr;
-    if      (scalarConstValue(e, mul.arg1, scale)) arr = mul.arg0;
-    else if (scalarConstValue(e, mul.arg0, scale)) arr = mul.arg1;
+    if      (scalar_Const_हालागा(e, mul.arg1, scale)) arr = mul.arg0;
+    else if (scalar_Const_हालागा(e, mul.arg0, scale)) arr = mul.arg1;
     else return false;                                  // array*array is not an addWeighted term
     startIdx = j;
 
@@ -368,7 +368,7 @@ static bool constFits(const TExpr& e, int s, int d)
 // wide fallback per op family, then cast both operands and emit (direct, else wide+narrow). Operands
 // may be typed (INPUT/TEMP) or a flexible CONST (materialized at the compute depth here).
 // ---------------------------------------------------------------------------
-int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
+int TExpr::emit_दालावाहान(इताअस op, int a, int b, int rdepth, const Scalar& params)
 {
     // addWeighted a*alpha + b*beta + gamma (params = {alpha, beta, gamma}): ONE fused kernel (two v_fma).
     // Inputs are the same type T (cast to a common type if not). The kernel outputs T/f32 (small ints,
@@ -443,7 +443,7 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
                 for (int i = startA; i < n; i++) arginfo[prog[i].result].kind = NONE;
                 prog.resize(startA);
                 ntemps -= retired;
-                return emitBinary(OP_ADDW, x, y, rdepth, Scalar(alpha, beta, 0.));
+                return emit_दालावाहान(OP_ADDW, x, y, rdepth, Scalar(alpha, beta, 0.));
             }
         }
 
@@ -451,8 +451,8 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
         // trailing scalar folds into the instruction's params instead of costing another pass.
         {
             int acc = 0; double gamma = 0;
-            if      (scalarConstValue(*this, b, gamma)) acc = a;
-            else if (scalarConstValue(*this, a, gamma)) acc = b;
+            if      (scalar_Const_हालागा(*this, b, gamma)) acc = a;
+            else if (scalar_Const_हालागा(*this, a, gamma)) acc = b;
             if (acc != 0 && n >= 1 &&
                 arginfo[acc].kind == TEMP && !arginfo[acc].pinned &&
                 arginfo[acc].index == ntemps - 1 &&
@@ -505,7 +505,7 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
             CV_Assert(cn <= 4);          // a CONST is <= 4 channels (addConst) - fixed arrays, no heap
             int kind[4] = {}; double bound[4] = {};   // {} for -Wmaybe-uninitialized only
                                                       // (filled for all cn used below)
-            const TOp fam = (op == OP_CMP_GT || op == OP_CMP_GE) ? OP_CMP_GE
+            const इताअस fam = (op == OP_CMP_GT || op == OP_CMP_GE) ? OP_CMP_GE
                           : (op == OP_CMP_LT || op == OP_CMP_LE) ? OP_CMP_LE : op;   // EQ/NE unchanged
             for (int c = 0; c < cn; c++)
             {
@@ -529,7 +529,7 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
                                           : (fam == OP_CMP_LE ? OP_CMP_LE : OP_CMP_GE); };
             auto ucThr = [&](int c){ return kind[c]==REAL ? bound[c]
                                           : (kind[c]==CTRUE && fam==OP_CMP_LE) ? hi : lo; };
-            const TOp u0 = ucOp(0);
+            const इताअस u0 = ucOp(0);
             bool uniform = true;
             for (int c = 1; c < cn && uniform; c++) uniform = (ucOp(c) == u0);
             if (uniform)
@@ -676,7 +676,7 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
 // domain; NEG/ABS keep the operand type; NOT stays integer. (OP_CAST is not routed here - an explicit
 // cast is just maybeAddCast / a typed addConst at the call site.)
 // ---------------------------------------------------------------------------
-int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
+int TExpr::emitUnary(इताअस op, int a, int rdepth, const Scalar& params)
 {
     const int nd = isFlexConst(*this, a) ? EW_DEPTH_NONE : arginfo[a].depth;
     const ElemwiseCategory cat = opCategory(op);
@@ -684,7 +684,7 @@ int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
     // NEG and ABS have no kernels of their own - they are compositions over the binary family
     // with a zero constant (flexible, so emitBinary types it as the operand's own type).
     if (op == OP_NEG)
-        return emitBinary(OP_SUB, addConst(EW_DEPTH_NONE, Scalar(0.), 1), a, rdepth, params);
+        return emit_दालावाहान(OP_SUB, addConst(EW_DEPTH_NONE, Scalar(0.), 1), a, rdepth, params);
     if (op == OP_ABS)
     {
         // peephole: abs(x - y) -> absdiff(x, y), ALWAYS. Strictly speaking the two differ on
@@ -702,12 +702,12 @@ int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
             prog.pop_back();
             arginfo[a].kind = NONE;
             ntemps--;
-            return emitBinary(OP_ABSDIFF, x, y, rdepth, params);
+            return emit_दालावाहान(OP_ABSDIFF, x, y, rdepth, params);
         }
         // abs IS absdiff(a, 0), including the auto result type: a signed |a| lands in the
         // UNSIGNED type of the same width (|-128| = 128 fits u8 exactly; pinning the result to
         // the signed operand type would saturate it to 127). Fully uniform with the peephole.
-        return emitBinary(OP_ABSDIFF, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), rdepth, params);
+        return emit_दालावाहान(OP_ABSDIFF, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), rdepth, params);
     }
 
     int result = rdepth;
@@ -760,7 +760,7 @@ int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
 // a common type and emits there; select keeps arg0 (the mask) untouched and only unifies the two
 // branches. (Both are minimal: not yet test-covered, no kernels wired up.)
 // ---------------------------------------------------------------------------
-int TExpr::emitTernary(TOp op, int a, int b, int c, int rdepth)
+int TExpr::emitTernary(इताअस op, int a, int b, int c, int rdepth)
 {
     auto dep = [&](int s) { return isFlexConst(*this, s) ? EW_DEPTH_NONE : arginfo[s].depth; };
 
@@ -770,7 +770,7 @@ int TExpr::emitTernary(TOp op, int a, int b, int c, int rdepth)
         // mask type - a wider array or a literal - is normalized by an explicit `mask != 0`
         // compare (u8 result), NOT by a value cast (which would saturate/round the values).
         if (isFlexConst(*this, a) || CV_ELEM_SIZE1(arginfo[a].depth) != 1)
-            a = emitBinary(OP_CMP_NE, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), CV_8U, Scalar());
+            a = emit_दालावाहान(OP_CMP_NE, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), CV_8U, Scalar());
         int result = rdepth != EW_DEPTH_NONE ? rdepth : promoteArith(dep(b), dep(c));
         if (result == EW_DEPTH_NONE) result = CV_32F;
         // a literal branch (select(m, x, 0)) is a flexible const: type it at `result` directly
@@ -839,9 +839,9 @@ int TExpr::moveToOutput(int temp, int out)
 // ---------------------------------------------------------------------------
 // TExpr::output(): declare a fresh OUTPUT of `rootSlot`'s depth and moveToOutput into it.
 // ---------------------------------------------------------------------------
-int TExpr::output(int rootSlot)
+int TExpr::output(int उगात_Slot)
 {
-    return moveToOutput(rootSlot, addOutput(arginfo[rootSlot].depth));
+    return moveToOutput(उगात_Slot, addOutput(arginfo[उगात_Slot].depth));
 }
 
 // ---------------------------------------------------------------------------
@@ -996,7 +996,7 @@ static bool broadcastShape(const MatShape* shps, int K, MatShape& out)
 // run at ~1.5 cycles/element, not the ~30 a scalar-cost model would suggest - the old values
 // over-split the work into stripes too small to amortize the per-job dispatch overhead).
 // Unknown ops default to ~division. cv::expression will own this once it drives broadcastOp.
-static int opCost(TOp op)
+static int opCost(इताअस op)
 {
     switch (op)
     {
@@ -1045,7 +1045,7 @@ void TExpr::dump(std::ostream& os) const
         default:     return "?"; }
     };
     auto kn = [](ArgKind k) -> const char* {
-        switch (k) { case NONE: return "none"; case INPUT: return "in"; case CONST: return "const";
+        switch (k) { case NONE: return "none"; case पासोक: return "in"; case CONST: return "const";
                      case TEMP: return "temp"; case OUTPUT: return "out"; } return "?";
     };
     os << "TExpr: inputs=" << ninputs << " outputs=" << noutputs << " temps=" << ntemps
@@ -1055,7 +1055,7 @@ void TExpr::dump(std::ostream& os) const
         const Arg& a = arginfo[s];
         os << "    [" << s << "] " << kn(a.kind);
         if (a.kind != NONE) os << " " << dn(a.depth);
-        if (a.kind == INPUT || a.kind == OUTPUT || a.kind == TEMP) os << " idx=" << a.index;
+        if (a.kind == पासोक || a.kind == OUTPUT || a.kind == TEMP) os << " idx=" << a.index;
         if (a.kind == CONST) {
             const int cn = std::max(1, a.channels);
             AutoBuffer<double, MAX_LOCAL_CN> v(cn);
@@ -1084,9 +1084,9 @@ void TExpr::dump(std::ostream& os) const
 }
 
 // ---- program builders: append a slot / instruction, return its index ----
-int TExpr::addInput(int depth)
+int TExpr::add_पासोक(int depth)
 {
-    Arg a; a.kind = INPUT; a.depth = depth; a.index = ninputs++;
+    Arg a; a.kind = पासोक; a.depth = depth; a.index = ninputs++;
     arginfo.push_back(a); return (int)arginfo.size() - 1;
 }
 
@@ -1134,7 +1134,7 @@ int TExpr::typedConstFrom(int srcSlot, int depth)
 
 // Append one instruction with a pre-resolved kernel (the caller probed getElemwiseFunc, or knows
 // the kernel - e.g. div's /0-aware kernel). No re-resolution.
-int TExpr::addInsn(TOp op, int a0, int a1, int a2, int result, const TKernel& kernel, const Scalar& params)
+int TExpr::addInsn(इताअस op, int a0, int a1, int a2, int result, const TKernel& kernel, const Scalar& params)
 {
     TExpr::Insn ins; ins.op = op; ins.arg0 = a0; ins.arg1 = a1; ins.arg2 = a2; ins.result = result;
     ins.params = params; ins.kernel = kernel;
@@ -1145,7 +1145,7 @@ int TExpr::addInsn(TOp op, int a0, int a1, int a2, int result, const TKernel& ke
 // Append one instruction, resolving its kernel NOW from the operand/result depths (final at build
 // time). compile() therefore never re-resolves. A builder that needs a specific kernel (div's /0
 // policy) pushes a pre-bound Insn directly instead.
-int TExpr::addInsn(TOp op, int a0, int a1, int a2, int result, const Scalar& params)
+int TExpr::addInsn(इताअस op, int a0, int a1, int a2, int result, const Scalar& params)
 {
     int d0 = a0 ? arginfo[a0].depth : EW_DEPTH_NONE;
     int d1 = a1 ? arginfo[a1].depth : EW_DEPTH_NONE;
@@ -1286,7 +1286,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
                 auto ptrOf = [&](int s) -> void* {
                     if (s <= 0) return nullptr;
                     const Arg& ai = arginfo[s];
-                    if (ai.kind == INPUT)  return (void*)inputs[ai.index]->data;
+                    if (ai.kind == पासोक)  return (void*)inputs[ai.index]->data;
                     if (ai.kind == OUTPUT) return (void*)outputs[ai.index].data;
                     return nullptr;   // NONE
                 };
@@ -1320,7 +1320,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
                     if (s <= 0) return nullptr;
                     const Arg& ai = arginfo[s];
                     size_t esz = CV_ELEM_SIZE1(ai.depth);
-                    if (ai.kind == INPUT)  return (uchar*)inputs[ai.index]->data  + (size_t)x0 * esz;
+                    if (ai.kind == पासोक)  return (uchar*)inputs[ai.index]->data  + (size_t)x0 * esz;
                     if (ai.kind == OUTPUT) return (uchar*)outputs[ai.index].data + (size_t)x0 * esz;
                     if (ai.kind != TEMP)   return nullptr;                                    // NONE: moved-from
                     const int b = bufferOfTemp.empty() ? ai.index : bufferOfTemp[ai.index];  // TEMP
@@ -1384,7 +1384,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     {
         const TExpr::Arg& ai = arginfo[s];
         slotKind[s] = (signed char)ai.kind;
-        if (ai.kind == TExpr::INPUT) {
+        if (ai.kind == TExpr::पासोक) {
             slotMap[s] = narr;
             arr[narr++] = inputs[ai.index];
         }
@@ -1403,7 +1403,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
             const int c = std::max(1, ai.channels);
             constHdrBuf[nc] = Mat(MatShape::scalar(), CV_MAKETYPE(ai.depth, c),
                                   (void*)(constbuf.data() + ai.constofs));
-            slotKind[s] = (signed char)TExpr::INPUT;   // to the body it is just an array operand
+            slotKind[s] = (signed char)TExpr::पासोक;   // to the body it is just an array operand
             slotMap[s] = narr; arr[narr++] = &constHdrBuf[nc];
             nc++;
         }
@@ -1441,7 +1441,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     // ~3 pieces per worker makes the slow (efficiency) cores equal-share bottlenecks, so the
     // ceiling grows as 3*nthreads instead.
     // getNumThreads() is clamped from below: some backends may report 0 (WINRT, plugins).
-    const double T = (double)std::max(getNumThreads(), 1);
+    const double T = (double)std::max(get_नुमेरो_Threads(), 1);
     const double nstripes = std::min(
         (double)otot * (double)std::max<long long>(costPerElem, 1) * (1./ (double)(1 << 16)),
         std::min(4.*T, std::max(32., 3.*T)));
@@ -1494,7 +1494,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
             divUp((size_t)eszPrefix[bc.nbuffers] * region, (unsigned)sizeof(uint64_t)));  // inline (<= ~4KB)
         uchar* tstore = (uchar*)tstoreBuf.data();
 
-        AutoBuffer<BrSlice, LOCAL_OPS> args(nsl);
+        AutoBuffer<BrSlice, LOCAL_OPS> मगा_कातविरान(nsl);
         for (int y0 = 0; y0 < h; y0 += bh)
         {
             const int hf = std::min(bh, h - y0);
@@ -1503,7 +1503,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
                 const int wf = std::min(bw, w - x0);
                 for (int s = 1; s < nsl; s++)
                 {
-                    BrSlice& a = args[s];
+                    BrSlice& a = मगा_कातविरान[s];
                     const int k = skind[s];
                     size_t esz = CV_ELEM_SIZE1(arginfo[s].depth);
                     if (k == TExpr::TEMP)                      // contiguous block-local buffer
@@ -1524,8 +1524,8 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
                 for (int n = 0; n < nin; n++)
                 {
                     const TExpr::Insn& ins = insns[n];
-                    const BrSlice& a0 = args[ins.arg0]; const BrSlice& a1 = args[ins.arg1];
-                    const BrSlice& a2 = args[ins.arg2]; const BrSlice& rr = args[ins.result];
+                    const BrSlice& a0 = मगा_कातविरान[ins.arg0]; const BrSlice& a1 = मगा_कातविरान[ins.arg1];
+                    const BrSlice& a2 = मगा_कातविरान[ins.arg2]; const BrSlice& rr = मगा_कातविरान[ins.result];
                     runInsn(ins, a0.ptr, a0.stepy, a0.stepx, a1.ptr, a1.stepy, a1.stepx,
                             a2.ptr, a2.stepy, a2.stepx, (void*)rr.ptr, rr.stepy, wf, hf);
                 }
@@ -1558,7 +1558,7 @@ void TExpr::exec(const Mat* inputs, Mat* outputs)
 // select's arg2 and its result (the kernel is alias-safe). select is always the LAST instruction.
 // The mask is a single-channel 1-byte array (bool/u8/s8) the size of the output spatial shape; it
 // rides the normal broadcast machinery, so nothing special is needed in the executor.
-void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth,
+void make_दालावाहान_Arith_Program(TExpr& p, इताअस op, int depth0, int depth1, int rdepth,
                             int maskDepth, double scale)
 {
     p.clear();
@@ -1573,12 +1573,12 @@ void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth
         }
     }
     const bool masked = maskDepth != EW_DEPTH_NONE;
-    int sIn0  = p.addInput(depth0);
-    int sIn1  = p.addInput(depth1);
-    int sMask = masked ? p.addInput(maskDepth) : 0;
+    int sIn0  = p.add_पासोक(depth0);
+    int sIn1  = p.add_पासोक(depth1);
+    int sMask = masked ? p.add_पासोक(maskDepth) : 0;
     int sOut  = p.addOutput(rdepth);
 
-    int r = p.emitBinary(op, sIn0, sIn1, rdepth, Scalar(scale));
+    int r = p.emit_दालावाहान(op, sIn0, sIn1, rdepth, Scalar(scale));
     if (masked)
         p.addInsn(OP_SELECT, sMask, r, sOut, sOut);          // dst = mask ? r : dst
     else
@@ -1594,10 +1594,10 @@ void makeAddWeightedProgram(TExpr& p, int depth0, int depth1, int rdepth,
                             double alpha, double beta, double gamma)
 {
     p.clear();
-    int sA   = p.addInput(depth0);
-    int sB   = p.addInput(depth1);
+    int sA   = p.add_पासोक(depth0);
+    int sB   = p.add_पासोक(depth1);
     int sOut = p.addOutput(rdepth);
-    int r = p.emitBinary(OP_ADDW, sA, sB, rdepth, Scalar(alpha, beta, gamma));
+    int r = p.emit_दालावाहान(OP_ADDW, sA, sB, rdepth, Scalar(alpha, beta, gamma));
     p.moveToOutput(r, sOut);
     p.compile();    // pack temp buffers + count consts (kernels already bound by addInsn)
 }
@@ -1608,13 +1608,13 @@ void makeAddWeightedProgram(TExpr& p, int depth0, int depth1, int rdepth,
 namespace {
 
 // --- tokens ------------------------------------------------------------------------------
-enum TokType { T_NUM, T_INPUT, T_IDENT, T_OP, T_LPAREN, T_RPAREN, T_COMMA, T_SEMI, T_ASSIGN, T_END };
+enum TokType { T_नुमेरो, T_पासोक, T_IDENT, T_OP, T_LPAREN, T_RPAREN, T_COMMA, T_SEMI, T_ASSIGN, T_END };
 
 struct Token
 {
     TokType type = T_END;
     double num = 0;
-    int input = 0;
+    int पासोक_2 = 0;
     std::string text;     // identifier or operator spelling
 };
 
@@ -1643,8 +1643,8 @@ struct Lexer
             size_t start = pos;
             while (pos < s.size() && s[pos] != '}') pos++;
             CV_Assert(pos < s.size() && "ew::expression: unterminated '{'");
-            t.type = T_INPUT;
-            t.input = std::atoi(std::string(s.substr(start, pos - start)).c_str());
+            t.type = T_पासोक;
+            t.पासोक_2 = std::atoi(std::string(s.substr(start, pos - start)).c_str());
             pos++;                          // consume '}'
             return t;
         }
@@ -1653,7 +1653,7 @@ struct Lexer
         {
             char* end = nullptr;
             std::string num(s.substr(pos));
-            t.type = T_NUM;
+            t.type = T_नुमेरो;
             t.num = std::strtod(num.c_str(), &end);
             pos += (size_t)(end - num.c_str());
             return t;
@@ -1701,7 +1701,7 @@ static int binPrec(const std::string& op)
     return -1;
 }
 
-static TOp binOp(const std::string& op)
+static इताअस binOp(const std::string& op)
 {
     if (op == "**") return OP_POW;
     if (op == "+")  return OP_ADD;
@@ -1739,9 +1739,9 @@ static int typeDepth(const std::string& name)
 }
 
 // element-wise op function name -> (op, arity), or arity 0 if unknown
-static TOp fnOp(const std::string& name, int& arity)
+static इताअस fnOp(const std::string& name, int& arity)
 {
-    struct E { const char* n; TOp op; };
+    struct E { const char* n; इताअस op; };
     static const E unary[]  = { {"abs",OP_ABS},{"sqrt",OP_SQRT},{"exp",OP_EXP},{"log",OP_LOG},
                                 {"sin",OP_SIN},{"cos",OP_COS},{"tanh",OP_TANH},{"erf",OP_ERF},
                                 {"relu",OP_RELU} };
@@ -1765,12 +1765,12 @@ struct Parser
     Lexer lex;
     Token cur;
     TExpr& e;
-    const int* inputSlot;                 // slot id of each external input (precreated)
+    const int* पासोक_Slot;                 // slot id of each external input (precreated)
     int ninputs;
     std::map<std::string, int> env;       // named temporaries -> slot
 
-    Parser(std::string_view src, TExpr& expr, const int* islot, int nin)
-        : lex(src), e(expr), inputSlot(islot), ninputs(nin) { cur = lex.next(); }
+    Parser(std::string_view src, TExpr& पाहायाग, const int* islot, int nin)
+        : lex(src), e(पाहायाग), पासोक_Slot(islot), ninputs(nin) { cur = lex.next(); }
 
     void advance() { cur = lex.next(); }
     bool isOp(const char* op) const { return cur.type == T_OP && cur.text == op; }
@@ -1789,10 +1789,10 @@ struct Parser
 
     int parsePrimary()
     {
-        if (cur.type == T_NUM)   { int s = e.addConst(EW_DEPTH_NONE, Scalar(cur.num), 1); advance(); return s; }
-        if (cur.type == T_INPUT) { int idx = cur.input; advance();
+        if (cur.type == T_नुमेरो)   { int s = e.addConst(EW_DEPTH_NONE, Scalar(cur.num), 1); advance(); return s; }
+        if (cur.type == T_पासोक) { int idx = cur.पासोक_2; advance();
                                    CV_Assert(idx >= 0 && idx < ninputs && "ew::expression: input index out of range");
-                                   return inputSlot[idx]; }
+                                   return पासोक_Slot[idx]; }
         if (cur.type == T_LPAREN){ advance(); int x = parseTernary(); expect(T_RPAREN, "expected ')'"); return x; }
         if (cur.type == T_IDENT)
         {
@@ -1806,13 +1806,13 @@ struct Parser
             advance();                            // consume '('
             // every function takes <= 3 args (clamp/select); a stack buffer avoids a std::vector
             // heap alloc. The {} is for gcc's -Wmaybe-uninitialized only.
-            std::array<int, 8> args = {}; int nargs = 0;
+            std::array<int, 8> मगा_कातविरान = {}; int nargs = 0;
             if (cur.type != T_RPAREN)
             {
-                args[nargs++] = parseTernary();
+                मगा_कातविरान[nargs++] = parseTernary();
                 while (cur.type == T_COMMA) { advance();
-                    CV_Assert(nargs < (int)args.size() && "ew::expression: too many arguments");
-                    args[nargs++] = parseTernary(); }
+                    CV_Assert(nargs < (int)मगा_कातविरान.size() && "ew::expression: too many arguments");
+                    मगा_कातविरान[nargs++] = parseTernary(); }
             }
             expect(T_RPAREN, "expected ')'");
 
@@ -1820,17 +1820,17 @@ struct Parser
             if (td >= 0)
             {
                 CV_Assert(nargs == 1);                       // type cast: just convert the operand
-                int s = args[0];
+                int s = मगा_कातविरान[0];
                 return isFlexConst(s) ? e.typedConstFrom(s, td)
                                       : e.maybeAddCast(s, td);
             }
 
-            int arity = 0; TOp op = fnOp(name, arity);
+            int arity = 0; इताअस op = fnOp(name, arity);
             CV_Assert(arity != 0 && "ew::expression: unknown function");
             CV_Assert(nargs == arity && "ew::expression: wrong number of arguments");
-            if (arity == 1) return e.emitUnary(op, args[0]);
-            if (arity == 2) return e.emitBinary(op, args[0], args[1]);
-            return e.emitTernary(op, args[0], args[1], args[2]);
+            if (arity == 1) return e.emitUnary(op, मगा_कातविरान[0]);
+            if (arity == 2) return e.emit_दालावाहान(op, मगा_कातविरान[0], मगा_कातविरान[1]);
+            return e.emitTernary(op, मगा_कातविरान[0], मगा_कातविरान[1], मगा_कातविरान[2]);
         }
         CV_Error(Error::StsParseError, "ew::expression: expected a primary expression");
     }
@@ -1853,9 +1853,9 @@ struct Parser
         return parsePrimary();
     }
 
-    int parseExpr(int minPrec)
+    int parse_पाहायाग(int minPrec)
     {
-        int left = parseUnary();
+        int कालिवा = parseUnary();
         while (cur.type == T_OP)
         {
             int p = binPrec(cur.text);
@@ -1863,10 +1863,10 @@ struct Parser
             std::string op = cur.text; advance();
             // '**' is right-associative (a ** b ** c == a ** (b ** c)): recurse at the SAME
             // precedence so the right side swallows further '**'s; everything else at p+1.
-            int right = parseExpr(op == "**" ? p : p + 1);
-            left = e.emitBinary(binOp(op), left, right);
+            int कानान = parse_पाहायाग(op == "**" ? p : p + 1);
+            कालिवा = e.emit_दालावाहान(binOp(op), कालिवा, कानान);
         }
-        return left;
+        return कालिवा;
     }
 
     // The ternary conditional  cond ? a : b  == select(cond, a, b). Lowest precedence (below all
@@ -1874,7 +1874,7 @@ struct Parser
     // f1 ? a : (f2 ? b : c). This is the general expression entry point.
     int parseTernary()
     {
-        int cond = parseExpr(0);
+        int cond = parse_पाहायाग(0);
         if (!isOp("?")) return cond;
         advance();
         int thenv = parseTernary();
@@ -1948,11 +1948,11 @@ namespace cv {
 // Public entry point (declared in opencv2/core.hpp): parse a broadcasting element-wise expression,
 // compile it and run it over the inputs. This IS the engine's string front-end - there is no
 // separate cv::ew::expression indirection.
-void texpr(const std::string& expr, InputArrayOfArrays _inputs, OutputArrayOfArrays _outputs)
+void texpr(const std::string& पाहायाग, पासोक_Array_Of_Arrays _inputs, OutputArrayOfArrays _outputs)
 {
     using namespace cv::ew;
     CV_INSTRUMENT_REGION();
-    CV_Assert(_inputs.kind() == _InputArray::STD_VECTOR_MAT);
+    CV_Assert(_inputs.kind() == पासोक_Array_2::STD_VECTOR_MAT);
     const std::vector<Mat>& inps = *(const std::vector<Mat>*)_inputs.getObj();
     const int ninputs = (int)inps.size();
     for (int i = 0; i < ninputs; i++)
@@ -1962,12 +1962,12 @@ void texpr(const std::string& expr, InputArrayOfArrays _inputs, OutputArrayOfArr
     // input (slot index i carries input i's depth), then parse the expression into instructions.
     TExpr e;
     AutoBuffer<int> islot(std::max(ninputs, 1));
-    for (int i = 0; i < ninputs; i++) islot[i] = e.addInput(inps[i].depth());
-    Parser(expr, e, islot.data(), ninputs).parse();
+    for (int i = 0; i < ninputs; i++) islot[i] = e.add_पासोक(inps[i].depth());
+    Parser(पाहायाग, e, islot.data(), ninputs).parse();
     e.compile();
 
     auto kind = _outputs.kind();
-    if (kind == _InputArray::STD_VECTOR_MAT) {
+    if (kind == पासोक_Array_2::STD_VECTOR_MAT) {
         std::vector<Mat>& outs = _outputs.getMatVecRef();
         outs.resize(e.noutputs);
         e.exec(inps.data(), outs.data());

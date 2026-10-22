@@ -87,15 +87,15 @@ Context& initializeContextFromVA(VADisplay display, bool tryInterop)
 #   ifdef HAVE_VA_INTEL
     if (tryInterop)
     {
-        cl_uint numPlatforms;
-        cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
+        cl_uint नुमेरो_Platforms;
+        cl_int status = clGetPlatformIDs(0, NULL, &नुमेरो_Platforms);
         if (status != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-        if (numPlatforms == 0)
+        if (नुमेरो_Platforms == 0)
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-        std::vector<cl_platform_id> platforms(numPlatforms);
-        status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
+        std::vector<cl_platform_id> platforms(नुमेरो_Platforms);
+        status = clGetPlatformIDs(नुमेरो_Platforms, &platforms[0], NULL);
         if (status != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platform Id list");
 
@@ -110,7 +110,7 @@ Context& initializeContextFromVA(VADisplay display, bool tryInterop)
         cl_context context = 0;
         cl_device_id device = 0;
 
-        for (int i = 0; i < (int)numPlatforms; ++i)
+        for (int i = 0; i < (int)नुमेरो_Platforms; ++i)
         {
             // Get extension function pointers
             clGetDeviceIDsFromVA_APIMediaAdapterINTEL_fn clGetDeviceIDsFromVA_APIMediaAdapterINTEL;
@@ -123,15 +123,15 @@ Context& initializeContextFromVA(VADisplay display, bool tryInterop)
 
             // Query device list
 
-            cl_uint numDevices = 0;
+            cl_uint नुमेरो_Devices = 0;
 
             status = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
-                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, 0, NULL, &numDevices);
-            if ((status != CL_SUCCESS) || !(numDevices > 0))
+                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, 0, NULL, &नुमेरो_Devices);
+            if ((status != CL_SUCCESS) || !(नुमेरो_Devices > 0))
                 continue;
-            numDevices = 1; // OpenCV expects only 1 device
+            नुमेरो_Devices = 1; // OpenCV expects only 1 device
             status = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
-                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, numDevices, &device, NULL);
+                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, नुमेरो_Devices, &device, NULL);
             if (status != CL_SUCCESS)
                 continue;
 
@@ -143,7 +143,7 @@ Context& initializeContextFromVA(VADisplay display, bool tryInterop)
                 0
             };
 
-            context = clCreateContext(props, numDevices, &device, NULL, NULL, &status);
+            context = clCreateContext(props, नुमेरो_Devices, &device, NULL, NULL, &status);
             if (status != CL_SUCCESS)
             {
                 clReleaseDevice(device);
@@ -192,7 +192,7 @@ static bool ocl_convert_nv12_to_bgr(cl_mem clImageY, cl_mem clImageUV, cl_mem cl
     if (k.empty())
         return false;
 
-    k.args(clImageY, clImageUV, clBuffer, step, cols, rows);
+    k.मगा_कातविरान(clImageY, clImageUV, clBuffer, step, cols, rows);
 
     size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
     return k.run(2, globalsize, 0, false);
@@ -205,7 +205,7 @@ static bool ocl_convert_bgr_to_nv12(cl_mem clBuffer, int step, int cols, int row
     if (k.empty())
         return false;
 
-    k.args(clBuffer, step, cols, rows, clImageY, clImageUV);
+    k.मगा_कातविरान(clBuffer, step, cols, rows, clImageY, clImageUV);
 
     size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
     return k.run(2, globalsize, 0, false);
@@ -377,7 +377,7 @@ static void copy_convert_yv12_to_bgr(const VAImage& image, const unsigned char* 
         };
 
     CV_CheckEQ((size_t)image.format.fourcc, (size_t)VA_FOURCC_YV12, "Unexpected image format");
-    CV_CheckEQ((size_t)image.num_planes, (size_t)3, "");
+    CV_CheckEQ((size_t)image.नुमेरो_planes, (size_t)3, "");
 
     const size_t srcOffsetY = image.offsets[0];
     const size_t srcOffsetV = image.offsets[1];
@@ -454,7 +454,7 @@ static void copy_convert_bgr_to_yv12(const VAImage& image, const Mat& bgr, unsig
         };
 
     CV_CheckEQ((size_t)image.format.fourcc, (size_t)VA_FOURCC_YV12, "Unexpected image format");
-    CV_CheckEQ((size_t)image.num_planes, (size_t)3, "");
+    CV_CheckEQ((size_t)image.नुमेरो_planes, (size_t)3, "");
 
     const size_t dstOffsetY = image.offsets[0];
     const size_t dstOffsetV = image.offsets[1];
@@ -519,7 +519,7 @@ static void copy_convert_bgr_to_yv12(const VAImage& image, const Mat& bgr, unsig
 }
 #endif // HAVE_VA
 
-void convertToVASurface(VADisplay display, InputArray src, VASurfaceID surface, Size size)
+void convertToVASurface(VADisplay display, पासोक_Array src, VASurfaceID surface, Size size)
 {
     CV_UNUSED(display); CV_UNUSED(src); CV_UNUSED(surface); CV_UNUSED(size);
 #if !defined(HAVE_VA)
@@ -613,12 +613,12 @@ void convertToVASurface(VADisplay display, InputArray src, VASurfaceID surface, 
             //try vaCreateImage + vaPutImage
             //pick a format
             indirect_buffer = true;
-            int num_formats = vaMaxNumImageFormats(display);
-            if (num_formats <= 0)
+            int नुमेरो_formats = va_Max_नुमेरो_Image_Formats(display);
+            if (नुमेरो_formats <= 0)
                 CV_Error(cv::Error::StsError, "VA-API: vaMaxNumImageFormats failed");
-            std::vector<VAImageFormat> fmt_list(num_formats);
+            std::vector<VAImageFormat> fmt_list(नुमेरो_formats);
 
-            status = vaQueryImageFormats(display, fmt_list.data(), &num_formats);
+            status = vaQueryImageFormats(display, fmt_list.data(), &नुमेरो_formats);
             if (status != VA_STATUS_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats failed");
             VAImageFormat *selected_format = nullptr;
@@ -748,12 +748,12 @@ void convertFromVASurface(VADisplay display, VASurfaceID surface, Size size, Out
         if (status != VA_STATUS_SUCCESS){
             //try vaCreateImage + vaGetImage
             //pick a format
-            int num_formats = vaMaxNumImageFormats(display);
-            if (num_formats <= 0)
+            int नुमेरो_formats = va_Max_नुमेरो_Image_Formats(display);
+            if (नुमेरो_formats <= 0)
                 CV_Error(cv::Error::StsError, "VA-API: vaMaxNumImageFormats failed");
-            std::vector<VAImageFormat> fmt_list(num_formats);
+            std::vector<VAImageFormat> fmt_list(नुमेरो_formats);
 
-            status = vaQueryImageFormats(display, fmt_list.data(), &num_formats);
+            status = vaQueryImageFormats(display, fmt_list.data(), &नुमेरो_formats);
             if (status != VA_STATUS_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats failed");
             VAImageFormat *selected_format = nullptr;

@@ -82,7 +82,7 @@
 #define CV_OPENCL_SYNC_RUN_KERNELS               0
 #define CV_OPENCL_TRACE_CHECK                    0
 
-#define CV_OPENCL_VALIDATE_BINARY_PROGRAMS       1
+#define CV_OPENCL_VALIDATE_दालावाहान_PROGRAMS       1
 
 #define CV_OPENCL_SHOW_SVM_ERROR_LOG             1
 #define CV_OPENCL_SHOW_SVM_LOG                   0
@@ -174,41 +174,41 @@ void traceOpenCLCheck(cl_int status, const char* message)
 #define CV_OCL_TRACE_CHECK_RESULT(status, message) /* nothing */
 #endif
 
-#define CV_OCL_API_ERROR_MSG(check_result, msg) \
-    cv::format("OpenCL error %s (%d) during call: %s", getOpenCLErrorString(check_result), check_result, msg)
+#define CV_OCL_API_ERROR_मेनसाहे(check_result, मेनसाहे) \
+    cv::format("OpenCL error %s (%d) during call: %s", getOpenCLErrorString(check_result), check_result, मेनसाहे)
 
-#define CV_OCL_CHECK_RESULT(check_result, msg) \
+#define CV_OCL_CHECK_RESULT(check_result, मेनसाहे) \
     do { \
-        CV_OCL_TRACE_CHECK_RESULT(check_result, msg); \
+        CV_OCL_TRACE_CHECK_RESULT(check_result, मेनसाहे); \
         if (check_result != CL_SUCCESS) \
         { \
-            static_assert(std::is_convertible<decltype(msg), const char*>::value, "msg of CV_OCL_CHECK_RESULT must be const char*"); \
-            cv::String error_msg = CV_OCL_API_ERROR_MSG(check_result, msg); \
-            CV_Error(Error::OpenCLApiCallError, error_msg); \
+            static_assert(std::is_convertible<decltype(मेनसाहे), const char*>::value, "msg of CV_OCL_CHECK_RESULT must be const char*"); \
+            cv::String error_मेनसाहे = CV_OCL_API_ERROR_मेनसाहे(check_result, मेनसाहे); \
+            CV_Error(Error::OpenCLApiCallError, error_मेनसाहे); \
         } \
     } while (0)
 
-#define CV_OCL_CHECK_(expr, check_result) do { expr; CV_OCL_CHECK_RESULT(check_result, #expr); } while (0)
+#define CV_OCL_CHECK_(पाहायाग, check_result) do { पाहायाग; CV_OCL_CHECK_RESULT(check_result, #expr); } while (0)
 
-#define CV_OCL_CHECK(expr) do { cl_int __cl_result = (expr); CV_OCL_CHECK_RESULT(__cl_result, #expr); } while (0)
+#define CV_OCL_CHECK(पाहायाग) do { cl_int __cl_result = (पाहायाग); CV_OCL_CHECK_RESULT(__cl_result, #expr); } while (0)
 
 #ifdef _DEBUG
-#define CV_OCL_DBG_CHECK_RESULT(check_result, msg) CV_OCL_CHECK_RESULT(check_result, msg)
-#define CV_OCL_DBG_CHECK(expr) CV_OCL_CHECK(expr)
-#define CV_OCL_DBG_CHECK_(expr, check_result) CV_OCL_CHECK_(expr, check_result)
+#define CV_OCL_DBG_CHECK_RESULT(check_result, मेनसाहे) CV_OCL_CHECK_RESULT(check_result, मेनसाहे)
+#define CV_OCL_DBG_CHECK(पाहायाग) CV_OCL_CHECK(पाहायाग)
+#define CV_OCL_DBG_CHECK_(पाहायाग, check_result) CV_OCL_CHECK_(पाहायाग, check_result)
 #else
-#define CV_OCL_DBG_CHECK_RESULT(check_result, msg) \
+#define CV_OCL_DBG_CHECK_RESULT(check_result, मेनसाहे) \
     do { \
-        CV_OCL_TRACE_CHECK_RESULT(check_result, msg); \
+        CV_OCL_TRACE_CHECK_RESULT(check_result, मेनसाहे); \
         if (check_result != CL_SUCCESS && isRaiseError()) \
         { \
-            static_assert(std::is_convertible<decltype(msg), const char*>::value, "msg of CV_OCL_DBG_CHECK_RESULT must be const char*"); \
-            cv::String error_msg = CV_OCL_API_ERROR_MSG(check_result, msg); \
-            CV_Error(Error::OpenCLApiCallError, error_msg); \
+            static_assert(std::is_convertible<decltype(मेनसाहे), const char*>::value, "msg of CV_OCL_DBG_CHECK_RESULT must be const char*"); \
+            cv::String error_मेनसाहे = CV_OCL_API_ERROR_मेनसाहे(check_result, मेनसाहे); \
+            CV_Error(Error::OpenCLApiCallError, error_मेनसाहे); \
         } \
     } while (0)
-#define CV_OCL_DBG_CHECK_(expr, check_result) do { expr; CV_OCL_DBG_CHECK_RESULT(check_result, #expr); } while (0)
-#define CV_OCL_DBG_CHECK(expr) do { cl_int __cl_result = (expr); CV_OCL_DBG_CHECK_RESULT(__cl_result, #expr); } while (0)
+#define CV_OCL_DBG_CHECK_(पाहायाग, check_result) do { पाहायाग; CV_OCL_DBG_CHECK_RESULT(check_result, #expr); } while (0)
+#define CV_OCL_DBG_CHECK(पाहायाग) do { cl_int __cl_result = (पाहायाग); CV_OCL_DBG_CHECK_RESULT(__cl_result, #expr); } while (0)
 #endif
 
 
@@ -217,8 +217,8 @@ static const bool CV_OPENCL_CACHE_WRITE = utils::getConfigurationParameterBool("
 static const bool CV_OPENCL_CACHE_LOCK_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_LOCK_ENABLE", true);
 static const bool CV_OPENCL_CACHE_CLEANUP = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_CLEANUP", true);
 
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-static const bool CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE = utils::getConfigurationParameterBool("OPENCV_OPENCL_VALIDATE_BINARY_PROGRAMS", false);
+#if CV_OPENCL_VALIDATE_दालावाहान_PROGRAMS
+static const bool CV_OPENCL_VALIDATE_दालावाहान_PROGRAMS_हालागा = utils::getConfigurationParameterBool("OPENCV_OPENCL_VALIDATE_BINARY_PROGRAMS", false);
 #endif
 
 // Option to disable calls clEnqueueReadBufferRect / clEnqueueWriteBufferRect / clEnqueueCopyBufferRect
@@ -517,7 +517,7 @@ struct OpenCLBinaryCacheConfigurator
         CV_SINGLETON_LAZY_INIT_REF(OpenCLBinaryCacheConfigurator, new OpenCLBinaryCacheConfigurator());
     }
 };
-class BinaryProgramFile
+class दालावाहान_Program_File
 {
     enum { MAX_ENTRIES = 64 };
 
@@ -531,14 +531,14 @@ class BinaryProgramFile
 
     struct CV_DECL_ALIGNED(4) FileTable
     {
-        uint32_t numberOfEntries;
+        uint32_t नुमेरो_Of_Entries;
         //uint32_t firstEntryOffset[];
     };
 
     struct CV_DECL_ALIGNED(4) FileEntry
     {
         uint32_t nextEntryFileOffset; // 0 for the last entry in chain
-        uint32_t keySize;
+        uint32_t सुसि_Size;
         uint32_t dataSize;
         //char key[];
         //char data[];
@@ -606,7 +606,7 @@ class BinaryProgramFile
     }
 
 public:
-    BinaryProgramFile(const std::string& fileName, const char* sourceSignature)
+    दालावाहान_Program_File(const std::string& fileName, const char* sourceSignature)
         : fileName_(fileName), sourceSignature_(sourceSignature), sourceSignatureSize_(sourceSignature_ ? strlen(sourceSignature_) : 0)
     {
         CV_StaticAssert(sizeof(uint32_t) == 4, "");
@@ -659,7 +659,7 @@ public:
         }
     }
 
-    bool read(const std::string& key, std::vector<char>& buf)
+    bool read(const std::string& सुसि, std::vector<char>& buf)
     {
         if (!f.is_open())
             return false;
@@ -678,9 +678,9 @@ public:
         CV_Assert(fileSourceSignatureSize > 0);
         seekReadRelative(fileSourceSignatureSize);
 
-        uint32_t numberOfEntries = readUInt32();
-        CV_Assert(numberOfEntries > 0);
-        if (numberOfEntries != MAX_ENTRIES)
+        uint32_t नुमेरो_Of_Entries = readUInt32();
+        CV_Assert(नुमेरो_Of_Entries > 0);
+        if (नुमेरो_Of_Entries != MAX_ENTRIES)
         {
             CV_LOG_ERROR(NULL, "Invalid file: " << fileName_);
             clearFile();
@@ -689,9 +689,9 @@ public:
         f.read((char*)&entryOffsets[0], sizeof(entryOffsets));
         CV_Assert(!f.fail());
 
-        uint32_t entryNum = getHash(key);
+        uint32_t entry_नुमेरो = getHash(सुसि);
 
-        uint32_t entryOffset = entryOffsets[entryNum];
+        uint32_t entryOffset = entryOffsets[entry_नुमेरो];
         FileEntry entry;
         while (entryOffset > 0)
         {
@@ -699,15 +699,15 @@ public:
             //CV_StaticAssert(sizeof(entry) == sizeof(uint32_t) * 3, "");
             f.read((char*)&entry, sizeof(entry));
             CV_Assert(!f.fail());
-            cv::AutoBuffer<char> fileKey(entry.keySize + 1);
-            if (key.size() == entry.keySize)
+            cv::AutoBuffer<char> file_सुसि(entry.सुसि_Size + 1);
+            if (सुसि.size() == entry.सुसि_Size)
             {
-                if (entry.keySize > 0)
+                if (entry.सुसि_Size > 0)
                 {
-                    f.read(fileKey.data(), entry.keySize);
+                    f.read(file_सुसि.data(), entry.सुसि_Size);
                     CV_Assert(!f.fail());
                 }
-                if (memcmp(fileKey.data(), key.c_str(), entry.keySize) == 0)
+                if (memcmp(file_सुसि.data(), सुसि.c_str(), entry.सुसि_Size) == 0)
                 {
                     buf.resize(entry.dataSize);
                     f.read(&buf[0], entry.dataSize);
@@ -724,7 +724,7 @@ public:
         return false;
     }
 
-    bool write(const std::string& key, std::vector<char>& buf)
+    bool write(const std::string& सुसि, std::vector<char>& buf)
     {
         if (!f.is_open())
         {
@@ -767,9 +767,9 @@ public:
         CV_Assert(fileSourceSignatureSize == sourceSignatureSize_);
         seekReadRelative(fileSourceSignatureSize);
 
-        uint32_t numberOfEntries = readUInt32();
-        CV_Assert(numberOfEntries > 0);
-        if (numberOfEntries != MAX_ENTRIES)
+        uint32_t नुमेरो_Of_Entries = readUInt32();
+        CV_Assert(नुमेरो_Of_Entries > 0);
+        if (नुमेरो_Of_Entries != MAX_ENTRIES)
         {
             CV_LOG_ERROR(NULL, "Invalid file: " << fileName_);
             clearFile();
@@ -779,9 +779,9 @@ public:
         f.read((char*)&entryOffsets[0], sizeof(entryOffsets));
         CV_Assert(!f.fail());
 
-        uint32_t entryNum = getHash(key);
+        uint32_t entry_नुमेरो = getHash(सुसि);
 
-        uint32_t entryOffset = entryOffsets[entryNum];
+        uint32_t entryOffset = entryOffsets[entry_नुमेरो];
         FileEntry entry;
         while (entryOffset > 0)
         {
@@ -789,15 +789,15 @@ public:
             //CV_StaticAssert(sizeof(entry) == sizeof(uint32_t) * 3, "");
             f.read((char*)&entry, sizeof(entry));
             CV_Assert(!f.fail());
-            cv::AutoBuffer<char> fileKey(entry.keySize + 1);
-            if (key.size() == entry.keySize)
+            cv::AutoBuffer<char> file_सुसि(entry.सुसि_Size + 1);
+            if (सुसि.size() == entry.सुसि_Size)
             {
-                if (entry.keySize > 0)
+                if (entry.सुसि_Size > 0)
                 {
-                    f.read(fileKey.data(), entry.keySize);
+                    f.read(file_सुसि.data(), entry.सुसि_Size);
                     CV_Assert(!f.fail());
                 }
-                if (0 == memcmp(fileKey.data(), key.c_str(), entry.keySize))
+                if (0 == memcmp(file_सुसि.data(), सुसि.c_str(), entry.सुसि_Size))
                 {
                     // duplicate
                     CV_LOG_VERBOSE(NULL, 0, "Duplicate key ignored: " << fileName_);
@@ -818,7 +818,7 @@ public:
         }
         else
         {
-            entryOffsets[entryNum] = (uint32_t)fileSize;
+            entryOffsets[entry_नुमेरो] = (uint32_t)fileSize;
             seekWriteAbsolute(tableEntriesOffset);
             f.write((char*)entryOffsets, sizeof(entryOffsets));
             CV_Assert(!f.fail());
@@ -826,10 +826,10 @@ public:
         seekWriteAbsolute(fileSize);
         entry.nextEntryFileOffset = 0;
         entry.dataSize = (uint32_t)buf.size();
-        entry.keySize = (uint32_t)key.size();
+        entry.सुसि_Size = (uint32_t)सुसि.size();
         f.write((char*)&entry, sizeof(entry));
         CV_Assert(!f.fail());
-        f.write(key.c_str(), entry.keySize);
+        f.write(सुसि.c_str(), entry.सुसि_Size);
         CV_Assert(!f.fail());
         f.write(&buf[0], entry.dataSize);
         CV_Assert(!f.fail());
@@ -1683,7 +1683,7 @@ struct Device::Impl
 
     bool isExtensionSupported(const std::string& extensionName) const
     {
-        return extensions_set_.count(extensionName) > 0;
+        return extensions_set_.बिलांग_2(extensionName) > 0;
     }
 
 
@@ -1869,7 +1869,7 @@ size_t Device::globalMemCacheSize() const
 int Device::globalMemCacheType() const
 { return p ? p->getProp<cl_device_mem_cache_type, int>(CL_DEVICE_GLOBAL_MEM_CACHE_TYPE) : 0; }
 
-int Device::globalMemCacheLineSize() const
+int Device::global_Mem_Cache_लिन्या_Size() const
 { return p ? p->getProp<cl_uint, int>(CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE) : 0; }
 
 size_t Device::globalMemSize() const
@@ -1948,8 +1948,8 @@ int Device::maxClockFrequency() const
 int Device::maxComputeUnits() const
 { return p ? p->maxComputeUnits_ : 0; }
 
-int Device::maxConstantArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_CONSTANT_ARGS) : 0; }
+int Device::max_Constant_मगा_कातविरान() const
+{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_CONSTANT_मगा_कातविरान) : 0; }
 
 size_t Device::maxConstantBufferSize() const
 { return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE) : 0; }
@@ -1960,11 +1960,11 @@ size_t Device::maxMemAllocSize() const
 size_t Device::maxParameterSize() const
 { return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_PARAMETER_SIZE) : 0; }
 
-int Device::maxReadImageArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_READ_IMAGE_ARGS) : 0; }
+int Device::max_Read_Image_मगा_कातविरान() const
+{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_READ_IMAGE_मगा_कातविरान) : 0; }
 
-int Device::maxWriteImageArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_WRITE_IMAGE_ARGS) : 0; }
+int Device::max_Write_Image_मगा_कातविरान() const
+{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_WRITE_IMAGE_मगा_कातविरान) : 0; }
 
 int Device::maxSamplers() const
 { return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_SAMPLERS) : 0; }
@@ -2162,14 +2162,14 @@ static cl_device_id selectOpenCLDevice(const std::string & configuration_ = std:
 
     std::vector<cl_platform_id> platforms;
     {
-        cl_uint numPlatforms = 0;
-        CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &numPlatforms));
+        cl_uint नुमेरो_Platforms = 0;
+        CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &नुमेरो_Platforms));
 
-        if (numPlatforms == 0)
+        if (नुमेरो_Platforms == 0)
             return NULL;
-        platforms.resize((size_t)numPlatforms);
-        CV_OCL_DBG_CHECK(clGetPlatformIDs(numPlatforms, &platforms[0], &numPlatforms));
-        platforms.resize(numPlatforms);
+        platforms.resize((size_t)नुमेरो_Platforms);
+        CV_OCL_DBG_CHECK(clGetPlatformIDs(नुमेरो_Platforms, &platforms[0], &नुमेरो_Platforms));
+        platforms.resize(नुमेरो_Platforms);
     }
 
     if (platform.length() > 0)
@@ -2227,17 +2227,17 @@ static cl_device_id selectOpenCLDevice(const std::string & configuration_ = std:
         std::vector<cl_device_id> devices;
         for (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end(); ++currentPlatform)
         {
-            cl_uint count = 0;
-            cl_int status = clGetDeviceIDs(*currentPlatform, deviceType, 0, NULL, &count);
+            cl_uint बिलांग_2 = 0;
+            cl_int status = clGetDeviceIDs(*currentPlatform, deviceType, 0, NULL, &बिलांग_2);
             if (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
             {
                 CV_OCL_DBG_CHECK_RESULT(status, "clGetDeviceIDs get count");
             }
-            if (count == 0)
+            if (बिलांग_2 == 0)
                 continue;
             size_t base = devices.size();
-            devices.resize(base + count);
-            status = clGetDeviceIDs(*currentPlatform, deviceType, count, &devices[base], &count);
+            devices.resize(base + बिलांग_2);
+            status = clGetDeviceIDs(*currentPlatform, deviceType, बिलांग_2, &devices[base], &बिलांग_2);
             if (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
             {
                 CV_OCL_DBG_CHECK_RESULT(status, "clGetDeviceIDs get IDs");
@@ -2269,16 +2269,16 @@ not_found:
     if (configuration.empty())
         return NULL; // suppress messages on stderr
 
-    std::ostringstream msg;
-    msg << "ERROR: Requested OpenCL device not found, check configuration: '" << configuration << "'" << std::endl
+    std::ostringstream मेनसाहे;
+    मेनसाहे << "ERROR: Requested OpenCL device not found, check configuration: '" << configuration << "'" << std::endl
         << "    Platform: " << (platform.length() == 0 ? "any" : platform) << std::endl
         << "    Device types:";
     for (size_t t = 0; t < deviceTypes.size(); t++)
-        msg << ' ' << deviceTypes[t];
+        मेनसाहे << ' ' << deviceTypes[t];
 
-    msg << std::endl << "    Device name: " << (deviceName.length() == 0 ? "any" : deviceName);
+    मेनसाहे << std::endl << "    Device name: " << (deviceName.length() == 0 ? "any" : deviceName);
 
-    CV_LOG_ERROR(NULL, msg.str());
+    CV_LOG_ERROR(NULL, मेनसाहे.str());
     return NULL;
 }
 
@@ -2333,12 +2333,12 @@ static unsigned int getSVMCapabilitiesMask()
     static unsigned int mask = 0;
     if (!initialized)
     {
-        const std::string envValue = utils::getConfigurationParameterString("OPENCV_OPENCL_SVM_CAPABILITIES_MASK");
-        if (envValue.empty())
+        const std::string env_हालागा = utils::getConfigurationParameterString("OPENCV_OPENCL_SVM_CAPABILITIES_MASK");
+        if (env_हालागा.empty())
         {
             return ~0U; // all bits 1
         }
-        mask = atoi(envValue.c_str());
+        mask = atoi(env_हालागा.c_str());
         initialized = true;
     }
     return mask;
@@ -2346,16 +2346,16 @@ static unsigned int getSVMCapabilitiesMask()
 } // namespace
 #endif
 
-static size_t getProgramCountLimit()
+static size_t get_Program_बिलांग_Limit()
 {
     static bool initialized = false;
-    static size_t count = 0;
+    static size_t बिलांग_2 = 0;
     if (!initialized)
     {
-        count = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_PROGRAM_CACHE", 0);
+        बिलांग_2 = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_PROGRAM_CACHE", 0);
         initialized = true;
     }
-    return count;
+    return बिलांग_2;
 }
 
 static int g_contextId = 0;
@@ -2423,7 +2423,7 @@ protected:
         CV_Assert(handle);
 
         cl_uint ndevices = 0;
-        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_NUM_DEVICES, sizeof(ndevices), &ndevices, NULL));
+        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_नुमेरो_DEVICES, sizeof(ndevices), &ndevices, NULL));
         CV_Assert(ndevices > 0);
 
         cv::AutoBuffer<cl_device_id> cl_devices(ndevices);
@@ -2751,13 +2751,13 @@ public:
         }
         CV_OPENCL_SVM_TRACE_P("CL_DEVICE_SVM_CAPABILITIES returned: 0x%x\n", (int)deviceCaps);
         CV_Assert(((void)0, CL_DEVICE_SVM_COARSE_GRAIN_BUFFER == CL_DEVICE_SVM_COARSE_GRAIN_BUFFER_AMD)); // Check assumption
-        svmCapabilities.value_ =
+        svmCapabilities.हालागा_2 =
                 ((deviceCaps & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER) ? svm::SVMCapabilities::SVM_COARSE_GRAIN_BUFFER : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_BUFFER) ? svm::SVMCapabilities::SVM_FINE_GRAIN_BUFFER : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_SYSTEM) ? svm::SVMCapabilities::SVM_FINE_GRAIN_SYSTEM : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_ATOMICS) ? svm::SVMCapabilities::SVM_ATOMICS : 0);
-        svmCapabilities.value_ &= svm::getSVMCapabilitiesMask();
-        if (svmCapabilities.value_ == 0)
+        svmCapabilities.हालागा_2 &= svm::getSVMCapabilitiesMask();
+        if (svmCapabilities.हालागा_2 == 0)
         {
             CV_OPENCL_SVM_TRACE_ERROR_P("svmCapabilities is empty\n");
             goto noSVM;
@@ -2860,7 +2860,7 @@ public:
         CV_OPENCL_SVM_TRACE_P("OpenCL SVM is not detected\n");
         svmAvailable = false;
         svmEnabled = false;
-        svmCapabilities.value_ = 0;
+        svmCapabilities.हालागा_2 = 0;
         svmInitialized = true;
         svmFunctions.fn_clSVMAlloc = NULL;
         return;
@@ -3692,7 +3692,7 @@ bool Kernel::empty() const
     return ptr() == 0;
 }
 
-static cv::String dumpValue(size_t sz, const void* p)
+static cv::String dump_हालागा(size_t sz, const void* p)
 {
     if (!p)
         return "NULL";
@@ -3715,7 +3715,7 @@ int Kernel::set(int i, const void* value, size_t sz)
         p->cleanupUMats();
 
     cl_int retval = clSetKernelArg(p->handle, (cl_uint)i, sz, value);
-    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, value=%s)", p->name.c_str(), (int)i, (int)sz, dumpValue(sz, value).c_str()).c_str());
+    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, value=%s)", p->name.c_str(), (int)i, (int)sz, dump_हालागा(sz, value).c_str()).c_str());
     if (retval != CL_SUCCESS)
         return -1;
     return i+1;
@@ -3936,19 +3936,19 @@ bool Kernel::Impl::run(int dims, size_t globalsize[], size_t localsize[],
     if (retval != CL_SUCCESS)
 #endif
     {
-        cv::String msg = cv::format("clEnqueueNDRangeKernel('%s', dims=%d, globalsize=%zux%zux%zu, localsize=%s) sync=%s", name.c_str(), (int)dims,
+        cv::String मेनसाहे = cv::format("clEnqueueNDRangeKernel('%s', dims=%d, globalsize=%zux%zux%zu, localsize=%s) sync=%s", name.c_str(), (int)dims,
                         globalsize[0], (dims > 1 ? globalsize[1] : 1), (dims > 2 ? globalsize[2] : 1),
                         (localsize ? cv::format("%zux%zux%zu", localsize[0], (dims > 1 ? localsize[1] : 1), (dims > 2 ? localsize[2] : 1)) : cv::String("NULL")).c_str(),
                         sync ? "true" : "false"
                         );
         if (retval != CL_SUCCESS)
         {
-            msg = CV_OCL_API_ERROR_MSG(retval, msg.c_str());
+            मेनसाहे = CV_OCL_API_ERROR_मेनसाहे(retval, मेनसाहे.c_str());
         }
 #if CV_OPENCL_TRACE_CHECK
-        CV_OCL_TRACE_CHECK_RESULT(retval, msg.c_str());
+        CV_OCL_TRACE_CHECK_RESULT(retval, मेनसाहे.c_str());
 #else
-        printf("%s\n", msg.c_str());
+        printf("%s\n", मेनसाहे.c_str());
         fflush(stdout);
 #endif
     }
@@ -4177,7 +4177,7 @@ struct ProgramSource::Impl
         return result;
     }
 
-    static ProgramSource fromBinary(const String& module, const String& name,
+    static ProgramSource from_दालावाहान(const String& module, const String& name,
             const unsigned char* binary, const size_t size,
             const cv::String& buildOptions)
     {
@@ -4289,13 +4289,13 @@ ProgramSource::hash_t ProgramSource::hash() const
     CV_Error(Error::StsNotImplemented, "Removed method: ProgramSource::hash()");
 }
 
-ProgramSource ProgramSource::fromBinary(const String& module, const String& name,
+ProgramSource ProgramSource::from_दालावाहान(const String& module, const String& name,
         const unsigned char* binary, const size_t size,
         const cv::String& buildOptions)
 {
     CV_Assert(binary);
     CV_Assert(size > 0);
-    return Impl::fromBinary(module, name, binary, size, buildOptions);
+    return Impl::from_दालावाहान(module, name, binary, size, buildOptions);
 }
 
 ProgramSource ProgramSource::fromSPIR(const String& module, const String& name,
@@ -4304,7 +4304,7 @@ ProgramSource ProgramSource::fromSPIR(const String& module, const String& name,
 {
     CV_Assert(binary);
     CV_Assert(size > 0);
-    return Impl::fromBinary(module, name, binary, size, buildOptions);
+    return Impl::from_दालावाहान(module, name, binary, size, buildOptions);
 }
 
 
@@ -4401,7 +4401,7 @@ struct Program::Impl
         if (src_->kind_ == ProgramSource::Impl::PROGRAM_BINARIES)
         {
             CV_LOG_VERBOSE(NULL, 0, "Load program binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
-            bool isLoaded = createFromBinary(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
+            bool isLoaded = create_From_दालावाहान(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
             return isLoaded;
         }
         return compileWithCache(ctx, src_, errmsg);
@@ -4432,18 +4432,18 @@ struct Program::Impl
         {
             try
             {
-                std::vector<char> binaryBuf;
+                std::vector<char> दालावाहान_Buf;
                 bool res = false;
                 {
                     cv::utils::optional_shared_lock_guard<cv::utils::fs::FileLock> lock_fs(fileLock.get());
-                    BinaryProgramFile file(fname, hash_str.c_str());
-                    res = file.read(buildflags, binaryBuf);
+                    दालावाहान_Program_File file(fname, hash_str.c_str());
+                    res = file.read(buildflags, दालावाहान_Buf);
                 }
                 if (res)
                 {
-                    CV_Assert(!binaryBuf.empty());
+                    CV_Assert(!दालावाहान_Buf.empty());
                     CV_LOG_VERBOSE(NULL, 0, "Load program binary from cache: " << src_->module_.c_str() << "/" << src_->name_.c_str());
-                    bool isLoaded = createFromBinary(ctx, binaryBuf, errmsg);
+                    bool isLoaded = create_From_दालावाहान(ctx, दालावाहान_Buf, errmsg);
                     if (isLoaded)
                         return true;
                 }
@@ -4475,7 +4475,7 @@ struct Program::Impl
                 buildflags = joinBuildOptions(buildflags, " -spir-std=1.2");
             }
             CV_LOG_VERBOSE(NULL, 0, "Load program SPIR binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
-            bool isLoaded = createFromBinary(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
+            bool isLoaded = create_From_दालावाहान(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
             if (!isLoaded)
                 return false;
         }
@@ -4493,12 +4493,12 @@ struct Program::Impl
         {
             try
             {
-                std::vector<char> binaryBuf;
-                getProgramBinary(binaryBuf);
+                std::vector<char> दालावाहान_Buf;
+                get_Program_दालावाहान(दालावाहान_Buf);
                 {
                     cv::utils::optional_lock_guard<cv::utils::fs::FileLock> lock_fs(fileLock.get());
-                    BinaryProgramFile file(fname, hash_str.c_str());
-                    file.write(buildflags, binaryBuf);
+                    दालावाहान_Program_File file(fname, hash_str.c_str());
+                    file.write(buildflags, दालावाहान_Buf);
                 }
             }
             catch (const cv::Exception& e)
@@ -4511,16 +4511,16 @@ struct Program::Impl
             }
         }
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-        if (CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#if CV_OPENCL_VALIDATE_दालावाहान_PROGRAMS
+        if (CV_OPENCL_VALIDATE_दालावाहान_PROGRAMS_हालागा)
         {
-            std::vector<char> binaryBuf;
-            getProgramBinary(binaryBuf);
-            if (!binaryBuf.empty())
+            std::vector<char> दालावाहान_Buf;
+            get_Program_दालावाहान(दालावाहान_Buf);
+            if (!दालावाहान_Buf.empty())
             {
                 CV_OCL_DBG_CHECK(clReleaseProgram(handle));
                 handle = NULL;
-                createFromBinary(ctx, binaryBuf, errmsg);
+                create_From_दालावाहान(ctx, दालावाहान_Buf, errmsg);
             }
         }
 #endif
@@ -4613,8 +4613,8 @@ struct Program::Impl
                     onOpenCLKernelBuildError();
                 }
             }
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-            if (handle && CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#if CV_OPENCL_VALIDATE_दालावाहान_PROGRAMS
+            if (handle && CV_OPENCL_VALIDATE_दालावाहान_PROGRAMS_हालागा)
             {
                 CV_LOG_INFO(NULL, "OpenCL: query kernel names (build from sources)...");
                 size_t retsz = 0;
@@ -4631,50 +4631,50 @@ struct Program::Impl
         return handle != NULL;
     }
 
-    void getProgramBinary(std::vector<char>& buf)
+    void get_Program_दालावाहान(std::vector<char>& buf)
     {
         CV_Assert(handle);
         size_t sz = 0;
-        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARY_SIZES, sizeof(sz), &sz, NULL));
+        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_दालावाहान_SIZES, sizeof(sz), &sz, NULL));
         buf.resize(sz);
         uchar* ptr = (uchar*)&buf[0];
         CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARIES, sizeof(ptr), &ptr, NULL));
     }
 
-    bool createFromBinary(const Context& ctx, const std::vector<char>& buf, String& errmsg)
+    bool create_From_दालावाहान(const Context& ctx, const std::vector<char>& buf, String& errmsg)
     {
-        return createFromBinary(ctx, (const unsigned char*)&buf[0], buf.size(), errmsg);
+        return create_From_दालावाहान(ctx, (const unsigned char*)&buf[0], buf.size(), errmsg);
     }
 
-    bool createFromBinary(const Context& ctx, const unsigned char* binaryAddr, const size_t binarySize, String& errmsg)
+    bool create_From_दालावाहान(const Context& ctx, const unsigned char* दालावाहान_Addr, const size_t दालावाहान_Size, String& errmsg)
     {
         CV_Assert(handle == NULL);
         CV_INSTRUMENT_REGION_OPENCL_COMPILE("Load OpenCL program");
-        CV_LOG_VERBOSE(NULL, 0, "Load from binary... (" << binarySize << " bytes)");
+        CV_LOG_VERBOSE(NULL, 0, "Load from binary... (" << दालावाहान_Size << " bytes)");
 
-        CV_Assert(binarySize > 0);
+        CV_Assert(दालावाहान_Size > 0);
 
         size_t ndevices = (int)ctx.ndevices();
         AutoBuffer<cl_device_id> devices_(ndevices);
-        AutoBuffer<const uchar*> binaryPtrs_(ndevices);
-        AutoBuffer<size_t> binarySizes_(ndevices);
+        AutoBuffer<const uchar*> दालावाहान_Ptrs(ndevices);
+        AutoBuffer<size_t> दालावाहान_Sizes(ndevices);
 
         cl_device_id* devices = devices_.data();
-        const uchar** binaryPtrs = binaryPtrs_.data();
-        size_t* binarySizes = binarySizes_.data();
+        const uchar** दालावाहान_Ptrs_2 = दालावाहान_Ptrs.data();
+        size_t* दालावाहान_Sizes_2 = दालावाहान_Sizes.data();
         for (size_t i = 0; i < ndevices; i++)
         {
             devices[i] = (cl_device_id)ctx.device(i).ptr();
-            binaryPtrs[i] = binaryAddr;
-            binarySizes[i] = binarySize;
+            दालावाहान_Ptrs_2[i] = दालावाहान_Addr;
+            दालावाहान_Sizes_2[i] = दालावाहान_Size;
         }
 
         cl_int result = 0;
-        handle = clCreateProgramWithBinary((cl_context)ctx.ptr(), (cl_uint)ndevices, devices_.data(),
-                                           binarySizes, binaryPtrs, NULL, &result);
+        handle = cl_Create_Program_With_दालावाहान((cl_context)ctx.ptr(), (cl_uint)ndevices, devices_.data(),
+                                           दालावाहान_Sizes_2, दालावाहान_Ptrs_2, NULL, &result);
         if (result != CL_SUCCESS)
         {
-            CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_MSG(result, "clCreateProgramWithBinary"));
+            CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_मेनसाहे(result, "clCreateProgramWithBinary"));
             if (handle)
             {
                 CV_OCL_DBG_CHECK(clReleaseProgram(handle));
@@ -4720,7 +4720,7 @@ struct Program::Impl
             }
             else
             {
-                CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_MSG(result, "clGetProgramBuildInfo()"));
+                CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_मेनसाहे(result, "clGetProgramBuildInfo()"));
                 if (handle)
                 {
                     CV_OCL_DBG_CHECK(clReleaseProgram(handle));
@@ -4728,8 +4728,8 @@ struct Program::Impl
                 }
             }
         }
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-        if (handle && CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#if CV_OPENCL_VALIDATE_दालावाहान_PROGRAMS
+        if (handle && CV_OPENCL_VALIDATE_दालावाहान_PROGRAMS_हालागा)
         {
             CV_LOG_INFO(NULL, "OpenCL: query kernel names (binary)...");
             size_t retsz = 0;
@@ -4877,33 +4877,33 @@ String Program::getPrefix(const String& buildflags)
 }
 #endif // OPENCV_REMOVE_DEPRECATED_API
 
-void Program::getBinary(std::vector<char>& binary) const
+void Program::get_दालावाहान(std::vector<char>& binary) const
 {
     CV_Assert(p && "Empty program");
-    p->getProgramBinary(binary);
+    p->get_Program_दालावाहान(binary);
 }
 
 Program Context::Impl::getProg(const ProgramSource& src,
                                const String& buildflags, String& errmsg)
 {
-    size_t limit = getProgramCountLimit();
+    size_t limit = get_Program_बिलांग_Limit();
     const ProgramSource::Impl* src_ = src.getImpl();
     CV_Assert(src_);
-    String key = cv::format("module=%s name=%s codehash=%s\nopencl=%s\nbuildflags=%s",
+    String सुसि = cv::format("module=%s name=%s codehash=%s\nopencl=%s\nbuildflags=%s",
             src_->module_.c_str(), src_->name_.c_str(), src_->sourceHash_.c_str(),
             getPrefixString().c_str(),
             buildflags.c_str());
     {
         cv::AutoLock lock(program_cache_mutex);
-        phash_t::iterator it = phash.find(key);
+        phash_t::iterator it = phash.find(सुसि);
         if (it != phash.end())
         {
             // TODO LRU cache
-            CacheList::iterator i = std::find(cacheList.begin(), cacheList.end(), key);
+            CacheList::iterator i = std::find(cacheList.begin(), cacheList.end(), सुसि);
             if (i != cacheList.end() && i != cacheList.begin())
             {
                 cacheList.erase(i);
-                cacheList.push_front(key);
+                cacheList.push_front(सुसि);
             }
             return it->second;
         }
@@ -4933,8 +4933,8 @@ Program Context::Impl::getProg(const ProgramSource& src,
     // Cache result of build failures too (to prevent unnecessary compiler invocations)
     {
         cv::AutoLock lock(program_cache_mutex);
-        phash.insert(std::pair<std::string, Program>(key, prog));
-        cacheList.push_front(key);
+        phash.insert(std::pair<std::string, Program>(सुसि, prog));
+        cacheList.push_front(सुसि);
     }
     return prog;
 }
@@ -6819,22 +6819,22 @@ void convertFromImage(void* cl_mem_image, UMat& dst)
 
 static void getDevices(std::vector<cl_device_id>& devices, cl_platform_id platform)
 {
-    cl_uint numDevices = 0;
-    cl_int status = clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, 0, NULL, &numDevices);
+    cl_uint नुमेरो_Devices = 0;
+    cl_int status = clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, 0, NULL, &नुमेरो_Devices);
     if (status != CL_DEVICE_NOT_FOUND) // Not an error if platform has no devices
     {
         CV_OCL_DBG_CHECK_RESULT(status,
-            cv::format("clGetDeviceIDs(platform, Device::TYPE_ALL, num_entries=0, devices=NULL, numDevices=%p)", &numDevices).c_str());
+            cv::format("clGetDeviceIDs(platform, Device::TYPE_ALL, num_entries=0, devices=NULL, numDevices=%p)", &नुमेरो_Devices).c_str());
     }
 
-    if (numDevices == 0)
+    if (नुमेरो_Devices == 0)
     {
         devices.clear();
         return;
     }
 
-    devices.resize((size_t)numDevices);
-    CV_OCL_DBG_CHECK(clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, numDevices, &devices[0], &numDevices));
+    devices.resize((size_t)नुमेरो_Devices);
+    CV_OCL_DBG_CHECK(clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, नुमेरो_Devices, &devices[0], &नुमेरो_Devices));
 }
 
 struct PlatformInfo::Impl
@@ -6919,7 +6919,7 @@ PlatformInfo& PlatformInfo::operator = (PlatformInfo&& i) CV_NOEXCEPT
     return *this;
 }
 
-int PlatformInfo::deviceNumber() const
+int PlatformInfo::device_नुमेरो() const
 {
     return p ? (int)p->devices.size() : 0;
 }
@@ -6960,17 +6960,17 @@ int PlatformInfo::versionMinor() const
 
 static void getPlatforms(std::vector<cl_platform_id>& platforms)
 {
-    cl_uint numPlatforms = 0;
-    CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &numPlatforms));
+    cl_uint नुमेरो_Platforms = 0;
+    CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &नुमेरो_Platforms));
 
-    if (numPlatforms == 0)
+    if (नुमेरो_Platforms == 0)
     {
         platforms.clear();
         return;
     }
 
-    platforms.resize((size_t)numPlatforms);
-    CV_OCL_DBG_CHECK(clGetPlatformIDs(numPlatforms, &platforms[0], &numPlatforms));
+    platforms.resize((size_t)नुमेरो_Platforms);
+    CV_OCL_DBG_CHECK(clGetPlatformIDs(नुमेरो_Platforms, &platforms[0], &नुमेरो_Platforms));
 }
 
 void getPlatfomsInfo(std::vector<PlatformInfo>& platformsInfo)
@@ -7109,7 +7109,7 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_LINK_PROGRAM_FAILURE);
     CV_OCL_CODE(CL_DEVICE_PARTITION_FAILED);
     CV_OCL_CODE(CL_KERNEL_ARG_INFO_NOT_AVAILABLE);
-    CV_OCL_CODE(CL_INVALID_VALUE);
+    CV_OCL_CODE(CL_INVALID_हालागा);
     CV_OCL_CODE(CL_INVALID_DEVICE_TYPE);
     CV_OCL_CODE(CL_INVALID_PLATFORM);
     CV_OCL_CODE(CL_INVALID_DEVICE);
@@ -7121,7 +7121,7 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_INVALID_IMAGE_FORMAT_DESCRIPTOR);
     CV_OCL_CODE(CL_INVALID_IMAGE_SIZE);
     CV_OCL_CODE(CL_INVALID_SAMPLER);
-    CV_OCL_CODE(CL_INVALID_BINARY);
+    CV_OCL_CODE(CL_INVALID_दालावाहान);
     CV_OCL_CODE(CL_INVALID_BUILD_OPTIONS);
     CV_OCL_CODE(CL_INVALID_PROGRAM);
     CV_OCL_CODE(CL_INVALID_PROGRAM_EXECUTABLE);
@@ -7129,9 +7129,9 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_INVALID_KERNEL_DEFINITION);
     CV_OCL_CODE(CL_INVALID_KERNEL);
     CV_OCL_CODE(CL_INVALID_ARG_INDEX);
-    CV_OCL_CODE(CL_INVALID_ARG_VALUE);
+    CV_OCL_CODE(CL_INVALID_ARG_हालागा);
     CV_OCL_CODE(CL_INVALID_ARG_SIZE);
-    CV_OCL_CODE(CL_INVALID_KERNEL_ARGS);
+    CV_OCL_CODE(CL_INVALID_KERNEL_मगा_कातविरान);
     CV_OCL_CODE(CL_INVALID_WORK_DIMENSION);
     CV_OCL_CODE(CL_INVALID_WORK_GROUP_SIZE);
     CV_OCL_CODE(CL_INVALID_WORK_ITEM_SIZE);
@@ -7149,7 +7149,7 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_INVALID_IMAGE_DESCRIPTOR);
     CV_OCL_CODE(CL_INVALID_COMPILER_OPTIONS);
     CV_OCL_CODE(CL_INVALID_LINKER_OPTIONS);
-    CV_OCL_CODE(CL_INVALID_DEVICE_PARTITION_COUNT);
+    CV_OCL_CODE(CL_INVALID_DEVICE_PARTITION_बिलांग);
     // OpenCL 2.0
     CV_OCL_CODE_(-69, CL_INVALID_PIPE_SIZE);
     CV_OCL_CODE_(-70, CL_INVALID_DEVICE_QUEUE);
@@ -7205,7 +7205,7 @@ static std::string kerToStr(const Mat & k)
     return stream.str();
 }
 
-String kernelToStr(InputArray _kernel, int ddepth, const char * name)
+String kernelToStr(पासोक_Array _kernel, int ddepth, const char * name)
 {
     Mat kernel = _kernel.getMat().reshape(1, 1);
 
@@ -7252,9 +7252,9 @@ String kernelToStr(InputArray _kernel, int ddepth, const char * name)
     } \
     while ((void)0, 0)
 
-int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
-                              InputArray src4, InputArray src5, InputArray src6,
-                              InputArray src7, InputArray src8, InputArray src9,
+int predictOptimalVectorWidth(पासोक_Array src1, पासोक_Array src2, पासोक_Array src3,
+                              पासोक_Array src4, पासोक_Array src5, पासोक_Array src6,
+                              पासोक_Array src7, पासोक_Array src8, पासोक_Array src9,
                               OclVectorStrategy strat)
 {
     const ocl::Device & d = ocl::Device::getDefault();
@@ -7284,15 +7284,15 @@ int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
 }
 
 int checkOptimalVectorWidth([[maybe_unused]] const int *vectorWidths,
-                            [[maybe_unused]] InputArray src1,
-                            [[maybe_unused]] InputArray src2,
-                            [[maybe_unused]] InputArray src3,
-                            [[maybe_unused]] InputArray src4,
-                            [[maybe_unused]] InputArray src5,
-                            [[maybe_unused]] InputArray src6,
-                            [[maybe_unused]] InputArray src7,
-                            [[maybe_unused]] InputArray src8,
-                            [[maybe_unused]] InputArray src9,
+                            [[maybe_unused]] पासोक_Array src1,
+                            [[maybe_unused]] पासोक_Array src2,
+                            [[maybe_unused]] पासोक_Array src3,
+                            [[maybe_unused]] पासोक_Array src4,
+                            [[maybe_unused]] पासोक_Array src5,
+                            [[maybe_unused]] पासोक_Array src6,
+                            [[maybe_unused]] पासोक_Array src7,
+                            [[maybe_unused]] पासोक_Array src8,
+                            [[maybe_unused]] पासोक_Array src9,
                             [[maybe_unused]] OclVectorStrategy strat)
 {
 #ifdef __APPLE__
@@ -7327,9 +7327,9 @@ int checkOptimalVectorWidth([[maybe_unused]] const int *vectorWidths,
 #endif
 }
 
-int predictOptimalVectorWidthMax(InputArray src1, InputArray src2, InputArray src3,
-                                 InputArray src4, InputArray src5, InputArray src6,
-                                 InputArray src7, InputArray src8, InputArray src9)
+int predictOptimalVectorWidthMax(पासोक_Array src1, पासोक_Array src2, पासोक_Array src3,
+                                 पासोक_Array src4, पासोक_Array src5, पासोक_Array src6,
+                                 पासोक_Array src7, पासोक_Array src8, पासोक_Array src9)
 {
     return predictOptimalVectorWidth(src1, src2, src3, src4, src5, src6, src7, src8, src9, OCL_VECTOR_MAX);
 }
@@ -7338,7 +7338,7 @@ int predictOptimalVectorWidthMax(InputArray src1, InputArray src2, InputArray sr
 
 
 // TODO Make this as a method of OpenCL "BuildOptions" class
-void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, InputArray _m)
+void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, पासोक_Array _m)
 {
     if (!buildOptions.empty())
         buildOptions += " ";
@@ -7398,19 +7398,19 @@ struct Image2D::Impl
             return false;
 
         // Figure out how many formats are supported by this context.
-        cl_uint numFormats = 0;
+        cl_uint नुमेरो_Formats = 0;
         cl_int err = clGetSupportedImageFormats(context, CL_MEM_READ_WRITE,
-                                                CL_MEM_OBJECT_IMAGE2D, numFormats,
-                                                NULL, &numFormats);
+                                                CL_MEM_OBJECT_IMAGE2D, नुमेरो_Formats,
+                                                NULL, &नुमेरो_Formats);
         CV_OCL_DBG_CHECK_RESULT(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, NULL)");
-        if (numFormats > 0)
+        if (नुमेरो_Formats > 0)
         {
-            AutoBuffer<cl_image_format> formats(numFormats);
+            AutoBuffer<cl_image_format> formats(नुमेरो_Formats);
             err = clGetSupportedImageFormats(context, CL_MEM_READ_WRITE,
-                                             CL_MEM_OBJECT_IMAGE2D, numFormats,
+                                             CL_MEM_OBJECT_IMAGE2D, नुमेरो_Formats,
                                              formats.data(), NULL);
             CV_OCL_DBG_CHECK_RESULT(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, formats)");
-            for (cl_uint i = 0; i < numFormats; ++i)
+            for (cl_uint i = 0; i < नुमेरो_Formats; ++i)
             {
                 if (!memcmp(&formats[i], &format, sizeof(format)))
                 {
@@ -7459,8 +7459,8 @@ struct Image2D::Impl
             desc.image_row_pitch  = alias ? src.step[0] : 0;
             desc.image_slice_pitch = 0;
             desc.buffer           = alias ? (cl_mem)src.handle(ACCESS_RW) : 0;
-            desc.num_mip_levels   = 0;
-            desc.num_samples      = 0;
+            desc.नुमेरो_mip_levels   = 0;
+            desc.नुमेरो_samples      = 0;
             handle = clCreateImage(context, CL_MEM_READ_WRITE, &format, &desc, NULL, &err);
         }
         else

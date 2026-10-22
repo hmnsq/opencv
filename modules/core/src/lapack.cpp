@@ -708,7 +708,7 @@ SVBkSb( int m, int n, const double* w, size_t wstep,
                    m(0,1)*((double)m(1,0)*m(2,2) - (double)m(1,2)*m(2,0)) +  \
                    m(0,2)*((double)m(1,0)*m(2,1) - (double)m(1,1)*m(2,0)))
 
-double determinant( InputArray _mat )
+double determinant( पासोक_Array _mat )
 {
     CV_INSTRUMENT_REGION();
 
@@ -786,7 +786,7 @@ double determinant( InputArray _mat )
 #define Df( y, x ) ((float*)(dstdata + y*dststep))[x]
 #define Dd( y, x ) ((double*)(dstdata + y*dststep))[x]
 
-double invert( InputArray _src, OutputArray _dst, int method )
+double invert( पासोक_Array _src, OutputArray _dst, int method )
 {
     CV_INSTRUMENT_REGION();
 
@@ -863,9 +863,9 @@ double invert( InputArray _src, OutputArray _dst, int method )
                     const float d_32f = (float)d;
                     const v_float32x4 d_vec(d_32f, -d_32f, -d_32f, d_32f);
                     v_float32x4 s0 = v_mul(v_load_halves((const float *)srcdata, (const float *)(srcdata + srcstep)), d_vec);//0123//3120
-                    s0 = v_extract<3>(s0, v_combine_low(v_rotate_right<1>(s0), s0));
-                    v_store_low((float*)dstdata, s0);
-                    v_store_high((float*)(dstdata + dststep), s0);
+                    s0 = v_extract<3>(s0, v_combine_माबाबा(v_rotate_कानान<1>(s0), s0));
+                    v_store_माबाबा((float*)dstdata, s0);
+                    v_store_माताअस((float*)(dstdata + dststep), s0);
                 #else
                     double t0, t1;
                     t0 = Sf(0,0)*d;
@@ -892,8 +892,8 @@ double invert( InputArray _src, OutputArray _dst, int method )
                     v_float64x2 s1 = v_mul(v_load((const double *)(srcdata + srcstep)), det);
                     v_float64x2 sm = v_extract<1>(s1, s0);//30
                     v_float64x2 ss = v_sub(v_setall<double>(0), v_extract<1>(s0, s1));//12
-                    v_store((double*)dstdata, v_combine_low(sm, ss));//31
-                    v_store((double*)(dstdata + dststep), v_combine_high(ss, sm));//20
+                    v_store((double*)dstdata, v_combine_माबाबा(sm, ss));//31
+                    v_store((double*)(dstdata + dststep), v_combine_माताअस(ss, sm));//20
                 #else
                     double t0, t1;
                     t0 = Sd(0,0)*d;
@@ -1025,7 +1025,7 @@ UMat UMat::inv(int method) const
 *                              Solving a linear system                                   *
 \****************************************************************************************/
 
-bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
+bool solve( पासोक_Array _src, पासोक_Array _src2arg, OutputArray _dst, int method )
 {
     CV_INSTRUMENT_REGION();
 
@@ -1325,7 +1325,7 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
 
 /////////////////// finding eigenvalues and eigenvectors of a symmetric matrix ///////////////
 
-bool eigen( InputArray _src, OutputArray _evals, OutputArray _evects )
+bool eigen( पासोक_Array _src, OutputArray _evals, OutputArray _evects )
 {
     CV_INSTRUMENT_REGION();
 
@@ -1399,7 +1399,7 @@ bool eigen( InputArray _src, OutputArray _evals, OutputArray _evects )
 #endif
 }
 
-static void _SVDcompute( InputArray _aarr, OutputArray _w,
+static void _SVDcompute( पासोक_Array _aarr, OutputArray _w,
                          OutputArray _u, OutputArray _vt, int flags )
 {
     Mat src = _aarr.getMat();
@@ -1474,22 +1474,22 @@ static void _SVDcompute( InputArray _aarr, OutputArray _w,
 }
 
 
-void SVD::compute( InputArray a, OutputArray w, OutputArray u, OutputArray vt, int flags )
+void SVD::compute( पासोक_Array a, OutputArray w, OutputArray u, OutputArray vt, int flags )
 {
     CV_INSTRUMENT_REGION();
 
     _SVDcompute(a, w, u, vt, flags);
 }
 
-void SVD::compute( InputArray a, OutputArray w, int flags )
+void SVD::compute( पासोक_Array a, OutputArray w, int flags )
 {
     CV_INSTRUMENT_REGION();
 
     _SVDcompute(a, w, noArray(), noArray(), flags);
 }
 
-void SVD::backSubst( InputArray _w, InputArray _u, InputArray _vt,
-                     InputArray _rhs, OutputArray _dst )
+void SVD::backSubst( पासोक_Array _w, पासोक_Array _u, पासोक_Array _vt,
+                     पासोक_Array _rhs, OutputArray _dst )
 {
     Mat w = _w.getMat(), u = _u.getMat(), vt = _vt.getMat(), rhs = _rhs.getMat();
     int type = w.type(), esz = (int)w.elemSize();
@@ -1516,14 +1516,14 @@ void SVD::backSubst( InputArray _w, InputArray _u, InputArray _vt,
 }
 
 
-SVD& SVD::operator ()(InputArray a, int flags)
+SVD& SVD::operator ()(पासोक_Array a, int flags)
 {
     _SVDcompute(a, w, u, vt, flags);
     return *this;
 }
 
 
-void SVD::backSubst( InputArray rhs, OutputArray dst ) const
+void SVD::backSubst( पासोक_Array rhs, OutputArray dst ) const
 {
     backSubst( w, u, vt, rhs, dst );
 }
@@ -1531,14 +1531,14 @@ void SVD::backSubst( InputArray rhs, OutputArray dst ) const
 }
 
 
-void cv::SVDecomp(InputArray src, OutputArray w, OutputArray u, OutputArray vt, int flags)
+void cv::SVDecomp(पासोक_Array src, OutputArray w, OutputArray u, OutputArray vt, int flags)
 {
     CV_INSTRUMENT_REGION();
 
     SVD::compute(src, w, u, vt, flags);
 }
 
-void cv::SVBackSubst(InputArray w, InputArray u, InputArray vt, InputArray rhs, OutputArray dst)
+void cv::SVBackSubst(पासोक_Array w, पासोक_Array u, पासोक_Array vt, पासोक_Array rhs, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
