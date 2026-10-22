@@ -2,335 +2,335 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "persistence.hpp"
 
-namespace cv
+నామాకాశ cv
 {
 
-void write( FileStorage& fs, const String& name, const Mat& m )
+శూన్య లిఖ( FileStorage& fs, స్థిరరాశి String& name, స్థిరరాశి Mat& m )
 {
-    char dt[22];
+    అక్షరం dt[22];
 
-    if( m.dims == 2 || m.empty() )
+    ఒకవేళ( m.dims == 2 || m.empty() )
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-matrix"));
-        fs << "rows" << m.rows;
-        fs << "cols" << m.cols;
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs.ప్రారంభం_Write_Struct(name, File_కణుపు::MAP, String("opencv-matrix"));
+        fs << "rows" << m.అడ్డువరుసలు;
+        fs << "cols" << m.నిలువుల_సంఖ్య;
+        fs << "dt" << fs::encodeFormat( m.type(), dt, పరిమాణం(dt) );
         fs << "data" << "[:";
-        for( int i = 0; i < m.rows; i++ )
-            fs.writeRaw(dt, m.ptr(i), m.cols*m.elemSize());
+        కొరకు( పూర్ణాంకం i = 0; i < m.అడ్డువరుసలు; i++ )
+            fs.writeRaw(dt, m.ptr(i), m.నిలువుల_సంఖ్య*m.elem_కొలత());
         fs << "]";
-        fs.endWriteStruct();
+        fs.చివర_Write_Struct();
     }
-    else
+    లేకపోతే
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-nd-matrix"));
+        fs.ప్రారంభం_Write_Struct(name, File_కణుపు::MAP, String("opencv-nd-matrix"));
         fs << "sizes" << "[:";
-        fs.writeRaw( "i", m.size.p, m.dims*sizeof(int) );
+        fs.writeRaw( "i", m.size.p, m.dims*పరిమాణం(పూర్ణాంకం) );
         fs << "]";
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, పరిమాణం(dt) );
         fs << "data" << "[:";
-        const Mat* arrays[] = {&m, 0};
+        స్థిరరాశి Mat* arrays[] = {&m, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
-        size_t total = it.size*m.elemSize();
+        size_t మొత్తం = it.size*m.elem_కొలత();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
-            fs.writeRaw( dt, ptrs[0], total );
+        కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
+            fs.writeRaw( dt, ptrs[0], మొత్తం );
         fs << "]";
-        fs.endWriteStruct();
+        fs.చివర_Write_Struct();
     }
 }
 
-struct SparseNodeCmp
+నిర్మాణం Sparse_కణుపు_Cmp
 {
-    SparseNodeCmp(int _dims) : dims(_dims) {}
-    bool operator()(const SparseMat::Node* a, const SparseMat::Node* b)
+    Sparse_కణుపు_Cmp(పూర్ణాంకం _dims) : dims(_dims) {}
+    తార్కిక క్రియాకారకం()(స్థిరరాశి SparseMat::Node* a, స్థిరరాశి SparseMat::Node* b)
     {
-        for( int i = 0; i < dims; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
         {
-            int d = a->idx[i] - b->idx[i];
-            if(d)
-                return d < 0;
+            పూర్ణాంకం d = a->idx[i] - b->idx[i];
+            ఒకవేళ(d)
+                తిరిగి d < 0;
         }
-        return false;
+        తిరిగి అబద్ధం;
     }
 
-    int dims;
+    పూర్ణాంకం dims;
 };
 
-void write( FileStorage& fs, const String& name, const SparseMat& m )
+శూన్య లిఖ( FileStorage& fs, స్థిరరాశి String& name, స్థిరరాశి SparseMat& m )
 {
-    char dt[22];
+    అక్షరం dt[22];
 
-    fs.startWriteStruct(name, FileNode::MAP, String("opencv-sparse-matrix"));
+    fs.ప్రారంభం_Write_Struct(name, File_కణుపు::MAP, String("opencv-sparse-matrix"));
     fs << "sizes" << "[:";
-    int dims = m.dims();
-    if( dims > 0 )
-        fs.writeRaw("i", m.hdr->size, dims*sizeof(int) );
+    పూర్ణాంకం dims = m.dims();
+    ఒకవేళ( dims > 0 )
+        fs.writeRaw("i", m.hdr->size, dims*పరిమాణం(పూర్ణాంకం) );
     fs << "]";
-    fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+    fs << "dt" << fs::encodeFormat( m.type(), dt, పరిమాణం(dt) );
     fs << "data" << "[:";
 
     size_t i = 0, n = m.nzcount();
-    AutoBuffer<const SparseMat::Node*> elems(n);
-    SparseMatConstIterator it = m.begin(), it_end = m.end();
+    Auto_బఫరు<స్థిరరాశి SparseMat::Node*> elems(n);
+    SparseMatConstIterator it = m.begin(), it_చివర = m.end();
 
-    for( ; it != it_end; ++it )
+    కొరకు( ; it != it_చివర; ++it )
     {
-        CV_Assert(it.node() != 0);
-        elems[i++] = it.node();
+        CV_Assert(it.కణుపు() != 0);
+        elems[i++] = it.కణుపు();
     }
 
-    std::sort(elems.begin(), elems.end(), SparseNodeCmp(dims));
-    const SparseMat::Node* prev_node = 0;
-    size_t esz = m.elemSize();
+    std::sort(elems.begin(), elems.end(), Sparse_కణుపు_Cmp(dims));
+    స్థిరరాశి SparseMat::Node* prev_కణుపు = 0;
+    size_t esz = m.elem_కొలత();
 
-    for( i = 0; i < n; i++ )
+    కొరకు( i = 0; i < n; i++ )
     {
-        const SparseMat::Node* node = elems[i];
-        int k = 0;
+        స్థిరరాశి SparseMat::Node* కణుపు = elems[i];
+        పూర్ణాంకం k = 0;
 
-        if( prev_node )
+        ఒకవేళ( prev_కణుపు )
         {
-            for( ; k < dims; k++ )
-                if( node->idx[k] != prev_node->idx[k] )
-                    break;
+            కొరకు( ; k < dims; k++ )
+                ఒకవేళ( కణుపు->idx[k] != prev_కణుపు->idx[k] )
+                    ఆపు;
             CV_Assert( k < dims );
-            if( k < dims - 1 )
+            ఒకవేళ( k < dims - 1 )
                 writeScalar( fs, k - dims + 1 );
         }
-        for( ; k < dims; k++ )
-            writeScalar( fs, node->idx[k] );
-        prev_node = node;
+        కొరకు( ; k < dims; k++ )
+            writeScalar( fs, కణుపు->idx[k] );
+        prev_కణుపు = కణుపు;
 
-        const uchar* value = &m.value<uchar>(node);
+        స్థిరరాశి uchar* value = &m.value<uchar>(కణుపు);
         fs.writeRaw(dt, value, esz);
     }
 
     fs << "]" << "}";
 }
 
-void read(const FileNode& node, Mat& m, const Mat& default_mat)
+శూన్య పఠ(స్థిరరాశి File_కణుపు& కణుపు, Mat& m, స్థిరరాశి Mat& default_mat)
 {
-    if( node.empty() )
+    ఒకవేళ( కణుపు.empty() )
     {
-        default_mat.copyTo(m);
-        return;
+        default_mat.copy_గమ్యం(m);
+        తిరిగి;
     }
 
     std::string dt;
-    int rows, cols, elem_type;
+    పూర్ణాంకం అడ్డువరుసలు, నిలువుల_సంఖ్య, elem_type;
 
-    read(node["dt"], dt, std::string());
+    పఠ(కణుపు["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
     elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    read(node["rows"], rows, -1);
-    if( rows >= 0 )
+    పఠ(కణుపు["rows"], అడ్డువరుసలు, -1);
+    ఒకవేళ( అడ్డువరుసలు >= 0 )
     {
-        read(node["cols"], cols, -1);
-        m.create(rows, cols, elem_type);
+        పఠ(కణుపు["cols"], నిలువుల_సంఖ్య, -1);
+        m.create(అడ్డువరుసలు, నిలువుల_సంఖ్య, elem_type);
     }
-    else
+    లేకపోతే
     {
-        int sizes[CV_MAX_DIM] = {0}, dims;
-        FileNode sizes_node = node["sizes"];
-        CV_Assert( !sizes_node.empty() );
+        పూర్ణాంకం sizes[CV_MAX_DIM] = {0}, dims;
+        File_కణుపు sizes_కణుపు = కణుపు["sizes"];
+        CV_Assert( !sizes_కణుపు.empty() );
 
-        dims = (int)sizes_node.size();
+        dims = (పూర్ణాంకం)sizes_కణుపు.size();
         CV_Assert( dims >= 0 && dims <= CV_MAX_DIM );
-        sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+        sizes_కణుపు.readRaw("i", sizes, dims*పరిమాణం(sizes[0]));
 
         m.create(dims, sizes, elem_type);
     }
 
-    FileNode data_node = node["data"];
-    CV_Assert(!data_node.empty());
+    File_కణుపు దత్తాంశం_కణుపు = కణుపు["data"];
+    CV_Assert(!దత్తాంశం_కణుపు.empty());
 
-    size_t nelems = data_node.size();
-    if (nelems == 0)
+    size_t nelems = దత్తాంశం_కణుపు.size();
+    ఒకవేళ (nelems == 0)
     {
         m = Mat();
-        return;
+        తిరిగి;
     }
-    CV_Assert(nelems == m.total()*m.channels());
+    CV_Assert(nelems == m.మొత్తం()*m.channels());
 
-    data_node.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
+    దత్తాంశం_కణుపు.readRaw(dt, (uchar*)m.ptr(), m.మొత్తం()*m.elem_కొలత());
 }
 
-void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
+శూన్య పఠ( స్థిరరాశి File_కణుపు& కణుపు, SparseMat& m, స్థిరరాశి SparseMat& default_mat )
 {
-    if( node.empty() )
+    ఒకవేళ( కణుపు.empty() )
     {
-        default_mat.copyTo(m);
-        return;
+        default_mat.copy_గమ్యం(m);
+        తిరిగి;
     }
 
     std::string dt;
-    read(node["dt"], dt, std::string());
+    పఠ(కణుపు["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
-    int elem_type = fs::decodeSimpleFormat( dt.c_str() );
+    పూర్ణాంకం elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    int sizes[CV_MAX_DIM] = {0};
-    FileNode sizes_node = node["sizes"];
-    CV_Assert( !sizes_node.empty() );
+    పూర్ణాంకం sizes[CV_MAX_DIM] = {0};
+    File_కణుపు sizes_కణుపు = కణుపు["sizes"];
+    CV_Assert( !sizes_కణుపు.empty() );
 
-    int dims = (int)sizes_node.size();
+    పూర్ణాంకం dims = (పూర్ణాంకం)sizes_కణుపు.size();
     CV_Assert( dims > 0 && dims <= CV_MAX_DIM );
-    sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+    sizes_కణుపు.readRaw("i", sizes, dims*పరిమాణం(sizes[0]));
 
     m.create(dims, sizes, elem_type);
 
-    FileNode data = node["data"];
-    CV_Assert( data.isSeq() );
+    File_కణుపు దత్తాంశం = కణుపు["data"];
+    CV_Assert( దత్తాంశం.isSeq() );
 
-    int cn = CV_MAT_CN(elem_type);
-    int idx[CV_MAX_DIM] = {0};
-    size_t i, sz = data.size();
-    size_t esz = m.elemSize();
-    FileNodeIterator it = data.begin();
+    పూర్ణాంకం cn = CV_MAT_CN(elem_type);
+    పూర్ణాంకం idx[CV_MAX_DIM] = {0};
+    size_t i, sz = దత్తాంశం.size();
+    size_t esz = m.elem_కొలత();
+    File_కణుపు_Iterator it = దత్తాంశం.begin();
 
-    for( i = 0; i < sz; )
+    కొరకు( i = 0; i < sz; )
     {
-        FileNode n = *it;
-        int k = (int)n;
-        if( i > 0 && k >= 0 )
+        File_కణుపు n = *it;
+        పూర్ణాంకం k = (పూర్ణాంకం)n;
+        ఒకవేళ( i > 0 && k >= 0 )
         {
             CV_Assert( k < sizes[dims-1] );
             idx[dims-1] = k;
         }
-        else
+        లేకపోతే
         {
-            if( i > 0 )
+            ఒకవేళ( i > 0 )
             {
                 // write() stores the first changed dimension as k - dims + 1
                 k = dims + k - 1;
                 CV_Assert( k >= 0 );
             }
-            else
+            లేకపోతే
             {
                 CV_Assert( k >= 0 && k < sizes[0] );
                 idx[0] = k, k = 1;
             }
-            for( ; k < dims; k++ )
+            కొరకు( ; k < dims; k++ )
             {
                 ++it;
                 i++;
                 n = *it;
                 CV_Assert( n.isInt() );
-                int idx_k = (int)n;
+                పూర్ణాంకం idx_k = (పూర్ణాంకం)n;
                 CV_Assert( idx_k >= 0 && idx_k < sizes[k] );
                 idx[k] = idx_k;
             }
         }
         ++it;
         i++;
-        uchar* valptr = m.ptr(idx, true);
+        uchar* valptr = m.ptr(idx, నిజం);
         it.readRaw(dt, valptr, esz);
         i += cn;
     }
 }
 
-void read(const FileNode& node, KeyPoint& value, const KeyPoint& default_value)
+శూన్య పఠ(స్థిరరాశి File_కణుపు& కణుపు, కీలకం_బిందువు& value, స్థిరరాశి కీలకం_బిందువు& default_విలువ)
 {
-    if( node.empty() )
+    ఒకవేళ( కణుపు.empty() )
     {
-        value = default_value;
-        return;
+        value = default_విలువ;
+        తిరిగి;
     }
-    node >> value;
+    కణుపు >> value;
 }
 
-void read(const FileNode& node, DMatch& value, const DMatch& default_value)
+శూన్య పఠ(స్థిరరాశి File_కణుపు& కణుపు, DMatch& value, స్థిరరాశి DMatch& default_విలువ)
 {
-    if( node.empty() )
+    ఒకవేళ( కణుపు.empty() )
     {
-        value = default_value;
-        return;
+        value = default_విలువ;
+        తిరిగి;
     }
-    node >> value;
+    కణుపు >> value;
 }
 
-#ifdef CV__LEGACY_PERSISTENCE
-void write( FileStorage& fs, const std::string& name, const std::vector<KeyPoint>& vec)
+#నిర్వచితమైతే CV__LEGACY_PERSISTENCE
+శూన్య లిఖ( FileStorage& fs, స్థిరరాశి std::string& name, స్థిరరాశి std::vector<కీలకం_బిందువు>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_కణుపు::SEQ);
+    లిఖ(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
+శూన్య పఠ(స్థిరరాశి File_కణుపు& కణుపు, std::vector<కీలకం_బిందువు>& keypoints)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_కణుపు మొదటి_కణుపు = *(కణుపు.begin());
+    ఒకవేళ (మొదటి_కణుపు.isSeq())
     {
         // modern scheme
-#ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
-        size_t total = (size_t)it.remaining;
-        keypoints.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+#నిర్వచితమైతే OPENCV_TRAITS_ENABLE_DEPRECATED
+        File_కణుపు_Iterator it = కణుపు.begin();
+        size_t మొత్తం = (size_t)it.మిగిలిన;
+        keypoints.resize(మొత్తం);
+        కొరకు (size_t i = 0; i < మొత్తం; ++i, ++it)
         {
             (*it) >> keypoints[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#లేకపోతే
+        File_కణుపు_Iterator it = కణుపు.begin();
         it >> keypoints;
-#endif
-        return;
+#అయితే_ముగింపు
+        తిరిగి;
     }
     keypoints.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_కణుపు_Iterator it = కణుపు.begin(), it_చివర = కణుపు.end();
+    కొరకు( ; it != it_చివర; )
     {
-        KeyPoint kpt;
+        కీలకం_బిందువు kpt;
         it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
         keypoints.push_back(kpt);
     }
 }
 
-void write( FileStorage& fs, const std::string& name, const std::vector<DMatch>& vec)
+శూన్య లిఖ( FileStorage& fs, స్థిరరాశి std::string& name, స్థిరరాశి std::vector<DMatch>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_కణుపు::SEQ);
+    లిఖ(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<DMatch>& matches)
+శూన్య పఠ(స్థిరరాశి File_కణుపు& కణుపు, std::vector<DMatch>& matches)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_కణుపు మొదటి_కణుపు = *(కణుపు.begin());
+    ఒకవేళ (మొదటి_కణుపు.isSeq())
     {
         // modern scheme
-#ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
-        size_t total = (size_t)it.remaining;
-        matches.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+#నిర్వచితమైతే OPENCV_TRAITS_ENABLE_DEPRECATED
+        File_కణుపు_Iterator it = కణుపు.begin();
+        size_t మొత్తం = (size_t)it.మిగిలిన;
+        matches.resize(మొత్తం);
+        కొరకు (size_t i = 0; i < మొత్తం; ++i, ++it)
         {
             (*it) >> matches[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#లేకపోతే
+        File_కణుపు_Iterator it = కణుపు.begin();
         it >> matches;
-#endif
-        return;
+#అయితే_ముగింపు
+        తిరిగి;
     }
     matches.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_కణుపు_Iterator it = కణుపు.begin(), it_చివర = కణుపు.end();
+    కొరకు( ; it != it_చివర; )
     {
         DMatch m;
         it >> m.queryIdx >> m.trainIdx >> m.imgIdx >> m.distance;
         matches.push_back(m);
     }
 }
-#endif
+#అయితే_ముగింపు
 
 
 }

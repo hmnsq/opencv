@@ -3,224 +3,224 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "opencl_kernels_core.hpp"
+#అన్తర్భావ "stat.hpp"
 
-#include "stat_parallel.hpp"
-#include "sum.simd.hpp"
-#include "sum.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#అన్తర్భావ "stat_parallel.hpp"
+#అన్తర్భావ "sum.simd.hpp"
+#అన్తర్భావ "sum.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv
+నామాకాశ cv
 {
 
-SumFunc getSumFunc(int depth)
+కూడిక_Func get_కూడిక_Func(పూర్ణాంకం లోతు)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getSumFunc, (depth),
+    CV_CPU_DISPATCH(get_కూడిక_Func, (లోతు),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
+#నిర్వచితమైతే HAVE_OPENCL
 
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
-                     InputArray _src2, bool calc2, const Scalar & res2 )
+తార్కిక ocl_కూడిక( ఆదానం_Array _src, Scalar & res, పూర్ణాంకం కూడిక_op, ఆదానం_Array ముసుగు_2,
+                     ఆదానం_Array _src2, తార్కిక calc2, స్థిరరాశి Scalar & res2 )
 {
-    CV_Assert(sum_op == OCL_OP_SUM || sum_op == OCL_OP_SUM_ABS || sum_op == OCL_OP_SUM_SQR);
+    CV_Assert(కూడిక_op == OCL_OP_కూడిక || కూడిక_op == OCL_OP_కూడిక_ABS || కూడిక_op == OCL_OP_కూడిక_SQR);
 
-    const ocl::Device & dev = ocl::Device::getDefault();
-    bool doubleSupport = dev.doubleFPConfig() > 0,
-        haveMask = _mask.kind() != _InputArray::NONE,
-        haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            kercn = cn == 1 && !haveMask ? ocl::predictOptimalVectorWidth(_src, _src2) : 1,
+    స్థిరరాశి ocl::Device & dev = ocl::Device::getDefault();
+    తార్కిక doubleSupport = dev.doubleFPConfig() > 0,
+        have_ముసుగు = ముసుగు_2.రకం() != ఆదానం_Array_2::NONE,
+        haveSrc2 = _src2.రకం() != ఆదానం_Array_2::NONE;
+    పూర్ణాంకం type = _src.type(), లోతు = CV_MAT_లోతు(type), cn = CV_MAT_CN(type),
+            kercn = cn == 1 && !have_ముసుగు ? ocl::predict_Optimal_సదిశ_వెడల్పు(_src, _src2) : 1,
             mcn = std::max(cn, kercn);
     CV_Assert(!haveSrc2 || _src2.type() == type);
-    int convert_cn = haveSrc2 ? mcn : cn;
+    పూర్ణాంకం convert_cn = haveSrc2 ? mcn : cn;
 
-    if ( (!doubleSupport && depth == CV_64F) || cn > 4 )
-        return false;
+    ఒకవేళ ( (!doubleSupport && లోతు == CV_64F) || cn > 4 )
+        తిరిగి అబద్ధం;
 
-    if (depth >= CV_16F)
-        return false;
+    ఒకవేళ (లోతు >= CV_16F)
+        తిరిగి అబద్ధం;
 
-    int ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
-    size_t wgs = dev.maxWorkGroupSize();
+    పూర్ణాంకం ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
+    size_t wgs = dev.max_Work_సమూహం_కొలత();
 
-    int ddepth = std::max(sum_op == OCL_OP_SUM_SQR ? CV_32F : CV_32S, depth),
+    పూర్ణాంకం ddepth = std::max(కూడిక_op == OCL_OP_కూడిక_SQR ? CV_32F : CV_32S, లోతు),
             dtype = CV_MAKE_TYPE(ddepth, cn);
-    CV_Assert(!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool);
+    CV_Assert(!have_ముసుగు || ముసుగు_2.type() == CV_8U || ముసుగు_2.type() == CV_8S || ముసుగు_2.type() == CV_Bool);
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    పూర్ణాంకం wgs2_aligned = 1;
+    అయితే (wgs2_aligned < (పూర్ణాంకం)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    static const char * const opMap[3] = { "OP_SUM", "OP_SUM_ABS", "OP_SUM_SQR" };
-    char cvt[2][50];
+    స్థిర స్థిరరాశి అక్షరం * స్థిరరాశి opMap[3] = { "OP_SUM", "OP_SUM_ABS", "OP_SUM_SQR" };
+    అక్షరం cvt[2][50];
     String opts = format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstTK=%s -D dstT1=%s -D ddepth=%d -D cn=%d"
                          " -D convertToDT=%s -D %s -D WGS=%d -D WGS2_ALIGNED=%d%s%s%s%s -D kercn=%d%s%s%s -D convertFromU=%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, mcn)), ocl::typeToStr(depth),
-                         ocl::typeToStr(dtype), ocl::typeToStr(CV_MAKE_TYPE(ddepth, mcn)),
-                         ocl::typeToStr(ddepth), ddepth, cn,
-                         ocl::convertTypeStr(depth, ddepth, mcn, cvt[0], sizeof(cvt[0])),
-                         opMap[sum_op], (int)wgs, wgs2_aligned,
+                         ocl::type_గమ్యం_Str(CV_MAKE_TYPE(లోతు, mcn)), ocl::type_గమ్యం_Str(లోతు),
+                         ocl::type_గమ్యం_Str(dtype), ocl::type_గమ్యం_Str(CV_MAKE_TYPE(ddepth, mcn)),
+                         ocl::type_గమ్యం_Str(ddepth), ddepth, cn,
+                         ocl::convertTypeStr(లోతు, ddepth, mcn, cvt[0], పరిమాణం(cvt[0])),
+                         opMap[కూడిక_op], (పూర్ణాంకం)wgs, wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
-                         haveMask ? " -D HAVE_MASK" : "",
+                         have_ముసుగు ? " -D HAVE_MASK" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
-                         haveMask && _mask.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
+                         have_ముసుగు && ముసుగు_2.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
                          haveSrc2 ? " -D HAVE_SRC2" : "", calc2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "",
-                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, convert_cn, cvt[1], sizeof(cvt[1])) : "noconvert");
+                         లోతు <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, convert_cn, cvt[1], పరిమాణం(cvt[1])) : "noconvert");
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ఒకవేళ (k.empty())
+        తిరిగి అబద్ధం;
 
     UMat src = _src.getUMat(), src2 = _src2.getUMat(),
-        db(1, dbsize, dtype), mask = _mask.getUMat();
+        db(1, dbsize, dtype), ముసుగు = ముసుగు_2.getUMat();
 
-    ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+    ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_కొలత(src),
             dbarg = ocl::KernelArg::PtrWriteOnly(db),
-            maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
-            src2arg = ocl::KernelArg::ReadOnlyNoSize(src2);
+            maskarg = ocl::KernelArg::Read_Only_No_కొలత(ముసుగు),
+            src2arg = ocl::KernelArg::Read_Only_No_కొలత(src2);
 
-    if (haveMask)
+    ఒకవేళ (have_ముసుగు)
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg);
+        ఒకవేళ (haveSrc2)
+            k.వాదనలు(srcarg, src.నిలువుల_సంఖ్య, (పూర్ణాంకం)src.మొత్తం(), ngroups, dbarg, maskarg, src2arg);
+        లేకపోతే
+            k.వాదనలు(srcarg, src.నిలువుల_సంఖ్య, (పూర్ణాంకం)src.మొత్తం(), ngroups, dbarg, maskarg);
     }
-    else
+    లేకపోతే
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg);
+        ఒకవేళ (haveSrc2)
+            k.వాదనలు(srcarg, src.నిలువుల_సంఖ్య, (పూర్ణాంకం)src.మొత్తం(), ngroups, dbarg, src2arg);
+        లేకపోతే
+            k.వాదనలు(srcarg, src.నిలువుల_సంఖ్య, (పూర్ణాంకం)src.మొత్తం(), ngroups, dbarg);
     }
 
     size_t globalsize = ngroups * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
+    ఒకవేళ (k.నిరంతరం(1, &globalsize, &wgs, నిజం))
     {
-        typedef Scalar (*part_sum)(Mat m);
-        part_sum funcs[3] = { ocl_part_sum<int>, ocl_part_sum<float>, ocl_part_sum<double> },
+        రకనిర్వచనం Scalar (*part_కూడిక)(Mat m);
+        part_కూడిక funcs[3] = { ocl_part_కూడిక<పూర్ణాంకం>, ocl_part_కూడిక<దశాంశం>, ocl_part_కూడిక<ద్విగుణ> },
                 func = funcs[ddepth - CV_32S];
 
         Mat mres = db.getMat(ACCESS_READ);
-        if (calc2)
-            const_cast<Scalar &>(res2) = func(mres.colRange(ngroups, dbsize));
+        ఒకవేళ (calc2)
+            const_cast<Scalar &>(res2) = func(mres.నిలువు_Range_2(ngroups, dbsize));
 
-        res = func(mres.colRange(0, ngroups));
-        return true;
+        res = func(mres.నిలువు_Range_2(0, ngroups));
+        తిరిగి నిజం;
     }
-    return false;
+    తిరిగి అబద్ధం;
 }
 
-#endif
+#అయితే_ముగింపు
 
 // serial implementation, also used for the pieces of the parallel version
-static Scalar sum_(const Mat& src)
+స్థిర Scalar కూడిక_2(స్థిరరాశి Mat& src)
 {
     Scalar _res;
-    int cn = src.channels();
+    పూర్ణాంకం cn = src.channels();
 
-    if (src.dims <= 2)
+    ఒకవేళ (src.dims <= 2)
     {
-        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, src.step, src.type(), src.cols, src.rows, &_res[0]);
+        CALL_HAL_RET2(కూడిక, cv_hal_కూడిక, _res, src.దత్తాంశం, src.అడుగు, src.type(), src.నిలువుల_సంఖ్య, src.అడ్డువరుసలు, &_res[0]);
     }
-    else if (src.isContinuous())
+    లేకపోతే ఒకవేళ (src.isContinuous())
     {
-        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, 0, src.type(), (int)src.total(), 1, &_res[0]);
+        CALL_HAL_RET2(కూడిక, cv_hal_కూడిక, _res, src.దత్తాంశం, 0, src.type(), (పూర్ణాంకం)src.మొత్తం(), 1, &_res[0]);
     }
 
-    int k, depth = src.depth();
-    SumFunc func = getSumFunc(depth);
-    if (func == nullptr) {
-        if (depth == CV_Bool && cn == 1)
-            return Scalar((double)countNonZero(src));
+    పూర్ణాంకం k, లోతు = src.లోతు();
+    కూడిక_Func func = get_కూడిక_Func(లోతు);
+    ఒకవేళ (func == శూన్యసూచిక) {
+        ఒకవేళ (లోతు == CV_Bool && cn == 1)
+            తిరిగి Scalar((ద్విగుణ)లెక్క_Non_Zero(src));
         CV_Error_(Error::StsNotImplemented, ("sum: %s input is not supported, convert the input to another type (e.g. CV_32F) first",
-                                            typeToString(src.type()).c_str()));
+                                            type_గమ్యం_String(src.type()).c_str()));
     }
 
-    const Mat* arrays[] = {&src, 0};
+    స్థిరరాశి Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
-    int _buf[CV_CN_MAX];
-    int* buf = (int*)&_res[0];
+    పూర్ణాంకం మొత్తం = (పూర్ణాంకం)it.size, ఖండం_కొలత_2 = మొత్తం, partial_ఖండం_కొలత = 0;
+    పూర్ణాంకం j, లెక్క_2 = 0;
+    పూర్ణాంకం _buf[CV_CN_MAX];
+    పూర్ణాంకం* buf = (పూర్ణాంకం*)&_res[0];
     size_t esz = 0;
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
+    తార్కిక partial_కూడిక_Is_Int = లోతు < CV_32S;
+    తార్కిక ఖండం_కూడిక = partial_కూడిక_Is_Int || లోతు == CV_16F || లోతు == CV_16BF;
 
-    if( blockSum )
+    ఒకవేళ( ఖండం_కూడిక )
     {
-        partialBlockSize = depth <= CV_8S ? (1 << 23) : (1 << 15);
-        blockSize = std::min(blockSize, partialBlockSize);
+        partial_ఖండం_కొలత = లోతు <= CV_8S ? (1 << 23) : (1 << 15);
+        ఖండం_కొలత_2 = std::min(ఖండం_కొలత_2, partial_ఖండం_కొలత);
         buf = _buf;
-        for( k = 0; k < cn; k++ )
+        కొరకు( k = 0; k < cn; k++ )
             buf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_కొలత();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        కొరకు( j = 0; j < మొత్తం; j += ఖండం_కొలత_2 )
         {
-            int bsz = std::min(total - j, blockSize);
+            పూర్ణాంకం bsz = std::min(మొత్తం - j, ఖండం_కొలత_2);
             func( ptrs[0], 0, (uchar*)buf, bsz, cn );
-            count += bsz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            లెక్క_2 += bsz;
+            ఒకవేళ( ఖండం_కూడిక && (లెక్క_2 + ఖండం_కొలత_2 >= partial_ఖండం_కొలత || (i+1 >= it.nplanes && j+bsz >= మొత్తం)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                ఒకవేళ (partial_కూడిక_Is_Int) {
+                    కొరకు( k = 0; k < cn; k++ )
                     {
                         _res[k] += buf[k];
                         buf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } లేకపోతే {
+                    కొరకు( k = 0; k < cn; k++ )
                     {
-                        _res[k] += ((float*)buf)[k];
+                        _res[k] += ((దశాంశం*)buf)[k];
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                లెక్క_2 = 0;
             }
             ptrs[0] += bsz*esz;
         }
     }
-    return _res;
+    తిరిగి _res;
 }
 
-Scalar sum(InputArray _src)
+Scalar కూడిక(ఆదానం_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
     Scalar _res;
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_sum(_src, _res, OCL_OP_SUM),
+#నిర్వచితమైతే HAVE_OPENCL
+    CV_OCL_నిరంతరం_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+                ocl_కూడిక(_src, _res, OCL_OP_కూడిక),
                 _res);
-#endif
+#అయితే_ముగింపు
 
     Mat src = _src.getMat();
     CV_CheckLE( src.channels(), 4, "cv::sum does not support more than 4 channels" );
 
     std::vector<StatChunk> chunks;
-    if (!splitForParallelStat(src, Mat(), chunks))
-        return sum_(src);
+    ఒకవేళ (!విభజించు_For_Parallel_Stat(src, Mat(), chunks))
+        తిరిగి కూడిక_2(src);
 
     std::vector<Scalar> part(chunks.size());
-    parallel_for_(Range(0, (int)chunks.size()), [&](const Range& r)
+    parallel_for_(Range(0, (పూర్ణాంకం)chunks.size()), [&](స్థిరరాశి Range& r)
     {
-        for (int i = r.start; i < r.end; i++)
-            part[i] = sum_(chunks[i].src);
+        కొరకు (పూర్ణాంకం i = r.ప్రారంభం; i < r.end; i++)
+            part[i] = కూడిక_2(chunks[i].src);
     });
-    for (const Scalar& v : part)
+    కొరకు (స్థిరరాశి Scalar& v : part)
         _res += v;
-    return _res;
+    తిరిగి _res;
 }
 
 } // namespace

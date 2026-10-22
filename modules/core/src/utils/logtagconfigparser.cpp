@@ -2,303 +2,303 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
-#include "logtagconfigparser.hpp"
+#అన్తర్భావ "../precomp.hpp"
+#అన్తర్భావ "logtagconfigparser.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+నామాకాశ cv {
+నామాకాశ utils {
+నామాకాశ logging {
 
-LogTagConfigParser::LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel)
+Log_ట్యాగ్_Config_Parser::Log_ట్యాగ్_Config_Parser(LogLevel defaultUnconfiguredGlobalLevel)
 {
     m_parsedGlobal.namePart = "global";
-    m_parsedGlobal.isGlobal = true;
-    m_parsedGlobal.hasPrefixWildcard = false;
-    m_parsedGlobal.hasSuffixWildcard = false;
+    m_parsedGlobal.isGlobal = నిజం;
+    m_parsedGlobal.has_ఉపసర్గ_Wildcard = అబద్ధం;
+    m_parsedGlobal.hasSuffixWildcard = అబద్ధం;
     m_parsedGlobal.level = defaultUnconfiguredGlobalLevel;
 }
 
-LogTagConfigParser::LogTagConfigParser(const std::string& input)
+Log_ట్యాగ్_Config_Parser::Log_ట్యాగ్_Config_Parser(స్థిరరాశి std::string& ఆదానం_2)
 {
-    parse(input);
+    parse(ఆదానం_2);
 }
 
-LogTagConfigParser::~LogTagConfigParser()
+Log_ట్యాగ్_Config_Parser::~Log_ట్యాగ్_Config_Parser()
 {
 }
 
-bool LogTagConfigParser::parse(const std::string& input)
+తార్కిక Log_ట్యాగ్_Config_Parser::parse(స్థిరరాశి std::string& ఆదానం_2)
 {
-    m_input = input;
-    segmentTokens();
-    return (m_malformed.empty());
+    m_ఆదానం = ఆదానం_2;
+    segment_టోకెన్లు();
+    తిరిగి (m_malformed.empty());
 }
 
-bool LogTagConfigParser::hasMalformed() const
+తార్కిక Log_ట్యాగ్_Config_Parser::hasMalformed() స్థిరరాశి
 {
-    return !m_malformed.empty();
+    తిరిగి !m_malformed.empty();
 }
 
-const LogTagConfig& LogTagConfigParser::getGlobalConfig() const
+స్థిరరాశి Log_ట్యాగ్_Config& Log_ట్యాగ్_Config_Parser::getGlobalConfig() స్థిరరాశి
 {
-    return m_parsedGlobal;
+    తిరిగి m_parsedGlobal;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFullNameConfigs() const
+స్థిరరాశి std::vector<Log_ట్యాగ్_Config>& Log_ట్యాగ్_Config_Parser::get_నిండిన_Name_Configs() స్థిరరాశి
 {
-    return m_parsedFullName;
+    తిరిగి m_parsed_నిండిన_Name;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFirstPartConfigs() const
+స్థిరరాశి std::vector<Log_ట్యాగ్_Config>& Log_ట్యాగ్_Config_Parser::get_మొదటి_Part_Configs() స్థిరరాశి
 {
-    return m_parsedFirstPart;
+    తిరిగి m_parsed_మొదటి_Part;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getAnyPartConfigs() const
+స్థిరరాశి std::vector<Log_ట్యాగ్_Config>& Log_ట్యాగ్_Config_Parser::getAnyPartConfigs() స్థిరరాశి
 {
-    return m_parsedAnyPart;
+    తిరిగి m_parsedAnyPart;
 }
 
-const std::vector<std::string>& LogTagConfigParser::getMalformed() const
+స్థిరరాశి std::vector<std::string>& Log_ట్యాగ్_Config_Parser::getMalformed() స్థిరరాశి
 {
-    return m_malformed;
+    తిరిగి m_malformed;
 }
 
-void LogTagConfigParser::segmentTokens()
+శూన్య Log_ట్యాగ్_Config_Parser::segment_టోకెన్లు()
 {
-    const size_t len = m_input.length();
-    std::vector<std::pair<size_t, size_t>> startStops;
-    bool wasSeparator = true;
-    for (size_t pos = 0u; pos < len; ++pos)
+    స్థిరరాశి size_t len = m_ఆదానం.length();
+    std::vector<std::pair<size_t, size_t>> ప్రారంభం_Stops;
+    తార్కిక wasSeparator = నిజం;
+    కొరకు (size_t pos = 0u; pos < len; ++pos)
     {
-        char c = m_input[pos];
-        bool isSeparator = (c == ' ' || c == '\t' || c == ';');
-        if (!isSeparator)
+        అక్షరం c = m_ఆదానం[pos];
+        తార్కిక isSeparator = (c == ' ' || c == '\t' || c == ';');
+        ఒకవేళ (!isSeparator)
         {
-            if (wasSeparator)
+            ఒకవేళ (wasSeparator)
             {
-                startStops.emplace_back(pos, pos + 1u);
+                ప్రారంభం_Stops.emplace_back(pos, pos + 1u);
             }
-            else
+            లేకపోతే
             {
-                startStops.back().second = pos + 1u;
+                ప్రారంభం_Stops.back().second = pos + 1u;
             }
         }
         wasSeparator = isSeparator;
     }
-    for (const auto& startStop : startStops)
+    కొరకు (స్థిరరాశి స్వయంచాలక& ప్రారంభం_Stop : ప్రారంభం_Stops)
     {
-        const auto s = m_input.substr(startStop.first, startStop.second - startStop.first);
+        స్థిరరాశి స్వయంచాలక s = m_ఆదానం.substr(ప్రారంభం_Stop.first, ప్రారంభం_Stop.second - ప్రారంభం_Stop.first);
         parseNameAndLevel(s);
     }
 }
 
-void LogTagConfigParser::parseNameAndLevel(const std::string& s)
+శూన్య Log_ట్యాగ్_Config_Parser::parseNameAndLevel(స్థిరరాశి std::string& s)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = s.length();
+    స్థిరరాశి size_t npos = std::string::npos;
+    స్థిరరాశి size_t len = s.length();
     size_t colonIdx = s.find_first_of(":=");
-    if (colonIdx == npos)
+    ఒకవేళ (colonIdx == npos)
     {
         // See if the whole string is a log level
-        auto parsedLevel = parseLogLevel(s);
-        if (parsedLevel.second)
+        స్వయంచాలక parsedLevel = parseLogLevel(s);
+        ఒకవేళ (parsedLevel.second)
         {
             // If it is, assume the log level is for global
             parseWildcard("", parsedLevel.first);
-            return;
+            తిరిగి;
         }
-        else
+        లేకపోతే
         {
             // not sure what to do.
             m_malformed.push_back(s);
-            return;
+            తిరిగి;
         }
     }
-    if (colonIdx == 0u || colonIdx + 1u == len)
+    ఒకవేళ (colonIdx == 0u || colonIdx + 1u == len)
     {
         // malformed (colon or equal sign at beginning or end), cannot do anything
         m_malformed.push_back(s);
-        return;
+        తిరిగి;
     }
     size_t colonIdx2 = s.find_first_of(":=", colonIdx + 1u);
-    if (colonIdx2 != npos)
+    ఒకవేళ (colonIdx2 != npos)
     {
         // malformed (more than one colon or equal sign), cannot do anything
         m_malformed.push_back(s);
-        return;
+        తిరిగి;
     }
-    auto parsedLevel = parseLogLevel(s.substr(colonIdx + 1u));
-    if (parsedLevel.second)
+    స్వయంచాలక parsedLevel = parseLogLevel(s.substr(colonIdx + 1u));
+    ఒకవేళ (parsedLevel.second)
     {
         parseWildcard(s.substr(0u, colonIdx), parsedLevel.first);
-        return;
+        తిరిగి;
     }
-    else
+    లేకపోతే
     {
         // Cannot recognize the right side of the colon or equal sign.
         // Not sure what to do.
         m_malformed.push_back(s);
-        return;
+        తిరిగి;
     }
 }
 
-void LogTagConfigParser::parseWildcard(const std::string& name, LogLevel level)
+శూన్య Log_ట్యాగ్_Config_Parser::parseWildcard(స్థిరరాశి std::string& name, LogLevel level)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = name.length();
-    if (len == 0u)
+    స్థిరరాశి size_t npos = std::string::npos;
+    స్థిరరాశి size_t len = name.length();
+    ఒకవేళ (len == 0u)
     {
         m_parsedGlobal.level = level;
-        return;
+        తిరిగి;
     }
-    const bool hasPrefixWildcard = (name[0u] == '*');
-    if (hasPrefixWildcard && len == 1u)
+    స్థిరరాశి తార్కిక has_ఉపసర్గ_Wildcard = (name[0u] == '*');
+    ఒకవేళ (has_ఉపసర్గ_Wildcard && len == 1u)
     {
         m_parsedGlobal.level = level;
-        return;
+        తిరిగి;
     }
-    const size_t firstNonWildcard = name.find_first_not_of("*.");
-    if (hasPrefixWildcard && firstNonWildcard == npos)
+    స్థిరరాశి size_t మొదటి_Non_Wildcard = name.find_first_not_of("*.");
+    ఒకవేళ (has_ఉపసర్గ_Wildcard && మొదటి_Non_Wildcard == npos)
     {
         m_parsedGlobal.level = level;
-        return;
+        తిరిగి;
     }
-    const bool hasSuffixWildcard = (name[len - 1u] == '*');
-    const size_t lastNonWildcard = name.find_last_not_of("*.");
-    std::string trimmedNamePart = name.substr(firstNonWildcard, lastNonWildcard - firstNonWildcard + 1u);
+    స్థిరరాశి తార్కిక hasSuffixWildcard = (name[len - 1u] == '*');
+    స్థిరరాశి size_t చివరి_Non_Wildcard = name.find_last_not_of("*.");
+    std::string trimmedNamePart = name.substr(మొదటి_Non_Wildcard, చివరి_Non_Wildcard - మొదటి_Non_Wildcard + 1u);
     // The case of a single asterisk has been handled above;
     // here we only handle the explicit use of "global" in the log config string.
-    const bool isGlobal = (trimmedNamePart == "global");
-    if (isGlobal)
+    స్థిరరాశి తార్కిక isGlobal = (trimmedNamePart == "global");
+    ఒకవేళ (isGlobal)
     {
         m_parsedGlobal.level = level;
-        return;
+        తిరిగి;
     }
-    LogTagConfig result(trimmedNamePart, level, false, hasPrefixWildcard, hasSuffixWildcard);
-    if (hasPrefixWildcard)
+    Log_ట్యాగ్_Config ఫలితం(trimmedNamePart, level, అబద్ధం, has_ఉపసర్గ_Wildcard, hasSuffixWildcard);
+    ఒకవేళ (has_ఉపసర్గ_Wildcard)
     {
-        m_parsedAnyPart.emplace_back(std::move(result));
+        m_parsedAnyPart.emplace_back(std::move(ఫలితం));
     }
-    else if (hasSuffixWildcard)
+    లేకపోతే ఒకవేళ (hasSuffixWildcard)
     {
-        m_parsedFirstPart.emplace_back(std::move(result));
+        m_parsed_మొదటి_Part.emplace_back(std::move(ఫలితం));
     }
-    else
+    లేకపోతే
     {
-        m_parsedFullName.emplace_back(std::move(result));
+        m_parsed_నిండిన_Name.emplace_back(std::move(ఫలితం));
     }
 }
 
-std::pair<LogLevel, bool> LogTagConfigParser::parseLogLevel(const std::string& s)
+std::pair<LogLevel, తార్కిక> Log_ట్యాగ్_Config_Parser::parseLogLevel(స్థిరరాశి std::string& s)
 {
-    const auto falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, false);
-    const auto make_parsed_result = [](LogLevel lev) -> std::pair<LogLevel, bool>
+    స్థిరరాశి స్వయంచాలక falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, అబద్ధం);
+    స్థిరరాశి స్వయంచాలక make_parsed_ఫలితం = [](LogLevel lev) -> std::pair<LogLevel, తార్కిక>
     {
-        return std::make_pair(lev, true);
+        తిరిగి std::make_pair(lev, నిజం);
     };
-    const size_t len = s.length();
-    if (len >= 1u)
+    స్థిరరాశి size_t len = s.length();
+    ఒకవేళ (len >= 1u)
     {
-        const char c = (char)std::toupper(s[0]);
-        switch (c)
+        స్థిరరాశి అక్షరం c = (అక్షరం)std::పెద్ద_అక్షరం(s[0]);
+        ఎంపిక (c)
         {
-        case '0':
-            if (len == 1u)
+        స్థితి '0':
+            ఒకవేళ (len == 1u)
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'D':
-            if (len == 1u ||
-                (len == 5u && cv::toUpperCase(s) == "DEBUG"))
+            ఆపు;
+        స్థితి 'D':
+            ఒకవేళ (len == 1u ||
+                (len == 5u && cv::గమ్యం_పై_Case(s) == "DEBUG"))
             {
-                return make_parsed_result(LOG_LEVEL_DEBUG);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_DEBUG);
             }
-            if ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
-                (len == 8u && cv::toUpperCase(s) == "DISABLED"))
+            ఒకవేళ ((len == 7u && cv::గమ్యం_పై_Case(s) == "DISABLE") ||
+                (len == 8u && cv::గమ్యం_పై_Case(s) == "DISABLED"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'E':
-            if (len == 1u ||
-                (len == 5u && cv::toUpperCase(s) == "ERROR"))
+            ఆపు;
+        స్థితి 'E':
+            ఒకవేళ (len == 1u ||
+                (len == 5u && cv::గమ్యం_పై_Case(s) == "ERROR"))
             {
-                return make_parsed_result(LOG_LEVEL_ERROR);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_ERROR);
             }
-            break;
-        case 'F':
-            if (len == 1u ||
-                (len == 5u && cv::toUpperCase(s) == "FATAL"))
+            ఆపు;
+        స్థితి 'F':
+            ఒకవేళ (len == 1u ||
+                (len == 5u && cv::గమ్యం_పై_Case(s) == "FATAL"))
             {
-                return make_parsed_result(LOG_LEVEL_FATAL);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_FATAL);
             }
-            break;
-        case 'I':
-            if (len == 1u ||
-                (len == 4u && cv::toUpperCase(s) == "INFO"))
+            ఆపు;
+        స్థితి 'I':
+            ఒకవేళ (len == 1u ||
+                (len == 4u && cv::గమ్యం_పై_Case(s) == "INFO"))
             {
-                return make_parsed_result(LOG_LEVEL_INFO);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_INFO);
             }
-            break;
-        case 'O':
-            if (len == 3u && cv::toUpperCase(s) == "OFF")
+            ఆపు;
+        స్థితి 'O':
+            ఒకవేళ (len == 3u && cv::గమ్యం_పై_Case(s) == "OFF")
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'S':
-            if (len == 1u ||
-                (len == 6u && cv::toUpperCase(s) == "SILENT"))
+            ఆపు;
+        స్థితి 'S':
+            ఒకవేళ (len == 1u ||
+                (len == 6u && cv::గమ్యం_పై_Case(s) == "SILENT"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'V':
-            if (len == 1u ||
-                (len == 7u && cv::toUpperCase(s) == "VERBOSE"))
+            ఆపు;
+        స్థితి 'V':
+            ఒకవేళ (len == 1u ||
+                (len == 7u && cv::గమ్యం_పై_Case(s) == "VERBOSE"))
             {
-                return make_parsed_result(LOG_LEVEL_VERBOSE);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_VERBOSE);
             }
-            break;
-        case 'W':
-            if (len == 1u ||
-                (len == 4u && cv::toUpperCase(s) == "WARN") ||
-                (len == 7u && cv::toUpperCase(s) == "WARNING") ||
-                (len == 8u && cv::toUpperCase(s) == "WARNINGS"))
+            ఆపు;
+        స్థితి 'W':
+            ఒకవేళ (len == 1u ||
+                (len == 4u && cv::గమ్యం_పై_Case(s) == "WARN") ||
+                (len == 7u && cv::గమ్యం_పై_Case(s) == "WARNING") ||
+                (len == 8u && cv::గమ్యం_పై_Case(s) == "WARNINGS"))
             {
-                return make_parsed_result(LOG_LEVEL_WARNING);
+                తిరిగి make_parsed_ఫలితం(LOG_LEVEL_WARNING);
             }
-            break;
-        default:
-            break;
+            ఆపు;
+        అప్రమేయ:
+            ఆపు;
         }
         // fall through
     }
-    return falseDontCare;
+    తిరిగి falseDontCare;
 }
 
-std::string LogTagConfigParser::toString(LogLevel level)
+std::string Log_ట్యాగ్_Config_Parser::గమ్యం_String(LogLevel level)
 {
-    switch (level)
+    ఎంపిక (level)
     {
-    case LOG_LEVEL_SILENT:
-        return "SILENT";
-    case LOG_LEVEL_FATAL:
-        return "FATAL";
-    case LOG_LEVEL_ERROR:
-        return "ERROR";
-    case LOG_LEVEL_WARNING:
-        return "WARNING";
-    case LOG_LEVEL_INFO:
-        return "INFO";
-    case LOG_LEVEL_DEBUG:
-        return "DEBUG";
-    case LOG_LEVEL_VERBOSE:
-        return "VERBOSE";
-    default:
-        return std::to_string((int)level);
+    స్థితి LOG_LEVEL_SILENT:
+        తిరిగి "SILENT";
+    స్థితి LOG_LEVEL_FATAL:
+        తిరిగి "FATAL";
+    స్థితి LOG_LEVEL_ERROR:
+        తిరిగి "ERROR";
+    స్థితి LOG_LEVEL_WARNING:
+        తిరిగి "WARNING";
+    స్థితి LOG_LEVEL_INFO:
+        తిరిగి "INFO";
+    స్థితి LOG_LEVEL_DEBUG:
+        తిరిగి "DEBUG";
+    స్థితి LOG_LEVEL_VERBOSE:
+        తిరిగి "VERBOSE";
+    అప్రమేయ:
+        తిరిగి std::to_string((పూర్ణాంకం)level);
     }
 }
 

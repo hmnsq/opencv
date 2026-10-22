@@ -41,371 +41,371 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/hal/hal.hpp>
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ <opencv2/core/utils/configuration.private.hpp>
+#అన్తర్భావ <opencv2/core/hal/hal.hpp>
 
 ////////////////////////////////////////// kmeans ////////////////////////////////////////////
 
-namespace cv
+నామాకాశ cv
 {
 
-static int CV_KMEANS_PARALLEL_GRANULARITY = (int)utils::getConfigurationParameterSizeT("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
+స్థిర పూర్ణాంకం CV_KMEANS_PARALLEL_GRANULARITY = (పూర్ణాంకం)utils::get_Configuration_Parameter_కొలత_T("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
 
-static void generateRandomCenter(int dims, const Vec2f* box, float* center, RNG& rng)
+స్థిర శూన్య generateRandomCenter(పూర్ణాంకం dims, స్థిరరాశి Vec2f* box, దశాంశం* center, RNG& rng)
 {
-    float margin = 1.f/dims;
-    for (int j = 0; j < dims; j++)
-        center[j] = ((float)rng*(1.f+margin*2.f)-margin)*(box[j][1] - box[j][0]) + box[j][0];
+    దశాంశం margin = 1.f/dims;
+    కొరకు (పూర్ణాంకం j = 0; j < dims; j++)
+        center[j] = ((దశాంశం)rng*(1.f+margin*2.f)-margin)*(box[j][1] - box[j][0]) + box[j][0];
 }
 
-class KMeansPPDistanceComputer : public ParallelLoopBody
+తరగతి KMeansPPDistanceComputer : బహిరంగ ParallelLoopBody
 {
-public:
-    KMeansPPDistanceComputer(float *tdist2_, const Mat& data_, const float *dist_, int ci_) :
-        tdist2(tdist2_), data(data_), dist(dist_), ci(ci_)
+బహిరంగ:
+    KMeansPPDistanceComputer(దశాంశం *tdist2_, స్థిరరాశి Mat& దత్తాంశం_2, స్థిరరాశి దశాంశం *dist_, పూర్ణాంకం ci_) :
+        tdist2(tdist2_), దత్తాంశం(దత్తాంశం_2), dist(dist_), ci(ci_)
     { }
 
-    void operator()( const cv::Range& range ) const CV_OVERRIDE
+    శూన్య క్రియాకారకం()( స్థిరరాశి cv::Range& range ) స్థిరరాశి CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int dims = data.cols;
+        స్థిరరాశి పూర్ణాంకం begin = range.ప్రారంభం;
+        స్థిరరాశి పూర్ణాంకం end = range.end;
+        స్థిరరాశి పూర్ణాంకం dims = దత్తాంశం.నిలువుల_సంఖ్య;
 
-        for (int i = begin; i<end; i++)
+        కొరకు (పూర్ణాంకం i = begin; i<end; i++)
         {
-            tdist2[i] = std::min(hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(ci), dims), dist[i]);
+            tdist2[i] = std::min(hal::normL2Sqr_(దత్తాంశం.ptr<దశాంశం>(i), దత్తాంశం.ptr<దశాంశం>(ci), dims), dist[i]);
         }
     }
 
-private:
-    KMeansPPDistanceComputer& operator=(const KMeansPPDistanceComputer&); // = delete
+అంతరంగ:
+    KMeansPPDistanceComputer& క్రియాకారకం=(స్థిరరాశి KMeansPPDistanceComputer&); // = delete
 
-    float *tdist2;
-    const Mat& data;
-    const float *dist;
-    const int ci;
+    దశాంశం *tdist2;
+    స్థిరరాశి Mat& దత్తాంశం;
+    స్థిరరాశి దశాంశం *dist;
+    స్థిరరాశి పూర్ణాంకం ci;
 };
 
 /*
 k-means center initialization using the following algorithm:
 Arthur & Vassilvitskii (2007) k-means++: The Advantages of Careful Seeding
 */
-static bool generateCentersPP(const Mat& data, Mat& _out_centers,
-                              int K, RNG& rng, int trials)
+స్థిర తార్కిక generateCentersPP(స్థిరరాశి Mat& దత్తాంశం, Mat& బహిర్గతం_centers,
+                              పూర్ణాంకం K, RNG& rng, పూర్ణాంకం trials)
 {
     CV_TRACE_FUNCTION();
-    const int dims = data.cols, N = data.rows;
-    cv::AutoBuffer<int, 64> _centers(K);
-    int* centers = &_centers[0];
-    cv::AutoBuffer<float, 0> _dist(N*3);
-    float* dist = &_dist[0], *tdist = dist + N, *tdist2 = tdist + N;
-    double sum0 = 0;
+    స్థిరరాశి పూర్ణాంకం dims = దత్తాంశం.నిలువుల_సంఖ్య, N = దత్తాంశం.అడ్డువరుసలు;
+    cv::Auto_బఫరు<పూర్ణాంకం, 64> _centers(K);
+    పూర్ణాంకం* centers = &_centers[0];
+    cv::Auto_బఫరు<దశాంశం, 0> _dist(N*3);
+    దశాంశం* dist = &_dist[0], *tdist = dist + N, *tdist2 = tdist + N;
+    ద్విగుణ sum0 = 0;
 
-    centers[0] = (unsigned)rng % N;
+    centers[0] = (గుర్తులేని)rng % N;
 
-    for (int i = 0; i < N; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < N; i++)
     {
-        dist[i] = hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(centers[0]), dims);
+        dist[i] = hal::normL2Sqr_(దత్తాంశం.ptr<దశాంశం>(i), దత్తాంశం.ptr<దశాంశం>(centers[0]), dims);
         sum0 += dist[i];
     }
-    if (!(sum0 < DBL_MAX))
-        return false;
+    ఒకవేళ (!(sum0 < DBL_MAX))
+        తిరిగి అబద్ధం;
 
-    for (int k = 1; k < K; k++)
+    కొరకు (పూర్ణాంకం k = 1; k < K; k++)
     {
-        double bestSum = DBL_MAX;
-        int bestCenter = -1;
+        ద్విగుణ ఉత్తమ_కూడిక = DBL_MAX;
+        పూర్ణాంకం ఉత్తమ_Center = -1;
 
-        for (int j = 0; j < trials; j++)
+        కొరకు (పూర్ణాంకం j = 0; j < trials; j++)
         {
-            double p = (double)rng*sum0;
-            int ci = 0;
-            for (; ci < N - 1; ci++)
+            ద్విగుణ p = (ద్విగుణ)rng*sum0;
+            పూర్ణాంకం ci = 0;
+            కొరకు (; ci < N - 1; ci++)
             {
                 p -= dist[ci];
-                if (p <= 0)
-                    break;
+                ఒకవేళ (p <= 0)
+                    ఆపు;
             }
 
             parallel_for_(Range(0, N),
-                          KMeansPPDistanceComputer(tdist2, data, dist, ci),
-                          (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
-            double s = 0;
-            int i = 0;
-        #if CV_ENABLE_UNROLLED
-            for (; i + 7 < N; i += 8)
+                          KMeansPPDistanceComputer(tdist2, దత్తాంశం, dist, ci),
+                          (ద్విగుణ)div_పైకి((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
+            ద్విగుణ s = 0;
+            పూర్ణాంకం i = 0;
+        #ఒకవేళ CV_ENABLE_UNROLLED
+            కొరకు (; i + 7 < N; i += 8)
             {
                 s += tdist2[i + 0] + tdist2[i + 1] + tdist2[i + 2] + tdist2[i + 3] +
                      tdist2[i + 4] + tdist2[i + 5] + tdist2[i + 6] + tdist2[i + 7];
             }
-        #endif
-            for (; i < N; i++)
+        #అయితే_ముగింపు
+            కొరకు (; i < N; i++)
             {
                 s += tdist2[i];
             }
 
-            if (s < bestSum)
+            ఒకవేళ (s < ఉత్తమ_కూడిక)
             {
-                bestSum = s;
-                bestCenter = ci;
+                ఉత్తమ_కూడిక = s;
+                ఉత్తమ_Center = ci;
                 std::swap(tdist, tdist2);
             }
         }
-        if (bestCenter < 0)
-            return false;
-        centers[k] = bestCenter;
-        sum0 = bestSum;
+        ఒకవేళ (ఉత్తమ_Center < 0)
+            తిరిగి అబద్ధం;
+        centers[k] = ఉత్తమ_Center;
+        sum0 = ఉత్తమ_కూడిక;
         std::swap(dist, tdist);
     }
 
-    for (int k = 0; k < K; k++)
+    కొరకు (పూర్ణాంకం k = 0; k < K; k++)
     {
-        const float* src = data.ptr<float>(centers[k]);
-        float* dst = _out_centers.ptr<float>(k);
-        for (int j = 0; j < dims; j++)
+        స్థిరరాశి దశాంశం* src = దత్తాంశం.ptr<దశాంశం>(centers[k]);
+        దశాంశం* dst = బహిర్గతం_centers.ptr<దశాంశం>(k);
+        కొరకు (పూర్ణాంకం j = 0; j < dims; j++)
             dst[j] = src[j];
     }
-    return true;
+    తిరిగి నిజం;
 }
 
-template<bool onlyDistance>
-class KMeansDistanceComputer : public ParallelLoopBody
+మూస<తార్కిక only_దూరం>
+తరగతి KMeans_దూరం_Computer : బహిరంగ ParallelLoopBody
 {
-public:
-    KMeansDistanceComputer( double *distances_,
-                            int *labels_,
-                            const Mat& data_,
-                            const Mat& centers_)
+బహిరంగ:
+    KMeans_దూరం_Computer( ద్విగుణ *distances_,
+                            పూర్ణాంకం *labels_,
+                            స్థిరరాశి Mat& దత్తాంశం_2,
+                            స్థిరరాశి Mat& centers_)
         : distances(distances_),
           labels(labels_),
-          data(data_),
+          దత్తాంశం(దత్తాంశం_2),
           centers(centers_)
     {
     }
 
-    void operator()(const Range& range) const CV_OVERRIDE
+    శూన్య క్రియాకారకం()(స్థిరరాశి Range& range) స్థిరరాశి CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int K = centers.rows;
-        const int dims = centers.cols;
+        స్థిరరాశి పూర్ణాంకం begin = range.ప్రారంభం;
+        స్థిరరాశి పూర్ణాంకం end = range.end;
+        స్థిరరాశి పూర్ణాంకం K = centers.అడ్డువరుసలు;
+        స్థిరరాశి పూర్ణాంకం dims = centers.నిలువుల_సంఖ్య;
 
-        for (int i = begin; i < end; ++i)
+        కొరకు (పూర్ణాంకం i = begin; i < end; ++i)
         {
-            const float *sample = data.ptr<float>(i);
-            if (onlyDistance)
+            స్థిరరాశి దశాంశం *sample = దత్తాంశం.ptr<దశాంశం>(i);
+            ఒకవేళ (only_దూరం)
             {
-                const float* center = centers.ptr<float>(labels[i]);
+                స్థిరరాశి దశాంశం* center = centers.ptr<దశాంశం>(labels[i]);
                 distances[i] = hal::normL2Sqr_(sample, center, dims);
-                continue;
+                కొనసాగు;
             }
-            else
+            లేకపోతే
             {
-                int k_best = 0;
-                double min_dist = DBL_MAX;
+                పూర్ణాంకం k_ఉత్తమ = 0;
+                ద్విగుణ min_dist = DBL_MAX;
 
-                for (int k = 0; k < K; k++)
+                కొరకు (పూర్ణాంకం k = 0; k < K; k++)
                 {
-                    const float* center = centers.ptr<float>(k);
-                    const double dist = hal::normL2Sqr_(sample, center, dims);
-                    if (!(dist <= FLT_MAX))
+                    స్థిరరాశి దశాంశం* center = centers.ptr<దశాంశం>(k);
+                    స్థిరరాశి ద్విగుణ dist = hal::normL2Sqr_(sample, center, dims);
+                    ఒకవేళ (!(dist <= FLT_MAX))
                     {
                         min_dist = DBL_MAX;
-                        break;
+                        ఆపు;
                     }
 
-                    if (min_dist > dist)
+                    ఒకవేళ (min_dist > dist)
                     {
                         min_dist = dist;
-                        k_best = k;
+                        k_ఉత్తమ = k;
                     }
                 }
 
                 distances[i] = min_dist;
-                labels[i] = k_best;
+                labels[i] = k_ఉత్తమ;
             }
         }
     }
 
-private:
-    KMeansDistanceComputer& operator=(const KMeansDistanceComputer&); // = delete
+అంతరంగ:
+    KMeans_దూరం_Computer& క్రియాకారకం=(స్థిరరాశి KMeans_దూరం_Computer&); // = delete
 
-    double *distances;
-    int *labels;
-    const Mat& data;
-    const Mat& centers;
+    ద్విగుణ *distances;
+    పూర్ణాంకం *labels;
+    స్థిరరాశి Mat& దత్తాంశం;
+    స్థిరరాశి Mat& centers;
 };
 
 }
 
-double cv::kmeans( InputArray _data, int K,
-                   InputOutputArray _bestLabels,
-                   TermCriteria criteria, int attempts,
-                   int flags, OutputArray _centers )
+ద్విగుణ cv::kmeans( ఆదానం_Array దత్తాంశం_3, పూర్ణాంకం K,
+                   ఆదానం_Output_Array ఉత్తమ_Labels,
+                   పదం_Criteria criteria, పూర్ణాంకం attempts,
+                   పూర్ణాంకం flags, OutputArray _centers )
 {
     CV_INSTRUMENT_REGION();
-    const int SPP_TRIALS = 3;
-    Mat data0 = _data.getMat();
-    const bool isrow = data0.rows == 1;
-    const int N = isrow ? data0.cols : data0.rows;
-    const int dims = (isrow ? 1 : data0.cols)*data0.channels();
-    const int type = data0.depth();
+    స్థిరరాశి పూర్ణాంకం SPP_TRIALS = 3;
+    Mat data0 = దత్తాంశం_3.getMat();
+    స్థిరరాశి తార్కిక isrow = data0.అడ్డువరుసలు == 1;
+    స్థిరరాశి పూర్ణాంకం N = isrow ? data0.నిలువుల_సంఖ్య : data0.అడ్డువరుసలు;
+    స్థిరరాశి పూర్ణాంకం dims = (isrow ? 1 : data0.నిలువుల_సంఖ్య)*data0.channels();
+    స్థిరరాశి పూర్ణాంకం type = data0.లోతు();
 
     attempts = std::max(attempts, 1);
     CV_Assert( data0.dims <= 2 && type == CV_32F && K > 0 );
     CV_CheckGE(N, K, "There can't be more clusters than elements");
 
-    Mat data(N, dims, CV_32F, data0.ptr(), isrow ? dims * sizeof(float) : static_cast<size_t>(data0.step));
+    Mat దత్తాంశం(N, dims, CV_32F, data0.ptr(), isrow ? dims * పరిమాణం(దశాంశం) : static_cast<size_t>(data0.అడుగు));
 
-    _bestLabels.create(N, 1, CV_32S, -1, true);
+    ఉత్తమ_Labels.create(N, 1, CV_32S, -1, నిజం);
 
-    Mat _labels, best_labels = _bestLabels.getMat();
-    if (flags & KMEANS_USE_INITIAL_LABELS)
+    Mat _labels, ఉత్తమ_labels = ఉత్తమ_Labels.getMat();
+    ఒకవేళ (flags & KMEANS_USE_INITIAL_LABELS)
     {
-        CV_Assert( (best_labels.cols == 1 || best_labels.rows == 1) &&
-                  best_labels.cols*best_labels.rows == N &&
-                  best_labels.type() == CV_32S &&
-                  best_labels.isContinuous());
-        best_labels.reshape(1, N).copyTo(_labels);
-        for (int i = 0; i < N; i++)
+        CV_Assert( (ఉత్తమ_labels.నిలువుల_సంఖ్య == 1 || ఉత్తమ_labels.అడ్డువరుసలు == 1) &&
+                  ఉత్తమ_labels.నిలువుల_సంఖ్య*ఉత్తమ_labels.అడ్డువరుసలు == N &&
+                  ఉత్తమ_labels.type() == CV_32S &&
+                  ఉత్తమ_labels.isContinuous());
+        ఉత్తమ_labels.reshape(1, N).copy_గమ్యం(_labels);
+        కొరకు (పూర్ణాంకం i = 0; i < N; i++)
         {
-            CV_Assert((unsigned)_labels.at<int>(i) < (unsigned)K);
+            CV_Assert((గుర్తులేని)_labels.at<పూర్ణాంకం>(i) < (గుర్తులేని)K);
         }
     }
-    else
+    లేకపోతే
     {
-        if (!((best_labels.cols == 1 || best_labels.rows == 1) &&
-             best_labels.cols*best_labels.rows == N &&
-             best_labels.type() == CV_32S &&
-             best_labels.isContinuous()))
+        ఒకవేళ (!((ఉత్తమ_labels.నిలువుల_సంఖ్య == 1 || ఉత్తమ_labels.అడ్డువరుసలు == 1) &&
+             ఉత్తమ_labels.నిలువుల_సంఖ్య*ఉత్తమ_labels.అడ్డువరుసలు == N &&
+             ఉత్తమ_labels.type() == CV_32S &&
+             ఉత్తమ_labels.isContinuous()))
         {
-            _bestLabels.create(N, 1, CV_32S);
-            best_labels = _bestLabels.getMat();
+            ఉత్తమ_Labels.create(N, 1, CV_32S);
+            ఉత్తమ_labels = ఉత్తమ_Labels.getMat();
         }
-        _labels.create(best_labels.size(), best_labels.type());
+        _labels.create(ఉత్తమ_labels.size(), ఉత్తమ_labels.type());
     }
-    int* labels = _labels.ptr<int>();
+    పూర్ణాంకం* labels = _labels.ptr<పూర్ణాంకం>();
 
-    Mat centers(K, dims, type), old_centers(K, dims, type), temp(1, dims, type);
-    cv::AutoBuffer<int, 64> counters(K);
-    cv::AutoBuffer<double, 64> dists(N);
+    Mat centers(K, dims, type), old_centers(K, dims, type), తాత్కాలిక_2(1, dims, type);
+    cv::Auto_బఫరు<పూర్ణాంకం, 64> counters(K);
+    cv::Auto_బఫరు<ద్విగుణ, 64> dists(N);
     RNG& rng = theRNG();
 
-    if (criteria.type & TermCriteria::EPS)
+    ఒకవేళ (criteria.type & పదం_Criteria::EPS)
         criteria.epsilon = std::max(criteria.epsilon, 0.);
-    else
+    లేకపోతే
         criteria.epsilon = FLT_EPSILON;
     criteria.epsilon *= criteria.epsilon;
 
-    if (criteria.type & TermCriteria::COUNT)
-        criteria.maxCount = std::min(std::max(criteria.maxCount, 2), 100);
-    else
-        criteria.maxCount = 100;
+    ఒకవేళ (criteria.type & పదం_Criteria::లెక్క_3)
+        criteria.max_లెక్క = std::min(std::max(criteria.max_లెక్క, 2), 100);
+    లేకపోతే
+        criteria.max_లెక్క = 100;
 
-    if (K == 1)
+    ఒకవేళ (K == 1)
     {
         attempts = 1;
-        criteria.maxCount = 2;
+        criteria.max_లెక్క = 2;
     }
 
-    cv::AutoBuffer<Vec2f, 64> box(dims);
-    if (!(flags & KMEANS_PP_CENTERS))
+    cv::Auto_బఫరు<Vec2f, 64> box(dims);
+    ఒకవేళ (!(flags & KMEANS_PP_CENTERS))
     {
         {
-            const float* sample = data.ptr<float>(0);
-            for (int j = 0; j < dims; j++)
+            స్థిరరాశి దశాంశం* sample = దత్తాంశం.ptr<దశాంశం>(0);
+            కొరకు (పూర్ణాంకం j = 0; j < dims; j++)
                 box[j] = Vec2f(sample[j], sample[j]);
         }
-        for (int i = 1; i < N; i++)
+        కొరకు (పూర్ణాంకం i = 1; i < N; i++)
         {
-            const float* sample = data.ptr<float>(i);
-            for (int j = 0; j < dims; j++)
+            స్థిరరాశి దశాంశం* sample = దత్తాంశం.ptr<దశాంశం>(i);
+            కొరకు (పూర్ణాంకం j = 0; j < dims; j++)
             {
-                float v = sample[j];
+                దశాంశం v = sample[j];
                 box[j][0] = std::min(box[j][0], v);
                 box[j][1] = std::max(box[j][1], v);
             }
         }
     }
 
-    double best_compactness = DBL_MAX;
-    for (int a = 0; a < attempts; a++)
+    ద్విగుణ ఉత్తమ_compactness = DBL_MAX;
+    కొరకు (పూర్ణాంకం a = 0; a < attempts; a++)
     {
-        double compactness = DBL_MAX;
+        ద్విగుణ compactness = DBL_MAX;
 
-        for (int iter = 0; ;)
+        కొరకు (పూర్ణాంకం iter = 0; ;)
         {
-            double max_center_shift = iter == 0 ? DBL_MAX : 0.0;
+            ద్విగుణ max_center_జరుపు = iter == 0 ? DBL_MAX : 0.0;
 
             swap(centers, old_centers);
 
-            if (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
+            ఒకవేళ (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
             {
-                if (flags & KMEANS_PP_CENTERS)
+                ఒకవేళ (flags & KMEANS_PP_CENTERS)
                 {
-                    if (!generateCentersPP(data, centers, K, rng, SPP_TRIALS))
-                        break;
+                    ఒకవేళ (!generateCentersPP(దత్తాంశం, centers, K, rng, SPP_TRIALS))
+                        ఆపు;
                 }
-                else
+                లేకపోతే
                 {
-                    for (int k = 0; k < K; k++)
-                        generateRandomCenter(dims, box.data(), centers.ptr<float>(k), rng);
+                    కొరకు (పూర్ణాంకం k = 0; k < K; k++)
+                        generateRandomCenter(dims, box.దత్తాంశం(), centers.ptr<దశాంశం>(k), rng);
                 }
             }
-            else
+            లేకపోతే
             {
                 // compute centers
                 centers = Scalar(0);
-                for (int k = 0; k < K; k++)
+                కొరకు (పూర్ణాంకం k = 0; k < K; k++)
                     counters[k] = 0;
 
-                for (int i = 0; i < N; i++)
+                కొరకు (పూర్ణాంకం i = 0; i < N; i++)
                 {
-                    const float* sample = data.ptr<float>(i);
-                    int k = labels[i];
-                    float* center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    స్థిరరాశి దశాంశం* sample = దత్తాంశం.ptr<దశాంశం>(i);
+                    పూర్ణాంకం k = labels[i];
+                    దశాంశం* center = centers.ptr<దశాంశం>(k);
+                    కొరకు (పూర్ణాంకం j = 0; j < dims; j++)
                         center[j] += sample[j];
                     counters[k]++;
                 }
 
-                for (int k = 0; k < K; k++)
+                కొరకు (పూర్ణాంకం k = 0; k < K; k++)
                 {
-                    if (counters[k] != 0)
-                        continue;
+                    ఒకవేళ (counters[k] != 0)
+                        కొనసాగు;
 
                     // if some cluster appeared to be empty then:
                     //   1. find the biggest cluster
                     //   2. find the farthest from the center point in the biggest cluster
                     //   3. exclude the farthest point from the biggest cluster and form a new 1-point cluster.
-                    int max_k = 0;
-                    for (int k1 = 1; k1 < K; k1++)
+                    పూర్ణాంకం max_k = 0;
+                    కొరకు (పూర్ణాంకం k1 = 1; k1 < K; k1++)
                     {
-                        if (counters[max_k] < counters[k1])
+                        ఒకవేళ (counters[max_k] < counters[k1])
                             max_k = k1;
                     }
 
-                    double max_dist = 0;
-                    int farthest_i = -1;
-                    float* base_center = centers.ptr<float>(max_k);
-                    float* _base_center = temp.ptr<float>(); // normalized
-                    float scale = 1.f/counters[max_k];
-                    for (int j = 0; j < dims; j++)
-                        _base_center[j] = base_center[j]*scale;
+                    ద్విగుణ max_dist = 0;
+                    పూర్ణాంకం farthest_i = -1;
+                    దశాంశం* పునాది_center = centers.ptr<దశాంశం>(max_k);
+                    దశాంశం* పునాది_center_2 = తాత్కాలిక_2.ptr<దశాంశం>(); // normalized
+                    దశాంశం scale = 1.f/counters[max_k];
+                    కొరకు (పూర్ణాంకం j = 0; j < dims; j++)
+                        పునాది_center_2[j] = పునాది_center[j]*scale;
 
-                    for (int i = 0; i < N; i++)
+                    కొరకు (పూర్ణాంకం i = 0; i < N; i++)
                     {
-                        if (labels[i] != max_k)
-                            continue;
-                        if (farthest_i < 0)
+                        ఒకవేళ (labels[i] != max_k)
+                            కొనసాగు;
+                        ఒకవేళ (farthest_i < 0)
                             farthest_i = i;
-                        const float* sample = data.ptr<float>(i);
-                        double dist = hal::normL2Sqr_(sample, _base_center, dims);
+                        స్థిరరాశి దశాంశం* sample = దత్తాంశం.ptr<దశాంశం>(i);
+                        ద్విగుణ dist = hal::normL2Sqr_(sample, పునాది_center_2, dims);
 
-                        if (max_dist <= dist)
+                        ఒకవేళ (max_dist <= dist)
                         {
                             max_dist = dist;
                             farthest_i = i;
@@ -416,77 +416,77 @@ double cv::kmeans( InputArray _data, int K,
                     counters[k]++;
                     labels[farthest_i] = k;
 
-                    const float* sample = data.ptr<float>(farthest_i);
-                    float* cur_center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    స్థిరరాశి దశాంశం* sample = దత్తాంశం.ptr<దశాంశం>(farthest_i);
+                    దశాంశం* cur_center = centers.ptr<దశాంశం>(k);
+                    కొరకు (పూర్ణాంకం j = 0; j < dims; j++)
                     {
-                        base_center[j] -= sample[j];
+                        పునాది_center[j] -= sample[j];
                         cur_center[j] += sample[j];
                     }
                 }
 
-                for (int k = 0; k < K; k++)
+                కొరకు (పూర్ణాంకం k = 0; k < K; k++)
                 {
-                    float* center = centers.ptr<float>(k);
+                    దశాంశం* center = centers.ptr<దశాంశం>(k);
                     CV_Assert( counters[k] != 0 );
 
-                    float scale = 1.f/counters[k];
-                    for (int j = 0; j < dims; j++)
+                    దశాంశం scale = 1.f/counters[k];
+                    కొరకు (పూర్ణాంకం j = 0; j < dims; j++)
                         center[j] *= scale;
 
-                    if (iter > 0)
+                    ఒకవేళ (iter > 0)
                     {
-                        double dist = 0;
-                        const float* old_center = old_centers.ptr<float>(k);
-                        for (int j = 0; j < dims; j++)
+                        ద్విగుణ dist = 0;
+                        స్థిరరాశి దశాంశం* old_center = old_centers.ptr<దశాంశం>(k);
+                        కొరకు (పూర్ణాంకం j = 0; j < dims; j++)
                         {
-                            double t = center[j] - old_center[j];
+                            ద్విగుణ t = center[j] - old_center[j];
                             dist += t*t;
                         }
-                        max_center_shift = std::max(max_center_shift, dist);
+                        max_center_జరుపు = std::max(max_center_జరుపు, dist);
                     }
                 }
             }
 
-            bool isLastIter = (++iter == MAX(criteria.maxCount, 2) || max_center_shift <= criteria.epsilon);
+            తార్కిక is_చివరి_Iter = (++iter == MAX(criteria.max_లెక్క, 2) || max_center_జరుపు <= criteria.epsilon);
 
-            if (isLastIter)
+            ఒకవేళ (is_చివరి_Iter)
             {
                 // don't re-assign labels to avoid creation of empty clusters
-                parallel_for_(Range(0, N), KMeansDistanceComputer<true>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
-                compactness = sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0];
-                break;
+                parallel_for_(Range(0, N), KMeans_దూరం_Computer<నిజం>(dists.దత్తాంశం(), labels, దత్తాంశం, centers), (ద్విగుణ)div_పైకి((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
+                compactness = కూడిక(Mat(కొలత(N, 1), CV_64F, &dists[0]))[0];
+                ఆపు;
             }
-            else
+            లేకపోతే
             {
                 // assign labels
-                parallel_for_(Range(0, N), KMeansDistanceComputer<false>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N * K), CV_KMEANS_PARALLEL_GRANULARITY));
-                if (!(sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
-                    break;
+                parallel_for_(Range(0, N), KMeans_దూరం_Computer<అబద్ధం>(dists.దత్తాంశం(), labels, దత్తాంశం, centers), (ద్విగుణ)div_పైకి((size_t)(dims * N * K), CV_KMEANS_PARALLEL_GRANULARITY));
+                ఒకవేళ (!(కూడిక(Mat(కొలత(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
+                    ఆపు;
             }
         }
 
-        if (!(compactness < DBL_MAX))
+        ఒకవేళ (!(compactness < DBL_MAX))
         {
-            centers.setZero();
-            _labels.setZero();
+            centers.సమితి_Zero();
+            _labels.సమితి_Zero();
             compactness = -1.;
         }
-        if (compactness < best_compactness)
+        ఒకవేళ (compactness < ఉత్తమ_compactness)
         {
-            best_compactness = compactness;
-            if (_centers.needed())
+            ఉత్తమ_compactness = compactness;
+            ఒకవేళ (_centers.needed())
             {
-                if (_centers.fixedType() && _centers.channels() == dims)
-                    centers.reshape(dims).copyTo(_centers);
-                else
-                    centers.copyTo(_centers);
+                ఒకవేళ (_centers.fixedType() && _centers.channels() == dims)
+                    centers.reshape(dims).copy_గమ్యం(_centers);
+                లేకపోతే
+                    centers.copy_గమ్యం(_centers);
             }
-            _labels.copyTo(best_labels);
+            _labels.copy_గమ్యం(ఉత్తమ_labels);
         }
-        if (compactness < 0.)
-            break;
+        ఒకవేళ (compactness < 0.)
+            ఆపు;
     }
 
-    return best_compactness;
+    తిరిగి ఉత్తమ_compactness;
 }

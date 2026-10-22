@@ -39,20 +39,20 @@
 //
 //M*/
 
-#if defined(HAVE_DIRECTX)
-#include <d3d11.h>
-#include <d3d10.h>
-#include <d3d9.h>
+#ఒకవేళ defined(HAVE_DIRECTX)
+#అన్తర్భావ <d3d11.h>
+#అన్తర్భావ <d3d10.h>
+#అన్తర్భావ <d3d9.h>
 
-#ifdef HAVE_OPENCL
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
+#నిర్వచితమైతే HAVE_OPENCL
+#అన్తర్భావ "opencv2/core/opencl/runtime/opencl_core.hpp"
 
-#include <CL/cl_d3d11.h>
-#ifdef HAVE_OPENCL_D3D11_NV
-#include <CL/cl_d3d11_ext.h>
-#endif
-#include <CL/cl_d3d10.h>
-#include <CL/cl_dx9_media_sharing.h>
-#endif // HAVE_OPENCL
+#అన్తర్భావ <CL/cl_d3d11.h>
+#నిర్వచితమైతే HAVE_OPENCL_D3D11_NV
+#అన్తర్భావ <CL/cl_d3d11_ext.h>
+#అయితే_ముగింపు
+#అన్తర్భావ <CL/cl_d3d10.h>
+#అన్తర్భావ <CL/cl_dx9_media_sharing.h>
+#అయితే_ముగింపు // HAVE_OPENCL
 
-#endif // HAVE_DIRECTX
+#అయితే_ముగింపు // HAVE_DIRECTX

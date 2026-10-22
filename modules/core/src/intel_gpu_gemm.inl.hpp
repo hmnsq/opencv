@@ -22,149 +22,149 @@
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifdef HAVE_OPENCL
+#నిర్వచితమైతే HAVE_OPENCL
 
-namespace cv
+నామాకాశ cv
 {
 
-static bool intel_gpu_gemm(
-    UMat A, Size sizeA,
-    UMat B, Size sizeB,
-    UMat D, Size sizeD,
-    double alpha, double beta,
-    bool atrans, bool btrans,
-    bool& isPropagatedC2D
+స్థిర తార్కిక intel_gpu_gemm(
+    UMat A, కొలత కొలత_A,
+    UMat B, కొలత కొలత_B,
+    UMat D, కొలత కొలత_D,
+    ద్విగుణ alpha, ద్విగుణ beta,
+    తార్కిక atrans, తార్కిక btrans,
+    తార్కిక& isPropagatedC2D
 )
 {
-    CV_UNUSED(sizeB);
+    CV_వాడని(కొలత_B);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    పూర్ణాంకం M = కొలత_D.ఎత్తు, N = కొలత_D.వెడల్పు, K = ((atrans)? కొలత_A.ఎత్తు : కొలత_A.వెడల్పు);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    ఒకవేళ (M < 4 || N < 4 || K < 4)  // vload4
+        తిరిగి అబద్ధం;
 
-    CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
+    CV_LOG_VERBOSE(ఖాళీ, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    గుర్తులేని పూర్ణాంకం lx = 8, ly = 4;
+    గుర్తులేని పూర్ణాంకం dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    ఒకవేళ(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        ఒకవేళ (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        లేకపోతే
         {
-            if (M % 2 != 0)
-                return false;
+            ఒకవేళ (M % 2 != 0)
+                తిరిగి అబద్ధం;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            ఒకవేళ (N % (4*8) != 0)
+                తిరిగి అబద్ధం;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    లేకపోతే ఒకవేళ(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        ఒకవేళ (M % 32 != 0)
+            తిరిగి అబద్ధం;
+        ఒకవేళ (N % 32 != 0)
+            తిరిగి అబద్ధం;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    లేకపోతే ఒకవేళ(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        ఒకవేళ (K % 4 != 0)
+            తిరిగి అబద్ధం;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    లేకపోతే
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        ఒకవేళ (M % 32 != 0)
+            తిరిగి అబద్ధం;
+        ఒకవేళ (N % 32 != 0)
+            తిరిగి అబద్ధం;
+        ఒకవేళ (K % 16 != 0)
+            తిరిగి అబద్ధం;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
-    CV_LOG_DEBUG(NULL, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
+    CV_LOG_DEBUG(ఖాళీ, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
 
-    const size_t gx = divUp((size_t)N, dx);
-    const size_t gy = divUp((size_t)M, dy);
+    స్థిరరాశి size_t gx = div_పైకి((size_t)N, dx);
+    స్థిరరాశి size_t gy = div_పైకి((size_t)M, dy);
 
     size_t local[] = {lx, ly, 1};
-    size_t global[] = {roundUp(gx, lx), roundUp(gy, ly), 1};
+    size_t global[] = {విడత_పైకి(gx, lx), విడత_పైకి(gy, ly), 1};
 
-    ocl::Queue q;
+    ocl::వరుస q;
     String errmsg;
-    const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
+    స్థిరరాశి ocl::కార్యక్రమం_2 కార్యక్రమం = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    ఒకవేళ(!atrans && btrans)
     {
-        ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        ocl::Kernel k(kernelName.c_str(), కార్యక్రమం);
+        ఒకవేళ (k.empty())
         {
-            return false;
+            తిరిగి అబద్ధం;
         }
 
-        k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+        k.వాదనలు(ocl::KernelArg::PtrReadOnly(A),
+               (పూర్ణాంకం) (A.offset / పరిమాణం(దశాంశం)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (పూర్ణాంకం) (B.offset / పరిమాణం(దశాంశం)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (పూర్ణాంకం) (D.offset / పరిమాణం(దశాంశం)),
                M, N, K,
-               (float)alpha,
-               (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (దశాంశం)alpha,
+               (దశాంశం)beta,
+               (పూర్ణాంకం)(A.అడుగు / పరిమాణం(దశాంశం)),
+               (పూర్ణాంకం)(B.అడుగు / పరిమాణం(దశాంశం)),
+               (పూర్ణాంకం)(D.అడుగు / పరిమాణం(దశాంశం))
         );
 
-        bool ret = k.run(2, global, local, false, q);
-        return ret;
+        తార్కిక ret = k.నిరంతరం(2, global, local, అబద్ధం, q);
+        తిరిగి ret;
     }
-    else
+    లేకపోతే
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        పూర్ణాంకం stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        కొరకు(పూర్ణాంకం ప్రారంభం_సూచీ = 0; ప్రారంభం_సూచీ < K; ప్రారంభం_సూచీ += stride)
         {
-             ocl::Kernel k(kernelName.c_str(), program);
-             k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+             ocl::Kernel k(kernelName.c_str(), కార్యక్రమం);
+             k.వాదనలు(ocl::KernelArg::PtrReadOnly(A),
+                    (పూర్ణాంకం) (A.offset / పరిమాణం(దశాంశం)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (పూర్ణాంకం) (B.offset / పరిమాణం(దశాంశం)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (పూర్ణాంకం) (D.offset / పరిమాణం(దశాంశం)),
                     M, N, K,
-                    (float)alpha,
-                    (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (దశాంశం)alpha,
+                    (దశాంశం)beta,
+                    (పూర్ణాంకం)(A.అడుగు / పరిమాణం(దశాంశం)),
+                    (పూర్ణాంకం)(B.అడుగు / పరిమాణం(దశాంశం)),
+                    (పూర్ణాంకం)(D.అడుగు / పరిమాణం(దశాంశం)),
+                    (పూర్ణాంకం) ప్రారంభం_సూచీ,                          // 14 start_index
                     stride);
 
-            bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            తార్కిక ret = k.నిరంతరం(2, global, local, అబద్ధం, q);
+            ఒకవేళ (!ret)
             {
-                if (start_index != 0)
-                    isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                ఒకవేళ (ప్రారంభం_సూచీ != 0)
+                    isPropagatedC2D = అబద్ధం;  // D array content is changed, need to rewrite
+                తిరిగి అబద్ధం;
             }
         }
-        return true;
+        తిరిగి నిజం;
     }
 }
 
 } // namespace cv
 
-#endif
+#అయితే_ముగింపు

@@ -3,15 +3,15 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "opencl_kernels_core.hpp"
 
-#include "merge.simd.hpp"
-#include "merge.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#అన్తర్భావ "merge.simd.hpp"
+#అన్తర్భావ "merge.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+నామాకాశ cv { నామాకాశ hal {
 
-void merge8u(const uchar** src, uchar* dst, int len, int cn )
+శూన్య merge8u(స్థిరరాశి uchar** src, uchar* dst, పూర్ణాంకం len, పూర్ణాంకం cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge8u, cv_hal_merge8u, src, dst, len, cn)
@@ -19,7 +19,7 @@ void merge8u(const uchar** src, uchar* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge16u(const ushort** src, ushort* dst, int len, int cn )
+శూన్య merge16u(స్థిరరాశి ushort** src, ushort* dst, పూర్ణాంకం len, పూర్ణాంకం cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge16u, cv_hal_merge16u, src, dst, len, cn)
@@ -27,7 +27,7 @@ void merge16u(const ushort** src, ushort* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge32s(const int** src, int* dst, int len, int cn )
+శూన్య merge32s(స్థిరరాశి పూర్ణాంకం** src, పూర్ణాంకం* dst, పూర్ణాంకం len, పూర్ణాంకం cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge32s, cv_hal_merge32s, src, dst, len, cn)
@@ -35,7 +35,7 @@ void merge32s(const int** src, int* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge64s(const int64** src, int64* dst, int len, int cn )
+శూన్య merge64s(స్థిరరాశి int64** src, int64* dst, పూర్ణాంకం len, పూర్ణాంకం cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge64s, cv_hal_merge64s, src, dst, len, cn)
@@ -46,198 +46,198 @@ void merge64s(const int64** src, int64* dst, int len, int cn )
 } // namespace cv::hal::
 
 
-typedef void (*MergeFunc)(const void** src, void* dst, int len, int cn);
+రకనిర్వచనం శూన్య (*విలీనం_Func)(స్థిరరాశి శూన్య** src, శూన్య* dst, పూర్ణాంకం len, పూర్ణాంకం cn);
 
-template<typename T, void (*fn)(const T**, T*, int, int)>
-static void mergeWrap(const void** src, void* dst, int len, int cn)
+మూస<రకం_పేరు T, శూన్య (*fn)(స్థిరరాశి T**, T*, పూర్ణాంకం, పూర్ణాంకం)>
+స్థిర శూన్య విలీనం_Wrap(స్థిరరాశి శూన్య** src, శూన్య* dst, పూర్ణాంకం len, పూర్ణాంకం cn)
 {
-    fn((const T**)src, (T*)dst, len, cn);
+    fn((స్థిరరాశి T**)src, (T*)dst, len, cn);
 }
 
-static MergeFunc getMergeFunc(int depth)
+స్థిర విలీనం_Func get_విలీనం_Func(పూర్ణాంకం లోతు)
 {
-    static MergeFunc mergeTab[CV_DEPTH_MAX] =
+    స్థిర విలీనం_Func విలీనం_Tab[CV_లోతు_MAX] =
     {
-        mergeWrap<uchar, cv::hal::merge8u>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<ushort, cv::hal::merge16u>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<int, cv::hal::merge32s>,
-        mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<ushort, cv::hal::merge16u>,
-        mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<int64_t, cv::hal::merge64s>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<uchar, cv::hal::merge8u>, 0,
+        విలీనం_Wrap<uchar, cv::hal::merge8u>, విలీనం_Wrap<uchar, cv::hal::merge8u>,
+        విలీనం_Wrap<ushort, cv::hal::merge16u>, విలీనం_Wrap<ushort, cv::hal::merge16u>,
+        విలీనం_Wrap<పూర్ణాంకం, cv::hal::merge32s>, విలీనం_Wrap<పూర్ణాంకం, cv::hal::merge32s>,
+        విలీనం_Wrap<int64_t, cv::hal::merge64s>, విలీనం_Wrap<ushort, cv::hal::merge16u>,
+        విలీనం_Wrap<ushort, cv::hal::merge16u>, విలీనం_Wrap<uchar, cv::hal::merge8u>,
+        విలీనం_Wrap<int64_t, cv::hal::merge64s>, విలీనం_Wrap<int64_t, cv::hal::merge64s>,
+        విలీనం_Wrap<పూర్ణాంకం, cv::hal::merge32s>, విలీనం_Wrap<uchar, cv::hal::merge8u>,
+        విలీనం_Wrap<uchar, cv::hal::merge8u>, 0,
     };
 
-    return mergeTab[depth];
+    తిరిగి విలీనం_Tab[లోతు];
 }
 
-#ifdef HAVE_IPP
+#నిర్వచితమైతే HAVE_IPP
 
-static bool ipp_merge(const Mat* mv, Mat& dst, int channels)
+స్థిర తార్కిక ipp_విలీనం(స్థిరరాశి Mat* mv, Mat& dst, పూర్ణాంకం channels)
 {
-#ifdef HAVE_IPP_IW_LL
+#నిర్వచితమైతే HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(channels != 3 && channels != 4)
-        return false;
+    ఒకవేళ(channels != 3 && channels != 4)
+        తిరిగి అబద్ధం;
 
-    if(mv[0].dims <= 2)
+    ఒకవేళ(mv[0].dims <= 2)
     {
-        IppiSize    size       = ippiSize(mv[0].size());
-        const void *srcPtrs[4] = {NULL};
-        size_t      srcStep    = mv[0].step;
-        for(int i = 0; i < channels; i++)
+        Ippi_కొలత    size       = ippi_కొలత(mv[0].size());
+        స్థిరరాశి శూన్య *srcPtrs[4] = {ఖాళీ};
+        size_t      src_అడుగు_3    = mv[0].అడుగు;
+        కొరకు(పూర్ణాంకం i = 0; i < channels; i++)
         {
             srcPtrs[i] = mv[i].ptr();
-            if(srcStep != mv[i].step)
-                return false;
+            ఒకవేళ(src_అడుగు_3 != mv[i].అడుగు)
+                తిరిగి అబద్ధం;
         }
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, srcPtrs, (int)srcStep, dst.ptr(), (int)dst.step, size, (int)mv[0].elemSize1(), channels, 0) >= 0;
+        తిరిగి CV_INSTRUMENT_FUN_IPP(llwi_Copy_విలీనం, srcPtrs, (పూర్ణాంకం)src_అడుగు_3, dst.ptr(), (పూర్ణాంకం)dst.అడుగు, size, (పూర్ణాంకం)mv[0].elemSize1(), channels, 0) >= 0;
     }
-    else
+    లేకపోతే
     {
-        const Mat *arrays[5] = {NULL};
-        uchar     *ptrs[5]   = {NULL};
+        స్థిరరాశి Mat *arrays[5] = {ఖాళీ};
+        uchar     *ptrs[5]   = {ఖాళీ};
         arrays[0] = &dst;
 
-        for(int i = 1; i < channels; i++)
+        కొరకు(పూర్ణాంకం i = 1; i < channels; i++)
         {
             arrays[i] = &mv[i-1];
         }
 
         NAryMatIterator it(arrays, ptrs);
-        IppiSize size = { (int)it.size, 1 };
+        Ippi_కొలత size = { (పూర్ణాంకం)it.size, 1 };
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, (const void**)&ptrs[1], 0, ptrs[0], 0, size, (int)mv[0].elemSize1(), channels, 0) < 0)
-                return false;
+            ఒకవేళ(CV_INSTRUMENT_FUN_IPP(llwi_Copy_విలీనం, (స్థిరరాశి శూన్య**)&ptrs[1], 0, ptrs[0], 0, size, (పూర్ణాంకం)mv[0].elemSize1(), channels, 0) < 0)
+                తిరిగి అబద్ధం;
         }
-        return true;
+        తిరిగి నిజం;
     }
-#else
-    CV_UNUSED(dst); CV_UNUSED(mv); CV_UNUSED(channels);
-    return false;
-#endif
+#లేకపోతే
+    CV_వాడని(dst); CV_వాడని(mv); CV_వాడని(channels);
+    తిరిగి అబద్ధం;
+#అయితే_ముగింపు
 }
-#endif
+#అయితే_ముగింపు
 
-void merge(const Mat* mv, size_t n, OutputArray _dst)
+శూన్య విలీనం(స్థిరరాశి Mat* mv, size_t n, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert( mv && n > 0 );
     CV_Assert(!mv[0].empty());
 
-    int depth = mv[0].depth();
-    bool allch1 = true;
-    int k, cn = 0;
+    పూర్ణాంకం లోతు = mv[0].లోతు();
+    తార్కిక allch1 = నిజం;
+    పూర్ణాంకం k, cn = 0;
     size_t i;
 
-    for( i = 0; i < n; i++ )
+    కొరకు( i = 0; i < n; i++ )
     {
-        CV_Assert(mv[i].size == mv[0].size && mv[i].depth() == depth);
+        CV_Assert(mv[i].size == mv[0].size && mv[i].లోతు() == లోతు);
         allch1 = allch1 && mv[i].channels() == 1;
         cn += mv[i].channels();
     }
 
     CV_Assert( 0 < cn && cn <= CV_CN_MAX );
-    _dst.create(mv[0].size, CV_MAKETYPE(depth, cn));
+    _dst.create(mv[0].size, CV_MAKETYPE(లోతు, cn));
     Mat dst = _dst.getMat();
 
-    if( n == 1 )
+    ఒకవేళ( n == 1 )
     {
-        mv[0].copyTo(dst);
-        return;
+        mv[0].copy_గమ్యం(dst);
+        తిరిగి;
     }
 
-    CV_IPP_RUN(allch1, ipp_merge(mv, dst, (int)n));
+    CV_IPP_నిరంతరం(allch1, ipp_విలీనం(mv, dst, (పూర్ణాంకం)n));
 
-    if( !allch1 )
+    ఒకవేళ( !allch1 )
     {
-        AutoBuffer<int> pairs(cn*2);
-        int j, ni=0;
+        Auto_బఫరు<పూర్ణాంకం> జతలు(cn*2);
+        పూర్ణాంకం j, ni=0;
 
-        for( i = 0, j = 0; i < n; i++, j += ni )
+        కొరకు( i = 0, j = 0; i < n; i++, j += ni )
         {
             ni = mv[i].channels();
-            for( k = 0; k < ni; k++ )
+            కొరకు( k = 0; k < ni; k++ )
             {
-                pairs[(j+k)*2] = j + k;
-                pairs[(j+k)*2+1] = j + k;
+                జతలు[(j+k)*2] = j + k;
+                జతలు[(j+k)*2+1] = j + k;
             }
         }
-        mixChannels( mv, n, &dst, 1, &pairs[0], cn );
-        return;
+        mixChannels( mv, n, &dst, 1, &జతలు[0], cn );
+        తిరిగి;
     }
 
-    MergeFunc func = getMergeFunc(depth);
+    విలీనం_Func func = get_విలీనం_Func(లోతు);
     CV_Assert( func != 0 );
 
-    size_t esz = dst.elemSize(), esz1 = dst.elemSize1();
-    size_t blocksize0 = (int)((BLOCK_SIZE + esz-1)/esz);
-    AutoBuffer<uchar> _buf((cn+1)*(sizeof(Mat*) + sizeof(uchar*)) + 16);
-    const Mat** arrays = (const Mat**)_buf.data();
+    size_t esz = dst.elem_కొలత(), esz1 = dst.elemSize1();
+    size_t blocksize0 = (పూర్ణాంకం)((ఖండం_కొలత + esz-1)/esz);
+    Auto_బఫరు<uchar> _buf((cn+1)*(పరిమాణం(Mat*) + పరిమాణం(uchar*)) + 16);
+    స్థిరరాశి Mat** arrays = (స్థిరరాశి Mat**)_buf.దత్తాంశం();
     uchar** ptrs = (uchar**)alignPtr(arrays + cn + 1, 16);
 
     arrays[0] = &dst;
-    for( k = 0; k < cn; k++ )
+    కొరకు( k = 0; k < cn; k++ )
         arrays[k+1] = &mv[k];
 
     NAryMatIterator it(arrays, ptrs, cn+1);
-    size_t total = (int)it.size;
-    size_t blocksize = std::min((size_t)CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn), cn <= 4 ? total : std::min(total, blocksize0));
+    size_t మొత్తం = (పూర్ణాంకం)it.size;
+    size_t blocksize = std::min((size_t)CV_విభజించు_విలీనం_MAX_ఖండం_కొలత(cn), cn <= 4 ? మొత్తం : std::min(మొత్తం, blocksize0));
 
-    for( i = 0; i < it.nplanes; i++, ++it )
+    కొరకు( i = 0; i < it.nplanes; i++, ++it )
     {
-        for( size_t j = 0; j < total; j += blocksize )
+        కొరకు( size_t j = 0; j < మొత్తం; j += blocksize )
         {
-            size_t bsz = std::min(total - j, blocksize);
-            func( (const void**)&ptrs[1], ptrs[0], (int)bsz, cn );
+            size_t bsz = std::min(మొత్తం - j, blocksize);
+            func( (స్థిరరాశి శూన్య**)&ptrs[1], ptrs[0], (పూర్ణాంకం)bsz, cn );
 
-            if( j + blocksize < total )
+            ఒకవేళ( j + blocksize < మొత్తం )
             {
                 ptrs[0] += bsz*esz;
-                for( int t = 0; t < cn; t++ )
+                కొరకు( పూర్ణాంకం t = 0; t < cn; t++ )
                     ptrs[t+1] += bsz*esz1;
             }
         }
     }
 }
 
-#ifdef HAVE_OPENCL
+#నిర్వచితమైతే HAVE_OPENCL
 
-static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
+స్థిర తార్కిక ocl_విలీనం( ఆదానం_Array_యొక్క_Arrays _mv, OutputArray _dst )
 {
     std::vector<UMat> src, ksrc;
-    _mv.getUMatVector(src);
+    _mv.get_UMat_సదిశ(src);
     CV_Assert(!src.empty());
 
-    int type = src[0].type(), depth = CV_MAT_DEPTH(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    Size size = src[0].size();
+    పూర్ణాంకం type = src[0].type(), లోతు = CV_MAT_లోతు(type),
+            అడ్డువరుసలు_చొప్పున_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    కొలత size = src[0].size();
 
-    for (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
+    కొరకు (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
     {
-        int itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_DEPTH(itype),
+        పూర్ణాంకం itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_లోతు(itype),
                 esz1 = CV_ELEM_SIZE1(idepth);
-        if (src[i].dims > 2)
-            return false;
+        ఒకవేళ (src[i].dims > 2)
+            తిరిగి అబద్ధం;
 
-        CV_Assert(size == src[i].size() && depth == idepth);
+        CV_Assert(size == src[i].size() && లోతు == idepth);
 
-        for (int cn = 0; cn < icn; ++cn)
+        కొరకు (పూర్ణాంకం cn = 0; cn < icn; ++cn)
         {
             UMat tsrc = src[i];
             tsrc.offset += cn * esz1;
             ksrc.push_back(tsrc);
         }
     }
-    int dcn = (int)ksrc.size();
+    పూర్ణాంకం dcn = (పూర్ణాంకం)ksrc.size();
 
     String srcargs, processelem, cndecl, indexdecl;
-    for (int i = 0; i < dcn; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < dcn; ++i)
     {
         srcargs += format("DECLARE_SRC_PARAM(%d)", i);
         processelem += format("PROCESS_ELEM(%d)", i);
@@ -245,39 +245,39 @@ static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
         cndecl += format(" -D scn%d=%d", i, ksrc[i].channels());
     }
 
-    ocl::Kernel k("merge", ocl::core::split_merge_oclsrc,
+    ocl::Kernel k("merge", ocl::core::విభజించు_విలీనం_oclsrc,
                   format("-D OP_MERGE -D cn=%d -D T=%s -D DECLARE_SRC_PARAMS_N=%s"
                          " -D DECLARE_INDEX_N=%s -D PROCESS_ELEMS_N=%s%s",
-                         dcn, ocl::memopTypeToStr(depth), srcargs.c_str(),
+                         dcn, ocl::memop_Type_గమ్యం_Str(లోతు), srcargs.c_str(),
                          indexdecl.c_str(), processelem.c_str(), cndecl.c_str()));
-    if (k.empty())
-        return false;
+    ఒకవేళ (k.empty())
+        తిరిగి అబద్ధం;
 
-    _dst.create(size, CV_MAKE_TYPE(depth, dcn));
+    _dst.create(size, CV_MAKE_TYPE(లోతు, dcn));
     UMat dst = _dst.getUMat();
 
-    int argidx = 0;
-    for (int i = 0; i < dcn; ++i)
-        argidx = k.set(argidx, ocl::KernelArg::ReadOnlyNoSize(ksrc[i]));
-    argidx = k.set(argidx, ocl::KernelArg::WriteOnly(dst));
-    k.set(argidx, rowsPerWI);
+    పూర్ణాంకం argidx = 0;
+    కొరకు (పూర్ణాంకం i = 0; i < dcn; ++i)
+        argidx = k.సమితి(argidx, ocl::KernelArg::Read_Only_No_కొలత(ksrc[i]));
+    argidx = k.సమితి(argidx, ocl::KernelArg::WriteOnly(dst));
+    k.సమితి(argidx, అడ్డువరుసలు_చొప్పున_WI);
 
-    size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.నిలువుల_సంఖ్య, ((size_t)dst.అడ్డువరుసలు + అడ్డువరుసలు_చొప్పున_WI - 1) / అడ్డువరుసలు_చొప్పున_WI };
+    తిరిగి k.నిరంతరం(2, globalsize, ఖాళీ, అబద్ధం);
 }
 
-#endif
+#అయితే_ముగింపు
 
-void merge(InputArrayOfArrays _mv, OutputArray _dst)
+శూన్య విలీనం(ఆదానం_Array_యొక్క_Arrays _mv, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_OCL_RUN(_mv.isUMatVector() && _dst.isUMat(),
-               ocl_merge(_mv, _dst))
+    CV_OCL_నిరంతరం(_mv.is_UMat_సదిశ() && _dst.isUMat(),
+               ocl_విలీనం(_mv, _dst))
 
     std::vector<Mat> mv;
-    _mv.getMatVector(mv);
-    merge(!mv.empty() ? &mv[0] : 0, mv.size(), _dst);
+    _mv.get_Mat_సదిశ(mv);
+    విలీనం(!mv.empty() ? &mv[0] : 0, mv.size(), _dst);
 }
 
 } // namespace

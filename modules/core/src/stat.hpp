@@ -3,41 +3,41 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#ifndef SRC_STAT_HPP
-#define SRC_STAT_HPP
+#నిర్వచితం_కాకపోతే SRC_STAT_HPP
+#నిర్వచించు SRC_STAT_HPP
 
-#include "opencv2/core/mat.hpp"
+#అన్తర్భావ "opencv2/core/mat.hpp"
 
-namespace cv {
+నామాకాశ cv {
 
-#ifdef HAVE_OPENCL
+#నిర్వచితమైతే HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
-                     InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+గణన { OCL_OP_కూడిక = 0, OCL_OP_కూడిక_ABS =  1, OCL_OP_కూడిక_SQR = 2 };
+తార్కిక ocl_కూడిక( ఆదానం_Array _src, Scalar & res, పూర్ణాంకం కూడిక_op, ఆదానం_Array ముసుగు_2 = noArray(),
+                     ఆదానం_Array _src2 = noArray(), తార్కిక calc2 = అబద్ధం, స్థిరరాశి Scalar & res2 = Scalar() );
+తార్కిక ocl_minMaxIdx( ఆదానం_Array _src, ద్విగుణ* minVal, ద్విగుణ* maxVal, పూర్ణాంకం* minLoc, పూర్ణాంకం* maxLoc, ఆదానం_Array ముసుగు_2,
+                           పూర్ణాంకం ddepth = -1, తార్కిక abs_విలువలు = అబద్ధం, ఆదానం_Array _src2 = noArray(), ద్విగుణ * maxVal2 = ఖాళీ);
 
-template <typename T> Scalar ocl_part_sum(Mat m)
+మూస <రకం_పేరు T> Scalar ocl_part_కూడిక(Mat m)
 {
-    CV_Assert(m.rows == 1);
+    CV_Assert(m.అడ్డువరుసలు == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
-    const T * const ptr = m.ptr<T>(0);
+    పూర్ణాంకం cn = m.channels();
+    స్థిరరాశి T * స్థిరరాశి ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    కొరకు (పూర్ణాంకం x = 0, w = m.నిలువుల_సంఖ్య * cn; x < w; )
+        కొరకు (పూర్ణాంకం c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    తిరిగి s;
 }
 
-#endif
+#అయితే_ముగింపు
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+రకనిర్వచనం పూర్ణాంకం (*కూడిక_Func)(స్థిరరాశి uchar*, స్థిరరాశి uchar* ముసుగు, uchar*, పూర్ణాంకం, పూర్ణాంకం);
+కూడిక_Func get_కూడిక_Func(పూర్ణాంకం లోతు);
 
 }
 
-#endif // SRC_STAT_HPP
+#అయితే_ముగింపు // SRC_STAT_HPP

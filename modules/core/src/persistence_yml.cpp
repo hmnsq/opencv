@@ -2,98 +2,98 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "persistence.hpp"
 
-enum
+గణన
 {
     CV_YML_INDENT = 3,
     CV_YML_INDENT_FLOW = 1
 };
 
-namespace cv
+నామాకాశ cv
 {
 
-class YAMLEmitter : public FileStorageEmitter
+తరగతి YAMLEmitter : బహిరంగ FileStorageEmitter
 {
-public:
+బహిరంగ:
     YAMLEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
-    virtual ~YAMLEmitter() {}
+    మాయా ~YAMLEmitter() {}
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
-                                 int struct_flags, const char* type_name=0)
+    FStruct_దత్తాంశం ప్రారంభం_Write_Struct(స్థిరరాశి FStruct_దత్తాంశం& మాతృ, స్థిరరాశి అక్షరం* కీలకం,
+                                 పూర్ణాంకం struct_flags, స్థిరరాశి అక్షరం* type_name=0)
     {
-        char buf[CV_FS_MAX_LEN + 1024];
-        const char* data = 0;
+        అక్షరం buf[CV_FS_MAX_LEN + 1024];
+        స్థిరరాశి అక్షరం* దత్తాంశం = 0;
 
-        if ( type_name && *type_name == '\0' )
+        ఒకవేళ ( type_name && *type_name == '\0' )
             type_name = 0;
 
-        struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        struct_flags = (struct_flags & (File_కణుపు::TYPE_ముసుగు|File_కణుపు::FLOW)) | File_కణుపు::ఖాళీలు_2;
+        ఒకవేళ( !File_కణుపు::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        ఒకవేళ (type_name && memcmp(type_name, "binary", 6) == 0)
         {
             /* reset struct flag. in order not to print ']' */
-            struct_flags = FileNode::SEQ;
-            snprintf(buf, sizeof(buf), "!!binary |");
-            data = buf;
+            struct_flags = File_కణుపు::SEQ;
+            snprintf(buf, పరిమాణం(buf), "!!binary |");
+            దత్తాంశం = buf;
         }
-        else if( FileNode::isFlow(struct_flags))
+        లేకపోతే ఒకవేళ( File_కణుపు::isFlow(struct_flags))
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
-            struct_flags |= FileNode::FLOW;
+            అక్షరం c = File_కణుపు::isMap(struct_flags) ? '{' : '[';
+            struct_flags |= File_కణుపు::FLOW;
 
-            if( type_name )
-                snprintf( buf, sizeof(buf), "!!%s %c", type_name, c );
-            else
+            ఒకవేళ( type_name )
+                snprintf( buf, పరిమాణం(buf), "!!%s %c", type_name, c );
+            లేకపోతే
             {
                 buf[0] = c;
                 buf[1] = '\0';
             }
-            data = buf;
+            దత్తాంశం = buf;
         }
-        else if( type_name )
+        లేకపోతే ఒకవేళ( type_name )
         {
-            snprintf( buf, sizeof(buf), "!!%s", type_name );
-            data = buf;
+            snprintf( buf, పరిమాణం(buf), "!!%s", type_name );
+            దత్తాంశం = buf;
         }
 
-        writeScalar( key, data );
+        writeScalar( కీలకం, దత్తాంశం );
 
-        FStructData fsd;
-        fsd.indent = parent.indent;
+        FStruct_దత్తాంశం fsd;
+        fsd.indent = మాతృ.indent;
         fsd.flags = struct_flags;
 
-        if( !FileNode::isFlow(parent.flags) )
-            fsd.indent += CV_YML_INDENT + FileNode::isFlow(struct_flags);
+        ఒకవేళ( !File_కణుపు::isFlow(మాతృ.flags) )
+            fsd.indent += CV_YML_INDENT + File_కణుపు::isFlow(struct_flags);
 
-        return fsd;
+        తిరిగి fsd;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    శూన్య చివర_Write_Struct(స్థిరరాశి FStruct_దత్తాంశం& current_struct)
     {
-        char* ptr;
+        అక్షరం* ptr;
 
-        int struct_flags = current_struct.flags;
+        పూర్ణాంకం struct_flags = current_struct.flags;
 
-        if( FileNode::isFlow(struct_flags) )
+        ఒకవేళ( File_కణుపు::isFlow(struct_flags) )
         {
-            ptr = fs->bufferPtr();
-            if( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
+            ptr = fs->బఫరు_Ptr();
+            ఒకవేళ( ptr > fs->బఫరు_ప్రారంభం() + current_struct.indent && !File_కణుపు::is_ఖాళీలు_Collection(struct_flags) )
                 *ptr++ = ' ';
-            *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
-            fs->setBufferPtr(ptr);
+            *ptr++ = File_కణుపు::isMap(struct_flags) ? '}' : ']';
+            fs->సమితి_బఫరు_Ptr(ptr);
         }
-        else if( FileNode::isEmptyCollection(struct_flags) )
+        లేకపోతే ఒకవేళ( File_కణుపు::is_ఖాళీలు_Collection(struct_flags) )
         {
             ptr = fs->flush();
-            memcpy( ptr, FileNode::isMap(struct_flags) ? "{}" : "[]", 2 );
-            fs->setBufferPtr(ptr + 2);
+            జ్ఞాపకం_నకలు( ptr, File_కణుపు::isMap(struct_flags) ? "{}" : "[]", 2 );
+            fs->సమితి_బఫరు_Ptr(ptr + 2);
         }
         /*
         if( !FileNode::isFlow(parent_flags) )
@@ -101,437 +101,437 @@ public:
         CV_Assert( fs->struct_indent >= 0 );*/
     }
 
-    void write(const char* key, int value)
+    శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, పూర్ణాంకం value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10 ));
+        అక్షరం buf[128];
+        writeScalar( కీలకం, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, int64_t value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10, true ));
+        అక్షరం buf[128];
+        writeScalar( కీలకం, fs::itoa( value, buf, 10, నిజం ));
     }
 
-    void write( const char* key, double value )
+    శూన్య లిఖ( స్థిరరాశి అక్షరం* కీలకం, ద్విగుణ value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ));
+        అక్షరం buf[128];
+        writeScalar( కీలకం, fs::double_గమ్యం_String( buf, పరిమాణం(buf), value, అబద్ధం ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, స్థిరరాశి అక్షరం* str, తార్కిక quote)
     {
-        char buf[CV_FS_MAX_LEN*4+16];
-        char* data = (char*)str;
-        int i, len;
+        అక్షరం buf[CV_FS_MAX_LEN*4+16];
+        అక్షరం* దత్తాంశం = (అక్షరం*)str;
+        పూర్ణాంకం i, len;
 
-        if( !str )
+        ఒకవేళ( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (పూర్ణాంకం)అక్షరశ్రేణి_పొడవు(str);
+        ఒకవేళ( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        ఒకవేళ( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = quote || len == 0 || str[0] == ' ';
-            data = buf;
-            *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            పూర్ణాంకం need_quote = quote || len == 0 || str[0] == ' ';
+            దత్తాంశం = buf;
+            *దత్తాంశం++ = '\"';
+            కొరకు( i = 0; i < len; i++ )
             {
-                char c = str[i];
+                అక్షరం c = str[i];
 
-                if( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
+                ఒకవేళ( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
                    c != '(' && c != ')' && c != '/' && c != '+' && c != ';' )
                     need_quote = 1;
 
-                if( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
+                ఒకవేళ( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
                 {
-                    *data++ = '\\';
-                    if( cv_isprint(c) )
-                        *data++ = c;
-                    else if( c == '\n' )
-                        *data++ = 'n';
-                    else if( c == '\r' )
-                        *data++ = 'r';
-                    else if( c == '\t' )
-                        *data++ = 't';
-                    else
+                    *దత్తాంశం++ = '\\';
+                    ఒకవేళ( cv_isprint(c) )
+                        *దత్తాంశం++ = c;
+                    లేకపోతే ఒకవేళ( c == '\n' )
+                        *దత్తాంశం++ = 'n';
+                    లేకపోతే ఒకవేళ( c == '\r' )
+                        *దత్తాంశం++ = 'r';
+                    లేకపోతే ఒకవేళ( c == '\t' )
+                        *దత్తాంశం++ = 't';
+                    లేకపోతే
                     {
-                        snprintf( data, sizeof(buf) - (data - buf), "x%02x", c );
-                        data += 3;
+                        snprintf( దత్తాంశం, పరిమాణం(buf) - (దత్తాంశం - buf), "x%02x", c );
+                        దత్తాంశం += 3;
                     }
                 }
-                else
-                    *data++ = c;
+                లేకపోతే
+                    *దత్తాంశం++ = c;
             }
-            if( !need_quote && (cv_isdigit(str[0]) ||
+            ఒకవేళ( !need_quote && (cv_isdigit(str[0]) ||
                                 str[0] == '+' || str[0] == '-' || str[0] == '.' ))
                 need_quote = 1;
 
-            if( need_quote )
-                *data++ = '\"';
-            *data++ = '\0';
-            data = buf + !need_quote;
+            ఒకవేళ( need_quote )
+                *దత్తాంశం++ = '\"';
+            *దత్తాంశం++ = '\0';
+            దత్తాంశం = buf + !need_quote;
         }
 
-        writeScalar( key, data);
+        writeScalar( కీలకం, దత్తాంశం);
     }
 
-    void writeScalar(const char* key, const char* data)
+    శూన్య writeScalar(స్థిరరాశి అక్షరం* కీలకం, స్థిరరాశి అక్షరం* దత్తాంశం)
     {
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(అబద్ధం);
+        ఒకవేళ ( fs->get_state_యొక్క_writing_base64() == FileStorage_API::Uncertain )
         {
-            fs->switch_to_Base64_state( FileStorage_API::NotUse );
+            fs->switch_గమ్యం_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        లేకపోతే ఒకవేళ ( fs->get_state_యొక్క_writing_base64() == FileStorage_API::లోపల_Use )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
-        int i, keylen = 0;
-        int datalen = 0;
-        char* ptr;
+        పూర్ణాంకం i, keylen = 0;
+        పూర్ణాంకం datalen = 0;
+        అక్షరం* ptr;
 
-        FStructData& current_struct = fs->getCurrentStruct();
+        FStruct_దత్తాంశం& current_struct = fs->getCurrentStruct();
 
-        int struct_flags = current_struct.flags;
+        పూర్ణాంకం struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
-            key = 0;
+        ఒకవేళ( కీలకం && కీలకం[0] == '\0' )
+            కీలకం = 0;
 
-        if( FileNode::isCollection(struct_flags) )
+        ఒకవేళ( File_కణుపు::isCollection(struct_flags) )
         {
-            if( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            ఒకవేళ( (File_కణుపు::isMap(struct_flags) ^ (కీలకం != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
         }
-        else
+        లేకపోతే
         {
-            fs->setNonEmpty();
-            struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
+            fs->సమితి_Non_ఖాళీలు();
+            struct_flags = File_కణుపు::ఖాళీలు_2 | (కీలకం ? File_కణుపు::MAP : File_కణుపు::SEQ);
         }
 
-        if( key )
+        ఒకవేళ( కీలకం )
         {
-            keylen = (int)strlen(key);
-            if( keylen == 0 )
+            keylen = (పూర్ణాంకం)అక్షరశ్రేణి_పొడవు(కీలకం);
+            ఒకవేళ( keylen == 0 )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
 
-            if( keylen > CV_FS_MAX_LEN )
+            ఒకవేళ( keylen > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
-        if( data )
-            datalen = (int)strlen(data);
+        ఒకవేళ( దత్తాంశం )
+            datalen = (పూర్ణాంకం)అక్షరశ్రేణి_పొడవు(దత్తాంశం);
 
-        if( FileNode::isFlow(struct_flags) )
+        ఒకవేళ( File_కణుపు::isFlow(struct_flags) )
         {
-            ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            ptr = fs->బఫరు_Ptr();
+            ఒకవేళ( !File_కణుపు::is_ఖాళీలు_Collection(struct_flags) )
                 *ptr++ = ',';
-            int new_offset = (int)(ptr - fs->bufferStart()) + keylen + datalen;
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            పూర్ణాంకం new_స్థానభ్రంశం = (పూర్ణాంకం)(ptr - fs->బఫరు_ప్రారంభం()) + keylen + datalen;
+            ఒకవేళ( new_స్థానభ్రంశం > fs->wrapMargin() && new_స్థానభ్రంశం - current_struct.indent > 10 )
             {
-                fs->setBufferPtr(ptr);
+                fs->సమితి_బఫరు_Ptr(ptr);
                 ptr = fs->flush();
             }
-            else
+            లేకపోతే
                 *ptr++ = ' ';
         }
-        else
+        లేకపోతే
         {
             ptr = fs->flush();
-            if( !FileNode::isMap(struct_flags) )
+            ఒకవేళ( !File_కణుపు::isMap(struct_flags) )
             {
                 *ptr++ = '-';
-                if( data )
+                ఒకవేళ( దత్తాంశం )
                     *ptr++ = ' ';
             }
         }
 
-        if( key )
+        ఒకవేళ( కీలకం )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            ఒకవేళ( !cv_isalpha(కీలకం[0]) && కీలకం[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
-            ptr = fs->resizeWriteBuffer( ptr, keylen );
+            ptr = fs->resize_Write_బఫరు( ptr, keylen );
 
-            for( i = 0; i < keylen; i++ )
+            కొరకు( i = 0; i < keylen; i++ )
             {
-                char c = key[i];
+                అక్షరం c = కీలకం[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                ఒకవేళ( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
             ptr += keylen;
             *ptr++ = ':';
-            if( !FileNode::isFlow(struct_flags) && data )
+            ఒకవేళ( !File_కణుపు::isFlow(struct_flags) && దత్తాంశం )
                 *ptr++ = ' ';
         }
 
-        if( data )
+        ఒకవేళ( దత్తాంశం )
         {
-            ptr = fs->resizeWriteBuffer( ptr, datalen );
-            memcpy( ptr, data, datalen );
+            ptr = fs->resize_Write_బఫరు( ptr, datalen );
+            జ్ఞాపకం_నకలు( ptr, దత్తాంశం, datalen );
             ptr += datalen;
         }
 
-        fs->setBufferPtr(ptr);
-        current_struct.flags &= ~FileNode::EMPTY;
+        fs->సమితి_బఫరు_Ptr(ptr);
+        current_struct.flags &= ~File_కణుపు::ఖాళీలు_2;
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    శూన్య writeComment(స్థిరరాశి అక్షరం* comment, తార్కిక eol_comment)
     {
-        if( !comment )
+        ఒకవేళ( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = (int)strlen(comment);
-        const char* eol = strchr(comment, '\n');
-        bool multiline = eol != 0;
-        char* ptr = fs->bufferPtr();
+        పూర్ణాంకం len = (పూర్ణాంకం)అక్షరశ్రేణి_పొడవు(comment);
+        స్థిరరాశి అక్షరం* eol = strchr(comment, '\n');
+        తార్కిక multiline = eol != 0;
+        అక్షరం* ptr = fs->బఫరు_Ptr();
 
-        if( !eol_comment || multiline ||
-            fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
+        ఒకవేళ( !eol_comment || multiline ||
+            fs->బఫరు_చివర_2() - ptr < len || ptr == fs->బఫరు_ప్రారంభం() )
             ptr = fs->flush();
-        else
+        లేకపోతే
             *ptr++ = ' ';
 
-        while( comment )
+        అయితే( comment )
         {
             *ptr++ = '#';
             *ptr++ = ' ';
-            if( eol )
+            ఒకవేళ( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
-                memcpy( ptr, comment, eol - comment + 1 );
-                fs->setBufferPtr(ptr + (eol - comment));
+                ptr = fs->resize_Write_బఫరు( ptr, (పూర్ణాంకం)(eol - comment) + 1 );
+                జ్ఞాపకం_నకలు( ptr, comment, eol - comment + 1 );
+                fs->సమితి_బఫరు_Ptr(ptr + (eol - comment));
                 comment = eol + 1;
                 eol = strchr( comment, '\n' );
             }
-            else
+            లేకపోతే
             {
-                len = (int)strlen(comment);
-                ptr = fs->resizeWriteBuffer( ptr, len );
-                memcpy( ptr, comment, len );
-                fs->setBufferPtr(ptr + len);
+                len = (పూర్ణాంకం)అక్షరశ్రేణి_పొడవు(comment);
+                ptr = fs->resize_Write_బఫరు( ptr, len );
+                జ్ఞాపకం_నకలు( ptr, comment, len );
+                fs->సమితి_బఫరు_Ptr(ptr + len);
                 comment = 0;
             }
             ptr = fs->flush();
         }
     }
 
-    void startNextStream()
+    శూన్య ప్రారంభం_తదుపరి_ప్రవాహం()
     {
         fs->puts( "...\n" );
         fs->puts( "---\n" );
     }
 
-protected:
+రక్షిత:
     FileStorage_API* fs;
 };
 
 
-class YAMLParser : public FileStorageParser
+తరగతి YAMLParser : బహిరంగ FileStorageParser
 {
-public:
+బహిరంగ:
     YAMLParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
-    virtual ~YAMLParser() {}
+    మాయా ~YAMLParser() {}
 
-    char* skipSpaces( char* ptr, int min_indent, int max_comment_indent )
+    అక్షరం* skipSpaces( అక్షరం* ptr, పూర్ణాంకం min_indent, పూర్ణాంకం max_comment_indent )
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        for(;;)
+        కొరకు(;;)
         {
-            while( *ptr == ' ' )
+            అయితే( *ptr == ' ' )
                 ptr++;
-            if( *ptr == '#' )
+            ఒకవేళ( *ptr == '#' )
             {
-                if( ptr - fs->bufferStart() > max_comment_indent )
-                    return ptr;
+                ఒకవేళ( ptr - fs->బఫరు_ప్రారంభం() > max_comment_indent )
+                    తిరిగి ptr;
                 *ptr = '\0';
             }
-            else if( cv_isprint(*ptr) )
+            లేకపోతే ఒకవేళ( cv_isprint(*ptr) )
             {
-                if( ptr - fs->bufferStart() < min_indent )
+                ఒకవేళ( ptr - fs->బఫరు_ప్రారంభం() < min_indent )
                     CV_PARSE_ERROR_CPP( "Incorrect indentation" );
-                break;
+                ఆపు;
             }
-            else if( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
+            లేకపోతే ఒకవేళ( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
             {
                 ptr = fs->gets();
-                if( !ptr )
+                ఒకవేళ( !ptr )
                 {
                     // emulate end of stream
-                    ptr = fs->bufferStart();
+                    ptr = fs->బఫరు_ప్రారంభం();
                     ptr[0] = ptr[1] = ptr[2] = '.';
                     ptr[3] = '\0';
-                    fs->setEof();
-                    break;
+                    fs->సమితి_Eof();
+                    ఆపు;
                 }
-                else
+                లేకపోతే
                 {
-                    int l = (int)strlen(ptr);
-                    if( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
+                    పూర్ణాంకం l = (పూర్ణాంకం)అక్షరశ్రేణి_పొడవు(ptr);
+                    ఒకవేళ( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
                         CV_PARSE_ERROR_CPP( "Too long string or a last string w/o newline" );
                 }
             }
-            else
+            లేకపోతే
                 CV_PARSE_ERROR_CPP( *ptr == '\t' ? "Tabs are prohibited in YAML!" : "Invalid character" );
         }
 
-        return ptr;
+        తిరిగి ptr;
     }
 
-    bool getBase64Row(char* ptr, int indent, char* &beg, char* &end)
+    తార్కిక get_Base64_అడ్డువరుస(అక్షరం* ptr, పూర్ణాంకం indent, అక్షరం* &beg, అక్షరం* &end)
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        beg = end = ptr = skipSpaces(ptr, 0, INT_MAX);
-        if (!ptr || !*ptr)
-            return false; // end of file
+        beg = end = ptr = skipSpaces(ptr, 0, గరిష్ఠ_పూర్ణాంకం);
+        ఒకవేళ (!ptr || !*ptr)
+            తిరిగి అబద్ధం; // end of file
 
-        if (ptr - fs->bufferStart() != indent)
-            return false; // end of base64 data
+        ఒకవేళ (ptr - fs->బఫరు_ప్రారంభం() != indent)
+            తిరిగి అబద్ధం; // end of base64 data
 
         /* find end */
-        while(cv_isprint(*ptr)) /* no check for base64 string */
+        అయితే(cv_isprint(*ptr)) /* no check for base64 string */
             ++ptr;
-        if (*ptr == '\0')
+        ఒకవేళ (*ptr == '\0')
             CV_PARSE_ERROR_CPP("Unexpected end of line");
 
         end = ptr;
-        return true;
+        తిరిగి నిజం;
     }
 
 
-    char* parseKey( char* ptr, FileNode& map_node, FileNode& value_placeholder )
+    అక్షరం* parse_కీలకం( అక్షరం* ptr, File_కణుపు& map_కణుపు, File_కణుపు& విలువ_placeholder )
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        char c;
-        char *endptr = ptr - 1, *saveptr;
+        అక్షరం c;
+        అక్షరం *endptr = ptr - 1, *saveptr;
 
-        if( *ptr == '-' )
+        ఒకవేళ( *ptr == '-' )
             CV_PARSE_ERROR_CPP( "Key may not start with \'-\'" );
 
-        do c = *++endptr;
-        while( cv_isprint(c) && c != ':' );
+        చేయి c = *++endptr;
+        అయితే( cv_isprint(c) && c != ':' );
 
-        if( c != ':' )
+        ఒకవేళ( c != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\'" );
 
         saveptr = endptr + 1;
-        if( endptr == ptr )
+        ఒకవేళ( endptr == ptr )
             CV_PARSE_ERROR_CPP( "An empty key" );
 
-        do c = *--endptr;
-        while( c == ' ' );
+        చేయి c = *--endptr;
+        అయితే( c == ' ' );
 
         ++endptr;
 
-        value_placeholder = fs->addNode(map_node, std::string(ptr, endptr - ptr), FileNode::NONE);
+        విలువ_placeholder = fs->కూడు_కణుపు(map_కణుపు, std::string(ptr, endptr - ptr), File_కణుపు::NONE);
         ptr = saveptr;
 
-        return ptr;
+        తిరిగి ptr;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int min_indent, bool is_parent_flow, int depth = 0 )
+    అక్షరం* parse_విలువ( అక్షరం* ptr, File_కణుపు& కణుపు, పూర్ణాంకం min_indent, తార్కిక is_మాతృ_flow, పూర్ణాంకం లోతు = 0 )
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        ఒకవేళ( లోతు > CV_PERSISTENCE_MAX_లోతు )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        char* endptr = 0;
-        char c = ptr[0], d = ptr[1];
-        int value_type = FileNode::NONE;
-        int len;
-        bool is_binary_string = false;
-        bool is_user = false;
+        అక్షరం* endptr = 0;
+        అక్షరం c = ptr[0], d = ptr[1];
+        పూర్ణాంకం value_type = File_కణుపు::NONE;
+        పూర్ణాంకం len;
+        తార్కిక is_ద్విమాన_string = అబద్ధం;
+        తార్కిక is_user = అబద్ధం;
 
-        if( c == '!' ) // handle explicit type specification
+        ఒకవేళ( c == '!' ) // handle explicit type specification
         {
-            if( d == '!' || d == '^' )
+            ఒకవేళ( d == '!' || d == '^' )
             {
                 ptr++;
-                is_user = true;
+                is_user = నిజం;
                 //value_type |= FileNode::USER;
             }
-            if ( d == '<') //support of full type heading from YAML 1.2
+            ఒకవేళ ( d == '<') //support of full type heading from YAML 1.2
             {
-                const char* yamlTypeHeading = "<tag:yaml.org,2002:";
-                const size_t headingLength = strlen(yamlTypeHeading);
+                స్థిరరాశి అక్షరం* yamlTypeHeading = "<tag:yaml.org,2002:";
+                స్థిరరాశి size_t heading_నిడివి = అక్షరశ్రేణి_పొడవు(yamlTypeHeading);
 
-                char* typeEndPtr = ++ptr;
+                అక్షరం* type_చివర_Ptr = ++ptr;
 
-                do d = *++typeEndPtr;
-                while( cv_isprint(d) && d != ' ' && d != '>' );
+                చేయి d = *++type_చివర_Ptr;
+                అయితే( cv_isprint(d) && d != ' ' && d != '>' );
 
-                if ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
+                ఒకవేళ ( d == '>' && (size_t)(type_చివర_Ptr - ptr) > heading_నిడివి )
                 {
-                    if ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
+                    ఒకవేళ ( memcmp(ptr, yamlTypeHeading, heading_నిడివి) == 0 )
                     {
-                        *typeEndPtr = ' ';
-                        ptr += headingLength - 1;
-                        is_user = true;
+                        *type_చివర_Ptr = ' ';
+                        ptr += heading_నిడివి - 1;
+                        is_user = నిజం;
                         //value_type |= FileNode::USER;
                     }
                 }
             }
 
             endptr = ptr++;
-            do d = *++endptr;
-            while( cv_isprint(d) && d != ' ' );
-            len = (int)(endptr - ptr);
-            if( len == 0 )
+            చేయి d = *++endptr;
+            అయితే( cv_isprint(d) && d != ' ' );
+            len = (పూర్ణాంకం)(endptr - ptr);
+            ఒకవేళ( len == 0 )
                 CV_PARSE_ERROR_CPP( "Empty type name" );
             d = *endptr;
             *endptr = '\0';
 
-            if( len == 3 && !is_user )
+            ఒకవేళ( len == 3 && !is_user )
             {
-                if( memcmp( ptr, "str", 3 ) == 0 )
-                    value_type = FileNode::STRING;
-                else if( memcmp( ptr, "int", 3 ) == 0 )
-                    value_type = FileNode::INT;
-                else if( memcmp( ptr, "seq", 3 ) == 0 )
-                    value_type = FileNode::SEQ;
-                else if( memcmp( ptr, "map", 3 ) == 0 )
-                    value_type = FileNode::MAP;
+                ఒకవేళ( memcmp( ptr, "str", 3 ) == 0 )
+                    value_type = File_కణుపు::STRING;
+                లేకపోతే ఒకవేళ( memcmp( ptr, "int", 3 ) == 0 )
+                    value_type = File_కణుపు::INT;
+                లేకపోతే ఒకవేళ( memcmp( ptr, "seq", 3 ) == 0 )
+                    value_type = File_కణుపు::SEQ;
+                లేకపోతే ఒకవేళ( memcmp( ptr, "map", 3 ) == 0 )
+                    value_type = File_కణుపు::MAP;
             }
-            else if( len == 5 && !is_user )
+            లేకపోతే ఒకవేళ( len == 5 && !is_user )
             {
-                if( memcmp( ptr, "float", 5 ) == 0 )
-                    value_type = FileNode::REAL;
+                ఒకవేళ( memcmp( ptr, "float", 5 ) == 0 )
+                    value_type = File_కణుపు::REAL;
             }
-            else if (len == 6 && is_user)
+            లేకపోతే ఒకవేళ (len == 6 && is_user)
             {
-                if( memcmp( ptr, "binary", 6 ) == 0 ) {
-                    value_type = FileNode::SEQ;
-                    is_binary_string = true;
+                ఒకవేళ( memcmp( ptr, "binary", 6 ) == 0 ) {
+                    value_type = File_కణుపు::SEQ;
+                    is_ద్విమాన_string = నిజం;
 
                     /* for ignore '|' */
 
                     /**** operation with endptr ****/
                     *endptr = d;
 
-                    do {
+                    చేయి {
                         d = *++endptr;
-                        if (d == '|')
-                            break;
-                    } while (d == ' ');
+                        ఒకవేళ (d == '|')
+                            ఆపు;
+                    } అయితే (d == ' ');
 
                     d = *++endptr;
                     *endptr = '\0';
@@ -539,364 +539,364 @@ public:
             }
 
             *endptr = d;
-            ptr = skipSpaces( endptr, min_indent, INT_MAX );
-            if (!ptr)
+            ptr = skipSpaces( endptr, min_indent, గరిష్ఠ_పూర్ణాంకం );
+            ఒకవేళ (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
 
             c = *ptr;
 
-            if( !is_user )
+            ఒకవేళ( !is_user )
             {
-                if (value_type == FileNode::STRING && c != '\'' && c != '\"')
-                    goto force_string;
-                if( value_type == FileNode::INT )
-                    goto force_int;
-                if( value_type == FileNode::REAL )
-                    goto force_real;
+                ఒకవేళ (value_type == File_కణుపు::STRING && c != '\'' && c != '\"')
+                    వెళ్ళు force_string;
+                ఒకవేళ( value_type == File_కణుపు::INT )
+                    వెళ్ళు force_int;
+                ఒకవేళ( value_type == File_కణుపు::REAL )
+                    వెళ్ళు force_real;
             }
         }
 
-        if (is_binary_string)
+        ఒకవేళ (is_ద్విమాన_string)
         {
-            int indent = static_cast<int>(ptr - fs->bufferStart());
-            ptr = fs->parseBase64(ptr, indent, node);
+            పూర్ణాంకం indent = static_cast<పూర్ణాంకం>(ptr - fs->బఫరు_ప్రారంభం());
+            ptr = fs->parseBase64(ptr, indent, కణుపు);
         }
-        else if( cv_isdigit(c) ||
+        లేకపోతే ఒకవేళ( cv_isdigit(c) ||
                 ((c == '-' || c == '+') && (cv_isdigit(d) || d == '.')) ||
                 (c == '.' && cv_isalnum(d))) // a number
         {
             endptr = ptr + (c == '-' || c == '+');
-            while( cv_isdigit(*endptr) )
+            అయితే( cv_isdigit(*endptr) )
                 endptr++;
-            if( *endptr == '.' || *endptr == 'e' )
+            ఒకవేళ( *endptr == '.' || *endptr == 'e' )
             {
             force_real:
-                double fval = fs->strtod( ptr, &endptr );
-                node.setValue(FileNode::REAL, &fval);
+                ద్విగుణ fval = fs->strtod( ptr, &endptr );
+                కణుపు.సమితి_విలువ(File_కణుపు::REAL, &fval);
             }
-            else
+            లేకపోతే
             {
             force_int:
                 int64_t ival = strtoll( ptr, &endptr, 0 );
-                node.setValue(FileNode::INT, &ival);
+                కణుపు.సమితి_విలువ(File_కణుపు::INT, &ival);
             }
 
-            if( !endptr || endptr == ptr )
+            ఒకవేళ( !endptr || endptr == ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
 
             ptr = endptr;
-            CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+            CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP();
         }
-        else if( c == '\'' || c == '\"' ) // an explicit string
+        లేకపోతే ఒకవేళ( c == '\'' || c == '\"' ) // an explicit string
         {
-            if( c == '\'' )
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            ఒకవేళ( c == '\'' )
+                కొరకు( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
+                    ఒకవేళ( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\'' )
+                    లేకపోతే ఒకవేళ( c == '\'' )
                     {
                         c = *++ptr;
-                        if( c != '\'' )
-                            break;
+                        ఒకవేళ( c != '\'' )
+                            ఆపు;
                         buf[len++] = c;
                     }
-                    else
+                    లేకపోతే
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
-            else
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            లేకపోతే
+                కొరకు( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
+                    ఒకవేళ( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\"' )
+                    లేకపోతే ఒకవేళ( c == '\"' )
                     {
                         ++ptr;
-                        break;
+                        ఆపు;
                     }
-                    else if( c == '\\' )
+                    లేకపోతే ఒకవేళ( c == '\\' )
                     {
                         d = *++ptr;
-                        if( d == '\'' )
+                        ఒకవేళ( d == '\'' )
                             buf[len++] = d;
-                        else if( d == '\"' || d == '\\' || d == '\'' )
+                        లేకపోతే ఒకవేళ( d == '\"' || d == '\\' || d == '\'' )
                             buf[len++] = d;
-                        else if( d == 'n' )
+                        లేకపోతే ఒకవేళ( d == 'n' )
                             buf[len++] = '\n';
-                        else if( d == 'r' )
+                        లేకపోతే ఒకవేళ( d == 'r' )
                             buf[len++] = '\r';
-                        else if( d == 't' )
+                        లేకపోతే ఒకవేళ( d == 't' )
                             buf[len++] = '\t';
-                        else if( d == 'x' || (cv_isdigit(d) && d < '8') )
+                        లేకపోతే ఒకవేళ( d == 'x' || (cv_isdigit(d) && d < '8') )
                         {
-                            int val, is_hex = d == 'x';
+                            పూర్ణాంకం val, is_hex = d == 'x';
                             c = ptr[3];
                             ptr[3] = '\0';
-                            val = (int)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
+                            val = (పూర్ణాంకం)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
                             ptr[3] = c;
-                            if( endptr == ptr + is_hex )
+                            ఒకవేళ( endptr == ptr + is_hex )
                                 buf[len++] = 'x';
-                            else
+                            లేకపోతే
                             {
-                                buf[len++] = (char)val;
+                                buf[len++] = (అక్షరం)val;
                                 ptr = endptr;
                             }
                         }
                     }
-                    else
+                    లేకపోతే
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
 
-            if( len >= CV_FS_MAX_LEN )
+            ఒకవేళ( len >= CV_FS_MAX_LEN )
                 CV_PARSE_ERROR_CPP( "Too long string literal" );
 
-            node.setValue(FileNode::STRING, buf, len);
+            కణుపు.సమితి_విలువ(File_కణుపు::STRING, buf, len);
         }
-        else if( c == '[' || c == '{' ) // collection as a flow
+        లేకపోతే ఒకవేళ( c == '[' || c == '{' ) // collection as a flow
         {
-            int new_min_indent = min_indent + !is_parent_flow;
-            int struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            int nelems = 0;
+            పూర్ణాంకం new_min_indent = min_indent + !is_మాతృ_flow;
+            పూర్ణాంకం struct_type = c == '{' ? File_కణుపు::MAP : File_కణుపు::SEQ;
+            పూర్ణాంకం nelems = 0;
 
-            fs->convertToCollection(struct_type, node);
+            fs->convert_గమ్యం_Collection(struct_type, కణుపు);
             d = c == '[' ? ']' : '}';
 
-            for( ++ptr ;; nelems++ )
+            కొరకు( ++ptr ;; nelems++ )
             {
-                FileNode elem;
+                File_కణుపు elem;
 
-                ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
-                if (!ptr)
+                ptr = skipSpaces( ptr, new_min_indent, గరిష్ఠ_పూర్ణాంకం );
+                ఒకవేళ (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
-                if( *ptr == '}' || *ptr == ']' )
+                ఒకవేళ( *ptr == '}' || *ptr == ']' )
                 {
-                    if( *ptr != d )
+                    ఒకవేళ( *ptr != d )
                         CV_PARSE_ERROR_CPP( "The wrong closing bracket" );
                     ptr++;
-                    break;
+                    ఆపు;
                 }
 
-                if( nelems != 0 )
+                ఒకవేళ( nelems != 0 )
                 {
-                    if( *ptr != ',' )
+                    ఒకవేళ( *ptr != ',' )
                         CV_PARSE_ERROR_CPP( "Missing , between the elements" );
-                    ptr = skipSpaces( ptr + 1, new_min_indent, INT_MAX );
-                    if (!ptr)
+                    ptr = skipSpaces( ptr + 1, new_min_indent, గరిష్ఠ_పూర్ణాంకం );
+                    ఒకవేళ (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
-                if( struct_type == FileNode::MAP )
+                ఒకవేళ( struct_type == File_కణుపు::MAP )
                 {
-                    ptr = parseKey( ptr, node, elem );
-                    ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
+                    ptr = parse_కీలకం( ptr, కణుపు, elem );
+                    ptr = skipSpaces( ptr, new_min_indent, గరిష్ఠ_పూర్ణాంకం );
                 }
-                else
+                లేకపోతే
                 {
-                    if( *ptr == ']' )
-                        break;
-                    elem = fs->addNode(node, std::string(), FileNode::NONE);
+                    ఒకవేళ( *ptr == ']' )
+                        ఆపు;
+                    elem = fs->కూడు_కణుపు(కణుపు, std::string(), File_కణుపు::NONE);
                 }
-                ptr = parseValue( ptr, elem, new_min_indent, true, depth + 1 );
+                ptr = parse_విలువ( ptr, elem, new_min_indent, నిజం, లోతు + 1 );
             }
-            fs->finalizeCollection(node);
+            fs->finalizeCollection(కణుపు);
         }
-        else
+        లేకపోతే
         {
-            int indent, struct_type;
+            పూర్ణాంకం indent, struct_type;
 
-            if( is_parent_flow || c != '-' )
+            ఒకవేళ( is_మాతృ_flow || c != '-' )
             {
                 // implicit (one-line) string or nested block-style collection
-                if( !is_parent_flow )
+                ఒకవేళ( !is_మాతృ_flow )
                 {
-                    if( c == '?' )
+                    ఒకవేళ( c == '?' )
                         CV_PARSE_ERROR_CPP( "Complex keys are not supported" );
-                    if( c == '|' || c == '>' )
+                    ఒకవేళ( c == '|' || c == '>' )
                         CV_PARSE_ERROR_CPP( "Multi-line text literals are not supported" );
                 }
 
             force_string:
                 endptr = ptr - 1;
 
-                do c = *++endptr;
-                while( cv_isprint(c) &&
-                      (!is_parent_flow || (c != ',' && c != '}' && c != ']')) &&
-                      (is_parent_flow || c != ':' || value_type == FileNode::STRING));
+                చేయి c = *++endptr;
+                అయితే( cv_isprint(c) &&
+                      (!is_మాతృ_flow || (c != ',' && c != '}' && c != ']')) &&
+                      (is_మాతృ_flow || c != ':' || value_type == File_కణుపు::STRING));
 
-                if( endptr == ptr )
+                ఒకవేళ( endptr == ptr )
                     CV_PARSE_ERROR_CPP( "Invalid character" );
 
-                if( is_parent_flow || c != ':' )
+                ఒకవేళ( is_మాతృ_flow || c != ':' )
                 {
-                    char* str_end = endptr;
-                    do c = *--str_end;
-                    while( str_end > ptr && c == ' ' );
-                    str_end++;
-                    if ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
+                    అక్షరం* str_చివర = endptr;
+                    చేయి c = *--str_చివర;
+                    అయితే( str_చివర > ptr && c == ' ' );
+                    str_చివర++;
+                    ఒకవేళ ((fs->getFormat() & FileStorage::FORMAT_ముసుగు) != FileStorage::FORMAT_YAML_1_0)
                     {
-                        size_t llen = str_end - ptr;
-                        if (llen == 4 && memcmp(ptr, "true", 4) == 0) {
+                        size_t llen = str_చివర - ptr;
+                        ఒకవేళ (llen == 4 && memcmp(ptr, "true", 4) == 0) {
                             int64_t ival = 1;
-                            node.setValue(FileNode::INT, &ival);
+                            కణుపు.సమితి_విలువ(File_కణుపు::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            తిరిగి ptr;
                         }
-                        else if (llen == 5 && memcmp(ptr, "false", 5) == 0) {
+                        లేకపోతే ఒకవేళ (llen == 5 && memcmp(ptr, "false", 5) == 0) {
                             int64_t ival = 0;
-                            node.setValue(FileNode::INT, &ival);
+                            కణుపు.సమితి_విలువ(File_కణుపు::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            తిరిగి ptr;
                         }
-                        else if (llen == 4 && memcmp(ptr, "null", 4) == 0) {
+                        లేకపోతే ఒకవేళ (llen == 4 && memcmp(ptr, "null", 4) == 0) {
                             ptr = endptr;
-                            return ptr;
+                            తిరిగి ptr;
                         }
                     }
 
-                    node.setValue(FileNode::STRING, ptr, (int)(str_end - ptr));
+                    కణుపు.సమితి_విలువ(File_కణుపు::STRING, ptr, (పూర్ణాంకం)(str_చివర - ptr));
                     ptr = endptr;
-                    return ptr;
+                    తిరిగి ptr;
                 }
-                struct_type = FileNode::MAP;
+                struct_type = File_కణుపు::MAP;
             }
-            else
-                struct_type = FileNode::SEQ;
+            లేకపోతే
+                struct_type = File_కణుపు::SEQ;
 
-            fs->convertToCollection( struct_type, node );
-            indent = (int)(ptr - fs->bufferStart());
+            fs->convert_గమ్యం_Collection( struct_type, కణుపు );
+            indent = (పూర్ణాంకం)(ptr - fs->బఫరు_ప్రారంభం());
 
-            for(;;)
+            కొరకు(;;)
             {
-                FileNode elem;
+                File_కణుపు elem;
 
-                if( struct_type == FileNode::MAP )
+                ఒకవేళ( struct_type == File_కణుపు::MAP )
                 {
-                    ptr = parseKey( ptr, node, elem );
+                    ptr = parse_కీలకం( ptr, కణుపు, elem );
                 }
-                else
+                లేకపోతే
                 {
                     c = *ptr++;
-                    if( c != '-' )
+                    ఒకవేళ( c != '-' )
                         CV_PARSE_ERROR_CPP( "Block sequence elements must be preceded with \'-\'" );
 
-                    elem = fs->addNode(node, std::string(), FileNode::NONE);
+                    elem = fs->కూడు_కణుపు(కణుపు, std::string(), File_కణుపు::NONE);
                 }
-                ptr = skipSpaces( ptr, indent + 1, INT_MAX );
-                ptr = parseValue( ptr, elem, indent + 1, false, depth + 1 );
-                ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( ptr - fs->bufferStart() != indent )
+                ptr = skipSpaces( ptr, indent + 1, గరిష్ఠ_పూర్ణాంకం );
+                ptr = parse_విలువ( ptr, elem, indent + 1, అబద్ధం, లోతు + 1 );
+                ptr = skipSpaces( ptr, 0, గరిష్ఠ_పూర్ణాంకం );
+                ఒకవేళ( ptr - fs->బఫరు_ప్రారంభం() != indent )
                 {
-                    if( ptr - fs->bufferStart() < indent )
-                        break;
-                    else
+                    ఒకవేళ( ptr - fs->బఫరు_ప్రారంభం() < indent )
+                        ఆపు;
+                    లేకపోతే
                         CV_PARSE_ERROR_CPP( "Incorrect indentation" );
                 }
-                if( memcmp( ptr, "...", 3 ) == 0 )
-                    break;
+                ఒకవేళ( memcmp( ptr, "...", 3 ) == 0 )
+                    ఆపు;
             }
-            fs->finalizeCollection(node);
+            fs->finalizeCollection(కణుపు);
         }
 
-        return ptr;
+        తిరిగి ptr;
     }
 
-    bool parse( char* ptr )
+    తార్కిక parse( అక్షరం* ptr )
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        bool first = true;
-        bool ok = true;
-        FileNode root_collection(fs->getFS(), 0, 0);
+        తార్కిక first = నిజం;
+        తార్కిక ok = నిజం;
+        File_కణుపు మూలం_collection(fs->getFS(), 0, 0);
 
-        for(;;)
+        కొరకు(;;)
         {
             // 0. skip leading comments and directives  and ...
             // 1. reach the first item
-            for(;;)
+            కొరకు(;;)
             {
-                ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr || *ptr == '\0' )
+                ptr = skipSpaces( ptr, 0, గరిష్ఠ_పూర్ణాంకం );
+                ఒకవేళ( !ptr || *ptr == '\0' )
                 {
                     ok = !first;
-                    break;
+                    ఆపు;
                 }
 
-                if( *ptr == '%' )
+                ఒకవేళ( *ptr == '%' )
                 {
-                    if( memcmp( ptr, "%YAML", 5 ) == 0 &&
+                    ఒకవేళ( memcmp( ptr, "%YAML", 5 ) == 0 &&
                         memcmp( ptr, "%YAML:1.", 8 ) != 0 &&
                         memcmp( ptr, "%YAML 1.", 8 ) != 0)
                     {
-                        if ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
+                        ఒకవేళ ((fs->getFormat() & FileStorage::FORMAT_ముసుగు) == FileStorage::FORMAT_YAML_1_0)
                             CV_PARSE_ERROR_CPP( "Unsupported YAML version (it must be 1.x)" );
                     }
                     *ptr = '\0';
                 }
-                else if( *ptr == '-' )
+                లేకపోతే ఒకవేళ( *ptr == '-' )
                 {
-                    if( memcmp(ptr, "---", 3) == 0 )
+                    ఒకవేళ( memcmp(ptr, "---", 3) == 0 )
                     {
                         ptr += 3;
-                        break;
+                        ఆపు;
                     }
-                    else if( first )
-                        break;
+                    లేకపోతే ఒకవేళ( first )
+                        ఆపు;
                 }
-                else if( cv_isalnum(*ptr) || *ptr=='_')
+                లేకపోతే ఒకవేళ( cv_isalnum(*ptr) || *ptr=='_')
                 {
-                    if( !first )
+                    ఒకవేళ( !first )
                         CV_PARSE_ERROR_CPP( "The YAML streams must start with '---', except the first one" );
-                    break;
+                    ఆపు;
                 }
-                else if( fs->eof() )
-                    break;
-                else
+                లేకపోతే ఒకవేళ( fs->eof() )
+                    ఆపు;
+                లేకపోతే
                     CV_PARSE_ERROR_CPP( "Invalid or unsupported syntax" );
             }
 
-            if( ptr )
-                ptr = skipSpaces( ptr, 0, INT_MAX );
-            if( !ptr || !ptr[0] )
-                break;
-            if( memcmp( ptr, "...", 3 ) != 0 )
+            ఒకవేళ( ptr )
+                ptr = skipSpaces( ptr, 0, గరిష్ఠ_పూర్ణాంకం );
+            ఒకవేళ( !ptr || !ptr[0] )
+                ఆపు;
+            ఒకవేళ( memcmp( ptr, "...", 3 ) != 0 )
             {
                 // 2. parse the collection
-                FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::NONE);
+                File_కణుపు మూలం_కణుపు = fs->కూడు_కణుపు(మూలం_collection, std::string(), File_కణుపు::NONE);
 
-                ptr = parseValue( ptr, root_node, 0, false );
-                if( !root_node.isMap() && !root_node.isSeq() )
+                ptr = parse_విలువ( ptr, మూలం_కణుపు, 0, అబద్ధం );
+                ఒకవేళ( !మూలం_కణుపు.isMap() && !మూలం_కణుపు.isSeq() )
                     CV_PARSE_ERROR_CPP( "Only collections as YAML streams are supported by this parser" );
 
                 // 3. parse until the end of file or next collection
-                ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr )
-                    break;
+                ptr = skipSpaces( ptr, 0, గరిష్ఠ_పూర్ణాంకం );
+                ఒకవేళ( !ptr )
+                    ఆపు;
             }
 
-            if( fs->eof() )
-                break;
+            ఒకవేళ( fs->eof() )
+                ఆపు;
             ptr += 3;
-            first = false;
+            first = అబద్ధం;
         }
 
-        return ok;
+        తిరిగి ok;
     }
 
     FileStorage_API* fs;
-    char buf[CV_FS_MAX_LEN+1024];
+    అక్షరం buf[CV_FS_MAX_LEN+1024];
 };
 
 Ptr<FileStorageEmitter> createYAMLEmitter(FileStorage_API* fs)
 {
-    return makePtr<YAMLEmitter>(fs);
+    తిరిగి makePtr<YAMLEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createYAMLParser(FileStorage_API* fs)
 {
-    return makePtr<YAMLParser>(fs);
+    తిరిగి makePtr<YAMLParser>(fs);
 }
 
 }

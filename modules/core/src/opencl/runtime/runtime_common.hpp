@@ -39,19 +39,19 @@
 //
 //M*/
 
-#ifndef __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
-#define __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
+#నిర్వచితం_కాకపోతే __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
+#నిర్వచించు __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
 
-namespace cv { namespace ocl { namespace runtime {
+నామాకాశ cv { నామాకాశ ocl { నామాకాశ runtime {
 
-struct DynamicFnEntry
+నిర్మాణం Dynamic_Fn_నమోదు
 {
-    const char* fnName; // "clCreateContext"
-    void** ppFn; // &clCreateContext_pfn
+    స్థిరరాశి అక్షరం* fnName; // "clCreateContext"
+    శూన్య** ppFn; // &clCreateContext_pfn
 };
 
 } } } // namespace cv::ocl::runtime
 
-using namespace cv::ocl::runtime;
+ఉపయోగించి నామాకాశ cv::ocl::runtime;
 
-#endif // __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
+#అయితే_ముగింపు // __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__

@@ -2,54 +2,54 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
-#define OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
+#నిర్వచితం_కాకపోతే OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
+#నిర్వచించు OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <vector>
-#include <functional>
-#endif
+#ఒకవేళ 1 // if not already in precompiled headers
+#అన్తర్భావ <string>
+#అన్తర్భావ <vector>
+#అన్తర్భావ <functional>
+#అయితే_ముగింపు
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#అన్తర్భావ <opencv2/core/utils/logtag.hpp>
+#అన్తర్భావ "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+నామాకాశ cv {
+నామాకాశ utils {
+నామాకాశ logging {
 
-class LogTagConfigParser
+తరగతి Log_ట్యాగ్_Config_Parser
 {
-public:
-    LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
-    explicit LogTagConfigParser(const std::string& input);
-    ~LogTagConfigParser();
+బహిరంగ:
+    Log_ట్యాగ్_Config_Parser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
+    స్పష్టమైన Log_ట్యాగ్_Config_Parser(స్థిరరాశి std::string& ఆదానం_2);
+    ~Log_ట్యాగ్_Config_Parser();
 
-public:
-    bool parse(const std::string& input);
-    bool hasMalformed() const;
-    const LogTagConfig& getGlobalConfig() const;
-    const std::vector<LogTagConfig>& getFullNameConfigs() const;
-    const std::vector<LogTagConfig>& getFirstPartConfigs() const;
-    const std::vector<LogTagConfig>& getAnyPartConfigs() const;
-    const std::vector<std::string>& getMalformed() const;
+బహిరంగ:
+    తార్కిక parse(స్థిరరాశి std::string& ఆదానం_2);
+    తార్కిక hasMalformed() స్థిరరాశి;
+    స్థిరరాశి Log_ట్యాగ్_Config& getGlobalConfig() స్థిరరాశి;
+    స్థిరరాశి std::vector<Log_ట్యాగ్_Config>& get_నిండిన_Name_Configs() స్థిరరాశి;
+    స్థిరరాశి std::vector<Log_ట్యాగ్_Config>& get_మొదటి_Part_Configs() స్థిరరాశి;
+    స్థిరరాశి std::vector<Log_ట్యాగ్_Config>& getAnyPartConfigs() స్థిరరాశి;
+    స్థిరరాశి std::vector<std::string>& getMalformed() స్థిరరాశి;
 
-private:
-    void segmentTokens();
-    void parseNameAndLevel(const std::string& s);
-    void parseWildcard(const std::string& name, LogLevel level);
-    static std::pair<LogLevel, bool> parseLogLevel(const std::string& s);
-    static std::string toString(LogLevel level);
+అంతరంగ:
+    శూన్య segment_టోకెన్లు();
+    శూన్య parseNameAndLevel(స్థిరరాశి std::string& s);
+    శూన్య parseWildcard(స్థిరరాశి std::string& name, LogLevel level);
+    స్థిర std::pair<LogLevel, తార్కిక> parseLogLevel(స్థిరరాశి std::string& s);
+    స్థిర std::string గమ్యం_String(LogLevel level);
 
-private:
-    std::string m_input;
-    LogTagConfig m_parsedGlobal;
-    std::vector<LogTagConfig> m_parsedFullName;
-    std::vector<LogTagConfig> m_parsedFirstPart;
-    std::vector<LogTagConfig> m_parsedAnyPart;
+అంతరంగ:
+    std::string m_ఆదానం;
+    Log_ట్యాగ్_Config m_parsedGlobal;
+    std::vector<Log_ట్యాగ్_Config> m_parsed_నిండిన_Name;
+    std::vector<Log_ట్యాగ్_Config> m_parsed_మొదటి_Part;
+    std::vector<Log_ట్యాగ్_Config> m_parsedAnyPart;
     std::vector<std::string> m_malformed;
 };
 
 }}} //namespace
 
-#endif
+#అయితే_ముగింపు

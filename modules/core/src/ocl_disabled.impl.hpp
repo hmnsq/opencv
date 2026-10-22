@@ -2,238 +2,238 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "opencv2/core/ocl_genbase.hpp"
+#అన్తర్భావ "opencv2/core/ocl_genbase.hpp"
 
-#if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable : 4100)
-    #pragma warning(disable : 4702)
-#elif defined(__clang__)
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wunused-parameter"
-#elif defined(__GNUC__)
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
+#ఒకవేళ defined(_MSC_VER)
+    #సూచన warning(push)
+    #సూచన warning(disable : 4100)
+    #సూచన warning(disable : 4702)
+#లేదావేళ defined(__clang__)
+    #సూచన clang diagnostic push
+    #సూచన clang diagnostic ignored "-Wunused-parameter"
+#లేదావేళ defined(__GNUC__)
+    #సూచన GCC diagnostic push
+    #సూచన GCC diagnostic ignored "-Wunused-parameter"
+#అయితే_ముగింపు
 
-namespace cv { namespace ocl {
+నామాకాశ cv { నామాకాశ ocl {
 
-static
-CV_NORETURN void throw_no_ocl()
+స్థిర
+CV_NORETURN శూన్య throw_no_ocl()
 {
     CV_Error(Error::OpenCLApiCallError, "OpenCV build without OpenCL support");
 }
-#define OCL_NOT_AVAILABLE() throw_no_ocl();
+#నిర్వచించు OCL_NOT_అందుబాటు() throw_no_ocl();
 
-CV_EXPORTS_W bool haveOpenCL() { return false; }
-CV_EXPORTS_W bool useOpenCL() { return false; }
-CV_EXPORTS_W bool haveAmdBlas() { return false; }
-CV_EXPORTS_W bool haveAmdFft() { return false; }
-CV_EXPORTS_W void setUseOpenCL(bool flag) { /* nothing */ }
-CV_EXPORTS_W void finish() { /* nothing */ }
+CV_EXPORTS_W తార్కిక haveOpenCL() { తిరిగి అబద్ధం; }
+CV_EXPORTS_W తార్కిక useOpenCL() { తిరిగి అబద్ధం; }
+CV_EXPORTS_W తార్కిక haveAmdBlas() { తిరిగి అబద్ధం; }
+CV_EXPORTS_W తార్కిక haveAmdFft() { తిరిగి అబద్ధం; }
+CV_EXPORTS_W శూన్య సమితి_Use_Open_CL(తార్కిక flag) { /* nothing */ }
+CV_EXPORTS_W శూన్య ముగింపు_2() { /* nothing */ }
 
-CV_EXPORTS bool haveSVM() { return false; }
+CV_EXPORTS తార్కిక haveSVM() { తిరిగి అబద్ధం; }
 
-Device::Device() CV_NOEXCEPT : p(NULL) { }
-Device::Device(void* d) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Device::Device(const Device& d) : p(NULL) { }
-Device& Device::operator=(const Device& d) { return *this; }
-Device::Device(Device&&) CV_NOEXCEPT : p(NULL) { }
-Device& Device::operator=(Device&&) CV_NOEXCEPT { return *this; }
+Device::Device() CV_NOEXCEPT : p(ఖాళీ) { }
+Device::Device(శూన్య* d) : p(ఖాళీ) { OCL_NOT_అందుబాటు(); }
+Device::Device(స్థిరరాశి Device& d) : p(ఖాళీ) { }
+Device& Device::క్రియాకారకం=(స్థిరరాశి Device& d) { తిరిగి *ఇది; }
+Device::Device(Device&&) CV_NOEXCEPT : p(ఖాళీ) { }
+Device& Device::క్రియాకారకం=(Device&&) CV_NOEXCEPT { తిరిగి *ఇది; }
 Device::~Device() { }
 
-void Device::set(void* d) { OCL_NOT_AVAILABLE(); }
+శూన్య Device::సమితి(శూన్య* d) { OCL_NOT_అందుబాటు(); }
 
-String Device::name() const { OCL_NOT_AVAILABLE(); }
-String Device::extensions() const { OCL_NOT_AVAILABLE(); }
-bool Device::isExtensionSupported(const String& extensionName) const { OCL_NOT_AVAILABLE(); }
-String Device::version() const { OCL_NOT_AVAILABLE(); }
-String Device::vendorName() const { OCL_NOT_AVAILABLE(); }
-String Device::OpenCL_C_Version() const { OCL_NOT_AVAILABLE(); }
-String Device::OpenCLVersion() const { OCL_NOT_AVAILABLE(); }
-int Device::deviceVersionMajor() const { OCL_NOT_AVAILABLE(); }
-int Device::deviceVersionMinor() const { OCL_NOT_AVAILABLE(); }
-String Device::driverVersion() const { OCL_NOT_AVAILABLE(); }
-void* Device::ptr() const { /*OCL_NOT_AVAILABLE();*/ return NULL; }
+String Device::name() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+String Device::extensions() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+తార్కిక Device::isExtensionSupported(స్థిరరాశి String& extensionName) స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+String Device::సంస్కరణ() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+String Device::vendorName() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+String Device::Open_CL_C_సంస్కరణ() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+String Device::OpenCLVersion() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::device_సంస్కరణ_Major() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::device_సంస్కరణ_Minor() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+String Device::driver_సంస్కరణ() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+శూన్య* Device::ptr() స్థిరరాశి { /*OCL_NOT_AVAILABLE();*/ తిరిగి ఖాళీ; }
 
-int Device::type() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::type() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::addressBits() const { OCL_NOT_AVAILABLE(); }
-bool Device::available() const { OCL_NOT_AVAILABLE(); }
-bool Device::compilerAvailable() const { OCL_NOT_AVAILABLE(); }
-bool Device::linkerAvailable() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::చిరునామా_బిట్లు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+తార్కిక Device::అందుబాటు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+తార్కిక Device::compiler_అందుబాటు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+తార్కిక Device::linker_అందుబాటు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::doubleFPConfig() const { OCL_NOT_AVAILABLE(); }
-int Device::singleFPConfig() const { OCL_NOT_AVAILABLE(); }
-int Device::halfFPConfig() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::doubleFPConfig() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::singleFPConfig() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::halfFPConfig() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-bool Device::hasFP64() const { OCL_NOT_AVAILABLE(); }
-bool Device::hasFP16() const { OCL_NOT_AVAILABLE(); }
+తార్కిక Device::hasFP64() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+తార్కిక Device::hasFP16() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-bool Device::endianLittle() const { OCL_NOT_AVAILABLE(); }
-bool Device::errorCorrectionSupport() const { OCL_NOT_AVAILABLE(); }
+తార్కిక Device::endianLittle() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+తార్కిక Device::errorCorrectionSupport() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::executionCapabilities() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::executionCapabilities() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-size_t Device::globalMemCacheSize() const { OCL_NOT_AVAILABLE(); }
+size_t Device::global_Mem_Cache_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::globalMemCacheType() const { OCL_NOT_AVAILABLE(); }
-int Device::globalMemCacheLineSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::globalMemSize() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::globalMemCacheType() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::global_Mem_Cache_పంక్తి_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Device::global_Mem_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-size_t Device::localMemSize() const { OCL_NOT_AVAILABLE(); }
-int Device::localMemType() const { return NO_LOCAL_MEM; }
-bool Device::hostUnifiedMemory() const { OCL_NOT_AVAILABLE(); }
+size_t Device::local_Mem_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::localMemType() స్థిరరాశి { తిరిగి NO_LOCAL_MEM; }
+తార్కిక Device::host_Unified_జ్ఞాపకం_2() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-bool Device::imageSupport() const { OCL_NOT_AVAILABLE(); }
+తార్కిక Device::imageSupport() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-bool Device::imageFromBufferSupport() const { OCL_NOT_AVAILABLE(); }
-uint Device::imagePitchAlignment() const { OCL_NOT_AVAILABLE(); }
-uint Device::imageBaseAddressAlignment() const { OCL_NOT_AVAILABLE(); }
+తార్కిక Device::image_From_బఫరు_Support() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+uint Device::imagePitchAlignment() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+uint Device::image_పునాది_చిరునామా_Alignment() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-bool Device::intelSubgroupsSupport() const { OCL_NOT_AVAILABLE(); }
+తార్కిక Device::intelSubgroupsSupport() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-size_t Device::image2DMaxWidth() const { OCL_NOT_AVAILABLE(); }
-size_t Device::image2DMaxHeight() const { OCL_NOT_AVAILABLE(); }
+size_t Device::image2_DMax_వెడల్పు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Device::image2_DMax_ఎత్తు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-size_t Device::image3DMaxWidth() const { OCL_NOT_AVAILABLE(); }
-size_t Device::image3DMaxHeight() const { OCL_NOT_AVAILABLE(); }
-size_t Device::image3DMaxDepth() const { OCL_NOT_AVAILABLE(); }
+size_t Device::image3_DMax_వెడల్పు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Device::image3_DMax_ఎత్తు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Device::image3_DMax_లోతు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-size_t Device::imageMaxBufferSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::imageMaxArraySize() const { OCL_NOT_AVAILABLE(); }
+size_t Device::image_Max_బఫరు_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Device::image_Max_Array_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::vendorID() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::vendorID() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::maxClockFrequency() const { OCL_NOT_AVAILABLE(); }
-int Device::maxComputeUnits() const { OCL_NOT_AVAILABLE(); }
-int Device::maxConstantArgs() const { OCL_NOT_AVAILABLE(); }
-size_t Device::maxConstantBufferSize() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::maxClockFrequency() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::maxComputeUnits() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::max_Constant_వాదనలు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Device::max_Constant_బఫరు_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-size_t Device::maxMemAllocSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::maxParameterSize() const { OCL_NOT_AVAILABLE(); }
+size_t Device::max_Mem_Alloc_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Device::max_Parameter_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::maxReadImageArgs() const { OCL_NOT_AVAILABLE(); }
-int Device::maxWriteImageArgs() const { OCL_NOT_AVAILABLE(); }
-int Device::maxSamplers() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::max_Read_Image_వాదనలు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::max_Write_Image_వాదనలు() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::maxSamplers() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-size_t Device::maxWorkGroupSize() const { OCL_NOT_AVAILABLE(); }
-int Device::maxWorkItemDims() const { OCL_NOT_AVAILABLE(); }
-void Device::maxWorkItemSizes(size_t*) const { OCL_NOT_AVAILABLE(); }
+size_t Device::max_Work_సమూహం_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::max_Work_అంశం_Dims() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+శూన్య Device::max_Work_అంశం_Sizes(size_t*) స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::memBaseAddrAlign() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::mem_పునాది_Addr_Align() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::nativeVectorWidthChar() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthShort() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthInt() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthLong() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthFloat() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthDouble() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthHalf() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Char() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Short() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Int() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Long() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Float() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Double() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Half() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-int Device::preferredVectorWidthChar() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthShort() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthInt() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthLong() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthFloat() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthDouble() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthHalf() const { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Char() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Short() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Int() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Long() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Float() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Double() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Half() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-size_t Device::printfBufferSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::profilingTimerResolution() const { OCL_NOT_AVAILABLE(); }
+size_t Device::printf_బఫరు_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Device::profilingTimerResolution() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
 /* static */
-const Device& Device::getDefault()
+స్థిరరాశి Device& Device::getDefault()
 {
-    static Device dummy;
-    return dummy;
+    స్థిర Device dummy;
+    తిరిగి dummy;
 }
 
-/* static */ Device Device::fromHandle(void* d) { OCL_NOT_AVAILABLE(); }
+/* static */ Device Device::fromHandle(శూన్య* d) { OCL_NOT_అందుబాటు(); }
 
 
-Context::Context() CV_NOEXCEPT : p(NULL) { }
-Context::Context(int dtype) : p(NULL) { }
+Context::Context() CV_NOEXCEPT : p(ఖాళీ) { }
+Context::Context(పూర్ణాంకం dtype) : p(ఖాళీ) { }
 Context::~Context() { }
-Context::Context(const Context& c) : p(NULL) { }
-Context& Context::operator=(const Context& c) { return *this; }
-Context::Context(Context&&) CV_NOEXCEPT : p(NULL) { }
-Context& Context::operator=(Context&&) CV_NOEXCEPT { return *this; }
+Context::Context(స్థిరరాశి Context& c) : p(ఖాళీ) { }
+Context& Context::క్రియాకారకం=(స్థిరరాశి Context& c) { తిరిగి *ఇది; }
+Context::Context(Context&&) CV_NOEXCEPT : p(ఖాళీ) { }
+Context& Context::క్రియాకారకం=(Context&&) CV_NOEXCEPT { తిరిగి *ఇది; }
 
-bool Context::create() { return false; }
-bool Context::create(int dtype) { return false; }
-size_t Context::ndevices() const { return 0; }
-Device& Context::device(size_t idx) const { OCL_NOT_AVAILABLE(); }
-Program Context::getProg(const ProgramSource& prog, const String& buildopt, String& errmsg) { OCL_NOT_AVAILABLE(); }
-void Context::unloadProg(Program& prog) { }
+తార్కిక Context::create() { తిరిగి అబద్ధం; }
+తార్కిక Context::create(పూర్ణాంకం dtype) { తిరిగి అబద్ధం; }
+size_t Context::ndevices() స్థిరరాశి { తిరిగి 0; }
+Device& Context::device(size_t idx) స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+కార్యక్రమం_2 Context::getProg(స్థిరరాశి కార్యక్రమం_ఆధారం& prog, స్థిరరాశి String& buildopt, String& errmsg) { OCL_NOT_అందుబాటు(); }
+శూన్య Context::unloadProg(కార్యక్రమం_2& prog) { }
 
 /* static */
 Context& Context::getDefault()
 {
-    static Context dummy;
-    return dummy;
+    స్థిర Context dummy;
+    తిరిగి dummy;
 }
-void* Context::ptr() const { return NULL; }
+శూన్య* Context::ptr() స్థిరరాశి { తిరిగి ఖాళీ; }
 
-void* Context::getOpenCLContextProperty(int /*propertyId*/) const { OCL_NOT_AVAILABLE(); }
+శూన్య* Context::getOpenCLContextProperty(పూర్ణాంకం /*propertyId*/) స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-bool Context::useSVM() const { return false; }
-void Context::setUseSVM(bool enabled) { }
+తార్కిక Context::useSVM() స్థిరరాశి { తిరిగి అబద్ధం; }
+శూన్య Context::సమితి_Use_SVM(తార్కిక enabled) { }
 
 Context::UserContext::~UserContext() { }
 
-void Context::setUserContext(std::type_index /*typeId*/, const std::shared_ptr<Context::UserContext>& /*userContext*/) { OCL_NOT_AVAILABLE(); }
-std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_index /*typeId*/) { OCL_NOT_AVAILABLE(); }
+శూన్య Context::సమితి_User_Context(std::type_సూచీ /*typeId*/, స్థిరరాశి std::shared_ptr<Context::UserContext>& /*userContext*/) { OCL_NOT_అందుబాటు(); }
+std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_సూచీ /*typeId*/) { OCL_NOT_అందుబాటు(); }
 
-/* static */ Context Context::fromHandle(void* context) { OCL_NOT_AVAILABLE(); }
-/* static */ Context Context::fromDevice(const ocl::Device& device) { OCL_NOT_AVAILABLE(); }
-/* static */ Context Context::create(const std::string& configuration) { OCL_NOT_AVAILABLE(); }
+/* static */ Context Context::fromHandle(శూన్య* context) { OCL_NOT_అందుబాటు(); }
+/* static */ Context Context::fromDevice(స్థిరరాశి ocl::Device& device) { OCL_NOT_అందుబాటు(); }
+/* static */ Context Context::create(స్థిరరాశి std::string& configuration) { OCL_NOT_అందుబాటు(); }
 
-void Context::release() { }
+శూన్య Context::release() { }
 
 
-Platform::Platform() CV_NOEXCEPT : p(NULL) { }
+Platform::Platform() CV_NOEXCEPT : p(ఖాళీ) { }
 Platform::~Platform() { }
-Platform::Platform(const Platform&) : p(NULL) { }
-Platform& Platform::operator=(const Platform&) { return *this; }
-Platform::Platform(Platform&&) CV_NOEXCEPT : p(NULL) { }
-Platform& Platform::operator=(Platform&&) CV_NOEXCEPT { return *this; }
+Platform::Platform(స్థిరరాశి Platform&) : p(ఖాళీ) { }
+Platform& Platform::క్రియాకారకం=(స్థిరరాశి Platform&) { తిరిగి *ఇది; }
+Platform::Platform(Platform&&) CV_NOEXCEPT : p(ఖాళీ) { }
+Platform& Platform::క్రియాకారకం=(Platform&&) CV_NOEXCEPT { తిరిగి *ఇది; }
 
-void* Platform::ptr() const { return NULL; }
+శూన్య* Platform::ptr() స్థిరరాశి { తిరిగి ఖాళీ; }
 
 /* static */
 Platform& Platform::getDefault()
 {
-    static Platform dummy;
-    return dummy;
+    స్థిర Platform dummy;
+    తిరిగి dummy;
 }
 
-void attachContext(const String& platformName, void* platformID, void* context, void* deviceID) { OCL_NOT_AVAILABLE(); }
-void convertFromBuffer(void* cl_mem_buffer, size_t step, int rows, int cols, int type, UMat& dst) { OCL_NOT_AVAILABLE(); }
-void convertFromImage(void* cl_mem_image, UMat& dst) { OCL_NOT_AVAILABLE(); }
+శూన్య attachContext(స్థిరరాశి String& platformName, శూన్య* platformID, శూన్య* context, శూన్య* deviceID) { OCL_NOT_అందుబాటు(); }
+శూన్య convert_From_బఫరు(శూన్య* cl_mem_బఫరు, size_t అడుగు, పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, UMat& dst) { OCL_NOT_అందుబాటు(); }
+శూన్య convertFromImage(శూన్య* cl_mem_image, UMat& dst) { OCL_NOT_అందుబాటు(); }
 
-void initializeContextFromHandle(Context& ctx, void* platform, void* context, void* device) { OCL_NOT_AVAILABLE(); }
+శూన్య initializeContextFromHandle(Context& ctx, శూన్య* platform, శూన్య* context, శూన్య* device) { OCL_NOT_అందుబాటు(); }
 
-Queue::Queue() CV_NOEXCEPT : p(NULL) { }
-Queue::Queue(const Context& c, const Device& d) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Queue::~Queue() { }
-Queue::Queue(const Queue& q) {}
-Queue& Queue::operator=(const Queue& q) { return *this; }
-Queue::Queue(Queue&&) CV_NOEXCEPT : p(NULL) { }
-Queue& Queue::operator=(Queue&&) CV_NOEXCEPT { return *this; }
+వరుస::వరుస() CV_NOEXCEPT : p(ఖాళీ) { }
+వరుస::వరుస(స్థిరరాశి Context& c, స్థిరరాశి Device& d) : p(ఖాళీ) { OCL_NOT_అందుబాటు(); }
+వరుస::~వరుస() { }
+వరుస::వరుస(స్థిరరాశి వరుస& q) {}
+వరుస& వరుస::క్రియాకారకం=(స్థిరరాశి వరుస& q) { తిరిగి *ఇది; }
+వరుస::వరుస(వరుస&&) CV_NOEXCEPT : p(ఖాళీ) { }
+వరుస& వరుస::క్రియాకారకం=(వరుస&&) CV_NOEXCEPT { తిరిగి *ఇది; }
 
-bool Queue::create(const Context& c, const Device& d) { OCL_NOT_AVAILABLE(); }
-void Queue::finish() {}
-void* Queue::ptr() const { return NULL; }
+తార్కిక వరుస::create(స్థిరరాశి Context& c, స్థిరరాశి Device& d) { OCL_NOT_అందుబాటు(); }
+శూన్య వరుస::ముగింపు_2() {}
+శూన్య* వరుస::ptr() స్థిరరాశి { తిరిగి ఖాళీ; }
 /* static */
-Queue& Queue::getDefault()
+వరుస& వరుస::getDefault()
 {
-    static Queue dummy;
-    return dummy;
+    స్థిర వరుస dummy;
+    తిరిగి dummy;
 }
 
 /// @brief Returns OpenCL command queue with enable profiling mode support
-const Queue& Queue::getProfilingQueue() const { OCL_NOT_AVAILABLE(); }
+స్థిరరాశి వరుస& వరుస::get_Profiling_వరుస() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
 
 KernelArg::KernelArg() CV_NOEXCEPT
@@ -241,200 +241,200 @@ KernelArg::KernelArg() CV_NOEXCEPT
 {
 }
 
-KernelArg::KernelArg(int _flags, UMat* _m, int _wscale, int _iwscale, const void* _obj, size_t _sz)
+KernelArg::KernelArg(పూర్ణాంకం _flags, UMat* _m, పూర్ణాంకం _wscale, పూర్ణాంకం _iwscale, స్థిరరాశి శూన్య* _obj, size_t _sz)
     : flags(_flags), m(_m), obj(_obj), sz(_sz), wscale(_wscale), iwscale(_iwscale)
 {
-    OCL_NOT_AVAILABLE();
+    OCL_NOT_అందుబాటు();
 }
 
-KernelArg KernelArg::Constant(const Mat& m)
+KernelArg KernelArg::Constant(స్థిరరాశి Mat& m)
 {
-    OCL_NOT_AVAILABLE();
+    OCL_NOT_అందుబాటు();
 }
 
 
-Kernel::Kernel() CV_NOEXCEPT : p(NULL) { }
-Kernel::Kernel(const char* kname, const Program& prog) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Kernel::Kernel(const char* kname, const ProgramSource& prog, const String& buildopts, String* errmsg) : p(NULL) { OCL_NOT_AVAILABLE(); }
+Kernel::Kernel() CV_NOEXCEPT : p(ఖాళీ) { }
+Kernel::Kernel(స్థిరరాశి అక్షరం* kname, స్థిరరాశి కార్యక్రమం_2& prog) : p(ఖాళీ) { OCL_NOT_అందుబాటు(); }
+Kernel::Kernel(స్థిరరాశి అక్షరం* kname, స్థిరరాశి కార్యక్రమం_ఆధారం& prog, స్థిరరాశి String& buildopts, String* errmsg) : p(ఖాళీ) { OCL_NOT_అందుబాటు(); }
 Kernel::~Kernel() { }
-Kernel::Kernel(const Kernel& k) : p(NULL) { }
-Kernel& Kernel::operator=(const Kernel& k) { return *this; }
-Kernel::Kernel(Kernel&&) CV_NOEXCEPT : p(NULL) { }
-Kernel& Kernel::operator=(Kernel&&) CV_NOEXCEPT { return *this; }
+Kernel::Kernel(స్థిరరాశి Kernel& k) : p(ఖాళీ) { }
+Kernel& Kernel::క్రియాకారకం=(స్థిరరాశి Kernel& k) { తిరిగి *ఇది; }
+Kernel::Kernel(Kernel&&) CV_NOEXCEPT : p(ఖాళీ) { }
+Kernel& Kernel::క్రియాకారకం=(Kernel&&) CV_NOEXCEPT { తిరిగి *ఇది; }
 
-bool Kernel::empty() const { return true; }
-bool Kernel::create(const char* kname, const Program& prog) { OCL_NOT_AVAILABLE(); }
-bool Kernel::create(const char* kname, const ProgramSource& prog, const String& buildopts, String* errmsg) { OCL_NOT_AVAILABLE(); }
+తార్కిక Kernel::empty() స్థిరరాశి { తిరిగి నిజం; }
+తార్కిక Kernel::create(స్థిరరాశి అక్షరం* kname, స్థిరరాశి కార్యక్రమం_2& prog) { OCL_NOT_అందుబాటు(); }
+తార్కిక Kernel::create(స్థిరరాశి అక్షరం* kname, స్థిరరాశి కార్యక్రమం_ఆధారం& prog, స్థిరరాశి String& buildopts, String* errmsg) { OCL_NOT_అందుబాటు(); }
 
-int Kernel::set(int i, const void* value, size_t sz) { OCL_NOT_AVAILABLE(); }
-int Kernel::set(int i, const Image2D& image2D) { OCL_NOT_AVAILABLE(); }
-int Kernel::set(int i, const UMat& m) { OCL_NOT_AVAILABLE(); }
-int Kernel::set(int i, const KernelArg& arg) { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం Kernel::సమితి(పూర్ణాంకం i, స్థిరరాశి శూన్య* value, size_t sz) { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Kernel::సమితి(పూర్ణాంకం i, స్థిరరాశి Image2D& image2D) { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Kernel::సమితి(పూర్ణాంకం i, స్థిరరాశి UMat& m) { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం Kernel::సమితి(పూర్ణాంకం i, స్థిరరాశి KernelArg& arg) { OCL_NOT_అందుబాటు(); }
 
-bool Kernel::run(int dims, size_t globalsize[], size_t localsize[], bool sync, const Queue& q) { OCL_NOT_AVAILABLE(); }
-bool Kernel::runTask(bool sync, const Queue& q) { OCL_NOT_AVAILABLE(); }
+తార్కిక Kernel::నిరంతరం(పూర్ణాంకం dims, size_t globalsize[], size_t localsize[], తార్కిక సమకాలీకరణ, స్థిరరాశి వరుస& q) { OCL_NOT_అందుబాటు(); }
+తార్కిక Kernel::నిరంతరం_Task(తార్కిక సమకాలీకరణ, స్థిరరాశి వరుస& q) { OCL_NOT_అందుబాటు(); }
 
-int64 Kernel::runProfiling(int dims, size_t globalsize[], size_t localsize[], const Queue& q) { OCL_NOT_AVAILABLE(); }
+int64 Kernel::నిరంతరం_Profiling(పూర్ణాంకం dims, size_t globalsize[], size_t localsize[], స్థిరరాశి వరుస& q) { OCL_NOT_అందుబాటు(); }
 
-size_t Kernel::workGroupSize() const { OCL_NOT_AVAILABLE(); }
-size_t Kernel::preferedWorkGroupSizeMultiple() const { OCL_NOT_AVAILABLE(); }
-bool Kernel::compileWorkGroupSize(size_t wsz[]) const { OCL_NOT_AVAILABLE(); }
-size_t Kernel::localMemSize() const { OCL_NOT_AVAILABLE(); }
+size_t Kernel::work_సమూహం_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Kernel::prefered_Work_సమూహం_కొలత_గుణిజం() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+తార్కిక Kernel::compile_Work_సమూహం_కొలత(size_t wsz[]) స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+size_t Kernel::local_Mem_కొలత() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-void* Kernel::ptr() const { return NULL; }
-
-
-Program::Program() CV_NOEXCEPT : p(NULL) { }
-Program::Program(const ProgramSource& src, const String& buildflags, String& errmsg) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Program::Program(const Program& prog) : p(NULL) { }
-Program& Program::operator=(const Program& prog) { return *this; }
-Program::Program(Program&&) CV_NOEXCEPT : p(NULL) { }
-Program& Program::operator=(Program&&) CV_NOEXCEPT { return *this; }
-Program::~Program() { }
-
-bool Program::create(const ProgramSource& src, const String& buildflags, String& errmsg) { OCL_NOT_AVAILABLE(); }
-
-void* Program::ptr() const { return NULL; }
-
-void Program::getBinary(std::vector<char>& binary) const { OCL_NOT_AVAILABLE(); }
-
-bool Program::read(const String& buf, const String& buildflags) { OCL_NOT_AVAILABLE(); }
-bool Program::write(String& buf) const { OCL_NOT_AVAILABLE(); }
-const ProgramSource& Program::source() const { OCL_NOT_AVAILABLE(); }
-String Program::getPrefix() const { OCL_NOT_AVAILABLE(); }
-/* static */ String Program::getPrefix(const String& buildflags) { OCL_NOT_AVAILABLE(); }
+శూన్య* Kernel::ptr() స్థిరరాశి { తిరిగి ఖాళీ; }
 
 
-ProgramSource::ProgramSource() CV_NOEXCEPT : p(NULL) { }
-ProgramSource::ProgramSource(const String& module, const String& name, const String& codeStr, const String& codeHash) : p(NULL) { }
-ProgramSource::ProgramSource(const String& prog) : p(NULL) { }
-ProgramSource::ProgramSource(const char* prog) : p(NULL) { }
-ProgramSource::~ProgramSource() { }
-ProgramSource::ProgramSource(const ProgramSource& prog) : p(NULL) { }
-ProgramSource& ProgramSource::operator=(const ProgramSource& prog) { return *this; }
-ProgramSource::ProgramSource(ProgramSource&&) CV_NOEXCEPT : p(NULL) { }
-ProgramSource& ProgramSource::operator=(ProgramSource&&) CV_NOEXCEPT { return *this; }
+కార్యక్రమం_2::కార్యక్రమం_2() CV_NOEXCEPT : p(ఖాళీ) { }
+కార్యక్రమం_2::కార్యక్రమం_2(స్థిరరాశి కార్యక్రమం_ఆధారం& src, స్థిరరాశి String& buildflags, String& errmsg) : p(ఖాళీ) { OCL_NOT_అందుబాటు(); }
+కార్యక్రమం_2::కార్యక్రమం_2(స్థిరరాశి కార్యక్రమం_2& prog) : p(ఖాళీ) { }
+కార్యక్రమం_2& కార్యక్రమం_2::క్రియాకారకం=(స్థిరరాశి కార్యక్రమం_2& prog) { తిరిగి *ఇది; }
+కార్యక్రమం_2::కార్యక్రమం_2(కార్యక్రమం_2&&) CV_NOEXCEPT : p(ఖాళీ) { }
+కార్యక్రమం_2& కార్యక్రమం_2::క్రియాకారకం=(కార్యక్రమం_2&&) CV_NOEXCEPT { తిరిగి *ఇది; }
+కార్యక్రమం_2::~కార్యక్రమం_2() { }
 
-const String& ProgramSource::source() const { OCL_NOT_AVAILABLE(); }
-ProgramSource::hash_t ProgramSource::hash() const { OCL_NOT_AVAILABLE(); }
+తార్కిక కార్యక్రమం_2::create(స్థిరరాశి కార్యక్రమం_ఆధారం& src, స్థిరరాశి String& buildflags, String& errmsg) { OCL_NOT_అందుబాటు(); }
 
-/* static */ ProgramSource ProgramSource::fromBinary(const String& module, const String& name, const unsigned char* binary, const size_t size, const cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
-/* static */ ProgramSource ProgramSource::fromSPIR(const String& module, const String& name, const unsigned char* binary, const size_t size, const cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
+శూన్య* కార్యక్రమం_2::ptr() స్థిరరాశి { తిరిగి ఖాళీ; }
+
+శూన్య కార్యక్రమం_2::get_ద్విమాన(std::vector<అక్షరం>& binary) స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+
+తార్కిక కార్యక్రమం_2::పఠ(స్థిరరాశి String& buf, స్థిరరాశి String& buildflags) { OCL_NOT_అందుబాటు(); }
+తార్కిక కార్యక్రమం_2::లిఖ(String& buf) స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+స్థిరరాశి కార్యక్రమం_ఆధారం& కార్యక్రమం_2::ఆధారం() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+String కార్యక్రమం_2::get_ఉపసర్గ() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+/* static */ String కార్యక్రమం_2::get_ఉపసర్గ(స్థిరరాశి String& buildflags) { OCL_NOT_అందుబాటు(); }
 
 
-PlatformInfo::PlatformInfo() CV_NOEXCEPT : p(NULL) { }
-PlatformInfo::PlatformInfo(void* id) : p(NULL) { OCL_NOT_AVAILABLE(); }
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం() CV_NOEXCEPT : p(ఖాళీ) { }
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(స్థిరరాశి String& module, స్థిరరాశి String& name, స్థిరరాశి String& సంకేతం_Str, స్థిరరాశి String& సంకేతం_Hash) : p(ఖాళీ) { }
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(స్థిరరాశి String& prog) : p(ఖాళీ) { }
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(స్థిరరాశి అక్షరం* prog) : p(ఖాళీ) { }
+కార్యక్రమం_ఆధారం::~కార్యక్రమం_ఆధారం() { }
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(స్థిరరాశి కార్యక్రమం_ఆధారం& prog) : p(ఖాళీ) { }
+కార్యక్రమం_ఆధారం& కార్యక్రమం_ఆధారం::క్రియాకారకం=(స్థిరరాశి కార్యక్రమం_ఆధారం& prog) { తిరిగి *ఇది; }
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(కార్యక్రమం_ఆధారం&&) CV_NOEXCEPT : p(ఖాళీ) { }
+కార్యక్రమం_ఆధారం& కార్యక్రమం_ఆధారం::క్రియాకారకం=(కార్యక్రమం_ఆధారం&&) CV_NOEXCEPT { తిరిగి *ఇది; }
+
+స్థిరరాశి String& కార్యక్రమం_ఆధారం::ఆధారం() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+కార్యక్రమం_ఆధారం::hash_t కార్యక్రమం_ఆధారం::hash() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+
+/* static */ కార్యక్రమం_ఆధారం కార్యక్రమం_ఆధారం::from_ద్విమాన(స్థిరరాశి String& module, స్థిరరాశి String& name, స్థిరరాశి గుర్తులేని అక్షరం* binary, స్థిరరాశి size_t size, స్థిరరాశి cv::String& buildOptions) { OCL_NOT_అందుబాటు(); }
+/* static */ కార్యక్రమం_ఆధారం కార్యక్రమం_ఆధారం::fromSPIR(స్థిరరాశి String& module, స్థిరరాశి String& name, స్థిరరాశి గుర్తులేని అక్షరం* binary, స్థిరరాశి size_t size, స్థిరరాశి cv::String& buildOptions) { OCL_NOT_అందుబాటు(); }
+
+
+PlatformInfo::PlatformInfo() CV_NOEXCEPT : p(ఖాళీ) { }
+PlatformInfo::PlatformInfo(శూన్య* id) : p(ఖాళీ) { OCL_NOT_అందుబాటు(); }
 PlatformInfo::~PlatformInfo() { }
 
-PlatformInfo::PlatformInfo(const PlatformInfo& i) : p(NULL) { }
-PlatformInfo& PlatformInfo::operator=(const PlatformInfo& i) { return *this; }
-PlatformInfo::PlatformInfo(PlatformInfo&&) CV_NOEXCEPT : p(NULL) { }
-PlatformInfo& PlatformInfo::operator=(PlatformInfo&&) CV_NOEXCEPT { return *this; }
+PlatformInfo::PlatformInfo(స్థిరరాశి PlatformInfo& i) : p(ఖాళీ) { }
+PlatformInfo& PlatformInfo::క్రియాకారకం=(స్థిరరాశి PlatformInfo& i) { తిరిగి *ఇది; }
+PlatformInfo::PlatformInfo(PlatformInfo&&) CV_NOEXCEPT : p(ఖాళీ) { }
+PlatformInfo& PlatformInfo::క్రియాకారకం=(PlatformInfo&&) CV_NOEXCEPT { తిరిగి *ఇది; }
 
-String PlatformInfo::name() const { OCL_NOT_AVAILABLE(); }
-String PlatformInfo::vendor() const { OCL_NOT_AVAILABLE(); }
-String PlatformInfo::version() const { OCL_NOT_AVAILABLE(); }
-int PlatformInfo::deviceNumber() const { OCL_NOT_AVAILABLE(); }
-void PlatformInfo::getDevice(Device& device, int d) const { OCL_NOT_AVAILABLE(); }
+String PlatformInfo::name() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+String PlatformInfo::vendor() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+String PlatformInfo::సంస్కరణ() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+పూర్ణాంకం PlatformInfo::device_సంఖ్య() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+శూన్య PlatformInfo::getDevice(Device& device, పూర్ణాంకం d) స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf) { OCL_NOT_AVAILABLE(); }
-const char* typeToStr(int t) { OCL_NOT_AVAILABLE(); }
-const char* memopTypeToStr(int t) { OCL_NOT_AVAILABLE(); }
-const char* vecopTypeToStr(int t) { OCL_NOT_AVAILABLE(); }
-const char* getOpenCLErrorString(int errorCode) { OCL_NOT_AVAILABLE(); }
-String kernelToStr(InputArray _kernel, int ddepth, const char* name) { OCL_NOT_AVAILABLE(); }
-void getPlatfomsInfo(std::vector<PlatformInfo>& platform_info) { OCL_NOT_AVAILABLE(); }
-
-
-int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9,
-        OclVectorStrategy strat)
-{ OCL_NOT_AVAILABLE(); }
-
-int checkOptimalVectorWidth(const int *vectorWidths,
-        InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9,
-        OclVectorStrategy strat)
-{ OCL_NOT_AVAILABLE(); }
-
-int predictOptimalVectorWidthMax(InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9)
-{ OCL_NOT_AVAILABLE(); }
-
-void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, InputArray _m) { OCL_NOT_AVAILABLE(); }
+స్థిరరాశి అక్షరం* convertTypeStr(పూర్ణాంకం sdepth, పూర్ణాంకం ddepth, పూర్ణాంకం cn, అక్షరం* buf) { OCL_NOT_అందుబాటు(); }
+స్థిరరాశి అక్షరం* type_గమ్యం_Str(పూర్ణాంకం t) { OCL_NOT_అందుబాటు(); }
+స్థిరరాశి అక్షరం* memop_Type_గమ్యం_Str(పూర్ణాంకం t) { OCL_NOT_అందుబాటు(); }
+స్థిరరాశి అక్షరం* vecop_Type_గమ్యం_Str(పూర్ణాంకం t) { OCL_NOT_అందుబాటు(); }
+స్థిరరాశి అక్షరం* getOpenCLErrorString(పూర్ణాంకం error_సంకేతం) { OCL_NOT_అందుబాటు(); }
+String kernel_గమ్యం_Str(ఆదానం_Array _kernel, పూర్ణాంకం ddepth, స్థిరరాశి అక్షరం* name) { OCL_NOT_అందుబాటు(); }
+శూన్య getPlatfomsInfo(std::vector<PlatformInfo>& platform_info) { OCL_NOT_అందుబాటు(); }
 
 
-Image2D::Image2D() CV_NOEXCEPT : p(NULL) { }
-Image2D::Image2D(const UMat &src, bool norm, bool alias) { OCL_NOT_AVAILABLE(); }
-Image2D::Image2D(const Image2D & i) : p(NULL) { OCL_NOT_AVAILABLE(); }
+పూర్ణాంకం predict_Optimal_సదిశ_వెడల్పు(ఆదానం_Array src1, ఆదానం_Array src2, ఆదానం_Array src3,
+        ఆదానం_Array src4, ఆదానం_Array src5, ఆదానం_Array src6,
+        ఆదానం_Array src7, ఆదానం_Array src8, ఆదానం_Array src9,
+        Ocl_సదిశ_Strategy strat)
+{ OCL_NOT_అందుబాటు(); }
+
+పూర్ణాంకం check_Optimal_సదిశ_వెడల్పు(స్థిరరాశి పూర్ణాంకం *సదిశ_Widths,
+        ఆదానం_Array src1, ఆదానం_Array src2, ఆదానం_Array src3,
+        ఆదానం_Array src4, ఆదానం_Array src5, ఆదానం_Array src6,
+        ఆదానం_Array src7, ఆదానం_Array src8, ఆదానం_Array src9,
+        Ocl_సదిశ_Strategy strat)
+{ OCL_NOT_అందుబాటు(); }
+
+పూర్ణాంకం predict_Optimal_సదిశ_వెడల్పు_Max(ఆదానం_Array src1, ఆదానం_Array src2, ఆదానం_Array src3,
+        ఆదానం_Array src4, ఆదానం_Array src5, ఆదానం_Array src6,
+        ఆదానం_Array src7, ఆదానం_Array src8, ఆదానం_Array src9)
+{ OCL_NOT_అందుబాటు(); }
+
+శూన్య build_Options_కూడు_మాతృక_Description(String& buildOptions, స్థిరరాశి String& name, ఆదానం_Array _m) { OCL_NOT_అందుబాటు(); }
+
+
+Image2D::Image2D() CV_NOEXCEPT : p(ఖాళీ) { }
+Image2D::Image2D(స్థిరరాశి UMat &src, తార్కిక norm, తార్కిక alias) { OCL_NOT_అందుబాటు(); }
+Image2D::Image2D(స్థిరరాశి Image2D & i) : p(ఖాళీ) { OCL_NOT_అందుబాటు(); }
 Image2D::~Image2D() { }
-Image2D& Image2D::operator=(const Image2D & i) { return *this; }
-Image2D::Image2D(Image2D&&) CV_NOEXCEPT : p(NULL) { }
-Image2D& Image2D::operator=(Image2D&&) CV_NOEXCEPT { return *this; }
+Image2D& Image2D::క్రియాకారకం=(స్థిరరాశి Image2D & i) { తిరిగి *ఇది; }
+Image2D::Image2D(Image2D&&) CV_NOEXCEPT : p(ఖాళీ) { }
+Image2D& Image2D::క్రియాకారకం=(Image2D&&) CV_NOEXCEPT { తిరిగి *ఇది; }
 
-/* static */ bool Image2D::canCreateAlias(const UMat &u) { OCL_NOT_AVAILABLE(); }
-/* static */ bool Image2D::isFormatSupported(int depth, int cn, bool norm) { OCL_NOT_AVAILABLE(); }
+/* static */ తార్కిక Image2D::canCreateAlias(స్థిరరాశి UMat &u) { OCL_NOT_అందుబాటు(); }
+/* static */ తార్కిక Image2D::isFormatSupported(పూర్ణాంకం లోతు, పూర్ణాంకం cn, తార్కిక norm) { OCL_NOT_అందుబాటు(); }
 
-void* Image2D::ptr() const { return NULL; }
+శూన్య* Image2D::ptr() స్థిరరాశి { తిరిగి ఖాళీ; }
 
 
-Timer::Timer(const Queue& q) : p(NULL) {}
+Timer::Timer(స్థిరరాశి వరుస& q) : p(ఖాళీ) {}
 Timer::~Timer() {}
-void Timer::start() { OCL_NOT_AVAILABLE(); }
-void Timer::stop() { OCL_NOT_AVAILABLE();}
+శూన్య Timer::ప్రారంభం() { OCL_NOT_అందుబాటు(); }
+శూన్య Timer::stop() { OCL_NOT_అందుబాటు();}
 
-uint64 Timer::durationNS() const { OCL_NOT_AVAILABLE(); }
+uint64 Timer::durationNS() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-MatAllocator* getOpenCLAllocator() { return NULL; }
+MatAllocator* getOpenCLAllocator() { తిరిగి ఖాళీ; }
 
-internal::ProgramEntry::operator ProgramSource&() const { OCL_NOT_AVAILABLE(); }
+internal::కార్యక్రమం_నమోదు::క్రియాకారకం కార్యక్రమం_ఆధారం&() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
 
-struct OpenCLExecutionContext::Impl
+నిర్మాణం OpenCLExecutionContext::Impl
 {
-    Impl() = default;
+    Impl() = అప్రమేయ;
 };
 
-Context& OpenCLExecutionContext::getContext() const { OCL_NOT_AVAILABLE(); }
-Device& OpenCLExecutionContext::getDevice() const { OCL_NOT_AVAILABLE(); }
-Queue& OpenCLExecutionContext::getQueue() const { OCL_NOT_AVAILABLE(); }
+Context& OpenCLExecutionContext::getContext() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+Device& OpenCLExecutionContext::getDevice() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+వరుస& OpenCLExecutionContext::get_వరుస() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-bool OpenCLExecutionContext::useOpenCL() const { return false; }
-void OpenCLExecutionContext::setUseOpenCL(bool flag) { }
+తార్కిక OpenCLExecutionContext::useOpenCL() స్థిరరాశి { తిరిగి అబద్ధం; }
+శూన్య OpenCLExecutionContext::సమితి_Use_Open_CL(తార్కిక flag) { }
 
-static
+స్థిర
 OpenCLExecutionContext& getDummyOpenCLExecutionContext()
 {
-    static OpenCLExecutionContext dummy;
-    return dummy;
+    స్థిర OpenCLExecutionContext dummy;
+    తిరిగి dummy;
 }
 
 /* static */
-OpenCLExecutionContext& OpenCLExecutionContext::getCurrent() { return getDummyOpenCLExecutionContext(); }
+OpenCLExecutionContext& OpenCLExecutionContext::getCurrent() { తిరిగి getDummyOpenCLExecutionContext(); }
 
 /* static */
-OpenCLExecutionContext& OpenCLExecutionContext::getCurrentRef() { return getDummyOpenCLExecutionContext(); }
+OpenCLExecutionContext& OpenCLExecutionContext::getCurrentRef() { తిరిగి getDummyOpenCLExecutionContext(); }
 
-void OpenCLExecutionContext::bind() const { OCL_NOT_AVAILABLE(); }
+శూన్య OpenCLExecutionContext::bind() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue(const ocl::Queue& q) const { OCL_NOT_AVAILABLE(); }
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue() const { OCL_NOT_AVAILABLE(); }
+OpenCLExecutionContext OpenCLExecutionContext::clone_With_New_వరుస(స్థిరరాశి ocl::వరుస& q) స్థిరరాశి { OCL_NOT_అందుబాటు(); }
+OpenCLExecutionContext OpenCLExecutionContext::clone_With_New_వరుస() స్థిరరాశి { OCL_NOT_అందుబాటు(); }
 
-/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(const std::string& platformName, void* platformID, void* context, void* deviceID) { OCL_NOT_AVAILABLE(); }
-/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device, const ocl::Queue& queue) { OCL_NOT_AVAILABLE(); }
-/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device) { OCL_NOT_AVAILABLE(); }
+/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(స్థిరరాశి std::string& platformName, శూన్య* platformID, శూన్య* context, శూన్య* deviceID) { OCL_NOT_అందుబాటు(); }
+/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(స్థిరరాశి Context& context, స్థిరరాశి Device& device, స్థిరరాశి ocl::వరుస& వరుస_2) { OCL_NOT_అందుబాటు(); }
+/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(స్థిరరాశి Context& context, స్థిరరాశి Device& device) { OCL_NOT_అందుబాటు(); }
 
-void OpenCLExecutionContext::release() { }
+శూన్య OpenCLExecutionContext::release() { }
 
 }}
 
-#if defined(_MSC_VER)
-    #pragma warning(pop)
-#elif defined(__clang__)
-    #pragma clang diagnostic pop
-#elif defined(__GNUC__)
-    #pragma GCC diagnostic pop
-#endif
+#ఒకవేళ defined(_MSC_VER)
+    #సూచన warning(pop)
+#లేదావేళ defined(__clang__)
+    #సూచన clang diagnostic pop
+#లేదావేళ defined(__GNUC__)
+    #సూచన GCC diagnostic pop
+#అయితే_ముగింపు

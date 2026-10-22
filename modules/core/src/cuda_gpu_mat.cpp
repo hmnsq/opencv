@@ -41,515 +41,515 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+ఉపయోగించి నామాకాశ cv;
+ఉపయోగించి నామాకాశ cv::cuda;
 
-void cv::cuda::GpuMat::updateContinuityFlag()
+శూన్య cv::cuda::GpuMat::updateContinuityFlag()
 {
-    int sz[] = { rows, cols };
-    size_t steps[] = { step, elemSize() };
-    flags = cv::updateContinuityFlag(flags, 2, sz, steps);
+    పూర్ణాంకం sz[] = { అడ్డువరుసలు, నిలువుల_సంఖ్య };
+    size_t అడుగులు[] = { అడుగు, elem_కొలత() };
+    flags = cv::updateContinuityFlag(flags, 2, sz, అడుగులు);
 }
 
-cv::cuda::GpuMat::GpuMat(int rows_, int cols_, int type_, void* data_, size_t step_) :
-    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(rows_), cols(cols_),
-    step(step_), data((uchar*)data_), refcount(0),
-    datastart((uchar*)data_), dataend((const uchar*)data_),
+cv::cuda::GpuMat::GpuMat(పూర్ణాంకం అడ్డువరుసలు_2, పూర్ణాంకం నిలువుల_సంఖ్య_2, పూర్ణాంకం type_, శూన్య* దత్తాంశం_2, size_t అడుగు_2) :
+    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_ముసుగు)), అడ్డువరుసలు(అడ్డువరుసలు_2), నిలువుల_సంఖ్య(నిలువుల_సంఖ్య_2),
+    అడుగు(అడుగు_2), దత్తాంశం((uchar*)దత్తాంశం_2), refcount(0),
+    datastart((uchar*)దత్తాంశం_2), dataend((స్థిరరాశి uchar*)దత్తాంశం_2),
     allocator(defaultAllocator())
 {
-    size_t minstep = cols * elemSize();
+    size_t minstep = నిలువుల_సంఖ్య * elem_కొలత();
 
-    if (step == Mat::AUTO_STEP)
+    ఒకవేళ (అడుగు == Mat::AUTO_అడుగు)
     {
-        step = minstep;
+        అడుగు = minstep;
     }
-    else
+    లేకపోతే
     {
-        if (rows == 1)
-            step = minstep;
+        ఒకవేళ (అడ్డువరుసలు == 1)
+            అడుగు = minstep;
 
-        CV_DbgAssert( step >= minstep );
+        CV_DbgAssert( అడుగు >= minstep );
     }
 
-    dataend += step * (rows - 1) + minstep;
+    dataend += అడుగు * (అడ్డువరుసలు - 1) + minstep;
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(Size size_, int type_, void* data_, size_t step_) :
-    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(size_.height), cols(size_.width),
-    step(step_), data((uchar*)data_), refcount(0),
-    datastart((uchar*)data_), dataend((const uchar*)data_),
+cv::cuda::GpuMat::GpuMat(కొలత కొలత_3, పూర్ణాంకం type_, శూన్య* దత్తాంశం_2, size_t అడుగు_2) :
+    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_ముసుగు)), అడ్డువరుసలు(కొలత_3.ఎత్తు), నిలువుల_సంఖ్య(కొలత_3.వెడల్పు),
+    అడుగు(అడుగు_2), దత్తాంశం((uchar*)దత్తాంశం_2), refcount(0),
+    datastart((uchar*)దత్తాంశం_2), dataend((స్థిరరాశి uchar*)దత్తాంశం_2),
     allocator(defaultAllocator())
 {
-    size_t minstep = cols * elemSize();
+    size_t minstep = నిలువుల_సంఖ్య * elem_కొలత();
 
-    if (step == Mat::AUTO_STEP)
+    ఒకవేళ (అడుగు == Mat::AUTO_అడుగు)
     {
-        step = minstep;
+        అడుగు = minstep;
     }
-    else
+    లేకపోతే
     {
-        if (rows == 1)
-            step = minstep;
+        ఒకవేళ (అడ్డువరుసలు == 1)
+            అడుగు = minstep;
 
-        CV_DbgAssert( step >= minstep );
+        CV_DbgAssert( అడుగు >= minstep );
     }
 
-    dataend += step * (rows - 1) + minstep;
+    dataend += అడుగు * (అడ్డువరుసలు - 1) + minstep;
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(const GpuMat& m, Range rowRange_, Range colRange_)
+cv::cuda::GpuMat::GpuMat(స్థిరరాశి GpuMat& m, Range అడ్డువరుస_Range, Range నిలువు_Range)
 {
     flags = m.flags;
-    step = m.step; refcount = m.refcount;
-    data = m.data; datastart = m.datastart; dataend = m.dataend;
+    అడుగు = m.అడుగు; refcount = m.refcount;
+    దత్తాంశం = m.దత్తాంశం; datastart = m.datastart; dataend = m.dataend;
     allocator = m.allocator;
 
-    if (rowRange_ == Range::all())
+    ఒకవేళ (అడ్డువరుస_Range == Range::all())
     {
-        rows = m.rows;
+        అడ్డువరుసలు = m.అడ్డువరుసలు;
     }
-    else
+    లేకపోతే
     {
-        CV_Assert( 0 <= rowRange_.start && rowRange_.start <= rowRange_.end && rowRange_.end <= m.rows );
+        CV_Assert( 0 <= అడ్డువరుస_Range.ప్రారంభం && అడ్డువరుస_Range.ప్రారంభం <= అడ్డువరుస_Range.end && అడ్డువరుస_Range.end <= m.అడ్డువరుసలు );
 
-        rows = rowRange_.size();
-        data += step*rowRange_.start;
-    }
-
-    if (colRange_ == Range::all())
-    {
-        cols = m.cols;
-    }
-    else
-    {
-        CV_Assert( 0 <= colRange_.start && colRange_.start <= colRange_.end && colRange_.end <= m.cols );
-
-        cols = colRange_.size();
-        data += colRange_.start*elemSize();
+        అడ్డువరుసలు = అడ్డువరుస_Range.size();
+        దత్తాంశం += అడుగు*అడ్డువరుస_Range.ప్రారంభం;
     }
 
-    if (refcount)
+    ఒకవేళ (నిలువు_Range == Range::all())
+    {
+        నిలువుల_సంఖ్య = m.నిలువుల_సంఖ్య;
+    }
+    లేకపోతే
+    {
+        CV_Assert( 0 <= నిలువు_Range.ప్రారంభం && నిలువు_Range.ప్రారంభం <= నిలువు_Range.end && నిలువు_Range.end <= m.నిలువుల_సంఖ్య );
+
+        నిలువుల_సంఖ్య = నిలువు_Range.size();
+        దత్తాంశం += నిలువు_Range.ప్రారంభం*elem_కొలత();
+    }
+
+    ఒకవేళ (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
-        rows = cols = 0;
+    ఒకవేళ (అడ్డువరుసలు <= 0 || నిలువుల_సంఖ్య <= 0)
+        అడ్డువరుసలు = నిలువుల_సంఖ్య = 0;
 
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(const GpuMat& m, Rect roi) :
-    flags(m.flags), rows(roi.height), cols(roi.width),
-    step(m.step), data(m.data + roi.y*step), refcount(m.refcount),
+cv::cuda::GpuMat::GpuMat(స్థిరరాశి GpuMat& m, Rect roi) :
+    flags(m.flags), అడ్డువరుసలు(roi.ఎత్తు), నిలువుల_సంఖ్య(roi.వెడల్పు),
+    అడుగు(m.అడుగు), దత్తాంశం(m.దత్తాంశం + roi.y*అడుగు), refcount(m.refcount),
     datastart(m.datastart), dataend(m.dataend),
     allocator(m.allocator)
 {
-    data += roi.x * elemSize();
+    దత్తాంశం += roi.x * elem_కొలత();
 
-    CV_Assert( 0 <= roi.x && 0 <= roi.width &&
-               roi.x + roi.width <= m.cols &&
-               0 <= roi.y && 0 <= roi.height &&
-               roi.y + roi.height <= m.rows );
+    CV_Assert( 0 <= roi.x && 0 <= roi.వెడల్పు &&
+               roi.x + roi.వెడల్పు <= m.నిలువుల_సంఖ్య &&
+               0 <= roi.y && 0 <= roi.ఎత్తు &&
+               roi.y + roi.ఎత్తు <= m.అడ్డువరుసలు );
 
-    if (refcount)
+    ఒకవేళ (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
-        rows = cols = 0;
+    ఒకవేళ (అడ్డువరుసలు <= 0 || నిలువుల_సంఖ్య <= 0)
+        అడ్డువరుసలు = నిలువుల_సంఖ్య = 0;
     updateContinuityFlag();
 }
 
-GpuMat cv::cuda::GpuMat::reshape(int new_cn, int new_rows) const
+GpuMat cv::cuda::GpuMat::reshape(పూర్ణాంకం new_cn, పూర్ణాంకం new_అడ్డువరుసలు) స్థిరరాశి
 {
-    GpuMat hdr = *this;
+    GpuMat hdr = *ఇది;
 
-    int cn = channels();
-    if (new_cn == 0)
+    పూర్ణాంకం cn = channels();
+    ఒకవేళ (new_cn == 0)
         new_cn = cn;
 
-    int total_width = cols * cn;
+    పూర్ణాంకం మొత్తం_వెడల్పు = నిలువుల_సంఖ్య * cn;
 
-    if ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
-        new_rows = rows * total_width / new_cn;
+    ఒకవేళ ((new_cn > మొత్తం_వెడల్పు || మొత్తం_వెడల్పు % new_cn != 0) && new_అడ్డువరుసలు == 0)
+        new_అడ్డువరుసలు = అడ్డువరుసలు * మొత్తం_వెడల్పు / new_cn;
 
-    if (new_rows != 0 && new_rows != rows)
+    ఒకవేళ (new_అడ్డువరుసలు != 0 && new_అడ్డువరుసలు != అడ్డువరుసలు)
     {
-        int total_size = total_width * rows;
+        పూర్ణాంకం మొత్తం_కొలత_2 = మొత్తం_వెడల్పు * అడ్డువరుసలు;
 
-        if (!isContinuous())
-            CV_Error(cv::Error::BadStep, "The matrix is not continuous, thus its number of rows can not be changed");
+        ఒకవేళ (!isContinuous())
+            CV_Error(cv::Error::Bad_అడుగు, "The matrix is not continuous, thus its number of rows can not be changed");
 
-        if ((unsigned)new_rows > (unsigned)total_size)
-            CV_Error(cv::Error::StsOutOfRange, "Bad new number of rows");
+        ఒకవేళ ((గుర్తులేని)new_అడ్డువరుసలు > (గుర్తులేని)మొత్తం_కొలత_2)
+            CV_Error(cv::Error::Sts_బహిర్గతం_యొక్క_Range, "Bad new number of rows");
 
-        total_width = total_size / new_rows;
+        మొత్తం_వెడల్పు = మొత్తం_కొలత_2 / new_అడ్డువరుసలు;
 
-        if (total_width * new_rows != total_size)
+        ఒకవేళ (మొత్తం_వెడల్పు * new_అడ్డువరుసలు != మొత్తం_కొలత_2)
             CV_Error(cv::Error::StsBadArg, "The total number of matrix elements is not divisible by the new number of rows");
 
-        hdr.rows = new_rows;
-        hdr.step = total_width * elemSize1();
+        hdr.అడ్డువరుసలు = new_అడ్డువరుసలు;
+        hdr.అడుగు = మొత్తం_వెడల్పు * elemSize1();
     }
 
-    int new_width = total_width / new_cn;
+    పూర్ణాంకం new_వెడల్పు = మొత్తం_వెడల్పు / new_cn;
 
-    if (new_width * new_cn != total_width)
-        CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
+    ఒకవేళ (new_వెడల్పు * new_cn != మొత్తం_వెడల్పు)
+        CV_Error(cv::Error::Bad_అంకె_Channels, "The total width is not divisible by the new number of channels");
 
-    hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
+    hdr.నిలువుల_సంఖ్య = new_వెడల్పు;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_ముసుగు) | ((new_cn - 1) << CV_CN_జరుపు);
 
-    return hdr;
+    తిరిగి hdr;
 }
 
-void cv::cuda::GpuMat::locateROI(Size& wholeSize, Point& ofs) const
+శూన్య cv::cuda::GpuMat::locateROI(కొలత& సంపూర్ణ_కొలత, బిందువు& ofs) స్థిరరాశి
 {
-    CV_DbgAssert( step > 0 );
+    CV_DbgAssert( అడుగు > 0 );
 
-    size_t esz = elemSize();
-    ptrdiff_t delta1 = data - datastart;
+    size_t esz = elem_కొలత();
+    ptrdiff_t delta1 = దత్తాంశం - datastart;
     ptrdiff_t delta2 = dataend - datastart;
 
-    if (delta1 == 0)
+    ఒకవేళ (delta1 == 0)
     {
         ofs.x = ofs.y = 0;
     }
-    else
+    లేకపోతే
     {
-        ofs.y = static_cast<int>(delta1 / step);
-        ofs.x = static_cast<int>((delta1 - step * ofs.y) / esz);
+        ofs.y = static_cast<పూర్ణాంకం>(delta1 / అడుగు);
+        ofs.x = static_cast<పూర్ణాంకం>((delta1 - అడుగు * ofs.y) / esz);
 
-        CV_DbgAssert( data == datastart + ofs.y * step + ofs.x * esz );
+        CV_DbgAssert( దత్తాంశం == datastart + ofs.y * అడుగు + ofs.x * esz );
     }
 
-    size_t minstep = (ofs.x + cols) * esz;
+    size_t minstep = (ofs.x + నిలువుల_సంఖ్య) * esz;
 
-    wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / step + 1), ofs.y + rows);
-    wholeSize.width = std::max(static_cast<int>((delta2 - step * (wholeSize.height - 1)) / esz), ofs.x + cols);
+    సంపూర్ణ_కొలత.ఎత్తు = std::max(static_cast<పూర్ణాంకం>((delta2 - minstep) / అడుగు + 1), ofs.y + అడ్డువరుసలు);
+    సంపూర్ణ_కొలత.వెడల్పు = std::max(static_cast<పూర్ణాంకం>((delta2 - అడుగు * (సంపూర్ణ_కొలత.ఎత్తు - 1)) / esz), ofs.x + నిలువుల_సంఖ్య);
 }
 
-GpuMat& cv::cuda::GpuMat::adjustROI(int dtop, int dbottom, int dleft, int dright)
+GpuMat& cv::cuda::GpuMat::adjustROI(పూర్ణాంకం dtop, పూర్ణాంకం dbottom, పూర్ణాంకం dleft, పూర్ణాంకం dright)
 {
-    Size wholeSize;
-    Point ofs;
-    locateROI(wholeSize, ofs);
+    కొలత సంపూర్ణ_కొలత;
+    బిందువు ofs;
+    locateROI(సంపూర్ణ_కొలత, ofs);
 
-    size_t esz = elemSize();
+    size_t esz = elem_కొలత();
 
-    int row1 = std::max(ofs.y - dtop, 0);
-    int row2 = std::min(ofs.y + rows + dbottom, wholeSize.height);
+    పూర్ణాంకం row1 = std::max(ofs.y - dtop, 0);
+    పూర్ణాంకం row2 = std::min(ofs.y + అడ్డువరుసలు + dbottom, సంపూర్ణ_కొలత.ఎత్తు);
 
-    int col1 = std::max(ofs.x - dleft, 0);
-    int col2 = std::min(ofs.x + cols + dright, wholeSize.width);
+    పూర్ణాంకం col1 = std::max(ofs.x - dleft, 0);
+    పూర్ణాంకం col2 = std::min(ofs.x + నిలువుల_సంఖ్య + dright, సంపూర్ణ_కొలత.వెడల్పు);
 
-    data += (row1 - ofs.y) * step + (col1 - ofs.x) * esz;
-    rows = row2 - row1;
-    cols = col2 - col1;
+    దత్తాంశం += (row1 - ofs.y) * అడుగు + (col1 - ofs.x) * esz;
+    అడ్డువరుసలు = row2 - row1;
+    నిలువుల_సంఖ్య = col2 - col1;
 
     updateContinuityFlag();
-    return *this;
+    తిరిగి *ఇది;
 }
 
-namespace
+నామాకాశ
 {
-    template <class ObjType>
-    void createContinuousImpl(int rows, int cols, int type, ObjType& obj)
+    మూస <తరగతి ObjType>
+    శూన్య createContinuousImpl(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, ObjType& obj)
     {
-        const int area = rows * cols;
+        స్థిరరాశి పూర్ణాంకం area = అడ్డువరుసలు * నిలువుల_సంఖ్య;
 
-        if (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
+        ఒకవేళ (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
             obj.create(1, area, type);
 
-        obj = obj.reshape(obj.channels(), rows);
+        obj = obj.reshape(obj.channels(), అడ్డువరుసలు);
     }
 }
 
-void cv::cuda::createContinuous(int rows, int cols, int type, OutputArray arr)
+శూన్య cv::cuda::createContinuous(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, OutputArray arr)
 {
-    switch (arr.kind())
+    ఎంపిక (arr.రకం())
     {
-    case _InputArray::MAT:
-        ::createContinuousImpl(rows, cols, type, arr.getMatRef());
-        break;
+    స్థితి ఆదానం_Array_2::MAT:
+        ::createContinuousImpl(అడ్డువరుసలు, నిలువుల_సంఖ్య, type, arr.getMatRef());
+        ఆపు;
 
-    case _InputArray::CUDA_GPU_MAT:
-        ::createContinuousImpl(rows, cols, type, arr.getGpuMatRef());
-        break;
+    స్థితి ఆదానం_Array_2::CUDA_GPU_MAT:
+        ::createContinuousImpl(అడ్డువరుసలు, నిలువుల_సంఖ్య, type, arr.getGpuMatRef());
+        ఆపు;
 
-    case _InputArray::CUDA_HOST_MEM:
-        ::createContinuousImpl(rows, cols, type, arr.getHostMemRef());
-        break;
+    స్థితి ఆదానం_Array_2::CUDA_HOST_MEM:
+        ::createContinuousImpl(అడ్డువరుసలు, నిలువుల_సంఖ్య, type, arr.getHostMemRef());
+        ఆపు;
 
-    default:
-        arr.create(rows, cols, type);
+    అప్రమేయ:
+        arr.create(అడ్డువరుసలు, నిలువుల_సంఖ్య, type);
     }
 }
 
-namespace
+నామాకాశ
 {
-    template <class ObjType>
-    void ensureSizeIsEnoughImpl(int rows, int cols, int type, ObjType& obj)
+    మూస <తరగతి ObjType>
+    శూన్య ensure_కొలత_Is_Enough_Impl(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, ObjType& obj)
     {
-        if (obj.empty() || obj.type() != type || obj.data != obj.datastart)
+        ఒకవేళ (obj.empty() || obj.type() != type || obj.దత్తాంశం != obj.datastart)
         {
-            obj.create(rows, cols, type);
+            obj.create(అడ్డువరుసలు, నిలువుల_సంఖ్య, type);
         }
-        else
+        లేకపోతే
         {
-            const size_t esz = obj.elemSize();
-            const ptrdiff_t delta2 = obj.dataend - obj.datastart;
+            స్థిరరాశి size_t esz = obj.elem_కొలత();
+            స్థిరరాశి ptrdiff_t delta2 = obj.dataend - obj.datastart;
 
-            const size_t minstep = obj.cols * esz;
+            స్థిరరాశి size_t minstep = obj.నిలువుల_సంఖ్య * esz;
 
-            Size wholeSize;
-            wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / static_cast<size_t>(obj.step) + 1), obj.rows);
-            wholeSize.width = std::max(static_cast<int>((delta2 - static_cast<size_t>(obj.step) * (wholeSize.height - 1)) / esz), obj.cols);
+            కొలత సంపూర్ణ_కొలత;
+            సంపూర్ణ_కొలత.ఎత్తు = std::max(static_cast<పూర్ణాంకం>((delta2 - minstep) / static_cast<size_t>(obj.అడుగు) + 1), obj.అడ్డువరుసలు);
+            సంపూర్ణ_కొలత.వెడల్పు = std::max(static_cast<పూర్ణాంకం>((delta2 - static_cast<size_t>(obj.అడుగు) * (సంపూర్ణ_కొలత.ఎత్తు - 1)) / esz), obj.నిలువుల_సంఖ్య);
 
-            if (wholeSize.height < rows || wholeSize.width < cols)
+            ఒకవేళ (సంపూర్ణ_కొలత.ఎత్తు < అడ్డువరుసలు || సంపూర్ణ_కొలత.వెడల్పు < నిలువుల_సంఖ్య)
             {
-                obj.create(rows, cols, type);
+                obj.create(అడ్డువరుసలు, నిలువుల_సంఖ్య, type);
             }
-            else
+            లేకపోతే
             {
-                obj.cols = cols;
-                obj.rows = rows;
+                obj.నిలువుల_సంఖ్య = నిలువుల_సంఖ్య;
+                obj.అడ్డువరుసలు = అడ్డువరుసలు;
             }
         }
     }
 }
 
-void cv::cuda::ensureSizeIsEnough(int rows, int cols, int type, OutputArray arr)
+శూన్య cv::cuda::ensure_కొలత_Is_Enough(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, OutputArray arr)
 {
-    switch (arr.kind())
+    ఎంపిక (arr.రకం())
     {
-    case _InputArray::MAT:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getMatRef());
-        break;
+    స్థితి ఆదానం_Array_2::MAT:
+        ::ensure_కొలత_Is_Enough_Impl(అడ్డువరుసలు, నిలువుల_సంఖ్య, type, arr.getMatRef());
+        ఆపు;
 
-    case _InputArray::CUDA_GPU_MAT:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getGpuMatRef());
-        break;
+    స్థితి ఆదానం_Array_2::CUDA_GPU_MAT:
+        ::ensure_కొలత_Is_Enough_Impl(అడ్డువరుసలు, నిలువుల_సంఖ్య, type, arr.getGpuMatRef());
+        ఆపు;
 
-    case _InputArray::CUDA_HOST_MEM:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getHostMemRef());
-        break;
+    స్థితి ఆదానం_Array_2::CUDA_HOST_MEM:
+        ::ensure_కొలత_Is_Enough_Impl(అడ్డువరుసలు, నిలువుల_సంఖ్య, type, arr.getHostMemRef());
+        ఆపు;
 
-    default:
-        arr.create(rows, cols, type);
+    అప్రమేయ:
+        arr.create(అడ్డువరుసలు, నిలువుల_సంఖ్య, type);
     }
 }
 
-GpuMat cv::cuda::getInputMat(InputArray _src, Stream& stream)
+GpuMat cv::cuda::get_ఆదానం_Mat(ఆదానం_Array _src, ప్రవాహం& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(_src);
-    CV_UNUSED(stream);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(_src);
+    CV_వాడని(stream);
     throw_no_cuda();
-#else
+#లేకపోతే
     GpuMat src;
-    if (_src.kind() == _InputArray::CUDA_GPU_MAT)
+    ఒకవేళ (_src.రకం() == ఆదానం_Array_2::CUDA_GPU_MAT)
     {
         src = _src.getGpuMat();
     }
-    else if (!_src.empty())
+    లేకపోతే ఒకవేళ (!_src.empty())
     {
-        BufferPool pool(stream);
-        src = pool.getBuffer(_src.size(), _src.type());
+        బఫరు_Pool pool(stream);
+        src = pool.get_బఫరు(_src.size(), _src.type());
         src.upload(_src, stream);
     }
-    return src;
-#endif
+    తిరిగి src;
+#అయితే_ముగింపు
 }
 
-GpuMat cv::cuda::getOutputMat(OutputArray _dst, int rows, int cols, int type, Stream& stream)
+GpuMat cv::cuda::getOutputMat(OutputArray _dst, పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, ప్రవాహం& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(_dst);
-    CV_UNUSED(rows);
-    CV_UNUSED(cols);
-    CV_UNUSED(type);
-    CV_UNUSED(stream);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(_dst);
+    CV_వాడని(అడ్డువరుసలు);
+    CV_వాడని(నిలువుల_సంఖ్య);
+    CV_వాడని(type);
+    CV_వాడని(stream);
     throw_no_cuda();
-#else
+#లేకపోతే
     GpuMat dst;
-    if (_dst.kind() == _InputArray::CUDA_GPU_MAT)
+    ఒకవేళ (_dst.రకం() == ఆదానం_Array_2::CUDA_GPU_MAT)
     {
-        _dst.create(rows, cols, type);
+        _dst.create(అడ్డువరుసలు, నిలువుల_సంఖ్య, type);
         dst = _dst.getGpuMat();
     }
-    else
+    లేకపోతే
     {
-        BufferPool pool(stream);
-        dst = pool.getBuffer(rows, cols, type);
+        బఫరు_Pool pool(stream);
+        dst = pool.get_బఫరు(అడ్డువరుసలు, నిలువుల_సంఖ్య, type);
     }
-    return dst;
-#endif
+    తిరిగి dst;
+#అయితే_ముగింపు
 }
 
-void cv::cuda::syncOutput(const GpuMat& dst, OutputArray _dst, Stream& stream)
+శూన్య cv::cuda::syncOutput(స్థిరరాశి GpuMat& dst, OutputArray _dst, ప్రవాహం& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(dst);
-    CV_UNUSED(_dst);
-    CV_UNUSED(stream);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(dst);
+    CV_వాడని(_dst);
+    CV_వాడని(stream);
     throw_no_cuda();
-#else
-    if (_dst.kind() != _InputArray::CUDA_GPU_MAT)
+#లేకపోతే
+    ఒకవేళ (_dst.రకం() != ఆదానం_Array_2::CUDA_GPU_MAT)
     {
-        if (stream)
+        ఒకవేళ (stream)
             dst.download(_dst, stream);
-        else
+        లేకపోతే
             dst.download(_dst);
     }
-#endif
+#అయితే_ముగింపు
 }
 
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
 
 GpuMat::Allocator* cv::cuda::GpuMat::defaultAllocator()
 {
-    return 0;
+    తిరిగి 0;
 }
 
-void cv::cuda::GpuMat::setDefaultAllocator(Allocator* allocator)
+శూన్య cv::cuda::GpuMat::సమితి_Default_Allocator(Allocator* allocator)
 {
-    CV_UNUSED(allocator);
+    CV_వాడని(allocator);
     throw_no_cuda();
 }
 
 GpuMat::Allocator* cv::cuda::GpuMat::getStdAllocator()
 {
-    return 0;
+    తిరిగి 0;
 }
 
-void cv::cuda::GpuMat::create(int _rows, int _cols, int _type)
+శూన్య cv::cuda::GpuMat::create(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type)
 {
-    CV_UNUSED(_rows);
-    CV_UNUSED(_cols);
-    CV_UNUSED(_type);
+    CV_వాడని(అడ్డువరుసలు_3);
+    CV_వాడని(నిలువుల_సంఖ్య_3);
+    CV_వాడని(_type);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::release()
+శూన్య cv::cuda::GpuMat::release()
 {
-    if( refcount && CV_XADD(refcount, -1) == 1 )
-        defaultAllocator()->free(this);
-    dataend = datastart = data = 0;
-    step = 0;
+    ఒకవేళ( refcount && CV_XADD(refcount, -1) == 1 )
+        defaultAllocator()->విడుదల(ఇది);
+    dataend = datastart = దత్తాంశం = 0;
+    అడుగు = 0;
     refcount = 0;
-    flags &= ~Mat::MAGIC_MASK;
+    flags &= ~Mat::MAGIC_ముసుగు;
 }
 
-void cv::cuda::GpuMat::fit(int _rows, int _cols, int _type)
+శూన్య cv::cuda::GpuMat::fit(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type)
 {
     // Emulate Mat::fit semantics for GPU: avoid reallocation when possible
-    size_t oldTotalBytes = (datastart && dataend) ? (size_t)(dataend - datastart) : 0;
-    size_t esz = CV_ELEM_SIZE(_type);
-    size_t newTotalBytes = (size_t)_rows * (size_t)_cols * esz;
+    size_t old_మొత్తం_బైట్లు = (datastart && dataend) ? (size_t)(dataend - datastart) : 0;
+    size_t esz = CV_ELEM_కొలత(_type);
+    size_t new_మొత్తం_బైట్లు = (size_t)అడ్డువరుసలు_3 * (size_t)నిలువుల_సంఖ్య_3 * esz;
 
     // Reallocate if:
     // - need non-contiguous layout (GPU pitch) or ROI, or
     // - requested bytes exceed current capacity, or
     // - data pointer is not at the start (ROI)
-    if (newTotalBytes > 0 && (!isContinuous() || newTotalBytes > oldTotalBytes || data != datastart))
+    ఒకవేళ (new_మొత్తం_బైట్లు > 0 && (!isContinuous() || new_మొత్తం_బైట్లు > old_మొత్తం_బైట్లు || దత్తాంశం != datastart))
     {
-        create(_rows, _cols, _type);
-        return;
+        create(అడ్డువరుసలు_3, నిలువుల_సంఖ్య_3, _type);
+        తిరిగి;
     }
 
     // Reuse existing allocation, just adjust header/type
-    flags = (flags & ~Mat::TYPE_MASK) | CV_MAKETYPE(CV_MAT_DEPTH(_type), CV_MAT_CN(_type));
-    rows = _rows;
-    cols = _cols;
-    step = (size_t)cols * esz;
+    flags = (flags & ~Mat::TYPE_ముసుగు) | CV_MAKETYPE(CV_MAT_లోతు(_type), CV_MAT_CN(_type));
+    అడ్డువరుసలు = అడ్డువరుసలు_3;
+    నిలువుల_సంఖ్య = నిలువుల_సంఖ్య_3;
+    అడుగు = (size_t)నిలువుల_సంఖ్య * esz;
 }
 
-void cv::cuda::GpuMat::fit(Size _sz, int _type)
+శూన్య cv::cuda::GpuMat::fit(కొలత _sz, పూర్ణాంకం _type)
 {
-    fit(_sz.height, _sz.width, _type);
+    fit(_sz.ఎత్తు, _sz.వెడల్పు, _type);
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr)
+శూన్య cv::cuda::GpuMat::upload(ఆదానం_Array arr)
 {
-    CV_UNUSED(arr);
+    CV_వాడని(arr);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr, Stream& _stream)
+శూన్య cv::cuda::GpuMat::upload(ఆదానం_Array arr, ప్రవాహం& ప్రవాహం_2)
 {
-    CV_UNUSED(arr);
-    CV_UNUSED(_stream);
+    CV_వాడని(arr);
+    CV_వాడని(ప్రవాహం_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::download(OutputArray _dst) const
+శూన్య cv::cuda::GpuMat::download(OutputArray _dst) స్థిరరాశి
 {
-    CV_UNUSED(_dst);
+    CV_వాడని(_dst);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::download(OutputArray _dst, Stream& _stream) const
+శూన్య cv::cuda::GpuMat::download(OutputArray _dst, ప్రవాహం& ప్రవాహం_2) స్థిరరాశి
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_stream);
+    CV_వాడని(_dst);
+    CV_వాడని(ప్రవాహం_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst) const
+శూన్య cv::cuda::GpuMat::copy_గమ్యం(OutputArray _dst) స్థిరరాశి
 {
-    CV_UNUSED(_dst);
+    CV_వాడని(_dst);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst, Stream& _stream) const
+శూన్య cv::cuda::GpuMat::copy_గమ్యం(OutputArray _dst, ప్రవాహం& ప్రవాహం_2) స్థిరరాశి
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_stream);
+    CV_వాడని(_dst);
+    CV_వాడని(ప్రవాహం_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst, InputArray _mask, Stream& _stream) const
+శూన్య cv::cuda::GpuMat::copy_గమ్యం(OutputArray _dst, ఆదానం_Array ముసుగు_2, ప్రవాహం& ప్రవాహం_2) స్థిరరాశి
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_mask);
-    CV_UNUSED(_stream);
+    CV_వాడని(_dst);
+    CV_వాడని(ముసుగు_2);
+    CV_వాడని(ప్రవాహం_2);
     throw_no_cuda();
 }
 
-GpuMat& cv::cuda::GpuMat::setTo(Scalar s, Stream& _stream)
+GpuMat& cv::cuda::GpuMat::సమితి_గమ్యం(Scalar s, ప్రవాహం& ప్రవాహం_2)
 {
-    CV_UNUSED(s);
-    CV_UNUSED(_stream);
+    CV_వాడని(s);
+    CV_వాడని(ప్రవాహం_2);
     throw_no_cuda();
 }
 
-GpuMat& cv::cuda::GpuMat::setTo(Scalar s, InputArray _mask, Stream& _stream)
+GpuMat& cv::cuda::GpuMat::సమితి_గమ్యం(Scalar s, ఆదానం_Array ముసుగు_2, ప్రవాహం& ప్రవాహం_2)
 {
-    CV_UNUSED(s);
-    CV_UNUSED(_mask);
-    CV_UNUSED(_stream);
+    CV_వాడని(s);
+    CV_వాడని(ముసుగు_2);
+    CV_వాడని(ప్రవాహం_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, Stream& _stream) const
+శూన్య cv::cuda::GpuMat::convert_గమ్యం(OutputArray _dst, పూర్ణాంకం rtype, ప్రవాహం& ప్రవాహం_2) స్థిరరాశి
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(rtype);
-    CV_UNUSED(_stream);
+    CV_వాడని(_dst);
+    CV_వాడని(rtype);
+    CV_వాడని(ప్రవాహం_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, double alpha, double beta, Stream& _stream) const
+శూన్య cv::cuda::GpuMat::convert_గమ్యం(OutputArray _dst, పూర్ణాంకం rtype, ద్విగుణ alpha, ద్విగుణ beta, ప్రవాహం& ప్రవాహం_2) స్థిరరాశి
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(rtype);
-    CV_UNUSED(alpha);
-    CV_UNUSED(beta);
-    CV_UNUSED(_stream);
+    CV_వాడని(_dst);
+    CV_వాడని(rtype);
+    CV_వాడని(alpha);
+    CV_వాడని(beta);
+    CV_వాడని(ప్రవాహం_2);
     throw_no_cuda();
 }
 
-#endif
+#అయితే_ముగింపు

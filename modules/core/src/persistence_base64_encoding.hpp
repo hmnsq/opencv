@@ -2,131 +2,131 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#ifndef OPENCV_CORE_BASE64_ENCODING_HPP
-#define OPENCV_CORE_BASE64_ENCODING_HPP
+#నిర్వచితం_కాకపోతే OPENCV_CORE_BASE64_ENCODING_HPP
+#నిర్వచించు OPENCV_CORE_BASE64_ENCODING_HPP
 
-namespace cv
+నామాకాశ cv
 {
 
-namespace base64
+నామాకాశ base64
 {
 /* A decorator for CvFileStorage
 * - no copyable
 * - not safe for now
 * - move constructor may be needed if C++11
 */
-uint8_t const base64_mapping[] =
+uint8_t స్థిరరాశి base64_mapping[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789+/";
 
-uint8_t const base64_padding = '=';
+uint8_t స్థిరరాశి base64_padding = '=';
 
-std::string make_base64_header(const char * dt);
+std::string make_base64_శీర్షిక(స్థిరరాశి అక్షరం * dt);
 
-size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
+size_t base64_encode(uint8_t స్థిరరాశి * src, uint8_t * dst, size_t off, size_t cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+పూర్ణాంకం icv_Calc_Struct_కొలత( స్థిరరాశి అక్షరం* dt, పూర్ణాంకం initial_కొలత );
 
-class Base64ContextEmitter;
-class Impl;
+తరగతి Base64ContextEmitter;
+తరగతి Impl;
 
-class Base64Writer
+తరగతి Base64Writer
 {
-public:
-    Base64Writer(cv::FileStorage::Impl& fs, bool can_indent);
+బహిరంగ:
+    Base64Writer(cv::FileStorage::Impl& fs, తార్కిక can_indent);
     ~Base64Writer();
-    void write(const void* _data, size_t len, const char* dt);
-    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const char* dt);
+    శూన్య లిఖ(స్థిరరాశి శూన్య* దత్తాంశం_3, size_t len, స్థిరరాశి అక్షరం* dt);
+    మూస<రకం_పేరు గమ్యం_ద్విమాన_convertor_t> శూన్య లిఖ(గమ్యం_ద్విమాన_convertor_t & convertor, స్థిరరాశి అక్షరం* dt);
 
-private:
-    void check_dt(const char* dt);
+అంతరంగ:
+    శూన్య check_dt(స్థిరరాశి అక్షరం* dt);
 
-private:
+అంతరంగ:
     // disable copy and assignment
-    Base64Writer(const Base64Writer &);
-    Base64Writer & operator=(const Base64Writer &);
+    Base64Writer(స్థిరరాశి Base64Writer &);
+    Base64Writer & క్రియాకారకం=(స్థిరరాశి Base64Writer &);
 
-private:
+అంతరంగ:
 
     Base64ContextEmitter * emitter;
-    std::string data_type_string;
+    std::string దత్తాంశం_type_string;
 };
 
-size_t base64_encode_buffer_size(size_t cnt, bool is_end_with_zero = true);
+size_t base64_encode_బఫరు_కొలత(size_t cnt, తార్కిక is_చివర_with_zero = నిజం);
 
-template<typename _uint_t> inline size_t
-to_binary(_uint_t val, uchar * cur)
+మూస<రకం_పేరు _uint_t> అంతఃవరుస size_t
+గమ్యం_ద్విమాన(_uint_t val, uchar * cur)
 {
     size_t delta = CHAR_BIT;
-    size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    size_t cnt = పరిమాణం(_uint_t);
+    అయితే (cnt --> static_cast<size_t>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    తిరిగి పరిమాణం(_uint_t);
 }
 
-template<> inline size_t to_binary(bool val, uchar * cur)
+మూస<> అంతఃవరుస size_t గమ్యం_ద్విమాన(తార్కిక val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    తిరిగి గమ్యం_ద్విమాన(static_cast<uchar>(val), cur);
 }
 
-template<> inline size_t to_binary(double val, uchar * cur)
+మూస<> అంతఃవరుస size_t గమ్యం_ద్విమాన(ద్విగుణ val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    తిరిగి గమ్యం_ద్విమాన(bit64.u, cur);
 }
 
-template<> inline size_t to_binary(float val, uchar * cur)
+మూస<> అంతఃవరుస size_t గమ్యం_ద్విమాన(దశాంశం val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    తిరిగి గమ్యం_ద్విమాన(bit32.u, cur);
 }
 
-template<typename _primitive_t> inline size_t
-to_binary(uchar const * val, uchar * cur)
+మూస<రకం_పేరు _primitive_t> అంతఃవరుస size_t
+గమ్యం_ద్విమాన(uchar స్థిరరాశి * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    తిరిగి గమ్యం_ద్విమాన<_primitive_t>(*reinterpret_cast<_primitive_t స్థిరరాశి *>(val), cur);
 }
 
 
 
-class RawDataToBinaryConvertor
+తరగతి Raw_దత్తాంశం_గమ్యం_ద్విమాన_Convertor
 {
-public:
+బహిరంగ:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    Raw_దత్తాంశం_గమ్యం_ద్విమాన_Convertor(స్థిరరాశి శూన్య* src, పూర్ణాంకం len, స్థిరరాశి std::string & dt);
 
-    inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
-    inline operator bool() const;
+    అంతఃవరుస Raw_దత్తాంశం_గమ్యం_ద్విమాన_Convertor & క్రియాకారకం >>(uchar * & dst);
+    అంతఃవరుస క్రియాకారకం తార్కిక() స్థిరరాశి;
 
-private:
-    typedef size_t(*to_binary_t)(const uchar *, uchar *);
-    struct elem_to_binary_t
+అంతరంగ:
+    రకనిర్వచనం size_t(*గమ్యం_ద్విమాన_t)(స్థిరరాశి uchar *, uchar *);
+    నిర్మాణం elem_గమ్యం_ద్విమాన_t
     {
         size_t      offset;
-        size_t      offset_packed;
-        to_binary_t func;
+        size_t      స్థానభ్రంశం_packed;
+        గమ్యం_ద్విమాన_t func;
     };
 
-private:
-    size_t make_to_binary_funcs(const std::string &dt);
+అంతరంగ:
+    size_t make_గమ్యం_ద్విమాన_funcs(స్థిరరాశి std::string &dt);
 
-private:
-    const uchar * beg;
-    const uchar * cur;
-    const uchar * end;
+అంతరంగ:
+    స్థిరరాశి uchar * beg;
+    స్థిరరాశి uchar * cur;
+    స్థిరరాశి uchar * end;
 
-    size_t step;
-    size_t step_packed;
-    std::vector<elem_to_binary_t> to_binary_funcs;
+    size_t అడుగు;
+    size_t అడుగు_packed;
+    std::vector<elem_గమ్యం_ద్విమాన_t> గమ్యం_ద్విమాన_funcs;
 };
 
 }
 
 }
-#endif
+#అయితే_ముగింపు

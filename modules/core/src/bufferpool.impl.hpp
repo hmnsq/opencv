@@ -4,25 +4,25 @@
 //
 // Copyright (C) 2014, Advanced Micro Devices, Inc., all rights reserved.
 
-#ifndef __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
-#define __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#నిర్వచితం_కాకపోతే __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#నిర్వచించు __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
 
-#include "opencv2/core/bufferpool.hpp"
+#అన్తర్భావ "opencv2/core/bufferpool.hpp"
 
-namespace cv {
+నామాకాశ cv {
 
-class DummyBufferPoolController : public BufferPoolController
+తరగతి Dummy_బఫరు_Pool_Controller : బహిరంగ బఫరు_Pool_Controller
 {
-public:
-    DummyBufferPoolController() { }
-    virtual ~DummyBufferPoolController() { }
+బహిరంగ:
+    Dummy_బఫరు_Pool_Controller() { }
+    మాయా ~Dummy_బఫరు_Pool_Controller() { }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual void setMaxReservedSize(size_t size) CV_OVERRIDE { CV_UNUSED(size); }
-    virtual void freeAllReservedBuffers() CV_OVERRIDE { }
+    మాయా size_t get_Reserved_కొలత() స్థిరరాశి CV_OVERRIDE { తిరిగి (size_t)-1; }
+    మాయా size_t get_Max_Reserved_కొలత() స్థిరరాశి CV_OVERRIDE { తిరిగి (size_t)-1; }
+    మాయా శూన్య సమితి_Max_Reserved_కొలత(size_t size) CV_OVERRIDE { CV_వాడని(size); }
+    మాయా శూన్య freeAllReservedBuffers() CV_OVERRIDE { }
 };
 
 } // namespace
 
-#endif // __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#అయితే_ముగింపు // __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__

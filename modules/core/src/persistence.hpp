@@ -3,213 +3,213 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#ifndef SRC_PERSISTENCE_HPP
-#define SRC_PERSISTENCE_HPP
+#నిర్వచితం_కాకపోతే SRC_PERSISTENCE_HPP
+#నిర్వచించు SRC_PERSISTENCE_HPP
 
-#include <deque>
-#include <sstream>
-#include <string>
-#include <iterator>
+#అన్తర్భావ <deque>
+#అన్తర్భావ <sstream>
+#అన్తర్భావ <string>
+#అన్తర్భావ <iterator>
 
-#define USE_ZLIB 1
-#if USE_ZLIB
+#నిర్వచించు USE_ZLIB 1
+#ఒకవేళ USE_ZLIB
 #  ifndef _LFS64_LARGEFILE
 #    define _LFS64_LARGEFILE 0
 #  endif
-#  ifndef _FILE_OFFSET_BITS
-#    define _FILE_OFFSET_BITS 0
+#  ifndef FILE_స్థానభ్రంశం_బిట్లు
+#    define FILE_స్థానభ్రంశం_బిట్లు 0
 #  endif
 #  include <zlib.h>
-#else
-typedef void* gzFile;
-#endif
+#లేకపోతే
+రకనిర్వచనం శూన్య* gzFile;
+#అయితే_ముగింపు
 
 //=====================================================================================
 
-static const size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
-static const int CV_PERSISTENCE_MAX_DEPTH = 1024;
+స్థిర స్థిరరాశి size_t PARSER_BASE64_బఫరు_కొలత = 1024U * 1024U / 8U;
+స్థిర స్థిరరాశి పూర్ణాంకం CV_PERSISTENCE_MAX_లోతు = 1024;
 
-namespace base64 {
+నామాకాశ base64 {
 
-enum
+గణన
 {
-    HEADER_SIZE         = 24,
-    ENCODED_HEADER_SIZE = 32
+    శీర్షిక_కొలత         = 24,
+    ENCODED_శీర్షిక_కొలత = 32
 };
 
 } // base64::
 
 //=====================================================================================
 
-#define CV_FS_MAX_LEN 4096
-#define CV_FS_MAX_FMT_PAIRS  128
+#నిర్వచించు CV_FS_MAX_LEN 4096
+#నిర్వచించు CV_FS_MAX_FMT_జతలు  128
 
 /****************************************************************************************\
 *                            Common macros and type definitions                          *
 \****************************************************************************************/
 
-#define cv_isprint(c)     ((uchar)(c) >= (uchar)' ')
-#define cv_isprint_or_tab(c)  ((uchar)(c) >= (uchar)' ' || (c) == '\t')
+#నిర్వచించు cv_isprint(c)     ((uchar)(c) >= (uchar)' ')
+#నిర్వచించు cv_isprint_or_tab(c)  ((uchar)(c) >= (uchar)' ' || (c) == '\t')
 
-inline bool cv_isalnum(char c)
+అంతఃవరుస తార్కిక cv_isalnum(అక్షరం c)
 {
-    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    తిరిగి ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isalpha(char c)
+అంతఃవరుస తార్కిక cv_isalpha(అక్షరం c)
 {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    తిరిగి ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isdigit(char c)
+అంతఃవరుస తార్కిక cv_isdigit(అక్షరం c)
 {
-    return '0' <= c && c <= '9';
+    తిరిగి '0' <= c && c <= '9';
 }
 
-inline bool cv_isspace(char c)
+అంతఃవరుస తార్కిక cv_isspace(అక్షరం c)
 {
-    return (9 <= c && c <= 13) || c == ' ';
+    తిరిగి (9 <= c && c <= 13) || c == ' ';
 }
 
-inline char* cv_skip_BOM(char* ptr)
+అంతఃవరుస అక్షరం* cv_skip_BOM(అక్షరం* ptr)
 {
-    if((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
+    ఒకవేళ((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
     {
-      return ptr + 3;
+      తిరిగి ptr + 3;
     }
-    return ptr;
+    తిరిగి ptr;
 }
 
-namespace cv
+నామాకాశ cv
 {
-namespace fs
+నామాకాశ fs
 {
-int strcasecmp(const char* str1, const char* str2);
-char* itoa( int _val, char* buffer, int /*radix*/ );
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed );
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero );
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero );
+పూర్ణాంకం strcasecmp(స్థిరరాశి అక్షరం* str1, స్థిరరాశి అక్షరం* str2);
+అక్షరం* itoa( పూర్ణాంకం _val, అక్షరం* బఫరు, పూర్ణాంకం /*radix*/ );
+అక్షరం* itoa( int64_t _val, అక్షరం* బఫరు, పూర్ణాంకం /*radix*/, తార్కిక _signed );
+అక్షరం* float_గమ్యం_String( అక్షరం* buf, size_t buf_కొలత, దశాంశం value, తార్కిక halfprecision, తార్కిక explicitZero );
+అక్షరం* double_గమ్యం_String( అక్షరం* buf, size_t buf_కొలత, ద్విగుణ value, తార్కిక explicitZero );
 
-int calcStructSize( const char* dt, int initial_size );
-int calcElemSize( const char* dt, int initial_size );
-CV_DEPRECATED char* encodeFormat( int elem_type, char* dt );
-char* encodeFormat( int elem_type, char* dt, size_t dt_len );
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len );
-int decodeSimpleFormat( const char* dt );
+పూర్ణాంకం calc_Struct_కొలత( స్థిరరాశి అక్షరం* dt, పూర్ణాంకం initial_కొలత );
+పూర్ణాంకం calc_Elem_కొలత( స్థిరరాశి అక్షరం* dt, పూర్ణాంకం initial_కొలత );
+CV_DEPRECATED అక్షరం* encodeFormat( పూర్ణాంకం elem_type, అక్షరం* dt );
+అక్షరం* encodeFormat( పూర్ణాంకం elem_type, అక్షరం* dt, size_t dt_len );
+పూర్ణాంకం decodeFormat( స్థిరరాశి అక్షరం* dt, పూర్ణాంకం* fmt_జతలు, పూర్ణాంకం max_len );
+పూర్ణాంకం decodeSimpleFormat( స్థిరరాశి అక్షరం* dt );
 }
 
 
-#ifdef CV_STATIC_ANALYSIS
-#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } while (0)
-#else
-#define CV_PARSE_ERROR_CPP( errmsg ) \
+#నిర్వచితమైతే CV_STATIC_ANALYSIS
+#నిర్వచించు CV_PARSE_ERROR_CPP(errmsg) చేయి { (శూన్య)fs; abort(); } అయితే (0)
+#లేకపోతే
+#నిర్వచించు CV_PARSE_ERROR_CPP( errmsg ) \
     fs->parseError( CV_Func, (errmsg), __FILE__, __LINE__ )
-#endif
+#అయితే_ముగింపు
 
 
-#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() do { \
+#నిర్వచించు CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP() చేయి { \
     CV_DbgAssert(ptr); \
-    if((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
-} while (0)
+    ఒకవేళ((ptr)[0] == 0 && (ptr) == fs->బఫరు_చివర_2() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
+} అయితే (0)
 
 
-class FileStorageParser;
-class FileStorageEmitter;
+తరగతి FileStorageParser;
+తరగతి FileStorageEmitter;
 
-struct FStructData
+నిర్మాణం FStruct_దత్తాంశం
 {
-    FStructData() { indent = flags = 0; }
-    FStructData( const std::string& _struct_tag,
-                 int _struct_flags, int _struct_indent )
+    FStruct_దత్తాంశం() { indent = flags = 0; }
+    FStruct_దత్తాంశం( స్థిరరాశి std::string& struct_ట్యాగ్,
+                 పూర్ణాంకం _struct_flags, పూర్ణాంకం _struct_indent )
     {
-        tag = _struct_tag;
+        ట్యాగ్ = struct_ట్యాగ్;
         flags = _struct_flags;
         indent = _struct_indent;
     }
 
-    std::string tag;
-    int flags;
-    int indent;
+    std::string ట్యాగ్;
+    పూర్ణాంకం flags;
+    పూర్ణాంకం indent;
 };
 
-class FileStorage_API
+తరగతి FileStorage_API
 {
-public:
-    virtual ~FileStorage_API();
-    virtual FileStorage* getFS() = 0;
+బహిరంగ:
+    మాయా ~FileStorage_API();
+    మాయా FileStorage* getFS() = 0;
 
-    virtual int getFormat() const = 0;
+    మాయా పూర్ణాంకం getFormat() స్థిరరాశి = 0;
 
-    virtual void puts( const char* str ) = 0;
-    virtual char* gets() = 0;
-    virtual bool eof() = 0;
-    virtual void setEof() = 0;
-    virtual void closeFile() = 0;
-    virtual void rewind() = 0;
-    virtual char* resizeWriteBuffer( char* ptr, int len ) = 0;
-    virtual char* bufferPtr() const = 0;
-    virtual char* bufferStart() const = 0;
-    virtual char* bufferEnd() const = 0;
-    virtual void setBufferPtr(char* ptr) = 0;
-    virtual char* flush() = 0;
-    virtual void setNonEmpty() = 0;
-    virtual int wrapMargin() const = 0;
+    మాయా శూన్య puts( స్థిరరాశి అక్షరం* str ) = 0;
+    మాయా అక్షరం* gets() = 0;
+    మాయా తార్కిక eof() = 0;
+    మాయా శూన్య సమితి_Eof() = 0;
+    మాయా శూన్య closeFile() = 0;
+    మాయా శూన్య rewind() = 0;
+    మాయా అక్షరం* resize_Write_బఫరు( అక్షరం* ptr, పూర్ణాంకం len ) = 0;
+    మాయా అక్షరం* బఫరు_Ptr() స్థిరరాశి = 0;
+    మాయా అక్షరం* బఫరు_ప్రారంభం() స్థిరరాశి = 0;
+    మాయా అక్షరం* బఫరు_చివర_2() స్థిరరాశి = 0;
+    మాయా శూన్య సమితి_బఫరు_Ptr(అక్షరం* ptr) = 0;
+    మాయా అక్షరం* flush() = 0;
+    మాయా శూన్య సమితి_Non_ఖాళీలు() = 0;
+    మాయా పూర్ణాంకం wrapMargin() స్థిరరాశి = 0;
 
-    virtual FStructData& getCurrentStruct() = 0;
+    మాయా FStruct_దత్తాంశం& getCurrentStruct() = 0;
 
-    virtual void convertToCollection( int type, FileNode& node ) = 0;
-    virtual FileNode addNode( FileNode& collection, const std::string& key,
-                               int type, const void* value=0, int len=-1 ) = 0;
-    virtual void finalizeCollection( FileNode& collection ) = 0;
-    virtual double strtod(char* ptr, char** endptr) = 0;
+    మాయా శూన్య convert_గమ్యం_Collection( పూర్ణాంకం type, File_కణుపు& కణుపు ) = 0;
+    మాయా File_కణుపు కూడు_కణుపు( File_కణుపు& collection, స్థిరరాశి std::string& కీలకం,
+                               పూర్ణాంకం type, స్థిరరాశి శూన్య* value=0, పూర్ణాంకం len=-1 ) = 0;
+    మాయా శూన్య finalizeCollection( File_కణుపు& collection ) = 0;
+    మాయా ద్విగుణ strtod(అక్షరం* ptr, అక్షరం** endptr) = 0;
 
-    virtual char* parseBase64(char* ptr, int indent, FileNode& collection) = 0;
+    మాయా అక్షరం* parseBase64(అక్షరం* ptr, పూర్ణాంకం indent, File_కణుపు& collection) = 0;
     CV_NORETURN
-    virtual void parseError(const char* funcname, const std::string& msg,
-                            const char* filename, int lineno) = 0;
+    మాయా శూన్య parseError(స్థిరరాశి అక్షరం* funcname, స్థిరరాశి std::string& సందేశం,
+                            స్థిరరాశి అక్షరం* filename, పూర్ణాంకం lineno) = 0;
 
-private:
-    enum Base64State{
+అంతరంగ:
+    గణన Base64State{
         Uncertain,
         NotUse,
-        InUse,
+        లోపల_Use,
     };
 
-    friend class cv::FileStorage::Impl;
-    friend class cv::FileStorage;
-    friend class JSONEmitter;
-    friend class XMLEmitter;
-    friend class YAMLEmitter;
+    మిత్ర తరగతి cv::FileStorage::Impl;
+    మిత్ర తరగతి cv::FileStorage;
+    మిత్ర తరగతి JSONEmitter;
+    మిత్ర తరగతి XMLEmitter;
+    మిత్ర తరగతి YAMLEmitter;
 
-    virtual void check_if_write_struct_is_delayed(bool change_type_to_base64 = false) = 0;
-    virtual void switch_to_Base64_state(Base64State state) = 0;
-    virtual Base64State get_state_of_writing_base64() = 0;
-    virtual int get_space() = 0;
+    మాయా శూన్య check_if_write_struct_is_delayed(తార్కిక change_type_గమ్యం_base64 = అబద్ధం) = 0;
+    మాయా శూన్య switch_గమ్యం_Base64_state(Base64State state) = 0;
+    మాయా Base64State get_state_యొక్క_writing_base64() = 0;
+    మాయా పూర్ణాంకం get_space() = 0;
 };
 
-class FileStorageEmitter
+తరగతి FileStorageEmitter
 {
-public:
-    virtual ~FileStorageEmitter() {}
+బహిరంగ:
+    మాయా ~FileStorageEmitter() {}
 
-    virtual FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                          int struct_flags, const char* type_name=0 ) = 0;
-    virtual void endWriteStruct(const FStructData& current_struct) = 0;
-    virtual void write(const char* key, int value) = 0;
-    virtual void write(const char* key, int64_t value) = 0;
-    virtual void write(const char* key, double value) = 0;
-    virtual void write(const char* key, const char* value, bool quote) = 0;
-    virtual void writeScalar(const char* key, const char* value) = 0;
-    virtual void writeComment(const char* comment, bool eol_comment) = 0;
-    virtual void startNextStream() = 0;
+    మాయా FStruct_దత్తాంశం ప్రారంభం_Write_Struct( స్థిరరాశి FStruct_దత్తాంశం& మాతృ, స్థిరరాశి అక్షరం* కీలకం,
+                                          పూర్ణాంకం struct_flags, స్థిరరాశి అక్షరం* type_name=0 ) = 0;
+    మాయా శూన్య చివర_Write_Struct(స్థిరరాశి FStruct_దత్తాంశం& current_struct) = 0;
+    మాయా శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, పూర్ణాంకం value) = 0;
+    మాయా శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, int64_t value) = 0;
+    మాయా శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, ద్విగుణ value) = 0;
+    మాయా శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, స్థిరరాశి అక్షరం* value, తార్కిక quote) = 0;
+    మాయా శూన్య writeScalar(స్థిరరాశి అక్షరం* కీలకం, స్థిరరాశి అక్షరం* value) = 0;
+    మాయా శూన్య writeComment(స్థిరరాశి అక్షరం* comment, తార్కిక eol_comment) = 0;
+    మాయా శూన్య ప్రారంభం_తదుపరి_ప్రవాహం() = 0;
 };
 
-class FileStorageParser
+తరగతి FileStorageParser
 {
-public:
-    virtual ~FileStorageParser() {}
-    virtual bool parse(char* ptr) = 0;
-    virtual bool getBase64Row(char* ptr, int indent, char* &beg, char* &end) = 0;
+బహిరంగ:
+    మాయా ~FileStorageParser() {}
+    మాయా తార్కిక parse(అక్షరం* ptr) = 0;
+    మాయా తార్కిక get_Base64_అడ్డువరుస(అక్షరం* ptr, పూర్ణాంకం indent, అక్షరం* &beg, అక్షరం* &end) = 0;
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs);
@@ -222,4 +222,4 @@ Ptr<FileStorageParser> createJSONParser(FileStorage_API* fs);
 
 }
 
-#endif // SRC_PERSISTENCE_HPP
+#అయితే_ముగింపు // SRC_PERSISTENCE_HPP

@@ -1,368 +1,368 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "precomp.hpp"
-#include <sstream>
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ <sstream>
 
-namespace cv
+నామాకాశ cv
 {
 
-namespace {
-static const char* noneValue = "<none>";
+నామాకాశ {
+స్థిర స్థిరరాశి అక్షరం* none_విలువ = "<none>";
 
-static String cat_string(const String& str)
+స్థిర String cat_string(స్థిరరాశి String& str)
 {
-    int left = 0, right = (int)str.length();
-    while( left < right && str[left] == ' ' )
-        left++;
-    while( right > left && str[right-1] == ' ' )
-        right--;
-    return left >= right ? String("") : str.substr(left, right-left);
+    పూర్ణాంకం ఎడమ = 0, కుడి = (పూర్ణాంకం)str.length();
+    అయితే( ఎడమ < కుడి && str[ఎడమ] == ' ' )
+        ఎడమ++;
+    అయితే( కుడి > ఎడమ && str[కుడి-1] == ' ' )
+        కుడి--;
+    తిరిగి ఎడమ >= కుడి ? String("") : str.substr(ఎడమ, కుడి-ఎడమ);
 }
 }
 
-struct CommandLineParserParams
+నిర్మాణం Command_పంక్తి_Parser_Params
 {
-public:
-    String help_message;
-    String def_value;
-    std::vector<String> keys;
-    int number;
+బహిరంగ:
+    String help_సందేశం;
+    String def_విలువ;
+    std::vector<String> కీలకాలు;
+    పూర్ణాంకం సంఖ్య;
 };
 
 
-struct CommandLineParser::Impl
+నిర్మాణం Command_పంక్తి_Parser::Impl
 {
-    bool error;
-    String error_message;
-    String about_message;
+    తార్కిక error;
+    String error_సందేశం;
+    String about_సందేశం;
 
-    String path_to_app;
+    String మార్గం_గమ్యం_app;
     String app_name;
 
-    std::vector<CommandLineParserParams> data;
+    std::vector<Command_పంక్తి_Parser_Params> దత్తాంశం;
 
-    std::vector<String> split_range_string(const String& str, char fs, char ss) const;
-    std::vector<String> split_string(const String& str, char symbol = ' ', bool create_empty_item = false) const;
+    std::vector<String> విభజించు_range_string(స్థిరరాశి String& str, అక్షరం fs, అక్షరం ss) స్థిరరాశి;
+    std::vector<String> విభజించు_string(స్థిరరాశి String& str, అక్షరం చిహ్నం = ' ', తార్కిక create_ఖాళీలు_అంశం = అబద్ధం) స్థిరరాశి;
 
-    void apply_params(const String& key, const String& value);
-    void apply_params(int i, String value);
+    శూన్య apply_params(స్థిరరాశి String& కీలకం, స్థిరరాశి String& value);
+    శూన్య apply_params(పూర్ణాంకం i, String value);
 
-    void sort_params();
-    int refcount;
+    శూన్య క్రమీకరించు_params();
+    పూర్ణాంకం refcount;
 };
 
 
-static const char* get_type_name(Param type)
+స్థిర స్థిరరాశి అక్షరం* get_type_name(Param type)
 {
-    if( type == Param::INT )
-        return "int";
-    if( type == Param::BOOLEAN )
-        return "bool";
-    if( type == Param::UNSIGNED_INT )
-        return "unsigned";
-    if( type == Param::UINT64 )
-        return "unsigned long long";
-    if( type == Param::FLOAT )
-        return "float";
-    if( type == Param::REAL )
-        return "double";
-    if( type == Param::STRING )
-        return "string";
-    return "unknown";
+    ఒకవేళ( type == Param::INT )
+        తిరిగి "int";
+    ఒకవేళ( type == Param::BOOLEAN )
+        తిరిగి "bool";
+    ఒకవేళ( type == Param::UNSIGNED_INT )
+        తిరిగి "unsigned";
+    ఒకవేళ( type == Param::UINT64 )
+        తిరిగి "unsigned long long";
+    ఒకవేళ( type == Param::FLOAT )
+        తిరిగి "float";
+    ఒకవేళ( type == Param::REAL )
+        తిరిగి "double";
+    ఒకవేళ( type == Param::STRING )
+        తిరిగి "string";
+    తిరిగి "unknown";
 }
 
-static bool parse_bool(std::string str)
+స్థిర తార్కిక parse_bool(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), details::char_tolower);
     std::istringstream is(str);
-    bool value = false;
+    తార్కిక value = అబద్ధం;
     is >> (str.size() > 1 ? std::boolalpha : std::noboolalpha) >> value;
 
-    if (is.fail())
+    ఒకవేళ (is.fail())
         CV_Error_(Error::StsBadArg, ("can not convert: [%s] to [bool]", str.c_str()));
 
-    return value;
+    తిరిగి value;
 }
 
-static void from_str(const String& str, Param type, void* dst)
+స్థిర శూన్య from_str(స్థిరరాశి String& str, Param type, శూన్య* dst)
 {
     std::stringstream ss(str.c_str());
-    if( type == Param::INT )
-        ss >> *(int*)dst;
-    else if( type == Param::BOOLEAN )
+    ఒకవేళ( type == Param::INT )
+        ss >> *(పూర్ణాంకం*)dst;
+    లేకపోతే ఒకవేళ( type == Param::BOOLEAN )
     {
-        std::string temp;
-        ss >> temp;
-        *(bool*) dst = parse_bool(temp);
+        std::string తాత్కాలిక_2;
+        ss >> తాత్కాలిక_2;
+        *(తార్కిక*) dst = parse_bool(తాత్కాలిక_2);
     }
-    else if( type == Param::UNSIGNED_INT )
-        ss >> *(unsigned*)dst;
-    else if( type == Param::UINT64 )
+    లేకపోతే ఒకవేళ( type == Param::UNSIGNED_INT )
+        ss >> *(గుర్తులేని*)dst;
+    లేకపోతే ఒకవేళ( type == Param::UINT64 )
         ss >> *(uint64*)dst;
-    else if( type == Param::FLOAT )
-        ss >> *(float*)dst;
-    else if( type == Param::REAL )
-        ss >> *(double*)dst;
-    else if( type == Param::STRING )
+    లేకపోతే ఒకవేళ( type == Param::FLOAT )
+        ss >> *(దశాంశం*)dst;
+    లేకపోతే ఒకవేళ( type == Param::REAL )
+        ss >> *(ద్విగుణ*)dst;
+    లేకపోతే ఒకవేళ( type == Param::STRING )
         *(String*)dst = str;
-    else if( type == Param::SCALAR)
+    లేకపోతే ఒకవేళ( type == Param::SCALAR)
     {
         Scalar& scalar = *(Scalar*)dst;
-        for (int i = 0; i < 4 && !ss.eof(); ++i)
+        కొరకు (పూర్ణాంకం i = 0; i < 4 && !ss.eof(); ++i)
             ss >> scalar[i];
     }
-    else
+    లేకపోతే
         CV_Error(Error::StsBadArg, "unknown/unsupported parameter type");
 
-    if (ss.fail())
+    ఒకవేళ (ss.fail())
     {
         CV_Error_(Error::StsBadArg, ("can not convert: [%s] to [%s]", str.c_str(), get_type_name(type)));
     }
 }
 
-void CommandLineParser::getByName(const String& name, bool space_delete, Param type, void* dst) const
+శూన్య Command_పంక్తి_Parser::getByName(స్థిరరాశి String& name, తార్కిక space_delete, Param type, శూన్య* dst) స్థిరరాశి
 {
-    try
+    ప్రయత్నించు
     {
-        for (size_t i = 0; i < impl->data.size(); i++)
+        కొరకు (size_t i = 0; i < impl->దత్తాంశం.size(); i++)
         {
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            కొరకు (size_t j = 0; j < impl->దత్తాంశం[i].కీలకాలు.size(); j++)
             {
-                if (name == impl->data[i].keys[j])
+                ఒకవేళ (name == impl->దత్తాంశం[i].కీలకాలు[j])
                 {
-                    String v = impl->data[i].def_value;
-                    if (space_delete)
+                    String v = impl->దత్తాంశం[i].def_విలువ;
+                    ఒకవేళ (space_delete)
                         v = cat_string(v);
 
                     // the key was neither specified nor has a default value
-                    if((v.empty() && type != Param::STRING) || v == noneValue) {
-                        impl->error = true;
-                        impl->error_message = impl->error_message + "Missing parameter: '" + name + "'\n";
-                        return;
+                    ఒకవేళ((v.empty() && type != Param::STRING) || v == none_విలువ) {
+                        impl->error = నిజం;
+                        impl->error_సందేశం = impl->error_సందేశం + "Missing parameter: '" + name + "'\n";
+                        తిరిగి;
                     }
 
                     from_str(v, type, dst);
-                    return;
+                    తిరిగి;
                 }
             }
         }
     }
-    catch (const Exception& e)
+    పట్టుకో (స్థిరరాశి Exception& e)
     {
-        impl->error = true;
-        impl->error_message = impl->error_message + "Parameter '"+ name + "': " + e.err + "\n";
-        return;
+        impl->error = నిజం;
+        impl->error_సందేశం = impl->error_సందేశం + "Parameter '"+ name + "': " + e.err + "\n";
+        తిరిగి;
     }
 
     CV_Error_(Error::StsBadArg, ("undeclared key '%s' requested", name.c_str()));
 }
 
 
-void CommandLineParser::getByIndex(int index, bool space_delete, Param type, void* dst) const
+శూన్య Command_పంక్తి_Parser::get_By_సూచీ(పూర్ణాంకం సూచీ, తార్కిక space_delete, Param type, శూన్య* dst) స్థిరరాశి
 {
-    try
+    ప్రయత్నించు
     {
-        for (size_t i = 0; i < impl->data.size(); i++)
+        కొరకు (size_t i = 0; i < impl->దత్తాంశం.size(); i++)
         {
-            if (impl->data[i].number == index)
+            ఒకవేళ (impl->దత్తాంశం[i].సంఖ్య == సూచీ)
             {
-                String v = impl->data[i].def_value;
-                if (space_delete == true) v = cat_string(v);
+                String v = impl->దత్తాంశం[i].def_విలువ;
+                ఒకవేళ (space_delete == నిజం) v = cat_string(v);
 
                 // the key was neither specified nor has a default value
-                if((v.empty() && type != Param::STRING) || v == noneValue) {
-                    impl->error = true;
-                    impl->error_message = impl->error_message + format("Missing parameter #%d\n", index);
-                    return;
+                ఒకవేళ((v.empty() && type != Param::STRING) || v == none_విలువ) {
+                    impl->error = నిజం;
+                    impl->error_సందేశం = impl->error_సందేశం + format("Missing parameter #%d\n", సూచీ);
+                    తిరిగి;
                 }
                 from_str(v, type, dst);
-                return;
+                తిరిగి;
             }
         }
     }
-    catch (const Exception& e)
+    పట్టుకో (స్థిరరాశి Exception& e)
     {
-        impl->error = true;
-        impl->error_message = impl->error_message + format("Parameter #%d: ", index) + e.err + "\n";
-        return;
+        impl->error = నిజం;
+        impl->error_సందేశం = impl->error_సందేశం + format("Parameter #%d: ", సూచీ) + e.err + "\n";
+        తిరిగి;
     }
 
-    CV_Error_(Error::StsBadArg, ("undeclared position %d requested", index));
+    CV_Error_(Error::StsBadArg, ("undeclared position %d requested", సూచీ));
 }
 
-static bool cmp_params(const CommandLineParserParams & p1, const CommandLineParserParams & p2)
+స్థిర తార్కిక cmp_params(స్థిరరాశి Command_పంక్తి_Parser_Params & p1, స్థిరరాశి Command_పంక్తి_Parser_Params & p2)
 {
-    if (p1.number < p2.number)
-        return true;
+    ఒకవేళ (p1.సంఖ్య < p2.సంఖ్య)
+        తిరిగి నిజం;
 
-    if (p1.number > p2.number)
-        return false;
+    ఒకవేళ (p1.సంఖ్య > p2.సంఖ్య)
+        తిరిగి అబద్ధం;
 
-    return p1.keys[0].compare(p2.keys[0]) < 0;
+    తిరిగి p1.కీలకాలు[0].compare(p2.కీలకాలు[0]) < 0;
 }
 
-CommandLineParser::CommandLineParser(int argc, const char* const argv[], const String& keys)
+Command_పంక్తి_Parser::Command_పంక్తి_Parser(పూర్ణాంకం argc, స్థిరరాశి అక్షరం* స్థిరరాశి argv[], స్థిరరాశి String& కీలకాలు)
 {
-    impl = new Impl;
+    impl = కొత్త Impl;
     impl->refcount = 1;
 
     // path to application
     size_t pos_s = String(argv[0]).find_last_of("/\\");
-    if (pos_s == String::npos)
+    ఒకవేళ (pos_s == String::npos)
     {
-        impl->path_to_app = "";
+        impl->మార్గం_గమ్యం_app = "";
         impl->app_name = String(argv[0]);
     }
-    else
+    లేకపోతే
     {
-        impl->path_to_app = String(argv[0]).substr(0, pos_s);
+        impl->మార్గం_గమ్యం_app = String(argv[0]).substr(0, pos_s);
         impl->app_name = String(argv[0]).substr(pos_s + 1, String(argv[0]).length() - pos_s);
     }
 
-    impl->error = false;
-    impl->error_message = "";
+    impl->error = అబద్ధం;
+    impl->error_సందేశం = "";
 
     // parse keys
-    std::vector<String> k = impl->split_range_string(keys, '{', '}');
+    std::vector<String> k = impl->విభజించు_range_string(కీలకాలు, '{', '}');
 
-    int jj = 0;
-    for (size_t i = 0; i < k.size(); i++)
+    పూర్ణాంకం jj = 0;
+    కొరకు (size_t i = 0; i < k.size(); i++)
     {
-        std::vector<String> l = impl->split_string(k[i], '|', true);
-        CommandLineParserParams p;
-        p.keys = impl->split_string(l[0]);
-        p.def_value = l[1];
-        p.help_message = cat_string(l[2]);
-        p.number = -1;
-        if (p.keys.size() <= 0)
+        std::vector<String> l = impl->విభజించు_string(k[i], '|', నిజం);
+        Command_పంక్తి_Parser_Params p;
+        p.కీలకాలు = impl->విభజించు_string(l[0]);
+        p.def_విలువ = l[1];
+        p.help_సందేశం = cat_string(l[2]);
+        p.సంఖ్య = -1;
+        ఒకవేళ (p.కీలకాలు.size() <= 0)
         {
-            impl->error = true;
-            impl->error_message = "Field KEYS could not be empty\n";
+            impl->error = నిజం;
+            impl->error_సందేశం = "Field KEYS could not be empty\n";
         }
-        else
+        లేకపోతే
         {
-            if (p.keys[0][0] == '@')
+            ఒకవేళ (p.కీలకాలు[0][0] == '@')
             {
-                p.number = jj;
+                p.సంఖ్య = jj;
                 jj++;
             }
 
-            impl->data.push_back(p);
+            impl->దత్తాంశం.push_back(p);
         }
     }
 
     // parse argv
     jj = 0;
-    for (int i = 1; i < argc; i++)
+    కొరకు (పూర్ణాంకం i = 1; i < argc; i++)
     {
         String s(argv[i]);
-        bool hasSingleDash = s.length() > 1 && s[0] == '-';
+        తార్కిక hasSingleDash = s.length() > 1 && s[0] == '-';
 
-        if (hasSingleDash)
+        ఒకవేళ (hasSingleDash)
         {
-            bool hasDoubleDash = s.length() > 2 && s[1] == '-';
-            String key = s.substr(hasDoubleDash ? 2 : 1);
+            తార్కిక hasDoubleDash = s.length() > 2 && s[1] == '-';
+            String కీలకం = s.substr(hasDoubleDash ? 2 : 1);
             String value = "true";
-            size_t equalsPos = key.find('=');
+            size_t equalsPos = కీలకం.find('=');
 
-            if(equalsPos != String::npos) {
-                value = key.substr(equalsPos + 1);
-                key = key.substr(0, equalsPos);
+            ఒకవేళ(equalsPos != String::npos) {
+                value = కీలకం.substr(equalsPos + 1);
+                కీలకం = కీలకం.substr(0, equalsPos);
             }
-            impl->apply_params(key, value);
+            impl->apply_params(కీలకం, value);
         }
-        else
+        లేకపోతే
         {
             impl->apply_params(jj, s);
             jj++;
         }
     }
 
-    impl->sort_params();
+    impl->క్రమీకరించు_params();
 }
 
-CommandLineParser::~CommandLineParser()
+Command_పంక్తి_Parser::~Command_పంక్తి_Parser()
 {
-    if (CV_XADD(&impl->refcount, -1) == 1)
-        delete impl;
+    ఒకవేళ (CV_XADD(&impl->refcount, -1) == 1)
+        తొలగించు impl;
 }
 
-CommandLineParser::CommandLineParser(const CommandLineParser& parser)
+Command_పంక్తి_Parser::Command_పంక్తి_Parser(స్థిరరాశి Command_పంక్తి_Parser& parser)
 {
     impl = parser.impl;
     CV_XADD(&impl->refcount, 1);
 }
 
-CommandLineParser& CommandLineParser::operator = (const CommandLineParser& parser)
+Command_పంక్తి_Parser& Command_పంక్తి_Parser::క్రియాకారకం = (స్థిరరాశి Command_పంక్తి_Parser& parser)
 {
-    if( this != &parser )
+    ఒకవేళ( ఇది != &parser )
     {
         CV_XADD(&parser.impl->refcount, 1);
-        if(CV_XADD(&impl->refcount, -1) == 1)
-            delete impl;
+        ఒకవేళ(CV_XADD(&impl->refcount, -1) == 1)
+            తొలగించు impl;
         impl = parser.impl;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-void CommandLineParser::about(const String& message)
+శూన్య Command_పంక్తి_Parser::about(స్థిరరాశి String& message)
 {
-    impl->about_message = message;
+    impl->about_సందేశం = message;
 }
 
-void CommandLineParser::Impl::apply_params(const String& key, const String& value)
+శూన్య Command_పంక్తి_Parser::Impl::apply_params(స్థిరరాశి String& కీలకం, స్థిరరాశి String& value)
 {
-    for (size_t i = 0; i < data.size(); i++)
+    కొరకు (size_t i = 0; i < దత్తాంశం.size(); i++)
     {
-        for (size_t k = 0; k < data[i].keys.size(); k++)
+        కొరకు (size_t k = 0; k < దత్తాంశం[i].కీలకాలు.size(); k++)
         {
-            if (key.compare(data[i].keys[k]) == 0)
+            ఒకవేళ (కీలకం.compare(దత్తాంశం[i].కీలకాలు[k]) == 0)
             {
-                data[i].def_value = value;
-                break;
+                దత్తాంశం[i].def_విలువ = value;
+                ఆపు;
             }
         }
     }
 }
 
-void CommandLineParser::Impl::apply_params(int i, String value)
+శూన్య Command_పంక్తి_Parser::Impl::apply_params(పూర్ణాంకం i, String value)
 {
-    for (size_t j = 0; j < data.size(); j++)
+    కొరకు (size_t j = 0; j < దత్తాంశం.size(); j++)
     {
-        if (data[j].number == i)
+        ఒకవేళ (దత్తాంశం[j].సంఖ్య == i)
         {
-            data[j].def_value = value;
-            break;
+            దత్తాంశం[j].def_విలువ = value;
+            ఆపు;
         }
     }
 }
 
-void CommandLineParser::Impl::sort_params()
+శూన్య Command_పంక్తి_Parser::Impl::క్రమీకరించు_params()
 {
-    for (size_t i = 0; i < data.size(); i++)
+    కొరకు (size_t i = 0; i < దత్తాంశం.size(); i++)
     {
-        std::sort(data[i].keys.begin(), data[i].keys.end());
+        std::sort(దత్తాంశం[i].కీలకాలు.begin(), దత్తాంశం[i].కీలకాలు.end());
     }
 
-    std::sort (data.begin(), data.end(), cmp_params);
+    std::sort (దత్తాంశం.begin(), దత్తాంశం.end(), cmp_params);
 }
 
-String CommandLineParser::getPathToApplication() const
+String Command_పంక్తి_Parser::get_మార్గం_గమ్యం_Application() స్థిరరాశి
 {
-    return impl->path_to_app;
+    తిరిగి impl->మార్గం_గమ్యం_app;
 }
 
-bool CommandLineParser::has(const String& name) const
+తార్కిక Command_పంక్తి_Parser::has(స్థిరరాశి String& name) స్థిరరాశి
 {
-    for (size_t i = 0; i < impl->data.size(); i++)
+    కొరకు (size_t i = 0; i < impl->దత్తాంశం.size(); i++)
     {
-        for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+        కొరకు (size_t j = 0; j < impl->దత్తాంశం[i].కీలకాలు.size(); j++)
         {
-            if (name == impl->data[i].keys[j])
+            ఒకవేళ (name == impl->దత్తాంశం[i].కీలకాలు[j])
             {
-                const String v = cat_string(impl->data[i].def_value);
-                return !v.empty() && v != noneValue;
+                స్థిరరాశి String v = cat_string(impl->దత్తాంశం[i].def_విలువ);
+                తిరిగి !v.empty() && v != none_విలువ;
             }
         }
     }
@@ -370,105 +370,105 @@ bool CommandLineParser::has(const String& name) const
     CV_Error_(Error::StsBadArg, ("undeclared key '%s' requested", name.c_str()));
 }
 
-bool CommandLineParser::check() const
+తార్కిక Command_పంక్తి_Parser::check() స్థిరరాశి
 {
-    return impl->error == false;
+    తిరిగి impl->error == అబద్ధం;
 }
 
-void CommandLineParser::printErrors() const
+శూన్య Command_పంక్తి_Parser::printErrors() స్థిరరాశి
 {
-    if (impl->error)
+    ఒకవేళ (impl->error)
     {
-        printf("\nERRORS:\n%s\n", impl->error_message.c_str());
+        రాయి("\nERRORS:\n%s\n", impl->error_సందేశం.c_str());
         fflush(stdout);
     }
 }
 
-void CommandLineParser::printMessage() const
+శూన్య Command_పంక్తి_Parser::print_సందేశం() స్థిరరాశి
 {
-    if (impl->about_message != "")
-        printf("%s\n", impl->about_message.c_str());
+    ఒకవేళ (impl->about_సందేశం != "")
+        రాయి("%s\n", impl->about_సందేశం.c_str());
 
-    printf("Usage: %s [params] ", impl->app_name.c_str());
+    రాయి("Usage: %s [params] ", impl->app_name.c_str());
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    కొరకు (size_t i = 0; i < impl->దత్తాంశం.size(); i++)
     {
-        if (impl->data[i].number > -1)
+        ఒకవేళ (impl->దత్తాంశం[i].సంఖ్య > -1)
         {
-            String name = impl->data[i].keys[0].substr(1, impl->data[i].keys[0].length() - 1);
-            printf("%s ", name.c_str());
+            String name = impl->దత్తాంశం[i].కీలకాలు[0].substr(1, impl->దత్తాంశం[i].కీలకాలు[0].length() - 1);
+            రాయి("%s ", name.c_str());
         }
     }
 
-    printf("\n\n");
+    రాయి("\n\n");
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    కొరకు (size_t i = 0; i < impl->దత్తాంశం.size(); i++)
     {
-        if (impl->data[i].number == -1)
+        ఒకవేళ (impl->దత్తాంశం[i].సంఖ్య == -1)
         {
-            printf("\t");
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            రాయి("\t");
+            కొరకు (size_t j = 0; j < impl->దత్తాంశం[i].కీలకాలు.size(); j++)
             {
-                String k = impl->data[i].keys[j];
-                if (k.length() > 1)
+                String k = impl->దత్తాంశం[i].కీలకాలు[j];
+                ఒకవేళ (k.length() > 1)
                 {
-                    printf("--");
+                    రాయి("--");
                 }
-                else
+                లేకపోతే
                 {
-                    printf("-");
+                    రాయి("-");
                 }
-                printf("%s", k.c_str());
+                రాయి("%s", k.c_str());
 
-                if (j != impl->data[i].keys.size() - 1)
+                ఒకవేళ (j != impl->దత్తాంశం[i].కీలకాలు.size() - 1)
                 {
-                    printf(", ");
+                    రాయి(", ");
                 }
             }
-            String dv = cat_string(impl->data[i].def_value);
-            if (dv.compare("") != 0)
+            String dv = cat_string(impl->దత్తాంశం[i].def_విలువ);
+            ఒకవేళ (dv.compare("") != 0)
             {
-                printf(" (value:%s)", dv.c_str());
+                రాయి(" (value:%s)", dv.c_str());
             }
-            printf("\n\t\t%s\n", impl->data[i].help_message.c_str());
+            రాయి("\n\t\t%s\n", impl->దత్తాంశం[i].help_సందేశం.c_str());
         }
     }
-    printf("\n");
+    రాయి("\n");
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    కొరకు (size_t i = 0; i < impl->దత్తాంశం.size(); i++)
     {
-        if (impl->data[i].number != -1)
+        ఒకవేళ (impl->దత్తాంశం[i].సంఖ్య != -1)
         {
-            printf("\t");
-            String k = impl->data[i].keys[0];
+            రాయి("\t");
+            String k = impl->దత్తాంశం[i].కీలకాలు[0];
             k = k.substr(1, k.length() - 1);
 
-            printf("%s", k.c_str());
+            రాయి("%s", k.c_str());
 
-            String dv = cat_string(impl->data[i].def_value);
-            if (dv.compare("") != 0)
+            String dv = cat_string(impl->దత్తాంశం[i].def_విలువ);
+            ఒకవేళ (dv.compare("") != 0)
             {
-                printf(" (value:%s)", dv.c_str());
+                రాయి(" (value:%s)", dv.c_str());
             }
-            printf("\n\t\t%s\n", impl->data[i].help_message.c_str());
+            రాయి("\n\t\t%s\n", impl->దత్తాంశం[i].help_సందేశం.c_str());
         }
     }
 }
 
-std::vector<String> CommandLineParser::Impl::split_range_string(const String& _str, char fs, char ss) const
+std::vector<String> Command_పంక్తి_Parser::Impl::విభజించు_range_string(స్థిరరాశి String& _str, అక్షరం fs, అక్షరం ss) స్థిరరాశి
 {
     String str = _str;
     std::vector<String> vec;
-    String word = "";
-    bool begin = false;
+    String మాట = "";
+    తార్కిక begin = అబద్ధం;
 
-    while (!str.empty())
+    అయితే (!str.empty())
     {
-        if (str[0] == fs)
+        ఒకవేళ (str[0] == fs)
         {
-            if (begin == true)
+            ఒకవేళ (begin == నిజం)
             {
-                throw cv::Exception(cv::Error::StsParseError,
+                విసురు cv::Exception(cv::Error::StsParseError,
                          String("error in split_range_string(")
                          + str
                          + String(", ")
@@ -479,16 +479,16 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                          "", __FILE__, __LINE__
                          );
             }
-            begin = true;
-            word = "";
+            begin = నిజం;
+            మాట = "";
             str = str.substr(1, str.length() - 1);
         }
 
-        if (str[0] == ss)
+        ఒకవేళ (str[0] == ss)
         {
-            if (begin == false)
+            ఒకవేళ (begin == అబద్ధం)
             {
-                throw cv::Exception(cv::Error::StsParseError,
+                విసురు cv::Exception(cv::Error::StsParseError,
                          String("error in split_range_string(")
                          + str
                          + String(", ")
@@ -499,20 +499,20 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                          "", __FILE__, __LINE__
                          );
             }
-            begin = false;
-            vec.push_back(word);
+            begin = అబద్ధం;
+            vec.push_back(మాట);
         }
 
-        if (begin == true)
+        ఒకవేళ (begin == నిజం)
         {
-            word = word + str[0];
+            మాట = మాట + str[0];
         }
         str = str.substr(1, str.length() - 1);
     }
 
-    if (begin == true)
+    ఒకవేళ (begin == నిజం)
     {
-        throw cv::Exception(cv::Error::StsParseError,
+        విసురు cv::Exception(cv::Error::StsParseError,
                  String("error in split_range_string(")
                  + str
                  + String(", ")
@@ -524,38 +524,38 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                 );
     }
 
-    return vec;
+    తిరిగి vec;
 }
 
-std::vector<String> CommandLineParser::Impl::split_string(const String& _str, char symbol, bool create_empty_item) const
+std::vector<String> Command_పంక్తి_Parser::Impl::విభజించు_string(స్థిరరాశి String& _str, అక్షరం చిహ్నం, తార్కిక create_ఖాళీలు_అంశం) స్థిరరాశి
 {
     String str = _str;
     std::vector<String> vec;
-    String word = "";
+    String మాట = "";
 
-    while (!str.empty())
+    అయితే (!str.empty())
     {
-        if (str[0] == symbol)
+        ఒకవేళ (str[0] == చిహ్నం)
         {
-            if (!word.empty() || create_empty_item)
+            ఒకవేళ (!మాట.empty() || create_ఖాళీలు_అంశం)
             {
-                vec.push_back(word);
-                word = "";
+                vec.push_back(మాట);
+                మాట = "";
             }
         }
-        else
+        లేకపోతే
         {
-            word = word + str[0];
+            మాట = మాట + str[0];
         }
         str = str.substr(1, str.length() - 1);
     }
 
-    if (word != "" || create_empty_item)
+    ఒకవేళ (మాట != "" || create_ఖాళీలు_అంశం)
     {
-        vec.push_back(word);
+        vec.push_back(మాట);
     }
 
-    return vec;
+    తిరిగి vec;
 }
 
 }

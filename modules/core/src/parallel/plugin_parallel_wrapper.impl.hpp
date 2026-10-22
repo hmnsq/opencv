@@ -9,282 +9,282 @@
 //==================================================================================================
 // Dynamic backend implementation
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"
+#అన్తర్భావ "opencv2/core/utils/plugin_loader.private.hpp"
 
-namespace cv { namespace impl {
+నామాకాశ cv { నామాకాశ impl {
 
-using namespace cv::parallel;
+ఉపయోగించి నామాకాశ cv::parallel;
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
 
-using namespace cv::plugin::impl;  // plugin_loader.hpp
+ఉపయోగించి నామాకాశ cv::plugin::impl;  // plugin_loader.hpp
 
-class PluginParallelBackend CV_FINAL: public std::enable_shared_from_this<PluginParallelBackend>
+తరగతి PluginParallelBackend CV_FINAL: బహిరంగ std::enable_shared_from_this<PluginParallelBackend>
 {
-protected:
-    void initPluginAPI()
+రక్షిత:
+    శూన్య initPluginAPI()
     {
-        const char* init_name = "opencv_core_parallel_plugin_init_v0";
-        FN_opencv_core_parallel_plugin_init_t fn_init = reinterpret_cast<FN_opencv_core_parallel_plugin_init_t>(lib_->getSymbol(init_name));
-        if (fn_init)
+        స్థిరరాశి అక్షరం* init_name = "opencv_core_parallel_plugin_init_v0";
+        FN_opencv_core_parallel_plugin_init_t fn_init = reinterpret_cast<FN_opencv_core_parallel_plugin_init_t>(lib_->get_చిహ్నం(init_name));
+        ఒకవేళ (fn_init)
         {
-            CV_LOG_DEBUG(NULL, "Found entry: '" << init_name << "'");
-            for (int supported_api_version = API_VERSION; supported_api_version >= 0; supported_api_version--)
+            CV_LOG_DEBUG(ఖాళీ, "Found entry: '" << init_name << "'");
+            కొరకు (పూర్ణాంకం supported_api_సంస్కరణ = API_సంస్కరణ; supported_api_సంస్కరణ >= 0; supported_api_సంస్కరణ--)
             {
-                plugin_api_ = fn_init(ABI_VERSION, supported_api_version, NULL);
-                if (plugin_api_)
-                    break;
+                plugin_api_ = fn_init(ABI_సంస్కరణ, supported_api_సంస్కరణ, ఖాళీ);
+                ఒకవేళ (plugin_api_)
+                    ఆపు;
             }
-            if (!plugin_api_)
+            ఒకవేళ (!plugin_api_)
             {
-                CV_LOG_INFO(NULL, "core(parallel): plugin is incompatible (can't be initialized): " << lib_->getName());
-                return;
+                CV_LOG_INFO(ఖాళీ, "core(parallel): plugin is incompatible (can't be initialized): " << lib_->getName());
+                తిరిగి;
             }
-            if (!checkCompatibility(plugin_api_->api_header, ABI_VERSION, API_VERSION, false))
+            ఒకవేళ (!checkCompatibility(plugin_api_->api_శీర్షిక, ABI_సంస్కరణ, API_సంస్కరణ, అబద్ధం))
             {
-                plugin_api_ = NULL;
-                return;
+                plugin_api_ = ఖాళీ;
+                తిరిగి;
             }
-            CV_LOG_INFO(NULL, "core(parallel): plugin is ready to use '" << plugin_api_->api_header.api_description << "'");
+            CV_LOG_INFO(ఖాళీ, "core(parallel): plugin is ready to use '" << plugin_api_->api_శీర్షిక.api_description << "'");
         }
-        else
+        లేకపోతే
         {
-            CV_LOG_INFO(NULL, "core(parallel): plugin is incompatible, missing init function: '" << init_name << "', file: " << lib_->getName());
+            CV_LOG_INFO(ఖాళీ, "core(parallel): plugin is incompatible, missing init function: '" << init_name << "', file: " << lib_->getName());
         }
     }
 
 
-    bool checkCompatibility(const OpenCV_API_Header& api_header, unsigned int abi_version, unsigned int api_version, bool checkMinorOpenCVVersion)
+    తార్కిక checkCompatibility(స్థిరరాశి Open_CV_API_శీర్షిక& api_శీర్షిక, గుర్తులేని పూర్ణాంకం abi_సంస్కరణ, గుర్తులేని పూర్ణాంకం api_సంస్కరణ, తార్కిక checkMinorOpenCVVersion)
     {
-        if (api_header.opencv_version_major != CV_VERSION_MAJOR)
+        ఒకవేళ (api_శీర్షిక.opencv_సంస్కరణ_major != CV_సంస్కరణ_MAJOR)
         {
-            CV_LOG_ERROR(NULL, "core(parallel): wrong OpenCV major version used by plugin '" << api_header.api_description << "': " <<
-                cv::format("%d.%d, OpenCV version is '" CV_VERSION "'", api_header.opencv_version_major, api_header.opencv_version_minor))
-            return false;
+            CV_LOG_ERROR(ఖాళీ, "core(parallel): wrong OpenCV major version used by plugin '" << api_శీర్షిక.api_description << "': " <<
+                cv::format("%d.%d, OpenCV version is '" CV_సంస్కరణ "'", api_శీర్షిక.opencv_సంస్కరణ_major, api_శీర్షిక.opencv_సంస్కరణ_minor))
+            తిరిగి అబద్ధం;
         }
-        if (!checkMinorOpenCVVersion)
+        ఒకవేళ (!checkMinorOpenCVVersion)
         {
             // no checks for OpenCV minor version
         }
-        else if (api_header.opencv_version_minor != CV_VERSION_MINOR)
+        లేకపోతే ఒకవేళ (api_శీర్షిక.opencv_సంస్కరణ_minor != CV_సంస్కరణ_MINOR)
         {
-            CV_LOG_ERROR(NULL, "core(parallel): wrong OpenCV minor version used by plugin '" << api_header.api_description << "': " <<
-                cv::format("%d.%d, OpenCV version is '" CV_VERSION "'", api_header.opencv_version_major, api_header.opencv_version_minor))
-            return false;
+            CV_LOG_ERROR(ఖాళీ, "core(parallel): wrong OpenCV minor version used by plugin '" << api_శీర్షిక.api_description << "': " <<
+                cv::format("%d.%d, OpenCV version is '" CV_సంస్కరణ "'", api_శీర్షిక.opencv_సంస్కరణ_major, api_శీర్షిక.opencv_సంస్కరణ_minor))
+            తిరిగి అబద్ధం;
         }
-        CV_LOG_DEBUG(NULL, "core(parallel): initialized '" << api_header.api_description << "': built with "
+        CV_LOG_DEBUG(ఖాళీ, "core(parallel): initialized '" << api_శీర్షిక.api_description << "': built with "
             << cv::format("OpenCV %d.%d (ABI/API = %d/%d)",
-                 api_header.opencv_version_major, api_header.opencv_version_minor,
-                 api_header.min_api_version, api_header.api_version)
-            << ", current OpenCV version is '" CV_VERSION "' (ABI/API = " << abi_version << "/" << api_version << ")"
+                 api_శీర్షిక.opencv_సంస్కరణ_major, api_శీర్షిక.opencv_సంస్కరణ_minor,
+                 api_శీర్షిక.min_api_సంస్కరణ, api_శీర్షిక.api_సంస్కరణ)
+            << ", current OpenCV version is '" CV_సంస్కరణ "' (ABI/API = " << abi_సంస్కరణ << "/" << api_సంస్కరణ << ")"
         );
-        if (api_header.min_api_version != abi_version)  // future: range can be here
+        ఒకవేళ (api_శీర్షిక.min_api_సంస్కరణ != abi_సంస్కరణ)  // future: range can be here
         {
             // actually this should never happen due to checks in plugin's init() function
-            CV_LOG_ERROR(NULL, "core(parallel): plugin is not supported due to incompatible ABI = " << api_header.min_api_version);
-            return false;
+            CV_LOG_ERROR(ఖాళీ, "core(parallel): plugin is not supported due to incompatible ABI = " << api_శీర్షిక.min_api_సంస్కరణ);
+            తిరిగి అబద్ధం;
         }
-        if (api_header.api_version != api_version)
+        ఒకవేళ (api_శీర్షిక.api_సంస్కరణ != api_సంస్కరణ)
         {
-            CV_LOG_INFO(NULL, "core(parallel): NOTE: plugin is supported, but there is API version mismath: "
-                << cv::format("plugin API level (%d) != OpenCV API level (%d)", api_header.api_version, api_version));
-            if (api_header.api_version < api_version)
+            CV_LOG_INFO(ఖాళీ, "core(parallel): NOTE: plugin is supported, but there is API version mismath: "
+                << cv::format("plugin API level (%d) != OpenCV API level (%d)", api_శీర్షిక.api_సంస్కరణ, api_సంస్కరణ));
+            ఒకవేళ (api_శీర్షిక.api_సంస్కరణ < api_సంస్కరణ)
             {
-                CV_LOG_INFO(NULL, "core(parallel): NOTE: some functionality may be unavailable due to lack of support by plugin implementation");
+                CV_LOG_INFO(ఖాళీ, "core(parallel): NOTE: some functionality may be unavailable due to lack of support by plugin implementation");
             }
         }
-        return true;
+        తిరిగి నిజం;
     }
 
-public:
+బహిరంగ:
     std::shared_ptr<cv::plugin::impl::DynamicLib> lib_;
-    const OpenCV_Core_Parallel_Plugin_API* plugin_api_;
+    స్థిరరాశి OpenCV_Core_Parallel_Plugin_API* plugin_api_;
 
-    PluginParallelBackend(const std::shared_ptr<cv::plugin::impl::DynamicLib>& lib)
+    PluginParallelBackend(స్థిరరాశి std::shared_ptr<cv::plugin::impl::DynamicLib>& lib)
         : lib_(lib)
-        , plugin_api_(NULL)
+        , plugin_api_(ఖాళీ)
     {
         initPluginAPI();
     }
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() స్థిరరాశి
     {
         CV_Assert(plugin_api_);
 
-        CvPluginParallelBackendAPI instancePtr = NULL;
+        CvPluginParallelBackendAPI instancePtr = ఖాళీ;
 
-        if (plugin_api_->v0.getInstance)
+        ఒకవేళ (plugin_api_->v0.getInstance)
         {
-            if (CV_ERROR_OK == plugin_api_->v0.getInstance(&instancePtr))
+            ఒకవేళ (CV_ERROR_OK == plugin_api_->v0.getInstance(&instancePtr))
             {
                 CV_Assert(instancePtr);
                 // TODO C++20 "aliasing constructor"
-                return std::shared_ptr<cv::parallel::ParallelForAPI>(instancePtr, [](cv::parallel::ParallelForAPI*){});  // empty deleter
+                తిరిగి std::shared_ptr<cv::parallel::ParallelForAPI>(instancePtr, [](cv::parallel::ParallelForAPI*){});  // empty deleter
             }
         }
-        return std::shared_ptr<cv::parallel::ParallelForAPI>();
+        తిరిగి std::shared_ptr<cv::parallel::ParallelForAPI>();
     }
 };
 
 
-class PluginParallelBackendFactory CV_FINAL: public IParallelBackendFactory
+తరగతి PluginParallelBackendFactory CV_FINAL: బహిరంగ IParallelBackendFactory
 {
-public:
-    std::string baseName_;
+బహిరంగ:
+    std::string పునాది_Name_2;
     std::shared_ptr<PluginParallelBackend> backend;
-    bool initialized;
-public:
-    PluginParallelBackendFactory(const std::string& baseName)
-        : baseName_(baseName)
-        , initialized(false)
+    తార్కిక initialized;
+బహిరంగ:
+    PluginParallelBackendFactory(స్థిరరాశి std::string& పునాది_Name)
+        : పునాది_Name_2(పునాది_Name)
+        , initialized(అబద్ధం)
     {
         // nothing, plugins are loaded on demand
     }
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() స్థిరరాశి CV_OVERRIDE
     {
-        if (!initialized)
+        ఒకవేళ (!initialized)
         {
-            const_cast<PluginParallelBackendFactory*>(this)->initBackend();
+            const_cast<PluginParallelBackendFactory*>(ఇది)->initBackend();
         }
-        if (backend)
-            return backend->create();
-        return std::shared_ptr<cv::parallel::ParallelForAPI>();
+        ఒకవేళ (backend)
+            తిరిగి backend->create();
+        తిరిగి std::shared_ptr<cv::parallel::ParallelForAPI>();
     }
-protected:
-    void initBackend()
+రక్షిత:
+    శూన్య initBackend()
     {
-        AutoLock lock(getInitializationMutex());
-        try
+        Auto_తాళం lock(getInitializationMutex());
+        ప్రయత్నించు
         {
-            if (!initialized)
-                loadPlugin();
+            ఒకవేళ (!initialized)
+                ఎక్కించు_Plugin();
         }
-        catch (...)
+        పట్టుకో (...)
         {
-            CV_LOG_INFO(NULL, "core(parallel): exception during plugin loading: " << baseName_ << ". SKIP");
+            CV_LOG_INFO(ఖాళీ, "core(parallel): exception during plugin loading: " << పునాది_Name_2 << ". SKIP");
         }
-        initialized = true;
+        initialized = నిజం;
     }
-    void loadPlugin();
+    శూన్య ఎక్కించు_Plugin();
 };
 
-static
-std::vector<FileSystemPath_t> getPluginCandidates(const std::string& baseName)
+స్థిర
+std::vector<File_System_మార్గం_t> getPluginCandidates(స్థిరరాశి std::string& పునాది_Name)
 {
-    using namespace cv::utils;
-    using namespace cv::utils::fs;
-    const std::string baseName_l = toLowerCase(baseName);
-    const std::string baseName_u = toUpperCase(baseName);
-    const FileSystemPath_t baseName_l_fs = toFileSystemPath(baseName_l);
-    std::vector<FileSystemPath_t> paths;
+    ఉపయోగించి నామాకాశ cv::utils;
+    ఉపయోగించి నామాకాశ cv::utils::fs;
+    స్థిరరాశి std::string పునాది_Name_l = గమ్యం_క్రింది_Case(పునాది_Name);
+    స్థిరరాశి std::string పునాది_Name_u = గమ్యం_పై_Case(పునాది_Name);
+    స్థిరరాశి File_System_మార్గం_t పునాది_Name_l_fs = గమ్యం_File_System_మార్గం(పునాది_Name_l);
+    std::vector<File_System_మార్గం_t> paths;
     // TODO OPENCV_PLUGIN_PATH
-    const std::vector<std::string> paths_ = getConfigurationParameterPaths("OPENCV_CORE_PLUGIN_PATH", std::vector<std::string>());
-    if (paths_.size() != 0)
+    స్థిరరాశి std::vector<std::string> paths_ = getConfigurationParameterPaths("OPENCV_CORE_PLUGIN_PATH", std::vector<std::string>());
+    ఒకవేళ (paths_.size() != 0)
     {
-        for (size_t i = 0; i < paths_.size(); i++)
+        కొరకు (size_t i = 0; i < paths_.size(); i++)
         {
-            paths.push_back(toFileSystemPath(paths_[i]));
+            paths.push_back(గమ్యం_File_System_మార్గం(paths_[i]));
         }
     }
-    else
+    లేకపోతే
     {
-        FileSystemPath_t binaryLocation;
-        if (getBinLocation(binaryLocation))
+        File_System_మార్గం_t ద్విమాన_Location;
+        ఒకవేళ (getBinLocation(ద్విమాన_Location))
         {
-            binaryLocation = getParent(binaryLocation);
-#ifndef CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY
-            paths.push_back(binaryLocation);
-#else
-            paths.push_back(binaryLocation + toFileSystemPath("/") + toFileSystemPath(CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY_STR));
-#endif
+            ద్విమాన_Location = get_మాతృ(ద్విమాన_Location);
+#నిర్వచితం_కాకపోతే CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY
+            paths.push_back(ద్విమాన_Location);
+#లేకపోతే
+            paths.push_back(ద్విమాన_Location + గమ్యం_File_System_మార్గం("/") + గమ్యం_File_System_మార్గం(CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY_STR));
+#అయితే_ముగింపు
         }
     }
-    const std::string default_expr = libraryPrefix() + "opencv_core_parallel_" + baseName_l + "*" + librarySuffix();
-    const std::string plugin_expr = getConfigurationParameterString((std::string("OPENCV_CORE_PARALLEL_PLUGIN_") + baseName_u).c_str(), default_expr.c_str());
-    std::vector<FileSystemPath_t> results;
-#ifdef _WIN32
-    FileSystemPath_t moduleName = toFileSystemPath(libraryPrefix() + "opencv_core_parallel_" + baseName_l + librarySuffix());
-    if (plugin_expr != default_expr)
+    స్థిరరాశి std::string default_సమాసం = library_ఉపసర్గ() + "opencv_core_parallel_" + పునాది_Name_l + "*" + librarySuffix();
+    స్థిరరాశి std::string plugin_సమాసం = getConfigurationParameterString((std::string("OPENCV_CORE_PARALLEL_PLUGIN_") + పునాది_Name_u).c_str(), default_సమాసం.c_str());
+    std::vector<File_System_మార్గం_t> results;
+#నిర్వచితమైతే _WIN32
+    File_System_మార్గం_t moduleName = గమ్యం_File_System_మార్గం(library_ఉపసర్గ() + "opencv_core_parallel_" + పునాది_Name_l + librarySuffix());
+    ఒకవేళ (plugin_సమాసం != default_సమాసం)
     {
-        moduleName = toFileSystemPath(plugin_expr);
+        moduleName = గమ్యం_File_System_మార్గం(plugin_సమాసం);
         results.push_back(moduleName);
     }
-    for (const FileSystemPath_t& path : paths)
+    కొరకు (స్థిరరాశి File_System_మార్గం_t& మార్గం : paths)
     {
-        results.push_back(path + L"\\" + moduleName);
+        results.push_back(మార్గం + L"\\" + moduleName);
     }
     results.push_back(moduleName);
-#else
-    CV_LOG_DEBUG(NULL, "core(parallel): " << baseName << " plugin's glob is '" << plugin_expr << "', " << paths.size() << " location(s)");
-    for (const std::string& path : paths)
+#లేకపోతే
+    CV_LOG_DEBUG(ఖాళీ, "core(parallel): " << పునాది_Name << " plugin's glob is '" << plugin_సమాసం << "', " << paths.size() << " location(s)");
+    కొరకు (స్థిరరాశి std::string& మార్గం : paths)
     {
-        if (path.empty())
-            continue;
+        ఒకవేళ (మార్గం.empty())
+            కొనసాగు;
         std::vector<std::string> candidates;
-        cv::glob(utils::fs::join(path, plugin_expr), candidates);
+        cv::glob(utils::fs::join(మార్గం, plugin_సమాసం), candidates);
         // Prefer candisates with higher versions
         // TODO: implemented accurate versions-based comparator
         std::sort(candidates.begin(), candidates.end(), std::greater<std::string>());
-        CV_LOG_DEBUG(NULL, "    - " << path << ": " << candidates.size());
+        CV_LOG_DEBUG(ఖాళీ, "    - " << మార్గం << ": " << candidates.size());
         copy(candidates.begin(), candidates.end(), back_inserter(results));
     }
-#endif
-    CV_LOG_DEBUG(NULL, "Found " << results.size() << " plugin(s) for " << baseName);
-    return results;
+#అయితే_ముగింపు
+    CV_LOG_DEBUG(ఖాళీ, "Found " << results.size() << " plugin(s) for " << పునాది_Name);
+    తిరిగి results;
 }
 
-void PluginParallelBackendFactory::loadPlugin()
+శూన్య PluginParallelBackendFactory::ఎక్కించు_Plugin()
 {
-    for (const FileSystemPath_t& plugin : getPluginCandidates(baseName_))
+    కొరకు (స్థిరరాశి File_System_మార్గం_t& plugin : getPluginCandidates(పునాది_Name_2))
     {
-        auto lib = std::make_shared<cv::plugin::impl::DynamicLib>(plugin);
-        if (!lib->isLoaded())
+        స్వయంచాలక lib = std::make_shared<cv::plugin::impl::DynamicLib>(plugin);
+        ఒకవేళ (!lib->isLoaded())
         {
-            continue;
+            కొనసాగు;
         }
-        try
+        ప్రయత్నించు
         {
-            auto pluginBackend = std::make_shared<PluginParallelBackend>(lib);
-            if (!pluginBackend)
+            స్వయంచాలక pluginBackend = std::make_shared<PluginParallelBackend>(lib);
+            ఒకవేళ (!pluginBackend)
             {
-                continue;
+                కొనసాగు;
             }
-            if (pluginBackend->plugin_api_ == NULL)
+            ఒకవేళ (pluginBackend->plugin_api_ == ఖాళీ)
             {
-                CV_LOG_ERROR(NULL, "core(parallel): no compatible plugin API for backend: " << baseName_ << " in " << toPrintablePath(plugin));
-                continue;
+                CV_LOG_ERROR(ఖాళీ, "core(parallel): no compatible plugin API for backend: " << పునాది_Name_2 << " in " << గమ్యం_Printable_మార్గం(plugin));
+                కొనసాగు;
             }
-#if !defined(_WIN32)
+#ఒకవేళ !defined(_WIN32)
             // NB: we are going to use parallel backend, so prevent automatic library unloading
             // (avoid uncontrolled crashes in worker threads of underlying libraries: libgomp, libtbb)
             // details: https://github.com/opencv/opencv/pull/19470#pullrequestreview-589834777
             lib->disableAutomaticLibraryUnloading();
-#endif
+#అయితే_ముగింపు
             backend = pluginBackend;
-            return;
+            తిరిగి;
         }
-        catch (...)
+        పట్టుకో (...)
         {
-            CV_LOG_WARNING(NULL, "core(parallel): exception during plugin initialization: " << toPrintablePath(plugin) << ". SKIP");
+            CV_LOG_WARNING(ఖాళీ, "core(parallel): exception during plugin initialization: " << గమ్యం_Printable_మార్గం(plugin) << ". SKIP");
         }
     }
 }
 
-#endif  // OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#అయితే_ముగింపు  // OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
 
 }  // namespace
 
-namespace parallel {
+నామాకాశ parallel {
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName)
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(స్థిరరాశి std::string& పునాది_Name)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
-    return std::make_shared<impl::PluginParallelBackendFactory>(baseName);
-#else
-    CV_UNUSED(baseName);
-    return std::shared_ptr<IParallelBackendFactory>();
-#endif
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+    తిరిగి std::make_shared<impl::PluginParallelBackendFactory>(పునాది_Name);
+#లేకపోతే
+    CV_వాడని(పునాది_Name);
+    తిరిగి std::shared_ptr<IParallelBackendFactory>();
+#అయితే_ముగింపు
 }
 
 }}  // namespace

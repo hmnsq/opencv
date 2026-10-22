@@ -2,315 +2,315 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "convert.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "convert.hpp"
 
-#if !defined(OPENCV_SUPRESS_WARNING_AVX2_WITHOUT_FP16C) && \
+#ఒకవేళ !defined(OPENCV_SUPRESS_WARNING_AVX2_WITHOUT_FP16C) && \
     (defined(__GNUC__) && defined(__AVX2__) && !defined(__F16C__))
 #warning "Non-optimal compiler flags: AVX2 without FP16. Generated code is very slow. Consider adding '-mf16c' compiler option."
-#endif
+#అయితే_ముగింపు
 
-namespace cv {
-namespace hal {
+నామాకాశ cv {
+నామాకాశ hal {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-void cvt16f32f(const hfloat* src, float* dst, int len);
-void cvt32f16f(const float* src, hfloat* dst, int len);
-void cvt16bf32f(const bfloat* src, float* dst, int len);
-void cvt32f16bf(const float* src, bfloat* dst, int len);
-void addRNGBias32f(float* arr, const float* scaleBiasPairs, int len, int cn);
-void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn);
+శూన్య cvt16f32f(స్థిరరాశి hfloat* src, దశాంశం* dst, పూర్ణాంకం len);
+శూన్య cvt32f16f(స్థిరరాశి దశాంశం* src, hfloat* dst, పూర్ణాంకం len);
+శూన్య cvt16bf32f(స్థిరరాశి bfloat* src, దశాంశం* dst, పూర్ణాంకం len);
+శూన్య cvt32f16bf(స్థిరరాశి దశాంశం* src, bfloat* dst, పూర్ణాంకం len);
+శూన్య కూడు_RNGBias32f(దశాంశం* arr, స్థిరరాశి దశాంశం* scale_Bias_జతలు, పూర్ణాంకం len, పూర్ణాంకం cn);
+శూన్య కూడు_RNGBias64f(ద్విగుణ* arr, స్థిరరాశి ద్విగుణ* scale_Bias_జతలు, పూర్ణాంకం len, పూర్ణాంకం cn);
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_చివర
 } // namespace cv::hal
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth);
+ద్విమాన_Func getConvertFunc(పూర్ణాంకం sdepth, పూర్ణాంకం ddepth);
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_చివర
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#నిర్వచితం_కాకపోతే CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-namespace hal {
+నామాకాశ hal {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth);
+ద్విమాన_Func getConvertFunc(పూర్ణాంకం sdepth, పూర్ణాంకం ddepth);
 
-void cvt16f32f( const hfloat* src, float* dst, int len )
+శూన్య cvt16f32f( స్థిరరాశి hfloat* src, దశాంశం* dst, పూర్ణాంకం len )
 {
     CV_INSTRUMENT_REGION();
-    int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; j < len; j += VECSZ )
+    పూర్ణాంకం j = 0;
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
+    స్థిరరాశి పూర్ణాంకం VECSZ = VTraits<v_float32>::vlanes();
+    కొరకు( ; j < len; j += VECSZ )
     {
-        if( j > len - VECSZ )
+        ఒకవేళ( j > len - VECSZ )
         {
-            if( j == 0 )
-                break;
+            ఒకవేళ( j == 0 )
+                ఆపు;
             j = len - VECSZ;
         }
-        v_store(dst + j, vx_load_expand(src + j));
+        v_store(dst + j, vx_ఎక్కించు_expand(src + j));
     }
-#endif
-    for( ; j < len; j++ )
-        dst[j] = (float)src[j];
+#అయితే_ముగింపు
+    కొరకు( ; j < len; j++ )
+        dst[j] = (దశాంశం)src[j];
 }
 
-void cvt32f16f( const float* src, hfloat* dst, int len )
+శూన్య cvt32f16f( స్థిరరాశి దశాంశం* src, hfloat* dst, పూర్ణాంకం len )
 {
     CV_INSTRUMENT_REGION();
-    int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; j < len; j += VECSZ )
+    పూర్ణాంకం j = 0;
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
+    స్థిరరాశి పూర్ణాంకం VECSZ = VTraits<v_float32>::vlanes();
+    కొరకు( ; j < len; j += VECSZ )
     {
-        if( j > len - VECSZ )
+        ఒకవేళ( j > len - VECSZ )
         {
-            if( j == 0 )
-                break;
+            ఒకవేళ( j == 0 )
+                ఆపు;
             j = len - VECSZ;
         }
-        v_pack_store(dst + j, vx_load(src + j));
+        v_pack_store(dst + j, vx_ఎక్కించు(src + j));
     }
-#endif
-    for( ; j < len; j++ )
+#అయితే_ముగింపు
+    కొరకు( ; j < len; j++ )
         dst[j] = hfloat(src[j]);
 }
 
-void cvt32f16bf( const float* src, bfloat* dst, int len )
+శూన్య cvt32f16bf( స్థిరరాశి దశాంశం* src, bfloat* dst, పూర్ణాంకం len )
 {
     CV_INSTRUMENT_REGION();
-    int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; j < len; j += VECSZ )
+    పూర్ణాంకం j = 0;
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
+    స్థిరరాశి పూర్ణాంకం VECSZ = VTraits<v_float32>::vlanes();
+    కొరకు( ; j < len; j += VECSZ )
     {
-        if( j > len - VECSZ )
+        ఒకవేళ( j > len - VECSZ )
         {
-            if( j == 0 )
-                break;
+            ఒకవేళ( j == 0 )
+                ఆపు;
             j = len - VECSZ;
         }
-        v_pack_store(dst + j, vx_load(src + j));
+        v_pack_store(dst + j, vx_ఎక్కించు(src + j));
     }
-#endif
-    for( ; j < len; j++ )
+#అయితే_ముగింపు
+    కొరకు( ; j < len; j++ )
         dst[j] = bfloat(src[j]);
 }
 
-void addRNGBias32f( float* arr, const float* scaleBiasPairs, int len, int cn )
+శూన్య కూడు_RNGBias32f( దశాంశం* arr, స్థిరరాశి దశాంశం* scale_Bias_జతలు, పూర్ణాంకం len, పూర్ణాంకం cn )
 {
     CV_INSTRUMENT_REGION();
-    if (cn == 1) {
-        float bias = scaleBiasPairs[1];
-        for( int i = 0; i < len; i++ ) {
+    ఒకవేళ (cn == 1) {
+        దశాంశం bias = scale_Bias_జతలు[1];
+        కొరకు( పూర్ణాంకం i = 0; i < len; i++ ) {
             arr[i] += bias;
         }
-    } else {
-        int k = 0;
+    } లేకపోతే {
+        పూర్ణాంకం k = 0;
         len *= cn;
         cn--;
-        for( int i = 0; i < len; i++ ) {
-            arr[i] += scaleBiasPairs[k*2 + 1];
+        కొరకు( పూర్ణాంకం i = 0; i < len; i++ ) {
+            arr[i] += scale_Bias_జతలు[k*2 + 1];
             k = (k + 1) & ((k >= cn) - 1);
         }
     }
 }
 
-void addRNGBias64f( double* arr, const double* scaleBiasPairs, int len, int cn )
+శూన్య కూడు_RNGBias64f( ద్విగుణ* arr, స్థిరరాశి ద్విగుణ* scale_Bias_జతలు, పూర్ణాంకం len, పూర్ణాంకం cn )
 {
     CV_INSTRUMENT_REGION();
-    if (cn == 1) {
-        double bias = scaleBiasPairs[1];
-        for( int i = 0; i < len; i++ ) {
+    ఒకవేళ (cn == 1) {
+        ద్విగుణ bias = scale_Bias_జతలు[1];
+        కొరకు( పూర్ణాంకం i = 0; i < len; i++ ) {
             arr[i] += bias;
         }
-    } else {
-        int k = 0;
+    } లేకపోతే {
+        పూర్ణాంకం k = 0;
         len *= cn;
         cn--;
-        for( int i = 0; i < len; i++ ) {
-            arr[i] += scaleBiasPairs[k*2 + 1];
+        కొరకు( పూర్ణాంకం i = 0; i < len; i++ ) {
+            arr[i] += scale_Bias_జతలు[k*2 + 1];
             k = (k + 1) & ((k >= cn) - 1);
         }
     }
 }
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_చివర
 } // namespace cv::hal
 
 // cv::
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-template<typename _Ts, typename _Td, typename _Twvec> static inline void
-cvt_( const _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
+మూస<రకం_పేరు _Ts, రకం_పేరు _Td, రకం_పేరు _Twvec> స్థిర అంతఃవరుస శూన్య
+cvt_( స్థిరరాశి _Ts* src, size_t sstep, _Td* dst, size_t dstep, కొలత size )
 {
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= పరిమాణం(src[0]);
+    dstep /= పరిమాణం(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    కొరకు( పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
+        పూర్ణాంకం j = 0;
 // Excluding GNU in CV_SIMD_SCALABLE because of "opencv/issues/26936"
-#if (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
-        const int VECSZ = VTraits<_Twvec>::vlanes()*2;
-        for( ; j < size.width; j += VECSZ )
+#ఒకవేళ (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
+        స్థిరరాశి పూర్ణాంకం VECSZ = VTraits<_Twvec>::vlanes()*2;
+        కొరకు( ; j < size.వెడల్పు; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            ఒకవేళ( j > size.వెడల్పు - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
-                j = size.width - VECSZ;
+                ఒకవేళ( j == 0 || src == (_Ts*)dst )
+                    ఆపు;
+                j = size.వెడల్పు - VECSZ;
             }
             _Twvec v0, v1;
-            vx_load_pair_as(src + j, v0, v1);
+            vx_ఎక్కించు_pair_as(src + j, v0, v1);
             v_store_pair_as(dst + j, v0, v1);
         }
-#endif
-        for( ; j < size.width; j++ )
+#అయితే_ముగింపు
+        కొరకు( ; j < size.వెడల్పు; j++ )
             dst[j] = saturate_cast<_Td>(src[j]);
     }
 }
 
-template<typename _Ts, typename _Td, typename dummy> static inline void
-cvt_64f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
+మూస<రకం_పేరు _Ts, రకం_పేరు _Td, రకం_పేరు dummy> స్థిర అంతఃవరుస శూన్య
+cvt_64f( స్థిరరాశి _Ts* src, size_t sstep, _Td* dst, size_t dstep, కొలత size )
 {
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= పరిమాణం(src[0]);
+    dstep /= పరిమాణం(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    కొరకు( పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-        const int VECSZ = VTraits<v_float64>::vlanes()*2;
-        for( ; j < size.width; j += VECSZ )
+        పూర్ణాంకం j = 0;
+#ఒకవేళ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+        స్థిరరాశి పూర్ణాంకం VECSZ = VTraits<v_float64>::vlanes()*2;
+        కొరకు( ; j < size.వెడల్పు; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            ఒకవేళ( j > size.వెడల్పు - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
-                j = size.width - VECSZ;
+                ఒకవేళ( j == 0 || src == (_Ts*)dst )
+                    ఆపు;
+                j = size.వెడల్పు - VECSZ;
             }
             v_float64 v0, v1;
-            vx_load_pair_as(src + j, v0, v1);
+            vx_ఎక్కించు_pair_as(src + j, v0, v1);
             v_store_pair_as(dst + j, v0, v1);
         }
-#endif
-        for( ; j < size.width; j++ )
+#అయితే_ముగింపు
+        కొరకు( ; j < size.వెడల్పు; j++ )
             dst[j] = saturate_cast<_Td>(src[j]);
     }
 }
 
 // in order to reduce the code size, for (16f <-> ...) conversions
 // we add a conversion function without loop unrolling
-template<typename _Ts, typename _Td, typename _Twvec> static inline void
-cvt1_( const _Ts* src, size_t sstep, _Td* dst, size_t dstep, Size size )
+మూస<రకం_పేరు _Ts, రకం_పేరు _Td, రకం_పేరు _Twvec> స్థిర అంతఃవరుస శూన్య
+cvt1_( స్థిరరాశి _Ts* src, size_t sstep, _Td* dst, size_t dstep, కొలత size )
 {
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= పరిమాణం(src[0]);
+    dstep /= పరిమాణం(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    కొరకు( పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        const int VECSZ = VTraits<_Twvec>::vlanes();
-        for( ; j < size.width; j += VECSZ )
+        పూర్ణాంకం j = 0;
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
+        స్థిరరాశి పూర్ణాంకం VECSZ = VTraits<_Twvec>::vlanes();
+        కొరకు( ; j < size.వెడల్పు; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            ఒకవేళ( j > size.వెడల్పు - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
-                j = size.width - VECSZ;
+                ఒకవేళ( j == 0 || src == (_Ts*)dst )
+                    ఆపు;
+                j = size.వెడల్పు - VECSZ;
             }
             _Twvec v;
-            vx_load_as(src + j, v);
+            vx_ఎక్కించు_as(src + j, v);
             v_store_as(dst + j, v);
         }
         vx_cleanup();
-#endif
-        for( ; j < size.width; j++ )
+#అయితే_ముగింపు
+        కొరకు( ; j < size.వెడల్పు; j++ )
             dst[j] = saturate_cast<_Td>(src[j]);
     }
 }
 
-static void cvtCopy( const uchar* src, size_t sstep,
-                     uchar* dst, size_t dstep, Size size, size_t elemsize)
+స్థిర శూన్య cvtCopy( స్థిరరాశి uchar* src, size_t sstep,
+                     uchar* dst, size_t dstep, కొలత size, size_t elemsize)
 {
-    size_t len = size.width*elemsize;
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    size_t len = size.వెడల్పు*elemsize;
+    కొరకు( పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep )
     {
-        memcpy( dst, src, len );
+        జ్ఞాపకం_నకలు( dst, src, len );
     }
 }
 
-#define DEF_CVT_FUNC(suffix, cvtfunc, _Ts, _Td, _Twvec) \
-static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
-                        uchar* dst_, size_t dstep, Size size, void*) \
+#నిర్వచించు DEF_CVT_FUNC(suffix, cvtfunc, _Ts, _Td, _Twvec) \
+స్థిర శూన్య cvt##suffix(స్థిరరాశి uchar* src_, size_t sstep, స్థిరరాశి uchar*, size_t, \
+                        uchar* dst_, size_t dstep, కొలత size, శూన్య*) \
 { \
     CV_INSTRUMENT_REGION(); \
-    const _Ts* src = (const _Ts*)src_; \
+    స్థిరరాశి _Ts* src = (స్థిరరాశి _Ts*)src_; \
     _Td* dst = (_Td*)dst_; \
     cvtfunc<_Ts, _Td, _Twvec>(src, sstep, dst, dstep, size); \
 }
 
-#define DEF_CVT2BOOL_FUNC(suffix, _Ts, shift) \
-static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
-                        uchar* dst, size_t dstep, Size size, void*) \
+#నిర్వచించు DEF_CVT2BOOL_FUNC(suffix, _Ts, జరుపు) \
+స్థిర శూన్య cvt##suffix(స్థిరరాశి uchar* src_, size_t sstep, స్థిరరాశి uchar*, size_t, \
+                        uchar* dst, size_t dstep, కొలత size, శూన్య*) \
 { \
     CV_INSTRUMENT_REGION(); \
-    const _Ts* src = (const _Ts*)src_; \
-    sstep /= sizeof(src[0]); \
+    స్థిరరాశి _Ts* src = (స్థిరరాశి _Ts*)src_; \
+    sstep /= పరిమాణం(src[0]); \
     \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
-        for ( int j = 0; j < size.width; j++ ) \
-            dst[j] = (src[j]<<shift) != 0; \
+    కొరకు( పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep ) { \
+        కొరకు ( పూర్ణాంకం j = 0; j < size.వెడల్పు; j++ ) \
+            dst[j] = (src[j]<<జరుపు) != 0; \
     } \
 }
 
-#define DEF_CVTBOOL2_FUNC(suffix, _Td, scale) \
-static void cvt##suffix(const uchar* src, size_t sstep, const uchar*, size_t, \
-                        uchar* dst_, size_t dstep, Size size, void*) \
+#నిర్వచించు DEF_CVTBOOL2_FUNC(suffix, _Td, scale) \
+స్థిర శూన్య cvt##suffix(స్థిరరాశి uchar* src, size_t sstep, స్థిరరాశి uchar*, size_t, \
+                        uchar* dst_, size_t dstep, కొలత size, శూన్య*) \
 { \
     CV_INSTRUMENT_REGION(); \
     _Td* dst = (_Td*)dst_; \
-    dstep /= sizeof(dst[0]); \
+    dstep /= పరిమాణం(dst[0]); \
     \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
-        for ( int j = 0; j < size.width; j++ ) \
+    కొరకు( పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep ) { \
+        కొరకు ( పూర్ణాంకం j = 0; j < size.వెడల్పు; j++ ) \
             dst[j] = (_Td)((src[j] != 0)*scale); \
     } \
 }
 
-#define DEF_CVT_SCALAR_FUNC(suffix, _Ts, _Td) \
-static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
-                        uchar* dst_, size_t dstep, Size size, void*) \
+#నిర్వచించు DEF_CVT_SCALAR_FUNC(suffix, _Ts, _Td) \
+స్థిర శూన్య cvt##suffix(స్థిరరాశి uchar* src_, size_t sstep, స్థిరరాశి uchar*, size_t, \
+                        uchar* dst_, size_t dstep, కొలత size, శూన్య*) \
 { \
     CV_INSTRUMENT_REGION(); \
-    const _Ts* src = (const _Ts*)src_; \
+    స్థిరరాశి _Ts* src = (స్థిరరాశి _Ts*)src_; \
     _Td* dst = (_Td*)dst_; \
-    sstep /= sizeof(src[0]); \
-    dstep /= sizeof(dst[0]); \
+    sstep /= పరిమాణం(src[0]); \
+    dstep /= పరిమాణం(dst[0]); \
     \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
-        for ( int j = 0; j < size.width; j++ ) \
+    కొరకు( పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep ) { \
+        కొరకు ( పూర్ణాంకం j = 0; j < size.వెడల్పు; j++ ) \
             dst[j] = saturate_cast<_Td>(src[j]); \
     } \
 }
 
-#define DEF_CVT_SCALAR_FUNC_S2U(suffix, _Ts, _Td, _Tw) \
-static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
-                        uchar* dst_, size_t dstep, Size size, void*) \
+#నిర్వచించు DEF_CVT_SCALAR_FUNC_S2U(suffix, _Ts, _Td, _Tw) \
+స్థిర శూన్య cvt##suffix(స్థిరరాశి uchar* src_, size_t sstep, స్థిరరాశి uchar*, size_t, \
+                        uchar* dst_, size_t dstep, కొలత size, శూన్య*) \
 { \
     CV_INSTRUMENT_REGION(); \
-    const _Ts* src = (const _Ts*)src_; \
+    స్థిరరాశి _Ts* src = (స్థిరరాశి _Ts*)src_; \
     _Td* dst = (_Td*)dst_; \
-    sstep /= sizeof(src[0]); \
-    dstep /= sizeof(dst[0]); \
+    sstep /= పరిమాణం(src[0]); \
+    dstep /= పరిమాణం(dst[0]); \
     \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) { \
-        for ( int j = 0; j < size.width; j++ ) \
+    కొరకు( పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep ) { \
+        కొరకు ( పూర్ణాంకం j = 0; j < size.వెడల్పు; j++ ) \
             dst[j] = saturate_cast<_Td>(std::max((_Tw)src[j], (_Tw)0)); \
     } \
 }
@@ -318,10 +318,10 @@ static void cvt##suffix(const uchar* src_, size_t sstep, const uchar*, size_t, \
 ////////////////////// 8u -> ... ////////////////////////
 
 DEF_CVT_FUNC(8u8s,  cvt_,  uchar, schar,    v_int16)
-DEF_CVT_FUNC(8u16s, cvt_,  uchar, short,    v_int16)
-DEF_CVT_FUNC(8u32s, cvt_,  uchar, int,      v_int32)
-DEF_CVT_FUNC(8u32f, cvt_,  uchar, float,    v_float32)
-DEF_CVT_FUNC(8u64f, cvt_,  uchar, double,   v_int32)
+DEF_CVT_FUNC(8u16s, cvt_,  uchar, పొట్టి,    v_int16)
+DEF_CVT_FUNC(8u32s, cvt_,  uchar, పూర్ణాంకం,      v_int32)
+DEF_CVT_FUNC(8u32f, cvt_,  uchar, దశాంశం,    v_float32)
+DEF_CVT_FUNC(8u64f, cvt_,  uchar, ద్విగుణ,   v_int32)
 DEF_CVT_SCALAR_FUNC(8u64s, uchar, int64_t)
 DEF_CVT_FUNC(8u16f, cvt1_, uchar, hfloat, v_float32)
 DEF_CVT_FUNC(8u16bf, cvt1_, uchar, bfloat, v_float32)
@@ -331,11 +331,11 @@ DEF_CVT2BOOL_FUNC(8u8b, uchar, 0)
 
 DEF_CVT_FUNC(8s8u,  cvt_,  schar, uchar,    v_int16)
 DEF_CVT_FUNC(8s16u, cvt_,  schar, ushort,   v_uint16)
-DEF_CVT_FUNC(8s16s, cvt_,  schar, short,    v_int16)
-DEF_CVT_FUNC(8s32u, cvt_,  schar, unsigned, v_uint32)
-DEF_CVT_FUNC(8s32s, cvt_,  schar, int,      v_int32)
-DEF_CVT_FUNC(8s32f, cvt_,  schar, float,    v_float32)
-DEF_CVT_FUNC(8s64f, cvt_,  schar, double,   v_int32)
+DEF_CVT_FUNC(8s16s, cvt_,  schar, పొట్టి,    v_int16)
+DEF_CVT_FUNC(8s32u, cvt_,  schar, గుర్తులేని, v_uint32)
+DEF_CVT_FUNC(8s32s, cvt_,  schar, పూర్ణాంకం,      v_int32)
+DEF_CVT_FUNC(8s32f, cvt_,  schar, దశాంశం,    v_float32)
+DEF_CVT_FUNC(8s64f, cvt_,  schar, ద్విగుణ,   v_int32)
 DEF_CVT_FUNC(8s64u, cvt_,  schar, uint64_t, v_uint32)
 DEF_CVT_FUNC(8s64s, cvt_,  schar, int64_t,  v_int32)
 DEF_CVT_FUNC(8s16f, cvt1_, schar, hfloat, v_float32)
@@ -344,10 +344,10 @@ DEF_CVT_FUNC(8s16bf, cvt1_, schar, bfloat, v_float32)
 ////////////////////// 8b -> ... ////////////////////////
 
 DEF_CVTBOOL2_FUNC(8b8u,  uchar, 1)
-DEF_CVTBOOL2_FUNC(8b16s, short, 1)
-DEF_CVTBOOL2_FUNC(8b32s, int, 1)
-DEF_CVTBOOL2_FUNC(8b32f, float, 1)
-DEF_CVTBOOL2_FUNC(8b64f, double, 1)
+DEF_CVTBOOL2_FUNC(8b16s, పొట్టి, 1)
+DEF_CVTBOOL2_FUNC(8b32s, పూర్ణాంకం, 1)
+DEF_CVTBOOL2_FUNC(8b32f, దశాంశం, 1)
+DEF_CVTBOOL2_FUNC(8b64f, ద్విగుణ, 1)
 DEF_CVTBOOL2_FUNC(8b64s, int64_t, 1)
 DEF_CVTBOOL2_FUNC(8b16f, uint16_t, 0x3c00) // hfloat(1.0f)
 DEF_CVTBOOL2_FUNC(8b16bf, uint16_t, 0x3f80) // bfloat(1.0f)
@@ -356,86 +356,86 @@ DEF_CVTBOOL2_FUNC(8b16bf, uint16_t, 0x3f80) // bfloat(1.0f)
 
 DEF_CVT_FUNC(16u8u,  cvt_, ushort, uchar,  v_uint16)
 DEF_CVT_FUNC(16u8s,  cvt_, ushort, schar,  v_uint16)
-DEF_CVT_FUNC(16u16s, cvt_, ushort, short,  v_int32)
-DEF_CVT_FUNC(16u32s, cvt_, ushort, int,    v_int32)
-DEF_CVT_FUNC(16u32f, cvt_, ushort, float,  v_float32)
-DEF_CVT_FUNC(16u64f, cvt_, ushort, double, v_int32)
+DEF_CVT_FUNC(16u16s, cvt_, ushort, పొట్టి,  v_int32)
+DEF_CVT_FUNC(16u32s, cvt_, ushort, పూర్ణాంకం,    v_int32)
+DEF_CVT_FUNC(16u32f, cvt_, ushort, దశాంశం,  v_float32)
+DEF_CVT_FUNC(16u64f, cvt_, ushort, ద్విగుణ, v_int32)
 DEF_CVT_SCALAR_FUNC(16u64s, ushort, int64_t)
 DEF_CVT_FUNC(16u16f, cvt1_,ushort, hfloat, v_float32)
 DEF_CVT_FUNC(16u16bf, cvt1_, ushort, bfloat, v_float32)
 
 ////////////////////// 16s -> ... ////////////////////////
 
-DEF_CVT_FUNC(16s8u,  cvt_, short, uchar,  v_int16)
-DEF_CVT_FUNC(16s8s,  cvt_, short, schar,  v_int16)
-DEF_CVT_FUNC(16s16u, cvt_, short, ushort, v_int32)
-DEF_CVT_FUNC(16s32u, cvt_, short, unsigned, v_uint32)
-DEF_CVT_FUNC(16s32s, cvt_, short, int,    v_int32)
-DEF_CVT_FUNC(16s32f, cvt_, short, float,  v_float32)
-DEF_CVT_FUNC(16s64f, cvt_, short, double, v_int32)
-DEF_CVT_FUNC(16s64u, cvt_, short, uint64_t, v_uint32)
-DEF_CVT_FUNC(16s64s, cvt_, short, int64_t, v_int32)
-DEF_CVT_FUNC(16s16f, cvt1_,short, hfloat, v_float32)
-DEF_CVT_FUNC(16s16bf, cvt1_, short, bfloat, v_float32)
-DEF_CVT2BOOL_FUNC(16s8b, short, 0)
+DEF_CVT_FUNC(16s8u,  cvt_, పొట్టి, uchar,  v_int16)
+DEF_CVT_FUNC(16s8s,  cvt_, పొట్టి, schar,  v_int16)
+DEF_CVT_FUNC(16s16u, cvt_, పొట్టి, ushort, v_int32)
+DEF_CVT_FUNC(16s32u, cvt_, పొట్టి, గుర్తులేని, v_uint32)
+DEF_CVT_FUNC(16s32s, cvt_, పొట్టి, పూర్ణాంకం,    v_int32)
+DEF_CVT_FUNC(16s32f, cvt_, పొట్టి, దశాంశం,  v_float32)
+DEF_CVT_FUNC(16s64f, cvt_, పొట్టి, ద్విగుణ, v_int32)
+DEF_CVT_FUNC(16s64u, cvt_, పొట్టి, uint64_t, v_uint32)
+DEF_CVT_FUNC(16s64s, cvt_, పొట్టి, int64_t, v_int32)
+DEF_CVT_FUNC(16s16f, cvt1_,పొట్టి, hfloat, v_float32)
+DEF_CVT_FUNC(16s16bf, cvt1_, పొట్టి, bfloat, v_float32)
+DEF_CVT2BOOL_FUNC(16s8b, పొట్టి, 0)
 
 ////////////////////// 32u -> ... ////////////////////////
 
-DEF_CVT_FUNC(32u8u,  cvt_, unsigned, uchar,  v_uint32)
-DEF_CVT_FUNC(32u8s,  cvt_, unsigned, schar,  v_int32)
-DEF_CVT_FUNC(32u16u, cvt_, unsigned, ushort, v_uint32)
-DEF_CVT_FUNC(32u16s, cvt_, unsigned, short,  v_int32)
-DEF_CVT_SCALAR_FUNC(32u32s, unsigned, int)
-DEF_CVT_FUNC(32u32f, cvt_, unsigned, float,  v_float32)
-DEF_CVT_FUNC(32u64f, cvt_64f, unsigned, double, v_float64)
-DEF_CVT_SCALAR_FUNC(32u64s, unsigned, int64_t)
+DEF_CVT_FUNC(32u8u,  cvt_, గుర్తులేని, uchar,  v_uint32)
+DEF_CVT_FUNC(32u8s,  cvt_, గుర్తులేని, schar,  v_int32)
+DEF_CVT_FUNC(32u16u, cvt_, గుర్తులేని, ushort, v_uint32)
+DEF_CVT_FUNC(32u16s, cvt_, గుర్తులేని, పొట్టి,  v_int32)
+DEF_CVT_SCALAR_FUNC(32u32s, గుర్తులేని, పూర్ణాంకం)
+DEF_CVT_FUNC(32u32f, cvt_, గుర్తులేని, దశాంశం,  v_float32)
+DEF_CVT_FUNC(32u64f, cvt_64f, గుర్తులేని, ద్విగుణ, v_float64)
+DEF_CVT_SCALAR_FUNC(32u64s, గుర్తులేని, int64_t)
 DEF_CVT_SCALAR_FUNC(64u64s, uint64_t, int64_t)
-DEF_CVT_FUNC(32u16f, cvt1_, unsigned, hfloat, v_float32)
-DEF_CVT_FUNC(32u16bf, cvt1_, unsigned, bfloat, v_float32)
+DEF_CVT_FUNC(32u16f, cvt1_, గుర్తులేని, hfloat, v_float32)
+DEF_CVT_FUNC(32u16bf, cvt1_, గుర్తులేని, bfloat, v_float32)
 
 ////////////////////// 32s -> ... ////////////////////////
 
-DEF_CVT_FUNC(32s8u,  cvt_, int, uchar,  v_int32)
-DEF_CVT_FUNC(32s8s,  cvt_, int, schar,  v_int32)
-DEF_CVT_FUNC(32s16u, cvt_, int, ushort, v_int32)
-DEF_CVT_FUNC(32s16s, cvt_, int, short,  v_int32)
-DEF_CVT_FUNC(32s32u, cvt_, int, unsigned, v_uint32)
-DEF_CVT_FUNC(32s32f, cvt_, int, float,  v_float32)
-DEF_CVT_FUNC(32s64f, cvt_, int, double, v_int32)
-DEF_CVT_FUNC(32s64u, cvt_, int, uint64_t, v_uint32)
-DEF_CVT_FUNC(32s64s, cvt_, int, int64_t, v_int32)
-DEF_CVT_FUNC(32s16f, cvt1_,int, hfloat, v_float32)
-DEF_CVT_FUNC(32s16bf, cvt1_, int, bfloat, v_float32)
-DEF_CVT2BOOL_FUNC(32s8b, int, 0)
+DEF_CVT_FUNC(32s8u,  cvt_, పూర్ణాంకం, uchar,  v_int32)
+DEF_CVT_FUNC(32s8s,  cvt_, పూర్ణాంకం, schar,  v_int32)
+DEF_CVT_FUNC(32s16u, cvt_, పూర్ణాంకం, ushort, v_int32)
+DEF_CVT_FUNC(32s16s, cvt_, పూర్ణాంకం, పొట్టి,  v_int32)
+DEF_CVT_FUNC(32s32u, cvt_, పూర్ణాంకం, గుర్తులేని, v_uint32)
+DEF_CVT_FUNC(32s32f, cvt_, పూర్ణాంకం, దశాంశం,  v_float32)
+DEF_CVT_FUNC(32s64f, cvt_, పూర్ణాంకం, ద్విగుణ, v_int32)
+DEF_CVT_FUNC(32s64u, cvt_, పూర్ణాంకం, uint64_t, v_uint32)
+DEF_CVT_FUNC(32s64s, cvt_, పూర్ణాంకం, int64_t, v_int32)
+DEF_CVT_FUNC(32s16f, cvt1_,పూర్ణాంకం, hfloat, v_float32)
+DEF_CVT_FUNC(32s16bf, cvt1_, పూర్ణాంకం, bfloat, v_float32)
+DEF_CVT2BOOL_FUNC(32s8b, పూర్ణాంకం, 0)
 
 ////////////////////// 32f -> ... ////////////////////////
 
-DEF_CVT_FUNC(32f8u,  cvt_, float, uchar,  v_float32)
-DEF_CVT_FUNC(32f8s,  cvt_, float, schar,  v_float32)
-DEF_CVT_FUNC(32f16u, cvt_, float, ushort, v_float32)
-DEF_CVT_FUNC(32f16s, cvt_, float, short,  v_float32)
-DEF_CVT_FUNC(32f32u, cvt_, float, unsigned, v_float32)
-DEF_CVT_FUNC(32f32s, cvt_, float, int,    v_float32)
-DEF_CVT_FUNC(32f64f, cvt_, float, double, v_float32)
-DEF_CVT_FUNC(32f64u, cvt_64f, float, uint64_t, v_float64)
-DEF_CVT_FUNC(32f64s, cvt_64f, float, int64_t, v_float64)
-DEF_CVT_FUNC(32f16f, cvt1_,float, hfloat, v_float32)
-DEF_CVT_FUNC(32f16bf, cvt1_,float, bfloat, v_float32)
-DEF_CVT2BOOL_FUNC(32f8b, int, 1)
+DEF_CVT_FUNC(32f8u,  cvt_, దశాంశం, uchar,  v_float32)
+DEF_CVT_FUNC(32f8s,  cvt_, దశాంశం, schar,  v_float32)
+DEF_CVT_FUNC(32f16u, cvt_, దశాంశం, ushort, v_float32)
+DEF_CVT_FUNC(32f16s, cvt_, దశాంశం, పొట్టి,  v_float32)
+DEF_CVT_FUNC(32f32u, cvt_, దశాంశం, గుర్తులేని, v_float32)
+DEF_CVT_FUNC(32f32s, cvt_, దశాంశం, పూర్ణాంకం,    v_float32)
+DEF_CVT_FUNC(32f64f, cvt_, దశాంశం, ద్విగుణ, v_float32)
+DEF_CVT_FUNC(32f64u, cvt_64f, దశాంశం, uint64_t, v_float64)
+DEF_CVT_FUNC(32f64s, cvt_64f, దశాంశం, int64_t, v_float64)
+DEF_CVT_FUNC(32f16f, cvt1_,దశాంశం, hfloat, v_float32)
+DEF_CVT_FUNC(32f16bf, cvt1_,దశాంశం, bfloat, v_float32)
+DEF_CVT2BOOL_FUNC(32f8b, పూర్ణాంకం, 1)
 
 ////////////////////// 64f -> ... ////////////////////////
 
-DEF_CVT_FUNC(64f8u,  cvt_, double, uchar,  v_int32)
-DEF_CVT_FUNC(64f8s,  cvt_, double, schar,  v_int32)
-DEF_CVT_FUNC(64f16u, cvt_, double, ushort, v_int32)
-DEF_CVT_FUNC(64f16s, cvt_, double, short,  v_int32)
-DEF_CVT_FUNC(64f32u, cvt_64f, double, unsigned, v_float32)
-DEF_CVT_FUNC(64f32s, cvt_, double, int,    v_int32)
-DEF_CVT_FUNC(64f32f, cvt_, double, float,  v_float32)
-DEF_CVT_FUNC(64f64u, cvt_64f, double, uint64_t, v_float64)
-DEF_CVT_FUNC(64f64s, cvt_64f, double, int64_t, v_float64)
-DEF_CVT_FUNC(64f16f, cvt1_,double, hfloat, v_float32)
-DEF_CVT_FUNC(64f16bf, cvt1_,double, bfloat, v_float32)
+DEF_CVT_FUNC(64f8u,  cvt_, ద్విగుణ, uchar,  v_int32)
+DEF_CVT_FUNC(64f8s,  cvt_, ద్విగుణ, schar,  v_int32)
+DEF_CVT_FUNC(64f16u, cvt_, ద్విగుణ, ushort, v_int32)
+DEF_CVT_FUNC(64f16s, cvt_, ద్విగుణ, పొట్టి,  v_int32)
+DEF_CVT_FUNC(64f32u, cvt_64f, ద్విగుణ, గుర్తులేని, v_float32)
+DEF_CVT_FUNC(64f32s, cvt_, ద్విగుణ, పూర్ణాంకం,    v_int32)
+DEF_CVT_FUNC(64f32f, cvt_, ద్విగుణ, దశాంశం,  v_float32)
+DEF_CVT_FUNC(64f64u, cvt_64f, ద్విగుణ, uint64_t, v_float64)
+DEF_CVT_FUNC(64f64s, cvt_64f, ద్విగుణ, int64_t, v_float64)
+DEF_CVT_FUNC(64f16f, cvt1_,ద్విగుణ, hfloat, v_float32)
+DEF_CVT_FUNC(64f16bf, cvt1_,ద్విగుణ, bfloat, v_float32)
 DEF_CVT2BOOL_FUNC(64f8b, int64_t, 1)
 
 ////////////////////// 16f -> ... ////////////////////////
@@ -443,26 +443,26 @@ DEF_CVT2BOOL_FUNC(64f8b, int64_t, 1)
 DEF_CVT_FUNC(16f8u,  cvt_,  hfloat, uchar,  v_float32)
 DEF_CVT_FUNC(16f8s,  cvt_,  hfloat, schar,  v_float32)
 DEF_CVT_FUNC(16f16u, cvt1_, hfloat, ushort, v_float32)
-DEF_CVT_FUNC(16f16s, cvt1_, hfloat, short,  v_float32)
-DEF_CVT_FUNC(16f32u, cvt1_, hfloat, unsigned, v_float32)
-DEF_CVT_FUNC(16f32s, cvt1_, hfloat, int,    v_float32)
-DEF_CVT_FUNC(16f32f, cvt1_, hfloat, float,  v_float32)
-DEF_CVT_FUNC(16f64f, cvt1_, hfloat, double, v_float32)
+DEF_CVT_FUNC(16f16s, cvt1_, hfloat, పొట్టి,  v_float32)
+DEF_CVT_FUNC(16f32u, cvt1_, hfloat, గుర్తులేని, v_float32)
+DEF_CVT_FUNC(16f32s, cvt1_, hfloat, పూర్ణాంకం,    v_float32)
+DEF_CVT_FUNC(16f32f, cvt1_, hfloat, దశాంశం,  v_float32)
+DEF_CVT_FUNC(16f64f, cvt1_, hfloat, ద్విగుణ, v_float32)
 DEF_CVT_FUNC(16f64u, cvt1_, hfloat, uint64_t, v_float32)
 DEF_CVT_FUNC(16f64s, cvt1_, hfloat, int64_t, v_float32)
 DEF_CVT_FUNC(16f16bf, cvt1_, hfloat, bfloat, v_float32)
-DEF_CVT2BOOL_FUNC(16f8b, short, 1)
+DEF_CVT2BOOL_FUNC(16f8b, పొట్టి, 1)
 
 ////////////////////// 16bf -> ... ////////////////////////
 
 DEF_CVT_FUNC(16bf8u,  cvt_,  bfloat, uchar,  v_float32)
 DEF_CVT_FUNC(16bf8s,  cvt_,  bfloat, schar,  v_float32)
 DEF_CVT_FUNC(16bf16u, cvt1_, bfloat, ushort, v_float32)
-DEF_CVT_FUNC(16bf16s, cvt1_, bfloat, short,  v_float32)
-DEF_CVT_FUNC(16bf32u, cvt1_, bfloat, unsigned, v_float32)
-DEF_CVT_FUNC(16bf32s, cvt1_, bfloat, int,    v_float32)
-DEF_CVT_FUNC(16bf32f, cvt1_, bfloat, float,  v_float32)
-DEF_CVT_FUNC(16bf64f, cvt1_, bfloat, double, v_float32)
+DEF_CVT_FUNC(16bf16s, cvt1_, bfloat, పొట్టి,  v_float32)
+DEF_CVT_FUNC(16bf32u, cvt1_, bfloat, గుర్తులేని, v_float32)
+DEF_CVT_FUNC(16bf32s, cvt1_, bfloat, పూర్ణాంకం,    v_float32)
+DEF_CVT_FUNC(16bf32f, cvt1_, bfloat, దశాంశం,  v_float32)
+DEF_CVT_FUNC(16bf64f, cvt1_, bfloat, ద్విగుణ, v_float32)
 DEF_CVT_FUNC(16bf64u, cvt1_, bfloat, uint64_t, v_float32)
 DEF_CVT_FUNC(16bf64s, cvt1_, bfloat, int64_t, v_float32)
 DEF_CVT_FUNC(16bf16f, cvt1_, bfloat, hfloat, v_float32)
@@ -472,11 +472,11 @@ DEF_CVT_FUNC(16bf16f, cvt1_, bfloat, hfloat, v_float32)
 DEF_CVT_FUNC(64s8u,  cvt_, int64_t, uchar,  v_int32)
 DEF_CVT_FUNC(64s8s,  cvt_, int64_t, schar,  v_int32)
 DEF_CVT_FUNC(64s16u, cvt_, int64_t, ushort, v_int32)
-DEF_CVT_FUNC(64s16s, cvt_, int64_t, short,  v_int32)
-DEF_CVT_FUNC(64s32u, cvt_, int64_t, unsigned, v_uint32)
-DEF_CVT_FUNC(64s32s, cvt_, int64_t, int,    v_int32)
-DEF_CVT_FUNC(64s32f, cvt_64f, int64_t, float,  v_float32)
-DEF_CVT_FUNC(64s64f, cvt_64f, int64_t, double,  v_float64)
+DEF_CVT_FUNC(64s16s, cvt_, int64_t, పొట్టి,  v_int32)
+DEF_CVT_FUNC(64s32u, cvt_, int64_t, గుర్తులేని, v_uint32)
+DEF_CVT_FUNC(64s32s, cvt_, int64_t, పూర్ణాంకం,    v_int32)
+DEF_CVT_FUNC(64s32f, cvt_64f, int64_t, దశాంశం,  v_float32)
+DEF_CVT_FUNC(64s64f, cvt_64f, int64_t, ద్విగుణ,  v_float64)
 DEF_CVT_FUNC(64s64u, cvt_, int64_t, uint64_t, v_uint64)
 DEF_CVT_FUNC(64s16f, cvt1_,int64_t, hfloat, v_float32)
 DEF_CVT_FUNC(64s16bf, cvt1_, int64_t, bfloat, v_float32)
@@ -487,43 +487,43 @@ DEF_CVT2BOOL_FUNC(64s8b, int64_t, 0)
 DEF_CVT_FUNC(64u8u,  cvt_, uint64_t, uchar,  v_int32)
 DEF_CVT_FUNC(64u8s,  cvt_, uint64_t, schar,  v_int32)
 DEF_CVT_FUNC(64u16u, cvt_, uint64_t, ushort, v_int32)
-DEF_CVT_FUNC(64u16s, cvt_, uint64_t, short,  v_int32)
-DEF_CVT_FUNC(64u32u, cvt_, uint64_t, unsigned, v_uint32)
-DEF_CVT_FUNC(64u32s, cvt_, uint64_t, int,   v_int32)
-DEF_CVT_FUNC(64u32f, cvt_64f, uint64_t, float,  v_float64)
-DEF_CVT_FUNC(64u64f, cvt_64f, uint64_t, double,  v_float64)
+DEF_CVT_FUNC(64u16s, cvt_, uint64_t, పొట్టి,  v_int32)
+DEF_CVT_FUNC(64u32u, cvt_, uint64_t, గుర్తులేని, v_uint32)
+DEF_CVT_FUNC(64u32s, cvt_, uint64_t, పూర్ణాంకం,   v_int32)
+DEF_CVT_FUNC(64u32f, cvt_64f, uint64_t, దశాంశం,  v_float64)
+DEF_CVT_FUNC(64u64f, cvt_64f, uint64_t, ద్విగుణ,  v_float64)
 DEF_CVT_FUNC(64u16f, cvt1_,uint64_t, hfloat, v_float32)
 DEF_CVT_FUNC(64u16bf, cvt1_, uint64_t, bfloat, v_float32)
 
 ///////////// "conversion" w/o conversion ///////////////
 
-static void cvt8u(const uchar* src, size_t sstep, const uchar*, size_t, uchar* dst, size_t dstep, Size size, void*)
+స్థిర శూన్య cvt8u(స్థిరరాశి uchar* src, size_t sstep, స్థిరరాశి uchar*, size_t, uchar* dst, size_t dstep, కొలత size, శూన్య*)
 { CV_INSTRUMENT_REGION(); cvtCopy(src, sstep, dst, dstep, size, 1); }
 
-static void cvt16u(const uchar* src, size_t sstep, const uchar*, size_t, uchar* dst, size_t dstep, Size size, void*)
-{ CV_INSTRUMENT_REGION(); cvtCopy((const uchar*)src, sstep, (uchar*)dst, dstep, size, 2); }
+స్థిర శూన్య cvt16u(స్థిరరాశి uchar* src, size_t sstep, స్థిరరాశి uchar*, size_t, uchar* dst, size_t dstep, కొలత size, శూన్య*)
+{ CV_INSTRUMENT_REGION(); cvtCopy((స్థిరరాశి uchar*)src, sstep, (uchar*)dst, dstep, size, 2); }
 
-static void cvt32s(const uchar* src, size_t sstep, const uchar*, size_t, uchar* dst, size_t dstep, Size size, void*)
-{ CV_INSTRUMENT_REGION(); cvtCopy((const uchar*)src, sstep, (uchar*)dst, dstep, size, 4); }
+స్థిర శూన్య cvt32s(స్థిరరాశి uchar* src, size_t sstep, స్థిరరాశి uchar*, size_t, uchar* dst, size_t dstep, కొలత size, శూన్య*)
+{ CV_INSTRUMENT_REGION(); cvtCopy((స్థిరరాశి uchar*)src, sstep, (uchar*)dst, dstep, size, 4); }
 
-static void cvt64s(const uchar* src, size_t sstep, const uchar*, size_t, uchar* dst, size_t dstep, Size size, void*)
-{ CV_INSTRUMENT_REGION(); cvtCopy((const uchar*)src, sstep, (uchar*)dst, dstep, size, 8); }
+స్థిర శూన్య cvt64s(స్థిరరాశి uchar* src, size_t sstep, స్థిరరాశి uchar*, size_t, uchar* dst, size_t dstep, కొలత size, శూన్య*)
+{ CV_INSTRUMENT_REGION(); cvtCopy((స్థిరరాశి uchar*)src, sstep, (uchar*)dst, dstep, size, 8); }
 
 //////////////////// FP8 (1-byte float) conversions — scalar via saturate_cast ////////////////////
 // Suffixes: 8fe4m3 (E4M3FN), 8fe4m3u (E4M3FNUZ).
-#define DEF_CVT_FP8(S, T) \
+#నిర్వచించు DEF_CVT_FP8(S, T) \
     DEF_CVT_SCALAR_FUNC(S##8u,   T, uchar)     DEF_CVT_SCALAR_FUNC(8u##S,   uchar, T) \
     DEF_CVT_SCALAR_FUNC(S##8s,   T, schar)     DEF_CVT_SCALAR_FUNC(8s##S,   schar, T) \
     DEF_CVT_SCALAR_FUNC(S##16u,  T, ushort)    DEF_CVT_SCALAR_FUNC(16u##S,  ushort, T) \
-    DEF_CVT_SCALAR_FUNC(S##16s,  T, short)     DEF_CVT_SCALAR_FUNC(16s##S,  short, T) \
-    DEF_CVT_SCALAR_FUNC(S##32u,  T, unsigned)  DEF_CVT_SCALAR_FUNC(32u##S,  unsigned, T) \
-    DEF_CVT_SCALAR_FUNC(S##32s,  T, int)       DEF_CVT_SCALAR_FUNC(32s##S,  int, T) \
-    DEF_CVT_SCALAR_FUNC(S##64f,  T, double)    DEF_CVT_SCALAR_FUNC(64f##S,  double, T) \
+    DEF_CVT_SCALAR_FUNC(S##16s,  T, పొట్టి)     DEF_CVT_SCALAR_FUNC(16s##S,  పొట్టి, T) \
+    DEF_CVT_SCALAR_FUNC(S##32u,  T, గుర్తులేని)  DEF_CVT_SCALAR_FUNC(32u##S,  గుర్తులేని, T) \
+    DEF_CVT_SCALAR_FUNC(S##32s,  T, పూర్ణాంకం)       DEF_CVT_SCALAR_FUNC(32s##S,  పూర్ణాంకం, T) \
+    DEF_CVT_SCALAR_FUNC(S##64f,  T, ద్విగుణ)    DEF_CVT_SCALAR_FUNC(64f##S,  ద్విగుణ, T) \
     DEF_CVT_SCALAR_FUNC(S##16f,  T, hfloat)    DEF_CVT_SCALAR_FUNC(16f##S,  hfloat, T) \
     DEF_CVT_SCALAR_FUNC(S##16bf, T, bfloat)    DEF_CVT_SCALAR_FUNC(16bf##S, bfloat, T) \
     DEF_CVT_SCALAR_FUNC(S##64u,  T, uint64_t)  DEF_CVT_SCALAR_FUNC(64u##S,  uint64_t, T) \
     DEF_CVT_SCALAR_FUNC(S##64s,  T, int64_t)   DEF_CVT_SCALAR_FUNC(64s##S,  int64_t, T) \
-    DEF_CVT_SCALAR_FUNC(S##8b,   T, bool)
+    DEF_CVT_SCALAR_FUNC(S##8b,   T, తార్కిక)
 
 DEF_CVT_FP8(8fe4m3,  fp8_t)
 DEF_CVT_FP8(8fe4m3u, fp8a_t)
@@ -533,69 +533,69 @@ DEF_CVT_SCALAR_FUNC(8fe4m38fe4m3u, fp8_t,   fp8a_t)
 DEF_CVT_SCALAR_FUNC(8fe4m3u8fe4m3, fp8a_t, fp8_t)
 
 // float32 -> FP8 encode via the shared building blocks in convert.hpp.
-template<int bias, bool fnuz> static void
-cvtF32ToFp8(const uchar* src_, size_t sstep, const uchar*, size_t,
-            uchar* dst, size_t dstep, Size size, void*)
+మూస<పూర్ణాంకం bias, తార్కిక fnuz> స్థిర శూన్య
+cvt_F32_గమ్యం_Fp8(స్థిరరాశి uchar* src_, size_t sstep, స్థిరరాశి uchar*, size_t,
+            uchar* dst, size_t dstep, కొలత size, శూన్య*)
 {
     CV_INSTRUMENT_REGION();
-    const float* src = (const float*)src_;
-    sstep /= sizeof(src[0]);
+    స్థిరరాశి దశాంశం* src = (స్థిరరాశి దశాంశం*)src_;
+    sstep /= పరిమాణం(src[0]);
 
-    for (int i = 0; i < size.height; i++, src += sstep, dst += dstep)
+    కొరకు (పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep)
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        const int LANES32 = VTraits<v_int32>::vlanes();
-        const int VECSZ = LANES32 * 4;
-        for (; j <= size.width - VECSZ; j += VECSZ)
+        పూర్ణాంకం j = 0;
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
+        స్థిరరాశి పూర్ణాంకం LANES32 = VTraits<v_int32>::vlanes();
+        స్థిరరాశి పూర్ణాంకం VECSZ = LANES32 * 4;
+        కొరకు (; j <= size.వెడల్పు - VECSZ; j += VECSZ)
         {
-            v_float32 vf0 = vx_load(src + j);
-            v_float32 vf1 = vx_load(src + j + LANES32);
-            v_float32 vf2 = vx_load(src + j + 2 * LANES32);
-            v_float32 vf3 = vx_load(src + j + 3 * LANES32);
+            v_float32 vf0 = vx_ఎక్కించు(src + j);
+            v_float32 vf1 = vx_ఎక్కించు(src + j + LANES32);
+            v_float32 vf2 = vx_ఎక్కించు(src + j + 2 * LANES32);
+            v_float32 vf3 = vx_ఎక్కించు(src + j + 3 * LANES32);
             encodeFp8Vec4<bias, fnuz>(vf0, vf1, vf2, vf3, src + j, VECSZ, dst + j);
         }
         vx_cleanup();
-#endif
-        for (; j < size.width; j++)
+#అయితే_ముగింపు
+        కొరకు (; j < size.వెడల్పు; j++)
             dst[j] = fp8_detail::encodeE4M3(src[j], bias, fnuz);
     }
 }
-static void cvt32f8fe4m3(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtF32ToFp8<7, false>(s, ss, p, ps, d, ds, sz, x); }
-static void cvt32f8fe4m3u(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtF32ToFp8<8, true>(s, ss, p, ps, d, ds, sz, x); }
+స్థిర శూన్య cvt32f8fe4m3(స్థిరరాశి uchar* s, size_t ss, స్థిరరాశి uchar* p, size_t ps, uchar* d, size_t ds, కొలత sz, శూన్య* x)
+{ cvt_F32_గమ్యం_Fp8<7, అబద్ధం>(s, ss, p, ps, d, ds, sz, x); }
+స్థిర శూన్య cvt32f8fe4m3u(స్థిరరాశి uchar* s, size_t ss, స్థిరరాశి uchar* p, size_t ps, uchar* d, size_t ds, కొలత sz, శూన్య* x)
+{ cvt_F32_గమ్యం_Fp8<8, నిజం>(s, ss, p, ps, d, ds, sz, x); }
 
 // FP8 -> float32: 256-entry decode table gathered via universal intrinsics (same table as scalar)
-template<typename FP8>
-static void cvtFp8ToF32(const uchar* src, size_t sstep, const uchar*, size_t,
-                        uchar* dst_, size_t dstep, Size size, void*)
+మూస<రకం_పేరు FP8>
+స్థిర శూన్య cvt_Fp8_గమ్యం_F32(స్థిరరాశి uchar* src, size_t sstep, స్థిరరాశి uchar*, size_t,
+                        uchar* dst_, size_t dstep, కొలత size, శూన్య*)
 {
     CV_INSTRUMENT_REGION();
-    float* dst = (float*)dst_;
-    const float* tab = FP8::decodeLUT();
-    dstep /= sizeof(dst[0]);
-    for (int i = 0; i < size.height; i++, src += sstep, dst += dstep)
+    దశాంశం* dst = (దశాంశం*)dst_;
+    స్థిరరాశి దశాంశం* tab = FP8::decodeLUT();
+    dstep /= పరిమాణం(dst[0]);
+    కొరకు (పూర్ణాంకం i = 0; i < size.ఎత్తు; i++, src += sstep, dst += dstep)
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        const int VECSZ = VTraits<v_float32>::vlanes();
-        for (; j <= size.width - VECSZ; j += VECSZ)
-            v_store(dst + j, v_lut(tab, v_reinterpret_as_s32(vx_load_expand_q(src + j))));
-#endif
-        for (; j < size.width; j++) dst[j] = tab[src[j]];
+        పూర్ణాంకం j = 0;
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
+        స్థిరరాశి పూర్ణాంకం VECSZ = VTraits<v_float32>::vlanes();
+        కొరకు (; j <= size.వెడల్పు - VECSZ; j += VECSZ)
+            v_store(dst + j, v_lut(tab, v_reinterpret_as_s32(vx_ఎక్కించు_expand_q(src + j))));
+#అయితే_ముగింపు
+        కొరకు (; j < size.వెడల్పు; j++) dst[j] = tab[src[j]];
     }
 }
-static void cvt8fe4m332f(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtFp8ToF32<fp8_t>(s, ss, p, ps, d, ds, sz, x); }
-static void cvt8fe4m3u32f(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtFp8ToF32<fp8a_t>(s, ss, p, ps, d, ds, sz, x); }
+స్థిర శూన్య cvt8fe4m332f(స్థిరరాశి uchar* s, size_t ss, స్థిరరాశి uchar* p, size_t ps, uchar* d, size_t ds, కొలత sz, శూన్య* x)
+{ cvt_Fp8_గమ్యం_F32<fp8_t>(s, ss, p, ps, d, ds, sz, x); }
+స్థిర శూన్య cvt8fe4m3u32f(స్థిరరాశి uchar* s, size_t ss, స్థిరరాశి uchar* p, size_t ps, uchar* d, size_t ds, కొలత sz, శూన్య* x)
+{ cvt_Fp8_గమ్యం_F32<fp8a_t>(s, ss, p, ps, d, ds, sz, x); }
 
-BinaryFunc getConvertFunc(int sdepth_, int ddepth_)
+ద్విమాన_Func getConvertFunc(పూర్ణాంకం sdepth_, పూర్ణాంకం ddepth_)
 {
-    int sdepth = CV_MAT_DEPTH(sdepth_);
-    int ddepth = CV_MAT_DEPTH(ddepth_);
-    BinaryFunc func =
+    పూర్ణాంకం sdepth = CV_MAT_లోతు(sdepth_);
+    పూర్ణాంకం ddepth = CV_MAT_లోతు(ddepth_);
+    ద్విమాన_Func func =
         ddepth == CV_8U ? (
             sdepth == CV_8U ? cvt8u :
             sdepth == CV_8S ? cvt8s8u :
@@ -853,9 +853,9 @@ BinaryFunc getConvertFunc(int sdepth_, int ddepth_)
             0) :
         0;
     CV_Assert(func != 0);
-    return func;
+    తిరిగి func;
 }
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
-#endif
+CV_CPU_OPTIMIZATION_NAMESPACE_చివర
+#అయితే_ముగింపు
 } // namespace

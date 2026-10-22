@@ -41,380 +41,380 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
 /****************************************************************************************\
 *                                          PCA                                           *
 \****************************************************************************************/
 
-namespace cv
+నామాకాశ cv
 {
 
 PCA::PCA() {}
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, int maxComponents)
+PCA::PCA(ఆదానం_Array దత్తాంశం, ఆదానం_Array సగటు, పూర్ణాంకం flags, పూర్ణాంకం maxComponents)
 {
-    operator()(data, _mean, flags, maxComponents);
+    క్రియాకారకం()(దత్తాంశం, సగటు, flags, maxComponents);
 }
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, double retainedVariance)
+PCA::PCA(ఆదానం_Array దత్తాంశం, ఆదానం_Array సగటు, పూర్ణాంకం flags, ద్విగుణ retainedVariance)
 {
-    operator()(data, _mean, flags, retainedVariance);
+    క్రియాకారకం()(దత్తాంశం, సగటు, flags, retainedVariance);
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, int maxComponents)
+PCA& PCA::క్రియాకారకం()(ఆదానం_Array దత్తాంశం_3, ఆదానం_Array __mean, పూర్ణాంకం flags, పూర్ణాంకం maxComponents)
 {
-    Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
-    Size mean_sz;
+    Mat దత్తాంశం = దత్తాంశం_3.getMat(), సగటు = __mean.getMat();
+    పూర్ణాంకం covar_flags = cv::COVAR_SCALE;
+    పూర్ణాంకం len, లోపల_లెక్క;
+    కొలత సగటు_sz;
 
-    CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    CV_Assert( దత్తాంశం.channels() == 1 );
+    ఒకవేళ( flags & PCA::దత్తాంశం_AS_నిలువు )
     {
-        len = data.rows;
-        in_count = data.cols;
-        covar_flags |= cv::COVAR_COLS;
-        mean_sz = Size(1, len);
+        len = దత్తాంశం.అడ్డువరుసలు;
+        లోపల_లెక్క = దత్తాంశం.నిలువుల_సంఖ్య;
+        covar_flags |= cv::COVAR_నిలువుల_సంఖ్య;
+        సగటు_sz = కొలత(1, len);
     }
-    else
+    లేకపోతే
     {
-        len = data.cols;
-        in_count = data.rows;
-        covar_flags |= cv::COVAR_ROWS;
-        mean_sz = Size(len, 1);
+        len = దత్తాంశం.నిలువుల_సంఖ్య;
+        లోపల_లెక్క = దత్తాంశం.అడ్డువరుసలు;
+        covar_flags |= cv::COVAR_అడ్డువరుసలు;
+        సగటు_sz = కొలత(len, 1);
     }
 
-    int count = std::min(len, in_count), out_count = count;
-    if( maxComponents > 0 )
-        out_count = std::min(count, maxComponents);
+    పూర్ణాంకం లెక్క_2 = std::min(len, లోపల_లెక్క), బహిర్గతం_లెక్క = లెక్క_2;
+    ఒకవేళ( maxComponents > 0 )
+        బహిర్గతం_లెక్క = std::min(లెక్క_2, maxComponents);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
-        covar_flags |= cv::COVAR_NORMAL;
+    ఒకవేళ( len <= లోపల_లెక్క )
+        covar_flags |= cv::COVAR_సాధారణ;
 
-    int ctype = std::max(CV_32F, data.depth());
-    mean.create( mean_sz, ctype );
+    పూర్ణాంకం ctype = std::max(CV_32F, దత్తాంశం.లోతు());
+    సగటు_2.create( సగటు_sz, ctype );
 
-    Mat covar( count, count, ctype );
+    Mat covar( లెక్క_2, లెక్క_2, ctype );
 
-    if( !_mean.empty() )
+    ఒకవేళ( !సగటు.empty() )
     {
-        CV_Assert( _mean.size() == mean_sz );
-        _mean.convertTo(mean, ctype);
+        CV_Assert( సగటు.size() == సగటు_sz );
+        సగటు.convert_గమ్యం(సగటు_2, ctype);
         covar_flags |= cv::COVAR_USE_AVG;
     }
 
-    calcCovarMatrix( data, covar, mean, covar_flags, ctype );
+    calc_Covar_మాతృక( దత్తాంశం, covar, సగటు_2, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    ఒకవేళ( !(covar_flags & cv::COVAR_సాధారణ) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
-        Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        Mat tmp_దత్తాంశం, tmp_సగటు = repeat(సగటు_2, దత్తాంశం.అడ్డువరుసలు/సగటు_2.అడ్డువరుసలు, దత్తాంశం.నిలువుల_సంఖ్య/సగటు_2.నిలువుల_సంఖ్య);
+        ఒకవేళ( దత్తాంశం.type() != ctype || tmp_సగటు.దత్తాంశం == సగటు_2.దత్తాంశం )
         {
-            data.convertTo( tmp_data, ctype );
-            subtract( tmp_data, tmp_mean, tmp_data );
+            దత్తాంశం.convert_గమ్యం( tmp_దత్తాంశం, ctype );
+            వ్యవకలనం( tmp_దత్తాంశం, tmp_సగటు, tmp_దత్తాంశం );
         }
-        else
+        లేకపోతే
         {
-            subtract( data, tmp_mean, tmp_mean );
-            tmp_data = tmp_mean;
+            వ్యవకలనం( దత్తాంశం, tmp_సగటు, tmp_సగటు );
+            tmp_దత్తాంశం = tmp_సగటు;
         }
 
-        Mat evects1(count, len, ctype);
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, evects1,
-            (flags & PCA::DATA_AS_COL) ? cv::GEMM_2_T : 0);
+        Mat evects1(లెక్క_2, len, ctype);
+        gemm( eigenvectors, tmp_దత్తాంశం, 1, Mat(), 0, evects1,
+            (flags & PCA::దత్తాంశం_AS_నిలువు) ? cv::GEMM_2_T : 0);
         eigenvectors = evects1;
 
         // normalize eigenvectors
-        int i;
-        for( i = 0; i < out_count; i++ )
+        పూర్ణాంకం i;
+        కొరకు( i = 0; i < బహిర్గతం_లెక్క; i++ )
         {
-            Mat vec = eigenvectors.row(i);
+            Mat vec = eigenvectors.అడ్డువరుస(i);
             normalize(vec, vec);
         }
     }
 
-    if( count > out_count )
+    ఒకవేళ( లెక్క_2 > బహిర్గతం_లెక్క )
     {
         // use clone() to physically copy the data and thus deallocate the original matrices
-        eigenvalues = eigenvalues.rowRange(0,out_count).clone();
-        eigenvectors = eigenvectors.rowRange(0,out_count).clone();
+        eigenvalues = eigenvalues.అడ్డువరుస_Range_2(0,బహిర్గతం_లెక్క).clone();
+        eigenvectors = eigenvectors.అడ్డువరుస_Range_2(0,బహిర్గతం_లెక్క).clone();
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-void PCA::write(FileStorage& fs ) const
+శూన్య PCA::లిఖ(FileStorage& fs ) స్థిరరాశి
 {
     CV_Assert( fs.isOpened() );
 
     fs << "name" << "PCA";
     fs << "vectors" << eigenvectors;
     fs << "values" << eigenvalues;
-    fs << "mean" << mean;
+    fs << "mean" << సగటు_2;
 }
 
-void PCA::read(const FileNode& fn)
+శూన్య PCA::పఠ(స్థిరరాశి File_కణుపు& fn)
 {
     CV_Assert( !fn.empty() );
     CV_Assert( (String)fn["name"] == "PCA" );
 
-    cv::read(fn["vectors"], eigenvectors);
-    cv::read(fn["values"], eigenvalues);
-    cv::read(fn["mean"], mean);
+    cv::పఠ(fn["vectors"], eigenvectors);
+    cv::పఠ(fn["values"], eigenvalues);
+    cv::పఠ(fn["mean"], సగటు_2);
 }
 
-template <typename T>
-int computeCumulativeEnergy(const Mat& eigenvalues, double retainedVariance)
+మూస <రకం_పేరు T>
+పూర్ణాంకం computeCumulativeEnergy(స్థిరరాశి Mat& eigenvalues, ద్విగుణ retainedVariance)
 {
-    CV_DbgAssert( eigenvalues.type() == DataType<T>::type );
+    CV_DbgAssert( eigenvalues.type() == దత్తాంశం_Type_2<T>::type );
 
-    Mat g(eigenvalues.size(), DataType<T>::type);
+    Mat g(eigenvalues.size(), దత్తాంశం_Type_2<T>::type);
 
-    for(int ig = 0; ig < g.rows; ig++)
+    కొరకు(పూర్ణాంకం ig = 0; ig < g.అడ్డువరుసలు; ig++)
     {
         g.at<T>(ig, 0) = 0;
-        for(int im = 0; im <= ig; im++)
+        కొరకు(పూర్ణాంకం im = 0; im <= ig; im++)
         {
             g.at<T>(ig,0) += eigenvalues.at<T>(im,0);
         }
     }
 
-    int L;
+    పూర్ణాంకం L;
 
-    for(L = 0; L < eigenvalues.rows; L++)
+    కొరకు(L = 0; L < eigenvalues.అడ్డువరుసలు; L++)
     {
-        double energy = g.at<T>(L, 0) / g.at<T>(g.rows - 1, 0);
-        if(energy > retainedVariance)
-            break;
+        ద్విగుణ energy = g.at<T>(L, 0) / g.at<T>(g.అడ్డువరుసలు - 1, 0);
+        ఒకవేళ(energy > retainedVariance)
+            ఆపు;
     }
 
     L = std::max(2, L);
 
-    return L;
+    తిరిగి L;
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double retainedVariance)
+PCA& PCA::క్రియాకారకం()(ఆదానం_Array దత్తాంశం_3, ఆదానం_Array __mean, పూర్ణాంకం flags, ద్విగుణ retainedVariance)
 {
-    Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
-    Size mean_sz;
+    Mat దత్తాంశం = దత్తాంశం_3.getMat(), సగటు = __mean.getMat();
+    పూర్ణాంకం covar_flags = cv::COVAR_SCALE;
+    పూర్ణాంకం len, లోపల_లెక్క;
+    కొలత సగటు_sz;
 
-    CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    CV_Assert( దత్తాంశం.channels() == 1 );
+    ఒకవేళ( flags & PCA::దత్తాంశం_AS_నిలువు )
     {
-        len = data.rows;
-        in_count = data.cols;
-        covar_flags |= cv::COVAR_COLS;
-        mean_sz = Size(1, len);
+        len = దత్తాంశం.అడ్డువరుసలు;
+        లోపల_లెక్క = దత్తాంశం.నిలువుల_సంఖ్య;
+        covar_flags |= cv::COVAR_నిలువుల_సంఖ్య;
+        సగటు_sz = కొలత(1, len);
     }
-    else
+    లేకపోతే
     {
-        len = data.cols;
-        in_count = data.rows;
-        covar_flags |= cv::COVAR_ROWS;
-        mean_sz = Size(len, 1);
+        len = దత్తాంశం.నిలువుల_సంఖ్య;
+        లోపల_లెక్క = దత్తాంశం.అడ్డువరుసలు;
+        covar_flags |= cv::COVAR_అడ్డువరుసలు;
+        సగటు_sz = కొలత(len, 1);
     }
 
     CV_Assert( retainedVariance > 0 && retainedVariance <= 1 );
 
-    int count = std::min(len, in_count);
+    పూర్ణాంకం లెక్క_2 = std::min(len, లోపల_లెక్క);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
-        covar_flags |= cv::COVAR_NORMAL;
+    ఒకవేళ( len <= లోపల_లెక్క )
+        covar_flags |= cv::COVAR_సాధారణ;
 
-    int ctype = std::max(CV_32F, data.depth());
-    mean.create( mean_sz, ctype );
+    పూర్ణాంకం ctype = std::max(CV_32F, దత్తాంశం.లోతు());
+    సగటు_2.create( సగటు_sz, ctype );
 
-    Mat covar( count, count, ctype );
+    Mat covar( లెక్క_2, లెక్క_2, ctype );
 
-    if( !_mean.empty() )
+    ఒకవేళ( !సగటు.empty() )
     {
-        CV_Assert( _mean.size() == mean_sz );
-        _mean.convertTo(mean, ctype);
+        CV_Assert( సగటు.size() == సగటు_sz );
+        సగటు.convert_గమ్యం(సగటు_2, ctype);
         covar_flags |= cv::COVAR_USE_AVG;
     }
 
-    calcCovarMatrix( data, covar, mean, covar_flags, ctype );
+    calc_Covar_మాతృక( దత్తాంశం, covar, సగటు_2, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    ఒకవేళ( !(covar_flags & cv::COVAR_సాధారణ) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
-        Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        Mat tmp_దత్తాంశం, tmp_సగటు = repeat(సగటు_2, దత్తాంశం.అడ్డువరుసలు/సగటు_2.అడ్డువరుసలు, దత్తాంశం.నిలువుల_సంఖ్య/సగటు_2.నిలువుల_సంఖ్య);
+        ఒకవేళ( దత్తాంశం.type() != ctype || tmp_సగటు.దత్తాంశం == సగటు_2.దత్తాంశం )
         {
-            data.convertTo( tmp_data, ctype );
-            subtract( tmp_data, tmp_mean, tmp_data );
+            దత్తాంశం.convert_గమ్యం( tmp_దత్తాంశం, ctype );
+            వ్యవకలనం( tmp_దత్తాంశం, tmp_సగటు, tmp_దత్తాంశం );
         }
-        else
+        లేకపోతే
         {
-            subtract( data, tmp_mean, tmp_mean );
-            tmp_data = tmp_mean;
+            వ్యవకలనం( దత్తాంశం, tmp_సగటు, tmp_సగటు );
+            tmp_దత్తాంశం = tmp_సగటు;
         }
 
-        Mat evects1(count, len, ctype);
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, evects1,
-            (flags & PCA::DATA_AS_COL) ? cv::GEMM_2_T : 0);
+        Mat evects1(లెక్క_2, len, ctype);
+        gemm( eigenvectors, tmp_దత్తాంశం, 1, Mat(), 0, evects1,
+            (flags & PCA::దత్తాంశం_AS_నిలువు) ? cv::GEMM_2_T : 0);
         eigenvectors = evects1;
 
         // normalize all eigenvectors
-        int i;
-        for( i = 0; i < eigenvectors.rows; i++ )
+        పూర్ణాంకం i;
+        కొరకు( i = 0; i < eigenvectors.అడ్డువరుసలు; i++ )
         {
-            Mat vec = eigenvectors.row(i);
+            Mat vec = eigenvectors.అడ్డువరుస(i);
             normalize(vec, vec);
         }
     }
 
     // compute the cumulative energy content for each eigenvector
-    int L;
-    if (ctype == CV_32F)
-        L = computeCumulativeEnergy<float>(eigenvalues, retainedVariance);
-    else
-        L = computeCumulativeEnergy<double>(eigenvalues, retainedVariance);
+    పూర్ణాంకం L;
+    ఒకవేళ (ctype == CV_32F)
+        L = computeCumulativeEnergy<దశాంశం>(eigenvalues, retainedVariance);
+    లేకపోతే
+        L = computeCumulativeEnergy<ద్విగుణ>(eigenvalues, retainedVariance);
 
     // use clone() to physically copy the data and thus deallocate the original matrices
-    eigenvalues = eigenvalues.rowRange(0,L).clone();
-    eigenvectors = eigenvectors.rowRange(0,L).clone();
+    eigenvalues = eigenvalues.అడ్డువరుస_Range_2(0,L).clone();
+    eigenvectors = eigenvectors.అడ్డువరుస_Range_2(0,L).clone();
 
-    return *this;
+    తిరిగి *ఇది;
 }
 
-void PCA::project(InputArray _data, OutputArray result) const
+శూన్య PCA::project(ఆదానం_Array దత్తాంశం_3, OutputArray ఫలితం) స్థిరరాశి
 {
-    Mat data = _data.getMat();
-    CV_Assert( !mean.empty() && !eigenvectors.empty() &&
-        ((mean.rows == 1 && mean.cols == data.cols) || (mean.cols == 1 && mean.rows == data.rows)));
-    Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-    int ctype = mean.type();
-    if( data.type() != ctype || tmp_mean.data == mean.data )
+    Mat దత్తాంశం = దత్తాంశం_3.getMat();
+    CV_Assert( !సగటు_2.empty() && !eigenvectors.empty() &&
+        ((సగటు_2.అడ్డువరుసలు == 1 && సగటు_2.నిలువుల_సంఖ్య == దత్తాంశం.నిలువుల_సంఖ్య) || (సగటు_2.నిలువుల_సంఖ్య == 1 && సగటు_2.అడ్డువరుసలు == దత్తాంశం.అడ్డువరుసలు)));
+    Mat tmp_దత్తాంశం, tmp_సగటు = repeat(సగటు_2, దత్తాంశం.అడ్డువరుసలు/సగటు_2.అడ్డువరుసలు, దత్తాంశం.నిలువుల_సంఖ్య/సగటు_2.నిలువుల_సంఖ్య);
+    పూర్ణాంకం ctype = సగటు_2.type();
+    ఒకవేళ( దత్తాంశం.type() != ctype || tmp_సగటు.దత్తాంశం == సగటు_2.దత్తాంశం )
     {
-        data.convertTo( tmp_data, ctype );
-        subtract( tmp_data, tmp_mean, tmp_data );
+        దత్తాంశం.convert_గమ్యం( tmp_దత్తాంశం, ctype );
+        వ్యవకలనం( tmp_దత్తాంశం, tmp_సగటు, tmp_దత్తాంశం );
     }
-    else
+    లేకపోతే
     {
-        subtract( data, tmp_mean, tmp_mean );
-        tmp_data = tmp_mean;
+        వ్యవకలనం( దత్తాంశం, tmp_సగటు, tmp_సగటు );
+        tmp_దత్తాంశం = tmp_సగటు;
     }
-    if( mean.rows == 1 )
-        gemm( tmp_data, eigenvectors, 1, Mat(), 0, result, GEMM_2_T );
-    else
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, result, 0 );
+    ఒకవేళ( సగటు_2.అడ్డువరుసలు == 1 )
+        gemm( tmp_దత్తాంశం, eigenvectors, 1, Mat(), 0, ఫలితం, GEMM_2_T );
+    లేకపోతే
+        gemm( eigenvectors, tmp_దత్తాంశం, 1, Mat(), 0, ఫలితం, 0 );
 }
 
-Mat PCA::project(InputArray data) const
+Mat PCA::project(ఆదానం_Array దత్తాంశం) స్థిరరాశి
 {
-    Mat result;
-    project(data, result);
-    return result;
+    Mat ఫలితం;
+    project(దత్తాంశం, ఫలితం);
+    తిరిగి ఫలితం;
 }
 
-void PCA::backProject(InputArray _data, OutputArray result) const
+శూన్య PCA::వెనుక_Project(ఆదానం_Array దత్తాంశం_3, OutputArray ఫలితం) స్థిరరాశి
 {
-    Mat data = _data.getMat();
-    CV_Assert( !mean.empty() && !eigenvectors.empty() &&
-        ((mean.rows == 1 && eigenvectors.rows == data.cols) ||
-         (mean.cols == 1 && eigenvectors.rows == data.rows)));
+    Mat దత్తాంశం = దత్తాంశం_3.getMat();
+    CV_Assert( !సగటు_2.empty() && !eigenvectors.empty() &&
+        ((సగటు_2.అడ్డువరుసలు == 1 && eigenvectors.అడ్డువరుసలు == దత్తాంశం.నిలువుల_సంఖ్య) ||
+         (సగటు_2.నిలువుల_సంఖ్య == 1 && eigenvectors.అడ్డువరుసలు == దత్తాంశం.అడ్డువరుసలు)));
 
-    Mat tmp_data, tmp_mean;
-    data.convertTo(tmp_data, mean.type());
-    if( mean.rows == 1 )
+    Mat tmp_దత్తాంశం, tmp_సగటు;
+    దత్తాంశం.convert_గమ్యం(tmp_దత్తాంశం, సగటు_2.type());
+    ఒకవేళ( సగటు_2.అడ్డువరుసలు == 1 )
     {
-        tmp_mean = repeat(mean, data.rows, 1);
-        gemm( tmp_data, eigenvectors, 1, tmp_mean, 1, result, 0 );
+        tmp_సగటు = repeat(సగటు_2, దత్తాంశం.అడ్డువరుసలు, 1);
+        gemm( tmp_దత్తాంశం, eigenvectors, 1, tmp_సగటు, 1, ఫలితం, 0 );
     }
-    else
+    లేకపోతే
     {
-        tmp_mean = repeat(mean, 1, data.cols);
-        gemm( eigenvectors, tmp_data, 1, tmp_mean, 1, result, GEMM_1_T );
+        tmp_సగటు = repeat(సగటు_2, 1, దత్తాంశం.నిలువుల_సంఖ్య);
+        gemm( eigenvectors, tmp_దత్తాంశం, 1, tmp_సగటు, 1, ఫలితం, GEMM_1_T );
     }
 }
 
-Mat PCA::backProject(InputArray data) const
+Mat PCA::వెనుక_Project(ఆదానం_Array దత్తాంశం) స్థిరరాశి
 {
-    Mat result;
-    backProject(data, result);
-    return result;
+    Mat ఫలితం;
+    వెనుక_Project(దత్తాంశం, ఫలితం);
+    తిరిగి ఫలితం;
 }
 
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, int maxComponents)
+శూన్య cv::PCACompute(ఆదానం_Array దత్తాంశం, ఆదానం_Output_Array సగటు_2,
+                    OutputArray eigenvectors, పూర్ణాంకం maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, maxComponents);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
+    pca(దత్తాంశం, సగటు_2, 0, maxComponents);
+    pca.సగటు_2.copy_గమ్యం(సగటు_2);
+    pca.eigenvectors.copy_గమ్యం(eigenvectors);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
+శూన్య cv::PCACompute(ఆదానం_Array దత్తాంశం, ఆదానం_Output_Array సగటు_2,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    int maxComponents)
+                    పూర్ణాంకం maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, maxComponents);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
-    pca.eigenvalues.copyTo(eigenvalues);
+    pca(దత్తాంశం, సగటు_2, 0, maxComponents);
+    pca.సగటు_2.copy_గమ్యం(సగటు_2);
+    pca.eigenvectors.copy_గమ్యం(eigenvectors);
+    pca.eigenvalues.copy_గమ్యం(eigenvalues);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, double retainedVariance)
+శూన్య cv::PCACompute(ఆదానం_Array దత్తాంశం, ఆదానం_Output_Array సగటు_2,
+                    OutputArray eigenvectors, ద్విగుణ retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, retainedVariance);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
+    pca(దత్తాంశం, సగటు_2, 0, retainedVariance);
+    pca.సగటు_2.copy_గమ్యం(సగటు_2);
+    pca.eigenvectors.copy_గమ్యం(eigenvectors);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
+శూన్య cv::PCACompute(ఆదానం_Array దత్తాంశం, ఆదానం_Output_Array సగటు_2,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    double retainedVariance)
+                    ద్విగుణ retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, retainedVariance);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
-    pca.eigenvalues.copyTo(eigenvalues);
+    pca(దత్తాంశం, సగటు_2, 0, retainedVariance);
+    pca.సగటు_2.copy_గమ్యం(సగటు_2);
+    pca.eigenvectors.copy_గమ్యం(eigenvectors);
+    pca.eigenvalues.copy_గమ్యం(eigenvalues);
 }
 
-void cv::PCAProject(InputArray data, InputArray mean,
-                    InputArray eigenvectors, OutputArray result)
+శూన్య cv::PCAProject(ఆదానం_Array దత్తాంశం, ఆదానం_Array సగటు_2,
+                    ఆదానం_Array eigenvectors, OutputArray ఫలితం)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca.mean = mean.getMat();
+    pca.సగటు_2 = సగటు_2.getMat();
     pca.eigenvectors = eigenvectors.getMat();
-    pca.project(data, result);
+    pca.project(దత్తాంశం, ఫలితం);
 }
 
-void cv::PCABackProject(InputArray data, InputArray mean,
-                    InputArray eigenvectors, OutputArray result)
+శూన్య cv::PCABackProject(ఆదానం_Array దత్తాంశం, ఆదానం_Array సగటు_2,
+                    ఆదానం_Array eigenvectors, OutputArray ఫలితం)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca.mean = mean.getMat();
+    pca.సగటు_2 = సగటు_2.getMat();
     pca.eigenvectors = eigenvectors.getMat();
-    pca.backProject(data, result);
+    pca.వెనుక_Project(దత్తాంశం, ఫలితం);
 }

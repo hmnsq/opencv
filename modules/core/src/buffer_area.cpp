@@ -2,174 +2,174 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "opencv2/core/utils/buffer_area.private.hpp"
-#include "opencv2/core/utils/configuration.private.hpp"
+#అన్తర్భావ "opencv2/core/utils/buffer_area.private.hpp"
+#అన్తర్భావ "opencv2/core/utils/configuration.private.hpp"
 
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-static bool CV_BUFFER_AREA_OVERRIDE_SAFE_MODE =
-    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", false);
-#endif
+#నిర్వచితం_కాకపోతే OPENCV_ENABLE_జ్ఞాపకం_SANITIZER
+స్థిర తార్కిక CV_బఫరు_AREA_OVERRIDE_సురక్షిత_బహుళకం =
+    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", అబద్ధం);
+#అయితే_ముగింపు
 
-namespace cv { namespace utils {
+నామాకాశ cv { నామాకాశ utils {
 
 //==================================================================================================
 
-class BufferArea::Block
+తరగతి బఫరు_Area::ఖండం
 {
-private:
-    inline size_t reserve_count() const
+అంతరంగ:
+    అంతఃవరుస size_t reserve_లెక్క() స్థిరరాశి
     {
-        return alignment / type_size - 1;
+        తిరిగి alignment / type_కొలత - 1;
     }
-public:
-    Block(void **ptr_, ushort type_size_, size_t count_, ushort alignment_)
-        : ptr(ptr_), raw_mem(0), count(count_), type_size(type_size_), alignment(alignment_)
+బహిరంగ:
+    ఖండం(శూన్య **ptr_, ushort type_కొలత_2, size_t లెక్క, ushort alignment_)
+        : ptr(ptr_), raw_mem(0), లెక్క_2(లెక్క), type_కొలత(type_కొలత_2), alignment(alignment_)
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == ఖాళీ);
     }
-    void cleanup() const
+    శూన్య cleanup() స్థిరరాశి
     {
         CV_DbgAssert(ptr);
-        if (raw_mem)
+        ఒకవేళ (raw_mem)
             fastFree(raw_mem);
     }
-    size_t getByteCount() const
+    size_t get_Byte_లెక్క() స్థిరరాశి
     {
-        return type_size * (count + reserve_count());
+        తిరిగి type_కొలత * (లెక్క_2 + reserve_లెక్క());
     }
-    void real_allocate()
+    శూన్య real_allocate()
     {
-        CV_Assert(ptr && *ptr == NULL);
-        const size_t allocated_count = count + reserve_count();
-        raw_mem = fastMalloc(type_size * allocated_count);
-        if (alignment != type_size)
+        CV_Assert(ptr && *ptr == ఖాళీ);
+        స్థిరరాశి size_t allocated_లెక్క = లెక్క_2 + reserve_లెక్క();
+        raw_mem = fastMalloc(type_కొలత * allocated_లెక్క);
+        ఒకవేళ (alignment != type_కొలత)
         {
             *ptr = alignPtr(raw_mem, alignment);
             CV_Assert(reinterpret_cast<size_t>(*ptr) % alignment == 0);
-            CV_Assert(static_cast<uchar*>(*ptr) + type_size * count <= static_cast<uchar*>(raw_mem) + type_size * allocated_count);
+            CV_Assert(static_cast<uchar*>(*ptr) + type_కొలత * లెక్క_2 <= static_cast<uchar*>(raw_mem) + type_కొలత * allocated_లెక్క);
         }
-        else
+        లేకపోతే
         {
             *ptr = raw_mem;
         }
     }
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    void * fast_allocate(void * buf) const
+#నిర్వచితం_కాకపోతే OPENCV_ENABLE_జ్ఞాపకం_SANITIZER
+    శూన్య * fast_allocate(శూన్య * buf) స్థిరరాశి
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == ఖాళీ);
         buf = alignPtr(buf, alignment);
         CV_Assert(reinterpret_cast<size_t>(buf) % alignment == 0);
         *ptr = buf;
-        return static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * count);
+        తిరిగి static_cast<శూన్య*>(static_cast<uchar*>(*ptr) + type_కొలత * లెక్క_2);
     }
-#endif
-    bool operator==(void **other) const
+#అయితే_ముగింపు
+    తార్కిక క్రియాకారకం==(శూన్య **other) స్థిరరాశి
     {
         CV_Assert(ptr && other);
-        return *ptr == *other;
+        తిరిగి *ptr == *other;
     }
-    void zeroFill() const
+    శూన్య zeroFill() స్థిరరాశి
     {
         CV_Assert(ptr && *ptr);
-        memset(static_cast<uchar*>(*ptr), 0, count * type_size);
+        memset(static_cast<uchar*>(*ptr), 0, లెక్క_2 * type_కొలత);
     }
-private:
-    void **ptr;
-    void * raw_mem;
-    size_t count;
-    ushort type_size;
+అంతరంగ:
+    శూన్య **ptr;
+    శూన్య * raw_mem;
+    size_t లెక్క_2;
+    ushort type_కొలత;
     ushort alignment;
 };
 
 //==================================================================================================
 
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-BufferArea::BufferArea(bool safe_) :
+#నిర్వచితం_కాకపోతే OPENCV_ENABLE_జ్ఞాపకం_SANITIZER
+బఫరు_Area::బఫరు_Area(తార్కిక సురక్షిత) :
     oneBuf(0),
-    totalSize(0),
-    safe(safe_ || CV_BUFFER_AREA_OVERRIDE_SAFE_MODE)
+    మొత్తం_కొలత(0),
+    సురక్షిత_2(సురక్షిత || CV_బఫరు_AREA_OVERRIDE_సురక్షిత_బహుళకం)
 {
     // nothing
 }
-#else
-BufferArea::BufferArea(bool safe_)
+#లేకపోతే
+బఫరు_Area::బఫరు_Area(తార్కిక సురక్షిత)
 {
-    CV_UNUSED(safe_);
+    CV_వాడని(సురక్షిత);
 }
-#endif
+#అయితే_ముగింపు
 
-BufferArea::~BufferArea()
+బఫరు_Area::~బఫరు_Area()
 {
     release();
 }
 
-void BufferArea::allocate_(void **ptr, ushort type_size, size_t count, ushort alignment)
+శూన్య బఫరు_Area::allocate_(శూన్య **ptr, ushort type_కొలత, size_t లెక్క_2, ushort alignment)
 {
-    blocks.push_back(Block(ptr, type_size, count, alignment));
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    ఖండాలు.push_back(ఖండం(ptr, type_కొలత, లెక్క_2, alignment));
+#నిర్వచితం_కాకపోతే OPENCV_ENABLE_జ్ఞాపకం_SANITIZER
+    ఒకవేళ (!సురక్షిత_2)
     {
-        totalSize += blocks.back().getByteCount();
+        మొత్తం_కొలత += ఖండాలు.back().get_Byte_లెక్క();
     }
-    else
-#endif
+    లేకపోతే
+#అయితే_ముగింపు
     {
-        blocks.back().real_allocate();
+        ఖండాలు.back().real_allocate();
     }
 }
 
-void BufferArea::zeroFill_(void **ptr)
+శూన్య బఫరు_Area::zeroFill_(శూన్య **ptr)
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    కొరకు(std::vector<ఖండం>::const_iterator i = ఖండాలు.begin(); i != ఖండాలు.end(); ++i)
     {
-        if (*i == ptr)
+        ఒకవేళ (*i == ptr)
         {
             i->zeroFill();
-            break;
+            ఆపు;
         }
     }
 }
 
-void BufferArea::zeroFill()
+శూన్య బఫరు_Area::zeroFill()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    కొరకు(std::vector<ఖండం>::const_iterator i = ఖండాలు.begin(); i != ఖండాలు.end(); ++i)
     {
         i->zeroFill();
     }
 }
 
-void BufferArea::commit()
+శూన్య బఫరు_Area::commit()
 {
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+#నిర్వచితం_కాకపోతే OPENCV_ENABLE_జ్ఞాపకం_SANITIZER
+    ఒకవేళ (!సురక్షిత_2)
     {
-        CV_Assert(totalSize > 0);
-        CV_Assert(oneBuf == NULL);
-        CV_Assert(!blocks.empty());
-        oneBuf = fastMalloc(totalSize);
-        void * ptr = oneBuf;
-        for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+        CV_Assert(మొత్తం_కొలత > 0);
+        CV_Assert(oneBuf == ఖాళీ);
+        CV_Assert(!ఖండాలు.empty());
+        oneBuf = fastMalloc(మొత్తం_కొలత);
+        శూన్య * ptr = oneBuf;
+        కొరకు(std::vector<ఖండం>::const_iterator i = ఖండాలు.begin(); i != ఖండాలు.end(); ++i)
         {
             ptr = i->fast_allocate(ptr);
         }
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void BufferArea::release()
+శూన్య బఫరు_Area::release()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    కొరకు(std::vector<ఖండం>::const_iterator i = ఖండాలు.begin(); i != ఖండాలు.end(); ++i)
     {
         i->cleanup();
     }
-    blocks.clear();
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (oneBuf)
+    ఖండాలు.clear();
+#నిర్వచితం_కాకపోతే OPENCV_ENABLE_జ్ఞాపకం_SANITIZER
+    ఒకవేళ (oneBuf)
     {
         fastFree(oneBuf);
         oneBuf = 0;
     }
-#endif
+#అయితే_ముగింపు
 }
 
 //==================================================================================================

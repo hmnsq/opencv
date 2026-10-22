@@ -2,120 +2,120 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#ifndef OPENCV_CORE_PERSISTENCE_IMPL_HPP
-#define OPENCV_CORE_PERSISTENCE_IMPL_HPP
+#నిర్వచితం_కాకపోతే OPENCV_CORE_PERSISTENCE_IMPL_HPP
+#నిర్వచించు OPENCV_CORE_PERSISTENCE_IMPL_HPP
 
-#include "persistence.hpp"
-#include "persistence_base64_encoding.hpp"
-#include <unordered_map>
-#include <iterator>
+#అన్తర్భావ "persistence.hpp"
+#అన్తర్భావ "persistence_base64_encoding.hpp"
+#అన్తర్భావ <unordered_map>
+#అన్తర్భావ <iterator>
 
 
-namespace cv
+నామాకాశ cv
 {
 
-enum Base64State{
+గణన Base64State{
     Uncertain,
     NotUse,
-    InUse,
+    లోపల_Use,
 };
 
-class cv::FileStorage::Impl : public FileStorage_API
+తరగతి cv::FileStorage::Impl : బహిరంగ FileStorage_API
 {
-public:
-    void init();
+బహిరంగ:
+    శూన్య init();
 
     Impl(FileStorage* _fs);
 
-    virtual ~Impl();
+    మాయా ~Impl();
 
-    void release(String* out=0);
+    శూన్య release(String* out=0);
 
-    void analyze_file_name( const std::string& file_name, std::vector<std::string>& params );
+    శూన్య analyze_file_name( స్థిరరాశి std::string& file_name, std::vector<std::string>& params );
 
-    bool open( const char* filename_or_buf, int _flags, const char* encoding );
+    తార్కిక open( స్థిరరాశి అక్షరం* filename_or_buf, పూర్ణాంకం _flags, స్థిరరాశి అక్షరం* encoding );
 
-    void puts( const char* str );
+    శూన్య puts( స్థిరరాశి అక్షరం* str );
 
-    char* getsFromFile( char* buf, int count );
+    అక్షరం* getsFromFile( అక్షరం* buf, పూర్ణాంకం లెక్క_2 );
 
-    char* gets( size_t maxCount );
+    అక్షరం* gets( size_t max_లెక్క );
 
-    char* gets();
+    అక్షరం* gets();
 
-    bool eof();
+    తార్కిక eof();
 
-    void setEof();
+    శూన్య సమితి_Eof();
 
-    void closeFile();
+    శూన్య closeFile();
 
-    void rewind();
+    శూన్య rewind();
 
-    char* resizeWriteBuffer( char* ptr, int len );
+    అక్షరం* resize_Write_బఫరు( అక్షరం* ptr, పూర్ణాంకం len );
 
-    char* flush();
+    అక్షరం* flush();
 
-    void endWriteStruct();
+    శూన్య చివర_Write_Struct();
 
-    void startWriteStruct_helper( const char* key, int struct_flags,
-                                  const char* type_name );
+    శూన్య ప్రారంభం_Write_Struct_helper( స్థిరరాశి అక్షరం* కీలకం, పూర్ణాంకం struct_flags,
+                                  స్థిరరాశి అక్షరం* type_name );
 
-    void startWriteStruct( const char* key, int struct_flags,
-                           const char* type_name );
+    శూన్య ప్రారంభం_Write_Struct( స్థిరరాశి అక్షరం* కీలకం, పూర్ణాంకం struct_flags,
+                           స్థిరరాశి అక్షరం* type_name );
 
-    void writeComment( const char* comment, bool eol_comment );
+    శూన్య writeComment( స్థిరరాశి అక్షరం* comment, తార్కిక eol_comment );
 
-    void startNextStream();
+    శూన్య ప్రారంభం_తదుపరి_ప్రవాహం();
 
-    void write( const String& key, int value );
+    శూన్య లిఖ( స్థిరరాశి String& కీలకం, పూర్ణాంకం value );
 
-    void write( const String& key, bool value );
+    శూన్య లిఖ( స్థిరరాశి String& కీలకం, తార్కిక value );
 
-    void write( const String& key, int64_t value );
+    శూన్య లిఖ( స్థిరరాశి String& కీలకం, int64_t value );
 
-    void write( const String& key, double value );
+    శూన్య లిఖ( స్థిరరాశి String& కీలకం, ద్విగుణ value );
 
-    void write( const String& key, const String& value );
+    శూన్య లిఖ( స్థిరరాశి String& కీలకం, స్థిరరాశి String& value );
 
-    void writeRawData( const std::string& dt, const void* _data, size_t len );
+    శూన్య write_Raw_దత్తాంశం( స్థిరరాశి std::string& dt, స్థిరరాశి శూన్య* దత్తాంశం_3, size_t len );
 
-    void workaround();
+    శూన్య workaround();
 
-    void switch_to_Base64_state( FileStorage_API::Base64State new_state);
+    శూన్య switch_గమ్యం_Base64_state( FileStorage_API::Base64State new_state);
 
-    void make_write_struct_delayed( const char* key, int struct_flags, const char* type_name );
+    శూన్య make_write_struct_delayed( స్థిరరాశి అక్షరం* కీలకం, పూర్ణాంకం struct_flags, స్థిరరాశి అక్షరం* type_name );
 
-    void check_if_write_struct_is_delayed( bool change_type_to_base64 );
+    శూన్య check_if_write_struct_is_delayed( తార్కిక change_type_గమ్యం_base64 );
 
-    void writeRawDataBase64(const void* _data, size_t len, const char* dt );
+    శూన్య write_Raw_దత్తాంశం_Base64(స్థిరరాశి శూన్య* దత్తాంశం_3, size_t len, స్థిరరాశి అక్షరం* dt );
 
     String releaseAndGetString();
 
-    FileNode getFirstTopLevelNode() const;
+    File_కణుపు get_మొదటి_శిఖరం_Level_కణుపు() స్థిరరాశి;
 
-    FileNode root(int streamIdx=0) const;
+    File_కణుపు మూలం(పూర్ణాంకం ప్రవాహం_Idx=0) స్థిరరాశి;
 
-    FileNode operator[](const String& nodename) const;
+    File_కణుపు క్రియాకారకం[](స్థిరరాశి String& nodename) స్థిరరాశి;
 
-    FileNode operator[](const char* /*nodename*/) const;
+    File_కణుపు క్రియాకారకం[](స్థిరరాశి అక్షరం* /*nodename*/) స్థిరరాశి;
 
-    virtual int getFormat() const CV_OVERRIDE;
+    మాయా పూర్ణాంకం getFormat() స్థిరరాశి CV_OVERRIDE;
 
-    char* bufferPtr() const;
-    char* bufferStart() const;
-    char* bufferEnd() const;
-    void setBufferPtr(char* ptr);
-    int wrapMargin() const;
+    అక్షరం* బఫరు_Ptr() స్థిరరాశి;
+    అక్షరం* బఫరు_ప్రారంభం() స్థిరరాశి;
+    అక్షరం* బఫరు_చివర_2() స్థిరరాశి;
+    శూన్య సమితి_బఫరు_Ptr(అక్షరం* ptr);
+    పూర్ణాంకం wrapMargin() స్థిరరాశి;
 
-    FStructData& getCurrentStruct();
+    FStruct_దత్తాంశం& getCurrentStruct();
 
-    void setNonEmpty();
+    శూన్య సమితి_Non_ఖాళీలు();
 
-    void processSpecialDouble( char* buf, double* value, char** endptr );
+    శూన్య processSpecialDouble( అక్షరం* buf, ద్విగుణ* value, అక్షరం** endptr );
 
-    double strtod( char* ptr, char** endptr );
+    ద్విగుణ strtod( అక్షరం* ptr, అక్షరం** endptr );
 
-    void convertToCollection(int type, FileNode& node);
+    శూన్య convert_గమ్యం_Collection(పూర్ణాంకం type, File_కణుపు& కణుపు);
 
     // a) allocates new FileNode (for that just set blockIdx to the last block and ofs to freeSpaceOfs) or
     // b) reallocates just created new node (blockIdx and ofs must be taken from FileNode).
@@ -124,132 +124,132 @@ public:
     //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
     // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
     // In the case (b) the existing tag and the name are copied automatically.
-    uchar* reserveNodeSpace(FileNode& node, size_t sz);
+    uchar* reserve_కణుపు_Space(File_కణుపు& కణుపు, size_t sz);
 
-    unsigned getStringOfs( const std::string& key ) const;
+    గుర్తులేని getStringOfs( స్థిరరాశి std::string& కీలకం ) స్థిరరాశి;
 
-    FileNode addNode( FileNode& collection, const std::string& key,
-                      int elem_type, const void* value, int len );
+    File_కణుపు కూడు_కణుపు( File_కణుపు& collection, స్థిరరాశి std::string& కీలకం,
+                      పూర్ణాంకం elem_type, స్థిరరాశి శూన్య* value, పూర్ణాంకం len );
 
-    void finalizeCollection( FileNode& collection );
+    శూన్య finalizeCollection( File_కణుపు& collection );
 
-    void normalizeNodeOfs(size_t& blockIdx, size_t& ofs) const;
+    శూన్య normalize_కణుపు_Ofs(size_t& ఖండం_Idx, size_t& ofs) స్థిరరాశి;
 
-    Base64State get_state_of_writing_base64();
+    Base64State get_state_యొక్క_writing_base64();
 
-    int get_space();
+    పూర్ణాంకం get_space();
 
-    class Base64Decoder
+    తరగతి Base64Decoder
     {
-    public:
+    బహిరంగ:
         Base64Decoder();
-        void init(const Ptr<FileStorageParser>& _parser, char* _ptr, int _indent);
+        శూన్య init(స్థిరరాశి Ptr<FileStorageParser>& _parser, అక్షరం* _ptr, పూర్ణాంకం _indent);
 
-        bool readMore(int needed);
+        తార్కిక read_మరిన్ని(పూర్ణాంకం needed);
 
         uchar getUInt8();
 
         ushort getUInt16();
 
-        int getInt32();
+        పూర్ణాంకం getInt32();
 
         int64_t getInt64();
 
-        double getFloat64();
+        ద్విగుణ getFloat64();
 
-        bool endOfStream() const;
-        char* getPtr() const;
-    protected:
+        తార్కిక చివర_యొక్క_ప్రవాహం() స్థిరరాశి;
+        అక్షరం* getPtr() స్థిరరాశి;
+    రక్షిత:
 
-        Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-        FileStorageParser& getParser() const
+        Ptr<FileStorageParser> parser_do_not_use_ప్రత్యక్ష_dereference;
+        FileStorageParser& getParser() స్థిరరాశి
         {
-            if (!parser_do_not_use_direct_dereference)
+            ఒకవేళ (!parser_do_not_use_ప్రత్యక్ష_dereference)
                 CV_Error(Error::StsNullPtr, "Parser is not available");
-            return *parser_do_not_use_direct_dereference;
+            తిరిగి *parser_do_not_use_ప్రత్యక్ష_dereference;
         }
-        char* ptr;
-        int indent;
-        std::vector<char> encoded;
+        అక్షరం* ptr;
+        పూర్ణాంకం indent;
+        std::vector<అక్షరం> encoded;
         std::vector<uchar> decoded;
         size_t ofs;
         size_t totalchars;
-        bool eos;
+        తార్కిక eos;
     };
 
-    char* parseBase64(char* ptr, int indent, FileNode& collection);
+    అక్షరం* parseBase64(అక్షరం* ptr, పూర్ణాంకం indent, File_కణుపు& collection);
 
-    void parseError( const char* func_name, const std::string& err_msg, const char* source_file, int source_line );
+    శూన్య parseError( స్థిరరాశి అక్షరం* func_name, స్థిరరాశి std::string& err_సందేశం, స్థిరరాశి అక్షరం* ఆధారం_file, పూర్ణాంకం ఆధారం_పంక్తి );
 
-    const uchar* getNodePtr(size_t blockIdx, size_t ofs) const;
+    స్థిరరాశి uchar* get_కణుపు_Ptr(size_t ఖండం_Idx, size_t ofs) స్థిరరాశి;
 
-    std::string getName( size_t nameofs ) const;
+    std::string getName( size_t nameofs ) స్థిరరాశి;
 
     FileStorage* getFS();
 
     FileStorage* fs_ext;
 
     std::string filename;
-    int flags;
-    bool empty_stream;
+    పూర్ణాంకం flags;
+    తార్కిక ఖాళీలు_ప్రవాహం;
 
     FILE* file;
     gzFile gzfile;
 
-    bool is_opened;
-    bool dummy_eof;
-    bool write_mode;
-    bool mem_mode;
-    int fmt;
+    తార్కిక is_opened;
+    తార్కిక dummy_eof;
+    తార్కిక write_బహుళకం;
+    తార్కిక mem_బహుళకం;
+    పూర్ణాంకం fmt;
 
     State state; //!< current state of the FileStorage (used only for writing)
-    bool is_using_base64;
-    bool is_write_struct_delayed;
-    char* delayed_struct_key;
-    int   delayed_struct_flags;
-    char* delayed_type_name;
-    FileStorage_API::Base64State state_of_writing_base64;
+    తార్కిక is_using_base64;
+    తార్కిక is_write_struct_delayed;
+    అక్షరం* delayed_struct_కీలకం;
+    పూర్ణాంకం   delayed_struct_flags;
+    అక్షరం* delayed_type_name;
+    FileStorage_API::Base64State state_యొక్క_writing_base64;
 
-    int space, wrap_margin;
-    std::deque<FStructData> write_stack;
-    std::vector<char> buffer;
+    పూర్ణాంకం space, wrap_margin;
+    std::deque<FStruct_దత్తాంశం> write_దొంతర;
+    std::vector<అక్షరం> బఫరు;
     size_t bufofs;
 
-    std::deque<char> outbuf;
+    std::deque<అక్షరం> outbuf;
 
-    Ptr<FileStorageEmitter> emitter_do_not_use_direct_dereference;
+    Ptr<FileStorageEmitter> emitter_do_not_use_ప్రత్యక్ష_dereference;
     FileStorageEmitter& getEmitter()
     {
-        if (!emitter_do_not_use_direct_dereference)
+        ఒకవేళ (!emitter_do_not_use_ప్రత్యక్ష_dereference)
             CV_Error(Error::StsNullPtr, "Emitter is not available");
-        return *emitter_do_not_use_direct_dereference;
+        తిరిగి *emitter_do_not_use_ప్రత్యక్ష_dereference;
     }
-    Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-    FileStorageParser& getParser() const
+    Ptr<FileStorageParser> parser_do_not_use_ప్రత్యక్ష_dereference;
+    FileStorageParser& getParser() స్థిరరాశి
     {
-        if (!parser_do_not_use_direct_dereference)
+        ఒకవేళ (!parser_do_not_use_ప్రత్యక్ష_dereference)
             CV_Error(Error::StsNullPtr, "Parser is not available");
-        return *parser_do_not_use_direct_dereference;
+        తిరిగి *parser_do_not_use_ప్రత్యక్ష_dereference;
     }
     Base64Decoder base64decoder;
     base64::Base64Writer* base64_writer;
 
-    std::vector<FileNode> roots;
-    std::vector<Ptr<std::vector<uchar> > > fs_data;
-    std::vector<uchar*> fs_data_ptrs;
-    std::vector<size_t> fs_data_blksz;
+    std::vector<File_కణుపు> roots;
+    std::vector<Ptr<std::vector<uchar> > > fs_దత్తాంశం;
+    std::vector<uchar*> fs_దత్తాంశం_ptrs;
+    std::vector<size_t> fs_దత్తాంశం_blksz;
     size_t freeSpaceOfs;
-    typedef std::unordered_map<std::string, unsigned> str_hash_t;
+    రకనిర్వచనం std::unordered_map<std::string, గుర్తులేని> str_hash_t;
     str_hash_t str_hash;
-    std::vector<char> str_hash_data;
+    std::vector<అక్షరం> str_hash_దత్తాంశం;
 
-    std::vector<char> strbufv;
-    char* strbuf;
+    std::vector<అక్షరం> strbufv;
+    అక్షరం* strbuf;
     size_t strbufsize;
     size_t strbufpos;
-    int lineno;
+    పూర్ణాంకం lineno;
 };
 
 }
 
-#endif
+#అయితే_ముగింపు

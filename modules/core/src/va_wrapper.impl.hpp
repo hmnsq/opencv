@@ -6,100 +6,100 @@
 // Not a standalone header, part of va_intel.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
-#include "opencv2/core/utils/configuration.private.hpp"
+#అన్తర్భావ "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
+#అన్తర్భావ "opencv2/core/utils/configuration.private.hpp"
 
-namespace cv { namespace detail {
+నామాకాశ cv { నామాకాశ detail {
 
-typedef VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
-typedef VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
-typedef VAStatus (*FN_vaMapBuffer)(VADisplay dpy, VABufferID buf_id, void **pbuf);
-typedef VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_target);
-typedef VAStatus (*FN_vaUnmapBuffer)(VADisplay dpy, VABufferID buf_id);
-typedef int (*FN_vaMaxNumImageFormats)(VADisplay dpy);
-typedef VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, int *num_formats);
-typedef VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, int width, int height, VAImage *image);
-typedef VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, int src_x, int src_y, unsigned int src_width, unsigned int src_height, int dest_x, int dest_y, unsigned int dest_width, unsigned int dest_height);
-typedef VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, int x, int y, unsigned int width, unsigned int height, VAImageID image);
+రకనిర్వచనం VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
+రకనిర్వచనం VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
+రకనిర్వచనం VAStatus (*FN_va_Map_బఫరు)(VADisplay dpy, VABufferID buf_id, శూన్య **pbuf);
+రకనిర్వచనం VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_లక్ష్యం);
+రకనిర్వచనం VAStatus (*FN_va_Unmap_బఫరు)(VADisplay dpy, VABufferID buf_id);
+రకనిర్వచనం పూర్ణాంకం (*FN_va_Max_అంకె_Image_Formats)(VADisplay dpy);
+రకనిర్వచనం VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, పూర్ణాంకం *అంకె_formats);
+రకనిర్వచనం VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, పూర్ణాంకం వెడల్పు, పూర్ణాంకం ఎత్తు, VAImage *image);
+రకనిర్వచనం VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, పూర్ణాంకం src_x, పూర్ణాంకం src_y, గుర్తులేని పూర్ణాంకం src_వెడల్పు, గుర్తులేని పూర్ణాంకం src_ఎత్తు, పూర్ణాంకం dest_x, పూర్ణాంకం dest_y, గుర్తులేని పూర్ణాంకం dest_వెడల్పు, గుర్తులేని పూర్ణాంకం dest_ఎత్తు);
+రకనిర్వచనం VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, పూర్ణాంకం x, పూర్ణాంకం y, గుర్తులేని పూర్ణాంకం వెడల్పు, గుర్తులేని పూర్ణాంకం ఎత్తు, VAImageID image);
 
-static FN_vaDeriveImage fn_vaDeriveImage = NULL;
-static FN_vaDestroyImage fn_vaDestroyImage = NULL;
-static FN_vaMapBuffer fn_vaMapBuffer = NULL;
-static FN_vaSyncSurface fn_vaSyncSurface = NULL;
-static FN_vaUnmapBuffer fn_vaUnmapBuffer = NULL;
-static FN_vaMaxNumImageFormats fn_vaMaxNumImageFormats = NULL;
-static FN_vaQueryImageFormats fn_vaQueryImageFormats = NULL;
-static FN_vaCreateImage fn_vaCreateImage = NULL;
-static FN_vaPutImage fn_vaPutImage = NULL;
-static FN_vaGetImage fn_vaGetImage = NULL;
+స్థిర FN_vaDeriveImage fn_vaDeriveImage = ఖాళీ;
+స్థిర FN_vaDestroyImage fn_vaDestroyImage = ఖాళీ;
+స్థిర FN_va_Map_బఫరు fn_va_Map_బఫరు = ఖాళీ;
+స్థిర FN_vaSyncSurface fn_vaSyncSurface = ఖాళీ;
+స్థిర FN_va_Unmap_బఫరు fn_va_Unmap_బఫరు = ఖాళీ;
+స్థిర FN_va_Max_అంకె_Image_Formats fn_va_Max_అంకె_Image_Formats = ఖాళీ;
+స్థిర FN_vaQueryImageFormats fn_vaQueryImageFormats = ఖాళీ;
+స్థిర FN_vaCreateImage fn_vaCreateImage = ఖాళీ;
+స్థిర FN_vaPutImage fn_vaPutImage = ఖాళీ;
+స్థిర FN_vaGetImage fn_vaGetImage = ఖాళీ;
 
-#define vaDeriveImage fn_vaDeriveImage
-#define vaDestroyImage fn_vaDestroyImage
-#define vaMapBuffer fn_vaMapBuffer
-#define vaSyncSurface fn_vaSyncSurface
-#define vaUnmapBuffer fn_vaUnmapBuffer
-#define vaMaxNumImageFormats fn_vaMaxNumImageFormats
-#define vaQueryImageFormats fn_vaQueryImageFormats
-#define vaCreateImage fn_vaCreateImage
-#define vaPutImage fn_vaPutImage
-#define vaGetImage fn_vaGetImage
+#నిర్వచించు vaDeriveImage fn_vaDeriveImage
+#నిర్వచించు vaDestroyImage fn_vaDestroyImage
+#నిర్వచించు va_Map_బఫరు fn_va_Map_బఫరు
+#నిర్వచించు vaSyncSurface fn_vaSyncSurface
+#నిర్వచించు va_Unmap_బఫరు fn_va_Unmap_బఫరు
+#నిర్వచించు va_Max_అంకె_Image_Formats fn_va_Max_అంకె_Image_Formats
+#నిర్వచించు vaQueryImageFormats fn_vaQueryImageFormats
+#నిర్వచించు vaCreateImage fn_vaCreateImage
+#నిర్వచించు vaPutImage fn_vaPutImage
+#నిర్వచించు vaGetImage fn_vaGetImage
 
 
-static std::shared_ptr<cv::plugin::impl::DynamicLib> loadLibVA()
+స్థిర std::shared_ptr<cv::plugin::impl::DynamicLib> ఎక్కించు_Lib_VA()
 {
     std::shared_ptr<cv::plugin::impl::DynamicLib> lib;
-    const std::string envPath = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
-    if (!envPath.empty())
+    స్థిరరాశి std::string env_మార్గం = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
+    ఒకవేళ (!env_మార్గం.empty())
     {
-        lib = std::make_shared<cv::plugin::impl::DynamicLib>(envPath);
-        return lib;
+        lib = std::make_shared<cv::plugin::impl::DynamicLib>(env_మార్గం);
+        తిరిగి lib;
     }
-    static const char* const candidates[] = {
+    స్థిర స్థిరరాశి అక్షరం* స్థిరరాశి candidates[] = {
         "libva.so",
         "libva.so.2",
         "libva.so.1",
     };
-    for (int i = 0; i < 3; ++i)
+    కొరకు (పూర్ణాంకం i = 0; i < 3; ++i)
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(candidates[i]);
-        if (lib->isLoaded())
-            break;
+        ఒకవేళ (lib->isLoaded())
+            ఆపు;
     }
-    return lib;
+    తిరిగి lib;
 }
-static void init_libva()
+స్థిర శూన్య init_libva()
 {
-    static bool initialized = false;
-    static auto library = loadLibVA();
-    if (!initialized)
+    స్థిర తార్కిక initialized = అబద్ధం;
+    స్థిర స్వయంచాలక library = ఎక్కించు_Lib_VA();
+    ఒకవేళ (!initialized)
     {
-        if (!library || !library->isLoaded())
+        ఒకవేళ (!library || !library->isLoaded())
         {
             library.reset();
             CV_Error(cv::Error::StsBadFunc, "OpenCV can't load VA library (libva)");
         }
-        auto& lib = *library.get();
-#define VA_LOAD_SYMBOL(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.getSymbol(#name)); \
-        if (!fn_ ## name) \
+        స్వయంచాలక& lib = *library.get();
+#నిర్వచించు VA_ఎక్కించు_చిహ్నం(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.get_చిహ్నం(#name)); \
+        ఒకవేళ (!fn_ ## name) \
         { \
             library.reset(); \
-            initialized = true; \
+            initialized = నిజం; \
             CV_Error_(cv::Error::StsBadFunc, ("OpenCV can't load VA library (libva), missing symbol: %s", #name)); \
         }
 
-        VA_LOAD_SYMBOL(vaDeriveImage);
-        VA_LOAD_SYMBOL(vaDestroyImage);
-        VA_LOAD_SYMBOL(vaMapBuffer);
-        VA_LOAD_SYMBOL(vaSyncSurface);
-        VA_LOAD_SYMBOL(vaUnmapBuffer);
-        VA_LOAD_SYMBOL(vaMaxNumImageFormats);
-        VA_LOAD_SYMBOL(vaQueryImageFormats);
-        VA_LOAD_SYMBOL(vaCreateImage);
-        VA_LOAD_SYMBOL(vaPutImage);
-        VA_LOAD_SYMBOL(vaGetImage);
-        initialized = true;
+        VA_ఎక్కించు_చిహ్నం(vaDeriveImage);
+        VA_ఎక్కించు_చిహ్నం(vaDestroyImage);
+        VA_ఎక్కించు_చిహ్నం(va_Map_బఫరు);
+        VA_ఎక్కించు_చిహ్నం(vaSyncSurface);
+        VA_ఎక్కించు_చిహ్నం(va_Unmap_బఫరు);
+        VA_ఎక్కించు_చిహ్నం(va_Max_అంకె_Image_Formats);
+        VA_ఎక్కించు_చిహ్నం(vaQueryImageFormats);
+        VA_ఎక్కించు_చిహ్నం(vaCreateImage);
+        VA_ఎక్కించు_చిహ్నం(vaPutImage);
+        VA_ఎక్కించు_చిహ్నం(vaGetImage);
+        initialized = నిజం;
     }
-    if (!library)
+    ఒకవేళ (!library)
         CV_Error(cv::Error::StsBadFunc, "OpenCV can't load/initialize VA library (libva)");
 }
 

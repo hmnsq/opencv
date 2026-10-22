@@ -8,68 +8,68 @@
 // Each piece is reduced by the existing serial code (including the HAL), and the results are
 // combined in piece order.
 
-#ifndef OPENCV_CORE_STAT_PARALLEL_HPP
-#define OPENCV_CORE_STAT_PARALLEL_HPP
+#నిర్వచితం_కాకపోతే OPENCV_CORE_STAT_PARALLEL_HPP
+#నిర్వచించు OPENCV_CORE_STAT_PARALLEL_HPP
 
-namespace cv {
+నామాకాశ cv {
 
-struct StatChunk
+నిర్మాణం StatChunk
 {
-    Mat src, mask;
-    size_t firstElem;   // row-major index of the first element of the piece in the whole array
+    Mat src, ముసుగు;
+    size_t మొదటి_Elem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+స్థిర అంతఃవరుస తార్కిక విభజించు_For_Parallel_Stat(స్థిరరాశి Mat& src, స్థిరరాశి Mat& ముసుగు, std::vector<StatChunk>& chunks)
 {
-    const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    స్థిరరాశి size_t మొత్తం = src.మొత్తం(), work = మొత్తం*src.channels();
+    ఒకవేళ (work < ((size_t)1 << 18))
+        తిరిగి అబద్ధం;
+    స్థిరరాశి పూర్ణాంకం nthreads = get_అంకె_దారాలు();
+    ఒకవేళ (nthreads <= 1)
+        తిరిగి అబద్ధం;
+    స్థిరరాశి పూర్ణాంకం n = (పూర్ణాంకం)std::min((size_t)nthreads*2, work >> 16);
+    ఒకవేళ (n < 2)
+        తిరిగి అబద్ధం;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    ఒకవేళ (src.dims <= 2 && src.అడ్డువరుసలు >= n)
     {
-        for (int i = 0; i < n; i++)
+        కొరకు (పూర్ణాంకం i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            పూర్ణాంకం r0 = (పూర్ణాంకం)((int64)src.అడ్డువరుసలు*i/n), r1 = (పూర్ణాంకం)((int64)src.అడ్డువరుసలు*(i + 1)/n);
             StatChunk c;
-            c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
-                c.mask = mask.rowRange(r0, r1);
-            c.firstElem = (size_t)r0*src.cols;
+            c.src = src.అడ్డువరుస_Range_2(r0, r1);
+            ఒకవేళ (!ముసుగు.empty())
+                c.ముసుగు = ముసుగు.అడ్డువరుస_Range_2(r0, r1);
+            c.మొదటి_Elem = (size_t)r0*src.నిలువుల_సంఖ్య;
             chunks.push_back(c);
         }
-        return true;
+        తిరిగి నిజం;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    ఒకవేళ (src.isContinuous() && (ముసుగు.empty() || ముసుగు.isContinuous()) && మొత్తం <= (size_t)గరిష్ఠ_పూర్ణాంకం)
     {
-        for (int i = 0; i < n; i++)
+        కొరకు (పూర్ణాంకం i = 0; i < n; i++)
         {
-            size_t e0 = total*i/n, e1 = total*(i + 1)/n;
+            size_t e0 = మొత్తం*i/n, e1 = మొత్తం*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
-            c.firstElem = e0;
+            c.src = Mat(1, (పూర్ణాంకం)(e1 - e0), src.type(), (శూన్య*)(src.దత్తాంశం + e0*src.elem_కొలత()));
+            ఒకవేళ (!ముసుగు.empty())
+                c.ముసుగు = Mat(1, (పూర్ణాంకం)(e1 - e0), ముసుగు.type(), (శూన్య*)(ముసుగు.దత్తాంశం + e0*ముసుగు.elem_కొలత()));
+            c.మొదటి_Elem = e0;
             chunks.push_back(c);
         }
-        return true;
+        తిరిగి నిజం;
     }
-    return false;
+    తిరిగి అబద్ధం;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+స్థిర అంతఃవరుస size_t chunk_సూచీ_గమ్యం_Elem(స్థిరరాశి StatChunk& c, స్థిరరాశి పూర్ణాంకం* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    తిరిగి c.మొదటి_Elem + (size_t)idx[0]*c.src.నిలువుల_సంఖ్య + idx[1];
 }
 
 } // namespace cv
 
-#endif
+#అయితే_ముగింపు

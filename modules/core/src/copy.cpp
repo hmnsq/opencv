@@ -47,175 +47,175 @@
 //
 // */
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "opencl_kernels_core.hpp"
 
-namespace cv
+నామాకాశ cv
 {
 
-template <typename T> static inline
-void scalarToRawData_(const Scalar& s, T * const buf, const int cn, const int unroll_to)
+మూస <రకం_పేరు T> స్థిర అంతఃవరుస
+శూన్య scalar_గమ్యం_Raw_దత్తాంశం_2(స్థిరరాశి Scalar& s, T * స్థిరరాశి buf, స్థిరరాశి పూర్ణాంకం cn, స్థిరరాశి పూర్ణాంకం unroll_గమ్యం)
 {
-    int i = 0;
-    for(; i < cn; i++)
+    పూర్ణాంకం i = 0;
+    కొరకు(; i < cn; i++)
         buf[i] = saturate_cast<T>(s.val[i]);
-    for(; i < unroll_to; i++)
+    కొరకు(; i < unroll_గమ్యం; i++)
         buf[i] = buf[i-cn];
 }
 
-void scalarToRawData(const Scalar& s, void* _buf, int type, int unroll_to)
+శూన్య scalar_గమ్యం_Raw_దత్తాంశం(స్థిరరాశి Scalar& s, శూన్య* _buf, పూర్ణాంకం type, పూర్ణాంకం unroll_గమ్యం)
 {
     CV_INSTRUMENT_REGION();
 
-    const int depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    స్థిరరాశి పూర్ణాంకం లోతు = CV_MAT_లోతు(type), cn = CV_MAT_CN(type);
     CV_Assert(cn <= 4);
-    switch(depth)
+    ఎంపిక(లోతు)
     {
-    case CV_8U:
-        scalarToRawData_(s, (uchar*)_buf, cn, unroll_to);
-        break;
-    case CV_8S:
-        scalarToRawData_(s, (schar*)_buf, cn, unroll_to);
-        break;
-    case CV_Bool:
-        scalarToRawData_(s, (bool*)_buf, cn, unroll_to);
-        break;
-    case CV_16U:
-        scalarToRawData_(s, (ushort*)_buf, cn, unroll_to);
-        break;
-    case CV_16S:
-        scalarToRawData_(s, (short*)_buf, cn, unroll_to);
-        break;
-    case CV_16F:
-        scalarToRawData_(s, (hfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_16BF:
-        scalarToRawData_(s, (bfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FN:
-        scalarToRawData_(s, (fp8_t*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FNUZ:
-        scalarToRawData_(s, (fp8a_t*)_buf, cn, unroll_to);
-        break;
-    case CV_32U:
-        scalarToRawData_(s, (unsigned*)_buf, cn, unroll_to);
-        break;
-    case CV_32S:
-        scalarToRawData_(s, (int*)_buf, cn, unroll_to);
-        break;
-    case CV_32F:
-        scalarToRawData_(s, (float*)_buf, cn, unroll_to);
-        break;
-    case CV_64U:
-        scalarToRawData_(s, (uint64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64S:
-        scalarToRawData_(s, (int64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64F:
-        scalarToRawData_(s, (double*)_buf, cn, unroll_to);
-        break;
-    default:
+    స్థితి CV_8U:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (uchar*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_8S:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (schar*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_Bool:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (తార్కిక*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_16U:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (ushort*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_16S:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (పొట్టి*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_16F:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (hfloat*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_16BF:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (bfloat*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_8F_E4M3FN:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (fp8_t*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_8F_E4M3FNUZ:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (fp8a_t*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_32U:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (గుర్తులేని*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_32S:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (పూర్ణాంకం*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_32F:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (దశాంశం*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_64U:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (uint64_t*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_64S:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (int64_t*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    స్థితి CV_64F:
+        scalar_గమ్యం_Raw_దత్తాంశం_2(s, (ద్విగుణ*)_buf, cn, unroll_గమ్యం);
+        ఆపు;
+    అప్రమేయ:
         CV_Error(cv::Error::StsUnsupportedFormat,"");
     }
 }
 
-void convertAndUnrollScalar( const Mat& sc, int buftype, uchar* scbuf, size_t blocksize )
+శూన్య convertAndUnrollScalar( స్థిరరాశి Mat& sc, పూర్ణాంకం buftype, uchar* scbuf, size_t blocksize )
 {
-    int scn = (int)sc.total(), cn = CV_MAT_CN(buftype);
-    size_t esz = CV_ELEM_SIZE(buftype);
-    BinaryFunc cvtFn = getConvertFunc(sc.depth(), buftype);
+    పూర్ణాంకం scn = (పూర్ణాంకం)sc.మొత్తం(), cn = CV_MAT_CN(buftype);
+    size_t esz = CV_ELEM_కొలత(buftype);
+    ద్విమాన_Func cvtFn = getConvertFunc(sc.లోతు(), buftype);
     CV_Assert(cvtFn);
-    cvtFn(sc.ptr(), 1, 0, 1, scbuf, 1, Size(std::min(cn, scn), 1), 0);
+    cvtFn(sc.ptr(), 1, 0, 1, scbuf, 1, కొలత(std::min(cn, scn), 1), 0);
     // unroll the scalar
-    if( scn < cn )
+    ఒకవేళ( scn < cn )
     {
         CV_Assert( scn == 1 );
         size_t esz1 = CV_ELEM_SIZE1(buftype);
-        for( size_t i = esz1; i < esz; i++ )
+        కొరకు( size_t i = esz1; i < esz; i++ )
             scbuf[i] = scbuf[i - esz1];
     }
-    for( size_t i = esz; i < blocksize*esz; i++ )
+    కొరకు( size_t i = esz; i < blocksize*esz; i++ )
         scbuf[i] = scbuf[i - esz];
 }
 
-template<typename T> static void
-copyMask_(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+మూస<రకం_పేరు T> స్థిర శూన్య
+copy_ముసుగు(స్థిరరాశి uchar* _src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, uchar* _dst, size_t dstep, కొలత size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    కొరకు( ; size.ఎత్తు--; ముసుగు += mstep, _src += sstep, _dst += dstep )
     {
-        const T* src = (const T*)_src;
+        స్థిరరాశి T* src = (స్థిరరాశి T*)_src;
         T* dst = (T*)_dst;
-        int x = 0;
-         #if CV_ENABLE_UNROLLED
-        for( ; x <= size.width - 4; x += 4 )
+        పూర్ణాంకం x = 0;
+         #ఒకవేళ CV_ENABLE_UNROLLED
+        కొరకు( ; x <= size.వెడల్పు - 4; x += 4 )
         {
-            if( mask[x] )
+            ఒకవేళ( ముసుగు[x] )
                 dst[x] = src[x];
-            if( mask[x+1] )
+            ఒకవేళ( ముసుగు[x+1] )
                 dst[x+1] = src[x+1];
-            if( mask[x+2] )
+            ఒకవేళ( ముసుగు[x+2] )
                 dst[x+2] = src[x+2];
-            if( mask[x+3] )
+            ఒకవేళ( ముసుగు[x+3] )
                 dst[x+3] = src[x+3];
         }
-        #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        #అయితే_ముగింపు
+        కొరకు( ; x < size.వెడల్పు; x++ )
+            ఒకవేళ( ముసుగు[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<uchar>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+మూస<> శూన్య
+copy_ముసుగు<uchar>(స్థిరరాశి uchar* _src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, uchar* _dst, size_t dstep, కొలత size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (int)sstep, _dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_నిరంతరం_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (పూర్ణాంకం)sstep, _dst, (పూర్ణాంకం)dstep, ippi_కొలత(size), ముసుగు, (పూర్ణాంకం)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    కొరకు( ; size.ఎత్తు--; ముసుగు += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        స్థిరరాశి uchar* src = (స్థిరరాశి uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        పూర్ణాంకం x = 0;
+        #ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            కొరకు( ; x <= size.వెడల్పు - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
-                v_uint8 v_src   = vx_load(src  + x),
-                        v_dst   = vx_load(dst  + x),
-                        v_nmask = v_eq(vx_load(mask + x), v_zero);
+                v_uint8 v_src   = vx_ఎక్కించు(src  + x),
+                        v_dst   = vx_ఎక్కించు(dst  + x),
+                        v_nmask = v_eq(vx_ఎక్కించు(ముసుగు + x), v_zero);
 
                 v_dst = v_select(v_nmask, v_dst, v_src);
                 v_store(dst + x, v_dst);
             }
         }
         vx_cleanup();
-        #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        #అయితే_ముగింపు
+        కొరకు( ; x < size.వెడల్పు; x++ )
+            ఒకవేళ( ముసుగు[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+మూస<> శూన్య
+copy_ముసుగు<Vec3b>(స్థిరరాశి uchar* _src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, uchar* _dst, size_t dstep, కొలత size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    కొరకు( ; size.ఎత్తు--; ముసుగు += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        స్థిరరాశి uchar* src = (స్థిరరాశి uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        పూర్ణాంకం x = 0;
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
+        కొరకు( ; x <= size.వెడల్పు - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
-            v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
+            v_uint8 v_nmask = v_eq(vx_ఎక్కించు(ముసుగు + x), vx_setzero_u8());
 
             v_uint8 v_src0, v_src1, v_src2;
             v_uint8 v_dst0, v_dst1, v_dst2;
-            v_load_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
-            v_load_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
+            v_ఎక్కించు_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
+            v_ఎక్కించు_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
 
             v_dst0 = v_select(v_nmask, v_dst0, v_src0);
             v_dst1 = v_select(v_nmask, v_dst1, v_src1);
@@ -224,9 +224,9 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
             v_store_interleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
         }
         vx_cleanup();
-#endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+#అయితే_ముగింపు
+        కొరకు( ; x < size.వెడల్పు; x++ )
+            ఒకవేళ( ముసుగు[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -234,27 +234,27 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+మూస<> శూన్య
+copy_ముసుగు<ushort>(స్థిరరాశి uchar* _src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, uchar* _dst, size_t dstep, కొలత size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (const Ipp16u *)_src, (int)sstep, (Ipp16u *)_dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_నిరంతరం_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (స్థిరరాశి Ipp16u *)_src, (పూర్ణాంకం)sstep, (Ipp16u *)_dst, (పూర్ణాంకం)dstep, ippi_కొలత(size), ముసుగు, (పూర్ణాంకం)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    కొరకు( ; size.ఎత్తు--; ముసుగు += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        స్థిరరాశి ushort* src = (స్థిరరాశి ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        పూర్ణాంకం x = 0;
+        #ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            కొరకు( ; x <= size.వెడల్పు - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
-                v_uint16 v_src1 = vx_load(src + x), v_src2 = vx_load(src + x + VTraits<v_uint16>::vlanes()),
-                         v_dst1 = vx_load(dst + x), v_dst2 = vx_load(dst + x + VTraits<v_uint16>::vlanes());
+                v_uint16 v_src1 = vx_ఎక్కించు(src + x), v_src2 = vx_ఎక్కించు(src + x + VTraits<v_uint16>::vlanes()),
+                         v_dst1 = vx_ఎక్కించు(dst + x), v_dst2 = vx_ఎక్కించు(dst + x + VTraits<v_uint16>::vlanes());
 
                 v_uint8 v_nmask1, v_nmask2;
-                v_uint8 v_nmask = v_eq(vx_load(mask + x), v_zero);
+                v_uint8 v_nmask = v_eq(vx_ఎక్కించు(ముసుగు + x), v_zero);
                 v_zip(v_nmask, v_nmask, v_nmask1, v_nmask2);
 
                 v_dst1 = v_select(v_reinterpret_as_u16(v_nmask1), v_dst1, v_src1);
@@ -264,36 +264,36 @@ copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mst
             }
         }
         vx_cleanup();
-        #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        #అయితే_ముగింపు
+        కొరకు( ; x < size.వెడల్పు; x++ )
+            ఒకవేళ( ముసుగు[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+మూస<> శూన్య
+copy_ముసుగు<Vec3s>(స్థిరరాశి uchar* _src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, uchar* _dst, size_t dstep, కొలత size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    కొరకు( ; size.ఎత్తు--; ముసుగు += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        స్థిరరాశి ushort* src = (స్థిరరాశి ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        పూర్ణాంకం x = 0;
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
+        కొరకు( ; x <= size.వెడల్పు - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
-            v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
+            v_uint8 v_nmask = v_eq(vx_ఎక్కించు(ముసుగు + x), vx_setzero_u8());
             v_uint8 v_nmask0, v_nmask1;
             v_zip(v_nmask, v_nmask, v_nmask0, v_nmask1);
 
             v_uint16 v_src0, v_src1, v_src2;
             v_uint16 v_dst0, v_dst1, v_dst2;
-            v_load_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
-            v_load_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
+            v_ఎక్కించు_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
+            v_ఎక్కించు_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
             v_uint16 v_src3, v_src4, v_src5;
             v_uint16 v_dst3, v_dst4, v_dst5;
-            v_load_deinterleave(src + 3 * (x + VTraits<v_uint16>::vlanes()), v_src3, v_src4, v_src5);
-            v_load_deinterleave(dst + 3 * (x + VTraits<v_uint16>::vlanes()), v_dst3, v_dst4, v_dst5);
+            v_ఎక్కించు_deinterleave(src + 3 * (x + VTraits<v_uint16>::vlanes()), v_src3, v_src4, v_src5);
+            v_ఎక్కించు_deinterleave(dst + 3 * (x + VTraits<v_uint16>::vlanes()), v_dst3, v_dst4, v_dst5);
 
             v_dst0 = v_select(v_reinterpret_as_u16(v_nmask0), v_dst0, v_src0);
             v_dst1 = v_select(v_reinterpret_as_u16(v_nmask0), v_dst1, v_src1);
@@ -306,9 +306,9 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
             v_store_interleave(dst + 3 * (x + VTraits<v_uint16>::vlanes()), v_dst3, v_dst4, v_dst5);
         }
         vx_cleanup();
-#endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+#అయితే_ముగింపు
+        కొరకు( ; x < size.వెడల్పు; x++ )
+            ఒకవేళ( ముసుగు[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -316,23 +316,23 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+మూస<> శూన్య
+copy_ముసుగు<పూర్ణాంకం>(స్థిరరాశి uchar* _src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, uchar* _dst, size_t dstep, కొలత size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    కొరకు( ; size.ఎత్తు--; ముసుగు += mstep, _src += sstep, _dst += dstep )
     {
-        const int* src = (const int*)_src;
-        int* dst = (int*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for (; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
+        స్థిరరాశి పూర్ణాంకం* src = (స్థిరరాశి పూర్ణాంకం*)_src;
+        పూర్ణాంకం* dst = (పూర్ణాంకం*)_dst;
+        పూర్ణాంకం x = 0;
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
+        కొరకు (; x <= size.వెడల్పు - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
         {
-            v_int32 v_src0 = vx_load(src + x), v_dst0 = vx_load(dst + x);
-            v_int32 v_src1 = vx_load(src + x +     VTraits<v_int32>::vlanes()), v_dst1 = vx_load(dst + x +     VTraits<v_int32>::vlanes());
-            v_int32 v_src2 = vx_load(src + x + 2 * VTraits<v_int32>::vlanes()), v_dst2 = vx_load(dst + x + 2 * VTraits<v_int32>::vlanes());
-            v_int32 v_src3 = vx_load(src + x + 3 * VTraits<v_int32>::vlanes()), v_dst3 = vx_load(dst + x + 3 * VTraits<v_int32>::vlanes());
+            v_int32 v_src0 = vx_ఎక్కించు(src + x), v_dst0 = vx_ఎక్కించు(dst + x);
+            v_int32 v_src1 = vx_ఎక్కించు(src + x +     VTraits<v_int32>::vlanes()), v_dst1 = vx_ఎక్కించు(dst + x +     VTraits<v_int32>::vlanes());
+            v_int32 v_src2 = vx_ఎక్కించు(src + x + 2 * VTraits<v_int32>::vlanes()), v_dst2 = vx_ఎక్కించు(dst + x + 2 * VTraits<v_int32>::vlanes());
+            v_int32 v_src3 = vx_ఎక్కించు(src + x + 3 * VTraits<v_int32>::vlanes()), v_dst3 = vx_ఎక్కించు(dst + x + 3 * VTraits<v_int32>::vlanes());
 
-            v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
+            v_uint8 v_nmask = v_eq(vx_ఎక్కించు(ముసుగు + x), vx_setzero_u8());
             v_uint8 v_nmask0, v_nmask1;
             v_zip(v_nmask, v_nmask, v_nmask0, v_nmask1);
             v_uint8 v_nmask00, v_nmask01, v_nmask10, v_nmask11;
@@ -350,74 +350,74 @@ copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep,
             vx_store(dst + x + 3 * VTraits<v_int32>::vlanes(), v_dst3);
         }
         vx_cleanup();
-#endif
-        for (; x < size.width; x++)
-            if ( mask[x] )
+#అయితే_ముగింపు
+        కొరకు (; x < size.వెడల్పు; x++)
+            ఒకవేళ ( ముసుగు[x] )
                 dst[x] = src[x];
     }
 }
 
-static void
-copyMaskGeneric(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size, void* _esz)
+స్థిర శూన్య
+copy_ముసుగు_Generic(స్థిరరాశి uchar* _src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, uchar* _dst, size_t dstep, కొలత size, శూన్య* _esz)
 {
     size_t k, esz = *(size_t*)_esz;
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    కొరకు( ; size.ఎత్తు--; ముసుగు += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = _src;
+        స్థిరరాశి uchar* src = _src;
         uchar* dst = _dst;
-        int x = 0;
-        for( ; x < size.width; x++, src += esz, dst += esz )
+        పూర్ణాంకం x = 0;
+        కొరకు( ; x < size.వెడల్పు; x++, src += esz, dst += esz )
         {
-            if( !mask[x] )
-                continue;
-            for( k = 0; k < esz; k++ )
+            ఒకవేళ( !ముసుగు[x] )
+                కొనసాగు;
+            కొరకు( k = 0; k < esz; k++ )
                 dst[k] = src[k];
         }
     }
 }
 
 
-#define DEF_COPY_MASK(suffix, type) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+#నిర్వచించు DEF_COPY_ముసుగు(suffix, type) \
+స్థిర శూన్య copy_ముసుగు_2##suffix(స్థిరరాశి uchar* src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, \
+                             uchar* dst, size_t dstep, కొలత size, శూన్య*) \
 { \
-    copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
+    copy_ముసుగు<type>(src, sstep, ముసుగు, mstep, dst, dstep, size); \
 }
 
-#if defined HAVE_IPP
-#define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+#ఒకవేళ defined HAVE_IPP
+#నిర్వచించు DEF_COPY_ముసుగు_F(suffix, type, ippfavor, ipptype) \
+స్థిర శూన్య copy_ముసుగు_2##suffix(స్థిరరాశి uchar* src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, \
+                             uchar* dst, size_t dstep, కొలత size, శూన్య*) \
 { \
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (const ipptype *)src, (int)sstep, (ipptype *)dst, (int)dstep, ippiSize(size), (const Ipp8u *)mask, (int)mstep) >= 0)\
-    copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
+    CV_IPP_నిరంతరం_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (స్థిరరాశి ipptype *)src, (పూర్ణాంకం)sstep, (ipptype *)dst, (పూర్ణాంకం)dstep, ippi_కొలత(size), (స్థిరరాశి Ipp8u *)ముసుగు, (పూర్ణాంకం)mstep) >= 0)\
+    copy_ముసుగు<type>(src, sstep, ముసుగు, mstep, dst, dstep, size); \
 }
-#else
-#define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+#లేకపోతే
+#నిర్వచించు DEF_COPY_ముసుగు_F(suffix, type, ippfavor, ipptype) \
+స్థిర శూన్య copy_ముసుగు_2##suffix(స్థిరరాశి uchar* src, size_t sstep, స్థిరరాశి uchar* ముసుగు, size_t mstep, \
+                             uchar* dst, size_t dstep, కొలత size, శూన్య*) \
 { \
-    copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
+    copy_ముసుగు<type>(src, sstep, ముసుగు, mstep, dst, dstep, size); \
 }
-#endif
+#అయితే_ముగింపు
 
-#if IPP_VERSION_X100 == 901 // bug in IPP 9.0.1
-DEF_COPY_MASK(32sC3, Vec3i)
-DEF_COPY_MASK(8uC3, Vec3b)
-#else
-DEF_COPY_MASK_F(8uC3, Vec3b, 8u_C3MR, Ipp8u)
-DEF_COPY_MASK_F(32sC3, Vec3i, 32s_C3MR, Ipp32s)
-#endif
-DEF_COPY_MASK(8u, uchar)
-DEF_COPY_MASK(16u, ushort)
-DEF_COPY_MASK_F(32s, int, 32s_C1MR, Ipp32s)
-DEF_COPY_MASK_F(16uC3, Vec3s, 16u_C3MR, Ipp16u)
-DEF_COPY_MASK(32sC2, Vec2i)
-DEF_COPY_MASK_F(32sC4, Vec4i, 32s_C4MR, Ipp32s)
-DEF_COPY_MASK(32sC6, Vec6i)
-DEF_COPY_MASK(32sC8, Vec8i)
+#ఒకవేళ IPP_సంస్కరణ_X100 == 901 // bug in IPP 9.0.1
+DEF_COPY_ముసుగు(32sC3, Vec3i)
+DEF_COPY_ముసుగు(8uC3, Vec3b)
+#లేకపోతే
+DEF_COPY_ముసుగు_F(8uC3, Vec3b, 8u_C3MR, Ipp8u)
+DEF_COPY_ముసుగు_F(32sC3, Vec3i, 32s_C3MR, Ipp32s)
+#అయితే_ముగింపు
+DEF_COPY_ముసుగు(8u, uchar)
+DEF_COPY_ముసుగు(16u, ushort)
+DEF_COPY_ముసుగు_F(32s, పూర్ణాంకం, 32s_C1MR, Ipp32s)
+DEF_COPY_ముసుగు_F(16uC3, Vec3s, 16u_C3MR, Ipp16u)
+DEF_COPY_ముసుగు(32sC2, Vec2i)
+DEF_COPY_ముసుగు_F(32sC4, Vec4i, 32s_C4MR, Ipp32s)
+DEF_COPY_ముసుగు(32sC6, Vec6i)
+DEF_COPY_ముసుగు(32sC8, Vec8i)
 
-BinaryFunc copyMaskTab[] =
+ద్విమాన_Func copy_ముసుగు_Tab[] =
 {
     0,
     copyMask8u,
@@ -438,164 +438,164 @@ BinaryFunc copyMaskTab[] =
     copyMask32sC8
 };
 
-BinaryFunc getCopyMaskFunc(size_t esz)
+ద్విమాన_Func get_Copy_ముసుగు_Func(size_t esz)
 {
-    return esz <= 32 && copyMaskTab[esz] ? copyMaskTab[esz] : copyMaskGeneric;
+    తిరిగి esz <= 32 && copy_ముసుగు_Tab[esz] ? copy_ముసుగు_Tab[esz] : copy_ముసుగు_Generic;
 }
 
 /* dst = src */
-void Mat::copyTo( OutputArray _dst ) const
+శూన్య Mat::copy_గమ్యం( OutputArray _dst ) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-#ifdef HAVE_CUDA
-    if (_dst.isGpuMat())
+#నిర్వచితమైతే HAVE_CUDA
+    ఒకవేళ (_dst.isGpuMat())
     {
-        _dst.getGpuMat().upload(*this);
-        return;
+        _dst.getGpuMat().upload(*ఇది);
+        తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-    int stype = type();
-    int dtype = _dst.type();
-    if( _dst.fixedType() && dtype != stype )
+    పూర్ణాంకం stype = type();
+    పూర్ణాంకం dtype = _dst.type();
+    ఒకవేళ( _dst.fixedType() && dtype != stype )
     {
         CV_Assert( CV_MAT_CN(stype) == CV_MAT_CN(dtype) );
-        convertTo( _dst, dtype );
-        return;
+        convert_గమ్యం( _dst, dtype );
+        తిరిగి;
     }
 
-    if( dims == 0 && empty() )
+    ఒకవేళ( dims == 0 && empty() )
     {
         _dst.release();
-        void* obj = _dst.getObj();
-        if (_dst.isMat())
+        శూన్య* obj = _dst.getObj();
+        ఒకవేళ (_dst.isMat())
             reinterpret_cast<Mat*>(obj)->flags = Mat::MAGIC_VAL | Mat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isUMat())
+        లేకపోతే ఒకవేళ (_dst.isUMat())
             reinterpret_cast<UMat*>(obj)->flags = UMat::MAGIC_VAL | UMat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isGpuMat())
+        లేకపోతే ఒకవేళ (_dst.isGpuMat())
             reinterpret_cast<cuda::GpuMat*>(obj)->flags = stype;
-        return;
+        తిరిగి;
     }
 
-    bool allowTransposed = dims == 1 ||
-        _dst.kind() == _InputArray::STD_VECTOR ||
-        (_dst.fixedSize() && _dst.dims() == 1);
-    if( _dst.isUMat() )
+    తార్కిక allowTransposed = dims == 1 ||
+        _dst.రకం() == ఆదానం_Array_2::STD_సదిశ ||
+        (_dst.fixed_కొలత() && _dst.dims() == 1);
+    ఒకవేళ( _dst.isUMat() )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
-        if (empty())
-            return;
+        ఒకవేళ (empty())
+            తిరిగి;
         UMat dst = _dst.getUMat();
-        CV_Assert(dst.u != NULL);
-        size_t i, sz[CV_MAX_DIM] = {1}, dstofs[CV_MAX_DIM] = {0}, esz = CV_ELEM_SIZE(stype);
+        CV_Assert(dst.u != ఖాళీ);
+        size_t i, sz[CV_MAX_DIM] = {1}, dstofs[CV_MAX_DIM] = {0}, esz = CV_ELEM_కొలత(stype);
         CV_Assert(dims >= 0 && dims < CV_MAX_DIM);
-        for( i = 0; i < (size_t)dims; i++ )
+        కొరకు( i = 0; i < (size_t)dims; i++ )
             sz[i] = size.p[i];
-        int lastdim = dims >= 1 ? dims-1 : 0;
+        పూర్ణాంకం lastdim = dims >= 1 ? dims-1 : 0;
         sz[lastdim] *= esz;
         dst.ndoffset(dstofs);
         dstofs[lastdim] *= esz;
-        dst.u->currAllocator->upload(dst.u, data, std::max(dims, 1), sz, dstofs, dst.step.p, step.p);
-        return;
+        dst.u->currAllocator->upload(dst.u, దత్తాంశం, std::max(dims, 1), sz, dstofs, dst.అడుగు.p, అడుగు.p);
+        తిరిగి;
     }
 
-    if( dims <= 2 )
+    ఒకవేళ( dims <= 2 )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
         Mat dst = _dst.getMat();
-        if( data == dst.data )
-            return;
+        ఒకవేళ( దత్తాంశం == dst.దత్తాంశం )
+            తిరిగి;
 
-        if( rows > 0 && cols > 0 )
+        ఒకవేళ( అడ్డువరుసలు > 0 && నిలువుల_సంఖ్య > 0 )
         {
-            Mat src = *this;
-            Size sz = getContinuousSize2D(src, dst, (int)elemSize());
-            CV_CheckGE(sz.width, 0, "");
+            Mat src = *ఇది;
+            కొలత sz = getContinuousSize2D(src, dst, (పూర్ణాంకం)elem_కొలత());
+            CV_CheckGE(sz.వెడల్పు, 0, "");
 
-            const uchar* sptr = src.data;
-            uchar* dptr = dst.data;
+            స్థిరరాశి uchar* sptr = src.దత్తాంశం;
+            uchar* dptr = dst.దత్తాంశం;
 
-#if IPP_VERSION_X100 >= 201700
-            CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (int)src.step, dptr, (int)dst.step, ippiSizeL(sz.width, sz.height)) >= 0)
-#endif
+#ఒకవేళ IPP_సంస్కరణ_X100 >= 201700
+            CV_IPP_నిరంతరం_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (పూర్ణాంకం)src.అడుగు, dptr, (పూర్ణాంకం)dst.అడుగు, ippi_కొలత_L(sz.వెడల్పు, sz.ఎత్తు)) >= 0)
+#అయితే_ముగింపు
 
-            for (; sz.height--; sptr += src.step, dptr += dst.step)
-                memcpy(dptr, sptr, sz.width);
+            కొరకు (; sz.ఎత్తు--; sptr += src.అడుగు, dptr += dst.అడుగు)
+                జ్ఞాపకం_నకలు(dptr, sptr, sz.వెడల్పు);
         }
-        return;
+        తిరిగి;
     }
 
     _dst.create( size, stype );
     Mat dst = _dst.getMat();
-    if( data == dst.data )
-        return;
+    ఒకవేళ( దత్తాంశం == dst.దత్తాంశం )
+        తిరిగి;
 
-    if( total() != 0 )
+    ఒకవేళ( మొత్తం() != 0 )
     {
-        const Mat* arrays[] = { this, &dst };
+        స్థిరరాశి Mat* arrays[] = { ఇది, &dst };
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs, 2);
-        size_t sz = it.size*elemSize();
+        size_t sz = it.size*elem_కొలత();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
-            memcpy(ptrs[1], ptrs[0], sz);
+        కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
+            జ్ఞాపకం_నకలు(ptrs[1], ptrs[0], sz);
     }
 }
 
-#ifdef HAVE_IPP
-static bool ipp_copyTo(const Mat &src, Mat &dst, const Mat &mask)
+#నిర్వచితమైతే HAVE_IPP
+స్థిర తార్కిక ipp_copy_గమ్యం(స్థిరరాశి Mat &src, Mat &dst, స్థిరరాశి Mat &ముసుగు)
 {
-#ifdef HAVE_IPP_IW_LL
+#నిర్వచితమైతే HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.channels() > 1 || mask.depth() != CV_8U)
-        return false;
+    ఒకవేళ(ముసుగు.channels() > 1 || ముసుగు.లోతు() != CV_8U)
+        తిరిగి అబద్ధం;
 
-    if (src.dims <= 2)
+    ఒకవేళ (src.dims <= 2)
     {
-        IppiSize size = ippiSize(src.size());
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMask, src.ptr(), (int)src.step, dst.ptr(), (int)dst.step, size, (int)src.elemSize1(), src.channels(), mask.ptr(), (int)mask.step) >= 0;
+        Ippi_కొలత size = ippi_కొలత(src.size());
+        తిరిగి CV_INSTRUMENT_FUN_IPP(llwi_Copy_ముసుగు, src.ptr(), (పూర్ణాంకం)src.అడుగు, dst.ptr(), (పూర్ణాంకం)dst.అడుగు, size, (పూర్ణాంకం)src.elemSize1(), src.channels(), ముసుగు.ptr(), (పూర్ణాంకం)ముసుగు.అడుగు) >= 0;
     }
-    else
+    లేకపోతే
     {
-        const Mat      *arrays[] = {&src, &dst, &mask, NULL};
-        uchar          *ptrs[3]  = {NULL};
+        స్థిరరాశి Mat      *arrays[] = {&src, &dst, &ముసుగు, ఖాళీ};
+        uchar          *ptrs[3]  = {ఖాళీ};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize size = ippiSize(it.size, 1);
+        Ippi_కొలత size = ippi_కొలత(it.size, 1);
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        కొరకు (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMask, ptrs[0], 0, ptrs[1], 0, size, (int)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
-                return false;
+            ఒకవేళ(CV_INSTRUMENT_FUN_IPP(llwi_Copy_ముసుగు, ptrs[0], 0, ptrs[1], 0, size, (పూర్ణాంకం)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
+                తిరిగి అబద్ధం;
         }
-        return true;
+        తిరిగి నిజం;
     }
-#else
-    CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(mask);
-    return false;
-#endif
+#లేకపోతే
+    CV_వాడని(src); CV_వాడని(dst); CV_వాడని(ముసుగు);
+    తిరిగి అబద్ధం;
+#అయితే_ముగింపు
 }
-#endif
+#అయితే_ముగింపు
 
-void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
+శూన్య Mat::copy_గమ్యం( OutputArray _dst, ఆదానం_Array ముసుగు_2 ) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    Mat mask = _mask.getMat();
-    if( !mask.data )
+    Mat ముసుగు = ముసుగు_2.getMat();
+    ఒకవేళ( !ముసుగు.దత్తాంశం )
     {
-        copyTo(_dst);
-        return;
+        copy_గమ్యం(_dst);
+        తిరిగి;
     }
 
-    int cn = channels(), mcn = mask.channels();
-    CV_Assert( (mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) && (mcn == 1 || mcn == cn) );
-    bool colorMask = mcn > 1;
-    if( dims <= 2 )
+    పూర్ణాంకం cn = channels(), mcn = ముసుగు.channels();
+    CV_Assert( (ముసుగు.లోతు() == CV_8U || ముసుగు.లోతు() == CV_8S || ముసుగు.లోతు() == CV_Bool) && (mcn == 1 || mcn == cn) );
+    తార్కిక color_ముసుగు = mcn > 1;
+    ఒకవేళ( dims <= 2 )
     {
-        CV_Assert( size() == mask.size() );
+        CV_Assert( size() == ముసుగు.size() );
     }
 
     Mat dst;
@@ -604,52 +604,52 @@ void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
         _dst.create(size, type()); // TODO Prohibit 'dst' re-creation, user should pass it explicitly with correct size/type or empty
         dst = _dst.getMat();
 
-        if (dst.data != dst0.data) // re-allocation happened
+        ఒకవేళ (dst.దత్తాంశం != dst0.దత్తాంశం) // re-allocation happened
         {
-#ifdef OPENCV_FUTURE
+#నిర్వచితమైతే OPENCV_FUTURE
             CV_Assert(dst0.empty() &&
                 "copyTo(): dst size/type mismatch (looks like a bug) - use dst.release() before copyTo() call to suppress this message");
-#endif
+#అయితే_ముగింపు
             dst = Scalar(0); // do not leave dst uninitialized
         }
     }
 
-    CV_IPP_RUN_FAST(ipp_copyTo(*this, dst, mask))
-    if ( this->dims <= 2 ) {
-        if ( this->size() == dst.size() && this->size() == dst.size() ) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, this->step, dst.data, dst.step, this->cols, this->rows, this->type(), mask.data, mask.step, mask.type());
+    CV_IPP_నిరంతరం_FAST(ipp_copy_గమ్యం(*ఇది, dst, ముసుగు))
+    ఒకవేళ ( ఇది->dims <= 2 ) {
+        ఒకవేళ ( ఇది->size() == dst.size() && ఇది->size() == dst.size() ) {
+            CALL_HAL(copy_గమ్యం_ముసుగు, cv_hal_copy_గమ్యం_Masked, ఇది->దత్తాంశం, ఇది->అడుగు, dst.దత్తాంశం, dst.అడుగు, ఇది->నిలువుల_సంఖ్య, ఇది->అడ్డువరుసలు, ఇది->type(), ముసుగు.దత్తాంశం, ముసుగు.అడుగు, ముసుగు.type());
         }
     }
-    else if ( this->isContinuous() && dst.isContinuous() && mask.isContinuous() )
+    లేకపోతే ఒకవేళ ( ఇది->isContinuous() && dst.isContinuous() && ముసుగు.isContinuous() )
     {
-        size_t sz = this->total();
-        if (sz < INT_MAX) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, 0, dst.data, 0, (int)sz, 1, this->type(), mask.data, 0, mask.type());
+        size_t sz = ఇది->మొత్తం();
+        ఒకవేళ (sz < గరిష్ఠ_పూర్ణాంకం) {
+            CALL_HAL(copy_గమ్యం_ముసుగు, cv_hal_copy_గమ్యం_Masked, ఇది->దత్తాంశం, 0, dst.దత్తాంశం, 0, (పూర్ణాంకం)sz, 1, ఇది->type(), ముసుగు.దత్తాంశం, 0, ముసుగు.type());
         }
     }
 
-    size_t esz = colorMask ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    size_t esz = color_ముసుగు ? elemSize1() : elem_కొలత();
+    ద్విమాన_Func copymask = get_Copy_ముసుగు_Func(esz);
 
-    if( dims <= 2 )
+    ఒకవేళ( dims <= 2 )
     {
-        Mat src = *this;
-        Size sz = getContinuousSize2D(src, dst, mask, mcn);
-        copymask(src.data, src.step, mask.data, mask.step, dst.data, dst.step, sz, &esz);
-        return;
+        Mat src = *ఇది;
+        కొలత sz = getContinuousSize2D(src, dst, ముసుగు, mcn);
+        copymask(src.దత్తాంశం, src.అడుగు, ముసుగు.దత్తాంశం, ముసుగు.అడుగు, dst.దత్తాంశం, dst.అడుగు, sz, &esz);
+        తిరిగి;
     }
 
-    const Mat* arrays[] = { this, &dst, &mask, 0 };
+    స్థిరరాశి Mat* arrays[] = { ఇది, &dst, &ముసుగు, 0 };
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    Size sz((int)(it.size*mcn), 1);
+    కొలత sz((పూర్ణాంకం)(it.size*mcn), 1);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
         copymask(ptrs[0], 0, ptrs[2], 0, ptrs[1], 0, sz, &esz);
 }
 
 /* dst = src */
-void Mat::copyAt( OutputArray _dst ) const
+శూన్య Mat::copyAt( OutputArray _dst ) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -657,9 +657,9 @@ void Mat::copyAt( OutputArray _dst ) const
     CV_CheckTrue( !dst.empty(), "dst must not be empty" );
     CV_CheckTypeEQ(type(), dst.type(), "Make the type of dst the same as src");
     CV_CheckEQ(size(), dst.size(), "Make the size of dst the same as src");
-    copyTo(_dst);
+    copy_గమ్యం(_dst);
 }
-void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
+శూన్య Mat::copyAt( OutputArray _dst, ఆదానం_Array ముసుగు_2 ) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -667,241 +667,241 @@ void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
     CV_CheckTrue( !dst.empty(), "dst must not be empty" );
     CV_CheckTypeEQ(type(), dst.type(), "Make the type of dst the same as src");
     CV_CheckEQ(size(), dst.size(), "Make the size of dst the same as src");
-    copyTo(_dst, _mask);
+    copy_గమ్యం(_dst, ముసుగు_2);
 }
 
 
-static bool can_apply_memset(const Mat &mat, const Scalar &s, int &fill_value)
+స్థిర తార్కిక can_apply_memset(స్థిరరాశి Mat &mat, స్థిరరాశి Scalar &s, పూర్ణాంకం &fill_విలువ)
 {
     // check if depth is 1 byte.
-    switch (mat.depth())
+    ఎంపిక (mat.లోతు())
     {
-    case CV_8U: fill_value = saturate_cast<uchar>( s.val[0] ); break;
-    case CV_8S: fill_value = saturate_cast<schar>( s.val[0] ); break;
-    default: return false;
+    స్థితి CV_8U: fill_విలువ = saturate_cast<uchar>( s.val[0] ); ఆపు;
+    స్థితి CV_8S: fill_విలువ = saturate_cast<schar>( s.val[0] ); ఆపు;
+    అప్రమేయ: తిరిగి అబద్ధం;
     }
 
     // check if all element is same.
-    const int64* is = (const int64*)&s.val[0];
-    switch (mat.channels())
+    స్థిరరాశి int64* is = (స్థిరరాశి int64*)&s.val[0];
+    ఎంపిక (mat.channels())
     {
-    case 1: return true;
-    case 2: return (is[0] == is[1]);
-    case 3: return (is[0] == is[1] && is[1] == is[2]);
-    case 4: return (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
-    default: return false;
+    స్థితి 1: తిరిగి నిజం;
+    స్థితి 2: తిరిగి (is[0] == is[1]);
+    స్థితి 3: తిరిగి (is[0] == is[1] && is[1] == is[2]);
+    స్థితి 4: తిరిగి (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
+    అప్రమేయ: తిరిగి అబద్ధం;
     }
 }
 
-Mat& Mat::operator = (const Scalar& s)
+Mat& Mat::క్రియాకారకం = (స్థిరరాశి Scalar& s)
 {
     CV_INSTRUMENT_REGION();
 
-    if (this->empty())
-        return *this;
+    ఒకవేళ (ఇది->empty())
+        తిరిగి *ఇది;
 
-    const Mat* arrays[] = { this };
+    స్థిరరాశి Mat* arrays[] = { ఇది };
     uchar* dptr;
     NAryMatIterator it(arrays, &dptr, 1);
-    size_t elsize = it.size*elemSize();
-    const int64* is = (const int64*)&s.val[0];
+    size_t elsize = it.size*elem_కొలత();
+    స్థిరరాశి int64* is = (స్థిరరాశి int64*)&s.val[0];
 
-    if( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
+    ఒకవేళ( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
     {
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
             memset( dptr, 0, elsize );
     }
-    else
+    లేకపోతే
     {
-        int fill_value = 0;
-        if ( can_apply_memset(*this, s, fill_value) )
+        పూర్ణాంకం fill_విలువ = 0;
+        ఒకవేళ ( can_apply_memset(*ఇది, s, fill_విలువ) )
         {
-            for (size_t i = 0; i < it.nplanes; i++, ++it)
-                memset(dptr, fill_value, elsize);
-            return *this;
+            కొరకు (size_t i = 0; i < it.nplanes; i++, ++it)
+                memset(dptr, fill_విలువ, elsize);
+            తిరిగి *ఇది;
         }
 
-        if( it.nplanes > 0 )
+        ఒకవేళ( it.nplanes > 0 )
         {
-            double scalar[12];
-            scalarToRawData(s, scalar, type(), 12);
-            size_t blockSize = 12*elemSize1();
+            ద్విగుణ scalar[12];
+            scalar_గమ్యం_Raw_దత్తాంశం(s, scalar, type(), 12);
+            size_t ఖండం_కొలత_2 = 12*elemSize1();
 
-            for( size_t j = 0; j < elsize; j += blockSize )
+            కొరకు( size_t j = 0; j < elsize; j += ఖండం_కొలత_2 )
             {
-                size_t sz = MIN(blockSize, elsize - j);
-                CV_Assert(sz <= sizeof(scalar));
-                memcpy( dptr + j, scalar, sz );
+                size_t sz = MIN(ఖండం_కొలత_2, elsize - j);
+                CV_Assert(sz <= పరిమాణం(scalar));
+                జ్ఞాపకం_నకలు( dptr + j, scalar, sz );
             }
         }
 
-        for( size_t i = 1; i < it.nplanes; i++ )
+        కొరకు( size_t i = 1; i < it.nplanes; i++ )
         {
             ++it;
-            memcpy( dptr, data, elsize );
+            జ్ఞాపకం_నకలు( dptr, దత్తాంశం, elsize );
         }
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-#ifdef HAVE_IPP
-static bool ipp_Mat_setTo_Mat(Mat &dst, Mat &_val, Mat &mask)
+#నిర్వచితమైతే HAVE_IPP
+స్థిర తార్కిక ipp_Mat_సమితి_గమ్యం_Mat(Mat &dst, Mat &_val, Mat &ముసుగు)
 {
-#ifdef HAVE_IPP_IW_LL
+#నిర్వచితమైతే HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.empty())
-        return false;
+    ఒకవేళ(ముసుగు.empty())
+        తిరిగి అబద్ధం;
 
-    if(mask.depth() != CV_8U || mask.channels() > 1)
-        return false;
+    ఒకవేళ(ముసుగు.లోతు() != CV_8U || ముసుగు.channels() > 1)
+        తిరిగి అబద్ధం;
 
-    if(dst.channels() > 4)
-        return false;
+    ఒకవేళ(dst.channels() > 4)
+        తిరిగి అబద్ధం;
 
-    if (dst.depth() == CV_32F)
+    ఒకవేళ (dst.లోతు() == CV_32F)
     {
-        for (int i = 0; i < (int)(_val.total()); i++)
+        కొరకు (పూర్ణాంకం i = 0; i < (పూర్ణాంకం)(_val.మొత్తం()); i++)
         {
-            float v = (float)(_val.at<double>(i));  // cast to float
-            if (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
-                return false;
+            దశాంశం v = (దశాంశం)(_val.at<ద్విగుణ>(i));  // cast to float
+            ఒకవేళ (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
+                తిరిగి అబద్ధం;
         }
     }
 
-    if(dst.dims <= 2)
+    ఒకవేళ(dst.dims <= 2)
     {
-        IppiSize            size     = ippiSize(dst.size());
-        IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        Ippi_కొలత            size     = ippi_కొలత(dst.size());
+        Ipp_దత్తాంశం_Type         దత్తాంశం_Type = ippi_Get_దత్తాంశం_Type(dst.లోతు());
+        ::ipp::Iw_విలువ_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        return CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, dst.ptr(), (int)dst.step, size, dataType, dst.channels(), mask.ptr(), (int)mask.step) >= 0;
+        తిరిగి CV_INSTRUMENT_FUN_IPP(llwi_సమితి_ముసుగు, s, dst.ptr(), (పూర్ణాంకం)dst.అడుగు, size, దత్తాంశం_Type, dst.channels(), ముసుగు.ptr(), (పూర్ణాంకం)ముసుగు.అడుగు) >= 0;
     }
-    else
+    లేకపోతే
     {
-        const Mat      *arrays[] = {&dst, mask.empty()?NULL:&mask, NULL};
-        uchar          *ptrs[2]  = {NULL};
+        స్థిరరాశి Mat      *arrays[] = {&dst, ముసుగు.empty()?ఖాళీ:&ముసుగు, ఖాళీ};
+        uchar          *ptrs[2]  = {ఖాళీ};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize            size     = {(int)it.size, 1};
-        IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        Ippi_కొలత            size     = {(పూర్ణాంకం)it.size, 1};
+        Ipp_దత్తాంశం_Type         దత్తాంశం_Type = ippi_Get_దత్తాంశం_Type(dst.లోతు());
+        ::ipp::Iw_విలువ_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it)
+        కొరకు( size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, ptrs[0], 0, size, dataType, dst.channels(), ptrs[1], 0) < 0)
-                return false;
+            ఒకవేళ(CV_INSTRUMENT_FUN_IPP(llwi_సమితి_ముసుగు, s, ptrs[0], 0, size, దత్తాంశం_Type, dst.channels(), ptrs[1], 0) < 0)
+                తిరిగి అబద్ధం;
         }
-        return true;
+        తిరిగి నిజం;
     }
-#else
-    CV_UNUSED(dst); CV_UNUSED(_val); CV_UNUSED(mask);
-    return false;
-#endif
+#లేకపోతే
+    CV_వాడని(dst); CV_వాడని(_val); CV_వాడని(ముసుగు);
+    తిరిగి అబద్ధం;
+#అయితే_ముగింపు
 }
-#endif
+#అయితే_ముగింపు
 
-Mat& Mat::setTo(InputArray _value, InputArray _mask)
+Mat& Mat::సమితి_గమ్యం(ఆదానం_Array విలువ, ఆదానం_Array ముసుగు_2)
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    ఒకవేళ( empty() )
+        తిరిగి *ఇది;
 
-    Mat value = _value.getMat(), mask = _mask.getMat();
+    Mat value = విలువ.getMat(), ముసుగు = ముసుగు_2.getMat();
 
-    CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::MAT ));
-    int cn = channels(), mcn = mask.channels();
-    CV_Assert( mask.empty() || ((mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) &&
-               (mcn == 1 || mcn == cn) && size == mask.size) );
+    CV_Assert( checkScalar(value, type(), విలువ.రకం(), ఆదానం_Array_2::MAT ));
+    పూర్ణాంకం cn = channels(), mcn = ముసుగు.channels();
+    CV_Assert( ముసుగు.empty() || ((ముసుగు.లోతు() == CV_8U || ముసుగు.లోతు() == CV_8S || ముసుగు.లోతు() == CV_Bool) &&
+               (mcn == 1 || mcn == cn) && size == ముసుగు.size) );
 
-    CV_IPP_RUN_FAST(ipp_Mat_setTo_Mat(*this, value, mask), *this)
+    CV_IPP_నిరంతరం_FAST(ipp_Mat_సమితి_గమ్యం_Mat(*ఇది, value, ముసుగు), *ఇది)
 
-    size_t esz = mcn > 1 ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    size_t esz = mcn > 1 ? elemSize1() : elem_కొలత();
+    ద్విమాన_Func copymask = get_Copy_ముసుగు_Func(esz);
 
-    const Mat* arrays[] = { this, !mask.empty() ? &mask : 0, 0 };
+    స్థిరరాశి Mat* arrays[] = { ఇది, !ముసుగు.empty() ? &ముసుగు : 0, 0 };
     uchar* ptrs[2]={0,0};
     NAryMatIterator it(arrays, ptrs);
-    int totalsz = (int)it.size*mcn;
-    int blockSize0 = std::min(totalsz, (int)((BLOCK_SIZE + esz-1)/esz));
-    blockSize0 -= blockSize0 % mcn;    // must be divisible without remainder for unrolling and advancing
-    AutoBuffer<uchar> _scbuf(blockSize0*esz + 32);
-    uchar* scbuf = alignPtr((uchar*)_scbuf.data(), (int)sizeof(double));
-    convertAndUnrollScalar( value, type(), scbuf, blockSize0/mcn );
+    పూర్ణాంకం totalsz = (పూర్ణాంకం)it.size*mcn;
+    పూర్ణాంకం ఖండం_Size0 = std::min(totalsz, (పూర్ణాంకం)((ఖండం_కొలత + esz-1)/esz));
+    ఖండం_Size0 -= ఖండం_Size0 % mcn;    // must be divisible without remainder for unrolling and advancing
+    Auto_బఫరు<uchar> _scbuf(ఖండం_Size0*esz + 32);
+    uchar* scbuf = alignPtr((uchar*)_scbuf.దత్తాంశం(), (పూర్ణాంకం)పరిమాణం(ద్విగుణ));
+    convertAndUnrollScalar( value, type(), scbuf, ఖండం_Size0/mcn );
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( int j = 0; j < totalsz; j += blockSize0 )
+        కొరకు( పూర్ణాంకం j = 0; j < totalsz; j += ఖండం_Size0 )
         {
-            Size sz(std::min(blockSize0, totalsz - j), 1);
-            size_t blockSize = sz.width*esz;
-            if( ptrs[1] )
+            కొలత sz(std::min(ఖండం_Size0, totalsz - j), 1);
+            size_t ఖండం_కొలత_2 = sz.వెడల్పు*esz;
+            ఒకవేళ( ptrs[1] )
             {
                 copymask(scbuf, 0, ptrs[1], 0, ptrs[0], 0, sz, &esz);
-                ptrs[1] += sz.width;
+                ptrs[1] += sz.వెడల్పు;
             }
-            else
-                memcpy(ptrs[0], scbuf, blockSize);
-            ptrs[0] += blockSize;
+            లేకపోతే
+                జ్ఞాపకం_నకలు(ptrs[0], scbuf, ఖండం_కొలత_2);
+            ptrs[0] += ఖండం_కొలత_2;
         }
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
 
-Mat& Mat::setZero()
+Mat& Mat::సమితి_Zero()
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    ఒకవేళ( empty() )
+        తిరిగి *ఇది;
 
-    size_t esz = elemSize();
+    size_t esz = elem_కొలత();
 
-    const Mat* arrays[] = { this, 0 };
+    స్థిరరాశి Mat* arrays[] = { ఇది, 0 };
     uchar* ptrs[]={0};
     NAryMatIterator it(arrays, ptrs);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
         memset(ptrs[0], 0, esz*it.size);
-    return *this;
+    తిరిగి *ఇది;
 }
 
 
-#if defined HAVE_OPENCL && !defined __APPLE__
+#ఒకవేళ defined HAVE_OPENCL && !defined __APPLE__
 
-static bool ocl_repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+స్థిర తార్కిక ocl_repeat(ఆదానం_Array _src, పూర్ణాంకం ny, పూర్ణాంకం nx, OutputArray _dst)
 {
-    if (ny == 1 && nx == 1)
+    ఒకవేళ (ny == 1 && nx == 1)
     {
-        _src.copyTo(_dst);
-        return true;
+        _src.copy_గమ్యం(_dst);
+        తిరిగి నిజం;
     }
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1,
-            kercn = ocl::predictOptimalVectorWidth(_src, _dst);
+    పూర్ణాంకం type = _src.type(), లోతు = CV_MAT_లోతు(type), cn = CV_MAT_CN(type),
+            అడ్డువరుసలు_చొప్పున_WI = ocl::Device::getDefault().isIntel() ? 4 : 1,
+            kercn = ocl::predict_Optimal_సదిశ_వెడల్పు(_src, _dst);
 
     ocl::Kernel k("repeat", ocl::core::repeat_oclsrc,
                   format("-D T=%s -D nx=%d -D ny=%d -D rowsPerWI=%d -D cn=%d",
-                         ocl::memopTypeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         nx, ny, rowsPerWI, kercn));
-    if (k.empty())
-        return false;
+                         ocl::memop_Type_గమ్యం_Str(CV_MAKE_TYPE(లోతు, kercn)),
+                         nx, ny, అడ్డువరుసలు_చొప్పున_WI, kercn));
+    ఒకవేళ (k.empty())
+        తిరిగి అబద్ధం;
 
     UMat src = _src.getUMat(), dst = _dst.getUMat();
-    k.args(ocl::KernelArg::ReadOnly(src, cn, kercn), ocl::KernelArg::WriteOnlyNoSize(dst));
+    k.వాదనలు(ocl::KernelArg::ReadOnly(src, cn, kercn), ocl::KernelArg::Write_Only_No_కొలత(dst));
 
-    size_t globalsize[] = { (size_t)src.cols * cn / kercn, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[] = { (size_t)src.నిలువుల_సంఖ్య * cn / kercn, ((size_t)src.అడ్డువరుసలు + అడ్డువరుసలు_చొప్పున_WI - 1) / అడ్డువరుసలు_చొప్పున_WI };
+    తిరిగి k.నిరంతరం(2, globalsize, ఖాళీ, అబద్ధం);
 }
 
-#endif
+#అయితే_ముగింపు
 
-void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+శూన్య repeat(ఆదానం_Array _src, పూర్ణాంకం ny, పూర్ణాంకం nx, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -909,43 +909,43 @@ void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
     CV_Assert( _src.dims() <= 2 );
     CV_Assert( ny > 0 && nx > 0 );
 
-    Size ssize = _src.size();
-    if( ssize.empty() )
+    కొలత ssize = _src.size();
+    ఒకవేళ( ssize.empty() )
     {
         _dst.create(0, 0, _src.type());
-        return;
+        తిరిగి;
     }
-    CV_Assert( (int64_t)ssize.height * ny <= INT_MAX && (int64_t)ssize.width * nx <= INT_MAX );
-    _dst.create(ssize.height*ny, ssize.width*nx, _src.type());
+    CV_Assert( (int64_t)ssize.ఎత్తు * ny <= గరిష్ఠ_పూర్ణాంకం && (int64_t)ssize.వెడల్పు * nx <= గరిష్ఠ_పూర్ణాంకం );
+    _dst.create(ssize.ఎత్తు*ny, ssize.వెడల్పు*nx, _src.type());
 
-#if !defined __APPLE__
-    CV_OCL_RUN(_dst.isUMat(),
+#ఒకవేళ !defined __APPLE__
+    CV_OCL_నిరంతరం(_dst.isUMat(),
                ocl_repeat(_src, ny, nx, _dst))
-#endif
+#అయితే_ముగింపు
 
     Mat src = _src.getMat(), dst = _dst.getMat();
-    Size dsize = dst.size();
-    int esz = (int)src.elemSize();
-    int x, y;
-    ssize.width *= esz; dsize.width *= esz;
+    కొలత dsize = dst.size();
+    పూర్ణాంకం esz = (పూర్ణాంకం)src.elem_కొలత();
+    పూర్ణాంకం x, y;
+    ssize.వెడల్పు *= esz; dsize.వెడల్పు *= esz;
 
-    for( y = 0; y < ssize.height; y++ )
+    కొరకు( y = 0; y < ssize.ఎత్తు; y++ )
     {
-        for( x = 0; x < dsize.width; x += ssize.width )
-            memcpy( dst.ptr(y) + x, src.ptr(y), ssize.width );
+        కొరకు( x = 0; x < dsize.వెడల్పు; x += ssize.వెడల్పు )
+            జ్ఞాపకం_నకలు( dst.ptr(y) + x, src.ptr(y), ssize.వెడల్పు );
     }
 
-    for( ; y < dsize.height; y++ )
-        memcpy( dst.ptr(y), dst.ptr(y - ssize.height), dsize.width );
+    కొరకు( ; y < dsize.ఎత్తు; y++ )
+        జ్ఞాపకం_నకలు( dst.ptr(y), dst.ptr(y - ssize.ఎత్తు), dsize.వెడల్పు );
 }
 
-Mat repeat(const Mat& src, int ny, int nx)
+Mat repeat(స్థిరరాశి Mat& src, పూర్ణాంకం ny, పూర్ణాంకం nx)
 {
-    if( nx == 1 && ny == 1 )
-        return src;
+    ఒకవేళ( nx == 1 && ny == 1 )
+        తిరిగి src;
     Mat dst;
     repeat(src, ny, nx, dst);
-    return dst;
+    తిరిగి dst;
 }
 
 
@@ -961,346 +961,346 @@ Mat repeat(const Mat& src, int ny, int nx)
  * BORDER_WRAP:          cdefgh|abcdefgh|abcdefg
  * BORDER_CONSTANT:      iiiiii|abcdefgh|iiiiiii  with some specified 'i'
  */
-int cv::borderInterpolate( int p, int len, int borderType )
+పూర్ణాంకం cv::borderInterpolate( పూర్ణాంకం p, పూర్ణాంకం len, పూర్ణాంకం borderType )
 {
     CV_TRACE_FUNCTION_VERBOSE();
 
     CV_DbgAssert(len > 0);
 
-#ifdef CV_STATIC_ANALYSIS
-    if(p >= 0 && p < len)
-#else
-    if( (unsigned)p < (unsigned)len )
-#endif
+#నిర్వచితమైతే CV_STATIC_ANALYSIS
+    ఒకవేళ(p >= 0 && p < len)
+#లేకపోతే
+    ఒకవేళ( (గుర్తులేని)p < (గుర్తులేని)len )
+#అయితే_ముగింపు
         ;
-    else if( borderType == BORDER_REPLICATE )
+    లేకపోతే ఒకవేళ( borderType == BORDER_REPLICATE )
         p = p < 0 ? 0 : len - 1;
-    else if( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
+    లేకపోతే ఒకవేళ( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
     {
-        int delta = borderType == BORDER_REFLECT_101;
-        if( len == 1 )
-            return 0;
-        do
+        పూర్ణాంకం delta = borderType == BORDER_REFLECT_101;
+        ఒకవేళ( len == 1 )
+            తిరిగి 0;
+        చేయి
         {
-            if( p < 0 )
+            ఒకవేళ( p < 0 )
                 p = -p - 1 + delta;
-            else
+            లేకపోతే
                 p = len - 1 - (p - len) - delta;
         }
-#ifdef CV_STATIC_ANALYSIS
-        while(p < 0 || p >= len);
-#else
-        while( (unsigned)p >= (unsigned)len );
-#endif
+#నిర్వచితమైతే CV_STATIC_ANALYSIS
+        అయితే(p < 0 || p >= len);
+#లేకపోతే
+        అయితే( (గుర్తులేని)p >= (గుర్తులేని)len );
+#అయితే_ముగింపు
     }
-    else if( borderType == BORDER_WRAP )
+    లేకపోతే ఒకవేళ( borderType == BORDER_WRAP )
     {
         CV_Assert(len > 0);
-        if( p < 0 || p >= len )
+        ఒకవేళ( p < 0 || p >= len )
         {
             int64_t p64 = p;
             p64 %= (int64_t)len;
-            if( p64 < 0 )
+            ఒకవేళ( p64 < 0 )
                 p64 += len;
-            p = (int)p64;
+            p = (పూర్ణాంకం)p64;
         }
     }
-    else if( borderType == BORDER_CONSTANT )
+    లేకపోతే ఒకవేళ( borderType == BORDER_CONSTANT )
         p = -1;
-    else
+    లేకపోతే
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported border type" );
-    return p;
+    తిరిగి p;
 }
 
-namespace
+నామాకాశ
 {
 
-void copyMakeBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
-                        uchar* dst, size_t dststep, cv::Size dstroi,
-                        int top, int left, int cn, int borderType )
+శూన్య copyMakeBorder_8u( స్థిరరాశి uchar* src, size_t srcstep, cv::కొలత srcroi,
+                        uchar* dst, size_t dststep, cv::కొలత dstroi,
+                        పూర్ణాంకం శిఖరం_2, పూర్ణాంకం ఎడమ, పూర్ణాంకం cn, పూర్ణాంకం borderType )
 {
-    const int isz = (int)sizeof(int);
-    int i, j, k, elemSize = 1;
-    bool intMode = false;
+    స్థిరరాశి పూర్ణాంకం isz = (పూర్ణాంకం)పరిమాణం(పూర్ణాంకం);
+    పూర్ణాంకం i, j, k, elem_కొలత = 1;
+    తార్కిక int_బహుళకం = అబద్ధం;
 
-    if( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
+    ఒకవేళ( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
     {
         cn /= isz;
-        elemSize = isz;
-        intMode = true;
+        elem_కొలత = isz;
+        int_బహుళకం = నిజం;
     }
 
-    cv::AutoBuffer<int> _tab((dstroi.width - srcroi.width)*cn);
-    int* tab = _tab.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    cv::Auto_బఫరు<పూర్ణాంకం> _tab((dstroi.వెడల్పు - srcroi.వెడల్పు)*cn);
+    పూర్ణాంకం* tab = _tab.దత్తాంశం();
+    పూర్ణాంకం కుడి = dstroi.వెడల్పు - srcroi.వెడల్పు - ఎడమ;
+    పూర్ణాంకం bottom = dstroi.ఎత్తు - srcroi.ఎత్తు - శిఖరం_2;
 
-    for( i = 0; i < left; i++ )
+    కొరకు( i = 0; i < ఎడమ; i++ )
     {
-        j = cv::borderInterpolate(i - left, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
+        j = cv::borderInterpolate(i - ఎడమ, srcroi.వెడల్పు, borderType)*cn;
+        కొరకు( k = 0; k < cn; k++ )
             tab[i*cn + k] = j + k;
     }
 
-    for( i = 0; i < right; i++ )
+    కొరకు( i = 0; i < కుడి; i++ )
     {
-        j = cv::borderInterpolate(srcroi.width + i, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
-            tab[(i+left)*cn + k] = j + k;
+        j = cv::borderInterpolate(srcroi.వెడల్పు + i, srcroi.వెడల్పు, borderType)*cn;
+        కొరకు( k = 0; k < cn; k++ )
+            tab[(i+ఎడమ)*cn + k] = j + k;
     }
 
-    srcroi.width *= cn;
-    dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    srcroi.వెడల్పు *= cn;
+    dstroi.వెడల్పు *= cn;
+    ఎడమ *= cn;
+    కుడి *= cn;
 
-    uchar* dstInner = dst + dststep*top + left*elemSize;
+    uchar* dstInner = dst + dststep*శిఖరం_2 + ఎడమ*elem_కొలత;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    కొరకు( i = 0; i < srcroi.ఎత్తు; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
-            memcpy(dstInner, src, srcroi.width*elemSize);
+        ఒకవేళ( dstInner != src )
+            జ్ఞాపకం_నకలు(dstInner, src, srcroi.వెడల్పు*elem_కొలత);
 
-        if( intMode )
+        ఒకవేళ( int_బహుళకం )
         {
-            const int* isrc = (int*)src;
-            int* idstInner = (int*)dstInner;
-            for( j = 0; j < left; j++ )
-                idstInner[j - left] = isrc[tab[j]];
-            for( j = 0; j < right; j++ )
-                idstInner[j + srcroi.width] = isrc[tab[j + left]];
+            స్థిరరాశి పూర్ణాంకం* isrc = (పూర్ణాంకం*)src;
+            పూర్ణాంకం* idstInner = (పూర్ణాంకం*)dstInner;
+            కొరకు( j = 0; j < ఎడమ; j++ )
+                idstInner[j - ఎడమ] = isrc[tab[j]];
+            కొరకు( j = 0; j < కుడి; j++ )
+                idstInner[j + srcroi.వెడల్పు] = isrc[tab[j + ఎడమ]];
         }
-        else
+        లేకపోతే
         {
-            for( j = 0; j < left; j++ )
-                dstInner[j - left] = src[tab[j]];
-            for( j = 0; j < right; j++ )
-                dstInner[j + srcroi.width] = src[tab[j + left]];
+            కొరకు( j = 0; j < ఎడమ; j++ )
+                dstInner[j - ఎడమ] = src[tab[j]];
+            కొరకు( j = 0; j < కుడి; j++ )
+                dstInner[j + srcroi.వెడల్పు] = src[tab[j + ఎడమ]];
         }
     }
 
-    dstroi.width *= elemSize;
+    dstroi.వెడల్పు *= elem_కొలత;
 
-    for( i = 0; i < top; i++ )
+    కొరకు( i = 0; i < శిఖరం_2; i++ )
     {
-        j = cv::borderInterpolate(i - top, srcroi.height, borderType);
-        memcpy(dst + i*dststep, dst + (top+j)*dststep, dstroi.width);
+        j = cv::borderInterpolate(i - శిఖరం_2, srcroi.ఎత్తు, borderType);
+        జ్ఞాపకం_నకలు(dst + i*dststep, dst + (శిఖరం_2+j)*dststep, dstroi.వెడల్పు);
     }
 
-    dst += dststep*top;
-    for( i = 0; i < bottom; i++ )
+    dst += dststep*శిఖరం_2;
+    కొరకు( i = 0; i < bottom; i++ )
     {
-        j = cv::borderInterpolate(i + srcroi.height, srcroi.height, borderType);
-        memcpy(dst + (i + srcroi.height)*dststep, dst + j*dststep, dstroi.width);
+        j = cv::borderInterpolate(i + srcroi.ఎత్తు, srcroi.ఎత్తు, borderType);
+        జ్ఞాపకం_నకలు(dst + (i + srcroi.ఎత్తు)*dststep, dst + j*dststep, dstroi.వెడల్పు);
     }
 }
 
 
-void copyMakeConstBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
-                             uchar* dst, size_t dststep, cv::Size dstroi,
-                             int top, int left, int cn, const uchar* value )
+శూన్య copyMakeConstBorder_8u( స్థిరరాశి uchar* src, size_t srcstep, cv::కొలత srcroi,
+                             uchar* dst, size_t dststep, cv::కొలత dstroi,
+                             పూర్ణాంకం శిఖరం_2, పూర్ణాంకం ఎడమ, పూర్ణాంకం cn, స్థిరరాశి uchar* value )
 {
-    int i, j;
-    cv::AutoBuffer<uchar> _constBuf(dstroi.width*cn);
-    uchar* constBuf = _constBuf.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    పూర్ణాంకం i, j;
+    cv::Auto_బఫరు<uchar> _constBuf(dstroi.వెడల్పు*cn);
+    uchar* constBuf = _constBuf.దత్తాంశం();
+    పూర్ణాంకం కుడి = dstroi.వెడల్పు - srcroi.వెడల్పు - ఎడమ;
+    పూర్ణాంకం bottom = dstroi.ఎత్తు - srcroi.ఎత్తు - శిఖరం_2;
 
-    for( i = 0; i < dstroi.width; i++ )
+    కొరకు( i = 0; i < dstroi.వెడల్పు; i++ )
     {
-        for( j = 0; j < cn; j++ )
+        కొరకు( j = 0; j < cn; j++ )
             constBuf[i*cn + j] = value[j];
     }
 
-    srcroi.width *= cn;
-    dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    srcroi.వెడల్పు *= cn;
+    dstroi.వెడల్పు *= cn;
+    ఎడమ *= cn;
+    కుడి *= cn;
 
-    uchar* dstInner = dst + dststep*top + left;
+    uchar* dstInner = dst + dststep*శిఖరం_2 + ఎడమ;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    కొరకు( i = 0; i < srcroi.ఎత్తు; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
-            memcpy( dstInner, src, srcroi.width );
-        memcpy( dstInner - left, constBuf, left );
-        memcpy( dstInner + srcroi.width, constBuf, right );
+        ఒకవేళ( dstInner != src )
+            జ్ఞాపకం_నకలు( dstInner, src, srcroi.వెడల్పు );
+        జ్ఞాపకం_నకలు( dstInner - ఎడమ, constBuf, ఎడమ );
+        జ్ఞాపకం_నకలు( dstInner + srcroi.వెడల్పు, constBuf, కుడి );
     }
 
-    for( i = 0; i < top; i++ )
-        memcpy(dst + i * dststep, constBuf, dstroi.width);
+    కొరకు( i = 0; i < శిఖరం_2; i++ )
+        జ్ఞాపకం_నకలు(dst + i * dststep, constBuf, dstroi.వెడల్పు);
 
-    dst += (top + srcroi.height) * dststep;
-    for( i = 0; i < bottom; i++ )
-        memcpy(dst + i * dststep, constBuf, dstroi.width);
+    dst += (శిఖరం_2 + srcroi.ఎత్తు) * dststep;
+    కొరకు( i = 0; i < bottom; i++ )
+        జ్ఞాపకం_నకలు(dst + i * dststep, constBuf, dstroi.వెడల్పు);
 }
 
 }
 
-#ifdef HAVE_OPENCL
+#నిర్వచితమైతే HAVE_OPENCL
 
-namespace cv {
+నామాకాశ cv {
 
-static bool ocl_copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                                int left, int right, int borderType, const Scalar& value )
+స్థిర తార్కిక ocl_copyMakeBorder( ఆదానం_Array _src, OutputArray _dst, పూర్ణాంకం శిఖరం_2, పూర్ణాంకం bottom,
+                                పూర్ణాంకం ఎడమ, పూర్ణాంకం కుడి, పూర్ణాంకం borderType, స్థిరరాశి Scalar& value )
 {
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    bool isolated = (borderType & BORDER_ISOLATED) != 0;
+    పూర్ణాంకం type = _src.type(), cn = CV_MAT_CN(type), లోతు = CV_MAT_లోతు(type),
+            అడ్డువరుసలు_చొప్పున_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    తార్కిక isolated = (borderType & BORDER_ISOLATED) != 0;
     borderType &= ~cv::BORDER_ISOLATED;
 
-    if ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
+    ఒకవేళ ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
            borderType == BORDER_WRAP || borderType == BORDER_REFLECT_101) ||
          cn > 4)
-        return false;
+        తిరిగి అబద్ధం;
 
-    const char * const borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
-    int scalarcn = cn == 3 ? 4 : cn;
-    int sctype = CV_MAKETYPE(depth, scalarcn);
+    స్థిరరాశి అక్షరం * స్థిరరాశి borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
+    పూర్ణాంకం scalarcn = cn == 3 ? 4 : cn;
+    పూర్ణాంకం sctype = CV_MAKETYPE(లోతు, scalarcn);
     String buildOptions = format("-D T=%s -D %s -D T1=%s -D cn=%d -D ST=%s -D rowsPerWI=%d",
-                                 ocl::memopTypeToStr(type), borderMap[borderType],
-                                 ocl::memopTypeToStr(depth), cn,
-                                 ocl::memopTypeToStr(sctype), rowsPerWI);
+                                 ocl::memop_Type_గమ్యం_Str(type), borderMap[borderType],
+                                 ocl::memop_Type_గమ్యం_Str(లోతు), cn,
+                                 ocl::memop_Type_గమ్యం_Str(sctype), అడ్డువరుసలు_చొప్పున_WI);
 
     ocl::Kernel k("copyMakeBorder", ocl::core::copymakeborder_oclsrc, buildOptions);
-    if (k.empty())
-        return false;
+    ఒకవేళ (k.empty())
+        తిరిగి అబద్ధం;
 
     UMat src = _src.getUMat();
-    if( src.isSubmatrix() && !isolated )
+    ఒకవేళ( src.isSubmatrix() && !isolated )
     {
-        Size wholeSize;
-        Point ofs;
-        src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        కొలత సంపూర్ణ_కొలత;
+        బిందువు ofs;
+        src.locateROI(సంపూర్ణ_కొలత, ofs);
+        పూర్ణాంకం dtop = std::min(ofs.y, శిఖరం_2);
+        పూర్ణాంకం dbottom = std::min(సంపూర్ణ_కొలత.ఎత్తు - src.అడ్డువరుసలు - ofs.y, bottom);
+        పూర్ణాంకం dleft = std::min(ofs.x, ఎడమ);
+        పూర్ణాంకం dright = std::min(సంపూర్ణ_కొలత.వెడల్పు - src.నిలువుల_సంఖ్య - ofs.x, కుడి);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        శిఖరం_2 -= dtop;
+        ఎడమ -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        కుడి -= dright;
     }
 
-    _dst.create(src.rows + top + bottom, src.cols + left + right, type);
+    _dst.create(src.అడ్డువరుసలు + శిఖరం_2 + bottom, src.నిలువుల_సంఖ్య + ఎడమ + కుడి, type);
     UMat dst = _dst.getUMat();
 
-    if (top == 0 && left == 0 && bottom == 0 && right == 0)
+    ఒకవేళ (శిఖరం_2 == 0 && ఎడమ == 0 && bottom == 0 && కుడి == 0)
     {
-        if(src.u != dst.u || src.step != dst.step)
-            src.copyTo(dst);
-        return true;
+        ఒకవేళ(src.u != dst.u || src.అడుగు != dst.అడుగు)
+            src.copy_గమ్యం(dst);
+        తిరిగి నిజం;
     }
 
-    k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst),
-           top, left, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
+    k.వాదనలు(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst),
+           శిఖరం_2, ఎడమ, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
 
-    size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.నిలువుల_సంఖ్య, ((size_t)dst.అడ్డువరుసలు + అడ్డువరుసలు_చొప్పున_WI - 1) / అడ్డువరుసలు_చొప్పున_WI };
+    తిరిగి k.నిరంతరం(2, globalsize, ఖాళీ, అబద్ధం);
 }
 
 }
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_IPP
-namespace cv {
+#నిర్వచితమైతే HAVE_IPP
+నామాకాశ cv {
 
-static bool ipp_copyMakeBorder( Mat &_src, Mat &_dst, int top, int bottom,
-                                int left, int right, int _borderType, const Scalar& value )
+స్థిర తార్కిక ipp_copyMakeBorder( Mat &_src, Mat &_dst, పూర్ణాంకం శిఖరం_2, పూర్ణాంకం bottom,
+                                పూర్ణాంకం ఎడమ, పూర్ణాంకం కుడి, పూర్ణాంకం _borderType, స్థిరరాశి Scalar& value )
 {
-#if defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
+#ఒకవేళ defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
     CV_INSTRUMENT_REGION_IPP();
 
-    ::ipp::IwiBorderSize borderSize(left, top, right, bottom);
-    ::ipp::IwiSize       size(_src.cols, _src.rows);
-    IppDataType          dataType   = ippiGetDataType(_src.depth());
+    ::ipp::Iwi_Border_కొలత border_కొలత(ఎడమ, శిఖరం_2, కుడి, bottom);
+    ::ipp::Iwi_కొలత       size(_src.నిలువుల_సంఖ్య, _src.అడ్డువరుసలు);
+    Ipp_దత్తాంశం_Type          దత్తాంశం_Type   = ippi_Get_దత్తాంశం_Type(_src.లోతు());
     IppiBorderType       borderType = ippiGetBorderType(_borderType);
-    if((int)borderType == -1)
-        return false;
+    ఒకవేళ((పూర్ణాంకం)borderType == -1)
+        తిరిగి అబద్ధం;
 
-    if(_src.dims > 2)
-        return false;
+    ఒకవేళ(_src.dims > 2)
+        తిరిగి అబద్ధం;
 
-    Rect dstRect(borderSize.left, borderSize.top,
-        _dst.cols - borderSize.right - borderSize.left,
-        _dst.rows - borderSize.bottom - borderSize.top);
+    Rect dstRect(border_కొలత.ఎడమ, border_కొలత.శిఖరం_2,
+        _dst.నిలువుల_సంఖ్య - border_కొలత.కుడి - border_కొలత.ఎడమ,
+        _dst.అడ్డువరుసలు - border_కొలత.bottom - border_కొలత.శిఖరం_2);
     Mat  subDst = Mat(_dst, dstRect);
     Mat *pSrc   = &_src;
 
-    return CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->step, subDst.ptr(), subDst.step, size, dataType, _src.channels(), borderSize, borderType, &value[0]) >= 0;
-#else
-    CV_UNUSED(_src); CV_UNUSED(_dst); CV_UNUSED(top); CV_UNUSED(bottom); CV_UNUSED(left); CV_UNUSED(right);
-    CV_UNUSED(_borderType); CV_UNUSED(value);
-    return false;
-#endif
+    తిరిగి CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->అడుగు, subDst.ptr(), subDst.అడుగు, size, దత్తాంశం_Type, _src.channels(), border_కొలత, borderType, &value[0]) >= 0;
+#లేకపోతే
+    CV_వాడని(_src); CV_వాడని(_dst); CV_వాడని(శిఖరం_2); CV_వాడని(bottom); CV_వాడని(ఎడమ); CV_వాడని(కుడి);
+    CV_వాడని(_borderType); CV_వాడని(value);
+    తిరిగి అబద్ధం;
+#అయితే_ముగింపు
 }
 }
-#endif
+#అయితే_ముగింపు
 
-void cv::copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                         int left, int right, int borderType, const Scalar& value )
+శూన్య cv::copyMakeBorder( ఆదానం_Array _src, OutputArray _dst, పూర్ణాంకం శిఖరం_2, పూర్ణాంకం bottom,
+                         పూర్ణాంకం ఎడమ, పూర్ణాంకం కుడి, పూర్ణాంకం borderType, స్థిరరాశి Scalar& value )
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert( top >= 0 && bottom >= 0 && left >= 0 && right >= 0 && _src.dims() <= 2 );
+    CV_Assert( శిఖరం_2 >= 0 && bottom >= 0 && ఎడమ >= 0 && కుడి >= 0 && _src.dims() <= 2 );
     CV_Assert( !_src.empty() );
 
     Mat src = _src.getMat();
-    CV_Assert( (int64_t)src.rows + top + bottom <= INT_MAX );
-    CV_Assert( (int64_t)src.cols + left + right <= INT_MAX );
+    CV_Assert( (int64_t)src.అడ్డువరుసలు + శిఖరం_2 + bottom <= గరిష్ఠ_పూర్ణాంకం );
+    CV_Assert( (int64_t)src.నిలువుల_సంఖ్య + ఎడమ + కుడి <= గరిష్ఠ_పూర్ణాంకం );
 
-    CV_OCL_RUN(_dst.isUMat(),
-               ocl_copyMakeBorder(_src, _dst, top, bottom, left, right, borderType, value))
-    int type = src.type();
+    CV_OCL_నిరంతరం(_dst.isUMat(),
+               ocl_copyMakeBorder(_src, _dst, శిఖరం_2, bottom, ఎడమ, కుడి, borderType, value))
+    పూర్ణాంకం type = src.type();
 
-    if( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
+    ఒకవేళ( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
     {
-        Size wholeSize;
-        Point ofs;
-        src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        కొలత సంపూర్ణ_కొలత;
+        బిందువు ofs;
+        src.locateROI(సంపూర్ణ_కొలత, ofs);
+        పూర్ణాంకం dtop = std::min(ofs.y, శిఖరం_2);
+        పూర్ణాంకం dbottom = std::min(సంపూర్ణ_కొలత.ఎత్తు - src.అడ్డువరుసలు - ofs.y, bottom);
+        పూర్ణాంకం dleft = std::min(ofs.x, ఎడమ);
+        పూర్ణాంకం dright = std::min(సంపూర్ణ_కొలత.వెడల్పు - src.నిలువుల_సంఖ్య - ofs.x, కుడి);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        శిఖరం_2 -= dtop;
+        ఎడమ -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        కుడి -= dright;
     }
 
-    _dst.create( src.rows + top + bottom, src.cols + left + right, type );
+    _dst.create( src.అడ్డువరుసలు + శిఖరం_2 + bottom, src.నిలువుల_సంఖ్య + ఎడమ + కుడి, type );
     Mat dst = _dst.getMat();
 
-    if(top == 0 && left == 0 && bottom == 0 && right == 0)
+    ఒకవేళ(శిఖరం_2 == 0 && ఎడమ == 0 && bottom == 0 && కుడి == 0)
     {
-        if(src.data != dst.data || src.step != dst.step)
-            src.copyTo(dst);
-        return;
+        ఒకవేళ(src.దత్తాంశం != dst.దత్తాంశం || src.అడుగు != dst.అడుగు)
+            src.copy_గమ్యం(dst);
+        తిరిగి;
     }
 
     borderType &= ~BORDER_ISOLATED;
 
-    CV_IPP_RUN_FAST(ipp_copyMakeBorder(src, dst, top, bottom, left, right, borderType, value))
+    CV_IPP_నిరంతరం_FAST(ipp_copyMakeBorder(src, dst, శిఖరం_2, bottom, ఎడమ, కుడి, borderType, value))
 
-    if( borderType != BORDER_CONSTANT )
-        copyMakeBorder_8u( src.ptr(), src.step, src.size(),
-                           dst.ptr(), dst.step, dst.size(),
-                           top, left, (int)src.elemSize(), borderType );
-    else
+    ఒకవేళ( borderType != BORDER_CONSTANT )
+        copyMakeBorder_8u( src.ptr(), src.అడుగు, src.size(),
+                           dst.ptr(), dst.అడుగు, dst.size(),
+                           శిఖరం_2, ఎడమ, (పూర్ణాంకం)src.elem_కొలత(), borderType );
+    లేకపోతే
     {
-        int cn = src.channels(), cn1 = cn;
-        AutoBuffer<double> buf(cn);
-        if( cn > 4 )
+        పూర్ణాంకం cn = src.channels(), cn1 = cn;
+        Auto_బఫరు<ద్విగుణ> buf(cn);
+        ఒకవేళ( cn > 4 )
         {
             CV_Assert( value[0] == value[1] && value[0] == value[2] && value[0] == value[3] );
             cn1 = 1;
         }
-        scalarToRawData(value, buf.data(), CV_MAKETYPE(src.depth(), cn1), cn);
-        copyMakeConstBorder_8u( src.ptr(), src.step, src.size(),
-                                dst.ptr(), dst.step, dst.size(),
-                                top, left, (int)src.elemSize(), (uchar*)buf.data() );
+        scalar_గమ్యం_Raw_దత్తాంశం(value, buf.దత్తాంశం(), CV_MAKETYPE(src.లోతు(), cn1), cn);
+        copyMakeConstBorder_8u( src.ptr(), src.అడుగు, src.size(),
+                                dst.ptr(), dst.అడుగు, dst.size(),
+                                శిఖరం_2, ఎడమ, (పూర్ణాంకం)src.elem_కొలత(), (uchar*)buf.దత్తాంశం() );
     }
 }
 /* End of file. */

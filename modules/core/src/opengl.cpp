@@ -40,129 +40,129 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
-#if defined (__APPLE__) || defined(MACOSX)
-   #define GL_SHARING_EXTENSION "cl_APPLE_gl_sharing"
-#else
-   #define GL_SHARING_EXTENSION "cl_khr_gl_sharing"
-#endif
+#ఒకవేళ defined (__APPLE__) || defined(MACOSX)
+   #నిర్వచించు GL_SHARING_EXTENSION "cl_APPLE_gl_sharing"
+#లేకపోతే
+   #నిర్వచించు GL_SHARING_EXTENSION "cl_khr_gl_sharing"
+#అయితే_ముగింపు
 
-#ifdef HAVE_OPENGL
+#నిర్వచితమైతే HAVE_OPENGL
 #  include "gl_core_3_1.hpp"
 #  ifdef HAVE_CUDA
-#    if (defined(__arm__) || defined(__aarch64__)) \
+#    ఒకవేళ (defined(__arm__) || defined(__aarch64__)) \
          && !defined(OPENCV_SKIP_CUDA_OPENGL_ARM_WORKAROUND)
 #      include <GL/gl.h>
-#      ifndef GL_VERSION
-#        define GL_VERSION 0x1F02
+#      ifndef GL_సంస్కరణ
+#        define GL_సంస్కరణ 0x1F02
 #      endif
 #    endif
 #    include <cuda_gl_interop.h>
 #  endif
-#else // HAVE_OPENGL
+#లేకపోతే // HAVE_OPENGL
 #  define NO_OPENGL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenGL support")
-#endif // HAVE_OPENGL
+#అయితే_ముగింపు // HAVE_OPENGL
 
-using namespace cv;
-using namespace cv::cuda;
+ఉపయోగించి నామాకాశ cv;
+ఉపయోగించి నామాకాశ cv::cuda;
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4702)  // unreachable code
-#endif
+#ఒకవేళ defined(_MSC_VER)
+#సూచన warning(disable : 4702)  // unreachable code
+#అయితే_ముగింపు
 
-namespace
+నామాకాశ
 {
-#ifndef HAVE_OPENGL
-inline static CV_NORETURN void throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
-#elif defined _DEBUG
-inline static bool checkError(const char* file, const int line, const char* func = 0)
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+అంతఃవరుస స్థిర CV_NORETURN శూన్య throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
+#లేదావేళ defined _DEBUG
+అంతఃవరుస స్థిర తార్కిక checkError(స్థిరరాశి అక్షరం* file, స్థిరరాశి పూర్ణాంకం పంక్తి, స్థిరరాశి అక్షరం* func = 0)
 {
     GLenum err = gl::GetError();
-    if (err != gl::NO_ERROR_)
+    ఒకవేళ (err != gl::NO_ERROR_)
     {
-        const char* msg;
-        switch (err)
+        స్థిరరాశి అక్షరం* సందేశం;
+        ఎంపిక (err)
         {
-        case gl::INVALID_ENUM:
-            msg = "An unacceptable value is specified for an enumerated argument";
-            break;
-        case gl::INVALID_VALUE:
-            msg = "A numeric argument is out of range";
-            break;
-        case gl::INVALID_OPERATION:
-            msg = "The specified operation is not allowed in the current state";
-            break;
-        case gl::OUT_OF_MEMORY:
-            msg = "There is not enough memory left to execute the command";
-            break;
-        default:
-            msg = "Unknown error";
+        స్థితి gl::INVALID_ENUM:
+            సందేశం = "An unacceptable value is specified for an enumerated argument";
+            ఆపు;
+        స్థితి gl::INVALID_విలువ:
+            సందేశం = "A numeric argument is out of range";
+            ఆపు;
+        స్థితి gl::INVALID_OPERATION:
+            సందేశం = "The specified operation is not allowed in the current state";
+            ఆపు;
+        స్థితి gl::బహిర్గతం_యొక్క_జ్ఞాపకం:
+            సందేశం = "There is not enough memory left to execute the command";
+            ఆపు;
+        అప్రమేయ:
+            సందేశం = "Unknown error";
         };
-        cv::error(Error::OpenGlApiCallError, func, msg, file, line);
+        cv::error(Error::OpenGlApiCallError, func, సందేశం, file, పంక్తి);
     }
-    return true;
+    తిరిగి నిజం;
 }
-#endif // HAVE_OPENGL
+#అయితే_ముగింపు // HAVE_OPENGL
 } // namespace
 
-#define CV_CheckGlError() CV_DbgAssert( (checkError(__FILE__, __LINE__, CV_Func)) )
+#నిర్వచించు CV_CheckGlError() CV_DbgAssert( (checkError(__FILE__, __LINE__, CV_Func)) )
 
-#ifdef HAVE_OPENGL
-namespace
+#నిర్వచితమైతే HAVE_OPENGL
+నామాకాశ
 {
-    const GLenum gl_types[] = { gl::UNSIGNED_BYTE, gl::BYTE, gl::UNSIGNED_SHORT, gl::SHORT, gl::INT, gl::FLOAT, gl::DOUBLE };
+    స్థిరరాశి GLenum gl_types[] = { gl::UNSIGNED_BYTE, gl::BYTE, gl::UNSIGNED_SHORT, gl::SHORT, gl::INT, gl::FLOAT, gl::DOUBLE };
 }
-#endif
+#అయితే_ముగింపు
 
 ////////////////////////////////////////////////////////////////////////
 // setGlDevice
 
-void cv::cuda::setGlDevice(int device)
+శూన్య cv::cuda::సమితి_Gl_Device(పూర్ణాంకం device)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(device);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(device);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(device);
+#లేకపోతే
+    #నిర్వచితం_కాకపోతే HAVE_CUDA
+        CV_వాడని(device);
         throw_no_cuda();
-    #else
-        cudaSafeCall( cudaGLSetGLDevice(device) );
-    #endif
-#endif
+    #లేకపోతే
+        cuda_సురక్షిత_Call( cudaGLSetGLDevice(device) );
+    #అయితే_ముగింపు
+#అయితే_ముగింపు
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CudaResource
 
-#if defined(HAVE_OPENGL) && defined(HAVE_CUDA)
+#ఒకవేళ defined(HAVE_OPENGL) && defined(HAVE_CUDA)
 
-namespace
+నామాకాశ
 {
-    class CudaResource
+    తరగతి CudaResource
     {
-    public:
+    బహిరంగ:
         CudaResource();
         ~CudaResource();
 
-        void registerBuffer(GLuint buffer);
-        void release();
+        శూన్య రిజిస్టరు_బఫరు(GLuint బఫరు);
+        శూన్య release();
 
-        void copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
-        void copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0);
+        శూన్య copyFrom(స్థిరరాశి శూన్య* src, size_t spitch, size_t వెడల్పు, size_t ఎత్తు, cuda_ప్రవాహం_t stream = 0);
+        శూన్య copy_గమ్యం(శూన్య* dst, size_t dpitch, size_t వెడల్పు, size_t ఎత్తు, cuda_ప్రవాహం_t stream = 0);
 
-        void* map(cudaStream_t stream = 0);
-        void unmap(cudaStream_t stream = 0);
+        శూన్య* map(cuda_ప్రవాహం_t stream = 0);
+        శూన్య unmap(cuda_ప్రవాహం_t stream = 0);
 
-    private:
+    అంతరంగ:
         cudaGraphicsResource_t resource_;
-        GLuint buffer_;
+        GLuint బఫరు_3;
 
-        class GraphicsMapHolder;
+        తరగతి GraphicsMapHolder;
     };
 
-    CudaResource::CudaResource() : resource_(0), buffer_(0)
+    CudaResource::CudaResource() : resource_(0), బఫరు_3(0)
     {
     }
 
@@ -171,115 +171,115 @@ namespace
         release();
     }
 
-    void CudaResource::registerBuffer(GLuint buffer)
+    శూన్య CudaResource::రిజిస్టరు_బఫరు(GLuint బఫరు)
     {
-        CV_DbgAssert( buffer != 0 );
+        CV_DbgAssert( బఫరు != 0 );
 
-        if (buffer_ == buffer)
-            return;
+        ఒకవేళ (బఫరు_3 == బఫరు)
+            తిరిగి;
 
         cudaGraphicsResource_t resource;
-        cudaSafeCall( cudaGraphicsGLRegisterBuffer(&resource, buffer, cudaGraphicsMapFlagsNone) );
+        cuda_సురక్షిత_Call( cuda_Graphics_GLRegister_బఫరు(&resource, బఫరు, cudaGraphicsMapFlagsNone) );
 
         release();
 
         resource_ = resource;
-        buffer_ = buffer;
+        బఫరు_3 = బఫరు;
     }
 
-    void CudaResource::release()
+    శూన్య CudaResource::release()
     {
-        if (resource_)
+        ఒకవేళ (resource_)
             cudaGraphicsUnregisterResource(resource_);
 
         resource_ = 0;
-        buffer_ = 0;
+        బఫరు_3 = 0;
     }
 
-    class CudaResource::GraphicsMapHolder
+    తరగతి CudaResource::GraphicsMapHolder
     {
-    public:
-        GraphicsMapHolder(cudaGraphicsResource_t* resource, cudaStream_t stream);
+    బహిరంగ:
+        GraphicsMapHolder(cudaGraphicsResource_t* resource, cuda_ప్రవాహం_t stream);
         ~GraphicsMapHolder();
 
-        void reset();
+        శూన్య reset();
 
-    private:
+    అంతరంగ:
         cudaGraphicsResource_t* resource_;
-        cudaStream_t stream_;
+        cuda_ప్రవాహం_t ప్రవాహం_3;
     };
 
-    CudaResource::GraphicsMapHolder::GraphicsMapHolder(cudaGraphicsResource_t* resource, cudaStream_t stream) : resource_(resource), stream_(stream)
+    CudaResource::GraphicsMapHolder::GraphicsMapHolder(cudaGraphicsResource_t* resource, cuda_ప్రవాహం_t stream) : resource_(resource), ప్రవాహం_3(stream)
     {
-        if (resource_)
-            cudaSafeCall( cudaGraphicsMapResources(1, resource_, stream_) );
+        ఒకవేళ (resource_)
+            cuda_సురక్షిత_Call( cudaGraphicsMapResources(1, resource_, ప్రవాహం_3) );
     }
 
     CudaResource::GraphicsMapHolder::~GraphicsMapHolder()
     {
-        if (resource_)
-            cudaGraphicsUnmapResources(1, resource_, stream_);
+        ఒకవేళ (resource_)
+            cudaGraphicsUnmapResources(1, resource_, ప్రవాహం_3);
     }
 
-    void CudaResource::GraphicsMapHolder::reset()
+    శూన్య CudaResource::GraphicsMapHolder::reset()
     {
         resource_ = 0;
     }
 
-    void CudaResource::copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
+    శూన్య CudaResource::copyFrom(స్థిరరాశి శూన్య* src, size_t spitch, size_t వెడల్పు, size_t ఎత్తు, cuda_ప్రవాహం_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
-        CV_UNUSED(h);
+        CV_వాడని(h);
 
-        void* dst;
+        శూన్య* dst;
         size_t size;
-        cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&dst, &size, resource_) );
+        cuda_సురక్షిత_Call( cuda_Graphics_Resource_Get_Mapped_సూచిక(&dst, &size, resource_) );
 
-        CV_DbgAssert( width * height == size );
+        CV_DbgAssert( వెడల్పు * ఎత్తు == size );
 
-        if (stream == 0)
-            cudaSafeCall( cudaMemcpy2D(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice) );
-        else
-            cudaSafeCall( cudaMemcpy2DAsync(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice, stream) );
+        ఒకవేళ (stream == 0)
+            cuda_సురక్షిత_Call( cudaMemcpy2D(dst, వెడల్పు, src, spitch, వెడల్పు, ఎత్తు, cuda_Memcpy_Device_గమ్యం_Device) );
+        లేకపోతే
+            cuda_సురక్షిత_Call( cudaMemcpy2DAsync(dst, వెడల్పు, src, spitch, వెడల్పు, ఎత్తు, cuda_Memcpy_Device_గమ్యం_Device, stream) );
     }
 
-    void CudaResource::copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream)
+    శూన్య CudaResource::copy_గమ్యం(శూన్య* dst, size_t dpitch, size_t వెడల్పు, size_t ఎత్తు, cuda_ప్రవాహం_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
-        CV_UNUSED(h);
+        CV_వాడని(h);
 
-        void* src;
+        శూన్య* src;
         size_t size;
-        cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&src, &size, resource_) );
+        cuda_సురక్షిత_Call( cuda_Graphics_Resource_Get_Mapped_సూచిక(&src, &size, resource_) );
 
-        CV_DbgAssert( width * height == size );
+        CV_DbgAssert( వెడల్పు * ఎత్తు == size );
 
-        if (stream == 0)
-            cudaSafeCall( cudaMemcpy2D(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice) );
-        else
-            cudaSafeCall( cudaMemcpy2DAsync(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice, stream) );
+        ఒకవేళ (stream == 0)
+            cuda_సురక్షిత_Call( cudaMemcpy2D(dst, dpitch, src, వెడల్పు, వెడల్పు, ఎత్తు, cuda_Memcpy_Device_గమ్యం_Device) );
+        లేకపోతే
+            cuda_సురక్షిత_Call( cudaMemcpy2DAsync(dst, dpitch, src, వెడల్పు, వెడల్పు, ఎత్తు, cuda_Memcpy_Device_గమ్యం_Device, stream) );
     }
 
-    void* CudaResource::map(cudaStream_t stream)
+    శూన్య* CudaResource::map(cuda_ప్రవాహం_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
 
-        void* ptr;
+        శూన్య* ptr;
         size_t size;
-        cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&ptr, &size, resource_) );
+        cuda_సురక్షిత_Call( cuda_Graphics_Resource_Get_Mapped_సూచిక(&ptr, &size, resource_) );
 
         h.reset();
 
-        return ptr;
+        తిరిగి ptr;
     }
 
-    void CudaResource::unmap(cudaStream_t stream)
+    శూన్య CudaResource::unmap(cuda_ప్రవాహం_t stream)
     {
         CV_Assert( resource_ != 0 );
 
@@ -287,619 +287,619 @@ namespace
     }
 }
 
-#endif
+#అయితే_ముగింపు
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Buffer
 
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
 
-class cv::ogl::Buffer::Impl
+తరగతి cv::ogl::బఫరు_2::Impl
 {
 };
 
-#else
+#లేకపోతే
 
-class cv::ogl::Buffer::Impl
+తరగతి cv::ogl::బఫరు_2::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+బహిరంగ:
+    స్థిర స్థిరరాశి Ptr<Impl>& empty();
 
-    Impl(GLuint bufId, bool autoRelease);
-    Impl(GLsizeiptr size, const GLvoid* data, GLenum target, bool autoRelease);
+    Impl(GLuint bufId, తార్కిక autoRelease);
+    Impl(GLsizeiptr size, స్థిరరాశి GLvoid* దత్తాంశం, GLenum target, తార్కిక autoRelease);
     ~Impl();
 
-    void bind(GLenum target) const;
+    శూన్య bind(GLenum target) స్థిరరాశి;
 
-    void copyFrom(GLuint srcBuf, GLsizeiptr size);
+    శూన్య copyFrom(GLuint srcBuf, GLsizeiptr size);
 
-    void copyFrom(GLsizeiptr size, const GLvoid* data);
-    void copyTo(GLsizeiptr size, GLvoid* data) const;
+    శూన్య copyFrom(GLsizeiptr size, స్థిరరాశి GLvoid* దత్తాంశం);
+    శూన్య copy_గమ్యం(GLsizeiptr size, GLvoid* దత్తాంశం) స్థిరరాశి;
 
-    void resize(GLsizeiptr size, GLenum target);
+    శూన్య resize(GLsizeiptr size, GLenum target);
 
-    void* mapHost(GLenum access);
-    void unmapHost();
+    శూన్య* mapHost(GLenum access);
+    శూన్య unmapHost();
 
-#ifdef HAVE_CUDA
-    void copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
-    void copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0) const;
+#నిర్వచితమైతే HAVE_CUDA
+    శూన్య copyFrom(స్థిరరాశి శూన్య* src, size_t spitch, size_t వెడల్పు, size_t ఎత్తు, cuda_ప్రవాహం_t stream = 0);
+    శూన్య copy_గమ్యం(శూన్య* dst, size_t dpitch, size_t వెడల్పు, size_t ఎత్తు, cuda_ప్రవాహం_t stream = 0) స్థిరరాశి;
 
-    void* mapDevice(cudaStream_t stream = 0);
-    void unmapDevice(cudaStream_t stream = 0);
-#endif
+    శూన్య* mapDevice(cuda_ప్రవాహం_t stream = 0);
+    శూన్య unmapDevice(cuda_ప్రవాహం_t stream = 0);
+#అయితే_ముగింపు
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    శూన్య సమితి_Auto_Release(తార్కిక flag) { autoRelease_ = flag; }
 
-    GLuint bufId() const { return bufId_; }
+    GLuint bufId() స్థిరరాశి { తిరిగి bufId_; }
 
-private:
+అంతరంగ:
     Impl();
 
     GLuint bufId_;
-    bool autoRelease_;
+    తార్కిక autoRelease_;
 
-#ifdef HAVE_CUDA
-    mutable CudaResource cudaResource_;
-#endif
+#నిర్వచితమైతే HAVE_CUDA
+    మార్చదగిన CudaResource cudaResource_;
+#అయితే_ముగింపు
 };
 
-const Ptr<cv::ogl::Buffer::Impl>& cv::ogl::Buffer::Impl::empty()
+స్థిరరాశి Ptr<cv::ogl::బఫరు_2::Impl>& cv::ogl::బఫరు_2::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    స్థిర Ptr<Impl> p(కొత్త Impl);
+    తిరిగి p;
 }
 
-cv::ogl::Buffer::Impl::Impl() : bufId_(0), autoRelease_(false)
+cv::ogl::బఫరు_2::Impl::Impl() : bufId_(0), autoRelease_(అబద్ధం)
 {
 }
 
-cv::ogl::Buffer::Impl::Impl(GLuint abufId, bool autoRelease) : bufId_(abufId), autoRelease_(autoRelease)
+cv::ogl::బఫరు_2::Impl::Impl(GLuint abufId, తార్కిక autoRelease) : bufId_(abufId), autoRelease_(autoRelease)
 {
-    CV_Assert( gl::IsBuffer(abufId) == gl::TRUE_ );
+    CV_Assert( gl::Is_బఫరు(abufId) == gl::TRUE_ );
 }
 
-cv::ogl::Buffer::Impl::Impl(GLsizeiptr size, const GLvoid* data, GLenum target, bool autoRelease) : bufId_(0), autoRelease_(autoRelease)
+cv::ogl::బఫరు_2::Impl::Impl(GLsizeiptr size, స్థిరరాశి GLvoid* దత్తాంశం, GLenum target, తార్కిక autoRelease) : bufId_(0), autoRelease_(autoRelease)
 {
     gl::GenBuffers(1, &bufId_);
     CV_CheckGlError();
 
     CV_Assert( bufId_ != 0 );
 
-    gl::BindBuffer(target, bufId_);
+    gl::Bind_బఫరు(target, bufId_);
     CV_CheckGlError();
 
-    gl::BufferData(target, size, data, gl::DYNAMIC_DRAW);
+    gl::బఫరు_దత్తాంశం(target, size, దత్తాంశం, gl::DYNAMIC_DRAW);
     CV_CheckGlError();
 
-    gl::BindBuffer(target, 0);
+    gl::Bind_బఫరు(target, 0);
     CV_CheckGlError();
 }
 
-cv::ogl::Buffer::Impl::~Impl()
+cv::ogl::బఫరు_2::Impl::~Impl()
 {
-    if (autoRelease_ && bufId_)
+    ఒకవేళ (autoRelease_ && bufId_)
         gl::DeleteBuffers(1, &bufId_);
 }
 
-void cv::ogl::Buffer::Impl::bind(GLenum target) const
+శూన్య cv::ogl::బఫరు_2::Impl::bind(GLenum target) స్థిరరాశి
 {
-    gl::BindBuffer(target, bufId_);
+    gl::Bind_బఫరు(target, bufId_);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::copyFrom(GLuint srcBuf, GLsizeiptr size)
+శూన్య cv::ogl::బఫరు_2::Impl::copyFrom(GLuint srcBuf, GLsizeiptr size)
 {
-    gl::BindBuffer(gl::COPY_WRITE_BUFFER, bufId_);
+    gl::Bind_బఫరు(gl::COPY_WRITE_బఫరు, bufId_);
     CV_CheckGlError();
 
-    gl::BindBuffer(gl::COPY_READ_BUFFER, srcBuf);
+    gl::Bind_బఫరు(gl::COPY_READ_బఫరు, srcBuf);
     CV_CheckGlError();
 
-    gl::CopyBufferSubData(gl::COPY_READ_BUFFER, gl::COPY_WRITE_BUFFER, 0, 0, size);
+    gl::Copy_బఫరు_Sub_దత్తాంశం(gl::COPY_READ_బఫరు, gl::COPY_WRITE_బఫరు, 0, 0, size);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::copyFrom(GLsizeiptr size, const GLvoid* data)
+శూన్య cv::ogl::బఫరు_2::Impl::copyFrom(GLsizeiptr size, స్థిరరాశి GLvoid* దత్తాంశం)
 {
-    gl::BindBuffer(gl::COPY_WRITE_BUFFER, bufId_);
+    gl::Bind_బఫరు(gl::COPY_WRITE_బఫరు, bufId_);
     CV_CheckGlError();
 
-    gl::BufferSubData(gl::COPY_WRITE_BUFFER, 0, size, data);
+    gl::బఫరు_Sub_దత్తాంశం(gl::COPY_WRITE_బఫరు, 0, size, దత్తాంశం);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::resize(GLsizeiptr size, GLenum target)
+శూన్య cv::ogl::బఫరు_2::Impl::resize(GLsizeiptr size, GLenum target)
 {
-    gl::BindBuffer(target, bufId_);
+    gl::Bind_బఫరు(target, bufId_);
     CV_CheckGlError();
 
     // keep the same buffer id so bound vertex arrays stay valid
-    gl::BufferData(target, size, 0, gl::DYNAMIC_DRAW);
+    gl::బఫరు_దత్తాంశం(target, size, 0, gl::DYNAMIC_DRAW);
     CV_CheckGlError();
 
-    gl::BindBuffer(target, 0);
-    CV_CheckGlError();
-}
-
-void cv::ogl::Buffer::Impl::copyTo(GLsizeiptr size, GLvoid* data) const
-{
-    gl::BindBuffer(gl::COPY_READ_BUFFER, bufId_);
-    CV_CheckGlError();
-
-    gl::GetBufferSubData(gl::COPY_READ_BUFFER, 0, size, data);
+    gl::Bind_బఫరు(target, 0);
     CV_CheckGlError();
 }
 
-void* cv::ogl::Buffer::Impl::mapHost(GLenum access)
+శూన్య cv::ogl::బఫరు_2::Impl::copy_గమ్యం(GLsizeiptr size, GLvoid* దత్తాంశం) స్థిరరాశి
 {
-    gl::BindBuffer(gl::COPY_READ_BUFFER, bufId_);
+    gl::Bind_బఫరు(gl::COPY_READ_బఫరు, bufId_);
     CV_CheckGlError();
 
-    GLvoid* data = gl::MapBuffer(gl::COPY_READ_BUFFER, access);
+    gl::Get_బఫరు_Sub_దత్తాంశం(gl::COPY_READ_బఫరు, 0, size, దత్తాంశం);
+    CV_CheckGlError();
+}
+
+శూన్య* cv::ogl::బఫరు_2::Impl::mapHost(GLenum access)
+{
+    gl::Bind_బఫరు(gl::COPY_READ_బఫరు, bufId_);
     CV_CheckGlError();
 
-    return data;
+    GLvoid* దత్తాంశం = gl::Map_బఫరు(gl::COPY_READ_బఫరు, access);
+    CV_CheckGlError();
+
+    తిరిగి దత్తాంశం;
 }
 
-void cv::ogl::Buffer::Impl::unmapHost()
+శూన్య cv::ogl::బఫరు_2::Impl::unmapHost()
 {
-    gl::UnmapBuffer(gl::COPY_READ_BUFFER);
+    gl::Unmap_బఫరు(gl::COPY_READ_బఫరు);
 }
 
-#ifdef HAVE_CUDA
+#నిర్వచితమైతే HAVE_CUDA
 
-void cv::ogl::Buffer::Impl::copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
+శూన్య cv::ogl::బఫరు_2::Impl::copyFrom(స్థిరరాశి శూన్య* src, size_t spitch, size_t వెడల్పు, size_t ఎత్తు, cuda_ప్రవాహం_t stream)
 {
-    cudaResource_.registerBuffer(bufId_);
-    cudaResource_.copyFrom(src, spitch, width, height, stream);
+    cudaResource_.రిజిస్టరు_బఫరు(bufId_);
+    cudaResource_.copyFrom(src, spitch, వెడల్పు, ఎత్తు, stream);
 }
 
-void cv::ogl::Buffer::Impl::copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream) const
+శూన్య cv::ogl::బఫరు_2::Impl::copy_గమ్యం(శూన్య* dst, size_t dpitch, size_t వెడల్పు, size_t ఎత్తు, cuda_ప్రవాహం_t stream) స్థిరరాశి
 {
-    cudaResource_.registerBuffer(bufId_);
-    cudaResource_.copyTo(dst, dpitch, width, height, stream);
+    cudaResource_.రిజిస్టరు_బఫరు(bufId_);
+    cudaResource_.copy_గమ్యం(dst, dpitch, వెడల్పు, ఎత్తు, stream);
 }
 
-void* cv::ogl::Buffer::Impl::mapDevice(cudaStream_t stream)
+శూన్య* cv::ogl::బఫరు_2::Impl::mapDevice(cuda_ప్రవాహం_t stream)
 {
-    cudaResource_.registerBuffer(bufId_);
-    return cudaResource_.map(stream);
+    cudaResource_.రిజిస్టరు_బఫరు(bufId_);
+    తిరిగి cudaResource_.map(stream);
 }
 
-void cv::ogl::Buffer::Impl::unmapDevice(cudaStream_t stream)
+శూన్య cv::ogl::బఫరు_2::Impl::unmapDevice(cuda_ప్రవాహం_t stream)
 {
     cudaResource_.unmap(stream);
 }
 
-#endif // HAVE_CUDA
+#అయితే_ముగింపు // HAVE_CUDA
 
-#endif // HAVE_OPENGL
+#అయితే_ముగింపు // HAVE_OPENGL
 
-cv::ogl::Buffer::Buffer() : rows_(0), cols_(0), type_(0)
+cv::ogl::బఫరు_2::బఫరు_2() : అడ్డువరుసలు_2(0), నిలువుల_సంఖ్య_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_ = Impl::empty();
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::Buffer::Buffer(int arows, int acols, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::బఫరు_2::బఫరు_2(పూర్ణాంకం arows, పూర్ణాంకం acols, పూర్ణాంకం atype, గుర్తులేని పూర్ణాంకం abufId, తార్కిక autoRelease) : అడ్డువరుసలు_2(0), నిలువుల_సంఖ్య_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(atype);
-    CV_UNUSED(abufId);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arows);
+    CV_వాడని(acols);
+    CV_వాడని(atype);
+    CV_వాడని(abufId);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(abufId, autoRelease));
-    rows_ = arows;
-    cols_ = acols;
+#లేకపోతే
+    impl_.reset(కొత్త Impl(abufId, autoRelease));
+    అడ్డువరుసలు_2 = arows;
+    నిలువుల_సంఖ్య_2 = acols;
     type_ = atype;
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::Buffer::Buffer(Size asize, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::బఫరు_2::బఫరు_2(కొలత asize, పూర్ణాంకం atype, గుర్తులేని పూర్ణాంకం abufId, తార్కిక autoRelease) : అడ్డువరుసలు_2(0), నిలువుల_సంఖ్య_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(asize);
-    CV_UNUSED(atype);
-    CV_UNUSED(abufId);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(asize);
+    CV_వాడని(atype);
+    CV_వాడని(abufId);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(abufId, autoRelease));
-    rows_ = asize.height;
-    cols_ = asize.width;
+#లేకపోతే
+    impl_.reset(కొత్త Impl(abufId, autoRelease));
+    అడ్డువరుసలు_2 = asize.ఎత్తు;
+    నిలువుల_సంఖ్య_2 = asize.వెడల్పు;
     type_ = atype;
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::Buffer::Buffer(InputArray arr, Target target, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::బఫరు_2::బఫరు_2(ఆదానం_Array arr, లక్ష్యం target, తార్కిక autoRelease) : అడ్డువరుసలు_2(0), నిలువుల_సంఖ్య_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
+    CV_వాడని(target);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#లేకపోతే
+    స్థిరరాశి పూర్ణాంకం రకం = arr.రకం();
 
-    switch (kind)
+    ఎంపిక (రకం)
     {
-    case _InputArray::OPENGL_BUFFER:
-    case _InputArray::CUDA_GPU_MAT:
+    స్థితి ఆదానం_Array_2::OPENGL_బఫరు:
+    స్థితి ఆదానం_Array_2::CUDA_GPU_MAT:
         copyFrom(arr, target, autoRelease);
-        break;
+        ఆపు;
 
-    default:
+    అప్రమేయ:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            const GLsizeiptr asize = mat.rows * mat.cols * mat.elemSize();
-            impl_.reset(new Impl(asize, mat.data, target, autoRelease));
-            rows_ = mat.rows;
-            cols_ = mat.cols;
+            స్థిరరాశి GLsizeiptr asize = mat.అడ్డువరుసలు * mat.నిలువుల_సంఖ్య * mat.elem_కొలత();
+            impl_.reset(కొత్త Impl(asize, mat.దత్తాంశం, target, autoRelease));
+            అడ్డువరుసలు_2 = mat.అడ్డువరుసలు;
+            నిలువుల_సంఖ్య_2 = mat.నిలువుల_సంఖ్య;
             type_ = mat.type();
-            break;
+            ఆపు;
         }
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::create(int arows, int acols, int atype, Target target, bool autoRelease)
+శూన్య cv::ogl::బఫరు_2::create(పూర్ణాంకం arows, పూర్ణాంకం acols, పూర్ణాంకం atype, లక్ష్యం target, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(atype);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arows);
+    CV_వాడని(acols);
+    CV_వాడని(atype);
+    CV_వాడని(target);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || type_ != atype)
+#లేకపోతే
+    ఒకవేళ (అడ్డువరుసలు_2 != arows || నిలువుల_సంఖ్య_2 != acols || type_ != atype)
     {
-        const GLsizeiptr asize = (GLsizeiptr)arows * acols * CV_ELEM_SIZE(atype);
+        స్థిరరాశి GLsizeiptr asize = (GLsizeiptr)arows * acols * CV_ELEM_కొలత(atype);
         // resize in place when sole owner (keeps the GL id); else allocate fresh (copy-on-write)
-        if (impl_->bufId() != 0 && impl_.use_count() == 1)
+        ఒకవేళ (impl_->bufId() != 0 && impl_.use_count() == 1)
         {
             impl_->resize(asize, target);
-            impl_->setAutoRelease(autoRelease);
+            impl_->సమితి_Auto_Release(autoRelease);
         }
-        else
-            impl_.reset(new Impl(asize, 0, target, autoRelease));
-        rows_ = arows;
-        cols_ = acols;
+        లేకపోతే
+            impl_.reset(కొత్త Impl(asize, 0, target, autoRelease));
+        అడ్డువరుసలు_2 = arows;
+        నిలువుల_సంఖ్య_2 = acols;
         type_ = atype;
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::release()
+శూన్య cv::ogl::బఫరు_2::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#నిర్వచితమైతే HAVE_OPENGL
+    ఒకవేళ (impl_)
+        impl_->సమితి_Auto_Release(నిజం);
     impl_ = Impl::empty();
-    rows_ = 0;
-    cols_ = 0;
+    అడ్డువరుసలు_2 = 0;
+    నిలువుల_సంఖ్య_2 = 0;
     type_ = 0;
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::setAutoRelease(bool flag)
+శూన్య cv::ogl::బఫరు_2::సమితి_Auto_Release(తార్కిక flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#లేకపోతే
+    impl_->సమితి_Auto_Release(flag);
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
+శూన్య cv::ogl::బఫరు_2::copyFrom(ఆదానం_Array arr, లక్ష్యం target, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
+    CV_వాడని(target);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#లేకపోతే
+    స్థిరరాశి పూర్ణాంకం రకం = arr.రకం();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    స్థిరరాశి కొలత asize = arr.size();
+    స్థిరరాశి పూర్ణాంకం atype = arr.type();
     create(asize, atype, target, autoRelease);
 
-    switch (kind)
+    ఎంపిక (రకం)
     {
-    case _InputArray::OPENGL_BUFFER:
+    స్థితి ఆదానం_Array_2::OPENGL_బఫరు:
         {
-            ogl::Buffer buf = arr.getOGlBuffer();
-            impl_->copyFrom(buf.bufId(), asize.area() * CV_ELEM_SIZE(atype));
-            break;
+            ogl::బఫరు_2 buf = arr.get_OGl_బఫరు();
+            impl_->copyFrom(buf.bufId(), asize.area() * CV_ELEM_కొలత(atype));
+            ఆపు;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    స్థితి ఆదానం_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #నిర్వచితం_కాకపోతే HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #లేకపోతే
                 GpuMat dmat = arr.getGpuMat();
-                impl_->copyFrom(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
-            #endif
+                impl_->copyFrom(dmat.దత్తాంశం, dmat.అడుగు, dmat.నిలువుల_సంఖ్య * dmat.elem_కొలత(), dmat.అడ్డువరుసలు);
+            #అయితే_ముగింపు
 
-            break;
+            ఆపు;
         }
 
-    default:
+    అప్రమేయ:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            impl_->copyFrom(asize.area() * CV_ELEM_SIZE(atype), mat.data);
+            impl_->copyFrom(asize.area() * CV_ELEM_కొలత(atype), mat.దత్తాంశం);
         }
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, cuda::Stream& stream, Target target, bool autoRelease)
+శూన్య cv::ogl::బఫరు_2::copyFrom(ఆదానం_Array arr, cuda::ప్రవాహం& stream, లక్ష్యం target, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(stream);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
+    CV_వాడని(stream);
+    CV_వాడని(target);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(arr);
-        CV_UNUSED(stream);
-        CV_UNUSED(target);
-        CV_UNUSED(autoRelease);
+#లేకపోతే
+    #నిర్వచితం_కాకపోతే HAVE_CUDA
+        CV_వాడని(arr);
+        CV_వాడని(stream);
+        CV_వాడని(target);
+        CV_వాడని(autoRelease);
         throw_no_cuda();
-    #else
+    #లేకపోతే
         GpuMat dmat = arr.getGpuMat();
 
         create(dmat.size(), dmat.type(), target, autoRelease);
 
-        impl_->copyFrom(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows, cuda::StreamAccessor::getStream(stream));
-    #endif
-#endif
+        impl_->copyFrom(dmat.దత్తాంశం, dmat.అడుగు, dmat.నిలువుల_సంఖ్య * dmat.elem_కొలత(), dmat.అడ్డువరుసలు, cuda::ప్రవాహం_Accessor::get_ప్రవాహం(stream));
+    #అయితే_ముగింపు
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::copyTo(OutputArray arr) const
+శూన్య cv::ogl::బఫరు_2::copy_గమ్యం(OutputArray arr) స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#లేకపోతే
+    స్థిరరాశి పూర్ణాంకం రకం = arr.రకం();
 
-    switch (kind)
+    ఎంపిక (రకం)
     {
-    case _InputArray::OPENGL_BUFFER:
+    స్థితి ఆదానం_Array_2::OPENGL_బఫరు:
         {
-            arr.getOGlBufferRef().copyFrom(*this);
-            break;
+            arr.get_OGl_బఫరు_Ref().copyFrom(*ఇది);
+            ఆపు;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    స్థితి ఆదానం_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #నిర్వచితం_కాకపోతే HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #లేకపోతే
                 GpuMat& dmat = arr.getGpuMatRef();
-                dmat.create(rows_, cols_, type_);
-                impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
-            #endif
+                dmat.create(అడ్డువరుసలు_2, నిలువుల_సంఖ్య_2, type_);
+                impl_->copy_గమ్యం(dmat.దత్తాంశం, dmat.అడుగు, dmat.నిలువుల_సంఖ్య * dmat.elem_కొలత(), dmat.అడ్డువరుసలు);
+            #అయితే_ముగింపు
 
-            break;
+            ఆపు;
         }
 
-    default:
+    అప్రమేయ:
         {
-            arr.create(rows_, cols_, type_);
+            arr.create(అడ్డువరుసలు_2, నిలువుల_సంఖ్య_2, type_);
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            impl_->copyTo(mat.rows * mat.cols * mat.elemSize(), mat.data);
+            impl_->copy_గమ్యం(mat.అడ్డువరుసలు * mat.నిలువుల_సంఖ్య * mat.elem_కొలత(), mat.దత్తాంశం);
         }
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::copyTo(OutputArray arr, cuda::Stream& stream) const
+శూన్య cv::ogl::బఫరు_2::copy_గమ్యం(OutputArray arr, cuda::ప్రవాహం& stream) స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(stream);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
+    CV_వాడని(stream);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(arr);
-        CV_UNUSED(stream);
+#లేకపోతే
+    #నిర్వచితం_కాకపోతే HAVE_CUDA
+        CV_వాడని(arr);
+        CV_వాడని(stream);
         throw_no_cuda();
-    #else
-        arr.create(rows_, cols_, type_);
+    #లేకపోతే
+        arr.create(అడ్డువరుసలు_2, నిలువుల_సంఖ్య_2, type_);
         GpuMat dmat = arr.getGpuMat();
-        impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows, cuda::StreamAccessor::getStream(stream));
-    #endif
-#endif
+        impl_->copy_గమ్యం(dmat.దత్తాంశం, dmat.అడుగు, dmat.నిలువుల_సంఖ్య * dmat.elem_కొలత(), dmat.అడ్డువరుసలు, cuda::ప్రవాహం_Accessor::get_ప్రవాహం(stream));
+    #అయితే_ముగింపు
+#అయితే_ముగింపు
 }
 
-cv::ogl::Buffer cv::ogl::Buffer::clone(Target target, bool autoRelease) const
+cv::ogl::బఫరు_2 cv::ogl::బఫరు_2::clone(లక్ష్యం target, తార్కిక autoRelease) స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(target);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    ogl::Buffer buf;
-    buf.copyFrom(*this, target, autoRelease);
-    return buf;
-#endif
+#లేకపోతే
+    ogl::బఫరు_2 buf;
+    buf.copyFrom(*ఇది, target, autoRelease);
+    తిరిగి buf;
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::bind(Target target) const
+శూన్య cv::ogl::బఫరు_2::bind(లక్ష్యం target) స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(target);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(target);
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_->bind(target);
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::unbind(Target target)
+శూన్య cv::ogl::బఫరు_2::unbind(లక్ష్యం target)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(target);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(target);
     throw_no_ogl();
-#else
-    gl::BindBuffer(target, 0);
+#లేకపోతే
+    gl::Bind_బఫరు(target, 0);
     CV_CheckGlError();
-#endif
+#అయితే_ముగింపు
 }
 
-Mat cv::ogl::Buffer::mapHost(Access access)
+Mat cv::ogl::బఫరు_2::mapHost(Access access)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(access);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(access);
     throw_no_ogl();
-#else
-    return Mat(rows_, cols_, type_, impl_->mapHost(access));
-#endif
+#లేకపోతే
+    తిరిగి Mat(అడ్డువరుసలు_2, నిలువుల_సంఖ్య_2, type_, impl_->mapHost(access));
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::unmapHost()
+శూన్య cv::ogl::బఫరు_2::unmapHost()
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->unmapHost();
-#endif
+#లేకపోతే
+    తిరిగి impl_->unmapHost();
+#అయితే_ముగింపు
 }
 
-GpuMat cv::ogl::Buffer::mapDevice()
+GpuMat cv::ogl::బఫరు_2::mapDevice()
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
+#లేకపోతే
+    #నిర్వచితం_కాకపోతే HAVE_CUDA
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice());
-    #endif
-#endif
+    #లేకపోతే
+        తిరిగి GpuMat(అడ్డువరుసలు_2, నిలువుల_సంఖ్య_2, type_, impl_->mapDevice());
+    #అయితే_ముగింపు
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::unmapDevice()
+శూన్య cv::ogl::బఫరు_2::unmapDevice()
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
+#లేకపోతే
+    #నిర్వచితం_కాకపోతే HAVE_CUDA
         throw_no_cuda();
-    #else
+    #లేకపోతే
         impl_->unmapDevice();
-    #endif
-#endif
+    #అయితే_ముగింపు
+#అయితే_ముగింపు
 }
 
-cuda::GpuMat cv::ogl::Buffer::mapDevice(cuda::Stream& stream)
+cuda::GpuMat cv::ogl::బఫరు_2::mapDevice(cuda::ప్రవాహం& stream)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(stream);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(stream);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(stream);
+#లేకపోతే
+    #నిర్వచితం_కాకపోతే HAVE_CUDA
+        CV_వాడని(stream);
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice(cuda::StreamAccessor::getStream(stream)));
-    #endif
-#endif
+    #లేకపోతే
+        తిరిగి GpuMat(అడ్డువరుసలు_2, నిలువుల_సంఖ్య_2, type_, impl_->mapDevice(cuda::ప్రవాహం_Accessor::get_ప్రవాహం(stream)));
+    #అయితే_ముగింపు
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Buffer::unmapDevice(cuda::Stream& stream)
+శూన్య cv::ogl::బఫరు_2::unmapDevice(cuda::ప్రవాహం& stream)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(stream);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(stream);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(stream);
+#లేకపోతే
+    #నిర్వచితం_కాకపోతే HAVE_CUDA
+        CV_వాడని(stream);
         throw_no_cuda();
-    #else
-        impl_->unmapDevice(cuda::StreamAccessor::getStream(stream));
-    #endif
-#endif
+    #లేకపోతే
+        impl_->unmapDevice(cuda::ప్రవాహం_Accessor::get_ప్రవాహం(stream));
+    #అయితే_ముగింపు
+#అయితే_ముగింపు
 }
 
-unsigned int cv::ogl::Buffer::bufId() const
+గుర్తులేని పూర్ణాంకం cv::ogl::బఫరు_2::bufId() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->bufId();
-#endif
+#లేకపోతే
+    తిరిగి impl_->bufId();
+#అయితే_ముగింపు
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // ogl::Texture
 
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
 
-class cv::ogl::Texture2D::Impl
+తరగతి cv::ogl::Texture2D::Impl
 {
 };
 
-#else
+#లేకపోతే
 
-class cv::ogl::Texture2D::Impl
+తరగతి cv::ogl::Texture2D::Impl
 {
-public:
-    static const Ptr<Impl> empty();
+బహిరంగ:
+    స్థిర స్థిరరాశి Ptr<Impl> empty();
 
-    Impl(GLuint texId, bool autoRelease);
-    Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels, bool autoRelease);
+    Impl(GLuint texId, తార్కిక autoRelease);
+    Impl(GLint అంతర్గత_Format, GLsizei వెడల్పు, GLsizei ఎత్తు, GLenum format, GLenum type, స్థిరరాశి GLvoid* pixels, తార్కిక autoRelease);
     ~Impl();
 
-    void copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
-    void copyTo(GLenum format, GLenum type, GLvoid* pixels) const;
+    శూన్య copyFrom(GLsizei వెడల్పు, GLsizei ఎత్తు, GLenum format, GLenum type, స్థిరరాశి GLvoid *pixels);
+    శూన్య copy_గమ్యం(GLenum format, GLenum type, GLvoid* pixels) స్థిరరాశి;
 
-    void bind() const;
+    శూన్య bind() స్థిరరాశి;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    శూన్య సమితి_Auto_Release(తార్కిక flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() స్థిరరాశి { తిరిగి texId_; }
 
-private:
+అంతరంగ:
     Impl();
 
     GLuint texId_;
-    bool autoRelease_;
+    తార్కిక autoRelease_;
 };
 
-const Ptr<cv::ogl::Texture2D::Impl> cv::ogl::Texture2D::Impl::empty()
+స్థిరరాశి Ptr<cv::ogl::Texture2D::Impl> cv::ogl::Texture2D::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    స్థిర Ptr<Impl> p(కొత్త Impl);
+    తిరిగి p;
 }
 
-cv::ogl::Texture2D::Impl::Impl() : texId_(0), autoRelease_(false)
+cv::ogl::Texture2D::Impl::Impl() : texId_(0), autoRelease_(అబద్ధం)
 {
 }
 
-cv::ogl::Texture2D::Impl::Impl(GLuint atexId, bool autoRelease) : texId_(atexId), autoRelease_(autoRelease)
+cv::ogl::Texture2D::Impl::Impl(GLuint atexId, తార్కిక autoRelease) : texId_(atexId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsTexture(atexId) == gl::TRUE_ );
 }
 
-cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels, bool autoRelease) : texId_(0), autoRelease_(autoRelease)
+cv::ogl::Texture2D::Impl::Impl(GLint అంతర్గత_Format, GLsizei వెడల్పు, GLsizei ఎత్తు, GLenum format, GLenum type, స్థిరరాశి GLvoid* pixels, తార్కిక autoRelease) : texId_(0), autoRelease_(autoRelease)
 {
     gl::GenTextures(1, &texId_);
     CV_CheckGlError();
@@ -912,7 +912,7 @@ cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei heig
     gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
     CV_CheckGlError();
 
-    gl::TexImage2D(gl::TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, pixels);
+    gl::TexImage2D(gl::TEXTURE_2D, 0, అంతర్గత_Format, వెడల్పు, ఎత్తు, 0, format, type, pixels);
     CV_CheckGlError();
 
     gl::GenerateMipmap(gl::TEXTURE_2D);
@@ -921,11 +921,11 @@ cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei heig
 
 cv::ogl::Texture2D::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    ఒకవేళ (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
-void cv::ogl::Texture2D::Impl::copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+శూన్య cv::ogl::Texture2D::Impl::copyFrom(GLsizei వెడల్పు, GLsizei ఎత్తు, GLenum format, GLenum type, స్థిరరాశి GLvoid *pixels)
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
@@ -933,14 +933,14 @@ void cv::ogl::Texture2D::Impl::copyFrom(GLsizei width, GLsizei height, GLenum fo
     gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
     CV_CheckGlError();
 
-    gl::TexSubImage2D(gl::TEXTURE_2D, 0, 0, 0, width, height, format, type, pixels);
+    gl::TexSubImage2D(gl::TEXTURE_2D, 0, 0, 0, వెడల్పు, ఎత్తు, format, type, pixels);
     CV_CheckGlError();
 
     gl::GenerateMipmap(gl::TEXTURE_2D);
     CV_CheckGlError();
 }
 
-void cv::ogl::Texture2D::Impl::copyTo(GLenum format, GLenum type, GLvoid* pixels) const
+శూన్య cv::ogl::Texture2D::Impl::copy_గమ్యం(GLenum format, GLenum type, GLvoid* pixels) స్థిరరాశి
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
@@ -952,893 +952,893 @@ void cv::ogl::Texture2D::Impl::copyTo(GLenum format, GLenum type, GLvoid* pixels
     CV_CheckGlError();
 }
 
-void cv::ogl::Texture2D::Impl::bind() const
+శూన్య cv::ogl::Texture2D::Impl::bind() స్థిరరాశి
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
 }
 
-#endif // HAVE_OPENGL
+#అయితే_ముగింపు // HAVE_OPENGL
 
-cv::ogl::Texture2D::Texture2D() : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D() : అడ్డువరుసలు_2(0), నిలువుల_సంఖ్య_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_ = Impl::empty();
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::Texture2D::Texture2D(int arows, int acols, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(పూర్ణాంకం arows, పూర్ణాంకం acols, Format aformat, గుర్తులేని పూర్ణాంకం atexId, తార్కిక autoRelease) : అడ్డువరుసలు_2(0), నిలువుల_సంఖ్య_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(aformat);
-    CV_UNUSED(atexId);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arows);
+    CV_వాడని(acols);
+    CV_వాడని(aformat);
+    CV_వాడని(atexId);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(atexId, autoRelease));
-    rows_ = arows;
-    cols_ = acols;
+#లేకపోతే
+    impl_.reset(కొత్త Impl(atexId, autoRelease));
+    అడ్డువరుసలు_2 = arows;
+    నిలువుల_సంఖ్య_2 = acols;
     format_ = aformat;
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(కొలత asize, Format aformat, గుర్తులేని పూర్ణాంకం atexId, తార్కిక autoRelease) : అడ్డువరుసలు_2(0), నిలువుల_సంఖ్య_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(asize);
-    CV_UNUSED(aformat);
-    CV_UNUSED(atexId);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(asize);
+    CV_వాడని(aformat);
+    CV_వాడని(atexId);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(atexId, autoRelease));
-    rows_ = asize.height;
-    cols_ = asize.width;
+#లేకపోతే
+    impl_.reset(కొత్త Impl(atexId, autoRelease));
+    అడ్డువరుసలు_2 = asize.ఎత్తు;
+    నిలువుల_సంఖ్య_2 = asize.వెడల్పు;
     format_ = aformat;
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(ఆదానం_Array arr, తార్కిక autoRelease) : అడ్డువరుసలు_2(0), నిలువుల_సంఖ్య_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#లేకపోతే
+    స్థిరరాశి పూర్ణాంకం రకం = arr.రకం();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    స్థిరరాశి కొలత asize = arr.size();
+    స్థిరరాశి పూర్ణాంకం atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    స్థిరరాశి పూర్ణాంకం లోతు = CV_MAT_లోతు(atype);
+    స్థిరరాశి పూర్ణాంకం cn = CV_MAT_CN(atype);
 
-    CV_Assert( depth <= CV_32F );
+    CV_Assert( లోతు <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
 
-    const Format internalFormats[] =
+    స్థిరరాశి Format అంతర్గత_Formats[] =
     {
-        NONE, DEPTH_COMPONENT, NONE, RGB, RGBA
+        NONE, లోతు_COMPONENT, NONE, RGB, RGBA
     };
-    const GLenum srcFormats[] =
+    స్థిరరాశి GLenum srcFormats[] =
     {
-        0, gl::DEPTH_COMPONENT, 0, gl::BGR, gl::BGRA
+        0, gl::లోతు_COMPONENT, 0, gl::BGR, gl::BGRA
     };
 
-    switch (kind)
+    ఎంపిక (రకం)
     {
-    case _InputArray::OPENGL_BUFFER:
+    స్థితి ఆదానం_Array_2::OPENGL_బఫరు:
         {
-            ogl::Buffer buf = arr.getOGlBuffer();
-            buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            break;
+            ogl::బఫరు_2 buf = arr.get_OGl_బఫరు();
+            buf.bind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+            impl_.reset(కొత్త Impl(అంతర్గత_Formats[cn], asize.వెడల్పు, asize.ఎత్తు, srcFormats[cn], gl_types[లోతు], 0, autoRelease));
+            ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+            ఆపు;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    స్థితి ఆదానం_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #నిర్వచితం_కాకపోతే HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #లేకపోతే
                 GpuMat dmat = arr.getGpuMat();
-                ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                buf.setAutoRelease(true);
-                buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
-                ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            #endif
+                ogl::బఫరు_2 buf(dmat, ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+                buf.సమితి_Auto_Release(నిజం);
+                buf.bind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+                impl_.reset(కొత్త Impl(అంతర్గత_Formats[cn], asize.వెడల్పు, asize.ఎత్తు, srcFormats[cn], gl_types[లోతు], 0, autoRelease));
+                ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+            #అయితే_ముగింపు
 
-            break;
+            ఆపు;
         }
 
-    default:
+    అప్రమేయ:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], mat.data, autoRelease));
-            break;
+            ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+            impl_.reset(కొత్త Impl(అంతర్గత_Formats[cn], asize.వెడల్పు, asize.ఎత్తు, srcFormats[cn], gl_types[లోతు], mat.దత్తాంశం, autoRelease));
+            ఆపు;
         }
     }
 
-    rows_ = asize.height;
-    cols_ = asize.width;
-    format_ = internalFormats[cn];
-#endif
+    అడ్డువరుసలు_2 = asize.ఎత్తు;
+    నిలువుల_సంఖ్య_2 = asize.వెడల్పు;
+    format_ = అంతర్గత_Formats[cn];
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Texture2D::create(int arows, int acols, Format aformat, bool autoRelease)
+శూన్య cv::ogl::Texture2D::create(పూర్ణాంకం arows, పూర్ణాంకం acols, Format aformat, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(aformat);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arows);
+    CV_వాడని(acols);
+    CV_వాడని(aformat);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || format_ != aformat)
+#లేకపోతే
+    ఒకవేళ (అడ్డువరుసలు_2 != arows || నిలువుల_సంఖ్య_2 != acols || format_ != aformat)
     {
-        ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-        impl_.reset(new Impl(aformat, acols, arows, aformat, gl::FLOAT, 0, autoRelease));
-        rows_ = arows;
-        cols_ = acols;
+        ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+        impl_.reset(కొత్త Impl(aformat, acols, arows, aformat, gl::FLOAT, 0, autoRelease));
+        అడ్డువరుసలు_2 = arows;
+        నిలువుల_సంఖ్య_2 = acols;
         format_ = aformat;
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Texture2D::release()
+శూన్య cv::ogl::Texture2D::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#నిర్వచితమైతే HAVE_OPENGL
+    ఒకవేళ (impl_)
+        impl_->సమితి_Auto_Release(నిజం);
     impl_ = Impl::empty();
-    rows_ = 0;
-    cols_ = 0;
+    అడ్డువరుసలు_2 = 0;
+    నిలువుల_సంఖ్య_2 = 0;
     format_ = NONE;
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Texture2D::setAutoRelease(bool flag)
+శూన్య cv::ogl::Texture2D::సమితి_Auto_Release(తార్కిక flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#లేకపోతే
+    impl_->సమితి_Auto_Release(flag);
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
+శూన్య cv::ogl::Texture2D::copyFrom(ఆదానం_Array arr, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#లేకపోతే
+    స్థిరరాశి పూర్ణాంకం రకం = arr.రకం();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    స్థిరరాశి కొలత asize = arr.size();
+    స్థిరరాశి పూర్ణాంకం atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    స్థిరరాశి పూర్ణాంకం లోతు = CV_MAT_లోతు(atype);
+    స్థిరరాశి పూర్ణాంకం cn = CV_MAT_CN(atype);
 
-    CV_Assert( depth <= CV_32F );
+    CV_Assert( లోతు <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
 
-    const Format internalFormats[] =
+    స్థిరరాశి Format అంతర్గత_Formats[] =
     {
-        NONE, DEPTH_COMPONENT, NONE, RGB, RGBA
+        NONE, లోతు_COMPONENT, NONE, RGB, RGBA
     };
-    const GLenum srcFormats[] =
+    స్థిరరాశి GLenum srcFormats[] =
     {
-        0, gl::DEPTH_COMPONENT, 0, gl::BGR, gl::BGRA
+        0, gl::లోతు_COMPONENT, 0, gl::BGR, gl::BGRA
     };
 
-    create(asize, internalFormats[cn], autoRelease);
+    create(asize, అంతర్గత_Formats[cn], autoRelease);
 
-    switch(kind)
+    ఎంపిక(రకం)
     {
-    case _InputArray::OPENGL_BUFFER:
+    స్థితి ఆదానం_Array_2::OPENGL_బఫరు:
         {
-            ogl::Buffer buf = arr.getOGlBuffer();
-            buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], 0);
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            break;
+            ogl::బఫరు_2 buf = arr.get_OGl_బఫరు();
+            buf.bind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+            impl_->copyFrom(asize.వెడల్పు, asize.ఎత్తు, srcFormats[cn], gl_types[లోతు], 0);
+            ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+            ఆపు;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    స్థితి ఆదానం_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #నిర్వచితం_కాకపోతే HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #లేకపోతే
                 GpuMat dmat = arr.getGpuMat();
-                ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                buf.setAutoRelease(true);
-                buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], 0);
-                ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            #endif
+                ogl::బఫరు_2 buf(dmat, ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+                buf.సమితి_Auto_Release(నిజం);
+                buf.bind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+                impl_->copyFrom(asize.వెడల్పు, asize.ఎత్తు, srcFormats[cn], gl_types[లోతు], 0);
+                ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+            #అయితే_ముగింపు
 
-            break;
+            ఆపు;
         }
 
-    default:
+    అప్రమేయ:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], mat.data);
+            ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_UNPACK_బఫరు);
+            impl_->copyFrom(asize.వెడల్పు, asize.ఎత్తు, srcFormats[cn], gl_types[లోతు], mat.దత్తాంశం);
         }
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Texture2D::copyTo(OutputArray arr, int ddepth, bool autoRelease) const
+శూన్య cv::ogl::Texture2D::copy_గమ్యం(OutputArray arr, పూర్ణాంకం ddepth, తార్కిక autoRelease) స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(ddepth);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
+    CV_వాడని(ddepth);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#లేకపోతే
+    స్థిరరాశి పూర్ణాంకం రకం = arr.రకం();
 
-    const int cn = format_ == DEPTH_COMPONENT ? 1: format_ == RGB ? 3 : 4;
-    const GLenum dstFormat = format_ == DEPTH_COMPONENT ? gl::DEPTH_COMPONENT : format_ == RGB ? gl::BGR : gl::BGRA;
+    స్థిరరాశి పూర్ణాంకం cn = format_ == లోతు_COMPONENT ? 1: format_ == RGB ? 3 : 4;
+    స్థిరరాశి GLenum dstFormat = format_ == లోతు_COMPONENT ? gl::లోతు_COMPONENT : format_ == RGB ? gl::BGR : gl::BGRA;
 
-    switch(kind)
+    ఎంపిక(రకం)
     {
-    case _InputArray::OPENGL_BUFFER:
+    స్థితి ఆదానం_Array_2::OPENGL_బఫరు:
         {
-            ogl::Buffer& buf = arr.getOGlBufferRef();
-            buf.create(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER, autoRelease);
-            buf.bind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            impl_->copyTo(dstFormat, gl_types[ddepth], 0);
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            break;
+            ogl::బఫరు_2& buf = arr.get_OGl_బఫరు_Ref();
+            buf.create(అడ్డువరుసలు_2, నిలువుల_సంఖ్య_2, CV_MAKE_TYPE(ddepth, cn), ogl::బఫరు_2::PIXEL_PACK_బఫరు, autoRelease);
+            buf.bind(ogl::బఫరు_2::PIXEL_PACK_బఫరు);
+            impl_->copy_గమ్యం(dstFormat, gl_types[ddepth], 0);
+            ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_PACK_బఫరు);
+            ఆపు;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    స్థితి ఆదానం_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #నిర్వచితం_కాకపోతే HAVE_CUDA
                 throw_no_cuda();
-            #else
-                ogl::Buffer buf(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER);
-                buf.setAutoRelease(true);
-                buf.bind(ogl::Buffer::PIXEL_PACK_BUFFER);
-                impl_->copyTo(dstFormat, gl_types[ddepth], 0);
-                ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-                buf.copyTo(arr);
-            #endif
+            #లేకపోతే
+                ogl::బఫరు_2 buf(అడ్డువరుసలు_2, నిలువుల_సంఖ్య_2, CV_MAKE_TYPE(ddepth, cn), ogl::బఫరు_2::PIXEL_PACK_బఫరు);
+                buf.సమితి_Auto_Release(నిజం);
+                buf.bind(ogl::బఫరు_2::PIXEL_PACK_బఫరు);
+                impl_->copy_గమ్యం(dstFormat, gl_types[ddepth], 0);
+                ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_PACK_బఫరు);
+                buf.copy_గమ్యం(arr);
+            #అయితే_ముగింపు
 
-            break;
+            ఆపు;
         }
 
-    default:
+    అప్రమేయ:
         {
-            arr.create(rows_, cols_, CV_MAKE_TYPE(ddepth, cn));
+            arr.create(అడ్డువరుసలు_2, నిలువుల_సంఖ్య_2, CV_MAKE_TYPE(ddepth, cn));
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            impl_->copyTo(dstFormat, gl_types[ddepth], mat.data);
+            ogl::బఫరు_2::unbind(ogl::బఫరు_2::PIXEL_PACK_బఫరు);
+            impl_->copy_గమ్యం(dstFormat, gl_types[ddepth], mat.దత్తాంశం);
         }
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Texture2D::bind() const
+శూన్య cv::ogl::Texture2D::bind() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_->bind();
-#endif
+#అయితే_ముగింపు
 }
 
-unsigned int cv::ogl::Texture2D::texId() const
+గుర్తులేని పూర్ణాంకం cv::ogl::Texture2D::texId() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
-#endif
+#లేకపోతే
+    తిరిగి impl_->texId();
+#అయితే_ముగింపు
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // ogl::TextureBuffer
 
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
 
-class cv::ogl::TextureBuffer::Impl
+తరగతి cv::ogl::Texture_బఫరు::Impl
 {
 };
 
-#else
+#లేకపోతే
 
-class cv::ogl::TextureBuffer::Impl
+తరగతి cv::ogl::Texture_బఫరు::Impl
 {
-public:
-    static const Ptr<Impl> empty();
+బహిరంగ:
+    స్థిర స్థిరరాశి Ptr<Impl> empty();
 
     Impl();
-    Impl(GLenum internalFormat, GLuint bufId, bool autoRelease);
+    Impl(GLenum అంతర్గత_Format, GLuint bufId, తార్కిక autoRelease);
     ~Impl();
 
-    void bind(GLint unit) const;
+    శూన్య bind(GLint unit) స్థిరరాశి;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    శూన్య సమితి_Auto_Release(తార్కిక flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() స్థిరరాశి { తిరిగి texId_; }
 
-private:
+అంతరంగ:
     GLuint texId_;
-    bool autoRelease_;
+    తార్కిక autoRelease_;
 };
 
-const Ptr<cv::ogl::TextureBuffer::Impl> cv::ogl::TextureBuffer::Impl::empty()
+స్థిరరాశి Ptr<cv::ogl::Texture_బఫరు::Impl> cv::ogl::Texture_బఫరు::Impl::empty()
 {
-    static Ptr<Impl> p = makePtr<Impl>();
-    return p;
+    స్థిర Ptr<Impl> p = makePtr<Impl>();
+    తిరిగి p;
 }
 
-cv::ogl::TextureBuffer::Impl::Impl() : texId_(0), autoRelease_(false)
+cv::ogl::Texture_బఫరు::Impl::Impl() : texId_(0), autoRelease_(అబద్ధం)
 {
 }
 
-cv::ogl::TextureBuffer::Impl::Impl(GLenum internalFormat, GLuint bufId, bool autoRelease) : texId_(0), autoRelease_(autoRelease)
+cv::ogl::Texture_బఫరు::Impl::Impl(GLenum అంతర్గత_Format, GLuint bufId, తార్కిక autoRelease) : texId_(0), autoRelease_(autoRelease)
 {
     gl::GenTextures(1, &texId_);
     CV_CheckGlError();
 
     CV_Assert(texId_ != 0);
 
-    gl::BindTexture(gl::TEXTURE_BUFFER, texId_);
+    gl::BindTexture(gl::TEXTURE_బఫరు, texId_);
     CV_CheckGlError();
 
-    gl::TexBuffer(gl::TEXTURE_BUFFER, internalFormat, bufId);
+    gl::Tex_బఫరు(gl::TEXTURE_బఫరు, అంతర్గత_Format, bufId);
     CV_CheckGlError();
 
-    gl::BindTexture(gl::TEXTURE_BUFFER, 0);
+    gl::BindTexture(gl::TEXTURE_బఫరు, 0);
     CV_CheckGlError();
 }
 
-cv::ogl::TextureBuffer::Impl::~Impl()
+cv::ogl::Texture_బఫరు::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    ఒకవేళ (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
-void cv::ogl::TextureBuffer::Impl::bind(GLint unit) const
+శూన్య cv::ogl::Texture_బఫరు::Impl::bind(GLint unit) స్థిరరాశి
 {
-    gl::ActiveTexture(gl::TEXTURE0 + unit);
+    gl::చురుకైన_Texture(gl::TEXTURE0 + unit);
     CV_CheckGlError();
 
-    gl::BindTexture(gl::TEXTURE_BUFFER, texId_);
+    gl::BindTexture(gl::TEXTURE_బఫరు, texId_);
     CV_CheckGlError();
 }
 
-#endif // HAVE_OPENGL
+#అయితే_ముగింపు // HAVE_OPENGL
 
-cv::ogl::TextureBuffer::TextureBuffer() : format_(NONE)
+cv::ogl::Texture_బఫరు::Texture_బఫరు() : format_(NONE)
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_ = Impl::empty();
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::TextureBuffer::TextureBuffer(const Buffer& buf, Format aformat, bool autoRelease) : format_(NONE)
+cv::ogl::Texture_బఫరు::Texture_బఫరు(స్థిరరాశి బఫరు_2& buf, Format aformat, తార్కిక autoRelease) : format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(buf);
-    CV_UNUSED(aformat);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(buf);
+    CV_వాడని(aformat);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_ = Impl::empty();
     create(buf, aformat, autoRelease);
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::TextureBuffer::create(const Buffer& buf, Format aformat, bool autoRelease)
+శూన్య cv::ogl::Texture_బఫరు::create(స్థిరరాశి బఫరు_2& buf, Format aformat, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(buf);
-    CV_UNUSED(aformat);
-    CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(buf);
+    CV_వాడని(aformat);
+    CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
+#లేకపోతే
     CV_Assert( !buf.empty() );
     CV_Assert( aformat != NONE );
 
     impl_ = makePtr<Impl>(aformat, buf.bufId(), autoRelease);
     buf_ = buf;
     format_ = aformat;
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::TextureBuffer::release()
+శూన్య cv::ogl::Texture_బఫరు::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#నిర్వచితమైతే HAVE_OPENGL
+    ఒకవేళ (impl_)
+        impl_->సమితి_Auto_Release(నిజం);
     impl_ = Impl::empty();
-#endif
-    buf_ = Buffer();
+#అయితే_ముగింపు
+    buf_ = బఫరు_2();
     format_ = NONE;
 }
 
-void cv::ogl::TextureBuffer::setAutoRelease(bool flag)
+శూన్య cv::ogl::Texture_బఫరు::సమితి_Auto_Release(తార్కిక flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#లేకపోతే
+    impl_->సమితి_Auto_Release(flag);
+#అయితే_ముగింపు
 }
 
-void cv::ogl::TextureBuffer::bind(int unit) const
+శూన్య cv::ogl::Texture_బఫరు::bind(పూర్ణాంకం unit) స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(unit);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(unit);
     throw_no_ogl();
-#else
+#లేకపోతే
     CV_Assert( unit >= 0 );
     impl_->bind(unit);
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::TextureBuffer::Format cv::ogl::TextureBuffer::format() const
+cv::ogl::Texture_బఫరు::Format cv::ogl::Texture_బఫరు::format() స్థిరరాశి
 {
-    return format_;
+    తిరిగి format_;
 }
 
-bool cv::ogl::TextureBuffer::empty() const
+తార్కిక cv::ogl::Texture_బఫరు::empty() స్థిరరాశి
 {
-    return format_ == NONE;
+    తిరిగి format_ == NONE;
 }
 
-unsigned int cv::ogl::TextureBuffer::texId() const
+గుర్తులేని పూర్ణాంకం cv::ogl::Texture_బఫరు::texId() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
-#endif
+#లేకపోతే
+    తిరిగి impl_->texId();
+#అయితే_ముగింపు
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Arrays
 
-void cv::ogl::Arrays::setVertexArray(InputArray vertex)
+శూన్య cv::ogl::Arrays::సమితి_శీర్షం_Array(ఆదానం_Array శీర్షం)
 {
-    const int cn = vertex.channels();
-    const int depth = vertex.depth();
+    స్థిరరాశి పూర్ణాంకం cn = శీర్షం.channels();
+    స్థిరరాశి పూర్ణాంకం లోతు = శీర్షం.లోతు();
 
     CV_Assert( cn == 2 || cn == 3 || cn == 4 );
-    CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
+    CV_Assert( లోతు == CV_16S || లోతు == CV_32S || లోతు == CV_32F || లోతు == CV_64F );
 
-    if (vertex.kind() == _InputArray::OPENGL_BUFFER)
-        vertex_ = vertex.getOGlBuffer();
-    else
-        vertex_.copyFrom(vertex);
+    ఒకవేళ (శీర్షం.రకం() == ఆదానం_Array_2::OPENGL_బఫరు)
+        శీర్షం_2 = శీర్షం.get_OGl_బఫరు();
+    లేకపోతే
+        శీర్షం_2.copyFrom(శీర్షం);
 
-    size_ = vertex_.size().area();
+    కొలత_3 = శీర్షం_2.size().area();
 }
 
-void cv::ogl::Arrays::resetVertexArray()
+శూన్య cv::ogl::Arrays::reset_శీర్షం_Array()
 {
-    vertex_.release();
-    size_ = 0;
+    శీర్షం_2.release();
+    కొలత_3 = 0;
 }
 
-void cv::ogl::Arrays::setColorArray(InputArray color)
+శూన్య cv::ogl::Arrays::సమితి_Color_Array(ఆదానం_Array color)
 {
-    const int cn = color.channels();
+    స్థిరరాశి పూర్ణాంకం cn = color.channels();
 
     CV_Assert( cn == 3 || cn == 4 );
 
-    if (color.kind() == _InputArray::OPENGL_BUFFER)
-        color_ = color.getOGlBuffer();
-    else
+    ఒకవేళ (color.రకం() == ఆదానం_Array_2::OPENGL_బఫరు)
+        color_ = color.get_OGl_బఫరు();
+    లేకపోతే
         color_.copyFrom(color);
 }
 
-void cv::ogl::Arrays::resetColorArray()
+శూన్య cv::ogl::Arrays::resetColorArray()
 {
     color_.release();
 }
 
-void cv::ogl::Arrays::setNormalArray(InputArray normal)
+శూన్య cv::ogl::Arrays::సమితి_సాధారణ_Array(ఆదానం_Array సాధారణ)
 {
-    const int cn = normal.channels();
-    const int depth = normal.depth();
+    స్థిరరాశి పూర్ణాంకం cn = సాధారణ.channels();
+    స్థిరరాశి పూర్ణాంకం లోతు = సాధారణ.లోతు();
 
     CV_Assert( cn == 3 );
-    CV_Assert( depth == CV_8S || depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
+    CV_Assert( లోతు == CV_8S || లోతు == CV_16S || లోతు == CV_32S || లోతు == CV_32F || లోతు == CV_64F );
 
-    if (normal.kind() == _InputArray::OPENGL_BUFFER)
-        normal_ = normal.getOGlBuffer();
-    else
-        normal_.copyFrom(normal);
+    ఒకవేళ (సాధారణ.రకం() == ఆదానం_Array_2::OPENGL_బఫరు)
+        సాధారణ_2 = సాధారణ.get_OGl_బఫరు();
+    లేకపోతే
+        సాధారణ_2.copyFrom(సాధారణ);
 }
 
-void cv::ogl::Arrays::resetNormalArray()
+శూన్య cv::ogl::Arrays::reset_సాధారణ_Array()
 {
-    normal_.release();
+    సాధారణ_2.release();
 }
 
-void cv::ogl::Arrays::setTexCoordArray(InputArray texCoord)
+శూన్య cv::ogl::Arrays::సమితి_Tex_Coord_Array(ఆదానం_Array texCoord)
 {
-    const int cn = texCoord.channels();
-    const int depth = texCoord.depth();
+    స్థిరరాశి పూర్ణాంకం cn = texCoord.channels();
+    స్థిరరాశి పూర్ణాంకం లోతు = texCoord.లోతు();
 
     CV_Assert( cn >= 1 && cn <= 4 );
-    CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
+    CV_Assert( లోతు == CV_16S || లోతు == CV_32S || లోతు == CV_32F || లోతు == CV_64F );
 
-    if (texCoord.kind() == _InputArray::OPENGL_BUFFER)
-        texCoord_ = texCoord.getOGlBuffer();
-    else
+    ఒకవేళ (texCoord.రకం() == ఆదానం_Array_2::OPENGL_బఫరు)
+        texCoord_ = texCoord.get_OGl_బఫరు();
+    లేకపోతే
         texCoord_.copyFrom(texCoord);
 }
 
-void cv::ogl::Arrays::resetTexCoordArray()
+శూన్య cv::ogl::Arrays::resetTexCoordArray()
 {
     texCoord_.release();
 }
 
-void cv::ogl::Arrays::release()
+శూన్య cv::ogl::Arrays::release()
 {
-    resetVertexArray();
+    reset_శీర్షం_Array();
     resetColorArray();
-    resetNormalArray();
+    reset_సాధారణ_Array();
     resetTexCoordArray();
 }
 
-void cv::ogl::Arrays::setAutoRelease(bool flag)
+శూన్య cv::ogl::Arrays::సమితి_Auto_Release(తార్కిక flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(flag);
     throw_no_ogl();
-#else
-    vertex_.setAutoRelease(flag);
-    color_.setAutoRelease(flag);
-    normal_.setAutoRelease(flag);
-    texCoord_.setAutoRelease(flag);
-#endif
+#లేకపోతే
+    శీర్షం_2.సమితి_Auto_Release(flag);
+    color_.సమితి_Auto_Release(flag);
+    సాధారణ_2.సమితి_Auto_Release(flag);
+    texCoord_.సమితి_Auto_Release(flag);
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Arrays::bind() const
+శూన్య cv::ogl::Arrays::bind() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    CV_Assert( texCoord_.empty() || texCoord_.size().area() == size_ );
-    CV_Assert( normal_.empty() || normal_.size().area() == size_ );
-    CV_Assert( color_.empty() || color_.size().area() == size_ );
+#లేకపోతే
+    CV_Assert( texCoord_.empty() || texCoord_.size().area() == కొలత_3 );
+    CV_Assert( సాధారణ_2.empty() || సాధారణ_2.size().area() == కొలత_3 );
+    CV_Assert( color_.empty() || color_.size().area() == కొలత_3 );
 
-    if (texCoord_.empty())
+    ఒకవేళ (texCoord_.empty())
     {
         gl::DisableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
     }
-    else
+    లేకపోతే
     {
         gl::EnableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
 
-        texCoord_.bind(ogl::Buffer::ARRAY_BUFFER);
+        texCoord_.bind(ogl::బఫరు_2::ARRAY_బఫరు);
 
-        gl::TexCoordPointer(texCoord_.channels(), gl_types[texCoord_.depth()], 0, 0);
+        gl::Tex_Coord_సూచిక(texCoord_.channels(), gl_types[texCoord_.లోతు()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (normal_.empty())
+    ఒకవేళ (సాధారణ_2.empty())
     {
-        gl::DisableClientState(gl::NORMAL_ARRAY);
+        gl::DisableClientState(gl::సాధారణ_ARRAY);
         CV_CheckGlError();
     }
-    else
+    లేకపోతే
     {
-        gl::EnableClientState(gl::NORMAL_ARRAY);
+        gl::EnableClientState(gl::సాధారణ_ARRAY);
         CV_CheckGlError();
 
-        normal_.bind(ogl::Buffer::ARRAY_BUFFER);
+        సాధారణ_2.bind(ogl::బఫరు_2::ARRAY_బఫరు);
 
-        gl::NormalPointer(gl_types[normal_.depth()], 0, 0);
+        gl::సాధారణ_సూచిక(gl_types[సాధారణ_2.లోతు()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (color_.empty())
+    ఒకవేళ (color_.empty())
     {
         gl::DisableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
     }
-    else
+    లేకపోతే
     {
         gl::EnableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
 
-        color_.bind(ogl::Buffer::ARRAY_BUFFER);
+        color_.bind(ogl::బఫరు_2::ARRAY_బఫరు);
 
-        const int cn = color_.channels();
+        స్థిరరాశి పూర్ణాంకం cn = color_.channels();
 
-        gl::ColorPointer(cn, gl_types[color_.depth()], 0, 0);
+        gl::Color_సూచిక(cn, gl_types[color_.లోతు()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (vertex_.empty())
+    ఒకవేళ (శీర్షం_2.empty())
     {
-        gl::DisableClientState(gl::VERTEX_ARRAY);
+        gl::DisableClientState(gl::శీర్షం_ARRAY);
         CV_CheckGlError();
     }
-    else
+    లేకపోతే
     {
-        gl::EnableClientState(gl::VERTEX_ARRAY);
+        gl::EnableClientState(gl::శీర్షం_ARRAY);
         CV_CheckGlError();
 
-        vertex_.bind(ogl::Buffer::ARRAY_BUFFER);
+        శీర్షం_2.bind(ogl::బఫరు_2::ARRAY_బఫరు);
 
-        gl::VertexPointer(vertex_.channels(), gl_types[vertex_.depth()], 0, 0);
+        gl::శీర్షం_సూచిక(శీర్షం_2.channels(), gl_types[శీర్షం_2.లోతు()], 0, 0);
         CV_CheckGlError();
     }
 
-    ogl::Buffer::unbind(ogl::Buffer::ARRAY_BUFFER);
-#endif
+    ogl::బఫరు_2::unbind(ogl::బఫరు_2::ARRAY_బఫరు);
+#అయితే_ముగింపు
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::VertexArray
 
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
 
-class cv::ogl::VertexArray::Impl
+తరగతి cv::ogl::శీర్షం_Array::Impl
 {
 };
 
-#else
+#లేకపోతే
 
-class cv::ogl::VertexArray::Impl
+తరగతి cv::ogl::శీర్షం_Array::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+బహిరంగ:
+    స్థిర స్థిరరాశి Ptr<Impl>& empty();
 
-    Impl(GLuint vaId, bool autoRelease);
-    Impl(std::initializer_list<Attribute> attributes, bool autoRelease);
+    Impl(GLuint vaId, తార్కిక autoRelease);
+    Impl(std::initializer_list<Attribute> లక్షణాలు, తార్కిక autoRelease);
     ~Impl();
 
-    void bind();
+    శూన్య bind();
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    శూన్య సమితి_Auto_Release(తార్కిక flag) { autoRelease_ = flag; }
 
-    GLuint vaId() const { return vaId_; }
+    GLuint vaId() స్థిరరాశి { తిరిగి vaId_; }
 
-private:
+అంతరంగ:
     Impl();
 
     GLuint vaId_;
-    bool autoRelease_;
+    తార్కిక autoRelease_;
 };
 
-const Ptr<cv::ogl::VertexArray::Impl>& cv::ogl::VertexArray::Impl::empty()
+స్థిరరాశి Ptr<cv::ogl::శీర్షం_Array::Impl>& cv::ogl::శీర్షం_Array::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    స్థిర Ptr<Impl> p(కొత్త Impl);
+    తిరిగి p;
 }
 
-cv::ogl::VertexArray::Impl::Impl() : vaId_(0), autoRelease_(false)
+cv::ogl::శీర్షం_Array::Impl::Impl() : vaId_(0), autoRelease_(అబద్ధం)
 {
 }
 
-cv::ogl::VertexArray::Impl::Impl(GLuint vaId, bool autoRelease) : vaId_(vaId), autoRelease_(autoRelease)
+cv::ogl::శీర్షం_Array::Impl::Impl(GLuint vaId, తార్కిక autoRelease) : vaId_(vaId), autoRelease_(autoRelease)
 {
-    CV_Assert( gl::IsVertexArray(vaId) == gl::TRUE_ );
+    CV_Assert( gl::Is_శీర్షం_Array(vaId) == gl::TRUE_ );
 }
 
-cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bool autoRelease) : vaId_(0), autoRelease_(autoRelease)
+cv::ogl::శీర్షం_Array::Impl::Impl(std::initializer_list<Attribute> లక్షణాలు, తార్కిక autoRelease) : vaId_(0), autoRelease_(autoRelease)
 {
-    gl::GenVertexArrays(1, &vaId_);
+    gl::Gen_శీర్షం_Arrays(1, &vaId_);
     CV_CheckGlError();
 
     CV_Assert( vaId_ != 0 );
-    gl::BindVertexArray(vaId_);
+    gl::Bind_శీర్షం_Array(vaId_);
     CV_CheckGlError();
 
-    for (auto& attribute : attributes)
+    కొరకు (స్వయంచాలక& attribute : లక్షణాలు)
     {
-        attribute.buffer_.bind(Buffer::ARRAY_BUFFER);
-        if (attribute.integer_)
+        attribute.బఫరు_3.bind(బఫరు_2::ARRAY_బఫరు);
+        ఒకవేళ (attribute.integer_)
         {
-            gl::VertexAttribIPointer(
+            gl::శీర్షం_Attrib_IPointer(
                 attribute.shader_loc_,
-                attribute.size_,
+                attribute.కొలత_3,
                 attribute.type_,
                 static_cast<GLsizei>(attribute.stride_),
-                reinterpret_cast<const void*>(attribute.offset_)
+                reinterpret_cast<స్థిరరాశి శూన్య*>(attribute.స్థానభ్రంశం)
             );
             CV_CheckGlError();
         }
-        else
+        లేకపోతే
         {
-            gl::VertexAttribPointer(
+            gl::శీర్షం_Attrib_సూచిక(
                 attribute.shader_loc_,
-                attribute.size_,
+                attribute.కొలత_3,
                 attribute.type_,
                 attribute.normalized_,
                 static_cast<GLsizei>(attribute.stride_),
-                reinterpret_cast<const void*>(attribute.offset_)
+                reinterpret_cast<స్థిరరాశి శూన్య*>(attribute.స్థానభ్రంశం)
             );
             CV_CheckGlError();
         }
 
-        gl::EnableVertexAttribArray(attribute.shader_loc_);
+        gl::Enable_శీర్షం_Attrib_Array(attribute.shader_loc_);
         CV_CheckGlError();
     }
 }
 
-cv::ogl::VertexArray::Impl::~Impl()
+cv::ogl::శీర్షం_Array::Impl::~Impl()
 {
-    if (autoRelease_ && vaId_)
-        gl::DeleteVertexArrays(1, &vaId_);
+    ఒకవేళ (autoRelease_ && vaId_)
+        gl::Delete_శీర్షం_Arrays(1, &vaId_);
 }
 
-void cv::ogl::VertexArray::Impl::bind()
+శూన్య cv::ogl::శీర్షం_Array::Impl::bind()
 {
-    gl::BindVertexArray(vaId_);
+    gl::Bind_శీర్షం_Array(vaId_);
     CV_CheckGlError();
 }
 
-#endif // HAVE_OPENGL
+#అయితే_ముగింపు // HAVE_OPENGL
 
-cv::ogl::VertexArray::VertexArray()
+cv::ogl::శీర్షం_Array::శీర్షం_Array()
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_ = Impl::empty();
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::VertexArray::VertexArray(std::initializer_list<Attribute> attributes, bool autoRelease)
+cv::ogl::శీర్షం_Array::శీర్షం_Array(std::initializer_list<Attribute> లక్షణాలు, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(attributes); CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(లక్షణాలు); CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(attributes, autoRelease));
-#endif
+#లేకపోతే
+    impl_.reset(కొత్త Impl(లక్షణాలు, autoRelease));
+#అయితే_ముగింపు
 }
 
-void cv::ogl::VertexArray::create(std::initializer_list<Attribute> attributes, bool autoRelease)
+శూన్య cv::ogl::శీర్షం_Array::create(std::initializer_list<Attribute> లక్షణాలు, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(attributes); CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(లక్షణాలు); CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(attributes, autoRelease));
-#endif
+#లేకపోతే
+    impl_.reset(కొత్త Impl(లక్షణాలు, autoRelease));
+#అయితే_ముగింపు
 }
 
-void cv::ogl::VertexArray::release()
+శూన్య cv::ogl::శీర్షం_Array::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#నిర్వచితమైతే HAVE_OPENGL
+    ఒకవేళ (impl_)
+        impl_->సమితి_Auto_Release(నిజం);
     impl_ = Impl::empty();
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::VertexArray::setAutoRelease(bool flag)
+శూన్య cv::ogl::శీర్షం_Array::సమితి_Auto_Release(తార్కిక flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#లేకపోతే
+    impl_->సమితి_Auto_Release(flag);
+#అయితే_ముగింపు
 }
 
-void cv::ogl::VertexArray::bind() const
+శూన్య cv::ogl::శీర్షం_Array::bind() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_->bind();
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::VertexArray::unbind()
+శూన్య cv::ogl::శీర్షం_Array::unbind()
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    gl::BindVertexArray(0);
-#endif
+#లేకపోతే
+    gl::Bind_శీర్షం_Array(0);
+#అయితే_ముగింపు
 }
 
-unsigned int cv::ogl::VertexArray::vaId() const
+గుర్తులేని పూర్ణాంకం cv::ogl::శీర్షం_Array::vaId() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->vaId();
-#endif
+#లేకపోతే
+    తిరిగి impl_->vaId();
+#అయితే_ముగింపు
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Shader
 
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
 
-class cv::ogl::Shader::Impl
+తరగతి cv::ogl::Shader::Impl
 {
 };
 
-#else
+#లేకపోతే
 
-class cv::ogl::Shader::Impl
+తరగతి cv::ogl::Shader::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+బహిరంగ:
+    స్థిర స్థిరరాశి Ptr<Impl>& empty();
 
-    Impl(GLuint shaderId, bool autoRelease);
-    Impl(const char* src, GLenum type, bool autoRelease);
+    Impl(GLuint shaderId, తార్కిక autoRelease);
+    Impl(స్థిరరాశి అక్షరం* src, GLenum type, తార్కిక autoRelease);
     ~Impl();
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    శూన్య సమితి_Auto_Release(తార్కిక flag) { autoRelease_ = flag; }
 
-    GLuint shaderId() const { return shaderId_; }
+    GLuint shaderId() స్థిరరాశి { తిరిగి shaderId_; }
 
-private:
+అంతరంగ:
     Impl();
 
     GLuint shaderId_;
-    bool autoRelease_;
+    తార్కిక autoRelease_;
 };
 
-const Ptr<cv::ogl::Shader::Impl>& cv::ogl::Shader::Impl::empty()
+స్థిరరాశి Ptr<cv::ogl::Shader::Impl>& cv::ogl::Shader::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    స్థిర Ptr<Impl> p(కొత్త Impl);
+    తిరిగి p;
 }
 
-cv::ogl::Shader::Impl::Impl() : shaderId_(0), autoRelease_(false)
+cv::ogl::Shader::Impl::Impl() : shaderId_(0), autoRelease_(అబద్ధం)
 {
 }
 
-cv::ogl::Shader::Impl::Impl(GLuint shaderId, bool autoRelease) : shaderId_(shaderId), autoRelease_(autoRelease)
+cv::ogl::Shader::Impl::Impl(GLuint shaderId, తార్కిక autoRelease) : shaderId_(shaderId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsShader(shaderId) == gl::TRUE_ );
 }
 
-cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : shaderId_(0), autoRelease_(autoRelease)
+cv::ogl::Shader::Impl::Impl(స్థిరరాశి అక్షరం* src, GLenum type, తార్కిక autoRelease) : shaderId_(0), autoRelease_(autoRelease)
 {
     shaderId_ = gl::CreateShader(type);
     CV_CheckGlError();
 
     CV_Assert( shaderId_ != 0 );
 
-    GLint status;
-    gl::ShaderSource(shaderId_, 1, &src, 0);
+    GLint స్థితి_2;
+    gl::Shader_ఆధారం(shaderId_, 1, &src, 0);
     gl::CompileShader(shaderId_);
-    gl::GetShaderiv(shaderId_, gl::COMPILE_STATUS, &status);
-    if (!status) {
+    gl::GetShaderiv(shaderId_, gl::COMPILE_స్థితి, &స్థితి_2);
+    ఒకవేళ (!స్థితి_2) {
         String info_log;
-        gl::GetShaderiv(shaderId_, gl::INFO_LOG_LENGTH, &status);
-        info_log.resize(status);
-        gl::GetShaderInfoLog(shaderId_, GLsizei(info_log.size()) + 1, nullptr, &info_log[0]);
+        gl::GetShaderiv(shaderId_, gl::INFO_LOG_నిడివి, &స్థితి_2);
+        info_log.resize(స్థితి_2);
+        gl::GetShaderInfoLog(shaderId_, GLsizei(info_log.size()) + 1, శూన్యసూచిక, &info_log[0]);
         CV_Error(Error::OpenGlApiCallError, info_log);
     }
 
@@ -1847,149 +1847,149 @@ cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : sh
 
 cv::ogl::Shader::Impl::~Impl()
 {
-    if (autoRelease_ && shaderId_)
+    ఒకవేళ (autoRelease_ && shaderId_)
         gl::DeleteShader(shaderId_);
 }
 
-#endif // HAVE_OPENGL
+#అయితే_ముగింపు // HAVE_OPENGL
 
-cv::ogl::Shader::Shader() : type_(ShaderType::VERTEX)
+cv::ogl::Shader::Shader() : type_(ShaderType::శీర్షం_3)
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_ = Impl::empty();
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::Shader::Shader(const char* src, ShaderType type, bool autoRelease) : type_(type)
+cv::ogl::Shader::Shader(స్థిరరాశి అక్షరం* src, ShaderType type, తార్కిక autoRelease) : type_(type)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(src); CV_వాడని(type); CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(src, type, autoRelease));
-#endif
+#లేకపోతే
+    impl_.reset(కొత్త Impl(src, type, autoRelease));
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Shader::create(const char* src, ShaderType type, bool autoRelease)
+శూన్య cv::ogl::Shader::create(స్థిరరాశి అక్షరం* src, ShaderType type, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(src); CV_వాడని(type); CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(src, type, autoRelease));
+#లేకపోతే
+    impl_.reset(కొత్త Impl(src, type, autoRelease));
     type_ = type;
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Shader::release()
+శూన్య cv::ogl::Shader::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#నిర్వచితమైతే HAVE_OPENGL
+    ఒకవేళ (impl_)
+        impl_->సమితి_Auto_Release(నిజం);
     impl_ = Impl::empty();
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Shader::setAutoRelease(bool flag)
+శూన్య cv::ogl::Shader::సమితి_Auto_Release(తార్కిక flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#లేకపోతే
+    impl_->సమితి_Auto_Release(flag);
+#అయితే_ముగింపు
 }
 
-unsigned int cv::ogl::Shader::shaderId() const
+గుర్తులేని పూర్ణాంకం cv::ogl::Shader::shaderId() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->shaderId();
-#endif
+#లేకపోతే
+    తిరిగి impl_->shaderId();
+#అయితే_ముగింపు
 }
 
-cv::ogl::Shader::ShaderType cv::ogl::Shader::type() const
+cv::ogl::Shader::ShaderType cv::ogl::Shader::type() స్థిరరాశి
 {
-    return type_;
+    తిరిగి type_;
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Program
 
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
 
-class cv::ogl::Program::Impl
+తరగతి cv::ogl::కార్యక్రమం_2::Impl
 {
 };
 
-#else
+#లేకపోతే
 
-class cv::ogl::Program::Impl
+తరగతి cv::ogl::కార్యక్రమం_2::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+బహిరంగ:
+    స్థిర స్థిరరాశి Ptr<Impl>& empty();
 
-    Impl(GLuint programId, bool autoRelease);
-    Impl(const Shader& vert, const Shader& frag, bool autoRelease);
+    Impl(GLuint కార్యక్రమం_Id, తార్కిక autoRelease);
+    Impl(స్థిరరాశి Shader& vert, స్థిరరాశి Shader& frag, తార్కిక autoRelease);
     ~Impl();
 
-    void bind();
+    శూన్య bind();
 
-    int getAttributeLocation(const char* name) const;
-    int getUniformLocation(const char* name) const;
+    పూర్ణాంకం getAttributeLocation(స్థిరరాశి అక్షరం* name) స్థిరరాశి;
+    పూర్ణాంకం get_ఏకరీతి_Location(స్థిరరాశి అక్షరం* name) స్థిరరాశి;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    శూన్య సమితి_Auto_Release(తార్కిక flag) { autoRelease_ = flag; }
 
-    GLuint programId() const { return programId_; }
+    GLuint కార్యక్రమం_Id() స్థిరరాశి { తిరిగి కార్యక్రమం_Id_2; }
 
-private:
+అంతరంగ:
     Impl();
 
     Shader vert_;
     Shader frag_;
-    GLuint programId_;
-    bool autoRelease_;
+    GLuint కార్యక్రమం_Id_2;
+    తార్కిక autoRelease_;
 };
 
-const Ptr<cv::ogl::Program::Impl>& cv::ogl::Program::Impl::empty()
+స్థిరరాశి Ptr<cv::ogl::కార్యక్రమం_2::Impl>& cv::ogl::కార్యక్రమం_2::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    స్థిర Ptr<Impl> p(కొత్త Impl);
+    తిరిగి p;
 }
 
-cv::ogl::Program::Impl::Impl() : programId_(0), autoRelease_(false)
+cv::ogl::కార్యక్రమం_2::Impl::Impl() : కార్యక్రమం_Id_2(0), autoRelease_(అబద్ధం)
 {
 }
 
-cv::ogl::Program::Impl::Impl(GLuint programId, bool autoRelease) : programId_(programId), autoRelease_(autoRelease)
+cv::ogl::కార్యక్రమం_2::Impl::Impl(GLuint కార్యక్రమం_Id, తార్కిక autoRelease) : కార్యక్రమం_Id_2(కార్యక్రమం_Id), autoRelease_(autoRelease)
 {
-    CV_Assert( gl::IsProgram(programId) == gl::TRUE_ );
+    CV_Assert( gl::Is_కార్యక్రమం(కార్యక్రమం_Id) == gl::TRUE_ );
 }
 
-cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRelease) : programId_(0), autoRelease_(autoRelease)
+cv::ogl::కార్యక్రమం_2::Impl::Impl(స్థిరరాశి Shader& vert, స్థిరరాశి Shader& frag, తార్కిక autoRelease) : కార్యక్రమం_Id_2(0), autoRelease_(autoRelease)
 {
-    programId_ = gl::CreateProgram();
+    కార్యక్రమం_Id_2 = gl::Create_కార్యక్రమం();
     CV_CheckGlError();
 
-    CV_Assert( programId_ != 0 );
+    CV_Assert( కార్యక్రమం_Id_2 != 0 );
 
-    gl::AttachShader(programId_, vert.shaderId());
+    gl::AttachShader(కార్యక్రమం_Id_2, vert.shaderId());
     CV_CheckGlError();
 
-    gl::AttachShader(programId_, frag.shaderId());
+    gl::AttachShader(కార్యక్రమం_Id_2, frag.shaderId());
     CV_CheckGlError();
 
-    GLint status;
-    gl::LinkProgram(programId_);
-    gl::GetProgramiv(programId_, gl::LINK_STATUS, &status);
-    if (!status) {
+    GLint స్థితి_2;
+    gl::Link_కార్యక్రమం(కార్యక్రమం_Id_2);
+    gl::GetProgramiv(కార్యక్రమం_Id_2, gl::LINK_స్థితి, &స్థితి_2);
+    ఒకవేళ (!స్థితి_2) {
         String info_log;
-        gl::GetProgramiv(programId_, gl::INFO_LOG_LENGTH, &status);
-        info_log.resize(status);
-        gl::GetProgramInfoLog(programId_, GLsizei(info_log.size()) + 1, nullptr, &info_log[0]);
+        gl::GetProgramiv(కార్యక్రమం_Id_2, gl::INFO_LOG_నిడివి, &స్థితి_2);
+        info_log.resize(స్థితి_2);
+        gl::Get_కార్యక్రమం_Info_Log(కార్యక్రమం_Id_2, GLsizei(info_log.size()) + 1, శూన్యసూచిక, &info_log[0]);
         CV_Error(Error::OpenGlApiCallError, info_log);
     }
 
@@ -1999,211 +1999,211 @@ cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRe
     frag_ = frag;
 }
 
-cv::ogl::Program::Impl::~Impl()
+cv::ogl::కార్యక్రమం_2::Impl::~Impl()
 {
-    if (autoRelease_ && programId_)
-        gl::DeleteProgram(programId_);
+    ఒకవేళ (autoRelease_ && కార్యక్రమం_Id_2)
+        gl::Delete_కార్యక్రమం(కార్యక్రమం_Id_2);
 }
 
-void cv::ogl::Program::Impl::bind()
+శూన్య cv::ogl::కార్యక్రమం_2::Impl::bind()
 {
-    gl::UseProgram(programId_);
+    gl::Use_కార్యక్రమం(కార్యక్రమం_Id_2);
     CV_CheckGlError();
 }
 
-int cv::ogl::Program::Impl::getAttributeLocation(const char* name) const
+పూర్ణాంకం cv::ogl::కార్యక్రమం_2::Impl::getAttributeLocation(స్థిరరాశి అక్షరం* name) స్థిరరాశి
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetAttribLocation(programId_, name);
+    పూర్ణాంకం location = gl::GetAttribLocation(కార్యక్రమం_Id_2, name);
     CV_CheckGlError();
-    return location;
+    తిరిగి location;
 }
 
-int cv::ogl::Program::Impl::getUniformLocation(const char* name) const
+పూర్ణాంకం cv::ogl::కార్యక్రమం_2::Impl::get_ఏకరీతి_Location(స్థిరరాశి అక్షరం* name) స్థిరరాశి
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetUniformLocation(programId_, name);
+    పూర్ణాంకం location = gl::Get_ఏకరీతి_Location(కార్యక్రమం_Id_2, name);
     CV_CheckGlError();
-    return location;
+    తిరిగి location;
 }
 
-#endif // HAVE_OPENGL
+#అయితే_ముగింపు // HAVE_OPENGL
 
-cv::ogl::Program::Program()
+cv::ogl::కార్యక్రమం_2::కార్యక్రమం_2()
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_ = Impl::empty();
-#endif
+#అయితే_ముగింపు
 }
 
-cv::ogl::Program::Program(const Shader& vert, const Shader& frag, bool autoRelease)
+cv::ogl::కార్యక్రమం_2::కార్యక్రమం_2(స్థిరరాశి Shader& vert, స్థిరరాశి Shader& frag, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(vert); CV_వాడని(frag); CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(vert, frag, autoRelease));
-#endif
+#లేకపోతే
+    impl_.reset(కొత్త Impl(vert, frag, autoRelease));
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::create(const Shader& vert, const Shader& frag, bool autoRelease)
+శూన్య cv::ogl::కార్యక్రమం_2::create(స్థిరరాశి Shader& vert, స్థిరరాశి Shader& frag, తార్కిక autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(vert); CV_వాడని(frag); CV_వాడని(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(vert, frag, autoRelease));
-#endif
+#లేకపోతే
+    impl_.reset(కొత్త Impl(vert, frag, autoRelease));
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::release()
+శూన్య cv::ogl::కార్యక్రమం_2::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#నిర్వచితమైతే HAVE_OPENGL
+    ఒకవేళ (impl_)
+        impl_->సమితి_Auto_Release(నిజం);
     impl_ = Impl::empty();
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::setAutoRelease(bool flag)
+శూన్య cv::ogl::కార్యక్రమం_2::సమితి_Auto_Release(తార్కిక flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#లేకపోతే
+    impl_->సమితి_Auto_Release(flag);
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::bind() const
+శూన్య cv::ogl::కార్యక్రమం_2::bind() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
+#లేకపోతే
     impl_->bind();
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::unbind()
+శూన్య cv::ogl::కార్యక్రమం_2::unbind()
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    gl::UseProgram(0);
-#endif
+#లేకపోతే
+    gl::Use_కార్యక్రమం(0);
+#అయితే_ముగింపు
 }
 
-int cv::ogl::Program::getAttributeLocation(const char* name) const
+పూర్ణాంకం cv::ogl::కార్యక్రమం_2::getAttributeLocation(స్థిరరాశి అక్షరం* name) స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(name);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(name);
     throw_no_ogl();
-#else
-    return impl_->getAttributeLocation(name);
-#endif
+#లేకపోతే
+    తిరిగి impl_->getAttributeLocation(name);
+#అయితే_ముగింపు
 }
 
-int cv::ogl::Program::getUniformLocation(const char* name) const
+పూర్ణాంకం cv::ogl::కార్యక్రమం_2::get_ఏకరీతి_Location(స్థిరరాశి అక్షరం* name) స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(name);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(name);
     throw_no_ogl();
-#else
-    return impl_->getUniformLocation(name);
-#endif
+#లేకపోతే
+    తిరిగి impl_->get_ఏకరీతి_Location(name);
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::setUniformVec3(int loc, Vec3f vec)
+శూన్య cv::ogl::కార్యక్రమం_2::సమితి_ఏకరీతి_Vec3(పూర్ణాంకం loc, Vec3f vec)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(vec);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(loc); CV_వాడని(vec);
     throw_no_ogl();
-#else
+#లేకపోతే
     gl::Uniform3f(loc, vec(0), vec(1), vec(2));
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::setUniformVec2(int loc, Vec2f vec)
+శూన్య cv::ogl::కార్యక్రమం_2::సమితి_ఏకరీతి_Vec2(పూర్ణాంకం loc, Vec2f vec)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(vec);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(loc); CV_వాడని(vec);
     throw_no_ogl();
-#else
+#లేకపోతే
     gl::Uniform2f(loc, vec(0), vec(1));
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::setUniformVec4(int loc, Vec4f vec)
+శూన్య cv::ogl::కార్యక్రమం_2::సమితి_ఏకరీతి_Vec4(పూర్ణాంకం loc, Vec4f vec)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(vec);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(loc); CV_వాడని(vec);
     throw_no_ogl();
-#else
+#లేకపోతే
     gl::Uniform4f(loc, vec(0), vec(1), vec(2), vec(3));
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::setUniformMat4x4(int loc, Matx44f mat)
+శూన్య cv::ogl::కార్యక్రమం_2::సమితి_ఏకరీతి_Mat4x4(పూర్ణాంకం loc, Matx44f mat)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(mat);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(loc); CV_వాడని(mat);
     throw_no_ogl();
-#else
-    gl::UniformMatrix4fv(loc, 1, true, mat.val);
-#endif
+#లేకపోతే
+    gl::ఏకరీతి_Matrix4fv(loc, 1, నిజం, mat.val);
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::setUniform1f(int loc, float value)
+శూన్య cv::ogl::కార్యక్రమం_2::సమితి_Uniform1f(పూర్ణాంకం loc, దశాంశం value)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(value);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(loc); CV_వాడని(value);
     throw_no_ogl();
-#else
+#లేకపోతే
     gl::Uniform1f(loc, value);
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::Program::setUniform1i(int loc, int value)
+శూన్య cv::ogl::కార్యక్రమం_2::సమితి_Uniform1i(పూర్ణాంకం loc, పూర్ణాంకం value)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(value);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(loc); CV_వాడని(value);
     throw_no_ogl();
-#else
+#లేకపోతే
     gl::Uniform1i(loc, value);
-#endif
+#అయితే_ముగింపు
 }
 
-unsigned int cv::ogl::Program::programId() const
+గుర్తులేని పూర్ణాంకం cv::ogl::కార్యక్రమం_2::కార్యక్రమం_Id() స్థిరరాశి
 {
-#ifndef HAVE_OPENGL
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->programId();
-#endif
+#లేకపోతే
+    తిరిగి impl_->కార్యక్రమం_Id();
+#అయితే_ముగింపు
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Rendering
 
-void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<double> texRect)
+శూన్య cv::ogl::render(స్థిరరాశి ogl::Texture2D& tex, Rect_<ద్విగుణ> wndRect, Rect_<ద్విగుణ> texRect)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(tex);
-    CV_UNUSED(wndRect);
-    CV_UNUSED(texRect);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(tex);
+    CV_వాడని(wndRect);
+    CV_వాడని(texRect);
     throw_no_ogl();
-#else
-    if (!tex.empty())
+#లేకపోతే
+    ఒకవేళ (!tex.empty())
     {
-        gl::MatrixMode(gl::PROJECTION);
-        gl::LoadIdentity();
+        gl::మాతృక_బహుళకం(gl::PROJECTION);
+        gl::ఎక్కించు_తటస్థం();
         gl::Ortho(0.0, 1.0, 1.0, 0.0, -1.0, 1.0);
         CV_CheckGlError();
 
-        gl::MatrixMode(gl::MODELVIEW);
-        gl::LoadIdentity();
+        gl::మాతృక_బహుళకం(gl::MODELVIEW);
+        gl::ఎక్కించు_తటస్థం();
         CV_CheckGlError();
 
         gl::Disable(gl::LIGHTING);
@@ -2214,267 +2214,267 @@ void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<dou
         gl::Enable(gl::TEXTURE_2D);
         CV_CheckGlError();
 
-        gl::TexEnvi(gl::TEXTURE_ENV, gl::TEXTURE_ENV_MODE, gl::REPLACE);
+        gl::TexEnvi(gl::TEXTURE_ENV, gl::TEXTURE_ENV_బహుళకం, gl::REPLACE);
         CV_CheckGlError();
 
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::రేఖీయ);
         CV_CheckGlError();
 
-        const double vertex[] =
+        స్థిరరాశి ద్విగుణ శీర్షం[] =
         {
             wndRect.x, wndRect.y, 0.0,
-            wndRect.x, (wndRect.y + wndRect.height), 0.0,
-            wndRect.x + wndRect.width, (wndRect.y + wndRect.height), 0.0,
-            wndRect.x + wndRect.width, wndRect.y, 0.0
+            wndRect.x, (wndRect.y + wndRect.ఎత్తు), 0.0,
+            wndRect.x + wndRect.వెడల్పు, (wndRect.y + wndRect.ఎత్తు), 0.0,
+            wndRect.x + wndRect.వెడల్పు, wndRect.y, 0.0
         };
-        const double texCoords[] =
+        స్థిరరాశి ద్విగుణ texCoords[] =
         {
             texRect.x, texRect.y,
-            texRect.x, texRect.y + texRect.height,
-            texRect.x + texRect.width, texRect.y + texRect.height,
-            texRect.x + texRect.width, texRect.y
+            texRect.x, texRect.y + texRect.ఎత్తు,
+            texRect.x + texRect.వెడల్పు, texRect.y + texRect.ఎత్తు,
+            texRect.x + texRect.వెడల్పు, texRect.y
         };
 
-        ogl::Buffer::unbind(ogl::Buffer::ARRAY_BUFFER);
+        ogl::బఫరు_2::unbind(ogl::బఫరు_2::ARRAY_బఫరు);
 
         gl::EnableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
 
-        gl::TexCoordPointer(2, gl::DOUBLE, 0, texCoords);
+        gl::Tex_Coord_సూచిక(2, gl::DOUBLE, 0, texCoords);
         CV_CheckGlError();
 
-        gl::DisableClientState(gl::NORMAL_ARRAY);
+        gl::DisableClientState(gl::సాధారణ_ARRAY);
         gl::DisableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
 
-        gl::EnableClientState(gl::VERTEX_ARRAY);
+        gl::EnableClientState(gl::శీర్షం_ARRAY);
         CV_CheckGlError();
 
-        gl::VertexPointer(3, gl::DOUBLE, 0, vertex);
+        gl::శీర్షం_సూచిక(3, gl::DOUBLE, 0, శీర్షం);
         CV_CheckGlError();
 
         gl::DrawArrays(gl::QUADS, 0, 4);
         CV_CheckGlError();
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, int mode, Scalar color)
+శూన్య cv::ogl::render(స్థిరరాశి ogl::Arrays& arr, పూర్ణాంకం బహుళకం, Scalar color)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(mode);
-    CV_UNUSED(color);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
+    CV_వాడని(బహుళకం);
+    CV_వాడని(color);
     throw_no_ogl();
-#else
-    if (!arr.empty())
+#లేకపోతే
+    ఒకవేళ (!arr.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
         arr.bind();
 
-        gl::DrawArrays(mode, 0, arr.size());
+        gl::DrawArrays(బహుళకం, 0, arr.size());
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scalar color)
+శూన్య cv::ogl::render(స్థిరరాశి ogl::Arrays& arr, ఆదానం_Array indices, పూర్ణాంకం బహుళకం, Scalar color)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(indices);
-    CV_UNUSED(mode);
-    CV_UNUSED(color);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(arr);
+    CV_వాడని(indices);
+    CV_వాడని(బహుళకం);
+    CV_వాడని(color);
     throw_no_ogl();
-#else
-    if (!arr.empty() && !indices.empty())
+#లేకపోతే
+    ఒకవేళ (!arr.empty() && !indices.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
         arr.bind();
 
-        const int kind = indices.kind();
+        స్థిరరాశి పూర్ణాంకం రకం = indices.రకం();
 
-        switch (kind)
+        ఎంపిక (రకం)
         {
-        case _InputArray::OPENGL_BUFFER :
+        స్థితి ఆదానం_Array_2::OPENGL_బఫరు :
             {
-                ogl::Buffer buf = indices.getOGlBuffer();
+                ogl::బఫరు_2 buf = indices.get_OGl_బఫరు();
 
-                const int depth = buf.depth();
+                స్థిరరాశి పూర్ణాంకం లోతు = buf.లోతు();
 
                 CV_Assert( buf.channels() == 1 );
-                CV_Assert( depth <= CV_32S );
+                CV_Assert( లోతు <= CV_32S );
 
                 GLenum type;
-                if (depth < CV_16U)
+                ఒకవేళ (లోతు < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                లేకపోతే ఒకవేళ (లోతు < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                లేకపోతే
                     type = gl::UNSIGNED_INT;
 
-                buf.bind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
+                buf.bind(ogl::బఫరు_2::ELEMENT_ARRAY_బఫరు);
 
-                gl::DrawElements(mode, buf.size().area(), type, 0);
+                gl::DrawElements(బహుళకం, buf.size().area(), type, 0);
 
-                ogl::Buffer::unbind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
+                ogl::బఫరు_2::unbind(ogl::బఫరు_2::ELEMENT_ARRAY_బఫరు);
 
-                break;
+                ఆపు;
             }
 
-        default:
+        అప్రమేయ:
             {
                 Mat mat = indices.getMat();
 
-                const int depth = mat.depth();
+                స్థిరరాశి పూర్ణాంకం లోతు = mat.లోతు();
 
                 CV_Assert( mat.channels() == 1 );
-                CV_Assert( depth <= CV_32S );
+                CV_Assert( లోతు <= CV_32S );
                 CV_Assert( mat.isContinuous() );
 
                 GLenum type;
-                if (depth < CV_16U)
+                ఒకవేళ (లోతు < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                లేకపోతే ఒకవేళ (లోతు < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                లేకపోతే
                     type = gl::UNSIGNED_INT;
 
-                ogl::Buffer::unbind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
+                ogl::బఫరు_2::unbind(ogl::బఫరు_2::ELEMENT_ARRAY_బఫరు);
 
-                gl::DrawElements(mode, mat.size().area(), type, mat.data);
+                gl::DrawElements(బహుళకం, mat.size().area(), type, mat.దత్తాంశం);
             }
         }
     }
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::clearColor(Scalar color)
+శూన్య cv::ogl::clearColor(Scalar color)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(color);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(color);
     throw_no_ogl();
-#else
+#లేకపోతే
     gl::ClearColor(static_cast<GLfloat>(color[0] / 255.0), static_cast<GLfloat>(color[1] / 255.0),
                    static_cast<GLfloat>(color[2] / 255.0), static_cast<GLfloat>(color[3] / 255.0));
-    gl::Clear(gl::COLOR_BUFFER_BIT);
-#endif // HAVE_OPENGL
+    gl::Clear(gl::COLOR_బఫరు_బిట్టు);
+#అయితే_ముగింపు // HAVE_OPENGL
 }
 
-void cv::ogl::clearDepth(float depth)
+శూన్య cv::ogl::clear_లోతు(దశాంశం లోతు)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(depth);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(లోతు);
     throw_no_ogl();
-#else
-    gl::ClearDepth(depth);
-    gl::Clear(gl::DEPTH_BUFFER_BIT);
-#endif // HAVE_OPENGL
+#లేకపోతే
+    gl::Clear_లోతు(లోతు);
+    gl::Clear(gl::లోతు_బఫరు_బిట్టు);
+#అయితే_ముగింపు // HAVE_OPENGL
 }
 
-void cv::ogl::drawArrays(int first, int count, int mode)
+శూన్య cv::ogl::drawArrays(పూర్ణాంకం first, పూర్ణాంకం లెక్క_2, పూర్ణాంకం బహుళకం)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(mode);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(first); CV_వాడని(లెక్క_2); CV_వాడని(బహుళకం);
     throw_no_ogl();
-#else
-    gl::DrawArrays(mode, first, count);
-#endif // HAVE_OPENGL
+#లేకపోతే
+    gl::DrawArrays(బహుళకం, first, లెక్క_2);
+#అయితే_ముగింపు // HAVE_OPENGL
 }
 
-void cv::ogl::drawElements(int first, int count, int type, int mode)
+శూన్య cv::ogl::drawElements(పూర్ణాంకం first, పూర్ణాంకం లెక్క_2, పూర్ణాంకం type, పూర్ణాంకం బహుళకం)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(first); CV_వాడని(లెక్క_2); CV_వాడని(type); CV_వాడని(బహుళకం);
     throw_no_ogl();
-#else
-    gl::DrawElements(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)));
-#endif
+#లేకపోతే
+    gl::DrawElements(బహుళకం, లెక్క_2, type, reinterpret_cast<స్థిరరాశి శూన్య*>(static_cast<size_t>(first)));
+#అయితే_ముగింపు
 }
 
-void cv::ogl::drawElementsInstanced(int first, int count, int type, int mode, int instanceCount)
+శూన్య cv::ogl::drawElementsInstanced(పూర్ణాంకం first, పూర్ణాంకం లెక్క_2, పూర్ణాంకం type, పూర్ణాంకం బహుళకం, పూర్ణాంకం instance_లెక్క)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode); CV_UNUSED(instanceCount);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(first); CV_వాడని(లెక్క_2); CV_వాడని(type); CV_వాడని(బహుళకం); CV_వాడని(instance_లెక్క);
     throw_no_ogl();
-#else
-    gl::DrawElementsInstanced(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)), instanceCount);
+#లేకపోతే
+    gl::DrawElementsInstanced(బహుళకం, లెక్క_2, type, reinterpret_cast<స్థిరరాశి శూన్య*>(static_cast<size_t>(first)), instance_లెక్క);
     CV_CheckGlError();
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::blendFunc(int sfactor, int dfactor)
+శూన్య cv::ogl::blendFunc(పూర్ణాంకం sfactor, పూర్ణాంకం dfactor)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(sfactor); CV_UNUSED(dfactor);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(sfactor); CV_వాడని(dfactor);
     throw_no_ogl();
-#else
+#లేకపోతే
     gl::BlendFunc(sfactor, dfactor);
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::depthMask(bool flag)
+శూన్య cv::ogl::లోతు_ముసుగు_2(తార్కిక flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(flag);
     throw_no_ogl();
-#else
-    gl::DepthMask(flag ? gl::TRUE_ : gl::FALSE_);
-#endif
+#లేకపోతే
+    gl::లోతు_ముసుగు(flag ? gl::TRUE_ : gl::FALSE_);
+#అయితే_ముగింపు
 }
 
-void cv::ogl::enable(int cap)
+శూన్య cv::ogl::enable(పూర్ణాంకం cap)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(cap);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(cap);
     throw_no_ogl();
-#else
+#లేకపోతే
     gl::Enable(cap);
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::ogl::disable(int cap)
+శూన్య cv::ogl::disable(పూర్ణాంకం cap)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(cap);
+#నిర్వచితం_కాకపోతే HAVE_OPENGL
+    CV_వాడని(cap);
     throw_no_ogl();
-#else
+#లేకపోతే
     gl::Disable(cap);
-#endif
+#అయితే_ముగింపు
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CL-GL Interoperability
 
-#ifdef HAVE_OPENCL
+#నిర్వచితమైతే HAVE_OPENCL
 #  include "opencv2/core/opencl/runtime/opencl_core.hpp"
 #  include "opencv2/core/opencl/runtime/opencl_gl.hpp"
 #  ifdef cl_khr_gl_sharing
 #    define HAVE_OPENCL_OPENGL_SHARING
-#  else
+#  లేకపోతే
 #    define NO_OPENCL_SHARING_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL/OpenGL sharing support")
 #  endif
-#else // HAVE_OPENCL
+#లేకపోతే // HAVE_OPENCL
 #  define NO_OPENCL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL support")
-#endif // HAVE_OPENCL
+#అయితే_ముగింపు // HAVE_OPENCL
 
-#if defined(HAVE_OPENGL)
-#  if defined(__ANDROID__)
+#ఒకవేళ defined(HAVE_OPENGL)
+#  ఒకవేళ defined(__ANDROID__)
 #    include <EGL/egl.h>
 #  elif defined(__linux__)
 #    include <GL/glx.h>
 #  endif
-#endif // HAVE_OPENGL
+#అయితే_ముగింపు // HAVE_OPENGL
 
-namespace cv { namespace ogl {
+నామాకాశ cv { నామాకాశ ogl {
 
-#if defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
+#ఒకవేళ defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
 // Check to avoid crash in OpenCL runtime: https://github.com/opencv/opencv/issues/5209
-static void checkOpenCLVersion()
+స్థిర శూన్య checkOpenCLVersion()
 {
-    using namespace cv::ocl;
-    const Device& device = Device::getDefault();
+    ఉపయోగించి నామాకాశ cv::ocl;
+    స్థిరరాశి Device& device = Device::getDefault();
     //CV_Assert(!device.empty());
     cl_device_id dev = (cl_device_id)device.ptr();
     CV_Assert(dev);
@@ -2482,118 +2482,118 @@ static void checkOpenCLVersion()
     cl_platform_id platform_id = 0;
     size_t sz = 0;
 
-    cl_int status = clGetDeviceInfo(dev, CL_DEVICE_PLATFORM, sizeof(platform_id), &platform_id, &sz);
-    CV_Assert(status == CL_SUCCESS && sz == sizeof(cl_platform_id));
+    cl_int స్థితి_2 = clGetDeviceInfo(dev, CL_DEVICE_PLATFORM, పరిమాణం(platform_id), &platform_id, &sz);
+    CV_Assert(స్థితి_2 == CL_SUCCESS && sz == పరిమాణం(cl_platform_id));
     CV_Assert(platform_id);
 
     PlatformInfo pi(&platform_id);
-    int versionMajor = pi.versionMajor();
-    int versionMinor = pi.versionMinor();
-    if (versionMajor < 1 || (versionMajor == 1 && versionMinor <= 1))
+    పూర్ణాంకం సంస్కరణ_Major_2 = pi.సంస్కరణ_Major_2();
+    పూర్ణాంకం సంస్కరణ_Minor_2 = pi.సంస్కరణ_Minor_2();
+    ఒకవేళ (సంస్కరణ_Major_2 < 1 || (సంస్కరణ_Major_2 == 1 && సంస్కరణ_Minor_2 <= 1))
         CV_Error_(cv::Error::OpenCLApiCallError,
             ("OpenCL: clCreateFromGLTexture requires OpenCL 1.2+ version: %d.%d - %s (%s)",
-                versionMajor, versionMinor, pi.name().c_str(), pi.version().c_str())
+                సంస్కరణ_Major_2, సంస్కరణ_Minor_2, pi.name().c_str(), pi.సంస్కరణ().c_str())
         );
 }
-#endif
+#అయితే_ముగింపు
 
-namespace ocl {
+నామాకాశ ocl {
 
 Context& initializeContextFromGL()
 {
-#if !defined(HAVE_OPENGL)
+#ఒకవేళ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#లేదావేళ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#లేదావేళ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#లేకపోతే
     cl_uint platformsCnt = 0;
     cl_uint devCnt = 0;
-    cl_device_id* devices = nullptr;
-    cl_uint devUsed = 0;
-    cl_context context = nullptr;
+    cl_device_id* devices = శూన్యసూచిక;
+    cl_uint dev_వాడిన = 0;
+    cl_context context = శూన్యసూచిక;
 
-    cl_int status = clGetPlatformIDs(0, NULL, &platformsCnt);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get number of platforms: %d", status));
-    if (platformsCnt == 0)
+    cl_int స్థితి_2 = clGetPlatformIDs(0, ఖాళీ, &platformsCnt);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get number of platforms: %d", స్థితి_2));
+    ఒకవేళ (platformsCnt == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
     std::vector<cl_platform_id> platforms(platformsCnt);
-    status = clGetPlatformIDs(platformsCnt, &platforms[0], NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platforms: %d", status));
+    స్థితి_2 = clGetPlatformIDs(platformsCnt, &platforms[0], ఖాళీ);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platforms: %d", స్థితి_2));
 
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    bool sharingSupported = false;
+    తార్కిక sharingSupported = అబద్ధం;
 
-    for (unsigned int i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
-        status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, NULL, &devCnt);
-        if (status != CL_SUCCESS)
-            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
+    కొరకు (గుర్తులేని పూర్ణాంకం i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
+        స్థితి_2 = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, ఖాళీ, &devCnt);
+        ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", స్థితి_2));
 
-        try {
-            devices = new cl_device_id[devCnt];
+        ప్రయత్నించు {
+            devices = కొత్త cl_device_id[devCnt];
 
-            status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, devCnt, devices, NULL);
-            if (status != CL_SUCCESS)
-                CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platform devices: %d", status));
+            స్థితి_2 = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, devCnt, devices, ఖాళీ);
+            ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+                CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platform devices: %d", స్థితి_2));
 
-            for (unsigned int j = 0; (!sharingSupported && (j < devCnt)); ++j) {
-                size_t extensionSize;
-                status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, NULL, &extensionSize );
-                if (status != CL_SUCCESS)
-                    CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
+            కొరకు (గుర్తులేని పూర్ణాంకం j = 0; (!sharingSupported && (j < devCnt)); ++j) {
+                size_t extension_కొలత;
+                స్థితి_2 = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, ఖాళీ, &extension_కొలత );
+                ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+                    CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", స్థితి_2));
 
-                if(extensionSize > 0)
+                ఒకవేళ(extension_కొలత > 0)
                 {
-                    std::string devString(extensionSize, '\0');
-                    status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, devString.size(), &devString[0], &extensionSize);
-                    if (status != CL_SUCCESS)
-                        continue;
-                    if (extensionSize > 0 && devString.size() >= extensionSize)
-                        devString.resize(extensionSize - 1);
+                    std::string devString(extension_కొలత, '\0');
+                    స్థితి_2 = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, devString.size(), &devString[0], &extension_కొలత);
+                    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+                        కొనసాగు;
+                    ఒకవేళ (extension_కొలత > 0 && devString.size() >= extension_కొలత)
+                        devString.resize(extension_కొలత - 1);
 
                     size_t oldPos = 0;
                     size_t spacePos = devString.find(' ', oldPos); // extensions string is space delimited
-                    while (spacePos != devString.npos) {
-                        if (strcmp(GL_SHARING_EXTENSION,
+                    అయితే (spacePos != devString.npos) {
+                        ఒకవేళ (strcmp(GL_SHARING_EXTENSION,
                                 devString.substr(oldPos, spacePos - oldPos).c_str())
                                 == 0) {
                             // Device supports context sharing with OpenGL
-                            devUsed = i;
-                            sharingSupported = true;
-                            break;
+                            dev_వాడిన = i;
+                            sharingSupported = నిజం;
+                            ఆపు;
                         }
-                        do {
+                        చేయి {
                             oldPos = spacePos + 1;
                             spacePos = devString.find(' ', oldPos);
-                        } while (spacePos == oldPos);
+                        } అయితే (spacePos == oldPos);
                     }
                 }
             }
-        } catch(...) {
+        } పట్టుకో(...) {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Exception thrown during device information gathering");
-            if(devices != nullptr) {
-                delete[] devices;
+            ఒకవేళ(devices != శూన్యసూచిక) {
+                తొలగించు[] devices;
             }
-            continue;
+            కొనసాగు;
         }
 
-        if (sharingSupported) {
+        ఒకవేళ (sharingSupported) {
             // Define OS-specific context properties and create the OpenCL context
-#if defined (__APPLE__)
+#ఒకవేళ defined (__APPLE__)
                 CGLContextObj cglContext = CGLGetCurrentContext();
-                CGLShareGroupObj cglShareGroup = CGLGetShareGroup(cglContext);
+                CGLShare_సమూహం_Obj cgl_Share_సమూహం = CGLGet_Share_సమూహం(cglContext);
                 cl_context_properties props[] =
                 {
-                    CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)cglShareGroup,
+                    CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)cgl_Share_సమూహం,
                     0
                 };
-                context = clCreateContext(props, 0,0, NULL, NULL, &ciErrNum);
-#elif defined(__ANDROID__)
+                context = clCreateContext(props, 0,0, ఖాళీ, ఖాళీ, &ci_Err_అంకె);
+#లేదావేళ defined(__ANDROID__)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
@@ -2601,8 +2601,8 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#elif defined(_WIN32)
+                context = clCreateContext(props, 1, &devices[dev_వాడిన], ఖాళీ, ఖాళీ, &స్థితి_2);
+#లేదావేళ defined(_WIN32)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
@@ -2610,8 +2610,8 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#elif defined(__linux__)
+                context = clCreateContext(props, 1, &devices[dev_వాడిన], ఖాళీ, ఖాళీ, &స్థితి_2);
+#లేదావేళ defined(__linux__)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
@@ -2619,44 +2619,44 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#endif
+                context = clCreateContext(props, 1, &devices[dev_వాడిన], ఖాళీ, ఖాళీ, &స్థితి_2);
+#అయితే_ముగింపు
         }
 
-        if (status != CL_SUCCESS)
-            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't create context for OpenGL interop: %d", status));
-        else
-            break;
+        ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't create context for OpenGL interop: %d", స్థితి_2));
+        లేకపోతే
+            ఆపు;
     }
 
 
-    cl_platform_id platform = platforms[devUsed];
+    cl_platform_id platform = platforms[dev_వాడిన];
     std::string platformName = PlatformInfo(&platform).name();
 
-    OpenCLExecutionContext clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, devices[devUsed]);
-    clReleaseDevice(devices[devUsed]);
+    OpenCLExecutionContext clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, devices[dev_వాడిన]);
+    clReleaseDevice(devices[dev_వాడిన]);
     clReleaseContext(context);
     clExecCtx.bind();
-    return const_cast<Context&>(clExecCtx.getContext());
-#endif
+    తిరిగి const_cast<Context&>(clExecCtx.getContext());
+#అయితే_ముగింపు
 }
 
 } // namespace cv::ogl::ocl
 
-void convertToGLTexture2D(InputArray src, Texture2D& texture)
+శూన్య convert_గమ్యం_GLTexture2_D(ఆదానం_Array src, Texture2D& texture)
 {
-    CV_UNUSED(src); CV_UNUSED(texture);
-#if !defined(HAVE_OPENGL)
+    CV_వాడని(src); CV_వాడని(texture);
+#ఒకవేళ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#లేదావేళ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#లేదావేళ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    Size srcSize = src.size();
-    CV_Assert(srcSize.width == (int)texture.cols() && srcSize.height == (int)texture.rows());
+#లేకపోతే
+    కొలత src_కొలత = src.size();
+    CV_Assert(src_కొలత.వెడల్పు == (పూర్ణాంకం)texture.నిలువుల_సంఖ్య() && src_కొలత.ఎత్తు == (పూర్ణాంకం)texture.అడ్డువరుసలు());
 
-    using namespace cv::ocl;
+    ఉపయోగించి నామాకాశ cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
 
@@ -2668,55 +2668,55 @@ void convertToGLTexture2D(InputArray src, Texture2D& texture)
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
-    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_WRITE_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
+    cl_int స్థితి_2 = 0;
+    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_WRITE_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &స్థితి_2);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", స్థితి_2));
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_బఫరు = (cl_mem)u.handle(ACCESS_READ);
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
+    cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
+    స్థితి_2 = cl_వరుసలో_చేర్చు_Acquire_GLObjects(q, 1, &clImage, 0, ఖాళీ, ఖాళీ);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", స్థితి_2));
     size_t offset = 0; // TODO
     size_t dst_origin[3] = {0, 0, 0};
-    size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, dst_origin, region, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyBufferToImage failed: %d", status));
-    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
+    size_t region[3] = { (size_t)u.నిలువుల_సంఖ్య, (size_t)u.అడ్డువరుసలు, 1};
+    స్థితి_2 = cl_వరుసలో_చేర్చు_Copy_బఫరు_గమ్యం_Image(q, cl_బఫరు, clImage, offset, dst_origin, region, 0, ఖాళీ, ఖాళీ);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyBufferToImage failed: %d", స్థితి_2));
+    స్థితి_2 = cl_వరుసలో_చేర్చు_Release_GLObjects(q, 1, &clImage, 0, ఖాళీ, ఖాళీ);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", స్థితి_2));
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
+    స్థితి_2 = cl_ముగింపు(q); // TODO Use events
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", స్థితి_2));
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
-#endif
+    స్థితి_2 = clReleaseMemObject(clImage); // TODO RAII
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", స్థితి_2));
+#అయితే_ముగింపు
 }
 
-void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
+శూన్య convertFromGLTexture2D(స్థిరరాశి Texture2D& texture, OutputArray dst)
 {
-    CV_UNUSED(texture); CV_UNUSED(dst);
-#if !defined(HAVE_OPENGL)
+    CV_వాడని(texture); CV_వాడని(dst);
+#ఒకవేళ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#లేదావేళ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#లేదావేళ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#లేకపోతే
     // check texture format
-    const int dtype = CV_8UC4;
+    స్థిరరాశి పూర్ణాంకం dtype = CV_8UC4;
     CV_Assert(texture.format() == Texture2D::RGBA);
 
-    int textureType = dtype;
+    పూర్ణాంకం textureType = dtype;
     CV_Assert(textureType >= 0);
 
-    using namespace cv::ocl;
+    ఉపయోగించి నామాకాశ cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
 
@@ -2730,119 +2730,119 @@ void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
-    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_READ_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
+    cl_int స్థితి_2 = 0;
+    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_READ_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &స్థితి_2);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", స్థితి_2));
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_బఫరు = (cl_mem)u.handle(ACCESS_READ);
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
+    cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
+    స్థితి_2 = cl_వరుసలో_చేర్చు_Acquire_GLObjects(q, 1, &clImage, 0, ఖాళీ, ఖాళీ);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", స్థితి_2));
     size_t offset = 0; // TODO
     size_t src_origin[3] = {0, 0, 0};
-    size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyImageToBuffer failed: %d", status));
-    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
+    size_t region[3] = { (size_t)u.నిలువుల_సంఖ్య, (size_t)u.అడ్డువరుసలు, 1};
+    స్థితి_2 = cl_వరుసలో_చేర్చు_Copy_Image_గమ్యం_బఫరు(q, clImage, cl_బఫరు, src_origin, region, offset, 0, ఖాళీ, ఖాళీ);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyImageToBuffer failed: %d", స్థితి_2));
+    స్థితి_2 = cl_వరుసలో_చేర్చు_Release_GLObjects(q, 1, &clImage, 0, ఖాళీ, ఖాళీ);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", స్థితి_2));
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
+    స్థితి_2 = cl_ముగింపు(q); // TODO Use events
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", స్థితి_2));
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
-#endif
+    స్థితి_2 = clReleaseMemObject(clImage); // TODO RAII
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", స్థితి_2));
+#అయితే_ముగింపు
 }
 
 //void mapGLBuffer(const Buffer& buffer, UMat& dst, AccessFlag accessFlags)
-UMat mapGLBuffer(const Buffer& buffer, AccessFlag accessFlags)
+UMat mapGLBuffer(స్థిరరాశి బఫరు_2& బఫరు, AccessFlag accessFlags)
 {
-    CV_UNUSED(buffer); CV_UNUSED(accessFlags);
-#if !defined(HAVE_OPENGL)
+    CV_వాడని(బఫరు); CV_వాడని(accessFlags);
+#ఒకవేళ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#లేదావేళ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#లేదావేళ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    using namespace cv::ocl;
+#లేకపోతే
+    ఉపయోగించి నామాకాశ cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
-    cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
+    cl_command_వరుస cl_వరుస = (cl_command_వరుస)వరుస::getDefault().ptr();
 
-    int clAccessFlags = 0;
-    switch (accessFlags & (ACCESS_READ|ACCESS_WRITE))
+    పూర్ణాంకం clAccessFlags = 0;
+    ఎంపిక (accessFlags & (ACCESS_READ|ACCESS_WRITE))
     {
-    default:
-    case ACCESS_READ+ACCESS_WRITE:
+    అప్రమేయ:
+    స్థితి ACCESS_READ+ACCESS_WRITE:
         clAccessFlags = CL_MEM_READ_WRITE;
-        break;
-    case ACCESS_READ:
+        ఆపు;
+    స్థితి ACCESS_READ:
         clAccessFlags = CL_MEM_READ_ONLY;
-        break;
-    case ACCESS_WRITE:
+        ఆపు;
+    స్థితి ACCESS_WRITE:
         clAccessFlags = CL_MEM_WRITE_ONLY;
-        break;
+        ఆపు;
     }
 
-    cl_int status = 0;
-    cl_mem clBuffer = clCreateFromGLBuffer(context, clAccessFlags, buffer.bufId(), &status);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLBuffer failed: %d", status));
+    cl_int స్థితి_2 = 0;
+    cl_mem cl_బఫరు = clCreateFromGLBuffer(context, clAccessFlags, బఫరు.bufId(), &స్థితి_2);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLBuffer failed: %d", స్థితి_2));
 
-    gl::Finish();
+    gl::ముగింపు();
 
-    status = clEnqueueAcquireGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
+    స్థితి_2 = cl_వరుసలో_చేర్చు_Acquire_GLObjects(cl_వరుస, 1, &cl_బఫరు, 0, ఖాళీ, ఖాళీ);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", స్థితి_2));
 
-    size_t step = buffer.cols() * buffer.elemSize();
-    int rows = buffer.rows();
-    int cols = buffer.cols();
-    int type = buffer.type();
+    size_t అడుగు = బఫరు.నిలువుల_సంఖ్య() * బఫరు.elem_కొలత();
+    పూర్ణాంకం అడ్డువరుసలు = బఫరు.అడ్డువరుసలు();
+    పూర్ణాంకం నిలువుల_సంఖ్య = బఫరు.నిలువుల_సంఖ్య();
+    పూర్ణాంకం type = బఫరు.type();
 
     UMat u;
-    convertFromBuffer(clBuffer, step, rows, cols, type, u);
-    return u;
-#endif
+    convert_From_బఫరు(cl_బఫరు, అడుగు, అడ్డువరుసలు, నిలువుల_సంఖ్య, type, u);
+    తిరిగి u;
+#అయితే_ముగింపు
 }
 
-void unmapGLBuffer(UMat& u)
+శూన్య unmapGLBuffer(UMat& u)
 {
-    CV_UNUSED(u);
-#if !defined(HAVE_OPENGL)
+    CV_వాడని(u);
+#ఒకవేళ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#లేదావేళ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#లేదావేళ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    using namespace cv::ocl;
-    cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
+#లేకపోతే
+    ఉపయోగించి నామాకాశ cv::ocl;
+    cl_command_వరుస cl_వరుస = (cl_command_వరుస)వరుస::getDefault().ptr();
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_బఫరు = (cl_mem)u.handle(ACCESS_READ);
 
     u.release();
 
-    cl_int status = clEnqueueReleaseGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
+    cl_int స్థితి_2 = cl_వరుసలో_చేర్చు_Release_GLObjects(cl_వరుస, 1, &cl_బఫరు, 0, ఖాళీ, ఖాళీ);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", స్థితి_2));
 
-    status = clFinish(clQueue);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
+    స్థితి_2 = cl_ముగింపు(cl_వరుస);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", స్థితి_2));
 
-    status = clReleaseMemObject(clBuffer);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
-#endif
+    స్థితి_2 = clReleaseMemObject(cl_బఫరు);
+    ఒకవేళ (స్థితి_2 != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", స్థితి_2));
+#అయితే_ముగింపు
 }
 
 }} // namespace cv::ogl

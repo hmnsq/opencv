@@ -2,24 +2,24 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
-#include "opencl_kernels_core.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "opencv2/core/mat.hpp"
+#అన్తర్భావ "opencl_kernels_core.hpp"
 
-#define IPP_DISABLE_REDUCE 1
-#define IPP_DISABLE_SORT   0
+#నిర్వచించు IPP_DISABLE_REDUCE 1
+#నిర్వచించు IPP_DISABLE_క్రమీకరించు   0
 
 /*************************************************************************************************\
                                         Matrix Operations
 \*************************************************************************************************/
 
-void cv::swap( Mat& a, Mat& b )
+శూన్య cv::swap( Mat& a, Mat& b )
 {
     std::swap(a.flags, b.flags);
     std::swap(a.dims, b.dims);
-    std::swap(a.rows, b.rows);
-    std::swap(a.cols, b.cols);
-    std::swap(a.data, b.data);
+    std::swap(a.అడ్డువరుసలు, b.అడ్డువరుసలు);
+    std::swap(a.నిలువుల_సంఖ్య, b.నిలువుల_సంఖ్య);
+    std::swap(a.దత్తాంశం, b.దత్తాంశం);
     std::swap(a.datastart, b.datastart);
     std::swap(a.dataend, b.dataend);
     std::swap(a.datalimit, b.datalimit);
@@ -27,39 +27,39 @@ void cv::swap( Mat& a, Mat& b )
     std::swap(a.u, b.u);
 
     std::swap(a.size, b.size);
-    std::swap(a.step, b.step);
+    std::swap(a.అడుగు, b.అడుగు);
 }
 
 
-void cv::hconcat(const Mat* src, size_t nsrc, OutputArray _dst)
+శూన్య cv::hconcat(స్థిరరాశి Mat* src, size_t nsrc, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    if( nsrc == 0 || !src )
+    ఒకవేళ( nsrc == 0 || !src )
     {
         _dst.release();
-        return;
+        తిరిగి;
     }
 
-    int totalCols = 0, cols = 0;
-    for( size_t i = 0; i < nsrc; i++ )
+    పూర్ణాంకం మొత్తం_నిలువుల_సంఖ్య = 0, నిలువుల_సంఖ్య = 0;
+    కొరకు( size_t i = 0; i < nsrc; i++ )
     {
         CV_Assert( src[i].dims <= 2 &&
-                   src[i].rows == src[0].rows &&
+                   src[i].అడ్డువరుసలు == src[0].అడ్డువరుసలు &&
                    src[i].type() == src[0].type());
-        totalCols += src[i].cols;
+        మొత్తం_నిలువుల_సంఖ్య += src[i].నిలువుల_సంఖ్య;
     }
-    _dst.create( src[0].rows, totalCols, src[0].type());
+    _dst.create( src[0].అడ్డువరుసలు, మొత్తం_నిలువుల_సంఖ్య, src[0].type());
     Mat dst = _dst.getMat();
-    for( size_t i = 0; i < nsrc; i++ )
+    కొరకు( size_t i = 0; i < nsrc; i++ )
     {
-        Mat dpart = dst(Rect(cols, 0, src[i].cols, src[i].rows));
-        src[i].copyTo(dpart);
-        cols += src[i].cols;
+        Mat dpart = dst(Rect(నిలువుల_సంఖ్య, 0, src[i].నిలువుల_సంఖ్య, src[i].అడ్డువరుసలు));
+        src[i].copy_గమ్యం(dpart);
+        నిలువుల_సంఖ్య += src[i].నిలువుల_సంఖ్య;
     }
 }
 
-void cv::hconcat(InputArray src1, InputArray src2, OutputArray dst)
+శూన్య cv::hconcat(ఆదానం_Array src1, ఆదానం_Array src2, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -67,44 +67,44 @@ void cv::hconcat(InputArray src1, InputArray src2, OutputArray dst)
     hconcat(src, 2, dst);
 }
 
-void cv::hconcat(InputArray _src, OutputArray dst)
+శూన్య cv::hconcat(ఆదానం_Array _src, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<Mat> src;
-    _src.getMatVector(src);
-    hconcat(!src.empty() ? &src[0] : nullptr, src.size(), dst);
+    _src.get_Mat_సదిశ(src);
+    hconcat(!src.empty() ? &src[0] : శూన్యసూచిక, src.size(), dst);
 }
 
-void cv::vconcat(const Mat* src, size_t nsrc, OutputArray _dst)
+శూన్య cv::vconcat(స్థిరరాశి Mat* src, size_t nsrc, OutputArray _dst)
 {
     CV_TRACE_FUNCTION_SKIP_NESTED()
 
-    if( nsrc == 0 || !src )
+    ఒకవేళ( nsrc == 0 || !src )
     {
         _dst.release();
-        return;
+        తిరిగి;
     }
 
-    int totalRows = 0, rows = 0;
-    for( size_t i = 0; i < nsrc; i++ )
+    పూర్ణాంకం మొత్తం_అడ్డువరుసలు = 0, అడ్డువరుసలు = 0;
+    కొరకు( size_t i = 0; i < nsrc; i++ )
     {
         CV_Assert(src[i].dims <= 2 &&
-                  src[i].cols == src[0].cols &&
+                  src[i].నిలువుల_సంఖ్య == src[0].నిలువుల_సంఖ్య &&
                   src[i].type() == src[0].type());
-        totalRows += src[i].rows;
+        మొత్తం_అడ్డువరుసలు += src[i].అడ్డువరుసలు;
     }
-    _dst.create( totalRows, src[0].cols, src[0].type());
+    _dst.create( మొత్తం_అడ్డువరుసలు, src[0].నిలువుల_సంఖ్య, src[0].type());
     Mat dst = _dst.getMat();
-    for( size_t i = 0; i < nsrc; i++ )
+    కొరకు( size_t i = 0; i < nsrc; i++ )
     {
-        Mat dpart(dst, Rect(0, rows, src[i].cols, src[i].rows));
-        src[i].copyTo(dpart);
-        rows += src[i].rows;
+        Mat dpart(dst, Rect(0, అడ్డువరుసలు, src[i].నిలువుల_సంఖ్య, src[i].అడ్డువరుసలు));
+        src[i].copy_గమ్యం(dpart);
+        అడ్డువరుసలు += src[i].అడ్డువరుసలు;
     }
 }
 
-void cv::vconcat(InputArray src1, InputArray src2, OutputArray dst)
+శూన్య cv::vconcat(ఆదానం_Array src1, ఆదానం_Array src2, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -112,97 +112,97 @@ void cv::vconcat(InputArray src1, InputArray src2, OutputArray dst)
     vconcat(src, 2, dst);
 }
 
-void cv::vconcat(InputArray _src, OutputArray dst)
+శూన్య cv::vconcat(ఆదానం_Array _src, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<Mat> src;
-    _src.getMatVector(src);
-    vconcat(!src.empty() ? &src[0] : nullptr, src.size(), dst);
+    _src.get_Mat_సదిశ(src);
+    vconcat(!src.empty() ? &src[0] : శూన్యసూచిక, src.size(), dst);
 }
 
 //////////////////////////////////////// set identity ////////////////////////////////////////////
 
-#ifdef HAVE_OPENCL
+#నిర్వచితమైతే HAVE_OPENCL
 
-namespace cv {
+నామాకాశ cv {
 
-static bool ocl_setIdentity( InputOutputArray _m, const Scalar& s )
+స్థిర తార్కిక ocl_సమితి_తటస్థం( ఆదానం_Output_Array _m, స్థిరరాశి Scalar& s )
 {
-    int type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type), kercn = cn, rowsPerWI = 1;
-    int sctype = CV_MAKE_TYPE(depth, cn == 3 ? 4 : cn);
-    if (ocl::Device::getDefault().isIntel())
+    పూర్ణాంకం type = _m.type(), లోతు = CV_MAT_లోతు(type), cn = CV_MAT_CN(type), kercn = cn, అడ్డువరుసలు_చొప్పున_WI = 1;
+    పూర్ణాంకం sctype = CV_MAKE_TYPE(లోతు, cn == 3 ? 4 : cn);
+    ఒకవేళ (ocl::Device::getDefault().isIntel())
     {
-        rowsPerWI = 4;
-        if (cn == 1)
+        అడ్డువరుసలు_చొప్పున_WI = 4;
+        ఒకవేళ (cn == 1)
         {
-            kercn = std::min(ocl::predictOptimalVectorWidth(_m), 4);
-            if (kercn != 4)
+            kercn = std::min(ocl::predict_Optimal_సదిశ_వెడల్పు(_m), 4);
+            ఒకవేళ (kercn != 4)
                 kercn = 1;
         }
     }
 
-    ocl::Kernel k("setIdentity", ocl::core::set_identity_oclsrc,
+    ocl::Kernel k("setIdentity", ocl::core::సమితి_తటస్థం_oclsrc,
                   format("-D T=%s -D T1=%s -D cn=%d -D ST=%s -D kercn=%d -D rowsPerWI=%d",
-                         ocl::memopTypeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::memopTypeToStr(depth), cn,
-                         ocl::memopTypeToStr(sctype),
-                         kercn, rowsPerWI));
-    if (k.empty())
-        return false;
+                         ocl::memop_Type_గమ్యం_Str(CV_MAKE_TYPE(లోతు, kercn)),
+                         ocl::memop_Type_గమ్యం_Str(లోతు), cn,
+                         ocl::memop_Type_గమ్యం_Str(sctype),
+                         kercn, అడ్డువరుసలు_చొప్పున_WI));
+    ఒకవేళ (k.empty())
+        తిరిగి అబద్ధం;
 
     UMat m = _m.getUMat();
-    k.args(ocl::KernelArg::WriteOnly(m, cn, kercn),
+    k.వాదనలు(ocl::KernelArg::WriteOnly(m, cn, kercn),
            ocl::KernelArg::Constant(Mat(1, 1, sctype, s)));
 
-    size_t globalsize[2] = { (size_t)m.cols * cn / kercn, ((size_t)m.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, nullptr, false);
+    size_t globalsize[2] = { (size_t)m.నిలువుల_సంఖ్య * cn / kercn, ((size_t)m.అడ్డువరుసలు + అడ్డువరుసలు_చొప్పున_WI - 1) / అడ్డువరుసలు_చొప్పున_WI };
+    తిరిగి k.నిరంతరం(2, globalsize, శూన్యసూచిక, అబద్ధం);
 }
 
 }
 
-#endif
+#అయితే_ముగింపు
 
-void cv::setIdentity( InputOutputArray _m, const Scalar& s )
+శూన్య cv::సమితి_తటస్థం( ఆదానం_Output_Array _m, స్థిరరాశి Scalar& s )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert( _m.dims() <= 2 );
 
-    CV_OCL_RUN(_m.isUMat(),
-               ocl_setIdentity(_m, s))
+    CV_OCL_నిరంతరం(_m.isUMat(),
+               ocl_సమితి_తటస్థం(_m, s))
 
     Mat m = _m.getMat();
-    int rows = m.rows, cols = m.cols, type = m.type();
+    పూర్ణాంకం అడ్డువరుసలు = m.అడ్డువరుసలు, నిలువుల_సంఖ్య = m.నిలువుల_సంఖ్య, type = m.type();
 
-    if( type == CV_32FC1 )
+    ఒకవేళ( type == CV_32FC1 )
     {
-        float* data = m.ptr<float>();
-        float val = (float)s[0];
-        size_t step = m.step/sizeof(data[0]);
+        దశాంశం* దత్తాంశం = m.ptr<దశాంశం>();
+        దశాంశం val = (దశాంశం)s[0];
+        size_t అడుగు = m.అడుగు/పరిమాణం(దత్తాంశం[0]);
 
-        for( int i = 0; i < rows; i++, data += step )
+        కొరకు( పూర్ణాంకం i = 0; i < అడ్డువరుసలు; i++, దత్తాంశం += అడుగు )
         {
-            for( int j = 0; j < cols; j++ )
-                data[j] = 0;
-            if( i < cols )
-                data[i] = val;
+            కొరకు( పూర్ణాంకం j = 0; j < నిలువుల_సంఖ్య; j++ )
+                దత్తాంశం[j] = 0;
+            ఒకవేళ( i < నిలువుల_సంఖ్య )
+                దత్తాంశం[i] = val;
         }
     }
-    else if( type == CV_64FC1 )
+    లేకపోతే ఒకవేళ( type == CV_64FC1 )
     {
-        double* data = m.ptr<double>();
-        double val = s[0];
-        size_t step = m.step/sizeof(data[0]);
+        ద్విగుణ* దత్తాంశం = m.ptr<ద్విగుణ>();
+        ద్విగుణ val = s[0];
+        size_t అడుగు = m.అడుగు/పరిమాణం(దత్తాంశం[0]);
 
-        for( int i = 0; i < rows; i++, data += step )
+        కొరకు( పూర్ణాంకం i = 0; i < అడ్డువరుసలు; i++, దత్తాంశం += అడుగు )
         {
-            std::fill(data, data + cols, 0.0);
-            if (i < cols)
-                data[i] = val;
+            std::fill(దత్తాంశం, దత్తాంశం + నిలువుల_సంఖ్య, 0.0);
+            ఒకవేళ (i < నిలువుల_సంఖ్య)
+                దత్తాంశం[i] = val;
         }
     }
-    else
+    లేకపోతే
     {
         m = Scalar(0);
         m.diag() = s;
@@ -210,162 +210,162 @@ void cv::setIdentity( InputOutputArray _m, const Scalar& s )
 }
 
 
-namespace cv {
+నామాకాశ cv {
 
-UMat UMat::eye(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::eye(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
-    return UMat::eye(Size(cols, rows), type, usageFlags);
+    తిరిగి UMat::eye(కొలత(నిలువుల_సంఖ్య, అడ్డువరుసలు), type, usageFlags);
 }
 
-UMat UMat::eye(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::eye(కొలత size, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
     UMat m(size, type, usageFlags);
-    setIdentity(m);
-    return m;
+    సమితి_తటస్థం(m);
+    తిరిగి m;
 }
 
 }  // namespace
 
 //////////////////////////////////////////// trace ///////////////////////////////////////////
 
-cv::Scalar cv::trace( InputArray _m )
+cv::Scalar cv::trace( ఆదానం_Array _m )
 {
     CV_INSTRUMENT_REGION();
 
     Mat m = _m.getMat();
     CV_Assert( m.dims <= 2 );
-    int type = m.type();
-    int nm = std::min(m.rows, m.cols);
+    పూర్ణాంకం type = m.type();
+    పూర్ణాంకం nm = std::min(m.అడ్డువరుసలు, m.నిలువుల_సంఖ్య);
 
-    if( type == CV_32FC1 )
+    ఒకవేళ( type == CV_32FC1 )
     {
-        const float* ptr = m.ptr<float>();
-        size_t step = m.step/sizeof(ptr[0]) + 1;
-        double _s = 0;
-        for( int i = 0; i < nm; i++ )
-            _s += ptr[i*step];
-        return _s;
+        స్థిరరాశి దశాంశం* ptr = m.ptr<దశాంశం>();
+        size_t అడుగు = m.అడుగు/పరిమాణం(ptr[0]) + 1;
+        ద్విగుణ _s = 0;
+        కొరకు( పూర్ణాంకం i = 0; i < nm; i++ )
+            _s += ptr[i*అడుగు];
+        తిరిగి _s;
     }
 
-    if( type == CV_64FC1 )
+    ఒకవేళ( type == CV_64FC1 )
     {
-        const double* ptr = m.ptr<double>();
-        size_t step = m.step/sizeof(ptr[0]) + 1;
-        double _s = 0;
-        for( int i = 0; i < nm; i++ )
-            _s += ptr[i*step];
-        return _s;
+        స్థిరరాశి ద్విగుణ* ptr = m.ptr<ద్విగుణ>();
+        size_t అడుగు = m.అడుగు/పరిమాణం(ptr[0]) + 1;
+        ద్విగుణ _s = 0;
+        కొరకు( పూర్ణాంకం i = 0; i < nm; i++ )
+            _s += ptr[i*అడుగు];
+        తిరిగి _s;
     }
 
-    return cv::sum(m.diag());
+    తిరిగి cv::కూడిక(m.diag());
 }
 
 
 ////////////////////////////////////// completeSymm /////////////////////////////////////////
 
-void cv::completeSymm( InputOutputArray _m, bool LtoR )
+శూన్య cv::completeSymm( ఆదానం_Output_Array _m, తార్కిక LtoR )
 {
     CV_INSTRUMENT_REGION();
 
     Mat m = _m.getMat();
-    size_t step = m.step, esz = m.elemSize();
-    CV_Assert( m.dims <= 2 && m.rows == m.cols );
+    size_t అడుగు = m.అడుగు, esz = m.elem_కొలత();
+    CV_Assert( m.dims <= 2 && m.అడ్డువరుసలు == m.నిలువుల_సంఖ్య );
 
-    int rows = m.rows;
-    int j0 = 0, j1 = rows;
+    పూర్ణాంకం అడ్డువరుసలు = m.అడ్డువరుసలు;
+    పూర్ణాంకం j0 = 0, j1 = అడ్డువరుసలు;
 
-    uchar* data = m.ptr();
-    for( int i = 0; i < rows; i++ )
+    uchar* దత్తాంశం = m.ptr();
+    కొరకు( పూర్ణాంకం i = 0; i < అడ్డువరుసలు; i++ )
     {
-        if( !LtoR ) j1 = i; else j0 = i+1;
-        for( int j = j0; j < j1; j++ )
-            memcpy(data + (i*step + j*esz), data + (j*step + i*esz), esz);
+        ఒకవేళ( !LtoR ) j1 = i; లేకపోతే j0 = i+1;
+        కొరకు( పూర్ణాంకం j = j0; j < j1; j++ )
+            జ్ఞాపకం_నకలు(దత్తాంశం + (i*అడుగు + j*esz), దత్తాంశం + (j*అడుగు + i*esz), esz);
     }
 }
 
 
-cv::Mat cv::Mat::cross(InputArray _m) const
+cv::Mat cv::Mat::cross(ఆదానం_Array _m) స్థిరరాశి
 {
     Mat m = _m.getMat();
-    int tp = type(), d = CV_MAT_DEPTH(tp);
+    పూర్ణాంకం tp = type(), d = CV_MAT_లోతు(tp);
     CV_Assert( dims <= 2 && m.dims <= 2 && size() == m.size() && tp == m.type() &&
-        ((rows == 3 && cols == 1) || (cols*channels() == 3 && rows == 1)));
-    Mat result(rows, cols, tp);
+        ((అడ్డువరుసలు == 3 && నిలువుల_సంఖ్య == 1) || (నిలువుల_సంఖ్య*channels() == 3 && అడ్డువరుసలు == 1)));
+    Mat ఫలితం(అడ్డువరుసలు, నిలువుల_సంఖ్య, tp);
 
-    if( d == CV_32F )
+    ఒకవేళ( d == CV_32F )
     {
-        const float *a = (const float*)data, *b = (const float*)m.data;
-        float* c = (float*)result.data;
-        size_t lda = rows > 1 ? step/sizeof(a[0]) : 1;
-        size_t ldb = rows > 1 ? m.step/sizeof(b[0]) : 1;
+        స్థిరరాశి దశాంశం *a = (స్థిరరాశి దశాంశం*)దత్తాంశం, *b = (స్థిరరాశి దశాంశం*)m.దత్తాంశం;
+        దశాంశం* c = (దశాంశం*)ఫలితం.దత్తాంశం;
+        size_t lda = అడ్డువరుసలు > 1 ? అడుగు/పరిమాణం(a[0]) : 1;
+        size_t ldb = అడ్డువరుసలు > 1 ? m.అడుగు/పరిమాణం(b[0]) : 1;
 
         c[0] = a[lda] * b[ldb*2] - a[lda*2] * b[ldb];
         c[1] = a[lda*2] * b[0] - a[0] * b[ldb*2];
         c[2] = a[0] * b[ldb] - a[lda] * b[0];
     }
-    else if( d == CV_64F )
+    లేకపోతే ఒకవేళ( d == CV_64F )
     {
-        const double *a = (const double*)data, *b = (const double*)m.data;
-        double* c = (double*)result.data;
-        size_t lda = rows > 1 ? step/sizeof(a[0]) : 1;
-        size_t ldb = rows > 1 ? m.step/sizeof(b[0]) : 1;
+        స్థిరరాశి ద్విగుణ *a = (స్థిరరాశి ద్విగుణ*)దత్తాంశం, *b = (స్థిరరాశి ద్విగుణ*)m.దత్తాంశం;
+        ద్విగుణ* c = (ద్విగుణ*)ఫలితం.దత్తాంశం;
+        size_t lda = అడ్డువరుసలు > 1 ? అడుగు/పరిమాణం(a[0]) : 1;
+        size_t ldb = అడ్డువరుసలు > 1 ? m.అడుగు/పరిమాణం(b[0]) : 1;
 
         c[0] = a[lda] * b[ldb*2] - a[lda*2] * b[ldb];
         c[1] = a[lda*2] * b[0] - a[0] * b[ldb*2];
         c[2] = a[0] * b[ldb] - a[lda] * b[0];
     }
 
-    return result;
+    తిరిగి ఫలితం;
 }
 
 
 ////////////////////////////////////////// reduce ////////////////////////////////////////////
 
-namespace cv
+నామాకాశ cv
 {
 
-typedef void (*ReduceSumFunc)(const Mat& src, Mat& dst);
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth);
+రకనిర్వచనం శూన్య (*Reduce_కూడిక_Func)(స్థిరరాశి Mat& src, Mat& dst);
+Reduce_కూడిక_Func getReduceCSumFunc(పూర్ణాంకం sdepth, పూర్ణాంకం ddepth);
+Reduce_కూడిక_Func getReduceRSumFunc(పూర్ణాంకం sdepth, పూర్ణాంకం ddepth);
+Reduce_కూడిక_Func getReduceRSum2Func(పూర్ణాంకం sdepth, పూర్ణాంకం ddepth);
 
-template <typename T, typename WT, typename Op>
-struct ReduceR_SIMD
+మూస <రకం_పేరు T, రకం_పేరు WT, రకం_పేరు Op>
+నిర్మాణం ReduceR_SIMD
 {
-    int operator()(const T*, int start, int, WT*, const Op&) const
+    పూర్ణాంకం క్రియాకారకం()(స్థిరరాశి T*, పూర్ణాంకం ప్రారంభం, పూర్ణాంకం, WT*, స్థిరరాశి Op&) స్థిరరాశి
     {
-        return start;
+        తిరిగి ప్రారంభం;
     }
 };
 
 
-template<typename T, typename ST, typename WT, class Op, class OpInit>
-class ReduceR_Invoker : public ParallelLoopBody
+మూస<రకం_పేరు T, రకం_పేరు ST, రకం_పేరు WT, తరగతి Op, తరగతి OpInit>
+తరగతి ReduceR_Invoker : బహిరంగ ParallelLoopBody
 {
-public:
-  ReduceR_Invoker(const Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
-                 :srcmat(aSrcmat),dstmat(aDstmat),op(aOp),opInit(aOpInit),buffer(srcmat.size().width*srcmat.channels())
+బహిరంగ:
+  ReduceR_Invoker(స్థిరరాశి Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
+                 :srcmat(aSrcmat),dstmat(aDstmat),op(aOp),opInit(aOpInit),బఫరు(srcmat.size().వెడల్పు*srcmat.channels())
   {
   }
-  void operator()(const Range& range) const CV_OVERRIDE
+  శూన్య క్రియాకారకం()(స్థిరరాశి Range& range) స్థిరరాశి CV_OVERRIDE
   {
-    const T* src = srcmat.ptr<T>();
-    const size_t srcstep = srcmat.step/sizeof(src[0]);
-    WT* buf = buffer.data();
+    స్థిరరాశి T* src = srcmat.ptr<T>();
+    స్థిరరాశి size_t srcstep = srcmat.అడుగు/పరిమాణం(src[0]);
+    WT* buf = బఫరు.దత్తాంశం();
     ST* dst = dstmat.ptr<ST>();
-    int i = 0;
+    పూర్ణాంకం i = 0;
 
-    for( i = range.start ; i < range.end; i++ )
+    కొరకు( i = range.ప్రారంభం ; i < range.end; i++ )
         buf[i] = opInit(src[i]);
 
-    int height = srcmat.size().height;
-    for( ; --height; )
+    పూర్ణాంకం ఎత్తు = srcmat.size().ఎత్తు;
+    కొరకు( ; --ఎత్తు; )
     {
         src += srcstep;
         ReduceR_SIMD<T, WT, Op> simd_op;
-        i = simd_op(src, range.start, range.end, buf, op);
-        #if CV_ENABLE_UNROLLED
-        for(; i <= range.end - 4; i += 4 )
+        i = simd_op(src, range.ప్రారంభం, range.end, buf, op);
+        #ఒకవేళ CV_ENABLE_UNROLLED
+        కొరకు(; i <= range.end - 4; i += 4 )
         {
             WT s0, s1;
             s0 = op(buf[i], (WT)src[i]);
@@ -376,972 +376,972 @@ public:
             s1 = op(buf[i+3], (WT)src[i+3]);
             buf[i+2] = s0; buf[i+3] = s1;
         }
-        #endif
-        for( ; i < range.end; i++ )
+        #అయితే_ముగింపు
+        కొరకు( ; i < range.end; i++ )
             buf[i] = op(buf[i], (WT)src[i]);
     }
 
-    for( i = range.start ; i < range.end; i++ )
+    కొరకు( i = range.ప్రారంభం ; i < range.end; i++ )
         dst[i] = (ST)buf[i];
   }
-private:
-  const Mat& srcmat;
+అంతరంగ:
+  స్థిరరాశి Mat& srcmat;
   Mat& dstmat;
   Op& op;
   OpInit& opInit;
-  mutable AutoBuffer<WT> buffer;
+  మార్చదగిన Auto_బఫరు<WT> బఫరు;
 };
 
-template<typename T, typename ST, class Op, class OpInit = OpNop<ST> > static void
-reduceR_( const Mat& srcmat, Mat& dstmat)
+మూస<రకం_పేరు T, రకం_పేరు ST, తరగతి Op, తరగతి OpInit = OpNop<ST> > స్థిర శూన్య
+reduceR_( స్థిరరాశి Mat& srcmat, Mat& dstmat)
 {
-    typedef typename Op::rtype WT;
+    రకనిర్వచనం రకం_పేరు Op::rtype WT;
     Op op;
     OpInit opInit;
 
     ReduceR_Invoker<T, ST, WT, Op, OpInit> body(srcmat, dstmat, op, opInit);
     //group columns by 64 bytes for data locality
-    parallel_for_(Range(0, srcmat.size().width*srcmat.channels()), body, srcmat.size().width*CV_ELEM_SIZE(srcmat.depth())/64);
+    parallel_for_(Range(0, srcmat.size().వెడల్పు*srcmat.channels()), body, srcmat.size().వెడల్పు*CV_ELEM_కొలత(srcmat.లోతు())/64);
 }
 
-template<typename T, typename ST, typename WT, class Op, class OpInit>
-class ReduceC_Invoker : public ParallelLoopBody
+మూస<రకం_పేరు T, రకం_పేరు ST, రకం_పేరు WT, తరగతి Op, తరగతి OpInit>
+తరగతి ReduceC_Invoker : బహిరంగ ParallelLoopBody
 {
-public:
-  ReduceC_Invoker(const Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
+బహిరంగ:
+  ReduceC_Invoker(స్థిరరాశి Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
                  :srcmat(aSrcmat),dstmat(aDstmat),op(aOp),opInit(aOpInit)
   {
   }
-  void operator()(const Range& range) const CV_OVERRIDE
+  శూన్య క్రియాకారకం()(స్థిరరాశి Range& range) స్థిరరాశి CV_OVERRIDE
   {
-    const int cn = srcmat.channels();
-    const int width = srcmat.size().width*cn;
-    AutoBuffer<WT> cumul(cn);
-    for( int y = range.start; y < range.end; y++ )
+    స్థిరరాశి పూర్ణాంకం cn = srcmat.channels();
+    స్థిరరాశి పూర్ణాంకం వెడల్పు = srcmat.size().వెడల్పు*cn;
+    Auto_బఫరు<WT> cumul(cn);
+    కొరకు( పూర్ణాంకం y = range.ప్రారంభం; y < range.end; y++ )
     {
-        const T* src = srcmat.ptr<T>(y);
+        స్థిరరాశి T* src = srcmat.ptr<T>(y);
         ST* dst = dstmat.ptr<ST>(y);
-        if( width == cn )
+        ఒకవేళ( వెడల్పు == cn )
         {
-          for( int k = 0; k < cn; k++ )
+          కొరకు( పూర్ణాంకం k = 0; k < cn; k++ )
               dst[k] = (ST)opInit(src[k]);
         }
-        else
+        లేకపోతే
         {
-            for(int k = 0; k < cn ; ++k )
+            కొరకు(పూర్ణాంకం k = 0; k < cn ; ++k )
               cumul[k] = opInit(src[k]);
-            for(int k = cn ; k < width ; k += cn )
+            కొరకు(పూర్ణాంకం k = cn ; k < వెడల్పు ; k += cn )
             {
-                for (int c = 0 ; c < cn ; ++c)
+                కొరకు (పూర్ణాంకం c = 0 ; c < cn ; ++c)
                   cumul[c] = op(cumul[c], src[k+c]);
             }
-            for(int k = 0 ; k < cn ; ++k )
+            కొరకు(పూర్ణాంకం k = 0 ; k < cn ; ++k )
               dst[k] = (ST)cumul[k];
         }
     }
   }
-private:
-  const Mat& srcmat;
+అంతరంగ:
+  స్థిరరాశి Mat& srcmat;
   Mat& dstmat;
   Op& op;
   OpInit& opInit;
 };
 
-template<typename T, typename ST, class Op, class OpInit = OpNop<ST> > static void
-reduceC_( const Mat& srcmat, Mat& dstmat)
+మూస<రకం_పేరు T, రకం_పేరు ST, తరగతి Op, తరగతి OpInit = OpNop<ST> > స్థిర శూన్య
+reduceC_( స్థిరరాశి Mat& srcmat, Mat& dstmat)
 {
-    typedef typename Op::rtype WT;
+    రకనిర్వచనం రకం_పేరు Op::rtype WT;
     Op op;
     OpInit opInit;
 
     ReduceC_Invoker<T, ST, WT, Op, OpInit> body(srcmat, dstmat, op, opInit);
-    parallel_for_(Range(0, srcmat.size().height), body);
+    parallel_for_(Range(0, srcmat.size().ఎత్తు), body);
 }
 
-typedef void (*ReduceFunc)( const Mat& src, Mat& dst );
+రకనిర్వచనం శూన్య (*ReduceFunc)( స్థిరరాశి Mat& src, Mat& dst );
 
 }
 
-#define reduceSumR8u32s  reduceR_<uchar, int,   OpAdd<int>, OpNop<int> >
-#define reduceSumR8u32f  reduceR_<uchar, float, OpAdd<int>, OpNop<int> >
-#define reduceSumR8u64f  reduceR_<uchar, double,OpAdd<int>, OpNop<int> >
-#define reduceSumR16u32f reduceR_<ushort,float, OpAdd<float> >
-#define reduceSumR16u64f reduceR_<ushort,double,OpAdd<double> >
-#define reduceSumR16s32f reduceR_<short, float, OpAdd<float> >
-#define reduceSumR16s64f reduceR_<short, double,OpAdd<double> >
-#define reduceSumR32f32f reduceR_<float, float, OpAdd<float> >
-#define reduceSumR32f64f reduceR_<float, double,OpAdd<double> >
-#define reduceSumR64f64f reduceR_<double,double,OpAdd<double> >
+#నిర్వచించు reduce_కూడిక_R8u32s  reduceR_<uchar, పూర్ణాంకం,   Op_కూడు<పూర్ణాంకం>, OpNop<పూర్ణాంకం> >
+#నిర్వచించు reduce_కూడిక_R8u32f  reduceR_<uchar, దశాంశం, Op_కూడు<పూర్ణాంకం>, OpNop<పూర్ణాంకం> >
+#నిర్వచించు reduce_కూడిక_R8u64f  reduceR_<uchar, ద్విగుణ,Op_కూడు<పూర్ణాంకం>, OpNop<పూర్ణాంకం> >
+#నిర్వచించు reduce_కూడిక_R16u32f reduceR_<ushort,దశాంశం, Op_కూడు<దశాంశం> >
+#నిర్వచించు reduce_కూడిక_R16u64f reduceR_<ushort,ద్విగుణ,Op_కూడు<ద్విగుణ> >
+#నిర్వచించు reduce_కూడిక_R16s32f reduceR_<పొట్టి, దశాంశం, Op_కూడు<దశాంశం> >
+#నిర్వచించు reduce_కూడిక_R16s64f reduceR_<పొట్టి, ద్విగుణ,Op_కూడు<ద్విగుణ> >
+#నిర్వచించు reduce_కూడిక_R32f32f reduceR_<దశాంశం, దశాంశం, Op_కూడు<దశాంశం> >
+#నిర్వచించు reduce_కూడిక_R32f64f reduceR_<దశాంశం, ద్విగుణ,Op_కూడు<ద్విగుణ> >
+#నిర్వచించు reduce_కూడిక_R64f64f reduceR_<ద్విగుణ,ద్విగుణ,Op_కూడు<ద్విగుణ> >
 
-#define reduceSum2R8u32s  reduceR_<uchar, int,   OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2R8u32f  reduceR_<uchar, float, OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2R8u64f  reduceR_<uchar, double,OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2R16u32f reduceR_<ushort,float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2R16u64f reduceR_<ushort,double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2R16s32f reduceR_<short, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2R16s64f reduceR_<short, double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2R32f32f reduceR_<float, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2R32f64f reduceR_<float, double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2R64f64f reduceR_<double,double,OpAddSqr<double>,OpSqr<double> >
+#నిర్వచించు reduceSum2R8u32s  reduceR_<uchar, పూర్ణాంకం,   Op_కూడు_Sqr<పూర్ణాంకం>,   OpSqr<పూర్ణాంకం> >
+#నిర్వచించు reduceSum2R8u32f  reduceR_<uchar, దశాంశం, Op_కూడు_Sqr<పూర్ణాంకం>,   OpSqr<పూర్ణాంకం> >
+#నిర్వచించు reduceSum2R8u64f  reduceR_<uchar, ద్విగుణ,Op_కూడు_Sqr<పూర్ణాంకం>,   OpSqr<పూర్ణాంకం> >
+#నిర్వచించు reduceSum2R16u32f reduceR_<ushort,దశాంశం, Op_కూడు_Sqr<దశాంశం>, OpSqr<దశాంశం> >
+#నిర్వచించు reduceSum2R16u64f reduceR_<ushort,ద్విగుణ,Op_కూడు_Sqr<ద్విగుణ>,OpSqr<ద్విగుణ> >
+#నిర్వచించు reduceSum2R16s32f reduceR_<పొట్టి, దశాంశం, Op_కూడు_Sqr<దశాంశం>, OpSqr<దశాంశం> >
+#నిర్వచించు reduceSum2R16s64f reduceR_<పొట్టి, ద్విగుణ,Op_కూడు_Sqr<ద్విగుణ>,OpSqr<ద్విగుణ> >
+#నిర్వచించు reduceSum2R32f32f reduceR_<దశాంశం, దశాంశం, Op_కూడు_Sqr<దశాంశం>, OpSqr<దశాంశం> >
+#నిర్వచించు reduceSum2R32f64f reduceR_<దశాంశం, ద్విగుణ,Op_కూడు_Sqr<ద్విగుణ>,OpSqr<ద్విగుణ> >
+#నిర్వచించు reduceSum2R64f64f reduceR_<ద్విగుణ,ద్విగుణ,Op_కూడు_Sqr<ద్విగుణ>,OpSqr<ద్విగుణ> >
 
-#define reduceMaxR8u  reduceR_<uchar, uchar, OpMax<uchar> >
-#define reduceMaxR16u reduceR_<ushort,ushort,OpMax<ushort> >
-#define reduceMaxR16s reduceR_<short, short, OpMax<short> >
-#define reduceMaxR32f reduceR_<float, float, OpMax<float> >
-#define reduceMaxR64f reduceR_<double,double,OpMax<double> >
+#నిర్వచించు reduceMaxR8u  reduceR_<uchar, uchar, OpMax<uchar> >
+#నిర్వచించు reduceMaxR16u reduceR_<ushort,ushort,OpMax<ushort> >
+#నిర్వచించు reduceMaxR16s reduceR_<పొట్టి, పొట్టి, OpMax<పొట్టి> >
+#నిర్వచించు reduceMaxR32f reduceR_<దశాంశం, దశాంశం, OpMax<దశాంశం> >
+#నిర్వచించు reduceMaxR64f reduceR_<ద్విగుణ,ద్విగుణ,OpMax<ద్విగుణ> >
 
-#define reduceMinR8u  reduceR_<uchar, uchar, OpMin<uchar> >
-#define reduceMinR16u reduceR_<ushort,ushort,OpMin<ushort> >
-#define reduceMinR16s reduceR_<short, short, OpMin<short> >
-#define reduceMinR32f reduceR_<float, float, OpMin<float> >
-#define reduceMinR64f reduceR_<double,double,OpMin<double> >
+#నిర్వచించు reduceMinR8u  reduceR_<uchar, uchar, OpMin<uchar> >
+#నిర్వచించు reduceMinR16u reduceR_<ushort,ushort,OpMin<ushort> >
+#నిర్వచించు reduceMinR16s reduceR_<పొట్టి, పొట్టి, OpMin<పొట్టి> >
+#నిర్వచించు reduceMinR32f reduceR_<దశాంశం, దశాంశం, OpMin<దశాంశం> >
+#నిర్వచించు reduceMinR64f reduceR_<ద్విగుణ,ద్విగుణ,OpMin<ద్విగుణ> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
-static inline bool ipp_reduceSumC_8u16u16s32f_64f(const cv::Mat& srcmat, cv::Mat& dstmat)
+#ఒకవేళ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+స్థిర అంతఃవరుస తార్కిక ipp_reduce_కూడిక_C_8u16u16s32f_64f(స్థిరరాశి cv::Mat& srcmat, cv::Mat& dstmat)
 {
-    int sstep = (int)srcmat.step, stype = srcmat.type(),
-            ddepth = dstmat.depth();
+    పూర్ణాంకం sstep = (పూర్ణాంకం)srcmat.అడుగు, stype = srcmat.type(),
+            ddepth = dstmat.లోతు();
 
-    IppiSize roisize = { srcmat.size().width, 1 };
+    Ippi_కొలత roisize = { srcmat.size().వెడల్పు, 1 };
 
-    typedef IppStatus (CV_STDCALL * IppiSum)(const void * pSrc, int srcStep, IppiSize roiSize, Ipp64f* pSum);
-    typedef IppStatus (CV_STDCALL * IppiSumHint)(const void * pSrc, int srcStep, IppiSize roiSize, Ipp64f* pSum, IppHintAlgorithm hint);
-    IppiSum ippiSum = 0;
-    IppiSumHint ippiSumHint = 0;
+    రకనిర్వచనం Ipp_స్థితి (CV_STDCALL * Ippi_కూడిక)(స్థిరరాశి శూన్య * pSrc, పూర్ణాంకం src_అడుగు_3, Ippi_కొలత roi_కొలత, Ipp64f* p_కూడిక);
+    రకనిర్వచనం Ipp_స్థితి (CV_STDCALL * Ippi_కూడిక_Hint)(స్థిరరాశి శూన్య * pSrc, పూర్ణాంకం src_అడుగు_3, Ippi_కొలత roi_కొలత, Ipp64f* p_కూడిక, IppHintAlgorithm hint);
+    Ippi_కూడిక ippi_కూడిక = 0;
+    Ippi_కూడిక_Hint ippi_కూడిక_Hint = 0;
 
-    if(ddepth == CV_64F)
+    ఒకవేళ(ddepth == CV_64F)
     {
-        ippiSum =
-            stype == CV_8UC1 ? (IppiSum)ippiSum_8u_C1R :
-            stype == CV_8UC3 ? (IppiSum)ippiSum_8u_C3R :
-            stype == CV_8UC4 ? (IppiSum)ippiSum_8u_C4R :
-            stype == CV_16UC1 ? (IppiSum)ippiSum_16u_C1R :
-            stype == CV_16UC3 ? (IppiSum)ippiSum_16u_C3R :
-            stype == CV_16UC4 ? (IppiSum)ippiSum_16u_C4R :
-            stype == CV_16SC1 ? (IppiSum)ippiSum_16s_C1R :
-            stype == CV_16SC3 ? (IppiSum)ippiSum_16s_C3R :
-            stype == CV_16SC4 ? (IppiSum)ippiSum_16s_C4R : 0;
-        ippiSumHint =
-            stype == CV_32FC1 ? (IppiSumHint)ippiSum_32f_C1R :
-            stype == CV_32FC3 ? (IppiSumHint)ippiSum_32f_C3R :
-            stype == CV_32FC4 ? (IppiSumHint)ippiSum_32f_C4R : 0;
+        ippi_కూడిక =
+            stype == CV_8UC1 ? (Ippi_కూడిక)ippi_కూడిక_8u_C1_R :
+            stype == CV_8UC3 ? (Ippi_కూడిక)ippi_కూడిక_8u_C3_R :
+            stype == CV_8UC4 ? (Ippi_కూడిక)ippi_కూడిక_8u_C4_R :
+            stype == CV_16UC1 ? (Ippi_కూడిక)ippi_కూడిక_16u_C1_R :
+            stype == CV_16UC3 ? (Ippi_కూడిక)ippi_కూడిక_16u_C3_R :
+            stype == CV_16UC4 ? (Ippi_కూడిక)ippi_కూడిక_16u_C4_R :
+            stype == CV_16SC1 ? (Ippi_కూడిక)ippi_కూడిక_16s_C1_R :
+            stype == CV_16SC3 ? (Ippi_కూడిక)ippi_కూడిక_16s_C3_R :
+            stype == CV_16SC4 ? (Ippi_కూడిక)ippi_కూడిక_16s_C4_R : 0;
+        ippi_కూడిక_Hint =
+            stype == CV_32FC1 ? (Ippi_కూడిక_Hint)ippi_కూడిక_32f_C1_R :
+            stype == CV_32FC3 ? (Ippi_కూడిక_Hint)ippi_కూడిక_32f_C3_R :
+            stype == CV_32FC4 ? (Ippi_కూడిక_Hint)ippi_కూడిక_32f_C4_R : 0;
     }
 
-    if(ippiSum)
+    ఒకవేళ(ippi_కూడిక)
     {
-        for(int y = 0; y < srcmat.size().height; y++)
+        కొరకు(పూర్ణాంకం y = 0; y < srcmat.size().ఎత్తు; y++)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippiSum, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y)) < 0)
-                return false;
+            ఒకవేళ(CV_INSTRUMENT_FUN_IPP(ippi_కూడిక, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y)) < 0)
+                తిరిగి అబద్ధం;
         }
-        return true;
+        తిరిగి నిజం;
     }
-    else if(ippiSumHint)
+    లేకపోతే ఒకవేళ(ippi_కూడిక_Hint)
     {
-        for(int y = 0; y < srcmat.size().height; y++)
+        కొరకు(పూర్ణాంకం y = 0; y < srcmat.size().ఎత్తు; y++)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippiSumHint, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y), ippAlgHintAccurate) < 0)
-                return false;
+            ఒకవేళ(CV_INSTRUMENT_FUN_IPP(ippi_కూడిక_Hint, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y), ippAlgHintAccurate) < 0)
+                తిరిగి అబద్ధం;
         }
-        return true;
+        తిరిగి నిజం;
     }
 
-    return false;
+    తిరిగి అబద్ధం;
 }
 
-static inline void reduceSumC_8u16u16s32f_64f(const cv::Mat& srcmat, cv::Mat& dstmat)
+స్థిర అంతఃవరుస శూన్య reduce_కూడిక_C_8u16u16s32f_64f(స్థిరరాశి cv::Mat& srcmat, cv::Mat& dstmat)
 {
-    CV_IPP_RUN_FAST(ipp_reduceSumC_8u16u16s32f_64f(srcmat, dstmat));
+    CV_IPP_నిరంతరం_FAST(ipp_reduce_కూడిక_C_8u16u16s32f_64f(srcmat, dstmat));
 
     cv::ReduceFunc func = 0;
 
-    if(dstmat.depth() == CV_64F)
+    ఒకవేళ(dstmat.లోతు() == CV_64F)
     {
-        int sdepth = CV_MAT_DEPTH(srcmat.type());
+        పూర్ణాంకం sdepth = CV_MAT_లోతు(srcmat.type());
         func =
-            sdepth == CV_8U ? (cv::ReduceFunc)cv::reduceC_<uchar, double,   cv::OpAdd<double> > :
-            sdepth == CV_16U ? (cv::ReduceFunc)cv::reduceC_<ushort, double,   cv::OpAdd<double> > :
-            sdepth == CV_16S ? (cv::ReduceFunc)cv::reduceC_<short, double,   cv::OpAdd<double> > :
-            sdepth == CV_32F ? (cv::ReduceFunc)cv::reduceC_<float, double,   cv::OpAdd<double> > : 0;
+            sdepth == CV_8U ? (cv::ReduceFunc)cv::reduceC_<uchar, ద్విగుణ,   cv::Op_కూడు<ద్విగుణ> > :
+            sdepth == CV_16U ? (cv::ReduceFunc)cv::reduceC_<ushort, ద్విగుణ,   cv::Op_కూడు<ద్విగుణ> > :
+            sdepth == CV_16S ? (cv::ReduceFunc)cv::reduceC_<పొట్టి, ద్విగుణ,   cv::Op_కూడు<ద్విగుణ> > :
+            sdepth == CV_32F ? (cv::ReduceFunc)cv::reduceC_<దశాంశం, ద్విగుణ,   cv::Op_కూడు<ద్విగుణ> > : 0;
     }
     CV_Assert(func);
 
     func(srcmat, dstmat);
 }
 
-#endif
+#అయితే_ముగింపు
 
-#define reduceSumC8u32s  reduceC_<uchar, int,   OpAdd<int>, OpNop<int> >
-#define reduceSumC8u32f  reduceC_<uchar, float, OpAdd<int>, OpNop<int> >
-#define reduceSumC16u32f reduceC_<ushort,float, OpAdd<float> >
-#define reduceSumC16s32f reduceC_<short, float, OpAdd<float> >
-#define reduceSumC32f32f reduceC_<float, float, OpAdd<float> >
-#define reduceSumC64f64f reduceC_<double,double,OpAdd<double> >
+#నిర్వచించు reduce_కూడిక_C8u32s  reduceC_<uchar, పూర్ణాంకం,   Op_కూడు<పూర్ణాంకం>, OpNop<పూర్ణాంకం> >
+#నిర్వచించు reduce_కూడిక_C8u32f  reduceC_<uchar, దశాంశం, Op_కూడు<పూర్ణాంకం>, OpNop<పూర్ణాంకం> >
+#నిర్వచించు reduce_కూడిక_C16u32f reduceC_<ushort,దశాంశం, Op_కూడు<దశాంశం> >
+#నిర్వచించు reduce_కూడిక_C16s32f reduceC_<పొట్టి, దశాంశం, Op_కూడు<దశాంశం> >
+#నిర్వచించు reduce_కూడిక_C32f32f reduceC_<దశాంశం, దశాంశం, Op_కూడు<దశాంశం> >
+#నిర్వచించు reduce_కూడిక_C64f64f reduceC_<ద్విగుణ,ద్విగుణ,Op_కూడు<ద్విగుణ> >
 
-#define reduceSum2C8u32s  reduceC_<uchar, int,   OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2C8u32f  reduceC_<uchar, float, OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2C16u32f reduceC_<ushort,float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2C16s32f reduceC_<short, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2C32f32f reduceC_<float, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2C64f64f reduceC_<double,double,OpAddSqr<double>,OpSqr<double> >
+#నిర్వచించు reduceSum2C8u32s  reduceC_<uchar, పూర్ణాంకం,   Op_కూడు_Sqr<పూర్ణాంకం>,   OpSqr<పూర్ణాంకం> >
+#నిర్వచించు reduceSum2C8u32f  reduceC_<uchar, దశాంశం, Op_కూడు_Sqr<పూర్ణాంకం>,   OpSqr<పూర్ణాంకం> >
+#నిర్వచించు reduceSum2C16u32f reduceC_<ushort,దశాంశం, Op_కూడు_Sqr<దశాంశం>, OpSqr<దశాంశం> >
+#నిర్వచించు reduceSum2C16s32f reduceC_<పొట్టి, దశాంశం, Op_కూడు_Sqr<దశాంశం>, OpSqr<దశాంశం> >
+#నిర్వచించు reduceSum2C32f32f reduceC_<దశాంశం, దశాంశం, Op_కూడు_Sqr<దశాంశం>, OpSqr<దశాంశం> >
+#నిర్వచించు reduceSum2C64f64f reduceC_<ద్విగుణ,ద్విగుణ,Op_కూడు_Sqr<ద్విగుణ>,OpSqr<ద్విగుణ> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
-#define reduceSumC8u64f  reduceSumC_8u16u16s32f_64f
-#define reduceSumC16u64f reduceSumC_8u16u16s32f_64f
-#define reduceSumC16s64f reduceSumC_8u16u16s32f_64f
-#define reduceSumC32f64f reduceSumC_8u16u16s32f_64f
-#else
-#define reduceSumC8u64f  reduceC_<uchar, double,OpAdd<int>, OpNop<int> >
-#define reduceSumC16u64f reduceC_<ushort,double,OpAdd<double> >
-#define reduceSumC16s64f reduceC_<short, double,OpAdd<double> >
-#define reduceSumC32f64f reduceC_<float, double,OpAdd<double> >
-#endif
+#ఒకవేళ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#నిర్వచించు reduce_కూడిక_C8u64f  reduce_కూడిక_C_8u16u16s32f_64f
+#నిర్వచించు reduce_కూడిక_C16u64f reduce_కూడిక_C_8u16u16s32f_64f
+#నిర్వచించు reduce_కూడిక_C16s64f reduce_కూడిక_C_8u16u16s32f_64f
+#నిర్వచించు reduce_కూడిక_C32f64f reduce_కూడిక_C_8u16u16s32f_64f
+#లేకపోతే
+#నిర్వచించు reduce_కూడిక_C8u64f  reduceC_<uchar, ద్విగుణ,Op_కూడు<పూర్ణాంకం>, OpNop<పూర్ణాంకం> >
+#నిర్వచించు reduce_కూడిక_C16u64f reduceC_<ushort,ద్విగుణ,Op_కూడు<ద్విగుణ> >
+#నిర్వచించు reduce_కూడిక_C16s64f reduceC_<పొట్టి, ద్విగుణ,Op_కూడు<ద్విగుణ> >
+#నిర్వచించు reduce_కూడిక_C32f64f reduceC_<దశాంశం, ద్విగుణ,Op_కూడు<ద్విగుణ> >
+#అయితే_ముగింపు
 
-#define reduceSum2C8u64f  reduceC_<uchar, double,OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2C16u64f reduceC_<ushort,double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2C16s64f reduceC_<short, double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2C32f64f reduceC_<float, double,OpAddSqr<double>,OpSqr<double> >
+#నిర్వచించు reduceSum2C8u64f  reduceC_<uchar, ద్విగుణ,Op_కూడు_Sqr<పూర్ణాంకం>,   OpSqr<పూర్ణాంకం> >
+#నిర్వచించు reduceSum2C16u64f reduceC_<ushort,ద్విగుణ,Op_కూడు_Sqr<ద్విగుణ>,OpSqr<ద్విగుణ> >
+#నిర్వచించు reduceSum2C16s64f reduceC_<పొట్టి, ద్విగుణ,Op_కూడు_Sqr<ద్విగుణ>,OpSqr<ద్విగుణ> >
+#నిర్వచించు reduceSum2C32f64f reduceC_<దశాంశం, ద్విగుణ,Op_కూడు_Sqr<ద్విగుణ>,OpSqr<ద్విగుణ> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
-#define REDUCE_OP(favor, optype, type1, type2) \
-static inline bool ipp_reduce##optype##C##favor(const cv::Mat& srcmat, cv::Mat& dstmat) \
+#ఒకవేళ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#నిర్వచించు REDUCE_OP(favor, optype, type1, type2) \
+స్థిర అంతఃవరుస తార్కిక ipp_reduce##optype##C##favor(స్థిరరాశి cv::Mat& srcmat, cv::Mat& dstmat) \
 { \
-    if((srcmat.channels() == 1)) \
+    ఒకవేళ((srcmat.channels() == 1)) \
     { \
-        int sstep = (int)srcmat.step; \
-        typedef Ipp##favor IppType; \
-        IppiSize roisize = ippiSize(srcmat.size().width, 1);\
-        for(int y = 0; y < srcmat.size().height; y++)\
+        పూర్ణాంకం sstep = (పూర్ణాంకం)srcmat.అడుగు; \
+        రకనిర్వచనం Ipp##favor IppType; \
+        Ippi_కొలత roisize = ippi_కొలత(srcmat.size().వెడల్పు, 1);\
+        కొరకు(పూర్ణాంకం y = 0; y < srcmat.size().ఎత్తు; y++)\
         {\
-            if(CV_INSTRUMENT_FUN_IPP(ippi##optype##_##favor##_C1R, srcmat.ptr<IppType>(y), sstep, roisize, dstmat.ptr<IppType>(y)) < 0)\
-                return false;\
+            ఒకవేళ(CV_INSTRUMENT_FUN_IPP(ippi##optype##_##favor##_C1R, srcmat.ptr<IppType>(y), sstep, roisize, dstmat.ptr<IppType>(y)) < 0)\
+                తిరిగి అబద్ధం;\
         }\
-        return true;\
+        తిరిగి నిజం;\
     }\
-    return false; \
+    తిరిగి అబద్ధం; \
 } \
-static inline void reduce##optype##C##favor(const cv::Mat& srcmat, cv::Mat& dstmat) \
+స్థిర అంతఃవరుస శూన్య reduce##optype##C##favor(స్థిరరాశి cv::Mat& srcmat, cv::Mat& dstmat) \
 { \
-    CV_IPP_RUN_FAST(ipp_reduce##optype##C##favor(srcmat, dstmat)); \
+    CV_IPP_నిరంతరం_FAST(ipp_reduce##optype##C##favor(srcmat, dstmat)); \
     cv::reduceC_ < type1, type2, cv::Op##optype < type2 > >(srcmat, dstmat); \
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#ఒకవేళ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
 REDUCE_OP(8u, Max, uchar, uchar)
 REDUCE_OP(16u, Max, ushort, ushort)
-REDUCE_OP(16s, Max, short, short)
-REDUCE_OP(32f, Max, float, float)
-#else
-#define reduceMaxC8u  reduceC_<uchar, uchar, OpMax<uchar> >
-#define reduceMaxC16u reduceC_<ushort,ushort,OpMax<ushort> >
-#define reduceMaxC16s reduceC_<short, short, OpMax<short> >
-#define reduceMaxC32f reduceC_<float, float, OpMax<float> >
-#endif
-#define reduceMaxC64f reduceC_<double,double,OpMax<double> >
+REDUCE_OP(16s, Max, పొట్టి, పొట్టి)
+REDUCE_OP(32f, Max, దశాంశం, దశాంశం)
+#లేకపోతే
+#నిర్వచించు reduceMaxC8u  reduceC_<uchar, uchar, OpMax<uchar> >
+#నిర్వచించు reduceMaxC16u reduceC_<ushort,ushort,OpMax<ushort> >
+#నిర్వచించు reduceMaxC16s reduceC_<పొట్టి, పొట్టి, OpMax<పొట్టి> >
+#నిర్వచించు reduceMaxC32f reduceC_<దశాంశం, దశాంశం, OpMax<దశాంశం> >
+#అయితే_ముగింపు
+#నిర్వచించు reduceMaxC64f reduceC_<ద్విగుణ,ద్విగుణ,OpMax<ద్విగుణ> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#ఒకవేళ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
 REDUCE_OP(8u, Min, uchar, uchar)
 REDUCE_OP(16u, Min, ushort, ushort)
-REDUCE_OP(16s, Min, short, short)
-REDUCE_OP(32f, Min, float, float)
-#else
-#define reduceMinC8u  reduceC_<uchar, uchar, OpMin<uchar> >
-#define reduceMinC16u reduceC_<ushort,ushort,OpMin<ushort> >
-#define reduceMinC16s reduceC_<short, short, OpMin<short> >
-#define reduceMinC32f reduceC_<float, float, OpMin<float> >
-#endif
-#define reduceMinC64f reduceC_<double,double,OpMin<double> >
+REDUCE_OP(16s, Min, పొట్టి, పొట్టి)
+REDUCE_OP(32f, Min, దశాంశం, దశాంశం)
+#లేకపోతే
+#నిర్వచించు reduceMinC8u  reduceC_<uchar, uchar, OpMin<uchar> >
+#నిర్వచించు reduceMinC16u reduceC_<ushort,ushort,OpMin<ushort> >
+#నిర్వచించు reduceMinC16s reduceC_<పొట్టి, పొట్టి, OpMin<పొట్టి> >
+#నిర్వచించు reduceMinC32f reduceC_<దశాంశం, దశాంశం, OpMin<దశాంశం> >
+#అయితే_ముగింపు
+#నిర్వచించు reduceMinC64f reduceC_<ద్విగుణ,ద్విగుణ,OpMin<ద్విగుణ> >
 
-#ifdef HAVE_OPENCL
+#నిర్వచితమైతే HAVE_OPENCL
 
-namespace cv {
+నామాకాశ cv {
 
-static bool ocl_reduce(InputArray _src, OutputArray _dst,
-                       int dim, int op, int op0, int stype, int dtype)
+స్థిర తార్కిక ocl_reduce(ఆదానం_Array _src, OutputArray _dst,
+                       పూర్ణాంకం dim, పూర్ణాంకం op, పూర్ణాంకం op0, పూర్ణాంకం stype, పూర్ణాంకం dtype)
 {
-    const int min_opt_cols = 128, buf_cols = 32;
-    int sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype),
-            ddepth = CV_MAT_DEPTH(dtype), ddepth0 = ddepth;
-    const ocl::Device &defDev = ocl::Device::getDefault();
-    bool doubleSupport = defDev.doubleFPConfig() > 0;
+    స్థిరరాశి పూర్ణాంకం min_opt_నిలువుల_సంఖ్య = 128, buf_నిలువుల_సంఖ్య = 32;
+    పూర్ణాంకం sdepth = CV_MAT_లోతు(stype), cn = CV_MAT_CN(stype),
+            ddepth = CV_MAT_లోతు(dtype), ddepth0 = ddepth;
+    స్థిరరాశి ocl::Device &defDev = ocl::Device::getDefault();
+    తార్కిక doubleSupport = defDev.doubleFPConfig() > 0;
 
-    size_t wgs = defDev.maxWorkGroupSize();
-    bool useOptimized = 1 == dim && _src.cols() > min_opt_cols && (wgs >= buf_cols);
+    size_t wgs = defDev.max_Work_సమూహం_కొలత();
+    తార్కిక useOptimized = 1 == dim && _src.నిలువుల_సంఖ్య() > min_opt_నిలువుల_సంఖ్య && (wgs >= buf_నిలువుల_సంఖ్య);
 
-    if (!doubleSupport && (sdepth == CV_64F || ddepth == CV_64F))
-        return false;
+    ఒకవేళ (!doubleSupport && (sdepth == CV_64F || ddepth == CV_64F))
+        తిరిగి అబద్ధం;
 
-    if (op == REDUCE_AVG)
+    ఒకవేళ (op == REDUCE_AVG)
     {
-        if (sdepth < CV_32S && ddepth < CV_32S)
+        ఒకవేళ (sdepth < CV_32S && ddepth < CV_32S)
             ddepth = CV_32S;
     }
 
-    const char * const ops[5] = { "OCL_CV_REDUCE_SUM", "OCL_CV_REDUCE_AVG",
+    స్థిరరాశి అక్షరం * స్థిరరాశి ops[5] = { "OCL_CV_REDUCE_SUM", "OCL_CV_REDUCE_AVG",
                                   "OCL_CV_REDUCE_MAX", "OCL_CV_REDUCE_MIN",
                                   "OCL_CV_REDUCE_SUM2"};
-    int wdepth = std::max(ddepth, CV_32F);
-    if (useOptimized)
+    పూర్ణాంకం wdepth = std::max(ddepth, CV_32F);
+    ఒకవేళ (useOptimized)
     {
-        size_t tileHeight = (size_t)(wgs / buf_cols);
-        if (defDev.isIntel())
+        size_t tile_ఎత్తు = (size_t)(wgs / buf_నిలువుల_సంఖ్య);
+        ఒకవేళ (defDev.isIntel())
         {
-            static const size_t maxItemInGroupCount = 16;
-            tileHeight = min(tileHeight, defDev.localMemSize() / buf_cols / CV_ELEM_SIZE(CV_MAKETYPE(wdepth, cn)) / maxItemInGroupCount);
+            స్థిర స్థిరరాశి size_t max_అంశం_లోపల_సమూహం_లెక్క = 16;
+            tile_ఎత్తు = min(tile_ఎత్తు, defDev.local_Mem_కొలత() / buf_నిలువుల_సంఖ్య / CV_ELEM_కొలత(CV_MAKETYPE(wdepth, cn)) / max_అంశం_లోపల_సమూహం_లెక్క);
         }
-        char cvt[3][50];
+        అక్షరం cvt[3][50];
         cv::String build_opt = format("-D OP_REDUCE_PRE -D BUF_COLS=%d -D TILE_HEIGHT=%zu -D %s -D dim=1"
                                             " -D cn=%d -D ddepth=%d"
                                             " -D srcT=%s -D bufT=%s -D dstT=%s"
                                             " -D convertToWT=%s -D convertToBufT=%s -D convertToDT=%s%s",
-                                            buf_cols, tileHeight, ops[op], cn, ddepth,
-                                            ocl::typeToStr(sdepth),
-                                            ocl::typeToStr(ddepth),
-                                            ocl::typeToStr(ddepth0),
-                                            ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-                                            ocl::convertTypeStr(sdepth, ddepth, 1, cvt[1], sizeof(cvt[1])),
-                                            ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[2], sizeof(cvt[2])),
+                                            buf_నిలువుల_సంఖ్య, tile_ఎత్తు, ops[op], cn, ddepth,
+                                            ocl::type_గమ్యం_Str(sdepth),
+                                            ocl::type_గమ్యం_Str(ddepth),
+                                            ocl::type_గమ్యం_Str(ddepth0),
+                                            ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], పరిమాణం(cvt[0])),
+                                            ocl::convertTypeStr(sdepth, ddepth, 1, cvt[1], పరిమాణం(cvt[1])),
+                                            ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[2], పరిమాణం(cvt[2])),
                                             doubleSupport ? " -D DOUBLE_SUPPORT" : "");
         ocl::Kernel k("reduce_horz_opt", ocl::core::reduce2_oclsrc, build_opt);
-        if (k.empty())
-            return false;
+        ఒకవేళ (k.empty())
+            తిరిగి అబద్ధం;
         UMat src = _src.getUMat();
-        Size dsize(1, src.rows);
+        కొలత dsize(1, src.అడ్డువరుసలు);
         _dst.create(dsize, dtype);
         UMat dst = _dst.getUMat();
 
-        if (op0 == REDUCE_AVG)
-            k.args(ocl::KernelArg::ReadOnly(src),
-                      ocl::KernelArg::WriteOnlyNoSize(dst), 1.0f / src.cols);
-        else
-            k.args(ocl::KernelArg::ReadOnly(src),
-                      ocl::KernelArg::WriteOnlyNoSize(dst));
+        ఒకవేళ (op0 == REDUCE_AVG)
+            k.వాదనలు(ocl::KernelArg::ReadOnly(src),
+                      ocl::KernelArg::Write_Only_No_కొలత(dst), 1.0f / src.నిలువుల_సంఖ్య);
+        లేకపోతే
+            k.వాదనలు(ocl::KernelArg::ReadOnly(src),
+                      ocl::KernelArg::Write_Only_No_కొలత(dst));
 
-        size_t localSize[2] = { (size_t)buf_cols, (size_t)tileHeight};
-        size_t globalSize[2] = { (size_t)buf_cols, (size_t)src.rows };
-        return k.run(2, globalSize, localSize, false);
+        size_t local_కొలత[2] = { (size_t)buf_నిలువుల_సంఖ్య, (size_t)tile_ఎత్తు};
+        size_t global_కొలత[2] = { (size_t)buf_నిలువుల_సంఖ్య, (size_t)src.అడ్డువరుసలు };
+        తిరిగి k.నిరంతరం(2, global_కొలత, local_కొలత, అబద్ధం);
     }
-    else
+    లేకపోతే
     {
-        char cvt[2][50];
+        అక్షరం cvt[2][50];
         cv::String build_opt = format("-D %s -D dim=%d -D cn=%d -D ddepth=%d"
                                       " -D srcT=%s -D dstT=%s -D dstT0=%s -D convertToWT=%s"
                                       " -D convertToDT=%s -D convertToDT0=%s%s",
-                                      ops[op], dim, cn, ddepth, ocl::typeToStr(useOptimized ? ddepth : sdepth),
-                                      ocl::typeToStr(ddepth), ocl::typeToStr(ddepth0),
-                                      ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-                                      ocl::convertTypeStr(sdepth, ddepth, 1, cvt[0], sizeof(cvt[0])),
-                                      ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[1], sizeof(cvt[1])),
+                                      ops[op], dim, cn, ddepth, ocl::type_గమ్యం_Str(useOptimized ? ddepth : sdepth),
+                                      ocl::type_గమ్యం_Str(ddepth), ocl::type_గమ్యం_Str(ddepth0),
+                                      ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], పరిమాణం(cvt[0])),
+                                      ocl::convertTypeStr(sdepth, ddepth, 1, cvt[0], పరిమాణం(cvt[0])),
+                                      ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[1], పరిమాణం(cvt[1])),
                                       doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
         ocl::Kernel k("reduce", ocl::core::reduce2_oclsrc, build_opt);
-        if (k.empty())
-            return false;
+        ఒకవేళ (k.empty())
+            తిరిగి అబద్ధం;
 
         UMat src = _src.getUMat();
-        Size dsize(dim == 0 ? src.cols : 1, dim == 0 ? 1 : src.rows);
+        కొలత dsize(dim == 0 ? src.నిలువుల_సంఖ్య : 1, dim == 0 ? 1 : src.అడ్డువరుసలు);
         _dst.create(dsize, dtype);
         UMat dst = _dst.getUMat();
 
         ocl::KernelArg srcarg = ocl::KernelArg::ReadOnly(src),
-                temparg = ocl::KernelArg::WriteOnlyNoSize(dst);
+                temparg = ocl::KernelArg::Write_Only_No_కొలత(dst);
 
-        if (op0 == REDUCE_AVG)
-            k.args(srcarg, temparg, 1.0f / (dim == 0 ? src.rows : src.cols));
-        else
-            k.args(srcarg, temparg);
+        ఒకవేళ (op0 == REDUCE_AVG)
+            k.వాదనలు(srcarg, temparg, 1.0f / (dim == 0 ? src.అడ్డువరుసలు : src.నిలువుల_సంఖ్య));
+        లేకపోతే
+            k.వాదనలు(srcarg, temparg);
 
-        size_t globalsize = std::max(dsize.width, dsize.height);
-        return k.run(1, &globalsize, NULL, false);
+        size_t globalsize = std::max(dsize.వెడల్పు, dsize.ఎత్తు);
+        తిరిగి k.నిరంతరం(1, &globalsize, ఖాళీ, అబద్ధం);
     }
 }
 
 }
 
-#endif
+#అయితే_ముగింపు
 
-void cv::reduce(InputArray _src, OutputArray _dst, int dim, int op, int dtype)
+శూన్య cv::reduce(ఆదానం_Array _src, OutputArray _dst, పూర్ణాంకం dim, పూర్ణాంకం op, పూర్ణాంకం dtype)
 {
     CV_INSTRUMENT_REGION();
 
-    if (_src.dims() > 2 || op > REDUCE_SUM2)
+    ఒకవేళ (_src.dims() > 2 || op > REDUCE_SUM2)
     {
         CV_CheckGE(dim, -_src.dims(), "reduce: dim is out of range");
         CV_CheckLT(dim, _src.dims(), "reduce: dim is out of range");
-        cv::reduce(_src, _dst, cv::ReduceParams(op, {dim}, true, dtype < 0 && _dst.fixedType() ? _dst.depth() : dtype));
-        return;
+        cv::reduce(_src, _dst, cv::ReduceParams(op, {dim}, నిజం, dtype < 0 && _dst.fixedType() ? _dst.లోతు() : dtype));
+        తిరిగి;
     }
-    int op0 = op;
-    int stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype);
-    if( dtype < 0 )
+    పూర్ణాంకం op0 = op;
+    పూర్ణాంకం stype = _src.type(), sdepth = CV_MAT_లోతు(stype), cn = CV_MAT_CN(stype);
+    ఒకవేళ( dtype < 0 )
         dtype = _dst.fixedType() ? _dst.type() : stype;
     dtype = CV_MAKETYPE(dtype >= 0 ? dtype : stype, cn);
-    int ddepth = CV_MAT_DEPTH(dtype);
+    పూర్ణాంకం ddepth = CV_MAT_లోతు(dtype);
 
     CV_Assert( cn == CV_MAT_CN(dtype) );
-    CV_Assert( op == REDUCE_SUM || op == REDUCE_MAX ||
+    CV_Assert( op == REDUCE_కూడిక || op == REDUCE_MAX ||
                op == REDUCE_MIN || op == REDUCE_AVG ||
                op == REDUCE_SUM2);
 
-    CV_OCL_RUN(_dst.isUMat(),
+    CV_OCL_నిరంతరం(_dst.isUMat(),
                ocl_reduce(_src, _dst, dim, op, op0, stype, dtype))
 
     // Fake reference to source. Resolves issue 8693 in case of src == dst.
     UMat srcUMat;
-    if (_src.isUMat())
+    ఒకవేళ (_src.isUMat())
         srcUMat = _src.getUMat();
 
     Mat src = _src.getMat();
-    if (src.empty()) {
-        src.convertTo(_dst, dtype);
-        return;
+    ఒకవేళ (src.empty()) {
+        src.convert_గమ్యం(_dst, dtype);
+        తిరిగి;
     }
-    if (src.dims <= 1) {
+    ఒకవేళ (src.dims <= 1) {
         CV_Assert(dim == 0);
         dim = 1;
     }
 
-    _dst.create(dim == 0 ? 1 : src.rows, dim == 0 ? src.cols : 1, dtype);
-    Mat dst = _dst.getMat(), temp = dst;
+    _dst.create(dim == 0 ? 1 : src.అడ్డువరుసలు, dim == 0 ? src.నిలువుల_సంఖ్య : 1, dtype);
+    Mat dst = _dst.getMat(), తాత్కాలిక_2 = dst;
 
-    if( op == REDUCE_AVG )
+    ఒకవేళ( op == REDUCE_AVG )
     {
-        op = REDUCE_SUM;
-        if( sdepth < CV_32S && ddepth < CV_32S )
+        op = REDUCE_కూడిక;
+        ఒకవేళ( sdepth < CV_32S && ddepth < CV_32S )
         {
-            temp.create(dst.rows, dst.cols, CV_32SC(cn));
+            తాత్కాలిక_2.create(dst.అడ్డువరుసలు, dst.నిలువుల_సంఖ్య, CV_32SC(cn));
             ddepth = CV_32S;
         }
     }
 
     ReduceFunc func = 0;
-    if( dim == 0 )
+    ఒకవేళ( dim == 0 )
     {
-        if( op == REDUCE_SUM )
+        ఒకవేళ( op == REDUCE_కూడిక )
         {
-            ReduceSumFunc simd_func = getReduceRSumFunc(sdepth, ddepth);
-            if(simd_func)
+            Reduce_కూడిక_Func simd_func = getReduceRSumFunc(sdepth, ddepth);
+            ఒకవేళ(simd_func)
                 func = (ReduceFunc)simd_func;
-            else if(sdepth == CV_8U && ddepth == CV_32S)
-                func = reduceSumR8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
-                func = reduceSumR8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
-                func = reduceSumR8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
-                func = reduceSumR16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
-                func = reduceSumR16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
-                func = reduceSumR16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
-                func = reduceSumR16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
-                func = reduceSumR32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
-                func = reduceSumR32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
-                func = reduceSumR64f64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_32S)
+                func = reduce_కూడిక_R8u32s;
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_32F)
+                func = reduce_కూడిక_R8u32f;
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_64F)
+                func = reduce_కూడిక_R8u64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_32F)
+                func = reduce_కూడిక_R16u32f;
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_64F)
+                func = reduce_కూడిక_R16u64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_32F)
+                func = reduce_కూడిక_R16s32f;
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_64F)
+                func = reduce_కూడిక_R16s64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_32F)
+                func = reduce_కూడిక_R32f32f;
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_64F)
+                func = reduce_కూడిక_R32f64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_64F && ddepth == CV_64F)
+                func = reduce_కూడిక_R64f64f;
         }
-        else if(op == REDUCE_MAX)
+        లేకపోతే ఒకవేళ(op == REDUCE_MAX)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            ఒకవేళ(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMaxR8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMaxR16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMaxR16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMaxR32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMaxR64f;
         }
-        else if(op == REDUCE_MIN)
+        లేకపోతే ఒకవేళ(op == REDUCE_MIN)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            ఒకవేళ(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMinR8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMinR16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMinR16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMinR32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMinR64f;
         }
-        else if( op == REDUCE_SUM2 )
+        లేకపోతే ఒకవేళ( op == REDUCE_SUM2 )
         {
-            ReduceSumFunc simd_func = getReduceRSum2Func(sdepth, ddepth);
-            if(simd_func)
+            Reduce_కూడిక_Func simd_func = getReduceRSum2Func(sdepth, ddepth);
+            ఒకవేళ(simd_func)
                 func = simd_func;
-            else if(sdepth == CV_8U && ddepth == CV_32S)
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_32S)
                 func = reduceSum2R8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_32F)
                 func = reduceSum2R8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_64F)
                 func = reduceSum2R8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_32F)
                 func = reduceSum2R16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_64F)
                 func = reduceSum2R16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_32F)
                 func = reduceSum2R16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_64F)
                 func = reduceSum2R16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceSum2R32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_64F)
                 func = reduceSum2R32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceSum2R64f64f;
         }
     }
-    else
+    లేకపోతే
     {
-        if(op == REDUCE_SUM)
+        ఒకవేళ(op == REDUCE_కూడిక)
         {
-            ReduceSumFunc simd_func = getReduceCSumFunc(sdepth, ddepth);
-            if(simd_func)
+            Reduce_కూడిక_Func simd_func = getReduceCSumFunc(sdepth, ddepth);
+            ఒకవేళ(simd_func)
                 func = (ReduceFunc)simd_func;
-            else if(sdepth == CV_8U && ddepth == CV_32S)
-                func = reduceSumC8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
-                func = reduceSumC8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
-                func = reduceSumC8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
-                func = reduceSumC16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
-                func = reduceSumC16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
-                func = reduceSumC16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
-                func = reduceSumC16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
-                func = reduceSumC32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
-                func = reduceSumC32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
-                func = reduceSumC64f64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_32S)
+                func = reduce_కూడిక_C8u32s;
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_32F)
+                func = reduce_కూడిక_C8u32f;
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_64F)
+                func = reduce_కూడిక_C8u64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_32F)
+                func = reduce_కూడిక_C16u32f;
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_64F)
+                func = reduce_కూడిక_C16u64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_32F)
+                func = reduce_కూడిక_C16s32f;
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_64F)
+                func = reduce_కూడిక_C16s64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_32F)
+                func = reduce_కూడిక_C32f32f;
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_64F)
+                func = reduce_కూడిక_C32f64f;
+            లేకపోతే ఒకవేళ(sdepth == CV_64F && ddepth == CV_64F)
+                func = reduce_కూడిక_C64f64f;
         }
-        else if(op == REDUCE_MAX)
+        లేకపోతే ఒకవేళ(op == REDUCE_MAX)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            ఒకవేళ(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMaxC8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMaxC16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMaxC16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMaxC32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMaxC64f;
         }
-        else if(op == REDUCE_MIN)
+        లేకపోతే ఒకవేళ(op == REDUCE_MIN)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            ఒకవేళ(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMinC8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMinC16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMinC16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMinC32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMinC64f;
         }
-        else if(op == REDUCE_SUM2)
+        లేకపోతే ఒకవేళ(op == REDUCE_SUM2)
         {
-            if(sdepth == CV_8U && ddepth == CV_32S)
+            ఒకవేళ(sdepth == CV_8U && ddepth == CV_32S)
                 func = reduceSum2C8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_32F)
                 func = reduceSum2C8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_8U && ddepth == CV_64F)
                 func = reduceSum2C8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_32F)
                 func = reduceSum2C16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_16U && ddepth == CV_64F)
                 func = reduceSum2C16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_32F)
                 func = reduceSum2C16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_16S && ddepth == CV_64F)
                 func = reduceSum2C16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceSum2C32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_32F && ddepth == CV_64F)
                 func = reduceSum2C32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            లేకపోతే ఒకవేళ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceSum2C64f64f;
         }
     }
 
-    if( !func )
+    ఒకవేళ( !func )
         CV_Error( cv::Error::StsUnsupportedFormat,
                   "Unsupported combination of input and output array formats" );
 
-    func( src, temp );
+    func( src, తాత్కాలిక_2 );
 
-    if( op0 == REDUCE_AVG )
-        temp.convertTo(dst, dst.type(), 1./(dim == 0 ? src.rows : src.cols));
+    ఒకవేళ( op0 == REDUCE_AVG )
+        తాత్కాలిక_2.convert_గమ్యం(dst, dst.type(), 1./(dim == 0 ? src.అడ్డువరుసలు : src.నిలువుల_సంఖ్య));
 }
 
 
 //////////////////////////////////////// sort ///////////////////////////////////////////
 
-namespace cv
+నామాకాశ cv
 {
 
-template<typename T> static void sort_( const Mat& src, Mat& dst, int flags )
+మూస<రకం_పేరు T> స్థిర శూన్య క్రమీకరించు( స్థిరరాశి Mat& src, Mat& dst, పూర్ణాంకం flags )
 {
-    int n, len;
-    bool sortRows = (flags & 1) == SORT_EVERY_ROW;
-    bool inplace = src.data == dst.data;
-    bool sortDescending = (flags & SORT_DESCENDING) != 0;
+    పూర్ణాంకం n, len;
+    తార్కిక క్రమీకరించు_అడ్డువరుసలు = (flags & 1) == క్రమీకరించు_EVERY_అడ్డువరుస;
+    తార్కిక inplace = src.దత్తాంశం == dst.దత్తాంశం;
+    తార్కిక క్రమీకరించు_Descending = (flags & క్రమీకరించు_DESCENDING) != 0;
 
-    if( sortRows )
-        n = src.rows, len = src.cols;
-    else
-        n = src.cols, len = src.rows;
-    parallel_for_(Range(0, n), [&](const Range& range)
+    ఒకవేళ( క్రమీకరించు_అడ్డువరుసలు )
+        n = src.అడ్డువరుసలు, len = src.నిలువుల_సంఖ్య;
+    లేకపోతే
+        n = src.నిలువుల_సంఖ్య, len = src.అడ్డువరుసలు;
+    parallel_for_(Range(0, n), [&](స్థిరరాశి Range& range)
     {
-        AutoBuffer<T> buf;
-        if( !sortRows )
+        Auto_బఫరు<T> buf;
+        ఒకవేళ( !క్రమీకరించు_అడ్డువరుసలు )
             buf.allocate(len);
-        T* bptr = buf.data();
+        T* bptr = buf.దత్తాంశం();
 
-        for( int i = range.start; i < range.end; i++ )
+        కొరకు( పూర్ణాంకం i = range.ప్రారంభం; i < range.end; i++ )
         {
             T* ptr = bptr;
-            if( sortRows )
+            ఒకవేళ( క్రమీకరించు_అడ్డువరుసలు )
             {
                 T* dptr = dst.ptr<T>(i);
-                if( !inplace )
+                ఒకవేళ( !inplace )
                 {
-                    const T* sptr = src.ptr<T>(i);
-                    memcpy(dptr, sptr, sizeof(T) * len);
+                    స్థిరరాశి T* sptr = src.ptr<T>(i);
+                    జ్ఞాపకం_నకలు(dptr, sptr, పరిమాణం(T) * len);
                 }
                 ptr = dptr;
             }
-            else
+            లేకపోతే
             {
-                for( int j = 0; j < len; j++ )
+                కొరకు( పూర్ణాంకం j = 0; j < len; j++ )
                     ptr[j] = src.ptr<T>(j)[i];
             }
 
             std::sort( ptr, ptr + len );
-            if( sortDescending )
+            ఒకవేళ( క్రమీకరించు_Descending )
             {
-                for( int j = 0; j < len/2; j++ )
+                కొరకు( పూర్ణాంకం j = 0; j < len/2; j++ )
                     std::swap(ptr[j], ptr[len-1-j]);
             }
 
-            if( !sortRows )
-                for( int j = 0; j < len; j++ )
+            ఒకవేళ( !క్రమీకరించు_అడ్డువరుసలు )
+                కొరకు( పూర్ణాంకం j = 0; j < len; j++ )
                     dst.ptr<T>(j)[i] = ptr[j];
         }
     });
 }
 
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_SORT
-typedef IppStatus (CV_STDCALL *IppSortFunc)(void  *pSrcDst, int    len, Ipp8u *pBuffer);
+#ఒకవేళ defined(HAVE_IPP) && !IPP_DISABLE_క్రమీకరించు
+రకనిర్వచనం Ipp_స్థితి (CV_STDCALL *Ipp_క్రమీకరించు_Func)(శూన్య  *pSrcDst, పూర్ణాంకం    len, Ipp8u *p_బఫరు);
 
-template<typename T, IppStatus (CV_STDCALL *fn)(T*, int, Ipp8u*)>
-static IppStatus CV_STDCALL ippSortWrap(void* pSrcDst, int len, Ipp8u* pBuffer)
+మూస<రకం_పేరు T, Ipp_స్థితి (CV_STDCALL *fn)(T*, పూర్ణాంకం, Ipp8u*)>
+స్థిర Ipp_స్థితి CV_STDCALL ipp_క్రమీకరించు_Wrap(శూన్య* pSrcDst, పూర్ణాంకం len, Ipp8u* p_బఫరు)
 {
-    return fn((T*)pSrcDst, len, pBuffer);
+    తిరిగి fn((T*)pSrcDst, len, p_బఫరు);
 }
 
-static IppSortFunc getSortFunc(int depth, bool sortDescending)
+స్థిర Ipp_క్రమీకరించు_Func get_క్రమీకరించు_Func(పూర్ణాంకం లోతు, తార్కిక క్రమీకరించు_Descending)
 {
-    if (!sortDescending)
-        return depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixAscend_8u_I> :
-            depth == CV_16U ? ippSortWrap<Ipp16u, ippsSortRadixAscend_16u_I> :
-            depth == CV_16S ? ippSortWrap<Ipp16s, ippsSortRadixAscend_16s_I> :
-            depth == CV_32S ? ippSortWrap<Ipp32s, ippsSortRadixAscend_32s_I> :
-            depth == CV_32F ? ippSortWrap<Ipp32f, ippsSortRadixAscend_32f_I> :
-            depth == CV_64F ? ippSortWrap<Ipp64f, ippsSortRadixAscend_64f_I> :
+    ఒకవేళ (!క్రమీకరించు_Descending)
+        తిరిగి లోతు == CV_8U ? ipp_క్రమీకరించు_Wrap<Ipp8u, ipps_క్రమీకరించు_Radix_Ascend_8u_I> :
+            లోతు == CV_16U ? ipp_క్రమీకరించు_Wrap<Ipp16u, ipps_క్రమీకరించు_Radix_Ascend_16u_I> :
+            లోతు == CV_16S ? ipp_క్రమీకరించు_Wrap<Ipp16s, ipps_క్రమీకరించు_Radix_Ascend_16s_I> :
+            లోతు == CV_32S ? ipp_క్రమీకరించు_Wrap<Ipp32s, ipps_క్రమీకరించు_Radix_Ascend_32s_I> :
+            లోతు == CV_32F ? ipp_క్రమీకరించు_Wrap<Ipp32f, ipps_క్రమీకరించు_Radix_Ascend_32f_I> :
+            లోతు == CV_64F ? ipp_క్రమీకరించు_Wrap<Ipp64f, ipps_క్రమీకరించు_Radix_Ascend_64f_I> :
             0;
-    else
-        return depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixDescend_8u_I> :
-            depth == CV_16U ? ippSortWrap<Ipp16u, ippsSortRadixDescend_16u_I> :
-            depth == CV_16S ? ippSortWrap<Ipp16s, ippsSortRadixDescend_16s_I> :
-            depth == CV_32S ? ippSortWrap<Ipp32s, ippsSortRadixDescend_32s_I> :
-            depth == CV_32F ? ippSortWrap<Ipp32f, ippsSortRadixDescend_32f_I> :
-            depth == CV_64F ? ippSortWrap<Ipp64f, ippsSortRadixDescend_64f_I> :
+    లేకపోతే
+        తిరిగి లోతు == CV_8U ? ipp_క్రమీకరించు_Wrap<Ipp8u, ipps_క్రమీకరించు_Radix_Descend_8u_I> :
+            లోతు == CV_16U ? ipp_క్రమీకరించు_Wrap<Ipp16u, ipps_క్రమీకరించు_Radix_Descend_16u_I> :
+            లోతు == CV_16S ? ipp_క్రమీకరించు_Wrap<Ipp16s, ipps_క్రమీకరించు_Radix_Descend_16s_I> :
+            లోతు == CV_32S ? ipp_క్రమీకరించు_Wrap<Ipp32s, ipps_క్రమీకరించు_Radix_Descend_32s_I> :
+            లోతు == CV_32F ? ipp_క్రమీకరించు_Wrap<Ipp32f, ipps_క్రమీకరించు_Radix_Descend_32f_I> :
+            లోతు == CV_64F ? ipp_క్రమీకరించు_Wrap<Ipp64f, ipps_క్రమీకరించు_Radix_Descend_64f_I> :
             0;
 }
 
-static bool ipp_sort(const Mat& src, Mat& dst, int flags)
+స్థిర తార్కిక ipp_క్రమీకరించు(స్థిరరాశి Mat& src, Mat& dst, పూర్ణాంకం flags)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    bool        sortRows        = (flags & 1) == SORT_EVERY_ROW;
-    bool        sortDescending  = (flags & SORT_DESCENDING) != 0;
-    bool        inplace         = (src.data == dst.data);
-    int         depth           = src.depth();
-    IppDataType type            = ippiGetDataType(depth);
+    తార్కిక        క్రమీకరించు_అడ్డువరుసలు        = (flags & 1) == క్రమీకరించు_EVERY_అడ్డువరుస;
+    తార్కిక        క్రమీకరించు_Descending  = (flags & క్రమీకరించు_DESCENDING) != 0;
+    తార్కిక        inplace         = (src.దత్తాంశం == dst.దత్తాంశం);
+    పూర్ణాంకం         లోతు           = src.లోతు();
+    Ipp_దత్తాంశం_Type type            = ippi_Get_దత్తాంశం_Type(లోతు);
 
-    IppSortFunc ippsSortRadix_I = getSortFunc(depth, sortDescending);
-    if(!ippsSortRadix_I)
-        return false;
+    Ipp_క్రమీకరించు_Func ipps_క్రమీకరించు_Radix_I = get_క్రమీకరించు_Func(లోతు, క్రమీకరించు_Descending);
+    ఒకవేళ(!ipps_క్రమీకరించు_Radix_I)
+        తిరిగి అబద్ధం;
 
-    int n, len;
-    if( sortRows )
-        n = src.rows, len = src.cols;
-    else
-        n = src.cols, len = src.rows;
+    పూర్ణాంకం n, len;
+    ఒకవేళ( క్రమీకరించు_అడ్డువరుసలు )
+        n = src.అడ్డువరుసలు, len = src.నిలువుల_సంఖ్య;
+    లేకపోతే
+        n = src.నిలువుల_సంఖ్య, len = src.అడ్డువరుసలు;
 
-    int bufferSize;
-    if(ippsSortRadixGetBufferSize(len, type, &bufferSize) < 0)
-        return false;
+    పూర్ణాంకం బఫరు_కొలత;
+    ఒకవేళ(ipps_క్రమీకరించు_Radix_Get_బఫరు_కొలత(len, type, &బఫరు_కొలత) < 0)
+        తిరిగి అబద్ధం;
 
     // Each row/column sorts independently, so parallelize over n like sort_ does.
     // IPP scratch (buffer) and per-column temporaries are thread-local; a shared flag
     // records IPP failures since the lambda cannot return from ipp_sort.
-    volatile bool ok = true;
-    parallel_for_(Range(0, n), [&](const Range& range)
+    అస్థిర తార్కిక ok = నిజం;
+    parallel_for_(Range(0, n), [&](స్థిరరాశి Range& range)
     {
-        AutoBuffer<Ipp8u> buffer(bufferSize);
-        Mat  row;
-        Rect subRect(0,0,1,src.rows);
-        if( !sortRows )
-            row.create(1, src.rows, src.type());
+        Auto_బఫరు<Ipp8u> బఫరు(బఫరు_కొలత);
+        Mat  అడ్డువరుస;
+        Rect subRect(0,0,1,src.అడ్డువరుసలు);
+        ఒకవేళ( !క్రమీకరించు_అడ్డువరుసలు )
+            అడ్డువరుస.create(1, src.అడ్డువరుసలు, src.type());
 
-        for( int i = range.start; i < range.end; i++ )
+        కొరకు( పూర్ణాంకం i = range.ప్రారంభం; i < range.end; i++ )
         {
-            if( !ok )
-                break;
-            void* ptr;
-            if( sortRows )
+            ఒకవేళ( !ok )
+                ఆపు;
+            శూన్య* ptr;
+            ఒకవేళ( క్రమీకరించు_అడ్డువరుసలు )
             {
                 uchar* dptr = dst.ptr(i);
-                if( !inplace )
-                    memcpy(dptr, src.ptr(i), src.cols * src.elemSize());
+                ఒకవేళ( !inplace )
+                    జ్ఞాపకం_నకలు(dptr, src.ptr(i), src.నిలువుల_సంఖ్య * src.elem_కొలత());
                 ptr = dptr;
             }
-            else
+            లేకపోతే
             {
                 subRect.x = i;
-                Mat(src, subRect).copyTo(row);
-                ptr = row.ptr();
+                Mat(src, subRect).copy_గమ్యం(అడ్డువరుస);
+                ptr = అడ్డువరుస.ptr();
             }
 
-            if( CV_INSTRUMENT_FUN_IPP(ippsSortRadix_I, ptr, len, buffer.data()) < 0 )
+            ఒకవేళ( CV_INSTRUMENT_FUN_IPP(ipps_క్రమీకరించు_Radix_I, ptr, len, బఫరు.దత్తాంశం()) < 0 )
             {
-                ok = false;
-                break;
+                ok = అబద్ధం;
+                ఆపు;
             }
 
-            if( !sortRows )
+            ఒకవేళ( !క్రమీకరించు_అడ్డువరుసలు )
             {
                 Mat dstSub(dst, subRect);
-                row = row.reshape(1, dstSub.rows);
-                row.copyTo(dstSub);
-                row = row.reshape(1, 1);
+                అడ్డువరుస = అడ్డువరుస.reshape(1, dstSub.అడ్డువరుసలు);
+                అడ్డువరుస.copy_గమ్యం(dstSub);
+                అడ్డువరుస = అడ్డువరుస.reshape(1, 1);
             }
         }
     });
 
-    return ok;
+    తిరిగి ok;
 }
-#endif
+#అయితే_ముగింపు
 
-template<typename _Tp> class LessThanIdx
+మూస<రకం_పేరు _Tp> తరగతి LessThanIdx
 {
-public:
-    LessThanIdx( const _Tp* _arr ) : arr(_arr) {}
-    bool operator()(int a, int b) const { return arr[a] < arr[b]; }
-    const _Tp* arr;
+బహిరంగ:
+    LessThanIdx( స్థిరరాశి _Tp* _arr ) : arr(_arr) {}
+    తార్కిక క్రియాకారకం()(పూర్ణాంకం a, పూర్ణాంకం b) స్థిరరాశి { తిరిగి arr[a] < arr[b]; }
+    స్థిరరాశి _Tp* arr;
 };
 
-template<typename T> static void sortIdx_( const Mat& src, Mat& dst, int flags )
+మూస<రకం_పేరు T> స్థిర శూన్య క్రమీకరించు_Idx_2( స్థిరరాశి Mat& src, Mat& dst, పూర్ణాంకం flags )
 {
-    AutoBuffer<T> buf;
-    AutoBuffer<int> ibuf;
-    bool sortRows = (flags & 1) == SORT_EVERY_ROW;
-    bool sortDescending = (flags & SORT_DESCENDING) != 0;
+    Auto_బఫరు<T> buf;
+    Auto_బఫరు<పూర్ణాంకం> ibuf;
+    తార్కిక క్రమీకరించు_అడ్డువరుసలు = (flags & 1) == క్రమీకరించు_EVERY_అడ్డువరుస;
+    తార్కిక క్రమీకరించు_Descending = (flags & క్రమీకరించు_DESCENDING) != 0;
 
-    CV_Assert( src.data != dst.data );
+    CV_Assert( src.దత్తాంశం != dst.దత్తాంశం );
 
-    int n, len;
-    if( sortRows )
-        n = src.rows, len = src.cols;
-    else
+    పూర్ణాంకం n, len;
+    ఒకవేళ( క్రమీకరించు_అడ్డువరుసలు )
+        n = src.అడ్డువరుసలు, len = src.నిలువుల_సంఖ్య;
+    లేకపోతే
     {
-        n = src.cols, len = src.rows;
+        n = src.నిలువుల_సంఖ్య, len = src.అడ్డువరుసలు;
         buf.allocate(len);
         ibuf.allocate(len);
     }
-    T* bptr = buf.data();
-    int* _iptr = ibuf.data();
+    T* bptr = buf.దత్తాంశం();
+    పూర్ణాంకం* _iptr = ibuf.దత్తాంశం();
 
-    for( int i = 0; i < n; i++ )
+    కొరకు( పూర్ణాంకం i = 0; i < n; i++ )
     {
         T* ptr = bptr;
-        int* iptr = _iptr;
+        పూర్ణాంకం* iptr = _iptr;
 
-        if( sortRows )
+        ఒకవేళ( క్రమీకరించు_అడ్డువరుసలు )
         {
-            ptr = (T*)(src.data + src.step*i);
-            iptr = dst.ptr<int>(i);
+            ptr = (T*)(src.దత్తాంశం + src.అడుగు*i);
+            iptr = dst.ptr<పూర్ణాంకం>(i);
         }
-        else
+        లేకపోతే
         {
-            for( int j = 0; j < len; j++ )
+            కొరకు( పూర్ణాంకం j = 0; j < len; j++ )
                 ptr[j] = src.ptr<T>(j)[i];
         }
-        for( int j = 0; j < len; j++ )
+        కొరకు( పూర్ణాంకం j = 0; j < len; j++ )
             iptr[j] = j;
 
         std::sort( iptr, iptr + len, LessThanIdx<T>(ptr) );
-        if( sortDescending )
+        ఒకవేళ( క్రమీకరించు_Descending )
         {
-            for( int j = 0; j < len/2; j++ )
+            కొరకు( పూర్ణాంకం j = 0; j < len/2; j++ )
                 std::swap(iptr[j], iptr[len-1-j]);
         }
 
-        if( !sortRows )
-            for( int j = 0; j < len; j++ )
-                dst.ptr<int>(j)[i] = iptr[j];
+        ఒకవేళ( !క్రమీకరించు_అడ్డువరుసలు )
+            కొరకు( పూర్ణాంకం j = 0; j < len; j++ )
+                dst.ptr<పూర్ణాంకం>(j)[i] = iptr[j];
     }
 }
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_SORT
-typedef IppStatus (CV_STDCALL *IppSortIndexFunc)(const void*  pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, int len, Ipp8u *pBuffer);
+#ఒకవేళ defined(HAVE_IPP) && !IPP_DISABLE_క్రమీకరించు
+రకనిర్వచనం Ipp_స్థితి (CV_STDCALL *Ipp_క్రమీకరించు_సూచీ_Func)(స్థిరరాశి శూన్య*  pSrc, Ipp32s src_Stride_బైట్లు, Ipp32s *pDstIndx, పూర్ణాంకం len, Ipp8u *p_బఫరు);
 
-template<typename T, IppStatus (CV_STDCALL *fn)(const T*, Ipp32s, Ipp32s*, int, Ipp8u*)>
-static IppStatus CV_STDCALL ippSortIndexWrap(const void* pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, int len, Ipp8u *pBuffer)
+మూస<రకం_పేరు T, Ipp_స్థితి (CV_STDCALL *fn)(స్థిరరాశి T*, Ipp32s, Ipp32s*, పూర్ణాంకం, Ipp8u*)>
+స్థిర Ipp_స్థితి CV_STDCALL ipp_క్రమీకరించు_సూచీ_Wrap(స్థిరరాశి శూన్య* pSrc, Ipp32s src_Stride_బైట్లు, Ipp32s *pDstIndx, పూర్ణాంకం len, Ipp8u *p_బఫరు)
 {
-    return fn((const T*)pSrc, srcStrideBytes, pDstIndx, len, pBuffer);
+    తిరిగి fn((స్థిరరాశి T*)pSrc, src_Stride_బైట్లు, pDstIndx, len, p_బఫరు);
 }
 
-static IppSortIndexFunc getSortIndexFunc(int depth, bool sortDescending)
+స్థిర Ipp_క్రమీకరించు_సూచీ_Func get_క్రమీకరించు_సూచీ_Func(పూర్ణాంకం లోతు, తార్కిక క్రమీకరించు_Descending)
 {
-    if (!sortDescending)
-        return depth == CV_8U ? ippSortIndexWrap<Ipp8u, ippsSortRadixIndexAscend_8u> :
-            depth == CV_16U ? ippSortIndexWrap<Ipp16u, ippsSortRadixIndexAscend_16u> :
-            depth == CV_16S ? ippSortIndexWrap<Ipp16s, ippsSortRadixIndexAscend_16s> :
-            depth == CV_32S ? ippSortIndexWrap<Ipp32s, ippsSortRadixIndexAscend_32s> :
-            depth == CV_32F ? ippSortIndexWrap<Ipp32f, ippsSortRadixIndexAscend_32f> :
+    ఒకవేళ (!క్రమీకరించు_Descending)
+        తిరిగి లోతు == CV_8U ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp8u, ipps_క్రమీకరించు_Radix_సూచీ_Ascend_8u> :
+            లోతు == CV_16U ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp16u, ipps_క్రమీకరించు_Radix_సూచీ_Ascend_16u> :
+            లోతు == CV_16S ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp16s, ipps_క్రమీకరించు_Radix_సూచీ_Ascend_16s> :
+            లోతు == CV_32S ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp32s, ipps_క్రమీకరించు_Radix_సూచీ_Ascend_32s> :
+            లోతు == CV_32F ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp32f, ipps_క్రమీకరించు_Radix_సూచీ_Ascend_32f> :
             0;
-    else
-        return depth == CV_8U ? ippSortIndexWrap<Ipp8u, ippsSortRadixIndexDescend_8u> :
-            depth == CV_16U ? ippSortIndexWrap<Ipp16u, ippsSortRadixIndexDescend_16u> :
-            depth == CV_16S ? ippSortIndexWrap<Ipp16s, ippsSortRadixIndexDescend_16s> :
-            depth == CV_32S ? ippSortIndexWrap<Ipp32s, ippsSortRadixIndexDescend_32s> :
-            depth == CV_32F ? ippSortIndexWrap<Ipp32f, ippsSortRadixIndexDescend_32f> :
+    లేకపోతే
+        తిరిగి లోతు == CV_8U ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp8u, ipps_క్రమీకరించు_Radix_సూచీ_Descend_8u> :
+            లోతు == CV_16U ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp16u, ipps_క్రమీకరించు_Radix_సూచీ_Descend_16u> :
+            లోతు == CV_16S ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp16s, ipps_క్రమీకరించు_Radix_సూచీ_Descend_16s> :
+            లోతు == CV_32S ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp32s, ipps_క్రమీకరించు_Radix_సూచీ_Descend_32s> :
+            లోతు == CV_32F ? ipp_క్రమీకరించు_సూచీ_Wrap<Ipp32f, ipps_క్రమీకరించు_Radix_సూచీ_Descend_32f> :
             0;
 }
 
-static bool ipp_sortIdx( const Mat& src, Mat& dst, int flags )
+స్థిర తార్కిక ipp_క్రమీకరించు_Idx( స్థిరరాశి Mat& src, Mat& dst, పూర్ణాంకం flags )
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    bool        sortRows        = (flags & 1) == SORT_EVERY_ROW;
-    bool        sortDescending  = (flags & SORT_DESCENDING) != 0;
-    int         depth           = src.depth();
-    IppDataType type            = ippiGetDataType(depth);
+    తార్కిక        క్రమీకరించు_అడ్డువరుసలు        = (flags & 1) == క్రమీకరించు_EVERY_అడ్డువరుస;
+    తార్కిక        క్రమీకరించు_Descending  = (flags & క్రమీకరించు_DESCENDING) != 0;
+    పూర్ణాంకం         లోతు           = src.లోతు();
+    Ipp_దత్తాంశం_Type type            = ippi_Get_దత్తాంశం_Type(లోతు);
 
-    IppSortIndexFunc ippsSortRadixIndex = getSortIndexFunc(depth, sortDescending);
-    if(!ippsSortRadixIndex)
-        return false;
+    Ipp_క్రమీకరించు_సూచీ_Func ipps_క్రమీకరించు_Radix_సూచీ = get_క్రమీకరించు_సూచీ_Func(లోతు, క్రమీకరించు_Descending);
+    ఒకవేళ(!ipps_క్రమీకరించు_Radix_సూచీ)
+        తిరిగి అబద్ధం;
 
-    if(sortRows)
+    ఒకవేళ(క్రమీకరించు_అడ్డువరుసలు)
     {
-        AutoBuffer<Ipp8u> buffer;
-        int               bufferSize;
-        if(ippsSortRadixIndexGetBufferSize(src.cols, type, &bufferSize) < 0)
-            return false;
+        Auto_బఫరు<Ipp8u> బఫరు;
+        పూర్ణాంకం               బఫరు_కొలత;
+        ఒకవేళ(ipps_క్రమీకరించు_Radix_సూచీ_Get_బఫరు_కొలత(src.నిలువుల_సంఖ్య, type, &బఫరు_కొలత) < 0)
+            తిరిగి అబద్ధం;
 
-        buffer.allocate(bufferSize);
+        బఫరు.allocate(బఫరు_కొలత);
 
-        for(int i = 0; i < src.rows; i++)
+        కొరకు(పూర్ణాంకం i = 0; i < src.అడ్డువరుసలు; i++)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippsSortRadixIndex, (const void*)src.ptr(i), (Ipp32s)src.step[1], (Ipp32s*)dst.ptr(i), src.cols, buffer.data()) < 0)
-                return false;
+            ఒకవేళ(CV_INSTRUMENT_FUN_IPP(ipps_క్రమీకరించు_Radix_సూచీ, (స్థిరరాశి శూన్య*)src.ptr(i), (Ipp32s)src.అడుగు[1], (Ipp32s*)dst.ptr(i), src.నిలువుల_సంఖ్య, బఫరు.దత్తాంశం()) < 0)
+                తిరిగి అబద్ధం;
         }
     }
-    else
+    లేకపోతే
     {
-        Mat  dstRow(1, dst.rows, dst.type());
+        Mat  dst_అడ్డువరుస(1, dst.అడ్డువరుసలు, dst.type());
         Mat  dstSub;
-        Rect subRect(0,0,1,src.rows);
+        Rect subRect(0,0,1,src.అడ్డువరుసలు);
 
-        AutoBuffer<Ipp8u> buffer;
-        int               bufferSize;
-        if(ippsSortRadixIndexGetBufferSize(src.rows, type, &bufferSize) < 0)
-            return false;
+        Auto_బఫరు<Ipp8u> బఫరు;
+        పూర్ణాంకం               బఫరు_కొలత;
+        ఒకవేళ(ipps_క్రమీకరించు_Radix_సూచీ_Get_బఫరు_కొలత(src.అడ్డువరుసలు, type, &బఫరు_కొలత) < 0)
+            తిరిగి అబద్ధం;
 
-        buffer.allocate(bufferSize);
+        బఫరు.allocate(బఫరు_కొలత);
 
-        Ipp32s srcStep = (Ipp32s)src.step[0];
-        for(int i = 0; i < src.cols; i++)
+        Ipp32s src_అడుగు_3 = (Ipp32s)src.అడుగు[0];
+        కొరకు(పూర్ణాంకం i = 0; i < src.నిలువుల_సంఖ్య; i++)
         {
             subRect.x = i;
             dstSub = Mat(dst, subRect);
 
-            if(CV_INSTRUMENT_FUN_IPP(ippsSortRadixIndex, (const void*)src.ptr(0, i), srcStep, (Ipp32s*)dstRow.ptr(), src.rows, buffer.data()) < 0)
-                return false;
+            ఒకవేళ(CV_INSTRUMENT_FUN_IPP(ipps_క్రమీకరించు_Radix_సూచీ, (స్థిరరాశి శూన్య*)src.ptr(0, i), src_అడుగు_3, (Ipp32s*)dst_అడ్డువరుస.ptr(), src.అడ్డువరుసలు, బఫరు.దత్తాంశం()) < 0)
+                తిరిగి అబద్ధం;
 
-            dstRow = dstRow.reshape(1, dstSub.rows);
-            dstRow.copyTo(dstSub);
+            dst_అడ్డువరుస = dst_అడ్డువరుస.reshape(1, dstSub.అడ్డువరుసలు);
+            dst_అడ్డువరుస.copy_గమ్యం(dstSub);
         }
     }
 
-    return true;
+    తిరిగి నిజం;
 }
-#endif
+#అయితే_ముగింపు
 
-typedef void (*SortFunc)(const Mat& src, Mat& dst, int flags);
+రకనిర్వచనం శూన్య (*క్రమీకరించు_Func)(స్థిరరాశి Mat& src, Mat& dst, పూర్ణాంకం flags);
 }
 
-void cv::sort( InputArray _src, OutputArray _dst, int flags )
+శూన్య cv::sort( ఆదానం_Array _src, OutputArray _dst, పూర్ణాంకం flags )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
     CV_Assert( src.dims <= 2 && src.channels() == 1 );
-    _dst.createSameSize( src, src.type() );
+    _dst.create_Same_కొలత( src, src.type() );
     Mat dst = _dst.getMat();
-#if !IPP_DISABLE_SORT
-    CV_IPP_RUN_FAST(ipp_sort(src, dst, flags));
-#endif
+#ఒకవేళ !IPP_DISABLE_క్రమీకరించు
+    CV_IPP_నిరంతరం_FAST(ipp_క్రమీకరించు(src, dst, flags));
+#అయితే_ముగింపు
 
-    static SortFunc tab[CV_DEPTH_MAX] =
+    స్థిర క్రమీకరించు_Func tab[CV_లోతు_MAX] =
     {
-        sort_<uchar>, sort_<schar>, sort_<ushort>, sort_<short>,
-        sort_<int>, sort_<float>, sort_<double>, 0
+        క్రమీకరించు<uchar>, క్రమీకరించు<schar>, క్రమీకరించు<ushort>, క్రమీకరించు<పొట్టి>,
+        క్రమీకరించు<పూర్ణాంకం>, క్రమీకరించు<దశాంశం>, క్రమీకరించు<ద్విగుణ>, 0
     };
-    SortFunc func = tab[src.depth()];
+    క్రమీకరించు_Func func = tab[src.లోతు()];
     CV_Assert( func != 0 );
 
     func( src, dst, flags );
 }
 
-void cv::sortIdx( InputArray _src, OutputArray _dst, int flags )
+శూన్య cv::క్రమీకరించు_Idx( ఆదానం_Array _src, OutputArray _dst, పూర్ణాంకం flags )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
     CV_Assert( src.dims <= 2 && src.channels() == 1 );
     Mat dst = _dst.getMat();
-    if( dst.data == src.data )
+    ఒకవేళ( dst.దత్తాంశం == src.దత్తాంశం )
         _dst.release();
-    _dst.createSameSize( src, CV_32S );
+    _dst.create_Same_కొలత( src, CV_32S );
     dst = _dst.getMat();
 
-#if !IPP_DISABLE_SORT
-    CV_IPP_RUN_FAST(ipp_sortIdx(src, dst, flags));
-#endif
+#ఒకవేళ !IPP_DISABLE_క్రమీకరించు
+    CV_IPP_నిరంతరం_FAST(ipp_క్రమీకరించు_Idx(src, dst, flags));
+#అయితే_ముగింపు
 
-    static SortFunc tab[CV_DEPTH_MAX] =
+    స్థిర క్రమీకరించు_Func tab[CV_లోతు_MAX] =
     {
-        sortIdx_<uchar>, sortIdx_<schar>, sortIdx_<ushort>, sortIdx_<short>,
-        sortIdx_<int>, sortIdx_<float>, sortIdx_<double>, 0
+        క్రమీకరించు_Idx_2<uchar>, క్రమీకరించు_Idx_2<schar>, క్రమీకరించు_Idx_2<ushort>, క్రమీకరించు_Idx_2<పొట్టి>,
+        క్రమీకరించు_Idx_2<పూర్ణాంకం>, క్రమీకరించు_Idx_2<దశాంశం>, క్రమీకరించు_Idx_2<ద్విగుణ>, 0
     };
-    SortFunc func = tab[src.depth()];
+    క్రమీకరించు_Func func = tab[src.లోతు()];
     CV_Assert( func != 0 );
     func( src, dst, flags );
 }

@@ -41,295 +41,295 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <map>
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ <map>
 
-using namespace cv;
-using namespace cv::cuda;
+ఉపయోగించి నామాకాశ cv;
+ఉపయోగించి నామాకాశ cv::cuda;
 
-#ifdef HAVE_CUDA
+#నిర్వచితమైతే HAVE_CUDA
 
-namespace {
+నామాకాశ {
 
-class HostMemAllocator : public MatAllocator
+తరగతి HostMemAllocator : బహిరంగ MatAllocator
 {
-public:
-    explicit HostMemAllocator(unsigned int flags) : flags_(flags)
+బహిరంగ:
+    స్పష్టమైన HostMemAllocator(గుర్తులేని పూర్ణాంకం flags) : flags_(flags)
     {
     }
 
-    UMatData* allocate(int dims, const int* sizes, int type,
-                       void* data0, size_t* step,
-                       AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    UMat_దత్తాంశం* allocate(పూర్ణాంకం dims, స్థిరరాశి పూర్ణాంకం* sizes, పూర్ణాంకం type,
+                       శూన్య* data0, size_t* అడుగు,
+                       AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) స్థిరరాశి CV_OVERRIDE
     {
-        size_t total = CV_ELEM_SIZE(type);
-        for (int i = dims-1; i >= 0; i--)
+        size_t మొత్తం = CV_ELEM_కొలత(type);
+        కొరకు (పూర్ణాంకం i = dims-1; i >= 0; i--)
         {
-            if (step)
+            ఒకవేళ (అడుగు)
             {
-                if (data0 && step[i] != CV_AUTOSTEP)
+                ఒకవేళ (data0 && అడుగు[i] != CV_AUTOSTEP)
                 {
-                    CV_Assert(total <= step[i]);
-                    total = step[i];
+                    CV_Assert(మొత్తం <= అడుగు[i]);
+                    మొత్తం = అడుగు[i];
                 }
-                else
+                లేకపోతే
                 {
-                    step[i] = total;
+                    అడుగు[i] = మొత్తం;
                 }
             }
 
-            total *= sizes[i];
+            మొత్తం *= sizes[i];
         }
 
-        UMatData* u = new UMatData(this);
-        u->size = total;
+        UMat_దత్తాంశం* u = కొత్త UMat_దత్తాంశం(ఇది);
+        u->size = మొత్తం;
 
-        if (data0)
+        ఒకవేళ (data0)
         {
-            u->data = u->origdata = static_cast<uchar*>(data0);
-            u->flags |= UMatData::USER_ALLOCATED;
+            u->దత్తాంశం = u->origdata = static_cast<uchar*>(data0);
+            u->flags |= UMat_దత్తాంశం::USER_ALLOCATED;
         }
-        else
+        లేకపోతే
         {
-            void* ptr = 0;
-            cudaSafeCall( cudaHostAlloc(&ptr, total, flags_) );
+            శూన్య* ptr = 0;
+            cuda_సురక్షిత_Call( cudaHostAlloc(&ptr, మొత్తం, flags_) );
 
-            u->data = u->origdata = static_cast<uchar*>(ptr);
+            u->దత్తాంశం = u->origdata = static_cast<uchar*>(ptr);
         }
 
-        return u;
+        తిరిగి u;
     }
 
-    bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    తార్కిక allocate(UMat_దత్తాంశం* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) స్థిరరాశి CV_OVERRIDE
     {
-        return (u != NULL);
+        తిరిగి (u != ఖాళీ);
     }
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    శూన్య deallocate(UMat_దత్తాంశం* u) స్థిరరాశి CV_OVERRIDE
     {
-        if (!u)
-            return;
+        ఒకవేళ (!u)
+            తిరిగి;
 
         CV_Assert(u->urefcount >= 0);
         CV_Assert(u->refcount >= 0);
 
-        if (u->refcount == 0)
+        ఒకవేళ (u->refcount == 0)
         {
-            if ( !(u->flags & UMatData::USER_ALLOCATED) )
+            ఒకవేళ ( !(u->flags & UMat_దత్తాంశం::USER_ALLOCATED) )
             {
                 cudaFreeHost(u->origdata);
                 u->origdata = 0;
             }
 
-            delete u;
+            తొలగించు u;
         }
     }
 
-private:
-    unsigned int flags_;
+అంతరంగ:
+    గుర్తులేని పూర్ణాంకం flags_;
 };
 
 } // namespace
 
-#endif
+#అయితే_ముగింపు
 
 MatAllocator* cv::cuda::HostMem::getAllocator(AllocType alloc_type)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(alloc_type);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(alloc_type);
     throw_no_cuda();
-#else
-    static std::map<unsigned int, Ptr<MatAllocator> > allocators;
+#లేకపోతే
+    స్థిర std::map<గుర్తులేని పూర్ణాంకం, Ptr<MatAllocator> > allocators;
 
-    unsigned int flag = cudaHostAllocDefault;
+    గుర్తులేని పూర్ణాంకం flag = cudaHostAllocDefault;
 
-    switch (alloc_type)
+    ఎంపిక (alloc_type)
     {
-    case PAGE_LOCKED:    flag = cudaHostAllocDefault; break;
-    case SHARED:         flag = cudaHostAllocMapped;  break;
-    case WRITE_COMBINED: flag = cudaHostAllocWriteCombined; break;
-    default:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
+    స్థితి పుట_LOCKED:    flag = cudaHostAllocDefault; ఆపు;
+    స్థితి SHARED:         flag = cudaHostAllocMapped;  ఆపు;
+    స్థితి WRITE_COMBINED: flag = cudaHostAllocWriteCombined; ఆపు;
+    అప్రమేయ:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
     }
 
     Ptr<MatAllocator>& a = allocators[flag];
 
-    if (a.empty())
+    ఒకవేళ (a.empty())
     {
         a = makePtr<HostMemAllocator>(flag);
     }
 
-    return a.get();
-#endif
+    తిరిగి a.get();
+#అయితే_ముగింపు
 }
 
-#ifdef HAVE_CUDA
-namespace
+#నిర్వచితమైతే HAVE_CUDA
+నామాకాశ
 {
-    size_t alignUpStep(size_t what, size_t alignment)
+    size_t align_పైకి_అడుగు(size_t what, size_t alignment)
     {
-        size_t alignMask = alignment - 1;
-        size_t inverseAlignMask = ~alignMask;
-        size_t res = (what + alignMask) & inverseAlignMask;
-        return res;
+        size_t align_ముసుగు = alignment - 1;
+        size_t inverse_Align_ముసుగు = ~align_ముసుగు;
+        size_t res = (what + align_ముసుగు) & inverse_Align_ముసుగు;
+        తిరిగి res;
     }
 }
-#endif
+#అయితే_ముగింపు
 
-void cv::cuda::HostMem::create(int rows_, int cols_, int type_)
+శూన్య cv::cuda::HostMem::create(పూర్ణాంకం అడ్డువరుసలు_2, పూర్ణాంకం నిలువుల_సంఖ్య_2, పూర్ణాంకం type_)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(rows_);
-    CV_UNUSED(cols_);
-    CV_UNUSED(type_);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(అడ్డువరుసలు_2);
+    CV_వాడని(నిలువుల_సంఖ్య_2);
+    CV_వాడని(type_);
     throw_no_cuda();
-#else
-    if (alloc_type == SHARED)
+#లేకపోతే
+    ఒకవేళ (alloc_type == SHARED)
     {
         DeviceInfo devInfo;
-        CV_Assert( devInfo.canMapHostMemory() );
+        CV_Assert( devInfo.can_Map_Host_జ్ఞాపకం() );
     }
 
-    type_ &= Mat::TYPE_MASK;
+    type_ &= Mat::TYPE_ముసుగు;
 
-    if (rows == rows_ && cols == cols_ && type() == type_ && data)
-        return;
+    ఒకవేళ (అడ్డువరుసలు == అడ్డువరుసలు_2 && నిలువుల_సంఖ్య == నిలువుల_సంఖ్య_2 && type() == type_ && దత్తాంశం)
+        తిరిగి;
 
-    if (data)
+    ఒకవేళ (దత్తాంశం)
         release();
 
-    CV_DbgAssert( rows_ >= 0 && cols_ >= 0 );
+    CV_DbgAssert( అడ్డువరుసలు_2 >= 0 && నిలువుల_సంఖ్య_2 >= 0 );
 
-    if (rows_ > 0 && cols_ > 0)
+    ఒకవేళ (అడ్డువరుసలు_2 > 0 && నిలువుల_సంఖ్య_2 > 0)
     {
         flags = Mat::MAGIC_VAL + type_;
-        rows = rows_;
-        cols = cols_;
-        step = elemSize() * cols;
-        int sz[] = { rows, cols };
-        size_t steps[] = { step, (size_t)CV_ELEM_SIZE(type_) };
-        flags = updateContinuityFlag(flags, 2, sz, steps);
+        అడ్డువరుసలు = అడ్డువరుసలు_2;
+        నిలువుల_సంఖ్య = నిలువుల_సంఖ్య_2;
+        అడుగు = elem_కొలత() * నిలువుల_సంఖ్య;
+        పూర్ణాంకం sz[] = { అడ్డువరుసలు, నిలువుల_సంఖ్య };
+        size_t అడుగులు[] = { అడుగు, (size_t)CV_ELEM_కొలత(type_) };
+        flags = updateContinuityFlag(flags, 2, sz, అడుగులు);
 
-        if (alloc_type == SHARED)
+        ఒకవేళ (alloc_type == SHARED)
         {
             DeviceInfo devInfo;
-            step = alignUpStep(step, devInfo.textureAlignment());
+            అడుగు = align_పైకి_అడుగు(అడుగు, devInfo.textureAlignment());
         }
 
-        int64 _nettosize = (int64)step*rows;
+        int64 _nettosize = (int64)అడుగు*అడ్డువరుసలు;
         size_t nettosize = (size_t)_nettosize;
 
-        if (_nettosize != (int64)nettosize)
+        ఒకవేళ (_nettosize != (int64)nettosize)
             CV_Error(cv::Error::StsNoMem, "Too big buffer is allocated");
 
-        size_t datasize = alignSize(nettosize, (int)sizeof(*refcount));
+        size_t datasize = align_కొలత(nettosize, (పూర్ణాంకం)పరిమాణం(*refcount));
 
-        void* ptr = 0;
+        శూన్య* ptr = 0;
 
-        switch (alloc_type)
+        ఎంపిక (alloc_type)
         {
-        case PAGE_LOCKED:    cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocDefault) ); break;
-        case SHARED:         cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocMapped) );  break;
-        case WRITE_COMBINED: cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocWriteCombined) ); break;
-        default:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
+        స్థితి పుట_LOCKED:    cuda_సురక్షిత_Call( cudaHostAlloc(&ptr, datasize, cudaHostAllocDefault) ); ఆపు;
+        స్థితి SHARED:         cuda_సురక్షిత_Call( cudaHostAlloc(&ptr, datasize, cudaHostAllocMapped) );  ఆపు;
+        స్థితి WRITE_COMBINED: cuda_సురక్షిత_Call( cudaHostAlloc(&ptr, datasize, cudaHostAllocWriteCombined) ); ఆపు;
+        అప్రమేయ:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
         }
 
-        datastart = data =  (uchar*)ptr;
-        dataend = data + nettosize;
+        datastart = దత్తాంశం =  (uchar*)ptr;
+        dataend = దత్తాంశం + nettosize;
 
-        refcount = (int*)cv::fastMalloc(sizeof(*refcount));
+        refcount = (పూర్ణాంకం*)cv::fastMalloc(పరిమాణం(*refcount));
         *refcount = 1;
     }
-#endif
+#అయితే_ముగింపు
 }
 
-HostMem cv::cuda::HostMem::reshape(int new_cn, int new_rows) const
+HostMem cv::cuda::HostMem::reshape(పూర్ణాంకం new_cn, పూర్ణాంకం new_అడ్డువరుసలు) స్థిరరాశి
 {
-    HostMem hdr = *this;
+    HostMem hdr = *ఇది;
 
-    int cn = channels();
-    if (new_cn == 0)
+    పూర్ణాంకం cn = channels();
+    ఒకవేళ (new_cn == 0)
         new_cn = cn;
 
-    int total_width = cols * cn;
+    పూర్ణాంకం మొత్తం_వెడల్పు = నిలువుల_సంఖ్య * cn;
 
-    if ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
-        new_rows = rows * total_width / new_cn;
+    ఒకవేళ ((new_cn > మొత్తం_వెడల్పు || మొత్తం_వెడల్పు % new_cn != 0) && new_అడ్డువరుసలు == 0)
+        new_అడ్డువరుసలు = అడ్డువరుసలు * మొత్తం_వెడల్పు / new_cn;
 
-    if (new_rows != 0 && new_rows != rows)
+    ఒకవేళ (new_అడ్డువరుసలు != 0 && new_అడ్డువరుసలు != అడ్డువరుసలు)
     {
-        int total_size = total_width * rows;
+        పూర్ణాంకం మొత్తం_కొలత_2 = మొత్తం_వెడల్పు * అడ్డువరుసలు;
 
-        if (!isContinuous())
-            CV_Error(cv::Error::BadStep, "The matrix is not continuous, thus its number of rows can not be changed");
+        ఒకవేళ (!isContinuous())
+            CV_Error(cv::Error::Bad_అడుగు, "The matrix is not continuous, thus its number of rows can not be changed");
 
-        if ((unsigned)new_rows > (unsigned)total_size)
-            CV_Error(cv::Error::StsOutOfRange, "Bad new number of rows");
+        ఒకవేళ ((గుర్తులేని)new_అడ్డువరుసలు > (గుర్తులేని)మొత్తం_కొలత_2)
+            CV_Error(cv::Error::Sts_బహిర్గతం_యొక్క_Range, "Bad new number of rows");
 
-        total_width = total_size / new_rows;
+        మొత్తం_వెడల్పు = మొత్తం_కొలత_2 / new_అడ్డువరుసలు;
 
-        if (total_width * new_rows != total_size)
+        ఒకవేళ (మొత్తం_వెడల్పు * new_అడ్డువరుసలు != మొత్తం_కొలత_2)
             CV_Error(cv::Error::StsBadArg, "The total number of matrix elements is not divisible by the new number of rows");
 
-        hdr.rows = new_rows;
-        hdr.step = total_width * elemSize1();
+        hdr.అడ్డువరుసలు = new_అడ్డువరుసలు;
+        hdr.అడుగు = మొత్తం_వెడల్పు * elemSize1();
     }
 
-    int new_width = total_width / new_cn;
+    పూర్ణాంకం new_వెడల్పు = మొత్తం_వెడల్పు / new_cn;
 
-    if (new_width * new_cn != total_width)
-        CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
+    ఒకవేళ (new_వెడల్పు * new_cn != మొత్తం_వెడల్పు)
+        CV_Error(cv::Error::Bad_అంకె_Channels, "The total width is not divisible by the new number of channels");
 
-    hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
+    hdr.నిలువుల_సంఖ్య = new_వెడల్పు;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_ముసుగు) | ((new_cn - 1) << CV_CN_జరుపు);
 
-    return hdr;
+    తిరిగి hdr;
 }
 
-void cv::cuda::HostMem::release()
+శూన్య cv::cuda::HostMem::release()
 {
-#ifdef HAVE_CUDA
-    if (refcount && CV_XADD(refcount, -1) == 1)
+#నిర్వచితమైతే HAVE_CUDA
+    ఒకవేళ (refcount && CV_XADD(refcount, -1) == 1)
     {
         cudaFreeHost(datastart);
         fastFree(refcount);
     }
 
-    dataend = data = datastart = 0;
-    step = rows = cols = 0;
+    dataend = దత్తాంశం = datastart = 0;
+    అడుగు = అడ్డువరుసలు = నిలువుల_సంఖ్య = 0;
     refcount = 0;
-#endif
+#అయితే_ముగింపు
 }
 
-GpuMat cv::cuda::HostMem::createGpuMatHeader() const
+GpuMat cv::cuda::HostMem::create_Gpu_Mat_శీర్షిక() స్థిరరాశి
 {
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
     throw_no_cuda();
-#else
+#లేకపోతే
     CV_Assert( alloc_type == SHARED );
 
-    void *pdev;
-    cudaSafeCall( cudaHostGetDevicePointer(&pdev, data, 0) );
+    శూన్య *pdev;
+    cuda_సురక్షిత_Call( cuda_Host_Get_Device_సూచిక(&pdev, దత్తాంశం, 0) );
 
-    return GpuMat(rows, cols, type(), pdev, step);
-#endif
+    తిరిగి GpuMat(అడ్డువరుసలు, నిలువుల_సంఖ్య, type(), pdev, అడుగు);
+#అయితే_ముగింపు
 }
 
-void cv::cuda::registerPageLocked(Mat& m)
+శూన్య cv::cuda::రిజిస్టరు_పుట_Locked(Mat& m)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(m);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(m);
     throw_no_cuda();
-#else
+#లేకపోతే
     CV_Assert( m.isContinuous() );
-    cudaSafeCall( cudaHostRegister(m.data, m.step * m.rows, cudaHostRegisterPortable) );
-#endif
+    cuda_సురక్షిత_Call( cuda_Host_రిజిస్టరు(m.దత్తాంశం, m.అడుగు * m.అడ్డువరుసలు, cuda_Host_రిజిస్టరు_Portable) );
+#అయితే_ముగింపు
 }
 
-void cv::cuda::unregisterPageLocked(Mat& m)
+శూన్య cv::cuda::unregister_పుట_Locked(Mat& m)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(m);
-#else
-    cudaSafeCall( cudaHostUnregister(m.data) );
-#endif
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(m);
+#లేకపోతే
+    cuda_సురక్షిత_Call( cudaHostUnregister(m.దత్తాంశం) );
+#అయితే_ముగింపు
 }

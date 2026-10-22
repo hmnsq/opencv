@@ -3,245 +3,245 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "opencl_kernels_core.hpp"
+#అన్తర్భావ "stat.hpp"
 
-#include "count_non_zero.simd.hpp"
-#include "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#అన్తర్భావ "count_non_zero.simd.hpp"
+#అన్తర్భావ "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+నామాకాశ cv {
 
-static CountNonZeroFunc getCountNonZeroTab(int depth)
+స్థిర లెక్క_Non_Zero_Func get_లెక్క_Non_Zero_Tab(పూర్ణాంకం లోతు)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getCountNonZeroTab, (depth),
+    CV_CPU_DISPATCH(get_లెక్క_Non_Zero_Tab, (లోతు),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
-static bool ocl_countNonZero( InputArray _src, int & res )
+#నిర్వచితమైతే HAVE_OPENCL
+స్థిర తార్కిక ocl_లెక్క_Non_Zero( ఆదానం_Array _src, పూర్ణాంకం & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    పూర్ణాంకం type = _src.type(), లోతు = CV_MAT_లోతు(type), kercn = ocl::predict_Optimal_సదిశ_వెడల్పు(_src);
+    తార్కిక doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    ఒకవేళ (లోతు == CV_64F && !doubleSupport)
+        తిరిగి అబద్ధం;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
-    size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
+    పూర్ణాంకం dbsize = ocl::Device::getDefault().maxComputeUnits();
+    size_t wgs = ocl::Device::getDefault().max_Work_సమూహం_కొలత();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    పూర్ణాంకం wgs2_aligned = 1;
+    అయితే (wgs2_aligned < (పూర్ణాంకం)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc,
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::type_గమ్యం_Str(CV_MAKE_TYPE(లోతు, kercn)),
+                         ocl::type_గమ్యం_Str(లోతు), (పూర్ణాంకం)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    ఒకవేళ (k.empty())
+        తిరిగి అబద్ధం;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.వాదనలు(ocl::KernelArg::Read_Only_No_కొలత(src), src.నిలువుల_సంఖ్య, (పూర్ణాంకం)src.మొత్తం(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0]), true;
-    return false;
+    ఒకవేళ (k.నిరంతరం(1, &globalsize, &wgs, నిజం))
+        తిరిగి res = saturate_cast<పూర్ణాంకం>(cv::కూడిక(db.getMat(ACCESS_READ))[0]), నిజం;
+    తిరిగి అబద్ధం;
 }
-#endif
+#అయితే_ముగింపు
 
-#if defined HAVE_IPP
-static bool ipp_countNonZero( Mat &src, int &res )
+#ఒకవేళ defined HAVE_IPP
+స్థిర తార్కిక ipp_లెక్క_Non_Zero( Mat &src, పూర్ణాంకం &res )
 {
     CV_INSTRUMENT_REGION_IPP();
 
-#if IPP_VERSION_X100 < 201801
+#ఒకవేళ IPP_సంస్కరణ_X100 < 201801
     // Poor performance of SSE42
-    if(cv::ipp::getIppTopFeatures() == ippCPUID_SSE42)
-        return false;
-#endif
+    ఒకవేళ(cv::ipp::get_Ipp_శిఖరం_Features() == ippCPUID_SSE42)
+        తిరిగి అబద్ధం;
+#అయితే_ముగింపు
 
-    Ipp32s  count = 0;
-    int     depth = src.depth();
+    Ipp32s  లెక్క_2 = 0;
+    పూర్ణాంకం     లోతు = src.లోతు();
 
-    if(src.dims <= 2)
+    ఒకవేళ(src.dims <= 2)
     {
-        IppStatus status;
-        IppiSize  size = {src.cols*src.channels(), src.rows};
+        Ipp_స్థితి స్థితి_2;
+        Ippi_కొలత  size = {src.నిలువుల_సంఖ్య*src.channels(), src.అడ్డువరుసలు};
 
-        if(depth == CV_8U)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, (const Ipp8u *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else if(depth == CV_32F)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, (const Ipp32f *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else
-            return false;
+        ఒకవేళ(లోతు == CV_8U)
+            స్థితి_2 = CV_INSTRUMENT_FUN_IPP(ippi_లెక్క_లోపల_Range_8u_C1_R, (స్థిరరాశి Ipp8u *)src.ptr(), (పూర్ణాంకం)src.అడుగు, size, &లెక్క_2, 0, 0);
+        లేకపోతే ఒకవేళ(లోతు == CV_32F)
+            స్థితి_2 = CV_INSTRUMENT_FUN_IPP(ippi_లెక్క_లోపల_Range_32f_C1_R, (స్థిరరాశి Ipp32f *)src.ptr(), (పూర్ణాంకం)src.అడుగు, size, &లెక్క_2, 0, 0);
+        లేకపోతే
+            తిరిగి అబద్ధం;
 
-        if(status < 0)
-            return false;
+        ఒకవేళ(స్థితి_2 < 0)
+            తిరిగి అబద్ధం;
 
-        res = size.width*size.height - count;
+        res = size.వెడల్పు*size.ఎత్తు - లెక్క_2;
     }
-    else
+    లేకపోతే
     {
-        IppStatus       status;
-        const Mat      *arrays[] = {&src, NULL};
+        Ipp_స్థితి       స్థితి_2;
+        స్థిరరాశి Mat      *arrays[] = {&src, ఖాళీ};
         Mat            planes[1];
         NAryMatIterator it(arrays, planes, 1);
-        IppiSize        size  = {(int)it.size*src.channels(), 1};
+        Ippi_కొలత        size  = {(పూర్ణాంకం)it.size*src.channels(), 1};
         res = 0;
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        కొరకు (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(depth == CV_8U)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, it.planes->ptr<Ipp8u>(), (int)it.planes->step, size, &count, 0, 0);
-            else if(depth == CV_32F)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, it.planes->ptr<Ipp32f>(), (int)it.planes->step, size, &count, 0, 0);
-            else
-                return false;
+            ఒకవేళ(లోతు == CV_8U)
+                స్థితి_2 = CV_INSTRUMENT_FUN_IPP(ippi_లెక్క_లోపల_Range_8u_C1_R, it.planes->ptr<Ipp8u>(), (పూర్ణాంకం)it.planes->అడుగు, size, &లెక్క_2, 0, 0);
+            లేకపోతే ఒకవేళ(లోతు == CV_32F)
+                స్థితి_2 = CV_INSTRUMENT_FUN_IPP(ippi_లెక్క_లోపల_Range_32f_C1_R, it.planes->ptr<Ipp32f>(), (పూర్ణాంకం)it.planes->అడుగు, size, &లెక్క_2, 0, 0);
+            లేకపోతే
+                తిరిగి అబద్ధం;
 
-            if(status < 0 || (int)it.planes->total()*src.channels() < count)
-                return false;
+            ఒకవేళ(స్థితి_2 < 0 || (పూర్ణాంకం)it.planes->మొత్తం()*src.channels() < లెక్క_2)
+                తిరిగి అబద్ధం;
 
-            res += (int)it.planes->total()*src.channels() - count;
+            res += (పూర్ణాంకం)it.planes->మొత్తం()*src.channels() - లెక్క_2;
         }
     }
 
-    return true;
+    తిరిగి నిజం;
 }
-#endif
+#అయితే_ముగింపు
 
-int countNonZero(InputArray _src)
+పూర్ణాంకం లెక్క_Non_Zero(ఆదానం_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    పూర్ణాంకం type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-#if defined HAVE_OPENCL || defined HAVE_IPP
-    int res = -1;
-#endif
+#ఒకవేళ defined HAVE_OPENCL || defined HAVE_IPP
+    పూర్ణాంకం res = -1;
+#అయితే_ముగింపు
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_countNonZero(_src, res),
+#నిర్వచితమైతే HAVE_OPENCL
+    CV_OCL_నిరంతరం_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+                ocl_లెక్క_Non_Zero(_src, res),
                 res)
-#endif
+#అయితే_ముగింపు
 
     Mat src = _src.getMat();
-    CV_IPP_RUN_FAST(ipp_countNonZero(src, res), res);
+    CV_IPP_నిరంతరం_FAST(ipp_లెక్క_Non_Zero(src, res), res);
 
-    CountNonZeroFunc func = getCountNonZeroTab(src.depth());
+    లెక్క_Non_Zero_Func func = get_లెక్క_Non_Zero_Tab(src.లోతు());
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, 0};
+    స్థిరరాశి Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, nz = 0;
+    పూర్ణాంకం మొత్తం = (పూర్ణాంకం)it.size, nz = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
-        nz += func( ptrs[0], total );
+    కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
+        nz += func( ptrs[0], మొత్తం );
 
-    return nz;
+    తిరిగి nz;
 }
 
-void findNonZero(InputArray _src, OutputArray _idx)
+శూన్య కనుగొను_Non_Zero(ఆదానం_Array _src, OutputArray _idx)
 {
     Mat src = _src.getMat();
     CV_Assert( src.channels() == 1 && src.dims == 2 );
 
-    int depth = src.depth();
-    std::vector<Point> idxvec;
-    int rows = src.rows, cols = src.cols;
-    AutoBuffer<int> buf_(cols + 1);
-    int* buf = buf_.data();
+    పూర్ణాంకం లోతు = src.లోతు();
+    std::vector<బిందువు> idxvec;
+    పూర్ణాంకం అడ్డువరుసలు = src.అడ్డువరుసలు, నిలువుల_సంఖ్య = src.నిలువుల_సంఖ్య;
+    Auto_బఫరు<పూర్ణాంకం> buf_(నిలువుల_సంఖ్య + 1);
+    పూర్ణాంకం* buf = buf_.దత్తాంశం();
 
-    for( int i = 0; i < rows; i++ )
+    కొరకు( పూర్ణాంకం i = 0; i < అడ్డువరుసలు; i++ )
     {
-        int j, k = 0;
-        const uchar* ptr8 = src.ptr(i);
-        if( depth == CV_8U || depth == CV_8S || depth == CV_Bool || depth == CV_8F_E4M3FNUZ )
+        పూర్ణాంకం j, k = 0;
+        స్థిరరాశి uchar* ptr8 = src.ptr(i);
+        ఒకవేళ( లోతు == CV_8U || లోతు == CV_8S || లోతు == CV_Bool || లోతు == CV_8F_E4M3FNUZ )
         {
             j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ఒకవేళ (CV_SIMD || CV_SIMD_SCALABLE)
             // skip whole SIMD blocks of zeros; only scan blocks that contain a non-zero byte
-            const int vlanes = VTraits<v_uint8>::vlanes();
-            const v_uint8 vzero = vx_setzero_u8();
-            for( ; j <= cols - vlanes; j += vlanes )
+            స్థిరరాశి పూర్ణాంకం vlanes = VTraits<v_uint8>::vlanes();
+            స్థిరరాశి v_uint8 vzero = vx_setzero_u8();
+            కొరకు( ; j <= నిలువుల_సంఖ్య - vlanes; j += vlanes )
             {
-                if( !v_check_any(v_ne(vx_load(ptr8 + j), vzero)) )
-                    continue;
-                for( int t = j; t < j + vlanes; t++ )
-                    if( ptr8[t] != 0 ) buf[k++] = t;
+                ఒకవేళ( !v_check_any(v_ne(vx_ఎక్కించు(ptr8 + j), vzero)) )
+                    కొనసాగు;
+                కొరకు( పూర్ణాంకం t = j; t < j + vlanes; t++ )
+                    ఒకవేళ( ptr8[t] != 0 ) buf[k++] = t;
             }
-#endif
-            for( ; j < cols; j++ )
-                if( ptr8[j] != 0 ) buf[k++] = j;
+#అయితే_ముగింపు
+            కొరకు( ; j < నిలువుల_సంఖ్య; j++ )
+                ఒకవేళ( ptr8[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16U || depth == CV_16S )
+        లేకపోతే ఒకవేళ( లోతు == CV_16U || లోతు == CV_16S )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr16[j] != 0 ) buf[k++] = j;
+            స్థిరరాశి ushort* ptr16 = (స్థిరరాశి ushort*)ptr8;
+            కొరకు( j = 0; j < నిలువుల_సంఖ్య; j++ )
+                ఒకవేళ( ptr16[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32S || depth == CV_32U )
+        లేకపోతే ఒకవేళ( లోతు == CV_32S || లోతు == CV_32U )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr32s[j] != 0 ) buf[k++] = j;
+            స్థిరరాశి పూర్ణాంకం* ptr32s = (స్థిరరాశి పూర్ణాంకం*)ptr8;
+            కొరకు( j = 0; j < నిలువుల_సంఖ్య; j++ )
+                ఒకవేళ( ptr32s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_64S || depth == CV_64U )
+        లేకపోతే ఒకవేళ( లోతు == CV_64S || లోతు == CV_64U )
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr64s[j] != 0 ) buf[k++] = j;
+            స్థిరరాశి int64* ptr64s = (స్థిరరాశి int64*)ptr8;
+            కొరకు( j = 0; j < నిలువుల_సంఖ్య; j++ )
+                ఒకవేళ( ptr64s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32F )
+        లేకపోతే ఒకవేళ( లోతు == CV_32F )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
+            స్థిరరాశి పూర్ణాంకం* ptr32s = (స్థిరరాశి పూర్ణాంకం*)ptr8;
+            కొరకు( j = 0; j < నిలువుల_సంఖ్య; j++ )
+                ఒకవేళ( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16F || depth == CV_16BF )
+        లేకపోతే ఒకవేళ( లోతు == CV_16F || లోతు == CV_16BF )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
+            స్థిరరాశి ushort* ptr16 = (స్థిరరాశి ushort*)ptr8;
+            కొరకు( j = 0; j < నిలువుల_సంఖ్య; j++ )
                 // mask sign bit so -0 (0x8000) is treated as zero; cannot use <<1 here
                 // because ushort is promoted to int and the sign bit would not be discarded
-                if( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
+                ఒకవేళ( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_8F_E4M3FN )
+        లేకపోతే ఒకవేళ( లోతు == CV_8F_E4M3FN )
         {
-            for( j = 0; j < cols; j++ )
+            కొరకు( j = 0; j < నిలువుల_సంఖ్య; j++ )
                 // mask sign bit so -0 (0x80) is treated as zero
-                if( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
+                ఒకవేళ( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
         }
-        else
+        లేకపోతే
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
+            స్థిరరాశి int64* ptr64s = (స్థిరరాశి int64*)ptr8;
+            కొరకు( j = 0; j < నిలువుల_సంఖ్య; j++ )
+                ఒకవేళ( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
         }
 
-        if( k > 0 )
+        ఒకవేళ( k > 0 )
         {
             size_t sz = idxvec.size();
             idxvec.resize(sz + k);
-            for( j = 0; j < k; j++ )
-                idxvec[sz + j] = Point(buf[j], i);
+            కొరకు( j = 0; j < k; j++ )
+                idxvec[sz + j] = బిందువు(buf[j], i);
         }
     }
 
-    if( idxvec.empty() || (_idx.kind() == _InputArray::MAT && !_idx.getMatRef().isContinuous()) )
+    ఒకవేళ( idxvec.empty() || (_idx.రకం() == ఆదానం_Array_2::MAT && !_idx.getMatRef().isContinuous()) )
         _idx.release();
 
-    if( !idxvec.empty() )
-        Mat(idxvec).copyTo(_idx);
+    ఒకవేళ( !idxvec.empty() )
+        Mat(idxvec).copy_గమ్యం(_idx);
 }
 
 } // namespace

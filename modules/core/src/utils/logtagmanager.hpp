@@ -2,27 +2,27 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGMANAGER_HPP
-#define OPENCV_CORE_LOGTAGMANAGER_HPP
+#నిర్వచితం_కాకపోతే OPENCV_CORE_LOGTAGMANAGER_HPP
+#నిర్వచించు OPENCV_CORE_LOGTAGMANAGER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <unordered_map>
-#include <mutex>
-#include <memory>
-#endif
+#ఒకవేళ 1 // if not already in precompiled headers
+#అన్తర్భావ <string>
+#అన్తర్భావ <algorithm>
+#అన్తర్భావ <functional>
+#అన్తర్భావ <unordered_map>
+#అన్తర్భావ <mutex>
+#అన్తర్భావ <memory>
+#అయితే_ముగింపు
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#అన్తర్భావ <opencv2/core/utils/logtag.hpp>
+#అన్తర్భావ "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+నామాకాశ cv {
+నామాకాశ utils {
+నామాకాశ logging {
 
 // forward declaration
-class LogTagConfigParser;
+తరగతి Log_ట్యాగ్_Config_Parser;
 
 // A lookup table of LogTags using full name, first part of name, and any part of name.
 // The name parts of a LogTag is delimited by period.
@@ -30,25 +30,25 @@ class LogTagConfigParser;
 // This class does not handle wildcard characters. The name-matching method can only be
 // selected by calling the appropriate function.
 //
-class LogTagManager
+తరగతి Log_ట్యాగ్_Manager
 {
-private:
+అంతరంగ:
     // Current implementation does not seem to require recursive mutex;
     // also, extensible functions (accepting user-provided callback) are not allowed
     // to call LogTagManger (to prevent iterator invalidation), which needs enforced
     // with a non-recursive mutex.
-    using MutexType = cv::Mutex;
-    using LockType = cv::AutoLock;
+    ఉపయోగించి MutexType = cv::Mutex;
+    ఉపయోగించి తాళం_Type = cv::Auto_తాళం;
 
-    enum class MatchingScope
+    గణన తరగతి MatchingScope
     {
         None,
-        Full,
-        FirstNamePart,
+        నిండిన_2,
+        మొదటి_Name_Part,
         AnyNamePart
     };
 
-    struct ParsedLevel
+    నిర్మాణం ParsedLevel
     {
         LogLevel level;
         MatchingScope scope;
@@ -60,75 +60,75 @@ private:
         }
     };
 
-    struct FullNameInfo
+    నిర్మాణం నిండిన_Name_Info
     {
-        LogTag* logTagPtr;
+        Log_ట్యాగ్* log_ట్యాగ్_Ptr;
         ParsedLevel parsedLevel;
     };
 
-    struct NamePartInfo
+    నిర్మాణం NamePartInfo
     {
         ParsedLevel parsedLevel;
     };
 
-    struct CrossReference
+    నిర్మాణం CrossReference
     {
-        size_t m_fullNameId;
+        size_t m_నిండిన_Name_Id;
         size_t m_namePartId;
         size_t m_matchingPos;
-        FullNameInfo* m_fullNameInfo;
+        నిండిన_Name_Info* m_నిండిన_Name_Info;
         NamePartInfo* m_namePartInfo;
 
-        explicit CrossReference(size_t fullNameId, size_t namePartId, size_t matchingPos,
-            FullNameInfo* fullNameInfo, NamePartInfo* namePartInfo)
-            : m_fullNameId(fullNameId)
+        స్పష్టమైన CrossReference(size_t నిండిన_Name_Id, size_t namePartId, size_t matchingPos,
+            నిండిన_Name_Info* నిండిన_Name_Info_2, NamePartInfo* namePartInfo)
+            : m_నిండిన_Name_Id(నిండిన_Name_Id)
             , m_namePartId(namePartId)
             , m_matchingPos(matchingPos)
-            , m_fullNameInfo(fullNameInfo)
+            , m_నిండిన_Name_Info(నిండిన_Name_Info_2)
             , m_namePartInfo(namePartInfo)
         {
         }
     };
 
-    struct FullNameLookupResult
+    నిర్మాణం నిండిన_Name_Lookup_ఫలితం
     {
         // The full name being looked up
-        std::string m_fullName;
+        std::string m_నిండిన_Name;
 
         // The full name being broken down into name parts
         std::vector<std::string> m_nameParts;
 
         // The full name ID that is added or looked up from the table
-        size_t m_fullNameId;
+        size_t m_నిండిన_Name_Id;
 
         // The name part IDs that are added to or looked up from the table
         // listed in the same order as m_nameParts
         std::vector<size_t> m_namePartIds;
 
         // The information struct for the full name
-        FullNameInfo* m_fullNameInfoPtr;
+        నిండిన_Name_Info* m_నిండిన_Name_Info_Ptr;
 
         // Specifies whether cross references (full names that match the name part)
         // should be computed.
-        bool m_findCrossReferences;
+        తార్కిక m_కనుగొను_Cross_References;
 
         // List of all full names that match the given name part.
         // This field is computed only if m_findCrossReferences is true.
         std::vector<CrossReference> m_crossReferences;
 
-        explicit FullNameLookupResult(const std::string& fullName)
-            : m_fullName(fullName)
+        స్పష్టమైన నిండిన_Name_Lookup_ఫలితం(స్థిరరాశి std::string& నిండిన_Name)
+            : m_నిండిన_Name(నిండిన_Name)
             , m_nameParts()
-            , m_fullNameId()
+            , m_నిండిన_Name_Id()
             , m_namePartIds()
-            , m_fullNameInfoPtr()
-            , m_findCrossReferences()
+            , m_నిండిన_Name_Info_Ptr()
+            , m_కనుగొను_Cross_References()
             , m_crossReferences()
         {
         }
     };
 
-    struct NamePartLookupResult
+    నిర్మాణం Name_Part_Lookup_ఫలితం
     {
         // The name part being looked up
         std::string m_namePart;
@@ -140,30 +140,30 @@ private:
         NamePartInfo* m_namePartInfoPtr;
 
         // Specifies whether cross references (full names that match the name part) should be computed.
-        bool m_findCrossReferences;
+        తార్కిక m_కనుగొను_Cross_References;
 
         // List of all full names that match the given name part.
         // This field is computed only if m_findCrossReferences is true.
         std::vector<CrossReference> m_crossReferences;
 
-        explicit NamePartLookupResult(const std::string& namePart)
+        స్పష్టమైన Name_Part_Lookup_ఫలితం(స్థిరరాశి std::string& namePart)
             : m_namePart(namePart)
             , m_namePartId()
             , m_namePartInfoPtr()
-            , m_findCrossReferences()
+            , m_కనుగొను_Cross_References()
             , m_crossReferences()
         {
         }
     };
 
-    struct NameTable
+    నిర్మాణం Name_పట్టిక
     {
         // All data structures in this class are append-only. The item count
         // is being used as an incrementing integer key.
 
-    public:
+    బహిరంగ:
         // Full name information struct.
-        std::vector<FullNameInfo> m_fullNameInfos;
+        std::vector<నిండిన_Name_Info> m_నిండిన_Name_Infos;
 
         // Name part information struct.
         std::vector<NamePartInfo> m_namePartInfos;
@@ -173,7 +173,7 @@ private:
         // .... (index into the vector of m_fullNameInfos)
         // .... (key into m_fullNameToNamePartIds)
         // .... (value.second in m_namePartToFullNameIds)
-        std::unordered_map<std::string, size_t> m_fullNameIds;
+        std::unordered_map<std::string, size_t> m_నిండిన_Name_Ids;
 
         // key: name part (string)
         // value: name part ID
@@ -185,100 +185,100 @@ private:
         // key: full name ID
         // value.first: name part ID
         // value.second: occurrence position of name part in the full name
-        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_fullNameToNamePartIds;
+        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_నిండిన_Name_గమ్యం_Name_Part_Ids;
 
         // key: name part ID
         // value.first: full name ID
         // value.second: occurrence position of name part in the full name
-        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_namePartToFullNameIds;
+        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_name_Part_గమ్యం_నిండిన_Name_Ids;
 
-    public:
-        void addOrLookupFullName(FullNameLookupResult& result);
-        void addOrLookupNamePart(NamePartLookupResult& result);
-        FullNameInfo* getFullNameInfo(const std::string& fullName);
+    బహిరంగ:
+        శూన్య కూడు_Or_Lookup_నిండిన_Name(నిండిన_Name_Lookup_ఫలితం& ఫలితం);
+        శూన్య కూడు_Or_Lookup_Name_Part(Name_Part_Lookup_ఫలితం& ఫలితం);
+        నిండిన_Name_Info* get_నిండిన_Name_Info(స్థిరరాశి std::string& నిండిన_Name);
 
-    private:
+    అంతరంగ:
         // Add or get full name. Does not compute name parts or access them in the table.
         // Returns the full name ID, and a bool indicating if the full name is new.
-        std::pair<size_t, bool> internal_addOrLookupFullName(const std::string& fullName);
+        std::pair<size_t, తార్కిక> అంతర్గత_కూడు_Or_Lookup_నిండిన_Name(స్థిరరాశి std::string& నిండిన_Name);
 
         // Add or get multiple name parts. Saves name part IDs into a vector.
-        void internal_addOrLookupNameParts(const std::vector<std::string>& nameParts, std::vector<size_t>& namePartIds);
+        శూన్య అంతర్గత_కూడు_Or_Lookup_Name_Parts(స్థిరరాశి std::vector<std::string>& nameParts, std::vector<size_t>& namePartIds);
 
         // Add or get name part. Returns namePartId.
-        size_t internal_addOrLookupNamePart(const std::string& namePart);
+        size_t అంతర్గత_కూడు_Or_Lookup_Name_Part(స్థిరరాశి std::string& namePart);
 
         // For each name part ID, insert the tuples (full name, name part ID, name part position)
         // into the cross reference table
-        void internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds);
+        శూన్య అంతర్గత_కూడు_Cross_Reference(size_t నిండిన_Name_Id, స్థిరరాశి std::vector<size_t>& namePartIds);
 
         // Gather pointer for full name info struct.
         // Note: The pointer is interior to the table vector. The pointers are invalidated
         // if the table is modified.
-        FullNameInfo* internal_getFullNameInfo(size_t fullNameId);
+        నిండిన_Name_Info* అంతర్గత_get_నిండిన_Name_Info(size_t నిండిన_Name_Id);
 
         // Gather pointers for name part info struct.
         // Note: The pointers are interior to the table vector. The pointers are invalidated
         // if the table is modified.
-        NamePartInfo* internal_getNamePartInfo(size_t namePartId);
+        NamePartInfo* అంతర్గత_get_Name_Part_Info(size_t namePartId);
 
-        void internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult);
-        void internal_findMatchingFullNamesForNamePart(NamePartLookupResult& result);
+        శూన్య అంతర్గత_కనుగొను_Matching_Name_Parts_For_నిండిన_Name(నిండిన_Name_Lookup_ఫలితం& నిండిన_Name_ఫలితం);
+        శూన్య అంతర్గత_కనుగొను_Matching_నిండిన_పేర్లు_For_Name_Part(Name_Part_Lookup_ఫలితం& ఫలితం);
     };
 
-public:
-    LogTagManager(LogLevel defaultUnconfiguredGlobalLevel);
-    ~LogTagManager();
+బహిరంగ:
+    Log_ట్యాగ్_Manager(LogLevel defaultUnconfiguredGlobalLevel);
+    ~Log_ట్యాగ్_Manager();
 
-public:
+బహిరంగ:
     // Parse and apply the config string.
-    void setConfigString(const std::string& configString, bool apply = true);
+    శూన్య సమితి_Config_String(స్థిరరాశి std::string& configString, తార్కిక apply = నిజం);
 
     // Gets the config parser. This is necessary to retrieve the list of malformed strings.
-    LogTagConfigParser& getConfigParser() const;
+    Log_ట్యాగ్_Config_Parser& getConfigParser() స్థిరరాశి;
 
     // Add (register) the log tag.
     // Note, passing in nullptr as value is equivalent to unassigning.
-    void assign(const std::string& fullName, LogTag* ptr);
+    శూన్య assign(స్థిరరాశి std::string& నిండిన_Name, Log_ట్యాగ్* ptr);
 
     // Unassign the log tag. This is equivalent to calling assign with nullptr value.
-    void unassign(const std::string& fullName);
+    శూన్య unassign(స్థిరరాశి std::string& నిండిన_Name);
 
     // Retrieve the log tag by exact name.
-    LogTag* get(const std::string& fullName);
+    Log_ట్యాగ్* get(స్థిరరాశి std::string& నిండిన_Name);
 
     // Changes the log level of the tag having the exact full name.
-    void setLevelByFullName(const std::string& fullName, LogLevel level);
+    శూన్య సమితి_Level_By_నిండిన_Name(స్థిరరాశి std::string& నిండిన_Name, LogLevel level);
 
     // Changes the log level of the tags matching the first part of the name.
-    void setLevelByFirstPart(const std::string& firstPart, LogLevel level);
+    శూన్య సమితి_Level_By_మొదటి_Part(స్థిరరాశి std::string& మొదటి_Part, LogLevel level);
 
     // Changes the log level of the tags matching any part of the name.
-    void setLevelByAnyPart(const std::string& anyPart, LogLevel level);
+    శూన్య సమితి_Level_By_Any_Part(స్థిరరాశి std::string& anyPart, LogLevel level);
 
     // Changes the log level of the tags with matching name part according
     // to the specified scope.
-    void setLevelByNamePart(const std::string& namePart, LogLevel level, MatchingScope scope);
+    శూన్య సమితి_Level_By_Name_Part(స్థిరరాశి std::string& namePart, LogLevel level, MatchingScope scope);
 
-private:
-    bool internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo);
-    bool internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult);
-    void internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult);
+అంతరంగ:
+    తార్కిక అంతర్గత_apply_నిండిన_Name_Config_గమ్యం_ట్యాగ్(నిండిన_Name_Info& నిండిన_Name_Info_2);
+    తార్కిక అంతర్గత_apply_Name_Part_Config_గమ్యం_Specific_ట్యాగ్(నిండిన_Name_Lookup_ఫలితం& నిండిన_Name_ఫలితం);
+    శూన్య అంతర్గత_apply_Name_Part_Config_గమ్యం_Matching_ట్యాగులు(Name_Part_Lookup_ఫలితం& name_Part_ఫలితం);
 
-private:
-    static std::vector<std::string> splitNameParts(const std::string& fullName);
-    static bool internal_isNamePartMatch(MatchingScope scope, size_t matchingPos);
+అంతరంగ:
+    స్థిర std::vector<std::string> విభజించు_Name_Parts(స్థిరరాశి std::string& నిండిన_Name);
+    స్థిర తార్కిక అంతర్గత_is_Name_Part_సరిపోలిక(MatchingScope scope, size_t matchingPos);
 
-private:
-    static const char* m_globalName;
+అంతరంగ:
+    స్థిర స్థిరరాశి అక్షరం* m_globalName;
 
-private:
-    mutable MutexType m_mutex;
-    std::unique_ptr<LogTag> m_globalLogTag;
-    NameTable m_nameTable;
-    std::shared_ptr<LogTagConfigParser> m_config;
+అంతరంగ:
+    మార్చదగిన MutexType m_mutex;
+    std::unique_ptr<Log_ట్యాగ్> m_global_Log_ట్యాగ్;
+    Name_పట్టిక m_name_పట్టిక;
+    std::shared_ptr<Log_ట్యాగ్_Config_Parser> m_config;
 };
 
 }}} //namespace
 
-#endif //OPENCV_CORE_LOGTAGMANAGER_HPP
+#అయితే_ముగింపు //OPENCV_CORE_LOGTAGMANAGER_HPP

@@ -2,50 +2,50 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGCONFIG_HPP
-#define OPENCV_CORE_LOGTAGCONFIG_HPP
+#నిర్వచితం_కాకపోతే OPENCV_CORE_LOGTAGCONFIG_HPP
+#నిర్వచించు OPENCV_CORE_LOGTAGCONFIG_HPP
 
-#if 1 // if not already in precompiled headers
-#include <opencv2/core/utils/logger.defines.hpp>
-#include <string>
-#endif
+#ఒకవేళ 1 // if not already in precompiled headers
+#అన్తర్భావ <opencv2/core/utils/logger.defines.hpp>
+#అన్తర్భావ <string>
+#అయితే_ముగింపు
 
-namespace cv {
-namespace utils {
-namespace logging {
+నామాకాశ cv {
+నామాకాశ utils {
+నామాకాశ logging {
 
-struct LogTagConfig
+నిర్మాణం Log_ట్యాగ్_Config
 {
     std::string namePart;
     LogLevel level;
-    bool isGlobal;
-    bool hasPrefixWildcard;
-    bool hasSuffixWildcard;
+    తార్కిక isGlobal;
+    తార్కిక has_ఉపసర్గ_Wildcard;
+    తార్కిక hasSuffixWildcard;
 
-    LogTagConfig()
+    Log_ట్యాగ్_Config()
         : namePart()
         , level()
         , isGlobal()
-        , hasPrefixWildcard()
+        , has_ఉపసర్గ_Wildcard()
         , hasSuffixWildcard()
     {
     }
 
-    LogTagConfig(const std::string& _namePart, LogLevel _level, bool _isGlobal = false,
-        bool _hasPrefixWildcard = false, bool _hasSuffixWildcard = false)
+    Log_ట్యాగ్_Config(స్థిరరాశి std::string& _namePart, LogLevel _level, తార్కిక _isGlobal = అబద్ధం,
+        తార్కిక has_ఉపసర్గ_Wildcard_2 = అబద్ధం, తార్కిక _hasSuffixWildcard = అబద్ధం)
         : namePart(_namePart)
         , level(_level)
         , isGlobal(_isGlobal)
-        , hasPrefixWildcard(_hasPrefixWildcard)
+        , has_ఉపసర్గ_Wildcard(has_ఉపసర్గ_Wildcard_2)
         , hasSuffixWildcard(_hasSuffixWildcard)
     {
     }
 
-    LogTagConfig(const LogTagConfig&) = default;
-    LogTagConfig(LogTagConfig&&) = default;
-    ~LogTagConfig() = default;
+    Log_ట్యాగ్_Config(స్థిరరాశి Log_ట్యాగ్_Config&) = అప్రమేయ;
+    Log_ట్యాగ్_Config(Log_ట్యాగ్_Config&&) = అప్రమేయ;
+    ~Log_ట్యాగ్_Config() = అప్రమేయ;
 };
 
 }}}
 
-#endif
+#అయితే_ముగింపు

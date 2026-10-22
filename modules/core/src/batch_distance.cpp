@@ -3,177 +3,177 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "stat.hpp"
-#include <opencv2/core/hal/hal.hpp>
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "stat.hpp"
+#అన్తర్భావ <opencv2/core/hal/hal.hpp>
 
-namespace cv
+నామాకాశ cv
 {
 
-template<typename _Tp, typename _Rt>
-static void batchDistL1_(const void* _src1, const void* _src2, size_t step2,
-                         int nvecs, int len, void* _dist, const uchar* mask)
+మూస<రకం_పేరు _Tp, రకం_పేరు _Rt>
+స్థిర శూన్య batchDistL1_(స్థిరరాశి శూన్య* _src1, స్థిరరాశి శూన్య* _src2, size_t step2,
+                         పూర్ణాంకం nvecs, పూర్ణాంకం len, శూన్య* _dist, స్థిరరాశి uchar* ముసుగు)
 {
-    const _Tp* src1 = (const _Tp*)_src1;
-    const _Tp* src2 = (const _Tp*)_src2;
+    స్థిరరాశి _Tp* src1 = (స్థిరరాశి _Tp*)_src1;
+    స్థిరరాశి _Tp* src2 = (స్థిరరాశి _Tp*)_src2;
     _Rt* dist = (_Rt*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    step2 /= పరిమాణం(src2[0]);
+    ఒకవేళ( !ముసుగు )
     {
-        for( int i = 0; i < nvecs; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
             dist[i] = normL1<_Tp, _Rt>(src1, src2 + step2*i, len);
     }
-    else
+    లేకపోతే
     {
         _Rt val0 = std::numeric_limits<_Rt>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? normL1<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
+            dist[i] = ముసుగు[i] ? normL1<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
     }
 }
 
-template<typename _Tp, typename _Rt>
-static void batchDistL2Sqr_(const void* _src1, const void* _src2, size_t step2,
-                            int nvecs, int len, void* _dist, const uchar* mask)
+మూస<రకం_పేరు _Tp, రకం_పేరు _Rt>
+స్థిర శూన్య batchDistL2Sqr_(స్థిరరాశి శూన్య* _src1, స్థిరరాశి శూన్య* _src2, size_t step2,
+                            పూర్ణాంకం nvecs, పూర్ణాంకం len, శూన్య* _dist, స్థిరరాశి uchar* ముసుగు)
 {
-    const _Tp* src1 = (const _Tp*)_src1;
-    const _Tp* src2 = (const _Tp*)_src2;
+    స్థిరరాశి _Tp* src1 = (స్థిరరాశి _Tp*)_src1;
+    స్థిరరాశి _Tp* src2 = (స్థిరరాశి _Tp*)_src2;
     _Rt* dist = (_Rt*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    step2 /= పరిమాణం(src2[0]);
+    ఒకవేళ( !ముసుగు )
     {
-        for( int i = 0; i < nvecs; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
             dist[i] = normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len);
     }
-    else
+    లేకపోతే
     {
         _Rt val0 = std::numeric_limits<_Rt>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
+            dist[i] = ముసుగు[i] ? normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
     }
 }
 
-template<>
-void batchDistL2Sqr_<float, float>(const void* _src1, const void* _src2, size_t step2,
-                                   int nvecs, int len, void* _dist, const uchar* mask)
+మూస<>
+శూన్య batchDistL2Sqr_<దశాంశం, దశాంశం>(స్థిరరాశి శూన్య* _src1, స్థిరరాశి శూన్య* _src2, size_t step2,
+                                   పూర్ణాంకం nvecs, పూర్ణాంకం len, శూన్య* _dist, స్థిరరాశి uchar* ముసుగు)
 {
-    const float* src1 = (const float*)_src1;
-    const float* src2 = (const float*)_src2;
-    float* dist = (float*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    స్థిరరాశి దశాంశం* src1 = (స్థిరరాశి దశాంశం*)_src1;
+    స్థిరరాశి దశాంశం* src2 = (స్థిరరాశి దశాంశం*)_src2;
+    దశాంశం* dist = (దశాంశం*)_dist;
+    step2 /= పరిమాణం(src2[0]);
+    ఒకవేళ( !ముసుగు )
     {
-        for( int i = 0; i < nvecs; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
             dist[i] = hal::normL2Sqr_(src1, src2 + step2*i, len);
     }
-    else
+    లేకపోతే
     {
-        float val0 = std::numeric_limits<float>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? hal::normL2Sqr_(src1, src2 + step2*i, len) : val0;
+        దశాంశం val0 = std::numeric_limits<దశాంశం>::max();
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
+            dist[i] = ముసుగు[i] ? hal::normL2Sqr_(src1, src2 + step2*i, len) : val0;
     }
 }
 
-template<typename _Tp, typename _Rt>
-static void batchDistL2_(const void* _src1, const void* _src2, size_t step2,
-                         int nvecs, int len, void* _dist, const uchar* mask)
+మూస<రకం_పేరు _Tp, రకం_పేరు _Rt>
+స్థిర శూన్య batchDistL2_(స్థిరరాశి శూన్య* _src1, స్థిరరాశి శూన్య* _src2, size_t step2,
+                         పూర్ణాంకం nvecs, పూర్ణాంకం len, శూన్య* _dist, స్థిరరాశి uchar* ముసుగు)
 {
-    const _Tp* src1 = (const _Tp*)_src1;
-    const _Tp* src2 = (const _Tp*)_src2;
+    స్థిరరాశి _Tp* src1 = (స్థిరరాశి _Tp*)_src1;
+    స్థిరరాశి _Tp* src2 = (స్థిరరాశి _Tp*)_src2;
     _Rt* dist = (_Rt*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    step2 /= పరిమాణం(src2[0]);
+    ఒకవేళ( !ముసుగు )
     {
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = std::sqrt(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len));
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
+            dist[i] = std::వర్గమూలం(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len));
     }
-    else
+    లేకపోతే
     {
         _Rt val0 = std::numeric_limits<_Rt>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? std::sqrt(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len)) : val0;
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
+            dist[i] = ముసుగు[i] ? std::వర్గమూలం(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len)) : val0;
     }
 }
 
-template<>
-void batchDistL2_<float, float>(const void* _src1, const void* _src2, size_t step2,
-                                int nvecs, int len, void* _dist, const uchar* mask)
+మూస<>
+శూన్య batchDistL2_<దశాంశం, దశాంశం>(స్థిరరాశి శూన్య* _src1, స్థిరరాశి శూన్య* _src2, size_t step2,
+                                పూర్ణాంకం nvecs, పూర్ణాంకం len, శూన్య* _dist, స్థిరరాశి uchar* ముసుగు)
 {
-    const float* src1 = (const float*)_src1;
-    const float* src2 = (const float*)_src2;
-    float* dist = (float*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    స్థిరరాశి దశాంశం* src1 = (స్థిరరాశి దశాంశం*)_src1;
+    స్థిరరాశి దశాంశం* src2 = (స్థిరరాశి దశాంశం*)_src2;
+    దశాంశం* dist = (దశాంశం*)_dist;
+    step2 /= పరిమాణం(src2[0]);
+    ఒకవేళ( !ముసుగు )
     {
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = std::sqrt(hal::normL2Sqr_(src1, src2 + step2*i, len));
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
+            dist[i] = std::వర్గమూలం(hal::normL2Sqr_(src1, src2 + step2*i, len));
     }
-    else
+    లేకపోతే
     {
-        float val0 = std::numeric_limits<float>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? std::sqrt(hal::normL2Sqr_(src1, src2 + step2*i, len)) : val0;
+        దశాంశం val0 = std::numeric_limits<దశాంశం>::max();
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
+            dist[i] = ముసుగు[i] ? std::వర్గమూలం(hal::normL2Sqr_(src1, src2 + step2*i, len)) : val0;
     }
 }
 
-static void batchDistHamming(const void* _src1, const void* _src2, size_t step2,
-                             int nvecs, int len, void* _dist, const uchar* mask)
+స్థిర శూన్య batchDistHamming(స్థిరరాశి శూన్య* _src1, స్థిరరాశి శూన్య* _src2, size_t step2,
+                             పూర్ణాంకం nvecs, పూర్ణాంకం len, శూన్య* _dist, స్థిరరాశి uchar* ముసుగు)
 {
-    const uchar* src1 = (const uchar*)_src1;
-    const uchar* src2 = (const uchar*)_src2;
-    int* dist = (int*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    స్థిరరాశి uchar* src1 = (స్థిరరాశి uchar*)_src1;
+    స్థిరరాశి uchar* src2 = (స్థిరరాశి uchar*)_src2;
+    పూర్ణాంకం* dist = (పూర్ణాంకం*)_dist;
+    step2 /= పరిమాణం(src2[0]);
+    ఒకవేళ( !ముసుగు )
     {
-        for( int i = 0; i < nvecs; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
              dist[i] = hal::normHamming(src1, src2 + step2*i, len);
     }
-    else
+    లేకపోతే
     {
-        int val0 = INT_MAX;
-        for( int i = 0; i < nvecs; i++ )
+        పూర్ణాంకం val0 = గరిష్ఠ_పూర్ణాంకం;
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
         {
-            if (mask[i])
+            ఒకవేళ (ముసుగు[i])
                 dist[i] = hal::normHamming(src1, src2 + step2*i, len);
-            else
+            లేకపోతే
                 dist[i] = val0;
         }
     }
 }
 
-static void batchDistHamming2(const void* _src1, const void* _src2, size_t step2,
-                              int nvecs, int len, void* _dist, const uchar* mask)
+స్థిర శూన్య batchDistHamming2(స్థిరరాశి శూన్య* _src1, స్థిరరాశి శూన్య* _src2, size_t step2,
+                              పూర్ణాంకం nvecs, పూర్ణాంకం len, శూన్య* _dist, స్థిరరాశి uchar* ముసుగు)
 {
-    const uchar* src1 = (const uchar*)_src1;
-    const uchar* src2 = (const uchar*)_src2;
-    int* dist = (int*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    స్థిరరాశి uchar* src1 = (స్థిరరాశి uchar*)_src1;
+    స్థిరరాశి uchar* src2 = (స్థిరరాశి uchar*)_src2;
+    పూర్ణాంకం* dist = (పూర్ణాంకం*)_dist;
+    step2 /= పరిమాణం(src2[0]);
+    ఒకవేళ( !ముసుగు )
     {
-        for( int i = 0; i < nvecs; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
             dist[i] = hal::normHamming(src1, src2 + step2*i, len, 2);
     }
-    else
+    లేకపోతే
     {
-        int val0 = INT_MAX;
-        for( int i = 0; i < nvecs; i++ )
+        పూర్ణాంకం val0 = గరిష్ఠ_పూర్ణాంకం;
+        కొరకు( పూర్ణాంకం i = 0; i < nvecs; i++ )
         {
-            if (mask[i])
+            ఒకవేళ (ముసుగు[i])
                 dist[i] = hal::normHamming(src1, src2 + step2*i, len, 2);
-            else
+            లేకపోతే
                 dist[i] = val0;
         }
     }
 }
 
-typedef void (*BatchDistFunc)(const void* src1, const void* src2, size_t step2,
-                              int nvecs, int len, void* dist, const uchar* mask);
+రకనిర్వచనం శూన్య (*BatchDistFunc)(స్థిరరాశి శూన్య* src1, స్థిరరాశి శూన్య* src2, size_t step2,
+                              పూర్ణాంకం nvecs, పూర్ణాంకం len, శూన్య* dist, స్థిరరాశి uchar* ముసుగు);
 
 
-struct BatchDistInvoker : public ParallelLoopBody
+నిర్మాణం BatchDistInvoker : బహిరంగ ParallelLoopBody
 {
-    BatchDistInvoker( const Mat& _src1, const Mat& _src2,
-                      Mat& _dist, Mat& _nidx, int _K,
-                      const Mat& _mask, int _update,
+    BatchDistInvoker( స్థిరరాశి Mat& _src1, స్థిరరాశి Mat& _src2,
+                      Mat& _dist, Mat& _nidx, పూర్ణాంకం _K,
+                      స్థిరరాశి Mat& ముసుగు_2, పూర్ణాంకం _update,
                       BatchDistFunc _func)
     {
         src1 = &_src1;
@@ -181,36 +181,36 @@ struct BatchDistInvoker : public ParallelLoopBody
         dist = &_dist;
         nidx = &_nidx;
         K = _K;
-        mask = &_mask;
+        ముసుగు = &ముసుగు_2;
         update = _update;
         func = _func;
     }
 
-    void operator()(const Range& range) const CV_OVERRIDE
+    శూన్య క్రియాకారకం()(స్థిరరాశి Range& range) స్థిరరాశి CV_OVERRIDE
     {
-        AutoBuffer<int> buf(src2->rows);
-        int* bufptr = buf.data();
+        Auto_బఫరు<పూర్ణాంకం> buf(src2->అడ్డువరుసలు);
+        పూర్ణాంకం* bufptr = buf.దత్తాంశం();
 
-        for( int i = range.start; i < range.end; i++ )
+        కొరకు( పూర్ణాంకం i = range.ప్రారంభం; i < range.end; i++ )
         {
-            func(src1->ptr(i), src2->ptr(), src2->step, src2->rows, src2->cols,
-                 K > 0 ? (uchar*)bufptr : dist->ptr(i), mask->data ? mask->ptr(i) : 0);
+            func(src1->ptr(i), src2->ptr(), src2->అడుగు, src2->అడ్డువరుసలు, src2->నిలువుల_సంఖ్య,
+                 K > 0 ? (uchar*)bufptr : dist->ptr(i), ముసుగు->దత్తాంశం ? ముసుగు->ptr(i) : 0);
 
-            if( K > 0 )
+            ఒకవేళ( K > 0 )
             {
-                int* nidxptr = nidx->ptr<int>(i);
+                పూర్ణాంకం* nidxptr = nidx->ptr<పూర్ణాంకం>(i);
                 // since positive float's can be compared just like int's,
                 // we handle both CV_32S and CV_32F cases with a single branch
-                int* distptr = (int*)dist->ptr(i);
+                పూర్ణాంకం* distptr = (పూర్ణాంకం*)dist->ptr(i);
 
-                int j, k;
+                పూర్ణాంకం j, k;
 
-                for( j = 0; j < src2->rows; j++ )
+                కొరకు( j = 0; j < src2->అడ్డువరుసలు; j++ )
                 {
-                    int d = bufptr[j];
-                    if( d < distptr[K-1] )
+                    పూర్ణాంకం d = bufptr[j];
+                    ఒకవేళ( d < distptr[K-1] )
                     {
-                        for( k = K-2; k >= 0 && distptr[k] > d; k-- )
+                        కొరకు( k = K-2; k >= 0 && distptr[k] > d; k-- )
                         {
                             nidxptr[k+1] = nidxptr[k];
                             distptr[k+1] = distptr[k];
@@ -223,61 +223,61 @@ struct BatchDistInvoker : public ParallelLoopBody
         }
     }
 
-    const Mat *src1;
-    const Mat *src2;
+    స్థిరరాశి Mat *src1;
+    స్థిరరాశి Mat *src2;
     Mat *dist;
     Mat *nidx;
-    const Mat *mask;
-    int K;
-    int update;
+    స్థిరరాశి Mat *ముసుగు;
+    పూర్ణాంకం K;
+    పూర్ణాంకం update;
     BatchDistFunc func;
 };
 
 }
 
-void cv::batchDistance( InputArray _src1, InputArray _src2,
-                        OutputArray _dist, int dtype, OutputArray _nidx,
-                        int normType, int K, InputArray _mask,
-                        int update, bool crosscheck )
+శూన్య cv::batch_దూరం( ఆదానం_Array _src1, ఆదానం_Array _src2,
+                        OutputArray _dist, పూర్ణాంకం dtype, OutputArray _nidx,
+                        పూర్ణాంకం normType, పూర్ణాంకం K, ఆదానం_Array ముసుగు_2,
+                        పూర్ణాంకం update, తార్కిక crosscheck )
 {
     CV_INSTRUMENT_REGION();
 
-    Mat src1 = _src1.getMat(), src2 = _src2.getMat(), mask = _mask.getMat();
-    int type = src1.type();
-    CV_Assert( type == src2.type() && src1.cols == src2.cols &&
+    Mat src1 = _src1.getMat(), src2 = _src2.getMat(), ముసుగు = ముసుగు_2.getMat();
+    పూర్ణాంకం type = src1.type();
+    CV_Assert( type == src2.type() && src1.నిలువుల_సంఖ్య == src2.నిలువుల_సంఖ్య &&
                (type == CV_32F || type == CV_8U));
     CV_Assert( _nidx.needed() == (K > 0) );
 
-    if( dtype == -1 )
+    ఒకవేళ( dtype == -1 )
     {
         dtype = normType == NORM_HAMMING || normType == NORM_HAMMING2 ? CV_32S : CV_32F;
     }
     CV_Assert( (type == CV_8U && dtype == CV_32S) || dtype == CV_32F);
 
-    K = std::min(K, src2.rows);
+    K = std::min(K, src2.అడ్డువరుసలు);
 
-    _dist.create(src1.rows, (K > 0 ? K : src2.rows), dtype);
+    _dist.create(src1.అడ్డువరుసలు, (K > 0 ? K : src2.అడ్డువరుసలు), dtype);
     Mat dist = _dist.getMat(), nidx;
-    if( _nidx.needed() )
+    ఒకవేళ( _nidx.needed() )
     {
         _nidx.create(dist.size(), CV_32S);
         nidx = _nidx.getMat();
     }
 
-    if( update == 0 && K > 0 )
+    ఒకవేళ( update == 0 && K > 0 )
     {
-        dist = Scalar::all(dtype == CV_32S ? (double)INT_MAX : (double)FLT_MAX);
+        dist = Scalar::all(dtype == CV_32S ? (ద్విగుణ)గరిష్ఠ_పూర్ణాంకం : (ద్విగుణ)FLT_MAX);
         nidx = Scalar::all(-1);
     }
 
 
-    if( crosscheck )
+    ఒకవేళ( crosscheck )
     {
-        CV_Assert( K == 1 && update == 0 && mask.empty() );
+        CV_Assert( K == 1 && update == 0 && ముసుగు.empty() );
         CV_Assert(!nidx.empty());
         Mat tdist, tidx, sdist, sidx;
-        batchDistance(src2, src1, tdist, dtype, tidx, normType, K, mask, 0, false);
-        batchDistance(src1, src2, sdist, dtype, sidx, normType, K, mask, 0, false);
+        batch_దూరం(src2, src1, tdist, dtype, tidx, normType, K, ముసుగు, 0, అబద్ధం);
+        batch_దూరం(src1, src2, sdist, dtype, sidx, normType, K, ముసుగు, 0, అబద్ధం);
 
         // if an idx-th element from src1 appeared to be the nearest to i-th element of src2,
         // we update the minimum mutual distance between idx-th element of src1 and the whole src2 set.
@@ -285,75 +285,75 @@ void cv::batchDistance( InputArray _src1, InputArray _src2,
         // to i*-th element of src2 and i*-th element of src2 is the closest to idx-th element of src1.
         // If nidx[idx] = -1, it means that there is no such ideal couple for it in src2.
         // This O(2N) procedure is called cross-check and it helps to eliminate some false matches.
-        if( dtype == CV_32S )
+        ఒకవేళ( dtype == CV_32S )
         {
-            for( int i = 0; i < tdist.rows; i++ )
+            కొరకు( పూర్ణాంకం i = 0; i < tdist.అడ్డువరుసలు; i++ )
             {
-                int idx = tidx.at<int>(i);
-                int d = tdist.at<int>(i), d0 = dist.at<int>(idx);
-                if( d < d0 )
+                పూర్ణాంకం idx = tidx.at<పూర్ణాంకం>(i);
+                పూర్ణాంకం d = tdist.at<పూర్ణాంకం>(i), d0 = dist.at<పూర్ణాంకం>(idx);
+                ఒకవేళ( d < d0 )
                 {
-                    dist.at<int>(idx) = d;
-                    nidx.at<int>(idx) = i + update;
+                    dist.at<పూర్ణాంకం>(idx) = d;
+                    nidx.at<పూర్ణాంకం>(idx) = i + update;
                 }
             }
         }
-        else
+        లేకపోతే
         {
-            for( int i = 0; i < tdist.rows; i++ )
+            కొరకు( పూర్ణాంకం i = 0; i < tdist.అడ్డువరుసలు; i++ )
             {
-                int idx = tidx.at<int>(i);
-                float d = tdist.at<float>(i), d0 = dist.at<float>(idx);
-                if( d < d0 )
+                పూర్ణాంకం idx = tidx.at<పూర్ణాంకం>(i);
+                దశాంశం d = tdist.at<దశాంశం>(i), d0 = dist.at<దశాంశం>(idx);
+                ఒకవేళ( d < d0 )
                 {
-                    dist.at<float>(idx) = d;
-                    nidx.at<int>(idx) = i + update;
+                    dist.at<దశాంశం>(idx) = d;
+                    nidx.at<పూర్ణాంకం>(idx) = i + update;
                 }
             }
         }
-        for( int i = 0; i < sdist.rows; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < sdist.అడ్డువరుసలు; i++ )
         {
-            if( tidx.at<int>(sidx.at<int>(i)) != i )
+            ఒకవేళ( tidx.at<పూర్ణాంకం>(sidx.at<పూర్ణాంకం>(i)) != i )
             {
-                nidx.at<int>(i) = -1;
+                nidx.at<పూర్ణాంకం>(i) = -1;
             }
         }
-        return;
+        తిరిగి;
     }
 
     BatchDistFunc func = 0;
-    if( type == CV_8U )
+    ఒకవేళ( type == CV_8U )
     {
-        if( normType == NORM_L1 && dtype == CV_32S )
-            func = batchDistL1_<uchar, int>;
-        else if( normType == NORM_L1 && dtype == CV_32F )
-            func = batchDistL1_<uchar, float>;
-        else if( normType == NORM_L2SQR && dtype == CV_32S )
-            func = batchDistL2Sqr_<uchar, int>;
-        else if( normType == NORM_L2SQR && dtype == CV_32F )
-            func = batchDistL2Sqr_<uchar, float>;
-        else if( normType == NORM_L2 && dtype == CV_32F )
-            func = batchDistL2_<uchar, float>;
-        else if( normType == NORM_HAMMING && dtype == CV_32S )
+        ఒకవేళ( normType == NORM_L1 && dtype == CV_32S )
+            func = batchDistL1_<uchar, పూర్ణాంకం>;
+        లేకపోతే ఒకవేళ( normType == NORM_L1 && dtype == CV_32F )
+            func = batchDistL1_<uchar, దశాంశం>;
+        లేకపోతే ఒకవేళ( normType == NORM_L2SQR && dtype == CV_32S )
+            func = batchDistL2Sqr_<uchar, పూర్ణాంకం>;
+        లేకపోతే ఒకవేళ( normType == NORM_L2SQR && dtype == CV_32F )
+            func = batchDistL2Sqr_<uchar, దశాంశం>;
+        లేకపోతే ఒకవేళ( normType == NORM_L2 && dtype == CV_32F )
+            func = batchDistL2_<uchar, దశాంశం>;
+        లేకపోతే ఒకవేళ( normType == NORM_HAMMING && dtype == CV_32S )
             func = batchDistHamming;
-        else if( normType == NORM_HAMMING2 && dtype == CV_32S )
+        లేకపోతే ఒకవేళ( normType == NORM_HAMMING2 && dtype == CV_32S )
             func = batchDistHamming2;
     }
-    else if( type == CV_32F && dtype == CV_32F )
+    లేకపోతే ఒకవేళ( type == CV_32F && dtype == CV_32F )
     {
-        if( normType == NORM_L1 )
-            func = batchDistL1_<float, float>;
-        else if( normType == NORM_L2SQR )
-            func = batchDistL2Sqr_<float, float>;
-        else if( normType == NORM_L2 )
-            func = batchDistL2_<float, float>;
+        ఒకవేళ( normType == NORM_L1 )
+            func = batchDistL1_<దశాంశం, దశాంశం>;
+        లేకపోతే ఒకవేళ( normType == NORM_L2SQR )
+            func = batchDistL2Sqr_<దశాంశం, దశాంశం>;
+        లేకపోతే ఒకవేళ( normType == NORM_L2 )
+            func = batchDistL2_<దశాంశం, దశాంశం>;
     }
 
-    if( func == 0 )
+    ఒకవేళ( func == 0 )
         CV_Error_(cv::Error::StsUnsupportedFormat,
                   ("The combination of type=%d, dtype=%d and normType=%d is not supported",
                    type, dtype, normType));
 
-    parallel_for_(Range(0, src1.rows),
-                  BatchDistInvoker(src1, src2, dist, nidx, K, mask, update, func));
+    parallel_for_(Range(0, src1.అడ్డువరుసలు),
+                  BatchDistInvoker(src1, src2, dist, nidx, K, ముసుగు, update, func));
 }

@@ -38,15 +38,15 @@
 // the use of this software, even if advised of the possibility of such damage.
 //
 //M*/
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
-#if 0
-#define dprintf(x) printf x
-#define print_matrix(x) print(x)
-#else
-#define dprintf(x)
-#define print_matrix(x)
-#endif
+#ఒకవేళ 0
+#నిర్వచించు dprintf(x) రాయి x
+#నిర్వచించు print_మాతృక(x) print(x)
+#లేకపోతే
+#నిర్వచించు dprintf(x)
+#నిర్వచించు print_మాతృక(x)
+#అయితే_ముగింపు
 
 /*
 
@@ -137,129 +137,129 @@ multiple lines in three dimensions as not all lines intersect in three dimension
 
 */
 
-namespace cv
+నామాకాశ cv
 {
 
-class DownhillSolverImpl CV_FINAL : public DownhillSolver
+తరగతి DownhillSolverImpl CV_FINAL : బహిరంగ DownhillSolver
 {
-public:
+బహిరంగ:
     DownhillSolverImpl()
     {
         _Function=Ptr<Function>();
-        _step=Mat_<double>();
+        అడుగు_3=Mat_<ద్విగుణ>();
     }
 
-    void getInitStep(OutputArray step) const CV_OVERRIDE { _step.copyTo(step); }
-    void setInitStep(InputArray step) CV_OVERRIDE
+    శూన్య get_Init_అడుగు(OutputArray అడుగు) స్థిరరాశి CV_OVERRIDE { అడుగు_3.copy_గమ్యం(అడుగు); }
+    శూన్య సమితి_Init_అడుగు(ఆదానం_Array అడుగు) CV_OVERRIDE
     {
         // set dimensionality and make a deep copy of step
-        Mat m = step.getMat();
-        dprintf(("m.cols=%d\nm.rows=%d\n", m.cols, m.rows));
-        if( m.rows == 1 )
-            m.copyTo(_step);
-        else
-            transpose(m, _step);
+        Mat m = అడుగు.getMat();
+        dprintf(("m.cols=%d\nm.rows=%d\n", m.నిలువుల_సంఖ్య, m.అడ్డువరుసలు));
+        ఒకవేళ( m.అడ్డువరుసలు == 1 )
+            m.copy_గమ్యం(అడుగు_3);
+        లేకపోతే
+            transpose(m, అడుగు_3);
     }
 
-    Ptr<MinProblemSolver::Function> getFunction() const CV_OVERRIDE { return _Function; }
+    Ptr<MinProblemSolver::Function> getFunction() స్థిరరాశి CV_OVERRIDE { తిరిగి _Function; }
 
-    void setFunction(const Ptr<Function>& f) CV_OVERRIDE { _Function=f; }
+    శూన్య సమితి_Function(స్థిరరాశి Ptr<Function>& f) CV_OVERRIDE { _Function=f; }
 
-    TermCriteria getTermCriteria() const CV_OVERRIDE { return _termcrit; }
+    పదం_Criteria get_పదం_Criteria() స్థిరరాశి CV_OVERRIDE { తిరిగి _termcrit; }
 
-    void setTermCriteria( const TermCriteria& termcrit ) CV_OVERRIDE
+    శూన్య సమితి_పదం_Criteria( స్థిరరాశి పదం_Criteria& termcrit ) CV_OVERRIDE
     {
-        CV_Assert( termcrit.type == (TermCriteria::MAX_ITER + TermCriteria::EPS) &&
+        CV_Assert( termcrit.type == (పదం_Criteria::MAX_ITER + పదం_Criteria::EPS) &&
                    termcrit.epsilon > 0 &&
-                   termcrit.maxCount > 0 );
+                   termcrit.max_లెక్క > 0 );
         _termcrit=termcrit;
     }
 
-    double minimize( InputOutputArray x_ ) CV_OVERRIDE
+    ద్విగుణ minimize( ఆదానం_Output_Array x_ ) CV_OVERRIDE
     {
         dprintf(("hi from minimize\n"));
         CV_Assert( !_Function.empty() );
-        CV_Assert( std::min(_step.cols, _step.rows) == 1 &&
-                  std::max(_step.cols, _step.rows) >= 2 &&
-                  _step.type() == CV_64FC1 );
-        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.maxCount,_termcrit.epsilon));
+        CV_Assert( std::min(అడుగు_3.నిలువుల_సంఖ్య, అడుగు_3.అడ్డువరుసలు) == 1 &&
+                  std::max(అడుగు_3.నిలువుల_సంఖ్య, అడుగు_3.అడ్డువరుసలు) >= 2 &&
+                  అడుగు_3.type() == CV_64FC1 );
+        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.max_లెక్క,_termcrit.epsilon));
         dprintf(("step\n"));
-        print_matrix(_step);
+        print_మాతృక(అడుగు_3);
 
         Mat x = x_.getMat(), simplex;
 
-        createInitialSimplex(x, simplex, _step);
-        int count = 0;
-        double res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
-                                          count, _termcrit.maxCount);
-        dprintf(("%d iterations done\n",count));
+        createInitialSimplex(x, simplex, అడుగు_3);
+        పూర్ణాంకం లెక్క_2 = 0;
+        ద్విగుణ res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
+                                          లెక్క_2, _termcrit.max_లెక్క);
+        dprintf(("%d iterations done\n",లెక్క_2));
 
-        if( !x.empty() )
+        ఒకవేళ( !x.empty() )
         {
-            Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<double>());
-            simplex_0m.convertTo(x, x.type());
+            Mat simplex_0m(x.అడ్డువరుసలు, x.నిలువుల_సంఖ్య, CV_64F, simplex.ptr<ద్విగుణ>());
+            simplex_0m.convert_గమ్యం(x, x.type());
         }
-        else
+        లేకపోతే
         {
-            int x_type = x_.fixedType() ? x_.type() : CV_64F;
-            simplex.row(0).convertTo(x_, x_type);
+            పూర్ణాంకం x_type = x_.fixedType() ? x_.type() : CV_64F;
+            simplex.అడ్డువరుస(0).convert_గమ్యం(x_, x_type);
         }
-        return res;
+        తిరిగి res;
     }
-protected:
+రక్షిత:
     Ptr<MinProblemSolver::Function> _Function;
-    TermCriteria _termcrit;
-    Mat _step;
+    పదం_Criteria _termcrit;
+    Mat అడుగు_3;
 
-    inline void updateCoordSum(const Mat& p, Mat& coord_sum)
+    అంతఃవరుస శూన్య update_Coord_కూడిక(స్థిరరాశి Mat& p, Mat& coord_కూడిక)
     {
-        int i, j, m = p.rows, n = p.cols;
-        double* coord_sum_ = coord_sum.ptr<double>();
-        CV_Assert( coord_sum.cols == n && coord_sum.rows == 1 );
+        పూర్ణాంకం i, j, m = p.అడ్డువరుసలు, n = p.నిలువుల_సంఖ్య;
+        ద్విగుణ* coord_కూడిక_2 = coord_కూడిక.ptr<ద్విగుణ>();
+        CV_Assert( coord_కూడిక.నిలువుల_సంఖ్య == n && coord_కూడిక.అడ్డువరుసలు == 1 );
 
-        for( j = 0; j < n; j++ )
-            coord_sum_[j] = 0.;
+        కొరకు( j = 0; j < n; j++ )
+            coord_కూడిక_2[j] = 0.;
 
-        for( i = 0; i < m; i++ )
+        కొరకు( i = 0; i < m; i++ )
         {
-            const double* p_i = p.ptr<double>(i);
-            for( j = 0; j < n; j++ )
-                coord_sum_[j] += p_i[j];
+            స్థిరరాశి ద్విగుణ* p_i = p.ptr<ద్విగుణ>(i);
+            కొరకు( j = 0; j < n; j++ )
+                coord_కూడిక_2[j] += p_i[j];
         }
 
         dprintf(("\nupdated coord sum:\n"));
-        print_matrix(coord_sum);
+        print_మాతృక(coord_కూడిక);
 
     }
 
-    inline void createInitialSimplex( const Mat& x0, Mat& simplex, Mat& step )
+    అంతఃవరుస శూన్య createInitialSimplex( స్థిరరాశి Mat& x0, Mat& simplex, Mat& అడుగు )
     {
-        int i, j, ndim = step.cols;
+        పూర్ణాంకం i, j, ndim = అడుగు.నిలువుల_సంఖ్య;
         CV_Assert( _Function->getDims() == ndim );
         Mat x = x0;
-        if( x0.empty() )
+        ఒకవేళ( x0.empty() )
             x = Mat::zeros(1, ndim, CV_64F);
-        CV_Assert( (x.cols == 1 && x.rows == ndim) || (x.cols == ndim && x.rows == 1) );
+        CV_Assert( (x.నిలువుల_సంఖ్య == 1 && x.అడ్డువరుసలు == ndim) || (x.నిలువుల_సంఖ్య == ndim && x.అడ్డువరుసలు == 1) );
         CV_Assert( x.type() == CV_32F || x.type() == CV_64F );
 
         simplex.create(ndim + 1, ndim, CV_64F);
-        Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<double>());
+        Mat simplex_0m(x.అడ్డువరుసలు, x.నిలువుల_సంఖ్య, CV_64F, simplex.ptr<ద్విగుణ>());
 
-        x.convertTo(simplex_0m, CV_64F);
-        double* simplex_0 = simplex.ptr<double>();
-        const double* step_ = step.ptr<double>();
-        for( i = 1; i <= ndim; i++ )
+        x.convert_గమ్యం(simplex_0m, CV_64F);
+        ద్విగుణ* simplex_0 = simplex.ptr<ద్విగుణ>();
+        స్థిరరాశి ద్విగుణ* అడుగు_2 = అడుగు.ptr<ద్విగుణ>();
+        కొరకు( i = 1; i <= ndim; i++ )
         {
-            double* simplex_i = simplex.ptr<double>(i);
-            for( j = 0; j < ndim; j++ )
+            ద్విగుణ* simplex_i = simplex.ptr<ద్విగుణ>(i);
+            కొరకు( j = 0; j < ndim; j++ )
                 simplex_i[j] = simplex_0[j];
-            simplex_i[i-1] += 0.5*step_[i-1];
+            simplex_i[i-1] += 0.5*అడుగు_2[i-1];
         }
-        for( j = 0; j < ndim; j++ )
-            simplex_0[j] -= 0.5*step_[j];
+        కొరకు( j = 0; j < ndim; j++ )
+            simplex_0[j] -= 0.5*అడుగు_2[j];
 
         dprintf(("\nthis is simplex\n"));
-        print_matrix(simplex);
+        print_మాతృక(simplex);
     }
 
     /*
@@ -269,197 +269,197 @@ protected:
      form a simplex - each row is an ndim vector.
      On output, fcount gives the number of function evaluations taken.
     */
-    double innerDownhillSimplex( Mat& p, double MinRange, double MinError, int& fcount, int nmax )
+    ద్విగుణ innerDownhillSimplex( Mat& p, ద్విగుణ MinRange, ద్విగుణ MinError, పూర్ణాంకం& fcount, పూర్ణాంకం nmax )
     {
-        int i, j, ndim = p.cols;
-        Mat coord_sum(1, ndim, CV_64F), buf(1, ndim, CV_64F), y(1, ndim+1, CV_64F);
-        double* y_ = y.ptr<double>();
+        పూర్ణాంకం i, j, ndim = p.నిలువుల_సంఖ్య;
+        Mat coord_కూడిక(1, ndim, CV_64F), buf(1, ndim, CV_64F), y(1, ndim+1, CV_64F);
+        ద్విగుణ* y_ = y.ptr<ద్విగుణ>();
 
         fcount = ndim+1;
-        for( i = 0; i <= ndim; i++ )
-            y_[i] = calc_f(p.ptr<double>(i));
+        కొరకు( i = 0; i <= ndim; i++ )
+            y_[i] = calc_f(p.ptr<ద్విగుణ>(i));
 
-        updateCoordSum(p, coord_sum);
+        update_Coord_కూడిక(p, coord_కూడిక);
 
-        for (;;)
+        కొరకు (;;)
         {
             // find highest (worst), next-to-worst, and lowest
             // (best) points by going through all of them.
-            int ilo = 0, ihi, inhi;
-            if( y_[0] > y_[1] )
+            పూర్ణాంకం ilo = 0, ihi, inhi;
+            ఒకవేళ( y_[0] > y_[1] )
             {
                 ihi = 0; inhi = 1;
             }
-            else
+            లేకపోతే
             {
                 ihi = 1; inhi = 0;
             }
-            for( i = 0; i <= ndim; i++ )
+            కొరకు( i = 0; i <= ndim; i++ )
             {
-                double yval = y_[i];
-                if (yval <= y_[ilo])
+                ద్విగుణ yval = y_[i];
+                ఒకవేళ (yval <= y_[ilo])
                     ilo = i;
-                if (yval > y_[ihi])
+                ఒకవేళ (yval > y_[ihi])
                 {
                     inhi = ihi;
                     ihi = i;
                 }
-                else if (yval > y_[inhi] && i != ihi)
+                లేకపోతే ఒకవేళ (yval > y_[inhi] && i != ihi)
                     inhi = i;
             }
             CV_Assert( ihi != inhi );
-            if( ilo == inhi || ilo == ihi )
+            ఒకవేళ( ilo == inhi || ilo == ihi )
             {
-                for( i = 0; i <= ndim; i++ )
+                కొరకు( i = 0; i <= ndim; i++ )
                 {
-                    double yval = y_[i];
-                    if( yval == y_[ilo] && i != ihi && i != inhi )
+                    ద్విగుణ yval = y_[i];
+                    ఒకవేళ( yval == y_[ilo] && i != ihi && i != inhi )
                     {
                         ilo = i;
-                        break;
+                        ఆపు;
                     }
                 }
             }
             dprintf(("\nthis is y on iteration %d:\n",fcount));
-            print_matrix(y);
+            print_మాతృక(y);
 
             // check stop criterion
-            double error = fabs(y_[ihi] - y_[ilo]);
-            double range = 0;
-            for( j = 0; j < ndim; j++ )
+            ద్విగుణ error = fabs(y_[ihi] - y_[ilo]);
+            ద్విగుణ range = 0;
+            కొరకు( j = 0; j < ndim; j++ )
             {
-                double minval, maxval;
-                minval = maxval = p.at<double>(0, j);
-                for( i = 1; i <= ndim; i++ )
+                ద్విగుణ minval, maxval;
+                minval = maxval = p.at<ద్విగుణ>(0, j);
+                కొరకు( i = 1; i <= ndim; i++ )
                 {
-                    double pval = p.at<double>(i, j);
+                    ద్విగుణ pval = p.at<ద్విగుణ>(i, j);
                     minval = std::min(minval, pval);
                     maxval = std::max(maxval, pval);
                 }
                 range = std::max(range, fabs(maxval - minval));
             }
 
-            if( range <= MinRange || error <= MinError || fcount >= nmax )
+            ఒకవేళ( range <= MinRange || error <= MinError || fcount >= nmax )
             {
                 // Put best point and value in first slot.
                 std::swap(y_[0], y_[ilo]);
-                for( j = 0; j < ndim; j++ )
+                కొరకు( j = 0; j < ndim; j++ )
                 {
-                    std::swap(p.at<double>(0, j), p.at<double>(ilo, j));
+                    std::swap(p.at<ద్విగుణ>(0, j), p.at<ద్విగుణ>(ilo, j));
                 }
-                break;
+                ఆపు;
             }
 
-            double y_lo = y_[ilo], y_nhi = y_[inhi], y_hi = y_[ihi];
+            ద్విగుణ y_lo = y_[ilo], y_nhi = y_[inhi], y_hi = y_[ihi];
             // Begin a new iteration. First, reflect the worst point about the centroid of others
-            double alpha = -1.0;
-            double y_alpha = tryNewPoint(p, coord_sum, ihi, alpha, buf, fcount);
+            ద్విగుణ alpha = -1.0;
+            ద్విగుణ y_alpha = try_New_బిందువు(p, coord_కూడిక, ihi, alpha, buf, fcount);
 
             dprintf(("\ny_lo=%g, y_nhi=%g, y_hi=%g, y_alpha=%g, p_alpha:\n", y_lo, y_nhi, y_hi, y_alpha));
-            print_matrix(buf);
+            print_మాతృక(buf);
 
-            if( y_alpha < y_nhi )
+            ఒకవేళ( y_alpha < y_nhi )
             {
-                if( y_alpha < y_lo )
+                ఒకవేళ( y_alpha < y_lo )
                 {
                     // If that's better than the best point, go twice as far in that direction
-                    double beta = -2.0;
-                    double y_beta = tryNewPoint(p, coord_sum, ihi, beta, buf, fcount);
+                    ద్విగుణ beta = -2.0;
+                    ద్విగుణ y_beta = try_New_బిందువు(p, coord_కూడిక, ihi, beta, buf, fcount);
                     dprintf(("\ny_beta=%g, p_beta:\n", y_beta));
-                    print_matrix(buf);
-                    if( y_beta < y_alpha )
+                    print_మాతృక(buf);
+                    ఒకవేళ( y_beta < y_alpha )
                     {
                         alpha = beta;
                         y_alpha = y_beta;
                     }
                 }
-                replacePoint(p, coord_sum, y, ihi, alpha, y_alpha);
+                replace_బిందువు(p, coord_కూడిక, y, ihi, alpha, y_alpha);
             }
-            else
+            లేకపోతే
             {
                 // The new point is worse than the second-highest,
                 // do not go so far in that direction
-                double gamma = 0.5;
-                double y_gamma = tryNewPoint(p, coord_sum, ihi, gamma, buf, fcount);
+                ద్విగుణ gamma = 0.5;
+                ద్విగుణ y_gamma = try_New_బిందువు(p, coord_కూడిక, ihi, gamma, buf, fcount);
                 dprintf(("\ny_gamma=%g, p_gamma:\n", y_gamma));
-                print_matrix(buf);
-                if( y_gamma < y_hi )
-                    replacePoint(p, coord_sum, y, ihi, gamma, y_gamma);
-                else
+                print_మాతృక(buf);
+                ఒకవేళ( y_gamma < y_hi )
+                    replace_బిందువు(p, coord_కూడిక, y, ihi, gamma, y_gamma);
+                లేకపోతే
                 {
                     // Can't seem to improve things.
                     // Contract the simplex to good point
                     // in hope to find a simplex landscape.
-                    for( i = 0; i <= ndim; i++ )
+                    కొరకు( i = 0; i <= ndim; i++ )
                     {
-                        if (i != ilo)
+                        ఒకవేళ (i != ilo)
                         {
-                            for( j = 0; j < ndim; j++ )
-                                p.at<double>(i, j) = 0.5*(p.at<double>(i, j) + p.at<double>(ilo, j));
-                            y_[i] = calc_f(p.ptr<double>(i));
+                            కొరకు( j = 0; j < ndim; j++ )
+                                p.at<ద్విగుణ>(i, j) = 0.5*(p.at<ద్విగుణ>(i, j) + p.at<ద్విగుణ>(ilo, j));
+                            y_[i] = calc_f(p.ptr<ద్విగుణ>(i));
                         }
                     }
                     fcount += ndim;
-                    updateCoordSum(p, coord_sum);
+                    update_Coord_కూడిక(p, coord_కూడిక);
                 }
             }
             dprintf(("\nthis is simplex on iteration %d\n",fcount));
-            print_matrix(p);
+            print_మాతృక(p);
         }
-        return y_[0];
+        తిరిగి y_[0];
     }
 
-    inline double calc_f(const double* ptr)
+    అంతఃవరుస ద్విగుణ calc_f(స్థిరరాశి ద్విగుణ* ptr)
     {
-        double res = _Function->calc(ptr);
+        ద్విగుణ res = _Function->calc(ptr);
         CV_Assert( !cvIsNaN(res) && !cvIsInf(res) );
-        return res;
+        తిరిగి res;
     }
 
-    double tryNewPoint( Mat& p, Mat& coord_sum, int ihi, double alpha_, Mat& ptry, int& fcount )
+    ద్విగుణ try_New_బిందువు( Mat& p, Mat& coord_కూడిక, పూర్ణాంకం ihi, ద్విగుణ alpha_, Mat& ptry, పూర్ణాంకం& fcount )
     {
-        int j, ndim = p.cols;
+        పూర్ణాంకం j, ndim = p.నిలువుల_సంఖ్య;
 
-        double alpha = (1.0 - alpha_)/ndim;
-        double beta = alpha - alpha_;
-        double* p_ihi = p.ptr<double>(ihi);
-        double* ptry_ = ptry.ptr<double>();
-        double* coord_sum_ = coord_sum.ptr<double>();
+        ద్విగుణ alpha = (1.0 - alpha_)/ndim;
+        ద్విగుణ beta = alpha - alpha_;
+        ద్విగుణ* p_ihi = p.ptr<ద్విగుణ>(ihi);
+        ద్విగుణ* ptry_ = ptry.ptr<ద్విగుణ>();
+        ద్విగుణ* coord_కూడిక_2 = coord_కూడిక.ptr<ద్విగుణ>();
 
-        for( j = 0; j < ndim; j++ )
-            ptry_[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
+        కొరకు( j = 0; j < ndim; j++ )
+            ptry_[j] = coord_కూడిక_2[j]*alpha - p_ihi[j]*beta;
 
         fcount++;
-        return calc_f(ptry_);
+        తిరిగి calc_f(ptry_);
     }
 
-    void replacePoint( Mat& p, Mat& coord_sum, Mat& y, int ihi, double alpha_, double ytry )
+    శూన్య replace_బిందువు( Mat& p, Mat& coord_కూడిక, Mat& y, పూర్ణాంకం ihi, ద్విగుణ alpha_, ద్విగుణ ytry )
     {
-        int j, ndim = p.cols;
+        పూర్ణాంకం j, ndim = p.నిలువుల_సంఖ్య;
 
-        double alpha = (1.0 - alpha_)/ndim;
-        double beta = alpha - alpha_;
-        double* p_ihi = p.ptr<double>(ihi);
-        double* coord_sum_ = coord_sum.ptr<double>();
+        ద్విగుణ alpha = (1.0 - alpha_)/ndim;
+        ద్విగుణ beta = alpha - alpha_;
+        ద్విగుణ* p_ihi = p.ptr<ద్విగుణ>(ihi);
+        ద్విగుణ* coord_కూడిక_2 = coord_కూడిక.ptr<ద్విగుణ>();
 
-        for( j = 0; j < ndim; j++ )
-            p_ihi[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
-        y.at<double>(ihi) = ytry;
-        updateCoordSum(p, coord_sum);
+        కొరకు( j = 0; j < ndim; j++ )
+            p_ihi[j] = coord_కూడిక_2[j]*alpha - p_ihi[j]*beta;
+        y.at<ద్విగుణ>(ihi) = ytry;
+        update_Coord_కూడిక(p, coord_కూడిక);
     }
 };
 
 
 // both minRange & minError are specified by termcrit.epsilon;
 // In addition, user may specify the number of iterations that the algorithm does.
-Ptr<DownhillSolver> DownhillSolver::create( const Ptr<MinProblemSolver::Function>& f,
-                                            InputArray initStep, TermCriteria termcrit )
+Ptr<DownhillSolver> DownhillSolver::create( స్థిరరాశి Ptr<MinProblemSolver::Function>& f,
+                                            ఆదానం_Array init_అడుగు, పదం_Criteria termcrit )
 {
     Ptr<DownhillSolver> DS = makePtr<DownhillSolverImpl>();
-    DS->setFunction(f);
-    DS->setInitStep(initStep);
-    DS->setTermCriteria(termcrit);
-    return DS;
+    DS->సమితి_Function(f);
+    DS->సమితి_Init_అడుగు(init_అడుగు);
+    DS->సమితి_పదం_Criteria(termcrit);
+    తిరిగి DS;
 }
 
 }

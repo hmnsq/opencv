@@ -4,217 +4,217 @@
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "convert.hpp"
-#include <sys/types.h>
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "opencl_kernels_core.hpp"
+#అన్తర్భావ "convert.hpp"
+#అన్తర్భావ <sys/types.h>
 
-namespace cv {
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+నామాకాశ cv {
+శూన్య LUT8u_dispatch( స్థిరరాశి uchar* src, స్థిరరాశి uchar* lut, uchar* dst, పూర్ణాంకం len, పూర్ణాంకం cn, పూర్ణాంకం lutcn );
+శూన్య LUT16u_dispatch( స్థిరరాశి uchar* src, స్థిరరాశి ushort* lut, ushort* dst, పూర్ణాంకం len, పూర్ణాంకం cn, పూర్ణాంకం lutcn );
 } // namespace cv
 
 /****************************************************************************************\
 *                                    LUT Transform                                       *
 \****************************************************************************************/
 
-namespace cv
+నామాకాశ cv
 {
 
-template<typename Ti, typename T> static void
-LUT_( const void* _src, const void* _lut, void* _dst, int len, int cn, int lutcn )
+మూస<రకం_పేరు Ti, రకం_పేరు T> స్థిర శూన్య
+LUT_( స్థిరరాశి శూన్య* _src, స్థిరరాశి శూన్య* _lut, శూన్య* _dst, పూర్ణాంకం len, పూర్ణాంకం cn, పూర్ణాంకం lutcn )
 {
-    const Ti* src = (const Ti*)_src;
-    const T* lut = (const T*)_lut;
+    స్థిరరాశి Ti* src = (స్థిరరాశి Ti*)_src;
+    స్థిరరాశి T* lut = (స్థిరరాశి T*)_lut;
     T* dst = (T*)_dst;
-    if( lutcn == 1 )
+    ఒకవేళ( lutcn == 1 )
     {
-        for( int i = 0; i < len*cn; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < len*cn; i++ )
             dst[i] = lut[src[i]];
     }
-    else
+    లేకపోతే
     {
-        for( int i = 0; i < len*cn; i += cn )
-            for( int k = 0; k < cn; k++ )
+        కొరకు( పూర్ణాంకం i = 0; i < len*cn; i += cn )
+            కొరకు( పూర్ణాంకం k = 0; k < cn; k++ )
                 dst[i+k] = lut[src[i+k]*cn+k];
     }
 }
 
-template<typename T, void (*fn)(const uchar*, const T*, T*, int, int, int)>
-static void lutDispatchWrap( const void* src, const void* lut, void* dst, int len, int cn, int lutcn )
+మూస<రకం_పేరు T, శూన్య (*fn)(స్థిరరాశి uchar*, స్థిరరాశి T*, T*, పూర్ణాంకం, పూర్ణాంకం, పూర్ణాంకం)>
+స్థిర శూన్య lutDispatchWrap( స్థిరరాశి శూన్య* src, స్థిరరాశి శూన్య* lut, శూన్య* dst, పూర్ణాంకం len, పూర్ణాంకం cn, పూర్ణాంకం lutcn )
 {
-    fn((const uchar*)src, (const T*)lut, (T*)dst, len, cn, lutcn);
+    fn((స్థిరరాశి uchar*)src, (స్థిరరాశి T*)lut, (T*)dst, len, cn, lutcn);
 }
 
-typedef void (*LUTFunc)( const void* src, const void* lut, void* dst, int len, int cn, int lutcn );
+రకనిర్వచనం శూన్య (*LUTFunc)( స్థిరరాశి శూన్య* src, స్థిరరాశి శూన్య* lut, శూన్య* dst, పూర్ణాంకం len, పూర్ణాంకం cn, పూర్ణాంకం lutcn );
 
-static LUTFunc getLUTFunc(const int srcDepth, const int dstDepth)
+స్థిర LUTFunc getLUTFunc(స్థిరరాశి పూర్ణాంకం src_లోతు, స్థిరరాశి పూర్ణాంకం dst_లోతు)
 {
-    LUTFunc ret = nullptr;
-    if((srcDepth == CV_8U) || (srcDepth == CV_8S))
+    LUTFunc ret = శూన్యసూచిక;
+    ఒకవేళ((src_లోతు == CV_8U) || (src_లోతు == CV_8S))
     {
-        switch(dstDepth)
+        ఎంపిక(dst_లోతు)
         {
-            case CV_8U:   ret = lutDispatchWrap<uchar, LUT8u_dispatch>;   break;
-            case CV_8S:   ret = LUT_<uint8_t, int8_t>;    break;
-            case CV_16U:  ret = lutDispatchWrap<ushort, LUT16u_dispatch>; break;
-            case CV_16S:  ret = LUT_<uint8_t, int16_t>;   break;
-            case CV_32S:  ret = LUT_<uint8_t, int32_t>;   break;
-            case CV_32F:  ret = LUT_<uint8_t, int32_t>;   break; // float
-            case CV_64F:  ret = LUT_<uint8_t, int64_t>;   break; // double
-            case CV_16F:  ret = LUT_<uint8_t, int16_t>;   break; // hfloat
-            case CV_16BF: ret = LUT_<uint8_t, int16_t>;   break; // bfloat
-            case CV_Bool: ret = LUT_<uint8_t, uint8_t>;   break; // bool
-            case CV_64U:  ret = LUT_<uint8_t, uint64_t>;  break;
-            case CV_64S:  ret = LUT_<uint8_t, int64_t>;   break;
-            case CV_32U:  ret = LUT_<uint8_t, uint32_t>;  break;
-            default:      ret = nullptr;                  break;
+            స్థితి CV_8U:   ret = lutDispatchWrap<uchar, LUT8u_dispatch>;   ఆపు;
+            స్థితి CV_8S:   ret = LUT_<uint8_t, int8_t>;    ఆపు;
+            స్థితి CV_16U:  ret = lutDispatchWrap<ushort, LUT16u_dispatch>; ఆపు;
+            స్థితి CV_16S:  ret = LUT_<uint8_t, int16_t>;   ఆపు;
+            స్థితి CV_32S:  ret = LUT_<uint8_t, int32_t>;   ఆపు;
+            స్థితి CV_32F:  ret = LUT_<uint8_t, int32_t>;   ఆపు; // float
+            స్థితి CV_64F:  ret = LUT_<uint8_t, int64_t>;   ఆపు; // double
+            స్థితి CV_16F:  ret = LUT_<uint8_t, int16_t>;   ఆపు; // hfloat
+            స్థితి CV_16BF: ret = LUT_<uint8_t, int16_t>;   ఆపు; // bfloat
+            స్థితి CV_Bool: ret = LUT_<uint8_t, uint8_t>;   ఆపు; // bool
+            స్థితి CV_64U:  ret = LUT_<uint8_t, uint64_t>;  ఆపు;
+            స్థితి CV_64S:  ret = LUT_<uint8_t, int64_t>;   ఆపు;
+            స్థితి CV_32U:  ret = LUT_<uint8_t, uint32_t>;  ఆపు;
+            అప్రమేయ:      ret = శూన్యసూచిక;                  ఆపు;
         }
     }
-    else if((srcDepth == CV_16U) || (srcDepth == CV_16S))
+    లేకపోతే ఒకవేళ((src_లోతు == CV_16U) || (src_లోతు == CV_16S))
     {
-        switch(dstDepth)
+        ఎంపిక(dst_లోతు)
         {
-            case CV_8U:   ret = LUT_<uint16_t, uint8_t>;  break;
-            case CV_8S:   ret = LUT_<uint16_t, int8_t>;   break;
-            case CV_16U:  ret = LUT_<uint16_t, uint16_t>; break;
-            case CV_16S:  ret = LUT_<uint16_t, int16_t>;  break;
-            case CV_32S:  ret = LUT_<uint16_t, int32_t>;  break;
-            case CV_32F:  ret = LUT_<uint16_t, int32_t>;  break; // float
-            case CV_64F:  ret = LUT_<uint16_t, int64_t>;  break; // double
-            case CV_16F:  ret = LUT_<uint16_t, int16_t>;  break; // hfloat
-            case CV_16BF: ret = LUT_<uint16_t, int16_t>;  break; // bfloat
-            case CV_Bool: ret = LUT_<uint16_t, uint8_t>;  break; // bool
-            case CV_64U:  ret = LUT_<uint16_t, uint64_t>; break;
-            case CV_64S:  ret = LUT_<uint16_t, int64_t>;  break;
-            case CV_32U:  ret = LUT_<uint16_t, uint32_t>; break;
-            default:      ret = nullptr;                  break;
+            స్థితి CV_8U:   ret = LUT_<uint16_t, uint8_t>;  ఆపు;
+            స్థితి CV_8S:   ret = LUT_<uint16_t, int8_t>;   ఆపు;
+            స్థితి CV_16U:  ret = LUT_<uint16_t, uint16_t>; ఆపు;
+            స్థితి CV_16S:  ret = LUT_<uint16_t, int16_t>;  ఆపు;
+            స్థితి CV_32S:  ret = LUT_<uint16_t, int32_t>;  ఆపు;
+            స్థితి CV_32F:  ret = LUT_<uint16_t, int32_t>;  ఆపు; // float
+            స్థితి CV_64F:  ret = LUT_<uint16_t, int64_t>;  ఆపు; // double
+            స్థితి CV_16F:  ret = LUT_<uint16_t, int16_t>;  ఆపు; // hfloat
+            స్థితి CV_16BF: ret = LUT_<uint16_t, int16_t>;  ఆపు; // bfloat
+            స్థితి CV_Bool: ret = LUT_<uint16_t, uint8_t>;  ఆపు; // bool
+            స్థితి CV_64U:  ret = LUT_<uint16_t, uint64_t>; ఆపు;
+            స్థితి CV_64S:  ret = LUT_<uint16_t, int64_t>;  ఆపు;
+            స్థితి CV_32U:  ret = LUT_<uint16_t, uint32_t>; ఆపు;
+            అప్రమేయ:      ret = శూన్యసూచిక;                  ఆపు;
         }
     }
 
-    CV_CheckTrue(ret != nullptr, "An unexpected type combination was specified.");
-    return ret;
+    CV_CheckTrue(ret != శూన్యసూచిక, "An unexpected type combination was specified.");
+    తిరిగి ret;
 }
 
-#ifdef HAVE_OPENCL
+#నిర్వచితమైతే HAVE_OPENCL
 
-static bool ocl_LUT(InputArray _src, InputArray _lut, OutputArray _dst)
+స్థిర తార్కిక ocl_LUT(ఆదానం_Array _src, ఆదానం_Array _lut, OutputArray _dst)
 {
-    int lcn = _lut.channels(), dcn = _src.channels(), ddepth = _lut.depth();
+    పూర్ణాంకం lcn = _lut.channels(), dcn = _src.channels(), ddepth = _lut.లోతు();
 
     UMat src = _src.getUMat(), lut = _lut.getUMat();
-    _dst.createSameSize(src, CV_MAKETYPE(ddepth, dcn));
+    _dst.create_Same_కొలత(src, CV_MAKETYPE(ddepth, dcn));
     UMat dst = _dst.getUMat();
-    int kercn = lcn == 1 ? std::min(4, ocl::predictOptimalVectorWidth(_src, _dst)) : dcn;
+    పూర్ణాంకం kercn = lcn == 1 ? std::min(4, ocl::predict_Optimal_సదిశ_వెడల్పు(_src, _dst)) : dcn;
 
     ocl::Kernel k("LUT", ocl::core::lut_oclsrc,
                   format("-D dcn=%d -D lcn=%d -D srcT=%s -D dstT=%s", kercn, lcn,
-                         ocl::typeToStr(src.depth()), ocl::memopTypeToStr(ddepth)));
-    if (k.empty())
-        return false;
+                         ocl::type_గమ్యం_Str(src.లోతు()), ocl::memop_Type_గమ్యం_Str(ddepth)));
+    ఒకవేళ (k.empty())
+        తిరిగి అబద్ధం;
 
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::ReadOnlyNoSize(lut),
+    k.వాదనలు(ocl::KernelArg::Read_Only_No_కొలత(src), ocl::KernelArg::Read_Only_No_కొలత(lut),
         ocl::KernelArg::WriteOnly(dst, dcn, kercn));
 
-    size_t globalSize[2] = { (size_t)dst.cols * dcn / kercn, ((size_t)dst.rows + 3) / 4 };
-    return k.run(2, globalSize, NULL, false);
+    size_t global_కొలత[2] = { (size_t)dst.నిలువుల_సంఖ్య * dcn / kercn, ((size_t)dst.అడ్డువరుసలు + 3) / 4 };
+    తిరిగి k.నిరంతరం(2, global_కొలత, ఖాళీ, అబద్ధం);
 }
 
-#endif
+#అయితే_ముగింపు
 
-class LUTParallelBody : public ParallelLoopBody
+తరగతి LUTParallelBody : బహిరంగ ParallelLoopBody
 {
-public:
-    const Mat& src_;
-    const Mat& lut_;
+బహిరంగ:
+    స్థిరరాశి Mat& src_;
+    స్థిరరాశి Mat& lut_;
     Mat& dst_;
 
     LUTFunc func_;
 
-    LUTParallelBody(const Mat& src, const Mat& lut, Mat& dst, LUTFunc func)
+    LUTParallelBody(స్థిరరాశి Mat& src, స్థిరరాశి Mat& lut, Mat& dst, LUTFunc func)
         : src_(src), lut_(lut), dst_(dst), func_(func)
     {
     }
 
-    void operator()( const cv::Range& range ) const CV_OVERRIDE
+    శూన్య క్రియాకారకం()( స్థిరరాశి cv::Range& range ) స్థిరరాశి CV_OVERRIDE
     {
-        const int row0 = range.start;
-        const int row1 = range.end;
+        స్థిరరాశి పూర్ణాంకం row0 = range.ప్రారంభం;
+        స్థిరరాశి పూర్ణాంకం row1 = range.end;
 
-        Mat src = src_.rowRange(row0, row1);
-        Mat dst = dst_.rowRange(row0, row1);
+        Mat src = src_.అడ్డువరుస_Range_2(row0, row1);
+        Mat dst = dst_.అడ్డువరుస_Range_2(row0, row1);
 
-        int cn = src.channels();
-        int lutcn = lut_.channels();
+        పూర్ణాంకం cn = src.channels();
+        పూర్ణాంకం lutcn = lut_.channels();
 
-        const Mat* arrays[] = {&src, &dst, 0};
+        స్థిరరాశి Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int len = (int)it.size;
+        పూర్ణాంకం len = (పూర్ణాంకం)it.size;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
             func_(ptrs[0], lut_.ptr(), ptrs[1], len, cn, lutcn);
     }
-private:
-    LUTParallelBody(const LUTParallelBody&);
-    LUTParallelBody& operator=(const LUTParallelBody&);
+అంతరంగ:
+    LUTParallelBody(స్థిరరాశి LUTParallelBody&);
+    LUTParallelBody& క్రియాకారకం=(స్థిరరాశి LUTParallelBody&);
 };
 
 } // cv::
 
-void cv::LUT( InputArray _src, InputArray _lut, OutputArray _dst )
+శూన్య cv::LUT( ఆదానం_Array _src, ఆదానం_Array _lut, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int cn = _src.channels(), depth = _src.depth();
-    int lutcn = _lut.channels();
-    const size_t lut_size = _lut.total();
+    పూర్ణాంకం cn = _src.channels(), లోతు = _src.లోతు();
+    పూర్ణాంకం lutcn = _lut.channels();
+    స్థిరరాశి size_t lut_కొలత = _lut.మొత్తం();
 
     CV_Assert( (lutcn == cn || lutcn == 1) && _lut.isContinuous() &&
         (
-            ((lut_size == 256) && ((depth == CV_8U)||(depth == CV_8S))) ||
-            ((lut_size == 65536) && ((depth == CV_16U)||(depth == CV_16S)))
+            ((lut_కొలత == 256) && ((లోతు == CV_8U)||(లోతు == CV_8S))) ||
+            ((lut_కొలత == 65536) && ((లోతు == CV_16U)||(లోతు == CV_16S)))
         )
     );
 
-    CV_OCL_RUN(_dst.isUMat() && _src.dims() <= 2 && (lut_size == 256),
+    CV_OCL_నిరంతరం(_dst.isUMat() && _src.dims() <= 2 && (lut_కొలత == 256),
                ocl_LUT(_src, _lut, _dst))
 
     Mat src = _src.getMat(), lut = _lut.getMat();
-    _dst.createSameSize(_src, CV_MAKETYPE(_lut.depth(), cn));
+    _dst.create_Same_కొలత(_src, CV_MAKETYPE(_lut.లోతు(), cn));
     Mat dst = _dst.getMat();
 
-    if(lut_size == 256)
+    ఒకవేళ(lut_కొలత == 256)
     {
-        CALL_HAL(LUT, cv_hal_lut, src.data, src.step, src.type(), lut.data,
-                 lut.elemSize1(), lutcn, dst.data, dst.step, src.cols, src.rows);
+        CALL_HAL(LUT, cv_hal_lut, src.దత్తాంశం, src.అడుగు, src.type(), lut.దత్తాంశం,
+                 lut.elemSize1(), lutcn, dst.దత్తాంశం, dst.అడుగు, src.నిలువుల_సంఖ్య, src.అడ్డువరుసలు);
     }
-    else
+    లేకపోతే
     {
-        CALL_HAL(LUT16, cv_hal_lut16, src.ptr<ushort>(), src.step, src.type(), lut.data,
-                 lut.elemSize1(), lutcn, dst.data, dst.step, src.cols, src.rows);
+        CALL_HAL(LUT16, cv_hal_lut16, src.ptr<ushort>(), src.అడుగు, src.type(), lut.దత్తాంశం,
+                 lut.elemSize1(), lutcn, dst.దత్తాంశం, dst.అడుగు, src.నిలువుల_సంఖ్య, src.అడ్డువరుసలు);
     }
 
-    const LUTFunc func = getLUTFunc(src.depth(), dst.depth());
-    CV_Assert( func != nullptr );
+    స్థిరరాశి LUTFunc func = getLUTFunc(src.లోతు(), dst.లోతు());
+    CV_Assert( func != శూన్యసూచిక );
 
-    if (_src.dims() <= 2)
+    ఒకవేళ (_src.dims() <= 2)
     {
         LUTParallelBody body(src, lut, dst, func);
-        Range all(0, dst.rows);
-        if (dst.total() >= (size_t)(1<<18))
-            parallel_for_(all, body, (double)std::max((size_t)1, dst.total()>>16));
-        else
+        Range all(0, dst.అడ్డువరుసలు);
+        ఒకవేళ (dst.మొత్తం() >= (size_t)(1<<18))
+            parallel_for_(all, body, (ద్విగుణ)std::max((size_t)1, dst.మొత్తం()>>16));
+        లేకపోతే
             body(all);
 
-        return;
+        తిరిగి;
     }
 
-    const Mat* arrays[] = {&src, &dst, 0};
+    స్థిరరాశి Mat* arrays[] = {&src, &dst, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)it.size;
+    పూర్ణాంకం len = (పూర్ణాంకం)it.size;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    కొరకు( size_t i = 0; i < it.nplanes; i++, ++it )
         func(ptrs[0], lut.ptr(), ptrs[1], len, cn, lutcn);
 }

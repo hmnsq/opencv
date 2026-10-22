@@ -1,29 +1,29 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#ifndef OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
-#define OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
+#నిర్వచితం_కాకపోతే OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
+#నిర్వచించు OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#అన్తర్భావ "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+నామాకాశ cv { నామాకాశ parallel {
 
-extern int numThreads;
+బాహ్య పూర్ణాంకం అంకె_దారాలు;
 
 std::shared_ptr<ParallelForAPI>& getCurrentParallelForAPI();
 
-#ifndef BUILD_PLUGIN
+#నిర్వచితం_కాకపోతే BUILD_PLUGIN
 
-#ifdef HAVE_TBB
+#నిర్వచితమైతే HAVE_TBB
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendTBB();
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_OPENMP
+#నిర్వచితమైతే HAVE_OPENMP
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendOpenMP();
-#endif
+#అయితే_ముగింపు
 
-#endif  // BUILD_PLUGIN
+#అయితే_ముగింపు  // BUILD_PLUGIN
 
 }}  // namespace
 
-#endif // OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
+#అయితే_ముగింపు // OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP

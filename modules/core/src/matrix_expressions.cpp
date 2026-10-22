@@ -9,209 +9,209 @@
 //
 // */
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ <opencv2/core/utils/logger.hpp>
 
-namespace cv
+నామాకాశ cv
 {
 
 //This and its overload below are used in various MatExpr operator overloads
 //implemented to check that Matrix operands exist.
-static void checkOperandsExist(const Mat& a)
+స్థిర శూన్య checkOperandsExist(స్థిరరాశి Mat& a)
 {
-    if (a.empty())
+    ఒకవేళ (a.empty())
     {
         CV_Error(cv::Error::StsBadArg, "Matrix operand is an empty matrix.");
     }
 }
 
-static void checkOperandsExist(const Mat& a, const Mat& b)
+స్థిర శూన్య checkOperandsExist(స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
-    if (a.empty() || b.empty())
+    ఒకవేళ (a.empty() || b.empty())
     {
         CV_Error(cv::Error::StsBadArg, "One or more matrix operands are empty.");
     }
 }
 
 
-class MatOp_Identity CV_FINAL : public MatOp
+తరగతి Mat_Op_తటస్థం CV_FINAL : బహిరంగ MatOp
 {
-public:
-    MatOp_Identity() {}
-    virtual ~MatOp_Identity() {}
+బహిరంగ:
+    Mat_Op_తటస్థం() {}
+    మాయా ~Mat_Op_తటస్థం() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    తార్కిక elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి CV_OVERRIDE { తిరిగి నిజం; }
+    శూన్య assign(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m, పూర్ణాంకం type=-1) స్థిరరాశి CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, స్థిరరాశి Mat& m);
 };
 
-static MatOp_Identity g_MatOp_Identity;
+స్థిర Mat_Op_తటస్థం g_Mat_Op_తటస్థం;
 
-class MatOp_AddEx CV_FINAL : public MatOp
+తరగతి Mat_Op_కూడు_Ex CV_FINAL : బహిరంగ MatOp
 {
-public:
-    MatOp_AddEx() {}
-    virtual ~MatOp_AddEx() {}
+బహిరంగ:
+    Mat_Op_కూడు_Ex() {}
+    మాయా ~Mat_Op_కూడు_Ex() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    తార్కిక elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి CV_OVERRIDE { తిరిగి నిజం; }
+    శూన్య assign(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m, పూర్ణాంకం type=-1) స్థిరరాశి CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    శూన్య కూడు(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Scalar& s, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
+    శూన్య వ్యవకలనం(స్థిరరాశి Scalar& s, స్థిరరాశి Mat_సమాసం& సమాసం, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
+    శూన్య multiply(స్థిరరాశి Mat_సమాసం& e1, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
+    శూన్య divide(ద్విగుణ s, స్థిరరాశి Mat_సమాసం& e, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    శూన్య transpose(స్థిరరాశి Mat_సమాసం& e1, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
+    శూన్య నిరపేక్ష(స్థిరరాశి Mat_సమాసం& సమాసం, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b, ద్విగుణ alpha, ద్విగుణ beta, స్థిరరాశి Scalar& s=Scalar());
 };
 
-static MatOp_AddEx g_MatOp_AddEx;
+స్థిర Mat_Op_కూడు_Ex g_Mat_Op_కూడు_Ex;
 
-class MatOp_Bin CV_FINAL : public MatOp
+తరగతి MatOp_Bin CV_FINAL : బహిరంగ MatOp
 {
-public:
+బహిరంగ:
     MatOp_Bin() {}
-    virtual ~MatOp_Bin() {}
+    మాయా ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    తార్కిక elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి CV_OVERRIDE { తిరిగి నిజం; }
+    శూన్య assign(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m, పూర్ణాంకం type=-1) స్థిరరాశి CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    శూన్య multiply(స్థిరరాశి Mat_సమాసం& e1, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
+    శూన్య divide(ద్విగుణ s, స్థిరరాశి Mat_సమాసం& e, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, అక్షరం op, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b, ద్విగుణ scale=1);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, అక్షరం op, స్థిరరాశి Mat& a, స్థిరరాశి Scalar& s);
 };
 
-static MatOp_Bin g_MatOp_Bin;
+స్థిర MatOp_Bin g_MatOp_Bin;
 
-class MatOp_Cmp CV_FINAL : public MatOp
+తరగతి MatOp_Cmp CV_FINAL : బహిరంగ MatOp
 {
-public:
+బహిరంగ:
     MatOp_Cmp() {}
-    virtual ~MatOp_Cmp() {}
+    మాయా ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    తార్కిక elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి CV_OVERRIDE { తిరిగి నిజం; }
+    శూన్య assign(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m, పూర్ణాంకం type=-1) స్థిరరాశి CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం cmpop, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం cmpop, స్థిరరాశి Mat& a, ద్విగుణ alpha);
 };
 
-static MatOp_Cmp g_MatOp_Cmp;
+స్థిర MatOp_Cmp g_MatOp_Cmp;
 
-class MatOp_GEMM CV_FINAL : public MatOp
+తరగతి MatOp_GEMM CV_FINAL : బహిరంగ MatOp
 {
-public:
+బహిరంగ:
     MatOp_GEMM() {}
-    virtual ~MatOp_GEMM() {}
+    మాయా ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    తార్కిక elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి CV_OVERRIDE { తిరిగి అబద్ధం; }
+    శూన్య assign(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m, పూర్ణాంకం type=-1) స్థిరరాశి CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    శూన్య కూడు(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
+    శూన్య వ్యవకలనం(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
+    శూన్య multiply(స్థిరరాశి Mat_సమాసం& e, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    శూన్య transpose(స్థిరరాశి Mat_సమాసం& సమాసం, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    కొలత size(స్థిరరాశి Mat_సమాసం& సమాసం) స్థిరరాశి CV_OVERRIDE
     {
-        return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+        తిరిగి కొలత(
+            (సమాసం.flags & GEMM_2_T) ? సమాసం.b.అడ్డువరుసలు : సమాసం.b.నిలువుల_సంఖ్య,
+            (సమాసం.flags & GEMM_1_T) ? సమాసం.a.నిలువుల_సంఖ్య : సమాసం.a.అడ్డువరుసలు
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                         double alpha=1, const Mat& c=Mat(), double beta=1);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం flags, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b,
+                         ద్విగుణ alpha=1, స్థిరరాశి Mat& c=Mat(), ద్విగుణ beta=1);
 
 };
 
-static MatOp_GEMM g_MatOp_GEMM;
+స్థిర MatOp_GEMM g_MatOp_GEMM;
 
-class MatOp_Invert CV_FINAL : public MatOp
+తరగతి MatOp_Invert CV_FINAL : బహిరంగ MatOp
 {
-public:
+బహిరంగ:
     MatOp_Invert() {}
-    virtual ~MatOp_Invert() {}
+    మాయా ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    తార్కిక elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి CV_OVERRIDE { తిరిగి అబద్ధం; }
+    శూన్య assign(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m, పూర్ణాంకం type=-1) స్థిరరాశి CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    శూన్య matmul(స్థిరరాశి Mat_సమాసం& expr1, స్థిరరాశి Mat_సమాసం& expr2, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం పద్ధతి, స్థిరరాశి Mat& m);
 };
 
-static MatOp_Invert g_MatOp_Invert;
+స్థిర MatOp_Invert g_MatOp_Invert;
 
-class MatOp_T CV_FINAL : public MatOp
+తరగతి MatOp_T CV_FINAL : బహిరంగ MatOp
 {
-public:
+బహిరంగ:
     MatOp_T() {}
-    virtual ~MatOp_T() {}
+    మాయా ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    తార్కిక elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి CV_OVERRIDE { తిరిగి అబద్ధం; }
+    శూన్య assign(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m, పూర్ణాంకం type=-1) స్థిరరాశి CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    శూన్య multiply(స్థిరరాశి Mat_సమాసం& e1, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
+    శూన్య transpose(స్థిరరాశి Mat_సమాసం& సమాసం, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, స్థిరరాశి Mat& a, ద్విగుణ alpha=1);
 };
 
-static MatOp_T g_MatOp_T;
+స్థిర MatOp_T g_MatOp_T;
 
-class MatOp_Solve CV_FINAL : public MatOp
+తరగతి MatOp_Solve CV_FINAL : బహిరంగ MatOp
 {
-public:
+బహిరంగ:
     MatOp_Solve() {}
-    virtual ~MatOp_Solve() {}
+    మాయా ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    తార్కిక elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి CV_OVERRIDE { తిరిగి అబద్ధం; }
+    శూన్య assign(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m, పూర్ణాంకం type=-1) స్థిరరాశి CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం పద్ధతి, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b);
 };
 
-static MatOp_Solve g_MatOp_Solve;
+స్థిర MatOp_Solve g_MatOp_Solve;
 
-class MatOp_Initializer CV_FINAL : public MatOp
+తరగతి MatOp_Initializer CV_FINAL : బహిరంగ MatOp
 {
-public:
+బహిరంగ:
     MatOp_Initializer() {}
-    virtual ~MatOp_Initializer() {}
+    మాయా ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    తార్కిక elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి CV_OVERRIDE { తిరిగి అబద్ధం; }
+    శూన్య assign(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m, పూర్ణాంకం type=-1) స్థిరరాశి CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    శూన్య multiply(స్థిరరాశి Mat_సమాసం& e, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం పద్ధతి, కొలత sz, పూర్ణాంకం type, ద్విగుణ alpha=1);
+    స్థిర శూన్య make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం పద్ధతి, పూర్ణాంకం ndims, స్థిరరాశి పూర్ణాంకం* sizes, పూర్ణాంకం type, ద్విగుణ alpha=1);
 };
 
-static MatOp_Initializer* getGlobalMatOpInitializer()
+స్థిర MatOp_Initializer* getGlobalMatOpInitializer()
 {
-    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
+    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, కొత్త MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+స్థిర అంతఃవరుస తార్కిక is_తటస్థం(స్థిరరాశి Mat_సమాసం& e) { తిరిగి e.op == &g_Mat_Op_తటస్థం; }
+స్థిర అంతఃవరుస తార్కిక is_కూడు_Ex(స్థిరరాశి Mat_సమాసం& e) { తిరిగి e.op == &g_Mat_Op_కూడు_Ex; }
+స్థిర అంతఃవరుస తార్కిక isScaled(స్థిరరాశి Mat_సమాసం& e) { తిరిగి is_కూడు_Ex(e) && (!e.b.దత్తాంశం || e.beta == 0) && e.s == Scalar(); }
+స్థిర అంతఃవరుస తార్కిక isBin(స్థిరరాశి Mat_సమాసం& e, అక్షరం c) { తిరిగి e.op == &g_MatOp_Bin && e.flags == c; }
+స్థిర అంతఃవరుస తార్కిక isCmp(స్థిరరాశి Mat_సమాసం& e) { తిరిగి e.op == &g_MatOp_Cmp; }
+స్థిర అంతఃవరుస తార్కిక isReciprocal(స్థిరరాశి Mat_సమాసం& e) { తిరిగి isBin(e,'/') && (!e.b.దత్తాంశం || e.beta == 0); }
+స్థిర అంతఃవరుస తార్కిక isT(స్థిరరాశి Mat_సమాసం& e) { తిరిగి e.op == &g_MatOp_T; }
+స్థిర అంతఃవరుస తార్కిక isInv(స్థిరరాశి Mat_సమాసం& e) { తిరిగి e.op == &g_MatOp_Invert; }
+స్థిర అంతఃవరుస తార్కిక isSolve(స్థిరరాశి Mat_సమాసం& e) { తిరిగి e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+స్థిర అంతఃవరుస తార్కిక isMatProd(స్థిరరాశి Mat_సమాసం& e) { తిరిగి e.op == &g_MatOp_GEMM && (!e.c.దత్తాంశం || e.beta == 0); }
+స్థిర అంతఃవరుస తార్కిక isInitializer(స్థిరరాశి Mat_సమాసం& e) { తిరిగి e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,1138 +219,1138 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+తార్కిక MatOp::elementWise(స్థిరరాశి Mat_సమాసం& /*సమాసం*/) స్థిరరాశి
 {
-    return false;
+    తిరిగి అబద్ధం;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+శూన్య MatOp::roi(స్థిరరాశి Mat_సమాసం& సమాసం, స్థిరరాశి Range& అడ్డువరుస_Range_2, స్థిరరాశి Range& నిలువు_Range_2, Mat_సమాసం& e) స్థిరరాశి
 {
-    if( elementWise(expr) )
+    ఒకవేళ( elementWise(సమాసం) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_సమాసం(సమాసం.op, సమాసం.flags, Mat(), Mat(), Mat(),
+                    సమాసం.alpha, సమాసం.beta, సమాసం.s);
+        ఒకవేళ(సమాసం.a.దత్తాంశం)
+            e.a = సమాసం.a(అడ్డువరుస_Range_2, నిలువు_Range_2);
+        ఒకవేళ(సమాసం.b.దత్తాంశం)
+            e.b = సమాసం.b(అడ్డువరుస_Range_2, నిలువు_Range_2);
+        ఒకవేళ(సమాసం.c.దత్తాంశం)
+            e.c = సమాసం.c(అడ్డువరుస_Range_2, నిలువు_Range_2);
     }
-    else
-    {
-        Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
-    }
-}
-
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
-{
-    if( elementWise(expr) )
-    {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
-    }
-    else
+    లేకపోతే
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        సమాసం.op->assign(సమాసం, m);
+        e = Mat_సమాసం(&g_Mat_Op_తటస్థం, 0, m(అడ్డువరుస_Range_2, నిలువు_Range_2), Mat(), Mat());
+    }
+}
+
+శూన్య MatOp::diag(స్థిరరాశి Mat_సమాసం& సమాసం, పూర్ణాంకం d, Mat_సమాసం& e) స్థిరరాశి
+{
+    ఒకవేళ( elementWise(సమాసం) )
+    {
+        e = Mat_సమాసం(సమాసం.op, సమాసం.flags, Mat(), Mat(), Mat(),
+                    సమాసం.alpha, సమాసం.beta, సమాసం.s);
+        ఒకవేళ(సమాసం.a.దత్తాంశం)
+            e.a = సమాసం.a.diag(d);
+        ఒకవేళ(సమాసం.b.దత్తాంశం)
+            e.b = సమాసం.b.diag(d);
+        ఒకవేళ(సమాసం.c.దత్తాంశం)
+            e.c = సమాసం.c.diag(d);
+    }
+    లేకపోతే
+    {
+        Mat m;
+        సమాసం.op->assign(సమాసం, m);
+        e = Mat_సమాసం(&g_Mat_Op_తటస్థం, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+శూన్య MatOp::aug_కేటాయించు_కూడు(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m) స్థిరరాశి
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m += temp;
+    Mat తాత్కాలిక_2;
+    సమాసం.op->assign(సమాసం, తాత్కాలిక_2);
+    m += తాత్కాలిక_2;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+శూన్య MatOp::aug_కేటాయించు_వ్యవకలనం(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m) స్థిరరాశి
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m -= temp;
+    Mat తాత్కాలిక_2;
+    సమాసం.op->assign(సమాసం, తాత్కాలిక_2);
+    m -= తాత్కాలిక_2;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+శూన్య MatOp::aug_కేటాయించు_Multiply(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m) స్థిరరాశి
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m *= temp;
+    Mat తాత్కాలిక_2;
+    సమాసం.op->assign(సమాసం, తాత్కాలిక_2);
+    m *= తాత్కాలిక_2;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+శూన్య MatOp::aug_కేటాయించు_Divide(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m) స్థిరరాశి
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m /= temp;
+    Mat తాత్కాలిక_2;
+    సమాసం.op->assign(సమాసం, తాత్కాలిక_2);
+    m /= తాత్కాలిక_2;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+శూన్య MatOp::aug_కేటాయించు_And(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m) స్థిరరాశి
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m &= temp;
+    Mat తాత్కాలిక_2;
+    సమాసం.op->assign(సమాసం, తాత్కాలిక_2);
+    m &= తాత్కాలిక_2;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+శూన్య MatOp::aug_కేటాయించు_Or(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m) స్థిరరాశి
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m |= temp;
+    Mat తాత్కాలిక_2;
+    సమాసం.op->assign(సమాసం, తాత్కాలిక_2);
+    m |= తాత్కాలిక_2;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+శూన్య MatOp::aug_కేటాయించు_Xor(స్థిరరాశి Mat_సమాసం& సమాసం, Mat& m) స్థిరరాశి
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m ^= temp;
+    Mat తాత్కాలిక_2;
+    సమాసం.op->assign(సమాసం, తాత్కాలిక_2);
+    m ^= తాత్కాలిక_2;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+శూన్య MatOp::కూడు(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ఒకవేళ( ఇది == e2.op )
     {
-        double alpha = 1, beta = 1;
+        ద్విగుణ alpha = 1, beta = 1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        ఒకవేళ( is_కూడు_Ex(e1) && (!e1.b.దత్తాంశం || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        లేకపోతే
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        ఒకవేళ( is_కూడు_Ex(e2) && (!e2.b.దత్తాంశం || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = e2.alpha;
             s += e2.s;
         }
-        else
+        లేకపోతే
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        Mat_Op_కూడు_Ex::make_సమాసం(res, m1, m2, alpha, beta, s);
     }
-    else
-        e2.op->add(e1, e2, res);
+    లేకపోతే
+        e2.op->కూడు(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+శూన్య MatOp::కూడు(స్థిరరాశి Mat_సమాసం& expr1, స్థిరరాశి Scalar& s, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    Mat_Op_కూడు_Ex::make_సమాసం(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+శూన్య MatOp::వ్యవకలనం(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ఒకవేళ( ఇది == e2.op )
     {
-        double alpha = 1, beta = -1;
+        ద్విగుణ alpha = 1, beta = -1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        ఒకవేళ( is_కూడు_Ex(e1) && (!e1.b.దత్తాంశం || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        లేకపోతే
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        ఒకవేళ( is_కూడు_Ex(e2) && (!e2.b.దత్తాంశం || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = -e2.alpha;
             s -= e2.s;
         }
-        else
+        లేకపోతే
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        Mat_Op_కూడు_Ex::make_సమాసం(res, m1, m2, alpha, beta, s);
     }
-    else
-        e2.op->subtract(e1, e2, res);
+    లేకపోతే
+        e2.op->వ్యవకలనం(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+శూన్య MatOp::వ్యవకలనం(స్థిరరాశి Scalar& s, స్థిరరాశి Mat_సమాసం& సమాసం, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    సమాసం.op->assign(సమాసం, m);
+    Mat_Op_కూడు_Ex::make_సమాసం(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+శూన్య MatOp::multiply(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res, ద్విగుణ scale) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ఒకవేళ( ఇది == e2.op )
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        ఒకవేళ( isReciprocal(e1) )
         {
-            if( isScaled(e2) )
+            ఒకవేళ( isScaled(e2) )
             {
                 scale *= e2.alpha;
                 m2 = e2.a;
             }
-            else
+            లేకపోతే
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_సమాసం(res, '/', m2, e1.a, scale/e1.alpha);
         }
-        else
+        లేకపోతే
         {
-            char op = '*';
-            if( isScaled(e1) )
+            అక్షరం op = '*';
+            ఒకవేళ( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            లేకపోతే
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            ఒకవేళ( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            లేకపోతే ఒకవేళ( isReciprocal(e2) )
             {
                 op = '/';
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else
+            లేకపోతే
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_సమాసం(res, op, m1, m2, scale);
         }
     }
-    else
+    లేకపోతే
         e2.op->multiply(e1, e2, res, scale);
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+శూన్య MatOp::multiply(స్థిరరాశి Mat_సమాసం& సమాసం, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    సమాసం.op->assign(సమాసం, m);
+    Mat_Op_కూడు_Ex::make_సమాసం(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+శూన్య MatOp::divide(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res, ద్విగుణ scale) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ఒకవేళ( ఇది == e2.op )
     {
-        if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
-        else
+        ఒకవేళ( isReciprocal(e1) && isReciprocal(e2) )
+            MatOp_Bin::make_సమాసం(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+        లేకపోతే
         {
             Mat m1, m2;
-            char op = '/';
+            అక్షరం op = '/';
 
-            if( isScaled(e1) )
+            ఒకవేళ( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            లేకపోతే
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            ఒకవేళ( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            లేకపోతే ఒకవేళ( isReciprocal(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
                 op = '*';
             }
-            else
+            లేకపోతే
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_సమాసం(res, op, m1, m2, scale);
         }
     }
-    else
+    లేకపోతే
         e2.op->divide(e1, e2, res, scale);
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+శూన్య MatOp::divide(ద్విగుణ s, స్థిరరాశి Mat_సమాసం& సమాసం, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    సమాసం.op->assign(సమాసం, m);
+    MatOp_Bin::make_సమాసం(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+శూన్య MatOp::నిరపేక్ష(స్థిరరాశి Mat_సమాసం& సమాసం, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    సమాసం.op->assign(సమాసం, m);
+    MatOp_Bin::make_సమాసం(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+శూన్య MatOp::transpose(స్థిరరాశి Mat_సమాసం& సమాసం, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    సమాసం.op->assign(సమాసం, m);
+    MatOp_T::make_సమాసం(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+శూన్య MatOp::matmul(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res) స్థిరరాశి
 {
-    if( this == e2.op )
+    ఒకవేళ( ఇది == e2.op )
     {
-        double scale = 1;
-        int flags = 0;
+        ద్విగుణ scale = 1;
+        పూర్ణాంకం flags = 0;
         Mat m1, m2;
 
-        if( isT(e1) )
+        ఒకవేళ( isT(e1) )
         {
             flags = cv::GEMM_1_T;
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else if( isScaled(e1) )
+        లేకపోతే ఒకవేళ( isScaled(e1) )
         {
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else
+        లేకపోతే
             e1.op->assign(e1, m1);
 
-        if( isT(e2) )
+        ఒకవేళ( isT(e2) )
         {
             flags |= cv::GEMM_2_T;
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else if( isScaled(e2) )
+        లేకపోతే ఒకవేళ( isScaled(e2) )
         {
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else
+        లేకపోతే
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_సమాసం(res, flags, m1, m2, scale);
     }
-    else
+    లేకపోతే
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+శూన్య MatOp::invert(స్థిరరాశి Mat_సమాసం& సమాసం, పూర్ణాంకం పద్ధతి, Mat_సమాసం& res) స్థిరరాశి
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    సమాసం.op->assign(సమాసం, m);
+    MatOp_Invert::make_సమాసం(res, పద్ధతి, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+కొలత MatOp::size(స్థిరరాశి Mat_సమాసం& సమాసం) స్థిరరాశి
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    తిరిగి !సమాసం.a.empty() ? సమాసం.a.size() : సమాసం.b.empty() ? సమాసం.b.size() : సమాసం.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+పూర్ణాంకం MatOp::type(స్థిరరాశి Mat_సమాసం& సమాసం) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    తిరిగి !సమాసం.a.empty() ? సమాసం.a.type() : సమాసం.b.empty() ? సమాసం.b.type() : సమాసం.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_సమాసం::Mat_సమాసం(స్థిరరాశి Mat& m) : op(&g_Mat_Op_తటస్థం), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_సమాసం Mat_సమాసం::అడ్డువరుస(పూర్ణాంకం y) స్థిరరాశి
 {
-    MatExpr e;
-    op->roi(*this, Range(y, y+1), Range::all(), e);
-    return e;
+    Mat_సమాసం e;
+    op->roi(*ఇది, Range(y, y+1), Range::all(), e);
+    తిరిగి e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_సమాసం Mat_సమాసం::నిలువు(పూర్ణాంకం x) స్థిరరాశి
 {
-    MatExpr e;
-    op->roi(*this, Range::all(), Range(x, x+1), e);
-    return e;
+    Mat_సమాసం e;
+    op->roi(*ఇది, Range::all(), Range(x, x+1), e);
+    తిరిగి e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_సమాసం Mat_సమాసం::diag(పూర్ణాంకం d) స్థిరరాశి
 {
-    MatExpr e;
-    op->diag(*this, d, e);
-    return e;
+    Mat_సమాసం e;
+    op->diag(*ఇది, d, e);
+    తిరిగి e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_సమాసం Mat_సమాసం::క్రియాకారకం()( స్థిరరాశి Range& అడ్డువరుస_Range_2, స్థిరరాశి Range& నిలువు_Range_2 ) స్థిరరాశి
 {
-    MatExpr e;
-    op->roi(*this, rowRange, colRange, e);
-    return e;
+    Mat_సమాసం e;
+    op->roi(*ఇది, అడ్డువరుస_Range_2, నిలువు_Range_2, e);
+    తిరిగి e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_సమాసం Mat_సమాసం::క్రియాకారకం()( స్థిరరాశి Rect& roi ) స్థిరరాశి
 {
-    MatExpr e;
-    op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
-    return e;
+    Mat_సమాసం e;
+    op->roi(*ఇది, Range(roi.y, roi.y + roi.ఎత్తు), Range(roi.x, roi.x + roi.వెడల్పు), e);
+    తిరిగి e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_సమాసం::cross(స్థిరరాశి Mat& m) స్థిరరాశి
 {
-    return ((Mat)*this).cross(m);
+    తిరిగి ((Mat)*ఇది).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+ద్విగుణ Mat_సమాసం::dot(స్థిరరాశి Mat& m) స్థిరరాశి
 {
-    return ((Mat)*this).dot(m);
+    తిరిగి ((Mat)*ఇది).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_సమాసం Mat_సమాసం::t() స్థిరరాశి
 {
-    MatExpr e;
-    op->transpose(*this, e);
-    return e;
+    Mat_సమాసం e;
+    op->transpose(*ఇది, e);
+    తిరిగి e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_సమాసం Mat_సమాసం::inv(పూర్ణాంకం పద్ధతి) స్థిరరాశి
 {
-    MatExpr e;
-    op->invert(*this, method, e);
-    return e;
+    Mat_సమాసం e;
+    op->invert(*ఇది, పద్ధతి, e);
+    తిరిగి e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_సమాసం Mat_సమాసం::mul(స్థిరరాశి Mat_సమాసం& e, ద్విగుణ scale) స్థిరరాశి
 {
-    MatExpr en;
-    op->multiply(*this, e, en, scale);
-    return en;
+    Mat_సమాసం en;
+    op->multiply(*ఇది, e, en, scale);
+    తిరిగి en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_సమాసం Mat_సమాసం::mul(స్థిరరాశి Mat& m, ద్విగుణ scale) స్థిరరాశి
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
-    return e;
+    Mat_సమాసం e;
+    op->multiply(*ఇది, Mat_సమాసం(m), e, scale);
+    తిరిగి e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం + (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, a, b, 1, 1);
+    తిరిగి e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_సమాసం క్రియాకారకం + (స్థిరరాశి Mat& a, స్థిరరాశి Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, a, Mat(), 1, 0, s);
+    తిరిగి e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_సమాసం క్రియాకారకం + (స్థిరరాశి Scalar& s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, a, Mat(), 1, 0, s);
+    తిరిగి e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_సమాసం క్రియాకారకం + (స్థిరరాశి Mat_సమాసం& e, స్థిరరాశి Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_సమాసం en;
+    e.op->కూడు(e, Mat_సమాసం(m), en);
+    తిరిగి en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_సమాసం క్రియాకారకం + (స్థిరరాశి Mat& m, స్థిరరాశి Mat_సమాసం& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_సమాసం en;
+    e.op->కూడు(e, Mat_సమాసం(m), en);
+    తిరిగి en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_సమాసం క్రియాకారకం + (స్థిరరాశి Mat_సమాసం& e, స్థిరరాశి Scalar& s)
 {
-    MatExpr en;
-    e.op->add(e, s, en);
-    return en;
+    Mat_సమాసం en;
+    e.op->కూడు(e, s, en);
+    తిరిగి en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_సమాసం క్రియాకారకం + (స్థిరరాశి Scalar& s, స్థిరరాశి Mat_సమాసం& e)
 {
-    MatExpr en;
-    e.op->add(e, s, en);
-    return en;
+    Mat_సమాసం en;
+    e.op->కూడు(e, s, en);
+    తిరిగి en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_సమాసం క్రియాకారకం + (స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2)
 {
-    MatExpr en;
-    e1.op->add(e1, e2, en);
-    return en;
+    Mat_సమాసం en;
+    e1.op->కూడు(e1, e2, en);
+    తిరిగి en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, a, b, 1, -1);
+    తిరిగి e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Mat& a, స్థిరరాశి Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, a, Mat(), 1, 0, -s);
+    తిరిగి e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Scalar& s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, a, Mat(), -1, 0, s);
+    తిరిగి e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Mat_సమాసం& e, స్థిరరాశి Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
-    return en;
+    Mat_సమాసం en;
+    e.op->వ్యవకలనం(e, Mat_సమాసం(m), en);
+    తిరిగి en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Mat& m, స్థిరరాశి Mat_సమాసం& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
-    return en;
+    Mat_సమాసం en;
+    e.op->వ్యవకలనం(Mat_సమాసం(m), e, en);
+    తిరిగి en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Mat_సమాసం& e, స్థిరరాశి Scalar& s)
 {
-    MatExpr en;
-    e.op->add(e, -s, en);
-    return en;
+    Mat_సమాసం en;
+    e.op->కూడు(e, -s, en);
+    తిరిగి en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Scalar& s, స్థిరరాశి Mat_సమాసం& e)
 {
-    MatExpr en;
-    e.op->subtract(s, e, en);
-    return en;
+    Mat_సమాసం en;
+    e.op->వ్యవకలనం(s, e, en);
+    తిరిగి en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2)
 {
-    MatExpr en;
-    e1.op->subtract(e1, e2, en);
-    return en;
+    Mat_సమాసం en;
+    e1.op->వ్యవకలనం(e1, e2, en);
+    తిరిగి en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, m, Mat(), -1, 0);
+    తిరిగి e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_సమాసం క్రియాకారకం - (స్థిరరాశి Mat_సమాసం& e)
 {
-    MatExpr en;
-    e.op->subtract(Scalar(0), e, en);
-    return en;
+    Mat_సమాసం en;
+    e.op->వ్యవకలనం(Scalar(0), e, en);
+    తిరిగి en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం * (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_GEMM::make_సమాసం(e, 0, a, b);
+    తిరిగి e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_సమాసం క్రియాకారకం * (స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, a, Mat(), s, 0);
+    తిరిగి e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_సమాసం క్రియాకారకం * (ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, a, Mat(), s, 0);
+    తిరిగి e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_సమాసం క్రియాకారకం * (స్థిరరాశి Mat_సమాసం& e, స్థిరరాశి Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
-    return en;
+    Mat_సమాసం en;
+    e.op->matmul(e, Mat_సమాసం(m), en);
+    తిరిగి en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_సమాసం క్రియాకారకం * (స్థిరరాశి Mat& m, స్థిరరాశి Mat_సమాసం& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
-    return en;
+    Mat_సమాసం en;
+    e.op->matmul(Mat_సమాసం(m), e, en);
+    తిరిగి en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_సమాసం క్రియాకారకం * (స్థిరరాశి Mat_సమాసం& e, ద్విగుణ s)
 {
-    MatExpr en;
+    Mat_సమాసం en;
     e.op->multiply(e, s, en);
-    return en;
+    తిరిగి en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_సమాసం క్రియాకారకం * (ద్విగుణ s, స్థిరరాశి Mat_సమాసం& e)
 {
-    MatExpr en;
+    Mat_సమాసం en;
     e.op->multiply(e, s, en);
-    return en;
+    తిరిగి en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_సమాసం క్రియాకారకం * (స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2)
 {
-    MatExpr en;
+    Mat_సమాసం en;
     e1.op->matmul(e1, e2, en);
-    return en;
+    తిరిగి en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం / (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '/', a, b);
+    తిరిగి e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_సమాసం క్రియాకారకం / (స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
-    return e;
+    Mat_సమాసం e;
+    Mat_Op_కూడు_Ex::make_సమాసం(e, a, Mat(), 1./s, 0);
+    తిరిగి e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_సమాసం క్రియాకారకం / (ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '/', a, Mat(), s);
+    తిరిగి e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_సమాసం క్రియాకారకం / (స్థిరరాశి Mat_సమాసం& e, స్థిరరాశి Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
-    return en;
+    Mat_సమాసం en;
+    e.op->divide(e, Mat_సమాసం(m), en);
+    తిరిగి en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_సమాసం క్రియాకారకం / (స్థిరరాశి Mat& m, స్థిరరాశి Mat_సమాసం& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
-    return en;
+    Mat_సమాసం en;
+    e.op->divide(Mat_సమాసం(m), e, en);
+    తిరిగి en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_సమాసం క్రియాకారకం / (స్థిరరాశి Mat_సమాసం& e, ద్విగుణ s)
 {
-    MatExpr en;
+    Mat_సమాసం en;
     e.op->multiply(e, 1./s, en);
-    return en;
+    తిరిగి en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_సమాసం క్రియాకారకం / (ద్విగుణ s, స్థిరరాశి Mat_సమాసం& e)
 {
-    MatExpr en;
+    Mat_సమాసం en;
     e.op->divide(s, e, en);
-    return en;
+    తిరిగి en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_సమాసం క్రియాకారకం / (స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2)
 {
-    MatExpr en;
+    Mat_సమాసం en;
     e1.op->divide(e1, e2, en);
-    return en;
+    తిరిగి en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం < (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_LT, a, b);
+    తిరిగి e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_సమాసం క్రియాకారకం < (స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_LT, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_సమాసం క్రియాకారకం < (ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_GT, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం <= (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_LE, a, b);
+    తిరిగి e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_సమాసం క్రియాకారకం <= (స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_LE, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_సమాసం క్రియాకారకం <= (ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_GE, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం == (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_EQ, a, b);
+    తిరిగి e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_సమాసం క్రియాకారకం == (స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_EQ, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_సమాసం క్రియాకారకం == (ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_EQ, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం != (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_NE, a, b);
+    తిరిగి e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_సమాసం క్రియాకారకం != (స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_NE, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_సమాసం క్రియాకారకం != (ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_NE, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం >= (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_GE, a, b);
+    తిరిగి e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_సమాసం క్రియాకారకం >= (స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_GE, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_సమాసం క్రియాకారకం >= (ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_LE, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం > (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_GT, a, b);
+    తిరిగి e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_సమాసం క్రియాకారకం > (స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_GT, a, s);
+    తిరిగి e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_సమాసం క్రియాకారకం > (ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Cmp::make_సమాసం(e, cv::CMP_LT, a, s);
+    తిరిగి e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_సమాసం min(స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, 'm', a, b);
+    తిరిగి e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_సమాసం min(స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, 'n', a, s);
+    తిరిగి e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_సమాసం min(ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, 'n', a, s);
+    తిరిగి e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_సమాసం max(స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, 'M', a, b);
+    తిరిగి e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_సమాసం max(స్థిరరాశి Mat& a, ద్విగుణ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, 'N', a, s);
+    తిరిగి e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_సమాసం max(ద్విగుణ s, స్థిరరాశి Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, 'N', a, s);
+    తిరిగి e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం & (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '&', a, b);
+    తిరిగి e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_సమాసం క్రియాకారకం & (స్థిరరాశి Mat& a, స్థిరరాశి Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '&', a, s);
+    తిరిగి e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_సమాసం క్రియాకారకం & (స్థిరరాశి Scalar& s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '&', a, s);
+    తిరిగి e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం | (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '|', a, b);
+    తిరిగి e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_సమాసం క్రియాకారకం | (స్థిరరాశి Mat& a, స్థిరరాశి Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '|', a, s);
+    తిరిగి e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_సమాసం క్రియాకారకం | (స్థిరరాశి Scalar& s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '|', a, s);
+    తిరిగి e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_సమాసం క్రియాకారకం ^ (స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '^', a, b);
+    తిరిగి e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_సమాసం క్రియాకారకం ^ (స్థిరరాశి Mat& a, స్థిరరాశి Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '^', a, s);
+    తిరిగి e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_సమాసం క్రియాకారకం ^ (స్థిరరాశి Scalar& s, స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '^', a, s);
+    తిరిగి e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_సమాసం క్రియాకారకం ~(స్థిరరాశి Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '~', a, Scalar());
+    తిరిగి e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_సమాసం నిరపేక్ష(స్థిరరాశి Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, 'a', a, Scalar());
+    తిరిగి e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_సమాసం నిరపేక్ష(స్థిరరాశి Mat_సమాసం& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
-    e.op->abs(e, en);
-    return en;
+    Mat_సమాసం en;
+    e.op->నిరపేక్ష(e, en);
+    తిరిగి en;
 }
 
 
-Size MatExpr::size() const
+కొలత Mat_సమాసం::size() స్థిరరాశి
 {
-    if( isT(*this) || isInv(*this) )
-        return Size(a.rows, a.cols);
-    if( isSolve(*this) )
-        return Size(b.cols, a.cols);
-    if( isInitializer(*this) )
-        return a.size();
-    return op ? op->size(*this) : Size();
+    ఒకవేళ( isT(*ఇది) || isInv(*ఇది) )
+        తిరిగి కొలత(a.అడ్డువరుసలు, a.నిలువుల_సంఖ్య);
+    ఒకవేళ( isSolve(*ఇది) )
+        తిరిగి కొలత(b.నిలువుల_సంఖ్య, a.నిలువుల_సంఖ్య);
+    ఒకవేళ( isInitializer(*ఇది) )
+        తిరిగి a.size();
+    తిరిగి op ? op->size(*ఇది) : కొలత();
 }
 
 
-int MatExpr::type() const
+పూర్ణాంకం Mat_సమాసం::type() స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( isInitializer(*this) )
-        return a.type();
-    if( isCmp(*this) )
-        return CV_MAKETYPE(CV_8U, a.channels());
-    return op ? op->type(*this) : -1;
+    ఒకవేళ( isInitializer(*ఇది) )
+        తిరిగి a.type();
+    ఒకవేళ( isCmp(*ఇది) )
+        తిరిగి CV_MAKETYPE(CV_8U, a.channels());
+    తిరిగి op ? op->type(*ఇది) : -1;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+శూన్య Mat_Op_తటస్థం::assign(స్థిరరాశి Mat_సమాసం& e, Mat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    if( _type == -1 || _type == e.a.type() )
+    ఒకవేళ( _type == -1 || _type == e.a.type() )
         m = e.a;
-    else
+    లేకపోతే
     {
         CV_Assert( CV_MAT_CN(_type) == e.a.channels() );
-        e.a.convertTo(m, _type);
+        e.a.convert_గమ్యం(m, _type);
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+అంతఃవరుస శూన్య Mat_Op_తటస్థం::make_సమాసం(Mat_సమాసం& res, స్థిరరాశి Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_సమాసం(&g_Mat_Op_తటస్థం, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+శూన్య Mat_Op_కూడు_Ex::assign(స్థిరరాశి Mat_సమాసం& e, Mat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
-    if( e.b.data )
+    Mat తాత్కాలిక_2, &dst = _type == -1 || e.a.type() == _type ? m : తాత్కాలిక_2;
+    ఒకవేళ( e.b.దత్తాంశం )
     {
-        if( e.s == Scalar() || !e.s.isReal() )
+        ఒకవేళ( e.s == Scalar() || !e.s.isReal() )
         {
-            if( e.alpha == 1 )
+            ఒకవేళ( e.alpha == 1 )
             {
-                if( e.beta == 1 )
-                    cv::add(e.a, e.b, dst);
-                else if( e.beta == -1 )
-                    cv::subtract(e.a, e.b, dst);
-                else
-                    cv::scaleAdd(e.b, e.beta, e.a, dst);
+                ఒకవేళ( e.beta == 1 )
+                    cv::కూడు(e.a, e.b, dst);
+                లేకపోతే ఒకవేళ( e.beta == -1 )
+                    cv::వ్యవకలనం(e.a, e.b, dst);
+                లేకపోతే
+                    cv::scale_కూడు(e.b, e.beta, e.a, dst);
             }
-            else if( e.beta == 1 )
+            లేకపోతే ఒకవేళ( e.beta == 1 )
             {
-                if( e.alpha == -1 )
-                    cv::subtract(e.b, e.a, dst);
-                else
-                    cv::scaleAdd(e.a, e.alpha, e.b, dst);
+                ఒకవేళ( e.alpha == -1 )
+                    cv::వ్యవకలనం(e.b, e.a, dst);
+                లేకపోతే
+                    cv::scale_కూడు(e.a, e.alpha, e.b, dst);
             }
-            else
-                cv::addWeighted(e.a, e.alpha, e.b, e.beta, 0, dst);
+            లేకపోతే
+                cv::కూడు_Weighted(e.a, e.alpha, e.b, e.beta, 0, dst);
 
-            if( !e.s.isReal() )
-                cv::add(dst, e.s, dst);
+            ఒకవేళ( !e.s.isReal() )
+                cv::కూడు(dst, e.s, dst);
         }
-        else
+        లేకపోతే
         {
-            if (e.a.channels() > 1)
-                CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+            ఒకవేళ (e.a.channels() > 1)
+                CV_LOG_ONCE_WARNING(ఖాళీ, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                           "https://github.com/opencv/opencv/issues/16739");
-            cv::addWeighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
+            cv::కూడు_Weighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
         }
     }
-    else if( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
+    లేకపోతే ఒకవేళ( e.s.isReal() && (dst.దత్తాంశం != m.దత్తాంశం || fabs(e.alpha) != 1))
     {
-        if (e.a.channels() > 1 && e.s[0] != 0.0)
-            CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+        ఒకవేళ (e.a.channels() > 1 && e.s[0] != 0.0)
+            CV_LOG_ONCE_WARNING(ఖాళీ, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                       "https://github.com/opencv/opencv/issues/16739");
-        e.a.convertTo(m, _type, e.alpha, e.s[0]);
-        return;
+        e.a.convert_గమ్యం(m, _type, e.alpha, e.s[0]);
+        తిరిగి;
     }
-    else if( e.alpha == 1 )
-        cv::add(e.a, e.s, dst);
-    else if( e.alpha == -1 )
-        cv::subtract(e.s, e.a, dst);
-    else
+    లేకపోతే ఒకవేళ( e.alpha == 1 )
+        cv::కూడు(e.a, e.s, dst);
+    లేకపోతే ఒకవేళ( e.alpha == -1 )
+        cv::వ్యవకలనం(e.s, e.a, dst);
+    లేకపోతే
     {
-        e.a.convertTo(dst, e.a.type(), e.alpha);
-        cv::add(dst, e.s, dst);
+        e.a.convert_గమ్యం(dst, e.a.type(), e.alpha);
+        cv::కూడు(dst, e.s, dst);
     }
 
-    if( dst.data != m.data )
-        dst.convertTo(m, m.type());
+    ఒకవేళ( dst.దత్తాంశం != m.దత్తాంశం )
+        dst.convert_గమ్యం(m, m.type());
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+శూన్య Mat_Op_కూడు_Ex::కూడు(స్థిరరాశి Mat_సమాసం& e, స్థిరరాశి Scalar& s, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+శూన్య Mat_Op_కూడు_Ex::వ్యవకలనం(స్థిరరాశి Scalar& s, స్థిరరాశి Mat_సమాసం& e, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+శూన్య Mat_Op_కూడు_Ex::multiply(స్థిరరాశి Mat_సమాసం& e, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,160 +1379,160 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+శూన్య Mat_Op_కూడు_Ex::divide(ద్విగుణ s, స్థిరరాశి Mat_సమాసం& e, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
-    else
+    ఒకవేళ( isScaled(e) )
+        MatOp_Bin::make_సమాసం(res, '/', e.a, Mat(), s/e.alpha);
+    లేకపోతే
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+శూన్య Mat_Op_కూడు_Ex::transpose(స్థిరరాశి Mat_సమాసం& e, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
-    else
+    ఒకవేళ( isScaled(e) )
+        MatOp_T::make_సమాసం(res, e.a, e.alpha);
+    లేకపోతే
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+శూన్య Mat_Op_కూడు_Ex::నిరపేక్ష(స్థిరరాశి Mat_సమాసం& e, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
-    else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
-    else
-        MatOp::abs(e, res);
+    ఒకవేళ( (!e.b.దత్తాంశం || e.beta == 0) && fabs(e.alpha) == 1 )
+        MatOp_Bin::make_సమాసం(res, 'a', e.a, -e.s*e.alpha);
+    లేకపోతే ఒకవేళ( e.b.దత్తాంశం && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
+        MatOp_Bin::make_సమాసం(res, 'a', e.a, e.b);
+    లేకపోతే
+        MatOp::నిరపేక్ష(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+అంతఃవరుస శూన్య Mat_Op_కూడు_Ex::make_సమాసం(Mat_సమాసం& res, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b, ద్విగుణ alpha, ద్విగుణ beta, స్థిరరాశి Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_సమాసం(&g_Mat_Op_కూడు_Ex, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+శూన్య MatOp_Bin::assign(స్థిరరాశి Mat_సమాసం& e, Mat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
+    Mat తాత్కాలిక_2, &dst = _type == -1 || e.a.type() == _type ? m : తాత్కాలిక_2;
 
-    if( e.flags == '*' )
+    ఒకవేళ( e.flags == '*' )
         cv::multiply(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == '/' && e.b.దత్తాంశం )
         cv::divide(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && !e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == '/' && !e.b.దత్తాంశం )
         cv::divide(e.alpha, e.a, dst );
-    else if( e.flags == '&' && e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == '&' && e.b.దత్తాంశం )
         bitwise_and(e.a, e.b, dst);
-    else if( e.flags == '&' && !e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == '&' && !e.b.దత్తాంశం )
         bitwise_and(e.a, e.s, dst);
-    else if( e.flags == '|' && e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == '|' && e.b.దత్తాంశం )
         bitwise_or(e.a, e.b, dst);
-    else if( e.flags == '|' && !e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == '|' && !e.b.దత్తాంశం )
         bitwise_or(e.a, e.s, dst);
-    else if( e.flags == '^' && e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == '^' && e.b.దత్తాంశం )
         bitwise_xor(e.a, e.b, dst);
-    else if( e.flags == '^' && !e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == '^' && !e.b.దత్తాంశం )
         bitwise_xor(e.a, e.s, dst);
-    else if( e.flags == '~' && !e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == '~' && !e.b.దత్తాంశం )
         bitwise_not(e.a, dst);
-    else if( e.flags == 'm' )
+    లేకపోతే ఒకవేళ( e.flags == 'm' )
         cv::min(e.a, e.b, dst);
-    else if( e.flags == 'n' )
+    లేకపోతే ఒకవేళ( e.flags == 'n' )
         cv::min(e.a, e.s[0], dst);
-    else if( e.flags == 'M' )
+    లేకపోతే ఒకవేళ( e.flags == 'M' )
         cv::max(e.a, e.b, dst);
-    else if( e.flags == 'N' )
+    లేకపోతే ఒకవేళ( e.flags == 'N' )
         cv::max(e.a, e.s[0], dst);
-    else if( e.flags == 'a' && e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == 'a' && e.b.దత్తాంశం )
         cv::absdiff(e.a, e.b, dst);
-    else if( e.flags == 'a' && !e.b.data )
+    లేకపోతే ఒకవేళ( e.flags == 'a' && !e.b.దత్తాంశం )
         cv::absdiff(e.a, e.s, dst);
-    else
+    లేకపోతే
         CV_Error(cv::Error::StsError, "Unknown operation");
 
-    if( dst.data != m.data )
-        dst.convertTo(m, _type);
+    ఒకవేళ( dst.దత్తాంశం != m.దత్తాంశం )
+        dst.convert_గమ్యం(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+శూన్య MatOp_Bin::multiply(స్థిరరాశి Mat_సమాసం& e, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '*' || e.flags == '/' )
+    ఒకవేళ( e.flags == '*' || e.flags == '/' )
     {
         res = e;
         res.alpha *= s;
     }
-    else
+    లేకపోతే
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+శూన్య MatOp_Bin::divide(ద్విగుణ s, స్థిరరాశి Mat_సమాసం& e, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
-    else
+    ఒకవేళ( e.flags == '/' && (!e.b.దత్తాంశం || e.beta == 0) )
+        Mat_Op_కూడు_Ex::make_సమాసం(res, e.a, Mat(), s/e.alpha, 0);
+    లేకపోతే
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+అంతఃవరుస శూన్య MatOp_Bin::make_సమాసం(Mat_సమాసం& res, అక్షరం op, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b, ద్విగుణ scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_సమాసం(&g_MatOp_Bin, op, a, b, Mat(), scale, b.దత్తాంశం ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+అంతఃవరుస శూన్య MatOp_Bin::make_సమాసం(Mat_సమాసం& res, అక్షరం op, స్థిరరాశి Mat& a, స్థిరరాశి Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_సమాసం(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+శూన్య MatOp_Cmp::assign(స్థిరరాశి Mat_సమాసం& e, Mat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
+    Mat తాత్కాలిక_2, &dst = _type == -1 || _type == CV_8U ? m : తాత్కాలిక_2;
 
-    if( e.b.data )
+    ఒకవేళ( e.b.దత్తాంశం )
         cv::compare(e.a, e.b, dst, e.flags);
-    else
+    లేకపోతే
         cv::compare(e.a, e.alpha, dst, e.flags);
 
-    if( dst.data != m.data )
-        dst.convertTo(m, _type);
+    ఒకవేళ( dst.దత్తాంశం != m.దత్తాంశం )
+        dst.convert_గమ్యం(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+అంతఃవరుస శూన్య MatOp_Cmp::make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం cmpop, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_సమాసం(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+అంతఃవరుస శూన్య MatOp_Cmp::make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం cmpop, స్థిరరాశి Mat& a, ద్విగుణ alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_సమాసం(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+శూన్య MatOp_T::assign(స్థిరరాశి Mat_సమాసం& e, Mat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
+    Mat తాత్కాలిక_2, &dst = _type == -1 || _type == e.a.type() ? m : తాత్కాలిక_2;
 
     cv::transpose(e.a, dst);
 
-    if( dst.data != m.data || e.alpha != 1 )
-        dst.convertTo(m, _type, e.alpha);
+    ఒకవేళ( dst.దత్తాంశం != m.దత్తాంశం || e.alpha != 1 )
+        dst.convert_గమ్యం(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+శూన్య MatOp_T::multiply(స్థిరరాశి Mat_సమాసం& e, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,71 +1540,71 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+శూన్య MatOp_T::transpose(స్థిరరాశి Mat_సమాసం& e, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
-    else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+    ఒకవేళ( e.alpha == 1 )
+        Mat_Op_తటస్థం::make_సమాసం(res, e.a);
+    లేకపోతే
+        Mat_Op_కూడు_Ex::make_సమాసం(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+అంతఃవరుస శూన్య MatOp_T::make_సమాసం(Mat_సమాసం& res, స్థిరరాశి Mat& a, ద్విగుణ alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_సమాసం(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+శూన్య MatOp_GEMM::assign(స్థిరరాశి Mat_సమాసం& e, Mat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
+    Mat తాత్కాలిక_2, &dst = _type == -1 || _type == e.a.type() ? m : తాత్కాలిక_2;
 
     cv::gemm(e.a, e.b, e.alpha, e.c, e.beta, dst, e.flags);
-    if( dst.data != m.data )
-        dst.convertTo(m, _type);
+    ఒకవేళ( dst.దత్తాంశం != m.దత్తాంశం )
+        dst.convert_గమ్యం(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+శూన్య MatOp_GEMM::కూడు(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    తార్కిక i1 = is_తటస్థం(e1), i2 = is_తటస్థం(e2);
+    ద్విగుణ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    ఒకవేళ( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_సమాసం(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    లేకపోతే ఒకవేళ( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_సమాసం(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
-    else if( this == e2.op )
-        MatOp::add(e1, e2, res);
-    else
-        e2.op->add(e1, e2, res);
+    లేకపోతే ఒకవేళ( ఇది == e2.op )
+        MatOp::కూడు(e1, e2, res);
+    లేకపోతే
+        e2.op->కూడు(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+శూన్య MatOp_GEMM::వ్యవకలనం(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    తార్కిక i1 = is_తటస్థం(e1), i2 = is_తటస్థం(e2);
+    ద్విగుణ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    ఒకవేళ( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_సమాసం(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    లేకపోతే ఒకవేళ( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_సమాసం(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
-    else if( this == e2.op )
-        MatOp::subtract(e1, e2, res);
-    else
-        e2.op->subtract(e1, e2, res);
+    లేకపోతే ఒకవేళ( ఇది == e2.op )
+        MatOp::వ్యవకలనం(e1, e2, res);
+    లేకపోతే
+        e2.op->వ్యవకలనం(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+శూన్య MatOp_GEMM::multiply(స్థిరరాశి Mat_సమాసం& e, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+శూన్య MatOp_GEMM::transpose(స్థిరరాశి Mat_సమాసం& e, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,74 +1624,74 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                                 double alpha, const Mat& c, double beta)
+అంతఃవరుస శూన్య MatOp_GEMM::make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం flags, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b,
+                                 ద్విగుణ alpha, స్థిరరాశి Mat& c, ద్విగుణ beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_సమాసం(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+శూన్య MatOp_Invert::assign(స్థిరరాశి Mat_సమాసం& e, Mat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
+    Mat తాత్కాలిక_2, &dst = _type == -1 || _type == e.a.type() ? m : తాత్కాలిక_2;
 
     cv::invert(e.a, dst, e.flags);
-    if( dst.data != m.data )
-        dst.convertTo(m, _type);
+    ఒకవేళ( dst.దత్తాంశం != m.దత్తాంశం )
+        dst.convert_గమ్యం(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+శూన్య MatOp_Invert::matmul(స్థిరరాశి Mat_సమాసం& e1, స్థిరరాశి Mat_సమాసం& e2, Mat_సమాసం& res) స్థిరరాశి
 {
-    if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
-    else if( this == e2.op )
+    ఒకవేళ( isInv(e1) && is_తటస్థం(e2) )
+        MatOp_Solve::make_సమాసం(res, e1.flags, e1.a, e2.a);
+    లేకపోతే ఒకవేళ( ఇది == e2.op )
         MatOp::matmul(e1, e2, res);
-    else
+    లేకపోతే
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+అంతఃవరుస శూన్య MatOp_Invert::make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం పద్ధతి, స్థిరరాశి Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_సమాసం(&g_MatOp_Invert, పద్ధతి, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+శూన్య MatOp_Solve::assign(స్థిరరాశి Mat_సమాసం& e, Mat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
+    Mat తాత్కాలిక_2, &dst = _type == -1 || _type == e.a.type() ? m : తాత్కాలిక_2;
 
     cv::solve(e.a, e.b, dst, e.flags);
-    if( dst.data != m.data )
-        dst.convertTo(m, _type);
+    ఒకవేళ( dst.దత్తాంశం != m.దత్తాంశం )
+        dst.convert_గమ్యం(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+అంతఃవరుస శూన్య MatOp_Solve::make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం పద్ధతి, స్థిరరాశి Mat& a, స్థిరరాశి Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_సమాసం(&g_MatOp_Solve, పద్ధతి, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+శూన్య MatOp_Initializer::assign(స్థిరరాశి Mat_సమాసం& e, Mat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    if( _type == -1 )
+    ఒకవేళ( _type == -1 )
         _type = e.a.type();
 
     m.create(e.a.size, _type);
 
-    if( e.flags == 'I' && e.a.dims <= 2 )
-        setIdentity(m, Scalar(e.alpha));
-    else if( e.flags == '0' )
+    ఒకవేళ( e.flags == 'I' && e.a.dims <= 2 )
+        సమితి_తటస్థం(m, Scalar(e.alpha));
+    లేకపోతే ఒకవేళ( e.flags == '0' )
         m = Scalar();
-    else if( e.flags == '1' )
+    లేకపోతే ఒకవేళ( e.flags == '1' )
         m = Scalar(e.alpha);
-    else
+    లేకపోతే
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+శూన్య MatOp_Initializer::multiply(స్థిరరాశి Mat_సమాసం& e, ద్విగుణ s, Mat_సమాసం& res) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+అంతఃవరుస శూన్య MatOp_Initializer::make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం పద్ధతి, కొలత sz, పూర్ణాంకం type, ద్విగుణ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_సమాసం(getGlobalMatOpInitializer(), పద్ధతి, Mat(sz, type, (శూన్య*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+అంతఃవరుస శూన్య MatOp_Initializer::make_సమాసం(Mat_సమాసం& res, పూర్ణాంకం పద్ధతి, పూర్ణాంకం ndims, స్థిరరాశి పూర్ణాంకం* sizes, పూర్ణాంకం type, ద్విగుణ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_సమాసం(getGlobalMatOpInitializer(), పద్ధతి, Mat(ndims, sizes, type, (శూన్య*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_సమాసం Mat::t() స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
-    return e;
+    checkOperandsExist(*ఇది);
+    Mat_సమాసం e;
+    MatOp_T::make_సమాసం(e, *ఇది);
+    తిరిగి e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_సమాసం Mat::inv(పూర్ణాంకం పద్ధతి) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Invert::make_సమాసం(e, పద్ధతి, *ఇది);
+    తిరిగి e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_సమాసం Mat::mul(ఆదానం_Array m, ద్విగుణ scale) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
@@ -1740,107 +1740,107 @@ MatExpr Mat::mul(InputArray m, double scale) const
     // a non-owning view of caller memory (e.g. a scalar bound to _InputArray(const double&),
     // a Matx or a Vec) that the returned MatExpr can outlive, so snapshot it.
     // See https://github.com/opencv/opencv/issues/23577
-    if( !m.isMat() && !m.isUMat() )
+    ఒకవేళ( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Bin::make_సమాసం(e, '*', *ఇది, b, scale);
+    తిరిగి e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_సమాసం Mat::zeros(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, '0', కొలత(నిలువుల_సంఖ్య, అడ్డువరుసలు), type);
+    తిరిగి e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_సమాసం Mat::zeros(కొలత size, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, '0', size, type);
+    తిరిగి e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_సమాసం Mat::zeros(పూర్ణాంకం ndims, స్థిరరాశి పూర్ణాంకం* sizes, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, '0', ndims, sizes, type);
+    తిరిగి e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_సమాసం Mat::zeros(స్థిరరాశి MatShape& shape, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, '0', shape.dims, shape.p, type);
+    తిరిగి e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_సమాసం Mat::ones(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, '1', కొలత(నిలువుల_సంఖ్య, అడ్డువరుసలు), type);
+    తిరిగి e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_సమాసం Mat::ones(కొలత size, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, '1', size, type);
+    తిరిగి e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_సమాసం Mat::ones(పూర్ణాంకం ndims, స్థిరరాశి పూర్ణాంకం* sizes, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, '1', ndims, sizes, type);
+    తిరిగి e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_సమాసం Mat::ones(స్థిరరాశి MatShape& shape, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, '1', shape.dims, shape.p, type);
+    తిరిగి e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_సమాసం Mat::eye(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, 'I', కొలత(నిలువుల_సంఖ్య, అడ్డువరుసలు), type);
+    తిరిగి e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_సమాసం Mat::eye(కొలత size, పూర్ణాంకం type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
-    return e;
+    Mat_సమాసం e;
+    MatOp_Initializer::make_సమాసం(e, 'I', size, type);
+    తిరిగి e;
 }
 
-void MatExpr::swap(MatExpr& other)
+శూన్య Mat_సమాసం::swap(Mat_సమాసం& other)
 {
-    using std::swap;
+    ఉపయోగించి std::swap;
 
     swap(op, other.op);
     swap(flags, other.flags);
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+ఆదానం_Array_2::ఆదానం_Array_2(స్థిరరాశి Mat_సమాసం& సమాసం)
 {
-    if (!isIdentity(expr))
+    ఒకవేళ (!is_తటస్థం(సమాసం))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat ఫలితం = సమాసం;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_సమాసం ఫలితం_సమాసం(ఫలితం);
+        swap(const_cast<Mat_సమాసం&>(సమాసం), ఫలితం_సమాసం);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(is_తటస్థం(సమాసం));
+    init(FIXED_TYPE + FIXED_కొలత + MAT + ACCESS_READ, &సమాసం.a);
 }
 
 } // cv::

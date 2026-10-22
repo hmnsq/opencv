@@ -39,79 +39,79 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "umatrix.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "opencl_kernels_core.hpp"
+#అన్తర్భావ "umatrix.hpp"
 
-#include <opencv2/core/utils/tls.hpp>
+#అన్తర్భావ <opencv2/core/utils/tls.hpp>
 
 ///////////////////////////////// UMat implementation ///////////////////////////////
 
-namespace cv {
+నామాకాశ cv {
 
 // forward decls, implementation is below in this file
-void setSize(UMat& m, int _dims, const int* _sz, const size_t* _steps,
-             bool autoSteps = false);
+శూన్య సమితి_కొలత(UMat& m, పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sz, స్థిరరాశి size_t* అడుగులు_2,
+             తార్కిక auto_అడుగులు = అబద్ధం);
 
-void updateContinuityFlag(UMat& m);
-void finalizeHdr(UMat& m);
+శూన్య updateContinuityFlag(UMat& m);
+శూన్య finalizeHdr(UMat& m);
 
-UMatData::UMatData(const MatAllocator* allocator)
+UMat_దత్తాంశం::UMat_దత్తాంశం(స్థిరరాశి MatAllocator* allocator)
 {
     prevAllocator = currAllocator = allocator;
     urefcount = refcount = mapcount = 0;
-    data = origdata = 0;
+    దత్తాంశం = origdata = 0;
     size = 0;
-    flags = static_cast<UMatData::MemoryFlag>(0);
+    flags = static_cast<UMat_దత్తాంశం::జ్ఞాపకం_Flag>(0);
     handle = 0;
     userdata = 0;
     allocatorFlags_ = 0;
-    originalUMatData = NULL;
+    original_UMat_దత్తాంశం = ఖాళీ;
 }
 
-UMatData::~UMatData()
+UMat_దత్తాంశం::~UMat_దత్తాంశం()
 {
     prevAllocator = currAllocator = 0;
     urefcount = refcount = 0;
     CV_Assert(mapcount == 0);
-    data = origdata = 0;
+    దత్తాంశం = origdata = 0;
     size = 0;
-    bool isAsyncCleanup = !!(flags & UMatData::ASYNC_CLEANUP);
-    flags = static_cast<UMatData::MemoryFlag>(0);
+    తార్కిక isAsyncCleanup = !!(flags & UMat_దత్తాంశం::ASYNC_CLEANUP);
+    flags = static_cast<UMat_దత్తాంశం::జ్ఞాపకం_Flag>(0);
     handle = 0;
     userdata = 0;
     allocatorFlags_ = 0;
-    if (originalUMatData)
+    ఒకవేళ (original_UMat_దత్తాంశం)
     {
-        bool showWarn = false;
-        UMatData* u = originalUMatData;
-        bool zero_Ref = CV_XADD(&(u->refcount), -1) == 1;
-        if (zero_Ref)
+        తార్కిక showWarn = అబద్ధం;
+        UMat_దత్తాంశం* u = original_UMat_దత్తాంశం;
+        తార్కిక zero_Ref = CV_XADD(&(u->refcount), -1) == 1;
+        ఒకవేళ (zero_Ref)
         {
             // simulate Mat::deallocate
-            if (u->mapcount != 0)
+            ఒకవేళ (u->mapcount != 0)
             {
                 (u->currAllocator ? u->currAllocator : /* TODO allocator ? allocator :*/ Mat::getDefaultAllocator())->unmap(u);
             }
-            else
+            లేకపోతే
             {
                 // we don't do "map", so we can't do "unmap"
             }
         }
-        bool zero_URef = CV_XADD(&(u->urefcount), -1) == 1;
-        if (zero_Ref && !zero_URef)
-            showWarn = true;
-        if (zero_Ref && zero_URef) // oops, we need to free resources
+        తార్కిక zero_URef = CV_XADD(&(u->urefcount), -1) == 1;
+        ఒకవేళ (zero_Ref && !zero_URef)
+            showWarn = నిజం;
+        ఒకవేళ (zero_Ref && zero_URef) // oops, we need to free resources
         {
             showWarn = !isAsyncCleanup;
             // simulate UMat::deallocate
             u->currAllocator->deallocate(u);
         }
-#ifndef NDEBUG
-        if (showWarn)
+#నిర్వచితం_కాకపోతే NDEBUG
+        ఒకవేళ (showWarn)
         {
-            static int warn_message_showed = 0;
-            if (warn_message_showed++ < 100)
+            స్థిర పూర్ణాంకం warn_సందేశం_showed = 0;
+            ఒకవేళ (warn_సందేశం_showed++ < 100)
             {
                 fflush(stdout);
                 fprintf(stderr, "\n! OPENCV warning: getUMat()/getMat() call chain possible problem."
@@ -120,489 +120,489 @@ UMatData::~UMatData()
                 fflush(stderr);
             }
         }
-#else
-        CV_UNUSED(showWarn);
-#endif
-        originalUMatData = NULL;
+#లేకపోతే
+        CV_వాడని(showWarn);
+#అయితే_ముగింపు
+        original_UMat_దత్తాంశం = ఖాళీ;
     }
 }
 
-#ifndef OPENCV_DISABLE_THREAD_SUPPORT
+#నిర్వచితం_కాకపోతే OPENCV_DISABLE_THREAD_SUPPORT
 
 // it should be a prime number for the best hash function
-enum { UMAT_NLOCKS = 31 };
-static Mutex umatLocks[UMAT_NLOCKS];
+గణన { UMAT_NLOCKS = 31 };
+స్థిర Mutex umatLocks[UMAT_NLOCKS];
 
-static size_t getUMatDataLockIndex(const UMatData* u)
+స్థిర size_t get_UMat_దత్తాంశం_తాళం_సూచీ(స్థిరరాశి UMat_దత్తాంశం* u)
 {
-    size_t idx = ((size_t)(void*)u) % UMAT_NLOCKS;
-    return idx;
+    size_t idx = ((size_t)(శూన్య*)u) % UMAT_NLOCKS;
+    తిరిగి idx;
 }
 
-void UMatData::lock()
+శూన్య UMat_దత్తాంశం::lock()
 {
-    size_t idx = getUMatDataLockIndex(this);
+    size_t idx = get_UMat_దత్తాంశం_తాళం_సూచీ(ఇది);
     //printf("%d lock(%d)\n", cv::utils::getThreadID(), (int)idx);
     umatLocks[idx].lock();
 }
 
-void UMatData::unlock()
+శూన్య UMat_దత్తాంశం::unlock()
 {
-    size_t idx = getUMatDataLockIndex(this);
+    size_t idx = get_UMat_దత్తాంశం_తాళం_సూచీ(ఇది);
     //printf("%d unlock(%d)\n", cv::utils::getThreadID(), (int)idx);
     umatLocks[idx].unlock();
 }
 
 
 // Do not allow several lock() calls with different UMatData objects.
-struct UMatDataAutoLocker
+నిర్మాణం UMat_దత్తాంశం_Auto_Locker
 {
-    int usage_count;
-    UMatData* locked_objects[2];
-    UMatDataAutoLocker() : usage_count(0) { locked_objects[0] = NULL; locked_objects[1] = NULL; }
+    పూర్ణాంకం usage_లెక్క;
+    UMat_దత్తాంశం* locked_objects[2];
+    UMat_దత్తాంశం_Auto_Locker() : usage_లెక్క(0) { locked_objects[0] = ఖాళీ; locked_objects[1] = ఖాళీ; }
 
-    void lock(UMatData*& u1)
+    శూన్య lock(UMat_దత్తాంశం*& u1)
     {
-        bool locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
-        if (locked_1)
+        తార్కిక locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
+        ఒకవేళ (locked_1)
         {
-            u1 = NULL;
-            return;
+            u1 = ఖాళీ;
+            తిరిగి;
         }
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        CV_Assert(usage_లెక్క == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_లెక్క = 1;
         locked_objects[0] = u1;
         u1->lock();
     }
-    void lock(UMatData*& u1, UMatData*& u2)
+    శూన్య lock(UMat_దత్తాంశం*& u1, UMat_దత్తాంశం*& u2)
     {
-        bool locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
-        bool locked_2 = (u2 == locked_objects[0] || u2 == locked_objects[1]);
-        if (locked_1)
-            u1 = NULL;
-        if (locked_2)
-            u2 = NULL;
-        if (locked_1 && locked_2)
-            return;
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        తార్కిక locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
+        తార్కిక locked_2 = (u2 == locked_objects[0] || u2 == locked_objects[1]);
+        ఒకవేళ (locked_1)
+            u1 = ఖాళీ;
+        ఒకవేళ (locked_2)
+            u2 = ఖాళీ;
+        ఒకవేళ (locked_1 && locked_2)
+            తిరిగి;
+        CV_Assert(usage_లెక్క == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_లెక్క = 1;
         locked_objects[0] = u1;
         locked_objects[1] = u2;
-        if (u1)
+        ఒకవేళ (u1)
             u1->lock();
-        if (u2)
+        ఒకవేళ (u2)
             u2->lock();
     }
-    void release(UMatData* u1, UMatData* u2)
+    శూన్య release(UMat_దత్తాంశం* u1, UMat_దత్తాంశం* u2)
     {
-        if (u1 == NULL && u2 == NULL)
-            return;
-        CV_Assert(usage_count == 1);
-        usage_count = 0;
-        if (u1)
+        ఒకవేళ (u1 == ఖాళీ && u2 == ఖాళీ)
+            తిరిగి;
+        CV_Assert(usage_లెక్క == 1);
+        usage_లెక్క = 0;
+        ఒకవేళ (u1)
             u1->unlock();
-        if (u2)
+        ఒకవేళ (u2)
             u2->unlock();
-        locked_objects[0] = NULL; locked_objects[1] = NULL;
+        locked_objects[0] = ఖాళీ; locked_objects[1] = ఖాళీ;
     }
 };
-static TLSData<UMatDataAutoLocker>& getUMatDataAutoLockerTLS()
+స్థిర TLSData<UMat_దత్తాంశం_Auto_Locker>& get_UMat_దత్తాంశం_Auto_Locker_TLS()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TLSData<UMatDataAutoLocker>, new TLSData<UMatDataAutoLocker>());
+    CV_SINGLETON_LAZY_INIT_REF(TLSData<UMat_దత్తాంశం_Auto_Locker>, కొత్త TLSData<UMat_దత్తాంశం_Auto_Locker>());
 }
-static UMatDataAutoLocker& getUMatDataAutoLocker() { return getUMatDataAutoLockerTLS().getRef(); }
+స్థిర UMat_దత్తాంశం_Auto_Locker& get_UMat_దత్తాంశం_Auto_Locker() { తిరిగి get_UMat_దత్తాంశం_Auto_Locker_TLS().getRef(); }
 
 
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(NULL)
+UMat_దత్తాంశం_Auto_తాళం::UMat_దత్తాంశం_Auto_తాళం(UMat_దత్తాంశం* u) : u1(u), u2(ఖాళీ)
 {
-    getUMatDataAutoLocker().lock(u1);
+    get_UMat_దత్తాంశం_Auto_Locker().lock(u1);
 }
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u1_, UMatData* u2_) : u1(u1_), u2(u2_)
+UMat_దత్తాంశం_Auto_తాళం::UMat_దత్తాంశం_Auto_తాళం(UMat_దత్తాంశం* u1_, UMat_దత్తాంశం* u2_) : u1(u1_), u2(u2_)
 {
-    if (getUMatDataLockIndex(u1) > getUMatDataLockIndex(u2))
+    ఒకవేళ (get_UMat_దత్తాంశం_తాళం_సూచీ(u1) > get_UMat_దత్తాంశం_తాళం_సూచీ(u2))
     {
         std::swap(u1, u2);
     }
-    getUMatDataAutoLocker().lock(u1, u2);
+    get_UMat_దత్తాంశం_Auto_Locker().lock(u1, u2);
 }
-UMatDataAutoLock::~UMatDataAutoLock()
+UMat_దత్తాంశం_Auto_తాళం::~UMat_దత్తాంశం_Auto_తాళం()
 {
-    getUMatDataAutoLocker().release(u1, u2);
+    get_UMat_దత్తాంశం_Auto_Locker().release(u1, u2);
 }
 
-#else
+#లేకపోతే
 
-void UMatData::lock()
+శూన్య UMat_దత్తాంశం::lock()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-void UMatData::unlock()
+శూన్య UMat_దత్తాంశం::unlock()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(NULL)
+UMat_దత్తాంశం_Auto_తాళం::UMat_దత్తాంశం_Auto_తాళం(UMat_దత్తాంశం* u) : u1(u), u2(ఖాళీ)
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u1_, UMatData* u2_) : u1(u1_), u2(u2_)
+UMat_దత్తాంశం_Auto_తాళం::UMat_దత్తాంశం_Auto_తాళం(UMat_దత్తాంశం* u1_, UMat_దత్తాంశం* u2_) : u1(u1_), u2(u2_)
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
-UMatDataAutoLock::~UMatDataAutoLock()
+UMat_దత్తాంశం_Auto_తాళం::~UMat_దత్తాంశం_Auto_తాళం()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-#endif  // OPENCV_DISABLE_THREAD_SUPPORT
+#అయితే_ముగింపు  // OPENCV_DISABLE_THREAD_SUPPORT
 
 //////////////////////////////// UMat ////////////////////////////////
 
 UMat::UMat(UMatUsageFlags _usageFlags) CV_NOEXCEPT
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+: flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {}
 
-UMat::UMat(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
-    create(_rows, _cols, _type);
+    create(అడ్డువరుసలు_3, నిలువుల_సంఖ్య_3, _type);
 }
 
-UMat::UMat(int _rows, int _cols, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
-    create(_rows, _cols, _type);
-    *this = _s;
+    create(అడ్డువరుసలు_3, నిలువుల_సంఖ్య_3, _type);
+    *ఇది = _s;
 }
 
-UMat::UMat(Size _sz, int _type, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(కొలత _sz, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
-    create( _sz.height, _sz.width, _type );
+    create( _sz.ఎత్తు, _sz.వెడల్పు, _type );
 }
 
-UMat::UMat(Size _sz, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(కొలత _sz, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
-    create(_sz.height, _sz.width, _type);
-    *this = _s;
+    create(_sz.ఎత్తు, _sz.వెడల్పు, _type);
+    *ఇది = _s;
 }
 
-UMat::UMat(int _dims, const int* _sz, int _type, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
-{
-    create(_dims, _sz, _type);
-}
-
-UMat::UMat(int _dims, const int* _sz, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sz, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_dims, _sz, _type);
-    *this = _s;
 }
 
-UMat::UMat(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sz, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+{
+    create(_dims, _sz, _type);
+    *ఇది = _s;
+}
+
+UMat::UMat(స్థిరరాశి MatShape& _shape, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_shape.dims, _shape.p, _type);
 }
 
-UMat::UMat(const MatShape& _shape, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(స్థిరరాశి MatShape& _shape, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_shape.dims, _shape.p, _type);
-    *this = _s;
+    *ఇది = _s;
 }
 
-UMat::UMat(const UMat& m)
-: flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), allocator(m.allocator),
-  usageFlags(m.usageFlags), u(m.u), offset(m.offset), size(m.size), step(m.step)
+UMat::UMat(స్థిరరాశి UMat& m)
+: flags(m.flags), dims(m.dims), అడ్డువరుసలు(m.అడ్డువరుసలు), నిలువుల_సంఖ్య(m.నిలువుల_సంఖ్య), allocator(m.allocator),
+  usageFlags(m.usageFlags), u(m.u), offset(m.offset), size(m.size), అడుగు(m.అడుగు)
 {
     addref();
 }
 
-UMat& UMat::operator=(const UMat& m)
+UMat& UMat::క్రియాకారకం=(స్థిరరాశి UMat& m)
 {
-    if( this != &m )
+    ఒకవేళ( ఇది != &m )
     {
         const_cast<UMat&>(m).addref();
         release();
         flags = m.flags;
         dims = m.dims;
-        rows = m.rows;
-        cols = m.cols;
+        అడ్డువరుసలు = m.అడ్డువరుసలు;
+        నిలువుల_సంఖ్య = m.నిలువుల_సంఖ్య;
         size = m.size;
-        step = m.step;
+        అడుగు = m.అడుగు;
         allocator = m.allocator;
         usageFlags = m.usageFlags;
         u = m.u;
         offset = m.offset;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-UMat UMat::clone() const
+UMat UMat::clone() స్థిరరాశి
 {
     UMat m;
-    copyTo(m);
-    return m;
+    copy_గమ్యం(m);
+    తిరిగి m;
 }
 
-void UMat::assignTo(UMat& m, int _type) const
+శూన్య UMat::కేటాయించు_గమ్యం(UMat& m, పూర్ణాంకం _type) స్థిరరాశి
 {
-    if( _type < 0 )
-        m = *this;
-    else
-        convertTo(m, _type);
+    ఒకవేళ( _type < 0 )
+        m = *ఇది;
+    లేకపోతే
+        convert_గమ్యం(m, _type);
 }
 
-void UMat::create(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::create(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
-    int sz[] = {_rows, _cols};
+    పూర్ణాంకం sz[] = {అడ్డువరుసలు_3, నిలువుల_సంఖ్య_3};
     create(2, sz, _type, _usageFlags);
 }
 
-void UMat::create(Size _sz, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::create(కొలత _sz, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
-    create(_sz.height, _sz.width, _type, _usageFlags);
+    create(_sz.ఎత్తు, _sz.వెడల్పు, _type, _usageFlags);
 }
 
-void UMat::createSameSize(InputArray arr, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::create_Same_కొలత(ఆదానం_Array arr, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
     create(arr.shape(), _type, _usageFlags);
 }
 
-void UMat::addref()
+శూన్య UMat::addref()
 {
-    if( u )
+    ఒకవేళ( u )
         CV_XADD(&(u->urefcount), 1);
 }
 
-void UMat::release()
+శూన్య UMat::release()
 {
-    if( u && CV_XADD(&(u->urefcount), -1) == 1 )
+    ఒకవేళ( u && CV_XADD(&(u->urefcount), -1) == 1 )
         deallocate();
     u = 0;
     size.clear();
-    dims = cols = rows = 0;
+    dims = నిలువుల_సంఖ్య = అడ్డువరుసలు = 0;
 }
 
-bool UMat::empty() const
+తార్కిక UMat::empty() స్థిరరాశి
 {
-    return u == 0 || total() == 0;
+    తిరిగి u == 0 || మొత్తం() == 0;
 }
 
-size_t UMat::total() const
+size_t UMat::మొత్తం() స్థిరరాశి
 {
-    if( dims <= 2 )
-        return (size_t)rows * cols;
+    ఒకవేళ( dims <= 2 )
+        తిరిగి (size_t)అడ్డువరుసలు * నిలువుల_సంఖ్య;
     size_t p = 1;
-    for( int i = 0; i < dims; i++ )
+    కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
         p *= size[i];
-    return p;
+    తిరిగి p;
 }
 
-MatShape UMat::shape() const
+MatShape UMat::shape() స్థిరరాశి
 {
-    return size;
+    తిరిగి size;
 }
 
 UMat::UMat(UMat&& m)
-: flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), allocator(m.allocator),
+: flags(m.flags), dims(m.dims), అడ్డువరుసలు(m.అడ్డువరుసలు), నిలువుల_సంఖ్య(m.నిలువుల_సంఖ్య), allocator(m.allocator),
   usageFlags(m.usageFlags), u(m.u), offset(m.offset)
 {
     size = m.size;
-    step = m.step;
+    అడుగు = m.అడుగు;
     m.flags = MAGIC_VAL;
     m.usageFlags = USAGE_DEFAULT;
-    m.dims = m.rows = m.cols = 0;
+    m.dims = m.అడ్డువరుసలు = m.నిలువుల_సంఖ్య = 0;
     m.size.clear();
-    m.allocator = NULL;
-    m.u = NULL;
+    m.allocator = ఖాళీ;
+    m.u = ఖాళీ;
     m.offset = 0;
 }
 
-UMat& UMat::operator=(UMat&& m)
+UMat& UMat::క్రియాకారకం=(UMat&& m)
 {
-    if (this == &m)
-      return *this;
+    ఒకవేళ (ఇది == &m)
+      తిరిగి *ఇది;
     release();
-    flags = m.flags; dims = m.dims; rows = m.rows; cols = m.cols;
+    flags = m.flags; dims = m.dims; అడ్డువరుసలు = m.అడ్డువరుసలు; నిలువుల_సంఖ్య = m.నిలువుల_సంఖ్య;
     allocator = m.allocator; usageFlags = m.usageFlags;
     u = m.u;
     offset = m.offset;
     size = m.size;
-    step = m.step;
+    అడుగు = m.అడుగు;
     m.flags = MAGIC_VAL;
     m.usageFlags = USAGE_DEFAULT;
-    m.dims = m.rows = m.cols = 0;
-    m.allocator = NULL;
-    m.u = NULL;
+    m.dims = m.అడ్డువరుసలు = m.నిలువుల_సంఖ్య = 0;
+    m.allocator = ఖాళీ;
+    m.u = ఖాళీ;
     m.offset = 0;
-    return *this;
+    తిరిగి *ఇది;
 }
 
 
 MatAllocator* UMat::getStdAllocator()
 {
-#ifdef HAVE_OPENCL
-    if (ocl::useOpenCL())
-        return ocl::getOpenCLAllocator();
-#endif
-    return Mat::getDefaultAllocator();
+#నిర్వచితమైతే HAVE_OPENCL
+    ఒకవేళ (ocl::useOpenCL())
+        తిరిగి ocl::getOpenCLAllocator();
+#అయితే_ముగింపు
+    తిరిగి Mat::getDefaultAllocator();
 }
 
-void swap( UMat& a, UMat& b )
+శూన్య swap( UMat& a, UMat& b )
 {
     std::swap(a.flags, b.flags);
     std::swap(a.dims, b.dims);
-    std::swap(a.rows, b.rows);
-    std::swap(a.cols, b.cols);
+    std::swap(a.అడ్డువరుసలు, b.అడ్డువరుసలు);
+    std::swap(a.నిలువుల_సంఖ్య, b.నిలువుల_సంఖ్య);
     std::swap(a.allocator, b.allocator);
     std::swap(a.u, b.u);
     std::swap(a.offset, b.offset);
 
     std::swap(a.size, b.size);
-    std::swap(a.step, b.step);
+    std::swap(a.అడుగు, b.అడుగు);
 }
 
 
-void setSize( UMat& m, int _dims, const int* _sz,
-              const size_t* _steps, bool autoSteps )
+శూన్య సమితి_కొలత( UMat& m, పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sz,
+              స్థిరరాశి size_t* అడుగులు_2, తార్కిక auto_అడుగులు )
 {
     CV_Assert( 0 <= _dims && _dims <= CV_MAX_DIM && _dims <= MatShape::MAX_DIMS);
 
     m.dims = _dims;
     m.size = MatShape(_dims, _sz);
-    m.step[std::max(_dims-1, 0)] = CV_ELEM_SIZE(m.flags);
-    for (int i = _dims-2; i >= 0; i--) {
-        size_t autostep = m.size[i+1]*m.step[i+1];
-        if (_steps) {
-            m.step[i] = _steps[i];
+    m.అడుగు[std::max(_dims-1, 0)] = CV_ELEM_కొలత(m.flags);
+    కొరకు (పూర్ణాంకం i = _dims-2; i >= 0; i--) {
+        size_t autostep = m.size[i+1]*m.అడుగు[i+1];
+        ఒకవేళ (అడుగులు_2) {
+            m.అడుగు[i] = అడుగులు_2[i];
             //CV_Assert(m.step[i] >= autostep);
-        } else if (autoSteps) {
-            m.step[i] = autostep;
-        } else {
-            m.step[i] = 0;
+        } లేకపోతే ఒకవేళ (auto_అడుగులు) {
+            m.అడుగు[i] = autostep;
+        } లేకపోతే {
+            m.అడుగు[i] = 0;
         }
     }
 
-    if( _dims <= 2 )
+    ఒకవేళ( _dims <= 2 )
     {
-        m.cols = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
-        m.rows = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
-    } else {
-        m.cols = m.rows = -1;
+        m.నిలువుల_సంఖ్య = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
+        m.అడ్డువరుసలు = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
+    } లేకపోతే {
+        m.నిలువుల_సంఖ్య = m.అడ్డువరుసలు = -1;
     }
 }
 
 
-void UMat::updateContinuityFlag()
+శూన్య UMat::updateContinuityFlag()
 {
-    flags = cv::updateContinuityFlag(flags, dims, size.p, step.p);
+    flags = cv::updateContinuityFlag(flags, dims, size.p, అడుగు.p);
 }
 
 
-void finalizeHdr(UMat& m)
+శూన్య finalizeHdr(UMat& m)
 {
     m.updateContinuityFlag();
-    int d = m.dims;
-    if( d > 2 )
-        m.rows = m.cols = -1;
+    పూర్ణాంకం d = m.dims;
+    ఒకవేళ( d > 2 )
+        m.అడ్డువరుసలు = m.నిలువుల_సంఖ్య = -1;
 }
 
 
-UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) const
+UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) స్థిరరాశి
 {
     UMat hdr;
-    if(!data)
-        return hdr;
-    if (data != datastart)
+    ఒకవేళ(!దత్తాంశం)
+        తిరిగి hdr;
+    ఒకవేళ (దత్తాంశం != datastart)
     {
-        Size wholeSize;
-        Point ofs;
-        locateROI(wholeSize, ofs);
-        Size sz(cols, rows);
-        if (ofs.x != 0 || ofs.y != 0)
+        కొలత సంపూర్ణ_కొలత;
+        బిందువు ofs;
+        locateROI(సంపూర్ణ_కొలత, ofs);
+        కొలత sz(నిలువుల_సంఖ్య, అడ్డువరుసలు);
+        ఒకవేళ (ofs.x != 0 || ofs.y != 0)
         {
-            Mat src = *this;
-            int dtop = ofs.y;
-            int dbottom = wholeSize.height - src.rows - ofs.y;
-            int dleft = ofs.x;
-            int dright = wholeSize.width - src.cols - ofs.x;
+            Mat src = *ఇది;
+            పూర్ణాంకం dtop = ofs.y;
+            పూర్ణాంకం dbottom = సంపూర్ణ_కొలత.ఎత్తు - src.అడ్డువరుసలు - ofs.y;
+            పూర్ణాంకం dleft = ofs.x;
+            పూర్ణాంకం dright = సంపూర్ణ_కొలత.వెడల్పు - src.నిలువుల_సంఖ్య - ofs.x;
             src.adjustROI(dtop, dbottom, dleft, dright);
-            return src.getUMat(accessFlags, usageFlags)(cv::Rect(ofs.x, ofs.y, sz.width, sz.height));
+            తిరిగి src.getUMat(accessFlags, usageFlags)(cv::Rect(ofs.x, ofs.y, sz.వెడల్పు, sz.ఎత్తు));
         }
     }
-    CV_Assert(data == datastart);
+    CV_Assert(దత్తాంశం == datastart);
 
     accessFlags |= ACCESS_RW;
-    UMatData* new_u = NULL;
-    MatStep new_step = step;
+    UMat_దత్తాంశం* new_u = ఖాళీ;
+    Mat_అడుగు new_అడుగు = అడుగు;
     {
         MatAllocator *a = allocator, *a0 = getDefaultAllocator();
-        if(!a)
+        ఒకవేళ(!a)
             a = a0;
-        new_u = a->allocate(dims, size.p, type(), data, new_step.p, accessFlags, usageFlags);
-        new_u->originalUMatData = u;
+        new_u = a->allocate(dims, size.p, type(), దత్తాంశం, new_అడుగు.p, accessFlags, usageFlags);
+        new_u->original_UMat_దత్తాంశం = u;
     }
-    bool allocated = false;
-    try
+    తార్కిక allocated = అబద్ధం;
+    ప్రయత్నించు
     {
         allocated = UMat::getStdAllocator()->allocate(new_u, accessFlags, usageFlags);
     }
-    catch (const cv::Exception& e)
+    పట్టుకో (స్థిరరాశి cv::Exception& e)
     {
         fprintf(stderr, "Exception: %s\n", e.what());
     }
-    if (!allocated)
+    ఒకవేళ (!allocated)
     {
         allocated = getDefaultAllocator()->allocate(new_u, accessFlags, usageFlags);
         CV_Assert(allocated);
     }
-    if (u != NULL)
+    ఒకవేళ (u != ఖాళీ)
     {
-#ifdef HAVE_OPENCL
-        if (ocl::useOpenCL() && new_u->currAllocator == ocl::getOpenCLAllocator())
+#నిర్వచితమైతే HAVE_OPENCL
+        ఒకవేళ (ocl::useOpenCL() && new_u->currAllocator == ocl::getOpenCLAllocator())
         {
-            CV_Assert(new_u->tempUMat());
+            CV_Assert(new_u->తాత్కాలిక_UMat());
         }
-#endif
+#అయితే_ముగింపు
         CV_XADD(&(u->refcount), 1);
         CV_XADD(&(u->urefcount), 1);
     }
-    try
+    ప్రయత్నించు
     {
         hdr.flags = flags;
         hdr.usageFlags = usageFlags;
-        setSize(hdr, dims, size.p, new_step.p);
+        సమితి_కొలత(hdr, dims, size.p, new_అడుగు.p);
         finalizeHdr(hdr);
         hdr.u = new_u;
         hdr.offset = 0; //data - datastart;
         hdr.addref();
-        return hdr;
+        తిరిగి hdr;
     }
-    catch(...)
+    పట్టుకో(...)
     {
-        if (u != NULL)
+        ఒకవేళ (u != ఖాళీ)
         {
             CV_XADD(&(u->refcount), -1);
             CV_XADD(&(u->urefcount), -1);
         }
         new_u->currAllocator->deallocate(new_u);
-        throw;
+        విసురు;
     }
 
 }
 
-void UMat::create(int d0, const int* _sizes, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::create(పూర్ణాంకం d0, స్థిరరాశి పూర్ణాంకం* _sizes, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
-    int sz1 = 1, d = d0;
-    int i;
-    if (d == 0) {
+    పూర్ణాంకం sz1 = 1, d = d0;
+    పూర్ణాంకం i;
+    ఒకవేళ (d == 0) {
         d = 1;
-        _sizes = (const int*)&sz1;
+        _sizes = (స్థిరరాశి పూర్ణాంకం*)&sz1;
     }
     CV_Assert(0 <= d && d <= CV_MAX_DIM && _sizes);
     _type = CV_MAT_TYPE(_type);
@@ -611,138 +611,138 @@ void UMat::create(int d0, const int* _sizes, int _type, UMatUsageFlags _usageFla
     // ...then don't change the existing usageFlags
     // it is not possible to change usage from non-default to USAGE_DEFAULT through create()
     // ...instead must construct UMat()
-    if (_usageFlags == cv::USAGE_DEFAULT)
+    ఒకవేళ (_usageFlags == cv::USAGE_DEFAULT)
     {
         _usageFlags = usageFlags;
     }
 
-    if( u && d == dims && _type == type() && _usageFlags == usageFlags )
+    ఒకవేళ( u && d == dims && _type == type() && _usageFlags == usageFlags )
     {
-        for( i = 0; i < d; i++ )
-            if( size[i] != _sizes[i] )
-                break;
-        if( i == d )
-            return;
+        కొరకు( i = 0; i < d; i++ )
+            ఒకవేళ( size[i] != _sizes[i] )
+                ఆపు;
+        ఒకవేళ( i == d )
+            తిరిగి;
     }
 
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (_sizes == (this->size.p))
+    పూర్ణాంకం _sizes_backup[CV_MAX_DIM]; // #5991
+    ఒకవేళ (_sizes == (ఇది->size.p))
     {
-        for(i = 0; i < d; i++ )
+        కొరకు(i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
 
     release();
     usageFlags = _usageFlags;
-    if( d == 0 )
-        return;
-    flags = (_type & CV_MAT_TYPE_MASK) | MAGIC_VAL;
-    setSize(*this, d, _sizes, 0, true);
+    ఒకవేళ( d == 0 )
+        తిరిగి;
+    flags = (_type & CV_MAT_TYPE_ముసుగు) | MAGIC_VAL;
+    సమితి_కొలత(*ఇది, d, _sizes, 0, నిజం);
     offset = 0;
 
-    if( total() > 0 )
+    ఒకవేళ( మొత్తం() > 0 )
     {
         MatAllocator *a = allocator, *a0 = getStdAllocator();
-        if (!a)
+        ఒకవేళ (!a)
         {
             a = a0;
             a0 = Mat::getDefaultAllocator();
         }
-        try
+        ప్రయత్నించు
         {
-            u = a->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, usageFlags);
+            u = a->allocate(dims, size.p, _type, 0, అడుగు.p, ACCESS_RW /* ignored */, usageFlags);
             CV_Assert(u != 0);
         }
-        catch(...)
+        పట్టుకో(...)
         {
-            if(a != a0)
-                u = a0->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, usageFlags);
+            ఒకవేళ(a != a0)
+                u = a0->allocate(dims, size.p, _type, 0, అడుగు.p, ACCESS_RW /* ignored */, usageFlags);
             CV_Assert(u != 0);
         }
-        CV_Assert( step[dims-1] == (size_t)CV_ELEM_SIZE(flags) );
+        CV_Assert( అడుగు[dims-1] == (size_t)CV_ELEM_కొలత(flags) );
     }
 
-    finalizeHdr(*this);
+    finalizeHdr(*ఇది);
     addref();
     size.dims = dims = d0;
 }
 
-void UMat::create(const std::vector<int>& _sizes, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::create(స్థిరరాశి std::vector<పూర్ణాంకం>& _sizes, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
-    create((int)_sizes.size(), _sizes.data(), _type, _usageFlags);
+    create((పూర్ణాంకం)_sizes.size(), _sizes.దత్తాంశం(), _type, _usageFlags);
 }
 
-void UMat::create(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::create(స్థిరరాశి MatShape& _shape, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
-    if (_shape.dims < 0) {
+    ఒకవేళ (_shape.dims < 0) {
         release();
-    } else {
+    } లేకపోతే {
         create(_shape.dims, _shape.p, _type, _usageFlags);
         size.layout = _shape.layout;
         size.C = _shape.C;
     }
 }
 
-void UMat::fit(int _dims, const int* _sizes, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::fit(పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sizes, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
-    if (_usageFlags == cv::USAGE_DEFAULT)
+    ఒకవేళ (_usageFlags == cv::USAGE_DEFAULT)
         _usageFlags = usageFlags;
-    size_t oldTotalBytes = u ? u->size : 0;
-    size_t esz = CV_ELEM_SIZE(_type), newTotal = _dims >= 0;
-    for (int i = 0; i < _dims; i++)
-        newTotal *= _sizes[i];
-    size_t newTotalBytes = newTotal*esz;
-    if (newTotalBytes > 0 &&
+    size_t old_మొత్తం_బైట్లు = u ? u->size : 0;
+    size_t esz = CV_ELEM_కొలత(_type), new_మొత్తం = _dims >= 0;
+    కొరకు (పూర్ణాంకం i = 0; i < _dims; i++)
+        new_మొత్తం *= _sizes[i];
+    size_t new_మొత్తం_బైట్లు = new_మొత్తం*esz;
+    ఒకవేళ (new_మొత్తం_బైట్లు > 0 &&
         (!isContinuous() ||
-         newTotalBytes > oldTotalBytes ||
+         new_మొత్తం_బైట్లు > old_మొత్తం_బైట్లు ||
          offset != 0 ||
          _usageFlags != usageFlags)) {
         create(_dims, _sizes, _type, _usageFlags);
-    } else {
-        flags = (flags & ~Mat::TYPE_MASK) | CV_MAT_TYPE(_type);
-        int _dummy_size = 0;
-        setSize(*this, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, true);
-        finalizeHdr(*this);
+    } లేకపోతే {
+        flags = (flags & ~Mat::TYPE_ముసుగు) | CV_MAT_TYPE(_type);
+        పూర్ణాంకం dummy_కొలత = 0;
+        సమితి_కొలత(*ఇది, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &dummy_కొలత), శూన్యసూచిక, నిజం);
+        finalizeHdr(*ఇది);
     }
 }
 
-void UMat::fit(const std::vector<int>& _shape, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::fit(స్థిరరాశి std::vector<పూర్ణాంకం>& _shape, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
-    fit((int)_shape.size(), _shape.data(), _type, _usageFlags);
+    fit((పూర్ణాంకం)_shape.size(), _shape.దత్తాంశం(), _type, _usageFlags);
 }
 
-void UMat::fit(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::fit(స్థిరరాశి MatShape& _shape, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
     fit(_shape.dims, _shape.p, _type, _usageFlags);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void UMat::fit(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::fit(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
-    _type &= TYPE_MASK;
-    int sz[] = {_rows, _cols};
+    _type &= TYPE_ముసుగు;
+    పూర్ణాంకం sz[] = {అడ్డువరుసలు_3, నిలువుల_సంఖ్య_3};
     fit(2, sz, _type, _usageFlags);
 }
 
-void UMat::fit(Size _sz, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::fit(కొలత _sz, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
-    fit(_sz.height, _sz.width, _type, _usageFlags);
+    fit(_sz.ఎత్తు, _sz.వెడల్పు, _type, _usageFlags);
 }
 
-void UMat::fitSameSize(InputArray m, int _type, UMatUsageFlags _usageFlags)
+శూన్య UMat::fit_Same_కొలత(ఆదానం_Array m, పూర్ణాంకం _type, UMatUsageFlags _usageFlags)
 {
     fit(m.shape(), _type, _usageFlags);
 }
 
-void UMat::copySize(const UMat& m)
+శూన్య UMat::copy_కొలత(స్థిరరాశి UMat& m)
 {
     dims = m.dims;
-    cols = m.cols;
-    rows = m.rows;
+    నిలువుల_సంఖ్య = m.నిలువుల_సంఖ్య;
+    అడ్డువరుసలు = m.అడ్డువరుసలు;
     size = m.size;
-    step = m.step;
+    అడుగు = m.అడుగు;
 }
 
 UMat::~UMat()
@@ -750,612 +750,612 @@ UMat::~UMat()
     release();
 }
 
-void UMat::deallocate()
+శూన్య UMat::deallocate()
 {
-    UMatData* u_ = u;
-    u = NULL;
+    UMat_దత్తాంశం* u_ = u;
+    u = ఖాళీ;
     u_->currAllocator->deallocate(u_);
 }
 
 
-UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
+UMat::UMat(స్థిరరాశి UMat& m, స్థిరరాశి Range& అడ్డువరుస_Range_3, స్థిరరాశి Range& నిలువు_Range_3)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
     CV_Assert( m.dims >= 2 && m.dims <= MatShape::MAX_DIMS );
-    if( m.dims > 2 )
+    ఒకవేళ( m.dims > 2 )
     {
         Range rs[MatShape::MAX_DIMS];
-        rs[0] = _rowRange;
-        rs[1] = _colRange;
-        for( int i = 2; i < m.dims; i++ )
+        rs[0] = అడ్డువరుస_Range_3;
+        rs[1] = నిలువు_Range_3;
+        కొరకు( పూర్ణాంకం i = 2; i < m.dims; i++ )
             rs[i] = Range::all();
-        *this = m(rs);
-        return;
+        *ఇది = m(rs);
+        తిరిగి;
     }
 
-    *this = m;
-    if( _rowRange != Range::all() && _rowRange != Range(0,rows) )
+    *ఇది = m;
+    ఒకవేళ( అడ్డువరుస_Range_3 != Range::all() && అడ్డువరుస_Range_3 != Range(0,అడ్డువరుసలు) )
     {
-        CV_Assert( 0 <= _rowRange.start &&
-                  _rowRange.start <= _rowRange.end &&
-                  _rowRange.end <= m.rows );
-        size[0] = rows = _rowRange.size();
-        offset += step*_rowRange.start;
+        CV_Assert( 0 <= అడ్డువరుస_Range_3.ప్రారంభం &&
+                  అడ్డువరుస_Range_3.ప్రారంభం <= అడ్డువరుస_Range_3.end &&
+                  అడ్డువరుస_Range_3.end <= m.అడ్డువరుసలు );
+        size[0] = అడ్డువరుసలు = అడ్డువరుస_Range_3.size();
+        offset += అడుగు*అడ్డువరుస_Range_3.ప్రారంభం;
         flags |= SUBMATRIX_FLAG;
     }
 
-    if( _colRange != Range::all() && _colRange != Range(0,cols) )
+    ఒకవేళ( నిలువు_Range_3 != Range::all() && నిలువు_Range_3 != Range(0,నిలువుల_సంఖ్య) )
     {
-        CV_Assert( 0 <= _colRange.start &&
-                  _colRange.start <= _colRange.end &&
-                  _colRange.end <= m.cols );
-        size[1] = cols = _colRange.size();
-        offset += _colRange.start*elemSize();
+        CV_Assert( 0 <= నిలువు_Range_3.ప్రారంభం &&
+                  నిలువు_Range_3.ప్రారంభం <= నిలువు_Range_3.end &&
+                  నిలువు_Range_3.end <= m.నిలువుల_సంఖ్య );
+        size[1] = నిలువుల_సంఖ్య = నిలువు_Range_3.size();
+        offset += నిలువు_Range_3.ప్రారంభం*elem_కొలత();
         flags |= SUBMATRIX_FLAG;
     }
 
     updateContinuityFlag();
 
-    if( rows <= 0 || cols <= 0 )
+    ఒకవేళ( అడ్డువరుసలు <= 0 || నిలువుల_సంఖ్య <= 0 )
     {
         release();
-        rows = cols = 0;
+        అడ్డువరుసలు = నిలువుల_సంఖ్య = 0;
     }
 }
 
 
-UMat::UMat(const UMat& m, const Rect& roi)
-    : flags(m.flags), dims(2), rows(roi.height), cols(roi.width),
+UMat::UMat(స్థిరరాశి UMat& m, స్థిరరాశి Rect& roi)
+    : flags(m.flags), dims(2), అడ్డువరుసలు(roi.ఎత్తు), నిలువుల_సంఖ్య(roi.వెడల్పు),
     allocator(m.allocator), usageFlags(m.usageFlags), u(m.u),
-    offset(m.offset + roi.y*m.step[0]), size(2)
+    offset(m.offset + roi.y*m.అడుగు[0]), size(2)
 {
     CV_Assert( m.dims <= 2 );
 
-    size_t esz = CV_ELEM_SIZE(flags);
+    size_t esz = CV_ELEM_కొలత(flags);
     offset += roi.x*esz;
-    CV_Assert( 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols &&
-              0 <= roi.y && 0 <= roi.height && roi.y + roi.height <= m.rows );
-    if( roi.width < m.cols || roi.height < m.rows )
+    CV_Assert( 0 <= roi.x && 0 <= roi.వెడల్పు && roi.x + roi.వెడల్పు <= m.నిలువుల_సంఖ్య &&
+              0 <= roi.y && 0 <= roi.ఎత్తు && roi.y + roi.ఎత్తు <= m.అడ్డువరుసలు );
+    ఒకవేళ( roi.వెడల్పు < m.నిలువుల_సంఖ్య || roi.ఎత్తు < m.అడ్డువరుసలు )
         flags |= SUBMATRIX_FLAG;
 
-    size[0] = rows;
-    size[1] = cols;
-    step[0] = m.dims == 2 ? m.step[0] : cols*esz;
-    step[1] = esz;
+    size[0] = అడ్డువరుసలు;
+    size[1] = నిలువుల_సంఖ్య;
+    అడుగు[0] = m.dims == 2 ? m.అడుగు[0] : నిలువుల_సంఖ్య*esz;
+    అడుగు[1] = esz;
 
     updateContinuityFlag();
 
     addref();
-    if( rows <= 0 || cols <= 0 )
+    ఒకవేళ( అడ్డువరుసలు <= 0 || నిలువుల_సంఖ్య <= 0 )
     {
-        rows = cols = 0;
+        అడ్డువరుసలు = నిలువుల_సంఖ్య = 0;
         release();
     }
 }
 
 
-UMat::UMat(const UMat& m, const Range* ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
+UMat::UMat(స్థిరరాశి UMat& m, స్థిరరాశి Range* ranges)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
-    int i, d = m.dims;
+    పూర్ణాంకం i, d = m.dims;
 
     CV_Assert(ranges);
-    for( i = 0; i < d; i++ )
+    కొరకు( i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        CV_Assert( r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]) );
+        CV_Assert( r == Range::all() || (0 <= r.ప్రారంభం && r.ప్రారంభం < r.end && r.end <= m.size[i]) );
     }
-    *this = m;
-    for( i = 0; i < d; i++ )
+    *ఇది = m;
+    కొరకు( i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        if( r != Range::all() && r != Range(0, size.p[i]))
+        ఒకవేళ( r != Range::all() && r != Range(0, size.p[i]))
         {
-            size.p[i] = r.end - r.start;
-            offset += r.start*step.p[i];
+            size.p[i] = r.end - r.ప్రారంభం;
+            offset += r.ప్రారంభం*అడుగు.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
-        rows = d == 2 ? size[0] : 1;
-        cols = d <= 0 ? (d >= 0) : size[d > 1];
+    ఒకవేళ (d <= 2) {
+        అడ్డువరుసలు = d == 2 ? size[0] : 1;
+        నిలువుల_సంఖ్య = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-UMat::UMat(const UMat& m, const std::vector<Range>& ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
+UMat::UMat(స్థిరరాశి UMat& m, స్థిరరాశి std::vector<Range>& ranges)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
-    int i, d = m.dims;
+    పూర్ణాంకం i, d = m.dims;
 
-    CV_Assert((int)ranges.size() == d);
-    for (i = 0; i < d; i++)
+    CV_Assert((పూర్ణాంకం)ranges.size() == d);
+    కొరకు (i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]));
+        CV_Assert(r == Range::all() || (0 <= r.ప్రారంభం && r.ప్రారంభం < r.end && r.end <= m.size[i]));
     }
-    *this = m;
-    for (i = 0; i < d; i++)
+    *ఇది = m;
+    కొరకు (i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, size.p[i]))
+        ఒకవేళ (r != Range::all() && r != Range(0, size.p[i]))
         {
-            size.p[i] = r.end - r.start;
-            offset += r.start*step.p[i];
+            size.p[i] = r.end - r.ప్రారంభం;
+            offset += r.ప్రారంభం*అడుగు.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
-        rows = d == 2 ? size[0] : 1;
-        cols = d <= 0 ? (d >= 0) : size[d > 1];
+    ఒకవేళ (d <= 2) {
+        అడ్డువరుసలు = d == 2 ? size[0] : 1;
+        నిలువుల_సంఖ్య = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-UMat UMat::diag(int d) const
+UMat UMat::diag(పూర్ణాంకం d) స్థిరరాశి
 {
     CV_Assert( dims <= 2 );
-    UMat m = *this;
-    size_t esz = elemSize();
-    int len;
+    UMat m = *ఇది;
+    size_t esz = elem_కొలత();
+    పూర్ణాంకం len;
 
-    if( d >= 0 )
+    ఒకవేళ( d >= 0 )
     {
-        len = std::min(cols - d, rows);
+        len = std::min(నిలువుల_సంఖ్య - d, అడ్డువరుసలు);
         m.offset += esz*d;
     }
-    else
+    లేకపోతే
     {
-        len = std::min(rows + d, cols);
-        m.offset -= step[0]*d;
+        len = std::min(అడ్డువరుసలు + d, నిలువుల_సంఖ్య);
+        m.offset -= అడుగు[0]*d;
     }
     CV_DbgAssert( len > 0 );
 
-    m.size[0] = m.rows = len;
-    m.size[1] = m.cols = 1;
-    m.step[0] += (len > 1 ? esz : 0);
+    m.size[0] = m.అడ్డువరుసలు = len;
+    m.size[1] = m.నిలువుల_సంఖ్య = 1;
+    m.అడుగు[0] += (len > 1 ? esz : 0);
 
     m.updateContinuityFlag();
 
-    if( size() != Size(1,1) )
+    ఒకవేళ( size() != కొలత(1,1) )
         m.flags |= SUBMATRIX_FLAG;
 
-    return m;
+    తిరిగి m;
 }
 
-void UMat::locateROI( Size& wholeSize, Point& ofs ) const
+శూన్య UMat::locateROI( కొలత& సంపూర్ణ_కొలత, బిందువు& ofs ) స్థిరరాశి
 {
-    CV_Assert( dims <= 2 && step[0] > 0 );
-    size_t esz = elemSize(), minstep;
+    CV_Assert( dims <= 2 && అడుగు[0] > 0 );
+    size_t esz = elem_కొలత(), minstep;
     ptrdiff_t delta1 = (ptrdiff_t)offset, delta2 = (ptrdiff_t)u->size;
 
-    if( delta1 == 0 )
+    ఒకవేళ( delta1 == 0 )
         ofs.x = ofs.y = 0;
-    else
+    లేకపోతే
     {
-        ofs.y = (int)(delta1/step[0]);
-        ofs.x = (int)((delta1 - step[0]*ofs.y)/esz);
-        CV_DbgAssert( offset == (size_t)(ofs.y*step[0] + ofs.x*esz) );
+        ofs.y = (పూర్ణాంకం)(delta1/అడుగు[0]);
+        ofs.x = (పూర్ణాంకం)((delta1 - అడుగు[0]*ofs.y)/esz);
+        CV_DbgAssert( offset == (size_t)(ofs.y*అడుగు[0] + ofs.x*esz) );
     }
-    minstep = (ofs.x + cols)*esz;
-    wholeSize.height = (int)((delta2 - minstep)/step[0] + 1);
-    wholeSize.height = std::max(wholeSize.height, ofs.y + rows);
-    wholeSize.width = (int)((delta2 - step*(wholeSize.height-1))/esz);
-    wholeSize.width = std::max(wholeSize.width, ofs.x + cols);
+    minstep = (ofs.x + నిలువుల_సంఖ్య)*esz;
+    సంపూర్ణ_కొలత.ఎత్తు = (పూర్ణాంకం)((delta2 - minstep)/అడుగు[0] + 1);
+    సంపూర్ణ_కొలత.ఎత్తు = std::max(సంపూర్ణ_కొలత.ఎత్తు, ofs.y + అడ్డువరుసలు);
+    సంపూర్ణ_కొలత.వెడల్పు = (పూర్ణాంకం)((delta2 - అడుగు*(సంపూర్ణ_కొలత.ఎత్తు-1))/esz);
+    సంపూర్ణ_కొలత.వెడల్పు = std::max(సంపూర్ణ_కొలత.వెడల్పు, ofs.x + నిలువుల_సంఖ్య);
 }
 
 
-UMat& UMat::adjustROI( int dtop, int dbottom, int dleft, int dright )
+UMat& UMat::adjustROI( పూర్ణాంకం dtop, పూర్ణాంకం dbottom, పూర్ణాంకం dleft, పూర్ణాంకం dright )
 {
-    CV_Assert( dims == 2 && step[0] > 0 );
-    Size wholeSize; Point ofs;
-    size_t esz = elemSize();
-    locateROI( wholeSize, ofs );
-    int row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
-    int col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
-    if(row1 > row2)
+    CV_Assert( dims == 2 && అడుగు[0] > 0 );
+    కొలత సంపూర్ణ_కొలత; బిందువు ofs;
+    size_t esz = elem_కొలత();
+    locateROI( సంపూర్ణ_కొలత, ofs );
+    పూర్ణాంకం row1 = std::min(std::max(ofs.y - dtop, 0), సంపూర్ణ_కొలత.ఎత్తు), row2 = std::max(0, std::min(ofs.y + అడ్డువరుసలు + dbottom, సంపూర్ణ_కొలత.ఎత్తు));
+    పూర్ణాంకం col1 = std::min(std::max(ofs.x - dleft, 0), సంపూర్ణ_కొలత.వెడల్పు), col2 = std::max(0, std::min(ofs.x + నిలువుల_సంఖ్య + dright, సంపూర్ణ_కొలత.వెడల్పు));
+    ఒకవేళ(row1 > row2)
         std::swap(row1, row2);
-    if(col1 > col2)
+    ఒకవేళ(col1 > col2)
         std::swap(col1, col2);
 
-    offset += (row1 - ofs.y)*step + (col1 - ofs.x)*esz;
-    rows = row2 - row1; cols = col2 - col1;
-    size.p[0] = rows; size.p[1] = cols;
+    offset += (row1 - ofs.y)*అడుగు + (col1 - ofs.x)*esz;
+    అడ్డువరుసలు = row2 - row1; నిలువుల_సంఖ్య = col2 - col1;
+    size.p[0] = అడ్డువరుసలు; size.p[1] = నిలువుల_సంఖ్య;
     updateContinuityFlag();
-    return *this;
+    తిరిగి *ఇది;
 }
 
 
-UMat UMat::reshape(int new_cn, int new_rows) const
+UMat UMat::reshape(పూర్ణాంకం new_cn, పూర్ణాంకం new_అడ్డువరుసలు) స్థిరరాశి
 {
-    int cn = channels();
-    UMat hdr = *this;
+    పూర్ణాంకం cn = channels();
+    UMat hdr = *ఇది;
 
-    if( dims > 2 && new_rows == 0 && new_cn != 0 && size[dims-1]*cn % new_cn == 0 )
+    ఒకవేళ( dims > 2 && new_అడ్డువరుసలు == 0 && new_cn != 0 && size[dims-1]*cn % new_cn == 0 )
     {
-        hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-        hdr.step[dims-1] = CV_ELEM_SIZE(hdr.flags);
+        hdr.flags = (hdr.flags & ~CV_MAT_CN_ముసుగు) | ((new_cn-1) << CV_CN_జరుపు);
+        hdr.అడుగు[dims-1] = CV_ELEM_కొలత(hdr.flags);
         hdr.size[dims-1] = hdr.size[dims-1]*cn / new_cn;
-        return hdr;
+        తిరిగి hdr;
     }
 
     CV_Assert( dims <= 2 );
 
-    if( new_cn == 0 )
+    ఒకవేళ( new_cn == 0 )
         new_cn = cn;
 
-    int total_width = cols * cn;
+    పూర్ణాంకం మొత్తం_వెడల్పు = నిలువుల_సంఖ్య * cn;
 
-    if( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
-        new_rows = rows * total_width / new_cn;
+    ఒకవేళ( (new_cn > మొత్తం_వెడల్పు || మొత్తం_వెడల్పు % new_cn != 0) && new_అడ్డువరుసలు == 0 )
+        new_అడ్డువరుసలు = అడ్డువరుసలు * మొత్తం_వెడల్పు / new_cn;
 
-    if( new_rows != 0 && new_rows != rows )
+    ఒకవేళ( new_అడ్డువరుసలు != 0 && new_అడ్డువరుసలు != అడ్డువరుసలు )
     {
-        int total_size = total_width * rows;
-        if( !isContinuous() )
-            CV_Error( cv::Error::BadStep,
+        పూర్ణాంకం మొత్తం_కొలత_2 = మొత్తం_వెడల్పు * అడ్డువరుసలు;
+        ఒకవేళ( !isContinuous() )
+            CV_Error( cv::Error::Bad_అడుగు,
             "The matrix is not continuous, thus its number of rows can not be changed" );
 
-        total_width = total_size / new_rows;
+        మొత్తం_వెడల్పు = మొత్తం_కొలత_2 / new_అడ్డువరుసలు;
 
-        if( total_width * new_rows != total_size )
+        ఒకవేళ( మొత్తం_వెడల్పు * new_అడ్డువరుసలు != మొత్తం_కొలత_2 )
             CV_Error( cv::Error::StsBadArg, "The total number of matrix elements "
                                     "is not divisible by the new number of rows" );
 
-        hdr.size[0] = hdr.rows = new_rows;
-        hdr.step[0] = total_width * elemSize1();
-    } else {
-        hdr.size[0] = hdr.rows = rows;
-        if (dims <= 1)
-            hdr.step[0] = cols * CV_ELEM_SIZE(flags);
+        hdr.size[0] = hdr.అడ్డువరుసలు = new_అడ్డువరుసలు;
+        hdr.అడుగు[0] = మొత్తం_వెడల్పు * elemSize1();
+    } లేకపోతే {
+        hdr.size[0] = hdr.అడ్డువరుసలు = అడ్డువరుసలు;
+        ఒకవేళ (dims <= 1)
+            hdr.అడుగు[0] = నిలువుల_సంఖ్య * CV_ELEM_కొలత(flags);
     }
 
-    int new_width = total_width / new_cn;
+    పూర్ణాంకం new_వెడల్పు = మొత్తం_వెడల్పు / new_cn;
 
-    if( new_width * new_cn != total_width )
-        CV_Error( cv::Error::BadNumChannels,
+    ఒకవేళ( new_వెడల్పు * new_cn != మొత్తం_వెడల్పు )
+        CV_Error( cv::Error::Bad_అంకె_Channels,
         "The total width is not divisible by the new number of channels" );
 
     hdr.size.dims = hdr.dims = 2;
-    hdr.size[1] = hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-    hdr.step[1] = CV_ELEM_SIZE(hdr.flags);
-    return hdr;
+    hdr.size[1] = hdr.నిలువుల_సంఖ్య = new_వెడల్పు;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_ముసుగు) | ((new_cn-1) << CV_CN_జరుపు);
+    hdr.అడుగు[1] = CV_ELEM_కొలత(hdr.flags);
+    తిరిగి hdr;
 }
 
-#ifdef HAVE_OPENCL
-namespace {
-static bool ocl_setDiag(const UMat& d, UMat& m, int len)
+#నిర్వచితమైతే HAVE_OPENCL
+నామాకాశ {
+స్థిర తార్కిక ocl_సమితి_Diag(స్థిరరాశి UMat& d, UMat& m, పూర్ణాంకం len)
 {
-    int cn = d.channels();
-    int depth = d.depth();
+    పూర్ణాంకం cn = d.channels();
+    పూర్ణాంకం లోతు = d.లోతు();
 
-    if (depth == CV_64F && !ocl::Device::getDefault().doubleFPConfig())
-        return false;
+    ఒకవేళ (లోతు == CV_64F && !ocl::Device::getDefault().doubleFPConfig())
+        తిరిగి అబద్ధం;
 
     String opts = format("-D SET_DIAG -D T1=%s -D cn=%d -D IS_ROW_VECTOR=%d",
-                         ocl::memopTypeToStr(depth),
+                         ocl::memop_Type_గమ్యం_Str(లోతు),
                          cn,
-                         (d.rows == 1) ? 1 : 0);
+                         (d.అడ్డువరుసలు == 1) ? 1 : 0);
 
     ocl::Kernel k("setDiag", ocl::core::copyset_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ఒకవేళ (k.empty())
+        తిరిగి అబద్ధం;
 
-    k.args(ocl::KernelArg::WriteOnly(m),
-           ocl::KernelArg::ReadOnlyNoSize(d),
+    k.వాదనలు(ocl::KernelArg::WriteOnly(m),
+           ocl::KernelArg::Read_Only_No_కొలత(d),
            len);
 
     size_t globalsize[2] = { (size_t)len, (size_t)len };
-    return k.run(2, globalsize, NULL, false);
+    తిరిగి k.నిరంతరం(2, globalsize, ఖాళీ, అబద్ధం);
 }
 }
-#endif
+#అయితే_ముగింపు
 
-UMat UMat::diag(const UMat& d, UMatUsageFlags usageFlags)
+UMat UMat::diag(స్థిరరాశి UMat& d, UMatUsageFlags usageFlags)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert(d.cols == 1 || d.rows == 1);
-    int len = d.rows + d.cols - 1;
+    CV_Assert(d.నిలువుల_సంఖ్య == 1 || d.అడ్డువరుసలు == 1);
+    పూర్ణాంకం len = d.అడ్డువరుసలు + d.నిలువుల_సంఖ్య - 1;
 
-#ifdef HAVE_OPENCL
-    if (ocl::useOpenCL())
+#నిర్వచితమైతే HAVE_OPENCL
+    ఒకవేళ (ocl::useOpenCL())
     {
         UMat m(len, len, d.type(), usageFlags);
-        if (ocl_setDiag(d, m, len))
+        ఒకవేళ (ocl_సమితి_Diag(d, m, len))
         {
-            CV_IMPL_ADD(CV_IMPL_OCL);
-            return m;
+            CV_IMPL_కూడు(CV_IMPL_OCL);
+            తిరిగి m;
         }
     }
-#endif
+#అయితే_ముగింపు
 
     UMat m(len, len, d.type(), Scalar(0), usageFlags);
     UMat md = m.diag();
-    if( d.cols == 1 )
-        d.copyTo(md);
-    else
+    ఒకవేళ( d.నిలువుల_సంఖ్య == 1 )
+        d.copy_గమ్యం(md);
+    లేకపోతే
         transpose(d, md);
-    return m;
+    తిరిగి m;
 }
 
-int UMat::checkVector(int _elemChannels, int _depth, bool _requireContinuous) const
+పూర్ణాంకం UMat::check_సదిశ(పూర్ణాంకం _elemChannels, పూర్ణాంకం లోతు_2, తార్కిక _requireContinuous) స్థిరరాశి
 {
-    return (depth() == _depth || _depth <= 0) &&
+    తిరిగి (లోతు() == లోతు_2 || లోతు_2 <= 0) &&
         (isContinuous() || !_requireContinuous) &&
-        ((dims <= 2 && (((rows == 1 || cols == 1) && channels() == _elemChannels) ||
-                        (cols == _elemChannels && channels() == 1))) ||
+        ((dims <= 2 && (((అడ్డువరుసలు == 1 || నిలువుల_సంఖ్య == 1) && channels() == _elemChannels) ||
+                        (నిలువుల_సంఖ్య == _elemChannels && channels() == 1))) ||
         (dims == 3 && channels() == 1 && size.p[2] == _elemChannels && (size.p[0] == 1 || size.p[1] == 1) &&
-         (isContinuous() || step.p[1] == step.p[2]*size.p[2])))
-    ? (int)(total()*channels()/_elemChannels) : -1;
+         (isContinuous() || అడుగు.p[1] == అడుగు.p[2]*size.p[2])))
+    ? (పూర్ణాంకం)(మొత్తం()*channels()/_elemChannels) : -1;
 }
 
-UMat UMat::reshape(int _cn, int _newndims, const int* _newsz) const
+UMat UMat::reshape(పూర్ణాంకం _cn, పూర్ణాంకం _newndims, స్థిరరాశి పూర్ణాంకం* _newsz) స్థిరరాశి
 {
-    if(_newndims == dims)
+    ఒకవేళ(_newndims == dims)
     {
-        if(_newsz == 0)
-            return reshape(_cn);
-        if(_newndims == 2)
-            return reshape(_cn, _newsz[0]);
+        ఒకవేళ(_newsz == 0)
+            తిరిగి reshape(_cn);
+        ఒకవేళ(_newndims == 2)
+            తిరిగి reshape(_cn, _newsz[0]);
     }
 
-    if (isContinuous())
+    ఒకవేళ (isContinuous())
     {
         CV_Assert(_cn >= 0 && _newndims >= 0 && _newndims <= CV_MAX_DIM && (_newndims == 0 || _newsz != 0));
 
-        if (_cn == 0)
-            _cn = this->channels();
-        else
+        ఒకవేళ (_cn == 0)
+            _cn = ఇది->channels();
+        లేకపోతే
             CV_Assert(_cn <= CV_CN_MAX);
 
-        size_t total_elem1_ref = this->total() * this->channels();
-        size_t total_elem1 = _cn;
+        size_t మొత్తం_elem1_ref = ఇది->మొత్తం() * ఇది->channels();
+        size_t మొత్తం_elem1 = _cn;
 
-        AutoBuffer<int, 4> newsz_buf( (size_t)std::max(_newndims, 1) );
+        Auto_బఫరు<పూర్ణాంకం, 4> newsz_buf( (size_t)std::max(_newndims, 1) );
 
-        int m1_idx = -1;
+        పూర్ణాంకం m1_idx = -1;
 
-        for (int i = 0; i < _newndims; i++)
+        కొరకు (పూర్ణాంకం i = 0; i < _newndims; i++)
         {
-            if (_newsz[i] >= 0) {
-                if (_newsz[i] == 0 && i < dims)
+            ఒకవేళ (_newsz[i] >= 0) {
+                ఒకవేళ (_newsz[i] == 0 && i < dims)
                     newsz_buf[i] = size.p[i];
-                else
+                లేకపోతే
                     newsz_buf[i] = _newsz[i];
-                total_elem1 *= (size_t)newsz_buf[i];
-            } else {
-                if (m1_idx >= 0)
-                    CV_Error(cv::Error::StsBadSize, "More than one '-1' occured in the new shape");
+                మొత్తం_elem1 *= (size_t)newsz_buf[i];
+            } లేకపోతే {
+                ఒకవేళ (m1_idx >= 0)
+                    CV_Error(cv::Error::Sts_Bad_కొలత, "More than one '-1' occured in the new shape");
                 m1_idx = i;
             }
         }
 
-        if (m1_idx >= 0) {
-            if (total_elem1 == 0) {
-                CV_Assert(total_elem1_ref == 0);
-                total_elem1 = 1;
+        ఒకవేళ (m1_idx >= 0) {
+            ఒకవేళ (మొత్తం_elem1 == 0) {
+                CV_Assert(మొత్తం_elem1_ref == 0);
+                మొత్తం_elem1 = 1;
             }
-            CV_Assert(total_elem1_ref % total_elem1 == 0);
-            newsz_buf[m1_idx] = (int)(total_elem1_ref / total_elem1);
-        } else if (total_elem1 != total_elem1_ref) {
+            CV_Assert(మొత్తం_elem1_ref % మొత్తం_elem1 == 0);
+            newsz_buf[m1_idx] = (పూర్ణాంకం)(మొత్తం_elem1_ref / మొత్తం_elem1);
+        } లేకపోతే ఒకవేళ (మొత్తం_elem1 != మొత్తం_elem1_ref) {
             CV_Error(cv::Error::StsUnmatchedSizes, "Requested and source matrices have different count of elements");
         }
 
-        UMat hdr = *this;
-        hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((_cn-1) << CV_CN_SHIFT);
-        setSize(hdr, _newndims, newsz_buf.data(), NULL, true);
+        UMat hdr = *ఇది;
+        hdr.flags = (hdr.flags & ~CV_MAT_CN_ముసుగు) | ((_cn-1) << CV_CN_జరుపు);
+        సమితి_కొలత(hdr, _newndims, newsz_buf.దత్తాంశం(), ఖాళీ, నిజం);
 
-        return hdr;
+        తిరిగి hdr;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "Reshaping of n-dimensional non-continuous matrices is not supported yet");
 }
 
-UMat UMat::reshape(int _cn, const MatShape& _newshape) const
+UMat UMat::reshape(పూర్ణాంకం _cn, స్థిరరాశి MatShape& _newshape) స్థిరరాశి
 {
-    if (_newshape.dims < 0) {
-        int newshape[] = {0};
-        return reshape(_cn, 1, newshape);
+    ఒకవేళ (_newshape.dims < 0) {
+        పూర్ణాంకం newshape[] = {0};
+        తిరిగి reshape(_cn, 1, newshape);
     }
-    return reshape(_cn, _newshape.dims, _newshape.p);
+    తిరిగి reshape(_cn, _newshape.dims, _newshape.p);
 }
 
-Mat UMat::getMat(AccessFlag accessFlags) const
+Mat UMat::getMat(AccessFlag accessFlags) స్థిరరాశి
 {
-    if(!u)
-        return Mat();
+    ఒకవేళ(!u)
+        తిరిగి Mat();
     // TODO Support ACCESS_READ (ACCESS_WRITE) without unnecessary data transfers
     accessFlags |= ACCESS_RW;
-    UMatDataAutoLock autolock(u);
-    try
+    UMat_దత్తాంశం_Auto_తాళం autolock(u);
+    ప్రయత్నించు
     {
-        if(CV_XADD(&u->refcount, 1) == 0)
+        ఒకవేళ(CV_XADD(&u->refcount, 1) == 0)
             u->currAllocator->map(u, accessFlags);
-        if (u->data != 0)
+        ఒకవేళ (u->దత్తాంశం != 0)
         {
-            Mat hdr(dims, size.p, type(), u->data + offset, step.p);
+            Mat hdr(dims, size.p, type(), u->దత్తాంశం + offset, అడుగు.p);
             hdr.flags = flags;
             hdr.u = u;
-            hdr.datastart = u->data;
-            hdr.data = u->data + offset;
-            hdr.datalimit = hdr.dataend = u->data + u->size;
-            return hdr;
+            hdr.datastart = u->దత్తాంశం;
+            hdr.దత్తాంశం = u->దత్తాంశం + offset;
+            hdr.datalimit = hdr.dataend = u->దత్తాంశం + u->size;
+            తిరిగి hdr;
         }
     }
-    catch(...)
+    పట్టుకో(...)
     {
         CV_XADD(&u->refcount, -1);
-        throw;
+        విసురు;
     }
     CV_XADD(&u->refcount, -1);
-    CV_Assert(u->data != 0 && "Error mapping of UMat to host memory.");
-    return Mat();
+    CV_Assert(u->దత్తాంశం != 0 && "Error mapping of UMat to host memory.");
+    తిరిగి Mat();
 }
 
-void* UMat::handle(AccessFlag accessFlags) const
+శూన్య* UMat::handle(AccessFlag accessFlags) స్థిరరాశి
 {
-    if( !u )
-        return 0;
+    ఒకవేళ( !u )
+        తిరిగి 0;
 
     CV_Assert(u->refcount == 0);
     CV_Assert(!u->deviceCopyObsolete() || u->copyOnMap());
-    if (u->deviceCopyObsolete())
+    ఒకవేళ (u->deviceCopyObsolete())
     {
         u->currAllocator->unmap(u);
     }
 
-    if (!!(accessFlags & ACCESS_WRITE))
-        u->markHostCopyObsolete(true);
+    ఒకవేళ (!!(accessFlags & ACCESS_WRITE))
+        u->markHostCopyObsolete(నిజం);
 
-    return u->handle;
+    తిరిగి u->handle;
 }
 
-void UMat::ndoffset(size_t* ofs) const
+శూన్య UMat::ndoffset(size_t* ofs) స్థిరరాశి
 {
     // offset = step[0]*ofs[0] + step[1]*ofs[1] + step[2]*ofs[2] + ...;
     size_t val = offset;
-    for( int i = 0; i < dims; i++ )
+    కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
     {
-        size_t s = step.p[i];
+        size_t s = అడుగు.p[i];
         ofs[i] = val / s;
         val -= ofs[i]*s;
     }
 }
 
-void UMat::copyTo(OutputArray _dst) const
+శూన్య UMat::copy_గమ్యం(OutputArray _dst) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-#ifdef HAVE_CUDA
-    if (_dst.isGpuMat())
+#నిర్వచితమైతే HAVE_CUDA
+    ఒకవేళ (_dst.isGpuMat())
     {
-        _dst.getGpuMat().upload(*this);
-        return;
+        _dst.getGpuMat().upload(*ఇది);
+        తిరిగి;
     }
-#endif
+#అయితే_ముగింపు
 
-    int stype = type();
-    int dtype = _dst.type();
-    if( _dst.fixedType() && dtype != stype )
+    పూర్ణాంకం stype = type();
+    పూర్ణాంకం dtype = _dst.type();
+    ఒకవేళ( _dst.fixedType() && dtype != stype )
     {
         CV_Assert( CV_MAT_CN(stype) == CV_MAT_CN(dtype) );
-        convertTo( _dst, dtype );
-        return;
+        convert_గమ్యం( _dst, dtype );
+        తిరిగి;
     }
 
-    if( dims == 0 && empty() )
+    ఒకవేళ( dims == 0 && empty() )
     {
         _dst.release();
-        void* obj = _dst.getObj();
-        if (_dst.isMat())
+        శూన్య* obj = _dst.getObj();
+        ఒకవేళ (_dst.isMat())
             reinterpret_cast<Mat*>(obj)->flags = Mat::MAGIC_VAL | Mat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isUMat())
+        లేకపోతే ఒకవేళ (_dst.isUMat())
             reinterpret_cast<UMat*>(obj)->flags = UMat::MAGIC_VAL | UMat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isGpuMat())
+        లేకపోతే ఒకవేళ (_dst.isGpuMat())
             reinterpret_cast<cuda::GpuMat*>(obj)->flags = stype;
-        return;
+        తిరిగి;
     }
 
     _dst.create( dims, size.p, stype );
-    if (empty())
-        return;
+    ఒకవేళ (empty())
+        తిరిగి;
 
     size_t sz[CV_MAX_DIM] = {1}, srcofs[CV_MAX_DIM]={0}, dstofs[CV_MAX_DIM]={0};
-    size_t esz = CV_ELEM_SIZE(stype);
-    int i, d = std::max(dims, 1);
-    for( i = 0; i < d; i++ )
+    size_t esz = CV_ELEM_కొలత(stype);
+    పూర్ణాంకం i, d = std::max(dims, 1);
+    కొరకు( i = 0; i < d; i++ )
         sz[i] = size.p[i];
     sz[d-1] *= esz;
     ndoffset(srcofs);
     srcofs[d-1] *= esz;
 
-    if( _dst.isUMat() )
+    ఒకవేళ( _dst.isUMat() )
     {
         UMat dst = _dst.getUMat();
         CV_Assert(dst.u);
-        if( u == dst.u && dst.offset == offset )
-            return;
+        ఒకవేళ( u == dst.u && dst.offset == offset )
+            తిరిగి;
 
-        if (u->currAllocator == dst.u->currAllocator)
+        ఒకవేళ (u->currAllocator == dst.u->currAllocator)
         {
             dst.ndoffset(dstofs);
             dstofs[dims-1] *= esz;
-            u->currAllocator->copy(u, dst.u, d, sz, srcofs, step.p, dstofs, dst.step.p, false);
-            return;
+            u->currAllocator->copy(u, dst.u, d, sz, srcofs, అడుగు.p, dstofs, dst.అడుగు.p, అబద్ధం);
+            తిరిగి;
         }
 
         // different allocators: never map a device destination, upload into it instead
         // (through a host Mat when both sides are device memory)
         MatAllocator* hostAllocator = Mat::getDefaultAllocator();
-        if (dst.u->currAllocator != hostAllocator)
+        ఒకవేళ (dst.u->currAllocator != hostAllocator)
         {
-            if (u->currAllocator == hostAllocator)
-                getMat(ACCESS_READ).copyTo(_dst);
-            else
+            ఒకవేళ (u->currAllocator == hostAllocator)
+                getMat(ACCESS_READ).copy_గమ్యం(_dst);
+            లేకపోతే
             {
                 Mat tmp;
-                copyTo(tmp);
-                tmp.copyTo(_dst);
+                copy_గమ్యం(tmp);
+                tmp.copy_గమ్యం(_dst);
             }
-            return;
+            తిరిగి;
         }
     }
 
     Mat dst = _dst.getMat();
-    u->currAllocator->download(u, dst.ptr(), d, sz, srcofs, step.p, dst.step.p);
+    u->currAllocator->download(u, dst.ptr(), d, sz, srcofs, అడుగు.p, dst.అడుగు.p);
 }
 
-void UMat::copyTo(OutputArray _dst, InputArray _mask) const
+శూన్య UMat::copy_గమ్యం(OutputArray _dst, ఆదానం_Array ముసుగు_2) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if( _mask.empty() )
+    ఒకవేళ( ముసుగు_2.empty() )
     {
-        copyTo(_dst);
-        return;
+        copy_గమ్యం(_dst);
+        తిరిగి;
     }
-#ifdef HAVE_OPENCL
-    int cn = channels(), mtype = _mask.type(), mdepth = CV_MAT_DEPTH(mtype), mcn = CV_MAT_CN(mtype);
+#నిర్వచితమైతే HAVE_OPENCL
+    పూర్ణాంకం cn = channels(), mtype = ముసుగు_2.type(), mdepth = CV_MAT_లోతు(mtype), mcn = CV_MAT_CN(mtype);
     CV_Assert( (mdepth == CV_8U || mdepth == CV_8S || mdepth == CV_Bool) && (mcn == 1 || mcn == cn) );
 
-    if (ocl::useOpenCL() && _dst.isUMat() && dims <= 2)
+    ఒకవేళ (ocl::useOpenCL() && _dst.isUMat() && dims <= 2)
     {
-        UMatData * prevu = _dst.getUMat().u;
+        UMat_దత్తాంశం * prevu = _dst.getUMat().u;
         _dst.create( size, type() );
 
         UMat dst = _dst.getUMat();
 
-        bool haveDstUninit = false;
-        if( prevu != dst.u ) // do not leave dst uninitialized
-            haveDstUninit = true;
+        తార్కిక haveDstUninit = అబద్ధం;
+        ఒకవేళ( prevu != dst.u ) // do not leave dst uninitialized
+            haveDstUninit = నిజం;
 
         String opts = format("-D COPY_TO_MASK -D T1=%s -D scn=%d -D mcn=%d%s",
-                             ocl::memopTypeToStr(depth()), cn, mcn,
+                             ocl::memop_Type_గమ్యం_Str(లోతు()), cn, mcn,
                              haveDstUninit ? " -D HAVE_DST_UNINIT" : "");
 
         ocl::Kernel k("copyToMask", ocl::core::copyset_oclsrc, opts);
-        if (!k.empty())
+        ఒకవేళ (!k.empty())
         {
-            k.args(ocl::KernelArg::ReadOnlyNoSize(*this),
-                   ocl::KernelArg::ReadOnlyNoSize(_mask.getUMat()),
+            k.వాదనలు(ocl::KernelArg::Read_Only_No_కొలత(*ఇది),
+                   ocl::KernelArg::Read_Only_No_కొలత(ముసుగు_2.getUMat()),
                    haveDstUninit ? ocl::KernelArg::WriteOnly(dst) :
                                    ocl::KernelArg::ReadWrite(dst));
 
-            size_t globalsize[2] = { (size_t)cols, (size_t)rows };
-            if (k.run(2, globalsize, NULL, false))
+            size_t globalsize[2] = { (size_t)నిలువుల_సంఖ్య, (size_t)అడ్డువరుసలు };
+            ఒకవేళ (k.నిరంతరం(2, globalsize, ఖాళీ, అబద్ధం))
             {
-                CV_IMPL_ADD(CV_IMPL_OCL);
-                return;
+                CV_IMPL_కూడు(CV_IMPL_OCL);
+                తిరిగి;
             }
         }
     }
-#endif
+#అయితే_ముగింపు
     Mat src = getMat(ACCESS_READ);
-    src.copyTo(_dst, _mask);
+    src.copy_గమ్యం(_dst, ముసుగు_2);
 }
 
 
@@ -1363,116 +1363,116 @@ void UMat::copyTo(OutputArray _dst, InputArray _mask) const
 // void UMat::convertTo moved to convert.dispatch.cpp
 //
 
-UMat& UMat::setTo(InputArray _value, InputArray _mask)
+UMat& UMat::సమితి_గమ్యం(ఆదానం_Array విలువ, ఆదానం_Array ముసుగు_2)
 {
     CV_INSTRUMENT_REGION();
 
-    bool haveMask = !_mask.empty();
-#ifdef HAVE_OPENCL
-    int tp = type(), cn = CV_MAT_CN(tp), d = CV_MAT_DEPTH(tp);
+    తార్కిక have_ముసుగు = !ముసుగు_2.empty();
+#నిర్వచితమైతే HAVE_OPENCL
+    పూర్ణాంకం tp = type(), cn = CV_MAT_CN(tp), d = CV_MAT_లోతు(tp);
 
-    if( dims <= 2 && cn <= 4 && CV_MAT_DEPTH(tp) < CV_64F && ocl::useOpenCL() )
+    ఒకవేళ( dims <= 2 && cn <= 4 && CV_MAT_లోతు(tp) < CV_64F && ocl::useOpenCL() )
     {
-        Mat value = _value.getMat();
-        CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::UMAT) );
-        int kercn = haveMask || cn == 3 ? cn : std::max(cn, ocl::predictOptimalVectorWidth(*this)),
+        Mat value = విలువ.getMat();
+        CV_Assert( checkScalar(value, type(), విలువ.రకం(), ఆదానం_Array_2::UMAT) );
+        పూర్ణాంకం kercn = have_ముసుగు || cn == 3 ? cn : std::max(cn, ocl::predict_Optimal_సదిశ_వెడల్పు(*ఇది)),
                 kertp = CV_MAKE_TYPE(d, kercn);
 
-        double buf[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+        ద్విగుణ buf[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0 };
         convertAndUnrollScalar(value, tp, (uchar *)buf, kercn / cn);
 
-        int scalarcn = kercn == 3 ? 4 : kercn, rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+        పూర్ణాంకం scalarcn = kercn == 3 ? 4 : kercn, అడ్డువరుసలు_చొప్పున_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
         String opts = format("-D dstT=%s -D rowsPerWI=%d -D dstST=%s -D dstT1=%s -D cn=%d",
-                             ocl::memopTypeToStr(kertp), rowsPerWI,
-                             ocl::memopTypeToStr(CV_MAKETYPE(d, scalarcn)),
-                             ocl::memopTypeToStr(d), kercn);
+                             ocl::memop_Type_గమ్యం_Str(kertp), అడ్డువరుసలు_చొప్పున_WI,
+                             ocl::memop_Type_గమ్యం_Str(CV_MAKETYPE(d, scalarcn)),
+                             ocl::memop_Type_గమ్యం_Str(d), kercn);
 
-        ocl::Kernel setK(haveMask ? "setMask" : "set", ocl::core::copyset_oclsrc, opts);
-        if( !setK.empty() )
+        ocl::Kernel సమితి_K(have_ముసుగు ? "setMask" : "set", ocl::core::copyset_oclsrc, opts);
+        ఒకవేళ( !సమితి_K.empty() )
         {
-            ocl::KernelArg scalararg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, CV_ELEM_SIZE(d) * scalarcn);
-            UMat mask;
+            ocl::KernelArg scalararg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, CV_ELEM_కొలత(d) * scalarcn);
+            UMat ముసుగు;
 
-            if( haveMask )
+            ఒకవేళ( have_ముసుగు )
             {
-                mask = _mask.getUMat();
-                CV_Assert( mask.size() == size() && (mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) );
-                ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
-                        dstarg = ocl::KernelArg::ReadWrite(*this);
-                setK.args(maskarg, dstarg, scalararg);
+                ముసుగు = ముసుగు_2.getUMat();
+                CV_Assert( ముసుగు.size() == size() && (ముసుగు.type() == CV_8U || ముసుగు.type() == CV_8S || ముసుగు.type() == CV_Bool) );
+                ocl::KernelArg maskarg = ocl::KernelArg::Read_Only_No_కొలత(ముసుగు),
+                        dstarg = ocl::KernelArg::ReadWrite(*ఇది);
+                సమితి_K.వాదనలు(maskarg, dstarg, scalararg);
             }
-            else
+            లేకపోతే
             {
-                ocl::KernelArg dstarg = ocl::KernelArg::WriteOnly(*this, cn, kercn);
-                setK.args(dstarg, scalararg);
+                ocl::KernelArg dstarg = ocl::KernelArg::WriteOnly(*ఇది, cn, kercn);
+                సమితి_K.వాదనలు(dstarg, scalararg);
             }
 
-            size_t globalsize[] = { (size_t)cols * cn / kercn, ((size_t)rows + rowsPerWI - 1) / rowsPerWI };
-            if( setK.run(2, globalsize, NULL, false) )
+            size_t globalsize[] = { (size_t)నిలువుల_సంఖ్య * cn / kercn, ((size_t)అడ్డువరుసలు + అడ్డువరుసలు_చొప్పున_WI - 1) / అడ్డువరుసలు_చొప్పున_WI };
+            ఒకవేళ( సమితి_K.నిరంతరం(2, globalsize, ఖాళీ, అబద్ధం) )
             {
-                CV_IMPL_ADD(CV_IMPL_OCL);
-                return *this;
+                CV_IMPL_కూడు(CV_IMPL_OCL);
+                తిరిగి *ఇది;
             }
         }
     }
-#endif
-    Mat m = getMat(haveMask ? ACCESS_RW : ACCESS_WRITE);
-    m.setTo(_value, _mask);
-    return *this;
+#అయితే_ముగింపు
+    Mat m = getMat(have_ముసుగు ? ACCESS_RW : ACCESS_WRITE);
+    m.సమితి_గమ్యం(విలువ, ముసుగు_2);
+    తిరిగి *ఇది;
 }
 
-UMat& UMat::operator = (const Scalar& s)
+UMat& UMat::క్రియాకారకం = (స్థిరరాశి Scalar& s)
 {
-    setTo(s);
-    return *this;
+    సమితి_గమ్యం(s);
+    తిరిగి *ఇది;
 }
 
-UMat UMat::t() const
+UMat UMat::t() స్థిరరాశి
 {
     UMat m;
-    transpose(*this, m);
-    return m;
+    transpose(*ఇది, m);
+    తిరిగి m;
 }
 
-UMat UMat::zeros(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
-    return UMat(rows, cols, type, Scalar::all(0), usageFlags);
+    తిరిగి UMat(అడ్డువరుసలు, నిలువుల_సంఖ్య, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(కొలత size, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
-    return UMat(size, type, Scalar::all(0), usageFlags);
+    తిరిగి UMat(size, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(int ndims, const int* sz, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(పూర్ణాంకం ndims, స్థిరరాశి పూర్ణాంకం* sz, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
-    return UMat(ndims, sz, type, Scalar::all(0), usageFlags);
+    తిరిగి UMat(ndims, sz, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(const MatShape& shape, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(స్థిరరాశి MatShape& shape, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
-    return UMat(shape.dims, shape.p, type, Scalar::all(0), usageFlags);
+    తిరిగి UMat(shape.dims, shape.p, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::ones(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
-    return UMat(rows, cols, type, Scalar(1), usageFlags);
+    తిరిగి UMat(అడ్డువరుసలు, నిలువుల_సంఖ్య, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(కొలత size, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
-    return UMat(size, type, Scalar(1), usageFlags);
+    తిరిగి UMat(size, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(int ndims, const int* sz, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(పూర్ణాంకం ndims, స్థిరరాశి పూర్ణాంకం* sz, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
-    return UMat(ndims, sz, type, Scalar(1), usageFlags);
+    తిరిగి UMat(ndims, sz, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(const MatShape& shape, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(స్థిరరాశి MatShape& shape, పూర్ణాంకం type, UMatUsageFlags usageFlags)
 {
-    return UMat(shape.dims, shape.p, type, Scalar(1), usageFlags);
+    తిరిగి UMat(shape.dims, shape.p, type, Scalar(1), usageFlags);
 }
 
 }

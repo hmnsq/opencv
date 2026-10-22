@@ -2,455 +2,455 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "persistence.hpp"
 
-namespace cv
+నామాకాశ cv
 {
 
-class JSONEmitter : public FileStorageEmitter
+తరగతి JSONEmitter : బహిరంగ FileStorageEmitter
 {
-public:
+బహిరంగ:
     JSONEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
-    virtual ~JSONEmitter() {}
+    మాయా ~JSONEmitter() {}
 
-    FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                  int struct_flags, const char* type_name=0 )
+    FStruct_దత్తాంశం ప్రారంభం_Write_Struct( స్థిరరాశి FStruct_దత్తాంశం& మాతృ, స్థిరరాశి అక్షరం* కీలకం,
+                                  పూర్ణాంకం struct_flags, స్థిరరాశి అక్షరం* type_name=0 )
     {
-        char data[CV_FS_MAX_LEN + 1024];
+        అక్షరం దత్తాంశం[CV_FS_MAX_LEN + 1024];
 
-        struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        struct_flags = (struct_flags & (File_కణుపు::TYPE_ముసుగు|File_కణుపు::FLOW)) | File_కణుపు::ఖాళీలు_2;
+        ఒకవేళ( !File_కణుపు::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if( type_name && *type_name == '\0' )
+        ఒకవేళ( type_name && *type_name == '\0' )
             type_name = 0;
 
-        bool is_real_collection = true;
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        తార్కిక is_real_collection = నిజం;
+        ఒకవేళ (type_name && memcmp(type_name, "binary", 6) == 0)
         {
-            struct_flags = FileNode::STR;
-            data[0] = '\0';
-            is_real_collection = false;
+            struct_flags = File_కణుపు::STR;
+            దత్తాంశం[0] = '\0';
+            is_real_collection = అబద్ధం;
         }
 
-        if ( is_real_collection )
+        ఒకవేళ ( is_real_collection )
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
-            data[0] = c;
-            data[1] = '\0';
+            అక్షరం c = File_కణుపు::isMap(struct_flags) ? '{' : '[';
+            దత్తాంశం[0] = c;
+            దత్తాంశం[1] = '\0';
         }
 
-        writeScalar( key, data );
-        FStructData current_struct("", struct_flags, parent.indent + 4);
+        writeScalar( కీలకం, దత్తాంశం );
+        FStruct_దత్తాంశం current_struct("", struct_flags, మాతృ.indent + 4);
 
-        return current_struct;
+        తిరిగి current_struct;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    శూన్య చివర_Write_Struct(స్థిరరాశి FStruct_దత్తాంశం& current_struct)
     {
-        int struct_flags = current_struct.flags;
+        పూర్ణాంకం struct_flags = current_struct.flags;
 
-        if (FileNode::isCollection(struct_flags)) {
-            if (!FileNode::isFlow(struct_flags)) {
-                if (fs->bufferPtr() <= fs->bufferStart() + fs->get_space()) {
+        ఒకవేళ (File_కణుపు::isCollection(struct_flags)) {
+            ఒకవేళ (!File_కణుపు::isFlow(struct_flags)) {
+                ఒకవేళ (fs->బఫరు_Ptr() <= fs->బఫరు_ప్రారంభం() + fs->get_space()) {
                     /* some bad code for base64_writer... */
-                    char *ptr = fs->bufferPtr();
+                    అక్షరం *ptr = fs->బఫరు_Ptr();
                     *ptr++ = '\n';
                     *ptr++ = '\0';
-                    fs->puts(fs->bufferStart());
-                    fs->setBufferPtr(fs->bufferStart());
+                    fs->puts(fs->బఫరు_ప్రారంభం());
+                    fs->సమితి_బఫరు_Ptr(fs->బఫరు_ప్రారంభం());
                 }
                 fs->flush();
             }
 
-            char *ptr = fs->bufferPtr();
-            if (ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags))
+            అక్షరం *ptr = fs->బఫరు_Ptr();
+            ఒకవేళ (ptr > fs->బఫరు_ప్రారంభం() + current_struct.indent && !File_కణుపు::is_ఖాళీలు_Collection(struct_flags))
                 *ptr++ = ' ';
-            *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
-            fs->setBufferPtr(ptr);
+            *ptr++ = File_కణుపు::isMap(struct_flags) ? '}' : ']';
+            fs->సమితి_బఫరు_Ptr(ptr);
         }
     }
 
-    void write(const char* key, int value)
+    శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, పూర్ణాంకం value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10 ));
+        అక్షరం buf[128];
+        writeScalar( కీలకం, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, int64_t value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10, true ));
+        అక్షరం buf[128];
+        writeScalar( కీలకం, fs::itoa( value, buf, 10, నిజం ));
     }
 
-    void write( const char* key, double value )
+    శూన్య లిఖ( స్థిరరాశి అక్షరం* కీలకం, ద్విగుణ value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, true ));
+        అక్షరం buf[128];
+        writeScalar( కీలకం, fs::double_గమ్యం_String( buf, పరిమాణం(buf), value, నిజం ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    శూన్య లిఖ(స్థిరరాశి అక్షరం* కీలకం, స్థిరరాశి అక్షరం* str, తార్కిక quote)
     {
-        char buf[CV_FS_MAX_LEN*6+16];
-        char* data = (char*)str;
-        int i, len;
+        అక్షరం buf[CV_FS_MAX_LEN*6+16];
+        అక్షరం* దత్తాంశం = (అక్షరం*)str;
+        పూర్ణాంకం i, len;
 
-        if( !str )
+        ఒకవేళ( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (పూర్ణాంకం)అక్షరశ్రేణి_పొడవు(str);
+        ఒకవేళ( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        ఒకవేళ( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = 1;
-            data = buf;
-            *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            పూర్ణాంకం need_quote = 1;
+            దత్తాంశం = buf;
+            *దత్తాంశం++ = '\"';
+            కొరకు( i = 0; i < len; i++ )
             {
-                char c = str[i];
-                const unsigned char byte = static_cast<unsigned char>(c);
+                అక్షరం c = str[i];
+                స్థిరరాశి గుర్తులేని అక్షరం byte = static_cast<గుర్తులేని అక్షరం>(c);
 
-                switch ( c )
+                ఎంపిక ( c )
                 {
-                case '\\':
-                case '\"': { *data++ = '\\'; *data++ = c;   break; }
-                case '\n': { *data++ = '\\'; *data++ = 'n'; break; }
-                case '\r': { *data++ = '\\'; *data++ = 'r'; break; }
-                case '\t': { *data++ = '\\'; *data++ = 't'; break; }
-                case '\b': { *data++ = '\\'; *data++ = 'b'; break; }
-                case '\f': { *data++ = '\\'; *data++ = 'f'; break; }
-                default  :
-                    if (byte < 0x20)
+                స్థితి '\\':
+                స్థితి '\"': { *దత్తాంశం++ = '\\'; *దత్తాంశం++ = c;   ఆపు; }
+                స్థితి '\n': { *దత్తాంశం++ = '\\'; *దత్తాంశం++ = 'n'; ఆపు; }
+                స్థితి '\r': { *దత్తాంశం++ = '\\'; *దత్తాంశం++ = 'r'; ఆపు; }
+                స్థితి '\t': { *దత్తాంశం++ = '\\'; *దత్తాంశం++ = 't'; ఆపు; }
+                స్థితి '\b': { *దత్తాంశం++ = '\\'; *దత్తాంశం++ = 'b'; ఆపు; }
+                స్థితి '\f': { *దత్తాంశం++ = '\\'; *దత్తాంశం++ = 'f'; ఆపు; }
+                అప్రమేయ  :
+                    ఒకవేళ (byte < 0x20)
                     {
-                        static const char hex[] = "0123456789abcdef";
-                        *data++ = '\\'; *data++ = 'u'; *data++ = '0'; *data++ = '0';
-                        *data++ = hex[byte >> 4]; *data++ = hex[byte & 0xf];
+                        స్థిర స్థిరరాశి అక్షరం hex[] = "0123456789abcdef";
+                        *దత్తాంశం++ = '\\'; *దత్తాంశం++ = 'u'; *దత్తాంశం++ = '0'; *దత్తాంశం++ = '0';
+                        *దత్తాంశం++ = hex[byte >> 4]; *దత్తాంశం++ = hex[byte & 0xf];
                     }
-                    else
-                        *data++ = c;
-                    break;
+                    లేకపోతే
+                        *దత్తాంశం++ = c;
+                    ఆపు;
                 }
             }
 
-            *data++ = '\"';
-            *data++ = '\0';
-            data = buf + !need_quote;
+            *దత్తాంశం++ = '\"';
+            *దత్తాంశం++ = '\0';
+            దత్తాంశం = buf + !need_quote;
         }
 
-        writeScalar( key, data);
+        writeScalar( కీలకం, దత్తాంశం);
     }
 
-    void writeScalar(const char* key, const char* data)
+    శూన్య writeScalar(స్థిరరాశి అక్షరం* కీలకం, స్థిరరాశి అక్షరం* దత్తాంశం)
     {
         /* check write_struct */
 
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(అబద్ధం);
+        ఒకవేళ ( fs->get_state_యొక్క_writing_base64() == FileStorage_API::Uncertain )
         {
-            fs->switch_to_Base64_state( FileStorage_API::NotUse );
+            fs->switch_గమ్యం_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        లేకపోతే ఒకవేళ ( fs->get_state_యొక్క_writing_base64() == FileStorage_API::లోపల_Use )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
         /* check parameters */
 
-        size_t key_len = 0u;
-        if( key && *key == '\0' )
-            key = 0;
-        if ( key )
+        size_t కీలకం_len = 0u;
+        ఒకవేళ( కీలకం && *కీలకం == '\0' )
+            కీలకం = 0;
+        ఒకవేళ ( కీలకం )
         {
-            key_len = strlen(key);
-            if ( key_len == 0u )
+            కీలకం_len = అక్షరశ్రేణి_పొడవు(కీలకం);
+            ఒకవేళ ( కీలకం_len == 0u )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
-            else if ( static_cast<int>(key_len) > CV_FS_MAX_LEN )
+            లేకపోతే ఒకవేళ ( static_cast<పూర్ణాంకం>(కీలకం_len) > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
-        size_t data_len = 0u;
-        if ( data )
-            data_len = strlen(data);
+        size_t దత్తాంశం_len = 0u;
+        ఒకవేళ ( దత్తాంశం )
+            దత్తాంశం_len = అక్షరశ్రేణి_పొడవు(దత్తాంశం);
 
-        FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
-        if( FileNode::isCollection(struct_flags) )
+        FStruct_దత్తాంశం& current_struct = fs->getCurrentStruct();
+        పూర్ణాంకం struct_flags = current_struct.flags;
+        ఒకవేళ( File_కణుపు::isCollection(struct_flags) )
         {
-            if ( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            ఒకవేళ ( (File_కణుపు::isMap(struct_flags) ^ (కీలకం != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
-        } else {
-            fs->setNonEmpty();
-            struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
+        } లేకపోతే {
+            fs->సమితి_Non_ఖాళీలు();
+            struct_flags = File_కణుపు::ఖాళీలు_2 | (కీలకం ? File_కణుపు::MAP : File_కణుపు::SEQ);
         }
 
         // start to write
-        char* ptr = 0;
+        అక్షరం* ptr = 0;
 
-        if( FileNode::isFlow(struct_flags) )
+        ఒకవేళ( File_కణుపు::isFlow(struct_flags) )
         {
-            int new_offset;
-            ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            పూర్ణాంకం new_స్థానభ్రంశం;
+            ptr = fs->బఫరు_Ptr();
+            ఒకవేళ( !File_కణుపు::is_ఖాళీలు_Collection(struct_flags) )
                 *ptr++ = ',';
-            new_offset = static_cast<int>(ptr - fs->bufferStart() + key_len + data_len);
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            new_స్థానభ్రంశం = static_cast<పూర్ణాంకం>(ptr - fs->బఫరు_ప్రారంభం() + కీలకం_len + దత్తాంశం_len);
+            ఒకవేళ( new_స్థానభ్రంశం > fs->wrapMargin() && new_స్థానభ్రంశం - current_struct.indent > 10 )
             {
-                fs->setBufferPtr(ptr);
+                fs->సమితి_బఫరు_Ptr(ptr);
                 ptr = fs->flush();
             }
-            else
+            లేకపోతే
                 *ptr++ = ' ';
         }
-        else
+        లేకపోతే
         {
-            if ( !FileNode::isEmptyCollection(struct_flags) )
+            ఒకవేళ ( !File_కణుపు::is_ఖాళీలు_Collection(struct_flags) )
             {
-                ptr = fs->bufferPtr();
+                ptr = fs->బఫరు_Ptr();
                 *ptr++ = ',';
                 *ptr++ = '\n';
                 *ptr++ = '\0';
-                fs->puts( fs->bufferStart() );
-                fs->setBufferPtr(fs->bufferStart());
+                fs->puts( fs->బఫరు_ప్రారంభం() );
+                fs->సమితి_బఫరు_Ptr(fs->బఫరు_ప్రారంభం());
             }
             ptr = fs->flush();
         }
 
-        if( key )
+        ఒకవేళ( కీలకం )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            ఒకవేళ( !cv_isalpha(కీలకం[0]) && కీలకం[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
-            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(key_len) );
+            ptr = fs->resize_Write_బఫరు( ptr, static_cast<పూర్ణాంకం>(కీలకం_len) );
             *ptr++ = '\"';
 
-            for( size_t i = 0u; i < key_len; i++ )
+            కొరకు( size_t i = 0u; i < కీలకం_len; i++ )
             {
-                char c = key[i];
+                అక్షరం c = కీలకం[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                ఒకవేళ( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
-            ptr += key_len;
+            ptr += కీలకం_len;
             *ptr++ = '\"';
             *ptr++ = ':';
             *ptr++ = ' ';
         }
 
-        if( data )
+        ఒకవేళ( దత్తాంశం )
         {
-            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(data_len) );
-            memcpy( ptr, data, data_len );
-            ptr += data_len;
+            ptr = fs->resize_Write_బఫరు( ptr, static_cast<పూర్ణాంకం>(దత్తాంశం_len) );
+            జ్ఞాపకం_నకలు( ptr, దత్తాంశం, దత్తాంశం_len );
+            ptr += దత్తాంశం_len;
         }
 
-        fs->setBufferPtr(ptr);
-        current_struct.flags &= ~FileNode::EMPTY;
+        fs->సమితి_బఫరు_Ptr(ptr);
+        current_struct.flags &= ~File_కణుపు::ఖాళీలు_2;
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    శూన్య writeComment(స్థిరరాశి అక్షరం* comment, తార్కిక eol_comment)
     {
-        if( !comment )
+        ఒకవేళ( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = static_cast<int>(strlen(comment));
-        char* ptr = fs->bufferPtr();
-        const char* eol = strchr(comment, '\n');
-        bool multiline = eol != 0;
+        పూర్ణాంకం len = static_cast<పూర్ణాంకం>(అక్షరశ్రేణి_పొడవు(comment));
+        అక్షరం* ptr = fs->బఫరు_Ptr();
+        స్థిరరాశి అక్షరం* eol = strchr(comment, '\n');
+        తార్కిక multiline = eol != 0;
 
-        if( !eol_comment || multiline || fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
+        ఒకవేళ( !eol_comment || multiline || fs->బఫరు_చివర_2() - ptr < len || ptr == fs->బఫరు_ప్రారంభం() )
             ptr = fs->flush();
-        else
+        లేకపోతే
             *ptr++ = ' ';
 
-        while( comment )
+        అయితే( comment )
         {
             *ptr++ = '/';
             *ptr++ = '/';
             *ptr++ = ' ';
-            if( eol )
+            ఒకవేళ( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
-                memcpy( ptr, comment, eol - comment + 1 );
-                fs->setBufferPtr(ptr + (eol - comment));
+                ptr = fs->resize_Write_బఫరు( ptr, (పూర్ణాంకం)(eol - comment) + 1 );
+                జ్ఞాపకం_నకలు( ptr, comment, eol - comment + 1 );
+                fs->సమితి_బఫరు_Ptr(ptr + (eol - comment));
                 comment = eol + 1;
                 eol = strchr( comment, '\n' );
             }
-            else
+            లేకపోతే
             {
-                len = (int)strlen(comment);
-                ptr = fs->resizeWriteBuffer( ptr, len );
-                memcpy( ptr, comment, len );
-                fs->setBufferPtr(ptr + len);
+                len = (పూర్ణాంకం)అక్షరశ్రేణి_పొడవు(comment);
+                ptr = fs->resize_Write_బఫరు( ptr, len );
+                జ్ఞాపకం_నకలు( ptr, comment, len );
+                fs->సమితి_బఫరు_Ptr(ptr + len);
                 comment = 0;
             }
             ptr = fs->flush();
         }
     }
 
-    void startNextStream()
+    శూన్య ప్రారంభం_తదుపరి_ప్రవాహం()
     {
         fs->puts( "...\n" );
         fs->puts( "---\n" );
     }
 
-protected:
+రక్షిత:
     FileStorage_API* fs;
 };
 
-class JSONParser : public FileStorageParser
+తరగతి JSONParser : బహిరంగ FileStorageParser
 {
-public:
+బహిరంగ:
     JSONParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
-    virtual ~JSONParser() {}
+    మాయా ~JSONParser() {}
 
-    char* skipSpaces( char* ptr )
+    అక్షరం* skipSpaces( అక్షరం* ptr )
     {
-        bool is_eof = false;
-        bool is_completed = false;
+        తార్కిక is_eof = అబద్ధం;
+        తార్కిక is_completed = అబద్ధం;
 
-        while ( is_eof == false && is_completed == false )
+        అయితే ( is_eof == అబద్ధం && is_completed == అబద్ధం )
         {
-            if (!ptr)
+            ఒకవేళ (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
-            switch ( *ptr )
+            ఎంపిక ( *ptr )
             {
                 /* comment */
-                case '/' : {
+                స్థితి '/' : {
                     ptr++;
-                    if ( *ptr == '\0' )
+                    ఒకవేళ ( *ptr == '\0' )
                     {
                         ptr = fs->gets();
-                        if( !ptr || !*ptr ) { is_eof = true; break; }
+                        ఒకవేళ( !ptr || !*ptr ) { is_eof = నిజం; ఆపు; }
                     }
 
-                    if ( *ptr == '/' )
+                    ఒకవేళ ( *ptr == '/' )
                     {
-                        while ( *ptr != '\n' && *ptr != '\r' )
+                        అయితే ( *ptr != '\n' && *ptr != '\r' )
                         {
-                            if ( *ptr == '\0' )
+                            ఒకవేళ ( *ptr == '\0' )
                             {
                                 ptr = fs->gets();
-                                if( !ptr || !*ptr ) { is_eof = true; break; }
+                                ఒకవేళ( !ptr || !*ptr ) { is_eof = నిజం; ఆపు; }
                             }
-                            else
+                            లేకపోతే
                             {
                                 ptr++;
                             }
                         }
                     }
-                    else if ( *ptr == '*' )
+                    లేకపోతే ఒకవేళ ( *ptr == '*' )
                     {
                         ptr++;
-                        for (;;)
+                        కొరకు (;;)
                         {
-                            if ( *ptr == '\0' )
+                            ఒకవేళ ( *ptr == '\0' )
                             {
                                 ptr = fs->gets();
-                                if( !ptr || !*ptr ) { is_eof = true; break; }
+                                ఒకవేళ( !ptr || !*ptr ) { is_eof = నిజం; ఆపు; }
                             }
-                            else if ( *ptr == '*' )
+                            లేకపోతే ఒకవేళ ( *ptr == '*' )
                             {
                                 ptr++;
-                                if ( *ptr == '\0' )
+                                ఒకవేళ ( *ptr == '\0' )
                                 {
                                     ptr = fs->gets();
-                                    if( !ptr || !*ptr ) { is_eof = true; break; }
+                                    ఒకవేళ( !ptr || !*ptr ) { is_eof = నిజం; ఆపు; }
                                 }
-                                if ( *ptr == '/' )
+                                ఒకవేళ ( *ptr == '/' )
                                 {
                                     ptr++;
-                                    break;
+                                    ఆపు;
                                 }
                             }
-                            else
+                            లేకపోతే
                             {
                                 ptr++;
                             }
                         }
                     }
-                    else
+                    లేకపోతే
                     {
                         CV_PARSE_ERROR_CPP( "Not supported escape character" );
                     }
-                } break;
+                } ఆపు;
                     /* whitespace */
-                case '\t':
-                case ' ' : {
+                స్థితి '\t':
+                స్థితి ' ' : {
                     ptr++;
-                } break;
+                } ఆపు;
                     /* newline || end mark */
-                case '\0':
-                case '\n':
-                case '\r': {
+                స్థితి '\0':
+                స్థితి '\n':
+                స్థితి '\r': {
                     ptr = fs->gets();
-                    if( !ptr || !*ptr ) { is_eof = true; break; }
-                } break;
+                    ఒకవేళ( !ptr || !*ptr ) { is_eof = నిజం; ఆపు; }
+                } ఆపు;
                     /* other character */
-                default: {
-                    if( !cv_isprint(*ptr) )
+                అప్రమేయ: {
+                    ఒకవేళ( !cv_isprint(*ptr) )
                         CV_PARSE_ERROR_CPP( "Invalid character in the stream" );
-                    is_completed = true;
-                } break;
+                    is_completed = నిజం;
+                } ఆపు;
             }
         }
 
-        if ( is_eof || !is_completed )
+        ఒకవేళ ( is_eof || !is_completed )
         {
-            ptr = fs->bufferStart();
+            ptr = fs->బఫరు_ప్రారంభం();
             CV_Assert(ptr);
             *ptr = '\0';
-            fs->setEof();
-            if( !is_completed )
+            fs->సమితి_Eof();
+            ఒకవేళ( !is_completed )
                 CV_PARSE_ERROR_CPP( "Abort at parse time" );
         }
 
-        return ptr;
+        తిరిగి ptr;
     }
 
-    uint32_t parseUnicodeEscape(char*& ptr)
+    uint32_t parseUnicodeEscape(అక్షరం*& ptr)
     {
         uint32_t codepoint = 0;
-        for (int k = 0; k < 4; k++, ptr++) {
-            CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-            char hex = *ptr;
+        కొరకు (పూర్ణాంకం k = 0; k < 4; k++, ptr++) {
+            CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP();
+            అక్షరం hex = *ptr;
             uint32_t digit = 0;
-            if      (hex >= '0' && hex <= '9') digit = (uint32_t)(hex - '0');
-            else if (hex >= 'a' && hex <= 'f') digit = (uint32_t)(hex - 'a') + 10u;
-            else if (hex >= 'A' && hex <= 'F') digit = (uint32_t)(hex - 'A') + 10u;
-            else CV_PARSE_ERROR_CPP("invalid \\uXXXX escape sequence");
+            ఒకవేళ      (hex >= '0' && hex <= '9') digit = (uint32_t)(hex - '0');
+            లేకపోతే ఒకవేళ (hex >= 'a' && hex <= 'f') digit = (uint32_t)(hex - 'a') + 10u;
+            లేకపోతే ఒకవేళ (hex >= 'A' && hex <= 'F') digit = (uint32_t)(hex - 'A') + 10u;
+            లేకపోతే CV_PARSE_ERROR_CPP("invalid \\uXXXX escape sequence");
             codepoint = (codepoint << 4) | digit;
         }
-        return codepoint;
+        తిరిగి codepoint;
     }
 
-    static void appendUtf8(std::string& out, uint32_t codepoint)
+    స్థిర శూన్య appendUtf8(std::string& out, uint32_t codepoint)
     {
-        if (codepoint < 0x80) {
-            out += (char)codepoint;
-        } else if (codepoint < 0x800) {
-            out += (char)(0xC0 | (codepoint >> 6));
-            out += (char)(0x80 | (codepoint & 0x3F));
-        } else if (codepoint < 0x10000) {
-            out += (char)(0xE0 | (codepoint >> 12));
-            out += (char)(0x80 | ((codepoint >> 6) & 0x3F));
-            out += (char)(0x80 | (codepoint & 0x3F));
-        } else {
-            out += (char)(0xF0 | (codepoint >> 18));
-            out += (char)(0x80 | ((codepoint >> 12) & 0x3F));
-            out += (char)(0x80 | ((codepoint >> 6) & 0x3F));
-            out += (char)(0x80 | (codepoint & 0x3F));
+        ఒకవేళ (codepoint < 0x80) {
+            out += (అక్షరం)codepoint;
+        } లేకపోతే ఒకవేళ (codepoint < 0x800) {
+            out += (అక్షరం)(0xC0 | (codepoint >> 6));
+            out += (అక్షరం)(0x80 | (codepoint & 0x3F));
+        } లేకపోతే ఒకవేళ (codepoint < 0x10000) {
+            out += (అక్షరం)(0xE0 | (codepoint >> 12));
+            out += (అక్షరం)(0x80 | ((codepoint >> 6) & 0x3F));
+            out += (అక్షరం)(0x80 | (codepoint & 0x3F));
+        } లేకపోతే {
+            out += (అక్షరం)(0xF0 | (codepoint >> 18));
+            out += (అక్షరం)(0x80 | ((codepoint >> 12) & 0x3F));
+            out += (అక్షరం)(0x80 | ((codepoint >> 6) & 0x3F));
+            out += (అక్షరం)(0x80 | (codepoint & 0x3F));
         }
     }
 
@@ -458,441 +458,441 @@ public:
     // surrogate pair and has to be recombined here. Encoding the halves separately would
     // emit three bytes each for code points that are not Unicode scalar values at all --
     // CESU-8, which no UTF-8 reader accepts.
-    void parseUnicodeEscapeToUtf8(char*& ptr, std::string& out)
+    శూన్య parse_Unicode_Escape_గమ్యం_Utf8(అక్షరం*& ptr, std::string& out)
     {
         uint32_t codepoint = parseUnicodeEscape(ptr);
-        if (codepoint >= 0xD800 && codepoint <= 0xDBFF)
+        ఒకవేళ (codepoint >= 0xD800 && codepoint <= 0xDBFF)
         {
             // ptr is just past the four hex digits; the low half must be its own escape.
             // Short-circuits before ptr[1] when ptr[0] is the buffer's terminating NUL.
-            if (ptr[0] != '\\' || ptr[1] != 'u')
+            ఒకవేళ (ptr[0] != '\\' || ptr[1] != 'u')
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
             ptr += 2;
-            uint32_t low = parseUnicodeEscape(ptr);
-            if (low < 0xDC00 || low > 0xDFFF)
+            uint32_t దిగువ = parseUnicodeEscape(ptr);
+            ఒకవేళ (దిగువ < 0xDC00 || దిగువ > 0xDFFF)
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
-            codepoint = 0x10000u + ((codepoint - 0xD800u) << 10) + (low - 0xDC00u);
+            codepoint = 0x10000u + ((codepoint - 0xD800u) << 10) + (దిగువ - 0xDC00u);
         }
-        else if (codepoint >= 0xDC00 && codepoint <= 0xDFFF)
+        లేకపోతే ఒకవేళ (codepoint >= 0xDC00 && codepoint <= 0xDFFF)
             CV_PARSE_ERROR_CPP("unpaired \\uXXXX low surrogate");
         appendUtf8(out, codepoint);
     }
 
-    char* parseKey( char* ptr, FileNode& collection, FileNode& value_placeholder )
+    అక్షరం* parse_కీలకం( అక్షరం* ptr, File_కణుపు& collection, File_కణుపు& విలువ_placeholder )
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( *ptr != '"' )
+        ఒకవేళ( *ptr != '"' )
             CV_PARSE_ERROR_CPP( "Key must start with \'\"\'" );
 
-        char * beg = ptr + 1;
-        std::string key_name;
-        do {
-            if (*ptr == '\\') { // skip the next character if current is back slash
+        అక్షరం * beg = ptr + 1;
+        std::string కీలకం_name;
+        చేయి {
+            ఒకవేళ (*ptr == '\\') { // skip the next character if current is back slash
                 ++ptr;
-                CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-                if (*ptr == 'u') {
+                CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP();
+                ఒకవేళ (*ptr == 'u') {
                     ++ptr;
-                    parseUnicodeEscapeToUtf8(ptr, key_name);
-                    continue;
+                    parse_Unicode_Escape_గమ్యం_Utf8(ptr, కీలకం_name);
+                    కొనసాగు;
                 }
-                key_name += *ptr;
-            } else if (*ptr != '"') {
+                కీలకం_name += *ptr;
+            } లేకపోతే ఒకవేళ (*ptr != '"') {
                 // normal byte: append current, do NOT skip ahead first
-                key_name += *ptr;
+                కీలకం_name += *ptr;
             }
             ++ptr;
-            CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-        } while( cv_isprint(*ptr) && *ptr != '"' );
+            CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP();
+        } అయితే( cv_isprint(*ptr) && *ptr != '"' );
 
-        if( *ptr != '"' )
+        ఒకవేళ( *ptr != '"' )
             CV_PARSE_ERROR_CPP( "Key must end with \'\"\'" );
 
-        if( ptr == beg )
+        ఒకవేళ( ptr == beg )
             CV_PARSE_ERROR_CPP( "Key is empty" );
-        value_placeholder = fs->addNode(collection, key_name, FileNode::NONE);
+        విలువ_placeholder = fs->కూడు_కణుపు(collection, కీలకం_name, File_కణుపు::NONE);
 
         ptr++;
         ptr = skipSpaces( ptr );
-        if( !ptr || !*ptr )
-            return 0;
+        ఒకవేళ( !ptr || !*ptr )
+            తిరిగి 0;
 
-        if( *ptr != ':' )
+        ఒకవేళ( *ptr != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\' between key and value" );
 
-        return ++ptr;
+        తిరిగి ++ptr;
     }
 
-    bool getBase64Row(char* ptr, int /*indent*/, char* &beg, char* &end)
+    తార్కిక get_Base64_అడ్డువరుస(అక్షరం* ptr, పూర్ణాంకం /*indent*/, అక్షరం* &beg, అక్షరం* &end)
     {
         beg = end = ptr;
-        if( !ptr || !*ptr )
-            return false;
+        ఒకవేళ( !ptr || !*ptr )
+            తిరిగి అబద్ధం;
 
         // find end of the row
-        while( cv_isprint(*ptr) && (*ptr != ',') && (*ptr != '"'))
+        అయితే( cv_isprint(*ptr) && (*ptr != ',') && (*ptr != '"'))
             ++ptr;
-        if ( *ptr == '\0' )
+        ఒకవేళ ( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of line" );
 
         end = ptr;
-        return true;
+        తిరిగి నిజం;
     }
 
-    char* parseValue( char* ptr, FileNode& node )
+    అక్షరం* parse_విలువ( అక్షరం* ptr, File_కణుపు& కణుపు )
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid value input");
 
         ptr = skipSpaces( ptr );
-        if( !ptr || !*ptr )
+        ఒకవేళ( !ptr || !*ptr )
             CV_PARSE_ERROR_CPP( "Unexpected End-Of-File" );
 
-        if( *ptr == '"' )
+        ఒకవేళ( *ptr == '"' )
         {   /* must be string or Base64 string */
             ptr++;
-            char * beg = ptr;
+            అక్షరం * beg = ptr;
             size_t len = 0u;
-            for ( ; (cv_isalnum(*ptr) || *ptr == '$' ) && len <= 9u; ptr++ )
+            కొరకు ( ; (cv_isalnum(*ptr) || *ptr == '$' ) && len <= 9u; ptr++ )
                 len++;
 
-            if ((len >= 8u) && (memcmp( beg, "$base64$", 8u ) == 0) )
+            ఒకవేళ ((len >= 8u) && (memcmp( beg, "$base64$", 8u ) == 0) )
             {   /**************** Base64 string ****************/
                 ptr = beg + 8;
-                ptr = fs->parseBase64(ptr, 0, node);
+                ptr = fs->parseBase64(ptr, 0, కణుపు);
 
-                if ( *ptr != '\"' )
+                ఒకవేళ ( *ptr != '\"' )
                     CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                else
+                లేకపోతే
                     ptr++;
             }
-            else
+            లేకపోతే
             {   /**************** normal string ****************/
-                int i = 0, sz;
+                పూర్ణాంకం i = 0, sz;
 
                 ptr = beg;
-                bool is_matching = false;
-                while ( !is_matching )
+                తార్కిక is_matching = అబద్ధం;
+                అయితే ( !is_matching )
                 {
-                    switch ( *ptr )
+                    ఎంపిక ( *ptr )
                     {
-                        case '\\':
+                        స్థితి '\\':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (పూర్ణాంకం)(ptr - beg);
+                            ఒకవేళ( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                ఒకవేళ (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
-                                memcpy(buf + i, beg, sz);
+                                జ్ఞాపకం_నకలు(buf + i, beg, sz);
                                 i += sz;
                             }
                             ptr++;
-                            if (i + 1 >= CV_FS_MAX_LEN)
+                            ఒకవేళ (i + 1 >= CV_FS_MAX_LEN)
                                 CV_PARSE_ERROR_CPP("string is too long");
-                            switch ( *ptr )
+                            ఎంపిక ( *ptr )
                             {
-                            case '\\':
-                            case '\"':
-                            case '\'': { buf[i++] = *ptr; break; }
-                            case 'n' : { buf[i++] = '\n'; break; }
-                            case 'r' : { buf[i++] = '\r'; break; }
-                            case 't' : { buf[i++] = '\t'; break; }
-                            case 'b' : { buf[i++] = '\b'; break; }
-                            case 'f' : { buf[i++] = '\f'; break; }
-                            case 'u' : {
+                            స్థితి '\\':
+                            స్థితి '\"':
+                            స్థితి '\'': { buf[i++] = *ptr; ఆపు; }
+                            స్థితి 'n' : { buf[i++] = '\n'; ఆపు; }
+                            స్థితి 'r' : { buf[i++] = '\r'; ఆపు; }
+                            స్థితి 't' : { buf[i++] = '\t'; ఆపు; }
+                            స్థితి 'b' : { buf[i++] = '\b'; ఆపు; }
+                            స్థితి 'f' : { buf[i++] = '\f'; ఆపు; }
+                            స్థితి 'u' : {
                                 ptr++;
                                 std::string utf8;
-                                parseUnicodeEscapeToUtf8(ptr, utf8);
-                                if (i + (int)utf8.size() >= CV_FS_MAX_LEN)
+                                parse_Unicode_Escape_గమ్యం_Utf8(ptr, utf8);
+                                ఒకవేళ (i + (పూర్ణాంకం)utf8.size() >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
-                                memcpy(buf + i, utf8.data(), utf8.size());
-                                i += (int)utf8.size();
+                                జ్ఞాపకం_నకలు(buf + i, utf8.దత్తాంశం(), utf8.size());
+                                i += (పూర్ణాంకం)utf8.size();
                                 beg = ptr;
-                                continue;
+                                కొనసాగు;
                             }
-                            default  : { CV_PARSE_ERROR_CPP( "Invalid escape character" ); }
-                            break;
+                            అప్రమేయ  : { CV_PARSE_ERROR_CPP( "Invalid escape character" ); }
+                            ఆపు;
                             }
                             ptr++;
                             beg = ptr;
-                            break;
+                            ఆపు;
                         }
-                        case '\0':
+                        స్థితి '\0':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (పూర్ణాంకం)(ptr - beg);
+                            ఒకవేళ( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                ఒకవేళ (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
-                                memcpy(buf + i, beg, sz);
+                                జ్ఞాపకం_నకలు(buf + i, beg, sz);
                                 i += sz;
                             }
                             ptr = fs->gets();
-                            if ( !ptr || !*ptr )
+                            ఒకవేళ ( !ptr || !*ptr )
                                 CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
 
                             beg = ptr;
-                            break;
+                            ఆపు;
                         }
-                        case '\"':
+                        స్థితి '\"':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (పూర్ణాంకం)(ptr - beg);
+                            ఒకవేళ( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                ఒకవేళ (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
-                                memcpy(buf + i, beg, sz);
+                                జ్ఞాపకం_నకలు(buf + i, beg, sz);
                                 i += sz;
                             }
                             beg = ptr;
-                            is_matching = true;
-                            break;
+                            is_matching = నిజం;
+                            ఆపు;
                         }
-                        case '\n':
-                        case '\r':
+                        స్థితి '\n':
+                        స్థితి '\r':
                         {
                             CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                            break;
+                            ఆపు;
                         }
-                        default:
+                        అప్రమేయ:
                         {
                             ptr++;
-                            break;
+                            ఆపు;
                         }
                     }
                 }
 
-                if ( *ptr != '\"' )
+                ఒకవేళ ( *ptr != '\"' )
                     CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                else
+                లేకపోతే
                     ptr++;
 
-                node.setValue(FileNode::STRING, buf, i);
+                కణుపు.సమితి_విలువ(File_కణుపు::STRING, buf, i);
             }
         }
-        else if ( cv_isdigit(*ptr) || *ptr == '-' || *ptr == '+' || *ptr == '.' )
+        లేకపోతే ఒకవేళ ( cv_isdigit(*ptr) || *ptr == '-' || *ptr == '+' || *ptr == '.' )
         {    /**************** number ****************/
-            char * beg = ptr;
-            if ( *ptr == '+' || *ptr == '-' )
+            అక్షరం * beg = ptr;
+            ఒకవేళ ( *ptr == '+' || *ptr == '-' )
             {
                 ptr++;
-                CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+                CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP();
             }
-            while( cv_isdigit(*ptr) )
+            అయితే( cv_isdigit(*ptr) )
             {
                 ptr++;
-                CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+                CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP();
             }
-            if (*ptr == '.' || *ptr == 'e')
+            ఒకవేళ (*ptr == '.' || *ptr == 'e')
             {
-                double fval = fs->strtod( beg, &ptr );
-                CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+                ద్విగుణ fval = fs->strtod( beg, &ptr );
+                CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP();
 
-                node.setValue(FileNode::REAL, &fval);
+                కణుపు.సమితి_విలువ(File_కణుపు::REAL, &fval);
             }
-            else
+            లేకపోతే
             {
                 int64_t ival = strtoll( beg, &ptr, 0 );
-                CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+                CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP();
 
-                node.setValue(FileNode::INT, &ival);
+                కణుపు.సమితి_విలువ(File_కణుపు::INT, &ival);
             }
 
-            if ( beg >= ptr )
+            ఒకవేళ ( beg >= ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
         }
-        else
+        లేకపోతే
         {    /**************** other data ****************/
-            const char* beg = ptr;
-            int len = 0;
-            for ( ; cv_isalpha(*ptr) && len <= 6; )
+            స్థిరరాశి అక్షరం* beg = ptr;
+            పూర్ణాంకం len = 0;
+            కొరకు ( ; cv_isalpha(*ptr) && len <= 6; )
             {
                 len++;
                 ptr++;
-                CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+                CV_PERSISTENCE_CHECK_చివర_యొక్క_బఫరు_BUG_CPP();
             }
 
-            if( len == 4 && memcmp( beg, "null", 4 ) == 0 )
+            ఒకవేళ( len == 4 && memcmp( beg, "null", 4 ) == 0 )
                 ;
-            else if( (len == 4 && memcmp( beg, "true", 4 ) == 0) ||
+            లేకపోతే ఒకవేళ( (len == 4 && memcmp( beg, "true", 4 ) == 0) ||
                      (len == 5 && memcmp( beg, "false", 5 ) == 0) )
             {
                 int64_t ival = *beg == 't' ? 1 : 0;
-                node.setValue(FileNode::INT, &ival);
+                కణుపు.సమితి_విలువ(File_కణుపు::INT, &ival);
             }
-            else
+            లేకపోతే
             {
                 CV_PARSE_ERROR_CPP( "Unrecognized value" );
             }
         }
 
-        return ptr;
+        తిరిగి ptr;
     }
 
-    char* parseSeq( char* ptr, FileNode& node, int depth = 0 )
+    అక్షరం* parseSeq( అక్షరం* ptr, File_కణుపు& కణుపు, పూర్ణాంకం లోతు = 0 )
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP( "ptr is NULL" );
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        ఒకవేళ( లోతు > CV_PERSISTENCE_MAX_లోతు )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        if ( *ptr != '[' )
+        ఒకవేళ ( *ptr != '[' )
             CV_PARSE_ERROR_CPP( "'[' - left-brace of seq is missing" );
-        else
+        లేకపోతే
             ptr++;
 
-        fs->convertToCollection(FileNode::SEQ, node);
+        fs->convert_గమ్యం_Collection(File_కణుపు::SEQ, కణుపు);
 
-        for (;;)
+        కొరకు (;;)
         {
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ఒకవేళ( !ptr || !*ptr )
+                ఆపు;
 
-            if ( *ptr != ']' )
+            ఒకవేళ ( *ptr != ']' )
             {
-                FileNode child = fs->addNode(node, std::string(), FileNode::NONE );
+                File_కణుపు బిడ్డ = fs->కూడు_కణుపు(కణుపు, std::string(), File_కణుపు::NONE );
 
-                if ( *ptr == '[' )
-                    ptr = parseSeq( ptr, child, depth + 1 );
-                else if ( *ptr == '{' )
-                    ptr = parseMap( ptr, child, depth + 1 );
-                else
-                    ptr = parseValue( ptr, child );
+                ఒకవేళ ( *ptr == '[' )
+                    ptr = parseSeq( ptr, బిడ్డ, లోతు + 1 );
+                లేకపోతే ఒకవేళ ( *ptr == '{' )
+                    ptr = parseMap( ptr, బిడ్డ, లోతు + 1 );
+                లేకపోతే
+                    ptr = parse_విలువ( ptr, బిడ్డ );
             }
 
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ఒకవేళ( !ptr || !*ptr )
+                ఆపు;
 
-            if ( *ptr == ',' )
+            ఒకవేళ ( *ptr == ',' )
                 ptr++;
-            else if ( *ptr == ']' )
-                break;
-            else
+            లేకపోతే ఒకవేళ ( *ptr == ']' )
+                ఆపు;
+            లేకపోతే
                 CV_PARSE_ERROR_CPP( "Unexpected character" );
         }
 
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if ( *ptr != ']' )
+        ఒకవేళ ( *ptr != ']' )
             CV_PARSE_ERROR_CPP( "']' - right-brace of seq is missing" );
-        else
+        లేకపోతే
             ptr++;
 
-        fs->finalizeCollection(node);
-        return ptr;
+        fs->finalizeCollection(కణుపు);
+        తిరిగి ptr;
     }
 
-    char* parseMap( char* ptr, FileNode& node, int depth = 0 )
+    అక్షరం* parseMap( అక్షరం* ptr, File_కణుపు& కణుపు, పూర్ణాంకం లోతు = 0 )
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        ఒకవేళ( లోతు > CV_PERSISTENCE_MAX_లోతు )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        if ( *ptr != '{' )
+        ఒకవేళ ( *ptr != '{' )
             CV_PARSE_ERROR_CPP( "'{' - left-brace of map is missing" );
-        else
+        లేకపోతే
             ptr++;
 
-        fs->convertToCollection(FileNode::MAP, node);
+        fs->convert_గమ్యం_Collection(File_కణుపు::MAP, కణుపు);
 
-        for( ;; )
+        కొరకు( ;; )
         {
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ఒకవేళ( !ptr || !*ptr )
+                ఆపు;
 
-            if ( *ptr == '"' )
+            ఒకవేళ ( *ptr == '"' )
             {
-                FileNode child;
-                ptr = parseKey( ptr, node, child );
-                if( !ptr || !*ptr )
-                    break;
+                File_కణుపు బిడ్డ;
+                ptr = parse_కీలకం( ptr, కణుపు, బిడ్డ );
+                ఒకవేళ( !ptr || !*ptr )
+                    ఆపు;
                 ptr = skipSpaces( ptr );
-                if( !ptr || !*ptr )
-                    break;
+                ఒకవేళ( !ptr || !*ptr )
+                    ఆపు;
 
-                if ( *ptr == '[' )
-                    ptr = parseSeq( ptr, child, depth + 1 );
-                else if ( *ptr == '{' )
-                    ptr = parseMap( ptr, child, depth + 1 );
-                else
-                    ptr = parseValue( ptr, child );
+                ఒకవేళ ( *ptr == '[' )
+                    ptr = parseSeq( ptr, బిడ్డ, లోతు + 1 );
+                లేకపోతే ఒకవేళ ( *ptr == '{' )
+                    ptr = parseMap( ptr, బిడ్డ, లోతు + 1 );
+                లేకపోతే
+                    ptr = parse_విలువ( ptr, బిడ్డ );
             }
 
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ఒకవేళ( !ptr || !*ptr )
+                ఆపు;
 
-            if ( *ptr == ',' )
+            ఒకవేళ ( *ptr == ',' )
                 ptr++;
-            else if ( *ptr == '}' )
-                break;
-            else
+            లేకపోతే ఒకవేళ ( *ptr == '}' )
+                ఆపు;
+            లేకపోతే
             {
                 CV_PARSE_ERROR_CPP( "Unexpected character" );
             }
         }
 
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if ( *ptr != '}' )
+        ఒకవేళ ( *ptr != '}' )
             CV_PARSE_ERROR_CPP( "'}' - right-brace of map is missing" );
-        else
+        లేకపోతే
             ptr++;
 
-        fs->finalizeCollection(node);
-        return ptr;
+        fs->finalizeCollection(కణుపు);
+        తిరిగి ptr;
     }
 
-    bool parse( char* ptr )
+    తార్కిక parse( అక్షరం* ptr )
     {
-        if (!ptr)
+        ఒకవేళ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         ptr = skipSpaces( ptr );
-        if ( !ptr || !*ptr )
-            return false;
+        ఒకవేళ ( !ptr || !*ptr )
+            తిరిగి అబద్ధం;
 
-        FileNode root_collection(fs->getFS(), 0, 0);
+        File_కణుపు మూలం_collection(fs->getFS(), 0, 0);
 
-        if( *ptr == '{' )
+        ఒకవేళ( *ptr == '{' )
         {
-            FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::MAP);
-            parseMap( ptr, root_node );
+            File_కణుపు మూలం_కణుపు = fs->కూడు_కణుపు(మూలం_collection, std::string(), File_కణుపు::MAP);
+            parseMap( ptr, మూలం_కణుపు );
         }
-        else if ( *ptr == '[' )
+        లేకపోతే ఒకవేళ ( *ptr == '[' )
         {
-            FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::SEQ);
-            parseSeq( ptr, root_node );
+            File_కణుపు మూలం_కణుపు = fs->కూడు_కణుపు(మూలం_collection, std::string(), File_కణుపు::SEQ);
+            parseSeq( ptr, మూలం_కణుపు );
         }
-        else
+        లేకపోతే
         {
             CV_PARSE_ERROR_CPP( "left-brace of top level is missing" );
         }
 
-        return true;
+        తిరిగి నిజం;
     }
 
     FileStorage_API* fs;
-    char buf[CV_FS_MAX_LEN+1024];
+    అక్షరం buf[CV_FS_MAX_LEN+1024];
 };
 
 Ptr<FileStorageEmitter> createJSONEmitter(FileStorage_API* fs)
 {
-    return makePtr<JSONEmitter>(fs);
+    తిరిగి makePtr<JSONEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createJSONParser(FileStorage_API* fs)
 {
-    return makePtr<JSONParser>(fs);
+    తిరిగి makePtr<JSONParser>(fs);
 }
 
 }

@@ -2,232 +2,232 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "bufferpool.impl.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "bufferpool.impl.hpp"
 
-namespace cv {
+నామాకాశ cv {
 
-std::string layoutToString(DataLayout layout)
+std::string layout_గమ్యం_String(దత్తాంశం_Layout layout)
 {
-    return
-        layout == DATA_LAYOUT_ND ? "ND" :
-        layout == DATA_LAYOUT_NCHW ? "NCHW" :
-        layout == DATA_LAYOUT_NHWC ? "NHWC" :
-        layout == DATA_LAYOUT_BLOCK ? "BLOCK" :
-        layout == DATA_LAYOUT_NCDHW ? "NCDHW" :
-        layout == DATA_LAYOUT_NDHWC ? "NDHWC" :
-        layout == DATA_LAYOUT_PLANAR ? "PLANAR" :
-        layout == DATA_LAYOUT_UNKNOWN ? "Unknown" : "???";
+    తిరిగి
+        layout == దత్తాంశం_LAYOUT_ND ? "ND" :
+        layout == దత్తాంశం_LAYOUT_NCHW ? "NCHW" :
+        layout == దత్తాంశం_LAYOUT_NHWC ? "NHWC" :
+        layout == దత్తాంశం_LAYOUT_ఖండం ? "BLOCK" :
+        layout == దత్తాంశం_LAYOUT_NCDHW ? "NCDHW" :
+        layout == దత్తాంశం_LAYOUT_NDHWC ? "NDHWC" :
+        layout == దత్తాంశం_LAYOUT_PLANAR ? "PLANAR" :
+        layout == దత్తాంశం_LAYOUT_UNKNOWN ? "Unknown" : "???";
 }
 
-bool operator == (const MatShape& size1, const MatShape& size2)
+తార్కిక క్రియాకారకం == (స్థిరరాశి MatShape& size1, స్థిరరాశి MatShape& size2)
 {
-    if (size1.dims != size2.dims)
-        return false;
-    if (size1.layout != size2.layout &&
-        size1.layout != DATA_LAYOUT_UNKNOWN &&
-        size2.layout != DATA_LAYOUT_UNKNOWN)
-        return false;
-    if (size1.layout == DATA_LAYOUT_BLOCK &&
-        size2.layout == DATA_LAYOUT_BLOCK &&
+    ఒకవేళ (size1.dims != size2.dims)
+        తిరిగి అబద్ధం;
+    ఒకవేళ (size1.layout != size2.layout &&
+        size1.layout != దత్తాంశం_LAYOUT_UNKNOWN &&
+        size2.layout != దత్తాంశం_LAYOUT_UNKNOWN)
+        తిరిగి అబద్ధం;
+    ఒకవేళ (size1.layout == దత్తాంశం_LAYOUT_ఖండం &&
+        size2.layout == దత్తాంశం_LAYOUT_ఖండం &&
         size1.C != size2.C)
-        return false;
-    for (int i = 0; i < size1.dims; i++) {
-        if (size1.p[i] != size2.p[i])
-            return false;
+        తిరిగి అబద్ధం;
+    కొరకు (పూర్ణాంకం i = 0; i < size1.dims; i++) {
+        ఒకవేళ (size1.p[i] != size2.p[i])
+            తిరిగి అబద్ధం;
     }
-    return true;
+    తిరిగి నిజం;
 }
 
-bool operator != (const MatShape& size1, const MatShape& size2)
+తార్కిక క్రియాకారకం != (స్థిరరాశి MatShape& size1, స్థిరరాశి MatShape& size2)
 {
-    return !(size1 == size2);
+    తిరిగి !(size1 == size2);
 }
 
 /////////////////////////// MatShape ////////////////////////////////
 
 MatShape MatShape::scalar()
 {
-    return MatShape(0);
+    తిరిగి MatShape(0);
 }
 
-void MatShape::clear()
+శూన్య MatShape::clear()
 {
     dims = -1;
-    layout = DATA_LAYOUT_UNKNOWN;
+    layout = దత్తాంశం_LAYOUT_UNKNOWN;
     C = 0;
-    for (int i = 0; i < MAX_DIMS; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < MAX_DIMS; i++)
         p[i] = 0;
 }
 
-void MatShape::resize(size_t newSize, int value)
+శూన్య MatShape::resize(size_t new_కొలత, పూర్ణాంకం value)
 {
-    CV_Assert(newSize < (size_t)MAX_DIMS);
-    int old_dims = std::max(dims, 0);
-    dims = (int)newSize;
-    for (int i = old_dims; i < dims; i++)
+    CV_Assert(new_కొలత < (size_t)MAX_DIMS);
+    పూర్ణాంకం old_dims = std::max(dims, 0);
+    dims = (పూర్ణాంకం)new_కొలత;
+    కొరకు (పూర్ణాంకం i = old_dims; i < dims; i++)
         p[i] = value;
 }
 
-void MatShape::reserve(size_t)
+శూన్య MatShape::reserve(size_t)
 {
     // no op; maybe need to add a check for overflow, but we check it anyway in other operations
 }
 
-void MatShape::assign(size_t newSize, int value)
+శూన్య MatShape::assign(size_t new_కొలత, పూర్ణాంకం value)
 {
-    CV_Assert(newSize < (size_t)MAX_DIMS);
-    dims = (int)newSize;
-    for (int i = 0; i < dims; i++)
+    CV_Assert(new_కొలత < (size_t)MAX_DIMS);
+    dims = (పూర్ణాంకం)new_కొలత;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++)
         p[i] = value;
 }
 
-void MatShape::assign(int newSize, int value)
+శూన్య MatShape::assign(పూర్ణాంకం new_కొలత, పూర్ణాంకం value)
 {
-    assign((size_t)newSize, value);
+    assign((size_t)new_కొలత, value);
 }
 
-void MatShape::assign(const int* begin, const int* end)
+శూన్య MatShape::assign(స్థిరరాశి పూర్ణాంకం* begin, స్థిరరాశి పూర్ణాంకం* end)
 {
-    assign_(begin, end);
+    కేటాయించు(begin, end);
 }
 
-void MatShape::assign_(const int* begin, const int* end)
+శూన్య MatShape::కేటాయించు(స్థిరరాశి పూర్ణాంకం* begin, స్థిరరాశి పూర్ణాంకం* end)
 {
-    ptrdiff_t newSize = end - begin;
-    CV_Assert(0 <= newSize && newSize < (ptrdiff_t)MAX_DIMS);
-    dims = (int)newSize;
-    for (int i = 0; i < dims; i++)
+    ptrdiff_t new_కొలత = end - begin;
+    CV_Assert(0 <= new_కొలత && new_కొలత < (ptrdiff_t)MAX_DIMS);
+    dims = (పూర్ణాంకం)new_కొలత;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++)
         p[i] = begin[i];
 }
 
-int* MatShape::begin() { return p; }
-const int* MatShape::begin() const { return p; }
-int* MatShape::end() { return p + std::max(dims, 0); }
-const int* MatShape::end() const { return p + std::max(dims, 0); }
-int& MatShape::back() { return p[std::max(dims-1, 0)]; }
-const int& MatShape::back() const { return p[std::max(dims-1, 0)]; }
+పూర్ణాంకం* MatShape::begin() { తిరిగి p; }
+స్థిరరాశి పూర్ణాంకం* MatShape::begin() స్థిరరాశి { తిరిగి p; }
+పూర్ణాంకం* MatShape::end() { తిరిగి p + std::max(dims, 0); }
+స్థిరరాశి పూర్ణాంకం* MatShape::end() స్థిరరాశి { తిరిగి p + std::max(dims, 0); }
+పూర్ణాంకం& MatShape::back() { తిరిగి p[std::max(dims-1, 0)]; }
+స్థిరరాశి పూర్ణాంకం& MatShape::back() స్థిరరాశి { తిరిగి p[std::max(dims-1, 0)]; }
 
-void MatShape::push_back(int value)
+శూన్య MatShape::push_back(పూర్ణాంకం value)
 {
     CV_Assert(dims+1 < MAX_DIMS);
     dims = std::max(dims+1, 1);
     p[dims-1] = value;
 }
 
-void MatShape::emplace_back(int value)
+శూన్య MatShape::emplace_back(పూర్ణాంకం value)
 {
     push_back(value);
 }
 
-void MatShape::insert(int* where, int value)
+శూన్య MatShape::insert(పూర్ణాంకం* where, పూర్ణాంకం value)
 {
-    int old_dims = std::max(dims, 0);
+    పూర్ణాంకం old_dims = std::max(dims, 0);
     CV_Assert(old_dims+1 < MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
     dims = old_dims+1;
-    for (int i = old_dims-1; i >= (int)ofs; i--)
+    కొరకు (పూర్ణాంకం i = old_dims-1; i >= (పూర్ణాంకం)ofs; i--)
         p[i+1] = p[i];
     p[ofs] = value;
 }
 
-void MatShape::insert(int* where, size_t count, int value)
+శూన్య MatShape::insert(పూర్ణాంకం* where, size_t లెక్క_2, పూర్ణాంకం value)
 {
-    int old_dims = std::max(dims, 0);
-    CV_Assert((size_t)(old_dims+count) < (size_t)MAX_DIMS);
+    పూర్ణాంకం old_dims = std::max(dims, 0);
+    CV_Assert((size_t)(old_dims+లెక్క_2) < (size_t)MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
-    dims = (int)(old_dims+count);
-    for (int i = old_dims-1; i >= (int)ofs; i--)
-        p[i+count] = p[i];
-    for (int i = 0; i < (int)count; i++)
+    dims = (పూర్ణాంకం)(old_dims+లెక్క_2);
+    కొరకు (పూర్ణాంకం i = old_dims-1; i >= (పూర్ణాంకం)ofs; i--)
+        p[i+లెక్క_2] = p[i];
+    కొరకు (పూర్ణాంకం i = 0; i < (పూర్ణాంకం)లెక్క_2; i++)
         p[i+ofs] = value;
 }
 
-void MatShape::insert(int* where, int count, int value)
+శూన్య MatShape::insert(పూర్ణాంకం* where, పూర్ణాంకం లెక్క_2, పూర్ణాంకం value)
 {
-    insert(where, (size_t)count, value);
+    insert(where, (size_t)లెక్క_2, value);
 }
 
-void MatShape::insert(int* where, const int* begin, const int* end)
+శూన్య MatShape::insert(పూర్ణాంకం* where, స్థిరరాశి పూర్ణాంకం* begin, స్థిరరాశి పూర్ణాంకం* end)
 {
-    insert_(where, begin, end);
+    చొప్పించు(where, begin, end);
 }
 
-void MatShape::insert_(int* where, const int* begin, const int* end)
+శూన్య MatShape::చొప్పించు(పూర్ణాంకం* where, స్థిరరాశి పూర్ణాంకం* begin, స్థిరరాశి పూర్ణాంకం* end)
 {
-    int old_dims = std::max(dims, 0);
+    పూర్ణాంకం old_dims = std::max(dims, 0);
     ptrdiff_t delta = end - begin;
     CV_Assert(0 <= delta && old_dims+delta < MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
-    dims = (int)(old_dims+delta);
-    for (int i = old_dims-1; i >= (int)ofs; i--)
+    dims = (పూర్ణాంకం)(old_dims+delta);
+    కొరకు (పూర్ణాంకం i = old_dims-1; i >= (పూర్ణాంకం)ofs; i--)
         p[i+delta] = p[i];
-    for (int i = 0; i < (int)delta; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < (పూర్ణాంకం)delta; i++)
         p[i+ofs] = begin[i];
 }
 
-void MatShape::erase(int* where)
+శూన్య MatShape::erase(పూర్ణాంకం* where)
 {
     CV_Assert(dims > 0);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= dims);
-    if (ofs == dims)
-        return;
+    ఒకవేళ (ofs == dims)
+        తిరిగి;
     dims--;
-    for (int i = (int)ofs+1; i <= dims; i++)
+    కొరకు (పూర్ణాంకం i = (పూర్ణాంకం)ofs+1; i <= dims; i++)
         p[i-1] = p[i];
 }
 
-size_t MatShape::total() const
+size_t MatShape::మొత్తం() స్థిరరాశి
 {
-    size_t result = 1;
-    if (dims < 0)
-        return 0;
-    for (int i = 0; i < dims; i++)
-        result *= p[i];
-    return result;
+    size_t ఫలితం = 1;
+    ఒకవేళ (dims < 0)
+        తిరిగి 0;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++)
+        ఫలితం *= p[i];
+    తిరిగి ఫలితం;
 }
 
-std::vector<int> MatShape::vec() const
+std::vector<పూర్ణాంకం> MatShape::vec() స్థిరరాశి
 {
-    if (dims < 0)
-        return std::vector<int>(1, 0);
-    return std::vector<int>(p, p + dims);
+    ఒకవేళ (dims < 0)
+        తిరిగి std::vector<పూర్ణాంకం>(1, 0);
+    తిరిగి std::vector<పూర్ణాంకం>(p, p + dims);
 }
 
-std::string MatShape::str() const
+std::string MatShape::str() స్థిరరాశి
 {
     std::stringstream sstrm;
-    if (empty()) {
+    ఒకవేళ (empty()) {
         sstrm << "<empty>";
-    } else if (dims == 0) {
+    } లేకపోతే ఒకవేళ (dims == 0) {
         sstrm << "<scalar>";
-    } else {
+    } లేకపోతే {
         sstrm << "[";
-        for (int i = 0; i < dims; i++) {
+        కొరకు (పూర్ణాంకం i = 0; i < dims; i++) {
             sstrm << (i > 0 ? " x " : "") << p[i];
         }
         sstrm << "]";
     }
-    return sstrm.str();
+    తిరిగి sstrm.str();
 }
 
-static void finalizeBlockLayout(MatShape& size, int C=0)
+స్థిర శూన్య finalize_ఖండం_Layout(MatShape& size, పూర్ణాంకం C=0)
 {
-    if (size.layout == DATA_LAYOUT_BLOCK) {
+    ఒకవేళ (size.layout == దత్తాంశం_LAYOUT_ఖండం) {
         CV_Assert(size.dims >= 4);
-        int C0 = size.p[size.dims-1];
+        పూర్ణాంకం C0 = size.p[size.dims-1];
         CV_Assert(C0 > 1 && (C0 & (C0-1)) == 0);
         size.C = C > 0 ? C : size.p[1]*size.p[size.dims-1];
-    } else {
+    } లేకపోతే {
         size.C = 0;
     }
-    for (int i = std::max(size.dims, 0); i < MatShape::MAX_DIMS; i++)
+    కొరకు (పూర్ణాంకం i = std::max(size.dims, 0); i < MatShape::MAX_DIMS; i++)
         size.p[i] = 0;
-    if (size.dims == 0)
+    ఒకవేళ (size.dims == 0)
         size.p[0] = 1;
 }
 
@@ -236,792 +236,792 @@ MatShape::MatShape()
     clear();
 }
 
-MatShape::MatShape(size_t dims_, const int* size_, DataLayout layout_, int C_)
+MatShape::MatShape(size_t dims_, స్థిరరాశి పూర్ణాంకం* కొలత_3, దత్తాంశం_Layout layout_, పూర్ణాంకం C_)
 {
     layout = layout_;
     CV_Assert(dims_ <= (size_t)MAX_DIMS);
-    dims = (int)dims_;
-    for (int i = 0; i < dims; i++) {
-        p[i] = size_ ? size_[i] : 0;
+    dims = (పూర్ణాంకం)dims_;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++) {
+        p[i] = కొలత_3 ? కొలత_3[i] : 0;
     }
-    finalizeBlockLayout(*this, C_);
+    finalize_ఖండం_Layout(*ఇది, C_);
 }
 
-MatShape::MatShape(size_t dims_, int value, DataLayout layout_)
+MatShape::MatShape(size_t dims_, పూర్ణాంకం value, దత్తాంశం_Layout layout_)
 {
     layout = layout_;
     CV_Assert(dims_ <= (size_t)MAX_DIMS);
-    dims = (int)dims_;
-    for (int i = 0; i < dims; i++) {
+    dims = (పూర్ణాంకం)dims_;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++) {
         p[i] = value;
     }
-    finalizeBlockLayout(*this, 0);
+    finalize_ఖండం_Layout(*ఇది, 0);
 }
 
-MatShape::MatShape(std::initializer_list<int> shape)
+MatShape::MatShape(std::initializer_list<పూర్ణాంకం> shape)
 {
-    layout = DATA_LAYOUT_UNKNOWN;
+    layout = దత్తాంశం_LAYOUT_UNKNOWN;
     CV_Assert(shape.size() <= (size_t)MAX_DIMS);
-    dims = (int)shape.size();
-    auto it = shape.begin();
-    for (int i = 0; i < dims; i++, ++it) {
+    dims = (పూర్ణాంకం)shape.size();
+    స్వయంచాలక it = shape.begin();
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++, ++it) {
         p[i] = *it;
     }
-    finalizeBlockLayout(*this, 0);
+    finalize_ఖండం_Layout(*ఇది, 0);
 }
 
-MatShape::MatShape(int dims_, int value, DataLayout layout_)
+MatShape::MatShape(పూర్ణాంకం dims_, పూర్ణాంకం value, దత్తాంశం_Layout layout_)
 {
     layout = layout_;
     CV_Assert(dims_ <= MAX_DIMS);
     dims = dims_;
-    for (int i = 0; i < dims; i++) {
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++) {
         p[i] = value;
     }
-    finalizeBlockLayout(*this, 0);
+    finalize_ఖండం_Layout(*ఇది, 0);
 }
 
-MatShape::MatShape(const std::vector<int>& shape_, DataLayout layout_, int C_)
+MatShape::MatShape(స్థిరరాశి std::vector<పూర్ణాంకం>& shape_, దత్తాంశం_Layout layout_, పూర్ణాంకం C_)
 {
     layout = layout_;
-    size_t shape_size = shape_.size();
-    CV_Assert(shape_size < (size_t)MAX_DIMS);
-    dims = (int)shape_size;
-    for (int i = 0; i < dims; i++) {
+    size_t shape_కొలత = shape_.size();
+    CV_Assert(shape_కొలత < (size_t)MAX_DIMS);
+    dims = (పూర్ణాంకం)shape_కొలత;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++) {
         p[i] = shape_[i];
     }
-    finalizeBlockLayout(*this, C_);
+    finalize_ఖండం_Layout(*ఇది, C_);
 }
 
-MatShape::MatShape(const int* begin, const int* end, DataLayout layout_, int C_)
+MatShape::MatShape(స్థిరరాశి పూర్ణాంకం* begin, స్థిరరాశి పూర్ణాంకం* end, దత్తాంశం_Layout layout_, పూర్ణాంకం C_)
 {
     layout = layout_;
-    ptrdiff_t shape_size = end - begin;
-    CV_Assert(0 <= shape_size && shape_size < MAX_DIMS);
-    dims = (int)shape_size;
-    for (int i = 0; i < dims; i++) {
+    ptrdiff_t shape_కొలత = end - begin;
+    CV_Assert(0 <= shape_కొలత && shape_కొలత < MAX_DIMS);
+    dims = (పూర్ణాంకం)shape_కొలత;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++) {
         p[i] = begin[i];
     }
-    finalizeBlockLayout(*this, C_);
+    finalize_ఖండం_Layout(*ఇది, C_);
 }
 
-MatShape::MatShape(const MatShape& shape)
+MatShape::MatShape(స్థిరరాశి MatShape& shape)
 {
     dims = shape.dims;
     layout = shape.layout;
     C = shape.C;
-    for (int i = 0; i < MAX_DIMS; i++)
+    కొరకు (పూర్ణాంకం i = 0; i < MAX_DIMS; i++)
         p[i] = shape.p[i];
 }
 
-MatShape& MatShape::operator = (const MatShape& shape)
+MatShape& MatShape::క్రియాకారకం = (స్థిరరాశి MatShape& shape)
 {
-    if (this != &shape) {
+    ఒకవేళ (ఇది != &shape) {
         dims = shape.dims;
         layout = shape.layout;
         C = shape.C;
-        for (int i = 0; i < MAX_DIMS; i++)
+        కొరకు (పూర్ణాంకం i = 0; i < MAX_DIMS; i++)
             p[i] = shape.p[i];
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-bool MatShape::hasSymbols() const
+తార్కిక MatShape::hasSymbols() స్థిరరాశి
 {
-    for (int i = 0; i < dims; i++) {
-        if (p[i] < 0)
-            return true;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++) {
+        ఒకవేళ (p[i] < 0)
+            తిరిగి నిజం;
     }
-    return false;
+    తిరిగి అబద్ధం;
 }
 
-int MatShape::channels() const
+పూర్ణాంకం MatShape::channels() స్థిరరాశి
 {
-    CV_Assert(layout == DATA_LAYOUT_BLOCK || layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC);
-    return layout == DATA_LAYOUT_BLOCK ? C : p[layout == DATA_LAYOUT_NCHW ? 1 : dims-1];
+    CV_Assert(layout == దత్తాంశం_LAYOUT_ఖండం || layout == దత్తాంశం_LAYOUT_NCHW || layout == దత్తాంశం_LAYOUT_NHWC);
+    తిరిగి layout == దత్తాంశం_LAYOUT_ఖండం ? C : p[layout == దత్తాంశం_LAYOUT_NCHW ? 1 : dims-1];
 }
 
-MatShape MatShape::toLayout(DataLayout newLayout, int C0) const
+MatShape MatShape::గమ్యం_Layout(దత్తాంశం_Layout newLayout, పూర్ణాంకం C0) స్థిరరాశి
 {
-    CV_Assert(layout == DATA_LAYOUT_BLOCK || layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC);
-    CV_Assert(newLayout == DATA_LAYOUT_BLOCK || newLayout == DATA_LAYOUT_NCHW || newLayout == DATA_LAYOUT_NHWC);
+    CV_Assert(layout == దత్తాంశం_LAYOUT_ఖండం || layout == దత్తాంశం_LAYOUT_NCHW || layout == దత్తాంశం_LAYOUT_NHWC);
+    CV_Assert(newLayout == దత్తాంశం_LAYOUT_ఖండం || newLayout == దత్తాంశం_LAYOUT_NCHW || newLayout == దత్తాంశం_LAYOUT_NHWC);
 
-    MatShape newsize = *this;
+    MatShape newsize = *ఇది;
     newsize.layout = newLayout;
 
-    if (newLayout == DATA_LAYOUT_BLOCK) {
+    ఒకవేళ (newLayout == దత్తాంశం_LAYOUT_ఖండం) {
         // any => BLOCK
         CV_Assert_N(C0 > 1, (C0 & (C0-1)) == 0);
-        int Corig = channels();
+        పూర్ణాంకం Corig = channels();
         newsize.C = Corig;
 
-        if (layout == DATA_LAYOUT_NHWC) {
-            for (int i = 2; i < dims; i++) {
+        ఒకవేళ (layout == దత్తాంశం_LAYOUT_NHWC) {
+            కొరకు (పూర్ణాంకం i = 2; i < dims; i++) {
                 newsize.p[i] = p[i-1];
             }
         }
 
-        newsize.dims += layout != DATA_LAYOUT_BLOCK;
+        newsize.dims += layout != దత్తాంశం_LAYOUT_ఖండం;
         newsize.p[1] = (Corig + C0 - 1)/C0;
         newsize.p[newsize.dims-1] = C0;
-    } else if (layout == DATA_LAYOUT_BLOCK) {
+    } లేకపోతే ఒకవేళ (layout == దత్తాంశం_LAYOUT_ఖండం) {
         // BLOCK => any (except for BLOCK, which is handled above)
         newsize.C = 0;
-        if (newLayout == DATA_LAYOUT_NHWC) {
-            for (int i = 2; i < dims; i++) {
+        ఒకవేళ (newLayout == దత్తాంశం_LAYOUT_NHWC) {
+            కొరకు (పూర్ణాంకం i = 2; i < dims; i++) {
                 newsize.p[i-1] = p[i];
             }
         }
-        newsize.p[newLayout == DATA_LAYOUT_NCHW ? 1 : dims-2] = C;
+        newsize.p[newLayout == దత్తాంశం_LAYOUT_NCHW ? 1 : dims-2] = C;
         newsize.dims--;
-    } else {
+    } లేకపోతే {
         CV_Assert_N(C0 <= 1);
 
-        if (newLayout == layout)
-            return newsize;
+        ఒకవేళ (newLayout == layout)
+            తిరిగి newsize;
 
         // NHWC => NCHW
-        if (newLayout == DATA_LAYOUT_NCHW) {
-            for (int i = 2; i < dims; i++)
+        ఒకవేళ (newLayout == దత్తాంశం_LAYOUT_NCHW) {
+            కొరకు (పూర్ణాంకం i = 2; i < dims; i++)
                 newsize.p[i] = p[i-1];
             newsize.p[1] = p[dims-1];
-        } else {
+        } లేకపోతే {
             // NCHW => NHWC
-            for (int i = 2; i < dims; i++)
+            కొరకు (పూర్ణాంకం i = 2; i < dims; i++)
                 newsize.p[i-1] = p[i];
             newsize.p[dims-1] = p[1];
         }
     }
 
-    return newsize;
+    తిరిగి newsize;
 }
 
-static int normalizeShapeAxis(int axis, int dims)
+స్థిర పూర్ణాంకం normalizeShapeAxis(పూర్ణాంకం axis, పూర్ణాంకం dims)
 {
     CV_CheckGE(axis, -dims, "axis is out of range");
     CV_CheckLT(axis, dims, "axis is out of range");
-    return axis < 0 ? axis + dims : axis;
+    తిరిగి axis < 0 ? axis + dims : axis;
 }
 
 // The semantic NCHW form {N, C, spatial...} of a block ('NC1HWC0') shape, so that axes and
 // element counts are the logical ones rather than the C0-padded ones.
-static MatShape toSemantic(const MatShape& shape)
+స్థిర MatShape గమ్యం_Semantic(స్థిరరాశి MatShape& shape)
 {
     CV_CheckGE(shape.dims, 3, "a block shape is {N, C1, spatial..., C0}");
-    return shape.toLayout(DATA_LAYOUT_NCHW);
+    తిరిగి shape.గమ్యం_Layout(దత్తాంశం_LAYOUT_NCHW);
 }
 
 // Blocks such a result again. Once N or C changes, elements cross the padded C0 lanes and
 // the data needs a repack, which a shape operation cannot express.
-static MatShape toBlockOf(MatShape result, const MatShape& src, const char* op)
+స్థిర MatShape గమ్యం_ఖండం_యొక్క(MatShape ఫలితం, స్థిరరాశి MatShape& src, స్థిరరాశి అక్షరం* op)
 {
-    if (result.dims < 2 || result.p[0] != src.p[0] || result.p[1] != src.C)
+    ఒకవేళ (ఫలితం.dims < 2 || ఫలితం.p[0] != src.p[0] || ఫలితం.p[1] != src.C)
         CV_Error_(Error::StsNotImplemented,
                   ("%s: the block layout is kept only when the batch and the channel axes stay "
                    "unchanged; convert the shape with toLayout() first", op));
-    CV_CheckLE(result.dims + 1, (int)MatShape::MAX_DIMS, "too many dimensions");
-    result.layout = DATA_LAYOUT_NCHW;
-    return result.toLayout(DATA_LAYOUT_BLOCK, src.p[src.dims-1]);
+    CV_CheckLE(ఫలితం.dims + 1, (పూర్ణాంకం)MatShape::MAX_DIMS, "too many dimensions");
+    ఫలితం.layout = దత్తాంశం_LAYOUT_NCHW;
+    తిరిగి ఫలితం.గమ్యం_Layout(దత్తాంశం_LAYOUT_ఖండం, src.p[src.dims-1]);
 }
 
-MatShape MatShape::squeeze(const std::vector<int>& axes) const
+MatShape MatShape::squeeze(స్థిరరాశి std::vector<పూర్ణాంకం>& axes) స్థిరరాశి
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).squeeze(axes), *this, "squeeze");
-    bool remove[MAX_DIMS] = {false};
-    if (axes.empty())
+    ఒకవేళ (layout == దత్తాంశం_LAYOUT_ఖండం)
+        తిరిగి గమ్యం_ఖండం_యొక్క(గమ్యం_Semantic(*ఇది).squeeze(axes), *ఇది, "squeeze");
+    తార్కిక remove[MAX_DIMS] = {అబద్ధం};
+    ఒకవేళ (axes.empty())
     {
-        for (int i = 0; i < dims; i++)
+        కొరకు (పూర్ణాంకం i = 0; i < dims; i++)
             remove[i] = p[i] == 1;
     }
-    for (int a : axes)
+    కొరకు (పూర్ణాంకం a : axes)
     {
-        int i = normalizeShapeAxis(a, dims);
+        పూర్ణాంకం i = normalizeShapeAxis(a, dims);
         CV_Check(a, !remove[i], "squeeze: duplicate axis");
         CV_Check(p[i], p[i] == 1, "squeeze: the size of a squeezed axis must be 1");
-        remove[i] = true;
+        remove[i] = నిజం;
     }
     // a new number of axes: the layout of this shape does not apply
-    MatShape result;
-    result.dims = 0;
-    for (int i = 0; i < dims; i++)
-        if (!remove[i])
-            result.p[result.dims++] = p[i];
-    return result;
+    MatShape ఫలితం;
+    ఫలితం.dims = 0;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++)
+        ఒకవేళ (!remove[i])
+            ఫలితం.p[ఫలితం.dims++] = p[i];
+    తిరిగి ఫలితం;
 }
 
-MatShape MatShape::unsqueeze(const std::vector<int>& axes) const
+MatShape MatShape::unsqueeze(స్థిరరాశి std::vector<పూర్ణాంకం>& axes) స్థిరరాశి
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).unsqueeze(axes), *this, "unsqueeze");
-    const int outDims = dims + (int)axes.size();
-    CV_CheckLE(outDims, (int)MAX_DIMS, "unsqueeze: too many dimensions");
-    bool insert[MAX_DIMS] = {false};
-    for (int a : axes)
+    ఒకవేళ (layout == దత్తాంశం_LAYOUT_ఖండం)
+        తిరిగి గమ్యం_ఖండం_యొక్క(గమ్యం_Semantic(*ఇది).unsqueeze(axes), *ఇది, "unsqueeze");
+    స్థిరరాశి పూర్ణాంకం బహిర్గతం_Dims = dims + (పూర్ణాంకం)axes.size();
+    CV_CheckLE(బహిర్గతం_Dims, (పూర్ణాంకం)MAX_DIMS, "unsqueeze: too many dimensions");
+    తార్కిక insert[MAX_DIMS] = {అబద్ధం};
+    కొరకు (పూర్ణాంకం a : axes)
     {
-        int i = normalizeShapeAxis(a, outDims);
+        పూర్ణాంకం i = normalizeShapeAxis(a, బహిర్గతం_Dims);
         CV_Check(a, !insert[i], "unsqueeze: duplicate axis");
-        insert[i] = true;
+        insert[i] = నిజం;
     }
     // a new number of axes: the layout of this shape does not apply
-    MatShape result;
-    result.dims = outDims;
-    for (int i = 0, j = 0; i < outDims; i++)
-        result.p[i] = insert[i] ? 1 : p[j++];
-    return result;
+    MatShape ఫలితం;
+    ఫలితం.dims = బహిర్గతం_Dims;
+    కొరకు (పూర్ణాంకం i = 0, j = 0; i < బహిర్గతం_Dims; i++)
+        ఫలితం.p[i] = insert[i] ? 1 : p[j++];
+    తిరిగి ఫలితం;
 }
 
-MatShape MatShape::flatten(int startAxis, int endAxis) const
+MatShape MatShape::flatten(పూర్ణాంకం ప్రారంభం_Axis, పూర్ణాంకం చివర_Axis) స్థిరరాశి
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).flatten(startAxis, endAxis), *this, "flatten");
-    if (dims == 0)
+    ఒకవేళ (layout == దత్తాంశం_LAYOUT_ఖండం)
+        తిరిగి గమ్యం_ఖండం_యొక్క(గమ్యం_Semantic(*ఇది).flatten(ప్రారంభం_Axis, చివర_Axis), *ఇది, "flatten");
+    ఒకవేళ (dims == 0)
     {
-        CV_Check(startAxis, startAxis == 0 || startAxis == -1, "flatten: axis is out of range");
-        CV_Check(endAxis, endAxis == 0 || endAxis == -1, "flatten: axis is out of range");
-        return MatShape({1});
+        CV_Check(ప్రారంభం_Axis, ప్రారంభం_Axis == 0 || ప్రారంభం_Axis == -1, "flatten: axis is out of range");
+        CV_Check(చివర_Axis, చివర_Axis == 0 || చివర_Axis == -1, "flatten: axis is out of range");
+        తిరిగి MatShape({1});
     }
-    int start = normalizeShapeAxis(startAxis, dims), end = normalizeShapeAxis(endAxis, dims);
-    CV_CheckLE(start, end, "flatten: startAxis must not follow endAxis");
+    పూర్ణాంకం ప్రారంభం = normalizeShapeAxis(ప్రారంభం_Axis, dims), end = normalizeShapeAxis(చివర_Axis, dims);
+    CV_CheckLE(ప్రారంభం, end, "flatten: startAxis must not follow endAxis");
     int64 merged = 1;
-    for (int i = start; i <= end; i++)
+    కొరకు (పూర్ణాంకం i = ప్రారంభం; i <= end; i++)
         merged *= p[i];
-    CV_CheckLE((double)merged, (double)INT_MAX, "flatten: the result is too big");
+    CV_CheckLE((ద్విగుణ)merged, (ద్విగుణ)గరిష్ఠ_పూర్ణాంకం, "flatten: the result is too big");
     // a new number of axes: the layout of this shape does not apply
-    MatShape result;
-    result.dims = 0;
-    for (int i = 0; i < dims; i++)
+    MatShape ఫలితం;
+    ఫలితం.dims = 0;
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++)
     {
-        if (i == start)
-            result.p[result.dims++] = (int)merged;
-        else if (i < start || i > end)
-            result.p[result.dims++] = p[i];
+        ఒకవేళ (i == ప్రారంభం)
+            ఫలితం.p[ఫలితం.dims++] = (పూర్ణాంకం)merged;
+        లేకపోతే ఒకవేళ (i < ప్రారంభం || i > end)
+            ఫలితం.p[ఫలితం.dims++] = p[i];
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
-MatShape MatShape::reshape(const MatShape& newShape, bool allowZero) const
+MatShape MatShape::reshape(స్థిరరాశి MatShape& newShape, తార్కిక allowZero) స్థిరరాశి
 {
     CV_Assert(dims >= 0 && newShape.dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).reshape(newShape, allowZero), *this, "reshape");
+    ఒకవేళ (layout == దత్తాంశం_LAYOUT_ఖండం)
+        తిరిగి గమ్యం_ఖండం_యొక్క(గమ్యం_Semantic(*ఇది).reshape(newShape, allowZero), *ఇది, "reshape");
     // a new number of axes: neither the layout of this shape nor the one of the spec applies
-    MatShape result;
-    result.dims = newShape.dims;
-    std::copy(newShape.p, newShape.p + newShape.dims, result.p);
-    int inferred = -1;
-    int64 known = 1;
-    for (int i = 0; i < result.dims; i++)
+    MatShape ఫలితం;
+    ఫలితం.dims = newShape.dims;
+    std::copy(newShape.p, newShape.p + newShape.dims, ఫలితం.p);
+    పూర్ణాంకం inferred = -1;
+    int64 తెలిసిన = 1;
+    కొరకు (పూర్ణాంకం i = 0; i < ఫలితం.dims; i++)
     {
-        int& sz = result.p[i];
-        if (sz == -1)
+        పూర్ణాంకం& sz = ఫలితం.p[i];
+        ఒకవేళ (sz == -1)
         {
             CV_Check(i, inferred < 0, "reshape: at most one axis may be -1");
             inferred = i;
-            continue;
+            కొనసాగు;
         }
         CV_Check(sz, sz >= 0, "reshape: sizes must be -1 or non-negative");
-        if (sz == 0 && !allowZero)
+        ఒకవేళ (sz == 0 && !allowZero)
         {
             CV_Check(i, i < dims, "reshape: 0 refers to an axis the source does not have");
             sz = p[i];
         }
-        known *= sz;
+        తెలిసిన *= sz;
     }
-    const int64 total_ = (int64)total();
-    if (inferred >= 0)
+    స్థిరరాశి int64 మొత్తం_2 = (int64)మొత్తం();
+    ఒకవేళ (inferred >= 0)
     {
-        CV_Check((double)known, known != 0, "reshape: cannot infer the -1 axis next to a zero-size axis");
-        CV_Check((double)total_, total_ % known == 0, "reshape: the number of elements does not match");
-        CV_CheckLE((double)(total_/known), (double)INT_MAX, "reshape: the result is too big");
-        result.p[inferred] = (int)(total_/known);
+        CV_Check((ద్విగుణ)తెలిసిన, తెలిసిన != 0, "reshape: cannot infer the -1 axis next to a zero-size axis");
+        CV_Check((ద్విగుణ)మొత్తం_2, మొత్తం_2 % తెలిసిన == 0, "reshape: the number of elements does not match");
+        CV_CheckLE((ద్విగుణ)(మొత్తం_2/తెలిసిన), (ద్విగుణ)గరిష్ఠ_పూర్ణాంకం, "reshape: the result is too big");
+        ఫలితం.p[inferred] = (పూర్ణాంకం)(మొత్తం_2/తెలిసిన);
     }
-    else if (known != total_)
+    లేకపోతే ఒకవేళ (తెలిసిన != మొత్తం_2)
         CV_Error_(Error::StsBadArg, ("reshape: the number of elements does not match: %lld vs %lld",
-                                     (long long)known, (long long)total_));
-    return result;
+                                     (దీర్ఘ దీర్ఘ)తెలిసిన, (దీర్ఘ దీర్ఘ)మొత్తం_2));
+    తిరిగి ఫలితం;
 }
 
-MatShape MatShape::expand(const MatShape& another) const
+MatShape MatShape::expand(స్థిరరాశి MatShape& another) స్థిరరాశి
 {
-    if (dims == 0)
-        return another;
-    if (another.dims == 0)
-        return *this;
+    ఒకవేళ (dims == 0)
+        తిరిగి another;
+    ఒకవేళ (another.dims == 0)
+        తిరిగి *ఇది;
 
-    if ((layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC) &&
-        (another.layout == DATA_LAYOUT_NCHW || another.layout == DATA_LAYOUT_NHWC)) {
+    ఒకవేళ ((layout == దత్తాంశం_LAYOUT_NCHW || layout == దత్తాంశం_LAYOUT_NHWC) &&
+        (another.layout == దత్తాంశం_LAYOUT_NCHW || another.layout == దత్తాంశం_LAYOUT_NHWC)) {
         CV_Assert(layout == another.layout);
     }
     // [TODO] support block layout
-    CV_Assert(layout != DATA_LAYOUT_BLOCK && another.layout != DATA_LAYOUT_BLOCK);
+    CV_Assert(layout != దత్తాంశం_LAYOUT_ఖండం && another.layout != దత్తాంశం_LAYOUT_ఖండం);
 
-    MatShape result;
+    MatShape ఫలితం;
 
-    if (dims < 0 || another.dims < 0)
-        return result;
+    ఒకవేళ (dims < 0 || another.dims < 0)
+        తిరిగి ఫలితం;
 
-    result = *this;
-    result.dims = std::max(dims, another.dims);
-    result.layout = layout == DATA_LAYOUT_UNKNOWN ? another.layout :
-        layout == DATA_LAYOUT_ND && (another.layout == DATA_LAYOUT_NCHW ||
-        another.layout == DATA_LAYOUT_NHWC) ? another.layout : layout;
-    for (int i = result.dims-1; i >= 0; i--) {
-        int i1 = i - (result.dims - dims);
-        int i2 = i - (result.dims - another.dims);
-        int sz1 = i1 < 0 ? 1 : p[i1];
-        int sz2 = i2 < 0 ? 1 : another.p[i2];
+    ఫలితం = *ఇది;
+    ఫలితం.dims = std::max(dims, another.dims);
+    ఫలితం.layout = layout == దత్తాంశం_LAYOUT_UNKNOWN ? another.layout :
+        layout == దత్తాంశం_LAYOUT_ND && (another.layout == దత్తాంశం_LAYOUT_NCHW ||
+        another.layout == దత్తాంశం_LAYOUT_NHWC) ? another.layout : layout;
+    కొరకు (పూర్ణాంకం i = ఫలితం.dims-1; i >= 0; i--) {
+        పూర్ణాంకం i1 = i - (ఫలితం.dims - dims);
+        పూర్ణాంకం i2 = i - (ఫలితం.dims - another.dims);
+        పూర్ణాంకం sz1 = i1 < 0 ? 1 : p[i1];
+        పూర్ణాంకం sz2 = i2 < 0 ? 1 : another.p[i2];
         CV_Assert(sz1 == sz2 || sz1 == 1 || sz2 == 1);
         // [TODO] handle symbolic shapes
-        result.p[i] = sz1 != 1 ? sz1 : sz2;
+        ఫలితం.p[i] = sz1 != 1 ? sz1 : sz2;
     }
-    return result;
+    తిరిగి ఫలితం;
 }
 
 /////////////////////////// MatAllocator ////////////////////////////
 
-void MatAllocator::map(UMatData*, AccessFlag) const
+శూన్య MatAllocator::map(UMat_దత్తాంశం*, AccessFlag) స్థిరరాశి
 {
 }
 
-void MatAllocator::unmap(UMatData* u) const
+శూన్య MatAllocator::unmap(UMat_దత్తాంశం* u) స్థిరరాశి
 {
-    if(u->urefcount == 0 && u->refcount == 0)
+    ఒకవేళ(u->urefcount == 0 && u->refcount == 0)
     {
         deallocate(u);
     }
 }
 
-void MatAllocator::download(UMatData* u, void* dstptr,
-         int dims, const size_t sz[],
-         const size_t srcofs[], const size_t srcstep[],
-         const size_t dststep[]) const
+శూన్య MatAllocator::download(UMat_దత్తాంశం* u, శూన్య* dstptr,
+         పూర్ణాంకం dims, స్థిరరాశి size_t sz[],
+         స్థిరరాశి size_t srcofs[], స్థిరరాశి size_t srcstep[],
+         స్థిరరాశి size_t dststep[]) స్థిరరాశి
 {
-    if(!u)
-        return;
-    int isz[CV_MAX_DIM];
-    uchar* srcptr = u->data;
-    for( int i = 0; i < dims; i++ )
+    ఒకవేళ(!u)
+        తిరిగి;
+    పూర్ణాంకం isz[CV_MAX_DIM];
+    uchar* srcptr = u->దత్తాంశం;
+    కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
     {
-        CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( srcofs )
+        CV_Assert( sz[i] <= (size_t)గరిష్ఠ_పూర్ణాంకం );
+        ఒకవేళ( sz[i] == 0 )
+            తిరిగి;
+        ఒకవేళ( srcofs )
             srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (పూర్ణాంకం)sz[i];
     }
 
     Mat src(dims, isz, CV_8U, srcptr, srcstep);
     Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-    const Mat* arrays[] = { &src, &dst };
+    స్థిరరాశి Mat* arrays[] = { &src, &dst };
     uchar* ptrs[2];
     NAryMatIterator it(arrays, ptrs, 2);
     size_t planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
-        memcpy(ptrs[1], ptrs[0], planesz);
+    కొరకు( size_t j = 0; j < it.nplanes; j++, ++it )
+        జ్ఞాపకం_నకలు(ptrs[1], ptrs[0], planesz);
 }
 
 
-void MatAllocator::upload(UMatData* u, const void* srcptr, int dims, const size_t sz[],
-                    const size_t dstofs[], const size_t dststep[],
-                    const size_t srcstep[]) const
+శూన్య MatAllocator::upload(UMat_దత్తాంశం* u, స్థిరరాశి శూన్య* srcptr, పూర్ణాంకం dims, స్థిరరాశి size_t sz[],
+                    స్థిరరాశి size_t dstofs[], స్థిరరాశి size_t dststep[],
+                    స్థిరరాశి size_t srcstep[]) స్థిరరాశి
 {
-    if(!u)
-        return;
-    int isz[CV_MAX_DIM];
-    uchar* dstptr = u->data;
-    for( int i = 0; i < dims; i++ )
+    ఒకవేళ(!u)
+        తిరిగి;
+    పూర్ణాంకం isz[CV_MAX_DIM];
+    uchar* dstptr = u->దత్తాంశం;
+    కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
     {
-        CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( dstofs )
+        CV_Assert( sz[i] <= (size_t)గరిష్ఠ_పూర్ణాంకం );
+        ఒకవేళ( sz[i] == 0 )
+            తిరిగి;
+        ఒకవేళ( dstofs )
             dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (పూర్ణాంకం)sz[i];
     }
 
-    Mat src(dims, isz, CV_8U, (void*)srcptr, srcstep);
+    Mat src(dims, isz, CV_8U, (శూన్య*)srcptr, srcstep);
     Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-    const Mat* arrays[] = { &src, &dst };
+    స్థిరరాశి Mat* arrays[] = { &src, &dst };
     uchar* ptrs[2];
     NAryMatIterator it(arrays, ptrs, 2);
     size_t planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
-        memcpy(ptrs[1], ptrs[0], planesz);
+    కొరకు( size_t j = 0; j < it.nplanes; j++, ++it )
+        జ్ఞాపకం_నకలు(ptrs[1], ptrs[0], planesz);
 }
 
-void MatAllocator::copy(UMatData* usrc, UMatData* udst, int dims, const size_t sz[],
-                  const size_t srcofs[], const size_t srcstep[],
-                  const size_t dstofs[], const size_t dststep[], bool /*sync*/) const
+శూన్య MatAllocator::copy(UMat_దత్తాంశం* usrc, UMat_దత్తాంశం* udst, పూర్ణాంకం dims, స్థిరరాశి size_t sz[],
+                  స్థిరరాశి size_t srcofs[], స్థిరరాశి size_t srcstep[],
+                  స్థిరరాశి size_t dstofs[], స్థిరరాశి size_t dststep[], తార్కిక /*sync*/) స్థిరరాశి
 {
     CV_INSTRUMENT_REGION();
 
-    if(!usrc || !udst)
-        return;
-    int isz[CV_MAX_DIM];
-    uchar* srcptr = usrc->data;
-    uchar* dstptr = udst->data;
-    for( int i = 0; i < dims; i++ )
+    ఒకవేళ(!usrc || !udst)
+        తిరిగి;
+    పూర్ణాంకం isz[CV_MAX_DIM];
+    uchar* srcptr = usrc->దత్తాంశం;
+    uchar* dstptr = udst->దత్తాంశం;
+    కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
     {
-        CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( srcofs )
+        CV_Assert( sz[i] <= (size_t)గరిష్ఠ_పూర్ణాంకం );
+        ఒకవేళ( sz[i] == 0 )
+            తిరిగి;
+        ఒకవేళ( srcofs )
             srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-        if( dstofs )
+        ఒకవేళ( dstofs )
             dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (పూర్ణాంకం)sz[i];
     }
 
     Mat src(dims, isz, CV_8U, srcptr, srcstep);
     Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-    const Mat* arrays[] = { &src, &dst };
+    స్థిరరాశి Mat* arrays[] = { &src, &dst };
     uchar* ptrs[2];
     NAryMatIterator it(arrays, ptrs, 2);
     size_t planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
-        memcpy(ptrs[1], ptrs[0], planesz);
+    కొరకు( size_t j = 0; j < it.nplanes; j++, ++it )
+        జ్ఞాపకం_నకలు(ptrs[1], ptrs[0], planesz);
 }
 
-BufferPoolController* MatAllocator::getBufferPoolController(const char* id) const
+బఫరు_Pool_Controller* MatAllocator::get_బఫరు_Pool_Controller(స్థిరరాశి అక్షరం* id) స్థిరరాశి
 {
-    CV_UNUSED(id);
-    static DummyBufferPoolController dummy;
-    return &dummy;
+    CV_వాడని(id);
+    స్థిర Dummy_బఫరు_Pool_Controller dummy;
+    తిరిగి &dummy;
 }
 
-class StdMatAllocator CV_FINAL : public MatAllocator
+తరగతి StdMatAllocator CV_FINAL : బహిరంగ MatAllocator
 {
-public:
-    UMatData* allocate(int dims, const int* sizes, int type,
-                       void* data0, size_t* step, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+బహిరంగ:
+    UMat_దత్తాంశం* allocate(పూర్ణాంకం dims, స్థిరరాశి పూర్ణాంకం* sizes, పూర్ణాంకం type,
+                       శూన్య* data0, size_t* అడుగు, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) స్థిరరాశి CV_OVERRIDE
     {
-        size_t total = CV_ELEM_SIZE(type);
-        for( int i = dims-1; i >= 0; i-- )
+        size_t మొత్తం = CV_ELEM_కొలత(type);
+        కొరకు( పూర్ణాంకం i = dims-1; i >= 0; i-- )
         {
-            if( step )
+            ఒకవేళ( అడుగు )
             {
-                if( data0 && step[i] != CV_AUTOSTEP )
+                ఒకవేళ( data0 && అడుగు[i] != CV_AUTOSTEP )
                 {
-                    CV_Assert(total <= step[i]);
-                    total = step[i];
+                    CV_Assert(మొత్తం <= అడుగు[i]);
+                    మొత్తం = అడుగు[i];
                 }
-                else
-                    step[i] = total;
+                లేకపోతే
+                    అడుగు[i] = మొత్తం;
             }
-            total *= sizes[i];
+            మొత్తం *= sizes[i];
         }
-        uchar* data = data0 ? (uchar*)data0 : (uchar*)fastMalloc(total);
-        UMatData* u = new UMatData(this);
-        u->data = u->origdata = data;
-        u->size = total;
-        if(data0)
-            u->flags |= UMatData::USER_ALLOCATED;
+        uchar* దత్తాంశం = data0 ? (uchar*)data0 : (uchar*)fastMalloc(మొత్తం);
+        UMat_దత్తాంశం* u = కొత్త UMat_దత్తాంశం(ఇది);
+        u->దత్తాంశం = u->origdata = దత్తాంశం;
+        u->size = మొత్తం;
+        ఒకవేళ(data0)
+            u->flags |= UMat_దత్తాంశం::USER_ALLOCATED;
 
-        return u;
+        తిరిగి u;
     }
 
-    bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    తార్కిక allocate(UMat_దత్తాంశం* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) స్థిరరాశి CV_OVERRIDE
     {
-        if(!u) return false;
-        return true;
+        ఒకవేళ(!u) తిరిగి అబద్ధం;
+        తిరిగి నిజం;
     }
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    శూన్య deallocate(UMat_దత్తాంశం* u) స్థిరరాశి CV_OVERRIDE
     {
-        if(!u)
-            return;
+        ఒకవేళ(!u)
+            తిరిగి;
 
         CV_Assert(u->urefcount == 0);
         CV_Assert(u->refcount == 0);
-        if( !(u->flags & UMatData::USER_ALLOCATED) )
+        ఒకవేళ( !(u->flags & UMat_దత్తాంశం::USER_ALLOCATED) )
         {
             fastFree(u->origdata);
             u->origdata = 0;
         }
-        delete u;
+        తొలగించు u;
     }
 };
 
-static
+స్థిర
 MatAllocator*& getDefaultAllocatorMatRef()
 {
-    static MatAllocator* g_matAllocator = Mat::getStdAllocator();
-    return g_matAllocator;
+    స్థిర MatAllocator* g_matAllocator = Mat::getStdAllocator();
+    తిరిగి g_matAllocator;
 }
 
 MatAllocator* Mat::getDefaultAllocator()
 {
-    return getDefaultAllocatorMatRef();
+    తిరిగి getDefaultAllocatorMatRef();
 }
 
-void Mat::setDefaultAllocator(MatAllocator* allocator)
+శూన్య Mat::సమితి_Default_Allocator(MatAllocator* allocator)
 {
     getDefaultAllocatorMatRef() = allocator;
 }
 
 MatAllocator* Mat::getStdAllocator()
 {
-    CV_SINGLETON_LAZY_INIT(MatAllocator, new StdMatAllocator())
+    CV_SINGLETON_LAZY_INIT(MatAllocator, కొత్త StdMatAllocator())
 }
 
 //==================================================================================================
 
-void setSize( Mat& m, int _dims, const int* _sz, const size_t* _steps, bool autoSteps)
+శూన్య సమితి_కొలత( Mat& m, పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sz, స్థిరరాశి size_t* అడుగులు_2, తార్కిక auto_అడుగులు)
 {
     CV_Assert( 0 <= _dims && _dims <= CV_MAX_DIM && _dims <= MatShape::MAX_DIMS);
 
     m.dims = _dims;
     m.size = MatShape(_dims, _sz);
-    m.step[std::max(_dims-1, 0)] = CV_ELEM_SIZE(m.flags);
-    for (int i = _dims-2; i >= 0; i--) {
-        size_t autostep = m.size[i+1]*m.step[i+1];
-        if (_steps) {
-            m.step[i] = _steps[i];
+    m.అడుగు[std::max(_dims-1, 0)] = CV_ELEM_కొలత(m.flags);
+    కొరకు (పూర్ణాంకం i = _dims-2; i >= 0; i--) {
+        size_t autostep = m.size[i+1]*m.అడుగు[i+1];
+        ఒకవేళ (అడుగులు_2) {
+            m.అడుగు[i] = అడుగులు_2[i];
             //CV_Assert(m.step[i] >= autostep);
-        } else if (autoSteps) {
-            m.step[i] = autostep;
-        } else {
-            m.step[i] = 0;
+        } లేకపోతే ఒకవేళ (auto_అడుగులు) {
+            m.అడుగు[i] = autostep;
+        } లేకపోతే {
+            m.అడుగు[i] = 0;
         }
     }
 
-    if( _dims <= 2 )
+    ఒకవేళ( _dims <= 2 )
     {
-        m.cols = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
-        m.rows = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
-    } else {
-        m.cols = m.rows = -1;
+        m.నిలువుల_సంఖ్య = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
+        m.అడ్డువరుసలు = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
+    } లేకపోతే {
+        m.నిలువుల_సంఖ్య = m.అడ్డువరుసలు = -1;
     }
 }
 
-int updateContinuityFlag(int flags, int dims, const int* size, const size_t* step)
+పూర్ణాంకం updateContinuityFlag(పూర్ణాంకం flags, పూర్ణాంకం dims, స్థిరరాశి పూర్ణాంకం* size, స్థిరరాశి size_t* అడుగు)
 {
-    int i, j;
-    if (dims <= 1)
-        return flags | Mat::CONTINUOUS_FLAG;
-    for( i = 0; i < dims; i++ )
+    పూర్ణాంకం i, j;
+    ఒకవేళ (dims <= 1)
+        తిరిగి flags | Mat::CONTINUOUS_FLAG;
+    కొరకు( i = 0; i < dims; i++ )
     {
-        if( size[i] > 1 )
-            break;
+        ఒకవేళ( size[i] > 1 )
+            ఆపు;
     }
 
     uint64 t = (uint64)size[std::min(i, dims-1)]*CV_MAT_CN(flags);
-    for( j = dims-1; j > i; j-- )
+    కొరకు( j = dims-1; j > i; j-- )
     {
         t *= size[j];
-        if( step[j]*size[j] < step[j-1] )
-            break;
+        ఒకవేళ( అడుగు[j]*size[j] < అడుగు[j-1] )
+            ఆపు;
     }
 
-    if( j <= i && t == (uint64)(int)t )
-        return flags | Mat::CONTINUOUS_FLAG;
-    return flags & ~Mat::CONTINUOUS_FLAG;
+    ఒకవేళ( j <= i && t == (uint64)(పూర్ణాంకం)t )
+        తిరిగి flags | Mat::CONTINUOUS_FLAG;
+    తిరిగి flags & ~Mat::CONTINUOUS_FLAG;
 }
 
-void Mat::updateContinuityFlag()
+శూన్య Mat::updateContinuityFlag()
 {
-    flags = cv::updateContinuityFlag(flags, dims, size.p, step.p);
+    flags = cv::updateContinuityFlag(flags, dims, size.p, అడుగు.p);
 }
 
-void finalizeHdr(Mat& m)
+శూన్య finalizeHdr(Mat& m)
 {
     m.updateContinuityFlag();
-    int d = m.dims;
-    if( d > 2 )
-        m.rows = m.cols = -1;
-    if(m.u)
-        m.datastart = m.data = m.u->data;
-    if( m.data && d > 0 )
+    పూర్ణాంకం d = m.dims;
+    ఒకవేళ( d > 2 )
+        m.అడ్డువరుసలు = m.నిలువుల_సంఖ్య = -1;
+    ఒకవేళ(m.u)
+        m.datastart = m.దత్తాంశం = m.u->దత్తాంశం;
+    ఒకవేళ( m.దత్తాంశం && d > 0 )
     {
-        m.datalimit = m.datastart + m.size[0]*m.step[0];
-        if( m.size[0] > 0 )
+        m.datalimit = m.datastart + m.size[0]*m.అడుగు[0];
+        ఒకవేళ( m.size[0] > 0 )
         {
-            int lastdim = d > 0 ? d - 1 : 0;
-            m.dataend = m.ptr() + m.size[lastdim]*m.step[lastdim];
-            for( int i = 0; i < d-1; i++ )
-                m.dataend += (m.size[i] - 1)*m.step[i];
+            పూర్ణాంకం lastdim = d > 0 ? d - 1 : 0;
+            m.dataend = m.ptr() + m.size[lastdim]*m.అడుగు[lastdim];
+            కొరకు( పూర్ణాంకం i = 0; i < d-1; i++ )
+                m.dataend += (m.size[i] - 1)*m.అడుగు[i];
         }
-        else
+        లేకపోతే
             m.dataend = m.datalimit;
     }
-    else
-        m.dataend = m.datalimit = m.data;
+    లేకపోతే
+        m.dataend = m.datalimit = m.దత్తాంశం;
 }
 
 //======================================= Mat ======================================================
 
 Mat::Mat() CV_NOEXCEPT
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {}
 
-Mat::Mat(int _rows, int _cols, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    create(_rows, _cols, _type);
+    create(అడ్డువరుసలు_3, నిలువుల_సంఖ్య_3, _type);
 }
 
-Mat::Mat(int _rows, int _cols, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    create(_rows, _cols, _type);
-    *this = _s;
+    create(అడ్డువరుసలు_3, నిలువుల_సంఖ్య_3, _type);
+    *ఇది = _s;
 }
 
-Mat::Mat(Size _sz, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(కొలత _sz, పూర్ణాంకం _type)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    create( _sz.height, _sz.width, _type );
+    create( _sz.ఎత్తు, _sz.వెడల్పు, _type );
 }
 
-Mat::Mat(Size _sz, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(కొలత _sz, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    create(_sz.height, _sz.width, _type);
-    *this = _s;
+    create(_sz.ఎత్తు, _sz.వెడల్పు, _type);
+    *ఇది = _s;
 }
 
-Mat::Mat(int _dims, const int* _sz, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
-      datalimit(0), allocator(0), u(0)
-{
-    create(_dims, _sz, _type);
-}
-
-Mat::Mat(int _dims, const int* _sz, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sz, పూర్ణాంకం _type)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_dims, _sz, _type);
-    *this = _s;
 }
 
-Mat::Mat(const std::vector<int>& _sz, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sz, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
+      datalimit(0), allocator(0), u(0)
+{
+    create(_dims, _sz, _type);
+    *ఇది = _s;
+}
+
+Mat::Mat(స్థిరరాశి std::vector<పూర్ణాంకం>& _sz, పూర్ణాంకం _type)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_sz, _type);
 }
 
-Mat::Mat(const std::vector<int>& _sz, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(స్థిరరాశి std::vector<పూర్ణాంకం>& _sz, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_sz, _type);
-    *this = _s;
+    *ఇది = _s;
 }
 
-Mat::Mat(const MatShape& _shape, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(స్థిరరాశి MatShape& _shape, పూర్ణాంకం _type)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(std::initializer_list<పూర్ణాంకం> _shape, పూర్ణాంకం _type)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
 }
 
-Mat::Mat(const MatShape& _shape, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(స్థిరరాశి MatShape& _shape, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
-    *this = _s;
+    *ఇది = _s;
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(std::initializer_list<పూర్ణాంకం> _shape, పూర్ణాంకం _type, స్థిరరాశి Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
-    *this = _s;
+    *ఇది = _s;
 }
 
-Mat::Mat(const Mat& m)
-    : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), data(m.data),
+Mat::Mat(స్థిరరాశి Mat& m)
+    : flags(m.flags), dims(m.dims), అడ్డువరుసలు(m.అడ్డువరుసలు), నిలువుల_సంఖ్య(m.నిలువుల_సంఖ్య), దత్తాంశం(m.దత్తాంశం),
       datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit), allocator(m.allocator),
-      u(m.u), size(m.size), step(m.step)
+      u(m.u), size(m.size), అడుగు(m.అడుగు)
 {
-    if( u )
+    ఒకవేళ( u )
         CV_XADD(&u->refcount, 1);
 }
 
-Mat::Mat(int _rows, int _cols, int _type, void* _data, size_t _step)
-    : flags(MAGIC_VAL + (_type & TYPE_MASK)), dims(2), rows(_rows), cols(_cols),
-      data((uchar*)_data), datastart((uchar*)_data), dataend(0), datalimit(0),
+Mat::Mat(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type, శూన్య* దత్తాంశం_3, size_t అడుగు_3)
+    : flags(MAGIC_VAL + (_type & TYPE_ముసుగు)), dims(2), అడ్డువరుసలు(అడ్డువరుసలు_3), నిలువుల_సంఖ్య(నిలువుల_సంఖ్య_3),
+      దత్తాంశం((uchar*)దత్తాంశం_3), datastart((uchar*)దత్తాంశం_3), dataend(0), datalimit(0),
       allocator(0), u(0), size(2)
 {
-    CV_Assert(total() == 0 || data != NULL);
+    CV_Assert(మొత్తం() == 0 || దత్తాంశం != ఖాళీ);
 
-    size_t esz = CV_ELEM_SIZE(_type), esz1 = CV_ELEM_SIZE1(_type);
-    size_t minstep = cols * esz;
-    if( _step == AUTO_STEP )
+    size_t esz = CV_ELEM_కొలత(_type), esz1 = CV_ELEM_SIZE1(_type);
+    size_t minstep = నిలువుల_సంఖ్య * esz;
+    ఒకవేళ( అడుగు_3 == AUTO_అడుగు )
     {
-        _step = minstep;
+        అడుగు_3 = minstep;
     }
-    else
+    లేకపోతే
     {
-        CV_Assert( _step >= minstep );
-        if (_step % esz1 != 0)
+        CV_Assert( అడుగు_3 >= minstep );
+        ఒకవేళ (అడుగు_3 % esz1 != 0)
         {
-            CV_Error(Error::BadStep, "Step must be a multiple of esz1");
+            CV_Error(Error::Bad_అడుగు, "Step must be a multiple of esz1");
         }
     }
-    size[0] = rows;
-    size[1] = cols;
-    step[0] = _step;
-    step[1] = esz;
-    datalimit = datastart + _step * rows;
-    dataend = datalimit - _step + minstep;
+    size[0] = అడ్డువరుసలు;
+    size[1] = నిలువుల_సంఖ్య;
+    అడుగు[0] = అడుగు_3;
+    అడుగు[1] = esz;
+    datalimit = datastart + అడుగు_3 * అడ్డువరుసలు;
+    dataend = datalimit - అడుగు_3 + minstep;
     updateContinuityFlag();
 }
 
-Mat::Mat(Size _sz, int _type, void* _data, size_t _step)
-    : flags(MAGIC_VAL + (_type & TYPE_MASK)), dims(2), rows(_sz.height), cols(_sz.width),
-      data((uchar*)_data), datastart((uchar*)_data), dataend(0), datalimit(0),
+Mat::Mat(కొలత _sz, పూర్ణాంకం _type, శూన్య* దత్తాంశం_3, size_t అడుగు_3)
+    : flags(MAGIC_VAL + (_type & TYPE_ముసుగు)), dims(2), అడ్డువరుసలు(_sz.ఎత్తు), నిలువుల_సంఖ్య(_sz.వెడల్పు),
+      దత్తాంశం((uchar*)దత్తాంశం_3), datastart((uchar*)దత్తాంశం_3), dataend(0), datalimit(0),
       allocator(0), u(0), size(2)
 {
-    CV_Assert(total() == 0 || data != NULL);
+    CV_Assert(మొత్తం() == 0 || దత్తాంశం != ఖాళీ);
 
-    size_t esz = CV_ELEM_SIZE(_type), esz1 = CV_ELEM_SIZE1(_type);
-    size_t minstep = cols*esz;
-    if( _step == AUTO_STEP || (_step < minstep && rows == 1))
+    size_t esz = CV_ELEM_కొలత(_type), esz1 = CV_ELEM_SIZE1(_type);
+    size_t minstep = నిలువుల_సంఖ్య*esz;
+    ఒకవేళ( అడుగు_3 == AUTO_అడుగు || (అడుగు_3 < minstep && అడ్డువరుసలు == 1))
     {
-        _step = minstep;
+        అడుగు_3 = minstep;
     }
-    else
+    లేకపోతే
     {
-        CV_CheckGE(_step, minstep, "");
+        CV_CheckGE(అడుగు_3, minstep, "");
 
-        if (_step % esz1 != 0)
+        ఒకవేళ (అడుగు_3 % esz1 != 0)
         {
-            CV_Error(Error::BadStep, "Step must be a multiple of esz1");
+            CV_Error(Error::Bad_అడుగు, "Step must be a multiple of esz1");
         }
     }
-    size[0] = rows;
-    size[1] = cols;
-    step[0] = _step;
-    step[1] = esz;
-    datalimit = datastart + _step*rows;
-    dataend = datalimit - _step + minstep;
+    size[0] = అడ్డువరుసలు;
+    size[1] = నిలువుల_సంఖ్య;
+    అడుగు[0] = అడుగు_3;
+    అడుగు[1] = esz;
+    datalimit = datastart + అడుగు_3*అడ్డువరుసలు;
+    dataend = datalimit - అడుగు_3 + minstep;
     updateContinuityFlag();
 }
 
@@ -1031,1060 +1031,1060 @@ Mat::~Mat()
     release();
 }
 
-Mat& Mat::operator = (const Mat& m)
+Mat& Mat::క్రియాకారకం = (స్థిరరాశి Mat& m)
 {
-    if( this != &m )
+    ఒకవేళ( ఇది != &m )
     {
-        if( m.u )
+        ఒకవేళ( m.u )
             CV_XADD(&m.u->refcount, 1);
         release();
         flags = m.flags;
         dims = m.dims;
-        rows = m.rows;
-        cols = m.cols;
+        అడ్డువరుసలు = m.అడ్డువరుసలు;
+        నిలువుల_సంఖ్య = m.నిలువుల_సంఖ్య;
         size = m.size;
-        step = m.step;
-        data = m.data;
+        అడుగు = m.అడుగు;
+        దత్తాంశం = m.దత్తాంశం;
         datastart = m.datastart;
         dataend = m.dataend;
         datalimit = m.datalimit;
         allocator = m.allocator;
         u = m.u;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-Mat Mat::clone() const
+Mat Mat::clone() స్థిరరాశి
 {
     Mat m;
-    copyTo(m);
-    return m;
+    copy_గమ్యం(m);
+    తిరిగి m;
 }
 
-void Mat::assignTo( Mat& m, int _type ) const
+శూన్య Mat::కేటాయించు_గమ్యం( Mat& m, పూర్ణాంకం _type ) స్థిరరాశి
 {
-    if( _type < 0 )
-        m = *this;
-    else
-        convertTo(m, _type);
+    ఒకవేళ( _type < 0 )
+        m = *ఇది;
+    లేకపోతే
+        convert_గమ్యం(m, _type);
 }
 
-void Mat::create(int _rows, int _cols, int _type)
+శూన్య Mat::create(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type)
 {
-    _type &= TYPE_MASK;
-    if( dims <= 2 && rows == _rows && cols == _cols && type() == _type && data )
-        return;
-    int sz[] = {_rows, _cols};
+    _type &= TYPE_ముసుగు;
+    ఒకవేళ( dims <= 2 && అడ్డువరుసలు == అడ్డువరుసలు_3 && నిలువుల_సంఖ్య == నిలువుల_సంఖ్య_3 && type() == _type && దత్తాంశం )
+        తిరిగి;
+    పూర్ణాంకం sz[] = {అడ్డువరుసలు_3, నిలువుల_సంఖ్య_3};
     create(2, sz, _type);
 }
 
-void Mat::create(Size _sz, int _type)
+శూన్య Mat::create(కొలత _sz, పూర్ణాంకం _type)
 {
-    create(_sz.height, _sz.width, _type);
+    create(_sz.ఎత్తు, _sz.వెడల్పు, _type);
 }
 
-void Mat::createSameSize(InputArray m, int type)
+శూన్య Mat::create_Same_కొలత(ఆదానం_Array m, పూర్ణాంకం type)
 {
     MatShape msize = m.shape();
     create(msize, type);
 }
 
-void Mat::fit(int _dims, const int* _sizes, int _type)
+శూన్య Mat::fit(పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sizes, పూర్ణాంకం _type)
 {
-    size_t oldTotalBytes = u ? u->size : 0;
-    size_t esz = CV_ELEM_SIZE(_type), newTotal = _dims >= 0;
-    for (int i = 0; i < _dims; i++)
-        newTotal *= _sizes[i];
-    size_t newTotalBytes = newTotal*esz;
-    if (newTotalBytes > 0 && (!isContinuous() ||
-                              newTotalBytes > oldTotalBytes ||
-                              data != datastart)) {
+    size_t old_మొత్తం_బైట్లు = u ? u->size : 0;
+    size_t esz = CV_ELEM_కొలత(_type), new_మొత్తం = _dims >= 0;
+    కొరకు (పూర్ణాంకం i = 0; i < _dims; i++)
+        new_మొత్తం *= _sizes[i];
+    size_t new_మొత్తం_బైట్లు = new_మొత్తం*esz;
+    ఒకవేళ (new_మొత్తం_బైట్లు > 0 && (!isContinuous() ||
+                              new_మొత్తం_బైట్లు > old_మొత్తం_బైట్లు ||
+                              దత్తాంశం != datastart)) {
         create(_dims, _sizes, _type);
-    } else {
-        flags = (flags & ~Mat::TYPE_MASK) | CV_MAT_TYPE(_type);
-        int _dummy_size = 0;
-        setSize(*this, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, true);
-        finalizeHdr(*this);
+    } లేకపోతే {
+        flags = (flags & ~Mat::TYPE_ముసుగు) | CV_MAT_TYPE(_type);
+        పూర్ణాంకం dummy_కొలత = 0;
+        సమితి_కొలత(*ఇది, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &dummy_కొలత), శూన్యసూచిక, నిజం);
+        finalizeHdr(*ఇది);
     }
 }
 
-void Mat::fit(const std::vector<int>& _shape, int _type)
+శూన్య Mat::fit(స్థిరరాశి std::vector<పూర్ణాంకం>& _shape, పూర్ణాంకం _type)
 {
-    fit((int)_shape.size(), _shape.data(), _type);
+    fit((పూర్ణాంకం)_shape.size(), _shape.దత్తాంశం(), _type);
 }
 
-void Mat::fit(const MatShape& _shape, int _type)
+శూన్య Mat::fit(స్థిరరాశి MatShape& _shape, పూర్ణాంకం _type)
 {
     fit(_shape.dims, _shape.p, _type);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void Mat::fit(std::initializer_list<int> _shape, int _type)
+శూన్య Mat::fit(std::initializer_list<పూర్ణాంకం> _shape, పూర్ణాంకం _type)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int new_ndims = (int)_shape.size();
+    పూర్ణాంకం new_shape[MatShape::MAX_DIMS];
+    పూర్ణాంకం new_ndims = (పూర్ణాంకం)_shape.size();
     CV_Assert(new_ndims <= MatShape::MAX_DIMS);
-    auto it = _shape.begin();
-    for (int i = 0; i < new_ndims; i++, ++it)
+    స్వయంచాలక it = _shape.begin();
+    కొరకు (పూర్ణాంకం i = 0; i < new_ndims; i++, ++it)
         new_shape[i] = *it;
     fit(new_ndims, new_shape, _type);
 }
 
-void Mat::fit(int _rows, int _cols, int _type)
+శూన్య Mat::fit(పూర్ణాంకం అడ్డువరుసలు_3, పూర్ణాంకం నిలువుల_సంఖ్య_3, పూర్ణాంకం _type)
 {
-    _type &= TYPE_MASK;
-    int sz[] = {_rows, _cols};
+    _type &= TYPE_ముసుగు;
+    పూర్ణాంకం sz[] = {అడ్డువరుసలు_3, నిలువుల_సంఖ్య_3};
     fit(2, sz, _type);
 }
 
-void Mat::fit(Size _sz, int _type)
+శూన్య Mat::fit(కొలత _sz, పూర్ణాంకం _type)
 {
-    fit(_sz.height, _sz.width, _type);
+    fit(_sz.ఎత్తు, _sz.వెడల్పు, _type);
 }
 
-void Mat::fitSameSize(InputArray m, int _type)
+శూన్య Mat::fit_Same_కొలత(ఆదానం_Array m, పూర్ణాంకం _type)
 {
     fit(m.shape(), _type);
 }
 
-void Mat::addref()
+శూన్య Mat::addref()
 {
-    if( u )
+    ఒకవేళ( u )
         CV_XADD(&u->refcount, 1);
 }
 
-void Mat::release()
+శూన్య Mat::release()
 {
-    if( u && CV_XADD(&u->refcount, -1) == 1 )
+    ఒకవేళ( u && CV_XADD(&u->refcount, -1) == 1 )
         deallocate();
-    u = NULL;
-    datastart = dataend = datalimit = data = 0;
-    for(int i = 0; i < dims; i++)
+    u = ఖాళీ;
+    datastart = dataend = datalimit = దత్తాంశం = 0;
+    కొరకు(పూర్ణాంకం i = 0; i < dims; i++)
         size.p[i] = 0;
-    flags = (flags & CV_MAT_TYPE_MASK) | MAGIC_VAL;
-    dims = rows = cols = 0;
+    flags = (flags & CV_MAT_TYPE_ముసుగు) | MAGIC_VAL;
+    dims = అడ్డువరుసలు = నిలువుల_సంఖ్య = 0;
     size.clear();
 }
 
-size_t Mat::step1(int i) const
+size_t Mat::step1(పూర్ణాంకం i) స్థిరరాశి
 {
-    return step.p[i] / elemSize1();
+    తిరిగి అడుగు.p[i] / elemSize1();
 }
 
-bool Mat::empty() const
+తార్కిక Mat::empty() స్థిరరాశి
 {
-    return data == 0 || total() == 0;
+    తిరిగి దత్తాంశం == 0 || మొత్తం() == 0;
 }
 
-size_t Mat::total() const
+size_t Mat::మొత్తం() స్థిరరాశి
 {
-    if( dims <= 2 )
-        return (size_t)rows * cols;
+    ఒకవేళ( dims <= 2 )
+        తిరిగి (size_t)అడ్డువరుసలు * నిలువుల_సంఖ్య;
     size_t p = 1;
-    for( int i = 0; i < dims; i++ )
+    కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
         p *= size[i];
-    return p;
+    తిరిగి p;
 }
 
-size_t Mat::total(int startDim, int endDim) const
+size_t Mat::మొత్తం(పూర్ణాంకం ప్రారంభం_Dim, పూర్ణాంకం చివర_Dim) స్థిరరాశి
 {
-    CV_Assert( 0 <= startDim && startDim <= endDim);
+    CV_Assert( 0 <= ప్రారంభం_Dim && ప్రారంభం_Dim <= చివర_Dim);
     size_t p = 1;
-    int endDim_ = endDim <= dims ? endDim : dims;
-    for( int i = startDim; i < endDim_; i++ )
+    పూర్ణాంకం చివర_Dim_2 = చివర_Dim <= dims ? చివర_Dim : dims;
+    కొరకు( పూర్ణాంకం i = ప్రారంభం_Dim; i < చివర_Dim_2; i++ )
         p *= size[i];
-    return p;
+    తిరిగి p;
 }
 
 Mat::Mat(Mat&& m) CV_NOEXCEPT
-    : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), data(m.data),
+    : flags(m.flags), dims(m.dims), అడ్డువరుసలు(m.అడ్డువరుసలు), నిలువుల_సంఖ్య(m.నిలువుల_సంఖ్య), దత్తాంశం(m.దత్తాంశం),
       datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit), allocator(m.allocator),
-      u(m.u), size(m.size), step(m.step)
+      u(m.u), size(m.size), అడుగు(m.అడుగు)
 {
-    m.flags = MAGIC_VAL; m.dims = m.rows = m.cols = 0;
-    m.size.clear(); m.step.clear();
-    m.data = NULL; m.datastart = NULL; m.dataend = NULL; m.datalimit = NULL;
-    m.allocator = NULL;
-    m.u = NULL;
+    m.flags = MAGIC_VAL; m.dims = m.అడ్డువరుసలు = m.నిలువుల_సంఖ్య = 0;
+    m.size.clear(); m.అడుగు.clear();
+    m.దత్తాంశం = ఖాళీ; m.datastart = ఖాళీ; m.dataend = ఖాళీ; m.datalimit = ఖాళీ;
+    m.allocator = ఖాళీ;
+    m.u = ఖాళీ;
 }
 
 
-Mat& Mat::operator = (Mat&& m)
+Mat& Mat::క్రియాకారకం = (Mat&& m)
 {
-    if (this == &m)
-      return *this;
+    ఒకవేళ (ఇది == &m)
+      తిరిగి *ఇది;
 
     release();
-    flags = m.flags; dims = m.dims; rows = m.rows; cols = m.cols; data = m.data;
-    size = m.size; step = m.step;
+    flags = m.flags; dims = m.dims; అడ్డువరుసలు = m.అడ్డువరుసలు; నిలువుల_సంఖ్య = m.నిలువుల_సంఖ్య; దత్తాంశం = m.దత్తాంశం;
+    size = m.size; అడుగు = m.అడుగు;
     datastart = m.datastart; dataend = m.dataend; datalimit = m.datalimit; allocator = m.allocator;
     u = m.u;
-    m.flags = MAGIC_VAL; m.dims = m.rows = m.cols = 0;
-    m.size.clear(); m.step.clear();
-    m.data = NULL; m.datastart = NULL; m.dataend = NULL; m.datalimit = NULL;
-    m.allocator = NULL;
-    m.u = NULL;
-    return *this;
+    m.flags = MAGIC_VAL; m.dims = m.అడ్డువరుసలు = m.నిలువుల_సంఖ్య = 0;
+    m.size.clear(); m.అడుగు.clear();
+    m.దత్తాంశం = ఖాళీ; m.datastart = ఖాళీ; m.dataend = ఖాళీ; m.datalimit = ఖాళీ;
+    m.allocator = ఖాళీ;
+    m.u = ఖాళీ;
+    తిరిగి *ఇది;
 }
 
 
-void Mat::create(int d0, const int* _sizes, int _type)
+శూన్య Mat::create(పూర్ణాంకం d0, స్థిరరాశి పూర్ణాంకం* _sizes, పూర్ణాంకం _type)
 {
-    int sz1 = 1, d = d0;
-    int i;
-    if (d == 0) {
+    పూర్ణాంకం sz1 = 1, d = d0;
+    పూర్ణాంకం i;
+    ఒకవేళ (d == 0) {
         d = 1;
-        _sizes = (const int*)&sz1;
+        _sizes = (స్థిరరాశి పూర్ణాంకం*)&sz1;
     }
     CV_Assert(0 <= d && d <= CV_MAX_DIM && _sizes);
     _type = CV_MAT_TYPE(_type);
 
-    if( data && d == dims && _type == type() )
+    ఒకవేళ( దత్తాంశం && d == dims && _type == type() )
     {
-        for( i = 0; i < d; i++ )
-            if( size[i] != _sizes[i] )
-                break;
-        if( i == d )
-            return;
+        కొరకు( i = 0; i < d; i++ )
+            ఒకవేళ( size[i] != _sizes[i] )
+                ఆపు;
+        ఒకవేళ( i == d )
+            తిరిగి;
     }
 
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (_sizes == (this->size.p))
+    పూర్ణాంకం _sizes_backup[CV_MAX_DIM]; // #5991
+    ఒకవేళ (_sizes == (ఇది->size.p))
     {
-        for(i = 0; i < d; i++ )
+        కొరకు(i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
 
     release();
-    if( d == 0 )
-        return;
-    flags = (_type & CV_MAT_TYPE_MASK) | MAGIC_VAL;
-    setSize(*this, d, _sizes, 0, true);
+    ఒకవేళ( d == 0 )
+        తిరిగి;
+    flags = (_type & CV_MAT_TYPE_ముసుగు) | MAGIC_VAL;
+    సమితి_కొలత(*ఇది, d, _sizes, 0, నిజం);
 
-    if( total() > 0 )
+    ఒకవేళ( మొత్తం() > 0 )
     {
         MatAllocator *a = allocator, *a0 = getDefaultAllocator();
-        if(!a)
+        ఒకవేళ(!a)
             a = a0;
-        try
+        ప్రయత్నించు
         {
-            u = a->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
+            u = a->allocate(dims, size.p, _type, 0, అడుగు.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
             CV_Assert(u != 0);
             allocator = a;
         }
-        catch (...)
+        పట్టుకో (...)
         {
-            if (a == a0)
-                throw;
-            u = a0->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
+            ఒకవేళ (a == a0)
+                విసురు;
+            u = a0->allocate(dims, size.p, _type, 0, అడుగు.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
             CV_Assert(u != 0);
             allocator = a0;
         }
-        CV_Assert( step[dims-1] == (size_t)CV_ELEM_SIZE(flags) );
+        CV_Assert( అడుగు[dims-1] == (size_t)CV_ELEM_కొలత(flags) );
     }
 
     addref();
-    finalizeHdr(*this);
+    finalizeHdr(*ఇది);
     size.dims = dims = d0;
 }
 
-void Mat::create(const std::vector<int>& _sizes, int _type)
+శూన్య Mat::create(స్థిరరాశి std::vector<పూర్ణాంకం>& _sizes, పూర్ణాంకం _type)
 {
-    create((int)_sizes.size(), _sizes.data(), _type);
+    create((పూర్ణాంకం)_sizes.size(), _sizes.దత్తాంశం(), _type);
 }
 
-void Mat::create(const MatShape& _shape, int _type)
+శూన్య Mat::create(స్థిరరాశి MatShape& _shape, పూర్ణాంకం _type)
 {
-    if (_shape.dims < 0) {
+    ఒకవేళ (_shape.dims < 0) {
         release();
-        return;
+        తిరిగి;
     }
     create(_shape.dims, _shape.p, _type);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void Mat::create(std::initializer_list<int> _shape, int _type)
+శూన్య Mat::create(std::initializer_list<పూర్ణాంకం> _shape, పూర్ణాంకం _type)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int new_ndims = (int)_shape.size();
+    పూర్ణాంకం new_shape[MatShape::MAX_DIMS];
+    పూర్ణాంకం new_ndims = (పూర్ణాంకం)_shape.size();
     CV_Assert(new_ndims <= MatShape::MAX_DIMS);
-    auto it = _shape.begin();
-    for (int i = 0; i < new_ndims; i++, ++it)
+    స్వయంచాలక it = _shape.begin();
+    కొరకు (పూర్ణాంకం i = 0; i < new_ndims; i++, ++it)
         new_shape[i] = *it;
 
     create(new_ndims, new_shape, _type);
 }
 
-void Mat::copySize(const Mat& m)
+శూన్య Mat::copy_కొలత(స్థిరరాశి Mat& m)
 {
     dims = m.dims;
-    cols = m.cols;
-    rows = m.rows;
+    నిలువుల_సంఖ్య = m.నిలువుల_సంఖ్య;
+    అడ్డువరుసలు = m.అడ్డువరుసలు;
     size = m.size;
-    step = m.step;
+    అడుగు = m.అడుగు;
 }
 
-void Mat::deallocate()
+శూన్య Mat::deallocate()
 {
-    if(u)
+    ఒకవేళ(u)
     {
-        UMatData* u_ = u;
-        u = NULL;
+        UMat_దత్తాంశం* u_ = u;
+        u = ఖాళీ;
         (u_->currAllocator ? u_->currAllocator : allocator ? allocator : getDefaultAllocator())->unmap(u_);
     }
 }
 
-Mat::Mat(const Mat& m, const Range& _rowRange, const Range& _colRange)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(స్థిరరాశి Mat& m, స్థిరరాశి Range& అడ్డువరుస_Range_3, స్థిరరాశి Range& నిలువు_Range_3)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     CV_Assert(m.dims <= MatShape::MAX_DIMS);
     CV_Assert(m.dims >= 2 ||
-              (m.dims == 1 && (_rowRange == Range::all() ||
-                               _rowRange == Range(0, m.rows))));
-    if( m.dims > 2 )
+              (m.dims == 1 && (అడ్డువరుస_Range_3 == Range::all() ||
+                               అడ్డువరుస_Range_3 == Range(0, m.అడ్డువరుసలు))));
+    ఒకవేళ( m.dims > 2 )
     {
         Range rs[MatShape::MAX_DIMS];
-        rs[0] = _rowRange;
-        rs[1] = _colRange;
-        for( int i = 2; i < m.dims; i++ )
+        rs[0] = అడ్డువరుస_Range_3;
+        rs[1] = నిలువు_Range_3;
+        కొరకు( పూర్ణాంకం i = 2; i < m.dims; i++ )
             rs[i] = Range::all();
-        *this = m(rs);
-        return;
+        *ఇది = m(rs);
+        తిరిగి;
     }
 
-    *this = m;
-    try
+    *ఇది = m;
+    ప్రయత్నించు
     {
-        if( _rowRange != Range::all() && _rowRange != Range(0,rows) )
+        ఒకవేళ( అడ్డువరుస_Range_3 != Range::all() && అడ్డువరుస_Range_3 != Range(0,అడ్డువరుసలు) )
         {
-            CV_Assert( 0 <= _rowRange.start && _rowRange.start <= _rowRange.end
-                       && _rowRange.end <= m.rows );
-            size[0] = rows = _rowRange.size();
-            data += step*_rowRange.start;
+            CV_Assert( 0 <= అడ్డువరుస_Range_3.ప్రారంభం && అడ్డువరుస_Range_3.ప్రారంభం <= అడ్డువరుస_Range_3.end
+                       && అడ్డువరుస_Range_3.end <= m.అడ్డువరుసలు );
+            size[0] = అడ్డువరుసలు = అడ్డువరుస_Range_3.size();
+            దత్తాంశం += అడుగు*అడ్డువరుస_Range_3.ప్రారంభం;
             flags |= SUBMATRIX_FLAG;
         }
 
-        if( _colRange != Range::all() && _colRange != Range(0,cols) )
+        ఒకవేళ( నిలువు_Range_3 != Range::all() && నిలువు_Range_3 != Range(0,నిలువుల_సంఖ్య) )
         {
-            CV_Assert( 0 <= _colRange.start && _colRange.start <= _colRange.end
-                       && _colRange.end <= m.cols );
-            size[dims > 1] = cols = _colRange.size();
-            data += _colRange.start*elemSize();
+            CV_Assert( 0 <= నిలువు_Range_3.ప్రారంభం && నిలువు_Range_3.ప్రారంభం <= నిలువు_Range_3.end
+                       && నిలువు_Range_3.end <= m.నిలువుల_సంఖ్య );
+            size[dims > 1] = నిలువుల_సంఖ్య = నిలువు_Range_3.size();
+            దత్తాంశం += నిలువు_Range_3.ప్రారంభం*elem_కొలత();
             flags |= SUBMATRIX_FLAG;
         }
     }
-    catch(...)
+    పట్టుకో(...)
     {
         release();
-        throw;
+        విసురు;
     }
 
     updateContinuityFlag();
 
-    if( rows <= 0 || cols <= 0 )
+    ఒకవేళ( అడ్డువరుసలు <= 0 || నిలువుల_సంఖ్య <= 0 )
     {
         release();
-        rows = cols = 0;
+        అడ్డువరుసలు = నిలువుల_సంఖ్య = 0;
     }
 }
 
 
-Mat::Mat(const Mat& m, const Rect& roi)
-    : flags(m.flags), dims(2), rows(roi.height), cols(roi.width),
-    data(m.data + roi.y*m.step[0]),
+Mat::Mat(స్థిరరాశి Mat& m, స్థిరరాశి Rect& roi)
+    : flags(m.flags), dims(2), అడ్డువరుసలు(roi.ఎత్తు), నిలువుల_సంఖ్య(roi.వెడల్పు),
+    దత్తాంశం(m.దత్తాంశం + roi.y*m.అడుగు[0]),
     datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit),
     allocator(m.allocator), u(m.u), size(2)
 {
     CV_Assert( m.dims <= 2 );
 
-    size_t esz = CV_ELEM_SIZE(flags);
-    data += roi.x*esz;
-    CV_Assert( 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols &&
-              0 <= roi.y && 0 <= roi.height && roi.y + roi.height <= m.rows );
-    if( roi.width < m.cols || roi.height < m.rows )
+    size_t esz = CV_ELEM_కొలత(flags);
+    దత్తాంశం += roi.x*esz;
+    CV_Assert( 0 <= roi.x && 0 <= roi.వెడల్పు && roi.x + roi.వెడల్పు <= m.నిలువుల_సంఖ్య &&
+              0 <= roi.y && 0 <= roi.ఎత్తు && roi.y + roi.ఎత్తు <= m.అడ్డువరుసలు );
+    ఒకవేళ( roi.వెడల్పు < m.నిలువుల_సంఖ్య || roi.ఎత్తు < m.అడ్డువరుసలు )
         flags |= SUBMATRIX_FLAG;
 
-    size[0] = rows;
-    size[1] = cols;
-    step[0] = m.step[0];
-    step[1] = esz;
+    size[0] = అడ్డువరుసలు;
+    size[1] = నిలువుల_సంఖ్య;
+    అడుగు[0] = m.అడుగు[0];
+    అడుగు[1] = esz;
     updateContinuityFlag();
 
     addref();
-    if( rows <= 0 || cols <= 0 )
+    ఒకవేళ( అడ్డువరుసలు <= 0 || నిలువుల_సంఖ్య <= 0 )
     {
-        rows = cols = 0;
+        అడ్డువరుసలు = నిలువుల_సంఖ్య = 0;
         release();
     }
 }
 
 
-Mat::Mat(int _dims, const int* _sizes, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sizes, పూర్ణాంకం _type, శూన్య* దత్తాంశం_3, స్థిరరాశి size_t* అడుగులు_2)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    if (_dims > 0 || _data != nullptr)
-        setSize(*this, _dims, _sizes, _steps, true);
-    finalizeHdr(*this);
+    datastart = దత్తాంశం = (uchar*)దత్తాంశం_3;
+    ఒకవేళ (_dims > 0 || దత్తాంశం_3 != శూన్యసూచిక)
+        సమితి_కొలత(*ఇది, _dims, _sizes, అడుగులు_2, నిజం);
+    finalizeHdr(*ఇది);
 }
 
 
-Mat::Mat(const std::vector<int>& _sizes, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(స్థిరరాశి std::vector<పూర్ణాంకం>& _sizes, పూర్ణాంకం _type, శూన్య* దత్తాంశం_3, స్థిరరాశి size_t* అడుగులు_2)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    int _dims = (int)_sizes.size();
-    if (_dims > 0 || _data != nullptr)
-        setSize(*this, _dims, _sizes.data(), _steps, true);
-    finalizeHdr(*this);
+    datastart = దత్తాంశం = (uchar*)దత్తాంశం_3;
+    పూర్ణాంకం _dims = (పూర్ణాంకం)_sizes.size();
+    ఒకవేళ (_dims > 0 || దత్తాంశం_3 != శూన్యసూచిక)
+        సమితి_కొలత(*ఇది, _dims, _sizes.దత్తాంశం(), అడుగులు_2, నిజం);
+    finalizeHdr(*ఇది);
 }
 
-Mat::Mat(const MatShape& _shape, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(స్థిరరాశి MatShape& _shape, పూర్ణాంకం _type, శూన్య* దత్తాంశం_3, స్థిరరాశి size_t* అడుగులు_2)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    if (_shape.dims >= 0) {
-        setSize(*this, _shape.dims, _shape.p, _steps, true);
+    datastart = దత్తాంశం = (uchar*)దత్తాంశం_3;
+    ఒకవేళ (_shape.dims >= 0) {
+        సమితి_కొలత(*ఇది, _shape.dims, _shape.p, అడుగులు_2, నిజం);
     }
-    else {
-        CV_Assert(!data);
+    లేకపోతే {
+        CV_Assert(!దత్తాంశం);
     }
-    finalizeHdr(*this);
+    finalizeHdr(*ఇది);
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(std::initializer_list<పూర్ణాంకం> _shape, పూర్ణాంకం _type, శూన్య* దత్తాంశం_3, స్థిరరాశి size_t* అడుగులు_2)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int _dims = (int)_shape.size();
+    పూర్ణాంకం new_shape[MatShape::MAX_DIMS];
+    పూర్ణాంకం _dims = (పూర్ణాంకం)_shape.size();
     CV_Assert(_dims <= MatShape::MAX_DIMS);
-    auto it = _shape.begin();
-    for (int i = 0; i < _dims; i++, ++it)
+    స్వయంచాలక it = _shape.begin();
+    కొరకు (పూర్ణాంకం i = 0; i < _dims; i++, ++it)
         new_shape[i] = *it;
 
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    if (_dims > 0 || _data != nullptr)
-        setSize(*this, _dims, new_shape, _steps, true);
-    finalizeHdr(*this);
+    datastart = దత్తాంశం = (uchar*)దత్తాంశం_3;
+    ఒకవేళ (_dims > 0 || దత్తాంశం_3 != శూన్యసూచిక)
+        సమితి_కొలత(*ఇది, _dims, new_shape, అడుగులు_2, నిజం);
+    finalizeHdr(*ఇది);
 }
 
-Mat::Mat(const Mat& m, const Range* ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(స్థిరరాశి Mat& m, స్థిరరాశి Range* ranges)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    int d = m.dims;
+    పూర్ణాంకం d = m.dims;
 
     CV_Assert(ranges);
-    for( int i = 0; i < d; i++ )
+    కొరకు( పూర్ణాంకం i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        CV_Assert( r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]) );
+        CV_Assert( r == Range::all() || (0 <= r.ప్రారంభం && r.ప్రారంభం < r.end && r.end <= m.size[i]) );
     }
-    *this = m;
-    for( int i = 0; i < d; i++ )
+    *ఇది = m;
+    కొరకు( పూర్ణాంకం i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        if( r != Range::all() && r != Range(0, size.p[i]))
+        ఒకవేళ( r != Range::all() && r != Range(0, size.p[i]))
         {
-            size.p[i] = r.end - r.start;
-            data += r.start*step.p[i];
+            size.p[i] = r.end - r.ప్రారంభం;
+            దత్తాంశం += r.ప్రారంభం*అడుగు.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
-        rows = d == 2 ? size[0] : 1;
-        cols = d <= 0 ? (d >= 0) : size[d > 1];
+    ఒకవేళ (d <= 2) {
+        అడ్డువరుసలు = d == 2 ? size[0] : 1;
+        నిలువుల_సంఖ్య = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-Mat::Mat(const Mat& m, const std::vector<Range>& ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(స్థిరరాశి Mat& m, స్థిరరాశి std::vector<Range>& ranges)
+    : flags(MAGIC_VAL), dims(0), అడ్డువరుసలు(0), నిలువుల_సంఖ్య(0), దత్తాంశం(0), datastart(0), dataend(0),
     datalimit(0), allocator(0), u(0)
 {
-    int d = m.dims;
+    పూర్ణాంకం d = m.dims;
 
-    CV_Assert((int)ranges.size() == d);
-    for (int i = 0; i < d; i++)
+    CV_Assert((పూర్ణాంకం)ranges.size() == d);
+    కొరకు (పూర్ణాంకం i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]));
+        CV_Assert(r == Range::all() || (0 <= r.ప్రారంభం && r.ప్రారంభం < r.end && r.end <= m.size[i]));
     }
-    *this = m;
-    for (int i = 0; i < d; i++)
+    *ఇది = m;
+    కొరకు (పూర్ణాంకం i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, size.p[i]))
+        ఒకవేళ (r != Range::all() && r != Range(0, size.p[i]))
         {
-            size.p[i] = r.end - r.start;
-            data += r.start*step.p[i];
+            size.p[i] = r.end - r.ప్రారంభం;
+            దత్తాంశం += r.ప్రారంభం*అడుగు.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
-        rows = d == 2 ? size[0] : 1;
-        cols = d <= 0 ? (d >= 0) : size[d > 1];
+    ఒకవేళ (d <= 2) {
+        అడ్డువరుసలు = d == 2 ? size[0] : 1;
+        నిలువుల_సంఖ్య = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
 
-Mat Mat::diag(int d) const
+Mat Mat::diag(పూర్ణాంకం d) స్థిరరాశి
 {
     CV_Assert( dims == 2 );
-    Mat m = *this;
-    size_t esz = elemSize();
-    int len;
+    Mat m = *ఇది;
+    size_t esz = elem_కొలత();
+    పూర్ణాంకం len;
 
-    if( d >= 0 )
+    ఒకవేళ( d >= 0 )
     {
-        len = std::min(cols - d, rows);
-        m.data += esz*d;
+        len = std::min(నిలువుల_సంఖ్య - d, అడ్డువరుసలు);
+        m.దత్తాంశం += esz*d;
     }
-    else
+    లేకపోతే
     {
-        len = std::min(rows + d, cols);
-        m.data -= step[0]*d;
+        len = std::min(అడ్డువరుసలు + d, నిలువుల_సంఖ్య);
+        m.దత్తాంశం -= అడుగు[0]*d;
     }
     CV_DbgAssert( len > 0 );
 
-    m.size[0] = m.rows = len;
-    m.size[1] = m.cols = 1;
-    m.step[0] += (len > 1 ? esz : 0);
+    m.size[0] = m.అడ్డువరుసలు = len;
+    m.size[1] = m.నిలువుల_సంఖ్య = 1;
+    m.అడుగు[0] += (len > 1 ? esz : 0);
 
     m.updateContinuityFlag();
 
-    if( size() != Size(1,1) )
+    ఒకవేళ( size() != కొలత(1,1) )
         m.flags |= SUBMATRIX_FLAG;
 
-    return m;
+    తిరిగి m;
 }
 
 
-void Mat::pop_back(size_t nelems)
+శూన్య Mat::pop_back(size_t nelems)
 {
     CV_Assert( nelems <= (size_t)size.p[0] );
     CV_Assert( dims >= 1 );
 
-    if( isSubmatrix() )
-        *this = rowRange(0, size.p[0] - (int)nelems);
-    else
+    ఒకవేళ( isSubmatrix() )
+        *ఇది = అడ్డువరుస_Range_2(0, size.p[0] - (పూర్ణాంకం)nelems);
+    లేకపోతే
     {
-        size.p[0] -= (int)nelems;
-        if (dims == 2)
-            rows = size.p[0];
-        else if (dims == 1)
-            cols = size.p[0];
-        dataend -= nelems*step.p[0];
+        size.p[0] -= (పూర్ణాంకం)nelems;
+        ఒకవేళ (dims == 2)
+            అడ్డువరుసలు = size.p[0];
+        లేకపోతే ఒకవేళ (dims == 1)
+            నిలువుల_సంఖ్య = size.p[0];
+        dataend -= nelems*అడుగు.p[0];
     }
 }
 
 
-void Mat::push_back_(const void* elem)
+శూన్య Mat::నెట్టు_వెనుక(స్థిరరాశి శూన్య* elem)
 {
     size_t r = size.p[0];
-    if( isSubmatrix() || dataend + step.p[0] > datalimit )
+    ఒకవేళ( isSubmatrix() || dataend + అడుగు.p[0] > datalimit )
         reserve( std::max(r + 1, (r*3+1)/2) );
 
-    size_t esz = elemSize();
-    memcpy(data + r*step.p[0], elem, esz);
-    size.p[0] = int(r + 1);
-    if (dims == 2)
-        rows = size.p[0];
-    else if (dims == 1)
-        cols = size.p[0];
-    dataend += step.p[0];
+    size_t esz = elem_కొలత();
+    జ్ఞాపకం_నకలు(దత్తాంశం + r*అడుగు.p[0], elem, esz);
+    size.p[0] = పూర్ణాంకం(r + 1);
+    ఒకవేళ (dims == 2)
+        అడ్డువరుసలు = size.p[0];
+    లేకపోతే ఒకవేళ (dims == 1)
+        నిలువుల_సంఖ్య = size.p[0];
+    dataend += అడుగు.p[0];
     uint64 tsz = size.p[0];
-    for( int i = 1; i < dims; i++ )
+    కొరకు( పూర్ణాంకం i = 1; i < dims; i++ )
         tsz *= size.p[i];
-    if( esz < step.p[0] || tsz != (uint64)(int)tsz )
+    ఒకవేళ( esz < అడుగు.p[0] || tsz != (uint64)(పూర్ణాంకం)tsz )
         flags &= ~CONTINUOUS_FLAG;
 }
 
 
-void Mat::reserve(size_t nelems)
+శూన్య Mat::reserve(size_t nelems)
 {
-    const size_t MIN_SIZE = 64;
+    స్థిరరాశి size_t MIN_కొలత = 64;
 
-    CV_Assert( (int)nelems >= 0 );
-    if( !isSubmatrix() && step.p[0] != 0 && data + step.p[0]*nelems <= datalimit )
-        return;
+    CV_Assert( (పూర్ణాంకం)nelems >= 0 );
+    ఒకవేళ( !isSubmatrix() && అడుగు.p[0] != 0 && దత్తాంశం + అడుగు.p[0]*nelems <= datalimit )
+        తిరిగి;
 
-    int r = size.p[0];
-    if( (size_t)r >= nelems)
-        return;
+    పూర్ణాంకం r = size.p[0];
+    ఒకవేళ( (size_t)r >= nelems)
+        తిరిగి;
 
     MatShape newsize = size;
-    size_t esz = elemSize();
+    size_t esz = elem_కొలత();
     newsize.dims = std::max(newsize.dims, 1);
-    if (dims > 1 && r == 0 && step.p[0] == 0) {
-        step.p[0] = size.p[1] * (dims == 2 ? esz : step.p[1]);
+    ఒకవేళ (dims > 1 && r == 0 && అడుగు.p[0] == 0) {
+        అడుగు.p[0] = size.p[1] * (dims == 2 ? esz : అడుగు.p[1]);
     }
-    newsize.p[0] = (int)nelems;
-    size_t newbytes = newsize.total() * esz;
-    if (newbytes < MIN_SIZE) {
+    newsize.p[0] = (పూర్ణాంకం)nelems;
+    size_t newbytes = newsize.మొత్తం() * esz;
+    ఒకవేళ (newbytes < MIN_కొలత) {
         newsize.p[0] = 1;
-        newsize.p[0] = int(MIN_SIZE / newsize.total() / esz);
+        newsize.p[0] = పూర్ణాంకం(MIN_కొలత / newsize.మొత్తం() / esz);
     }
 
     Mat m(newsize, type());
-    if( r > 0)
+    ఒకవేళ( r > 0)
     {
-        Mat mpart = m.rowRange(0, r);
-        copyTo(mpart);
+        Mat mpart = m.అడ్డువరుస_Range_2(0, r);
+        copy_గమ్యం(mpart);
     }
 
-    *this = m;
+    *ఇది = m;
     size.p[0] = r;
 
-    if (dims == 2)
-        rows = size.p[0];
-    else if (dims == 1)
-        cols = size.p[0];
-    dataend = data + step.p[0]*r;
+    ఒకవేళ (dims == 2)
+        అడ్డువరుసలు = size.p[0];
+    లేకపోతే ఒకవేళ (dims == 1)
+        నిలువుల_సంఖ్య = size.p[0];
+    dataend = దత్తాంశం + అడుగు.p[0]*r;
 }
 
 
-void Mat::reserveBuffer(size_t nbytes)
+శూన్య Mat::reserve_బఫరు(size_t nbytes)
 {
     size_t esz = 1;
-    int mtype = CV_8UC1;
-    if (!empty())
+    పూర్ణాంకం mtype = CV_8UC1;
+    ఒకవేళ (!empty())
     {
-        if (!isSubmatrix() && data + nbytes <= dataend)//Should it be datalimit?
-            return;
-        esz = elemSize();
+        ఒకవేళ (!isSubmatrix() && దత్తాంశం + nbytes <= dataend)//Should it be datalimit?
+            తిరిగి;
+        esz = elem_కొలత();
         mtype = type();
     }
 
     size_t nelems = (nbytes - 1) / esz + 1;
 
-#if SIZE_MAX > UINT_MAX
-    CV_Assert(nelems <= size_t(INT_MAX)*size_t(INT_MAX));
-    int newrows = nelems > size_t(INT_MAX) ? nelems > 0x400*size_t(INT_MAX) ? nelems > 0x100000 * size_t(INT_MAX) ? nelems > 0x40000000 * size_t(INT_MAX) ?
-                  size_t(INT_MAX) : 0x40000000 : 0x100000 : 0x400 : 1;
-#else
-    int newrows = nelems > size_t(INT_MAX) ? 2 : 1;
-#endif
-    int newcols = (int)((nelems - 1) / newrows + 1);
+#ఒకవేళ SIZE_MAX > UINT_MAX
+    CV_Assert(nelems <= size_t(గరిష్ఠ_పూర్ణాంకం)*size_t(గరిష్ఠ_పూర్ణాంకం));
+    పూర్ణాంకం newrows = nelems > size_t(గరిష్ఠ_పూర్ణాంకం) ? nelems > 0x400*size_t(గరిష్ఠ_పూర్ణాంకం) ? nelems > 0x100000 * size_t(గరిష్ఠ_పూర్ణాంకం) ? nelems > 0x40000000 * size_t(గరిష్ఠ_పూర్ణాంకం) ?
+                  size_t(గరిష్ఠ_పూర్ణాంకం) : 0x40000000 : 0x100000 : 0x400 : 1;
+#లేకపోతే
+    పూర్ణాంకం newrows = nelems > size_t(గరిష్ఠ_పూర్ణాంకం) ? 2 : 1;
+#అయితే_ముగింపు
+    పూర్ణాంకం newcols = (పూర్ణాంకం)((nelems - 1) / newrows + 1);
 
     create(newrows, newcols, mtype);
 }
 
 
-void Mat::resize(size_t nelems)
+శూన్య Mat::resize(size_t nelems)
 {
-    int r = size.p[0];
-    if( r == (int)nelems )
-        return;
-    CV_Assert( (int)nelems >= 0 );
+    పూర్ణాంకం r = size.p[0];
+    ఒకవేళ( r == (పూర్ణాంకం)nelems )
+        తిరిగి;
+    CV_Assert( (పూర్ణాంకం)nelems >= 0 );
 
-    if( isSubmatrix() || data + step.p[0]*nelems > datalimit )
+    ఒకవేళ( isSubmatrix() || దత్తాంశం + అడుగు.p[0]*nelems > datalimit )
         reserve(nelems);
 
-    size.p[0] = (int)nelems;
-    if (dims == 2)
-        rows = size.p[0];
-    else if (dims == 1)
-        cols = size.p[0];
-    dataend += (size.p[0] - r)*(int64_t)step.p[0];
+    size.p[0] = (పూర్ణాంకం)nelems;
+    ఒకవేళ (dims == 2)
+        అడ్డువరుసలు = size.p[0];
+    లేకపోతే ఒకవేళ (dims == 1)
+        నిలువుల_సంఖ్య = size.p[0];
+    dataend += (size.p[0] - r)*(int64_t)అడుగు.p[0];
 
     //updateContinuityFlag(*this);
 }
 
 
-void Mat::resize(size_t nelems, const Scalar& s)
+శూన్య Mat::resize(size_t nelems, స్థిరరాశి Scalar& s)
 {
-    int saveRows = size.p[0];
+    పూర్ణాంకం save_అడ్డువరుసలు = size.p[0];
     resize(nelems);
 
-    if( size.p[0] > saveRows )
+    ఒకవేళ( size.p[0] > save_అడ్డువరుసలు )
     {
-        Mat part = rowRange(saveRows, size.p[0]);
+        Mat part = అడ్డువరుస_Range_2(save_అడ్డువరుసలు, size.p[0]);
         part = s;
     }
 }
 
-void Mat::push_back(const Mat& elems)
+శూన్య Mat::push_back(స్థిరరాశి Mat& elems)
 {
     size_t r = size.p[0];
     size_t delta = elems.size.p[0];
-    if( delta == 0 )
-        return;
-    if( this == &elems )
+    ఒకవేళ( delta == 0 )
+        తిరిగి;
+    ఒకవేళ( ఇది == &elems )
     {
         Mat tmp = elems;
         push_back(tmp);
-        return;
+        తిరిగి;
     }
-    if( !data )
+    ఒకవేళ( !దత్తాంశం )
     {
-        *this = elems.clone();
-        return;
+        *ఇది = elems.clone();
+        తిరిగి;
     }
     CV_Assert(dims > 0);
 
     size.p[0] = elems.size.p[0];
-    bool eq = size == elems.size;
-    size.p[0] = int(r);
-    if( !eq )
+    తార్కిక eq = size == elems.size;
+    size.p[0] = పూర్ణాంకం(r);
+    ఒకవేళ( !eq )
         CV_Error(cv::Error::StsUnmatchedSizes, "Pushed vector length is not equal to matrix row length");
-    if( type() != elems.type() )
+    ఒకవేళ( type() != elems.type() )
         CV_Error(cv::Error::StsUnmatchedFormats, "Pushed vector type is not the same as matrix type");
-    size_t esz = elemSize();
-    size_t minstep = dims <= 1 ? esz : size.p[1] * (dims == 2 ? esz : step.p[1]);
-    size_t step0 = step.p[0];
-    if (step0 < minstep) {
-        if (size.p[0] <= 1)
-            step.p[0] = step0 = minstep;
+    size_t esz = elem_కొలత();
+    size_t minstep = dims <= 1 ? esz : size.p[1] * (dims == 2 ? esz : అడుగు.p[1]);
+    size_t step0 = అడుగు.p[0];
+    ఒకవేళ (step0 < minstep) {
+        ఒకవేళ (size.p[0] <= 1)
+            అడుగు.p[0] = step0 = minstep;
     }
 
-    if( isSubmatrix() || dataend + step0*delta > datalimit )
+    ఒకవేళ( isSubmatrix() || dataend + step0*delta > datalimit )
         reserve( std::max(r + delta, (r*3+1)/2) );
 
-    size.p[0] += int(delta);
-    if (dims == 2)
-        rows = size.p[0];
-    else if (dims == 1)
-        cols = size.p[0];
+    size.p[0] += పూర్ణాంకం(delta);
+    ఒకవేళ (dims == 2)
+        అడ్డువరుసలు = size.p[0];
+    లేకపోతే ఒకవేళ (dims == 1)
+        నిలువుల_సంఖ్య = size.p[0];
     dataend += step0*delta;
 
     //updateContinuityFlag(*this);
 
-    if( isContinuous() && elems.isContinuous() )
-        memcpy(data + r*step0, elems.data, elems.total()*elems.elemSize());
-    else
+    ఒకవేళ( isContinuous() && elems.isContinuous() )
+        జ్ఞాపకం_నకలు(దత్తాంశం + r*step0, elems.దత్తాంశం, elems.మొత్తం()*elems.elem_కొలత());
+    లేకపోతే
     {
-        Mat part = rowRange(int(r), int(r + delta));
-        elems.copyTo(part);
+        Mat part = అడ్డువరుస_Range_2(పూర్ణాంకం(r), పూర్ణాంకం(r + delta));
+        elems.copy_గమ్యం(part);
     }
 }
 
 
-void Mat::locateROI( Size& wholeSize, Point& ofs ) const
+శూన్య Mat::locateROI( కొలత& సంపూర్ణ_కొలత, బిందువు& ofs ) స్థిరరాశి
 {
-    CV_Assert( dims <= 2 && step[0] > 0 );
-    size_t esz = elemSize(), minstep;
-    ptrdiff_t delta1 = data - datastart, delta2 = dataend - datastart;
+    CV_Assert( dims <= 2 && అడుగు[0] > 0 );
+    size_t esz = elem_కొలత(), minstep;
+    ptrdiff_t delta1 = దత్తాంశం - datastart, delta2 = dataend - datastart;
 
-    if( delta1 == 0 )
+    ఒకవేళ( delta1 == 0 )
         ofs.x = ofs.y = 0;
-    else
+    లేకపోతే
     {
-        ofs.y = (int)(delta1/step[0]);
-        ofs.x = (int)((delta1 - step[0]*ofs.y)/esz);
-        CV_DbgAssert( data == datastart + ofs.y*step[0] + ofs.x*esz );
+        ofs.y = (పూర్ణాంకం)(delta1/అడుగు[0]);
+        ofs.x = (పూర్ణాంకం)((delta1 - అడుగు[0]*ofs.y)/esz);
+        CV_DbgAssert( దత్తాంశం == datastart + ofs.y*అడుగు[0] + ofs.x*esz );
     }
-    minstep = (ofs.x + cols)*esz;
-    wholeSize.height = (int)((delta2 - minstep)/step[0] + 1);
-    wholeSize.height = std::max(wholeSize.height, ofs.y + rows);
-    wholeSize.width = (int)((delta2 - step*(wholeSize.height-1))/esz);
-    wholeSize.width = std::max(wholeSize.width, ofs.x + cols);
+    minstep = (ofs.x + నిలువుల_సంఖ్య)*esz;
+    సంపూర్ణ_కొలత.ఎత్తు = (పూర్ణాంకం)((delta2 - minstep)/అడుగు[0] + 1);
+    సంపూర్ణ_కొలత.ఎత్తు = std::max(సంపూర్ణ_కొలత.ఎత్తు, ofs.y + అడ్డువరుసలు);
+    సంపూర్ణ_కొలత.వెడల్పు = (పూర్ణాంకం)((delta2 - అడుగు*(సంపూర్ణ_కొలత.ఎత్తు-1))/esz);
+    సంపూర్ణ_కొలత.వెడల్పు = std::max(సంపూర్ణ_కొలత.వెడల్పు, ofs.x + నిలువుల_సంఖ్య);
 }
 
-Mat& Mat::adjustROI( int dtop, int dbottom, int dleft, int dright )
+Mat& Mat::adjustROI( పూర్ణాంకం dtop, పూర్ణాంకం dbottom, పూర్ణాంకం dleft, పూర్ణాంకం dright )
 {
-    CV_Assert( dims <= 2 && step[0] > 0 );
-    Size wholeSize; Point ofs;
-    size_t esz = elemSize();
-    locateROI( wholeSize, ofs );
-    int row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
-    int col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
-    if(row1 > row2)
+    CV_Assert( dims <= 2 && అడుగు[0] > 0 );
+    కొలత సంపూర్ణ_కొలత; బిందువు ofs;
+    size_t esz = elem_కొలత();
+    locateROI( సంపూర్ణ_కొలత, ofs );
+    పూర్ణాంకం row1 = std::min(std::max(ofs.y - dtop, 0), సంపూర్ణ_కొలత.ఎత్తు), row2 = std::max(0, std::min(ofs.y + అడ్డువరుసలు + dbottom, సంపూర్ణ_కొలత.ఎత్తు));
+    పూర్ణాంకం col1 = std::min(std::max(ofs.x - dleft, 0), సంపూర్ణ_కొలత.వెడల్పు), col2 = std::max(0, std::min(ofs.x + నిలువుల_సంఖ్య + dright, సంపూర్ణ_కొలత.వెడల్పు));
+    ఒకవేళ(row1 > row2)
         std::swap(row1, row2);
-    if(col1 > col2)
+    ఒకవేళ(col1 > col2)
         std::swap(col1, col2);
 
-    if (dims == 1) {
-        data += (col1 - ofs.x)*(std::ptrdiff_t)esz;
-        cols = col2 - col1;
-        size.p[0] = cols;
-    } else {
-        data += (row1 - ofs.y)*(std::ptrdiff_t)step + (col1 - ofs.x)*(std::ptrdiff_t)esz;
-        rows = row2 - row1; cols = col2 - col1;
-        size.p[0] = rows; size.p[1] = cols;
+    ఒకవేళ (dims == 1) {
+        దత్తాంశం += (col1 - ofs.x)*(std::ptrdiff_t)esz;
+        నిలువుల_సంఖ్య = col2 - col1;
+        size.p[0] = నిలువుల_సంఖ్య;
+    } లేకపోతే {
+        దత్తాంశం += (row1 - ofs.y)*(std::ptrdiff_t)అడుగు + (col1 - ofs.x)*(std::ptrdiff_t)esz;
+        అడ్డువరుసలు = row2 - row1; నిలువుల_సంఖ్య = col2 - col1;
+        size.p[0] = అడ్డువరుసలు; size.p[1] = నిలువుల_సంఖ్య;
         updateContinuityFlag();
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-Mat Mat::reshape(int new_cn, int new_rows) const
+Mat Mat::reshape(పూర్ణాంకం new_cn, పూర్ణాంకం new_అడ్డువరుసలు) స్థిరరాశి
 {
-    int cn = channels();
-    Mat hdr = *this;
+    పూర్ణాంకం cn = channels();
+    Mat hdr = *ఇది;
 
-    if( new_cn == 0 )
+    ఒకవేళ( new_cn == 0 )
         new_cn = cn;
 
-    if( dims > 2 )
+    ఒకవేళ( dims > 2 )
     {
-        if( new_rows == 0 )
+        ఒకవేళ( new_అడ్డువరుసలు == 0 )
         {
             // special case: just change the number of channnels; retain the same shape,
             // except for the last, innermost dimension
             CV_Assert(size[dims-1]*cn % new_cn == 0);
-            hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-            hdr.step[dims-1] = CV_ELEM_SIZE(hdr.flags);
+            hdr.flags = (hdr.flags & ~CV_MAT_CN_ముసుగు) | ((new_cn-1) << CV_CN_జరుపు);
+            hdr.అడుగు[dims-1] = CV_ELEM_కొలత(hdr.flags);
             hdr.size[dims-1] = hdr.size[dims-1]*cn / new_cn;
-            return hdr;
+            తిరిగి hdr;
         }
-        CV_Assert( new_rows > 0 );
-        int sz[] = { new_rows, (int)(total()*cn/new_rows) };
-        return reshape(new_cn, 2, sz);
+        CV_Assert( new_అడ్డువరుసలు > 0 );
+        పూర్ణాంకం sz[] = { new_అడ్డువరుసలు, (పూర్ణాంకం)(మొత్తం()*cn/new_అడ్డువరుసలు) };
+        తిరిగి reshape(new_cn, 2, sz);
     }
 
-    int total_width = cols * cn;
+    పూర్ణాంకం మొత్తం_వెడల్పు = నిలువుల_సంఖ్య * cn;
 
-    if( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
-        new_rows = rows * total_width / new_cn;
+    ఒకవేళ( (new_cn > మొత్తం_వెడల్పు || మొత్తం_వెడల్పు % new_cn != 0) && new_అడ్డువరుసలు == 0 )
+        new_అడ్డువరుసలు = అడ్డువరుసలు * మొత్తం_వెడల్పు / new_cn;
 
-    if( new_rows != 0 && new_rows != rows )
+    ఒకవేళ( new_అడ్డువరుసలు != 0 && new_అడ్డువరుసలు != అడ్డువరుసలు )
     {
-        int total_size = total_width * rows;
-        if( !isContinuous() )
-            CV_Error( cv::Error::BadStep,
+        పూర్ణాంకం మొత్తం_కొలత_2 = మొత్తం_వెడల్పు * అడ్డువరుసలు;
+        ఒకవేళ( !isContinuous() )
+            CV_Error( cv::Error::Bad_అడుగు,
             "The matrix is not continuous, thus its number of rows can not be changed" );
 
-        total_width = total_size / new_rows;
+        మొత్తం_వెడల్పు = మొత్తం_కొలత_2 / new_అడ్డువరుసలు;
 
-        if( total_width * new_rows != total_size )
+        ఒకవేళ( మొత్తం_వెడల్పు * new_అడ్డువరుసలు != మొత్తం_కొలత_2 )
             CV_Error( cv::Error::StsBadArg, "The total number of matrix elements "
                                     "is not divisible by the new number of rows" );
 
-        hdr.size[0] = hdr.rows = new_rows;
-        hdr.step[0] = total_width * elemSize1();
-    } else {
-        hdr.size[0] = hdr.rows = rows;
-        if (dims <= 1)
-            hdr.step[0] = cols * CV_ELEM_SIZE(flags);
+        hdr.size[0] = hdr.అడ్డువరుసలు = new_అడ్డువరుసలు;
+        hdr.అడుగు[0] = మొత్తం_వెడల్పు * elemSize1();
+    } లేకపోతే {
+        hdr.size[0] = hdr.అడ్డువరుసలు = అడ్డువరుసలు;
+        ఒకవేళ (dims <= 1)
+            hdr.అడుగు[0] = నిలువుల_సంఖ్య * CV_ELEM_కొలత(flags);
     }
 
-    int new_width = total_width / new_cn;
+    పూర్ణాంకం new_వెడల్పు = మొత్తం_వెడల్పు / new_cn;
 
-    if( new_width * new_cn != total_width )
-        CV_Error( cv::Error::BadNumChannels,
+    ఒకవేళ( new_వెడల్పు * new_cn != మొత్తం_వెడల్పు )
+        CV_Error( cv::Error::Bad_అంకె_Channels,
         "The total width is not divisible by the new number of channels" );
 
     hdr.size.dims = hdr.dims = 2;
-    hdr.size[1] = hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-    hdr.step[1] = CV_ELEM_SIZE(hdr.flags);
-    return hdr;
+    hdr.size[1] = hdr.నిలువుల_సంఖ్య = new_వెడల్పు;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_ముసుగు) | ((new_cn-1) << CV_CN_జరుపు);
+    hdr.అడుగు[1] = CV_ELEM_కొలత(hdr.flags);
+    తిరిగి hdr;
 }
 
-Mat Mat::reshape(int _cn, int _newndims, const int* _newsz) const
+Mat Mat::reshape(పూర్ణాంకం _cn, పూర్ణాంకం _newndims, స్థిరరాశి పూర్ణాంకం* _newsz) స్థిరరాశి
 {
-    if(_newndims == dims)
+    ఒకవేళ(_newndims == dims)
     {
-        if(_newsz == 0)
-            return reshape(_cn);
-        if(_newndims == 2)
-            return reshape(_cn, _newsz[0]);
+        ఒకవేళ(_newsz == 0)
+            తిరిగి reshape(_cn);
+        ఒకవేళ(_newndims == 2)
+            తిరిగి reshape(_cn, _newsz[0]);
     }
 
-    if (isContinuous())
+    ఒకవేళ (isContinuous())
     {
         CV_Assert(_cn >= 0 && _newndims >= 0 && _newndims <= CV_MAX_DIM && (_newndims == 0 || _newsz != 0));
 
-        if (_cn == 0)
-            _cn = this->channels();
-        else
+        ఒకవేళ (_cn == 0)
+            _cn = ఇది->channels();
+        లేకపోతే
             CV_Assert(_cn <= CV_CN_MAX);
 
-        size_t total_elem1_ref = this->total() * this->channels();
-        size_t total_elem1 = _cn;
+        size_t మొత్తం_elem1_ref = ఇది->మొత్తం() * ఇది->channels();
+        size_t మొత్తం_elem1 = _cn;
 
-        AutoBuffer<int, 4> newsz_buf( (size_t)_newndims );
+        Auto_బఫరు<పూర్ణాంకం, 4> newsz_buf( (size_t)_newndims );
 
-        int m1_idx = -1;
+        పూర్ణాంకం m1_idx = -1;
 
-        for (int i = 0; i < _newndims; i++)
+        కొరకు (పూర్ణాంకం i = 0; i < _newndims; i++)
         {
-            if (_newsz[i] >= 0) {
-                if (_newsz[i] == 0 && i < dims)
+            ఒకవేళ (_newsz[i] >= 0) {
+                ఒకవేళ (_newsz[i] == 0 && i < dims)
                     newsz_buf[i] = size.p[i];
-                else
+                లేకపోతే
                     newsz_buf[i] = _newsz[i];
-                total_elem1 *= (size_t)newsz_buf[i];
-            } else {
-                if (m1_idx >= 0)
-                    CV_Error(cv::Error::StsBadSize, "More than one '-1' occured in the new shape");
+                మొత్తం_elem1 *= (size_t)newsz_buf[i];
+            } లేకపోతే {
+                ఒకవేళ (m1_idx >= 0)
+                    CV_Error(cv::Error::Sts_Bad_కొలత, "More than one '-1' occured in the new shape");
                 m1_idx = i;
             }
         }
 
-        if (m1_idx >= 0) {
-            if (total_elem1 == 0) {
-                CV_Assert(total_elem1_ref == 0);
-                total_elem1 = 1;
+        ఒకవేళ (m1_idx >= 0) {
+            ఒకవేళ (మొత్తం_elem1 == 0) {
+                CV_Assert(మొత్తం_elem1_ref == 0);
+                మొత్తం_elem1 = 1;
             }
-            CV_Assert(total_elem1_ref % total_elem1 == 0);
-            newsz_buf[m1_idx] = (int)(total_elem1_ref / total_elem1);
-        } else if (total_elem1 != total_elem1_ref) {
+            CV_Assert(మొత్తం_elem1_ref % మొత్తం_elem1 == 0);
+            newsz_buf[m1_idx] = (పూర్ణాంకం)(మొత్తం_elem1_ref / మొత్తం_elem1);
+        } లేకపోతే ఒకవేళ (మొత్తం_elem1 != మొత్తం_elem1_ref) {
             CV_Error(cv::Error::StsUnmatchedSizes, "Requested and source matrices have different count of elements");
         }
 
-        Mat hdr = *this;
-        hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((_cn-1) << CV_CN_SHIFT);
-        setSize(hdr, _newndims, newsz_buf.data(), NULL, true);
+        Mat hdr = *ఇది;
+        hdr.flags = (hdr.flags & ~CV_MAT_CN_ముసుగు) | ((_cn-1) << CV_CN_జరుపు);
+        సమితి_కొలత(hdr, _newndims, newsz_buf.దత్తాంశం(), ఖాళీ, నిజం);
 
-        return hdr;
+        తిరిగి hdr;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "Reshaping of n-dimensional non-continuous matrices is not supported yet");
     // TBD
 }
 
-Mat Mat::reshape(int _cn, const std::vector<int>& _newshape) const
+Mat Mat::reshape(పూర్ణాంకం _cn, స్థిరరాశి std::vector<పూర్ణాంకం>& _newshape) స్థిరరాశి
 {
-    int newdims = (int)_newshape.size();
-    if(newdims == 0 && empty())
+    పూర్ణాంకం newdims = (పూర్ణాంకం)_newshape.size();
+    ఒకవేళ(newdims == 0 && empty())
     {
-        return *this;
+        తిరిగి *ఇది;
     }
 
-    return reshape(_cn, newdims, newdims > 0 ? &_newshape[0] : 0);
+    తిరిగి reshape(_cn, newdims, newdims > 0 ? &_newshape[0] : 0);
 }
 
-Mat Mat::reshape(int _cn, const MatShape& _newshape) const
+Mat Mat::reshape(పూర్ణాంకం _cn, స్థిరరాశి MatShape& _newshape) స్థిరరాశి
 {
-    if (_newshape.dims < 0) {
-        int newshape[] = {0};
-        return reshape(_cn, 1, newshape);
+    ఒకవేళ (_newshape.dims < 0) {
+        పూర్ణాంకం newshape[] = {0};
+        తిరిగి reshape(_cn, 1, newshape);
     }
-    return reshape(_cn, _newshape.dims, _newshape.p);
+    తిరిగి reshape(_cn, _newshape.dims, _newshape.p);
 }
 
-Mat Mat::reshape(int _cn, std::initializer_list<int> newshape_) const
+Mat Mat::reshape(పూర్ణాంకం _cn, std::initializer_list<పూర్ణాంకం> newshape_) స్థిరరాశి
 {
-    int newshape[MatShape::MAX_DIMS];
+    పూర్ణాంకం newshape[MatShape::MAX_DIMS];
     size_t i, newshape_dims = newshape_.size();
     CV_Assert(newshape_dims <= (size_t)MatShape::MAX_DIMS);
-    auto it = newshape_.begin();
-    for (i = 0; i < newshape_dims; i++, ++it)
+    స్వయంచాలక it = newshape_.begin();
+    కొరకు (i = 0; i < newshape_dims; i++, ++it)
         newshape[i] = *it;
-    return reshape(_cn, (int)newshape_dims, newshape);
+    తిరిగి reshape(_cn, (పూర్ణాంకం)newshape_dims, newshape);
 }
 
-Mat Mat::reinterpret(int type) const
+Mat Mat::reinterpret(పూర్ణాంకం type) స్థిరరాశి
 {
     type = CV_MAT_TYPE(type);
-    CV_Assert(CV_ELEM_SIZE(this->type()) == CV_ELEM_SIZE(type));
-    Mat m = *this;
-    m.flags = (m.flags & ~CV_MAT_TYPE_MASK) | type;
+    CV_Assert(CV_ELEM_కొలత(ఇది->type()) == CV_ELEM_కొలత(type));
+    Mat m = *ఇది;
+    m.flags = (m.flags & ~CV_MAT_TYPE_ముసుగు) | type;
     m.updateContinuityFlag();
-    return m;
+    తిరిగి m;
 }
 
-Mat Mat::diag(const Mat& d)
+Mat Mat::diag(స్థిరరాశి Mat& d)
 {
-    CV_Assert( d.cols == 1 || d.rows == 1 );
-    int len = d.rows + d.cols - 1;
+    CV_Assert( d.నిలువుల_సంఖ్య == 1 || d.అడ్డువరుసలు == 1 );
+    పూర్ణాంకం len = d.అడ్డువరుసలు + d.నిలువుల_సంఖ్య - 1;
     Mat m(len, len, d.type(), Scalar(0));
     Mat md = m.diag();
-    if( d.cols == 1 )
-        d.copyTo(md);
-    else
+    ఒకవేళ( d.నిలువుల_సంఖ్య == 1 )
+        d.copy_గమ్యం(md);
+    లేకపోతే
         transpose(d, md);
-    return m;
+    తిరిగి m;
 }
 
-int Mat::checkVector(int _elemChannels, int _depth, bool _requireContinuous) const
+పూర్ణాంకం Mat::check_సదిశ(పూర్ణాంకం _elemChannels, పూర్ణాంకం లోతు_2, తార్కిక _requireContinuous) స్థిరరాశి
 {
-    return data && (depth() == _depth || _depth <= 0) &&
+    తిరిగి దత్తాంశం && (లోతు() == లోతు_2 || లోతు_2 <= 0) &&
         (isContinuous() || !_requireContinuous) &&
-        ((dims <= 2 && (((rows == 1 || cols == 1) && channels() == _elemChannels) ||
-                        (cols == _elemChannels && channels() == 1))) ||
+        ((dims <= 2 && (((అడ్డువరుసలు == 1 || నిలువుల_సంఖ్య == 1) && channels() == _elemChannels) ||
+                        (నిలువుల_సంఖ్య == _elemChannels && channels() == 1))) ||
         (dims == 3 && channels() == 1 && size.p[2] == _elemChannels && (size.p[0] == 1 || size.p[1] == 1) &&
-         (isContinuous() || step.p[1] == step.p[2]*size.p[2])))
-    ? (int)(total()*channels()/_elemChannels) : -1;
+         (isContinuous() || అడుగు.p[1] == అడుగు.p[2]*size.p[2])))
+    ? (పూర్ణాంకం)(మొత్తం()*channels()/_elemChannels) : -1;
 }
 
 
-static inline Size getContinuousSize_(int flags, int cols, int rows, int widthScale)
+స్థిర అంతఃవరుస కొలత get_Continuous_కొలత(పూర్ణాంకం flags, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం వెడల్పు_Scale)
 {
-    int64 sz = (int64)cols * rows * widthScale;
-    bool has_int_overflow = sz >= INT_MAX;
-    bool isContiguous = (flags & Mat::CONTINUOUS_FLAG) != 0;
-    return (isContiguous && !has_int_overflow)
-            ? Size((int)sz, 1)
-            : Size(cols * widthScale, rows);
+    int64 sz = (int64)నిలువుల_సంఖ్య * అడ్డువరుసలు * వెడల్పు_Scale;
+    తార్కిక has_int_అధికప్రవాహం = sz >= గరిష్ఠ_పూర్ణాంకం;
+    తార్కిక isContiguous = (flags & Mat::CONTINUOUS_FLAG) != 0;
+    తిరిగి (isContiguous && !has_int_అధికప్రవాహం)
+            ? కొలత((పూర్ణాంకం)sz, 1)
+            : కొలత(నిలువుల_సంఖ్య * వెడల్పు_Scale, అడ్డువరుసలు);
 }
 
-Size getContinuousSize2D(Mat& m1, int widthScale)
+కొలత getContinuousSize2D(Mat& m1, పూర్ణాంకం వెడల్పు_Scale)
 {
     CV_CheckLE(m1.dims, 2, "");
-    return getContinuousSize_(m1.flags,
-                              m1.cols, m1.rows, widthScale);
+    తిరిగి get_Continuous_కొలత(m1.flags,
+                              m1.నిలువుల_సంఖ్య, m1.అడ్డువరుసలు, వెడల్పు_Scale);
 }
-Size getContinuousSize2D(Mat& m1, Mat& m2, int widthScale)
+కొలత getContinuousSize2D(Mat& m1, Mat& m2, పూర్ణాంకం వెడల్పు_Scale)
 {
     CV_CheckLE(m1.dims, 2, "");
     CV_CheckLE(m2.dims, 2, "");
-    const Size sz1 = m1.size();
-    if (sz1 != m2.size())  // reshape all matrixes to the same size (#4159)
+    స్థిరరాశి కొలత sz1 = m1.size();
+    ఒకవేళ (sz1 != m2.size())  // reshape all matrixes to the same size (#4159)
     {
-        size_t total_sz = m1.total();
-        CV_CheckEQ(total_sz, m2.total(), "");
-        bool is_m1_vector = m1.cols == 1 || m1.rows == 1;
-        bool is_m2_vector = m2.cols == 1 || m2.rows == 1;
-        CV_Assert(is_m1_vector); CV_Assert(is_m2_vector);
-        int total = (int)total_sz;  // vector-column
-        bool isContiguous = ((m1.flags & m2.flags) & Mat::CONTINUOUS_FLAG) != 0;
-        bool has_int_overflow = ((int64)total_sz * widthScale) >= INT_MAX;
-        if (isContiguous && !has_int_overflow)
-            total = 1; // vector-row
-        m1 = m1.reshape(0, total);
-        m2 = m2.reshape(0, total);
-        CV_Assert(m1.cols == m2.cols && m1.rows == m2.rows);
-        return Size(m1.cols * widthScale, m1.rows);
+        size_t మొత్తం_sz = m1.మొత్తం();
+        CV_CheckEQ(మొత్తం_sz, m2.మొత్తం(), "");
+        తార్కిక is_m1_సదిశ = m1.నిలువుల_సంఖ్య == 1 || m1.అడ్డువరుసలు == 1;
+        తార్కిక is_m2_సదిశ = m2.నిలువుల_సంఖ్య == 1 || m2.అడ్డువరుసలు == 1;
+        CV_Assert(is_m1_సదిశ); CV_Assert(is_m2_సదిశ);
+        పూర్ణాంకం మొత్తం = (పూర్ణాంకం)మొత్తం_sz;  // vector-column
+        తార్కిక isContiguous = ((m1.flags & m2.flags) & Mat::CONTINUOUS_FLAG) != 0;
+        తార్కిక has_int_అధికప్రవాహం = ((int64)మొత్తం_sz * వెడల్పు_Scale) >= గరిష్ఠ_పూర్ణాంకం;
+        ఒకవేళ (isContiguous && !has_int_అధికప్రవాహం)
+            మొత్తం = 1; // vector-row
+        m1 = m1.reshape(0, మొత్తం);
+        m2 = m2.reshape(0, మొత్తం);
+        CV_Assert(m1.నిలువుల_సంఖ్య == m2.నిలువుల_సంఖ్య && m1.అడ్డువరుసలు == m2.అడ్డువరుసలు);
+        తిరిగి కొలత(m1.నిలువుల_సంఖ్య * వెడల్పు_Scale, m1.అడ్డువరుసలు);
     }
-    return getContinuousSize_(m1.flags & m2.flags,
-                              m1.cols, m1.rows, widthScale);
+    తిరిగి get_Continuous_కొలత(m1.flags & m2.flags,
+                              m1.నిలువుల_సంఖ్య, m1.అడ్డువరుసలు, వెడల్పు_Scale);
 }
 
-Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, int widthScale)
+కొలత getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, పూర్ణాంకం వెడల్పు_Scale)
 {
     CV_CheckLE(m1.dims, 2, "");
     CV_CheckLE(m2.dims, 2, "");
     CV_CheckLE(m3.dims, 2, "");
-    const Size sz1 = m1.size();
-    if (sz1 != m2.size() || sz1 != m3.size())  // reshape all matrixes to the same size (#4159)
+    స్థిరరాశి కొలత sz1 = m1.size();
+    ఒకవేళ (sz1 != m2.size() || sz1 != m3.size())  // reshape all matrixes to the same size (#4159)
     {
-        size_t total_sz = m1.total();
-        CV_CheckEQ(total_sz, m2.total(), "");
-        CV_CheckEQ(total_sz, m3.total(), "");
-        bool is_m1_vector = m1.cols == 1 || m1.rows == 1;
-        bool is_m2_vector = m2.cols == 1 || m2.rows == 1;
-        bool is_m3_vector = m3.cols == 1 || m3.rows == 1;
-        CV_Assert(is_m1_vector); CV_Assert(is_m2_vector); CV_Assert(is_m3_vector);
-        int total = (int)total_sz;  // vector-column
-        bool isContiguous = ((m1.flags & m2.flags & m3.flags) & Mat::CONTINUOUS_FLAG) != 0;
-        bool has_int_overflow = ((int64)total_sz * widthScale) >= INT_MAX;
-        if (isContiguous && !has_int_overflow)
-            total = 1; // vector-row
-        m1 = m1.reshape(0, total);
-        m2 = m2.reshape(0, total);
-        m3 = m3.reshape(0, total);
-        CV_Assert(m1.cols == m2.cols && m1.rows == m2.rows && m1.cols == m3.cols && m1.rows == m3.rows);
-        return Size(m1.cols * widthScale, m1.rows);
+        size_t మొత్తం_sz = m1.మొత్తం();
+        CV_CheckEQ(మొత్తం_sz, m2.మొత్తం(), "");
+        CV_CheckEQ(మొత్తం_sz, m3.మొత్తం(), "");
+        తార్కిక is_m1_సదిశ = m1.నిలువుల_సంఖ్య == 1 || m1.అడ్డువరుసలు == 1;
+        తార్కిక is_m2_సదిశ = m2.నిలువుల_సంఖ్య == 1 || m2.అడ్డువరుసలు == 1;
+        తార్కిక is_m3_సదిశ = m3.నిలువుల_సంఖ్య == 1 || m3.అడ్డువరుసలు == 1;
+        CV_Assert(is_m1_సదిశ); CV_Assert(is_m2_సదిశ); CV_Assert(is_m3_సదిశ);
+        పూర్ణాంకం మొత్తం = (పూర్ణాంకం)మొత్తం_sz;  // vector-column
+        తార్కిక isContiguous = ((m1.flags & m2.flags & m3.flags) & Mat::CONTINUOUS_FLAG) != 0;
+        తార్కిక has_int_అధికప్రవాహం = ((int64)మొత్తం_sz * వెడల్పు_Scale) >= గరిష్ఠ_పూర్ణాంకం;
+        ఒకవేళ (isContiguous && !has_int_అధికప్రవాహం)
+            మొత్తం = 1; // vector-row
+        m1 = m1.reshape(0, మొత్తం);
+        m2 = m2.reshape(0, మొత్తం);
+        m3 = m3.reshape(0, మొత్తం);
+        CV_Assert(m1.నిలువుల_సంఖ్య == m2.నిలువుల_సంఖ్య && m1.అడ్డువరుసలు == m2.అడ్డువరుసలు && m1.నిలువుల_సంఖ్య == m3.నిలువుల_సంఖ్య && m1.అడ్డువరుసలు == m3.అడ్డువరుసలు);
+        తిరిగి కొలత(m1.నిలువుల_సంఖ్య * వెడల్పు_Scale, m1.అడ్డువరుసలు);
     }
-    return getContinuousSize_(m1.flags & m2.flags & m3.flags,
-                              m1.cols, m1.rows, widthScale);
+    తిరిగి get_Continuous_కొలత(m1.flags & m2.flags & m3.flags,
+                              m1.నిలువుల_సంఖ్య, m1.అడ్డువరుసలు, వెడల్పు_Scale);
 }
 
 } // cv::

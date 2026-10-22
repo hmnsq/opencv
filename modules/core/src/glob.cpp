@@ -40,322 +40,322 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
-#include "opencv2/core/utils/filesystem.hpp"
-#include "opencv2/core/utils/filesystem.private.hpp"
+#అన్తర్భావ "opencv2/core/utils/filesystem.hpp"
+#అన్తర్భావ "opencv2/core/utils/filesystem.private.hpp"
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-#if defined _WIN32 || defined WINCE
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ఒకవేళ defined _WIN32 || defined WINCE
 # include <windows.h>
-const char dir_separators[] = "/\\";
+స్థిరరాశి అక్షరం dir_separators[] = "/\\";
 
-namespace
+నామాకాశ
 {
-    struct dirent
+    నిర్మాణం dirent
     {
-        const char* d_name;
+        స్థిరరాశి అక్షరం* d_name;
     };
 
-    struct DIR
+    నిర్మాణం DIR
     {
-#if defined(WINRT) || defined(_WIN32_WCE)
-        WIN32_FIND_DATAW data;
-#else
-        WIN32_FIND_DATAA data;
-#endif
+#ఒకవేళ defined(WINRT) || defined(_WIN32_WCE)
+        WIN32_కనుగొను_DATAW దత్తాంశం;
+#లేకపోతే
+        WIN32_కనుగొను_DATAA దత్తాంశం;
+#అయితే_ముగింపు
         HANDLE handle;
         dirent ent;
-#if defined(WINRT) || defined(_WIN32_WCE)
+#ఒకవేళ defined(WINRT) || defined(_WIN32_WCE)
         DIR() { }
         ~DIR()
         {
-            if (ent.d_name)
-                delete[] ent.d_name;
+            ఒకవేళ (ent.d_name)
+                తొలగించు[] ent.d_name;
         }
-#endif
+#అయితే_ముగింపు
     };
 
-    DIR* opendir(const char* path)
+    DIR* opendir(స్థిరరాశి అక్షరం* మార్గం)
     {
-        DIR* dir = new DIR;
+        DIR* dir = కొత్త DIR;
         dir->ent.d_name = 0;
-#if defined(WINRT) || defined(_WIN32_WCE)
-        cv::String full_path = cv::String(path) + "\\*";
-        wchar_t wfull_path[MAX_PATH];
-        size_t copied = mbstowcs(wfull_path, full_path.c_str(), MAX_PATH);
-        CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
-        dir->handle = ::FindFirstFileExW(wfull_path, FindExInfoStandard,
-                        &dir->data, FindExSearchNameMatch, NULL, 0);
-#else
-        dir->handle = ::FindFirstFileExA((cv::String(path) + "\\*").c_str(),
-            FindExInfoStandard, &dir->data, FindExSearchNameMatch, NULL, 0);
-#endif
-        if(dir->handle == INVALID_HANDLE_VALUE)
+#ఒకవేళ defined(WINRT) || defined(_WIN32_WCE)
+        cv::String నిండిన_మార్గం = cv::String(మార్గం) + "\\*";
+        wchar_t wfull_మార్గం[MAX_మార్గం];
+        size_t copied = mbstowcs(wfull_మార్గం, నిండిన_మార్గం.c_str(), MAX_మార్గం);
+        CV_Assert((copied != MAX_మార్గం) && (copied != (size_t)-1));
+        dir->handle = ::కనుగొను_మొదటి_File_Ex_W(wfull_మార్గం, కనుగొను_Ex_Info_Standard,
+                        &dir->దత్తాంశం, కనుగొను_Ex_శోధన_Name_సరిపోలిక, ఖాళీ, 0);
+#లేకపోతే
+        dir->handle = ::కనుగొను_మొదటి_File_Ex_A((cv::String(మార్గం) + "\\*").c_str(),
+            కనుగొను_Ex_Info_Standard, &dir->దత్తాంశం, కనుగొను_Ex_శోధన_Name_సరిపోలిక, ఖాళీ, 0);
+#అయితే_ముగింపు
+        ఒకవేళ(dir->handle == INVALID_HANDLE_విలువ)
         {
             /*closedir will do all cleanup*/
-            delete dir;
-            return 0;
+            తొలగించు dir;
+            తిరిగి 0;
         }
-        return dir;
+        తిరిగి dir;
     }
 
     dirent* readdir(DIR* dir)
     {
-#if defined(WINRT) || defined(_WIN32_WCE)
-        if (dir->ent.d_name != 0)
+#ఒకవేళ defined(WINRT) || defined(_WIN32_WCE)
+        ఒకవేళ (dir->ent.d_name != 0)
         {
-            if (::FindNextFileW(dir->handle, &dir->data) != TRUE)
-                return 0;
+            ఒకవేళ (::కనుగొను_తదుపరి_File_W(dir->handle, &dir->దత్తాంశం) != TRUE)
+                తిరిగి 0;
         }
-        size_t asize = wcstombs(NULL, dir->data.cFileName, 0);
+        size_t asize = wcstombs(ఖాళీ, dir->దత్తాంశం.cFileName, 0);
         CV_Assert((asize != 0) && (asize != (size_t)-1));
-        char* aname = new char[asize+1];
+        అక్షరం* aname = కొత్త అక్షరం[asize+1];
         aname[asize] = 0;
-        wcstombs(aname, dir->data.cFileName, asize);
-        delete[] dir->ent.d_name;
+        wcstombs(aname, dir->దత్తాంశం.cFileName, asize);
+        తొలగించు[] dir->ent.d_name;
         dir->ent.d_name = aname;
-#else
-        if (dir->ent.d_name != 0)
+#లేకపోతే
+        ఒకవేళ (dir->ent.d_name != 0)
         {
-            if (::FindNextFileA(dir->handle, &dir->data) != TRUE)
-                return 0;
+            ఒకవేళ (::కనుగొను_తదుపరి_File_A(dir->handle, &dir->దత్తాంశం) != TRUE)
+                తిరిగి 0;
         }
-        dir->ent.d_name = dir->data.cFileName;
-#endif
-        return &dir->ent;
+        dir->ent.d_name = dir->దత్తాంశం.cFileName;
+#అయితే_ముగింపు
+        తిరిగి &dir->ent;
     }
 
-    void closedir(DIR* dir)
+    శూన్య closedir(DIR* dir)
     {
-        ::FindClose(dir->handle);
-        delete dir;
+        ::కనుగొను_Close(dir->handle);
+        తొలగించు dir;
     }
 
 
 }
-#else // defined _WIN32 || defined WINCE
+#లేకపోతే // defined _WIN32 || defined WINCE
 # include <dirent.h>
 # include <sys/stat.h>
-const char dir_separators[] = "/";
-#endif // defined _WIN32 || defined WINCE
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+స్థిరరాశి అక్షరం dir_separators[] = "/";
+#అయితే_ముగింపు // defined _WIN32 || defined WINCE
+#అయితే_ముగింపు // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-static bool isDir(const cv::String& path, DIR* dir)
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
+స్థిర తార్కిక isDir(స్థిరరాశి cv::String& మార్గం, DIR* dir)
 {
-#if defined _WIN32 || defined _WIN32_WCE
-    DWORD attributes;
-    BOOL status = TRUE;
-    if (dir)
-        attributes = dir->data.dwFileAttributes;
-    else
+#ఒకవేళ defined _WIN32 || defined _WIN32_WCE
+    DWORD లక్షణాలు;
+    BOOL స్థితి_2 = TRUE;
+    ఒకవేళ (dir)
+        లక్షణాలు = dir->దత్తాంశం.dw_File_లక్షణాలు;
+    లేకపోతే
     {
-        WIN32_FILE_ATTRIBUTE_DATA all_attrs;
-#if defined WINRT || defined _WIN32_WCE
-        wchar_t wpath[MAX_PATH];
-        size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
-        CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
-        status = ::GetFileAttributesExW(wpath, GetFileExInfoStandard, &all_attrs);
-#else
-        status = ::GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &all_attrs);
-#endif
-        attributes = all_attrs.dwFileAttributes;
+        WIN32_FILE_ATTRIBUTE_దత్తాంశం all_attrs;
+#ఒకవేళ defined WINRT || defined _WIN32_WCE
+        wchar_t wpath[MAX_మార్గం];
+        size_t copied = mbstowcs(wpath, మార్గం.c_str(), MAX_మార్గం);
+        CV_Assert((copied != MAX_మార్గం) && (copied != (size_t)-1));
+        స్థితి_2 = ::Get_File_లక్షణాలు_Ex_W(wpath, GetFileExInfoStandard, &all_attrs);
+#లేకపోతే
+        స్థితి_2 = ::Get_File_లక్షణాలు_Ex_A(మార్గం.c_str(), GetFileExInfoStandard, &all_attrs);
+#అయితే_ముగింపు
+        లక్షణాలు = all_attrs.dw_File_లక్షణాలు;
     }
 
-    return status && ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0);
-#else
-    CV_UNUSED(dir);
-    struct stat stat_buf;
-    if (0 != stat( path.c_str(), &stat_buf))
-        return false;
-    int is_dir = S_ISDIR( stat_buf.st_mode);
-    return is_dir != 0;
-#endif
+    తిరిగి స్థితి_2 && ((లక్షణాలు & FILE_ATTRIBUTE_DIRECTORY) != 0);
+#లేకపోతే
+    CV_వాడని(dir);
+    నిర్మాణం stat stat_buf;
+    ఒకవేళ (0 != stat( మార్గం.c_str(), &stat_buf))
+        తిరిగి అబద్ధం;
+    పూర్ణాంకం is_dir = S_ISDIR( stat_buf.st_బహుళకం);
+    తిరిగి is_dir != 0;
+#అయితే_ముగింపు
 }
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#అయితే_ముగింపు // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-bool cv::utils::fs::isDirectory(const cv::String& path)
+తార్కిక cv::utils::fs::isDirectory(స్థిరరాశి cv::String& మార్గం)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_INSTRUMENT_REGION();
-    return isDir(path, NULL);
-#else
-    CV_UNUSED(path);
+    తిరిగి isDir(మార్గం, ఖాళీ);
+#లేకపోతే
+    CV_వాడని(మార్గం);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif
+#అయితే_ముగింపు
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-static bool wildcmp(const char *string, const char *wild)
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
+స్థిర తార్కిక wildcmp(స్థిరరాశి అక్షరం *string, స్థిరరాశి అక్షరం *wild)
 {
     // Based on wildcmp written by Jack Handy - <A href="mailto:jakkhandy@hotmail.com">jakkhandy@hotmail.com</A>
-    const char *cp = 0, *mp = 0;
+    స్థిరరాశి అక్షరం *cp = 0, *mp = 0;
 
-    while ((*string) && (*wild != '*'))
+    అయితే ((*string) && (*wild != '*'))
     {
-        if ((*wild != *string) && (*wild != '?'))
+        ఒకవేళ ((*wild != *string) && (*wild != '?'))
         {
-            return false;
+            తిరిగి అబద్ధం;
         }
 
         wild++;
         string++;
     }
 
-    while (*string)
+    అయితే (*string)
     {
-        if (*wild == '*')
+        ఒకవేళ (*wild == '*')
         {
-            if (!*++wild)
+            ఒకవేళ (!*++wild)
             {
-                return true;
+                తిరిగి నిజం;
             }
 
             mp = wild;
             cp = string + 1;
         }
-        else if ((*wild == *string) || (*wild == '?'))
+        లేకపోతే ఒకవేళ ((*wild == *string) || (*wild == '?'))
         {
             wild++;
             string++;
         }
-        else
+        లేకపోతే
         {
             wild = mp;
             string = cp++;
         }
     }
 
-    while (*wild == '*')
+    అయితే (*wild == '*')
     {
         wild++;
     }
 
-    return *wild == 0;
+    తిరిగి *wild == 0;
 }
 
-static void glob_rec(const cv::String& directory, const cv::String& wildchart, std::vector<cv::String>& result,
-        bool recursive, bool includeDirectories, const cv::String& pathPrefix)
+స్థిర శూన్య glob_rec(స్థిరరాశి cv::String& directory, స్థిరరాశి cv::String& wildchart, std::vector<cv::String>& ఫలితం,
+        తార్కిక recursive, తార్కిక includeDirectories, స్థిరరాశి cv::String& మార్గం_ఉపసర్గ)
 {
     DIR *dir;
 
-    if ((dir = opendir (directory.c_str())) != 0)
+    ఒకవేళ ((dir = opendir (directory.c_str())) != 0)
     {
         /* find all the files and directories within directory */
-        try
+        ప్రయత్నించు
         {
-            struct dirent *ent;
-            while ((ent = readdir (dir)) != 0)
+            నిర్మాణం dirent *ent;
+            అయితే ((ent = readdir (dir)) != 0)
             {
-                const char* name = ent->d_name;
-                if((name[0] == 0) || (name[0] == '.' && name[1] == 0) || (name[0] == '.' && name[1] == '.' && name[2] == 0))
-                    continue;
+                స్థిరరాశి అక్షరం* name = ent->d_name;
+                ఒకవేళ((name[0] == 0) || (name[0] == '.' && name[1] == 0) || (name[0] == '.' && name[1] == '.' && name[2] == 0))
+                    కొనసాగు;
 
-                cv::String path = cv::utils::fs::join(directory, name);
-                cv::String entry = cv::utils::fs::join(pathPrefix, name);
+                cv::String మార్గం = cv::utils::fs::join(directory, name);
+                cv::String నమోదు_2 = cv::utils::fs::join(మార్గం_ఉపసర్గ, name);
 
-                if (isDir(path, dir))
+                ఒకవేళ (isDir(మార్గం, dir))
                 {
-                    if (recursive)
-                        glob_rec(path, wildchart, result, recursive, includeDirectories, entry);
-                    if (!includeDirectories)
-                        continue;
+                    ఒకవేళ (recursive)
+                        glob_rec(మార్గం, wildchart, ఫలితం, recursive, includeDirectories, నమోదు_2);
+                    ఒకవేళ (!includeDirectories)
+                        కొనసాగు;
                 }
 
-                if (wildchart.empty() || wildcmp(name, wildchart.c_str()))
-                    result.push_back(entry);
+                ఒకవేళ (wildchart.empty() || wildcmp(name, wildchart.c_str()))
+                    ఫలితం.push_back(నమోదు_2);
             }
         }
-        catch (...)
+        పట్టుకో (...)
         {
             closedir(dir);
-            throw;
+            విసురు;
         }
         closedir(dir);
     }
-    else
+    లేకపోతే
     {
-        CV_Error_(cv::Error::StsObjectNotFound, ("could not open directory: %s", directory.c_str()));
+        CV_Error_(cv::Error::Sts_Object_Not_దొరికింది, ("could not open directory: %s", directory.c_str()));
     }
 }
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#అయితే_ముగింపు // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-void cv::glob(String pattern, std::vector<String>& result, bool recursive)
+శూన్య cv::glob(String నమూనా, std::vector<String>& ఫలితం, తార్కిక recursive)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_INSTRUMENT_REGION();
 
-    result.clear();
-    String path, wildchart;
+    ఫలితం.clear();
+    String మార్గం, wildchart;
 
-    if (isDir(pattern, 0))
+    ఒకవేళ (isDir(నమూనా, 0))
     {
-        if(strchr(dir_separators, pattern[pattern.size() - 1]) != 0)
+        ఒకవేళ(strchr(dir_separators, నమూనా[నమూనా.size() - 1]) != 0)
         {
-            path = pattern.substr(0, pattern.size() - 1);
+            మార్గం = నమూనా.substr(0, నమూనా.size() - 1);
         }
-        else
+        లేకపోతే
         {
-            path = pattern;
+            మార్గం = నమూనా;
         }
     }
-    else
+    లేకపోతే
     {
-        size_t pos = pattern.find_last_of(dir_separators);
-        if (pos == String::npos)
+        size_t pos = నమూనా.find_last_of(dir_separators);
+        ఒకవేళ (pos == String::npos)
         {
-            wildchart = pattern;
-            path = ".";
+            wildchart = నమూనా;
+            మార్గం = ".";
         }
-        else
+        లేకపోతే
         {
-            path = pattern.substr(0, pos);
-            wildchart = pattern.substr(pos + 1);
+            మార్గం = నమూనా.substr(0, pos);
+            wildchart = నమూనా.substr(pos + 1);
         }
     }
 
-    glob_rec(path, wildchart, result, recursive, false, path);
-    std::sort(result.begin(), result.end());
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
-    CV_UNUSED(pattern);
-    CV_UNUSED(result);
-    CV_UNUSED(recursive);
+    glob_rec(మార్గం, wildchart, ఫలితం, recursive, అబద్ధం, మార్గం);
+    std::sort(ఫలితం.begin(), ఫలితం.end());
+#లేకపోతే // OPENCV_HAVE_FILESYSTEM_SUPPORT
+    CV_వాడని(నమూనా);
+    CV_వాడని(ఫలితం);
+    CV_వాడని(recursive);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#అయితే_ముగింపు // OPENCV_HAVE_FILESYSTEM_SUPPORT
 }
 
-void cv::utils::fs::glob(const cv::String& directory, const cv::String& pattern,
-        std::vector<cv::String>& result,
-        bool recursive, bool includeDirectories)
+శూన్య cv::utils::fs::glob(స్థిరరాశి cv::String& directory, స్థిరరాశి cv::String& నమూనా,
+        std::vector<cv::String>& ఫలితం,
+        తార్కిక recursive, తార్కిక includeDirectories)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-    glob_rec(directory, pattern, result, recursive, includeDirectories, directory);
-    std::sort(result.begin(), result.end());
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
-    CV_UNUSED(directory);
-    CV_UNUSED(pattern);
-    CV_UNUSED(result);
-    CV_UNUSED(recursive);
-    CV_UNUSED(includeDirectories);
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
+    glob_rec(directory, నమూనా, ఫలితం, recursive, includeDirectories, directory);
+    std::sort(ఫలితం.begin(), ఫలితం.end());
+#లేకపోతే // OPENCV_HAVE_FILESYSTEM_SUPPORT
+    CV_వాడని(directory);
+    CV_వాడని(నమూనా);
+    CV_వాడని(ఫలితం);
+    CV_వాడని(recursive);
+    CV_వాడని(includeDirectories);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#అయితే_ముగింపు // OPENCV_HAVE_FILESYSTEM_SUPPORT
 }
 
-void cv::utils::fs::glob_relative(const cv::String& directory, const cv::String& pattern,
-        std::vector<cv::String>& result,
-        bool recursive, bool includeDirectories)
+శూన్య cv::utils::fs::glob_relative(స్థిరరాశి cv::String& directory, స్థిరరాశి cv::String& నమూనా,
+        std::vector<cv::String>& ఫలితం,
+        తార్కిక recursive, తార్కిక includeDirectories)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-    glob_rec(directory, pattern, result, recursive, includeDirectories, cv::String());
-    std::sort(result.begin(), result.end());
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
-    CV_UNUSED(directory);
-    CV_UNUSED(pattern);
-    CV_UNUSED(result);
-    CV_UNUSED(recursive);
-    CV_UNUSED(includeDirectories);
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
+    glob_rec(directory, నమూనా, ఫలితం, recursive, includeDirectories, cv::String());
+    std::sort(ఫలితం.begin(), ఫలితం.end());
+#లేకపోతే // OPENCV_HAVE_FILESYSTEM_SUPPORT
+    CV_వాడని(directory);
+    CV_వాడని(నమూనా);
+    CV_వాడని(ఫలితం);
+    CV_వాడని(recursive);
+    CV_వాడని(includeDirectories);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#అయితే_ముగింపు // OPENCV_HAVE_FILESYSTEM_SUPPORT
 }

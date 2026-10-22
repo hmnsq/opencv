@@ -20,75 +20,75 @@
 // workspace is a separate, per-executor, mutable buffer allocated ONCE by the owner (never per
 // call).
 
-#ifndef OPENCV_CORE_SRC_DXT_HPP
-#define OPENCV_CORE_SRC_DXT_HPP
+#నిర్వచితం_కాకపోతే OPENCV_CORE_SRC_DXT_HPP
+#నిర్వచించు OPENCV_CORE_SRC_DXT_HPP
 
-#include "opencv2/core/utility.hpp"
+#అన్తర్భావ "opencv2/core/utility.hpp"
 
-namespace cv {
+నామాకాశ cv {
 
-enum DftKind
+గణన Dft_రకం
 {
-    DFT_KIND_C2C = 0,   // complex -> complex (forward or inverse)
-    DFT_KIND_R2C,       // real -> CCS-packed (or "half complex") spectrum, forward only
-    DFT_KIND_C2R,       // CCS-packed (or full complex) spectrum -> real, inverse only
-    DFT_KIND_DCT,       // DCT-II, even n only
-    DFT_KIND_IDCT       // DCT-III, even n only
+    DFT_రకం_C2_C = 0,   // complex -> complex (forward or inverse)
+    DFT_రకం_R2_C,       // real -> CCS-packed (or "half complex") spectrum, forward only
+    DFT_రకం_C2_R,       // CCS-packed (or full complex) spectrum -> real, inverse only
+    DFT_రకం_DCT,       // DCT-II, even n only
+    DFT_రకం_IDCT       // DCT-III, even n only
 };
 
-enum DftStageMode
+గణన Dft_Stage_బహుళకం
 {
     DFT_STAGE_SCALAR = 0,   // scalar reference loop (span < VL, no SIMD for this depth, ...)
-    DFT_STAGE_FULL = 1      // span >= VL: vector loop with back-off clamp (brief, section 5)
+    DFT_STAGE_నిండిన = 1      // span >= VL: vector loop with back-off clamp (brief, section 5)
 };
 
-enum { DFT_MAX_STAGES = 40 };
+గణన { DFT_MAX_STAGES = 40 };
 
-struct DftStage
+నిర్మాణం DftStage
 {
-    int radix;          // 3, 4, 5 or an odd number >= 7
-    int span;           // L: length of the sub-DFTs combined by this stage
-    int ngroups;        // G = nc / (radix*span)
-    int nsteps;         // number of (vector) iterations of the flat loop, precomputed by the plan
-    int mode;           // DftStageMode
-    int tw_stride;      // per-leg twiddle table length (== span for now)
+    పూర్ణాంకం radix;          // 3, 4, 5 or an odd number >= 7
+    పూర్ణాంకం పరిధి;           // L: length of the sub-DFTs combined by this stage
+    పూర్ణాంకం ngroups;        // G = nc / (radix*span)
+    పూర్ణాంకం nsteps;         // number of (vector) iterations of the flat loop, precomputed by the plan
+    పూర్ణాంకం బహుళకం;           // DftStageMode
+    పూర్ణాంకం tw_stride;      // per-leg twiddle table length (== span for now)
     // Per-stage twiddles, split layout, leg-major: tw_re[(q-1)*tw_stride + j] = cos(-2*pi*q*j/(radix*span)),
     // q in [1, radix), j in [0, span). Type T of the plan.
-    const void* tw_re;
-    const void* tw_im;
+    స్థిరరాశి శూన్య* tw_re;
+    స్థిరరాశి శూన్య* tw_im;
     // radix-odd (>=7) only: cs[p*h + k] = cos(2*pi*(p+1)*(k+1)/radix), sn[...] = sin(...), h = (radix-1)/2
-    const void* cs;
-    const void* sn;
+    స్థిరరాశి శూన్య* cs;
+    స్థిరరాశి శూన్య* sn;
 };
 
-struct DftPlan
+నిర్మాణం DftPlan
 {
-    int kind;           // DftKind
-    int n;              // logical transform length (real length for R2C/C2R/DCT/IDCT)
-    int nc;             // complex length actually run through the stages (n/2 for even real kinds)
-    int depth;          // CV_32F or CV_64F
-    int vl;             // vector lanes of the kernels this plan was built for (DFTKernels::vlanes)
-    int first_radix;    // 1, 2, 4 or 8: the fused first stage done in preproc
-    bool real_input;    // R2C with odd n: gather real samples, im = 0
-    bool pingpong;      // stages must alternate between two workspace pairs
-    bool need_tmp;      // C2R / DCT / IDCT: a temp of 2*nc elements (interleaved complex or the Makhoul-permuted reals)
-    int nstages;
+    పూర్ణాంకం రకం;           // DftKind
+    పూర్ణాంకం n;              // logical transform length (real length for R2C/C2R/DCT/IDCT)
+    పూర్ణాంకం nc;             // complex length actually run through the stages (n/2 for even real kinds)
+    పూర్ణాంకం లోతు;          // CV_32F or CV_64F
+    పూర్ణాంకం vl;             // vector lanes of the kernels this plan was built for (DFTKernels::vlanes)
+    పూర్ణాంకం మొదటి_radix;    // 1, 2, 4 or 8: the fused first stage done in preproc
+    తార్కిక real_ఆదానం;    // R2C with odd n: gather real samples, im = 0
+    తార్కిక pingpong;      // stages must alternate between two workspace pairs
+    తార్కిక need_tmp;      // C2R / DCT / IDCT: a temp of 2*nc elements (interleaved complex or the Makhoul-permuted reals)
+    పూర్ణాంకం nstages;
     DftStage stages[DFT_MAX_STAGES];
     // first_radix == 1: 2*nc element indices into the (real-typed) source (re index, im index);
     // first_radix > 1: nc/first_radix output positions (g*first_radix) of the input columns j
-    AutoBuffer<int> itab;
-    AutoBuffer<double> tw;      // storage for all the tables below (type T, 8-byte aligned)
-    const void* rtw_re;         // W_n^k = exp(-2*pi*i*k/n), k in [0, n/2]; R2C/C2R/DCT/IDCT with even n
-    const void* rtw_im;
-    const void* dct_re;         // s*W_4n^k, k in [0, n/2]; DCT/IDCT (s = DCT normalization)
-    const void* dct_im;
-    size_t ws_bytes;            // workspace size (incl. 64 bytes for alignment)
+    Auto_బఫరు<పూర్ణాంకం> itab;
+    Auto_బఫరు<ద్విగుణ> tw;      // storage for all the tables below (type T, 8-byte aligned)
+    స్థిరరాశి శూన్య* rtw_re;         // W_n^k = exp(-2*pi*i*k/n), k in [0, n/2]; R2C/C2R/DCT/IDCT with even n
+    స్థిరరాశి శూన్య* rtw_im;
+    స్థిరరాశి శూన్య* dct_re;         // s*W_4n^k, k in [0, n/2]; DCT/IDCT (s = DCT normalization)
+    స్థిరరాశి శూన్య* dct_im;
+    size_t ws_బైట్లు;            // workspace size (incl. 64 bytes for alignment)
     size_t pair1_ofs;           // byte offset of the second (re, im) pair or of the temp, from the aligned base
     size_t scratch_ofs;         // byte offset of the radix-odd scratch area
 
-    DftPlan() : kind(0), n(0), nc(0), depth(0), vl(0), first_radix(1), real_input(false),
-                pingpong(false), need_tmp(false), nstages(0), rtw_re(0), rtw_im(0),
-                dct_re(0), dct_im(0), ws_bytes(0), pair1_ofs(0), scratch_ofs(0) {}
+    DftPlan() : రకం(0), n(0), nc(0), లోతు(0), vl(0), మొదటి_radix(1), real_ఆదానం(అబద్ధం),
+                pingpong(అబద్ధం), need_tmp(అబద్ధం), nstages(0), rtw_re(0), rtw_im(0),
+                dct_re(0), dct_im(0), ws_బైట్లు(0), pair1_ofs(0), scratch_ofs(0) {}
 
     // Builds the plan for a 1D transform of the given kind (DftKind) and length.
     //
@@ -96,24 +96,24 @@ struct DftPlan
     // (DFTKernels::vlanes), never from VTraits<> in dxt.cpp, which is compiled for the baseline
     // ISA and reports the wrong lane count on AVX2/AVX512/RVV builds. Stage modes and step counts
     // depend on it.
-    void build(int kind, int n, int depth, int vl);
+    శూన్య build(పూర్ణాంకం రకం, పూర్ణాంకం n, పూర్ణాంకం లోతు, పూర్ణాంకం vl);
 
-private:
+అంతరంగ:
     // fills the twiddle tables (stage tables, W_n^k, DCT) into `tw`; ntw = total number of T entries
-    template<typename T> void fillTables(size_t ntw, bool need_rtw, bool need_dct);
+    మూస<రకం_పేరు T> శూన్య fillTables(size_t ntw, తార్కిక need_rtw, తార్కిక need_dct);
 
-    DftPlan(const DftPlan&);            // tables hold raw pointers into the AutoBuffers: no copies
-    DftPlan& operator=(const DftPlan&);
+    DftPlan(స్థిరరాశి DftPlan&);            // tables hold raw pointers into the AutoBuffers: no copies
+    DftPlan& క్రియాకారకం=(స్థిరరాశి DftPlan&);
 };
 
 // (plan, src, src_step (in elements), re, im, conj)
-typedef void (*DftPreprocFunc)(const DftPlan& plan, const void* src, size_t sstep,
-                               void* re, void* im, bool conj);
+రకనిర్వచనం శూన్య (*DftPreprocFunc)(స్థిరరాశి DftPlan& plan, స్థిరరాశి శూన్య* src, size_t sstep,
+                               శూన్య* re, శూన్య* im, తార్కిక conj);
 // (stage, src_re, src_im, dst_re, dst_im, scratch); src == dst allowed only when !plan.pingpong
-typedef void (*DftStageFunc)(const DftStage& st, const void* sre, const void* sim,
-                             void* dre, void* dim, void* scratch);
+రకనిర్వచనం శూన్య (*DftStageFunc)(స్థిరరాశి DftStage& st, స్థిరరాశి శూన్య* sre, స్థిరరాశి శూన్య* sim,
+                             శూన్య* dre, శూన్య* dim, శూన్య* scratch);
 
-struct DFTKernels
+నిర్మాణం DFTKernels
 {
     // group A
     DftPreprocFunc preprocRadix0;   // gather + deinterleave only
@@ -121,24 +121,24 @@ struct DFTKernels
     DftPreprocFunc preprocRadix4;   // + fused twiddle-free radix-4
     DftPreprocFunc preprocRadix8;   // + fused twiddle-free radix-8
     // C2R: CCS (or full complex, complex_input) spectrum -> interleaved "2Z" temp (2*nc elements)
-    void (*preprocCCS)(const DftPlan& plan, const void* src, void* tmp, bool complex_input);
+    శూన్య (*preprocCCS)(స్థిరరాశి DftPlan& plan, స్థిరరాశి శూన్య* src, శూన్య* tmp, తార్కిక complex_ఆదానం);
     // DCT: Makhoul permutation of the (possibly strided) input into the temp
-    void (*preprocDCT)(const DftPlan& plan, const void* src, size_t sstep, void* tmp);
+    శూన్య (*preprocDCT)(స్థిరరాశి DftPlan& plan, స్థిరరాశి శూన్య* src, size_t sstep, శూన్య* tmp);
     // IDCT: pre-twiddle + CCS untangle -> interleaved temp
-    void (*preprocIDCT)(const DftPlan& plan, const void* src, size_t sstep, void* tmp);
+    శూన్య (*preprocIDCT)(స్థిరరాశి DftPlan& plan, స్థిరరాశి శూన్య* src, size_t sstep, శూన్య* tmp);
     // group B
     DftStageFunc radix3, radix4, radix5, radixOdd;
     // group C
-    void (*postprocDFT)(const DftPlan& plan, const void* re, const void* im, void* dst,
-                        double re_scale, double im_scale);          // split -> interleaved complex
-    void (*postprocRealDFT)(const DftPlan& plan, const void* re, const void* im, void* dst,
-                            double scale, bool complex_output);     // R2C untangle + CCS/complex packing
-    void (*postprocReal)(const DftPlan& plan, const void* re, void* dst, double scale); // re only
-    void (*postprocDCT)(const DftPlan& plan, const void* re, const void* im, void* dst, size_t dstep);
-    void (*postprocIDCT)(const DftPlan& plan, const void* re, const void* im, void* dst, size_t dstep);
-    int vlanes;     // VTraits<v_T>::vlanes() of the ISA these pointers belong to (1 = no SIMD)
+    శూన్య (*postprocDFT)(స్థిరరాశి DftPlan& plan, స్థిరరాశి శూన్య* re, స్థిరరాశి శూన్య* im, శూన్య* dst,
+                        ద్విగుణ re_scale, ద్విగుణ im_scale);          // split -> interleaved complex
+    శూన్య (*postprocRealDFT)(స్థిరరాశి DftPlan& plan, స్థిరరాశి శూన్య* re, స్థిరరాశి శూన్య* im, శూన్య* dst,
+                            ద్విగుణ scale, తార్కిక complex_output);     // R2C untangle + CCS/complex packing
+    శూన్య (*postprocReal)(స్థిరరాశి DftPlan& plan, స్థిరరాశి శూన్య* re, శూన్య* dst, ద్విగుణ scale); // re only
+    శూన్య (*postprocDCT)(స్థిరరాశి DftPlan& plan, స్థిరరాశి శూన్య* re, స్థిరరాశి శూన్య* im, శూన్య* dst, size_t dstep);
+    శూన్య (*postprocIDCT)(స్థిరరాశి DftPlan& plan, స్థిరరాశి శూన్య* re, స్థిరరాశి శూన్య* im, శూన్య* dst, size_t dstep);
+    పూర్ణాంకం vlanes;     // VTraits<v_T>::vlanes() of the ISA these pointers belong to (1 = no SIMD)
 };
 
 }
 
-#endif
+#అయితే_ముగింపు

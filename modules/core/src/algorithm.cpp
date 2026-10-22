@@ -40,9 +40,9 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
-namespace cv
+నామాకాశ cv
 {
 
 Algorithm::Algorithm()
@@ -55,38 +55,38 @@ Algorithm::~Algorithm()
     CV_TRACE_FUNCTION();
 }
 
-void Algorithm::write(FileStorage& fs, const String& name) const
+శూన్య Algorithm::లిఖ(FileStorage& fs, స్థిరరాశి String& name) స్థిరరాశి
 {
     CV_TRACE_FUNCTION();
-    if(name.empty())
+    ఒకవేళ(name.empty())
     {
-        write(fs);
-        return;
+        లిఖ(fs);
+        తిరిగి;
     }
     fs << name << "{";
-    write(fs);
+    లిఖ(fs);
     fs << "}";
 }
 
-void Algorithm::save(const String& filename) const
+శూన్య Algorithm::save(స్థిరరాశి String& filename) స్థిరరాశి
 {
     CV_TRACE_FUNCTION();
     FileStorage fs(filename, FileStorage::WRITE);
     fs << getDefaultName() << "{";
-    write(fs);
+    లిఖ(fs);
     fs << "}";
 }
 
-String Algorithm::getDefaultName() const
+String Algorithm::getDefaultName() స్థిరరాశి
 {
     CV_TRACE_FUNCTION();
-    return String("my_object");
+    తిరిగి String("my_object");
 }
 
-void Algorithm::writeFormat(FileStorage& fs) const
+శూన్య Algorithm::writeFormat(FileStorage& fs) స్థిరరాశి
 {
     CV_TRACE_FUNCTION();
-    fs << "format" << (int)3;
+    fs << "format" << (పూర్ణాంకం)3;
 }
 
 }

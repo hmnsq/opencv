@@ -40,190 +40,190 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
-#include <opencv2/core/utils/logger.defines.hpp>
-#undef CV_LOG_STRIP_LEVEL
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#include <opencv2/core/utils/logger.hpp>
-#include <opencv2/core/utils/configuration.private.hpp>
+#అన్తర్భావ <opencv2/core/utils/logger.defines.hpp>
+#నిర్వచనం_రద్దు CV_LOG_STRIP_LEVEL
+#నిర్వచించు CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
+#అన్తర్భావ <opencv2/core/utils/logger.hpp>
+#అన్తర్భావ <opencv2/core/utils/configuration.private.hpp>
 
-#define CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(NULL, 0, "alloc.cpp: " << __VA_ARGS__)
-#include "opencv2/core/utils/allocator_stats.impl.hpp"
-#undef CV__ALLOCATOR_STATS_LOG
+#నిర్వచించు CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(ఖాళీ, 0, "alloc.cpp: " << __VA_ARGS__)
+#అన్తర్భావ "opencv2/core/utils/allocator_stats.impl.hpp"
+#నిర్వచనం_రద్దు CV__ALLOCATOR_STATS_LOG
 
 //#define OPENCV_ALLOC_ENABLE_STATISTICS
 
 
-#ifdef HAVE_POSIX_MEMALIGN
-#include <stdlib.h>
-#elif defined HAVE_MALLOC_H
-#include <malloc.h>
-#endif
+#నిర్వచితమైతే HAVE_POSIX_MEMALIGN
+#అన్తర్భావ <stdlib.h>
+#లేదావేళ defined HAVE_MALLOC_H
+#అన్తర్భావ <malloc.h>
+#అయితే_ముగింపు
 
-#ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-#define OPENCV_ALLOC_STATISTICS_LIMIT 4096  // don't track buffers less than N bytes
-#include <map>
-#endif
+#నిర్వచితమైతే OPENCV_ALLOC_ENABLE_STATISTICS
+#నిర్వచించు OPENCV_ALLOC_STATISTICS_హద్దు 4096  // don't track buffers less than N bytes
+#అన్తర్భావ <map>
+#అయితే_ముగింపు
 
-namespace cv {
+నామాకాశ cv {
 
-static void* OutOfMemoryError(size_t size)
+స్థిర శూన్య* బహిర్గతం_యొక్క_జ్ఞాపకం_Error(size_t size)
 {
-    CV_Error_(cv::Error::StsNoMem, ("Failed to allocate %llu bytes", (unsigned long long)size));
+    CV_Error_(cv::Error::StsNoMem, ("Failed to allocate %llu bytes", (గుర్తులేని దీర్ఘ దీర్ఘ)size));
 }
 
 CV_EXPORTS cv::utils::AllocatorStatisticsInterface& getAllocatorStatistics();
 
-static cv::utils::AllocatorStatistics allocator_stats;
+స్థిర cv::utils::AllocatorStatistics allocator_stats;
 
 cv::utils::AllocatorStatisticsInterface& getAllocatorStatistics()
 {
-    return allocator_stats;
+    తిరిగి allocator_stats;
 }
 
-#if defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN || defined HAVE_WIN32_ALIGNED_MALLOC
-static bool readMemoryAlignmentParameter()
+#ఒకవేళ defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN || defined HAVE_WIN32_ALIGNED_MALLOC
+స్థిర తార్కిక read_జ్ఞాపకం_Alignment_Parameter()
 {
-    bool value = true;
-#if defined(__GLIBC__) && defined(__linux__) \
+    తార్కిక value = నిజం;
+#ఒకవేళ defined(__GLIBC__) && defined(__linux__) \
     && !defined(CV_STATIC_ANALYSIS) \
-    && !defined(OPENCV_ENABLE_MEMORY_SANITIZER) \
-    && !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)  /* oss-fuzz */ \
+    && !defined(OPENCV_ENABLE_జ్ఞాపకం_SANITIZER) \
+    && !defined(FUZZING_BUILD_బహుళకం_UNSAFE_FOR_PRODUCTION)  /* oss-fuzz */ \
     && !defined(_WIN32)  /* MinGW? */
     {
         // https://github.com/opencv/opencv/issues/15526
-        value = false;
+        value = అబద్ధం;
     }
-#endif
+#అయితే_ముగింపు
     value = cv::utils::getConfigurationParameterBool("OPENCV_ENABLE_MEMALIGN", value);  // should not call fastMalloc() internally
     // TODO add checks for valgrind, ASAN if value == false
-    return value;
+    తిరిగి value;
 }
 
-#if defined _MSC_VER
-#pragma warning(suppress:4714)  // preventive: const marked as __forceinline not inlined
-static __forceinline
-#else
-static inline
-#endif
-bool isAlignedAllocationEnabled()
+#ఒకవేళ defined _MSC_VER
+#సూచన warning(suppress:4714)  // preventive: const marked as __forceinline not inlined
+స్థిర __forceinline
+#లేకపోతే
+స్థిర అంతఃవరుస
+#అయితే_ముగింపు
+తార్కిక is_Aligned_కేటాయింపు_Enabled()
 {
     // use construct on first use idiom https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
     // details: https://github.com/opencv/opencv/issues/15691
-    static bool useMemalign = readMemoryAlignmentParameter();
-    return useMemalign;
+    స్థిర తార్కిక useMemalign = read_జ్ఞాపకం_Alignment_Parameter();
+    తిరిగి useMemalign;
 }
 
 // need for this static const is disputed; retaining as it doesn't cause harm
-static const bool g_force_initialization_memalign_flag
-#if defined __GNUC__
-    __attribute__((unused))
-#endif
-    = isAlignedAllocationEnabled();
-#endif
+స్థిర స్థిరరాశి తార్కిక g_force_initialization_memalign_flag
+#ఒకవేళ defined __GNUC__
+    __attribute__((వాడని))
+#అయితే_ముగింపు
+    = is_Aligned_కేటాయింపు_Enabled();
+#అయితే_ముగింపు
 
-#ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-static inline
-void* fastMalloc_(size_t size)
-#else
-void* fastMalloc(size_t size)
-#endif
+#నిర్వచితమైతే OPENCV_ALLOC_ENABLE_STATISTICS
+స్థిర అంతఃవరుస
+శూన్య* fastMalloc_(size_t size)
+#లేకపోతే
+శూన్య* fastMalloc(size_t size)
+#అయితే_ముగింపు
 {
-#ifdef HAVE_POSIX_MEMALIGN
-    if (isAlignedAllocationEnabled())
+#నిర్వచితమైతే HAVE_POSIX_MEMALIGN
+    ఒకవేళ (is_Aligned_కేటాయింపు_Enabled())
     {
-        void* ptr = NULL;
-        if(posix_memalign(&ptr, CV_MALLOC_ALIGN, size))
-            ptr = NULL;
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        శూన్య* ptr = ఖాళీ;
+        ఒకవేళ(posix_memalign(&ptr, CV_MALLOC_ALIGN, size))
+            ptr = ఖాళీ;
+        ఒకవేళ(!ptr)
+            తిరిగి బహిర్గతం_యొక్క_జ్ఞాపకం_Error(size);
+        తిరిగి ptr;
     }
-#elif defined HAVE_MEMALIGN
-    if (isAlignedAllocationEnabled())
+#లేదావేళ defined HAVE_MEMALIGN
+    ఒకవేళ (is_Aligned_కేటాయింపు_Enabled())
     {
-        void* ptr = memalign(CV_MALLOC_ALIGN, size);
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        శూన్య* ptr = memalign(CV_MALLOC_ALIGN, size);
+        ఒకవేళ(!ptr)
+            తిరిగి బహిర్గతం_యొక్క_జ్ఞాపకం_Error(size);
+        తిరిగి ptr;
     }
-#elif defined HAVE_WIN32_ALIGNED_MALLOC
-    if (isAlignedAllocationEnabled())
+#లేదావేళ defined HAVE_WIN32_ALIGNED_MALLOC
+    ఒకవేళ (is_Aligned_కేటాయింపు_Enabled())
     {
-        void* ptr = _aligned_malloc(size, CV_MALLOC_ALIGN);
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        శూన్య* ptr = _aligned_malloc(size, CV_MALLOC_ALIGN);
+        ఒకవేళ(!ptr)
+            తిరిగి బహిర్గతం_యొక్క_జ్ఞాపకం_Error(size);
+        తిరిగి ptr;
     }
-#endif
-    uchar* udata = (uchar*)malloc(size + sizeof(void*) + CV_MALLOC_ALIGN);
-    if(!udata)
-        return OutOfMemoryError(size);
+#అయితే_ముగింపు
+    uchar* udata = (uchar*)జ్ఞాపకం_ఇవ్వు(size + పరిమాణం(శూన్య*) + CV_MALLOC_ALIGN);
+    ఒకవేళ(!udata)
+        తిరిగి బహిర్గతం_యొక్క_జ్ఞాపకం_Error(size);
     uchar** adata = alignPtr((uchar**)udata + 1, CV_MALLOC_ALIGN);
     adata[-1] = udata;
-    return adata;
+    తిరిగి adata;
 }
 
-#ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-static inline
-void fastFree_(void* ptr)
-#else
-void fastFree(void* ptr)
-#endif
+#నిర్వచితమైతే OPENCV_ALLOC_ENABLE_STATISTICS
+స్థిర అంతఃవరుస
+శూన్య fastFree_(శూన్య* ptr)
+#లేకపోతే
+శూన్య fastFree(శూన్య* ptr)
+#అయితే_ముగింపు
 {
-#if defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN
-    if (isAlignedAllocationEnabled())
+#ఒకవేళ defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN
+    ఒకవేళ (is_Aligned_కేటాయింపు_Enabled())
     {
-        free(ptr);
-        return;
+        విడుదల(ptr);
+        తిరిగి;
     }
-#elif defined HAVE_WIN32_ALIGNED_MALLOC
-    if (isAlignedAllocationEnabled())
+#లేదావేళ defined HAVE_WIN32_ALIGNED_MALLOC
+    ఒకవేళ (is_Aligned_కేటాయింపు_Enabled())
     {
         _aligned_free(ptr);
-        return;
+        తిరిగి;
     }
-#endif
-    if(ptr)
+#అయితే_ముగింపు
+    ఒకవేళ(ptr)
     {
         uchar* udata = ((uchar**)ptr)[-1];
         CV_DbgAssert(udata < (uchar*)ptr &&
-               ((uchar*)ptr - udata) <= (ptrdiff_t)(sizeof(void*)+CV_MALLOC_ALIGN));
-        free(udata);
+               ((uchar*)ptr - udata) <= (ptrdiff_t)(పరిమాణం(శూన్య*)+CV_MALLOC_ALIGN));
+        విడుదల(udata);
     }
 }
 
-#ifdef OPENCV_ALLOC_ENABLE_STATISTICS
+#నిర్వచితమైతే OPENCV_ALLOC_ENABLE_STATISTICS
 
-static
-Mutex& getAllocationStatisticsMutex()
+స్థిర
+Mutex& get_కేటాయింపు_Statistics_Mutex()
 {
-    static Mutex* p_alloc_mutex = allocSingletonNew<Mutex>();
+    స్థిర Mutex* p_alloc_mutex = allocSingletonNew<Mutex>();
     CV_Assert(p_alloc_mutex);
-    return *p_alloc_mutex;
+    తిరిగి *p_alloc_mutex;
 }
 
-static std::map<void*, size_t> allocated_buffers;  // guarded by getAllocationStatisticsMutex()
+స్థిర std::map<శూన్య*, size_t> allocated_buffers;  // guarded by getAllocationStatisticsMutex()
 
-void* fastMalloc(size_t size)
+శూన్య* fastMalloc(size_t size)
 {
-    void* res = fastMalloc_(size);
-    if (res && size >= OPENCV_ALLOC_STATISTICS_LIMIT)
+    శూన్య* res = fastMalloc_(size);
+    ఒకవేళ (res && size >= OPENCV_ALLOC_STATISTICS_హద్దు)
     {
-        cv::AutoLock lock(getAllocationStatisticsMutex());
+        cv::Auto_తాళం lock(get_కేటాయింపు_Statistics_Mutex());
         allocated_buffers.insert(std::make_pair(res, size));
         allocator_stats.onAllocate(size);
     }
-    return res;
+    తిరిగి res;
 }
 
-void fastFree(void* ptr)
+శూన్య fastFree(శూన్య* ptr)
 {
     {
-        cv::AutoLock lock(getAllocationStatisticsMutex());
-        std::map<void*, size_t>::iterator i = allocated_buffers.find(ptr);
-        if (i != allocated_buffers.end())
+        cv::Auto_తాళం lock(get_కేటాయింపు_Statistics_Mutex());
+        std::map<శూన్య*, size_t>::iterator i = allocated_buffers.find(ptr);
+        ఒకవేళ (i != allocated_buffers.end())
         {
             size_t size = i->second;
             allocator_stats.onFree(size);
@@ -233,7 +233,7 @@ void fastFree(void* ptr)
     fastFree_(ptr);
 }
 
-#endif // OPENCV_ALLOC_ENABLE_STATISTICS
+#అయితే_ముగింపు // OPENCV_ALLOC_ENABLE_STATISTICS
 
 } // namespace
 /* End of file. */

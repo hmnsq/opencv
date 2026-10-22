@@ -40,426 +40,426 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "gl_core_3_1.hpp"
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ "gl_core_3_1.hpp"
 
-#ifdef HAVE_OPENGL
+#నిర్వచితమైతే HAVE_OPENGL
 
-    #ifdef __APPLE__
-        #include <dlfcn.h>
+    #నిర్వచితమైతే __APPLE__
+        #అన్తర్భావ <dlfcn.h>
 
-        static void* AppleGLGetProcAddress (const char* name)
+        స్థిర శూన్య* Apple_GLGet_Proc_చిరునామా (స్థిరరాశి అక్షరం* name)
         {
-            static bool initialized = false;
-            static void * handle = NULL;
-            if (!handle)
+            స్థిర తార్కిక initialized = అబద్ధం;
+            స్థిర శూన్య * handle = ఖాళీ;
+            ఒకవేళ (!handle)
             {
-                if (!initialized)
+                ఒకవేళ (!initialized)
                 {
-                    initialized = true;
-                    const char * const path = "/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL";
+                    initialized = నిజం;
+                    స్థిరరాశి అక్షరం * స్థిరరాశి మార్గం = "/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL";
 
-                    handle = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
+                    handle = dlopen(మార్గం, RTLD_LAZY | RTLD_GLOBAL);
                 }
-                if (!handle)
-                    return NULL;
+                ఒకవేళ (!handle)
+                    తిరిగి ఖాళీ;
             }
-            return dlsym(handle, name);
+            తిరిగి dlsym(handle, name);
         }
-    #endif // __APPLE__
+    #అయితే_ముగింపు // __APPLE__
 
-    #if defined(__sgi) || defined (__sun)
-        #include <dlfcn.h>
-        #include <stdio.h>
+    #ఒకవేళ defined(__sgi) || defined (__sun)
+        #అన్తర్భావ <dlfcn.h>
+        #అన్తర్భావ <stdio.h>
 
-        static void* SunGetProcAddress (const char* name)
+        స్థిర శూన్య* Sun_Get_Proc_చిరునామా (స్థిరరాశి అక్షరం* name)
         {
-            typedef void* (func_t*)(const GLubyte*);
+            రకనిర్వచనం శూన్య* (func_t*)(స్థిరరాశి GLubyte*);
 
-            static void* h = 0;
-            static func_t gpa = 0;
+            స్థిర శూన్య* h = 0;
+            స్థిర func_t gpa = 0;
 
-            if (!h)
+            ఒకవేళ (!h)
             {
-                h = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
-                if (!h)
-                    return 0;
+                h = dlopen(ఖాళీ, RTLD_LAZY | RTLD_LOCAL);
+                ఒకవేళ (!h)
+                    తిరిగి 0;
                 gpa = (func_t) dlsym(h, "glXGetProcAddress");
             }
 
-            return gpa ? gpa((const GLubyte*) name) : dlsym(h, name);
+            తిరిగి gpa ? gpa((స్థిరరాశి GLubyte*) name) : dlsym(h, name);
         }
-    #endif // __sgi || __sun
+    #అయితే_ముగింపు // __sgi || __sun
 
-    #if defined(_WIN32)
-        #ifdef _MSC_VER
-            #pragma warning(disable: 4055)
-            #pragma warning(disable: 4054)
-        #endif
+    #ఒకవేళ defined(_WIN32)
+        #నిర్వచితమైతే _MSC_VER
+            #సూచన warning(disable: 4055)
+            #సూచన warning(disable: 4054)
+        #అయితే_ముగింపు
 
-        static int TestPointer(const PROC pTest)
+        స్థిర పూర్ణాంకం Test_సూచిక(స్థిరరాశి PROC pTest)
         {
-            if(!pTest)
-                return 0;
+            ఒకవేళ(!pTest)
+                తిరిగి 0;
 
             ptrdiff_t iTest = (ptrdiff_t) pTest;
 
-            if (iTest == 1 || iTest == 2 || iTest == 3 || iTest == -1)
-                return 0;
+            ఒకవేళ (iTest == 1 || iTest == 2 || iTest == 3 || iTest == -1)
+                తిరిగి 0;
 
-            return 1;
+            తిరిగి 1;
         }
 
-        static PROC WinGetProcAddress(const char* name)
+        స్థిర PROC Win_Get_Proc_చిరునామా(స్థిరరాశి అక్షరం* name)
         {
-            PROC pFunc = wglGetProcAddress((LPCSTR) name);
-            if (TestPointer(pFunc))
-                return pFunc;
+            PROC pFunc = wgl_Get_Proc_చిరునామా((LPCSTR) name);
+            ఒకవేళ (Test_సూచిక(pFunc))
+                తిరిగి pFunc;
 
             HMODULE glMod = GetModuleHandleA("OpenGL32.dll");
-            return (PROC) GetProcAddress(glMod, (LPCSTR) name);
+            తిరిగి (PROC) Get_Proc_చిరునామా(glMod, (LPCSTR) name);
         }
-    #endif // _WIN32
+    #అయితే_ముగింపు // _WIN32
 
-    #if defined(_WIN32)
-        #define CV_GL_GET_PROC_ADDRESS(name) WinGetProcAddress(name)
-    #elif defined(__APPLE__)
-        #define CV_GL_GET_PROC_ADDRESS(name) AppleGLGetProcAddress(name)
-    #elif defined(__sgi) || defined(__sun)
-        #define CV_GL_GET_PROC_ADDRESS(name) SunGetProcAddress(name)
-    #else // GLX
-        #include <GL/glx.h>
+    #ఒకవేళ defined(_WIN32)
+        #నిర్వచించు CV_GL_GET_PROC_చిరునామా(name) Win_Get_Proc_చిరునామా(name)
+    #లేదావేళ defined(__APPLE__)
+        #నిర్వచించు CV_GL_GET_PROC_చిరునామా(name) Apple_GLGet_Proc_చిరునామా(name)
+    #లేదావేళ defined(__sgi) || defined(__sun)
+        #నిర్వచించు CV_GL_GET_PROC_చిరునామా(name) Sun_Get_Proc_చిరునామా(name)
+    #లేకపోతే // GLX
+        #అన్తర్భావ <GL/glx.h>
 
-        #define CV_GL_GET_PROC_ADDRESS(name) glXGetProcAddressARB((const GLubyte*) name)
-    #endif
+        #నిర్వచించు CV_GL_GET_PROC_చిరునామా(name) gl_XGet_Proc_చిరునామా_ARB((స్థిరరాశి GLubyte*) name)
+    #అయితే_ముగింపు
 
-    static void* IntGetProcAddress(const char* name)
+    స్థిర శూన్య* Int_Get_Proc_చిరునామా(స్థిరరాశి అక్షరం* name)
     {
-        void* func =  (void*) CV_GL_GET_PROC_ADDRESS(name);
-        if (!func)
+        శూన్య* func =  (శూన్య*) CV_GL_GET_PROC_చిరునామా(name);
+        ఒకవేళ (!func)
         {
             CV_Error(cv::Error::OpenGlApiCallError, cv::format("Can't load OpenGL extension [%s]", name) );
         }
-        return func;
+        తిరిగి func;
     }
-#else
-#if defined(_MSC_VER)
-    #pragma warning(disable : 4702)  // unreachable code
-#endif
-    static void* IntGetProcAddress(const char*)
+#లేకపోతే
+#ఒకవేళ defined(_MSC_VER)
+    #సూచన warning(disable : 4702)  // unreachable code
+#అయితే_ముగింపు
+    స్థిర శూన్య* Int_Get_Proc_చిరునామా(స్థిరరాశి అక్షరం*)
     {
         CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support");
     }
-#endif
+#అయితే_ముగింపు
 
-namespace gl
+నామాకాశ gl
 {
     //////////////////////////////////////////////
     // Function pointer types
 
     // Extension: 1.1
-    typedef void (CODEGEN_FUNCPTR *PFNCULLFACEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNFRONTFACEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNHINTPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNLINEWIDTHPROC)(GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTSIZEPROC)(GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNPOLYGONMODEPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNSCISSORPROC)(GLint , GLint , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERFPROC)(GLenum , GLenum , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERFVPROC)(GLenum , GLenum , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERIPROC)(GLenum , GLenum , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERIVPROC)(GLenum , GLenum , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLint , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXIMAGE2DPROC)(GLenum , GLint , GLint , GLsizei , GLsizei , GLint , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWBUFFERPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARPROC)(GLbitfield );
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARCOLORPROC)(GLfloat , GLfloat , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARSTENCILPROC)(GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARDEPTHPROC)(GLdouble );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILMASKPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNCOLORMASKPROC)(GLboolean , GLboolean , GLboolean , GLboolean );
-    typedef void (CODEGEN_FUNCPTR *PFNDEPTHMASKPROC)(GLboolean );
-    typedef void (CODEGEN_FUNCPTR *PFNDISABLEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNENABLEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNFINISHPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNFLUSHPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDFUNCPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNLOGICOPPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILFUNCPROC)(GLenum , GLint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILOPPROC)(GLenum , GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDEPTHFUNCPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNPIXELSTOREFPROC)(GLenum , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNPIXELSTOREIPROC)(GLenum , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNREADBUFFERPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNREADPIXELSPROC)(GLint , GLint , GLsizei , GLsizei , GLenum , GLenum , GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETBOOLEANVPROC)(GLenum , GLboolean *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETDOUBLEVPROC)(GLenum , GLdouble *);
-    typedef GLenum (CODEGEN_FUNCPTR *PFNGETERRORPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNGETFLOATVPROC)(GLenum , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETINTEGERVPROC)(GLenum , GLint *);
-    typedef const GLubyte * (CODEGEN_FUNCPTR *PFNGETSTRINGPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXIMAGEPROC)(GLenum , GLint , GLenum , GLenum , GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERFVPROC)(GLenum , GLenum , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIVPROC)(GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXLEVELPARAMETERFVPROC)(GLenum , GLint , GLenum , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXLEVELPARAMETERIVPROC)(GLenum , GLint , GLenum , GLint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISENABLEDPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDEPTHRANGEPROC)(GLdouble , GLdouble );
-    typedef void (CODEGEN_FUNCPTR *PFNVIEWPORTPROC)(GLint , GLint , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWARRAYSPROC)(GLenum , GLint , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWELEMENTSPROC)(GLenum , GLsizei , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETPOINTERVPROC)(GLenum , GLvoid* *);
-    typedef void (CODEGEN_FUNCPTR *PFNPOLYGONOFFSETPROC)(GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXIMAGE1DPROC)(GLenum , GLint , GLenum , GLint , GLint , GLsizei , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXIMAGE2DPROC)(GLenum , GLint , GLenum , GLint , GLint , GLsizei , GLsizei , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLint , GLint , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLsizei , GLsizei , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNBINDTEXTUREPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETETEXTURESPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENTEXTURESPROC)(GLsizei , GLuint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISTEXTUREPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNINDEXUBPROC)(GLubyte );
-    typedef void (CODEGEN_FUNCPTR *PFNINDEXUBVPROC)(const GLubyte *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCULLFACEPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNFRONTFACEPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNHINTPROC)(GLenum , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNLINEWIDTHPROC)(GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPOINTSIZEPROC)(GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPOLYGONMODEPROC)(GLenum , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNSCISSORPROC)(GLint , GLint , GLsizei , GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXPARAMETERFPROC)(GLenum , GLenum , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXPARAMETERFVPROC)(GLenum , GLenum , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXPARAMETERIPROC)(GLenum , GLenum , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXPARAMETERIVPROC)(GLenum , GLenum , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLint , GLenum , GLenum , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXIMAGE2DPROC)(GLenum , GLint , GLint , GLsizei , GLsizei , GLint , GLenum , GLenum , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDRAWBUFFERPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCLEARPROC)(GLbitfield );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCLEARCOLORPROC)(GLfloat , GLfloat , GLfloat , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCLEARSTENCILPROC)(GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCLEARDEPTHPROC)(GLdouble );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNSTENCILMASKPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOLORMASKPROC)(GLboolean , GLboolean , GLboolean , GLboolean );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDEPTHMASKPROC)(GLboolean );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDISABLEPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNENABLEPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNFINISHPROC)();
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNFLUSHPROC)();
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBLENDFUNCPROC)(GLenum , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNLOGICOPPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNSTENCILFUNCPROC)(GLenum , GLint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNSTENCILOPPROC)(GLenum , GLenum , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDEPTHFUNCPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPIXELSTOREFPROC)(GLenum , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPIXELSTOREIPROC)(GLenum , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNREADBUFFERPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNREADPIXELSPROC)(GLint , GLint , GLsizei , GLsizei , GLenum , GLenum , GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETBOOLEANVPROC)(GLenum , GLboolean *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETDOUBLEVPROC)(GLenum , GLdouble *);
+    రకనిర్వచనం GLenum (CODEGEN_FUNCPTR *PFNGETERRORPROC)();
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETFLOATVPROC)(GLenum , GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETINTEGERVPROC)(GLenum , GLint *);
+    రకనిర్వచనం స్థిరరాశి GLubyte * (CODEGEN_FUNCPTR *PFNGETSTRINGPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETTEXIMAGEPROC)(GLenum , GLint , GLenum , GLenum , GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERFVPROC)(GLenum , GLenum , GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIVPROC)(GLenum , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETTEXLEVELPARAMETERFVPROC)(GLenum , GLint , GLenum , GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETTEXLEVELPARAMETERIVPROC)(GLenum , GLint , GLenum , GLint *);
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISENABLEDPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDEPTHRANGEPROC)(GLdouble , GLdouble );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVIEWPORTPROC)(GLint , GLint , GLsizei , GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDRAWARRAYSPROC)(GLenum , GLint , GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDRAWELEMENTSPROC)(GLenum , GLsizei , GLenum , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETPOINTERVPROC)(GLenum , GLvoid* *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPOLYGONOFFSETPROC)(GLfloat , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOPYTEXIMAGE1DPROC)(GLenum , GLint , GLenum , GLint , GLint , GLsizei , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOPYTEXIMAGE2DPROC)(GLenum , GLint , GLenum , GLint , GLint , GLsizei , GLsizei , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLint , GLint , GLsizei , GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLenum , GLenum , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLsizei , GLsizei , GLenum , GLenum , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBINDTEXTUREPROC)(GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDELETETEXTURESPROC)(GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGENTEXTURESPROC)(GLsizei , GLuint *);
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISTEXTUREPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNINDEXUBPROC)(GLubyte );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNINDEXUBVPROC)(స్థిరరాశి GLubyte *);
 
     // Extension: 1.2
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDCOLORPROC)(GLfloat , GLfloat , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDEQUATIONPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWRANGEELEMENTSPROC)(GLenum , GLuint , GLuint , GLsizei , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei , GLsizei , GLsizei , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLint , GLint , GLsizei , GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBLENDCOLORPROC)(GLfloat , GLfloat , GLfloat , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBLENDEQUATIONPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDRAWRANGEELEMENTSPROC)(GLenum , GLuint , GLuint , GLsizei , GLenum , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei , GLsizei , GLsizei , GLenum , GLenum , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLint , GLint , GLsizei , GLsizei );
 
     // Extension: 1.3
-    typedef void (CODEGEN_FUNCPTR *PFNACTIVETEXTUREPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNSAMPLECOVERAGEPROC)(GLfloat , GLboolean );
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE3DPROC)(GLenum , GLint , GLenum , GLsizei , GLsizei , GLsizei , GLint , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE2DPROC)(GLenum , GLint , GLenum , GLsizei , GLsizei , GLint , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE1DPROC)(GLenum , GLint , GLenum , GLsizei , GLint , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei , GLsizei , GLsizei , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLsizei , GLsizei , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETCOMPRESSEDTEXIMAGEPROC)(GLenum , GLint , GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNACTIVETEXTUREPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNSAMPLECOVERAGEPROC)(GLfloat , GLboolean );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE3DPROC)(GLenum , GLint , GLenum , GLsizei , GLsizei , GLsizei , GLint , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE2DPROC)(GLenum , GLint , GLenum , GLsizei , GLsizei , GLint , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE1DPROC)(GLenum , GLint , GLenum , GLsizei , GLint , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei , GLsizei , GLsizei , GLenum , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLsizei , GLsizei , GLenum , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLenum , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETCOMPRESSEDTEXIMAGEPROC)(GLenum , GLint , GLvoid *);
 
     // Extension: 1.4
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDFUNCSEPARATEPROC)(GLenum , GLenum , GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNMULTIDRAWARRAYSPROC)(GLenum , const GLint *, const GLsizei *, GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNMULTIDRAWELEMENTSPROC)(GLenum , const GLsizei *, GLenum , const GLvoid* const *, GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTPARAMETERFPROC)(GLenum , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTPARAMETERFVPROC)(GLenum , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTPARAMETERIPROC)(GLenum , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTPARAMETERIVPROC)(GLenum , const GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBLENDFUNCSEPARATEPROC)(GLenum , GLenum , GLenum , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNMULTIDRAWARRAYSPROC)(GLenum , స్థిరరాశి GLint *, స్థిరరాశి GLsizei *, GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNMULTIDRAWELEMENTSPROC)(GLenum , స్థిరరాశి GLsizei *, GLenum , స్థిరరాశి GLvoid* స్థిరరాశి *, GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPOINTPARAMETERFPROC)(GLenum , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPOINTPARAMETERFVPROC)(GLenum , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPOINTPARAMETERIPROC)(GLenum , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPOINTPARAMETERIVPROC)(GLenum , స్థిరరాశి GLint *);
 
     // Extension: 1.5
-    typedef void (CODEGEN_FUNCPTR *PFNGENQUERIESPROC)(GLsizei , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEQUERIESPROC)(GLsizei , const GLuint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISQUERYPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBEGINQUERYPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNENDQUERYPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNGETQUERYIVPROC)(GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETQUERYOBJECTIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETQUERYOBJECTUIVPROC)(GLuint , GLenum , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNBINDBUFFERPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEBUFFERSPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENBUFFERSPROC)(GLsizei , GLuint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISBUFFERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBUFFERDATAPROC)(GLenum , GLsizeiptr , const GLvoid *, GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNBUFFERSUBDATAPROC)(GLenum , GLintptr , GLsizeiptr , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETBUFFERSUBDATAPROC)(GLenum , GLintptr , GLsizeiptr , GLvoid *);
-    typedef GLvoid* (CODEGEN_FUNCPTR *PFNMAPBUFFERPROC)(GLenum , GLenum );
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNUNMAPBUFFERPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNGETBUFFERPARAMETERIVPROC)(GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETBUFFERPOINTERVPROC)(GLenum , GLenum , GLvoid* *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGENQUERIESPROC)(GLsizei , GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDELETEQUERIESPROC)(GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISQUERYPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBEGINQUERYPROC)(GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNENDQUERYPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETQUERYIVPROC)(GLenum , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETQUERYOBJECTIVPROC)(GLuint , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETQUERYOBJECTUIVPROC)(GLuint , GLenum , GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBINDBUFFERPROC)(GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDELETEBUFFERSPROC)(GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGENBUFFERSPROC)(GLsizei , GLuint *);
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISBUFFERPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBUFFERDATAPROC)(GLenum , GLsizeiptr , స్థిరరాశి GLvoid *, GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBUFFERSUBDATAPROC)(GLenum , GLintptr , GLsizeiptr , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETBUFFERSUBDATAPROC)(GLenum , GLintptr , GLsizeiptr , GLvoid *);
+    రకనిర్వచనం GLvoid* (CODEGEN_FUNCPTR *PFNMAPBUFFERPROC)(GLenum , GLenum );
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNUNMAPBUFFERPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETBUFFERPARAMETERIVPROC)(GLenum , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETBUFFERPOINTERVPROC)(GLenum , GLenum , GLvoid* *);
 
     // Extension: 2.0
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDEQUATIONSEPARATEPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWBUFFERSPROC)(GLsizei , const GLenum *);
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILOPSEPARATEPROC)(GLenum , GLenum , GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILFUNCSEPARATEPROC)(GLenum , GLenum , GLint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILMASKSEPARATEPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNATTACHSHADERPROC)(GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBINDATTRIBLOCATIONPROC)(GLuint , GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPILESHADERPROC)(GLuint );
-    typedef GLuint (CODEGEN_FUNCPTR *PFNCREATEPROGRAMPROC)();
-    typedef GLuint (CODEGEN_FUNCPTR *PFNCREATESHADERPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEPROGRAMPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETESHADERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDETACHSHADERPROC)(GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDISABLEVERTEXATTRIBARRAYPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNENABLEVERTEXATTRIBARRAYPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEATTRIBPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLint *, GLenum *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLint *, GLenum *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETATTACHEDSHADERSPROC)(GLuint , GLsizei , GLsizei *, GLuint *);
-    typedef GLint (CODEGEN_FUNCPTR *PFNGETATTRIBLOCATIONPROC)(GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETPROGRAMIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETPROGRAMINFOLOGPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETSHADERIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETSHADERINFOLOGPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETSHADERSOURCEPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef GLint (CODEGEN_FUNCPTR *PFNGETUNIFORMLOCATIONPROC)(GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETUNIFORMFVPROC)(GLuint , GLint , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETUNIFORMIVPROC)(GLuint , GLint , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBDVPROC)(GLuint , GLenum , GLdouble *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBFVPROC)(GLuint , GLenum , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBPOINTERVPROC)(GLuint , GLenum , GLvoid* *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISPROGRAMPROC)(GLuint );
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISSHADERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNLINKPROGRAMPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNSHADERSOURCEPROC)(GLuint , GLsizei , const GLchar* const *, const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUSEPROGRAMPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1FPROC)(GLint , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2FPROC)(GLint , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3FPROC)(GLint , GLfloat , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4FPROC)(GLint , GLfloat , GLfloat , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1IPROC)(GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2IPROC)(GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3IPROC)(GLint , GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4IPROC)(GLint , GLint , GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1FVPROC)(GLint , GLsizei , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2FVPROC)(GLint , GLsizei , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3FVPROC)(GLint , GLsizei , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4FVPROC)(GLint , GLsizei , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1IVPROC)(GLint , GLsizei , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2IVPROC)(GLint , GLsizei , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3IVPROC)(GLint , GLsizei , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4IVPROC)(GLint , GLsizei , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNVALIDATEPROGRAMPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBPOINTERPROC)(GLuint , GLint , GLenum , GLboolean , GLsizei , const GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBLENDEQUATIONSEPARATEPROC)(GLenum , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDRAWBUFFERSPROC)(GLsizei , స్థిరరాశి GLenum *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNSTENCILOPSEPARATEPROC)(GLenum , GLenum , GLenum , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNSTENCILFUNCSEPARATEPROC)(GLenum , GLenum , GLint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNSTENCILMASKSEPARATEPROC)(GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNATTACHSHADERPROC)(GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBINDATTRIBLOCATIONPROC)(GLuint , GLuint , స్థిరరాశి GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOMPILESHADERPROC)(GLuint );
+    రకనిర్వచనం GLuint (CODEGEN_FUNCPTR *PFNCREATEPROGRAMPROC)();
+    రకనిర్వచనం GLuint (CODEGEN_FUNCPTR *PFNCREATESHADERPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDELETEPROGRAMPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDELETESHADERPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDETACHSHADERPROC)(GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDISABLEVERTEXATTRIBARRAYPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNENABLEVERTEXATTRIBARRAYPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETACTIVEATTRIBPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLint *, GLenum *, GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLint *, GLenum *, GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETATTACHEDSHADERSPROC)(GLuint , GLsizei , GLsizei *, GLuint *);
+    రకనిర్వచనం GLint (CODEGEN_FUNCPTR *PFNGETATTRIBLOCATIONPROC)(GLuint , స్థిరరాశి GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETPROGRAMIVPROC)(GLuint , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETPROGRAMINFOLOGPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETSHADERIVPROC)(GLuint , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETSHADERINFOLOGPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETSHADERSOURCEPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
+    రకనిర్వచనం GLint (CODEGEN_FUNCPTR *PFNGETUNIFORMLOCATIONPROC)(GLuint , స్థిరరాశి GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETUNIFORMFVPROC)(GLuint , GLint , GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETUNIFORMIVPROC)(GLuint , GLint , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBDVPROC)(GLuint , GLenum , GLdouble *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBFVPROC)(GLuint , GLenum , GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIVPROC)(GLuint , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBPOINTERVPROC)(GLuint , GLenum , GLvoid* *);
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISPROGRAMPROC)(GLuint );
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISSHADERPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNLINKPROGRAMPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNSHADERSOURCEPROC)(GLuint , GLsizei , స్థిరరాశి GLchar* స్థిరరాశి *, స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUSEPROGRAMPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM1FPROC)(GLint , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM2FPROC)(GLint , GLfloat , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM3FPROC)(GLint , GLfloat , GLfloat , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM4FPROC)(GLint , GLfloat , GLfloat , GLfloat , GLfloat );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM1IPROC)(GLint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM2IPROC)(GLint , GLint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM3IPROC)(GLint , GLint , GLint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM4IPROC)(GLint , GLint , GLint , GLint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM1FVPROC)(GLint , GLsizei , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM2FVPROC)(GLint , GLsizei , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM3FVPROC)(GLint , GLsizei , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM4FVPROC)(GLint , GLsizei , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM1IVPROC)(GLint , GLsizei , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM2IVPROC)(GLint , GLsizei , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM3IVPROC)(GLint , GLsizei , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM4IVPROC)(GLint , GLsizei , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2FVPROC)(GLint , GLsizei , GLboolean , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3FVPROC)(GLint , GLsizei , GLboolean , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4FVPROC)(GLint , GLsizei , GLboolean , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVALIDATEPROGRAMPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBPOINTERPROC)(GLuint , GLint , GLenum , GLboolean , GLsizei , స్థిరరాశి GLvoid *);
 
     // Extension: 2.1
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2X3FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3X2FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2X4FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4X2FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3X4FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4X3FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2X3FVPROC)(GLint , GLsizei , GLboolean , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3X2FVPROC)(GLint , GLsizei , GLboolean , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2X4FVPROC)(GLint , GLsizei , GLboolean , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4X2FVPROC)(GLint , GLsizei , GLboolean , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3X4FVPROC)(GLint , GLsizei , GLboolean , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4X3FVPROC)(GLint , GLsizei , GLboolean , స్థిరరాశి GLfloat *);
 
     // Extension: ARB_vertex_array_object
-    typedef void (CODEGEN_FUNCPTR *PFNBINDVERTEXARRAYPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEVERTEXARRAYSPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENVERTEXARRAYSPROC)(GLsizei , GLuint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISVERTEXARRAYPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBINDVERTEXARRAYPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDELETEVERTEXARRAYSPROC)(GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGENVERTEXARRAYSPROC)(GLsizei , GLuint *);
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISVERTEXARRAYPROC)(GLuint );
 
     // Extension: ARB_map_buffer_range
-    typedef GLvoid* (CODEGEN_FUNCPTR *PFNMAPBUFFERRANGEPROC)(GLenum , GLintptr , GLsizeiptr , GLbitfield );
-    typedef void (CODEGEN_FUNCPTR *PFNFLUSHMAPPEDBUFFERRANGEPROC)(GLenum , GLintptr , GLsizeiptr );
+    రకనిర్వచనం GLvoid* (CODEGEN_FUNCPTR *PFNMAPBUFFERRANGEPROC)(GLenum , GLintptr , GLsizeiptr , GLbitfield );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNFLUSHMAPPEDBUFFERRANGEPROC)(GLenum , GLintptr , GLsizeiptr );
 
     // Extension: ARB_framebuffer_object
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISRENDERBUFFERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBINDRENDERBUFFERPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETERENDERBUFFERSPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENRENDERBUFFERSPROC)(GLsizei , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNRENDERBUFFERSTORAGEPROC)(GLenum , GLenum , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNGETRENDERBUFFERPARAMETERIVPROC)(GLenum , GLenum , GLint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISFRAMEBUFFERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBINDFRAMEBUFFERPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEFRAMEBUFFERSPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENFRAMEBUFFERSPROC)(GLsizei , GLuint *);
-    typedef GLenum (CODEGEN_FUNCPTR *PFNCHECKFRAMEBUFFERSTATUSPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE1DPROC)(GLenum , GLenum , GLenum , GLuint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE2DPROC)(GLenum , GLenum , GLenum , GLuint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE3DPROC)(GLenum , GLenum , GLenum , GLuint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERRENDERBUFFERPROC)(GLenum , GLenum , GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC)(GLenum , GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENERATEMIPMAPPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNBLITFRAMEBUFFERPROC)(GLint , GLint , GLint , GLint , GLint , GLint , GLint , GLint , GLbitfield , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNRENDERBUFFERSTORAGEMULTISAMPLEPROC)(GLenum , GLsizei , GLenum , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURELAYERPROC)(GLenum , GLenum , GLuint , GLint , GLint );
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISRENDERBUFFERPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBINDRENDERBUFFERPROC)(GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDELETERENDERBUFFERSPROC)(GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGENRENDERBUFFERSPROC)(GLsizei , GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNRENDERBUFFERSTORAGEPROC)(GLenum , GLenum , GLsizei , GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETRENDERBUFFERPARAMETERIVPROC)(GLenum , GLenum , GLint *);
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISFRAMEBUFFERPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBINDFRAMEBUFFERPROC)(GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDELETEFRAMEBUFFERSPROC)(GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGENFRAMEBUFFERSPROC)(GLsizei , GLuint *);
+    రకనిర్వచనం GLenum (CODEGEN_FUNCPTR *PFNCHECKFRAMEBUFFERSTATUSPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE1DPROC)(GLenum , GLenum , GLenum , GLuint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE2DPROC)(GLenum , GLenum , GLenum , GLuint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE3DPROC)(GLenum , GLenum , GLenum , GLuint , GLint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNFRAMEBUFFERRENDERBUFFERPROC)(GLenum , GLenum , GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC)(GLenum , GLenum , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGENERATEMIPMAPPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBLITFRAMEBUFFERPROC)(GLint , GLint , GLint , GLint , GLint , GLint , GLint , GLint , GLbitfield , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNRENDERBUFFERSTORAGEMULTISAMPLEPROC)(GLenum , GLsizei , GLenum , GLsizei , GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURELAYERPROC)(GLenum , GLenum , GLuint , GLint , GLint );
 
     // Extension: 3.0
-    typedef void (CODEGEN_FUNCPTR *PFNCOLORMASKIPROC)(GLuint , GLboolean , GLboolean , GLboolean , GLboolean );
-    typedef void (CODEGEN_FUNCPTR *PFNGETBOOLEANI_VPROC)(GLenum , GLuint , GLboolean *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETINTEGERI_VPROC)(GLenum , GLuint , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNENABLEIPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDISABLEIPROC)(GLenum , GLuint );
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISENABLEDIPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBEGINTRANSFORMFEEDBACKPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNENDTRANSFORMFEEDBACKPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNBINDBUFFERRANGEPROC)(GLenum , GLuint , GLuint , GLintptr , GLsizeiptr );
-    typedef void (CODEGEN_FUNCPTR *PFNBINDBUFFERBASEPROC)(GLenum , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNTRANSFORMFEEDBACKVARYINGSPROC)(GLuint , GLsizei , const GLchar* const *, GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNGETTRANSFORMFEEDBACKVARYINGPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLsizei *, GLenum *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLAMPCOLORPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNBEGINCONDITIONALRENDERPROC)(GLuint , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNENDCONDITIONALRENDERPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBIPOINTERPROC)(GLuint , GLint , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIUIVPROC)(GLuint , GLenum , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1IPROC)(GLuint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2IPROC)(GLuint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3IPROC)(GLuint , GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4IPROC)(GLuint , GLint , GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1UIPROC)(GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2UIPROC)(GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3UIPROC)(GLuint , GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UIPROC)(GLuint , GLuint , GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1IVPROC)(GLuint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2IVPROC)(GLuint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3IVPROC)(GLuint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4IVPROC)(GLuint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1UIVPROC)(GLuint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2UIVPROC)(GLuint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3UIVPROC)(GLuint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UIVPROC)(GLuint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4BVPROC)(GLuint , const GLbyte *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4SVPROC)(GLuint , const GLshort *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UBVPROC)(GLuint , const GLubyte *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4USVPROC)(GLuint , const GLushort *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETUNIFORMUIVPROC)(GLuint , GLint , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNBINDFRAGDATALOCATIONPROC)(GLuint , GLuint , const GLchar *);
-    typedef GLint (CODEGEN_FUNCPTR *PFNGETFRAGDATALOCATIONPROC)(GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1UIPROC)(GLint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2UIPROC)(GLint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3UIPROC)(GLint , GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4UIPROC)(GLint , GLuint , GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1UIVPROC)(GLint , GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2UIVPROC)(GLint , GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3UIVPROC)(GLint , GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4UIVPROC)(GLint , GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERIIVPROC)(GLenum , GLenum , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERIUIVPROC)(GLenum , GLenum , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIIVPROC)(GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIUIVPROC)(GLenum , GLenum , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARBUFFERIVPROC)(GLenum , GLint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARBUFFERUIVPROC)(GLenum , GLint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARBUFFERFVPROC)(GLenum , GLint , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARBUFFERFIPROC)(GLenum , GLint , GLfloat , GLint );
-    typedef const GLubyte * (CODEGEN_FUNCPTR *PFNGETSTRINGIPROC)(GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOLORMASKIPROC)(GLuint , GLboolean , GLboolean , GLboolean , GLboolean );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETBOOLEANI_VPROC)(GLenum , GLuint , GLboolean *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETINTEGERI_VPROC)(GLenum , GLuint , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNENABLEIPROC)(GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDISABLEIPROC)(GLenum , GLuint );
+    రకనిర్వచనం GLboolean (CODEGEN_FUNCPTR *PFNISENABLEDIPROC)(GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBEGINTRANSFORMFEEDBACKPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNENDTRANSFORMFEEDBACKPROC)();
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBINDBUFFERRANGEPROC)(GLenum , GLuint , GLuint , GLintptr , GLsizeiptr );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBINDBUFFERBASEPROC)(GLenum , GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTRANSFORMFEEDBACKVARYINGSPROC)(GLuint , GLsizei , స్థిరరాశి GLchar* స్థిరరాశి *, GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETTRANSFORMFEEDBACKVARYINGPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLsizei *, GLenum *, GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCLAMPCOLORPROC)(GLenum , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBEGINCONDITIONALRENDERPROC)(GLuint , GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNENDCONDITIONALRENDERPROC)();
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBIPOINTERPROC)(GLuint , GLint , GLenum , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIIVPROC)(GLuint , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIUIVPROC)(GLuint , GLenum , GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1IPROC)(GLuint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2IPROC)(GLuint , GLint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3IPROC)(GLuint , GLint , GLint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4IPROC)(GLuint , GLint , GLint , GLint , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1UIPROC)(GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2UIPROC)(GLuint , GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3UIPROC)(GLuint , GLuint , GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UIPROC)(GLuint , GLuint , GLuint , GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1IVPROC)(GLuint , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2IVPROC)(GLuint , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3IVPROC)(GLuint , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4IVPROC)(GLuint , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1UIVPROC)(GLuint , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2UIVPROC)(GLuint , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3UIVPROC)(GLuint , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UIVPROC)(GLuint , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4BVPROC)(GLuint , స్థిరరాశి GLbyte *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4SVPROC)(GLuint , స్థిరరాశి GLshort *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UBVPROC)(GLuint , స్థిరరాశి GLubyte *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4USVPROC)(GLuint , స్థిరరాశి GLushort *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETUNIFORMUIVPROC)(GLuint , GLint , GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNBINDFRAGDATALOCATIONPROC)(GLuint , GLuint , స్థిరరాశి GLchar *);
+    రకనిర్వచనం GLint (CODEGEN_FUNCPTR *PFNGETFRAGDATALOCATIONPROC)(GLuint , స్థిరరాశి GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM1UIPROC)(GLint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM2UIPROC)(GLint , GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM3UIPROC)(GLint , GLuint , GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM4UIPROC)(GLint , GLuint , GLuint , GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM1UIVPROC)(GLint , GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM2UIVPROC)(GLint , GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM3UIVPROC)(GLint , GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORM4UIVPROC)(GLint , GLsizei , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXPARAMETERIIVPROC)(GLenum , GLenum , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXPARAMETERIUIVPROC)(GLenum , GLenum , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIIVPROC)(GLenum , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIUIVPROC)(GLenum , GLenum , GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCLEARBUFFERIVPROC)(GLenum , GLint , స్థిరరాశి GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCLEARBUFFERUIVPROC)(GLenum , GLint , స్థిరరాశి GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCLEARBUFFERFVPROC)(GLenum , GLint , స్థిరరాశి GLfloat *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCLEARBUFFERFIPROC)(GLenum , GLint , GLfloat , GLint );
+    రకనిర్వచనం స్థిరరాశి GLubyte * (CODEGEN_FUNCPTR *PFNGETSTRINGIPROC)(GLenum , GLuint );
 
     // Extension: ARB_uniform_buffer_object
-    typedef void (CODEGEN_FUNCPTR *PFNGETUNIFORMINDICESPROC)(GLuint , GLsizei , const GLchar* const *, GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMSIVPROC)(GLuint , GLsizei , const GLuint *, GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMNAMEPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef GLuint (CODEGEN_FUNCPTR *PFNGETUNIFORMBLOCKINDEXPROC)(GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMBLOCKIVPROC)(GLuint , GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMBLOCKNAMEPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMBLOCKBINDINGPROC)(GLuint , GLuint , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETUNIFORMINDICESPROC)(GLuint , GLsizei , స్థిరరాశి GLchar* స్థిరరాశి *, GLuint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMSIVPROC)(GLuint , GLsizei , స్థిరరాశి GLuint *, GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMNAMEPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLchar *);
+    రకనిర్వచనం GLuint (CODEGEN_FUNCPTR *PFNGETUNIFORMBLOCKINDEXPROC)(GLuint , స్థిరరాశి GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMBLOCKIVPROC)(GLuint , GLuint , GLenum , GLint *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMBLOCKNAMEPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLchar *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNUNIFORMBLOCKBINDINGPROC)(GLuint , GLuint , GLuint );
 
     // Extension: ARB_copy_buffer
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYBUFFERSUBDATAPROC)(GLenum , GLenum , GLintptr , GLintptr , GLsizeiptr );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOPYBUFFERSUBDATAPROC)(GLenum , GLenum , GLintptr , GLintptr , GLsizeiptr );
 
     // Extension: 3.1
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWARRAYSINSTANCEDPROC)(GLenum , GLint , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWELEMENTSINSTANCEDPROC)(GLenum , GLsizei , GLenum , const GLvoid *, GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXBUFFERPROC)(GLenum , GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNPRIMITIVERESTARTINDEXPROC)(GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDRAWARRAYSINSTANCEDPROC)(GLenum , GLint , GLsizei , GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDRAWELEMENTSINSTANCEDPROC)(GLenum , GLsizei , GLenum , స్థిరరాశి GLvoid *, GLsizei );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXBUFFERPROC)(GLenum , GLenum , GLuint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNPRIMITIVERESTARTINDEXPROC)(GLuint );
 
     // Legacy
-    typedef void (CODEGEN_FUNCPTR *PFNENABLECLIENTSTATEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDISABLECLIENTSTATEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXPOINTERPROC)(GLint , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNNORMALPOINTERPROC)(GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOLORPOINTERPROC)(GLint , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXCOORDPOINTERPROC)(GLint , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXENVIPROC)(GLenum , GLenum , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNMATRIXMODEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNLOADIDENTITYPROC)(void);
-    typedef void (CODEGEN_FUNCPTR *PFNORTHOPROC)(GLdouble , GLdouble , GLdouble , GLdouble , GLdouble , GLdouble );
-    typedef void (CODEGEN_FUNCPTR *PFNCOLOR3DPROC)(GLdouble , GLdouble , GLdouble );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNENABLECLIENTSTATEPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNDISABLECLIENTSTATEPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNVERTEXPOINTERPROC)(GLint , GLenum , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNNORMALPOINTERPROC)(GLenum , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOLORPOINTERPROC)(GLint , GLenum , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXCOORDPOINTERPROC)(GLint , GLenum , GLsizei , స్థిరరాశి GLvoid *);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNTEXENVIPROC)(GLenum , GLenum , GLint );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNMATRIXMODEPROC)(GLenum );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNLOADIDENTITYPROC)(శూన్య);
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNORTHOPROC)(GLdouble , GLdouble , GLdouble , GLdouble , GLdouble , GLdouble );
+    రకనిర్వచనం శూన్య (CODEGEN_FUNCPTR *PFNCOLOR3DPROC)(GLdouble , GLdouble , GLdouble );
 
     //////////////////////////////////////////////
     // Function pointers
@@ -468,9 +468,9 @@ namespace gl
     PFNCULLFACEPROC CullFace;
     PFNFRONTFACEPROC FrontFace;
     PFNHINTPROC Hint;
-    PFNLINEWIDTHPROC LineWidth;
-    PFNPOINTSIZEPROC PointSize;
-    PFNPOLYGONMODEPROC PolygonMode;
+    PFNLINEWIDTHPROC పంక్తి_వెడల్పు;
+    PFNPOINTSIZEPROC బిందువు_కొలత;
+    PFNPOLYGONMODEPROC Polygon_బహుళకం;
     PFNSCISSORPROC Scissor;
     PFNTEXPARAMETERFPROC TexParameterf;
     PFNTEXPARAMETERFVPROC TexParameterfv;
@@ -478,26 +478,26 @@ namespace gl
     PFNTEXPARAMETERIVPROC TexParameteriv;
     PFNTEXIMAGE1DPROC TexImage1D;
     PFNTEXIMAGE2DPROC TexImage2D;
-    PFNDRAWBUFFERPROC DrawBuffer;
+    PFNDRAWBUFFERPROC Draw_బఫరు;
     PFNCLEARPROC Clear;
     PFNCLEARCOLORPROC ClearColor;
     PFNCLEARSTENCILPROC ClearStencil;
-    PFNCLEARDEPTHPROC ClearDepth;
-    PFNSTENCILMASKPROC StencilMask;
-    PFNCOLORMASKPROC ColorMask;
-    PFNDEPTHMASKPROC DepthMask;
+    PFNCLEARDEPTHPROC Clear_లోతు;
+    PFNSTENCILMASKPROC Stencil_ముసుగు;
+    PFNCOLORMASKPROC Color_ముసుగు;
+    PFNDEPTHMASKPROC లోతు_ముసుగు;
     PFNDISABLEPROC Disable;
     PFNENABLEPROC Enable;
-    PFNFINISHPROC Finish;
+    PFNFINISHPROC ముగింపు;
     PFNFLUSHPROC Flush;
     PFNBLENDFUNCPROC BlendFunc;
     PFNLOGICOPPROC LogicOp;
     PFNSTENCILFUNCPROC StencilFunc;
     PFNSTENCILOPPROC StencilOp;
-    PFNDEPTHFUNCPROC DepthFunc;
+    PFNDEPTHFUNCPROC లోతు_Func;
     PFNPIXELSTOREFPROC PixelStoref;
     PFNPIXELSTOREIPROC PixelStorei;
-    PFNREADBUFFERPROC ReadBuffer;
+    PFNREADBUFFERPROC Read_బఫరు;
     PFNREADPIXELSPROC ReadPixels;
     PFNGETBOOLEANVPROC GetBooleanv;
     PFNGETDOUBLEVPROC GetDoublev;
@@ -511,12 +511,12 @@ namespace gl
     PFNGETTEXLEVELPARAMETERFVPROC GetTexLevelParameterfv;
     PFNGETTEXLEVELPARAMETERIVPROC GetTexLevelParameteriv;
     PFNISENABLEDPROC IsEnabled;
-    PFNDEPTHRANGEPROC DepthRange;
+    PFNDEPTHRANGEPROC లోతు_Range;
     PFNVIEWPORTPROC Viewport;
     PFNDRAWARRAYSPROC DrawArrays;
     PFNDRAWELEMENTSPROC DrawElements;
     PFNGETPOINTERVPROC GetPointerv;
-    PFNPOLYGONOFFSETPROC PolygonOffset;
+    PFNPOLYGONOFFSETPROC Polygon_స్థానభ్రంశం;
     PFNCOPYTEXIMAGE1DPROC CopyTexImage1D;
     PFNCOPYTEXIMAGE2DPROC CopyTexImage2D;
     PFNCOPYTEXSUBIMAGE1DPROC CopyTexSubImage1D;
@@ -538,7 +538,7 @@ namespace gl
     PFNCOPYTEXSUBIMAGE3DPROC CopyTexSubImage3D;
 
     // Extension: 1.3
-    PFNACTIVETEXTUREPROC ActiveTexture;
+    PFNACTIVETEXTUREPROC చురుకైన_Texture;
     PFNSAMPLECOVERAGEPROC SampleCoverage;
     PFNCOMPRESSEDTEXIMAGE3DPROC CompressedTexImage3D;
     PFNCOMPRESSEDTEXIMAGE2DPROC CompressedTexImage2D;
@@ -552,69 +552,69 @@ namespace gl
     PFNBLENDFUNCSEPARATEPROC BlendFuncSeparate;
     PFNMULTIDRAWARRAYSPROC MultiDrawArrays;
     PFNMULTIDRAWELEMENTSPROC MultiDrawElements;
-    PFNPOINTPARAMETERFPROC PointParameterf;
-    PFNPOINTPARAMETERFVPROC PointParameterfv;
-    PFNPOINTPARAMETERIPROC PointParameteri;
-    PFNPOINTPARAMETERIVPROC PointParameteriv;
+    PFNPOINTPARAMETERFPROC బిందువు_Parameterf;
+    PFNPOINTPARAMETERFVPROC బిందువు_Parameterfv;
+    PFNPOINTPARAMETERIPROC బిందువు_Parameteri;
+    PFNPOINTPARAMETERIVPROC బిందువు_Parameteriv;
 
     // Extension: 1.5
     PFNGENQUERIESPROC GenQueries;
     PFNDELETEQUERIESPROC DeleteQueries;
     PFNISQUERYPROC IsQuery;
     PFNBEGINQUERYPROC BeginQuery;
-    PFNENDQUERYPROC EndQuery;
+    PFNENDQUERYPROC చివర_Query;
     PFNGETQUERYIVPROC GetQueryiv;
     PFNGETQUERYOBJECTIVPROC GetQueryObjectiv;
     PFNGETQUERYOBJECTUIVPROC GetQueryObjectuiv;
-    PFNBINDBUFFERPROC BindBuffer;
+    PFNBINDBUFFERPROC Bind_బఫరు;
     PFNDELETEBUFFERSPROC DeleteBuffers;
     PFNGENBUFFERSPROC GenBuffers;
-    PFNISBUFFERPROC IsBuffer;
-    PFNBUFFERDATAPROC BufferData;
-    PFNBUFFERSUBDATAPROC BufferSubData;
-    PFNGETBUFFERSUBDATAPROC GetBufferSubData;
-    PFNMAPBUFFERPROC MapBuffer;
-    PFNUNMAPBUFFERPROC UnmapBuffer;
-    PFNGETBUFFERPARAMETERIVPROC GetBufferParameteriv;
-    PFNGETBUFFERPOINTERVPROC GetBufferPointerv;
+    PFNISBUFFERPROC Is_బఫరు;
+    PFNBUFFERDATAPROC బఫరు_దత్తాంశం;
+    PFNBUFFERSUBDATAPROC బఫరు_Sub_దత్తాంశం;
+    PFNGETBUFFERSUBDATAPROC Get_బఫరు_Sub_దత్తాంశం;
+    PFNMAPBUFFERPROC Map_బఫరు;
+    PFNUNMAPBUFFERPROC Unmap_బఫరు;
+    PFNGETBUFFERPARAMETERIVPROC Get_బఫరు_Parameteriv;
+    PFNGETBUFFERPOINTERVPROC Get_బఫరు_Pointerv;
 
     // Extension: 2.0
     PFNBLENDEQUATIONSEPARATEPROC BlendEquationSeparate;
     PFNDRAWBUFFERSPROC DrawBuffers;
     PFNSTENCILOPSEPARATEPROC StencilOpSeparate;
     PFNSTENCILFUNCSEPARATEPROC StencilFuncSeparate;
-    PFNSTENCILMASKSEPARATEPROC StencilMaskSeparate;
+    PFNSTENCILMASKSEPARATEPROC Stencil_ముసుగు_Separate;
     PFNATTACHSHADERPROC AttachShader;
     PFNBINDATTRIBLOCATIONPROC BindAttribLocation;
     PFNCOMPILESHADERPROC CompileShader;
-    PFNCREATEPROGRAMPROC CreateProgram;
+    PFNCREATEPROGRAMPROC Create_కార్యక్రమం;
     PFNCREATESHADERPROC CreateShader;
-    PFNDELETEPROGRAMPROC DeleteProgram;
+    PFNDELETEPROGRAMPROC Delete_కార్యక్రమం;
     PFNDELETESHADERPROC DeleteShader;
     PFNDETACHSHADERPROC DetachShader;
-    PFNDISABLEVERTEXATTRIBARRAYPROC DisableVertexAttribArray;
-    PFNENABLEVERTEXATTRIBARRAYPROC EnableVertexAttribArray;
-    PFNGETACTIVEATTRIBPROC GetActiveAttrib;
-    PFNGETACTIVEUNIFORMPROC GetActiveUniform;
+    PFNDISABLEVERTEXATTRIBARRAYPROC Disable_శీర్షం_Attrib_Array;
+    PFNENABLEVERTEXATTRIBARRAYPROC Enable_శీర్షం_Attrib_Array;
+    PFNGETACTIVEATTRIBPROC Get_చురుకైన_Attrib;
+    PFNGETACTIVEUNIFORMPROC Get_చురుకైన_ఏకరీతి;
     PFNGETATTACHEDSHADERSPROC GetAttachedShaders;
     PFNGETATTRIBLOCATIONPROC GetAttribLocation;
     PFNGETPROGRAMIVPROC GetProgramiv;
-    PFNGETPROGRAMINFOLOGPROC GetProgramInfoLog;
+    PFNGETPROGRAMINFOLOGPROC Get_కార్యక్రమం_Info_Log;
     PFNGETSHADERIVPROC GetShaderiv;
     PFNGETSHADERINFOLOGPROC GetShaderInfoLog;
-    PFNGETSHADERSOURCEPROC GetShaderSource;
-    PFNGETUNIFORMLOCATIONPROC GetUniformLocation;
+    PFNGETSHADERSOURCEPROC Get_Shader_ఆధారం;
+    PFNGETUNIFORMLOCATIONPROC Get_ఏకరీతి_Location;
     PFNGETUNIFORMFVPROC GetUniformfv;
     PFNGETUNIFORMIVPROC GetUniformiv;
-    PFNGETVERTEXATTRIBDVPROC GetVertexAttribdv;
-    PFNGETVERTEXATTRIBFVPROC GetVertexAttribfv;
-    PFNGETVERTEXATTRIBIVPROC GetVertexAttribiv;
-    PFNGETVERTEXATTRIBPOINTERVPROC GetVertexAttribPointerv;
-    PFNISPROGRAMPROC IsProgram;
+    PFNGETVERTEXATTRIBDVPROC Get_శీర్షం_Attribdv;
+    PFNGETVERTEXATTRIBFVPROC Get_శీర్షం_Attribfv;
+    PFNGETVERTEXATTRIBIVPROC Get_శీర్షం_Attribiv;
+    PFNGETVERTEXATTRIBPOINTERVPROC Get_శీర్షం_Attrib_Pointerv;
+    PFNISPROGRAMPROC Is_కార్యక్రమం;
     PFNISSHADERPROC IsShader;
-    PFNLINKPROGRAMPROC LinkProgram;
-    PFNSHADERSOURCEPROC ShaderSource;
-    PFNUSEPROGRAMPROC UseProgram;
+    PFNLINKPROGRAMPROC Link_కార్యక్రమం;
+    PFNSHADERSOURCEPROC Shader_ఆధారం;
+    PFNUSEPROGRAMPROC Use_కార్యక్రమం;
     PFNUNIFORM1FPROC Uniform1f;
     PFNUNIFORM2FPROC Uniform2f;
     PFNUNIFORM3FPROC Uniform3f;
@@ -631,29 +631,29 @@ namespace gl
     PFNUNIFORM2IVPROC Uniform2iv;
     PFNUNIFORM3IVPROC Uniform3iv;
     PFNUNIFORM4IVPROC Uniform4iv;
-    PFNUNIFORMMATRIX2FVPROC UniformMatrix2fv;
-    PFNUNIFORMMATRIX3FVPROC UniformMatrix3fv;
-    PFNUNIFORMMATRIX4FVPROC UniformMatrix4fv;
-    PFNVALIDATEPROGRAMPROC ValidateProgram;
-    PFNVERTEXATTRIBPOINTERPROC VertexAttribPointer;
+    PFNUNIFORMMATRIX2FVPROC ఏకరీతి_Matrix2fv;
+    PFNUNIFORMMATRIX3FVPROC ఏకరీతి_Matrix3fv;
+    PFNUNIFORMMATRIX4FVPROC ఏకరీతి_Matrix4fv;
+    PFNVALIDATEPROGRAMPROC Validate_కార్యక్రమం;
+    PFNVERTEXATTRIBPOINTERPROC శీర్షం_Attrib_సూచిక;
 
     // Extension: 2.1
-    PFNUNIFORMMATRIX2X3FVPROC UniformMatrix2x3fv;
-    PFNUNIFORMMATRIX3X2FVPROC UniformMatrix3x2fv;
-    PFNUNIFORMMATRIX2X4FVPROC UniformMatrix2x4fv;
-    PFNUNIFORMMATRIX4X2FVPROC UniformMatrix4x2fv;
-    PFNUNIFORMMATRIX3X4FVPROC UniformMatrix3x4fv;
-    PFNUNIFORMMATRIX4X3FVPROC UniformMatrix4x3fv;
+    PFNUNIFORMMATRIX2X3FVPROC ఏకరీతి_Matrix2x3fv;
+    PFNUNIFORMMATRIX3X2FVPROC ఏకరీతి_Matrix3x2fv;
+    PFNUNIFORMMATRIX2X4FVPROC ఏకరీతి_Matrix2x4fv;
+    PFNUNIFORMMATRIX4X2FVPROC ఏకరీతి_Matrix4x2fv;
+    PFNUNIFORMMATRIX3X4FVPROC ఏకరీతి_Matrix3x4fv;
+    PFNUNIFORMMATRIX4X3FVPROC ఏకరీతి_Matrix4x3fv;
 
     // Extension: ARB_vertex_array_object
-    PFNBINDVERTEXARRAYPROC BindVertexArray;
-    PFNDELETEVERTEXARRAYSPROC DeleteVertexArrays;
-    PFNGENVERTEXARRAYSPROC GenVertexArrays;
-    PFNISVERTEXARRAYPROC IsVertexArray;
+    PFNBINDVERTEXARRAYPROC Bind_శీర్షం_Array;
+    PFNDELETEVERTEXARRAYSPROC Delete_శీర్షం_Arrays;
+    PFNGENVERTEXARRAYSPROC Gen_శీర్షం_Arrays;
+    PFNISVERTEXARRAYPROC Is_శీర్షం_Array;
 
     // Extension: ARB_map_buffer_range
-    PFNMAPBUFFERRANGEPROC MapBufferRange;
-    PFNFLUSHMAPPEDBUFFERRANGEPROC FlushMappedBufferRange;
+    PFNMAPBUFFERRANGEPROC Map_బఫరు_Range;
+    PFNFLUSHMAPPEDBUFFERRANGEPROC Flush_Mapped_బఫరు_Range;
 
     // Extension: ARB_framebuffer_object
     PFNISRENDERBUFFERPROC IsRenderbuffer;
@@ -666,7 +666,7 @@ namespace gl
     PFNBINDFRAMEBUFFERPROC BindFramebuffer;
     PFNDELETEFRAMEBUFFERSPROC DeleteFramebuffers;
     PFNGENFRAMEBUFFERSPROC GenFramebuffers;
-    PFNCHECKFRAMEBUFFERSTATUSPROC CheckFramebufferStatus;
+    PFNCHECKFRAMEBUFFERSTATUSPROC Check_Framebuffer_స్థితి;
     PFNFRAMEBUFFERTEXTURE1DPROC FramebufferTexture1D;
     PFNFRAMEBUFFERTEXTURE2DPROC FramebufferTexture2D;
     PFNFRAMEBUFFERTEXTURE3DPROC FramebufferTexture3D;
@@ -685,40 +685,40 @@ namespace gl
     PFNDISABLEIPROC Disablei;
     PFNISENABLEDIPROC IsEnabledi;
     PFNBEGINTRANSFORMFEEDBACKPROC BeginTransformFeedback;
-    PFNENDTRANSFORMFEEDBACKPROC EndTransformFeedback;
-    PFNBINDBUFFERRANGEPROC BindBufferRange;
-    PFNBINDBUFFERBASEPROC BindBufferBase;
+    PFNENDTRANSFORMFEEDBACKPROC చివర_Transform_Feedback;
+    PFNBINDBUFFERRANGEPROC Bind_బఫరు_Range;
+    PFNBINDBUFFERBASEPROC Bind_బఫరు_పునాది;
     PFNTRANSFORMFEEDBACKVARYINGSPROC TransformFeedbackVaryings;
     PFNGETTRANSFORMFEEDBACKVARYINGPROC GetTransformFeedbackVarying;
     PFNCLAMPCOLORPROC ClampColor;
     PFNBEGINCONDITIONALRENDERPROC BeginConditionalRender;
-    PFNENDCONDITIONALRENDERPROC EndConditionalRender;
-    PFNVERTEXATTRIBIPOINTERPROC VertexAttribIPointer;
-    PFNGETVERTEXATTRIBIIVPROC GetVertexAttribIiv;
-    PFNGETVERTEXATTRIBIUIVPROC GetVertexAttribIuiv;
-    PFNVERTEXATTRIBI1IPROC VertexAttribI1i;
-    PFNVERTEXATTRIBI2IPROC VertexAttribI2i;
-    PFNVERTEXATTRIBI3IPROC VertexAttribI3i;
-    PFNVERTEXATTRIBI4IPROC VertexAttribI4i;
-    PFNVERTEXATTRIBI1UIPROC VertexAttribI1ui;
-    PFNVERTEXATTRIBI2UIPROC VertexAttribI2ui;
-    PFNVERTEXATTRIBI3UIPROC VertexAttribI3ui;
-    PFNVERTEXATTRIBI4UIPROC VertexAttribI4ui;
-    PFNVERTEXATTRIBI1IVPROC VertexAttribI1iv;
-    PFNVERTEXATTRIBI2IVPROC VertexAttribI2iv;
-    PFNVERTEXATTRIBI3IVPROC VertexAttribI3iv;
-    PFNVERTEXATTRIBI4IVPROC VertexAttribI4iv;
-    PFNVERTEXATTRIBI1UIVPROC VertexAttribI1uiv;
-    PFNVERTEXATTRIBI2UIVPROC VertexAttribI2uiv;
-    PFNVERTEXATTRIBI3UIVPROC VertexAttribI3uiv;
-    PFNVERTEXATTRIBI4UIVPROC VertexAttribI4uiv;
-    PFNVERTEXATTRIBI4BVPROC VertexAttribI4bv;
-    PFNVERTEXATTRIBI4SVPROC VertexAttribI4sv;
-    PFNVERTEXATTRIBI4UBVPROC VertexAttribI4ubv;
-    PFNVERTEXATTRIBI4USVPROC VertexAttribI4usv;
+    PFNENDCONDITIONALRENDERPROC చివర_Conditional_Render;
+    PFNVERTEXATTRIBIPOINTERPROC శీర్షం_Attrib_IPointer;
+    PFNGETVERTEXATTRIBIIVPROC Get_శీర్షం_Attrib_Iiv;
+    PFNGETVERTEXATTRIBIUIVPROC Get_శీర్షం_Attrib_Iuiv;
+    PFNVERTEXATTRIBI1IPROC శీర్షం_Attrib_I1i;
+    PFNVERTEXATTRIBI2IPROC శీర్షం_Attrib_I2i;
+    PFNVERTEXATTRIBI3IPROC శీర్షం_Attrib_I3i;
+    PFNVERTEXATTRIBI4IPROC శీర్షం_Attrib_I4i;
+    PFNVERTEXATTRIBI1UIPROC శీర్షం_Attrib_I1ui;
+    PFNVERTEXATTRIBI2UIPROC శీర్షం_Attrib_I2ui;
+    PFNVERTEXATTRIBI3UIPROC శీర్షం_Attrib_I3ui;
+    PFNVERTEXATTRIBI4UIPROC శీర్షం_Attrib_I4ui;
+    PFNVERTEXATTRIBI1IVPROC శీర్షం_Attrib_I1iv;
+    PFNVERTEXATTRIBI2IVPROC శీర్షం_Attrib_I2iv;
+    PFNVERTEXATTRIBI3IVPROC శీర్షం_Attrib_I3iv;
+    PFNVERTEXATTRIBI4IVPROC శీర్షం_Attrib_I4iv;
+    PFNVERTEXATTRIBI1UIVPROC శీర్షం_Attrib_I1uiv;
+    PFNVERTEXATTRIBI2UIVPROC శీర్షం_Attrib_I2uiv;
+    PFNVERTEXATTRIBI3UIVPROC శీర్షం_Attrib_I3uiv;
+    PFNVERTEXATTRIBI4UIVPROC శీర్షం_Attrib_I4uiv;
+    PFNVERTEXATTRIBI4BVPROC శీర్షం_Attrib_I4bv;
+    PFNVERTEXATTRIBI4SVPROC శీర్షం_Attrib_I4sv;
+    PFNVERTEXATTRIBI4UBVPROC శీర్షం_Attrib_I4ubv;
+    PFNVERTEXATTRIBI4USVPROC శీర్షం_Attrib_I4usv;
     PFNGETUNIFORMUIVPROC GetUniformuiv;
-    PFNBINDFRAGDATALOCATIONPROC BindFragDataLocation;
-    PFNGETFRAGDATALOCATIONPROC GetFragDataLocation;
+    PFNBINDFRAGDATALOCATIONPROC Bind_Frag_దత్తాంశం_Location;
+    PFNGETFRAGDATALOCATIONPROC Get_Frag_దత్తాంశం_Location;
     PFNUNIFORM1UIPROC Uniform1ui;
     PFNUNIFORM2UIPROC Uniform2ui;
     PFNUNIFORM3UIPROC Uniform3ui;
@@ -738,35 +738,35 @@ namespace gl
     PFNGETSTRINGIPROC GetStringi;
 
     // Extension: ARB_uniform_buffer_object
-    PFNGETUNIFORMINDICESPROC GetUniformIndices;
-    PFNGETACTIVEUNIFORMSIVPROC GetActiveUniformsiv;
-    PFNGETACTIVEUNIFORMNAMEPROC GetActiveUniformName;
-    PFNGETUNIFORMBLOCKINDEXPROC GetUniformBlockIndex;
-    PFNGETACTIVEUNIFORMBLOCKIVPROC GetActiveUniformBlockiv;
-    PFNGETACTIVEUNIFORMBLOCKNAMEPROC GetActiveUniformBlockName;
-    PFNUNIFORMBLOCKBINDINGPROC UniformBlockBinding;
+    PFNGETUNIFORMINDICESPROC Get_ఏకరీతి_Indices;
+    PFNGETACTIVEUNIFORMSIVPROC Get_చురుకైన_Uniformsiv;
+    PFNGETACTIVEUNIFORMNAMEPROC Get_చురుకైన_ఏకరీతి_Name;
+    PFNGETUNIFORMBLOCKINDEXPROC Get_ఏకరీతి_ఖండం_సూచీ;
+    PFNGETACTIVEUNIFORMBLOCKIVPROC Get_చురుకైన_ఏకరీతి_Blockiv;
+    PFNGETACTIVEUNIFORMBLOCKNAMEPROC Get_చురుకైన_ఏకరీతి_ఖండం_Name;
+    PFNUNIFORMBLOCKBINDINGPROC ఏకరీతి_ఖండం_Binding;
 
     // Extension: ARB_copy_buffer
-    PFNCOPYBUFFERSUBDATAPROC CopyBufferSubData;
+    PFNCOPYBUFFERSUBDATAPROC Copy_బఫరు_Sub_దత్తాంశం;
 
     // Extension: 3.1
     PFNDRAWARRAYSINSTANCEDPROC DrawArraysInstanced;
     PFNDRAWELEMENTSINSTANCEDPROC DrawElementsInstanced;
-    PFNTEXBUFFERPROC TexBuffer;
-    PFNPRIMITIVERESTARTINDEXPROC PrimitiveRestartIndex;
+    PFNTEXBUFFERPROC Tex_బఫరు;
+    PFNPRIMITIVERESTARTINDEXPROC Primitive_Restart_సూచీ;
 
     // Legacy
     PFNENABLECLIENTSTATEPROC EnableClientState;
     PFNDISABLECLIENTSTATEPROC DisableClientState;
-    PFNVERTEXPOINTERPROC VertexPointer;
-    PFNNORMALPOINTERPROC NormalPointer;
-    PFNCOLORPOINTERPROC ColorPointer;
-    PFNTEXCOORDPOINTERPROC TexCoordPointer;
+    PFNVERTEXPOINTERPROC శీర్షం_సూచిక;
+    PFNNORMALPOINTERPROC సాధారణ_సూచిక;
+    PFNCOLORPOINTERPROC Color_సూచిక;
+    PFNTEXCOORDPOINTERPROC Tex_Coord_సూచిక;
 
     PFNTEXENVIPROC TexEnvi;
 
-    PFNMATRIXMODEPROC MatrixMode;
-    PFNLOADIDENTITYPROC LoadIdentity;
+    PFNMATRIXMODEPROC మాతృక_బహుళకం;
+    PFNLOADIDENTITYPROC ఎక్కించు_తటస్థం;
     PFNORTHOPROC Ortho;
 
     PFNCOLOR3DPROC Color3d;
@@ -776,1679 +776,1679 @@ namespace gl
 
     // Extension: 1.1
 
-    static void CODEGEN_FUNCPTR Switch_CullFace(GLenum mode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CullFace(GLenum బహుళకం)
     {
-        CullFace = (PFNCULLFACEPROC)IntGetProcAddress("glCullFace");
-        CullFace(mode);
+        CullFace = (PFNCULLFACEPROC)Int_Get_Proc_చిరునామా("glCullFace");
+        CullFace(బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FrontFace(GLenum mode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_FrontFace(GLenum బహుళకం)
     {
-        FrontFace = (PFNFRONTFACEPROC)IntGetProcAddress("glFrontFace");
-        FrontFace(mode);
+        FrontFace = (PFNFRONTFACEPROC)Int_Get_Proc_చిరునామా("glFrontFace");
+        FrontFace(బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Hint(GLenum target, GLenum mode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Hint(GLenum target, GLenum బహుళకం)
     {
-        Hint = (PFNHINTPROC)IntGetProcAddress("glHint");
-        Hint(target, mode);
+        Hint = (PFNHINTPROC)Int_Get_Proc_చిరునామా("glHint");
+        Hint(target, బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_LineWidth(GLfloat width)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_పంక్తి_వెడల్పు(GLfloat వెడల్పు)
     {
-        LineWidth = (PFNLINEWIDTHPROC)IntGetProcAddress("glLineWidth");
-        LineWidth(width);
+        పంక్తి_వెడల్పు = (PFNLINEWIDTHPROC)Int_Get_Proc_చిరునామా("glLineWidth");
+        పంక్తి_వెడల్పు(వెడల్పు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointSize(GLfloat size)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_బిందువు_కొలత(GLfloat size)
     {
-        PointSize = (PFNPOINTSIZEPROC)IntGetProcAddress("glPointSize");
-        PointSize(size);
+        బిందువు_కొలత = (PFNPOINTSIZEPROC)Int_Get_Proc_చిరునామా("glPointSize");
+        బిందువు_కొలత(size);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PolygonMode(GLenum face, GLenum mode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Polygon_బహుళకం(GLenum face, GLenum బహుళకం)
     {
-        PolygonMode = (PFNPOLYGONMODEPROC)IntGetProcAddress("glPolygonMode");
-        PolygonMode(face, mode);
+        Polygon_బహుళకం = (PFNPOLYGONMODEPROC)Int_Get_Proc_చిరునామా("glPolygonMode");
+        Polygon_బహుళకం(face, బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Scissor(GLint x, GLint y, GLsizei width, GLsizei height)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Scissor(GLint x, GLint y, GLsizei వెడల్పు, GLsizei ఎత్తు)
     {
-        Scissor = (PFNSCISSORPROC)IntGetProcAddress("glScissor");
-        Scissor(x, y, width, height);
+        Scissor = (PFNSCISSORPROC)Int_Get_Proc_చిరునామా("glScissor");
+        Scissor(x, y, వెడల్పు, ఎత్తు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameterf(GLenum target, GLenum pname, GLfloat param)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexParameterf(GLenum target, GLenum pname, GLfloat param)
     {
-        TexParameterf = (PFNTEXPARAMETERFPROC)IntGetProcAddress("glTexParameterf");
+        TexParameterf = (PFNTEXPARAMETERFPROC)Int_Get_Proc_చిరునామా("glTexParameterf");
         TexParameterf(target, pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexParameterfv(GLenum target, GLenum pname, స్థిరరాశి GLfloat *params)
     {
-        TexParameterfv = (PFNTEXPARAMETERFVPROC)IntGetProcAddress("glTexParameterfv");
+        TexParameterfv = (PFNTEXPARAMETERFVPROC)Int_Get_Proc_చిరునామా("glTexParameterfv");
         TexParameterfv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameteri(GLenum target, GLenum pname, GLint param)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexParameteri(GLenum target, GLenum pname, GLint param)
     {
-        TexParameteri = (PFNTEXPARAMETERIPROC)IntGetProcAddress("glTexParameteri");
+        TexParameteri = (PFNTEXPARAMETERIPROC)Int_Get_Proc_చిరునామా("glTexParameteri");
         TexParameteri(target, pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexParameteriv(GLenum target, GLenum pname, స్థిరరాశి GLint *params)
     {
-        TexParameteriv = (PFNTEXPARAMETERIVPROC)IntGetProcAddress("glTexParameteriv");
+        TexParameteriv = (PFNTEXPARAMETERIVPROC)Int_Get_Proc_చిరునామా("glTexParameteriv");
         TexParameteriv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexImage1D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexImage1D(GLenum target, GLint level, GLint internalformat, GLsizei వెడల్పు, GLint border, GLenum format, GLenum type, స్థిరరాశి GLvoid *pixels)
     {
-        TexImage1D = (PFNTEXIMAGE1DPROC)IntGetProcAddress("glTexImage1D");
-        TexImage1D(target, level, internalformat, width, border, format, type, pixels);
+        TexImage1D = (PFNTEXIMAGE1DPROC)Int_Get_Proc_చిరునామా("glTexImage1D");
+        TexImage1D(target, level, internalformat, వెడల్పు, border, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei వెడల్పు, GLsizei ఎత్తు, GLint border, GLenum format, GLenum type, స్థిరరాశి GLvoid *pixels)
     {
-        TexImage2D = (PFNTEXIMAGE2DPROC)IntGetProcAddress("glTexImage2D");
-        TexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+        TexImage2D = (PFNTEXIMAGE2DPROC)Int_Get_Proc_చిరునామా("glTexImage2D");
+        TexImage2D(target, level, internalformat, వెడల్పు, ఎత్తు, border, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawBuffer(GLenum mode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Draw_బఫరు(GLenum బహుళకం)
     {
-        DrawBuffer = (PFNDRAWBUFFERPROC)IntGetProcAddress("glDrawBuffer");
-        DrawBuffer(mode);
+        Draw_బఫరు = (PFNDRAWBUFFERPROC)Int_Get_Proc_చిరునామా("glDrawBuffer");
+        Draw_బఫరు(బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Clear(GLbitfield mask)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Clear(GLbitfield ముసుగు)
     {
-        Clear = (PFNCLEARPROC)IntGetProcAddress("glClear");
-        Clear(mask);
+        Clear = (PFNCLEARPROC)Int_Get_Proc_చిరునామా("glClear");
+        Clear(ముసుగు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
     {
-        ClearColor = (PFNCLEARCOLORPROC)IntGetProcAddress("glClearColor");
+        ClearColor = (PFNCLEARCOLORPROC)Int_Get_Proc_చిరునామా("glClearColor");
         ClearColor(red, green, blue, alpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearStencil(GLint s)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ClearStencil(GLint s)
     {
-        ClearStencil = (PFNCLEARSTENCILPROC)IntGetProcAddress("glClearStencil");
+        ClearStencil = (PFNCLEARSTENCILPROC)Int_Get_Proc_చిరునామా("glClearStencil");
         ClearStencil(s);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearDepth(GLdouble depth)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Clear_లోతు(GLdouble లోతు)
     {
-        ClearDepth = (PFNCLEARDEPTHPROC)IntGetProcAddress("glClearDepth");
-        ClearDepth(depth);
+        Clear_లోతు = (PFNCLEARDEPTHPROC)Int_Get_Proc_చిరునామా("glClearDepth");
+        Clear_లోతు(లోతు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilMask(GLuint mask)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Stencil_ముసుగు(GLuint ముసుగు)
     {
-        StencilMask = (PFNSTENCILMASKPROC)IntGetProcAddress("glStencilMask");
-        StencilMask(mask);
+        Stencil_ముసుగు = (PFNSTENCILMASKPROC)Int_Get_Proc_చిరునామా("glStencilMask");
+        Stencil_ముసుగు(ముసుగు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Color_ముసుగు(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
-        ColorMask = (PFNCOLORMASKPROC)IntGetProcAddress("glColorMask");
-        ColorMask(red, green, blue, alpha);
+        Color_ముసుగు = (PFNCOLORMASKPROC)Int_Get_Proc_చిరునామా("glColorMask");
+        Color_ముసుగు(red, green, blue, alpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DepthMask(GLboolean flag)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_లోతు_ముసుగు(GLboolean flag)
     {
-        DepthMask = (PFNDEPTHMASKPROC)IntGetProcAddress("glDepthMask");
-        DepthMask(flag);
+        లోతు_ముసుగు = (PFNDEPTHMASKPROC)Int_Get_Proc_చిరునామా("glDepthMask");
+        లోతు_ముసుగు(flag);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Disable(GLenum cap)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Disable(GLenum cap)
     {
-        Disable = (PFNDISABLEPROC)IntGetProcAddress("glDisable");
+        Disable = (PFNDISABLEPROC)Int_Get_Proc_చిరునామా("glDisable");
         Disable(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Enable(GLenum cap)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Enable(GLenum cap)
     {
-        Enable = (PFNENABLEPROC)IntGetProcAddress("glEnable");
+        Enable = (PFNENABLEPROC)Int_Get_Proc_చిరునామా("glEnable");
         Enable(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Finish()
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ముగింపు()
     {
-        Finish = (PFNFINISHPROC)IntGetProcAddress("glFinish");
-        Finish();
+        ముగింపు = (PFNFINISHPROC)Int_Get_Proc_చిరునామా("glFinish");
+        ముగింపు();
     }
 
-    static void CODEGEN_FUNCPTR Switch_Flush()
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Flush()
     {
-        Flush = (PFNFLUSHPROC)IntGetProcAddress("glFlush");
+        Flush = (PFNFLUSHPROC)Int_Get_Proc_చిరునామా("glFlush");
         Flush();
     }
 
-    static void CODEGEN_FUNCPTR Switch_BlendFunc(GLenum sfactor, GLenum dfactor)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BlendFunc(GLenum sfactor, GLenum dfactor)
     {
-        BlendFunc = (PFNBLENDFUNCPROC)IntGetProcAddress("glBlendFunc");
+        BlendFunc = (PFNBLENDFUNCPROC)Int_Get_Proc_చిరునామా("glBlendFunc");
         BlendFunc(sfactor, dfactor);
     }
 
-    static void CODEGEN_FUNCPTR Switch_LogicOp(GLenum opcode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_LogicOp(GLenum opcode)
     {
-        LogicOp = (PFNLOGICOPPROC)IntGetProcAddress("glLogicOp");
+        LogicOp = (PFNLOGICOPPROC)Int_Get_Proc_చిరునామా("glLogicOp");
         LogicOp(opcode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilFunc(GLenum func, GLint ref, GLuint mask)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_StencilFunc(GLenum func, GLint ref, GLuint ముసుగు)
     {
-        StencilFunc = (PFNSTENCILFUNCPROC)IntGetProcAddress("glStencilFunc");
-        StencilFunc(func, ref, mask);
+        StencilFunc = (PFNSTENCILFUNCPROC)Int_Get_Proc_చిరునామా("glStencilFunc");
+        StencilFunc(func, ref, ముసుగు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
     {
-        StencilOp = (PFNSTENCILOPPROC)IntGetProcAddress("glStencilOp");
+        StencilOp = (PFNSTENCILOPPROC)Int_Get_Proc_చిరునామా("glStencilOp");
         StencilOp(fail, zfail, zpass);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DepthFunc(GLenum func)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_లోతు_Func(GLenum func)
     {
-        DepthFunc = (PFNDEPTHFUNCPROC)IntGetProcAddress("glDepthFunc");
-        DepthFunc(func);
+        లోతు_Func = (PFNDEPTHFUNCPROC)Int_Get_Proc_చిరునామా("glDepthFunc");
+        లోతు_Func(func);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PixelStoref(GLenum pname, GLfloat param)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_PixelStoref(GLenum pname, GLfloat param)
     {
-        PixelStoref = (PFNPIXELSTOREFPROC)IntGetProcAddress("glPixelStoref");
+        PixelStoref = (PFNPIXELSTOREFPROC)Int_Get_Proc_చిరునామా("glPixelStoref");
         PixelStoref(pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PixelStorei(GLenum pname, GLint param)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_PixelStorei(GLenum pname, GLint param)
     {
-        PixelStorei = (PFNPIXELSTOREIPROC)IntGetProcAddress("glPixelStorei");
+        PixelStorei = (PFNPIXELSTOREIPROC)Int_Get_Proc_చిరునామా("glPixelStorei");
         PixelStorei(pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ReadBuffer(GLenum mode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Read_బఫరు(GLenum బహుళకం)
     {
-        ReadBuffer = (PFNREADBUFFERPROC)IntGetProcAddress("glReadBuffer");
-        ReadBuffer(mode);
+        Read_బఫరు = (PFNREADBUFFERPROC)Int_Get_Proc_చిరునామా("glReadBuffer");
+        Read_బఫరు(బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ReadPixels(GLint x, GLint y, GLsizei వెడల్పు, GLsizei ఎత్తు, GLenum format, GLenum type, GLvoid *pixels)
     {
-        ReadPixels = (PFNREADPIXELSPROC)IntGetProcAddress("glReadPixels");
-        ReadPixels(x, y, width, height, format, type, pixels);
+        ReadPixels = (PFNREADPIXELSPROC)Int_Get_Proc_చిరునామా("glReadPixels");
+        ReadPixels(x, y, వెడల్పు, ఎత్తు, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBooleanv(GLenum pname, GLboolean *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetBooleanv(GLenum pname, GLboolean *params)
     {
-        GetBooleanv = (PFNGETBOOLEANVPROC)IntGetProcAddress("glGetBooleanv");
+        GetBooleanv = (PFNGETBOOLEANVPROC)Int_Get_Proc_చిరునామా("glGetBooleanv");
         GetBooleanv(pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetDoublev(GLenum pname, GLdouble *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetDoublev(GLenum pname, GLdouble *params)
     {
-        GetDoublev = (PFNGETDOUBLEVPROC)IntGetProcAddress("glGetDoublev");
+        GetDoublev = (PFNGETDOUBLEVPROC)Int_Get_Proc_చిరునామా("glGetDoublev");
         GetDoublev(pname, params);
     }
 
-    static GLenum CODEGEN_FUNCPTR Switch_GetError()
+    స్థిర GLenum CODEGEN_FUNCPTR Switch_GetError()
     {
-        GetError = (PFNGETERRORPROC)IntGetProcAddress("glGetError");
-        return GetError();
+        GetError = (PFNGETERRORPROC)Int_Get_Proc_చిరునామా("glGetError");
+        తిరిగి GetError();
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetFloatv(GLenum pname, GLfloat *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetFloatv(GLenum pname, GLfloat *params)
     {
-        GetFloatv = (PFNGETFLOATVPROC)IntGetProcAddress("glGetFloatv");
+        GetFloatv = (PFNGETFLOATVPROC)Int_Get_Proc_చిరునామా("glGetFloatv");
         GetFloatv(pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetIntegerv(GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetIntegerv(GLenum pname, GLint *params)
     {
-        GetIntegerv = (PFNGETINTEGERVPROC)IntGetProcAddress("glGetIntegerv");
+        GetIntegerv = (PFNGETINTEGERVPROC)Int_Get_Proc_చిరునామా("glGetIntegerv");
         GetIntegerv(pname, params);
     }
 
-    static const GLubyte * CODEGEN_FUNCPTR Switch_GetString(GLenum name)
+    స్థిర స్థిరరాశి GLubyte * CODEGEN_FUNCPTR Switch_GetString(GLenum name)
     {
-        GetString = (PFNGETSTRINGPROC)IntGetProcAddress("glGetString");
-        return GetString(name);
+        GetString = (PFNGETSTRINGPROC)Int_Get_Proc_చిరునామా("glGetString");
+        తిరిగి GetString(name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels)
     {
-        GetTexImage = (PFNGETTEXIMAGEPROC)IntGetProcAddress("glGetTexImage");
+        GetTexImage = (PFNGETTEXIMAGEPROC)Int_Get_Proc_చిరునామా("glGetTexImage");
         GetTexImage(target, level, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
     {
-        GetTexParameterfv = (PFNGETTEXPARAMETERFVPROC)IntGetProcAddress("glGetTexParameterfv");
+        GetTexParameterfv = (PFNGETTEXPARAMETERFVPROC)Int_Get_Proc_చిరునామా("glGetTexParameterfv");
         GetTexParameterfv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexParameteriv(GLenum target, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetTexParameteriv(GLenum target, GLenum pname, GLint *params)
     {
-        GetTexParameteriv = (PFNGETTEXPARAMETERIVPROC)IntGetProcAddress("glGetTexParameteriv");
+        GetTexParameteriv = (PFNGETTEXPARAMETERIVPROC)Int_Get_Proc_చిరునామా("glGetTexParameteriv");
         GetTexParameteriv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexLevelParameterfv(GLenum target, GLint level, GLenum pname, GLfloat *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetTexLevelParameterfv(GLenum target, GLint level, GLenum pname, GLfloat *params)
     {
-        GetTexLevelParameterfv = (PFNGETTEXLEVELPARAMETERFVPROC)IntGetProcAddress("glGetTexLevelParameterfv");
+        GetTexLevelParameterfv = (PFNGETTEXLEVELPARAMETERFVPROC)Int_Get_Proc_చిరునామా("glGetTexLevelParameterfv");
         GetTexLevelParameterfv(target, level, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint *params)
     {
-        GetTexLevelParameteriv = (PFNGETTEXLEVELPARAMETERIVPROC)IntGetProcAddress("glGetTexLevelParameteriv");
+        GetTexLevelParameteriv = (PFNGETTEXLEVELPARAMETERIVPROC)Int_Get_Proc_చిరునామా("glGetTexLevelParameteriv");
         GetTexLevelParameteriv(target, level, pname, params);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsEnabled(GLenum cap)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_IsEnabled(GLenum cap)
     {
-        IsEnabled = (PFNISENABLEDPROC)IntGetProcAddress("glIsEnabled");
-        return IsEnabled(cap);
+        IsEnabled = (PFNISENABLEDPROC)Int_Get_Proc_చిరునామా("glIsEnabled");
+        తిరిగి IsEnabled(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DepthRange(GLdouble ren_near, GLdouble ren_far)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_లోతు_Range(GLdouble ren_near, GLdouble ren_far)
     {
-        DepthRange = (PFNDEPTHRANGEPROC)IntGetProcAddress("glDepthRange");
-        DepthRange(ren_near, ren_far);
+        లోతు_Range = (PFNDEPTHRANGEPROC)Int_Get_Proc_చిరునామా("glDepthRange");
+        లోతు_Range(ren_near, ren_far);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Viewport(GLint x, GLint y, GLsizei వెడల్పు, GLsizei ఎత్తు)
     {
-        Viewport = (PFNVIEWPORTPROC)IntGetProcAddress("glViewport");
-        Viewport(x, y, width, height);
+        Viewport = (PFNVIEWPORTPROC)Int_Get_Proc_చిరునామా("glViewport");
+        Viewport(x, y, వెడల్పు, ఎత్తు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawArrays(GLenum mode, GLint first, GLsizei count)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DrawArrays(GLenum బహుళకం, GLint first, GLsizei లెక్క_2)
     {
-        DrawArrays = (PFNDRAWARRAYSPROC)IntGetProcAddress("glDrawArrays");
-        DrawArrays(mode, first, count);
+        DrawArrays = (PFNDRAWARRAYSPROC)Int_Get_Proc_చిరునామా("glDrawArrays");
+        DrawArrays(బహుళకం, first, లెక్క_2);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DrawElements(GLenum బహుళకం, GLsizei లెక్క_2, GLenum type, స్థిరరాశి GLvoid *indices)
     {
-        DrawElements = (PFNDRAWELEMENTSPROC)IntGetProcAddress("glDrawElements");
-        DrawElements(mode, count, type, indices);
+        DrawElements = (PFNDRAWELEMENTSPROC)Int_Get_Proc_చిరునామా("glDrawElements");
+        DrawElements(బహుళకం, లెక్క_2, type, indices);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetPointerv(GLenum pname, GLvoid* *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetPointerv(GLenum pname, GLvoid* *params)
     {
-        GetPointerv = (PFNGETPOINTERVPROC)IntGetProcAddress("glGetPointerv");
+        GetPointerv = (PFNGETPOINTERVPROC)Int_Get_Proc_చిరునామా("glGetPointerv");
         GetPointerv(pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PolygonOffset(GLfloat factor, GLfloat units)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Polygon_స్థానభ్రంశం(GLfloat గుణకం, GLfloat units)
     {
-        PolygonOffset = (PFNPOLYGONOFFSETPROC)IntGetProcAddress("glPolygonOffset");
-        PolygonOffset(factor, units);
+        Polygon_స్థానభ్రంశం = (PFNPOLYGONOFFSETPROC)Int_Get_Proc_చిరునామా("glPolygonOffset");
+        Polygon_స్థానభ్రంశం(గుణకం, units);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexImage1D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLint border)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CopyTexImage1D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei వెడల్పు, GLint border)
     {
-        CopyTexImage1D = (PFNCOPYTEXIMAGE1DPROC)IntGetProcAddress("glCopyTexImage1D");
-        CopyTexImage1D(target, level, internalformat, x, y, width, border);
+        CopyTexImage1D = (PFNCOPYTEXIMAGE1DPROC)Int_Get_Proc_చిరునామా("glCopyTexImage1D");
+        CopyTexImage1D(target, level, internalformat, x, y, వెడల్పు, border);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei వెడల్పు, GLsizei ఎత్తు, GLint border)
     {
-        CopyTexImage2D = (PFNCOPYTEXIMAGE2DPROC)IntGetProcAddress("glCopyTexImage2D");
-        CopyTexImage2D(target, level, internalformat, x, y, width, height, border);
+        CopyTexImage2D = (PFNCOPYTEXIMAGE2DPROC)Int_Get_Proc_చిరునామా("glCopyTexImage2D");
+        CopyTexImage2D(target, level, internalformat, x, y, వెడల్పు, ఎత్తు, border);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CopyTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei వెడల్పు)
     {
-        CopyTexSubImage1D = (PFNCOPYTEXSUBIMAGE1DPROC)IntGetProcAddress("glCopyTexSubImage1D");
-        CopyTexSubImage1D(target, level, xoffset, x, y, width);
+        CopyTexSubImage1D = (PFNCOPYTEXSUBIMAGE1DPROC)Int_Get_Proc_చిరునామా("glCopyTexSubImage1D");
+        CopyTexSubImage1D(target, level, xoffset, x, y, వెడల్పు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei వెడల్పు, GLsizei ఎత్తు)
     {
-        CopyTexSubImage2D = (PFNCOPYTEXSUBIMAGE2DPROC)IntGetProcAddress("glCopyTexSubImage2D");
-        CopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
+        CopyTexSubImage2D = (PFNCOPYTEXSUBIMAGE2DPROC)Int_Get_Proc_చిరునామా("glCopyTexSubImage2D");
+        CopyTexSubImage2D(target, level, xoffset, yoffset, x, y, వెడల్పు, ఎత్తు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei వెడల్పు, GLenum format, GLenum type, స్థిరరాశి GLvoid *pixels)
     {
-        TexSubImage1D = (PFNTEXSUBIMAGE1DPROC)IntGetProcAddress("glTexSubImage1D");
-        TexSubImage1D(target, level, xoffset, width, format, type, pixels);
+        TexSubImage1D = (PFNTEXSUBIMAGE1DPROC)Int_Get_Proc_చిరునామా("glTexSubImage1D");
+        TexSubImage1D(target, level, xoffset, వెడల్పు, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei వెడల్పు, GLsizei ఎత్తు, GLenum format, GLenum type, స్థిరరాశి GLvoid *pixels)
     {
-        TexSubImage2D = (PFNTEXSUBIMAGE2DPROC)IntGetProcAddress("glTexSubImage2D");
-        TexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+        TexSubImage2D = (PFNTEXSUBIMAGE2DPROC)Int_Get_Proc_చిరునామా("glTexSubImage2D");
+        TexSubImage2D(target, level, xoffset, yoffset, వెడల్పు, ఎత్తు, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindTexture(GLenum target, GLuint texture)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BindTexture(GLenum target, GLuint texture)
     {
-        BindTexture = (PFNBINDTEXTUREPROC)IntGetProcAddress("glBindTexture");
+        BindTexture = (PFNBINDTEXTUREPROC)Int_Get_Proc_చిరునామా("glBindTexture");
         BindTexture(target, texture);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteTextures(GLsizei n, const GLuint *textures)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DeleteTextures(GLsizei n, స్థిరరాశి GLuint *textures)
     {
-        DeleteTextures = (PFNDELETETEXTURESPROC)IntGetProcAddress("glDeleteTextures");
+        DeleteTextures = (PFNDELETETEXTURESPROC)Int_Get_Proc_చిరునామా("glDeleteTextures");
         DeleteTextures(n, textures);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenTextures(GLsizei n, GLuint *textures)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GenTextures(GLsizei n, GLuint *textures)
     {
-        GenTextures = (PFNGENTEXTURESPROC)IntGetProcAddress("glGenTextures");
+        GenTextures = (PFNGENTEXTURESPROC)Int_Get_Proc_చిరునామా("glGenTextures");
         GenTextures(n, textures);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsTexture(GLuint texture)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_IsTexture(GLuint texture)
     {
-        IsTexture = (PFNISTEXTUREPROC)IntGetProcAddress("glIsTexture");
-        return IsTexture(texture);
+        IsTexture = (PFNISTEXTUREPROC)Int_Get_Proc_చిరునామా("glIsTexture");
+        తిరిగి IsTexture(texture);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Indexub(GLubyte c)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Indexub(GLubyte c)
     {
-        Indexub = (PFNINDEXUBPROC)IntGetProcAddress("glIndexub");
+        Indexub = (PFNINDEXUBPROC)Int_Get_Proc_చిరునామా("glIndexub");
         Indexub(c);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Indexubv(const GLubyte *c)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Indexubv(స్థిరరాశి GLubyte *c)
     {
-        Indexubv = (PFNINDEXUBVPROC)IntGetProcAddress("glIndexubv");
+        Indexubv = (PFNINDEXUBVPROC)Int_Get_Proc_చిరునామా("glIndexubv");
         Indexubv(c);
     }
 
     // Extension: 1.2
 
-    static void CODEGEN_FUNCPTR Switch_BlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
     {
-        BlendColor = (PFNBLENDCOLORPROC)IntGetProcAddress("glBlendColor");
+        BlendColor = (PFNBLENDCOLORPROC)Int_Get_Proc_చిరునామా("glBlendColor");
         BlendColor(red, green, blue, alpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BlendEquation(GLenum mode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BlendEquation(GLenum బహుళకం)
     {
-        BlendEquation = (PFNBLENDEQUATIONPROC)IntGetProcAddress("glBlendEquation");
-        BlendEquation(mode);
+        BlendEquation = (PFNBLENDEQUATIONPROC)Int_Get_Proc_చిరునామా("glBlendEquation");
+        BlendEquation(బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DrawRangeElements(GLenum బహుళకం, GLuint ప్రారంభం, GLuint end, GLsizei లెక్క_2, GLenum type, స్థిరరాశి GLvoid *indices)
     {
-        DrawRangeElements = (PFNDRAWRANGEELEMENTSPROC)IntGetProcAddress("glDrawRangeElements");
-        DrawRangeElements(mode, start, end, count, type, indices);
+        DrawRangeElements = (PFNDRAWRANGEELEMENTSPROC)Int_Get_Proc_చిరునామా("glDrawRangeElements");
+        DrawRangeElements(బహుళకం, ప్రారంభం, end, లెక్క_2, type, indices);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid *pixels)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei వెడల్పు, GLsizei ఎత్తు, GLsizei లోతు, GLenum format, GLenum type, స్థిరరాశి GLvoid *pixels)
     {
-        TexSubImage3D = (PFNTEXSUBIMAGE3DPROC)IntGetProcAddress("glTexSubImage3D");
-        TexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels);
+        TexSubImage3D = (PFNTEXSUBIMAGE3DPROC)Int_Get_Proc_చిరునామా("glTexSubImage3D");
+        TexSubImage3D(target, level, xoffset, yoffset, zoffset, వెడల్పు, ఎత్తు, లోతు, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CopyTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei వెడల్పు, GLsizei ఎత్తు)
     {
-        CopyTexSubImage3D = (PFNCOPYTEXSUBIMAGE3DPROC)IntGetProcAddress("glCopyTexSubImage3D");
-        CopyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height);
+        CopyTexSubImage3D = (PFNCOPYTEXSUBIMAGE3DPROC)Int_Get_Proc_చిరునామా("glCopyTexSubImage3D");
+        CopyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, వెడల్పు, ఎత్తు);
     }
 
     // Extension: 1.3
 
-    static void CODEGEN_FUNCPTR Switch_ActiveTexture(GLenum texture)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_చురుకైన_Texture(GLenum texture)
     {
-        ActiveTexture = (PFNACTIVETEXTUREPROC)IntGetProcAddress("glActiveTexture");
-        ActiveTexture(texture);
+        చురుకైన_Texture = (PFNACTIVETEXTUREPROC)Int_Get_Proc_చిరునామా("glActiveTexture");
+        చురుకైన_Texture(texture);
     }
 
-    static void CODEGEN_FUNCPTR Switch_SampleCoverage(GLfloat value, GLboolean invert)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_SampleCoverage(GLfloat value, GLboolean invert)
     {
-        SampleCoverage = (PFNSAMPLECOVERAGEPROC)IntGetProcAddress("glSampleCoverage");
+        SampleCoverage = (PFNSAMPLECOVERAGEPROC)Int_Get_Proc_చిరునామా("glSampleCoverage");
         SampleCoverage(value, invert);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexImage3D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CompressedTexImage3D(GLenum target, GLint level, GLenum internalformat, GLsizei వెడల్పు, GLsizei ఎత్తు, GLsizei లోతు, GLint border, GLsizei image_కొలత, స్థిరరాశి GLvoid *దత్తాంశం)
     {
-        CompressedTexImage3D = (PFNCOMPRESSEDTEXIMAGE3DPROC)IntGetProcAddress("glCompressedTexImage3D");
-        CompressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data);
+        CompressedTexImage3D = (PFNCOMPRESSEDTEXIMAGE3DPROC)Int_Get_Proc_చిరునామా("glCompressedTexImage3D");
+        CompressedTexImage3D(target, level, internalformat, వెడల్పు, ఎత్తు, లోతు, border, image_కొలత, దత్తాంశం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei వెడల్పు, GLsizei ఎత్తు, GLint border, GLsizei image_కొలత, స్థిరరాశి GLvoid *దత్తాంశం)
     {
-        CompressedTexImage2D = (PFNCOMPRESSEDTEXIMAGE2DPROC)IntGetProcAddress("glCompressedTexImage2D");
-        CompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data);
+        CompressedTexImage2D = (PFNCOMPRESSEDTEXIMAGE2DPROC)Int_Get_Proc_చిరునామా("glCompressedTexImage2D");
+        CompressedTexImage2D(target, level, internalformat, వెడల్పు, ఎత్తు, border, image_కొలత, దత్తాంశం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexImage1D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CompressedTexImage1D(GLenum target, GLint level, GLenum internalformat, GLsizei వెడల్పు, GLint border, GLsizei image_కొలత, స్థిరరాశి GLvoid *దత్తాంశం)
     {
-        CompressedTexImage1D = (PFNCOMPRESSEDTEXIMAGE1DPROC)IntGetProcAddress("glCompressedTexImage1D");
-        CompressedTexImage1D(target, level, internalformat, width, border, imageSize, data);
+        CompressedTexImage1D = (PFNCOMPRESSEDTEXIMAGE1DPROC)Int_Get_Proc_చిరునామా("glCompressedTexImage1D");
+        CompressedTexImage1D(target, level, internalformat, వెడల్పు, border, image_కొలత, దత్తాంశం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei వెడల్పు, GLsizei ఎత్తు, GLsizei లోతు, GLenum format, GLsizei image_కొలత, స్థిరరాశి GLvoid *దత్తాంశం)
     {
-        CompressedTexSubImage3D = (PFNCOMPRESSEDTEXSUBIMAGE3DPROC)IntGetProcAddress("glCompressedTexSubImage3D");
-        CompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data);
+        CompressedTexSubImage3D = (PFNCOMPRESSEDTEXSUBIMAGE3DPROC)Int_Get_Proc_చిరునామా("glCompressedTexSubImage3D");
+        CompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, వెడల్పు, ఎత్తు, లోతు, format, image_కొలత, దత్తాంశం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei వెడల్పు, GLsizei ఎత్తు, GLenum format, GLsizei image_కొలత, స్థిరరాశి GLvoid *దత్తాంశం)
     {
-        CompressedTexSubImage2D = (PFNCOMPRESSEDTEXSUBIMAGE2DPROC)IntGetProcAddress("glCompressedTexSubImage2D");
-        CompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data);
+        CompressedTexSubImage2D = (PFNCOMPRESSEDTEXSUBIMAGE2DPROC)Int_Get_Proc_చిరునామా("glCompressedTexSubImage2D");
+        CompressedTexSubImage2D(target, level, xoffset, yoffset, వెడల్పు, ఎత్తు, format, image_కొలత, దత్తాంశం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CompressedTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei వెడల్పు, GLenum format, GLsizei image_కొలత, స్థిరరాశి GLvoid *దత్తాంశం)
     {
-        CompressedTexSubImage1D = (PFNCOMPRESSEDTEXSUBIMAGE1DPROC)IntGetProcAddress("glCompressedTexSubImage1D");
-        CompressedTexSubImage1D(target, level, xoffset, width, format, imageSize, data);
+        CompressedTexSubImage1D = (PFNCOMPRESSEDTEXSUBIMAGE1DPROC)Int_Get_Proc_చిరునామా("glCompressedTexSubImage1D");
+        CompressedTexSubImage1D(target, level, xoffset, వెడల్పు, format, image_కొలత, దత్తాంశం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetCompressedTexImage(GLenum target, GLint level, GLvoid *img)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetCompressedTexImage(GLenum target, GLint level, GLvoid *img)
     {
-        GetCompressedTexImage = (PFNGETCOMPRESSEDTEXIMAGEPROC)IntGetProcAddress("glGetCompressedTexImage");
+        GetCompressedTexImage = (PFNGETCOMPRESSEDTEXIMAGEPROC)Int_Get_Proc_చిరునామా("glGetCompressedTexImage");
         GetCompressedTexImage(target, level, img);
     }
 
     // Extension: 1.4
 
-    static void CODEGEN_FUNCPTR Switch_BlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
     {
-        BlendFuncSeparate = (PFNBLENDFUNCSEPARATEPROC)IntGetProcAddress("glBlendFuncSeparate");
+        BlendFuncSeparate = (PFNBLENDFUNCSEPARATEPROC)Int_Get_Proc_చిరునామా("glBlendFuncSeparate");
         BlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_MultiDrawArrays(GLenum mode, const GLint *first, const GLsizei *count, GLsizei drawcount)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_MultiDrawArrays(GLenum బహుళకం, స్థిరరాశి GLint *first, స్థిరరాశి GLsizei *లెక్క_2, GLsizei drawcount)
     {
-        MultiDrawArrays = (PFNMULTIDRAWARRAYSPROC)IntGetProcAddress("glMultiDrawArrays");
-        MultiDrawArrays(mode, first, count, drawcount);
+        MultiDrawArrays = (PFNMULTIDRAWARRAYSPROC)Int_Get_Proc_చిరునామా("glMultiDrawArrays");
+        MultiDrawArrays(బహుళకం, first, లెక్క_2, drawcount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_MultiDrawElements(GLenum mode, const GLsizei *count, GLenum type, const GLvoid* const *indices, GLsizei drawcount)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_MultiDrawElements(GLenum బహుళకం, స్థిరరాశి GLsizei *లెక్క_2, GLenum type, స్థిరరాశి GLvoid* స్థిరరాశి *indices, GLsizei drawcount)
     {
-        MultiDrawElements = (PFNMULTIDRAWELEMENTSPROC)IntGetProcAddress("glMultiDrawElements");
-        MultiDrawElements(mode, count, type, indices, drawcount);
+        MultiDrawElements = (PFNMULTIDRAWELEMENTSPROC)Int_Get_Proc_చిరునామా("glMultiDrawElements");
+        MultiDrawElements(బహుళకం, లెక్క_2, type, indices, drawcount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointParameterf(GLenum pname, GLfloat param)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_బిందువు_Parameterf(GLenum pname, GLfloat param)
     {
-        PointParameterf = (PFNPOINTPARAMETERFPROC)IntGetProcAddress("glPointParameterf");
-        PointParameterf(pname, param);
+        బిందువు_Parameterf = (PFNPOINTPARAMETERFPROC)Int_Get_Proc_చిరునామా("glPointParameterf");
+        బిందువు_Parameterf(pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointParameterfv(GLenum pname, const GLfloat *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_బిందువు_Parameterfv(GLenum pname, స్థిరరాశి GLfloat *params)
     {
-        PointParameterfv = (PFNPOINTPARAMETERFVPROC)IntGetProcAddress("glPointParameterfv");
-        PointParameterfv(pname, params);
+        బిందువు_Parameterfv = (PFNPOINTPARAMETERFVPROC)Int_Get_Proc_చిరునామా("glPointParameterfv");
+        బిందువు_Parameterfv(pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointParameteri(GLenum pname, GLint param)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_బిందువు_Parameteri(GLenum pname, GLint param)
     {
-        PointParameteri = (PFNPOINTPARAMETERIPROC)IntGetProcAddress("glPointParameteri");
-        PointParameteri(pname, param);
+        బిందువు_Parameteri = (PFNPOINTPARAMETERIPROC)Int_Get_Proc_చిరునామా("glPointParameteri");
+        బిందువు_Parameteri(pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointParameteriv(GLenum pname, const GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_బిందువు_Parameteriv(GLenum pname, స్థిరరాశి GLint *params)
     {
-        PointParameteriv = (PFNPOINTPARAMETERIVPROC)IntGetProcAddress("glPointParameteriv");
-        PointParameteriv(pname, params);
+        బిందువు_Parameteriv = (PFNPOINTPARAMETERIVPROC)Int_Get_Proc_చిరునామా("glPointParameteriv");
+        బిందువు_Parameteriv(pname, params);
     }
 
     // Extension: 1.5
 
-    static void CODEGEN_FUNCPTR Switch_GenQueries(GLsizei n, GLuint *ids)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GenQueries(GLsizei n, GLuint *ids)
     {
-        GenQueries = (PFNGENQUERIESPROC)IntGetProcAddress("glGenQueries");
+        GenQueries = (PFNGENQUERIESPROC)Int_Get_Proc_చిరునామా("glGenQueries");
         GenQueries(n, ids);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteQueries(GLsizei n, const GLuint *ids)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DeleteQueries(GLsizei n, స్థిరరాశి GLuint *ids)
     {
-        DeleteQueries = (PFNDELETEQUERIESPROC)IntGetProcAddress("glDeleteQueries");
+        DeleteQueries = (PFNDELETEQUERIESPROC)Int_Get_Proc_చిరునామా("glDeleteQueries");
         DeleteQueries(n, ids);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsQuery(GLuint id)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_IsQuery(GLuint id)
     {
-        IsQuery = (PFNISQUERYPROC)IntGetProcAddress("glIsQuery");
-        return IsQuery(id);
+        IsQuery = (PFNISQUERYPROC)Int_Get_Proc_చిరునామా("glIsQuery");
+        తిరిగి IsQuery(id);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BeginQuery(GLenum target, GLuint id)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BeginQuery(GLenum target, GLuint id)
     {
-        BeginQuery = (PFNBEGINQUERYPROC)IntGetProcAddress("glBeginQuery");
+        BeginQuery = (PFNBEGINQUERYPROC)Int_Get_Proc_చిరునామా("glBeginQuery");
         BeginQuery(target, id);
     }
 
-    static void CODEGEN_FUNCPTR Switch_EndQuery(GLenum target)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_చివర_Query(GLenum target)
     {
-        EndQuery = (PFNENDQUERYPROC)IntGetProcAddress("glEndQuery");
-        EndQuery(target);
+        చివర_Query = (PFNENDQUERYPROC)Int_Get_Proc_చిరునామా("glEndQuery");
+        చివర_Query(target);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetQueryiv(GLenum target, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetQueryiv(GLenum target, GLenum pname, GLint *params)
     {
-        GetQueryiv = (PFNGETQUERYIVPROC)IntGetProcAddress("glGetQueryiv");
+        GetQueryiv = (PFNGETQUERYIVPROC)Int_Get_Proc_చిరునామా("glGetQueryiv");
         GetQueryiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetQueryObjectiv(GLuint id, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetQueryObjectiv(GLuint id, GLenum pname, GLint *params)
     {
-        GetQueryObjectiv = (PFNGETQUERYOBJECTIVPROC)IntGetProcAddress("glGetQueryObjectiv");
+        GetQueryObjectiv = (PFNGETQUERYOBJECTIVPROC)Int_Get_Proc_చిరునామా("glGetQueryObjectiv");
         GetQueryObjectiv(id, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params)
     {
-        GetQueryObjectuiv = (PFNGETQUERYOBJECTUIVPROC)IntGetProcAddress("glGetQueryObjectuiv");
+        GetQueryObjectuiv = (PFNGETQUERYOBJECTUIVPROC)Int_Get_Proc_చిరునామా("glGetQueryObjectuiv");
         GetQueryObjectuiv(id, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindBuffer(GLenum target, GLuint buffer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Bind_బఫరు(GLenum target, GLuint బఫరు)
     {
-        BindBuffer = (PFNBINDBUFFERPROC)IntGetProcAddress("glBindBuffer");
-        BindBuffer(target, buffer);
+        Bind_బఫరు = (PFNBINDBUFFERPROC)Int_Get_Proc_చిరునామా("glBindBuffer");
+        Bind_బఫరు(target, బఫరు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteBuffers(GLsizei n, const GLuint *buffers)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DeleteBuffers(GLsizei n, స్థిరరాశి GLuint *buffers)
     {
-        DeleteBuffers = (PFNDELETEBUFFERSPROC)IntGetProcAddress("glDeleteBuffers");
+        DeleteBuffers = (PFNDELETEBUFFERSPROC)Int_Get_Proc_చిరునామా("glDeleteBuffers");
         DeleteBuffers(n, buffers);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenBuffers(GLsizei n, GLuint *buffers)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GenBuffers(GLsizei n, GLuint *buffers)
     {
-        GenBuffers = (PFNGENBUFFERSPROC)IntGetProcAddress("glGenBuffers");
+        GenBuffers = (PFNGENBUFFERSPROC)Int_Get_Proc_చిరునామా("glGenBuffers");
         GenBuffers(n, buffers);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsBuffer(GLuint buffer)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_Is_బఫరు(GLuint బఫరు)
     {
-        IsBuffer = (PFNISBUFFERPROC)IntGetProcAddress("glIsBuffer");
-        return IsBuffer(buffer);
+        Is_బఫరు = (PFNISBUFFERPROC)Int_Get_Proc_చిరునామా("glIsBuffer");
+        తిరిగి Is_బఫరు(బఫరు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BufferData(GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_బఫరు_దత్తాంశం(GLenum target, GLsizeiptr size, స్థిరరాశి GLvoid *దత్తాంశం, GLenum usage)
     {
-        BufferData = (PFNBUFFERDATAPROC)IntGetProcAddress("glBufferData");
-        BufferData(target, size, data, usage);
+        బఫరు_దత్తాంశం = (PFNBUFFERDATAPROC)Int_Get_Proc_చిరునామా("glBufferData");
+        బఫరు_దత్తాంశం(target, size, దత్తాంశం, usage);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_బఫరు_Sub_దత్తాంశం(GLenum target, GLintptr offset, GLsizeiptr size, స్థిరరాశి GLvoid *దత్తాంశం)
     {
-        BufferSubData = (PFNBUFFERSUBDATAPROC)IntGetProcAddress("glBufferSubData");
-        BufferSubData(target, offset, size, data);
+        బఫరు_Sub_దత్తాంశం = (PFNBUFFERSUBDATAPROC)Int_Get_Proc_చిరునామా("glBufferSubData");
+        బఫరు_Sub_దత్తాంశం(target, offset, size, దత్తాంశం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_బఫరు_Sub_దత్తాంశం(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *దత్తాంశం)
     {
-        GetBufferSubData = (PFNGETBUFFERSUBDATAPROC)IntGetProcAddress("glGetBufferSubData");
-        GetBufferSubData(target, offset, size, data);
+        Get_బఫరు_Sub_దత్తాంశం = (PFNGETBUFFERSUBDATAPROC)Int_Get_Proc_చిరునామా("glGetBufferSubData");
+        Get_బఫరు_Sub_దత్తాంశం(target, offset, size, దత్తాంశం);
     }
 
-    static GLvoid* CODEGEN_FUNCPTR Switch_MapBuffer(GLenum target, GLenum access)
+    స్థిర GLvoid* CODEGEN_FUNCPTR Switch_Map_బఫరు(GLenum target, GLenum access)
     {
-        MapBuffer = (PFNMAPBUFFERPROC)IntGetProcAddress("glMapBuffer");
-        return MapBuffer(target, access);
+        Map_బఫరు = (PFNMAPBUFFERPROC)Int_Get_Proc_చిరునామా("glMapBuffer");
+        తిరిగి Map_బఫరు(target, access);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_UnmapBuffer(GLenum target)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_Unmap_బఫరు(GLenum target)
     {
-        UnmapBuffer = (PFNUNMAPBUFFERPROC)IntGetProcAddress("glUnmapBuffer");
-        return UnmapBuffer(target);
+        Unmap_బఫరు = (PFNUNMAPBUFFERPROC)Int_Get_Proc_చిరునామా("glUnmapBuffer");
+        తిరిగి Unmap_బఫరు(target);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBufferParameteriv(GLenum target, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_బఫరు_Parameteriv(GLenum target, GLenum pname, GLint *params)
     {
-        GetBufferParameteriv = (PFNGETBUFFERPARAMETERIVPROC)IntGetProcAddress("glGetBufferParameteriv");
-        GetBufferParameteriv(target, pname, params);
+        Get_బఫరు_Parameteriv = (PFNGETBUFFERPARAMETERIVPROC)Int_Get_Proc_చిరునామా("glGetBufferParameteriv");
+        Get_బఫరు_Parameteriv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBufferPointerv(GLenum target, GLenum pname, GLvoid* *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_బఫరు_Pointerv(GLenum target, GLenum pname, GLvoid* *params)
     {
-        GetBufferPointerv = (PFNGETBUFFERPOINTERVPROC)IntGetProcAddress("glGetBufferPointerv");
-        GetBufferPointerv(target, pname, params);
+        Get_బఫరు_Pointerv = (PFNGETBUFFERPOINTERVPROC)Int_Get_Proc_చిరునామా("glGetBufferPointerv");
+        Get_బఫరు_Pointerv(target, pname, params);
     }
 
     // Extension: 2.0
 
-    static void CODEGEN_FUNCPTR Switch_BlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BlendEquationSeparate(GLenum బహుళకం_RGB, GLenum బహుళకం_Alpha)
     {
-        BlendEquationSeparate = (PFNBLENDEQUATIONSEPARATEPROC)IntGetProcAddress("glBlendEquationSeparate");
-        BlendEquationSeparate(modeRGB, modeAlpha);
+        BlendEquationSeparate = (PFNBLENDEQUATIONSEPARATEPROC)Int_Get_Proc_చిరునామా("glBlendEquationSeparate");
+        BlendEquationSeparate(బహుళకం_RGB, బహుళకం_Alpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawBuffers(GLsizei n, const GLenum *bufs)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DrawBuffers(GLsizei n, స్థిరరాశి GLenum *bufs)
     {
-        DrawBuffers = (PFNDRAWBUFFERSPROC)IntGetProcAddress("glDrawBuffers");
+        DrawBuffers = (PFNDRAWBUFFERSPROC)Int_Get_Proc_చిరునామా("glDrawBuffers");
         DrawBuffers(n, bufs);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilOpSeparate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_StencilOpSeparate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass)
     {
-        StencilOpSeparate = (PFNSTENCILOPSEPARATEPROC)IntGetProcAddress("glStencilOpSeparate");
+        StencilOpSeparate = (PFNSTENCILOPSEPARATEPROC)Int_Get_Proc_చిరునామా("glStencilOpSeparate");
         StencilOpSeparate(face, sfail, dpfail, dppass);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint ముసుగు)
     {
-        StencilFuncSeparate = (PFNSTENCILFUNCSEPARATEPROC)IntGetProcAddress("glStencilFuncSeparate");
-        StencilFuncSeparate(face, func, ref, mask);
+        StencilFuncSeparate = (PFNSTENCILFUNCSEPARATEPROC)Int_Get_Proc_చిరునామా("glStencilFuncSeparate");
+        StencilFuncSeparate(face, func, ref, ముసుగు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilMaskSeparate(GLenum face, GLuint mask)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Stencil_ముసుగు_Separate(GLenum face, GLuint ముసుగు)
     {
-        StencilMaskSeparate = (PFNSTENCILMASKSEPARATEPROC)IntGetProcAddress("glStencilMaskSeparate");
-        StencilMaskSeparate(face, mask);
+        Stencil_ముసుగు_Separate = (PFNSTENCILMASKSEPARATEPROC)Int_Get_Proc_చిరునామా("glStencilMaskSeparate");
+        Stencil_ముసుగు_Separate(face, ముసుగు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_AttachShader(GLuint program, GLuint shader)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_AttachShader(GLuint కార్యక్రమం, GLuint shader)
     {
-        AttachShader = (PFNATTACHSHADERPROC)IntGetProcAddress("glAttachShader");
-        AttachShader(program, shader);
+        AttachShader = (PFNATTACHSHADERPROC)Int_Get_Proc_చిరునామా("glAttachShader");
+        AttachShader(కార్యక్రమం, shader);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindAttribLocation(GLuint program, GLuint index, const GLchar *name)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BindAttribLocation(GLuint కార్యక్రమం, GLuint సూచీ, స్థిరరాశి GLchar *name)
     {
-        BindAttribLocation = (PFNBINDATTRIBLOCATIONPROC)IntGetProcAddress("glBindAttribLocation");
-        BindAttribLocation(program, index, name);
+        BindAttribLocation = (PFNBINDATTRIBLOCATIONPROC)Int_Get_Proc_చిరునామా("glBindAttribLocation");
+        BindAttribLocation(కార్యక్రమం, సూచీ, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompileShader(GLuint shader)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_CompileShader(GLuint shader)
     {
-        CompileShader = (PFNCOMPILESHADERPROC)IntGetProcAddress("glCompileShader");
+        CompileShader = (PFNCOMPILESHADERPROC)Int_Get_Proc_చిరునామా("glCompileShader");
         CompileShader(shader);
     }
 
-    static GLuint CODEGEN_FUNCPTR Switch_CreateProgram()
+    స్థిర GLuint CODEGEN_FUNCPTR Switch_Create_కార్యక్రమం()
     {
-        CreateProgram = (PFNCREATEPROGRAMPROC)IntGetProcAddress("glCreateProgram");
-        return CreateProgram();
+        Create_కార్యక్రమం = (PFNCREATEPROGRAMPROC)Int_Get_Proc_చిరునామా("glCreateProgram");
+        తిరిగి Create_కార్యక్రమం();
     }
 
-    static GLuint CODEGEN_FUNCPTR Switch_CreateShader(GLenum type)
+    స్థిర GLuint CODEGEN_FUNCPTR Switch_CreateShader(GLenum type)
     {
-        CreateShader = (PFNCREATESHADERPROC)IntGetProcAddress("glCreateShader");
-        return CreateShader(type);
+        CreateShader = (PFNCREATESHADERPROC)Int_Get_Proc_చిరునామా("glCreateShader");
+        తిరిగి CreateShader(type);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteProgram(GLuint program)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Delete_కార్యక్రమం(GLuint కార్యక్రమం)
     {
-        DeleteProgram = (PFNDELETEPROGRAMPROC)IntGetProcAddress("glDeleteProgram");
-        DeleteProgram(program);
+        Delete_కార్యక్రమం = (PFNDELETEPROGRAMPROC)Int_Get_Proc_చిరునామా("glDeleteProgram");
+        Delete_కార్యక్రమం(కార్యక్రమం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteShader(GLuint shader)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DeleteShader(GLuint shader)
     {
-        DeleteShader = (PFNDELETESHADERPROC)IntGetProcAddress("glDeleteShader");
+        DeleteShader = (PFNDELETESHADERPROC)Int_Get_Proc_చిరునామా("glDeleteShader");
         DeleteShader(shader);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DetachShader(GLuint program, GLuint shader)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DetachShader(GLuint కార్యక్రమం, GLuint shader)
     {
-        DetachShader = (PFNDETACHSHADERPROC)IntGetProcAddress("glDetachShader");
-        DetachShader(program, shader);
+        DetachShader = (PFNDETACHSHADERPROC)Int_Get_Proc_చిరునామా("glDetachShader");
+        DetachShader(కార్యక్రమం, shader);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DisableVertexAttribArray(GLuint index)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Disable_శీర్షం_Attrib_Array(GLuint సూచీ)
     {
-        DisableVertexAttribArray = (PFNDISABLEVERTEXATTRIBARRAYPROC)IntGetProcAddress("glDisableVertexAttribArray");
-        DisableVertexAttribArray(index);
+        Disable_శీర్షం_Attrib_Array = (PFNDISABLEVERTEXATTRIBARRAYPROC)Int_Get_Proc_చిరునామా("glDisableVertexAttribArray");
+        Disable_శీర్షం_Attrib_Array(సూచీ);
     }
 
-    static void CODEGEN_FUNCPTR Switch_EnableVertexAttribArray(GLuint index)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Enable_శీర్షం_Attrib_Array(GLuint సూచీ)
     {
-        EnableVertexAttribArray = (PFNENABLEVERTEXATTRIBARRAYPROC)IntGetProcAddress("glEnableVertexAttribArray");
-        EnableVertexAttribArray(index);
+        Enable_శీర్షం_Attrib_Array = (PFNENABLEVERTEXATTRIBARRAYPROC)Int_Get_Proc_చిరునామా("glEnableVertexAttribArray");
+        Enable_శీర్షం_Attrib_Array(సూచీ);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveAttrib(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_చురుకైన_Attrib(GLuint కార్యక్రమం, GLuint సూచీ, GLsizei buf_కొలత, GLsizei *length, GLint *size, GLenum *type, GLchar *name)
     {
-        GetActiveAttrib = (PFNGETACTIVEATTRIBPROC)IntGetProcAddress("glGetActiveAttrib");
-        GetActiveAttrib(program, index, bufSize, length, size, type, name);
+        Get_చురుకైన_Attrib = (PFNGETACTIVEATTRIBPROC)Int_Get_Proc_చిరునామా("glGetActiveAttrib");
+        Get_చురుకైన_Attrib(కార్యక్రమం, సూచీ, buf_కొలత, length, size, type, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniform(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_చురుకైన_ఏకరీతి(GLuint కార్యక్రమం, GLuint సూచీ, GLsizei buf_కొలత, GLsizei *length, GLint *size, GLenum *type, GLchar *name)
     {
-        GetActiveUniform = (PFNGETACTIVEUNIFORMPROC)IntGetProcAddress("glGetActiveUniform");
-        GetActiveUniform(program, index, bufSize, length, size, type, name);
+        Get_చురుకైన_ఏకరీతి = (PFNGETACTIVEUNIFORMPROC)Int_Get_Proc_చిరునామా("glGetActiveUniform");
+        Get_చురుకైన_ఏకరీతి(కార్యక్రమం, సూచీ, buf_కొలత, length, size, type, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetAttachedShaders(GLuint program, GLsizei maxCount, GLsizei *count, GLuint *obj)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetAttachedShaders(GLuint కార్యక్రమం, GLsizei max_లెక్క, GLsizei *లెక్క_2, GLuint *obj)
     {
-        GetAttachedShaders = (PFNGETATTACHEDSHADERSPROC)IntGetProcAddress("glGetAttachedShaders");
-        GetAttachedShaders(program, maxCount, count, obj);
+        GetAttachedShaders = (PFNGETATTACHEDSHADERSPROC)Int_Get_Proc_చిరునామా("glGetAttachedShaders");
+        GetAttachedShaders(కార్యక్రమం, max_లెక్క, లెక్క_2, obj);
     }
 
-    static GLint CODEGEN_FUNCPTR Switch_GetAttribLocation(GLuint program, const GLchar *name)
+    స్థిర GLint CODEGEN_FUNCPTR Switch_GetAttribLocation(GLuint కార్యక్రమం, స్థిరరాశి GLchar *name)
     {
-        GetAttribLocation = (PFNGETATTRIBLOCATIONPROC)IntGetProcAddress("glGetAttribLocation");
-        return GetAttribLocation(program, name);
+        GetAttribLocation = (PFNGETATTRIBLOCATIONPROC)Int_Get_Proc_చిరునామా("glGetAttribLocation");
+        తిరిగి GetAttribLocation(కార్యక్రమం, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetProgramiv(GLuint program, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetProgramiv(GLuint కార్యక్రమం, GLenum pname, GLint *params)
     {
-        GetProgramiv = (PFNGETPROGRAMIVPROC)IntGetProcAddress("glGetProgramiv");
-        GetProgramiv(program, pname, params);
+        GetProgramiv = (PFNGETPROGRAMIVPROC)Int_Get_Proc_చిరునామా("glGetProgramiv");
+        GetProgramiv(కార్యక్రమం, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_కార్యక్రమం_Info_Log(GLuint కార్యక్రమం, GLsizei buf_కొలత, GLsizei *length, GLchar *infoLog)
     {
-        GetProgramInfoLog = (PFNGETPROGRAMINFOLOGPROC)IntGetProcAddress("glGetProgramInfoLog");
-        GetProgramInfoLog(program, bufSize, length, infoLog);
+        Get_కార్యక్రమం_Info_Log = (PFNGETPROGRAMINFOLOGPROC)Int_Get_Proc_చిరునామా("glGetProgramInfoLog");
+        Get_కార్యక్రమం_Info_Log(కార్యక్రమం, buf_కొలత, length, infoLog);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetShaderiv(GLuint shader, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetShaderiv(GLuint shader, GLenum pname, GLint *params)
     {
-        GetShaderiv = (PFNGETSHADERIVPROC)IntGetProcAddress("glGetShaderiv");
+        GetShaderiv = (PFNGETSHADERIVPROC)Int_Get_Proc_చిరునామా("glGetShaderiv");
         GetShaderiv(shader, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetShaderInfoLog(GLuint shader, GLsizei buf_కొలత, GLsizei *length, GLchar *infoLog)
     {
-        GetShaderInfoLog = (PFNGETSHADERINFOLOGPROC)IntGetProcAddress("glGetShaderInfoLog");
-        GetShaderInfoLog(shader, bufSize, length, infoLog);
+        GetShaderInfoLog = (PFNGETSHADERINFOLOGPROC)Int_Get_Proc_చిరునామా("glGetShaderInfoLog");
+        GetShaderInfoLog(shader, buf_కొలత, length, infoLog);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetShaderSource(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_Shader_ఆధారం(GLuint shader, GLsizei buf_కొలత, GLsizei *length, GLchar *ఆధారం)
     {
-        GetShaderSource = (PFNGETSHADERSOURCEPROC)IntGetProcAddress("glGetShaderSource");
-        GetShaderSource(shader, bufSize, length, source);
+        Get_Shader_ఆధారం = (PFNGETSHADERSOURCEPROC)Int_Get_Proc_చిరునామా("glGetShaderSource");
+        Get_Shader_ఆధారం(shader, buf_కొలత, length, ఆధారం);
     }
 
-    static GLint CODEGEN_FUNCPTR Switch_GetUniformLocation(GLuint program, const GLchar *name)
+    స్థిర GLint CODEGEN_FUNCPTR Switch_Get_ఏకరీతి_Location(GLuint కార్యక్రమం, స్థిరరాశి GLchar *name)
     {
-        GetUniformLocation = (PFNGETUNIFORMLOCATIONPROC)IntGetProcAddress("glGetUniformLocation");
-        return GetUniformLocation(program, name);
+        Get_ఏకరీతి_Location = (PFNGETUNIFORMLOCATIONPROC)Int_Get_Proc_చిరునామా("glGetUniformLocation");
+        తిరిగి Get_ఏకరీతి_Location(కార్యక్రమం, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetUniformfv(GLuint program, GLint location, GLfloat *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetUniformfv(GLuint కార్యక్రమం, GLint location, GLfloat *params)
     {
-        GetUniformfv = (PFNGETUNIFORMFVPROC)IntGetProcAddress("glGetUniformfv");
-        GetUniformfv(program, location, params);
+        GetUniformfv = (PFNGETUNIFORMFVPROC)Int_Get_Proc_చిరునామా("glGetUniformfv");
+        GetUniformfv(కార్యక్రమం, location, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetUniformiv(GLuint program, GLint location, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetUniformiv(GLuint కార్యక్రమం, GLint location, GLint *params)
     {
-        GetUniformiv = (PFNGETUNIFORMIVPROC)IntGetProcAddress("glGetUniformiv");
-        GetUniformiv(program, location, params);
+        GetUniformiv = (PFNGETUNIFORMIVPROC)Int_Get_Proc_చిరునామా("glGetUniformiv");
+        GetUniformiv(కార్యక్రమం, location, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribdv(GLuint index, GLenum pname, GLdouble *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_శీర్షం_Attribdv(GLuint సూచీ, GLenum pname, GLdouble *params)
     {
-        GetVertexAttribdv = (PFNGETVERTEXATTRIBDVPROC)IntGetProcAddress("glGetVertexAttribdv");
-        GetVertexAttribdv(index, pname, params);
+        Get_శీర్షం_Attribdv = (PFNGETVERTEXATTRIBDVPROC)Int_Get_Proc_చిరునామా("glGetVertexAttribdv");
+        Get_శీర్షం_Attribdv(సూచీ, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribfv(GLuint index, GLenum pname, GLfloat *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_శీర్షం_Attribfv(GLuint సూచీ, GLenum pname, GLfloat *params)
     {
-        GetVertexAttribfv = (PFNGETVERTEXATTRIBFVPROC)IntGetProcAddress("glGetVertexAttribfv");
-        GetVertexAttribfv(index, pname, params);
+        Get_శీర్షం_Attribfv = (PFNGETVERTEXATTRIBFVPROC)Int_Get_Proc_చిరునామా("glGetVertexAttribfv");
+        Get_శీర్షం_Attribfv(సూచీ, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribiv(GLuint index, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_శీర్షం_Attribiv(GLuint సూచీ, GLenum pname, GLint *params)
     {
-        GetVertexAttribiv = (PFNGETVERTEXATTRIBIVPROC)IntGetProcAddress("glGetVertexAttribiv");
-        GetVertexAttribiv(index, pname, params);
+        Get_శీర్షం_Attribiv = (PFNGETVERTEXATTRIBIVPROC)Int_Get_Proc_చిరునామా("glGetVertexAttribiv");
+        Get_శీర్షం_Attribiv(సూచీ, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribPointerv(GLuint index, GLenum pname, GLvoid* *pointer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_శీర్షం_Attrib_Pointerv(GLuint సూచీ, GLenum pname, GLvoid* *pointer)
     {
-        GetVertexAttribPointerv = (PFNGETVERTEXATTRIBPOINTERVPROC)IntGetProcAddress("glGetVertexAttribPointerv");
-        GetVertexAttribPointerv(index, pname, pointer);
+        Get_శీర్షం_Attrib_Pointerv = (PFNGETVERTEXATTRIBPOINTERVPROC)Int_Get_Proc_చిరునామా("glGetVertexAttribPointerv");
+        Get_శీర్షం_Attrib_Pointerv(సూచీ, pname, pointer);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsProgram(GLuint program)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_Is_కార్యక్రమం(GLuint కార్యక్రమం)
     {
-        IsProgram = (PFNISPROGRAMPROC)IntGetProcAddress("glIsProgram");
-        return IsProgram(program);
+        Is_కార్యక్రమం = (PFNISPROGRAMPROC)Int_Get_Proc_చిరునామా("glIsProgram");
+        తిరిగి Is_కార్యక్రమం(కార్యక్రమం);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsShader(GLuint shader)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_IsShader(GLuint shader)
     {
-        IsShader = (PFNISSHADERPROC)IntGetProcAddress("glIsShader");
-        return IsShader(shader);
+        IsShader = (PFNISSHADERPROC)Int_Get_Proc_చిరునామా("glIsShader");
+        తిరిగి IsShader(shader);
     }
 
-    static void CODEGEN_FUNCPTR Switch_LinkProgram(GLuint program)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Link_కార్యక్రమం(GLuint కార్యక్రమం)
     {
-        LinkProgram = (PFNLINKPROGRAMPROC)IntGetProcAddress("glLinkProgram");
-        LinkProgram(program);
+        Link_కార్యక్రమం = (PFNLINKPROGRAMPROC)Int_Get_Proc_చిరునామా("glLinkProgram");
+        Link_కార్యక్రమం(కార్యక్రమం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ShaderSource(GLuint shader, GLsizei count, const GLchar* const *string, const GLint *length)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Shader_ఆధారం(GLuint shader, GLsizei లెక్క_2, స్థిరరాశి GLchar* స్థిరరాశి *string, స్థిరరాశి GLint *length)
     {
-        ShaderSource = (PFNSHADERSOURCEPROC)IntGetProcAddress("glShaderSource");
-        ShaderSource(shader, count, string, length);
+        Shader_ఆధారం = (PFNSHADERSOURCEPROC)Int_Get_Proc_చిరునామా("glShaderSource");
+        Shader_ఆధారం(shader, లెక్క_2, string, length);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UseProgram(GLuint program)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Use_కార్యక్రమం(GLuint కార్యక్రమం)
     {
-        UseProgram = (PFNUSEPROGRAMPROC)IntGetProcAddress("glUseProgram");
-        UseProgram(program);
+        Use_కార్యక్రమం = (PFNUSEPROGRAMPROC)Int_Get_Proc_చిరునామా("glUseProgram");
+        Use_కార్యక్రమం(కార్యక్రమం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1f(GLint location, GLfloat v0)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform1f(GLint location, GLfloat v0)
     {
-        Uniform1f = (PFNUNIFORM1FPROC)IntGetProcAddress("glUniform1f");
+        Uniform1f = (PFNUNIFORM1FPROC)Int_Get_Proc_చిరునామా("glUniform1f");
         Uniform1f(location, v0);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2f(GLint location, GLfloat v0, GLfloat v1)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform2f(GLint location, GLfloat v0, GLfloat v1)
     {
-        Uniform2f = (PFNUNIFORM2FPROC)IntGetProcAddress("glUniform2f");
+        Uniform2f = (PFNUNIFORM2FPROC)Int_Get_Proc_చిరునామా("glUniform2f");
         Uniform2f(location, v0, v1);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
     {
-        Uniform3f = (PFNUNIFORM3FPROC)IntGetProcAddress("glUniform3f");
+        Uniform3f = (PFNUNIFORM3FPROC)Int_Get_Proc_చిరునామా("glUniform3f");
         Uniform3f(location, v0, v1, v2);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
     {
-        Uniform4f = (PFNUNIFORM4FPROC)IntGetProcAddress("glUniform4f");
+        Uniform4f = (PFNUNIFORM4FPROC)Int_Get_Proc_చిరునామా("glUniform4f");
         Uniform4f(location, v0, v1, v2, v3);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1i(GLint location, GLint v0)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform1i(GLint location, GLint v0)
     {
-        Uniform1i = (PFNUNIFORM1IPROC)IntGetProcAddress("glUniform1i");
+        Uniform1i = (PFNUNIFORM1IPROC)Int_Get_Proc_చిరునామా("glUniform1i");
         Uniform1i(location, v0);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2i(GLint location, GLint v0, GLint v1)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform2i(GLint location, GLint v0, GLint v1)
     {
-        Uniform2i = (PFNUNIFORM2IPROC)IntGetProcAddress("glUniform2i");
+        Uniform2i = (PFNUNIFORM2IPROC)Int_Get_Proc_చిరునామా("glUniform2i");
         Uniform2i(location, v0, v1);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3i(GLint location, GLint v0, GLint v1, GLint v2)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform3i(GLint location, GLint v0, GLint v1, GLint v2)
     {
-        Uniform3i = (PFNUNIFORM3IPROC)IntGetProcAddress("glUniform3i");
+        Uniform3i = (PFNUNIFORM3IPROC)Int_Get_Proc_చిరునామా("glUniform3i");
         Uniform3i(location, v0, v1, v2);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3)
     {
-        Uniform4i = (PFNUNIFORM4IPROC)IntGetProcAddress("glUniform4i");
+        Uniform4i = (PFNUNIFORM4IPROC)Int_Get_Proc_చిరునామా("glUniform4i");
         Uniform4i(location, v0, v1, v2, v3);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1fv(GLint location, GLsizei count, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform1fv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLfloat *value)
     {
-        Uniform1fv = (PFNUNIFORM1FVPROC)IntGetProcAddress("glUniform1fv");
-        Uniform1fv(location, count, value);
+        Uniform1fv = (PFNUNIFORM1FVPROC)Int_Get_Proc_చిరునామా("glUniform1fv");
+        Uniform1fv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2fv(GLint location, GLsizei count, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform2fv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLfloat *value)
     {
-        Uniform2fv = (PFNUNIFORM2FVPROC)IntGetProcAddress("glUniform2fv");
-        Uniform2fv(location, count, value);
+        Uniform2fv = (PFNUNIFORM2FVPROC)Int_Get_Proc_చిరునామా("glUniform2fv");
+        Uniform2fv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3fv(GLint location, GLsizei count, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform3fv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLfloat *value)
     {
-        Uniform3fv = (PFNUNIFORM3FVPROC)IntGetProcAddress("glUniform3fv");
-        Uniform3fv(location, count, value);
+        Uniform3fv = (PFNUNIFORM3FVPROC)Int_Get_Proc_చిరునామా("glUniform3fv");
+        Uniform3fv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4fv(GLint location, GLsizei count, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform4fv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLfloat *value)
     {
-        Uniform4fv = (PFNUNIFORM4FVPROC)IntGetProcAddress("glUniform4fv");
-        Uniform4fv(location, count, value);
+        Uniform4fv = (PFNUNIFORM4FVPROC)Int_Get_Proc_చిరునామా("glUniform4fv");
+        Uniform4fv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1iv(GLint location, GLsizei count, const GLint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform1iv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLint *value)
     {
-        Uniform1iv = (PFNUNIFORM1IVPROC)IntGetProcAddress("glUniform1iv");
-        Uniform1iv(location, count, value);
+        Uniform1iv = (PFNUNIFORM1IVPROC)Int_Get_Proc_చిరునామా("glUniform1iv");
+        Uniform1iv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2iv(GLint location, GLsizei count, const GLint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform2iv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLint *value)
     {
-        Uniform2iv = (PFNUNIFORM2IVPROC)IntGetProcAddress("glUniform2iv");
-        Uniform2iv(location, count, value);
+        Uniform2iv = (PFNUNIFORM2IVPROC)Int_Get_Proc_చిరునామా("glUniform2iv");
+        Uniform2iv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3iv(GLint location, GLsizei count, const GLint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform3iv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLint *value)
     {
-        Uniform3iv = (PFNUNIFORM3IVPROC)IntGetProcAddress("glUniform3iv");
-        Uniform3iv(location, count, value);
+        Uniform3iv = (PFNUNIFORM3IVPROC)Int_Get_Proc_చిరునామా("glUniform3iv");
+        Uniform3iv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4iv(GLint location, GLsizei count, const GLint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform4iv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLint *value)
     {
-        Uniform4iv = (PFNUNIFORM4IVPROC)IntGetProcAddress("glUniform4iv");
-        Uniform4iv(location, count, value);
+        Uniform4iv = (PFNUNIFORM4IVPROC)Int_Get_Proc_చిరునామా("glUniform4iv");
+        Uniform4iv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_Matrix2fv(GLint location, GLsizei లెక్క_2, GLboolean transpose, స్థిరరాశి GLfloat *value)
     {
-        UniformMatrix2fv = (PFNUNIFORMMATRIX2FVPROC)IntGetProcAddress("glUniformMatrix2fv");
-        UniformMatrix2fv(location, count, transpose, value);
+        ఏకరీతి_Matrix2fv = (PFNUNIFORMMATRIX2FVPROC)Int_Get_Proc_చిరునామా("glUniformMatrix2fv");
+        ఏకరీతి_Matrix2fv(location, లెక్క_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_Matrix3fv(GLint location, GLsizei లెక్క_2, GLboolean transpose, స్థిరరాశి GLfloat *value)
     {
-        UniformMatrix3fv = (PFNUNIFORMMATRIX3FVPROC)IntGetProcAddress("glUniformMatrix3fv");
-        UniformMatrix3fv(location, count, transpose, value);
+        ఏకరీతి_Matrix3fv = (PFNUNIFORMMATRIX3FVPROC)Int_Get_Proc_చిరునామా("glUniformMatrix3fv");
+        ఏకరీతి_Matrix3fv(location, లెక్క_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_Matrix4fv(GLint location, GLsizei లెక్క_2, GLboolean transpose, స్థిరరాశి GLfloat *value)
     {
-        UniformMatrix4fv = (PFNUNIFORMMATRIX4FVPROC)IntGetProcAddress("glUniformMatrix4fv");
-        UniformMatrix4fv(location, count, transpose, value);
+        ఏకరీతి_Matrix4fv = (PFNUNIFORMMATRIX4FVPROC)Int_Get_Proc_చిరునామా("glUniformMatrix4fv");
+        ఏకరీతి_Matrix4fv(location, లెక్క_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ValidateProgram(GLuint program)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Validate_కార్యక్రమం(GLuint కార్యక్రమం)
     {
-        ValidateProgram = (PFNVALIDATEPROGRAMPROC)IntGetProcAddress("glValidateProgram");
-        ValidateProgram(program);
+        Validate_కార్యక్రమం = (PFNVALIDATEPROGRAMPROC)Int_Get_Proc_చిరునామా("glValidateProgram");
+        Validate_కార్యక్రమం(కార్యక్రమం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_సూచిక(GLuint సూచీ, GLint size, GLenum type, GLboolean normalized, GLsizei stride, స్థిరరాశి GLvoid *pointer)
     {
-        VertexAttribPointer = (PFNVERTEXATTRIBPOINTERPROC)IntGetProcAddress("glVertexAttribPointer");
-        VertexAttribPointer(index, size, type, normalized, stride, pointer);
+        శీర్షం_Attrib_సూచిక = (PFNVERTEXATTRIBPOINTERPROC)Int_Get_Proc_చిరునామా("glVertexAttribPointer");
+        శీర్షం_Attrib_సూచిక(సూచీ, size, type, normalized, stride, pointer);
     }
 
     // Extension: 2.1
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix2x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_Matrix2x3fv(GLint location, GLsizei లెక్క_2, GLboolean transpose, స్థిరరాశి GLfloat *value)
     {
-        UniformMatrix2x3fv = (PFNUNIFORMMATRIX2X3FVPROC)IntGetProcAddress("glUniformMatrix2x3fv");
-        UniformMatrix2x3fv(location, count, transpose, value);
+        ఏకరీతి_Matrix2x3fv = (PFNUNIFORMMATRIX2X3FVPROC)Int_Get_Proc_చిరునామా("glUniformMatrix2x3fv");
+        ఏకరీతి_Matrix2x3fv(location, లెక్క_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix3x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_Matrix3x2fv(GLint location, GLsizei లెక్క_2, GLboolean transpose, స్థిరరాశి GLfloat *value)
     {
-        UniformMatrix3x2fv = (PFNUNIFORMMATRIX3X2FVPROC)IntGetProcAddress("glUniformMatrix3x2fv");
-        UniformMatrix3x2fv(location, count, transpose, value);
+        ఏకరీతి_Matrix3x2fv = (PFNUNIFORMMATRIX3X2FVPROC)Int_Get_Proc_చిరునామా("glUniformMatrix3x2fv");
+        ఏకరీతి_Matrix3x2fv(location, లెక్క_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix2x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_Matrix2x4fv(GLint location, GLsizei లెక్క_2, GLboolean transpose, స్థిరరాశి GLfloat *value)
     {
-        UniformMatrix2x4fv = (PFNUNIFORMMATRIX2X4FVPROC)IntGetProcAddress("glUniformMatrix2x4fv");
-        UniformMatrix2x4fv(location, count, transpose, value);
+        ఏకరీతి_Matrix2x4fv = (PFNUNIFORMMATRIX2X4FVPROC)Int_Get_Proc_చిరునామా("glUniformMatrix2x4fv");
+        ఏకరీతి_Matrix2x4fv(location, లెక్క_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix4x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_Matrix4x2fv(GLint location, GLsizei లెక్క_2, GLboolean transpose, స్థిరరాశి GLfloat *value)
     {
-        UniformMatrix4x2fv = (PFNUNIFORMMATRIX4X2FVPROC)IntGetProcAddress("glUniformMatrix4x2fv");
-        UniformMatrix4x2fv(location, count, transpose, value);
+        ఏకరీతి_Matrix4x2fv = (PFNUNIFORMMATRIX4X2FVPROC)Int_Get_Proc_చిరునామా("glUniformMatrix4x2fv");
+        ఏకరీతి_Matrix4x2fv(location, లెక్క_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix3x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_Matrix3x4fv(GLint location, GLsizei లెక్క_2, GLboolean transpose, స్థిరరాశి GLfloat *value)
     {
-        UniformMatrix3x4fv = (PFNUNIFORMMATRIX3X4FVPROC)IntGetProcAddress("glUniformMatrix3x4fv");
-        UniformMatrix3x4fv(location, count, transpose, value);
+        ఏకరీతి_Matrix3x4fv = (PFNUNIFORMMATRIX3X4FVPROC)Int_Get_Proc_చిరునామా("glUniformMatrix3x4fv");
+        ఏకరీతి_Matrix3x4fv(location, లెక్క_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_Matrix4x3fv(GLint location, GLsizei లెక్క_2, GLboolean transpose, స్థిరరాశి GLfloat *value)
     {
-        UniformMatrix4x3fv = (PFNUNIFORMMATRIX4X3FVPROC)IntGetProcAddress("glUniformMatrix4x3fv");
-        UniformMatrix4x3fv(location, count, transpose, value);
+        ఏకరీతి_Matrix4x3fv = (PFNUNIFORMMATRIX4X3FVPROC)Int_Get_Proc_చిరునామా("glUniformMatrix4x3fv");
+        ఏకరీతి_Matrix4x3fv(location, లెక్క_2, transpose, value);
     }
 
     // Extension: ARB_vertex_array_object
 
-    static void CODEGEN_FUNCPTR Switch_BindVertexArray(GLuint ren_array)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Bind_శీర్షం_Array(GLuint ren_array)
     {
-        BindVertexArray = (PFNBINDVERTEXARRAYPROC)IntGetProcAddress("glBindVertexArray");
-        BindVertexArray(ren_array);
+        Bind_శీర్షం_Array = (PFNBINDVERTEXARRAYPROC)Int_Get_Proc_చిరునామా("glBindVertexArray");
+        Bind_శీర్షం_Array(ren_array);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteVertexArrays(GLsizei n, const GLuint *arrays)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Delete_శీర్షం_Arrays(GLsizei n, స్థిరరాశి GLuint *arrays)
     {
-        DeleteVertexArrays = (PFNDELETEVERTEXARRAYSPROC)IntGetProcAddress("glDeleteVertexArrays");
-        DeleteVertexArrays(n, arrays);
+        Delete_శీర్షం_Arrays = (PFNDELETEVERTEXARRAYSPROC)Int_Get_Proc_చిరునామా("glDeleteVertexArrays");
+        Delete_శీర్షం_Arrays(n, arrays);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenVertexArrays(GLsizei n, GLuint *arrays)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Gen_శీర్షం_Arrays(GLsizei n, GLuint *arrays)
     {
-        GenVertexArrays = (PFNGENVERTEXARRAYSPROC)IntGetProcAddress("glGenVertexArrays");
-        GenVertexArrays(n, arrays);
+        Gen_శీర్షం_Arrays = (PFNGENVERTEXARRAYSPROC)Int_Get_Proc_చిరునామా("glGenVertexArrays");
+        Gen_శీర్షం_Arrays(n, arrays);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsVertexArray(GLuint ren_array)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_Is_శీర్షం_Array(GLuint ren_array)
     {
-        IsVertexArray = (PFNISVERTEXARRAYPROC)IntGetProcAddress("glIsVertexArray");
-        return IsVertexArray(ren_array);
+        Is_శీర్షం_Array = (PFNISVERTEXARRAYPROC)Int_Get_Proc_చిరునామా("glIsVertexArray");
+        తిరిగి Is_శీర్షం_Array(ren_array);
     }
 
     // Extension: ARB_map_buffer_range
 
-    static GLvoid* CODEGEN_FUNCPTR Switch_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
+    స్థిర GLvoid* CODEGEN_FUNCPTR Switch_Map_బఫరు_Range(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
     {
-        MapBufferRange = (PFNMAPBUFFERRANGEPROC)IntGetProcAddress("glMapBufferRange");
-        return MapBufferRange(target, offset, length, access);
+        Map_బఫరు_Range = (PFNMAPBUFFERRANGEPROC)Int_Get_Proc_చిరునామా("glMapBufferRange");
+        తిరిగి Map_బఫరు_Range(target, offset, length, access);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Flush_Mapped_బఫరు_Range(GLenum target, GLintptr offset, GLsizeiptr length)
     {
-        FlushMappedBufferRange = (PFNFLUSHMAPPEDBUFFERRANGEPROC)IntGetProcAddress("glFlushMappedBufferRange");
-        FlushMappedBufferRange(target, offset, length);
+        Flush_Mapped_బఫరు_Range = (PFNFLUSHMAPPEDBUFFERRANGEPROC)Int_Get_Proc_చిరునామా("glFlushMappedBufferRange");
+        Flush_Mapped_బఫరు_Range(target, offset, length);
     }
 
     // Extension: ARB_framebuffer_object
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsRenderbuffer(GLuint renderbuffer)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_IsRenderbuffer(GLuint renderbuffer)
     {
-        IsRenderbuffer = (PFNISRENDERBUFFERPROC)IntGetProcAddress("glIsRenderbuffer");
-        return IsRenderbuffer(renderbuffer);
+        IsRenderbuffer = (PFNISRENDERBUFFERPROC)Int_Get_Proc_చిరునామా("glIsRenderbuffer");
+        తిరిగి IsRenderbuffer(renderbuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindRenderbuffer(GLenum target, GLuint renderbuffer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BindRenderbuffer(GLenum target, GLuint renderbuffer)
     {
-        BindRenderbuffer = (PFNBINDRENDERBUFFERPROC)IntGetProcAddress("glBindRenderbuffer");
+        BindRenderbuffer = (PFNBINDRENDERBUFFERPROC)Int_Get_Proc_చిరునామా("glBindRenderbuffer");
         BindRenderbuffer(target, renderbuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteRenderbuffers(GLsizei n, const GLuint *renderbuffers)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DeleteRenderbuffers(GLsizei n, స్థిరరాశి GLuint *renderbuffers)
     {
-        DeleteRenderbuffers = (PFNDELETERENDERBUFFERSPROC)IntGetProcAddress("glDeleteRenderbuffers");
+        DeleteRenderbuffers = (PFNDELETERENDERBUFFERSPROC)Int_Get_Proc_చిరునామా("glDeleteRenderbuffers");
         DeleteRenderbuffers(n, renderbuffers);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenRenderbuffers(GLsizei n, GLuint *renderbuffers)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GenRenderbuffers(GLsizei n, GLuint *renderbuffers)
     {
-        GenRenderbuffers = (PFNGENRENDERBUFFERSPROC)IntGetProcAddress("glGenRenderbuffers");
+        GenRenderbuffers = (PFNGENRENDERBUFFERSPROC)Int_Get_Proc_చిరునామా("glGenRenderbuffers");
         GenRenderbuffers(n, renderbuffers);
     }
 
-    static void CODEGEN_FUNCPTR Switch_RenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_RenderbufferStorage(GLenum target, GLenum internalformat, GLsizei వెడల్పు, GLsizei ఎత్తు)
     {
-        RenderbufferStorage = (PFNRENDERBUFFERSTORAGEPROC)IntGetProcAddress("glRenderbufferStorage");
-        RenderbufferStorage(target, internalformat, width, height);
+        RenderbufferStorage = (PFNRENDERBUFFERSTORAGEPROC)Int_Get_Proc_చిరునామా("glRenderbufferStorage");
+        RenderbufferStorage(target, internalformat, వెడల్పు, ఎత్తు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
     {
-        GetRenderbufferParameteriv = (PFNGETRENDERBUFFERPARAMETERIVPROC)IntGetProcAddress("glGetRenderbufferParameteriv");
+        GetRenderbufferParameteriv = (PFNGETRENDERBUFFERPARAMETERIVPROC)Int_Get_Proc_చిరునామా("glGetRenderbufferParameteriv");
         GetRenderbufferParameteriv(target, pname, params);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsFramebuffer(GLuint framebuffer)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_IsFramebuffer(GLuint framebuffer)
     {
-        IsFramebuffer = (PFNISFRAMEBUFFERPROC)IntGetProcAddress("glIsFramebuffer");
-        return IsFramebuffer(framebuffer);
+        IsFramebuffer = (PFNISFRAMEBUFFERPROC)Int_Get_Proc_చిరునామా("glIsFramebuffer");
+        తిరిగి IsFramebuffer(framebuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindFramebuffer(GLenum target, GLuint framebuffer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BindFramebuffer(GLenum target, GLuint framebuffer)
     {
-        BindFramebuffer = (PFNBINDFRAMEBUFFERPROC)IntGetProcAddress("glBindFramebuffer");
+        BindFramebuffer = (PFNBINDFRAMEBUFFERPROC)Int_Get_Proc_చిరునామా("glBindFramebuffer");
         BindFramebuffer(target, framebuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteFramebuffers(GLsizei n, const GLuint *framebuffers)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DeleteFramebuffers(GLsizei n, స్థిరరాశి GLuint *framebuffers)
     {
-        DeleteFramebuffers = (PFNDELETEFRAMEBUFFERSPROC)IntGetProcAddress("glDeleteFramebuffers");
+        DeleteFramebuffers = (PFNDELETEFRAMEBUFFERSPROC)Int_Get_Proc_చిరునామా("glDeleteFramebuffers");
         DeleteFramebuffers(n, framebuffers);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenFramebuffers(GLsizei n, GLuint *framebuffers)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GenFramebuffers(GLsizei n, GLuint *framebuffers)
     {
-        GenFramebuffers = (PFNGENFRAMEBUFFERSPROC)IntGetProcAddress("glGenFramebuffers");
+        GenFramebuffers = (PFNGENFRAMEBUFFERSPROC)Int_Get_Proc_చిరునామా("glGenFramebuffers");
         GenFramebuffers(n, framebuffers);
     }
 
-    static GLenum CODEGEN_FUNCPTR Switch_CheckFramebufferStatus(GLenum target)
+    స్థిర GLenum CODEGEN_FUNCPTR Switch_Check_Framebuffer_స్థితి(GLenum target)
     {
-        CheckFramebufferStatus = (PFNCHECKFRAMEBUFFERSTATUSPROC)IntGetProcAddress("glCheckFramebufferStatus");
-        return CheckFramebufferStatus(target);
+        Check_Framebuffer_స్థితి = (PFNCHECKFRAMEBUFFERSTATUSPROC)Int_Get_Proc_చిరునామా("glCheckFramebufferStatus");
+        తిరిగి Check_Framebuffer_స్థితి(target);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferTexture1D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_FramebufferTexture1D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
     {
-        FramebufferTexture1D = (PFNFRAMEBUFFERTEXTURE1DPROC)IntGetProcAddress("glFramebufferTexture1D");
+        FramebufferTexture1D = (PFNFRAMEBUFFERTEXTURE1DPROC)Int_Get_Proc_చిరునామా("glFramebufferTexture1D");
         FramebufferTexture1D(target, attachment, textarget, texture, level);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
     {
-        FramebufferTexture2D = (PFNFRAMEBUFFERTEXTURE2DPROC)IntGetProcAddress("glFramebufferTexture2D");
+        FramebufferTexture2D = (PFNFRAMEBUFFERTEXTURE2DPROC)Int_Get_Proc_చిరునామా("glFramebufferTexture2D");
         FramebufferTexture2D(target, attachment, textarget, texture, level);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferTexture3D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_FramebufferTexture3D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset)
     {
-        FramebufferTexture3D = (PFNFRAMEBUFFERTEXTURE3DPROC)IntGetProcAddress("glFramebufferTexture3D");
+        FramebufferTexture3D = (PFNFRAMEBUFFERTEXTURE3DPROC)Int_Get_Proc_చిరునామా("glFramebufferTexture3D");
         FramebufferTexture3D(target, attachment, textarget, texture, level, zoffset);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer)
     {
-        FramebufferRenderbuffer = (PFNFRAMEBUFFERRENDERBUFFERPROC)IntGetProcAddress("glFramebufferRenderbuffer");
+        FramebufferRenderbuffer = (PFNFRAMEBUFFERRENDERBUFFERPROC)Int_Get_Proc_చిరునామా("glFramebufferRenderbuffer");
         FramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint *params)
     {
-        GetFramebufferAttachmentParameteriv = (PFNGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC)IntGetProcAddress("glGetFramebufferAttachmentParameteriv");
+        GetFramebufferAttachmentParameteriv = (PFNGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC)Int_Get_Proc_చిరునామా("glGetFramebufferAttachmentParameteriv");
         GetFramebufferAttachmentParameteriv(target, attachment, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenerateMipmap(GLenum target)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GenerateMipmap(GLenum target)
     {
-        GenerateMipmap = (PFNGENERATEMIPMAPPROC)IntGetProcAddress("glGenerateMipmap");
+        GenerateMipmap = (PFNGENERATEMIPMAPPROC)Int_Get_Proc_చిరునామా("glGenerateMipmap");
         GenerateMipmap(target);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield ముసుగు, GLenum filter)
     {
-        BlitFramebuffer = (PFNBLITFRAMEBUFFERPROC)IntGetProcAddress("glBlitFramebuffer");
-        BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+        BlitFramebuffer = (PFNBLITFRAMEBUFFERPROC)Int_Get_Proc_చిరునామా("glBlitFramebuffer");
+        BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, ముసుగు, filter);
     }
 
-    static void CODEGEN_FUNCPTR Switch_RenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_RenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei వెడల్పు, GLsizei ఎత్తు)
     {
-        RenderbufferStorageMultisample = (PFNRENDERBUFFERSTORAGEMULTISAMPLEPROC)IntGetProcAddress("glRenderbufferStorageMultisample");
-        RenderbufferStorageMultisample(target, samples, internalformat, width, height);
+        RenderbufferStorageMultisample = (PFNRENDERBUFFERSTORAGEMULTISAMPLEPROC)Int_Get_Proc_చిరునామా("glRenderbufferStorageMultisample");
+        RenderbufferStorageMultisample(target, samples, internalformat, వెడల్పు, ఎత్తు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_FramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer)
     {
-        FramebufferTextureLayer = (PFNFRAMEBUFFERTEXTURELAYERPROC)IntGetProcAddress("glFramebufferTextureLayer");
+        FramebufferTextureLayer = (PFNFRAMEBUFFERTEXTURELAYERPROC)Int_Get_Proc_చిరునామా("glFramebufferTextureLayer");
         FramebufferTextureLayer(target, attachment, texture, level, layer);
     }
 
     // Extension: 3.0
 
-    static void CODEGEN_FUNCPTR Switch_ColorMaski(GLuint index, GLboolean r, GLboolean g, GLboolean b, GLboolean a)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ColorMaski(GLuint సూచీ, GLboolean r, GLboolean g, GLboolean b, GLboolean a)
     {
-        ColorMaski = (PFNCOLORMASKIPROC)IntGetProcAddress("glColorMaski");
-        ColorMaski(index, r, g, b, a);
+        ColorMaski = (PFNCOLORMASKIPROC)Int_Get_Proc_చిరునామా("glColorMaski");
+        ColorMaski(సూచీ, r, g, b, a);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBooleani_v(GLenum target, GLuint index, GLboolean *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetBooleani_v(GLenum target, GLuint సూచీ, GLboolean *దత్తాంశం)
     {
-        GetBooleani_v = (PFNGETBOOLEANI_VPROC)IntGetProcAddress("glGetBooleani_v");
-        GetBooleani_v(target, index, data);
+        GetBooleani_v = (PFNGETBOOLEANI_VPROC)Int_Get_Proc_చిరునామా("glGetBooleani_v");
+        GetBooleani_v(target, సూచీ, దత్తాంశం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetIntegeri_v(GLenum target, GLuint index, GLint *data)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetIntegeri_v(GLenum target, GLuint సూచీ, GLint *దత్తాంశం)
     {
-        GetIntegeri_v = (PFNGETINTEGERI_VPROC)IntGetProcAddress("glGetIntegeri_v");
-        GetIntegeri_v(target, index, data);
+        GetIntegeri_v = (PFNGETINTEGERI_VPROC)Int_Get_Proc_చిరునామా("glGetIntegeri_v");
+        GetIntegeri_v(target, సూచీ, దత్తాంశం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Enablei(GLenum target, GLuint index)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Enablei(GLenum target, GLuint సూచీ)
     {
-        Enablei = (PFNENABLEIPROC)IntGetProcAddress("glEnablei");
-        Enablei(target, index);
+        Enablei = (PFNENABLEIPROC)Int_Get_Proc_చిరునామా("glEnablei");
+        Enablei(target, సూచీ);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Disablei(GLenum target, GLuint index)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Disablei(GLenum target, GLuint సూచీ)
     {
-        Disablei = (PFNDISABLEIPROC)IntGetProcAddress("glDisablei");
-        Disablei(target, index);
+        Disablei = (PFNDISABLEIPROC)Int_Get_Proc_చిరునామా("glDisablei");
+        Disablei(target, సూచీ);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsEnabledi(GLenum target, GLuint index)
+    స్థిర GLboolean CODEGEN_FUNCPTR Switch_IsEnabledi(GLenum target, GLuint సూచీ)
     {
-        IsEnabledi = (PFNISENABLEDIPROC)IntGetProcAddress("glIsEnabledi");
-        return IsEnabledi(target, index);
+        IsEnabledi = (PFNISENABLEDIPROC)Int_Get_Proc_చిరునామా("glIsEnabledi");
+        తిరిగి IsEnabledi(target, సూచీ);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BeginTransformFeedback(GLenum primitiveMode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BeginTransformFeedback(GLenum primitive_బహుళకం)
     {
-        BeginTransformFeedback = (PFNBEGINTRANSFORMFEEDBACKPROC)IntGetProcAddress("glBeginTransformFeedback");
-        BeginTransformFeedback(primitiveMode);
+        BeginTransformFeedback = (PFNBEGINTRANSFORMFEEDBACKPROC)Int_Get_Proc_చిరునామా("glBeginTransformFeedback");
+        BeginTransformFeedback(primitive_బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_EndTransformFeedback()
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_చివర_Transform_Feedback()
     {
-        EndTransformFeedback = (PFNENDTRANSFORMFEEDBACKPROC)IntGetProcAddress("glEndTransformFeedback");
-        EndTransformFeedback();
+        చివర_Transform_Feedback = (PFNENDTRANSFORMFEEDBACKPROC)Int_Get_Proc_చిరునామా("glEndTransformFeedback");
+        చివర_Transform_Feedback();
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindBufferRange(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Bind_బఫరు_Range(GLenum target, GLuint సూచీ, GLuint బఫరు, GLintptr offset, GLsizeiptr size)
     {
-        BindBufferRange = (PFNBINDBUFFERRANGEPROC)IntGetProcAddress("glBindBufferRange");
-        BindBufferRange(target, index, buffer, offset, size);
+        Bind_బఫరు_Range = (PFNBINDBUFFERRANGEPROC)Int_Get_Proc_చిరునామా("glBindBufferRange");
+        Bind_బఫరు_Range(target, సూచీ, బఫరు, offset, size);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindBufferBase(GLenum target, GLuint index, GLuint buffer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Bind_బఫరు_పునాది(GLenum target, GLuint సూచీ, GLuint బఫరు)
     {
-        BindBufferBase = (PFNBINDBUFFERBASEPROC)IntGetProcAddress("glBindBufferBase");
-        BindBufferBase(target, index, buffer);
+        Bind_బఫరు_పునాది = (PFNBINDBUFFERBASEPROC)Int_Get_Proc_చిరునామా("glBindBufferBase");
+        Bind_బఫరు_పునాది(target, సూచీ, బఫరు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TransformFeedbackVaryings(GLuint program, GLsizei count, const GLchar* const *varyings, GLenum bufferMode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TransformFeedbackVaryings(GLuint కార్యక్రమం, GLsizei లెక్క_2, స్థిరరాశి GLchar* స్థిరరాశి *varyings, GLenum బఫరు_బహుళకం)
     {
-        TransformFeedbackVaryings = (PFNTRANSFORMFEEDBACKVARYINGSPROC)IntGetProcAddress("glTransformFeedbackVaryings");
-        TransformFeedbackVaryings(program, count, varyings, bufferMode);
+        TransformFeedbackVaryings = (PFNTRANSFORMFEEDBACKVARYINGSPROC)Int_Get_Proc_చిరునామా("glTransformFeedbackVaryings");
+        TransformFeedbackVaryings(కార్యక్రమం, లెక్క_2, varyings, బఫరు_బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTransformFeedbackVarying(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLsizei *size, GLenum *type, GLchar *name)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetTransformFeedbackVarying(GLuint కార్యక్రమం, GLuint సూచీ, GLsizei buf_కొలత, GLsizei *length, GLsizei *size, GLenum *type, GLchar *name)
     {
-        GetTransformFeedbackVarying = (PFNGETTRANSFORMFEEDBACKVARYINGPROC)IntGetProcAddress("glGetTransformFeedbackVarying");
-        GetTransformFeedbackVarying(program, index, bufSize, length, size, type, name);
+        GetTransformFeedbackVarying = (PFNGETTRANSFORMFEEDBACKVARYINGPROC)Int_Get_Proc_చిరునామా("glGetTransformFeedbackVarying");
+        GetTransformFeedbackVarying(కార్యక్రమం, సూచీ, buf_కొలత, length, size, type, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClampColor(GLenum target, GLenum clamp)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ClampColor(GLenum target, GLenum clamp)
     {
-        ClampColor = (PFNCLAMPCOLORPROC)IntGetProcAddress("glClampColor");
+        ClampColor = (PFNCLAMPCOLORPROC)Int_Get_Proc_చిరునామా("glClampColor");
         ClampColor(target, clamp);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BeginConditionalRender(GLuint id, GLenum mode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_BeginConditionalRender(GLuint id, GLenum బహుళకం)
     {
-        BeginConditionalRender = (PFNBEGINCONDITIONALRENDERPROC)IntGetProcAddress("glBeginConditionalRender");
-        BeginConditionalRender(id, mode);
+        BeginConditionalRender = (PFNBEGINCONDITIONALRENDERPROC)Int_Get_Proc_చిరునామా("glBeginConditionalRender");
+        BeginConditionalRender(id, బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_EndConditionalRender()
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_చివర_Conditional_Render()
     {
-        EndConditionalRender = (PFNENDCONDITIONALRENDERPROC)IntGetProcAddress("glEndConditionalRender");
-        EndConditionalRender();
+        చివర_Conditional_Render = (PFNENDCONDITIONALRENDERPROC)Int_Get_Proc_చిరునామా("glEndConditionalRender");
+        చివర_Conditional_Render();
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_IPointer(GLuint సూచీ, GLint size, GLenum type, GLsizei stride, స్థిరరాశి GLvoid *pointer)
     {
-        VertexAttribIPointer = (PFNVERTEXATTRIBIPOINTERPROC)IntGetProcAddress("glVertexAttribIPointer");
-        VertexAttribIPointer(index, size, type, stride, pointer);
+        శీర్షం_Attrib_IPointer = (PFNVERTEXATTRIBIPOINTERPROC)Int_Get_Proc_చిరునామా("glVertexAttribIPointer");
+        శీర్షం_Attrib_IPointer(సూచీ, size, type, stride, pointer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribIiv(GLuint index, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_శీర్షం_Attrib_Iiv(GLuint సూచీ, GLenum pname, GLint *params)
     {
-        GetVertexAttribIiv = (PFNGETVERTEXATTRIBIIVPROC)IntGetProcAddress("glGetVertexAttribIiv");
-        GetVertexAttribIiv(index, pname, params);
+        Get_శీర్షం_Attrib_Iiv = (PFNGETVERTEXATTRIBIIVPROC)Int_Get_Proc_చిరునామా("glGetVertexAttribIiv");
+        Get_శీర్షం_Attrib_Iiv(సూచీ, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribIuiv(GLuint index, GLenum pname, GLuint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_శీర్షం_Attrib_Iuiv(GLuint సూచీ, GLenum pname, GLuint *params)
     {
-        GetVertexAttribIuiv = (PFNGETVERTEXATTRIBIUIVPROC)IntGetProcAddress("glGetVertexAttribIuiv");
-        GetVertexAttribIuiv(index, pname, params);
+        Get_శీర్షం_Attrib_Iuiv = (PFNGETVERTEXATTRIBIUIVPROC)Int_Get_Proc_చిరునామా("glGetVertexAttribIuiv");
+        Get_శీర్షం_Attrib_Iuiv(సూచీ, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI1i(GLuint index, GLint x)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I1i(GLuint సూచీ, GLint x)
     {
-        VertexAttribI1i = (PFNVERTEXATTRIBI1IPROC)IntGetProcAddress("glVertexAttribI1i");
-        VertexAttribI1i(index, x);
+        శీర్షం_Attrib_I1i = (PFNVERTEXATTRIBI1IPROC)Int_Get_Proc_చిరునామా("glVertexAttribI1i");
+        శీర్షం_Attrib_I1i(సూచీ, x);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI2i(GLuint index, GLint x, GLint y)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I2i(GLuint సూచీ, GLint x, GLint y)
     {
-        VertexAttribI2i = (PFNVERTEXATTRIBI2IPROC)IntGetProcAddress("glVertexAttribI2i");
-        VertexAttribI2i(index, x, y);
+        శీర్షం_Attrib_I2i = (PFNVERTEXATTRIBI2IPROC)Int_Get_Proc_చిరునామా("glVertexAttribI2i");
+        శీర్షం_Attrib_I2i(సూచీ, x, y);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI3i(GLuint index, GLint x, GLint y, GLint z)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I3i(GLuint సూచీ, GLint x, GLint y, GLint z)
     {
-        VertexAttribI3i = (PFNVERTEXATTRIBI3IPROC)IntGetProcAddress("glVertexAttribI3i");
-        VertexAttribI3i(index, x, y, z);
+        శీర్షం_Attrib_I3i = (PFNVERTEXATTRIBI3IPROC)Int_Get_Proc_చిరునామా("glVertexAttribI3i");
+        శీర్షం_Attrib_I3i(సూచీ, x, y, z);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4i(GLuint index, GLint x, GLint y, GLint z, GLint w)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I4i(GLuint సూచీ, GLint x, GLint y, GLint z, GLint w)
     {
-        VertexAttribI4i = (PFNVERTEXATTRIBI4IPROC)IntGetProcAddress("glVertexAttribI4i");
-        VertexAttribI4i(index, x, y, z, w);
+        శీర్షం_Attrib_I4i = (PFNVERTEXATTRIBI4IPROC)Int_Get_Proc_చిరునామా("glVertexAttribI4i");
+        శీర్షం_Attrib_I4i(సూచీ, x, y, z, w);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI1ui(GLuint index, GLuint x)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I1ui(GLuint సూచీ, GLuint x)
     {
-        VertexAttribI1ui = (PFNVERTEXATTRIBI1UIPROC)IntGetProcAddress("glVertexAttribI1ui");
-        VertexAttribI1ui(index, x);
+        శీర్షం_Attrib_I1ui = (PFNVERTEXATTRIBI1UIPROC)Int_Get_Proc_చిరునామా("glVertexAttribI1ui");
+        శీర్షం_Attrib_I1ui(సూచీ, x);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI2ui(GLuint index, GLuint x, GLuint y)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I2ui(GLuint సూచీ, GLuint x, GLuint y)
     {
-        VertexAttribI2ui = (PFNVERTEXATTRIBI2UIPROC)IntGetProcAddress("glVertexAttribI2ui");
-        VertexAttribI2ui(index, x, y);
+        శీర్షం_Attrib_I2ui = (PFNVERTEXATTRIBI2UIPROC)Int_Get_Proc_చిరునామా("glVertexAttribI2ui");
+        శీర్షం_Attrib_I2ui(సూచీ, x, y);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI3ui(GLuint index, GLuint x, GLuint y, GLuint z)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I3ui(GLuint సూచీ, GLuint x, GLuint y, GLuint z)
     {
-        VertexAttribI3ui = (PFNVERTEXATTRIBI3UIPROC)IntGetProcAddress("glVertexAttribI3ui");
-        VertexAttribI3ui(index, x, y, z);
+        శీర్షం_Attrib_I3ui = (PFNVERTEXATTRIBI3UIPROC)Int_Get_Proc_చిరునామా("glVertexAttribI3ui");
+        శీర్షం_Attrib_I3ui(సూచీ, x, y, z);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4ui(GLuint index, GLuint x, GLuint y, GLuint z, GLuint w)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I4ui(GLuint సూచీ, GLuint x, GLuint y, GLuint z, GLuint w)
     {
-        VertexAttribI4ui = (PFNVERTEXATTRIBI4UIPROC)IntGetProcAddress("glVertexAttribI4ui");
-        VertexAttribI4ui(index, x, y, z, w);
+        శీర్షం_Attrib_I4ui = (PFNVERTEXATTRIBI4UIPROC)Int_Get_Proc_చిరునామా("glVertexAttribI4ui");
+        శీర్షం_Attrib_I4ui(సూచీ, x, y, z, w);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI1iv(GLuint index, const GLint *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I1iv(GLuint సూచీ, స్థిరరాశి GLint *v)
     {
-        VertexAttribI1iv = (PFNVERTEXATTRIBI1IVPROC)IntGetProcAddress("glVertexAttribI1iv");
-        VertexAttribI1iv(index, v);
+        శీర్షం_Attrib_I1iv = (PFNVERTEXATTRIBI1IVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI1iv");
+        శీర్షం_Attrib_I1iv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI2iv(GLuint index, const GLint *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I2iv(GLuint సూచీ, స్థిరరాశి GLint *v)
     {
-        VertexAttribI2iv = (PFNVERTEXATTRIBI2IVPROC)IntGetProcAddress("glVertexAttribI2iv");
-        VertexAttribI2iv(index, v);
+        శీర్షం_Attrib_I2iv = (PFNVERTEXATTRIBI2IVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI2iv");
+        శీర్షం_Attrib_I2iv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI3iv(GLuint index, const GLint *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I3iv(GLuint సూచీ, స్థిరరాశి GLint *v)
     {
-        VertexAttribI3iv = (PFNVERTEXATTRIBI3IVPROC)IntGetProcAddress("glVertexAttribI3iv");
-        VertexAttribI3iv(index, v);
+        శీర్షం_Attrib_I3iv = (PFNVERTEXATTRIBI3IVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI3iv");
+        శీర్షం_Attrib_I3iv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4iv(GLuint index, const GLint *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I4iv(GLuint సూచీ, స్థిరరాశి GLint *v)
     {
-        VertexAttribI4iv = (PFNVERTEXATTRIBI4IVPROC)IntGetProcAddress("glVertexAttribI4iv");
-        VertexAttribI4iv(index, v);
+        శీర్షం_Attrib_I4iv = (PFNVERTEXATTRIBI4IVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI4iv");
+        శీర్షం_Attrib_I4iv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI1uiv(GLuint index, const GLuint *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I1uiv(GLuint సూచీ, స్థిరరాశి GLuint *v)
     {
-        VertexAttribI1uiv = (PFNVERTEXATTRIBI1UIVPROC)IntGetProcAddress("glVertexAttribI1uiv");
-        VertexAttribI1uiv(index, v);
+        శీర్షం_Attrib_I1uiv = (PFNVERTEXATTRIBI1UIVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI1uiv");
+        శీర్షం_Attrib_I1uiv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI2uiv(GLuint index, const GLuint *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I2uiv(GLuint సూచీ, స్థిరరాశి GLuint *v)
     {
-        VertexAttribI2uiv = (PFNVERTEXATTRIBI2UIVPROC)IntGetProcAddress("glVertexAttribI2uiv");
-        VertexAttribI2uiv(index, v);
+        శీర్షం_Attrib_I2uiv = (PFNVERTEXATTRIBI2UIVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI2uiv");
+        శీర్షం_Attrib_I2uiv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI3uiv(GLuint index, const GLuint *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I3uiv(GLuint సూచీ, స్థిరరాశి GLuint *v)
     {
-        VertexAttribI3uiv = (PFNVERTEXATTRIBI3UIVPROC)IntGetProcAddress("glVertexAttribI3uiv");
-        VertexAttribI3uiv(index, v);
+        శీర్షం_Attrib_I3uiv = (PFNVERTEXATTRIBI3UIVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI3uiv");
+        శీర్షం_Attrib_I3uiv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4uiv(GLuint index, const GLuint *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I4uiv(GLuint సూచీ, స్థిరరాశి GLuint *v)
     {
-        VertexAttribI4uiv = (PFNVERTEXATTRIBI4UIVPROC)IntGetProcAddress("glVertexAttribI4uiv");
-        VertexAttribI4uiv(index, v);
+        శీర్షం_Attrib_I4uiv = (PFNVERTEXATTRIBI4UIVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI4uiv");
+        శీర్షం_Attrib_I4uiv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4bv(GLuint index, const GLbyte *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I4bv(GLuint సూచీ, స్థిరరాశి GLbyte *v)
     {
-        VertexAttribI4bv = (PFNVERTEXATTRIBI4BVPROC)IntGetProcAddress("glVertexAttribI4bv");
-        VertexAttribI4bv(index, v);
+        శీర్షం_Attrib_I4bv = (PFNVERTEXATTRIBI4BVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI4bv");
+        శీర్షం_Attrib_I4bv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4sv(GLuint index, const GLshort *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I4sv(GLuint సూచీ, స్థిరరాశి GLshort *v)
     {
-        VertexAttribI4sv = (PFNVERTEXATTRIBI4SVPROC)IntGetProcAddress("glVertexAttribI4sv");
-        VertexAttribI4sv(index, v);
+        శీర్షం_Attrib_I4sv = (PFNVERTEXATTRIBI4SVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI4sv");
+        శీర్షం_Attrib_I4sv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4ubv(GLuint index, const GLubyte *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I4ubv(GLuint సూచీ, స్థిరరాశి GLubyte *v)
     {
-        VertexAttribI4ubv = (PFNVERTEXATTRIBI4UBVPROC)IntGetProcAddress("glVertexAttribI4ubv");
-        VertexAttribI4ubv(index, v);
+        శీర్షం_Attrib_I4ubv = (PFNVERTEXATTRIBI4UBVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI4ubv");
+        శీర్షం_Attrib_I4ubv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4usv(GLuint index, const GLushort *v)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_Attrib_I4usv(GLuint సూచీ, స్థిరరాశి GLushort *v)
     {
-        VertexAttribI4usv = (PFNVERTEXATTRIBI4USVPROC)IntGetProcAddress("glVertexAttribI4usv");
-        VertexAttribI4usv(index, v);
+        శీర్షం_Attrib_I4usv = (PFNVERTEXATTRIBI4USVPROC)Int_Get_Proc_చిరునామా("glVertexAttribI4usv");
+        శీర్షం_Attrib_I4usv(సూచీ, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetUniformuiv(GLuint program, GLint location, GLuint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetUniformuiv(GLuint కార్యక్రమం, GLint location, GLuint *params)
     {
-        GetUniformuiv = (PFNGETUNIFORMUIVPROC)IntGetProcAddress("glGetUniformuiv");
-        GetUniformuiv(program, location, params);
+        GetUniformuiv = (PFNGETUNIFORMUIVPROC)Int_Get_Proc_చిరునామా("glGetUniformuiv");
+        GetUniformuiv(కార్యక్రమం, location, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindFragDataLocation(GLuint program, GLuint color, const GLchar *name)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Bind_Frag_దత్తాంశం_Location(GLuint కార్యక్రమం, GLuint color, స్థిరరాశి GLchar *name)
     {
-        BindFragDataLocation = (PFNBINDFRAGDATALOCATIONPROC)IntGetProcAddress("glBindFragDataLocation");
-        BindFragDataLocation(program, color, name);
+        Bind_Frag_దత్తాంశం_Location = (PFNBINDFRAGDATALOCATIONPROC)Int_Get_Proc_చిరునామా("glBindFragDataLocation");
+        Bind_Frag_దత్తాంశం_Location(కార్యక్రమం, color, name);
     }
 
-    static GLint CODEGEN_FUNCPTR Switch_GetFragDataLocation(GLuint program, const GLchar *name)
+    స్థిర GLint CODEGEN_FUNCPTR Switch_Get_Frag_దత్తాంశం_Location(GLuint కార్యక్రమం, స్థిరరాశి GLchar *name)
     {
-        GetFragDataLocation = (PFNGETFRAGDATALOCATIONPROC)IntGetProcAddress("glGetFragDataLocation");
-        return GetFragDataLocation(program, name);
+        Get_Frag_దత్తాంశం_Location = (PFNGETFRAGDATALOCATIONPROC)Int_Get_Proc_చిరునామా("glGetFragDataLocation");
+        తిరిగి Get_Frag_దత్తాంశం_Location(కార్యక్రమం, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1ui(GLint location, GLuint v0)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform1ui(GLint location, GLuint v0)
     {
-        Uniform1ui = (PFNUNIFORM1UIPROC)IntGetProcAddress("glUniform1ui");
+        Uniform1ui = (PFNUNIFORM1UIPROC)Int_Get_Proc_చిరునామా("glUniform1ui");
         Uniform1ui(location, v0);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2ui(GLint location, GLuint v0, GLuint v1)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform2ui(GLint location, GLuint v0, GLuint v1)
     {
-        Uniform2ui = (PFNUNIFORM2UIPROC)IntGetProcAddress("glUniform2ui");
+        Uniform2ui = (PFNUNIFORM2UIPROC)Int_Get_Proc_చిరునామా("glUniform2ui");
         Uniform2ui(location, v0, v1);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2)
     {
-        Uniform3ui = (PFNUNIFORM3UIPROC)IntGetProcAddress("glUniform3ui");
+        Uniform3ui = (PFNUNIFORM3UIPROC)Int_Get_Proc_చిరునామా("glUniform3ui");
         Uniform3ui(location, v0, v1, v2);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
     {
-        Uniform4ui = (PFNUNIFORM4UIPROC)IntGetProcAddress("glUniform4ui");
+        Uniform4ui = (PFNUNIFORM4UIPROC)Int_Get_Proc_చిరునామా("glUniform4ui");
         Uniform4ui(location, v0, v1, v2, v3);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1uiv(GLint location, GLsizei count, const GLuint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform1uiv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLuint *value)
     {
-        Uniform1uiv = (PFNUNIFORM1UIVPROC)IntGetProcAddress("glUniform1uiv");
-        Uniform1uiv(location, count, value);
+        Uniform1uiv = (PFNUNIFORM1UIVPROC)Int_Get_Proc_చిరునామా("glUniform1uiv");
+        Uniform1uiv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2uiv(GLint location, GLsizei count, const GLuint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform2uiv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLuint *value)
     {
-        Uniform2uiv = (PFNUNIFORM2UIVPROC)IntGetProcAddress("glUniform2uiv");
-        Uniform2uiv(location, count, value);
+        Uniform2uiv = (PFNUNIFORM2UIVPROC)Int_Get_Proc_చిరునామా("glUniform2uiv");
+        Uniform2uiv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3uiv(GLint location, GLsizei count, const GLuint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform3uiv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLuint *value)
     {
-        Uniform3uiv = (PFNUNIFORM3UIVPROC)IntGetProcAddress("glUniform3uiv");
-        Uniform3uiv(location, count, value);
+        Uniform3uiv = (PFNUNIFORM3UIVPROC)Int_Get_Proc_చిరునామా("glUniform3uiv");
+        Uniform3uiv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4uiv(GLint location, GLsizei count, const GLuint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Uniform4uiv(GLint location, GLsizei లెక్క_2, స్థిరరాశి GLuint *value)
     {
-        Uniform4uiv = (PFNUNIFORM4UIVPROC)IntGetProcAddress("glUniform4uiv");
-        Uniform4uiv(location, count, value);
+        Uniform4uiv = (PFNUNIFORM4UIVPROC)Int_Get_Proc_చిరునామా("glUniform4uiv");
+        Uniform4uiv(location, లెక్క_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameterIiv(GLenum target, GLenum pname, const GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexParameterIiv(GLenum target, GLenum pname, స్థిరరాశి GLint *params)
     {
-        TexParameterIiv = (PFNTEXPARAMETERIIVPROC)IntGetProcAddress("glTexParameterIiv");
+        TexParameterIiv = (PFNTEXPARAMETERIIVPROC)Int_Get_Proc_చిరునామా("glTexParameterIiv");
         TexParameterIiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameterIuiv(GLenum target, GLenum pname, const GLuint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexParameterIuiv(GLenum target, GLenum pname, స్థిరరాశి GLuint *params)
     {
-        TexParameterIuiv = (PFNTEXPARAMETERIUIVPROC)IntGetProcAddress("glTexParameterIuiv");
+        TexParameterIuiv = (PFNTEXPARAMETERIUIVPROC)Int_Get_Proc_చిరునామా("glTexParameterIuiv");
         TexParameterIuiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexParameterIiv(GLenum target, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetTexParameterIiv(GLenum target, GLenum pname, GLint *params)
     {
-        GetTexParameterIiv = (PFNGETTEXPARAMETERIIVPROC)IntGetProcAddress("glGetTexParameterIiv");
+        GetTexParameterIiv = (PFNGETTEXPARAMETERIIVPROC)Int_Get_Proc_చిరునామా("glGetTexParameterIiv");
         GetTexParameterIiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexParameterIuiv(GLenum target, GLenum pname, GLuint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_GetTexParameterIuiv(GLenum target, GLenum pname, GLuint *params)
     {
-        GetTexParameterIuiv = (PFNGETTEXPARAMETERIUIVPROC)IntGetProcAddress("glGetTexParameterIuiv");
+        GetTexParameterIuiv = (PFNGETTEXPARAMETERIUIVPROC)Int_Get_Proc_చిరునామా("glGetTexParameterIuiv");
         GetTexParameterIuiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearBufferiv(GLenum buffer, GLint drawbuffer, const GLint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ClearBufferiv(GLenum బఫరు, GLint drawbuffer, స్థిరరాశి GLint *value)
     {
-        ClearBufferiv = (PFNCLEARBUFFERIVPROC)IntGetProcAddress("glClearBufferiv");
-        ClearBufferiv(buffer, drawbuffer, value);
+        ClearBufferiv = (PFNCLEARBUFFERIVPROC)Int_Get_Proc_చిరునామా("glClearBufferiv");
+        ClearBufferiv(బఫరు, drawbuffer, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearBufferuiv(GLenum buffer, GLint drawbuffer, const GLuint *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ClearBufferuiv(GLenum బఫరు, GLint drawbuffer, స్థిరరాశి GLuint *value)
     {
-        ClearBufferuiv = (PFNCLEARBUFFERUIVPROC)IntGetProcAddress("glClearBufferuiv");
-        ClearBufferuiv(buffer, drawbuffer, value);
+        ClearBufferuiv = (PFNCLEARBUFFERUIVPROC)Int_Get_Proc_చిరునామా("glClearBufferuiv");
+        ClearBufferuiv(బఫరు, drawbuffer, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearBufferfv(GLenum buffer, GLint drawbuffer, const GLfloat *value)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ClearBufferfv(GLenum బఫరు, GLint drawbuffer, స్థిరరాశి GLfloat *value)
     {
-        ClearBufferfv = (PFNCLEARBUFFERFVPROC)IntGetProcAddress("glClearBufferfv");
-        ClearBufferfv(buffer, drawbuffer, value);
+        ClearBufferfv = (PFNCLEARBUFFERFVPROC)Int_Get_Proc_చిరునామా("glClearBufferfv");
+        ClearBufferfv(బఫరు, drawbuffer, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearBufferfi(GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ClearBufferfi(GLenum బఫరు, GLint drawbuffer, GLfloat లోతు, GLint stencil)
     {
-        ClearBufferfi = (PFNCLEARBUFFERFIPROC)IntGetProcAddress("glClearBufferfi");
-        ClearBufferfi(buffer, drawbuffer, depth, stencil);
+        ClearBufferfi = (PFNCLEARBUFFERFIPROC)Int_Get_Proc_చిరునామా("glClearBufferfi");
+        ClearBufferfi(బఫరు, drawbuffer, లోతు, stencil);
     }
 
-    static const GLubyte * CODEGEN_FUNCPTR Switch_GetStringi(GLenum name, GLuint index)
+    స్థిర స్థిరరాశి GLubyte * CODEGEN_FUNCPTR Switch_GetStringi(GLenum name, GLuint సూచీ)
     {
-        GetStringi = (PFNGETSTRINGIPROC)IntGetProcAddress("glGetStringi");
-        return GetStringi(name, index);
+        GetStringi = (PFNGETSTRINGIPROC)Int_Get_Proc_చిరునామా("glGetStringi");
+        తిరిగి GetStringi(name, సూచీ);
     }
 
     // Extension: ARB_uniform_buffer_object
 
-    static void CODEGEN_FUNCPTR Switch_GetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar* const *uniformNames, GLuint *uniformIndices)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_ఏకరీతి_Indices(GLuint కార్యక్రమం, GLsizei ఏకరీతి_లెక్క, స్థిరరాశి GLchar* స్థిరరాశి *ఏకరీతి_పేర్లు, GLuint *ఏకరీతి_Indices)
     {
-        GetUniformIndices = (PFNGETUNIFORMINDICESPROC)IntGetProcAddress("glGetUniformIndices");
-        GetUniformIndices(program, uniformCount, uniformNames, uniformIndices);
+        Get_ఏకరీతి_Indices = (PFNGETUNIFORMINDICESPROC)Int_Get_Proc_చిరునామా("glGetUniformIndices");
+        Get_ఏకరీతి_Indices(కార్యక్రమం, ఏకరీతి_లెక్క, ఏకరీతి_పేర్లు, ఏకరీతి_Indices);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniformsiv(GLuint program, GLsizei uniformCount, const GLuint *uniformIndices, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_చురుకైన_Uniformsiv(GLuint కార్యక్రమం, GLsizei ఏకరీతి_లెక్క, స్థిరరాశి GLuint *ఏకరీతి_Indices, GLenum pname, GLint *params)
     {
-        GetActiveUniformsiv = (PFNGETACTIVEUNIFORMSIVPROC)IntGetProcAddress("glGetActiveUniformsiv");
-        GetActiveUniformsiv(program, uniformCount, uniformIndices, pname, params);
+        Get_చురుకైన_Uniformsiv = (PFNGETACTIVEUNIFORMSIVPROC)Int_Get_Proc_చిరునామా("glGetActiveUniformsiv");
+        Get_చురుకైన_Uniformsiv(కార్యక్రమం, ఏకరీతి_లెక్క, ఏకరీతి_Indices, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniformName(GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformName)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_చురుకైన_ఏకరీతి_Name(GLuint కార్యక్రమం, GLuint ఏకరీతి_సూచీ, GLsizei buf_కొలత, GLsizei *length, GLchar *ఏకరీతి_Name)
     {
-        GetActiveUniformName = (PFNGETACTIVEUNIFORMNAMEPROC)IntGetProcAddress("glGetActiveUniformName");
-        GetActiveUniformName(program, uniformIndex, bufSize, length, uniformName);
+        Get_చురుకైన_ఏకరీతి_Name = (PFNGETACTIVEUNIFORMNAMEPROC)Int_Get_Proc_చిరునామా("glGetActiveUniformName");
+        Get_చురుకైన_ఏకరీతి_Name(కార్యక్రమం, ఏకరీతి_సూచీ, buf_కొలత, length, ఏకరీతి_Name);
     }
 
-    static GLuint CODEGEN_FUNCPTR Switch_GetUniformBlockIndex(GLuint program, const GLchar *uniformBlockName)
+    స్థిర GLuint CODEGEN_FUNCPTR Switch_Get_ఏకరీతి_ఖండం_సూచీ(GLuint కార్యక్రమం, స్థిరరాశి GLchar *ఏకరీతి_ఖండం_Name)
     {
-        GetUniformBlockIndex = (PFNGETUNIFORMBLOCKINDEXPROC)IntGetProcAddress("glGetUniformBlockIndex");
-        return GetUniformBlockIndex(program, uniformBlockName);
+        Get_ఏకరీతి_ఖండం_సూచీ = (PFNGETUNIFORMBLOCKINDEXPROC)Int_Get_Proc_చిరునామా("glGetUniformBlockIndex");
+        తిరిగి Get_ఏకరీతి_ఖండం_సూచీ(కార్యక్రమం, ఏకరీతి_ఖండం_Name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniformBlockiv(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint *params)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_చురుకైన_ఏకరీతి_Blockiv(GLuint కార్యక్రమం, GLuint ఏకరీతి_ఖండం_సూచీ, GLenum pname, GLint *params)
     {
-        GetActiveUniformBlockiv = (PFNGETACTIVEUNIFORMBLOCKIVPROC)IntGetProcAddress("glGetActiveUniformBlockiv");
-        GetActiveUniformBlockiv(program, uniformBlockIndex, pname, params);
+        Get_చురుకైన_ఏకరీతి_Blockiv = (PFNGETACTIVEUNIFORMBLOCKIVPROC)Int_Get_Proc_చిరునామా("glGetActiveUniformBlockiv");
+        Get_చురుకైన_ఏకరీతి_Blockiv(కార్యక్రమం, ఏకరీతి_ఖండం_సూచీ, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniformBlockName(GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformBlockName)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Get_చురుకైన_ఏకరీతి_ఖండం_Name(GLuint కార్యక్రమం, GLuint ఏకరీతి_ఖండం_సూచీ, GLsizei buf_కొలత, GLsizei *length, GLchar *ఏకరీతి_ఖండం_Name)
     {
-        GetActiveUniformBlockName = (PFNGETACTIVEUNIFORMBLOCKNAMEPROC)IntGetProcAddress("glGetActiveUniformBlockName");
-        GetActiveUniformBlockName(program, uniformBlockIndex, bufSize, length, uniformBlockName);
+        Get_చురుకైన_ఏకరీతి_ఖండం_Name = (PFNGETACTIVEUNIFORMBLOCKNAMEPROC)Int_Get_Proc_చిరునామా("glGetActiveUniformBlockName");
+        Get_చురుకైన_ఏకరీతి_ఖండం_Name(కార్యక్రమం, ఏకరీతి_ఖండం_సూచీ, buf_కొలత, length, ఏకరీతి_ఖండం_Name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformBlockBinding(GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఏకరీతి_ఖండం_Binding(GLuint కార్యక్రమం, GLuint ఏకరీతి_ఖండం_సూచీ, GLuint ఏకరీతి_ఖండం_Binding_2)
     {
-        UniformBlockBinding = (PFNUNIFORMBLOCKBINDINGPROC)IntGetProcAddress("glUniformBlockBinding");
-        UniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding);
+        ఏకరీతి_ఖండం_Binding = (PFNUNIFORMBLOCKBINDINGPROC)Int_Get_Proc_చిరునామా("glUniformBlockBinding");
+        ఏకరీతి_ఖండం_Binding(కార్యక్రమం, ఏకరీతి_ఖండం_సూచీ, ఏకరీతి_ఖండం_Binding_2);
     }
 
     // Extension: ARB_copy_buffer
 
-    static void CODEGEN_FUNCPTR Switch_CopyBufferSubData(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Copy_బఫరు_Sub_దత్తాంశం(GLenum read_లక్ష్యం, GLenum write_లక్ష్యం, GLintptr read_స్థానభ్రంశం, GLintptr write_స్థానభ్రంశం, GLsizeiptr size)
     {
-        CopyBufferSubData = (PFNCOPYBUFFERSUBDATAPROC)IntGetProcAddress("glCopyBufferSubData");
-        CopyBufferSubData(readTarget, writeTarget, readOffset, writeOffset, size);
+        Copy_బఫరు_Sub_దత్తాంశం = (PFNCOPYBUFFERSUBDATAPROC)Int_Get_Proc_చిరునామా("glCopyBufferSubData");
+        Copy_బఫరు_Sub_దత్తాంశం(read_లక్ష్యం, write_లక్ష్యం, read_స్థానభ్రంశం, write_స్థానభ్రంశం, size);
     }
 
     // Extension: 3.1
 
-    static void CODEGEN_FUNCPTR Switch_DrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instancecount)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DrawArraysInstanced(GLenum బహుళకం, GLint first, GLsizei లెక్క_2, GLsizei instancecount)
     {
-        DrawArraysInstanced = (PFNDRAWARRAYSINSTANCEDPROC)IntGetProcAddress("glDrawArraysInstanced");
-        DrawArraysInstanced(mode, first, count, instancecount);
+        DrawArraysInstanced = (PFNDRAWARRAYSINSTANCEDPROC)Int_Get_Proc_చిరునామా("glDrawArraysInstanced");
+        DrawArraysInstanced(బహుళకం, first, లెక్క_2, instancecount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices, GLsizei instancecount)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DrawElementsInstanced(GLenum బహుళకం, GLsizei లెక్క_2, GLenum type, స్థిరరాశి GLvoid *indices, GLsizei instancecount)
     {
-        DrawElementsInstanced = (PFNDRAWELEMENTSINSTANCEDPROC)IntGetProcAddress("glDrawElementsInstanced");
-        DrawElementsInstanced(mode, count, type, indices, instancecount);
+        DrawElementsInstanced = (PFNDRAWELEMENTSINSTANCEDPROC)Int_Get_Proc_చిరునామా("glDrawElementsInstanced");
+        DrawElementsInstanced(బహుళకం, లెక్క_2, type, indices, instancecount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexBuffer(GLenum target, GLenum internalformat, GLuint buffer)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Tex_బఫరు(GLenum target, GLenum internalformat, GLuint బఫరు)
     {
-        TexBuffer = (PFNTEXBUFFERPROC)IntGetProcAddress("glTexBuffer");
-        TexBuffer(target, internalformat, buffer);
+        Tex_బఫరు = (PFNTEXBUFFERPROC)Int_Get_Proc_చిరునామా("glTexBuffer");
+        Tex_బఫరు(target, internalformat, బఫరు);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PrimitiveRestartIndex(GLuint index)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Primitive_Restart_సూచీ(GLuint సూచీ)
     {
-        PrimitiveRestartIndex = (PFNPRIMITIVERESTARTINDEXPROC)IntGetProcAddress("glPrimitiveRestartIndex");
-        PrimitiveRestartIndex(index);
+        Primitive_Restart_సూచీ = (PFNPRIMITIVERESTARTINDEXPROC)Int_Get_Proc_చిరునామా("glPrimitiveRestartIndex");
+        Primitive_Restart_సూచీ(సూచీ);
     }
 
     // Legacy
 
-    static void CODEGEN_FUNCPTR Switch_EnableClientState(GLenum cap)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_EnableClientState(GLenum cap)
     {
-        EnableClientState = (PFNENABLECLIENTSTATEPROC)IntGetProcAddress("glEnableClientState");
+        EnableClientState = (PFNENABLECLIENTSTATEPROC)Int_Get_Proc_చిరునామా("glEnableClientState");
         EnableClientState(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DisableClientState(GLenum cap)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_DisableClientState(GLenum cap)
     {
-        DisableClientState = (PFNDISABLECLIENTSTATEPROC)IntGetProcAddress("glDisableClientState");
+        DisableClientState = (PFNDISABLECLIENTSTATEPROC)Int_Get_Proc_చిరునామా("glDisableClientState");
         DisableClientState(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_శీర్షం_సూచిక(GLint size, GLenum type, GLsizei stride, స్థిరరాశి GLvoid *ptr)
     {
-        VertexPointer = (PFNVERTEXPOINTERPROC)IntGetProcAddress("glVertexPointer");
-        VertexPointer(size, type, stride, ptr);
+        శీర్షం_సూచిక = (PFNVERTEXPOINTERPROC)Int_Get_Proc_చిరునామా("glVertexPointer");
+        శీర్షం_సూచిక(size, type, stride, ptr);
     }
 
-    static void CODEGEN_FUNCPTR Switch_NormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_సాధారణ_సూచిక(GLenum type, GLsizei stride, స్థిరరాశి GLvoid *ptr)
     {
-        NormalPointer = (PFNNORMALPOINTERPROC)IntGetProcAddress("glNormalPointer");
-        NormalPointer(type, stride, ptr);
+        సాధారణ_సూచిక = (PFNNORMALPOINTERPROC)Int_Get_Proc_చిరునామా("glNormalPointer");
+        సాధారణ_సూచిక(type, stride, ptr);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Color_సూచిక(GLint size, GLenum type, GLsizei stride, స్థిరరాశి GLvoid *ptr)
     {
-        ColorPointer = (PFNCOLORPOINTERPROC)IntGetProcAddress("glColorPointer");
-        ColorPointer(size, type, stride, ptr);
+        Color_సూచిక = (PFNCOLORPOINTERPROC)Int_Get_Proc_చిరునామా("glColorPointer");
+        Color_సూచిక(size, type, stride, ptr);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Tex_Coord_సూచిక(GLint size, GLenum type, GLsizei stride, స్థిరరాశి GLvoid *ptr)
     {
-        TexCoordPointer = (PFNTEXCOORDPOINTERPROC)IntGetProcAddress("glTexCoordPointer");
-        TexCoordPointer(size, type, stride, ptr);
+        Tex_Coord_సూచిక = (PFNTEXCOORDPOINTERPROC)Int_Get_Proc_చిరునామా("glTexCoordPointer");
+        Tex_Coord_సూచిక(size, type, stride, ptr);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexEnvi(GLenum target, GLenum pname, GLint param)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_TexEnvi(GLenum target, GLenum pname, GLint param)
     {
-        TexEnvi = (PFNTEXENVIPROC)IntGetProcAddress("glTexEnvi");
+        TexEnvi = (PFNTEXENVIPROC)Int_Get_Proc_చిరునామా("glTexEnvi");
         TexEnvi(target, pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_MatrixMode(GLenum mode)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_మాతృక_బహుళకం(GLenum బహుళకం)
     {
-        MatrixMode = (PFNMATRIXMODEPROC)IntGetProcAddress("glMatrixMode");
-        MatrixMode(mode);
+        మాతృక_బహుళకం = (PFNMATRIXMODEPROC)Int_Get_Proc_చిరునామా("glMatrixMode");
+        మాతృక_బహుళకం(బహుళకం);
     }
 
-    static void CODEGEN_FUNCPTR Switch_LoadIdentity(void)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_ఎక్కించు_తటస్థం(శూన్య)
     {
-        LoadIdentity = (PFNLOADIDENTITYPROC)IntGetProcAddress("glLoadIdentity");
-        LoadIdentity();
+        ఎక్కించు_తటస్థం = (PFNLOADIDENTITYPROC)Int_Get_Proc_చిరునామా("glLoadIdentity");
+        ఎక్కించు_తటస్థం();
     }
 
-    static void CODEGEN_FUNCPTR Switch_Ortho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Ortho(GLdouble ఎడమ, GLdouble కుడి, GLdouble bottom, GLdouble శిఖరం_2, GLdouble near_val, GLdouble far_val)
     {
-        Ortho = (PFNORTHOPROC)IntGetProcAddress("glOrtho");
-        Ortho(left, right, bottom, top, near_val, far_val);
+        Ortho = (PFNORTHOPROC)Int_Get_Proc_చిరునామా("glOrtho");
+        Ortho(ఎడమ, కుడి, bottom, శిఖరం_2, near_val, far_val);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Color3d(GLdouble red, GLdouble green, GLdouble blue)
+    స్థిర శూన్య CODEGEN_FUNCPTR Switch_Color3d(GLdouble red, GLdouble green, GLdouble blue)
     {
-        Color3d = (PFNCOLOR3DPROC)IntGetProcAddress("glColor3d");
+        Color3d = (PFNCOLOR3DPROC)Int_Get_Proc_చిరునామా("glColor3d");
         Color3d(red, green, blue);
     }
 
-    struct InitializeVariables
+    నిర్మాణం InitializeVariables
     {
         InitializeVariables()
         {
@@ -2456,9 +2456,9 @@ namespace gl
             CullFace = Switch_CullFace;
             FrontFace = Switch_FrontFace;
             Hint = Switch_Hint;
-            LineWidth = Switch_LineWidth;
-            PointSize = Switch_PointSize;
-            PolygonMode = Switch_PolygonMode;
+            పంక్తి_వెడల్పు = Switch_పంక్తి_వెడల్పు;
+            బిందువు_కొలత = Switch_బిందువు_కొలత;
+            Polygon_బహుళకం = Switch_Polygon_బహుళకం;
             Scissor = Switch_Scissor;
             TexParameterf = Switch_TexParameterf;
             TexParameterfv = Switch_TexParameterfv;
@@ -2466,26 +2466,26 @@ namespace gl
             TexParameteriv = Switch_TexParameteriv;
             TexImage1D = Switch_TexImage1D;
             TexImage2D = Switch_TexImage2D;
-            DrawBuffer = Switch_DrawBuffer;
+            Draw_బఫరు = Switch_Draw_బఫరు;
             Clear = Switch_Clear;
             ClearColor = Switch_ClearColor;
             ClearStencil = Switch_ClearStencil;
-            ClearDepth = Switch_ClearDepth;
-            StencilMask = Switch_StencilMask;
-            ColorMask = Switch_ColorMask;
-            DepthMask = Switch_DepthMask;
+            Clear_లోతు = Switch_Clear_లోతు;
+            Stencil_ముసుగు = Switch_Stencil_ముసుగు;
+            Color_ముసుగు = Switch_Color_ముసుగు;
+            లోతు_ముసుగు = Switch_లోతు_ముసుగు;
             Disable = Switch_Disable;
             Enable = Switch_Enable;
-            Finish = Switch_Finish;
+            ముగింపు = Switch_ముగింపు;
             Flush = Switch_Flush;
             BlendFunc = Switch_BlendFunc;
             LogicOp = Switch_LogicOp;
             StencilFunc = Switch_StencilFunc;
             StencilOp = Switch_StencilOp;
-            DepthFunc = Switch_DepthFunc;
+            లోతు_Func = Switch_లోతు_Func;
             PixelStoref = Switch_PixelStoref;
             PixelStorei = Switch_PixelStorei;
-            ReadBuffer = Switch_ReadBuffer;
+            Read_బఫరు = Switch_Read_బఫరు;
             ReadPixels = Switch_ReadPixels;
             GetBooleanv = Switch_GetBooleanv;
             GetDoublev = Switch_GetDoublev;
@@ -2499,12 +2499,12 @@ namespace gl
             GetTexLevelParameterfv = Switch_GetTexLevelParameterfv;
             GetTexLevelParameteriv = Switch_GetTexLevelParameteriv;
             IsEnabled = Switch_IsEnabled;
-            DepthRange = Switch_DepthRange;
+            లోతు_Range = Switch_లోతు_Range;
             Viewport = Switch_Viewport;
             DrawArrays = Switch_DrawArrays;
             DrawElements = Switch_DrawElements;
             GetPointerv = Switch_GetPointerv;
-            PolygonOffset = Switch_PolygonOffset;
+            Polygon_స్థానభ్రంశం = Switch_Polygon_స్థానభ్రంశం;
             CopyTexImage1D = Switch_CopyTexImage1D;
             CopyTexImage2D = Switch_CopyTexImage2D;
             CopyTexSubImage1D = Switch_CopyTexSubImage1D;
@@ -2526,7 +2526,7 @@ namespace gl
             CopyTexSubImage3D = Switch_CopyTexSubImage3D;
 
             // Extension: 1.3
-            ActiveTexture = Switch_ActiveTexture;
+            చురుకైన_Texture = Switch_చురుకైన_Texture;
             SampleCoverage = Switch_SampleCoverage;
             CompressedTexImage3D = Switch_CompressedTexImage3D;
             CompressedTexImage2D = Switch_CompressedTexImage2D;
@@ -2540,69 +2540,69 @@ namespace gl
             BlendFuncSeparate = Switch_BlendFuncSeparate;
             MultiDrawArrays = Switch_MultiDrawArrays;
             MultiDrawElements = Switch_MultiDrawElements;
-            PointParameterf = Switch_PointParameterf;
-            PointParameterfv = Switch_PointParameterfv;
-            PointParameteri = Switch_PointParameteri;
-            PointParameteriv = Switch_PointParameteriv;
+            బిందువు_Parameterf = Switch_బిందువు_Parameterf;
+            బిందువు_Parameterfv = Switch_బిందువు_Parameterfv;
+            బిందువు_Parameteri = Switch_బిందువు_Parameteri;
+            బిందువు_Parameteriv = Switch_బిందువు_Parameteriv;
 
             // Extension: 1.5
             GenQueries = Switch_GenQueries;
             DeleteQueries = Switch_DeleteQueries;
             IsQuery = Switch_IsQuery;
             BeginQuery = Switch_BeginQuery;
-            EndQuery = Switch_EndQuery;
+            చివర_Query = Switch_చివర_Query;
             GetQueryiv = Switch_GetQueryiv;
             GetQueryObjectiv = Switch_GetQueryObjectiv;
             GetQueryObjectuiv = Switch_GetQueryObjectuiv;
-            BindBuffer = Switch_BindBuffer;
+            Bind_బఫరు = Switch_Bind_బఫరు;
             DeleteBuffers = Switch_DeleteBuffers;
             GenBuffers = Switch_GenBuffers;
-            IsBuffer = Switch_IsBuffer;
-            BufferData = Switch_BufferData;
-            BufferSubData = Switch_BufferSubData;
-            GetBufferSubData = Switch_GetBufferSubData;
-            MapBuffer = Switch_MapBuffer;
-            UnmapBuffer = Switch_UnmapBuffer;
-            GetBufferParameteriv = Switch_GetBufferParameteriv;
-            GetBufferPointerv = Switch_GetBufferPointerv;
+            Is_బఫరు = Switch_Is_బఫరు;
+            బఫరు_దత్తాంశం = Switch_బఫరు_దత్తాంశం;
+            బఫరు_Sub_దత్తాంశం = Switch_బఫరు_Sub_దత్తాంశం;
+            Get_బఫరు_Sub_దత్తాంశం = Switch_Get_బఫరు_Sub_దత్తాంశం;
+            Map_బఫరు = Switch_Map_బఫరు;
+            Unmap_బఫరు = Switch_Unmap_బఫరు;
+            Get_బఫరు_Parameteriv = Switch_Get_బఫరు_Parameteriv;
+            Get_బఫరు_Pointerv = Switch_Get_బఫరు_Pointerv;
 
             // Extension: 2.0
             BlendEquationSeparate = Switch_BlendEquationSeparate;
             DrawBuffers = Switch_DrawBuffers;
             StencilOpSeparate = Switch_StencilOpSeparate;
             StencilFuncSeparate = Switch_StencilFuncSeparate;
-            StencilMaskSeparate = Switch_StencilMaskSeparate;
+            Stencil_ముసుగు_Separate = Switch_Stencil_ముసుగు_Separate;
             AttachShader = Switch_AttachShader;
             BindAttribLocation = Switch_BindAttribLocation;
             CompileShader = Switch_CompileShader;
-            CreateProgram = Switch_CreateProgram;
+            Create_కార్యక్రమం = Switch_Create_కార్యక్రమం;
             CreateShader = Switch_CreateShader;
-            DeleteProgram = Switch_DeleteProgram;
+            Delete_కార్యక్రమం = Switch_Delete_కార్యక్రమం;
             DeleteShader = Switch_DeleteShader;
             DetachShader = Switch_DetachShader;
-            DisableVertexAttribArray = Switch_DisableVertexAttribArray;
-            EnableVertexAttribArray = Switch_EnableVertexAttribArray;
-            GetActiveAttrib = Switch_GetActiveAttrib;
-            GetActiveUniform = Switch_GetActiveUniform;
+            Disable_శీర్షం_Attrib_Array = Switch_Disable_శీర్షం_Attrib_Array;
+            Enable_శీర్షం_Attrib_Array = Switch_Enable_శీర్షం_Attrib_Array;
+            Get_చురుకైన_Attrib = Switch_Get_చురుకైన_Attrib;
+            Get_చురుకైన_ఏకరీతి = Switch_Get_చురుకైన_ఏకరీతి;
             GetAttachedShaders = Switch_GetAttachedShaders;
             GetAttribLocation = Switch_GetAttribLocation;
             GetProgramiv = Switch_GetProgramiv;
-            GetProgramInfoLog = Switch_GetProgramInfoLog;
+            Get_కార్యక్రమం_Info_Log = Switch_Get_కార్యక్రమం_Info_Log;
             GetShaderiv = Switch_GetShaderiv;
             GetShaderInfoLog = Switch_GetShaderInfoLog;
-            GetShaderSource = Switch_GetShaderSource;
-            GetUniformLocation = Switch_GetUniformLocation;
+            Get_Shader_ఆధారం = Switch_Get_Shader_ఆధారం;
+            Get_ఏకరీతి_Location = Switch_Get_ఏకరీతి_Location;
             GetUniformfv = Switch_GetUniformfv;
             GetUniformiv = Switch_GetUniformiv;
-            GetVertexAttribdv = Switch_GetVertexAttribdv;
-            GetVertexAttribfv = Switch_GetVertexAttribfv;
-            GetVertexAttribiv = Switch_GetVertexAttribiv;
-            GetVertexAttribPointerv = Switch_GetVertexAttribPointerv;
-            IsProgram = Switch_IsProgram;
+            Get_శీర్షం_Attribdv = Switch_Get_శీర్షం_Attribdv;
+            Get_శీర్షం_Attribfv = Switch_Get_శీర్షం_Attribfv;
+            Get_శీర్షం_Attribiv = Switch_Get_శీర్షం_Attribiv;
+            Get_శీర్షం_Attrib_Pointerv = Switch_Get_శీర్షం_Attrib_Pointerv;
+            Is_కార్యక్రమం = Switch_Is_కార్యక్రమం;
             IsShader = Switch_IsShader;
-            LinkProgram = Switch_LinkProgram;
-            ShaderSource = Switch_ShaderSource;
-            UseProgram = Switch_UseProgram;
+            Link_కార్యక్రమం = Switch_Link_కార్యక్రమం;
+            Shader_ఆధారం = Switch_Shader_ఆధారం;
+            Use_కార్యక్రమం = Switch_Use_కార్యక్రమం;
             Uniform1f = Switch_Uniform1f;
             Uniform2f = Switch_Uniform2f;
             Uniform3f = Switch_Uniform3f;
@@ -2619,29 +2619,29 @@ namespace gl
             Uniform2iv = Switch_Uniform2iv;
             Uniform3iv = Switch_Uniform3iv;
             Uniform4iv = Switch_Uniform4iv;
-            UniformMatrix2fv = Switch_UniformMatrix2fv;
-            UniformMatrix3fv = Switch_UniformMatrix3fv;
-            UniformMatrix4fv = Switch_UniformMatrix4fv;
-            ValidateProgram = Switch_ValidateProgram;
-            VertexAttribPointer = Switch_VertexAttribPointer;
+            ఏకరీతి_Matrix2fv = Switch_ఏకరీతి_Matrix2fv;
+            ఏకరీతి_Matrix3fv = Switch_ఏకరీతి_Matrix3fv;
+            ఏకరీతి_Matrix4fv = Switch_ఏకరీతి_Matrix4fv;
+            Validate_కార్యక్రమం = Switch_Validate_కార్యక్రమం;
+            శీర్షం_Attrib_సూచిక = Switch_శీర్షం_Attrib_సూచిక;
 
             // Extension: 2.1
-            UniformMatrix2x3fv = Switch_UniformMatrix2x3fv;
-            UniformMatrix3x2fv = Switch_UniformMatrix3x2fv;
-            UniformMatrix2x4fv = Switch_UniformMatrix2x4fv;
-            UniformMatrix4x2fv = Switch_UniformMatrix4x2fv;
-            UniformMatrix3x4fv = Switch_UniformMatrix3x4fv;
-            UniformMatrix4x3fv = Switch_UniformMatrix4x3fv;
+            ఏకరీతి_Matrix2x3fv = Switch_ఏకరీతి_Matrix2x3fv;
+            ఏకరీతి_Matrix3x2fv = Switch_ఏకరీతి_Matrix3x2fv;
+            ఏకరీతి_Matrix2x4fv = Switch_ఏకరీతి_Matrix2x4fv;
+            ఏకరీతి_Matrix4x2fv = Switch_ఏకరీతి_Matrix4x2fv;
+            ఏకరీతి_Matrix3x4fv = Switch_ఏకరీతి_Matrix3x4fv;
+            ఏకరీతి_Matrix4x3fv = Switch_ఏకరీతి_Matrix4x3fv;
 
             // Extension: ARB_vertex_array_object
-            BindVertexArray = Switch_BindVertexArray;
-            DeleteVertexArrays = Switch_DeleteVertexArrays;
-            GenVertexArrays = Switch_GenVertexArrays;
-            IsVertexArray = Switch_IsVertexArray;
+            Bind_శీర్షం_Array = Switch_Bind_శీర్షం_Array;
+            Delete_శీర్షం_Arrays = Switch_Delete_శీర్షం_Arrays;
+            Gen_శీర్షం_Arrays = Switch_Gen_శీర్షం_Arrays;
+            Is_శీర్షం_Array = Switch_Is_శీర్షం_Array;
 
             // Extension: ARB_map_buffer_range
-            MapBufferRange = Switch_MapBufferRange;
-            FlushMappedBufferRange = Switch_FlushMappedBufferRange;
+            Map_బఫరు_Range = Switch_Map_బఫరు_Range;
+            Flush_Mapped_బఫరు_Range = Switch_Flush_Mapped_బఫరు_Range;
 
             // Extension: ARB_framebuffer_object
             IsRenderbuffer = Switch_IsRenderbuffer;
@@ -2654,7 +2654,7 @@ namespace gl
             BindFramebuffer = Switch_BindFramebuffer;
             DeleteFramebuffers = Switch_DeleteFramebuffers;
             GenFramebuffers = Switch_GenFramebuffers;
-            CheckFramebufferStatus = Switch_CheckFramebufferStatus;
+            Check_Framebuffer_స్థితి = Switch_Check_Framebuffer_స్థితి;
             FramebufferTexture1D = Switch_FramebufferTexture1D;
             FramebufferTexture2D = Switch_FramebufferTexture2D;
             FramebufferTexture3D = Switch_FramebufferTexture3D;
@@ -2673,40 +2673,40 @@ namespace gl
             Disablei = Switch_Disablei;
             IsEnabledi = Switch_IsEnabledi;
             BeginTransformFeedback = Switch_BeginTransformFeedback;
-            EndTransformFeedback = Switch_EndTransformFeedback;
-            BindBufferRange = Switch_BindBufferRange;
-            BindBufferBase = Switch_BindBufferBase;
+            చివర_Transform_Feedback = Switch_చివర_Transform_Feedback;
+            Bind_బఫరు_Range = Switch_Bind_బఫరు_Range;
+            Bind_బఫరు_పునాది = Switch_Bind_బఫరు_పునాది;
             TransformFeedbackVaryings = Switch_TransformFeedbackVaryings;
             GetTransformFeedbackVarying = Switch_GetTransformFeedbackVarying;
             ClampColor = Switch_ClampColor;
             BeginConditionalRender = Switch_BeginConditionalRender;
-            EndConditionalRender = Switch_EndConditionalRender;
-            VertexAttribIPointer = Switch_VertexAttribIPointer;
-            GetVertexAttribIiv = Switch_GetVertexAttribIiv;
-            GetVertexAttribIuiv = Switch_GetVertexAttribIuiv;
-            VertexAttribI1i = Switch_VertexAttribI1i;
-            VertexAttribI2i = Switch_VertexAttribI2i;
-            VertexAttribI3i = Switch_VertexAttribI3i;
-            VertexAttribI4i = Switch_VertexAttribI4i;
-            VertexAttribI1ui = Switch_VertexAttribI1ui;
-            VertexAttribI2ui = Switch_VertexAttribI2ui;
-            VertexAttribI3ui = Switch_VertexAttribI3ui;
-            VertexAttribI4ui = Switch_VertexAttribI4ui;
-            VertexAttribI1iv = Switch_VertexAttribI1iv;
-            VertexAttribI2iv = Switch_VertexAttribI2iv;
-            VertexAttribI3iv = Switch_VertexAttribI3iv;
-            VertexAttribI4iv = Switch_VertexAttribI4iv;
-            VertexAttribI1uiv = Switch_VertexAttribI1uiv;
-            VertexAttribI2uiv = Switch_VertexAttribI2uiv;
-            VertexAttribI3uiv = Switch_VertexAttribI3uiv;
-            VertexAttribI4uiv = Switch_VertexAttribI4uiv;
-            VertexAttribI4bv = Switch_VertexAttribI4bv;
-            VertexAttribI4sv = Switch_VertexAttribI4sv;
-            VertexAttribI4ubv = Switch_VertexAttribI4ubv;
-            VertexAttribI4usv = Switch_VertexAttribI4usv;
+            చివర_Conditional_Render = Switch_చివర_Conditional_Render;
+            శీర్షం_Attrib_IPointer = Switch_శీర్షం_Attrib_IPointer;
+            Get_శీర్షం_Attrib_Iiv = Switch_Get_శీర్షం_Attrib_Iiv;
+            Get_శీర్షం_Attrib_Iuiv = Switch_Get_శీర్షం_Attrib_Iuiv;
+            శీర్షం_Attrib_I1i = Switch_శీర్షం_Attrib_I1i;
+            శీర్షం_Attrib_I2i = Switch_శీర్షం_Attrib_I2i;
+            శీర్షం_Attrib_I3i = Switch_శీర్షం_Attrib_I3i;
+            శీర్షం_Attrib_I4i = Switch_శీర్షం_Attrib_I4i;
+            శీర్షం_Attrib_I1ui = Switch_శీర్షం_Attrib_I1ui;
+            శీర్షం_Attrib_I2ui = Switch_శీర్షం_Attrib_I2ui;
+            శీర్షం_Attrib_I3ui = Switch_శీర్షం_Attrib_I3ui;
+            శీర్షం_Attrib_I4ui = Switch_శీర్షం_Attrib_I4ui;
+            శీర్షం_Attrib_I1iv = Switch_శీర్షం_Attrib_I1iv;
+            శీర్షం_Attrib_I2iv = Switch_శీర్షం_Attrib_I2iv;
+            శీర్షం_Attrib_I3iv = Switch_శీర్షం_Attrib_I3iv;
+            శీర్షం_Attrib_I4iv = Switch_శీర్షం_Attrib_I4iv;
+            శీర్షం_Attrib_I1uiv = Switch_శీర్షం_Attrib_I1uiv;
+            శీర్షం_Attrib_I2uiv = Switch_శీర్షం_Attrib_I2uiv;
+            శీర్షం_Attrib_I3uiv = Switch_శీర్షం_Attrib_I3uiv;
+            శీర్షం_Attrib_I4uiv = Switch_శీర్షం_Attrib_I4uiv;
+            శీర్షం_Attrib_I4bv = Switch_శీర్షం_Attrib_I4bv;
+            శీర్షం_Attrib_I4sv = Switch_శీర్షం_Attrib_I4sv;
+            శీర్షం_Attrib_I4ubv = Switch_శీర్షం_Attrib_I4ubv;
+            శీర్షం_Attrib_I4usv = Switch_శీర్షం_Attrib_I4usv;
             GetUniformuiv = Switch_GetUniformuiv;
-            BindFragDataLocation = Switch_BindFragDataLocation;
-            GetFragDataLocation = Switch_GetFragDataLocation;
+            Bind_Frag_దత్తాంశం_Location = Switch_Bind_Frag_దత్తాంశం_Location;
+            Get_Frag_దత్తాంశం_Location = Switch_Get_Frag_దత్తాంశం_Location;
             Uniform1ui = Switch_Uniform1ui;
             Uniform2ui = Switch_Uniform2ui;
             Uniform3ui = Switch_Uniform3ui;
@@ -2726,33 +2726,33 @@ namespace gl
             GetStringi = Switch_GetStringi;
 
             // Extension: ARB_uniform_buffer_object
-            GetUniformIndices = Switch_GetUniformIndices;
-            GetActiveUniformsiv = Switch_GetActiveUniformsiv;
-            GetActiveUniformName = Switch_GetActiveUniformName;
-            GetUniformBlockIndex = Switch_GetUniformBlockIndex;
-            GetActiveUniformBlockiv = Switch_GetActiveUniformBlockiv;
-            GetActiveUniformBlockName = Switch_GetActiveUniformBlockName;
-            UniformBlockBinding = Switch_UniformBlockBinding;
+            Get_ఏకరీతి_Indices = Switch_Get_ఏకరీతి_Indices;
+            Get_చురుకైన_Uniformsiv = Switch_Get_చురుకైన_Uniformsiv;
+            Get_చురుకైన_ఏకరీతి_Name = Switch_Get_చురుకైన_ఏకరీతి_Name;
+            Get_ఏకరీతి_ఖండం_సూచీ = Switch_Get_ఏకరీతి_ఖండం_సూచీ;
+            Get_చురుకైన_ఏకరీతి_Blockiv = Switch_Get_చురుకైన_ఏకరీతి_Blockiv;
+            Get_చురుకైన_ఏకరీతి_ఖండం_Name = Switch_Get_చురుకైన_ఏకరీతి_ఖండం_Name;
+            ఏకరీతి_ఖండం_Binding = Switch_ఏకరీతి_ఖండం_Binding;
 
             // Extension: ARB_copy_buffer
-            CopyBufferSubData = Switch_CopyBufferSubData;
+            Copy_బఫరు_Sub_దత్తాంశం = Switch_Copy_బఫరు_Sub_దత్తాంశం;
 
             // Extension: 3.1
             DrawArraysInstanced = Switch_DrawArraysInstanced;
             DrawElementsInstanced = Switch_DrawElementsInstanced;
-            TexBuffer = Switch_TexBuffer;
-            PrimitiveRestartIndex = Switch_PrimitiveRestartIndex;
+            Tex_బఫరు = Switch_Tex_బఫరు;
+            Primitive_Restart_సూచీ = Switch_Primitive_Restart_సూచీ;
 
             // Legacy
             EnableClientState = Switch_EnableClientState;
             DisableClientState = Switch_DisableClientState;
-            VertexPointer = Switch_VertexPointer;
-            NormalPointer = Switch_NormalPointer;
-            ColorPointer = Switch_ColorPointer;
-            TexCoordPointer = Switch_TexCoordPointer;
+            శీర్షం_సూచిక = Switch_శీర్షం_సూచిక;
+            సాధారణ_సూచిక = Switch_సాధారణ_సూచిక;
+            Color_సూచిక = Switch_Color_సూచిక;
+            Tex_Coord_సూచిక = Switch_Tex_Coord_సూచిక;
             TexEnvi = Switch_TexEnvi;
-            MatrixMode = Switch_MatrixMode;
-            LoadIdentity = Switch_LoadIdentity;
+            మాతృక_బహుళకం = Switch_మాతృక_బహుళకం;
+            ఎక్కించు_తటస్థం = Switch_ఎక్కించు_తటస్థం;
             Ortho = Switch_Ortho;
             Color3d = Switch_Color3d;
         }

@@ -40,328 +40,328 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <cstdint>
+#అన్తర్భావ "precomp.hpp"
+#అన్తర్భావ <cstdint>
 
-using namespace cv;
-using namespace cv::cuda;
+ఉపయోగించి నామాకాశ cv;
+ఉపయోగించి నామాకాశ cv::cuda;
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4702)  // unreachable code
-#endif
+#ఒకవేళ defined(_MSC_VER)
+#సూచన warning(disable : 4702)  // unreachable code
+#అయితే_ముగింపు
 
 /////////////////////////////////////////////////////////////
 /// MemoryStack
 
-#ifdef HAVE_CUDA
+#నిర్వచితమైతే HAVE_CUDA
 
-namespace
+నామాకాశ
 {
-    class MemoryPool;
+    తరగతి జ్ఞాపకం_Pool;
 
-    class MemoryStack
+    తరగతి జ్ఞాపకం_దొంతర
     {
-    public:
-        uchar* requestMemory(size_t size);
-        void returnMemory(uchar* ptr);
+    బహిరంగ:
+        uchar* request_జ్ఞాపకం(size_t size);
+        శూన్య return_జ్ఞాపకం(uchar* ptr);
 
         uchar* datastart;
         uchar* dataend;
         uchar* tip;
 
-        bool isFree;
-        MemoryPool* pool;
+        తార్కిక isFree;
+        జ్ఞాపకం_Pool* pool;
 
-    #if !defined(NDEBUG)
+    #ఒకవేళ !defined(NDEBUG)
         std::vector<size_t> allocations;
-    #endif
+    #అయితే_ముగింపు
     };
 
-    uchar* MemoryStack::requestMemory(size_t size)
+    uchar* జ్ఞాపకం_దొంతర::request_జ్ఞాపకం(size_t size)
     {
-        const size_t freeMem = dataend - tip;
+        స్థిరరాశి size_t freeMem = dataend - tip;
 
-        if (size > freeMem)
-            return 0;
+        ఒకవేళ (size > freeMem)
+            తిరిగి 0;
 
         uchar* ptr = tip;
 
         tip += size;
 
-    #if !defined(NDEBUG)
+    #ఒకవేళ !defined(NDEBUG)
         allocations.push_back(size);
-    #endif
+    #అయితే_ముగింపు
 
-        return ptr;
+        తిరిగి ptr;
     }
 
-    void MemoryStack::returnMemory(uchar* ptr)
+    శూన్య జ్ఞాపకం_దొంతర::return_జ్ఞాపకం(uchar* ptr)
     {
         CV_DbgAssert( ptr >= datastart && ptr < dataend );
 
-    #if !defined(NDEBUG)
-        const size_t allocSize = tip - ptr;
-        CV_Assert( allocSize == allocations.back() );
+    #ఒకవేళ !defined(NDEBUG)
+        స్థిరరాశి size_t alloc_కొలత = tip - ptr;
+        CV_Assert( alloc_కొలత == allocations.back() );
         allocations.pop_back();
-    #endif
+    #అయితే_ముగింపు
 
         tip = ptr;
     }
 }
 
-#endif
+#అయితే_ముగింపు
 
 /////////////////////////////////////////////////////////////
 /// MemoryPool
 
-#ifdef HAVE_CUDA
+#నిర్వచితమైతే HAVE_CUDA
 
-namespace
+నామాకాశ
 {
-    class MemoryPool
+    తరగతి జ్ఞాపకం_Pool
     {
-    public:
-        MemoryPool();
-        ~MemoryPool() { release(); }
+    బహిరంగ:
+        జ్ఞాపకం_Pool();
+        ~జ్ఞాపకం_Pool() { release(); }
 
-        void initialize(size_t stackSize, int stackCount);
-        void release();
+        శూన్య initialize(size_t దొంతర_కొలత, పూర్ణాంకం దొంతర_లెక్క);
+        శూన్య release();
 
-        MemoryStack* getFreeMemStack();
-        void returnMemStack(MemoryStack* memStack);
+        జ్ఞాపకం_దొంతర* get_Free_Mem_దొంతర();
+        శూన్య return_Mem_దొంతర(జ్ఞాపకం_దొంతర* mem_దొంతర);
 
-    private:
-        void initilizeImpl();
+    అంతరంగ:
+        శూన్య initilizeImpl();
 
         Mutex mtx_;
 
-        bool initialized_;
-        size_t stackSize_;
-        int stackCount_;
+        తార్కిక initialized_;
+        size_t దొంతర_కొలత_2;
+        పూర్ణాంకం దొంతర_లెక్క_2;
 
         uchar* mem_;
 
-        std::vector<MemoryStack> stacks_;
+        std::vector<జ్ఞాపకం_దొంతర> stacks_;
 
-        MemoryPool(const MemoryPool&); //= delete;
+        జ్ఞాపకం_Pool(స్థిరరాశి జ్ఞాపకం_Pool&); //= delete;
     };
 
-    MemoryPool::MemoryPool() : initialized_(false), mem_(0)
+    జ్ఞాపకం_Pool::జ్ఞాపకం_Pool() : initialized_(అబద్ధం), mem_(0)
     {
         // default : 10 Mb, 5 stacks
-        stackSize_ = 10 * 1024 * 1024;
-        stackCount_ = 5;
+        దొంతర_కొలత_2 = 10 * 1024 * 1024;
+        దొంతర_లెక్క_2 = 5;
     }
 
-    void MemoryPool::initialize(size_t stackSize, int stackCount)
+    శూన్య జ్ఞాపకం_Pool::initialize(size_t దొంతర_కొలత, పూర్ణాంకం దొంతర_లెక్క)
     {
-        AutoLock lock(mtx_);
+        Auto_తాళం lock(mtx_);
 
         release();
 
-        stackSize_ = stackSize;
-        stackCount_ = stackCount;
+        దొంతర_కొలత_2 = దొంతర_కొలత;
+        దొంతర_లెక్క_2 = దొంతర_లెక్క;
 
         initilizeImpl();
     }
 
-    void MemoryPool::initilizeImpl()
+    శూన్య జ్ఞాపకం_Pool::initilizeImpl()
     {
-        const size_t totalSize = stackSize_ * stackCount_;
+        స్థిరరాశి size_t మొత్తం_కొలత = దొంతర_కొలత_2 * దొంతర_లెక్క_2;
 
-        if (totalSize > 0)
+        ఒకవేళ (మొత్తం_కొలత > 0)
         {
-            cudaError_t err = cudaMalloc(&mem_, totalSize);
-            if (err != cudaSuccess)
-                return;
+            cudaError_t err = cudaMalloc(&mem_, మొత్తం_కొలత);
+            ఒకవేళ (err != cudaSuccess)
+                తిరిగి;
 
-            stacks_.resize(stackCount_);
+            stacks_.resize(దొంతర_లెక్క_2);
 
             uchar* ptr = mem_;
 
-            for (int i = 0; i < stackCount_; ++i)
+            కొరకు (పూర్ణాంకం i = 0; i < దొంతర_లెక్క_2; ++i)
             {
                 stacks_[i].datastart = ptr;
-                stacks_[i].dataend = ptr + stackSize_;
+                stacks_[i].dataend = ptr + దొంతర_కొలత_2;
                 stacks_[i].tip = ptr;
-                stacks_[i].isFree = true;
-                stacks_[i].pool = this;
+                stacks_[i].isFree = నిజం;
+                stacks_[i].pool = ఇది;
 
-                ptr += stackSize_;
+                ptr += దొంతర_కొలత_2;
             }
 
-            initialized_ = true;
+            initialized_ = నిజం;
         }
     }
 
-    void MemoryPool::release()
+    శూన్య జ్ఞాపకం_Pool::release()
     {
-        if (mem_)
+        ఒకవేళ (mem_)
         {
-#if !defined(NDEBUG)
-            for (int i = 0; i < stackCount_; ++i)
+#ఒకవేళ !defined(NDEBUG)
+            కొరకు (పూర్ణాంకం i = 0; i < దొంతర_లెక్క_2; ++i)
             {
                 CV_DbgAssert( stacks_[i].isFree );
                 CV_DbgAssert( stacks_[i].tip == stacks_[i].datastart );
             }
-#endif
+#అయితే_ముగింపు
 
             cudaFree(mem_);
 
             mem_ = 0;
-            initialized_ = false;
+            initialized_ = అబద్ధం;
         }
     }
 
-    MemoryStack* MemoryPool::getFreeMemStack()
+    జ్ఞాపకం_దొంతర* జ్ఞాపకం_Pool::get_Free_Mem_దొంతర()
     {
-        AutoLock lock(mtx_);
+        Auto_తాళం lock(mtx_);
 
-        if (!initialized_)
+        ఒకవేళ (!initialized_)
             initilizeImpl();
 
-        if (!mem_)
-            return 0;
+        ఒకవేళ (!mem_)
+            తిరిగి 0;
 
-        for (int i = 0; i < stackCount_; ++i)
+        కొరకు (పూర్ణాంకం i = 0; i < దొంతర_లెక్క_2; ++i)
         {
-            if (stacks_[i].isFree)
+            ఒకవేళ (stacks_[i].isFree)
             {
-                stacks_[i].isFree = false;
-                return &stacks_[i];
+                stacks_[i].isFree = అబద్ధం;
+                తిరిగి &stacks_[i];
             }
         }
 
-        return 0;
+        తిరిగి 0;
     }
 
-    void MemoryPool::returnMemStack(MemoryStack* memStack)
+    శూన్య జ్ఞాపకం_Pool::return_Mem_దొంతర(జ్ఞాపకం_దొంతర* mem_దొంతర)
     {
-        AutoLock lock(mtx_);
+        Auto_తాళం lock(mtx_);
 
-        CV_DbgAssert( !memStack->isFree );
+        CV_DbgAssert( !mem_దొంతర->isFree );
 
-#if !defined(NDEBUG)
-        bool found = false;
-        for (int i = 0; i < stackCount_; ++i)
+#ఒకవేళ !defined(NDEBUG)
+        తార్కిక దొరికింది = అబద్ధం;
+        కొరకు (పూర్ణాంకం i = 0; i < దొంతర_లెక్క_2; ++i)
         {
-            if (memStack == &stacks_[i])
+            ఒకవేళ (mem_దొంతర == &stacks_[i])
             {
-                found = true;
-                break;
+                దొరికింది = నిజం;
+                ఆపు;
             }
         }
-        CV_DbgAssert( found );
-#endif
+        CV_DbgAssert( దొరికింది );
+#అయితే_ముగింపు
 
-        CV_DbgAssert( memStack->tip == memStack->datastart );
+        CV_DbgAssert( mem_దొంతర->tip == mem_దొంతర->datastart );
 
-        memStack->isFree = true;
+        mem_దొంతర->isFree = నిజం;
     }
 }
 
-#endif
+#అయితే_ముగింపు
 
 ////////////////////////////////////////////////////////////////
 /// Stream::Impl
 
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
 
-class cv::cuda::Stream::Impl
+తరగతి cv::cuda::ప్రవాహం::Impl
 {
-public:
-    Impl(void* ptr = 0)
+బహిరంగ:
+    Impl(శూన్య* ptr = 0)
     {
-        CV_UNUSED(ptr);
+        CV_వాడని(ptr);
         throw_no_cuda();
     }
 };
 
-#else
+#లేకపోతే
 
-namespace
+నామాకాశ
 {
-    class StackAllocator;
+    తరగతి దొంతర_Allocator;
 }
 
-class cv::cuda::Stream::Impl
+తరగతి cv::cuda::ప్రవాహం::Impl
 {
-public:
-    cudaStream_t stream;
-    bool ownStream;
+బహిరంగ:
+    cuda_ప్రవాహం_t stream;
+    తార్కిక own_ప్రవాహం;
 
     Ptr<GpuMat::Allocator> allocator;
 
     Impl();
-    Impl(const Ptr<GpuMat::Allocator>& allocator);
-    Impl(const unsigned int cudaFlags);
-    explicit Impl(cudaStream_t stream);
+    Impl(స్థిరరాశి Ptr<GpuMat::Allocator>& allocator);
+    Impl(స్థిరరాశి గుర్తులేని పూర్ణాంకం cudaFlags);
+    స్పష్టమైన Impl(cuda_ప్రవాహం_t stream);
 
     ~Impl();
 };
 
-cv::cuda::Stream::Impl::Impl() : stream(0), ownStream(false)
+cv::cuda::ప్రవాహం::Impl::Impl() : stream(0), own_ప్రవాహం(అబద్ధం)
 {
-    cudaSafeCall( cudaStreamCreate(&stream) );
-    ownStream = true;
+    cuda_సురక్షిత_Call( cuda_ప్రవాహం_Create(&stream) );
+    own_ప్రవాహం = నిజం;
 
-    allocator = makePtr<StackAllocator>(stream);
+    allocator = makePtr<దొంతర_Allocator>(stream);
 }
 
-cv::cuda::Stream::Impl::Impl(const Ptr<GpuMat::Allocator>& allocator) : stream(0), ownStream(false), allocator(allocator)
+cv::cuda::ప్రవాహం::Impl::Impl(స్థిరరాశి Ptr<GpuMat::Allocator>& allocator) : stream(0), own_ప్రవాహం(అబద్ధం), allocator(allocator)
 {
-    cudaSafeCall( cudaStreamCreate(&stream) );
-    ownStream = true;
+    cuda_సురక్షిత_Call( cuda_ప్రవాహం_Create(&stream) );
+    own_ప్రవాహం = నిజం;
 }
 
-cv::cuda::Stream::Impl::Impl(const unsigned int cudaFlags) : stream(0), ownStream(false)
+cv::cuda::ప్రవాహం::Impl::Impl(స్థిరరాశి గుర్తులేని పూర్ణాంకం cudaFlags) : stream(0), own_ప్రవాహం(అబద్ధం)
 {
-    cudaSafeCall(cudaStreamCreateWithFlags(&stream, cudaFlags));
-    ownStream = true;
-    allocator = makePtr<StackAllocator>(stream);
+    cuda_సురక్షిత_Call(cuda_ప్రవాహం_Create_With_Flags(&stream, cudaFlags));
+    own_ప్రవాహం = నిజం;
+    allocator = makePtr<దొంతర_Allocator>(stream);
 }
 
-cv::cuda::Stream::Impl::Impl(cudaStream_t stream_) : stream(stream_), ownStream(false)
+cv::cuda::ప్రవాహం::Impl::Impl(cuda_ప్రవాహం_t ప్రవాహం_3) : stream(ప్రవాహం_3), own_ప్రవాహం(అబద్ధం)
 {
-    allocator = makePtr<StackAllocator>(stream);
+    allocator = makePtr<దొంతర_Allocator>(stream);
 }
 
-cv::cuda::Stream::Impl::~Impl()
+cv::cuda::ప్రవాహం::Impl::~Impl()
 {
     allocator.release();
 
-    if (stream && ownStream)
+    ఒకవేళ (stream && own_ప్రవాహం)
     {
-        cudaStreamDestroy(stream);
+        cuda_ప్రవాహం_Destroy(stream);
     }
 }
 
-#endif
+#అయితే_ముగింపు
 
 /////////////////////////////////////////////////////////////
 /// DefaultDeviceInitializer
 
-#ifdef HAVE_CUDA
+#నిర్వచితమైతే HAVE_CUDA
 
-namespace cv { namespace cuda
+నామాకాశ cv { నామాకాశ cuda
 {
-    class DefaultDeviceInitializer
+    తరగతి DefaultDeviceInitializer
     {
-    public:
+    బహిరంగ:
         DefaultDeviceInitializer();
         ~DefaultDeviceInitializer();
 
-        Stream& getNullStream(int deviceId);
-        MemoryPool& getMemoryPool(int deviceId);
+        ప్రవాహం& get_Null_ప్రవాహం(పూర్ణాంకం deviceId);
+        జ్ఞాపకం_Pool& get_జ్ఞాపకం_Pool(పూర్ణాంకం deviceId);
 
-    private:
-        void initStreams();
-        void initPools();
+    అంతరంగ:
+        శూన్య initStreams();
+        శూన్య initPools();
 
-        std::vector<Ptr<Stream> > streams_;
+        std::vector<Ptr<ప్రవాహం> > streams_;
         Mutex streams_mtx_;
 
-        std::vector<Ptr<MemoryPool> > pools_;
+        std::vector<Ptr<జ్ఞాపకం_Pool> > pools_;
         Mutex pools_mtx_;
     };
 
@@ -373,506 +373,506 @@ namespace cv { namespace cuda
     {
         streams_.clear();
 
-        for (size_t i = 0; i < pools_.size(); ++i)
+        కొరకు (size_t i = 0; i < pools_.size(); ++i)
         {
-            cudaSetDevice(static_cast<int>(i));
+            cuda_సమితి_Device(static_cast<పూర్ణాంకం>(i));
             pools_[i]->release();
         }
 
         pools_.clear();
     }
 
-    Stream& DefaultDeviceInitializer::getNullStream(int deviceId)
+    ప్రవాహం& DefaultDeviceInitializer::get_Null_ప్రవాహం(పూర్ణాంకం deviceId)
     {
-        AutoLock lock(streams_mtx_);
+        Auto_తాళం lock(streams_mtx_);
 
-        if (streams_.empty())
+        ఒకవేళ (streams_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            పూర్ణాంకం device_లెక్క = get_Cuda_Enabled_Device_లెక్క();
 
-            if (deviceCount > 0)
-                streams_.resize(deviceCount);
+            ఒకవేళ (device_లెక్క > 0)
+                streams_.resize(device_లెక్క);
         }
 
-        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<int>(streams_.size()) );
+        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<పూర్ణాంకం>(streams_.size()) );
 
-        if (streams_[deviceId].empty())
+        ఒకవేళ (streams_[deviceId].empty())
         {
-            cudaStream_t stream = NULL;
-            Ptr<Stream::Impl> impl = makePtr<Stream::Impl>(stream);
-            streams_[deviceId] = Ptr<Stream>(new Stream(impl));
+            cuda_ప్రవాహం_t stream = ఖాళీ;
+            Ptr<ప్రవాహం::Impl> impl = makePtr<ప్రవాహం::Impl>(stream);
+            streams_[deviceId] = Ptr<ప్రవాహం>(కొత్త ప్రవాహం(impl));
         }
 
-        return *streams_[deviceId];
+        తిరిగి *streams_[deviceId];
     }
 
-    MemoryPool& DefaultDeviceInitializer::getMemoryPool(int deviceId)
+    జ్ఞాపకం_Pool& DefaultDeviceInitializer::get_జ్ఞాపకం_Pool(పూర్ణాంకం deviceId)
     {
-        AutoLock lock(pools_mtx_);
+        Auto_తాళం lock(pools_mtx_);
 
-        if (pools_.empty())
+        ఒకవేళ (pools_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            పూర్ణాంకం device_లెక్క = get_Cuda_Enabled_Device_లెక్క();
 
-            if (deviceCount > 0)
+            ఒకవేళ (device_లెక్క > 0)
             {
-                pools_.resize(deviceCount);
-                for (size_t i = 0; i < pools_.size(); ++i)
+                pools_.resize(device_లెక్క);
+                కొరకు (size_t i = 0; i < pools_.size(); ++i)
                 {
-                    cudaSetDevice(static_cast<int>(i));
-                    pools_[i] = makePtr<MemoryPool>();
+                    cuda_సమితి_Device(static_cast<పూర్ణాంకం>(i));
+                    pools_[i] = makePtr<జ్ఞాపకం_Pool>();
                 }
             }
         }
 
-        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<int>(pools_.size()) );
+        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<పూర్ణాంకం>(pools_.size()) );
 
-        MemoryPool* p = pools_[deviceId];
+        జ్ఞాపకం_Pool* p = pools_[deviceId];
         CV_Assert(p);
-        return *p;
+        తిరిగి *p;
     }
 
     DefaultDeviceInitializer initializer;
 }}
 
-#endif
+#అయితే_ముగింపు
 
 /////////////////////////////////////////////////////////////
 /// Stream
 
-cv::cuda::Stream::Stream()
+cv::cuda::ప్రవాహం::ప్రవాహం()
 {
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
     throw_no_cuda();
-#else
+#లేకపోతే
     impl_ = makePtr<Impl>();
-#endif
+#అయితే_ముగింపు
 }
 
-cv::cuda::Stream::Stream(const Ptr<GpuMat::Allocator>& allocator)
+cv::cuda::ప్రవాహం::ప్రవాహం(స్థిరరాశి Ptr<GpuMat::Allocator>& allocator)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(allocator);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(allocator);
     throw_no_cuda();
-#else
+#లేకపోతే
     impl_ = makePtr<Impl>(allocator);
-#endif
+#అయితే_ముగింపు
 }
 
-cv::cuda::Stream::Stream(const size_t cudaFlags)
+cv::cuda::ప్రవాహం::ప్రవాహం(స్థిరరాశి size_t cudaFlags)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(cudaFlags);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(cudaFlags);
     throw_no_cuda();
-#else
+#లేకపోతే
     impl_ = makePtr<Impl>(cudaFlags & UINT_MAX);
-#endif
+#అయితే_ముగింపు
 }
 
-bool cv::cuda::Stream::queryIfComplete() const
+తార్కిక cv::cuda::ప్రవాహం::queryIfComplete() స్థిరరాశి
 {
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
     throw_no_cuda();
-#else
-    cudaError_t err = cudaStreamQuery(impl_->stream);
+#లేకపోతే
+    cudaError_t err = cuda_ప్రవాహం_Query(impl_->stream);
 
-    if (err == cudaErrorNotReady || err == cudaSuccess)
-        return err == cudaSuccess;
+    ఒకవేళ (err == cudaErrorNotReady || err == cudaSuccess)
+        తిరిగి err == cudaSuccess;
 
-    cudaSafeCall(err);
-    return false;
-#endif
+    cuda_సురక్షిత_Call(err);
+    తిరిగి అబద్ధం;
+#అయితే_ముగింపు
 }
 
-void cv::cuda::Stream::waitForCompletion()
+శూన్య cv::cuda::ప్రవాహం::waitForCompletion()
 {
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaStreamSynchronize(impl_->stream) );
-#endif
+#లేకపోతే
+    cuda_సురక్షిత_Call( cuda_ప్రవాహం_Synchronize(impl_->stream) );
+#అయితే_ముగింపు
 }
 
-void cv::cuda::Stream::waitEvent(const Event& event)
+శూన్య cv::cuda::ప్రవాహం::waitEvent(స్థిరరాశి Event& event)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(event);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(event);
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaStreamWaitEvent(impl_->stream, EventAccessor::getEvent(event), 0) );
-#endif
+#లేకపోతే
+    cuda_సురక్షిత_Call( cuda_ప్రవాహం_Wait_Event(impl_->stream, EventAccessor::getEvent(event), 0) );
+#అయితే_ముగింపు
 }
 
-#if defined(HAVE_CUDA) && (CUDART_VERSION >= 5000)
+#ఒకవేళ defined(HAVE_CUDA) && (CUDART_సంస్కరణ >= 5000)
 
-namespace
+నామాకాశ
 {
-    struct CallbackData
+    నిర్మాణం Callback_దత్తాంశం
     {
-        Stream::StreamCallback callback;
-        void* userData;
+        ప్రవాహం::ప్రవాహం_Callback callback;
+        శూన్య* user_దత్తాంశం;
 
-        CallbackData(Stream::StreamCallback callback_, void* userData_) : callback(callback_), userData(userData_) {}
+        Callback_దత్తాంశం(ప్రవాహం::ప్రవాహం_Callback callback_, శూన్య* user_దత్తాంశం_2) : callback(callback_), user_దత్తాంశం(user_దత్తాంశం_2) {}
     };
 
-    void CUDART_CB cudaStreamCallback(cudaStream_t, cudaError_t status, void* userData)
+    శూన్య CUDART_CB cuda_ప్రవాహం_Callback(cuda_ప్రవాహం_t, cudaError_t స్థితి_2, శూన్య* user_దత్తాంశం)
     {
-        CallbackData* data = reinterpret_cast<CallbackData*>(userData);
-        data->callback(static_cast<int>(status), data->userData);
-        delete data;
+        Callback_దత్తాంశం* దత్తాంశం = reinterpret_cast<Callback_దత్తాంశం*>(user_దత్తాంశం);
+        దత్తాంశం->callback(static_cast<పూర్ణాంకం>(స్థితి_2), దత్తాంశం->user_దత్తాంశం);
+        తొలగించు దత్తాంశం;
     }
 }
 
-#endif
+#అయితే_ముగింపు
 
-void cv::cuda::Stream::enqueueHostCallback(StreamCallback callback, void* userData)
+శూన్య cv::cuda::ప్రవాహం::వరుసలో_చేర్చు_Host_Callback(ప్రవాహం_Callback callback, శూన్య* user_దత్తాంశం)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(callback);
-    CV_UNUSED(userData);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(callback);
+    CV_వాడని(user_దత్తాంశం);
     throw_no_cuda();
-#else
-    #if CUDART_VERSION < 5000
-        CV_UNUSED(callback);
-        CV_UNUSED(userData);
+#లేకపోతే
+    #ఒకవేళ CUDART_సంస్కరణ < 5000
+        CV_వాడని(callback);
+        CV_వాడని(user_దత్తాంశం);
         CV_Error(cv::Error::StsNotImplemented, "This function requires CUDA >= 5.0");
-    #else
-        CallbackData* data = new CallbackData(callback, userData);
+    #లేకపోతే
+        Callback_దత్తాంశం* దత్తాంశం = కొత్త Callback_దత్తాంశం(callback, user_దత్తాంశం);
 
-        cudaSafeCall( cudaStreamAddCallback(impl_->stream, cudaStreamCallback, data, 0) );
-    #endif
-#endif
+        cuda_సురక్షిత_Call( cuda_ప్రవాహం_కూడు_Callback(impl_->stream, cuda_ప్రవాహం_Callback, దత్తాంశం, 0) );
+    #అయితే_ముగింపు
+#అయితే_ముగింపు
 }
 
-Stream& cv::cuda::Stream::Null()
+ప్రవాహం& cv::cuda::ప్రవాహం::Null()
 {
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
     throw_no_cuda();
-#else
-    const int deviceId = getDevice();
-    return initializer.getNullStream(deviceId);
-#endif
+#లేకపోతే
+    స్థిరరాశి పూర్ణాంకం deviceId = getDevice();
+    తిరిగి initializer.get_Null_ప్రవాహం(deviceId);
+#అయితే_ముగింపు
 }
 
-void* cv::cuda::Stream::cudaPtr() const
+శూన్య* cv::cuda::ప్రవాహం::cudaPtr() స్థిరరాశి
 {
-#ifndef HAVE_CUDA
-    return nullptr;
-#else
-    return impl_->stream;
-#endif
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    తిరిగి శూన్యసూచిక;
+#లేకపోతే
+    తిరిగి impl_->stream;
+#అయితే_ముగింపు
 }
 
-cv::cuda::Stream::operator bool_type() const
+cv::cuda::ప్రవాహం::క్రియాకారకం bool_type() స్థిరరాశి
 {
-#ifndef HAVE_CUDA
-    return 0;
-#else
-    return (impl_->stream != 0) ? &Stream::this_type_does_not_support_comparisons : 0;
-#endif
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    తిరిగి 0;
+#లేకపోతే
+    తిరిగి (impl_->stream != 0) ? &ప్రవాహం::this_type_does_not_support_comparisons : 0;
+#అయితే_ముగింపు
 }
 
-#ifdef HAVE_CUDA
+#నిర్వచితమైతే HAVE_CUDA
 
-cudaStream_t cv::cuda::StreamAccessor::getStream(const Stream& stream)
+cuda_ప్రవాహం_t cv::cuda::ప్రవాహం_Accessor::get_ప్రవాహం(స్థిరరాశి ప్రవాహం& stream)
 {
-    return stream.impl_->stream;
+    తిరిగి stream.impl_->stream;
 }
 
-Stream cv::cuda::StreamAccessor::wrapStream(cudaStream_t stream)
+ప్రవాహం cv::cuda::ప్రవాహం_Accessor::wrap_ప్రవాహం(cuda_ప్రవాహం_t stream)
 {
-    return Stream(makePtr<Stream::Impl>(stream));
+    తిరిగి ప్రవాహం(makePtr<ప్రవాహం::Impl>(stream));
 }
 
-#endif
+#అయితే_ముగింపు
 
-Stream cv::cuda::wrapStream(size_t cudaStreamMemoryAddress) {
-#ifndef HAVE_CUDA
-    CV_UNUSED(cudaStreamMemoryAddress);
+ప్రవాహం cv::cuda::wrap_ప్రవాహం(size_t cuda_ప్రవాహం_జ్ఞాపకం_చిరునామా) {
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(cuda_ప్రవాహం_జ్ఞాపకం_చిరునామా);
     throw_no_cuda();
-#else
-    return cv::cuda::StreamAccessor::wrapStream(reinterpret_cast<cudaStream_t>(cudaStreamMemoryAddress));
-#endif
+#లేకపోతే
+    తిరిగి cv::cuda::ప్రవాహం_Accessor::wrap_ప్రవాహం(reinterpret_cast<cuda_ప్రవాహం_t>(cuda_ప్రవాహం_జ్ఞాపకం_చిరునామా));
+#అయితే_ముగింపు
 }
 
 /////////////////////////////////////////////////////////////
 /// StackAllocator
 
-#ifdef HAVE_CUDA
+#నిర్వచితమైతే HAVE_CUDA
 
-namespace
+నామాకాశ
 {
-    bool enableMemoryPool = false;
+    తార్కిక enable_జ్ఞాపకం_Pool = అబద్ధం;
 
-    class StackAllocator : public GpuMat::Allocator
+    తరగతి దొంతర_Allocator : బహిరంగ GpuMat::Allocator
     {
-    public:
-        explicit StackAllocator(cudaStream_t stream);
-        ~StackAllocator();
+    బహిరంగ:
+        స్పష్టమైన దొంతర_Allocator(cuda_ప్రవాహం_t stream);
+        ~దొంతర_Allocator();
 
-        bool allocate(GpuMat* mat, int rows, int cols, size_t elemSize) CV_OVERRIDE;
-        void free(GpuMat* mat) CV_OVERRIDE;
+        తార్కిక allocate(GpuMat* mat, పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, size_t elem_కొలత) CV_OVERRIDE;
+        శూన్య విడుదల(GpuMat* mat) CV_OVERRIDE;
 
-    private:
-        StackAllocator(const StackAllocator&);
-        StackAllocator& operator =(const StackAllocator&);
+    అంతరంగ:
+        దొంతర_Allocator(స్థిరరాశి దొంతర_Allocator&);
+        దొంతర_Allocator& క్రియాకారకం =(స్థిరరాశి దొంతర_Allocator&);
 
-        cudaStream_t stream_;
-        MemoryStack* memStack_;
+        cuda_ప్రవాహం_t ప్రవాహం_3;
+        జ్ఞాపకం_దొంతర* mem_దొంతర_2;
         size_t alignment_;
     };
 
-    StackAllocator::StackAllocator(cudaStream_t stream) : stream_(stream), memStack_(0)
+    దొంతర_Allocator::దొంతర_Allocator(cuda_ప్రవాహం_t stream) : ప్రవాహం_3(stream), mem_దొంతర_2(0)
     {
-        if (enableMemoryPool)
+        ఒకవేళ (enable_జ్ఞాపకం_Pool)
         {
-            const int deviceId = getDevice();
-            memStack_ = initializer.getMemoryPool(deviceId).getFreeMemStack();
+            స్థిరరాశి పూర్ణాంకం deviceId = getDevice();
+            mem_దొంతర_2 = initializer.get_జ్ఞాపకం_Pool(deviceId).get_Free_Mem_దొంతర();
             DeviceInfo devInfo(deviceId);
             alignment_ = devInfo.textureAlignment();
         }
     }
 
-    StackAllocator::~StackAllocator()
+    దొంతర_Allocator::~దొంతర_Allocator()
     {
-        if (memStack_ != 0)
+        ఒకవేళ (mem_దొంతర_2 != 0)
         {
-            cudaStreamSynchronize(stream_);
-            memStack_->pool->returnMemStack(memStack_);
+            cuda_ప్రవాహం_Synchronize(ప్రవాహం_3);
+            mem_దొంతర_2->pool->return_Mem_దొంతర(mem_దొంతర_2);
         }
     }
 
-    size_t alignUp(size_t what, size_t alignment)
+    size_t align_పైకి(size_t what, size_t alignment)
     {
-        size_t alignMask = alignment-1;
-        size_t inverseAlignMask = ~alignMask;
-        size_t res = (what + alignMask) & inverseAlignMask;
-        return res;
+        size_t align_ముసుగు = alignment-1;
+        size_t inverse_Align_ముసుగు = ~align_ముసుగు;
+        size_t res = (what + align_ముసుగు) & inverse_Align_ముసుగు;
+        తిరిగి res;
     }
 
-    bool StackAllocator::allocate(GpuMat* mat, int rows, int cols, size_t elemSize)
+    తార్కిక దొంతర_Allocator::allocate(GpuMat* mat, పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, size_t elem_కొలత)
     {
-        if (memStack_ == 0)
-            return false;
+        ఒకవేళ (mem_దొంతర_2 == 0)
+            తిరిగి అబద్ధం;
 
-        size_t pitch, memSize;
+        size_t pitch, mem_కొలత;
 
-        if (rows > 1 && cols > 1)
+        ఒకవేళ (అడ్డువరుసలు > 1 && నిలువుల_సంఖ్య > 1)
         {
-            pitch = alignUp(cols * elemSize, alignment_);
-            memSize = pitch * rows;
+            pitch = align_పైకి(నిలువుల_సంఖ్య * elem_కొలత, alignment_);
+            mem_కొలత = pitch * అడ్డువరుసలు;
         }
-        else
+        లేకపోతే
         {
             // Single row or single column must be continuous
-            pitch = elemSize * cols;
-            memSize = alignUp(elemSize * cols * rows, 64);
+            pitch = elem_కొలత * నిలువుల_సంఖ్య;
+            mem_కొలత = align_పైకి(elem_కొలత * నిలువుల_సంఖ్య * అడ్డువరుసలు, 64);
         }
 
-        uchar* ptr = memStack_->requestMemory(memSize);
+        uchar* ptr = mem_దొంతర_2->request_జ్ఞాపకం(mem_కొలత);
 
-        if (ptr == 0)
-            return false;
+        ఒకవేళ (ptr == 0)
+            తిరిగి అబద్ధం;
 
-        mat->data = ptr;
-        mat->step = pitch;
-        mat->refcount = (int*) fastMalloc(sizeof(int));
+        mat->దత్తాంశం = ptr;
+        mat->అడుగు = pitch;
+        mat->refcount = (పూర్ణాంకం*) fastMalloc(పరిమాణం(పూర్ణాంకం));
 
-        return true;
+        తిరిగి నిజం;
     }
 
-    void StackAllocator::free(GpuMat* mat)
+    శూన్య దొంతర_Allocator::విడుదల(GpuMat* mat)
     {
-        if (memStack_ == 0)
-            return;
+        ఒకవేళ (mem_దొంతర_2 == 0)
+            తిరిగి;
 
-        memStack_->returnMemory(mat->datastart);
+        mem_దొంతర_2->return_జ్ఞాపకం(mat->datastart);
         fastFree(mat->refcount);
     }
 }
 
-#endif
+#అయితే_ముగింపు
 
 /////////////////////////////////////////////////////////////
 /// BufferPool
 
-void cv::cuda::setBufferPoolUsage(bool on)
+శూన్య cv::cuda::సమితి_బఫరు_Pool_Usage(తార్కిక on)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(on);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(on);
     throw_no_cuda();
-#else
-    enableMemoryPool = on;
-#endif
+#లేకపోతే
+    enable_జ్ఞాపకం_Pool = on;
+#అయితే_ముగింపు
 }
 
-void cv::cuda::setBufferPoolConfig(int deviceId, size_t stackSize, int stackCount)
+శూన్య cv::cuda::సమితి_బఫరు_Pool_Config(పూర్ణాంకం deviceId, size_t దొంతర_కొలత, పూర్ణాంకం దొంతర_లెక్క)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(deviceId);
-    CV_UNUSED(stackSize);
-    CV_UNUSED(stackCount);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(deviceId);
+    CV_వాడని(దొంతర_కొలత);
+    CV_వాడని(దొంతర_లెక్క);
     throw_no_cuda();
-#else
-    const int currentDevice = getDevice();
+#లేకపోతే
+    స్థిరరాశి పూర్ణాంకం currentDevice = getDevice();
 
-    if (deviceId >= 0)
+    ఒకవేళ (deviceId >= 0)
     {
-        setDevice(deviceId);
-        initializer.getMemoryPool(deviceId).initialize(stackSize, stackCount);
+        సమితి_Device(deviceId);
+        initializer.get_జ్ఞాపకం_Pool(deviceId).initialize(దొంతర_కొలత, దొంతర_లెక్క);
     }
-    else
+    లేకపోతే
     {
-        const int deviceCount = getCudaEnabledDeviceCount();
+        స్థిరరాశి పూర్ణాంకం device_లెక్క = get_Cuda_Enabled_Device_లెక్క();
 
-        for (deviceId = 0; deviceId < deviceCount; ++deviceId)
+        కొరకు (deviceId = 0; deviceId < device_లెక్క; ++deviceId)
         {
-            setDevice(deviceId);
-            initializer.getMemoryPool(deviceId).initialize(stackSize, stackCount);
+            సమితి_Device(deviceId);
+            initializer.get_జ్ఞాపకం_Pool(deviceId).initialize(దొంతర_కొలత, దొంతర_లెక్క);
         }
     }
 
-    setDevice(currentDevice);
-#endif
+    సమితి_Device(currentDevice);
+#అయితే_ముగింపు
 }
 
-#ifndef HAVE_CUDA
-cv::cuda::BufferPool::BufferPool(Stream& stream)
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+cv::cuda::బఫరు_Pool::బఫరు_Pool(ప్రవాహం& stream)
 {
-    CV_UNUSED(stream);
+    CV_వాడని(stream);
     throw_no_cuda();
 }
-#else
-cv::cuda::BufferPool::BufferPool(Stream& stream) : allocator_(stream.impl_->allocator)
+#లేకపోతే
+cv::cuda::బఫరు_Pool::బఫరు_Pool(ప్రవాహం& stream) : allocator_(stream.impl_->allocator)
 {
 }
-#endif
+#అయితే_ముగింపు
 
-GpuMat cv::cuda::BufferPool::getBuffer(int rows, int cols, int type)
+GpuMat cv::cuda::బఫరు_Pool::get_బఫరు(పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(rows);
-    CV_UNUSED(cols);
-    CV_UNUSED(type);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(అడ్డువరుసలు);
+    CV_వాడని(నిలువుల_సంఖ్య);
+    CV_వాడని(type);
     throw_no_cuda();
-#else
+#లేకపోతే
     GpuMat buf(allocator_);
-    buf.create(rows, cols, type);
-    return buf;
-#endif
+    buf.create(అడ్డువరుసలు, నిలువుల_సంఖ్య, type);
+    తిరిగి buf;
+#అయితే_ముగింపు
 }
 
 
 ////////////////////////////////////////////////////////////////
 // Event
 
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
 
-class cv::cuda::Event::Impl
+తరగతి cv::cuda::Event::Impl
 {
-public:
-    Impl(unsigned int)
+బహిరంగ:
+    Impl(గుర్తులేని పూర్ణాంకం)
     {
         throw_no_cuda();
     }
 };
 
-#else
+#లేకపోతే
 
-class cv::cuda::Event::Impl
+తరగతి cv::cuda::Event::Impl
 {
-public:
+బహిరంగ:
     cudaEvent_t event;
-    bool ownEvent;
+    తార్కిక ownEvent;
 
-    explicit Impl(unsigned int flags);
-    explicit Impl(cudaEvent_t event);
+    స్పష్టమైన Impl(గుర్తులేని పూర్ణాంకం flags);
+    స్పష్టమైన Impl(cudaEvent_t event);
     ~Impl();
 };
 
-cv::cuda::Event::Impl::Impl(unsigned int flags) : event(0), ownEvent(false)
+cv::cuda::Event::Impl::Impl(గుర్తులేని పూర్ణాంకం flags) : event(0), ownEvent(అబద్ధం)
 {
-    cudaSafeCall( cudaEventCreateWithFlags(&event, flags) );
-    ownEvent = true;
+    cuda_సురక్షిత_Call( cudaEventCreateWithFlags(&event, flags) );
+    ownEvent = నిజం;
 }
 
-cv::cuda::Event::Impl::Impl(cudaEvent_t e) : event(e), ownEvent(false)
+cv::cuda::Event::Impl::Impl(cudaEvent_t e) : event(e), ownEvent(అబద్ధం)
 {
 }
 
 cv::cuda::Event::Impl::~Impl()
 {
-    if (event && ownEvent)
+    ఒకవేళ (event && ownEvent)
     {
         cudaEventDestroy(event);
     }
 }
 
-cudaEvent_t cv::cuda::EventAccessor::getEvent(const Event& event)
+cudaEvent_t cv::cuda::EventAccessor::getEvent(స్థిరరాశి Event& event)
 {
-    return event.impl_->event;
+    తిరిగి event.impl_->event;
 }
 
 Event cv::cuda::EventAccessor::wrapEvent(cudaEvent_t event)
 {
-    return Event(makePtr<Event::Impl>(event));
+    తిరిగి Event(makePtr<Event::Impl>(event));
 }
 
-#endif
+#అయితే_ముగింపు
 
-cv::cuda::Event::Event(const Event::CreateFlags flags)
+cv::cuda::Event::Event(స్థిరరాశి Event::CreateFlags flags)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(flags);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(flags);
     throw_no_cuda();
-#else
+#లేకపోతే
     impl_ = makePtr<Impl>(flags);
-#endif
+#అయితే_ముగింపు
 }
 
-void cv::cuda::Event::record(Stream& stream)
+శూన్య cv::cuda::Event::రికార్డు(ప్రవాహం& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(stream);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(stream);
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaEventRecord(impl_->event, StreamAccessor::getStream(stream)) );
-#endif
+#లేకపోతే
+    cuda_సురక్షిత_Call( cuda_Event_రికార్డు(impl_->event, ప్రవాహం_Accessor::get_ప్రవాహం(stream)) );
+#అయితే_ముగింపు
 }
 
-bool cv::cuda::Event::queryIfComplete() const
+తార్కిక cv::cuda::Event::queryIfComplete() స్థిరరాశి
 {
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
     throw_no_cuda();
-#else
+#లేకపోతే
     cudaError_t err = cudaEventQuery(impl_->event);
 
-    if (err == cudaErrorNotReady || err == cudaSuccess)
-        return err == cudaSuccess;
+    ఒకవేళ (err == cudaErrorNotReady || err == cudaSuccess)
+        తిరిగి err == cudaSuccess;
 
-    cudaSafeCall(err);
-    return false;
-#endif
+    cuda_సురక్షిత_Call(err);
+    తిరిగి అబద్ధం;
+#అయితే_ముగింపు
 }
 
-void cv::cuda::Event::waitForCompletion()
+శూన్య cv::cuda::Event::waitForCompletion()
 {
-#ifndef HAVE_CUDA
+#నిర్వచితం_కాకపోతే HAVE_CUDA
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaEventSynchronize(impl_->event) );
-#endif
+#లేకపోతే
+    cuda_సురక్షిత_Call( cudaEventSynchronize(impl_->event) );
+#అయితే_ముగింపు
 }
 
-float cv::cuda::Event::elapsedTime(const Event& start, const Event& end)
+దశాంశం cv::cuda::Event::elapsed_సమయం(స్థిరరాశి Event& ప్రారంభం, స్థిరరాశి Event& end)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(start);
-    CV_UNUSED(end);
+#నిర్వచితం_కాకపోతే HAVE_CUDA
+    CV_వాడని(ప్రారంభం);
+    CV_వాడని(end);
     throw_no_cuda();
-#else
-    float ms;
-    cudaSafeCall( cudaEventElapsedTime(&ms, start.impl_->event, end.impl_->event) );
-    return ms;
-#endif
+#లేకపోతే
+    దశాంశం ms;
+    cuda_సురక్షిత_Call( cuda_Event_Elapsed_సమయం(&ms, ప్రారంభం.impl_->event, end.impl_->event) );
+    తిరిగి ms;
+#అయితే_ముగింపు
 }

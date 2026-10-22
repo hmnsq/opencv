@@ -2,361 +2,361 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
-#include "parallel_impl.hpp"
+#అన్తర్భావ "parallel_impl.hpp"
 
-#ifdef HAVE_PTHREADS_PF
-#include <pthread.h>
+#నిర్వచితమైతే HAVE_PTHREADS_PF
+#అన్తర్భావ <pthread.h>
 
-#include <opencv2/core/utils/configuration.private.hpp>
+#అన్తర్భావ <opencv2/core/utils/configuration.private.hpp>
 
-#include <opencv2/core/utils/logger.defines.hpp>
+#అన్తర్భావ <opencv2/core/utils/logger.defines.hpp>
 //#undef CV_LOG_STRIP_LEVEL
 //#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#include <opencv2/core/utils/logger.hpp>
+#అన్తర్భావ <opencv2/core/utils/logger.hpp>
 
-#include <opencv2/core/utils/trace.private.hpp>
+#అన్తర్భావ <opencv2/core/utils/trace.private.hpp>
 
 //#define CV_PROFILE_THREADS 64
 //#define getTickCount getCPUTickCount  // use this if getTickCount() calls are expensive (and getCPUTickCount() is accurate)
 
 //#define CV_USE_GLOBAL_WORKERS_COND_VAR  // not effective on many-core systems (10+)
 
-#include <atomic>
+#అన్తర్భావ <atomic>
 
 // Spin lock's OS-level yield
-#ifdef DECLARE_CV_YIELD
+#నిర్వచితమైతే DECLARE_CV_YIELD
 DECLARE_CV_YIELD
-#endif
-#ifndef CV_YIELD
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే CV_YIELD
 # include <thread>
 # define CV_YIELD() std::this_thread::yield()
-#endif // CV_YIELD
+#అయితే_ముగింపు // CV_YIELD
 
 // Spin lock's CPU-level yield (required for Hyper-Threading)
-#ifdef DECLARE_CV_PAUSE
+#నిర్వచితమైతే DECLARE_CV_PAUSE
 DECLARE_CV_PAUSE
-#endif
-#ifndef CV_PAUSE
-# if defined __GNUC__ && (defined __i386__ || defined __x86_64__)
+#అయితే_ముగింపు
+#నిర్వచితం_కాకపోతే CV_PAUSE
+# ఒకవేళ defined __GNUC__ && (defined __i386__ || defined __x86_64__)
 #   include <x86intrin.h> /* for __rdtsc */
-#   if !defined(__SSE2__)
-      static inline void cv_non_sse_mm_pause() { __asm__ __volatile__ ("rep; nop"); }
+#   ఒకవేళ !defined(__SSE2__)
+      స్థిర అంతఃవరుస శూన్య cv_non_sse_mm_pause() { __asm__ __volatile__ ("rep; nop"); }
 #     define _mm_pause cv_non_sse_mm_pause
 #   endif
 // With Skylake CPUs and above, _mm_pause takes 140 cycles so no need for a loop.
-#   define CV_PAUSE(v) do { (void)v; _mm_pause(); } while (0)
+#   define CV_PAUSE(v) చేయి { (శూన్య)v; _mm_pause(); } అయితే (0)
 # elif defined __GNUC__ && defined __aarch64__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("yield" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) చేయి { కొరకు (పూర్ణాంకం __delay = (v); __delay > 0; --__delay) { asm అస్థిర("yield" ::: "memory"); } } అయితే (0)
 # elif defined __GNUC__ && defined __arm__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) చేయి { కొరకు (పూర్ణాంకం __delay = (v); __delay > 0; --__delay) { asm అస్థిర("" ::: "memory"); } } అయితే (0)
 # elif defined __GNUC__ && defined __mips__ && __mips_isa_rev >= 2
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("pause" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) చేయి { కొరకు (పూర్ణాంకం __delay = (v); __delay > 0; --__delay) { asm అస్థిర("pause" ::: "memory"); } } అయితే (0)
 # elif defined __APPLE__ && defined __POWERPC__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("or r27,r27,r27" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) చేయి { కొరకు (పూర్ణాంకం __delay = (v); __delay > 0; --__delay) { asm అస్థిర("or r27,r27,r27" ::: "memory"); } } అయితే (0)
 # elif defined __GNUC__ && defined __PPC64__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("or 27,27,27" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) చేయి { కొరకు (పూర్ణాంకం __delay = (v); __delay > 0; --__delay) { asm అస్థిర("or 27,27,27" ::: "memory"); } } అయితే (0)
 # elif defined __GNUC__ && defined __riscv
 // PAUSE HINT is not part of RISC-V ISA yet, but is under discussion now. For details see:
 // https://github.com/riscv/riscv-isa-manual/pull/398
 // https://github.com/riscv/riscv-isa-manual/issues/43
 // #   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("pause"); } } while (0)
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("nop"); } } while (0)
+#   define CV_PAUSE(v) చేయి { కొరకు (పూర్ణాంకం __delay = (v); __delay > 0; --__delay) { asm అస్థిర("nop"); } } అయితే (0)
 # elif defined __GNUC__ && defined __loongarch__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("nop"); } } while (0)
-# else
+#   define CV_PAUSE(v) చేయి { కొరకు (పూర్ణాంకం __delay = (v); __delay > 0; --__delay) { asm అస్థిర("nop"); } } అయితే (0)
+# లేకపోతే
 #   warning "Can't detect 'pause' (CPU-yield) instruction on the target platform. Specify CV_PAUSE() definition via compiler flags."
-#   define CV_PAUSE(...) do { /* no-op: works, but not effective */ } while (0)
+#   define CV_PAUSE(...) చేయి { /* no-op: works, but not effective */ } అయితే (0)
 # endif
-#endif // CV_PAUSE
+#అయితే_ముగింపు // CV_PAUSE
 
 
-namespace cv
+నామాకాశ cv
 {
 
-static int CV_ACTIVE_WAIT_PAUSE_LIMIT = (int)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_PAUSE_LIMIT", 16);  // iterations
-static int CV_WORKER_ACTIVE_WAIT = (int)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_WORKER", 2000);  // iterations
-static int CV_MAIN_THREAD_ACTIVE_WAIT = (int)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_MAIN", 10000); // iterations
+స్థిర పూర్ణాంకం CV_చురుకైన_WAIT_PAUSE_హద్దు = (పూర్ణాంకం)utils::get_Configuration_Parameter_కొలత_T("OPENCV_THREAD_POOL_ACTIVE_WAIT_PAUSE_LIMIT", 16);  // iterations
+స్థిర పూర్ణాంకం CV_కార్మికుడు_చురుకైన_WAIT = (పూర్ణాంకం)utils::get_Configuration_Parameter_కొలత_T("OPENCV_THREAD_POOL_ACTIVE_WAIT_WORKER", 2000);  // iterations
+స్థిర పూర్ణాంకం CV_MAIN_THREAD_చురుకైన_WAIT = (పూర్ణాంకం)utils::get_Configuration_Parameter_కొలత_T("OPENCV_THREAD_POOL_ACTIVE_WAIT_MAIN", 10000); // iterations
 
-static int CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT = (int)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_THREADS_LIMIT", 0); // number of real cores
+స్థిర పూర్ణాంకం CV_కార్మికుడు_చురుకైన_WAIT_దారాలు_హద్దు = (పూర్ణాంకం)utils::get_Configuration_Parameter_కొలత_T("OPENCV_THREAD_POOL_ACTIVE_WAIT_THREADS_LIMIT", 0); // number of real cores
 
-class WorkerThread;
-class ParallelJob;
+తరగతి కార్మికుడు_Thread;
+తరగతి Parallel_పని;
 
-class ThreadPool
+తరగతి ThreadPool
 {
-public:
-    static ThreadPool& instance()
+బహిరంగ:
+    స్థిర ThreadPool& instance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(ThreadPool, new ThreadPool())
+        CV_SINGLETON_LAZY_INIT_REF(ThreadPool, కొత్త ThreadPool())
     }
 
-    static void stop()
+    స్థిర శూన్య stop()
     {
         ThreadPool& manager = instance();
         manager.reconfigure(0);
     }
 
-    void reconfigure(unsigned new_threads_count)
+    శూన్య reconfigure(గుర్తులేని new_దారాలు_లెక్క)
     {
-        if (new_threads_count == threads.size())
-            return;
+        ఒకవేళ (new_దారాలు_లెక్క == దారాలు.size())
+            తిరిగి;
         pthread_mutex_lock(&mutex);
-        reconfigure_(new_threads_count);
+        reconfigure_(new_దారాలు_లెక్క);
         pthread_mutex_unlock(&mutex);
     }
-    bool reconfigure_(unsigned new_threads_count); // internal implementation
+    తార్కిక reconfigure_(గుర్తులేని new_దారాలు_లెక్క); // internal implementation
 
-    void run(const Range& range, const ParallelLoopBody& body, double nstripes);
+    శూన్య నిరంతరం(స్థిరరాశి Range& range, స్థిరరాశి ParallelLoopBody& body, ద్విగుణ nstripes);
 
-    size_t getNumOfThreads();
+    size_t get_అంకె_యొక్క_దారాలు();
 
-    void setNumOfThreads(unsigned n);
+    శూన్య సమితి_అంకె_యొక్క_దారాలు(గుర్తులేని n);
 
     ThreadPool();
 
     ~ThreadPool();
 
-    unsigned num_threads;
+    గుర్తులేని అంకె_దారాలు_2;
 
     pthread_mutex_t mutex;  // guards fields (job/threads) from non-worker threads (concurrent parallel_for calls)
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#ఒకవేళ defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
     pthread_cond_t cond_thread_wake;
-#endif
+#అయితే_ముగింపు
 
     pthread_mutex_t mutex_notify;
     pthread_cond_t cond_thread_task_complete;
 
-    std::vector< Ptr<WorkerThread> > threads;
+    std::vector< Ptr<కార్మికుడు_Thread> > దారాలు;
 
-    Ptr<ParallelJob> job;
+    Ptr<Parallel_పని> పని;
 
-#ifdef CV_PROFILE_THREADS
-    double tickFreq;
-    int64 jobSubmitTime;
-    struct ThreadStatistics
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+    ద్విగుణ tickFreq;
+    int64 పని_Submit_సమయం;
+    నిర్మాణం ThreadStatistics
     {
         ThreadStatistics() : threadWait(0)
         {
             reset();
         }
-        void reset()
+        శూన్య reset()
         {
             threadWake = 0;
-            threadExecuteStart = 0;
+            thread_Execute_ప్రారంభం = 0;
             threadExecuteStop = 0;
             executedTasks = 0;
-            keepActive = false;
-            threadPing = getTickCount();
+            keep_చురుకైన = అబద్ధం;
+            threadPing = get_Tick_లెక్క();
         }
         int64 threadWait; // don't reset by default
         int64 threadPing; // don't reset by default
         int64 threadWake;
-        int64 threadExecuteStart;
+        int64 thread_Execute_ప్రారంభం;
         int64 threadExecuteStop;
         int64 threadFree;
-        unsigned executedTasks;
-        bool keepActive;
+        గుర్తులేని executedTasks;
+        తార్కిక keep_చురుకైన;
 
         int64 dummy_[8]; // separate cache lines
 
-        void dump(int id, int64 baseTime, double tickFreq)
+        శూన్య dump(పూర్ణాంకం id, int64 పునాది_సమయం, ద్విగుణ tickFreq)
         {
-            if (id < 0)
-                std::cout << "Main: ";
-            else
-                printf("T%03d: ", id + 2);
-            printf("wait=% 10.1f   ping=% 6.1f",
-                    threadWait > 0 ? (threadWait - baseTime) / tickFreq * 1e6 : -0.0,
-                    threadPing > 0 ? (threadPing - baseTime) / tickFreq * 1e6 : -0.0);
-            if (threadWake > 0)
-                printf("   wake=% 6.1f",
-                    (threadWake > 0 ? (threadWake - baseTime) / tickFreq * 1e6 : -0.0));
-            if (threadExecuteStart > 0)
+            ఒకవేళ (id < 0)
+                std::బయటకు << "Main: ";
+            లేకపోతే
+                రాయి("T%03d: ", id + 2);
+            రాయి("wait=% 10.1f   ping=% 6.1f",
+                    threadWait > 0 ? (threadWait - పునాది_సమయం) / tickFreq * 1e6 : -0.0,
+                    threadPing > 0 ? (threadPing - పునాది_సమయం) / tickFreq * 1e6 : -0.0);
+            ఒకవేళ (threadWake > 0)
+                రాయి("   wake=% 6.1f",
+                    (threadWake > 0 ? (threadWake - పునాది_సమయం) / tickFreq * 1e6 : -0.0));
+            ఒకవేళ (thread_Execute_ప్రారంభం > 0)
             {
-                printf("   exec=% 6.1f - % 6.1f   tasksDone=%5u   free=% 6.1f",
-                    (threadExecuteStart > 0 ? (threadExecuteStart - baseTime) / tickFreq * 1e6 : -0.0),
-                    (threadExecuteStop > 0 ? (threadExecuteStop - baseTime) / tickFreq * 1e6 : -0.0),
+                రాయి("   exec=% 6.1f - % 6.1f   tasksDone=%5u   free=% 6.1f",
+                    (thread_Execute_ప్రారంభం > 0 ? (thread_Execute_ప్రారంభం - పునాది_సమయం) / tickFreq * 1e6 : -0.0),
+                    (threadExecuteStop > 0 ? (threadExecuteStop - పునాది_సమయం) / tickFreq * 1e6 : -0.0),
                     executedTasks,
-                    (threadFree > 0 ? (threadFree - baseTime) / tickFreq * 1e6 : -0.0));
-                if (id >= 0)
-                    printf(" active=%s\n", keepActive ? "true" : "false");
-                else
-                    printf("\n");
+                    (threadFree > 0 ? (threadFree - పునాది_సమయం) / tickFreq * 1e6 : -0.0));
+                ఒకవేళ (id >= 0)
+                    రాయి(" active=%s\n", keep_చురుకైన ? "true" : "false");
+                లేకపోతే
+                    రాయి("\n");
             }
-            else
-                printf("   ------------------------------------------------------------------------------\n");
+            లేకపోతే
+                రాయి("   ------------------------------------------------------------------------------\n");
         }
     };
-    ThreadStatistics threads_stat[CV_PROFILE_THREADS]; // 0 - main thread, 1..N - worker threads
-#endif
+    ThreadStatistics దారాలు_stat[CV_PROFILE_దారాలు]; // 0 - main thread, 1..N - worker threads
+#అయితే_ముగింపు
 
 };
 
-class WorkerThread
+తరగతి కార్మికుడు_Thread
 {
-public:
+బహిరంగ:
     ThreadPool& thread_pool;
-    const unsigned id;
+    స్థిరరాశి గుర్తులేని id;
     pthread_t posix_thread;
-    bool is_created;
+    తార్కిక is_created;
 
-    std::atomic<bool> stop_thread;
+    std::atomic<తార్కిక> stop_thread;
 
-    std::atomic<bool> has_wake_signal;
+    std::atomic<తార్కిక> has_wake_signal;
 
-    Ptr<ParallelJob> job;
+    Ptr<Parallel_పని> పని;
 
     pthread_mutex_t mutex;
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-    volatile bool isActive;
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+    అస్థిర తార్కిక is_చురుకైన_2;
     pthread_cond_t cond_thread_wake;
-#endif
+#అయితే_ముగింపు
 
-    WorkerThread(ThreadPool& thread_pool_, unsigned id_) :
+    కార్మికుడు_Thread(ThreadPool& thread_pool_, గుర్తులేని id_) :
         thread_pool(thread_pool_),
         id(id_),
         posix_thread(0),
-        is_created(false),
-        stop_thread(false),
-        has_wake_signal(false)
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-        , isActive(true)
-#endif
+        is_created(అబద్ధం),
+        stop_thread(అబద్ధం),
+        has_wake_signal(అబద్ధం)
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+        , is_చురుకైన_2(నిజం)
+#అయితే_ముగింపు
     {
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: initializing new worker: " << id);
-        int res = pthread_mutex_init(&mutex, NULL);
-        if (res != 0)
+        CV_LOG_VERBOSE(ఖాళీ, 1, "MainThread: initializing new worker: " << id);
+        పూర్ణాంకం res = pthread_mutex_init(&mutex, ఖాళీ);
+        ఒకవేళ (res != 0)
         {
-            CV_LOG_ERROR(NULL, id << ": Can't create thread mutex: res = " << res);
-            return;
+            CV_LOG_ERROR(ఖాళీ, id << ": Can't create thread mutex: res = " << res);
+            తిరిగి;
         }
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-        res = pthread_cond_init(&cond_thread_wake, NULL);
-        if (res != 0)
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+        res = pthread_cond_init(&cond_thread_wake, ఖాళీ);
+        ఒకవేళ (res != 0)
         {
-            CV_LOG_ERROR(NULL, id << ": Can't create thread condition variable: res = " << res);
-            return;
+            CV_LOG_ERROR(ఖాళీ, id << ": Can't create thread condition variable: res = " << res);
+            తిరిగి;
         }
-#endif
-        res = pthread_create(&posix_thread, NULL, thread_loop_wrapper, (void*)this);
-        if (res != 0)
+#అయితే_ముగింపు
+        res = pthread_create(&posix_thread, ఖాళీ, thread_loop_wrapper, (శూన్య*)ఇది);
+        ఒకవేళ (res != 0)
         {
-            CV_LOG_ERROR(NULL, id << ": Can't spawn new thread: res = " << res);
+            CV_LOG_ERROR(ఖాళీ, id << ": Can't spawn new thread: res = " << res);
         }
-        else
+        లేకపోతే
         {
-            is_created = true;
+            is_created = నిజం;
         }
     }
 
-    ~WorkerThread()
+    ~కార్మికుడు_Thread()
     {
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: destroy worker thread: " << id);
-        if (is_created)
+        CV_LOG_VERBOSE(ఖాళీ, 1, "MainThread: destroy worker thread: " << id);
+        ఒకవేళ (is_created)
         {
-            if (!stop_thread)
+            ఒకవేళ (!stop_thread)
             {
                 pthread_mutex_lock(&mutex);  // to avoid signal miss due pre-check
-                stop_thread = true;
+                stop_thread = నిజం;
                 pthread_mutex_unlock(&mutex);
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#ఒకవేళ defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
                 pthread_cond_broadcast(&thread_pool.cond_thread_wake);
-#else
+#లేకపోతే
                 pthread_cond_signal(&cond_thread_wake);
-#endif
+#అయితే_ముగింపు
             }
-            pthread_join(posix_thread, NULL);
+            pthread_join(posix_thread, ఖాళీ);
         }
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
         pthread_cond_destroy(&cond_thread_wake);
-#endif
+#అయితే_ముగింపు
         pthread_mutex_destroy(&mutex);
     }
 
-    void thread_body();
-    static void* thread_loop_wrapper(void* thread_object)
+    శూన్య thread_body();
+    స్థిర శూన్య* thread_loop_wrapper(శూన్య* thread_object)
     {
-#ifdef OPENCV_WITH_ITT
+#నిర్వచితమైతే OPENCV_WITH_ITT
         __itt_thread_set_name(cv::format("OpenCVThread-%03d", cv::utils::getThreadID()).c_str());
-#endif
-        ((WorkerThread*)thread_object)->thread_body();
-        return 0;
+#అయితే_ముగింపు
+        ((కార్మికుడు_Thread*)thread_object)->thread_body();
+        తిరిగి 0;
     }
 };
 
-class ParallelJob
+తరగతి Parallel_పని
 {
-public:
-    ParallelJob(const ThreadPool& thread_pool_, const Range& range_, const ParallelLoopBody& body_, int nstripes_) :
+బహిరంగ:
+    Parallel_పని(స్థిరరాశి ThreadPool& thread_pool_, స్థిరరాశి Range& range_, స్థిరరాశి ParallelLoopBody& body_, పూర్ణాంకం nstripes_) :
         thread_pool(thread_pool_),
         body(body_),
         range(range_),
-        nstripes((unsigned)nstripes_),
-        is_completed(false)
+        nstripes((గుర్తులేని)nstripes_),
+        is_completed(అబద్ధం)
     {
-        CV_LOG_VERBOSE(NULL, 5, "ParallelJob::ParallelJob(" << (void*)this << ")");
+        CV_LOG_VERBOSE(ఖాళీ, 5, "ParallelJob::ParallelJob(" << (శూన్య*)ఇది << ")");
         current_task.store(0, std::memory_order_relaxed);
-        active_thread_count.store(0, std::memory_order_relaxed);
-        completed_thread_count.store(0, std::memory_order_relaxed);
+        చురుకైన_thread_లెక్క.store(0, std::memory_order_relaxed);
+        completed_thread_లెక్క.store(0, std::memory_order_relaxed);
         dummy0_[0] = 0, dummy1_[0] = 0, dummy2_[0] = 0; // compiler warning
     }
 
-    ~ParallelJob()
+    ~Parallel_పని()
     {
-        CV_LOG_VERBOSE(NULL, 5, "ParallelJob::~ParallelJob(" << (void*)this << ")");
+        CV_LOG_VERBOSE(ఖాళీ, 5, "ParallelJob::~ParallelJob(" << (శూన్య*)ఇది << ")");
     }
 
-    unsigned execute(bool is_worker_thread)
+    గుర్తులేని execute(తార్కిక is_కార్మికుడు_thread)
     {
-        unsigned executed_tasks = 0;
-        const int task_count = range.size();
-        const int remaining_multiplier = std::min(nstripes,
+        గుర్తులేని executed_tasks = 0;
+        స్థిరరాశి పూర్ణాంకం task_లెక్క = range.size();
+        స్థిరరాశి పూర్ణాంకం మిగిలిన_multiplier = std::min(nstripes,
                 std::max(
-                        std::min(100u, thread_pool.num_threads * 4),
-                        thread_pool.num_threads * 2
+                        std::min(100u, thread_pool.అంకె_దారాలు_2 * 4),
+                        thread_pool.అంకె_దారాలు_2 * 2
                 ));  // experimental value
-        for (;;)
+        కొరకు (;;)
         {
-            int chunk_size = std::max(1, (task_count - current_task) / remaining_multiplier);
-            int id = current_task.fetch_add(chunk_size, std::memory_order_seq_cst);
-            if (id >= task_count)
-                break; // no more free tasks
+            పూర్ణాంకం chunk_కొలత = std::max(1, (task_లెక్క - current_task) / మిగిలిన_multiplier);
+            పూర్ణాంకం id = current_task.fetch_add(chunk_కొలత, std::memory_order_seq_cst);
+            ఒకవేళ (id >= task_లెక్క)
+                ఆపు; // no more free tasks
 
-            executed_tasks += chunk_size;
-            int start_id = id;
-            int end_id = std::min(task_count, id + chunk_size);
-            CV_LOG_VERBOSE(NULL, 9, "Thread: job " << start_id << "-" << end_id);
+            executed_tasks += chunk_కొలత;
+            పూర్ణాంకం ప్రారంభం_id = id;
+            పూర్ణాంకం చివర_id = std::min(task_లెక్క, id + chunk_కొలత);
+            CV_LOG_VERBOSE(ఖాళీ, 9, "Thread: job " << ప్రారంభం_id << "-" << చివర_id);
 
             //TODO: if (not pending exception)
             {
-                body.operator()(Range(range.start + start_id, range.start + end_id));
+                body.క్రియాకారకం()(Range(range.ప్రారంభం + ప్రారంభం_id, range.ప్రారంభం + చివర_id));
             }
-            if (is_worker_thread && is_completed)
+            ఒకవేళ (is_కార్మికుడు_thread && is_completed)
             {
-                CV_LOG_ERROR(NULL, "\t\t\t\tBUG! Job: " << (void*)this << " " << id << " " << active_thread_count << " " << completed_thread_count);
+                CV_LOG_ERROR(ఖాళీ, "\t\t\t\tBUG! Job: " << (శూన్య*)ఇది << " " << id << " " << చురుకైన_thread_లెక్క << " " << completed_thread_లెక్క);
                 CV_Assert(!is_completed); // TODO Dbg this
             }
         }
-        return executed_tasks;
+        తిరిగి executed_tasks;
     }
 
-    const ThreadPool& thread_pool;
-    const ParallelLoopBody& body;
-    const Range range;
-    const unsigned nstripes;
+    స్థిరరాశి ThreadPool& thread_pool;
+    స్థిరరాశి ParallelLoopBody& body;
+    స్థిరరాశి Range range;
+    స్థిరరాశి గుర్తులేని nstripes;
 
-    std::atomic<int> current_task;  // next free part of job
+    std::atomic<పూర్ణాంకం> current_task;  // next free part of job
     int64 dummy0_[8];  // avoid cache-line reusing for the same atomics
 
-    std::atomic<int> active_thread_count;  // number of threads worked on this job
+    std::atomic<పూర్ణాంకం> చురుకైన_thread_లెక్క;  // number of threads worked on this job
     int64 dummy1_[8];  // avoid cache-line reusing for the same atomics
 
-    std::atomic<int> completed_thread_count;  // number of threads completed any activities on this job
+    std::atomic<పూర్ణాంకం> completed_thread_లెక్క;  // number of threads completed any activities on this job
     int64 dummy2_[8];  // avoid cache-line reusing for the same atomics
 
-    std::atomic<bool> is_completed;
+    std::atomic<తార్కిక> is_completed;
 
     // TODO exception handling
 };
@@ -367,394 +367,394 @@ public:
 // thread writes it (but it all works out because a mutex is locked in the main
 // thread and isActive re-checked).
 // This is to solve issue #19463.
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR) && defined(__clang__) && defined(__has_feature)
-#if __has_feature(thread_sanitizer)
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR) && defined(__clang__) && defined(__has_feature)
+#ఒకవేళ __has_feature(thread_sanitizer)
 __attribute__((no_sanitize("thread")))
-#endif
-#endif
-void WorkerThread::thread_body()
+#అయితే_ముగింపు
+#అయితే_ముగింపు
+శూన్య కార్మికుడు_Thread::thread_body()
 {
-    (void)cv::utils::getThreadID(); // notify OpenCV about new thread
-    CV_LOG_VERBOSE(NULL, 5, "Thread: new thread: " << id);
+    (శూన్య)cv::utils::getThreadID(); // notify OpenCV about new thread
+    CV_LOG_VERBOSE(ఖాళీ, 5, "Thread: new thread: " << id);
 
-    bool allow_active_wait = true;
+    తార్కిక allow_చురుకైన_wait = నిజం;
 
-#ifdef CV_PROFILE_THREADS
-    ThreadPool::ThreadStatistics& stat = thread_pool.threads_stat[id + 1];
-#endif
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+    ThreadPool::ThreadStatistics& stat = thread_pool.దారాలు_stat[id + 1];
+#అయితే_ముగింపు
 
-    while (!stop_thread)
+    అయితే (!stop_thread)
     {
-        CV_LOG_VERBOSE(NULL, 5, "Thread: ... loop iteration: allow_active_wait=" << allow_active_wait << "   has_wake_signal=" << has_wake_signal);
-        if (allow_active_wait && CV_WORKER_ACTIVE_WAIT > 0)
+        CV_LOG_VERBOSE(ఖాళీ, 5, "Thread: ... loop iteration: allow_active_wait=" << allow_చురుకైన_wait << "   has_wake_signal=" << has_wake_signal);
+        ఒకవేళ (allow_చురుకైన_wait && CV_కార్మికుడు_చురుకైన_WAIT > 0)
         {
-            allow_active_wait = false;
-            for (int i = 0; i < CV_WORKER_ACTIVE_WAIT; i++)
+            allow_చురుకైన_wait = అబద్ధం;
+            కొరకు (పూర్ణాంకం i = 0; i < CV_కార్మికుడు_చురుకైన_WAIT; i++)
             {
-                if (has_wake_signal)
-                    break;
-                if (CV_ACTIVE_WAIT_PAUSE_LIMIT > 0 && (i < CV_ACTIVE_WAIT_PAUSE_LIMIT || (i & 1)))
+                ఒకవేళ (has_wake_signal)
+                    ఆపు;
+                ఒకవేళ (CV_చురుకైన_WAIT_PAUSE_హద్దు > 0 && (i < CV_చురుకైన_WAIT_PAUSE_హద్దు || (i & 1)))
                     CV_PAUSE(16);
-                else
+                లేకపోతే
                     CV_YIELD();
             }
         }
         pthread_mutex_lock(&mutex);
-#ifdef CV_PROFILE_THREADS
-        stat.threadWait = getTickCount();
-#endif
-        while (!has_wake_signal) // to handle spurious wakeups
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+        stat.threadWait = get_Tick_లెక్క();
+#అయితే_ముగింపు
+        అయితే (!has_wake_signal) // to handle spurious wakeups
         {
             //CV_LOG_VERBOSE(NULL, 5, "Thread: wait (sleep) ...");
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#ఒకవేళ defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
             pthread_cond_wait(&thread_pool.cond_thread_wake, &mutex);
-#else
-            isActive = false;
+#లేకపోతే
+            is_చురుకైన_2 = అబద్ధం;
             pthread_cond_wait(&cond_thread_wake, &mutex);
-            isActive = true;
-#endif
-            CV_LOG_VERBOSE(NULL, 5, "Thread: wake ... (has_wake_signal=" << has_wake_signal << " stop_thread=" << stop_thread << ")")
+            is_చురుకైన_2 = నిజం;
+#అయితే_ముగింపు
+            CV_LOG_VERBOSE(ఖాళీ, 5, "Thread: wake ... (has_wake_signal=" << has_wake_signal << " stop_thread=" << stop_thread << ")")
         }
-#ifdef CV_PROFILE_THREADS
-        stat.threadWake = getTickCount();
-#endif
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+        stat.threadWake = get_Tick_లెక్క();
+#అయితే_ముగింపు
 
-        CV_LOG_VERBOSE(NULL, 5, "Thread: checking for new job");
-        if (CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT == 0)
-            allow_active_wait = true;
-        Ptr<ParallelJob> j_ptr; swap(j_ptr, job);
-        has_wake_signal = false;
+        CV_LOG_VERBOSE(ఖాళీ, 5, "Thread: checking for new job");
+        ఒకవేళ (CV_కార్మికుడు_చురుకైన_WAIT_దారాలు_హద్దు == 0)
+            allow_చురుకైన_wait = నిజం;
+        Ptr<Parallel_పని> j_ptr; swap(j_ptr, పని);
+        has_wake_signal = అబద్ధం;
         pthread_mutex_unlock(&mutex);
 
-        if (!stop_thread)
+        ఒకవేళ (!stop_thread)
         {
-            ParallelJob* j = j_ptr;
-            if (j)
+            Parallel_పని* j = j_ptr;
+            ఒకవేళ (j)
             {
-                CV_LOG_VERBOSE(NULL, 5, "Thread: job size=" << j->range.size() << " done=" << j->current_task);
-                if (j->current_task < j->range.size())
+                CV_LOG_VERBOSE(ఖాళీ, 5, "Thread: job size=" << j->range.size() << " done=" << j->current_task);
+                ఒకవేళ (j->current_task < j->range.size())
                 {
-                    int other = j->active_thread_count.fetch_add(1, std::memory_order_seq_cst);
-                    CV_LOG_VERBOSE(NULL, 5, "Thread: processing new job (with " << other << " other threads)"); CV_UNUSED(other);
-#ifdef CV_PROFILE_THREADS
-                    stat.threadExecuteStart = getTickCount();
-                    stat.executedTasks = j->execute(true);
-                    stat.threadExecuteStop = getTickCount();
-#else
-                    j->execute(true);
-#endif
-                    int completed = j->completed_thread_count.fetch_add(1, std::memory_order_seq_cst) + 1;
-                    int active = j->active_thread_count.load(std::memory_order_acquire);
-                    if (CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT > 0)
+                    పూర్ణాంకం other = j->చురుకైన_thread_లెక్క.fetch_add(1, std::memory_order_seq_cst);
+                    CV_LOG_VERBOSE(ఖాళీ, 5, "Thread: processing new job (with " << other << " other threads)"); CV_వాడని(other);
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+                    stat.thread_Execute_ప్రారంభం = get_Tick_లెక్క();
+                    stat.executedTasks = j->execute(నిజం);
+                    stat.threadExecuteStop = get_Tick_లెక్క();
+#లేకపోతే
+                    j->execute(నిజం);
+#అయితే_ముగింపు
+                    పూర్ణాంకం completed = j->completed_thread_లెక్క.fetch_add(1, std::memory_order_seq_cst) + 1;
+                    పూర్ణాంకం చురుకైన = j->చురుకైన_thread_లెక్క.load(std::memory_order_acquire);
+                    ఒకవేళ (CV_కార్మికుడు_చురుకైన_WAIT_దారాలు_హద్దు > 0)
                     {
-                        allow_active_wait = true;
-                        if (active >= CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT && (id & 1) == 0) // turn off a half of threads
-                            allow_active_wait = false;
+                        allow_చురుకైన_wait = నిజం;
+                        ఒకవేళ (చురుకైన >= CV_కార్మికుడు_చురుకైన_WAIT_దారాలు_హద్దు && (id & 1) == 0) // turn off a half of threads
+                            allow_చురుకైన_wait = అబద్ధం;
                     }
-                    CV_LOG_VERBOSE(NULL, 5, "Thread: completed job processing: " << active << " " << completed);
-                    if (active == completed)
+                    CV_LOG_VERBOSE(ఖాళీ, 5, "Thread: completed job processing: " << చురుకైన << " " << completed);
+                    ఒకవేళ (చురుకైన == completed)
                     {
-                        bool need_signal = !j->is_completed;
-                        j->is_completed = true;
-                        j = NULL; j_ptr.release();
-                        if (need_signal)
+                        తార్కిక need_signal = !j->is_completed;
+                        j->is_completed = నిజం;
+                        j = ఖాళీ; j_ptr.release();
+                        ఒకవేళ (need_signal)
                         {
-                            CV_LOG_VERBOSE(NULL, 5, "Thread: job finished => notifying the main thread");
+                            CV_LOG_VERBOSE(ఖాళీ, 5, "Thread: job finished => notifying the main thread");
                             pthread_mutex_lock(&thread_pool.mutex_notify);  // to avoid signal miss due pre-check condition
-                            // empty
+                            //ఖాళీలు
                             pthread_mutex_unlock(&thread_pool.mutex_notify);
                             pthread_cond_broadcast/*pthread_cond_signal*/(&thread_pool.cond_thread_task_complete);
                         }
                     }
                 }
-                else
+                లేకపోతే
                 {
-                    CV_LOG_VERBOSE(NULL, 5, "Thread: no free job tasks");
+                    CV_LOG_VERBOSE(ఖాళీ, 5, "Thread: no free job tasks");
                 }
             }
         }
-#ifdef CV_PROFILE_THREADS
-        stat.threadFree = getTickCount();
-        stat.keepActive = allow_active_wait;
-#endif
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+        stat.threadFree = get_Tick_లెక్క();
+        stat.keep_చురుకైన = allow_చురుకైన_wait;
+#అయితే_ముగింపు
     }
 }
 
 ThreadPool::ThreadPool()
 {
-#ifdef CV_PROFILE_THREADS
+#నిర్వచితమైతే CV_PROFILE_దారాలు
     tickFreq = getTickFrequency();
-#endif
+#అయితే_ముగింపు
 
-    int res = 0;
-    res |= pthread_mutex_init(&mutex, NULL);
-    res |= pthread_mutex_init(&mutex_notify, NULL);
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-    res |= pthread_cond_init(&cond_thread_wake, NULL);
-#endif
-    res |= pthread_cond_init(&cond_thread_task_complete, NULL);
+    పూర్ణాంకం res = 0;
+    res |= pthread_mutex_init(&mutex, ఖాళీ);
+    res |= pthread_mutex_init(&mutex_notify, ఖాళీ);
+#ఒకవేళ defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+    res |= pthread_cond_init(&cond_thread_wake, ఖాళీ);
+#అయితే_ముగింపు
+    res |= pthread_cond_init(&cond_thread_task_complete, ఖాళీ);
 
-    if (0 != res)
+    ఒకవేళ (0 != res)
     {
-        CV_LOG_FATAL(NULL, "Failed to initialize ThreadPool (pthreads)");
+        CV_LOG_FATAL(ఖాళీ, "Failed to initialize ThreadPool (pthreads)");
     }
-    num_threads = defaultNumberOfThreads();
+    అంకె_దారాలు_2 = default_సంఖ్య_యొక్క_దారాలు();
 }
 
-bool ThreadPool::reconfigure_(unsigned new_threads_count)
+తార్కిక ThreadPool::reconfigure_(గుర్తులేని new_దారాలు_లెక్క)
 {
-    if (new_threads_count == threads.size())
-        return false;
+    ఒకవేళ (new_దారాలు_లెక్క == దారాలు.size())
+        తిరిగి అబద్ధం;
 
-    if (new_threads_count < threads.size())
+    ఒకవేళ (new_దారాలు_లెక్క < దారాలు.size())
     {
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: reduce worker pool: " << threads.size() << " => " << new_threads_count);
-        std::vector< Ptr<WorkerThread> > release_threads(threads.size() - new_threads_count);
-        for (size_t i = new_threads_count; i < threads.size(); ++i)
+        CV_LOG_VERBOSE(ఖాళీ, 1, "MainThread: reduce worker pool: " << దారాలు.size() << " => " << new_దారాలు_లెక్క);
+        std::vector< Ptr<కార్మికుడు_Thread> > release_దారాలు(దారాలు.size() - new_దారాలు_లెక్క);
+        కొరకు (size_t i = new_దారాలు_లెక్క; i < దారాలు.size(); ++i)
         {
-            pthread_mutex_lock(&threads[i]->mutex);  // to avoid signal miss due pre-check
-            threads[i]->stop_thread = true;
-            threads[i]->has_wake_signal = true;
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-            pthread_mutex_unlock(&threads[i]->mutex);
-            pthread_cond_broadcast/*pthread_cond_signal*/(&threads[i]->cond_thread_wake); // wake thread
-#else
-            pthread_mutex_unlock(&threads[i]->mutex);
-#endif
-            std::swap(threads[i], release_threads[i - new_threads_count]);
+            pthread_mutex_lock(&దారాలు[i]->mutex);  // to avoid signal miss due pre-check
+            దారాలు[i]->stop_thread = నిజం;
+            దారాలు[i]->has_wake_signal = నిజం;
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+            pthread_mutex_unlock(&దారాలు[i]->mutex);
+            pthread_cond_broadcast/*pthread_cond_signal*/(&దారాలు[i]->cond_thread_wake); // wake thread
+#లేకపోతే
+            pthread_mutex_unlock(&దారాలు[i]->mutex);
+#అయితే_ముగింపు
+            std::swap(దారాలు[i], release_దారాలు[i - new_దారాలు_లెక్క]);
         }
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: notify worker threads about termination...");
+#ఒకవేళ defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+        CV_LOG_VERBOSE(ఖాళీ, 1, "MainThread: notify worker threads about termination...");
         pthread_cond_broadcast(&cond_thread_wake); // wake all threads
-#endif
-        threads.resize(new_threads_count);
-        release_threads.clear();  // calls thread_join which want to lock mutex
-        return false;
+#అయితే_ముగింపు
+        దారాలు.resize(new_దారాలు_లెక్క);
+        release_దారాలు.clear();  // calls thread_join which want to lock mutex
+        తిరిగి అబద్ధం;
     }
-    else
+    లేకపోతే
     {
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: upgrade worker pool: " << threads.size() << " => " << new_threads_count);
-        for (size_t i = threads.size(); i < new_threads_count; ++i)
+        CV_LOG_VERBOSE(ఖాళీ, 1, "MainThread: upgrade worker pool: " << దారాలు.size() << " => " << new_దారాలు_లెక్క);
+        కొరకు (size_t i = దారాలు.size(); i < new_దారాలు_లెక్క; ++i)
         {
-            threads.push_back(Ptr<WorkerThread>(new WorkerThread(*this, (unsigned)i))); // spawn more threads
+            దారాలు.push_back(Ptr<కార్మికుడు_Thread>(కొత్త కార్మికుడు_Thread(*ఇది, (గుర్తులేని)i))); // spawn more threads
         }
     }
-    return false;
+    తిరిగి అబద్ధం;
 }
 
 ThreadPool::~ThreadPool()
 {
     reconfigure(0);
     pthread_cond_destroy(&cond_thread_task_complete);
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#ఒకవేళ defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
     pthread_cond_destroy(&cond_thread_wake);
-#endif
+#అయితే_ముగింపు
     pthread_mutex_destroy(&mutex);
     pthread_mutex_destroy(&mutex_notify);
 }
 
-void ThreadPool::run(const Range& range, const ParallelLoopBody& body, double nstripes)
+శూన్య ThreadPool::నిరంతరం(స్థిరరాశి Range& range, స్థిరరాశి ParallelLoopBody& body, ద్విగుణ nstripes)
 {
-    CV_LOG_VERBOSE(NULL, 1, "MainThread: new parallel job: num_threads=" << num_threads << "   range=" << range.size() << "   nstripes=" << nstripes << "   job=" << (void*)job);
-#ifdef CV_PROFILE_THREADS
-    jobSubmitTime = getTickCount();
-    threads_stat[0].reset();
-    threads_stat[0].threadWait = jobSubmitTime;
-    threads_stat[0].threadWake = jobSubmitTime;
-#endif
-    if (getNumOfThreads() > 1 &&
-        job == NULL &&
+    CV_LOG_VERBOSE(ఖాళీ, 1, "MainThread: new parallel job: num_threads=" << అంకె_దారాలు_2 << "   range=" << range.size() << "   nstripes=" << nstripes << "   job=" << (శూన్య*)పని);
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+    పని_Submit_సమయం = get_Tick_లెక్క();
+    దారాలు_stat[0].reset();
+    దారాలు_stat[0].threadWait = పని_Submit_సమయం;
+    దారాలు_stat[0].threadWake = పని_Submit_సమయం;
+#అయితే_ముగింపు
+    ఒకవేళ (get_అంకె_యొక్క_దారాలు() > 1 &&
+        పని == ఖాళీ &&
         (range.size() * nstripes >= 2 || (range.size() > 1 && nstripes <= 0))
     )
     {
         pthread_mutex_lock(&mutex);
-        if (job != NULL)
+        ఒకవేళ (పని != ఖాళీ)
         {
             pthread_mutex_unlock(&mutex);
             body(range);
-            return;
+            తిరిగి;
         }
-        reconfigure_(num_threads - 1);
+        reconfigure_(అంకె_దారాలు_2 - 1);
 
         {
-            CV_LOG_VERBOSE(NULL, 1, "MainThread: initialize parallel job: " << range.size());
-            job = Ptr<ParallelJob>(new ParallelJob(*this, range, body, nstripes));
+            CV_LOG_VERBOSE(ఖాళీ, 1, "MainThread: initialize parallel job: " << range.size());
+            పని = Ptr<Parallel_పని>(కొత్త Parallel_పని(*ఇది, range, body, nstripes));
             pthread_mutex_unlock(&mutex);
 
-            CV_LOG_VERBOSE(NULL, 5, "MainThread: wake worker threads...");
-            size_t num_threads_to_wake = std::min(static_cast<size_t>(range.size()), threads.size());
-            for (size_t i = 0; i < num_threads_to_wake; ++i)
+            CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: wake worker threads...");
+            size_t అంకె_దారాలు_గమ్యం_wake = std::min(static_cast<size_t>(range.size()), దారాలు.size());
+            కొరకు (size_t i = 0; i < అంకె_దారాలు_గమ్యం_wake; ++i)
             {
-                if (job->current_task >= job->range.size())
-                    break;
-                WorkerThread& thread = *(threads[i].get());
-                if (
-#if defined(__clang__) && defined(__has_feature)
-#if __has_feature(thread_sanitizer)
+                ఒకవేళ (పని->current_task >= పని->range.size())
+                    ఆపు;
+                కార్మికుడు_Thread& thread = *(దారాలు[i].get());
+                ఒకవేళ (
+#ఒకవేళ defined(__clang__) && defined(__has_feature)
+#ఒకవేళ __has_feature(thread_sanitizer)
                         1 ||  // Robust workaround to avoid data race warning of `thread.job`
-#endif
-#endif
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-                        thread.isActive ||
-#endif
+#అయితే_ముగింపు
+#అయితే_ముగింపు
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+                        thread.is_చురుకైన_2 ||
+#అయితే_ముగింపు
                         thread.has_wake_signal
-                        || !thread.job.empty()  // #10881
+                        || !thread.పని.empty()  // #10881
                 )
                 {
                     pthread_mutex_lock(&thread.mutex);
-                    thread.job = job;
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-                    bool isActive = thread.isActive;
-#endif
-                    thread.has_wake_signal = true;
-#ifdef CV_PROFILE_THREADS
-                    threads_stat[i + 1].reset();
-#endif
+                    thread.పని = పని;
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+                    తార్కిక is_చురుకైన_2 = thread.is_చురుకైన_2;
+#అయితే_ముగింపు
+                    thread.has_wake_signal = నిజం;
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+                    దారాలు_stat[i + 1].reset();
+#అయితే_ముగింపు
                     pthread_mutex_unlock(&thread.mutex);
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-                    if (!isActive)
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+                    ఒకవేళ (!is_చురుకైన_2)
                     {
                         pthread_cond_broadcast/*pthread_cond_signal*/(&thread.cond_thread_wake); // wake thread
                     }
-#endif
+#అయితే_ముగింపు
                 }
-                else
+                లేకపోతే
                 {
-                    CV_Assert(thread.job.empty());
-                    thread.job = job;
-                    thread.has_wake_signal = true;
-#ifdef CV_PROFILE_THREADS
-                    threads_stat[i + 1].reset();
-#endif
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+                    CV_Assert(thread.పని.empty());
+                    thread.పని = పని;
+                    thread.has_wake_signal = నిజం;
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+                    దారాలు_stat[i + 1].reset();
+#అయితే_ముగింపు
+#ఒకవేళ !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
                     pthread_cond_broadcast/*pthread_cond_signal*/(&thread.cond_thread_wake); // wake thread
-#endif
+#అయితే_ముగింపు
                 }
             }
-#ifdef CV_PROFILE_THREADS
-            threads_stat[0].threadPing = getTickCount();
-#endif
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+            దారాలు_stat[0].threadPing = get_Tick_లెక్క();
+#అయితే_ముగింపు
+#ఒకవేళ defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
             pthread_cond_broadcast(&cond_thread_wake); // wake all threads
-#endif
-#ifdef CV_PROFILE_THREADS
-            threads_stat[0].threadWake = getTickCount();
-#endif
-            CV_LOG_VERBOSE(NULL, 5, "MainThread: wake worker threads... (done)");
+#అయితే_ముగింపు
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+            దారాలు_stat[0].threadWake = get_Tick_లెక్క();
+#అయితే_ముగింపు
+            CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: wake worker threads... (done)");
 
             {
-                ParallelJob& j = *(this->job);
-#ifdef CV_PROFILE_THREADS
-                threads_stat[0].threadExecuteStart = getTickCount();
-                threads_stat[0].executedTasks = j.execute(false);
-                threads_stat[0].threadExecuteStop = getTickCount();
-#else
-                j.execute(false);
-#endif
+                Parallel_పని& j = *(ఇది->పని);
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+                దారాలు_stat[0].thread_Execute_ప్రారంభం = get_Tick_లెక్క();
+                దారాలు_stat[0].executedTasks = j.execute(అబద్ధం);
+                దారాలు_stat[0].threadExecuteStop = get_Tick_లెక్క();
+#లేకపోతే
+                j.execute(అబద్ధం);
+#అయితే_ముగింపు
                 CV_Assert(j.current_task >= j.range.size());
-                CV_LOG_VERBOSE(NULL, 5, "MainThread: complete self-tasks: " << j.active_thread_count << " " << j.completed_thread_count);
-                if (job->is_completed || j.active_thread_count == 0)
+                CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: complete self-tasks: " << j.చురుకైన_thread_లెక్క << " " << j.completed_thread_లెక్క);
+                ఒకవేళ (పని->is_completed || j.చురుకైన_thread_లెక్క == 0)
                 {
-                    job->is_completed = true;
-                    CV_LOG_VERBOSE(NULL, 5, "MainThread: no WIP worker threads");
+                    పని->is_completed = నిజం;
+                    CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: no WIP worker threads");
                 }
-                else
+                లేకపోతే
                 {
-                    if (CV_MAIN_THREAD_ACTIVE_WAIT > 0)
+                    ఒకవేళ (CV_MAIN_THREAD_చురుకైన_WAIT > 0)
                     {
-                        for (int i = 0; i < CV_MAIN_THREAD_ACTIVE_WAIT; i++)  // don't spin too much in any case (inaccurate getTickCount())
+                        కొరకు (పూర్ణాంకం i = 0; i < CV_MAIN_THREAD_చురుకైన_WAIT; i++)  // don't spin too much in any case (inaccurate getTickCount())
                         {
-                            if (job->is_completed)
+                            ఒకవేళ (పని->is_completed)
                             {
-                                CV_LOG_VERBOSE(NULL, 5, "MainThread: job finalize (active wait) " << j.active_thread_count << " " << j.completed_thread_count);
-                                break;
+                                CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: job finalize (active wait) " << j.చురుకైన_thread_లెక్క << " " << j.completed_thread_లెక్క);
+                                ఆపు;
                             }
-                            if (CV_ACTIVE_WAIT_PAUSE_LIMIT > 0 && (i < CV_ACTIVE_WAIT_PAUSE_LIMIT || (i & 1)))
+                            ఒకవేళ (CV_చురుకైన_WAIT_PAUSE_హద్దు > 0 && (i < CV_చురుకైన_WAIT_PAUSE_హద్దు || (i & 1)))
                                 CV_PAUSE(16);
-                            else
+                            లేకపోతే
                                 CV_YIELD();
                         }
                     }
-                    if (!job->is_completed)
+                    ఒకవేళ (!పని->is_completed)
                     {
-                        CV_LOG_VERBOSE(NULL, 5, "MainThread: prepare wait " << j.active_thread_count << " " << j.completed_thread_count);
+                        CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: prepare wait " << j.చురుకైన_thread_లెక్క << " " << j.completed_thread_లెక్క);
                         pthread_mutex_lock(&mutex_notify);
-                        for (;;)
+                        కొరకు (;;)
                         {
-                            if (job->is_completed)
+                            ఒకవేళ (పని->is_completed)
                             {
-                                CV_LOG_VERBOSE(NULL, 5, "MainThread: job finalize (wait) " << j.active_thread_count << " " << j.completed_thread_count);
-                                break;
+                                CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: job finalize (wait) " << j.చురుకైన_thread_లెక్క << " " << j.completed_thread_లెక్క);
+                                ఆపు;
                             }
-                            CV_LOG_VERBOSE(NULL, 5, "MainThread: wait completion (sleep) ...");
+                            CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: wait completion (sleep) ...");
                             pthread_cond_wait(&cond_thread_task_complete, &mutex_notify);
-                            CV_LOG_VERBOSE(NULL, 5, "MainThread: wake");
+                            CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: wake");
                         }
                         pthread_mutex_unlock(&mutex_notify);
                     }
                 }
             }
-#ifdef CV_PROFILE_THREADS
-            threads_stat[0].threadFree = getTickCount();
-            std::cout << "Job: sz=" << range.size() << " nstripes=" << nstripes << "    Time: " << (threads_stat[0].threadFree - jobSubmitTime) / tickFreq * 1e6 << " usec" << std::endl;
-            for (int i = 0; i < (int)threads.size() + 1; i++)
+#నిర్వచితమైతే CV_PROFILE_దారాలు
+            దారాలు_stat[0].threadFree = get_Tick_లెక్క();
+            std::బయటకు << "Job: sz=" << range.size() << " nstripes=" << nstripes << "    Time: " << (దారాలు_stat[0].threadFree - పని_Submit_సమయం) / tickFreq * 1e6 << " usec" << std::పంక్తి_ముగింపు;
+            కొరకు (పూర్ణాంకం i = 0; i < (పూర్ణాంకం)దారాలు.size() + 1; i++)
             {
-                threads_stat[i].dump(i - 1, jobSubmitTime, tickFreq);
+                దారాలు_stat[i].dump(i - 1, పని_Submit_సమయం, tickFreq);
             }
-#endif
-            if (job)
+#అయితే_ముగింపు
+            ఒకవేళ (పని)
             {
                 pthread_mutex_lock(&mutex);
-                CV_LOG_VERBOSE(NULL, 5, "MainThread: job release");
-                CV_Assert(job->is_completed);
-                job.release();
+                CV_LOG_VERBOSE(ఖాళీ, 5, "MainThread: job release");
+                CV_Assert(పని->is_completed);
+                పని.release();
                 pthread_mutex_unlock(&mutex);
             }
         }
     }
-    else
+    లేకపోతే
     {
         body(range);
     }
 }
 
-size_t ThreadPool::getNumOfThreads()
+size_t ThreadPool::get_అంకె_యొక్క_దారాలు()
 {
-    return num_threads;
+    తిరిగి అంకె_దారాలు_2;
 }
 
-void ThreadPool::setNumOfThreads(unsigned n)
+శూన్య ThreadPool::సమితి_అంకె_యొక్క_దారాలు(గుర్తులేని n)
 {
-    if (n != num_threads)
+    ఒకవేళ (n != అంకె_దారాలు_2)
     {
-        num_threads = n;
-        if (n == 1)
-           if (job == NULL) reconfigure(0);  // stop worker threads immediately
+        అంకె_దారాలు_2 = n;
+        ఒకవేళ (n == 1)
+           ఒకవేళ (పని == ఖాళీ) reconfigure(0);  // stop worker threads immediately
     }
 }
 
-size_t parallel_pthreads_get_threads_num()
+size_t parallel_pthreads_get_దారాలు_అంకె()
 {
-    return ThreadPool::instance().getNumOfThreads();
+    తిరిగి ThreadPool::instance().get_అంకె_యొక్క_దారాలు();
 }
 
-void parallel_pthreads_set_threads_num(int num)
+శూన్య parallel_pthreads_సమితి_దారాలు_అంకె(పూర్ణాంకం num)
 {
-    if(num < 0)
+    ఒకవేళ(num < 0)
     {
-        ThreadPool::instance().setNumOfThreads(0);
+        ThreadPool::instance().సమితి_అంకె_యొక్క_దారాలు(0);
     }
-    else
+    లేకపోతే
     {
-        ThreadPool::instance().setNumOfThreads(unsigned(num));
+        ThreadPool::instance().సమితి_అంకె_యొక్క_దారాలు(గుర్తులేని(num));
     }
 }
 
-void parallel_for_pthreads(const Range& range, const ParallelLoopBody& body, double nstripes)
+శూన్య parallel_for_pthreads(స్థిరరాశి Range& range, స్థిరరాశి ParallelLoopBody& body, ద్విగుణ nstripes)
 {
-    ThreadPool::instance().run(range, body, nstripes);
+    ThreadPool::instance().నిరంతరం(range, body, nstripes);
 }
 
 }
 
-#endif
+#అయితే_ముగింపు

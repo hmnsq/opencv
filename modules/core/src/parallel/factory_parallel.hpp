@@ -2,28 +2,28 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_PARALLEL_FACTORY_HPP
-#define OPENCV_CORE_PARALLEL_FACTORY_HPP
+#నిర్వచితం_కాకపోతే OPENCV_CORE_PARALLEL_FACTORY_HPP
+#నిర్వచించు OPENCV_CORE_PARALLEL_FACTORY_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#అన్తర్భావ "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+నామాకాశ cv { నామాకాశ parallel {
 
-class IParallelBackendFactory
+తరగతి IParallelBackendFactory
 {
-public:
-    virtual ~IParallelBackendFactory() {}
-    virtual std::shared_ptr<cv::parallel::ParallelForAPI> create() const = 0;
+బహిరంగ:
+    మాయా ~IParallelBackendFactory() {}
+    మాయా std::shared_ptr<cv::parallel::ParallelForAPI> create() స్థిరరాశి = 0;
 };
 
 
-class StaticBackendFactory CV_FINAL: public IParallelBackendFactory
+తరగతి StaticBackendFactory CV_FINAL: బహిరంగ IParallelBackendFactory
 {
-protected:
-    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)> create_fn_;
+రక్షిత:
+    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(శూన్య)> create_fn_;
 
-public:
-    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)>&& create_fn)
+బహిరంగ:
+    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(శూన్య)>&& create_fn)
         : create_fn_(create_fn)
     {
         // nothing
@@ -31,9 +31,9 @@ public:
 
     ~StaticBackendFactory() CV_OVERRIDE {}
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() స్థిరరాశి CV_OVERRIDE
     {
-        return create_fn_();
+        తిరిగి create_fn_();
     }
 };
 
@@ -41,8 +41,8 @@ public:
 // PluginBackendFactory is implemented in plugin_wrapper.cpp
 //
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName);
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(స్థిరరాశి std::string& పునాది_Name);
 
 }}  // namespace
 
-#endif  // OPENCV_CORE_PARALLEL_FACTORY_HPP
+#అయితే_ముగింపు  // OPENCV_CORE_PARALLEL_FACTORY_HPP

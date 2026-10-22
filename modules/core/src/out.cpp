@@ -41,55 +41,55 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
-namespace cv
+నామాకాశ cv
 {
-    class FormattedImpl CV_FINAL : public Formatted
+    తరగతి FormattedImpl CV_FINAL : బహిరంగ Formatted
     {
-        enum { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
-               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_VALUE, STATE_FINISHED,
-               STATE_LINE_SEPARATOR, STATE_CN_SEPARATOR, STATE_VALUE_SEPARATOR };
-        enum {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
+        గణన { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
+               STATE_అడ్డువరుస_OPEN, STATE_అడ్డువరుస_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_విలువ, STATE_ముగిసిన,
+               STATE_పంక్తి_SEPARATOR, STATE_CN_SEPARATOR, STATE_విలువ_SEPARATOR };
+        గణన {BRACE_అడ్డువరుస_OPEN = 0, BRACE_అడ్డువరుస_CLOSE = 1, BRACE_అడ్డువరుస_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
 
-        char floatFormat[8];
-        char buf[32];   // enough for double with precision up to 20
+        అక్షరం floatFormat[8];
+        అక్షరం buf[32];   // enough for double with precision up to 20
 
         Mat mtx;
-        int mcn; // == mtx.channels()
-        bool singleLine;
-        bool alignOrder;    // true when cn first order
+        పూర్ణాంకం mcn; // == mtx.channels()
+        తార్కిక single_పంక్తి;
+        తార్కిక align_క్రమం;    // true when cn first order
 
-        int state;
-        int row;
-        int col;
-        int cn;
+        పూర్ణాంకం state;
+        పూర్ణాంకం అడ్డువరుస;
+        పూర్ణాంకం నిలువు;
+        పూర్ణాంకం cn;
 
         String prologue;
         String epilogue;
-        char braces[5];
+        అక్షరం braces[5];
 
-        void (FormattedImpl::*valueToStr)();
-        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
-        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
-        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
-        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
-        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
-        void valueToStr32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
-        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
-        void valueToStr32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
-        void valueToStr64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
-        void valueToStr64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
-        void valueToStr64s() { snprintf(buf, sizeof(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
-        void valueToStr16f() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<hfloat>(row, col)[cn]); }
-        void valueToStr16bf() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<bfloat>(row, col)[cn]); }
-        void valueToStr8f()   { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8_t>(row, col)[cn]); }
-        void valueToStr8fnuz() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8a_t>(row, col)[cn]); }
-        void valueToStrOther() { buf[0] = 0; }
+        శూన్య (FormattedImpl::*విలువ_గమ్యం_Str)();
+        శూన్య విలువ_గమ్యం_Str_Bool() { snprintf(buf, పరిమాణం(buf), "%d", (పూర్ణాంకం)mtx.ptr<uchar>(అడ్డువరుస, నిలువు)[cn] != 0); }
+        శూన్య విలువ_గమ్యం_Str8u()  { snprintf(buf, పరిమాణం(buf), "%3d", (పూర్ణాంకం)mtx.ptr<uchar>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str8s()  { snprintf(buf, పరిమాణం(buf), "%3d", (పూర్ణాంకం)mtx.ptr<schar>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str16u() { snprintf(buf, పరిమాణం(buf), "%d", (పూర్ణాంకం)mtx.ptr<ushort>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str16s() { snprintf(buf, పరిమాణం(buf), "%d", (పూర్ణాంకం)mtx.ptr<పొట్టి>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str32u() { snprintf(buf, పరిమాణం(buf), "%u", mtx.ptr<గుర్తులేని>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str32s() { snprintf(buf, పరిమాణం(buf), "%d", mtx.ptr<పూర్ణాంకం>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str32f() { snprintf(buf, పరిమాణం(buf), floatFormat, mtx.ptr<దశాంశం>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str64f() { snprintf(buf, పరిమాణం(buf), floatFormat, mtx.ptr<ద్విగుణ>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str64u() { snprintf(buf, పరిమాణం(buf), "%llu", (గుర్తులేని దీర్ఘ దీర్ఘ)mtx.ptr<uint64_t>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str64s() { snprintf(buf, పరిమాణం(buf), "%lld", (దీర్ఘ దీర్ఘ)mtx.ptr<int64_t>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str16f() { snprintf(buf, పరిమాణం(buf), floatFormat, (దశాంశం)mtx.ptr<hfloat>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str16bf() { snprintf(buf, పరిమాణం(buf), floatFormat, (దశాంశం)mtx.ptr<bfloat>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str8f()   { snprintf(buf, పరిమాణం(buf), floatFormat, (దశాంశం)mtx.ptr<fp8_t>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str8fnuz() { snprintf(buf, పరిమాణం(buf), floatFormat, (దశాంశం)mtx.ptr<fp8a_t>(అడ్డువరుస, నిలువు)[cn]); }
+        శూన్య విలువ_గమ్యం_Str_Other() { buf[0] = 0; }
 
-    public:
+    బహిరంగ:
 
-        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, int precision)
+        FormattedImpl(String pl, String el, Mat m, అక్షరం br[5], తార్కిక s_పంక్తి, తార్కిక a_క్రమం, పూర్ణాంకం precision)
         {
             CV_Assert(m.dims <= 2);
 
@@ -97,292 +97,292 @@ namespace cv
             epilogue = el;
             mtx = m;
             mcn = m.channels();
-            memcpy(braces, br, 5);
+            జ్ఞాపకం_నకలు(braces, br, 5);
             state = STATE_PROLOGUE;
-            singleLine = sLine;
-            alignOrder = aOrder;
-            row = col = cn =0;
+            single_పంక్తి = s_పంక్తి;
+            align_క్రమం = a_క్రమం;
+            అడ్డువరుస = నిలువు = cn =0;
 
-            if (precision < 0)
+            ఒకవేళ (precision < 0)
             {
                 floatFormat[0] = '%';
                 floatFormat[1] = 'a';
                 floatFormat[2] = 0;
             }
-            else
+            లేకపోతే
             {
-                cv_snprintf(floatFormat, sizeof(floatFormat), "%%.%dg", std::min(precision, 20));
+                cv_snprintf(floatFormat, పరిమాణం(floatFormat), "%%.%dg", std::min(precision, 20));
             }
 
-            switch(mtx.depth())
+            ఎంపిక(mtx.లోతు())
             {
-                case CV_8U:  valueToStr = &FormattedImpl::valueToStr8u; break;
-                case CV_8S:  valueToStr = &FormattedImpl::valueToStr8s; break;
-                case CV_Bool: valueToStr = &FormattedImpl::valueToStrBool; break;
-                case CV_16U: valueToStr = &FormattedImpl::valueToStr16u; break;
-                case CV_16S: valueToStr = &FormattedImpl::valueToStr16s; break;
-                case CV_32U: valueToStr = &FormattedImpl::valueToStr32u; break;
-                case CV_32S: valueToStr = &FormattedImpl::valueToStr32s; break;
-                case CV_32F: valueToStr = &FormattedImpl::valueToStr32f; break;
-                case CV_64F: valueToStr = &FormattedImpl::valueToStr64f; break;
-                case CV_64U: valueToStr = &FormattedImpl::valueToStr64u; break;
-                case CV_64S: valueToStr = &FormattedImpl::valueToStr64s; break;
-                case CV_16F: valueToStr = &FormattedImpl::valueToStr16f; break;
-                case CV_16BF: valueToStr = &FormattedImpl::valueToStr16bf; break;
-                case CV_8F_E4M3FN:   valueToStr = &FormattedImpl::valueToStr8f; break;
-                case CV_8F_E4M3FNUZ: valueToStr = &FormattedImpl::valueToStr8fnuz; break;
-                default:
-                    CV_Error_(Error::StsError, ("unsupported matrix type %d\n", mtx.depth()));
+                స్థితి CV_8U:  విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str8u; ఆపు;
+                స్థితి CV_8S:  విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str8s; ఆపు;
+                స్థితి CV_Bool: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str_Bool; ఆపు;
+                స్థితి CV_16U: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str16u; ఆపు;
+                స్థితి CV_16S: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str16s; ఆపు;
+                స్థితి CV_32U: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str32u; ఆపు;
+                స్థితి CV_32S: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str32s; ఆపు;
+                స్థితి CV_32F: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str32f; ఆపు;
+                స్థితి CV_64F: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str64f; ఆపు;
+                స్థితి CV_64U: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str64u; ఆపు;
+                స్థితి CV_64S: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str64s; ఆపు;
+                స్థితి CV_16F: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str16f; ఆపు;
+                స్థితి CV_16BF: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str16bf; ఆపు;
+                స్థితి CV_8F_E4M3FN:   విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str8f; ఆపు;
+                స్థితి CV_8F_E4M3FNUZ: విలువ_గమ్యం_Str = &FormattedImpl::విలువ_గమ్యం_Str8fnuz; ఆపు;
+                అప్రమేయ:
+                    CV_Error_(Error::StsError, ("unsupported matrix type %d\n", mtx.లోతు()));
             }
         }
 
-        void reset() CV_OVERRIDE
+        శూన్య reset() CV_OVERRIDE
         {
             state = STATE_PROLOGUE;
         }
 
-        const char* next() CV_OVERRIDE
+        స్థిరరాశి అక్షరం* next() CV_OVERRIDE
         {
-            switch(state)
+            ఎంపిక(state)
             {
-                case STATE_PROLOGUE:
-                    row = 0;
-                    if (mtx.empty())
+                స్థితి STATE_PROLOGUE:
+                    అడ్డువరుస = 0;
+                    ఒకవేళ (mtx.empty())
                         state = STATE_EPILOGUE;
-                    else if (alignOrder)
+                    లేకపోతే ఒకవేళ (align_క్రమం)
                         state = STATE_INTERLUDE;
-                    else
-                        state = STATE_ROW_OPEN;
-                    return prologue.c_str();
-                case STATE_INTERLUDE:
-                    state = STATE_ROW_OPEN;
-                    if (row >= mtx.rows)
+                    లేకపోతే
+                        state = STATE_అడ్డువరుస_OPEN;
+                    తిరిగి prologue.c_str();
+                స్థితి STATE_INTERLUDE:
+                    state = STATE_అడ్డువరుస_OPEN;
+                    ఒకవేళ (అడ్డువరుస >= mtx.అడ్డువరుసలు)
                     {
-                        if (++cn >= mcn)
+                        ఒకవేళ (++cn >= mcn)
                         {
                             state = STATE_EPILOGUE;
                             buf[0] = 0;
-                            return buf;
+                            తిరిగి buf;
                         }
-                        else
-                            row = 0;
-                        snprintf(buf, sizeof(buf), "\n(:, :, %d) = \n", cn+1);
-                        return buf;
+                        లేకపోతే
+                            అడ్డువరుస = 0;
+                        snprintf(buf, పరిమాణం(buf), "\n(:, :, %d) = \n", cn+1);
+                        తిరిగి buf;
                     }
-                    snprintf(buf, sizeof(buf), "(:, :, %d) = \n", cn+1);
-                    return buf;
-                case STATE_EPILOGUE:
-                    state = STATE_FINISHED;
-                    return epilogue.c_str();
-                case STATE_ROW_OPEN:
-                    col = 0;
+                    snprintf(buf, పరిమాణం(buf), "(:, :, %d) = \n", cn+1);
+                    తిరిగి buf;
+                స్థితి STATE_EPILOGUE:
+                    state = STATE_ముగిసిన;
+                    తిరిగి epilogue.c_str();
+                స్థితి STATE_అడ్డువరుస_OPEN:
+                    నిలువు = 0;
                     state = STATE_CN_OPEN;
                     {
                         size_t pos = 0;
-                        if (row > 0)
-                            while(pos < prologue.size() && pos < sizeof(buf) - 2)
+                        ఒకవేళ (అడ్డువరుస > 0)
+                            అయితే(pos < prologue.size() && pos < పరిమాణం(buf) - 2)
                                 buf[pos++] = ' ';
-                        if (braces[BRACE_ROW_OPEN])
-                            buf[pos++] = braces[BRACE_ROW_OPEN];
-                        if(!pos)
-                            return next();
+                        ఒకవేళ (braces[BRACE_అడ్డువరుస_OPEN])
+                            buf[pos++] = braces[BRACE_అడ్డువరుస_OPEN];
+                        ఒకవేళ(!pos)
+                            తిరిగి next();
                         buf[pos] = 0;
                     }
-                    return buf;
-                case STATE_ROW_CLOSE:
-                    state = STATE_LINE_SEPARATOR;
-                    ++row;
-                    if (braces[BRACE_ROW_CLOSE])
+                    తిరిగి buf;
+                స్థితి STATE_అడ్డువరుస_CLOSE:
+                    state = STATE_పంక్తి_SEPARATOR;
+                    ++అడ్డువరుస;
+                    ఒకవేళ (braces[BRACE_అడ్డువరుస_CLOSE])
                     {
-                        buf[0] = braces[BRACE_ROW_CLOSE];
-                        buf[1] = row < mtx.rows ? ',' : '\0';
+                        buf[0] = braces[BRACE_అడ్డువరుస_CLOSE];
+                        buf[1] = అడ్డువరుస < mtx.అడ్డువరుసలు ? ',' : '\0';
                         buf[2] = 0;
-                        return buf;
+                        తిరిగి buf;
                     }
-                    else if(braces[BRACE_ROW_SEP] && row < mtx.rows)
+                    లేకపోతే ఒకవేళ(braces[BRACE_అడ్డువరుస_SEP] && అడ్డువరుస < mtx.అడ్డువరుసలు)
                     {
-                        buf[0] = braces[BRACE_ROW_SEP];
+                        buf[0] = braces[BRACE_అడ్డువరుస_SEP];
                         buf[1] = 0;
-                        return buf;
+                        తిరిగి buf;
                     }
-                    return next();
-                case STATE_CN_OPEN:
-                    state = STATE_VALUE;
-                    if (!alignOrder)
+                    తిరిగి next();
+                స్థితి STATE_CN_OPEN:
+                    state = STATE_విలువ;
+                    ఒకవేళ (!align_క్రమం)
                         cn = 0;
-                    if (mcn > 1 && braces[BRACE_CN_OPEN])
+                    ఒకవేళ (mcn > 1 && braces[BRACE_CN_OPEN])
                     {
                         buf[0] = braces[BRACE_CN_OPEN];
                         buf[1] = 0;
-                        return buf;
+                        తిరిగి buf;
                     }
-                    return next();
-                case STATE_CN_CLOSE:
-                    ++col;
-                    if (col >= mtx.cols)
-                        state = STATE_ROW_CLOSE;
-                    else
+                    తిరిగి next();
+                స్థితి STATE_CN_CLOSE:
+                    ++నిలువు;
+                    ఒకవేళ (నిలువు >= mtx.నిలువుల_సంఖ్య)
+                        state = STATE_అడ్డువరుస_CLOSE;
+                    లేకపోతే
                         state = STATE_CN_SEPARATOR;
-                    if (mcn > 1 && braces[BRACE_CN_CLOSE])
+                    ఒకవేళ (mcn > 1 && braces[BRACE_CN_CLOSE])
                     {
                         buf[0] = braces[BRACE_CN_CLOSE];
                         buf[1] = 0;
-                        return buf;
+                        తిరిగి buf;
                     }
-                    return next();
-                case STATE_VALUE:
-                    (this->*valueToStr)();
+                    తిరిగి next();
+                స్థితి STATE_విలువ:
+                    (ఇది->*విలువ_గమ్యం_Str)();
                     state = STATE_CN_CLOSE;
-                    if (alignOrder)
-                        return buf;
-                    if (++cn < mcn)
-                        state = STATE_VALUE_SEPARATOR;
-                    return buf;
-                case STATE_FINISHED:
-                    return 0;
-                case STATE_LINE_SEPARATOR:
-                    if (row >= mtx.rows)
+                    ఒకవేళ (align_క్రమం)
+                        తిరిగి buf;
+                    ఒకవేళ (++cn < mcn)
+                        state = STATE_విలువ_SEPARATOR;
+                    తిరిగి buf;
+                స్థితి STATE_ముగిసిన:
+                    తిరిగి 0;
+                స్థితి STATE_పంక్తి_SEPARATOR:
+                    ఒకవేళ (అడ్డువరుస >= mtx.అడ్డువరుసలు)
                     {
-                        if (alignOrder)
+                        ఒకవేళ (align_క్రమం)
                             state = STATE_INTERLUDE;
-                        else
+                        లేకపోతే
                             state = STATE_EPILOGUE;
-                        return next();
+                        తిరిగి next();
                     }
-                    state = STATE_ROW_OPEN;
-                    buf[0] = singleLine ? ' ' : '\n';
+                    state = STATE_అడ్డువరుస_OPEN;
+                    buf[0] = single_పంక్తి ? ' ' : '\n';
                     buf[1] = 0;
-                    return buf;
-                case STATE_CN_SEPARATOR:
+                    తిరిగి buf;
+                స్థితి STATE_CN_SEPARATOR:
                     state = STATE_CN_OPEN;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
-                case STATE_VALUE_SEPARATOR:
-                    state = STATE_VALUE;
+                    తిరిగి buf;
+                స్థితి STATE_విలువ_SEPARATOR:
+                    state = STATE_విలువ;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    తిరిగి buf;
             }
-            return 0;
+            తిరిగి 0;
         }
     };
 
-    class FormatterBase : public Formatter
+    తరగతి Formatter_పునాది : బహిరంగ Formatter
     {
-    public:
-        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(true) {}
+    బహిరంగ:
+        Formatter_పునాది() : prec16f(4), prec32f(8), prec64f(16), multiline(నిజం) {}
 
-        void set16fPrecision(int p) CV_OVERRIDE
+        శూన్య set16fPrecision(పూర్ణాంకం p) CV_OVERRIDE
         {
             prec16f = p;
         }
 
-        void set32fPrecision(int p) CV_OVERRIDE
+        శూన్య set32fPrecision(పూర్ణాంకం p) CV_OVERRIDE
         {
             prec32f = p;
         }
 
-        void set64fPrecision(int p) CV_OVERRIDE
+        శూన్య set64fPrecision(పూర్ణాంకం p) CV_OVERRIDE
         {
             prec64f = p;
         }
 
-        void setMultiline(bool ml) CV_OVERRIDE
+        శూన్య సమితి_Multiline(తార్కిక ml) CV_OVERRIDE
         {
             multiline = ml;
         }
 
-    protected:
-        int prec16f;
-        int prec32f;
-        int prec64f;
-        int multiline;
+    రక్షిత:
+        పూర్ణాంకం prec16f;
+        పూర్ణాంకం prec32f;
+        పూర్ణాంకం prec64f;
+        పూర్ణాంకం multiline;
     };
 
-    class DefaultFormatter CV_FINAL : public FormatterBase
+    తరగతి DefaultFormatter CV_FINAL : బహిరంగ Formatter_పునాది
     {
-    public:
+    బహిరంగ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(స్థిరరాశి Mat& mtx) స్థిరరాశి CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            అక్షరం braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            తిరిగి makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.అడ్డువరుసలు == 1 || !multiline, అబద్ధం, mtx.లోతు() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class MatlabFormatter CV_FINAL : public FormatterBase
+    తరగతి MatlabFormatter CV_FINAL : బహిరంగ Formatter_పునాది
     {
-    public:
+    బహిరంగ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(స్థిరరాశి Mat& mtx) స్థిరరాశి CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("", "", mtx, &*braces,
-                mtx.rows == 1 || !multiline, true, mtx.depth() == CV_64F ? prec64f : prec32f );
+            అక్షరం braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            తిరిగి makePtr<FormattedImpl>("", "", mtx, &*braces,
+                mtx.అడ్డువరుసలు == 1 || !multiline, నిజం, mtx.లోతు() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class PythonFormatter CV_FINAL : public FormatterBase
+    తరగతి PythonFormatter CV_FINAL : బహిరంగ Formatter_పునాది
     {
-    public:
+    బహిరంగ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(స్థిరరాశి Mat& mtx) స్థిరరాశి CV_OVERRIDE
         {
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            అక్షరం braces[5] = {'[', ']', ',', '[', ']'};
+            ఒకవేళ (mtx.నిలువుల_సంఖ్య == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            తిరిగి makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.అడ్డువరుసలు == 1 || !multiline, అబద్ధం, mtx.లోతు() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class NumpyFormatter CV_FINAL : public FormatterBase
+    తరగతి NumpyFormatter CV_FINAL : బహిరంగ Formatter_పునాది
     {
-    public:
+    బహిరంగ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(స్థిరరాశి Mat& mtx) స్థిరరాశి CV_OVERRIDE
         {
-            static const char* numpyTypes[CV_DEPTH_MAX] =
+            స్థిర స్థిరరాశి అక్షరం* numpyTypes[CV_లోతు_MAX] =
             {
                 "uint8", "int8", "uint16", "int16", "int32", "float32", "float64",
                 "float16", "bfloat16", "bool", "uint64", "int64", "uint32",
                 "float8_e4m3fn", "float8_e4m3fnuz"
             };
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            అక్షరం braces[5] = {'[', ']', ',', '[', ']'};
+            ఒకవేళ (mtx.నిలువుల_సంఖ్య == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("array([",
-                cv::format("], dtype='%s')", numpyTypes[mtx.depth()]), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            తిరిగి makePtr<FormattedImpl>("array([",
+                cv::format("], dtype='%s')", numpyTypes[mtx.లోతు()]), mtx, &*braces,
+                mtx.అడ్డువరుసలు == 1 || !multiline, అబద్ధం, mtx.లోతు() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CSVFormatter CV_FINAL : public FormatterBase
+    తరగతి CSVFormatter CV_FINAL : బహిరంగ Formatter_పునాది
     {
-    public:
+    బహిరంగ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(స్థిరరాశి Mat& mtx) స్థిరరాశి CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', '\0', '\0', '\0'};
-            return makePtr<FormattedImpl>(String(),
-                mtx.rows > 1 ? String("\n") : String(), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            అక్షరం braces[5] = {'\0', '\0', '\0', '\0', '\0'};
+            తిరిగి makePtr<FormattedImpl>(String(),
+                mtx.అడ్డువరుసలు > 1 ? String("\n") : String(), mtx, &*braces,
+                mtx.అడ్డువరుసలు == 1 || !multiline, అబద్ధం, mtx.లోతు() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CFormatter CV_FINAL : public FormatterBase
+    తరగతి CFormatter CV_FINAL : బహిరంగ Formatter_పునాది
     {
-    public:
+    బహిరంగ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(స్థిరరాశి Mat& mtx) స్థిరరాశి CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ',', '\0', '\0'};
-            return makePtr<FormattedImpl>("{", "}", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            అక్షరం braces[5] = {'\0', '\0', ',', '\0', '\0'};
+            తిరిగి makePtr<FormattedImpl>("{", "}", mtx, &*braces,
+                mtx.అడ్డువరుసలు == 1 || !multiline, అబద్ధం, mtx.లోతు() == CV_64F ? prec64f : prec32f );
         }
     };
 
@@ -391,219 +391,219 @@ namespace cv
 
     Ptr<Formatter> Formatter::get(Formatter::FormatType fmt)
     {
-        switch(fmt)
+        ఎంపిక(fmt)
         {
-            case FMT_DEFAULT:
-                return makePtr<DefaultFormatter>();
-            case FMT_MATLAB:
-                return makePtr<MatlabFormatter>();
-            case FMT_CSV:
-                return makePtr<CSVFormatter>();
-            case FMT_PYTHON:
-                return makePtr<PythonFormatter>();
-            case FMT_NUMPY:
-                return makePtr<NumpyFormatter>();
-            case FMT_C:
-                return makePtr<CFormatter>();
+            స్థితి FMT_DEFAULT:
+                తిరిగి makePtr<DefaultFormatter>();
+            స్థితి FMT_MATLAB:
+                తిరిగి makePtr<MatlabFormatter>();
+            స్థితి FMT_CSV:
+                తిరిగి makePtr<CSVFormatter>();
+            స్థితి FMT_PYTHON:
+                తిరిగి makePtr<PythonFormatter>();
+            స్థితి FMT_NUMPY:
+                తిరిగి makePtr<NumpyFormatter>();
+            స్థితి FMT_C:
+                తిరిగి makePtr<CFormatter>();
         }
-        return makePtr<DefaultFormatter>();
+        తిరిగి makePtr<DefaultFormatter>();
     }
 
-    template<typename _Tp> struct Fmt
+    మూస<రకం_పేరు _Tp> నిర్మాణం Fmt
     {
-        typedef int temp_type;
-        static const char* fmt() { return "%d"; }
+        రకనిర్వచనం పూర్ణాంకం తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%d"; }
     };
 
-    template<> struct Fmt<uint32_t>
+    మూస<> నిర్మాణం Fmt<uint32_t>
     {
-        typedef unsigned temp_type;
-        static const char* fmt() { return "%u"; }
+        రకనిర్వచనం గుర్తులేని తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%u"; }
     };
 
-    template<> struct Fmt<int64_t>
+    మూస<> నిర్మాణం Fmt<int64_t>
     {
-        typedef long long temp_type;
-        static const char* fmt() { return "%lld"; }
+        రకనిర్వచనం దీర్ఘ దీర్ఘ తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%lld"; }
     };
 
-    template<> struct Fmt<uint64_t>
+    మూస<> నిర్మాణం Fmt<uint64_t>
     {
-        typedef unsigned long long temp_type;
-        static const char* fmt() { return "%llu"; }
+        రకనిర్వచనం గుర్తులేని దీర్ఘ దీర్ఘ తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%llu"; }
     };
 
-    template<> struct Fmt<float>
+    మూస<> నిర్మాణం Fmt<దశాంశం>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        రకనిర్వచనం దశాంశం తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%.5g"; }
     };
 
-    template<> struct Fmt<double>
+    మూస<> నిర్మాణం Fmt<ద్విగుణ>
     {
-        typedef double temp_type;
-        static const char* fmt() { return "%.5g"; }
+        రకనిర్వచనం ద్విగుణ తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%.5g"; }
     };
 
-    template<> struct Fmt<hfloat>
+    మూస<> నిర్మాణం Fmt<hfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        రకనిర్వచనం దశాంశం తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%.5g"; }
     };
 
-    template<> struct Fmt<bfloat>
+    మూస<> నిర్మాణం Fmt<bfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        రకనిర్వచనం దశాంశం తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%.4g"; }
     };
 
-    template<> struct Fmt<fp8_t>
+    మూస<> నిర్మాణం Fmt<fp8_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        రకనిర్వచనం దశాంశం తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%.4g"; }
     };
 
-    template<> struct Fmt<fp8a_t>
+    మూస<> నిర్మాణం Fmt<fp8a_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        రకనిర్వచనం దశాంశం తాత్కాలిక_type;
+        స్థిర స్థిరరాశి అక్షరం* fmt() { తిరిగి "%.4g"; }
     };
 
-    template <typename _Tp>
-    static void pprintRow(std::ostream& strm, const _Tp* ptr, int n, size_t ofs, int edge)
+    మూస <రకం_పేరు _Tp>
+    స్థిర శూన్య pprint_అడ్డువరుస(std::ostream& strm, స్థిరరాశి _Tp* ptr, పూర్ణాంకం n, size_t ofs, పూర్ణాంకం అంచు)
     {
-        char buf[128];
-        const char* fmt = Fmt<_Tp>::fmt();
-        int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-        if (edge == 0)
-            edge = ndump;
-        for (i = 0; i < ndump; i++) {
-            int j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
-            if (i > 0)
+        అక్షరం buf[128];
+        స్థిరరాశి అక్షరం* fmt = Fmt<_Tp>::fmt();
+        పూర్ణాంకం i, ndump = అంచు > 0 ? std::min(n, అంచు*2+1) : n;
+        ఒకవేళ (అంచు == 0)
+            అంచు = ndump;
+        కొరకు (i = 0; i < ndump; i++) {
+            పూర్ణాంకం j = n == ndump || i < అంచు ? i : i == అంచు ? -1 : n-అంచు*2-1+i;
+            ఒకవేళ (i > 0)
                 strm << ", ";
-            if (j >= 0) {
-                snprintf(buf, sizeof(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
+            ఒకవేళ (j >= 0) {
+                snprintf(buf, పరిమాణం(buf), fmt, (రకం_పేరు Fmt<_Tp>::తాత్కాలిక_type)ptr[ofs + j]);
                 strm << buf;
-            } else
+            } లేకపోతే
                 strm << "... ";
         }
     }
 
-    static void pprintSlice(std::ostream& strm, const Mat& tensor,
-                            const size_t* step, int d,
-                            size_t ofs, int edge)
+    స్థిర శూన్య pprint_ముక్క(std::ostream& strm, స్థిరరాశి Mat& tensor,
+                            స్థిరరాశి size_t* అడుగు, పూర్ణాంకం d,
+                            size_t ofs, పూర్ణాంకం అంచు)
     {
         MatShape shape = tensor.shape();
-        int ndims = shape.dims;
-        int n = d >= ndims ? 1 : shape[d];
-        if (d >= ndims - 1) {
-            int typ = tensor.depth();
-            void* data = tensor.data;
-            CV_Assert(data);
+        పూర్ణాంకం ndims = shape.dims;
+        పూర్ణాంకం n = d >= ndims ? 1 : shape[d];
+        ఒకవేళ (d >= ndims - 1) {
+            పూర్ణాంకం typ = tensor.లోతు();
+            శూన్య* దత్తాంశం = tensor.దత్తాంశం;
+            CV_Assert(దత్తాంశం);
             n *= tensor.channels();
-            if (typ == CV_8U)
-                pprintRow(strm, (const uint8_t*)data, n, ofs, edge);
-            else if (typ == CV_8S)
-                pprintRow(strm, (const int8_t*)data, n, ofs, edge);
-            else if (typ == CV_16U)
-                pprintRow(strm, (const uint16_t*)data, n, ofs, edge);
-            else if (typ == CV_16S)
-                pprintRow(strm, (const int16_t*)data, n, ofs, edge);
-            else if (typ == CV_32U)
-                pprintRow(strm, (const unsigned*)data, n, ofs, edge);
-            else if (typ == CV_32S)
-                pprintRow(strm, (const int*)data, n, ofs, edge);
-            else if (typ == CV_64U)
-                pprintRow(strm, (const uint64_t*)data, n, ofs, edge);
-            else if (typ == CV_64S)
-                pprintRow(strm, (const int64_t*)data, n, ofs, edge);
-            else if (typ == CV_32F)
-                pprintRow(strm, (const float*)data, n, ofs, edge);
-            else if (typ == CV_64F)
-                pprintRow(strm, (const double*)data, n, ofs, edge);
-            else if (typ == CV_16F)
-                pprintRow(strm, (const hfloat*)data, n, ofs, edge);
-            else if (typ == CV_16BF)
-                pprintRow(strm, (const bfloat*)data, n, ofs, edge);
-            else if (typ == CV_Bool)
-                pprintRow(strm, (const bool*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FN)
-                pprintRow(strm, (const fp8_t*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FNUZ)
-                pprintRow(strm, (const fp8a_t*)data, n, ofs, edge);
-            else {
+            ఒకవేళ (typ == CV_8U)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి uint8_t*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_8S)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి int8_t*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_16U)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి uint16_t*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_16S)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి int16_t*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_32U)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి గుర్తులేని*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_32S)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి పూర్ణాంకం*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_64U)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి uint64_t*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_64S)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి int64_t*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_32F)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి దశాంశం*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_64F)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి ద్విగుణ*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_16F)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి hfloat*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_16BF)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి bfloat*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_Bool)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి తార్కిక*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_8F_E4M3FN)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి fp8_t*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే ఒకవేళ (typ == CV_8F_E4M3FNUZ)
+                pprint_అడ్డువరుస(strm, (స్థిరరాశి fp8a_t*)దత్తాంశం, n, ofs, అంచు);
+            లేకపోతే {
                 CV_Error(Error::StsNotImplemented, "unsupported type");
             }
-        } else {
-            int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-            bool dots = false;
-            for (i = 0; i < ndump; i++) {
-                if (i > 0 && !dots) {
-                    int nempty_lines = ndims - 2 - d;
-                    for (int k = 0; k < nempty_lines; k++)
+        } లేకపోతే {
+            పూర్ణాంకం i, ndump = అంచు > 0 ? std::min(n, అంచు*2+1) : n;
+            తార్కిక dots = అబద్ధం;
+            కొరకు (i = 0; i < ndump; i++) {
+                ఒకవేళ (i > 0 && !dots) {
+                    పూర్ణాంకం nempty_పంక్తులు = ndims - 2 - d;
+                    కొరకు (పూర్ణాంకం k = 0; k < nempty_పంక్తులు; k++)
                         strm << "\n";
                 }
-                if (i > 0)
+                ఒకవేళ (i > 0)
                     strm << "\n";
-                int j = n == ndump || i < edge ? i :
-                        i == edge ? -1 :
-                        n - edge*2 - 1 + i;
+                పూర్ణాంకం j = n == ndump || i < అంచు ? i :
+                        i == అంచు ? -1 :
+                        n - అంచు*2 - 1 + i;
                 dots = j < 0;
-                if (!dots)
-                    pprintSlice(strm, tensor, step, d+1, ofs + j*step[d], edge);
-                else
+                ఒకవేళ (!dots)
+                    pprint_ముక్క(strm, tensor, అడుగు, d+1, ofs + j*అడుగు[d], అంచు);
+                లేకపోతే
                     strm << "...";
             }
         }
     }
 
-    std::ostream& pprint(std::ostream& strm, InputArray array,
-                         int /*indent*/, int edge_,
-                         int wholeTensorThreshold,
-                         char parens)
+    std::ostream& pprint(std::ostream& strm, ఆదానం_Array array,
+                         పూర్ణాంకం /*indent*/, పూర్ణాంకం అంచు_2,
+                         పూర్ణాంకం సంపూర్ణ_Tensor_పరిమితి,
+                         అక్షరం parens)
     {
-        char oparen = parens;
-        char cparen = parens == '(' ? ')' :
+        అక్షరం oparen = parens;
+        అక్షరం cparen = parens == '(' ? ')' :
                       parens == '[' ? ']' :
                       parens == '{' ? '}' :
                       parens == '<' ? '>' :
                       parens;
-        int edge = edge_ > 0 ? edge_ : 3;
-        wholeTensorThreshold = wholeTensorThreshold > 0 ? wholeTensorThreshold : 100;
+        పూర్ణాంకం అంచు = అంచు_2 > 0 ? అంచు_2 : 3;
+        సంపూర్ణ_Tensor_పరిమితి = సంపూర్ణ_Tensor_పరిమితి > 0 ? సంపూర్ణ_Tensor_పరిమితి : 100;
 
         Mat tensor = array.getMat();
-        if (!tensor.isContinuous()) {
+        ఒకవేళ (!tensor.isContinuous()) {
             // [TODO] print non-continous arrays without copy
-            Mat temp;
-            tensor.copyTo(temp);
-            tensor = temp;
+            Mat తాత్కాలిక_2;
+            tensor.copy_గమ్యం(తాత్కాలిక_2);
+            tensor = తాత్కాలిక_2;
         }
 
         MatShape shape = tensor.shape();
-        size_t sz_all = tensor.total();
+        size_t sz_all = tensor.మొత్తం();
 
-        if (parens)
+        ఒకవేళ (parens)
             strm << oparen;
-        if (sz_all == 0) {
-            if (!parens)
+        ఒకవేళ (sz_all == 0) {
+            ఒకవేళ (!parens)
                 strm << "<empty>";
-        } else {
-            if (sz_all <= (size_t)wholeTensorThreshold)
-                edge = 0;
+        } లేకపోతే {
+            ఒకవేళ (sz_all <= (size_t)సంపూర్ణ_Tensor_పరిమితి)
+                అంచు = 0;
 
-            int ndims = shape.dims;
-            int cn = tensor.channels();
-            size_t step[MatShape::MAX_DIMS];
-            step[std::max(ndims-1, 0)] = 1;
-            for (int i = ndims-2; i >= 0; i--) {
-                step[i] = step[i+1]*shape[i+1]*cn;
+            పూర్ణాంకం ndims = shape.dims;
+            పూర్ణాంకం cn = tensor.channels();
+            size_t అడుగు[MatShape::MAX_DIMS];
+            అడుగు[std::max(ndims-1, 0)] = 1;
+            కొరకు (పూర్ణాంకం i = ndims-2; i >= 0; i--) {
+                అడుగు[i] = అడుగు[i+1]*shape[i+1]*cn;
                 cn = 1;
             }
-            pprintSlice(strm, tensor, step, 0, 0, edge);
+            pprint_ముక్క(strm, tensor, అడుగు, 0, 0, అంచు);
         }
-        if (parens)
+        ఒకవేళ (parens)
             strm << cparen;
-        return strm;
+        తిరిగి strm;
     }
 
 } // cv

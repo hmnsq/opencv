@@ -39,873 +39,873 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#అన్తర్భావ "precomp.hpp"
 
-#ifndef HAVE_OPENCL
-#include "ocl_disabled.impl.hpp"
-#else // HAVE_OPENCL
+#నిర్వచితం_కాకపోతే HAVE_OPENCL
+#అన్తర్భావ "ocl_disabled.impl.hpp"
+#లేకపోతే // HAVE_OPENCL
 
-#include <list>
-#include <map>
-#include <deque>
-#include <set>
-#include <string>
-#include <sstream>
-#include <fstream>
-#if !(defined _MSC_VER) || (defined _MSC_VER && _MSC_VER > 1700)
-#include <inttypes.h>
-#endif
+#అన్తర్భావ <list>
+#అన్తర్భావ <map>
+#అన్తర్భావ <deque>
+#అన్తర్భావ <set>
+#అన్తర్భావ <string>
+#అన్తర్భావ <sstream>
+#అన్తర్భావ <fstream>
+#ఒకవేళ !(defined _MSC_VER) || (defined _MSC_VER && _MSC_VER > 1700)
+#అన్తర్భావ <inttypes.h>
+#అయితే_ముగింపు
 
-#include <opencv2/core/utils/configuration.private.hpp>
+#అన్తర్భావ <opencv2/core/utils/configuration.private.hpp>
 
-#include <opencv2/core/utils/logger.defines.hpp>
-#undef CV_LOG_STRIP_LEVEL
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#include <opencv2/core/utils/logger.hpp>
+#అన్తర్భావ <opencv2/core/utils/logger.defines.hpp>
+#నిర్వచనం_రద్దు CV_LOG_STRIP_LEVEL
+#నిర్వచించు CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
+#అన్తర్భావ <opencv2/core/utils/logger.hpp>
 
-#include "opencv2/core/ocl_genbase.hpp"
-#include "opencl_kernels_core.hpp"
+#అన్తర్భావ "opencv2/core/ocl_genbase.hpp"
+#అన్తర్భావ "opencl_kernels_core.hpp"
 
-#include "opencv2/core/utils/lock.private.hpp"
-#include "opencv2/core/utils/filesystem.hpp"
-#include "opencv2/core/utils/filesystem.private.hpp"
+#అన్తర్భావ "opencv2/core/utils/lock.private.hpp"
+#అన్తర్భావ "opencv2/core/utils/filesystem.hpp"
+#అన్తర్భావ "opencv2/core/utils/filesystem.private.hpp"
 
-#define CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(NULL, 0, "OpenCL allocator: " << __VA_ARGS__)
-#include "opencv2/core/utils/allocator_stats.impl.hpp"
-#undef CV__ALLOCATOR_STATS_LOG
+#నిర్వచించు CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(ఖాళీ, 0, "OpenCL allocator: " << __VA_ARGS__)
+#అన్తర్భావ "opencv2/core/utils/allocator_stats.impl.hpp"
+#నిర్వచనం_రద్దు CV__ALLOCATOR_STATS_LOG
 
-#define CV_OPENCL_ALWAYS_SHOW_BUILD_LOG          0
-#define CV_OPENCL_SHOW_BUILD_OPTIONS             0
-#define CV_OPENCL_SHOW_BUILD_KERNELS             0
+#నిర్వచించు CV_OPENCL_ALWAYS_SHOW_BUILD_LOG          0
+#నిర్వచించు CV_OPENCL_SHOW_BUILD_OPTIONS             0
+#నిర్వచించు CV_OPENCL_SHOW_BUILD_KERNELS             0
 
-#define CV_OPENCL_SHOW_RUN_KERNELS               0
-#define CV_OPENCL_SYNC_RUN_KERNELS               0
-#define CV_OPENCL_TRACE_CHECK                    0
+#నిర్వచించు CV_OPENCL_SHOW_నిరంతరం_KERNELS               0
+#నిర్వచించు CV_OPENCL_SYNC_నిరంతరం_KERNELS               0
+#నిర్వచించు CV_OPENCL_TRACE_CHECK                    0
 
-#define CV_OPENCL_VALIDATE_BINARY_PROGRAMS       1
+#నిర్వచించు CV_OPENCL_VALIDATE_ద్విమాన_PROGRAMS       1
 
-#define CV_OPENCL_SHOW_SVM_ERROR_LOG             1
-#define CV_OPENCL_SHOW_SVM_LOG                   0
+#నిర్వచించు CV_OPENCL_SHOW_SVM_ERROR_LOG             1
+#నిర్వచించు CV_OPENCL_SHOW_SVM_LOG                   0
 
-#include "opencv2/core/bufferpool.hpp"
-#ifndef LOG_BUFFER_POOL
-# if 0
-#   define LOG_BUFFER_POOL printf
-# else
-#   define LOG_BUFFER_POOL(...)
+#అన్తర్భావ "opencv2/core/bufferpool.hpp"
+#నిర్వచితం_కాకపోతే LOG_బఫరు_POOL
+# ఒకవేళ 0
+#   define LOG_బఫరు_POOL రాయి
+# లేకపోతే
+#   define LOG_బఫరు_POOL(...)
 # endif
-#endif
+#అయితే_ముగింపు
 
-#if CV_OPENCL_SHOW_SVM_LOG
+#ఒకవేళ CV_OPENCL_SHOW_SVM_LOG
 // TODO add timestamp logging
-#define CV_OPENCL_SVM_TRACE_P printf("line %d (ocl.cpp): ", __LINE__); printf
-#else
-#define CV_OPENCL_SVM_TRACE_P(...)
-#endif
+#నిర్వచించు CV_OPENCL_SVM_TRACE_P రాయి("line %d (ocl.cpp): ", __LINE__); రాయి
+#లేకపోతే
+#నిర్వచించు CV_OPENCL_SVM_TRACE_P(...)
+#అయితే_ముగింపు
 
-#if CV_OPENCL_SHOW_SVM_ERROR_LOG
+#ఒకవేళ CV_OPENCL_SHOW_SVM_ERROR_LOG
 // TODO add timestamp logging
-#define CV_OPENCL_SVM_TRACE_ERROR_P printf("Error on line %d (ocl.cpp): ", __LINE__); printf
-#else
-#define CV_OPENCL_SVM_TRACE_ERROR_P(...)
-#endif
+#నిర్వచించు CV_OPENCL_SVM_TRACE_ERROR_P రాయి("Error on line %d (ocl.cpp): ", __LINE__); రాయి
+#లేకపోతే
+#నిర్వచించు CV_OPENCL_SVM_TRACE_ERROR_P(...)
+#అయితే_ముగింపు
 
-#include "opencv2/core/opencl/runtime/opencl_clblas.hpp"
-#include "opencv2/core/opencl/runtime/opencl_clfft.hpp"
+#అన్తర్భావ "opencv2/core/opencl/runtime/opencl_clblas.hpp"
+#అన్తర్భావ "opencv2/core/opencl/runtime/opencl_clfft.hpp"
 
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
+#అన్తర్భావ "opencv2/core/opencl/runtime/opencl_core.hpp"
 
-#ifdef HAVE_OPENCL_SVM
-#include "opencv2/core/opencl/runtime/opencl_svm_20.hpp"
-#include "opencv2/core/opencl/runtime/opencl_svm_hsa_extension.hpp"
-#include "opencv2/core/opencl/opencl_svm.hpp"
-#endif
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+#అన్తర్భావ "opencv2/core/opencl/runtime/opencl_svm_20.hpp"
+#అన్తర్భావ "opencv2/core/opencl/runtime/opencl_svm_hsa_extension.hpp"
+#అన్తర్భావ "opencv2/core/opencl/opencl_svm.hpp"
+#అయితే_ముగింపు
 
-#include "umatrix.hpp"
+#అన్తర్భావ "umatrix.hpp"
 
-namespace cv { namespace ocl {
+నామాకాశ cv { నామాకాశ ocl {
 
-#define IMPLEMENT_REFCOUNTABLE() \
-    void addref() { CV_XADD(&refcount, 1); } \
-    void release() { if( CV_XADD(&refcount, -1) == 1 && !cv::__termination) delete this; } \
-    int refcount
+#నిర్వచించు IMPLEMENT_REFCOUNTABLE() \
+    శూన్య addref() { CV_XADD(&refcount, 1); } \
+    శూన్య release() { ఒకవేళ( CV_XADD(&refcount, -1) == 1 && !cv::__termination) తొలగించు ఇది; } \
+    పూర్ణాంకం refcount
 
-static cv::utils::AllocatorStatistics opencl_allocator_stats;
+స్థిర cv::utils::AllocatorStatistics opencl_allocator_stats;
 
 CV_EXPORTS cv::utils::AllocatorStatisticsInterface& getOpenCLAllocatorStatistics();
 cv::utils::AllocatorStatisticsInterface& getOpenCLAllocatorStatistics()
 {
-    return opencl_allocator_stats;
+    తిరిగి opencl_allocator_stats;
 }
 
-#ifndef _DEBUG
-static bool isRaiseError()
+#నిర్వచితం_కాకపోతే _DEBUG
+స్థిర తార్కిక isRaiseError()
 {
-    static bool initialized = false;
-    static bool value = false;
-    if (!initialized)
+    స్థిర తార్కిక initialized = అబద్ధం;
+    స్థిర తార్కిక value = అబద్ధం;
+    ఒకవేళ (!initialized)
     {
-        value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_RAISE_ERROR", false);
-        initialized = true;
+        value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_RAISE_ERROR", అబద్ధం);
+        initialized = నిజం;
     }
-    return value;
+    తిరిగి value;
 }
-#endif
+#అయితే_ముగింపు
 
-static void onOpenCLKernelBuildError()
+స్థిర శూన్య onOpenCLKernelBuildError()
 {
     // NB: no need to cache this value
-    bool value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_ABORT_ON_BUILD_ERROR", false);
-    if (value)
+    తార్కిక value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_ABORT_ON_BUILD_ERROR", అబద్ధం);
+    ఒకవేళ (value)
     {
         fprintf(stderr, "Abort on OpenCL kernel build failure!\n");
         abort();
     }
 }
 
-#if CV_OPENCL_TRACE_CHECK
-static inline
-void traceOpenCLCheck(cl_int status, const char* message)
+#ఒకవేళ CV_OPENCL_TRACE_CHECK
+స్థిర అంతఃవరుస
+శూన్య traceOpenCLCheck(cl_int స్థితి_2, స్థిరరాశి అక్షరం* message)
 {
-    std::cout << "OpenCV(OpenCL:" << status << "): " << message << std::endl << std::flush;
+    std::బయటకు << "OpenCV(OpenCL:" << స్థితి_2 << "): " << message << std::పంక్తి_ముగింపు << std::flush;
 }
-#define CV_OCL_TRACE_CHECK_RESULT(status, message) traceOpenCLCheck(status, message)
-#else
-#define CV_OCL_TRACE_CHECK_RESULT(status, message) /* nothing */
-#endif
+#నిర్వచించు CV_OCL_TRACE_CHECK_ఫలితం(స్థితి_2, message) traceOpenCLCheck(స్థితి_2, message)
+#లేకపోతే
+#నిర్వచించు CV_OCL_TRACE_CHECK_ఫలితం(స్థితి_2, message) /* nothing */
+#అయితే_ముగింపు
 
-#define CV_OCL_API_ERROR_MSG(check_result, msg) \
-    cv::format("OpenCL error %s (%d) during call: %s", getOpenCLErrorString(check_result), check_result, msg)
+#నిర్వచించు CV_OCL_API_ERROR_సందేశం(check_ఫలితం, సందేశం) \
+    cv::format("OpenCL error %s (%d) during call: %s", getOpenCLErrorString(check_ఫలితం), check_ఫలితం, సందేశం)
 
-#define CV_OCL_CHECK_RESULT(check_result, msg) \
-    do { \
-        CV_OCL_TRACE_CHECK_RESULT(check_result, msg); \
-        if (check_result != CL_SUCCESS) \
+#నిర్వచించు CV_OCL_CHECK_ఫలితం(check_ఫలితం, సందేశం) \
+    చేయి { \
+        CV_OCL_TRACE_CHECK_ఫలితం(check_ఫలితం, సందేశం); \
+        ఒకవేళ (check_ఫలితం != CL_SUCCESS) \
         { \
-            static_assert(std::is_convertible<decltype(msg), const char*>::value, "msg of CV_OCL_CHECK_RESULT must be const char*"); \
-            cv::String error_msg = CV_OCL_API_ERROR_MSG(check_result, msg); \
-            CV_Error(Error::OpenCLApiCallError, error_msg); \
+            static_assert(std::is_convertible<decltype(సందేశం), స్థిరరాశి అక్షరం*>::value, "msg of CV_OCL_CHECK_RESULT must be const char*"); \
+            cv::String error_సందేశం_2 = CV_OCL_API_ERROR_సందేశం(check_ఫలితం, సందేశం); \
+            CV_Error(Error::OpenCLApiCallError, error_సందేశం_2); \
         } \
-    } while (0)
+    } అయితే (0)
 
-#define CV_OCL_CHECK_(expr, check_result) do { expr; CV_OCL_CHECK_RESULT(check_result, #expr); } while (0)
+#నిర్వచించు CV_OCL_CHECK_(సమాసం, check_ఫలితం) చేయి { సమాసం; CV_OCL_CHECK_ఫలితం(check_ఫలితం, #expr); } అయితే (0)
 
-#define CV_OCL_CHECK(expr) do { cl_int __cl_result = (expr); CV_OCL_CHECK_RESULT(__cl_result, #expr); } while (0)
+#నిర్వచించు CV_OCL_CHECK(సమాసం) చేయి { cl_int __cl_result = (సమాసం); CV_OCL_CHECK_ఫలితం(__cl_result, #expr); } అయితే (0)
 
-#ifdef _DEBUG
-#define CV_OCL_DBG_CHECK_RESULT(check_result, msg) CV_OCL_CHECK_RESULT(check_result, msg)
-#define CV_OCL_DBG_CHECK(expr) CV_OCL_CHECK(expr)
-#define CV_OCL_DBG_CHECK_(expr, check_result) CV_OCL_CHECK_(expr, check_result)
-#else
-#define CV_OCL_DBG_CHECK_RESULT(check_result, msg) \
-    do { \
-        CV_OCL_TRACE_CHECK_RESULT(check_result, msg); \
-        if (check_result != CL_SUCCESS && isRaiseError()) \
+#నిర్వచితమైతే _DEBUG
+#నిర్వచించు CV_OCL_DBG_CHECK_ఫలితం(check_ఫలితం, సందేశం) CV_OCL_CHECK_ఫలితం(check_ఫలితం, సందేశం)
+#నిర్వచించు CV_OCL_DBG_CHECK(సమాసం) CV_OCL_CHECK(సమాసం)
+#నిర్వచించు CV_OCL_DBG_CHECK_(సమాసం, check_ఫలితం) CV_OCL_CHECK_(సమాసం, check_ఫలితం)
+#లేకపోతే
+#నిర్వచించు CV_OCL_DBG_CHECK_ఫలితం(check_ఫలితం, సందేశం) \
+    చేయి { \
+        CV_OCL_TRACE_CHECK_ఫలితం(check_ఫలితం, సందేశం); \
+        ఒకవేళ (check_ఫలితం != CL_SUCCESS && isRaiseError()) \
         { \
-            static_assert(std::is_convertible<decltype(msg), const char*>::value, "msg of CV_OCL_DBG_CHECK_RESULT must be const char*"); \
-            cv::String error_msg = CV_OCL_API_ERROR_MSG(check_result, msg); \
-            CV_Error(Error::OpenCLApiCallError, error_msg); \
+            static_assert(std::is_convertible<decltype(సందేశం), స్థిరరాశి అక్షరం*>::value, "msg of CV_OCL_DBG_CHECK_RESULT must be const char*"); \
+            cv::String error_సందేశం_2 = CV_OCL_API_ERROR_సందేశం(check_ఫలితం, సందేశం); \
+            CV_Error(Error::OpenCLApiCallError, error_సందేశం_2); \
         } \
-    } while (0)
-#define CV_OCL_DBG_CHECK_(expr, check_result) do { expr; CV_OCL_DBG_CHECK_RESULT(check_result, #expr); } while (0)
-#define CV_OCL_DBG_CHECK(expr) do { cl_int __cl_result = (expr); CV_OCL_DBG_CHECK_RESULT(__cl_result, #expr); } while (0)
-#endif
+    } అయితే (0)
+#నిర్వచించు CV_OCL_DBG_CHECK_(సమాసం, check_ఫలితం) చేయి { సమాసం; CV_OCL_DBG_CHECK_ఫలితం(check_ఫలితం, #expr); } అయితే (0)
+#నిర్వచించు CV_OCL_DBG_CHECK(సమాసం) చేయి { cl_int __cl_result = (సమాసం); CV_OCL_DBG_CHECK_ఫలితం(__cl_result, #expr); } అయితే (0)
+#అయితే_ముగింపు
 
 
-static const bool CV_OPENCL_CACHE_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_ENABLE", true);
-static const bool CV_OPENCL_CACHE_WRITE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_WRITE", true);
-static const bool CV_OPENCL_CACHE_LOCK_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_LOCK_ENABLE", true);
-static const bool CV_OPENCL_CACHE_CLEANUP = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_CLEANUP", true);
+స్థిర స్థిరరాశి తార్కిక CV_OPENCL_CACHE_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_ENABLE", నిజం);
+స్థిర స్థిరరాశి తార్కిక CV_OPENCL_CACHE_WRITE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_WRITE", నిజం);
+స్థిర స్థిరరాశి తార్కిక CV_OPENCL_CACHE_తాళం_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_LOCK_ENABLE", నిజం);
+స్థిర స్థిరరాశి తార్కిక CV_OPENCL_CACHE_CLEANUP = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_CLEANUP", నిజం);
 
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-static const bool CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE = utils::getConfigurationParameterBool("OPENCV_OPENCL_VALIDATE_BINARY_PROGRAMS", false);
-#endif
+#ఒకవేళ CV_OPENCL_VALIDATE_ద్విమాన_PROGRAMS
+స్థిర స్థిరరాశి తార్కిక CV_OPENCL_VALIDATE_ద్విమాన_PROGRAMS_విలువ = utils::getConfigurationParameterBool("OPENCV_OPENCL_VALIDATE_BINARY_PROGRAMS", అబద్ధం);
+#అయితే_ముగింపు
 
 // Option to disable calls clEnqueueReadBufferRect / clEnqueueWriteBufferRect / clEnqueueCopyBufferRect
-static const bool CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS = utils::getConfigurationParameterBool("OPENCV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS",
-#if 1 //def __APPLE__
-        true
-#else
-        false
-#endif
+స్థిర స్థిరరాశి తార్కిక CV_OPENCL_DISABLE_బఫరు_RECT_OPERATIONS = utils::getConfigurationParameterBool("OPENCV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS",
+#ఒకవేళ 1 //def __APPLE__
+        నిజం
+#లేకపోతే
+        అబద్ధం
+#అయితే_ముగింపు
 );
 
-static String getBuildExtraOptions()
+స్థిర String getBuildExtraOptions()
 {
-    static String param_buildExtraOptions;
-    static bool initialized = false;
-    if (!initialized)
+    స్థిర String param_buildExtraOptions;
+    స్థిర తార్కిక initialized = అబద్ధం;
+    ఒకవేళ (!initialized)
     {
         param_buildExtraOptions = utils::getConfigurationParameterString("OPENCV_OPENCL_BUILD_EXTRA_OPTIONS", "");
-        initialized = true;
-        if (!param_buildExtraOptions.empty())
-            CV_LOG_WARNING(NULL, "OpenCL: using extra build options: '" << param_buildExtraOptions << "'");
+        initialized = నిజం;
+        ఒకవేళ (!param_buildExtraOptions.empty())
+            CV_LOG_WARNING(ఖాళీ, "OpenCL: using extra build options: '" << param_buildExtraOptions << "'");
     }
-    return param_buildExtraOptions;
+    తిరిగి param_buildExtraOptions;
 }
 
-static const bool CV_OPENCL_ENABLE_MEM_USE_HOST_PTR = utils::getConfigurationParameterBool("OPENCV_OPENCL_ENABLE_MEM_USE_HOST_PTR", true);
-static const size_t CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR", 4);
+స్థిర స్థిరరాశి తార్కిక CV_OPENCL_ENABLE_MEM_USE_HOST_PTR = utils::getConfigurationParameterBool("OPENCV_OPENCL_ENABLE_MEM_USE_HOST_PTR", నిజం);
+స్థిర స్థిరరాశి size_t CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR = utils::get_Configuration_Parameter_కొలత_T("OPENCV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR", 4);
 
 
-struct UMat2D
+నిర్మాణం UMat2D
 {
-    UMat2D(const UMat& m)
+    UMat2D(స్థిరరాశి UMat& m)
     {
-        offset = (int)m.offset;
-        step = (int)m.step;
-        rows = m.rows;
-        cols = m.cols;
+        offset = (పూర్ణాంకం)m.offset;
+        అడుగు = (పూర్ణాంకం)m.అడుగు;
+        అడ్డువరుసలు = m.అడ్డువరుసలు;
+        నిలువుల_సంఖ్య = m.నిలువుల_సంఖ్య;
     }
-    int offset;
-    int step;
-    int rows;
-    int cols;
+    పూర్ణాంకం offset;
+    పూర్ణాంకం అడుగు;
+    పూర్ణాంకం అడ్డువరుసలు;
+    పూర్ణాంకం నిలువుల_సంఖ్య;
 };
 
-struct UMat3D
+నిర్మాణం UMat3D
 {
-    UMat3D(const UMat& m)
+    UMat3D(స్థిరరాశి UMat& m)
     {
-        offset = (int)m.offset;
-        step = (int)m.step.p[1];
-        slicestep = (int)m.step.p[0];
-        slices = (int)m.size.p[0];
-        rows = m.size.p[1];
-        cols = m.size.p[2];
+        offset = (పూర్ణాంకం)m.offset;
+        అడుగు = (పూర్ణాంకం)m.అడుగు.p[1];
+        slicestep = (పూర్ణాంకం)m.అడుగు.p[0];
+        slices = (పూర్ణాంకం)m.size.p[0];
+        అడ్డువరుసలు = m.size.p[1];
+        నిలువుల_సంఖ్య = m.size.p[2];
     }
-    int offset;
-    int slicestep;
-    int step;
-    int slices;
-    int rows;
-    int cols;
+    పూర్ణాంకం offset;
+    పూర్ణాంకం slicestep;
+    పూర్ణాంకం అడుగు;
+    పూర్ణాంకం slices;
+    పూర్ణాంకం అడ్డువరుసలు;
+    పూర్ణాంకం నిలువుల_సంఖ్య;
 };
 
 // Computes 64-bit "cyclic redundancy check" sum, as specified in ECMA-182
-static uint64 crc64( const uchar* data, size_t size, uint64 crc0=0 )
+స్థిర uint64 crc64( స్థిరరాశి uchar* దత్తాంశం, size_t size, uint64 crc0=0 )
 {
-    static uint64 table[256];
-    static bool initialized = false;
+    స్థిర uint64 table[256];
+    స్థిర తార్కిక initialized = అబద్ధం;
 
-    if( !initialized )
+    ఒకవేళ( !initialized )
     {
-        for( int i = 0; i < 256; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < 256; i++ )
         {
             uint64 c = i;
-            for( int j = 0; j < 8; j++ )
+            కొరకు( పూర్ణాంకం j = 0; j < 8; j++ )
                 c = ((c & 1) ? CV_BIG_UINT(0xc96c5795d7870f42) : 0) ^ (c >> 1);
             table[i] = c;
         }
-        initialized = true;
+        initialized = నిజం;
     }
 
-    uint64 crc = ~crc0;
-    for( size_t idx = 0; idx < size; idx++ )
-        crc = table[(uchar)crc ^ data[idx]] ^ (crc >> 8);
+    uint64 చక్రీయ_తనిఖీ = ~crc0;
+    కొరకు( size_t idx = 0; idx < size; idx++ )
+        చక్రీయ_తనిఖీ = table[(uchar)చక్రీయ_తనిఖీ ^ దత్తాంశం[idx]] ^ (చక్రీయ_తనిఖీ >> 8);
 
-    return ~crc;
+    తిరిగి ~చక్రీయ_తనిఖీ;
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-struct OpenCLBinaryCacheConfigurator
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
+నిర్మాణం OpenCLBinaryCacheConfigurator
 {
-    cv::String cache_path_;
-    cv::String cache_lock_filename_;
-    cv::Ptr<utils::fs::FileLock> cache_lock_;
+    cv::String cache_మార్గం;
+    cv::String cache_తాళం_filename;
+    cv::Ptr<utils::fs::File_తాళం> cache_తాళం;
 
-    typedef std::map<std::string, std::string> ContextCacheType;
+    రకనిర్వచనం std::map<std::string, std::string> ContextCacheType;
     ContextCacheType prepared_contexts_;
     Mutex mutex_prepared_contexts_;
 
     OpenCLBinaryCacheConfigurator()
     {
-        CV_LOG_DEBUG(NULL, "Initializing OpenCL cache configuration...");
-        if (!CV_OPENCL_CACHE_ENABLE)
+        CV_LOG_DEBUG(ఖాళీ, "Initializing OpenCL cache configuration...");
+        ఒకవేళ (!CV_OPENCL_CACHE_ENABLE)
         {
-            CV_LOG_INFO(NULL, "OpenCL cache is disabled");
-            return;
+            CV_LOG_INFO(ఖాళీ, "OpenCL cache is disabled");
+            తిరిగి;
         }
-        cache_path_ = utils::fs::getCacheDirectory("opencl_cache", "OPENCV_OPENCL_CACHE_DIR");
-        if (cache_path_.empty())
+        cache_మార్గం = utils::fs::getCacheDirectory("opencl_cache", "OPENCV_OPENCL_CACHE_DIR");
+        ఒకవేళ (cache_మార్గం.empty())
         {
-            CV_LOG_INFO(NULL, "Specify OPENCV_OPENCL_CACHE_DIR configuration parameter to enable OpenCL cache");
+            CV_LOG_INFO(ఖాళీ, "Specify OPENCV_OPENCL_CACHE_DIR configuration parameter to enable OpenCL cache");
         }
-        do
+        చేయి
         {
-            try
+            ప్రయత్నించు
             {
-                if (cache_path_.empty())
-                    break;
-                if (cache_path_ == "disabled")
-                    break;
-                if (!utils::fs::createDirectories(cache_path_))
+                ఒకవేళ (cache_మార్గం.empty())
+                    ఆపు;
+                ఒకవేళ (cache_మార్గం == "disabled")
+                    ఆపు;
+                ఒకవేళ (!utils::fs::createDirectories(cache_మార్గం))
                 {
-                    CV_LOG_DEBUG(NULL, "Can't use OpenCL cache directory: " << cache_path_);
+                    CV_LOG_DEBUG(ఖాళీ, "Can't use OpenCL cache directory: " << cache_మార్గం);
                     clear();
-                    break;
+                    ఆపు;
                 }
 
-                if (CV_OPENCL_CACHE_LOCK_ENABLE)
+                ఒకవేళ (CV_OPENCL_CACHE_తాళం_ENABLE)
                 {
-                    cache_lock_filename_ = cache_path_ + ".lock";
-                    if (!utils::fs::exists(cache_lock_filename_))
+                    cache_తాళం_filename = cache_మార్గం + ".lock";
+                    ఒకవేళ (!utils::fs::exists(cache_తాళం_filename))
                     {
-                        CV_LOG_DEBUG(NULL, "Creating lock file... (" << cache_lock_filename_ << ")");
-                        std::ofstream lock_filename(cache_lock_filename_.c_str(), std::ios::out);
-                        if (!lock_filename.is_open())
+                        CV_LOG_DEBUG(ఖాళీ, "Creating lock file... (" << cache_తాళం_filename << ")");
+                        std::ofstream తాళం_filename(cache_తాళం_filename.c_str(), std::ios::out);
+                        ఒకవేళ (!తాళం_filename.is_open())
                         {
-                            CV_LOG_WARNING(NULL, "Can't create lock file for OpenCL program cache: " << cache_lock_filename_);
-                            break;
+                            CV_LOG_WARNING(ఖాళీ, "Can't create lock file for OpenCL program cache: " << cache_తాళం_filename);
+                            ఆపు;
                         }
                     }
 
-                    try
+                    ప్రయత్నించు
                     {
-                        cache_lock_ = makePtr<utils::fs::FileLock>(cache_lock_filename_.c_str());
-                        CV_LOG_VERBOSE(NULL, 0, "Checking cache lock... (" << cache_lock_filename_ << ")");
+                        cache_తాళం = makePtr<utils::fs::File_తాళం>(cache_తాళం_filename.c_str());
+                        CV_LOG_VERBOSE(ఖాళీ, 0, "Checking cache lock... (" << cache_తాళం_filename << ")");
                         {
-                            utils::shared_lock_guard<utils::fs::FileLock> lock(*cache_lock_);
+                            utils::shared_తాళం_guard<utils::fs::File_తాళం> lock(*cache_తాళం);
                         }
-                        CV_LOG_VERBOSE(NULL, 0, "Checking cache lock... Done!");
+                        CV_LOG_VERBOSE(ఖాళీ, 0, "Checking cache lock... Done!");
                     }
-                    catch (const cv::Exception& e)
+                    పట్టుకో (స్థిరరాశి cv::Exception& e)
                     {
-                        CV_LOG_WARNING(NULL, "Can't create OpenCL program cache lock: " << cache_lock_filename_ << std::endl << e.what());
+                        CV_LOG_WARNING(ఖాళీ, "Can't create OpenCL program cache lock: " << cache_తాళం_filename << std::పంక్తి_ముగింపు << e.what());
                     }
-                    catch (...)
+                    పట్టుకో (...)
                     {
-                        CV_LOG_WARNING(NULL, "Can't create OpenCL program cache lock: " << cache_lock_filename_);
+                        CV_LOG_WARNING(ఖాళీ, "Can't create OpenCL program cache lock: " << cache_తాళం_filename);
                     }
                 }
-                else
+                లేకపోతే
                 {
-                    if (CV_OPENCL_CACHE_WRITE)
+                    ఒకవేళ (CV_OPENCL_CACHE_WRITE)
                     {
-                        CV_LOG_WARNING(NULL, "OpenCL cache lock is disabled while cache write is allowed "
+                        CV_LOG_WARNING(ఖాళీ, "OpenCL cache lock is disabled while cache write is allowed "
                                 "(not safe for multiprocess environment)");
                     }
-                    else
+                    లేకపోతే
                     {
-                        CV_LOG_INFO(NULL, "OpenCL cache lock is disabled");
+                        CV_LOG_INFO(ఖాళీ, "OpenCL cache lock is disabled");
                     }
                 }
             }
-            catch (const cv::Exception& e)
+            పట్టుకో (స్థిరరాశి cv::Exception& e)
             {
-                CV_LOG_WARNING(NULL, "Can't prepare OpenCL program cache: " << cache_path_ << std::endl << e.what());
+                CV_LOG_WARNING(ఖాళీ, "Can't prepare OpenCL program cache: " << cache_మార్గం << std::పంక్తి_ముగింపు << e.what());
                 clear();
             }
-        } while (0);
-        if (!cache_path_.empty())
+        } అయితే (0);
+        ఒకవేళ (!cache_మార్గం.empty())
         {
-            if (cache_lock_.empty() && CV_OPENCL_CACHE_LOCK_ENABLE)
+            ఒకవేళ (cache_తాళం.empty() && CV_OPENCL_CACHE_తాళం_ENABLE)
             {
-                CV_LOG_WARNING(NULL, "Initialized OpenCL cache directory, but interprocess synchronization lock is not available. "
+                CV_LOG_WARNING(ఖాళీ, "Initialized OpenCL cache directory, but interprocess synchronization lock is not available. "
                         "Consider to disable OpenCL cache: OPENCV_OPENCL_CACHE_DIR=disabled");
             }
-            else
+            లేకపోతే
             {
-                CV_LOG_INFO(NULL, "Successfully initialized OpenCL cache directory: " << cache_path_);
+                CV_LOG_INFO(ఖాళీ, "Successfully initialized OpenCL cache directory: " << cache_మార్గం);
             }
         }
     }
 
-    void clear()
+    శూన్య clear()
     {
-        cache_path_.clear();
-        cache_lock_filename_.clear();
-        cache_lock_.release();
+        cache_మార్గం.clear();
+        cache_తాళం_filename.clear();
+        cache_తాళం.release();
     }
 
-    std::string prepareCacheDirectoryForContext(const std::string& ctx_prefix,
-            const std::string& cleanup_prefix)
+    std::string prepareCacheDirectoryForContext(స్థిరరాశి std::string& ctx_ఉపసర్గ,
+            స్థిరరాశి std::string& cleanup_ఉపసర్గ)
     {
-        if (cache_path_.empty())
-            return std::string();
+        ఒకవేళ (cache_మార్గం.empty())
+            తిరిగి std::string();
 
-        AutoLock lock(mutex_prepared_contexts_);
+        Auto_తాళం lock(mutex_prepared_contexts_);
 
-        ContextCacheType::iterator found_it = prepared_contexts_.find(ctx_prefix);
-        if (found_it != prepared_contexts_.end())
-            return found_it->second;
+        ContextCacheType::iterator దొరికింది_it = prepared_contexts_.find(ctx_ఉపసర్గ);
+        ఒకవేళ (దొరికింది_it != prepared_contexts_.end())
+            తిరిగి దొరికింది_it->second;
 
-        CV_LOG_INFO(NULL, "Preparing OpenCL cache configuration for context: " << ctx_prefix);
+        CV_LOG_INFO(ఖాళీ, "Preparing OpenCL cache configuration for context: " << ctx_ఉపసర్గ);
 
-        std::string target_directory = cache_path_ + ctx_prefix + "/";
-        bool result = utils::fs::isDirectory(target_directory);
-        if (!result)
+        std::string లక్ష్యం_directory = cache_మార్గం + ctx_ఉపసర్గ + "/";
+        తార్కిక ఫలితం = utils::fs::isDirectory(లక్ష్యం_directory);
+        ఒకవేళ (!ఫలితం)
         {
-            try
+            ప్రయత్నించు
             {
-                CV_LOG_VERBOSE(NULL, 0, "Creating directory: " << target_directory);
-                if (utils::fs::createDirectories(target_directory))
+                CV_LOG_VERBOSE(ఖాళీ, 0, "Creating directory: " << లక్ష్యం_directory);
+                ఒకవేళ (utils::fs::createDirectories(లక్ష్యం_directory))
                 {
-                    result = true;
+                    ఫలితం = నిజం;
                 }
-                else
+                లేకపోతే
                 {
-                    CV_LOG_WARNING(NULL, "Can't create directory: " << target_directory);
+                    CV_LOG_WARNING(ఖాళీ, "Can't create directory: " << లక్ష్యం_directory);
                 }
             }
-            catch (const cv::Exception& e)
+            పట్టుకో (స్థిరరాశి cv::Exception& e)
             {
-                CV_LOG_ERROR(NULL, "Can't create OpenCL program cache directory for context: " << target_directory << std::endl << e.what());
+                CV_LOG_ERROR(ఖాళీ, "Can't create OpenCL program cache directory for context: " << లక్ష్యం_directory << std::పంక్తి_ముగింపు << e.what());
             }
         }
-        target_directory = result ? target_directory : std::string();
-        prepared_contexts_.insert(std::pair<std::string, std::string>(ctx_prefix, target_directory));
+        లక్ష్యం_directory = ఫలితం ? లక్ష్యం_directory : std::string();
+        prepared_contexts_.insert(std::pair<std::string, std::string>(ctx_ఉపసర్గ, లక్ష్యం_directory));
 
-        if (result && CV_OPENCL_CACHE_CLEANUP && CV_OPENCL_CACHE_WRITE && !cleanup_prefix.empty())
+        ఒకవేళ (ఫలితం && CV_OPENCL_CACHE_CLEANUP && CV_OPENCL_CACHE_WRITE && !cleanup_ఉపసర్గ.empty())
         {
-            try
+            ప్రయత్నించు
             {
                 std::vector<String> entries;
-                utils::fs::glob_relative(cache_path_, cleanup_prefix + "*", entries, false, true);
+                utils::fs::glob_relative(cache_మార్గం, cleanup_ఉపసర్గ + "*", entries, అబద్ధం, నిజం);
                 std::vector<String> remove_entries;
-                for (size_t i = 0; i < entries.size(); i++)
+                కొరకు (size_t i = 0; i < entries.size(); i++)
                 {
-                    const String& name = entries[i];
-                    if (0 == name.find(cleanup_prefix))
+                    స్థిరరాశి String& name = entries[i];
+                    ఒకవేళ (0 == name.find(cleanup_ఉపసర్గ))
                     {
-                        if (0 == name.find(ctx_prefix))
-                            continue; // skip current
+                        ఒకవేళ (0 == name.find(ctx_ఉపసర్గ))
+                            కొనసాగు; // skip current
                         remove_entries.push_back(name);
                     }
                 }
-                if (!remove_entries.empty())
+                ఒకవేళ (!remove_entries.empty())
                 {
-                    CV_LOG_WARNING(NULL, (remove_entries.size() == 1
+                    CV_LOG_WARNING(ఖాళీ, (remove_entries.size() == 1
                             ? "Detected OpenCL cache directory for other version of OpenCL device."
                             : "Detected OpenCL cache directories for other versions of OpenCL device.")
                             << " We assume that these directories are obsolete after OpenCL runtime/drivers upgrade.");
-                    CV_LOG_WARNING(NULL, "Trying to remove these directories...");
-                    for (size_t i = 0; i < remove_entries.size(); i++)
+                    CV_LOG_WARNING(ఖాళీ, "Trying to remove these directories...");
+                    కొరకు (size_t i = 0; i < remove_entries.size(); i++)
                     {
-                        CV_LOG_WARNING(NULL, "- " << remove_entries[i]);
+                        CV_LOG_WARNING(ఖాళీ, "- " << remove_entries[i]);
                     }
-                    CV_LOG_WARNING(NULL, "Note: You can disable this behavior via this option: OPENCV_OPENCL_CACHE_CLEANUP=0");
+                    CV_LOG_WARNING(ఖాళీ, "Note: You can disable this behavior via this option: OPENCV_OPENCL_CACHE_CLEANUP=0");
 
-                    for (size_t i = 0; i < remove_entries.size(); i++)
+                    కొరకు (size_t i = 0; i < remove_entries.size(); i++)
                     {
-                        const String& name = remove_entries[i];
-                        cv::String path = utils::fs::join(cache_path_, name);
-                        try
+                        స్థిరరాశి String& name = remove_entries[i];
+                        cv::String మార్గం = utils::fs::join(cache_మార్గం, name);
+                        ప్రయత్నించు
                         {
-                            utils::fs::remove_all(path);
-                            CV_LOG_WARNING(NULL, "Removed: " << path);
+                            utils::fs::remove_all(మార్గం);
+                            CV_LOG_WARNING(ఖాళీ, "Removed: " << మార్గం);
                         }
-                        catch (const cv::Exception& e)
+                        పట్టుకో (స్థిరరాశి cv::Exception& e)
                         {
-                            CV_LOG_ERROR(NULL, "Exception during removal of obsolete OpenCL cache directory: " << path << std::endl << e.what());
+                            CV_LOG_ERROR(ఖాళీ, "Exception during removal of obsolete OpenCL cache directory: " << మార్గం << std::పంక్తి_ముగింపు << e.what());
                         }
                     }
                 }
             }
-            catch (...)
+            పట్టుకో (...)
             {
-                CV_LOG_WARNING(NULL, "Can't check for obsolete OpenCL cache directories");
+                CV_LOG_WARNING(ఖాళీ, "Can't check for obsolete OpenCL cache directories");
             }
         }
 
-        CV_LOG_VERBOSE(NULL, 1, "  Result: " << (target_directory.empty() ? std::string("Failed") : target_directory));
-        return target_directory;
+        CV_LOG_VERBOSE(ఖాళీ, 1, "  Result: " << (లక్ష్యం_directory.empty() ? std::string("Failed") : లక్ష్యం_directory));
+        తిరిగి లక్ష్యం_directory;
     }
 
-    static OpenCLBinaryCacheConfigurator& getSingletonInstance()
+    స్థిర OpenCLBinaryCacheConfigurator& getSingletonInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(OpenCLBinaryCacheConfigurator, new OpenCLBinaryCacheConfigurator());
+        CV_SINGLETON_LAZY_INIT_REF(OpenCLBinaryCacheConfigurator, కొత్త OpenCLBinaryCacheConfigurator());
     }
 };
-class BinaryProgramFile
+తరగతి ద్విమాన_కార్యక్రమం_File
 {
-    enum { MAX_ENTRIES = 64 };
+    గణన { MAX_ENTRIES = 64 };
 
-    typedef unsigned int uint32_t;
+    రకనిర్వచనం గుర్తులేని పూర్ణాంకం uint32_t;
 
-    struct CV_DECL_ALIGNED(4) FileHeader
+    నిర్మాణం CV_DECL_ALIGNED(4) File_శీర్షిక
     {
-        uint32_t sourceSignatureSize;
+        uint32_t ఆధారం_Signature_కొలత;
         //char sourceSignature[];
     };
 
-    struct CV_DECL_ALIGNED(4) FileTable
+    నిర్మాణం CV_DECL_ALIGNED(4) File_పట్టిక
     {
-        uint32_t numberOfEntries;
+        uint32_t సంఖ్య_యొక్క_Entries;
         //uint32_t firstEntryOffset[];
     };
 
-    struct CV_DECL_ALIGNED(4) FileEntry
+    నిర్మాణం CV_DECL_ALIGNED(4) File_నమోదు
     {
-        uint32_t nextEntryFileOffset; // 0 for the last entry in chain
-        uint32_t keySize;
-        uint32_t dataSize;
+        uint32_t తదుపరి_నమోదు_File_స్థానభ్రంశం; // 0 for the last entry in chain
+        uint32_t కీలకం_కొలత;
+        uint32_t దత్తాంశం_కొలత;
         //char key[];
         //char data[];
     };
 
-    const std::string fileName_;
-    const char* const sourceSignature_;
-    const size_t sourceSignatureSize_;
+    స్థిరరాశి std::string fileName_;
+    స్థిరరాశి అక్షరం* స్థిరరాశి ఆధారం_Signature;
+    స్థిరరాశి size_t ఆధారం_Signature_కొలత_2;
 
     std::fstream f;
 
-    uint32_t entryOffsets[MAX_ENTRIES];
+    uint32_t నమోదు_Offsets[MAX_ENTRIES];
 
-    uint32_t getHash(const std::string& options)
+    uint32_t getHash(స్థిరరాశి std::string& options)
     {
-        uint64 hash = crc64((const uchar*)options.c_str(), options.size(), 0);
-        return hash & (MAX_ENTRIES - 1);
+        uint64 hash = crc64((స్థిరరాశి uchar*)options.c_str(), options.size(), 0);
+        తిరిగి hash & (MAX_ENTRIES - 1);
     }
 
-    inline size_t getFileSize()
+    అంతఃవరుస size_t get_File_కొలత()
     {
         size_t pos = (size_t)f.tellg();
         f.seekg(0, std::fstream::end);
-        size_t fileSize = (size_t)f.tellg();
+        size_t file_కొలత = (size_t)f.tellg();
         f.seekg(pos, std::fstream::beg);
-        return fileSize;
+        తిరిగి file_కొలత;
     }
-    inline uint32_t readUInt32()
+    అంతఃవరుస uint32_t readUInt32()
     {
         uint32_t res = 0;
-        f.read((char*)&res, sizeof(uint32_t));
+        f.పఠ((అక్షరం*)&res, పరిమాణం(uint32_t));
         CV_Assert(!f.fail());
-        return res;
+        తిరిగి res;
     }
-    inline void writeUInt32(const uint32_t value)
+    అంతఃవరుస శూన్య writeUInt32(స్థిరరాశి uint32_t value)
     {
         uint32_t v = value;
-        f.write((char*)&v, sizeof(uint32_t));
+        f.లిఖ((అక్షరం*)&v, పరిమాణం(uint32_t));
         CV_Assert(!f.fail());
     }
 
-    inline void seekReadAbsolute(size_t pos)
+    అంతఃవరుస శూన్య seekReadAbsolute(size_t pos)
     {
         f.seekg(pos, std::fstream::beg);
         CV_Assert(!f.fail());
     }
-    inline void seekReadRelative(size_t pos)
+    అంతఃవరుస శూన్య seekReadRelative(size_t pos)
     {
         f.seekg(pos, std::fstream::cur);
         CV_Assert(!f.fail());
     }
 
-    inline void seekWriteAbsolute(size_t pos)
+    అంతఃవరుస శూన్య seekWriteAbsolute(size_t pos)
     {
         f.seekp(pos, std::fstream::beg);
         CV_Assert(!f.fail());
     }
 
-    void clearFile()
+    శూన్య clearFile()
     {
         f.close();
-        if (0 != remove(fileName_.c_str()))
-            CV_LOG_ERROR(NULL, "Can't remove: " << fileName_);
-        return;
+        ఒకవేళ (0 != remove(fileName_.c_str()))
+            CV_LOG_ERROR(ఖాళీ, "Can't remove: " << fileName_);
+        తిరిగి;
     }
 
-public:
-    BinaryProgramFile(const std::string& fileName, const char* sourceSignature)
-        : fileName_(fileName), sourceSignature_(sourceSignature), sourceSignatureSize_(sourceSignature_ ? strlen(sourceSignature_) : 0)
+బహిరంగ:
+    ద్విమాన_కార్యక్రమం_File(స్థిరరాశి std::string& fileName, స్థిరరాశి అక్షరం* ఆధారం_Signature_2)
+        : fileName_(fileName), ఆధారం_Signature(ఆధారం_Signature_2), ఆధారం_Signature_కొలత_2(ఆధారం_Signature ? అక్షరశ్రేణి_పొడవు(ఆధారం_Signature) : 0)
     {
-        CV_StaticAssert(sizeof(uint32_t) == 4, "");
-        CV_Assert(sourceSignature_ != NULL);
-        CV_Assert(sourceSignatureSize_ > 0);
-        memset(entryOffsets, 0, sizeof(entryOffsets));
+        CV_StaticAssert(పరిమాణం(uint32_t) == 4, "");
+        CV_Assert(ఆధారం_Signature != ఖాళీ);
+        CV_Assert(ఆధారం_Signature_కొలత_2 > 0);
+        memset(నమోదు_Offsets, 0, పరిమాణం(నమోదు_Offsets));
 
         f.rdbuf()->pubsetbuf(0, 0); // disable buffering
         f.open(fileName_.c_str(), std::ios::in|std::ios::out|std::ios::binary);
-        if(f.is_open() && getFileSize() > 0)
+        ఒకవేళ(f.is_open() && get_File_కొలత() > 0)
         {
-            bool isValid = false;
-            try
+            తార్కిక isValid = అబద్ధం;
+            ప్రయత్నించు
             {
-                uint32_t fileSourceSignatureSize = readUInt32();
-                if (fileSourceSignatureSize == sourceSignatureSize_)
+                uint32_t file_ఆధారం_Signature_కొలత = readUInt32();
+                ఒకవేళ (file_ఆధారం_Signature_కొలత == ఆధారం_Signature_కొలత_2)
                 {
-                    cv::AutoBuffer<char> fileSourceSignature(fileSourceSignatureSize + 1);
-                    f.read(fileSourceSignature.data(), fileSourceSignatureSize);
-                    if (f.eof())
+                    cv::Auto_బఫరు<అక్షరం> file_ఆధారం_Signature(file_ఆధారం_Signature_కొలత + 1);
+                    f.పఠ(file_ఆధారం_Signature.దత్తాంశం(), file_ఆధారం_Signature_కొలత);
+                    ఒకవేళ (f.eof())
                     {
-                        CV_LOG_ERROR(NULL, "Unexpected EOF");
+                        CV_LOG_ERROR(ఖాళీ, "Unexpected EOF");
                     }
-                    else if (memcmp(sourceSignature, fileSourceSignature.data(), fileSourceSignatureSize) == 0)
+                    లేకపోతే ఒకవేళ (memcmp(ఆధారం_Signature_2, file_ఆధారం_Signature.దత్తాంశం(), file_ఆధారం_Signature_కొలత) == 0)
                     {
-                        isValid = true;
+                        isValid = నిజం;
                     }
                 }
-                if (!isValid)
+                ఒకవేళ (!isValid)
                 {
-                    CV_LOG_ERROR(NULL, "Source code signature/hash mismatch (program source code has been changed/updated)");
+                    CV_LOG_ERROR(ఖాళీ, "Source code signature/hash mismatch (program source code has been changed/updated)");
                 }
             }
-            catch (const cv::Exception& e)
+            పట్టుకో (స్థిరరాశి cv::Exception& e)
             {
-                CV_LOG_ERROR(NULL, "Can't open binary program file: " << fileName << " : " << e.what());
+                CV_LOG_ERROR(ఖాళీ, "Can't open binary program file: " << fileName << " : " << e.what());
             }
-            catch (...)
+            పట్టుకో (...)
             {
-                CV_LOG_ERROR(NULL, "Can't open binary program file: " << fileName << " : Unknown error");
+                CV_LOG_ERROR(ఖాళీ, "Can't open binary program file: " << fileName << " : Unknown error");
             }
-            if (!isValid)
+            ఒకవేళ (!isValid)
             {
                 clearFile();
             }
-            else
+            లేకపోతే
             {
                 seekReadAbsolute(0);
             }
         }
     }
 
-    bool read(const std::string& key, std::vector<char>& buf)
+    తార్కిక పఠ(స్థిరరాశి std::string& కీలకం, std::vector<అక్షరం>& buf)
     {
-        if (!f.is_open())
-            return false;
+        ఒకవేళ (!f.is_open())
+            తిరిగి అబద్ధం;
 
-        size_t fileSize = getFileSize();
-        if (fileSize == 0)
+        size_t file_కొలత = get_File_కొలత();
+        ఒకవేళ (file_కొలత == 0)
         {
-            CV_LOG_ERROR(NULL, "Invalid file (empty): " << fileName_);
+            CV_LOG_ERROR(ఖాళీ, "Invalid file (empty): " << fileName_);
             clearFile();
-            return false;
+            తిరిగి అబద్ధం;
         }
         seekReadAbsolute(0);
 
         // bypass FileHeader
-        uint32_t fileSourceSignatureSize = readUInt32();
-        CV_Assert(fileSourceSignatureSize > 0);
-        seekReadRelative(fileSourceSignatureSize);
+        uint32_t file_ఆధారం_Signature_కొలత = readUInt32();
+        CV_Assert(file_ఆధారం_Signature_కొలత > 0);
+        seekReadRelative(file_ఆధారం_Signature_కొలత);
 
-        uint32_t numberOfEntries = readUInt32();
-        CV_Assert(numberOfEntries > 0);
-        if (numberOfEntries != MAX_ENTRIES)
+        uint32_t సంఖ్య_యొక్క_Entries = readUInt32();
+        CV_Assert(సంఖ్య_యొక్క_Entries > 0);
+        ఒకవేళ (సంఖ్య_యొక్క_Entries != MAX_ENTRIES)
         {
-            CV_LOG_ERROR(NULL, "Invalid file: " << fileName_);
+            CV_LOG_ERROR(ఖాళీ, "Invalid file: " << fileName_);
             clearFile();
-            return false;
+            తిరిగి అబద్ధం;
         }
-        f.read((char*)&entryOffsets[0], sizeof(entryOffsets));
+        f.పఠ((అక్షరం*)&నమోదు_Offsets[0], పరిమాణం(నమోదు_Offsets));
         CV_Assert(!f.fail());
 
-        uint32_t entryNum = getHash(key);
+        uint32_t నమోదు_అంకె = getHash(కీలకం);
 
-        uint32_t entryOffset = entryOffsets[entryNum];
-        FileEntry entry;
-        while (entryOffset > 0)
+        uint32_t నమోదు_స్థానభ్రంశం = నమోదు_Offsets[నమోదు_అంకె];
+        File_నమోదు నమోదు_2;
+        అయితే (నమోదు_స్థానభ్రంశం > 0)
         {
-            seekReadAbsolute(entryOffset);
+            seekReadAbsolute(నమోదు_స్థానభ్రంశం);
             //CV_StaticAssert(sizeof(entry) == sizeof(uint32_t) * 3, "");
-            f.read((char*)&entry, sizeof(entry));
+            f.పఠ((అక్షరం*)&నమోదు_2, పరిమాణం(నమోదు_2));
             CV_Assert(!f.fail());
-            cv::AutoBuffer<char> fileKey(entry.keySize + 1);
-            if (key.size() == entry.keySize)
+            cv::Auto_బఫరు<అక్షరం> file_కీలకం(నమోదు_2.కీలకం_కొలత + 1);
+            ఒకవేళ (కీలకం.size() == నమోదు_2.కీలకం_కొలత)
             {
-                if (entry.keySize > 0)
+                ఒకవేళ (నమోదు_2.కీలకం_కొలత > 0)
                 {
-                    f.read(fileKey.data(), entry.keySize);
+                    f.పఠ(file_కీలకం.దత్తాంశం(), నమోదు_2.కీలకం_కొలత);
                     CV_Assert(!f.fail());
                 }
-                if (memcmp(fileKey.data(), key.c_str(), entry.keySize) == 0)
+                ఒకవేళ (memcmp(file_కీలకం.దత్తాంశం(), కీలకం.c_str(), నమోదు_2.కీలకం_కొలత) == 0)
                 {
-                    buf.resize(entry.dataSize);
-                    f.read(&buf[0], entry.dataSize);
+                    buf.resize(నమోదు_2.దత్తాంశం_కొలత);
+                    f.పఠ(&buf[0], నమోదు_2.దత్తాంశం_కొలత);
                     CV_Assert(!f.fail());
                     seekReadAbsolute(0);
-                    CV_LOG_VERBOSE(NULL, 0, "Read...");
-                    return true;
+                    CV_LOG_VERBOSE(ఖాళీ, 0, "Read...");
+                    తిరిగి నిజం;
                 }
             }
-            if (entry.nextEntryFileOffset == 0)
-                break;
-            entryOffset = entry.nextEntryFileOffset;
+            ఒకవేళ (నమోదు_2.తదుపరి_నమోదు_File_స్థానభ్రంశం == 0)
+                ఆపు;
+            నమోదు_స్థానభ్రంశం = నమోదు_2.తదుపరి_నమోదు_File_స్థానభ్రంశం;
         }
-        return false;
+        తిరిగి అబద్ధం;
     }
 
-    bool write(const std::string& key, std::vector<char>& buf)
+    తార్కిక లిఖ(స్థిరరాశి std::string& కీలకం, std::vector<అక్షరం>& buf)
     {
-        if (!f.is_open())
+        ఒకవేళ (!f.is_open())
         {
             f.open(fileName_.c_str(), std::ios::in|std::ios::out|std::ios::binary);
-            if (!f.is_open())
+            ఒకవేళ (!f.is_open())
             {
                 f.open(fileName_.c_str(), std::ios::out|std::ios::binary);
-                if (!f.is_open())
+                ఒకవేళ (!f.is_open())
                 {
-                    CV_LOG_ERROR(NULL, "Can't create file: " << fileName_);
-                    return false;
+                    CV_LOG_ERROR(ఖాళీ, "Can't create file: " << fileName_);
+                    తిరిగి అబద్ధం;
                 }
             }
         }
 
-        size_t fileSize = getFileSize();
-        if (fileSize == 0)
+        size_t file_కొలత = get_File_కొలత();
+        ఒకవేళ (file_కొలత == 0)
         {
             // Write header
             seekWriteAbsolute(0);
-            writeUInt32((uint32_t)sourceSignatureSize_);
-            f.write(sourceSignature_, sourceSignatureSize_);
+            writeUInt32((uint32_t)ఆధారం_Signature_కొలత_2);
+            f.లిఖ(ఆధారం_Signature, ఆధారం_Signature_కొలత_2);
             CV_Assert(!f.fail());
 
             writeUInt32(MAX_ENTRIES);
-            memset(entryOffsets, 0, sizeof(entryOffsets));
-            f.write((char*)entryOffsets, sizeof(entryOffsets));
+            memset(నమోదు_Offsets, 0, పరిమాణం(నమోదు_Offsets));
+            f.లిఖ((అక్షరం*)నమోదు_Offsets, పరిమాణం(నమోదు_Offsets));
             CV_Assert(!f.fail());
             f.flush();
             CV_Assert(!f.fail());
             f.close();
             f.open(fileName_.c_str(), std::ios::in|std::ios::out|std::ios::binary);
             CV_Assert(f.is_open());
-            fileSize = getFileSize();
+            file_కొలత = get_File_కొలత();
         }
         seekReadAbsolute(0);
 
         // bypass FileHeader
-        uint32_t fileSourceSignatureSize = readUInt32();
-        CV_Assert(fileSourceSignatureSize == sourceSignatureSize_);
-        seekReadRelative(fileSourceSignatureSize);
+        uint32_t file_ఆధారం_Signature_కొలత = readUInt32();
+        CV_Assert(file_ఆధారం_Signature_కొలత == ఆధారం_Signature_కొలత_2);
+        seekReadRelative(file_ఆధారం_Signature_కొలత);
 
-        uint32_t numberOfEntries = readUInt32();
-        CV_Assert(numberOfEntries > 0);
-        if (numberOfEntries != MAX_ENTRIES)
+        uint32_t సంఖ్య_యొక్క_Entries = readUInt32();
+        CV_Assert(సంఖ్య_యొక్క_Entries > 0);
+        ఒకవేళ (సంఖ్య_యొక్క_Entries != MAX_ENTRIES)
         {
-            CV_LOG_ERROR(NULL, "Invalid file: " << fileName_);
+            CV_LOG_ERROR(ఖాళీ, "Invalid file: " << fileName_);
             clearFile();
-            return false;
+            తిరిగి అబద్ధం;
         }
-        size_t tableEntriesOffset = (size_t)f.tellg();
-        f.read((char*)&entryOffsets[0], sizeof(entryOffsets));
+        size_t పట్టిక_Entries_స్థానభ్రంశం = (size_t)f.tellg();
+        f.పఠ((అక్షరం*)&నమోదు_Offsets[0], పరిమాణం(నమోదు_Offsets));
         CV_Assert(!f.fail());
 
-        uint32_t entryNum = getHash(key);
+        uint32_t నమోదు_అంకె = getHash(కీలకం);
 
-        uint32_t entryOffset = entryOffsets[entryNum];
-        FileEntry entry;
-        while (entryOffset > 0)
+        uint32_t నమోదు_స్థానభ్రంశం = నమోదు_Offsets[నమోదు_అంకె];
+        File_నమోదు నమోదు_2;
+        అయితే (నమోదు_స్థానభ్రంశం > 0)
         {
-            seekReadAbsolute(entryOffset);
+            seekReadAbsolute(నమోదు_స్థానభ్రంశం);
             //CV_StaticAssert(sizeof(entry) == sizeof(uint32_t) * 3, "");
-            f.read((char*)&entry, sizeof(entry));
+            f.పఠ((అక్షరం*)&నమోదు_2, పరిమాణం(నమోదు_2));
             CV_Assert(!f.fail());
-            cv::AutoBuffer<char> fileKey(entry.keySize + 1);
-            if (key.size() == entry.keySize)
+            cv::Auto_బఫరు<అక్షరం> file_కీలకం(నమోదు_2.కీలకం_కొలత + 1);
+            ఒకవేళ (కీలకం.size() == నమోదు_2.కీలకం_కొలత)
             {
-                if (entry.keySize > 0)
+                ఒకవేళ (నమోదు_2.కీలకం_కొలత > 0)
                 {
-                    f.read(fileKey.data(), entry.keySize);
+                    f.పఠ(file_కీలకం.దత్తాంశం(), నమోదు_2.కీలకం_కొలత);
                     CV_Assert(!f.fail());
                 }
-                if (0 == memcmp(fileKey.data(), key.c_str(), entry.keySize))
+                ఒకవేళ (0 == memcmp(file_కీలకం.దత్తాంశం(), కీలకం.c_str(), నమోదు_2.కీలకం_కొలత))
                 {
                     // duplicate
-                    CV_LOG_VERBOSE(NULL, 0, "Duplicate key ignored: " << fileName_);
-                    return false;
+                    CV_LOG_VERBOSE(ఖాళీ, 0, "Duplicate key ignored: " << fileName_);
+                    తిరిగి అబద్ధం;
                 }
             }
-            if (entry.nextEntryFileOffset == 0)
-                break;
-            entryOffset = entry.nextEntryFileOffset;
+            ఒకవేళ (నమోదు_2.తదుపరి_నమోదు_File_స్థానభ్రంశం == 0)
+                ఆపు;
+            నమోదు_స్థానభ్రంశం = నమోదు_2.తదుపరి_నమోదు_File_స్థానభ్రంశం;
         }
         seekReadAbsolute(0);
-        if (entryOffset > 0)
+        ఒకవేళ (నమోదు_స్థానభ్రంశం > 0)
         {
-            seekWriteAbsolute(entryOffset);
-            entry.nextEntryFileOffset = (uint32_t)fileSize;
-            f.write((char*)&entry, sizeof(entry));
+            seekWriteAbsolute(నమోదు_స్థానభ్రంశం);
+            నమోదు_2.తదుపరి_నమోదు_File_స్థానభ్రంశం = (uint32_t)file_కొలత;
+            f.లిఖ((అక్షరం*)&నమోదు_2, పరిమాణం(నమోదు_2));
             CV_Assert(!f.fail());
         }
-        else
+        లేకపోతే
         {
-            entryOffsets[entryNum] = (uint32_t)fileSize;
-            seekWriteAbsolute(tableEntriesOffset);
-            f.write((char*)entryOffsets, sizeof(entryOffsets));
+            నమోదు_Offsets[నమోదు_అంకె] = (uint32_t)file_కొలత;
+            seekWriteAbsolute(పట్టిక_Entries_స్థానభ్రంశం);
+            f.లిఖ((అక్షరం*)నమోదు_Offsets, పరిమాణం(నమోదు_Offsets));
             CV_Assert(!f.fail());
         }
-        seekWriteAbsolute(fileSize);
-        entry.nextEntryFileOffset = 0;
-        entry.dataSize = (uint32_t)buf.size();
-        entry.keySize = (uint32_t)key.size();
-        f.write((char*)&entry, sizeof(entry));
+        seekWriteAbsolute(file_కొలత);
+        నమోదు_2.తదుపరి_నమోదు_File_స్థానభ్రంశం = 0;
+        నమోదు_2.దత్తాంశం_కొలత = (uint32_t)buf.size();
+        నమోదు_2.కీలకం_కొలత = (uint32_t)కీలకం.size();
+        f.లిఖ((అక్షరం*)&నమోదు_2, పరిమాణం(నమోదు_2));
         CV_Assert(!f.fail());
-        f.write(key.c_str(), entry.keySize);
+        f.లిఖ(కీలకం.c_str(), నమోదు_2.కీలకం_కొలత);
         CV_Assert(!f.fail());
-        f.write(&buf[0], entry.dataSize);
+        f.లిఖ(&buf[0], నమోదు_2.దత్తాంశం_కొలత);
         CV_Assert(!f.fail());
         f.flush();
         CV_Assert(!f.fail());
-        CV_LOG_VERBOSE(NULL, 0, "Write... (" << buf.size() << " bytes)");
-        return true;
+        CV_LOG_VERBOSE(ఖాళీ, 0, "Write... (" << buf.size() << " bytes)");
+        తిరిగి నిజం;
     }
 };
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#అయితే_ముగింపు // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 
 
-struct OpenCLExecutionContext::Impl
+నిర్మాణం OpenCLExecutionContext::Impl
 {
     ocl::Context context_;
-    int device_;  // device index in context
-    ocl::Queue queue_;
-    int useOpenCL_;
+    పూర్ణాంకం device_;  // device index in context
+    ocl::వరుస వరుస_3;
+    పూర్ణాంకం useOpenCL_;
 
-protected:
-    Impl() = delete;
+రక్షిత:
+    Impl() = తొలగించు;
 
-    void _init_device(cl_device_id deviceID)
+    శూన్య _init_device(cl_device_id deviceID)
     {
         CV_Assert(deviceID);
-        int ndevices = (int)context_.ndevices();
+        పూర్ణాంకం ndevices = (పూర్ణాంకం)context_.ndevices();
         CV_Assert(ndevices > 0);
-        bool found = false;
-        for (int i = 0; i < ndevices; i++)
+        తార్కిక దొరికింది = అబద్ధం;
+        కొరకు (పూర్ణాంకం i = 0; i < ndevices; i++)
         {
             ocl::Device d = context_.device(i);
             cl_device_id dhandle = (cl_device_id)d.ptr();
-            if (dhandle == deviceID)
+            ఒకవేళ (dhandle == deviceID)
             {
                 device_ = i;
-                found = true;
-                break;
+                దొరికింది = నిజం;
+                ఆపు;
             }
         }
-        CV_Assert(found && "OpenCL device can't work with passed OpenCL context");
+        CV_Assert(దొరికింది && "OpenCL device can't work with passed OpenCL context");
     }
 
-    void _init_device(const ocl::Device& device)
+    శూన్య _init_device(స్థిరరాశి ocl::Device& device)
     {
         CV_Assert(device.ptr());
-        int ndevices = (int)context_.ndevices();
+        పూర్ణాంకం ndevices = (పూర్ణాంకం)context_.ndevices();
         CV_Assert(ndevices > 0);
-        bool found = false;
-        for (int i = 0; i < ndevices; i++)
+        తార్కిక దొరికింది = అబద్ధం;
+        కొరకు (పూర్ణాంకం i = 0; i < ndevices; i++)
         {
             ocl::Device d = context_.device(i);
-            if (d.getImpl() == device.getImpl())
+            ఒకవేళ (d.getImpl() == device.getImpl())
             {
                 device_ = i;
-                found = true;
-                break;
+                దొరికింది = నిజం;
+                ఆపు;
             }
         }
-        CV_Assert(found && "OpenCL device can't work with passed OpenCL context");
+        CV_Assert(దొరికింది && "OpenCL device can't work with passed OpenCL context");
     }
 
-public:
+బహిరంగ:
     Impl(cl_platform_id platformID, cl_context context, cl_device_id deviceID)
         : device_(0), useOpenCL_(-1)
     {
-        CV_UNUSED(platformID);
+        CV_వాడని(platformID);
         CV_Assert(context);
         CV_Assert(deviceID);
 
         context_ = Context::fromHandle(context);
         _init_device(deviceID);
-        queue_ = Queue(context_, context_.device(device_));
+        వరుస_3 = వరుస(context_, context_.device(device_));
     }
 
-    Impl(const ocl::Context& context, const ocl::Device& device, const ocl::Queue& queue)
+    Impl(స్థిరరాశి ocl::Context& context, స్థిరరాశి ocl::Device& device, స్థిరరాశి ocl::వరుస& వరుస_2)
         : device_(0), useOpenCL_(-1)
     {
         CV_Assert(context.ptr());
@@ -913,10 +913,10 @@ public:
 
         context_ = context;
         _init_device(device);
-        queue_ = queue;
+        వరుస_3 = వరుస_2;
     }
 
-    Impl(const ocl::Context& context, const ocl::Device& device)
+    Impl(స్థిరరాశి ocl::Context& context, స్థిరరాశి ocl::Device& device)
         : device_(0), useOpenCL_(-1)
     {
         CV_Assert(context.ptr());
@@ -924,204 +924,204 @@ public:
 
         context_ = context;
         _init_device(device);
-        queue_ = Queue(context_, context_.device(device_));
+        వరుస_3 = వరుస(context_, context_.device(device_));
     }
 
-    Impl(const ocl::Context& context, const int device, const ocl::Queue& queue)
+    Impl(స్థిరరాశి ocl::Context& context, స్థిరరాశి పూర్ణాంకం device, స్థిరరాశి ocl::వరుస& వరుస_2)
         : context_(context)
         , device_(device)
-        , queue_(queue)
+        , వరుస_3(వరుస_2)
         , useOpenCL_(-1)
     {
         // nothing
     }
-    Impl(const Impl& other)
+    Impl(స్థిరరాశి Impl& other)
         : context_(other.context_)
         , device_(other.device_)
-        , queue_(other.queue_)
+        , వరుస_3(other.వరుస_3)
         , useOpenCL_(-1)
     {
         // nothing
     }
 
-    inline bool useOpenCL() const { return const_cast<Impl*>(this)->useOpenCL(); }
-    bool useOpenCL()
+    అంతఃవరుస తార్కిక useOpenCL() స్థిరరాశి { తిరిగి const_cast<Impl*>(ఇది)->useOpenCL(); }
+    తార్కిక useOpenCL()
     {
-        if (useOpenCL_ < 0)
+        ఒకవేళ (useOpenCL_ < 0)
         {
-            try
+            ప్రయత్నించు
             {
                 useOpenCL_ = 0;
-                if (!context_.empty() && context_.ndevices() > 0)
+                ఒకవేళ (!context_.empty() && context_.ndevices() > 0)
                 {
-                    const Device& d = context_.device(device_);
-                    useOpenCL_ = d.available();
+                    స్థిరరాశి Device& d = context_.device(device_);
+                    useOpenCL_ = d.అందుబాటు();
                 }
             }
-            catch (const cv::Exception&)
+            పట్టుకో (స్థిరరాశి cv::Exception&)
             {
                 // nothing
             }
-            if (!useOpenCL_)
-                CV_LOG_INFO(NULL, "OpenCL: can't use OpenCL execution context");
+            ఒకవేళ (!useOpenCL_)
+                CV_LOG_INFO(ఖాళీ, "OpenCL: can't use OpenCL execution context");
         }
-        return useOpenCL_ > 0;
+        తిరిగి useOpenCL_ > 0;
     }
 
-    void setUseOpenCL(bool flag)
+    శూన్య సమితి_Use_Open_CL(తార్కిక flag)
     {
-        if (!flag)
+        ఒకవేళ (!flag)
             useOpenCL_ = 0;
-        else
+        లేకపోతే
             useOpenCL_ = -1;
     }
 
-    static const std::shared_ptr<Impl>& getInitializedExecutionContext()
+    స్థిర స్థిరరాశి std::shared_ptr<Impl>& getInitializedExecutionContext()
     {
         CV_TRACE_FUNCTION();
 
-        CV_LOG_INFO(NULL, "OpenCL: initializing thread execution context");
+        CV_LOG_INFO(ఖాళీ, "OpenCL: initializing thread execution context");
 
-        static bool initialized = false;
-        static std::shared_ptr<Impl> g_primaryExecutionContext;
+        స్థిర తార్కిక initialized = అబద్ధం;
+        స్థిర std::shared_ptr<Impl> g_primaryExecutionContext;
 
-        if (!initialized)
+        ఒకవేళ (!initialized)
         {
-            cv::AutoLock lock(getInitializationMutex());
-            if (!initialized)
+            cv::Auto_తాళం lock(getInitializationMutex());
+            ఒకవేళ (!initialized)
             {
-                CV_LOG_INFO(NULL, "OpenCL: creating new execution context...");
-                try
+                CV_LOG_INFO(ఖాళీ, "OpenCL: creating new execution context...");
+                ప్రయత్నించు
                 {
                     Context c = ocl::Context::create(std::string());
-                    if (c.ndevices())
+                    ఒకవేళ (c.ndevices())
                     {
-                        int deviceId = 0;
-                        auto& d = c.device(deviceId);
-                        if (d.available())
+                        పూర్ణాంకం deviceId = 0;
+                        స్వయంచాలక& d = c.device(deviceId);
+                        ఒకవేళ (d.అందుబాటు())
                         {
-                            auto q = ocl::Queue(c, d);
-                            if (!q.ptr())
+                            స్వయంచాలక q = ocl::వరుస(c, d);
+                            ఒకవేళ (!q.ptr())
                             {
-                                CV_LOG_ERROR(NULL, "OpenCL: Can't create default OpenCL queue");
+                                CV_LOG_ERROR(ఖాళీ, "OpenCL: Can't create default OpenCL queue");
                             }
-                            else
+                            లేకపోతే
                             {
                                 g_primaryExecutionContext = std::make_shared<Impl>(c, deviceId, q);
-                                CV_LOG_INFO(NULL, "OpenCL: device=" << d.name());
+                                CV_LOG_INFO(ఖాళీ, "OpenCL: device=" << d.name());
                             }
                         }
-                        else
+                        లేకపోతే
                         {
-                            CV_LOG_ERROR(NULL, "OpenCL: OpenCL device is not available (CL_DEVICE_AVAILABLE returns false)");
+                            CV_LOG_ERROR(ఖాళీ, "OpenCL: OpenCL device is not available (CL_DEVICE_AVAILABLE returns false)");
                         }
                     }
-                    else
+                    లేకపోతే
                     {
-                        CV_LOG_INFO(NULL, "OpenCL: context is not available/disabled");
+                        CV_LOG_INFO(ఖాళీ, "OpenCL: context is not available/disabled");
                     }
                 }
-                catch (const std::exception& e)
+                పట్టుకో (స్థిరరాశి std::exception& e)
                 {
-                    CV_LOG_INFO(NULL, "OpenCL: Can't initialize OpenCL context/device/queue: " << e.what());
+                    CV_LOG_INFO(ఖాళీ, "OpenCL: Can't initialize OpenCL context/device/queue: " << e.what());
                 }
-                catch (...)
+                పట్టుకో (...)
                 {
-                    CV_LOG_WARNING(NULL, "OpenCL: Can't initialize OpenCL context/device/queue: unknown C++ exception");
+                    CV_LOG_WARNING(ఖాళీ, "OpenCL: Can't initialize OpenCL context/device/queue: unknown C++ exception");
                 }
-                initialized = true;
+                initialized = నిజం;
             }
         }
-        return g_primaryExecutionContext;
+        తిరిగి g_primaryExecutionContext;
     }
 };
 
-Context& OpenCLExecutionContext::getContext() const
+Context& OpenCLExecutionContext::getContext() స్థిరరాశి
 {
     CV_Assert(p);
-    return p->context_;
+    తిరిగి p->context_;
 }
-Device& OpenCLExecutionContext::getDevice() const
+Device& OpenCLExecutionContext::getDevice() స్థిరరాశి
 {
     CV_Assert(p);
-    return p->context_.device(p->device_);
+    తిరిగి p->context_.device(p->device_);
 }
-Queue& OpenCLExecutionContext::getQueue() const
+వరుస& OpenCLExecutionContext::get_వరుస() స్థిరరాశి
 {
     CV_Assert(p);
-    return p->queue_;
+    తిరిగి p->వరుస_3;
 }
 
-bool OpenCLExecutionContext::useOpenCL() const
+తార్కిక OpenCLExecutionContext::useOpenCL() స్థిరరాశి
 {
-    if (p)
-        return p->useOpenCL();
-    return false;
+    ఒకవేళ (p)
+        తిరిగి p->useOpenCL();
+    తిరిగి అబద్ధం;
 }
-void OpenCLExecutionContext::setUseOpenCL(bool flag)
+శూన్య OpenCLExecutionContext::సమితి_Use_Open_CL(తార్కిక flag)
 {
     CV_Assert(p);
-    p->setUseOpenCL(flag);
+    p->సమితి_Use_Open_CL(flag);
 }
 
 /* static */
 OpenCLExecutionContext& OpenCLExecutionContext::getCurrent()
 {
     CV_TRACE_FUNCTION();
-    CoreTLSData& data = getCoreTlsData();
-    OpenCLExecutionContext& c = data.oclExecutionContext;
-    if (!data.oclExecutionContextInitialized)
+    CoreTLSData& దత్తాంశం = get_Core_Tls_దత్తాంశం();
+    OpenCLExecutionContext& c = దత్తాంశం.oclExecutionContext;
+    ఒకవేళ (!దత్తాంశం.oclExecutionContextInitialized)
     {
-        data.oclExecutionContextInitialized = true;
-        if (c.empty() && haveOpenCL())
+        దత్తాంశం.oclExecutionContextInitialized = నిజం;
+        ఒకవేళ (c.empty() && haveOpenCL())
             c.p = Impl::getInitializedExecutionContext();
     }
-    return c;
+    తిరిగి c;
 }
 
 /* static */
 OpenCLExecutionContext& OpenCLExecutionContext::getCurrentRef()
 {
     CV_TRACE_FUNCTION();
-    CoreTLSData& data = getCoreTlsData();
-    OpenCLExecutionContext& c = data.oclExecutionContext;
-    return c;
+    CoreTLSData& దత్తాంశం = get_Core_Tls_దత్తాంశం();
+    OpenCLExecutionContext& c = దత్తాంశం.oclExecutionContext;
+    తిరిగి c;
 }
 
-void OpenCLExecutionContext::bind() const
+శూన్య OpenCLExecutionContext::bind() స్థిరరాశి
 {
     CV_TRACE_FUNCTION();
     CV_Assert(p);
-    CoreTLSData& data = getCoreTlsData();
-    data.oclExecutionContext = *this;
-    data.oclExecutionContextInitialized = true;
-    data.useOpenCL = p->useOpenCL_;  // propagate "-1", avoid call useOpenCL()
+    CoreTLSData& దత్తాంశం = get_Core_Tls_దత్తాంశం();
+    దత్తాంశం.oclExecutionContext = *ఇది;
+    దత్తాంశం.oclExecutionContextInitialized = నిజం;
+    దత్తాంశం.useOpenCL = p->useOpenCL_;  // propagate "-1", avoid call useOpenCL()
 }
 
 
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue() const
+OpenCLExecutionContext OpenCLExecutionContext::clone_With_New_వరుస() స్థిరరాశి
 {
     CV_TRACE_FUNCTION();
     CV_Assert(p);
-    const Queue q(getContext(), getDevice());
-    return cloneWithNewQueue(q);
+    స్థిరరాశి వరుస q(getContext(), getDevice());
+    తిరిగి clone_With_New_వరుస(q);
 }
 
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue(const ocl::Queue& q) const
+OpenCLExecutionContext OpenCLExecutionContext::clone_With_New_వరుస(స్థిరరాశి ocl::వరుస& q) స్థిరరాశి
 {
     CV_TRACE_FUNCTION();
     CV_Assert(p);
-    CV_Assert(q.ptr() != NULL);
+    CV_Assert(q.ptr() != ఖాళీ);
     OpenCLExecutionContext c;
     c.p = std::make_shared<Impl>(p->context_, p->device_, q);
-    return c;
+    తిరిగి c;
 }
 
 /* static */
-OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device, const ocl::Queue& queue)
+OpenCLExecutionContext OpenCLExecutionContext::create(స్థిరరాశి Context& context, స్థిరరాశి Device& device, స్థిరరాశి ocl::వరుస& వరుస_2)
 {
     CV_TRACE_FUNCTION();
-    if (!haveOpenCL())
+    ఒకవేళ (!haveOpenCL())
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
     CV_Assert(!context.empty());
@@ -1129,16 +1129,16 @@ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, co
     CV_Assert(!device.empty());
     CV_Assert(device.ptr());
     OpenCLExecutionContext ctx;
-    ctx.p = std::make_shared<OpenCLExecutionContext::Impl>(context, device, queue);
-    return ctx;
+    ctx.p = std::make_shared<OpenCLExecutionContext::Impl>(context, device, వరుస_2);
+    తిరిగి ctx;
 
 }
 
 /* static */
-OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device)
+OpenCLExecutionContext OpenCLExecutionContext::create(స్థిరరాశి Context& context, స్థిరరాశి Device& device)
 {
     CV_TRACE_FUNCTION();
-    if (!haveOpenCL())
+    ఒకవేళ (!haveOpenCL())
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
     CV_Assert(!context.empty());
@@ -1147,11 +1147,11 @@ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, co
     CV_Assert(device.ptr());
     OpenCLExecutionContext ctx;
     ctx.p = std::make_shared<OpenCLExecutionContext::Impl>(context, device);
-    return ctx;
+    తిరిగి ctx;
 
 }
 
-void OpenCLExecutionContext::release()
+శూన్య OpenCLExecutionContext::release()
 {
     CV_TRACE_FUNCTION();
     p.reset();
@@ -1160,109 +1160,109 @@ void OpenCLExecutionContext::release()
 
 
 // true if we have initialized OpenCL subsystem with available platforms
-static bool g_isOpenCLInitialized = false;
-static bool g_isOpenCLAvailable = false;
+స్థిర తార్కిక g_isOpenCLInitialized = అబద్ధం;
+స్థిర తార్కిక g_isOpenCLAvailable = అబద్ధం;
 
-bool haveOpenCL()
+తార్కిక haveOpenCL()
 {
     CV_TRACE_FUNCTION();
 
-    if (!g_isOpenCLInitialized)
+    ఒకవేళ (!g_isOpenCLInitialized)
     {
         CV_TRACE_REGION("Init_OpenCL_Runtime");
-        std::string envPath = utils::getConfigurationParameterString("OPENCV_OPENCL_RUNTIME");
-        if (!envPath.empty())
+        std::string env_మార్గం = utils::getConfigurationParameterString("OPENCV_OPENCL_RUNTIME");
+        ఒకవేళ (!env_మార్గం.empty())
         {
-            if (envPath == "disabled")
+            ఒకవేళ (env_మార్గం == "disabled")
             {
-                g_isOpenCLAvailable = false;
-                g_isOpenCLInitialized = true;
-                return false;
+                g_isOpenCLAvailable = అబద్ధం;
+                g_isOpenCLInitialized = నిజం;
+                తిరిగి అబద్ధం;
             }
         }
 
-        cv::AutoLock lock(getInitializationMutex());
-        CV_LOG_INFO(NULL, "Initialize OpenCL runtime...");
-        try
+        cv::Auto_తాళం lock(getInitializationMutex());
+        CV_LOG_INFO(ఖాళీ, "Initialize OpenCL runtime...");
+        ప్రయత్నించు
         {
             cl_uint n = 0;
-            g_isOpenCLAvailable = ::clGetPlatformIDs(0, NULL, &n) == CL_SUCCESS;
+            g_isOpenCLAvailable = ::clGetPlatformIDs(0, ఖాళీ, &n) == CL_SUCCESS;
             g_isOpenCLAvailable &= n > 0;
-            CV_LOG_INFO(NULL, "OpenCL: found " << n << " platforms");
+            CV_LOG_INFO(ఖాళీ, "OpenCL: found " << n << " platforms");
         }
-        catch (...)
+        పట్టుకో (...)
         {
-            g_isOpenCLAvailable = false;
+            g_isOpenCLAvailable = అబద్ధం;
         }
-        g_isOpenCLInitialized = true;
+        g_isOpenCLInitialized = నిజం;
     }
-    return g_isOpenCLAvailable;
+    తిరిగి g_isOpenCLAvailable;
 }
 
-bool useOpenCL()
+తార్కిక useOpenCL()
 {
-    CoreTLSData& data = getCoreTlsData();
-    if (data.useOpenCL < 0)
+    CoreTLSData& దత్తాంశం = get_Core_Tls_దత్తాంశం();
+    ఒకవేళ (దత్తాంశం.useOpenCL < 0)
     {
-        try
+        ప్రయత్నించు
         {
-            data.useOpenCL = 0;
-            if (haveOpenCL())
+            దత్తాంశం.useOpenCL = 0;
+            ఒకవేళ (haveOpenCL())
             {
-                auto c = OpenCLExecutionContext::getCurrent();
-                data.useOpenCL = c.useOpenCL();
+                స్వయంచాలక c = OpenCLExecutionContext::getCurrent();
+                దత్తాంశం.useOpenCL = c.useOpenCL();
             }
         }
-        catch (...)
+        పట్టుకో (...)
         {
-            CV_LOG_INFO(NULL, "OpenCL: can't initialize thread OpenCL execution context");
+            CV_LOG_INFO(ఖాళీ, "OpenCL: can't initialize thread OpenCL execution context");
         }
     }
-    return data.useOpenCL > 0;
+    తిరిగి దత్తాంశం.useOpenCL > 0;
 }
 
-bool isOpenCLActivated()
+తార్కిక isOpenCLActivated()
 {
-    if (!g_isOpenCLAvailable)
-        return false; // prevent unnecessary OpenCL activation via useOpenCL()->haveOpenCL() calls
-    return useOpenCL();
+    ఒకవేళ (!g_isOpenCLAvailable)
+        తిరిగి అబద్ధం; // prevent unnecessary OpenCL activation via useOpenCL()->haveOpenCL() calls
+    తిరిగి useOpenCL();
 }
 
-void setUseOpenCL(bool flag)
+శూన్య సమితి_Use_Open_CL(తార్కిక flag)
 {
     CV_TRACE_FUNCTION();
 
-    CoreTLSData& data = getCoreTlsData();
-    auto& c = OpenCLExecutionContext::getCurrentRef();
-    if (!c.empty())
+    CoreTLSData& దత్తాంశం = get_Core_Tls_దత్తాంశం();
+    స్వయంచాలక& c = OpenCLExecutionContext::getCurrentRef();
+    ఒకవేళ (!c.empty())
     {
-        c.setUseOpenCL(flag);
-        data.useOpenCL = c.useOpenCL();
+        c.సమితి_Use_Open_CL(flag);
+        దత్తాంశం.useOpenCL = c.useOpenCL();
     }
-    else
+    లేకపోతే
     {
-        if (!flag)
-            data.useOpenCL = 0;
-        else
-            data.useOpenCL = -1; // enabled by default (if context is not initialized)
+        ఒకవేళ (!flag)
+            దత్తాంశం.useOpenCL = 0;
+        లేకపోతే
+            దత్తాంశం.useOpenCL = -1; // enabled by default (if context is not initialized)
     }
 }
 
 
 
-#ifdef HAVE_CLAMDBLAS
+#నిర్వచితమైతే HAVE_CLAMDBLAS
 
-class AmdBlasHelper
+తరగతి AmdBlasHelper
 {
-public:
-    static AmdBlasHelper & getInstance()
+బహిరంగ:
+    స్థిర AmdBlasHelper & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(AmdBlasHelper, new AmdBlasHelper())
+        CV_SINGLETON_LAZY_INIT_REF(AmdBlasHelper, కొత్త AmdBlasHelper())
     }
 
-    bool isAvailable() const
+    తార్కిక is_అందుబాటు() స్థిరరాశి
     {
-        return g_isAmdBlasAvailable;
+        తిరిగి g_is_Amd_Blas_అందుబాటు;
     }
 
     ~AmdBlasHelper()
@@ -1276,69 +1276,69 @@ public:
         catch (...) { }*/
     }
 
-protected:
+రక్షిత:
     AmdBlasHelper()
     {
-        if (!g_isAmdBlasInitialized)
+        ఒకవేళ (!g_isAmdBlasInitialized)
         {
-            AutoLock lock(getInitializationMutex());
+            Auto_తాళం lock(getInitializationMutex());
 
-            if (!g_isAmdBlasInitialized)
+            ఒకవేళ (!g_isAmdBlasInitialized)
             {
-                if (haveOpenCL())
+                ఒకవేళ (haveOpenCL())
                 {
-                    try
+                    ప్రయత్నించు
                     {
-                        g_isAmdBlasAvailable = clblasSetup() == clblasSuccess;
+                        g_is_Amd_Blas_అందుబాటు = clblas_అమరిక() == clblasSuccess;
                     }
-                    catch (...)
+                    పట్టుకో (...)
                     {
-                        g_isAmdBlasAvailable = false;
+                        g_is_Amd_Blas_అందుబాటు = అబద్ధం;
                     }
                 }
-                else
-                    g_isAmdBlasAvailable = false;
+                లేకపోతే
+                    g_is_Amd_Blas_అందుబాటు = అబద్ధం;
 
-                g_isAmdBlasInitialized = true;
+                g_isAmdBlasInitialized = నిజం;
             }
         }
     }
 
-private:
-    static bool g_isAmdBlasInitialized;
-    static bool g_isAmdBlasAvailable;
+అంతరంగ:
+    స్థిర తార్కిక g_isAmdBlasInitialized;
+    స్థిర తార్కిక g_is_Amd_Blas_అందుబాటు;
 };
 
-bool AmdBlasHelper::g_isAmdBlasAvailable = false;
-bool AmdBlasHelper::g_isAmdBlasInitialized = false;
+తార్కిక AmdBlasHelper::g_is_Amd_Blas_అందుబాటు = అబద్ధం;
+తార్కిక AmdBlasHelper::g_isAmdBlasInitialized = అబద్ధం;
 
-bool haveAmdBlas()
+తార్కిక haveAmdBlas()
 {
-    return AmdBlasHelper::getInstance().isAvailable();
+    తిరిగి AmdBlasHelper::getInstance().is_అందుబాటు();
 }
 
-#else
+#లేకపోతే
 
-bool haveAmdBlas()
+తార్కిక haveAmdBlas()
 {
-    return false;
+    తిరిగి అబద్ధం;
 }
 
-#endif
+#అయితే_ముగింపు
 
-#ifdef HAVE_CLAMDFFT
+#నిర్వచితమైతే HAVE_CLAMDFFT
 
-class AmdFftHelper
+తరగతి AmdFftHelper
 {
-public:
-    static AmdFftHelper & getInstance()
+బహిరంగ:
+    స్థిర AmdFftHelper & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(AmdFftHelper, new AmdFftHelper())
+        CV_SINGLETON_LAZY_INIT_REF(AmdFftHelper, కొత్త AmdFftHelper())
     }
 
-    bool isAvailable() const
+    తార్కిక is_అందుబాటు() స్థిరరాశి
     {
-        return g_isAmdFftAvailable;
+        తిరిగి g_is_Amd_Fft_అందుబాటు;
     }
 
     ~AmdFftHelper()
@@ -1352,108 +1352,108 @@ public:
         catch (...) { }*/
     }
 
-protected:
+రక్షిత:
     AmdFftHelper()
     {
-        if (!g_isAmdFftInitialized)
+        ఒకవేళ (!g_isAmdFftInitialized)
         {
-            AutoLock lock(getInitializationMutex());
+            Auto_తాళం lock(getInitializationMutex());
 
-            if (!g_isAmdFftInitialized)
+            ఒకవేళ (!g_isAmdFftInitialized)
             {
-                if (haveOpenCL())
+                ఒకవేళ (haveOpenCL())
                 {
-                    try
+                    ప్రయత్నించు
                     {
                         cl_uint major, minor, patch;
-                        CV_Assert(clfftInitSetupData(&setupData) == CLFFT_SUCCESS);
+                        CV_Assert(clfft_Init_అమరిక_దత్తాంశం(&అమరిక_దత్తాంశం) == CLFFT_SUCCESS);
 
                         // it throws exception in case AmdFft binaries are not found
-                        CV_Assert(clfftGetVersion(&major, &minor, &patch) == CLFFT_SUCCESS);
-                        g_isAmdFftAvailable = true;
+                        CV_Assert(clfft_Get_సంస్కరణ(&major, &minor, &patch) == CLFFT_SUCCESS);
+                        g_is_Amd_Fft_అందుబాటు = నిజం;
                     }
-                    catch (const Exception &)
+                    పట్టుకో (స్థిరరాశి Exception &)
                     {
-                        g_isAmdFftAvailable = false;
+                        g_is_Amd_Fft_అందుబాటు = అబద్ధం;
                     }
                 }
-                else
-                    g_isAmdFftAvailable = false;
+                లేకపోతే
+                    g_is_Amd_Fft_అందుబాటు = అబద్ధం;
 
-                g_isAmdFftInitialized = true;
+                g_isAmdFftInitialized = నిజం;
             }
         }
     }
 
-private:
-    static clfftSetupData setupData;
-    static bool g_isAmdFftInitialized;
-    static bool g_isAmdFftAvailable;
+అంతరంగ:
+    స్థిర clfft_అమరిక_దత్తాంశం అమరిక_దత్తాంశం;
+    స్థిర తార్కిక g_isAmdFftInitialized;
+    స్థిర తార్కిక g_is_Amd_Fft_అందుబాటు;
 };
 
-clfftSetupData AmdFftHelper::setupData;
-bool AmdFftHelper::g_isAmdFftAvailable = false;
-bool AmdFftHelper::g_isAmdFftInitialized = false;
+clfft_అమరిక_దత్తాంశం AmdFftHelper::అమరిక_దత్తాంశం;
+తార్కిక AmdFftHelper::g_is_Amd_Fft_అందుబాటు = అబద్ధం;
+తార్కిక AmdFftHelper::g_isAmdFftInitialized = అబద్ధం;
 
-bool haveAmdFft()
+తార్కిక haveAmdFft()
 {
-    return AmdFftHelper::getInstance().isAvailable();
+    తిరిగి AmdFftHelper::getInstance().is_అందుబాటు();
 }
 
-#else
+#లేకపోతే
 
-bool haveAmdFft()
+తార్కిక haveAmdFft()
 {
-    return false;
+    తిరిగి అబద్ధం;
 }
 
-#endif
+#అయితే_ముగింపు
 
-bool haveSVM()
+తార్కిక haveSVM()
 {
-#ifdef HAVE_OPENCL_SVM
-    return true;
-#else
-    return false;
-#endif
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+    తిరిగి నిజం;
+#లేకపోతే
+    తిరిగి అబద్ధం;
+#అయితే_ముగింపు
 }
 
-void finish()
+శూన్య ముగింపు_2()
 {
-    Queue::getDefault().finish();
+    వరుస::getDefault().ముగింపు_2();
 }
 
 /////////////////////////////////////////// Platform /////////////////////////////////////////////
 
-struct Platform::Impl
+నిర్మాణం Platform::Impl
 {
     Impl()
     {
         refcount = 1;
         handle = 0;
-        initialized = false;
+        initialized = అబద్ధం;
     }
 
     ~Impl() {}
 
-    void init()
+    శూన్య init()
     {
-        if( !initialized )
+        ఒకవేళ( !initialized )
         {
             //cl_uint num_entries
             cl_uint n = 0;
-            if( clGetPlatformIDs(1, &handle, &n) != CL_SUCCESS || n == 0 )
+            ఒకవేళ( clGetPlatformIDs(1, &handle, &n) != CL_SUCCESS || n == 0 )
                 handle = 0;
-            if( handle != 0 )
+            ఒకవేళ( handle != 0 )
             {
-                char buf[1000];
+                అక్షరం buf[1000];
                 size_t len = 0;
-                CV_OCL_DBG_CHECK(clGetPlatformInfo(handle, CL_PLATFORM_VENDOR, sizeof(buf), buf, &len));
+                CV_OCL_DBG_CHECK(clGetPlatformInfo(handle, CL_PLATFORM_VENDOR, పరిమాణం(buf), buf, &len));
                 buf[len] = '\0';
                 vendor = String(buf);
             }
 
-            initialized = true;
+            initialized = నిజం;
         }
     }
 
@@ -1461,7 +1461,7 @@ struct Platform::Impl
 
     cl_platform_id handle;
     String vendor;
-    bool initialized;
+    తార్కిక initialized;
 };
 
 Platform::Platform() CV_NOEXCEPT
@@ -1471,60 +1471,60 @@ Platform::Platform() CV_NOEXCEPT
 
 Platform::~Platform()
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
 }
 
-Platform::Platform(const Platform& pl)
+Platform::Platform(స్థిరరాశి Platform& pl)
 {
     p = (Impl*)pl.p;
-    if(p)
+    ఒకవేళ(p)
         p->addref();
 }
 
-Platform& Platform::operator = (const Platform& pl)
+Platform& Platform::క్రియాకారకం = (స్థిరరాశి Platform& pl)
 {
     Impl* newp = (Impl*)pl.p;
-    if(newp)
+    ఒకవేళ(newp)
         newp->addref();
-    if(p)
+    ఒకవేళ(p)
         p->release();
     p = newp;
-    return *this;
+    తిరిగి *ఇది;
 }
 
 Platform::Platform(Platform&& pl) CV_NOEXCEPT
 {
     p = pl.p;
-    pl.p = nullptr;
+    pl.p = శూన్యసూచిక;
 }
 
-Platform& Platform::operator = (Platform&& pl) CV_NOEXCEPT
+Platform& Platform::క్రియాకారకం = (Platform&& pl) CV_NOEXCEPT
 {
-    if (this != &pl) {
-        if(p)
+    ఒకవేళ (ఇది != &pl) {
+        ఒకవేళ(p)
             p->release();
         p = pl.p;
-        pl.p = nullptr;
+        pl.p = శూన్యసూచిక;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-void* Platform::ptr() const
+శూన్య* Platform::ptr() స్థిరరాశి
 {
-    return p ? p->handle : 0;
+    తిరిగి p ? p->handle : 0;
 }
 
 Platform& Platform::getDefault()
 {
-    CV_LOG_ONCE_WARNING(NULL, "OpenCL: Platform::getDefault() is deprecated and will be removed. Use cv::ocl::getPlatfomsInfo() for enumeration of available platforms");
-    static Platform p;
-    if( !p.p )
+    CV_LOG_ONCE_WARNING(ఖాళీ, "OpenCL: Platform::getDefault() is deprecated and will be removed. Use cv::ocl::getPlatfomsInfo() for enumeration of available platforms");
+    స్థిర Platform p;
+    ఒకవేళ( !p.p )
     {
-        p.p = new Impl;
+        p.p = కొత్త Impl;
         p.p->init();
     }
-    return p;
+    తిరిగి p;
 }
 
 /////////////////////////////////////// Device ////////////////////////////////////////////
@@ -1536,70 +1536,70 @@ Platform& Platform::getDefault()
 //   http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetDeviceInfo.html
 //   https://www.khronos.org/registry/OpenCL/sdk/1.1/docs/man/xhtml/clGetPlatformInfo.html
 //   https://www.khronos.org/registry/OpenCL/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
-static void parseOpenCLVersion(const String &version, int &major, int &minor)
+స్థిర శూన్య parseOpenCLVersion(స్థిరరాశి String &సంస్కరణ, పూర్ణాంకం &major, పూర్ణాంకం &minor)
 {
     major = minor = 0;
-    if (10 >= version.length())
-        return;
-    const char *pstr = version.c_str();
-    if (0 != strncmp(pstr, "OpenCL ", 7))
-        return;
-    size_t ppos = version.find('.', 7);
-    if (String::npos == ppos)
-        return;
-    String temp = version.substr(7, ppos - 7);
-    major = atoi(temp.c_str());
-    temp = version.substr(ppos + 1);
-    minor = atoi(temp.c_str());
+    ఒకవేళ (10 >= సంస్కరణ.length())
+        తిరిగి;
+    స్థిరరాశి అక్షరం *pstr = సంస్కరణ.c_str();
+    ఒకవేళ (0 != అక్షరశ్రేణి_పోలిక(pstr, "OpenCL ", 7))
+        తిరిగి;
+    size_t ppos = సంస్కరణ.find('.', 7);
+    ఒకవేళ (String::npos == ppos)
+        తిరిగి;
+    String తాత్కాలిక_2 = సంస్కరణ.substr(7, ppos - 7);
+    major = atoi(తాత్కాలిక_2.c_str());
+    తాత్కాలిక_2 = సంస్కరణ.substr(ppos + 1);
+    minor = atoi(తాత్కాలిక_2.c_str());
 }
 
-struct Device::Impl
+నిర్మాణం Device::Impl
 {
-    Impl(void* d)
+    Impl(శూన్య* d)
         : refcount(1)
         , handle(0)
     {
-        try
+        ప్రయత్నించు
         {
             cl_device_id device = (cl_device_id)d;
             _init(device);
             CV_OCL_CHECK(clRetainDevice(device));  // increment reference counter on success only
         }
-        catch (...)
+        పట్టుకో (...)
         {
-            throw;
+            విసురు;
         }
     }
 
-    void _init(cl_device_id d)
+    శూన్య _init(cl_device_id d)
     {
         handle = (cl_device_id)d;
 
         name_ = getStrProp(CL_DEVICE_NAME);
-        version_ = getStrProp(CL_DEVICE_VERSION);
+        సంస్కరణ_3 = getStrProp(CL_DEVICE_సంస్కరణ);
         extensions_ = getStrProp(CL_DEVICE_EXTENSIONS);
-        doubleFPConfig_ = getProp<cl_device_fp_config, int>(CL_DEVICE_DOUBLE_FP_CONFIG);
-        halfFPConfig_ = getProp<cl_device_fp_config, int>(CL_DEVICE_HALF_FP_CONFIG);
-        hostUnifiedMemory_ = getBoolProp(CL_DEVICE_HOST_UNIFIED_MEMORY);
-        maxComputeUnits_ = getProp<cl_uint, int>(CL_DEVICE_MAX_COMPUTE_UNITS);
-        maxWorkGroupSize_ = getProp<size_t, size_t>(CL_DEVICE_MAX_WORK_GROUP_SIZE);
-        type_ = getProp<cl_device_type, int>(CL_DEVICE_TYPE);
-        driverVersion_ = getStrProp(CL_DRIVER_VERSION);
-        addressBits_ = getProp<cl_uint, int>(CL_DEVICE_ADDRESS_BITS);
+        doubleFPConfig_ = getProp<cl_device_fp_config, పూర్ణాంకం>(CL_DEVICE_DOUBLE_FP_CONFIG);
+        halfFPConfig_ = getProp<cl_device_fp_config, పూర్ణాంకం>(CL_DEVICE_HALF_FP_CONFIG);
+        host_Unified_జ్ఞాపకం = getBoolProp(CL_DEVICE_HOST_UNIFIED_జ్ఞాపకం);
+        maxComputeUnits_ = getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_MAX_COMPUTE_UNITS);
+        max_Work_సమూహం_కొలత_2 = getProp<size_t, size_t>(CL_DEVICE_MAX_WORK_సమూహం_కొలత);
+        type_ = getProp<cl_device_type, పూర్ణాంకం>(CL_DEVICE_TYPE);
+        driver_సంస్కరణ_2 = getStrProp(CL_DRIVER_సంస్కరణ);
+        చిరునామా_బిట్లు_2 = getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_చిరునామా_బిట్లు);
 
-        String deviceVersion_ = getStrProp(CL_DEVICE_VERSION);
-        parseOpenCLVersion(deviceVersion_, deviceVersionMajor_, deviceVersionMinor_);
+        String device_సంస్కరణ = getStrProp(CL_DEVICE_సంస్కరణ);
+        parseOpenCLVersion(device_సంస్కరణ, device_సంస్కరణ_Major_2, device_సంస్కరణ_Minor_2);
 
         size_t pos = 0;
-        while (pos < extensions_.size())
+        అయితే (pos < extensions_.size())
         {
             size_t pos2 = extensions_.find(' ', pos);
-            if (pos2 == String::npos)
+            ఒకవేళ (pos2 == String::npos)
                 pos2 = extensions_.size();
-            if (pos2 > pos)
+            ఒకవేళ (pos2 > pos)
             {
                 std::string extensionName = extensions_.substr(pos, pos2 - pos);
-                extensions_set_.insert(extensionName);
+                extensions_సమితి.insert(extensionName);
             }
             pos = pos2 + 1;
         }
@@ -1610,43 +1610,43 @@ struct Device::Impl
         intelSubgroupsSupport_ = isExtensionSupported("cl_intel_subgroups");
 
         vendorName_ = getStrProp(CL_DEVICE_VENDOR);
-        if (vendorName_ == "Advanced Micro Devices, Inc." ||
+        ఒకవేళ (vendorName_ == "Advanced Micro Devices, Inc." ||
             vendorName_ == "AMD")
             vendorID_ = VENDOR_AMD;
-        else if (vendorName_ == "Intel(R) Corporation" || vendorName_ == "Intel" || vendorName_ == "Intel Inc." || strstr(name_.c_str(), "Iris") != 0)
+        లేకపోతే ఒకవేళ (vendorName_ == "Intel(R) Corporation" || vendorName_ == "Intel" || vendorName_ == "Intel Inc." || అక్షరశ్రేణి_శోధన(name_.c_str(), "Iris") != 0)
             vendorID_ = VENDOR_INTEL;
-        else if (vendorName_ == "NVIDIA Corporation")
+        లేకపోతే ఒకవేళ (vendorName_ == "NVIDIA Corporation")
             vendorID_ = VENDOR_NVIDIA;
-        else
+        లేకపోతే
             vendorID_ = UNKNOWN_VENDOR;
 
-        const size_t CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE", 0);
-        if (CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE > 0)
+        స్థిరరాశి size_t CV_OPENCL_DEVICE_MAX_WORK_సమూహం_కొలత = utils::get_Configuration_Parameter_కొలత_T("OPENCV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE", 0);
+        ఒకవేళ (CV_OPENCL_DEVICE_MAX_WORK_సమూహం_కొలత > 0)
         {
-            const size_t new_maxWorkGroupSize = std::min(maxWorkGroupSize_, CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE);
-            if (new_maxWorkGroupSize != maxWorkGroupSize_)
-                CV_LOG_WARNING(NULL, "OpenCL: using workgroup size: " << new_maxWorkGroupSize << " (was " << maxWorkGroupSize_ << ")");
-            maxWorkGroupSize_ = new_maxWorkGroupSize;
+            స్థిరరాశి size_t new_max_Work_సమూహం_కొలత = std::min(max_Work_సమూహం_కొలత_2, CV_OPENCL_DEVICE_MAX_WORK_సమూహం_కొలత);
+            ఒకవేళ (new_max_Work_సమూహం_కొలత != max_Work_సమూహం_కొలత_2)
+                CV_LOG_WARNING(ఖాళీ, "OpenCL: using workgroup size: " << new_max_Work_సమూహం_కొలత << " (was " << max_Work_సమూహం_కొలత_2 << ")");
+            max_Work_సమూహం_కొలత_2 = new_max_Work_సమూహం_కొలత;
         }
-#if 0
-        if (isExtensionSupported("cl_khr_spir"))
+#ఒకవేళ 0
+        ఒకవేళ (isExtensionSupported("cl_khr_spir"))
         {
-#ifndef CL_DEVICE_SPIR_VERSIONS
-#define CL_DEVICE_SPIR_VERSIONS                     0x40E0
-#endif
+#నిర్వచితం_కాకపోతే CL_DEVICE_SPIR_VERSIONS
+#నిర్వచించు CL_DEVICE_SPIR_VERSIONS                     0x40E0
+#అయితే_ముగింపు
             cv::String spir_versions = getStrProp(CL_DEVICE_SPIR_VERSIONS);
-            std::cout << spir_versions << std::endl;
+            std::బయటకు << spir_versions << std::పంక్తి_ముగింపు;
         }
-#endif
+#అయితే_ముగింపు
     }
 
     ~Impl()
     {
-#ifdef _WIN32
-        if (!cv::__termination)
-#endif
+#నిర్వచితమైతే _WIN32
+        ఒకవేళ (!cv::__termination)
+#అయితే_ముగింపు
         {
-            if (handle)
+            ఒకవేళ (handle)
             {
                 CV_OCL_CHECK(clReleaseDevice(handle));
                 handle = 0;
@@ -1654,36 +1654,36 @@ struct Device::Impl
         }
     }
 
-    template<typename _TpCL, typename _TpOut>
-    _TpOut getProp(cl_device_info prop) const
+    మూస<రకం_పేరు _TpCL, రకం_పేరు Tp_బహిర్గతం>
+    Tp_బహిర్గతం getProp(cl_device_info prop) స్థిరరాశి
     {
-        _TpCL temp=_TpCL();
+        _TpCL తాత్కాలిక_2=_TpCL();
         size_t sz = 0;
 
-        return clGetDeviceInfo(handle, prop, sizeof(temp), &temp, &sz) == CL_SUCCESS &&
-            sz == sizeof(temp) ? _TpOut(temp) : _TpOut();
+        తిరిగి clGetDeviceInfo(handle, prop, పరిమాణం(తాత్కాలిక_2), &తాత్కాలిక_2, &sz) == CL_SUCCESS &&
+            sz == పరిమాణం(తాత్కాలిక_2) ? Tp_బహిర్గతం(తాత్కాలిక_2) : Tp_బహిర్గతం();
     }
 
-    bool getBoolProp(cl_device_info prop) const
+    తార్కిక getBoolProp(cl_device_info prop) స్థిరరాశి
     {
-        cl_bool temp = CL_FALSE;
+        cl_bool తాత్కాలిక_2 = CL_FALSE;
         size_t sz = 0;
 
-        return clGetDeviceInfo(handle, prop, sizeof(temp), &temp, &sz) == CL_SUCCESS &&
-            sz == sizeof(temp) ? temp != 0 : false;
+        తిరిగి clGetDeviceInfo(handle, prop, పరిమాణం(తాత్కాలిక_2), &తాత్కాలిక_2, &sz) == CL_SUCCESS &&
+            sz == పరిమాణం(తాత్కాలిక_2) ? తాత్కాలిక_2 != 0 : అబద్ధం;
     }
 
-    String getStrProp(cl_device_info prop) const
+    String getStrProp(cl_device_info prop) స్థిరరాశి
     {
-        char buf[4096];
+        అక్షరం buf[4096];
         size_t sz=0;
-        return clGetDeviceInfo(handle, prop, sizeof(buf)-16, buf, &sz) == CL_SUCCESS &&
-            sz < sizeof(buf) ? String(buf) : String();
+        తిరిగి clGetDeviceInfo(handle, prop, పరిమాణం(buf)-16, buf, &sz) == CL_SUCCESS &&
+            sz < పరిమాణం(buf) ? String(buf) : String();
     }
 
-    bool isExtensionSupported(const std::string& extensionName) const
+    తార్కిక isExtensionSupported(స్థిరరాశి std::string& extensionName) స్థిరరాశి
     {
-        return extensions_set_.count(extensionName) > 0;
+        తిరిగి extensions_సమితి.లెక్క_2(extensionName) > 0;
     }
 
 
@@ -1692,25 +1692,25 @@ struct Device::Impl
     cl_device_id handle;
 
     String name_;
-    String version_;
+    String సంస్కరణ_3;
     std::string extensions_;
-    int doubleFPConfig_;
-    bool khr_fp64_support_;
-    int halfFPConfig_;
-    bool khr_fp16_support_;
-    bool hostUnifiedMemory_;
-    int maxComputeUnits_;
-    size_t maxWorkGroupSize_;
-    int type_;
-    int addressBits_;
-    int deviceVersionMajor_;
-    int deviceVersionMinor_;
-    String driverVersion_;
+    పూర్ణాంకం doubleFPConfig_;
+    తార్కిక khr_fp64_support_;
+    పూర్ణాంకం halfFPConfig_;
+    తార్కిక khr_fp16_support_;
+    తార్కిక host_Unified_జ్ఞాపకం;
+    పూర్ణాంకం maxComputeUnits_;
+    size_t max_Work_సమూహం_కొలత_2;
+    పూర్ణాంకం type_;
+    పూర్ణాంకం చిరునామా_బిట్లు_2;
+    పూర్ణాంకం device_సంస్కరణ_Major_2;
+    పూర్ణాంకం device_సంస్కరణ_Minor_2;
+    String driver_సంస్కరణ_2;
     String vendorName_;
-    int vendorID_;
-    bool intelSubgroupsSupport_;
+    పూర్ణాంకం vendorID_;
+    తార్కిక intelSubgroupsSupport_;
 
-    std::set<std::string> extensions_set_;
+    std::సమితి<std::string> extensions_సమితి;
 };
 
 
@@ -1719,376 +1719,376 @@ Device::Device() CV_NOEXCEPT
     p = 0;
 }
 
-Device::Device(void* d)
+Device::Device(శూన్య* d)
 {
     p = 0;
-    set(d);
+    సమితి(d);
 }
 
-Device::Device(const Device& d)
+Device::Device(స్థిరరాశి Device& d)
 {
     p = d.p;
-    if(p)
+    ఒకవేళ(p)
         p->addref();
 }
 
-Device& Device::operator = (const Device& d)
+Device& Device::క్రియాకారకం = (స్థిరరాశి Device& d)
 {
     Impl* newp = (Impl*)d.p;
-    if(newp)
+    ఒకవేళ(newp)
         newp->addref();
-    if(p)
+    ఒకవేళ(p)
         p->release();
     p = newp;
-    return *this;
+    తిరిగి *ఇది;
 }
 
 Device::Device(Device&& d) CV_NOEXCEPT
 {
     p = d.p;
-    d.p = nullptr;
+    d.p = శూన్యసూచిక;
 }
 
-Device& Device::operator = (Device&& d) CV_NOEXCEPT
+Device& Device::క్రియాకారకం = (Device&& d) CV_NOEXCEPT
 {
-    if (this != &d) {
-        if(p)
+    ఒకవేళ (ఇది != &d) {
+        ఒకవేళ(p)
             p->release();
         p = d.p;
-        d.p = nullptr;
+        d.p = శూన్యసూచిక;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
 Device::~Device()
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
 }
 
-void Device::set(void* d)
+శూన్య Device::సమితి(శూన్య* d)
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
-    p = new Impl(d);
-    if (p->handle)
+    p = కొత్త Impl(d);
+    ఒకవేళ (p->handle)
     {
         CV_OCL_CHECK(clReleaseDevice((cl_device_id)d));
     }
 }
 
-Device Device::fromHandle(void* d)
+Device Device::fromHandle(శూన్య* d)
 {
     Device device(d);
-    return device;
+    తిరిగి device;
 }
 
-void* Device::ptr() const
+శూన్య* Device::ptr() స్థిరరాశి
 {
-    return p ? p->handle : 0;
+    తిరిగి p ? p->handle : 0;
 }
 
-String Device::name() const
-{ return p ? p->name_ : String(); }
+String Device::name() స్థిరరాశి
+{ తిరిగి p ? p->name_ : String(); }
 
-String Device::extensions() const
-{ return p ? String(p->extensions_) : String(); }
+String Device::extensions() స్థిరరాశి
+{ తిరిగి p ? String(p->extensions_) : String(); }
 
-bool Device::isExtensionSupported(const String& extensionName) const
-{ return p ? p->isExtensionSupported(extensionName) : false; }
+తార్కిక Device::isExtensionSupported(స్థిరరాశి String& extensionName) స్థిరరాశి
+{ తిరిగి p ? p->isExtensionSupported(extensionName) : అబద్ధం; }
 
-String Device::version() const
-{ return p ? p->version_ : String(); }
+String Device::సంస్కరణ() స్థిరరాశి
+{ తిరిగి p ? p->సంస్కరణ_3 : String(); }
 
-String Device::vendorName() const
-{ return p ? p->vendorName_ : String(); }
+String Device::vendorName() స్థిరరాశి
+{ తిరిగి p ? p->vendorName_ : String(); }
 
-int Device::vendorID() const
-{ return p ? p->vendorID_ : 0; }
+పూర్ణాంకం Device::vendorID() స్థిరరాశి
+{ తిరిగి p ? p->vendorID_ : 0; }
 
-String Device::OpenCL_C_Version() const
-{ return p ? p->getStrProp(CL_DEVICE_OPENCL_C_VERSION) : String(); }
+String Device::Open_CL_C_సంస్కరణ() స్థిరరాశి
+{ తిరిగి p ? p->getStrProp(CL_DEVICE_OPENCL_C_సంస్కరణ) : String(); }
 
-String Device::OpenCLVersion() const
-{ return p ? p->getStrProp(CL_DEVICE_VERSION) : String(); }
+String Device::OpenCLVersion() స్థిరరాశి
+{ తిరిగి p ? p->getStrProp(CL_DEVICE_సంస్కరణ) : String(); }
 
-int Device::deviceVersionMajor() const
-{ return p ? p->deviceVersionMajor_ : 0; }
+పూర్ణాంకం Device::device_సంస్కరణ_Major() స్థిరరాశి
+{ తిరిగి p ? p->device_సంస్కరణ_Major_2 : 0; }
 
-int Device::deviceVersionMinor() const
-{ return p ? p->deviceVersionMinor_ : 0; }
+పూర్ణాంకం Device::device_సంస్కరణ_Minor() స్థిరరాశి
+{ తిరిగి p ? p->device_సంస్కరణ_Minor_2 : 0; }
 
-String Device::driverVersion() const
-{ return p ? p->driverVersion_ : String(); }
+String Device::driver_సంస్కరణ() స్థిరరాశి
+{ తిరిగి p ? p->driver_సంస్కరణ_2 : String(); }
 
-int Device::type() const
-{ return p ? p->type_ : 0; }
+పూర్ణాంకం Device::type() స్థిరరాశి
+{ తిరిగి p ? p->type_ : 0; }
 
-int Device::addressBits() const
-{ return p ? p->addressBits_ : 0; }
+పూర్ణాంకం Device::చిరునామా_బిట్లు() స్థిరరాశి
+{ తిరిగి p ? p->చిరునామా_బిట్లు_2 : 0; }
 
-bool Device::available() const
-{ return p ? p->getBoolProp(CL_DEVICE_AVAILABLE) : false; }
+తార్కిక Device::అందుబాటు() స్థిరరాశి
+{ తిరిగి p ? p->getBoolProp(CL_DEVICE_అందుబాటు) : అబద్ధం; }
 
-bool Device::compilerAvailable() const
-{ return p ? p->getBoolProp(CL_DEVICE_COMPILER_AVAILABLE) : false; }
+తార్కిక Device::compiler_అందుబాటు() స్థిరరాశి
+{ తిరిగి p ? p->getBoolProp(CL_DEVICE_COMPILER_అందుబాటు) : అబద్ధం; }
 
-bool Device::linkerAvailable() const
-#ifdef CL_VERSION_1_2
-{ return p ? p->getBoolProp(CL_DEVICE_LINKER_AVAILABLE) : false; }
-#else
+తార్కిక Device::linker_అందుబాటు() స్థిరరాశి
+#నిర్వచితమైతే CL_సంస్కరణ_1_2
+{ తిరిగి p ? p->getBoolProp(CL_DEVICE_LINKER_అందుబాటు) : అబద్ధం; }
+#లేకపోతే
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
-#endif
+#అయితే_ముగింపు
 
-int Device::doubleFPConfig() const
-{ return p ? p->doubleFPConfig_ : 0; }
+పూర్ణాంకం Device::doubleFPConfig() స్థిరరాశి
+{ తిరిగి p ? p->doubleFPConfig_ : 0; }
 
-int Device::singleFPConfig() const
-{ return p ? p->getProp<cl_device_fp_config, int>(CL_DEVICE_SINGLE_FP_CONFIG) : 0; }
+పూర్ణాంకం Device::singleFPConfig() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_device_fp_config, పూర్ణాంకం>(CL_DEVICE_SINGLE_FP_CONFIG) : 0; }
 
-int Device::halfFPConfig() const
-{ return p ? p->halfFPConfig_ : 0; }
+పూర్ణాంకం Device::halfFPConfig() స్థిరరాశి
+{ తిరిగి p ? p->halfFPConfig_ : 0; }
 
-bool Device::hasFP64() const
-{ return p ? p->khr_fp64_support_ : false; }
-bool Device::hasFP16() const
-{ return p ? p->khr_fp16_support_ : false; }
+తార్కిక Device::hasFP64() స్థిరరాశి
+{ తిరిగి p ? p->khr_fp64_support_ : అబద్ధం; }
+తార్కిక Device::hasFP16() స్థిరరాశి
+{ తిరిగి p ? p->khr_fp16_support_ : అబద్ధం; }
 
-bool Device::endianLittle() const
-{ return p ? p->getBoolProp(CL_DEVICE_ENDIAN_LITTLE) : false; }
+తార్కిక Device::endianLittle() స్థిరరాశి
+{ తిరిగి p ? p->getBoolProp(CL_DEVICE_ENDIAN_LITTLE) : అబద్ధం; }
 
-bool Device::errorCorrectionSupport() const
-{ return p ? p->getBoolProp(CL_DEVICE_ERROR_CORRECTION_SUPPORT) : false; }
+తార్కిక Device::errorCorrectionSupport() స్థిరరాశి
+{ తిరిగి p ? p->getBoolProp(CL_DEVICE_ERROR_CORRECTION_SUPPORT) : అబద్ధం; }
 
-int Device::executionCapabilities() const
-{ return p ? p->getProp<cl_device_exec_capabilities, int>(CL_DEVICE_EXECUTION_CAPABILITIES) : 0; }
+పూర్ణాంకం Device::executionCapabilities() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_device_exec_capabilities, పూర్ణాంకం>(CL_DEVICE_EXECUTION_CAPABILITIES) : 0; }
 
-size_t Device::globalMemCacheSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_CACHE_SIZE) : 0; }
+size_t Device::global_Mem_Cache_కొలత() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_CACHE_కొలత) : 0; }
 
-int Device::globalMemCacheType() const
-{ return p ? p->getProp<cl_device_mem_cache_type, int>(CL_DEVICE_GLOBAL_MEM_CACHE_TYPE) : 0; }
+పూర్ణాంకం Device::globalMemCacheType() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_device_mem_cache_type, పూర్ణాంకం>(CL_DEVICE_GLOBAL_MEM_CACHE_TYPE) : 0; }
 
-int Device::globalMemCacheLineSize() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE) : 0; }
+పూర్ణాంకం Device::global_Mem_Cache_పంక్తి_కొలత() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_GLOBAL_MEM_CACHELINE_కొలత) : 0; }
 
-size_t Device::globalMemSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_SIZE) : 0; }
+size_t Device::global_Mem_కొలత() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_కొలత) : 0; }
 
-size_t Device::localMemSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_LOCAL_MEM_SIZE) : 0; }
+size_t Device::local_Mem_కొలత() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_LOCAL_MEM_కొలత) : 0; }
 
-int Device::localMemType() const
-{ return p ? p->getProp<cl_device_local_mem_type, int>(CL_DEVICE_LOCAL_MEM_TYPE) : 0; }
+పూర్ణాంకం Device::localMemType() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_device_local_mem_type, పూర్ణాంకం>(CL_DEVICE_LOCAL_MEM_TYPE) : 0; }
 
-bool Device::hostUnifiedMemory() const
-{ return p ? p->hostUnifiedMemory_ : false; }
+తార్కిక Device::host_Unified_జ్ఞాపకం_2() స్థిరరాశి
+{ తిరిగి p ? p->host_Unified_జ్ఞాపకం : అబద్ధం; }
 
-bool Device::imageSupport() const
-{ return p ? p->getBoolProp(CL_DEVICE_IMAGE_SUPPORT) : false; }
+తార్కిక Device::imageSupport() స్థిరరాశి
+{ తిరిగి p ? p->getBoolProp(CL_DEVICE_IMAGE_SUPPORT) : అబద్ధం; }
 
-bool Device::imageFromBufferSupport() const
+తార్కిక Device::image_From_బఫరు_Support() స్థిరరాశి
 {
-    return p ? p->isExtensionSupported("cl_khr_image2d_from_buffer") : false;
+    తిరిగి p ? p->isExtensionSupported("cl_khr_image2d_from_buffer") : అబద్ధం;
 }
 
-uint Device::imagePitchAlignment() const
+uint Device::imagePitchAlignment() స్థిరరాశి
 {
-#ifdef CL_DEVICE_IMAGE_PITCH_ALIGNMENT
-    return p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_PITCH_ALIGNMENT) : 0;
-#else
-    return 0;
-#endif
+#నిర్వచితమైతే CL_DEVICE_IMAGE_PITCH_ALIGNMENT
+    తిరిగి p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_PITCH_ALIGNMENT) : 0;
+#లేకపోతే
+    తిరిగి 0;
+#అయితే_ముగింపు
 }
 
-uint Device::imageBaseAddressAlignment() const
+uint Device::image_పునాది_చిరునామా_Alignment() స్థిరరాశి
 {
-#ifdef CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT
-    return p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT) : 0;
-#else
-    return 0;
-#endif
+#నిర్వచితమైతే CL_DEVICE_IMAGE_పునాది_చిరునామా_ALIGNMENT
+    తిరిగి p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_పునాది_చిరునామా_ALIGNMENT) : 0;
+#లేకపోతే
+    తిరిగి 0;
+#అయితే_ముగింపు
 }
 
-size_t Device::image2DMaxWidth() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_WIDTH) : 0; }
+size_t Device::image2_DMax_వెడల్పు() స్థిరరాశి
+{ తిరిగి p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2_D_MAX_వెడల్పు) : 0; }
 
-size_t Device::image2DMaxHeight() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_HEIGHT) : 0; }
+size_t Device::image2_DMax_ఎత్తు() స్థిరరాశి
+{ తిరిగి p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2_D_MAX_ఎత్తు) : 0; }
 
-size_t Device::image3DMaxWidth() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_WIDTH) : 0; }
+size_t Device::image3_DMax_వెడల్పు() స్థిరరాశి
+{ తిరిగి p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3_D_MAX_వెడల్పు) : 0; }
 
-size_t Device::image3DMaxHeight() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_HEIGHT) : 0; }
+size_t Device::image3_DMax_ఎత్తు() స్థిరరాశి
+{ తిరిగి p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3_D_MAX_ఎత్తు) : 0; }
 
-size_t Device::image3DMaxDepth() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_DEPTH) : 0; }
+size_t Device::image3_DMax_లోతు() స్థిరరాశి
+{ తిరిగి p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3_D_MAX_లోతు) : 0; }
 
-size_t Device::imageMaxBufferSize() const
-#ifdef CL_VERSION_1_2
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_BUFFER_SIZE) : 0; }
-#else
+size_t Device::image_Max_బఫరు_కొలత() స్థిరరాశి
+#నిర్వచితమైతే CL_సంస్కరణ_1_2
+{ తిరిగి p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_బఫరు_కొలత) : 0; }
+#లేకపోతే
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
-#endif
+#అయితే_ముగింపు
 
-size_t Device::imageMaxArraySize() const
-#ifdef CL_VERSION_1_2
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_ARRAY_SIZE) : 0; }
-#else
+size_t Device::image_Max_Array_కొలత() స్థిరరాశి
+#నిర్వచితమైతే CL_సంస్కరణ_1_2
+{ తిరిగి p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_ARRAY_కొలత) : 0; }
+#లేకపోతే
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
-#endif
+#అయితే_ముగింపు
 
-bool Device::intelSubgroupsSupport() const
-{ return p ? p->intelSubgroupsSupport_ : false; }
+తార్కిక Device::intelSubgroupsSupport() స్థిరరాశి
+{ తిరిగి p ? p->intelSubgroupsSupport_ : అబద్ధం; }
 
-int Device::maxClockFrequency() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_CLOCK_FREQUENCY) : 0; }
+పూర్ణాంకం Device::maxClockFrequency() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_MAX_CLOCK_FREQUENCY) : 0; }
 
-int Device::maxComputeUnits() const
-{ return p ? p->maxComputeUnits_ : 0; }
+పూర్ణాంకం Device::maxComputeUnits() స్థిరరాశి
+{ తిరిగి p ? p->maxComputeUnits_ : 0; }
 
-int Device::maxConstantArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_CONSTANT_ARGS) : 0; }
+పూర్ణాంకం Device::max_Constant_వాదనలు() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_MAX_CONSTANT_వాదనలు) : 0; }
 
-size_t Device::maxConstantBufferSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE) : 0; }
+size_t Device::max_Constant_బఫరు_కొలత() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_CONSTANT_బఫరు_కొలత) : 0; }
 
-size_t Device::maxMemAllocSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_MEM_ALLOC_SIZE) : 0; }
+size_t Device::max_Mem_Alloc_కొలత() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_MEM_ALLOC_కొలత) : 0; }
 
-size_t Device::maxParameterSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_PARAMETER_SIZE) : 0; }
+size_t Device::max_Parameter_కొలత() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_PARAMETER_కొలత) : 0; }
 
-int Device::maxReadImageArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_READ_IMAGE_ARGS) : 0; }
+పూర్ణాంకం Device::max_Read_Image_వాదనలు() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_MAX_READ_IMAGE_వాదనలు) : 0; }
 
-int Device::maxWriteImageArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_WRITE_IMAGE_ARGS) : 0; }
+పూర్ణాంకం Device::max_Write_Image_వాదనలు() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_MAX_WRITE_IMAGE_వాదనలు) : 0; }
 
-int Device::maxSamplers() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_SAMPLERS) : 0; }
+పూర్ణాంకం Device::maxSamplers() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_MAX_SAMPLERS) : 0; }
 
-size_t Device::maxWorkGroupSize() const
-{ return p ? p->maxWorkGroupSize_ : 0; }
+size_t Device::max_Work_సమూహం_కొలత() స్థిరరాశి
+{ తిరిగి p ? p->max_Work_సమూహం_కొలత_2 : 0; }
 
-int Device::maxWorkItemDims() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS) : 0; }
+పూర్ణాంకం Device::max_Work_అంశం_Dims() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_MAX_WORK_అంశం_DIMENSIONS) : 0; }
 
-void Device::maxWorkItemSizes(size_t* sizes) const
+శూన్య Device::max_Work_అంశం_Sizes(size_t* sizes) స్థిరరాశి
 {
-    if(p)
+    ఒకవేళ(p)
     {
-        const int MAX_DIMS = 32;
+        స్థిరరాశి పూర్ణాంకం MAX_DIMS = 32;
         size_t retsz = 0;
-        CV_OCL_DBG_CHECK(clGetDeviceInfo(p->handle, CL_DEVICE_MAX_WORK_ITEM_SIZES,
-                MAX_DIMS*sizeof(sizes[0]), &sizes[0], &retsz));
+        CV_OCL_DBG_CHECK(clGetDeviceInfo(p->handle, CL_DEVICE_MAX_WORK_అంశం_SIZES,
+                MAX_DIMS*పరిమాణం(sizes[0]), &sizes[0], &retsz));
     }
 }
 
-int Device::memBaseAddrAlign() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MEM_BASE_ADDR_ALIGN) : 0; }
+పూర్ణాంకం Device::mem_పునాది_Addr_Align() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_MEM_పునాది_ADDR_ALIGN) : 0; }
 
-int Device::nativeVectorWidthChar() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR) : 0; }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Char() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_NATIVE_సదిశ_వెడల్పు_CHAR) : 0; }
 
-int Device::nativeVectorWidthShort() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT) : 0; }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Short() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_NATIVE_సదిశ_వెడల్పు_SHORT) : 0; }
 
-int Device::nativeVectorWidthInt() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_INT) : 0; }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Int() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_NATIVE_సదిశ_వెడల్పు_INT) : 0; }
 
-int Device::nativeVectorWidthLong() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG) : 0; }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Long() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_NATIVE_సదిశ_వెడల్పు_LONG) : 0; }
 
-int Device::nativeVectorWidthFloat() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT) : 0; }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Float() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_NATIVE_సదిశ_వెడల్పు_FLOAT) : 0; }
 
-int Device::nativeVectorWidthDouble() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE) : 0; }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Double() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_NATIVE_సదిశ_వెడల్పు_DOUBLE) : 0; }
 
-int Device::nativeVectorWidthHalf() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF) : 0; }
+పూర్ణాంకం Device::native_సదిశ_వెడల్పు_Half() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_NATIVE_సదిశ_వెడల్పు_HALF) : 0; }
 
-int Device::preferredVectorWidthChar() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR) : 0; }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Char() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_PREFERRED_సదిశ_వెడల్పు_CHAR) : 0; }
 
-int Device::preferredVectorWidthShort() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT) : 0; }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Short() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_PREFERRED_సదిశ_వెడల్పు_SHORT) : 0; }
 
-int Device::preferredVectorWidthInt() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT) : 0; }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Int() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_PREFERRED_సదిశ_వెడల్పు_INT) : 0; }
 
-int Device::preferredVectorWidthLong() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG) : 0; }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Long() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_PREFERRED_సదిశ_వెడల్పు_LONG) : 0; }
 
-int Device::preferredVectorWidthFloat() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT) : 0; }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Float() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_PREFERRED_సదిశ_వెడల్పు_FLOAT) : 0; }
 
-int Device::preferredVectorWidthDouble() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE) : 0; }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Double() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_PREFERRED_సదిశ_వెడల్పు_DOUBLE) : 0; }
 
-int Device::preferredVectorWidthHalf() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF) : 0; }
+పూర్ణాంకం Device::preferred_సదిశ_వెడల్పు_Half() స్థిరరాశి
+{ తిరిగి p ? p->getProp<cl_uint, పూర్ణాంకం>(CL_DEVICE_PREFERRED_సదిశ_వెడల్పు_HALF) : 0; }
 
-size_t Device::printfBufferSize() const
-#ifdef CL_VERSION_1_2
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_PRINTF_BUFFER_SIZE) : 0; }
-#else
+size_t Device::printf_బఫరు_కొలత() స్థిరరాశి
+#నిర్వచితమైతే CL_సంస్కరణ_1_2
+{ తిరిగి p ? p->getProp<size_t, size_t>(CL_DEVICE_PRINTF_బఫరు_కొలత) : 0; }
+#లేకపోతే
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
-#endif
+#అయితే_ముగింపు
 
 
-size_t Device::profilingTimerResolution() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_PROFILING_TIMER_RESOLUTION) : 0; }
+size_t Device::profilingTimerResolution() స్థిరరాశి
+{ తిరిగి p ? p->getProp<size_t, size_t>(CL_DEVICE_PROFILING_TIMER_RESOLUTION) : 0; }
 
-const Device& Device::getDefault()
+స్థిరరాశి Device& Device::getDefault()
 {
-    auto& c = OpenCLExecutionContext::getCurrent();
-    if (!c.empty())
+    స్వయంచాలక& c = OpenCLExecutionContext::getCurrent();
+    ఒకవేళ (!c.empty())
     {
-        return c.getDevice();
+        తిరిగి c.getDevice();
     }
 
-    static Device dummy;
-    return dummy;
+    స్థిర Device dummy;
+    తిరిగి dummy;
 }
 
 ////////////////////////////////////// Context ///////////////////////////////////////////////////
 
-template <typename Functor, typename ObjectType>
-inline cl_int getStringInfo(Functor f, ObjectType obj, cl_uint name, std::string& param)
+మూస <రకం_పేరు Functor, రకం_పేరు ObjectType>
+అంతఃవరుస cl_int getStringInfo(Functor f, ObjectType obj, cl_uint name, std::string& param)
 {
     ::size_t required;
-    cl_int err = f(obj, name, 0, NULL, &required);
-    if (err != CL_SUCCESS)
-        return err;
+    cl_int err = f(obj, name, 0, ఖాళీ, &required);
+    ఒకవేళ (err != CL_SUCCESS)
+        తిరిగి err;
 
     param.clear();
-    if (required > 0)
+    ఒకవేళ (required > 0)
     {
-        AutoBuffer<char> buf(required + 1);
-        char* ptr = buf.data(); // cleanup is not needed
-        err = f(obj, name, required, ptr, NULL);
-        if (err != CL_SUCCESS)
-            return err;
+        Auto_బఫరు<అక్షరం> buf(required + 1);
+        అక్షరం* ptr = buf.దత్తాంశం(); // cleanup is not needed
+        err = f(obj, name, required, ptr, ఖాళీ);
+        ఒకవేళ (err != CL_SUCCESS)
+            తిరిగి err;
         param = ptr;
     }
 
-    return CL_SUCCESS;
+    తిరిగి CL_SUCCESS;
 }
 
-static void split(const std::string &s, char delim, std::vector<std::string> &elems)
+స్థిర శూన్య విభజించు(స్థిరరాశి std::string &s, అక్షరం delim, std::vector<std::string> &elems)
 {
     elems.clear();
-    if (s.size() == 0)
-        return;
+    ఒకవేళ (s.size() == 0)
+        తిరిగి;
     std::istringstream ss(s);
-    std::string item;
-    while (!ss.eof())
+    std::string అంశం;
+    అయితే (!ss.eof())
     {
-        std::getline(ss, item, delim);
-        elems.push_back(item);
+        std::getline(ss, అంశం, delim);
+        elems.push_back(అంశం);
     }
 }
 
@@ -2096,314 +2096,314 @@ static void split(const std::string &s, char delim, std::vector<std::string> &el
 // Sample: AMD:GPU:
 // Sample: AMD:GPU:Tahiti
 // Sample: :GPU|CPU: = '' = ':' = '::'
-static bool parseOpenCLDeviceConfiguration(const std::string& configurationStr,
+స్థిర తార్కిక parseOpenCLDeviceConfiguration(స్థిరరాశి std::string& configurationStr,
         std::string& platform, std::vector<std::string>& deviceTypes, std::string& deviceNameOrID)
 {
     std::vector<std::string> parts;
-    split(configurationStr, ':', parts);
-    if (parts.size() > 3)
+    విభజించు(configurationStr, ':', parts);
+    ఒకవేళ (parts.size() > 3)
     {
-        CV_LOG_ERROR(NULL, "OpenCL: Invalid configuration string for OpenCL device: " << configurationStr);
-        return false;
+        CV_LOG_ERROR(ఖాళీ, "OpenCL: Invalid configuration string for OpenCL device: " << configurationStr);
+        తిరిగి అబద్ధం;
     }
-    if (parts.size() > 2)
+    ఒకవేళ (parts.size() > 2)
         deviceNameOrID = parts[2];
-    if (parts.size() > 1)
+    ఒకవేళ (parts.size() > 1)
     {
-        split(parts[1], '|', deviceTypes);
+        విభజించు(parts[1], '|', deviceTypes);
     }
-    if (parts.size() > 0)
+    ఒకవేళ (parts.size() > 0)
     {
         platform = parts[0];
     }
-    return true;
+    తిరిగి నిజం;
 }
 
-static cl_device_id selectOpenCLDevice(const std::string & configuration_ = std::string())
+స్థిర cl_device_id selectOpenCLDevice(స్థిరరాశి std::string & configuration_ = std::string())
 {
     std::string platform, deviceName;
     std::vector<std::string> deviceTypes;
 
     std::string configuration(configuration_);
-    if (configuration.empty())
+    ఒకవేళ (configuration.empty())
         configuration = utils::getConfigurationParameterString("OPENCV_OPENCL_DEVICE");
 
-    if (!configuration.empty() &&
+    ఒకవేళ (!configuration.empty() &&
             (configuration == "disabled" ||
              !parseOpenCLDeviceConfiguration(configuration, platform, deviceTypes, deviceName)
             ))
-        return NULL;
+        తిరిగి ఖాళీ;
 
-    bool isID = false;
-    int deviceID = -1;
-    if (deviceName.length() == 1)
+    తార్కిక isID = అబద్ధం;
+    పూర్ణాంకం deviceID = -1;
+    ఒకవేళ (deviceName.length() == 1)
     // We limit ID range to 0..9, because we want to write:
     // - '2500' to mean i5-2500
     // - '8350' to mean AMD FX-8350
     // - '650' to mean GeForce 650
     // To extend ID range change condition to '> 0'
     {
-        isID = true;
-        for (size_t i = 0; i < deviceName.length(); i++)
+        isID = నిజం;
+        కొరకు (size_t i = 0; i < deviceName.length(); i++)
         {
-            if (!isdigit(deviceName[i]))
+            ఒకవేళ (!అంకెనా(deviceName[i]))
             {
-                isID = false;
-                break;
+                isID = అబద్ధం;
+                ఆపు;
             }
         }
-        if (isID)
+        ఒకవేళ (isID)
         {
             deviceID = atoi(deviceName.c_str());
-            if (deviceID < 0)
-                return NULL;
+            ఒకవేళ (deviceID < 0)
+                తిరిగి ఖాళీ;
         }
     }
 
     std::vector<cl_platform_id> platforms;
     {
-        cl_uint numPlatforms = 0;
-        CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &numPlatforms));
+        cl_uint అంకె_Platforms = 0;
+        CV_OCL_DBG_CHECK(clGetPlatformIDs(0, ఖాళీ, &అంకె_Platforms));
 
-        if (numPlatforms == 0)
-            return NULL;
-        platforms.resize((size_t)numPlatforms);
-        CV_OCL_DBG_CHECK(clGetPlatformIDs(numPlatforms, &platforms[0], &numPlatforms));
-        platforms.resize(numPlatforms);
+        ఒకవేళ (అంకె_Platforms == 0)
+            తిరిగి ఖాళీ;
+        platforms.resize((size_t)అంకె_Platforms);
+        CV_OCL_DBG_CHECK(clGetPlatformIDs(అంకె_Platforms, &platforms[0], &అంకె_Platforms));
+        platforms.resize(అంకె_Platforms);
     }
 
-    if (platform.length() > 0)
+    ఒకవేళ (platform.length() > 0)
     {
-        for (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end();)
+        కొరకు (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end();)
         {
             std::string name;
             CV_OCL_DBG_CHECK(getStringInfo(clGetPlatformInfo, *currentPlatform, CL_PLATFORM_NAME, name));
-            if (name.find(platform) != std::string::npos)
+            ఒకవేళ (name.find(platform) != std::string::npos)
             {
                 ++currentPlatform;
             }
-            else
+            లేకపోతే
             {
                 currentPlatform = platforms.erase(currentPlatform);
             }
         }
-        if (platforms.size() == 0)
+        ఒకవేళ (platforms.size() == 0)
         {
-            CV_LOG_ERROR(NULL, "OpenCL: Can't find OpenCL platform by name: " << platform);
-            goto not_found;
+            CV_LOG_ERROR(ఖాళీ, "OpenCL: Can't find OpenCL platform by name: " << platform);
+            వెళ్ళు not_దొరికింది;
         }
     }
-    if (deviceTypes.size() == 0)
+    ఒకవేళ (deviceTypes.size() == 0)
     {
-        if (!isID)
+        ఒకవేళ (!isID)
         {
             deviceTypes.push_back("GPU");
-            if (!configuration.empty())
+            ఒకవేళ (!configuration.empty())
                 deviceTypes.push_back("CPU");
         }
-        else
+        లేకపోతే
             deviceTypes.push_back("ALL");
     }
-    for (size_t t = 0; t < deviceTypes.size(); t++)
+    కొరకు (size_t t = 0; t < deviceTypes.size(); t++)
     {
-        int deviceType = 0;
-        std::string tempStrDeviceType = deviceTypes[t];
-        std::transform(tempStrDeviceType.begin(), tempStrDeviceType.end(), tempStrDeviceType.begin(), details::char_tolower);
+        పూర్ణాంకం deviceType = 0;
+        std::string తాత్కాలిక_Str_Device_Type = deviceTypes[t];
+        std::transform(తాత్కాలిక_Str_Device_Type.begin(), తాత్కాలిక_Str_Device_Type.end(), తాత్కాలిక_Str_Device_Type.begin(), details::char_tolower);
 
-        if (tempStrDeviceType == "gpu" || tempStrDeviceType == "dgpu" || tempStrDeviceType == "igpu")
+        ఒకవేళ (తాత్కాలిక_Str_Device_Type == "gpu" || తాత్కాలిక_Str_Device_Type == "dgpu" || తాత్కాలిక_Str_Device_Type == "igpu")
             deviceType = Device::TYPE_GPU;
-        else if (tempStrDeviceType == "cpu")
+        లేకపోతే ఒకవేళ (తాత్కాలిక_Str_Device_Type == "cpu")
             deviceType = Device::TYPE_CPU;
-        else if (tempStrDeviceType == "accelerator")
+        లేకపోతే ఒకవేళ (తాత్కాలిక_Str_Device_Type == "accelerator")
             deviceType = Device::TYPE_ACCELERATOR;
-        else if (tempStrDeviceType == "all")
+        లేకపోతే ఒకవేళ (తాత్కాలిక_Str_Device_Type == "all")
             deviceType = Device::TYPE_ALL;
-        else
+        లేకపోతే
         {
-            CV_LOG_ERROR(NULL, "OpenCL: Unsupported device type for OpenCL device (GPU, CPU, ACCELERATOR): " << deviceTypes[t]);
-            goto not_found;
+            CV_LOG_ERROR(ఖాళీ, "OpenCL: Unsupported device type for OpenCL device (GPU, CPU, ACCELERATOR): " << deviceTypes[t]);
+            వెళ్ళు not_దొరికింది;
         }
 
         std::vector<cl_device_id> devices;
-        for (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end(); ++currentPlatform)
+        కొరకు (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end(); ++currentPlatform)
         {
-            cl_uint count = 0;
-            cl_int status = clGetDeviceIDs(*currentPlatform, deviceType, 0, NULL, &count);
-            if (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
+            cl_uint లెక్క_2 = 0;
+            cl_int స్థితి_2 = clGetDeviceIDs(*currentPlatform, deviceType, 0, ఖాళీ, &లెక్క_2);
+            ఒకవేళ (!(స్థితి_2 == CL_SUCCESS || స్థితి_2 == CL_DEVICE_NOT_దొరికింది))
             {
-                CV_OCL_DBG_CHECK_RESULT(status, "clGetDeviceIDs get count");
+                CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, "clGetDeviceIDs get count");
             }
-            if (count == 0)
-                continue;
-            size_t base = devices.size();
-            devices.resize(base + count);
-            status = clGetDeviceIDs(*currentPlatform, deviceType, count, &devices[base], &count);
-            if (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
+            ఒకవేళ (లెక్క_2 == 0)
+                కొనసాగు;
+            size_t పునాది = devices.size();
+            devices.resize(పునాది + లెక్క_2);
+            స్థితి_2 = clGetDeviceIDs(*currentPlatform, deviceType, లెక్క_2, &devices[పునాది], &లెక్క_2);
+            ఒకవేళ (!(స్థితి_2 == CL_SUCCESS || స్థితి_2 == CL_DEVICE_NOT_దొరికింది))
             {
-                CV_OCL_DBG_CHECK_RESULT(status, "clGetDeviceIDs get IDs");
+                CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, "clGetDeviceIDs get IDs");
             }
         }
 
-        for (size_t i = (isID ? deviceID : 0);
-             (isID ? (i == (size_t)deviceID) : true) && (i < devices.size());
+        కొరకు (size_t i = (isID ? deviceID : 0);
+             (isID ? (i == (size_t)deviceID) : నిజం) && (i < devices.size());
              i++)
         {
             std::string name;
             CV_OCL_DBG_CHECK(getStringInfo(clGetDeviceInfo, devices[i], CL_DEVICE_NAME, name));
-            cl_bool useGPU = true;
-            if(tempStrDeviceType == "dgpu" || tempStrDeviceType == "igpu")
+            cl_bool useGPU = నిజం;
+            ఒకవేళ(తాత్కాలిక_Str_Device_Type == "dgpu" || తాత్కాలిక_Str_Device_Type == "igpu")
             {
                 cl_bool isIGPU = CL_FALSE;
-                CV_OCL_DBG_CHECK(clGetDeviceInfo(devices[i], CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(isIGPU), &isIGPU, NULL));
-                useGPU = tempStrDeviceType == "dgpu" ? !isIGPU : isIGPU;
+                CV_OCL_DBG_CHECK(clGetDeviceInfo(devices[i], CL_DEVICE_HOST_UNIFIED_జ్ఞాపకం, పరిమాణం(isIGPU), &isIGPU, ఖాళీ));
+                useGPU = తాత్కాలిక_Str_Device_Type == "dgpu" ? !isIGPU : isIGPU;
             }
-            if ( (isID || name.find(deviceName) != std::string::npos) && useGPU)
+            ఒకవేళ ( (isID || name.find(deviceName) != std::string::npos) && useGPU)
             {
                 // TODO check for OpenCL 1.1
-                return devices[i];
+                తిరిగి devices[i];
             }
         }
     }
 
-not_found:
-    if (configuration.empty())
-        return NULL; // suppress messages on stderr
+not_దొరికింది:
+    ఒకవేళ (configuration.empty())
+        తిరిగి ఖాళీ; // suppress messages on stderr
 
-    std::ostringstream msg;
-    msg << "ERROR: Requested OpenCL device not found, check configuration: '" << configuration << "'" << std::endl
-        << "    Platform: " << (platform.length() == 0 ? "any" : platform) << std::endl
+    std::ostringstream సందేశం;
+    సందేశం << "ERROR: Requested OpenCL device not found, check configuration: '" << configuration << "'" << std::పంక్తి_ముగింపు
+        << "    Platform: " << (platform.length() == 0 ? "any" : platform) << std::పంక్తి_ముగింపు
         << "    Device types:";
-    for (size_t t = 0; t < deviceTypes.size(); t++)
-        msg << ' ' << deviceTypes[t];
+    కొరకు (size_t t = 0; t < deviceTypes.size(); t++)
+        సందేశం << ' ' << deviceTypes[t];
 
-    msg << std::endl << "    Device name: " << (deviceName.length() == 0 ? "any" : deviceName);
+    సందేశం << std::పంక్తి_ముగింపు << "    Device name: " << (deviceName.length() == 0 ? "any" : deviceName);
 
-    CV_LOG_ERROR(NULL, msg.str());
-    return NULL;
+    CV_LOG_ERROR(ఖాళీ, సందేశం.str());
+    తిరిగి ఖాళీ;
 }
 
-#ifdef HAVE_OPENCL_SVM
-namespace svm {
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+నామాకాశ svm {
 
-enum AllocatorFlags { // don't use first 16 bits
-        OPENCL_SVM_COARSE_GRAIN_BUFFER = 1 << 16, // clSVMAlloc + SVM map/unmap
-        OPENCL_SVM_FINE_GRAIN_BUFFER = 2 << 16, // clSVMAlloc
+గణన AllocatorFlags { // don't use first 16 bits
+        OPENCL_SVM_COARSE_GRAIN_బఫరు = 1 << 16, // clSVMAlloc + SVM map/unmap
+        OPENCL_SVM_FINE_GRAIN_బఫరు = 2 << 16, // clSVMAlloc
         OPENCL_SVM_FINE_GRAIN_SYSTEM = 3 << 16, // direct access
-        OPENCL_SVM_BUFFER_MASK = 3 << 16,
-        OPENCL_SVM_BUFFER_MAP = 4 << 16
+        OPENCL_SVM_బఫరు_ముసుగు = 3 << 16,
+        OPENCL_SVM_బఫరు_MAP = 4 << 16
 };
 
-static bool checkForceSVMUmatUsage()
+స్థిర తార్కిక checkForceSVMUmatUsage()
 {
-    static bool initialized = false;
-    static bool force = false;
-    if (!initialized)
+    స్థిర తార్కిక initialized = అబద్ధం;
+    స్థిర తార్కిక force = అబద్ధం;
+    ఒకవేళ (!initialized)
     {
-        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_FORCE_UMAT_USAGE", false);
-        initialized = true;
+        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_FORCE_UMAT_USAGE", అబద్ధం);
+        initialized = నిజం;
     }
-    return force;
+    తిరిగి force;
 }
-static bool checkDisableSVMUMatUsage()
+స్థిర తార్కిక checkDisableSVMUMatUsage()
 {
-    static bool initialized = false;
-    static bool force = false;
-    if (!initialized)
+    స్థిర తార్కిక initialized = అబద్ధం;
+    స్థిర తార్కిక force = అబద్ధం;
+    ఒకవేళ (!initialized)
     {
-        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE_UMAT_USAGE", false);
-        initialized = true;
+        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE_UMAT_USAGE", అబద్ధం);
+        initialized = నిజం;
     }
-    return force;
+    తిరిగి force;
 }
-static bool checkDisableSVM()
+స్థిర తార్కిక checkDisableSVM()
 {
-    static bool initialized = false;
-    static bool force = false;
-    if (!initialized)
+    స్థిర తార్కిక initialized = అబద్ధం;
+    స్థిర తార్కిక force = అబద్ధం;
+    ఒకవేళ (!initialized)
     {
-        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE", false);
-        initialized = true;
+        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE", అబద్ధం);
+        initialized = నిజం;
     }
-    return force;
+    తిరిగి force;
 }
 // see SVMCapabilities
-static unsigned int getSVMCapabilitiesMask()
+స్థిర గుర్తులేని పూర్ణాంకం get_SVMCapabilities_ముసుగు()
 {
-    static bool initialized = false;
-    static unsigned int mask = 0;
-    if (!initialized)
+    స్థిర తార్కిక initialized = అబద్ధం;
+    స్థిర గుర్తులేని పూర్ణాంకం ముసుగు = 0;
+    ఒకవేళ (!initialized)
     {
-        const std::string envValue = utils::getConfigurationParameterString("OPENCV_OPENCL_SVM_CAPABILITIES_MASK");
-        if (envValue.empty())
+        స్థిరరాశి std::string env_విలువ = utils::getConfigurationParameterString("OPENCV_OPENCL_SVM_CAPABILITIES_MASK");
+        ఒకవేళ (env_విలువ.empty())
         {
-            return ~0U; // all bits 1
+            తిరిగి ~0U; // all bits 1
         }
-        mask = atoi(envValue.c_str());
-        initialized = true;
+        ముసుగు = atoi(env_విలువ.c_str());
+        initialized = నిజం;
     }
-    return mask;
+    తిరిగి ముసుగు;
 }
 } // namespace
-#endif
+#అయితే_ముగింపు
 
-static size_t getProgramCountLimit()
+స్థిర size_t get_కార్యక్రమం_లెక్క_హద్దు()
 {
-    static bool initialized = false;
-    static size_t count = 0;
-    if (!initialized)
+    స్థిర తార్కిక initialized = అబద్ధం;
+    స్థిర size_t లెక్క_2 = 0;
+    ఒకవేళ (!initialized)
     {
-        count = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_PROGRAM_CACHE", 0);
-        initialized = true;
+        లెక్క_2 = utils::get_Configuration_Parameter_కొలత_T("OPENCV_OPENCL_PROGRAM_CACHE", 0);
+        initialized = నిజం;
     }
-    return count;
+    తిరిగి లెక్క_2;
 }
 
-static int g_contextId = 0;
+స్థిర పూర్ణాంకం g_contextId = 0;
 
-class OpenCLBufferPoolImpl;
-class OpenCLSVMBufferPoolImpl;
+తరగతి OpenCLBufferPoolImpl;
+తరగతి OpenCLSVMBufferPoolImpl;
 
-struct Context::Impl
+నిర్మాణం Context::Impl
 {
-    static Context::Impl* get(Context& context) { return context.getImpl(); }
+    స్థిర Context::Impl* get(Context& context) { తిరిగి context.getImpl(); }
 
-    typedef std::deque<Context::Impl*> container_t;
-    static container_t& getGlobalContainer()
+    రకనిర్వచనం std::deque<Context::Impl*> container_t;
+    స్థిర container_t& getGlobalContainer()
     {
         // never delete this container (Impl lifetime is greater due to TLS storage)
-        static container_t* g_contexts = new container_t();
-        return *g_contexts;
+        స్థిర container_t* g_contexts = కొత్త container_t();
+        తిరిగి *g_contexts;
     }
 
-protected:
-    Impl(const std::string& configuration_)
+రక్షిత:
+    Impl(స్థిరరాశి std::string& configuration_)
         : refcount(1)
         , contextId(CV_XADD(&g_contextId, 1))
         , configuration(configuration_)
         , handle(0)
-#ifdef HAVE_OPENCL_SVM
-        , svmInitialized(false)
-#endif
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        , svmInitialized(అబద్ధం)
+#అయితే_ముగింపు
     {
-        if (!haveOpenCL())
+        ఒకవేళ (!haveOpenCL())
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
-        cv::AutoLock lock(cv::getInitializationMutex());
-        auto& container = getGlobalContainer();
+        cv::Auto_తాళం lock(cv::getInitializationMutex());
+        స్వయంచాలక& container = getGlobalContainer();
         container.resize(std::max(container.size(), (size_t)contextId + 1));
-        container[contextId] = this;
+        container[contextId] = ఇది;
     }
 
     ~Impl()
     {
-#ifdef _WIN32
-        if (!cv::__termination)
-#endif
+#నిర్వచితమైతే _WIN32
+        ఒకవేళ (!cv::__termination)
+#అయితే_ముగింపు
         {
-            if (handle)
+            ఒకవేళ (handle)
             {
                 CV_OCL_DBG_CHECK(clReleaseContext(handle));
-                handle = NULL;
+                handle = ఖాళీ;
             }
             devices.clear();
         }
@@ -2411,133 +2411,133 @@ protected:
         userContextStorage.clear();
 
         {
-            cv::AutoLock lock(cv::getInitializationMutex());
-            auto& container = getGlobalContainer();
+            cv::Auto_తాళం lock(cv::getInitializationMutex());
+            స్వయంచాలక& container = getGlobalContainer();
             CV_CheckLT((size_t)contextId, container.size(), "");
-            container[contextId] = NULL;
+            container[contextId] = ఖాళీ;
         }
     }
 
-    void init_device_list()
+    శూన్య init_device_list()
     {
         CV_Assert(handle);
 
         cl_uint ndevices = 0;
-        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_NUM_DEVICES, sizeof(ndevices), &ndevices, NULL));
+        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_అంకె_DEVICES, పరిమాణం(ndevices), &ndevices, ఖాళీ));
         CV_Assert(ndevices > 0);
 
-        cv::AutoBuffer<cl_device_id> cl_devices(ndevices);
-        size_t devices_ret_size = 0;
-        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_DEVICES, cl_devices.size() * sizeof(cl_device_id), &cl_devices[0], &devices_ret_size));
-        CV_CheckEQ(devices_ret_size, cl_devices.size() * sizeof(cl_device_id), "");
+        cv::Auto_బఫరు<cl_device_id> cl_devices(ndevices);
+        size_t devices_ret_కొలత = 0;
+        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_DEVICES, cl_devices.size() * పరిమాణం(cl_device_id), &cl_devices[0], &devices_ret_కొలత));
+        CV_CheckEQ(devices_ret_కొలత, cl_devices.size() * పరిమాణం(cl_device_id), "");
 
         devices.clear();
-        for (unsigned i = 0; i < ndevices; i++)
+        కొరకు (గుర్తులేని i = 0; i < ndevices; i++)
         {
             devices.emplace_back(Device::fromHandle(cl_devices[i]));
         }
     }
 
-    void __init_buffer_pools();  // w/o synchronization
-    void _init_buffer_pools() const
+    శూన్య __init_buffer_pools();  // w/o synchronization
+    శూన్య init_బఫరు_pools() స్థిరరాశి
     {
-        if (!bufferPool_)
+        ఒకవేళ (!బఫరు_Pool_2)
         {
-            cv::AutoLock lock(cv::getInitializationMutex());
-            if (!bufferPool_)
+            cv::Auto_తాళం lock(cv::getInitializationMutex());
+            ఒకవేళ (!బఫరు_Pool_2)
             {
-                const_cast<Impl*>(this)->__init_buffer_pools();
+                const_cast<Impl*>(ఇది)->__init_buffer_pools();
             }
         }
     }
-public:
-    static Impl* findContext(const std::string& configuration)
+బహిరంగ:
+    స్థిర Impl* కనుగొను_Context(స్థిరరాశి std::string& configuration)
     {
         CV_TRACE_FUNCTION();
-        cv::AutoLock lock(cv::getInitializationMutex());
-        auto& container = getGlobalContainer();
-        if (configuration.empty() && !container.empty())
-            return container[0];
-        for (auto it = container.begin(); it != container.end(); ++it)
+        cv::Auto_తాళం lock(cv::getInitializationMutex());
+        స్వయంచాలక& container = getGlobalContainer();
+        ఒకవేళ (configuration.empty() && !container.empty())
+            తిరిగి container[0];
+        కొరకు (స్వయంచాలక it = container.begin(); it != container.end(); ++it)
         {
             Impl* i = *it;
-            if (i && i->configuration == configuration)
+            ఒకవేళ (i && i->configuration == configuration)
             {
-                return i;
+                తిరిగి i;
             }
         }
-        return NULL;
+        తిరిగి ఖాళీ;
     }
 
-    static Impl* findOrCreateContext(const std::string& configuration_)
+    స్థిర Impl* కనుగొను_Or_Create_Context(స్థిరరాశి std::string& configuration_)
     {
         CV_TRACE_FUNCTION();
         std::string configuration = configuration_;
-        if (configuration_.empty())
+        ఒకవేళ (configuration_.empty())
         {
-            const std::string c = utils::getConfigurationParameterString("OPENCV_OPENCL_DEVICE");
-            if (!c.empty())
+            స్థిరరాశి std::string c = utils::getConfigurationParameterString("OPENCV_OPENCL_DEVICE");
+            ఒకవేళ (!c.empty())
                 configuration = c;
         }
-        Impl* impl = findContext(configuration);
-        if (impl)
+        Impl* impl = కనుగొను_Context(configuration);
+        ఒకవేళ (impl)
         {
-            CV_LOG_INFO(NULL, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
+            CV_LOG_INFO(ఖాళీ, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
             impl->addref();
-            return impl;
+            తిరిగి impl;
         }
 
         cl_device_id d = selectOpenCLDevice(configuration);
-        if (d == NULL)
-            return NULL;
+        ఒకవేళ (d == ఖాళీ)
+            తిరిగి ఖాళీ;
 
-        impl = new Impl(configuration);
-        try
+        impl = కొత్త Impl(configuration);
+        ప్రయత్నించు
         {
             impl->createFromDevice(d);
-            if (impl->handle)
-                return impl;
-            delete impl;
-            return NULL;
+            ఒకవేళ (impl->handle)
+                తిరిగి impl;
+            తొలగించు impl;
+            తిరిగి ఖాళీ;
         }
-        catch (...)
+        పట్టుకో (...)
         {
-            delete impl;
-            throw;
+            తొలగించు impl;
+            విసురు;
         }
     }
 
-    static Impl* findOrCreateContext(cl_context h)
+    స్థిర Impl* కనుగొను_Or_Create_Context(cl_context h)
     {
         CV_TRACE_FUNCTION();
 
         CV_Assert(h);
 
-        std::string configuration = cv::format("@ctx-%p", (void*)h);
-        Impl* impl = findContext(configuration);
-        if (impl)
+        std::string configuration = cv::format("@ctx-%p", (శూన్య*)h);
+        Impl* impl = కనుగొను_Context(configuration);
+        ఒకవేళ (impl)
         {
-            CV_LOG_INFO(NULL, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
+            CV_LOG_INFO(ఖాళీ, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
             impl->addref();
-            return impl;
+            తిరిగి impl;
         }
 
-        impl = new Impl(configuration);
-        try
+        impl = కొత్త Impl(configuration);
+        ప్రయత్నించు
         {
             CV_OCL_CHECK(clRetainContext(h));
             impl->handle = h;
             impl->init_device_list();
-            return impl;
+            తిరిగి impl;
         }
-        catch (...)
+        పట్టుకో (...)
         {
-            delete impl;
-            throw;
+            తొలగించు impl;
+            విసురు;
         }
     }
 
-    static Impl* findOrCreateContext(const ocl::Device& device)
+    స్థిర Impl* కనుగొను_Or_Create_Context(స్థిరరాశి ocl::Device& device)
     {
         CV_TRACE_FUNCTION();
 
@@ -2545,47 +2545,47 @@ public:
         cl_device_id d = (cl_device_id)device.ptr();
         CV_Assert(d);
 
-        std::string configuration = cv::format("@dev-%p", (void*)d);
-        Impl* impl = findContext(configuration);
-        if (impl)
+        std::string configuration = cv::format("@dev-%p", (శూన్య*)d);
+        Impl* impl = కనుగొను_Context(configuration);
+        ఒకవేళ (impl)
         {
-            CV_LOG_INFO(NULL, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
+            CV_LOG_INFO(ఖాళీ, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
             impl->addref();
-            return impl;
+            తిరిగి impl;
         }
 
-        impl = new Impl(configuration);
-        try
+        impl = కొత్త Impl(configuration);
+        ప్రయత్నించు
         {
             impl->createFromDevice(d);
             CV_Assert(impl->handle);
-            return impl;
+            తిరిగి impl;
         }
-        catch (...)
+        పట్టుకో (...)
         {
-            delete impl;
-            throw;
+            తొలగించు impl;
+            విసురు;
         }
     }
 
-    void setDefault()
+    శూన్య సమితి_Default()
     {
         CV_TRACE_FUNCTION();
         cl_device_id d = selectOpenCLDevice();
 
-        if (d == NULL)
-            return;
+        ఒకవేళ (d == ఖాళీ)
+            తిరిగి;
 
         createFromDevice(d);
     }
 
-    void createFromDevice(cl_device_id d)
+    శూన్య createFromDevice(cl_device_id d)
     {
         CV_TRACE_FUNCTION();
-        CV_Assert(handle == NULL);
+        CV_Assert(handle == ఖాళీ);
 
-        cl_platform_id pl = NULL;
-        CV_OCL_DBG_CHECK(clGetDeviceInfo(d, CL_DEVICE_PLATFORM, sizeof(cl_platform_id), &pl, NULL));
+        cl_platform_id pl = ఖాళీ;
+        CV_OCL_DBG_CHECK(clGetDeviceInfo(d, CL_DEVICE_PLATFORM, పరిమాణం(cl_platform_id), &pl, ఖాళీ));
 
         cl_context_properties prop[] =
         {
@@ -2595,288 +2595,288 @@ public:
 
         // !!! in the current implementation force the number of devices to 1 !!!
         cl_uint nd = 1;
-        cl_int status;
+        cl_int స్థితి_2;
 
-        handle = clCreateContext(prop, nd, &d, 0, 0, &status);
-        CV_OCL_DBG_CHECK_RESULT(status, "clCreateContext");
+        handle = clCreateContext(prop, nd, &d, 0, 0, &స్థితి_2);
+        CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, "clCreateContext");
 
-        bool ok = handle != 0 && status == CL_SUCCESS;
-        if( ok )
+        తార్కిక ok = handle != 0 && స్థితి_2 == CL_SUCCESS;
+        ఒకవేళ( ok )
         {
             devices.resize(nd);
-            devices[0].set(d);
+            devices[0].సమితి(d);
         }
-        else
-            handle = NULL;
+        లేకపోతే
+            handle = ఖాళీ;
     }
 
-    Program getProg(const ProgramSource& src, const String& buildflags, String& errmsg);
+    కార్యక్రమం_2 getProg(స్థిరరాశి కార్యక్రమం_ఆధారం& src, స్థిరరాశి String& buildflags, String& errmsg);
 
-    void unloadProg(Program& prog)
+    శూన్య unloadProg(కార్యక్రమం_2& prog)
     {
-        cv::AutoLock lock(program_cache_mutex);
-        for (CacheList::iterator i = cacheList.begin(); i != cacheList.end(); ++i)
+        cv::Auto_తాళం lock(కార్యక్రమం_cache_mutex);
+        కొరకు (CacheList::iterator i = cacheList.begin(); i != cacheList.end(); ++i)
         {
               phash_t::iterator it = phash.find(*i);
-              if (it != phash.end())
+              ఒకవేళ (it != phash.end())
               {
-                  if (it->second.ptr() == prog.ptr())
+                  ఒకవేళ (it->second.ptr() == prog.ptr())
                   {
                       phash.erase(*i);
                       cacheList.erase(i);
-                      return;
+                      తిరిగి;
                   }
               }
         }
     }
 
-    std::string& getPrefixString()
+    std::string& get_ఉపసర్గ_String()
     {
-        if (prefix.empty())
+        ఒకవేళ (ఉపసర్గ.empty())
         {
-            cv::AutoLock lock(program_cache_mutex);
-            if (prefix.empty())
+            cv::Auto_తాళం lock(కార్యక్రమం_cache_mutex);
+            ఒకవేళ (ఉపసర్గ.empty())
             {
                 CV_Assert(!devices.empty());
-                const Device& d = devices[0];
-                int bits = d.addressBits();
-                if (bits > 0 && bits != 64)
-                    prefix = cv::format("%d-bit--", bits);
-                prefix += d.vendorName() + "--" + d.name() + "--" + d.driverVersion();
+                స్థిరరాశి Device& d = devices[0];
+                పూర్ణాంకం బిట్లు_2 = d.చిరునామా_బిట్లు();
+                ఒకవేళ (బిట్లు_2 > 0 && బిట్లు_2 != 64)
+                    ఉపసర్గ = cv::format("%d-bit--", బిట్లు_2);
+                ఉపసర్గ += d.vendorName() + "--" + d.name() + "--" + d.driver_సంస్కరణ();
                 // sanitize chars
-                for (size_t i = 0; i < prefix.size(); i++)
+                కొరకు (size_t i = 0; i < ఉపసర్గ.size(); i++)
                 {
-                    char c = prefix[i];
-                    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
+                    అక్షరం c = ఉపసర్గ[i];
+                    ఒకవేళ (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
                     {
-                        prefix[i] = '_';
+                        ఉపసర్గ[i] = '_';
                     }
                 }
             }
         }
-        return prefix;
+        తిరిగి ఉపసర్గ;
     }
 
-    std::string& getPrefixBase()
+    std::string& get_ఉపసర్గ_పునాది()
     {
-        if (prefix_base.empty())
+        ఒకవేళ (ఉపసర్గ_పునాది.empty())
         {
-            cv::AutoLock lock(program_cache_mutex);
-            if (prefix_base.empty())
+            cv::Auto_తాళం lock(కార్యక్రమం_cache_mutex);
+            ఒకవేళ (ఉపసర్గ_పునాది.empty())
             {
-                const Device& d = devices[0];
-                int bits = d.addressBits();
-                if (bits > 0 && bits != 64)
-                    prefix_base = cv::format("%d-bit--", bits);
-                prefix_base += d.vendorName() + "--" + d.name() + "--";
+                స్థిరరాశి Device& d = devices[0];
+                పూర్ణాంకం బిట్లు_2 = d.చిరునామా_బిట్లు();
+                ఒకవేళ (బిట్లు_2 > 0 && బిట్లు_2 != 64)
+                    ఉపసర్గ_పునాది = cv::format("%d-bit--", బిట్లు_2);
+                ఉపసర్గ_పునాది += d.vendorName() + "--" + d.name() + "--";
                 // sanitize chars
-                for (size_t i = 0; i < prefix_base.size(); i++)
+                కొరకు (size_t i = 0; i < ఉపసర్గ_పునాది.size(); i++)
                 {
-                    char c = prefix_base[i];
-                    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
+                    అక్షరం c = ఉపసర్గ_పునాది[i];
+                    ఒకవేళ (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
                     {
-                        prefix_base[i] = '_';
+                        ఉపసర్గ_పునాది[i] = '_';
                     }
                 }
             }
         }
-        return prefix_base;
+        తిరిగి ఉపసర్గ_పునాది;
     }
 
     IMPLEMENT_REFCOUNTABLE();
 
-    const int contextId;  // global unique ID
-    const std::string configuration;
+    స్థిరరాశి పూర్ణాంకం contextId;  // global unique ID
+    స్థిరరాశి std::string configuration;
 
     cl_context handle;
     std::vector<Device> devices;
 
-    std::string prefix;
-    std::string prefix_base;
+    std::string ఉపసర్గ;
+    std::string ఉపసర్గ_పునాది;
 
-    cv::Mutex program_cache_mutex;
-    typedef std::map<std::string, Program> phash_t;
+    cv::Mutex కార్యక్రమం_cache_mutex;
+    రకనిర్వచనం std::map<std::string, కార్యక్రమం_2> phash_t;
     phash_t phash;
-    typedef std::list<cv::String> CacheList;
+    రకనిర్వచనం std::list<cv::String> CacheList;
     CacheList cacheList;
 
-    std::shared_ptr<OpenCLBufferPoolImpl> bufferPool_;
-    std::shared_ptr<OpenCLBufferPoolImpl> bufferPoolHostPtr_;
-    OpenCLBufferPoolImpl& getBufferPool() const
+    std::shared_ptr<OpenCLBufferPoolImpl> బఫరు_Pool_2;
+    std::shared_ptr<OpenCLBufferPoolImpl> బఫరు_Pool_Host_Ptr;
+    OpenCLBufferPoolImpl& get_బఫరు_Pool() స్థిరరాశి
     {
-        _init_buffer_pools();
-        CV_DbgAssert(bufferPool_);
-        return *bufferPool_.get();
+        init_బఫరు_pools();
+        CV_DbgAssert(బఫరు_Pool_2);
+        తిరిగి *బఫరు_Pool_2.get();
     }
-    OpenCLBufferPoolImpl& getBufferPoolHostPtr() const
+    OpenCLBufferPoolImpl& get_బఫరు_Pool_Host_Ptr() స్థిరరాశి
     {
-        _init_buffer_pools();
-        CV_DbgAssert(bufferPoolHostPtr_);
-        return *bufferPoolHostPtr_.get();
+        init_బఫరు_pools();
+        CV_DbgAssert(బఫరు_Pool_Host_Ptr);
+        తిరిగి *బఫరు_Pool_Host_Ptr.get();
     }
 
-    std::map<std::type_index, std::shared_ptr<UserContext>> userContextStorage;
+    std::map<std::type_సూచీ, std::shared_ptr<UserContext>> userContextStorage;
     cv::Mutex userContextMutex;
-    void setUserContext(std::type_index typeId, const std::shared_ptr<UserContext>& userContext) {
-        cv::AutoLock lock(userContextMutex);
+    శూన్య సమితి_User_Context(std::type_సూచీ typeId, స్థిరరాశి std::shared_ptr<UserContext>& userContext) {
+        cv::Auto_తాళం lock(userContextMutex);
         userContextStorage[typeId] = userContext;
     }
-    std::shared_ptr<UserContext> getUserContext(std::type_index typeId) {
-        cv::AutoLock lock(userContextMutex);
-        auto it = userContextStorage.find(typeId);
-        if (it != userContextStorage.end())
-            return it->second;
-        else
-            return nullptr;
+    std::shared_ptr<UserContext> getUserContext(std::type_సూచీ typeId) {
+        cv::Auto_తాళం lock(userContextMutex);
+        స్వయంచాలక it = userContextStorage.find(typeId);
+        ఒకవేళ (it != userContextStorage.end())
+            తిరిగి it->second;
+        లేకపోతే
+            తిరిగి శూన్యసూచిక;
     }
 
-#ifdef HAVE_OPENCL_SVM
-    bool svmInitialized;
-    bool svmAvailable;
-    bool svmEnabled;
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+    తార్కిక svmInitialized;
+    తార్కిక svm_అందుబాటు;
+    తార్కిక svmEnabled;
     svm::SVMCapabilities svmCapabilities;
     svm::SVMFunctions svmFunctions;
 
-    void svmInit()
+    శూన్య svmInit()
     {
-        CV_Assert(handle != NULL);
-        const Device& device = devices[0];
+        CV_Assert(handle != ఖాళీ);
+        స్థిరరాశి Device& device = devices[0];
         cl_device_svm_capabilities deviceCaps = 0;
-        CV_Assert(((void)0, CL_DEVICE_SVM_CAPABILITIES == CL_DEVICE_SVM_CAPABILITIES_AMD)); // Check assumption
-        cl_int status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_SVM_CAPABILITIES, sizeof(deviceCaps), &deviceCaps, NULL);
-        if (status != CL_SUCCESS)
+        CV_Assert(((శూన్య)0, CL_DEVICE_SVM_CAPABILITIES == CL_DEVICE_SVM_CAPABILITIES_AMD)); // Check assumption
+        cl_int స్థితి_2 = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_SVM_CAPABILITIES, పరిమాణం(deviceCaps), &deviceCaps, ఖాళీ);
+        ఒకవేళ (స్థితి_2 != CL_SUCCESS)
         {
-            CV_OPENCL_SVM_TRACE_ERROR_P("CL_DEVICE_SVM_CAPABILITIES via clGetDeviceInfo failed: %d\n", status);
-            goto noSVM;
+            CV_OPENCL_SVM_TRACE_ERROR_P("CL_DEVICE_SVM_CAPABILITIES via clGetDeviceInfo failed: %d\n", స్థితి_2);
+            వెళ్ళు noSVM;
         }
-        CV_OPENCL_SVM_TRACE_P("CL_DEVICE_SVM_CAPABILITIES returned: 0x%x\n", (int)deviceCaps);
-        CV_Assert(((void)0, CL_DEVICE_SVM_COARSE_GRAIN_BUFFER == CL_DEVICE_SVM_COARSE_GRAIN_BUFFER_AMD)); // Check assumption
-        svmCapabilities.value_ =
-                ((deviceCaps & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER) ? svm::SVMCapabilities::SVM_COARSE_GRAIN_BUFFER : 0) |
-                ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_BUFFER) ? svm::SVMCapabilities::SVM_FINE_GRAIN_BUFFER : 0) |
+        CV_OPENCL_SVM_TRACE_P("CL_DEVICE_SVM_CAPABILITIES returned: 0x%x\n", (పూర్ణాంకం)deviceCaps);
+        CV_Assert(((శూన్య)0, CL_DEVICE_SVM_COARSE_GRAIN_బఫరు == CL_DEVICE_SVM_COARSE_GRAIN_బఫరు_AMD)); // Check assumption
+        svmCapabilities.విలువ_2 =
+                ((deviceCaps & CL_DEVICE_SVM_COARSE_GRAIN_బఫరు) ? svm::SVMCapabilities::SVM_COARSE_GRAIN_బఫరు : 0) |
+                ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_బఫరు) ? svm::SVMCapabilities::SVM_FINE_GRAIN_బఫరు : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_SYSTEM) ? svm::SVMCapabilities::SVM_FINE_GRAIN_SYSTEM : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_ATOMICS) ? svm::SVMCapabilities::SVM_ATOMICS : 0);
-        svmCapabilities.value_ &= svm::getSVMCapabilitiesMask();
-        if (svmCapabilities.value_ == 0)
+        svmCapabilities.విలువ_2 &= svm::get_SVMCapabilities_ముసుగు();
+        ఒకవేళ (svmCapabilities.విలువ_2 == 0)
         {
             CV_OPENCL_SVM_TRACE_ERROR_P("svmCapabilities is empty\n");
-            goto noSVM;
+            వెళ్ళు noSVM;
         }
-        try
+        ప్రయత్నించు
         {
             // Try OpenCL 2.0
             CV_OPENCL_SVM_TRACE_P("Try SVM from OpenCL 2.0 ...\n");
-            void* ptr = clSVMAlloc(handle, CL_MEM_READ_WRITE, 100, 0);
-            if (!ptr)
+            శూన్య* ptr = clSVMAlloc(handle, CL_MEM_READ_WRITE, 100, 0);
+            ఒకవేళ (!ptr)
             {
                 CV_OPENCL_SVM_TRACE_ERROR_P("clSVMAlloc returned NULL...\n");
                 CV_Error(Error::StsBadArg, "clSVMAlloc returned NULL");
             }
-            try
+            ప్రయత్నించు
             {
-                bool error = false;
-                cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-                if (CL_SUCCESS != clEnqueueSVMMap(q, CL_TRUE, CL_MAP_WRITE, ptr, 100, 0, NULL, NULL))
+                తార్కిక error = అబద్ధం;
+                cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
+                ఒకవేళ (CL_SUCCESS != cl_వరుసలో_చేర్చు_SVMMap(q, CL_TRUE, CL_MAP_WRITE, ptr, 100, 0, ఖాళీ, ఖాళీ))
                 {
                     CV_OPENCL_SVM_TRACE_ERROR_P("clEnqueueSVMMap failed...\n");
                     CV_Error(Error::StsBadArg, "clEnqueueSVMMap FAILED");
                 }
-                clFinish(q);
-                try
+                cl_ముగింపు(q);
+                ప్రయత్నించు
                 {
-                    ((int*)ptr)[0] = 100;
+                    ((పూర్ణాంకం*)ptr)[0] = 100;
                 }
-                catch (...)
+                పట్టుకో (...)
                 {
                     CV_OPENCL_SVM_TRACE_ERROR_P("SVM buffer access test FAILED\n");
-                    error = true;
+                    error = నిజం;
                 }
-                if (CL_SUCCESS != clEnqueueSVMUnmap(q, ptr, 0, NULL, NULL))
+                ఒకవేళ (CL_SUCCESS != cl_వరుసలో_చేర్చు_SVMUnmap(q, ptr, 0, ఖాళీ, ఖాళీ))
                 {
                     CV_OPENCL_SVM_TRACE_ERROR_P("clEnqueueSVMUnmap failed...\n");
                     CV_Error(Error::StsBadArg, "clEnqueueSVMUnmap FAILED");
                 }
-                clFinish(q);
-                if (error)
+                cl_ముగింపు(q);
+                ఒకవేళ (error)
                 {
                     CV_Error(Error::StsBadArg, "OpenCL SVM buffer access test was FAILED");
                 }
             }
-            catch (...)
+            పట్టుకో (...)
             {
                 CV_OPENCL_SVM_TRACE_ERROR_P("OpenCL SVM buffer access test was FAILED\n");
                 clSVMFree(handle, ptr);
-                throw;
+                విసురు;
             }
             clSVMFree(handle, ptr);
             svmFunctions.fn_clSVMAlloc = clSVMAlloc;
             svmFunctions.fn_clSVMFree = clSVMFree;
-            svmFunctions.fn_clSetKernelArgSVMPointer = clSetKernelArgSVMPointer;
+            svmFunctions.fn_cl_సమితి_Kernel_Arg_SVMPointer = cl_సమితి_Kernel_Arg_SVMPointer;
             //svmFunctions.fn_clSetKernelExecInfo = clSetKernelExecInfo;
             //svmFunctions.fn_clEnqueueSVMFree = clEnqueueSVMFree;
-            svmFunctions.fn_clEnqueueSVMMemcpy = clEnqueueSVMMemcpy;
-            svmFunctions.fn_clEnqueueSVMMemFill = clEnqueueSVMMemFill;
-            svmFunctions.fn_clEnqueueSVMMap = clEnqueueSVMMap;
-            svmFunctions.fn_clEnqueueSVMUnmap = clEnqueueSVMUnmap;
+            svmFunctions.fn_cl_వరుసలో_చేర్చు_SVMMemcpy = cl_వరుసలో_చేర్చు_SVMMemcpy;
+            svmFunctions.fn_cl_వరుసలో_చేర్చు_SVMMem_Fill = cl_వరుసలో_చేర్చు_SVMMem_Fill;
+            svmFunctions.fn_cl_వరుసలో_చేర్చు_SVMMap = cl_వరుసలో_చేర్చు_SVMMap;
+            svmFunctions.fn_cl_వరుసలో_చేర్చు_SVMUnmap = cl_వరుసలో_చేర్చు_SVMUnmap;
         }
-        catch (...)
+        పట్టుకో (...)
         {
             CV_OPENCL_SVM_TRACE_P("clSVMAlloc failed, trying HSA extension...\n");
-            try
+            ప్రయత్నించు
             {
                 // Try HSA extension
                 String extensions = device.extensions();
-                if (extensions.find("cl_amd_svm") == String::npos)
+                ఒకవేళ (extensions.find("cl_amd_svm") == String::npos)
                 {
                     CV_OPENCL_SVM_TRACE_P("Device extension doesn't have cl_amd_svm: %s\n", extensions.c_str());
-                    goto noSVM;
+                    వెళ్ళు noSVM;
                 }
-                cl_platform_id p = NULL;
-                CV_OCL_CHECK(status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_PLATFORM, sizeof(cl_platform_id), &p, NULL));
-                svmFunctions.fn_clSVMAlloc = (clSVMAllocAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSVMAllocAMD");
-                svmFunctions.fn_clSVMFree = (clSVMFreeAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSVMFreeAMD");
-                svmFunctions.fn_clSetKernelArgSVMPointer = (clSetKernelArgSVMPointerAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSetKernelArgSVMPointerAMD");
+                cl_platform_id p = ఖాళీ;
+                CV_OCL_CHECK(స్థితి_2 = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_PLATFORM, పరిమాణం(cl_platform_id), &p, ఖాళీ));
+                svmFunctions.fn_clSVMAlloc = (clSVMAllocAMD_fn)cl_Get_Extension_Function_చిరునామా_For_Platform(p, "clSVMAllocAMD");
+                svmFunctions.fn_clSVMFree = (clSVMFreeAMD_fn)cl_Get_Extension_Function_చిరునామా_For_Platform(p, "clSVMFreeAMD");
+                svmFunctions.fn_cl_సమితి_Kernel_Arg_SVMPointer = (cl_సమితి_Kernel_Arg_SVMPointer_AMD_fn)cl_Get_Extension_Function_చిరునామా_For_Platform(p, "clSetKernelArgSVMPointerAMD");
                 //svmFunctions.fn_clSetKernelExecInfo = (clSetKernelExecInfoAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSetKernelExecInfoAMD");
                 //svmFunctions.fn_clEnqueueSVMFree = (clEnqueueSVMFreeAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clEnqueueSVMFreeAMD");
-                svmFunctions.fn_clEnqueueSVMMemcpy = (clEnqueueSVMMemcpyAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clEnqueueSVMMemcpyAMD");
-                svmFunctions.fn_clEnqueueSVMMemFill = (clEnqueueSVMMemFillAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clEnqueueSVMMemFillAMD");
-                svmFunctions.fn_clEnqueueSVMMap = (clEnqueueSVMMapAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clEnqueueSVMMapAMD");
-                svmFunctions.fn_clEnqueueSVMUnmap = (clEnqueueSVMUnmapAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clEnqueueSVMUnmapAMD");
+                svmFunctions.fn_cl_వరుసలో_చేర్చు_SVMMemcpy = (cl_వరుసలో_చేర్చు_SVMMemcpy_AMD_fn)cl_Get_Extension_Function_చిరునామా_For_Platform(p, "clEnqueueSVMMemcpyAMD");
+                svmFunctions.fn_cl_వరుసలో_చేర్చు_SVMMem_Fill = (cl_వరుసలో_చేర్చు_SVMMem_Fill_AMD_fn)cl_Get_Extension_Function_చిరునామా_For_Platform(p, "clEnqueueSVMMemFillAMD");
+                svmFunctions.fn_cl_వరుసలో_చేర్చు_SVMMap = (cl_వరుసలో_చేర్చు_SVMMap_AMD_fn)cl_Get_Extension_Function_చిరునామా_For_Platform(p, "clEnqueueSVMMapAMD");
+                svmFunctions.fn_cl_వరుసలో_చేర్చు_SVMUnmap = (cl_వరుసలో_చేర్చు_SVMUnmap_AMD_fn)cl_Get_Extension_Function_చిరునామా_For_Platform(p, "clEnqueueSVMUnmapAMD");
                 CV_Assert(svmFunctions.isValid());
             }
-            catch (...)
+            పట్టుకో (...)
             {
                 CV_OPENCL_SVM_TRACE_P("Something is totally wrong\n");
-                goto noSVM;
+                వెళ్ళు noSVM;
             }
         }
 
-        svmAvailable = true;
+        svm_అందుబాటు = నిజం;
         svmEnabled = !svm::checkDisableSVM();
-        svmInitialized = true;
+        svmInitialized = నిజం;
         CV_OPENCL_SVM_TRACE_P("OpenCV OpenCL SVM support initialized\n");
-        return;
+        తిరిగి;
     noSVM:
         CV_OPENCL_SVM_TRACE_P("OpenCL SVM is not detected\n");
-        svmAvailable = false;
-        svmEnabled = false;
-        svmCapabilities.value_ = 0;
-        svmInitialized = true;
-        svmFunctions.fn_clSVMAlloc = NULL;
-        return;
+        svm_అందుబాటు = అబద్ధం;
+        svmEnabled = అబద్ధం;
+        svmCapabilities.విలువ_2 = 0;
+        svmInitialized = నిజం;
+        svmFunctions.fn_clSVMAlloc = ఖాళీ;
+        తిరిగి;
     }
 
-    std::shared_ptr<OpenCLSVMBufferPoolImpl> bufferPoolSVM_;
+    std::shared_ptr<OpenCLSVMBufferPoolImpl> బఫరు_Pool_SVM;
 
-    OpenCLSVMBufferPoolImpl& getBufferPoolSVM() const
+    OpenCLSVMBufferPoolImpl& get_బఫరు_Pool_SVM() స్థిరరాశి
     {
-        _init_buffer_pools();
-        CV_DbgAssert(bufferPoolSVM_);
-        return *bufferPoolSVM_.get();
+        init_బఫరు_pools();
+        CV_DbgAssert(బఫరు_Pool_SVM);
+        తిరిగి *బఫరు_Pool_SVM.get();
     }
-#endif
+#అయితే_ముగింపు
 
-    friend class Program;
+    మిత్ర తరగతి కార్యక్రమం_2;
 };
 
 
@@ -2891,333 +2891,333 @@ Context::~Context()
 }
 
 // deprecated
-Context::Context(int dtype)
+Context::Context(పూర్ణాంకం dtype)
 {
     p = 0;
     create(dtype);
 }
 
-void Context::release()
+శూన్య Context::release()
 {
-    if (p)
+    ఒకవేళ (p)
     {
         p->release();
-        p = NULL;
+        p = ఖాళీ;
     }
 }
 
-bool Context::create()
+తార్కిక Context::create()
 {
     release();
-    if (!haveOpenCL())
-        return false;
-    p = Impl::findOrCreateContext(std::string());
-    if (p && p->handle)
-        return true;
+    ఒకవేళ (!haveOpenCL())
+        తిరిగి అబద్ధం;
+    p = Impl::కనుగొను_Or_Create_Context(std::string());
+    ఒకవేళ (p && p->handle)
+        తిరిగి నిజం;
     release();
-    return false;
+    తిరిగి అబద్ధం;
 }
 
 // deprecated
-bool Context::create(int dtype)
+తార్కిక Context::create(పూర్ణాంకం dtype)
 {
-    if( !haveOpenCL() )
-        return false;
+    ఒకవేళ( !haveOpenCL() )
+        తిరిగి అబద్ధం;
     release();
-    if (dtype == CL_DEVICE_TYPE_DEFAULT || (unsigned)dtype == (unsigned)CL_DEVICE_TYPE_ALL)
+    ఒకవేళ (dtype == CL_DEVICE_TYPE_DEFAULT || (గుర్తులేని)dtype == (గుర్తులేని)CL_DEVICE_TYPE_ALL)
     {
-        p = Impl::findOrCreateContext("");
+        p = Impl::కనుగొను_Or_Create_Context("");
     }
-    else if (dtype == CL_DEVICE_TYPE_GPU)
+    లేకపోతే ఒకవేళ (dtype == CL_DEVICE_TYPE_GPU)
     {
-        p = Impl::findOrCreateContext(":GPU:");
+        p = Impl::కనుగొను_Or_Create_Context(":GPU:");
     }
-    else if (dtype == CL_DEVICE_TYPE_CPU)
+    లేకపోతే ఒకవేళ (dtype == CL_DEVICE_TYPE_CPU)
     {
-        p = Impl::findOrCreateContext(":CPU:");
+        p = Impl::కనుగొను_Or_Create_Context(":CPU:");
     }
-    else
+    లేకపోతే
     {
-        CV_LOG_ERROR(NULL, "OpenCL: Can't recognize OpenCV device type=" << dtype);
+        CV_LOG_ERROR(ఖాళీ, "OpenCL: Can't recognize OpenCV device type=" << dtype);
     }
-    if (p && !p->handle)
+    ఒకవేళ (p && !p->handle)
     {
         release();
     }
-    return p != 0;
+    తిరిగి p != 0;
 }
 
-Context::Context(const Context& c)
+Context::Context(స్థిరరాశి Context& c)
 {
     p = (Impl*)c.p;
-    if(p)
+    ఒకవేళ(p)
         p->addref();
 }
 
-Context& Context::operator = (const Context& c)
+Context& Context::క్రియాకారకం = (స్థిరరాశి Context& c)
 {
     Impl* newp = (Impl*)c.p;
-    if(newp)
+    ఒకవేళ(newp)
         newp->addref();
-    if(p)
+    ఒకవేళ(p)
         p->release();
     p = newp;
-    return *this;
+    తిరిగి *ఇది;
 }
 
 Context::Context(Context&& c) CV_NOEXCEPT
 {
     p = c.p;
-    c.p = nullptr;
+    c.p = శూన్యసూచిక;
 }
 
-Context& Context::operator = (Context&& c) CV_NOEXCEPT
+Context& Context::క్రియాకారకం = (Context&& c) CV_NOEXCEPT
 {
-    if (this != &c) {
-        if(p)
+    ఒకవేళ (ఇది != &c) {
+        ఒకవేళ(p)
             p->release();
         p = c.p;
-        c.p = nullptr;
+        c.p = శూన్యసూచిక;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-void* Context::ptr() const
+శూన్య* Context::ptr() స్థిరరాశి
 {
-    return p == NULL ? NULL : p->handle;
+    తిరిగి p == ఖాళీ ? ఖాళీ : p->handle;
 }
 
-size_t Context::ndevices() const
+size_t Context::ndevices() స్థిరరాశి
 {
-    return p ? p->devices.size() : 0;
+    తిరిగి p ? p->devices.size() : 0;
 }
 
-Device& Context::device(size_t idx) const
+Device& Context::device(size_t idx) స్థిరరాశి
 {
-    static Device dummy;
-    return !p || idx >= p->devices.size() ? dummy : p->devices[idx];
+    స్థిర Device dummy;
+    తిరిగి !p || idx >= p->devices.size() ? dummy : p->devices[idx];
 }
 
 Context& Context::getDefault()
 {
-    auto& c = OpenCLExecutionContext::getCurrent();
-    if (!c.empty())
+    స్వయంచాలక& c = OpenCLExecutionContext::getCurrent();
+    ఒకవేళ (!c.empty())
     {
-        auto& ctx = c.getContext();
-        return ctx;
+        స్వయంచాలక& ctx = c.getContext();
+        తిరిగి ctx;
     }
 
-    static Context dummy;
-    return dummy;
+    స్థిర Context dummy;
+    తిరిగి dummy;
 }
 
-Program Context::getProg(const ProgramSource& prog,
-                         const String& buildopts, String& errmsg)
+కార్యక్రమం_2 Context::getProg(స్థిరరాశి కార్యక్రమం_ఆధారం& prog,
+                         స్థిరరాశి String& buildopts, String& errmsg)
 {
-    return p ? p->getProg(prog, buildopts, errmsg) : Program();
+    తిరిగి p ? p->getProg(prog, buildopts, errmsg) : కార్యక్రమం_2();
 }
 
-void Context::unloadProg(Program& prog)
+శూన్య Context::unloadProg(కార్యక్రమం_2& prog)
 {
-    if (p)
+    ఒకవేళ (p)
         p->unloadProg(prog);
 }
 
 /* static */
-Context Context::fromHandle(void* context)
+Context Context::fromHandle(శూన్య* context)
 {
     Context ctx;
-    ctx.p = Impl::findOrCreateContext((cl_context)context);
-    return ctx;
+    ctx.p = Impl::కనుగొను_Or_Create_Context((cl_context)context);
+    తిరిగి ctx;
 }
 
 /* static */
-Context Context::fromDevice(const ocl::Device& device)
+Context Context::fromDevice(స్థిరరాశి ocl::Device& device)
 {
     Context ctx;
-    ctx.p = Impl::findOrCreateContext(device);
-    return ctx;
+    ctx.p = Impl::కనుగొను_Or_Create_Context(device);
+    తిరిగి ctx;
 }
 
 /* static */
-Context Context::create(const std::string& configuration)
+Context Context::create(స్థిరరాశి std::string& configuration)
 {
     Context ctx;
-    ctx.p = Impl::findOrCreateContext(configuration);
-    return ctx;
+    ctx.p = Impl::కనుగొను_Or_Create_Context(configuration);
+    తిరిగి ctx;
 }
 
-void* Context::getOpenCLContextProperty(int propertyId) const
+శూన్య* Context::getOpenCLContextProperty(పూర్ణాంకం propertyId) స్థిరరాశి
 {
-    if (p == NULL)
-        return nullptr;
+    ఒకవేళ (p == ఖాళీ)
+        తిరిగి శూన్యసూచిక;
     ::size_t size = 0;
-    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, 0, NULL, &size));
-    std::vector<cl_context_properties> prop(size / sizeof(cl_context_properties), (cl_context_properties)0);
-    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, size, prop.data(), NULL));
-    for (size_t i = 0; i < prop.size(); i += 2)
+    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, 0, ఖాళీ, &size));
+    std::vector<cl_context_properties> prop(size / పరిమాణం(cl_context_properties), (cl_context_properties)0);
+    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, size, prop.దత్తాంశం(), ఖాళీ));
+    కొరకు (size_t i = 0; i < prop.size(); i += 2)
     {
-        if (prop[i] == (cl_context_properties)propertyId)
+        ఒకవేళ (prop[i] == (cl_context_properties)propertyId)
         {
-            CV_LOG_DEBUG(NULL, "OpenCL: found context property=" << propertyId << ") => " << (void*)prop[i + 1]);
-            return (void*)prop[i + 1];
+            CV_LOG_DEBUG(ఖాళీ, "OpenCL: found context property=" << propertyId << ") => " << (శూన్య*)prop[i + 1]);
+            తిరిగి (శూన్య*)prop[i + 1];
         }
     }
-    return nullptr;
+    తిరిగి శూన్యసూచిక;
 }
 
-#ifdef HAVE_OPENCL_SVM
-bool Context::useSVM() const
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+తార్కిక Context::useSVM() స్థిరరాశి
 {
     Context::Impl* i = p;
     CV_Assert(i);
-    if (!i->svmInitialized)
+    ఒకవేళ (!i->svmInitialized)
         i->svmInit();
-    return i->svmEnabled;
+    తిరిగి i->svmEnabled;
 }
-void Context::setUseSVM(bool enabled)
+శూన్య Context::సమితి_Use_SVM(తార్కిక enabled)
 {
     Context::Impl* i = p;
     CV_Assert(i);
-    if (!i->svmInitialized)
+    ఒకవేళ (!i->svmInitialized)
         i->svmInit();
-    if (enabled && !i->svmAvailable)
+    ఒకవేళ (enabled && !i->svm_అందుబాటు)
     {
         CV_Error(Error::StsError, "OpenCL Shared Virtual Memory (SVM) is not supported by OpenCL device");
     }
     i->svmEnabled = enabled;
 }
-#else
-bool Context::useSVM() const { return false; }
-void Context::setUseSVM(bool enabled) { CV_Assert(!enabled); }
-#endif
+#లేకపోతే
+తార్కిక Context::useSVM() స్థిరరాశి { తిరిగి అబద్ధం; }
+శూన్య Context::సమితి_Use_SVM(తార్కిక enabled) { CV_Assert(!enabled); }
+#అయితే_ముగింపు
 
-#ifdef HAVE_OPENCL_SVM
-namespace svm {
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+నామాకాశ svm {
 
-const SVMCapabilities getSVMCapabilitites(const ocl::Context& context)
+స్థిరరాశి SVMCapabilities getSVMCapabilitites(స్థిరరాశి ocl::Context& context)
 {
     Context::Impl* i = context.getImpl();
     CV_Assert(i);
-    if (!i->svmInitialized)
+    ఒకవేళ (!i->svmInitialized)
         i->svmInit();
-    return i->svmCapabilities;
+    తిరిగి i->svmCapabilities;
 }
 
-CV_EXPORTS const SVMFunctions* getSVMFunctions(const ocl::Context& context)
+CV_EXPORTS స్థిరరాశి SVMFunctions* getSVMFunctions(స్థిరరాశి ocl::Context& context)
 {
     Context::Impl* i = context.getImpl();
     CV_Assert(i);
     CV_Assert(i->svmInitialized); // getSVMCapabilitites() must be called first
-    CV_Assert(i->svmFunctions.fn_clSVMAlloc != NULL);
-    return &i->svmFunctions;
+    CV_Assert(i->svmFunctions.fn_clSVMAlloc != ఖాళీ);
+    తిరిగి &i->svmFunctions;
 }
 
-CV_EXPORTS bool useSVM(UMatUsageFlags usageFlags)
+CV_EXPORTS తార్కిక useSVM(UMatUsageFlags usageFlags)
 {
-    if (checkForceSVMUmatUsage())
-        return true;
-    if (checkDisableSVMUMatUsage())
-        return false;
-    if ((usageFlags & USAGE_ALLOCATE_SHARED_MEMORY) != 0)
-        return true;
-    return false; // don't use SVM by default
+    ఒకవేళ (checkForceSVMUmatUsage())
+        తిరిగి నిజం;
+    ఒకవేళ (checkDisableSVMUMatUsage())
+        తిరిగి అబద్ధం;
+    ఒకవేళ ((usageFlags & USAGE_ALLOCATE_SHARED_జ్ఞాపకం) != 0)
+        తిరిగి నిజం;
+    తిరిగి అబద్ధం; // don't use SVM by default
 }
 
 } // namespace cv::ocl::svm
-#endif // HAVE_OPENCL_SVM
+#అయితే_ముగింపు // HAVE_OPENCL_SVM
 
 Context::UserContext::~UserContext()
 {
 }
 
-void Context::setUserContext(std::type_index typeId, const std::shared_ptr<Context::UserContext>& userContext)
+శూన్య Context::సమితి_User_Context(std::type_సూచీ typeId, స్థిరరాశి std::shared_ptr<Context::UserContext>& userContext)
 {
     CV_Assert(p);
-    p->setUserContext(typeId, userContext);
+    p->సమితి_User_Context(typeId, userContext);
 }
 
-std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_index typeId)
+std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_సూచీ typeId)
 {
     CV_Assert(p);
-    return p->getUserContext(typeId);
+    తిరిగి p->getUserContext(typeId);
 }
 
-static void get_platform_name(cl_platform_id id, String& name)
+స్థిర శూన్య get_platform_name(cl_platform_id id, String& name)
 {
     // get platform name string length
     size_t sz = 0;
     CV_OCL_CHECK(clGetPlatformInfo(id, CL_PLATFORM_NAME, 0, 0, &sz));
 
     // get platform name string
-    AutoBuffer<char> buf(sz + 1);
-    CV_OCL_CHECK(clGetPlatformInfo(id, CL_PLATFORM_NAME, sz, buf.data(), 0));
+    Auto_బఫరు<అక్షరం> buf(sz + 1);
+    CV_OCL_CHECK(clGetPlatformInfo(id, CL_PLATFORM_NAME, sz, buf.దత్తాంశం(), 0));
 
     // just in case, ensure trailing zero for ASCIIZ string
     buf[sz] = 0;
 
-    name = buf.data();
+    name = buf.దత్తాంశం();
 }
 
 /*
 // Attaches OpenCL context to OpenCV
 */
-void attachContext(const String& platformName, void* platformID, void* context, void* deviceID)
+శూన్య attachContext(స్థిరరాశి String& platformName, శూన్య* platformID, శూన్య* context, శూన్య* deviceID)
 {
-    auto ctx = OpenCLExecutionContext::create(platformName, platformID, context, deviceID);
+    స్వయంచాలక ctx = OpenCLExecutionContext::create(platformName, platformID, context, deviceID);
     ctx.bind();
 }
 
 /* static */
 OpenCLExecutionContext OpenCLExecutionContext::create(
-        const std::string& platformName, void* platformID, void* context, void* deviceID
+        స్థిరరాశి std::string& platformName, శూన్య* platformID, శూన్య* context, శూన్య* deviceID
 )
 {
-    if (!haveOpenCL())
+    ఒకవేళ (!haveOpenCL())
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
     cl_uint cnt = 0;
     CV_OCL_CHECK(clGetPlatformIDs(0, 0, &cnt));
 
-    if (cnt == 0)
+    ఒకవేళ (cnt == 0)
         CV_Error(cv::Error::OpenCLApiCallError, "No OpenCL platform available!");
 
     std::vector<cl_platform_id> platforms(cnt);
 
     CV_OCL_CHECK(clGetPlatformIDs(cnt, &platforms[0], 0));
 
-    bool platformAvailable = false;
+    తార్కిక platform_అందుబాటు = అబద్ధం;
 
     // check if external platformName contained in list of available platforms in OpenCV
-    for (unsigned int i = 0; i < cnt; i++)
+    కొరకు (గుర్తులేని పూర్ణాంకం i = 0; i < cnt; i++)
     {
-        String availablePlatformName;
-        get_platform_name(platforms[i], availablePlatformName);
+        String అందుబాటు_Platform_Name;
+        get_platform_name(platforms[i], అందుబాటు_Platform_Name);
         // external platform is found in the list of available platforms
-        if (platformName == availablePlatformName)
+        ఒకవేళ (platformName == అందుబాటు_Platform_Name)
         {
-            platformAvailable = true;
-            break;
+            platform_అందుబాటు = నిజం;
+            ఆపు;
         }
     }
 
-    if (!platformAvailable)
+    ఒకవేళ (!platform_అందుబాటు)
         CV_Error(cv::Error::OpenCLApiCallError, "No matched platforms available!");
 
     // check if platformID corresponds to platformName
     String actualPlatformName;
     get_platform_name((cl_platform_id)platformID, actualPlatformName);
-    if (platformName != actualPlatformName)
+    ఒకవేళ (platformName != actualPlatformName)
         CV_Error(cv::Error::OpenCLApiCallError, "No matched platforms available!");
 
     OpenCLExecutionContext ctx;
     ctx.p = std::make_shared<OpenCLExecutionContext::Impl>((cl_platform_id)platformID, (cl_context)context, (cl_device_id)deviceID);
     CV_OCL_CHECK(clReleaseContext((cl_context)context));
     CV_OCL_CHECK(clReleaseDevice((cl_device_id)deviceID));
-    return ctx;
+    తిరిగి ctx;
 }
 
-void initializeContextFromHandle(Context& ctx, void* _platform, void* _context, void* _device)
+శూన్య initializeContextFromHandle(Context& ctx, శూన్య* _platform, శూన్య* _context, శూన్య* _device)
 {
     // internal call, less checks
     cl_platform_id platformID = (cl_platform_id)_platform;
@@ -3226,204 +3226,204 @@ void initializeContextFromHandle(Context& ctx, void* _platform, void* _context, 
 
     std::string platformName = PlatformInfo(&platformID).name();
 
-    auto clExecCtx = OpenCLExecutionContext::create(platformName, platformID, context, deviceID);
+    స్వయంచాలక clExecCtx = OpenCLExecutionContext::create(platformName, platformID, context, deviceID);
     CV_Assert(!clExecCtx.empty());
     ctx = clExecCtx.getContext();
 }
 
 /////////////////////////////////////////// Queue /////////////////////////////////////////////
 
-struct Queue::Impl
+నిర్మాణం వరుస::Impl
 {
-    inline void __init()
+    అంతఃవరుస శూన్య __init()
     {
         refcount = 1;
         handle = 0;
-        isProfilingQueue_ = false;
+        is_Profiling_వరుస = అబద్ధం;
     }
 
-    Impl(cl_command_queue q)
+    Impl(cl_command_వరుస q)
     {
         __init();
         handle = q;
 
-        cl_command_queue_properties props = 0;
-        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_PROPERTIES, sizeof(cl_command_queue_properties), &props, NULL));
-        isProfilingQueue_ = !!(props & CL_QUEUE_PROFILING_ENABLE);
+        cl_command_వరుస_properties props = 0;
+        CV_OCL_CHECK(cl_Get_Command_వరుస_Info(handle, CL_వరుస_PROPERTIES, పరిమాణం(cl_command_వరుస_properties), &props, ఖాళీ));
+        is_Profiling_వరుస = !!(props & CL_వరుస_PROFILING_ENABLE);
     }
 
-    Impl(cl_command_queue q, bool isProfilingQueue)
+    Impl(cl_command_వరుస q, తార్కిక is_Profiling_వరుస_2)
     {
         __init();
         handle = q;
-        isProfilingQueue_ = isProfilingQueue;
+        is_Profiling_వరుస = is_Profiling_వరుస_2;
     }
 
-    Impl(const Context& c, const Device& d, bool withProfiling = false)
+    Impl(స్థిరరాశి Context& c, స్థిరరాశి Device& d, తార్కిక withProfiling = అబద్ధం)
     {
         __init();
 
-        const Context* pc = &c;
+        స్థిరరాశి Context* pc = &c;
         cl_context ch = (cl_context)pc->ptr();
-        if( !ch )
+        ఒకవేళ( !ch )
         {
             pc = &Context::getDefault();
             ch = (cl_context)pc->ptr();
         }
         cl_device_id dh = (cl_device_id)d.ptr();
-        if( !dh )
+        ఒకవేళ( !dh )
             dh = (cl_device_id)pc->device(0).ptr();
         cl_int retval = 0;
-        cl_command_queue_properties props = withProfiling ? CL_QUEUE_PROFILING_ENABLE : 0;
-        CV_OCL_DBG_CHECK_(handle = clCreateCommandQueue(ch, dh, props, &retval), retval);
-        isProfilingQueue_ = withProfiling;
+        cl_command_వరుస_properties props = withProfiling ? CL_వరుస_PROFILING_ENABLE : 0;
+        CV_OCL_DBG_CHECK_(handle = cl_Create_Command_వరుస(ch, dh, props, &retval), retval);
+        is_Profiling_వరుస = withProfiling;
     }
 
     ~Impl()
     {
-#ifdef _WIN32
-        if (!cv::__termination)
-#endif
+#నిర్వచితమైతే _WIN32
+        ఒకవేళ (!cv::__termination)
+#అయితే_ముగింపు
         {
-            if(handle)
+            ఒకవేళ(handle)
             {
-                CV_OCL_DBG_CHECK(clFinish(handle));
-                CV_OCL_DBG_CHECK(clReleaseCommandQueue(handle));
-                handle = NULL;
+                CV_OCL_DBG_CHECK(cl_ముగింపు(handle));
+                CV_OCL_DBG_CHECK(cl_Release_Command_వరుస(handle));
+                handle = ఖాళీ;
             }
         }
     }
 
-    const cv::ocl::Queue& getProfilingQueue(const cv::ocl::Queue& self)
+    స్థిరరాశి cv::ocl::వరుస& get_Profiling_వరుస(స్థిరరాశి cv::ocl::వరుస& self)
     {
-        if (isProfilingQueue_)
-            return self;
+        ఒకవేళ (is_Profiling_వరుస)
+            తిరిగి self;
 
-        if (profiling_queue_.ptr())
-            return profiling_queue_;
+        ఒకవేళ (profiling_వరుస.ptr())
+            తిరిగి profiling_వరుస;
 
         cl_context ctx = 0;
-        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_CONTEXT, sizeof(cl_context), &ctx, NULL));
+        CV_OCL_CHECK(cl_Get_Command_వరుస_Info(handle, CL_వరుస_CONTEXT, పరిమాణం(cl_context), &ctx, ఖాళీ));
 
         cl_device_id device = 0;
-        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_DEVICE, sizeof(cl_device_id), &device, NULL));
+        CV_OCL_CHECK(cl_Get_Command_వరుస_Info(handle, CL_వరుస_DEVICE, పరిమాణం(cl_device_id), &device, ఖాళీ));
 
-        cl_int result = CL_SUCCESS;
-        cl_command_queue_properties props = CL_QUEUE_PROFILING_ENABLE;
-        cl_command_queue q = clCreateCommandQueue(ctx, device, props, &result);
-        CV_OCL_DBG_CHECK_RESULT(result, "clCreateCommandQueue(with CL_QUEUE_PROFILING_ENABLE)");
+        cl_int ఫలితం = CL_SUCCESS;
+        cl_command_వరుస_properties props = CL_వరుస_PROFILING_ENABLE;
+        cl_command_వరుస q = cl_Create_Command_వరుస(ctx, device, props, &ఫలితం);
+        CV_OCL_DBG_CHECK_ఫలితం(ఫలితం, "clCreateCommandQueue(with CL_QUEUE_PROFILING_ENABLE)");
 
-        Queue queue;
-        queue.p = new Impl(q, true);
-        profiling_queue_ = queue;
+        వరుస వరుస_2;
+        వరుస_2.p = కొత్త Impl(q, నిజం);
+        profiling_వరుస = వరుస_2;
 
-        return profiling_queue_;
+        తిరిగి profiling_వరుస;
     }
 
     IMPLEMENT_REFCOUNTABLE();
 
-    cl_command_queue handle;
-    bool isProfilingQueue_;
-    cv::ocl::Queue profiling_queue_;
+    cl_command_వరుస handle;
+    తార్కిక is_Profiling_వరుస;
+    cv::ocl::వరుస profiling_వరుస;
 };
 
-Queue::Queue() CV_NOEXCEPT
+వరుస::వరుస() CV_NOEXCEPT
 {
     p = 0;
 }
 
-Queue::Queue(const Context& c, const Device& d)
+వరుస::వరుస(స్థిరరాశి Context& c, స్థిరరాశి Device& d)
 {
     p = 0;
     create(c, d);
 }
 
-Queue::Queue(const Queue& q)
+వరుస::వరుస(స్థిరరాశి వరుస& q)
 {
     p = q.p;
-    if(p)
+    ఒకవేళ(p)
         p->addref();
 }
 
-Queue& Queue::operator = (const Queue& q)
+వరుస& వరుస::క్రియాకారకం = (స్థిరరాశి వరుస& q)
 {
     Impl* newp = (Impl*)q.p;
-    if(newp)
+    ఒకవేళ(newp)
         newp->addref();
-    if(p)
+    ఒకవేళ(p)
         p->release();
     p = newp;
-    return *this;
+    తిరిగి *ఇది;
 }
 
-Queue::Queue(Queue&& q) CV_NOEXCEPT
+వరుస::వరుస(వరుస&& q) CV_NOEXCEPT
 {
     p = q.p;
-    q.p = nullptr;
+    q.p = శూన్యసూచిక;
 }
 
-Queue& Queue::operator = (Queue&& q) CV_NOEXCEPT
+వరుస& వరుస::క్రియాకారకం = (వరుస&& q) CV_NOEXCEPT
 {
-    if (this != &q) {
-        if(p)
+    ఒకవేళ (ఇది != &q) {
+        ఒకవేళ(p)
             p->release();
         p = q.p;
-        q.p = nullptr;
+        q.p = శూన్యసూచిక;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-Queue::~Queue()
+వరుస::~వరుస()
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
 }
 
-bool Queue::create(const Context& c, const Device& d)
+తార్కిక వరుస::create(స్థిరరాశి Context& c, స్థిరరాశి Device& d)
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
-    p = new Impl(c, d);
-    return p->handle != 0;
+    p = కొత్త Impl(c, d);
+    తిరిగి p->handle != 0;
 }
 
-void Queue::finish()
+శూన్య వరుస::ముగింపు_2()
 {
-    if(p && p->handle)
+    ఒకవేళ(p && p->handle)
     {
-        CV_OCL_DBG_CHECK(clFinish(p->handle));
+        CV_OCL_DBG_CHECK(cl_ముగింపు(p->handle));
     }
 }
 
-const Queue& Queue::getProfilingQueue() const
+స్థిరరాశి వరుస& వరుస::get_Profiling_వరుస() స్థిరరాశి
 {
     CV_Assert(p);
-    return p->getProfilingQueue(*this);
+    తిరిగి p->get_Profiling_వరుస(*ఇది);
 }
 
-void* Queue::ptr() const
+శూన్య* వరుస::ptr() స్థిరరాశి
 {
-    return p ? p->handle : 0;
+    తిరిగి p ? p->handle : 0;
 }
 
-Queue& Queue::getDefault()
+వరుస& వరుస::getDefault()
 {
-    auto& c = OpenCLExecutionContext::getCurrent();
-    if (!c.empty())
+    స్వయంచాలక& c = OpenCLExecutionContext::getCurrent();
+    ఒకవేళ (!c.empty())
     {
-        auto& q = c.getQueue();
-        return q;
+        స్వయంచాలక& q = c.get_వరుస();
+        తిరిగి q;
     }
-    static Queue dummy;
-    return dummy;
+    స్థిర వరుస dummy;
+    తిరిగి dummy;
 }
 
-static cl_command_queue getQueue(const Queue& q)
+స్థిర cl_command_వరుస get_వరుస(స్థిరరాశి వరుస& q)
 {
-    cl_command_queue qq = (cl_command_queue)q.ptr();
-    if(!qq)
-        qq = (cl_command_queue)Queue::getDefault().ptr();
-    return qq;
+    cl_command_వరుస qq = (cl_command_వరుస)q.ptr();
+    ఒకవేళ(!qq)
+        qq = (cl_command_వరుస)వరుస::getDefault().ptr();
+    తిరిగి qq;
 }
 
 /////////////////////////////////////////// KernelArg /////////////////////////////////////////////
@@ -3433,71 +3433,71 @@ KernelArg::KernelArg() CV_NOEXCEPT
 {
 }
 
-KernelArg::KernelArg(int _flags, UMat* _m, int _wscale, int _iwscale, const void* _obj, size_t _sz)
+KernelArg::KernelArg(పూర్ణాంకం _flags, UMat* _m, పూర్ణాంకం _wscale, పూర్ణాంకం _iwscale, స్థిరరాశి శూన్య* _obj, size_t _sz)
     : flags(_flags), m(_m), obj(_obj), sz(_sz), wscale(_wscale), iwscale(_iwscale)
 {
-    CV_Assert(_flags == LOCAL || _flags == CONSTANT || _m != NULL);
+    CV_Assert(_flags == LOCAL || _flags == CONSTANT || _m != ఖాళీ);
 }
 
-KernelArg KernelArg::Constant(const Mat& m)
+KernelArg KernelArg::Constant(స్థిరరాశి Mat& m)
 {
     CV_Assert(m.isContinuous());
-    return KernelArg(CONSTANT, 0, 0, 0, m.ptr(), m.total()*m.elemSize());
+    తిరిగి KernelArg(CONSTANT, 0, 0, 0, m.ptr(), m.మొత్తం()*m.elem_కొలత());
 }
 
 /////////////////////////////////////////// Kernel /////////////////////////////////////////////
 
-struct Kernel::Impl
+నిర్మాణం Kernel::Impl
 {
-    Impl(const char* kname, const Program& prog) :
-        refcount(1), handle(NULL), isInProgress(false), isAsyncRun(false), nu(0)
+    Impl(స్థిరరాశి అక్షరం* kname, స్థిరరాశి కార్యక్రమం_2& prog) :
+        refcount(1), handle(ఖాళీ), is_లోపల_పురోగతి(అబద్ధం), is_Async_నిరంతరం(అబద్ధం), nu(0)
     {
-        cl_program ph = (cl_program)prog.ptr();
+        cl_కార్యక్రమం ph = (cl_కార్యక్రమం)prog.ptr();
         cl_int retval = 0;
         name = kname;
-        if (ph)
+        ఒకవేళ (ph)
         {
             handle = clCreateKernel(ph, kname, &retval);
-            CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateKernel('%s')", kname).c_str());
+            CV_OCL_DBG_CHECK_ఫలితం(retval, cv::format("clCreateKernel('%s')", kname).c_str());
         }
-        for( int i = 0; i < MAX_ARRS; i++ )
+        కొరకు( పూర్ణాంకం i = 0; i < MAX_ARRS; i++ )
             u[i] = 0;
-        haveTempDstUMats = false;
-        haveTempSrcUMats = false;
+        have_తాత్కాలిక_Dst_UMats = అబద్ధం;
+        have_తాత్కాలిక_Src_UMats = అబద్ధం;
     }
 
-    void cleanupUMats()
+    శూన్య cleanupUMats()
     {
-        bool exceptionOccurred = false;
-        for( int i = 0; i < MAX_ARRS; i++ )
+        తార్కిక exceptionOccurred = అబద్ధం;
+        కొరకు( పూర్ణాంకం i = 0; i < MAX_ARRS; i++ )
         {
-            if( u[i] )
+            ఒకవేళ( u[i] )
             {
-                if( CV_XADD(&u[i]->urefcount, -1) == 1 )
+                ఒకవేళ( CV_XADD(&u[i]->urefcount, -1) == 1 )
                 {
-                    u[i]->flags |= UMatData::ASYNC_CLEANUP;
-                    try
+                    u[i]->flags |= UMat_దత్తాంశం::ASYNC_CLEANUP;
+                    ప్రయత్నించు
                     {
                         u[i]->currAllocator->deallocate(u[i]);
                     }
-                    catch(const std::exception& exc)
+                    పట్టుకో(స్థిరరాశి std::exception& exc)
                     {
                         // limited by legacy before C++11, therefore log and
                         // remember some exception occurred to throw below
-                        CV_LOG_ERROR(NULL, "OCL: Unexpected C++ exception in OpenCL Kernel::Impl::cleanupUMats(): " << exc.what());
-                        exceptionOccurred = true;
+                        CV_LOG_ERROR(ఖాళీ, "OCL: Unexpected C++ exception in OpenCL Kernel::Impl::cleanupUMats(): " << exc.what());
+                        exceptionOccurred = నిజం;
                     }
                 }
                 u[i] = 0;
             }
         }
         nu = 0;
-        haveTempDstUMats = false;
-        haveTempSrcUMats = false;
+        have_తాత్కాలిక_Dst_UMats = అబద్ధం;
+        have_తాత్కాలిక_Src_UMats = అబద్ధం;
         CV_Assert(!exceptionOccurred);
     }
 
-    void addUMat(const UMat& m, bool dst)
+    శూన్య కూడు_UMat(స్థిరరాశి UMat& m, తార్కిక dst)
     {
         // TSAN false positive: see #27638
         CV_Assert(nu < MAX_ARRS && m.u && m.u->urefcount > 0);
@@ -3505,47 +3505,47 @@ struct Kernel::Impl
         // TSAN false positive: see #27638
         CV_XADD(&m.u->urefcount, 1);
         nu++;
-        if(dst && m.u->tempUMat())
-            haveTempDstUMats = true;
-        if(m.u->originalUMatData == NULL && m.u->tempUMat())
-            haveTempSrcUMats = true;  // UMat is created on RAW memory (without proper lifetime management, even from Mat)
+        ఒకవేళ(dst && m.u->తాత్కాలిక_UMat())
+            have_తాత్కాలిక_Dst_UMats = నిజం;
+        ఒకవేళ(m.u->original_UMat_దత్తాంశం == ఖాళీ && m.u->తాత్కాలిక_UMat())
+            have_తాత్కాలిక_Src_UMats = నిజం;  // UMat is created on RAW memory (without proper lifetime management, even from Mat)
     }
 
     /// Preserve image lifetime (while it is specified as Kernel argument)
-    void registerImageArgument(int arg, const Image2D& image)
+    శూన్య రిజిస్టరు_Image_వాదం(పూర్ణాంకం arg, స్థిరరాశి Image2D& image)
     {
         CV_CheckGE(arg, 0, "");
-        if (arg < (int)shadow_images.size() && shadow_images[arg].ptr() != image.ptr())  // TODO future: replace ptr => impl (more strong check)
+        ఒకవేళ (arg < (పూర్ణాంకం)shadow_images.size() && shadow_images[arg].ptr() != image.ptr())  // TODO future: replace ptr => impl (more strong check)
         {
-            CV_Check(arg, !isInProgress, "ocl::Kernel: clearing of pending Image2D arguments is not allowed");
+            CV_Check(arg, !is_లోపల_పురోగతి, "ocl::Kernel: clearing of pending Image2D arguments is not allowed");
         }
         shadow_images.reserve(MAX_ARRS);
         shadow_images.resize(std::max(shadow_images.size(), (size_t)arg + 1));
         shadow_images[arg] = image;
     }
 
-    void finit(cl_event e)
+    శూన్య finit(cl_event e)
     {
-        CV_UNUSED(e);
-        isInProgress = false;
-        try
+        CV_వాడని(e);
+        is_లోపల_పురోగతి = అబద్ధం;
+        ప్రయత్నించు
         {
             cleanupUMats();
         }
-        catch(...)
+        పట్టుకో(...)
         {
             release();
-            throw;
+            విసురు;
         }
         release();
     }
 
-    bool run(int dims, size_t _globalsize[], size_t _localsize[],
-            bool sync, int64* timeNS, const Queue& q);
+    తార్కిక నిరంతరం(పూర్ణాంకం dims, size_t _globalsize[], size_t _localsize[],
+            తార్కిక సమకాలీకరణ, int64* సమయం_NS, స్థిరరాశి వరుస& q);
 
     ~Impl()
     {
-        if(handle)
+        ఒకవేళ(handle)
         {
             CV_OCL_DBG_CHECK(clReleaseKernel(handle));
         }
@@ -3555,1834 +3555,1834 @@ struct Kernel::Impl
 
     cv::String name;
     cl_kernel handle;
-    enum { MAX_ARRS = 16 };
-    UMatData* u[MAX_ARRS];
-    bool isInProgress;
-    bool isAsyncRun;  // true if kernel was scheduled in async mode
-    int nu;
+    గణన { MAX_ARRS = 16 };
+    UMat_దత్తాంశం* u[MAX_ARRS];
+    తార్కిక is_లోపల_పురోగతి;
+    తార్కిక is_Async_నిరంతరం;  // true if kernel was scheduled in async mode
+    పూర్ణాంకం nu;
     std::vector<Image2D> shadow_images;
-    bool haveTempDstUMats;
-    bool haveTempSrcUMats;
+    తార్కిక have_తాత్కాలిక_Dst_UMats;
+    తార్కిక have_తాత్కాలిక_Src_UMats;
 };
 
 }} // namespace cv::ocl
 
-extern "C" {
+బాహ్య "C" {
 
-static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
+స్థిర శూన్య CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, శూన్య *p)
 {
-    try
+    ప్రయత్నించు
     {
         ((cv::ocl::Kernel::Impl*)p)->finit(e);
     }
-    catch (const cv::Exception& exc)
+    పట్టుకో (స్థిరరాశి cv::Exception& exc)
     {
-        CV_LOG_ERROR(NULL, "OCL: Unexpected OpenCV exception in OpenCL callback: " << exc.what());
+        CV_LOG_ERROR(ఖాళీ, "OCL: Unexpected OpenCV exception in OpenCL callback: " << exc.what());
     }
-    catch (const std::exception& exc)
+    పట్టుకో (స్థిరరాశి std::exception& exc)
     {
-        CV_LOG_ERROR(NULL, "OCL: Unexpected C++ exception in OpenCL callback: " << exc.what());
+        CV_LOG_ERROR(ఖాళీ, "OCL: Unexpected C++ exception in OpenCL callback: " << exc.what());
     }
-    catch (...)
+    పట్టుకో (...)
     {
-        CV_LOG_ERROR(NULL, "OCL: Unexpected unknown C++ exception in OpenCL callback");
+        CV_LOG_ERROR(ఖాళీ, "OCL: Unexpected unknown C++ exception in OpenCL callback");
     }
 }
 
 }
 
-namespace cv { namespace ocl {
+నామాకాశ cv { నామాకాశ ocl {
 
 Kernel::Kernel() CV_NOEXCEPT
 {
     p = 0;
 }
 
-Kernel::Kernel(const char* kname, const Program& prog)
+Kernel::Kernel(స్థిరరాశి అక్షరం* kname, స్థిరరాశి కార్యక్రమం_2& prog)
 {
     p = 0;
     create(kname, prog);
 }
 
-Kernel::Kernel(const char* kname, const ProgramSource& src,
-               const String& buildopts, String* errmsg)
+Kernel::Kernel(స్థిరరాశి అక్షరం* kname, స్థిరరాశి కార్యక్రమం_ఆధారం& src,
+               స్థిరరాశి String& buildopts, String* errmsg)
 {
     p = 0;
     create(kname, src, buildopts, errmsg);
 }
 
-Kernel::Kernel(const Kernel& k)
+Kernel::Kernel(స్థిరరాశి Kernel& k)
 {
     p = k.p;
-    if(p)
+    ఒకవేళ(p)
         p->addref();
 }
 
-Kernel& Kernel::operator = (const Kernel& k)
+Kernel& Kernel::క్రియాకారకం = (స్థిరరాశి Kernel& k)
 {
     Impl* newp = (Impl*)k.p;
-    if(newp)
+    ఒకవేళ(newp)
         newp->addref();
-    if(p)
+    ఒకవేళ(p)
         p->release();
     p = newp;
-    return *this;
+    తిరిగి *ఇది;
 }
 
 Kernel::Kernel(Kernel&& k) CV_NOEXCEPT
 {
     p = k.p;
-    k.p = nullptr;
+    k.p = శూన్యసూచిక;
 }
 
-Kernel& Kernel::operator = (Kernel&& k) CV_NOEXCEPT
+Kernel& Kernel::క్రియాకారకం = (Kernel&& k) CV_NOEXCEPT
 {
-    if (this != &k) {
-        if(p)
+    ఒకవేళ (ఇది != &k) {
+        ఒకవేళ(p)
             p->release();
         p = k.p;
-        k.p = nullptr;
+        k.p = శూన్యసూచిక;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
 Kernel::~Kernel()
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
 }
 
-bool Kernel::create(const char* kname, const Program& prog)
+తార్కిక Kernel::create(స్థిరరాశి అక్షరం* kname, స్థిరరాశి కార్యక్రమం_2& prog)
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
-    p = new Impl(kname, prog);
-    if(p->handle == 0)
+    p = కొత్త Impl(kname, prog);
+    ఒకవేళ(p->handle == 0)
     {
         p->release();
         p = 0;
     }
-#ifdef CV_OPENCL_RUN_ASSERT // check kernel compilation fails
+#నిర్వచితమైతే CV_OPENCL_నిరంతరం_ASSERT // check kernel compilation fails
     CV_Assert(p);
-#endif
-    return p != 0;
+#అయితే_ముగింపు
+    తిరిగి p != 0;
 }
 
-bool Kernel::create(const char* kname, const ProgramSource& src,
-                    const String& buildopts, String* errmsg)
+తార్కిక Kernel::create(స్థిరరాశి అక్షరం* kname, స్థిరరాశి కార్యక్రమం_ఆధారం& src,
+                    స్థిరరాశి String& buildopts, String* errmsg)
 {
-    if(p)
+    ఒకవేళ(p)
     {
         p->release();
         p = 0;
     }
     String tempmsg;
-    if( !errmsg ) errmsg = &tempmsg;
-    const Program prog = Context::getDefault().getProg(src, buildopts, *errmsg);
-    return create(kname, prog);
+    ఒకవేళ( !errmsg ) errmsg = &tempmsg;
+    స్థిరరాశి కార్యక్రమం_2 prog = Context::getDefault().getProg(src, buildopts, *errmsg);
+    తిరిగి create(kname, prog);
 }
 
-void* Kernel::ptr() const
+శూన్య* Kernel::ptr() స్థిరరాశి
 {
-    return p ? p->handle : 0;
+    తిరిగి p ? p->handle : 0;
 }
 
-bool Kernel::empty() const
+తార్కిక Kernel::empty() స్థిరరాశి
 {
-    return ptr() == 0;
+    తిరిగి ptr() == 0;
 }
 
-static cv::String dumpValue(size_t sz, const void* p)
+స్థిర cv::String dump_విలువ(size_t sz, స్థిరరాశి శూన్య* p)
 {
-    if (!p)
-        return "NULL";
-    if (sz == 2)
-        return cv::format("%d / %uu / 0x%04x", *(short*)p, *(unsigned short*)p, *(short*)p);
-    if (sz == 4)
-        return cv::format("%d / %uu / 0x%08x / %g", *(int*)p, *(int*)p, *(int*)p, *(float*)p);
-    if (sz == 8)
-        return cv::format("%lld / %lluu / 0x%16llx / %g", *(long long*)p, *(long long*)p, *(long long*)p, *(double*)p);
-    return cv::format("%p", p);
+    ఒకవేళ (!p)
+        తిరిగి "NULL";
+    ఒకవేళ (sz == 2)
+        తిరిగి cv::format("%d / %uu / 0x%04x", *(పొట్టి*)p, *(గుర్తులేని పొట్టి*)p, *(పొట్టి*)p);
+    ఒకవేళ (sz == 4)
+        తిరిగి cv::format("%d / %uu / 0x%08x / %g", *(పూర్ణాంకం*)p, *(పూర్ణాంకం*)p, *(పూర్ణాంకం*)p, *(దశాంశం*)p);
+    ఒకవేళ (sz == 8)
+        తిరిగి cv::format("%lld / %lluu / 0x%16llx / %g", *(దీర్ఘ దీర్ఘ*)p, *(దీర్ఘ దీర్ఘ*)p, *(దీర్ఘ దీర్ఘ*)p, *(ద్విగుణ*)p);
+    తిరిగి cv::format("%p", p);
 }
 
-int Kernel::set(int i, const void* value, size_t sz)
+పూర్ణాంకం Kernel::సమితి(పూర్ణాంకం i, స్థిరరాశి శూన్య* value, size_t sz)
 {
-    if (!p || !p->handle)
-        return -1;
-    if (i < 0)
-        return i;
-    if( i == 0 )
+    ఒకవేళ (!p || !p->handle)
+        తిరిగి -1;
+    ఒకవేళ (i < 0)
+        తిరిగి i;
+    ఒకవేళ( i == 0 )
         p->cleanupUMats();
 
-    cl_int retval = clSetKernelArg(p->handle, (cl_uint)i, sz, value);
-    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, value=%s)", p->name.c_str(), (int)i, (int)sz, dumpValue(sz, value).c_str()).c_str());
-    if (retval != CL_SUCCESS)
-        return -1;
-    return i+1;
+    cl_int retval = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)i, sz, value);
+    CV_OCL_DBG_CHECK_ఫలితం(retval, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, value=%s)", p->name.c_str(), (పూర్ణాంకం)i, (పూర్ణాంకం)sz, dump_విలువ(sz, value).c_str()).c_str());
+    ఒకవేళ (retval != CL_SUCCESS)
+        తిరిగి -1;
+    తిరిగి i+1;
 }
 
-int Kernel::set(int i, const Image2D& image2D)
+పూర్ణాంకం Kernel::సమితి(పూర్ణాంకం i, స్థిరరాశి Image2D& image2D)
 {
     cl_mem h = (cl_mem)image2D.ptr();
-    int res = set(i, &h, sizeof(h));
-    if (res >= 0)
-        p->registerImageArgument(i, image2D);
-    return res;
+    పూర్ణాంకం res = సమితి(i, &h, పరిమాణం(h));
+    ఒకవేళ (res >= 0)
+        p->రిజిస్టరు_Image_వాదం(i, image2D);
+    తిరిగి res;
 }
 
-int Kernel::set(int i, const UMat& m)
+పూర్ణాంకం Kernel::సమితి(పూర్ణాంకం i, స్థిరరాశి UMat& m)
 {
-    return set(i, KernelArg(KernelArg::READ_WRITE, (UMat*)&m));
+    తిరిగి సమితి(i, KernelArg(KernelArg::READ_WRITE, (UMat*)&m));
 }
 
 // a CUDA-backed UMat carries a device pointer in u->handle, not a cl_mem
-static bool isCudaBacked(const UMatData* u)
+స్థిర తార్కిక isCudaBacked(స్థిరరాశి UMat_దత్తాంశం* u)
 {
-    const MatAllocator* cudaAllocator = cv::cuda::getCudaAllocator();
-    return u && cudaAllocator && u->currAllocator == cudaAllocator;
+    స్థిరరాశి MatAllocator* cudaAllocator = cv::cuda::getCudaAllocator();
+    తిరిగి u && cudaAllocator && u->currAllocator == cudaAllocator;
 }
 
-int Kernel::set(int i, const KernelArg& arg)
+పూర్ణాంకం Kernel::సమితి(పూర్ణాంకం i, స్థిరరాశి KernelArg& arg)
 {
-    if( !p || !p->handle )
-        return -1;
-    if (i < 0)
+    ఒకవేళ( !p || !p->handle )
+        తిరిగి -1;
+    ఒకవేళ (i < 0)
     {
-        CV_LOG_ERROR(NULL, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): negative arg_index",
-                p->name.c_str(), (int)i));
-        return i;
+        CV_LOG_ERROR(ఖాళీ, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): negative arg_index",
+                p->name.c_str(), (పూర్ణాంకం)i));
+        తిరిగి i;
     }
-    if( i == 0 )
+    ఒకవేళ( i == 0 )
         p->cleanupUMats();
-    cl_int status = 0;
-    if( arg.m )
+    cl_int స్థితి_2 = 0;
+    ఒకవేళ( arg.m )
     {
         AccessFlag accessFlags = ((arg.flags & KernelArg::READ_ONLY) ? ACCESS_READ : static_cast<AccessFlag>(0)) |
                                  ((arg.flags & KernelArg::WRITE_ONLY) ? ACCESS_WRITE : static_cast<AccessFlag>(0));
-        bool ptronly = (arg.flags & KernelArg::PTR_ONLY) != 0;
-        if (ptronly && arg.m->empty())
+        తార్కిక ptronly = (arg.flags & KernelArg::PTR_ONLY) != 0;
+        ఒకవేళ (ptronly && arg.m->empty())
         {
-            cl_mem h_null = (cl_mem)NULL;
-            status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(h_null), &h_null);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=NULL)", p->name.c_str(), (int)i).c_str());
-            return i + 1;
+            cl_mem h_null = (cl_mem)ఖాళీ;
+            స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)i, పరిమాణం(h_null), &h_null);
+            CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=NULL)", p->name.c_str(), (పూర్ణాంకం)i).c_str());
+            తిరిగి i + 1;
         }
         // a CUDA-backed UMat has no cl_mem; decline so the caller falls back to CPU
-        if (isCudaBacked(arg.m->u))
+        ఒకవేళ (isCudaBacked(arg.m->u))
         {
-            CV_LOG_DEBUG(NULL, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): UMat is backed by the CUDA allocator, declining",
-                    p->name.c_str(), (int)i));
+            CV_LOG_DEBUG(ఖాళీ, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): UMat is backed by the CUDA allocator, declining",
+                    p->name.c_str(), (పూర్ణాంకం)i));
             p->cleanupUMats();
             p->release();
             p = 0;
-            return -1;
+            తిరిగి -1;
         }
         cl_mem h = (cl_mem)arg.m->handle(accessFlags);
 
-        if (!h)
+        ఒకవేళ (!h)
         {
-            CV_LOG_ERROR(NULL, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d, flags=%d): can't create cl_mem handle for passed UMat buffer (addr=%p)",
-                    p->name.c_str(), (int)i, (int)arg.flags, arg.m));
+            CV_LOG_ERROR(ఖాళీ, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d, flags=%d): can't create cl_mem handle for passed UMat buffer (addr=%p)",
+                    p->name.c_str(), (పూర్ణాంకం)i, (పూర్ణాంకం)arg.flags, arg.m));
             p->release();
             p = 0;
-            return -1;
+            తిరిగి -1;
         }
 
-#ifdef HAVE_OPENCL_SVM
-        if ((arg.m->u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        ఒకవేళ ((arg.m->u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
         {
-            const Context& ctx = Context::getDefault();
-            const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
-            uchar*& svmDataPtr = (uchar*&)arg.m->u->handle;
-            CV_OPENCL_SVM_TRACE_P("clSetKernelArgSVMPointer: %p\n", svmDataPtr);
-#if 1 // TODO
-            status = svmFns->fn_clSetKernelArgSVMPointer(p->handle, (cl_uint)i, svmDataPtr);
-#else
-            status = svmFns->fn_clSetKernelArgSVMPointer(p->handle, (cl_uint)i, &svmDataPtr);
-#endif
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArgSVMPointer('%s', arg_index=%d, ptr=%p)", p->name.c_str(), (int)i, (void*)svmDataPtr).c_str());
+            స్థిరరాశి Context& ctx = Context::getDefault();
+            స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+            uchar*& svm_దత్తాంశం_Ptr = (uchar*&)arg.m->u->handle;
+            CV_OPENCL_SVM_TRACE_P("clSetKernelArgSVMPointer: %p\n", svm_దత్తాంశం_Ptr);
+#ఒకవేళ 1 // TODO
+            స్థితి_2 = svmFns->fn_cl_సమితి_Kernel_Arg_SVMPointer(p->handle, (cl_uint)i, svm_దత్తాంశం_Ptr);
+#లేకపోతే
+            స్థితి_2 = svmFns->fn_cl_సమితి_Kernel_Arg_SVMPointer(p->handle, (cl_uint)i, &svm_దత్తాంశం_Ptr);
+#అయితే_ముగింపు
+            CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArgSVMPointer('%s', arg_index=%d, ptr=%p)", p->name.c_str(), (పూర్ణాంకం)i, (శూన్య*)svm_దత్తాంశం_Ptr).c_str());
         }
-        else
-#endif
+        లేకపోతే
+#అయితే_ముగింపు
         {
-            status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(h), &h);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=%p)", p->name.c_str(), (int)i, (void*)h).c_str());
+            స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)i, పరిమాణం(h), &h);
+            CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=%p)", p->name.c_str(), (పూర్ణాంకం)i, (శూన్య*)h).c_str());
         }
 
-        if (ptronly)
+        ఒకవేళ (ptronly)
         {
             i++;
         }
-        else if( arg.m->dims <= 2 )
+        లేకపోతే ఒకవేళ( arg.m->dims <= 2 )
         {
             UMat2D u2d(*arg.m);
-            status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(u2d.step), &u2d.step);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (int)(i+1), (int)u2d.step).c_str());
-            status = clSetKernelArg(p->handle, (cl_uint)(i+2), sizeof(u2d.offset), &u2d.offset);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (int)(i+2), (int)u2d.offset).c_str());
+            స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)(i+1), పరిమాణం(u2d.అడుగు), &u2d.అడుగు);
+            CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (పూర్ణాంకం)(i+1), (పూర్ణాంకం)u2d.అడుగు).c_str());
+            స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)(i+2), పరిమాణం(u2d.offset), &u2d.offset);
+            CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (పూర్ణాంకం)(i+2), (పూర్ణాంకం)u2d.offset).c_str());
             i += 3;
 
-            if( !(arg.flags & KernelArg::NO_SIZE) )
+            ఒకవేళ( !(arg.flags & KernelArg::NO_కొలత) )
             {
-                int cols = u2d.cols*arg.wscale/arg.iwscale;
-                status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(u2d.rows), &u2d.rows);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (int)i, (int)u2d.rows).c_str());
-                status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(cols), &cols);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (int)(i+1), (int)cols).c_str());
+                పూర్ణాంకం నిలువుల_సంఖ్య = u2d.నిలువుల_సంఖ్య*arg.wscale/arg.iwscale;
+                స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)i, పరిమాణం(u2d.అడ్డువరుసలు), &u2d.అడ్డువరుసలు);
+                CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (పూర్ణాంకం)i, (పూర్ణాంకం)u2d.అడ్డువరుసలు).c_str());
+                స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)(i+1), పరిమాణం(నిలువుల_సంఖ్య), &నిలువుల_సంఖ్య);
+                CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (పూర్ణాంకం)(i+1), (పూర్ణాంకం)నిలువుల_సంఖ్య).c_str());
                 i += 2;
             }
         }
-        else
+        లేకపోతే
         {
             UMat3D u3d(*arg.m);
-            status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(u3d.slicestep), &u3d.slicestep);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, slicestep_value=%d)", p->name.c_str(), (int)(i+1), (int)u3d.slicestep).c_str());
-            status = clSetKernelArg(p->handle, (cl_uint)(i+2), sizeof(u3d.step), &u3d.step);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (int)(i+2), (int)u3d.step).c_str());
-            status = clSetKernelArg(p->handle, (cl_uint)(i+3), sizeof(u3d.offset), &u3d.offset);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (int)(i+3), (int)u3d.offset).c_str());
+            స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)(i+1), పరిమాణం(u3d.slicestep), &u3d.slicestep);
+            CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, slicestep_value=%d)", p->name.c_str(), (పూర్ణాంకం)(i+1), (పూర్ణాంకం)u3d.slicestep).c_str());
+            స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)(i+2), పరిమాణం(u3d.అడుగు), &u3d.అడుగు);
+            CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (పూర్ణాంకం)(i+2), (పూర్ణాంకం)u3d.అడుగు).c_str());
+            స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)(i+3), పరిమాణం(u3d.offset), &u3d.offset);
+            CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (పూర్ణాంకం)(i+3), (పూర్ణాంకం)u3d.offset).c_str());
             i += 4;
-            if( !(arg.flags & KernelArg::NO_SIZE) )
+            ఒకవేళ( !(arg.flags & KernelArg::NO_కొలత) )
             {
-                int cols = u3d.cols*arg.wscale/arg.iwscale;
-                status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(u3d.slices), &u3d.slices);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, slices_value=%d)", p->name.c_str(), (int)i, (int)u3d.slices).c_str());
-                status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(u3d.rows), &u3d.rows);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (int)(i+1), (int)u3d.rows).c_str());
-                status = clSetKernelArg(p->handle, (cl_uint)(i+2), sizeof(u3d.cols), &cols);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (int)(i+2), (int)cols).c_str());
+                పూర్ణాంకం నిలువుల_సంఖ్య = u3d.నిలువుల_సంఖ్య*arg.wscale/arg.iwscale;
+                స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)i, పరిమాణం(u3d.slices), &u3d.slices);
+                CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, slices_value=%d)", p->name.c_str(), (పూర్ణాంకం)i, (పూర్ణాంకం)u3d.slices).c_str());
+                స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)(i+1), పరిమాణం(u3d.అడ్డువరుసలు), &u3d.అడ్డువరుసలు);
+                CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (పూర్ణాంకం)(i+1), (పూర్ణాంకం)u3d.అడ్డువరుసలు).c_str());
+                స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)(i+2), పరిమాణం(u3d.నిలువుల_సంఖ్య), &నిలువుల_సంఖ్య);
+                CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (పూర్ణాంకం)(i+2), (పూర్ణాంకం)నిలువుల_సంఖ్య).c_str());
                 i += 3;
             }
         }
-        p->addUMat(*arg.m, !!(accessFlags & ACCESS_WRITE));
-        return i;
+        p->కూడు_UMat(*arg.m, !!(accessFlags & ACCESS_WRITE));
+        తిరిగి i;
     }
-    status = clSetKernelArg(p->handle, (cl_uint)i, arg.sz, arg.obj);
-    CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, obj=%p)", p->name.c_str(), (int)i, (int)arg.sz, (void*)arg.obj).c_str());
-    return i+1;
+    స్థితి_2 = cl_సమితి_Kernel_Arg(p->handle, (cl_uint)i, arg.sz, arg.obj);
+    CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, obj=%p)", p->name.c_str(), (పూర్ణాంకం)i, (పూర్ణాంకం)arg.sz, (శూన్య*)arg.obj).c_str());
+    తిరిగి i+1;
 }
 
-bool Kernel::run(int dims, size_t _globalsize[], size_t _localsize[],
-                 bool sync, const Queue& q)
+తార్కిక Kernel::నిరంతరం(పూర్ణాంకం dims, size_t _globalsize[], size_t _localsize[],
+                 తార్కిక సమకాలీకరణ, స్థిరరాశి వరుస& q)
 {
-    if (!p)
-        return false;
+    ఒకవేళ (!p)
+        తిరిగి అబద్ధం;
 
     size_t globalsize[CV_MAX_DIM] = {1,1,1};
-    size_t total = 1;
-    CV_Assert(_globalsize != NULL);
-    for (int i = 0; i < dims; i++)
+    size_t మొత్తం = 1;
+    CV_Assert(_globalsize != ఖాళీ);
+    కొరకు (పూర్ణాంకం i = 0; i < dims; i++)
     {
         size_t val = _localsize ? _localsize[i] :
-            dims == 1 ? 64 : dims == 2 ? (i == 0 ? 256 : 8) : dims == 3 ? (8>>(int)(i>0)) : 1;
+            dims == 1 ? 64 : dims == 2 ? (i == 0 ? 256 : 8) : dims == 3 ? (8>>(పూర్ణాంకం)(i>0)) : 1;
         CV_Assert( val > 0 );
-        total *= _globalsize[i];
-        if (_globalsize[i] == 1 && !_localsize)
+        మొత్తం *= _globalsize[i];
+        ఒకవేళ (_globalsize[i] == 1 && !_localsize)
             val = 1;
-        globalsize[i] = divUp(_globalsize[i], (unsigned int)val) * val;
+        globalsize[i] = div_పైకి(_globalsize[i], (గుర్తులేని పూర్ణాంకం)val) * val;
     }
-    CV_Assert(total > 0);
+    CV_Assert(మొత్తం > 0);
 
-    return p->run(dims, globalsize, _localsize, sync, NULL, q);
+    తిరిగి p->నిరంతరం(dims, globalsize, _localsize, సమకాలీకరణ, ఖాళీ, q);
 }
 
 
-bool Kernel::run_(int dims, size_t _globalsize[], size_t _localsize[],
-                  bool sync, const Queue& q)
+తార్కిక Kernel::నిరంతరం_2(పూర్ణాంకం dims, size_t _globalsize[], size_t _localsize[],
+                  తార్కిక సమకాలీకరణ, స్థిరరాశి వరుస& q)
 {
     CV_Assert(p);
-    return p->run(dims, _globalsize, _localsize, sync, NULL, q);
+    తిరిగి p->నిరంతరం(dims, _globalsize, _localsize, సమకాలీకరణ, ఖాళీ, q);
 }
 
 
-bool Kernel::Impl::run(int dims, size_t globalsize[], size_t localsize[],
-        bool sync, int64* timeNS, const Queue& q)
+తార్కిక Kernel::Impl::నిరంతరం(పూర్ణాంకం dims, size_t globalsize[], size_t localsize[],
+        తార్కిక సమకాలీకరణ, int64* సమయం_NS, స్థిరరాశి వరుస& q)
 {
-    CV_INSTRUMENT_REGION_OPENCL_RUN(name.c_str());
+    CV_INSTRUMENT_REGION_OPENCL_నిరంతరం(name.c_str());
 
-    if (!handle)
+    ఒకవేళ (!handle)
     {
-        CV_LOG_ERROR(NULL, "OpenCL kernel has zero handle: " << name);
-        return false;
+        CV_LOG_ERROR(ఖాళీ, "OpenCL kernel has zero handle: " << name);
+        తిరిగి అబద్ధం;
     }
 
-    if (isAsyncRun)
+    ఒకవేళ (is_Async_నిరంతరం)
     {
         CV_Error_(Error::StsError, ("OpenCL kernel can't be reused in async mode: %s", name.c_str()));
     }
-    isAsyncRun = !sync;
+    is_Async_నిరంతరం = !సమకాలీకరణ;
 
-    if (isInProgress)
+    ఒకవేళ (is_లోపల_పురోగతి)
     {
         CV_Error_(Error::StsError, ("Previous OpenCL kernel launch is not finished: %s", name.c_str()));
     }
 
-#if CV_OPENCL_SYNC_RUN_KERNELS
-    sync = true;
-#endif
+#ఒకవేళ CV_OPENCL_SYNC_నిరంతరం_KERNELS
+    సమకాలీకరణ = నిజం;
+#అయితే_ముగింపు
 
-    cl_command_queue qq = getQueue(q);
-    if (haveTempDstUMats)
-        sync = true;
-    if (haveTempSrcUMats)
-        sync = true;
-    if (timeNS)
-        sync = true;
+    cl_command_వరుస qq = get_వరుస(q);
+    ఒకవేళ (have_తాత్కాలిక_Dst_UMats)
+        సమకాలీకరణ = నిజం;
+    ఒకవేళ (have_తాత్కాలిక_Src_UMats)
+        సమకాలీకరణ = నిజం;
+    ఒకవేళ (సమయం_NS)
+        సమకాలీకరణ = నిజం;
     cl_event asyncEvent = 0;
-    cl_int retval = clEnqueueNDRangeKernel(qq, handle, (cl_uint)dims,
-                                           NULL, globalsize, localsize, 0, 0,
-                                           (sync && !timeNS) ? 0 : &asyncEvent);
-#if !CV_OPENCL_SHOW_RUN_KERNELS
-    if (retval != CL_SUCCESS)
-#endif
+    cl_int retval = cl_వరుసలో_చేర్చు_NDRange_Kernel(qq, handle, (cl_uint)dims,
+                                           ఖాళీ, globalsize, localsize, 0, 0,
+                                           (సమకాలీకరణ && !సమయం_NS) ? 0 : &asyncEvent);
+#ఒకవేళ !CV_OPENCL_SHOW_నిరంతరం_KERNELS
+    ఒకవేళ (retval != CL_SUCCESS)
+#అయితే_ముగింపు
     {
-        cv::String msg = cv::format("clEnqueueNDRangeKernel('%s', dims=%d, globalsize=%zux%zux%zu, localsize=%s) sync=%s", name.c_str(), (int)dims,
+        cv::String సందేశం = cv::format("clEnqueueNDRangeKernel('%s', dims=%d, globalsize=%zux%zux%zu, localsize=%s) sync=%s", name.c_str(), (పూర్ణాంకం)dims,
                         globalsize[0], (dims > 1 ? globalsize[1] : 1), (dims > 2 ? globalsize[2] : 1),
                         (localsize ? cv::format("%zux%zux%zu", localsize[0], (dims > 1 ? localsize[1] : 1), (dims > 2 ? localsize[2] : 1)) : cv::String("NULL")).c_str(),
-                        sync ? "true" : "false"
+                        సమకాలీకరణ ? "true" : "false"
                         );
-        if (retval != CL_SUCCESS)
+        ఒకవేళ (retval != CL_SUCCESS)
         {
-            msg = CV_OCL_API_ERROR_MSG(retval, msg.c_str());
+            సందేశం = CV_OCL_API_ERROR_సందేశం(retval, సందేశం.c_str());
         }
-#if CV_OPENCL_TRACE_CHECK
-        CV_OCL_TRACE_CHECK_RESULT(retval, msg.c_str());
-#else
-        printf("%s\n", msg.c_str());
+#ఒకవేళ CV_OPENCL_TRACE_CHECK
+        CV_OCL_TRACE_CHECK_ఫలితం(retval, సందేశం.c_str());
+#లేకపోతే
+        రాయి("%s\n", సందేశం.c_str());
         fflush(stdout);
-#endif
+#అయితే_ముగింపు
     }
-    if (sync || retval != CL_SUCCESS)
+    ఒకవేళ (సమకాలీకరణ || retval != CL_SUCCESS)
     {
-        CV_OCL_DBG_CHECK(clFinish(qq));
-        if (timeNS)
+        CV_OCL_DBG_CHECK(cl_ముగింపు(qq));
+        ఒకవేళ (సమయం_NS)
         {
-            if (retval == CL_SUCCESS)
+            ఒకవేళ (retval == CL_SUCCESS)
             {
                 CV_OCL_DBG_CHECK(clWaitForEvents(1, &asyncEvent));
-                cl_ulong startTime, stopTime;
-                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_START, sizeof(startTime), &startTime, NULL));
-                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_END, sizeof(stopTime), &stopTime, NULL));
-                *timeNS = (int64)(stopTime - startTime);
+                cl_ulong ప్రారంభం_సమయం, stop_సమయం;
+                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_ప్రారంభం, పరిమాణం(ప్రారంభం_సమయం), &ప్రారంభం_సమయం, ఖాళీ));
+                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_చివర, పరిమాణం(stop_సమయం), &stop_సమయం, ఖాళీ));
+                *సమయం_NS = (int64)(stop_సమయం - ప్రారంభం_సమయం);
             }
-            else
+            లేకపోతే
             {
-                *timeNS = -1;
+                *సమయం_NS = -1;
             }
         }
         cleanupUMats();
     }
-    else
+    లేకపోతే
     {
         addref();
-        isInProgress = true;
-        CV_OCL_CHECK(clSetEventCallback(asyncEvent, CL_COMPLETE, oclCleanupCallback, this));
+        is_లోపల_పురోగతి = నిజం;
+        CV_OCL_CHECK(cl_సమితి_Event_Callback(asyncEvent, CL_COMPLETE, oclCleanupCallback, ఇది));
     }
-    if (asyncEvent)
+    ఒకవేళ (asyncEvent)
         CV_OCL_DBG_CHECK(clReleaseEvent(asyncEvent));
-    return retval == CL_SUCCESS;
+    తిరిగి retval == CL_SUCCESS;
 }
 
-bool Kernel::runTask(bool sync, const Queue& q)
+తార్కిక Kernel::నిరంతరం_Task(తార్కిక సమకాలీకరణ, స్థిరరాశి వరుస& q)
 {
-    if(!p || !p->handle || p->isInProgress)
-        return false;
+    ఒకవేళ(!p || !p->handle || p->is_లోపల_పురోగతి)
+        తిరిగి అబద్ధం;
 
-    cl_command_queue qq = getQueue(q);
+    cl_command_వరుస qq = get_వరుస(q);
     cl_event asyncEvent = 0;
-    cl_int retval = clEnqueueTask(qq, p->handle, 0, 0, sync ? 0 : &asyncEvent);
-    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clEnqueueTask('%s') sync=%s", p->name.c_str(), sync ? "true" : "false").c_str());
-    if (sync || retval != CL_SUCCESS)
+    cl_int retval = cl_వరుసలో_చేర్చు_Task(qq, p->handle, 0, 0, సమకాలీకరణ ? 0 : &asyncEvent);
+    CV_OCL_DBG_CHECK_ఫలితం(retval, cv::format("clEnqueueTask('%s') sync=%s", p->name.c_str(), సమకాలీకరణ ? "true" : "false").c_str());
+    ఒకవేళ (సమకాలీకరణ || retval != CL_SUCCESS)
     {
-        CV_OCL_DBG_CHECK(clFinish(qq));
+        CV_OCL_DBG_CHECK(cl_ముగింపు(qq));
         p->cleanupUMats();
     }
-    else
+    లేకపోతే
     {
         p->addref();
-        p->isInProgress = true;
-        CV_OCL_CHECK(clSetEventCallback(asyncEvent, CL_COMPLETE, oclCleanupCallback, p));
+        p->is_లోపల_పురోగతి = నిజం;
+        CV_OCL_CHECK(cl_సమితి_Event_Callback(asyncEvent, CL_COMPLETE, oclCleanupCallback, p));
     }
-    if (asyncEvent)
+    ఒకవేళ (asyncEvent)
         CV_OCL_DBG_CHECK(clReleaseEvent(asyncEvent));
-    return retval == CL_SUCCESS;
+    తిరిగి retval == CL_SUCCESS;
 }
 
-int64 Kernel::runProfiling(int dims, size_t globalsize[], size_t localsize[], const Queue& q_)
+int64 Kernel::నిరంతరం_Profiling(పూర్ణాంకం dims, size_t globalsize[], size_t localsize[], స్థిరరాశి వరుస& q_)
 {
-    CV_Assert(p && p->handle && !p->isInProgress);
-    Queue q = q_.ptr() ? q_ : Queue::getDefault();
+    CV_Assert(p && p->handle && !p->is_లోపల_పురోగతి);
+    వరుస q = q_.ptr() ? q_ : వరుస::getDefault();
     CV_Assert(q.ptr());
-    q.finish(); // call clFinish() on base queue
-    Queue profilingQueue = q.getProfilingQueue();
-    int64 timeNs = -1;
-    bool res = p->run(dims, globalsize, localsize, true, &timeNs, profilingQueue);
-    return res ? timeNs : -1;
+    q.ముగింపు_2(); // call clFinish() on base queue
+    వరుస profiling_వరుస_2 = q.get_Profiling_వరుస();
+    int64 సమయం_Ns = -1;
+    తార్కిక res = p->నిరంతరం(dims, globalsize, localsize, నిజం, &సమయం_Ns, profiling_వరుస_2);
+    తిరిగి res ? సమయం_Ns : -1;
 }
 
-size_t Kernel::workGroupSize() const
+size_t Kernel::work_సమూహం_కొలత() స్థిరరాశి
 {
-    if(!p || !p->handle)
-        return 0;
+    ఒకవేళ(!p || !p->handle)
+        తిరిగి 0;
     size_t val = 0, retsz = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_WORK_GROUP_SIZE, sizeof(val), &val, &retsz);
-    CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_WORK_GROUP_SIZE)");
-    return status == CL_SUCCESS ? val : 0;
+    cl_int స్థితి_2 = cl_Get_Kernel_Work_సమూహం_Info(p->handle, dev, CL_KERNEL_WORK_సమూహం_కొలత, పరిమాణం(val), &val, &retsz);
+    CV_OCL_CHECK_ఫలితం(స్థితి_2, "clGetKernelWorkGroupInfo(CL_KERNEL_WORK_GROUP_SIZE)");
+    తిరిగి స్థితి_2 == CL_SUCCESS ? val : 0;
 }
 
-size_t Kernel::preferedWorkGroupSizeMultiple() const
+size_t Kernel::prefered_Work_సమూహం_కొలత_గుణిజం() స్థిరరాశి
 {
-    if(!p || !p->handle)
-        return 0;
+    ఒకవేళ(!p || !p->handle)
+        తిరిగి 0;
     size_t val = 0, retsz = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(val), &val, &retsz);
-    CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE)");
-    return status == CL_SUCCESS ? val : 0;
+    cl_int స్థితి_2 = cl_Get_Kernel_Work_సమూహం_Info(p->handle, dev, CL_KERNEL_PREFERRED_WORK_సమూహం_కొలత_గుణిజం, పరిమాణం(val), &val, &retsz);
+    CV_OCL_CHECK_ఫలితం(స్థితి_2, "clGetKernelWorkGroupInfo(CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE)");
+    తిరిగి స్థితి_2 == CL_SUCCESS ? val : 0;
 }
 
-bool Kernel::compileWorkGroupSize(size_t wsz[]) const
+తార్కిక Kernel::compile_Work_సమూహం_కొలత(size_t wsz[]) స్థిరరాశి
 {
-    if(!p || !p->handle || !wsz)
-        return 0;
+    ఒకవేళ(!p || !p->handle || !wsz)
+        తిరిగి 0;
     size_t retsz = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, sizeof(wsz[0])*3, wsz, &retsz);
-    CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_COMPILE_WORK_GROUP_SIZE)");
-    return status == CL_SUCCESS;
+    cl_int స్థితి_2 = cl_Get_Kernel_Work_సమూహం_Info(p->handle, dev, CL_KERNEL_COMPILE_WORK_సమూహం_కొలత, పరిమాణం(wsz[0])*3, wsz, &retsz);
+    CV_OCL_CHECK_ఫలితం(స్థితి_2, "clGetKernelWorkGroupInfo(CL_KERNEL_COMPILE_WORK_GROUP_SIZE)");
+    తిరిగి స్థితి_2 == CL_SUCCESS;
 }
 
-size_t Kernel::localMemSize() const
+size_t Kernel::local_Mem_కొలత() స్థిరరాశి
 {
-    if(!p || !p->handle)
-        return 0;
+    ఒకవేళ(!p || !p->handle)
+        తిరిగి 0;
     size_t retsz = 0;
     cl_ulong val = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(val), &val, &retsz);
-    CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_LOCAL_MEM_SIZE)");
-    return status == CL_SUCCESS ? (size_t)val : 0;
+    cl_int స్థితి_2 = cl_Get_Kernel_Work_సమూహం_Info(p->handle, dev, CL_KERNEL_LOCAL_MEM_కొలత, పరిమాణం(val), &val, &retsz);
+    CV_OCL_CHECK_ఫలితం(స్థితి_2, "clGetKernelWorkGroupInfo(CL_KERNEL_LOCAL_MEM_SIZE)");
+    తిరిగి స్థితి_2 == CL_SUCCESS ? (size_t)val : 0;
 }
 
 
 
 ///////////////////////////////////////// ProgramSource ///////////////////////////////////////////////
 
-struct ProgramSource::Impl
+నిర్మాణం కార్యక్రమం_ఆధారం::Impl
 {
     IMPLEMENT_REFCOUNTABLE();
 
-    enum KIND {
-        PROGRAM_SOURCE_CODE = 0,
-        PROGRAM_BINARIES,
-        PROGRAM_SPIR,
-        PROGRAM_SPIRV
-    } kind_;
+    గణన రకం_4 {
+        కార్యక్రమం_ఆధారం_సంకేతం = 0,
+        కార్యక్రమం_BINARIES,
+        కార్యక్రమం_SPIR,
+        కార్యక్రమం_SPIRV
+    } రకం_5;
 
-    Impl(const String& src)
+    Impl(స్థిరరాశి String& src)
     {
-        init(PROGRAM_SOURCE_CODE, cv::String(), cv::String());
-        initFromSource(src, cv::String());
+        init(కార్యక్రమం_ఆధారం_సంకేతం, cv::String(), cv::String());
+        init_From_ఆధారం(src, cv::String());
     }
-    Impl(const String& module, const String& name, const String& codeStr, const String& codeHash)
+    Impl(స్థిరరాశి String& module, స్థిరరాశి String& name, స్థిరరాశి String& సంకేతం_Str, స్థిరరాశి String& సంకేతం_Hash)
     {
-        init(PROGRAM_SOURCE_CODE, module, name);
-        initFromSource(codeStr, codeHash);
+        init(కార్యక్రమం_ఆధారం_సంకేతం, module, name);
+        init_From_ఆధారం(సంకేతం_Str, సంకేతం_Hash);
     }
 
     /// reset fields
-    void init(enum KIND kind, const String& module, const String& name)
+    శూన్య init(గణన రకం_4 రకం, స్థిరరాశి String& module, స్థిరరాశి String& name)
     {
         refcount = 1;
-        kind_ = kind;
+        రకం_5 = రకం;
         module_ = module;
         name_ = name;
 
-        sourceAddr_ = NULL;
-        sourceSize_ = 0;
-        isHashUpdated = false;
+        ఆధారం_Addr = ఖాళీ;
+        ఆధారం_కొలత = 0;
+        isHashUpdated = అబద్ధం;
     }
 
-    void initFromSource(const String& codeStr, const String& codeHash)
+    శూన్య init_From_ఆధారం(స్థిరరాశి String& సంకేతం_Str, స్థిరరాశి String& సంకేతం_Hash)
     {
-        codeStr_ = codeStr;
-        sourceHash_ = codeHash;
-        if (sourceHash_.empty())
+        సంకేతం_Str_2 = సంకేతం_Str;
+        ఆధారం_Hash = సంకేతం_Hash;
+        ఒకవేళ (ఆధారం_Hash.empty())
         {
             updateHash();
         }
-        else
+        లేకపోతే
         {
-            isHashUpdated = true;
+            isHashUpdated = నిజం;
         }
     }
 
-    void updateHash(const char* hashStr = NULL)
+    శూన్య updateHash(స్థిరరాశి అక్షరం* hashStr = ఖాళీ)
     {
-        if (hashStr)
+        ఒకవేళ (hashStr)
         {
-            sourceHash_ = cv::String(hashStr);
-            isHashUpdated = true;
-            return;
+            ఆధారం_Hash = cv::String(hashStr);
+            isHashUpdated = నిజం;
+            తిరిగి;
         }
         uint64 hash = 0;
-        switch (kind_)
+        ఎంపిక (రకం_5)
         {
-        case PROGRAM_SOURCE_CODE:
-            if (sourceAddr_)
+        స్థితి కార్యక్రమం_ఆధారం_సంకేతం:
+            ఒకవేళ (ఆధారం_Addr)
             {
-                CV_Assert(codeStr_.empty());
-                hash = crc64(sourceAddr_, sourceSize_); // static storage
+                CV_Assert(సంకేతం_Str_2.empty());
+                hash = crc64(ఆధారం_Addr, ఆధారం_కొలత); // static storage
             }
-            else
+            లేకపోతే
             {
-                CV_Assert(!codeStr_.empty());
-                hash = crc64((uchar*)codeStr_.c_str(), codeStr_.size());
+                CV_Assert(!సంకేతం_Str_2.empty());
+                hash = crc64((uchar*)సంకేతం_Str_2.c_str(), సంకేతం_Str_2.size());
             }
-            break;
-        case PROGRAM_BINARIES:
-        case PROGRAM_SPIR:
-        case PROGRAM_SPIRV:
-            hash = crc64(sourceAddr_, sourceSize_);
-            break;
-        default:
-            CV_Error(Error::StsInternal, "Internal error");
+            ఆపు;
+        స్థితి కార్యక్రమం_BINARIES:
+        స్థితి కార్యక్రమం_SPIR:
+        స్థితి కార్యక్రమం_SPIRV:
+            hash = crc64(ఆధారం_Addr, ఆధారం_కొలత);
+            ఆపు;
+        అప్రమేయ:
+            CV_Error(Error::Sts_అంతర్గత, "Internal error");
         }
-        sourceHash_ = cv::format("%08jx", (uintmax_t)hash);
-        isHashUpdated = true;
+        ఆధారం_Hash = cv::format("%08jx", (uintmax_t)hash);
+        isHashUpdated = నిజం;
     }
 
-    Impl(enum KIND kind,
-            const String& module, const String& name,
-            const unsigned char* binary, const size_t size,
-            const cv::String& buildOptions = cv::String())
+    Impl(గణన రకం_4 రకం,
+            స్థిరరాశి String& module, స్థిరరాశి String& name,
+            స్థిరరాశి గుర్తులేని అక్షరం* binary, స్థిరరాశి size_t size,
+            స్థిరరాశి cv::String& buildOptions = cv::String())
     {
-        init(kind, module, name);
+        init(రకం, module, name);
 
-        sourceAddr_ = binary;
-        sourceSize_ = size;
+        ఆధారం_Addr = binary;
+        ఆధారం_కొలత = size;
 
         buildOptions_ = buildOptions;
     }
 
-    static ProgramSource fromSourceWithStaticLifetime(const String& module, const String& name,
-            const char* sourceCodeStaticStr, const char* hashStaticStr,
-            const cv::String& buildOptions)
+    స్థిర కార్యక్రమం_ఆధారం from_ఆధారం_With_Static_Lifetime(స్థిరరాశి String& module, స్థిరరాశి String& name,
+            స్థిరరాశి అక్షరం* ఆధారం_సంకేతం_Static_Str, స్థిరరాశి అక్షరం* hashStaticStr,
+            స్థిరరాశి cv::String& buildOptions)
     {
-        ProgramSource result;
-        result.p = new Impl(PROGRAM_SOURCE_CODE, module, name,
-                (const unsigned char*)sourceCodeStaticStr, strlen(sourceCodeStaticStr), buildOptions);
-        result.p->updateHash(hashStaticStr);
-        return result;
+        కార్యక్రమం_ఆధారం ఫలితం;
+        ఫలితం.p = కొత్త Impl(కార్యక్రమం_ఆధారం_సంకేతం, module, name,
+                (స్థిరరాశి గుర్తులేని అక్షరం*)ఆధారం_సంకేతం_Static_Str, అక్షరశ్రేణి_పొడవు(ఆధారం_సంకేతం_Static_Str), buildOptions);
+        ఫలితం.p->updateHash(hashStaticStr);
+        తిరిగి ఫలితం;
     }
 
-    static ProgramSource fromBinary(const String& module, const String& name,
-            const unsigned char* binary, const size_t size,
-            const cv::String& buildOptions)
+    స్థిర కార్యక్రమం_ఆధారం from_ద్విమాన(స్థిరరాశి String& module, స్థిరరాశి String& name,
+            స్థిరరాశి గుర్తులేని అక్షరం* binary, స్థిరరాశి size_t size,
+            స్థిరరాశి cv::String& buildOptions)
     {
-        ProgramSource result;
-        result.p = new Impl(PROGRAM_BINARIES, module, name, binary, size, buildOptions);
-        return result;
+        కార్యక్రమం_ఆధారం ఫలితం;
+        ఫలితం.p = కొత్త Impl(కార్యక్రమం_BINARIES, module, name, binary, size, buildOptions);
+        తిరిగి ఫలితం;
     }
 
-    static ProgramSource fromSPIR(const String& module, const String& name,
-            const unsigned char* binary, const size_t size,
-            const cv::String& buildOptions)
+    స్థిర కార్యక్రమం_ఆధారం fromSPIR(స్థిరరాశి String& module, స్థిరరాశి String& name,
+            స్థిరరాశి గుర్తులేని అక్షరం* binary, స్థిరరాశి size_t size,
+            స్థిరరాశి cv::String& buildOptions)
     {
-        ProgramSource result;
-        result.p = new Impl(PROGRAM_SPIR, module, name, binary, size, buildOptions);
-        return result;
+        కార్యక్రమం_ఆధారం ఫలితం;
+        ఫలితం.p = కొత్త Impl(కార్యక్రమం_SPIR, module, name, binary, size, buildOptions);
+        తిరిగి ఫలితం;
     }
 
     String module_;
     String name_;
 
     // TODO std::vector<ProgramSource> includes_;
-    String codeStr_; // PROGRAM_SOURCE_CODE only
+    String సంకేతం_Str_2; // PROGRAM_SOURCE_CODE only
 
-    const unsigned char* sourceAddr_;
-    size_t sourceSize_;
+    స్థిరరాశి గుర్తులేని అక్షరం* ఆధారం_Addr;
+    size_t ఆధారం_కొలత;
 
     cv::String buildOptions_;
 
-    String sourceHash_;
-    bool isHashUpdated;
+    String ఆధారం_Hash;
+    తార్కిక isHashUpdated;
 
-    friend struct Program::Impl;
-    friend struct internal::ProgramEntry;
-    friend struct Context::Impl;
+    మిత్ర నిర్మాణం కార్యక్రమం_2::Impl;
+    మిత్ర నిర్మాణం internal::కార్యక్రమం_నమోదు;
+    మిత్ర నిర్మాణం Context::Impl;
 };
 
 
-ProgramSource::ProgramSource() CV_NOEXCEPT
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం() CV_NOEXCEPT
 {
     p = 0;
 }
 
-ProgramSource::ProgramSource(const String& module, const String& name, const String& codeStr, const String& codeHash)
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(స్థిరరాశి String& module, స్థిరరాశి String& name, స్థిరరాశి String& సంకేతం_Str, స్థిరరాశి String& సంకేతం_Hash)
 {
-    p = new Impl(module, name, codeStr, codeHash);
+    p = కొత్త Impl(module, name, సంకేతం_Str, సంకేతం_Hash);
 }
 
-ProgramSource::ProgramSource(const char* prog)
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(స్థిరరాశి అక్షరం* prog)
 {
-    p = new Impl(prog);
+    p = కొత్త Impl(prog);
 }
 
-ProgramSource::ProgramSource(const String& prog)
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(స్థిరరాశి String& prog)
 {
-    p = new Impl(prog);
+    p = కొత్త Impl(prog);
 }
 
-ProgramSource::~ProgramSource()
+కార్యక్రమం_ఆధారం::~కార్యక్రమం_ఆధారం()
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
 }
 
-ProgramSource::ProgramSource(const ProgramSource& prog)
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(స్థిరరాశి కార్యక్రమం_ఆధారం& prog)
 {
     p = prog.p;
-    if(p)
+    ఒకవేళ(p)
         p->addref();
 }
 
-ProgramSource& ProgramSource::operator = (const ProgramSource& prog)
+కార్యక్రమం_ఆధారం& కార్యక్రమం_ఆధారం::క్రియాకారకం = (స్థిరరాశి కార్యక్రమం_ఆధారం& prog)
 {
     Impl* newp = (Impl*)prog.p;
-    if(newp)
+    ఒకవేళ(newp)
         newp->addref();
-    if(p)
+    ఒకవేళ(p)
         p->release();
     p = newp;
-    return *this;
+    తిరిగి *ఇది;
 }
 
-ProgramSource::ProgramSource(ProgramSource&& prog) CV_NOEXCEPT
+కార్యక్రమం_ఆధారం::కార్యక్రమం_ఆధారం(కార్యక్రమం_ఆధారం&& prog) CV_NOEXCEPT
 {
     p = prog.p;
-    prog.p = nullptr;
+    prog.p = శూన్యసూచిక;
 }
 
-ProgramSource& ProgramSource::operator = (ProgramSource&& prog) CV_NOEXCEPT
+కార్యక్రమం_ఆధారం& కార్యక్రమం_ఆధారం::క్రియాకారకం = (కార్యక్రమం_ఆధారం&& prog) CV_NOEXCEPT
 {
-    if (this != &prog) {
-        if(p)
+    ఒకవేళ (ఇది != &prog) {
+        ఒకవేళ(p)
             p->release();
         p = prog.p;
-        prog.p = nullptr;
+        prog.p = శూన్యసూచిక;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-const String& ProgramSource::source() const
+స్థిరరాశి String& కార్యక్రమం_ఆధారం::ఆధారం() స్థిరరాశి
 {
     CV_Assert(p);
-    CV_Assert(p->kind_ == Impl::PROGRAM_SOURCE_CODE);
-    CV_Assert(p->sourceAddr_ == NULL); // method returns reference - can't construct temporary object
-    return p->codeStr_;
+    CV_Assert(p->రకం_5 == Impl::కార్యక్రమం_ఆధారం_సంకేతం);
+    CV_Assert(p->ఆధారం_Addr == ఖాళీ); // method returns reference - can't construct temporary object
+    తిరిగి p->సంకేతం_Str_2;
 }
 
-ProgramSource::hash_t ProgramSource::hash() const
+కార్యక్రమం_ఆధారం::hash_t కార్యక్రమం_ఆధారం::hash() స్థిరరాశి
 {
     CV_Error(Error::StsNotImplemented, "Removed method: ProgramSource::hash()");
 }
 
-ProgramSource ProgramSource::fromBinary(const String& module, const String& name,
-        const unsigned char* binary, const size_t size,
-        const cv::String& buildOptions)
+కార్యక్రమం_ఆధారం కార్యక్రమం_ఆధారం::from_ద్విమాన(స్థిరరాశి String& module, స్థిరరాశి String& name,
+        స్థిరరాశి గుర్తులేని అక్షరం* binary, స్థిరరాశి size_t size,
+        స్థిరరాశి cv::String& buildOptions)
 {
     CV_Assert(binary);
     CV_Assert(size > 0);
-    return Impl::fromBinary(module, name, binary, size, buildOptions);
+    తిరిగి Impl::from_ద్విమాన(module, name, binary, size, buildOptions);
 }
 
-ProgramSource ProgramSource::fromSPIR(const String& module, const String& name,
-        const unsigned char* binary, const size_t size,
-        const cv::String& buildOptions)
+కార్యక్రమం_ఆధారం కార్యక్రమం_ఆధారం::fromSPIR(స్థిరరాశి String& module, స్థిరరాశి String& name,
+        స్థిరరాశి గుర్తులేని అక్షరం* binary, స్థిరరాశి size_t size,
+        స్థిరరాశి cv::String& buildOptions)
 {
     CV_Assert(binary);
     CV_Assert(size > 0);
-    return Impl::fromBinary(module, name, binary, size, buildOptions);
+    తిరిగి Impl::from_ద్విమాన(module, name, binary, size, buildOptions);
 }
 
 
-internal::ProgramEntry::operator ProgramSource&() const
+internal::కార్యక్రమం_నమోదు::క్రియాకారకం కార్యక్రమం_ఆధారం&() స్థిరరాశి
 {
-    if (this->pProgramSource == NULL)
+    ఒకవేళ (ఇది->p_కార్యక్రమం_ఆధారం == ఖాళీ)
     {
-        cv::AutoLock lock(cv::getInitializationMutex());
-        if (this->pProgramSource == NULL)
+        cv::Auto_తాళం lock(cv::getInitializationMutex());
+        ఒకవేళ (ఇది->p_కార్యక్రమం_ఆధారం == ఖాళీ)
         {
-            ProgramSource ps = ProgramSource::Impl::fromSourceWithStaticLifetime(this->module, this->name, this->programCode, this->programHash, cv::String());
-            ProgramSource* ptr = new ProgramSource(ps);
-            const_cast<ProgramEntry*>(this)->pProgramSource = ptr;
+            కార్యక్రమం_ఆధారం ps = కార్యక్రమం_ఆధారం::Impl::from_ఆధారం_With_Static_Lifetime(ఇది->module, ఇది->name, ఇది->కార్యక్రమం_సంకేతం, ఇది->కార్యక్రమం_Hash, cv::String());
+            కార్యక్రమం_ఆధారం* ptr = కొత్త కార్యక్రమం_ఆధారం(ps);
+            const_cast<కార్యక్రమం_నమోదు*>(ఇది)->p_కార్యక్రమం_ఆధారం = ptr;
         }
     }
-    return *this->pProgramSource;
+    తిరిగి *ఇది->p_కార్యక్రమం_ఆధారం;
 }
 
 
 
 /////////////////////////////////////////// Program /////////////////////////////////////////////
 
-static
-cv::String joinBuildOptions(const cv::String& a, const cv::String& b)
+స్థిర
+cv::String joinBuildOptions(స్థిరరాశి cv::String& a, స్థిరరాశి cv::String& b)
 {
-    if (b.empty())
-        return a;
-    if (a.empty())
-        return b;
-    if (b[0] == ' ')
-        return a + b;
-    return a + (cv::String(" ") + b);
+    ఒకవేళ (b.empty())
+        తిరిగి a;
+    ఒకవేళ (a.empty())
+        తిరిగి b;
+    ఒకవేళ (b[0] == ' ')
+        తిరిగి a + b;
+    తిరిగి a + (cv::String(" ") + b);
 }
 
-struct Program::Impl
+నిర్మాణం కార్యక్రమం_2::Impl
 {
     IMPLEMENT_REFCOUNTABLE();
 
-    Impl(const ProgramSource& src,
-         const String& _buildflags, String& errmsg) :
+    Impl(స్థిరరాశి కార్యక్రమం_ఆధారం& src,
+         స్థిరరాశి String& _buildflags, String& errmsg) :
          refcount(1),
-         handle(NULL),
+         handle(ఖాళీ),
          buildflags(_buildflags)
     {
-        const ProgramSource::Impl* src_ = src.getImpl();
+        స్థిరరాశి కార్యక్రమం_ఆధారం::Impl* src_ = src.getImpl();
         CV_Assert(src_);
-        sourceModule_ = src_->module_;
-        sourceName_ = src_->name_;
-        const Context ctx = Context::getDefault();
+        ఆధారం_Module = src_->module_;
+        ఆధారం_Name = src_->name_;
+        స్థిరరాశి Context ctx = Context::getDefault();
         Device device = ctx.device(0);
-        if (ctx.ptr() == NULL || device.ptr() == NULL)
-            return;
+        ఒకవేళ (ctx.ptr() == ఖాళీ || device.ptr() == ఖాళీ)
+            తిరిగి;
         buildflags = joinBuildOptions(buildflags, src_->buildOptions_);
-        if (src.getImpl()->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
+        ఒకవేళ (src.getImpl()->రకం_5 == కార్యక్రమం_ఆధారం::Impl::కార్యక్రమం_ఆధారం_సంకేతం)
         {
-            if (device.isAMD())
+            ఒకవేళ (device.isAMD())
                 buildflags = joinBuildOptions(buildflags, " -D AMD_DEVICE");
-            else if (device.isIntel())
+            లేకపోతే ఒకవేళ (device.isIntel())
                 buildflags = joinBuildOptions(buildflags, " -D INTEL_DEVICE");
-            const String param_buildExtraOptions = getBuildExtraOptions();
-            if (!param_buildExtraOptions.empty())
+            స్థిరరాశి String param_buildExtraOptions = getBuildExtraOptions();
+            ఒకవేళ (!param_buildExtraOptions.empty())
                 buildflags = joinBuildOptions(buildflags, param_buildExtraOptions);
         }
-#if CV_OPENCL_SHOW_BUILD_OPTIONS
-        CV_LOG_INFO(NULL, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' options:" << buildflags);
-#endif
+#ఒకవేళ CV_OPENCL_SHOW_BUILD_OPTIONS
+        CV_LOG_INFO(ఖాళీ, "OpenCL program '" << ఆధారం_Module << "/" << ఆధారం_Name << "' options:" << buildflags);
+#అయితే_ముగింపు
         compile(ctx, src_, errmsg);
-#if CV_OPENCL_SHOW_BUILD_KERNELS
-        if (handle)
+#ఒకవేళ CV_OPENCL_SHOW_BUILD_KERNELS
+        ఒకవేళ (handle)
         {
             size_t retsz = 0;
-            char kernels_buffer[4096] = {0};
-            cl_int result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, sizeof(kernels_buffer), &kernels_buffer[0], &retsz);
-            CV_OCL_DBG_CHECK_RESULT(result, cv::format("clGetProgramInfo(CL_PROGRAM_KERNEL_NAMES: %s/%s)", sourceModule_.c_str(), sourceName_.c_str()).c_str());
-            if (result == CL_SUCCESS && retsz < sizeof(kernels_buffer))
+            అక్షరం kernels_బఫరు[4096] = {0};
+            cl_int ఫలితం = cl_Get_కార్యక్రమం_Info(handle, CL_కార్యక్రమం_KERNEL_పేర్లు, పరిమాణం(kernels_బఫరు), &kernels_బఫరు[0], &retsz);
+            CV_OCL_DBG_CHECK_ఫలితం(ఫలితం, cv::format("clGetProgramInfo(CL_PROGRAM_KERNEL_NAMES: %s/%s)", ఆధారం_Module.c_str(), ఆధారం_Name.c_str()).c_str());
+            ఒకవేళ (ఫలితం == CL_SUCCESS && retsz < పరిమాణం(kernels_బఫరు))
             {
-                kernels_buffer[retsz] = 0;
-                CV_LOG_INFO(NULL, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' kernels: '" << kernels_buffer << "'");
+                kernels_బఫరు[retsz] = 0;
+                CV_LOG_INFO(ఖాళీ, "OpenCL program '" << ఆధారం_Module << "/" << ఆధారం_Name << "' kernels: '" << kernels_బఫరు << "'");
             }
-            else
+            లేకపోతే
             {
-                CV_LOG_ERROR(NULL, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' can't retrieve kernel names!");
+                CV_LOG_ERROR(ఖాళీ, "OpenCL program '" << ఆధారం_Module << "/" << ఆధారం_Name << "' can't retrieve kernel names!");
             }
         }
-#endif
+#అయితే_ముగింపు
     }
 
-    bool compile(const Context& ctx, const ProgramSource::Impl* src_, String& errmsg)
+    తార్కిక compile(స్థిరరాశి Context& ctx, స్థిరరాశి కార్యక్రమం_ఆధారం::Impl* src_, String& errmsg)
     {
         CV_Assert(ctx.getImpl());
         CV_Assert(src_);
 
         // We don't cache OpenCL binaries
-        if (src_->kind_ == ProgramSource::Impl::PROGRAM_BINARIES)
+        ఒకవేళ (src_->రకం_5 == కార్యక్రమం_ఆధారం::Impl::కార్యక్రమం_BINARIES)
         {
-            CV_LOG_VERBOSE(NULL, 0, "Load program binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
-            bool isLoaded = createFromBinary(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
-            return isLoaded;
+            CV_LOG_VERBOSE(ఖాళీ, 0, "Load program binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
+            తార్కిక isLoaded = create_From_ద్విమాన(ctx, src_->ఆధారం_Addr, src_->ఆధారం_కొలత, errmsg);
+            తిరిగి isLoaded;
         }
-        return compileWithCache(ctx, src_, errmsg);
+        తిరిగి compileWithCache(ctx, src_, errmsg);
     }
 
-    bool compileWithCache(const Context& ctx, const ProgramSource::Impl* src_, String& errmsg)
+    తార్కిక compileWithCache(స్థిరరాశి Context& ctx, స్థిరరాశి కార్యక్రమం_ఆధారం::Impl* src_, String& errmsg)
     {
         CV_Assert(ctx.getImpl());
         CV_Assert(src_);
-        CV_Assert(src_->kind_ != ProgramSource::Impl::PROGRAM_BINARIES);
+        CV_Assert(src_->రకం_5 != కార్యక్రమం_ఆధారం::Impl::కార్యక్రమం_BINARIES);
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
         OpenCLBinaryCacheConfigurator& config = OpenCLBinaryCacheConfigurator::getSingletonInstance();
-        const std::string base_dir = config.prepareCacheDirectoryForContext(
-                ctx.getImpl()->getPrefixString(),
-                ctx.getImpl()->getPrefixBase()
+        స్థిరరాశి std::string పునాది_dir = config.prepareCacheDirectoryForContext(
+                ctx.getImpl()->get_ఉపసర్గ_String(),
+                ctx.getImpl()->get_ఉపసర్గ_పునాది()
         );
-        const String& hash_str = src_->sourceHash_;
+        స్థిరరాశి String& hash_str = src_->ఆధారం_Hash;
         cv::String fname;
-        if (!base_dir.empty() && !src_->module_.empty() && !src_->name_.empty())
+        ఒకవేళ (!పునాది_dir.empty() && !src_->module_.empty() && !src_->name_.empty())
         {
             CV_Assert(!hash_str.empty());
             fname = src_->module_ + "--" + src_->name_ + "_" + hash_str + ".bin";
-            fname = utils::fs::join(base_dir, fname);
+            fname = utils::fs::join(పునాది_dir, fname);
         }
-        const cv::Ptr<utils::fs::FileLock> fileLock = config.cache_lock_; // can be empty
-        if (!fname.empty() && CV_OPENCL_CACHE_ENABLE)
+        స్థిరరాశి cv::Ptr<utils::fs::File_తాళం> file_తాళం = config.cache_తాళం; // can be empty
+        ఒకవేళ (!fname.empty() && CV_OPENCL_CACHE_ENABLE)
         {
-            try
+            ప్రయత్నించు
             {
-                std::vector<char> binaryBuf;
-                bool res = false;
+                std::vector<అక్షరం> ద్విమాన_Buf;
+                తార్కిక res = అబద్ధం;
                 {
-                    cv::utils::optional_shared_lock_guard<cv::utils::fs::FileLock> lock_fs(fileLock.get());
-                    BinaryProgramFile file(fname, hash_str.c_str());
-                    res = file.read(buildflags, binaryBuf);
+                    cv::utils::optional_shared_తాళం_guard<cv::utils::fs::File_తాళం> తాళం_fs(file_తాళం.get());
+                    ద్విమాన_కార్యక్రమం_File file(fname, hash_str.c_str());
+                    res = file.పఠ(buildflags, ద్విమాన_Buf);
                 }
-                if (res)
+                ఒకవేళ (res)
                 {
-                    CV_Assert(!binaryBuf.empty());
-                    CV_LOG_VERBOSE(NULL, 0, "Load program binary from cache: " << src_->module_.c_str() << "/" << src_->name_.c_str());
-                    bool isLoaded = createFromBinary(ctx, binaryBuf, errmsg);
-                    if (isLoaded)
-                        return true;
+                    CV_Assert(!ద్విమాన_Buf.empty());
+                    CV_LOG_VERBOSE(ఖాళీ, 0, "Load program binary from cache: " << src_->module_.c_str() << "/" << src_->name_.c_str());
+                    తార్కిక isLoaded = create_From_ద్విమాన(ctx, ద్విమాన_Buf, errmsg);
+                    ఒకవేళ (isLoaded)
+                        తిరిగి నిజం;
                 }
             }
-            catch (const cv::Exception& e)
+            పట్టుకో (స్థిరరాశి cv::Exception& e)
             {
-                CV_UNUSED(e);
-                CV_LOG_VERBOSE(NULL, 0, "Can't load OpenCL binary: " + fname << std::endl << e.what());
+                CV_వాడని(e);
+                CV_LOG_VERBOSE(ఖాళీ, 0, "Can't load OpenCL binary: " + fname << std::పంక్తి_ముగింపు << e.what());
             }
-            catch (...)
+            పట్టుకో (...)
             {
-                CV_LOG_VERBOSE(NULL, 0, "Can't load OpenCL binary: " + fname);
+                CV_LOG_VERBOSE(ఖాళీ, 0, "Can't load OpenCL binary: " + fname);
             }
         }
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
-        CV_Assert(handle == NULL);
-        if (src_->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
+#అయితే_ముగింపు // OPENCV_HAVE_FILESYSTEM_SUPPORT
+        CV_Assert(handle == ఖాళీ);
+        ఒకవేళ (src_->రకం_5 == కార్యక్రమం_ఆధారం::Impl::కార్యక్రమం_ఆధారం_సంకేతం)
         {
-            if (!buildFromSources(ctx, src_, errmsg))
+            ఒకవేళ (!buildFromSources(ctx, src_, errmsg))
             {
-                return false;
+                తిరిగి అబద్ధం;
             }
         }
-        else if (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIR)
+        లేకపోతే ఒకవేళ (src_->రకం_5 == కార్యక్రమం_ఆధారం::Impl::కార్యక్రమం_SPIR)
         {
             buildflags = joinBuildOptions(buildflags, " -x spir");
-            if ((cv::String(" ") + buildflags).find(" -spir-std=") == cv::String::npos)
+            ఒకవేళ ((cv::String(" ") + buildflags).find(" -spir-std=") == cv::String::npos)
             {
                 buildflags = joinBuildOptions(buildflags, " -spir-std=1.2");
             }
-            CV_LOG_VERBOSE(NULL, 0, "Load program SPIR binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
-            bool isLoaded = createFromBinary(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
-            if (!isLoaded)
-                return false;
+            CV_LOG_VERBOSE(ఖాళీ, 0, "Load program SPIR binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
+            తార్కిక isLoaded = create_From_ద్విమాన(ctx, src_->ఆధారం_Addr, src_->ఆధారం_కొలత, errmsg);
+            ఒకవేళ (!isLoaded)
+                తిరిగి అబద్ధం;
         }
-        else if (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIRV)
+        లేకపోతే ఒకవేళ (src_->రకం_5 == కార్యక్రమం_ఆధారం::Impl::కార్యక్రమం_SPIRV)
         {
             CV_Error(Error::StsNotImplemented, "OpenCL: SPIR-V is not supported");
         }
-        else
+        లేకపోతే
         {
-            CV_Error(Error::StsInternal, "Internal error");
+            CV_Error(Error::Sts_అంతర్గత, "Internal error");
         }
-        CV_Assert(handle != NULL);
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-        if (!fname.empty() && CV_OPENCL_CACHE_WRITE)
+        CV_Assert(handle != ఖాళీ);
+#ఒకవేళ OPENCV_HAVE_FILESYSTEM_SUPPORT
+        ఒకవేళ (!fname.empty() && CV_OPENCL_CACHE_WRITE)
         {
-            try
+            ప్రయత్నించు
             {
-                std::vector<char> binaryBuf;
-                getProgramBinary(binaryBuf);
+                std::vector<అక్షరం> ద్విమాన_Buf;
+                get_కార్యక్రమం_ద్విమాన(ద్విమాన_Buf);
                 {
-                    cv::utils::optional_lock_guard<cv::utils::fs::FileLock> lock_fs(fileLock.get());
-                    BinaryProgramFile file(fname, hash_str.c_str());
-                    file.write(buildflags, binaryBuf);
+                    cv::utils::optional_తాళం_guard<cv::utils::fs::File_తాళం> తాళం_fs(file_తాళం.get());
+                    ద్విమాన_కార్యక్రమం_File file(fname, hash_str.c_str());
+                    file.లిఖ(buildflags, ద్విమాన_Buf);
                 }
             }
-            catch (const cv::Exception& e)
+            పట్టుకో (స్థిరరాశి cv::Exception& e)
             {
-                CV_LOG_WARNING(NULL, "Can't save OpenCL binary into cache: " + fname << std::endl << e.what());
+                CV_LOG_WARNING(ఖాళీ, "Can't save OpenCL binary into cache: " + fname << std::పంక్తి_ముగింపు << e.what());
             }
-            catch (...)
+            పట్టుకో (...)
             {
-                CV_LOG_WARNING(NULL, "Can't save OpenCL binary into cache: " + fname);
+                CV_LOG_WARNING(ఖాళీ, "Can't save OpenCL binary into cache: " + fname);
             }
         }
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-        if (CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#అయితే_ముగింపు // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ఒకవేళ CV_OPENCL_VALIDATE_ద్విమాన_PROGRAMS
+        ఒకవేళ (CV_OPENCL_VALIDATE_ద్విమాన_PROGRAMS_విలువ)
         {
-            std::vector<char> binaryBuf;
-            getProgramBinary(binaryBuf);
-            if (!binaryBuf.empty())
+            std::vector<అక్షరం> ద్విమాన_Buf;
+            get_కార్యక్రమం_ద్విమాన(ద్విమాన_Buf);
+            ఒకవేళ (!ద్విమాన_Buf.empty())
             {
-                CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                handle = NULL;
-                createFromBinary(ctx, binaryBuf, errmsg);
+                CV_OCL_DBG_CHECK(cl_Release_కార్యక్రమం(handle));
+                handle = ఖాళీ;
+                create_From_ద్విమాన(ctx, ద్విమాన_Buf, errmsg);
             }
         }
-#endif
-        return handle != NULL;
+#అయితే_ముగింపు
+        తిరిగి handle != ఖాళీ;
     }
 
-    void dumpBuildLog_(cl_int result, const cl_device_id* deviceList, String& errmsg)
+    శూన్య dumpBuildLog_(cl_int ఫలితం, స్థిరరాశి cl_device_id* deviceList, String& errmsg)
     {
-        AutoBuffer<char, 4096> buffer; buffer[0] = 0;
+        Auto_బఫరు<అక్షరం, 4096> బఫరు; బఫరు[0] = 0;
 
         size_t retsz = 0;
-        cl_int log_retval = clGetProgramBuildInfo(handle, deviceList[0],
-                                                  CL_PROGRAM_BUILD_LOG, 0, 0, &retsz);
-        if (log_retval == CL_SUCCESS && retsz > 1)
+        cl_int log_retval = cl_Get_కార్యక్రమం_Build_Info(handle, deviceList[0],
+                                                  CL_కార్యక్రమం_BUILD_LOG, 0, 0, &retsz);
+        ఒకవేళ (log_retval == CL_SUCCESS && retsz > 1)
         {
-            buffer.resize(retsz + 16);
-            log_retval = clGetProgramBuildInfo(handle, deviceList[0],
-                                               CL_PROGRAM_BUILD_LOG, retsz+1, buffer.data(), &retsz);
-            if (log_retval == CL_SUCCESS)
+            బఫరు.resize(retsz + 16);
+            log_retval = cl_Get_కార్యక్రమం_Build_Info(handle, deviceList[0],
+                                               CL_కార్యక్రమం_BUILD_LOG, retsz+1, బఫరు.దత్తాంశం(), &retsz);
+            ఒకవేళ (log_retval == CL_SUCCESS)
             {
-                if (retsz < buffer.size())
-                    buffer[retsz] = 0;
-                else
-                    buffer[buffer.size() - 1] = 0;
+                ఒకవేళ (retsz < బఫరు.size())
+                    బఫరు[retsz] = 0;
+                లేకపోతే
+                    బఫరు[బఫరు.size() - 1] = 0;
             }
-            else
+            లేకపోతే
             {
-                buffer[0] = 0;
+                బఫరు[0] = 0;
             }
         }
 
-        errmsg = String(buffer.data());
-        printf("OpenCL program build log: %s/%s\nStatus %d: %s\n%s\n%s\n",
-                sourceModule_.c_str(), sourceName_.c_str(),
-                result, getOpenCLErrorString(result),
+        errmsg = String(బఫరు.దత్తాంశం());
+        రాయి("OpenCL program build log: %s/%s\nStatus %d: %s\n%s\n%s\n",
+                ఆధారం_Module.c_str(), ఆధారం_Name.c_str(),
+                ఫలితం, getOpenCLErrorString(ఫలితం),
                 buildflags.c_str(), errmsg.c_str());
         fflush(stdout);
     }
 
-    bool buildFromSources(const Context& ctx, const ProgramSource::Impl* src_, String& errmsg)
+    తార్కిక buildFromSources(స్థిరరాశి Context& ctx, స్థిరరాశి కార్యక్రమం_ఆధారం::Impl* src_, String& errmsg)
     {
         CV_Assert(src_);
-        CV_Assert(src_->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE);
-        CV_Assert(handle == NULL);
+        CV_Assert(src_->రకం_5 == కార్యక్రమం_ఆధారం::Impl::కార్యక్రమం_ఆధారం_సంకేతం);
+        CV_Assert(handle == ఖాళీ);
         CV_INSTRUMENT_REGION_OPENCL_COMPILE(cv::format("Build OpenCL program: %s/%s %s options: %s",
-                sourceModule_.c_str(), sourceName_.c_str(),
-                src_->sourceHash_.c_str(), buildflags.c_str()).c_str());
+                ఆధారం_Module.c_str(), ఆధారం_Name.c_str(),
+                src_->ఆధారం_Hash.c_str(), buildflags.c_str()).c_str());
 
-        CV_LOG_VERBOSE(NULL, 0, "Compile... " << sourceModule_.c_str() << "/" << sourceName_.c_str());
+        CV_LOG_VERBOSE(ఖాళీ, 0, "Compile... " << ఆధారం_Module.c_str() << "/" << ఆధారం_Name.c_str());
 
-        const char* srcptr = src_->sourceAddr_ ? ((const char*)src_->sourceAddr_) : src_->codeStr_.c_str();
-        size_t srclen = src_->sourceAddr_ ? src_->sourceSize_ : src_->codeStr_.size();
-        CV_Assert(srcptr != NULL);
+        స్థిరరాశి అక్షరం* srcptr = src_->ఆధారం_Addr ? ((స్థిరరాశి అక్షరం*)src_->ఆధారం_Addr) : src_->సంకేతం_Str_2.c_str();
+        size_t srclen = src_->ఆధారం_Addr ? src_->ఆధారం_కొలత : src_->సంకేతం_Str_2.size();
+        CV_Assert(srcptr != ఖాళీ);
         CV_Assert(srclen > 0);
 
         cl_int retval = 0;
 
-        handle = clCreateProgramWithSource((cl_context)ctx.ptr(), 1, &srcptr, &srclen, &retval);
-        CV_OCL_DBG_CHECK_RESULT(retval, "clCreateProgramWithSource");
+        handle = cl_Create_కార్యక్రమం_With_ఆధారం((cl_context)ctx.ptr(), 1, &srcptr, &srclen, &retval);
+        CV_OCL_DBG_CHECK_ఫలితం(retval, "clCreateProgramWithSource");
         CV_Assert(handle || retval != CL_SUCCESS);
-        if (handle && retval == CL_SUCCESS)
+        ఒకవేళ (handle && retval == CL_SUCCESS)
         {
             size_t n = ctx.ndevices();
-            AutoBuffer<cl_device_id, 4> deviceListBuf(n + 1);
-            cl_device_id* deviceList = deviceListBuf.data();
-            for (size_t i = 0; i < n; i++)
+            Auto_బఫరు<cl_device_id, 4> deviceListBuf(n + 1);
+            cl_device_id* deviceList = deviceListBuf.దత్తాంశం();
+            కొరకు (size_t i = 0; i < n; i++)
             {
                 deviceList[i] = (cl_device_id)(ctx.device(i).ptr());
             }
 
-            retval = clBuildProgram(handle, (cl_uint)n, deviceList, buildflags.c_str(), 0, 0);
-            CV_OCL_TRACE_CHECK_RESULT(/*don't throw: retval*/CL_SUCCESS, cv::format("clBuildProgram(source: %s)", buildflags.c_str()).c_str());
-#if !CV_OPENCL_ALWAYS_SHOW_BUILD_LOG
-            if (retval != CL_SUCCESS)
-#endif
+            retval = cl_Build_కార్యక్రమం(handle, (cl_uint)n, deviceList, buildflags.c_str(), 0, 0);
+            CV_OCL_TRACE_CHECK_ఫలితం(/*don't throw: retval*/CL_SUCCESS, cv::format("clBuildProgram(source: %s)", buildflags.c_str()).c_str());
+#ఒకవేళ !CV_OPENCL_ALWAYS_SHOW_BUILD_LOG
+            ఒకవేళ (retval != CL_SUCCESS)
+#అయితే_ముగింపు
             {
                 dumpBuildLog_(retval, deviceList, errmsg);
 
                 // don't remove "retval != CL_SUCCESS" condition here:
                 // it would break CV_OPENCL_ALWAYS_SHOW_BUILD_LOG mode
-                if (retval != CL_SUCCESS && handle)
+                ఒకవేళ (retval != CL_SUCCESS && handle)
                 {
-                    CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                    handle = NULL;
+                    CV_OCL_DBG_CHECK(cl_Release_కార్యక్రమం(handle));
+                    handle = ఖాళీ;
                 }
-                if (retval != CL_SUCCESS &&
-                    sourceName_ != "dummy"  // used for testing of compilation flags
+                ఒకవేళ (retval != CL_SUCCESS &&
+                    ఆధారం_Name != "dummy"  // used for testing of compilation flags
                 )
                 {
                     onOpenCLKernelBuildError();
                 }
             }
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-            if (handle && CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#ఒకవేళ CV_OPENCL_VALIDATE_ద్విమాన_PROGRAMS
+            ఒకవేళ (handle && CV_OPENCL_VALIDATE_ద్విమాన_PROGRAMS_విలువ)
             {
-                CV_LOG_INFO(NULL, "OpenCL: query kernel names (build from sources)...");
+                CV_LOG_INFO(ఖాళీ, "OpenCL: query kernel names (build from sources)...");
                 size_t retsz = 0;
-                char kernels_buffer[4096] = {0};
-                cl_int result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, sizeof(kernels_buffer), &kernels_buffer[0], &retsz);
-                if (retsz < sizeof(kernels_buffer))
-                    kernels_buffer[retsz] = 0;
-                else
-                    kernels_buffer[0] = 0;
-                CV_LOG_INFO(NULL, result << ": Kernels='" << kernels_buffer << "'");
+                అక్షరం kernels_బఫరు[4096] = {0};
+                cl_int ఫలితం = cl_Get_కార్యక్రమం_Info(handle, CL_కార్యక్రమం_KERNEL_పేర్లు, పరిమాణం(kernels_బఫరు), &kernels_బఫరు[0], &retsz);
+                ఒకవేళ (retsz < పరిమాణం(kernels_బఫరు))
+                    kernels_బఫరు[retsz] = 0;
+                లేకపోతే
+                    kernels_బఫరు[0] = 0;
+                CV_LOG_INFO(ఖాళీ, ఫలితం << ": Kernels='" << kernels_బఫరు << "'");
             }
-#endif
+#అయితే_ముగింపు
         }
-        return handle != NULL;
+        తిరిగి handle != ఖాళీ;
     }
 
-    void getProgramBinary(std::vector<char>& buf)
+    శూన్య get_కార్యక్రమం_ద్విమాన(std::vector<అక్షరం>& buf)
     {
         CV_Assert(handle);
         size_t sz = 0;
-        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARY_SIZES, sizeof(sz), &sz, NULL));
+        CV_OCL_CHECK(cl_Get_కార్యక్రమం_Info(handle, CL_కార్యక్రమం_ద్విమాన_SIZES, పరిమాణం(sz), &sz, ఖాళీ));
         buf.resize(sz);
         uchar* ptr = (uchar*)&buf[0];
-        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARIES, sizeof(ptr), &ptr, NULL));
+        CV_OCL_CHECK(cl_Get_కార్యక్రమం_Info(handle, CL_కార్యక్రమం_BINARIES, పరిమాణం(ptr), &ptr, ఖాళీ));
     }
 
-    bool createFromBinary(const Context& ctx, const std::vector<char>& buf, String& errmsg)
+    తార్కిక create_From_ద్విమాన(స్థిరరాశి Context& ctx, స్థిరరాశి std::vector<అక్షరం>& buf, String& errmsg)
     {
-        return createFromBinary(ctx, (const unsigned char*)&buf[0], buf.size(), errmsg);
+        తిరిగి create_From_ద్విమాన(ctx, (స్థిరరాశి గుర్తులేని అక్షరం*)&buf[0], buf.size(), errmsg);
     }
 
-    bool createFromBinary(const Context& ctx, const unsigned char* binaryAddr, const size_t binarySize, String& errmsg)
+    తార్కిక create_From_ద్విమాన(స్థిరరాశి Context& ctx, స్థిరరాశి గుర్తులేని అక్షరం* ద్విమాన_Addr, స్థిరరాశి size_t ద్విమాన_కొలత, String& errmsg)
     {
-        CV_Assert(handle == NULL);
+        CV_Assert(handle == ఖాళీ);
         CV_INSTRUMENT_REGION_OPENCL_COMPILE("Load OpenCL program");
-        CV_LOG_VERBOSE(NULL, 0, "Load from binary... (" << binarySize << " bytes)");
+        CV_LOG_VERBOSE(ఖాళీ, 0, "Load from binary... (" << ద్విమాన_కొలత << " bytes)");
 
-        CV_Assert(binarySize > 0);
+        CV_Assert(ద్విమాన_కొలత > 0);
 
-        size_t ndevices = (int)ctx.ndevices();
-        AutoBuffer<cl_device_id> devices_(ndevices);
-        AutoBuffer<const uchar*> binaryPtrs_(ndevices);
-        AutoBuffer<size_t> binarySizes_(ndevices);
+        size_t ndevices = (పూర్ణాంకం)ctx.ndevices();
+        Auto_బఫరు<cl_device_id> devices_(ndevices);
+        Auto_బఫరు<స్థిరరాశి uchar*> ద్విమాన_Ptrs(ndevices);
+        Auto_బఫరు<size_t> ద్విమాన_Sizes(ndevices);
 
-        cl_device_id* devices = devices_.data();
-        const uchar** binaryPtrs = binaryPtrs_.data();
-        size_t* binarySizes = binarySizes_.data();
-        for (size_t i = 0; i < ndevices; i++)
+        cl_device_id* devices = devices_.దత్తాంశం();
+        స్థిరరాశి uchar** ద్విమాన_Ptrs_2 = ద్విమాన_Ptrs.దత్తాంశం();
+        size_t* ద్విమాన_Sizes_2 = ద్విమాన_Sizes.దత్తాంశం();
+        కొరకు (size_t i = 0; i < ndevices; i++)
         {
             devices[i] = (cl_device_id)ctx.device(i).ptr();
-            binaryPtrs[i] = binaryAddr;
-            binarySizes[i] = binarySize;
+            ద్విమాన_Ptrs_2[i] = ద్విమాన_Addr;
+            ద్విమాన_Sizes_2[i] = ద్విమాన_కొలత;
         }
 
-        cl_int result = 0;
-        handle = clCreateProgramWithBinary((cl_context)ctx.ptr(), (cl_uint)ndevices, devices_.data(),
-                                           binarySizes, binaryPtrs, NULL, &result);
-        if (result != CL_SUCCESS)
+        cl_int ఫలితం = 0;
+        handle = cl_Create_కార్యక్రమం_With_ద్విమాన((cl_context)ctx.ptr(), (cl_uint)ndevices, devices_.దత్తాంశం(),
+                                           ద్విమాన_Sizes_2, ద్విమాన_Ptrs_2, ఖాళీ, &ఫలితం);
+        ఒకవేళ (ఫలితం != CL_SUCCESS)
         {
-            CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_MSG(result, "clCreateProgramWithBinary"));
-            if (handle)
+            CV_LOG_ERROR(ఖాళీ, CV_OCL_API_ERROR_సందేశం(ఫలితం, "clCreateProgramWithBinary"));
+            ఒకవేళ (handle)
             {
-                CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                handle = NULL;
+                CV_OCL_DBG_CHECK(cl_Release_కార్యక్రమం(handle));
+                handle = ఖాళీ;
             }
         }
-        if (!handle)
+        ఒకవేళ (!handle)
         {
-            return false;
+            తిరిగి అబద్ధం;
         }
         // call clBuildProgram()
         {
-            result = clBuildProgram(handle, (cl_uint)ndevices, devices_.data(), buildflags.c_str(), 0, 0);
-            CV_OCL_DBG_CHECK_RESULT(result, cv::format("clBuildProgram(binary: %s/%s)", sourceModule_.c_str(), sourceName_.c_str()).c_str());
-            if (result != CL_SUCCESS)
+            ఫలితం = cl_Build_కార్యక్రమం(handle, (cl_uint)ndevices, devices_.దత్తాంశం(), buildflags.c_str(), 0, 0);
+            CV_OCL_DBG_CHECK_ఫలితం(ఫలితం, cv::format("clBuildProgram(binary: %s/%s)", ఆధారం_Module.c_str(), ఆధారం_Name.c_str()).c_str());
+            ఒకవేళ (ఫలితం != CL_SUCCESS)
             {
-                dumpBuildLog_(result, devices, errmsg);
-                if (handle)
+                dumpBuildLog_(ఫలితం, devices, errmsg);
+                ఒకవేళ (handle)
                 {
-                    CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                    handle = NULL;
+                    CV_OCL_DBG_CHECK(cl_Release_కార్యక్రమం(handle));
+                    handle = ఖాళీ;
                 }
-                return false;
+                తిరిగి అబద్ధం;
             }
         }
         // check build status
         {
-            cl_build_status build_status = CL_BUILD_NONE;
+            cl_build_స్థితి build_స్థితి = CL_BUILD_NONE;
             size_t retsz = 0;
-            CV_OCL_DBG_CHECK(result = clGetProgramBuildInfo(handle, devices[0], CL_PROGRAM_BUILD_STATUS,
-                    sizeof(build_status), &build_status, &retsz));
-            if (result == CL_SUCCESS)
+            CV_OCL_DBG_CHECK(ఫలితం = cl_Get_కార్యక్రమం_Build_Info(handle, devices[0], CL_కార్యక్రమం_BUILD_స్థితి,
+                    పరిమాణం(build_స్థితి), &build_స్థితి, &retsz));
+            ఒకవేళ (ఫలితం == CL_SUCCESS)
             {
-                if (build_status == CL_BUILD_SUCCESS)
+                ఒకవేళ (build_స్థితి == CL_BUILD_SUCCESS)
                 {
-                    return true;
+                    తిరిగి నిజం;
                 }
-                else
+                లేకపోతే
                 {
-                    CV_LOG_WARNING(NULL, "clGetProgramBuildInfo() returns " << build_status);
-                    return false;
+                    CV_LOG_WARNING(ఖాళీ, "clGetProgramBuildInfo() returns " << build_స్థితి);
+                    తిరిగి అబద్ధం;
                 }
             }
-            else
+            లేకపోతే
             {
-                CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_MSG(result, "clGetProgramBuildInfo()"));
-                if (handle)
+                CV_LOG_ERROR(ఖాళీ, CV_OCL_API_ERROR_సందేశం(ఫలితం, "clGetProgramBuildInfo()"));
+                ఒకవేళ (handle)
                 {
-                    CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                    handle = NULL;
+                    CV_OCL_DBG_CHECK(cl_Release_కార్యక్రమం(handle));
+                    handle = ఖాళీ;
                 }
             }
         }
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-        if (handle && CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#ఒకవేళ CV_OPENCL_VALIDATE_ద్విమాన_PROGRAMS
+        ఒకవేళ (handle && CV_OPENCL_VALIDATE_ద్విమాన_PROGRAMS_విలువ)
         {
-            CV_LOG_INFO(NULL, "OpenCL: query kernel names (binary)...");
+            CV_LOG_INFO(ఖాళీ, "OpenCL: query kernel names (binary)...");
             size_t retsz = 0;
-            char kernels_buffer[4096] = {0};
-            result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, sizeof(kernels_buffer), &kernels_buffer[0], &retsz);
-            if (retsz < sizeof(kernels_buffer))
-                kernels_buffer[retsz] = 0;
-            else
-                kernels_buffer[0] = 0;
-            CV_LOG_INFO(NULL, result << ": Kernels='" << kernels_buffer << "'");
+            అక్షరం kernels_బఫరు[4096] = {0};
+            ఫలితం = cl_Get_కార్యక్రమం_Info(handle, CL_కార్యక్రమం_KERNEL_పేర్లు, పరిమాణం(kernels_బఫరు), &kernels_బఫరు[0], &retsz);
+            ఒకవేళ (retsz < పరిమాణం(kernels_బఫరు))
+                kernels_బఫరు[retsz] = 0;
+            లేకపోతే
+                kernels_బఫరు[0] = 0;
+            CV_LOG_INFO(ఖాళీ, ఫలితం << ": Kernels='" << kernels_బఫరు << "'");
         }
-#endif
-        return handle != NULL;
+#అయితే_ముగింపు
+        తిరిగి handle != ఖాళీ;
     }
 
     ~Impl()
     {
-        if( handle )
+        ఒకవేళ( handle )
         {
-#ifdef _WIN32
-            if (!cv::__termination)
-#endif
+#నిర్వచితమైతే _WIN32
+            ఒకవేళ (!cv::__termination)
+#అయితే_ముగింపు
             {
-                clReleaseProgram(handle);
+                cl_Release_కార్యక్రమం(handle);
             }
-            handle = NULL;
+            handle = ఖాళీ;
         }
     }
 
-    cl_program handle;
+    cl_కార్యక్రమం handle;
 
     String buildflags;
-    String sourceModule_;
-    String sourceName_;
+    String ఆధారం_Module;
+    String ఆధారం_Name;
 };
 
 
-Program::Program() CV_NOEXCEPT
+కార్యక్రమం_2::కార్యక్రమం_2() CV_NOEXCEPT
 {
     p = 0;
 }
 
-Program::Program(const ProgramSource& src,
-        const String& buildflags, String& errmsg)
+కార్యక్రమం_2::కార్యక్రమం_2(స్థిరరాశి కార్యక్రమం_ఆధారం& src,
+        స్థిరరాశి String& buildflags, String& errmsg)
 {
     p = 0;
     create(src, buildflags, errmsg);
 }
 
-Program::Program(const Program& prog)
+కార్యక్రమం_2::కార్యక్రమం_2(స్థిరరాశి కార్యక్రమం_2& prog)
 {
     p = prog.p;
-    if(p)
+    ఒకవేళ(p)
         p->addref();
 }
 
-Program& Program::operator = (const Program& prog)
+కార్యక్రమం_2& కార్యక్రమం_2::క్రియాకారకం = (స్థిరరాశి కార్యక్రమం_2& prog)
 {
     Impl* newp = (Impl*)prog.p;
-    if(newp)
+    ఒకవేళ(newp)
         newp->addref();
-    if(p)
+    ఒకవేళ(p)
         p->release();
     p = newp;
-    return *this;
+    తిరిగి *ఇది;
 }
 
-Program::Program(Program&& prog) CV_NOEXCEPT
+కార్యక్రమం_2::కార్యక్రమం_2(కార్యక్రమం_2&& prog) CV_NOEXCEPT
 {
     p = prog.p;
-    prog.p = nullptr;
+    prog.p = శూన్యసూచిక;
 }
 
-Program& Program::operator = (Program&& prog) CV_NOEXCEPT
+కార్యక్రమం_2& కార్యక్రమం_2::క్రియాకారకం = (కార్యక్రమం_2&& prog) CV_NOEXCEPT
 {
-    if (this != &prog) {
-        if(p)
+    ఒకవేళ (ఇది != &prog) {
+        ఒకవేళ(p)
             p->release();
         p = prog.p;
-        prog.p = nullptr;
+        prog.p = శూన్యసూచిక;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-Program::~Program()
+కార్యక్రమం_2::~కార్యక్రమం_2()
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
 }
 
-bool Program::create(const ProgramSource& src,
-            const String& buildflags, String& errmsg)
+తార్కిక కార్యక్రమం_2::create(స్థిరరాశి కార్యక్రమం_ఆధారం& src,
+            స్థిరరాశి String& buildflags, String& errmsg)
 {
-    if(p)
+    ఒకవేళ(p)
     {
         p->release();
-        p = NULL;
+        p = ఖాళీ;
     }
-    p = new Impl(src, buildflags, errmsg);
-    if(!p->handle)
+    p = కొత్త Impl(src, buildflags, errmsg);
+    ఒకవేళ(!p->handle)
     {
         p->release();
         p = 0;
     }
-    return p != 0;
+    తిరిగి p != 0;
 }
 
-void* Program::ptr() const
+శూన్య* కార్యక్రమం_2::ptr() స్థిరరాశి
 {
-    return p ? p->handle : 0;
+    తిరిగి p ? p->handle : 0;
 }
 
-#ifndef OPENCV_REMOVE_DEPRECATED_API
-const ProgramSource& Program::source() const
+#నిర్వచితం_కాకపోతే OPENCV_REMOVE_DEPRECATED_API
+స్థిరరాశి కార్యక్రమం_ఆధారం& కార్యక్రమం_2::ఆధారం() స్థిరరాశి
 {
     CV_Error(Error::StsNotImplemented, "Removed API");
 }
 
-bool Program::read(const String& bin, const String& buildflags)
+తార్కిక కార్యక్రమం_2::పఠ(స్థిరరాశి String& bin, స్థిరరాశి String& buildflags)
 {
-    CV_UNUSED(bin); CV_UNUSED(buildflags);
+    CV_వాడని(bin); CV_వాడని(buildflags);
     CV_Error(Error::StsNotImplemented, "Removed API");
 }
 
-bool Program::write(String& bin) const
+తార్కిక కార్యక్రమం_2::లిఖ(String& bin) స్థిరరాశి
 {
-    CV_UNUSED(bin);
+    CV_వాడని(bin);
     CV_Error(Error::StsNotImplemented, "Removed API");
 }
 
-String Program::getPrefix() const
+String కార్యక్రమం_2::get_ఉపసర్గ() స్థిరరాశి
 {
-    if(!p)
-        return String();
+    ఒకవేళ(!p)
+        తిరిగి String();
     Context::Impl* ctx_ = Context::getDefault().getImpl();
     CV_Assert(ctx_);
-    return cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), p->buildflags.c_str());
+    తిరిగి cv::format("opencl=%s\nbuildflags=%s", ctx_->get_ఉపసర్గ_String().c_str(), p->buildflags.c_str());
 }
 
-String Program::getPrefix(const String& buildflags)
+String కార్యక్రమం_2::get_ఉపసర్గ(స్థిరరాశి String& buildflags)
 {
         Context::Impl* ctx_ = Context::getDefault().getImpl();
         CV_Assert(ctx_);
-        return cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), buildflags.c_str());
+        తిరిగి cv::format("opencl=%s\nbuildflags=%s", ctx_->get_ఉపసర్గ_String().c_str(), buildflags.c_str());
 }
-#endif // OPENCV_REMOVE_DEPRECATED_API
+#అయితే_ముగింపు // OPENCV_REMOVE_DEPRECATED_API
 
-void Program::getBinary(std::vector<char>& binary) const
+శూన్య కార్యక్రమం_2::get_ద్విమాన(std::vector<అక్షరం>& binary) స్థిరరాశి
 {
     CV_Assert(p && "Empty program");
-    p->getProgramBinary(binary);
+    p->get_కార్యక్రమం_ద్విమాన(binary);
 }
 
-Program Context::Impl::getProg(const ProgramSource& src,
-                               const String& buildflags, String& errmsg)
+కార్యక్రమం_2 Context::Impl::getProg(స్థిరరాశి కార్యక్రమం_ఆధారం& src,
+                               స్థిరరాశి String& buildflags, String& errmsg)
 {
-    size_t limit = getProgramCountLimit();
-    const ProgramSource::Impl* src_ = src.getImpl();
+    size_t హద్దు = get_కార్యక్రమం_లెక్క_హద్దు();
+    స్థిరరాశి కార్యక్రమం_ఆధారం::Impl* src_ = src.getImpl();
     CV_Assert(src_);
-    String key = cv::format("module=%s name=%s codehash=%s\nopencl=%s\nbuildflags=%s",
-            src_->module_.c_str(), src_->name_.c_str(), src_->sourceHash_.c_str(),
-            getPrefixString().c_str(),
+    String కీలకం = cv::format("module=%s name=%s codehash=%s\nopencl=%s\nbuildflags=%s",
+            src_->module_.c_str(), src_->name_.c_str(), src_->ఆధారం_Hash.c_str(),
+            get_ఉపసర్గ_String().c_str(),
             buildflags.c_str());
     {
-        cv::AutoLock lock(program_cache_mutex);
-        phash_t::iterator it = phash.find(key);
-        if (it != phash.end())
+        cv::Auto_తాళం lock(కార్యక్రమం_cache_mutex);
+        phash_t::iterator it = phash.find(కీలకం);
+        ఒకవేళ (it != phash.end())
         {
             // TODO LRU cache
-            CacheList::iterator i = std::find(cacheList.begin(), cacheList.end(), key);
-            if (i != cacheList.end() && i != cacheList.begin())
+            CacheList::iterator i = std::find(cacheList.begin(), cacheList.end(), కీలకం);
+            ఒకవేళ (i != cacheList.end() && i != cacheList.begin())
             {
                 cacheList.erase(i);
-                cacheList.push_front(key);
+                cacheList.push_front(కీలకం);
             }
-            return it->second;
+            తిరిగి it->second;
         }
         { // cleanup program cache
             size_t sz = phash.size();
-            if (limit > 0 && sz >= limit)
+            ఒకవేళ (హద్దు > 0 && sz >= హద్దు)
             {
-                static bool warningFlag = false;
-                if (!warningFlag)
+                స్థిర తార్కిక warningFlag = అబద్ధం;
+                ఒకవేళ (!warningFlag)
                 {
-                    printf("\nWARNING: OpenCV-OpenCL:\n"
+                    రాయి("\nWARNING: OpenCV-OpenCL:\n"
                         "    In-memory cache for OpenCL programs is full, older programs will be unloaded.\n"
                         "    You can change cache size via OPENCV_OPENCL_PROGRAM_CACHE environment variable\n\n");
-                    warningFlag = true;
+                    warningFlag = నిజం;
                 }
-                while (!cacheList.empty())
+                అయితే (!cacheList.empty())
                 {
                     size_t c = phash.erase(cacheList.back());
                     cacheList.pop_back();
-                    if (c != 0)
-                        break;
+                    ఒకవేళ (c != 0)
+                        ఆపు;
                 }
             }
         }
     }
-    Program prog(src, buildflags, errmsg);
+    కార్యక్రమం_2 prog(src, buildflags, errmsg);
     // Cache result of build failures too (to prevent unnecessary compiler invocations)
     {
-        cv::AutoLock lock(program_cache_mutex);
-        phash.insert(std::pair<std::string, Program>(key, prog));
-        cacheList.push_front(key);
+        cv::Auto_తాళం lock(కార్యక్రమం_cache_mutex);
+        phash.insert(std::pair<std::string, కార్యక్రమం_2>(కీలకం, prog));
+        cacheList.push_front(కీలకం);
     }
-    return prog;
+    తిరిగి prog;
 }
 
 
 //////////////////////////////////////////// OpenCLAllocator //////////////////////////////////////////////////
 
-template<typename T>
-class OpenCLBufferPool
+మూస<రకం_పేరు T>
+తరగతి OpenCLBufferPool
 {
-protected:
+రక్షిత:
     ~OpenCLBufferPool() { }
-public:
-    virtual T allocate(size_t size) = 0;
-    virtual void release(T buffer) = 0;
+బహిరంగ:
+    మాయా T allocate(size_t size) = 0;
+    మాయా శూన్య release(T బఫరు) = 0;
 };
 
-template <typename Derived, typename BufferEntry, typename T>
-class OpenCLBufferPoolBaseImpl : public BufferPoolController, public OpenCLBufferPool<T>
+మూస <రకం_పేరు Derived, రకం_పేరు బఫరు_నమోదు, రకం_పేరు T>
+తరగతి Open_CLBuffer_Pool_పునాది_Impl : బహిరంగ బఫరు_Pool_Controller, బహిరంగ OpenCLBufferPool<T>
 {
-private:
-    inline Derived& derived() { return *static_cast<Derived*>(this); }
-protected:
+అంతరంగ:
+    అంతఃవరుస Derived& derived() { తిరిగి *static_cast<Derived*>(ఇది); }
+రక్షిత:
     Mutex mutex_;
 
-    size_t currentReservedSize;
-    size_t maxReservedSize;
+    size_t current_Reserved_కొలత;
+    size_t max_Reserved_కొలత;
 
-    std::list<BufferEntry> allocatedEntries_; // Allocated and used entries
-    std::list<BufferEntry> reservedEntries_; // LRU order. Allocated, but not used entries
+    std::list<బఫరు_నమోదు> allocatedEntries_; // Allocated and used entries
+    std::list<బఫరు_నమోదు> reservedEntries_; // LRU order. Allocated, but not used entries
 
     // synchronized
-    bool _findAndRemoveEntryFromAllocatedList(CV_OUT BufferEntry& entry, T buffer)
+    తార్కిక కనుగొను_And_Remove_నమోదు_From_Allocated_List(CV_బహిర్గతం బఫరు_నమోదు& నమోదు_2, T బఫరు)
     {
-        typename std::list<BufferEntry>::iterator i = allocatedEntries_.begin();
-        for (; i != allocatedEntries_.end(); ++i)
+        రకం_పేరు std::list<బఫరు_నమోదు>::iterator i = allocatedEntries_.begin();
+        కొరకు (; i != allocatedEntries_.end(); ++i)
         {
-            BufferEntry& e = *i;
-            if (e.clBuffer_ == buffer)
+            బఫరు_నమోదు& e = *i;
+            ఒకవేళ (e.cl_బఫరు_2 == బఫరు)
             {
-                entry = e;
+                నమోదు_2 = e;
                 allocatedEntries_.erase(i);
-                return true;
+                తిరిగి నిజం;
             }
         }
-        return false;
+        తిరిగి అబద్ధం;
     }
 
     // synchronized
-    bool _findAndRemoveEntryFromReservedList(CV_OUT BufferEntry& entry, const size_t size)
+    తార్కిక కనుగొను_And_Remove_నమోదు_From_Reserved_List(CV_బహిర్గతం బఫరు_నమోదు& నమోదు_2, స్థిరరాశి size_t size)
     {
-        if (reservedEntries_.empty())
-            return false;
-        typename std::list<BufferEntry>::iterator i = reservedEntries_.begin();
-        typename std::list<BufferEntry>::iterator result_pos = reservedEntries_.end();
-        BufferEntry result;
+        ఒకవేళ (reservedEntries_.empty())
+            తిరిగి అబద్ధం;
+        రకం_పేరు std::list<బఫరు_నమోదు>::iterator i = reservedEntries_.begin();
+        రకం_పేరు std::list<బఫరు_నమోదు>::iterator ఫలితం_pos = reservedEntries_.end();
+        బఫరు_నమోదు ఫలితం;
         size_t minDiff = (size_t)(-1);
-        for (; i != reservedEntries_.end(); ++i)
+        కొరకు (; i != reservedEntries_.end(); ++i)
         {
-            BufferEntry& e = *i;
-            if (e.capacity_ >= size)
+            బఫరు_నమోదు& e = *i;
+            ఒకవేళ (e.సామర్థ్యం >= size)
             {
-                size_t diff = e.capacity_ - size;
-                if (diff < std::max((size_t)4096, size / 8) && (result_pos == reservedEntries_.end() || diff < minDiff))
+                size_t diff = e.సామర్థ్యం - size;
+                ఒకవేళ (diff < std::max((size_t)4096, size / 8) && (ఫలితం_pos == reservedEntries_.end() || diff < minDiff))
                 {
                     minDiff = diff;
-                    result_pos = i;
-                    result = e;
-                    if (diff == 0)
-                        break;
+                    ఫలితం_pos = i;
+                    ఫలితం = e;
+                    ఒకవేళ (diff == 0)
+                        ఆపు;
                 }
             }
         }
-        if (result_pos != reservedEntries_.end())
+        ఒకవేళ (ఫలితం_pos != reservedEntries_.end())
         {
             //CV_DbgAssert(result == *result_pos);
-            reservedEntries_.erase(result_pos);
-            entry = result;
-            currentReservedSize -= entry.capacity_;
-            allocatedEntries_.push_back(entry);
-            return true;
+            reservedEntries_.erase(ఫలితం_pos);
+            నమోదు_2 = ఫలితం;
+            current_Reserved_కొలత -= నమోదు_2.సామర్థ్యం;
+            allocatedEntries_.push_back(నమోదు_2);
+            తిరిగి నిజం;
         }
-        return false;
+        తిరిగి అబద్ధం;
     }
 
     // synchronized
-    void _checkSizeOfReservedEntries()
+    శూన్య check_కొలత_యొక్క_Reserved_Entries()
     {
-        while (currentReservedSize > maxReservedSize)
+        అయితే (current_Reserved_కొలత > max_Reserved_కొలత)
         {
             CV_DbgAssert(!reservedEntries_.empty());
-            const BufferEntry& entry = reservedEntries_.back();
-            CV_DbgAssert(currentReservedSize >= entry.capacity_);
-            currentReservedSize -= entry.capacity_;
-            derived()._releaseBufferEntry(entry);
+            స్థిరరాశి బఫరు_నమోదు& నమోదు_2 = reservedEntries_.back();
+            CV_DbgAssert(current_Reserved_కొలత >= నమోదు_2.సామర్థ్యం);
+            current_Reserved_కొలత -= నమోదు_2.సామర్థ్యం;
+            derived().release_బఫరు_నమోదు(నమోదు_2);
             reservedEntries_.pop_back();
         }
     }
 
-    inline size_t _allocationGranularity(size_t size)
+    అంతఃవరుస size_t కేటాయింపు_Granularity(size_t size)
     {
         // heuristic values
-        if (size < 1024*1024)
-            return 4096;  // don't work with buffers smaller than 4Kb (hidden allocation overhead issue)
-        else if (size < 16*1024*1024)
-            return 64*1024;
-        else
-            return 1024*1024;
+        ఒకవేళ (size < 1024*1024)
+            తిరిగి 4096;  // don't work with buffers smaller than 4Kb (hidden allocation overhead issue)
+        లేకపోతే ఒకవేళ (size < 16*1024*1024)
+            తిరిగి 64*1024;
+        లేకపోతే
+            తిరిగి 1024*1024;
     }
 
-public:
-    OpenCLBufferPoolBaseImpl()
-        : currentReservedSize(0),
-          maxReservedSize(0)
+బహిరంగ:
+    Open_CLBuffer_Pool_పునాది_Impl()
+        : current_Reserved_కొలత(0),
+          max_Reserved_కొలత(0)
     {
         // nothing
     }
-    virtual ~OpenCLBufferPoolBaseImpl()
+    మాయా ~Open_CLBuffer_Pool_పునాది_Impl()
     {
         freeAllReservedBuffers();
         CV_Assert(reservedEntries_.empty());
     }
-public:
-    virtual T allocate(size_t size) CV_OVERRIDE
+బహిరంగ:
+    మాయా T allocate(size_t size) CV_OVERRIDE
     {
-        AutoLock locker(mutex_);
-        BufferEntry entry;
-        if (maxReservedSize > 0 && _findAndRemoveEntryFromReservedList(entry, size))
+        Auto_తాళం locker(mutex_);
+        బఫరు_నమోదు నమోదు_2;
+        ఒకవేళ (max_Reserved_కొలత > 0 && కనుగొను_And_Remove_నమోదు_From_Reserved_List(నమోదు_2, size))
         {
-            CV_DbgAssert(size <= entry.capacity_);
-            LOG_BUFFER_POOL("Reuse reserved buffer: %p\n", entry.clBuffer_);
+            CV_DbgAssert(size <= నమోదు_2.సామర్థ్యం);
+            LOG_బఫరు_POOL("Reuse reserved buffer: %p\n", నమోదు_2.cl_బఫరు_2);
         }
-        else
+        లేకపోతే
         {
-            derived()._allocateBufferEntry(entry, size);
+            derived().allocate_బఫరు_నమోదు(నమోదు_2, size);
         }
-        return entry.clBuffer_;
+        తిరిగి నమోదు_2.cl_బఫరు_2;
     }
-    virtual void release(T buffer) CV_OVERRIDE
+    మాయా శూన్య release(T బఫరు) CV_OVERRIDE
     {
-        AutoLock locker(mutex_);
-        BufferEntry entry;
-        CV_Assert(_findAndRemoveEntryFromAllocatedList(entry, buffer));
-        if (maxReservedSize == 0 || entry.capacity_ > maxReservedSize / 8)
+        Auto_తాళం locker(mutex_);
+        బఫరు_నమోదు నమోదు_2;
+        CV_Assert(కనుగొను_And_Remove_నమోదు_From_Allocated_List(నమోదు_2, బఫరు));
+        ఒకవేళ (max_Reserved_కొలత == 0 || నమోదు_2.సామర్థ్యం > max_Reserved_కొలత / 8)
         {
-            derived()._releaseBufferEntry(entry);
+            derived().release_బఫరు_నమోదు(నమోదు_2);
         }
-        else
+        లేకపోతే
         {
-            reservedEntries_.push_front(entry);
-            currentReservedSize += entry.capacity_;
-            _checkSizeOfReservedEntries();
+            reservedEntries_.push_front(నమోదు_2);
+            current_Reserved_కొలత += నమోదు_2.సామర్థ్యం;
+            check_కొలత_యొక్క_Reserved_Entries();
         }
     }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return currentReservedSize; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return maxReservedSize; }
-    virtual void setMaxReservedSize(size_t size) CV_OVERRIDE
+    మాయా size_t get_Reserved_కొలత() స్థిరరాశి CV_OVERRIDE { తిరిగి current_Reserved_కొలత; }
+    మాయా size_t get_Max_Reserved_కొలత() స్థిరరాశి CV_OVERRIDE { తిరిగి max_Reserved_కొలత; }
+    మాయా శూన్య సమితి_Max_Reserved_కొలత(size_t size) CV_OVERRIDE
     {
-        AutoLock locker(mutex_);
-        size_t oldMaxReservedSize = maxReservedSize;
-        maxReservedSize = size;
-        if (maxReservedSize < oldMaxReservedSize)
+        Auto_తాళం locker(mutex_);
+        size_t old_Max_Reserved_కొలత = max_Reserved_కొలత;
+        max_Reserved_కొలత = size;
+        ఒకవేళ (max_Reserved_కొలత < old_Max_Reserved_కొలత)
         {
-            typename std::list<BufferEntry>::iterator i = reservedEntries_.begin();
-            for (; i != reservedEntries_.end();)
+            రకం_పేరు std::list<బఫరు_నమోదు>::iterator i = reservedEntries_.begin();
+            కొరకు (; i != reservedEntries_.end();)
             {
-                const BufferEntry& entry = *i;
-                if (entry.capacity_ > maxReservedSize / 8)
+                స్థిరరాశి బఫరు_నమోదు& నమోదు_2 = *i;
+                ఒకవేళ (నమోదు_2.సామర్థ్యం > max_Reserved_కొలత / 8)
                 {
-                    CV_DbgAssert(currentReservedSize >= entry.capacity_);
-                    currentReservedSize -= entry.capacity_;
-                    derived()._releaseBufferEntry(entry);
+                    CV_DbgAssert(current_Reserved_కొలత >= నమోదు_2.సామర్థ్యం);
+                    current_Reserved_కొలత -= నమోదు_2.సామర్థ్యం;
+                    derived().release_బఫరు_నమోదు(నమోదు_2);
                     i = reservedEntries_.erase(i);
-                    continue;
+                    కొనసాగు;
                 }
                 ++i;
             }
-            _checkSizeOfReservedEntries();
+            check_కొలత_యొక్క_Reserved_Entries();
         }
     }
-    virtual void freeAllReservedBuffers() CV_OVERRIDE
+    మాయా శూన్య freeAllReservedBuffers() CV_OVERRIDE
     {
-        AutoLock locker(mutex_);
-        typename std::list<BufferEntry>::const_iterator i = reservedEntries_.begin();
-        for (; i != reservedEntries_.end(); ++i)
+        Auto_తాళం locker(mutex_);
+        రకం_పేరు std::list<బఫరు_నమోదు>::const_iterator i = reservedEntries_.begin();
+        కొరకు (; i != reservedEntries_.end(); ++i)
         {
-            const BufferEntry& entry = *i;
-            derived()._releaseBufferEntry(entry);
+            స్థిరరాశి బఫరు_నమోదు& నమోదు_2 = *i;
+            derived().release_బఫరు_నమోదు(నమోదు_2);
         }
         reservedEntries_.clear();
-        currentReservedSize = 0;
+        current_Reserved_కొలత = 0;
     }
 };
 
-struct CLBufferEntry
+నిర్మాణం CLBuffer_నమోదు
 {
-    cl_mem clBuffer_;
-    size_t capacity_;
-    CLBufferEntry() : clBuffer_((cl_mem)NULL), capacity_(0) { }
+    cl_mem cl_బఫరు_2;
+    size_t సామర్థ్యం;
+    CLBuffer_నమోదు() : cl_బఫరు_2((cl_mem)ఖాళీ), సామర్థ్యం(0) { }
 };
 
-class OpenCLBufferPoolImpl CV_FINAL : public OpenCLBufferPoolBaseImpl<OpenCLBufferPoolImpl, CLBufferEntry, cl_mem>
+తరగతి OpenCLBufferPoolImpl CV_FINAL : బహిరంగ Open_CLBuffer_Pool_పునాది_Impl<OpenCLBufferPoolImpl, CLBuffer_నమోదు, cl_mem>
 {
-public:
-    typedef struct CLBufferEntry BufferEntry;
-protected:
-    int createFlags_;
-public:
-    OpenCLBufferPoolImpl(int createFlags = 0)
+బహిరంగ:
+    రకనిర్వచనం నిర్మాణం CLBuffer_నమోదు బఫరు_నమోదు;
+రక్షిత:
+    పూర్ణాంకం createFlags_;
+బహిరంగ:
+    OpenCLBufferPoolImpl(పూర్ణాంకం createFlags = 0)
         : createFlags_(createFlags)
     {
     }
 
-    void _allocateBufferEntry(BufferEntry& entry, size_t size)
+    శూన్య allocate_బఫరు_నమోదు(బఫరు_నమోదు& నమోదు_2, size_t size)
     {
-        CV_DbgAssert(entry.clBuffer_ == NULL);
-        entry.capacity_ = alignSize(size, (int)_allocationGranularity(size));
+        CV_DbgAssert(నమోదు_2.cl_బఫరు_2 == ఖాళీ);
+        నమోదు_2.సామర్థ్యం = align_కొలత(size, (పూర్ణాంకం)కేటాయింపు_Granularity(size));
         Context& ctx = Context::getDefault();
         cl_int retval = CL_SUCCESS;
-        entry.clBuffer_ = clCreateBuffer((cl_context)ctx.ptr(), CL_MEM_READ_WRITE|createFlags_, entry.capacity_, 0, &retval);
-        CV_OCL_CHECK_RESULT(retval, cv::format("clCreateBuffer(capacity=%lld) => %p", (long long int)entry.capacity_, (void*)entry.clBuffer_).c_str());
-        CV_Assert(entry.clBuffer_ != NULL);
-        if(retval == CL_SUCCESS)
+        నమోదు_2.cl_బఫరు_2 = cl_Create_బఫరు((cl_context)ctx.ptr(), CL_MEM_READ_WRITE|createFlags_, నమోదు_2.సామర్థ్యం, 0, &retval);
+        CV_OCL_CHECK_ఫలితం(retval, cv::format("clCreateBuffer(capacity=%lld) => %p", (దీర్ఘ దీర్ఘ పూర్ణాంకం)నమోదు_2.సామర్థ్యం, (శూన్య*)నమోదు_2.cl_బఫరు_2).c_str());
+        CV_Assert(నమోదు_2.cl_బఫరు_2 != ఖాళీ);
+        ఒకవేళ(retval == CL_SUCCESS)
         {
-            CV_IMPL_ADD(CV_IMPL_OCL);
+            CV_IMPL_కూడు(CV_IMPL_OCL);
         }
-        LOG_BUFFER_POOL("OpenCL allocate %lld (0x%llx) bytes: %p\n",
-                (long long)entry.capacity_, (long long)entry.capacity_, entry.clBuffer_);
-        allocatedEntries_.push_back(entry);
+        LOG_బఫరు_POOL("OpenCL allocate %lld (0x%llx) bytes: %p\n",
+                (దీర్ఘ దీర్ఘ)నమోదు_2.సామర్థ్యం, (దీర్ఘ దీర్ఘ)నమోదు_2.సామర్థ్యం, నమోదు_2.cl_బఫరు_2);
+        allocatedEntries_.push_back(నమోదు_2);
     }
 
-    void _releaseBufferEntry(const BufferEntry& entry)
+    శూన్య release_బఫరు_నమోదు(స్థిరరాశి బఫరు_నమోదు& నమోదు_2)
     {
-        CV_Assert(entry.capacity_ != 0);
-        CV_Assert(entry.clBuffer_ != NULL);
-        LOG_BUFFER_POOL("OpenCL release buffer: %p, %lld (0x%llx) bytes\n",
-                entry.clBuffer_, (long long)entry.capacity_, (long long)entry.capacity_);
-        CV_OCL_DBG_CHECK(clReleaseMemObject(entry.clBuffer_));
+        CV_Assert(నమోదు_2.సామర్థ్యం != 0);
+        CV_Assert(నమోదు_2.cl_బఫరు_2 != ఖాళీ);
+        LOG_బఫరు_POOL("OpenCL release buffer: %p, %lld (0x%llx) bytes\n",
+                నమోదు_2.cl_బఫరు_2, (దీర్ఘ దీర్ఘ)నమోదు_2.సామర్థ్యం, (దీర్ఘ దీర్ఘ)నమోదు_2.సామర్థ్యం);
+        CV_OCL_DBG_CHECK(clReleaseMemObject(నమోదు_2.cl_బఫరు_2));
     }
 };
 
-#ifdef HAVE_OPENCL_SVM
-struct CLSVMBufferEntry
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+నిర్మాణం CLSVMBuffer_నమోదు
 {
-    void* clBuffer_;
-    size_t capacity_;
-    CLSVMBufferEntry() : clBuffer_(NULL), capacity_(0) { }
+    శూన్య* cl_బఫరు_2;
+    size_t సామర్థ్యం;
+    CLSVMBuffer_నమోదు() : cl_బఫరు_2(ఖాళీ), సామర్థ్యం(0) { }
 };
-class OpenCLSVMBufferPoolImpl CV_FINAL : public OpenCLBufferPoolBaseImpl<OpenCLSVMBufferPoolImpl, CLSVMBufferEntry, void*>
+తరగతి OpenCLSVMBufferPoolImpl CV_FINAL : బహిరంగ Open_CLBuffer_Pool_పునాది_Impl<OpenCLSVMBufferPoolImpl, CLSVMBuffer_నమోదు, శూన్య*>
 {
-public:
-    typedef struct CLSVMBufferEntry BufferEntry;
-public:
+బహిరంగ:
+    రకనిర్వచనం నిర్మాణం CLSVMBuffer_నమోదు బఫరు_నమోదు;
+బహిరంగ:
     OpenCLSVMBufferPoolImpl()
     {
     }
 
-    void _allocateBufferEntry(BufferEntry& entry, size_t size)
+    శూన్య allocate_బఫరు_నమోదు(బఫరు_నమోదు& నమోదు_2, size_t size)
     {
-        CV_DbgAssert(entry.clBuffer_ == NULL);
-        entry.capacity_ = alignSize(size, (int)_allocationGranularity(size));
+        CV_DbgAssert(నమోదు_2.cl_బఫరు_2 == ఖాళీ);
+        నమోదు_2.సామర్థ్యం = align_కొలత(size, (పూర్ణాంకం)కేటాయింపు_Granularity(size));
 
         Context& ctx = Context::getDefault();
-        const svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
-        bool isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
+        స్థిరరాశి svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
+        తార్కిక is_Fine_Grain_బఫరు = svmCaps.is_Support_Fine_Grain_బఫరు();
         cl_svm_mem_flags memFlags = CL_MEM_READ_WRITE |
-                (isFineGrainBuffer ? CL_MEM_SVM_FINE_GRAIN_BUFFER : 0);
+                (is_Fine_Grain_బఫరు ? CL_MEM_SVM_FINE_GRAIN_బఫరు : 0);
 
-        const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+        స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
         CV_DbgAssert(svmFns->isValid());
 
-        CV_OPENCL_SVM_TRACE_P("clSVMAlloc: %d\n", (int)entry.capacity_);
-        void *buf = svmFns->fn_clSVMAlloc((cl_context)ctx.ptr(), memFlags, entry.capacity_, 0);
+        CV_OPENCL_SVM_TRACE_P("clSVMAlloc: %d\n", (పూర్ణాంకం)నమోదు_2.సామర్థ్యం);
+        శూన్య *buf = svmFns->fn_clSVMAlloc((cl_context)ctx.ptr(), memFlags, నమోదు_2.సామర్థ్యం, 0);
         CV_Assert(buf);
 
-        entry.clBuffer_ = buf;
+        నమోదు_2.cl_బఫరు_2 = buf;
         {
-            CV_IMPL_ADD(CV_IMPL_OCL);
+            CV_IMPL_కూడు(CV_IMPL_OCL);
         }
-        LOG_BUFFER_POOL("OpenCL SVM allocate %lld (0x%llx) bytes: %p\n",
-                (long long)entry.capacity_, (long long)entry.capacity_, entry.clBuffer_);
-        allocatedEntries_.push_back(entry);
+        LOG_బఫరు_POOL("OpenCL SVM allocate %lld (0x%llx) bytes: %p\n",
+                (దీర్ఘ దీర్ఘ)నమోదు_2.సామర్థ్యం, (దీర్ఘ దీర్ఘ)నమోదు_2.సామర్థ్యం, నమోదు_2.cl_బఫరు_2);
+        allocatedEntries_.push_back(నమోదు_2);
     }
 
-    void _releaseBufferEntry(const BufferEntry& entry)
+    శూన్య release_బఫరు_నమోదు(స్థిరరాశి బఫరు_నమోదు& నమోదు_2)
     {
-        CV_Assert(entry.capacity_ != 0);
-        CV_Assert(entry.clBuffer_ != NULL);
-        LOG_BUFFER_POOL("OpenCL release SVM buffer: %p, %lld (0x%llx) bytes\n",
-                entry.clBuffer_, (long long)entry.capacity_, (long long)entry.capacity_);
+        CV_Assert(నమోదు_2.సామర్థ్యం != 0);
+        CV_Assert(నమోదు_2.cl_బఫరు_2 != ఖాళీ);
+        LOG_బఫరు_POOL("OpenCL release SVM buffer: %p, %lld (0x%llx) bytes\n",
+                నమోదు_2.cl_బఫరు_2, (దీర్ఘ దీర్ఘ)నమోదు_2.సామర్థ్యం, (దీర్ఘ దీర్ఘ)నమోదు_2.సామర్థ్యం);
         Context& ctx = Context::getDefault();
-        const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+        స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
         CV_DbgAssert(svmFns->isValid());
-        CV_OPENCL_SVM_TRACE_P("clSVMFree: %p\n",  entry.clBuffer_);
-        svmFns->fn_clSVMFree((cl_context)ctx.ptr(), entry.clBuffer_);
+        CV_OPENCL_SVM_TRACE_P("clSVMFree: %p\n",  నమోదు_2.cl_బఫరు_2);
+        svmFns->fn_clSVMFree((cl_context)ctx.ptr(), నమోదు_2.cl_బఫరు_2);
     }
 };
-#endif
+#అయితే_ముగింపు
 
 
 
-template <bool readAccess, bool writeAccess>
-class AlignedDataPtr
+మూస <తార్కిక readAccess, తార్కిక writeAccess>
+తరగతి Aligned_దత్తాంశం_Ptr
 {
-protected:
-    const size_t size_;
-    uchar* const originPtr_;
-    const size_t alignment_;
+రక్షిత:
+    స్థిరరాశి size_t కొలత_3;
+    uchar* స్థిరరాశి originPtr_;
+    స్థిరరాశి size_t alignment_;
     uchar* ptr_;
     uchar* allocatedPtr_;
 
-public:
-    AlignedDataPtr(uchar* ptr, size_t size, size_t alignment)
-        : size_(size), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(NULL)
+బహిరంగ:
+    Aligned_దత్తాంశం_Ptr(uchar* ptr, size_t size, size_t alignment)
+        : కొలత_3(size), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(ఖాళీ)
     {
         CV_DbgAssert((alignment & (alignment - 1)) == 0); // check for 2^n
         CV_DbgAssert(!readAccess || ptr);
-        if (((size_t)ptr_ & (alignment - 1)) != 0)
+        ఒకవేళ (((size_t)ptr_ & (alignment - 1)) != 0)
         {
-            allocatedPtr_ = new uchar[size_ + alignment - 1];
+            allocatedPtr_ = కొత్త uchar[కొలత_3 + alignment - 1];
             ptr_ = (uchar*)(((uintptr_t)allocatedPtr_ + (alignment - 1)) & ~(alignment - 1));
-            if (readAccess)
+            ఒకవేళ (readAccess)
             {
-                memcpy(ptr_, originPtr_, size_);
+                జ్ఞాపకం_నకలు(ptr_, originPtr_, కొలత_3);
             }
         }
     }
 
-    uchar* getAlignedPtr() const
+    uchar* getAlignedPtr() స్థిరరాశి
     {
         CV_DbgAssert(((size_t)ptr_ & (alignment_ - 1)) == 0);
-        return ptr_;
+        తిరిగి ptr_;
     }
 
-    ~AlignedDataPtr()
+    ~Aligned_దత్తాంశం_Ptr()
     {
-        if (allocatedPtr_)
+        ఒకవేళ (allocatedPtr_)
         {
-            if (writeAccess)
+            ఒకవేళ (writeAccess)
             {
-                memcpy(originPtr_, ptr_, size_);
+                జ్ఞాపకం_నకలు(originPtr_, ptr_, కొలత_3);
             }
-            delete[] allocatedPtr_;
-            allocatedPtr_ = NULL;
+            తొలగించు[] allocatedPtr_;
+            allocatedPtr_ = ఖాళీ;
         }
-        ptr_ = NULL;
+        ptr_ = ఖాళీ;
     }
-private:
-    AlignedDataPtr(const AlignedDataPtr&); // disabled
-    AlignedDataPtr& operator=(const AlignedDataPtr&); // disabled
+అంతరంగ:
+    Aligned_దత్తాంశం_Ptr(స్థిరరాశి Aligned_దత్తాంశం_Ptr&); // disabled
+    Aligned_దత్తాంశం_Ptr& క్రియాకారకం=(స్థిరరాశి Aligned_దత్తాంశం_Ptr&); // disabled
 };
 
-template <bool readAccess, bool writeAccess>
-class AlignedDataPtr2D
+మూస <తార్కిక readAccess, తార్కిక writeAccess>
+తరగతి Aligned_దత్తాంశం_Ptr2_D
 {
-protected:
-    const size_t size_;
-    uchar* const originPtr_;
-    const size_t alignment_;
+రక్షిత:
+    స్థిరరాశి size_t కొలత_3;
+    uchar* స్థిరరాశి originPtr_;
+    స్థిరరాశి size_t alignment_;
     uchar* ptr_;
     uchar* allocatedPtr_;
-    size_t rows_;
-    size_t cols_;
-    size_t step_;
+    size_t అడ్డువరుసలు_2;
+    size_t నిలువుల_సంఖ్య_2;
+    size_t అడుగు_2;
 
-public:
-    AlignedDataPtr2D(uchar* ptr, size_t rows, size_t cols, size_t step, size_t alignment, size_t extrabytes=0)
-        : size_(rows*step), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(NULL), rows_(rows), cols_(cols), step_(step)
+బహిరంగ:
+    Aligned_దత్తాంశం_Ptr2_D(uchar* ptr, size_t అడ్డువరుసలు, size_t నిలువుల_సంఖ్య, size_t అడుగు, size_t alignment, size_t extrabytes=0)
+        : కొలత_3(అడ్డువరుసలు*అడుగు), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(ఖాళీ), అడ్డువరుసలు_2(అడ్డువరుసలు), నిలువుల_సంఖ్య_2(నిలువుల_సంఖ్య), అడుగు_2(అడుగు)
     {
         CV_DbgAssert((alignment & (alignment - 1)) == 0); // check for 2^n
-        CV_DbgAssert(!readAccess || ptr != NULL);
-        if (ptr == 0 || ((size_t)ptr_ & (alignment - 1)) != 0)
+        CV_DbgAssert(!readAccess || ptr != ఖాళీ);
+        ఒకవేళ (ptr == 0 || ((size_t)ptr_ & (alignment - 1)) != 0)
         {
-            allocatedPtr_ = new uchar[size_ + extrabytes + alignment - 1];
+            allocatedPtr_ = కొత్త uchar[కొలత_3 + extrabytes + alignment - 1];
             ptr_ = (uchar*)(((uintptr_t)allocatedPtr_ + (alignment - 1)) & ~(alignment - 1));
-            if (readAccess)
+            ఒకవేళ (readAccess)
             {
-                for (size_t i = 0; i < rows_; i++)
-                    memcpy(ptr_ + i*step_, originPtr_ + i*step_, cols_);
+                కొరకు (size_t i = 0; i < అడ్డువరుసలు_2; i++)
+                    జ్ఞాపకం_నకలు(ptr_ + i*అడుగు_2, originPtr_ + i*అడుగు_2, నిలువుల_సంఖ్య_2);
             }
         }
     }
 
-    uchar* getAlignedPtr() const
+    uchar* getAlignedPtr() స్థిరరాశి
     {
         CV_DbgAssert(((size_t)ptr_ & (alignment_ - 1)) == 0);
-        return ptr_;
+        తిరిగి ptr_;
     }
 
-    ~AlignedDataPtr2D()
+    ~Aligned_దత్తాంశం_Ptr2_D()
     {
-        if (allocatedPtr_)
+        ఒకవేళ (allocatedPtr_)
         {
-            if (writeAccess)
+            ఒకవేళ (writeAccess)
             {
-                for (size_t i = 0; i < rows_; i++)
-                    memcpy(originPtr_ + i*step_, ptr_ + i*step_, cols_);
+                కొరకు (size_t i = 0; i < అడ్డువరుసలు_2; i++)
+                    జ్ఞాపకం_నకలు(originPtr_ + i*అడుగు_2, ptr_ + i*అడుగు_2, నిలువుల_సంఖ్య_2);
             }
-            delete[] allocatedPtr_;
-            allocatedPtr_ = NULL;
+            తొలగించు[] allocatedPtr_;
+            allocatedPtr_ = ఖాళీ;
         }
-        ptr_ = NULL;
+        ptr_ = ఖాళీ;
     }
-private:
-    AlignedDataPtr2D(const AlignedDataPtr2D&); // disabled
-    AlignedDataPtr2D& operator=(const AlignedDataPtr2D&); // disabled
+అంతరంగ:
+    Aligned_దత్తాంశం_Ptr2_D(స్థిరరాశి Aligned_దత్తాంశం_Ptr2_D&); // disabled
+    Aligned_దత్తాంశం_Ptr2_D& క్రియాకారకం=(స్థిరరాశి Aligned_దత్తాంశం_Ptr2_D&); // disabled
 };
 
-#ifndef CV_OPENCL_DATA_PTR_ALIGNMENT
-#define CV_OPENCL_DATA_PTR_ALIGNMENT 16
-#endif
+#నిర్వచితం_కాకపోతే CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT
+#నిర్వచించు CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT 16
+#అయితే_ముగింపు
 
 
-void Context::Impl::__init_buffer_pools()
+శూన్య Context::Impl::__init_buffer_pools()
 {
-    bufferPool_ = std::make_shared<OpenCLBufferPoolImpl>(0);
-    OpenCLBufferPoolImpl& bufferPool = *bufferPool_.get();
-    bufferPoolHostPtr_ = std::make_shared<OpenCLBufferPoolImpl>(CL_MEM_ALLOC_HOST_PTR);
-    OpenCLBufferPoolImpl& bufferPoolHostPtr = *bufferPoolHostPtr_.get();
+    బఫరు_Pool_2 = std::make_shared<OpenCLBufferPoolImpl>(0);
+    OpenCLBufferPoolImpl& బఫరు_Pool_3 = *బఫరు_Pool_2.get();
+    బఫరు_Pool_Host_Ptr = std::make_shared<OpenCLBufferPoolImpl>(CL_MEM_ALLOC_HOST_PTR);
+    OpenCLBufferPoolImpl& బఫరు_Pool_Host_Ptr_2 = *బఫరు_Pool_Host_Ptr.get();
 
-    size_t defaultPoolSize = ocl::Device::getDefault().isIntel() ? 1 << 27 : 0;
-    size_t poolSize = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_BUFFERPOOL_LIMIT", defaultPoolSize);
-    bufferPool.setMaxReservedSize(poolSize);
-    size_t poolSizeHostPtr = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_HOST_PTR_BUFFERPOOL_LIMIT", defaultPoolSize);
-    bufferPoolHostPtr.setMaxReservedSize(poolSizeHostPtr);
+    size_t default_Pool_కొలత = ocl::Device::getDefault().isIntel() ? 1 << 27 : 0;
+    size_t pool_కొలత = utils::get_Configuration_Parameter_కొలత_T("OPENCV_OPENCL_BUFFERPOOL_LIMIT", default_Pool_కొలత);
+    బఫరు_Pool_3.సమితి_Max_Reserved_కొలత(pool_కొలత);
+    size_t pool_కొలత_Host_Ptr = utils::get_Configuration_Parameter_కొలత_T("OPENCV_OPENCL_HOST_PTR_BUFFERPOOL_LIMIT", default_Pool_కొలత);
+    బఫరు_Pool_Host_Ptr_2.సమితి_Max_Reserved_కొలత(pool_కొలత_Host_Ptr);
 
-#ifdef HAVE_OPENCL_SVM
-    bufferPoolSVM_ = std::make_shared<OpenCLSVMBufferPoolImpl>();
-    OpenCLSVMBufferPoolImpl& bufferPoolSVM = *bufferPoolSVM_.get();
-    size_t poolSizeSVM = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_SVM_BUFFERPOOL_LIMIT", defaultPoolSize);
-    bufferPoolSVM.setMaxReservedSize(poolSizeSVM);
-#endif
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+    బఫరు_Pool_SVM = std::make_shared<OpenCLSVMBufferPoolImpl>();
+    OpenCLSVMBufferPoolImpl& బఫరు_Pool_SVM_2 = *బఫరు_Pool_SVM.get();
+    size_t pool_కొలత_SVM = utils::get_Configuration_Parameter_కొలత_T("OPENCV_OPENCL_SVM_BUFFERPOOL_LIMIT", default_Pool_కొలత);
+    బఫరు_Pool_SVM_2.సమితి_Max_Reserved_కొలత(pool_కొలత_SVM);
+#అయితే_ముగింపు
 
-    CV_LOG_INFO(NULL, "OpenCL: Initializing buffer pool for context@" << contextId << " with max capacity: poolSize=" << poolSize << " poolSizeHostPtr=" << poolSizeHostPtr);
+    CV_LOG_INFO(ఖాళీ, "OpenCL: Initializing buffer pool for context@" << contextId << " with max capacity: poolSize=" << pool_కొలత << " poolSizeHostPtr=" << pool_కొలత_Host_Ptr);
 }
 
-class OpenCLAllocator CV_FINAL : public MatAllocator
+తరగతి OpenCLAllocator CV_FINAL : బహిరంగ MatAllocator
 {
-public:
-    enum AllocatorFlags
+బహిరంగ:
+    గణన AllocatorFlags
     {
-        ALLOCATOR_FLAGS_BUFFER_POOL_USED = 1 << 0,
-        ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED = 1 << 1,
-#ifdef HAVE_OPENCL_SVM
-        ALLOCATOR_FLAGS_BUFFER_POOL_SVM_USED = 1 << 2,
-#endif
-        ALLOCATOR_FLAGS_EXTERNAL_BUFFER = 1 << 3  // convertFromBuffer()
+        ALLOCATOR_FLAGS_బఫరు_POOL_వాడిన = 1 << 0,
+        ALLOCATOR_FLAGS_బఫరు_POOL_HOST_PTR_వాడిన = 1 << 1,
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        ALLOCATOR_FLAGS_బఫరు_POOL_SVM_వాడిన = 1 << 2,
+#అయితే_ముగింపు
+        ALLOCATOR_FLAGS_EXTERNAL_బఫరు = 1 << 3  // convertFromBuffer()
     };
 
     OpenCLAllocator()
@@ -5391,248 +5391,248 @@ public:
     }
     ~OpenCLAllocator()
     {
-        flushCleanupQueue();
+        flush_Cleanup_వరుస();
     }
 
-    UMatData* defaultAllocate(int dims, const int* sizes, int type, void* data, size_t* step,
-            AccessFlag flags, UMatUsageFlags usageFlags) const
+    UMat_దత్తాంశం* defaultAllocate(పూర్ణాంకం dims, స్థిరరాశి పూర్ణాంకం* sizes, పూర్ణాంకం type, శూన్య* దత్తాంశం, size_t* అడుగు,
+            AccessFlag flags, UMatUsageFlags usageFlags) స్థిరరాశి
     {
-        UMatData* u = matStdAllocator->allocate(dims, sizes, type, data, step, flags, usageFlags);
-        return u;
+        UMat_దత్తాంశం* u = matStdAllocator->allocate(dims, sizes, type, దత్తాంశం, అడుగు, flags, usageFlags);
+        తిరిగి u;
     }
 
-    static bool isOpenCLMapForced()  // force clEnqueueMapBuffer / clEnqueueUnmapMemObject OpenCL API
+    స్థిర తార్కిక isOpenCLMapForced()  // force clEnqueueMapBuffer / clEnqueueUnmapMemObject OpenCL API
     {
-        static bool value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_MAPPING", false);
-        return value;
+        స్థిర తార్కిక value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_MAPPING", అబద్ధం);
+        తిరిగి value;
     }
-    static bool isOpenCLCopyingForced()  // force clEnqueueReadBuffer[Rect] / clEnqueueWriteBuffer[Rect] OpenCL API
+    స్థిర తార్కిక isOpenCLCopyingForced()  // force clEnqueueReadBuffer[Rect] / clEnqueueWriteBuffer[Rect] OpenCL API
     {
-        static bool value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_COPYING", false);
-        return value;
+        స్థిర తార్కిక value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_COPYING", అబద్ధం);
+        తిరిగి value;
     }
 
-    void getBestFlags(const Context& ctx, AccessFlag /*flags*/, UMatUsageFlags usageFlags, int& createFlags, UMatData::MemoryFlag& flags0) const
+    శూన్య get_ఉత్తమ_Flags(స్థిరరాశి Context& ctx, AccessFlag /*flags*/, UMatUsageFlags usageFlags, పూర్ణాంకం& createFlags, UMat_దత్తాంశం::జ్ఞాపకం_Flag& flags0) స్థిరరాశి
     {
-        const Device& dev = ctx.device(0);
+        స్థిరరాశి Device& dev = ctx.device(0);
         createFlags = 0;
-        if ((usageFlags & USAGE_ALLOCATE_HOST_MEMORY) != 0)
+        ఒకవేళ ((usageFlags & USAGE_ALLOCATE_HOST_జ్ఞాపకం) != 0)
             createFlags |= CL_MEM_ALLOC_HOST_PTR;
 
-        if (!isOpenCLCopyingForced() &&
+        ఒకవేళ (!isOpenCLCopyingForced() &&
             (isOpenCLMapForced() ||
-                (dev.hostUnifiedMemory()
-#ifndef __APPLE__
+                (dev.host_Unified_జ్ఞాపకం_2()
+#నిర్వచితం_కాకపోతే __APPLE__
                 || dev.isIntel()
-#endif
+#అయితే_ముగింపు
                 )
             )
         )
-            flags0 = static_cast<UMatData::MemoryFlag>(0);
-        else
-            flags0 = UMatData::COPY_ON_MAP;
+            flags0 = static_cast<UMat_దత్తాంశం::జ్ఞాపకం_Flag>(0);
+        లేకపోతే
+            flags0 = UMat_దత్తాంశం::COPY_ON_MAP;
     }
 
-    UMatData* allocate(int dims, const int* sizes, int type,
-                       void* data, size_t* step, AccessFlag flags, UMatUsageFlags usageFlags) const CV_OVERRIDE
+    UMat_దత్తాంశం* allocate(పూర్ణాంకం dims, స్థిరరాశి పూర్ణాంకం* sizes, పూర్ణాంకం type,
+                       శూన్య* దత్తాంశం, size_t* అడుగు, AccessFlag flags, UMatUsageFlags usageFlags) స్థిరరాశి CV_OVERRIDE
     {
-        if(!useOpenCL())
-            return defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
+        ఒకవేళ(!useOpenCL())
+            తిరిగి defaultAllocate(dims, sizes, type, దత్తాంశం, అడుగు, flags, usageFlags);
 
-        flushCleanupQueue();
+        flush_Cleanup_వరుస();
 
-        CV_Assert(data == 0);
-        size_t total = CV_ELEM_SIZE(type);
-        for( int i = dims-1; i >= 0; i-- )
+        CV_Assert(దత్తాంశం == 0);
+        size_t మొత్తం = CV_ELEM_కొలత(type);
+        కొరకు( పూర్ణాంకం i = dims-1; i >= 0; i-- )
         {
-            if( step )
-                step[i] = total;
-            total *= sizes[i];
+            ఒకవేళ( అడుగు )
+                అడుగు[i] = మొత్తం;
+            మొత్తం *= sizes[i];
         }
 
         Context& ctx = Context::getDefault();
-        if (!ctx.getImpl())
-            return defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
+        ఒకవేళ (!ctx.getImpl())
+            తిరిగి defaultAllocate(dims, sizes, type, దత్తాంశం, అడుగు, flags, usageFlags);
         Context::Impl& ctxImpl = *ctx.getImpl();
 
-        int createFlags = 0;
-        UMatData::MemoryFlag flags0 = static_cast<UMatData::MemoryFlag>(0);
-        getBestFlags(ctx, flags, usageFlags, createFlags, flags0);
+        పూర్ణాంకం createFlags = 0;
+        UMat_దత్తాంశం::జ్ఞాపకం_Flag flags0 = static_cast<UMat_దత్తాంశం::జ్ఞాపకం_Flag>(0);
+        get_ఉత్తమ_Flags(ctx, flags, usageFlags, createFlags, flags0);
 
-        void* handle = NULL;
-        int allocatorFlags = 0;
+        శూన్య* handle = ఖాళీ;
+        పూర్ణాంకం allocatorFlags = 0;
 
-#ifdef HAVE_OPENCL_SVM
-        const svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
-        if (ctx.useSVM() && svm::useSVM(usageFlags) && !svmCaps.isNoSVMSupport())
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        స్థిరరాశి svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
+        ఒకవేళ (ctx.useSVM() && svm::useSVM(usageFlags) && !svmCaps.isNoSVMSupport())
         {
-            allocatorFlags = ALLOCATOR_FLAGS_BUFFER_POOL_SVM_USED;
-            handle = ctxImpl.getBufferPoolSVM().allocate(total);
+            allocatorFlags = ALLOCATOR_FLAGS_బఫరు_POOL_SVM_వాడిన;
+            handle = ctxImpl.get_బఫరు_Pool_SVM().allocate(మొత్తం);
 
             // this property is constant, so single buffer pool can be used here
-            bool isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
-            allocatorFlags |= isFineGrainBuffer ? svm::OPENCL_SVM_FINE_GRAIN_BUFFER : svm::OPENCL_SVM_COARSE_GRAIN_BUFFER;
+            తార్కిక is_Fine_Grain_బఫరు = svmCaps.is_Support_Fine_Grain_బఫరు();
+            allocatorFlags |= is_Fine_Grain_బఫరు ? svm::OPENCL_SVM_FINE_GRAIN_బఫరు : svm::OPENCL_SVM_COARSE_GRAIN_బఫరు;
         }
-        else
-#endif
-        if (createFlags == 0)
+        లేకపోతే
+#అయితే_ముగింపు
+        ఒకవేళ (createFlags == 0)
         {
-            allocatorFlags = ALLOCATOR_FLAGS_BUFFER_POOL_USED;
-            handle = ctxImpl.getBufferPool().allocate(total);
+            allocatorFlags = ALLOCATOR_FLAGS_బఫరు_POOL_వాడిన;
+            handle = ctxImpl.get_బఫరు_Pool().allocate(మొత్తం);
         }
-        else if (createFlags == CL_MEM_ALLOC_HOST_PTR)
+        లేకపోతే ఒకవేళ (createFlags == CL_MEM_ALLOC_HOST_PTR)
         {
-            allocatorFlags = ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED;
-            handle = ctxImpl.getBufferPoolHostPtr().allocate(total);
+            allocatorFlags = ALLOCATOR_FLAGS_బఫరు_POOL_HOST_PTR_వాడిన;
+            handle = ctxImpl.get_బఫరు_Pool_Host_Ptr().allocate(మొత్తం);
         }
-        else
+        లేకపోతే
         {
-            CV_Assert(handle != NULL); // Unsupported, throw
+            CV_Assert(handle != ఖాళీ); // Unsupported, throw
         }
 
-        if (!handle)
-            return defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
+        ఒకవేళ (!handle)
+            తిరిగి defaultAllocate(dims, sizes, type, దత్తాంశం, అడుగు, flags, usageFlags);
 
-        UMatData* u = new UMatData(this);
-        u->data = 0;
-        u->size = total;
+        UMat_దత్తాంశం* u = కొత్త UMat_దత్తాంశం(ఇది);
+        u->దత్తాంశం = 0;
+        u->size = మొత్తం;
         u->handle = handle;
         u->flags = flags0;
         u->allocatorFlags_ = allocatorFlags;
-        u->allocatorContext = std::static_pointer_cast<void>(std::make_shared<ocl::Context>(ctx));
-        CV_DbgAssert(!u->tempUMat()); // for bufferPool.release() consistency in deallocate()
-        u->markHostCopyObsolete(true);
+        u->allocatorContext = std::static_pointer_cast<శూన్య>(std::make_shared<ocl::Context>(ctx));
+        CV_DbgAssert(!u->తాత్కాలిక_UMat()); // for bufferPool.release() consistency in deallocate()
+        u->markHostCopyObsolete(నిజం);
         opencl_allocator_stats.onAllocate(u->size);
-        return u;
+        తిరిగి u;
     }
 
-    bool allocate(UMatData* u, AccessFlag accessFlags, UMatUsageFlags usageFlags) const CV_OVERRIDE
+    తార్కిక allocate(UMat_దత్తాంశం* u, AccessFlag accessFlags, UMatUsageFlags usageFlags) స్థిరరాశి CV_OVERRIDE
     {
-        if(!u)
-            return false;
+        ఒకవేళ(!u)
+            తిరిగి అబద్ధం;
 
-        flushCleanupQueue();
+        flush_Cleanup_వరుస();
 
-        UMatDataAutoLock lock(u);
+        UMat_దత్తాంశం_Auto_తాళం lock(u);
 
-        if(u->handle == 0)
+        ఒకవేళ(u->handle == 0)
         {
             CV_Assert(u->origdata != 0);
             Context& ctx = Context::getDefault();
-            int createFlags = 0;
-            UMatData::MemoryFlag flags0 = static_cast<UMatData::MemoryFlag>(0);
-            getBestFlags(ctx, accessFlags, usageFlags, createFlags, flags0);
+            పూర్ణాంకం createFlags = 0;
+            UMat_దత్తాంశం::జ్ఞాపకం_Flag flags0 = static_cast<UMat_దత్తాంశం::జ్ఞాపకం_Flag>(0);
+            get_ఉత్తమ_Flags(ctx, accessFlags, usageFlags, createFlags, flags0);
 
-            bool copyOnMap = (flags0 & UMatData::COPY_ON_MAP) != 0;
+            తార్కిక copyOnMap = (flags0 & UMat_దత్తాంశం::COPY_ON_MAP) != 0;
 
             cl_context ctx_handle = (cl_context)ctx.ptr();
-            int allocatorFlags = 0;
-            UMatData::MemoryFlag tempUMatFlags = static_cast<UMatData::MemoryFlag>(0);
-            void* handle = NULL;
+            పూర్ణాంకం allocatorFlags = 0;
+            UMat_దత్తాంశం::జ్ఞాపకం_Flag తాత్కాలిక_UMat_Flags = static_cast<UMat_దత్తాంశం::జ్ఞాపకం_Flag>(0);
+            శూన్య* handle = ఖాళీ;
             cl_int retval = CL_SUCCESS;
 
-#ifdef HAVE_OPENCL_SVM
+#నిర్వచితమైతే HAVE_OPENCL_SVM
             svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
-            bool useSVM = ctx.useSVM() && svm::useSVM(usageFlags);
-            if (useSVM && svmCaps.isSupportFineGrainSystem())
+            తార్కిక useSVM = ctx.useSVM() && svm::useSVM(usageFlags);
+            ఒకవేళ (useSVM && svmCaps.isSupportFineGrainSystem())
             {
                 allocatorFlags = svm::OPENCL_SVM_FINE_GRAIN_SYSTEM;
-                tempUMatFlags = UMatData::TEMP_UMAT;
+                తాత్కాలిక_UMat_Flags = UMat_దత్తాంశం::తాత్కాలిక_UMAT;
                 handle = u->origdata;
-                CV_OPENCL_SVM_TRACE_P("Use fine grain system: %d (%p)\n", (int)u->size, handle);
+                CV_OPENCL_SVM_TRACE_P("Use fine grain system: %d (%p)\n", (పూర్ణాంకం)u->size, handle);
             }
-            else if (useSVM && (svmCaps.isSupportFineGrainBuffer() || svmCaps.isSupportCoarseGrainBuffer()))
+            లేకపోతే ఒకవేళ (useSVM && (svmCaps.is_Support_Fine_Grain_బఫరు() || svmCaps.is_Support_Coarse_Grain_బఫరు()))
             {
-                if (!(accessFlags & ACCESS_FAST)) // memcpy used
+                ఒకవేళ (!(accessFlags & ACCESS_FAST)) // memcpy used
                 {
-                    bool isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
+                    తార్కిక is_Fine_Grain_బఫరు = svmCaps.is_Support_Fine_Grain_బఫరు();
 
                     cl_svm_mem_flags memFlags = createFlags |
-                            (isFineGrainBuffer ? CL_MEM_SVM_FINE_GRAIN_BUFFER : 0);
+                            (is_Fine_Grain_బఫరు ? CL_MEM_SVM_FINE_GRAIN_బఫరు : 0);
 
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
-                    CV_OPENCL_SVM_TRACE_P("clSVMAlloc + copy: %d\n", (int)u->size);
+                    CV_OPENCL_SVM_TRACE_P("clSVMAlloc + copy: %d\n", (పూర్ణాంకం)u->size);
                     handle = svmFns->fn_clSVMAlloc((cl_context)ctx.ptr(), memFlags, u->size, 0);
                     CV_Assert(handle);
 
-                    cl_command_queue q = NULL;
-                    if (!isFineGrainBuffer)
+                    cl_command_వరుస q = ఖాళీ;
+                    ఒకవేళ (!is_Fine_Grain_బఫరు)
                     {
-                        q = (cl_command_queue)Queue::getDefault().ptr();
-                        CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", handle, (int)u->size);
-                        cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_TRUE, CL_MAP_WRITE,
+                        q = (cl_command_వరుస)వరుస::getDefault().ptr();
+                        CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", handle, (పూర్ణాంకం)u->size);
+                        cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMMap(q, CL_TRUE, CL_MAP_WRITE,
                                 handle, u->size,
-                                0, NULL, NULL);
-                        CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
+                                0, ఖాళీ, ఖాళీ);
+                        CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMMap()");
 
                     }
-                    memcpy(handle, u->origdata, u->size);
-                    if (!isFineGrainBuffer)
+                    జ్ఞాపకం_నకలు(handle, u->origdata, u->size);
+                    ఒకవేళ (!is_Fine_Grain_బఫరు)
                     {
                         CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", handle);
-                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, handle, 0, NULL, NULL);
-                        CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
+                        cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMUnmap(q, handle, 0, ఖాళీ, ఖాళీ);
+                        CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMUnmap()");
                     }
 
-                    tempUMatFlags = UMatData::TEMP_UMAT | UMatData::TEMP_COPIED_UMAT;
-                    allocatorFlags |= isFineGrainBuffer ? svm::OPENCL_SVM_FINE_GRAIN_BUFFER
-                                                : svm::OPENCL_SVM_COARSE_GRAIN_BUFFER;
+                    తాత్కాలిక_UMat_Flags = UMat_దత్తాంశం::తాత్కాలిక_UMAT | UMat_దత్తాంశం::తాత్కాలిక_COPIED_UMAT;
+                    allocatorFlags |= is_Fine_Grain_బఫరు ? svm::OPENCL_SVM_FINE_GRAIN_బఫరు
+                                                : svm::OPENCL_SVM_COARSE_GRAIN_బఫరు;
                 }
             }
-            else
-#endif
+            లేకపోతే
+#అయితే_ముగింపు
             {
-                if( copyOnMap )
+                ఒకవేళ( copyOnMap )
                     accessFlags &= ~ACCESS_FAST;
 
-                tempUMatFlags = UMatData::TEMP_UMAT;
-                if (
-                #ifdef __APPLE__
+                తాత్కాలిక_UMat_Flags = UMat_దత్తాంశం::తాత్కాలిక_UMAT;
+                ఒకవేళ (
+                #నిర్వచితమైతే __APPLE__
                     !copyOnMap &&
-                #endif
+                #అయితే_ముగింపు
                     CV_OPENCL_ENABLE_MEM_USE_HOST_PTR
                     // There are OpenCL runtime issues for less aligned data
                     && (CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR != 0
-                        && u->origdata == cv::alignPtr(u->origdata, (int)CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR))
+                        && u->origdata == cv::alignPtr(u->origdata, (పూర్ణాంకం)CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR))
                     // Avoid sharing of host memory between OpenCL buffers
-                    && !(u->originalUMatData && u->originalUMatData->handle)
+                    && !(u->original_UMat_దత్తాంశం && u->original_UMat_దత్తాంశం->handle)
                 )
                 {
                     // Change the host-side origdata[size] to "pinned memory" that enables fast
                     // DMA-transfers over PCIe to the device. Often used with clEnqueueMapBuffer/clEnqueueUnmapMemObject
-                    handle = clCreateBuffer(ctx_handle, CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR),
+                    handle = cl_Create_బఫరు(ctx_handle, CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR),
                                             u->size, u->origdata, &retval);
-                    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer(CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR), sz=%lld, origdata=%p) => %p",
-                            (long long int)u->size, u->origdata, (void*)handle).c_str());
+                    CV_OCL_DBG_CHECK_ఫలితం(retval, cv::format("clCreateBuffer(CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR), sz=%lld, origdata=%p) => %p",
+                            (దీర్ఘ దీర్ఘ పూర్ణాంకం)u->size, u->origdata, (శూన్య*)handle).c_str());
                 }
-                if((!handle || retval < 0) && !(accessFlags & ACCESS_FAST))
+                ఒకవేళ((!handle || retval < 0) && !(accessFlags & ACCESS_FAST))
                 {
                     // Allocate device-side memory and immediately copy data from the host-side pointer origdata[size].
                     // If createFlags=CL_MEM_ALLOC_HOST_PTR (aka cv::USAGE_ALLOCATE_HOST_MEMORY), then
                     // additionally allocate a host-side "pinned" duplicate of the origdata that is
                     // managed by OpenCL. This is potentially faster in unaligned/unmanaged scenarios.
-                    handle = clCreateBuffer(ctx_handle, CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags,
+                    handle = cl_Create_బఫరు(ctx_handle, CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags,
                                                u->size, u->origdata, &retval);
-                    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer(CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags, sz=%lld, origdata=%p) => %p",
-                            (long long int)u->size, u->origdata, (void*)handle).c_str());
-                    tempUMatFlags |= UMatData::TEMP_COPIED_UMAT;
+                    CV_OCL_DBG_CHECK_ఫలితం(retval, cv::format("clCreateBuffer(CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags, sz=%lld, origdata=%p) => %p",
+                            (దీర్ఘ దీర్ఘ పూర్ణాంకం)u->size, u->origdata, (శూన్య*)handle).c_str());
+                    తాత్కాలిక_UMat_Flags |= UMat_దత్తాంశం::తాత్కాలిక_COPIED_UMAT;
                 }
             }
-            CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer() => %p", (void*)handle).c_str());
-            if(!handle || retval != CL_SUCCESS)
-                return false;
+            CV_OCL_DBG_CHECK_ఫలితం(retval, cv::format("clCreateBuffer() => %p", (శూన్య*)handle).c_str());
+            ఒకవేళ(!handle || retval != CL_SUCCESS)
+                తిరిగి అబద్ధం;
             u->handle = handle;
             u->prevAllocator = u->currAllocator;
-            u->currAllocator = this;
-            u->flags |= tempUMatFlags | flags0;
+            u->currAllocator = ఇది;
+            u->flags |= తాత్కాలిక_UMat_Flags | flags0;
             u->allocatorFlags_ = allocatorFlags;
         }
-        if (!!(accessFlags & ACCESS_WRITE))
-            u->markHostCopyObsolete(true);
+        ఒకవేళ (!!(accessFlags & ACCESS_WRITE))
+            u->markHostCopyObsolete(నిజం);
         opencl_allocator_stats.onAllocate(u->size);
-        return true;
+        తిరిగి నిజం;
     }
 
     /*void sync(UMatData* u) const
@@ -5665,10 +5665,10 @@ public:
         }
     }*/
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    శూన్య deallocate(UMat_దత్తాంశం* u) స్థిరరాశి CV_OVERRIDE
     {
-        if(!u)
-            return;
+        ఒకవేళ(!u)
+            తిరిగి;
 
         // Next two lines: TSAN false positive: see #27638
         CV_Assert(u->urefcount == 0);
@@ -5677,398 +5677,398 @@ public:
         CV_Assert(u->handle != 0);
         CV_Assert(u->mapcount == 0);
 
-        if (!!(u->flags & UMatData::ASYNC_CLEANUP))
-            addToCleanupQueue(u);
-        else
+        ఒకవేళ (!!(u->flags & UMat_దత్తాంశం::ASYNC_CLEANUP))
+            కూడు_గమ్యం_Cleanup_వరుస(u);
+        లేకపోతే
             deallocate_(u);
     }
 
-    void deallocate_(UMatData* u) const
+    శూన్య deallocate_(UMat_దత్తాంశం* u) స్థిరరాశి
     {
         CV_Assert(u);
         CV_Assert(u->handle);
-        if ((u->allocatorFlags_ & ALLOCATOR_FLAGS_EXTERNAL_BUFFER) == 0)
+        ఒకవేళ ((u->allocatorFlags_ & ALLOCATOR_FLAGS_EXTERNAL_బఫరు) == 0)
         {
             opencl_allocator_stats.onFree(u->size);
         }
 
-#ifdef _WIN32
-        if (cv::__termination)  // process is not in consistent state (after ExitProcess call) and terminating
-            return;             // avoid any OpenCL calls
-#endif
-        if(u->tempUMat())
+#నిర్వచితమైతే _WIN32
+        ఒకవేళ (cv::__termination)  // process is not in consistent state (after ExitProcess call) and terminating
+            తిరిగి;             // avoid any OpenCL calls
+#అయితే_ముగింపు
+        ఒకవేళ(u->తాత్కాలిక_UMat())
         {
             CV_Assert(u->origdata);
 //            UMatDataAutoLock lock(u);
 
-            if (u->hostCopyObsolete())
+            ఒకవేళ (u->hostCopyObsolete())
             {
-#ifdef HAVE_OPENCL_SVM
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+                ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
                 {
                     Context& ctx = Context::getDefault();
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
-                    if( u->tempCopiedUMat() )
+                    ఒకవేళ( u->తాత్కాలిక_Copied_UMat() )
                     {
-                        CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-                                (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER);
-                        bool isFineGrainBuffer = (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER;
-                        cl_command_queue q = NULL;
-                        if (!isFineGrainBuffer)
+                        CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_బఫరు ||
+                                (u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_COARSE_GRAIN_బఫరు);
+                        తార్కిక is_Fine_Grain_బఫరు = (u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_బఫరు;
+                        cl_command_వరుస q = ఖాళీ;
+                        ఒకవేళ (!is_Fine_Grain_బఫరు)
                         {
-                            CV_DbgAssert(((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0));
-                            q = (cl_command_queue)Queue::getDefault().ptr();
-                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
-                            cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_READ,
+                            CV_DbgAssert(((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_MAP) == 0));
+                            q = (cl_command_వరుస)వరుస::getDefault().ptr();
+                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (పూర్ణాంకం)u->size);
+                            cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMMap(q, CL_FALSE, CL_MAP_READ,
                                     u->handle, u->size,
-                                    0, NULL, NULL);
-                            CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
+                                    0, ఖాళీ, ఖాళీ);
+                            CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMMap()");
                         }
-                        clFinish(q);
-                        memcpy(u->origdata, u->handle, u->size);
-                        if (!isFineGrainBuffer)
+                        cl_ముగింపు(q);
+                        జ్ఞాపకం_నకలు(u->origdata, u->handle, u->size);
+                        ఒకవేళ (!is_Fine_Grain_బఫరు)
                         {
                             CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
-                            cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, NULL, NULL);
-                            CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
+                            cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMUnmap(q, u->handle, 0, ఖాళీ, ఖాళీ);
+                            CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMUnmap()");
                         }
                     }
-                    else
+                    లేకపోతే
                     {
-                        CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM);
+                        CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM);
                         // nothing
                     }
                 }
-                else
-#endif
+                లేకపోతే
+#అయితే_ముగింపు
                 {
-                    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-                    if( u->tempCopiedUMat() )
+                    cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
+                    ఒకవేళ( u->తాత్కాలిక_Copied_UMat() )
                     {
-                        AlignedDataPtr<false, true> alignedPtr(u->origdata, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
-                        CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE, 0,
+                        Aligned_దత్తాంశం_Ptr<అబద్ధం, నిజం> alignedPtr(u->origdata, u->size, CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT);
+                        CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Read_బఫరు(q, (cl_mem)u->handle, CL_TRUE, 0,
                                             u->size, alignedPtr.getAlignedPtr(), 0, 0, 0));
                     }
-                    else
+                    లేకపోతే
                     {
                         cl_int retval = 0;
-                        if (u->tempUMat())
+                        ఒకవేళ (u->తాత్కాలిక_UMat())
                         {
                             CV_Assert(u->mapcount == 0);
-                            flushCleanupQueue(); // workaround for CL_OUT_OF_RESOURCES problem (#9960)
-                            void* data = clEnqueueMapBuffer(q, (cl_mem)u->handle, CL_TRUE,
+                            flush_Cleanup_వరుస(); // workaround for CL_OUT_OF_RESOURCES problem (#9960)
+                            శూన్య* దత్తాంశం = cl_వరుసలో_చేర్చు_Map_బఫరు(q, (cl_mem)u->handle, CL_TRUE,
                                 (CL_MAP_READ | CL_MAP_WRITE),
                                 0, u->size, 0, 0, 0, &retval);
-                            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (void*)u->handle, (long long int)u->size, data).c_str());
-                            CV_Assert(u->origdata == data && "Details: https://github.com/opencv/opencv/issues/6293");
-                            if (u->originalUMatData)
+                            CV_OCL_CHECK_ఫలితం(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (శూన్య*)u->handle, (దీర్ఘ దీర్ఘ పూర్ణాంకం)u->size, దత్తాంశం).c_str());
+                            CV_Assert(u->origdata == దత్తాంశం && "Details: https://github.com/opencv/opencv/issues/6293");
+                            ఒకవేళ (u->original_UMat_దత్తాంశం)
                             {
-                                CV_Assert(u->originalUMatData->data == data);
+                                CV_Assert(u->original_UMat_దత్తాంశం->దత్తాంశం == దత్తాంశం);
                             }
-                            retval = clEnqueueUnmapMemObject(q, (cl_mem)u->handle, data, 0, 0, 0);
-                            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (void*)u->handle, data, (long long int)u->size).c_str());
-                            CV_OCL_DBG_CHECK(clFinish(q));
+                            retval = cl_వరుసలో_చేర్చు_Unmap_Mem_Object(q, (cl_mem)u->handle, దత్తాంశం, 0, 0, 0);
+                            CV_OCL_CHECK_ఫలితం(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (శూన్య*)u->handle, దత్తాంశం, (దీర్ఘ దీర్ఘ పూర్ణాంకం)u->size).c_str());
+                            CV_OCL_DBG_CHECK(cl_ముగింపు(q));
                         }
                     }
                 }
-                u->markHostCopyObsolete(false);
+                u->markHostCopyObsolete(అబద్ధం);
             }
-            else
+            లేకపోతే
             {
                 // nothing
             }
-#ifdef HAVE_OPENCL_SVM
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+            ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
             {
-                if( u->tempCopiedUMat() )
+                ఒకవేళ( u->తాత్కాలిక_Copied_UMat() )
                 {
                     Context& ctx = Context::getDefault();
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
                     CV_OPENCL_SVM_TRACE_P("clSVMFree: %p\n", u->handle);
                     svmFns->fn_clSVMFree((cl_context)ctx.ptr(), u->handle);
                 }
             }
-            else
-#endif
+            లేకపోతే
+#అయితే_ముగింపు
             {
                 cl_int retval = clReleaseMemObject((cl_mem)u->handle);
-                CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clReleaseMemObject(ptr=%p)", (void*)u->handle).c_str());
+                CV_OCL_DBG_CHECK_ఫలితం(retval, cv::format("clReleaseMemObject(ptr=%p)", (శూన్య*)u->handle).c_str());
             }
             u->handle = 0;
-            u->markDeviceCopyObsolete(true);
+            u->markDeviceCopyObsolete(నిజం);
             u->currAllocator = u->prevAllocator;
-            u->prevAllocator = NULL;
-            if(u->data && u->copyOnMap() && u->data != u->origdata)
-                fastFree(u->data);
-            u->data = u->origdata;
+            u->prevAllocator = ఖాళీ;
+            ఒకవేళ(u->దత్తాంశం && u->copyOnMap() && u->దత్తాంశం != u->origdata)
+                fastFree(u->దత్తాంశం);
+            u->దత్తాంశం = u->origdata;
             u->currAllocator->deallocate(u);
-            u = NULL;
+            u = ఖాళీ;
         }
-        else
+        లేకపోతే
         {
-            CV_Assert(u->origdata == NULL);
-            if(u->data && u->copyOnMap() && u->data != u->origdata)
+            CV_Assert(u->origdata == ఖాళీ);
+            ఒకవేళ(u->దత్తాంశం && u->copyOnMap() && u->దత్తాంశం != u->origdata)
             {
-                fastFree(u->data);
-                u->data = 0;
-                u->markHostCopyObsolete(true);
+                fastFree(u->దత్తాంశం);
+                u->దత్తాంశం = 0;
+                u->markHostCopyObsolete(నిజం);
             }
-            if (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_USED)
+            ఒకవేళ (u->allocatorFlags_ & ALLOCATOR_FLAGS_బఫరు_POOL_వాడిన)
             {
                 std::shared_ptr<ocl::Context> pCtx = std::static_pointer_cast<ocl::Context>(u->allocatorContext);
                 CV_Assert(pCtx);
                 ocl::Context& ctx = *pCtx.get();
                 CV_Assert(ctx.getImpl());
-                ctx.getImpl()->getBufferPool().release((cl_mem)u->handle);
+                ctx.getImpl()->get_బఫరు_Pool().release((cl_mem)u->handle);
             }
-            else if (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED)
+            లేకపోతే ఒకవేళ (u->allocatorFlags_ & ALLOCATOR_FLAGS_బఫరు_POOL_HOST_PTR_వాడిన)
             {
                 std::shared_ptr<ocl::Context> pCtx = std::static_pointer_cast<ocl::Context>(u->allocatorContext);
                 CV_Assert(pCtx);
                 ocl::Context& ctx = *pCtx.get();
                 CV_Assert(ctx.getImpl());
-                ctx.getImpl()->getBufferPoolHostPtr().release((cl_mem)u->handle);
+                ctx.getImpl()->get_బఫరు_Pool_Host_Ptr().release((cl_mem)u->handle);
             }
-#ifdef HAVE_OPENCL_SVM
-            else if (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_SVM_USED)
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+            లేకపోతే ఒకవేళ (u->allocatorFlags_ & ALLOCATOR_FLAGS_బఫరు_POOL_SVM_వాడిన)
             {
                 std::shared_ptr<ocl::Context> pCtx = std::static_pointer_cast<ocl::Context>(u->allocatorContext);
                 CV_Assert(pCtx);
                 ocl::Context& ctx = *pCtx.get();
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
+                ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
                 {
                     //nothing
                 }
-                else if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-                        (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+                లేకపోతే ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_బఫరు ||
+                        (u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_COARSE_GRAIN_బఫరు)
                 {
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
-                    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
+                    cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
 
-                    if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) != 0)
+                    ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_MAP) != 0)
                     {
                         CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
-                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, NULL, NULL);
-                        CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
+                        cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMUnmap(q, u->handle, 0, ఖాళీ, ఖాళీ);
+                        CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMUnmap()");
                     }
                 }
                 CV_Assert(ctx.getImpl());
-                ctx.getImpl()->getBufferPoolSVM().release((void*)u->handle);
+                ctx.getImpl()->get_బఫరు_Pool_SVM().release((శూన్య*)u->handle);
             }
-#endif
-            else
+#అయితే_ముగింపు
+            లేకపోతే
             {
                 CV_OCL_DBG_CHECK(clReleaseMemObject((cl_mem)u->handle));
             }
             u->handle = 0;
-            u->markDeviceCopyObsolete(true);
-            delete u;
-            u = NULL;
+            u->markDeviceCopyObsolete(నిజం);
+            తొలగించు u;
+            u = ఖాళీ;
         }
-        CV_Assert(u == NULL);
+        CV_Assert(u == ఖాళీ);
     }
 
     // synchronized call (external UMatDataAutoLock, see UMat::getMat)
-    void map(UMatData* u, AccessFlag accessFlags) const CV_OVERRIDE
+    శూన్య map(UMat_దత్తాంశం* u, AccessFlag accessFlags) స్థిరరాశి CV_OVERRIDE
     {
         CV_Assert(u && u->handle);
 
-        if (!!(accessFlags & ACCESS_WRITE))
-            u->markDeviceCopyObsolete(true);
+        ఒకవేళ (!!(accessFlags & ACCESS_WRITE))
+            u->markDeviceCopyObsolete(నిజం);
 
-        cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
+        cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
 
         {
-            if( !u->copyOnMap() )
+            ఒకవేళ( !u->copyOnMap() )
             {
                 // TODO
                 // because there can be other map requests for the same UMat with different access flags,
                 // we use the universal (read-write) access mode.
-#ifdef HAVE_OPENCL_SVM
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+                ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
                 {
-                    if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+                    ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_COARSE_GRAIN_బఫరు)
                     {
                         Context& ctx = Context::getDefault();
-                        const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                        స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                         CV_DbgAssert(svmFns->isValid());
 
-                        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0)
+                        ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_MAP) == 0)
                         {
-                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
-                            cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_READ | CL_MAP_WRITE,
+                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (పూర్ణాంకం)u->size);
+                            cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMMap(q, CL_FALSE, CL_MAP_READ | CL_MAP_WRITE,
                                     u->handle, u->size,
-                                    0, NULL, NULL);
-                            CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
-                            u->allocatorFlags_ |= svm::OPENCL_SVM_BUFFER_MAP;
+                                    0, ఖాళీ, ఖాళీ);
+                            CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMMap()");
+                            u->allocatorFlags_ |= svm::OPENCL_SVM_బఫరు_MAP;
                         }
                     }
-                    clFinish(q);
-                    u->data = (uchar*)u->handle;
-                    u->markHostCopyObsolete(false);
-                    u->markDeviceMemMapped(true);
-                    return;
+                    cl_ముగింపు(q);
+                    u->దత్తాంశం = (uchar*)u->handle;
+                    u->markHostCopyObsolete(అబద్ధం);
+                    u->markDeviceMemMapped(నిజం);
+                    తిరిగి;
                 }
-#endif
+#అయితే_ముగింపు
 
                 cl_int retval = CL_SUCCESS;
-                if (!u->deviceMemMapped())
+                ఒకవేళ (!u->deviceMemMapped())
                 {
                     CV_Assert(u->refcount == 1);
                     CV_Assert(u->mapcount++ == 0);
-                    u->data = (uchar*)clEnqueueMapBuffer(q, (cl_mem)u->handle, CL_TRUE,
+                    u->దత్తాంశం = (uchar*)cl_వరుసలో_చేర్చు_Map_బఫరు(q, (cl_mem)u->handle, CL_TRUE,
                                                          (CL_MAP_READ | CL_MAP_WRITE),
                                                          0, u->size, 0, 0, 0, &retval);
-                    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (void*)u->handle, (long long int)u->size, u->data).c_str());
+                    CV_OCL_DBG_CHECK_ఫలితం(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (శూన్య*)u->handle, (దీర్ఘ దీర్ఘ పూర్ణాంకం)u->size, u->దత్తాంశం).c_str());
                 }
-                if (u->data && retval == CL_SUCCESS)
+                ఒకవేళ (u->దత్తాంశం && retval == CL_SUCCESS)
                 {
-                    u->markHostCopyObsolete(false);
-                    u->markDeviceMemMapped(true);
-                    return;
+                    u->markHostCopyObsolete(అబద్ధం);
+                    u->markDeviceMemMapped(నిజం);
+                    తిరిగి;
                 }
 
                 // TODO Is it really a good idea and was it tested well?
                 // if map failed, switch to copy-on-map mode for the particular buffer
-                u->flags |= UMatData::COPY_ON_MAP;
+                u->flags |= UMat_దత్తాంశం::COPY_ON_MAP;
             }
 
-            if(!u->data)
+            ఒకవేళ(!u->దత్తాంశం)
             {
-                u->data = (uchar*)fastMalloc(u->size);
-                u->markHostCopyObsolete(true);
+                u->దత్తాంశం = (uchar*)fastMalloc(u->size);
+                u->markHostCopyObsolete(నిజం);
             }
         }
 
-        if (!!(accessFlags & ACCESS_READ) && u->hostCopyObsolete())
+        ఒకవేళ (!!(accessFlags & ACCESS_READ) && u->hostCopyObsolete())
         {
-            AlignedDataPtr<false, true> alignedPtr(u->data, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
-#ifdef HAVE_OPENCL_SVM
-            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == 0);
-#endif
-            cl_int retval = clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
+            Aligned_దత్తాంశం_Ptr<అబద్ధం, నిజం> alignedPtr(u->దత్తాంశం, u->size, CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT);
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == 0);
+#అయితే_ముగింపు
+            cl_int retval = cl_వరుసలో_చేర్చు_Read_బఫరు(q, (cl_mem)u->handle, CL_TRUE,
                     0, u->size, alignedPtr.getAlignedPtr(), 0, 0, 0);
-            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueReadBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
-                    (void*)u->handle, (long long int)u->size, alignedPtr.getAlignedPtr()).c_str());
-            u->markHostCopyObsolete(false);
+            CV_OCL_CHECK_ఫలితం(retval, cv::format("clEnqueueReadBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
+                    (శూన్య*)u->handle, (దీర్ఘ దీర్ఘ పూర్ణాంకం)u->size, alignedPtr.getAlignedPtr()).c_str());
+            u->markHostCopyObsolete(అబద్ధం);
         }
     }
 
-    void unmap(UMatData* u) const CV_OVERRIDE
+    శూన్య unmap(UMat_దత్తాంశం* u) స్థిరరాశి CV_OVERRIDE
     {
-        if(!u)
-            return;
+        ఒకవేళ(!u)
+            తిరిగి;
 
 
         CV_Assert(u->handle != 0);
 
-        UMatDataAutoLock autolock(u);
+        UMat_దత్తాంశం_Auto_తాళం autolock(u);
 
-        cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
+        cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
         cl_int retval = 0;
-        if( !u->copyOnMap() && u->deviceMemMapped() )
+        ఒకవేళ( !u->copyOnMap() && u->deviceMemMapped() )
         {
-            CV_Assert(u->data != NULL);
-#ifdef HAVE_OPENCL_SVM
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+            CV_Assert(u->దత్తాంశం != ఖాళీ);
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+            ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
             {
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+                ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_COARSE_GRAIN_బఫరు)
                 {
                     Context& ctx = Context::getDefault();
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
-                    CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) != 0);
+                    CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_MAP) != 0);
                     {
                         CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
-                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle,
-                                0, NULL, NULL);
-                        CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
-                        clFinish(q);
-                        u->allocatorFlags_ &= ~svm::OPENCL_SVM_BUFFER_MAP;
+                        cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMUnmap(q, u->handle,
+                                0, ఖాళీ, ఖాళీ);
+                        CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMUnmap()");
+                        cl_ముగింపు(q);
+                        u->allocatorFlags_ &= ~svm::OPENCL_SVM_బఫరు_MAP;
                     }
                 }
-                if (u->refcount == 0)
-                    u->data = 0;
-                u->markDeviceCopyObsolete(false);
-                u->markHostCopyObsolete(true);
-                return;
+                ఒకవేళ (u->refcount == 0)
+                    u->దత్తాంశం = 0;
+                u->markDeviceCopyObsolete(అబద్ధం);
+                u->markHostCopyObsolete(నిజం);
+                తిరిగి;
             }
-#endif
-            if (u->refcount == 0)
+#అయితే_ముగింపు
+            ఒకవేళ (u->refcount == 0)
             {
                 CV_Assert(u->mapcount-- == 1);
-                retval = clEnqueueUnmapMemObject(q, (cl_mem)u->handle, u->data, 0, 0, 0);
-                CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (void*)u->handle, u->data, (long long int)u->size).c_str());
-                if (Device::getDefault().isAMD())
+                retval = cl_వరుసలో_చేర్చు_Unmap_Mem_Object(q, (cl_mem)u->handle, u->దత్తాంశం, 0, 0, 0);
+                CV_OCL_CHECK_ఫలితం(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (శూన్య*)u->handle, u->దత్తాంశం, (దీర్ఘ దీర్ఘ పూర్ణాంకం)u->size).c_str());
+                ఒకవేళ (Device::getDefault().isAMD())
                 {
                     // required for multithreaded applications (see stitching test)
-                    CV_OCL_DBG_CHECK(clFinish(q));
+                    CV_OCL_DBG_CHECK(cl_ముగింపు(q));
                 }
-                u->markDeviceMemMapped(false);
-                u->data = 0;
-                u->markDeviceCopyObsolete(false);
-                u->markHostCopyObsolete(true);
+                u->markDeviceMemMapped(అబద్ధం);
+                u->దత్తాంశం = 0;
+                u->markDeviceCopyObsolete(అబద్ధం);
+                u->markHostCopyObsolete(నిజం);
             }
         }
-        else if( u->copyOnMap() && u->deviceCopyObsolete() )
+        లేకపోతే ఒకవేళ( u->copyOnMap() && u->deviceCopyObsolete() )
         {
-            AlignedDataPtr<true, false> alignedPtr(u->data, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
-#ifdef HAVE_OPENCL_SVM
-            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == 0);
-#endif
-            retval = clEnqueueWriteBuffer(q, (cl_mem)u->handle, CL_TRUE,
+            Aligned_దత్తాంశం_Ptr<నిజం, అబద్ధం> alignedPtr(u->దత్తాంశం, u->size, CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT);
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == 0);
+#అయితే_ముగింపు
+            retval = cl_వరుసలో_చేర్చు_Write_బఫరు(q, (cl_mem)u->handle, CL_TRUE,
                                 0, u->size, alignedPtr.getAlignedPtr(), 0, 0, 0);
-            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
-                    (void*)u->handle, (long long int)u->size, alignedPtr.getAlignedPtr()).c_str());
-            u->markDeviceCopyObsolete(false);
-            u->markHostCopyObsolete(true);
+            CV_OCL_CHECK_ఫలితం(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
+                    (శూన్య*)u->handle, (దీర్ఘ దీర్ఘ పూర్ణాంకం)u->size, alignedPtr.getAlignedPtr()).c_str());
+            u->markDeviceCopyObsolete(అబద్ధం);
+            u->markHostCopyObsolete(నిజం);
         }
     }
 
-    bool checkContinuous(int dims, const size_t sz[],
-                         const size_t srcofs[], const size_t srcstep[],
-                         const size_t dstofs[], const size_t dststep[],
-                         size_t& total, size_t new_sz[],
+    తార్కిక checkContinuous(పూర్ణాంకం dims, స్థిరరాశి size_t sz[],
+                         స్థిరరాశి size_t srcofs[], స్థిరరాశి size_t srcstep[],
+                         స్థిరరాశి size_t dstofs[], స్థిరరాశి size_t dststep[],
+                         size_t& మొత్తం, size_t new_sz[],
                          size_t& srcrawofs, size_t new_srcofs[], size_t new_srcstep[],
-                         size_t& dstrawofs, size_t new_dstofs[], size_t new_dststep[]) const
+                         size_t& dstrawofs, size_t new_dstofs[], size_t new_dststep[]) స్థిరరాశి
     {
-        bool iscontinuous = true;
+        తార్కిక iscontinuous = నిజం;
         srcrawofs = srcofs ? srcofs[dims-1] : 0;
         dstrawofs = dstofs ? dstofs[dims-1] : 0;
-        total = sz[dims-1];
-        for( int i = dims-2; i >= 0; i-- )
+        మొత్తం = sz[dims-1];
+        కొరకు( పూర్ణాంకం i = dims-2; i >= 0; i-- )
         {
-            if( i >= 0 && (total != srcstep[i] || total != dststep[i]) )
-                iscontinuous = false;
-            total *= sz[i];
-            if( srcofs )
+            ఒకవేళ( i >= 0 && (మొత్తం != srcstep[i] || మొత్తం != dststep[i]) )
+                iscontinuous = అబద్ధం;
+            మొత్తం *= sz[i];
+            ఒకవేళ( srcofs )
                 srcrawofs += srcofs[i]*srcstep[i];
-            if( dstofs )
+            ఒకవేళ( dstofs )
                 dstrawofs += dstofs[i]*dststep[i];
         }
 
-        if( !iscontinuous )
+        ఒకవేళ( !iscontinuous )
         {
             // OpenCL uses {x, y, z} order while OpenCV uses {z, y, x} order.
-            if( dims == 2 )
+            ఒకవేళ( dims == 2 )
             {
                 new_sz[0] = sz[1]; new_sz[1] = sz[0]; new_sz[2] = 1;
                 // we assume that new_... arrays are initialized by caller
                 // with 0's, so there is no else branch
-                if( srcofs )
+                ఒకవేళ( srcofs )
                 {
                     new_srcofs[0] = srcofs[1];
                     new_srcofs[1] = srcofs[0];
                     new_srcofs[2] = 0;
                 }
 
-                if( dstofs )
+                ఒకవేళ( dstofs )
                 {
                     new_dstofs[0] = dstofs[1];
                     new_dstofs[1] = dstofs[0];
@@ -6078,20 +6078,20 @@ public:
                 new_srcstep[0] = srcstep[0]; new_srcstep[1] = 0;
                 new_dststep[0] = dststep[0]; new_dststep[1] = 0;
             }
-            else
+            లేకపోతే
             {
                 // we could check for dims == 3 here,
                 // but from user perspective this one is more informative
                 CV_Assert(dims <= 3);
                 new_sz[0] = sz[2]; new_sz[1] = sz[1]; new_sz[2] = sz[0];
-                if( srcofs )
+                ఒకవేళ( srcofs )
                 {
                     new_srcofs[0] = srcofs[2];
                     new_srcofs[1] = srcofs[1];
                     new_srcofs[2] = srcofs[0];
                 }
 
-                if( dstofs )
+                ఒకవేళ( dstofs )
                 {
                     new_dstofs[0] = dstofs[2];
                     new_dstofs[1] = dstofs[1];
@@ -6102,124 +6102,124 @@ public:
                 new_dststep[0] = dststep[1]; new_dststep[1] = dststep[0];
             }
         }
-        return iscontinuous;
+        తిరిగి iscontinuous;
     }
 
-    void download(UMatData* u, void* dstptr, int dims, const size_t sz[],
-                  const size_t srcofs[], const size_t srcstep[],
-                  const size_t dststep[]) const CV_OVERRIDE
+    శూన్య download(UMat_దత్తాంశం* u, శూన్య* dstptr, పూర్ణాంకం dims, స్థిరరాశి size_t sz[],
+                  స్థిరరాశి size_t srcofs[], స్థిరరాశి size_t srcstep[],
+                  స్థిరరాశి size_t dststep[]) స్థిరరాశి CV_OVERRIDE
     {
-        if(!u)
-            return;
-        UMatDataAutoLock autolock(u);
+        ఒకవేళ(!u)
+            తిరిగి;
+        UMat_దత్తాంశం_Auto_తాళం autolock(u);
 
-        if( u->data && !u->hostCopyObsolete() )
+        ఒకవేళ( u->దత్తాంశం && !u->hostCopyObsolete() )
         {
             Mat::getDefaultAllocator()->download(u, dstptr, dims, sz, srcofs, srcstep, dststep);
-            return;
+            తిరిగి;
         }
         CV_Assert( u->handle != 0 );
 
-        cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
+        cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
 
-        size_t total = 0, new_sz[] = {0, 0, 0};
+        size_t మొత్తం = 0, new_sz[] = {0, 0, 0};
         size_t srcrawofs = 0, new_srcofs[] = {0, 0, 0}, new_srcstep[] = {0, 0, 0};
         size_t dstrawofs = 0, new_dstofs[] = {0, 0, 0}, new_dststep[] = {0, 0, 0};
 
-        bool iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, 0, dststep,
-                                            total, new_sz,
+        తార్కిక iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, 0, dststep,
+                                            మొత్తం, new_sz,
                                             srcrawofs, new_srcofs, new_srcstep,
                                             dstrawofs, new_dstofs, new_dststep);
 
-#ifdef HAVE_OPENCL_SVM
-        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
         {
-            CV_DbgAssert(u->data == NULL || u->data == u->handle);
+            CV_DbgAssert(u->దత్తాంశం == ఖాళీ || u->దత్తాంశం == u->handle);
             Context& ctx = Context::getDefault();
-            const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+            స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
             CV_DbgAssert(svmFns->isValid());
 
-            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0);
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_MAP) == 0);
+            ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_COARSE_GRAIN_బఫరు)
             {
-                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
-                cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_READ,
+                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (పూర్ణాంకం)u->size);
+                cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMMap(q, CL_FALSE, CL_MAP_READ,
                         u->handle, u->size,
-                        0, NULL, NULL);
-                CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
+                        0, ఖాళీ, ఖాళీ);
+                CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMMap()");
             }
-            clFinish(q);
-            if( iscontinuous )
+            cl_ముగింపు(q);
+            ఒకవేళ( iscontinuous )
             {
-                memcpy(dstptr, (uchar*)u->handle + srcrawofs, total);
+                జ్ఞాపకం_నకలు(dstptr, (uchar*)u->handle + srcrawofs, మొత్తం);
             }
-            else
+            లేకపోతే
             {
                 // This code is from MatAllocator::download()
-                int isz[CV_MAX_DIM];
+                పూర్ణాంకం isz[CV_MAX_DIM];
                 uchar* srcptr = (uchar*)u->handle;
-                for( int i = 0; i < dims; i++ )
+                కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
                 {
-                    CV_Assert( sz[i] <= (size_t)INT_MAX );
-                    if( sz[i] == 0 )
-                    return;
-                    if( srcofs )
+                    CV_Assert( sz[i] <= (size_t)గరిష్ఠ_పూర్ణాంకం );
+                    ఒకవేళ( sz[i] == 0 )
+                    తిరిగి;
+                    ఒకవేళ( srcofs )
                     srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-                    isz[i] = (int)sz[i];
+                    isz[i] = (పూర్ణాంకం)sz[i];
                 }
 
                 Mat src(dims, isz, CV_8U, srcptr, srcstep);
                 Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-                const Mat* arrays[] = { &src, &dst };
+                స్థిరరాశి Mat* arrays[] = { &src, &dst };
                 uchar* ptrs[2];
                 NAryMatIterator it(arrays, ptrs, 2);
                 size_t j, planesz = it.size;
 
-                for( j = 0; j < it.nplanes; j++, ++it )
-                    memcpy(ptrs[1], ptrs[0], planesz);
+                కొరకు( j = 0; j < it.nplanes; j++, ++it )
+                    జ్ఞాపకం_నకలు(ptrs[1], ptrs[0], planesz);
             }
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_COARSE_GRAIN_బఫరు)
             {
                 CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
-                cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle,
-                        0, NULL, NULL);
-                CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
-                clFinish(q);
+                cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMUnmap(q, u->handle,
+                        0, ఖాళీ, ఖాళీ);
+                CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMUnmap()");
+                cl_ముగింపు(q);
             }
         }
-        else
-#endif
+        లేకపోతే
+#అయితే_ముగింపు
         {
-            if( iscontinuous )
+            ఒకవేళ( iscontinuous )
             {
-                AlignedDataPtr<false, true> alignedPtr((uchar*)dstptr, total, CV_OPENCL_DATA_PTR_ALIGNMENT);
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                    srcrawofs, total, alignedPtr.getAlignedPtr(), 0, 0, 0));
+                Aligned_దత్తాంశం_Ptr<అబద్ధం, నిజం> alignedPtr((uchar*)dstptr, మొత్తం, CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT);
+                CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Read_బఫరు(q, (cl_mem)u->handle, CL_TRUE,
+                    srcrawofs, మొత్తం, alignedPtr.getAlignedPtr(), 0, 0, 0));
             }
-            else if (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
+            లేకపోతే ఒకవేళ (CV_OPENCL_DISABLE_బఫరు_RECT_OPERATIONS)
             {
-                const size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
+                స్థిరరాశి size_t padding = CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT;
                 size_t new_srcrawofs = srcrawofs & ~(padding-1);
                 size_t membuf_ofs = srcrawofs - new_srcrawofs;
-                AlignedDataPtr2D<false, false> alignedPtr(0, new_sz[1], new_srcstep[0], new_srcstep[0],
-                                                          CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
+                Aligned_దత్తాంశం_Ptr2_D<అబద్ధం, అబద్ధం> alignedPtr(0, new_sz[1], new_srcstep[0], new_srcstep[0],
+                                                          CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT, padding*2);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
                 CV_Assert(new_srcstep[0] >= new_sz[0]);
-                total = alignSize(new_srcstep[0]*new_sz[1] + membuf_ofs, padding);
-                total = std::min(total, u->size - new_srcrawofs);
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                                                 new_srcrawofs, total, ptr, 0, 0, 0));
-                for( size_t i = 0; i < new_sz[1]; i++ )
-                    memcpy( (uchar*)dstptr + i*new_dststep[0], ptr + i*new_srcstep[0] + membuf_ofs, new_sz[0]);
+                మొత్తం = align_కొలత(new_srcstep[0]*new_sz[1] + membuf_ofs, padding);
+                మొత్తం = std::min(మొత్తం, u->size - new_srcrawofs);
+                CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Read_బఫరు(q, (cl_mem)u->handle, CL_TRUE,
+                                                 new_srcrawofs, మొత్తం, ptr, 0, 0, 0));
+                కొరకు( size_t i = 0; i < new_sz[1]; i++ )
+                    జ్ఞాపకం_నకలు( (uchar*)dstptr + i*new_dststep[0], ptr + i*new_srcstep[0] + membuf_ofs, new_sz[0]);
             }
-            else
+            లేకపోతే
             {
-                AlignedDataPtr2D<false, true> alignedPtr((uchar*)dstptr, new_sz[1], new_sz[0], new_dststep[0], CV_OPENCL_DATA_PTR_ALIGNMENT);
+                Aligned_దత్తాంశం_Ptr2_D<అబద్ధం, నిజం> alignedPtr((uchar*)dstptr, new_sz[1], new_sz[0], new_dststep[0], CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
-                CV_OCL_CHECK(clEnqueueReadBufferRect(q, (cl_mem)u->handle, CL_TRUE,
+                CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Read_బఫరు_Rect(q, (cl_mem)u->handle, CL_TRUE,
                     new_srcofs, new_dstofs, new_sz,
                     new_srcstep[0], 0,
                     new_dststep[0], 0,
@@ -6228,410 +6228,410 @@ public:
         }
     }
 
-    void upload(UMatData* u, const void* srcptr, int dims, const size_t sz[],
-                const size_t dstofs[], const size_t dststep[],
-                const size_t srcstep[]) const CV_OVERRIDE
+    శూన్య upload(UMat_దత్తాంశం* u, స్థిరరాశి శూన్య* srcptr, పూర్ణాంకం dims, స్థిరరాశి size_t sz[],
+                స్థిరరాశి size_t dstofs[], స్థిరరాశి size_t dststep[],
+                స్థిరరాశి size_t srcstep[]) స్థిరరాశి CV_OVERRIDE
     {
-        if(!u)
-            return;
+        ఒకవేళ(!u)
+            తిరిగి;
 
         // there should be no user-visible CPU copies of the UMat which we are going to copy to
-        CV_Assert(u->refcount == 0 || u->tempUMat());
+        CV_Assert(u->refcount == 0 || u->తాత్కాలిక_UMat());
 
-        size_t total = 0, new_sz[] = {0, 0, 0};
+        size_t మొత్తం = 0, new_sz[] = {0, 0, 0};
         size_t srcrawofs = 0, new_srcofs[] = {0, 0, 0}, new_srcstep[] = {0, 0, 0};
         size_t dstrawofs = 0, new_dstofs[] = {0, 0, 0}, new_dststep[] = {0, 0, 0};
 
-        bool iscontinuous = checkContinuous(dims, sz, 0, srcstep, dstofs, dststep,
-                                            total, new_sz,
+        తార్కిక iscontinuous = checkContinuous(dims, sz, 0, srcstep, dstofs, dststep,
+                                            మొత్తం, new_sz,
                                             srcrawofs, new_srcofs, new_srcstep,
                                             dstrawofs, new_dstofs, new_dststep);
 
-        UMatDataAutoLock autolock(u);
+        UMat_దత్తాంశం_Auto_తాళం autolock(u);
 
         // if there is cached CPU copy of the GPU matrix,
         // we could use it as a destination.
         // we can do it in 2 cases:
         //    1. we overwrite the whole content
         //    2. we overwrite part of the matrix, but the GPU copy is out-of-date
-        if( u->data && (u->hostCopyObsolete() < u->deviceCopyObsolete() || total == u->size))
+        ఒకవేళ( u->దత్తాంశం && (u->hostCopyObsolete() < u->deviceCopyObsolete() || మొత్తం == u->size))
         {
             Mat::getDefaultAllocator()->upload(u, srcptr, dims, sz, dstofs, dststep, srcstep);
-            u->markHostCopyObsolete(false);
-            u->markDeviceCopyObsolete(true);
-            return;
+            u->markHostCopyObsolete(అబద్ధం);
+            u->markDeviceCopyObsolete(నిజం);
+            తిరిగి;
         }
 
         CV_Assert( u->handle != 0 );
-        cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
+        cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
 
-#ifdef HAVE_OPENCL_SVM
-        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
         {
-            CV_DbgAssert(u->data == NULL || u->data == u->handle);
+            CV_DbgAssert(u->దత్తాంశం == ఖాళీ || u->దత్తాంశం == u->handle);
             Context& ctx = Context::getDefault();
-            const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+            స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
             CV_DbgAssert(svmFns->isValid());
 
-            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0);
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_MAP) == 0);
+            ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_COARSE_GRAIN_బఫరు)
             {
-                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
-                cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_WRITE,
+                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (పూర్ణాంకం)u->size);
+                cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMMap(q, CL_FALSE, CL_MAP_WRITE,
                         u->handle, u->size,
-                        0, NULL, NULL);
-                CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
+                        0, ఖాళీ, ఖాళీ);
+                CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMMap()");
             }
-            clFinish(q);
-            if( iscontinuous )
+            cl_ముగింపు(q);
+            ఒకవేళ( iscontinuous )
             {
-                memcpy((uchar*)u->handle + dstrawofs, srcptr, total);
+                జ్ఞాపకం_నకలు((uchar*)u->handle + dstrawofs, srcptr, మొత్తం);
             }
-            else
+            లేకపోతే
             {
                 // This code is from MatAllocator::upload()
-                int isz[CV_MAX_DIM];
+                పూర్ణాంకం isz[CV_MAX_DIM];
                 uchar* dstptr = (uchar*)u->handle;
-                for( int i = 0; i < dims; i++ )
+                కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
                 {
-                    CV_Assert( sz[i] <= (size_t)INT_MAX );
-                    if( sz[i] == 0 )
-                    return;
-                    if( dstofs )
+                    CV_Assert( sz[i] <= (size_t)గరిష్ఠ_పూర్ణాంకం );
+                    ఒకవేళ( sz[i] == 0 )
+                    తిరిగి;
+                    ఒకవేళ( dstofs )
                     dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-                    isz[i] = (int)sz[i];
+                    isz[i] = (పూర్ణాంకం)sz[i];
                 }
 
-                Mat src(dims, isz, CV_8U, (void*)srcptr, srcstep);
+                Mat src(dims, isz, CV_8U, (శూన్య*)srcptr, srcstep);
                 Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-                const Mat* arrays[] = { &src, &dst };
+                స్థిరరాశి Mat* arrays[] = { &src, &dst };
                 uchar* ptrs[2];
                 NAryMatIterator it(arrays, ptrs, 2);
                 size_t j, planesz = it.size;
 
-                for( j = 0; j < it.nplanes; j++, ++it )
-                    memcpy(ptrs[1], ptrs[0], planesz);
+                కొరకు( j = 0; j < it.nplanes; j++, ++it )
+                    జ్ఞాపకం_నకలు(ptrs[1], ptrs[0], planesz);
             }
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_COARSE_GRAIN_బఫరు)
             {
                 CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
-                cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle,
-                        0, NULL, NULL);
-                CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
-                clFinish(q);
+                cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMUnmap(q, u->handle,
+                        0, ఖాళీ, ఖాళీ);
+                CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMUnmap()");
+                cl_ముగింపు(q);
             }
         }
-        else
-#endif
+        లేకపోతే
+#అయితే_ముగింపు
         {
-            if( iscontinuous )
+            ఒకవేళ( iscontinuous )
             {
-                AlignedDataPtr<true, false> alignedPtr((uchar*)srcptr, total, CV_OPENCL_DATA_PTR_ALIGNMENT);
-                cl_int retval = clEnqueueWriteBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                    dstrawofs, total, alignedPtr.getAlignedPtr(), 0, 0, 0);
-                CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, offset=%lld, sz=%lld, data=%p, 0, 0, 0)",
-                        (void*)u->handle, (long long int)dstrawofs, (long long int)u->size, alignedPtr.getAlignedPtr()).c_str());
+                Aligned_దత్తాంశం_Ptr<నిజం, అబద్ధం> alignedPtr((uchar*)srcptr, మొత్తం, CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT);
+                cl_int retval = cl_వరుసలో_చేర్చు_Write_బఫరు(q, (cl_mem)u->handle, CL_TRUE,
+                    dstrawofs, మొత్తం, alignedPtr.getAlignedPtr(), 0, 0, 0);
+                CV_OCL_CHECK_ఫలితం(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, offset=%lld, sz=%lld, data=%p, 0, 0, 0)",
+                        (శూన్య*)u->handle, (దీర్ఘ దీర్ఘ పూర్ణాంకం)dstrawofs, (దీర్ఘ దీర్ఘ పూర్ణాంకం)u->size, alignedPtr.getAlignedPtr()).c_str());
             }
-            else if (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
+            లేకపోతే ఒకవేళ (CV_OPENCL_DISABLE_బఫరు_RECT_OPERATIONS)
             {
-                const size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
+                స్థిరరాశి size_t padding = CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT;
                 size_t new_dstrawofs = dstrawofs & ~(padding-1);
                 size_t membuf_ofs = dstrawofs - new_dstrawofs;
-                AlignedDataPtr2D<false, false> alignedPtr(0, new_sz[1], new_dststep[0], new_dststep[0],
-                                                          CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
+                Aligned_దత్తాంశం_Ptr2_D<అబద్ధం, అబద్ధం> alignedPtr(0, new_sz[1], new_dststep[0], new_dststep[0],
+                                                          CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT, padding*2);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
                 CV_Assert(new_dststep[0] >= new_sz[0] && new_srcstep[0] >= new_sz[0]);
-                total = alignSize(new_dststep[0]*new_sz[1] + membuf_ofs, padding);
-                total = std::min(total, u->size - new_dstrawofs);
+                మొత్తం = align_కొలత(new_dststep[0]*new_sz[1] + membuf_ofs, padding);
+                మొత్తం = std::min(మొత్తం, u->size - new_dstrawofs);
                 /*printf("new_sz0=%d, new_sz1=%d, membuf_ofs=%d, total=%d (%08x), new_dstrawofs=%d (%08x)\n",
                        (int)new_sz[0], (int)new_sz[1], (int)membuf_ofs,
                        (int)total, (int)total, (int)new_dstrawofs, (int)new_dstrawofs);*/
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                                                 new_dstrawofs, total, ptr, 0, 0, 0));
-                for( size_t i = 0; i < new_sz[1]; i++ )
-                    memcpy( ptr + i*new_dststep[0] + membuf_ofs, (uchar*)srcptr + i*new_srcstep[0], new_sz[0]);
-                CV_OCL_CHECK(clEnqueueWriteBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                                                 new_dstrawofs, total, ptr, 0, 0, 0));
+                CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Read_బఫరు(q, (cl_mem)u->handle, CL_TRUE,
+                                                 new_dstrawofs, మొత్తం, ptr, 0, 0, 0));
+                కొరకు( size_t i = 0; i < new_sz[1]; i++ )
+                    జ్ఞాపకం_నకలు( ptr + i*new_dststep[0] + membuf_ofs, (uchar*)srcptr + i*new_srcstep[0], new_sz[0]);
+                CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Write_బఫరు(q, (cl_mem)u->handle, CL_TRUE,
+                                                 new_dstrawofs, మొత్తం, ptr, 0, 0, 0));
             }
-            else
+            లేకపోతే
             {
-                AlignedDataPtr2D<true, false> alignedPtr((uchar*)srcptr, new_sz[1], new_sz[0], new_srcstep[0], CV_OPENCL_DATA_PTR_ALIGNMENT);
+                Aligned_దత్తాంశం_Ptr2_D<నిజం, అబద్ధం> alignedPtr((uchar*)srcptr, new_sz[1], new_sz[0], new_srcstep[0], CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
-                CV_OCL_CHECK(clEnqueueWriteBufferRect(q, (cl_mem)u->handle, CL_TRUE,
+                CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Write_బఫరు_Rect(q, (cl_mem)u->handle, CL_TRUE,
                     new_dstofs, new_srcofs, new_sz,
                     new_dststep[0], 0,
                     new_srcstep[0], 0,
                     ptr, 0, 0, 0));
             }
         }
-        u->markHostCopyObsolete(true);
-#ifdef HAVE_OPENCL_SVM
-        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-                (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
+        u->markHostCopyObsolete(నిజం);
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        ఒకవేళ ((u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_బఫరు ||
+                (u->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
         {
             // nothing
         }
-        else
-#endif
+        లేకపోతే
+#అయితే_ముగింపు
         {
-            u->markHostCopyObsolete(true);
+            u->markHostCopyObsolete(నిజం);
         }
-        u->markDeviceCopyObsolete(false);
+        u->markDeviceCopyObsolete(అబద్ధం);
     }
 
-    void copy(UMatData* src, UMatData* dst, int dims, const size_t sz[],
-              const size_t srcofs[], const size_t srcstep[],
-              const size_t dstofs[], const size_t dststep[], bool _sync) const CV_OVERRIDE
+    శూన్య copy(UMat_దత్తాంశం* src, UMat_దత్తాంశం* dst, పూర్ణాంకం dims, స్థిరరాశి size_t sz[],
+              స్థిరరాశి size_t srcofs[], స్థిరరాశి size_t srcstep[],
+              స్థిరరాశి size_t dstofs[], స్థిరరాశి size_t dststep[], తార్కిక _sync) స్థిరరాశి CV_OVERRIDE
     {
-        if(!src || !dst)
-            return;
+        ఒకవేళ(!src || !dst)
+            తిరిగి;
 
-        size_t total = 0, new_sz[] = {0, 0, 0};
+        size_t మొత్తం = 0, new_sz[] = {0, 0, 0};
         size_t srcrawofs = 0, new_srcofs[] = {0, 0, 0}, new_srcstep[] = {0, 0, 0};
         size_t dstrawofs = 0, new_dstofs[] = {0, 0, 0}, new_dststep[] = {0, 0, 0};
 
-        bool iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, dstofs, dststep,
-                                            total, new_sz,
+        తార్కిక iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, dstofs, dststep,
+                                            మొత్తం, new_sz,
                                             srcrawofs, new_srcofs, new_srcstep,
                                             dstrawofs, new_dstofs, new_dststep);
 
-        UMatDataAutoLock src_autolock(src, dst);
+        UMat_దత్తాంశం_Auto_తాళం src_autolock(src, dst);
 
-        if( !src->handle || (src->data && src->hostCopyObsolete() < src->deviceCopyObsolete()) )
+        ఒకవేళ( !src->handle || (src->దత్తాంశం && src->hostCopyObsolete() < src->deviceCopyObsolete()) )
         {
-            upload(dst, src->data + srcrawofs, dims, sz, dstofs, dststep, srcstep);
-            return;
+            upload(dst, src->దత్తాంశం + srcrawofs, dims, sz, dstofs, dststep, srcstep);
+            తిరిగి;
         }
-        if( !dst->handle || (dst->data && dst->hostCopyObsolete() < dst->deviceCopyObsolete()) )
+        ఒకవేళ( !dst->handle || (dst->దత్తాంశం && dst->hostCopyObsolete() < dst->deviceCopyObsolete()) )
         {
-            download(src, dst->data + dstrawofs, dims, sz, srcofs, srcstep, dststep);
-            dst->markHostCopyObsolete(false);
-#ifdef HAVE_OPENCL_SVM
-            if ((dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-                    (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
+            download(src, dst->దత్తాంశం + dstrawofs, dims, sz, srcofs, srcstep, dststep);
+            dst->markHostCopyObsolete(అబద్ధం);
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+            ఒకవేళ ((dst->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_బఫరు ||
+                    (dst->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
             {
                 // nothing
             }
-            else
-#endif
+            లేకపోతే
+#అయితే_ముగింపు
             {
-                dst->markDeviceCopyObsolete(true);
+                dst->markDeviceCopyObsolete(నిజం);
             }
-            return;
+            తిరిగి;
         }
 
         // there should be no user-visible CPU copies of the UMat which we are going to copy to
         CV_Assert(dst->refcount == 0);
-        cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
+        cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
 
         cl_int retval = CL_SUCCESS;
-#ifdef HAVE_OPENCL_SVM
-        if ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0 ||
-                (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        ఒకవేళ ((src->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0 ||
+                (dst->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
         {
-            if ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0 &&
-                            (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+            ఒకవేళ ((src->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0 &&
+                            (dst->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
             {
                 Context& ctx = Context::getDefault();
-                const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                స్థిరరాశి svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                 CV_DbgAssert(svmFns->isValid());
 
-                if( iscontinuous )
+                ఒకవేళ( iscontinuous )
                 {
                     CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMemcpy: %p <-- %p (%d)\n",
-                            (uchar*)dst->handle + dstrawofs, (uchar*)src->handle + srcrawofs, (int)total);
-                    cl_int status = svmFns->fn_clEnqueueSVMMemcpy(q, CL_TRUE,
+                            (uchar*)dst->handle + dstrawofs, (uchar*)src->handle + srcrawofs, (పూర్ణాంకం)మొత్తం);
+                    cl_int స్థితి_2 = svmFns->fn_cl_వరుసలో_చేర్చు_SVMMemcpy(q, CL_TRUE,
                             (uchar*)dst->handle + dstrawofs, (uchar*)src->handle + srcrawofs,
-                            total, 0, NULL, NULL);
-                    CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMemcpy()");
+                            మొత్తం, 0, ఖాళీ, ఖాళీ);
+                    CV_OCL_CHECK_ఫలితం(స్థితి_2, "clEnqueueSVMMemcpy()");
                 }
-                else
+                లేకపోతే
                 {
-                    clFinish(q);
+                    cl_ముగింపు(q);
                     // This code is from MatAllocator::download()/upload()
-                    int isz[CV_MAX_DIM];
+                    పూర్ణాంకం isz[CV_MAX_DIM];
                     uchar* srcptr = (uchar*)src->handle;
-                    for( int i = 0; i < dims; i++ )
+                    కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
                     {
-                        CV_Assert( sz[i] <= (size_t)INT_MAX );
-                        if( sz[i] == 0 )
-                        return;
-                        if( srcofs )
+                        CV_Assert( sz[i] <= (size_t)గరిష్ఠ_పూర్ణాంకం );
+                        ఒకవేళ( sz[i] == 0 )
+                        తిరిగి;
+                        ఒకవేళ( srcofs )
                         srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-                        isz[i] = (int)sz[i];
+                        isz[i] = (పూర్ణాంకం)sz[i];
                     }
                     Mat m_src(dims, isz, CV_8U, srcptr, srcstep);
 
                     uchar* dstptr = (uchar*)dst->handle;
-                    for( int i = 0; i < dims; i++ )
+                    కొరకు( పూర్ణాంకం i = 0; i < dims; i++ )
                     {
-                        if( dstofs )
+                        ఒకవేళ( dstofs )
                         dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
                     }
                     Mat m_dst(dims, isz, CV_8U, dstptr, dststep);
 
-                    const Mat* arrays[] = { &m_src, &m_dst };
+                    స్థిరరాశి Mat* arrays[] = { &m_src, &m_dst };
                     uchar* ptrs[2];
                     NAryMatIterator it(arrays, ptrs, 2);
                     size_t j, planesz = it.size;
 
-                    for( j = 0; j < it.nplanes; j++, ++it )
-                        memcpy(ptrs[1], ptrs[0], planesz);
+                    కొరకు( j = 0; j < it.nplanes; j++, ++it )
+                        జ్ఞాపకం_నకలు(ptrs[1], ptrs[0], planesz);
                 }
             }
-            else
+            లేకపోతే
             {
-                if ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+                ఒకవేళ ((src->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) != 0)
                 {
                     map(src, ACCESS_READ);
-                    upload(dst, src->data + srcrawofs, dims, sz, dstofs, dststep, srcstep);
+                    upload(dst, src->దత్తాంశం + srcrawofs, dims, sz, dstofs, dststep, srcstep);
                     unmap(src);
                 }
-                else
+                లేకపోతే
                 {
                     map(dst, ACCESS_WRITE);
-                    download(src, dst->data + dstrawofs, dims, sz, srcofs, srcstep, dststep);
+                    download(src, dst->దత్తాంశం + dstrawofs, dims, sz, srcofs, srcstep, dststep);
                     unmap(dst);
                 }
             }
         }
-        else
-#endif
+        లేకపోతే
+#అయితే_ముగింపు
         {
-            if( iscontinuous )
+            ఒకవేళ( iscontinuous )
             {
-                retval = clEnqueueCopyBuffer(q, (cl_mem)src->handle, (cl_mem)dst->handle,
-                                               srcrawofs, dstrawofs, total, 0, 0, 0);
-                CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueCopyBuffer(q, src=%p, dst=%p, src_offset=%lld, dst_offset=%lld, sz=%lld, 0, 0, 0)",
-                        (void*)src->handle, (void*)dst->handle, (long long int)srcrawofs, (long long int)dstrawofs, (long long int)total).c_str());
+                retval = cl_వరుసలో_చేర్చు_Copy_బఫరు(q, (cl_mem)src->handle, (cl_mem)dst->handle,
+                                               srcrawofs, dstrawofs, మొత్తం, 0, 0, 0);
+                CV_OCL_CHECK_ఫలితం(retval, cv::format("clEnqueueCopyBuffer(q, src=%p, dst=%p, src_offset=%lld, dst_offset=%lld, sz=%lld, 0, 0, 0)",
+                        (శూన్య*)src->handle, (శూన్య*)dst->handle, (దీర్ఘ దీర్ఘ పూర్ణాంకం)srcrawofs, (దీర్ఘ దీర్ఘ పూర్ణాంకం)dstrawofs, (దీర్ఘ దీర్ఘ పూర్ణాంకం)మొత్తం).c_str());
             }
-            else if (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
+            లేకపోతే ఒకవేళ (CV_OPENCL_DISABLE_బఫరు_RECT_OPERATIONS)
             {
-                const size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
+                స్థిరరాశి size_t padding = CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT;
                 size_t new_srcrawofs = srcrawofs & ~(padding-1);
                 size_t srcmembuf_ofs = srcrawofs - new_srcrawofs;
                 size_t new_dstrawofs = dstrawofs & ~(padding-1);
                 size_t dstmembuf_ofs = dstrawofs - new_dstrawofs;
 
-                AlignedDataPtr2D<false, false> srcBuf(0, new_sz[1], new_srcstep[0], new_srcstep[0],
-                                                      CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
-                AlignedDataPtr2D<false, false> dstBuf(0, new_sz[1], new_dststep[0], new_dststep[0],
-                                                      CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
+                Aligned_దత్తాంశం_Ptr2_D<అబద్ధం, అబద్ధం> srcBuf(0, new_sz[1], new_srcstep[0], new_srcstep[0],
+                                                      CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT, padding*2);
+                Aligned_దత్తాంశం_Ptr2_D<అబద్ధం, అబద్ధం> dstBuf(0, new_sz[1], new_dststep[0], new_dststep[0],
+                                                      CV_OPENCL_దత్తాంశం_PTR_ALIGNMENT, padding*2);
                 uchar* srcptr = srcBuf.getAlignedPtr();
                 uchar* dstptr = dstBuf.getAlignedPtr();
 
                 CV_Assert(new_dststep[0] >= new_sz[0] && new_srcstep[0] >= new_sz[0]);
 
-                size_t src_total = alignSize(new_srcstep[0]*new_sz[1] + srcmembuf_ofs, padding);
-                src_total = std::min(src_total, src->size - new_srcrawofs);
-                size_t dst_total = alignSize(new_dststep[0]*new_sz[1] + dstmembuf_ofs, padding);
-                dst_total = std::min(dst_total, dst->size - new_dstrawofs);
+                size_t src_మొత్తం = align_కొలత(new_srcstep[0]*new_sz[1] + srcmembuf_ofs, padding);
+                src_మొత్తం = std::min(src_మొత్తం, src->size - new_srcrawofs);
+                size_t dst_మొత్తం = align_కొలత(new_dststep[0]*new_sz[1] + dstmembuf_ofs, padding);
+                dst_మొత్తం = std::min(dst_మొత్తం, dst->size - new_dstrawofs);
 
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)src->handle, CL_TRUE,
-                                                 new_srcrawofs, src_total, srcptr, 0, 0, 0));
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)dst->handle, CL_TRUE,
-                                                 new_dstrawofs, dst_total, dstptr, 0, 0, 0));
+                CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Read_బఫరు(q, (cl_mem)src->handle, CL_TRUE,
+                                                 new_srcrawofs, src_మొత్తం, srcptr, 0, 0, 0));
+                CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Read_బఫరు(q, (cl_mem)dst->handle, CL_TRUE,
+                                                 new_dstrawofs, dst_మొత్తం, dstptr, 0, 0, 0));
 
-                for( size_t i = 0; i < new_sz[1]; i++ )
-                    memcpy( dstptr + dstmembuf_ofs + i*new_dststep[0],
+                కొరకు( size_t i = 0; i < new_sz[1]; i++ )
+                    జ్ఞాపకం_నకలు( dstptr + dstmembuf_ofs + i*new_dststep[0],
                             srcptr + srcmembuf_ofs + i*new_srcstep[0], new_sz[0]);
-                CV_OCL_CHECK(clEnqueueWriteBuffer(q, (cl_mem)dst->handle, CL_TRUE,
-                                                  new_dstrawofs, dst_total, dstptr, 0, 0, 0));
+                CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Write_బఫరు(q, (cl_mem)dst->handle, CL_TRUE,
+                                                  new_dstrawofs, dst_మొత్తం, dstptr, 0, 0, 0));
             }
-            else
+            లేకపోతే
             {
-                CV_OCL_CHECK(retval = clEnqueueCopyBufferRect(q, (cl_mem)src->handle, (cl_mem)dst->handle,
+                CV_OCL_CHECK(retval = cl_వరుసలో_చేర్చు_Copy_బఫరు_Rect(q, (cl_mem)src->handle, (cl_mem)dst->handle,
                                                    new_srcofs, new_dstofs, new_sz,
                                                    new_srcstep[0], 0,
                                                    new_dststep[0], 0,
                                                    0, 0, 0));
             }
         }
-        if (retval == CL_SUCCESS)
+        ఒకవేళ (retval == CL_SUCCESS)
         {
-            CV_IMPL_ADD(CV_IMPL_OCL)
+            CV_IMPL_కూడు(CV_IMPL_OCL)
         }
 
-#ifdef HAVE_OPENCL_SVM
-        if ((dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-            (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        ఒకవేళ ((dst->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_బఫరు ||
+            (dst->allocatorFlags_ & svm::OPENCL_SVM_బఫరు_ముసుగు) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
         {
             // nothing
         }
-        else
-#endif
+        లేకపోతే
+#అయితే_ముగింపు
         {
-            dst->markHostCopyObsolete(true);
+            dst->markHostCopyObsolete(నిజం);
         }
-        dst->markDeviceCopyObsolete(false);
+        dst->markDeviceCopyObsolete(అబద్ధం);
 
-        if( _sync )
+        ఒకవేళ( _sync )
         {
-            CV_OCL_DBG_CHECK(clFinish(q));
+            CV_OCL_DBG_CHECK(cl_ముగింపు(q));
         }
     }
 
-    BufferPoolController* getBufferPoolController(const char* id) const CV_OVERRIDE
+    బఫరు_Pool_Controller* get_బఫరు_Pool_Controller(స్థిరరాశి అక్షరం* id) స్థిరరాశి CV_OVERRIDE
     {
         ocl::Context ctx = Context::getDefault();
-        if (ctx.empty())
-            return NULL;
-#ifdef HAVE_OPENCL_SVM
-        if ((svm::checkForceSVMUmatUsage() && (id == NULL || strcmp(id, "OCL") == 0)) || (id != NULL && strcmp(id, "SVM") == 0))
+        ఒకవేళ (ctx.empty())
+            తిరిగి ఖాళీ;
+#నిర్వచితమైతే HAVE_OPENCL_SVM
+        ఒకవేళ ((svm::checkForceSVMUmatUsage() && (id == ఖాళీ || strcmp(id, "OCL") == 0)) || (id != ఖాళీ && strcmp(id, "SVM") == 0))
         {
-            return &ctx.getImpl()->getBufferPoolSVM();
+            తిరిగి &ctx.getImpl()->get_బఫరు_Pool_SVM();
         }
-#endif
-        if (id != NULL && strcmp(id, "HOST_ALLOC") == 0)
+#అయితే_ముగింపు
+        ఒకవేళ (id != ఖాళీ && strcmp(id, "HOST_ALLOC") == 0)
         {
-            return &ctx.getImpl()->getBufferPoolHostPtr();
+            తిరిగి &ctx.getImpl()->get_బఫరు_Pool_Host_Ptr();
         }
-        if (id != NULL && strcmp(id, "OCL") != 0)
+        ఒకవేళ (id != ఖాళీ && strcmp(id, "OCL") != 0)
         {
             CV_Error(cv::Error::StsBadArg, "getBufferPoolController(): unknown BufferPool ID\n");
         }
-        return &ctx.getImpl()->getBufferPool();
+        తిరిగి &ctx.getImpl()->get_బఫరు_Pool();
     }
 
     MatAllocator* matStdAllocator;
 
-    mutable cv::Mutex cleanupQueueMutex;
-    mutable std::deque<UMatData*> cleanupQueue;
+    మార్చదగిన cv::Mutex cleanup_వరుస_Mutex;
+    మార్చదగిన std::deque<UMat_దత్తాంశం*> cleanup_వరుస;
 
-    void flushCleanupQueue() const
+    శూన్య flush_Cleanup_వరుస() స్థిరరాశి
     {
         // TSAN false positive: see #27638
-        if (!cleanupQueue.empty())
+        ఒకవేళ (!cleanup_వరుస.empty())
         {
-            std::deque<UMatData*> q;
+            std::deque<UMat_దత్తాంశం*> q;
             {
-                cv::AutoLock lock(cleanupQueueMutex);
+                cv::Auto_తాళం lock(cleanup_వరుస_Mutex);
                 // TSAN false positive: see #27638
-                q.swap(cleanupQueue);
+                q.swap(cleanup_వరుస);
             }
-            for (std::deque<UMatData*>::const_iterator i = q.begin(); i != q.end(); ++i)
+            కొరకు (std::deque<UMat_దత్తాంశం*>::const_iterator i = q.begin(); i != q.end(); ++i)
             {
                 deallocate_(*i);
             }
         }
     }
-    void addToCleanupQueue(UMatData* u) const
+    శూన్య కూడు_గమ్యం_Cleanup_వరుస(UMat_దత్తాంశం* u) స్థిరరాశి
     {
         //TODO: Validation check: CV_Assert(!u->tempUMat());
         {
-            cv::AutoLock lock(cleanupQueueMutex);
-            cleanupQueue.push_back(u);
+            cv::Auto_తాళం lock(cleanup_వరుస_Mutex);
+            cleanup_వరుస.push_back(u);
         }
     }
 };
 
-static OpenCLAllocator* getOpenCLAllocator_() // call once guarantee
+స్థిర OpenCLAllocator* getOpenCLAllocator_() // call once guarantee
 {
-    static OpenCLAllocator* g_allocator = new OpenCLAllocator(); // avoid destructor call (using of this object is too wide)
-    return g_allocator;
+    స్థిర OpenCLAllocator* g_allocator = కొత్త OpenCLAllocator(); // avoid destructor call (using of this object is too wide)
+    తిరిగి g_allocator;
 }
 MatAllocator* getOpenCLAllocator()
 {
@@ -6641,136 +6641,136 @@ MatAllocator* getOpenCLAllocator()
 }} // namespace cv::ocl
 
 
-namespace cv {
+నామాకాశ cv {
 
 // three funcs below are implemented in umatrix.cpp
-void setSize( UMat& m, int _dims, const int* _sz, const size_t* _steps,
-              bool autoSteps = false );
-void finalizeHdr(UMat& m);
+శూన్య సమితి_కొలత( UMat& m, పూర్ణాంకం _dims, స్థిరరాశి పూర్ణాంకం* _sz, స్థిరరాశి size_t* అడుగులు_2,
+              తార్కిక auto_అడుగులు = అబద్ధం );
+శూన్య finalizeHdr(UMat& m);
 
 } // namespace cv
 
 
-namespace cv { namespace ocl {
+నామాకాశ cv { నామాకాశ ocl {
 
 /*
 // Convert OpenCL buffer memory to UMat
 */
-void convertFromBuffer(void* cl_mem_buffer, size_t step, int rows, int cols, int type, UMat& dst)
+శూన్య convert_From_బఫరు(శూన్య* cl_mem_బఫరు, size_t అడుగు, పూర్ణాంకం అడ్డువరుసలు, పూర్ణాంకం నిలువుల_సంఖ్య, పూర్ణాంకం type, UMat& dst)
 {
-    int d = 2;
-    int sizes[] = { rows, cols };
+    పూర్ణాంకం d = 2;
+    పూర్ణాంకం sizes[] = { అడ్డువరుసలు, నిలువుల_సంఖ్య };
 
     CV_Assert(0 <= d && d <= CV_MAX_DIM);
 
     dst.release();
 
-    dst.flags      = (type & Mat::TYPE_MASK) | Mat::MAGIC_VAL;
+    dst.flags      = (type & Mat::TYPE_ముసుగు) | Mat::MAGIC_VAL;
     dst.usageFlags = USAGE_DEFAULT;
 
-    setSize(dst, d, sizes, 0, true);
+    సమితి_కొలత(dst, d, sizes, 0, నిజం);
     dst.offset = 0;
 
-    cl_mem             memobj = (cl_mem)cl_mem_buffer;
+    cl_mem             memobj = (cl_mem)cl_mem_బఫరు;
     cl_mem_object_type mem_type = 0;
 
-    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_TYPE, sizeof(cl_mem_object_type), &mem_type, 0));
+    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_TYPE, పరిమాణం(cl_mem_object_type), &mem_type, 0));
 
-    CV_Assert(CL_MEM_OBJECT_BUFFER == mem_type);
+    CV_Assert(CL_MEM_OBJECT_బఫరు == mem_type);
 
-    size_t total = 0;
-    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_SIZE, sizeof(size_t), &total, 0));
+    size_t మొత్తం = 0;
+    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_కొలత, పరిమాణం(size_t), &మొత్తం, 0));
 
     CV_OCL_CHECK(clRetainMemObject(memobj));
 
-    CV_Assert((int)step >= cols * CV_ELEM_SIZE(type));
-    CV_Assert(total >= rows * step);
+    CV_Assert((పూర్ణాంకం)అడుగు >= నిలువుల_సంఖ్య * CV_ELEM_కొలత(type));
+    CV_Assert(మొత్తం >= అడ్డువరుసలు * అడుగు);
 
     // attach clBuffer to UMatData
-    dst.u = new UMatData(getOpenCLAllocator());
-    dst.u->data            = 0;
-    dst.u->allocatorFlags_ = OpenCLAllocator::ALLOCATOR_FLAGS_EXTERNAL_BUFFER;  // not allocated from any OpenCV buffer pool
-    dst.u->flags           = static_cast<UMatData::MemoryFlag>(0);
-    dst.u->handle          = cl_mem_buffer;
+    dst.u = కొత్త UMat_దత్తాంశం(getOpenCLAllocator());
+    dst.u->దత్తాంశం            = 0;
+    dst.u->allocatorFlags_ = OpenCLAllocator::ALLOCATOR_FLAGS_EXTERNAL_బఫరు;  // not allocated from any OpenCV buffer pool
+    dst.u->flags           = static_cast<UMat_దత్తాంశం::జ్ఞాపకం_Flag>(0);
+    dst.u->handle          = cl_mem_బఫరు;
     dst.u->origdata        = 0;
     dst.u->prevAllocator   = 0;
-    dst.u->size            = total;
+    dst.u->size            = మొత్తం;
 
     finalizeHdr(dst);
     dst.addref();
 
-    return;
+    తిరిగి;
 } // convertFromBuffer()
 
 
 /*
 // Convert OpenCL image2d_t memory to UMat
 */
-void convertFromImage(void* cl_mem_image, UMat& dst)
+శూన్య convertFromImage(శూన్య* cl_mem_image, UMat& dst)
 {
     cl_mem             clImage = (cl_mem)cl_mem_image;
     cl_mem_object_type mem_type = 0;
 
-    CV_OCL_CHECK(clGetMemObjectInfo(clImage, CL_MEM_TYPE, sizeof(cl_mem_object_type), &mem_type, 0));
+    CV_OCL_CHECK(clGetMemObjectInfo(clImage, CL_MEM_TYPE, పరిమాణం(cl_mem_object_type), &mem_type, 0));
 
     CV_Assert(CL_MEM_OBJECT_IMAGE2D == mem_type);
 
     cl_image_format fmt = { 0, 0 };
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_FORMAT, sizeof(cl_image_format), &fmt, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_FORMAT, పరిమాణం(cl_image_format), &fmt, 0));
 
-    int depth = CV_8U;
-    switch (fmt.image_channel_data_type)
+    పూర్ణాంకం లోతు = CV_8U;
+    ఎంపిక (fmt.image_channel_దత్తాంశం_type)
     {
-    case CL_UNORM_INT8:
-    case CL_UNSIGNED_INT8:
-        depth = CV_8U;
-        break;
+    స్థితి CL_UNORM_INT8:
+    స్థితి CL_UNSIGNED_INT8:
+        లోతు = CV_8U;
+        ఆపు;
 
-    case CL_SNORM_INT8:
-    case CL_SIGNED_INT8:
-        depth = CV_8S;
-        break;
+    స్థితి CL_SNORM_INT8:
+    స్థితి CL_SIGNED_INT8:
+        లోతు = CV_8S;
+        ఆపు;
 
-    case CL_UNORM_INT16:
-    case CL_UNSIGNED_INT16:
-        depth = CV_16U;
-        break;
+    స్థితి CL_UNORM_INT16:
+    స్థితి CL_UNSIGNED_INT16:
+        లోతు = CV_16U;
+        ఆపు;
 
-    case CL_SNORM_INT16:
-    case CL_SIGNED_INT16:
-        depth = CV_16S;
-        break;
+    స్థితి CL_SNORM_INT16:
+    స్థితి CL_SIGNED_INT16:
+        లోతు = CV_16S;
+        ఆపు;
 
-    case CL_SIGNED_INT32:
-        depth = CV_32S;
-        break;
+    స్థితి CL_SIGNED_INT32:
+        లోతు = CV_32S;
+        ఆపు;
 
-    case CL_FLOAT:
-        depth = CV_32F;
-        break;
+    స్థితి CL_FLOAT:
+        లోతు = CV_32F;
+        ఆపు;
 
-    case CL_HALF_FLOAT:
-        depth = CV_16F;
-        break;
+    స్థితి CL_HALF_FLOAT:
+        లోతు = CV_16F;
+        ఆపు;
 
-    default:
+    అప్రమేయ:
         CV_Error(cv::Error::OpenCLApiCallError, "Not supported image_channel_data_type");
     }
 
-    int type = CV_8UC1;
-    switch (fmt.image_channel_order)
+    పూర్ణాంకం type = CV_8UC1;
+    ఎంపిక (fmt.image_channel_క్రమం)
     {
-    case CL_R:
-    case CL_A:
-    case CL_INTENSITY:
-    case CL_LUMINANCE:
-        type = CV_MAKE_TYPE(depth, 1);
-        break;
+    స్థితి CL_R:
+    స్థితి CL_A:
+    స్థితి CL_INTENSITY:
+    స్థితి CL_LUMINANCE:
+        type = CV_MAKE_TYPE(లోతు, 1);
+        ఆపు;
 
-    case CL_RG:
-    case CL_RA:
-        type = CV_MAKE_TYPE(depth, 2);
-        break;
+    స్థితి CL_RG:
+    స్థితి CL_RA:
+        type = CV_MAKE_TYPE(లోతు, 2);
+        ఆపు;
 
     // CL_RGB has no mappings to OpenCV types because CL_RGB can only be used with
     // CL_UNORM_SHORT_565, CL_UNORM_SHORT_555, or CL_UNORM_INT_101010.
@@ -6778,92 +6778,92 @@ void convertFromImage(void* cl_mem_image, UMat& dst)
         type = CV_MAKE_TYPE(depth, 3);
         break;*/
 
-    case CL_RGBA:
-    case CL_BGRA:
-    case CL_ARGB:
-        type = CV_MAKE_TYPE(depth, 4);
-        break;
+    స్థితి CL_RGBA:
+    స్థితి CL_BGRA:
+    స్థితి CL_ARGB:
+        type = CV_MAKE_TYPE(లోతు, 4);
+        ఆపు;
 
-    default:
+    అప్రమేయ:
         CV_Error(cv::Error::OpenCLApiCallError, "Not supported image_channel_order");
-        break;
+        ఆపు;
     }
 
-    size_t step = 0;
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_ROW_PITCH, sizeof(size_t), &step, 0));
+    size_t అడుగు = 0;
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_అడ్డువరుస_PITCH, పరిమాణం(size_t), &అడుగు, 0));
 
     size_t w = 0;
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_WIDTH, sizeof(size_t), &w, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_వెడల్పు, పరిమాణం(size_t), &w, 0));
 
     size_t h = 0;
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_HEIGHT, sizeof(size_t), &h, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_ఎత్తు, పరిమాణం(size_t), &h, 0));
 
-    dst.create((int)h, (int)w, type);
+    dst.create((పూర్ణాంకం)h, (పూర్ణాంకం)w, type);
 
-    cl_mem clBuffer = (cl_mem)dst.handle(ACCESS_READ);
+    cl_mem cl_బఫరు = (cl_mem)dst.handle(ACCESS_READ);
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
+    cl_command_వరుస q = (cl_command_వరుస)వరుస::getDefault().ptr();
 
     size_t offset = 0;
     size_t src_origin[3] = { 0, 0, 0 };
     size_t region[3] = { w, h, 1 };
-    CV_OCL_CHECK(clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL));
+    CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Copy_Image_గమ్యం_బఫరు(q, clImage, cl_బఫరు, src_origin, region, offset, 0, ఖాళీ, ఖాళీ));
 
-    CV_OCL_CHECK(clFinish(q));
+    CV_OCL_CHECK(cl_ముగింపు(q));
 
-    return;
+    తిరిగి;
 } // convertFromImage()
 
 
 ///////////////////////////////////////////// Utility functions /////////////////////////////////////////////////
 
-static void getDevices(std::vector<cl_device_id>& devices, cl_platform_id platform)
+స్థిర శూన్య getDevices(std::vector<cl_device_id>& devices, cl_platform_id platform)
 {
-    cl_uint numDevices = 0;
-    cl_int status = clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, 0, NULL, &numDevices);
-    if (status != CL_DEVICE_NOT_FOUND) // Not an error if platform has no devices
+    cl_uint అంకె_Devices = 0;
+    cl_int స్థితి_2 = clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, 0, ఖాళీ, &అంకె_Devices);
+    ఒకవేళ (స్థితి_2 != CL_DEVICE_NOT_దొరికింది) // Not an error if platform has no devices
     {
-        CV_OCL_DBG_CHECK_RESULT(status,
-            cv::format("clGetDeviceIDs(platform, Device::TYPE_ALL, num_entries=0, devices=NULL, numDevices=%p)", &numDevices).c_str());
+        CV_OCL_DBG_CHECK_ఫలితం(స్థితి_2,
+            cv::format("clGetDeviceIDs(platform, Device::TYPE_ALL, num_entries=0, devices=NULL, numDevices=%p)", &అంకె_Devices).c_str());
     }
 
-    if (numDevices == 0)
+    ఒకవేళ (అంకె_Devices == 0)
     {
         devices.clear();
-        return;
+        తిరిగి;
     }
 
-    devices.resize((size_t)numDevices);
-    CV_OCL_DBG_CHECK(clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, numDevices, &devices[0], &numDevices));
+    devices.resize((size_t)అంకె_Devices);
+    CV_OCL_DBG_CHECK(clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, అంకె_Devices, &devices[0], &అంకె_Devices));
 }
 
-struct PlatformInfo::Impl
+నిర్మాణం PlatformInfo::Impl
 {
-    Impl(void* id)
+    Impl(శూన్య* id)
     {
         refcount = 1;
         handle = *(cl_platform_id*)id;
         getDevices(devices, handle);
 
-        version_ = getStrProp(CL_PLATFORM_VERSION);
-        parseOpenCLVersion(version_, versionMajor_, versionMinor_);
+        సంస్కరణ_3 = getStrProp(CL_PLATFORM_సంస్కరణ);
+        parseOpenCLVersion(సంస్కరణ_3, సంస్కరణ_Major, సంస్కరణ_Minor);
     }
 
-    String getStrProp(cl_platform_info prop) const
+    String getStrProp(cl_platform_info prop) స్థిరరాశి
     {
-        char buf[1024];
+        అక్షరం buf[1024];
         size_t sz=0;
-        return clGetPlatformInfo(handle, prop, sizeof(buf)-16, buf, &sz) == CL_SUCCESS &&
-            sz < sizeof(buf) ? String(buf) : String();
+        తిరిగి clGetPlatformInfo(handle, prop, పరిమాణం(buf)-16, buf, &sz) == CL_SUCCESS &&
+            sz < పరిమాణం(buf) ? String(buf) : String();
     }
 
     IMPLEMENT_REFCOUNTABLE();
     std::vector<cl_device_id> devices;
     cl_platform_id handle;
 
-    String version_;
-    int versionMajor_;
-    int versionMinor_;
+    String సంస్కరణ_3;
+    పూర్ణాంకం సంస్కరణ_Major;
+    పూర్ణాంకం సంస్కరణ_Minor;
 };
 
 PlatformInfo::PlatformInfo() CV_NOEXCEPT
@@ -6871,120 +6871,120 @@ PlatformInfo::PlatformInfo() CV_NOEXCEPT
     p = 0;
 }
 
-PlatformInfo::PlatformInfo(void* platform_id)
+PlatformInfo::PlatformInfo(శూన్య* platform_id)
 {
-    p = new Impl(platform_id);
+    p = కొత్త Impl(platform_id);
 }
 
 PlatformInfo::~PlatformInfo()
 {
-    if(p)
+    ఒకవేళ(p)
         p->release();
 }
 
-PlatformInfo::PlatformInfo(const PlatformInfo& i)
+PlatformInfo::PlatformInfo(స్థిరరాశి PlatformInfo& i)
 {
-    if (i.p)
+    ఒకవేళ (i.p)
         i.p->addref();
     p = i.p;
 }
 
-PlatformInfo& PlatformInfo::operator =(const PlatformInfo& i)
+PlatformInfo& PlatformInfo::క్రియాకారకం =(స్థిరరాశి PlatformInfo& i)
 {
-    if (i.p != p)
+    ఒకవేళ (i.p != p)
     {
-        if (i.p)
+        ఒకవేళ (i.p)
             i.p->addref();
-        if (p)
+        ఒకవేళ (p)
             p->release();
         p = i.p;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
 PlatformInfo::PlatformInfo(PlatformInfo&& i) CV_NOEXCEPT
 {
     p = i.p;
-    i.p = nullptr;
+    i.p = శూన్యసూచిక;
 }
 
-PlatformInfo& PlatformInfo::operator = (PlatformInfo&& i) CV_NOEXCEPT
+PlatformInfo& PlatformInfo::క్రియాకారకం = (PlatformInfo&& i) CV_NOEXCEPT
 {
-    if (this != &i) {
-        if(p)
+    ఒకవేళ (ఇది != &i) {
+        ఒకవేళ(p)
             p->release();
         p = i.p;
-        i.p = nullptr;
+        i.p = శూన్యసూచిక;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
-int PlatformInfo::deviceNumber() const
+పూర్ణాంకం PlatformInfo::device_సంఖ్య() స్థిరరాశి
 {
-    return p ? (int)p->devices.size() : 0;
+    తిరిగి p ? (పూర్ణాంకం)p->devices.size() : 0;
 }
 
-void PlatformInfo::getDevice(Device& device, int d) const
+శూన్య PlatformInfo::getDevice(Device& device, పూర్ణాంకం d) స్థిరరాశి
 {
-    CV_Assert(p && d < (int)p->devices.size() );
-    if(p)
-        device.set(p->devices[d]);
+    CV_Assert(p && d < (పూర్ణాంకం)p->devices.size() );
+    ఒకవేళ(p)
+        device.సమితి(p->devices[d]);
 }
 
-String PlatformInfo::name() const
+String PlatformInfo::name() స్థిరరాశి
 {
-    return p ? p->getStrProp(CL_PLATFORM_NAME) : String();
+    తిరిగి p ? p->getStrProp(CL_PLATFORM_NAME) : String();
 }
 
-String PlatformInfo::vendor() const
+String PlatformInfo::vendor() స్థిరరాశి
 {
-    return p ? p->getStrProp(CL_PLATFORM_VENDOR) : String();
+    తిరిగి p ? p->getStrProp(CL_PLATFORM_VENDOR) : String();
 }
 
-String PlatformInfo::version() const
+String PlatformInfo::సంస్కరణ() స్థిరరాశి
 {
-    return p ? p->version_ : String();
+    తిరిగి p ? p->సంస్కరణ_3 : String();
 }
 
-int PlatformInfo::versionMajor() const
-{
-    CV_Assert(p);
-    return p->versionMajor_;
-}
-
-int PlatformInfo::versionMinor() const
+పూర్ణాంకం PlatformInfo::సంస్కరణ_Major_2() స్థిరరాశి
 {
     CV_Assert(p);
-    return p->versionMinor_;
+    తిరిగి p->సంస్కరణ_Major;
 }
 
-static void getPlatforms(std::vector<cl_platform_id>& platforms)
+పూర్ణాంకం PlatformInfo::సంస్కరణ_Minor_2() స్థిరరాశి
 {
-    cl_uint numPlatforms = 0;
-    CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &numPlatforms));
+    CV_Assert(p);
+    తిరిగి p->సంస్కరణ_Minor;
+}
 
-    if (numPlatforms == 0)
+స్థిర శూన్య getPlatforms(std::vector<cl_platform_id>& platforms)
+{
+    cl_uint అంకె_Platforms = 0;
+    CV_OCL_DBG_CHECK(clGetPlatformIDs(0, ఖాళీ, &అంకె_Platforms));
+
+    ఒకవేళ (అంకె_Platforms == 0)
     {
         platforms.clear();
-        return;
+        తిరిగి;
     }
 
-    platforms.resize((size_t)numPlatforms);
-    CV_OCL_DBG_CHECK(clGetPlatformIDs(numPlatforms, &platforms[0], &numPlatforms));
+    platforms.resize((size_t)అంకె_Platforms);
+    CV_OCL_DBG_CHECK(clGetPlatformIDs(అంకె_Platforms, &platforms[0], &అంకె_Platforms));
 }
 
-void getPlatfomsInfo(std::vector<PlatformInfo>& platformsInfo)
+శూన్య getPlatfomsInfo(std::vector<PlatformInfo>& platformsInfo)
 {
     std::vector<cl_platform_id> platforms;
     getPlatforms(platforms);
 
-    for (size_t i = 0; i < platforms.size(); i++)
-        platformsInfo.push_back( PlatformInfo((void*)&platforms[i]) );
+    కొరకు (size_t i = 0; i < platforms.size(); i++)
+        platformsInfo.push_back( PlatformInfo((శూన్య*)&platforms[i]) );
 }
 
-const char* typeToStr(int type)
+స్థిరరాశి అక్షరం* type_గమ్యం_Str(పూర్ణాంకం type)
 {
-    static const char* tab[CV_DEPTH_MAX*16]=
+    స్థిర స్థిరరాశి అక్షరం* tab[CV_లోతు_MAX*16]=
     {
         "uchar", "uchar2", "uchar3", "uchar4", 0, 0, 0, "uchar8", 0, 0, 0, 0, 0, 0, 0, "uchar16",
         "char", "char2", "char3", "char4", 0, 0, 0, "char8", 0, 0, 0, 0, 0, 0, 0, "char16",
@@ -7000,15 +7000,15 @@ const char* typeToStr(int type)
         "long", "long2", "long3", "long4", 0, 0, 0, "long8", 0, 0, 0, 0, 0, 0, 0, "long16",
         "uint", "uint2", "uint3", "uint4", 0, 0, 0, "uint8", 0, 0, 0, 0, 0, 0, 0, "uint16"
     };
-    int cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    const char* result = cn > 16 ? nullptr : tab[depth*16 + cn-1];
-    CV_Assert(result);
-    return result;
+    పూర్ణాంకం cn = CV_MAT_CN(type), లోతు = CV_MAT_లోతు(type);
+    స్థిరరాశి అక్షరం* ఫలితం = cn > 16 ? శూన్యసూచిక : tab[లోతు*16 + cn-1];
+    CV_Assert(ఫలితం);
+    తిరిగి ఫలితం;
 }
 
-const char* memopTypeToStr(int type)
+స్థిరరాశి అక్షరం* memop_Type_గమ్యం_Str(పూర్ణాంకం type)
 {
-    static const char* tab[CV_DEPTH_MAX*16] =
+    స్థిర స్థిరరాశి అక్షరం* tab[CV_లోతు_MAX*16] =
     {
         "uchar", "uchar2", "uchar3", "uchar4", 0, 0, 0, "uchar8", 0, 0, 0, 0, 0, 0, 0, "uchar16",
         "char", "char2", "char3", "char4", 0, 0, 0, "char8", 0, 0, 0, 0, 0, 0, 0, "char16",
@@ -7024,15 +7024,15 @@ const char* memopTypeToStr(int type)
         "long", "long2", "long3", "long4", 0, 0, 0, "long8", 0, 0, 0, 0, 0, 0, 0, "long16",
         "uint", "uint2", "uint3", "uint4", 0, 0, 0, "uint8", 0, 0, 0, 0, 0, 0, 0, "uint16"
     };
-    int cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    const char* result = cn > 16 ? nullptr : tab[depth*16 + cn-1];
-    CV_Assert(result);
-    return result;
+    పూర్ణాంకం cn = CV_MAT_CN(type), లోతు = CV_MAT_లోతు(type);
+    స్థిరరాశి అక్షరం* ఫలితం = cn > 16 ? శూన్యసూచిక : tab[లోతు*16 + cn-1];
+    CV_Assert(ఫలితం);
+    తిరిగి ఫలితం;
 }
 
-const char* vecopTypeToStr(int type)
+స్థిరరాశి అక్షరం* vecop_Type_గమ్యం_Str(పూర్ణాంకం type)
 {
-    static const char* tab[CV_DEPTH_MAX*16] =
+    స్థిర స్థిరరాశి అక్షరం* tab[CV_లోతు_MAX*16] =
     {
         "uchar", "short", "uchar3", "int", 0, 0, 0, "int2", 0, 0, 0, 0, 0, 0, 0, "int4",
         "char", "short", "char3", "int", 0, 0, 0, "int2", 0, 0, 0, 0, 0, 0, 0, "int4",
@@ -7048,262 +7048,262 @@ const char* vecopTypeToStr(int type)
         "long", "long2", "long3", "long4", 0, 0, 0, "long8", 0, 0, 0, 0, 0, 0, 0, "long16",
         "uint", "uint2", "uint3", "uint4", 0, 0, 0, "uint8", 0, 0, 0, 0, 0, 0, 0, "uint16"
     };
-    int cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    const char* result = cn > 16 ? 0 : tab[depth*16 + cn-1];
-    CV_Assert(result);
-    return result;
+    పూర్ణాంకం cn = CV_MAT_CN(type), లోతు = CV_MAT_లోతు(type);
+    స్థిరరాశి అక్షరం* ఫలితం = cn > 16 ? 0 : tab[లోతు*16 + cn-1];
+    CV_Assert(ఫలితం);
+    తిరిగి ఫలితం;
 }
 
 // Deprecated due to size of buf buffer being unknowable.
-const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf)
+స్థిరరాశి అక్షరం* convertTypeStr(పూర్ణాంకం sdepth, పూర్ణాంకం ddepth, పూర్ణాంకం cn, అక్షరం* buf)
 {
     // Since the size of buf is not given, we assume 50 because that's what all callers use.
     constexpr size_t buf_max = 50;
 
-    return convertTypeStr(sdepth, ddepth, cn, buf, buf_max);
+    తిరిగి convertTypeStr(sdepth, ddepth, cn, buf, buf_max);
 }
 
-const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf, size_t buf_size)
+స్థిరరాశి అక్షరం* convertTypeStr(పూర్ణాంకం sdepth, పూర్ణాంకం ddepth, పూర్ణాంకం cn, అక్షరం* buf, size_t buf_కొలత_2)
 {
-    if( sdepth == ddepth )
-        return "noconvert";
-    const char *typestr = typeToStr(CV_MAKETYPE(ddepth, cn));
-    if( CV_IS_FLOAT_TYPE(ddepth) ||
+    ఒకవేళ( sdepth == ddepth )
+        తిరిగి "noconvert";
+    స్థిరరాశి అక్షరం *typestr = type_గమ్యం_Str(CV_MAKETYPE(ddepth, cn));
+    ఒకవేళ( CV_IS_FLOAT_TYPE(ddepth) ||
         (ddepth == CV_32S && sdepth < CV_32S) ||
         (ddepth == CV_16S && sdepth <= CV_8S) ||
         (ddepth == CV_16U && sdepth == CV_8U))
     {
-        snprintf(buf, buf_size, "convert_%s", typestr);
+        snprintf(buf, buf_కొలత_2, "convert_%s", typestr);
     }
-    else if( CV_IS_FLOAT_TYPE(sdepth) )
-        snprintf(buf, buf_size, "convert_%s_sat_rte", typestr);
-    else
-        snprintf(buf, buf_size, "convert_%s_sat", typestr);
+    లేకపోతే ఒకవేళ( CV_IS_FLOAT_TYPE(sdepth) )
+        snprintf(buf, buf_కొలత_2, "convert_%s_sat_rte", typestr);
+    లేకపోతే
+        snprintf(buf, buf_కొలత_2, "convert_%s_sat", typestr);
 
-    return buf;
+    తిరిగి buf;
 }
 
-const char* getOpenCLErrorString(int errorCode)
+స్థిరరాశి అక్షరం* getOpenCLErrorString(పూర్ణాంకం error_సంకేతం)
 {
-#define CV_OCL_CODE(id) case id: return #id
-#define CV_OCL_CODE_(id, name) case id: return #name
-    switch (errorCode)
+#నిర్వచించు CV_OCL_సంకేతం(id) స్థితి id: తిరిగి #id
+#నిర్వచించు CV_OCL_సంకేతం_2(id, name) స్థితి id: తిరిగి #name
+    ఎంపిక (error_సంకేతం)
     {
-    CV_OCL_CODE(CL_SUCCESS);
-    CV_OCL_CODE(CL_DEVICE_NOT_FOUND);
-    CV_OCL_CODE(CL_DEVICE_NOT_AVAILABLE);
-    CV_OCL_CODE(CL_COMPILER_NOT_AVAILABLE);
-    CV_OCL_CODE(CL_MEM_OBJECT_ALLOCATION_FAILURE);
-    CV_OCL_CODE(CL_OUT_OF_RESOURCES);
-    CV_OCL_CODE(CL_OUT_OF_HOST_MEMORY);
-    CV_OCL_CODE(CL_PROFILING_INFO_NOT_AVAILABLE);
-    CV_OCL_CODE(CL_MEM_COPY_OVERLAP);
-    CV_OCL_CODE(CL_IMAGE_FORMAT_MISMATCH);
-    CV_OCL_CODE(CL_IMAGE_FORMAT_NOT_SUPPORTED);
-    CV_OCL_CODE(CL_BUILD_PROGRAM_FAILURE);
-    CV_OCL_CODE(CL_MAP_FAILURE);
-    CV_OCL_CODE(CL_MISALIGNED_SUB_BUFFER_OFFSET);
-    CV_OCL_CODE(CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST);
-    CV_OCL_CODE(CL_COMPILE_PROGRAM_FAILURE);
-    CV_OCL_CODE(CL_LINKER_NOT_AVAILABLE);
-    CV_OCL_CODE(CL_LINK_PROGRAM_FAILURE);
-    CV_OCL_CODE(CL_DEVICE_PARTITION_FAILED);
-    CV_OCL_CODE(CL_KERNEL_ARG_INFO_NOT_AVAILABLE);
-    CV_OCL_CODE(CL_INVALID_VALUE);
-    CV_OCL_CODE(CL_INVALID_DEVICE_TYPE);
-    CV_OCL_CODE(CL_INVALID_PLATFORM);
-    CV_OCL_CODE(CL_INVALID_DEVICE);
-    CV_OCL_CODE(CL_INVALID_CONTEXT);
-    CV_OCL_CODE(CL_INVALID_QUEUE_PROPERTIES);
-    CV_OCL_CODE(CL_INVALID_COMMAND_QUEUE);
-    CV_OCL_CODE(CL_INVALID_HOST_PTR);
-    CV_OCL_CODE(CL_INVALID_MEM_OBJECT);
-    CV_OCL_CODE(CL_INVALID_IMAGE_FORMAT_DESCRIPTOR);
-    CV_OCL_CODE(CL_INVALID_IMAGE_SIZE);
-    CV_OCL_CODE(CL_INVALID_SAMPLER);
-    CV_OCL_CODE(CL_INVALID_BINARY);
-    CV_OCL_CODE(CL_INVALID_BUILD_OPTIONS);
-    CV_OCL_CODE(CL_INVALID_PROGRAM);
-    CV_OCL_CODE(CL_INVALID_PROGRAM_EXECUTABLE);
-    CV_OCL_CODE(CL_INVALID_KERNEL_NAME);
-    CV_OCL_CODE(CL_INVALID_KERNEL_DEFINITION);
-    CV_OCL_CODE(CL_INVALID_KERNEL);
-    CV_OCL_CODE(CL_INVALID_ARG_INDEX);
-    CV_OCL_CODE(CL_INVALID_ARG_VALUE);
-    CV_OCL_CODE(CL_INVALID_ARG_SIZE);
-    CV_OCL_CODE(CL_INVALID_KERNEL_ARGS);
-    CV_OCL_CODE(CL_INVALID_WORK_DIMENSION);
-    CV_OCL_CODE(CL_INVALID_WORK_GROUP_SIZE);
-    CV_OCL_CODE(CL_INVALID_WORK_ITEM_SIZE);
-    CV_OCL_CODE(CL_INVALID_GLOBAL_OFFSET);
-    CV_OCL_CODE(CL_INVALID_EVENT_WAIT_LIST);
-    CV_OCL_CODE(CL_INVALID_EVENT);
-    CV_OCL_CODE(CL_INVALID_OPERATION);
-    CV_OCL_CODE(CL_INVALID_GL_OBJECT);
-    CV_OCL_CODE(CL_INVALID_BUFFER_SIZE);
-    CV_OCL_CODE(CL_INVALID_MIP_LEVEL);
-    CV_OCL_CODE(CL_INVALID_GLOBAL_WORK_SIZE);
+    CV_OCL_సంకేతం(CL_SUCCESS);
+    CV_OCL_సంకేతం(CL_DEVICE_NOT_దొరికింది);
+    CV_OCL_సంకేతం(CL_DEVICE_NOT_అందుబాటు);
+    CV_OCL_సంకేతం(CL_COMPILER_NOT_అందుబాటు);
+    CV_OCL_సంకేతం(CL_MEM_OBJECT_కేటాయింపు_FAILURE);
+    CV_OCL_సంకేతం(CL_బహిర్గతం_యొక్క_RESOURCES);
+    CV_OCL_సంకేతం(CL_బహిర్గతం_యొక్క_HOST_జ్ఞాపకం);
+    CV_OCL_సంకేతం(CL_PROFILING_INFO_NOT_అందుబాటు);
+    CV_OCL_సంకేతం(CL_MEM_COPY_OVERLAP);
+    CV_OCL_సంకేతం(CL_IMAGE_FORMAT_MISMATCH);
+    CV_OCL_సంకేతం(CL_IMAGE_FORMAT_NOT_SUPPORTED);
+    CV_OCL_సంకేతం(CL_BUILD_కార్యక్రమం_FAILURE);
+    CV_OCL_సంకేతం(CL_MAP_FAILURE);
+    CV_OCL_సంకేతం(CL_MISALIGNED_SUB_బఫరు_స్థానభ్రంశం);
+    CV_OCL_సంకేతం(CL_EXEC_స్థితి_ERROR_FOR_EVENTS_లోపల_WAIT_LIST);
+    CV_OCL_సంకేతం(CL_COMPILE_కార్యక్రమం_FAILURE);
+    CV_OCL_సంకేతం(CL_LINKER_NOT_అందుబాటు);
+    CV_OCL_సంకేతం(CL_LINK_కార్యక్రమం_FAILURE);
+    CV_OCL_సంకేతం(CL_DEVICE_విభజన_FAILED);
+    CV_OCL_సంకేతం(CL_KERNEL_ARG_INFO_NOT_అందుబాటు);
+    CV_OCL_సంకేతం(CL_INVALID_విలువ);
+    CV_OCL_సంకేతం(CL_INVALID_DEVICE_TYPE);
+    CV_OCL_సంకేతం(CL_INVALID_PLATFORM);
+    CV_OCL_సంకేతం(CL_INVALID_DEVICE);
+    CV_OCL_సంకేతం(CL_INVALID_CONTEXT);
+    CV_OCL_సంకేతం(CL_INVALID_వరుస_PROPERTIES);
+    CV_OCL_సంకేతం(CL_INVALID_COMMAND_వరుస);
+    CV_OCL_సంకేతం(CL_INVALID_HOST_PTR);
+    CV_OCL_సంకేతం(CL_INVALID_MEM_OBJECT);
+    CV_OCL_సంకేతం(CL_INVALID_IMAGE_FORMAT_DESCRIPTOR);
+    CV_OCL_సంకేతం(CL_INVALID_IMAGE_కొలత);
+    CV_OCL_సంకేతం(CL_INVALID_SAMPLER);
+    CV_OCL_సంకేతం(CL_INVALID_ద్విమాన);
+    CV_OCL_సంకేతం(CL_INVALID_BUILD_OPTIONS);
+    CV_OCL_సంకేతం(CL_INVALID_కార్యక్రమం);
+    CV_OCL_సంకేతం(CL_INVALID_కార్యక్రమం_EXECUTABLE);
+    CV_OCL_సంకేతం(CL_INVALID_KERNEL_NAME);
+    CV_OCL_సంకేతం(CL_INVALID_KERNEL_DEFINITION);
+    CV_OCL_సంకేతం(CL_INVALID_KERNEL);
+    CV_OCL_సంకేతం(CL_INVALID_ARG_సూచీ);
+    CV_OCL_సంకేతం(CL_INVALID_ARG_విలువ);
+    CV_OCL_సంకేతం(CL_INVALID_ARG_కొలత);
+    CV_OCL_సంకేతం(CL_INVALID_KERNEL_వాదనలు);
+    CV_OCL_సంకేతం(CL_INVALID_WORK_DIMENSION);
+    CV_OCL_సంకేతం(CL_INVALID_WORK_సమూహం_కొలత);
+    CV_OCL_సంకేతం(CL_INVALID_WORK_అంశం_కొలత);
+    CV_OCL_సంకేతం(CL_INVALID_GLOBAL_స్థానభ్రంశం);
+    CV_OCL_సంకేతం(CL_INVALID_EVENT_WAIT_LIST);
+    CV_OCL_సంకేతం(CL_INVALID_EVENT);
+    CV_OCL_సంకేతం(CL_INVALID_OPERATION);
+    CV_OCL_సంకేతం(CL_INVALID_GL_OBJECT);
+    CV_OCL_సంకేతం(CL_INVALID_బఫరు_కొలత);
+    CV_OCL_సంకేతం(CL_INVALID_MIP_LEVEL);
+    CV_OCL_సంకేతం(CL_INVALID_GLOBAL_WORK_కొలత);
     // OpenCL 1.1
-    CV_OCL_CODE(CL_INVALID_PROPERTY);
+    CV_OCL_సంకేతం(CL_INVALID_PROPERTY);
     // OpenCL 1.2
-    CV_OCL_CODE(CL_INVALID_IMAGE_DESCRIPTOR);
-    CV_OCL_CODE(CL_INVALID_COMPILER_OPTIONS);
-    CV_OCL_CODE(CL_INVALID_LINKER_OPTIONS);
-    CV_OCL_CODE(CL_INVALID_DEVICE_PARTITION_COUNT);
+    CV_OCL_సంకేతం(CL_INVALID_IMAGE_DESCRIPTOR);
+    CV_OCL_సంకేతం(CL_INVALID_COMPILER_OPTIONS);
+    CV_OCL_సంకేతం(CL_INVALID_LINKER_OPTIONS);
+    CV_OCL_సంకేతం(CL_INVALID_DEVICE_విభజన_లెక్క);
     // OpenCL 2.0
-    CV_OCL_CODE_(-69, CL_INVALID_PIPE_SIZE);
-    CV_OCL_CODE_(-70, CL_INVALID_DEVICE_QUEUE);
+    CV_OCL_సంకేతం_2(-69, CL_INVALID_PIPE_కొలత);
+    CV_OCL_సంకేతం_2(-70, CL_INVALID_DEVICE_వరుస);
     // Extensions
-    CV_OCL_CODE_(-1000, CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR);
-    CV_OCL_CODE_(-1001, CL_PLATFORM_NOT_FOUND_KHR);
-    CV_OCL_CODE_(-1002, CL_INVALID_D3D10_DEVICE_KHR);
-    CV_OCL_CODE_(-1003, CL_INVALID_D3D10_RESOURCE_KHR);
-    CV_OCL_CODE_(-1004, CL_D3D10_RESOURCE_ALREADY_ACQUIRED_KHR);
-    CV_OCL_CODE_(-1005, CL_D3D10_RESOURCE_NOT_ACQUIRED_KHR);
-    default: return "Unknown OpenCL error";
+    CV_OCL_సంకేతం_2(-1000, CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR);
+    CV_OCL_సంకేతం_2(-1001, CL_PLATFORM_NOT_దొరికింది_KHR);
+    CV_OCL_సంకేతం_2(-1002, CL_INVALID_D3D10_DEVICE_KHR);
+    CV_OCL_సంకేతం_2(-1003, CL_INVALID_D3D10_RESOURCE_KHR);
+    CV_OCL_సంకేతం_2(-1004, CL_D3D10_RESOURCE_ALREADY_ACQUIRED_KHR);
+    CV_OCL_సంకేతం_2(-1005, CL_D3D10_RESOURCE_NOT_ACQUIRED_KHR);
+    అప్రమేయ: తిరిగి "Unknown OpenCL error";
     }
-#undef CV_OCL_CODE
-#undef CV_OCL_CODE_
+#నిర్వచనం_రద్దు CV_OCL_సంకేతం
+#నిర్వచనం_రద్దు CV_OCL_సంకేతం_2
 }
 
-template <typename T>
-static std::string kerToStr(const Mat & k)
+మూస <రకం_పేరు T>
+స్థిర std::string ker_గమ్యం_Str(స్థిరరాశి Mat & k)
 {
-    int width = k.cols - 1, depth = k.depth();
-    const T * const data = k.ptr<T>();
+    పూర్ణాంకం వెడల్పు = k.నిలువుల_సంఖ్య - 1, లోతు = k.లోతు();
+    స్థిరరాశి T * స్థిరరాశి దత్తాంశం = k.ptr<T>();
 
     std::ostringstream stream;
     stream.precision(10);
 
-    if (depth <= CV_8S)
+    ఒకవేళ (లోతు <= CV_8S)
     {
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << (int)data[i] << ")";
-        stream << "DIG(" << (int)data[width] << ")";
+        కొరకు (పూర్ణాంకం i = 0; i < వెడల్పు; ++i)
+            stream << "DIG(" << (పూర్ణాంకం)దత్తాంశం[i] << ")";
+        stream << "DIG(" << (పూర్ణాంకం)దత్తాంశం[వెడల్పు] << ")";
     }
-    else if (depth == CV_32F)
+    లేకపోతే ఒకవేళ (లోతు == CV_32F)
     {
         stream.setf(std::ios_base::showpoint);
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << data[i] << "f)";
-        stream << "DIG(" << data[width] << "f)";
+        కొరకు (పూర్ణాంకం i = 0; i < వెడల్పు; ++i)
+            stream << "DIG(" << దత్తాంశం[i] << "f)";
+        stream << "DIG(" << దత్తాంశం[వెడల్పు] << "f)";
     }
-    else if (depth == CV_16F)
+    లేకపోతే ఒకవేళ (లోతు == CV_16F)
     {
         stream.setf(std::ios_base::showpoint);
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << (float)data[i] << "h)";
-        stream << "DIG(" << (float)data[width] << "h)";
+        కొరకు (పూర్ణాంకం i = 0; i < వెడల్పు; ++i)
+            stream << "DIG(" << (దశాంశం)దత్తాంశం[i] << "h)";
+        stream << "DIG(" << (దశాంశం)దత్తాంశం[వెడల్పు] << "h)";
     }
-    else
+    లేకపోతే
     {
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << data[i] << ")";
-        stream << "DIG(" << data[width] << ")";
+        కొరకు (పూర్ణాంకం i = 0; i < వెడల్పు; ++i)
+            stream << "DIG(" << దత్తాంశం[i] << ")";
+        stream << "DIG(" << దత్తాంశం[వెడల్పు] << ")";
     }
 
-    return stream.str();
+    తిరిగి stream.str();
 }
 
-String kernelToStr(InputArray _kernel, int ddepth, const char * name)
+String kernel_గమ్యం_Str(ఆదానం_Array _kernel, పూర్ణాంకం ddepth, స్థిరరాశి అక్షరం * name)
 {
     Mat kernel = _kernel.getMat().reshape(1, 1);
 
-    int depth = kernel.depth();
-    if (ddepth < 0)
-        ddepth = depth;
+    పూర్ణాంకం లోతు = kernel.లోతు();
+    ఒకవేళ (ddepth < 0)
+        ddepth = లోతు;
 
     // bf16 and fp8 constants have no OpenCL literal form, output them as regular float
-    if (ddepth == CV_16BF || ddepth == CV_8F_E4M3FN || ddepth == CV_8F_E4M3FNUZ)
+    ఒకవేళ (ddepth == CV_16BF || ddepth == CV_8F_E4M3FN || ddepth == CV_8F_E4M3FNUZ)
         ddepth = CV_32F;
 
-    if (ddepth != depth)
-        kernel.convertTo(kernel, ddepth);
+    ఒకవేళ (ddepth != లోతు)
+        kernel.convert_గమ్యం(kernel, ddepth);
 
-    typedef std::string (* func_t)(const Mat &);
-    static const func_t funcs[CV_DEPTH_MAX] = { kerToStr<uchar>, kerToStr<char>, kerToStr<ushort>, kerToStr<short>,
-                                                kerToStr<int>, kerToStr<float>, kerToStr<double>, kerToStr<hfloat>,
-                                                0, kerToStr<bool>, kerToStr<uint64_t>, kerToStr<int64_t>, kerToStr<unsigned> };
-    const func_t func = funcs[ddepth];
+    రకనిర్వచనం std::string (* func_t)(స్థిరరాశి Mat &);
+    స్థిర స్థిరరాశి func_t funcs[CV_లోతు_MAX] = { ker_గమ్యం_Str<uchar>, ker_గమ్యం_Str<అక్షరం>, ker_గమ్యం_Str<ushort>, ker_గమ్యం_Str<పొట్టి>,
+                                                ker_గమ్యం_Str<పూర్ణాంకం>, ker_గమ్యం_Str<దశాంశం>, ker_గమ్యం_Str<ద్విగుణ>, ker_గమ్యం_Str<hfloat>,
+                                                0, ker_గమ్యం_Str<తార్కిక>, ker_గమ్యం_Str<uint64_t>, ker_గమ్యం_Str<int64_t>, ker_గమ్యం_Str<గుర్తులేని> };
+    స్థిరరాశి func_t func = funcs[ddepth];
     CV_Assert(func != 0);
 
-    return cv::format(" -D %s=%s", name ? name : "COEFF", func(kernel).c_str());
+    తిరిగి cv::format(" -D %s=%s", name ? name : "COEFF", func(kernel).c_str());
 }
 
-#define PROCESS_SRC(src) \
-    do \
+#నిర్వచించు PROCESS_SRC(src) \
+    చేయి \
     { \
-        if (!src.empty()) \
+        ఒకవేళ (!src.empty()) \
         { \
             CV_Assert(src.isMat() || src.isUMat()); \
-            Size csize = src.size(); \
-            int ctype = src.type(), ccn = CV_MAT_CN(ctype), cdepth = CV_MAT_DEPTH(ctype), \
-                ckercn = vectorWidths[cdepth], cwidth = ccn * csize.width; \
-            if (cwidth < ckercn || ckercn <= 0) \
-                return 1; \
-            cols.push_back(cwidth); \
-            if (strat == OCL_VECTOR_OWN && ctype != ref_type) \
-                return 1; \
+            కొలత csize = src.size(); \
+            పూర్ణాంకం ctype = src.type(), ccn = CV_MAT_CN(ctype), cdepth = CV_MAT_లోతు(ctype), \
+                ckercn = సదిశ_Widths[cdepth], cwidth = ccn * csize.వెడల్పు; \
+            ఒకవేళ (cwidth < ckercn || ckercn <= 0) \
+                తిరిగి 1; \
+            నిలువుల_సంఖ్య.push_back(cwidth); \
+            ఒకవేళ (strat == OCL_సదిశ_OWN && ctype != ref_type) \
+                తిరిగి 1; \
             offsets.push_back(src.offset()); \
-            steps.push_back(src.step()); \
+            అడుగులు.push_back(src.అడుగు()); \
             dividers.push_back(ckercn * CV_ELEM_SIZE1(ctype)); \
             kercns.push_back(ckercn); \
         } \
     } \
-    while ((void)0, 0)
+    అయితే ((శూన్య)0, 0)
 
-int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
-                              InputArray src4, InputArray src5, InputArray src6,
-                              InputArray src7, InputArray src8, InputArray src9,
-                              OclVectorStrategy strat)
+పూర్ణాంకం predict_Optimal_సదిశ_వెడల్పు(ఆదానం_Array src1, ఆదానం_Array src2, ఆదానం_Array src3,
+                              ఆదానం_Array src4, ఆదానం_Array src5, ఆదానం_Array src6,
+                              ఆదానం_Array src7, ఆదానం_Array src8, ఆదానం_Array src9,
+                              Ocl_సదిశ_Strategy strat)
 {
-    const ocl::Device & d = ocl::Device::getDefault();
+    స్థిరరాశి ocl::Device & d = ocl::Device::getDefault();
 
     // Indexed by depth: must span CV_DEPTH_MAX. bf16 has no OpenCL vector type.
-    int vectorWidths[CV_DEPTH_MAX] = {
-        d.preferredVectorWidthChar(), d.preferredVectorWidthChar(),   // CV_8U,  CV_8S
-        d.preferredVectorWidthShort(), d.preferredVectorWidthShort(), // CV_16U, CV_16S
-        d.preferredVectorWidthInt(), d.preferredVectorWidthFloat(),   // CV_32S, CV_32F
-        d.preferredVectorWidthDouble(), d.preferredVectorWidthHalf(), // CV_64F, CV_16F
+    పూర్ణాంకం సదిశ_Widths[CV_లోతు_MAX] = {
+        d.preferred_సదిశ_వెడల్పు_Char(), d.preferred_సదిశ_వెడల్పు_Char(),   // CV_8U,  CV_8S
+        d.preferred_సదిశ_వెడల్పు_Short(), d.preferred_సదిశ_వెడల్పు_Short(), // CV_16U, CV_16S
+        d.preferred_సదిశ_వెడల్పు_Int(), d.preferred_సదిశ_వెడల్పు_Float(),   // CV_32S, CV_32F
+        d.preferred_సదిశ_వెడల్పు_Double(), d.preferred_సదిశ_వెడల్పు_Half(), // CV_64F, CV_16F
         1,                                                            // CV_16BF
-        d.preferredVectorWidthChar(),                                 // CV_Bool
-        d.preferredVectorWidthLong(), d.preferredVectorWidthLong(),   // CV_64U, CV_64S
-        d.preferredVectorWidthInt()                                   // CV_32U
+        d.preferred_సదిశ_వెడల్పు_Char(),                                 // CV_Bool
+        d.preferred_సదిశ_వెడల్పు_Long(), d.preferred_సదిశ_వెడల్పు_Long(),   // CV_64U, CV_64S
+        d.preferred_సదిశ_వెడల్పు_Int()                                   // CV_32U
     };
 
     // if the device says don't use vectors
-    if (vectorWidths[0] == 1)
+    ఒకవేళ (సదిశ_Widths[0] == 1)
     {
         // it's heuristic
-        vectorWidths[CV_8U] = vectorWidths[CV_8S] = 4;
-        vectorWidths[CV_16U] = vectorWidths[CV_16S] = vectorWidths[CV_16F] = 2;
-        vectorWidths[CV_32S] = vectorWidths[CV_32F] = vectorWidths[CV_64F] = 1;
+        సదిశ_Widths[CV_8U] = సదిశ_Widths[CV_8S] = 4;
+        సదిశ_Widths[CV_16U] = సదిశ_Widths[CV_16S] = సదిశ_Widths[CV_16F] = 2;
+        సదిశ_Widths[CV_32S] = సదిశ_Widths[CV_32F] = సదిశ_Widths[CV_64F] = 1;
     }
 
-    return checkOptimalVectorWidth(vectorWidths, src1, src2, src3, src4, src5, src6, src7, src8, src9, strat);
+    తిరిగి check_Optimal_సదిశ_వెడల్పు(సదిశ_Widths, src1, src2, src3, src4, src5, src6, src7, src8, src9, strat);
 }
 
-int checkOptimalVectorWidth([[maybe_unused]] const int *vectorWidths,
-                            [[maybe_unused]] InputArray src1,
-                            [[maybe_unused]] InputArray src2,
-                            [[maybe_unused]] InputArray src3,
-                            [[maybe_unused]] InputArray src4,
-                            [[maybe_unused]] InputArray src5,
-                            [[maybe_unused]] InputArray src6,
-                            [[maybe_unused]] InputArray src7,
-                            [[maybe_unused]] InputArray src8,
-                            [[maybe_unused]] InputArray src9,
-                            [[maybe_unused]] OclVectorStrategy strat)
+పూర్ణాంకం check_Optimal_సదిశ_వెడల్పు([[maybe_unused]] స్థిరరాశి పూర్ణాంకం *సదిశ_Widths,
+                            [[maybe_unused]] ఆదానం_Array src1,
+                            [[maybe_unused]] ఆదానం_Array src2,
+                            [[maybe_unused]] ఆదానం_Array src3,
+                            [[maybe_unused]] ఆదానం_Array src4,
+                            [[maybe_unused]] ఆదానం_Array src5,
+                            [[maybe_unused]] ఆదానం_Array src6,
+                            [[maybe_unused]] ఆదానం_Array src7,
+                            [[maybe_unused]] ఆదానం_Array src8,
+                            [[maybe_unused]] ఆదానం_Array src9,
+                            [[maybe_unused]] Ocl_సదిశ_Strategy strat)
 {
-#ifdef __APPLE__
-    return 1;
-#else
-    CV_Assert(vectorWidths);
+#నిర్వచితమైతే __APPLE__
+    తిరిగి 1;
+#లేకపోతే
+    CV_Assert(సదిశ_Widths);
 
-    int ref_type = src1.type();
+    పూర్ణాంకం ref_type = src1.type();
 
-    std::vector<size_t> offsets, steps, cols;
-    std::vector<int> dividers, kercns;
+    std::vector<size_t> offsets, అడుగులు, నిలువుల_సంఖ్య;
+    std::vector<పూర్ణాంకం> dividers, kercns;
     PROCESS_SRC(src1);
     PROCESS_SRC(src2);
     PROCESS_SRC(src3);
@@ -7316,48 +7316,48 @@ int checkOptimalVectorWidth([[maybe_unused]] const int *vectorWidths,
 
     size_t size = offsets.size();
 
-    for (size_t i = 0; i < size; ++i)
-        while (offsets[i] % dividers[i] != 0 || steps[i] % dividers[i] != 0 || cols[i] % kercns[i] != 0)
+    కొరకు (size_t i = 0; i < size; ++i)
+        అయితే (offsets[i] % dividers[i] != 0 || అడుగులు[i] % dividers[i] != 0 || నిలువుల_సంఖ్య[i] % kercns[i] != 0)
             dividers[i] >>= 1, kercns[i] >>= 1;
 
     // default strategy
-    int kercn = *std::min_element(kercns.begin(), kercns.end());
+    పూర్ణాంకం kercn = *std::min_element(kercns.begin(), kercns.end());
 
-    return kercn;
-#endif
+    తిరిగి kercn;
+#అయితే_ముగింపు
 }
 
-int predictOptimalVectorWidthMax(InputArray src1, InputArray src2, InputArray src3,
-                                 InputArray src4, InputArray src5, InputArray src6,
-                                 InputArray src7, InputArray src8, InputArray src9)
+పూర్ణాంకం predict_Optimal_సదిశ_వెడల్పు_Max(ఆదానం_Array src1, ఆదానం_Array src2, ఆదానం_Array src3,
+                                 ఆదానం_Array src4, ఆదానం_Array src5, ఆదానం_Array src6,
+                                 ఆదానం_Array src7, ఆదానం_Array src8, ఆదానం_Array src9)
 {
-    return predictOptimalVectorWidth(src1, src2, src3, src4, src5, src6, src7, src8, src9, OCL_VECTOR_MAX);
+    తిరిగి predict_Optimal_సదిశ_వెడల్పు(src1, src2, src3, src4, src5, src6, src7, src8, src9, OCL_సదిశ_MAX);
 }
 
-#undef PROCESS_SRC
+#నిర్వచనం_రద్దు PROCESS_SRC
 
 
 // TODO Make this as a method of OpenCL "BuildOptions" class
-void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, InputArray _m)
+శూన్య build_Options_కూడు_మాతృక_Description(String& buildOptions, స్థిరరాశి String& name, ఆదానం_Array _m)
 {
-    if (!buildOptions.empty())
+    ఒకవేళ (!buildOptions.empty())
         buildOptions += " ";
-    int type = _m.type(), depth = CV_MAT_DEPTH(type);
+    పూర్ణాంకం type = _m.type(), లోతు = CV_MAT_లోతు(type);
     buildOptions += format(
             "-D %s_T=%s -D %s_T1=%s -D %s_CN=%d -D %s_TSIZE=%d -D %s_T1SIZE=%d -D %s_DEPTH=%d",
-            name.c_str(), ocl::typeToStr(type),
-            name.c_str(), ocl::typeToStr(CV_MAKE_TYPE(depth, 1)),
-            name.c_str(), (int)CV_MAT_CN(type),
-            name.c_str(), (int)CV_ELEM_SIZE(type),
-            name.c_str(), (int)CV_ELEM_SIZE1(type),
-            name.c_str(), (int)depth
+            name.c_str(), ocl::type_గమ్యం_Str(type),
+            name.c_str(), ocl::type_గమ్యం_Str(CV_MAKE_TYPE(లోతు, 1)),
+            name.c_str(), (పూర్ణాంకం)CV_MAT_CN(type),
+            name.c_str(), (పూర్ణాంకం)CV_ELEM_కొలత(type),
+            name.c_str(), (పూర్ణాంకం)CV_ELEM_SIZE1(type),
+            name.c_str(), (పూర్ణాంకం)లోతు
             );
 }
 
 
-struct Image2D::Impl
+నిర్మాణం Image2D::Impl
 {
-    Impl(const UMat &src, bool norm, bool alias)
+    Impl(స్థిరరాశి UMat &src, తార్కిక norm, తార్కిక alias)
     {
         handle = 0;
         refcount = 1;
@@ -7366,142 +7366,142 @@ struct Image2D::Impl
 
     ~Impl()
     {
-        if (handle)
+        ఒకవేళ (handle)
             clReleaseMemObject(handle);
     }
 
-    static cl_image_format getImageFormat(int depth, int cn, bool norm)
+    స్థిర cl_image_format getImageFormat(పూర్ణాంకం లోతు, పూర్ణాంకం cn, తార్కిక norm)
     {
         cl_image_format format;
-        static const int channelTypes[] = { CL_UNSIGNED_INT8, CL_SIGNED_INT8, CL_UNSIGNED_INT16,
+        స్థిర స్థిరరాశి పూర్ణాంకం channelTypes[] = { CL_UNSIGNED_INT8, CL_SIGNED_INT8, CL_UNSIGNED_INT16,
                                        CL_SIGNED_INT16, CL_SIGNED_INT32, CL_FLOAT, -1, CL_HALF_FLOAT };
-        static const int channelTypesNorm[] = { CL_UNORM_INT8, CL_SNORM_INT8, CL_UNORM_INT16,
+        స్థిర స్థిరరాశి పూర్ణాంకం channelTypesNorm[] = { CL_UNORM_INT8, CL_SNORM_INT8, CL_UNORM_INT16,
                                                 CL_SNORM_INT16, -1, -1, -1, -1 };
         // CL_RGB has no mappings to OpenCV types because CL_RGB can only be used with
         // CL_UNORM_SHORT_565, CL_UNORM_SHORT_555, or CL_UNORM_INT_101010.
-        static const int channelOrders[] = { -1, CL_R, CL_RG, /*CL_RGB*/ -1, CL_RGBA };
+        స్థిర స్థిరరాశి పూర్ణాంకం channelOrders[] = { -1, CL_R, CL_RG, /*CL_RGB*/ -1, CL_RGBA };
 
-        int channelType = norm ? channelTypesNorm[depth] : channelTypes[depth];
-        int channelOrder = channelOrders[cn];
-        format.image_channel_data_type = (cl_channel_type)channelType;
-        format.image_channel_order = (cl_channel_order)channelOrder;
-        return format;
+        పూర్ణాంకం channelType = norm ? channelTypesNorm[లోతు] : channelTypes[లోతు];
+        పూర్ణాంకం channel_క్రమం = channelOrders[cn];
+        format.image_channel_దత్తాంశం_type = (cl_channel_type)channelType;
+        format.image_channel_క్రమం = (cl_channel_క్రమం)channel_క్రమం;
+        తిరిగి format;
     }
 
-    static bool isFormatSupported(cl_image_format format)
+    స్థిర తార్కిక isFormatSupported(cl_image_format format)
     {
-        if (!haveOpenCL())
+        ఒకవేళ (!haveOpenCL())
             CV_Error(Error::OpenCLApiCallError, "OpenCL runtime not found!");
 
         cl_context context = (cl_context)Context::getDefault().ptr();
-        if (!context)
-            return false;
+        ఒకవేళ (!context)
+            తిరిగి అబద్ధం;
 
         // Figure out how many formats are supported by this context.
-        cl_uint numFormats = 0;
+        cl_uint అంకె_Formats = 0;
         cl_int err = clGetSupportedImageFormats(context, CL_MEM_READ_WRITE,
-                                                CL_MEM_OBJECT_IMAGE2D, numFormats,
-                                                NULL, &numFormats);
-        CV_OCL_DBG_CHECK_RESULT(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, NULL)");
-        if (numFormats > 0)
+                                                CL_MEM_OBJECT_IMAGE2D, అంకె_Formats,
+                                                ఖాళీ, &అంకె_Formats);
+        CV_OCL_DBG_CHECK_ఫలితం(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, NULL)");
+        ఒకవేళ (అంకె_Formats > 0)
         {
-            AutoBuffer<cl_image_format> formats(numFormats);
+            Auto_బఫరు<cl_image_format> formats(అంకె_Formats);
             err = clGetSupportedImageFormats(context, CL_MEM_READ_WRITE,
-                                             CL_MEM_OBJECT_IMAGE2D, numFormats,
-                                             formats.data(), NULL);
-            CV_OCL_DBG_CHECK_RESULT(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, formats)");
-            for (cl_uint i = 0; i < numFormats; ++i)
+                                             CL_MEM_OBJECT_IMAGE2D, అంకె_Formats,
+                                             formats.దత్తాంశం(), ఖాళీ);
+            CV_OCL_DBG_CHECK_ఫలితం(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, formats)");
+            కొరకు (cl_uint i = 0; i < అంకె_Formats; ++i)
             {
-                if (!memcmp(&formats[i], &format, sizeof(format)))
+                ఒకవేళ (!memcmp(&formats[i], &format, పరిమాణం(format)))
                 {
-                    return true;
+                    తిరిగి నిజం;
                 }
             }
         }
-        return false;
+        తిరిగి అబద్ధం;
     }
 
-    void init(const UMat &src, bool norm, bool alias)
+    శూన్య init(స్థిరరాశి UMat &src, తార్కిక norm, తార్కిక alias)
     {
-        if (!haveOpenCL())
+        ఒకవేళ (!haveOpenCL())
             CV_Error(Error::OpenCLApiCallError, "OpenCL runtime not found!");
 
         CV_Assert(!src.empty());
         CV_Assert(ocl::Device::getDefault().imageSupport());
 
-        int err, depth = src.depth(), cn = src.channels();
+        పూర్ణాంకం err, లోతు = src.లోతు(), cn = src.channels();
         CV_Assert(cn <= 4);
-        cl_image_format format = getImageFormat(depth, cn, norm);
+        cl_image_format format = getImageFormat(లోతు, cn, norm);
 
-        if (!isFormatSupported(format))
+        ఒకవేళ (!isFormatSupported(format))
             CV_Error(Error::OpenCLApiCallError, "Image format is not supported");
 
-        if (alias && !src.handle(ACCESS_RW))
+        ఒకవేళ (alias && !src.handle(ACCESS_RW))
             CV_Error(Error::OpenCLApiCallError, "Incorrect UMat, handle is null");
 
         cl_context context = (cl_context)Context::getDefault().ptr();
-        cl_command_queue queue = (cl_command_queue)Queue::getDefault().ptr();
+        cl_command_వరుస వరుస_2 = (cl_command_వరుస)వరుస::getDefault().ptr();
 
-#ifdef CL_VERSION_1_2
+#నిర్వచితమైతే CL_సంస్కరణ_1_2
         // this enables backwards portability to
         // run on OpenCL 1.1 platform if library binaries are compiled with OpenCL 1.2 support
-        const Device & d = ocl::Device::getDefault();
-        int minor = d.deviceVersionMinor(), major = d.deviceVersionMajor();
+        స్థిరరాశి Device & d = ocl::Device::getDefault();
+        పూర్ణాంకం minor = d.device_సంస్కరణ_Minor(), major = d.device_సంస్కరణ_Major();
         CV_Assert(!alias || canCreateAlias(src));
-        if (1 < major || (1 == major && 2 <= minor))
+        ఒకవేళ (1 < major || (1 == major && 2 <= minor))
         {
             cl_image_desc desc;
             desc.image_type       = CL_MEM_OBJECT_IMAGE2D;
-            desc.image_width      = src.cols;
-            desc.image_height     = src.rows;
-            desc.image_depth      = 0;
-            desc.image_array_size = 1;
-            desc.image_row_pitch  = alias ? src.step[0] : 0;
-            desc.image_slice_pitch = 0;
-            desc.buffer           = alias ? (cl_mem)src.handle(ACCESS_RW) : 0;
-            desc.num_mip_levels   = 0;
-            desc.num_samples      = 0;
-            handle = clCreateImage(context, CL_MEM_READ_WRITE, &format, &desc, NULL, &err);
+            desc.image_వెడల్పు      = src.నిలువుల_సంఖ్య;
+            desc.image_ఎత్తు     = src.అడ్డువరుసలు;
+            desc.image_లోతు      = 0;
+            desc.image_array_కొలత = 1;
+            desc.image_అడ్డువరుస_pitch  = alias ? src.అడుగు[0] : 0;
+            desc.image_ముక్క_pitch = 0;
+            desc.బఫరు           = alias ? (cl_mem)src.handle(ACCESS_RW) : 0;
+            desc.అంకె_mip_స్థాయిలు   = 0;
+            desc.అంకె_samples      = 0;
+            handle = clCreateImage(context, CL_MEM_READ_WRITE, &format, &desc, ఖాళీ, &err);
         }
-        else
-#endif
+        లేకపోతే
+#అయితే_ముగింపు
         {
-            CV_SUPPRESS_DEPRECATED_START
+            CV_SUPPRESS_DEPRECATED_ప్రారంభం
             CV_Assert(!alias);  // This is an OpenCL 1.2 extension
-            handle = clCreateImage2D(context, CL_MEM_READ_WRITE, &format, src.cols, src.rows, 0, NULL, &err);
-            CV_SUPPRESS_DEPRECATED_END
+            handle = clCreateImage2D(context, CL_MEM_READ_WRITE, &format, src.నిలువుల_సంఖ్య, src.అడ్డువరుసలు, 0, ఖాళీ, &err);
+            CV_SUPPRESS_DEPRECATED_చివర
         }
-        CV_OCL_DBG_CHECK_RESULT(err, "clCreateImage()");
+        CV_OCL_DBG_CHECK_ఫలితం(err, "clCreateImage()");
 
         size_t origin[] = { 0, 0, 0 };
-        size_t region[] = { static_cast<size_t>(src.cols), static_cast<size_t>(src.rows), 1 };
+        size_t region[] = { static_cast<size_t>(src.నిలువుల_సంఖ్య), static_cast<size_t>(src.అడ్డువరుసలు), 1 };
 
-        cl_mem devData;
-        if (!alias && !src.isContinuous())
+        cl_mem dev_దత్తాంశం;
+        ఒకవేళ (!alias && !src.isContinuous())
         {
-            devData = clCreateBuffer(context, CL_MEM_READ_ONLY, src.cols * src.rows * src.elemSize(), NULL, &err);
-            CV_OCL_CHECK_RESULT(err, cv::format("clCreateBuffer(CL_MEM_READ_ONLY, sz=%lld) => %p",
-                    (long long int)(src.cols * src.rows * src.elemSize()), (void*)devData
+            dev_దత్తాంశం = cl_Create_బఫరు(context, CL_MEM_READ_ONLY, src.నిలువుల_సంఖ్య * src.అడ్డువరుసలు * src.elem_కొలత(), ఖాళీ, &err);
+            CV_OCL_CHECK_ఫలితం(err, cv::format("clCreateBuffer(CL_MEM_READ_ONLY, sz=%lld) => %p",
+                    (దీర్ఘ దీర్ఘ పూర్ణాంకం)(src.నిలువుల_సంఖ్య * src.అడ్డువరుసలు * src.elem_కొలత()), (శూన్య*)dev_దత్తాంశం
                 ).c_str());
 
-            const size_t roi[3] = {static_cast<size_t>(src.cols) * src.elemSize(), static_cast<size_t>(src.rows), 1};
-            CV_OCL_CHECK(clEnqueueCopyBufferRect(queue, (cl_mem)src.handle(ACCESS_READ), devData, origin, origin,
-                roi, src.step, 0, src.cols * src.elemSize(), 0, 0, NULL, NULL));
-            CV_OCL_DBG_CHECK(clFlush(queue));
+            స్థిరరాశి size_t roi[3] = {static_cast<size_t>(src.నిలువుల_సంఖ్య) * src.elem_కొలత(), static_cast<size_t>(src.అడ్డువరుసలు), 1};
+            CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Copy_బఫరు_Rect(వరుస_2, (cl_mem)src.handle(ACCESS_READ), dev_దత్తాంశం, origin, origin,
+                roi, src.అడుగు, 0, src.నిలువుల_సంఖ్య * src.elem_కొలత(), 0, 0, ఖాళీ, ఖాళీ));
+            CV_OCL_DBG_CHECK(clFlush(వరుస_2));
         }
-        else
+        లేకపోతే
         {
-            devData = (cl_mem)src.handle(ACCESS_READ);
+            dev_దత్తాంశం = (cl_mem)src.handle(ACCESS_READ);
         }
-        CV_Assert(devData != NULL);
+        CV_Assert(dev_దత్తాంశం != ఖాళీ);
 
-        if (!alias)
+        ఒకవేళ (!alias)
         {
-            CV_OCL_CHECK(clEnqueueCopyBufferToImage(queue, devData, handle, 0, origin, region, 0, NULL, 0));
-            if (!src.isContinuous())
+            CV_OCL_CHECK(cl_వరుసలో_చేర్చు_Copy_బఫరు_గమ్యం_Image(వరుస_2, dev_దత్తాంశం, handle, 0, origin, region, 0, ఖాళీ, 0));
+            ఒకవేళ (!src.isContinuous())
             {
-                CV_OCL_DBG_CHECK(clFlush(queue));
-                CV_OCL_DBG_CHECK(clReleaseMemObject(devData));
+                CV_OCL_DBG_CHECK(clFlush(వరుస_2));
+                CV_OCL_DBG_CHECK(clReleaseMemObject(dev_దత్తాంశం));
             }
         }
     }
@@ -7513,186 +7513,186 @@ struct Image2D::Impl
 
 Image2D::Image2D() CV_NOEXCEPT
 {
-    p = NULL;
+    p = ఖాళీ;
 }
 
-Image2D::Image2D(const UMat &src, bool norm, bool alias)
+Image2D::Image2D(స్థిరరాశి UMat &src, తార్కిక norm, తార్కిక alias)
 {
-    p = new Impl(src, norm, alias);
+    p = కొత్త Impl(src, norm, alias);
 }
 
-bool Image2D::canCreateAlias(const UMat &m)
+తార్కిక Image2D::canCreateAlias(స్థిరరాశి UMat &m)
 {
-    bool ret = false;
-    const Device & d = ocl::Device::getDefault();
-    if (d.imageFromBufferSupport() && !m.empty())
+    తార్కిక ret = అబద్ధం;
+    స్థిరరాశి Device & d = ocl::Device::getDefault();
+    ఒకవేళ (d.image_From_బఫరు_Support() && !m.empty())
     {
         // This is the required pitch alignment in pixels
         uint pitchAlign = d.imagePitchAlignment();
-        if (pitchAlign && !(m.step % (pitchAlign * m.elemSize())))
+        ఒకవేళ (pitchAlign && !(m.అడుగు % (pitchAlign * m.elem_కొలత())))
         {
             // We don't currently handle the case where the buffer was created
             // with CL_MEM_USE_HOST_PTR
-            if (!m.u->tempUMat())
+            ఒకవేళ (!m.u->తాత్కాలిక_UMat())
             {
-                ret = true;
+                ret = నిజం;
             }
         }
     }
-    return ret;
+    తిరిగి ret;
 }
 
-bool Image2D::isFormatSupported(int depth, int cn, bool norm)
+తార్కిక Image2D::isFormatSupported(పూర్ణాంకం లోతు, పూర్ణాంకం cn, తార్కిక norm)
 {
-    cl_image_format format = Impl::getImageFormat(depth, cn, norm);
+    cl_image_format format = Impl::getImageFormat(లోతు, cn, norm);
 
-    return Impl::isFormatSupported(format);
+    తిరిగి Impl::isFormatSupported(format);
 }
 
-Image2D::Image2D(const Image2D & i)
+Image2D::Image2D(స్థిరరాశి Image2D & i)
 {
     p = i.p;
-    if (p)
+    ఒకవేళ (p)
         p->addref();
 }
 
-Image2D & Image2D::operator = (const Image2D & i)
+Image2D & Image2D::క్రియాకారకం = (స్థిరరాశి Image2D & i)
 {
-    if (i.p != p)
+    ఒకవేళ (i.p != p)
     {
-        if (i.p)
+        ఒకవేళ (i.p)
             i.p->addref();
-        if (p)
+        ఒకవేళ (p)
             p->release();
         p = i.p;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
 Image2D::Image2D(Image2D&& i) CV_NOEXCEPT
 {
     p = i.p;
-    i.p = nullptr;
+    i.p = శూన్యసూచిక;
 }
 
-Image2D& Image2D::operator = (Image2D&& i) CV_NOEXCEPT
+Image2D& Image2D::క్రియాకారకం = (Image2D&& i) CV_NOEXCEPT
 {
-    if (this != &i) {
-        if (p)
+    ఒకవేళ (ఇది != &i) {
+        ఒకవేళ (p)
             p->release();
         p = i.p;
-        i.p = nullptr;
+        i.p = శూన్యసూచిక;
     }
-    return *this;
+    తిరిగి *ఇది;
 }
 
 Image2D::~Image2D()
 {
-    if (p)
+    ఒకవేళ (p)
         p->release();
 }
 
-void* Image2D::ptr() const
+శూన్య* Image2D::ptr() స్థిరరాశి
 {
-    return p ? p->handle : 0;
+    తిరిగి p ? p->handle : 0;
 }
 
-bool internal::isOpenCLForced()
+తార్కిక internal::isOpenCLForced()
 {
-    static bool initialized = false;
-    static bool value = false;
-    if (!initialized)
+    స్థిర తార్కిక initialized = అబద్ధం;
+    స్థిర తార్కిక value = అబద్ధం;
+    ఒకవేళ (!initialized)
     {
-        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_FORCE", false);
-        initialized = true;
+        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_FORCE", అబద్ధం);
+        initialized = నిజం;
     }
-    return value;
+    తిరిగి value;
 }
 
-bool internal::isPerformanceCheckBypassed()
+తార్కిక internal::isPerformanceCheckBypassed()
 {
-    static bool initialized = false;
-    static bool value = false;
-    if (!initialized)
+    స్థిర తార్కిక initialized = అబద్ధం;
+    స్థిర తార్కిక value = అబద్ధం;
+    ఒకవేళ (!initialized)
     {
-        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_PERF_CHECK_BYPASS", false);
-        initialized = true;
+        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_PERF_CHECK_BYPASS", అబద్ధం);
+        initialized = నిజం;
     }
-    return value;
+    తిరిగి value;
 }
 
-bool internal::isCLBuffer(UMat& u)
+తార్కిక internal::isCLBuffer(UMat& u)
 {
-    if (isCudaBacked(u.u))
-        return false;
-    void* h = u.handle(ACCESS_RW);
-    if (!h)
-        return true;
+    ఒకవేళ (isCudaBacked(u.u))
+        తిరిగి అబద్ధం;
+    శూన్య* h = u.handle(ACCESS_RW);
+    ఒకవేళ (!h)
+        తిరిగి నిజం;
     CV_DbgAssert(u.u->currAllocator == getOpenCLAllocator());
-#if 1
-    if ((u.u->allocatorFlags_ & 0xffff0000) != 0) // OpenCL SVM flags are stored here
-        return false;
-#else
+#ఒకవేళ 1
+    ఒకవేళ ((u.u->allocatorFlags_ & 0xffff0000) != 0) // OpenCL SVM flags are stored here
+        తిరిగి అబద్ధం;
+#లేకపోతే
     cl_mem_object_type type = 0;
-    cl_int ret = clGetMemObjectInfo((cl_mem)h, CL_MEM_TYPE, sizeof(type), &type, NULL);
-    if (ret != CL_SUCCESS || type != CL_MEM_OBJECT_BUFFER)
-        return false;
-#endif
-    return true;
+    cl_int ret = clGetMemObjectInfo((cl_mem)h, CL_MEM_TYPE, పరిమాణం(type), &type, ఖాళీ);
+    ఒకవేళ (ret != CL_SUCCESS || type != CL_MEM_OBJECT_బఫరు)
+        తిరిగి అబద్ధం;
+#అయితే_ముగింపు
+    తిరిగి నిజం;
 }
 
-struct Timer::Impl
+నిర్మాణం Timer::Impl
 {
-    const Queue queue;
+    స్థిరరాశి వరుస వరుస_2;
 
-    Impl(const Queue& q)
-        : queue(q)
+    Impl(స్థిరరాశి వరుస& q)
+        : వరుస_2(q)
     {
     }
 
     ~Impl(){}
 
-    void start()
+    శూన్య ప్రారంభం()
     {
-        CV_OCL_DBG_CHECK(clFinish((cl_command_queue)queue.ptr()));
-        timer.start();
+        CV_OCL_DBG_CHECK(cl_ముగింపు((cl_command_వరుస)వరుస_2.ptr()));
+        timer.ప్రారంభం();
     }
 
-    void stop()
+    శూన్య stop()
     {
-        CV_OCL_DBG_CHECK(clFinish((cl_command_queue)queue.ptr()));
+        CV_OCL_DBG_CHECK(cl_ముగింపు((cl_command_వరుస)వరుస_2.ptr()));
         timer.stop();
     }
 
-    uint64 durationNS() const
+    uint64 durationNS() స్థిరరాశి
     {
-        return (uint64)(timer.getTimeSec() * 1e9);
+        తిరిగి (uint64)(timer.get_సమయం_Sec() * 1e9);
     }
 
     TickMeter timer;
 };
 
-Timer::Timer(const Queue& q) : p(new Impl(q)) { }
-Timer::~Timer() { delete p; }
+Timer::Timer(స్థిరరాశి వరుస& q) : p(కొత్త Impl(q)) { }
+Timer::~Timer() { తొలగించు p; }
 
-void Timer::start()
+శూన్య Timer::ప్రారంభం()
 {
     CV_Assert(p);
-    p->start();
+    p->ప్రారంభం();
 }
 
-void Timer::stop()
+శూన్య Timer::stop()
 {
     CV_Assert(p);
     p->stop();
 }
 
-uint64 Timer::durationNS() const
+uint64 Timer::durationNS() స్థిరరాశి
 {
     CV_Assert(p);
-    return p->durationNS();
+    తిరిగి p->durationNS();
 }
 
 }} // namespace
 
-#endif // HAVE_OPENCL
+#అయితే_ముగింపు // HAVE_OPENCL
