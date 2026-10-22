@@ -4,13 +4,13 @@
 #ifndef OPENCV_CORE_PARALLEL_IMPL_HPP
 #define OPENCV_CORE_PARALLEL_IMPL_HPP
 
-namespace cv {
+نطاق cv {
 
-unsigned defaultNumberOfThreads();
+unsigned default_ژمار_Of_Threads();
 
-void parallel_for_pthreads(const Range& range, const ParallelLoopBody& body, double nstripes);
-size_t parallel_pthreads_get_threads_num();
-void parallel_pthreads_set_threads_num(int num);
+فراغ parallel_for_pthreads(ثابت Range& range, ثابت ParallelLoopBody& body, مزدوج nstripes);
+size_t parallel_pthreads_get_threads_ژمارە();
+فراغ parallel_pthreads_set_threads_ژمارە(صحيح num);
 
 }
 
