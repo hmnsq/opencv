@@ -5,44 +5,44 @@
 #ifndef OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 #define OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <vector>
-#include <functional>
+#اگر 1 // if not already in precompiled headers
+#شامل <string>
+#شامل <vector>
+#شامل <functional>
 #endif
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#شامل <opencv2/core/utils/logtag.hpp>
+#شامل "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+فضاینام cv {
+فضاینام utils {
+فضاینام logging {
 
-class LogTagConfigParser
+رده LogTagConfigParser
 {
-public:
+عمومی:
     LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
-    explicit LogTagConfigParser(const std::string& input);
+    explicit LogTagConfigParser(ثابت std::string& درون_داد_2);
     ~LogTagConfigParser();
 
-public:
-    bool parse(const std::string& input);
-    bool hasMalformed() const;
-    const LogTagConfig& getGlobalConfig() const;
-    const std::vector<LogTagConfig>& getFullNameConfigs() const;
-    const std::vector<LogTagConfig>& getFirstPartConfigs() const;
-    const std::vector<LogTagConfig>& getAnyPartConfigs() const;
-    const std::vector<std::string>& getMalformed() const;
+عمومی:
+    منطقی parse(ثابت std::string& درون_داد_2);
+    منطقی hasMalformed() ثابت;
+    ثابت LogTagConfig& getGlobalConfig() ثابت;
+    ثابت std::vector<LogTagConfig>& getFullNameConfigs() ثابت;
+    ثابت std::vector<LogTagConfig>& getFirstPartConfigs() ثابت;
+    ثابت std::vector<LogTagConfig>& getAnyPartConfigs() ثابت;
+    ثابت std::vector<std::string>& getMalformed() ثابت;
 
-private:
-    void segmentTokens();
-    void parseNameAndLevel(const std::string& s);
-    void parseWildcard(const std::string& name, LogLevel level);
-    static std::pair<LogLevel, bool> parseLogLevel(const std::string& s);
-    static std::string toString(LogLevel level);
+خصوصی:
+    تهی segmentTokens();
+    تهی parseNameAndLevel(ثابت std::string& s);
+    تهی parseWildcard(ثابت std::string& name, LogLevel level);
+    ایستا std::pair<LogLevel, منطقی> parseLogLevel(ثابت std::string& s);
+    ایستا std::string toString(LogLevel level);
 
-private:
-    std::string m_input;
+خصوصی:
+    std::string m_درون_داد;
     LogTagConfig m_parsedGlobal;
     std::vector<LogTagConfig> m_parsedFullName;
     std::vector<LogTagConfig> m_parsedFirstPart;

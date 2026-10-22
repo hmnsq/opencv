@@ -9,209 +9,209 @@
 //
 // */
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#شامل "precomp.hpp"
+#شامل <opencv2/core/utils/logger.hpp>
 
-namespace cv
+فضاینام cv
 {
 
 //This and its overload below are used in various MatExpr operator overloads
 //implemented to check that Matrix operands exist.
-static void checkOperandsExist(const Mat& a)
+ایستا تهی checkOperandsExist(ثابت Mat& a)
 {
-    if (a.empty())
+    اگر (a.empty())
     {
         CV_Error(cv::Error::StsBadArg, "Matrix operand is an empty matrix.");
     }
 }
 
-static void checkOperandsExist(const Mat& a, const Mat& b)
+ایستا تهی checkOperandsExist(ثابت Mat& a, ثابت Mat& b)
 {
-    if (a.empty() || b.empty())
+    اگر (a.empty() || b.empty())
     {
         CV_Error(cv::Error::StsBadArg, "One or more matrix operands are empty.");
     }
 }
 
 
-class MatOp_Identity CV_FINAL : public MatOp
+رده MatOp_Identity CV_FINAL : عمومی MatOp
 {
-public:
+عمومی:
     MatOp_Identity() {}
-    virtual ~MatOp_Identity() {}
+    مجازی ~MatOp_Identity() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقی elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت CV_OVERRIDE { بازگشت درست; }
+    تهی assign(ثابت Mat_عبارت& عبارت, Mat& m, صحیح type=-1) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    ایستا تهی make_عبارت(Mat_عبارت& res, ثابت Mat& m);
 };
 
-static MatOp_Identity g_MatOp_Identity;
+ایستا MatOp_Identity g_MatOp_Identity;
 
-class MatOp_AddEx CV_FINAL : public MatOp
+رده MatOp_AddEx CV_FINAL : عمومی MatOp
 {
-public:
+عمومی:
     MatOp_AddEx() {}
-    virtual ~MatOp_AddEx() {}
+    مجازی ~MatOp_AddEx() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقی elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت CV_OVERRIDE { بازگشت درست; }
+    تهی assign(ثابت Mat_عبارت& عبارت, Mat& m, صحیح type=-1) ثابت CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    تهی add(ثابت Mat_عبارت& e1, ثابت Scalar& s, Mat_عبارت& res) ثابت CV_OVERRIDE;
+    تهی subtract(ثابت Scalar& s, ثابت Mat_عبارت& عبارت, Mat_عبارت& res) ثابت CV_OVERRIDE;
+    تهی multiply(ثابت Mat_عبارت& e1, دوگانه s, Mat_عبارت& res) ثابت CV_OVERRIDE;
+    تهی divide(دوگانه s, ثابت Mat_عبارت& e, Mat_عبارت& res) ثابت CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    تهی transpose(ثابت Mat_عبارت& e1, Mat_عبارت& res) ثابت CV_OVERRIDE;
+    تهی abs(ثابت Mat_عبارت& عبارت, Mat_عبارت& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    ایستا تهی make_عبارت(Mat_عبارت& res, ثابت Mat& a, ثابت Mat& b, دوگانه alpha, دوگانه beta, ثابت Scalar& s=Scalar());
 };
 
-static MatOp_AddEx g_MatOp_AddEx;
+ایستا MatOp_AddEx g_MatOp_AddEx;
 
-class MatOp_Bin CV_FINAL : public MatOp
+رده MatOp_Bin CV_FINAL : عمومی MatOp
 {
-public:
+عمومی:
     MatOp_Bin() {}
-    virtual ~MatOp_Bin() {}
+    مجازی ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقی elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت CV_OVERRIDE { بازگشت درست; }
+    تهی assign(ثابت Mat_عبارت& عبارت, Mat& m, صحیح type=-1) ثابت CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    تهی multiply(ثابت Mat_عبارت& e1, دوگانه s, Mat_عبارت& res) ثابت CV_OVERRIDE;
+    تهی divide(دوگانه s, ثابت Mat_عبارت& e, Mat_عبارت& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    ایستا تهی make_عبارت(Mat_عبارت& res, نویسه op, ثابت Mat& a, ثابت Mat& b, دوگانه scale=1);
+    ایستا تهی make_عبارت(Mat_عبارت& res, نویسه op, ثابت Mat& a, ثابت Scalar& s);
 };
 
-static MatOp_Bin g_MatOp_Bin;
+ایستا MatOp_Bin g_MatOp_Bin;
 
-class MatOp_Cmp CV_FINAL : public MatOp
+رده MatOp_Cmp CV_FINAL : عمومی MatOp
 {
-public:
+عمومی:
     MatOp_Cmp() {}
-    virtual ~MatOp_Cmp() {}
+    مجازی ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقی elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت CV_OVERRIDE { بازگشت درست; }
+    تهی assign(ثابت Mat_عبارت& عبارت, Mat& m, صحیح type=-1) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    ایستا تهی make_عبارت(Mat_عبارت& res, صحیح cmpop, ثابت Mat& a, ثابت Mat& b);
+    ایستا تهی make_عبارت(Mat_عبارت& res, صحیح cmpop, ثابت Mat& a, دوگانه alpha);
 };
 
-static MatOp_Cmp g_MatOp_Cmp;
+ایستا MatOp_Cmp g_MatOp_Cmp;
 
-class MatOp_GEMM CV_FINAL : public MatOp
+رده MatOp_GEMM CV_FINAL : عمومی MatOp
 {
-public:
+عمومی:
     MatOp_GEMM() {}
-    virtual ~MatOp_GEMM() {}
+    مجازی ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقی elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت CV_OVERRIDE { بازگشت نادرست; }
+    تهی assign(ثابت Mat_عبارت& عبارت, Mat& m, صحیح type=-1) ثابت CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    تهی add(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res) ثابت CV_OVERRIDE;
+    تهی subtract(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res) ثابت CV_OVERRIDE;
+    تهی multiply(ثابت Mat_عبارت& e, دوگانه s, Mat_عبارت& res) ثابت CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    تهی transpose(ثابت Mat_عبارت& عبارت, Mat_عبارت& res) ثابت CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    Size size(ثابت Mat_عبارت& عبارت) ثابت CV_OVERRIDE
     {
-        return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+        بازگشت Size(
+            (عبارت.flags & GEMM_2_T) ? عبارت.b.rows : عبارت.b.cols,
+            (عبارت.flags & GEMM_1_T) ? عبارت.a.cols : عبارت.a.rows
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                         double alpha=1, const Mat& c=Mat(), double beta=1);
+    ایستا تهی make_عبارت(Mat_عبارت& res, صحیح flags, ثابت Mat& a, ثابت Mat& b,
+                         دوگانه alpha=1, ثابت Mat& c=Mat(), دوگانه beta=1);
 
 };
 
-static MatOp_GEMM g_MatOp_GEMM;
+ایستا MatOp_GEMM g_MatOp_GEMM;
 
-class MatOp_Invert CV_FINAL : public MatOp
+رده MatOp_Invert CV_FINAL : عمومی MatOp
 {
-public:
+عمومی:
     MatOp_Invert() {}
-    virtual ~MatOp_Invert() {}
+    مجازی ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقی elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت CV_OVERRIDE { بازگشت نادرست; }
+    تهی assign(ثابت Mat_عبارت& عبارت, Mat& m, صحیح type=-1) ثابت CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    تهی matmul(ثابت Mat_عبارت& expr1, ثابت Mat_عبارت& expr2, Mat_عبارت& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    ایستا تهی make_عبارت(Mat_عبارت& res, صحیح method, ثابت Mat& m);
 };
 
-static MatOp_Invert g_MatOp_Invert;
+ایستا MatOp_Invert g_MatOp_Invert;
 
-class MatOp_T CV_FINAL : public MatOp
+رده MatOp_T CV_FINAL : عمومی MatOp
 {
-public:
+عمومی:
     MatOp_T() {}
-    virtual ~MatOp_T() {}
+    مجازی ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقی elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت CV_OVERRIDE { بازگشت نادرست; }
+    تهی assign(ثابت Mat_عبارت& عبارت, Mat& m, صحیح type=-1) ثابت CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    تهی multiply(ثابت Mat_عبارت& e1, دوگانه s, Mat_عبارت& res) ثابت CV_OVERRIDE;
+    تهی transpose(ثابت Mat_عبارت& عبارت, Mat_عبارت& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    ایستا تهی make_عبارت(Mat_عبارت& res, ثابت Mat& a, دوگانه alpha=1);
 };
 
-static MatOp_T g_MatOp_T;
+ایستا MatOp_T g_MatOp_T;
 
-class MatOp_Solve CV_FINAL : public MatOp
+رده MatOp_Solve CV_FINAL : عمومی MatOp
 {
-public:
+عمومی:
     MatOp_Solve() {}
-    virtual ~MatOp_Solve() {}
+    مجازی ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقی elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت CV_OVERRIDE { بازگشت نادرست; }
+    تهی assign(ثابت Mat_عبارت& عبارت, Mat& m, صحیح type=-1) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    ایستا تهی make_عبارت(Mat_عبارت& res, صحیح method, ثابت Mat& a, ثابت Mat& b);
 };
 
-static MatOp_Solve g_MatOp_Solve;
+ایستا MatOp_Solve g_MatOp_Solve;
 
-class MatOp_Initializer CV_FINAL : public MatOp
+رده MatOp_Initializer CV_FINAL : عمومی MatOp
 {
-public:
+عمومی:
     MatOp_Initializer() {}
-    virtual ~MatOp_Initializer() {}
+    مجازی ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقی elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت CV_OVERRIDE { بازگشت نادرست; }
+    تهی assign(ثابت Mat_عبارت& عبارت, Mat& m, صحیح type=-1) ثابت CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    تهی multiply(ثابت Mat_عبارت& e, دوگانه s, Mat_عبارت& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    ایستا تهی make_عبارت(Mat_عبارت& res, صحیح method, Size sz, صحیح type, دوگانه alpha=1);
+    ایستا تهی make_عبارت(Mat_عبارت& res, صحیح method, صحیح ndims, ثابت صحیح* sizes, صحیح type, دوگانه alpha=1);
 };
 
-static MatOp_Initializer* getGlobalMatOpInitializer()
+ایستا MatOp_Initializer* getGlobalMatOpInitializer()
 {
-    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
+    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, جدید MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+ایستا درونخطی منطقی isIdentity(ثابت Mat_عبارت& e) { بازگشت e.op == &g_MatOp_Identity; }
+ایستا درونخطی منطقی isAddEx(ثابت Mat_عبارت& e) { بازگشت e.op == &g_MatOp_AddEx; }
+ایستا درونخطی منطقی isScaled(ثابت Mat_عبارت& e) { بازگشت isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
+ایستا درونخطی منطقی isBin(ثابت Mat_عبارت& e, نویسه c) { بازگشت e.op == &g_MatOp_Bin && e.flags == c; }
+ایستا درونخطی منطقی isCmp(ثابت Mat_عبارت& e) { بازگشت e.op == &g_MatOp_Cmp; }
+ایستا درونخطی منطقی isReciprocal(ثابت Mat_عبارت& e) { بازگشت isBin(e,'/') && (!e.b.data || e.beta == 0); }
+ایستا درونخطی منطقی isT(ثابت Mat_عبارت& e) { بازگشت e.op == &g_MatOp_T; }
+ایستا درونخطی منطقی isInv(ثابت Mat_عبارت& e) { بازگشت e.op == &g_MatOp_Invert; }
+ایستا درونخطی منطقی isSolve(ثابت Mat_عبارت& e) { بازگشت e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+ایستا درونخطی منطقی isMatProd(ثابت Mat_عبارت& e) { بازگشت e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
+ایستا درونخطی منطقی isInitializer(ثابت Mat_عبارت& e) { بازگشت e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,1138 +219,1138 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+منطقی MatOp::elementWise(ثابت Mat_عبارت& /*عبارت*/) ثابت
 {
-    return false;
+    بازگشت نادرست;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+تهی MatOp::roi(ثابت Mat_عبارت& عبارت, ثابت Range& rowRange, ثابت Range& colRange, Mat_عبارت& e) ثابت
 {
-    if( elementWise(expr) )
+    اگر( elementWise(عبارت) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_عبارت(عبارت.op, عبارت.flags, Mat(), Mat(), Mat(),
+                    عبارت.alpha, عبارت.beta, عبارت.s);
+        اگر(عبارت.a.data)
+            e.a = عبارت.a(rowRange, colRange);
+        اگر(عبارت.b.data)
+            e.b = عبارت.b(rowRange, colRange);
+        اگر(عبارت.c.data)
+            e.c = عبارت.c(rowRange, colRange);
     }
-    else
+    وگرنه
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
+        عبارت.op->assign(عبارت, m);
+        e = Mat_عبارت(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
     }
 }
 
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
+تهی MatOp::diag(ثابت Mat_عبارت& عبارت, صحیح d, Mat_عبارت& e) ثابت
 {
-    if( elementWise(expr) )
+    اگر( elementWise(عبارت) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
+        e = Mat_عبارت(عبارت.op, عبارت.flags, Mat(), Mat(), Mat(),
+                    عبارت.alpha, عبارت.beta, عبارت.s);
+        اگر(عبارت.a.data)
+            e.a = عبارت.a.diag(d);
+        اگر(عبارت.b.data)
+            e.b = عبارت.b.diag(d);
+        اگر(عبارت.c.data)
+            e.c = عبارت.c.diag(d);
     }
-    else
+    وگرنه
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        عبارت.op->assign(عبارت, m);
+        e = Mat_عبارت(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+تهی MatOp::augAssignAdd(ثابت Mat_عبارت& عبارت, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    عبارت.op->assign(عبارت, temp);
     m += temp;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+تهی MatOp::augAssignSubtract(ثابت Mat_عبارت& عبارت, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    عبارت.op->assign(عبارت, temp);
     m -= temp;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+تهی MatOp::augAssignMultiply(ثابت Mat_عبارت& عبارت, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    عبارت.op->assign(عبارت, temp);
     m *= temp;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+تهی MatOp::augAssignDivide(ثابت Mat_عبارت& عبارت, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    عبارت.op->assign(عبارت, temp);
     m /= temp;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+تهی MatOp::augAssignAnd(ثابت Mat_عبارت& عبارت, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    عبارت.op->assign(عبارت, temp);
     m &= temp;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+تهی MatOp::augAssignOr(ثابت Mat_عبارت& عبارت, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    عبارت.op->assign(عبارت, temp);
     m |= temp;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+تهی MatOp::augAssignXor(ثابت Mat_عبارت& عبارت, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    عبارت.op->assign(عبارت, temp);
     m ^= temp;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+تهی MatOp::add(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    اگر( این == e2.op )
     {
-        double alpha = 1, beta = 1;
+        دوگانه alpha = 1, beta = 1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        اگر( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        وگرنه
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        اگر( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = e2.alpha;
             s += e2.s;
         }
-        else
+        وگرنه
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_عبارت(res, m1, m2, alpha, beta, s);
     }
-    else
+    وگرنه
         e2.op->add(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+تهی MatOp::add(ثابت Mat_عبارت& expr1, ثابت Scalar& s, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    MatOp_AddEx::make_عبارت(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+تهی MatOp::subtract(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    اگر( این == e2.op )
     {
-        double alpha = 1, beta = -1;
+        دوگانه alpha = 1, beta = -1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        اگر( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        وگرنه
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        اگر( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = -e2.alpha;
             s -= e2.s;
         }
-        else
+        وگرنه
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_عبارت(res, m1, m2, alpha, beta, s);
     }
-    else
+    وگرنه
         e2.op->subtract(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+تهی MatOp::subtract(ثابت Scalar& s, ثابت Mat_عبارت& عبارت, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    عبارت.op->assign(عبارت, m);
+    MatOp_AddEx::make_عبارت(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+تهی MatOp::multiply(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res, دوگانه scale) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    اگر( این == e2.op )
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        اگر( isReciprocal(e1) )
         {
-            if( isScaled(e2) )
+            اگر( isScaled(e2) )
             {
                 scale *= e2.alpha;
                 m2 = e2.a;
             }
-            else
+            وگرنه
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_عبارت(res, '/', m2, e1.a, scale/e1.alpha);
         }
-        else
+        وگرنه
         {
-            char op = '*';
-            if( isScaled(e1) )
+            نویسه op = '*';
+            اگر( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            وگرنه
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            اگر( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            وگرنه اگر( isReciprocal(e2) )
             {
                 op = '/';
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else
+            وگرنه
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_عبارت(res, op, m1, m2, scale);
         }
     }
-    else
+    وگرنه
         e2.op->multiply(e1, e2, res, scale);
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+تهی MatOp::multiply(ثابت Mat_عبارت& عبارت, دوگانه s, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    عبارت.op->assign(عبارت, m);
+    MatOp_AddEx::make_عبارت(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+تهی MatOp::divide(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res, دوگانه scale) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    اگر( این == e2.op )
     {
-        if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
-        else
+        اگر( isReciprocal(e1) && isReciprocal(e2) )
+            MatOp_Bin::make_عبارت(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+        وگرنه
         {
             Mat m1, m2;
-            char op = '/';
+            نویسه op = '/';
 
-            if( isScaled(e1) )
+            اگر( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            وگرنه
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            اگر( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            وگرنه اگر( isReciprocal(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
                 op = '*';
             }
-            else
+            وگرنه
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_عبارت(res, op, m1, m2, scale);
         }
     }
-    else
+    وگرنه
         e2.op->divide(e1, e2, res, scale);
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+تهی MatOp::divide(دوگانه s, ثابت Mat_عبارت& عبارت, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    عبارت.op->assign(عبارت, m);
+    MatOp_Bin::make_عبارت(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+تهی MatOp::abs(ثابت Mat_عبارت& عبارت, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    عبارت.op->assign(عبارت, m);
+    MatOp_Bin::make_عبارت(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+تهی MatOp::transpose(ثابت Mat_عبارت& عبارت, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    عبارت.op->assign(عبارت, m);
+    MatOp_T::make_عبارت(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+تهی MatOp::matmul(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res) ثابت
 {
-    if( this == e2.op )
+    اگر( این == e2.op )
     {
-        double scale = 1;
-        int flags = 0;
+        دوگانه scale = 1;
+        صحیح flags = 0;
         Mat m1, m2;
 
-        if( isT(e1) )
+        اگر( isT(e1) )
         {
             flags = cv::GEMM_1_T;
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else if( isScaled(e1) )
+        وگرنه اگر( isScaled(e1) )
         {
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else
+        وگرنه
             e1.op->assign(e1, m1);
 
-        if( isT(e2) )
+        اگر( isT(e2) )
         {
             flags |= cv::GEMM_2_T;
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else if( isScaled(e2) )
+        وگرنه اگر( isScaled(e2) )
         {
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else
+        وگرنه
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_عبارت(res, flags, m1, m2, scale);
     }
-    else
+    وگرنه
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+تهی MatOp::invert(ثابت Mat_عبارت& عبارت, صحیح method, Mat_عبارت& res) ثابت
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    عبارت.op->assign(عبارت, m);
+    MatOp_Invert::make_عبارت(res, method, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+Size MatOp::size(ثابت Mat_عبارت& عبارت) ثابت
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    بازگشت !عبارت.a.empty() ? عبارت.a.size() : عبارت.b.empty() ? عبارت.b.size() : عبارت.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+صحیح MatOp::type(ثابت Mat_عبارت& عبارت) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    بازگشت !عبارت.a.empty() ? عبارت.a.type() : عبارت.b.empty() ? عبارت.b.type() : عبارت.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_عبارت::Mat_عبارت(ثابت Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_عبارت Mat_عبارت::row(صحیح y) ثابت
 {
-    MatExpr e;
-    op->roi(*this, Range(y, y+1), Range::all(), e);
-    return e;
+    Mat_عبارت e;
+    op->roi(*این, Range(y, y+1), Range::all(), e);
+    بازگشت e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_عبارت Mat_عبارت::col(صحیح x) ثابت
 {
-    MatExpr e;
-    op->roi(*this, Range::all(), Range(x, x+1), e);
-    return e;
+    Mat_عبارت e;
+    op->roi(*این, Range::all(), Range(x, x+1), e);
+    بازگشت e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_عبارت Mat_عبارت::diag(صحیح d) ثابت
 {
-    MatExpr e;
-    op->diag(*this, d, e);
-    return e;
+    Mat_عبارت e;
+    op->diag(*این, d, e);
+    بازگشت e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_عبارت Mat_عبارت::operator()( ثابت Range& rowRange, ثابت Range& colRange ) ثابت
 {
-    MatExpr e;
-    op->roi(*this, rowRange, colRange, e);
-    return e;
+    Mat_عبارت e;
+    op->roi(*این, rowRange, colRange, e);
+    بازگشت e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_عبارت Mat_عبارت::operator()( ثابت Rect& roi ) ثابت
 {
-    MatExpr e;
-    op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
-    return e;
+    Mat_عبارت e;
+    op->roi(*این, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
+    بازگشت e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_عبارت::cross(ثابت Mat& m) ثابت
 {
-    return ((Mat)*this).cross(m);
+    بازگشت ((Mat)*این).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+دوگانه Mat_عبارت::dot(ثابت Mat& m) ثابت
 {
-    return ((Mat)*this).dot(m);
+    بازگشت ((Mat)*این).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_عبارت Mat_عبارت::t() ثابت
 {
-    MatExpr e;
-    op->transpose(*this, e);
-    return e;
+    Mat_عبارت e;
+    op->transpose(*این, e);
+    بازگشت e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_عبارت Mat_عبارت::inv(صحیح method) ثابت
 {
-    MatExpr e;
-    op->invert(*this, method, e);
-    return e;
+    Mat_عبارت e;
+    op->invert(*این, method, e);
+    بازگشت e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_عبارت Mat_عبارت::mul(ثابت Mat_عبارت& e, دوگانه scale) ثابت
 {
-    MatExpr en;
-    op->multiply(*this, e, en, scale);
-    return en;
+    Mat_عبارت en;
+    op->multiply(*این, e, en, scale);
+    بازگشت en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_عبارت Mat_عبارت::mul(ثابت Mat& m, دوگانه scale) ثابت
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
-    return e;
+    Mat_عبارت e;
+    op->multiply(*این, Mat_عبارت(m), e, scale);
+    بازگشت e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_عبارت operator + (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, a, b, 1, 1);
+    بازگشت e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_عبارت operator + (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, a, Mat(), 1, 0, s);
+    بازگشت e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_عبارت operator + (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, a, Mat(), 1, 0, s);
+    بازگشت e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_عبارت operator + (ثابت Mat_عبارت& e, ثابت Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_عبارت en;
+    e.op->add(e, Mat_عبارت(m), en);
+    بازگشت en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_عبارت operator + (ثابت Mat& m, ثابت Mat_عبارت& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_عبارت en;
+    e.op->add(e, Mat_عبارت(m), en);
+    بازگشت en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_عبارت operator + (ثابت Mat_عبارت& e, ثابت Scalar& s)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e.op->add(e, s, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_عبارت operator + (ثابت Scalar& s, ثابت Mat_عبارت& e)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e.op->add(e, s, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_عبارت operator + (ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e1.op->add(e1, e2, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_عبارت operator - (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, a, b, 1, -1);
+    بازگشت e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_عبارت operator - (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, a, Mat(), 1, 0, -s);
+    بازگشت e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_عبارت operator - (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, a, Mat(), -1, 0, s);
+    بازگشت e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_عبارت operator - (ثابت Mat_عبارت& e, ثابت Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
-    return en;
+    Mat_عبارت en;
+    e.op->subtract(e, Mat_عبارت(m), en);
+    بازگشت en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_عبارت operator - (ثابت Mat& m, ثابت Mat_عبارت& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
-    return en;
+    Mat_عبارت en;
+    e.op->subtract(Mat_عبارت(m), e, en);
+    بازگشت en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_عبارت operator - (ثابت Mat_عبارت& e, ثابت Scalar& s)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e.op->add(e, -s, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_عبارت operator - (ثابت Scalar& s, ثابت Mat_عبارت& e)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e.op->subtract(s, e, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_عبارت operator - (ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e1.op->subtract(e1, e2, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_عبارت operator - (ثابت Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, m, Mat(), -1, 0);
+    بازگشت e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_عبارت operator - (ثابت Mat_عبارت& e)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e.op->subtract(Scalar(0), e, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_عبارت operator * (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_GEMM::make_عبارت(e, 0, a, b);
+    بازگشت e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_عبارت operator * (ثابت Mat& a, دوگانه s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, a, Mat(), s, 0);
+    بازگشت e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_عبارت operator * (دوگانه s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, a, Mat(), s, 0);
+    بازگشت e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_عبارت operator * (ثابت Mat_عبارت& e, ثابت Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
-    return en;
+    Mat_عبارت en;
+    e.op->matmul(e, Mat_عبارت(m), en);
+    بازگشت en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_عبارت operator * (ثابت Mat& m, ثابت Mat_عبارت& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
-    return en;
+    Mat_عبارت en;
+    e.op->matmul(Mat_عبارت(m), e, en);
+    بازگشت en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_عبارت operator * (ثابت Mat_عبارت& e, دوگانه s)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e.op->multiply(e, s, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_عبارت operator * (دوگانه s, ثابت Mat_عبارت& e)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e.op->multiply(e, s, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_عبارت operator * (ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e1.op->matmul(e1, e2, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_عبارت operator / (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '/', a, b);
+    بازگشت e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_عبارت operator / (ثابت Mat& a, دوگانه s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
-    return e;
+    Mat_عبارت e;
+    MatOp_AddEx::make_عبارت(e, a, Mat(), 1./s, 0);
+    بازگشت e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_عبارت operator / (دوگانه s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '/', a, Mat(), s);
+    بازگشت e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_عبارت operator / (ثابت Mat_عبارت& e, ثابت Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
-    return en;
+    Mat_عبارت en;
+    e.op->divide(e, Mat_عبارت(m), en);
+    بازگشت en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_عبارت operator / (ثابت Mat& m, ثابت Mat_عبارت& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
-    return en;
+    Mat_عبارت en;
+    e.op->divide(Mat_عبارت(m), e, en);
+    بازگشت en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_عبارت operator / (ثابت Mat_عبارت& e, دوگانه s)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e.op->multiply(e, 1./s, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_عبارت operator / (دوگانه s, ثابت Mat_عبارت& e)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e.op->divide(s, e, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_عبارت operator / (ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2)
 {
-    MatExpr en;
+    Mat_عبارت en;
     e1.op->divide(e1, e2, en);
-    return en;
+    بازگشت en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_عبارت operator < (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_LT, a, b);
+    بازگشت e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_عبارت operator < (ثابت Mat& a, دوگانه s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_LT, a, s);
+    بازگشت e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_عبارت operator < (دوگانه s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_GT, a, s);
+    بازگشت e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_عبارت operator <= (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_LE, a, b);
+    بازگشت e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_عبارت operator <= (ثابت Mat& a, دوگانه s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_LE, a, s);
+    بازگشت e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_عبارت operator <= (دوگانه s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_GE, a, s);
+    بازگشت e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_عبارت operator == (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_EQ, a, b);
+    بازگشت e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_عبارت operator == (ثابت Mat& a, دوگانه s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_EQ, a, s);
+    بازگشت e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_عبارت operator == (دوگانه s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_EQ, a, s);
+    بازگشت e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_عبارت operator != (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_NE, a, b);
+    بازگشت e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_عبارت operator != (ثابت Mat& a, دوگانه s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_NE, a, s);
+    بازگشت e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_عبارت operator != (دوگانه s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_NE, a, s);
+    بازگشت e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_عبارت operator >= (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_GE, a, b);
+    بازگشت e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_عبارت operator >= (ثابت Mat& a, دوگانه s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_GE, a, s);
+    بازگشت e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_عبارت operator >= (دوگانه s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_LE, a, s);
+    بازگشت e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_عبارت operator > (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_GT, a, b);
+    بازگشت e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_عبارت operator > (ثابت Mat& a, دوگانه s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_GT, a, s);
+    بازگشت e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_عبارت operator > (دوگانه s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Cmp::make_عبارت(e, cv::CMP_LT, a, s);
+    بازگشت e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_عبارت min(ثابت Mat& a, ثابت Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, 'm', a, b);
+    بازگشت e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_عبارت min(ثابت Mat& a, دوگانه s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, 'n', a, s);
+    بازگشت e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_عبارت min(دوگانه s, ثابت Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, 'n', a, s);
+    بازگشت e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_عبارت max(ثابت Mat& a, ثابت Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, 'M', a, b);
+    بازگشت e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_عبارت max(ثابت Mat& a, دوگانه s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, 'N', a, s);
+    بازگشت e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_عبارت max(دوگانه s, ثابت Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, 'N', a, s);
+    بازگشت e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_عبارت operator & (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '&', a, b);
+    بازگشت e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_عبارت operator & (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '&', a, s);
+    بازگشت e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_عبارت operator & (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '&', a, s);
+    بازگشت e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_عبارت operator | (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '|', a, b);
+    بازگشت e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_عبارت operator | (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '|', a, s);
+    بازگشت e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_عبارت operator | (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '|', a, s);
+    بازگشت e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_عبارت operator ^ (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '^', a, b);
+    بازگشت e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_عبارت operator ^ (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '^', a, s);
+    بازگشت e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_عبارت operator ^ (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '^', a, s);
+    بازگشت e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_عبارت operator ~(ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '~', a, Scalar());
+    بازگشت e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_عبارت abs(ثابت Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, 'a', a, Scalar());
+    بازگشت e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_عبارت abs(ثابت Mat_عبارت& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
+    Mat_عبارت en;
     e.op->abs(e, en);
-    return en;
+    بازگشت en;
 }
 
 
-Size MatExpr::size() const
+Size Mat_عبارت::size() ثابت
 {
-    if( isT(*this) || isInv(*this) )
-        return Size(a.rows, a.cols);
-    if( isSolve(*this) )
-        return Size(b.cols, a.cols);
-    if( isInitializer(*this) )
-        return a.size();
-    return op ? op->size(*this) : Size();
+    اگر( isT(*این) || isInv(*این) )
+        بازگشت Size(a.rows, a.cols);
+    اگر( isSolve(*این) )
+        بازگشت Size(b.cols, a.cols);
+    اگر( isInitializer(*این) )
+        بازگشت a.size();
+    بازگشت op ? op->size(*این) : Size();
 }
 
 
-int MatExpr::type() const
+صحیح Mat_عبارت::type() ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( isInitializer(*this) )
-        return a.type();
-    if( isCmp(*this) )
-        return CV_MAKETYPE(CV_8U, a.channels());
-    return op ? op->type(*this) : -1;
+    اگر( isInitializer(*این) )
+        بازگشت a.type();
+    اگر( isCmp(*این) )
+        بازگشت CV_MAKETYPE(CV_8U, a.channels());
+    بازگشت op ? op->type(*این) : -1;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+تهی MatOp_Identity::assign(ثابت Mat_عبارت& e, Mat& m, صحیح _type) ثابت
 {
-    if( _type == -1 || _type == e.a.type() )
+    اگر( _type == -1 || _type == e.a.type() )
         m = e.a;
-    else
+    وگرنه
     {
         CV_Assert( CV_MAT_CN(_type) == e.a.channels() );
         e.a.convertTo(m, _type);
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+درونخطی تهی MatOp_Identity::make_عبارت(Mat_عبارت& res, ثابت Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_عبارت(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+تهی MatOp_AddEx::assign(ثابت Mat_عبارت& e, Mat& m, صحیح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
-    if( e.b.data )
+    اگر( e.b.data )
     {
-        if( e.s == Scalar() || !e.s.isReal() )
+        اگر( e.s == Scalar() || !e.s.isReal() )
         {
-            if( e.alpha == 1 )
+            اگر( e.alpha == 1 )
             {
-                if( e.beta == 1 )
+                اگر( e.beta == 1 )
                     cv::add(e.a, e.b, dst);
-                else if( e.beta == -1 )
+                وگرنه اگر( e.beta == -1 )
                     cv::subtract(e.a, e.b, dst);
-                else
+                وگرنه
                     cv::scaleAdd(e.b, e.beta, e.a, dst);
             }
-            else if( e.beta == 1 )
+            وگرنه اگر( e.beta == 1 )
             {
-                if( e.alpha == -1 )
+                اگر( e.alpha == -1 )
                     cv::subtract(e.b, e.a, dst);
-                else
+                وگرنه
                     cv::scaleAdd(e.a, e.alpha, e.b, dst);
             }
-            else
+            وگرنه
                 cv::addWeighted(e.a, e.alpha, e.b, e.beta, 0, dst);
 
-            if( !e.s.isReal() )
+            اگر( !e.s.isReal() )
                 cv::add(dst, e.s, dst);
         }
-        else
+        وگرنه
         {
-            if (e.a.channels() > 1)
-                CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+            اگر (e.a.channels() > 1)
+                CV_LOG_ONCE_WARNING(پوچ, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                           "https://github.com/opencv/opencv/issues/16739");
             cv::addWeighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
         }
     }
-    else if( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
+    وگرنه اگر( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
     {
-        if (e.a.channels() > 1 && e.s[0] != 0.0)
-            CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+        اگر (e.a.channels() > 1 && e.s[0] != 0.0)
+            CV_LOG_ONCE_WARNING(پوچ, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                       "https://github.com/opencv/opencv/issues/16739");
         e.a.convertTo(m, _type, e.alpha, e.s[0]);
-        return;
+        بازگشت;
     }
-    else if( e.alpha == 1 )
+    وگرنه اگر( e.alpha == 1 )
         cv::add(e.a, e.s, dst);
-    else if( e.alpha == -1 )
+    وگرنه اگر( e.alpha == -1 )
         cv::subtract(e.s, e.a, dst);
-    else
+    وگرنه
     {
         e.a.convertTo(dst, e.a.type(), e.alpha);
         cv::add(dst, e.s, dst);
     }
 
-    if( dst.data != m.data )
+    اگر( dst.data != m.data )
         dst.convertTo(m, m.type());
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+تهی MatOp_AddEx::add(ثابت Mat_عبارت& e, ثابت Scalar& s, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+تهی MatOp_AddEx::subtract(ثابت Scalar& s, ثابت Mat_عبارت& e, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+تهی MatOp_AddEx::multiply(ثابت Mat_عبارت& e, دوگانه s, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,160 +1379,160 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+تهی MatOp_AddEx::divide(دوگانه s, ثابت Mat_عبارت& e, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
-    else
+    اگر( isScaled(e) )
+        MatOp_Bin::make_عبارت(res, '/', e.a, Mat(), s/e.alpha);
+    وگرنه
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+تهی MatOp_AddEx::transpose(ثابت Mat_عبارت& e, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
-    else
+    اگر( isScaled(e) )
+        MatOp_T::make_عبارت(res, e.a, e.alpha);
+    وگرنه
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+تهی MatOp_AddEx::abs(ثابت Mat_عبارت& e, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
-    else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
-    else
+    اگر( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
+        MatOp_Bin::make_عبارت(res, 'a', e.a, -e.s*e.alpha);
+    وگرنه اگر( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
+        MatOp_Bin::make_عبارت(res, 'a', e.a, e.b);
+    وگرنه
         MatOp::abs(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+درونخطی تهی MatOp_AddEx::make_عبارت(Mat_عبارت& res, ثابت Mat& a, ثابت Mat& b, دوگانه alpha, دوگانه beta, ثابت Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_عبارت(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+تهی MatOp_Bin::assign(ثابت Mat_عبارت& e, Mat& m, صحیح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
 
-    if( e.flags == '*' )
+    اگر( e.flags == '*' )
         cv::multiply(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && e.b.data )
+    وگرنه اگر( e.flags == '/' && e.b.data )
         cv::divide(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && !e.b.data )
+    وگرنه اگر( e.flags == '/' && !e.b.data )
         cv::divide(e.alpha, e.a, dst );
-    else if( e.flags == '&' && e.b.data )
+    وگرنه اگر( e.flags == '&' && e.b.data )
         bitwise_and(e.a, e.b, dst);
-    else if( e.flags == '&' && !e.b.data )
+    وگرنه اگر( e.flags == '&' && !e.b.data )
         bitwise_and(e.a, e.s, dst);
-    else if( e.flags == '|' && e.b.data )
+    وگرنه اگر( e.flags == '|' && e.b.data )
         bitwise_or(e.a, e.b, dst);
-    else if( e.flags == '|' && !e.b.data )
+    وگرنه اگر( e.flags == '|' && !e.b.data )
         bitwise_or(e.a, e.s, dst);
-    else if( e.flags == '^' && e.b.data )
+    وگرنه اگر( e.flags == '^' && e.b.data )
         bitwise_xor(e.a, e.b, dst);
-    else if( e.flags == '^' && !e.b.data )
+    وگرنه اگر( e.flags == '^' && !e.b.data )
         bitwise_xor(e.a, e.s, dst);
-    else if( e.flags == '~' && !e.b.data )
+    وگرنه اگر( e.flags == '~' && !e.b.data )
         bitwise_not(e.a, dst);
-    else if( e.flags == 'm' )
+    وگرنه اگر( e.flags == 'm' )
         cv::min(e.a, e.b, dst);
-    else if( e.flags == 'n' )
+    وگرنه اگر( e.flags == 'n' )
         cv::min(e.a, e.s[0], dst);
-    else if( e.flags == 'M' )
+    وگرنه اگر( e.flags == 'M' )
         cv::max(e.a, e.b, dst);
-    else if( e.flags == 'N' )
+    وگرنه اگر( e.flags == 'N' )
         cv::max(e.a, e.s[0], dst);
-    else if( e.flags == 'a' && e.b.data )
+    وگرنه اگر( e.flags == 'a' && e.b.data )
         cv::absdiff(e.a, e.b, dst);
-    else if( e.flags == 'a' && !e.b.data )
+    وگرنه اگر( e.flags == 'a' && !e.b.data )
         cv::absdiff(e.a, e.s, dst);
-    else
+    وگرنه
         CV_Error(cv::Error::StsError, "Unknown operation");
 
-    if( dst.data != m.data )
+    اگر( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+تهی MatOp_Bin::multiply(ثابت Mat_عبارت& e, دوگانه s, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '*' || e.flags == '/' )
+    اگر( e.flags == '*' || e.flags == '/' )
     {
         res = e;
         res.alpha *= s;
     }
-    else
+    وگرنه
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+تهی MatOp_Bin::divide(دوگانه s, ثابت Mat_عبارت& e, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
-    else
+    اگر( e.flags == '/' && (!e.b.data || e.beta == 0) )
+        MatOp_AddEx::make_عبارت(res, e.a, Mat(), s/e.alpha, 0);
+    وگرنه
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+درونخطی تهی MatOp_Bin::make_عبارت(Mat_عبارت& res, نویسه op, ثابت Mat& a, ثابت Mat& b, دوگانه scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_عبارت(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+درونخطی تهی MatOp_Bin::make_عبارت(Mat_عبارت& res, نویسه op, ثابت Mat& a, ثابت Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_عبارت(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+تهی MatOp_Cmp::assign(ثابت Mat_عبارت& e, Mat& m, صحیح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
 
-    if( e.b.data )
+    اگر( e.b.data )
         cv::compare(e.a, e.b, dst, e.flags);
-    else
+    وگرنه
         cv::compare(e.a, e.alpha, dst, e.flags);
 
-    if( dst.data != m.data )
+    اگر( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+درونخطی تهی MatOp_Cmp::make_عبارت(Mat_عبارت& res, صحیح cmpop, ثابت Mat& a, ثابت Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_عبارت(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+درونخطی تهی MatOp_Cmp::make_عبارت(Mat_عبارت& res, صحیح cmpop, ثابت Mat& a, دوگانه alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_عبارت(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+تهی MatOp_T::assign(ثابت Mat_عبارت& e, Mat& m, صحیح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::transpose(e.a, dst);
 
-    if( dst.data != m.data || e.alpha != 1 )
+    اگر( dst.data != m.data || e.alpha != 1 )
         dst.convertTo(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+تهی MatOp_T::multiply(ثابت Mat_عبارت& e, دوگانه s, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,71 +1540,71 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+تهی MatOp_T::transpose(ثابت Mat_عبارت& e, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
-    else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+    اگر( e.alpha == 1 )
+        MatOp_Identity::make_عبارت(res, e.a);
+    وگرنه
+        MatOp_AddEx::make_عبارت(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+درونخطی تهی MatOp_T::make_عبارت(Mat_عبارت& res, ثابت Mat& a, دوگانه alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_عبارت(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+تهی MatOp_GEMM::assign(ثابت Mat_عبارت& e, Mat& m, صحیح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::gemm(e.a, e.b, e.alpha, e.c, e.beta, dst, e.flags);
-    if( dst.data != m.data )
+    اگر( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+تهی MatOp_GEMM::add(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    منطقی i1 = isIdentity(e1), i2 = isIdentity(e2);
+    دوگانه alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    اگر( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_عبارت(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    وگرنه اگر( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_عبارت(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    وگرنه اگر( این == e2.op )
         MatOp::add(e1, e2, res);
-    else
+    وگرنه
         e2.op->add(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+تهی MatOp_GEMM::subtract(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    منطقی i1 = isIdentity(e1), i2 = isIdentity(e2);
+    دوگانه alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    اگر( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_عبارت(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    وگرنه اگر( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_عبارت(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    وگرنه اگر( این == e2.op )
         MatOp::subtract(e1, e2, res);
-    else
+    وگرنه
         e2.op->subtract(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+تهی MatOp_GEMM::multiply(ثابت Mat_عبارت& e, دوگانه s, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+تهی MatOp_GEMM::transpose(ثابت Mat_عبارت& e, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,74 +1624,74 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                                 double alpha, const Mat& c, double beta)
+درونخطی تهی MatOp_GEMM::make_عبارت(Mat_عبارت& res, صحیح flags, ثابت Mat& a, ثابت Mat& b,
+                                 دوگانه alpha, ثابت Mat& c, دوگانه beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_عبارت(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+تهی MatOp_Invert::assign(ثابت Mat_عبارت& e, Mat& m, صحیح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::invert(e.a, dst, e.flags);
-    if( dst.data != m.data )
+    اگر( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+تهی MatOp_Invert::matmul(ثابت Mat_عبارت& e1, ثابت Mat_عبارت& e2, Mat_عبارت& res) ثابت
 {
-    if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
-    else if( this == e2.op )
+    اگر( isInv(e1) && isIdentity(e2) )
+        MatOp_Solve::make_عبارت(res, e1.flags, e1.a, e2.a);
+    وگرنه اگر( این == e2.op )
         MatOp::matmul(e1, e2, res);
-    else
+    وگرنه
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+درونخطی تهی MatOp_Invert::make_عبارت(Mat_عبارت& res, صحیح method, ثابت Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_عبارت(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+تهی MatOp_Solve::assign(ثابت Mat_عبارت& e, Mat& m, صحیح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::solve(e.a, e.b, dst, e.flags);
-    if( dst.data != m.data )
+    اگر( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+درونخطی تهی MatOp_Solve::make_عبارت(Mat_عبارت& res, صحیح method, ثابت Mat& a, ثابت Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_عبارت(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+تهی MatOp_Initializer::assign(ثابت Mat_عبارت& e, Mat& m, صحیح _type) ثابت
 {
-    if( _type == -1 )
+    اگر( _type == -1 )
         _type = e.a.type();
 
     m.create(e.a.size, _type);
 
-    if( e.flags == 'I' && e.a.dims <= 2 )
+    اگر( e.flags == 'I' && e.a.dims <= 2 )
         setIdentity(m, Scalar(e.alpha));
-    else if( e.flags == '0' )
+    وگرنه اگر( e.flags == '0' )
         m = Scalar();
-    else if( e.flags == '1' )
+    وگرنه اگر( e.flags == '1' )
         m = Scalar(e.alpha);
-    else
+    وگرنه
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+تهی MatOp_Initializer::multiply(ثابت Mat_عبارت& e, دوگانه s, Mat_عبارت& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+درونخطی تهی MatOp_Initializer::make_عبارت(Mat_عبارت& res, صحیح method, Size sz, صحیح type, دوگانه alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_عبارت(getGlobalMatOpInitializer(), method, Mat(sz, type, (تهی*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+درونخطی تهی MatOp_Initializer::make_عبارت(Mat_عبارت& res, صحیح method, صحیح ndims, ثابت صحیح* sizes, صحیح type, دوگانه alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_عبارت(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (تهی*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_عبارت Mat::t() ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
-    return e;
+    checkOperandsExist(*این);
+    Mat_عبارت e;
+    MatOp_T::make_عبارت(e, *این);
+    بازگشت e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_عبارت Mat::inv(صحیح method) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
-    return e;
+    Mat_عبارت e;
+    MatOp_Invert::make_عبارت(e, method, *این);
+    بازگشت e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_عبارت Mat::mul(درون_داد_Array m, دوگانه scale) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1740,105 +1740,105 @@ MatExpr Mat::mul(InputArray m, double scale) const
     // a non-owning view of caller memory (e.g. a scalar bound to _InputArray(const double&),
     // a Matx or a Vec) that the returned MatExpr can outlive, so snapshot it.
     // See https://github.com/opencv/opencv/issues/23577
-    if( !m.isMat() && !m.isUMat() )
+    اگر( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
-    return e;
+    Mat_عبارت e;
+    MatOp_Bin::make_عبارت(e, '*', *این, b, scale);
+    بازگشت e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_عبارت Mat::zeros(صحیح rows, صحیح cols, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, '0', Size(cols, rows), type);
+    بازگشت e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_عبارت Mat::zeros(Size size, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, '0', size, type);
+    بازگشت e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_عبارت Mat::zeros(صحیح ndims, ثابت صحیح* sizes, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, '0', ndims, sizes, type);
+    بازگشت e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_عبارت Mat::zeros(ثابت MatShape& shape, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, '0', shape.dims, shape.p, type);
+    بازگشت e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_عبارت Mat::ones(صحیح rows, صحیح cols, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, '1', Size(cols, rows), type);
+    بازگشت e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_عبارت Mat::ones(Size size, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, '1', size, type);
+    بازگشت e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_عبارت Mat::ones(صحیح ndims, ثابت صحیح* sizes, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, '1', ndims, sizes, type);
+    بازگشت e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_عبارت Mat::ones(ثابت MatShape& shape, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, '1', shape.dims, shape.p, type);
+    بازگشت e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_عبارت Mat::eye(صحیح rows, صحیح cols, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, 'I', Size(cols, rows), type);
+    بازگشت e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_عبارت Mat::eye(Size size, صحیح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
-    return e;
+    Mat_عبارت e;
+    MatOp_Initializer::make_عبارت(e, 'I', size, type);
+    بازگشت e;
 }
 
-void MatExpr::swap(MatExpr& other)
+تهی Mat_عبارت::swap(Mat_عبارت& other)
 {
     using std::swap;
 
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+درون_داد_Array_2::درون_داد_Array_2(ثابت Mat_عبارت& عبارت)
 {
-    if (!isIdentity(expr))
+    اگر (!isIdentity(عبارت))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat result = عبارت;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_عبارت result_عبارت(result);
+        swap(const_cast<Mat_عبارت&>(عبارت), result_عبارت);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(isIdentity(عبارت));
+    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &عبارت.a);
 }
 
 } // cv::

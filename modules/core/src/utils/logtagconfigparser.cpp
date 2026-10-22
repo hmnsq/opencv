@@ -2,303 +2,303 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
-#include "logtagconfigparser.hpp"
+#شامل "../precomp.hpp"
+#شامل "logtagconfigparser.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+فضاینام cv {
+فضاینام utils {
+فضاینام logging {
 
 LogTagConfigParser::LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel)
 {
     m_parsedGlobal.namePart = "global";
-    m_parsedGlobal.isGlobal = true;
-    m_parsedGlobal.hasPrefixWildcard = false;
-    m_parsedGlobal.hasSuffixWildcard = false;
+    m_parsedGlobal.isGlobal = درست;
+    m_parsedGlobal.hasPrefixWildcard = نادرست;
+    m_parsedGlobal.hasSuffixWildcard = نادرست;
     m_parsedGlobal.level = defaultUnconfiguredGlobalLevel;
 }
 
-LogTagConfigParser::LogTagConfigParser(const std::string& input)
+LogTagConfigParser::LogTagConfigParser(ثابت std::string& درون_داد_2)
 {
-    parse(input);
+    parse(درون_داد_2);
 }
 
 LogTagConfigParser::~LogTagConfigParser()
 {
 }
 
-bool LogTagConfigParser::parse(const std::string& input)
+منطقی LogTagConfigParser::parse(ثابت std::string& درون_داد_2)
 {
-    m_input = input;
+    m_درون_داد = درون_داد_2;
     segmentTokens();
-    return (m_malformed.empty());
+    بازگشت (m_malformed.empty());
 }
 
-bool LogTagConfigParser::hasMalformed() const
+منطقی LogTagConfigParser::hasMalformed() ثابت
 {
-    return !m_malformed.empty();
+    بازگشت !m_malformed.empty();
 }
 
-const LogTagConfig& LogTagConfigParser::getGlobalConfig() const
+ثابت LogTagConfig& LogTagConfigParser::getGlobalConfig() ثابت
 {
-    return m_parsedGlobal;
+    بازگشت m_parsedGlobal;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFullNameConfigs() const
+ثابت std::vector<LogTagConfig>& LogTagConfigParser::getFullNameConfigs() ثابت
 {
-    return m_parsedFullName;
+    بازگشت m_parsedFullName;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFirstPartConfigs() const
+ثابت std::vector<LogTagConfig>& LogTagConfigParser::getFirstPartConfigs() ثابت
 {
-    return m_parsedFirstPart;
+    بازگشت m_parsedFirstPart;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getAnyPartConfigs() const
+ثابت std::vector<LogTagConfig>& LogTagConfigParser::getAnyPartConfigs() ثابت
 {
-    return m_parsedAnyPart;
+    بازگشت m_parsedAnyPart;
 }
 
-const std::vector<std::string>& LogTagConfigParser::getMalformed() const
+ثابت std::vector<std::string>& LogTagConfigParser::getMalformed() ثابت
 {
-    return m_malformed;
+    بازگشت m_malformed;
 }
 
-void LogTagConfigParser::segmentTokens()
+تهی LogTagConfigParser::segmentTokens()
 {
-    const size_t len = m_input.length();
+    ثابت size_t len = m_درون_داد.length();
     std::vector<std::pair<size_t, size_t>> startStops;
-    bool wasSeparator = true;
-    for (size_t pos = 0u; pos < len; ++pos)
+    منطقی wasSeparator = درست;
+    برای (size_t pos = 0u; pos < len; ++pos)
     {
-        char c = m_input[pos];
-        bool isSeparator = (c == ' ' || c == '\t' || c == ';');
-        if (!isSeparator)
+        نویسه c = m_درون_داد[pos];
+        منطقی isSeparator = (c == ' ' || c == '\t' || c == ';');
+        اگر (!isSeparator)
         {
-            if (wasSeparator)
+            اگر (wasSeparator)
             {
                 startStops.emplace_back(pos, pos + 1u);
             }
-            else
+            وگرنه
             {
                 startStops.back().second = pos + 1u;
             }
         }
         wasSeparator = isSeparator;
     }
-    for (const auto& startStop : startStops)
+    برای (ثابت auto& startStop : startStops)
     {
-        const auto s = m_input.substr(startStop.first, startStop.second - startStop.first);
+        ثابت auto s = m_درون_داد.substr(startStop.first, startStop.second - startStop.first);
         parseNameAndLevel(s);
     }
 }
 
-void LogTagConfigParser::parseNameAndLevel(const std::string& s)
+تهی LogTagConfigParser::parseNameAndLevel(ثابت std::string& s)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = s.length();
+    ثابت size_t npos = std::string::npos;
+    ثابت size_t len = s.length();
     size_t colonIdx = s.find_first_of(":=");
-    if (colonIdx == npos)
+    اگر (colonIdx == npos)
     {
         // See if the whole string is a log level
         auto parsedLevel = parseLogLevel(s);
-        if (parsedLevel.second)
+        اگر (parsedLevel.second)
         {
             // If it is, assume the log level is for global
             parseWildcard("", parsedLevel.first);
-            return;
+            بازگشت;
         }
-        else
+        وگرنه
         {
             // not sure what to do.
             m_malformed.push_back(s);
-            return;
+            بازگشت;
         }
     }
-    if (colonIdx == 0u || colonIdx + 1u == len)
+    اگر (colonIdx == 0u || colonIdx + 1u == len)
     {
         // malformed (colon or equal sign at beginning or end), cannot do anything
         m_malformed.push_back(s);
-        return;
+        بازگشت;
     }
     size_t colonIdx2 = s.find_first_of(":=", colonIdx + 1u);
-    if (colonIdx2 != npos)
+    اگر (colonIdx2 != npos)
     {
         // malformed (more than one colon or equal sign), cannot do anything
         m_malformed.push_back(s);
-        return;
+        بازگشت;
     }
     auto parsedLevel = parseLogLevel(s.substr(colonIdx + 1u));
-    if (parsedLevel.second)
+    اگر (parsedLevel.second)
     {
         parseWildcard(s.substr(0u, colonIdx), parsedLevel.first);
-        return;
+        بازگشت;
     }
-    else
+    وگرنه
     {
         // Cannot recognize the right side of the colon or equal sign.
         // Not sure what to do.
         m_malformed.push_back(s);
-        return;
+        بازگشت;
     }
 }
 
-void LogTagConfigParser::parseWildcard(const std::string& name, LogLevel level)
+تهی LogTagConfigParser::parseWildcard(ثابت std::string& name, LogLevel level)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = name.length();
-    if (len == 0u)
+    ثابت size_t npos = std::string::npos;
+    ثابت size_t len = name.length();
+    اگر (len == 0u)
     {
         m_parsedGlobal.level = level;
-        return;
+        بازگشت;
     }
-    const bool hasPrefixWildcard = (name[0u] == '*');
-    if (hasPrefixWildcard && len == 1u)
+    ثابت منطقی hasPrefixWildcard = (name[0u] == '*');
+    اگر (hasPrefixWildcard && len == 1u)
     {
         m_parsedGlobal.level = level;
-        return;
+        بازگشت;
     }
-    const size_t firstNonWildcard = name.find_first_not_of("*.");
-    if (hasPrefixWildcard && firstNonWildcard == npos)
+    ثابت size_t firstNonWildcard = name.find_first_not_of("*.");
+    اگر (hasPrefixWildcard && firstNonWildcard == npos)
     {
         m_parsedGlobal.level = level;
-        return;
+        بازگشت;
     }
-    const bool hasSuffixWildcard = (name[len - 1u] == '*');
-    const size_t lastNonWildcard = name.find_last_not_of("*.");
+    ثابت منطقی hasSuffixWildcard = (name[len - 1u] == '*');
+    ثابت size_t lastNonWildcard = name.find_last_not_of("*.");
     std::string trimmedNamePart = name.substr(firstNonWildcard, lastNonWildcard - firstNonWildcard + 1u);
     // The case of a single asterisk has been handled above;
     // here we only handle the explicit use of "global" in the log config string.
-    const bool isGlobal = (trimmedNamePart == "global");
-    if (isGlobal)
+    ثابت منطقی isGlobal = (trimmedNamePart == "global");
+    اگر (isGlobal)
     {
         m_parsedGlobal.level = level;
-        return;
+        بازگشت;
     }
-    LogTagConfig result(trimmedNamePart, level, false, hasPrefixWildcard, hasSuffixWildcard);
-    if (hasPrefixWildcard)
+    LogTagConfig result(trimmedNamePart, level, نادرست, hasPrefixWildcard, hasSuffixWildcard);
+    اگر (hasPrefixWildcard)
     {
         m_parsedAnyPart.emplace_back(std::move(result));
     }
-    else if (hasSuffixWildcard)
+    وگرنه اگر (hasSuffixWildcard)
     {
         m_parsedFirstPart.emplace_back(std::move(result));
     }
-    else
+    وگرنه
     {
         m_parsedFullName.emplace_back(std::move(result));
     }
 }
 
-std::pair<LogLevel, bool> LogTagConfigParser::parseLogLevel(const std::string& s)
+std::pair<LogLevel, منطقی> LogTagConfigParser::parseLogLevel(ثابت std::string& s)
 {
-    const auto falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, false);
-    const auto make_parsed_result = [](LogLevel lev) -> std::pair<LogLevel, bool>
+    ثابت auto falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, نادرست);
+    ثابت auto make_parsed_result = [](LogLevel lev) -> std::pair<LogLevel, منطقی>
     {
-        return std::make_pair(lev, true);
+        بازگشت std::make_pair(lev, درست);
     };
-    const size_t len = s.length();
-    if (len >= 1u)
+    ثابت size_t len = s.length();
+    اگر (len >= 1u)
     {
-        const char c = (char)std::toupper(s[0]);
-        switch (c)
+        ثابت نویسه c = (نویسه)std::toupper(s[0]);
+        انتخاب (c)
         {
-        case '0':
-            if (len == 1u)
+        حالت '0':
+            اگر (len == 1u)
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                بازگشت make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'D':
-            if (len == 1u ||
+            بشکن;
+        حالت 'D':
+            اگر (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "DEBUG"))
             {
-                return make_parsed_result(LOG_LEVEL_DEBUG);
+                بازگشت make_parsed_result(LOG_LEVEL_DEBUG);
             }
-            if ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
+            اگر ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
                 (len == 8u && cv::toUpperCase(s) == "DISABLED"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                بازگشت make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'E':
-            if (len == 1u ||
+            بشکن;
+        حالت 'E':
+            اگر (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "ERROR"))
             {
-                return make_parsed_result(LOG_LEVEL_ERROR);
+                بازگشت make_parsed_result(LOG_LEVEL_ERROR);
             }
-            break;
-        case 'F':
-            if (len == 1u ||
+            بشکن;
+        حالت 'F':
+            اگر (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "FATAL"))
             {
-                return make_parsed_result(LOG_LEVEL_FATAL);
+                بازگشت make_parsed_result(LOG_LEVEL_FATAL);
             }
-            break;
-        case 'I':
-            if (len == 1u ||
+            بشکن;
+        حالت 'I':
+            اگر (len == 1u ||
                 (len == 4u && cv::toUpperCase(s) == "INFO"))
             {
-                return make_parsed_result(LOG_LEVEL_INFO);
+                بازگشت make_parsed_result(LOG_LEVEL_INFO);
             }
-            break;
-        case 'O':
-            if (len == 3u && cv::toUpperCase(s) == "OFF")
+            بشکن;
+        حالت 'O':
+            اگر (len == 3u && cv::toUpperCase(s) == "OFF")
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                بازگشت make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'S':
-            if (len == 1u ||
+            بشکن;
+        حالت 'S':
+            اگر (len == 1u ||
                 (len == 6u && cv::toUpperCase(s) == "SILENT"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                بازگشت make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'V':
-            if (len == 1u ||
+            بشکن;
+        حالت 'V':
+            اگر (len == 1u ||
                 (len == 7u && cv::toUpperCase(s) == "VERBOSE"))
             {
-                return make_parsed_result(LOG_LEVEL_VERBOSE);
+                بازگشت make_parsed_result(LOG_LEVEL_VERBOSE);
             }
-            break;
-        case 'W':
-            if (len == 1u ||
+            بشکن;
+        حالت 'W':
+            اگر (len == 1u ||
                 (len == 4u && cv::toUpperCase(s) == "WARN") ||
                 (len == 7u && cv::toUpperCase(s) == "WARNING") ||
                 (len == 8u && cv::toUpperCase(s) == "WARNINGS"))
             {
-                return make_parsed_result(LOG_LEVEL_WARNING);
+                بازگشت make_parsed_result(LOG_LEVEL_WARNING);
             }
-            break;
-        default:
-            break;
+            بشکن;
+        پیشفرض:
+            بشکن;
         }
         // fall through
     }
-    return falseDontCare;
+    بازگشت falseDontCare;
 }
 
 std::string LogTagConfigParser::toString(LogLevel level)
 {
-    switch (level)
+    انتخاب (level)
     {
-    case LOG_LEVEL_SILENT:
-        return "SILENT";
-    case LOG_LEVEL_FATAL:
-        return "FATAL";
-    case LOG_LEVEL_ERROR:
-        return "ERROR";
-    case LOG_LEVEL_WARNING:
-        return "WARNING";
-    case LOG_LEVEL_INFO:
-        return "INFO";
-    case LOG_LEVEL_DEBUG:
-        return "DEBUG";
-    case LOG_LEVEL_VERBOSE:
-        return "VERBOSE";
-    default:
-        return std::to_string((int)level);
+    حالت LOG_LEVEL_SILENT:
+        بازگشت "SILENT";
+    حالت LOG_LEVEL_FATAL:
+        بازگشت "FATAL";
+    حالت LOG_LEVEL_ERROR:
+        بازگشت "ERROR";
+    حالت LOG_LEVEL_WARNING:
+        بازگشت "WARNING";
+    حالت LOG_LEVEL_INFO:
+        بازگشت "INFO";
+    حالت LOG_LEVEL_DEBUG:
+        بازگشت "DEBUG";
+    حالت LOG_LEVEL_VERBOSE:
+        بازگشت "VERBOSE";
+    پیشفرض:
+        بازگشت std::to_string((صحیح)level);
     }
 }
 

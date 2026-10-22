@@ -42,16 +42,16 @@
 #ifndef __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
 #define __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
 
-namespace cv { namespace ocl { namespace runtime {
+فضاینام cv { فضاینام ocl { فضاینام runtime {
 
-struct DynamicFnEntry
+ساختار DynamicFnEntry
 {
-    const char* fnName; // "clCreateContext"
-    void** ppFn; // &clCreateContext_pfn
+    ثابت نویسه* fnName; // "clCreateContext"
+    تهی** ppFn; // &clCreateContext_pfn
 };
 
 } } } // namespace cv::ocl::runtime
 
-using namespace cv::ocl::runtime;
+using فضاینام cv::ocl::runtime;
 
 #endif // __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__

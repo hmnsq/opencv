@@ -47,26 +47,26 @@
 
 #ifdef HAVE_LAPACK
 
-int lapack_LU32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, int* info);
-int lapack_LU64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, int* info);
-int lapack_Cholesky32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, bool* info);
-int lapack_Cholesky64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, bool* info);
-int lapack_SVD32f(float* a, size_t a_step, float* w, float* u, size_t u_step, float* vt, size_t v_step, int m, int n, int flags);
-int lapack_SVD64f(double* a, size_t a_step, double* w, double* u, size_t u_step, double* vt, size_t v_step, int m, int n, int flags);
-int lapack_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info);
-int lapack_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info);
-int lapack_gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
+صحیح lapack_LU32f(اعشاری* a, size_t a_step, صحیح m, اعشاری* b, size_t b_step, صحیح n, صحیح* info);
+صحیح lapack_LU64f(دوگانه* a, size_t a_step, صحیح m, دوگانه* b, size_t b_step, صحیح n, صحیح* info);
+صحیح lapack_Cholesky32f(اعشاری* a, size_t a_step, صحیح m, اعشاری* b, size_t b_step, صحیح n, منطقی* info);
+صحیح lapack_Cholesky64f(دوگانه* a, size_t a_step, صحیح m, دوگانه* b, size_t b_step, صحیح n, منطقی* info);
+صحیح lapack_SVD32f(اعشاری* a, size_t a_step, اعشاری* w, اعشاری* u, size_t u_step, اعشاری* vt, size_t v_step, صحیح m, صحیح n, صحیح flags);
+صحیح lapack_SVD64f(دوگانه* a, size_t a_step, دوگانه* w, دوگانه* u, size_t u_step, دوگانه* vt, size_t v_step, صحیح m, صحیح n, صحیح flags);
+صحیح lapack_QR32f(اعشاری* src1, size_t src1_step, صحیح m, صحیح n, صحیح k, اعشاری* src2, size_t src2_step, اعشاری* dst, صحیح* info);
+صحیح lapack_QR64f(دوگانه* src1, size_t src1_step, صحیح m, صحیح n, صحیح k, دوگانه* src2, size_t src2_step, دوگانه* dst, صحیح* info);
+صحیح lapack_gemm32f(ثابت اعشاری* src1, size_t src1_step, ثابت اعشاری* src2, size_t src2_step,
+                   اعشاری alpha, ثابت اعشاری* src3, size_t src3_step, اعشاری beta, اعشاری* dst, size_t dst_step,
+                   صحیح m, صحیح n, صحیح k, صحیح flags);
+صحیح lapack_gemm64f(ثابت دوگانه* src1, size_t src1_step, ثابت دوگانه* src2, size_t src2_step,
+                   دوگانه alpha, ثابت دوگانه* src3, size_t src3_step, دوگانه beta, دوگانه* dst, size_t dst_step,
+                   صحیح m, صحیح n, صحیح k, صحیح flags);
+صحیح lapack_gemm32fc(ثابت اعشاری* src1, size_t src1_step, ثابت اعشاری* src2, size_t src2_step,
+                   اعشاری alpha, ثابت اعشاری* src3, size_t src3_step, اعشاری beta, اعشاری* dst, size_t dst_step,
+                   صحیح m, صحیح n, صحیح k, صحیح flags);
+صحیح lapack_gemm64fc(ثابت دوگانه* src1, size_t src1_step, ثابت دوگانه* src2, size_t src2_step,
+                   دوگانه alpha, ثابت دوگانه* src3, size_t src3_step, دوگانه beta, دوگانه* dst, size_t dst_step,
+                   صحیح m, صحیح n, صحیح k, صحیح flags);
 
 #undef cv_hal_LU32f
 #define cv_hal_LU32f lapack_LU32f

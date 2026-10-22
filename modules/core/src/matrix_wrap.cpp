@@ -2,53 +2,53 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
+#شامل "precomp.hpp"
+#شامل "opencv2/core/mat.hpp"
 
-namespace cv {
+فضاینام cv {
 
-typedef Vec<int, 5> Vec5i;
-typedef Vec<int, 7> Vec7i;
-typedef Vec<int, 9> Vec9i;
-typedef Vec<int, 10> Vec10i;
-typedef Vec<int, 11> Vec11i;
-typedef Vec<int, 12> Vec12i;
-typedef Vec<int, 13> Vec13i;
-typedef Vec<int, 14> Vec14i;
-typedef Vec<int, 15> Vec15i;
-typedef Vec<int, 16> Vec16i;
-typedef Vec<int, 32> Vec32i;
-typedef Vec<int, 64> Vec64i;
-typedef Vec<int, 128> Vec128i;
+تعریفنوع Vec<صحیح, 5> Vec5i;
+تعریفنوع Vec<صحیح, 7> Vec7i;
+تعریفنوع Vec<صحیح, 9> Vec9i;
+تعریفنوع Vec<صحیح, 10> Vec10i;
+تعریفنوع Vec<صحیح, 11> Vec11i;
+تعریفنوع Vec<صحیح, 12> Vec12i;
+تعریفنوع Vec<صحیح, 13> Vec13i;
+تعریفنوع Vec<صحیح, 14> Vec14i;
+تعریفنوع Vec<صحیح, 15> Vec15i;
+تعریفنوع Vec<صحیح, 16> Vec16i;
+تعریفنوع Vec<صحیح, 32> Vec32i;
+تعریفنوع Vec<صحیح, 64> Vec64i;
+تعریفنوع Vec<صحیح, 128> Vec128i;
 
 #undef STD_VECTOR_SWITCH
 #define STD_VECTOR_SWITCH(esz, func) \
-    switch( esz ) \
+    انتخاب( esz ) \
     { \
-    case 1: func(uchar); \
-    case 2: func(Vec2b); \
-    case 3: func(Vec3b); \
-    case 4: func(int); \
-    case 6: func(Vec3s); \
-    case 8: func(Vec2i); \
-    case 12: func(Vec3i); \
-    case 16: func(Vec4i); \
-    case 20: func(Vec5i); \
-    case 24: func(Vec6i); \
-    case 28: func(Vec7i); \
-    case 32: func(Vec8i); \
-    case 36: func(Vec9i); \
-    case 40: func(Vec10i); \
-    case 44: func(Vec11i); \
-    case 48: func(Vec12i); \
-    case 52: func(Vec13i); \
-    case 56: func(Vec14i); \
-    case 60: func(Vec15i); \
-    case 64: func(Vec16i); \
-    case 128: func(Vec32i); \
-    case 256: func(Vec64i); \
-    case 512: func(Vec128i); \
-    default: \
+    حالت 1: func(uchar); \
+    حالت 2: func(Vec2b); \
+    حالت 3: func(Vec3b); \
+    حالت 4: func(صحیح); \
+    حالت 6: func(Vec3s); \
+    حالت 8: func(Vec2i); \
+    حالت 12: func(Vec3i); \
+    حالت 16: func(Vec4i); \
+    حالت 20: func(Vec5i); \
+    حالت 24: func(Vec6i); \
+    حالت 28: func(Vec7i); \
+    حالت 32: func(Vec8i); \
+    حالت 36: func(Vec9i); \
+    حالت 40: func(Vec10i); \
+    حالت 44: func(Vec11i); \
+    حالت 48: func(Vec12i); \
+    حالت 52: func(Vec13i); \
+    حالت 56: func(Vec14i); \
+    حالت 60: func(Vec15i); \
+    حالت 64: func(Vec16i); \
+    حالت 128: func(Vec32i); \
+    حالت 256: func(Vec64i); \
+    حالت 512: func(Vec128i); \
+    پیشفرض: \
         CV_Error_(cv::Error::StsBadArg, ("Vectors of vectors with element size %d are not supported. Please, modify STD_VECTOR_SWITCH() macro\n", esz)); \
     }
 
@@ -56,1637 +56,1637 @@ typedef Vec<int, 128> Vec128i;
                                         Input/Output Array
 \*************************************************************************************************/
 
-Mat _InputArray::getMat_(int i) const
+Mat درون_داد_Array_2::getMat_(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
-        const Mat* m = (const Mat*)obj;
-        if( i < 0 )
-            return *m;
-        return m->row(i);
+        ثابت Mat* m = (ثابت Mat*)obj;
+        اگر( i < 0 )
+            بازگشت *m;
+        بازگشت m->row(i);
     }
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
-        const UMat* m = (const UMat*)obj;
-        if( i < 0 )
-            return m->getMat(accessFlags);
-        return m->getMat(accessFlags).row(i);
+        ثابت UMat* m = (ثابت UMat*)obj;
+        اگر( i < 0 )
+            بازگشت m->getMat(accessFlags);
+        بازگشت m->getMat(accessFlags).row(i);
     }
 
-    if (k == MATX)
+    اگر (k == MATX)
     {
         CV_Assert( i < 0 );
-        return Mat(sz, flags, obj);
+        بازگشت Mat(sz, flags, obj);
     }
 
-    if( k == STD_BOOL_VECTOR )
+    اگر( k == STD_BOOL_VECTOR )
     {
         CV_Assert( i < 0 );
-        int t = CV_8U;
-        const std::vector<bool>& v = *(const std::vector<bool>*)obj;
-        int j, n = (int)v.size();
-        if( n == 0 )
-            return Mat();
+        صحیح t = CV_8U;
+        ثابت std::vector<منطقی>& v = *(ثابت std::vector<منطقی>*)obj;
+        صحیح j, n = (صحیح)v.size();
+        اگر( n == 0 )
+            بازگشت Mat();
         Mat m(1, &n, t);
         uchar* dst = m.data;
-        for( j = 0; j < n; j++ )
+        برای( j = 0; j < n; j++ )
             dst[j] = (uchar)v[j];
-        return m;
+        بازگشت m;
     }
 
-    if( k == NONE )
-        return Mat();
+    اگر( k == NONE )
+        بازگشت Mat();
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    اگر( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
     {
-        int t = CV_MAT_TYPE(flags);
-        int esz = CV_ELEM_SIZE(t);
+        صحیح t = CV_MAT_TYPE(flags);
+        صحیح esz = CV_ELEM_SIZE(t);
 
     #undef GET_MAT
     #define GET_MAT(T) \
         { \
             std::vector<T>* v; \
-            if (k == STD_VECTOR_VECTOR) { \
+            اگر (k == STD_VECTOR_VECTOR) { \
                 std::vector<std::vector<T> >* vv = \
                     reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
                 CV_Assert(size_t(i) < vv->size()); \
                 v = &vv->at(i); \
-            } else { \
+            } وگرنه { \
                 v = reinterpret_cast<std::vector<T>*>(obj); \
             } \
-            int v_sz = int(v->size()); \
-            return v->empty() ? Mat() : Mat(1, &v_sz, t, v->data()); \
+            صحیح v_sz = صحیح(v->size()); \
+            بازگشت v->empty() ? Mat() : Mat(1, &v_sz, t, v->data()); \
         }
 
         STD_VECTOR_SWITCH(esz, GET_MAT)
     }
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        ثابت std::vector<Mat>& v = *(ثابت std::vector<Mat>*)obj;
+        CV_Assert( 0 <= i && i < (صحیح)v.size() );
 
-        return v[i];
+        بازگشت v[i];
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* v = (const Mat*)obj;
+        ثابت Mat* v = (ثابت Mat*)obj;
         CV_Assert( 0 <= i && i < sz.height );
 
-        return v[i];
+        بازگشت v[i];
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        ثابت std::vector<UMat>& v = *(ثابت std::vector<UMat>*)obj;
+        CV_Assert( 0 <= i && i < (صحیح)v.size() );
 
-        return v[i].getMat(accessFlags);
+        بازگشت v[i].getMat(accessFlags);
     }
 
-    if( k == OPENGL_BUFFER )
+    اگر( k == OPENGL_BUFFER )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call mapHost/unmapHost methods for ogl::Buffer object");
     }
 
-    if( k == CUDA_GPU_MAT )
+    اگر( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call download method for cuda::GpuMat object");
     }
 
-    if( k == CUDA_GPU_MATND )
+    اگر( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call download method for cuda::GpuMatND object");
     }
 
-    if( k == CUDA_HOST_MEM )
+    اگر( k == CUDA_HOST_MEM )
     {
         CV_Assert( i < 0 );
 
-        const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
+        ثابت cuda::HostMem* cuda_mem = (ثابت cuda::HostMem*)obj;
 
-        return cuda_mem->createMatHeader();
+        بازگشت cuda_mem->createMatHeader();
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-UMat _InputArray::getUMat(int i) const
+UMat درون_داد_Array_2::getUMat(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
-        const UMat* m = (const UMat*)obj;
-        if( i < 0 )
-            return *m;
-        return m->row(i);
+        ثابت UMat* m = (ثابت UMat*)obj;
+        اگر( i < 0 )
+            بازگشت *m;
+        بازگشت m->row(i);
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        ثابت std::vector<UMat>& v = *(ثابت std::vector<UMat>*)obj;
+        CV_Assert( 0 <= i && i < (صحیح)v.size() );
 
-        return v[i];
+        بازگشت v[i];
     }
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
-        const Mat* m = (const Mat*)obj;
-        if( i < 0 )
-            return m->getUMat(accessFlags);
-        return m->row(i).getUMat(accessFlags);
+        ثابت Mat* m = (ثابت Mat*)obj;
+        اگر( i < 0 )
+            بازگشت m->getUMat(accessFlags);
+        بازگشت m->row(i).getUMat(accessFlags);
     }
 
-    return getMat(i).getUMat(accessFlags);
+    بازگشت getMat(i).getUMat(accessFlags);
 }
 
-void _InputArray::getMatVector(std::vector<Mat>& mv) const
+تهی درون_داد_Array_2::getMatVector(std::vector<Mat>& mv) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
-        const Mat& m = *(const Mat*)obj;
-        int n = (int)m.size[0];
+        ثابت Mat& m = *(ثابت Mat*)obj;
+        صحیح n = (صحیح)m.size[0];
         mv.resize(n);
         CV_Assert(m.dims >= 2);
 
-        for( int i = 0; i < n; i++ )
-            mv[i] = m.dims <= 2 ? Mat(1, m.cols, m.type(), (void*)m.ptr(i)) :
-                Mat(m.dims-1, &m.size[1], m.type(), (void*)m.ptr(i), &m.step[1]);
-        return;
+        برای( صحیح i = 0; i < n; i++ )
+            mv[i] = m.dims <= 2 ? Mat(1, m.cols, m.type(), (تهی*)m.ptr(i)) :
+                Mat(m.dims-1, &m.size[1], m.type(), (تهی*)m.ptr(i), &m.step[1]);
+        بازگشت;
     }
 
-    if (k == MATX)
+    اگر (k == MATX)
     {
         size_t n = sz.height, esz = CV_ELEM_SIZE(flags);
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        برای( size_t i = 0; i < n; i++ )
             mv[i] = Mat(1, sz.width, CV_MAT_TYPE(flags), (uchar*)obj + esz*sz.width*i);
-        return;
+        بازگشت;
     }
 
-    if( k == STD_VECTOR )
+    اگر( k == STD_VECTOR )
     {
-        const std::vector<uchar>& v = *(const std::vector<uchar>*)obj;
+        ثابت std::vector<uchar>& v = *(ثابت std::vector<uchar>*)obj;
 
         size_t n = total(), esz = CV_ELEM_SIZE(flags);
-        int t = CV_MAT_DEPTH(flags), cn = CV_MAT_CN(flags);
+        صحیح t = CV_MAT_DEPTH(flags), cn = CV_MAT_CN(flags);
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
-            mv[i] = Mat(1, cn, t, (void*)(v.data() + esz*i));
-        return;
+        برای( size_t i = 0; i < n; i++ )
+            mv[i] = Mat(1, cn, t, (تهی*)(v.data() + esz*i));
+        بازگشت;
     }
 
-    if( k == NONE )
+    اگر( k == NONE )
     {
         mv.clear();
-        return;
+        بازگشت;
     }
 
-    if( k == STD_VECTOR_VECTOR )
+    اگر( k == STD_VECTOR_VECTOR )
     {
-        int typ = CV_MAT_TYPE(flags);
-        int esz = CV_ELEM_SIZE(typ);
+        صحیح typ = CV_MAT_TYPE(flags);
+        صحیح esz = CV_ELEM_SIZE(typ);
 
         #undef GET_VEC_VEC_MAT_VEC
         #define GET_VEC_VEC_MAT_VEC(T) \
         { \
-            const std::vector<std::vector<T > >* vv = (const std::vector<std::vector<T > >*)obj; \
+            ثابت std::vector<std::vector<T > >* vv = (ثابت std::vector<std::vector<T > >*)obj; \
             size_t n = vv->size(); \
             mv.resize(n); \
-            for (size_t i = 0; i < n; i++) { \
-                const std::vector<T >& vi = vv->at(i); \
+            برای (size_t i = 0; i < n; i++) { \
+                ثابت std::vector<T >& vi = vv->at(i); \
                 CV_Assert(vi.size() <= (size_t)INT_MAX); \
-                int ni = (int)vi.size(); \
-                mv[i] = ni > 0 ? Mat(1, &ni, typ, (void*)vi.data()) : Mat(); \
+                صحیح ni = (صحیح)vi.size(); \
+                mv[i] = ni > 0 ? Mat(1, &ni, typ, (تهی*)vi.data()) : Mat(); \
             } \
         } \
-        break
+        بشکن
 
         STD_VECTOR_SWITCH(esz, GET_VEC_VEC_MAT_VEC)
-        return;
+        بازگشت;
     }
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
+        ثابت std::vector<Mat>& v = *(ثابت std::vector<Mat>*)obj;
         size_t n = v.size();
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        برای( size_t i = 0; i < n; i++ )
             mv[i] = v[i];
-        return;
+        بازگشت;
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* v = (const Mat*)obj;
+        ثابت Mat* v = (ثابت Mat*)obj;
         size_t n = sz.height;
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        برای( size_t i = 0; i < n; i++ )
             mv[i] = v[i];
-        return;
+        بازگشت;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
+        ثابت std::vector<UMat>& v = *(ثابت std::vector<UMat>*)obj;
         size_t n = v.size();
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        برای( size_t i = 0; i < n; i++ )
             mv[i] = v[i].getMat(accessFlags);
-        return;
+        بازگشت;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _InputArray::getUMatVector(std::vector<UMat>& umv) const
+تهی درون_داد_Array_2::getUMatVector(std::vector<UMat>& umv) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == NONE )
+    اگر( k == NONE )
     {
         umv.clear();
-        return;
+        بازگشت;
     }
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
+        ثابت std::vector<Mat>& v = *(ثابت std::vector<Mat>*)obj;
         size_t n = v.size();
         umv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        برای( size_t i = 0; i < n; i++ )
             umv[i] = v[i].getUMat(accessFlags);
-        return;
+        بازگشت;
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* v = (const Mat*)obj;
+        ثابت Mat* v = (ثابت Mat*)obj;
         size_t n = sz.height;
         umv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        برای( size_t i = 0; i < n; i++ )
             umv[i] = v[i].getUMat(accessFlags);
-        return;
+        بازگشت;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
+        ثابت std::vector<UMat>& v = *(ثابت std::vector<UMat>*)obj;
         size_t n = v.size();
         umv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        برای( size_t i = 0; i < n; i++ )
             umv[i] = v[i];
-        return;
+        بازگشت;
     }
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
         UMat& v = *(UMat*)obj;
         umv.resize(1);
         umv[0] = v;
-        return;
+        بازگشت;
     }
-    if( k == MAT )
+    اگر( k == MAT )
     {
         Mat& v = *(Mat*)obj;
         umv.resize(1);
         umv[0] = v.getUMat(accessFlags);
-        return;
+        بازگشت;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-cuda::GpuMat _InputArray::getGpuMat() const
+cuda::GpuMat درون_داد_Array_2::getGpuMat() ثابت
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if (k == CUDA_GPU_MAT)
+    اگر (k == CUDA_GPU_MAT)
     {
-        const cuda::GpuMat* d_mat = (const cuda::GpuMat*)obj;
-        return *d_mat;
+        ثابت cuda::GpuMat* d_mat = (ثابت cuda::GpuMat*)obj;
+        بازگشت *d_mat;
     }
 
-    if (k == CUDA_HOST_MEM)
+    اگر (k == CUDA_HOST_MEM)
     {
-        const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
-        return cuda_mem->createGpuMatHeader();
+        ثابت cuda::HostMem* cuda_mem = (ثابت cuda::HostMem*)obj;
+        بازگشت cuda_mem->createGpuMatHeader();
     }
 
-    if (k == OPENGL_BUFFER)
+    اگر (k == OPENGL_BUFFER)
     {
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call mapDevice/unmapDevice methods for ogl::Buffer object");
     }
 
-    if (k == NONE)
-        return cuda::GpuMat();
+    اگر (k == NONE)
+        بازگشت cuda::GpuMat();
 
     CV_Error(cv::Error::StsNotImplemented, "getGpuMat is available only for cuda::GpuMat and cuda::HostMem");
-#else
+#وگرنه
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-void _InputArray::getGpuMatVector(std::vector<cuda::GpuMat>& gpumv) const
+تهی درون_داد_Array_2::getGpuMatVector(std::vector<cuda::GpuMat>& gpumv) ثابت
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT)
     {
         gpumv = *(std::vector<cuda::GpuMat>*)obj;
     }
-#else
+#وگرنه
     CV_UNUSED(gpumv);
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-void _InputArray::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) const
+تهی درون_داد_Array_2::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) ثابت
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
         gpumv = *(std::vector<cuda::GpuMatND>*)obj;
     }
-#else
+#وگرنه
     CV_UNUSED(gpumv);
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-cuda::GpuMatND _InputArray::getGpuMatND() const
+cuda::GpuMatND درون_داد_Array_2::getGpuMatND() ثابت
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if (k == CUDA_GPU_MATND)
+    اگر (k == CUDA_GPU_MATND)
     {
-        const cuda::GpuMatND* d_mat = (const cuda::GpuMatND*)obj;
-        return *d_mat;
+        ثابت cuda::GpuMatND* d_mat = (ثابت cuda::GpuMatND*)obj;
+        بازگشت *d_mat;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "getGpuMatND is available only for cuda::GpuMatND");
-#else
+#وگرنه
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-ogl::Buffer _InputArray::getOGlBuffer() const
+ogl::Buffer درون_داد_Array_2::getOGlBuffer() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
     CV_Assert(k == OPENGL_BUFFER);
 
-    const ogl::Buffer* gl_buf = (const ogl::Buffer*)obj;
-    return *gl_buf;
+    ثابت ogl::Buffer* gl_buf = (ثابت ogl::Buffer*)obj;
+    بازگشت *gl_buf;
 }
 
-int _InputArray::rows_(int i) const
+صحیح درون_داد_Array_2::rows_(صحیح i) ثابت
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == CUDA_GPU_MATND)
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر (k == CUDA_GPU_MATND)
     {
-        const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
-        return (_gpuMatND.dims < 1) ? 0 : _gpuMatND.size[0];
+        ثابت cuda::GpuMatND& _gpuMatND = *(ثابت cuda::GpuMatND*)obj;
+        بازگشت (_gpuMatND.dims < 1) ? 0 : _gpuMatND.size[0];
     }
 #endif
 
-    return size_(i).height;
+    بازگشت size_(i).height;
 }
 
-int _InputArray::cols_(int i) const
+صحیح درون_داد_Array_2::cols_(صحیح i) ثابت
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == CUDA_GPU_MATND)
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر (k == CUDA_GPU_MATND)
     {
-        const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
-        return (_gpuMatND.dims < 2) ? 0 : _gpuMatND.size[1];
+        ثابت cuda::GpuMatND& _gpuMatND = *(ثابت cuda::GpuMatND*)obj;
+        بازگشت (_gpuMatND.dims < 2) ? 0 : _gpuMatND.size[1];
     }
 #endif
 
-    return size_(i).width;
+    بازگشت size_(i).width;
 }
 
-Size _InputArray::size_(int i) const
+Size درون_داد_Array_2::size_(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat* m = (const Mat*)obj;
+        ثابت Mat* m = (ثابت Mat*)obj;
         CV_Assert(m->dims <= 2);
-        return Size(m->cols, m->rows);
+        بازگشت Size(m->cols, m->rows);
     }
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
         CV_Assert( i < 0 );
-        const UMat* m = (const UMat*)obj;
+        ثابت UMat* m = (ثابت UMat*)obj;
         CV_Assert(m->dims <= 2);
-        return Size(m->cols, m->rows);
+        بازگشت Size(m->cols, m->rows);
     }
 
-    if (k == MATX)
+    اگر (k == MATX)
     {
         CV_Assert( i < 0 );
-        return sz;
+        بازگشت sz;
     }
 
-    if( k == NONE )
-        return Size();
+    اگر( k == NONE )
+        بازگشت Size();
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
+    اگر( k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
     {
         size_t n = total(i);
         CV_Assert(n <= (size_t)INT_MAX);
-        return Size((int)n, 1);
+        بازگشت Size((صحیح)n, 1);
     }
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert( i < (int)vv.size() );
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
+        اگر( i < 0 )
+            بازگشت vv.empty() ? Size() : Size((صحیح)vv.size(), 1);
+        CV_Assert( i < (صحیح)vv.size() );
 
-        return vv[i].size();
+        بازگشت vv[i].size();
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return sz.height==0 ? Size() : Size(sz.height, 1);
+        ثابت Mat* vv = (ثابت Mat*)obj;
+        اگر( i < 0 )
+            بازگشت sz.height==0 ? Size() : Size(sz.height, 1);
         CV_Assert( i < sz.height );
 
-        return vv[i].size();
+        بازگشت vv[i].size();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        return vv[i].size();
-#else
+        ثابت std::vector<cuda::GpuMat>& vv = *(ثابت std::vector<cuda::GpuMat>*)obj;
+        اگر (i < 0)
+            بازگشت vv.empty() ? Size() : Size((صحیح)vv.size(), 1);
+        CV_Assert(i < (صحیح)vv.size());
+        بازگشت vv[i].size();
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        const cuda::GpuMatND& m = vv[i];
-        if (m.dims == 0)
-            return Size();
-        if (m.dims == 1)
-            return Size(1, m.size[0]);
-        return Size(m.size[1], m.size[0]);
-#else
+        ثابت std::vector<cuda::GpuMatND>& vv = *(ثابت std::vector<cuda::GpuMatND>*)obj;
+        اگر (i < 0)
+            بازگشت vv.empty() ? Size() : Size((صحیح)vv.size(), 1);
+        CV_Assert(i < (صحیح)vv.size());
+        ثابت cuda::GpuMatND& m = vv[i];
+        اگر (m.dims == 0)
+            بازگشت Size();
+        اگر (m.dims == 1)
+            بازگشت Size(1, m.size[0]);
+        بازگشت Size(m.size[1], m.size[0]);
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert( i < (int)vv.size() );
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
+        اگر( i < 0 )
+            بازگشت vv.empty() ? Size() : Size((صحیح)vv.size(), 1);
+        CV_Assert( i < (صحیح)vv.size() );
 
-        return vv[i].size();
+        بازگشت vv[i].size();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        const cuda::GpuMatND& m = vv[i];
-        if (m.dims == 0)
-            return Size();
-        if (m.dims == 1)
-            return Size(1, m.size[0]);
-        return Size(m.size[1], m.size[0]);
-#else
+        ثابت std::vector<cuda::GpuMatND>& vv = *(ثابت std::vector<cuda::GpuMatND>*)obj;
+        اگر (i < 0)
+            بازگشت vv.empty() ? Size() : Size((صحیح)vv.size(), 1);
+        CV_Assert(i < (صحیح)vv.size());
+        ثابت cuda::GpuMatND& m = vv[i];
+        اگر (m.dims == 0)
+            بازگشت Size();
+        اگر (m.dims == 1)
+            بازگشت Size(1, m.size[0]);
+        بازگشت Size(m.size[1], m.size[0]);
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == OPENGL_BUFFER )
+    اگر( k == OPENGL_BUFFER )
     {
         CV_Assert( i < 0 );
-        const ogl::Buffer* buf = (const ogl::Buffer*)obj;
-        return buf->size();
+        ثابت ogl::Buffer* buf = (ثابت ogl::Buffer*)obj;
+        بازگشت buf->size();
     }
 
-    if( k == CUDA_GPU_MAT )
+    اگر( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        const cuda::GpuMat* d_mat = (const cuda::GpuMat*)obj;
-        return d_mat->size();
+        ثابت cuda::GpuMat* d_mat = (ثابت cuda::GpuMat*)obj;
+        بازگشت d_mat->size();
     }
 
-    if( k == CUDA_HOST_MEM )
+    اگر( k == CUDA_HOST_MEM )
     {
         CV_Assert( i < 0 );
-        const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
-        return cuda_mem->size();
+        ثابت cuda::HostMem* cuda_mem = (ثابت cuda::HostMem*)obj;
+        بازگشت cuda_mem->size();
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::sizend(int* arrsz, int i) const
+صحیح درون_داد_Array_2::sizend(صحیح* arrsz, صحیح i) ثابت
 {
-    int j, d = 0;
-    _InputArray::KindFlag k = kind();
+    صحیح j, d = 0;
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    اگر( k == NONE )
         ;
-    else if( k == MAT )
+    وگرنه اگر( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat& m = *(const Mat*)obj;
+        ثابت Mat& m = *(ثابت Mat*)obj;
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        اگر(arrsz)
+            برای(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == UMAT )
+    وگرنه اگر( k == UMAT )
     {
         CV_Assert( i < 0 );
-        const UMat& m = *(const UMat*)obj;
+        ثابت UMat& m = *(ثابت UMat*)obj;
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        اگر(arrsz)
+            برای(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_VECTOR_MAT && i >= 0 )
+    وگرنه اگر( k == STD_VECTOR_MAT && i >= 0 )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i < (int)vv.size() );
-        const Mat& m = vv[i];
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
+        CV_Assert( i < (صحیح)vv.size() );
+        ثابت Mat& m = vv[i];
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        اگر(arrsz)
+            برای(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_ARRAY_MAT && i >= 0 )
+    وگرنه اگر( k == STD_ARRAY_MAT && i >= 0 )
     {
-        const Mat* vv = (const Mat*)obj;
+        ثابت Mat* vv = (ثابت Mat*)obj;
         CV_Assert( i < sz.height );
-        const Mat& m = vv[i];
+        ثابت Mat& m = vv[i];
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        اگر(arrsz)
+            برای(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_VECTOR_UMAT && i >= 0 )
+    وگرنه اگر( k == STD_VECTOR_UMAT && i >= 0 )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        CV_Assert( i < (int)vv.size() );
-        const UMat& m = vv[i];
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
+        CV_Assert( i < (صحیح)vv.size() );
+        ثابت UMat& m = vv[i];
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        اگر(arrsz)
+            برای(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if (((k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) && i < 0) ||
+    وگرنه اگر (((k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) && i < 0) ||
              (k == STD_VECTOR_VECTOR && i >= 0))
     {
         size_t n = total(i);
         d = 1;
-        if(arrsz)
+        اگر(arrsz)
         {
-            arrsz[0] = int(n);
+            arrsz[0] = صحیح(n);
         }
     }
-    else
+    وگرنه
     {
         CV_CheckLE(dims(i), 2, "Not supported");
         Size sz2d = size(i);
         d = 2;
-        if(arrsz)
+        اگر(arrsz)
         {
             arrsz[0] = sz2d.height;
             arrsz[1] = sz2d.width;
         }
     }
 
-    return d;
+    بازگشت d;
 }
 
-bool _InputArray::empty(int i) const
+منطقی درون_داد_Array_2::empty(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
-    if (i >= 0) {
-        if (k == STD_VECTOR_MAT) {
-            auto mv = reinterpret_cast<const std::vector<Mat>*>(obj);
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر (i >= 0) {
+        اگر (k == STD_VECTOR_MAT) {
+            auto mv = reinterpret_cast<ثابت std::vector<Mat>*>(obj);
             CV_Assert((size_t)i < mv->size());
-            return mv->at(i).empty();
+            بازگشت mv->at(i).empty();
         }
-        else if (k == STD_VECTOR_UMAT) {
-            auto umv = reinterpret_cast<const std::vector<UMat>*>(obj);
+        وگرنه اگر (k == STD_VECTOR_UMAT) {
+            auto umv = reinterpret_cast<ثابت std::vector<UMat>*>(obj);
             CV_Assert((size_t)i < umv->size());
-            return umv->at(i).empty();
+            بازگشت umv->at(i).empty();
         }
-        else if (k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) {
+        وگرنه اگر (k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) {
             size_t n = total(i);
-            return n == 0;
-        } else {
+            بازگشت n == 0;
+        } وگرنه {
             CV_Error(Error::StsNotImplemented, "");
         }
     }
-    return empty();
+    بازگشت empty();
 }
 
-MatShape _InputArray::shape(int i) const
+MatShape درون_داد_Array_2::shape(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     MatShape shape;
 
-    if( k == NONE )
+    اگر( k == NONE )
         ;
-    else if( k == MAT )
+    وگرنه اگر( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat& m = *(const Mat*)obj;
+        ثابت Mat& m = *(ثابت Mat*)obj;
         shape = m.size;
     }
-    else if( k == UMAT )
+    وگرنه اگر( k == UMAT )
     {
         CV_Assert( i < 0 );
-        const UMat& m = *(const UMat*)obj;
+        ثابت UMat& m = *(ثابت UMat*)obj;
         shape = m.size;
     }
-    else if( k == STD_VECTOR_MAT && i >= 0 )
+    وگرنه اگر( k == STD_VECTOR_MAT && i >= 0 )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
         CV_Assert( (size_t)i < vv.size() );
-        const Mat& m = vv[i];
+        ثابت Mat& m = vv[i];
         shape = m.size;
     }
-    else if( k == STD_ARRAY_MAT && i >= 0 )
+    وگرنه اگر( k == STD_ARRAY_MAT && i >= 0 )
     {
-        const Mat* vv = (const Mat*)obj;
+        ثابت Mat* vv = (ثابت Mat*)obj;
         CV_Assert( i < sz.height );
-        const Mat& m = vv[i];
+        ثابت Mat& m = vv[i];
         shape = m.size;
     }
-    else if( k == STD_VECTOR_UMAT && i >= 0 )
+    وگرنه اگر( k == STD_VECTOR_UMAT && i >= 0 )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
         CV_Assert( (size_t)i < vv.size() );
-        const UMat& m = vv[i];
+        ثابت UMat& m = vv[i];
         shape = m.size;
     }
-    else
+    وگرنه
     {
-        int sizes[CV_MAX_DIM];
-        int dims = sizend(sizes, i);
+        صحیح sizes[CV_MAX_DIM];
+        صحیح dims = sizend(sizes, i);
         shape = MatShape(dims, sizes);
     }
 
-    return shape;
+    بازگشت shape;
 }
 
-bool _InputArray::sameSize(const _InputArray& arr) const
+منطقی درون_داد_Array_2::sameSize(ثابت درون_داد_Array_2& arr) ثابت
 {
-    _InputArray::KindFlag k1 = kind(), k2 = arr.kind();
+    درون_داد_Array_2::KindFlag k1 = kind(), k2 = arr.kind();
     Size sz1;
 
-    if( k1 == MAT )
+    اگر( k1 == MAT )
     {
-        const Mat* m = ((const Mat*)obj);
-        if( k2 == MAT )
-            return m->size == ((const Mat*)arr.obj)->size;
-        if( k2 == UMAT )
-            return m->size == ((const UMat*)arr.obj)->size;
-        if( m->dims > 2 )
-            return false;
+        ثابت Mat* m = ((ثابت Mat*)obj);
+        اگر( k2 == MAT )
+            بازگشت m->size == ((ثابت Mat*)arr.obj)->size;
+        اگر( k2 == UMAT )
+            بازگشت m->size == ((ثابت UMat*)arr.obj)->size;
+        اگر( m->dims > 2 )
+            بازگشت نادرست;
         sz1 = m->size();
     }
-    else if( k1 == UMAT )
+    وگرنه اگر( k1 == UMAT )
     {
-        const UMat* m = ((const UMat*)obj);
-        if( k2 == MAT )
-            return m->size == ((const Mat*)arr.obj)->size;
-        if( k2 == UMAT )
-            return m->size == ((const UMat*)arr.obj)->size;
-        if( m->dims > 2 )
-            return false;
+        ثابت UMat* m = ((ثابت UMat*)obj);
+        اگر( k2 == MAT )
+            بازگشت m->size == ((ثابت Mat*)arr.obj)->size;
+        اگر( k2 == UMAT )
+            بازگشت m->size == ((ثابت UMat*)arr.obj)->size;
+        اگر( m->dims > 2 )
+            بازگشت نادرست;
         sz1 = m->size();
     }
-    else if ( (k1 == CUDA_GPU_MATND) && (k2 == CUDA_GPU_MATND))
+    وگرنه اگر ( (k1 == CUDA_GPU_MATND) && (k2 == CUDA_GPU_MATND))
     {
-        return ((const cuda::GpuMatND*)obj)->size == ((const cuda::GpuMatND*)arr.obj)->size;
+        بازگشت ((ثابت cuda::GpuMatND*)obj)->size == ((ثابت cuda::GpuMatND*)arr.obj)->size;
     }
-    else
+    وگرنه
         sz1 = size();
 
-    if( arr.dims() > 2 )
-        return false;
-    return sz1 == arr.size();
+    اگر( arr.dims() > 2 )
+        بازگشت نادرست;
+    بازگشت sz1 == arr.size();
 }
 
-int _InputArray::dims_(int i) const
+صحیح درون_داد_Array_2::dims_(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->dims;
+        بازگشت ((ثابت Mat*)obj)->dims;
     }
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->dims;
+        بازگشت ((ثابت UMat*)obj)->dims;
     }
 
-    if (k == MATX)
+    اگر (k == MATX)
     {
         CV_Assert( i < 0 );
-        return 2;
+        بازگشت 2;
     }
 
-    if( k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    اگر( k == STD_VECTOR || k == STD_BOOL_VECTOR )
     {
         CV_Assert( i < 0 );
-        return 1;
+        بازگشت 1;
     }
 
-    if( k == NONE )
-        return 0;
+    اگر( k == NONE )
+        بازگشت 0;
 
-    if( k == STD_VECTOR_VECTOR )
+    اگر( k == STD_VECTOR_VECTOR )
     {
-        if( i < 0 )
-            return 1;
+        اگر( i < 0 )
+            بازگشت 1;
         CV_Assert( size_t(i) < total() );
-        return 1;
+        بازگشت 1;
     }
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return 1;
-        CV_Assert( i < (int)vv.size() );
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
+        اگر( i < 0 )
+            بازگشت 1;
+        CV_Assert( i < (صحیح)vv.size() );
 
-        return vv[i].dims;
+        بازگشت vv[i].dims;
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return 1;
+        ثابت Mat* vv = (ثابت Mat*)obj;
+        اگر( i < 0 )
+            بازگشت 1;
         CV_Assert( i < sz.height );
 
-        return vv[i].dims;
+        بازگشت vv[i].dims;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return 1;
-        CV_Assert( i < (int)vv.size() );
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
+        اگر( i < 0 )
+            بازگشت 1;
+        CV_Assert( i < (صحیح)vv.size() );
 
-        return vv[i].dims;
+        بازگشت vv[i].dims;
     }
 
-    if( k == OPENGL_BUFFER )
-    {
-        CV_Assert( i < 0 );
-        return 2;
-    }
-
-    if( k == CUDA_GPU_MAT )
+    اگر( k == OPENGL_BUFFER )
     {
         CV_Assert( i < 0 );
-        return 2;
+        بازگشت 2;
     }
 
-    if( k == CUDA_GPU_MATND )
+    اگر( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        return ((const cuda::GpuMatND*)obj)->dims;
+        بازگشت 2;
     }
 
-    if( k == CUDA_HOST_MEM )
+    اگر( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
-        return 2;
+        بازگشت ((ثابت cuda::GpuMatND*)obj)->dims;
+    }
+
+    اگر( k == CUDA_HOST_MEM )
+    {
+        CV_Assert( i < 0 );
+        بازگشت 2;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-size_t _InputArray::total(int i) const
+size_t درون_داد_Array_2::total(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->total();
+        بازگشت ((ثابت Mat*)obj)->total();
     }
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->total();
+        بازگشت ((ثابت UMat*)obj)->total();
     }
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return vv.size();
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
+        اگر( i < 0 )
+            بازگشت vv.size();
 
-        CV_Assert( i < (int)vv.size() );
-        return vv[i].total();
+        CV_Assert( i < (صحیح)vv.size() );
+        بازگشت vv[i].total();
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return sz.height;
+        ثابت Mat* vv = (ثابت Mat*)obj;
+        اگر( i < 0 )
+            بازگشت sz.height;
 
         CV_Assert( i < sz.height );
-        return vv[i].total();
+        بازگشت vv[i].total();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return vv.size();
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
+        اگر( i < 0 )
+            بازگشت vv.size();
 
-        CV_Assert( i < (int)vv.size() );
-        return vv[i].total();
+        CV_Assert( i < (صحیح)vv.size() );
+        بازگشت vv[i].total();
     }
 
-    if( k == CUDA_GPU_MATND )
+    اگر( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
         size_t res = 0;
-        const cuda::GpuMatND& _gpuMatND = *((const cuda::GpuMatND*)obj);
-        if (_gpuMatND.dims > 0)
+        ثابت cuda::GpuMatND& _gpuMatND = *((ثابت cuda::GpuMatND*)obj);
+        اگر (_gpuMatND.dims > 0)
         {
             res = 1;
-            for(int d = 0 ; d<_gpuMatND.dims ; ++d)
+            برای(صحیح d = 0 ; d<_gpuMatND.dims ; ++d)
                 res *= _gpuMatND.size[d];
-            return res;
+            بازگشت res;
         }
     }
 
-    if (k == STD_VECTOR || k == STD_VECTOR_VECTOR)
+    اگر (k == STD_VECTOR || k == STD_VECTOR_VECTOR)
     {
         CV_Assert(i < 0 || k == STD_VECTOR_VECTOR);
-        int esz = CV_ELEM_SIZE(flags);
+        صحیح esz = CV_ELEM_SIZE(flags);
 
         #undef GET_VEC_SIZE
         #define GET_VEC_SIZE(T) \
-            if (k == STD_VECTOR_VECTOR) { \
-                const std::vector<std::vector<T > >* vv = (const std::vector<std::vector<T > >*)obj; \
+            اگر (k == STD_VECTOR_VECTOR) { \
+                ثابت std::vector<std::vector<T > >* vv = (ثابت std::vector<std::vector<T > >*)obj; \
                 size_t n = vv->size(); \
-                if (i < 0) \
-                    return n; \
+                اگر (i < 0) \
+                    بازگشت n; \
                 CV_Assert((size_t)i < n); \
-                return vv->at(i).size(); \
-            } else \
-                return ((const std::vector<T >*)obj)->size()
+                بازگشت vv->at(i).size(); \
+            } وگرنه \
+                بازگشت ((ثابت std::vector<T >*)obj)->size()
 
         STD_VECTOR_SWITCH(esz, GET_VEC_SIZE)
     }
 
-    return size(i).area();
+    بازگشت size(i).area();
 }
 
-int _InputArray::type_(int i) const
+صحیح درون_داد_Array_2::type_(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
-        return ((const Mat*)obj)->type();
+    اگر( k == MAT )
+        بازگشت ((ثابت Mat*)obj)->type();
 
-    if( k == UMAT )
-        return ((const UMat*)obj)->type();
+    اگر( k == UMAT )
+        بازگشت ((ثابت UMat*)obj)->type();
 
-    if( k == MATX || k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return CV_MAT_TYPE(flags);
+    اگر( k == MATX || k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
+        بازگشت CV_MAT_TYPE(flags);
 
-    if( k == NONE )
-        return -1;
+    اگر( k == NONE )
+        بازگشت -1;
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( vv.empty() )
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
+        اگر( vv.empty() )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            بازگشت CV_MAT_TYPE(flags);
         }
-        CV_Assert( i < (int)vv.size() );
-        return vv[i >= 0 ? i : 0].type();
+        CV_Assert( i < (صحیح)vv.size() );
+        بازگشت vv[i >= 0 ? i : 0].type();
     }
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( vv.empty() )
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
+        اگر( vv.empty() )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            بازگشت CV_MAT_TYPE(flags);
         }
-        CV_Assert( i < (int)vv.size() );
-        return vv[i >= 0 ? i : 0].type();
+        CV_Assert( i < (صحیح)vv.size() );
+        بازگشت vv[i >= 0 ? i : 0].type();
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( sz.height == 0 )
+        ثابت Mat* vv = (ثابت Mat*)obj;
+        اگر( sz.height == 0 )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            بازگشت CV_MAT_TYPE(flags);
         }
         CV_Assert( i < sz.height );
-        return vv[i >= 0 ? i : 0].type();
+        بازگشت vv[i >= 0 ? i : 0].type();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        if (vv.empty())
+        ثابت std::vector<cuda::GpuMat>& vv = *(ثابت std::vector<cuda::GpuMat>*)obj;
+        اگر (vv.empty())
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            بازگشت CV_MAT_TYPE(flags);
         }
-        CV_Assert(i < (int)vv.size());
-        return vv[i >= 0 ? i : 0].type();
-#else
+        CV_Assert(i < (صحیح)vv.size());
+        بازگشت vv[i >= 0 ? i : 0].type();
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (vv.empty())
+        ثابت std::vector<cuda::GpuMatND>& vv = *(ثابت std::vector<cuda::GpuMatND>*)obj;
+        اگر (vv.empty())
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            بازگشت CV_MAT_TYPE(flags);
         }
-        CV_Assert(i < (int)vv.size());
-        return vv[i >= 0 ? i : 0].type();
-#else
+        CV_Assert(i < (صحیح)vv.size());
+        بازگشت vv[i >= 0 ? i : 0].type();
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == OPENGL_BUFFER )
-        return ((const ogl::Buffer*)obj)->type();
+    اگر( k == OPENGL_BUFFER )
+        بازگشت ((ثابت ogl::Buffer*)obj)->type();
 
-    if( k == CUDA_GPU_MAT )
-        return ((const cuda::GpuMat*)obj)->type();
+    اگر( k == CUDA_GPU_MAT )
+        بازگشت ((ثابت cuda::GpuMat*)obj)->type();
 
-    if( k == CUDA_GPU_MATND )
-        return ((const cuda::GpuMatND*)obj)->type();
+    اگر( k == CUDA_GPU_MATND )
+        بازگشت ((ثابت cuda::GpuMatND*)obj)->type();
 
-    if( k == CUDA_HOST_MEM )
-        return ((const cuda::HostMem*)obj)->type();
+    اگر( k == CUDA_HOST_MEM )
+        بازگشت ((ثابت cuda::HostMem*)obj)->type();
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::depth_(int i) const
+صحیح درون_داد_Array_2::depth_(صحیح i) ثابت
 {
-    return CV_MAT_DEPTH(type(i));
+    بازگشت CV_MAT_DEPTH(type(i));
 }
 
-bool _InputArray::empty_() const
+منطقی درون_داد_Array_2::empty_() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
-        return ((const Mat*)obj)->empty();
+    اگر( k == MAT )
+        بازگشت ((ثابت Mat*)obj)->empty();
 
-    if( k == UMAT )
-        return ((const UMat*)obj)->empty();
+    اگر( k == UMAT )
+        بازگشت ((ثابت UMat*)obj)->empty();
 
-    if (k == MATX)
-        return false;
+    اگر (k == MATX)
+        بازگشت نادرست;
 
-    if( k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR )
+    اگر( k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR )
     {
         size_t n = total(-1);
-        return n == 0;
+        بازگشت n == 0;
     }
 
-    if( k == NONE )
-        return true;
+    اگر( k == NONE )
+        بازگشت درست;
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        return vv.empty();
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
+        بازگشت vv.empty();
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        return sz.height == 0;
+        بازگشت sz.height == 0;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        return vv.empty();
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
+        بازگشت vv.empty();
     }
 
-    if( k == OPENGL_BUFFER )
-        return ((const ogl::Buffer*)obj)->empty();
+    اگر( k == OPENGL_BUFFER )
+        بازگشت ((ثابت ogl::Buffer*)obj)->empty();
 
-    if( k == CUDA_GPU_MAT )
-        return ((const cuda::GpuMat*)obj)->empty();
+    اگر( k == CUDA_GPU_MAT )
+        بازگشت ((ثابت cuda::GpuMat*)obj)->empty();
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT)
     {
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        return vv.empty();
+        ثابت std::vector<cuda::GpuMat>& vv = *(ثابت std::vector<cuda::GpuMat>*)obj;
+        بازگشت vv.empty();
     }
 
-    if( k == CUDA_GPU_MATND )
-        return ((const cuda::GpuMatND*)obj)->empty();
+    اگر( k == CUDA_GPU_MATND )
+        بازگشت ((ثابت cuda::GpuMatND*)obj)->empty();
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        return vv.empty();
+        ثابت std::vector<cuda::GpuMatND>& vv = *(ثابت std::vector<cuda::GpuMatND>*)obj;
+        بازگشت vv.empty();
     }
 
-    if( k == CUDA_HOST_MEM )
-        return ((const cuda::HostMem*)obj)->empty();
+    اگر( k == CUDA_HOST_MEM )
+        بازگشت ((ثابت cuda::HostMem*)obj)->empty();
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isContinuous(int i) const
+منطقی درون_داد_Array_2::isContinuous(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
-        return i < 0 ? ((const Mat*)obj)->isContinuous() : true;
+    اگر( k == MAT )
+        بازگشت i < 0 ? ((ثابت Mat*)obj)->isContinuous() : درست;
 
-    if( k == UMAT )
-        return i < 0 ? ((const UMat*)obj)->isContinuous() : true;
+    اگر( k == UMAT )
+        بازگشت i < 0 ? ((ثابت UMat*)obj)->isContinuous() : درست;
 
-    if( k == MATX || k == STD_VECTOR ||
+    اگر( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return true;
+        بازگشت درست;
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isContinuous();
+        بازگشت vv[i].isContinuous();
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
+        ثابت Mat* vv = (ثابت Mat*)obj;
         CV_Assert(i >= 0 && i < sz.height);
-        return vv[i].isContinuous();
+        بازگشت vv[i].isContinuous();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isContinuous();
+        بازگشت vv[i].isContinuous();
     }
 
-    if( k == CUDA_GPU_MAT )
-      return i < 0 ? ((const cuda::GpuMat*)obj)->isContinuous() : true;
+    اگر( k == CUDA_GPU_MAT )
+      بازگشت i < 0 ? ((ثابت cuda::GpuMat*)obj)->isContinuous() : درست;
 
-    if( k == CUDA_GPU_MATND )
-        return i < 0 ? ((const cuda::GpuMatND*)obj)->isContinuous() : true;
+    اگر( k == CUDA_GPU_MATND )
+        بازگشت i < 0 ? ((ثابت cuda::GpuMatND*)obj)->isContinuous() : درست;
 
     CV_Error(cv::Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isSubmatrix(int i) const
+منطقی درون_داد_Array_2::isSubmatrix(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
-        return i < 0 ? ((const Mat*)obj)->isSubmatrix() : false;
+    اگر( k == MAT )
+        بازگشت i < 0 ? ((ثابت Mat*)obj)->isSubmatrix() : نادرست;
 
-    if( k == UMAT )
-        return i < 0 ? ((const UMat*)obj)->isSubmatrix() : false;
+    اگر( k == UMAT )
+        بازگشت i < 0 ? ((ثابت UMat*)obj)->isSubmatrix() : نادرست;
 
-    if( k == MATX || k == STD_VECTOR ||
+    اگر( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return false;
+        بازگشت نادرست;
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        بازگشت vv[i].isSubmatrix();
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
+        ثابت Mat* vv = (ثابت Mat*)obj;
         CV_Assert(i >= 0 && i < sz.height);
-        return vv[i].isSubmatrix();
+        بازگشت vv[i].isSubmatrix();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        بازگشت vv[i].isSubmatrix();
     }
 
-    if( k == CUDA_GPU_MATND )
+    اگر( k == CUDA_GPU_MATND )
     {
-        return ((const cuda::GpuMatND*)obj)->isSubmatrix();
+        بازگشت ((ثابت cuda::GpuMatND*)obj)->isSubmatrix();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
+        ثابت std::vector<cuda::GpuMatND>& vv = *(ثابت std::vector<cuda::GpuMatND>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        بازگشت vv[i].isSubmatrix();
     }
 
     CV_Error(cv::Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::offset(int i) const
+size_t درون_داد_Array_2::offset(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat * const m = ((const Mat*)obj);
-        return (size_t)(m->ptr() - m->datastart);
+        ثابت Mat * ثابت m = ((ثابت Mat*)obj);
+        بازگشت (size_t)(m->ptr() - m->datastart);
     }
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->offset;
+        بازگشت ((ثابت UMat*)obj)->offset;
     }
 
-    if( k == MATX || k == STD_VECTOR ||
+    اگر( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return 0;
+        بازگشت 0;
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i >= 0 && i < (int)vv.size() );
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
+        CV_Assert( i >= 0 && i < (صحیح)vv.size() );
 
-        return (size_t)(vv[i].ptr() - vv[i].datastart);
+        بازگشت (size_t)(vv[i].ptr() - vv[i].datastart);
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
+        ثابت Mat* vv = (ثابت Mat*)obj;
         CV_Assert( i >= 0 && i < sz.height );
-        return (size_t)(vv[i].ptr() - vv[i].datastart);
+        بازگشت (size_t)(vv[i].ptr() - vv[i].datastart);
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].offset;
+        بازگشت vv[i].offset;
     }
 
-    if( k == CUDA_GPU_MAT )
+    اگر( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        const cuda::GpuMat * const m = ((const cuda::GpuMat*)obj);
-        return (size_t)(m->data - m->datastart);
+        ثابت cuda::GpuMat * ثابت m = ((ثابت cuda::GpuMat*)obj);
+        بازگشت (size_t)(m->data - m->datastart);
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT)
     {
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
+        ثابت std::vector<cuda::GpuMat>& vv = *(ثابت std::vector<cuda::GpuMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return (size_t)(vv[i].data - vv[i].datastart);
+        بازگشت (size_t)(vv[i].data - vv[i].datastart);
     }
 
     CV_Error(Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::step(int i) const
+size_t درون_داد_Array_2::step(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->step;
+        بازگشت ((ثابت Mat*)obj)->step;
     }
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->step;
+        بازگشت ((ثابت UMat*)obj)->step;
     }
 
-    if( k == MATX || k == STD_VECTOR ||
+    اگر( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return 0;
+        بازگشت 0;
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i >= 0 && i < (int)vv.size() );
-        return vv[i].step;
+        ثابت std::vector<Mat>& vv = *(ثابت std::vector<Mat>*)obj;
+        CV_Assert( i >= 0 && i < (صحیح)vv.size() );
+        بازگشت vv[i].step;
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
+        ثابت Mat* vv = (ثابت Mat*)obj;
         CV_Assert( i >= 0 && i < sz.height );
-        return vv[i].step;
+        بازگشت vv[i].step;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ثابت std::vector<UMat>& vv = *(ثابت std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].step;
+        بازگشت vv[i].step;
     }
 
-    if( k == CUDA_GPU_MAT )
+    اگر( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        return ((const cuda::GpuMat*)obj)->step;
+        بازگشت ((ثابت cuda::GpuMat*)obj)->step;
     }
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT)
     {
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
+        ثابت std::vector<cuda::GpuMat>& vv = *(ثابت std::vector<cuda::GpuMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].step;
+        بازگشت vv[i].step;
     }
-    if( k == CUDA_GPU_MATND )
+    اگر( k == CUDA_GPU_MATND )
     {
-        const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
+        ثابت cuda::GpuMatND& _gpuMatND = *(ثابت cuda::GpuMatND*)obj;
         CV_Assert( i >= 0 && i < _gpuMatND.dims );
-        return _gpuMatND.step[i];
+        بازگشت _gpuMatND.step[i];
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
+        ثابت std::vector<cuda::GpuMatND>& vv = *(ثابت std::vector<cuda::GpuMatND>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        const cuda::GpuMatND& _gpuMatND = vv[i];
+        ثابت cuda::GpuMatND& _gpuMatND = vv[i];
         CV_Assert( _gpuMatND.dims > 0 );
-        return _gpuMatND.step[0];
+        بازگشت _gpuMatND.step[0];
     }
 
     CV_Error(Error::StsNotImplemented, "");
 }
 
-void _InputArray::copyTo(const _OutputArray& arr) const
+تهی درون_داد_Array_2::copyTo(ثابت _OutputArray& arr) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    اگر( k == NONE )
         arr.release();
-    else if( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    وگرنه اگر( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
     {
         Mat m = getMat();
         m.copyTo(arr);
     }
-    else if( k == UMAT )
+    وگرنه اگر( k == UMAT )
         ((UMat*)obj)->copyTo(arr);
 #ifdef HAVE_CUDA
-    else if (k == CUDA_GPU_MAT)
+    وگرنه اگر (k == CUDA_GPU_MAT)
         ((cuda::GpuMat*)obj)->copyTo(arr);
 #endif
-    else
+    وگرنه
         CV_Error(Error::StsNotImplemented, "");
 }
 
-void _InputArray::copyTo(const _OutputArray& arr, const _InputArray & mask) const
+تهی درون_داد_Array_2::copyTo(ثابت _OutputArray& arr, ثابت درون_داد_Array_2 & mask) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    اگر( k == NONE )
         arr.release();
-    else if( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    وگرنه اگر( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
     {
         Mat m = getMat();
         m.copyTo(arr, mask);
     }
-    else if( k == UMAT )
+    وگرنه اگر( k == UMAT )
         ((UMat*)obj)->copyTo(arr, mask);
 #ifdef HAVE_CUDA
-    else if (k == CUDA_GPU_MAT)
+    وگرنه اگر (k == CUDA_GPU_MAT)
         ((cuda::GpuMat*)obj)->copyTo(arr, mask);
 #endif
-    else
+    وگرنه
         CV_Error(Error::StsNotImplemented, "");
 }
 
-bool _OutputArray::fixedSize() const
+منطقی _OutputArray::fixedSize() ثابت
 {
-    return (flags & FIXED_SIZE) == FIXED_SIZE;
+    بازگشت (flags & FIXED_SIZE) == FIXED_SIZE;
 }
 
-bool _OutputArray::fixedType() const
+منطقی _OutputArray::fixedType() ثابت
 {
-    return (flags & FIXED_TYPE) == FIXED_TYPE;
+    بازگشت (flags & FIXED_TYPE) == FIXED_TYPE;
 }
 
-void _OutputArray::create_(Size _sz, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+تهی _OutputArray::create_(Size _sz, صحیح mtype, صحیح i, منطقی allowTransposed, _OutputArray::DepthMask fixedDepthMask) ثابت
 {
-    _InputArray::KindFlag k = kind();
-    if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == _sz);
         CV_Assert(!fixedType() || ((Mat*)obj)->type() == mtype);
         ((Mat*)obj)->create(_sz, mtype);
-        return;
+        بازگشت;
     }
-    if( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((UMat*)obj)->size.operator()() == _sz);
         CV_Assert(!fixedType() || ((UMat*)obj)->type() == mtype);
         ((UMat*)obj)->create(_sz, mtype);
-        return;
+        بازگشت;
     }
-    if( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::GpuMat*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((cuda::GpuMat*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::GpuMat*)obj)->create(_sz, mtype);
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == _sz.height) && (((cuda::GpuMatND*)obj)->size[1] == _sz.width)));
         CV_Assert(!fixedType() || ((cuda::GpuMatND*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         cuda::GpuMatND::SizeArray sizes({_sz.height, _sz.width});
         ((cuda::GpuMatND*)obj)->create(sizes, mtype);
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((ogl::Buffer*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((ogl::Buffer*)obj)->type() == mtype);
 #ifdef HAVE_OPENGL
         ((ogl::Buffer*)obj)->create(_sz, mtype);
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
 #endif
     }
-    if( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::HostMem*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((cuda::HostMem*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::HostMem*)obj)->create(_sz, mtype);
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    int sizes[] = {_sz.height, _sz.width};
+    صحیح sizes[] = {_sz.height, _sz.width};
     create(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::create_(int _rows, int _cols, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+تهی _OutputArray::create_(صحیح _rows, صحیح _cols, صحیح mtype, صحیح i, منطقی allowTransposed, _OutputArray::DepthMask fixedDepthMask) ثابت
 {
-    _InputArray::KindFlag k = kind();
-    if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((Mat*)obj)->type() == mtype);
         ((Mat*)obj)->create(_rows, _cols, mtype);
-        return;
+        بازگشت;
     }
-    if( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((UMat*)obj)->size.operator()() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((UMat*)obj)->type() == mtype);
         ((UMat*)obj)->create(_rows, _cols, mtype);
-        return;
+        بازگشت;
     }
-    if( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::GpuMat*)obj)->size() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((cuda::GpuMat*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::GpuMat*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == _rows) && (((cuda::GpuMatND*)obj)->size[1] == _cols)));
         CV_Assert(!fixedType() || ((cuda::GpuMatND*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         cuda::GpuMatND::SizeArray sizes({_rows, _cols});
         ((cuda::GpuMatND*)obj)->create(sizes, mtype);
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((ogl::Buffer*)obj)->size() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((ogl::Buffer*)obj)->type() == mtype);
 #ifdef HAVE_OPENGL
         ((ogl::Buffer*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
 #endif
     }
-    if( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::HostMem*)obj)->size() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((cuda::HostMem*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::HostMem*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    int sizes[] = {_rows, _cols};
+    صحیح sizes[] = {_rows, _cols};
     create(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::create(int d, const int* sizes, int mtype, int i,
-                          bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+تهی _OutputArray::create(صحیح d, ثابت صحیح* sizes, صحیح mtype, صحیح i,
+                          منطقی allowTransposed, _OutputArray::DepthMask fixedDepthMask) ثابت
 {
-    int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
-    _InputArray::KindFlag k = kind();
+    صحیح size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
+    درون_داد_Array_2::KindFlag k = kind();
     mtype = CV_MAT_TYPE(mtype);
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
         CV_Assert( i < 0 );
         Mat& m = *(Mat*)obj;
         CV_Assert(!(m.empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m.empty() && d <= 2 && m.dims <= 2 &&
+        اگر (!m.empty() && d <= 2 && m.dims <= 2 &&
             m.type() == mtype &&
             ((m.rows == size0 && m.cols == size1) ||
             (allowTransposed && m.rows == size1 && m.cols == size0 && m.isContinuous())))
         {
-            return;
+            بازگشت;
         }
 
-        if(fixedType())
+        اگر(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            اگر(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            وگرنه
                 CV_CheckTypeEQ(m.type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        اگر(fixedSize())
         {
             CV_CheckEQ(m.dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            برای(صحیح j = 0; j < d; ++j)
                 CV_CheckEQ(m.size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m.create(d, sizes, mtype);
-        return;
+        بازگشت;
     }
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
         CV_Assert( i < 0 );
         UMat& m = *(UMat*)obj;
         CV_Assert(!(m.empty() && fixedType() && fixedSize()) && "Can't reallocate empty UMat with locked layout (probably due to misused 'const' modifier)");
-        if (!m.empty() && d <= 2 && m.dims <= 2 &&
+        اگر (!m.empty() && d <= 2 && m.dims <= 2 &&
             m.type() == mtype &&
             ((m.rows == size0 && m.cols == size1) ||
             (allowTransposed && m.rows == size1 && m.cols == size0 && m.isContinuous())))
         {
-            return;
+            بازگشت;
         }
 
-        if(fixedType())
+        اگر(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            اگر(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            وگرنه
                 CV_CheckTypeEQ(m.type(), CV_MAT_TYPE(mtype), "Can't reallocate UMat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        اگر(fixedSize())
         {
             CV_CheckEQ(m.dims, d, "Can't reallocate UMat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            برای(صحیح j = 0; j < d; ++j)
                 CV_CheckEQ(m.size[j], sizes[j], "Can't reallocate UMat with locked size (probably due to misused 'const' modifier)");
         }
         m.create(d, sizes, mtype);
-        return;
+        بازگشت;
     }
 
-    if( k == MATX )
+    اگر( k == MATX )
     {
         CV_Assert( i < 0 );
-        int type0 = CV_MAT_TYPE(flags);
+        صحیح type0 = CV_MAT_TYPE(flags);
         CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == 1 && ((1 << type0) & fixedDepthMask) != 0) );
         CV_CheckLE(d, 2, "");
         Size requested_size(d == 2 ? sizes[1] : 1, d >= 1 ? sizes[0] : 1);
-        if (sz.width == 1 || sz.height == 1)
+        اگر (sz.width == 1 || sz.height == 1)
         {
             // NB: 1D arrays assume allowTransposed=true (see #4159)
-            int total_1d = std::max(sz.width, sz.height);
+            صحیح total_1d = std::max(sz.width, sz.height);
             CV_Check(requested_size, std::max(requested_size.width, requested_size.height) == total_1d, "");
         }
-        else
+        وگرنه
         {
-            if (!allowTransposed)
+            اگر (!allowTransposed)
             {
                 CV_CheckEQ(requested_size, sz, "");
             }
-            else
+            وگرنه
             {
                 CV_Check(requested_size,
                         (requested_size == sz || (requested_size.height == sz.width && requested_size.width == sz.height)),
                         "");
             }
         }
-        return;
+        بازگشت;
     }
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    اگر( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
     {
         CV_Assert(!fixedSize());
         CV_Assert(k == STD_VECTOR_VECTOR || i < 0);
         CV_Assert( d <= 2 && (size0 == 1 || size1 == 1 || size0*size1 == 0) );
         size_t len = size0*size1 > 0 ? size0 + size1 - 1 : 0;
-        int esz = CV_ELEM_SIZE(flags);
+        صحیح esz = CV_ELEM_SIZE(flags);
 
-        if( k == STD_VECTOR || (k == STD_VECTOR_VECTOR && i >= 0) )
+        اگر( k == STD_VECTOR || (k == STD_VECTOR_VECTOR && i >= 0) )
         {
-            int type0 = CV_MAT_TYPE(flags);
+            صحیح type0 = CV_MAT_TYPE(flags);
             CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == CV_MAT_CN(type0) && ((1 << type0) & fixedDepthMask) != 0) );
         }
 
@@ -1694,224 +1694,224 @@ void _OutputArray::create(int d, const int* sizes, int mtype, int i,
     #define RESIZE_VEC(T) \
         { \
             std::vector<T>* v; \
-            if (k == STD_VECTOR_VECTOR) { \
+            اگر (k == STD_VECTOR_VECTOR) { \
                 std::vector<std::vector<T> >* vv = reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
-                if (i < 0) { \
+                اگر (i < 0) { \
                     CV_Assert(!fixedSize() || len == vv->size()); \
                     vv->resize(len); \
-                    return; \
+                    بازگشت; \
                 } \
                 CV_Assert(size_t(i) < vv->size()); \
                 v = &vv->at(i); \
-            } else { \
+            } وگرنه { \
                 v = reinterpret_cast<std::vector<T>*>(obj); \
             } \
             CV_Assert(!fixedSize() || len == v->size()); \
             v->resize(len); \
         } \
-        break
+        بشکن
 
         STD_VECTOR_SWITCH(esz, RESIZE_VEC)
-        return;
+        بازگشت;
     }
 
-    if( k == NONE )
+    اگر( k == NONE )
     {
         CV_Error(cv::Error::StsNullPtr, "create() called for the missing output array" );
     }
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
         std::vector<Mat>& v = *(std::vector<Mat>*)obj;
 
-        if( i < 0 )
+        اگر( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = v.size();
 
             CV_Assert(!fixedSize() || len == len0);
             v.resize(len);
-            if( fixedType() )
+            اگر( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
-                for( size_t j = len0; j < len; j++ )
+                صحیح _type = CV_MAT_TYPE(flags);
+                برای( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
-                        continue;
+                    اگر( v[j].type() == _type )
+                        ادامه;
                     CV_Assert( v[j].empty() );
                     v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
                 }
             }
-            return;
+            بازگشت;
         }
 
-        CV_Assert( i < (int)v.size() );
+        CV_Assert( i < (صحیح)v.size() );
         Mat& m = v[i];
 
-        if( allowTransposed )
+        اگر( allowTransposed )
         {
-            if( !m.isContinuous() )
+            اگر( !m.isContinuous() )
             {
                 CV_Assert(!fixedType() && !fixedSize());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.data &&
+            اگر( d == 2 && m.dims == 2 && m.data &&
                 m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+                بازگشت;
         }
 
-        if(fixedType())
+        اگر(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            اگر(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            وگرنه
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
-        if(fixedSize())
+        اگر(fixedSize())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            برای(صحیح j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        بازگشت;
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
         Mat* v = (Mat*)obj;
 
-        if( i < 0 )
+        اگر( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = sz.height;
 
             CV_Assert(len == len0);
-            if( fixedType() )
+            اگر( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
-                for( size_t j = len0; j < len; j++ )
+                صحیح _type = CV_MAT_TYPE(flags);
+                برای( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
-                        continue;
+                    اگر( v[j].type() == _type )
+                        ادامه;
                     CV_Assert( v[j].empty() );
                     v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
                 }
             }
-            return;
+            بازگشت;
         }
 
         CV_Assert( i < sz.height );
         Mat& m = v[i];
 
-        if( allowTransposed )
+        اگر( allowTransposed )
         {
-            if( !m.isContinuous() )
+            اگر( !m.isContinuous() )
             {
                 CV_Assert(!fixedType() && !fixedSize());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.data &&
+            اگر( d == 2 && m.dims == 2 && m.data &&
                 m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+                بازگشت;
         }
 
-        if(fixedType())
+        اگر(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            اگر(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            وگرنه
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
 
-        if(fixedSize())
+        اگر(fixedSize())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            برای(صحیح j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        بازگشت;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
         std::vector<UMat>& v = *(std::vector<UMat>*)obj;
 
-        if( i < 0 )
+        اگر( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = v.size();
 
             CV_Assert(!fixedSize() || len == len0);
             v.resize(len);
-            if( fixedType() )
+            اگر( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
-                for( size_t j = len0; j < len; j++ )
+                صحیح _type = CV_MAT_TYPE(flags);
+                برای( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
-                        continue;
+                    اگر( v[j].type() == _type )
+                        ادامه;
                     CV_Assert( v[j].empty() );
                     v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
                 }
             }
-            return;
+            بازگشت;
         }
 
-        CV_Assert( i < (int)v.size() );
+        CV_Assert( i < (صحیح)v.size() );
         UMat& m = v[i];
 
-        if( allowTransposed )
+        اگر( allowTransposed )
         {
-            if( !m.isContinuous() )
+            اگر( !m.isContinuous() )
             {
                 CV_Assert(!fixedType() && !fixedSize());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.u &&
+            اگر( d == 2 && m.dims == 2 && m.u &&
                 m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+                بازگشت;
         }
 
-        if(fixedType())
+        اگر(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            اگر(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            وگرنه
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
-        if(fixedSize())
+        اگر(fixedSize())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            برای(صحیح j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        بازگشت;
     }
 
-    if ((k == CUDA_GPU_MAT || k == CUDA_HOST_MEM) && d <= 2 &&
+    اگر ((k == CUDA_GPU_MAT || k == CUDA_HOST_MEM) && d <= 2 &&
         i < 0 && !allowTransposed && fixedDepthMask == 0)
     {
         create((d < 2 ? 1 : sizes[0]), (d < 1 ? 1 : sizes[d > 1]),
                 mtype, i, allowTransposed, fixedDepthMask);
-        return;
+        بازگشت;
     }
 
-    if( k == CUDA_GPU_MATND && d > 0 && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    اگر( k == CUDA_GPU_MATND && d > 0 && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
 #ifdef HAVE_CUDA
         cuda::GpuMatND::SizeArray sizeArray = cuda::GpuMatND::SizeArray(sizes, sizes+d);
         ((cuda::GpuMatND*)obj)->create(sizeArray, mtype);
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
@@ -1920,593 +1920,593 @@ void _OutputArray::create(int d, const int* sizes, int mtype, int i,
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _OutputArray::create(const MatShape& shape, int mtype, int i,
-                          bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+تهی _OutputArray::create(ثابت MatShape& shape, صحیح mtype, صحیح i,
+                          منطقی allowTransposed, _OutputArray::DepthMask fixedDepthMask) ثابت
 {
-    if (shape.dims < 0) {
+    اگر (shape.dims < 0) {
         release();
-    } else {
+    } وگرنه {
         create(shape.dims, shape.p, mtype, i, allowTransposed, fixedDepthMask);
     }
 }
 
-Mat _OutputArray::reinterpret(int mtype) const
+Mat _OutputArray::reinterpret(صحیح mtype) ثابت
 {
     mtype = CV_MAT_TYPE(mtype);
-    return getMat().reinterpret(mtype);
+    بازگشت getMat().reinterpret(mtype);
 }
 
-void _OutputArray::createSameSize(const _InputArray& arr, int mtype) const
+تهی _OutputArray::createSameSize(ثابت درون_داد_Array_2& arr, صحیح mtype) ثابت
 {
     create(arr.shape(), mtype);
 }
 
-void _OutputArray::fit(Size _sz, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+تهی _OutputArray::fit(Size _sz, صحیح mtype, صحیح i,
+                       منطقی allowTransposed, _OutputArray::DepthMask fixedDepthMask) ثابت
 {
-    int sizes[] = {_sz.height, _sz.width};
+    صحیح sizes[] = {_sz.height, _sz.width};
     fit(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::fit(int rows, int cols, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+تهی _OutputArray::fit(صحیح rows, صحیح cols, صحیح mtype, صحیح i,
+                       منطقی allowTransposed, _OutputArray::DepthMask fixedDepthMask) ثابت
 {
-    int sizes[] = {rows, cols};
+    صحیح sizes[] = {rows, cols};
     fit(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::fit(const MatShape& shape, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+تهی _OutputArray::fit(ثابت MatShape& shape, صحیح mtype, صحیح i,
+                       منطقی allowTransposed, _OutputArray::DepthMask fixedDepthMask) ثابت
 {
-    if (shape.dims < 0) {
+    اگر (shape.dims < 0) {
         release();
-        return;
+        بازگشت;
     }
     fit(shape.dims, shape.p, mtype, i, allowTransposed, fixedDepthMask);
 
     // fit(dims, sizes) resets the layout, so carry it over the same way Mat::fit(const MatShape&) does
-    _InputArray::KindFlag k = kind();
-    if ((k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0)) {
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر ((k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0)) {
         MatSize& msize = getMatRef(i).size;
         msize.layout = shape.layout;
         msize.C = shape.C;
-    } else if ((k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0)) {
+    } وگرنه اگر ((k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0)) {
         MatSize& msize = getUMatRef(i).size;
         msize.layout = shape.layout;
         msize.C = shape.C;
     }
 }
 
-void _OutputArray::fitSameSize(const _InputArray& arr, int mtype) const
+تهی _OutputArray::fitSameSize(ثابت درون_داد_Array_2& arr, صحیح mtype) ثابت
 {
     fit(arr.shape(), mtype);
 }
 
-void _OutputArray::fit(int d, const int* sizes, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+تهی _OutputArray::fit(صحیح d, ثابت صحیح* sizes, صحیح mtype, صحیح i,
+                       منطقی allowTransposed, _OutputArray::DepthMask fixedDepthMask) ثابت
 {
-    int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
-    _InputArray::KindFlag k = kind();
+    صحیح size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
+    درون_داد_Array_2::KindFlag k = kind();
     mtype = CV_MAT_TYPE(mtype);
 
-    if( (k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0) )
+    اگر( (k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0) )
     {
         Mat* m;
-        if (k == MAT)
+        اگر (k == MAT)
             m = (Mat*)obj;
-        else {
+        وگرنه {
             std::vector<Mat>& v = *(std::vector<Mat>*)obj;
             CV_Assert((size_t)i < v.size());
             m = &v[i];
         }
         CV_Assert(!(m->empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m->empty() && d <= 2 && m->dims <= 2 &&
+        اگر (!m->empty() && d <= 2 && m->dims <= 2 &&
             m->type() == mtype &&
             ((m->rows == size0 && m->cols == size1) ||
              (allowTransposed && m->rows == size1 && m->cols == size0 && m->isContinuous())))
         {
-            return;
+            بازگشت;
         }
 
-        if(fixedType())
+        اگر(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            اگر(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
                 mtype = m->type();
-            else
+            وگرنه
                 CV_CheckTypeEQ(m->type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        اگر(fixedSize())
         {
             CV_CheckEQ(m->dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            برای(صحیح j = 0; j < d; ++j)
                 CV_CheckEQ(m->size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m->fit(d, sizes, mtype);
-        return;
+        بازگشت;
     }
 
-    if( (k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0) )
+    اگر( (k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0) )
     {
         UMat* m;
-        if (k == UMAT)
+        اگر (k == UMAT)
             m = (UMat*)obj;
-        else {
+        وگرنه {
             std::vector<UMat>& v = *(std::vector<UMat>*)obj;
             CV_Assert((size_t)i < v.size());
             m = &v[i];
         }
         CV_Assert(!(m->empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m->empty() && d <= 2 && m->dims <= 2 &&
+        اگر (!m->empty() && d <= 2 && m->dims <= 2 &&
             m->type() == mtype &&
             ((m->rows == size0 && m->cols == size1) ||
              (allowTransposed && m->rows == size1 && m->cols == size0 && m->isContinuous())))
         {
-            return;
+            بازگشت;
         }
 
-        if(fixedType())
+        اگر(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            اگر(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
                 mtype = m->type();
-            else
+            وگرنه
                 CV_CheckTypeEQ(m->type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        اگر(fixedSize())
         {
             CV_CheckEQ(m->dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            برای(صحیح j = 0; j < d; ++j)
                 CV_CheckEQ(m->size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m->fit(d, sizes, mtype);
-        return;
+        بازگشت;
     }
 
     create(d, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::release() const
+تهی _OutputArray::release() ثابت
 {
     CV_Assert(!fixedSize());
 
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
         ((Mat*)obj)->release();
-        return;
+        بازگشت;
     }
 
-    if( k == UMAT )
+    اگر( k == UMAT )
     {
         ((UMat*)obj)->release();
-        return;
+        بازگشت;
     }
 
-    if( k == CUDA_GPU_MAT )
+    اگر( k == CUDA_GPU_MAT )
     {
 #ifdef HAVE_CUDA
         ((cuda::GpuMat*)obj)->release();
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == CUDA_GPU_MATND )
+    اگر( k == CUDA_GPU_MATND )
     {
 #ifdef HAVE_CUDA
         ((cuda::GpuMatND*)obj)->release();
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == CUDA_HOST_MEM )
+    اگر( k == CUDA_HOST_MEM )
     {
 #ifdef HAVE_CUDA
         ((cuda::HostMem*)obj)->release();
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == OPENGL_BUFFER )
+    اگر( k == OPENGL_BUFFER )
     {
 #ifdef HAVE_OPENGL
         ((ogl::Buffer*)obj)->release();
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
 #endif
     }
 
-    if( k == NONE )
-        return;
+    اگر( k == NONE )
+        بازگشت;
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    اگر( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
     {
     #undef CLEAR_VEC
     #define CLEAR_VEC(T) \
-        if (k == STD_VECTOR_VECTOR) { \
+        اگر (k == STD_VECTOR_VECTOR) { \
             std::vector<std::vector<T> >* vv = \
                 reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
             vv->clear(); \
-        } else { \
+        } وگرنه { \
             std::vector<T>* v = reinterpret_cast<std::vector<T>*>(obj); \
             v->clear(); \
         } \
-        break
+        بشکن
 
-        int esz = CV_ELEM_SIZE(flags);
+        صحیح esz = CV_ELEM_SIZE(flags);
         STD_VECTOR_SWITCH(esz, CLEAR_VEC);
-        return;
+        بازگشت;
     }
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
         ((std::vector<Mat>*)obj)->clear();
-        return;
+        بازگشت;
     }
 
-    if( k == STD_ARRAY_MAT )
+    اگر( k == STD_ARRAY_MAT )
     {
         Mat* v = (Mat*)obj;
-        for( int i = 0; i < sz.height; i++ )
+        برای( صحیح i = 0; i < sz.height; i++ )
             v[i].release();
-        return;
+        بازگشت;
     }
 
-    if( k == STD_BOOL_VECTOR )
+    اگر( k == STD_BOOL_VECTOR )
     {
-        ((std::vector<bool>*)obj)->clear();
-        return;
+        ((std::vector<منطقی>*)obj)->clear();
+        بازگشت;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    اگر( k == STD_VECTOR_UMAT )
     {
         ((std::vector<UMat>*)obj)->clear();
-        return;
+        بازگشت;
     }
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    اگر (k == STD_VECTOR_CUDA_GPU_MAT)
     {
 #ifdef HAVE_CUDA
         ((std::vector<cuda::GpuMat>*)obj)->clear();
-        return;
-#else
+        بازگشت;
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _OutputArray::clear() const
+تهی _OutputArray::clear() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    اگر( k == MAT )
     {
         CV_Assert(!fixedSize());
         ((Mat*)obj)->resize(0);
-        return;
+        بازگشت;
     }
 
     release();
 }
 
-bool _OutputArray::needed() const
+منطقی _OutputArray::needed() ثابت
 {
-    return kind() != NONE;
+    بازگشت kind() != NONE;
 }
 
-Mat& _OutputArray::getMatRef(int i) const
+Mat& _OutputArray::getMatRef(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
-    if( i < 0 )
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر( i < 0 )
     {
         CV_Assert( k == MAT );
-        return *(Mat*)obj;
+        بازگشت *(Mat*)obj;
     }
 
     CV_Assert( k == STD_VECTOR_MAT || k == STD_ARRAY_MAT );
 
-    if( k == STD_VECTOR_MAT )
+    اگر( k == STD_VECTOR_MAT )
     {
         std::vector<Mat>& v = *(std::vector<Mat>*)obj;
-        CV_Assert( i < (int)v.size() );
-        return v[i];
+        CV_Assert( i < (صحیح)v.size() );
+        بازگشت v[i];
     }
-    else
+    وگرنه
     {
         Mat* v = (Mat*)obj;
         CV_Assert( 0 <= i && i < sz.height );
-        return v[i];
+        بازگشت v[i];
     }
 }
 
-UMat& _OutputArray::getUMatRef(int i) const
+UMat& _OutputArray::getUMatRef(صحیح i) ثابت
 {
-    _InputArray::KindFlag k = kind();
-    if( i < 0 )
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر( i < 0 )
     {
         CV_Assert( k == UMAT );
-        return *(UMat*)obj;
+        بازگشت *(UMat*)obj;
     }
-    else
+    وگرنه
     {
         CV_Assert( k == STD_VECTOR_UMAT );
         std::vector<UMat>& v = *(std::vector<UMat>*)obj;
-        CV_Assert( i < (int)v.size() );
-        return v[i];
+        CV_Assert( i < (صحیح)v.size() );
+        بازگشت v[i];
     }
 }
 
-cuda::GpuMat& _OutputArray::getGpuMatRef() const
+cuda::GpuMat& _OutputArray::getGpuMatRef() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     CV_Assert( k == CUDA_GPU_MAT );
-    return *(cuda::GpuMat*)obj;
+    بازگشت *(cuda::GpuMat*)obj;
 }
-std::vector<cuda::GpuMat>& _OutputArray::getGpuMatVecRef() const
+std::vector<cuda::GpuMat>& _OutputArray::getGpuMatVecRef() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT);
-    return *(std::vector<cuda::GpuMat>*)obj;
+    بازگشت *(std::vector<cuda::GpuMat>*)obj;
 }
-cuda::GpuMatND& _OutputArray::getGpuMatNDRef() const
+cuda::GpuMatND& _OutputArray::getGpuMatNDRef() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     CV_Assert( k == CUDA_GPU_MATND );
-    return *(cuda::GpuMatND*)obj;
+    بازگشت *(cuda::GpuMatND*)obj;
 }
 
-std::vector<cuda::GpuMatND>& _OutputArray::getGpuMatNDVecRef() const
+std::vector<cuda::GpuMatND>& _OutputArray::getGpuMatNDVecRef() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT_ND);
-    return *(std::vector<cuda::GpuMatND>*)obj;
+    بازگشت *(std::vector<cuda::GpuMatND>*)obj;
 }
 
-ogl::Buffer& _OutputArray::getOGlBufferRef() const
+ogl::Buffer& _OutputArray::getOGlBufferRef() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     CV_Assert( k == OPENGL_BUFFER );
-    return *(ogl::Buffer*)obj;
+    بازگشت *(ogl::Buffer*)obj;
 }
 
-cuda::HostMem& _OutputArray::getHostMemRef() const
+cuda::HostMem& _OutputArray::getHostMemRef() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
     CV_Assert( k == CUDA_HOST_MEM );
-    return *(cuda::HostMem*)obj;
+    بازگشت *(cuda::HostMem*)obj;
 }
 
-void _OutputArray::setTo(const _InputArray& arr, const _InputArray & mask) const
+تهی _OutputArray::setTo(ثابت درون_داد_Array_2& arr, ثابت درون_داد_Array_2 & mask) ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    اگر( k == NONE )
         ;
-    else if (k == MAT || k == MATX || k == STD_VECTOR)
+    وگرنه اگر (k == MAT || k == MATX || k == STD_VECTOR)
     {
         Mat m = getMat();
         m.setTo(arr, mask);
     }
-    else if( k == UMAT )
+    وگرنه اگر( k == UMAT )
         ((UMat*)obj)->setTo(arr, mask);
-    else if( k == CUDA_GPU_MAT )
+    وگرنه اگر( k == CUDA_GPU_MAT )
     {
 #ifdef HAVE_CUDA
         Mat value = arr.getMat();
-        CV_Assert( checkScalar(value, type(), arr.kind(), _InputArray::CUDA_GPU_MAT) );
-        ((cuda::GpuMat*)obj)->setTo(Scalar(Vec<double, 4>(value.ptr<double>())), mask);
-#else
+        CV_Assert( checkScalar(value, type(), arr.kind(), درون_داد_Array_2::CUDA_GPU_MAT) );
+        ((cuda::GpuMat*)obj)->setTo(Scalar(Vec<دوگانه, 4>(value.ptr<دوگانه>())), mask);
+#وگرنه
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    else
+    وگرنه
         CV_Error(Error::StsNotImplemented, "");
 }
 
-void _OutputArray::setZero() const
+تهی _OutputArray::setZero() ثابت
 {
-    _InputArray::KindFlag k = kind();
+    درون_داد_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    اگر( k == NONE )
         ;
-    else if (k == MAT || k == MATX || k == STD_VECTOR)
+    وگرنه اگر (k == MAT || k == MATX || k == STD_VECTOR)
     {
         Mat m = getMat();
         m.setZero();
     }
-    else
+    وگرنه
     {
         setTo(Scalar::all(0), noArray());
     }
 }
 
-void _OutputArray::assign(const UMat& u) const
+تهی _OutputArray::assign(ثابت UMat& u) ثابت
 {
-    _InputArray::KindFlag k = kind();
-    if (k == UMAT)
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر (k == UMAT)
     {
         *(UMat*)obj = u;
     }
-    else if (k == MAT)
+    وگرنه اگر (k == MAT)
     {
         u.copyTo(*(Mat*)obj); // TODO check u.getMat()
     }
-    else if (k == MATX)
+    وگرنه اگر (k == MATX)
     {
         u.copyTo(getMat()); // TODO check u.getMat()
     }
-    else
+    وگرنه
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::assign(const Mat& m) const
+تهی _OutputArray::assign(ثابت Mat& m) ثابت
 {
-    _InputArray::KindFlag k = kind();
-    if (k == UMAT)
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر (k == UMAT)
     {
         m.copyTo(*(UMat*)obj); // TODO check m.getUMat()
     }
-    else if (k == MAT)
+    وگرنه اگر (k == MAT)
     {
         *(Mat*)obj = m;
     }
-    else if (k == MATX)
+    وگرنه اگر (k == MATX)
     {
         m.copyTo(getMat());
     }
-    else
+    وگرنه
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::move(UMat& u) const
+تهی _OutputArray::move(UMat& u) ثابت
 {
-    if (fixedSize())
+    اگر (fixedSize())
     {
         // TODO Performance warning
         assign(u);
-        return;
+        بازگشت;
     }
-    int k = kind();
-    if (k == UMAT)
+    صحیح k = kind();
+    اگر (k == UMAT)
     {
         *(UMat*)obj = std::move(u);
     }
-    else if (k == MAT)
+    وگرنه اگر (k == MAT)
     {
         u.copyTo(*(Mat*)obj); // TODO check u.getMat()
         u.release();
     }
-    else if (k == MATX)
+    وگرنه اگر (k == MATX)
     {
         u.copyTo(getMat()); // TODO check u.getMat()
         u.release();
     }
-    else
+    وگرنه
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::move(Mat& m) const
+تهی _OutputArray::move(Mat& m) ثابت
 {
-    if (fixedSize())
+    اگر (fixedSize())
     {
         // TODO Performance warning
         assign(m);
-        return;
+        بازگشت;
     }
-    int k = kind();
-    if (k == UMAT)
+    صحیح k = kind();
+    اگر (k == UMAT)
     {
         m.copyTo(*(UMat*)obj); // TODO check m.getUMat()
         m.release();
     }
-    else if (k == MAT)
+    وگرنه اگر (k == MAT)
     {
         *(Mat*)obj = std::move(m);
     }
-    else if (k == MATX)
+    وگرنه اگر (k == MATX)
     {
         m.copyTo(getMat());
         m.release();
     }
-    else
+    وگرنه
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::assign(const std::vector<UMat>& v) const
+تهی _OutputArray::assign(ثابت std::vector<UMat>& v) ثابت
 {
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_UMAT)
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر (k == STD_VECTOR_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        برای (size_t i = 0; i < v.size(); i++)
         {
-            const UMat& m = v[i];
+            ثابت UMat& m = v[i];
             UMat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
+            اگر (this_m.u != پوچ && this_m.u == m.u)
+                ادامه; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else if (k == STD_VECTOR_MAT)
+    وگرنه اگر (k == STD_VECTOR_MAT)
     {
         std::vector<Mat>& this_v = *(std::vector<Mat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        برای (size_t i = 0; i < v.size(); i++)
         {
-            const UMat& m = v[i];
+            ثابت UMat& m = v[i];
             Mat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
+            اگر (this_m.u != پوچ && this_m.u == m.u)
+                ادامه; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else
+    وگرنه
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::assign(const std::vector<Mat>& v) const
+تهی _OutputArray::assign(ثابت std::vector<Mat>& v) ثابت
 {
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_UMAT)
+    درون_داد_Array_2::KindFlag k = kind();
+    اگر (k == STD_VECTOR_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        برای (size_t i = 0; i < v.size(); i++)
         {
-            const Mat& m = v[i];
+            ثابت Mat& m = v[i];
             UMat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
+            اگر (this_m.u != پوچ && this_m.u == m.u)
+                ادامه; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else if (k == STD_VECTOR_MAT)
+    وگرنه اگر (k == STD_VECTOR_MAT)
     {
         std::vector<Mat>& this_v = *(std::vector<Mat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        برای (size_t i = 0; i < v.size(); i++)
         {
-            const Mat& m = v[i];
+            ثابت Mat& m = v[i];
             Mat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
+            اگر (this_m.u != پوچ && this_m.u == m.u)
+                ادامه; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else
+    وگرنه
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-static _InputOutputArray _none;
-InputOutputArray noArray() { return _none; }
+ایستا درون_داد_Output_Array_2 _none;
+درون_داد_Output_Array noArray() { بازگشت _none; }
 
 } // cv::

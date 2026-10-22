@@ -42,7 +42,7 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
 #ifdef HAVE_LAPACK
 #define CV_GEMM_BASELINE_ONLY
@@ -65,171 +65,171 @@
 // bifurcation rather than a single-feature effect, so we simply keep the
 // reference-matching scalar GEMM path on the affected targets.
 #ifndef CV_GEMM_SIMD_ENABLED
-#if defined(__i386__) || defined(_M_IX86) || (defined(__APPLE__) && defined(__x86_64__))
+#اگر defined(__i386__) || defined(_M_IX86) || (defined(__APPLE__) && defined(__x86_64__))
 #define CV_GEMM_SIMD_ENABLED 0
-#else
+#وگرنه
 #define CV_GEMM_SIMD_ENABLED 1
 #endif
 #endif
 
-namespace cv {
+فضاینام cv {
 
 // forward declarations
-typedef void (*TransformFunc)(const void* src, void* dst, const void* m, int len, int scn, int dcn);
-typedef void (*ScaleAddFunc)(const void* src1, const void* src2, void* dst, int len, const void* alpha);
-typedef void (*MulTransposedFunc)(const Mat& src, const/*preallocated*/ Mat& dst, const Mat& delta, double scale);
-typedef double (*MahalanobisImplFunc)(const Mat& v1, const Mat& v2, const Mat& icovar, double *diff_buffer /*[len]*/, int len /*=v1.total()*/);
+تعریفنوع تهی (*TransformFunc)(ثابت تهی* src, تهی* dst, ثابت تهی* m, صحیح len, صحیح scn, صحیح dcn);
+تعریفنوع تهی (*ScaleAddFunc)(ثابت تهی* src1, ثابت تهی* src2, تهی* dst, صحیح len, ثابت تهی* alpha);
+تعریفنوع تهی (*MulTransposedFunc)(ثابت Mat& src, ثابت/*preallocated*/ Mat& dst, ثابت Mat& delta, دوگانه scale);
+تعریفنوع دوگانه (*MahalanobisImplFunc)(ثابت Mat& v1, ثابت Mat& v2, ثابت Mat& icovar, دوگانه *diff_buffer /*[len]*/, صحیح len /*=v1.total()*/);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // forward declarations
 
-void gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-             float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags);
-void gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-             double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags);
-void gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-              float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags);
-void gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-              double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags);
+تهی gemm32f(ثابت اعشاری* src1, size_t src1_step, ثابت اعشاری* src2, size_t src2_step,
+             اعشاری alpha, ثابت اعشاری* src3, size_t src3_step, اعشاری beta, اعشاری* dst, size_t dst_step,
+             صحیح m_a, صحیح n_a, صحیح n_d, صحیح flags);
+تهی gemm64f(ثابت دوگانه* src1, size_t src1_step, ثابت دوگانه* src2, size_t src2_step,
+             دوگانه alpha, ثابت دوگانه* src3, size_t src3_step, دوگانه beta, دوگانه* dst, size_t dst_step,
+             صحیح m_a, صحیح n_a, صحیح n_d, صحیح flags);
+تهی gemm32fc(ثابت اعشاری* src1, size_t src1_step, ثابت اعشاری* src2, size_t src2_step,
+              اعشاری alpha, ثابت اعشاری* src3, size_t src3_step, اعشاری beta, اعشاری* dst, size_t dst_step,
+              صحیح m_a, صحیح n_a, صحیح n_d, صحیح flags);
+تهی gemm64fc(ثابت دوگانه* src1, size_t src1_step, ثابت دوگانه* src2, size_t src2_step,
+              دوگانه alpha, ثابت دوگانه* src3, size_t src3_step, دوگانه beta, دوگانه* dst, size_t dst_step,
+              صحیح m_a, صحیح n_a, صحیح n_d, صحیح flags);
 
-TransformFunc getTransformFunc(int depth);
-TransformFunc getDiagTransformFunc(int depth);
-TransformFunc getPerspectiveTransform(int depth);
+TransformFunc getTransformFunc(صحیح depth);
+TransformFunc getDiagTransformFunc(صحیح depth);
+TransformFunc getPerspectiveTransform(صحیح depth);
 
-ScaleAddFunc getScaleAddFunc(int depth);
+ScaleAddFunc getScaleAddFunc(صحیح depth);
 
-MahalanobisImplFunc getMahalanobisImplFunc(int depth);
+MahalanobisImplFunc getMahalanobisImplFunc(صحیح depth);
 
-MulTransposedFunc getMulTransposedFunc(int stype, int dtype, bool ata);
+MulTransposedFunc getMulTransposedFunc(صحیح stype, صحیح dtype, منطقی ata);
 
-double dotProd_8u(const uchar* src1, const uchar* src2, int len);
-double dotProd_8s(const schar* src1, const schar* src2, int len);
-double dotProd_16u(const ushort* src1, const ushort* src2, int len);
-double dotProd_16s(const short* src1, const short* src2, int len);
-double dotProd_32s(const int* src1, const int* src2, int len);
-double dotProd_32f(const float* src1, const float* src2, int len);
-double dotProd_64f(const double* src1, const double* src2, int len);
+دوگانه dotProd_8u(ثابت uchar* src1, ثابت uchar* src2, صحیح len);
+دوگانه dotProd_8s(ثابت schar* src1, ثابت schar* src2, صحیح len);
+دوگانه dotProd_16u(ثابت ushort* src1, ثابت ushort* src2, صحیح len);
+دوگانه dotProd_16s(ثابت short* src1, ثابت short* src2, صحیح len);
+دوگانه dotProd_32s(ثابت صحیح* src1, ثابت صحیح* src2, صحیح len);
+دوگانه dotProd_32f(ثابت اعشاری* src1, ثابت اعشاری* src2, صحیح len);
+دوگانه dotProd_64f(ثابت دوگانه* src1, ثابت دوگانه* src2, صحیح len);
 
 
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-#if !defined(CV_GEMM_BASELINE_ONLY) || defined(CV_CPU_BASELINE_MODE)
+#اگر !defined(CV_GEMM_BASELINE_ONLY) || defined(CV_CPU_BASELINE_MODE)
 /****************************************************************************************\
 *                                         GEMM                                           *
 \****************************************************************************************/
 
-static void
-GEMM_CopyBlock( const uchar* src, size_t src_step,
+ایستا تهی
+GEMM_CopyBlock( ثابت uchar* src, size_t src_step,
                 uchar* dst, size_t dst_step,
                 Size size, size_t pix_size )
 {
-    int j;
-    size.width *= (int)(pix_size / sizeof(int));
+    صحیح j;
+    size.width *= (صحیح)(pix_size / اندازه(صحیح));
 
-    for( ; size.height--; src += src_step, dst += dst_step )
+    برای( ; size.height--; src += src_step, dst += dst_step )
     {
         j=0;
-         #if CV_ENABLE_UNROLLED
-        for( ; j <= size.width - 4; j += 4 )
+         #اگر CV_ENABLE_UNROLLED
+        برای( ; j <= size.width - 4; j += 4 )
         {
-            int t0 = ((const int*)src)[j];
-            int t1 = ((const int*)src)[j+1];
-            ((int*)dst)[j] = t0;
-            ((int*)dst)[j+1] = t1;
-            t0 = ((const int*)src)[j+2];
-            t1 = ((const int*)src)[j+3];
-            ((int*)dst)[j+2] = t0;
-            ((int*)dst)[j+3] = t1;
+            صحیح t0 = ((ثابت صحیح*)src)[j];
+            صحیح t1 = ((ثابت صحیح*)src)[j+1];
+            ((صحیح*)dst)[j] = t0;
+            ((صحیح*)dst)[j+1] = t1;
+            t0 = ((ثابت صحیح*)src)[j+2];
+            t1 = ((ثابت صحیح*)src)[j+3];
+            ((صحیح*)dst)[j+2] = t0;
+            ((صحیح*)dst)[j+3] = t1;
         }
         #endif
-        for( ; j < size.width; j++ )
-            ((int*)dst)[j] = ((const int*)src)[j];
+        برای( ; j < size.width; j++ )
+            ((صحیح*)dst)[j] = ((ثابت صحیح*)src)[j];
     }
 }
 
 
-static void
-GEMM_TransposeBlock( const uchar* src, size_t src_step,
+ایستا تهی
+GEMM_TransposeBlock( ثابت uchar* src, size_t src_step,
                      uchar* dst, size_t dst_step,
                      Size size, size_t pix_size )
 {
-    int i, j;
-    for( i = 0; i < size.width; i++, dst += dst_step, src += pix_size )
+    صحیح i, j;
+    برای( i = 0; i < size.width; i++, dst += dst_step, src += pix_size )
     {
-        const uchar* _src = src;
-        switch( pix_size )
+        ثابت uchar* _src = src;
+        انتخاب( pix_size )
         {
-        case sizeof(int):
-            for( j = 0; j < size.height; j++, _src += src_step )
-                ((int*)dst)[j] = ((int*)_src)[0];
-            break;
-        case sizeof(int)*2:
-            for( j = 0; j < size.height*2; j += 2, _src += src_step )
+        حالت اندازه(صحیح):
+            برای( j = 0; j < size.height; j++, _src += src_step )
+                ((صحیح*)dst)[j] = ((صحیح*)_src)[0];
+            بشکن;
+        حالت اندازه(صحیح)*2:
+            برای( j = 0; j < size.height*2; j += 2, _src += src_step )
             {
-                int t0 = ((int*)_src)[0];
-                int t1 = ((int*)_src)[1];
-                ((int*)dst)[j] = t0;
-                ((int*)dst)[j+1] = t1;
+                صحیح t0 = ((صحیح*)_src)[0];
+                صحیح t1 = ((صحیح*)_src)[1];
+                ((صحیح*)dst)[j] = t0;
+                ((صحیح*)dst)[j+1] = t1;
             }
-            break;
-        case sizeof(int)*4:
-            for( j = 0; j < size.height*4; j += 4, _src += src_step )
+            بشکن;
+        حالت اندازه(صحیح)*4:
+            برای( j = 0; j < size.height*4; j += 4, _src += src_step )
             {
-                int t0 = ((int*)_src)[0];
-                int t1 = ((int*)_src)[1];
-                ((int*)dst)[j] = t0;
-                ((int*)dst)[j+1] = t1;
-                t0 = ((int*)_src)[2];
-                t1 = ((int*)_src)[3];
-                ((int*)dst)[j+2] = t0;
-                ((int*)dst)[j+3] = t1;
+                صحیح t0 = ((صحیح*)_src)[0];
+                صحیح t1 = ((صحیح*)_src)[1];
+                ((صحیح*)dst)[j] = t0;
+                ((صحیح*)dst)[j+1] = t1;
+                t0 = ((صحیح*)_src)[2];
+                t1 = ((صحیح*)_src)[3];
+                ((صحیح*)dst)[j+2] = t0;
+                ((صحیح*)dst)[j+3] = t1;
             }
-            break;
-        default:
+            بشکن;
+        پیشفرض:
             CV_Assert(0);
-            return;
+            بازگشت;
         }
     }
 }
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-template<typename ST> struct VecTraits;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+template<typename ST> ساختار VecTraits;
 
-template<> struct VecTraits<float> {
-    typedef v_float32 VT;
-    static inline VT zero() { return vx_setzero_f32(); }
-    static inline VT load(const float* p) { return vx_load(p); }
-    static inline VT setall(float v) { return vx_setall_f32(v); }
+template<> ساختار VecTraits<اعشاری> {
+    تعریفنوع v_float32 VT;
+    ایستا درونخطی VT zero() { بازگشت vx_setzero_f32(); }
+    ایستا درونخطی VT load(ثابت اعشاری* p) { بازگشت vx_load(p); }
+    ایستا درونخطی VT setall(اعشاری v) { بازگشت vx_setall_f32(v); }
 };
 #endif
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-template<> struct VecTraits<double> {
-    typedef v_float64 VT;
-    static inline VT zero() { return vx_setzero_f64(); }
-    static inline VT load(const double* p) { return vx_load(p); }
-    static inline VT setall(double v) { return vx_setall_f64(v); }
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+template<> ساختار VecTraits<دوگانه> {
+    تعریفنوع v_float64 VT;
+    ایستا درونخطی VT zero() { بازگشت vx_setzero_f64(); }
+    ایستا درونخطی VT load(ثابت دوگانه* p) { بازگشت vx_load(p); }
+    ایستا درونخطی VT setall(دوگانه v) { بازگشت vx_setall_f64(v); }
 };
 #endif
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
 template<typename ST>
-static inline ST simdDotProduct(const ST* a, const ST* b, int n, int& k)
+ایستا درونخطی ST simdDotProduct(ثابت ST* a, ثابت ST* b, صحیح n, صحیح& k)
 {
-    typedef typename VecTraits<ST>::VT VecT;
-    const int vlanes = VTraits<VecT>::vlanes();
-    const int stride4 = vlanes * 4;
+    تعریفنوع typename VecTraits<ST>::VT VecT;
+    ثابت صحیح vlanes = VTraits<VecT>::vlanes();
+    ثابت صحیح stride4 = vlanes * 4;
     VecT vs0 = VecTraits<ST>::zero();
     VecT vs1 = VecTraits<ST>::zero();
     VecT vs2 = VecTraits<ST>::zero();
     VecT vs3 = VecTraits<ST>::zero();
-    for( ; k <= n - stride4; k += stride4 )
+    برای( ; k <= n - stride4; k += stride4 )
     {
         vs0 = v_muladd(VecTraits<ST>::load(a + k),              VecTraits<ST>::load(b + k),              vs0);
         vs1 = v_muladd(VecTraits<ST>::load(a + k + vlanes),     VecTraits<ST>::load(b + k + vlanes),     vs1);
@@ -237,83 +237,83 @@ static inline ST simdDotProduct(const ST* a, const ST* b, int n, int& k)
         vs3 = v_muladd(VecTraits<ST>::load(a + k + vlanes * 3), VecTraits<ST>::load(b + k + vlanes * 3), vs3);
     }
     vs0 = v_add(v_add(vs0, vs1), v_add(vs2, vs3));
-    for( ; k <= n - vlanes; k += vlanes )
+    برای( ; k <= n - vlanes; k += vlanes )
         vs0 = v_muladd(VecTraits<ST>::load(a + k), VecTraits<ST>::load(b + k), vs0);
-    return v_reduce_sum(vs0);
+    بازگشت v_reduce_sum(vs0);
 }
 #endif
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 // Float input, double accumulation dot product (for 32FC1 where WT=double)
-static inline double simdDotProduct_f32f64(const float* a, const float* b, int n, int& k)
+ایستا درونخطی دوگانه simdDotProduct_f32f64(ثابت اعشاری* a, ثابت اعشاری* b, صحیح n, صحیح& k)
 {
-    const int vlanes_f32 = VTraits<v_float32>::vlanes();
-    const int stride2 = vlanes_f32 * 2;
+    ثابت صحیح vlanes_f32 = VTraits<v_float32>::vlanes();
+    ثابت صحیح stride2 = vlanes_f32 * 2;
     v_float64 vs0 = vx_setzero_f64();
     v_float64 vs1 = vx_setzero_f64();
     v_float64 vs2 = vx_setzero_f64();
     v_float64 vs3 = vx_setzero_f64();
-    for( ; k <= n - stride2; k += stride2 )
+    برای( ; k <= n - stride2; k += stride2 )
     {
         v_float32 va0 = vx_load(a + k);
         v_float32 vb0 = vx_load(b + k);
         vs0 = v_muladd(v_cvt_f64(va0), v_cvt_f64(vb0), vs0);
-        vs1 = v_muladd(v_cvt_f64_high(va0), v_cvt_f64_high(vb0), vs1);
+        vs1 = v_muladd(v_cvt_f64_بالا(va0), v_cvt_f64_بالا(vb0), vs1);
 
         v_float32 va1 = vx_load(a + k + vlanes_f32);
         v_float32 vb1 = vx_load(b + k + vlanes_f32);
         vs2 = v_muladd(v_cvt_f64(va1), v_cvt_f64(vb1), vs2);
-        vs3 = v_muladd(v_cvt_f64_high(va1), v_cvt_f64_high(vb1), vs3);
+        vs3 = v_muladd(v_cvt_f64_بالا(va1), v_cvt_f64_بالا(vb1), vs3);
     }
     vs0 = v_add(v_add(vs0, vs1), v_add(vs2, vs3));
-    for( ; k <= n - vlanes_f32; k += vlanes_f32 )
+    برای( ; k <= n - vlanes_f32; k += vlanes_f32 )
     {
         v_float32 va = vx_load(a + k);
         v_float32 vb = vx_load(b + k);
         vs0 = v_muladd(v_cvt_f64(va), v_cvt_f64(vb), vs0);
-        vs0 = v_muladd(v_cvt_f64_high(va), v_cvt_f64_high(vb), vs0);
+        vs0 = v_muladd(v_cvt_f64_بالا(va), v_cvt_f64_بالا(vb), vs0);
     }
-    return v_reduce_sum(vs0);
+    بازگشت v_reduce_sum(vs0);
 }
 
 // Float input, double accumulation GEMM k-outer/j-inner (for 32FC1 where WT=double)
-static inline void simdGEMM_kj_f32f64(
-    const float* a_data, const float* _b_data, size_t b_step,
-    const float* _c_data, size_t c_step1,
-    float* d_data,
-    int n, int m,
-    double alpha, double beta,
-    int& j)
+ایستا درونخطی تهی simdGEMM_kj_f32f64(
+    ثابت اعشاری* a_data, ثابت اعشاری* _b_data, size_t b_step,
+    ثابت اعشاری* _c_data, size_t c_step1,
+    اعشاری* d_data,
+    صحیح n, صحیح m,
+    دوگانه alpha, دوگانه beta,
+    صحیح& j)
 {
-    const int vlanes_f32 = VTraits<v_float32>::vlanes();
-    const int vlanes_f64 = VTraits<v_float64>::vlanes();
+    ثابت صحیح vlanes_f32 = VTraits<v_float32>::vlanes();
+    ثابت صحیح vlanes_f64 = VTraits<v_float64>::vlanes();
 
-    if( m >= 2 * vlanes_f32 && n >= 64 )
+    اگر( m >= 2 * vlanes_f32 && n >= 64 )
     {
         // k-outer / j-inner with double accumulation
-        const int max_m = 1600 / (int)sizeof(float);
-        cv::AutoBuffer<double> _s_buf(max_m);
-        double* s_buf = _s_buf.data();
+        ثابت صحیح max_m = 1600 / (صحیح)اندازه(اعشاری);
+        cv::AutoBuffer<دوگانه> _s_buf(max_m);
+        دوگانه* s_buf = _s_buf.data();
 
         {
             v_float64 vz = vx_setzero_f64();
-            for( j = 0; j <= m - vlanes_f64; j += vlanes_f64 )
+            برای( j = 0; j <= m - vlanes_f64; j += vlanes_f64 )
                 v_store(s_buf + j, vz);
-            for( ; j < m; j++ )
+            برای( ; j < m; j++ )
                 s_buf[j] = 0.0;
         }
 
         {
-            const float* b_ptr = _b_data;
-            for( int k = 0; k < n; k++, b_ptr += b_step )
+            ثابت اعشاری* b_ptr = _b_data;
+            برای( صحیح k = 0; k < n; k++, b_ptr += b_step )
             {
-                v_float64 va = vx_setall_f64((double)a_data[k]);
+                v_float64 va = vx_setall_f64((دوگانه)a_data[k]);
                 j = 0;
-                for( ; j <= m - vlanes_f32; j += vlanes_f32 )
+                برای( ; j <= m - vlanes_f32; j += vlanes_f32 )
                 {
                     v_float32 vb = vx_load(b_ptr + j);
                     v_float64 vb_lo = v_cvt_f64(vb);
-                    v_float64 vb_hi = v_cvt_f64_high(vb);
+                    v_float64 vb_hi = v_cvt_f64_بالا(vb);
                     v_float64 vd_lo = vx_load(s_buf + j);
                     v_float64 vd_hi = vx_load(s_buf + j + vlanes_f64);
                     vd_lo = v_muladd(va, vb_lo, vd_lo);
@@ -321,127 +321,127 @@ static inline void simdGEMM_kj_f32f64(
                     v_store(s_buf + j, vd_lo);
                     v_store(s_buf + j + vlanes_f64, vd_hi);
                 }
-                double a_val = (double)a_data[k];
-                for( ; j < m; j++ )
-                    s_buf[j] += a_val * (double)b_ptr[j];
+                دوگانه a_val = (دوگانه)a_data[k];
+                برای( ; j < m; j++ )
+                    s_buf[j] += a_val * (دوگانه)b_ptr[j];
             }
         }
 
         {
             v_float64 valpha = vx_setall_f64(alpha);
-            const float* c_data = _c_data;
+            ثابت اعشاری* c_data = _c_data;
             j = 0;
-            if( !_c_data )
+            اگر( !_c_data )
             {
-                for( ; j <= m - vlanes_f32; j += vlanes_f32 )
+                برای( ; j <= m - vlanes_f32; j += vlanes_f32 )
                 {
                     v_float64 vs_lo = v_mul(vx_load(s_buf + j), valpha);
                     v_float64 vs_hi = v_mul(vx_load(s_buf + j + vlanes_f64), valpha);
                     v_store(d_data + j, v_cvt_f32(vs_lo, vs_hi));
                 }
-                for( ; j < m; j++ )
-                    d_data[j] = (float)(s_buf[j] * alpha);
+                برای( ; j < m; j++ )
+                    d_data[j] = (اعشاری)(s_buf[j] * alpha);
             }
-            else if( c_step1 == 1 )
+            وگرنه اگر( c_step1 == 1 )
             {
                 v_float64 vbeta = vx_setall_f64(beta);
-                for( ; j <= m - vlanes_f32; j += vlanes_f32 )
+                برای( ; j <= m - vlanes_f32; j += vlanes_f32 )
                 {
                     v_float64 vs_lo = v_mul(vx_load(s_buf + j), valpha);
                     v_float64 vs_hi = v_mul(vx_load(s_buf + j + vlanes_f64), valpha);
                     v_float32 vc = vx_load(c_data + j);
                     vs_lo = v_muladd(v_cvt_f64(vc), vbeta, vs_lo);
-                    vs_hi = v_muladd(v_cvt_f64_high(vc), vbeta, vs_hi);
+                    vs_hi = v_muladd(v_cvt_f64_بالا(vc), vbeta, vs_hi);
                     v_store(d_data + j, v_cvt_f32(vs_lo, vs_hi));
                 }
-                for( ; j < m; j++ )
-                    d_data[j] = (float)(s_buf[j] * alpha + (double)c_data[j] * beta);
+                برای( ; j < m; j++ )
+                    d_data[j] = (اعشاری)(s_buf[j] * alpha + (دوگانه)c_data[j] * beta);
             }
-            else
+            وگرنه
             {
-                for( j = 0; j < m; j++, c_data += c_step1 )
-                    d_data[j] = (float)(s_buf[j] * alpha + (double)c_data[0] * beta);
+                برای( j = 0; j < m; j++, c_data += c_step1 )
+                    d_data[j] = (اعشاری)(s_buf[j] * alpha + (دوگانه)c_data[0] * beta);
             }
         }
         j = m;
     }
-    else if( vlanes_f32 * (int)sizeof(float) >= 32 )
+    وگرنه اگر( vlanes_f32 * (صحیح)اندازه(اعشاری) >= 32 )
     {
         // j-outer with SIMD: double accumulation per vlanes_f64 group
-        const float* c_data = _c_data;
-        for( ; j <= m - vlanes_f32; j += vlanes_f32, c_data += vlanes_f32 * c_step1 )
+        ثابت اعشاری* c_data = _c_data;
+        برای( ; j <= m - vlanes_f32; j += vlanes_f32, c_data += vlanes_f32 * c_step1 )
         {
-            const float* b = _b_data + j;
+            ثابت اعشاری* b = _b_data + j;
             v_float64 vs_lo = vx_setzero_f64();
             v_float64 vs_hi = vx_setzero_f64();
-            for( int k = 0; k < n; k++, b += b_step )
+            برای( صحیح k = 0; k < n; k++, b += b_step )
             {
-                v_float64 va = vx_setall_f64((double)a_data[k]);
+                v_float64 va = vx_setall_f64((دوگانه)a_data[k]);
                 v_float32 vb = vx_load(b);
                 vs_lo = v_muladd(va, v_cvt_f64(vb), vs_lo);
-                vs_hi = v_muladd(va, v_cvt_f64_high(vb), vs_hi);
+                vs_hi = v_muladd(va, v_cvt_f64_بالا(vb), vs_hi);
             }
             v_float64 valpha = vx_setall_f64(alpha);
             vs_lo = v_mul(vs_lo, valpha);
             vs_hi = v_mul(vs_hi, valpha);
-            if( !_c_data )
+            اگر( !_c_data )
             {
                 v_store(d_data + j, v_cvt_f32(vs_lo, vs_hi));
             }
-            else if( c_step1 == 1 )
+            وگرنه اگر( c_step1 == 1 )
             {
                 v_float64 vbeta = vx_setall_f64(beta);
                 v_float32 vc = vx_load(c_data);
                 vs_lo = v_muladd(v_cvt_f64(vc), vbeta, vs_lo);
-                vs_hi = v_muladd(v_cvt_f64_high(vc), vbeta, vs_hi);
+                vs_hi = v_muladd(v_cvt_f64_بالا(vc), vbeta, vs_hi);
                 v_store(d_data + j, v_cvt_f32(vs_lo, vs_hi));
             }
-            else
+            وگرنه
             {
-                CV_DECL_ALIGNED(CV_SIMD_WIDTH) float buf[VTraits<v_float32>::max_nlanes];
+                CV_DECL_ALIGNED(CV_SIMD_WIDTH) اعشاری buf[VTraits<v_float32>::max_nlanes];
                 v_store_aligned(buf, v_cvt_f32(vs_lo, vs_hi));
-                for( int jj = 0; jj < vlanes_f32; jj++ )
-                    d_data[j + jj] = buf[jj] + c_data[jj * c_step1] * (float)beta;
+                برای( صحیح jj = 0; jj < vlanes_f32; jj++ )
+                    d_data[j + jj] = buf[jj] + c_data[jj * c_step1] * (اعشاری)beta;
             }
         }
     }
 }
 #endif
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
 template<typename ST>
-static inline void simdGEMM_kj(
-    const ST* a_data, const ST* _b_data, size_t b_step,
-    const ST* _c_data, size_t c_step1,
+ایستا درونخطی تهی simdGEMM_kj(
+    ثابت ST* a_data, ثابت ST* _b_data, size_t b_step,
+    ثابت ST* _c_data, size_t c_step1,
     ST* d_data,
-    int n, int m,
-    double alpha, double beta,
-    int& j)
+    صحیح n, صحیح m,
+    دوگانه alpha, دوگانه beta,
+    صحیح& j)
 {
-    typedef typename VecTraits<ST>::VT VecT;
-    const int vlanes = VTraits<VecT>::vlanes();
+    تعریفنوع typename VecTraits<ST>::VT VecT;
+    ثابت صحیح vlanes = VTraits<VecT>::vlanes();
 
-    if( m >= 2 * vlanes && n >= 64 )
+    اگر( m >= 2 * vlanes && n >= 64 )
     {
         // k-outer / j-inner SIMD: sequential B-row access, good for large n
-        const int max_m = 1600 / (int)sizeof(ST);
+        ثابت صحیح max_m = 1600 / (صحیح)اندازه(ST);
         CV_DECL_ALIGNED(CV_SIMD_WIDTH) ST s_buf[max_m];
 
         {
             VecT vz = VecTraits<ST>::zero();
-            for( j = 0; j <= m - vlanes; j += vlanes )
+            برای( j = 0; j <= m - vlanes; j += vlanes )
                 v_store_aligned(s_buf + j, vz);
-            for( ; j < m; j++ )
+            برای( ; j < m; j++ )
                 s_buf[j] = (ST)0;
         }
 
         {
-            const ST* b_ptr = _b_data;
-            for( int k = 0; k < n; k++, b_ptr += b_step )
+            ثابت ST* b_ptr = _b_data;
+            برای( صحیح k = 0; k < n; k++, b_ptr += b_step )
             {
                 VecT va = VecTraits<ST>::setall(a_data[k]);
                 j = 0;
-                for( ; j <= m - vlanes; j += vlanes )
+                برای( ; j <= m - vlanes; j += vlanes )
                 {
                     VecT vd = vx_load_aligned(s_buf + j);
                     VecT vb = VecTraits<ST>::load(b_ptr + j);
@@ -449,78 +449,78 @@ static inline void simdGEMM_kj(
                     v_store_aligned(s_buf + j, vd);
                 }
                 ST a_val = a_data[k];
-                for( ; j < m; j++ )
+                برای( ; j < m; j++ )
                     s_buf[j] += a_val * b_ptr[j];
             }
         }
 
         {
             VecT valpha = VecTraits<ST>::setall((ST)alpha);
-            const ST* c_data = _c_data;
+            ثابت ST* c_data = _c_data;
             j = 0;
-            if( !_c_data )
+            اگر( !_c_data )
             {
-                for( ; j <= m - vlanes; j += vlanes )
+                برای( ; j <= m - vlanes; j += vlanes )
                 {
                     VecT vs = v_mul(vx_load_aligned(s_buf + j), valpha);
                     v_store(d_data + j, vs);
                 }
-                for( ; j < m; j++ )
+                برای( ; j < m; j++ )
                     d_data[j] = s_buf[j] * (ST)alpha;
             }
-            else if( c_step1 == 1 )
+            وگرنه اگر( c_step1 == 1 )
             {
                 VecT vbeta = VecTraits<ST>::setall((ST)beta);
-                for( ; j <= m - vlanes; j += vlanes )
+                برای( ; j <= m - vlanes; j += vlanes )
                 {
                     VecT vs = v_mul(vx_load_aligned(s_buf + j), valpha);
                     VecT vc = VecTraits<ST>::load(c_data + j);
                     vs = v_muladd(vc, vbeta, vs);
                     v_store(d_data + j, vs);
                 }
-                for( ; j < m; j++ )
+                برای( ; j < m; j++ )
                     d_data[j] = s_buf[j] * (ST)alpha + c_data[j] * (ST)beta;
             }
-            else
+            وگرنه
             {
-                for( j = 0; j < m; j++, c_data += c_step1 )
+                برای( j = 0; j < m; j++, c_data += c_step1 )
                     d_data[j] = s_buf[j] * (ST)alpha + c_data[0] * (ST)beta;
             }
         }
         j = m; // all columns handled
     }
-    else if( vlanes * (int)sizeof(ST) >= 32 )
+    وگرنه اگر( vlanes * (صحیح)اندازه(ST) >= 32 )
     {
         // j-outer with SIMD: process vlanes columns per group
         // (skip on narrow SIMD where 4-column scalar is faster)
         VecT valpha = VecTraits<ST>::setall((ST)alpha);
-        const ST* c_data = _c_data;
-        for( ; j <= m - vlanes; j += vlanes, c_data += vlanes * c_step1 )
+        ثابت ST* c_data = _c_data;
+        برای( ; j <= m - vlanes; j += vlanes, c_data += vlanes * c_step1 )
         {
-            const ST* b = _b_data + j;
+            ثابت ST* b = _b_data + j;
             VecT vs = VecTraits<ST>::zero();
-            for( int k = 0; k < n; k++, b += b_step )
+            برای( صحیح k = 0; k < n; k++, b += b_step )
             {
                 VecT va = VecTraits<ST>::setall(a_data[k]);
                 VecT vb = VecTraits<ST>::load(b);
                 vs = v_muladd(va, vb, vs);
             }
             vs = v_mul(vs, valpha);
-            if( !_c_data )
+            اگر( !_c_data )
             {
                 v_store(d_data + j, vs);
             }
-            else if( c_step1 == 1 )
+            وگرنه اگر( c_step1 == 1 )
             {
                 VecT vc = VecTraits<ST>::load(c_data);
                 vs = v_muladd(vc, VecTraits<ST>::setall((ST)beta), vs);
                 v_store(d_data + j, vs);
             }
-            else
+            وگرنه
             {
                 CV_DECL_ALIGNED(CV_SIMD_WIDTH) ST buf[VTraits<VecT>::max_nlanes];
                 v_store_aligned(buf, vs);
-                for( int jj = 0; jj < vlanes; jj++ )
+                برای( صحیح jj = 0; jj < vlanes; jj++ )
                     d_data[j + jj] = buf[jj] + c_data[jj * c_step1] * (ST)beta;
             }
         }
@@ -530,132 +530,132 @@ static inline void simdGEMM_kj(
 #endif
 
 
-template<typename T, typename WT> static void
-GEMMSingleMul( const T* a_data, size_t a_step,
-               const T* b_data, size_t b_step,
-               const T* c_data, size_t c_step,
+template<typename T, typename WT> ایستا تهی
+GEMMSingleMul( ثابت T* a_data, size_t a_step,
+               ثابت T* b_data, size_t b_step,
+               ثابت T* c_data, size_t c_step,
                T* d_data, size_t d_step,
                Size a_size, Size d_size,
-               double alpha, double beta, int flags )
+               دوگانه alpha, دوگانه beta, صحیح flags )
 {
-    int i, j, k, n = a_size.width, m = d_size.width, drows = d_size.height;
-    const T *_a_data = a_data, *_b_data = b_data, *_c_data = c_data;
+    صحیح i, j, k, n = a_size.width, m = d_size.width, drows = d_size.height;
+    ثابت T *_a_data = a_data, *_b_data = b_data, *_c_data = c_data;
     cv::AutoBuffer<T> _a_buf;
     T* a_buf = 0;
     size_t a_step0, a_step1, c_step0, c_step1, t_step;
 
-    a_step /= sizeof(a_data[0]);
-    b_step /= sizeof(b_data[0]);
-    c_step /= sizeof(c_data[0]);
-    d_step /= sizeof(d_data[0]);
+    a_step /= اندازه(a_data[0]);
+    b_step /= اندازه(b_data[0]);
+    c_step /= اندازه(c_data[0]);
+    d_step /= اندازه(d_data[0]);
     a_step0 = a_step;
     a_step1 = 1;
 
-    if( !c_data )
+    اگر( !c_data )
         c_step0 = c_step1 = 0;
-    else if( !(flags & GEMM_3_T) )
+    وگرنه اگر( !(flags & GEMM_3_T) )
         c_step0 = c_step, c_step1 = 1;
-    else
+    وگرنه
         c_step0 = 1, c_step1 = c_step;
 
-    if( flags & GEMM_1_T )
+    اگر( flags & GEMM_1_T )
     {
         CV_SWAP( a_step0, a_step1, t_step );
         n = a_size.height;
-        if( a_step > 1 && n > 1 )
+        اگر( a_step > 1 && n > 1 )
         {
             _a_buf.allocate(n);
             a_buf = _a_buf.data();
         }
     }
 
-    if( n == 1 ) /* external product */
+    اگر( n == 1 ) /* external product */
     {
         cv::AutoBuffer<T> _b_buf;
         T* b_buf = 0;
 
-        if( a_step > 1 && a_size.height > 1 )
+        اگر( a_step > 1 && a_size.height > 1 )
         {
             _a_buf.allocate(drows);
             a_buf = _a_buf.data();
-            for( k = 0; k < drows; k++ )
+            برای( k = 0; k < drows; k++ )
                 a_buf[k] = a_data[a_step*k];
             a_data = a_buf;
         }
 
-        if( b_step > 1 )
+        اگر( b_step > 1 )
         {
             _b_buf.allocate(d_size.width);
             b_buf = _b_buf.data();
-            for( j = 0; j < d_size.width; j++ )
+            برای( j = 0; j < d_size.width; j++ )
                 b_buf[j] = b_data[j*b_step];
             b_data = b_buf;
         }
 
-        for( i = 0; i < drows; i++, _c_data += c_step0, d_data += d_step )
+        برای( i = 0; i < drows; i++, _c_data += c_step0, d_data += d_step )
         {
             WT al = WT(a_data[i])*alpha;
             c_data = _c_data;
-            for( j = 0; j <= d_size.width - 2; j += 2, c_data += 2*c_step1 )
+            برای( j = 0; j <= d_size.width - 2; j += 2, c_data += 2*c_step1 )
             {
                 WT s0 = al*WT(b_data[j]);
                 WT s1 = al*WT(b_data[j+1]);
-                if( !c_data )
+                اگر( !c_data )
                 {
                     d_data[j] = T(s0);
                     d_data[j+1] = T(s1);
                 }
-                else
+                وگرنه
                 {
                     d_data[j] = T(s0 + WT(c_data[0])*beta);
                     d_data[j+1] = T(s1 + WT(c_data[c_step1])*beta);
                 }
             }
 
-            for( ; j < d_size.width; j++, c_data += c_step1 )
+            برای( ; j < d_size.width; j++, c_data += c_step1 )
             {
                 WT s0 = al*WT(b_data[j]);
-                if( !c_data )
+                اگر( !c_data )
                     d_data[j] = T(s0);
-                else
+                وگرنه
                     d_data[j] = T(s0 + WT(c_data[0])*beta);
             }
         }
     }
-    else if( flags & GEMM_2_T ) /* A * Bt */
+    وگرنه اگر( flags & GEMM_2_T ) /* A * Bt */
     {
-        for( i = 0; i < drows; i++, _a_data += a_step0, _c_data += c_step0, d_data += d_step )
+        برای( i = 0; i < drows; i++, _a_data += a_step0, _c_data += c_step0, d_data += d_step )
         {
             a_data = _a_data;
             b_data = _b_data;
             c_data = _c_data;
 
-            if( a_buf )
+            اگر( a_buf )
             {
-                for( k = 0; k < n; k++ )
+                برای( k = 0; k < n; k++ )
                     a_buf[k] = a_data[a_step1*k];
                 a_data = a_buf;
             }
 
-            for( j = 0; j < d_size.width; j++, b_data += b_step,
+            برای( j = 0; j < d_size.width; j++, b_data += b_step,
                                                c_data += c_step1 )
             {
                 WT s0(0);
                 k = 0;
-#if CV_SIMD_64F && CV_GEMM_SIMD_ENABLED
-                if( sizeof(WT) == sizeof(double) )
+#اگر CV_SIMD_64F && CV_GEMM_SIMD_ENABLED
+                اگر( اندازه(WT) == اندازه(دوگانه) )
                 {
-                    if( sizeof(T) == sizeof(double) )
-                        s0 = (WT)simdDotProduct((const double*)a_data, (const double*)b_data, n, k);
-                    else if( sizeof(T) == sizeof(float) )
-                        s0 = (WT)simdDotProduct_f32f64((const float*)a_data, (const float*)b_data, n, k);
+                    اگر( اندازه(T) == اندازه(دوگانه) )
+                        s0 = (WT)simdDotProduct((ثابت دوگانه*)a_data, (ثابت دوگانه*)b_data, n, k);
+                    وگرنه اگر( اندازه(T) == اندازه(اعشاری) )
+                        s0 = (WT)simdDotProduct_f32f64((ثابت اعشاری*)a_data, (ثابت اعشاری*)b_data, n, k);
                 }
-                else
+                وگرنه
 #endif
                 {
                     WT s1(0), s2(0), s3(0);
-                     #if CV_ENABLE_UNROLLED
-                    for( ; k <= n - 4; k += 4 )
+                     #اگر CV_ENABLE_UNROLLED
+                    برای( ; k <= n - 4; k += 4 )
                     {
                         s0 += WT(a_data[k])*WT(b_data[k]);
                         s1 += WT(a_data[k+1])*WT(b_data[k+1]);
@@ -665,68 +665,68 @@ GEMMSingleMul( const T* a_data, size_t a_step,
                     #endif
                     s0 += s1 + s2 + s3;
                 }
-                for( ; k < n; k++ )
+                برای( ; k < n; k++ )
                     s0 += WT(a_data[k])*WT(b_data[k]);
                 s0 = s0*alpha;
 
-                if( !c_data )
+                اگر( !c_data )
                     d_data[j] = T(s0);
-                else
+                وگرنه
                     d_data[j] = T(s0 + WT(c_data[0])*beta);
             }
         }
     }
-    else if( d_size.width*sizeof(d_data[0]) <= 1600 )
+    وگرنه اگر( d_size.width*اندازه(d_data[0]) <= 1600 )
     {
-        for( i = 0; i < drows; i++, _a_data += a_step0,
+        برای( i = 0; i < drows; i++, _a_data += a_step0,
                                     _c_data += c_step0,
                                     d_data += d_step )
         {
             a_data = _a_data, c_data = _c_data;
 
-            if( a_buf )
+            اگر( a_buf )
             {
-                for( k = 0; k < n; k++ )
+                برای( k = 0; k < n; k++ )
                     a_buf[k] = a_data[a_step1*k];
                 a_data = a_buf;
             }
 
             j = 0;
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F) && CV_GEMM_SIMD_ENABLED
-            if( sizeof(WT) == sizeof(double) )
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F) && CV_GEMM_SIMD_ENABLED
+            اگر( اندازه(WT) == اندازه(دوگانه) )
             {
-                if( sizeof(T) == sizeof(double) )
-                    simdGEMM_kj((const double*)a_data, (const double*)_b_data, b_step,
-                                        (const double*)_c_data, c_step1,
-                                (double*)d_data, n, m, alpha, beta, j);
-                else if( sizeof(T) == sizeof(float) )
-                    simdGEMM_kj_f32f64((const float*)a_data, (const float*)_b_data, b_step,
-                                        (const float*)_c_data, c_step1,
-                                (float*)d_data, n, m, alpha, beta, j);
+                اگر( اندازه(T) == اندازه(دوگانه) )
+                    simdGEMM_kj((ثابت دوگانه*)a_data, (ثابت دوگانه*)_b_data, b_step,
+                                        (ثابت دوگانه*)_c_data, c_step1,
+                                (دوگانه*)d_data, n, m, alpha, beta, j);
+                وگرنه اگر( اندازه(T) == اندازه(اعشاری) )
+                    simdGEMM_kj_f32f64((ثابت اعشاری*)a_data, (ثابت اعشاری*)_b_data, b_step,
+                                        (ثابت اعشاری*)_c_data, c_step1,
+                                (اعشاری*)d_data, n, m, alpha, beta, j);
             }
 #endif
             c_data = _c_data + j * c_step1;
             // 4-column j-outer with register accumulators for remaining columns
-            for( ; j <= m - 4; j += 4, c_data += 4*c_step1 )
+            برای( ; j <= m - 4; j += 4, c_data += 4*c_step1 )
             {
-                const T* b = _b_data + j;
+                ثابت T* b = _b_data + j;
                 WT s0(0), s1(0), s2(0), s3(0);
 
-                for( k = 0; k < n; k++, b += b_step )
+                برای( k = 0; k < n; k++, b += b_step )
                 {
                     WT a(a_data[k]);
                     s0 += a * WT(b[0]); s1 += a * WT(b[1]);
                     s2 += a * WT(b[2]); s3 += a * WT(b[3]);
                 }
 
-                if( !c_data )
+                اگر( !c_data )
                 {
                     d_data[j] = T(s0*alpha);
                     d_data[j+1] = T(s1*alpha);
                     d_data[j+2] = T(s2*alpha);
                     d_data[j+3] = T(s3*alpha);
                 }
-                else
+                وگرنه
                 {
                     s0 = s0*alpha; s1 = s1*alpha;
                     s2 = s2*alpha; s3 = s3*alpha;
@@ -737,91 +737,91 @@ GEMMSingleMul( const T* a_data, size_t a_step,
                 }
             }
 
-            for( ; j < m; j++, c_data += c_step1 )
+            برای( ; j < m; j++, c_data += c_step1 )
             {
-                const T* b = _b_data + j;
+                ثابت T* b = _b_data + j;
                 WT s0(0);
 
-                for( k = 0; k < n; k++, b += b_step )
+                برای( k = 0; k < n; k++, b += b_step )
                     s0 += WT(a_data[k]) * WT(b[0]);
 
                 s0 = s0*alpha;
-                if( !c_data )
+                اگر( !c_data )
                     d_data[j] = T(s0);
-                else
+                وگرنه
                     d_data[j] = T(s0 + WT(c_data[0])*beta);
             }
         }
     }
-    else
+    وگرنه
     {
         cv::AutoBuffer<WT> _d_buf(m);
         WT* d_buf = _d_buf.data();
 
-        for( i = 0; i < drows; i++, _a_data += a_step0, _c_data += c_step0, d_data += d_step )
+        برای( i = 0; i < drows; i++, _a_data += a_step0, _c_data += c_step0, d_data += d_step )
         {
             a_data = _a_data;
             b_data = _b_data;
             c_data = _c_data;
 
-            if( a_buf )
+            اگر( a_buf )
             {
-                for( k = 0; k < n; k++ )
+                برای( k = 0; k < n; k++ )
                     a_buf[k] = _a_data[a_step1*k];
                 a_data = a_buf;
             }
 
-            for( j = 0; j < m; j++ )
+            برای( j = 0; j < m; j++ )
                 d_buf[j] = WT(0);
 
-            for( k = 0; k < n; k++, b_data += b_step )
+            برای( k = 0; k < n; k++, b_data += b_step )
             {
                 WT al(a_data[k]);
                 j=0;
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-                if( sizeof(WT) == sizeof(double) )
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+                اگر( اندازه(WT) == اندازه(دوگانه) )
                 {
-                    if( sizeof(T) == sizeof(double) )
+                    اگر( اندازه(T) == اندازه(دوگانه) )
                     {
-                        const int vlanes = VTraits<v_float64>::vlanes();
-                        v_float64 val = vx_setall_f64(*((const double*)&al));
-                        for( ; j <= m - vlanes; j += vlanes )
+                        ثابت صحیح vlanes = VTraits<v_float64>::vlanes();
+                        v_float64 val = vx_setall_f64(*((ثابت دوگانه*)&al));
+                        برای( ; j <= m - vlanes; j += vlanes )
                         {
-                            v_float64 vd = vx_load((const double*)(d_buf + j));
-                            v_float64 vb = vx_load((const double*)(b_data + j));
+                            v_float64 vd = vx_load((ثابت دوگانه*)(d_buf + j));
+                            v_float64 vb = vx_load((ثابت دوگانه*)(b_data + j));
                             vd = v_muladd(vb, val, vd);
-                            v_store((double*)(d_buf + j), vd);
+                            v_store((دوگانه*)(d_buf + j), vd);
                         }
                     }
-                    else
+                    وگرنه
                     {
-                        const int vlanes_f32 = VTraits<v_float32>::vlanes();
-                        const int vlanes_f64 = VTraits<v_float64>::vlanes();
-                        v_float64 val = vx_setall_f64(*((const double*)&al));
-                        for( ; j <= m - vlanes_f32; j += vlanes_f32 )
+                        ثابت صحیح vlanes_f32 = VTraits<v_float32>::vlanes();
+                        ثابت صحیح vlanes_f64 = VTraits<v_float64>::vlanes();
+                        v_float64 val = vx_setall_f64(*((ثابت دوگانه*)&al));
+                        برای( ; j <= m - vlanes_f32; j += vlanes_f32 )
                         {
-                            v_float32 vb = vx_load((const float*)(b_data + j));
+                            v_float32 vb = vx_load((ثابت اعشاری*)(b_data + j));
                             v_float64 vb_lo = v_cvt_f64(vb);
-                            v_float64 vb_hi = v_cvt_f64_high(vb);
-                            v_float64 vd_lo = vx_load((const double*)(d_buf + j));
-                            v_float64 vd_hi = vx_load((const double*)(d_buf + j + vlanes_f64));
+                            v_float64 vb_hi = v_cvt_f64_بالا(vb);
+                            v_float64 vd_lo = vx_load((ثابت دوگانه*)(d_buf + j));
+                            v_float64 vd_hi = vx_load((ثابت دوگانه*)(d_buf + j + vlanes_f64));
                             vd_lo = v_muladd(vb_lo, val, vd_lo);
                             vd_hi = v_muladd(vb_hi, val, vd_hi);
-                            v_store((double*)(d_buf + j), vd_lo);
-                            v_store((double*)(d_buf + j + vlanes_f64), vd_hi);
+                            v_store((دوگانه*)(d_buf + j), vd_lo);
+                            v_store((دوگانه*)(d_buf + j + vlanes_f64), vd_hi);
                         }
                     }
                 }
 #endif
-                for( ; j < m; j++ )
+                برای( ; j < m; j++ )
                     d_buf[j] += WT(b_data[j])*al;
             }
 
-            if( !c_data )
-                for( j = 0; j < m; j++ )
+            اگر( !c_data )
+                برای( j = 0; j < m; j++ )
                     d_data[j] = T(d_buf[j]*alpha);
-            else
-                for( j = 0; j < m; j++, c_data += c_step1 )
+            وگرنه
+                برای( j = 0; j < m; j++, c_data += c_step1 )
                 {
                     WT t = d_buf[j]*alpha;
                     d_data[j] = T(t + WT(c_data[0])*beta);
@@ -829,34 +829,34 @@ GEMMSingleMul( const T* a_data, size_t a_step,
         }
     }
 }
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 template<typename WT>
-static inline void setDoubleDataZero(WT* d_data, int m, int vlanes)
+ایستا درونخطی تهی setDoubleDataZero(WT* d_data, صحیح m, صحیح vlanes)
 {
     v_float64 vz = vx_setzero_f64();
-    int j = 0;
-    for( ; j <= m - vlanes; j += vlanes )
-        v_store((double*)(d_data + j), vz);
-    for( ; j < m; j++ )
+    صحیح j = 0;
+    برای( ; j <= m - vlanes; j += vlanes )
+        v_store((دوگانه*)(d_data + j), vz);
+    برای( ; j < m; j++ )
         d_data[j] = WT(0);
 }
 
 template<typename ST>
-static inline void simdMulAdd(const ST* b, double* d, int m, double a_val);
+ایستا درونخطی تهی simdMulAdd(ثابت ST* b, دوگانه* d, صحیح m, دوگانه a_val);
 
 template<>
-inline void simdMulAdd<float>(
-    const float* b, double* d, int m, double a_val)
+درونخطی تهی simdMulAdd<اعشاری>(
+    ثابت اعشاری* b, دوگانه* d, صحیح m, دوگانه a_val)
 {
-    const int vlanes_f32 = VTraits<v_float32>::vlanes();
-    const int vlanes_f64 = VTraits<v_float64>::vlanes();
+    ثابت صحیح vlanes_f32 = VTraits<v_float32>::vlanes();
+    ثابت صحیح vlanes_f64 = VTraits<v_float64>::vlanes();
     v_float64 va = vx_setall_f64(a_val);
-    int j = 0;
-    for( ; j <= m - vlanes_f32; j += vlanes_f32 )
+    صحیح j = 0;
+    برای( ; j <= m - vlanes_f32; j += vlanes_f32 )
     {
         v_float32 vb    = vx_load(b + j);
         v_float64 vb_lo = v_cvt_f64(vb);
-        v_float64 vb_hi = v_cvt_f64_high(vb);
+        v_float64 vb_hi = v_cvt_f64_بالا(vb);
         v_float64 vd_lo = vx_load(d + j);
         v_float64 vd_hi = vx_load(d + j + vlanes_f64);
         vd_lo = v_muladd(va, vb_lo, vd_lo);
@@ -864,19 +864,19 @@ inline void simdMulAdd<float>(
         v_store(d + j, vd_lo);
         v_store(d + j + vlanes_f64, vd_hi);
     }
-    for( ; j < m; j++ )
-        d[j] += a_val * (double)b[j];
+    برای( ; j < m; j++ )
+        d[j] += a_val * (دوگانه)b[j];
 }
 
 template<>
-inline void simdMulAdd<double>(
-    const double* b, double* d, int m, double a_val)
+درونخطی تهی simdMulAdd<دوگانه>(
+    ثابت دوگانه* b, دوگانه* d, صحیح m, دوگانه a_val)
 {
-    const int vlanes = VTraits<v_float64>::vlanes();
-    const int stride2 = vlanes * 2;
+    ثابت صحیح vlanes = VTraits<v_float64>::vlanes();
+    ثابت صحیح stride2 = vlanes * 2;
     v_float64 va = vx_setall_f64(a_val);
-    int j = 0;
-    for( ; j <= m - stride2; j += stride2 )
+    صحیح j = 0;
+    برای( ; j <= m - stride2; j += stride2 )
     {
         v_float64 vd0 = vx_load(d + j);
         v_float64 vb0 = vx_load(b + j);
@@ -887,51 +887,51 @@ inline void simdMulAdd<double>(
         v_store(d + j, vd0);
         v_store(d + j + vlanes, vd1);
     }
-    for( ; j <= m - vlanes; j += vlanes )
+    برای( ; j <= m - vlanes; j += vlanes )
     {
         v_float64 vd = vx_load(d + j);
         v_float64 vb = vx_load(b + j);
         vd = v_muladd(va, vb, vd);
         v_store(d + j, vd);
     }
-    for( ; j < m; j++ )
+    برای( ; j < m; j++ )
         d[j] += a_val * b[j];
 }
 
 template<typename ST>
-static inline void simdBlockMul_kj(
-    const ST* a_data, const ST* b_data, size_t b_step,
-    double* d_data, int n, int m, bool do_acc)
+ایستا درونخطی تهی simdBlockMul_kj(
+    ثابت ST* a_data, ثابت ST* b_data, size_t b_step,
+    دوگانه* d_data, صحیح n, صحیح m, منطقی do_acc)
 {
-    const int vlanes = VTraits<v_float64>::vlanes();
-    if( !do_acc )
+    ثابت صحیح vlanes = VTraits<v_float64>::vlanes();
+    اگر( !do_acc )
         setDoubleDataZero(d_data, m, vlanes);
-    for( int k = 0; k < n; k++, b_data += b_step )
-        simdMulAdd(b_data, d_data, m, (double)a_data[k]);
+    برای( صحیح k = 0; k < n; k++, b_data += b_step )
+        simdMulAdd(b_data, d_data, m, (دوگانه)a_data[k]);
 }
 #endif // CV_SIMD_64F || CV_SIMD_SCALABLE_64F
 
-template<typename T, typename WT> static void
-GEMMBlockMul( const T* a_data, size_t a_step,
-              const T* b_data, size_t b_step,
+template<typename T, typename WT> ایستا تهی
+GEMMBlockMul( ثابت T* a_data, size_t a_step,
+              ثابت T* b_data, size_t b_step,
               WT* d_data, size_t d_step,
-              Size a_size, Size d_size, int flags )
+              Size a_size, Size d_size, صحیح flags )
 {
-    int i, j, k, n = a_size.width, m = d_size.width;
-    const T *_a_data = a_data, *_b_data = b_data;
+    صحیح i, j, k, n = a_size.width, m = d_size.width;
+    ثابت T *_a_data = a_data, *_b_data = b_data;
     cv::AutoBuffer<T> _a_buf;
     T* a_buf = 0;
     size_t a_step0, a_step1, t_step;
-    int do_acc = flags & 16;
+    صحیح do_acc = flags & 16;
 
-    a_step /= sizeof(a_data[0]);
-    b_step /= sizeof(b_data[0]);
-    d_step /= sizeof(d_data[0]);
+    a_step /= اندازه(a_data[0]);
+    b_step /= اندازه(b_data[0]);
+    d_step /= اندازه(d_data[0]);
 
     a_step0 = a_step;
     a_step1 = 1;
 
-    if( flags & GEMM_1_T )
+    اگر( flags & GEMM_1_T )
     {
         CV_SWAP( a_step0, a_step1, t_step );
         n = a_size.height;
@@ -939,91 +939,91 @@ GEMMBlockMul( const T* a_data, size_t a_step,
         a_buf = _a_buf.data();
     }
 
-    if( flags & GEMM_2_T )
+    اگر( flags & GEMM_2_T )
     {
         /* second operand is transposed */
-        for( i = 0; i < d_size.height; i++, _a_data += a_step0, d_data += d_step )
+        برای( i = 0; i < d_size.height; i++, _a_data += a_step0, d_data += d_step )
         {
             a_data = _a_data; b_data = _b_data;
 
-            if( a_buf )
+            اگر( a_buf )
             {
-                for( k = 0; k < n; k++ )
+                برای( k = 0; k < n; k++ )
                     a_buf[k] = a_data[a_step1*k];
                 a_data = a_buf;
             }
 
-            for( j = 0; j < d_size.width; j++, b_data += b_step )
+            برای( j = 0; j < d_size.width; j++, b_data += b_step )
             {
                 WT s0 = do_acc ? d_data[j] : WT(0);
                 k = 0;
-#if CV_SIMD_64F && CV_GEMM_SIMD_ENABLED
-                if( sizeof(WT) == sizeof(double) )
+#اگر CV_SIMD_64F && CV_GEMM_SIMD_ENABLED
+                اگر( اندازه(WT) == اندازه(دوگانه) )
                 {
-                    if( sizeof(T) == sizeof(double) )
-                        s0 += (WT)simdDotProduct((const double*)a_data, (const double*)b_data, n, k);
-                    else if( sizeof(T) == sizeof(float) )
-                        s0 += (WT)simdDotProduct_f32f64((const float*)a_data, (const float*)b_data, n, k);
+                    اگر( اندازه(T) == اندازه(دوگانه) )
+                        s0 += (WT)simdDotProduct((ثابت دوگانه*)a_data, (ثابت دوگانه*)b_data, n, k);
+                    وگرنه اگر( اندازه(T) == اندازه(اعشاری) )
+                        s0 += (WT)simdDotProduct_f32f64((ثابت اعشاری*)a_data, (ثابت اعشاری*)b_data, n, k);
                 }
-                else
+                وگرنه
 #endif
                 {
                     WT s1(0);
-                    for( ; k <= n - 2; k += 2 )
+                    برای( ; k <= n - 2; k += 2 )
                     {
                         s0 += WT(a_data[k])*WT(b_data[k]);
                         s1 += WT(a_data[k+1])*WT(b_data[k+1]);
                     }
                     s0 += s1;
                 }
-                for( ; k < n; k++ )
+                برای( ; k < n; k++ )
                     s0 += WT(a_data[k])*WT(b_data[k]);
 
                 d_data[j] = s0;
             }
         }
     }
-    else
+    وگرنه
     {
-        for( i = 0; i < d_size.height; i++, _a_data += a_step0, d_data += d_step )
+        برای( i = 0; i < d_size.height; i++, _a_data += a_step0, d_data += d_step )
         {
             a_data = _a_data, b_data = _b_data;
 
-            if( a_buf )
+            اگر( a_buf )
             {
-                for( k = 0; k < n; k++ )
+                برای( k = 0; k < n; k++ )
                     a_buf[k] = a_data[a_step1*k];
                 a_data = a_buf;
             }
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F) && CV_GEMM_SIMD_ENABLED
-            if( sizeof(WT) == sizeof(double) )
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F) && CV_GEMM_SIMD_ENABLED
+            اگر( اندازه(WT) == اندازه(دوگانه) )
             {
-                if( sizeof(T) == sizeof(double) )
+                اگر( اندازه(T) == اندازه(دوگانه) )
                     simdBlockMul_kj(
-                        (const double*)a_data, (const double*)b_data, b_step,
-                        (double*)d_data, n, m, do_acc != 0);
-                else
+                        (ثابت دوگانه*)a_data, (ثابت دوگانه*)b_data, b_step,
+                        (دوگانه*)d_data, n, m, do_acc != 0);
+                وگرنه
                     simdBlockMul_kj(
-                        (const float*)a_data, (const float*)b_data, b_step,
-                        (double*)d_data, n, m, do_acc != 0);
+                        (ثابت اعشاری*)a_data, (ثابت اعشاری*)b_data, b_step,
+                        (دوگانه*)d_data, n, m, do_acc != 0);
             }
-            else
+            وگرنه
 #endif
             {
-                for( j = 0; j <= m - 4; j += 4 )
+                برای( j = 0; j <= m - 4; j += 4 )
                 {
                     WT s0, s1, s2, s3;
-                    const T* b = b_data + j;
+                    ثابت T* b = b_data + j;
 
-                    if( do_acc )
+                    اگر( do_acc )
                     {
                         s0 = d_data[j]; s1 = d_data[j+1];
                         s2 = d_data[j+2]; s3 = d_data[j+3];
                     }
-                    else
+                    وگرنه
                         s0 = s1 = s2 = s3 = WT(0);
 
-                    for( k = 0; k < n; k++, b += b_step )
+                    برای( k = 0; k < n; k++, b += b_step )
                     {
                         WT a(a_data[k]);
                         s0 += a * WT(b[0]); s1 += a * WT(b[1]);
@@ -1034,12 +1034,12 @@ GEMMBlockMul( const T* a_data, size_t a_step,
                     d_data[j+2] = s2; d_data[j+3] = s3;
                 }
 
-                for( ; j < m; j++ )
+                برای( ; j < m; j++ )
                 {
-                    const T* b = b_data + j;
+                    ثابت T* b = b_data + j;
                     WT s0 = do_acc ? d_data[j] : WT(0);
 
-                    for( k = 0; k < n; k++, b += b_step )
+                    برای( k = 0; k < n; k++, b += b_step )
                         s0 += WT(a_data[k]) * WT(b[0]);
 
                     d_data[j] = s0;
@@ -1050,35 +1050,35 @@ GEMMBlockMul( const T* a_data, size_t a_step,
 }
 
 
-template<typename T, typename WT> static void
-GEMMStore( const T* c_data, size_t c_step,
-           const WT* d_buf, size_t d_buf_step,
+template<typename T, typename WT> ایستا تهی
+GEMMStore( ثابت T* c_data, size_t c_step,
+           ثابت WT* d_buf, size_t d_buf_step,
            T* d_data, size_t d_step, Size d_size,
-           double alpha, double beta, int flags )
+           دوگانه alpha, دوگانه beta, صحیح flags )
 {
-    const T* _c_data = c_data;
-    int j;
+    ثابت T* _c_data = c_data;
+    صحیح j;
     size_t c_step0, c_step1;
 
-    c_step /= sizeof(c_data[0]);
-    d_buf_step /= sizeof(d_buf[0]);
-    d_step /= sizeof(d_data[0]);
+    c_step /= اندازه(c_data[0]);
+    d_buf_step /= اندازه(d_buf[0]);
+    d_step /= اندازه(d_data[0]);
 
-    if( !c_data )
+    اگر( !c_data )
         c_step0 = c_step1 = 0;
-    else if( !(flags & GEMM_3_T) )
+    وگرنه اگر( !(flags & GEMM_3_T) )
         c_step0 = c_step, c_step1 = 1;
-    else
+    وگرنه
         c_step0 = 1, c_step1 = c_step;
 
-    for( ; d_size.height--; _c_data += c_step0, d_buf += d_buf_step, d_data += d_step )
+    برای( ; d_size.height--; _c_data += c_step0, d_buf += d_buf_step, d_data += d_step )
     {
-        if( _c_data )
+        اگر( _c_data )
         {
             c_data = _c_data;
             j=0;
-             #if CV_ENABLE_UNROLLED
-            for(; j <= d_size.width - 4; j += 4, c_data += 4*c_step1 )
+             #اگر CV_ENABLE_UNROLLED
+            برای(; j <= d_size.width - 4; j += 4, c_data += 4*c_step1 )
             {
                 WT t0 = alpha*d_buf[j];
                 WT t1 = alpha*d_buf[j+1];
@@ -1094,17 +1094,17 @@ GEMMStore( const T* c_data, size_t c_step,
                 d_data[j+3] = T(t1);
             }
             #endif
-            for( ; j < d_size.width; j++, c_data += c_step1 )
+            برای( ; j < d_size.width; j++, c_data += c_step1 )
             {
                 WT t0 = alpha*d_buf[j];
                 d_data[j] = T(t0 + WT(c_data[0])*beta);
             }
         }
-        else
+        وگرنه
         {
             j = 0;
-             #if CV_ENABLE_UNROLLED
-            for( ; j <= d_size.width - 4; j += 4 )
+             #اگر CV_ENABLE_UNROLLED
+            برای( ; j <= d_size.width - 4; j += 4 )
             {
                 WT t0 = alpha*d_buf[j];
                 WT t1 = alpha*d_buf[j+1];
@@ -1116,449 +1116,449 @@ GEMMStore( const T* c_data, size_t c_step,
                 d_data[j+3] = T(t1);
             }
             #endif
-            for( ; j < d_size.width; j++ )
+            برای( ; j < d_size.width; j++ )
                 d_data[j] = T(alpha*d_buf[j]);
         }
     }
 }
 
 
-typedef void (*GEMMSingleMulFunc)( const void* src1, size_t step1,
-                   const void* src2, size_t step2, const void* src3, size_t step3,
-                   void* dst, size_t dststep, Size srcsize, Size dstsize,
-                   double alpha, double beta, int flags );
+تعریفنوع تهی (*GEMMSingleMulFunc)( ثابت تهی* src1, size_t step1,
+                   ثابت تهی* src2, size_t step2, ثابت تهی* src3, size_t step3,
+                   تهی* dst, size_t dststep, Size srcsize, Size dstsize,
+                   دوگانه alpha, دوگانه beta, صحیح flags );
 
-typedef void (*GEMMBlockMulFunc)( const void* src1, size_t step1,
-                   const void* src2, size_t step2, void* dst, size_t dststep,
-                   Size srcsize, Size dstsize, int flags );
+تعریفنوع تهی (*GEMMBlockMulFunc)( ثابت تهی* src1, size_t step1,
+                   ثابت تهی* src2, size_t step2, تهی* dst, size_t dststep,
+                   Size srcsize, Size dstsize, صحیح flags );
 
-typedef void (*GEMMStoreFunc)( const void* src1, size_t step1,
-                   const void* src2, size_t step2, void* dst, size_t dststep,
-                   Size dstsize, double alpha, double beta, int flags );
+تعریفنوع تهی (*GEMMStoreFunc)( ثابت تهی* src1, size_t step1,
+                   ثابت تهی* src2, size_t step2, تهی* dst, size_t dststep,
+                   Size dstsize, دوگانه alpha, دوگانه beta, صحیح flags );
 
-template<typename T, typename WT, void (*fn)(const T*, size_t, const T*, size_t, const T*, size_t, T*, size_t, Size, Size, double, double, int)>
-static void gemmSingleMulWrap( const void* src1, size_t step1,
-                   const void* src2, size_t step2, const void* src3, size_t step3,
-                   void* dst, size_t dststep, Size srcsize, Size dstsize,
-                   double alpha, double beta, int flags )
+template<typename T, typename WT, تهی (*fn)(ثابت T*, size_t, ثابت T*, size_t, ثابت T*, size_t, T*, size_t, Size, Size, دوگانه, دوگانه, صحیح)>
+ایستا تهی gemmSingleMulWrap( ثابت تهی* src1, size_t step1,
+                   ثابت تهی* src2, size_t step2, ثابت تهی* src3, size_t step3,
+                   تهی* dst, size_t dststep, Size srcsize, Size dstsize,
+                   دوگانه alpha, دوگانه beta, صحیح flags )
 {
-    fn((const T*)src1, step1, (const T*)src2, step2, (const T*)src3, step3, (T*)dst, dststep, srcsize, dstsize, alpha, beta, flags);
+    fn((ثابت T*)src1, step1, (ثابت T*)src2, step2, (ثابت T*)src3, step3, (T*)dst, dststep, srcsize, dstsize, alpha, beta, flags);
 }
 
-template<typename T, typename WT, void (*fn)(const T*, size_t, const T*, size_t, WT*, size_t, Size, Size, int)>
-static void gemmBlockMulWrap( const void* src1, size_t step1,
-                   const void* src2, size_t step2, void* dst, size_t dststep,
-                   Size srcsize, Size dstsize, int flags )
+template<typename T, typename WT, تهی (*fn)(ثابت T*, size_t, ثابت T*, size_t, WT*, size_t, Size, Size, صحیح)>
+ایستا تهی gemmBlockMulWrap( ثابت تهی* src1, size_t step1,
+                   ثابت تهی* src2, size_t step2, تهی* dst, size_t dststep,
+                   Size srcsize, Size dstsize, صحیح flags )
 {
-    fn((const T*)src1, step1, (const T*)src2, step2, (WT*)dst, dststep, srcsize, dstsize, flags);
+    fn((ثابت T*)src1, step1, (ثابت T*)src2, step2, (WT*)dst, dststep, srcsize, dstsize, flags);
 }
 
-template<typename T, typename WT, void (*fn)(const T*, size_t, const WT*, size_t, T*, size_t, Size, double, double, int)>
-static void gemmStoreWrap( const void* src1, size_t step1,
-                   const void* src2, size_t step2, void* dst, size_t dststep,
-                   Size dstsize, double alpha, double beta, int flags )
+template<typename T, typename WT, تهی (*fn)(ثابت T*, size_t, ثابت WT*, size_t, T*, size_t, Size, دوگانه, دوگانه, صحیح)>
+ایستا تهی gemmStoreWrap( ثابت تهی* src1, size_t step1,
+                   ثابت تهی* src2, size_t step2, تهی* dst, size_t dststep,
+                   Size dstsize, دوگانه alpha, دوگانه beta, صحیح flags )
 {
-    fn((const T*)src1, step1, (const WT*)src2, step2, (T*)dst, dststep, dstsize, alpha, beta, flags);
+    fn((ثابت T*)src1, step1, (ثابت WT*)src2, step2, (T*)dst, dststep, dstsize, alpha, beta, flags);
 }
 
-static void GEMMSingleMul_32f( const float* a_data, size_t a_step,
-              const float* b_data, size_t b_step,
-              const float* c_data, size_t c_step,
-              float* d_data, size_t d_step,
+ایستا تهی GEMMSingleMul_32f( ثابت اعشاری* a_data, size_t a_step,
+              ثابت اعشاری* b_data, size_t b_step,
+              ثابت اعشاری* c_data, size_t c_step,
+              اعشاری* d_data, size_t d_step,
               Size a_size, Size d_size,
-              double alpha, double beta, int flags )
+              دوگانه alpha, دوگانه beta, صحیح flags )
 {
-    GEMMSingleMul<float,double>(a_data, a_step, b_data, b_step, c_data,
+    GEMMSingleMul<اعشاری,دوگانه>(a_data, a_step, b_data, b_step, c_data,
                                 c_step, d_data, d_step, a_size, d_size,
                                 alpha, beta, flags);
 }
 
-static void GEMMSingleMul_64f( const double* a_data, size_t a_step,
-                              const double* b_data, size_t b_step,
-                              const double* c_data, size_t c_step,
-                              double* d_data, size_t d_step,
+ایستا تهی GEMMSingleMul_64f( ثابت دوگانه* a_data, size_t a_step,
+                              ثابت دوگانه* b_data, size_t b_step,
+                              ثابت دوگانه* c_data, size_t c_step,
+                              دوگانه* d_data, size_t d_step,
                               Size a_size, Size d_size,
-                              double alpha, double beta, int flags )
+                              دوگانه alpha, دوگانه beta, صحیح flags )
 {
-    GEMMSingleMul<double,double>(a_data, a_step, b_data, b_step, c_data,
+    GEMMSingleMul<دوگانه,دوگانه>(a_data, a_step, b_data, b_step, c_data,
                                 c_step, d_data, d_step, a_size, d_size,
                                 alpha, beta, flags);
 }
 
 
-static void GEMMSingleMul_32fc( const Complexf* a_data, size_t a_step,
-                              const Complexf* b_data, size_t b_step,
-                              const Complexf* c_data, size_t c_step,
+ایستا تهی GEMMSingleMul_32fc( ثابت Complexf* a_data, size_t a_step,
+                              ثابت Complexf* b_data, size_t b_step,
+                              ثابت Complexf* c_data, size_t c_step,
                               Complexf* d_data, size_t d_step,
                               Size a_size, Size d_size,
-                              double alpha, double beta, int flags )
+                              دوگانه alpha, دوگانه beta, صحیح flags )
 {
     GEMMSingleMul<Complexf,Complexd>(a_data, a_step, b_data, b_step, c_data,
                                 c_step, d_data, d_step, a_size, d_size,
                                 alpha, beta, flags);
 }
 
-static void GEMMSingleMul_64fc( const Complexd* a_data, size_t a_step,
-                              const Complexd* b_data, size_t b_step,
-                              const Complexd* c_data, size_t c_step,
+ایستا تهی GEMMSingleMul_64fc( ثابت Complexd* a_data, size_t a_step,
+                              ثابت Complexd* b_data, size_t b_step,
+                              ثابت Complexd* c_data, size_t c_step,
                               Complexd* d_data, size_t d_step,
                               Size a_size, Size d_size,
-                              double alpha, double beta, int flags )
+                              دوگانه alpha, دوگانه beta, صحیح flags )
 {
     GEMMSingleMul<Complexd,Complexd>(a_data, a_step, b_data, b_step, c_data,
                                  c_step, d_data, d_step, a_size, d_size,
                                  alpha, beta, flags);
 }
 
-static void GEMMBlockMul_32f( const float* a_data, size_t a_step,
-             const float* b_data, size_t b_step,
-             double* d_data, size_t d_step,
-             Size a_size, Size d_size, int flags )
+ایستا تهی GEMMBlockMul_32f( ثابت اعشاری* a_data, size_t a_step,
+             ثابت اعشاری* b_data, size_t b_step,
+             دوگانه* d_data, size_t d_step,
+             Size a_size, Size d_size, صحیح flags )
 {
     GEMMBlockMul(a_data, a_step, b_data, b_step, d_data, d_step, a_size, d_size, flags);
 }
 
 
-static void GEMMBlockMul_64f( const double* a_data, size_t a_step,
-                             const double* b_data, size_t b_step,
-                             double* d_data, size_t d_step,
-                             Size a_size, Size d_size, int flags )
+ایستا تهی GEMMBlockMul_64f( ثابت دوگانه* a_data, size_t a_step,
+                             ثابت دوگانه* b_data, size_t b_step,
+                             دوگانه* d_data, size_t d_step,
+                             Size a_size, Size d_size, صحیح flags )
 {
     GEMMBlockMul(a_data, a_step, b_data, b_step, d_data, d_step, a_size, d_size, flags);
 }
 
 
-static void GEMMBlockMul_32fc( const Complexf* a_data, size_t a_step,
-                             const Complexf* b_data, size_t b_step,
+ایستا تهی GEMMBlockMul_32fc( ثابت Complexf* a_data, size_t a_step,
+                             ثابت Complexf* b_data, size_t b_step,
                              Complexd* d_data, size_t d_step,
-                             Size a_size, Size d_size, int flags )
+                             Size a_size, Size d_size, صحیح flags )
 {
     GEMMBlockMul<Complexf,Complexd>(a_data, a_step, b_data, b_step, d_data, d_step, a_size, d_size, flags);
 }
 
 
-static void GEMMBlockMul_64fc( const Complexd* a_data, size_t a_step,
-                             const Complexd* b_data, size_t b_step,
+ایستا تهی GEMMBlockMul_64fc( ثابت Complexd* a_data, size_t a_step,
+                             ثابت Complexd* b_data, size_t b_step,
                              Complexd* d_data, size_t d_step,
-                             Size a_size, Size d_size, int flags )
+                             Size a_size, Size d_size, صحیح flags )
 {
     GEMMBlockMul<Complexd,Complexd>(a_data, a_step, b_data, b_step, d_data, d_step, a_size, d_size, flags);
 }
 
 
-static void GEMMStore_32f( const float* c_data, size_t c_step,
-          const double* d_buf, size_t d_buf_step,
-          float* d_data, size_t d_step, Size d_size,
-          double alpha, double beta, int flags )
+ایستا تهی GEMMStore_32f( ثابت اعشاری* c_data, size_t c_step,
+          ثابت دوگانه* d_buf, size_t d_buf_step,
+          اعشاری* d_data, size_t d_step, Size d_size,
+          دوگانه alpha, دوگانه beta, صحیح flags )
 {
     GEMMStore(c_data, c_step, d_buf, d_buf_step, d_data, d_step, d_size, alpha, beta, flags);
 }
 
 
-static void GEMMStore_64f( const double* c_data, size_t c_step,
-                      const double* d_buf, size_t d_buf_step,
-                      double* d_data, size_t d_step, Size d_size,
-                      double alpha, double beta, int flags )
+ایستا تهی GEMMStore_64f( ثابت دوگانه* c_data, size_t c_step,
+                      ثابت دوگانه* d_buf, size_t d_buf_step,
+                      دوگانه* d_data, size_t d_step, Size d_size,
+                      دوگانه alpha, دوگانه beta, صحیح flags )
 {
     GEMMStore(c_data, c_step, d_buf, d_buf_step, d_data, d_step, d_size, alpha, beta, flags);
 }
 
 
-static void GEMMStore_32fc( const Complexf* c_data, size_t c_step,
-                          const Complexd* d_buf, size_t d_buf_step,
+ایستا تهی GEMMStore_32fc( ثابت Complexf* c_data, size_t c_step,
+                          ثابت Complexd* d_buf, size_t d_buf_step,
                           Complexf* d_data, size_t d_step, Size d_size,
-                          double alpha, double beta, int flags )
+                          دوگانه alpha, دوگانه beta, صحیح flags )
 {
     GEMMStore(c_data, c_step, d_buf, d_buf_step, d_data, d_step, d_size, alpha, beta, flags);
 }
 
 
-static void GEMMStore_64fc( const Complexd* c_data, size_t c_step,
-                          const Complexd* d_buf, size_t d_buf_step,
+ایستا تهی GEMMStore_64fc( ثابت Complexd* c_data, size_t c_step,
+                          ثابت Complexd* d_buf, size_t d_buf_step,
                           Complexd* d_data, size_t d_step, Size d_size,
-                          double alpha, double beta, int flags )
+                          دوگانه alpha, دوگانه beta, صحیح flags )
 {
     GEMMStore(c_data, c_step, d_buf, d_buf_step, d_data, d_step, d_size, alpha, beta, flags);
 }
 
-static void gemmImpl( Mat A, Mat B, double alpha,
-           Mat C, double beta, Mat D, int flags )
+ایستا تهی gemmImpl( Mat A, Mat B, دوگانه alpha,
+           Mat C, دوگانه beta, Mat D, صحیح flags )
 {
     CV_INSTRUMENT_REGION();
 
-    const int block_lin_size = 128;
-    const int block_size = block_lin_size * block_lin_size;
+    ثابت صحیح block_lin_size = 128;
+    ثابت صحیح block_size = block_lin_size * block_lin_size;
 
-    static double zero[] = {0,0,0,0};
-    static float zerof[] = {0,0,0,0};
+    ایستا دوگانه zero[] = {0,0,0,0};
+    ایستا اعشاری zerof[] = {0,0,0,0};
 
     Size a_size = A.size(), d_size;
-    int i, len = 0, type = A.type();
+    صحیح i, len = 0, type = A.type();
 
-    switch( flags & (GEMM_1_T|GEMM_2_T) )
+    انتخاب( flags & (GEMM_1_T|GEMM_2_T) )
     {
-    case 0:
+    حالت 0:
         d_size = Size( B.cols, a_size.height );
         len = B.rows;
-        break;
-    case 1:
+        بشکن;
+    حالت 1:
         d_size = Size( B.cols, a_size.width );
         len = B.rows;
-        break;
-    case 2:
+        بشکن;
+    حالت 2:
         d_size = Size( B.rows, a_size.height );
         len = B.cols;
-        break;
-    case 3:
+        بشکن;
+    حالت 3:
         d_size = Size( B.rows, a_size.width );
         len = B.cols;
-        break;
+        بشکن;
     }
 
-    if( flags == 0 && 2 <= len && len <= 4 && (len == d_size.width || len == d_size.height) )
+    اگر( flags == 0 && 2 <= len && len <= 4 && (len == d_size.width || len == d_size.height) )
     {
-        if( type == CV_32F )
+        اگر( type == CV_32F )
         {
-            float* d = D.ptr<float>();
-            const float *a = A.ptr<float>(),
-                        *b = B.ptr<float>(),
-                        *c = (const float*)C.data;
-            size_t d_step = D.step/sizeof(d[0]),
-                a_step = A.step/sizeof(a[0]),
-                b_step = B.step/sizeof(b[0]),
-                c_step = C.data ? C.step/sizeof(c[0]) : 0;
+            اعشاری* d = D.ptr<اعشاری>();
+            ثابت اعشاری *a = A.ptr<اعشاری>(),
+                        *b = B.ptr<اعشاری>(),
+                        *c = (ثابت اعشاری*)C.data;
+            size_t d_step = D.step/اندازه(d[0]),
+                a_step = A.step/اندازه(a[0]),
+                b_step = B.step/اندازه(b[0]),
+                c_step = C.data ? C.step/اندازه(c[0]) : 0;
 
-            if( !c )
+            اگر( !c )
                 c = zerof;
 
-            switch( len )
+            انتخاب( len )
             {
-            case 2:
-                if( len == d_size.width && b != d )
+            حالت 2:
+                اگر( len == d_size.width && b != d )
                 {
-                    for( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
+                    برای( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
                     {
-                        float t0 = a[0]*b[0] + a[1]*b[b_step];
-                        float t1 = a[0]*b[1] + a[1]*b[b_step+1];
-                        d[0] = (float)(t0*alpha + c[0]*beta);
-                        d[1] = (float)(t1*alpha + c[1]*beta);
+                        اعشاری t0 = a[0]*b[0] + a[1]*b[b_step];
+                        اعشاری t1 = a[0]*b[1] + a[1]*b[b_step+1];
+                        d[0] = (اعشاری)(t0*alpha + c[0]*beta);
+                        d[1] = (اعشاری)(t1*alpha + c[1]*beta);
                     }
                 }
-                else if( a != d )
+                وگرنه اگر( a != d )
                 {
-                    int c_step0 = 1;
-                    if( c == zerof )
+                    صحیح c_step0 = 1;
+                    اگر( c == zerof )
                     {
                         c_step0 = 0;
                         c_step = 1;
                     }
 
-                    for( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
+                    برای( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
                     {
-                        float t0 = a[0]*b[0] + a[1]*b[b_step];
-                        float t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step];
-                        d[0] = (float)(t0*alpha + c[0]*beta);
-                        d[d_step] = (float)(t1*alpha + c[c_step]*beta);
+                        اعشاری t0 = a[0]*b[0] + a[1]*b[b_step];
+                        اعشاری t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step];
+                        d[0] = (اعشاری)(t0*alpha + c[0]*beta);
+                        d[d_step] = (اعشاری)(t1*alpha + c[c_step]*beta);
                     }
                 }
-                else
-                    break;
-                return;
-            case 3:
-                if( len == d_size.width && b != d )
+                وگرنه
+                    بشکن;
+                بازگشت;
+            حالت 3:
+                اگر( len == d_size.width && b != d )
                 {
-                    for( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
+                    برای( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
                     {
-                        float t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2];
-                        float t1 = a[0]*b[1] + a[1]*b[b_step+1] + a[2]*b[b_step*2+1];
-                        float t2 = a[0]*b[2] + a[1]*b[b_step+2] + a[2]*b[b_step*2+2];
-                        d[0] = (float)(t0*alpha + c[0]*beta);
-                        d[1] = (float)(t1*alpha + c[1]*beta);
-                        d[2] = (float)(t2*alpha + c[2]*beta);
+                        اعشاری t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2];
+                        اعشاری t1 = a[0]*b[1] + a[1]*b[b_step+1] + a[2]*b[b_step*2+1];
+                        اعشاری t2 = a[0]*b[2] + a[1]*b[b_step+2] + a[2]*b[b_step*2+2];
+                        d[0] = (اعشاری)(t0*alpha + c[0]*beta);
+                        d[1] = (اعشاری)(t1*alpha + c[1]*beta);
+                        d[2] = (اعشاری)(t2*alpha + c[2]*beta);
                     }
                 }
-                else if( a != d )
+                وگرنه اگر( a != d )
                 {
-                    int c_step0 = 1;
-                    if( c == zerof )
+                    صحیح c_step0 = 1;
+                    اگر( c == zerof )
                     {
                         c_step0 = 0;
                         c_step = 1;
                     }
 
-                    for( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
+                    برای( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
                     {
-                        float t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2];
-                        float t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step] + a[a_step+2]*b[b_step*2];
-                        float t2 = a[a_step*2]*b[0] + a[a_step*2+1]*b[b_step] + a[a_step*2+2]*b[b_step*2];
+                        اعشاری t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2];
+                        اعشاری t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step] + a[a_step+2]*b[b_step*2];
+                        اعشاری t2 = a[a_step*2]*b[0] + a[a_step*2+1]*b[b_step] + a[a_step*2+2]*b[b_step*2];
 
-                        d[0] = (float)(t0*alpha + c[0]*beta);
-                        d[d_step] = (float)(t1*alpha + c[c_step]*beta);
-                        d[d_step*2] = (float)(t2*alpha + c[c_step*2]*beta);
+                        d[0] = (اعشاری)(t0*alpha + c[0]*beta);
+                        d[d_step] = (اعشاری)(t1*alpha + c[c_step]*beta);
+                        d[d_step*2] = (اعشاری)(t2*alpha + c[c_step*2]*beta);
                     }
                 }
-                else
-                    break;
-                return;
-            case 4:
-                if( len == d_size.width && b != d )
+                وگرنه
+                    بشکن;
+                بازگشت;
+            حالت 4:
+                اگر( len == d_size.width && b != d )
                 {
-                    for( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
+                    برای( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
                     {
-                        float t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2] + a[3]*b[b_step*3];
-                        float t1 = a[0]*b[1] + a[1]*b[b_step+1] + a[2]*b[b_step*2+1] + a[3]*b[b_step*3+1];
-                        float t2 = a[0]*b[2] + a[1]*b[b_step+2] + a[2]*b[b_step*2+2] + a[3]*b[b_step*3+2];
-                        float t3 = a[0]*b[3] + a[1]*b[b_step+3] + a[2]*b[b_step*2+3] + a[3]*b[b_step*3+3];
-                        d[0] = (float)(t0*alpha + c[0]*beta);
-                        d[1] = (float)(t1*alpha + c[1]*beta);
-                        d[2] = (float)(t2*alpha + c[2]*beta);
-                        d[3] = (float)(t3*alpha + c[3]*beta);
+                        اعشاری t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2] + a[3]*b[b_step*3];
+                        اعشاری t1 = a[0]*b[1] + a[1]*b[b_step+1] + a[2]*b[b_step*2+1] + a[3]*b[b_step*3+1];
+                        اعشاری t2 = a[0]*b[2] + a[1]*b[b_step+2] + a[2]*b[b_step*2+2] + a[3]*b[b_step*3+2];
+                        اعشاری t3 = a[0]*b[3] + a[1]*b[b_step+3] + a[2]*b[b_step*2+3] + a[3]*b[b_step*3+3];
+                        d[0] = (اعشاری)(t0*alpha + c[0]*beta);
+                        d[1] = (اعشاری)(t1*alpha + c[1]*beta);
+                        d[2] = (اعشاری)(t2*alpha + c[2]*beta);
+                        d[3] = (اعشاری)(t3*alpha + c[3]*beta);
                     }
                 }
-                else if( len <= 16 && a != d )
+                وگرنه اگر( len <= 16 && a != d )
                 {
-                    int c_step0 = 1;
-                    if( c == zerof )
+                    صحیح c_step0 = 1;
+                    اگر( c == zerof )
                     {
                         c_step0 = 0;
                         c_step = 1;
                     }
 
-                    for( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
+                    برای( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
                     {
-                        float t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2] + a[3]*b[b_step*3];
-                        float t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step] +
+                        اعشاری t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2] + a[3]*b[b_step*3];
+                        اعشاری t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step] +
                                    a[a_step+2]*b[b_step*2] + a[a_step+3]*b[b_step*3];
-                        float t2 = a[a_step*2]*b[0] + a[a_step*2+1]*b[b_step] +
+                        اعشاری t2 = a[a_step*2]*b[0] + a[a_step*2+1]*b[b_step] +
                                    a[a_step*2+2]*b[b_step*2] + a[a_step*2+3]*b[b_step*3];
-                        float t3 = a[a_step*3]*b[0] + a[a_step*3+1]*b[b_step] +
+                        اعشاری t3 = a[a_step*3]*b[0] + a[a_step*3+1]*b[b_step] +
                                    a[a_step*3+2]*b[b_step*2] + a[a_step*3+3]*b[b_step*3];
-                        d[0] = (float)(t0*alpha + c[0]*beta);
-                        d[d_step] = (float)(t1*alpha + c[c_step]*beta);
-                        d[d_step*2] = (float)(t2*alpha + c[c_step*2]*beta);
-                        d[d_step*3] = (float)(t3*alpha + c[c_step*3]*beta);
+                        d[0] = (اعشاری)(t0*alpha + c[0]*beta);
+                        d[d_step] = (اعشاری)(t1*alpha + c[c_step]*beta);
+                        d[d_step*2] = (اعشاری)(t2*alpha + c[c_step*2]*beta);
+                        d[d_step*3] = (اعشاری)(t3*alpha + c[c_step*3]*beta);
                     }
                 }
-                else
-                    break;
-                return;
+                وگرنه
+                    بشکن;
+                بازگشت;
             }
         }
 
-        if( type == CV_64F )
+        اگر( type == CV_64F )
         {
-            double* d = D.ptr<double>();
-            const double *a = A.ptr<double>(),
-                         *b = B.ptr<double>(),
-                         *c = (const double*)C.data;
-            size_t d_step = D.step/sizeof(d[0]),
-                a_step = A.step/sizeof(a[0]),
-                b_step = B.step/sizeof(b[0]),
-                c_step = C.data ? C.step/sizeof(c[0]) : 0;
-            if( !c )
+            دوگانه* d = D.ptr<دوگانه>();
+            ثابت دوگانه *a = A.ptr<دوگانه>(),
+                         *b = B.ptr<دوگانه>(),
+                         *c = (ثابت دوگانه*)C.data;
+            size_t d_step = D.step/اندازه(d[0]),
+                a_step = A.step/اندازه(a[0]),
+                b_step = B.step/اندازه(b[0]),
+                c_step = C.data ? C.step/اندازه(c[0]) : 0;
+            اگر( !c )
                 c = zero;
 
-            switch( len )
+            انتخاب( len )
             {
-            case 2:
-                if( len == d_size.width && b != d )
+            حالت 2:
+                اگر( len == d_size.width && b != d )
                 {
-                    for( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
+                    برای( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
                     {
-                        double t0 = a[0]*b[0] + a[1]*b[b_step];
-                        double t1 = a[0]*b[1] + a[1]*b[b_step+1];
+                        دوگانه t0 = a[0]*b[0] + a[1]*b[b_step];
+                        دوگانه t1 = a[0]*b[1] + a[1]*b[b_step+1];
                         d[0] = t0*alpha + c[0]*beta;
                         d[1] = t1*alpha + c[1]*beta;
                     }
                 }
-                else if( a != d )
+                وگرنه اگر( a != d )
                 {
-                    int c_step0 = 1;
-                    if( c == zero )
+                    صحیح c_step0 = 1;
+                    اگر( c == zero )
                     {
                         c_step0 = 0;
                         c_step = 1;
                     }
 
-                    for( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
+                    برای( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
                     {
-                        double t0 = a[0]*b[0] + a[1]*b[b_step];
-                        double t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step];
+                        دوگانه t0 = a[0]*b[0] + a[1]*b[b_step];
+                        دوگانه t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step];
                         d[0] = t0*alpha + c[0]*beta;
                         d[d_step] = t1*alpha + c[c_step]*beta;
                     }
                 }
-                else
-                    break;
-                return;
-            case 3:
-                if( len == d_size.width && b != d )
+                وگرنه
+                    بشکن;
+                بازگشت;
+            حالت 3:
+                اگر( len == d_size.width && b != d )
                 {
-                    for( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
+                    برای( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
                     {
-                        double t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2];
-                        double t1 = a[0]*b[1] + a[1]*b[b_step+1] + a[2]*b[b_step*2+1];
-                        double t2 = a[0]*b[2] + a[1]*b[b_step+2] + a[2]*b[b_step*2+2];
+                        دوگانه t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2];
+                        دوگانه t1 = a[0]*b[1] + a[1]*b[b_step+1] + a[2]*b[b_step*2+1];
+                        دوگانه t2 = a[0]*b[2] + a[1]*b[b_step+2] + a[2]*b[b_step*2+2];
                         d[0] = t0*alpha + c[0]*beta;
                         d[1] = t1*alpha + c[1]*beta;
                         d[2] = t2*alpha + c[2]*beta;
                     }
                 }
-                else if( a != d )
+                وگرنه اگر( a != d )
                 {
-                    int c_step0 = 1;
-                    if( c == zero )
+                    صحیح c_step0 = 1;
+                    اگر( c == zero )
                     {
                         c_step0 = 0;
                         c_step = 1;
                     }
 
-                    for( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
+                    برای( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
                     {
-                        double t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2];
-                        double t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step] + a[a_step+2]*b[b_step*2];
-                        double t2 = a[a_step*2]*b[0] + a[a_step*2+1]*b[b_step] + a[a_step*2+2]*b[b_step*2];
+                        دوگانه t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2];
+                        دوگانه t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step] + a[a_step+2]*b[b_step*2];
+                        دوگانه t2 = a[a_step*2]*b[0] + a[a_step*2+1]*b[b_step] + a[a_step*2+2]*b[b_step*2];
 
                         d[0] = t0*alpha + c[0]*beta;
                         d[d_step] = t1*alpha + c[c_step]*beta;
                         d[d_step*2] = t2*alpha + c[c_step*2]*beta;
                     }
                 }
-                else
-                    break;
-                return;
-            case 4:
-                if( len == d_size.width && b != d )
+                وگرنه
+                    بشکن;
+                بازگشت;
+            حالت 4:
+                اگر( len == d_size.width && b != d )
                 {
-                    for( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
+                    برای( i = 0; i < d_size.height; i++, d += d_step, a += a_step, c += c_step )
                     {
-                        double t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2] + a[3]*b[b_step*3];
-                        double t1 = a[0]*b[1] + a[1]*b[b_step+1] + a[2]*b[b_step*2+1] + a[3]*b[b_step*3+1];
-                        double t2 = a[0]*b[2] + a[1]*b[b_step+2] + a[2]*b[b_step*2+2] + a[3]*b[b_step*3+2];
-                        double t3 = a[0]*b[3] + a[1]*b[b_step+3] + a[2]*b[b_step*2+3] + a[3]*b[b_step*3+3];
+                        دوگانه t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2] + a[3]*b[b_step*3];
+                        دوگانه t1 = a[0]*b[1] + a[1]*b[b_step+1] + a[2]*b[b_step*2+1] + a[3]*b[b_step*3+1];
+                        دوگانه t2 = a[0]*b[2] + a[1]*b[b_step+2] + a[2]*b[b_step*2+2] + a[3]*b[b_step*3+2];
+                        دوگانه t3 = a[0]*b[3] + a[1]*b[b_step+3] + a[2]*b[b_step*2+3] + a[3]*b[b_step*3+3];
                         d[0] = t0*alpha + c[0]*beta;
                         d[1] = t1*alpha + c[1]*beta;
                         d[2] = t2*alpha + c[2]*beta;
                         d[3] = t3*alpha + c[3]*beta;
                     }
                 }
-                else if( d_size.width <= 16 && a != d )
+                وگرنه اگر( d_size.width <= 16 && a != d )
                 {
-                    int c_step0 = 1;
-                    if( c == zero )
+                    صحیح c_step0 = 1;
+                    اگر( c == zero )
                     {
                         c_step0 = 0;
                         c_step = 1;
                     }
 
-                    for( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
+                    برای( i = 0; i < d_size.width; i++, d++, b++, c += c_step0 )
                     {
-                        double t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2] + a[3]*b[b_step*3];
-                        double t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step] +
+                        دوگانه t0 = a[0]*b[0] + a[1]*b[b_step] + a[2]*b[b_step*2] + a[3]*b[b_step*3];
+                        دوگانه t1 = a[a_step]*b[0] + a[a_step+1]*b[b_step] +
                                     a[a_step+2]*b[b_step*2] + a[a_step+3]*b[b_step*3];
-                        double t2 = a[a_step*2]*b[0] + a[a_step*2+1]*b[b_step] +
+                        دوگانه t2 = a[a_step*2]*b[0] + a[a_step*2+1]*b[b_step] +
                                     a[a_step*2+2]*b[b_step*2] + a[a_step*2+3]*b[b_step*3];
-                        double t3 = a[a_step*3]*b[0] + a[a_step*3+1]*b[b_step] +
+                        دوگانه t3 = a[a_step*3]*b[0] + a[a_step*3+1]*b[b_step] +
                                     a[a_step*3+2]*b[b_step*2] + a[a_step*3+3]*b[b_step*3];
                         d[0] = t0*alpha + c[0]*beta;
                         d[d_step] = t1*alpha + c[c_step]*beta;
@@ -1566,9 +1566,9 @@ static void gemmImpl( Mat A, Mat B, double alpha,
                         d[d_step*3] = t3*alpha + c[c_step*3]*beta;
                     }
                 }
-                else
-                    break;
-                return;
+                وگرنه
+                    بشکن;
+                بازگشت;
             }
         }
     }
@@ -1579,29 +1579,29 @@ static void gemmImpl( Mat A, Mat B, double alpha,
     GEMMBlockMulFunc blockMulFunc;
     GEMMStoreFunc storeFunc;
     Mat *matD = &D;
-    const uchar* Cdata = C.data;
+    ثابت uchar* Cdata = C.data;
     size_t Cstep = C.data ? (size_t)C.step : 0;
     AutoBuffer<uchar> buf;
 
-    if( type == CV_32FC1 )
+    اگر( type == CV_32FC1 )
     {
-        singleMulFunc = gemmSingleMulWrap<float, double, GEMMSingleMul_32f>;
-        blockMulFunc = gemmBlockMulWrap<float, double, GEMMBlockMul_32f>;
-        storeFunc = gemmStoreWrap<float, double, GEMMStore_32f>;
+        singleMulFunc = gemmSingleMulWrap<اعشاری, دوگانه, GEMMSingleMul_32f>;
+        blockMulFunc = gemmBlockMulWrap<اعشاری, دوگانه, GEMMBlockMul_32f>;
+        storeFunc = gemmStoreWrap<اعشاری, دوگانه, GEMMStore_32f>;
     }
-    else if( type == CV_64FC1 )
+    وگرنه اگر( type == CV_64FC1 )
     {
-        singleMulFunc = gemmSingleMulWrap<double, double, GEMMSingleMul_64f>;
-        blockMulFunc = gemmBlockMulWrap<double, double, GEMMBlockMul_64f>;
-        storeFunc = gemmStoreWrap<double, double, GEMMStore_64f>;
+        singleMulFunc = gemmSingleMulWrap<دوگانه, دوگانه, GEMMSingleMul_64f>;
+        blockMulFunc = gemmBlockMulWrap<دوگانه, دوگانه, GEMMBlockMul_64f>;
+        storeFunc = gemmStoreWrap<دوگانه, دوگانه, GEMMStore_64f>;
     }
-    else if( type == CV_32FC2 )
+    وگرنه اگر( type == CV_32FC2 )
     {
         singleMulFunc = gemmSingleMulWrap<Complexf, Complexd, GEMMSingleMul_32fc>;
         blockMulFunc = gemmBlockMulWrap<Complexf, Complexd, GEMMBlockMul_32fc>;
         storeFunc = gemmStoreWrap<Complexf, Complexd, GEMMStore_32fc>;
     }
-    else
+    وگرنه
     {
         CV_Assert( type == CV_64FC2 );
         singleMulFunc = gemmSingleMulWrap<Complexd, Complexd, GEMMSingleMul_64fc>;
@@ -1609,7 +1609,7 @@ static void gemmImpl( Mat A, Mat B, double alpha,
         storeFunc = gemmStoreWrap<Complexd, Complexd, GEMMStore_64fc>;
     }
 
-    if( (d_size.width == 1 || len == 1) && !(flags & GEMM_2_T) && B.isContinuous() )
+    اگر( (d_size.width == 1 || len == 1) && !(flags & GEMM_2_T) && B.isContinuous() )
     {
         b_step = d_size.width == 1 ? 0 : CV_ELEM_SIZE(type);
         flags |= GEMM_2_T;
@@ -1677,7 +1677,7 @@ static void gemmImpl( Mat A, Mat B, double alpha,
                    &_beta, D->data.ptr, &ldd );
         }
     }
-    else*/ if( ((d_size.height <= block_lin_size/2 || d_size.width <= block_lin_size/2) &&
+    else*/ اگر( ((d_size.height <= block_lin_size/2 || d_size.width <= block_lin_size/2) &&
         len <= 10000) || len <= 10 ||
         (d_size.width <= block_lin_size &&
         d_size.height <= block_lin_size && len <= block_lin_size) )
@@ -1685,39 +1685,39 @@ static void gemmImpl( Mat A, Mat B, double alpha,
         singleMulFunc( A.ptr(), A.step, B.ptr(), b_step, Cdata, Cstep,
                        matD->ptr(), matD->step, a_size, d_size, alpha, beta, flags );
     }
-    else
+    وگرنه
     {
-        int is_a_t = flags & GEMM_1_T;
-        int is_b_t = flags & GEMM_2_T;
-        int elem_size = CV_ELEM_SIZE(type);
-        int dk0_1, dk0_2;
+        صحیح is_a_t = flags & GEMM_1_T;
+        صحیح is_b_t = flags & GEMM_2_T;
+        صحیح elem_size = CV_ELEM_SIZE(type);
+        صحیح dk0_1, dk0_2;
         size_t a_buf_size = 0, b_buf_size, d_buf_size;
         uchar* a_buf = 0;
         uchar* b_buf = 0;
         uchar* d_buf = 0;
-        int j, k, di = 0, dj = 0, dk = 0;
-        int dm0, dn0, dk0;
+        صحیح j, k, di = 0, dj = 0, dk = 0;
+        صحیح dm0, dn0, dk0;
         size_t a_step0, a_step1, b_step0, b_step1, c_step0, c_step1;
-        int work_elem_size = elem_size << (CV_MAT_DEPTH(type) == CV_32F ? 1 : 0);
+        صحیح work_elem_size = elem_size << (CV_MAT_DEPTH(type) == CV_32F ? 1 : 0);
 
-        if( !is_a_t )
+        اگر( !is_a_t )
             a_step0 = A.step, a_step1 = elem_size;
-        else
+        وگرنه
             a_step0 = elem_size, a_step1 = A.step;
 
-        if( !is_b_t )
+        اگر( !is_b_t )
             b_step0 = b_step, b_step1 = elem_size;
-        else
+        وگرنه
             b_step0 = elem_size, b_step1 = b_step;
 
-        if( C.empty() )
+        اگر( C.empty() )
         {
             c_step0 = c_step1 = 0;
             flags &= ~GEMM_3_T;
         }
-        else if( !(flags & GEMM_3_T) )
+        وگرنه اگر( !(flags & GEMM_3_T) )
             c_step0 = C.step, c_step1 = elem_size;
-        else
+        وگرنه
             c_step0 = elem_size, c_step1 = C.step;
 
         dm0 = std::min( block_lin_size, d_size.height );
@@ -1726,16 +1726,16 @@ static void gemmImpl( Mat A, Mat B, double alpha,
         dk0_2 = block_size / dn0;
         dk0 = std::min( dk0_1, dk0_2 );
         dk0 = std::min( dk0, len );
-        if( dk0*dm0 > block_size )
+        اگر( dk0*dm0 > block_size )
             dm0 = block_size / dk0;
-        if( dk0*dn0 > block_size )
+        اگر( dk0*dn0 > block_size )
             dn0 = block_size / dk0;
 
         dk0_1 = (dn0+dn0/8+2) & -2;
         b_buf_size = (size_t)(dk0+dk0/8+1)*dk0_1*elem_size;
         d_buf_size = (size_t)(dk0+dk0/8+1)*dk0_1*work_elem_size;
 
-        if( is_a_t )
+        اگر( is_a_t )
         {
             a_buf_size = (size_t)(dm0+dm0/8+1)*((dk0+dk0/8+2)&-2)*elem_size;
             flags &= ~GEMM_1_T;
@@ -1745,50 +1745,50 @@ static void gemmImpl( Mat A, Mat B, double alpha,
         d_buf = buf.data();
         b_buf = d_buf + d_buf_size;
 
-        if( is_a_t )
+        اگر( is_a_t )
             a_buf = b_buf + b_buf_size;
 
-        for( i = 0; i < d_size.height; i += di )
+        برای( i = 0; i < d_size.height; i += di )
         {
             di = dm0;
-            if( i + di >= d_size.height || 8*(i + di) + di > 8*d_size.height )
+            اگر( i + di >= d_size.height || 8*(i + di) + di > 8*d_size.height )
                 di = d_size.height - i;
 
-            for( j = 0; j < d_size.width; j += dj )
+            برای( j = 0; j < d_size.width; j += dj )
             {
                 uchar* _d = matD->ptr() + i*matD->step + j*elem_size;
-                const uchar* _c = Cdata + i*c_step0 + j*c_step1;
+                ثابت uchar* _c = Cdata + i*c_step0 + j*c_step1;
                 size_t _d_step = matD->step;
                 dj = dn0;
 
-                if( j + dj >= d_size.width || 8*(j + dj) + dj > 8*d_size.width )
+                اگر( j + dj >= d_size.width || 8*(j + dj) + dj > 8*d_size.width )
                     dj = d_size.width - j;
 
                 flags &= 15;
-                if( dk0 < len )
+                اگر( dk0 < len )
                 {
                     _d = d_buf;
                     _d_step = dj*work_elem_size;
                 }
 
-                for( k = 0; k < len; k += dk )
+                برای( k = 0; k < len; k += dk )
                 {
-                    const uchar* _a = A.ptr() + i*a_step0 + k*a_step1;
+                    ثابت uchar* _a = A.ptr() + i*a_step0 + k*a_step1;
                     size_t _a_step = A.step;
-                    const uchar* _b = B.ptr() + k*b_step0 + j*b_step1;
+                    ثابت uchar* _b = B.ptr() + k*b_step0 + j*b_step1;
                     size_t _b_step = b_step;
                     Size a_bl_size;
 
                     dk = dk0;
-                    if( k + dk >= len || 8*(k + dk) + dk > 8*len )
+                    اگر( k + dk >= len || 8*(k + dk) + dk > 8*len )
                         dk = len - k;
 
-                    if( !is_a_t )
+                    اگر( !is_a_t )
                         a_bl_size.width = dk, a_bl_size.height = di;
-                    else
+                    وگرنه
                         a_bl_size.width = di, a_bl_size.height = dk;
 
-                    if( a_buf && is_a_t )
+                    اگر( a_buf && is_a_t )
                     {
                         _a_step = dk*elem_size;
                         GEMM_TransposeBlock( _a, A.step, a_buf, _a_step, a_bl_size, elem_size );
@@ -1796,12 +1796,12 @@ static void gemmImpl( Mat A, Mat B, double alpha,
                         _a = a_buf;
                     }
 
-                    if( dj < d_size.width )
+                    اگر( dj < d_size.width )
                     {
                         Size b_size;
-                        if( !is_b_t )
+                        اگر( !is_b_t )
                             b_size.width = dj, b_size.height = dk;
-                        else
+                        وگرنه
                             b_size.width = dk, b_size.height = dj;
 
                         _b_step = b_size.width*elem_size;
@@ -1809,16 +1809,16 @@ static void gemmImpl( Mat A, Mat B, double alpha,
                         _b = b_buf;
                     }
 
-                    if( dk0 < len )
+                    اگر( dk0 < len )
                         blockMulFunc( _a, _a_step, _b, _b_step, _d, _d_step,
                                       a_bl_size, Size(dj,di), flags );
-                    else
+                    وگرنه
                         singleMulFunc( _a, _a_step, _b, _b_step, _c, Cstep,
                                        _d, _d_step, a_bl_size, Size(dj,di), alpha, beta, flags );
                     flags |= 16;
                 }
 
-                if( dk0 < len )
+                اگر( dk0 < len )
                     storeFunc( _c, Cstep, _d, _d_step,
                                matD->ptr(i) + j*elem_size,
                                matD->step, Size(dj,di), alpha, beta, flags );
@@ -1828,95 +1828,95 @@ static void gemmImpl( Mat A, Mat B, double alpha,
     }
 }
 
-template <typename fptype>inline static void
-callGemmImpl(const fptype *src1, size_t src1_step, const fptype *src2, size_t src2_step, fptype alpha,
-          const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, int m_a, int n_a, int n_d, int flags, int type)
+template <typename fptype>درونخطی ایستا تهی
+callGemmImpl(ثابت fptype *src1, size_t src1_step, ثابت fptype *src2, size_t src2_step, fptype alpha,
+          ثابت fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, صحیح m_a, صحیح n_a, صحیح n_d, صحیح flags, صحیح type)
 {
     CV_StaticAssert(GEMM_1_T == CV_HAL_GEMM_1_T, "Incompatible GEMM_1_T flag in HAL");
     CV_StaticAssert(GEMM_2_T == CV_HAL_GEMM_2_T, "Incompatible GEMM_2_T flag in HAL");
     CV_StaticAssert(GEMM_3_T == CV_HAL_GEMM_3_T, "Incompatible GEMM_3_T flag in HAL");
 
-    int b_m, b_n, c_m, c_n, m_d;
+    صحیح b_m, b_n, c_m, c_n, m_d;
 
-    if(flags & GEMM_2_T)
+    اگر(flags & GEMM_2_T)
     {
         b_m = n_d;
-        if(flags & GEMM_1_T )
+        اگر(flags & GEMM_1_T )
         {
             b_n = m_a;
             m_d = n_a;
         }
-        else
+        وگرنه
         {
             b_n = n_a;
             m_d = m_a;
         }
     }
-    else
+    وگرنه
     {
         b_n = n_d;
-        if(flags & GEMM_1_T )
+        اگر(flags & GEMM_1_T )
         {
             b_m = m_a;
             m_d = n_a;
         }
-        else
+        وگرنه
         {
             m_d = m_a;
             b_m = n_a;
         }
     }
 
-    if(flags & GEMM_3_T)
+    اگر(flags & GEMM_3_T)
     {
         c_m = n_d;
         c_n = m_d;
     }
-    else
+    وگرنه
     {
         c_m = m_d;
         c_n = n_d;
     }
 
     Mat A, B, C;
-    if(src1 != NULL)
-        A = Mat(m_a, n_a, type, (void*)src1, src1_step);
-    if(src2 != NULL)
-        B = Mat(b_m, b_n, type, (void*)src2, src2_step);
-    if(src3 != NULL && beta != 0.0)
-        C = Mat(c_m, c_n, type, (void*)src3, src3_step);
-    Mat D(m_d, n_d, type, (void*)dst, dst_step);
+    اگر(src1 != پوچ)
+        A = Mat(m_a, n_a, type, (تهی*)src1, src1_step);
+    اگر(src2 != پوچ)
+        B = Mat(b_m, b_n, type, (تهی*)src2, src2_step);
+    اگر(src3 != پوچ && beta != 0.0)
+        C = Mat(c_m, c_n, type, (تهی*)src3, src3_step);
+    Mat D(m_d, n_d, type, (تهی*)dst, dst_step);
 
     gemmImpl(A, B, alpha, C, beta, D, flags);
 }
 
-void gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-             float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags)
+تهی gemm32f(ثابت اعشاری* src1, size_t src1_step, ثابت اعشاری* src2, size_t src2_step,
+             اعشاری alpha, ثابت اعشاری* src3, size_t src3_step, اعشاری beta, اعشاری* dst, size_t dst_step,
+             صحیح m_a, صحیح n_a, صحیح n_d, صحیح flags)
 {
     CV_INSTRUMENT_REGION();
     callGemmImpl(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags, CV_32F);
 }
 
-void gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-             double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags)
+تهی gemm64f(ثابت دوگانه* src1, size_t src1_step, ثابت دوگانه* src2, size_t src2_step,
+             دوگانه alpha, ثابت دوگانه* src3, size_t src3_step, دوگانه beta, دوگانه* dst, size_t dst_step,
+             صحیح m_a, صحیح n_a, صحیح n_d, صحیح flags)
 {
     CV_INSTRUMENT_REGION();
     callGemmImpl(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags, CV_64F);
 }
 
-void gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-              float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags)
+تهی gemm32fc(ثابت اعشاری* src1, size_t src1_step, ثابت اعشاری* src2, size_t src2_step,
+              اعشاری alpha, ثابت اعشاری* src3, size_t src3_step, اعشاری beta, اعشاری* dst, size_t dst_step,
+              صحیح m_a, صحیح n_a, صحیح n_d, صحیح flags)
 {
     CV_INSTRUMENT_REGION();
     callGemmImpl(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags, CV_32FC2);
 }
 
-void gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-              double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags)
+تهی gemm64fc(ثابت دوگانه* src1, size_t src1_step, ثابت دوگانه* src2, size_t src2_step,
+              دوگانه alpha, ثابت دوگانه* src3, size_t src3_step, دوگانه beta, دوگانه* dst, size_t dst_step,
+              صحیح m_a, صحیح n_a, صحیح n_d, صحیح flags)
 {
     CV_INSTRUMENT_REGION();
     callGemmImpl(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags, CV_64FC2);
@@ -1930,14 +1930,14 @@ void gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t s
 *                                        Transform                                       *
 \****************************************************************************************/
 
-template<typename T, typename WT> static void
-transform_( const T* src, T* dst, const WT* m, int len, int scn, int dcn )
+template<typename T, typename WT> ایستا تهی
+transform_( ثابت T* src, T* dst, ثابت WT* m, صحیح len, صحیح scn, صحیح dcn )
 {
-    int x;
+    صحیح x;
 
-    if( scn == 2 && dcn == 2 )
+    اگر( scn == 2 && dcn == 2 )
     {
-        for( x = 0; x < len*2; x += 2 )
+        برای( x = 0; x < len*2; x += 2 )
         {
             WT v0 = src[x], v1 = src[x+1];
             T t0 = saturate_cast<T>(m[0]*v0 + m[1]*v1 + m[2]);
@@ -1945,9 +1945,9 @@ transform_( const T* src, T* dst, const WT* m, int len, int scn, int dcn )
             dst[x] = t0; dst[x+1] = t1;
         }
     }
-    else if( scn == 3 && dcn == 3 )
+    وگرنه اگر( scn == 3 && dcn == 3 )
     {
-        for( x = 0; x < len*3; x += 3 )
+        برای( x = 0; x < len*3; x += 3 )
         {
             WT v0 = src[x], v1 = src[x+1], v2 = src[x+2];
             T t0 = saturate_cast<T>(m[0]*v0 + m[1]*v1 + m[2]*v2 + m[3]);
@@ -1956,14 +1956,14 @@ transform_( const T* src, T* dst, const WT* m, int len, int scn, int dcn )
             dst[x] = t0; dst[x+1] = t1; dst[x+2] = t2;
         }
     }
-    else if( scn == 3 && dcn == 1 )
+    وگرنه اگر( scn == 3 && dcn == 1 )
     {
-        for( x = 0; x < len; x++, src += 3 )
+        برای( x = 0; x < len; x++, src += 3 )
             dst[x] = saturate_cast<T>(m[0]*src[0] + m[1]*src[1] + m[2]*src[2] + m[3]);
     }
-    else if( scn == 4 && dcn == 4 )
+    وگرنه اگر( scn == 4 && dcn == 4 )
     {
-        for( x = 0; x < len*4; x += 4 )
+        برای( x = 0; x < len*4; x += 4 )
         {
             WT v0 = src[x], v1 = src[x+1], v2 = src[x+2], v3 = src[x+3];
             T t0 = saturate_cast<T>(m[0]*v0 + m[1]*v1 + m[2]*v2 + m[3]*v3 + m[4]);
@@ -1974,16 +1974,16 @@ transform_( const T* src, T* dst, const WT* m, int len, int scn, int dcn )
             dst[x+2] = t0; dst[x+3] = t1;
         }
     }
-    else
+    وگرنه
     {
-        for( x = 0; x < len; x++, src += scn, dst += dcn )
+        برای( x = 0; x < len; x++, src += scn, dst += dcn )
         {
-            const WT* _m = m;
-            int j, k;
-            for( j = 0; j < dcn; j++, _m += scn + 1 )
+            ثابت WT* _m = m;
+            صحیح j, k;
+            برای( j = 0; j < dcn; j++, _m += scn + 1 )
             {
                 WT s = _m[scn];
-                for( k = 0; k < scn; k++ )
+                برای( k = 0; k < scn; k++ )
                     s += _m[k]*src[k];
                 dst[j] = saturate_cast<T>(s);
             }
@@ -1991,30 +1991,30 @@ transform_( const T* src, T* dst, const WT* m, int len, int scn, int dcn )
     }
 }
 
-static void
-transform_8u( const uchar* src, uchar* dst, const float* m, int len, int scn, int dcn )
+ایستا تهی
+transform_8u( ثابت uchar* src, uchar* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn )
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int BITS = 10, SCALE = 1 << BITS;
-    const float MAX_M = (float)(1 << (15 - BITS));
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحیح BITS = 10, SCALE = 1 << BITS;
+    ثابت اعشاری MAX_M = (اعشاری)(1 << (15 - BITS));
 
-    if( scn == 3 && dcn == 3 &&
+    اگر( scn == 3 && dcn == 3 &&
         std::abs(m[0]) < MAX_M && std::abs(m[1]) < MAX_M && std::abs(m[ 2]) < MAX_M*256 && std::abs(m[ 3]) < MAX_M*256 &&
         std::abs(m[4]) < MAX_M && std::abs(m[5]) < MAX_M && std::abs(m[ 6]) < MAX_M*256 && std::abs(m[ 7]) < MAX_M*256 &&
         std::abs(m[8]) < MAX_M && std::abs(m[9]) < MAX_M && std::abs(m[10]) < MAX_M*256 && std::abs(m[11]) < MAX_M*256 )
     {
-        const int nChannels = 3;
+        ثابت صحیح nChannels = 3;
 
-        union {
+        اجتماع {
             short s[6];
-            int p[3];
+            صحیح p[3];
         } m16;
         m16.s[0] = saturate_cast<short>(m[0] * SCALE); m16.s[1] = saturate_cast<short>(m[1] * SCALE);
         m16.s[2] = saturate_cast<short>(m[4] * SCALE); m16.s[3] = saturate_cast<short>(m[5] * SCALE);
         m16.s[4] = saturate_cast<short>(m[8] * SCALE); m16.s[5] = saturate_cast<short>(m[9] * SCALE);
-        int m32[] = {saturate_cast<int>(m[ 2] * SCALE), saturate_cast<int>(m[ 3] * SCALE),
-                     saturate_cast<int>(m[ 6] * SCALE), saturate_cast<int>(m[ 7] * SCALE),
-                     saturate_cast<int>(m[10] * SCALE), saturate_cast<int>(m[11] * SCALE)};
+        صحیح m32[] = {saturate_cast<صحیح>(m[ 2] * SCALE), saturate_cast<صحیح>(m[ 3] * SCALE),
+                     saturate_cast<صحیح>(m[ 6] * SCALE), saturate_cast<صحیح>(m[ 7] * SCALE),
+                     saturate_cast<صحیح>(m[10] * SCALE), saturate_cast<صحیح>(m[11] * SCALE)};
         v_int16 m01 = v_reinterpret_as_s16(vx_setall_s32(m16.p[0]));
         v_int32 m2 = vx_setall_s32(m32[0]);
         v_int32 m3 = vx_setall_s32(m32[1]);
@@ -2024,8 +2024,8 @@ transform_8u( const uchar* src, uchar* dst, const float* m, int len, int scn, in
         v_int16 m89 = v_reinterpret_as_s16(vx_setall_s32(m16.p[2]));
         v_int32 m10 = vx_setall_s32(m32[4]);
         v_int32 m11 = vx_setall_s32(m32[5]);
-        int x = 0;
-        for (; x <= (len - VTraits<v_uint8>::vlanes()) * nChannels; x += VTraits<v_uint8>::vlanes() * nChannels)
+        صحیح x = 0;
+        برای (; x <= (len - VTraits<v_uint8>::vlanes()) * nChannels; x += VTraits<v_uint8>::vlanes() * nChannels)
         {
             v_uint8 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
@@ -2055,33 +2055,33 @@ transform_8u( const uchar* src, uchar* dst, const float* m, int len, int scn, in
                                     v_add(v_add(v_dotprod(v_reinterpret_as_s16(p2), m89), v_mul(p3, m10)), m11));
             v_store_interleave(dst + x, v_pack_u(dbl, dbh), v_pack_u(dgl, dgh), v_pack_u(drl, drh));
         }
-        m32[1] = saturate_cast<int>((m[3] + 0.5f)*SCALE);
-        m32[3] = saturate_cast<int>((m[7] + 0.5f)*SCALE);
-        m32[5] = saturate_cast<int>((m[11] + 0.5f)*SCALE);
-        for( ; x < len * nChannels; x += nChannels )
+        m32[1] = saturate_cast<صحیح>((m[3] + 0.5f)*SCALE);
+        m32[3] = saturate_cast<صحیح>((m[7] + 0.5f)*SCALE);
+        m32[5] = saturate_cast<صحیح>((m[11] + 0.5f)*SCALE);
+        برای( ; x < len * nChannels; x += nChannels )
         {
-            int v0 = src[x], v1 = src[x+1], v2 = src[x+2];
+            صحیح v0 = src[x], v1 = src[x+1], v2 = src[x+2];
             uchar t0 = saturate_cast<uchar>((m16.s[0] * v0 + m16.s[1] * v1 + m32[0] * v2 + m32[1]) >> BITS);
             uchar t1 = saturate_cast<uchar>((m16.s[2] * v0 + m16.s[3] * v1 + m32[2] * v2 + m32[3]) >> BITS);
             uchar t2 = saturate_cast<uchar>((m16.s[4] * v0 + m16.s[5] * v1 + m32[4] * v2 + m32[5]) >> BITS);
             dst[x] = t0; dst[x+1] = t1; dst[x+2] = t2;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     transform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-transform_16u( const ushort* src, ushort* dst, const float* m, int len, int scn, int dcn )
+ایستا تهی
+transform_16u( ثابت ushort* src, ushort* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn )
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( scn == 3 && dcn == 3 )
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    اگر( scn == 3 && dcn == 3 )
     {
-        int x = 0;
-#if CV_SIMD_WIDTH > 16
+        صحیح x = 0;
+#اگر CV_SIMD_WIDTH > 16
         v_float32 m0  = vx_setall_f32(m[ 0]);
         v_float32 m1  = vx_setall_f32(m[ 1]);
         v_float32 m2  = vx_setall_f32(m[ 2]);
@@ -2095,7 +2095,7 @@ transform_16u( const ushort* src, ushort* dst, const float* m, int len, int scn,
         v_float32 m10 = vx_setall_f32(m[10]);
         v_float32 m11 = vx_setall_f32(m[11] - 32768.f);
         v_int16 delta = vx_setall_s16(-32768);
-        for (; x <= (len - VTraits<v_uint16>::vlanes())*3; x +=  VTraits<v_uint16>::vlanes()*3)
+        برای (; x <= (len - VTraits<v_uint16>::vlanes())*3; x +=  VTraits<v_uint16>::vlanes()*3)
         {
             v_uint16 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
@@ -2114,53 +2114,53 @@ transform_16u( const ushort* src, ushort* dst, const float* m, int len, int scn,
             v_store_interleave(dst + x, v_reinterpret_as_u16(db), v_reinterpret_as_u16(dg), v_reinterpret_as_u16(dr));
         }
 #endif
-#if CV_SIMD128
+#اگر CV_SIMD128
         v_float32x4 _m0l(m[0], m[4], m[ 8], 0.f);
         v_float32x4 _m1l(m[1], m[5], m[ 9], 0.f);
         v_float32x4 _m2l(m[2], m[6], m[10], 0.f);
         v_float32x4 _m3l(m[3] - 32768.f, m[7] - 32768.f, m[11] - 32768.f, 0.f);
-        v_float32x4 _m0h = v_rotate_left<1>(_m0l);
-        v_float32x4 _m1h = v_rotate_left<1>(_m1l);
-        v_float32x4 _m2h = v_rotate_left<1>(_m2l);
-        v_float32x4 _m3h = v_rotate_left<1>(_m3l);
+        v_float32x4 _m0h = v_rotate_چپ<1>(_m0l);
+        v_float32x4 _m1h = v_rotate_چپ<1>(_m1l);
+        v_float32x4 _m2h = v_rotate_چپ<1>(_m2l);
+        v_float32x4 _m3h = v_rotate_چپ<1>(_m3l);
         v_int16x8 _delta(0, -32768, -32768, -32768, -32768, -32768, -32768, 0);
-        for( ; x <= len*3 - VTraits<v_uint16x8>::vlanes(); x += 3*VTraits<v_uint16x8>::vlanes()/4 )
-            v_store(dst + x, v_rotate_right<1>(v_reinterpret_as_u16(v_add_wrap(v_pack(
+        برای( ; x <= len*3 - VTraits<v_uint16x8>::vlanes(); x += 3*VTraits<v_uint16x8>::vlanes()/4 )
+            v_store(dst + x, v_rotate_راست<1>(v_reinterpret_as_u16(v_add_wrap(v_pack(
                              v_round(v_matmuladd(v_cvt_f32(v_reinterpret_as_s32(v_load_expand(src + x    ))), _m0h, _m1h, _m2h, _m3h)),
                              v_round(v_matmuladd(v_cvt_f32(v_reinterpret_as_s32(v_load_expand(src + x + 3))), _m0l, _m1l, _m2l, _m3l))), _delta))));
 #endif //CV_SIMD128
-        for( ; x < len * 3; x += 3 )
+        برای( ; x < len * 3; x += 3 )
         {
-            float v0 = src[x], v1 = src[x + 1], v2 = src[x + 2];
+            اعشاری v0 = src[x], v1 = src[x + 1], v2 = src[x + 2];
             ushort t0 = saturate_cast<ushort>(m[0] * v0 + m[1] * v1 + m[ 2] * v2 + m[ 3]);
             ushort t1 = saturate_cast<ushort>(m[4] * v0 + m[5] * v1 + m[ 6] * v2 + m[ 7]);
             ushort t2 = saturate_cast<ushort>(m[8] * v0 + m[9] * v1 + m[10] * v2 + m[11]);
             dst[x] = t0; dst[x + 1] = t1; dst[x + 2] = t2;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     transform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-transform_32f( const float* src, float* dst, const float* m, int len, int scn, int dcn )
+ایستا تهی
+transform_32f( ثابت اعشاری* src, اعشاری* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn )
 {
 // Disabled for RISC-V Vector (scalable), because of:
 // 1. Both gcc and clang can autovectorize this, with better performance than using Universal intrinsic.
-#if (CV_SIMD || CV_SIMD_SCALABLE) && !defined(__aarch64__) && !defined(_M_ARM64) && !defined(_M_ARM64EC) && !(CV_TRY_RVV && CV_RVV)
-    int x = 0;
-    if( scn == 3 && dcn == 3 )
+#اگر (CV_SIMD || CV_SIMD_SCALABLE) && !defined(__aarch64__) && !defined(_M_ARM64) && !defined(_M_ARM64EC) && !(CV_TRY_RVV && CV_RVV)
+    صحیح x = 0;
+    اگر( scn == 3 && dcn == 3 )
     {
-        int idx[VTraits<v_float32>::max_nlanes/2];
-        for( int i = 0; i < VTraits<v_float32>::vlanes()/4; i++ )
+        صحیح idx[VTraits<v_float32>::max_nlanes/2];
+        برای( صحیح i = 0; i < VTraits<v_float32>::vlanes()/4; i++ )
         {
             idx[i] = 3*i;
             idx[i + VTraits<v_float32>::vlanes()/4] = 0;
         }
-        float _m[] = { m[0], m[4], m[ 8], 0.f,
+        اعشاری _m[] = { m[0], m[4], m[ 8], 0.f,
                        m[1], m[5], m[ 9], 0.f,
                        m[2], m[6], m[10], 0.f,
                        m[3], m[7], m[11], 0.f };
@@ -2168,62 +2168,62 @@ transform_32f( const float* src, float* dst, const float* m, int len, int scn, i
         v_float32 m1 = vx_lut_quads(_m +  4, idx + VTraits<v_float32>::vlanes()/4);
         v_float32 m2 = vx_lut_quads(_m +  8, idx + VTraits<v_float32>::vlanes()/4);
         v_float32 m3 = vx_lut_quads(_m + 12, idx + VTraits<v_float32>::vlanes()/4);
-        for( ; x <= len*3 - VTraits<v_float32>::vlanes(); x += 3*VTraits<v_float32>::vlanes()/4 )
+        برای( ; x <= len*3 - VTraits<v_float32>::vlanes(); x += 3*VTraits<v_float32>::vlanes()/4 )
             v_store(dst + x, v_pack_triplets(v_matmuladd(vx_lut_quads(src + x, idx), m0, m1, m2, m3)));
-        for( ; x < len*3; x += 3 )
+        برای( ; x < len*3; x += 3 )
         {
-            float v0 = src[x], v1 = src[x+1], v2 = src[x+2];
-            float t0 = saturate_cast<float>(m[0]*v0 + m[1]*v1 + m[ 2]*v2 + m[ 3]);
-            float t1 = saturate_cast<float>(m[4]*v0 + m[5]*v1 + m[ 6]*v2 + m[ 7]);
-            float t2 = saturate_cast<float>(m[8]*v0 + m[9]*v1 + m[10]*v2 + m[11]);
+            اعشاری v0 = src[x], v1 = src[x+1], v2 = src[x+2];
+            اعشاری t0 = saturate_cast<اعشاری>(m[0]*v0 + m[1]*v1 + m[ 2]*v2 + m[ 3]);
+            اعشاری t1 = saturate_cast<اعشاری>(m[4]*v0 + m[5]*v1 + m[ 6]*v2 + m[ 7]);
+            اعشاری t2 = saturate_cast<اعشاری>(m[8]*v0 + m[9]*v1 + m[10]*v2 + m[11]);
             dst[x] = t0; dst[x+1] = t1; dst[x+2] = t2;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 
-    if( scn == 4 && dcn == 4 )
+    اگر( scn == 4 && dcn == 4 )
     {
-#if CV_SIMD_WIDTH > 16
-        int idx[VTraits<v_float32>::max_nlanes/4];
-        for( int i = 0; i < VTraits<v_float32>::vlanes()/4; i++ )
+#اگر CV_SIMD_WIDTH > 16
+        صحیح idx[VTraits<v_float32>::max_nlanes/4];
+        برای( صحیح i = 0; i < VTraits<v_float32>::vlanes()/4; i++ )
             idx[i] = 0;
-        float _m[] = { m[4], m[9], m[14], m[19] };
+        اعشاری _m[] = { m[4], m[9], m[14], m[19] };
         v_float32 m0 = vx_lut_quads(m   , idx);
         v_float32 m1 = vx_lut_quads(m+ 5, idx);
         v_float32 m2 = vx_lut_quads(m+10, idx);
         v_float32 m3 = vx_lut_quads(m+15, idx);
         v_float32 m4 = vx_lut_quads(_m, idx);
-        for( ; x <= len*4 - VTraits<v_float32>::vlanes(); x += VTraits<v_float32>::vlanes() )
+        برای( ; x <= len*4 - VTraits<v_float32>::vlanes(); x += VTraits<v_float32>::vlanes() )
         {
             v_float32 v_src = vx_load(src + x);
             v_store(dst + x, v_add(v_reduce_sum4(v_mul(v_src, m0), v_mul(v_src, m1), v_mul(v_src, m2), v_mul(v_src, m3)), m4));
         }
 #endif
-#if CV_SIMD128
+#اگر CV_SIMD128
         v_float32x4 _m0 = v_load(m     );
         v_float32x4 _m1 = v_load(m +  5);
         v_float32x4 _m2 = v_load(m + 10);
         v_float32x4 _m3 = v_load(m + 15);
         v_float32x4 _m4(m[4], m[9], m[14], m[19]);
-        for( ; x < len*4; x += VTraits<v_float32x4>::vlanes() )
+        برای( ; x < len*4; x += VTraits<v_float32x4>::vlanes() )
         {
             v_float32x4 v_src = v_load(src + x);
             v_store(dst + x, v_add(v_reduce_sum4(v_mul(v_src, _m0), v_mul(v_src, _m1), v_mul(v_src, _m2), v_mul(v_src, _m3)), _m4));
         }
-#else // CV_SIMD_WIDTH >= 16 && !CV_SIMD128
-        for( ; x < len*4; x += 4 )
+#وگرنه // CV_SIMD_WIDTH >= 16 && !CV_SIMD128
+        برای( ; x < len*4; x += 4 )
         {
-            float v0 = src[x], v1 = src[x+1], v2 = src[x+2], v3 = src[x+3];
-            float t0 = saturate_cast<float>(m[0]*v0 + m[1]*v1 + m[ 2]*v2 + m[ 3]*v3 + m[ 4]);
-            float t1 = saturate_cast<float>(m[5]*v0 + m[6]*v1 + m[ 7]*v2 + m[ 8]*v3 + m[ 9]);
-            float t2 = saturate_cast<float>(m[10]*v0 + m[11]*v1 + m[12]*v2 + m[13]*v3 + m[14]);
-            float t3 = saturate_cast<float>(m[15]*v0 + m[16]*v1 + m[17]*v2 + m[18]*v3 + m[19]);
+            اعشاری v0 = src[x], v1 = src[x+1], v2 = src[x+2], v3 = src[x+3];
+            اعشاری t0 = saturate_cast<اعشاری>(m[0]*v0 + m[1]*v1 + m[ 2]*v2 + m[ 3]*v3 + m[ 4]);
+            اعشاری t1 = saturate_cast<اعشاری>(m[5]*v0 + m[6]*v1 + m[ 7]*v2 + m[ 8]*v3 + m[ 9]);
+            اعشاری t2 = saturate_cast<اعشاری>(m[10]*v0 + m[11]*v1 + m[12]*v2 + m[13]*v3 + m[14]);
+            اعشاری t3 = saturate_cast<اعشاری>(m[15]*v0 + m[16]*v1 + m[17]*v2 + m[18]*v3 + m[19]);
             dst[x] = t0; dst[x+1] = t1; dst[x+2] = t2; dst[x+3] = t3;
         }
 #endif
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
@@ -2231,30 +2231,30 @@ transform_32f( const float* src, float* dst, const float* m, int len, int scn, i
 }
 
 
-static void
-transform_8s(const schar* src, schar* dst, const float* m, int len, int scn, int dcn)
+ایستا تهی
+transform_8s(ثابت schar* src, schar* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int BITS = 10, SCALE = 1 << BITS;
-    const float MAX_M = (float)(1 << (15 - BITS));
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحیح BITS = 10, SCALE = 1 << BITS;
+    ثابت اعشاری MAX_M = (اعشاری)(1 << (15 - BITS));
 
-    if( scn == 3 && dcn == 3 &&
+    اگر( scn == 3 && dcn == 3 &&
         std::abs(m[0]) < MAX_M && std::abs(m[1]) < MAX_M && std::abs(m[ 2]) < MAX_M*256 && std::abs(m[ 3]) < MAX_M*256 &&
         std::abs(m[4]) < MAX_M && std::abs(m[5]) < MAX_M && std::abs(m[ 6]) < MAX_M*256 && std::abs(m[ 7]) < MAX_M*256 &&
         std::abs(m[8]) < MAX_M && std::abs(m[9]) < MAX_M && std::abs(m[10]) < MAX_M*256 && std::abs(m[11]) < MAX_M*256 )
     {
-        const int nChannels = 3;
+        ثابت صحیح nChannels = 3;
 
-        union {
+        اجتماع {
             short s[6];
-            int p[3];
+            صحیح p[3];
         } m16;
         m16.s[0] = saturate_cast<short>(m[0] * SCALE); m16.s[1] = saturate_cast<short>(m[1] * SCALE);
         m16.s[2] = saturate_cast<short>(m[4] * SCALE); m16.s[3] = saturate_cast<short>(m[5] * SCALE);
         m16.s[4] = saturate_cast<short>(m[8] * SCALE); m16.s[5] = saturate_cast<short>(m[9] * SCALE);
-        int m32[] = {saturate_cast<int>(m[ 2] * SCALE), saturate_cast<int>(m[ 3] * SCALE),
-                     saturate_cast<int>(m[ 6] * SCALE), saturate_cast<int>(m[ 7] * SCALE),
-                     saturate_cast<int>(m[10] * SCALE), saturate_cast<int>(m[11] * SCALE)};
+        صحیح m32[] = {saturate_cast<صحیح>(m[ 2] * SCALE), saturate_cast<صحیح>(m[ 3] * SCALE),
+                     saturate_cast<صحیح>(m[ 6] * SCALE), saturate_cast<صحیح>(m[ 7] * SCALE),
+                     saturate_cast<صحیح>(m[10] * SCALE), saturate_cast<صحیح>(m[11] * SCALE)};
         v_int16 m01 = v_reinterpret_as_s16(vx_setall_s32(m16.p[0]));
         v_int32 m2 = vx_setall_s32(m32[0]);
         v_int32 m3 = vx_setall_s32(m32[1]);
@@ -2264,8 +2264,8 @@ transform_8s(const schar* src, schar* dst, const float* m, int len, int scn, int
         v_int16 m89 = v_reinterpret_as_s16(vx_setall_s32(m16.p[2]));
         v_int32 m10 = vx_setall_s32(m32[4]);
         v_int32 m11 = vx_setall_s32(m32[5]);
-        int x = 0;
-        for (; x <= (len - VTraits<v_int8>::vlanes()) * nChannels; x += VTraits<v_int8>::vlanes() * nChannels)
+        صحیح x = 0;
+        برای (; x <= (len - VTraits<v_int8>::vlanes()) * nChannels; x += VTraits<v_int8>::vlanes() * nChannels)
         {
             v_int8 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
@@ -2295,31 +2295,31 @@ transform_8s(const schar* src, schar* dst, const float* m, int len, int scn, int
                                     v_add(v_add(v_dotprod(p2, m89), v_mul(p3, m10)), m11));
             v_store_interleave(dst + x, v_pack(dbl, dbh), v_pack(dgl, dgh), v_pack(drl, drh));
         }
-        m32[1] = saturate_cast<int>((m[3] + 0.5f)*SCALE);
-        m32[3] = saturate_cast<int>((m[7] + 0.5f)*SCALE);
-        m32[5] = saturate_cast<int>((m[11] + 0.5f)*SCALE);
-        for( ; x < len * nChannels; x += nChannels )
+        m32[1] = saturate_cast<صحیح>((m[3] + 0.5f)*SCALE);
+        m32[3] = saturate_cast<صحیح>((m[7] + 0.5f)*SCALE);
+        m32[5] = saturate_cast<صحیح>((m[11] + 0.5f)*SCALE);
+        برای( ; x < len * nChannels; x += nChannels )
         {
-            int v0 = src[x], v1 = src[x+1], v2 = src[x+2];
+            صحیح v0 = src[x], v1 = src[x+1], v2 = src[x+2];
             schar t0 = saturate_cast<schar>((m16.s[0] * v0 + m16.s[1] * v1 + m32[0] * v2 + m32[1]) >> BITS);
             schar t1 = saturate_cast<schar>((m16.s[2] * v0 + m16.s[3] * v1 + m32[2] * v2 + m32[3]) >> BITS);
             schar t2 = saturate_cast<schar>((m16.s[4] * v0 + m16.s[5] * v1 + m32[4] * v2 + m32[5]) >> BITS);
             dst[x] = t0; dst[x+1] = t1; dst[x+2] = t2;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     transform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-transform_16s(const short* src, short* dst, const float* m, int len, int scn, int dcn)
+ایستا تهی
+transform_16s(ثابت short* src, short* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (scn == 3 && dcn == 3) {
-        int x = 0;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    اگر (scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float32 m0  = vx_setall_f32(m[ 0]);
         v_float32 m1  = vx_setall_f32(m[ 1]);
@@ -2333,7 +2333,7 @@ transform_16s(const short* src, short* dst, const float* m, int len, int scn, in
         v_float32 m9  = vx_setall_f32(m[ 9]);
         v_float32 m10 = vx_setall_f32(m[10]);
         v_float32 m11 = vx_setall_f32(m[11]);
-        for (; x <= (len - VTraits<v_int16>::vlanes())*3; x +=  VTraits<v_int16>::vlanes()*3)
+        برای (; x <= (len - VTraits<v_int16>::vlanes())*3; x +=  VTraits<v_int16>::vlanes()*3)
         {
             v_int16 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
@@ -2351,28 +2351,28 @@ transform_16s(const short* src, short* dst, const float* m, int len, int scn, in
                         v_round(v_muladd(v_cvt_f32(bh), m8, v_muladd(v_cvt_f32(gh), m9, v_muladd(v_cvt_f32(rh), m10, m11)))));
             v_store_interleave(dst + x, db, dg, dr);
         }
-        for( ; x < len * 3; x += 3 )
+        برای( ; x < len * 3; x += 3 )
         {
-            float v0 = src[x], v1 = src[x + 1], v2 = src[x + 2];
+            اعشاری v0 = src[x], v1 = src[x + 1], v2 = src[x + 2];
             short t0 = saturate_cast<short>(m[0] * v0 + m[1] * v1 + m[ 2] * v2 + m[ 3]);
             short t1 = saturate_cast<short>(m[4] * v0 + m[5] * v1 + m[ 6] * v2 + m[ 7]);
             short t2 = saturate_cast<short>(m[8] * v0 + m[9] * v1 + m[10] * v2 + m[11]);
             dst[x] = t0; dst[x + 1] = t1; dst[x + 2] = t2;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     transform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-transform_32s(const int* src, int* dst, const double* m, int len, int scn, int dcn)
+ایستا تهی
+transform_32s(ثابت صحیح* src, صحیح* dst, ثابت دوگانه* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    if( scn == 3 && dcn == 3) {
-        int x = 0;
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    اگر( scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float64 m0  = vx_setall_f64(m[ 0]);
         v_float64 m1  = vx_setall_f64(m[ 1]);
@@ -2386,12 +2386,12 @@ transform_32s(const int* src, int* dst, const double* m, int len, int scn, int d
         v_float64 m9  = vx_setall_f64(m[ 9]);
         v_float64 m10 = vx_setall_f64(m[10]);
         v_float64 m11 = vx_setall_f64(m[11]);
-        for (; x <= (len - VTraits<v_int32>::vlanes()) * 3; x += VTraits<v_int32>::vlanes() * 3) {
+        برای (; x <= (len - VTraits<v_int32>::vlanes()) * 3; x += VTraits<v_int32>::vlanes() * 3) {
             v_int32 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
-            v_float64 bh = v_cvt_f64_high(b), bl = v_cvt_f64(b);
-            v_float64 gh = v_cvt_f64_high(g), gl = v_cvt_f64(g);
-            v_float64 rh = v_cvt_f64_high(r), rl = v_cvt_f64(r);
+            v_float64 bh = v_cvt_f64_بالا(b), bl = v_cvt_f64(b);
+            v_float64 gh = v_cvt_f64_بالا(g), gl = v_cvt_f64(g);
+            v_float64 rh = v_cvt_f64_بالا(r), rl = v_cvt_f64(r);
 
             v_int32 db, dg, dr;
             db = v_round(v_fma(bl, m0, v_fma(gl, m1, v_fma(rl,  m2,  m3))),
@@ -2403,27 +2403,27 @@ transform_32s(const int* src, int* dst, const double* m, int len, int scn, int d
 
             v_store_interleave(dst + x, db, dg, dr);
         }
-        for (; x < len * 3; x += 3) {
-            double b = src[x], g = src[x + 1], r = src[x + 2];
-            int db = saturate_cast<int>(m[0] * b + m[1] * g + m[ 2] * r + m[ 3]);
-            int dg = saturate_cast<int>(m[4] * b + m[5] * g + m[ 6] * r + m[ 7]);
-            int dr = saturate_cast<int>(m[8] * b + m[9] * g + m[10] * r + m[11]);
+        برای (; x < len * 3; x += 3) {
+            دوگانه b = src[x], g = src[x + 1], r = src[x + 2];
+            صحیح db = saturate_cast<صحیح>(m[0] * b + m[1] * g + m[ 2] * r + m[ 3]);
+            صحیح dg = saturate_cast<صحیح>(m[4] * b + m[5] * g + m[ 6] * r + m[ 7]);
+            صحیح dr = saturate_cast<صحیح>(m[8] * b + m[9] * g + m[10] * r + m[11]);
             dst[x] = db; dst[x + 1] = dg; dst[x + 2] = dr;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     transform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-transform_64f(const double* src, double* dst, const double* m, int len, int scn, int dcn)
+ایستا تهی
+transform_64f(ثابت دوگانه* src, دوگانه* dst, ثابت دوگانه* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    if( scn == 3 && dcn == 3) {
-        int x = 0;
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    اگر( scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float64 m0  = vx_setall_f64(m[ 0]);
         v_float64 m1  = vx_setall_f64(m[ 1]);
@@ -2437,7 +2437,7 @@ transform_64f(const double* src, double* dst, const double* m, int len, int scn,
         v_float64 m9  = vx_setall_f64(m[ 9]);
         v_float64 m10 = vx_setall_f64(m[10]);
         v_float64 m11 = vx_setall_f64(m[11]);
-        for (; x <= (len - VTraits<v_float64>::vlanes()) * 3; x += VTraits<v_float64>::vlanes() * 3) {
+        برای (; x <= (len - VTraits<v_float64>::vlanes()) * 3; x += VTraits<v_float64>::vlanes() * 3) {
             v_float64 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
 
@@ -2448,38 +2448,38 @@ transform_64f(const double* src, double* dst, const double* m, int len, int scn,
 
             v_store_interleave(dst + x, db, dg, dr);
         }
-        for (; x < len * 3; x += 3) {
-            double b = src[x], g = src[x + 1], r = src[x + 2];
-            double db = saturate_cast<double>(m[0] * b + m[1] * g + m[ 2] * r + m[ 3]);
-            double dg = saturate_cast<double>(m[4] * b + m[5] * g + m[ 6] * r + m[ 7]);
-            double dr = saturate_cast<double>(m[8] * b + m[9] * g + m[10] * r + m[11]);
+        برای (; x < len * 3; x += 3) {
+            دوگانه b = src[x], g = src[x + 1], r = src[x + 2];
+            دوگانه db = saturate_cast<دوگانه>(m[0] * b + m[1] * g + m[ 2] * r + m[ 3]);
+            دوگانه dg = saturate_cast<دوگانه>(m[4] * b + m[5] * g + m[ 6] * r + m[ 7]);
+            دوگانه dr = saturate_cast<دوگانه>(m[8] * b + m[9] * g + m[10] * r + m[11]);
             dst[x] = db; dst[x + 1] = dg; dst[x + 2] = dr;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     transform_(src, dst, m, len, scn, dcn);
 }
 
-template<typename T, typename WT> static void
-diagtransform_( const T* src, T* dst, const WT* m, int len, int cn, int )
+template<typename T, typename WT> ایستا تهی
+diagtransform_( ثابت T* src, T* dst, ثابت WT* m, صحیح len, صحیح cn, صحیح )
 {
-    int x;
+    صحیح x;
 
-    if( cn == 2 )
+    اگر( cn == 2 )
     {
-        for( x = 0; x < len*2; x += 2 )
+        برای( x = 0; x < len*2; x += 2 )
         {
             T t0 = saturate_cast<T>(m[0]*src[x] + m[2]);
             T t1 = saturate_cast<T>(m[4]*src[x+1] + m[5]);
             dst[x] = t0; dst[x+1] = t1;
         }
     }
-    else if( cn == 3 )
+    وگرنه اگر( cn == 3 )
     {
-        for( x = 0; x < len*3; x += 3 )
+        برای( x = 0; x < len*3; x += 3 )
         {
             T t0 = saturate_cast<T>(m[0]*src[x] + m[3]);
             T t1 = saturate_cast<T>(m[5]*src[x+1] + m[7]);
@@ -2487,9 +2487,9 @@ diagtransform_( const T* src, T* dst, const WT* m, int len, int cn, int )
             dst[x] = t0; dst[x+1] = t1; dst[x+2] = t2;
         }
     }
-    else if( cn == 4 )
+    وگرنه اگر( cn == 4 )
     {
-        for( x = 0; x < len*4; x += 4 )
+        برای( x = 0; x < len*4; x += 4 )
         {
             T t0 = saturate_cast<T>(m[0]*src[x] + m[4]);
             T t1 = saturate_cast<T>(m[6]*src[x+1] + m[9]);
@@ -2499,23 +2499,23 @@ diagtransform_( const T* src, T* dst, const WT* m, int len, int cn, int )
             dst[x+2] = t0; dst[x+3] = t1;
         }
     }
-    else
+    وگرنه
     {
-        for( x = 0; x < len; x++, src += cn, dst += cn )
+        برای( x = 0; x < len; x++, src += cn, dst += cn )
         {
-            const WT* _m = m;
-            for( int j = 0; j < cn; j++, _m += cn + 1 )
+            ثابت WT* _m = m;
+            برای( صحیح j = 0; j < cn; j++, _m += cn + 1 )
                 dst[j] = saturate_cast<T>(src[j]*_m[j] + _m[cn]);
         }
     }
 }
 
-static void
-diagtransform_8u(const uchar* src, uchar* dst, const float* m, int len, int scn, int dcn)
+ایستا تهی
+diagtransform_8u(ثابت uchar* src, uchar* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (scn == 3 && dcn == 3) {
-        int x = 0;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    اگر (scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float32 m0  = vx_setall_f32(m[ 0]);
         v_float32 m3  = vx_setall_f32(m[ 3]);
@@ -2523,7 +2523,7 @@ diagtransform_8u(const uchar* src, uchar* dst, const float* m, int len, int scn,
         v_float32 m7  = vx_setall_f32(m[ 7]);
         v_float32 m10 = vx_setall_f32(m[10]);
         v_float32 m11 = vx_setall_f32(m[11]);
-        for (; x <= (len - VTraits<v_uint8>::vlanes()) * 3; x += VTraits<v_uint8>::vlanes() * 3) {
+        برای (; x <= (len - VTraits<v_uint8>::vlanes()) * 3; x += VTraits<v_uint8>::vlanes() * 3) {
             v_uint8 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
             v_uint16 b_u16_l, g_u16_l, r_u16_l;
@@ -2563,27 +2563,27 @@ diagtransform_8u(const uchar* src, uchar* dst, const float* m, int len, int scn,
                                v_pack(v_pack_u(v_round(dg_f32_l0), v_round(dg_f32_l1)), v_pack_u(v_round(dg_f32_h0), v_round(dg_f32_h1))),
                                v_pack(v_pack_u(v_round(dr_f32_l0), v_round(dr_f32_l1)), v_pack_u(v_round(dr_f32_h0), v_round(dr_f32_h1))));
         }
-        for (; x < len * 3; x += 3) {
-            int b = src[x], g = src[x + 1], r = src[x + 2];
+        برای (; x < len * 3; x += 3) {
+            صحیح b = src[x], g = src[x + 1], r = src[x + 2];
             uchar db = saturate_cast<uchar>(m[ 0] * b + m[ 3]);
             uchar dg = saturate_cast<uchar>(m[ 5] * g + m[ 7]);
             uchar dr = saturate_cast<uchar>(m[10] * r + m[11]);
             dst[x] = db; dst[x + 1] = dg; dst[x + 2] = dr;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     diagtransform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-diagtransform_8s(const schar* src, schar* dst, const float* m, int len, int scn, int dcn)
+ایستا تهی
+diagtransform_8s(ثابت schar* src, schar* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn)
 {
-    #if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (scn == 3 && dcn == 3) {
-        int x = 0;
+    #اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    اگر (scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float32 m0  = vx_setall_f32(m[ 0]);
         v_float32 m3  = vx_setall_f32(m[ 3]);
@@ -2591,7 +2591,7 @@ diagtransform_8s(const schar* src, schar* dst, const float* m, int len, int scn,
         v_float32 m7  = vx_setall_f32(m[ 7]);
         v_float32 m10 = vx_setall_f32(m[10]);
         v_float32 m11 = vx_setall_f32(m[11]);
-        for (; x <= (len - VTraits<v_int8>::vlanes()) * 3; x += VTraits<v_int8>::vlanes() * 3) {
+        برای (; x <= (len - VTraits<v_int8>::vlanes()) * 3; x += VTraits<v_int8>::vlanes() * 3) {
             v_int8 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
             v_int16 b_u16_l, g_u16_l, r_u16_l;
@@ -2631,27 +2631,27 @@ diagtransform_8s(const schar* src, schar* dst, const float* m, int len, int scn,
                                v_pack(v_pack(v_round(dg_f32_l0), v_round(dg_f32_l1)), v_pack(v_round(dg_f32_h0), v_round(dg_f32_h1))),
                                v_pack(v_pack(v_round(dr_f32_l0), v_round(dr_f32_l1)), v_pack(v_round(dr_f32_h0), v_round(dr_f32_h1))));
         }
-        for (; x < len * 3; x += 3) {
-            int b = src[x], g = src[x + 1], r = src[x + 2];
+        برای (; x < len * 3; x += 3) {
+            صحیح b = src[x], g = src[x + 1], r = src[x + 2];
             schar db = saturate_cast<schar>(m[ 0] * b + m[ 3]);
             schar dg = saturate_cast<schar>(m[ 5] * g + m[ 7]);
             schar dr = saturate_cast<schar>(m[10] * r + m[11]);
             dst[x] = db; dst[x + 1] = dg; dst[x + 2] = dr;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     diagtransform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-diagtransform_16u(const ushort* src, ushort* dst, const float* m, int len, int scn, int dcn)
+ایستا تهی
+diagtransform_16u(ثابت ushort* src, ushort* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (scn == 3 && dcn == 3) {
-        int x = 0;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    اگر (scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float32 m0  = vx_setall_f32(m[ 0]);
         v_float32 m3  = vx_setall_f32(m[ 3]);
@@ -2659,7 +2659,7 @@ diagtransform_16u(const ushort* src, ushort* dst, const float* m, int len, int s
         v_float32 m7  = vx_setall_f32(m[ 7]);
         v_float32 m10 = vx_setall_f32(m[10]);
         v_float32 m11 = vx_setall_f32(m[11]);
-        for (; x <= (len - VTraits<v_uint16>::vlanes()) * 3; x += VTraits<v_uint16>::vlanes() * 3) {
+        برای (; x <= (len - VTraits<v_uint16>::vlanes()) * 3; x += VTraits<v_uint16>::vlanes() * 3) {
             v_uint16 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
             v_uint32 b_u32_l, g_u32_l, r_u32_l;
@@ -2682,27 +2682,27 @@ diagtransform_16u(const ushort* src, ushort* dst, const float* m, int len, int s
                                v_pack_u(v_round(dg_f32_l), v_round(dg_f32_h)),
                                v_pack_u(v_round(dr_f32_l), v_round(dr_f32_h)));
         }
-        for (; x < len * 3; x += 3) {
-            int b = src[x], g = src[x + 1], r = src[x + 2];
+        برای (; x < len * 3; x += 3) {
+            صحیح b = src[x], g = src[x + 1], r = src[x + 2];
             ushort db = saturate_cast<ushort>(m[ 0] * b + m[ 3]);
             ushort dg = saturate_cast<ushort>(m[ 5] * g + m[ 7]);
             ushort dr = saturate_cast<ushort>(m[10] * r + m[11]);
             dst[x] = db; dst[x + 1] = dg; dst[x + 2] = dr;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     diagtransform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-diagtransform_16s(const short* src, short* dst, const float* m, int len, int scn, int dcn)
+ایستا تهی
+diagtransform_16s(ثابت short* src, short* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (scn == 3 && dcn == 3) {
-        int x = 0;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    اگر (scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float32 m0  = vx_setall_f32(m[ 0]);
         v_float32 m3  = vx_setall_f32(m[ 3]);
@@ -2710,7 +2710,7 @@ diagtransform_16s(const short* src, short* dst, const float* m, int len, int scn
         v_float32 m7  = vx_setall_f32(m[ 7]);
         v_float32 m10 = vx_setall_f32(m[10]);
         v_float32 m11 = vx_setall_f32(m[11]);
-        for (; x <= (len - VTraits<v_int16>::vlanes()) * 3; x += VTraits<v_int16>::vlanes() * 3) {
+        برای (; x <= (len - VTraits<v_int16>::vlanes()) * 3; x += VTraits<v_int16>::vlanes() * 3) {
             v_int16 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
             v_int32 b_u32_l, g_u32_l, r_u32_l;
@@ -2733,27 +2733,27 @@ diagtransform_16s(const short* src, short* dst, const float* m, int len, int scn
                                v_pack(v_round(dg_f32_l), v_round(dg_f32_h)),
                                v_pack(v_round(dr_f32_l), v_round(dr_f32_h)));
         }
-        for (; x < len * 3; x += 3) {
-            int b = src[x], g = src[x + 1], r = src[x + 2];
+        برای (; x < len * 3; x += 3) {
+            صحیح b = src[x], g = src[x + 1], r = src[x + 2];
             short db = saturate_cast<short>(m[ 0] * b + m[ 3]);
             short dg = saturate_cast<short>(m[ 5] * g + m[ 7]);
             short dr = saturate_cast<short>(m[10] * r + m[11]);
             dst[x] = db; dst[x + 1] = dg; dst[x + 2] = dr;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     diagtransform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-diagtransform_32s(const int* src, int* dst, const double* m, int len, int scn, int dcn)
+ایستا تهی
+diagtransform_32s(ثابت صحیح* src, صحیح* dst, ثابت دوگانه* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    if (scn == 3 && dcn == 3) {
-        int x = 0;
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    اگر (scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float64 m0  = vx_setall_f64(m[ 0]);
         v_float64 m3  = vx_setall_f64(m[ 3]);
@@ -2761,12 +2761,12 @@ diagtransform_32s(const int* src, int* dst, const double* m, int len, int scn, i
         v_float64 m7  = vx_setall_f64(m[ 7]);
         v_float64 m10 = vx_setall_f64(m[10]);
         v_float64 m11 = vx_setall_f64(m[11]);
-        for (; x <= (len - VTraits<v_float32>::vlanes()) * 3; x += VTraits<v_float32>::vlanes() * 3) {
+        برای (; x <= (len - VTraits<v_float32>::vlanes()) * 3; x += VTraits<v_float32>::vlanes() * 3) {
             v_int32 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
-            v_float64 bh = v_cvt_f64_high(b), bl = v_cvt_f64(b);
-            v_float64 gh = v_cvt_f64_high(g), gl = v_cvt_f64(g);
-            v_float64 rh = v_cvt_f64_high(r), rl = v_cvt_f64(r);
+            v_float64 bh = v_cvt_f64_بالا(b), bl = v_cvt_f64(b);
+            v_float64 gh = v_cvt_f64_بالا(g), gl = v_cvt_f64(g);
+            v_float64 rh = v_cvt_f64_بالا(r), rl = v_cvt_f64(r);
 
             v_int32 db = v_round(v_fma( m0, bl,  m3),
                                  v_fma( m0, bh,  m3));
@@ -2777,27 +2777,27 @@ diagtransform_32s(const int* src, int* dst, const double* m, int len, int scn, i
 
             v_store_interleave(dst + x, db, dg, dr);
         }
-        for (; x < len * 3; x += 3) {
-            int b = src[x], g = src[x + 1], r = src[x + 2];
-            int db = saturate_cast<int>(m[ 0] * b + m[ 3]);
-            int dg = saturate_cast<int>(m[ 5] * g + m[ 7]);
-            int dr = saturate_cast<int>(m[10] * r + m[11]);
+        برای (; x < len * 3; x += 3) {
+            صحیح b = src[x], g = src[x + 1], r = src[x + 2];
+            صحیح db = saturate_cast<صحیح>(m[ 0] * b + m[ 3]);
+            صحیح dg = saturate_cast<صحیح>(m[ 5] * g + m[ 7]);
+            صحیح dr = saturate_cast<صحیح>(m[10] * r + m[11]);
             dst[x] = db; dst[x + 1] = dg; dst[x + 2] = dr;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     diagtransform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-diagtransform_32f(const float* src, float* dst, const float* m, int len, int scn, int dcn)
+ایستا تهی
+diagtransform_32f(ثابت اعشاری* src, اعشاری* dst, ثابت اعشاری* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (scn == 3 && dcn == 3) {
-        int x = 0;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    اگر (scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float32 m0  = vx_setall_f32(m[ 0]);
         v_float32 m3  = vx_setall_f32(m[ 3]);
@@ -2805,7 +2805,7 @@ diagtransform_32f(const float* src, float* dst, const float* m, int len, int scn
         v_float32 m7  = vx_setall_f32(m[ 7]);
         v_float32 m10 = vx_setall_f32(m[10]);
         v_float32 m11 = vx_setall_f32(m[11]);
-        for (; x <= (len - VTraits<v_float32>::vlanes()) * 3; x += VTraits<v_float32>::vlanes() * 3) {
+        برای (; x <= (len - VTraits<v_float32>::vlanes()) * 3; x += VTraits<v_float32>::vlanes() * 3) {
             v_float32 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
 
@@ -2815,27 +2815,27 @@ diagtransform_32f(const float* src, float* dst, const float* m, int len, int scn
 
             v_store_interleave(dst + x, db, dg, dr);
         }
-        for (; x < len * 3; x += 3) {
-            float b = src[x], g = src[x + 1], r = src[x + 2];
-            float db = saturate_cast<float>(m[ 0] * b + m[ 3]);
-            float dg = saturate_cast<float>(m[ 5] * g + m[ 7]);
-            float dr = saturate_cast<float>(m[10] * r + m[11]);
+        برای (; x < len * 3; x += 3) {
+            اعشاری b = src[x], g = src[x + 1], r = src[x + 2];
+            اعشاری db = saturate_cast<اعشاری>(m[ 0] * b + m[ 3]);
+            اعشاری dg = saturate_cast<اعشاری>(m[ 5] * g + m[ 7]);
+            اعشاری dr = saturate_cast<اعشاری>(m[10] * r + m[11]);
             dst[x] = db; dst[x + 1] = dg; dst[x + 2] = dr;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
     diagtransform_(src, dst, m, len, scn, dcn);
 }
 
-static void
-diagtransform_64f(const double* src, double* dst, const double* m, int len, int scn, int dcn)
+ایستا تهی
+diagtransform_64f(ثابت دوگانه* src, دوگانه* dst, ثابت دوگانه* m, صحیح len, صحیح scn, صحیح dcn)
 {
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    if (scn == 3 && dcn == 3) {
-        int x = 0;
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    اگر (scn == 3 && dcn == 3) {
+        صحیح x = 0;
 
         v_float64 m0  = vx_setall_f64(m[ 0]);
         v_float64 m3  = vx_setall_f64(m[ 3]);
@@ -2843,7 +2843,7 @@ diagtransform_64f(const double* src, double* dst, const double* m, int len, int 
         v_float64 m7  = vx_setall_f64(m[ 7]);
         v_float64 m10 = vx_setall_f64(m[10]);
         v_float64 m11 = vx_setall_f64(m[11]);
-        for (; x <= (len - VTraits<v_float64>::vlanes()) * 3; x += VTraits<v_float64>::vlanes() * 3) {
+        برای (; x <= (len - VTraits<v_float64>::vlanes()) * 3; x += VTraits<v_float64>::vlanes() * 3) {
             v_float64 b, g, r;
             v_load_deinterleave(src + x, b, g, r);
 
@@ -2853,15 +2853,15 @@ diagtransform_64f(const double* src, double* dst, const double* m, int len, int 
 
             v_store_interleave(dst + x, db, dg, dr);
         }
-        for (; x < len * 3; x += 3) {
-            double b = src[x], g = src[x + 1], r = src[x + 2];
-            double db = saturate_cast<double>(m[ 0] * b + m[ 3]);
-            double dg = saturate_cast<double>(m[ 5] * g + m[ 7]);
-            double dr = saturate_cast<double>(m[10] * r + m[11]);
+        برای (; x < len * 3; x += 3) {
+            دوگانه b = src[x], g = src[x + 1], r = src[x + 2];
+            دوگانه db = saturate_cast<دوگانه>(m[ 0] * b + m[ 3]);
+            دوگانه dg = saturate_cast<دوگانه>(m[ 5] * g + m[ 7]);
+            دوگانه dr = saturate_cast<دوگانه>(m[10] * r + m[11]);
             dst[x] = db; dst[x + 1] = dg; dst[x + 2] = dr;
         }
         vx_cleanup();
-        return;
+        بازگشت;
     }
 #endif
 
@@ -2869,34 +2869,34 @@ diagtransform_64f(const double* src, double* dst, const double* m, int len, int 
 }
 
 
-template<typename T, typename WT, void (*fn)(const T*, T*, const WT*, int, int, int)>
-static void transformWrap(const void* src, void* dst, const void* m, int len, int scn, int dcn)
+template<typename T, typename WT, تهی (*fn)(ثابت T*, T*, ثابت WT*, صحیح, صحیح, صحیح)>
+ایستا تهی transformWrap(ثابت تهی* src, تهی* dst, ثابت تهی* m, صحیح len, صحیح scn, صحیح dcn)
 {
-    fn((const T*)src, (T*)dst, (const WT*)m, len, scn, dcn);
+    fn((ثابت T*)src, (T*)dst, (ثابت WT*)m, len, scn, dcn);
 }
 
-TransformFunc getTransformFunc(int depth)
+TransformFunc getTransformFunc(صحیح depth)
 {
-    static TransformFunc transformTab[CV_DEPTH_MAX] =
+    ایستا TransformFunc transformTab[CV_DEPTH_MAX] =
     {
-        transformWrap<uchar, float, transform_8u>, transformWrap<schar, float, transform_8s>, transformWrap<ushort, float, transform_16u>,
-        transformWrap<short, float, transform_16s>, transformWrap<int, double, transform_32s>, transformWrap<float, float, transform_32f>,
-        transformWrap<double, double, transform_64f>, 0
+        transformWrap<uchar, اعشاری, transform_8u>, transformWrap<schar, اعشاری, transform_8s>, transformWrap<ushort, اعشاری, transform_16u>,
+        transformWrap<short, اعشاری, transform_16s>, transformWrap<صحیح, دوگانه, transform_32s>, transformWrap<اعشاری, اعشاری, transform_32f>,
+        transformWrap<دوگانه, دوگانه, transform_64f>, 0
     };
 
-    return transformTab[depth];
+    بازگشت transformTab[depth];
 }
 
-TransformFunc getDiagTransformFunc(int depth)
+TransformFunc getDiagTransformFunc(صحیح depth)
 {
-    static TransformFunc diagTransformTab[CV_DEPTH_MAX] =
+    ایستا TransformFunc diagTransformTab[CV_DEPTH_MAX] =
     {
-        transformWrap<uchar, float, diagtransform_8u>, transformWrap<schar, float, diagtransform_8s>, transformWrap<ushort, float, diagtransform_16u>,
-        transformWrap<short, float, diagtransform_16s>, transformWrap<int, double, diagtransform_32s>, transformWrap<float, float, diagtransform_32f>,
-        transformWrap<double, double, diagtransform_64f>, 0
+        transformWrap<uchar, اعشاری, diagtransform_8u>, transformWrap<schar, اعشاری, diagtransform_8s>, transformWrap<ushort, اعشاری, diagtransform_16u>,
+        transformWrap<short, اعشاری, diagtransform_16s>, transformWrap<صحیح, دوگانه, diagtransform_32s>, transformWrap<اعشاری, اعشاری, diagtransform_32f>,
+        transformWrap<دوگانه, دوگانه, diagtransform_64f>, 0
     };
 
-    return diagTransformTab[depth];
+    بازگشت diagTransformTab[depth];
 }
 
 
@@ -2905,100 +2905,100 @@ TransformFunc getDiagTransformFunc(int depth)
 *                                  Perspective Transform                                 *
 \****************************************************************************************/
 
-template<typename T> static void
-perspectiveTransform_( const void* _src, void* _dst, const void* _m_ptr, int len, int scn, int dcn )
+template<typename T> ایستا تهی
+perspectiveTransform_( ثابت تهی* _src, تهی* _dst, ثابت تهی* _m_ptr, صحیح len, صحیح scn, صحیح dcn )
 {
-    const T* src = (const T*)_src;
+    ثابت T* src = (ثابت T*)_src;
     T* dst = (T*)_dst;
-    const double* m = (const double*)_m_ptr;
-    const double eps = FLT_EPSILON;
-    int i;
+    ثابت دوگانه* m = (ثابت دوگانه*)_m_ptr;
+    ثابت دوگانه eps = FLT_EPSILON;
+    صحیح i;
 
-    if( scn == 2 && dcn == 2 )
+    اگر( scn == 2 && dcn == 2 )
     {
-        for( i = 0; i < len*2; i += 2 )
+        برای( i = 0; i < len*2; i += 2 )
         {
             T x = src[i], y = src[i + 1];
-            double w = x*m[6] + y*m[7] + m[8];
+            دوگانه w = x*m[6] + y*m[7] + m[8];
 
-            if( fabs(w) > eps )
+            اگر( fabs(w) > eps )
             {
                 w = 1./w;
                 dst[i] = (T)((x*m[0] + y*m[1] + m[2])*w);
                 dst[i+1] = (T)((x*m[3] + y*m[4] + m[5])*w);
             }
-            else
+            وگرنه
                 dst[i] = dst[i+1] = (T)0;
         }
     }
-    else if( scn == 3 && dcn == 3 )
+    وگرنه اگر( scn == 3 && dcn == 3 )
     {
-        for( i = 0; i < len*3; i += 3 )
+        برای( i = 0; i < len*3; i += 3 )
         {
             T x = src[i], y = src[i + 1], z = src[i + 2];
-            double w = x*m[12] + y*m[13] + z*m[14] + m[15];
+            دوگانه w = x*m[12] + y*m[13] + z*m[14] + m[15];
 
-            if( fabs(w) > eps )
+            اگر( fabs(w) > eps )
             {
                 w = 1./w;
                 dst[i] = (T)((x*m[0] + y*m[1] + z*m[2] + m[3]) * w);
                 dst[i+1] = (T)((x*m[4] + y*m[5] + z*m[6] + m[7]) * w);
                 dst[i+2] = (T)((x*m[8] + y*m[9] + z*m[10] + m[11]) * w);
             }
-            else
+            وگرنه
                 dst[i] = dst[i+1] = dst[i+2] = (T)0;
         }
     }
-    else if( scn == 3 && dcn == 2 )
+    وگرنه اگر( scn == 3 && dcn == 2 )
     {
-        for( i = 0; i < len; i++, src += 3, dst += 2 )
+        برای( i = 0; i < len; i++, src += 3, dst += 2 )
         {
             T x = src[0], y = src[1], z = src[2];
-            double w = x*m[8] + y*m[9] + z*m[10] + m[11];
+            دوگانه w = x*m[8] + y*m[9] + z*m[10] + m[11];
 
-            if( fabs(w) > eps )
+            اگر( fabs(w) > eps )
             {
                 w = 1./w;
                 dst[0] = (T)((x*m[0] + y*m[1] + z*m[2] + m[3])*w);
                 dst[1] = (T)((x*m[4] + y*m[5] + z*m[6] + m[7])*w);
             }
-            else
+            وگرنه
                 dst[0] = dst[1] = (T)0;
         }
     }
-    else
+    وگرنه
     {
-        for( i = 0; i < len; i++, src += scn, dst += dcn )
+        برای( i = 0; i < len; i++, src += scn, dst += dcn )
         {
-            const double* _m = m + dcn*(scn + 1);
-            double w = _m[scn];
-            int j, k;
-            for( k = 0; k < scn; k++ )
+            ثابت دوگانه* _m = m + dcn*(scn + 1);
+            دوگانه w = _m[scn];
+            صحیح j, k;
+            برای( k = 0; k < scn; k++ )
                 w += _m[k]*src[k];
-            if( fabs(w) > eps )
+            اگر( fabs(w) > eps )
             {
                 _m = m;
-                for( j = 0; j < dcn; j++, _m += scn + 1 )
+                برای( j = 0; j < dcn; j++, _m += scn + 1 )
                 {
-                    double s = _m[scn];
-                    for( k = 0; k < scn; k++ )
+                    دوگانه s = _m[scn];
+                    برای( k = 0; k < scn; k++ )
                         s += _m[k]*src[k];
                     dst[j] = (T)(s*w);
                 }
             }
-            else
-                for( j = 0; j < dcn; j++ )
+            وگرنه
+                برای( j = 0; j < dcn; j++ )
                     dst[j] = 0;
         }
     }
 }
 
-TransformFunc getPerspectiveTransform(int depth)
+TransformFunc getPerspectiveTransform(صحیح depth)
 {
-    if (depth == CV_32F)
-        return perspectiveTransform_<float>;
-    if (depth == CV_64F)
-        return perspectiveTransform_<double>;
+    اگر (depth == CV_32F)
+        بازگشت perspectiveTransform_<اعشاری>;
+    اگر (depth == CV_64F)
+        بازگشت perspectiveTransform_<دوگانه>;
     CV_Assert(0 && "Not supported");
 }
 
@@ -3008,51 +3008,51 @@ TransformFunc getPerspectiveTransform(int depth)
 *                                       ScaleAdd                                         *
 \****************************************************************************************/
 
-static void scaleAdd_32f(const void* _src1, const void* _src2, void* _dst,
-                         int len, const void* _alpha)
+ایستا تهی scaleAdd_32f(ثابت تهی* _src1, ثابت تهی* _src2, تهی* _dst,
+                         صحیح len, ثابت تهی* _alpha)
 {
-    const float* src1 = (const float*)_src1;
-    const float* src2 = (const float*)_src2;
-    float* dst = (float*)_dst;
-    float alpha = *(const float*)_alpha;
-    int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت اعشاری* src1 = (ثابت اعشاری*)_src1;
+    ثابت اعشاری* src2 = (ثابت اعشاری*)_src2;
+    اعشاری* dst = (اعشاری*)_dst;
+    اعشاری alpha = *(ثابت اعشاری*)_alpha;
+    صحیح i = 0;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
     v_float32 v_alpha = vx_setall_f32(alpha);
-    const int cWidth = VTraits<v_float32>::vlanes();
-    for (; i <= len - cWidth; i += cWidth)
+    ثابت صحیح cWidth = VTraits<v_float32>::vlanes();
+    برای (; i <= len - cWidth; i += cWidth)
         v_store(dst + i, v_muladd(vx_load(src1 + i), v_alpha, vx_load(src2 + i)));
     vx_cleanup();
 #endif
-    for (; i < len; i++)
+    برای (; i < len; i++)
         dst[i] = src1[i] * alpha + src2[i];
 }
 
 
-static void scaleAdd_64f(const void* _src1, const void* _src2, void* _dst,
-                         int len, const void* _alpha)
+ایستا تهی scaleAdd_64f(ثابت تهی* _src1, ثابت تهی* _src2, تهی* _dst,
+                         صحیح len, ثابت تهی* _alpha)
 {
-    const double* src1 = (const double*)_src1;
-    const double* src2 = (const double*)_src2;
-    double* dst = (double*)_dst;
-    double alpha = *(const double*)_alpha;
-    int i = 0;
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ثابت دوگانه* src1 = (ثابت دوگانه*)_src1;
+    ثابت دوگانه* src2 = (ثابت دوگانه*)_src2;
+    دوگانه* dst = (دوگانه*)_dst;
+    دوگانه alpha = *(ثابت دوگانه*)_alpha;
+    صحیح i = 0;
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
     v_float64 a2 = vx_setall_f64(alpha);
-    const int cWidth = VTraits<v_float64>::vlanes();
-    for (; i <= len - cWidth; i += cWidth)
+    ثابت صحیح cWidth = VTraits<v_float64>::vlanes();
+    برای (; i <= len - cWidth; i += cWidth)
         v_store(dst + i, v_muladd(vx_load(src1 + i), a2, vx_load(src2 + i)));
     vx_cleanup();
 #endif
-    for (; i < len; i++)
+    برای (; i < len; i++)
         dst[i] = src1[i] * alpha + src2[i];
 }
 
-ScaleAddFunc getScaleAddFunc(int depth)
+ScaleAddFunc getScaleAddFunc(صحیح depth)
 {
-    if (depth == CV_32F)
-        return scaleAdd_32f;
-    if (depth == CV_64F)
-        return scaleAdd_64f;
+    اگر (depth == CV_32F)
+        بازگشت scaleAdd_32f;
+    اگر (depth == CV_64F)
+        بازگشت scaleAdd_64f;
     CV_Assert(0 && "Not supported");
 }
 
@@ -3062,88 +3062,88 @@ ScaleAddFunc getScaleAddFunc(int depth)
 *                                        Mahalanobis                                     *
 \****************************************************************************************/
 
-template<typename T> static inline
-double MahalanobisImpl(const Mat& v1, const Mat& v2, const Mat& icovar, double *diff_buffer /*[len]*/, int len /*=v1.total()*/)
+template<typename T> ایستا درونخطی
+دوگانه MahalanobisImpl(ثابت Mat& v1, ثابت Mat& v2, ثابت Mat& icovar, دوگانه *diff_buffer /*[len]*/, صحیح len /*=v1.total()*/)
 {
     CV_INSTRUMENT_REGION();
 
     Size sz = v1.size();
-    double result = 0;
+    دوگانه result = 0;
 
     sz.width *= v1.channels();
-    if (v1.isContinuous() && v2.isContinuous())
+    اگر (v1.isContinuous() && v2.isContinuous())
     {
         sz.width *= sz.height;
         sz.height = 1;
     }
 
     {
-        const T* src1 = v1.ptr<T>();
-        const T* src2 = v2.ptr<T>();
-        size_t step1 = v1.step/sizeof(src1[0]);
-        size_t step2 = v2.step/sizeof(src2[0]);
-        double* diff = diff_buffer;
-        const T* mat = icovar.ptr<T>();
-        size_t matstep = icovar.step/sizeof(mat[0]);
+        ثابت T* src1 = v1.ptr<T>();
+        ثابت T* src2 = v2.ptr<T>();
+        size_t step1 = v1.step/اندازه(src1[0]);
+        size_t step2 = v2.step/اندازه(src2[0]);
+        دوگانه* diff = diff_buffer;
+        ثابت T* mat = icovar.ptr<T>();
+        size_t matstep = icovar.step/اندازه(mat[0]);
 
-        for (; sz.height--; src1 += step1, src2 += step2, diff += sz.width)
+        برای (; sz.height--; src1 += step1, src2 += step2, diff += sz.width)
         {
-            for (int i = 0; i < sz.width; i++)
+            برای (صحیح i = 0; i < sz.width; i++)
                 diff[i] = src1[i] - src2[i];
         }
 
         diff = diff_buffer;
-        for (int i = 0; i < len; i++, mat += matstep)
+        برای (صحیح i = 0; i < len; i++, mat += matstep)
         {
-            double row_sum = 0;
-            int j = 0;
-#if CV_ENABLE_UNROLLED
-            for(; j <= len - 4; j += 4 )
+            دوگانه row_sum = 0;
+            صحیح j = 0;
+#اگر CV_ENABLE_UNROLLED
+            برای(; j <= len - 4; j += 4 )
                 row_sum += diff[j]*mat[j] + diff[j+1]*mat[j+1] +
                            diff[j+2]*mat[j+2] + diff[j+3]*mat[j+3];
 #endif
-            for (; j < len; j++)
+            برای (; j < len; j++)
                 row_sum += diff[j]*mat[j];
             result += row_sum * diff[i];
         }
     }
-    return result;
+    بازگشت result;
 }
 
-MahalanobisImplFunc getMahalanobisImplFunc(int depth)
+MahalanobisImplFunc getMahalanobisImplFunc(صحیح depth)
 {
-    if (depth == CV_32F)
-        return (MahalanobisImplFunc)MahalanobisImpl<float>;
-    if (depth == CV_64F)
-        return (MahalanobisImplFunc)MahalanobisImpl<double>;
+    اگر (depth == CV_32F)
+        بازگشت (MahalanobisImplFunc)MahalanobisImpl<اعشاری>;
+    اگر (depth == CV_64F)
+        بازگشت (MahalanobisImplFunc)MahalanobisImpl<دوگانه>;
     CV_Assert(0 && "Not supported");
 }
 
 
-#if !defined(CV_MULTRANSPOSED_BASELINE_ONLY) || defined(CV_CPU_BASELINE_MODE)
+#اگر !defined(CV_MULTRANSPOSED_BASELINE_ONLY) || defined(CV_CPU_BASELINE_MODE)
 /****************************************************************************************\
 *                                        MulTransposed                                   *
 \****************************************************************************************/
 
-template<typename sT, typename dT> static void
-MulTransposedR(const Mat& srcmat, const Mat& dstmat, const Mat& deltamat, double scale)
+template<typename sT, typename dT> ایستا تهی
+MulTransposedR(ثابت Mat& srcmat, ثابت Mat& dstmat, ثابت Mat& deltamat, دوگانه scale)
 {
-    int i, j, k;
-    const sT* src = srcmat.ptr<sT>();
+    صحیح i, j, k;
+    ثابت sT* src = srcmat.ptr<sT>();
     dT* dst = (dT*)dstmat.ptr<dT>();
-    const dT* delta = deltamat.ptr<dT>();
-    size_t srcstep = srcmat.step/sizeof(src[0]);
-    size_t dststep = dstmat.step/sizeof(dst[0]);
-    size_t deltastep = deltamat.rows > 1 ? deltamat.step/sizeof(delta[0]) : 0;
-    int delta_cols = deltamat.cols;
+    ثابت dT* delta = deltamat.ptr<dT>();
+    size_t srcstep = srcmat.step/اندازه(src[0]);
+    size_t dststep = dstmat.step/اندازه(dst[0]);
+    size_t deltastep = deltamat.rows > 1 ? deltamat.step/اندازه(delta[0]) : 0;
+    صحیح delta_cols = deltamat.cols;
     Size size = srcmat.size();
     dT* tdst = dst;
     dT* col_buf = 0;
     dT* delta_buf = 0;
-    int buf_size = size.height*sizeof(dT);
+    صحیح buf_size = size.height*اندازه(dT);
     AutoBuffer<uchar> buf;
 
-    if( delta && delta_cols < size.width )
+    اگر( delta && delta_cols < size.width )
     {
         CV_Assert( delta_cols == 1 );
         buf_size *= 5;
@@ -3151,52 +3151,52 @@ MulTransposedR(const Mat& srcmat, const Mat& dstmat, const Mat& deltamat, double
     buf.allocate(buf_size);
     col_buf = (dT*)buf.data();
 
-    if( delta && delta_cols < size.width )
+    اگر( delta && delta_cols < size.width )
     {
         delta_buf = col_buf + size.height;
-        for( i = 0; i < size.height; i++ )
+        برای( i = 0; i < size.height; i++ )
             delta_buf[i*4] = delta_buf[i*4+1] =
                 delta_buf[i*4+2] = delta_buf[i*4+3] = delta[i*deltastep];
         delta = delta_buf;
         deltastep = deltastep ? 4 : 0;
     }
 
-#if CV_SIMD128_64F
+#اگر CV_SIMD128_64F
     v_float64x2 v_scale = v_setall_f64(scale);
 #endif
 
-    if( !delta )
-        for( i = 0; i < size.width; i++, tdst += dststep )
+    اگر( !delta )
+        برای( i = 0; i < size.width; i++, tdst += dststep )
         {
-            for( k = 0; k < size.height; k++ )
+            برای( k = 0; k < size.height; k++ )
                 col_buf[k] = src[k*srcstep+i];
 
-            for( j = i; j <= size.width - 4; j += 4 )
+            برای( j = i; j <= size.width - 4; j += 4 )
             {
-#if CV_SIMD128_64F
-                if (DataType<sT>::depth == CV_64F && DataType<dT>::depth == CV_64F)
+#اگر CV_SIMD128_64F
+                اگر (DataType<sT>::depth == CV_64F && DataType<dT>::depth == CV_64F)
                 {
                     v_float64x2 s0 = v_setzero_f64(), s1 = v_setzero_f64();
-                    const double *tsrc = (double*)(src + j);
+                    ثابت دوگانه *tsrc = (دوگانه*)(src + j);
 
-                    for( k = 0; k < size.height; k++, tsrc += srcstep )
+                    برای( k = 0; k < size.height; k++, tsrc += srcstep )
                     {
-                        v_float64x2 a = v_setall_f64((double)col_buf[k]);
+                        v_float64x2 a = v_setall_f64((دوگانه)col_buf[k]);
                         s0 = v_add(s0, v_mul(a, v_load(tsrc + 0)));
                         s1 = v_add(s1, v_mul(a, v_load(tsrc + 2)));
                     }
 
-                    v_store((double*)(tdst+j), v_mul(s0, v_scale));
-                    v_store((double*)(tdst+j+2), v_mul(s1, v_scale));
-                } else
+                    v_store((دوگانه*)(tdst+j), v_mul(s0, v_scale));
+                    v_store((دوگانه*)(tdst+j+2), v_mul(s1, v_scale));
+                } وگرنه
 #endif
                 {
-                    double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
-                    const sT *tsrc = src + j;
+                    دوگانه s0 = 0, s1 = 0, s2 = 0, s3 = 0;
+                    ثابت sT *tsrc = src + j;
 
-                    for( k = 0; k < size.height; k++, tsrc += srcstep )
+                    برای( k = 0; k < size.height; k++, tsrc += srcstep )
                     {
-                        double a = col_buf[k];
+                        دوگانه a = col_buf[k];
                         s0 += a * tsrc[0];
                         s1 += a * tsrc[1];
                         s2 += a * tsrc[2];
@@ -3210,57 +3210,57 @@ MulTransposedR(const Mat& srcmat, const Mat& dstmat, const Mat& deltamat, double
                 }
             }
 
-            for( ; j < size.width; j++ )
+            برای( ; j < size.width; j++ )
             {
-                double s0 = 0;
-                const sT *tsrc = src + j;
+                دوگانه s0 = 0;
+                ثابت sT *tsrc = src + j;
 
-                for( k = 0; k < size.height; k++, tsrc += srcstep )
-                    s0 += (double)col_buf[k] * tsrc[0];
+                برای( k = 0; k < size.height; k++, tsrc += srcstep )
+                    s0 += (دوگانه)col_buf[k] * tsrc[0];
 
                 tdst[j] = (dT)(s0*scale);
             }
         }
-    else
-        for( i = 0; i < size.width; i++, tdst += dststep )
+    وگرنه
+        برای( i = 0; i < size.width; i++, tdst += dststep )
         {
-            if( !delta_buf )
-                for( k = 0; k < size.height; k++ )
+            اگر( !delta_buf )
+                برای( k = 0; k < size.height; k++ )
                     col_buf[k] = src[k*srcstep+i] - delta[k*deltastep+i];
-            else
-                for( k = 0; k < size.height; k++ )
+            وگرنه
+                برای( k = 0; k < size.height; k++ )
                     col_buf[k] = src[k*srcstep+i] - delta_buf[k*deltastep];
 
-            for( j = i; j <= size.width - 4; j += 4 )
+            برای( j = i; j <= size.width - 4; j += 4 )
             {
-#if CV_SIMD128_64F
-                if (DataType<sT>::depth == CV_64F && DataType<dT>::depth == CV_64F)
+#اگر CV_SIMD128_64F
+                اگر (DataType<sT>::depth == CV_64F && DataType<dT>::depth == CV_64F)
                 {
                     v_float64x2 s0 = v_setzero_f64(), s1 = v_setzero_f64();
-                    const double *tsrc = (double*)(src + j);
-                    const double *d = (double*)(delta_buf ? delta_buf : delta + j);
+                    ثابت دوگانه *tsrc = (دوگانه*)(src + j);
+                    ثابت دوگانه *d = (دوگانه*)(delta_buf ? delta_buf : delta + j);
 
-                    for( k = 0; k < size.height; k++, tsrc+=srcstep, d+=deltastep )
+                    برای( k = 0; k < size.height; k++, tsrc+=srcstep, d+=deltastep )
                     {
-                        v_float64x2 a = v_setall_f64((double)col_buf[k]);
+                        v_float64x2 a = v_setall_f64((دوگانه)col_buf[k]);
                         s0 = v_add(s0, v_mul(a, v_sub(v_load(tsrc + 0), v_load(d + 0))));
                         s1 = v_add(s1, v_mul(a, v_sub(v_load(tsrc + 2), v_load(d + 2))));
                     }
 
-                    v_store((double*)(tdst+j), v_mul(s0, v_scale));
-                    v_store((double*)(tdst+j+2), v_mul(s1, v_scale));
+                    v_store((دوگانه*)(tdst+j), v_mul(s0, v_scale));
+                    v_store((دوگانه*)(tdst+j+2), v_mul(s1, v_scale));
                 }
-                else
+                وگرنه
 #endif
 
                 {
-                    double s0 = 0, s1 = 0, s2 = 0, s3 = 0;
-                    const sT *tsrc = src + j;
-                    const dT *d = delta_buf ? delta_buf : delta + j;
+                    دوگانه s0 = 0, s1 = 0, s2 = 0, s3 = 0;
+                    ثابت sT *tsrc = src + j;
+                    ثابت dT *d = delta_buf ? delta_buf : delta + j;
 
-                    for( k = 0; k < size.height; k++, tsrc+=srcstep, d+=deltastep )
+                    برای( k = 0; k < size.height; k++, tsrc+=srcstep, d+=deltastep )
                     {
-                        double a = col_buf[k];
+                        دوگانه a = col_buf[k];
                         s0 += a * (tsrc[0] - d[0]);
                         s1 += a * (tsrc[1] - d[1]);
                         s2 += a * (tsrc[2] - d[2]);
@@ -3274,14 +3274,14 @@ MulTransposedR(const Mat& srcmat, const Mat& dstmat, const Mat& deltamat, double
                 }
             }
 
-            for( ; j < size.width; j++ )
+            برای( ; j < size.width; j++ )
             {
-                double s0 = 0;
-                const sT *tsrc = src + j;
-                const dT *d = delta_buf ? delta_buf : delta + j;
+                دوگانه s0 = 0;
+                ثابت sT *tsrc = src + j;
+                ثابت dT *d = delta_buf ? delta_buf : delta + j;
 
-                for( k = 0; k < size.height; k++, tsrc+=srcstep, d+=deltastep )
-                    s0 += (double)col_buf[k] * (tsrc[0] - d[0]);
+                برای( k = 0; k < size.height; k++, tsrc+=srcstep, d+=deltastep )
+                    s0 += (دوگانه)col_buf[k] * (tsrc[0] - d[0]);
 
                 tdst[j] = (dT)(s0*scale);
             }
@@ -3289,160 +3289,160 @@ MulTransposedR(const Mat& srcmat, const Mat& dstmat, const Mat& deltamat, double
 }
 
 
-template<typename sT, typename dT> static void
-MulTransposedL(const Mat& srcmat, const Mat& dstmat, const Mat& deltamat, double scale)
+template<typename sT, typename dT> ایستا تهی
+MulTransposedL(ثابت Mat& srcmat, ثابت Mat& dstmat, ثابت Mat& deltamat, دوگانه scale)
 {
-    int i, j, k;
-    const sT* src = srcmat.ptr<sT>();
+    صحیح i, j, k;
+    ثابت sT* src = srcmat.ptr<sT>();
     dT* dst = (dT*)dstmat.ptr<dT>();
-    const dT* delta = deltamat.ptr<dT>();
-    size_t srcstep = srcmat.step/sizeof(src[0]);
-    size_t dststep = dstmat.step/sizeof(dst[0]);
-    size_t deltastep = deltamat.rows > 1 ? deltamat.step/sizeof(delta[0]) : 0;
-    int delta_cols = deltamat.cols;
+    ثابت dT* delta = deltamat.ptr<dT>();
+    size_t srcstep = srcmat.step/اندازه(src[0]);
+    size_t dststep = dstmat.step/اندازه(dst[0]);
+    size_t deltastep = deltamat.rows > 1 ? deltamat.step/اندازه(delta[0]) : 0;
+    صحیح delta_cols = deltamat.cols;
     Size size = srcmat.size();
     dT* tdst = dst;
 
-    if( !delta )
-        for( i = 0; i < size.height; i++, tdst += dststep )
-            for( j = i; j < size.height; j++ )
+    اگر( !delta )
+        برای( i = 0; i < size.height; i++, tdst += dststep )
+            برای( j = i; j < size.height; j++ )
             {
-                double s = 0;
-                const sT *tsrc1 = src + i*srcstep;
-                const sT *tsrc2 = src + j*srcstep;
-#if CV_SIMD128_64F
-                if (DataType<sT>::depth == CV_64F && DataType<dT>::depth == CV_64F)
+                دوگانه s = 0;
+                ثابت sT *tsrc1 = src + i*srcstep;
+                ثابت sT *tsrc2 = src + j*srcstep;
+#اگر CV_SIMD128_64F
+                اگر (DataType<sT>::depth == CV_64F && DataType<dT>::depth == CV_64F)
                 {
-                    const double *v_tsrc1 = (double *)(tsrc1);
-                    const double *v_tsrc2 = (double *)(tsrc2);
+                    ثابت دوگانه *v_tsrc1 = (دوگانه *)(tsrc1);
+                    ثابت دوگانه *v_tsrc2 = (دوگانه *)(tsrc2);
                     v_float64x2 v_s = v_setzero_f64();
 
-                    for( k = 0; k <= size.width - 4; k += 4 )
+                    برای( k = 0; k <= size.width - 4; k += 4 )
                         v_s = v_add(v_s, v_add(v_mul(v_load(v_tsrc1 + k), v_load(v_tsrc2 + k)), v_mul(v_load(v_tsrc1 + k + 2), v_load(v_tsrc2 + k + 2))));
                     s += v_reduce_sum(v_s);
                 }
-                else
+                وگرنه
 #endif
                 {
-                    for( k = 0; k <= size.width - 4; k += 4 )
-                        s += (double)tsrc1[k]*tsrc2[k] + (double)tsrc1[k+1]*tsrc2[k+1] +
-                             (double)tsrc1[k+2]*tsrc2[k+2] + (double)tsrc1[k+3]*tsrc2[k+3];
+                    برای( k = 0; k <= size.width - 4; k += 4 )
+                        s += (دوگانه)tsrc1[k]*tsrc2[k] + (دوگانه)tsrc1[k+1]*tsrc2[k+1] +
+                             (دوگانه)tsrc1[k+2]*tsrc2[k+2] + (دوگانه)tsrc1[k+3]*tsrc2[k+3];
                 }
-                for( ; k < size.width; k++ )
-                    s += (double)tsrc1[k] * tsrc2[k];
+                برای( ; k < size.width; k++ )
+                    s += (دوگانه)tsrc1[k] * tsrc2[k];
                 tdst[j] = (dT)(s*scale);
             }
-    else
+    وگرنه
     {
         dT delta_buf[4];
-        int delta_shift = delta_cols == size.width ? 4 : 0;
-        AutoBuffer<uchar> buf(size.width*sizeof(dT));
+        صحیح delta_shift = delta_cols == size.width ? 4 : 0;
+        AutoBuffer<uchar> buf(size.width*اندازه(dT));
         dT* row_buf = (dT*)buf.data();
 
-        for( i = 0; i < size.height; i++, tdst += dststep )
+        برای( i = 0; i < size.height; i++, tdst += dststep )
         {
-            const sT *tsrc1 = src + i*srcstep;
-            const dT *tdelta1 = delta + i*deltastep;
+            ثابت sT *tsrc1 = src + i*srcstep;
+            ثابت dT *tdelta1 = delta + i*deltastep;
 
-            if( delta_cols < size.width )
-                for( k = 0; k < size.width; k++ )
+            اگر( delta_cols < size.width )
+                برای( k = 0; k < size.width; k++ )
                     row_buf[k] = tsrc1[k] - tdelta1[0];
-            else
-                for( k = 0; k < size.width; k++ )
+            وگرنه
+                برای( k = 0; k < size.width; k++ )
                     row_buf[k] = tsrc1[k] - tdelta1[k];
 
-            for( j = i; j < size.height; j++ )
+            برای( j = i; j < size.height; j++ )
             {
-                double s = 0;
-                const sT *tsrc2 = src + j*srcstep;
-                const dT *tdelta2 = delta + j*deltastep;
-                if( delta_cols < size.width )
+                دوگانه s = 0;
+                ثابت sT *tsrc2 = src + j*srcstep;
+                ثابت dT *tdelta2 = delta + j*deltastep;
+                اگر( delta_cols < size.width )
                 {
                     delta_buf[0] = delta_buf[1] =
                         delta_buf[2] = delta_buf[3] = tdelta2[0];
                     tdelta2 = delta_buf;
                 }
-#if CV_SIMD128_64F
-                if (DataType<sT>::depth == CV_64F && DataType<dT>::depth == CV_64F)
+#اگر CV_SIMD128_64F
+                اگر (DataType<sT>::depth == CV_64F && DataType<dT>::depth == CV_64F)
                 {
-                    const double *v_tsrc2 = (double *)(tsrc2);
-                    const double *v_tdelta2 = (double *)(tdelta2);
-                    const double *v_row_buf = (double *)(row_buf);
+                    ثابت دوگانه *v_tsrc2 = (دوگانه *)(tsrc2);
+                    ثابت دوگانه *v_tdelta2 = (دوگانه *)(tdelta2);
+                    ثابت دوگانه *v_row_buf = (دوگانه *)(row_buf);
                     v_float64x2 v_s = v_setzero_f64();
 
-                    for( k = 0; k <= size.width - 4; k += 4, v_tdelta2 += delta_shift )
+                    برای( k = 0; k <= size.width - 4; k += 4, v_tdelta2 += delta_shift )
                         v_s = v_add(v_s, v_add(v_mul(v_sub(v_load(v_tsrc2 + k), v_load(v_tdelta2)), v_load(v_row_buf + k)), v_mul(v_sub(v_load(v_tsrc2 + k + 2), v_load(v_tdelta2 + 2)), v_load(v_row_buf + k + 2))));
                     s += v_reduce_sum(v_s);
 
-                    tdelta2 = (const dT *)(v_tdelta2);
+                    tdelta2 = (ثابت dT *)(v_tdelta2);
                 }
-                else
+                وگرنه
 #endif
                 {
-                    for( k = 0; k <= size.width-4; k += 4, tdelta2 += delta_shift )
-                        s += (double)row_buf[k]*(tsrc2[k] - tdelta2[0]) +
-                             (double)row_buf[k+1]*(tsrc2[k+1] - tdelta2[1]) +
-                             (double)row_buf[k+2]*(tsrc2[k+2] - tdelta2[2]) +
-                             (double)row_buf[k+3]*(tsrc2[k+3] - tdelta2[3]);
+                    برای( k = 0; k <= size.width-4; k += 4, tdelta2 += delta_shift )
+                        s += (دوگانه)row_buf[k]*(tsrc2[k] - tdelta2[0]) +
+                             (دوگانه)row_buf[k+1]*(tsrc2[k+1] - tdelta2[1]) +
+                             (دوگانه)row_buf[k+2]*(tsrc2[k+2] - tdelta2[2]) +
+                             (دوگانه)row_buf[k+3]*(tsrc2[k+3] - tdelta2[3]);
                 }
-                for( ; k < size.width; k++, tdelta2++ )
-                    s += (double)row_buf[k]*(tsrc2[k] - tdelta2[0]);
+                برای( ; k < size.width; k++, tdelta2++ )
+                    s += (دوگانه)row_buf[k]*(tsrc2[k] - tdelta2[0]);
                 tdst[j] = (dT)(s*scale);
             }
         }
     }
 }
 
-MulTransposedFunc getMulTransposedFunc(int stype, int dtype, bool ata)
+MulTransposedFunc getMulTransposedFunc(صحیح stype, صحیح dtype, منطقی ata)
 {
-    MulTransposedFunc func = NULL;
-    if (stype == CV_8U && dtype == CV_32F)
+    MulTransposedFunc func = پوچ;
+    اگر (stype == CV_8U && dtype == CV_32F)
     {
-        func = ata ? MulTransposedR<uchar,float>
-                   : MulTransposedL<uchar,float>;
+        func = ata ? MulTransposedR<uchar,اعشاری>
+                   : MulTransposedL<uchar,اعشاری>;
     }
-    else if (stype == CV_8U && dtype == CV_64F)
+    وگرنه اگر (stype == CV_8U && dtype == CV_64F)
     {
-        func = ata ? MulTransposedR<uchar,double>
-                   : MulTransposedL<uchar,double>;
+        func = ata ? MulTransposedR<uchar,دوگانه>
+                   : MulTransposedL<uchar,دوگانه>;
     }
-    else if(stype == CV_16U && dtype == CV_32F)
+    وگرنه اگر(stype == CV_16U && dtype == CV_32F)
     {
-        func = ata ? MulTransposedR<ushort,float>
-                   : MulTransposedL<ushort,float>;
+        func = ata ? MulTransposedR<ushort,اعشاری>
+                   : MulTransposedL<ushort,اعشاری>;
     }
-    else if(stype == CV_16U && dtype == CV_64F)
+    وگرنه اگر(stype == CV_16U && dtype == CV_64F)
     {
-        func = ata ? MulTransposedR<ushort,double>
-                   : MulTransposedL<ushort,double>;
+        func = ata ? MulTransposedR<ushort,دوگانه>
+                   : MulTransposedL<ushort,دوگانه>;
     }
-    else if(stype == CV_16S && dtype == CV_32F)
+    وگرنه اگر(stype == CV_16S && dtype == CV_32F)
     {
-        func = ata ? MulTransposedR<short,float>
-                   : MulTransposedL<short,float>;
+        func = ata ? MulTransposedR<short,اعشاری>
+                   : MulTransposedL<short,اعشاری>;
     }
-    else if(stype == CV_16S && dtype == CV_64F)
+    وگرنه اگر(stype == CV_16S && dtype == CV_64F)
     {
-        func = ata ? MulTransposedR<short,double>
-                   : MulTransposedL<short,double>;
+        func = ata ? MulTransposedR<short,دوگانه>
+                   : MulTransposedL<short,دوگانه>;
     }
-    else if(stype == CV_32F && dtype == CV_32F)
+    وگرنه اگر(stype == CV_32F && dtype == CV_32F)
     {
-        func = ata ? MulTransposedR<float,float>
-                   : MulTransposedL<float,float>;
+        func = ata ? MulTransposedR<اعشاری,اعشاری>
+                   : MulTransposedL<اعشاری,اعشاری>;
     }
-    else if(stype == CV_32F && dtype == CV_64F)
+    وگرنه اگر(stype == CV_32F && dtype == CV_64F)
     {
-        func = ata ? MulTransposedR<float,double>
-                   : MulTransposedL<float,double>;
+        func = ata ? MulTransposedR<اعشاری,دوگانه>
+                   : MulTransposedL<اعشاری,دوگانه>;
     }
-    else if(stype == CV_64F && dtype == CV_64F)
+    وگرنه اگر(stype == CV_64F && dtype == CV_64F)
     {
-        func = ata ? MulTransposedR<double,double>
-                   : MulTransposedL<double,double>;
+        func = ata ? MulTransposedR<دوگانه,دوگانه>
+                   : MulTransposedL<دوگانه,دوگانه>;
     }
     CV_Assert(func && "Not supported");
-    return func;
+    بازگشت func;
 }
 #endif // !defined(CV_MULTRANSPOSED_BASELINE_ONLY) || defined(CV_CPU_BASELINE_MODE)
 
@@ -3451,53 +3451,53 @@ MulTransposedFunc getMulTransposedFunc(int stype, int dtype, bool ata)
 *                                      Dot Product                                       *
 \****************************************************************************************/
 
-template<typename T> static inline
-double dotProd_(const T* src1, const T* src2, int len)
+template<typename T> ایستا درونخطی
+دوگانه dotProd_(ثابت T* src1, ثابت T* src2, صحیح len)
 {
-    int i = 0;
-    double result = 0;
+    صحیح i = 0;
+    دوگانه result = 0;
 
-#if CV_ENABLE_UNROLLED
-    for( ; i <= len - 4; i += 4 )
-        result += (double)src1[i]*src2[i] + (double)src1[i+1]*src2[i+1] +
-            (double)src1[i+2]*src2[i+2] + (double)src1[i+3]*src2[i+3];
+#اگر CV_ENABLE_UNROLLED
+    برای( ; i <= len - 4; i += 4 )
+        result += (دوگانه)src1[i]*src2[i] + (دوگانه)src1[i+1]*src2[i+1] +
+            (دوگانه)src1[i+2]*src2[i+2] + (دوگانه)src1[i+3]*src2[i+3];
 #endif
-    for( ; i < len; i++ )
-        result += (double)src1[i]*src2[i];
+    برای( ; i < len; i++ )
+        result += (دوگانه)src1[i]*src2[i];
 
-    return result;
+    بازگشت result;
 }
 
 
-double dotProd_8u(const uchar* src1, const uchar* src2, int len)
+دوگانه dotProd_8u(ثابت uchar* src1, ثابت uchar* src2, صحیح len)
 {
-    double r = 0;
-    int i = 0;
+    دوگانه r = 0;
+    صحیح i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    int len0 = len & -VTraits<v_uint16>::vlanes(), blockSize0 = (1 << 15), blockSize;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    صحیح len0 = len & -VTraits<v_uint16>::vlanes(), blockSize0 = (1 << 15), blockSize;
 
-    while (i < len0)
+    وقتی (i < len0)
     {
         blockSize = std::min(len0 - i, blockSize0);
         v_uint32 v_sum = vx_setzero_u32();
-        const int cWidth = VTraits<v_uint16>::vlanes();
+        ثابت صحیح cWidth = VTraits<v_uint16>::vlanes();
 
-        int j = 0;
-        for (; j <= blockSize - cWidth * 2; j += cWidth * 2)
+        صحیح j = 0;
+        برای (; j <= blockSize - cWidth * 2; j += cWidth * 2)
         {
             v_uint8 v_src1 = vx_load(src1 + j);
             v_uint8 v_src2 = vx_load(src2 + j);
             v_sum = v_dotprod_expand_fast(v_src1, v_src2, v_sum);
         }
 
-        for (; j <= blockSize - cWidth; j += cWidth)
+        برای (; j <= blockSize - cWidth; j += cWidth)
         {
             v_int16 v_src10 = v_reinterpret_as_s16(vx_load_expand(src1 + j));
             v_int16 v_src20 = v_reinterpret_as_s16(vx_load_expand(src2 + j));
             v_sum = v_add(v_sum, v_reinterpret_as_u32(v_dotprod_fast(v_src10, v_src20)));
         }
-        r += (double)v_reduce_sum(v_sum);
+        r += (دوگانه)v_reduce_sum(v_sum);
 
         src1 += blockSize;
         src2 += blockSize;
@@ -3505,39 +3505,39 @@ double dotProd_8u(const uchar* src1, const uchar* src2, int len)
     }
     vx_cleanup();
 #endif
-    return r + dotProd_(src1, src2, len - i);
+    بازگشت r + dotProd_(src1, src2, len - i);
 }
 
 
-double dotProd_8s(const schar* src1, const schar* src2, int len)
+دوگانه dotProd_8s(ثابت schar* src1, ثابت schar* src2, صحیح len)
 {
-    double r = 0.0;
-    int i = 0;
+    دوگانه r = 0.0;
+    صحیح i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    int len0 = len & -VTraits<v_int16>::vlanes(), blockSize0 = (1 << 14), blockSize;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    صحیح len0 = len & -VTraits<v_int16>::vlanes(), blockSize0 = (1 << 14), blockSize;
 
-    while (i < len0)
+    وقتی (i < len0)
     {
         blockSize = std::min(len0 - i, blockSize0);
         v_int32 v_sum = vx_setzero_s32();
-        const int cWidth = VTraits<v_int16>::vlanes();
+        ثابت صحیح cWidth = VTraits<v_int16>::vlanes();
 
-        int j = 0;
-        for (; j <= blockSize - cWidth * 2; j += cWidth * 2)
+        صحیح j = 0;
+        برای (; j <= blockSize - cWidth * 2; j += cWidth * 2)
         {
             v_int8 v_src1 = vx_load(src1 + j);
             v_int8 v_src2 = vx_load(src2 + j);
             v_sum = v_dotprod_expand_fast(v_src1, v_src2, v_sum);
         }
 
-        for (; j <= blockSize - cWidth; j += cWidth)
+        برای (; j <= blockSize - cWidth; j += cWidth)
         {
             v_int16 v_src1 = vx_load_expand(src1 + j);
             v_int16 v_src2 = vx_load_expand(src2 + j);
             v_sum = v_dotprod_fast(v_src1, v_src2, v_sum);
         }
-        r += (double)v_reduce_sum(v_sum);
+        r += (دوگانه)v_reduce_sum(v_sum);
 
         src1 += blockSize;
         src2 += blockSize;
@@ -3546,31 +3546,31 @@ double dotProd_8s(const schar* src1, const schar* src2, int len)
     vx_cleanup();
 #endif
 
-    return r + dotProd_(src1, src2, len - i);
+    بازگشت r + dotProd_(src1, src2, len - i);
 }
 
-double dotProd_16u(const ushort* src1, const ushort* src2, int len)
+دوگانه dotProd_16u(ثابت ushort* src1, ثابت ushort* src2, صحیح len)
 {
-    double r = 0.0;
-    int i = 0;
+    دوگانه r = 0.0;
+    صحیح i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    int len0 = len & -VTraits<v_uint16>::vlanes(), blockSize0 = (1 << 24), blockSize;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    صحیح len0 = len & -VTraits<v_uint16>::vlanes(), blockSize0 = (1 << 24), blockSize;
 
-    while (i < len0)
+    وقتی (i < len0)
     {
         blockSize = std::min(len0 - i, blockSize0);
         v_uint64 v_sum = vx_setzero_u64();
-        const int cWidth = VTraits<v_uint16>::vlanes();
+        ثابت صحیح cWidth = VTraits<v_uint16>::vlanes();
 
-        int j = 0;
-        for (; j <= blockSize - cWidth; j += cWidth)
+        صحیح j = 0;
+        برای (; j <= blockSize - cWidth; j += cWidth)
         {
             v_uint16 v_src1 = vx_load(src1 + j);
             v_uint16 v_src2 = vx_load(src2 + j);
             v_sum = v_dotprod_expand_fast(v_src1, v_src2, v_sum);
         }
-        r += (double)v_reduce_sum(v_sum);
+        r += (دوگانه)v_reduce_sum(v_sum);
 
         src1 += blockSize;
         src2 += blockSize;
@@ -3578,31 +3578,31 @@ double dotProd_16u(const ushort* src1, const ushort* src2, int len)
     }
     vx_cleanup();
 #endif
-    return r + dotProd_(src1, src2, len - i);
+    بازگشت r + dotProd_(src1, src2, len - i);
 }
 
-double dotProd_16s(const short* src1, const short* src2, int len)
+دوگانه dotProd_16s(ثابت short* src1, ثابت short* src2, صحیح len)
 {
-    double r = 0.0;
-    int i = 0;
+    دوگانه r = 0.0;
+    صحیح i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    int len0 = len & -VTraits<v_int16>::vlanes(), blockSize0 = (1 << 24), blockSize;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    صحیح len0 = len & -VTraits<v_int16>::vlanes(), blockSize0 = (1 << 24), blockSize;
 
-    while (i < len0)
+    وقتی (i < len0)
     {
         blockSize = std::min(len0 - i, blockSize0);
         v_int64 v_sum = vx_setzero_s64();
-        const int cWidth = VTraits<v_int16>::vlanes();
+        ثابت صحیح cWidth = VTraits<v_int16>::vlanes();
 
-        int j = 0;
-        for (; j <= blockSize - cWidth; j += cWidth)
+        صحیح j = 0;
+        برای (; j <= blockSize - cWidth; j += cWidth)
         {
             v_int16 v_src1 = vx_load(src1 + j);
             v_int16 v_src2 = vx_load(src2 + j);
             v_sum = v_dotprod_expand_fast(v_src1, v_src2, v_sum);
         }
-        r += (double)v_reduce_sum(v_sum);
+        r += (دوگانه)v_reduce_sum(v_sum);
 
         src1 += blockSize;
         src2 += blockSize;
@@ -3610,20 +3610,20 @@ double dotProd_16s(const short* src1, const short* src2, int len)
     }
     vx_cleanup();
 #endif
-    return r + dotProd_(src1, src2, len - i);
+    بازگشت r + dotProd_(src1, src2, len - i);
 }
 
-double dotProd_32s(const int* src1, const int* src2, int len)
+دوگانه dotProd_32s(ثابت صحیح* src1, ثابت صحیح* src2, صحیح len)
 {
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    double r = .0;
-    int i = 0;
-    const int step  = VTraits<v_int32>::vlanes();
+#اگر CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    دوگانه r = .0;
+    صحیح i = 0;
+    ثابت صحیح step  = VTraits<v_int32>::vlanes();
     v_float64 v_sum0 = vx_setzero_f64();
-#if CV_SIMD_WIDTH == 16
-    const int wstep = step * 2;
+#اگر CV_SIMD_WIDTH == 16
+    ثابت صحیح wstep = step * 2;
     v_float64 v_sum1 = vx_setzero_f64();
-    for (; i <= len - wstep; i += wstep, src1 += wstep, src2 += wstep)
+    برای (; i <= len - wstep; i += wstep, src1 += wstep, src2 += wstep)
     {
         v_int32 v_src10 = vx_load(src1);
         v_int32 v_src20 = vx_load(src2);
@@ -3634,7 +3634,7 @@ double dotProd_32s(const int* src1, const int* src2, int len)
     }
     v_sum0 = v_add(v_sum0, v_sum1);
 #endif
-    for (; i <= len - step; i += step, src1 += step, src2 += step)
+    برای (; i <= len - step; i += step, src1 += step, src2 += step)
     {
         v_int32 v_src1 = vx_load(src1);
         v_int32 v_src2 = vx_load(src2);
@@ -3642,34 +3642,34 @@ double dotProd_32s(const int* src1, const int* src2, int len)
     }
     r = v_reduce_sum(v_sum0);
     vx_cleanup();
-    return r + dotProd_(src1, src2, len - i);
-#else
-    return dotProd_(src1, src2, len);
+    بازگشت r + dotProd_(src1, src2, len - i);
+#وگرنه
+    بازگشت dotProd_(src1, src2, len);
 #endif
 }
 
-double dotProd_32f(const float* src1, const float* src2, int len)
+دوگانه dotProd_32f(ثابت اعشاری* src1, ثابت اعشاری* src2, صحیح len)
 {
-    double r = 0.0;
-    int i = 0;
+    دوگانه r = 0.0;
+    صحیح i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    int len0 = len & -VTraits<v_float32>::vlanes(), blockSize0 = (1 << 13), blockSize;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    صحیح len0 = len & -VTraits<v_float32>::vlanes(), blockSize0 = (1 << 13), blockSize;
 
-    while (i < len0)
+    وقتی (i < len0)
     {
         blockSize = std::min(len0 - i, blockSize0);
         v_float32 v_sum = vx_setzero_f32();
 
-        int j = 0;
-        int cWidth = VTraits<v_float32>::vlanes();
+        صحیح j = 0;
+        صحیح cWidth = VTraits<v_float32>::vlanes();
 
-#if CV_ENABLE_UNROLLED
+#اگر CV_ENABLE_UNROLLED
         v_float32 v_sum1 = vx_setzero_f32();
         v_float32 v_sum2 = vx_setzero_f32();
         v_float32 v_sum3 = vx_setzero_f32();
 
-        for (; j <= blockSize - (cWidth * 4); j += (cWidth * 4))
+        برای (; j <= blockSize - (cWidth * 4); j += (cWidth * 4))
         {
             v_sum  = v_muladd(vx_load(src1 + j),
                               vx_load(src2 + j), v_sum);
@@ -3684,7 +3684,7 @@ double dotProd_32f(const float* src1, const float* src2, int len)
         v_sum = v_add(v_sum, v_add(v_add(v_sum1, v_sum2), v_sum3));
 #endif
 
-        for (; j <= blockSize - cWidth; j += cWidth)
+        برای (; j <= blockSize - cWidth; j += cWidth)
             v_sum = v_muladd(vx_load(src1 + j), vx_load(src2 + j), v_sum);
 
         r += v_reduce_sum(v_sum);
@@ -3695,12 +3695,12 @@ double dotProd_32f(const float* src1, const float* src2, int len)
     }
     vx_cleanup();
 #endif
-    return r + dotProd_(src1, src2, len - i);
+    بازگشت r + dotProd_(src1, src2, len - i);
 }
 
-double dotProd_64f(const double* src1, const double* src2, int len)
+دوگانه dotProd_64f(ثابت دوگانه* src1, ثابت دوگانه* src2, صحیح len)
 {
-    return dotProd_(src1, src2, len);
+    بازگشت dotProd_(src1, src2, len);
 }
 
 #endif

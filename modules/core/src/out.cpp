@@ -41,55 +41,55 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
-namespace cv
+فضاینام cv
 {
-    class FormattedImpl CV_FINAL : public Formatted
+    رده FormattedImpl CV_FINAL : عمومی Formatted
     {
-        enum { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
-               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_VALUE, STATE_FINISHED,
-               STATE_LINE_SEPARATOR, STATE_CN_SEPARATOR, STATE_VALUE_SEPARATOR };
-        enum {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
+        شمارش { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
+               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_مقدار, STATE_FINISHED,
+               STATE_سطر_SEPARATOR, STATE_CN_SEPARATOR, STATE_مقدار_SEPARATOR };
+        شمارش {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
 
-        char floatFormat[8];
-        char buf[32];   // enough for double with precision up to 20
+        نویسه floatFormat[8];
+        نویسه buf[32];   // enough for double with precision up to 20
 
         Mat mtx;
-        int mcn; // == mtx.channels()
-        bool singleLine;
-        bool alignOrder;    // true when cn first order
+        صحیح mcn; // == mtx.channels()
+        منطقی single_سطر;
+        منطقی alignOrder;    // true when cn first order
 
-        int state;
-        int row;
-        int col;
-        int cn;
+        صحیح state;
+        صحیح row;
+        صحیح col;
+        صحیح cn;
 
         String prologue;
         String epilogue;
-        char braces[5];
+        نویسه braces[5];
 
-        void (FormattedImpl::*valueToStr)();
-        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
-        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
-        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
-        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
-        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
-        void valueToStr32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
-        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
-        void valueToStr32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
-        void valueToStr64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
-        void valueToStr64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
-        void valueToStr64s() { snprintf(buf, sizeof(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
-        void valueToStr16f() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<hfloat>(row, col)[cn]); }
-        void valueToStr16bf() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<bfloat>(row, col)[cn]); }
-        void valueToStr8f()   { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8_t>(row, col)[cn]); }
-        void valueToStr8fnuz() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8a_t>(row, col)[cn]); }
-        void valueToStrOther() { buf[0] = 0; }
+        تهی (FormattedImpl::*مقدار_To_Str)();
+        تهی مقدار_To_Str_Bool() { snprintf(buf, اندازه(buf), "%d", (صحیح)mtx.ptr<uchar>(row, col)[cn] != 0); }
+        تهی مقدار_To_Str8u()  { snprintf(buf, اندازه(buf), "%3d", (صحیح)mtx.ptr<uchar>(row, col)[cn]); }
+        تهی مقدار_To_Str8s()  { snprintf(buf, اندازه(buf), "%3d", (صحیح)mtx.ptr<schar>(row, col)[cn]); }
+        تهی مقدار_To_Str16u() { snprintf(buf, اندازه(buf), "%d", (صحیح)mtx.ptr<ushort>(row, col)[cn]); }
+        تهی مقدار_To_Str16s() { snprintf(buf, اندازه(buf), "%d", (صحیح)mtx.ptr<short>(row, col)[cn]); }
+        تهی مقدار_To_Str32u() { snprintf(buf, اندازه(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
+        تهی مقدار_To_Str32s() { snprintf(buf, اندازه(buf), "%d", mtx.ptr<صحیح>(row, col)[cn]); }
+        تهی مقدار_To_Str32f() { snprintf(buf, اندازه(buf), floatFormat, mtx.ptr<اعشاری>(row, col)[cn]); }
+        تهی مقدار_To_Str64f() { snprintf(buf, اندازه(buf), floatFormat, mtx.ptr<دوگانه>(row, col)[cn]); }
+        تهی مقدار_To_Str64u() { snprintf(buf, اندازه(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
+        تهی مقدار_To_Str64s() { snprintf(buf, اندازه(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
+        تهی مقدار_To_Str16f() { snprintf(buf, اندازه(buf), floatFormat, (اعشاری)mtx.ptr<hfloat>(row, col)[cn]); }
+        تهی مقدار_To_Str16bf() { snprintf(buf, اندازه(buf), floatFormat, (اعشاری)mtx.ptr<bfloat>(row, col)[cn]); }
+        تهی مقدار_To_Str8f()   { snprintf(buf, اندازه(buf), floatFormat, (اعشاری)mtx.ptr<fp8_t>(row, col)[cn]); }
+        تهی مقدار_To_Str8fnuz() { snprintf(buf, اندازه(buf), floatFormat, (اعشاری)mtx.ptr<fp8a_t>(row, col)[cn]); }
+        تهی مقدار_To_Str_Other() { buf[0] = 0; }
 
-    public:
+    عمومی:
 
-        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, int precision)
+        FormattedImpl(String pl, String el, Mat m, نویسه br[5], منطقی s_سطر, منطقی aOrder, صحیح precision)
         {
             CV_Assert(m.dims <= 2);
 
@@ -99,290 +99,290 @@ namespace cv
             mcn = m.channels();
             memcpy(braces, br, 5);
             state = STATE_PROLOGUE;
-            singleLine = sLine;
+            single_سطر = s_سطر;
             alignOrder = aOrder;
             row = col = cn =0;
 
-            if (precision < 0)
+            اگر (precision < 0)
             {
                 floatFormat[0] = '%';
                 floatFormat[1] = 'a';
                 floatFormat[2] = 0;
             }
-            else
+            وگرنه
             {
-                cv_snprintf(floatFormat, sizeof(floatFormat), "%%.%dg", std::min(precision, 20));
+                cv_snprintf(floatFormat, اندازه(floatFormat), "%%.%dg", std::min(precision, 20));
             }
 
-            switch(mtx.depth())
+            انتخاب(mtx.depth())
             {
-                case CV_8U:  valueToStr = &FormattedImpl::valueToStr8u; break;
-                case CV_8S:  valueToStr = &FormattedImpl::valueToStr8s; break;
-                case CV_Bool: valueToStr = &FormattedImpl::valueToStrBool; break;
-                case CV_16U: valueToStr = &FormattedImpl::valueToStr16u; break;
-                case CV_16S: valueToStr = &FormattedImpl::valueToStr16s; break;
-                case CV_32U: valueToStr = &FormattedImpl::valueToStr32u; break;
-                case CV_32S: valueToStr = &FormattedImpl::valueToStr32s; break;
-                case CV_32F: valueToStr = &FormattedImpl::valueToStr32f; break;
-                case CV_64F: valueToStr = &FormattedImpl::valueToStr64f; break;
-                case CV_64U: valueToStr = &FormattedImpl::valueToStr64u; break;
-                case CV_64S: valueToStr = &FormattedImpl::valueToStr64s; break;
-                case CV_16F: valueToStr = &FormattedImpl::valueToStr16f; break;
-                case CV_16BF: valueToStr = &FormattedImpl::valueToStr16bf; break;
-                case CV_8F_E4M3FN:   valueToStr = &FormattedImpl::valueToStr8f; break;
-                case CV_8F_E4M3FNUZ: valueToStr = &FormattedImpl::valueToStr8fnuz; break;
-                default:
+                حالت CV_8U:  مقدار_To_Str = &FormattedImpl::مقدار_To_Str8u; بشکن;
+                حالت CV_8S:  مقدار_To_Str = &FormattedImpl::مقدار_To_Str8s; بشکن;
+                حالت CV_Bool: مقدار_To_Str = &FormattedImpl::مقدار_To_Str_Bool; بشکن;
+                حالت CV_16U: مقدار_To_Str = &FormattedImpl::مقدار_To_Str16u; بشکن;
+                حالت CV_16S: مقدار_To_Str = &FormattedImpl::مقدار_To_Str16s; بشکن;
+                حالت CV_32U: مقدار_To_Str = &FormattedImpl::مقدار_To_Str32u; بشکن;
+                حالت CV_32S: مقدار_To_Str = &FormattedImpl::مقدار_To_Str32s; بشکن;
+                حالت CV_32F: مقدار_To_Str = &FormattedImpl::مقدار_To_Str32f; بشکن;
+                حالت CV_64F: مقدار_To_Str = &FormattedImpl::مقدار_To_Str64f; بشکن;
+                حالت CV_64U: مقدار_To_Str = &FormattedImpl::مقدار_To_Str64u; بشکن;
+                حالت CV_64S: مقدار_To_Str = &FormattedImpl::مقدار_To_Str64s; بشکن;
+                حالت CV_16F: مقدار_To_Str = &FormattedImpl::مقدار_To_Str16f; بشکن;
+                حالت CV_16BF: مقدار_To_Str = &FormattedImpl::مقدار_To_Str16bf; بشکن;
+                حالت CV_8F_E4M3FN:   مقدار_To_Str = &FormattedImpl::مقدار_To_Str8f; بشکن;
+                حالت CV_8F_E4M3FNUZ: مقدار_To_Str = &FormattedImpl::مقدار_To_Str8fnuz; بشکن;
+                پیشفرض:
                     CV_Error_(Error::StsError, ("unsupported matrix type %d\n", mtx.depth()));
             }
         }
 
-        void reset() CV_OVERRIDE
+        تهی reset() CV_OVERRIDE
         {
             state = STATE_PROLOGUE;
         }
 
-        const char* next() CV_OVERRIDE
+        ثابت نویسه* next() CV_OVERRIDE
         {
-            switch(state)
+            انتخاب(state)
             {
-                case STATE_PROLOGUE:
+                حالت STATE_PROLOGUE:
                     row = 0;
-                    if (mtx.empty())
+                    اگر (mtx.empty())
                         state = STATE_EPILOGUE;
-                    else if (alignOrder)
+                    وگرنه اگر (alignOrder)
                         state = STATE_INTERLUDE;
-                    else
+                    وگرنه
                         state = STATE_ROW_OPEN;
-                    return prologue.c_str();
-                case STATE_INTERLUDE:
+                    بازگشت prologue.c_str();
+                حالت STATE_INTERLUDE:
                     state = STATE_ROW_OPEN;
-                    if (row >= mtx.rows)
+                    اگر (row >= mtx.rows)
                     {
-                        if (++cn >= mcn)
+                        اگر (++cn >= mcn)
                         {
                             state = STATE_EPILOGUE;
                             buf[0] = 0;
-                            return buf;
+                            بازگشت buf;
                         }
-                        else
+                        وگرنه
                             row = 0;
-                        snprintf(buf, sizeof(buf), "\n(:, :, %d) = \n", cn+1);
-                        return buf;
+                        snprintf(buf, اندازه(buf), "\n(:, :, %d) = \n", cn+1);
+                        بازگشت buf;
                     }
-                    snprintf(buf, sizeof(buf), "(:, :, %d) = \n", cn+1);
-                    return buf;
-                case STATE_EPILOGUE:
+                    snprintf(buf, اندازه(buf), "(:, :, %d) = \n", cn+1);
+                    بازگشت buf;
+                حالت STATE_EPILOGUE:
                     state = STATE_FINISHED;
-                    return epilogue.c_str();
-                case STATE_ROW_OPEN:
+                    بازگشت epilogue.c_str();
+                حالت STATE_ROW_OPEN:
                     col = 0;
                     state = STATE_CN_OPEN;
                     {
                         size_t pos = 0;
-                        if (row > 0)
-                            while(pos < prologue.size() && pos < sizeof(buf) - 2)
+                        اگر (row > 0)
+                            وقتی(pos < prologue.size() && pos < اندازه(buf) - 2)
                                 buf[pos++] = ' ';
-                        if (braces[BRACE_ROW_OPEN])
+                        اگر (braces[BRACE_ROW_OPEN])
                             buf[pos++] = braces[BRACE_ROW_OPEN];
-                        if(!pos)
-                            return next();
+                        اگر(!pos)
+                            بازگشت next();
                         buf[pos] = 0;
                     }
-                    return buf;
-                case STATE_ROW_CLOSE:
-                    state = STATE_LINE_SEPARATOR;
+                    بازگشت buf;
+                حالت STATE_ROW_CLOSE:
+                    state = STATE_سطر_SEPARATOR;
                     ++row;
-                    if (braces[BRACE_ROW_CLOSE])
+                    اگر (braces[BRACE_ROW_CLOSE])
                     {
                         buf[0] = braces[BRACE_ROW_CLOSE];
                         buf[1] = row < mtx.rows ? ',' : '\0';
                         buf[2] = 0;
-                        return buf;
+                        بازگشت buf;
                     }
-                    else if(braces[BRACE_ROW_SEP] && row < mtx.rows)
+                    وگرنه اگر(braces[BRACE_ROW_SEP] && row < mtx.rows)
                     {
                         buf[0] = braces[BRACE_ROW_SEP];
                         buf[1] = 0;
-                        return buf;
+                        بازگشت buf;
                     }
-                    return next();
-                case STATE_CN_OPEN:
-                    state = STATE_VALUE;
-                    if (!alignOrder)
+                    بازگشت next();
+                حالت STATE_CN_OPEN:
+                    state = STATE_مقدار;
+                    اگر (!alignOrder)
                         cn = 0;
-                    if (mcn > 1 && braces[BRACE_CN_OPEN])
+                    اگر (mcn > 1 && braces[BRACE_CN_OPEN])
                     {
                         buf[0] = braces[BRACE_CN_OPEN];
                         buf[1] = 0;
-                        return buf;
+                        بازگشت buf;
                     }
-                    return next();
-                case STATE_CN_CLOSE:
+                    بازگشت next();
+                حالت STATE_CN_CLOSE:
                     ++col;
-                    if (col >= mtx.cols)
+                    اگر (col >= mtx.cols)
                         state = STATE_ROW_CLOSE;
-                    else
+                    وگرنه
                         state = STATE_CN_SEPARATOR;
-                    if (mcn > 1 && braces[BRACE_CN_CLOSE])
+                    اگر (mcn > 1 && braces[BRACE_CN_CLOSE])
                     {
                         buf[0] = braces[BRACE_CN_CLOSE];
                         buf[1] = 0;
-                        return buf;
+                        بازگشت buf;
                     }
-                    return next();
-                case STATE_VALUE:
-                    (this->*valueToStr)();
+                    بازگشت next();
+                حالت STATE_مقدار:
+                    (این->*مقدار_To_Str)();
                     state = STATE_CN_CLOSE;
-                    if (alignOrder)
-                        return buf;
-                    if (++cn < mcn)
-                        state = STATE_VALUE_SEPARATOR;
-                    return buf;
-                case STATE_FINISHED:
-                    return 0;
-                case STATE_LINE_SEPARATOR:
-                    if (row >= mtx.rows)
+                    اگر (alignOrder)
+                        بازگشت buf;
+                    اگر (++cn < mcn)
+                        state = STATE_مقدار_SEPARATOR;
+                    بازگشت buf;
+                حالت STATE_FINISHED:
+                    بازگشت 0;
+                حالت STATE_سطر_SEPARATOR:
+                    اگر (row >= mtx.rows)
                     {
-                        if (alignOrder)
+                        اگر (alignOrder)
                             state = STATE_INTERLUDE;
-                        else
+                        وگرنه
                             state = STATE_EPILOGUE;
-                        return next();
+                        بازگشت next();
                     }
                     state = STATE_ROW_OPEN;
-                    buf[0] = singleLine ? ' ' : '\n';
+                    buf[0] = single_سطر ? ' ' : '\n';
                     buf[1] = 0;
-                    return buf;
-                case STATE_CN_SEPARATOR:
+                    بازگشت buf;
+                حالت STATE_CN_SEPARATOR:
                     state = STATE_CN_OPEN;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
-                case STATE_VALUE_SEPARATOR:
-                    state = STATE_VALUE;
+                    بازگشت buf;
+                حالت STATE_مقدار_SEPARATOR:
+                    state = STATE_مقدار;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    بازگشت buf;
             }
-            return 0;
+            بازگشت 0;
         }
     };
 
-    class FormatterBase : public Formatter
+    رده FormatterBase : عمومی Formatter
     {
-    public:
-        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(true) {}
+    عمومی:
+        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(درست) {}
 
-        void set16fPrecision(int p) CV_OVERRIDE
+        تهی set16fPrecision(صحیح p) CV_OVERRIDE
         {
             prec16f = p;
         }
 
-        void set32fPrecision(int p) CV_OVERRIDE
+        تهی set32fPrecision(صحیح p) CV_OVERRIDE
         {
             prec32f = p;
         }
 
-        void set64fPrecision(int p) CV_OVERRIDE
+        تهی set64fPrecision(صحیح p) CV_OVERRIDE
         {
             prec64f = p;
         }
 
-        void setMultiline(bool ml) CV_OVERRIDE
+        تهی setMultiline(منطقی ml) CV_OVERRIDE
         {
             multiline = ml;
         }
 
-    protected:
-        int prec16f;
-        int prec32f;
-        int prec64f;
-        int multiline;
+    محافظتشده:
+        صحیح prec16f;
+        صحیح prec32f;
+        صحیح prec64f;
+        صحیح multiline;
     };
 
-    class DefaultFormatter CV_FINAL : public FormatterBase
+    رده DefaultFormatter CV_FINAL : عمومی FormatterBase
     {
-    public:
+    عمومی:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ثابت Mat& mtx) ثابت CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            نویسه braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            بازگشت makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.rows == 1 || !multiline, نادرست, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class MatlabFormatter CV_FINAL : public FormatterBase
+    رده MatlabFormatter CV_FINAL : عمومی FormatterBase
     {
-    public:
+    عمومی:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ثابت Mat& mtx) ثابت CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("", "", mtx, &*braces,
-                mtx.rows == 1 || !multiline, true, mtx.depth() == CV_64F ? prec64f : prec32f );
+            نویسه braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            بازگشت makePtr<FormattedImpl>("", "", mtx, &*braces,
+                mtx.rows == 1 || !multiline, درست, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class PythonFormatter CV_FINAL : public FormatterBase
+    رده PythonFormatter CV_FINAL : عمومی FormatterBase
     {
-    public:
+    عمومی:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ثابت Mat& mtx) ثابت CV_OVERRIDE
         {
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            نویسه braces[5] = {'[', ']', ',', '[', ']'};
+            اگر (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            بازگشت makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.rows == 1 || !multiline, نادرست, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class NumpyFormatter CV_FINAL : public FormatterBase
+    رده NumpyFormatter CV_FINAL : عمومی FormatterBase
     {
-    public:
+    عمومی:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ثابت Mat& mtx) ثابت CV_OVERRIDE
         {
-            static const char* numpyTypes[CV_DEPTH_MAX] =
+            ایستا ثابت نویسه* numpyTypes[CV_DEPTH_MAX] =
             {
                 "uint8", "int8", "uint16", "int16", "int32", "float32", "float64",
                 "float16", "bfloat16", "bool", "uint64", "int64", "uint32",
                 "float8_e4m3fn", "float8_e4m3fnuz"
             };
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            نویسه braces[5] = {'[', ']', ',', '[', ']'};
+            اگر (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("array([",
+            بازگشت makePtr<FormattedImpl>("array([",
                 cv::format("], dtype='%s')", numpyTypes[mtx.depth()]), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+                mtx.rows == 1 || !multiline, نادرست, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CSVFormatter CV_FINAL : public FormatterBase
+    رده CSVFormatter CV_FINAL : عمومی FormatterBase
     {
-    public:
+    عمومی:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ثابت Mat& mtx) ثابت CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', '\0', '\0', '\0'};
-            return makePtr<FormattedImpl>(String(),
+            نویسه braces[5] = {'\0', '\0', '\0', '\0', '\0'};
+            بازگشت makePtr<FormattedImpl>(String(),
                 mtx.rows > 1 ? String("\n") : String(), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+                mtx.rows == 1 || !multiline, نادرست, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CFormatter CV_FINAL : public FormatterBase
+    رده CFormatter CV_FINAL : عمومی FormatterBase
     {
-    public:
+    عمومی:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ثابت Mat& mtx) ثابت CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ',', '\0', '\0'};
-            return makePtr<FormattedImpl>("{", "}", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            نویسه braces[5] = {'\0', '\0', ',', '\0', '\0'};
+            بازگشت makePtr<FormattedImpl>("{", "}", mtx, &*braces,
+                mtx.rows == 1 || !multiline, نادرست, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
@@ -391,188 +391,188 @@ namespace cv
 
     Ptr<Formatter> Formatter::get(Formatter::FormatType fmt)
     {
-        switch(fmt)
+        انتخاب(fmt)
         {
-            case FMT_DEFAULT:
-                return makePtr<DefaultFormatter>();
-            case FMT_MATLAB:
-                return makePtr<MatlabFormatter>();
-            case FMT_CSV:
-                return makePtr<CSVFormatter>();
-            case FMT_PYTHON:
-                return makePtr<PythonFormatter>();
-            case FMT_NUMPY:
-                return makePtr<NumpyFormatter>();
-            case FMT_C:
-                return makePtr<CFormatter>();
+            حالت FMT_DEFAULT:
+                بازگشت makePtr<DefaultFormatter>();
+            حالت FMT_MATLAB:
+                بازگشت makePtr<MatlabFormatter>();
+            حالت FMT_CSV:
+                بازگشت makePtr<CSVFormatter>();
+            حالت FMT_PYTHON:
+                بازگشت makePtr<PythonFormatter>();
+            حالت FMT_NUMPY:
+                بازگشت makePtr<NumpyFormatter>();
+            حالت FMT_C:
+                بازگشت makePtr<CFormatter>();
         }
-        return makePtr<DefaultFormatter>();
+        بازگشت makePtr<DefaultFormatter>();
     }
 
-    template<typename _Tp> struct Fmt
+    template<typename _Tp> ساختار Fmt
     {
-        typedef int temp_type;
-        static const char* fmt() { return "%d"; }
+        تعریفنوع صحیح temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%d"; }
     };
 
-    template<> struct Fmt<uint32_t>
+    template<> ساختار Fmt<uint32_t>
     {
-        typedef unsigned temp_type;
-        static const char* fmt() { return "%u"; }
+        تعریفنوع unsigned temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%u"; }
     };
 
-    template<> struct Fmt<int64_t>
+    template<> ساختار Fmt<int64_t>
     {
-        typedef long long temp_type;
-        static const char* fmt() { return "%lld"; }
+        تعریفنوع long long temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%lld"; }
     };
 
-    template<> struct Fmt<uint64_t>
+    template<> ساختار Fmt<uint64_t>
     {
-        typedef unsigned long long temp_type;
-        static const char* fmt() { return "%llu"; }
+        تعریفنوع unsigned long long temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%llu"; }
     };
 
-    template<> struct Fmt<float>
+    template<> ساختار Fmt<اعشاری>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        تعریفنوع اعشاری temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%.5g"; }
     };
 
-    template<> struct Fmt<double>
+    template<> ساختار Fmt<دوگانه>
     {
-        typedef double temp_type;
-        static const char* fmt() { return "%.5g"; }
+        تعریفنوع دوگانه temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%.5g"; }
     };
 
-    template<> struct Fmt<hfloat>
+    template<> ساختار Fmt<hfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        تعریفنوع اعشاری temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%.5g"; }
     };
 
-    template<> struct Fmt<bfloat>
+    template<> ساختار Fmt<bfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        تعریفنوع اعشاری temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%.4g"; }
     };
 
-    template<> struct Fmt<fp8_t>
+    template<> ساختار Fmt<fp8_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        تعریفنوع اعشاری temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%.4g"; }
     };
 
-    template<> struct Fmt<fp8a_t>
+    template<> ساختار Fmt<fp8a_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        تعریفنوع اعشاری temp_type;
+        ایستا ثابت نویسه* fmt() { بازگشت "%.4g"; }
     };
 
     template <typename _Tp>
-    static void pprintRow(std::ostream& strm, const _Tp* ptr, int n, size_t ofs, int edge)
+    ایستا تهی pprintRow(std::ostream& strm, ثابت _Tp* ptr, صحیح n, size_t ofs, صحیح edge)
     {
-        char buf[128];
-        const char* fmt = Fmt<_Tp>::fmt();
-        int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-        if (edge == 0)
+        نویسه buf[128];
+        ثابت نویسه* fmt = Fmt<_Tp>::fmt();
+        صحیح i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+        اگر (edge == 0)
             edge = ndump;
-        for (i = 0; i < ndump; i++) {
-            int j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
-            if (i > 0)
+        برای (i = 0; i < ndump; i++) {
+            صحیح j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
+            اگر (i > 0)
                 strm << ", ";
-            if (j >= 0) {
-                snprintf(buf, sizeof(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
+            اگر (j >= 0) {
+                snprintf(buf, اندازه(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
                 strm << buf;
-            } else
+            } وگرنه
                 strm << "... ";
         }
     }
 
-    static void pprintSlice(std::ostream& strm, const Mat& tensor,
-                            const size_t* step, int d,
-                            size_t ofs, int edge)
+    ایستا تهی pprintSlice(std::ostream& strm, ثابت Mat& tensor,
+                            ثابت size_t* step, صحیح d,
+                            size_t ofs, صحیح edge)
     {
         MatShape shape = tensor.shape();
-        int ndims = shape.dims;
-        int n = d >= ndims ? 1 : shape[d];
-        if (d >= ndims - 1) {
-            int typ = tensor.depth();
-            void* data = tensor.data;
+        صحیح ndims = shape.dims;
+        صحیح n = d >= ndims ? 1 : shape[d];
+        اگر (d >= ndims - 1) {
+            صحیح typ = tensor.depth();
+            تهی* data = tensor.data;
             CV_Assert(data);
             n *= tensor.channels();
-            if (typ == CV_8U)
-                pprintRow(strm, (const uint8_t*)data, n, ofs, edge);
-            else if (typ == CV_8S)
-                pprintRow(strm, (const int8_t*)data, n, ofs, edge);
-            else if (typ == CV_16U)
-                pprintRow(strm, (const uint16_t*)data, n, ofs, edge);
-            else if (typ == CV_16S)
-                pprintRow(strm, (const int16_t*)data, n, ofs, edge);
-            else if (typ == CV_32U)
-                pprintRow(strm, (const unsigned*)data, n, ofs, edge);
-            else if (typ == CV_32S)
-                pprintRow(strm, (const int*)data, n, ofs, edge);
-            else if (typ == CV_64U)
-                pprintRow(strm, (const uint64_t*)data, n, ofs, edge);
-            else if (typ == CV_64S)
-                pprintRow(strm, (const int64_t*)data, n, ofs, edge);
-            else if (typ == CV_32F)
-                pprintRow(strm, (const float*)data, n, ofs, edge);
-            else if (typ == CV_64F)
-                pprintRow(strm, (const double*)data, n, ofs, edge);
-            else if (typ == CV_16F)
-                pprintRow(strm, (const hfloat*)data, n, ofs, edge);
-            else if (typ == CV_16BF)
-                pprintRow(strm, (const bfloat*)data, n, ofs, edge);
-            else if (typ == CV_Bool)
-                pprintRow(strm, (const bool*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FN)
-                pprintRow(strm, (const fp8_t*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FNUZ)
-                pprintRow(strm, (const fp8a_t*)data, n, ofs, edge);
-            else {
+            اگر (typ == CV_8U)
+                pprintRow(strm, (ثابت uint8_t*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_8S)
+                pprintRow(strm, (ثابت int8_t*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_16U)
+                pprintRow(strm, (ثابت uint16_t*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_16S)
+                pprintRow(strm, (ثابت int16_t*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_32U)
+                pprintRow(strm, (ثابت unsigned*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_32S)
+                pprintRow(strm, (ثابت صحیح*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_64U)
+                pprintRow(strm, (ثابت uint64_t*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_64S)
+                pprintRow(strm, (ثابت int64_t*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_32F)
+                pprintRow(strm, (ثابت اعشاری*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_64F)
+                pprintRow(strm, (ثابت دوگانه*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_16F)
+                pprintRow(strm, (ثابت hfloat*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_16BF)
+                pprintRow(strm, (ثابت bfloat*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_Bool)
+                pprintRow(strm, (ثابت منطقی*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_8F_E4M3FN)
+                pprintRow(strm, (ثابت fp8_t*)data, n, ofs, edge);
+            وگرنه اگر (typ == CV_8F_E4M3FNUZ)
+                pprintRow(strm, (ثابت fp8a_t*)data, n, ofs, edge);
+            وگرنه {
                 CV_Error(Error::StsNotImplemented, "unsupported type");
             }
-        } else {
-            int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-            bool dots = false;
-            for (i = 0; i < ndump; i++) {
-                if (i > 0 && !dots) {
-                    int nempty_lines = ndims - 2 - d;
-                    for (int k = 0; k < nempty_lines; k++)
+        } وگرنه {
+            صحیح i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+            منطقی dots = نادرست;
+            برای (i = 0; i < ndump; i++) {
+                اگر (i > 0 && !dots) {
+                    صحیح nempty_سطرها = ndims - 2 - d;
+                    برای (صحیح k = 0; k < nempty_سطرها; k++)
                         strm << "\n";
                 }
-                if (i > 0)
+                اگر (i > 0)
                     strm << "\n";
-                int j = n == ndump || i < edge ? i :
+                صحیح j = n == ndump || i < edge ? i :
                         i == edge ? -1 :
                         n - edge*2 - 1 + i;
                 dots = j < 0;
-                if (!dots)
+                اگر (!dots)
                     pprintSlice(strm, tensor, step, d+1, ofs + j*step[d], edge);
-                else
+                وگرنه
                     strm << "...";
             }
         }
     }
 
-    std::ostream& pprint(std::ostream& strm, InputArray array,
-                         int /*indent*/, int edge_,
-                         int wholeTensorThreshold,
-                         char parens)
+    std::ostream& pprint(std::ostream& strm, درون_داد_Array array,
+                         صحیح /*indent*/, صحیح edge_,
+                         صحیح wholeTensorThreshold,
+                         نویسه parens)
     {
-        char oparen = parens;
-        char cparen = parens == '(' ? ')' :
+        نویسه oparen = parens;
+        نویسه cparen = parens == '(' ? ')' :
                       parens == '[' ? ']' :
                       parens == '{' ? '}' :
                       parens == '<' ? '>' :
                       parens;
-        int edge = edge_ > 0 ? edge_ : 3;
+        صحیح edge = edge_ > 0 ? edge_ : 3;
         wholeTensorThreshold = wholeTensorThreshold > 0 ? wholeTensorThreshold : 100;
 
         Mat tensor = array.getMat();
-        if (!tensor.isContinuous()) {
+        اگر (!tensor.isContinuous()) {
             // [TODO] print non-continous arrays without copy
             Mat temp;
             tensor.copyTo(temp);
@@ -582,28 +582,28 @@ namespace cv
         MatShape shape = tensor.shape();
         size_t sz_all = tensor.total();
 
-        if (parens)
+        اگر (parens)
             strm << oparen;
-        if (sz_all == 0) {
-            if (!parens)
+        اگر (sz_all == 0) {
+            اگر (!parens)
                 strm << "<empty>";
-        } else {
-            if (sz_all <= (size_t)wholeTensorThreshold)
+        } وگرنه {
+            اگر (sz_all <= (size_t)wholeTensorThreshold)
                 edge = 0;
 
-            int ndims = shape.dims;
-            int cn = tensor.channels();
+            صحیح ndims = shape.dims;
+            صحیح cn = tensor.channels();
             size_t step[MatShape::MAX_DIMS];
             step[std::max(ndims-1, 0)] = 1;
-            for (int i = ndims-2; i >= 0; i--) {
+            برای (صحیح i = ndims-2; i >= 0; i--) {
                 step[i] = step[i+1]*shape[i+1]*cn;
                 cn = 1;
             }
             pprintSlice(strm, tensor, step, 0, 0, edge);
         }
-        if (parens)
+        اگر (parens)
             strm << cparen;
-        return strm;
+        بازگشت strm;
     }
 
 } // cv

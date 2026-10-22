@@ -5,125 +5,125 @@
 #ifndef OPENCV_CORE_BASE64_ENCODING_HPP
 #define OPENCV_CORE_BASE64_ENCODING_HPP
 
-namespace cv
+فضاینام cv
 {
 
-namespace base64
+فضاینام base64
 {
 /* A decorator for CvFileStorage
 * - no copyable
 * - not safe for now
 * - move constructor may be needed if C++11
 */
-uint8_t const base64_mapping[] =
+uint8_t ثابت base64_mapping[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789+/";
 
-uint8_t const base64_padding = '=';
+uint8_t ثابت base64_padding = '=';
 
-std::string make_base64_header(const char * dt);
+std::string make_base64_header(ثابت نویسه * dt);
 
-size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
+size_t base64_encode(uint8_t ثابت * src, uint8_t * dst, size_t off, size_t cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+صحیح icvCalcStructSize( ثابت نویسه* dt, صحیح initial_size );
 
-class Base64ContextEmitter;
-class Impl;
+رده Base64ContextEmitter;
+رده Impl;
 
-class Base64Writer
+رده Base64Writer
 {
-public:
-    Base64Writer(cv::FileStorage::Impl& fs, bool can_indent);
+عمومی:
+    Base64Writer(cv::FileStorage::Impl& fs, منطقی can_indent);
     ~Base64Writer();
-    void write(const void* _data, size_t len, const char* dt);
-    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const char* dt);
+    تهی اكتب(ثابت تهی* _data, size_t len, ثابت نویسه* dt);
+    template<typename to_دودویی_convertor_t> تهی اكتب(to_دودویی_convertor_t & convertor, ثابت نویسه* dt);
 
-private:
-    void check_dt(const char* dt);
+خصوصی:
+    تهی check_dt(ثابت نویسه* dt);
 
-private:
+خصوصی:
     // disable copy and assignment
-    Base64Writer(const Base64Writer &);
-    Base64Writer & operator=(const Base64Writer &);
+    Base64Writer(ثابت Base64Writer &);
+    Base64Writer & operator=(ثابت Base64Writer &);
 
-private:
+خصوصی:
 
     Base64ContextEmitter * emitter;
     std::string data_type_string;
 };
 
-size_t base64_encode_buffer_size(size_t cnt, bool is_end_with_zero = true);
+size_t base64_encode_buffer_size(size_t cnt, منطقی is_end_with_zero = درست);
 
-template<typename _uint_t> inline size_t
-to_binary(_uint_t val, uchar * cur)
+template<typename _uint_t> درونخطی size_t
+to_دودویی(_uint_t val, uchar * cur)
 {
     size_t delta = CHAR_BIT;
-    size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    size_t cnt = اندازه(_uint_t);
+    وقتی (cnt --> static_cast<size_t>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    بازگشت اندازه(_uint_t);
 }
 
-template<> inline size_t to_binary(bool val, uchar * cur)
+template<> درونخطی size_t to_دودویی(منطقی val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    بازگشت to_دودویی(static_cast<uchar>(val), cur);
 }
 
-template<> inline size_t to_binary(double val, uchar * cur)
+template<> درونخطی size_t to_دودویی(دوگانه val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    بازگشت to_دودویی(bit64.u, cur);
 }
 
-template<> inline size_t to_binary(float val, uchar * cur)
+template<> درونخطی size_t to_دودویی(اعشاری val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    بازگشت to_دودویی(bit32.u, cur);
 }
 
-template<typename _primitive_t> inline size_t
-to_binary(uchar const * val, uchar * cur)
+template<typename _primitive_t> درونخطی size_t
+to_دودویی(uchar ثابت * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    بازگشت to_دودویی<_primitive_t>(*reinterpret_cast<_primitive_t ثابت *>(val), cur);
 }
 
 
 
-class RawDataToBinaryConvertor
+رده Raw_Data_To_دودویی_Convertor
 {
-public:
+عمومی:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    Raw_Data_To_دودویی_Convertor(ثابت تهی* src, صحیح len, ثابت std::string & dt);
 
-    inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
-    inline operator bool() const;
+    درونخطی Raw_Data_To_دودویی_Convertor & operator >>(uchar * & dst);
+    درونخطی operator منطقی() ثابت;
 
-private:
-    typedef size_t(*to_binary_t)(const uchar *, uchar *);
-    struct elem_to_binary_t
+خصوصی:
+    تعریفنوع size_t(*to_دودویی_t)(ثابت uchar *, uchar *);
+    ساختار elem_to_دودویی_t
     {
         size_t      offset;
         size_t      offset_packed;
-        to_binary_t func;
+        to_دودویی_t func;
     };
 
-private:
-    size_t make_to_binary_funcs(const std::string &dt);
+خصوصی:
+    size_t make_to_دودویی_funcs(ثابت std::string &dt);
 
-private:
-    const uchar * beg;
-    const uchar * cur;
-    const uchar * end;
+خصوصی:
+    ثابت uchar * beg;
+    ثابت uchar * cur;
+    ثابت uchar * end;
 
     size_t step;
     size_t step_packed;
-    std::vector<elem_to_binary_t> to_binary_funcs;
+    std::vector<elem_to_دودویی_t> to_دودویی_funcs;
 };
 
 }

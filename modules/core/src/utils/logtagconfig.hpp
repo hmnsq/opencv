@@ -5,22 +5,22 @@
 #ifndef OPENCV_CORE_LOGTAGCONFIG_HPP
 #define OPENCV_CORE_LOGTAGCONFIG_HPP
 
-#if 1 // if not already in precompiled headers
-#include <opencv2/core/utils/logger.defines.hpp>
-#include <string>
+#اگر 1 // if not already in precompiled headers
+#شامل <opencv2/core/utils/logger.defines.hpp>
+#شامل <string>
 #endif
 
-namespace cv {
-namespace utils {
-namespace logging {
+فضاینام cv {
+فضاینام utils {
+فضاینام logging {
 
-struct LogTagConfig
+ساختار LogTagConfig
 {
     std::string namePart;
     LogLevel level;
-    bool isGlobal;
-    bool hasPrefixWildcard;
-    bool hasSuffixWildcard;
+    منطقی isGlobal;
+    منطقی hasPrefixWildcard;
+    منطقی hasSuffixWildcard;
 
     LogTagConfig()
         : namePart()
@@ -31,8 +31,8 @@ struct LogTagConfig
     {
     }
 
-    LogTagConfig(const std::string& _namePart, LogLevel _level, bool _isGlobal = false,
-        bool _hasPrefixWildcard = false, bool _hasSuffixWildcard = false)
+    LogTagConfig(ثابت std::string& _namePart, LogLevel _level, منطقی _isGlobal = نادرست,
+        منطقی _hasPrefixWildcard = نادرست, منطقی _hasSuffixWildcard = نادرست)
         : namePart(_namePart)
         , level(_level)
         , isGlobal(_isGlobal)
@@ -41,9 +41,9 @@ struct LogTagConfig
     {
     }
 
-    LogTagConfig(const LogTagConfig&) = default;
-    LogTagConfig(LogTagConfig&&) = default;
-    ~LogTagConfig() = default;
+    LogTagConfig(ثابت LogTagConfig&) = پیشفرض;
+    LogTagConfig(LogTagConfig&&) = پیشفرض;
+    ~LogTagConfig() = پیشفرض;
 };
 
 }}}

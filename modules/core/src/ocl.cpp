@@ -39,39 +39,39 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
 #ifndef HAVE_OPENCL
-#include "ocl_disabled.impl.hpp"
-#else // HAVE_OPENCL
+#شامل "ocl_disabled.impl.hpp"
+#وگرنه // HAVE_OPENCL
 
-#include <list>
-#include <map>
-#include <deque>
-#include <set>
-#include <string>
-#include <sstream>
-#include <fstream>
-#if !(defined _MSC_VER) || (defined _MSC_VER && _MSC_VER > 1700)
-#include <inttypes.h>
+#شامل <list>
+#شامل <map>
+#شامل <deque>
+#شامل <set>
+#شامل <string>
+#شامل <sstream>
+#شامل <fstream>
+#اگر !(defined _MSC_VER) || (defined _MSC_VER && _MSC_VER > 1700)
+#شامل <inttypes.h>
 #endif
 
-#include <opencv2/core/utils/configuration.private.hpp>
+#شامل <opencv2/core/utils/configuration.private.hpp>
 
-#include <opencv2/core/utils/logger.defines.hpp>
+#شامل <opencv2/core/utils/logger.defines.hpp>
 #undef CV_LOG_STRIP_LEVEL
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#include <opencv2/core/utils/logger.hpp>
+#شامل <opencv2/core/utils/logger.hpp>
 
-#include "opencv2/core/ocl_genbase.hpp"
-#include "opencl_kernels_core.hpp"
+#شامل "opencv2/core/ocl_genbase.hpp"
+#شامل "opencl_kernels_core.hpp"
 
-#include "opencv2/core/utils/lock.private.hpp"
-#include "opencv2/core/utils/filesystem.hpp"
-#include "opencv2/core/utils/filesystem.private.hpp"
+#شامل "opencv2/core/utils/lock.private.hpp"
+#شامل "opencv2/core/utils/filesystem.hpp"
+#شامل "opencv2/core/utils/filesystem.private.hpp"
 
-#define CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(NULL, 0, "OpenCL allocator: " << __VA_ARGS__)
-#include "opencv2/core/utils/allocator_stats.impl.hpp"
+#define CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(پوچ, 0, "OpenCL allocator: " << __VA_ARGS__)
+#شامل "opencv2/core/utils/allocator_stats.impl.hpp"
 #undef CV__ALLOCATOR_STATS_LOG
 
 #define CV_OPENCL_ALWAYS_SHOW_BUILD_LOG          0
@@ -82,594 +82,594 @@
 #define CV_OPENCL_SYNC_RUN_KERNELS               0
 #define CV_OPENCL_TRACE_CHECK                    0
 
-#define CV_OPENCL_VALIDATE_BINARY_PROGRAMS       1
+#define CV_OPENCL_VALIDATE_دودویی_PROGRAMS       1
 
 #define CV_OPENCL_SHOW_SVM_ERROR_LOG             1
 #define CV_OPENCL_SHOW_SVM_LOG                   0
 
-#include "opencv2/core/bufferpool.hpp"
+#شامل "opencv2/core/bufferpool.hpp"
 #ifndef LOG_BUFFER_POOL
-# if 0
+# اگر 0
 #   define LOG_BUFFER_POOL printf
-# else
+# وگرنه
 #   define LOG_BUFFER_POOL(...)
 # endif
 #endif
 
-#if CV_OPENCL_SHOW_SVM_LOG
+#اگر CV_OPENCL_SHOW_SVM_LOG
 // TODO add timestamp logging
 #define CV_OPENCL_SVM_TRACE_P printf("line %d (ocl.cpp): ", __LINE__); printf
-#else
+#وگرنه
 #define CV_OPENCL_SVM_TRACE_P(...)
 #endif
 
-#if CV_OPENCL_SHOW_SVM_ERROR_LOG
+#اگر CV_OPENCL_SHOW_SVM_ERROR_LOG
 // TODO add timestamp logging
 #define CV_OPENCL_SVM_TRACE_ERROR_P printf("Error on line %d (ocl.cpp): ", __LINE__); printf
-#else
+#وگرنه
 #define CV_OPENCL_SVM_TRACE_ERROR_P(...)
 #endif
 
-#include "opencv2/core/opencl/runtime/opencl_clblas.hpp"
-#include "opencv2/core/opencl/runtime/opencl_clfft.hpp"
+#شامل "opencv2/core/opencl/runtime/opencl_clblas.hpp"
+#شامل "opencv2/core/opencl/runtime/opencl_clfft.hpp"
 
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
+#شامل "opencv2/core/opencl/runtime/opencl_core.hpp"
 
 #ifdef HAVE_OPENCL_SVM
-#include "opencv2/core/opencl/runtime/opencl_svm_20.hpp"
-#include "opencv2/core/opencl/runtime/opencl_svm_hsa_extension.hpp"
-#include "opencv2/core/opencl/opencl_svm.hpp"
+#شامل "opencv2/core/opencl/runtime/opencl_svm_20.hpp"
+#شامل "opencv2/core/opencl/runtime/opencl_svm_hsa_extension.hpp"
+#شامل "opencv2/core/opencl/opencl_svm.hpp"
 #endif
 
-#include "umatrix.hpp"
+#شامل "umatrix.hpp"
 
-namespace cv { namespace ocl {
+فضاینام cv { فضاینام ocl {
 
 #define IMPLEMENT_REFCOUNTABLE() \
-    void addref() { CV_XADD(&refcount, 1); } \
-    void release() { if( CV_XADD(&refcount, -1) == 1 && !cv::__termination) delete this; } \
-    int refcount
+    تهی addref() { CV_XADD(&refcount, 1); } \
+    تهی release() { اگر( CV_XADD(&refcount, -1) == 1 && !cv::__termination) delete این; } \
+    صحیح refcount
 
-static cv::utils::AllocatorStatistics opencl_allocator_stats;
+ایستا cv::utils::AllocatorStatistics opencl_allocator_stats;
 
 CV_EXPORTS cv::utils::AllocatorStatisticsInterface& getOpenCLAllocatorStatistics();
 cv::utils::AllocatorStatisticsInterface& getOpenCLAllocatorStatistics()
 {
-    return opencl_allocator_stats;
+    بازگشت opencl_allocator_stats;
 }
 
 #ifndef _DEBUG
-static bool isRaiseError()
+ایستا منطقی isRaiseError()
 {
-    static bool initialized = false;
-    static bool value = false;
-    if (!initialized)
+    ایستا منطقی initialized = نادرست;
+    ایستا منطقی value = نادرست;
+    اگر (!initialized)
     {
-        value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_RAISE_ERROR", false);
-        initialized = true;
+        value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_RAISE_ERROR", نادرست);
+        initialized = درست;
     }
-    return value;
+    بازگشت value;
 }
 #endif
 
-static void onOpenCLKernelBuildError()
+ایستا تهی onOpenCLKernelBuildError()
 {
     // NB: no need to cache this value
-    bool value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_ABORT_ON_BUILD_ERROR", false);
-    if (value)
+    منطقی value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_ABORT_ON_BUILD_ERROR", نادرست);
+    اگر (value)
     {
         fprintf(stderr, "Abort on OpenCL kernel build failure!\n");
         abort();
     }
 }
 
-#if CV_OPENCL_TRACE_CHECK
-static inline
-void traceOpenCLCheck(cl_int status, const char* message)
+#اگر CV_OPENCL_TRACE_CHECK
+ایستا درونخطی
+تهی traceOpenCLCheck(cl_int status, ثابت نویسه* message)
 {
     std::cout << "OpenCV(OpenCL:" << status << "): " << message << std::endl << std::flush;
 }
 #define CV_OCL_TRACE_CHECK_RESULT(status, message) traceOpenCLCheck(status, message)
-#else
+#وگرنه
 #define CV_OCL_TRACE_CHECK_RESULT(status, message) /* nothing */
 #endif
 
-#define CV_OCL_API_ERROR_MSG(check_result, msg) \
-    cv::format("OpenCL error %s (%d) during call: %s", getOpenCLErrorString(check_result), check_result, msg)
+#define CV_OCL_API_ERROR_پیام(check_result, پیام) \
+    cv::format("OpenCL error %s (%d) during call: %s", getOpenCLErrorString(check_result), check_result, پیام)
 
-#define CV_OCL_CHECK_RESULT(check_result, msg) \
-    do { \
-        CV_OCL_TRACE_CHECK_RESULT(check_result, msg); \
-        if (check_result != CL_SUCCESS) \
+#define CV_OCL_CHECK_RESULT(check_result, پیام) \
+    انجامبده { \
+        CV_OCL_TRACE_CHECK_RESULT(check_result, پیام); \
+        اگر (check_result != CL_SUCCESS) \
         { \
-            static_assert(std::is_convertible<decltype(msg), const char*>::value, "msg of CV_OCL_CHECK_RESULT must be const char*"); \
-            cv::String error_msg = CV_OCL_API_ERROR_MSG(check_result, msg); \
-            CV_Error(Error::OpenCLApiCallError, error_msg); \
+            static_assert(std::is_convertible<decltype(پیام), ثابت نویسه*>::value, "msg of CV_OCL_CHECK_RESULT must be const char*"); \
+            cv::String error_پیام = CV_OCL_API_ERROR_پیام(check_result, پیام); \
+            CV_Error(Error::OpenCLApiCallError, error_پیام); \
         } \
-    } while (0)
+    } وقتی (0)
 
-#define CV_OCL_CHECK_(expr, check_result) do { expr; CV_OCL_CHECK_RESULT(check_result, #expr); } while (0)
+#define CV_OCL_CHECK_(عبارت, check_result) انجامبده { عبارت; CV_OCL_CHECK_RESULT(check_result, #expr); } وقتی (0)
 
-#define CV_OCL_CHECK(expr) do { cl_int __cl_result = (expr); CV_OCL_CHECK_RESULT(__cl_result, #expr); } while (0)
+#define CV_OCL_CHECK(عبارت) انجامبده { cl_int __cl_result = (عبارت); CV_OCL_CHECK_RESULT(__cl_result, #expr); } وقتی (0)
 
 #ifdef _DEBUG
-#define CV_OCL_DBG_CHECK_RESULT(check_result, msg) CV_OCL_CHECK_RESULT(check_result, msg)
-#define CV_OCL_DBG_CHECK(expr) CV_OCL_CHECK(expr)
-#define CV_OCL_DBG_CHECK_(expr, check_result) CV_OCL_CHECK_(expr, check_result)
-#else
-#define CV_OCL_DBG_CHECK_RESULT(check_result, msg) \
-    do { \
-        CV_OCL_TRACE_CHECK_RESULT(check_result, msg); \
-        if (check_result != CL_SUCCESS && isRaiseError()) \
+#define CV_OCL_DBG_CHECK_RESULT(check_result, پیام) CV_OCL_CHECK_RESULT(check_result, پیام)
+#define CV_OCL_DBG_CHECK(عبارت) CV_OCL_CHECK(عبارت)
+#define CV_OCL_DBG_CHECK_(عبارت, check_result) CV_OCL_CHECK_(عبارت, check_result)
+#وگرنه
+#define CV_OCL_DBG_CHECK_RESULT(check_result, پیام) \
+    انجامبده { \
+        CV_OCL_TRACE_CHECK_RESULT(check_result, پیام); \
+        اگر (check_result != CL_SUCCESS && isRaiseError()) \
         { \
-            static_assert(std::is_convertible<decltype(msg), const char*>::value, "msg of CV_OCL_DBG_CHECK_RESULT must be const char*"); \
-            cv::String error_msg = CV_OCL_API_ERROR_MSG(check_result, msg); \
-            CV_Error(Error::OpenCLApiCallError, error_msg); \
+            static_assert(std::is_convertible<decltype(پیام), ثابت نویسه*>::value, "msg of CV_OCL_DBG_CHECK_RESULT must be const char*"); \
+            cv::String error_پیام = CV_OCL_API_ERROR_پیام(check_result, پیام); \
+            CV_Error(Error::OpenCLApiCallError, error_پیام); \
         } \
-    } while (0)
-#define CV_OCL_DBG_CHECK_(expr, check_result) do { expr; CV_OCL_DBG_CHECK_RESULT(check_result, #expr); } while (0)
-#define CV_OCL_DBG_CHECK(expr) do { cl_int __cl_result = (expr); CV_OCL_DBG_CHECK_RESULT(__cl_result, #expr); } while (0)
+    } وقتی (0)
+#define CV_OCL_DBG_CHECK_(عبارت, check_result) انجامبده { عبارت; CV_OCL_DBG_CHECK_RESULT(check_result, #expr); } وقتی (0)
+#define CV_OCL_DBG_CHECK(عبارت) انجامبده { cl_int __cl_result = (عبارت); CV_OCL_DBG_CHECK_RESULT(__cl_result, #expr); } وقتی (0)
 #endif
 
 
-static const bool CV_OPENCL_CACHE_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_ENABLE", true);
-static const bool CV_OPENCL_CACHE_WRITE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_WRITE", true);
-static const bool CV_OPENCL_CACHE_LOCK_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_LOCK_ENABLE", true);
-static const bool CV_OPENCL_CACHE_CLEANUP = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_CLEANUP", true);
+ایستا ثابت منطقی CV_OPENCL_CACHE_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_ENABLE", درست);
+ایستا ثابت منطقی CV_OPENCL_CACHE_WRITE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_WRITE", درست);
+ایستا ثابت منطقی CV_OPENCL_CACHE_LOCK_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_LOCK_ENABLE", درست);
+ایستا ثابت منطقی CV_OPENCL_CACHE_CLEANUP = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_CLEANUP", درست);
 
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-static const bool CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE = utils::getConfigurationParameterBool("OPENCV_OPENCL_VALIDATE_BINARY_PROGRAMS", false);
+#اگر CV_OPENCL_VALIDATE_دودویی_PROGRAMS
+ایستا ثابت منطقی CV_OPENCL_VALIDATE_دودویی_PROGRAMS_مقدار = utils::getConfigurationParameterBool("OPENCV_OPENCL_VALIDATE_BINARY_PROGRAMS", نادرست);
 #endif
 
 // Option to disable calls clEnqueueReadBufferRect / clEnqueueWriteBufferRect / clEnqueueCopyBufferRect
-static const bool CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS = utils::getConfigurationParameterBool("OPENCV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS",
-#if 1 //def __APPLE__
-        true
-#else
-        false
+ایستا ثابت منطقی CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS = utils::getConfigurationParameterBool("OPENCV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS",
+#اگر 1 //def __APPLE__
+        درست
+#وگرنه
+        نادرست
 #endif
 );
 
-static String getBuildExtraOptions()
+ایستا String getBuildExtraOptions()
 {
-    static String param_buildExtraOptions;
-    static bool initialized = false;
-    if (!initialized)
+    ایستا String param_buildExtraOptions;
+    ایستا منطقی initialized = نادرست;
+    اگر (!initialized)
     {
         param_buildExtraOptions = utils::getConfigurationParameterString("OPENCV_OPENCL_BUILD_EXTRA_OPTIONS", "");
-        initialized = true;
-        if (!param_buildExtraOptions.empty())
-            CV_LOG_WARNING(NULL, "OpenCL: using extra build options: '" << param_buildExtraOptions << "'");
+        initialized = درست;
+        اگر (!param_buildExtraOptions.empty())
+            CV_LOG_WARNING(پوچ, "OpenCL: using extra build options: '" << param_buildExtraOptions << "'");
     }
-    return param_buildExtraOptions;
+    بازگشت param_buildExtraOptions;
 }
 
-static const bool CV_OPENCL_ENABLE_MEM_USE_HOST_PTR = utils::getConfigurationParameterBool("OPENCV_OPENCL_ENABLE_MEM_USE_HOST_PTR", true);
-static const size_t CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR", 4);
+ایستا ثابت منطقی CV_OPENCL_ENABLE_MEM_USE_HOST_PTR = utils::getConfigurationParameterBool("OPENCV_OPENCL_ENABLE_MEM_USE_HOST_PTR", درست);
+ایستا ثابت size_t CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR", 4);
 
 
-struct UMat2D
+ساختار UMat2D
 {
-    UMat2D(const UMat& m)
+    UMat2D(ثابت UMat& m)
     {
-        offset = (int)m.offset;
-        step = (int)m.step;
+        offset = (صحیح)m.offset;
+        step = (صحیح)m.step;
         rows = m.rows;
         cols = m.cols;
     }
-    int offset;
-    int step;
-    int rows;
-    int cols;
+    صحیح offset;
+    صحیح step;
+    صحیح rows;
+    صحیح cols;
 };
 
-struct UMat3D
+ساختار UMat3D
 {
-    UMat3D(const UMat& m)
+    UMat3D(ثابت UMat& m)
     {
-        offset = (int)m.offset;
-        step = (int)m.step.p[1];
-        slicestep = (int)m.step.p[0];
-        slices = (int)m.size.p[0];
+        offset = (صحیح)m.offset;
+        step = (صحیح)m.step.p[1];
+        slicestep = (صحیح)m.step.p[0];
+        slices = (صحیح)m.size.p[0];
         rows = m.size.p[1];
         cols = m.size.p[2];
     }
-    int offset;
-    int slicestep;
-    int step;
-    int slices;
-    int rows;
-    int cols;
+    صحیح offset;
+    صحیح slicestep;
+    صحیح step;
+    صحیح slices;
+    صحیح rows;
+    صحیح cols;
 };
 
 // Computes 64-bit "cyclic redundancy check" sum, as specified in ECMA-182
-static uint64 crc64( const uchar* data, size_t size, uint64 crc0=0 )
+ایستا uint64 crc64( ثابت uchar* data, size_t size, uint64 crc0=0 )
 {
-    static uint64 table[256];
-    static bool initialized = false;
+    ایستا uint64 table[256];
+    ایستا منطقی initialized = نادرست;
 
-    if( !initialized )
+    اگر( !initialized )
     {
-        for( int i = 0; i < 256; i++ )
+        برای( صحیح i = 0; i < 256; i++ )
         {
             uint64 c = i;
-            for( int j = 0; j < 8; j++ )
+            برای( صحیح j = 0; j < 8; j++ )
                 c = ((c & 1) ? CV_BIG_UINT(0xc96c5795d7870f42) : 0) ^ (c >> 1);
             table[i] = c;
         }
-        initialized = true;
+        initialized = درست;
     }
 
     uint64 crc = ~crc0;
-    for( size_t idx = 0; idx < size; idx++ )
+    برای( size_t idx = 0; idx < size; idx++ )
         crc = table[(uchar)crc ^ data[idx]] ^ (crc >> 8);
 
-    return ~crc;
+    بازگشت ~crc;
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-struct OpenCLBinaryCacheConfigurator
+#اگر OPENCV_HAVE_FILESYSTEM_SUPPORT
+ساختار OpenCLBinaryCacheConfigurator
 {
     cv::String cache_path_;
     cv::String cache_lock_filename_;
     cv::Ptr<utils::fs::FileLock> cache_lock_;
 
-    typedef std::map<std::string, std::string> ContextCacheType;
+    تعریفنوع std::map<std::string, std::string> ContextCacheType;
     ContextCacheType prepared_contexts_;
     Mutex mutex_prepared_contexts_;
 
     OpenCLBinaryCacheConfigurator()
     {
-        CV_LOG_DEBUG(NULL, "Initializing OpenCL cache configuration...");
-        if (!CV_OPENCL_CACHE_ENABLE)
+        CV_LOG_DEBUG(پوچ, "Initializing OpenCL cache configuration...");
+        اگر (!CV_OPENCL_CACHE_ENABLE)
         {
-            CV_LOG_INFO(NULL, "OpenCL cache is disabled");
-            return;
+            CV_LOG_INFO(پوچ, "OpenCL cache is disabled");
+            بازگشت;
         }
         cache_path_ = utils::fs::getCacheDirectory("opencl_cache", "OPENCV_OPENCL_CACHE_DIR");
-        if (cache_path_.empty())
+        اگر (cache_path_.empty())
         {
-            CV_LOG_INFO(NULL, "Specify OPENCV_OPENCL_CACHE_DIR configuration parameter to enable OpenCL cache");
+            CV_LOG_INFO(پوچ, "Specify OPENCV_OPENCL_CACHE_DIR configuration parameter to enable OpenCL cache");
         }
-        do
+        انجامبده
         {
-            try
+            تلاش
             {
-                if (cache_path_.empty())
-                    break;
-                if (cache_path_ == "disabled")
-                    break;
-                if (!utils::fs::createDirectories(cache_path_))
+                اگر (cache_path_.empty())
+                    بشکن;
+                اگر (cache_path_ == "disabled")
+                    بشکن;
+                اگر (!utils::fs::createDirectories(cache_path_))
                 {
-                    CV_LOG_DEBUG(NULL, "Can't use OpenCL cache directory: " << cache_path_);
+                    CV_LOG_DEBUG(پوچ, "Can't use OpenCL cache directory: " << cache_path_);
                     clear();
-                    break;
+                    بشکن;
                 }
 
-                if (CV_OPENCL_CACHE_LOCK_ENABLE)
+                اگر (CV_OPENCL_CACHE_LOCK_ENABLE)
                 {
                     cache_lock_filename_ = cache_path_ + ".lock";
-                    if (!utils::fs::exists(cache_lock_filename_))
+                    اگر (!utils::fs::exists(cache_lock_filename_))
                     {
-                        CV_LOG_DEBUG(NULL, "Creating lock file... (" << cache_lock_filename_ << ")");
+                        CV_LOG_DEBUG(پوچ, "Creating lock file... (" << cache_lock_filename_ << ")");
                         std::ofstream lock_filename(cache_lock_filename_.c_str(), std::ios::out);
-                        if (!lock_filename.is_open())
+                        اگر (!lock_filename.is_open())
                         {
-                            CV_LOG_WARNING(NULL, "Can't create lock file for OpenCL program cache: " << cache_lock_filename_);
-                            break;
+                            CV_LOG_WARNING(پوچ, "Can't create lock file for OpenCL program cache: " << cache_lock_filename_);
+                            بشکن;
                         }
                     }
 
-                    try
+                    تلاش
                     {
                         cache_lock_ = makePtr<utils::fs::FileLock>(cache_lock_filename_.c_str());
-                        CV_LOG_VERBOSE(NULL, 0, "Checking cache lock... (" << cache_lock_filename_ << ")");
+                        CV_LOG_VERBOSE(پوچ, 0, "Checking cache lock... (" << cache_lock_filename_ << ")");
                         {
                             utils::shared_lock_guard<utils::fs::FileLock> lock(*cache_lock_);
                         }
-                        CV_LOG_VERBOSE(NULL, 0, "Checking cache lock... Done!");
+                        CV_LOG_VERBOSE(پوچ, 0, "Checking cache lock... Done!");
                     }
-                    catch (const cv::Exception& e)
+                    بگیر (ثابت cv::Exception& e)
                     {
-                        CV_LOG_WARNING(NULL, "Can't create OpenCL program cache lock: " << cache_lock_filename_ << std::endl << e.what());
+                        CV_LOG_WARNING(پوچ, "Can't create OpenCL program cache lock: " << cache_lock_filename_ << std::endl << e.what());
                     }
-                    catch (...)
+                    بگیر (...)
                     {
-                        CV_LOG_WARNING(NULL, "Can't create OpenCL program cache lock: " << cache_lock_filename_);
+                        CV_LOG_WARNING(پوچ, "Can't create OpenCL program cache lock: " << cache_lock_filename_);
                     }
                 }
-                else
+                وگرنه
                 {
-                    if (CV_OPENCL_CACHE_WRITE)
+                    اگر (CV_OPENCL_CACHE_WRITE)
                     {
-                        CV_LOG_WARNING(NULL, "OpenCL cache lock is disabled while cache write is allowed "
+                        CV_LOG_WARNING(پوچ, "OpenCL cache lock is disabled while cache write is allowed "
                                 "(not safe for multiprocess environment)");
                     }
-                    else
+                    وگرنه
                     {
-                        CV_LOG_INFO(NULL, "OpenCL cache lock is disabled");
+                        CV_LOG_INFO(پوچ, "OpenCL cache lock is disabled");
                     }
                 }
             }
-            catch (const cv::Exception& e)
+            بگیر (ثابت cv::Exception& e)
             {
-                CV_LOG_WARNING(NULL, "Can't prepare OpenCL program cache: " << cache_path_ << std::endl << e.what());
+                CV_LOG_WARNING(پوچ, "Can't prepare OpenCL program cache: " << cache_path_ << std::endl << e.what());
                 clear();
             }
-        } while (0);
-        if (!cache_path_.empty())
+        } وقتی (0);
+        اگر (!cache_path_.empty())
         {
-            if (cache_lock_.empty() && CV_OPENCL_CACHE_LOCK_ENABLE)
+            اگر (cache_lock_.empty() && CV_OPENCL_CACHE_LOCK_ENABLE)
             {
-                CV_LOG_WARNING(NULL, "Initialized OpenCL cache directory, but interprocess synchronization lock is not available. "
+                CV_LOG_WARNING(پوچ, "Initialized OpenCL cache directory, but interprocess synchronization lock is not available. "
                         "Consider to disable OpenCL cache: OPENCV_OPENCL_CACHE_DIR=disabled");
             }
-            else
+            وگرنه
             {
-                CV_LOG_INFO(NULL, "Successfully initialized OpenCL cache directory: " << cache_path_);
+                CV_LOG_INFO(پوچ, "Successfully initialized OpenCL cache directory: " << cache_path_);
             }
         }
     }
 
-    void clear()
+    تهی clear()
     {
         cache_path_.clear();
         cache_lock_filename_.clear();
         cache_lock_.release();
     }
 
-    std::string prepareCacheDirectoryForContext(const std::string& ctx_prefix,
-            const std::string& cleanup_prefix)
+    std::string prepareCacheDirectoryForContext(ثابت std::string& ctx_prefix,
+            ثابت std::string& cleanup_prefix)
     {
-        if (cache_path_.empty())
-            return std::string();
+        اگر (cache_path_.empty())
+            بازگشت std::string();
 
         AutoLock lock(mutex_prepared_contexts_);
 
         ContextCacheType::iterator found_it = prepared_contexts_.find(ctx_prefix);
-        if (found_it != prepared_contexts_.end())
-            return found_it->second;
+        اگر (found_it != prepared_contexts_.end())
+            بازگشت found_it->second;
 
-        CV_LOG_INFO(NULL, "Preparing OpenCL cache configuration for context: " << ctx_prefix);
+        CV_LOG_INFO(پوچ, "Preparing OpenCL cache configuration for context: " << ctx_prefix);
 
         std::string target_directory = cache_path_ + ctx_prefix + "/";
-        bool result = utils::fs::isDirectory(target_directory);
-        if (!result)
+        منطقی result = utils::fs::isDirectory(target_directory);
+        اگر (!result)
         {
-            try
+            تلاش
             {
-                CV_LOG_VERBOSE(NULL, 0, "Creating directory: " << target_directory);
-                if (utils::fs::createDirectories(target_directory))
+                CV_LOG_VERBOSE(پوچ, 0, "Creating directory: " << target_directory);
+                اگر (utils::fs::createDirectories(target_directory))
                 {
-                    result = true;
+                    result = درست;
                 }
-                else
+                وگرنه
                 {
-                    CV_LOG_WARNING(NULL, "Can't create directory: " << target_directory);
+                    CV_LOG_WARNING(پوچ, "Can't create directory: " << target_directory);
                 }
             }
-            catch (const cv::Exception& e)
+            بگیر (ثابت cv::Exception& e)
             {
-                CV_LOG_ERROR(NULL, "Can't create OpenCL program cache directory for context: " << target_directory << std::endl << e.what());
+                CV_LOG_ERROR(پوچ, "Can't create OpenCL program cache directory for context: " << target_directory << std::endl << e.what());
             }
         }
         target_directory = result ? target_directory : std::string();
         prepared_contexts_.insert(std::pair<std::string, std::string>(ctx_prefix, target_directory));
 
-        if (result && CV_OPENCL_CACHE_CLEANUP && CV_OPENCL_CACHE_WRITE && !cleanup_prefix.empty())
+        اگر (result && CV_OPENCL_CACHE_CLEANUP && CV_OPENCL_CACHE_WRITE && !cleanup_prefix.empty())
         {
-            try
+            تلاش
             {
                 std::vector<String> entries;
-                utils::fs::glob_relative(cache_path_, cleanup_prefix + "*", entries, false, true);
+                utils::fs::glob_relative(cache_path_, cleanup_prefix + "*", entries, نادرست, درست);
                 std::vector<String> remove_entries;
-                for (size_t i = 0; i < entries.size(); i++)
+                برای (size_t i = 0; i < entries.size(); i++)
                 {
-                    const String& name = entries[i];
-                    if (0 == name.find(cleanup_prefix))
+                    ثابت String& name = entries[i];
+                    اگر (0 == name.find(cleanup_prefix))
                     {
-                        if (0 == name.find(ctx_prefix))
-                            continue; // skip current
+                        اگر (0 == name.find(ctx_prefix))
+                            ادامه; // skip current
                         remove_entries.push_back(name);
                     }
                 }
-                if (!remove_entries.empty())
+                اگر (!remove_entries.empty())
                 {
-                    CV_LOG_WARNING(NULL, (remove_entries.size() == 1
+                    CV_LOG_WARNING(پوچ, (remove_entries.size() == 1
                             ? "Detected OpenCL cache directory for other version of OpenCL device."
                             : "Detected OpenCL cache directories for other versions of OpenCL device.")
                             << " We assume that these directories are obsolete after OpenCL runtime/drivers upgrade.");
-                    CV_LOG_WARNING(NULL, "Trying to remove these directories...");
-                    for (size_t i = 0; i < remove_entries.size(); i++)
+                    CV_LOG_WARNING(پوچ, "Trying to remove these directories...");
+                    برای (size_t i = 0; i < remove_entries.size(); i++)
                     {
-                        CV_LOG_WARNING(NULL, "- " << remove_entries[i]);
+                        CV_LOG_WARNING(پوچ, "- " << remove_entries[i]);
                     }
-                    CV_LOG_WARNING(NULL, "Note: You can disable this behavior via this option: OPENCV_OPENCL_CACHE_CLEANUP=0");
+                    CV_LOG_WARNING(پوچ, "Note: You can disable this behavior via this option: OPENCV_OPENCL_CACHE_CLEANUP=0");
 
-                    for (size_t i = 0; i < remove_entries.size(); i++)
+                    برای (size_t i = 0; i < remove_entries.size(); i++)
                     {
-                        const String& name = remove_entries[i];
+                        ثابت String& name = remove_entries[i];
                         cv::String path = utils::fs::join(cache_path_, name);
-                        try
+                        تلاش
                         {
                             utils::fs::remove_all(path);
-                            CV_LOG_WARNING(NULL, "Removed: " << path);
+                            CV_LOG_WARNING(پوچ, "Removed: " << path);
                         }
-                        catch (const cv::Exception& e)
+                        بگیر (ثابت cv::Exception& e)
                         {
-                            CV_LOG_ERROR(NULL, "Exception during removal of obsolete OpenCL cache directory: " << path << std::endl << e.what());
+                            CV_LOG_ERROR(پوچ, "Exception during removal of obsolete OpenCL cache directory: " << path << std::endl << e.what());
                         }
                     }
                 }
             }
-            catch (...)
+            بگیر (...)
             {
-                CV_LOG_WARNING(NULL, "Can't check for obsolete OpenCL cache directories");
+                CV_LOG_WARNING(پوچ, "Can't check for obsolete OpenCL cache directories");
             }
         }
 
-        CV_LOG_VERBOSE(NULL, 1, "  Result: " << (target_directory.empty() ? std::string("Failed") : target_directory));
-        return target_directory;
+        CV_LOG_VERBOSE(پوچ, 1, "  Result: " << (target_directory.empty() ? std::string("Failed") : target_directory));
+        بازگشت target_directory;
     }
 
-    static OpenCLBinaryCacheConfigurator& getSingletonInstance()
+    ایستا OpenCLBinaryCacheConfigurator& getSingletonInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(OpenCLBinaryCacheConfigurator, new OpenCLBinaryCacheConfigurator());
+        CV_SINGLETON_LAZY_INIT_REF(OpenCLBinaryCacheConfigurator, جدید OpenCLBinaryCacheConfigurator());
     }
 };
-class BinaryProgramFile
+رده دودویی_Program_File
 {
-    enum { MAX_ENTRIES = 64 };
+    شمارش { MAX_ENTRIES = 64 };
 
-    typedef unsigned int uint32_t;
+    تعریفنوع unsigned صحیح uint32_t;
 
-    struct CV_DECL_ALIGNED(4) FileHeader
+    ساختار CV_DECL_ALIGNED(4) FileHeader
     {
         uint32_t sourceSignatureSize;
         //char sourceSignature[];
     };
 
-    struct CV_DECL_ALIGNED(4) FileTable
+    ساختار CV_DECL_ALIGNED(4) FileTable
     {
-        uint32_t numberOfEntries;
+        uint32_t عدد_Of_Entries;
         //uint32_t firstEntryOffset[];
     };
 
-    struct CV_DECL_ALIGNED(4) FileEntry
+    ساختار CV_DECL_ALIGNED(4) FileEntry
     {
         uint32_t nextEntryFileOffset; // 0 for the last entry in chain
-        uint32_t keySize;
+        uint32_t کلید_Size;
         uint32_t dataSize;
         //char key[];
         //char data[];
     };
 
-    const std::string fileName_;
-    const char* const sourceSignature_;
-    const size_t sourceSignatureSize_;
+    ثابت std::string fileName_;
+    ثابت نویسه* ثابت sourceSignature_;
+    ثابت size_t sourceSignatureSize_;
 
     std::fstream f;
 
     uint32_t entryOffsets[MAX_ENTRIES];
 
-    uint32_t getHash(const std::string& options)
+    uint32_t getHash(ثابت std::string& options)
     {
-        uint64 hash = crc64((const uchar*)options.c_str(), options.size(), 0);
-        return hash & (MAX_ENTRIES - 1);
+        uint64 hash = crc64((ثابت uchar*)options.c_str(), options.size(), 0);
+        بازگشت hash & (MAX_ENTRIES - 1);
     }
 
-    inline size_t getFileSize()
+    درونخطی size_t getFileSize()
     {
         size_t pos = (size_t)f.tellg();
         f.seekg(0, std::fstream::end);
         size_t fileSize = (size_t)f.tellg();
         f.seekg(pos, std::fstream::beg);
-        return fileSize;
+        بازگشت fileSize;
     }
-    inline uint32_t readUInt32()
+    درونخطی uint32_t readUInt32()
     {
         uint32_t res = 0;
-        f.read((char*)&res, sizeof(uint32_t));
+        f.اقرأ((نویسه*)&res, اندازه(uint32_t));
         CV_Assert(!f.fail());
-        return res;
+        بازگشت res;
     }
-    inline void writeUInt32(const uint32_t value)
+    درونخطی تهی writeUInt32(ثابت uint32_t value)
     {
         uint32_t v = value;
-        f.write((char*)&v, sizeof(uint32_t));
+        f.اكتب((نویسه*)&v, اندازه(uint32_t));
         CV_Assert(!f.fail());
     }
 
-    inline void seekReadAbsolute(size_t pos)
+    درونخطی تهی seekReadAbsolute(size_t pos)
     {
         f.seekg(pos, std::fstream::beg);
         CV_Assert(!f.fail());
     }
-    inline void seekReadRelative(size_t pos)
+    درونخطی تهی seekReadRelative(size_t pos)
     {
         f.seekg(pos, std::fstream::cur);
         CV_Assert(!f.fail());
     }
 
-    inline void seekWriteAbsolute(size_t pos)
+    درونخطی تهی seekWriteAbsolute(size_t pos)
     {
         f.seekp(pos, std::fstream::beg);
         CV_Assert(!f.fail());
     }
 
-    void clearFile()
+    تهی clearFile()
     {
         f.close();
-        if (0 != remove(fileName_.c_str()))
-            CV_LOG_ERROR(NULL, "Can't remove: " << fileName_);
-        return;
+        اگر (0 != remove(fileName_.c_str()))
+            CV_LOG_ERROR(پوچ, "Can't remove: " << fileName_);
+        بازگشت;
     }
 
-public:
-    BinaryProgramFile(const std::string& fileName, const char* sourceSignature)
+عمومی:
+    دودویی_Program_File(ثابت std::string& fileName, ثابت نویسه* sourceSignature)
         : fileName_(fileName), sourceSignature_(sourceSignature), sourceSignatureSize_(sourceSignature_ ? strlen(sourceSignature_) : 0)
     {
-        CV_StaticAssert(sizeof(uint32_t) == 4, "");
-        CV_Assert(sourceSignature_ != NULL);
+        CV_StaticAssert(اندازه(uint32_t) == 4, "");
+        CV_Assert(sourceSignature_ != پوچ);
         CV_Assert(sourceSignatureSize_ > 0);
-        memset(entryOffsets, 0, sizeof(entryOffsets));
+        memset(entryOffsets, 0, اندازه(entryOffsets));
 
         f.rdbuf()->pubsetbuf(0, 0); // disable buffering
         f.open(fileName_.c_str(), std::ios::in|std::ios::out|std::ios::binary);
-        if(f.is_open() && getFileSize() > 0)
+        اگر(f.is_open() && getFileSize() > 0)
         {
-            bool isValid = false;
-            try
+            منطقی isValid = نادرست;
+            تلاش
             {
                 uint32_t fileSourceSignatureSize = readUInt32();
-                if (fileSourceSignatureSize == sourceSignatureSize_)
+                اگر (fileSourceSignatureSize == sourceSignatureSize_)
                 {
-                    cv::AutoBuffer<char> fileSourceSignature(fileSourceSignatureSize + 1);
-                    f.read(fileSourceSignature.data(), fileSourceSignatureSize);
-                    if (f.eof())
+                    cv::AutoBuffer<نویسه> fileSourceSignature(fileSourceSignatureSize + 1);
+                    f.اقرأ(fileSourceSignature.data(), fileSourceSignatureSize);
+                    اگر (f.eof())
                     {
-                        CV_LOG_ERROR(NULL, "Unexpected EOF");
+                        CV_LOG_ERROR(پوچ, "Unexpected EOF");
                     }
-                    else if (memcmp(sourceSignature, fileSourceSignature.data(), fileSourceSignatureSize) == 0)
+                    وگرنه اگر (memcmp(sourceSignature, fileSourceSignature.data(), fileSourceSignatureSize) == 0)
                     {
-                        isValid = true;
+                        isValid = درست;
                     }
                 }
-                if (!isValid)
+                اگر (!isValid)
                 {
-                    CV_LOG_ERROR(NULL, "Source code signature/hash mismatch (program source code has been changed/updated)");
+                    CV_LOG_ERROR(پوچ, "Source code signature/hash mismatch (program source code has been changed/updated)");
                 }
             }
-            catch (const cv::Exception& e)
+            بگیر (ثابت cv::Exception& e)
             {
-                CV_LOG_ERROR(NULL, "Can't open binary program file: " << fileName << " : " << e.what());
+                CV_LOG_ERROR(پوچ, "Can't open binary program file: " << fileName << " : " << e.what());
             }
-            catch (...)
+            بگیر (...)
             {
-                CV_LOG_ERROR(NULL, "Can't open binary program file: " << fileName << " : Unknown error");
+                CV_LOG_ERROR(پوچ, "Can't open binary program file: " << fileName << " : Unknown error");
             }
-            if (!isValid)
+            اگر (!isValid)
             {
                 clearFile();
             }
-            else
+            وگرنه
             {
                 seekReadAbsolute(0);
             }
         }
     }
 
-    bool read(const std::string& key, std::vector<char>& buf)
+    منطقی اقرأ(ثابت std::string& کلید, std::vector<نویسه>& buf)
     {
-        if (!f.is_open())
-            return false;
+        اگر (!f.is_open())
+            بازگشت نادرست;
 
         size_t fileSize = getFileSize();
-        if (fileSize == 0)
+        اگر (fileSize == 0)
         {
-            CV_LOG_ERROR(NULL, "Invalid file (empty): " << fileName_);
+            CV_LOG_ERROR(پوچ, "Invalid file (empty): " << fileName_);
             clearFile();
-            return false;
+            بازگشت نادرست;
         }
         seekReadAbsolute(0);
 
@@ -678,80 +678,80 @@ public:
         CV_Assert(fileSourceSignatureSize > 0);
         seekReadRelative(fileSourceSignatureSize);
 
-        uint32_t numberOfEntries = readUInt32();
-        CV_Assert(numberOfEntries > 0);
-        if (numberOfEntries != MAX_ENTRIES)
+        uint32_t عدد_Of_Entries = readUInt32();
+        CV_Assert(عدد_Of_Entries > 0);
+        اگر (عدد_Of_Entries != MAX_ENTRIES)
         {
-            CV_LOG_ERROR(NULL, "Invalid file: " << fileName_);
+            CV_LOG_ERROR(پوچ, "Invalid file: " << fileName_);
             clearFile();
-            return false;
+            بازگشت نادرست;
         }
-        f.read((char*)&entryOffsets[0], sizeof(entryOffsets));
+        f.اقرأ((نویسه*)&entryOffsets[0], اندازه(entryOffsets));
         CV_Assert(!f.fail());
 
-        uint32_t entryNum = getHash(key);
+        uint32_t entry_رقم = getHash(کلید);
 
-        uint32_t entryOffset = entryOffsets[entryNum];
+        uint32_t entryOffset = entryOffsets[entry_رقم];
         FileEntry entry;
-        while (entryOffset > 0)
+        وقتی (entryOffset > 0)
         {
             seekReadAbsolute(entryOffset);
             //CV_StaticAssert(sizeof(entry) == sizeof(uint32_t) * 3, "");
-            f.read((char*)&entry, sizeof(entry));
+            f.اقرأ((نویسه*)&entry, اندازه(entry));
             CV_Assert(!f.fail());
-            cv::AutoBuffer<char> fileKey(entry.keySize + 1);
-            if (key.size() == entry.keySize)
+            cv::AutoBuffer<نویسه> file_کلید(entry.کلید_Size + 1);
+            اگر (کلید.size() == entry.کلید_Size)
             {
-                if (entry.keySize > 0)
+                اگر (entry.کلید_Size > 0)
                 {
-                    f.read(fileKey.data(), entry.keySize);
+                    f.اقرأ(file_کلید.data(), entry.کلید_Size);
                     CV_Assert(!f.fail());
                 }
-                if (memcmp(fileKey.data(), key.c_str(), entry.keySize) == 0)
+                اگر (memcmp(file_کلید.data(), کلید.c_str(), entry.کلید_Size) == 0)
                 {
                     buf.resize(entry.dataSize);
-                    f.read(&buf[0], entry.dataSize);
+                    f.اقرأ(&buf[0], entry.dataSize);
                     CV_Assert(!f.fail());
                     seekReadAbsolute(0);
-                    CV_LOG_VERBOSE(NULL, 0, "Read...");
-                    return true;
+                    CV_LOG_VERBOSE(پوچ, 0, "Read...");
+                    بازگشت درست;
                 }
             }
-            if (entry.nextEntryFileOffset == 0)
-                break;
+            اگر (entry.nextEntryFileOffset == 0)
+                بشکن;
             entryOffset = entry.nextEntryFileOffset;
         }
-        return false;
+        بازگشت نادرست;
     }
 
-    bool write(const std::string& key, std::vector<char>& buf)
+    منطقی اكتب(ثابت std::string& کلید, std::vector<نویسه>& buf)
     {
-        if (!f.is_open())
+        اگر (!f.is_open())
         {
             f.open(fileName_.c_str(), std::ios::in|std::ios::out|std::ios::binary);
-            if (!f.is_open())
+            اگر (!f.is_open())
             {
                 f.open(fileName_.c_str(), std::ios::out|std::ios::binary);
-                if (!f.is_open())
+                اگر (!f.is_open())
                 {
-                    CV_LOG_ERROR(NULL, "Can't create file: " << fileName_);
-                    return false;
+                    CV_LOG_ERROR(پوچ, "Can't create file: " << fileName_);
+                    بازگشت نادرست;
                 }
             }
         }
 
         size_t fileSize = getFileSize();
-        if (fileSize == 0)
+        اگر (fileSize == 0)
         {
             // Write header
             seekWriteAbsolute(0);
             writeUInt32((uint32_t)sourceSignatureSize_);
-            f.write(sourceSignature_, sourceSignatureSize_);
+            f.اكتب(sourceSignature_, sourceSignatureSize_);
             CV_Assert(!f.fail());
 
             writeUInt32(MAX_ENTRIES);
-            memset(entryOffsets, 0, sizeof(entryOffsets));
-            f.write((char*)entryOffsets, sizeof(entryOffsets));
+            memset(entryOffsets, 0, اندازه(entryOffsets));
+            f.اكتب((نویسه*)entryOffsets, اندازه(entryOffsets));
             CV_Assert(!f.fail());
             f.flush();
             CV_Assert(!f.fail());
@@ -767,132 +767,132 @@ public:
         CV_Assert(fileSourceSignatureSize == sourceSignatureSize_);
         seekReadRelative(fileSourceSignatureSize);
 
-        uint32_t numberOfEntries = readUInt32();
-        CV_Assert(numberOfEntries > 0);
-        if (numberOfEntries != MAX_ENTRIES)
+        uint32_t عدد_Of_Entries = readUInt32();
+        CV_Assert(عدد_Of_Entries > 0);
+        اگر (عدد_Of_Entries != MAX_ENTRIES)
         {
-            CV_LOG_ERROR(NULL, "Invalid file: " << fileName_);
+            CV_LOG_ERROR(پوچ, "Invalid file: " << fileName_);
             clearFile();
-            return false;
+            بازگشت نادرست;
         }
         size_t tableEntriesOffset = (size_t)f.tellg();
-        f.read((char*)&entryOffsets[0], sizeof(entryOffsets));
+        f.اقرأ((نویسه*)&entryOffsets[0], اندازه(entryOffsets));
         CV_Assert(!f.fail());
 
-        uint32_t entryNum = getHash(key);
+        uint32_t entry_رقم = getHash(کلید);
 
-        uint32_t entryOffset = entryOffsets[entryNum];
+        uint32_t entryOffset = entryOffsets[entry_رقم];
         FileEntry entry;
-        while (entryOffset > 0)
+        وقتی (entryOffset > 0)
         {
             seekReadAbsolute(entryOffset);
             //CV_StaticAssert(sizeof(entry) == sizeof(uint32_t) * 3, "");
-            f.read((char*)&entry, sizeof(entry));
+            f.اقرأ((نویسه*)&entry, اندازه(entry));
             CV_Assert(!f.fail());
-            cv::AutoBuffer<char> fileKey(entry.keySize + 1);
-            if (key.size() == entry.keySize)
+            cv::AutoBuffer<نویسه> file_کلید(entry.کلید_Size + 1);
+            اگر (کلید.size() == entry.کلید_Size)
             {
-                if (entry.keySize > 0)
+                اگر (entry.کلید_Size > 0)
                 {
-                    f.read(fileKey.data(), entry.keySize);
+                    f.اقرأ(file_کلید.data(), entry.کلید_Size);
                     CV_Assert(!f.fail());
                 }
-                if (0 == memcmp(fileKey.data(), key.c_str(), entry.keySize))
+                اگر (0 == memcmp(file_کلید.data(), کلید.c_str(), entry.کلید_Size))
                 {
                     // duplicate
-                    CV_LOG_VERBOSE(NULL, 0, "Duplicate key ignored: " << fileName_);
-                    return false;
+                    CV_LOG_VERBOSE(پوچ, 0, "Duplicate key ignored: " << fileName_);
+                    بازگشت نادرست;
                 }
             }
-            if (entry.nextEntryFileOffset == 0)
-                break;
+            اگر (entry.nextEntryFileOffset == 0)
+                بشکن;
             entryOffset = entry.nextEntryFileOffset;
         }
         seekReadAbsolute(0);
-        if (entryOffset > 0)
+        اگر (entryOffset > 0)
         {
             seekWriteAbsolute(entryOffset);
             entry.nextEntryFileOffset = (uint32_t)fileSize;
-            f.write((char*)&entry, sizeof(entry));
+            f.اكتب((نویسه*)&entry, اندازه(entry));
             CV_Assert(!f.fail());
         }
-        else
+        وگرنه
         {
-            entryOffsets[entryNum] = (uint32_t)fileSize;
+            entryOffsets[entry_رقم] = (uint32_t)fileSize;
             seekWriteAbsolute(tableEntriesOffset);
-            f.write((char*)entryOffsets, sizeof(entryOffsets));
+            f.اكتب((نویسه*)entryOffsets, اندازه(entryOffsets));
             CV_Assert(!f.fail());
         }
         seekWriteAbsolute(fileSize);
         entry.nextEntryFileOffset = 0;
         entry.dataSize = (uint32_t)buf.size();
-        entry.keySize = (uint32_t)key.size();
-        f.write((char*)&entry, sizeof(entry));
+        entry.کلید_Size = (uint32_t)کلید.size();
+        f.اكتب((نویسه*)&entry, اندازه(entry));
         CV_Assert(!f.fail());
-        f.write(key.c_str(), entry.keySize);
+        f.اكتب(کلید.c_str(), entry.کلید_Size);
         CV_Assert(!f.fail());
-        f.write(&buf[0], entry.dataSize);
+        f.اكتب(&buf[0], entry.dataSize);
         CV_Assert(!f.fail());
         f.flush();
         CV_Assert(!f.fail());
-        CV_LOG_VERBOSE(NULL, 0, "Write... (" << buf.size() << " bytes)");
-        return true;
+        CV_LOG_VERBOSE(پوچ, 0, "Write... (" << buf.size() << " bytes)");
+        بازگشت درست;
     }
 };
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 
 
-struct OpenCLExecutionContext::Impl
+ساختار OpenCLExecutionContext::Impl
 {
     ocl::Context context_;
-    int device_;  // device index in context
+    صحیح device_;  // device index in context
     ocl::Queue queue_;
-    int useOpenCL_;
+    صحیح useOpenCL_;
 
-protected:
+محافظتشده:
     Impl() = delete;
 
-    void _init_device(cl_device_id deviceID)
+    تهی _init_device(cl_device_id deviceID)
     {
         CV_Assert(deviceID);
-        int ndevices = (int)context_.ndevices();
+        صحیح ndevices = (صحیح)context_.ndevices();
         CV_Assert(ndevices > 0);
-        bool found = false;
-        for (int i = 0; i < ndevices; i++)
+        منطقی found = نادرست;
+        برای (صحیح i = 0; i < ndevices; i++)
         {
             ocl::Device d = context_.device(i);
             cl_device_id dhandle = (cl_device_id)d.ptr();
-            if (dhandle == deviceID)
+            اگر (dhandle == deviceID)
             {
                 device_ = i;
-                found = true;
-                break;
+                found = درست;
+                بشکن;
             }
         }
         CV_Assert(found && "OpenCL device can't work with passed OpenCL context");
     }
 
-    void _init_device(const ocl::Device& device)
+    تهی _init_device(ثابت ocl::Device& device)
     {
         CV_Assert(device.ptr());
-        int ndevices = (int)context_.ndevices();
+        صحیح ndevices = (صحیح)context_.ndevices();
         CV_Assert(ndevices > 0);
-        bool found = false;
-        for (int i = 0; i < ndevices; i++)
+        منطقی found = نادرست;
+        برای (صحیح i = 0; i < ndevices; i++)
         {
             ocl::Device d = context_.device(i);
-            if (d.getImpl() == device.getImpl())
+            اگر (d.getImpl() == device.getImpl())
             {
                 device_ = i;
-                found = true;
-                break;
+                found = درست;
+                بشکن;
             }
         }
         CV_Assert(found && "OpenCL device can't work with passed OpenCL context");
     }
 
-public:
+عمومی:
     Impl(cl_platform_id platformID, cl_context context, cl_device_id deviceID)
         : device_(0), useOpenCL_(-1)
     {
@@ -905,7 +905,7 @@ public:
         queue_ = Queue(context_, context_.device(device_));
     }
 
-    Impl(const ocl::Context& context, const ocl::Device& device, const ocl::Queue& queue)
+    Impl(ثابت ocl::Context& context, ثابت ocl::Device& device, ثابت ocl::Queue& queue)
         : device_(0), useOpenCL_(-1)
     {
         CV_Assert(context.ptr());
@@ -916,7 +916,7 @@ public:
         queue_ = queue;
     }
 
-    Impl(const ocl::Context& context, const ocl::Device& device)
+    Impl(ثابت ocl::Context& context, ثابت ocl::Device& device)
         : device_(0), useOpenCL_(-1)
     {
         CV_Assert(context.ptr());
@@ -927,7 +927,7 @@ public:
         queue_ = Queue(context_, context_.device(device_));
     }
 
-    Impl(const ocl::Context& context, const int device, const ocl::Queue& queue)
+    Impl(ثابت ocl::Context& context, ثابت صحیح device, ثابت ocl::Queue& queue)
         : context_(context)
         , device_(device)
         , queue_(queue)
@@ -935,7 +935,7 @@ public:
     {
         // nothing
     }
-    Impl(const Impl& other)
+    Impl(ثابت Impl& other)
         : context_(other.context_)
         , device_(other.device_)
         , queue_(other.queue_)
@@ -944,121 +944,121 @@ public:
         // nothing
     }
 
-    inline bool useOpenCL() const { return const_cast<Impl*>(this)->useOpenCL(); }
-    bool useOpenCL()
+    درونخطی منطقی useOpenCL() ثابت { بازگشت const_cast<Impl*>(این)->useOpenCL(); }
+    منطقی useOpenCL()
     {
-        if (useOpenCL_ < 0)
+        اگر (useOpenCL_ < 0)
         {
-            try
+            تلاش
             {
                 useOpenCL_ = 0;
-                if (!context_.empty() && context_.ndevices() > 0)
+                اگر (!context_.empty() && context_.ndevices() > 0)
                 {
-                    const Device& d = context_.device(device_);
+                    ثابت Device& d = context_.device(device_);
                     useOpenCL_ = d.available();
                 }
             }
-            catch (const cv::Exception&)
+            بگیر (ثابت cv::Exception&)
             {
                 // nothing
             }
-            if (!useOpenCL_)
-                CV_LOG_INFO(NULL, "OpenCL: can't use OpenCL execution context");
+            اگر (!useOpenCL_)
+                CV_LOG_INFO(پوچ, "OpenCL: can't use OpenCL execution context");
         }
-        return useOpenCL_ > 0;
+        بازگشت useOpenCL_ > 0;
     }
 
-    void setUseOpenCL(bool flag)
+    تهی setUseOpenCL(منطقی flag)
     {
-        if (!flag)
+        اگر (!flag)
             useOpenCL_ = 0;
-        else
+        وگرنه
             useOpenCL_ = -1;
     }
 
-    static const std::shared_ptr<Impl>& getInitializedExecutionContext()
+    ایستا ثابت std::shared_ptr<Impl>& getInitializedExecutionContext()
     {
         CV_TRACE_FUNCTION();
 
-        CV_LOG_INFO(NULL, "OpenCL: initializing thread execution context");
+        CV_LOG_INFO(پوچ, "OpenCL: initializing thread execution context");
 
-        static bool initialized = false;
-        static std::shared_ptr<Impl> g_primaryExecutionContext;
+        ایستا منطقی initialized = نادرست;
+        ایستا std::shared_ptr<Impl> g_primaryExecutionContext;
 
-        if (!initialized)
+        اگر (!initialized)
         {
             cv::AutoLock lock(getInitializationMutex());
-            if (!initialized)
+            اگر (!initialized)
             {
-                CV_LOG_INFO(NULL, "OpenCL: creating new execution context...");
-                try
+                CV_LOG_INFO(پوچ, "OpenCL: creating new execution context...");
+                تلاش
                 {
                     Context c = ocl::Context::create(std::string());
-                    if (c.ndevices())
+                    اگر (c.ndevices())
                     {
-                        int deviceId = 0;
+                        صحیح deviceId = 0;
                         auto& d = c.device(deviceId);
-                        if (d.available())
+                        اگر (d.available())
                         {
                             auto q = ocl::Queue(c, d);
-                            if (!q.ptr())
+                            اگر (!q.ptr())
                             {
-                                CV_LOG_ERROR(NULL, "OpenCL: Can't create default OpenCL queue");
+                                CV_LOG_ERROR(پوچ, "OpenCL: Can't create default OpenCL queue");
                             }
-                            else
+                            وگرنه
                             {
                                 g_primaryExecutionContext = std::make_shared<Impl>(c, deviceId, q);
-                                CV_LOG_INFO(NULL, "OpenCL: device=" << d.name());
+                                CV_LOG_INFO(پوچ, "OpenCL: device=" << d.name());
                             }
                         }
-                        else
+                        وگرنه
                         {
-                            CV_LOG_ERROR(NULL, "OpenCL: OpenCL device is not available (CL_DEVICE_AVAILABLE returns false)");
+                            CV_LOG_ERROR(پوچ, "OpenCL: OpenCL device is not available (CL_DEVICE_AVAILABLE returns false)");
                         }
                     }
-                    else
+                    وگرنه
                     {
-                        CV_LOG_INFO(NULL, "OpenCL: context is not available/disabled");
+                        CV_LOG_INFO(پوچ, "OpenCL: context is not available/disabled");
                     }
                 }
-                catch (const std::exception& e)
+                بگیر (ثابت std::exception& e)
                 {
-                    CV_LOG_INFO(NULL, "OpenCL: Can't initialize OpenCL context/device/queue: " << e.what());
+                    CV_LOG_INFO(پوچ, "OpenCL: Can't initialize OpenCL context/device/queue: " << e.what());
                 }
-                catch (...)
+                بگیر (...)
                 {
-                    CV_LOG_WARNING(NULL, "OpenCL: Can't initialize OpenCL context/device/queue: unknown C++ exception");
+                    CV_LOG_WARNING(پوچ, "OpenCL: Can't initialize OpenCL context/device/queue: unknown C++ exception");
                 }
-                initialized = true;
+                initialized = درست;
             }
         }
-        return g_primaryExecutionContext;
+        بازگشت g_primaryExecutionContext;
     }
 };
 
-Context& OpenCLExecutionContext::getContext() const
+Context& OpenCLExecutionContext::getContext() ثابت
 {
     CV_Assert(p);
-    return p->context_;
+    بازگشت p->context_;
 }
-Device& OpenCLExecutionContext::getDevice() const
+Device& OpenCLExecutionContext::getDevice() ثابت
 {
     CV_Assert(p);
-    return p->context_.device(p->device_);
+    بازگشت p->context_.device(p->device_);
 }
-Queue& OpenCLExecutionContext::getQueue() const
+Queue& OpenCLExecutionContext::getQueue() ثابت
 {
     CV_Assert(p);
-    return p->queue_;
+    بازگشت p->queue_;
 }
 
-bool OpenCLExecutionContext::useOpenCL() const
+منطقی OpenCLExecutionContext::useOpenCL() ثابت
 {
-    if (p)
-        return p->useOpenCL();
-    return false;
+    اگر (p)
+        بازگشت p->useOpenCL();
+    بازگشت نادرست;
 }
-void OpenCLExecutionContext::setUseOpenCL(bool flag)
+تهی OpenCLExecutionContext::setUseOpenCL(منطقی flag)
 {
     CV_Assert(p);
     p->setUseOpenCL(flag);
@@ -1070,13 +1070,13 @@ OpenCLExecutionContext& OpenCLExecutionContext::getCurrent()
     CV_TRACE_FUNCTION();
     CoreTLSData& data = getCoreTlsData();
     OpenCLExecutionContext& c = data.oclExecutionContext;
-    if (!data.oclExecutionContextInitialized)
+    اگر (!data.oclExecutionContextInitialized)
     {
-        data.oclExecutionContextInitialized = true;
-        if (c.empty() && haveOpenCL())
+        data.oclExecutionContextInitialized = درست;
+        اگر (c.empty() && haveOpenCL())
             c.p = Impl::getInitializedExecutionContext();
     }
-    return c;
+    بازگشت c;
 }
 
 /* static */
@@ -1085,43 +1085,43 @@ OpenCLExecutionContext& OpenCLExecutionContext::getCurrentRef()
     CV_TRACE_FUNCTION();
     CoreTLSData& data = getCoreTlsData();
     OpenCLExecutionContext& c = data.oclExecutionContext;
-    return c;
+    بازگشت c;
 }
 
-void OpenCLExecutionContext::bind() const
+تهی OpenCLExecutionContext::bind() ثابت
 {
     CV_TRACE_FUNCTION();
     CV_Assert(p);
     CoreTLSData& data = getCoreTlsData();
-    data.oclExecutionContext = *this;
-    data.oclExecutionContextInitialized = true;
+    data.oclExecutionContext = *این;
+    data.oclExecutionContextInitialized = درست;
     data.useOpenCL = p->useOpenCL_;  // propagate "-1", avoid call useOpenCL()
 }
 
 
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue() const
+OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue() ثابت
 {
     CV_TRACE_FUNCTION();
     CV_Assert(p);
-    const Queue q(getContext(), getDevice());
-    return cloneWithNewQueue(q);
+    ثابت Queue q(getContext(), getDevice());
+    بازگشت cloneWithNewQueue(q);
 }
 
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue(const ocl::Queue& q) const
+OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue(ثابت ocl::Queue& q) ثابت
 {
     CV_TRACE_FUNCTION();
     CV_Assert(p);
-    CV_Assert(q.ptr() != NULL);
+    CV_Assert(q.ptr() != پوچ);
     OpenCLExecutionContext c;
     c.p = std::make_shared<Impl>(p->context_, p->device_, q);
-    return c;
+    بازگشت c;
 }
 
 /* static */
-OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device, const ocl::Queue& queue)
+OpenCLExecutionContext OpenCLExecutionContext::create(ثابت Context& context, ثابت Device& device, ثابت ocl::Queue& queue)
 {
     CV_TRACE_FUNCTION();
-    if (!haveOpenCL())
+    اگر (!haveOpenCL())
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
     CV_Assert(!context.empty());
@@ -1130,15 +1130,15 @@ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, co
     CV_Assert(device.ptr());
     OpenCLExecutionContext ctx;
     ctx.p = std::make_shared<OpenCLExecutionContext::Impl>(context, device, queue);
-    return ctx;
+    بازگشت ctx;
 
 }
 
 /* static */
-OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device)
+OpenCLExecutionContext OpenCLExecutionContext::create(ثابت Context& context, ثابت Device& device)
 {
     CV_TRACE_FUNCTION();
-    if (!haveOpenCL())
+    اگر (!haveOpenCL())
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
     CV_Assert(!context.empty());
@@ -1147,11 +1147,11 @@ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, co
     CV_Assert(device.ptr());
     OpenCLExecutionContext ctx;
     ctx.p = std::make_shared<OpenCLExecutionContext::Impl>(context, device);
-    return ctx;
+    بازگشت ctx;
 
 }
 
-void OpenCLExecutionContext::release()
+تهی OpenCLExecutionContext::release()
 {
     CV_TRACE_FUNCTION();
     p.reset();
@@ -1160,90 +1160,90 @@ void OpenCLExecutionContext::release()
 
 
 // true if we have initialized OpenCL subsystem with available platforms
-static bool g_isOpenCLInitialized = false;
-static bool g_isOpenCLAvailable = false;
+ایستا منطقی g_isOpenCLInitialized = نادرست;
+ایستا منطقی g_isOpenCLAvailable = نادرست;
 
-bool haveOpenCL()
+منطقی haveOpenCL()
 {
     CV_TRACE_FUNCTION();
 
-    if (!g_isOpenCLInitialized)
+    اگر (!g_isOpenCLInitialized)
     {
         CV_TRACE_REGION("Init_OpenCL_Runtime");
         std::string envPath = utils::getConfigurationParameterString("OPENCV_OPENCL_RUNTIME");
-        if (!envPath.empty())
+        اگر (!envPath.empty())
         {
-            if (envPath == "disabled")
+            اگر (envPath == "disabled")
             {
-                g_isOpenCLAvailable = false;
-                g_isOpenCLInitialized = true;
-                return false;
+                g_isOpenCLAvailable = نادرست;
+                g_isOpenCLInitialized = درست;
+                بازگشت نادرست;
             }
         }
 
         cv::AutoLock lock(getInitializationMutex());
-        CV_LOG_INFO(NULL, "Initialize OpenCL runtime...");
-        try
+        CV_LOG_INFO(پوچ, "Initialize OpenCL runtime...");
+        تلاش
         {
             cl_uint n = 0;
-            g_isOpenCLAvailable = ::clGetPlatformIDs(0, NULL, &n) == CL_SUCCESS;
+            g_isOpenCLAvailable = ::clGetPlatformIDs(0, پوچ, &n) == CL_SUCCESS;
             g_isOpenCLAvailable &= n > 0;
-            CV_LOG_INFO(NULL, "OpenCL: found " << n << " platforms");
+            CV_LOG_INFO(پوچ, "OpenCL: found " << n << " platforms");
         }
-        catch (...)
+        بگیر (...)
         {
-            g_isOpenCLAvailable = false;
+            g_isOpenCLAvailable = نادرست;
         }
-        g_isOpenCLInitialized = true;
+        g_isOpenCLInitialized = درست;
     }
-    return g_isOpenCLAvailable;
+    بازگشت g_isOpenCLAvailable;
 }
 
-bool useOpenCL()
+منطقی useOpenCL()
 {
     CoreTLSData& data = getCoreTlsData();
-    if (data.useOpenCL < 0)
+    اگر (data.useOpenCL < 0)
     {
-        try
+        تلاش
         {
             data.useOpenCL = 0;
-            if (haveOpenCL())
+            اگر (haveOpenCL())
             {
                 auto c = OpenCLExecutionContext::getCurrent();
                 data.useOpenCL = c.useOpenCL();
             }
         }
-        catch (...)
+        بگیر (...)
         {
-            CV_LOG_INFO(NULL, "OpenCL: can't initialize thread OpenCL execution context");
+            CV_LOG_INFO(پوچ, "OpenCL: can't initialize thread OpenCL execution context");
         }
     }
-    return data.useOpenCL > 0;
+    بازگشت data.useOpenCL > 0;
 }
 
-bool isOpenCLActivated()
+منطقی isOpenCLActivated()
 {
-    if (!g_isOpenCLAvailable)
-        return false; // prevent unnecessary OpenCL activation via useOpenCL()->haveOpenCL() calls
-    return useOpenCL();
+    اگر (!g_isOpenCLAvailable)
+        بازگشت نادرست; // prevent unnecessary OpenCL activation via useOpenCL()->haveOpenCL() calls
+    بازگشت useOpenCL();
 }
 
-void setUseOpenCL(bool flag)
+تهی setUseOpenCL(منطقی flag)
 {
     CV_TRACE_FUNCTION();
 
     CoreTLSData& data = getCoreTlsData();
     auto& c = OpenCLExecutionContext::getCurrentRef();
-    if (!c.empty())
+    اگر (!c.empty())
     {
         c.setUseOpenCL(flag);
         data.useOpenCL = c.useOpenCL();
     }
-    else
+    وگرنه
     {
-        if (!flag)
+        اگر (!flag)
             data.useOpenCL = 0;
-        else
+        وگرنه
             data.useOpenCL = -1; // enabled by default (if context is not initialized)
     }
 }
@@ -1252,17 +1252,17 @@ void setUseOpenCL(bool flag)
 
 #ifdef HAVE_CLAMDBLAS
 
-class AmdBlasHelper
+رده AmdBlasHelper
 {
-public:
-    static AmdBlasHelper & getInstance()
+عمومی:
+    ایستا AmdBlasHelper & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(AmdBlasHelper, new AmdBlasHelper())
+        CV_SINGLETON_LAZY_INIT_REF(AmdBlasHelper, جدید AmdBlasHelper())
     }
 
-    bool isAvailable() const
+    منطقی isAvailable() ثابت
     {
-        return g_isAmdBlasAvailable;
+        بازگشت g_isAmdBlasAvailable;
     }
 
     ~AmdBlasHelper()
@@ -1276,69 +1276,69 @@ public:
         catch (...) { }*/
     }
 
-protected:
+محافظتشده:
     AmdBlasHelper()
     {
-        if (!g_isAmdBlasInitialized)
+        اگر (!g_isAmdBlasInitialized)
         {
             AutoLock lock(getInitializationMutex());
 
-            if (!g_isAmdBlasInitialized)
+            اگر (!g_isAmdBlasInitialized)
             {
-                if (haveOpenCL())
+                اگر (haveOpenCL())
                 {
-                    try
+                    تلاش
                     {
                         g_isAmdBlasAvailable = clblasSetup() == clblasSuccess;
                     }
-                    catch (...)
+                    بگیر (...)
                     {
-                        g_isAmdBlasAvailable = false;
+                        g_isAmdBlasAvailable = نادرست;
                     }
                 }
-                else
-                    g_isAmdBlasAvailable = false;
+                وگرنه
+                    g_isAmdBlasAvailable = نادرست;
 
-                g_isAmdBlasInitialized = true;
+                g_isAmdBlasInitialized = درست;
             }
         }
     }
 
-private:
-    static bool g_isAmdBlasInitialized;
-    static bool g_isAmdBlasAvailable;
+خصوصی:
+    ایستا منطقی g_isAmdBlasInitialized;
+    ایستا منطقی g_isAmdBlasAvailable;
 };
 
-bool AmdBlasHelper::g_isAmdBlasAvailable = false;
-bool AmdBlasHelper::g_isAmdBlasInitialized = false;
+منطقی AmdBlasHelper::g_isAmdBlasAvailable = نادرست;
+منطقی AmdBlasHelper::g_isAmdBlasInitialized = نادرست;
 
-bool haveAmdBlas()
+منطقی haveAmdBlas()
 {
-    return AmdBlasHelper::getInstance().isAvailable();
+    بازگشت AmdBlasHelper::getInstance().isAvailable();
 }
 
-#else
+#وگرنه
 
-bool haveAmdBlas()
+منطقی haveAmdBlas()
 {
-    return false;
+    بازگشت نادرست;
 }
 
 #endif
 
 #ifdef HAVE_CLAMDFFT
 
-class AmdFftHelper
+رده AmdFftHelper
 {
-public:
-    static AmdFftHelper & getInstance()
+عمومی:
+    ایستا AmdFftHelper & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(AmdFftHelper, new AmdFftHelper())
+        CV_SINGLETON_LAZY_INIT_REF(AmdFftHelper, جدید AmdFftHelper())
     }
 
-    bool isAvailable() const
+    منطقی isAvailable() ثابت
     {
-        return g_isAmdFftAvailable;
+        بازگشت g_isAmdFftAvailable;
     }
 
     ~AmdFftHelper()
@@ -1352,108 +1352,108 @@ public:
         catch (...) { }*/
     }
 
-protected:
+محافظتشده:
     AmdFftHelper()
     {
-        if (!g_isAmdFftInitialized)
+        اگر (!g_isAmdFftInitialized)
         {
             AutoLock lock(getInitializationMutex());
 
-            if (!g_isAmdFftInitialized)
+            اگر (!g_isAmdFftInitialized)
             {
-                if (haveOpenCL())
+                اگر (haveOpenCL())
                 {
-                    try
+                    تلاش
                     {
                         cl_uint major, minor, patch;
                         CV_Assert(clfftInitSetupData(&setupData) == CLFFT_SUCCESS);
 
                         // it throws exception in case AmdFft binaries are not found
                         CV_Assert(clfftGetVersion(&major, &minor, &patch) == CLFFT_SUCCESS);
-                        g_isAmdFftAvailable = true;
+                        g_isAmdFftAvailable = درست;
                     }
-                    catch (const Exception &)
+                    بگیر (ثابت Exception &)
                     {
-                        g_isAmdFftAvailable = false;
+                        g_isAmdFftAvailable = نادرست;
                     }
                 }
-                else
-                    g_isAmdFftAvailable = false;
+                وگرنه
+                    g_isAmdFftAvailable = نادرست;
 
-                g_isAmdFftInitialized = true;
+                g_isAmdFftInitialized = درست;
             }
         }
     }
 
-private:
-    static clfftSetupData setupData;
-    static bool g_isAmdFftInitialized;
-    static bool g_isAmdFftAvailable;
+خصوصی:
+    ایستا clfftSetupData setupData;
+    ایستا منطقی g_isAmdFftInitialized;
+    ایستا منطقی g_isAmdFftAvailable;
 };
 
 clfftSetupData AmdFftHelper::setupData;
-bool AmdFftHelper::g_isAmdFftAvailable = false;
-bool AmdFftHelper::g_isAmdFftInitialized = false;
+منطقی AmdFftHelper::g_isAmdFftAvailable = نادرست;
+منطقی AmdFftHelper::g_isAmdFftInitialized = نادرست;
 
-bool haveAmdFft()
+منطقی haveAmdFft()
 {
-    return AmdFftHelper::getInstance().isAvailable();
+    بازگشت AmdFftHelper::getInstance().isAvailable();
 }
 
-#else
+#وگرنه
 
-bool haveAmdFft()
+منطقی haveAmdFft()
 {
-    return false;
+    بازگشت نادرست;
 }
 
 #endif
 
-bool haveSVM()
+منطقی haveSVM()
 {
 #ifdef HAVE_OPENCL_SVM
-    return true;
-#else
-    return false;
+    بازگشت درست;
+#وگرنه
+    بازگشت نادرست;
 #endif
 }
 
-void finish()
+تهی finish()
 {
     Queue::getDefault().finish();
 }
 
 /////////////////////////////////////////// Platform /////////////////////////////////////////////
 
-struct Platform::Impl
+ساختار Platform::Impl
 {
     Impl()
     {
         refcount = 1;
         handle = 0;
-        initialized = false;
+        initialized = نادرست;
     }
 
     ~Impl() {}
 
-    void init()
+    تهی init()
     {
-        if( !initialized )
+        اگر( !initialized )
         {
             //cl_uint num_entries
             cl_uint n = 0;
-            if( clGetPlatformIDs(1, &handle, &n) != CL_SUCCESS || n == 0 )
+            اگر( clGetPlatformIDs(1, &handle, &n) != CL_SUCCESS || n == 0 )
                 handle = 0;
-            if( handle != 0 )
+            اگر( handle != 0 )
             {
-                char buf[1000];
+                نویسه buf[1000];
                 size_t len = 0;
-                CV_OCL_DBG_CHECK(clGetPlatformInfo(handle, CL_PLATFORM_VENDOR, sizeof(buf), buf, &len));
+                CV_OCL_DBG_CHECK(clGetPlatformInfo(handle, CL_PLATFORM_VENDOR, اندازه(buf), buf, &len));
                 buf[len] = '\0';
                 vendor = String(buf);
             }
 
-            initialized = true;
+            initialized = درست;
         }
     }
 
@@ -1461,7 +1461,7 @@ struct Platform::Impl
 
     cl_platform_id handle;
     String vendor;
-    bool initialized;
+    منطقی initialized;
 };
 
 Platform::Platform() CV_NOEXCEPT
@@ -1471,26 +1471,26 @@ Platform::Platform() CV_NOEXCEPT
 
 Platform::~Platform()
 {
-    if(p)
+    اگر(p)
         p->release();
 }
 
-Platform::Platform(const Platform& pl)
+Platform::Platform(ثابت Platform& pl)
 {
     p = (Impl*)pl.p;
-    if(p)
+    اگر(p)
         p->addref();
 }
 
-Platform& Platform::operator = (const Platform& pl)
+Platform& Platform::operator = (ثابت Platform& pl)
 {
     Impl* newp = (Impl*)pl.p;
-    if(newp)
+    اگر(newp)
         newp->addref();
-    if(p)
+    اگر(p)
         p->release();
     p = newp;
-    return *this;
+    بازگشت *این;
 }
 
 Platform::Platform(Platform&& pl) CV_NOEXCEPT
@@ -1501,30 +1501,30 @@ Platform::Platform(Platform&& pl) CV_NOEXCEPT
 
 Platform& Platform::operator = (Platform&& pl) CV_NOEXCEPT
 {
-    if (this != &pl) {
-        if(p)
+    اگر (این != &pl) {
+        اگر(p)
             p->release();
         p = pl.p;
         pl.p = nullptr;
     }
-    return *this;
+    بازگشت *این;
 }
 
-void* Platform::ptr() const
+تهی* Platform::ptr() ثابت
 {
-    return p ? p->handle : 0;
+    بازگشت p ? p->handle : 0;
 }
 
 Platform& Platform::getDefault()
 {
-    CV_LOG_ONCE_WARNING(NULL, "OpenCL: Platform::getDefault() is deprecated and will be removed. Use cv::ocl::getPlatfomsInfo() for enumeration of available platforms");
-    static Platform p;
-    if( !p.p )
+    CV_LOG_ONCE_WARNING(پوچ, "OpenCL: Platform::getDefault() is deprecated and will be removed. Use cv::ocl::getPlatfomsInfo() for enumeration of available platforms");
+    ایستا Platform p;
+    اگر( !p.p )
     {
-        p.p = new Impl;
+        p.p = جدید Impl;
         p.p->init();
     }
-    return p;
+    بازگشت p;
 }
 
 /////////////////////////////////////// Device ////////////////////////////////////////////
@@ -1536,67 +1536,67 @@ Platform& Platform::getDefault()
 //   http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetDeviceInfo.html
 //   https://www.khronos.org/registry/OpenCL/sdk/1.1/docs/man/xhtml/clGetPlatformInfo.html
 //   https://www.khronos.org/registry/OpenCL/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
-static void parseOpenCLVersion(const String &version, int &major, int &minor)
+ایستا تهی parseOpenCLVersion(ثابت String &version, صحیح &major, صحیح &minor)
 {
     major = minor = 0;
-    if (10 >= version.length())
-        return;
-    const char *pstr = version.c_str();
-    if (0 != strncmp(pstr, "OpenCL ", 7))
-        return;
+    اگر (10 >= version.length())
+        بازگشت;
+    ثابت نویسه *pstr = version.c_str();
+    اگر (0 != strncmp(pstr, "OpenCL ", 7))
+        بازگشت;
     size_t ppos = version.find('.', 7);
-    if (String::npos == ppos)
-        return;
+    اگر (String::npos == ppos)
+        بازگشت;
     String temp = version.substr(7, ppos - 7);
     major = atoi(temp.c_str());
     temp = version.substr(ppos + 1);
     minor = atoi(temp.c_str());
 }
 
-struct Device::Impl
+ساختار Device::Impl
 {
-    Impl(void* d)
+    Impl(تهی* d)
         : refcount(1)
         , handle(0)
     {
-        try
+        تلاش
         {
             cl_device_id device = (cl_device_id)d;
             _init(device);
             CV_OCL_CHECK(clRetainDevice(device));  // increment reference counter on success only
         }
-        catch (...)
+        بگیر (...)
         {
-            throw;
+            پرتابکن;
         }
     }
 
-    void _init(cl_device_id d)
+    تهی _init(cl_device_id d)
     {
         handle = (cl_device_id)d;
 
         name_ = getStrProp(CL_DEVICE_NAME);
         version_ = getStrProp(CL_DEVICE_VERSION);
         extensions_ = getStrProp(CL_DEVICE_EXTENSIONS);
-        doubleFPConfig_ = getProp<cl_device_fp_config, int>(CL_DEVICE_DOUBLE_FP_CONFIG);
-        halfFPConfig_ = getProp<cl_device_fp_config, int>(CL_DEVICE_HALF_FP_CONFIG);
+        doubleFPConfig_ = getProp<cl_device_fp_config, صحیح>(CL_DEVICE_DOUBLE_FP_CONFIG);
+        halfFPConfig_ = getProp<cl_device_fp_config, صحیح>(CL_DEVICE_HALF_FP_CONFIG);
         hostUnifiedMemory_ = getBoolProp(CL_DEVICE_HOST_UNIFIED_MEMORY);
-        maxComputeUnits_ = getProp<cl_uint, int>(CL_DEVICE_MAX_COMPUTE_UNITS);
+        maxComputeUnits_ = getProp<cl_uint, صحیح>(CL_DEVICE_MAX_COMPUTE_UNITS);
         maxWorkGroupSize_ = getProp<size_t, size_t>(CL_DEVICE_MAX_WORK_GROUP_SIZE);
-        type_ = getProp<cl_device_type, int>(CL_DEVICE_TYPE);
+        type_ = getProp<cl_device_type, صحیح>(CL_DEVICE_TYPE);
         driverVersion_ = getStrProp(CL_DRIVER_VERSION);
-        addressBits_ = getProp<cl_uint, int>(CL_DEVICE_ADDRESS_BITS);
+        addressBits_ = getProp<cl_uint, صحیح>(CL_DEVICE_ADDRESS_BITS);
 
         String deviceVersion_ = getStrProp(CL_DEVICE_VERSION);
         parseOpenCLVersion(deviceVersion_, deviceVersionMajor_, deviceVersionMinor_);
 
         size_t pos = 0;
-        while (pos < extensions_.size())
+        وقتی (pos < extensions_.size())
         {
             size_t pos2 = extensions_.find(' ', pos);
-            if (pos2 == String::npos)
+            اگر (pos2 == String::npos)
                 pos2 = extensions_.size();
-            if (pos2 > pos)
+            اگر (pos2 > pos)
             {
                 std::string extensionName = extensions_.substr(pos, pos2 - pos);
                 extensions_set_.insert(extensionName);
@@ -1610,26 +1610,26 @@ struct Device::Impl
         intelSubgroupsSupport_ = isExtensionSupported("cl_intel_subgroups");
 
         vendorName_ = getStrProp(CL_DEVICE_VENDOR);
-        if (vendorName_ == "Advanced Micro Devices, Inc." ||
+        اگر (vendorName_ == "Advanced Micro Devices, Inc." ||
             vendorName_ == "AMD")
             vendorID_ = VENDOR_AMD;
-        else if (vendorName_ == "Intel(R) Corporation" || vendorName_ == "Intel" || vendorName_ == "Intel Inc." || strstr(name_.c_str(), "Iris") != 0)
+        وگرنه اگر (vendorName_ == "Intel(R) Corporation" || vendorName_ == "Intel" || vendorName_ == "Intel Inc." || strstr(name_.c_str(), "Iris") != 0)
             vendorID_ = VENDOR_INTEL;
-        else if (vendorName_ == "NVIDIA Corporation")
+        وگرنه اگر (vendorName_ == "NVIDIA Corporation")
             vendorID_ = VENDOR_NVIDIA;
-        else
+        وگرنه
             vendorID_ = UNKNOWN_VENDOR;
 
-        const size_t CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE", 0);
-        if (CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE > 0)
+        ثابت size_t CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE", 0);
+        اگر (CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE > 0)
         {
-            const size_t new_maxWorkGroupSize = std::min(maxWorkGroupSize_, CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE);
-            if (new_maxWorkGroupSize != maxWorkGroupSize_)
-                CV_LOG_WARNING(NULL, "OpenCL: using workgroup size: " << new_maxWorkGroupSize << " (was " << maxWorkGroupSize_ << ")");
+            ثابت size_t new_maxWorkGroupSize = std::min(maxWorkGroupSize_, CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE);
+            اگر (new_maxWorkGroupSize != maxWorkGroupSize_)
+                CV_LOG_WARNING(پوچ, "OpenCL: using workgroup size: " << new_maxWorkGroupSize << " (was " << maxWorkGroupSize_ << ")");
             maxWorkGroupSize_ = new_maxWorkGroupSize;
         }
-#if 0
-        if (isExtensionSupported("cl_khr_spir"))
+#اگر 0
+        اگر (isExtensionSupported("cl_khr_spir"))
         {
 #ifndef CL_DEVICE_SPIR_VERSIONS
 #define CL_DEVICE_SPIR_VERSIONS                     0x40E0
@@ -1643,10 +1643,10 @@ struct Device::Impl
     ~Impl()
     {
 #ifdef _WIN32
-        if (!cv::__termination)
+        اگر (!cv::__termination)
 #endif
         {
-            if (handle)
+            اگر (handle)
             {
                 CV_OCL_CHECK(clReleaseDevice(handle));
                 handle = 0;
@@ -1655,35 +1655,35 @@ struct Device::Impl
     }
 
     template<typename _TpCL, typename _TpOut>
-    _TpOut getProp(cl_device_info prop) const
+    _TpOut getProp(cl_device_info prop) ثابت
     {
         _TpCL temp=_TpCL();
         size_t sz = 0;
 
-        return clGetDeviceInfo(handle, prop, sizeof(temp), &temp, &sz) == CL_SUCCESS &&
-            sz == sizeof(temp) ? _TpOut(temp) : _TpOut();
+        بازگشت clGetDeviceInfo(handle, prop, اندازه(temp), &temp, &sz) == CL_SUCCESS &&
+            sz == اندازه(temp) ? _TpOut(temp) : _TpOut();
     }
 
-    bool getBoolProp(cl_device_info prop) const
+    منطقی getBoolProp(cl_device_info prop) ثابت
     {
         cl_bool temp = CL_FALSE;
         size_t sz = 0;
 
-        return clGetDeviceInfo(handle, prop, sizeof(temp), &temp, &sz) == CL_SUCCESS &&
-            sz == sizeof(temp) ? temp != 0 : false;
+        بازگشت clGetDeviceInfo(handle, prop, اندازه(temp), &temp, &sz) == CL_SUCCESS &&
+            sz == اندازه(temp) ? temp != 0 : نادرست;
     }
 
-    String getStrProp(cl_device_info prop) const
+    String getStrProp(cl_device_info prop) ثابت
     {
-        char buf[4096];
+        نویسه buf[4096];
         size_t sz=0;
-        return clGetDeviceInfo(handle, prop, sizeof(buf)-16, buf, &sz) == CL_SUCCESS &&
-            sz < sizeof(buf) ? String(buf) : String();
+        بازگشت clGetDeviceInfo(handle, prop, اندازه(buf)-16, buf, &sz) == CL_SUCCESS &&
+            sz < اندازه(buf) ? String(buf) : String();
     }
 
-    bool isExtensionSupported(const std::string& extensionName) const
+    منطقی isExtensionSupported(ثابت std::string& extensionName) ثابت
     {
-        return extensions_set_.count(extensionName) > 0;
+        بازگشت extensions_set_.شمار_2(extensionName) > 0;
     }
 
 
@@ -1694,21 +1694,21 @@ struct Device::Impl
     String name_;
     String version_;
     std::string extensions_;
-    int doubleFPConfig_;
-    bool khr_fp64_support_;
-    int halfFPConfig_;
-    bool khr_fp16_support_;
-    bool hostUnifiedMemory_;
-    int maxComputeUnits_;
+    صحیح doubleFPConfig_;
+    منطقی khr_fp64_support_;
+    صحیح halfFPConfig_;
+    منطقی khr_fp16_support_;
+    منطقی hostUnifiedMemory_;
+    صحیح maxComputeUnits_;
     size_t maxWorkGroupSize_;
-    int type_;
-    int addressBits_;
-    int deviceVersionMajor_;
-    int deviceVersionMinor_;
+    صحیح type_;
+    صحیح addressBits_;
+    صحیح deviceVersionMajor_;
+    صحیح deviceVersionMinor_;
     String driverVersion_;
     String vendorName_;
-    int vendorID_;
-    bool intelSubgroupsSupport_;
+    صحیح vendorID_;
+    منطقی intelSubgroupsSupport_;
 
     std::set<std::string> extensions_set_;
 };
@@ -1719,28 +1719,28 @@ Device::Device() CV_NOEXCEPT
     p = 0;
 }
 
-Device::Device(void* d)
+Device::Device(تهی* d)
 {
     p = 0;
     set(d);
 }
 
-Device::Device(const Device& d)
+Device::Device(ثابت Device& d)
 {
     p = d.p;
-    if(p)
+    اگر(p)
         p->addref();
 }
 
-Device& Device::operator = (const Device& d)
+Device& Device::operator = (ثابت Device& d)
 {
     Impl* newp = (Impl*)d.p;
-    if(newp)
+    اگر(newp)
         newp->addref();
-    if(p)
+    اگر(p)
         p->release();
     p = newp;
-    return *this;
+    بازگشت *این;
 }
 
 Device::Device(Device&& d) CV_NOEXCEPT
@@ -1751,341 +1751,341 @@ Device::Device(Device&& d) CV_NOEXCEPT
 
 Device& Device::operator = (Device&& d) CV_NOEXCEPT
 {
-    if (this != &d) {
-        if(p)
+    اگر (این != &d) {
+        اگر(p)
             p->release();
         p = d.p;
         d.p = nullptr;
     }
-    return *this;
+    بازگشت *این;
 }
 
 Device::~Device()
 {
-    if(p)
+    اگر(p)
         p->release();
 }
 
-void Device::set(void* d)
+تهی Device::set(تهی* d)
 {
-    if(p)
+    اگر(p)
         p->release();
-    p = new Impl(d);
-    if (p->handle)
+    p = جدید Impl(d);
+    اگر (p->handle)
     {
         CV_OCL_CHECK(clReleaseDevice((cl_device_id)d));
     }
 }
 
-Device Device::fromHandle(void* d)
+Device Device::fromHandle(تهی* d)
 {
     Device device(d);
-    return device;
+    بازگشت device;
 }
 
-void* Device::ptr() const
+تهی* Device::ptr() ثابت
 {
-    return p ? p->handle : 0;
+    بازگشت p ? p->handle : 0;
 }
 
-String Device::name() const
-{ return p ? p->name_ : String(); }
+String Device::name() ثابت
+{ بازگشت p ? p->name_ : String(); }
 
-String Device::extensions() const
-{ return p ? String(p->extensions_) : String(); }
+String Device::extensions() ثابت
+{ بازگشت p ? String(p->extensions_) : String(); }
 
-bool Device::isExtensionSupported(const String& extensionName) const
-{ return p ? p->isExtensionSupported(extensionName) : false; }
+منطقی Device::isExtensionSupported(ثابت String& extensionName) ثابت
+{ بازگشت p ? p->isExtensionSupported(extensionName) : نادرست; }
 
-String Device::version() const
-{ return p ? p->version_ : String(); }
+String Device::version() ثابت
+{ بازگشت p ? p->version_ : String(); }
 
-String Device::vendorName() const
-{ return p ? p->vendorName_ : String(); }
+String Device::vendorName() ثابت
+{ بازگشت p ? p->vendorName_ : String(); }
 
-int Device::vendorID() const
-{ return p ? p->vendorID_ : 0; }
+صحیح Device::vendorID() ثابت
+{ بازگشت p ? p->vendorID_ : 0; }
 
-String Device::OpenCL_C_Version() const
-{ return p ? p->getStrProp(CL_DEVICE_OPENCL_C_VERSION) : String(); }
+String Device::OpenCL_C_Version() ثابت
+{ بازگشت p ? p->getStrProp(CL_DEVICE_OPENCL_C_VERSION) : String(); }
 
-String Device::OpenCLVersion() const
-{ return p ? p->getStrProp(CL_DEVICE_VERSION) : String(); }
+String Device::OpenCLVersion() ثابت
+{ بازگشت p ? p->getStrProp(CL_DEVICE_VERSION) : String(); }
 
-int Device::deviceVersionMajor() const
-{ return p ? p->deviceVersionMajor_ : 0; }
+صحیح Device::deviceVersionMajor() ثابت
+{ بازگشت p ? p->deviceVersionMajor_ : 0; }
 
-int Device::deviceVersionMinor() const
-{ return p ? p->deviceVersionMinor_ : 0; }
+صحیح Device::deviceVersionMinor() ثابت
+{ بازگشت p ? p->deviceVersionMinor_ : 0; }
 
-String Device::driverVersion() const
-{ return p ? p->driverVersion_ : String(); }
+String Device::driverVersion() ثابت
+{ بازگشت p ? p->driverVersion_ : String(); }
 
-int Device::type() const
-{ return p ? p->type_ : 0; }
+صحیح Device::type() ثابت
+{ بازگشت p ? p->type_ : 0; }
 
-int Device::addressBits() const
-{ return p ? p->addressBits_ : 0; }
+صحیح Device::addressBits() ثابت
+{ بازگشت p ? p->addressBits_ : 0; }
 
-bool Device::available() const
-{ return p ? p->getBoolProp(CL_DEVICE_AVAILABLE) : false; }
+منطقی Device::available() ثابت
+{ بازگشت p ? p->getBoolProp(CL_DEVICE_AVAILABLE) : نادرست; }
 
-bool Device::compilerAvailable() const
-{ return p ? p->getBoolProp(CL_DEVICE_COMPILER_AVAILABLE) : false; }
+منطقی Device::compilerAvailable() ثابت
+{ بازگشت p ? p->getBoolProp(CL_DEVICE_COMPILER_AVAILABLE) : نادرست; }
 
-bool Device::linkerAvailable() const
+منطقی Device::linkerAvailable() ثابت
 #ifdef CL_VERSION_1_2
-{ return p ? p->getBoolProp(CL_DEVICE_LINKER_AVAILABLE) : false; }
-#else
+{ بازگشت p ? p->getBoolProp(CL_DEVICE_LINKER_AVAILABLE) : نادرست; }
+#وگرنه
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
 #endif
 
-int Device::doubleFPConfig() const
-{ return p ? p->doubleFPConfig_ : 0; }
+صحیح Device::doubleFPConfig() ثابت
+{ بازگشت p ? p->doubleFPConfig_ : 0; }
 
-int Device::singleFPConfig() const
-{ return p ? p->getProp<cl_device_fp_config, int>(CL_DEVICE_SINGLE_FP_CONFIG) : 0; }
+صحیح Device::singleFPConfig() ثابت
+{ بازگشت p ? p->getProp<cl_device_fp_config, صحیح>(CL_DEVICE_SINGLE_FP_CONFIG) : 0; }
 
-int Device::halfFPConfig() const
-{ return p ? p->halfFPConfig_ : 0; }
+صحیح Device::halfFPConfig() ثابت
+{ بازگشت p ? p->halfFPConfig_ : 0; }
 
-bool Device::hasFP64() const
-{ return p ? p->khr_fp64_support_ : false; }
-bool Device::hasFP16() const
-{ return p ? p->khr_fp16_support_ : false; }
+منطقی Device::hasFP64() ثابت
+{ بازگشت p ? p->khr_fp64_support_ : نادرست; }
+منطقی Device::hasFP16() ثابت
+{ بازگشت p ? p->khr_fp16_support_ : نادرست; }
 
-bool Device::endianLittle() const
-{ return p ? p->getBoolProp(CL_DEVICE_ENDIAN_LITTLE) : false; }
+منطقی Device::endianLittle() ثابت
+{ بازگشت p ? p->getBoolProp(CL_DEVICE_ENDIAN_LITTLE) : نادرست; }
 
-bool Device::errorCorrectionSupport() const
-{ return p ? p->getBoolProp(CL_DEVICE_ERROR_CORRECTION_SUPPORT) : false; }
+منطقی Device::errorCorrectionSupport() ثابت
+{ بازگشت p ? p->getBoolProp(CL_DEVICE_ERROR_CORRECTION_SUPPORT) : نادرست; }
 
-int Device::executionCapabilities() const
-{ return p ? p->getProp<cl_device_exec_capabilities, int>(CL_DEVICE_EXECUTION_CAPABILITIES) : 0; }
+صحیح Device::executionCapabilities() ثابت
+{ بازگشت p ? p->getProp<cl_device_exec_capabilities, صحیح>(CL_DEVICE_EXECUTION_CAPABILITIES) : 0; }
 
-size_t Device::globalMemCacheSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_CACHE_SIZE) : 0; }
+size_t Device::globalMemCacheSize() ثابت
+{ بازگشت p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_CACHE_SIZE) : 0; }
 
-int Device::globalMemCacheType() const
-{ return p ? p->getProp<cl_device_mem_cache_type, int>(CL_DEVICE_GLOBAL_MEM_CACHE_TYPE) : 0; }
+صحیح Device::globalMemCacheType() ثابت
+{ بازگشت p ? p->getProp<cl_device_mem_cache_type, صحیح>(CL_DEVICE_GLOBAL_MEM_CACHE_TYPE) : 0; }
 
-int Device::globalMemCacheLineSize() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE) : 0; }
+صحیح Device::global_Mem_Cache_سطر_Size() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE) : 0; }
 
-size_t Device::globalMemSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_SIZE) : 0; }
+size_t Device::globalMemSize() ثابت
+{ بازگشت p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_SIZE) : 0; }
 
-size_t Device::localMemSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_LOCAL_MEM_SIZE) : 0; }
+size_t Device::localMemSize() ثابت
+{ بازگشت p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_LOCAL_MEM_SIZE) : 0; }
 
-int Device::localMemType() const
-{ return p ? p->getProp<cl_device_local_mem_type, int>(CL_DEVICE_LOCAL_MEM_TYPE) : 0; }
+صحیح Device::localMemType() ثابت
+{ بازگشت p ? p->getProp<cl_device_local_mem_type, صحیح>(CL_DEVICE_LOCAL_MEM_TYPE) : 0; }
 
-bool Device::hostUnifiedMemory() const
-{ return p ? p->hostUnifiedMemory_ : false; }
+منطقی Device::hostUnifiedMemory() ثابت
+{ بازگشت p ? p->hostUnifiedMemory_ : نادرست; }
 
-bool Device::imageSupport() const
-{ return p ? p->getBoolProp(CL_DEVICE_IMAGE_SUPPORT) : false; }
+منطقی Device::imageSupport() ثابت
+{ بازگشت p ? p->getBoolProp(CL_DEVICE_IMAGE_SUPPORT) : نادرست; }
 
-bool Device::imageFromBufferSupport() const
+منطقی Device::imageFromBufferSupport() ثابت
 {
-    return p ? p->isExtensionSupported("cl_khr_image2d_from_buffer") : false;
+    بازگشت p ? p->isExtensionSupported("cl_khr_image2d_from_buffer") : نادرست;
 }
 
-uint Device::imagePitchAlignment() const
+uint Device::imagePitchAlignment() ثابت
 {
 #ifdef CL_DEVICE_IMAGE_PITCH_ALIGNMENT
-    return p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_PITCH_ALIGNMENT) : 0;
-#else
-    return 0;
+    بازگشت p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_PITCH_ALIGNMENT) : 0;
+#وگرنه
+    بازگشت 0;
 #endif
 }
 
-uint Device::imageBaseAddressAlignment() const
+uint Device::imageBaseAddressAlignment() ثابت
 {
 #ifdef CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT
-    return p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT) : 0;
-#else
-    return 0;
+    بازگشت p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT) : 0;
+#وگرنه
+    بازگشت 0;
 #endif
 }
 
-size_t Device::image2DMaxWidth() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_WIDTH) : 0; }
+size_t Device::image2DMaxWidth() ثابت
+{ بازگشت p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_WIDTH) : 0; }
 
-size_t Device::image2DMaxHeight() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_HEIGHT) : 0; }
+size_t Device::image2DMaxHeight() ثابت
+{ بازگشت p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_HEIGHT) : 0; }
 
-size_t Device::image3DMaxWidth() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_WIDTH) : 0; }
+size_t Device::image3DMaxWidth() ثابت
+{ بازگشت p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_WIDTH) : 0; }
 
-size_t Device::image3DMaxHeight() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_HEIGHT) : 0; }
+size_t Device::image3DMaxHeight() ثابت
+{ بازگشت p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_HEIGHT) : 0; }
 
-size_t Device::image3DMaxDepth() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_DEPTH) : 0; }
+size_t Device::image3DMaxDepth() ثابت
+{ بازگشت p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_DEPTH) : 0; }
 
-size_t Device::imageMaxBufferSize() const
+size_t Device::imageMaxBufferSize() ثابت
 #ifdef CL_VERSION_1_2
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_BUFFER_SIZE) : 0; }
-#else
+{ بازگشت p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_BUFFER_SIZE) : 0; }
+#وگرنه
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
 #endif
 
-size_t Device::imageMaxArraySize() const
+size_t Device::imageMaxArraySize() ثابت
 #ifdef CL_VERSION_1_2
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_ARRAY_SIZE) : 0; }
-#else
+{ بازگشت p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_ARRAY_SIZE) : 0; }
+#وگرنه
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
 #endif
 
-bool Device::intelSubgroupsSupport() const
-{ return p ? p->intelSubgroupsSupport_ : false; }
+منطقی Device::intelSubgroupsSupport() ثابت
+{ بازگشت p ? p->intelSubgroupsSupport_ : نادرست; }
 
-int Device::maxClockFrequency() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_CLOCK_FREQUENCY) : 0; }
+صحیح Device::maxClockFrequency() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_MAX_CLOCK_FREQUENCY) : 0; }
 
-int Device::maxComputeUnits() const
-{ return p ? p->maxComputeUnits_ : 0; }
+صحیح Device::maxComputeUnits() ثابت
+{ بازگشت p ? p->maxComputeUnits_ : 0; }
 
-int Device::maxConstantArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_CONSTANT_ARGS) : 0; }
+صحیح Device::maxConstantArgs() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_MAX_CONSTANT_ARGS) : 0; }
 
-size_t Device::maxConstantBufferSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE) : 0; }
+size_t Device::maxConstantBufferSize() ثابت
+{ بازگشت p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE) : 0; }
 
-size_t Device::maxMemAllocSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_MEM_ALLOC_SIZE) : 0; }
+size_t Device::maxMemAllocSize() ثابت
+{ بازگشت p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_MEM_ALLOC_SIZE) : 0; }
 
-size_t Device::maxParameterSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_PARAMETER_SIZE) : 0; }
+size_t Device::maxParameterSize() ثابت
+{ بازگشت p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_PARAMETER_SIZE) : 0; }
 
-int Device::maxReadImageArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_READ_IMAGE_ARGS) : 0; }
+صحیح Device::maxReadImageArgs() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_MAX_READ_IMAGE_ARGS) : 0; }
 
-int Device::maxWriteImageArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_WRITE_IMAGE_ARGS) : 0; }
+صحیح Device::maxWriteImageArgs() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_MAX_WRITE_IMAGE_ARGS) : 0; }
 
-int Device::maxSamplers() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_SAMPLERS) : 0; }
+صحیح Device::maxSamplers() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_MAX_SAMPLERS) : 0; }
 
-size_t Device::maxWorkGroupSize() const
-{ return p ? p->maxWorkGroupSize_ : 0; }
+size_t Device::maxWorkGroupSize() ثابت
+{ بازگشت p ? p->maxWorkGroupSize_ : 0; }
 
-int Device::maxWorkItemDims() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS) : 0; }
+صحیح Device::maxWorkItemDims() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS) : 0; }
 
-void Device::maxWorkItemSizes(size_t* sizes) const
+تهی Device::maxWorkItemSizes(size_t* sizes) ثابت
 {
-    if(p)
+    اگر(p)
     {
-        const int MAX_DIMS = 32;
+        ثابت صحیح MAX_DIMS = 32;
         size_t retsz = 0;
         CV_OCL_DBG_CHECK(clGetDeviceInfo(p->handle, CL_DEVICE_MAX_WORK_ITEM_SIZES,
-                MAX_DIMS*sizeof(sizes[0]), &sizes[0], &retsz));
+                MAX_DIMS*اندازه(sizes[0]), &sizes[0], &retsz));
     }
 }
 
-int Device::memBaseAddrAlign() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MEM_BASE_ADDR_ALIGN) : 0; }
+صحیح Device::memBaseAddrAlign() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_MEM_BASE_ADDR_ALIGN) : 0; }
 
-int Device::nativeVectorWidthChar() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR) : 0; }
+صحیح Device::nativeVectorWidthChar() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR) : 0; }
 
-int Device::nativeVectorWidthShort() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT) : 0; }
+صحیح Device::nativeVectorWidthShort() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT) : 0; }
 
-int Device::nativeVectorWidthInt() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_INT) : 0; }
+صحیح Device::nativeVectorWidthInt() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_NATIVE_VECTOR_WIDTH_INT) : 0; }
 
-int Device::nativeVectorWidthLong() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG) : 0; }
+صحیح Device::nativeVectorWidthLong() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG) : 0; }
 
-int Device::nativeVectorWidthFloat() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT) : 0; }
+صحیح Device::nativeVectorWidthFloat() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT) : 0; }
 
-int Device::nativeVectorWidthDouble() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE) : 0; }
+صحیح Device::nativeVectorWidthDouble() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE) : 0; }
 
-int Device::nativeVectorWidthHalf() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF) : 0; }
+صحیح Device::nativeVectorWidthHalf() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF) : 0; }
 
-int Device::preferredVectorWidthChar() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR) : 0; }
+صحیح Device::preferredVectorWidthChar() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR) : 0; }
 
-int Device::preferredVectorWidthShort() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT) : 0; }
+صحیح Device::preferredVectorWidthShort() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT) : 0; }
 
-int Device::preferredVectorWidthInt() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT) : 0; }
+صحیح Device::preferredVectorWidthInt() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT) : 0; }
 
-int Device::preferredVectorWidthLong() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG) : 0; }
+صحیح Device::preferredVectorWidthLong() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG) : 0; }
 
-int Device::preferredVectorWidthFloat() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT) : 0; }
+صحیح Device::preferredVectorWidthFloat() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT) : 0; }
 
-int Device::preferredVectorWidthDouble() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE) : 0; }
+صحیح Device::preferredVectorWidthDouble() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE) : 0; }
 
-int Device::preferredVectorWidthHalf() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF) : 0; }
+صحیح Device::preferredVectorWidthHalf() ثابت
+{ بازگشت p ? p->getProp<cl_uint, صحیح>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF) : 0; }
 
-size_t Device::printfBufferSize() const
+size_t Device::printfBufferSize() ثابت
 #ifdef CL_VERSION_1_2
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_PRINTF_BUFFER_SIZE) : 0; }
-#else
+{ بازگشت p ? p->getProp<size_t, size_t>(CL_DEVICE_PRINTF_BUFFER_SIZE) : 0; }
+#وگرنه
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
 #endif
 
 
-size_t Device::profilingTimerResolution() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_PROFILING_TIMER_RESOLUTION) : 0; }
+size_t Device::profilingTimerResolution() ثابت
+{ بازگشت p ? p->getProp<size_t, size_t>(CL_DEVICE_PROFILING_TIMER_RESOLUTION) : 0; }
 
-const Device& Device::getDefault()
+ثابت Device& Device::getDefault()
 {
     auto& c = OpenCLExecutionContext::getCurrent();
-    if (!c.empty())
+    اگر (!c.empty())
     {
-        return c.getDevice();
+        بازگشت c.getDevice();
     }
 
-    static Device dummy;
-    return dummy;
+    ایستا Device dummy;
+    بازگشت dummy;
 }
 
 ////////////////////////////////////// Context ///////////////////////////////////////////////////
 
 template <typename Functor, typename ObjectType>
-inline cl_int getStringInfo(Functor f, ObjectType obj, cl_uint name, std::string& param)
+درونخطی cl_int getStringInfo(Functor f, ObjectType obj, cl_uint name, std::string& param)
 {
     ::size_t required;
-    cl_int err = f(obj, name, 0, NULL, &required);
-    if (err != CL_SUCCESS)
-        return err;
+    cl_int err = f(obj, name, 0, پوچ, &required);
+    اگر (err != CL_SUCCESS)
+        بازگشت err;
 
     param.clear();
-    if (required > 0)
+    اگر (required > 0)
     {
-        AutoBuffer<char> buf(required + 1);
-        char* ptr = buf.data(); // cleanup is not needed
-        err = f(obj, name, required, ptr, NULL);
-        if (err != CL_SUCCESS)
-            return err;
+        AutoBuffer<نویسه> buf(required + 1);
+        نویسه* ptr = buf.data(); // cleanup is not needed
+        err = f(obj, name, required, ptr, پوچ);
+        اگر (err != CL_SUCCESS)
+            بازگشت err;
         param = ptr;
     }
 
-    return CL_SUCCESS;
+    بازگشت CL_SUCCESS;
 }
 
-static void split(const std::string &s, char delim, std::vector<std::string> &elems)
+ایستا تهی split(ثابت std::string &s, نویسه delim, std::vector<std::string> &elems)
 {
     elems.clear();
-    if (s.size() == 0)
-        return;
+    اگر (s.size() == 0)
+        بازگشت;
     std::istringstream ss(s);
     std::string item;
-    while (!ss.eof())
+    وقتی (!ss.eof())
     {
         std::getline(ss, item, delim);
         elems.push_back(item);
@@ -2096,196 +2096,196 @@ static void split(const std::string &s, char delim, std::vector<std::string> &el
 // Sample: AMD:GPU:
 // Sample: AMD:GPU:Tahiti
 // Sample: :GPU|CPU: = '' = ':' = '::'
-static bool parseOpenCLDeviceConfiguration(const std::string& configurationStr,
+ایستا منطقی parseOpenCLDeviceConfiguration(ثابت std::string& configurationStr,
         std::string& platform, std::vector<std::string>& deviceTypes, std::string& deviceNameOrID)
 {
     std::vector<std::string> parts;
     split(configurationStr, ':', parts);
-    if (parts.size() > 3)
+    اگر (parts.size() > 3)
     {
-        CV_LOG_ERROR(NULL, "OpenCL: Invalid configuration string for OpenCL device: " << configurationStr);
-        return false;
+        CV_LOG_ERROR(پوچ, "OpenCL: Invalid configuration string for OpenCL device: " << configurationStr);
+        بازگشت نادرست;
     }
-    if (parts.size() > 2)
+    اگر (parts.size() > 2)
         deviceNameOrID = parts[2];
-    if (parts.size() > 1)
+    اگر (parts.size() > 1)
     {
         split(parts[1], '|', deviceTypes);
     }
-    if (parts.size() > 0)
+    اگر (parts.size() > 0)
     {
         platform = parts[0];
     }
-    return true;
+    بازگشت درست;
 }
 
-static cl_device_id selectOpenCLDevice(const std::string & configuration_ = std::string())
+ایستا cl_device_id selectOpenCLDevice(ثابت std::string & configuration_ = std::string())
 {
     std::string platform, deviceName;
     std::vector<std::string> deviceTypes;
 
     std::string configuration(configuration_);
-    if (configuration.empty())
+    اگر (configuration.empty())
         configuration = utils::getConfigurationParameterString("OPENCV_OPENCL_DEVICE");
 
-    if (!configuration.empty() &&
+    اگر (!configuration.empty() &&
             (configuration == "disabled" ||
              !parseOpenCLDeviceConfiguration(configuration, platform, deviceTypes, deviceName)
             ))
-        return NULL;
+        بازگشت پوچ;
 
-    bool isID = false;
-    int deviceID = -1;
-    if (deviceName.length() == 1)
+    منطقی isID = نادرست;
+    صحیح deviceID = -1;
+    اگر (deviceName.length() == 1)
     // We limit ID range to 0..9, because we want to write:
     // - '2500' to mean i5-2500
     // - '8350' to mean AMD FX-8350
     // - '650' to mean GeForce 650
     // To extend ID range change condition to '> 0'
     {
-        isID = true;
-        for (size_t i = 0; i < deviceName.length(); i++)
+        isID = درست;
+        برای (size_t i = 0; i < deviceName.length(); i++)
         {
-            if (!isdigit(deviceName[i]))
+            اگر (!isdigit(deviceName[i]))
             {
-                isID = false;
-                break;
+                isID = نادرست;
+                بشکن;
             }
         }
-        if (isID)
+        اگر (isID)
         {
             deviceID = atoi(deviceName.c_str());
-            if (deviceID < 0)
-                return NULL;
+            اگر (deviceID < 0)
+                بازگشت پوچ;
         }
     }
 
     std::vector<cl_platform_id> platforms;
     {
-        cl_uint numPlatforms = 0;
-        CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &numPlatforms));
+        cl_uint رقم_Platforms = 0;
+        CV_OCL_DBG_CHECK(clGetPlatformIDs(0, پوچ, &رقم_Platforms));
 
-        if (numPlatforms == 0)
-            return NULL;
-        platforms.resize((size_t)numPlatforms);
-        CV_OCL_DBG_CHECK(clGetPlatformIDs(numPlatforms, &platforms[0], &numPlatforms));
-        platforms.resize(numPlatforms);
+        اگر (رقم_Platforms == 0)
+            بازگشت پوچ;
+        platforms.resize((size_t)رقم_Platforms);
+        CV_OCL_DBG_CHECK(clGetPlatformIDs(رقم_Platforms, &platforms[0], &رقم_Platforms));
+        platforms.resize(رقم_Platforms);
     }
 
-    if (platform.length() > 0)
+    اگر (platform.length() > 0)
     {
-        for (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end();)
+        برای (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end();)
         {
             std::string name;
             CV_OCL_DBG_CHECK(getStringInfo(clGetPlatformInfo, *currentPlatform, CL_PLATFORM_NAME, name));
-            if (name.find(platform) != std::string::npos)
+            اگر (name.find(platform) != std::string::npos)
             {
                 ++currentPlatform;
             }
-            else
+            وگرنه
             {
                 currentPlatform = platforms.erase(currentPlatform);
             }
         }
-        if (platforms.size() == 0)
+        اگر (platforms.size() == 0)
         {
-            CV_LOG_ERROR(NULL, "OpenCL: Can't find OpenCL platform by name: " << platform);
-            goto not_found;
+            CV_LOG_ERROR(پوچ, "OpenCL: Can't find OpenCL platform by name: " << platform);
+            برو not_found;
         }
     }
-    if (deviceTypes.size() == 0)
+    اگر (deviceTypes.size() == 0)
     {
-        if (!isID)
+        اگر (!isID)
         {
             deviceTypes.push_back("GPU");
-            if (!configuration.empty())
+            اگر (!configuration.empty())
                 deviceTypes.push_back("CPU");
         }
-        else
+        وگرنه
             deviceTypes.push_back("ALL");
     }
-    for (size_t t = 0; t < deviceTypes.size(); t++)
+    برای (size_t t = 0; t < deviceTypes.size(); t++)
     {
-        int deviceType = 0;
+        صحیح deviceType = 0;
         std::string tempStrDeviceType = deviceTypes[t];
         std::transform(tempStrDeviceType.begin(), tempStrDeviceType.end(), tempStrDeviceType.begin(), details::char_tolower);
 
-        if (tempStrDeviceType == "gpu" || tempStrDeviceType == "dgpu" || tempStrDeviceType == "igpu")
+        اگر (tempStrDeviceType == "gpu" || tempStrDeviceType == "dgpu" || tempStrDeviceType == "igpu")
             deviceType = Device::TYPE_GPU;
-        else if (tempStrDeviceType == "cpu")
+        وگرنه اگر (tempStrDeviceType == "cpu")
             deviceType = Device::TYPE_CPU;
-        else if (tempStrDeviceType == "accelerator")
+        وگرنه اگر (tempStrDeviceType == "accelerator")
             deviceType = Device::TYPE_ACCELERATOR;
-        else if (tempStrDeviceType == "all")
+        وگرنه اگر (tempStrDeviceType == "all")
             deviceType = Device::TYPE_ALL;
-        else
+        وگرنه
         {
-            CV_LOG_ERROR(NULL, "OpenCL: Unsupported device type for OpenCL device (GPU, CPU, ACCELERATOR): " << deviceTypes[t]);
-            goto not_found;
+            CV_LOG_ERROR(پوچ, "OpenCL: Unsupported device type for OpenCL device (GPU, CPU, ACCELERATOR): " << deviceTypes[t]);
+            برو not_found;
         }
 
         std::vector<cl_device_id> devices;
-        for (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end(); ++currentPlatform)
+        برای (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end(); ++currentPlatform)
         {
-            cl_uint count = 0;
-            cl_int status = clGetDeviceIDs(*currentPlatform, deviceType, 0, NULL, &count);
-            if (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
+            cl_uint شمار_2 = 0;
+            cl_int status = clGetDeviceIDs(*currentPlatform, deviceType, 0, پوچ, &شمار_2);
+            اگر (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
             {
                 CV_OCL_DBG_CHECK_RESULT(status, "clGetDeviceIDs get count");
             }
-            if (count == 0)
-                continue;
+            اگر (شمار_2 == 0)
+                ادامه;
             size_t base = devices.size();
-            devices.resize(base + count);
-            status = clGetDeviceIDs(*currentPlatform, deviceType, count, &devices[base], &count);
-            if (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
+            devices.resize(base + شمار_2);
+            status = clGetDeviceIDs(*currentPlatform, deviceType, شمار_2, &devices[base], &شمار_2);
+            اگر (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
             {
                 CV_OCL_DBG_CHECK_RESULT(status, "clGetDeviceIDs get IDs");
             }
         }
 
-        for (size_t i = (isID ? deviceID : 0);
-             (isID ? (i == (size_t)deviceID) : true) && (i < devices.size());
+        برای (size_t i = (isID ? deviceID : 0);
+             (isID ? (i == (size_t)deviceID) : درست) && (i < devices.size());
              i++)
         {
             std::string name;
             CV_OCL_DBG_CHECK(getStringInfo(clGetDeviceInfo, devices[i], CL_DEVICE_NAME, name));
-            cl_bool useGPU = true;
-            if(tempStrDeviceType == "dgpu" || tempStrDeviceType == "igpu")
+            cl_bool useGPU = درست;
+            اگر(tempStrDeviceType == "dgpu" || tempStrDeviceType == "igpu")
             {
                 cl_bool isIGPU = CL_FALSE;
-                CV_OCL_DBG_CHECK(clGetDeviceInfo(devices[i], CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(isIGPU), &isIGPU, NULL));
+                CV_OCL_DBG_CHECK(clGetDeviceInfo(devices[i], CL_DEVICE_HOST_UNIFIED_MEMORY, اندازه(isIGPU), &isIGPU, پوچ));
                 useGPU = tempStrDeviceType == "dgpu" ? !isIGPU : isIGPU;
             }
-            if ( (isID || name.find(deviceName) != std::string::npos) && useGPU)
+            اگر ( (isID || name.find(deviceName) != std::string::npos) && useGPU)
             {
                 // TODO check for OpenCL 1.1
-                return devices[i];
+                بازگشت devices[i];
             }
         }
     }
 
 not_found:
-    if (configuration.empty())
-        return NULL; // suppress messages on stderr
+    اگر (configuration.empty())
+        بازگشت پوچ; // suppress messages on stderr
 
-    std::ostringstream msg;
-    msg << "ERROR: Requested OpenCL device not found, check configuration: '" << configuration << "'" << std::endl
+    std::ostringstream پیام;
+    پیام << "ERROR: Requested OpenCL device not found, check configuration: '" << configuration << "'" << std::endl
         << "    Platform: " << (platform.length() == 0 ? "any" : platform) << std::endl
         << "    Device types:";
-    for (size_t t = 0; t < deviceTypes.size(); t++)
-        msg << ' ' << deviceTypes[t];
+    برای (size_t t = 0; t < deviceTypes.size(); t++)
+        پیام << ' ' << deviceTypes[t];
 
-    msg << std::endl << "    Device name: " << (deviceName.length() == 0 ? "any" : deviceName);
+    پیام << std::endl << "    Device name: " << (deviceName.length() == 0 ? "any" : deviceName);
 
-    CV_LOG_ERROR(NULL, msg.str());
-    return NULL;
+    CV_LOG_ERROR(پوچ, پیام.str());
+    بازگشت پوچ;
 }
 
 #ifdef HAVE_OPENCL_SVM
-namespace svm {
+فضاینام svm {
 
-enum AllocatorFlags { // don't use first 16 bits
+شمارش AllocatorFlags { // don't use first 16 bits
         OPENCL_SVM_COARSE_GRAIN_BUFFER = 1 << 16, // clSVMAlloc + SVM map/unmap
         OPENCL_SVM_FINE_GRAIN_BUFFER = 2 << 16, // clSVMAlloc
         OPENCL_SVM_FINE_GRAIN_SYSTEM = 3 << 16, // direct access
@@ -2293,117 +2293,117 @@ enum AllocatorFlags { // don't use first 16 bits
         OPENCL_SVM_BUFFER_MAP = 4 << 16
 };
 
-static bool checkForceSVMUmatUsage()
+ایستا منطقی checkForceSVMUmatUsage()
 {
-    static bool initialized = false;
-    static bool force = false;
-    if (!initialized)
+    ایستا منطقی initialized = نادرست;
+    ایستا منطقی force = نادرست;
+    اگر (!initialized)
     {
-        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_FORCE_UMAT_USAGE", false);
-        initialized = true;
+        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_FORCE_UMAT_USAGE", نادرست);
+        initialized = درست;
     }
-    return force;
+    بازگشت force;
 }
-static bool checkDisableSVMUMatUsage()
+ایستا منطقی checkDisableSVMUMatUsage()
 {
-    static bool initialized = false;
-    static bool force = false;
-    if (!initialized)
+    ایستا منطقی initialized = نادرست;
+    ایستا منطقی force = نادرست;
+    اگر (!initialized)
     {
-        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE_UMAT_USAGE", false);
-        initialized = true;
+        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE_UMAT_USAGE", نادرست);
+        initialized = درست;
     }
-    return force;
+    بازگشت force;
 }
-static bool checkDisableSVM()
+ایستا منطقی checkDisableSVM()
 {
-    static bool initialized = false;
-    static bool force = false;
-    if (!initialized)
+    ایستا منطقی initialized = نادرست;
+    ایستا منطقی force = نادرست;
+    اگر (!initialized)
     {
-        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE", false);
-        initialized = true;
+        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE", نادرست);
+        initialized = درست;
     }
-    return force;
+    بازگشت force;
 }
 // see SVMCapabilities
-static unsigned int getSVMCapabilitiesMask()
+ایستا unsigned صحیح getSVMCapabilitiesMask()
 {
-    static bool initialized = false;
-    static unsigned int mask = 0;
-    if (!initialized)
+    ایستا منطقی initialized = نادرست;
+    ایستا unsigned صحیح mask = 0;
+    اگر (!initialized)
     {
-        const std::string envValue = utils::getConfigurationParameterString("OPENCV_OPENCL_SVM_CAPABILITIES_MASK");
-        if (envValue.empty())
+        ثابت std::string env_مقدار = utils::getConfigurationParameterString("OPENCV_OPENCL_SVM_CAPABILITIES_MASK");
+        اگر (env_مقدار.empty())
         {
-            return ~0U; // all bits 1
+            بازگشت ~0U; // all bits 1
         }
-        mask = atoi(envValue.c_str());
-        initialized = true;
+        mask = atoi(env_مقدار.c_str());
+        initialized = درست;
     }
-    return mask;
+    بازگشت mask;
 }
 } // namespace
 #endif
 
-static size_t getProgramCountLimit()
+ایستا size_t get_Program_شمار_Limit()
 {
-    static bool initialized = false;
-    static size_t count = 0;
-    if (!initialized)
+    ایستا منطقی initialized = نادرست;
+    ایستا size_t شمار_2 = 0;
+    اگر (!initialized)
     {
-        count = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_PROGRAM_CACHE", 0);
-        initialized = true;
+        شمار_2 = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_PROGRAM_CACHE", 0);
+        initialized = درست;
     }
-    return count;
+    بازگشت شمار_2;
 }
 
-static int g_contextId = 0;
+ایستا صحیح g_contextId = 0;
 
-class OpenCLBufferPoolImpl;
-class OpenCLSVMBufferPoolImpl;
+رده OpenCLBufferPoolImpl;
+رده OpenCLSVMBufferPoolImpl;
 
-struct Context::Impl
+ساختار Context::Impl
 {
-    static Context::Impl* get(Context& context) { return context.getImpl(); }
+    ایستا Context::Impl* get(Context& context) { بازگشت context.getImpl(); }
 
-    typedef std::deque<Context::Impl*> container_t;
-    static container_t& getGlobalContainer()
+    تعریفنوع std::deque<Context::Impl*> container_t;
+    ایستا container_t& getGlobalContainer()
     {
         // never delete this container (Impl lifetime is greater due to TLS storage)
-        static container_t* g_contexts = new container_t();
-        return *g_contexts;
+        ایستا container_t* g_contexts = جدید container_t();
+        بازگشت *g_contexts;
     }
 
-protected:
-    Impl(const std::string& configuration_)
+محافظتشده:
+    Impl(ثابت std::string& configuration_)
         : refcount(1)
         , contextId(CV_XADD(&g_contextId, 1))
         , configuration(configuration_)
         , handle(0)
 #ifdef HAVE_OPENCL_SVM
-        , svmInitialized(false)
+        , svmInitialized(نادرست)
 #endif
     {
-        if (!haveOpenCL())
+        اگر (!haveOpenCL())
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
         cv::AutoLock lock(cv::getInitializationMutex());
         auto& container = getGlobalContainer();
         container.resize(std::max(container.size(), (size_t)contextId + 1));
-        container[contextId] = this;
+        container[contextId] = این;
     }
 
     ~Impl()
     {
 #ifdef _WIN32
-        if (!cv::__termination)
+        اگر (!cv::__termination)
 #endif
         {
-            if (handle)
+            اگر (handle)
             {
                 CV_OCL_DBG_CHECK(clReleaseContext(handle));
-                handle = NULL;
+                handle = پوچ;
             }
             devices.clear();
         }
@@ -2414,130 +2414,130 @@ protected:
             cv::AutoLock lock(cv::getInitializationMutex());
             auto& container = getGlobalContainer();
             CV_CheckLT((size_t)contextId, container.size(), "");
-            container[contextId] = NULL;
+            container[contextId] = پوچ;
         }
     }
 
-    void init_device_list()
+    تهی init_device_list()
     {
         CV_Assert(handle);
 
         cl_uint ndevices = 0;
-        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_NUM_DEVICES, sizeof(ndevices), &ndevices, NULL));
+        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_رقم_DEVICES, اندازه(ndevices), &ndevices, پوچ));
         CV_Assert(ndevices > 0);
 
         cv::AutoBuffer<cl_device_id> cl_devices(ndevices);
         size_t devices_ret_size = 0;
-        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_DEVICES, cl_devices.size() * sizeof(cl_device_id), &cl_devices[0], &devices_ret_size));
-        CV_CheckEQ(devices_ret_size, cl_devices.size() * sizeof(cl_device_id), "");
+        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_DEVICES, cl_devices.size() * اندازه(cl_device_id), &cl_devices[0], &devices_ret_size));
+        CV_CheckEQ(devices_ret_size, cl_devices.size() * اندازه(cl_device_id), "");
 
         devices.clear();
-        for (unsigned i = 0; i < ndevices; i++)
+        برای (unsigned i = 0; i < ndevices; i++)
         {
             devices.emplace_back(Device::fromHandle(cl_devices[i]));
         }
     }
 
-    void __init_buffer_pools();  // w/o synchronization
-    void _init_buffer_pools() const
+    تهی __init_buffer_pools();  // w/o synchronization
+    تهی _init_buffer_pools() ثابت
     {
-        if (!bufferPool_)
+        اگر (!bufferPool_)
         {
             cv::AutoLock lock(cv::getInitializationMutex());
-            if (!bufferPool_)
+            اگر (!bufferPool_)
             {
-                const_cast<Impl*>(this)->__init_buffer_pools();
+                const_cast<Impl*>(این)->__init_buffer_pools();
             }
         }
     }
-public:
-    static Impl* findContext(const std::string& configuration)
+عمومی:
+    ایستا Impl* findContext(ثابت std::string& configuration)
     {
         CV_TRACE_FUNCTION();
         cv::AutoLock lock(cv::getInitializationMutex());
         auto& container = getGlobalContainer();
-        if (configuration.empty() && !container.empty())
-            return container[0];
-        for (auto it = container.begin(); it != container.end(); ++it)
+        اگر (configuration.empty() && !container.empty())
+            بازگشت container[0];
+        برای (auto it = container.begin(); it != container.end(); ++it)
         {
             Impl* i = *it;
-            if (i && i->configuration == configuration)
+            اگر (i && i->configuration == configuration)
             {
-                return i;
+                بازگشت i;
             }
         }
-        return NULL;
+        بازگشت پوچ;
     }
 
-    static Impl* findOrCreateContext(const std::string& configuration_)
+    ایستا Impl* findOrCreateContext(ثابت std::string& configuration_)
     {
         CV_TRACE_FUNCTION();
         std::string configuration = configuration_;
-        if (configuration_.empty())
+        اگر (configuration_.empty())
         {
-            const std::string c = utils::getConfigurationParameterString("OPENCV_OPENCL_DEVICE");
-            if (!c.empty())
+            ثابت std::string c = utils::getConfigurationParameterString("OPENCV_OPENCL_DEVICE");
+            اگر (!c.empty())
                 configuration = c;
         }
         Impl* impl = findContext(configuration);
-        if (impl)
+        اگر (impl)
         {
-            CV_LOG_INFO(NULL, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
+            CV_LOG_INFO(پوچ, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
             impl->addref();
-            return impl;
+            بازگشت impl;
         }
 
         cl_device_id d = selectOpenCLDevice(configuration);
-        if (d == NULL)
-            return NULL;
+        اگر (d == پوچ)
+            بازگشت پوچ;
 
-        impl = new Impl(configuration);
-        try
+        impl = جدید Impl(configuration);
+        تلاش
         {
             impl->createFromDevice(d);
-            if (impl->handle)
-                return impl;
+            اگر (impl->handle)
+                بازگشت impl;
             delete impl;
-            return NULL;
+            بازگشت پوچ;
         }
-        catch (...)
+        بگیر (...)
         {
             delete impl;
-            throw;
+            پرتابکن;
         }
     }
 
-    static Impl* findOrCreateContext(cl_context h)
+    ایستا Impl* findOrCreateContext(cl_context h)
     {
         CV_TRACE_FUNCTION();
 
         CV_Assert(h);
 
-        std::string configuration = cv::format("@ctx-%p", (void*)h);
+        std::string configuration = cv::format("@ctx-%p", (تهی*)h);
         Impl* impl = findContext(configuration);
-        if (impl)
+        اگر (impl)
         {
-            CV_LOG_INFO(NULL, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
+            CV_LOG_INFO(پوچ, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
             impl->addref();
-            return impl;
+            بازگشت impl;
         }
 
-        impl = new Impl(configuration);
-        try
+        impl = جدید Impl(configuration);
+        تلاش
         {
             CV_OCL_CHECK(clRetainContext(h));
             impl->handle = h;
             impl->init_device_list();
-            return impl;
+            بازگشت impl;
         }
-        catch (...)
+        بگیر (...)
         {
             delete impl;
-            throw;
+            پرتابکن;
         }
     }
 
-    static Impl* findOrCreateContext(const ocl::Device& device)
+    ایستا Impl* findOrCreateContext(ثابت ocl::Device& device)
     {
         CV_TRACE_FUNCTION();
 
@@ -2545,47 +2545,47 @@ public:
         cl_device_id d = (cl_device_id)device.ptr();
         CV_Assert(d);
 
-        std::string configuration = cv::format("@dev-%p", (void*)d);
+        std::string configuration = cv::format("@dev-%p", (تهی*)d);
         Impl* impl = findContext(configuration);
-        if (impl)
+        اگر (impl)
         {
-            CV_LOG_INFO(NULL, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
+            CV_LOG_INFO(پوچ, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
             impl->addref();
-            return impl;
+            بازگشت impl;
         }
 
-        impl = new Impl(configuration);
-        try
+        impl = جدید Impl(configuration);
+        تلاش
         {
             impl->createFromDevice(d);
             CV_Assert(impl->handle);
-            return impl;
+            بازگشت impl;
         }
-        catch (...)
+        بگیر (...)
         {
             delete impl;
-            throw;
+            پرتابکن;
         }
     }
 
-    void setDefault()
+    تهی setDefault()
     {
         CV_TRACE_FUNCTION();
         cl_device_id d = selectOpenCLDevice();
 
-        if (d == NULL)
-            return;
+        اگر (d == پوچ)
+            بازگشت;
 
         createFromDevice(d);
     }
 
-    void createFromDevice(cl_device_id d)
+    تهی createFromDevice(cl_device_id d)
     {
         CV_TRACE_FUNCTION();
-        CV_Assert(handle == NULL);
+        CV_Assert(handle == پوچ);
 
-        cl_platform_id pl = NULL;
-        CV_OCL_DBG_CHECK(clGetDeviceInfo(d, CL_DEVICE_PLATFORM, sizeof(cl_platform_id), &pl, NULL));
+        cl_platform_id pl = پوچ;
+        CV_OCL_DBG_CHECK(clGetDeviceInfo(d, CL_DEVICE_PLATFORM, اندازه(cl_platform_id), &pl, پوچ));
 
         cl_context_properties prop[] =
         {
@@ -2600,31 +2600,31 @@ public:
         handle = clCreateContext(prop, nd, &d, 0, 0, &status);
         CV_OCL_DBG_CHECK_RESULT(status, "clCreateContext");
 
-        bool ok = handle != 0 && status == CL_SUCCESS;
-        if( ok )
+        منطقی ok = handle != 0 && status == CL_SUCCESS;
+        اگر( ok )
         {
             devices.resize(nd);
             devices[0].set(d);
         }
-        else
-            handle = NULL;
+        وگرنه
+            handle = پوچ;
     }
 
-    Program getProg(const ProgramSource& src, const String& buildflags, String& errmsg);
+    Program getProg(ثابت ProgramSource& src, ثابت String& buildflags, String& errmsg);
 
-    void unloadProg(Program& prog)
+    تهی unloadProg(Program& prog)
     {
         cv::AutoLock lock(program_cache_mutex);
-        for (CacheList::iterator i = cacheList.begin(); i != cacheList.end(); ++i)
+        برای (CacheList::iterator i = cacheList.begin(); i != cacheList.end(); ++i)
         {
               phash_t::iterator it = phash.find(*i);
-              if (it != phash.end())
+              اگر (it != phash.end())
               {
-                  if (it->second.ptr() == prog.ptr())
+                  اگر (it->second.ptr() == prog.ptr())
                   {
                       phash.erase(*i);
                       cacheList.erase(i);
-                      return;
+                      بازگشت;
                   }
               }
         }
@@ -2632,61 +2632,61 @@ public:
 
     std::string& getPrefixString()
     {
-        if (prefix.empty())
+        اگر (prefix.empty())
         {
             cv::AutoLock lock(program_cache_mutex);
-            if (prefix.empty())
+            اگر (prefix.empty())
             {
                 CV_Assert(!devices.empty());
-                const Device& d = devices[0];
-                int bits = d.addressBits();
-                if (bits > 0 && bits != 64)
+                ثابت Device& d = devices[0];
+                صحیح bits = d.addressBits();
+                اگر (bits > 0 && bits != 64)
                     prefix = cv::format("%d-bit--", bits);
                 prefix += d.vendorName() + "--" + d.name() + "--" + d.driverVersion();
                 // sanitize chars
-                for (size_t i = 0; i < prefix.size(); i++)
+                برای (size_t i = 0; i < prefix.size(); i++)
                 {
-                    char c = prefix[i];
-                    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
+                    نویسه c = prefix[i];
+                    اگر (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
                     {
                         prefix[i] = '_';
                     }
                 }
             }
         }
-        return prefix;
+        بازگشت prefix;
     }
 
     std::string& getPrefixBase()
     {
-        if (prefix_base.empty())
+        اگر (prefix_base.empty())
         {
             cv::AutoLock lock(program_cache_mutex);
-            if (prefix_base.empty())
+            اگر (prefix_base.empty())
             {
-                const Device& d = devices[0];
-                int bits = d.addressBits();
-                if (bits > 0 && bits != 64)
+                ثابت Device& d = devices[0];
+                صحیح bits = d.addressBits();
+                اگر (bits > 0 && bits != 64)
                     prefix_base = cv::format("%d-bit--", bits);
                 prefix_base += d.vendorName() + "--" + d.name() + "--";
                 // sanitize chars
-                for (size_t i = 0; i < prefix_base.size(); i++)
+                برای (size_t i = 0; i < prefix_base.size(); i++)
                 {
-                    char c = prefix_base[i];
-                    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
+                    نویسه c = prefix_base[i];
+                    اگر (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
                     {
                         prefix_base[i] = '_';
                     }
                 }
             }
         }
-        return prefix_base;
+        بازگشت prefix_base;
     }
 
     IMPLEMENT_REFCOUNTABLE();
 
-    const int contextId;  // global unique ID
-    const std::string configuration;
+    ثابت صحیح contextId;  // global unique ID
+    ثابت std::string configuration;
 
     cl_context handle;
     std::vector<Device> devices;
@@ -2695,118 +2695,118 @@ public:
     std::string prefix_base;
 
     cv::Mutex program_cache_mutex;
-    typedef std::map<std::string, Program> phash_t;
+    تعریفنوع std::map<std::string, Program> phash_t;
     phash_t phash;
-    typedef std::list<cv::String> CacheList;
+    تعریفنوع std::list<cv::String> CacheList;
     CacheList cacheList;
 
     std::shared_ptr<OpenCLBufferPoolImpl> bufferPool_;
     std::shared_ptr<OpenCLBufferPoolImpl> bufferPoolHostPtr_;
-    OpenCLBufferPoolImpl& getBufferPool() const
+    OpenCLBufferPoolImpl& getBufferPool() ثابت
     {
         _init_buffer_pools();
         CV_DbgAssert(bufferPool_);
-        return *bufferPool_.get();
+        بازگشت *bufferPool_.get();
     }
-    OpenCLBufferPoolImpl& getBufferPoolHostPtr() const
+    OpenCLBufferPoolImpl& getBufferPoolHostPtr() ثابت
     {
         _init_buffer_pools();
         CV_DbgAssert(bufferPoolHostPtr_);
-        return *bufferPoolHostPtr_.get();
+        بازگشت *bufferPoolHostPtr_.get();
     }
 
     std::map<std::type_index, std::shared_ptr<UserContext>> userContextStorage;
     cv::Mutex userContextMutex;
-    void setUserContext(std::type_index typeId, const std::shared_ptr<UserContext>& userContext) {
+    تهی setUserContext(std::type_index typeId, ثابت std::shared_ptr<UserContext>& userContext) {
         cv::AutoLock lock(userContextMutex);
         userContextStorage[typeId] = userContext;
     }
     std::shared_ptr<UserContext> getUserContext(std::type_index typeId) {
         cv::AutoLock lock(userContextMutex);
         auto it = userContextStorage.find(typeId);
-        if (it != userContextStorage.end())
-            return it->second;
-        else
-            return nullptr;
+        اگر (it != userContextStorage.end())
+            بازگشت it->second;
+        وگرنه
+            بازگشت nullptr;
     }
 
 #ifdef HAVE_OPENCL_SVM
-    bool svmInitialized;
-    bool svmAvailable;
-    bool svmEnabled;
+    منطقی svmInitialized;
+    منطقی svmAvailable;
+    منطقی svmEnabled;
     svm::SVMCapabilities svmCapabilities;
     svm::SVMFunctions svmFunctions;
 
-    void svmInit()
+    تهی svmInit()
     {
-        CV_Assert(handle != NULL);
-        const Device& device = devices[0];
+        CV_Assert(handle != پوچ);
+        ثابت Device& device = devices[0];
         cl_device_svm_capabilities deviceCaps = 0;
-        CV_Assert(((void)0, CL_DEVICE_SVM_CAPABILITIES == CL_DEVICE_SVM_CAPABILITIES_AMD)); // Check assumption
-        cl_int status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_SVM_CAPABILITIES, sizeof(deviceCaps), &deviceCaps, NULL);
-        if (status != CL_SUCCESS)
+        CV_Assert(((تهی)0, CL_DEVICE_SVM_CAPABILITIES == CL_DEVICE_SVM_CAPABILITIES_AMD)); // Check assumption
+        cl_int status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_SVM_CAPABILITIES, اندازه(deviceCaps), &deviceCaps, پوچ);
+        اگر (status != CL_SUCCESS)
         {
             CV_OPENCL_SVM_TRACE_ERROR_P("CL_DEVICE_SVM_CAPABILITIES via clGetDeviceInfo failed: %d\n", status);
-            goto noSVM;
+            برو noSVM;
         }
-        CV_OPENCL_SVM_TRACE_P("CL_DEVICE_SVM_CAPABILITIES returned: 0x%x\n", (int)deviceCaps);
-        CV_Assert(((void)0, CL_DEVICE_SVM_COARSE_GRAIN_BUFFER == CL_DEVICE_SVM_COARSE_GRAIN_BUFFER_AMD)); // Check assumption
-        svmCapabilities.value_ =
+        CV_OPENCL_SVM_TRACE_P("CL_DEVICE_SVM_CAPABILITIES returned: 0x%x\n", (صحیح)deviceCaps);
+        CV_Assert(((تهی)0, CL_DEVICE_SVM_COARSE_GRAIN_BUFFER == CL_DEVICE_SVM_COARSE_GRAIN_BUFFER_AMD)); // Check assumption
+        svmCapabilities.مقدار_2 =
                 ((deviceCaps & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER) ? svm::SVMCapabilities::SVM_COARSE_GRAIN_BUFFER : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_BUFFER) ? svm::SVMCapabilities::SVM_FINE_GRAIN_BUFFER : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_SYSTEM) ? svm::SVMCapabilities::SVM_FINE_GRAIN_SYSTEM : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_ATOMICS) ? svm::SVMCapabilities::SVM_ATOMICS : 0);
-        svmCapabilities.value_ &= svm::getSVMCapabilitiesMask();
-        if (svmCapabilities.value_ == 0)
+        svmCapabilities.مقدار_2 &= svm::getSVMCapabilitiesMask();
+        اگر (svmCapabilities.مقدار_2 == 0)
         {
             CV_OPENCL_SVM_TRACE_ERROR_P("svmCapabilities is empty\n");
-            goto noSVM;
+            برو noSVM;
         }
-        try
+        تلاش
         {
             // Try OpenCL 2.0
             CV_OPENCL_SVM_TRACE_P("Try SVM from OpenCL 2.0 ...\n");
-            void* ptr = clSVMAlloc(handle, CL_MEM_READ_WRITE, 100, 0);
-            if (!ptr)
+            تهی* ptr = clSVMAlloc(handle, CL_MEM_READ_WRITE, 100, 0);
+            اگر (!ptr)
             {
                 CV_OPENCL_SVM_TRACE_ERROR_P("clSVMAlloc returned NULL...\n");
                 CV_Error(Error::StsBadArg, "clSVMAlloc returned NULL");
             }
-            try
+            تلاش
             {
-                bool error = false;
+                منطقی error = نادرست;
                 cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-                if (CL_SUCCESS != clEnqueueSVMMap(q, CL_TRUE, CL_MAP_WRITE, ptr, 100, 0, NULL, NULL))
+                اگر (CL_SUCCESS != clEnqueueSVMMap(q, CL_TRUE, CL_MAP_WRITE, ptr, 100, 0, پوچ, پوچ))
                 {
                     CV_OPENCL_SVM_TRACE_ERROR_P("clEnqueueSVMMap failed...\n");
                     CV_Error(Error::StsBadArg, "clEnqueueSVMMap FAILED");
                 }
                 clFinish(q);
-                try
+                تلاش
                 {
-                    ((int*)ptr)[0] = 100;
+                    ((صحیح*)ptr)[0] = 100;
                 }
-                catch (...)
+                بگیر (...)
                 {
                     CV_OPENCL_SVM_TRACE_ERROR_P("SVM buffer access test FAILED\n");
-                    error = true;
+                    error = درست;
                 }
-                if (CL_SUCCESS != clEnqueueSVMUnmap(q, ptr, 0, NULL, NULL))
+                اگر (CL_SUCCESS != clEnqueueSVMUnmap(q, ptr, 0, پوچ, پوچ))
                 {
                     CV_OPENCL_SVM_TRACE_ERROR_P("clEnqueueSVMUnmap failed...\n");
                     CV_Error(Error::StsBadArg, "clEnqueueSVMUnmap FAILED");
                 }
                 clFinish(q);
-                if (error)
+                اگر (error)
                 {
                     CV_Error(Error::StsBadArg, "OpenCL SVM buffer access test was FAILED");
                 }
             }
-            catch (...)
+            بگیر (...)
             {
                 CV_OPENCL_SVM_TRACE_ERROR_P("OpenCL SVM buffer access test was FAILED\n");
                 clSVMFree(handle, ptr);
-                throw;
+                پرتابکن;
             }
             clSVMFree(handle, ptr);
             svmFunctions.fn_clSVMAlloc = clSVMAlloc;
@@ -2819,20 +2819,20 @@ public:
             svmFunctions.fn_clEnqueueSVMMap = clEnqueueSVMMap;
             svmFunctions.fn_clEnqueueSVMUnmap = clEnqueueSVMUnmap;
         }
-        catch (...)
+        بگیر (...)
         {
             CV_OPENCL_SVM_TRACE_P("clSVMAlloc failed, trying HSA extension...\n");
-            try
+            تلاش
             {
                 // Try HSA extension
                 String extensions = device.extensions();
-                if (extensions.find("cl_amd_svm") == String::npos)
+                اگر (extensions.find("cl_amd_svm") == String::npos)
                 {
                     CV_OPENCL_SVM_TRACE_P("Device extension doesn't have cl_amd_svm: %s\n", extensions.c_str());
-                    goto noSVM;
+                    برو noSVM;
                 }
-                cl_platform_id p = NULL;
-                CV_OCL_CHECK(status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_PLATFORM, sizeof(cl_platform_id), &p, NULL));
+                cl_platform_id p = پوچ;
+                CV_OCL_CHECK(status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_PLATFORM, اندازه(cl_platform_id), &p, پوچ));
                 svmFunctions.fn_clSVMAlloc = (clSVMAllocAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSVMAllocAMD");
                 svmFunctions.fn_clSVMFree = (clSVMFreeAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSVMFreeAMD");
                 svmFunctions.fn_clSetKernelArgSVMPointer = (clSetKernelArgSVMPointerAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSetKernelArgSVMPointerAMD");
@@ -2844,39 +2844,39 @@ public:
                 svmFunctions.fn_clEnqueueSVMUnmap = (clEnqueueSVMUnmapAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clEnqueueSVMUnmapAMD");
                 CV_Assert(svmFunctions.isValid());
             }
-            catch (...)
+            بگیر (...)
             {
                 CV_OPENCL_SVM_TRACE_P("Something is totally wrong\n");
-                goto noSVM;
+                برو noSVM;
             }
         }
 
-        svmAvailable = true;
+        svmAvailable = درست;
         svmEnabled = !svm::checkDisableSVM();
-        svmInitialized = true;
+        svmInitialized = درست;
         CV_OPENCL_SVM_TRACE_P("OpenCV OpenCL SVM support initialized\n");
-        return;
+        بازگشت;
     noSVM:
         CV_OPENCL_SVM_TRACE_P("OpenCL SVM is not detected\n");
-        svmAvailable = false;
-        svmEnabled = false;
-        svmCapabilities.value_ = 0;
-        svmInitialized = true;
-        svmFunctions.fn_clSVMAlloc = NULL;
-        return;
+        svmAvailable = نادرست;
+        svmEnabled = نادرست;
+        svmCapabilities.مقدار_2 = 0;
+        svmInitialized = درست;
+        svmFunctions.fn_clSVMAlloc = پوچ;
+        بازگشت;
     }
 
     std::shared_ptr<OpenCLSVMBufferPoolImpl> bufferPoolSVM_;
 
-    OpenCLSVMBufferPoolImpl& getBufferPoolSVM() const
+    OpenCLSVMBufferPoolImpl& getBufferPoolSVM() ثابت
     {
         _init_buffer_pools();
         CV_DbgAssert(bufferPoolSVM_);
-        return *bufferPoolSVM_.get();
+        بازگشت *bufferPoolSVM_.get();
     }
 #endif
 
-    friend class Program;
+    friend رده Program;
 };
 
 
@@ -2891,78 +2891,78 @@ Context::~Context()
 }
 
 // deprecated
-Context::Context(int dtype)
+Context::Context(صحیح dtype)
 {
     p = 0;
     create(dtype);
 }
 
-void Context::release()
+تهی Context::release()
 {
-    if (p)
+    اگر (p)
     {
         p->release();
-        p = NULL;
+        p = پوچ;
     }
 }
 
-bool Context::create()
+منطقی Context::create()
 {
     release();
-    if (!haveOpenCL())
-        return false;
+    اگر (!haveOpenCL())
+        بازگشت نادرست;
     p = Impl::findOrCreateContext(std::string());
-    if (p && p->handle)
-        return true;
+    اگر (p && p->handle)
+        بازگشت درست;
     release();
-    return false;
+    بازگشت نادرست;
 }
 
 // deprecated
-bool Context::create(int dtype)
+منطقی Context::create(صحیح dtype)
 {
-    if( !haveOpenCL() )
-        return false;
+    اگر( !haveOpenCL() )
+        بازگشت نادرست;
     release();
-    if (dtype == CL_DEVICE_TYPE_DEFAULT || (unsigned)dtype == (unsigned)CL_DEVICE_TYPE_ALL)
+    اگر (dtype == CL_DEVICE_TYPE_DEFAULT || (unsigned)dtype == (unsigned)CL_DEVICE_TYPE_ALL)
     {
         p = Impl::findOrCreateContext("");
     }
-    else if (dtype == CL_DEVICE_TYPE_GPU)
+    وگرنه اگر (dtype == CL_DEVICE_TYPE_GPU)
     {
         p = Impl::findOrCreateContext(":GPU:");
     }
-    else if (dtype == CL_DEVICE_TYPE_CPU)
+    وگرنه اگر (dtype == CL_DEVICE_TYPE_CPU)
     {
         p = Impl::findOrCreateContext(":CPU:");
     }
-    else
+    وگرنه
     {
-        CV_LOG_ERROR(NULL, "OpenCL: Can't recognize OpenCV device type=" << dtype);
+        CV_LOG_ERROR(پوچ, "OpenCL: Can't recognize OpenCV device type=" << dtype);
     }
-    if (p && !p->handle)
+    اگر (p && !p->handle)
     {
         release();
     }
-    return p != 0;
+    بازگشت p != 0;
 }
 
-Context::Context(const Context& c)
+Context::Context(ثابت Context& c)
 {
     p = (Impl*)c.p;
-    if(p)
+    اگر(p)
         p->addref();
 }
 
-Context& Context::operator = (const Context& c)
+Context& Context::operator = (ثابت Context& c)
 {
     Impl* newp = (Impl*)c.p;
-    if(newp)
+    اگر(newp)
         newp->addref();
-    if(p)
+    اگر(p)
         p->release();
     p = newp;
-    return *this;
+    بازگشت *این;
 }
 
 Context::Context(Context&& c) CV_NOEXCEPT
@@ -2973,155 +2973,155 @@ Context::Context(Context&& c) CV_NOEXCEPT
 
 Context& Context::operator = (Context&& c) CV_NOEXCEPT
 {
-    if (this != &c) {
-        if(p)
+    اگر (این != &c) {
+        اگر(p)
             p->release();
         p = c.p;
         c.p = nullptr;
     }
-    return *this;
+    بازگشت *این;
 }
 
-void* Context::ptr() const
+تهی* Context::ptr() ثابت
 {
-    return p == NULL ? NULL : p->handle;
+    بازگشت p == پوچ ? پوچ : p->handle;
 }
 
-size_t Context::ndevices() const
+size_t Context::ndevices() ثابت
 {
-    return p ? p->devices.size() : 0;
+    بازگشت p ? p->devices.size() : 0;
 }
 
-Device& Context::device(size_t idx) const
+Device& Context::device(size_t idx) ثابت
 {
-    static Device dummy;
-    return !p || idx >= p->devices.size() ? dummy : p->devices[idx];
+    ایستا Device dummy;
+    بازگشت !p || idx >= p->devices.size() ? dummy : p->devices[idx];
 }
 
 Context& Context::getDefault()
 {
     auto& c = OpenCLExecutionContext::getCurrent();
-    if (!c.empty())
+    اگر (!c.empty())
     {
         auto& ctx = c.getContext();
-        return ctx;
+        بازگشت ctx;
     }
 
-    static Context dummy;
-    return dummy;
+    ایستا Context dummy;
+    بازگشت dummy;
 }
 
-Program Context::getProg(const ProgramSource& prog,
-                         const String& buildopts, String& errmsg)
+Program Context::getProg(ثابت ProgramSource& prog,
+                         ثابت String& buildopts, String& errmsg)
 {
-    return p ? p->getProg(prog, buildopts, errmsg) : Program();
+    بازگشت p ? p->getProg(prog, buildopts, errmsg) : Program();
 }
 
-void Context::unloadProg(Program& prog)
+تهی Context::unloadProg(Program& prog)
 {
-    if (p)
+    اگر (p)
         p->unloadProg(prog);
 }
 
 /* static */
-Context Context::fromHandle(void* context)
+Context Context::fromHandle(تهی* context)
 {
     Context ctx;
     ctx.p = Impl::findOrCreateContext((cl_context)context);
-    return ctx;
+    بازگشت ctx;
 }
 
 /* static */
-Context Context::fromDevice(const ocl::Device& device)
+Context Context::fromDevice(ثابت ocl::Device& device)
 {
     Context ctx;
     ctx.p = Impl::findOrCreateContext(device);
-    return ctx;
+    بازگشت ctx;
 }
 
 /* static */
-Context Context::create(const std::string& configuration)
+Context Context::create(ثابت std::string& configuration)
 {
     Context ctx;
     ctx.p = Impl::findOrCreateContext(configuration);
-    return ctx;
+    بازگشت ctx;
 }
 
-void* Context::getOpenCLContextProperty(int propertyId) const
+تهی* Context::getOpenCLContextProperty(صحیح propertyId) ثابت
 {
-    if (p == NULL)
-        return nullptr;
+    اگر (p == پوچ)
+        بازگشت nullptr;
     ::size_t size = 0;
-    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, 0, NULL, &size));
-    std::vector<cl_context_properties> prop(size / sizeof(cl_context_properties), (cl_context_properties)0);
-    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, size, prop.data(), NULL));
-    for (size_t i = 0; i < prop.size(); i += 2)
+    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, 0, پوچ, &size));
+    std::vector<cl_context_properties> prop(size / اندازه(cl_context_properties), (cl_context_properties)0);
+    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, size, prop.data(), پوچ));
+    برای (size_t i = 0; i < prop.size(); i += 2)
     {
-        if (prop[i] == (cl_context_properties)propertyId)
+        اگر (prop[i] == (cl_context_properties)propertyId)
         {
-            CV_LOG_DEBUG(NULL, "OpenCL: found context property=" << propertyId << ") => " << (void*)prop[i + 1]);
-            return (void*)prop[i + 1];
+            CV_LOG_DEBUG(پوچ, "OpenCL: found context property=" << propertyId << ") => " << (تهی*)prop[i + 1]);
+            بازگشت (تهی*)prop[i + 1];
         }
     }
-    return nullptr;
+    بازگشت nullptr;
 }
 
 #ifdef HAVE_OPENCL_SVM
-bool Context::useSVM() const
+منطقی Context::useSVM() ثابت
 {
     Context::Impl* i = p;
     CV_Assert(i);
-    if (!i->svmInitialized)
+    اگر (!i->svmInitialized)
         i->svmInit();
-    return i->svmEnabled;
+    بازگشت i->svmEnabled;
 }
-void Context::setUseSVM(bool enabled)
+تهی Context::setUseSVM(منطقی enabled)
 {
     Context::Impl* i = p;
     CV_Assert(i);
-    if (!i->svmInitialized)
+    اگر (!i->svmInitialized)
         i->svmInit();
-    if (enabled && !i->svmAvailable)
+    اگر (enabled && !i->svmAvailable)
     {
         CV_Error(Error::StsError, "OpenCL Shared Virtual Memory (SVM) is not supported by OpenCL device");
     }
     i->svmEnabled = enabled;
 }
-#else
-bool Context::useSVM() const { return false; }
-void Context::setUseSVM(bool enabled) { CV_Assert(!enabled); }
+#وگرنه
+منطقی Context::useSVM() ثابت { بازگشت نادرست; }
+تهی Context::setUseSVM(منطقی enabled) { CV_Assert(!enabled); }
 #endif
 
 #ifdef HAVE_OPENCL_SVM
-namespace svm {
+فضاینام svm {
 
-const SVMCapabilities getSVMCapabilitites(const ocl::Context& context)
+ثابت SVMCapabilities getSVMCapabilitites(ثابت ocl::Context& context)
 {
     Context::Impl* i = context.getImpl();
     CV_Assert(i);
-    if (!i->svmInitialized)
+    اگر (!i->svmInitialized)
         i->svmInit();
-    return i->svmCapabilities;
+    بازگشت i->svmCapabilities;
 }
 
-CV_EXPORTS const SVMFunctions* getSVMFunctions(const ocl::Context& context)
+CV_EXPORTS ثابت SVMFunctions* getSVMFunctions(ثابت ocl::Context& context)
 {
     Context::Impl* i = context.getImpl();
     CV_Assert(i);
     CV_Assert(i->svmInitialized); // getSVMCapabilitites() must be called first
-    CV_Assert(i->svmFunctions.fn_clSVMAlloc != NULL);
-    return &i->svmFunctions;
+    CV_Assert(i->svmFunctions.fn_clSVMAlloc != پوچ);
+    بازگشت &i->svmFunctions;
 }
 
-CV_EXPORTS bool useSVM(UMatUsageFlags usageFlags)
+CV_EXPORTS منطقی useSVM(UMatUsageFlags usageFlags)
 {
-    if (checkForceSVMUmatUsage())
-        return true;
-    if (checkDisableSVMUMatUsage())
-        return false;
-    if ((usageFlags & USAGE_ALLOCATE_SHARED_MEMORY) != 0)
-        return true;
-    return false; // don't use SVM by default
+    اگر (checkForceSVMUmatUsage())
+        بازگشت درست;
+    اگر (checkDisableSVMUMatUsage())
+        بازگشت نادرست;
+    اگر ((usageFlags & USAGE_ALLOCATE_SHARED_MEMORY) != 0)
+        بازگشت درست;
+    بازگشت نادرست; // don't use SVM by default
 }
 
 } // namespace cv::ocl::svm
@@ -3131,7 +3131,7 @@ Context::UserContext::~UserContext()
 {
 }
 
-void Context::setUserContext(std::type_index typeId, const std::shared_ptr<Context::UserContext>& userContext)
+تهی Context::setUserContext(std::type_index typeId, ثابت std::shared_ptr<Context::UserContext>& userContext)
 {
     CV_Assert(p);
     p->setUserContext(typeId, userContext);
@@ -3140,17 +3140,17 @@ void Context::setUserContext(std::type_index typeId, const std::shared_ptr<Conte
 std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_index typeId)
 {
     CV_Assert(p);
-    return p->getUserContext(typeId);
+    بازگشت p->getUserContext(typeId);
 }
 
-static void get_platform_name(cl_platform_id id, String& name)
+ایستا تهی get_platform_name(cl_platform_id id, String& name)
 {
     // get platform name string length
     size_t sz = 0;
     CV_OCL_CHECK(clGetPlatformInfo(id, CL_PLATFORM_NAME, 0, 0, &sz));
 
     // get platform name string
-    AutoBuffer<char> buf(sz + 1);
+    AutoBuffer<نویسه> buf(sz + 1);
     CV_OCL_CHECK(clGetPlatformInfo(id, CL_PLATFORM_NAME, sz, buf.data(), 0));
 
     // just in case, ensure trailing zero for ASCIIZ string
@@ -3162,7 +3162,7 @@ static void get_platform_name(cl_platform_id id, String& name)
 /*
 // Attaches OpenCL context to OpenCV
 */
-void attachContext(const String& platformName, void* platformID, void* context, void* deviceID)
+تهی attachContext(ثابت String& platformName, تهی* platformID, تهی* context, تهی* deviceID)
 {
     auto ctx = OpenCLExecutionContext::create(platformName, platformID, context, deviceID);
     ctx.bind();
@@ -3170,54 +3170,54 @@ void attachContext(const String& platformName, void* platformID, void* context, 
 
 /* static */
 OpenCLExecutionContext OpenCLExecutionContext::create(
-        const std::string& platformName, void* platformID, void* context, void* deviceID
+        ثابت std::string& platformName, تهی* platformID, تهی* context, تهی* deviceID
 )
 {
-    if (!haveOpenCL())
+    اگر (!haveOpenCL())
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
     cl_uint cnt = 0;
     CV_OCL_CHECK(clGetPlatformIDs(0, 0, &cnt));
 
-    if (cnt == 0)
+    اگر (cnt == 0)
         CV_Error(cv::Error::OpenCLApiCallError, "No OpenCL platform available!");
 
     std::vector<cl_platform_id> platforms(cnt);
 
     CV_OCL_CHECK(clGetPlatformIDs(cnt, &platforms[0], 0));
 
-    bool platformAvailable = false;
+    منطقی platformAvailable = نادرست;
 
     // check if external platformName contained in list of available platforms in OpenCV
-    for (unsigned int i = 0; i < cnt; i++)
+    برای (unsigned صحیح i = 0; i < cnt; i++)
     {
         String availablePlatformName;
         get_platform_name(platforms[i], availablePlatformName);
         // external platform is found in the list of available platforms
-        if (platformName == availablePlatformName)
+        اگر (platformName == availablePlatformName)
         {
-            platformAvailable = true;
-            break;
+            platformAvailable = درست;
+            بشکن;
         }
     }
 
-    if (!platformAvailable)
+    اگر (!platformAvailable)
         CV_Error(cv::Error::OpenCLApiCallError, "No matched platforms available!");
 
     // check if platformID corresponds to platformName
     String actualPlatformName;
     get_platform_name((cl_platform_id)platformID, actualPlatformName);
-    if (platformName != actualPlatformName)
+    اگر (platformName != actualPlatformName)
         CV_Error(cv::Error::OpenCLApiCallError, "No matched platforms available!");
 
     OpenCLExecutionContext ctx;
     ctx.p = std::make_shared<OpenCLExecutionContext::Impl>((cl_platform_id)platformID, (cl_context)context, (cl_device_id)deviceID);
     CV_OCL_CHECK(clReleaseContext((cl_context)context));
     CV_OCL_CHECK(clReleaseDevice((cl_device_id)deviceID));
-    return ctx;
+    بازگشت ctx;
 }
 
-void initializeContextFromHandle(Context& ctx, void* _platform, void* _context, void* _device)
+تهی initializeContextFromHandle(Context& ctx, تهی* _platform, تهی* _context, تهی* _device)
 {
     // internal call, less checks
     cl_platform_id platformID = (cl_platform_id)_platform;
@@ -3233,13 +3233,13 @@ void initializeContextFromHandle(Context& ctx, void* _platform, void* _context, 
 
 /////////////////////////////////////////// Queue /////////////////////////////////////////////
 
-struct Queue::Impl
+ساختار Queue::Impl
 {
-    inline void __init()
+    درونخطی تهی __init()
     {
         refcount = 1;
         handle = 0;
-        isProfilingQueue_ = false;
+        isProfilingQueue_ = نادرست;
     }
 
     Impl(cl_command_queue q)
@@ -3248,30 +3248,30 @@ struct Queue::Impl
         handle = q;
 
         cl_command_queue_properties props = 0;
-        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_PROPERTIES, sizeof(cl_command_queue_properties), &props, NULL));
+        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_PROPERTIES, اندازه(cl_command_queue_properties), &props, پوچ));
         isProfilingQueue_ = !!(props & CL_QUEUE_PROFILING_ENABLE);
     }
 
-    Impl(cl_command_queue q, bool isProfilingQueue)
+    Impl(cl_command_queue q, منطقی isProfilingQueue)
     {
         __init();
         handle = q;
         isProfilingQueue_ = isProfilingQueue;
     }
 
-    Impl(const Context& c, const Device& d, bool withProfiling = false)
+    Impl(ثابت Context& c, ثابت Device& d, منطقی withProfiling = نادرست)
     {
         __init();
 
-        const Context* pc = &c;
+        ثابت Context* pc = &c;
         cl_context ch = (cl_context)pc->ptr();
-        if( !ch )
+        اگر( !ch )
         {
             pc = &Context::getDefault();
             ch = (cl_context)pc->ptr();
         }
         cl_device_id dh = (cl_device_id)d.ptr();
-        if( !dh )
+        اگر( !dh )
             dh = (cl_device_id)pc->device(0).ptr();
         cl_int retval = 0;
         cl_command_queue_properties props = withProfiling ? CL_QUEUE_PROFILING_ENABLE : 0;
@@ -3282,31 +3282,31 @@ struct Queue::Impl
     ~Impl()
     {
 #ifdef _WIN32
-        if (!cv::__termination)
+        اگر (!cv::__termination)
 #endif
         {
-            if(handle)
+            اگر(handle)
             {
                 CV_OCL_DBG_CHECK(clFinish(handle));
                 CV_OCL_DBG_CHECK(clReleaseCommandQueue(handle));
-                handle = NULL;
+                handle = پوچ;
             }
         }
     }
 
-    const cv::ocl::Queue& getProfilingQueue(const cv::ocl::Queue& self)
+    ثابت cv::ocl::Queue& getProfilingQueue(ثابت cv::ocl::Queue& self)
     {
-        if (isProfilingQueue_)
-            return self;
+        اگر (isProfilingQueue_)
+            بازگشت self;
 
-        if (profiling_queue_.ptr())
-            return profiling_queue_;
+        اگر (profiling_queue_.ptr())
+            بازگشت profiling_queue_;
 
         cl_context ctx = 0;
-        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_CONTEXT, sizeof(cl_context), &ctx, NULL));
+        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_CONTEXT, اندازه(cl_context), &ctx, پوچ));
 
         cl_device_id device = 0;
-        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_DEVICE, sizeof(cl_device_id), &device, NULL));
+        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_DEVICE, اندازه(cl_device_id), &device, پوچ));
 
         cl_int result = CL_SUCCESS;
         cl_command_queue_properties props = CL_QUEUE_PROFILING_ENABLE;
@@ -3314,16 +3314,16 @@ struct Queue::Impl
         CV_OCL_DBG_CHECK_RESULT(result, "clCreateCommandQueue(with CL_QUEUE_PROFILING_ENABLE)");
 
         Queue queue;
-        queue.p = new Impl(q, true);
+        queue.p = جدید Impl(q, درست);
         profiling_queue_ = queue;
 
-        return profiling_queue_;
+        بازگشت profiling_queue_;
     }
 
     IMPLEMENT_REFCOUNTABLE();
 
     cl_command_queue handle;
-    bool isProfilingQueue_;
+    منطقی isProfilingQueue_;
     cv::ocl::Queue profiling_queue_;
 };
 
@@ -3332,28 +3332,28 @@ Queue::Queue() CV_NOEXCEPT
     p = 0;
 }
 
-Queue::Queue(const Context& c, const Device& d)
+Queue::Queue(ثابت Context& c, ثابت Device& d)
 {
     p = 0;
     create(c, d);
 }
 
-Queue::Queue(const Queue& q)
+Queue::Queue(ثابت Queue& q)
 {
     p = q.p;
-    if(p)
+    اگر(p)
         p->addref();
 }
 
-Queue& Queue::operator = (const Queue& q)
+Queue& Queue::operator = (ثابت Queue& q)
 {
     Impl* newp = (Impl*)q.p;
-    if(newp)
+    اگر(newp)
         newp->addref();
-    if(p)
+    اگر(p)
         p->release();
     p = newp;
-    return *this;
+    بازگشت *این;
 }
 
 Queue::Queue(Queue&& q) CV_NOEXCEPT
@@ -3364,66 +3364,66 @@ Queue::Queue(Queue&& q) CV_NOEXCEPT
 
 Queue& Queue::operator = (Queue&& q) CV_NOEXCEPT
 {
-    if (this != &q) {
-        if(p)
+    اگر (این != &q) {
+        اگر(p)
             p->release();
         p = q.p;
         q.p = nullptr;
     }
-    return *this;
+    بازگشت *این;
 }
 
 Queue::~Queue()
 {
-    if(p)
+    اگر(p)
         p->release();
 }
 
-bool Queue::create(const Context& c, const Device& d)
+منطقی Queue::create(ثابت Context& c, ثابت Device& d)
 {
-    if(p)
+    اگر(p)
         p->release();
-    p = new Impl(c, d);
-    return p->handle != 0;
+    p = جدید Impl(c, d);
+    بازگشت p->handle != 0;
 }
 
-void Queue::finish()
+تهی Queue::finish()
 {
-    if(p && p->handle)
+    اگر(p && p->handle)
     {
         CV_OCL_DBG_CHECK(clFinish(p->handle));
     }
 }
 
-const Queue& Queue::getProfilingQueue() const
+ثابت Queue& Queue::getProfilingQueue() ثابت
 {
     CV_Assert(p);
-    return p->getProfilingQueue(*this);
+    بازگشت p->getProfilingQueue(*این);
 }
 
-void* Queue::ptr() const
+تهی* Queue::ptr() ثابت
 {
-    return p ? p->handle : 0;
+    بازگشت p ? p->handle : 0;
 }
 
 Queue& Queue::getDefault()
 {
     auto& c = OpenCLExecutionContext::getCurrent();
-    if (!c.empty())
+    اگر (!c.empty())
     {
         auto& q = c.getQueue();
-        return q;
+        بازگشت q;
     }
-    static Queue dummy;
-    return dummy;
+    ایستا Queue dummy;
+    بازگشت dummy;
 }
 
-static cl_command_queue getQueue(const Queue& q)
+ایستا cl_command_queue getQueue(ثابت Queue& q)
 {
     cl_command_queue qq = (cl_command_queue)q.ptr();
-    if(!qq)
+    اگر(!qq)
         qq = (cl_command_queue)Queue::getDefault().ptr();
-    return qq;
+    بازگشت qq;
 }
 
 /////////////////////////////////////////// KernelArg /////////////////////////////////////////////
@@ -3433,71 +3433,71 @@ KernelArg::KernelArg() CV_NOEXCEPT
 {
 }
 
-KernelArg::KernelArg(int _flags, UMat* _m, int _wscale, int _iwscale, const void* _obj, size_t _sz)
+KernelArg::KernelArg(صحیح _flags, UMat* _m, صحیح _wscale, صحیح _iwscale, ثابت تهی* _obj, size_t _sz)
     : flags(_flags), m(_m), obj(_obj), sz(_sz), wscale(_wscale), iwscale(_iwscale)
 {
-    CV_Assert(_flags == LOCAL || _flags == CONSTANT || _m != NULL);
+    CV_Assert(_flags == LOCAL || _flags == CONSTANT || _m != پوچ);
 }
 
-KernelArg KernelArg::Constant(const Mat& m)
+KernelArg KernelArg::Constant(ثابت Mat& m)
 {
     CV_Assert(m.isContinuous());
-    return KernelArg(CONSTANT, 0, 0, 0, m.ptr(), m.total()*m.elemSize());
+    بازگشت KernelArg(CONSTANT, 0, 0, 0, m.ptr(), m.total()*m.elemSize());
 }
 
 /////////////////////////////////////////// Kernel /////////////////////////////////////////////
 
-struct Kernel::Impl
+ساختار Kernel::Impl
 {
-    Impl(const char* kname, const Program& prog) :
-        refcount(1), handle(NULL), isInProgress(false), isAsyncRun(false), nu(0)
+    Impl(ثابت نویسه* kname, ثابت Program& prog) :
+        refcount(1), handle(پوچ), isInProgress(نادرست), isAsyncRun(نادرست), nu(0)
     {
         cl_program ph = (cl_program)prog.ptr();
         cl_int retval = 0;
         name = kname;
-        if (ph)
+        اگر (ph)
         {
             handle = clCreateKernel(ph, kname, &retval);
             CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateKernel('%s')", kname).c_str());
         }
-        for( int i = 0; i < MAX_ARRS; i++ )
+        برای( صحیح i = 0; i < MAX_ARRS; i++ )
             u[i] = 0;
-        haveTempDstUMats = false;
-        haveTempSrcUMats = false;
+        haveTempDstUMats = نادرست;
+        haveTempSrcUMats = نادرست;
     }
 
-    void cleanupUMats()
+    تهی cleanupUMats()
     {
-        bool exceptionOccurred = false;
-        for( int i = 0; i < MAX_ARRS; i++ )
+        منطقی exceptionOccurred = نادرست;
+        برای( صحیح i = 0; i < MAX_ARRS; i++ )
         {
-            if( u[i] )
+            اگر( u[i] )
             {
-                if( CV_XADD(&u[i]->urefcount, -1) == 1 )
+                اگر( CV_XADD(&u[i]->urefcount, -1) == 1 )
                 {
                     u[i]->flags |= UMatData::ASYNC_CLEANUP;
-                    try
+                    تلاش
                     {
                         u[i]->currAllocator->deallocate(u[i]);
                     }
-                    catch(const std::exception& exc)
+                    بگیر(ثابت std::exception& exc)
                     {
                         // limited by legacy before C++11, therefore log and
                         // remember some exception occurred to throw below
-                        CV_LOG_ERROR(NULL, "OCL: Unexpected C++ exception in OpenCL Kernel::Impl::cleanupUMats(): " << exc.what());
-                        exceptionOccurred = true;
+                        CV_LOG_ERROR(پوچ, "OCL: Unexpected C++ exception in OpenCL Kernel::Impl::cleanupUMats(): " << exc.what());
+                        exceptionOccurred = درست;
                     }
                 }
                 u[i] = 0;
             }
         }
         nu = 0;
-        haveTempDstUMats = false;
-        haveTempSrcUMats = false;
+        haveTempDstUMats = نادرست;
+        haveTempSrcUMats = نادرست;
         CV_Assert(!exceptionOccurred);
     }
 
-    void addUMat(const UMat& m, bool dst)
+    تهی addUMat(ثابت UMat& m, منطقی dst)
     {
         // TSAN false positive: see #27638
         CV_Assert(nu < MAX_ARRS && m.u && m.u->urefcount > 0);
@@ -3505,17 +3505,17 @@ struct Kernel::Impl
         // TSAN false positive: see #27638
         CV_XADD(&m.u->urefcount, 1);
         nu++;
-        if(dst && m.u->tempUMat())
-            haveTempDstUMats = true;
-        if(m.u->originalUMatData == NULL && m.u->tempUMat())
-            haveTempSrcUMats = true;  // UMat is created on RAW memory (without proper lifetime management, even from Mat)
+        اگر(dst && m.u->tempUMat())
+            haveTempDstUMats = درست;
+        اگر(m.u->originalUMatData == پوچ && m.u->tempUMat())
+            haveTempSrcUMats = درست;  // UMat is created on RAW memory (without proper lifetime management, even from Mat)
     }
 
     /// Preserve image lifetime (while it is specified as Kernel argument)
-    void registerImageArgument(int arg, const Image2D& image)
+    تهی registerImageArgument(صحیح arg, ثابت Image2D& image)
     {
         CV_CheckGE(arg, 0, "");
-        if (arg < (int)shadow_images.size() && shadow_images[arg].ptr() != image.ptr())  // TODO future: replace ptr => impl (more strong check)
+        اگر (arg < (صحیح)shadow_images.size() && shadow_images[arg].ptr() != image.ptr())  // TODO future: replace ptr => impl (more strong check)
         {
             CV_Check(arg, !isInProgress, "ocl::Kernel: clearing of pending Image2D arguments is not allowed");
         }
@@ -3524,28 +3524,28 @@ struct Kernel::Impl
         shadow_images[arg] = image;
     }
 
-    void finit(cl_event e)
+    تهی finit(cl_event e)
     {
         CV_UNUSED(e);
-        isInProgress = false;
-        try
+        isInProgress = نادرست;
+        تلاش
         {
             cleanupUMats();
         }
-        catch(...)
+        بگیر(...)
         {
             release();
-            throw;
+            پرتابکن;
         }
         release();
     }
 
-    bool run(int dims, size_t _globalsize[], size_t _localsize[],
-            bool sync, int64* timeNS, const Queue& q);
+    منطقی run(صحیح dims, size_t _globalsize[], size_t _localsize[],
+            منطقی همگام, int64* timeNS, ثابت Queue& q);
 
     ~Impl()
     {
-        if(handle)
+        اگر(handle)
         {
             CV_OCL_DBG_CHECK(clReleaseKernel(handle));
         }
@@ -3555,78 +3555,78 @@ struct Kernel::Impl
 
     cv::String name;
     cl_kernel handle;
-    enum { MAX_ARRS = 16 };
+    شمارش { MAX_ARRS = 16 };
     UMatData* u[MAX_ARRS];
-    bool isInProgress;
-    bool isAsyncRun;  // true if kernel was scheduled in async mode
-    int nu;
+    منطقی isInProgress;
+    منطقی isAsyncRun;  // true if kernel was scheduled in async mode
+    صحیح nu;
     std::vector<Image2D> shadow_images;
-    bool haveTempDstUMats;
-    bool haveTempSrcUMats;
+    منطقی haveTempDstUMats;
+    منطقی haveTempSrcUMats;
 };
 
 }} // namespace cv::ocl
 
-extern "C" {
+بیرونی "C" {
 
-static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
+ایستا تهی CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, تهی *p)
 {
-    try
+    تلاش
     {
         ((cv::ocl::Kernel::Impl*)p)->finit(e);
     }
-    catch (const cv::Exception& exc)
+    بگیر (ثابت cv::Exception& exc)
     {
-        CV_LOG_ERROR(NULL, "OCL: Unexpected OpenCV exception in OpenCL callback: " << exc.what());
+        CV_LOG_ERROR(پوچ, "OCL: Unexpected OpenCV exception in OpenCL callback: " << exc.what());
     }
-    catch (const std::exception& exc)
+    بگیر (ثابت std::exception& exc)
     {
-        CV_LOG_ERROR(NULL, "OCL: Unexpected C++ exception in OpenCL callback: " << exc.what());
+        CV_LOG_ERROR(پوچ, "OCL: Unexpected C++ exception in OpenCL callback: " << exc.what());
     }
-    catch (...)
+    بگیر (...)
     {
-        CV_LOG_ERROR(NULL, "OCL: Unexpected unknown C++ exception in OpenCL callback");
+        CV_LOG_ERROR(پوچ, "OCL: Unexpected unknown C++ exception in OpenCL callback");
     }
 }
 
 }
 
-namespace cv { namespace ocl {
+فضاینام cv { فضاینام ocl {
 
 Kernel::Kernel() CV_NOEXCEPT
 {
     p = 0;
 }
 
-Kernel::Kernel(const char* kname, const Program& prog)
+Kernel::Kernel(ثابت نویسه* kname, ثابت Program& prog)
 {
     p = 0;
     create(kname, prog);
 }
 
-Kernel::Kernel(const char* kname, const ProgramSource& src,
-               const String& buildopts, String* errmsg)
+Kernel::Kernel(ثابت نویسه* kname, ثابت ProgramSource& src,
+               ثابت String& buildopts, String* errmsg)
 {
     p = 0;
     create(kname, src, buildopts, errmsg);
 }
 
-Kernel::Kernel(const Kernel& k)
+Kernel::Kernel(ثابت Kernel& k)
 {
     p = k.p;
-    if(p)
+    اگر(p)
         p->addref();
 }
 
-Kernel& Kernel::operator = (const Kernel& k)
+Kernel& Kernel::operator = (ثابت Kernel& k)
 {
     Impl* newp = (Impl*)k.p;
-    if(newp)
+    اگر(newp)
         newp->addref();
-    if(p)
+    اگر(p)
         p->release();
     p = newp;
-    return *this;
+    بازگشت *این;
 }
 
 Kernel::Kernel(Kernel&& k) CV_NOEXCEPT
@@ -3637,27 +3637,27 @@ Kernel::Kernel(Kernel&& k) CV_NOEXCEPT
 
 Kernel& Kernel::operator = (Kernel&& k) CV_NOEXCEPT
 {
-    if (this != &k) {
-        if(p)
+    اگر (این != &k) {
+        اگر(p)
             p->release();
         p = k.p;
         k.p = nullptr;
     }
-    return *this;
+    بازگشت *این;
 }
 
 Kernel::~Kernel()
 {
-    if(p)
+    اگر(p)
         p->release();
 }
 
-bool Kernel::create(const char* kname, const Program& prog)
+منطقی Kernel::create(ثابت نویسه* kname, ثابت Program& prog)
 {
-    if(p)
+    اگر(p)
         p->release();
-    p = new Impl(kname, prog);
-    if(p->handle == 0)
+    p = جدید Impl(kname, prog);
+    اگر(p->handle == 0)
     {
         p->release();
         p = 0;
@@ -3665,350 +3665,350 @@ bool Kernel::create(const char* kname, const Program& prog)
 #ifdef CV_OPENCL_RUN_ASSERT // check kernel compilation fails
     CV_Assert(p);
 #endif
-    return p != 0;
+    بازگشت p != 0;
 }
 
-bool Kernel::create(const char* kname, const ProgramSource& src,
-                    const String& buildopts, String* errmsg)
+منطقی Kernel::create(ثابت نویسه* kname, ثابت ProgramSource& src,
+                    ثابت String& buildopts, String* errmsg)
 {
-    if(p)
+    اگر(p)
     {
         p->release();
         p = 0;
     }
     String tempmsg;
-    if( !errmsg ) errmsg = &tempmsg;
-    const Program prog = Context::getDefault().getProg(src, buildopts, *errmsg);
-    return create(kname, prog);
+    اگر( !errmsg ) errmsg = &tempmsg;
+    ثابت Program prog = Context::getDefault().getProg(src, buildopts, *errmsg);
+    بازگشت create(kname, prog);
 }
 
-void* Kernel::ptr() const
+تهی* Kernel::ptr() ثابت
 {
-    return p ? p->handle : 0;
+    بازگشت p ? p->handle : 0;
 }
 
-bool Kernel::empty() const
+منطقی Kernel::empty() ثابت
 {
-    return ptr() == 0;
+    بازگشت ptr() == 0;
 }
 
-static cv::String dumpValue(size_t sz, const void* p)
+ایستا cv::String dump_مقدار(size_t sz, ثابت تهی* p)
 {
-    if (!p)
-        return "NULL";
-    if (sz == 2)
-        return cv::format("%d / %uu / 0x%04x", *(short*)p, *(unsigned short*)p, *(short*)p);
-    if (sz == 4)
-        return cv::format("%d / %uu / 0x%08x / %g", *(int*)p, *(int*)p, *(int*)p, *(float*)p);
-    if (sz == 8)
-        return cv::format("%lld / %lluu / 0x%16llx / %g", *(long long*)p, *(long long*)p, *(long long*)p, *(double*)p);
-    return cv::format("%p", p);
+    اگر (!p)
+        بازگشت "NULL";
+    اگر (sz == 2)
+        بازگشت cv::format("%d / %uu / 0x%04x", *(short*)p, *(unsigned short*)p, *(short*)p);
+    اگر (sz == 4)
+        بازگشت cv::format("%d / %uu / 0x%08x / %g", *(صحیح*)p, *(صحیح*)p, *(صحیح*)p, *(اعشاری*)p);
+    اگر (sz == 8)
+        بازگشت cv::format("%lld / %lluu / 0x%16llx / %g", *(long long*)p, *(long long*)p, *(long long*)p, *(دوگانه*)p);
+    بازگشت cv::format("%p", p);
 }
 
-int Kernel::set(int i, const void* value, size_t sz)
+صحیح Kernel::set(صحیح i, ثابت تهی* value, size_t sz)
 {
-    if (!p || !p->handle)
-        return -1;
-    if (i < 0)
-        return i;
-    if( i == 0 )
+    اگر (!p || !p->handle)
+        بازگشت -1;
+    اگر (i < 0)
+        بازگشت i;
+    اگر( i == 0 )
         p->cleanupUMats();
 
     cl_int retval = clSetKernelArg(p->handle, (cl_uint)i, sz, value);
-    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, value=%s)", p->name.c_str(), (int)i, (int)sz, dumpValue(sz, value).c_str()).c_str());
-    if (retval != CL_SUCCESS)
-        return -1;
-    return i+1;
+    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, value=%s)", p->name.c_str(), (صحیح)i, (صحیح)sz, dump_مقدار(sz, value).c_str()).c_str());
+    اگر (retval != CL_SUCCESS)
+        بازگشت -1;
+    بازگشت i+1;
 }
 
-int Kernel::set(int i, const Image2D& image2D)
+صحیح Kernel::set(صحیح i, ثابت Image2D& image2D)
 {
     cl_mem h = (cl_mem)image2D.ptr();
-    int res = set(i, &h, sizeof(h));
-    if (res >= 0)
+    صحیح res = set(i, &h, اندازه(h));
+    اگر (res >= 0)
         p->registerImageArgument(i, image2D);
-    return res;
+    بازگشت res;
 }
 
-int Kernel::set(int i, const UMat& m)
+صحیح Kernel::set(صحیح i, ثابت UMat& m)
 {
-    return set(i, KernelArg(KernelArg::READ_WRITE, (UMat*)&m));
+    بازگشت set(i, KernelArg(KernelArg::READ_WRITE, (UMat*)&m));
 }
 
 // a CUDA-backed UMat carries a device pointer in u->handle, not a cl_mem
-static bool isCudaBacked(const UMatData* u)
+ایستا منطقی isCudaBacked(ثابت UMatData* u)
 {
-    const MatAllocator* cudaAllocator = cv::cuda::getCudaAllocator();
-    return u && cudaAllocator && u->currAllocator == cudaAllocator;
+    ثابت MatAllocator* cudaAllocator = cv::cuda::getCudaAllocator();
+    بازگشت u && cudaAllocator && u->currAllocator == cudaAllocator;
 }
 
-int Kernel::set(int i, const KernelArg& arg)
+صحیح Kernel::set(صحیح i, ثابت KernelArg& arg)
 {
-    if( !p || !p->handle )
-        return -1;
-    if (i < 0)
+    اگر( !p || !p->handle )
+        بازگشت -1;
+    اگر (i < 0)
     {
-        CV_LOG_ERROR(NULL, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): negative arg_index",
-                p->name.c_str(), (int)i));
-        return i;
+        CV_LOG_ERROR(پوچ, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): negative arg_index",
+                p->name.c_str(), (صحیح)i));
+        بازگشت i;
     }
-    if( i == 0 )
+    اگر( i == 0 )
         p->cleanupUMats();
     cl_int status = 0;
-    if( arg.m )
+    اگر( arg.m )
     {
         AccessFlag accessFlags = ((arg.flags & KernelArg::READ_ONLY) ? ACCESS_READ : static_cast<AccessFlag>(0)) |
                                  ((arg.flags & KernelArg::WRITE_ONLY) ? ACCESS_WRITE : static_cast<AccessFlag>(0));
-        bool ptronly = (arg.flags & KernelArg::PTR_ONLY) != 0;
-        if (ptronly && arg.m->empty())
+        منطقی ptronly = (arg.flags & KernelArg::PTR_ONLY) != 0;
+        اگر (ptronly && arg.m->empty())
         {
-            cl_mem h_null = (cl_mem)NULL;
-            status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(h_null), &h_null);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=NULL)", p->name.c_str(), (int)i).c_str());
-            return i + 1;
+            cl_mem h_null = (cl_mem)پوچ;
+            status = clSetKernelArg(p->handle, (cl_uint)i, اندازه(h_null), &h_null);
+            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=NULL)", p->name.c_str(), (صحیح)i).c_str());
+            بازگشت i + 1;
         }
         // a CUDA-backed UMat has no cl_mem; decline so the caller falls back to CPU
-        if (isCudaBacked(arg.m->u))
+        اگر (isCudaBacked(arg.m->u))
         {
-            CV_LOG_DEBUG(NULL, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): UMat is backed by the CUDA allocator, declining",
-                    p->name.c_str(), (int)i));
+            CV_LOG_DEBUG(پوچ, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): UMat is backed by the CUDA allocator, declining",
+                    p->name.c_str(), (صحیح)i));
             p->cleanupUMats();
             p->release();
             p = 0;
-            return -1;
+            بازگشت -1;
         }
         cl_mem h = (cl_mem)arg.m->handle(accessFlags);
 
-        if (!h)
+        اگر (!h)
         {
-            CV_LOG_ERROR(NULL, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d, flags=%d): can't create cl_mem handle for passed UMat buffer (addr=%p)",
-                    p->name.c_str(), (int)i, (int)arg.flags, arg.m));
+            CV_LOG_ERROR(پوچ, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d, flags=%d): can't create cl_mem handle for passed UMat buffer (addr=%p)",
+                    p->name.c_str(), (صحیح)i, (صحیح)arg.flags, arg.m));
             p->release();
             p = 0;
-            return -1;
+            بازگشت -1;
         }
 
 #ifdef HAVE_OPENCL_SVM
-        if ((arg.m->u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+        اگر ((arg.m->u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
         {
-            const Context& ctx = Context::getDefault();
-            const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+            ثابت Context& ctx = Context::getDefault();
+            ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
             uchar*& svmDataPtr = (uchar*&)arg.m->u->handle;
             CV_OPENCL_SVM_TRACE_P("clSetKernelArgSVMPointer: %p\n", svmDataPtr);
-#if 1 // TODO
+#اگر 1 // TODO
             status = svmFns->fn_clSetKernelArgSVMPointer(p->handle, (cl_uint)i, svmDataPtr);
-#else
+#وگرنه
             status = svmFns->fn_clSetKernelArgSVMPointer(p->handle, (cl_uint)i, &svmDataPtr);
 #endif
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArgSVMPointer('%s', arg_index=%d, ptr=%p)", p->name.c_str(), (int)i, (void*)svmDataPtr).c_str());
+            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArgSVMPointer('%s', arg_index=%d, ptr=%p)", p->name.c_str(), (صحیح)i, (تهی*)svmDataPtr).c_str());
         }
-        else
+        وگرنه
 #endif
         {
-            status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(h), &h);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=%p)", p->name.c_str(), (int)i, (void*)h).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)i, اندازه(h), &h);
+            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=%p)", p->name.c_str(), (صحیح)i, (تهی*)h).c_str());
         }
 
-        if (ptronly)
+        اگر (ptronly)
         {
             i++;
         }
-        else if( arg.m->dims <= 2 )
+        وگرنه اگر( arg.m->dims <= 2 )
         {
             UMat2D u2d(*arg.m);
-            status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(u2d.step), &u2d.step);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (int)(i+1), (int)u2d.step).c_str());
-            status = clSetKernelArg(p->handle, (cl_uint)(i+2), sizeof(u2d.offset), &u2d.offset);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (int)(i+2), (int)u2d.offset).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+1), اندازه(u2d.step), &u2d.step);
+            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (صحیح)(i+1), (صحیح)u2d.step).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+2), اندازه(u2d.offset), &u2d.offset);
+            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (صحیح)(i+2), (صحیح)u2d.offset).c_str());
             i += 3;
 
-            if( !(arg.flags & KernelArg::NO_SIZE) )
+            اگر( !(arg.flags & KernelArg::NO_SIZE) )
             {
-                int cols = u2d.cols*arg.wscale/arg.iwscale;
-                status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(u2d.rows), &u2d.rows);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (int)i, (int)u2d.rows).c_str());
-                status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(cols), &cols);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (int)(i+1), (int)cols).c_str());
+                صحیح cols = u2d.cols*arg.wscale/arg.iwscale;
+                status = clSetKernelArg(p->handle, (cl_uint)i, اندازه(u2d.rows), &u2d.rows);
+                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (صحیح)i, (صحیح)u2d.rows).c_str());
+                status = clSetKernelArg(p->handle, (cl_uint)(i+1), اندازه(cols), &cols);
+                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (صحیح)(i+1), (صحیح)cols).c_str());
                 i += 2;
             }
         }
-        else
+        وگرنه
         {
             UMat3D u3d(*arg.m);
-            status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(u3d.slicestep), &u3d.slicestep);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, slicestep_value=%d)", p->name.c_str(), (int)(i+1), (int)u3d.slicestep).c_str());
-            status = clSetKernelArg(p->handle, (cl_uint)(i+2), sizeof(u3d.step), &u3d.step);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (int)(i+2), (int)u3d.step).c_str());
-            status = clSetKernelArg(p->handle, (cl_uint)(i+3), sizeof(u3d.offset), &u3d.offset);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (int)(i+3), (int)u3d.offset).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+1), اندازه(u3d.slicestep), &u3d.slicestep);
+            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, slicestep_value=%d)", p->name.c_str(), (صحیح)(i+1), (صحیح)u3d.slicestep).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+2), اندازه(u3d.step), &u3d.step);
+            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (صحیح)(i+2), (صحیح)u3d.step).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+3), اندازه(u3d.offset), &u3d.offset);
+            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (صحیح)(i+3), (صحیح)u3d.offset).c_str());
             i += 4;
-            if( !(arg.flags & KernelArg::NO_SIZE) )
+            اگر( !(arg.flags & KernelArg::NO_SIZE) )
             {
-                int cols = u3d.cols*arg.wscale/arg.iwscale;
-                status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(u3d.slices), &u3d.slices);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, slices_value=%d)", p->name.c_str(), (int)i, (int)u3d.slices).c_str());
-                status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(u3d.rows), &u3d.rows);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (int)(i+1), (int)u3d.rows).c_str());
-                status = clSetKernelArg(p->handle, (cl_uint)(i+2), sizeof(u3d.cols), &cols);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (int)(i+2), (int)cols).c_str());
+                صحیح cols = u3d.cols*arg.wscale/arg.iwscale;
+                status = clSetKernelArg(p->handle, (cl_uint)i, اندازه(u3d.slices), &u3d.slices);
+                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, slices_value=%d)", p->name.c_str(), (صحیح)i, (صحیح)u3d.slices).c_str());
+                status = clSetKernelArg(p->handle, (cl_uint)(i+1), اندازه(u3d.rows), &u3d.rows);
+                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (صحیح)(i+1), (صحیح)u3d.rows).c_str());
+                status = clSetKernelArg(p->handle, (cl_uint)(i+2), اندازه(u3d.cols), &cols);
+                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (صحیح)(i+2), (صحیح)cols).c_str());
                 i += 3;
             }
         }
         p->addUMat(*arg.m, !!(accessFlags & ACCESS_WRITE));
-        return i;
+        بازگشت i;
     }
     status = clSetKernelArg(p->handle, (cl_uint)i, arg.sz, arg.obj);
-    CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, obj=%p)", p->name.c_str(), (int)i, (int)arg.sz, (void*)arg.obj).c_str());
-    return i+1;
+    CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, obj=%p)", p->name.c_str(), (صحیح)i, (صحیح)arg.sz, (تهی*)arg.obj).c_str());
+    بازگشت i+1;
 }
 
-bool Kernel::run(int dims, size_t _globalsize[], size_t _localsize[],
-                 bool sync, const Queue& q)
+منطقی Kernel::run(صحیح dims, size_t _globalsize[], size_t _localsize[],
+                 منطقی همگام, ثابت Queue& q)
 {
-    if (!p)
-        return false;
+    اگر (!p)
+        بازگشت نادرست;
 
     size_t globalsize[CV_MAX_DIM] = {1,1,1};
     size_t total = 1;
-    CV_Assert(_globalsize != NULL);
-    for (int i = 0; i < dims; i++)
+    CV_Assert(_globalsize != پوچ);
+    برای (صحیح i = 0; i < dims; i++)
     {
         size_t val = _localsize ? _localsize[i] :
-            dims == 1 ? 64 : dims == 2 ? (i == 0 ? 256 : 8) : dims == 3 ? (8>>(int)(i>0)) : 1;
+            dims == 1 ? 64 : dims == 2 ? (i == 0 ? 256 : 8) : dims == 3 ? (8>>(صحیح)(i>0)) : 1;
         CV_Assert( val > 0 );
         total *= _globalsize[i];
-        if (_globalsize[i] == 1 && !_localsize)
+        اگر (_globalsize[i] == 1 && !_localsize)
             val = 1;
-        globalsize[i] = divUp(_globalsize[i], (unsigned int)val) * val;
+        globalsize[i] = divUp(_globalsize[i], (unsigned صحیح)val) * val;
     }
     CV_Assert(total > 0);
 
-    return p->run(dims, globalsize, _localsize, sync, NULL, q);
+    بازگشت p->run(dims, globalsize, _localsize, همگام, پوچ, q);
 }
 
 
-bool Kernel::run_(int dims, size_t _globalsize[], size_t _localsize[],
-                  bool sync, const Queue& q)
+منطقی Kernel::run_(صحیح dims, size_t _globalsize[], size_t _localsize[],
+                  منطقی همگام, ثابت Queue& q)
 {
     CV_Assert(p);
-    return p->run(dims, _globalsize, _localsize, sync, NULL, q);
+    بازگشت p->run(dims, _globalsize, _localsize, همگام, پوچ, q);
 }
 
 
-bool Kernel::Impl::run(int dims, size_t globalsize[], size_t localsize[],
-        bool sync, int64* timeNS, const Queue& q)
+منطقی Kernel::Impl::run(صحیح dims, size_t globalsize[], size_t localsize[],
+        منطقی همگام, int64* timeNS, ثابت Queue& q)
 {
     CV_INSTRUMENT_REGION_OPENCL_RUN(name.c_str());
 
-    if (!handle)
+    اگر (!handle)
     {
-        CV_LOG_ERROR(NULL, "OpenCL kernel has zero handle: " << name);
-        return false;
+        CV_LOG_ERROR(پوچ, "OpenCL kernel has zero handle: " << name);
+        بازگشت نادرست;
     }
 
-    if (isAsyncRun)
+    اگر (isAsyncRun)
     {
         CV_Error_(Error::StsError, ("OpenCL kernel can't be reused in async mode: %s", name.c_str()));
     }
-    isAsyncRun = !sync;
+    isAsyncRun = !همگام;
 
-    if (isInProgress)
+    اگر (isInProgress)
     {
         CV_Error_(Error::StsError, ("Previous OpenCL kernel launch is not finished: %s", name.c_str()));
     }
 
-#if CV_OPENCL_SYNC_RUN_KERNELS
-    sync = true;
+#اگر CV_OPENCL_SYNC_RUN_KERNELS
+    همگام = درست;
 #endif
 
     cl_command_queue qq = getQueue(q);
-    if (haveTempDstUMats)
-        sync = true;
-    if (haveTempSrcUMats)
-        sync = true;
-    if (timeNS)
-        sync = true;
+    اگر (haveTempDstUMats)
+        همگام = درست;
+    اگر (haveTempSrcUMats)
+        همگام = درست;
+    اگر (timeNS)
+        همگام = درست;
     cl_event asyncEvent = 0;
     cl_int retval = clEnqueueNDRangeKernel(qq, handle, (cl_uint)dims,
-                                           NULL, globalsize, localsize, 0, 0,
-                                           (sync && !timeNS) ? 0 : &asyncEvent);
-#if !CV_OPENCL_SHOW_RUN_KERNELS
-    if (retval != CL_SUCCESS)
+                                           پوچ, globalsize, localsize, 0, 0,
+                                           (همگام && !timeNS) ? 0 : &asyncEvent);
+#اگر !CV_OPENCL_SHOW_RUN_KERNELS
+    اگر (retval != CL_SUCCESS)
 #endif
     {
-        cv::String msg = cv::format("clEnqueueNDRangeKernel('%s', dims=%d, globalsize=%zux%zux%zu, localsize=%s) sync=%s", name.c_str(), (int)dims,
+        cv::String پیام = cv::format("clEnqueueNDRangeKernel('%s', dims=%d, globalsize=%zux%zux%zu, localsize=%s) sync=%s", name.c_str(), (صحیح)dims,
                         globalsize[0], (dims > 1 ? globalsize[1] : 1), (dims > 2 ? globalsize[2] : 1),
                         (localsize ? cv::format("%zux%zux%zu", localsize[0], (dims > 1 ? localsize[1] : 1), (dims > 2 ? localsize[2] : 1)) : cv::String("NULL")).c_str(),
-                        sync ? "true" : "false"
+                        همگام ? "true" : "false"
                         );
-        if (retval != CL_SUCCESS)
+        اگر (retval != CL_SUCCESS)
         {
-            msg = CV_OCL_API_ERROR_MSG(retval, msg.c_str());
+            پیام = CV_OCL_API_ERROR_پیام(retval, پیام.c_str());
         }
-#if CV_OPENCL_TRACE_CHECK
-        CV_OCL_TRACE_CHECK_RESULT(retval, msg.c_str());
-#else
-        printf("%s\n", msg.c_str());
+#اگر CV_OPENCL_TRACE_CHECK
+        CV_OCL_TRACE_CHECK_RESULT(retval, پیام.c_str());
+#وگرنه
+        printf("%s\n", پیام.c_str());
         fflush(stdout);
 #endif
     }
-    if (sync || retval != CL_SUCCESS)
+    اگر (همگام || retval != CL_SUCCESS)
     {
         CV_OCL_DBG_CHECK(clFinish(qq));
-        if (timeNS)
+        اگر (timeNS)
         {
-            if (retval == CL_SUCCESS)
+            اگر (retval == CL_SUCCESS)
             {
                 CV_OCL_DBG_CHECK(clWaitForEvents(1, &asyncEvent));
                 cl_ulong startTime, stopTime;
-                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_START, sizeof(startTime), &startTime, NULL));
-                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_END, sizeof(stopTime), &stopTime, NULL));
+                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_START, اندازه(startTime), &startTime, پوچ));
+                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_END, اندازه(stopTime), &stopTime, پوچ));
                 *timeNS = (int64)(stopTime - startTime);
             }
-            else
+            وگرنه
             {
                 *timeNS = -1;
             }
         }
         cleanupUMats();
     }
-    else
+    وگرنه
     {
         addref();
-        isInProgress = true;
-        CV_OCL_CHECK(clSetEventCallback(asyncEvent, CL_COMPLETE, oclCleanupCallback, this));
+        isInProgress = درست;
+        CV_OCL_CHECK(clSetEventCallback(asyncEvent, CL_COMPLETE, oclCleanupCallback, این));
     }
-    if (asyncEvent)
+    اگر (asyncEvent)
         CV_OCL_DBG_CHECK(clReleaseEvent(asyncEvent));
-    return retval == CL_SUCCESS;
+    بازگشت retval == CL_SUCCESS;
 }
 
-bool Kernel::runTask(bool sync, const Queue& q)
+منطقی Kernel::runTask(منطقی همگام, ثابت Queue& q)
 {
-    if(!p || !p->handle || p->isInProgress)
-        return false;
+    اگر(!p || !p->handle || p->isInProgress)
+        بازگشت نادرست;
 
     cl_command_queue qq = getQueue(q);
     cl_event asyncEvent = 0;
-    cl_int retval = clEnqueueTask(qq, p->handle, 0, 0, sync ? 0 : &asyncEvent);
-    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clEnqueueTask('%s') sync=%s", p->name.c_str(), sync ? "true" : "false").c_str());
-    if (sync || retval != CL_SUCCESS)
+    cl_int retval = clEnqueueTask(qq, p->handle, 0, 0, همگام ? 0 : &asyncEvent);
+    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clEnqueueTask('%s') sync=%s", p->name.c_str(), همگام ? "true" : "false").c_str());
+    اگر (همگام || retval != CL_SUCCESS)
     {
         CV_OCL_DBG_CHECK(clFinish(qq));
         p->cleanupUMats();
     }
-    else
+    وگرنه
     {
         p->addref();
-        p->isInProgress = true;
+        p->isInProgress = درست;
         CV_OCL_CHECK(clSetEventCallback(asyncEvent, CL_COMPLETE, oclCleanupCallback, p));
     }
-    if (asyncEvent)
+    اگر (asyncEvent)
         CV_OCL_DBG_CHECK(clReleaseEvent(asyncEvent));
-    return retval == CL_SUCCESS;
+    بازگشت retval == CL_SUCCESS;
 }
 
-int64 Kernel::runProfiling(int dims, size_t globalsize[], size_t localsize[], const Queue& q_)
+int64 Kernel::runProfiling(صحیح dims, size_t globalsize[], size_t localsize[], ثابت Queue& q_)
 {
     CV_Assert(p && p->handle && !p->isInProgress);
     Queue q = q_.ptr() ? q_ : Queue::getDefault();
@@ -4016,147 +4016,147 @@ int64 Kernel::runProfiling(int dims, size_t globalsize[], size_t localsize[], co
     q.finish(); // call clFinish() on base queue
     Queue profilingQueue = q.getProfilingQueue();
     int64 timeNs = -1;
-    bool res = p->run(dims, globalsize, localsize, true, &timeNs, profilingQueue);
-    return res ? timeNs : -1;
+    منطقی res = p->run(dims, globalsize, localsize, درست, &timeNs, profilingQueue);
+    بازگشت res ? timeNs : -1;
 }
 
-size_t Kernel::workGroupSize() const
+size_t Kernel::workGroupSize() ثابت
 {
-    if(!p || !p->handle)
-        return 0;
+    اگر(!p || !p->handle)
+        بازگشت 0;
     size_t val = 0, retsz = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_WORK_GROUP_SIZE, sizeof(val), &val, &retsz);
+    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_WORK_GROUP_SIZE, اندازه(val), &val, &retsz);
     CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_WORK_GROUP_SIZE)");
-    return status == CL_SUCCESS ? val : 0;
+    بازگشت status == CL_SUCCESS ? val : 0;
 }
 
-size_t Kernel::preferedWorkGroupSizeMultiple() const
+size_t Kernel::preferedWorkGroupSizeMultiple() ثابت
 {
-    if(!p || !p->handle)
-        return 0;
+    اگر(!p || !p->handle)
+        بازگشت 0;
     size_t val = 0, retsz = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(val), &val, &retsz);
+    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, اندازه(val), &val, &retsz);
     CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE)");
-    return status == CL_SUCCESS ? val : 0;
+    بازگشت status == CL_SUCCESS ? val : 0;
 }
 
-bool Kernel::compileWorkGroupSize(size_t wsz[]) const
+منطقی Kernel::compileWorkGroupSize(size_t wsz[]) ثابت
 {
-    if(!p || !p->handle || !wsz)
-        return 0;
+    اگر(!p || !p->handle || !wsz)
+        بازگشت 0;
     size_t retsz = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, sizeof(wsz[0])*3, wsz, &retsz);
+    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, اندازه(wsz[0])*3, wsz, &retsz);
     CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_COMPILE_WORK_GROUP_SIZE)");
-    return status == CL_SUCCESS;
+    بازگشت status == CL_SUCCESS;
 }
 
-size_t Kernel::localMemSize() const
+size_t Kernel::localMemSize() ثابت
 {
-    if(!p || !p->handle)
-        return 0;
+    اگر(!p || !p->handle)
+        بازگشت 0;
     size_t retsz = 0;
     cl_ulong val = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(val), &val, &retsz);
+    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_LOCAL_MEM_SIZE, اندازه(val), &val, &retsz);
     CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_LOCAL_MEM_SIZE)");
-    return status == CL_SUCCESS ? (size_t)val : 0;
+    بازگشت status == CL_SUCCESS ? (size_t)val : 0;
 }
 
 
 
 ///////////////////////////////////////// ProgramSource ///////////////////////////////////////////////
 
-struct ProgramSource::Impl
+ساختار ProgramSource::Impl
 {
     IMPLEMENT_REFCOUNTABLE();
 
-    enum KIND {
+    شمارش KIND {
         PROGRAM_SOURCE_CODE = 0,
         PROGRAM_BINARIES,
         PROGRAM_SPIR,
         PROGRAM_SPIRV
     } kind_;
 
-    Impl(const String& src)
+    Impl(ثابت String& src)
     {
         init(PROGRAM_SOURCE_CODE, cv::String(), cv::String());
         initFromSource(src, cv::String());
     }
-    Impl(const String& module, const String& name, const String& codeStr, const String& codeHash)
+    Impl(ثابت String& module, ثابت String& name, ثابت String& codeStr, ثابت String& codeHash)
     {
         init(PROGRAM_SOURCE_CODE, module, name);
         initFromSource(codeStr, codeHash);
     }
 
     /// reset fields
-    void init(enum KIND kind, const String& module, const String& name)
+    تهی init(شمارش KIND kind, ثابت String& module, ثابت String& name)
     {
         refcount = 1;
         kind_ = kind;
         module_ = module;
         name_ = name;
 
-        sourceAddr_ = NULL;
+        sourceAddr_ = پوچ;
         sourceSize_ = 0;
-        isHashUpdated = false;
+        isHashUpdated = نادرست;
     }
 
-    void initFromSource(const String& codeStr, const String& codeHash)
+    تهی initFromSource(ثابت String& codeStr, ثابت String& codeHash)
     {
         codeStr_ = codeStr;
         sourceHash_ = codeHash;
-        if (sourceHash_.empty())
+        اگر (sourceHash_.empty())
         {
             updateHash();
         }
-        else
+        وگرنه
         {
-            isHashUpdated = true;
+            isHashUpdated = درست;
         }
     }
 
-    void updateHash(const char* hashStr = NULL)
+    تهی updateHash(ثابت نویسه* hashStr = پوچ)
     {
-        if (hashStr)
+        اگر (hashStr)
         {
             sourceHash_ = cv::String(hashStr);
-            isHashUpdated = true;
-            return;
+            isHashUpdated = درست;
+            بازگشت;
         }
         uint64 hash = 0;
-        switch (kind_)
+        انتخاب (kind_)
         {
-        case PROGRAM_SOURCE_CODE:
-            if (sourceAddr_)
+        حالت PROGRAM_SOURCE_CODE:
+            اگر (sourceAddr_)
             {
                 CV_Assert(codeStr_.empty());
                 hash = crc64(sourceAddr_, sourceSize_); // static storage
             }
-            else
+            وگرنه
             {
                 CV_Assert(!codeStr_.empty());
                 hash = crc64((uchar*)codeStr_.c_str(), codeStr_.size());
             }
-            break;
-        case PROGRAM_BINARIES:
-        case PROGRAM_SPIR:
-        case PROGRAM_SPIRV:
+            بشکن;
+        حالت PROGRAM_BINARIES:
+        حالت PROGRAM_SPIR:
+        حالت PROGRAM_SPIRV:
             hash = crc64(sourceAddr_, sourceSize_);
-            break;
-        default:
+            بشکن;
+        پیشفرض:
             CV_Error(Error::StsInternal, "Internal error");
         }
         sourceHash_ = cv::format("%08jx", (uintmax_t)hash);
-        isHashUpdated = true;
+        isHashUpdated = درست;
     }
 
-    Impl(enum KIND kind,
-            const String& module, const String& name,
-            const unsigned char* binary, const size_t size,
-            const cv::String& buildOptions = cv::String())
+    Impl(شمارش KIND kind,
+            ثابت String& module, ثابت String& name,
+            ثابت unsigned نویسه* binary, ثابت size_t size,
+            ثابت cv::String& buildOptions = cv::String())
     {
         init(kind, module, name);
 
@@ -4166,33 +4166,33 @@ struct ProgramSource::Impl
         buildOptions_ = buildOptions;
     }
 
-    static ProgramSource fromSourceWithStaticLifetime(const String& module, const String& name,
-            const char* sourceCodeStaticStr, const char* hashStaticStr,
-            const cv::String& buildOptions)
+    ایستا ProgramSource fromSourceWithStaticLifetime(ثابت String& module, ثابت String& name,
+            ثابت نویسه* sourceCodeStaticStr, ثابت نویسه* hashStaticStr,
+            ثابت cv::String& buildOptions)
     {
         ProgramSource result;
-        result.p = new Impl(PROGRAM_SOURCE_CODE, module, name,
-                (const unsigned char*)sourceCodeStaticStr, strlen(sourceCodeStaticStr), buildOptions);
+        result.p = جدید Impl(PROGRAM_SOURCE_CODE, module, name,
+                (ثابت unsigned نویسه*)sourceCodeStaticStr, strlen(sourceCodeStaticStr), buildOptions);
         result.p->updateHash(hashStaticStr);
-        return result;
+        بازگشت result;
     }
 
-    static ProgramSource fromBinary(const String& module, const String& name,
-            const unsigned char* binary, const size_t size,
-            const cv::String& buildOptions)
+    ایستا ProgramSource from_دودویی(ثابت String& module, ثابت String& name,
+            ثابت unsigned نویسه* binary, ثابت size_t size,
+            ثابت cv::String& buildOptions)
     {
         ProgramSource result;
-        result.p = new Impl(PROGRAM_BINARIES, module, name, binary, size, buildOptions);
-        return result;
+        result.p = جدید Impl(PROGRAM_BINARIES, module, name, binary, size, buildOptions);
+        بازگشت result;
     }
 
-    static ProgramSource fromSPIR(const String& module, const String& name,
-            const unsigned char* binary, const size_t size,
-            const cv::String& buildOptions)
+    ایستا ProgramSource fromSPIR(ثابت String& module, ثابت String& name,
+            ثابت unsigned نویسه* binary, ثابت size_t size,
+            ثابت cv::String& buildOptions)
     {
         ProgramSource result;
-        result.p = new Impl(PROGRAM_SPIR, module, name, binary, size, buildOptions);
-        return result;
+        result.p = جدید Impl(PROGRAM_SPIR, module, name, binary, size, buildOptions);
+        بازگشت result;
     }
 
     String module_;
@@ -4201,17 +4201,17 @@ struct ProgramSource::Impl
     // TODO std::vector<ProgramSource> includes_;
     String codeStr_; // PROGRAM_SOURCE_CODE only
 
-    const unsigned char* sourceAddr_;
+    ثابت unsigned نویسه* sourceAddr_;
     size_t sourceSize_;
 
     cv::String buildOptions_;
 
     String sourceHash_;
-    bool isHashUpdated;
+    منطقی isHashUpdated;
 
-    friend struct Program::Impl;
-    friend struct internal::ProgramEntry;
-    friend struct Context::Impl;
+    friend ساختار Program::Impl;
+    friend ساختار internal::ProgramEntry;
+    friend ساختار Context::Impl;
 };
 
 
@@ -4220,43 +4220,43 @@ ProgramSource::ProgramSource() CV_NOEXCEPT
     p = 0;
 }
 
-ProgramSource::ProgramSource(const String& module, const String& name, const String& codeStr, const String& codeHash)
+ProgramSource::ProgramSource(ثابت String& module, ثابت String& name, ثابت String& codeStr, ثابت String& codeHash)
 {
-    p = new Impl(module, name, codeStr, codeHash);
+    p = جدید Impl(module, name, codeStr, codeHash);
 }
 
-ProgramSource::ProgramSource(const char* prog)
+ProgramSource::ProgramSource(ثابت نویسه* prog)
 {
-    p = new Impl(prog);
+    p = جدید Impl(prog);
 }
 
-ProgramSource::ProgramSource(const String& prog)
+ProgramSource::ProgramSource(ثابت String& prog)
 {
-    p = new Impl(prog);
+    p = جدید Impl(prog);
 }
 
 ProgramSource::~ProgramSource()
 {
-    if(p)
+    اگر(p)
         p->release();
 }
 
-ProgramSource::ProgramSource(const ProgramSource& prog)
+ProgramSource::ProgramSource(ثابت ProgramSource& prog)
 {
     p = prog.p;
-    if(p)
+    اگر(p)
         p->addref();
 }
 
-ProgramSource& ProgramSource::operator = (const ProgramSource& prog)
+ProgramSource& ProgramSource::operator = (ثابت ProgramSource& prog)
 {
     Impl* newp = (Impl*)prog.p;
-    if(newp)
+    اگر(newp)
         newp->addref();
-    if(p)
+    اگر(p)
         p->release();
     p = newp;
-    return *this;
+    بازگشت *این;
 }
 
 ProgramSource::ProgramSource(ProgramSource&& prog) CV_NOEXCEPT
@@ -4267,286 +4267,286 @@ ProgramSource::ProgramSource(ProgramSource&& prog) CV_NOEXCEPT
 
 ProgramSource& ProgramSource::operator = (ProgramSource&& prog) CV_NOEXCEPT
 {
-    if (this != &prog) {
-        if(p)
+    اگر (این != &prog) {
+        اگر(p)
             p->release();
         p = prog.p;
         prog.p = nullptr;
     }
-    return *this;
+    بازگشت *این;
 }
 
-const String& ProgramSource::source() const
+ثابت String& ProgramSource::source() ثابت
 {
     CV_Assert(p);
     CV_Assert(p->kind_ == Impl::PROGRAM_SOURCE_CODE);
-    CV_Assert(p->sourceAddr_ == NULL); // method returns reference - can't construct temporary object
-    return p->codeStr_;
+    CV_Assert(p->sourceAddr_ == پوچ); // method returns reference - can't construct temporary object
+    بازگشت p->codeStr_;
 }
 
-ProgramSource::hash_t ProgramSource::hash() const
+ProgramSource::hash_t ProgramSource::hash() ثابت
 {
     CV_Error(Error::StsNotImplemented, "Removed method: ProgramSource::hash()");
 }
 
-ProgramSource ProgramSource::fromBinary(const String& module, const String& name,
-        const unsigned char* binary, const size_t size,
-        const cv::String& buildOptions)
+ProgramSource ProgramSource::from_دودویی(ثابت String& module, ثابت String& name,
+        ثابت unsigned نویسه* binary, ثابت size_t size,
+        ثابت cv::String& buildOptions)
 {
     CV_Assert(binary);
     CV_Assert(size > 0);
-    return Impl::fromBinary(module, name, binary, size, buildOptions);
+    بازگشت Impl::from_دودویی(module, name, binary, size, buildOptions);
 }
 
-ProgramSource ProgramSource::fromSPIR(const String& module, const String& name,
-        const unsigned char* binary, const size_t size,
-        const cv::String& buildOptions)
+ProgramSource ProgramSource::fromSPIR(ثابت String& module, ثابت String& name,
+        ثابت unsigned نویسه* binary, ثابت size_t size,
+        ثابت cv::String& buildOptions)
 {
     CV_Assert(binary);
     CV_Assert(size > 0);
-    return Impl::fromBinary(module, name, binary, size, buildOptions);
+    بازگشت Impl::from_دودویی(module, name, binary, size, buildOptions);
 }
 
 
-internal::ProgramEntry::operator ProgramSource&() const
+internal::ProgramEntry::operator ProgramSource&() ثابت
 {
-    if (this->pProgramSource == NULL)
+    اگر (این->pProgramSource == پوچ)
     {
         cv::AutoLock lock(cv::getInitializationMutex());
-        if (this->pProgramSource == NULL)
+        اگر (این->pProgramSource == پوچ)
         {
-            ProgramSource ps = ProgramSource::Impl::fromSourceWithStaticLifetime(this->module, this->name, this->programCode, this->programHash, cv::String());
-            ProgramSource* ptr = new ProgramSource(ps);
-            const_cast<ProgramEntry*>(this)->pProgramSource = ptr;
+            ProgramSource ps = ProgramSource::Impl::fromSourceWithStaticLifetime(این->module, این->name, این->programCode, این->programHash, cv::String());
+            ProgramSource* ptr = جدید ProgramSource(ps);
+            const_cast<ProgramEntry*>(این)->pProgramSource = ptr;
         }
     }
-    return *this->pProgramSource;
+    بازگشت *این->pProgramSource;
 }
 
 
 
 /////////////////////////////////////////// Program /////////////////////////////////////////////
 
-static
-cv::String joinBuildOptions(const cv::String& a, const cv::String& b)
+ایستا
+cv::String joinBuildOptions(ثابت cv::String& a, ثابت cv::String& b)
 {
-    if (b.empty())
-        return a;
-    if (a.empty())
-        return b;
-    if (b[0] == ' ')
-        return a + b;
-    return a + (cv::String(" ") + b);
+    اگر (b.empty())
+        بازگشت a;
+    اگر (a.empty())
+        بازگشت b;
+    اگر (b[0] == ' ')
+        بازگشت a + b;
+    بازگشت a + (cv::String(" ") + b);
 }
 
-struct Program::Impl
+ساختار Program::Impl
 {
     IMPLEMENT_REFCOUNTABLE();
 
-    Impl(const ProgramSource& src,
-         const String& _buildflags, String& errmsg) :
+    Impl(ثابت ProgramSource& src,
+         ثابت String& _buildflags, String& errmsg) :
          refcount(1),
-         handle(NULL),
+         handle(پوچ),
          buildflags(_buildflags)
     {
-        const ProgramSource::Impl* src_ = src.getImpl();
+        ثابت ProgramSource::Impl* src_ = src.getImpl();
         CV_Assert(src_);
         sourceModule_ = src_->module_;
         sourceName_ = src_->name_;
-        const Context ctx = Context::getDefault();
+        ثابت Context ctx = Context::getDefault();
         Device device = ctx.device(0);
-        if (ctx.ptr() == NULL || device.ptr() == NULL)
-            return;
+        اگر (ctx.ptr() == پوچ || device.ptr() == پوچ)
+            بازگشت;
         buildflags = joinBuildOptions(buildflags, src_->buildOptions_);
-        if (src.getImpl()->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
+        اگر (src.getImpl()->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
         {
-            if (device.isAMD())
+            اگر (device.isAMD())
                 buildflags = joinBuildOptions(buildflags, " -D AMD_DEVICE");
-            else if (device.isIntel())
+            وگرنه اگر (device.isIntel())
                 buildflags = joinBuildOptions(buildflags, " -D INTEL_DEVICE");
-            const String param_buildExtraOptions = getBuildExtraOptions();
-            if (!param_buildExtraOptions.empty())
+            ثابت String param_buildExtraOptions = getBuildExtraOptions();
+            اگر (!param_buildExtraOptions.empty())
                 buildflags = joinBuildOptions(buildflags, param_buildExtraOptions);
         }
-#if CV_OPENCL_SHOW_BUILD_OPTIONS
-        CV_LOG_INFO(NULL, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' options:" << buildflags);
+#اگر CV_OPENCL_SHOW_BUILD_OPTIONS
+        CV_LOG_INFO(پوچ, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' options:" << buildflags);
 #endif
         compile(ctx, src_, errmsg);
-#if CV_OPENCL_SHOW_BUILD_KERNELS
-        if (handle)
+#اگر CV_OPENCL_SHOW_BUILD_KERNELS
+        اگر (handle)
         {
             size_t retsz = 0;
-            char kernels_buffer[4096] = {0};
-            cl_int result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, sizeof(kernels_buffer), &kernels_buffer[0], &retsz);
+            نویسه kernels_buffer[4096] = {0};
+            cl_int result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, اندازه(kernels_buffer), &kernels_buffer[0], &retsz);
             CV_OCL_DBG_CHECK_RESULT(result, cv::format("clGetProgramInfo(CL_PROGRAM_KERNEL_NAMES: %s/%s)", sourceModule_.c_str(), sourceName_.c_str()).c_str());
-            if (result == CL_SUCCESS && retsz < sizeof(kernels_buffer))
+            اگر (result == CL_SUCCESS && retsz < اندازه(kernels_buffer))
             {
                 kernels_buffer[retsz] = 0;
-                CV_LOG_INFO(NULL, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' kernels: '" << kernels_buffer << "'");
+                CV_LOG_INFO(پوچ, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' kernels: '" << kernels_buffer << "'");
             }
-            else
+            وگرنه
             {
-                CV_LOG_ERROR(NULL, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' can't retrieve kernel names!");
+                CV_LOG_ERROR(پوچ, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' can't retrieve kernel names!");
             }
         }
 #endif
     }
 
-    bool compile(const Context& ctx, const ProgramSource::Impl* src_, String& errmsg)
+    منطقی compile(ثابت Context& ctx, ثابت ProgramSource::Impl* src_, String& errmsg)
     {
         CV_Assert(ctx.getImpl());
         CV_Assert(src_);
 
         // We don't cache OpenCL binaries
-        if (src_->kind_ == ProgramSource::Impl::PROGRAM_BINARIES)
+        اگر (src_->kind_ == ProgramSource::Impl::PROGRAM_BINARIES)
         {
-            CV_LOG_VERBOSE(NULL, 0, "Load program binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
-            bool isLoaded = createFromBinary(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
-            return isLoaded;
+            CV_LOG_VERBOSE(پوچ, 0, "Load program binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
+            منطقی isLoaded = create_From_دودویی(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
+            بازگشت isLoaded;
         }
-        return compileWithCache(ctx, src_, errmsg);
+        بازگشت compileWithCache(ctx, src_, errmsg);
     }
 
-    bool compileWithCache(const Context& ctx, const ProgramSource::Impl* src_, String& errmsg)
+    منطقی compileWithCache(ثابت Context& ctx, ثابت ProgramSource::Impl* src_, String& errmsg)
     {
         CV_Assert(ctx.getImpl());
         CV_Assert(src_);
         CV_Assert(src_->kind_ != ProgramSource::Impl::PROGRAM_BINARIES);
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#اگر OPENCV_HAVE_FILESYSTEM_SUPPORT
         OpenCLBinaryCacheConfigurator& config = OpenCLBinaryCacheConfigurator::getSingletonInstance();
-        const std::string base_dir = config.prepareCacheDirectoryForContext(
+        ثابت std::string base_dir = config.prepareCacheDirectoryForContext(
                 ctx.getImpl()->getPrefixString(),
                 ctx.getImpl()->getPrefixBase()
         );
-        const String& hash_str = src_->sourceHash_;
+        ثابت String& hash_str = src_->sourceHash_;
         cv::String fname;
-        if (!base_dir.empty() && !src_->module_.empty() && !src_->name_.empty())
+        اگر (!base_dir.empty() && !src_->module_.empty() && !src_->name_.empty())
         {
             CV_Assert(!hash_str.empty());
             fname = src_->module_ + "--" + src_->name_ + "_" + hash_str + ".bin";
             fname = utils::fs::join(base_dir, fname);
         }
-        const cv::Ptr<utils::fs::FileLock> fileLock = config.cache_lock_; // can be empty
-        if (!fname.empty() && CV_OPENCL_CACHE_ENABLE)
+        ثابت cv::Ptr<utils::fs::FileLock> fileLock = config.cache_lock_; // can be empty
+        اگر (!fname.empty() && CV_OPENCL_CACHE_ENABLE)
         {
-            try
+            تلاش
             {
-                std::vector<char> binaryBuf;
-                bool res = false;
+                std::vector<نویسه> دودویی_Buf;
+                منطقی res = نادرست;
                 {
                     cv::utils::optional_shared_lock_guard<cv::utils::fs::FileLock> lock_fs(fileLock.get());
-                    BinaryProgramFile file(fname, hash_str.c_str());
-                    res = file.read(buildflags, binaryBuf);
+                    دودویی_Program_File file(fname, hash_str.c_str());
+                    res = file.اقرأ(buildflags, دودویی_Buf);
                 }
-                if (res)
+                اگر (res)
                 {
-                    CV_Assert(!binaryBuf.empty());
-                    CV_LOG_VERBOSE(NULL, 0, "Load program binary from cache: " << src_->module_.c_str() << "/" << src_->name_.c_str());
-                    bool isLoaded = createFromBinary(ctx, binaryBuf, errmsg);
-                    if (isLoaded)
-                        return true;
+                    CV_Assert(!دودویی_Buf.empty());
+                    CV_LOG_VERBOSE(پوچ, 0, "Load program binary from cache: " << src_->module_.c_str() << "/" << src_->name_.c_str());
+                    منطقی isLoaded = create_From_دودویی(ctx, دودویی_Buf, errmsg);
+                    اگر (isLoaded)
+                        بازگشت درست;
                 }
             }
-            catch (const cv::Exception& e)
+            بگیر (ثابت cv::Exception& e)
             {
                 CV_UNUSED(e);
-                CV_LOG_VERBOSE(NULL, 0, "Can't load OpenCL binary: " + fname << std::endl << e.what());
+                CV_LOG_VERBOSE(پوچ, 0, "Can't load OpenCL binary: " + fname << std::endl << e.what());
             }
-            catch (...)
+            بگیر (...)
             {
-                CV_LOG_VERBOSE(NULL, 0, "Can't load OpenCL binary: " + fname);
+                CV_LOG_VERBOSE(پوچ, 0, "Can't load OpenCL binary: " + fname);
             }
         }
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
-        CV_Assert(handle == NULL);
-        if (src_->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
+        CV_Assert(handle == پوچ);
+        اگر (src_->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
         {
-            if (!buildFromSources(ctx, src_, errmsg))
+            اگر (!buildFromSources(ctx, src_, errmsg))
             {
-                return false;
+                بازگشت نادرست;
             }
         }
-        else if (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIR)
+        وگرنه اگر (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIR)
         {
             buildflags = joinBuildOptions(buildflags, " -x spir");
-            if ((cv::String(" ") + buildflags).find(" -spir-std=") == cv::String::npos)
+            اگر ((cv::String(" ") + buildflags).find(" -spir-std=") == cv::String::npos)
             {
                 buildflags = joinBuildOptions(buildflags, " -spir-std=1.2");
             }
-            CV_LOG_VERBOSE(NULL, 0, "Load program SPIR binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
-            bool isLoaded = createFromBinary(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
-            if (!isLoaded)
-                return false;
+            CV_LOG_VERBOSE(پوچ, 0, "Load program SPIR binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
+            منطقی isLoaded = create_From_دودویی(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
+            اگر (!isLoaded)
+                بازگشت نادرست;
         }
-        else if (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIRV)
+        وگرنه اگر (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIRV)
         {
             CV_Error(Error::StsNotImplemented, "OpenCL: SPIR-V is not supported");
         }
-        else
+        وگرنه
         {
             CV_Error(Error::StsInternal, "Internal error");
         }
-        CV_Assert(handle != NULL);
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-        if (!fname.empty() && CV_OPENCL_CACHE_WRITE)
+        CV_Assert(handle != پوچ);
+#اگر OPENCV_HAVE_FILESYSTEM_SUPPORT
+        اگر (!fname.empty() && CV_OPENCL_CACHE_WRITE)
         {
-            try
+            تلاش
             {
-                std::vector<char> binaryBuf;
-                getProgramBinary(binaryBuf);
+                std::vector<نویسه> دودویی_Buf;
+                get_Program_دودویی(دودویی_Buf);
                 {
                     cv::utils::optional_lock_guard<cv::utils::fs::FileLock> lock_fs(fileLock.get());
-                    BinaryProgramFile file(fname, hash_str.c_str());
-                    file.write(buildflags, binaryBuf);
+                    دودویی_Program_File file(fname, hash_str.c_str());
+                    file.اكتب(buildflags, دودویی_Buf);
                 }
             }
-            catch (const cv::Exception& e)
+            بگیر (ثابت cv::Exception& e)
             {
-                CV_LOG_WARNING(NULL, "Can't save OpenCL binary into cache: " + fname << std::endl << e.what());
+                CV_LOG_WARNING(پوچ, "Can't save OpenCL binary into cache: " + fname << std::endl << e.what());
             }
-            catch (...)
+            بگیر (...)
             {
-                CV_LOG_WARNING(NULL, "Can't save OpenCL binary into cache: " + fname);
+                CV_LOG_WARNING(پوچ, "Can't save OpenCL binary into cache: " + fname);
             }
         }
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-        if (CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#اگر CV_OPENCL_VALIDATE_دودویی_PROGRAMS
+        اگر (CV_OPENCL_VALIDATE_دودویی_PROGRAMS_مقدار)
         {
-            std::vector<char> binaryBuf;
-            getProgramBinary(binaryBuf);
-            if (!binaryBuf.empty())
+            std::vector<نویسه> دودویی_Buf;
+            get_Program_دودویی(دودویی_Buf);
+            اگر (!دودویی_Buf.empty())
             {
                 CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                handle = NULL;
-                createFromBinary(ctx, binaryBuf, errmsg);
+                handle = پوچ;
+                create_From_دودویی(ctx, دودویی_Buf, errmsg);
             }
         }
 #endif
-        return handle != NULL;
+        بازگشت handle != پوچ;
     }
 
-    void dumpBuildLog_(cl_int result, const cl_device_id* deviceList, String& errmsg)
+    تهی dumpBuildLog_(cl_int result, ثابت cl_device_id* deviceList, String& errmsg)
     {
-        AutoBuffer<char, 4096> buffer; buffer[0] = 0;
+        AutoBuffer<نویسه, 4096> buffer; buffer[0] = 0;
 
         size_t retsz = 0;
         cl_int log_retval = clGetProgramBuildInfo(handle, deviceList[0],
                                                   CL_PROGRAM_BUILD_LOG, 0, 0, &retsz);
-        if (log_retval == CL_SUCCESS && retsz > 1)
+        اگر (log_retval == CL_SUCCESS && retsz > 1)
         {
             buffer.resize(retsz + 16);
             log_retval = clGetProgramBuildInfo(handle, deviceList[0],
                                                CL_PROGRAM_BUILD_LOG, retsz+1, buffer.data(), &retsz);
-            if (log_retval == CL_SUCCESS)
+            اگر (log_retval == CL_SUCCESS)
             {
-                if (retsz < buffer.size())
+                اگر (retsz < buffer.size())
                     buffer[retsz] = 0;
-                else
+                وگرنه
                     buffer[buffer.size() - 1] = 0;
             }
-            else
+            وگرنه
             {
                 buffer[0] = 0;
             }
@@ -4560,20 +4560,20 @@ struct Program::Impl
         fflush(stdout);
     }
 
-    bool buildFromSources(const Context& ctx, const ProgramSource::Impl* src_, String& errmsg)
+    منطقی buildFromSources(ثابت Context& ctx, ثابت ProgramSource::Impl* src_, String& errmsg)
     {
         CV_Assert(src_);
         CV_Assert(src_->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE);
-        CV_Assert(handle == NULL);
+        CV_Assert(handle == پوچ);
         CV_INSTRUMENT_REGION_OPENCL_COMPILE(cv::format("Build OpenCL program: %s/%s %s options: %s",
                 sourceModule_.c_str(), sourceName_.c_str(),
                 src_->sourceHash_.c_str(), buildflags.c_str()).c_str());
 
-        CV_LOG_VERBOSE(NULL, 0, "Compile... " << sourceModule_.c_str() << "/" << sourceName_.c_str());
+        CV_LOG_VERBOSE(پوچ, 0, "Compile... " << sourceModule_.c_str() << "/" << sourceName_.c_str());
 
-        const char* srcptr = src_->sourceAddr_ ? ((const char*)src_->sourceAddr_) : src_->codeStr_.c_str();
+        ثابت نویسه* srcptr = src_->sourceAddr_ ? ((ثابت نویسه*)src_->sourceAddr_) : src_->codeStr_.c_str();
         size_t srclen = src_->sourceAddr_ ? src_->sourceSize_ : src_->codeStr_.size();
-        CV_Assert(srcptr != NULL);
+        CV_Assert(srcptr != پوچ);
         CV_Assert(srclen > 0);
 
         cl_int retval = 0;
@@ -4581,123 +4581,123 @@ struct Program::Impl
         handle = clCreateProgramWithSource((cl_context)ctx.ptr(), 1, &srcptr, &srclen, &retval);
         CV_OCL_DBG_CHECK_RESULT(retval, "clCreateProgramWithSource");
         CV_Assert(handle || retval != CL_SUCCESS);
-        if (handle && retval == CL_SUCCESS)
+        اگر (handle && retval == CL_SUCCESS)
         {
             size_t n = ctx.ndevices();
             AutoBuffer<cl_device_id, 4> deviceListBuf(n + 1);
             cl_device_id* deviceList = deviceListBuf.data();
-            for (size_t i = 0; i < n; i++)
+            برای (size_t i = 0; i < n; i++)
             {
                 deviceList[i] = (cl_device_id)(ctx.device(i).ptr());
             }
 
             retval = clBuildProgram(handle, (cl_uint)n, deviceList, buildflags.c_str(), 0, 0);
             CV_OCL_TRACE_CHECK_RESULT(/*don't throw: retval*/CL_SUCCESS, cv::format("clBuildProgram(source: %s)", buildflags.c_str()).c_str());
-#if !CV_OPENCL_ALWAYS_SHOW_BUILD_LOG
-            if (retval != CL_SUCCESS)
+#اگر !CV_OPENCL_ALWAYS_SHOW_BUILD_LOG
+            اگر (retval != CL_SUCCESS)
 #endif
             {
                 dumpBuildLog_(retval, deviceList, errmsg);
 
                 // don't remove "retval != CL_SUCCESS" condition here:
                 // it would break CV_OPENCL_ALWAYS_SHOW_BUILD_LOG mode
-                if (retval != CL_SUCCESS && handle)
+                اگر (retval != CL_SUCCESS && handle)
                 {
                     CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                    handle = NULL;
+                    handle = پوچ;
                 }
-                if (retval != CL_SUCCESS &&
+                اگر (retval != CL_SUCCESS &&
                     sourceName_ != "dummy"  // used for testing of compilation flags
                 )
                 {
                     onOpenCLKernelBuildError();
                 }
             }
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-            if (handle && CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#اگر CV_OPENCL_VALIDATE_دودویی_PROGRAMS
+            اگر (handle && CV_OPENCL_VALIDATE_دودویی_PROGRAMS_مقدار)
             {
-                CV_LOG_INFO(NULL, "OpenCL: query kernel names (build from sources)...");
+                CV_LOG_INFO(پوچ, "OpenCL: query kernel names (build from sources)...");
                 size_t retsz = 0;
-                char kernels_buffer[4096] = {0};
-                cl_int result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, sizeof(kernels_buffer), &kernels_buffer[0], &retsz);
-                if (retsz < sizeof(kernels_buffer))
+                نویسه kernels_buffer[4096] = {0};
+                cl_int result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, اندازه(kernels_buffer), &kernels_buffer[0], &retsz);
+                اگر (retsz < اندازه(kernels_buffer))
                     kernels_buffer[retsz] = 0;
-                else
+                وگرنه
                     kernels_buffer[0] = 0;
-                CV_LOG_INFO(NULL, result << ": Kernels='" << kernels_buffer << "'");
+                CV_LOG_INFO(پوچ, result << ": Kernels='" << kernels_buffer << "'");
             }
 #endif
         }
-        return handle != NULL;
+        بازگشت handle != پوچ;
     }
 
-    void getProgramBinary(std::vector<char>& buf)
+    تهی get_Program_دودویی(std::vector<نویسه>& buf)
     {
         CV_Assert(handle);
         size_t sz = 0;
-        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARY_SIZES, sizeof(sz), &sz, NULL));
+        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_دودویی_SIZES, اندازه(sz), &sz, پوچ));
         buf.resize(sz);
         uchar* ptr = (uchar*)&buf[0];
-        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARIES, sizeof(ptr), &ptr, NULL));
+        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARIES, اندازه(ptr), &ptr, پوچ));
     }
 
-    bool createFromBinary(const Context& ctx, const std::vector<char>& buf, String& errmsg)
+    منطقی create_From_دودویی(ثابت Context& ctx, ثابت std::vector<نویسه>& buf, String& errmsg)
     {
-        return createFromBinary(ctx, (const unsigned char*)&buf[0], buf.size(), errmsg);
+        بازگشت create_From_دودویی(ctx, (ثابت unsigned نویسه*)&buf[0], buf.size(), errmsg);
     }
 
-    bool createFromBinary(const Context& ctx, const unsigned char* binaryAddr, const size_t binarySize, String& errmsg)
+    منطقی create_From_دودویی(ثابت Context& ctx, ثابت unsigned نویسه* دودویی_Addr, ثابت size_t دودویی_Size, String& errmsg)
     {
-        CV_Assert(handle == NULL);
+        CV_Assert(handle == پوچ);
         CV_INSTRUMENT_REGION_OPENCL_COMPILE("Load OpenCL program");
-        CV_LOG_VERBOSE(NULL, 0, "Load from binary... (" << binarySize << " bytes)");
+        CV_LOG_VERBOSE(پوچ, 0, "Load from binary... (" << دودویی_Size << " bytes)");
 
-        CV_Assert(binarySize > 0);
+        CV_Assert(دودویی_Size > 0);
 
-        size_t ndevices = (int)ctx.ndevices();
+        size_t ndevices = (صحیح)ctx.ndevices();
         AutoBuffer<cl_device_id> devices_(ndevices);
-        AutoBuffer<const uchar*> binaryPtrs_(ndevices);
-        AutoBuffer<size_t> binarySizes_(ndevices);
+        AutoBuffer<ثابت uchar*> دودویی_Ptrs(ndevices);
+        AutoBuffer<size_t> دودویی_Sizes(ndevices);
 
         cl_device_id* devices = devices_.data();
-        const uchar** binaryPtrs = binaryPtrs_.data();
-        size_t* binarySizes = binarySizes_.data();
-        for (size_t i = 0; i < ndevices; i++)
+        ثابت uchar** دودویی_Ptrs_2 = دودویی_Ptrs.data();
+        size_t* دودویی_Sizes_2 = دودویی_Sizes.data();
+        برای (size_t i = 0; i < ndevices; i++)
         {
             devices[i] = (cl_device_id)ctx.device(i).ptr();
-            binaryPtrs[i] = binaryAddr;
-            binarySizes[i] = binarySize;
+            دودویی_Ptrs_2[i] = دودویی_Addr;
+            دودویی_Sizes_2[i] = دودویی_Size;
         }
 
         cl_int result = 0;
-        handle = clCreateProgramWithBinary((cl_context)ctx.ptr(), (cl_uint)ndevices, devices_.data(),
-                                           binarySizes, binaryPtrs, NULL, &result);
-        if (result != CL_SUCCESS)
+        handle = cl_Create_Program_With_دودویی((cl_context)ctx.ptr(), (cl_uint)ndevices, devices_.data(),
+                                           دودویی_Sizes_2, دودویی_Ptrs_2, پوچ, &result);
+        اگر (result != CL_SUCCESS)
         {
-            CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_MSG(result, "clCreateProgramWithBinary"));
-            if (handle)
+            CV_LOG_ERROR(پوچ, CV_OCL_API_ERROR_پیام(result, "clCreateProgramWithBinary"));
+            اگر (handle)
             {
                 CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                handle = NULL;
+                handle = پوچ;
             }
         }
-        if (!handle)
+        اگر (!handle)
         {
-            return false;
+            بازگشت نادرست;
         }
         // call clBuildProgram()
         {
             result = clBuildProgram(handle, (cl_uint)ndevices, devices_.data(), buildflags.c_str(), 0, 0);
             CV_OCL_DBG_CHECK_RESULT(result, cv::format("clBuildProgram(binary: %s/%s)", sourceModule_.c_str(), sourceName_.c_str()).c_str());
-            if (result != CL_SUCCESS)
+            اگر (result != CL_SUCCESS)
             {
                 dumpBuildLog_(result, devices, errmsg);
-                if (handle)
+                اگر (handle)
                 {
                     CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                    handle = NULL;
+                    handle = پوچ;
                 }
-                return false;
+                بازگشت نادرست;
             }
         }
         // check build status
@@ -4705,57 +4705,57 @@ struct Program::Impl
             cl_build_status build_status = CL_BUILD_NONE;
             size_t retsz = 0;
             CV_OCL_DBG_CHECK(result = clGetProgramBuildInfo(handle, devices[0], CL_PROGRAM_BUILD_STATUS,
-                    sizeof(build_status), &build_status, &retsz));
-            if (result == CL_SUCCESS)
+                    اندازه(build_status), &build_status, &retsz));
+            اگر (result == CL_SUCCESS)
             {
-                if (build_status == CL_BUILD_SUCCESS)
+                اگر (build_status == CL_BUILD_SUCCESS)
                 {
-                    return true;
+                    بازگشت درست;
                 }
-                else
+                وگرنه
                 {
-                    CV_LOG_WARNING(NULL, "clGetProgramBuildInfo() returns " << build_status);
-                    return false;
+                    CV_LOG_WARNING(پوچ, "clGetProgramBuildInfo() returns " << build_status);
+                    بازگشت نادرست;
                 }
             }
-            else
+            وگرنه
             {
-                CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_MSG(result, "clGetProgramBuildInfo()"));
-                if (handle)
+                CV_LOG_ERROR(پوچ, CV_OCL_API_ERROR_پیام(result, "clGetProgramBuildInfo()"));
+                اگر (handle)
                 {
                     CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                    handle = NULL;
+                    handle = پوچ;
                 }
             }
         }
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-        if (handle && CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#اگر CV_OPENCL_VALIDATE_دودویی_PROGRAMS
+        اگر (handle && CV_OPENCL_VALIDATE_دودویی_PROGRAMS_مقدار)
         {
-            CV_LOG_INFO(NULL, "OpenCL: query kernel names (binary)...");
+            CV_LOG_INFO(پوچ, "OpenCL: query kernel names (binary)...");
             size_t retsz = 0;
-            char kernels_buffer[4096] = {0};
-            result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, sizeof(kernels_buffer), &kernels_buffer[0], &retsz);
-            if (retsz < sizeof(kernels_buffer))
+            نویسه kernels_buffer[4096] = {0};
+            result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, اندازه(kernels_buffer), &kernels_buffer[0], &retsz);
+            اگر (retsz < اندازه(kernels_buffer))
                 kernels_buffer[retsz] = 0;
-            else
+            وگرنه
                 kernels_buffer[0] = 0;
-            CV_LOG_INFO(NULL, result << ": Kernels='" << kernels_buffer << "'");
+            CV_LOG_INFO(پوچ, result << ": Kernels='" << kernels_buffer << "'");
         }
 #endif
-        return handle != NULL;
+        بازگشت handle != پوچ;
     }
 
     ~Impl()
     {
-        if( handle )
+        اگر( handle )
         {
 #ifdef _WIN32
-            if (!cv::__termination)
+            اگر (!cv::__termination)
 #endif
             {
                 clReleaseProgram(handle);
             }
-            handle = NULL;
+            handle = پوچ;
         }
     }
 
@@ -4772,29 +4772,29 @@ Program::Program() CV_NOEXCEPT
     p = 0;
 }
 
-Program::Program(const ProgramSource& src,
-        const String& buildflags, String& errmsg)
+Program::Program(ثابت ProgramSource& src,
+        ثابت String& buildflags, String& errmsg)
 {
     p = 0;
     create(src, buildflags, errmsg);
 }
 
-Program::Program(const Program& prog)
+Program::Program(ثابت Program& prog)
 {
     p = prog.p;
-    if(p)
+    اگر(p)
         p->addref();
 }
 
-Program& Program::operator = (const Program& prog)
+Program& Program::operator = (ثابت Program& prog)
 {
     Impl* newp = (Impl*)prog.p;
-    if(newp)
+    اگر(newp)
         newp->addref();
-    if(p)
+    اگر(p)
         p->release();
     p = newp;
-    return *this;
+    بازگشت *این;
 }
 
 Program::Program(Program&& prog) CV_NOEXCEPT
@@ -4805,126 +4805,126 @@ Program::Program(Program&& prog) CV_NOEXCEPT
 
 Program& Program::operator = (Program&& prog) CV_NOEXCEPT
 {
-    if (this != &prog) {
-        if(p)
+    اگر (این != &prog) {
+        اگر(p)
             p->release();
         p = prog.p;
         prog.p = nullptr;
     }
-    return *this;
+    بازگشت *این;
 }
 
 Program::~Program()
 {
-    if(p)
+    اگر(p)
         p->release();
 }
 
-bool Program::create(const ProgramSource& src,
-            const String& buildflags, String& errmsg)
+منطقی Program::create(ثابت ProgramSource& src,
+            ثابت String& buildflags, String& errmsg)
 {
-    if(p)
+    اگر(p)
     {
         p->release();
-        p = NULL;
+        p = پوچ;
     }
-    p = new Impl(src, buildflags, errmsg);
-    if(!p->handle)
+    p = جدید Impl(src, buildflags, errmsg);
+    اگر(!p->handle)
     {
         p->release();
         p = 0;
     }
-    return p != 0;
+    بازگشت p != 0;
 }
 
-void* Program::ptr() const
+تهی* Program::ptr() ثابت
 {
-    return p ? p->handle : 0;
+    بازگشت p ? p->handle : 0;
 }
 
 #ifndef OPENCV_REMOVE_DEPRECATED_API
-const ProgramSource& Program::source() const
+ثابت ProgramSource& Program::source() ثابت
 {
     CV_Error(Error::StsNotImplemented, "Removed API");
 }
 
-bool Program::read(const String& bin, const String& buildflags)
+منطقی Program::اقرأ(ثابت String& bin, ثابت String& buildflags)
 {
     CV_UNUSED(bin); CV_UNUSED(buildflags);
     CV_Error(Error::StsNotImplemented, "Removed API");
 }
 
-bool Program::write(String& bin) const
+منطقی Program::اكتب(String& bin) ثابت
 {
     CV_UNUSED(bin);
     CV_Error(Error::StsNotImplemented, "Removed API");
 }
 
-String Program::getPrefix() const
+String Program::getPrefix() ثابت
 {
-    if(!p)
-        return String();
+    اگر(!p)
+        بازگشت String();
     Context::Impl* ctx_ = Context::getDefault().getImpl();
     CV_Assert(ctx_);
-    return cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), p->buildflags.c_str());
+    بازگشت cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), p->buildflags.c_str());
 }
 
-String Program::getPrefix(const String& buildflags)
+String Program::getPrefix(ثابت String& buildflags)
 {
         Context::Impl* ctx_ = Context::getDefault().getImpl();
         CV_Assert(ctx_);
-        return cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), buildflags.c_str());
+        بازگشت cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), buildflags.c_str());
 }
 #endif // OPENCV_REMOVE_DEPRECATED_API
 
-void Program::getBinary(std::vector<char>& binary) const
+تهی Program::get_دودویی(std::vector<نویسه>& binary) ثابت
 {
     CV_Assert(p && "Empty program");
-    p->getProgramBinary(binary);
+    p->get_Program_دودویی(binary);
 }
 
-Program Context::Impl::getProg(const ProgramSource& src,
-                               const String& buildflags, String& errmsg)
+Program Context::Impl::getProg(ثابت ProgramSource& src,
+                               ثابت String& buildflags, String& errmsg)
 {
-    size_t limit = getProgramCountLimit();
-    const ProgramSource::Impl* src_ = src.getImpl();
+    size_t limit = get_Program_شمار_Limit();
+    ثابت ProgramSource::Impl* src_ = src.getImpl();
     CV_Assert(src_);
-    String key = cv::format("module=%s name=%s codehash=%s\nopencl=%s\nbuildflags=%s",
+    String کلید = cv::format("module=%s name=%s codehash=%s\nopencl=%s\nbuildflags=%s",
             src_->module_.c_str(), src_->name_.c_str(), src_->sourceHash_.c_str(),
             getPrefixString().c_str(),
             buildflags.c_str());
     {
         cv::AutoLock lock(program_cache_mutex);
-        phash_t::iterator it = phash.find(key);
-        if (it != phash.end())
+        phash_t::iterator it = phash.find(کلید);
+        اگر (it != phash.end())
         {
             // TODO LRU cache
-            CacheList::iterator i = std::find(cacheList.begin(), cacheList.end(), key);
-            if (i != cacheList.end() && i != cacheList.begin())
+            CacheList::iterator i = std::find(cacheList.begin(), cacheList.end(), کلید);
+            اگر (i != cacheList.end() && i != cacheList.begin())
             {
                 cacheList.erase(i);
-                cacheList.push_front(key);
+                cacheList.push_front(کلید);
             }
-            return it->second;
+            بازگشت it->second;
         }
         { // cleanup program cache
             size_t sz = phash.size();
-            if (limit > 0 && sz >= limit)
+            اگر (limit > 0 && sz >= limit)
             {
-                static bool warningFlag = false;
-                if (!warningFlag)
+                ایستا منطقی warningFlag = نادرست;
+                اگر (!warningFlag)
                 {
                     printf("\nWARNING: OpenCV-OpenCL:\n"
                         "    In-memory cache for OpenCL programs is full, older programs will be unloaded.\n"
                         "    You can change cache size via OPENCV_OPENCL_PROGRAM_CACHE environment variable\n\n");
-                    warningFlag = true;
+                    warningFlag = درست;
                 }
-                while (!cacheList.empty())
+                وقتی (!cacheList.empty())
                 {
                     size_t c = phash.erase(cacheList.back());
                     cacheList.pop_back();
-                    if (c != 0)
-                        break;
+                    اگر (c != 0)
+                        بشکن;
                 }
             }
         }
@@ -4933,31 +4933,31 @@ Program Context::Impl::getProg(const ProgramSource& src,
     // Cache result of build failures too (to prevent unnecessary compiler invocations)
     {
         cv::AutoLock lock(program_cache_mutex);
-        phash.insert(std::pair<std::string, Program>(key, prog));
-        cacheList.push_front(key);
+        phash.insert(std::pair<std::string, Program>(کلید, prog));
+        cacheList.push_front(کلید);
     }
-    return prog;
+    بازگشت prog;
 }
 
 
 //////////////////////////////////////////// OpenCLAllocator //////////////////////////////////////////////////
 
 template<typename T>
-class OpenCLBufferPool
+رده OpenCLBufferPool
 {
-protected:
+محافظتشده:
     ~OpenCLBufferPool() { }
-public:
-    virtual T allocate(size_t size) = 0;
-    virtual void release(T buffer) = 0;
+عمومی:
+    مجازی T allocate(size_t size) = 0;
+    مجازی تهی release(T buffer) = 0;
 };
 
 template <typename Derived, typename BufferEntry, typename T>
-class OpenCLBufferPoolBaseImpl : public BufferPoolController, public OpenCLBufferPool<T>
+رده OpenCLBufferPoolBaseImpl : عمومی BufferPoolController, عمومی OpenCLBufferPool<T>
 {
-private:
-    inline Derived& derived() { return *static_cast<Derived*>(this); }
-protected:
+خصوصی:
+    درونخطی Derived& derived() { بازگشت *static_cast<Derived*>(این); }
+محافظتشده:
     Mutex mutex_;
 
     size_t currentReservedSize;
@@ -4967,66 +4967,66 @@ protected:
     std::list<BufferEntry> reservedEntries_; // LRU order. Allocated, but not used entries
 
     // synchronized
-    bool _findAndRemoveEntryFromAllocatedList(CV_OUT BufferEntry& entry, T buffer)
+    منطقی _findAndRemoveEntryFromAllocatedList(CV_OUT BufferEntry& entry, T buffer)
     {
         typename std::list<BufferEntry>::iterator i = allocatedEntries_.begin();
-        for (; i != allocatedEntries_.end(); ++i)
+        برای (; i != allocatedEntries_.end(); ++i)
         {
             BufferEntry& e = *i;
-            if (e.clBuffer_ == buffer)
+            اگر (e.clBuffer_ == buffer)
             {
                 entry = e;
                 allocatedEntries_.erase(i);
-                return true;
+                بازگشت درست;
             }
         }
-        return false;
+        بازگشت نادرست;
     }
 
     // synchronized
-    bool _findAndRemoveEntryFromReservedList(CV_OUT BufferEntry& entry, const size_t size)
+    منطقی _findAndRemoveEntryFromReservedList(CV_OUT BufferEntry& entry, ثابت size_t size)
     {
-        if (reservedEntries_.empty())
-            return false;
+        اگر (reservedEntries_.empty())
+            بازگشت نادرست;
         typename std::list<BufferEntry>::iterator i = reservedEntries_.begin();
         typename std::list<BufferEntry>::iterator result_pos = reservedEntries_.end();
         BufferEntry result;
         size_t minDiff = (size_t)(-1);
-        for (; i != reservedEntries_.end(); ++i)
+        برای (; i != reservedEntries_.end(); ++i)
         {
             BufferEntry& e = *i;
-            if (e.capacity_ >= size)
+            اگر (e.capacity_ >= size)
             {
                 size_t diff = e.capacity_ - size;
-                if (diff < std::max((size_t)4096, size / 8) && (result_pos == reservedEntries_.end() || diff < minDiff))
+                اگر (diff < std::max((size_t)4096, size / 8) && (result_pos == reservedEntries_.end() || diff < minDiff))
                 {
                     minDiff = diff;
                     result_pos = i;
                     result = e;
-                    if (diff == 0)
-                        break;
+                    اگر (diff == 0)
+                        بشکن;
                 }
             }
         }
-        if (result_pos != reservedEntries_.end())
+        اگر (result_pos != reservedEntries_.end())
         {
             //CV_DbgAssert(result == *result_pos);
             reservedEntries_.erase(result_pos);
             entry = result;
             currentReservedSize -= entry.capacity_;
             allocatedEntries_.push_back(entry);
-            return true;
+            بازگشت درست;
         }
-        return false;
+        بازگشت نادرست;
     }
 
     // synchronized
-    void _checkSizeOfReservedEntries()
+    تهی _checkSizeOfReservedEntries()
     {
-        while (currentReservedSize > maxReservedSize)
+        وقتی (currentReservedSize > maxReservedSize)
         {
             CV_DbgAssert(!reservedEntries_.empty());
-            const BufferEntry& entry = reservedEntries_.back();
+            ثابت BufferEntry& entry = reservedEntries_.back();
             CV_DbgAssert(currentReservedSize >= entry.capacity_);
             currentReservedSize -= entry.capacity_;
             derived()._releaseBufferEntry(entry);
@@ -5034,55 +5034,55 @@ protected:
         }
     }
 
-    inline size_t _allocationGranularity(size_t size)
+    درونخطی size_t _allocationGranularity(size_t size)
     {
         // heuristic values
-        if (size < 1024*1024)
-            return 4096;  // don't work with buffers smaller than 4Kb (hidden allocation overhead issue)
-        else if (size < 16*1024*1024)
-            return 64*1024;
-        else
-            return 1024*1024;
+        اگر (size < 1024*1024)
+            بازگشت 4096;  // don't work with buffers smaller than 4Kb (hidden allocation overhead issue)
+        وگرنه اگر (size < 16*1024*1024)
+            بازگشت 64*1024;
+        وگرنه
+            بازگشت 1024*1024;
     }
 
-public:
+عمومی:
     OpenCLBufferPoolBaseImpl()
         : currentReservedSize(0),
           maxReservedSize(0)
     {
         // nothing
     }
-    virtual ~OpenCLBufferPoolBaseImpl()
+    مجازی ~OpenCLBufferPoolBaseImpl()
     {
         freeAllReservedBuffers();
         CV_Assert(reservedEntries_.empty());
     }
-public:
-    virtual T allocate(size_t size) CV_OVERRIDE
+عمومی:
+    مجازی T allocate(size_t size) CV_OVERRIDE
     {
         AutoLock locker(mutex_);
         BufferEntry entry;
-        if (maxReservedSize > 0 && _findAndRemoveEntryFromReservedList(entry, size))
+        اگر (maxReservedSize > 0 && _findAndRemoveEntryFromReservedList(entry, size))
         {
             CV_DbgAssert(size <= entry.capacity_);
             LOG_BUFFER_POOL("Reuse reserved buffer: %p\n", entry.clBuffer_);
         }
-        else
+        وگرنه
         {
             derived()._allocateBufferEntry(entry, size);
         }
-        return entry.clBuffer_;
+        بازگشت entry.clBuffer_;
     }
-    virtual void release(T buffer) CV_OVERRIDE
+    مجازی تهی release(T buffer) CV_OVERRIDE
     {
         AutoLock locker(mutex_);
         BufferEntry entry;
         CV_Assert(_findAndRemoveEntryFromAllocatedList(entry, buffer));
-        if (maxReservedSize == 0 || entry.capacity_ > maxReservedSize / 8)
+        اگر (maxReservedSize == 0 || entry.capacity_ > maxReservedSize / 8)
         {
             derived()._releaseBufferEntry(entry);
         }
-        else
+        وگرنه
         {
             reservedEntries_.push_front(entry);
             currentReservedSize += entry.capacity_;
@@ -5090,39 +5090,39 @@ public:
         }
     }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return currentReservedSize; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return maxReservedSize; }
-    virtual void setMaxReservedSize(size_t size) CV_OVERRIDE
+    مجازی size_t getReservedSize() ثابت CV_OVERRIDE { بازگشت currentReservedSize; }
+    مجازی size_t getMaxReservedSize() ثابت CV_OVERRIDE { بازگشت maxReservedSize; }
+    مجازی تهی setMaxReservedSize(size_t size) CV_OVERRIDE
     {
         AutoLock locker(mutex_);
         size_t oldMaxReservedSize = maxReservedSize;
         maxReservedSize = size;
-        if (maxReservedSize < oldMaxReservedSize)
+        اگر (maxReservedSize < oldMaxReservedSize)
         {
             typename std::list<BufferEntry>::iterator i = reservedEntries_.begin();
-            for (; i != reservedEntries_.end();)
+            برای (; i != reservedEntries_.end();)
             {
-                const BufferEntry& entry = *i;
-                if (entry.capacity_ > maxReservedSize / 8)
+                ثابت BufferEntry& entry = *i;
+                اگر (entry.capacity_ > maxReservedSize / 8)
                 {
                     CV_DbgAssert(currentReservedSize >= entry.capacity_);
                     currentReservedSize -= entry.capacity_;
                     derived()._releaseBufferEntry(entry);
                     i = reservedEntries_.erase(i);
-                    continue;
+                    ادامه;
                 }
                 ++i;
             }
             _checkSizeOfReservedEntries();
         }
     }
-    virtual void freeAllReservedBuffers() CV_OVERRIDE
+    مجازی تهی freeAllReservedBuffers() CV_OVERRIDE
     {
         AutoLock locker(mutex_);
         typename std::list<BufferEntry>::const_iterator i = reservedEntries_.begin();
-        for (; i != reservedEntries_.end(); ++i)
+        برای (; i != reservedEntries_.end(); ++i)
         {
-            const BufferEntry& entry = *i;
+            ثابت BufferEntry& entry = *i;
             derived()._releaseBufferEntry(entry);
         }
         reservedEntries_.clear();
@@ -5130,35 +5130,35 @@ public:
     }
 };
 
-struct CLBufferEntry
+ساختار CLBufferEntry
 {
     cl_mem clBuffer_;
     size_t capacity_;
-    CLBufferEntry() : clBuffer_((cl_mem)NULL), capacity_(0) { }
+    CLBufferEntry() : clBuffer_((cl_mem)پوچ), capacity_(0) { }
 };
 
-class OpenCLBufferPoolImpl CV_FINAL : public OpenCLBufferPoolBaseImpl<OpenCLBufferPoolImpl, CLBufferEntry, cl_mem>
+رده OpenCLBufferPoolImpl CV_FINAL : عمومی OpenCLBufferPoolBaseImpl<OpenCLBufferPoolImpl, CLBufferEntry, cl_mem>
 {
-public:
-    typedef struct CLBufferEntry BufferEntry;
-protected:
-    int createFlags_;
-public:
-    OpenCLBufferPoolImpl(int createFlags = 0)
+عمومی:
+    تعریفنوع ساختار CLBufferEntry BufferEntry;
+محافظتشده:
+    صحیح createFlags_;
+عمومی:
+    OpenCLBufferPoolImpl(صحیح createFlags = 0)
         : createFlags_(createFlags)
     {
     }
 
-    void _allocateBufferEntry(BufferEntry& entry, size_t size)
+    تهی _allocateBufferEntry(BufferEntry& entry, size_t size)
     {
-        CV_DbgAssert(entry.clBuffer_ == NULL);
-        entry.capacity_ = alignSize(size, (int)_allocationGranularity(size));
+        CV_DbgAssert(entry.clBuffer_ == پوچ);
+        entry.capacity_ = alignSize(size, (صحیح)_allocationGranularity(size));
         Context& ctx = Context::getDefault();
         cl_int retval = CL_SUCCESS;
         entry.clBuffer_ = clCreateBuffer((cl_context)ctx.ptr(), CL_MEM_READ_WRITE|createFlags_, entry.capacity_, 0, &retval);
-        CV_OCL_CHECK_RESULT(retval, cv::format("clCreateBuffer(capacity=%lld) => %p", (long long int)entry.capacity_, (void*)entry.clBuffer_).c_str());
-        CV_Assert(entry.clBuffer_ != NULL);
-        if(retval == CL_SUCCESS)
+        CV_OCL_CHECK_RESULT(retval, cv::format("clCreateBuffer(capacity=%lld) => %p", (long long صحیح)entry.capacity_, (تهی*)entry.clBuffer_).c_str());
+        CV_Assert(entry.clBuffer_ != پوچ);
+        اگر(retval == CL_SUCCESS)
         {
             CV_IMPL_ADD(CV_IMPL_OCL);
         }
@@ -5167,10 +5167,10 @@ public:
         allocatedEntries_.push_back(entry);
     }
 
-    void _releaseBufferEntry(const BufferEntry& entry)
+    تهی _releaseBufferEntry(ثابت BufferEntry& entry)
     {
         CV_Assert(entry.capacity_ != 0);
-        CV_Assert(entry.clBuffer_ != NULL);
+        CV_Assert(entry.clBuffer_ != پوچ);
         LOG_BUFFER_POOL("OpenCL release buffer: %p, %lld (0x%llx) bytes\n",
                 entry.clBuffer_, (long long)entry.capacity_, (long long)entry.capacity_);
         CV_OCL_DBG_CHECK(clReleaseMemObject(entry.clBuffer_));
@@ -5178,37 +5178,37 @@ public:
 };
 
 #ifdef HAVE_OPENCL_SVM
-struct CLSVMBufferEntry
+ساختار CLSVMBufferEntry
 {
-    void* clBuffer_;
+    تهی* clBuffer_;
     size_t capacity_;
-    CLSVMBufferEntry() : clBuffer_(NULL), capacity_(0) { }
+    CLSVMBufferEntry() : clBuffer_(پوچ), capacity_(0) { }
 };
-class OpenCLSVMBufferPoolImpl CV_FINAL : public OpenCLBufferPoolBaseImpl<OpenCLSVMBufferPoolImpl, CLSVMBufferEntry, void*>
+رده OpenCLSVMBufferPoolImpl CV_FINAL : عمومی OpenCLBufferPoolBaseImpl<OpenCLSVMBufferPoolImpl, CLSVMBufferEntry, تهی*>
 {
-public:
-    typedef struct CLSVMBufferEntry BufferEntry;
-public:
+عمومی:
+    تعریفنوع ساختار CLSVMBufferEntry BufferEntry;
+عمومی:
     OpenCLSVMBufferPoolImpl()
     {
     }
 
-    void _allocateBufferEntry(BufferEntry& entry, size_t size)
+    تهی _allocateBufferEntry(BufferEntry& entry, size_t size)
     {
-        CV_DbgAssert(entry.clBuffer_ == NULL);
-        entry.capacity_ = alignSize(size, (int)_allocationGranularity(size));
+        CV_DbgAssert(entry.clBuffer_ == پوچ);
+        entry.capacity_ = alignSize(size, (صحیح)_allocationGranularity(size));
 
         Context& ctx = Context::getDefault();
-        const svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
-        bool isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
+        ثابت svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
+        منطقی isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
         cl_svm_mem_flags memFlags = CL_MEM_READ_WRITE |
                 (isFineGrainBuffer ? CL_MEM_SVM_FINE_GRAIN_BUFFER : 0);
 
-        const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+        ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
         CV_DbgAssert(svmFns->isValid());
 
-        CV_OPENCL_SVM_TRACE_P("clSVMAlloc: %d\n", (int)entry.capacity_);
-        void *buf = svmFns->fn_clSVMAlloc((cl_context)ctx.ptr(), memFlags, entry.capacity_, 0);
+        CV_OPENCL_SVM_TRACE_P("clSVMAlloc: %d\n", (صحیح)entry.capacity_);
+        تهی *buf = svmFns->fn_clSVMAlloc((cl_context)ctx.ptr(), memFlags, entry.capacity_, 0);
         CV_Assert(buf);
 
         entry.clBuffer_ = buf;
@@ -5220,14 +5220,14 @@ public:
         allocatedEntries_.push_back(entry);
     }
 
-    void _releaseBufferEntry(const BufferEntry& entry)
+    تهی _releaseBufferEntry(ثابت BufferEntry& entry)
     {
         CV_Assert(entry.capacity_ != 0);
-        CV_Assert(entry.clBuffer_ != NULL);
+        CV_Assert(entry.clBuffer_ != پوچ);
         LOG_BUFFER_POOL("OpenCL release SVM buffer: %p, %lld (0x%llx) bytes\n",
                 entry.clBuffer_, (long long)entry.capacity_, (long long)entry.capacity_);
         Context& ctx = Context::getDefault();
-        const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+        ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
         CV_DbgAssert(svmFns->isValid());
         CV_OPENCL_SVM_TRACE_P("clSVMFree: %p\n",  entry.clBuffer_);
         svmFns->fn_clSVMFree((cl_context)ctx.ptr(), entry.clBuffer_);
@@ -5237,111 +5237,111 @@ public:
 
 
 
-template <bool readAccess, bool writeAccess>
-class AlignedDataPtr
+template <منطقی readAccess, منطقی writeAccess>
+رده AlignedDataPtr
 {
-protected:
-    const size_t size_;
-    uchar* const originPtr_;
-    const size_t alignment_;
+محافظتشده:
+    ثابت size_t size_;
+    uchar* ثابت originPtr_;
+    ثابت size_t alignment_;
     uchar* ptr_;
     uchar* allocatedPtr_;
 
-public:
+عمومی:
     AlignedDataPtr(uchar* ptr, size_t size, size_t alignment)
-        : size_(size), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(NULL)
+        : size_(size), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(پوچ)
     {
         CV_DbgAssert((alignment & (alignment - 1)) == 0); // check for 2^n
         CV_DbgAssert(!readAccess || ptr);
-        if (((size_t)ptr_ & (alignment - 1)) != 0)
+        اگر (((size_t)ptr_ & (alignment - 1)) != 0)
         {
-            allocatedPtr_ = new uchar[size_ + alignment - 1];
+            allocatedPtr_ = جدید uchar[size_ + alignment - 1];
             ptr_ = (uchar*)(((uintptr_t)allocatedPtr_ + (alignment - 1)) & ~(alignment - 1));
-            if (readAccess)
+            اگر (readAccess)
             {
                 memcpy(ptr_, originPtr_, size_);
             }
         }
     }
 
-    uchar* getAlignedPtr() const
+    uchar* getAlignedPtr() ثابت
     {
         CV_DbgAssert(((size_t)ptr_ & (alignment_ - 1)) == 0);
-        return ptr_;
+        بازگشت ptr_;
     }
 
     ~AlignedDataPtr()
     {
-        if (allocatedPtr_)
+        اگر (allocatedPtr_)
         {
-            if (writeAccess)
+            اگر (writeAccess)
             {
                 memcpy(originPtr_, ptr_, size_);
             }
             delete[] allocatedPtr_;
-            allocatedPtr_ = NULL;
+            allocatedPtr_ = پوچ;
         }
-        ptr_ = NULL;
+        ptr_ = پوچ;
     }
-private:
-    AlignedDataPtr(const AlignedDataPtr&); // disabled
-    AlignedDataPtr& operator=(const AlignedDataPtr&); // disabled
+خصوصی:
+    AlignedDataPtr(ثابت AlignedDataPtr&); // disabled
+    AlignedDataPtr& operator=(ثابت AlignedDataPtr&); // disabled
 };
 
-template <bool readAccess, bool writeAccess>
-class AlignedDataPtr2D
+template <منطقی readAccess, منطقی writeAccess>
+رده AlignedDataPtr2D
 {
-protected:
-    const size_t size_;
-    uchar* const originPtr_;
-    const size_t alignment_;
+محافظتشده:
+    ثابت size_t size_;
+    uchar* ثابت originPtr_;
+    ثابت size_t alignment_;
     uchar* ptr_;
     uchar* allocatedPtr_;
     size_t rows_;
     size_t cols_;
     size_t step_;
 
-public:
+عمومی:
     AlignedDataPtr2D(uchar* ptr, size_t rows, size_t cols, size_t step, size_t alignment, size_t extrabytes=0)
-        : size_(rows*step), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(NULL), rows_(rows), cols_(cols), step_(step)
+        : size_(rows*step), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(پوچ), rows_(rows), cols_(cols), step_(step)
     {
         CV_DbgAssert((alignment & (alignment - 1)) == 0); // check for 2^n
-        CV_DbgAssert(!readAccess || ptr != NULL);
-        if (ptr == 0 || ((size_t)ptr_ & (alignment - 1)) != 0)
+        CV_DbgAssert(!readAccess || ptr != پوچ);
+        اگر (ptr == 0 || ((size_t)ptr_ & (alignment - 1)) != 0)
         {
-            allocatedPtr_ = new uchar[size_ + extrabytes + alignment - 1];
+            allocatedPtr_ = جدید uchar[size_ + extrabytes + alignment - 1];
             ptr_ = (uchar*)(((uintptr_t)allocatedPtr_ + (alignment - 1)) & ~(alignment - 1));
-            if (readAccess)
+            اگر (readAccess)
             {
-                for (size_t i = 0; i < rows_; i++)
+                برای (size_t i = 0; i < rows_; i++)
                     memcpy(ptr_ + i*step_, originPtr_ + i*step_, cols_);
             }
         }
     }
 
-    uchar* getAlignedPtr() const
+    uchar* getAlignedPtr() ثابت
     {
         CV_DbgAssert(((size_t)ptr_ & (alignment_ - 1)) == 0);
-        return ptr_;
+        بازگشت ptr_;
     }
 
     ~AlignedDataPtr2D()
     {
-        if (allocatedPtr_)
+        اگر (allocatedPtr_)
         {
-            if (writeAccess)
+            اگر (writeAccess)
             {
-                for (size_t i = 0; i < rows_; i++)
+                برای (size_t i = 0; i < rows_; i++)
                     memcpy(originPtr_ + i*step_, ptr_ + i*step_, cols_);
             }
             delete[] allocatedPtr_;
-            allocatedPtr_ = NULL;
+            allocatedPtr_ = پوچ;
         }
-        ptr_ = NULL;
+        ptr_ = پوچ;
     }
-private:
-    AlignedDataPtr2D(const AlignedDataPtr2D&); // disabled
-    AlignedDataPtr2D& operator=(const AlignedDataPtr2D&); // disabled
+خصوصی:
+    AlignedDataPtr2D(ثابت AlignedDataPtr2D&); // disabled
+    AlignedDataPtr2D& operator=(ثابت AlignedDataPtr2D&); // disabled
 };
 
 #ifndef CV_OPENCL_DATA_PTR_ALIGNMENT
@@ -5349,7 +5349,7 @@ private:
 #endif
 
 
-void Context::Impl::__init_buffer_pools()
+تهی Context::Impl::__init_buffer_pools()
 {
     bufferPool_ = std::make_shared<OpenCLBufferPoolImpl>(0);
     OpenCLBufferPoolImpl& bufferPool = *bufferPool_.get();
@@ -5369,13 +5369,13 @@ void Context::Impl::__init_buffer_pools()
     bufferPoolSVM.setMaxReservedSize(poolSizeSVM);
 #endif
 
-    CV_LOG_INFO(NULL, "OpenCL: Initializing buffer pool for context@" << contextId << " with max capacity: poolSize=" << poolSize << " poolSizeHostPtr=" << poolSizeHostPtr);
+    CV_LOG_INFO(پوچ, "OpenCL: Initializing buffer pool for context@" << contextId << " with max capacity: poolSize=" << poolSize << " poolSizeHostPtr=" << poolSizeHostPtr);
 }
 
-class OpenCLAllocator CV_FINAL : public MatAllocator
+رده OpenCLAllocator CV_FINAL : عمومی MatAllocator
 {
-public:
-    enum AllocatorFlags
+عمومی:
+    شمارش AllocatorFlags
     {
         ALLOCATOR_FLAGS_BUFFER_POOL_USED = 1 << 0,
         ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED = 1 << 1,
@@ -5394,32 +5394,32 @@ public:
         flushCleanupQueue();
     }
 
-    UMatData* defaultAllocate(int dims, const int* sizes, int type, void* data, size_t* step,
-            AccessFlag flags, UMatUsageFlags usageFlags) const
+    UMatData* defaultAllocate(صحیح dims, ثابت صحیح* sizes, صحیح type, تهی* data, size_t* step,
+            AccessFlag flags, UMatUsageFlags usageFlags) ثابت
     {
         UMatData* u = matStdAllocator->allocate(dims, sizes, type, data, step, flags, usageFlags);
-        return u;
+        بازگشت u;
     }
 
-    static bool isOpenCLMapForced()  // force clEnqueueMapBuffer / clEnqueueUnmapMemObject OpenCL API
+    ایستا منطقی isOpenCLMapForced()  // force clEnqueueMapBuffer / clEnqueueUnmapMemObject OpenCL API
     {
-        static bool value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_MAPPING", false);
-        return value;
+        ایستا منطقی value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_MAPPING", نادرست);
+        بازگشت value;
     }
-    static bool isOpenCLCopyingForced()  // force clEnqueueReadBuffer[Rect] / clEnqueueWriteBuffer[Rect] OpenCL API
+    ایستا منطقی isOpenCLCopyingForced()  // force clEnqueueReadBuffer[Rect] / clEnqueueWriteBuffer[Rect] OpenCL API
     {
-        static bool value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_COPYING", false);
-        return value;
+        ایستا منطقی value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_COPYING", نادرست);
+        بازگشت value;
     }
 
-    void getBestFlags(const Context& ctx, AccessFlag /*flags*/, UMatUsageFlags usageFlags, int& createFlags, UMatData::MemoryFlag& flags0) const
+    تهی getBestFlags(ثابت Context& ctx, AccessFlag /*flags*/, UMatUsageFlags usageFlags, صحیح& createFlags, UMatData::MemoryFlag& flags0) ثابت
     {
-        const Device& dev = ctx.device(0);
+        ثابت Device& dev = ctx.device(0);
         createFlags = 0;
-        if ((usageFlags & USAGE_ALLOCATE_HOST_MEMORY) != 0)
+        اگر ((usageFlags & USAGE_ALLOCATE_HOST_MEMORY) != 0)
             createFlags |= CL_MEM_ALLOC_HOST_PTR;
 
-        if (!isOpenCLCopyingForced() &&
+        اگر (!isOpenCLCopyingForced() &&
             (isOpenCLMapForced() ||
                 (dev.hostUnifiedMemory()
 #ifndef __APPLE__
@@ -5429,150 +5429,150 @@ public:
             )
         )
             flags0 = static_cast<UMatData::MemoryFlag>(0);
-        else
+        وگرنه
             flags0 = UMatData::COPY_ON_MAP;
     }
 
-    UMatData* allocate(int dims, const int* sizes, int type,
-                       void* data, size_t* step, AccessFlag flags, UMatUsageFlags usageFlags) const CV_OVERRIDE
+    UMatData* allocate(صحیح dims, ثابت صحیح* sizes, صحیح type,
+                       تهی* data, size_t* step, AccessFlag flags, UMatUsageFlags usageFlags) ثابت CV_OVERRIDE
     {
-        if(!useOpenCL())
-            return defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
+        اگر(!useOpenCL())
+            بازگشت defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
 
         flushCleanupQueue();
 
         CV_Assert(data == 0);
         size_t total = CV_ELEM_SIZE(type);
-        for( int i = dims-1; i >= 0; i-- )
+        برای( صحیح i = dims-1; i >= 0; i-- )
         {
-            if( step )
+            اگر( step )
                 step[i] = total;
             total *= sizes[i];
         }
 
         Context& ctx = Context::getDefault();
-        if (!ctx.getImpl())
-            return defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
+        اگر (!ctx.getImpl())
+            بازگشت defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
         Context::Impl& ctxImpl = *ctx.getImpl();
 
-        int createFlags = 0;
+        صحیح createFlags = 0;
         UMatData::MemoryFlag flags0 = static_cast<UMatData::MemoryFlag>(0);
         getBestFlags(ctx, flags, usageFlags, createFlags, flags0);
 
-        void* handle = NULL;
-        int allocatorFlags = 0;
+        تهی* handle = پوچ;
+        صحیح allocatorFlags = 0;
 
 #ifdef HAVE_OPENCL_SVM
-        const svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
-        if (ctx.useSVM() && svm::useSVM(usageFlags) && !svmCaps.isNoSVMSupport())
+        ثابت svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
+        اگر (ctx.useSVM() && svm::useSVM(usageFlags) && !svmCaps.isNoSVMSupport())
         {
             allocatorFlags = ALLOCATOR_FLAGS_BUFFER_POOL_SVM_USED;
             handle = ctxImpl.getBufferPoolSVM().allocate(total);
 
             // this property is constant, so single buffer pool can be used here
-            bool isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
+            منطقی isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
             allocatorFlags |= isFineGrainBuffer ? svm::OPENCL_SVM_FINE_GRAIN_BUFFER : svm::OPENCL_SVM_COARSE_GRAIN_BUFFER;
         }
-        else
+        وگرنه
 #endif
-        if (createFlags == 0)
+        اگر (createFlags == 0)
         {
             allocatorFlags = ALLOCATOR_FLAGS_BUFFER_POOL_USED;
             handle = ctxImpl.getBufferPool().allocate(total);
         }
-        else if (createFlags == CL_MEM_ALLOC_HOST_PTR)
+        وگرنه اگر (createFlags == CL_MEM_ALLOC_HOST_PTR)
         {
             allocatorFlags = ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED;
             handle = ctxImpl.getBufferPoolHostPtr().allocate(total);
         }
-        else
+        وگرنه
         {
-            CV_Assert(handle != NULL); // Unsupported, throw
+            CV_Assert(handle != پوچ); // Unsupported, throw
         }
 
-        if (!handle)
-            return defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
+        اگر (!handle)
+            بازگشت defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
 
-        UMatData* u = new UMatData(this);
+        UMatData* u = جدید UMatData(این);
         u->data = 0;
         u->size = total;
         u->handle = handle;
         u->flags = flags0;
         u->allocatorFlags_ = allocatorFlags;
-        u->allocatorContext = std::static_pointer_cast<void>(std::make_shared<ocl::Context>(ctx));
+        u->allocatorContext = std::static_pointer_cast<تهی>(std::make_shared<ocl::Context>(ctx));
         CV_DbgAssert(!u->tempUMat()); // for bufferPool.release() consistency in deallocate()
-        u->markHostCopyObsolete(true);
+        u->markHostCopyObsolete(درست);
         opencl_allocator_stats.onAllocate(u->size);
-        return u;
+        بازگشت u;
     }
 
-    bool allocate(UMatData* u, AccessFlag accessFlags, UMatUsageFlags usageFlags) const CV_OVERRIDE
+    منطقی allocate(UMatData* u, AccessFlag accessFlags, UMatUsageFlags usageFlags) ثابت CV_OVERRIDE
     {
-        if(!u)
-            return false;
+        اگر(!u)
+            بازگشت نادرست;
 
         flushCleanupQueue();
 
         UMatDataAutoLock lock(u);
 
-        if(u->handle == 0)
+        اگر(u->handle == 0)
         {
             CV_Assert(u->origdata != 0);
             Context& ctx = Context::getDefault();
-            int createFlags = 0;
+            صحیح createFlags = 0;
             UMatData::MemoryFlag flags0 = static_cast<UMatData::MemoryFlag>(0);
             getBestFlags(ctx, accessFlags, usageFlags, createFlags, flags0);
 
-            bool copyOnMap = (flags0 & UMatData::COPY_ON_MAP) != 0;
+            منطقی copyOnMap = (flags0 & UMatData::COPY_ON_MAP) != 0;
 
             cl_context ctx_handle = (cl_context)ctx.ptr();
-            int allocatorFlags = 0;
+            صحیح allocatorFlags = 0;
             UMatData::MemoryFlag tempUMatFlags = static_cast<UMatData::MemoryFlag>(0);
-            void* handle = NULL;
+            تهی* handle = پوچ;
             cl_int retval = CL_SUCCESS;
 
 #ifdef HAVE_OPENCL_SVM
             svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
-            bool useSVM = ctx.useSVM() && svm::useSVM(usageFlags);
-            if (useSVM && svmCaps.isSupportFineGrainSystem())
+            منطقی useSVM = ctx.useSVM() && svm::useSVM(usageFlags);
+            اگر (useSVM && svmCaps.isSupportFineGrainSystem())
             {
                 allocatorFlags = svm::OPENCL_SVM_FINE_GRAIN_SYSTEM;
                 tempUMatFlags = UMatData::TEMP_UMAT;
                 handle = u->origdata;
-                CV_OPENCL_SVM_TRACE_P("Use fine grain system: %d (%p)\n", (int)u->size, handle);
+                CV_OPENCL_SVM_TRACE_P("Use fine grain system: %d (%p)\n", (صحیح)u->size, handle);
             }
-            else if (useSVM && (svmCaps.isSupportFineGrainBuffer() || svmCaps.isSupportCoarseGrainBuffer()))
+            وگرنه اگر (useSVM && (svmCaps.isSupportFineGrainBuffer() || svmCaps.isSupportCoarseGrainBuffer()))
             {
-                if (!(accessFlags & ACCESS_FAST)) // memcpy used
+                اگر (!(accessFlags & ACCESS_FAST)) // memcpy used
                 {
-                    bool isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
+                    منطقی isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
 
                     cl_svm_mem_flags memFlags = createFlags |
                             (isFineGrainBuffer ? CL_MEM_SVM_FINE_GRAIN_BUFFER : 0);
 
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
-                    CV_OPENCL_SVM_TRACE_P("clSVMAlloc + copy: %d\n", (int)u->size);
+                    CV_OPENCL_SVM_TRACE_P("clSVMAlloc + copy: %d\n", (صحیح)u->size);
                     handle = svmFns->fn_clSVMAlloc((cl_context)ctx.ptr(), memFlags, u->size, 0);
                     CV_Assert(handle);
 
-                    cl_command_queue q = NULL;
-                    if (!isFineGrainBuffer)
+                    cl_command_queue q = پوچ;
+                    اگر (!isFineGrainBuffer)
                     {
                         q = (cl_command_queue)Queue::getDefault().ptr();
-                        CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", handle, (int)u->size);
+                        CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", handle, (صحیح)u->size);
                         cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_TRUE, CL_MAP_WRITE,
                                 handle, u->size,
-                                0, NULL, NULL);
+                                0, پوچ, پوچ);
                         CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
 
                     }
                     memcpy(handle, u->origdata, u->size);
-                    if (!isFineGrainBuffer)
+                    اگر (!isFineGrainBuffer)
                     {
                         CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", handle);
-                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, handle, 0, NULL, NULL);
+                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, handle, 0, پوچ, پوچ);
                         CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
                     }
 
@@ -5581,21 +5581,21 @@ public:
                                                 : svm::OPENCL_SVM_COARSE_GRAIN_BUFFER;
                 }
             }
-            else
+            وگرنه
 #endif
             {
-                if( copyOnMap )
+                اگر( copyOnMap )
                     accessFlags &= ~ACCESS_FAST;
 
                 tempUMatFlags = UMatData::TEMP_UMAT;
-                if (
+                اگر (
                 #ifdef __APPLE__
                     !copyOnMap &&
                 #endif
                     CV_OPENCL_ENABLE_MEM_USE_HOST_PTR
                     // There are OpenCL runtime issues for less aligned data
                     && (CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR != 0
-                        && u->origdata == cv::alignPtr(u->origdata, (int)CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR))
+                        && u->origdata == cv::alignPtr(u->origdata, (صحیح)CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR))
                     // Avoid sharing of host memory between OpenCL buffers
                     && !(u->originalUMatData && u->originalUMatData->handle)
                 )
@@ -5605,9 +5605,9 @@ public:
                     handle = clCreateBuffer(ctx_handle, CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR),
                                             u->size, u->origdata, &retval);
                     CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer(CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR), sz=%lld, origdata=%p) => %p",
-                            (long long int)u->size, u->origdata, (void*)handle).c_str());
+                            (long long صحیح)u->size, u->origdata, (تهی*)handle).c_str());
                 }
-                if((!handle || retval < 0) && !(accessFlags & ACCESS_FAST))
+                اگر((!handle || retval < 0) && !(accessFlags & ACCESS_FAST))
                 {
                     // Allocate device-side memory and immediately copy data from the host-side pointer origdata[size].
                     // If createFlags=CL_MEM_ALLOC_HOST_PTR (aka cv::USAGE_ALLOCATE_HOST_MEMORY), then
@@ -5616,23 +5616,23 @@ public:
                     handle = clCreateBuffer(ctx_handle, CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags,
                                                u->size, u->origdata, &retval);
                     CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer(CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags, sz=%lld, origdata=%p) => %p",
-                            (long long int)u->size, u->origdata, (void*)handle).c_str());
+                            (long long صحیح)u->size, u->origdata, (تهی*)handle).c_str());
                     tempUMatFlags |= UMatData::TEMP_COPIED_UMAT;
                 }
             }
-            CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer() => %p", (void*)handle).c_str());
-            if(!handle || retval != CL_SUCCESS)
-                return false;
+            CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer() => %p", (تهی*)handle).c_str());
+            اگر(!handle || retval != CL_SUCCESS)
+                بازگشت نادرست;
             u->handle = handle;
             u->prevAllocator = u->currAllocator;
-            u->currAllocator = this;
+            u->currAllocator = این;
             u->flags |= tempUMatFlags | flags0;
             u->allocatorFlags_ = allocatorFlags;
         }
-        if (!!(accessFlags & ACCESS_WRITE))
-            u->markHostCopyObsolete(true);
+        اگر (!!(accessFlags & ACCESS_WRITE))
+            u->markHostCopyObsolete(درست);
         opencl_allocator_stats.onAllocate(u->size);
-        return true;
+        بازگشت درست;
     }
 
     /*void sync(UMatData* u) const
@@ -5665,10 +5665,10 @@ public:
         }
     }*/
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    تهی deallocate(UMatData* u) ثابت CV_OVERRIDE
     {
-        if(!u)
-            return;
+        اگر(!u)
+            بازگشت;
 
         // Next two lines: TSAN false positive: see #27638
         CV_Assert(u->urefcount == 0);
@@ -5677,147 +5677,147 @@ public:
         CV_Assert(u->handle != 0);
         CV_Assert(u->mapcount == 0);
 
-        if (!!(u->flags & UMatData::ASYNC_CLEANUP))
+        اگر (!!(u->flags & UMatData::ASYNC_CLEANUP))
             addToCleanupQueue(u);
-        else
+        وگرنه
             deallocate_(u);
     }
 
-    void deallocate_(UMatData* u) const
+    تهی deallocate_(UMatData* u) ثابت
     {
         CV_Assert(u);
         CV_Assert(u->handle);
-        if ((u->allocatorFlags_ & ALLOCATOR_FLAGS_EXTERNAL_BUFFER) == 0)
+        اگر ((u->allocatorFlags_ & ALLOCATOR_FLAGS_EXTERNAL_BUFFER) == 0)
         {
             opencl_allocator_stats.onFree(u->size);
         }
 
 #ifdef _WIN32
-        if (cv::__termination)  // process is not in consistent state (after ExitProcess call) and terminating
-            return;             // avoid any OpenCL calls
+        اگر (cv::__termination)  // process is not in consistent state (after ExitProcess call) and terminating
+            بازگشت;             // avoid any OpenCL calls
 #endif
-        if(u->tempUMat())
+        اگر(u->tempUMat())
         {
             CV_Assert(u->origdata);
 //            UMatDataAutoLock lock(u);
 
-            if (u->hostCopyObsolete())
+            اگر (u->hostCopyObsolete())
             {
 #ifdef HAVE_OPENCL_SVM
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+                اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
                 {
                     Context& ctx = Context::getDefault();
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
-                    if( u->tempCopiedUMat() )
+                    اگر( u->tempCopiedUMat() )
                     {
                         CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
                                 (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER);
-                        bool isFineGrainBuffer = (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER;
-                        cl_command_queue q = NULL;
-                        if (!isFineGrainBuffer)
+                        منطقی isFineGrainBuffer = (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER;
+                        cl_command_queue q = پوچ;
+                        اگر (!isFineGrainBuffer)
                         {
                             CV_DbgAssert(((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0));
                             q = (cl_command_queue)Queue::getDefault().ptr();
-                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
+                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (صحیح)u->size);
                             cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_READ,
                                     u->handle, u->size,
-                                    0, NULL, NULL);
+                                    0, پوچ, پوچ);
                             CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
                         }
                         clFinish(q);
                         memcpy(u->origdata, u->handle, u->size);
-                        if (!isFineGrainBuffer)
+                        اگر (!isFineGrainBuffer)
                         {
                             CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
-                            cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, NULL, NULL);
+                            cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, پوچ, پوچ);
                             CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
                         }
                     }
-                    else
+                    وگرنه
                     {
                         CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM);
                         // nothing
                     }
                 }
-                else
+                وگرنه
 #endif
                 {
                     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-                    if( u->tempCopiedUMat() )
+                    اگر( u->tempCopiedUMat() )
                     {
-                        AlignedDataPtr<false, true> alignedPtr(u->origdata, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
+                        AlignedDataPtr<نادرست, درست> alignedPtr(u->origdata, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
                         CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE, 0,
                                             u->size, alignedPtr.getAlignedPtr(), 0, 0, 0));
                     }
-                    else
+                    وگرنه
                     {
                         cl_int retval = 0;
-                        if (u->tempUMat())
+                        اگر (u->tempUMat())
                         {
                             CV_Assert(u->mapcount == 0);
                             flushCleanupQueue(); // workaround for CL_OUT_OF_RESOURCES problem (#9960)
-                            void* data = clEnqueueMapBuffer(q, (cl_mem)u->handle, CL_TRUE,
+                            تهی* data = clEnqueueMapBuffer(q, (cl_mem)u->handle, CL_TRUE,
                                 (CL_MAP_READ | CL_MAP_WRITE),
                                 0, u->size, 0, 0, 0, &retval);
-                            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (void*)u->handle, (long long int)u->size, data).c_str());
+                            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (تهی*)u->handle, (long long صحیح)u->size, data).c_str());
                             CV_Assert(u->origdata == data && "Details: https://github.com/opencv/opencv/issues/6293");
-                            if (u->originalUMatData)
+                            اگر (u->originalUMatData)
                             {
                                 CV_Assert(u->originalUMatData->data == data);
                             }
                             retval = clEnqueueUnmapMemObject(q, (cl_mem)u->handle, data, 0, 0, 0);
-                            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (void*)u->handle, data, (long long int)u->size).c_str());
+                            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (تهی*)u->handle, data, (long long صحیح)u->size).c_str());
                             CV_OCL_DBG_CHECK(clFinish(q));
                         }
                     }
                 }
-                u->markHostCopyObsolete(false);
+                u->markHostCopyObsolete(نادرست);
             }
-            else
+            وگرنه
             {
                 // nothing
             }
 #ifdef HAVE_OPENCL_SVM
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+            اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
             {
-                if( u->tempCopiedUMat() )
+                اگر( u->tempCopiedUMat() )
                 {
                     Context& ctx = Context::getDefault();
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
                     CV_OPENCL_SVM_TRACE_P("clSVMFree: %p\n", u->handle);
                     svmFns->fn_clSVMFree((cl_context)ctx.ptr(), u->handle);
                 }
             }
-            else
+            وگرنه
 #endif
             {
                 cl_int retval = clReleaseMemObject((cl_mem)u->handle);
-                CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clReleaseMemObject(ptr=%p)", (void*)u->handle).c_str());
+                CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clReleaseMemObject(ptr=%p)", (تهی*)u->handle).c_str());
             }
             u->handle = 0;
-            u->markDeviceCopyObsolete(true);
+            u->markDeviceCopyObsolete(درست);
             u->currAllocator = u->prevAllocator;
-            u->prevAllocator = NULL;
-            if(u->data && u->copyOnMap() && u->data != u->origdata)
+            u->prevAllocator = پوچ;
+            اگر(u->data && u->copyOnMap() && u->data != u->origdata)
                 fastFree(u->data);
             u->data = u->origdata;
             u->currAllocator->deallocate(u);
-            u = NULL;
+            u = پوچ;
         }
-        else
+        وگرنه
         {
-            CV_Assert(u->origdata == NULL);
-            if(u->data && u->copyOnMap() && u->data != u->origdata)
+            CV_Assert(u->origdata == پوچ);
+            اگر(u->data && u->copyOnMap() && u->data != u->origdata)
             {
                 fastFree(u->data);
                 u->data = 0;
-                u->markHostCopyObsolete(true);
+                u->markHostCopyObsolete(درست);
             }
-            if (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_USED)
+            اگر (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_USED)
             {
                 std::shared_ptr<ocl::Context> pCtx = std::static_pointer_cast<ocl::Context>(u->allocatorContext);
                 CV_Assert(pCtx);
@@ -5825,7 +5825,7 @@ public:
                 CV_Assert(ctx.getImpl());
                 ctx.getImpl()->getBufferPool().release((cl_mem)u->handle);
             }
-            else if (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED)
+            وگرنه اگر (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED)
             {
                 std::shared_ptr<ocl::Context> pCtx = std::static_pointer_cast<ocl::Context>(u->allocatorContext);
                 CV_Assert(pCtx);
@@ -5834,103 +5834,103 @@ public:
                 ctx.getImpl()->getBufferPoolHostPtr().release((cl_mem)u->handle);
             }
 #ifdef HAVE_OPENCL_SVM
-            else if (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_SVM_USED)
+            وگرنه اگر (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_SVM_USED)
             {
                 std::shared_ptr<ocl::Context> pCtx = std::static_pointer_cast<ocl::Context>(u->allocatorContext);
                 CV_Assert(pCtx);
                 ocl::Context& ctx = *pCtx.get();
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
+                اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
                 {
                     //nothing
                 }
-                else if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
+                وگرنه اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
                         (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
                 {
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
                     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
 
-                    if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) != 0)
+                    اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) != 0)
                     {
                         CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
-                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, NULL, NULL);
+                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, پوچ, پوچ);
                         CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
                     }
                 }
                 CV_Assert(ctx.getImpl());
-                ctx.getImpl()->getBufferPoolSVM().release((void*)u->handle);
+                ctx.getImpl()->getBufferPoolSVM().release((تهی*)u->handle);
             }
 #endif
-            else
+            وگرنه
             {
                 CV_OCL_DBG_CHECK(clReleaseMemObject((cl_mem)u->handle));
             }
             u->handle = 0;
-            u->markDeviceCopyObsolete(true);
+            u->markDeviceCopyObsolete(درست);
             delete u;
-            u = NULL;
+            u = پوچ;
         }
-        CV_Assert(u == NULL);
+        CV_Assert(u == پوچ);
     }
 
     // synchronized call (external UMatDataAutoLock, see UMat::getMat)
-    void map(UMatData* u, AccessFlag accessFlags) const CV_OVERRIDE
+    تهی map(UMatData* u, AccessFlag accessFlags) ثابت CV_OVERRIDE
     {
         CV_Assert(u && u->handle);
 
-        if (!!(accessFlags & ACCESS_WRITE))
-            u->markDeviceCopyObsolete(true);
+        اگر (!!(accessFlags & ACCESS_WRITE))
+            u->markDeviceCopyObsolete(درست);
 
         cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
 
         {
-            if( !u->copyOnMap() )
+            اگر( !u->copyOnMap() )
             {
                 // TODO
                 // because there can be other map requests for the same UMat with different access flags,
                 // we use the universal (read-write) access mode.
 #ifdef HAVE_OPENCL_SVM
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+                اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
                 {
-                    if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+                    اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
                     {
                         Context& ctx = Context::getDefault();
-                        const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                        ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                         CV_DbgAssert(svmFns->isValid());
 
-                        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0)
+                        اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0)
                         {
-                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
+                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (صحیح)u->size);
                             cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_READ | CL_MAP_WRITE,
                                     u->handle, u->size,
-                                    0, NULL, NULL);
+                                    0, پوچ, پوچ);
                             CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
                             u->allocatorFlags_ |= svm::OPENCL_SVM_BUFFER_MAP;
                         }
                     }
                     clFinish(q);
                     u->data = (uchar*)u->handle;
-                    u->markHostCopyObsolete(false);
-                    u->markDeviceMemMapped(true);
-                    return;
+                    u->markHostCopyObsolete(نادرست);
+                    u->markDeviceMemMapped(درست);
+                    بازگشت;
                 }
 #endif
 
                 cl_int retval = CL_SUCCESS;
-                if (!u->deviceMemMapped())
+                اگر (!u->deviceMemMapped())
                 {
                     CV_Assert(u->refcount == 1);
                     CV_Assert(u->mapcount++ == 0);
                     u->data = (uchar*)clEnqueueMapBuffer(q, (cl_mem)u->handle, CL_TRUE,
                                                          (CL_MAP_READ | CL_MAP_WRITE),
                                                          0, u->size, 0, 0, 0, &retval);
-                    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (void*)u->handle, (long long int)u->size, u->data).c_str());
+                    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (تهی*)u->handle, (long long صحیح)u->size, u->data).c_str());
                 }
-                if (u->data && retval == CL_SUCCESS)
+                اگر (u->data && retval == CL_SUCCESS)
                 {
-                    u->markHostCopyObsolete(false);
-                    u->markDeviceMemMapped(true);
-                    return;
+                    u->markHostCopyObsolete(نادرست);
+                    u->markDeviceMemMapped(درست);
+                    بازگشت;
                 }
 
                 // TODO Is it really a good idea and was it tested well?
@@ -5938,31 +5938,31 @@ public:
                 u->flags |= UMatData::COPY_ON_MAP;
             }
 
-            if(!u->data)
+            اگر(!u->data)
             {
                 u->data = (uchar*)fastMalloc(u->size);
-                u->markHostCopyObsolete(true);
+                u->markHostCopyObsolete(درست);
             }
         }
 
-        if (!!(accessFlags & ACCESS_READ) && u->hostCopyObsolete())
+        اگر (!!(accessFlags & ACCESS_READ) && u->hostCopyObsolete())
         {
-            AlignedDataPtr<false, true> alignedPtr(u->data, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
+            AlignedDataPtr<نادرست, درست> alignedPtr(u->data, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
 #ifdef HAVE_OPENCL_SVM
             CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == 0);
 #endif
             cl_int retval = clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
                     0, u->size, alignedPtr.getAlignedPtr(), 0, 0, 0);
             CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueReadBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
-                    (void*)u->handle, (long long int)u->size, alignedPtr.getAlignedPtr()).c_str());
-            u->markHostCopyObsolete(false);
+                    (تهی*)u->handle, (long long صحیح)u->size, alignedPtr.getAlignedPtr()).c_str());
+            u->markHostCopyObsolete(نادرست);
         }
     }
 
-    void unmap(UMatData* u) const CV_OVERRIDE
+    تهی unmap(UMatData* u) ثابت CV_OVERRIDE
     {
-        if(!u)
-            return;
+        اگر(!u)
+            بازگشت;
 
 
         CV_Assert(u->handle != 0);
@@ -5971,104 +5971,104 @@ public:
 
         cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
         cl_int retval = 0;
-        if( !u->copyOnMap() && u->deviceMemMapped() )
+        اگر( !u->copyOnMap() && u->deviceMemMapped() )
         {
-            CV_Assert(u->data != NULL);
+            CV_Assert(u->data != پوچ);
 #ifdef HAVE_OPENCL_SVM
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+            اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
             {
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+                اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
                 {
                     Context& ctx = Context::getDefault();
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
                     CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) != 0);
                     {
                         CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
                         cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle,
-                                0, NULL, NULL);
+                                0, پوچ, پوچ);
                         CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
                         clFinish(q);
                         u->allocatorFlags_ &= ~svm::OPENCL_SVM_BUFFER_MAP;
                     }
                 }
-                if (u->refcount == 0)
+                اگر (u->refcount == 0)
                     u->data = 0;
-                u->markDeviceCopyObsolete(false);
-                u->markHostCopyObsolete(true);
-                return;
+                u->markDeviceCopyObsolete(نادرست);
+                u->markHostCopyObsolete(درست);
+                بازگشت;
             }
 #endif
-            if (u->refcount == 0)
+            اگر (u->refcount == 0)
             {
                 CV_Assert(u->mapcount-- == 1);
                 retval = clEnqueueUnmapMemObject(q, (cl_mem)u->handle, u->data, 0, 0, 0);
-                CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (void*)u->handle, u->data, (long long int)u->size).c_str());
-                if (Device::getDefault().isAMD())
+                CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (تهی*)u->handle, u->data, (long long صحیح)u->size).c_str());
+                اگر (Device::getDefault().isAMD())
                 {
                     // required for multithreaded applications (see stitching test)
                     CV_OCL_DBG_CHECK(clFinish(q));
                 }
-                u->markDeviceMemMapped(false);
+                u->markDeviceMemMapped(نادرست);
                 u->data = 0;
-                u->markDeviceCopyObsolete(false);
-                u->markHostCopyObsolete(true);
+                u->markDeviceCopyObsolete(نادرست);
+                u->markHostCopyObsolete(درست);
             }
         }
-        else if( u->copyOnMap() && u->deviceCopyObsolete() )
+        وگرنه اگر( u->copyOnMap() && u->deviceCopyObsolete() )
         {
-            AlignedDataPtr<true, false> alignedPtr(u->data, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
+            AlignedDataPtr<درست, نادرست> alignedPtr(u->data, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
 #ifdef HAVE_OPENCL_SVM
             CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == 0);
 #endif
             retval = clEnqueueWriteBuffer(q, (cl_mem)u->handle, CL_TRUE,
                                 0, u->size, alignedPtr.getAlignedPtr(), 0, 0, 0);
             CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
-                    (void*)u->handle, (long long int)u->size, alignedPtr.getAlignedPtr()).c_str());
-            u->markDeviceCopyObsolete(false);
-            u->markHostCopyObsolete(true);
+                    (تهی*)u->handle, (long long صحیح)u->size, alignedPtr.getAlignedPtr()).c_str());
+            u->markDeviceCopyObsolete(نادرست);
+            u->markHostCopyObsolete(درست);
         }
     }
 
-    bool checkContinuous(int dims, const size_t sz[],
-                         const size_t srcofs[], const size_t srcstep[],
-                         const size_t dstofs[], const size_t dststep[],
+    منطقی checkContinuous(صحیح dims, ثابت size_t sz[],
+                         ثابت size_t srcofs[], ثابت size_t srcstep[],
+                         ثابت size_t dstofs[], ثابت size_t dststep[],
                          size_t& total, size_t new_sz[],
                          size_t& srcrawofs, size_t new_srcofs[], size_t new_srcstep[],
-                         size_t& dstrawofs, size_t new_dstofs[], size_t new_dststep[]) const
+                         size_t& dstrawofs, size_t new_dstofs[], size_t new_dststep[]) ثابت
     {
-        bool iscontinuous = true;
+        منطقی iscontinuous = درست;
         srcrawofs = srcofs ? srcofs[dims-1] : 0;
         dstrawofs = dstofs ? dstofs[dims-1] : 0;
         total = sz[dims-1];
-        for( int i = dims-2; i >= 0; i-- )
+        برای( صحیح i = dims-2; i >= 0; i-- )
         {
-            if( i >= 0 && (total != srcstep[i] || total != dststep[i]) )
-                iscontinuous = false;
+            اگر( i >= 0 && (total != srcstep[i] || total != dststep[i]) )
+                iscontinuous = نادرست;
             total *= sz[i];
-            if( srcofs )
+            اگر( srcofs )
                 srcrawofs += srcofs[i]*srcstep[i];
-            if( dstofs )
+            اگر( dstofs )
                 dstrawofs += dstofs[i]*dststep[i];
         }
 
-        if( !iscontinuous )
+        اگر( !iscontinuous )
         {
             // OpenCL uses {x, y, z} order while OpenCV uses {z, y, x} order.
-            if( dims == 2 )
+            اگر( dims == 2 )
             {
                 new_sz[0] = sz[1]; new_sz[1] = sz[0]; new_sz[2] = 1;
                 // we assume that new_... arrays are initialized by caller
                 // with 0's, so there is no else branch
-                if( srcofs )
+                اگر( srcofs )
                 {
                     new_srcofs[0] = srcofs[1];
                     new_srcofs[1] = srcofs[0];
                     new_srcofs[2] = 0;
                 }
 
-                if( dstofs )
+                اگر( dstofs )
                 {
                     new_dstofs[0] = dstofs[1];
                     new_dstofs[1] = dstofs[0];
@@ -6078,20 +6078,20 @@ public:
                 new_srcstep[0] = srcstep[0]; new_srcstep[1] = 0;
                 new_dststep[0] = dststep[0]; new_dststep[1] = 0;
             }
-            else
+            وگرنه
             {
                 // we could check for dims == 3 here,
                 // but from user perspective this one is more informative
                 CV_Assert(dims <= 3);
                 new_sz[0] = sz[2]; new_sz[1] = sz[1]; new_sz[2] = sz[0];
-                if( srcofs )
+                اگر( srcofs )
                 {
                     new_srcofs[0] = srcofs[2];
                     new_srcofs[1] = srcofs[1];
                     new_srcofs[2] = srcofs[0];
                 }
 
-                if( dstofs )
+                اگر( dstofs )
                 {
                     new_dstofs[0] = dstofs[2];
                     new_dstofs[1] = dstofs[1];
@@ -6102,21 +6102,21 @@ public:
                 new_dststep[0] = dststep[1]; new_dststep[1] = dststep[0];
             }
         }
-        return iscontinuous;
+        بازگشت iscontinuous;
     }
 
-    void download(UMatData* u, void* dstptr, int dims, const size_t sz[],
-                  const size_t srcofs[], const size_t srcstep[],
-                  const size_t dststep[]) const CV_OVERRIDE
+    تهی download(UMatData* u, تهی* dstptr, صحیح dims, ثابت size_t sz[],
+                  ثابت size_t srcofs[], ثابت size_t srcstep[],
+                  ثابت size_t dststep[]) ثابت CV_OVERRIDE
     {
-        if(!u)
-            return;
+        اگر(!u)
+            بازگشت;
         UMatDataAutoLock autolock(u);
 
-        if( u->data && !u->hostCopyObsolete() )
+        اگر( u->data && !u->hostCopyObsolete() )
         {
             Mat::getDefaultAllocator()->download(u, dstptr, dims, sz, srcofs, srcstep, dststep);
-            return;
+            بازگشت;
         }
         CV_Assert( u->handle != 0 );
 
@@ -6126,83 +6126,83 @@ public:
         size_t srcrawofs = 0, new_srcofs[] = {0, 0, 0}, new_srcstep[] = {0, 0, 0};
         size_t dstrawofs = 0, new_dstofs[] = {0, 0, 0}, new_dststep[] = {0, 0, 0};
 
-        bool iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, 0, dststep,
+        منطقی iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, 0, dststep,
                                             total, new_sz,
                                             srcrawofs, new_srcofs, new_srcstep,
                                             dstrawofs, new_dstofs, new_dststep);
 
 #ifdef HAVE_OPENCL_SVM
-        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+        اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
         {
-            CV_DbgAssert(u->data == NULL || u->data == u->handle);
+            CV_DbgAssert(u->data == پوچ || u->data == u->handle);
             Context& ctx = Context::getDefault();
-            const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+            ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
             CV_DbgAssert(svmFns->isValid());
 
             CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0);
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
             {
-                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
+                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (صحیح)u->size);
                 cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_READ,
                         u->handle, u->size,
-                        0, NULL, NULL);
+                        0, پوچ, پوچ);
                 CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
             }
             clFinish(q);
-            if( iscontinuous )
+            اگر( iscontinuous )
             {
                 memcpy(dstptr, (uchar*)u->handle + srcrawofs, total);
             }
-            else
+            وگرنه
             {
                 // This code is from MatAllocator::download()
-                int isz[CV_MAX_DIM];
+                صحیح isz[CV_MAX_DIM];
                 uchar* srcptr = (uchar*)u->handle;
-                for( int i = 0; i < dims; i++ )
+                برای( صحیح i = 0; i < dims; i++ )
                 {
                     CV_Assert( sz[i] <= (size_t)INT_MAX );
-                    if( sz[i] == 0 )
-                    return;
-                    if( srcofs )
+                    اگر( sz[i] == 0 )
+                    بازگشت;
+                    اگر( srcofs )
                     srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-                    isz[i] = (int)sz[i];
+                    isz[i] = (صحیح)sz[i];
                 }
 
                 Mat src(dims, isz, CV_8U, srcptr, srcstep);
                 Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-                const Mat* arrays[] = { &src, &dst };
+                ثابت Mat* arrays[] = { &src, &dst };
                 uchar* ptrs[2];
                 NAryMatIterator it(arrays, ptrs, 2);
                 size_t j, planesz = it.size;
 
-                for( j = 0; j < it.nplanes; j++, ++it )
+                برای( j = 0; j < it.nplanes; j++, ++it )
                     memcpy(ptrs[1], ptrs[0], planesz);
             }
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
             {
                 CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
                 cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle,
-                        0, NULL, NULL);
+                        0, پوچ, پوچ);
                 CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
                 clFinish(q);
             }
         }
-        else
+        وگرنه
 #endif
         {
-            if( iscontinuous )
+            اگر( iscontinuous )
             {
-                AlignedDataPtr<false, true> alignedPtr((uchar*)dstptr, total, CV_OPENCL_DATA_PTR_ALIGNMENT);
+                AlignedDataPtr<نادرست, درست> alignedPtr((uchar*)dstptr, total, CV_OPENCL_DATA_PTR_ALIGNMENT);
                 CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
                     srcrawofs, total, alignedPtr.getAlignedPtr(), 0, 0, 0));
             }
-            else if (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
+            وگرنه اگر (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
             {
-                const size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
+                ثابت size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
                 size_t new_srcrawofs = srcrawofs & ~(padding-1);
                 size_t membuf_ofs = srcrawofs - new_srcrawofs;
-                AlignedDataPtr2D<false, false> alignedPtr(0, new_sz[1], new_srcstep[0], new_srcstep[0],
+                AlignedDataPtr2D<نادرست, نادرست> alignedPtr(0, new_sz[1], new_srcstep[0], new_srcstep[0],
                                                           CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
@@ -6211,12 +6211,12 @@ public:
                 total = std::min(total, u->size - new_srcrawofs);
                 CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
                                                  new_srcrawofs, total, ptr, 0, 0, 0));
-                for( size_t i = 0; i < new_sz[1]; i++ )
+                برای( size_t i = 0; i < new_sz[1]; i++ )
                     memcpy( (uchar*)dstptr + i*new_dststep[0], ptr + i*new_srcstep[0] + membuf_ofs, new_sz[0]);
             }
-            else
+            وگرنه
             {
-                AlignedDataPtr2D<false, true> alignedPtr((uchar*)dstptr, new_sz[1], new_sz[0], new_dststep[0], CV_OPENCL_DATA_PTR_ALIGNMENT);
+                AlignedDataPtr2D<نادرست, درست> alignedPtr((uchar*)dstptr, new_sz[1], new_sz[0], new_dststep[0], CV_OPENCL_DATA_PTR_ALIGNMENT);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
                 CV_OCL_CHECK(clEnqueueReadBufferRect(q, (cl_mem)u->handle, CL_TRUE,
@@ -6228,12 +6228,12 @@ public:
         }
     }
 
-    void upload(UMatData* u, const void* srcptr, int dims, const size_t sz[],
-                const size_t dstofs[], const size_t dststep[],
-                const size_t srcstep[]) const CV_OVERRIDE
+    تهی upload(UMatData* u, ثابت تهی* srcptr, صحیح dims, ثابت size_t sz[],
+                ثابت size_t dstofs[], ثابت size_t dststep[],
+                ثابت size_t srcstep[]) ثابت CV_OVERRIDE
     {
-        if(!u)
-            return;
+        اگر(!u)
+            بازگشت;
 
         // there should be no user-visible CPU copies of the UMat which we are going to copy to
         CV_Assert(u->refcount == 0 || u->tempUMat());
@@ -6242,7 +6242,7 @@ public:
         size_t srcrawofs = 0, new_srcofs[] = {0, 0, 0}, new_srcstep[] = {0, 0, 0};
         size_t dstrawofs = 0, new_dstofs[] = {0, 0, 0}, new_dststep[] = {0, 0, 0};
 
-        bool iscontinuous = checkContinuous(dims, sz, 0, srcstep, dstofs, dststep,
+        منطقی iscontinuous = checkContinuous(dims, sz, 0, srcstep, dstofs, dststep,
                                             total, new_sz,
                                             srcrawofs, new_srcofs, new_srcstep,
                                             dstrawofs, new_dstofs, new_dststep);
@@ -6254,91 +6254,91 @@ public:
         // we can do it in 2 cases:
         //    1. we overwrite the whole content
         //    2. we overwrite part of the matrix, but the GPU copy is out-of-date
-        if( u->data && (u->hostCopyObsolete() < u->deviceCopyObsolete() || total == u->size))
+        اگر( u->data && (u->hostCopyObsolete() < u->deviceCopyObsolete() || total == u->size))
         {
             Mat::getDefaultAllocator()->upload(u, srcptr, dims, sz, dstofs, dststep, srcstep);
-            u->markHostCopyObsolete(false);
-            u->markDeviceCopyObsolete(true);
-            return;
+            u->markHostCopyObsolete(نادرست);
+            u->markDeviceCopyObsolete(درست);
+            بازگشت;
         }
 
         CV_Assert( u->handle != 0 );
         cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
 
 #ifdef HAVE_OPENCL_SVM
-        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+        اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
         {
-            CV_DbgAssert(u->data == NULL || u->data == u->handle);
+            CV_DbgAssert(u->data == پوچ || u->data == u->handle);
             Context& ctx = Context::getDefault();
-            const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+            ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
             CV_DbgAssert(svmFns->isValid());
 
             CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0);
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
             {
-                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
+                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (صحیح)u->size);
                 cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_WRITE,
                         u->handle, u->size,
-                        0, NULL, NULL);
+                        0, پوچ, پوچ);
                 CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
             }
             clFinish(q);
-            if( iscontinuous )
+            اگر( iscontinuous )
             {
                 memcpy((uchar*)u->handle + dstrawofs, srcptr, total);
             }
-            else
+            وگرنه
             {
                 // This code is from MatAllocator::upload()
-                int isz[CV_MAX_DIM];
+                صحیح isz[CV_MAX_DIM];
                 uchar* dstptr = (uchar*)u->handle;
-                for( int i = 0; i < dims; i++ )
+                برای( صحیح i = 0; i < dims; i++ )
                 {
                     CV_Assert( sz[i] <= (size_t)INT_MAX );
-                    if( sz[i] == 0 )
-                    return;
-                    if( dstofs )
+                    اگر( sz[i] == 0 )
+                    بازگشت;
+                    اگر( dstofs )
                     dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-                    isz[i] = (int)sz[i];
+                    isz[i] = (صحیح)sz[i];
                 }
 
-                Mat src(dims, isz, CV_8U, (void*)srcptr, srcstep);
+                Mat src(dims, isz, CV_8U, (تهی*)srcptr, srcstep);
                 Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-                const Mat* arrays[] = { &src, &dst };
+                ثابت Mat* arrays[] = { &src, &dst };
                 uchar* ptrs[2];
                 NAryMatIterator it(arrays, ptrs, 2);
                 size_t j, planesz = it.size;
 
-                for( j = 0; j < it.nplanes; j++, ++it )
+                برای( j = 0; j < it.nplanes; j++, ++it )
                     memcpy(ptrs[1], ptrs[0], planesz);
             }
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
             {
                 CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
                 cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle,
-                        0, NULL, NULL);
+                        0, پوچ, پوچ);
                 CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
                 clFinish(q);
             }
         }
-        else
+        وگرنه
 #endif
         {
-            if( iscontinuous )
+            اگر( iscontinuous )
             {
-                AlignedDataPtr<true, false> alignedPtr((uchar*)srcptr, total, CV_OPENCL_DATA_PTR_ALIGNMENT);
+                AlignedDataPtr<درست, نادرست> alignedPtr((uchar*)srcptr, total, CV_OPENCL_DATA_PTR_ALIGNMENT);
                 cl_int retval = clEnqueueWriteBuffer(q, (cl_mem)u->handle, CL_TRUE,
                     dstrawofs, total, alignedPtr.getAlignedPtr(), 0, 0, 0);
                 CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, offset=%lld, sz=%lld, data=%p, 0, 0, 0)",
-                        (void*)u->handle, (long long int)dstrawofs, (long long int)u->size, alignedPtr.getAlignedPtr()).c_str());
+                        (تهی*)u->handle, (long long صحیح)dstrawofs, (long long صحیح)u->size, alignedPtr.getAlignedPtr()).c_str());
             }
-            else if (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
+            وگرنه اگر (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
             {
-                const size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
+                ثابت size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
                 size_t new_dstrawofs = dstrawofs & ~(padding-1);
                 size_t membuf_ofs = dstrawofs - new_dstrawofs;
-                AlignedDataPtr2D<false, false> alignedPtr(0, new_sz[1], new_dststep[0], new_dststep[0],
+                AlignedDataPtr2D<نادرست, نادرست> alignedPtr(0, new_sz[1], new_dststep[0], new_dststep[0],
                                                           CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
@@ -6350,14 +6350,14 @@ public:
                        (int)total, (int)total, (int)new_dstrawofs, (int)new_dstrawofs);*/
                 CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
                                                  new_dstrawofs, total, ptr, 0, 0, 0));
-                for( size_t i = 0; i < new_sz[1]; i++ )
+                برای( size_t i = 0; i < new_sz[1]; i++ )
                     memcpy( ptr + i*new_dststep[0] + membuf_ofs, (uchar*)srcptr + i*new_srcstep[0], new_sz[0]);
                 CV_OCL_CHECK(clEnqueueWriteBuffer(q, (cl_mem)u->handle, CL_TRUE,
                                                  new_dstrawofs, total, ptr, 0, 0, 0));
             }
-            else
+            وگرنه
             {
-                AlignedDataPtr2D<true, false> alignedPtr((uchar*)srcptr, new_sz[1], new_sz[0], new_srcstep[0], CV_OPENCL_DATA_PTR_ALIGNMENT);
+                AlignedDataPtr2D<درست, نادرست> alignedPtr((uchar*)srcptr, new_sz[1], new_sz[0], new_srcstep[0], CV_OPENCL_DATA_PTR_ALIGNMENT);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
                 CV_OCL_CHECK(clEnqueueWriteBufferRect(q, (cl_mem)u->handle, CL_TRUE,
@@ -6367,60 +6367,60 @@ public:
                     ptr, 0, 0, 0));
             }
         }
-        u->markHostCopyObsolete(true);
+        u->markHostCopyObsolete(درست);
 #ifdef HAVE_OPENCL_SVM
-        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
+        اگر ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
                 (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
         {
             // nothing
         }
-        else
+        وگرنه
 #endif
         {
-            u->markHostCopyObsolete(true);
+            u->markHostCopyObsolete(درست);
         }
-        u->markDeviceCopyObsolete(false);
+        u->markDeviceCopyObsolete(نادرست);
     }
 
-    void copy(UMatData* src, UMatData* dst, int dims, const size_t sz[],
-              const size_t srcofs[], const size_t srcstep[],
-              const size_t dstofs[], const size_t dststep[], bool _sync) const CV_OVERRIDE
+    تهی copy(UMatData* src, UMatData* dst, صحیح dims, ثابت size_t sz[],
+              ثابت size_t srcofs[], ثابت size_t srcstep[],
+              ثابت size_t dstofs[], ثابت size_t dststep[], منطقی _sync) ثابت CV_OVERRIDE
     {
-        if(!src || !dst)
-            return;
+        اگر(!src || !dst)
+            بازگشت;
 
         size_t total = 0, new_sz[] = {0, 0, 0};
         size_t srcrawofs = 0, new_srcofs[] = {0, 0, 0}, new_srcstep[] = {0, 0, 0};
         size_t dstrawofs = 0, new_dstofs[] = {0, 0, 0}, new_dststep[] = {0, 0, 0};
 
-        bool iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, dstofs, dststep,
+        منطقی iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, dstofs, dststep,
                                             total, new_sz,
                                             srcrawofs, new_srcofs, new_srcstep,
                                             dstrawofs, new_dstofs, new_dststep);
 
         UMatDataAutoLock src_autolock(src, dst);
 
-        if( !src->handle || (src->data && src->hostCopyObsolete() < src->deviceCopyObsolete()) )
+        اگر( !src->handle || (src->data && src->hostCopyObsolete() < src->deviceCopyObsolete()) )
         {
             upload(dst, src->data + srcrawofs, dims, sz, dstofs, dststep, srcstep);
-            return;
+            بازگشت;
         }
-        if( !dst->handle || (dst->data && dst->hostCopyObsolete() < dst->deviceCopyObsolete()) )
+        اگر( !dst->handle || (dst->data && dst->hostCopyObsolete() < dst->deviceCopyObsolete()) )
         {
             download(src, dst->data + dstrawofs, dims, sz, srcofs, srcstep, dststep);
-            dst->markHostCopyObsolete(false);
+            dst->markHostCopyObsolete(نادرست);
 #ifdef HAVE_OPENCL_SVM
-            if ((dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
+            اگر ((dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
                     (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
             {
                 // nothing
             }
-            else
+            وگرنه
 #endif
             {
-                dst->markDeviceCopyObsolete(true);
+                dst->markDeviceCopyObsolete(درست);
             }
-            return;
+            بازگشت;
         }
 
         // there should be no user-visible CPU copies of the UMat which we are going to copy to
@@ -6429,68 +6429,68 @@ public:
 
         cl_int retval = CL_SUCCESS;
 #ifdef HAVE_OPENCL_SVM
-        if ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0 ||
+        اگر ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0 ||
                 (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
         {
-            if ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0 &&
+            اگر ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0 &&
                             (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
             {
                 Context& ctx = Context::getDefault();
-                const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                ثابت svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                 CV_DbgAssert(svmFns->isValid());
 
-                if( iscontinuous )
+                اگر( iscontinuous )
                 {
                     CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMemcpy: %p <-- %p (%d)\n",
-                            (uchar*)dst->handle + dstrawofs, (uchar*)src->handle + srcrawofs, (int)total);
+                            (uchar*)dst->handle + dstrawofs, (uchar*)src->handle + srcrawofs, (صحیح)total);
                     cl_int status = svmFns->fn_clEnqueueSVMMemcpy(q, CL_TRUE,
                             (uchar*)dst->handle + dstrawofs, (uchar*)src->handle + srcrawofs,
-                            total, 0, NULL, NULL);
+                            total, 0, پوچ, پوچ);
                     CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMemcpy()");
                 }
-                else
+                وگرنه
                 {
                     clFinish(q);
                     // This code is from MatAllocator::download()/upload()
-                    int isz[CV_MAX_DIM];
+                    صحیح isz[CV_MAX_DIM];
                     uchar* srcptr = (uchar*)src->handle;
-                    for( int i = 0; i < dims; i++ )
+                    برای( صحیح i = 0; i < dims; i++ )
                     {
                         CV_Assert( sz[i] <= (size_t)INT_MAX );
-                        if( sz[i] == 0 )
-                        return;
-                        if( srcofs )
+                        اگر( sz[i] == 0 )
+                        بازگشت;
+                        اگر( srcofs )
                         srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-                        isz[i] = (int)sz[i];
+                        isz[i] = (صحیح)sz[i];
                     }
                     Mat m_src(dims, isz, CV_8U, srcptr, srcstep);
 
                     uchar* dstptr = (uchar*)dst->handle;
-                    for( int i = 0; i < dims; i++ )
+                    برای( صحیح i = 0; i < dims; i++ )
                     {
-                        if( dstofs )
+                        اگر( dstofs )
                         dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
                     }
                     Mat m_dst(dims, isz, CV_8U, dstptr, dststep);
 
-                    const Mat* arrays[] = { &m_src, &m_dst };
+                    ثابت Mat* arrays[] = { &m_src, &m_dst };
                     uchar* ptrs[2];
                     NAryMatIterator it(arrays, ptrs, 2);
                     size_t j, planesz = it.size;
 
-                    for( j = 0; j < it.nplanes; j++, ++it )
+                    برای( j = 0; j < it.nplanes; j++, ++it )
                         memcpy(ptrs[1], ptrs[0], planesz);
                 }
             }
-            else
+            وگرنه
             {
-                if ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+                اگر ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
                 {
                     map(src, ACCESS_READ);
                     upload(dst, src->data + srcrawofs, dims, sz, dstofs, dststep, srcstep);
                     unmap(src);
                 }
-                else
+                وگرنه
                 {
                     map(dst, ACCESS_WRITE);
                     download(src, dst->data + dstrawofs, dims, sz, srcofs, srcstep, dststep);
@@ -6498,27 +6498,27 @@ public:
                 }
             }
         }
-        else
+        وگرنه
 #endif
         {
-            if( iscontinuous )
+            اگر( iscontinuous )
             {
                 retval = clEnqueueCopyBuffer(q, (cl_mem)src->handle, (cl_mem)dst->handle,
                                                srcrawofs, dstrawofs, total, 0, 0, 0);
                 CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueCopyBuffer(q, src=%p, dst=%p, src_offset=%lld, dst_offset=%lld, sz=%lld, 0, 0, 0)",
-                        (void*)src->handle, (void*)dst->handle, (long long int)srcrawofs, (long long int)dstrawofs, (long long int)total).c_str());
+                        (تهی*)src->handle, (تهی*)dst->handle, (long long صحیح)srcrawofs, (long long صحیح)dstrawofs, (long long صحیح)total).c_str());
             }
-            else if (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
+            وگرنه اگر (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
             {
-                const size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
+                ثابت size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
                 size_t new_srcrawofs = srcrawofs & ~(padding-1);
                 size_t srcmembuf_ofs = srcrawofs - new_srcrawofs;
                 size_t new_dstrawofs = dstrawofs & ~(padding-1);
                 size_t dstmembuf_ofs = dstrawofs - new_dstrawofs;
 
-                AlignedDataPtr2D<false, false> srcBuf(0, new_sz[1], new_srcstep[0], new_srcstep[0],
+                AlignedDataPtr2D<نادرست, نادرست> srcBuf(0, new_sz[1], new_srcstep[0], new_srcstep[0],
                                                       CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
-                AlignedDataPtr2D<false, false> dstBuf(0, new_sz[1], new_dststep[0], new_dststep[0],
+                AlignedDataPtr2D<نادرست, نادرست> dstBuf(0, new_sz[1], new_dststep[0], new_dststep[0],
                                                       CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
                 uchar* srcptr = srcBuf.getAlignedPtr();
                 uchar* dstptr = dstBuf.getAlignedPtr();
@@ -6535,13 +6535,13 @@ public:
                 CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)dst->handle, CL_TRUE,
                                                  new_dstrawofs, dst_total, dstptr, 0, 0, 0));
 
-                for( size_t i = 0; i < new_sz[1]; i++ )
+                برای( size_t i = 0; i < new_sz[1]; i++ )
                     memcpy( dstptr + dstmembuf_ofs + i*new_dststep[0],
                             srcptr + srcmembuf_ofs + i*new_srcstep[0], new_sz[0]);
                 CV_OCL_CHECK(clEnqueueWriteBuffer(q, (cl_mem)dst->handle, CL_TRUE,
                                                   new_dstrawofs, dst_total, dstptr, 0, 0, 0));
             }
-            else
+            وگرنه
             {
                 CV_OCL_CHECK(retval = clEnqueueCopyBufferRect(q, (cl_mem)src->handle, (cl_mem)dst->handle,
                                                    new_srcofs, new_dstofs, new_sz,
@@ -6550,50 +6550,50 @@ public:
                                                    0, 0, 0));
             }
         }
-        if (retval == CL_SUCCESS)
+        اگر (retval == CL_SUCCESS)
         {
             CV_IMPL_ADD(CV_IMPL_OCL)
         }
 
 #ifdef HAVE_OPENCL_SVM
-        if ((dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
+        اگر ((dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
             (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
         {
             // nothing
         }
-        else
+        وگرنه
 #endif
         {
-            dst->markHostCopyObsolete(true);
+            dst->markHostCopyObsolete(درست);
         }
-        dst->markDeviceCopyObsolete(false);
+        dst->markDeviceCopyObsolete(نادرست);
 
-        if( _sync )
+        اگر( _sync )
         {
             CV_OCL_DBG_CHECK(clFinish(q));
         }
     }
 
-    BufferPoolController* getBufferPoolController(const char* id) const CV_OVERRIDE
+    BufferPoolController* getBufferPoolController(ثابت نویسه* id) ثابت CV_OVERRIDE
     {
         ocl::Context ctx = Context::getDefault();
-        if (ctx.empty())
-            return NULL;
+        اگر (ctx.empty())
+            بازگشت پوچ;
 #ifdef HAVE_OPENCL_SVM
-        if ((svm::checkForceSVMUmatUsage() && (id == NULL || strcmp(id, "OCL") == 0)) || (id != NULL && strcmp(id, "SVM") == 0))
+        اگر ((svm::checkForceSVMUmatUsage() && (id == پوچ || strcmp(id, "OCL") == 0)) || (id != پوچ && strcmp(id, "SVM") == 0))
         {
-            return &ctx.getImpl()->getBufferPoolSVM();
+            بازگشت &ctx.getImpl()->getBufferPoolSVM();
         }
 #endif
-        if (id != NULL && strcmp(id, "HOST_ALLOC") == 0)
+        اگر (id != پوچ && strcmp(id, "HOST_ALLOC") == 0)
         {
-            return &ctx.getImpl()->getBufferPoolHostPtr();
+            بازگشت &ctx.getImpl()->getBufferPoolHostPtr();
         }
-        if (id != NULL && strcmp(id, "OCL") != 0)
+        اگر (id != پوچ && strcmp(id, "OCL") != 0)
         {
             CV_Error(cv::Error::StsBadArg, "getBufferPoolController(): unknown BufferPool ID\n");
         }
-        return &ctx.getImpl()->getBufferPool();
+        بازگشت &ctx.getImpl()->getBufferPool();
     }
 
     MatAllocator* matStdAllocator;
@@ -6601,10 +6601,10 @@ public:
     mutable cv::Mutex cleanupQueueMutex;
     mutable std::deque<UMatData*> cleanupQueue;
 
-    void flushCleanupQueue() const
+    تهی flushCleanupQueue() ثابت
     {
         // TSAN false positive: see #27638
-        if (!cleanupQueue.empty())
+        اگر (!cleanupQueue.empty())
         {
             std::deque<UMatData*> q;
             {
@@ -6612,13 +6612,13 @@ public:
                 // TSAN false positive: see #27638
                 q.swap(cleanupQueue);
             }
-            for (std::deque<UMatData*>::const_iterator i = q.begin(); i != q.end(); ++i)
+            برای (std::deque<UMatData*>::const_iterator i = q.begin(); i != q.end(); ++i)
             {
                 deallocate_(*i);
             }
         }
     }
-    void addToCleanupQueue(UMatData* u) const
+    تهی addToCleanupQueue(UMatData* u) ثابت
     {
         //TODO: Validation check: CV_Assert(!u->tempUMat());
         {
@@ -6628,10 +6628,10 @@ public:
     }
 };
 
-static OpenCLAllocator* getOpenCLAllocator_() // call once guarantee
+ایستا OpenCLAllocator* getOpenCLAllocator_() // call once guarantee
 {
-    static OpenCLAllocator* g_allocator = new OpenCLAllocator(); // avoid destructor call (using of this object is too wide)
-    return g_allocator;
+    ایستا OpenCLAllocator* g_allocator = جدید OpenCLAllocator(); // avoid destructor call (using of this object is too wide)
+    بازگشت g_allocator;
 }
 MatAllocator* getOpenCLAllocator()
 {
@@ -6641,25 +6641,25 @@ MatAllocator* getOpenCLAllocator()
 }} // namespace cv::ocl
 
 
-namespace cv {
+فضاینام cv {
 
 // three funcs below are implemented in umatrix.cpp
-void setSize( UMat& m, int _dims, const int* _sz, const size_t* _steps,
-              bool autoSteps = false );
-void finalizeHdr(UMat& m);
+تهی setSize( UMat& m, صحیح _dims, ثابت صحیح* _sz, ثابت size_t* _steps,
+              منطقی autoSteps = نادرست );
+تهی finalizeHdr(UMat& m);
 
 } // namespace cv
 
 
-namespace cv { namespace ocl {
+فضاینام cv { فضاینام ocl {
 
 /*
 // Convert OpenCL buffer memory to UMat
 */
-void convertFromBuffer(void* cl_mem_buffer, size_t step, int rows, int cols, int type, UMat& dst)
+تهی convertFromBuffer(تهی* cl_mem_buffer, size_t step, صحیح rows, صحیح cols, صحیح type, UMat& dst)
 {
-    int d = 2;
-    int sizes[] = { rows, cols };
+    صحیح d = 2;
+    صحیح sizes[] = { rows, cols };
 
     CV_Assert(0 <= d && d <= CV_MAX_DIM);
 
@@ -6668,26 +6668,26 @@ void convertFromBuffer(void* cl_mem_buffer, size_t step, int rows, int cols, int
     dst.flags      = (type & Mat::TYPE_MASK) | Mat::MAGIC_VAL;
     dst.usageFlags = USAGE_DEFAULT;
 
-    setSize(dst, d, sizes, 0, true);
+    setSize(dst, d, sizes, 0, درست);
     dst.offset = 0;
 
     cl_mem             memobj = (cl_mem)cl_mem_buffer;
     cl_mem_object_type mem_type = 0;
 
-    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_TYPE, sizeof(cl_mem_object_type), &mem_type, 0));
+    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_TYPE, اندازه(cl_mem_object_type), &mem_type, 0));
 
     CV_Assert(CL_MEM_OBJECT_BUFFER == mem_type);
 
     size_t total = 0;
-    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_SIZE, sizeof(size_t), &total, 0));
+    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_SIZE, اندازه(size_t), &total, 0));
 
     CV_OCL_CHECK(clRetainMemObject(memobj));
 
-    CV_Assert((int)step >= cols * CV_ELEM_SIZE(type));
+    CV_Assert((صحیح)step >= cols * CV_ELEM_SIZE(type));
     CV_Assert(total >= rows * step);
 
     // attach clBuffer to UMatData
-    dst.u = new UMatData(getOpenCLAllocator());
+    dst.u = جدید UMatData(getOpenCLAllocator());
     dst.u->data            = 0;
     dst.u->allocatorFlags_ = OpenCLAllocator::ALLOCATOR_FLAGS_EXTERNAL_BUFFER;  // not allocated from any OpenCV buffer pool
     dst.u->flags           = static_cast<UMatData::MemoryFlag>(0);
@@ -6699,78 +6699,78 @@ void convertFromBuffer(void* cl_mem_buffer, size_t step, int rows, int cols, int
     finalizeHdr(dst);
     dst.addref();
 
-    return;
+    بازگشت;
 } // convertFromBuffer()
 
 
 /*
 // Convert OpenCL image2d_t memory to UMat
 */
-void convertFromImage(void* cl_mem_image, UMat& dst)
+تهی convertFromImage(تهی* cl_mem_image, UMat& dst)
 {
     cl_mem             clImage = (cl_mem)cl_mem_image;
     cl_mem_object_type mem_type = 0;
 
-    CV_OCL_CHECK(clGetMemObjectInfo(clImage, CL_MEM_TYPE, sizeof(cl_mem_object_type), &mem_type, 0));
+    CV_OCL_CHECK(clGetMemObjectInfo(clImage, CL_MEM_TYPE, اندازه(cl_mem_object_type), &mem_type, 0));
 
     CV_Assert(CL_MEM_OBJECT_IMAGE2D == mem_type);
 
     cl_image_format fmt = { 0, 0 };
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_FORMAT, sizeof(cl_image_format), &fmt, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_FORMAT, اندازه(cl_image_format), &fmt, 0));
 
-    int depth = CV_8U;
-    switch (fmt.image_channel_data_type)
+    صحیح depth = CV_8U;
+    انتخاب (fmt.image_channel_data_type)
     {
-    case CL_UNORM_INT8:
-    case CL_UNSIGNED_INT8:
+    حالت CL_UNORM_INT8:
+    حالت CL_UNSIGNED_INT8:
         depth = CV_8U;
-        break;
+        بشکن;
 
-    case CL_SNORM_INT8:
-    case CL_SIGNED_INT8:
+    حالت CL_SNORM_INT8:
+    حالت CL_SIGNED_INT8:
         depth = CV_8S;
-        break;
+        بشکن;
 
-    case CL_UNORM_INT16:
-    case CL_UNSIGNED_INT16:
+    حالت CL_UNORM_INT16:
+    حالت CL_UNSIGNED_INT16:
         depth = CV_16U;
-        break;
+        بشکن;
 
-    case CL_SNORM_INT16:
-    case CL_SIGNED_INT16:
+    حالت CL_SNORM_INT16:
+    حالت CL_SIGNED_INT16:
         depth = CV_16S;
-        break;
+        بشکن;
 
-    case CL_SIGNED_INT32:
+    حالت CL_SIGNED_INT32:
         depth = CV_32S;
-        break;
+        بشکن;
 
-    case CL_FLOAT:
+    حالت CL_FLOAT:
         depth = CV_32F;
-        break;
+        بشکن;
 
-    case CL_HALF_FLOAT:
+    حالت CL_HALF_FLOAT:
         depth = CV_16F;
-        break;
+        بشکن;
 
-    default:
+    پیشفرض:
         CV_Error(cv::Error::OpenCLApiCallError, "Not supported image_channel_data_type");
     }
 
-    int type = CV_8UC1;
-    switch (fmt.image_channel_order)
+    صحیح type = CV_8UC1;
+    انتخاب (fmt.image_channel_order)
     {
-    case CL_R:
-    case CL_A:
-    case CL_INTENSITY:
-    case CL_LUMINANCE:
+    حالت CL_R:
+    حالت CL_A:
+    حالت CL_INTENSITY:
+    حالت CL_LUMINANCE:
         type = CV_MAKE_TYPE(depth, 1);
-        break;
+        بشکن;
 
-    case CL_RG:
-    case CL_RA:
+    حالت CL_RG:
+    حالت CL_RA:
         type = CV_MAKE_TYPE(depth, 2);
-        break;
+        بشکن;
 
     // CL_RGB has no mappings to OpenCV types because CL_RGB can only be used with
     // CL_UNORM_SHORT_565, CL_UNORM_SHORT_555, or CL_UNORM_INT_101010.
@@ -6778,27 +6778,27 @@ void convertFromImage(void* cl_mem_image, UMat& dst)
         type = CV_MAKE_TYPE(depth, 3);
         break;*/
 
-    case CL_RGBA:
-    case CL_BGRA:
-    case CL_ARGB:
+    حالت CL_RGBA:
+    حالت CL_BGRA:
+    حالت CL_ARGB:
         type = CV_MAKE_TYPE(depth, 4);
-        break;
+        بشکن;
 
-    default:
+    پیشفرض:
         CV_Error(cv::Error::OpenCLApiCallError, "Not supported image_channel_order");
-        break;
+        بشکن;
     }
 
     size_t step = 0;
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_ROW_PITCH, sizeof(size_t), &step, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_ROW_PITCH, اندازه(size_t), &step, 0));
 
     size_t w = 0;
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_WIDTH, sizeof(size_t), &w, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_WIDTH, اندازه(size_t), &w, 0));
 
     size_t h = 0;
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_HEIGHT, sizeof(size_t), &h, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_HEIGHT, اندازه(size_t), &h, 0));
 
-    dst.create((int)h, (int)w, type);
+    dst.create((صحیح)h, (صحیح)w, type);
 
     cl_mem clBuffer = (cl_mem)dst.handle(ACCESS_READ);
 
@@ -6807,39 +6807,39 @@ void convertFromImage(void* cl_mem_image, UMat& dst)
     size_t offset = 0;
     size_t src_origin[3] = { 0, 0, 0 };
     size_t region[3] = { w, h, 1 };
-    CV_OCL_CHECK(clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL));
+    CV_OCL_CHECK(clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, پوچ, پوچ));
 
     CV_OCL_CHECK(clFinish(q));
 
-    return;
+    بازگشت;
 } // convertFromImage()
 
 
 ///////////////////////////////////////////// Utility functions /////////////////////////////////////////////////
 
-static void getDevices(std::vector<cl_device_id>& devices, cl_platform_id platform)
+ایستا تهی getDevices(std::vector<cl_device_id>& devices, cl_platform_id platform)
 {
-    cl_uint numDevices = 0;
-    cl_int status = clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, 0, NULL, &numDevices);
-    if (status != CL_DEVICE_NOT_FOUND) // Not an error if platform has no devices
+    cl_uint رقم_Devices = 0;
+    cl_int status = clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, 0, پوچ, &رقم_Devices);
+    اگر (status != CL_DEVICE_NOT_FOUND) // Not an error if platform has no devices
     {
         CV_OCL_DBG_CHECK_RESULT(status,
-            cv::format("clGetDeviceIDs(platform, Device::TYPE_ALL, num_entries=0, devices=NULL, numDevices=%p)", &numDevices).c_str());
+            cv::format("clGetDeviceIDs(platform, Device::TYPE_ALL, num_entries=0, devices=NULL, numDevices=%p)", &رقم_Devices).c_str());
     }
 
-    if (numDevices == 0)
+    اگر (رقم_Devices == 0)
     {
         devices.clear();
-        return;
+        بازگشت;
     }
 
-    devices.resize((size_t)numDevices);
-    CV_OCL_DBG_CHECK(clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, numDevices, &devices[0], &numDevices));
+    devices.resize((size_t)رقم_Devices);
+    CV_OCL_DBG_CHECK(clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, رقم_Devices, &devices[0], &رقم_Devices));
 }
 
-struct PlatformInfo::Impl
+ساختار PlatformInfo::Impl
 {
-    Impl(void* id)
+    Impl(تهی* id)
     {
         refcount = 1;
         handle = *(cl_platform_id*)id;
@@ -6849,12 +6849,12 @@ struct PlatformInfo::Impl
         parseOpenCLVersion(version_, versionMajor_, versionMinor_);
     }
 
-    String getStrProp(cl_platform_info prop) const
+    String getStrProp(cl_platform_info prop) ثابت
     {
-        char buf[1024];
+        نویسه buf[1024];
         size_t sz=0;
-        return clGetPlatformInfo(handle, prop, sizeof(buf)-16, buf, &sz) == CL_SUCCESS &&
-            sz < sizeof(buf) ? String(buf) : String();
+        بازگشت clGetPlatformInfo(handle, prop, اندازه(buf)-16, buf, &sz) == CL_SUCCESS &&
+            sz < اندازه(buf) ? String(buf) : String();
     }
 
     IMPLEMENT_REFCOUNTABLE();
@@ -6862,8 +6862,8 @@ struct PlatformInfo::Impl
     cl_platform_id handle;
 
     String version_;
-    int versionMajor_;
-    int versionMinor_;
+    صحیح versionMajor_;
+    صحیح versionMinor_;
 };
 
 PlatformInfo::PlatformInfo() CV_NOEXCEPT
@@ -6871,35 +6871,35 @@ PlatformInfo::PlatformInfo() CV_NOEXCEPT
     p = 0;
 }
 
-PlatformInfo::PlatformInfo(void* platform_id)
+PlatformInfo::PlatformInfo(تهی* platform_id)
 {
-    p = new Impl(platform_id);
+    p = جدید Impl(platform_id);
 }
 
 PlatformInfo::~PlatformInfo()
 {
-    if(p)
+    اگر(p)
         p->release();
 }
 
-PlatformInfo::PlatformInfo(const PlatformInfo& i)
+PlatformInfo::PlatformInfo(ثابت PlatformInfo& i)
 {
-    if (i.p)
+    اگر (i.p)
         i.p->addref();
     p = i.p;
 }
 
-PlatformInfo& PlatformInfo::operator =(const PlatformInfo& i)
+PlatformInfo& PlatformInfo::operator =(ثابت PlatformInfo& i)
 {
-    if (i.p != p)
+    اگر (i.p != p)
     {
-        if (i.p)
+        اگر (i.p)
             i.p->addref();
-        if (p)
+        اگر (p)
             p->release();
         p = i.p;
     }
-    return *this;
+    بازگشت *این;
 }
 
 PlatformInfo::PlatformInfo(PlatformInfo&& i) CV_NOEXCEPT
@@ -6910,81 +6910,81 @@ PlatformInfo::PlatformInfo(PlatformInfo&& i) CV_NOEXCEPT
 
 PlatformInfo& PlatformInfo::operator = (PlatformInfo&& i) CV_NOEXCEPT
 {
-    if (this != &i) {
-        if(p)
+    اگر (این != &i) {
+        اگر(p)
             p->release();
         p = i.p;
         i.p = nullptr;
     }
-    return *this;
+    بازگشت *این;
 }
 
-int PlatformInfo::deviceNumber() const
+صحیح PlatformInfo::device_عدد() ثابت
 {
-    return p ? (int)p->devices.size() : 0;
+    بازگشت p ? (صحیح)p->devices.size() : 0;
 }
 
-void PlatformInfo::getDevice(Device& device, int d) const
+تهی PlatformInfo::getDevice(Device& device, صحیح d) ثابت
 {
-    CV_Assert(p && d < (int)p->devices.size() );
-    if(p)
+    CV_Assert(p && d < (صحیح)p->devices.size() );
+    اگر(p)
         device.set(p->devices[d]);
 }
 
-String PlatformInfo::name() const
+String PlatformInfo::name() ثابت
 {
-    return p ? p->getStrProp(CL_PLATFORM_NAME) : String();
+    بازگشت p ? p->getStrProp(CL_PLATFORM_NAME) : String();
 }
 
-String PlatformInfo::vendor() const
+String PlatformInfo::vendor() ثابت
 {
-    return p ? p->getStrProp(CL_PLATFORM_VENDOR) : String();
+    بازگشت p ? p->getStrProp(CL_PLATFORM_VENDOR) : String();
 }
 
-String PlatformInfo::version() const
+String PlatformInfo::version() ثابت
 {
-    return p ? p->version_ : String();
+    بازگشت p ? p->version_ : String();
 }
 
-int PlatformInfo::versionMajor() const
+صحیح PlatformInfo::versionMajor() ثابت
 {
     CV_Assert(p);
-    return p->versionMajor_;
+    بازگشت p->versionMajor_;
 }
 
-int PlatformInfo::versionMinor() const
+صحیح PlatformInfo::versionMinor() ثابت
 {
     CV_Assert(p);
-    return p->versionMinor_;
+    بازگشت p->versionMinor_;
 }
 
-static void getPlatforms(std::vector<cl_platform_id>& platforms)
+ایستا تهی getPlatforms(std::vector<cl_platform_id>& platforms)
 {
-    cl_uint numPlatforms = 0;
-    CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &numPlatforms));
+    cl_uint رقم_Platforms = 0;
+    CV_OCL_DBG_CHECK(clGetPlatformIDs(0, پوچ, &رقم_Platforms));
 
-    if (numPlatforms == 0)
+    اگر (رقم_Platforms == 0)
     {
         platforms.clear();
-        return;
+        بازگشت;
     }
 
-    platforms.resize((size_t)numPlatforms);
-    CV_OCL_DBG_CHECK(clGetPlatformIDs(numPlatforms, &platforms[0], &numPlatforms));
+    platforms.resize((size_t)رقم_Platforms);
+    CV_OCL_DBG_CHECK(clGetPlatformIDs(رقم_Platforms, &platforms[0], &رقم_Platforms));
 }
 
-void getPlatfomsInfo(std::vector<PlatformInfo>& platformsInfo)
+تهی getPlatfomsInfo(std::vector<PlatformInfo>& platformsInfo)
 {
     std::vector<cl_platform_id> platforms;
     getPlatforms(platforms);
 
-    for (size_t i = 0; i < platforms.size(); i++)
-        platformsInfo.push_back( PlatformInfo((void*)&platforms[i]) );
+    برای (size_t i = 0; i < platforms.size(); i++)
+        platformsInfo.push_back( PlatformInfo((تهی*)&platforms[i]) );
 }
 
-const char* typeToStr(int type)
+ثابت نویسه* typeToStr(صحیح type)
 {
-    static const char* tab[CV_DEPTH_MAX*16]=
+    ایستا ثابت نویسه* tab[CV_DEPTH_MAX*16]=
     {
         "uchar", "uchar2", "uchar3", "uchar4", 0, 0, 0, "uchar8", 0, 0, 0, 0, 0, 0, 0, "uchar16",
         "char", "char2", "char3", "char4", 0, 0, 0, "char8", 0, 0, 0, 0, 0, 0, 0, "char16",
@@ -7000,15 +7000,15 @@ const char* typeToStr(int type)
         "long", "long2", "long3", "long4", 0, 0, 0, "long8", 0, 0, 0, 0, 0, 0, 0, "long16",
         "uint", "uint2", "uint3", "uint4", 0, 0, 0, "uint8", 0, 0, 0, 0, 0, 0, 0, "uint16"
     };
-    int cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    const char* result = cn > 16 ? nullptr : tab[depth*16 + cn-1];
+    صحیح cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
+    ثابت نویسه* result = cn > 16 ? nullptr : tab[depth*16 + cn-1];
     CV_Assert(result);
-    return result;
+    بازگشت result;
 }
 
-const char* memopTypeToStr(int type)
+ثابت نویسه* memopTypeToStr(صحیح type)
 {
-    static const char* tab[CV_DEPTH_MAX*16] =
+    ایستا ثابت نویسه* tab[CV_DEPTH_MAX*16] =
     {
         "uchar", "uchar2", "uchar3", "uchar4", 0, 0, 0, "uchar8", 0, 0, 0, 0, 0, 0, 0, "uchar16",
         "char", "char2", "char3", "char4", 0, 0, 0, "char8", 0, 0, 0, 0, 0, 0, 0, "char16",
@@ -7024,15 +7024,15 @@ const char* memopTypeToStr(int type)
         "long", "long2", "long3", "long4", 0, 0, 0, "long8", 0, 0, 0, 0, 0, 0, 0, "long16",
         "uint", "uint2", "uint3", "uint4", 0, 0, 0, "uint8", 0, 0, 0, 0, 0, 0, 0, "uint16"
     };
-    int cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    const char* result = cn > 16 ? nullptr : tab[depth*16 + cn-1];
+    صحیح cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
+    ثابت نویسه* result = cn > 16 ? nullptr : tab[depth*16 + cn-1];
     CV_Assert(result);
-    return result;
+    بازگشت result;
 }
 
-const char* vecopTypeToStr(int type)
+ثابت نویسه* vecopTypeToStr(صحیح type)
 {
-    static const char* tab[CV_DEPTH_MAX*16] =
+    ایستا ثابت نویسه* tab[CV_DEPTH_MAX*16] =
     {
         "uchar", "short", "uchar3", "int", 0, 0, 0, "int2", 0, 0, 0, 0, 0, 0, 0, "int4",
         "char", "short", "char3", "int", 0, 0, 0, "int2", 0, 0, 0, 0, 0, 0, 0, "int4",
@@ -7048,46 +7048,46 @@ const char* vecopTypeToStr(int type)
         "long", "long2", "long3", "long4", 0, 0, 0, "long8", 0, 0, 0, 0, 0, 0, 0, "long16",
         "uint", "uint2", "uint3", "uint4", 0, 0, 0, "uint8", 0, 0, 0, 0, 0, 0, 0, "uint16"
     };
-    int cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    const char* result = cn > 16 ? 0 : tab[depth*16 + cn-1];
+    صحیح cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
+    ثابت نویسه* result = cn > 16 ? 0 : tab[depth*16 + cn-1];
     CV_Assert(result);
-    return result;
+    بازگشت result;
 }
 
 // Deprecated due to size of buf buffer being unknowable.
-const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf)
+ثابت نویسه* convertTypeStr(صحیح sdepth, صحیح ddepth, صحیح cn, نویسه* buf)
 {
     // Since the size of buf is not given, we assume 50 because that's what all callers use.
     constexpr size_t buf_max = 50;
 
-    return convertTypeStr(sdepth, ddepth, cn, buf, buf_max);
+    بازگشت convertTypeStr(sdepth, ddepth, cn, buf, buf_max);
 }
 
-const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf, size_t buf_size)
+ثابت نویسه* convertTypeStr(صحیح sdepth, صحیح ddepth, صحیح cn, نویسه* buf, size_t buf_size)
 {
-    if( sdepth == ddepth )
-        return "noconvert";
-    const char *typestr = typeToStr(CV_MAKETYPE(ddepth, cn));
-    if( CV_IS_FLOAT_TYPE(ddepth) ||
+    اگر( sdepth == ddepth )
+        بازگشت "noconvert";
+    ثابت نویسه *typestr = typeToStr(CV_MAKETYPE(ddepth, cn));
+    اگر( CV_IS_FLOAT_TYPE(ddepth) ||
         (ddepth == CV_32S && sdepth < CV_32S) ||
         (ddepth == CV_16S && sdepth <= CV_8S) ||
         (ddepth == CV_16U && sdepth == CV_8U))
     {
         snprintf(buf, buf_size, "convert_%s", typestr);
     }
-    else if( CV_IS_FLOAT_TYPE(sdepth) )
+    وگرنه اگر( CV_IS_FLOAT_TYPE(sdepth) )
         snprintf(buf, buf_size, "convert_%s_sat_rte", typestr);
-    else
+    وگرنه
         snprintf(buf, buf_size, "convert_%s_sat", typestr);
 
-    return buf;
+    بازگشت buf;
 }
 
-const char* getOpenCLErrorString(int errorCode)
+ثابت نویسه* getOpenCLErrorString(صحیح errorCode)
 {
-#define CV_OCL_CODE(id) case id: return #id
-#define CV_OCL_CODE_(id, name) case id: return #name
-    switch (errorCode)
+#define CV_OCL_CODE(id) حالت id: بازگشت #id
+#define CV_OCL_CODE_(id, name) حالت id: بازگشت #name
+    انتخاب (errorCode)
     {
     CV_OCL_CODE(CL_SUCCESS);
     CV_OCL_CODE(CL_DEVICE_NOT_FOUND);
@@ -7109,7 +7109,7 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_LINK_PROGRAM_FAILURE);
     CV_OCL_CODE(CL_DEVICE_PARTITION_FAILED);
     CV_OCL_CODE(CL_KERNEL_ARG_INFO_NOT_AVAILABLE);
-    CV_OCL_CODE(CL_INVALID_VALUE);
+    CV_OCL_CODE(CL_INVALID_مقدار);
     CV_OCL_CODE(CL_INVALID_DEVICE_TYPE);
     CV_OCL_CODE(CL_INVALID_PLATFORM);
     CV_OCL_CODE(CL_INVALID_DEVICE);
@@ -7121,7 +7121,7 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_INVALID_IMAGE_FORMAT_DESCRIPTOR);
     CV_OCL_CODE(CL_INVALID_IMAGE_SIZE);
     CV_OCL_CODE(CL_INVALID_SAMPLER);
-    CV_OCL_CODE(CL_INVALID_BINARY);
+    CV_OCL_CODE(CL_INVALID_دودویی);
     CV_OCL_CODE(CL_INVALID_BUILD_OPTIONS);
     CV_OCL_CODE(CL_INVALID_PROGRAM);
     CV_OCL_CODE(CL_INVALID_PROGRAM_EXECUTABLE);
@@ -7129,7 +7129,7 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_INVALID_KERNEL_DEFINITION);
     CV_OCL_CODE(CL_INVALID_KERNEL);
     CV_OCL_CODE(CL_INVALID_ARG_INDEX);
-    CV_OCL_CODE(CL_INVALID_ARG_VALUE);
+    CV_OCL_CODE(CL_INVALID_ARG_مقدار);
     CV_OCL_CODE(CL_INVALID_ARG_SIZE);
     CV_OCL_CODE(CL_INVALID_KERNEL_ARGS);
     CV_OCL_CODE(CL_INVALID_WORK_DIMENSION);
@@ -7149,7 +7149,7 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_INVALID_IMAGE_DESCRIPTOR);
     CV_OCL_CODE(CL_INVALID_COMPILER_OPTIONS);
     CV_OCL_CODE(CL_INVALID_LINKER_OPTIONS);
-    CV_OCL_CODE(CL_INVALID_DEVICE_PARTITION_COUNT);
+    CV_OCL_CODE(CL_INVALID_DEVICE_PARTITION_شمار);
     // OpenCL 2.0
     CV_OCL_CODE_(-69, CL_INVALID_PIPE_SIZE);
     CV_OCL_CODE_(-70, CL_INVALID_DEVICE_QUEUE);
@@ -7160,107 +7160,107 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE_(-1003, CL_INVALID_D3D10_RESOURCE_KHR);
     CV_OCL_CODE_(-1004, CL_D3D10_RESOURCE_ALREADY_ACQUIRED_KHR);
     CV_OCL_CODE_(-1005, CL_D3D10_RESOURCE_NOT_ACQUIRED_KHR);
-    default: return "Unknown OpenCL error";
+    پیشفرض: بازگشت "Unknown OpenCL error";
     }
 #undef CV_OCL_CODE
 #undef CV_OCL_CODE_
 }
 
 template <typename T>
-static std::string kerToStr(const Mat & k)
+ایستا std::string kerToStr(ثابت Mat & k)
 {
-    int width = k.cols - 1, depth = k.depth();
-    const T * const data = k.ptr<T>();
+    صحیح width = k.cols - 1, depth = k.depth();
+    ثابت T * ثابت data = k.ptr<T>();
 
     std::ostringstream stream;
     stream.precision(10);
 
-    if (depth <= CV_8S)
+    اگر (depth <= CV_8S)
     {
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << (int)data[i] << ")";
-        stream << "DIG(" << (int)data[width] << ")";
+        برای (صحیح i = 0; i < width; ++i)
+            stream << "DIG(" << (صحیح)data[i] << ")";
+        stream << "DIG(" << (صحیح)data[width] << ")";
     }
-    else if (depth == CV_32F)
+    وگرنه اگر (depth == CV_32F)
     {
         stream.setf(std::ios_base::showpoint);
-        for (int i = 0; i < width; ++i)
+        برای (صحیح i = 0; i < width; ++i)
             stream << "DIG(" << data[i] << "f)";
         stream << "DIG(" << data[width] << "f)";
     }
-    else if (depth == CV_16F)
+    وگرنه اگر (depth == CV_16F)
     {
         stream.setf(std::ios_base::showpoint);
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << (float)data[i] << "h)";
-        stream << "DIG(" << (float)data[width] << "h)";
+        برای (صحیح i = 0; i < width; ++i)
+            stream << "DIG(" << (اعشاری)data[i] << "h)";
+        stream << "DIG(" << (اعشاری)data[width] << "h)";
     }
-    else
+    وگرنه
     {
-        for (int i = 0; i < width; ++i)
+        برای (صحیح i = 0; i < width; ++i)
             stream << "DIG(" << data[i] << ")";
         stream << "DIG(" << data[width] << ")";
     }
 
-    return stream.str();
+    بازگشت stream.str();
 }
 
-String kernelToStr(InputArray _kernel, int ddepth, const char * name)
+String kernelToStr(درون_داد_Array _kernel, صحیح ddepth, ثابت نویسه * name)
 {
     Mat kernel = _kernel.getMat().reshape(1, 1);
 
-    int depth = kernel.depth();
-    if (ddepth < 0)
+    صحیح depth = kernel.depth();
+    اگر (ddepth < 0)
         ddepth = depth;
 
     // bf16 and fp8 constants have no OpenCL literal form, output them as regular float
-    if (ddepth == CV_16BF || ddepth == CV_8F_E4M3FN || ddepth == CV_8F_E4M3FNUZ)
+    اگر (ddepth == CV_16BF || ddepth == CV_8F_E4M3FN || ddepth == CV_8F_E4M3FNUZ)
         ddepth = CV_32F;
 
-    if (ddepth != depth)
+    اگر (ddepth != depth)
         kernel.convertTo(kernel, ddepth);
 
-    typedef std::string (* func_t)(const Mat &);
-    static const func_t funcs[CV_DEPTH_MAX] = { kerToStr<uchar>, kerToStr<char>, kerToStr<ushort>, kerToStr<short>,
-                                                kerToStr<int>, kerToStr<float>, kerToStr<double>, kerToStr<hfloat>,
-                                                0, kerToStr<bool>, kerToStr<uint64_t>, kerToStr<int64_t>, kerToStr<unsigned> };
-    const func_t func = funcs[ddepth];
+    تعریفنوع std::string (* func_t)(ثابت Mat &);
+    ایستا ثابت func_t funcs[CV_DEPTH_MAX] = { kerToStr<uchar>, kerToStr<نویسه>, kerToStr<ushort>, kerToStr<short>,
+                                                kerToStr<صحیح>, kerToStr<اعشاری>, kerToStr<دوگانه>, kerToStr<hfloat>,
+                                                0, kerToStr<منطقی>, kerToStr<uint64_t>, kerToStr<int64_t>, kerToStr<unsigned> };
+    ثابت func_t func = funcs[ddepth];
     CV_Assert(func != 0);
 
-    return cv::format(" -D %s=%s", name ? name : "COEFF", func(kernel).c_str());
+    بازگشت cv::format(" -D %s=%s", name ? name : "COEFF", func(kernel).c_str());
 }
 
 #define PROCESS_SRC(src) \
-    do \
+    انجامبده \
     { \
-        if (!src.empty()) \
+        اگر (!src.empty()) \
         { \
             CV_Assert(src.isMat() || src.isUMat()); \
             Size csize = src.size(); \
-            int ctype = src.type(), ccn = CV_MAT_CN(ctype), cdepth = CV_MAT_DEPTH(ctype), \
+            صحیح ctype = src.type(), ccn = CV_MAT_CN(ctype), cdepth = CV_MAT_DEPTH(ctype), \
                 ckercn = vectorWidths[cdepth], cwidth = ccn * csize.width; \
-            if (cwidth < ckercn || ckercn <= 0) \
-                return 1; \
+            اگر (cwidth < ckercn || ckercn <= 0) \
+                بازگشت 1; \
             cols.push_back(cwidth); \
-            if (strat == OCL_VECTOR_OWN && ctype != ref_type) \
-                return 1; \
+            اگر (strat == OCL_VECTOR_OWN && ctype != ref_type) \
+                بازگشت 1; \
             offsets.push_back(src.offset()); \
             steps.push_back(src.step()); \
             dividers.push_back(ckercn * CV_ELEM_SIZE1(ctype)); \
             kercns.push_back(ckercn); \
         } \
     } \
-    while ((void)0, 0)
+    وقتی ((تهی)0, 0)
 
-int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
-                              InputArray src4, InputArray src5, InputArray src6,
-                              InputArray src7, InputArray src8, InputArray src9,
+صحیح predictOptimalVectorWidth(درون_داد_Array src1, درون_داد_Array src2, درون_داد_Array src3,
+                              درون_داد_Array src4, درون_داد_Array src5, درون_داد_Array src6,
+                              درون_داد_Array src7, درون_داد_Array src8, درون_داد_Array src9,
                               OclVectorStrategy strat)
 {
-    const ocl::Device & d = ocl::Device::getDefault();
+    ثابت ocl::Device & d = ocl::Device::getDefault();
 
     // Indexed by depth: must span CV_DEPTH_MAX. bf16 has no OpenCL vector type.
-    int vectorWidths[CV_DEPTH_MAX] = {
+    صحیح vectorWidths[CV_DEPTH_MAX] = {
         d.preferredVectorWidthChar(), d.preferredVectorWidthChar(),   // CV_8U,  CV_8S
         d.preferredVectorWidthShort(), d.preferredVectorWidthShort(), // CV_16U, CV_16S
         d.preferredVectorWidthInt(), d.preferredVectorWidthFloat(),   // CV_32S, CV_32F
@@ -7272,7 +7272,7 @@ int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
     };
 
     // if the device says don't use vectors
-    if (vectorWidths[0] == 1)
+    اگر (vectorWidths[0] == 1)
     {
         // it's heuristic
         vectorWidths[CV_8U] = vectorWidths[CV_8S] = 4;
@@ -7280,30 +7280,30 @@ int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
         vectorWidths[CV_32S] = vectorWidths[CV_32F] = vectorWidths[CV_64F] = 1;
     }
 
-    return checkOptimalVectorWidth(vectorWidths, src1, src2, src3, src4, src5, src6, src7, src8, src9, strat);
+    بازگشت checkOptimalVectorWidth(vectorWidths, src1, src2, src3, src4, src5, src6, src7, src8, src9, strat);
 }
 
-int checkOptimalVectorWidth([[maybe_unused]] const int *vectorWidths,
-                            [[maybe_unused]] InputArray src1,
-                            [[maybe_unused]] InputArray src2,
-                            [[maybe_unused]] InputArray src3,
-                            [[maybe_unused]] InputArray src4,
-                            [[maybe_unused]] InputArray src5,
-                            [[maybe_unused]] InputArray src6,
-                            [[maybe_unused]] InputArray src7,
-                            [[maybe_unused]] InputArray src8,
-                            [[maybe_unused]] InputArray src9,
+صحیح checkOptimalVectorWidth([[maybe_unused]] ثابت صحیح *vectorWidths,
+                            [[maybe_unused]] درون_داد_Array src1,
+                            [[maybe_unused]] درون_داد_Array src2,
+                            [[maybe_unused]] درون_داد_Array src3,
+                            [[maybe_unused]] درون_داد_Array src4,
+                            [[maybe_unused]] درون_داد_Array src5,
+                            [[maybe_unused]] درون_داد_Array src6,
+                            [[maybe_unused]] درون_داد_Array src7,
+                            [[maybe_unused]] درون_داد_Array src8,
+                            [[maybe_unused]] درون_داد_Array src9,
                             [[maybe_unused]] OclVectorStrategy strat)
 {
 #ifdef __APPLE__
-    return 1;
-#else
+    بازگشت 1;
+#وگرنه
     CV_Assert(vectorWidths);
 
-    int ref_type = src1.type();
+    صحیح ref_type = src1.type();
 
     std::vector<size_t> offsets, steps, cols;
-    std::vector<int> dividers, kercns;
+    std::vector<صحیح> dividers, kercns;
     PROCESS_SRC(src1);
     PROCESS_SRC(src2);
     PROCESS_SRC(src3);
@@ -7316,48 +7316,48 @@ int checkOptimalVectorWidth([[maybe_unused]] const int *vectorWidths,
 
     size_t size = offsets.size();
 
-    for (size_t i = 0; i < size; ++i)
-        while (offsets[i] % dividers[i] != 0 || steps[i] % dividers[i] != 0 || cols[i] % kercns[i] != 0)
+    برای (size_t i = 0; i < size; ++i)
+        وقتی (offsets[i] % dividers[i] != 0 || steps[i] % dividers[i] != 0 || cols[i] % kercns[i] != 0)
             dividers[i] >>= 1, kercns[i] >>= 1;
 
     // default strategy
-    int kercn = *std::min_element(kercns.begin(), kercns.end());
+    صحیح kercn = *std::min_element(kercns.begin(), kercns.end());
 
-    return kercn;
+    بازگشت kercn;
 #endif
 }
 
-int predictOptimalVectorWidthMax(InputArray src1, InputArray src2, InputArray src3,
-                                 InputArray src4, InputArray src5, InputArray src6,
-                                 InputArray src7, InputArray src8, InputArray src9)
+صحیح predictOptimalVectorWidthMax(درون_داد_Array src1, درون_داد_Array src2, درون_داد_Array src3,
+                                 درون_داد_Array src4, درون_داد_Array src5, درون_داد_Array src6,
+                                 درون_داد_Array src7, درون_داد_Array src8, درون_داد_Array src9)
 {
-    return predictOptimalVectorWidth(src1, src2, src3, src4, src5, src6, src7, src8, src9, OCL_VECTOR_MAX);
+    بازگشت predictOptimalVectorWidth(src1, src2, src3, src4, src5, src6, src7, src8, src9, OCL_VECTOR_MAX);
 }
 
 #undef PROCESS_SRC
 
 
 // TODO Make this as a method of OpenCL "BuildOptions" class
-void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, InputArray _m)
+تهی buildOptionsAddMatrixDescription(String& buildOptions, ثابت String& name, درون_داد_Array _m)
 {
-    if (!buildOptions.empty())
+    اگر (!buildOptions.empty())
         buildOptions += " ";
-    int type = _m.type(), depth = CV_MAT_DEPTH(type);
+    صحیح type = _m.type(), depth = CV_MAT_DEPTH(type);
     buildOptions += format(
             "-D %s_T=%s -D %s_T1=%s -D %s_CN=%d -D %s_TSIZE=%d -D %s_T1SIZE=%d -D %s_DEPTH=%d",
             name.c_str(), ocl::typeToStr(type),
             name.c_str(), ocl::typeToStr(CV_MAKE_TYPE(depth, 1)),
-            name.c_str(), (int)CV_MAT_CN(type),
-            name.c_str(), (int)CV_ELEM_SIZE(type),
-            name.c_str(), (int)CV_ELEM_SIZE1(type),
-            name.c_str(), (int)depth
+            name.c_str(), (صحیح)CV_MAT_CN(type),
+            name.c_str(), (صحیح)CV_ELEM_SIZE(type),
+            name.c_str(), (صحیح)CV_ELEM_SIZE1(type),
+            name.c_str(), (صحیح)depth
             );
 }
 
 
-struct Image2D::Impl
+ساختار Image2D::Impl
 {
-    Impl(const UMat &src, bool norm, bool alias)
+    Impl(ثابت UMat &src, منطقی norm, منطقی alias)
     {
         handle = 0;
         refcount = 1;
@@ -7366,77 +7366,77 @@ struct Image2D::Impl
 
     ~Impl()
     {
-        if (handle)
+        اگر (handle)
             clReleaseMemObject(handle);
     }
 
-    static cl_image_format getImageFormat(int depth, int cn, bool norm)
+    ایستا cl_image_format getImageFormat(صحیح depth, صحیح cn, منطقی norm)
     {
         cl_image_format format;
-        static const int channelTypes[] = { CL_UNSIGNED_INT8, CL_SIGNED_INT8, CL_UNSIGNED_INT16,
+        ایستا ثابت صحیح channelTypes[] = { CL_UNSIGNED_INT8, CL_SIGNED_INT8, CL_UNSIGNED_INT16,
                                        CL_SIGNED_INT16, CL_SIGNED_INT32, CL_FLOAT, -1, CL_HALF_FLOAT };
-        static const int channelTypesNorm[] = { CL_UNORM_INT8, CL_SNORM_INT8, CL_UNORM_INT16,
+        ایستا ثابت صحیح channelTypesNorm[] = { CL_UNORM_INT8, CL_SNORM_INT8, CL_UNORM_INT16,
                                                 CL_SNORM_INT16, -1, -1, -1, -1 };
         // CL_RGB has no mappings to OpenCV types because CL_RGB can only be used with
         // CL_UNORM_SHORT_565, CL_UNORM_SHORT_555, or CL_UNORM_INT_101010.
-        static const int channelOrders[] = { -1, CL_R, CL_RG, /*CL_RGB*/ -1, CL_RGBA };
+        ایستا ثابت صحیح channelOrders[] = { -1, CL_R, CL_RG, /*CL_RGB*/ -1, CL_RGBA };
 
-        int channelType = norm ? channelTypesNorm[depth] : channelTypes[depth];
-        int channelOrder = channelOrders[cn];
+        صحیح channelType = norm ? channelTypesNorm[depth] : channelTypes[depth];
+        صحیح channelOrder = channelOrders[cn];
         format.image_channel_data_type = (cl_channel_type)channelType;
         format.image_channel_order = (cl_channel_order)channelOrder;
-        return format;
+        بازگشت format;
     }
 
-    static bool isFormatSupported(cl_image_format format)
+    ایستا منطقی isFormatSupported(cl_image_format format)
     {
-        if (!haveOpenCL())
+        اگر (!haveOpenCL())
             CV_Error(Error::OpenCLApiCallError, "OpenCL runtime not found!");
 
         cl_context context = (cl_context)Context::getDefault().ptr();
-        if (!context)
-            return false;
+        اگر (!context)
+            بازگشت نادرست;
 
         // Figure out how many formats are supported by this context.
-        cl_uint numFormats = 0;
+        cl_uint رقم_Formats = 0;
         cl_int err = clGetSupportedImageFormats(context, CL_MEM_READ_WRITE,
-                                                CL_MEM_OBJECT_IMAGE2D, numFormats,
-                                                NULL, &numFormats);
+                                                CL_MEM_OBJECT_IMAGE2D, رقم_Formats,
+                                                پوچ, &رقم_Formats);
         CV_OCL_DBG_CHECK_RESULT(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, NULL)");
-        if (numFormats > 0)
+        اگر (رقم_Formats > 0)
         {
-            AutoBuffer<cl_image_format> formats(numFormats);
+            AutoBuffer<cl_image_format> formats(رقم_Formats);
             err = clGetSupportedImageFormats(context, CL_MEM_READ_WRITE,
-                                             CL_MEM_OBJECT_IMAGE2D, numFormats,
-                                             formats.data(), NULL);
+                                             CL_MEM_OBJECT_IMAGE2D, رقم_Formats,
+                                             formats.data(), پوچ);
             CV_OCL_DBG_CHECK_RESULT(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, formats)");
-            for (cl_uint i = 0; i < numFormats; ++i)
+            برای (cl_uint i = 0; i < رقم_Formats; ++i)
             {
-                if (!memcmp(&formats[i], &format, sizeof(format)))
+                اگر (!memcmp(&formats[i], &format, اندازه(format)))
                 {
-                    return true;
+                    بازگشت درست;
                 }
             }
         }
-        return false;
+        بازگشت نادرست;
     }
 
-    void init(const UMat &src, bool norm, bool alias)
+    تهی init(ثابت UMat &src, منطقی norm, منطقی alias)
     {
-        if (!haveOpenCL())
+        اگر (!haveOpenCL())
             CV_Error(Error::OpenCLApiCallError, "OpenCL runtime not found!");
 
         CV_Assert(!src.empty());
         CV_Assert(ocl::Device::getDefault().imageSupport());
 
-        int err, depth = src.depth(), cn = src.channels();
+        صحیح err, depth = src.depth(), cn = src.channels();
         CV_Assert(cn <= 4);
         cl_image_format format = getImageFormat(depth, cn, norm);
 
-        if (!isFormatSupported(format))
+        اگر (!isFormatSupported(format))
             CV_Error(Error::OpenCLApiCallError, "Image format is not supported");
 
-        if (alias && !src.handle(ACCESS_RW))
+        اگر (alias && !src.handle(ACCESS_RW))
             CV_Error(Error::OpenCLApiCallError, "Incorrect UMat, handle is null");
 
         cl_context context = (cl_context)Context::getDefault().ptr();
@@ -7445,10 +7445,10 @@ struct Image2D::Impl
 #ifdef CL_VERSION_1_2
         // this enables backwards portability to
         // run on OpenCL 1.1 platform if library binaries are compiled with OpenCL 1.2 support
-        const Device & d = ocl::Device::getDefault();
-        int minor = d.deviceVersionMinor(), major = d.deviceVersionMajor();
+        ثابت Device & d = ocl::Device::getDefault();
+        صحیح minor = d.deviceVersionMinor(), major = d.deviceVersionMajor();
         CV_Assert(!alias || canCreateAlias(src));
-        if (1 < major || (1 == major && 2 <= minor))
+        اگر (1 < major || (1 == major && 2 <= minor))
         {
             cl_image_desc desc;
             desc.image_type       = CL_MEM_OBJECT_IMAGE2D;
@@ -7459,16 +7459,16 @@ struct Image2D::Impl
             desc.image_row_pitch  = alias ? src.step[0] : 0;
             desc.image_slice_pitch = 0;
             desc.buffer           = alias ? (cl_mem)src.handle(ACCESS_RW) : 0;
-            desc.num_mip_levels   = 0;
-            desc.num_samples      = 0;
-            handle = clCreateImage(context, CL_MEM_READ_WRITE, &format, &desc, NULL, &err);
+            desc.رقم_mip_levels   = 0;
+            desc.رقم_samples      = 0;
+            handle = clCreateImage(context, CL_MEM_READ_WRITE, &format, &desc, پوچ, &err);
         }
-        else
+        وگرنه
 #endif
         {
             CV_SUPPRESS_DEPRECATED_START
             CV_Assert(!alias);  // This is an OpenCL 1.2 extension
-            handle = clCreateImage2D(context, CL_MEM_READ_WRITE, &format, src.cols, src.rows, 0, NULL, &err);
+            handle = clCreateImage2D(context, CL_MEM_READ_WRITE, &format, src.cols, src.rows, 0, پوچ, &err);
             CV_SUPPRESS_DEPRECATED_END
         }
         CV_OCL_DBG_CHECK_RESULT(err, "clCreateImage()");
@@ -7477,28 +7477,28 @@ struct Image2D::Impl
         size_t region[] = { static_cast<size_t>(src.cols), static_cast<size_t>(src.rows), 1 };
 
         cl_mem devData;
-        if (!alias && !src.isContinuous())
+        اگر (!alias && !src.isContinuous())
         {
-            devData = clCreateBuffer(context, CL_MEM_READ_ONLY, src.cols * src.rows * src.elemSize(), NULL, &err);
+            devData = clCreateBuffer(context, CL_MEM_READ_ONLY, src.cols * src.rows * src.elemSize(), پوچ, &err);
             CV_OCL_CHECK_RESULT(err, cv::format("clCreateBuffer(CL_MEM_READ_ONLY, sz=%lld) => %p",
-                    (long long int)(src.cols * src.rows * src.elemSize()), (void*)devData
+                    (long long صحیح)(src.cols * src.rows * src.elemSize()), (تهی*)devData
                 ).c_str());
 
-            const size_t roi[3] = {static_cast<size_t>(src.cols) * src.elemSize(), static_cast<size_t>(src.rows), 1};
+            ثابت size_t roi[3] = {static_cast<size_t>(src.cols) * src.elemSize(), static_cast<size_t>(src.rows), 1};
             CV_OCL_CHECK(clEnqueueCopyBufferRect(queue, (cl_mem)src.handle(ACCESS_READ), devData, origin, origin,
-                roi, src.step, 0, src.cols * src.elemSize(), 0, 0, NULL, NULL));
+                roi, src.step, 0, src.cols * src.elemSize(), 0, 0, پوچ, پوچ));
             CV_OCL_DBG_CHECK(clFlush(queue));
         }
-        else
+        وگرنه
         {
             devData = (cl_mem)src.handle(ACCESS_READ);
         }
-        CV_Assert(devData != NULL);
+        CV_Assert(devData != پوچ);
 
-        if (!alias)
+        اگر (!alias)
         {
-            CV_OCL_CHECK(clEnqueueCopyBufferToImage(queue, devData, handle, 0, origin, region, 0, NULL, 0));
-            if (!src.isContinuous())
+            CV_OCL_CHECK(clEnqueueCopyBufferToImage(queue, devData, handle, 0, origin, region, 0, پوچ, 0));
+            اگر (!src.isContinuous())
             {
                 CV_OCL_DBG_CHECK(clFlush(queue));
                 CV_OCL_DBG_CHECK(clReleaseMemObject(devData));
@@ -7513,60 +7513,60 @@ struct Image2D::Impl
 
 Image2D::Image2D() CV_NOEXCEPT
 {
-    p = NULL;
+    p = پوچ;
 }
 
-Image2D::Image2D(const UMat &src, bool norm, bool alias)
+Image2D::Image2D(ثابت UMat &src, منطقی norm, منطقی alias)
 {
-    p = new Impl(src, norm, alias);
+    p = جدید Impl(src, norm, alias);
 }
 
-bool Image2D::canCreateAlias(const UMat &m)
+منطقی Image2D::canCreateAlias(ثابت UMat &m)
 {
-    bool ret = false;
-    const Device & d = ocl::Device::getDefault();
-    if (d.imageFromBufferSupport() && !m.empty())
+    منطقی ret = نادرست;
+    ثابت Device & d = ocl::Device::getDefault();
+    اگر (d.imageFromBufferSupport() && !m.empty())
     {
         // This is the required pitch alignment in pixels
         uint pitchAlign = d.imagePitchAlignment();
-        if (pitchAlign && !(m.step % (pitchAlign * m.elemSize())))
+        اگر (pitchAlign && !(m.step % (pitchAlign * m.elemSize())))
         {
             // We don't currently handle the case where the buffer was created
             // with CL_MEM_USE_HOST_PTR
-            if (!m.u->tempUMat())
+            اگر (!m.u->tempUMat())
             {
-                ret = true;
+                ret = درست;
             }
         }
     }
-    return ret;
+    بازگشت ret;
 }
 
-bool Image2D::isFormatSupported(int depth, int cn, bool norm)
+منطقی Image2D::isFormatSupported(صحیح depth, صحیح cn, منطقی norm)
 {
     cl_image_format format = Impl::getImageFormat(depth, cn, norm);
 
-    return Impl::isFormatSupported(format);
+    بازگشت Impl::isFormatSupported(format);
 }
 
-Image2D::Image2D(const Image2D & i)
+Image2D::Image2D(ثابت Image2D & i)
 {
     p = i.p;
-    if (p)
+    اگر (p)
         p->addref();
 }
 
-Image2D & Image2D::operator = (const Image2D & i)
+Image2D & Image2D::operator = (ثابت Image2D & i)
 {
-    if (i.p != p)
+    اگر (i.p != p)
     {
-        if (i.p)
+        اگر (i.p)
             i.p->addref();
-        if (p)
+        اگر (p)
             p->release();
         p = i.p;
     }
-    return *this;
+    بازگشت *این;
 }
 
 Image2D::Image2D(Image2D&& i) CV_NOEXCEPT
@@ -7577,120 +7577,120 @@ Image2D::Image2D(Image2D&& i) CV_NOEXCEPT
 
 Image2D& Image2D::operator = (Image2D&& i) CV_NOEXCEPT
 {
-    if (this != &i) {
-        if (p)
+    اگر (این != &i) {
+        اگر (p)
             p->release();
         p = i.p;
         i.p = nullptr;
     }
-    return *this;
+    بازگشت *این;
 }
 
 Image2D::~Image2D()
 {
-    if (p)
+    اگر (p)
         p->release();
 }
 
-void* Image2D::ptr() const
+تهی* Image2D::ptr() ثابت
 {
-    return p ? p->handle : 0;
+    بازگشت p ? p->handle : 0;
 }
 
-bool internal::isOpenCLForced()
+منطقی internal::isOpenCLForced()
 {
-    static bool initialized = false;
-    static bool value = false;
-    if (!initialized)
+    ایستا منطقی initialized = نادرست;
+    ایستا منطقی value = نادرست;
+    اگر (!initialized)
     {
-        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_FORCE", false);
-        initialized = true;
+        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_FORCE", نادرست);
+        initialized = درست;
     }
-    return value;
+    بازگشت value;
 }
 
-bool internal::isPerformanceCheckBypassed()
+منطقی internal::isPerformanceCheckBypassed()
 {
-    static bool initialized = false;
-    static bool value = false;
-    if (!initialized)
+    ایستا منطقی initialized = نادرست;
+    ایستا منطقی value = نادرست;
+    اگر (!initialized)
     {
-        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_PERF_CHECK_BYPASS", false);
-        initialized = true;
+        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_PERF_CHECK_BYPASS", نادرست);
+        initialized = درست;
     }
-    return value;
+    بازگشت value;
 }
 
-bool internal::isCLBuffer(UMat& u)
+منطقی internal::isCLBuffer(UMat& u)
 {
-    if (isCudaBacked(u.u))
-        return false;
-    void* h = u.handle(ACCESS_RW);
-    if (!h)
-        return true;
+    اگر (isCudaBacked(u.u))
+        بازگشت نادرست;
+    تهی* h = u.handle(ACCESS_RW);
+    اگر (!h)
+        بازگشت درست;
     CV_DbgAssert(u.u->currAllocator == getOpenCLAllocator());
-#if 1
-    if ((u.u->allocatorFlags_ & 0xffff0000) != 0) // OpenCL SVM flags are stored here
-        return false;
-#else
+#اگر 1
+    اگر ((u.u->allocatorFlags_ & 0xffff0000) != 0) // OpenCL SVM flags are stored here
+        بازگشت نادرست;
+#وگرنه
     cl_mem_object_type type = 0;
-    cl_int ret = clGetMemObjectInfo((cl_mem)h, CL_MEM_TYPE, sizeof(type), &type, NULL);
-    if (ret != CL_SUCCESS || type != CL_MEM_OBJECT_BUFFER)
-        return false;
+    cl_int ret = clGetMemObjectInfo((cl_mem)h, CL_MEM_TYPE, اندازه(type), &type, پوچ);
+    اگر (ret != CL_SUCCESS || type != CL_MEM_OBJECT_BUFFER)
+        بازگشت نادرست;
 #endif
-    return true;
+    بازگشت درست;
 }
 
-struct Timer::Impl
+ساختار Timer::Impl
 {
-    const Queue queue;
+    ثابت Queue queue;
 
-    Impl(const Queue& q)
+    Impl(ثابت Queue& q)
         : queue(q)
     {
     }
 
     ~Impl(){}
 
-    void start()
+    تهی start()
     {
         CV_OCL_DBG_CHECK(clFinish((cl_command_queue)queue.ptr()));
         timer.start();
     }
 
-    void stop()
+    تهی stop()
     {
         CV_OCL_DBG_CHECK(clFinish((cl_command_queue)queue.ptr()));
         timer.stop();
     }
 
-    uint64 durationNS() const
+    uint64 durationNS() ثابت
     {
-        return (uint64)(timer.getTimeSec() * 1e9);
+        بازگشت (uint64)(timer.getTimeSec() * 1e9);
     }
 
     TickMeter timer;
 };
 
-Timer::Timer(const Queue& q) : p(new Impl(q)) { }
+Timer::Timer(ثابت Queue& q) : p(جدید Impl(q)) { }
 Timer::~Timer() { delete p; }
 
-void Timer::start()
+تهی Timer::start()
 {
     CV_Assert(p);
     p->start();
 }
 
-void Timer::stop()
+تهی Timer::stop()
 {
     CV_Assert(p);
     p->stop();
 }
 
-uint64 Timer::durationNS() const
+uint64 Timer::durationNS() ثابت
 {
     CV_Assert(p);
-    return p->durationNS();
+    بازگشت p->durationNS();
 }
 
 }} // namespace

@@ -40,9 +40,9 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
-namespace cv
+فضاینام cv
 {
 
 Algorithm::Algorithm()
@@ -55,38 +55,38 @@ Algorithm::~Algorithm()
     CV_TRACE_FUNCTION();
 }
 
-void Algorithm::write(FileStorage& fs, const String& name) const
+تهی Algorithm::اكتب(FileStorage& fs, ثابت String& name) ثابت
 {
     CV_TRACE_FUNCTION();
-    if(name.empty())
+    اگر(name.empty())
     {
-        write(fs);
-        return;
+        اكتب(fs);
+        بازگشت;
     }
     fs << name << "{";
-    write(fs);
+    اكتب(fs);
     fs << "}";
 }
 
-void Algorithm::save(const String& filename) const
+تهی Algorithm::save(ثابت String& filename) ثابت
 {
     CV_TRACE_FUNCTION();
     FileStorage fs(filename, FileStorage::WRITE);
     fs << getDefaultName() << "{";
-    write(fs);
+    اكتب(fs);
     fs << "}";
 }
 
-String Algorithm::getDefaultName() const
+String Algorithm::getDefaultName() ثابت
 {
     CV_TRACE_FUNCTION();
-    return String("my_object");
+    بازگشت String("my_object");
 }
 
-void Algorithm::writeFormat(FileStorage& fs) const
+تهی Algorithm::writeFormat(FileStorage& fs) ثابت
 {
     CV_TRACE_FUNCTION();
-    fs << "format" << (int)3;
+    fs << "format" << (صحیح)3;
 }
 
 }

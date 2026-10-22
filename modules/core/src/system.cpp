@@ -41,38 +41,38 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 //#include "opencv2/core/core_c.h"
-#include <atomic>
-#include <exception>
-#include <iostream>
-#include <ostream>
+#شامل <atomic>
+#شامل <exception>
+#شامل <iostream>
+#شامل <ostream>
 
 #ifdef __QNX__
-    #include <unistd.h>
-    #include <sys/neutrino.h>
-    #include <sys/syspage.h>
+    #شامل <unistd.h>
+    #شامل <sys/neutrino.h>
+    #شامل <sys/syspage.h>
 #ifdef __aarch64__
-    #include <aarch64/syspage.h>
+    #شامل <aarch64/syspage.h>
 #endif
 #endif
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/trace.private.hpp>
+#شامل <opencv2/core/utils/configuration.private.hpp>
+#شامل <opencv2/core/utils/trace.private.hpp>
 
-#include <opencv2/core/utils/logger.hpp>
+#شامل <opencv2/core/utils/logger.hpp>
 
-#include <opencv2/core/utils/tls.hpp>
-#include <opencv2/core/utils/instrumentation.hpp>
+#شامل <opencv2/core/utils/tls.hpp>
+#شامل <opencv2/core/utils/instrumentation.hpp>
 
-#include <opencv2/core/utils/filesystem.private.hpp>
+#شامل <opencv2/core/utils/filesystem.private.hpp>
 
-#include <opencv2/core/utils/fp_control_utils.hpp>
-#include <opencv2/core/utils/fp_control.private.hpp>
+#شامل <opencv2/core/utils/fp_control_utils.hpp>
+#شامل <opencv2/core/utils/fp_control.private.hpp>
 
-namespace cv {
+فضاینام cv {
 
-static void _initSystem()
+ایستا تهی _initSystem()
 {
 #ifdef __ANDROID__
     // https://github.com/opencv/opencv/issues/14906
@@ -80,79 +80,79 @@ static void _initSystem()
     // Ref1: https://en.cppreference.com/w/cpp/io/ios_base/Init
     //       The header <iostream> behaves as if it defines (directly or indirectly) an instance of std::ios_base::Init with static storage duration
     // Ref2: https://github.com/gcc-mirror/gcc/blob/gcc-8-branch/libstdc%2B%2B-v3/include/std/iostream#L73-L74
-    static std::ios_base::Init s_iostream_initializer;
+    ایستا std::ios_base::Init s_iostream_initializer;
 #endif
 }
 
-static Mutex* __initialization_mutex = NULL;
+ایستا Mutex* __initialization_mutex = پوچ;
 Mutex& getInitializationMutex()
 {
-    if (__initialization_mutex == NULL)
+    اگر (__initialization_mutex == پوچ)
     {
-        (void)_initSystem();
-        __initialization_mutex = new Mutex();
+        (تهی)_initSystem();
+        __initialization_mutex = جدید Mutex();
     }
-    return *__initialization_mutex;
+    بازگشت *__initialization_mutex;
 }
 // force initialization (single-threaded environment)
 Mutex* __initialization_mutex_initializer = &getInitializationMutex();
 
-static bool param_dumpErrors = utils::getConfigurationParameterBool("OPENCV_DUMP_ERRORS",
-#if defined(_DEBUG) || defined(__ANDROID__)
-    true
-#else
-    false
+ایستا منطقی param_dumpErrors = utils::getConfigurationParameterBool("OPENCV_DUMP_ERRORS",
+#اگر defined(_DEBUG) || defined(__ANDROID__)
+    درست
+#وگرنه
+    نادرست
 #endif
 );
 
-void* allocSingletonBuffer(size_t size) { return fastMalloc(size); }
-void* allocSingletonNewBuffer(size_t size) { return malloc(size); }
+تهی* allocSingletonBuffer(size_t size) { بازگشت fastMalloc(size); }
+تهی* allocSingletonNewBuffer(size_t size) { بازگشت malloc(size); }
 
 
 } // namespace cv
 
 #ifndef CV_ERROR_SET_TERMINATE_HANDLER  // build config option
-# if defined(_WIN32)
+# اگر defined(_WIN32)
 #   define CV_ERROR_SET_TERMINATE_HANDLER 1
 # endif
 #endif
-#if defined(CV_ERROR_SET_TERMINATE_HANDLER) && !CV_ERROR_SET_TERMINATE_HANDLER
+#اگر defined(CV_ERROR_SET_TERMINATE_HANDLER) && !CV_ERROR_SET_TERMINATE_HANDLER
 # undef CV_ERROR_SET_TERMINATE_HANDLER
 #endif
 
 #ifdef _MSC_VER
-# if _MSC_VER >= 1700
+# اگر _MSC_VER >= 1700
 #  pragma warning(disable:4447) // Disable warning 'main' signature found without threading model
 # endif
 #endif
 
 #ifdef CV_ERROR_SET_TERMINATE_HANDLER
-#include <cstdlib>        // std::abort
+#شامل <cstdlib>        // std::abort
 #endif
 
-#if defined __ANDROID__ || defined __unix__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __HAIKU__ || defined __Fuchsia__ || defined __QNX__
+#اگر defined __ANDROID__ || defined __unix__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __HAIKU__ || defined __Fuchsia__ || defined __QNX__
 #  include <unistd.h>
 #  include <fcntl.h>
-#if defined __QNX__
+#اگر defined __QNX__
 #  include <sys/elf.h>
 #  include <sys/auxv.h>
 using Elf64_auxv_t = auxv64_t;
 #  include <elfdefinitions.h>
-const uint64_t AT_HWCAP = NT_GNU_HWCAP;
-#else
+ثابت uint64_t AT_HWCAP = NT_GNU_HWCAP;
+#وگرنه
 #  include <elf.h>
 #endif
-#if defined __ANDROID__ || defined __linux__
+#اگر defined __ANDROID__ || defined __linux__
 #  include <linux/auxvec.h>
 #endif
 #endif
 
-#if defined __ANDROID__ && defined HAVE_CPUFEATURES
+#اگر defined __ANDROID__ && defined HAVE_CPUFEATURES
 #  include <cpu-features.h>
 #endif
 
 
-#if ((defined __ppc64__ || defined __PPC64__) && (defined HAVE_GETAUXVAL || defined HAVE_ELF_AUX_INFO))
+#اگر ((defined __ppc64__ || defined __PPC64__) && (defined HAVE_GETAUXVAL || defined HAVE_ELF_AUX_INFO))
 # include "sys/auxv.h"
 # ifndef AT_HWCAP2
 #   define AT_HWCAP2 26
@@ -168,43 +168,43 @@ const uint64_t AT_HWCAP = NT_GNU_HWCAP;
 # endif
 #endif
 
-#if defined __loongarch64
-#include "sys/auxv.h"
+#اگر defined __loongarch64
+#شامل "sys/auxv.h"
 #define LA_HWCAP_LSX   (1<<4)
 #define LA_HWCAP_LASX  (1<<5)
 #endif
 
-#if defined _WIN32 || defined WINCE
+#اگر defined _WIN32 || defined WINCE
 #ifndef _WIN32_WINNT           // This is needed for the declaration of TryEnterCriticalSection in winbase.h with Visual Studio 2005 (and older?)
   #define _WIN32_WINNT 0x0400  // http://msdn.microsoft.com/en-us/library/ms686857(VS.85).aspx
 #endif
-#include <windows.h>
-#include <combaseapi.h>
-#if (_WIN32_WINNT >= 0x0602)
-  #include <synchapi.h>
+#شامل <windows.h>
+#شامل <combaseapi.h>
+#اگر (_WIN32_WINNT >= 0x0602)
+  #شامل <synchapi.h>
 #endif
-#if ((_WIN32_WINNT >= 0x0600) && !defined(CV_DISABLE_FLS)) || defined(CV_FORCE_FLS)
-  #include <fibersapi.h>
+#اگر ((_WIN32_WINNT >= 0x0600) && !defined(CV_DISABLE_FLS)) || defined(CV_FORCE_FLS)
+  #شامل <fibersapi.h>
   #define CV_USE_FLS
 #endif
 #undef small
 #undef min
 #undef max
 #undef abs
-#include <tchar.h>
+#شامل <tchar.h>
 
 #ifdef WINRT
-#include <wrl/client.h>
+#شامل <wrl/client.h>
 #ifndef __cplusplus_winrt
-#include <windows.storage.h>
+#شامل <windows.storage.h>
 #pragma comment(lib, "runtimeobject.lib")
 #endif // WINRT
 
 std::wstring GetTempPathWinRT()
 {
 #ifdef __cplusplus_winrt
-    return std::wstring(Windows::Storage::ApplicationData::Current->TemporaryFolder->Path->Data());
-#else
+    بازگشت std::wstring(Windows::Storage::ApplicationData::Current->TemporaryFolder->Path->Data());
+#وگرنه
     Microsoft::WRL::ComPtr<ABI::Windows::Storage::IApplicationDataStatics> appdataFactory;
     Microsoft::WRL::ComPtr<ABI::Windows::Storage::IApplicationData> appdataRef;
     Microsoft::WRL::ComPtr<ABI::Windows::Storage::IStorageFolder> storagefolderRef;
@@ -212,23 +212,23 @@ std::wstring GetTempPathWinRT()
     HSTRING str;
     HSTRING_HEADER hstrHead;
     std::wstring wstr;
-    if (FAILED(WindowsCreateStringReference(RuntimeClass_Windows_Storage_ApplicationData,
+    اگر (FAILED(WindowsCreateStringReference(RuntimeClass_Windows_Storage_ApplicationData,
                                             (UINT32)wcslen(RuntimeClass_Windows_Storage_ApplicationData), &hstrHead, &str)))
-        return wstr;
-    if (FAILED(RoGetActivationFactory(str, IID_PPV_ARGS(appdataFactory.ReleaseAndGetAddressOf()))))
-        return wstr;
-    if (FAILED(appdataFactory->get_Current(appdataRef.ReleaseAndGetAddressOf())))
-        return wstr;
-    if (FAILED(appdataRef->get_TemporaryFolder(storagefolderRef.ReleaseAndGetAddressOf())))
-        return wstr;
-    if (FAILED(storagefolderRef.As(&storageitemRef)))
-        return wstr;
-    str = NULL;
-    if (FAILED(storageitemRef->get_Path(&str)))
-        return wstr;
-    wstr = WindowsGetStringRawBuffer(str, NULL);
+        بازگشت wstr;
+    اگر (FAILED(RoGetActivationFactory(str, IID_PPV_ARGS(appdataFactory.ReleaseAndGetAddressOf()))))
+        بازگشت wstr;
+    اگر (FAILED(appdataFactory->get_Current(appdataRef.ReleaseAndGetAddressOf())))
+        بازگشت wstr;
+    اگر (FAILED(appdataRef->get_TemporaryFolder(storagefolderRef.ReleaseAndGetAddressOf())))
+        بازگشت wstr;
+    اگر (FAILED(storagefolderRef.As(&storageitemRef)))
+        بازگشت wstr;
+    str = پوچ;
+    اگر (FAILED(storageitemRef->get_Path(&str)))
+        بازگشت wstr;
+    wstr = WindowsGetStringRawBuffer(str, پوچ);
     WindowsDeleteString(str);
-    return wstr;
+    بازگشت wstr;
 #endif
 }
 
@@ -238,40 +238,40 @@ std::wstring GetTempFileNameWinRT(std::wstring prefix)
     GUID g;
     CoCreateGuid(&g);
     wchar_t* mask = L"%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
-    swprintf(&guidStr[0], sizeof(guidStr)/sizeof(wchar_t), mask,
+    swprintf(&guidStr[0], اندازه(guidStr)/اندازه(wchar_t), mask,
              g.Data1, g.Data2, g.Data3, UINT(g.Data4[0]), UINT(g.Data4[1]),
              UINT(g.Data4[2]), UINT(g.Data4[3]), UINT(g.Data4[4]),
              UINT(g.Data4[5]), UINT(g.Data4[6]), UINT(g.Data4[7]));
 
-    return prefix.append(std::wstring(guidStr));
+    بازگشت prefix.append(std::wstring(guidStr));
 }
 
 #endif
-#else
+#وگرنه
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
-#include <pthread.h>
+#شامل <pthread.h>
 #endif
-#include <sys/time.h>
-#include <time.h>
+#شامل <sys/time.h>
+#شامل <time.h>
 
-#if defined __MACH__ && defined __APPLE__
-#include <mach/mach.h>
-#include <mach/mach_time.h>
-#include <sys/sysctl.h>
+#اگر defined __MACH__ && defined __APPLE__
+#شامل <mach/mach.h>
+#شامل <mach/mach_time.h>
+#شامل <sys/sysctl.h>
 #endif
 
 #endif
 
 #ifdef _OPENMP
-#include "omp.h"
+#شامل "omp.h"
 #endif
 
-#if defined __unix__ || defined __APPLE__ || defined __EMSCRIPTEN__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __GLIBC__ || defined __HAIKU__
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/types.h>
-#if defined __ANDROID__
-#include <sys/sysconf.h>
+#اگر defined __unix__ || defined __APPLE__ || defined __EMSCRIPTEN__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __GLIBC__ || defined __HAIKU__
+#شامل <unistd.h>
+#شامل <stdio.h>
+#شامل <sys/types.h>
+#اگر defined __ANDROID__
+#شامل <sys/sysconf.h>
 #endif
 #endif
 
@@ -283,31 +283,31 @@ std::wstring GetTempFileNameWinRT(std::wstring prefix)
 DECLARE_CV_CPUID_X86
 #endif
 #ifndef CV_CPUID_X86
-  #if defined _MSC_VER && (defined _M_IX86 || defined _M_X64)
-    #if _MSC_VER >= 1400  // MSVS 2005
-      #include <intrin.h>  // __cpuidex()
+  #اگر defined _MSC_VER && (defined _M_IX86 || defined _M_X64)
+    #اگر _MSC_VER >= 1400  // MSVS 2005
+      #شامل <intrin.h>  // __cpuidex()
       #define CV_CPUID_X86 __cpuidex
-    #else
+    #وگرنه
       #error "Required MSVS 2005+"
     #endif
-  #elif defined __GNUC__ && (defined __i386__ || defined __x86_64__)
-    static void cv_cpuid(int* cpuid_data, int reg_eax, int reg_ecx)
+  #وگرنهاگر defined __GNUC__ && (defined __i386__ || defined __x86_64__)
+    ایستا تهی cv_cpuid(صحیح* cpuid_data, صحیح reg_eax, صحیح reg_ecx)
     {
-        int __eax = reg_eax, __ebx = 0, __ecx = reg_ecx, __edx = 0;
+        صحیح __eax = reg_eax, __ebx = 0, __ecx = reg_ecx, __edx = 0;
 // tested with available compilers (-fPIC -O2 -m32/-m64): https://godbolt.org/
-#if !defined(__PIC__) \
+#اگر !defined(__PIC__) \
     || defined(__x86_64__) || __GNUC__ >= 5 \
     || defined(__clang__) || defined(__INTEL_COMPILER)
         __asm__("cpuid\n\t"
                 : "+a" (__eax), "=b" (__ebx), "+c" (__ecx), "=d" (__edx)
         );
-#elif defined(__i386__)  // ebx may be reserved as the PIC register
+#وگرنهاگر defined(__i386__)  // ebx may be reserved as the PIC register
         __asm__("xchg{l}\t{%%}ebx, %1\n\t"
                 "cpuid\n\t"
                 "xchg{l}\t{%%}ebx, %1\n\t"
                 : "+a" (__eax), "=&r" (__ebx), "+c" (__ecx), "=d" (__edx)
         );
-#else
+#وگرنه
 #error "Configuration error"
 #endif
         cpuid_data[0] = __eax; cpuid_data[1] = __ebx; cpuid_data[2] = __ecx; cpuid_data[3] = __edx;
@@ -316,15 +316,15 @@ DECLARE_CV_CPUID_X86
   #endif
 #endif
 
-#include <chrono>
+#شامل <chrono>
 
-namespace cv
+فضاینام cv
 {
 
-Exception::Exception() { code = Error::StsOk; line = 0; }
+Exception::Exception() { code = Error::StsOk; سطر = 0; }
 
-Exception::Exception(Error::Code _code, const String& _err, const String& _func, const String& _file, int _line)
-: code(_code), err(_err), func(_func), file(_file), line(_line)
+Exception::Exception(Error::Code _code, ثابت String& _err, ثابت String& _func, ثابت String& _file, صحیح سطر_3)
+: code(_code), err(_err), func(_func), file(_file), سطر(سطر_3)
 {
     formatMessage();
 }
@@ -334,115 +334,115 @@ Exception::~Exception() CV_NOEXCEPT {}
 /*!
  \return the error description and the context as a text string.
  */
-const char* Exception::what() const CV_NOEXCEPT { return msg.c_str(); }
+ثابت نویسه* Exception::what() ثابت CV_NOEXCEPT { بازگشت پیام.c_str(); }
 
-void Exception::formatMessage()
+تهی Exception::formatMessage()
 {
     size_t pos = err.find('\n');
-    bool multiline = pos != cv::String::npos;
-    if (multiline)
+    منطقی multiline = pos != cv::String::npos;
+    اگر (multiline)
     {
         std::stringstream ss;
         size_t prev_pos = 0;
-        while (pos != cv::String::npos)
+        وقتی (pos != cv::String::npos)
         {
            ss << "> " << err.substr(prev_pos, pos - prev_pos) << std::endl;
            prev_pos = pos + 1;
            pos = err.find('\n', prev_pos);
         }
         ss << "> " << err.substr(prev_pos);
-        if (err[err.size() - 1] != '\n')
+        اگر (err[err.size() - 1] != '\n')
             ss << std::endl;
         err = ss.str();
     }
-    if (func.size() > 0)
+    اگر (func.size() > 0)
     {
-        if (multiline)
-            msg = format("OpenCV(%s) %s:%d: error: (%d:%s) in function '%s'\n%s", CV_VERSION, file.c_str(), line, code, codeMessage(), func.c_str(), err.c_str());
-        else
-            msg = format("OpenCV(%s) %s:%d: error: (%d:%s) %s in function '%s'\n", CV_VERSION, file.c_str(), line, code, codeMessage(), err.c_str(), func.c_str());
+        اگر (multiline)
+            پیام = format("OpenCV(%s) %s:%d: error: (%d:%s) in function '%s'\n%s", CV_VERSION, file.c_str(), سطر, code, codeMessage(), func.c_str(), err.c_str());
+        وگرنه
+            پیام = format("OpenCV(%s) %s:%d: error: (%d:%s) %s in function '%s'\n", CV_VERSION, file.c_str(), سطر, code, codeMessage(), err.c_str(), func.c_str());
     }
-    else
+    وگرنه
     {
-        msg = format("OpenCV(%s) %s:%d: error: (%d:%s) %s%s", CV_VERSION, file.c_str(), line, code, codeMessage(), err.c_str(), multiline ? "" : "\n");
+        پیام = format("OpenCV(%s) %s:%d: error: (%d:%s) %s%s", CV_VERSION, file.c_str(), سطر, code, codeMessage(), err.c_str(), multiline ? "" : "\n");
     }
 }
 
-const char * Exception::codeMessage() const
+ثابت نویسه * Exception::codeMessage() ثابت
 {
-    switch (code)
+    انتخاب (code)
     {
-    case cv::Error::StsOk :                  return "No Error";
-    case cv::Error::StsBackTrace :           return "Backtrace";
-    case cv::Error::StsError :               return "Unspecified error";
-    case cv::Error::StsInternal :            return "Internal error";
-    case cv::Error::StsNoMem :               return "Insufficient memory";
-    case cv::Error::StsBadArg :              return "Bad argument";
-    case cv::Error::StsNoConv :              return "Iterations do not converge";
-    case cv::Error::StsAutoTrace :           return "Autotrace call";
-    case cv::Error::StsBadSize :             return "Incorrect size of input array";
-    case cv::Error::StsNullPtr :             return "Null pointer";
-    case cv::Error::StsDivByZero :           return "Division by zero occurred";
-    case cv::Error::BadStep :                return "Image step is wrong";
-    case cv::Error::StsInplaceNotSupported : return "Inplace operation is not supported";
-    case cv::Error::StsObjectNotFound :      return "Requested object was not found";
-    case cv::Error::BadDepth :               return "Input image depth is not supported by function";
-    case cv::Error::StsUnmatchedFormats :    return "Formats of input arguments do not match";
-    case cv::Error::StsUnmatchedSizes :      return "Sizes of input arguments do not match";
-    case cv::Error::StsOutOfRange :          return "One of the arguments\' values is out of range";
-    case cv::Error::StsUnsupportedFormat :   return "Unsupported format or combination of formats";
-    case cv::Error::BadCOI :                 return "Input COI is not supported";
-    case cv::Error::BadNumChannels :         return "Bad number of channels";
-    case cv::Error::StsBadFlag :             return "Bad flag (parameter or structure field)";
-    case cv::Error::StsBadPoint :            return "Bad parameter of type CvPoint";
-    case cv::Error::StsBadMask :             return "Bad type of mask argument";
-    case cv::Error::StsParseError :          return "Parsing error";
-    case cv::Error::StsNotImplemented :      return "The function/feature is not implemented";
-    case cv::Error::StsBadMemBlock :         return "Memory block has been corrupted";
-    case cv::Error::StsAssert :              return "Assertion failed";
-    case cv::Error::GpuNotSupported :        return "No CUDA support";
-    case cv::Error::GpuApiCallError :        return "Gpu API call";
-    case cv::Error::OpenGlNotSupported :     return "No OpenGL support";
-    case cv::Error::OpenGlApiCallError :     return "OpenGL API call";
-    case cv::Error::OpenCLApiCallError :     return "OpenCL API call error";
-    case cv::Error::OpenCLDoubleNotSupported:return "OpenCL device does not support double";
-    case cv::Error::OpenCLInitError :        return "OpenCL initialization error";
-    case cv::Error::OpenCLNoAMDBlasFft :     return "Missing OpenCL AMD BLAS FFT";
-    default:
+    حالت cv::Error::StsOk :                  بازگشت "No Error";
+    حالت cv::Error::StsBackTrace :           بازگشت "Backtrace";
+    حالت cv::Error::StsError :               بازگشت "Unspecified error";
+    حالت cv::Error::StsInternal :            بازگشت "Internal error";
+    حالت cv::Error::StsNoMem :               بازگشت "Insufficient memory";
+    حالت cv::Error::StsBadArg :              بازگشت "Bad argument";
+    حالت cv::Error::StsNoConv :              بازگشت "Iterations do not converge";
+    حالت cv::Error::StsAutoTrace :           بازگشت "Autotrace call";
+    حالت cv::Error::StsBadSize :             بازگشت "Incorrect size of input array";
+    حالت cv::Error::StsNullPtr :             بازگشت "Null pointer";
+    حالت cv::Error::StsDivByZero :           بازگشت "Division by zero occurred";
+    حالت cv::Error::BadStep :                بازگشت "Image step is wrong";
+    حالت cv::Error::StsInplaceNotSupported : بازگشت "Inplace operation is not supported";
+    حالت cv::Error::StsObjectNotFound :      بازگشت "Requested object was not found";
+    حالت cv::Error::BadDepth :               بازگشت "Input image depth is not supported by function";
+    حالت cv::Error::StsUnmatchedFormats :    بازگشت "Formats of input arguments do not match";
+    حالت cv::Error::StsUnmatchedSizes :      بازگشت "Sizes of input arguments do not match";
+    حالت cv::Error::StsOutOfRange :          بازگشت "One of the arguments\' values is out of range";
+    حالت cv::Error::StsUnsupportedFormat :   بازگشت "Unsupported format or combination of formats";
+    حالت cv::Error::BadCOI :                 بازگشت "Input COI is not supported";
+    حالت cv::Error::Bad_رقم_Channels :         بازگشت "Bad number of channels";
+    حالت cv::Error::StsBadFlag :             بازگشت "Bad flag (parameter or structure field)";
+    حالت cv::Error::StsBadPoint :            بازگشت "Bad parameter of type CvPoint";
+    حالت cv::Error::StsBadMask :             بازگشت "Bad type of mask argument";
+    حالت cv::Error::StsParseError :          بازگشت "Parsing error";
+    حالت cv::Error::StsNotImplemented :      بازگشت "The function/feature is not implemented";
+    حالت cv::Error::StsBadMemBlock :         بازگشت "Memory block has been corrupted";
+    حالت cv::Error::StsAssert :              بازگشت "Assertion failed";
+    حالت cv::Error::GpuNotSupported :        بازگشت "No CUDA support";
+    حالت cv::Error::GpuApiCallError :        بازگشت "Gpu API call";
+    حالت cv::Error::OpenGlNotSupported :     بازگشت "No OpenGL support";
+    حالت cv::Error::OpenGlApiCallError :     بازگشت "OpenGL API call";
+    حالت cv::Error::OpenCLApiCallError :     بازگشت "OpenCL API call error";
+    حالت cv::Error::OpenCLDoubleNotSupported:بازگشت "OpenCL device does not support double";
+    حالت cv::Error::OpenCLInitError :        بازگشت "OpenCL initialization error";
+    حالت cv::Error::OpenCLNoAMDBlasFft :     بازگشت "Missing OpenCL AMD BLAS FFT";
+    پیشفرض:
     {
-        static char buf[256] {0};
-        snprintf(buf, sizeof(buf), "Unknown %s code %d", code >= 0 ? "status":"error", code);
-        return buf;
+        ایستا نویسه buf[256] {0};
+        snprintf(buf, اندازه(buf), "Unknown %s code %d", code >= 0 ? "status":"error", code);
+        بازگشت buf;
     }
     };
 
 }
 
-static const char* g_hwFeatureNames[CV_HARDWARE_MAX_FEATURE] = { NULL };
+ایستا ثابت نویسه* g_hwFeatureNames[CV_HARDWARE_MAX_FEATURE] = { پوچ };
 
-static const char* getHWFeatureName(int id)
+ایستا ثابت نویسه* getHWFeatureName(صحیح id)
 {
-    return (0 <= id && id < CV_HARDWARE_MAX_FEATURE) ? g_hwFeatureNames[id] : NULL;
+    بازگشت (0 <= id && id < CV_HARDWARE_MAX_FEATURE) ? g_hwFeatureNames[id] : پوچ;
 }
-static const char* getHWFeatureNameSafe(int id)
+ایستا ثابت نویسه* getHWFeatureNameSafe(صحیح id)
 {
-    const char* name = getHWFeatureName(id);
-    return name ? name : "Unknown feature";
+    ثابت نویسه* name = getHWFeatureName(id);
+    بازگشت name ? name : "Unknown feature";
 }
 
-struct HWFeatures
+ساختار HWFeatures
 {
-    enum { MAX_FEATURE = CV_HARDWARE_MAX_FEATURE };
+    شمارش { MAX_FEATURE = CV_HARDWARE_MAX_FEATURE };
 
-    HWFeatures(bool run_initialize = false)
+    HWFeatures(منطقی run_initialize = نادرست)
     {
-        if (run_initialize)
+        اگر (run_initialize)
             initialize();
     }
 
-    static void initializeNames()
+    ایستا تهی initializeNames()
     {
-        for (int i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
+        برای (صحیح i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
         {
             g_hwFeatureNames[i] = 0;
         }
@@ -503,9 +503,9 @@ struct HWFeatures
         g_hwFeatureNames[CPU_LASX] = "LASX";
     }
 
-    void initialize(void)
+    تهی initialize(تهی)
     {
-        if (utils::getConfigurationParameterBool("OPENCV_DUMP_CONFIG"))
+        اگر (utils::getConfigurationParameterBool("OPENCV_DUMP_CONFIG"))
         {
             fprintf(stderr, "\nOpenCV build configuration is:\n%s\n",
                 cv::getBuildInformation().c_str());
@@ -514,13 +514,13 @@ struct HWFeatures
         initializeNames();
 
     #ifdef CV_CPUID_X86
-        int cpuid_data[4] = { 0, 0, 0, 0 };
-        int cpuid_data_ex[4] = { 0, 0, 0, 0 };
+        صحیح cpuid_data[4] = { 0, 0, 0, 0 };
+        صحیح cpuid_data_ex[4] = { 0, 0, 0, 0 };
 
         CV_CPUID_X86(cpuid_data, 1, 0/*unused*/);
 
-        int x86_family = (cpuid_data[0] >> 8) & 15;
-        if( x86_family >= 6 )
+        صحیح x86_family = (cpuid_data[0] >> 8) & 15;
+        اگر( x86_family >= 6 )
         {
             have[CV_CPU_MMX]    = (cpuid_data[3] & (1<<23)) != 0;
             have[CV_CPU_SSE]    = (cpuid_data[3] & (1<<25)) != 0;
@@ -557,57 +557,57 @@ struct HWFeatures
             have[CV_CPU_AVX_5124FMAPS]    = (cpuid_data_ex[3] & (1<<3))  != 0;
 
             // CPUID leaf 7, subleaf 1 for AVX-VNNI
-            int cpuid_data_ex1[4] = { 0, 0, 0, 0 };
+            صحیح cpuid_data_ex1[4] = { 0, 0, 0, 0 };
             CV_CPUID_X86(cpuid_data_ex1, 7, 1);
             have[CV_CPU_AVX_VNNI]         = (cpuid_data_ex1[0] & (1<<4))  != 0;
 
-            bool have_AVX_OS_support = true;
-            bool have_AVX512_OS_support = true;
-            if (!(cpuid_data[2] & (1<<27)))
-                have_AVX_OS_support = false; // OS uses XSAVE_XRSTORE and CPU support AVX
-            else
+            منطقی have_AVX_OS_support = درست;
+            منطقی have_AVX512_OS_support = درست;
+            اگر (!(cpuid_data[2] & (1<<27)))
+                have_AVX_OS_support = نادرست; // OS uses XSAVE_XRSTORE and CPU support AVX
+            وگرنه
             {
-                int xcr0 = 0;
+                صحیح xcr0 = 0;
             #ifdef _XCR_XFEATURE_ENABLED_MASK // requires immintrin.h
-                xcr0 = (int)_xgetbv(_XCR_XFEATURE_ENABLED_MASK);
-            #elif defined __GNUC__ && (defined __i386__ || defined __x86_64__)
+                xcr0 = (صحیح)_xgetbv(_XCR_XFEATURE_ENABLED_MASK);
+            #وگرنهاگر defined __GNUC__ && (defined __i386__ || defined __x86_64__)
                 __asm__ ("xgetbv\n\t" : "=a" (xcr0) : "c" (0) : "%edx" );
             #endif
-                if ((xcr0 & 0x6) != 0x6)
-                    have_AVX_OS_support = false; // YMM registers
-                if ((xcr0 & 0xe6) != 0xe6)
-                    have_AVX512_OS_support = false; // ZMM registers
+                اگر ((xcr0 & 0x6) != 0x6)
+                    have_AVX_OS_support = نادرست; // YMM registers
+                اگر ((xcr0 & 0xe6) != 0xe6)
+                    have_AVX512_OS_support = نادرست; // ZMM registers
             }
 
-            if (!have_AVX_OS_support)
+            اگر (!have_AVX_OS_support)
             {
-                have[CV_CPU_AVX] = false;
-                have[CV_CPU_FP16] = false;
-                have[CV_CPU_AVX2] = false;
-                have[CV_CPU_FMA3] = false;
-                have[CV_CPU_AVX_VNNI] = false;
+                have[CV_CPU_AVX] = نادرست;
+                have[CV_CPU_FP16] = نادرست;
+                have[CV_CPU_AVX2] = نادرست;
+                have[CV_CPU_FMA3] = نادرست;
+                have[CV_CPU_AVX_VNNI] = نادرست;
             }
-            if (!have_AVX_OS_support || !have_AVX512_OS_support)
+            اگر (!have_AVX_OS_support || !have_AVX512_OS_support)
             {
-                have[CV_CPU_AVX_512F] = false;
-                have[CV_CPU_AVX_512BW] = false;
-                have[CV_CPU_AVX_512CD] = false;
-                have[CV_CPU_AVX_512DQ] = false;
-                have[CV_CPU_AVX_512ER] = false;
-                have[CV_CPU_AVX_512IFMA] = false;
-                have[CV_CPU_AVX_512PF] = false;
-                have[CV_CPU_AVX_512VBMI] = false;
-                have[CV_CPU_AVX_512VL] = false;
-                have[CV_CPU_AVX_512VBMI2] = false;
-                have[CV_CPU_AVX_512VNNI] = false;
-                have[CV_CPU_AVX_512BITALG] = false;
-                have[CV_CPU_AVX_512VPOPCNTDQ] = false;
-                have[CV_CPU_AVX_5124VNNIW] = false;
-                have[CV_CPU_AVX_5124FMAPS] = false;
+                have[CV_CPU_AVX_512F] = نادرست;
+                have[CV_CPU_AVX_512BW] = نادرست;
+                have[CV_CPU_AVX_512CD] = نادرست;
+                have[CV_CPU_AVX_512DQ] = نادرست;
+                have[CV_CPU_AVX_512ER] = نادرست;
+                have[CV_CPU_AVX_512IFMA] = نادرست;
+                have[CV_CPU_AVX_512PF] = نادرست;
+                have[CV_CPU_AVX_512VBMI] = نادرست;
+                have[CV_CPU_AVX_512VL] = نادرست;
+                have[CV_CPU_AVX_512VBMI2] = نادرست;
+                have[CV_CPU_AVX_512VNNI] = نادرست;
+                have[CV_CPU_AVX_512BITALG] = نادرست;
+                have[CV_CPU_AVX_512VPOPCNTDQ] = نادرست;
+                have[CV_CPU_AVX_5124VNNIW] = نادرست;
+                have[CV_CPU_AVX_5124FMAPS] = نادرست;
             }
 
             have[CV_CPU_AVX512_COMMON] = have[CV_CPU_AVX_512F] && have[CV_CPU_AVX_512CD];
-            if (have[CV_CPU_AVX512_COMMON])
+            اگر (have[CV_CPU_AVX512_COMMON])
             {
                 have[CV_CPU_AVX512_KNL] = have[CV_CPU_AVX_512ER]  && have[CV_CPU_AVX_512PF];
                 have[CV_CPU_AVX512_KNM] = have[CV_CPU_AVX512_KNL] && have[CV_CPU_AVX_5124FMAPS] &&
@@ -620,40 +620,40 @@ struct HWFeatures
                                           have[CV_CPU_AVX_512VNNI] &&
                                           have[CV_CPU_AVX_512VBMI2] && have[CV_CPU_AVX_512BITALG] && have[CV_CPU_AVX_512VPOPCNTDQ];
             }
-            else
+            وگرنه
             {
-                have[CV_CPU_AVX512_KNL] = false;
-                have[CV_CPU_AVX512_KNM] = false;
-                have[CV_CPU_AVX512_SKX] = false;
-                have[CV_CPU_AVX512_CNL] = false;
-                have[CV_CPU_AVX512_CLX] = false;
-                have[CV_CPU_AVX512_ICL] = false;
+                have[CV_CPU_AVX512_KNL] = نادرست;
+                have[CV_CPU_AVX512_KNM] = نادرست;
+                have[CV_CPU_AVX512_SKX] = نادرست;
+                have[CV_CPU_AVX512_CNL] = نادرست;
+                have[CV_CPU_AVX512_CLX] = نادرست;
+                have[CV_CPU_AVX512_ICL] = نادرست;
             }
         }
     #endif // CV_CPUID_X86
 
-    #if defined __ANDROID__ || defined __linux__ || defined __QNX__
+    #اگر defined __ANDROID__ || defined __linux__ || defined __QNX__
     #ifdef __aarch64__
-        have[CV_CPU_NEON] = true;
-        have[CV_CPU_FP16] = true;
-        int cpufile = open("/proc/self/auxv", O_RDONLY);
+        have[CV_CPU_NEON] = درست;
+        have[CV_CPU_FP16] = درست;
+        صحیح cpufile = open("/proc/self/auxv", O_RDONLY);
 
-        if (cpufile >= 0)
+        اگر (cpufile >= 0)
         {
             Elf64_auxv_t auxv;
-            const size_t size_auxv_t = sizeof(auxv);
+            ثابت size_t size_auxv_t = اندازه(auxv);
 
-            while ((size_t)read(cpufile, &auxv, size_auxv_t) == size_auxv_t)
+            وقتی ((size_t)اقرأ(cpufile, &auxv, size_auxv_t) == size_auxv_t)
             {
                 // see https://elixir.bootlin.com/linux/latest/source/arch/arm64/include/uapi/asm/hwcap.h
-                if (auxv.a_type == AT_HWCAP)
+                اگر (auxv.a_type == AT_HWCAP)
                 {
                     have[CV_CPU_NEON_DOTPROD] = (auxv.a_un.a_val & (1 << 20)) != 0; // HWCAP_ASIMDDP
                     have[CV_CPU_NEON_FP16] = (auxv.a_un.a_val & (1 << 10)) != 0; // HWCAP_ASIMDHP
                     have[CV_CPU_SVE] = (auxv.a_un.a_val & (1 << 22)) != 0; // HWCAP_SVE
                 }
-#if defined(AT_HWCAP2)
-                else if (auxv.a_type == AT_HWCAP2)
+#اگر defined(AT_HWCAP2)
+                وگرنه اگر (auxv.a_type == AT_HWCAP2)
                 {
                     have[CV_CPU_NEON_BF16] = (auxv.a_un.a_val & (1 << 14)) != 0; // HWCAP2_BF16
                 }
@@ -662,149 +662,149 @@ struct HWFeatures
 
             close(cpufile);
         }
-    #elif defined __arm__ && defined __ANDROID__
-      #if defined HAVE_CPUFEATURES
-        CV_LOG_INFO(NULL, "calling android_getCpuFeatures() ...");
+    #وگرنهاگر defined __arm__ && defined __ANDROID__
+      #اگر defined HAVE_CPUFEATURES
+        CV_LOG_INFO(پوچ, "calling android_getCpuFeatures() ...");
         uint64_t features = android_getCpuFeatures();
-        CV_LOG_INFO(NULL, cv::format("calling android_getCpuFeatures() ... Done (%llx)", (long long)features));
+        CV_LOG_INFO(پوچ, cv::format("calling android_getCpuFeatures() ... Done (%llx)", (long long)features));
         have[CV_CPU_NEON] = (features & ANDROID_CPU_ARM_FEATURE_NEON) != 0;
         have[CV_CPU_FP16] = (features & ANDROID_CPU_ARM_FEATURE_VFP_FP16) != 0;
-      #else
-        CV_LOG_INFO(NULL, "cpufeatures library is not available for CPU detection");
-        #if CV_NEON
-        CV_LOG_INFO(NULL, "- NEON instructions is enabled via build flags");
-        have[CV_CPU_NEON] = true;
-        #else
-        CV_LOG_INFO(NULL, "- NEON instructions is NOT enabled via build flags");
+      #وگرنه
+        CV_LOG_INFO(پوچ, "cpufeatures library is not available for CPU detection");
+        #اگر CV_NEON
+        CV_LOG_INFO(پوچ, "- NEON instructions is enabled via build flags");
+        have[CV_CPU_NEON] = درست;
+        #وگرنه
+        CV_LOG_INFO(پوچ, "- NEON instructions is NOT enabled via build flags");
         #endif
-        #if CV_FP16
-        CV_LOG_INFO(NULL, "- FP16 instructions is enabled via build flags");
-        have[CV_CPU_FP16] = true;
-        #else
-        CV_LOG_INFO(NULL, "- FP16 instructions is NOT enabled via build flags");
+        #اگر CV_FP16
+        CV_LOG_INFO(پوچ, "- FP16 instructions is enabled via build flags");
+        have[CV_CPU_FP16] = درست;
+        #وگرنه
+        CV_LOG_INFO(پوچ, "- FP16 instructions is NOT enabled via build flags");
         #endif
       #endif
-    #elif defined __arm__
-        int cpufile = open("/proc/self/auxv", O_RDONLY);
+    #وگرنهاگر defined __arm__
+        صحیح cpufile = open("/proc/self/auxv", O_RDONLY);
 
-        if (cpufile >= 0)
+        اگر (cpufile >= 0)
         {
             Elf32_auxv_t auxv;
-            const size_t size_auxv_t = sizeof(auxv);
+            ثابت size_t size_auxv_t = اندازه(auxv);
 
-            while ((size_t)read(cpufile, &auxv, size_auxv_t) == size_auxv_t)
+            وقتی ((size_t)اقرأ(cpufile, &auxv, size_auxv_t) == size_auxv_t)
             {
-                if (auxv.a_type == AT_HWCAP)
+                اگر (auxv.a_type == AT_HWCAP)
                 {
                     have[CV_CPU_NEON] = (auxv.a_un.a_val & 4096) != 0;
                     have[CV_CPU_FP16] = (auxv.a_un.a_val & 2) != 0;
-                    break;
+                    بشکن;
                 }
             }
 
             close(cpufile);
         }
     #endif
-    #elif (defined __APPLE__)
-    #if defined __ARM_NEON
-        have[CV_CPU_NEON] = true;
+    #وگرنهاگر (defined __APPLE__)
+    #اگر defined __ARM_NEON
+        have[CV_CPU_NEON] = درست;
     #endif
-    #if (defined __ARM_FP  && (((__ARM_FP & 0x2) != 0) && defined __ARM_NEON))
-        have[CV_CPU_FP16] = have[CV_CPU_NEON_FP16] = true;
+    #اگر (defined __ARM_FP  && (((__ARM_FP & 0x2) != 0) && defined __ARM_NEON))
+        have[CV_CPU_FP16] = have[CV_CPU_NEON_FP16] = درست;
     #endif
     // system.cpp may be compiled w/o special -march=armv8...+dotprod, -march=armv8...+bf16 etc.,
     // so we check for the features in any case, no mater what are the compile flags.
     // We check the real hardware capabilities here.
-    int has_feat_dotprod = 0;
-    size_t has_feat_dotprod_size = sizeof(has_feat_dotprod);
-    sysctlbyname("hw.optional.arm.FEAT_DotProd", &has_feat_dotprod, &has_feat_dotprod_size, NULL, 0);
-    if (has_feat_dotprod) {
-        have[CV_CPU_NEON_DOTPROD] = true;
+    صحیح has_feat_dotprod = 0;
+    size_t has_feat_dotprod_size = اندازه(has_feat_dotprod);
+    sysctlbyname("hw.optional.arm.FEAT_DotProd", &has_feat_dotprod, &has_feat_dotprod_size, پوچ, 0);
+    اگر (has_feat_dotprod) {
+        have[CV_CPU_NEON_DOTPROD] = درست;
     }
-    int has_feat_bf16 = 0;
-    size_t has_feat_bf16_size = sizeof(has_feat_bf16);
-    sysctlbyname("hw.optional.arm.FEAT_BF16", &has_feat_bf16, &has_feat_bf16_size, NULL, 0);
-    if (has_feat_bf16) {
-        have[CV_CPU_NEON_BF16] = true;
+    صحیح has_feat_bf16 = 0;
+    size_t has_feat_bf16_size = اندازه(has_feat_bf16);
+    sysctlbyname("hw.optional.arm.FEAT_BF16", &has_feat_bf16, &has_feat_bf16_size, پوچ, 0);
+    اگر (has_feat_bf16) {
+        have[CV_CPU_NEON_BF16] = درست;
     }
-    #elif (defined __clang__)
-    #if defined __ARM_NEON
-        have[CV_CPU_NEON] = true;
-        #if (defined __ARM_FP  && ((__ARM_FP & 0x2) != 0))
-        have[CV_CPU_FP16] = true;
+    #وگرنهاگر (defined __clang__)
+    #اگر defined __ARM_NEON
+        have[CV_CPU_NEON] = درست;
+        #اگر (defined __ARM_FP  && ((__ARM_FP & 0x2) != 0))
+        have[CV_CPU_FP16] = درست;
         #endif
     #endif
     #endif
-    #if defined _ARM_ && (defined(_WIN32_WCE) && _WIN32_WCE >= 0x800)
-        have[CV_CPU_NEON] = true;
+    #اگر defined _ARM_ && (defined(_WIN32_WCE) && _WIN32_WCE >= 0x800)
+        have[CV_CPU_NEON] = درست;
     #endif
-    #if defined _M_ARM64 || defined _M_ARM64EC
-        have[CV_CPU_NEON] = true;
+    #اگر defined _M_ARM64 || defined _M_ARM64EC
+        have[CV_CPU_NEON] = درست;
     #endif
     #ifdef __riscv_vector
-        have[CV_CPU_RISCVV] = true;
+        have[CV_CPU_RISCVV] = درست;
     #endif
     #ifdef __mips_msa
-        have[CV_CPU_MSA] = true;
+        have[CV_CPU_MSA] = درست;
     #endif
 
-    #if (defined __ppc64__ || defined __PPC64__) && defined HAVE_GETAUXVAL
-        unsigned int hwcap = getauxval(AT_HWCAP);
-        if (hwcap & PPC_FEATURE_HAS_VSX) {
+    #اگر (defined __ppc64__ || defined __PPC64__) && defined HAVE_GETAUXVAL
+        unsigned صحیح hwcap = getauxval(AT_HWCAP);
+        اگر (hwcap & PPC_FEATURE_HAS_VSX) {
             hwcap = getauxval(AT_HWCAP2);
-            if (hwcap & PPC_FEATURE2_ARCH_3_00) {
-                have[CV_CPU_VSX] = have[CV_CPU_VSX3] = true;
-            } else {
+            اگر (hwcap & PPC_FEATURE2_ARCH_3_00) {
+                have[CV_CPU_VSX] = have[CV_CPU_VSX3] = درست;
+            } وگرنه {
                 have[CV_CPU_VSX] = (hwcap & PPC_FEATURE2_ARCH_2_07) != 0;
             }
         }
-    #elif (defined __ppc64__ || defined __PPC64__) && defined HAVE_ELF_AUX_INFO
+    #وگرنهاگر (defined __ppc64__ || defined __PPC64__) && defined HAVE_ELF_AUX_INFO
         unsigned long hwcap = 0, hwcap2 = 0;
-        if (elf_aux_info(AT_HWCAP, &hwcap, sizeof(hwcap)) != 0)
+        اگر (elf_aux_info(AT_HWCAP, &hwcap, اندازه(hwcap)) != 0)
             hwcap = 0;
-        if (hwcap & PPC_FEATURE_HAS_VSX) {
-            if (elf_aux_info(AT_HWCAP2, &hwcap2, sizeof(hwcap2)) != 0)
+        اگر (hwcap & PPC_FEATURE_HAS_VSX) {
+            اگر (elf_aux_info(AT_HWCAP2, &hwcap2, اندازه(hwcap2)) != 0)
                 hwcap2 = 0;
-            if (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
-                have[CV_CPU_VSX] = have[CV_CPU_VSX3] = true;
-            } else {
+            اگر (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
+                have[CV_CPU_VSX] = have[CV_CPU_VSX3] = درست;
+            } وگرنه {
                 have[CV_CPU_VSX] = (hwcap2 & PPC_FEATURE2_ARCH_2_07) != 0;
             }
         }
-    #else
+    #وگرنه
         // TODO: AIX
-        #if CV_VSX || defined _ARCH_PWR8 || defined __POWER9_VECTOR__
-            have[CV_CPU_VSX] = true;
+        #اگر CV_VSX || defined _ARCH_PWR8 || defined __POWER9_VECTOR__
+            have[CV_CPU_VSX] = درست;
         #endif
-        #if CV_VSX3 || defined __POWER9_VECTOR__
-            have[CV_CPU_VSX3] = true;
-        #endif
-    #endif
-
-    #if defined __riscv && defined __riscv_vector
-        have[CV_CPU_RVV] = true;
-        #if (defined __riscv_zvfh && __riscv_zvfh) || (defined __riscv_zvfhmin && __riscv_zvfhmin)
-            have[CV_CPU_FP16] = true;
-        #endif
-        #if defined __riscv_zvfh && __riscv_zvfh
-            have[CV_CPU_RVV_ZVFH] = true;
+        #اگر CV_VSX3 || defined __POWER9_VECTOR__
+            have[CV_CPU_VSX3] = درست;
         #endif
     #endif
 
-    #if defined __loongarch64 && defined __linux__
-        int flag = (int)getauxval(AT_HWCAP);
+    #اگر defined __riscv && defined __riscv_vector
+        have[CV_CPU_RVV] = درست;
+        #اگر (defined __riscv_zvfh && __riscv_zvfh) || (defined __riscv_zvfhmin && __riscv_zvfhmin)
+            have[CV_CPU_FP16] = درست;
+        #endif
+        #اگر defined __riscv_zvfh && __riscv_zvfh
+            have[CV_CPU_RVV_ZVFH] = درست;
+        #endif
+    #endif
+
+    #اگر defined __loongarch64 && defined __linux__
+        صحیح flag = (صحیح)getauxval(AT_HWCAP);
 
         have[CV_CPU_LSX] = (flag & LA_HWCAP_LSX) != 0;
         have[CV_CPU_LASX] = (flag & LA_HWCAP_LASX) != 0;
     #endif
 
-        bool skip_baseline_check = false;
-        if (utils::getConfigurationParameterBool("OPENCV_SKIP_CPU_BASELINE_CHECK"))
+        منطقی skip_baseline_check = نادرست;
+        اگر (utils::getConfigurationParameterBool("OPENCV_SKIP_CPU_BASELINE_CHECK"))
         {
-            skip_baseline_check = true;
+            skip_baseline_check = درست;
         }
-        int baseline_features[] = { CV_CPU_BASELINE_FEATURES };
-        if (!checkFeatures(baseline_features, sizeof(baseline_features) / sizeof(baseline_features[0]))
+        صحیح baseline_features[] = { CV_CPU_BASELINE_FEATURES };
+        اگر (!checkFeatures(baseline_features, اندازه(baseline_features) / اندازه(baseline_features[0]))
             && !skip_baseline_check)
         {
             fprintf(stderr, "\n"
@@ -815,152 +815,152 @@ struct HWFeatures
                     "* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *\n"
                     "******************************************************************\n");
             fprintf(stderr, "\nRequired baseline features:\n");
-            checkFeatures(baseline_features, sizeof(baseline_features) / sizeof(baseline_features[0]), true);
+            checkFeatures(baseline_features, اندازه(baseline_features) / اندازه(baseline_features[0]), درست);
             CV_Error(cv::Error::StsAssert, "Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup.");
         }
 
-        readSettings(baseline_features, sizeof(baseline_features) / sizeof(baseline_features[0]));
+        readSettings(baseline_features, اندازه(baseline_features) / اندازه(baseline_features[0]));
     }
 
-    bool checkFeatures(const int* features, int count, bool dump = false)
+    منطقی checkFeatures(ثابت صحیح* features, صحیح شمار_2, منطقی dump = نادرست)
     {
-        bool result = true;
-        for (int i = 0; i < count; i++)
+        منطقی result = درست;
+        برای (صحیح i = 0; i < شمار_2; i++)
         {
-            int feature = features[i];
-            if (feature)
+            صحیح feature = features[i];
+            اگر (feature)
             {
-                if (have[feature])
+                اگر (have[feature])
                 {
-                    if (dump) fprintf(stderr, "    ID=%3d (%s) - OK\n", feature, getHWFeatureNameSafe(feature));
+                    اگر (dump) fprintf(stderr, "    ID=%3d (%s) - OK\n", feature, getHWFeatureNameSafe(feature));
                 }
-                else
+                وگرنه
                 {
-                    result = false;
-                    if (dump) fprintf(stderr, "    ID=%3d (%s) - NOT AVAILABLE\n", feature, getHWFeatureNameSafe(feature));
+                    result = نادرست;
+                    اگر (dump) fprintf(stderr, "    ID=%3d (%s) - NOT AVAILABLE\n", feature, getHWFeatureNameSafe(feature));
                 }
             }
         }
-        return result;
+        بازگشت result;
     }
 
-    static inline bool isSymbolSeparator(char c)
+    ایستا درونخطی منطقی is_نماد_Separator(نویسه c)
     {
-        return c == ',' || c == ';';
+        بازگشت c == ',' || c == ';';
     }
 
-    void readSettings(const int* baseline_features, int baseline_count)
+    تهی readSettings(ثابت صحیح* baseline_features, صحیح baseline_شمار)
     {
-        bool dump = true;
+        منطقی dump = درست;
         std::string disabled_features = utils::getConfigurationParameterString("OPENCV_CPU_DISABLE");
-        if (!disabled_features.empty())
+        اگر (!disabled_features.empty())
         {
-            const char* start = disabled_features.c_str();
-            for (;;)
+            ثابت نویسه* start = disabled_features.c_str();
+            برای (;;)
             {
-                while (start[0] != 0 && isSymbolSeparator(start[0]))
+                وقتی (start[0] != 0 && is_نماد_Separator(start[0]))
                 {
                     start++;
                 }
-                if (start[0] == 0)
-                    break;
-                const char* end = start;
-                while (end[0] != 0 && !isSymbolSeparator(end[0]))
+                اگر (start[0] == 0)
+                    بشکن;
+                ثابت نویسه* end = start;
+                وقتی (end[0] != 0 && !is_نماد_Separator(end[0]))
                 {
                     end++;
                 }
-                if (end == start)
-                    continue;
+                اگر (end == start)
+                    ادامه;
                 cv::String feature(start, end);
                 start = end;
 
                 CV_Assert(feature.size() > 0);
 
-                bool found = false;
-                for (int i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
+                منطقی found = نادرست;
+                برای (صحیح i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
                 {
-                    if (!g_hwFeatureNames[i]) continue;
+                    اگر (!g_hwFeatureNames[i]) ادامه;
                     size_t len = strlen(g_hwFeatureNames[i]);
-                    if (len != feature.size()) continue;
-                    if (feature.compare(g_hwFeatureNames[i]) == 0)
+                    اگر (len != feature.size()) ادامه;
+                    اگر (feature.compare(g_hwFeatureNames[i]) == 0)
                     {
-                        bool isBaseline = false;
-                        for (int k = 0; k < baseline_count; k++)
+                        منطقی isBaseline = نادرست;
+                        برای (صحیح k = 0; k < baseline_شمار; k++)
                         {
-                            if (baseline_features[k] == i)
+                            اگر (baseline_features[k] == i)
                             {
-                                isBaseline = true;
-                                break;
+                                isBaseline = درست;
+                                بشکن;
                             }
                         }
-                        if (isBaseline)
+                        اگر (isBaseline)
                         {
-                            if (dump) fprintf(stderr, "OPENCV: Trying to disable baseline CPU feature: '%s'."
+                            اگر (dump) fprintf(stderr, "OPENCV: Trying to disable baseline CPU feature: '%s'."
                                                       "This has very limited effect, because code optimizations for this feature are executed unconditionally "
                                                       "in the most cases.\n", getHWFeatureNameSafe(i));
                         }
-                        if (!have[i])
+                        اگر (!have[i])
                         {
-                            if (dump) fprintf(stderr, "OPENCV: Trying to disable unavailable CPU feature on the current platform: '%s'.\n",
+                            اگر (dump) fprintf(stderr, "OPENCV: Trying to disable unavailable CPU feature on the current platform: '%s'.\n",
                                 getHWFeatureNameSafe(i));
                         }
-                        have[i] = false;
+                        have[i] = نادرست;
 
-                        found = true;
-                        break;
+                        found = درست;
+                        بشکن;
                     }
                 }
-                if (!found)
+                اگر (!found)
                 {
-                    if (dump) fprintf(stderr, "OPENCV: Trying to disable unknown CPU feature: '%s'.\n", feature.c_str());
+                    اگر (dump) fprintf(stderr, "OPENCV: Trying to disable unknown CPU feature: '%s'.\n", feature.c_str());
                 }
             }
         }
     }
 
-    bool have[MAX_FEATURE+1]{};
+    منطقی have[MAX_FEATURE+1]{};
 };
 
-static HWFeatures  featuresEnabled(true), featuresDisabled = HWFeatures(false);
-static HWFeatures* currentFeatures = &featuresEnabled;
+ایستا HWFeatures  featuresEnabled(درست), featuresDisabled = HWFeatures(نادرست);
+ایستا HWFeatures* currentFeatures = &featuresEnabled;
 
-bool checkHardwareSupport(int feature)
+منطقی checkHardwareSupport(صحیح feature)
 {
-    if (feature < 0 || feature >= CV_HARDWARE_MAX_FEATURE)
-        return false;
-    return currentFeatures->have[feature];
+    اگر (feature < 0 || feature >= CV_HARDWARE_MAX_FEATURE)
+        بازگشت نادرست;
+    بازگشت currentFeatures->have[feature];
 }
 
-String getHardwareFeatureName(int feature)
+String getHardwareFeatureName(صحیح feature)
 {
-    const char* name = getHWFeatureName(feature);
-    return name ? String(name) : String();
+    ثابت نویسه* name = getHWFeatureName(feature);
+    بازگشت name ? String(name) : String();
 }
 
-std::string getCPUFeaturesLine()
+std::string get_CPUFeatures_سطر()
 {
-    const int features[] = { CV_CPU_BASELINE_FEATURES, CV_CPU_DISPATCH_FEATURES };
-    const int sz = sizeof(features) / sizeof(features[0]);
+    ثابت صحیح features[] = { CV_CPU_BASELINE_FEATURES, CV_CPU_DISPATCH_FEATURES };
+    ثابت صحیح sz = اندازه(features) / اندازه(features[0]);
     std::string result;
     std::string prefix;
-    for (int i = 1; i < sz; ++i)
+    برای (صحیح i = 1; i < sz; ++i)
     {
-        if (features[i] == 0)
+        اگر (features[i] == 0)
         {
             prefix = "*";
-            continue;
+            ادامه;
         }
-        if (i != 1) result.append(" ");
+        اگر (i != 1) result.append(" ");
         result.append(prefix);
         result.append(getHWFeatureNameSafe(features[i]));
-        if (!checkHardwareSupport(features[i])) result.append("?");
+        اگر (!checkHardwareSupport(features[i])) result.append("?");
     }
-    return result;
+    بازگشت result;
 }
 
-volatile bool useOptimizedFlag = true;
+فرار منطقی useOptimizedFlag = درست;
 
-void setUseOptimized( bool flag )
+تهی setUseOptimized( منطقی flag )
 {
     useOptimizedFlag = flag;
     currentFeatures = flag ? &featuresEnabled : &featuresDisabled;
@@ -971,48 +971,48 @@ void setUseOptimized( bool flag )
 #endif
 }
 
-bool useOptimized(void)
+منطقی useOptimized(تهی)
 {
-    return useOptimizedFlag;
+    بازگشت useOptimizedFlag;
 }
 
-int64 getTickCount(void)
+int64 get_Tick_شمار(تهی)
 {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    return (int64)now.time_since_epoch().count();
+    بازگشت (int64)now.time_since_epoch().شمار_2();
 }
 
-double getTickFrequency(void)
+دوگانه getTickFrequency(تهی)
 {
     using clock_period_t = std::chrono::steady_clock::duration::period;
-    double clock_freq = clock_period_t::den / clock_period_t::num;
-    return clock_freq;
+    دوگانه clock_freq = clock_period_t::den / clock_period_t::num;
+    بازگشت clock_freq;
 }
 
-#if defined __GNUC__ && (defined __i386__ || defined __x86_64__ || defined __ppc__)
-#if defined(__i386__)
+#اگر defined __GNUC__ && (defined __i386__ || defined __x86_64__ || defined __ppc__)
+#اگر defined(__i386__)
 
-int64 getCPUTickCount(void)
+int64 get_CPUTick_شمار(تهی)
 {
     int64 x;
-    __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
-    return x;
+    __asm__ فرار (".byte 0x0f, 0x31" : "=A" (x));
+    بازگشت x;
 }
-#elif defined(__x86_64__)
+#وگرنهاگر defined(__x86_64__)
 
-int64 getCPUTickCount(void)
+int64 get_CPUTick_شمار(تهی)
 {
     unsigned hi, lo;
     __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    return (int64)lo | ((int64)hi << 32);
+    بازگشت (int64)lo | ((int64)hi << 32);
 }
 
-#elif defined(__ppc__)
+#وگرنهاگر defined(__ppc__)
 
-int64 getCPUTickCount(void)
+int64 get_CPUTick_شمار(تهی)
 {
     unsigned upper, lower, tmp;
-    __asm__ volatile(
+    __asm__ فرار(
                      "0:                  \n"
                      "\tmftbu   %0           \n"
                      "\tmftb    %1           \n"
@@ -1021,24 +1021,24 @@ int64 getCPUTickCount(void)
                      "\tbne     0b         \n"
                      : "=r"(upper),"=r"(lower),"=r"(tmp)
                      );
-    return lower | ((int64)upper << 32);
+    بازگشت lower | ((int64)upper << 32);
 }
 
-#else
+#وگرنه
 
 #error "RDTSC not defined"
 
 #endif
 
-#elif defined _MSC_VER && defined _WIN32 && defined _M_IX86
+#وگرنهاگر defined _MSC_VER && defined _WIN32 && defined _M_IX86
 
-int64 getCPUTickCount(void)
+int64 get_CPUTick_شمار(تهی)
 {
     __asm _emit 0x0f;
     __asm _emit 0x31;
 }
 
-#else
+#وگرنه
 
 //#ifdef HAVE_IPP
 //int64 getCPUTickCount(void)
@@ -1046,25 +1046,25 @@ int64 getCPUTickCount(void)
 //    return ippGetCpuClocks();
 //}
 //#else
-int64 getCPUTickCount(void)
+int64 get_CPUTick_شمار(تهی)
 {
-    return getTickCount();
+    بازگشت get_Tick_شمار();
 }
 //#endif
 
 #endif
 
 
-namespace internal {
+فضاینام internal {
 
-class Timestamp
+رده Timestamp
 {
-public:
-    const int64 zeroTickCount;
-    const double ns_in_ticks;
+عمومی:
+    ثابت int64 zero_Tick_شمار;
+    ثابت دوگانه ns_in_ticks;
 
     Timestamp()
-        : zeroTickCount(getTickCount())
+        : zero_Tick_شمار(get_Tick_شمار())
         , ns_in_ticks(1e9 / getTickFrequency())
     {
         // nothing
@@ -1072,238 +1072,238 @@ public:
 
     int64 getTimestamp()
     {
-        int64 t = getTickCount();
-        return (int64)((t - zeroTickCount) * ns_in_ticks);
+        int64 t = get_Tick_شمار();
+        بازگشت (int64)((t - zero_Tick_شمار) * ns_in_ticks);
     }
 
-    static Timestamp& getInstance()
+    ایستا Timestamp& getInstance()
     {
-        static Timestamp g_timestamp;
-        return g_timestamp;
+        ایستا Timestamp g_timestamp;
+        بازگشت g_timestamp;
     }
 };
 
-class InitTimestamp {
-public:
+رده InitTimestamp {
+عمومی:
     InitTimestamp() {
         Timestamp::getInstance();
     }
 };
-static InitTimestamp g_initialize_timestamp;  // force zero timestamp initialization
+ایستا InitTimestamp g_initialize_timestamp;  // force zero timestamp initialization
 
 }  // namespace
 
 int64 getTimestampNS()
 {
-    return internal::Timestamp::getInstance().getTimestamp();
+    بازگشت internal::Timestamp::getInstance().getTimestamp();
 }
 
 
-const String& getBuildInformation()
+ثابت String& getBuildInformation()
 {
-    static String build_info =
-#include "version_string.inc"
+    ایستا String build_info =
+#شامل "version_string.inc"
     ;
-    return build_info;
+    بازگشت build_info;
 }
 
-String getVersionString() { return String(CV_VERSION); }
+String getVersionString() { بازگشت String(CV_VERSION); }
 
-int getVersionMajor() { return CV_VERSION_MAJOR; }
+صحیح getVersionMajor() { بازگشت CV_VERSION_MAJOR; }
 
-int getVersionMinor() { return CV_VERSION_MINOR; }
+صحیح getVersionMinor() { بازگشت CV_VERSION_MINOR; }
 
-int getVersionRevision() { return CV_VERSION_REVISION; }
+صحیح getVersionRevision() { بازگشت CV_VERSION_REVISION; }
 
-String format( const char* fmt, ... )
+String format( ثابت نویسه* fmt, ... )
 {
-    AutoBuffer<char, 1024> buf;
+    AutoBuffer<نویسه, 1024> buf;
 
-    for ( ; ; )
+    برای ( ; ; )
     {
         va_list va;
         va_start(va, fmt);
-        int bsize = static_cast<int>(buf.size());
-        int len = cv_vsnprintf(buf.data(), bsize, fmt, va);
+        صحیح bsize = static_cast<صحیح>(buf.size());
+        صحیح len = cv_vsnprintf(buf.data(), bsize, fmt, va);
         va_end(va);
 
         CV_Assert(len >= 0 && "Check format string for errors");
-        if (len >= bsize)
+        اگر (len >= bsize)
         {
             buf.resize(len + 1);
-            continue;
+            ادامه;
         }
         buf[bsize - 1] = 0;
-        return String(buf.data(), len);
+        بازگشت String(buf.data(), len);
     }
 }
 
-String tempfile( const char* suffix )
+String tempfile( ثابت نویسه* suffix )
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#اگر OPENCV_HAVE_FILESYSTEM_SUPPORT
     String fname;
 
     std::string temp_dir = utils::getConfigurationParameterString("OPENCV_TEMP_PATH");
 
-#if defined _WIN32
+#اگر defined _WIN32
 #ifdef WINRT
     RoInitialize(RO_INIT_MULTITHREADED);
     std::wstring temp_dir_rt = GetTempPathWinRT();
 
     std::wstring temp_file = GetTempFileNameWinRT(L"ocv");
-    if (temp_file.empty())
-        return String();
+    اگر (temp_file.empty())
+        بازگشت String();
 
     temp_file = temp_dir_rt.append(std::wstring(L"\\")).append(temp_file);
     DeleteFileW(temp_file.c_str());
 
-    char aname[MAX_PATH];
+    نویسه aname[MAX_PATH];
     size_t copied = wcstombs(aname, temp_file.c_str(), MAX_PATH);
     CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
     fname = String(aname);
     RoUninitialize();
-#elif defined(_WIN32_WCE)
-    const auto kMaxPathSize = MAX_PATH+1;
+#وگرنهاگر defined(_WIN32_WCE)
+    ثابت auto kMaxPathSize = MAX_PATH+1;
     wchar_t temp_dir_ce[kMaxPathSize] = {0};
     wchar_t temp_file[kMaxPathSize] = {0};
 
     ::GetTempPathW(kMaxPathSize, temp_dir_ce);
 
-    if(0 != ::GetTempFileNameW(temp_dir_ce, L"ocv", 0, temp_file)) {
+    اگر(0 != ::GetTempFileNameW(temp_dir_ce, L"ocv", 0, temp_file)) {
         DeleteFileW(temp_file);
-        char aname[MAX_PATH];
+        نویسه aname[MAX_PATH];
         size_t copied = wcstombs(aname, temp_file, MAX_PATH);
         CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
         fname = String(aname);
     }
-#else
+#وگرنه
     // Use GUID-based naming to avoid race condition with GetTempFileNameA
     // See issue #19648
     wchar_t temp_dir2_w[MAX_PATH] = { 0 };
 
-    if (temp_dir.empty())
+    اگر (temp_dir.empty())
     {
-        ::GetTempPathW(sizeof(temp_dir2_w)/sizeof(wchar_t), temp_dir2_w);
+        ::GetTempPathW(اندازه(temp_dir2_w)/اندازه(wchar_t), temp_dir2_w);
         // Convert from UTF-16 to UTF-8 to support Unicode paths
-        int len = WideCharToMultiByte(CP_UTF8, 0, temp_dir2_w, -1, NULL, 0, NULL, NULL);
-        if (len > 0)
+        صحیح len = WideCharToMultiByte(CP_UTF8, 0, temp_dir2_w, -1, پوچ, 0, پوچ, پوچ);
+        اگر (len > 0)
         {
-            std::vector<char> utf8_buf(len);
-            WideCharToMultiByte(CP_UTF8, 0, temp_dir2_w, -1, utf8_buf.data(), len, NULL, NULL);
+            std::vector<نویسه> utf8_buf(len);
+            WideCharToMultiByte(CP_UTF8, 0, temp_dir2_w, -1, utf8_buf.data(), len, پوچ, پوچ);
             temp_dir = std::string(utf8_buf.data());
         }
     }
 
     GUID g;
     HRESULT hr = CoCreateGuid(&g);
-    if (FAILED(hr))
-        return String();
-    char guidStr[40];
-    const char* mask = "%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
-    snprintf(guidStr, sizeof(guidStr), mask,
-            g.Data1, g.Data2, g.Data3, (unsigned int)g.Data4[0], (unsigned int)g.Data4[1],
-            (unsigned int)g.Data4[2], (unsigned int)g.Data4[3], (unsigned int)g.Data4[4],
-            (unsigned int)g.Data4[5], (unsigned int)g.Data4[6], (unsigned int)g.Data4[7]);
+    اگر (FAILED(hr))
+        بازگشت String();
+    نویسه guidStr[40];
+    ثابت نویسه* mask = "%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
+    snprintf(guidStr, اندازه(guidStr), mask,
+            g.Data1, g.Data2, g.Data3, (unsigned صحیح)g.Data4[0], (unsigned صحیح)g.Data4[1],
+            (unsigned صحیح)g.Data4[2], (unsigned صحیح)g.Data4[3], (unsigned صحیح)g.Data4[4],
+            (unsigned صحیح)g.Data4[5], (unsigned صحیح)g.Data4[6], (unsigned صحیح)g.Data4[7]);
 
     fname = temp_dir;
-    if (!fname.empty() && fname[fname.size()-1] != '\\' && fname[fname.size()-1] != '/')
+    اگر (!fname.empty() && fname[fname.size()-1] != '\\' && fname[fname.size()-1] != '/')
         fname += "\\";
     fname = fname + "ocv" + guidStr;
 #endif
-# else
+# وگرنه
 #  ifdef __ANDROID__
     //char defaultTemplate[] = "/mnt/sdcard/__opencv_temp.XXXXXX";
-    char defaultTemplate[] = "/data/local/tmp/__opencv_temp.XXXXXX";
-#  else
-    char defaultTemplate[] = "/tmp/__opencv_temp.XXXXXX";
+    نویسه defaultTemplate[] = "/data/local/tmp/__opencv_temp.XXXXXX";
+#  وگرنه
+    نویسه defaultTemplate[] = "/tmp/__opencv_temp.XXXXXX";
 #  endif
 
-    if (temp_dir.empty())
+    اگر (temp_dir.empty())
         fname = defaultTemplate;
-    else
+    وگرنه
     {
         fname = temp_dir;
-        char ech = fname[fname.size() - 1];
-        if(ech != '/' && ech != '\\')
+        نویسه ech = fname[fname.size() - 1];
+        اگر(ech != '/' && ech != '\\')
             fname = fname + "/";
         fname = fname + "__opencv_temp.XXXXXX";
     }
 
-    const int fd = mkstemp((char*)fname.c_str());
-    if (fd == -1) return String();
+    ثابت صحیح fd = mkstemp((نویسه*)fname.c_str());
+    اگر (fd == -1) بازگشت String();
 
     close(fd);
     remove(fname.c_str());
 # endif
 
-    if (suffix)
+    اگر (suffix)
     {
-        if (suffix[0] != '.')
-            return fname + "." + suffix;
-        else
-            return fname + suffix;
+        اگر (suffix[0] != '.')
+            بازگشت fname + "." + suffix;
+        وگرنه
+            بازگشت fname + suffix;
     }
-    return fname;
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
+    بازگشت fname;
+#وگرنه // OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_UNUSED(suffix);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 }
 
-static ErrorCallback customErrorCallback = 0;
-static void* customErrorCallbackData = 0;
-static bool breakOnError = false;
+ایستا ErrorCallback customErrorCallback = 0;
+ایستا تهی* customErrorCallbackData = 0;
+ایستا منطقی breakOnError = نادرست;
 
-bool setBreakOnError(bool value)
+منطقی setBreakOnError(منطقی value)
 {
-    bool prevVal = breakOnError;
+    منطقی prevVal = breakOnError;
     breakOnError = value;
-    return prevVal;
+    بازگشت prevVal;
 }
 
-int cv_snprintf(char* buf, int len, const char* fmt, ...)
+صحیح cv_snprintf(نویسه* buf, صحیح len, ثابت نویسه* fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
-    int res = cv_vsnprintf(buf, len, fmt, va);
+    صحیح res = cv_vsnprintf(buf, len, fmt, va);
     va_end(va);
-    return res;
+    بازگشت res;
 }
 
-int cv_vsnprintf(char* buf, int len, const char* fmt, va_list args)
+صحیح cv_vsnprintf(نویسه* buf, صحیح len, ثابت نویسه* fmt, va_list args)
 {
-#if defined _MSC_VER
-    if (len <= 0) return len == 0 ? 1024 : -1;
-    int res = _vsnprintf_s(buf, len, _TRUNCATE, fmt, args);
+#اگر defined _MSC_VER
+    اگر (len <= 0) بازگشت len == 0 ? 1024 : -1;
+    صحیح res = _vsnprintf_s(buf, len, _TRUNCATE, fmt, args);
     // ensure null terminating on VS
-    if (res >= 0 && res < len)
+    اگر (res >= 0 && res < len)
     {
         buf[res] = 0;
-        return res;
+        بازگشت res;
     }
-    else
+    وگرنه
     {
         buf[len - 1] = 0; // truncate happened
-        return res >= len ? res : (len * 2);
+        بازگشت res >= len ? res : (len * 2);
     }
-#else
-    return vsnprintf(buf, len, fmt, args);
+#وگرنه
+    بازگشت vsnprintf(buf, len, fmt, args);
 #endif
 }
 
-static void dumpException(const Exception& exc)
+ایستا تهی dumpException(ثابت Exception& exc)
 {
-    const char* errorStr = exc.codeMessage();
-    char buf[1 << 12];
+    ثابت نویسه* errorStr = exc.codeMessage();
+    نویسه buf[1 << 12];
 
-    cv_snprintf(buf, sizeof(buf),
+    cv_snprintf(buf, اندازه(buf),
         "OpenCV(%s) Error: %s (%s) in %s, file %s, line %d",
         CV_VERSION,
         errorStr, exc.err.c_str(), exc.func.size() > 0 ?
-        exc.func.c_str() : "unknown function", exc.file.c_str(), exc.line);
+        exc.func.c_str() : "unknown function", exc.file.c_str(), exc.سطر);
 #ifdef __ANDROID__
     __android_log_print(ANDROID_LOG_ERROR, "cv::error()", "%s", buf);
-#else
+#وگرنه
     fflush(stdout); fflush(stderr);
     fprintf(stderr, "%s\n", buf);
     fflush(stderr);
@@ -1311,14 +1311,14 @@ static void dumpException(const Exception& exc)
 }
 
 #ifdef CV_ERROR_SET_TERMINATE_HANDLER
-static bool cv_terminate_handler_installed = false;
-static std::terminate_handler cv_old_terminate_handler;
-static cv::Exception cv_terminate_handler_exception;
-static bool param_setupTerminateHandler = utils::getConfigurationParameterBool("OPENCV_SETUP_TERMINATE_HANDLER", true);
-static void cv_terminate_handler() {
+ایستا منطقی cv_terminate_handler_installed = نادرست;
+ایستا std::terminate_handler cv_old_terminate_handler;
+ایستا cv::Exception cv_terminate_handler_exception;
+ایستا منطقی param_setupTerminateHandler = utils::getConfigurationParameterBool("OPENCV_SETUP_TERMINATE_HANDLER", درست);
+ایستا تهی cv_terminate_handler() {
     std::cerr << "OpenCV: terminate handler is called! The last OpenCV error is:\n";
     dumpException(cv_terminate_handler_exception);
-    if (false /*cv_old_terminate_handler*/)  // buggy behavior is observed with doubled "abort/retry/ignore" windows
+    اگر (نادرست /*cv_old_terminate_handler*/)  // buggy behavior is observed with doubled "abort/retry/ignore" windows
         cv_old_terminate_handler();
     abort();
 }
@@ -1326,43 +1326,43 @@ static void cv_terminate_handler() {
 #endif
 
 #ifdef __GNUC__
-# if defined __clang__ || defined __APPLE__
+# اگر defined __clang__ || defined __APPLE__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Winvalid-noreturn"
 # endif
 #endif
 
-void error( const Exception& exc )
+تهی error( ثابت Exception& exc )
 {
 #ifdef CV_ERROR_SET_TERMINATE_HANDLER
     {
         cv::AutoLock lock(getInitializationMutex());
-        if (!cv_terminate_handler_installed)
+        اگر (!cv_terminate_handler_installed)
         {
-            if (param_setupTerminateHandler)
+            اگر (param_setupTerminateHandler)
                 cv_old_terminate_handler = std::set_terminate(cv_terminate_handler);
-            cv_terminate_handler_installed = true;
+            cv_terminate_handler_installed = درست;
         }
         cv_terminate_handler_exception = exc;
     }
 #endif
 
-    if (customErrorCallback != 0)
+    اگر (customErrorCallback != 0)
         customErrorCallback(exc.code, exc.func.c_str(), exc.err.c_str(),
-                            exc.file.c_str(), exc.line, customErrorCallbackData);
-    else if (param_dumpErrors)
+                            exc.file.c_str(), exc.سطر, customErrorCallbackData);
+    وگرنه اگر (param_dumpErrors)
     {
         dumpException(exc);
     }
 
-    if(breakOnError)
+    اگر(breakOnError)
     {
         std::terminate();
     }
 
-    throw exc;
+    پرتابکن exc;
 #ifdef __GNUC__
-# if !defined __clang__ && !defined __APPLE__
+# اگر !defined __clang__ && !defined __APPLE__
     // this suppresses this warning: "noreturn" function does return [enabled by default]
     __builtin_trap();
     // or use infinite loop: for (;;) {}
@@ -1370,11 +1370,11 @@ void error( const Exception& exc )
 #endif
 }
 
-void error(Error::Code _code, const String& _err, const char* _func, const char* _file, int _line)
+تهی error(Error::Code _code, ثابت String& _err, ثابت نویسه* _func, ثابت نویسه* _file, صحیح سطر_3)
 {
-    error(cv::Exception(_code, _err, _func, _file, _line));
+    error(cv::Exception(_code, _err, _func, _file, سطر_3));
 #ifdef __GNUC__
-# if !defined __clang__ && !defined __APPLE__
+# اگر !defined __clang__ && !defined __APPLE__
     // this suppresses this warning: "noreturn" function does return [enabled by default]
     __builtin_trap();
     // or use infinite loop: for (;;) {}
@@ -1383,16 +1383,16 @@ void error(Error::Code _code, const String& _err, const char* _func, const char*
 }
 
 #ifdef __GNUC__
-# if defined __clang__ || defined __APPLE__
+# اگر defined __clang__ || defined __APPLE__
 #   pragma GCC diagnostic pop
 # endif
 #endif
 
 
 ErrorCallback
-redirectError( ErrorCallback errCallback, void* userdata, void** prevUserdata)
+redirectError( ErrorCallback errCallback, تهی* userdata, تهی** prevUserdata)
 {
-    if( prevUserdata )
+    اگر( prevUserdata )
         *prevUserdata = customErrorCallbackData;
 
     ErrorCallback prevCallback = customErrorCallback;
@@ -1400,24 +1400,24 @@ redirectError( ErrorCallback errCallback, void* userdata, void** prevUserdata)
     customErrorCallback     = errCallback;
     customErrorCallbackData = userdata;
 
-    return prevCallback;
+    بازگشت prevCallback;
 }
 
-void terminate(Error::Code _code, const String& _err, const char* _func, const char* _file, int _line) CV_NOEXCEPT
+تهی terminate(Error::Code _code, ثابت String& _err, ثابت نویسه* _func, ثابت نویسه* _file, صحیح سطر_3) CV_NOEXCEPT
 {
-    dumpException(cv::Exception(_code, _err, _func, _file, _line));
+    dumpException(cv::Exception(_code, _err, _func, _file, سطر_3));
     std::terminate();
 }
 
 }
 
-namespace cv {
-bool __termination = false;
+فضاینام cv {
+منطقی __termination = نادرست;
 
 
 //////////////////////////////// thread-local storage ////////////////////////////////
 
-namespace details {
+فضاینام details {
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
 
@@ -1431,9 +1431,9 @@ namespace details {
 #endif
 
 // TLS platform abstraction layer
-class TlsAbstraction
+رده TlsAbstraction
 {
-public:
+عمومی:
     TlsAbstraction();
     ~TlsAbstraction()
     {
@@ -1444,28 +1444,28 @@ public:
         fflush(stderr);
     }
 
-    void* getData() const;
-    void setData(void *pData);
+    تهی* getData() ثابت;
+    تهی setData(تهی *pData);
 
-    void releaseSystemResources();
+    تهی releaseSystemResources();
 
-private:
+خصوصی:
 
 #ifdef _WIN32
 #ifndef WINRT
-    DWORD tlsKey;
-    bool disposed;
+    DWORD tls_کلید;
+    منطقی disposed;
 #endif
-#else // _WIN32
-    pthread_key_t  tlsKey;
-    std::atomic<bool> disposed;
+#وگرنه // _WIN32
+    pthread_key_t  tls_کلید;
+    std::atomic<منطقی> disposed;
 #endif
 };
 
-class TlsAbstractionReleaseGuard
+رده TlsAbstractionReleaseGuard
 {
     TlsAbstraction& tls_;
-public:
+عمومی:
     TlsAbstractionReleaseGuard(TlsAbstraction& tls) : tls_(tls)
     {
         /* nothing */
@@ -1477,110 +1477,110 @@ public:
 };
 
 // TODO use reference
-static TlsAbstraction* getTlsAbstraction()
+ایستا TlsAbstraction* getTlsAbstraction()
 {
-    static TlsAbstraction *g_tls = new TlsAbstraction();  // memory leak is intended here to avoid disposing of TLS container
-    static TlsAbstractionReleaseGuard g_tlsReleaseGuard(*g_tls);
-    return g_tls;
+    ایستا TlsAbstraction *g_tls = جدید TlsAbstraction();  // memory leak is intended here to avoid disposing of TLS container
+    ایستا TlsAbstractionReleaseGuard g_tlsReleaseGuard(*g_tls);
+    بازگشت g_tls;
 }
 
 
 #ifdef _WIN32
 #ifdef WINRT
-static __declspec( thread ) void* tlsData = NULL; // using C++11 thread attribute for local thread data
+ایستا __declspec( thread ) تهی* tlsData = پوچ; // using C++11 thread attribute for local thread data
 TlsAbstraction::TlsAbstraction() {}
-void TlsAbstraction::releaseSystemResources()
+تهی TlsAbstraction::releaseSystemResources()
 {
-    cv::__termination = true;  // DllMain is missing in static builds
+    cv::__termination = درست;  // DllMain is missing in static builds
 }
-void* TlsAbstraction::getData() const
+تهی* TlsAbstraction::getData() ثابت
 {
-    return tlsData;
+    بازگشت tlsData;
 }
-void TlsAbstraction::setData(void *pData)
+تهی TlsAbstraction::setData(تهی *pData)
 {
     tlsData = pData;
 }
-#else //WINRT
+#وگرنه //WINRT
 #ifdef CV_USE_FLS
-static void NTAPI opencv_fls_destructor(void* pData);
+ایستا تهی NTAPI opencv_fls_destructor(تهی* pData);
 #endif // CV_USE_FLS
 TlsAbstraction::TlsAbstraction()
-    : disposed(false)
+    : disposed(نادرست)
 {
 #ifndef CV_USE_FLS
-    tlsKey = TlsAlloc();
-#else // CV_USE_FLS
-    tlsKey = FlsAlloc(opencv_fls_destructor);
+    tls_کلید = TlsAlloc();
+#وگرنه // CV_USE_FLS
+    tls_کلید = FlsAlloc(opencv_fls_destructor);
 #endif // CV_USE_FLS
-    CV_Assert(tlsKey != TLS_OUT_OF_INDEXES);
+    CV_Assert(tls_کلید != TLS_OUT_OF_INDEXES);
 }
-void TlsAbstraction::releaseSystemResources()
+تهی TlsAbstraction::releaseSystemResources()
 {
-    cv::__termination = true;  // DllMain is missing in static builds
-    disposed = true;
+    cv::__termination = درست;  // DllMain is missing in static builds
+    disposed = درست;
 #ifndef CV_USE_FLS
-    TlsFree(tlsKey);
-#else // CV_USE_FLS
-    FlsFree(tlsKey);
+    TlsFree(tls_کلید);
+#وگرنه // CV_USE_FLS
+    FlsFree(tls_کلید);
 #endif // CV_USE_FLS
-    tlsKey = TLS_OUT_OF_INDEXES;
+    tls_کلید = TLS_OUT_OF_INDEXES;
 }
-void* TlsAbstraction::getData() const
+تهی* TlsAbstraction::getData() ثابت
 {
-    if (disposed)
-        return NULL;
+    اگر (disposed)
+        بازگشت پوچ;
 #ifndef CV_USE_FLS
-    return TlsGetValue(tlsKey);
-#else // CV_USE_FLS
-    return FlsGetValue(tlsKey);
+    بازگشت Tls_Get_مقدار(tls_کلید);
+#وگرنه // CV_USE_FLS
+    بازگشت Fls_Get_مقدار(tls_کلید);
 #endif // CV_USE_FLS
 }
-void TlsAbstraction::setData(void *pData)
+تهی TlsAbstraction::setData(تهی *pData)
 {
-    if (disposed)
-        return;  // no-op
+    اگر (disposed)
+        بازگشت;  // no-op
 #ifndef CV_USE_FLS
-    CV_Assert(TlsSetValue(tlsKey, pData) == TRUE);
-#else // CV_USE_FLS
-    CV_Assert(FlsSetValue(tlsKey, pData) == TRUE);
+    CV_Assert(Tls_Set_مقدار(tls_کلید, pData) == TRUE);
+#وگرنه // CV_USE_FLS
+    CV_Assert(Fls_Set_مقدار(tls_کلید, pData) == TRUE);
 #endif // CV_USE_FLS
 }
 #endif // WINRT
-#else // _WIN32
-static void opencv_tls_destructor(void* pData);
+#وگرنه // _WIN32
+ایستا تهی opencv_tls_destructor(تهی* pData);
 TlsAbstraction::TlsAbstraction()
-    : disposed(false)
+    : disposed(نادرست)
 {
-    CV_Assert(pthread_key_create(&tlsKey, opencv_tls_destructor) == 0);
+    CV_Assert(pthread_key_create(&tls_کلید, opencv_tls_destructor) == 0);
 }
-void TlsAbstraction::releaseSystemResources()
+تهی TlsAbstraction::releaseSystemResources()
 {
-    cv::__termination = true;  // DllMain is missing in static builds
-    disposed = true;
-    if (pthread_key_delete(tlsKey) != 0)
+    cv::__termination = درست;  // DllMain is missing in static builds
+    disposed = درست;
+    اگر (pthread_key_delete(tls_کلید) != 0)
     {
         // Don't use logging here
         fprintf(stderr, "OpenCV ERROR: TlsAbstraction::~TlsAbstraction(): pthread_key_delete() call failed\n");
         fflush(stderr);
     }
 }
-void* TlsAbstraction::getData() const
+تهی* TlsAbstraction::getData() ثابت
 {
-    if (disposed)
-        return NULL;
-    return pthread_getspecific(tlsKey);
+    اگر (disposed)
+        بازگشت پوچ;
+    بازگشت pthread_getspecific(tls_کلید);
 }
-void TlsAbstraction::setData(void *pData)
+تهی TlsAbstraction::setData(تهی *pData)
 {
-    if (disposed)
-        return;  // no-op
-    CV_Assert(pthread_setspecific(tlsKey, pData) == 0);
+    اگر (disposed)
+        بازگشت;  // no-op
+    CV_Assert(pthread_setspecific(tls_کلید, pData) == 0);
 }
 #endif
 
 // Per-thread data structure
-struct ThreadData
+ساختار ThreadData
 {
     ThreadData()
     {
@@ -1588,24 +1588,24 @@ struct ThreadData
         slots.reserve(32);
     }
 
-    std::vector<void*> slots; // Data array for a thread
+    std::vector<تهی*> slots; // Data array for a thread
     size_t idx;               // Thread index in TLS storage. This is not OS thread ID!
 };
 
 
-static bool g_isTlsStorageInitialized = false;
+ایستا منطقی g_isTlsStorageInitialized = نادرست;
 
 // Main TLS storage class
-class TlsStorage
+رده TlsStorage
 {
-public:
+عمومی:
     TlsStorage() :
         tlsSlotsSize(0)
     {
-        (void)getTlsAbstraction();  // ensure singeton initialization (for correct order of atexit calls)
+        (تهی)getTlsAbstraction();  // ensure singeton initialization (for correct order of atexit calls)
         tlsSlots.reserve(32);
         threads.reserve(32);
-        g_isTlsStorageInitialized = true;
+        g_isTlsStorageInitialized = درست;
     }
     ~TlsStorage()
     {
@@ -1616,43 +1616,43 @@ public:
         fflush(stderr);
     }
 
-    void releaseThread(void* tlsValue = NULL)
+    تهی releaseThread(تهی* tls_مقدار = پوچ)
     {
         TlsAbstraction* tls = getTlsAbstraction();
-        if (NULL == tls)
-            return;  // TLS singleton is not available (terminated)
-        ThreadData *pTD = tlsValue == NULL ? (ThreadData*)tls->getData() : (ThreadData*)tlsValue;
-        if (pTD == NULL)
-            return;  // no OpenCV TLS data for this thread
+        اگر (پوچ == tls)
+            بازگشت;  // TLS singleton is not available (terminated)
+        ThreadData *pTD = tls_مقدار == پوچ ? (ThreadData*)tls->getData() : (ThreadData*)tls_مقدار;
+        اگر (pTD == پوچ)
+            بازگشت;  // no OpenCV TLS data for this thread
         AutoLock guard(mtxGlobalAccess);
-        for (size_t i = 0; i < threads.size(); i++)
+        برای (size_t i = 0; i < threads.size(); i++)
         {
-            if (pTD == threads[i])
+            اگر (pTD == threads[i])
             {
-                threads[i] = NULL;
-                if (tlsValue == NULL)
+                threads[i] = پوچ;
+                اگر (tls_مقدار == پوچ)
                     tls->setData(0);
-                std::vector<void*>& thread_slots = pTD->slots;
-                for (size_t slotIdx = 0; slotIdx < thread_slots.size(); slotIdx++)
+                std::vector<تهی*>& thread_slots = pTD->slots;
+                برای (size_t slotIdx = 0; slotIdx < thread_slots.size(); slotIdx++)
                 {
-                    void* pData = thread_slots[slotIdx];
-                    thread_slots[slotIdx] = NULL;
-                    if (!pData)
-                        continue;
+                    تهی* pData = thread_slots[slotIdx];
+                    thread_slots[slotIdx] = پوچ;
+                    اگر (!pData)
+                        ادامه;
                     TLSDataContainer* container = tlsSlots[slotIdx].container;
-                    if (container)
+                    اگر (container)
                         container->deleteDataInstance(pData);
-                    else
+                    وگرنه
                     {
-                        fprintf(stderr, "OpenCV ERROR: TLS: container for slotIdx=%d is NULL. Can't release thread data\n", (int)slotIdx);
+                        fprintf(stderr, "OpenCV ERROR: TLS: container for slotIdx=%d is NULL. Can't release thread data\n", (صحیح)slotIdx);
                         fflush(stderr);
                     }
                 }
                 delete pTD;
-                return;
+                بازگشت;
             }
         }
-        fprintf(stderr, "OpenCV WARNING: TLS: Can't release thread TLS data (unknown pointer or data race): %p\n", (void*)pTD); fflush(stderr);
+        fprintf(stderr, "OpenCV WARNING: TLS: Can't release thread TLS data (unknown pointer or data race): %p\n", (تهی*)pTD); fflush(stderr);
     }
 
     // Reserve TLS storage index
@@ -1662,115 +1662,115 @@ public:
         CV_Assert(tlsSlotsSize == tlsSlots.size());
 
         // Find unused slots
-        for(size_t slot = 0; slot < tlsSlotsSize; slot++)
+        برای(size_t slot = 0; slot < tlsSlotsSize; slot++)
         {
-            if (tlsSlots[slot].container == NULL)
+            اگر (tlsSlots[slot].container == پوچ)
             {
                 tlsSlots[slot].container = container;
-                return slot;
+                بازگشت slot;
             }
         }
 
         // Create new slot
         tlsSlots.push_back(TlsSlotInfo(container)); tlsSlotsSize++;
-        return tlsSlotsSize - 1;
+        بازگشت tlsSlotsSize - 1;
     }
 
     // Release TLS storage index and pass associated data to caller
-    void releaseSlot(size_t slotIdx, std::vector<void*> &dataVec, bool keepSlot = false)
+    تهی releaseSlot(size_t slotIdx, std::vector<تهی*> &dataVec, منطقی keepSlot = نادرست)
     {
         AutoLock guard(mtxGlobalAccess);
         CV_Assert(tlsSlotsSize == tlsSlots.size());
         CV_Assert(tlsSlotsSize > slotIdx);
 
-        for(size_t i = 0; i < threads.size(); i++)
+        برای(size_t i = 0; i < threads.size(); i++)
         {
-            if(threads[i])
+            اگر(threads[i])
             {
-                std::vector<void*>& thread_slots = threads[i]->slots;
-                if (thread_slots.size() > slotIdx && thread_slots[slotIdx])
+                std::vector<تهی*>& thread_slots = threads[i]->slots;
+                اگر (thread_slots.size() > slotIdx && thread_slots[slotIdx])
                 {
                     dataVec.push_back(thread_slots[slotIdx]);
-                    thread_slots[slotIdx] = NULL;
+                    thread_slots[slotIdx] = پوچ;
                 }
             }
         }
 
-        if (!keepSlot)
+        اگر (!keepSlot)
         {
-            tlsSlots[slotIdx].container = NULL;  // mark slot as free (see reserveSlot() implementation)
+            tlsSlots[slotIdx].container = پوچ;  // mark slot as free (see reserveSlot() implementation)
         }
     }
 
     // Get data by TLS storage index
-    void* getData(size_t slotIdx) const
+    تهی* getData(size_t slotIdx) ثابت
     {
 #ifndef CV_THREAD_SANITIZER
         CV_Assert(tlsSlotsSize > slotIdx);
 #endif
 
         TlsAbstraction* tls = getTlsAbstraction();
-        if (NULL == tls)
-            return NULL;  // TLS singleton is not available (terminated)
+        اگر (پوچ == tls)
+            بازگشت پوچ;  // TLS singleton is not available (terminated)
 
         ThreadData* threadData = (ThreadData*)tls->getData();
-        if(threadData && threadData->slots.size() > slotIdx)
-            return threadData->slots[slotIdx];
+        اگر(threadData && threadData->slots.size() > slotIdx)
+            بازگشت threadData->slots[slotIdx];
 
-        return NULL;
+        بازگشت پوچ;
     }
 
     // Gather data from threads by TLS storage index
-    void gather(size_t slotIdx, std::vector<void*> &dataVec)
+    تهی gather(size_t slotIdx, std::vector<تهی*> &dataVec)
     {
         AutoLock guard(mtxGlobalAccess);
         CV_Assert(tlsSlotsSize == tlsSlots.size());
         CV_Assert(tlsSlotsSize > slotIdx);
 
-        for(size_t i = 0; i < threads.size(); i++)
+        برای(size_t i = 0; i < threads.size(); i++)
         {
-            if(threads[i])
+            اگر(threads[i])
             {
-                std::vector<void*>& thread_slots = threads[i]->slots;
-                if (thread_slots.size() > slotIdx && thread_slots[slotIdx])
+                std::vector<تهی*>& thread_slots = threads[i]->slots;
+                اگر (thread_slots.size() > slotIdx && thread_slots[slotIdx])
                     dataVec.push_back(thread_slots[slotIdx]);
             }
         }
     }
 
     // Set data to storage index
-    void setData(size_t slotIdx, void* pData)
+    تهی setData(size_t slotIdx, تهی* pData)
     {
 #ifndef CV_THREAD_SANITIZER
         CV_Assert(tlsSlotsSize > slotIdx);
 #endif
 
         TlsAbstraction* tls = getTlsAbstraction();
-        if (NULL == tls)
-            return;  // TLS singleton is not available (terminated)
+        اگر (پوچ == tls)
+            بازگشت;  // TLS singleton is not available (terminated)
 
         ThreadData* threadData = (ThreadData*)tls->getData();
-        if(!threadData)
+        اگر(!threadData)
         {
-            threadData = new ThreadData;
-            tls->setData((void*)threadData);
+            threadData = جدید ThreadData;
+            tls->setData((تهی*)threadData);
             {
                 AutoLock guard(mtxGlobalAccess);
 
-                bool found = false;
+                منطقی found = نادرست;
                 // Find unused slots
-                for(size_t slot = 0; slot < threads.size(); slot++)
+                برای(size_t slot = 0; slot < threads.size(); slot++)
                 {
-                    if (threads[slot] == NULL)
+                    اگر (threads[slot] == پوچ)
                     {
-                        threadData->idx = (int)slot;
+                        threadData->idx = (صحیح)slot;
                         threads[slot] = threadData;
-                        found = true;
-                        break;
+                        found = درست;
+                        بشکن;
                     }
                 }
 
-                if (!found)
+                اگر (!found)
                 {
                     // Create new slot
                     threadData->idx = threads.size();
@@ -1779,49 +1779,49 @@ public:
             }
         }
 
-        if(slotIdx >= threadData->slots.size())
+        اگر(slotIdx >= threadData->slots.size())
         {
             AutoLock guard(mtxGlobalAccess); // keep synchronization with gather() calls
-            threadData->slots.resize(slotIdx + 1, NULL);
+            threadData->slots.resize(slotIdx + 1, پوچ);
         }
         threadData->slots[slotIdx] = pData;
     }
 
-private:
+خصوصی:
     Mutex  mtxGlobalAccess;           // Shared objects operation guard
     size_t tlsSlotsSize;              // equal to tlsSlots.size() in synchronized sections
                                       // without synchronization this counter doesn't decrease - it is used for slotIdx sanity checks
 
-    struct TlsSlotInfo
+    ساختار TlsSlotInfo
     {
         TlsSlotInfo(TLSDataContainer* _container) : container(_container) {}
         TLSDataContainer* container;  // attached container (to dispose data of terminated threads)
     };
-    std::vector<struct TlsSlotInfo> tlsSlots;  // TLS keys state
+    std::vector<ساختار TlsSlotInfo> tlsSlots;  // TLS keys state
     std::vector<ThreadData*> threads; // Array for all allocated data. Thread data pointers are placed here to allow data cleanup
 };
 
 // Create global TLS storage object
-static TlsStorage &getTlsStorage()
+ایستا TlsStorage &getTlsStorage()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TlsStorage, new TlsStorage())
+    CV_SINGLETON_LAZY_INIT_REF(TlsStorage, جدید TlsStorage())
 }
 
 #ifndef _WIN32  // pthread key destructor
-static void opencv_tls_destructor(void* pData)
+ایستا تهی opencv_tls_destructor(تهی* pData)
 {
-    if (!g_isTlsStorageInitialized)
-        return;  // nothing to release, so prefer to avoid creation of new global structures
+    اگر (!g_isTlsStorageInitialized)
+        بازگشت;  // nothing to release, so prefer to avoid creation of new global structures
     getTlsStorage().releaseThread(pData);
 }
-#else // _WIN32
+#وگرنه // _WIN32
 #ifdef CV_USE_FLS
-static void WINAPI opencv_fls_destructor(void* pData)
+ایستا تهی WINAPI opencv_fls_destructor(تهی* pData)
 {
     // Empiric detection of ExitProcess call
     DWORD code = STILL_ACTIVE/*259*/;
     BOOL res = GetExitCodeProcess(GetCurrentProcess(), &code);
-    if (res && code != STILL_ACTIVE)
+    اگر (res && code != STILL_ACTIVE)
     {
         // Looks like we are in ExitProcess() call
         // This is FLS specific only because their callback is called before DllMain.
@@ -1830,40 +1830,40 @@ static void WINAPI opencv_fls_destructor(void* pData)
         // 3. ... called with DLL_PROCESS_DETACH
         // 7. The termination status of the process changes from STILL_ACTIVE to the exit value of the process.
         // (ref: https://docs.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-exitprocess)
-        cv::__termination = true;
+        cv::__termination = درست;
     }
 
-    if (!g_isTlsStorageInitialized)
-        return;  // nothing to release, so prefer to avoid creation of new global structures
+    اگر (!g_isTlsStorageInitialized)
+        بازگشت;  // nothing to release, so prefer to avoid creation of new global structures
     getTlsStorage().releaseThread(pData);
 }
 #endif // CV_USE_FLS
 #endif // _WIN32
 
-static TlsStorage* const g_force_initialization_of_TlsStorage
-#if defined __GNUC__
+ایستا TlsStorage* ثابت g_force_initialization_of_TlsStorage
+#اگر defined __GNUC__
     __attribute__((unused))
 #endif
     = &getTlsStorage();
 
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
+#وگرنه  // OPENCV_DISABLE_THREAD_SUPPORT
 
 // no threading (OPENCV_DISABLE_THREAD_SUPPORT=ON)
-class TlsStorage
+رده TlsStorage
 {
-public:
+عمومی:
     TlsStorage()
     {
         slots.reserve(32);
     }
     ~TlsStorage()
     {
-        for (size_t slotIdx = 0; slotIdx < slots.size(); slotIdx++)
+        برای (size_t slotIdx = 0; slotIdx < slots.size(); slotIdx++)
         {
             SlotInfo& s = slots[slotIdx];
             TLSDataContainer* container = s.container;
-            if (container && s.data)
+            اگر (container && s.data)
             {
                 container->deleteDataInstance(s.data);  // Can't use from SlotInfo destructor
                 s.data = nullptr;
@@ -1875,360 +1875,360 @@ public:
     size_t reserveSlot(TLSDataContainer* container)
     {
         size_t slotsSize = slots.size();
-        for (size_t slot = 0; slot < slotsSize; slot++)
+        برای (size_t slot = 0; slot < slotsSize; slot++)
         {
             SlotInfo& s = slots[slot];
-            if (s.container == NULL)
+            اگر (s.container == پوچ)
             {
                 CV_Assert(!s.data);
                 s.container = container;
-                return slot;
+                بازگشت slot;
             }
         }
 
         // create new slot
         slots.push_back(SlotInfo(container));
-        return slotsSize;
+        بازگشت slotsSize;
     }
 
     // Release TLS storage index and pass associated data to caller
-    void releaseSlot(size_t slotIdx, std::vector<void*> &dataVec, bool keepSlot = false)
+    تهی releaseSlot(size_t slotIdx, std::vector<تهی*> &dataVec, منطقی keepSlot = نادرست)
     {
         CV_Assert(slotIdx < slots.size());
         SlotInfo& s = slots[slotIdx];
-        void* data = s.data;
-        if (data)
+        تهی* data = s.data;
+        اگر (data)
         {
             dataVec.push_back(data);
             s.data = nullptr;
         }
-        if (!keepSlot)
+        اگر (!keepSlot)
         {
-            s.container = NULL;  // mark slot as free (see reserveSlot() implementation)
+            s.container = پوچ;  // mark slot as free (see reserveSlot() implementation)
         }
     }
 
     // Get data by TLS storage index
-    void* getData(size_t slotIdx) const
+    تهی* getData(size_t slotIdx) ثابت
     {
         CV_Assert(slotIdx < slots.size());
-        const SlotInfo& s = slots[slotIdx];
-        return s.data;
+        ثابت SlotInfo& s = slots[slotIdx];
+        بازگشت s.data;
     }
 
     // Gather data from threads by TLS storage index
-    void gather(size_t slotIdx, std::vector<void*> &dataVec)
+    تهی gather(size_t slotIdx, std::vector<تهی*> &dataVec)
     {
         CV_Assert(slotIdx < slots.size());
         SlotInfo& s = slots[slotIdx];
-        void* data = s.data;
-        if (data)
+        تهی* data = s.data;
+        اگر (data)
             dataVec.push_back(data);
-        return;
+        بازگشت;
     }
 
     // Set data to storage index
-    void setData(size_t slotIdx, void* pData)
+    تهی setData(size_t slotIdx, تهی* pData)
     {
         CV_Assert(slotIdx < slots.size());
         SlotInfo& s = slots[slotIdx];
         s.data = pData;
     }
 
-private:
-    struct SlotInfo
+خصوصی:
+    ساختار SlotInfo
     {
         SlotInfo(TLSDataContainer* _container) : container(_container), data(nullptr) {}
         TLSDataContainer* container;  // attached container (to dispose data)
-        void* data;
+        تهی* data;
     };
-    std::vector<struct SlotInfo> slots;
+    std::vector<ساختار SlotInfo> slots;
 };
 
-static TlsStorage& getTlsStorage()
+ایستا TlsStorage& getTlsStorage()
 {
-    static TlsStorage g_storage;  // no threading
-    return g_storage;
+    ایستا TlsStorage g_storage;  // no threading
+    بازگشت g_storage;
 }
 
 #endif  // OPENCV_DISABLE_THREAD_SUPPORT
 
 } // namespace details
-using namespace details;
+using فضاینام details;
 
-void releaseTlsStorageThread()
+تهی releaseTlsStorageThread()
 {
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
-    if (!g_isTlsStorageInitialized)
-        return;  // nothing to release, so prefer to avoid creation of new global structures
+    اگر (!g_isTlsStorageInitialized)
+        بازگشت;  // nothing to release, so prefer to avoid creation of new global structures
     getTlsStorage().releaseThread();
 #endif
 }
 
 TLSDataContainer::TLSDataContainer()
 {
-    key_ = (int)getTlsStorage().reserveSlot(this); // Reserve key from TLS storage
+    کلید_2 = (صحیح)getTlsStorage().reserveSlot(این); // Reserve key from TLS storage
 }
 
 TLSDataContainer::~TLSDataContainer()
 {
-    CV_Assert(key_ == -1); // Key must be released in child object
+    CV_Assert(کلید_2 == -1); // Key must be released in child object
 }
 
-void TLSDataContainer::gatherData(std::vector<void*> &data) const
+تهی TLSDataContainer::gatherData(std::vector<تهی*> &data) ثابت
 {
-    getTlsStorage().gather(key_, data);
+    getTlsStorage().gather(کلید_2, data);
 }
 
-void TLSDataContainer::detachData(std::vector<void*> &data)
+تهی TLSDataContainer::detachData(std::vector<تهی*> &data)
 {
-    getTlsStorage().releaseSlot(key_, data, true);
+    getTlsStorage().releaseSlot(کلید_2, data, درست);
 }
 
-void TLSDataContainer::release()
+تهی TLSDataContainer::release()
 {
-    if (key_ == -1)
-        return;  // already released
-    std::vector<void*> data; data.reserve(32);
-    getTlsStorage().releaseSlot(key_, data, false); // Release key and get stored data for proper destruction
-    key_ = -1;
-    for(size_t i = 0; i < data.size(); i++)  // Delete all associated data
+    اگر (کلید_2 == -1)
+        بازگشت;  // already released
+    std::vector<تهی*> data; data.reserve(32);
+    getTlsStorage().releaseSlot(کلید_2, data, نادرست); // Release key and get stored data for proper destruction
+    کلید_2 = -1;
+    برای(size_t i = 0; i < data.size(); i++)  // Delete all associated data
         deleteDataInstance(data[i]);
 }
 
-void TLSDataContainer::cleanup()
+تهی TLSDataContainer::cleanup()
 {
-    std::vector<void*> data; data.reserve(32);
-    getTlsStorage().releaseSlot(key_, data, true); // Extract stored data with removal from TLS tables
-    for(size_t i = 0; i < data.size(); i++)  // Delete all associated data
+    std::vector<تهی*> data; data.reserve(32);
+    getTlsStorage().releaseSlot(کلید_2, data, درست); // Extract stored data with removal from TLS tables
+    برای(size_t i = 0; i < data.size(); i++)  // Delete all associated data
         deleteDataInstance(data[i]);
 }
 
-void* TLSDataContainer::getData() const
+تهی* TLSDataContainer::getData() ثابت
 {
-    CV_Assert(key_ != -1 && "Can't fetch data from terminated TLS container.");
-    void* pData = getTlsStorage().getData(key_); // Check if data was already allocated
-    if(!pData)
+    CV_Assert(کلید_2 != -1 && "Can't fetch data from terminated TLS container.");
+    تهی* pData = getTlsStorage().getData(کلید_2); // Check if data was already allocated
+    اگر(!pData)
     {
         // Create new data instance and save it to TLS storage
         pData = createDataInstance();
-        try
+        تلاش
         {
-            getTlsStorage().setData(key_, pData);
+            getTlsStorage().setData(کلید_2, pData);
         }
-        catch (...)
+        بگیر (...)
         {
             deleteDataInstance(pData);
-            throw;
+            پرتابکن;
         }
     }
-    return pData;
+    بازگشت pData;
 }
 
-static TLSData<CoreTLSData>& getCoreTlsDataTLS()
+ایستا TLSData<CoreTLSData>& getCoreTlsDataTLS()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TLSData<CoreTLSData>, new TLSData<CoreTLSData>())
+    CV_SINGLETON_LAZY_INIT_REF(TLSData<CoreTLSData>, جدید TLSData<CoreTLSData>())
 }
 
 CoreTLSData& getCoreTlsData()
 {
-    return getCoreTlsDataTLS().getRef();
+    بازگشت getCoreTlsDataTLS().getRef();
 }
 
-#if defined CVAPI_EXPORTS && defined _WIN32 && !defined WINCE
+#اگر defined CVAPI_EXPORTS && defined _WIN32 && !defined WINCE
 #ifdef WINRT
     #pragma warning(disable:4447) // Disable warning 'main' signature found without threading model
 #endif
 
-extern "C"
+بیرونی "C"
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID lpReserved);
 
-extern "C"
+بیرونی "C"
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID lpReserved)
 {
-    if (fdwReason == DLL_THREAD_DETACH || fdwReason == DLL_PROCESS_DETACH)
+    اگر (fdwReason == DLL_THREAD_DETACH || fdwReason == DLL_PROCESS_DETACH)
     {
-        if (lpReserved != NULL) // called after ExitProcess() call
+        اگر (lpReserved != پوچ) // called after ExitProcess() call
         {
-            cv::__termination = true;
+            cv::__termination = درست;
         }
-        else
+        وگرنه
         {
             // Not allowed to free resources if lpReserved is non-null
             // http://msdn.microsoft.com/en-us/library/windows/desktop/ms682583.aspx
             releaseTlsStorageThread();
         }
     }
-    return TRUE;
+    بازگشت TRUE;
 }
 #endif
 
 
-namespace {
+فضاینام {
 
 #ifdef OPENCV_WITH_ITT
-bool overrideThreadName()
+منطقی overrideThreadName()
 {
-    static bool param = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_SET_THREAD_NAME", false);
-    return param;
+    ایستا منطقی param = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_SET_THREAD_NAME", نادرست);
+    بازگشت param;
 }
 #endif
 
-static int g_threadNum = 0;
-class ThreadID {
-public:
-    const int id;
+ایستا صحیح g_thread_رقم = 0;
+رده ThreadID {
+عمومی:
+    ثابت صحیح id;
     ThreadID() :
-        id(CV_XADD(&g_threadNum, 1))
+        id(CV_XADD(&g_thread_رقم, 1))
     {
 #ifdef OPENCV_WITH_ITT
-        if (overrideThreadName())
+        اگر (overrideThreadName())
             __itt_thread_set_name(cv::format("OpenCVThread-%03d", id).c_str());
 #endif
     }
 };
 
-static TLSData<ThreadID>& getThreadIDTLS()
+ایستا TLSData<ThreadID>& getThreadIDTLS()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TLSData<ThreadID>, new TLSData<ThreadID>());
+    CV_SINGLETON_LAZY_INIT_REF(TLSData<ThreadID>, جدید TLSData<ThreadID>());
 }
 
 } // namespace
-int utils::getThreadID() { return getThreadIDTLS().get()->id; }
+صحیح utils::getThreadID() { بازگشت getThreadIDTLS().get()->id; }
 
 
-class ParseError
+رده ParseError
 {
-    std::string bad_value;
-public:
-    ParseError(const std::string &bad_value_) :bad_value(bad_value_) {}
-    std::string toString(const std::string &param) const
+    std::string bad_مقدار;
+عمومی:
+    ParseError(ثابت std::string &bad_مقدار_2) :bad_مقدار(bad_مقدار_2) {}
+    std::string toString(ثابت std::string &param) ثابت
     {
         std::ostringstream out;
-        out << "Invalid value for parameter " << param << ": " << bad_value;
-        return out.str();
+        out << "Invalid value for parameter " << param << ": " << bad_مقدار;
+        بازگشت out.str();
     }
 };
 
 template <typename T>
-T parseOption(const std::string &);
+T parseOption(ثابت std::string &);
 
 template<>
-inline bool parseOption(const std::string & value)
+درونخطی منطقی parseOption(ثابت std::string & value)
 {
-    if (value == "1" || value == "True" || value == "true" || value == "TRUE")
+    اگر (value == "1" || value == "True" || value == "true" || value == "TRUE")
     {
-        return true;
+        بازگشت درست;
     }
-    if (value == "0" || value == "False" || value == "false" || value == "FALSE")
+    اگر (value == "0" || value == "False" || value == "false" || value == "FALSE")
     {
-        return false;
+        بازگشت نادرست;
     }
-    throw ParseError(value);
+    پرتابکن ParseError(value);
 }
 
 template<>
-inline size_t parseOption(const std::string &value)
+درونخطی size_t parseOption(ثابت std::string &value)
 {
     size_t pos = 0;
-    for (; pos < value.size(); pos++)
+    برای (; pos < value.size(); pos++)
     {
-        if (!isdigit(value[pos]))
-            break;
+        اگر (!isdigit(value[pos]))
+            بشکن;
     }
-    cv::String valueStr = value.substr(0, pos);
+    cv::String مقدار_Str = value.substr(0, pos);
     cv::String suffixStr = value.substr(pos, value.length() - pos);
-    size_t v = (size_t)std::stoull(valueStr);
-    if (suffixStr.length() == 0)
-        return v;
-    else if (suffixStr == "MB" || suffixStr == "Mb" || suffixStr == "mb")
-        return v * 1024 * 1024;
-    else if (suffixStr == "KB" || suffixStr == "Kb" || suffixStr == "kb")
-        return v * 1024;
-    throw ParseError(value);
+    size_t v = (size_t)std::stoull(مقدار_Str);
+    اگر (suffixStr.length() == 0)
+        بازگشت v;
+    وگرنه اگر (suffixStr == "MB" || suffixStr == "Mb" || suffixStr == "mb")
+        بازگشت v * 1024 * 1024;
+    وگرنه اگر (suffixStr == "KB" || suffixStr == "Kb" || suffixStr == "kb")
+        بازگشت v * 1024;
+    پرتابکن ParseError(value);
 }
 
 template<>
-inline cv::String parseOption(const std::string &value)
+درونخطی cv::String parseOption(ثابت std::string &value)
 {
-    return value;
+    بازگشت value;
 }
 
 template<>
-inline utils::Paths parseOption(const std::string &value)
+درونخطی utils::Paths parseOption(ثابت std::string &value)
 {
     utils::Paths result;
 #ifdef _WIN32
-    const char sep = ';';
-#else
-    const char sep = ':';
+    ثابت نویسه sep = ';';
+#وگرنه
+    ثابت نویسه sep = ':';
 #endif
     size_t start_pos = 0;
-    while (start_pos != std::string::npos)
+    وقتی (start_pos != std::string::npos)
     {
-        const size_t pos = value.find(sep, start_pos);
-        const std::string one_piece(value, start_pos, pos == std::string::npos ? pos : pos - start_pos);
-        if (!one_piece.empty())
+        ثابت size_t pos = value.find(sep, start_pos);
+        ثابت std::string one_piece(value, start_pos, pos == std::string::npos ? pos : pos - start_pos);
+        اگر (!one_piece.empty())
             result.push_back(one_piece);
         start_pos = pos == std::string::npos ? pos : pos + 1;
     }
-    return result;
+    بازگشت result;
 }
 
-static inline const char * envRead(const char * name)
+ایستا درونخطی ثابت نویسه * envRead(ثابت نویسه * name)
 {
 #ifdef NO_GETENV
     CV_UNUSED(name);
-    return NULL;
-#else
-    return getenv(name);
+    بازگشت پوچ;
+#وگرنه
+    بازگشت getenv(name);
 #endif
 }
 
 template<typename T>
-inline T read(const std::string & k, const T & defaultValue)
+درونخطی T اقرأ(ثابت std::string & k, ثابت T & default_مقدار_2)
 {
-    try
+    تلاش
     {
-        const char * res = envRead(k.c_str());
-        if (res)
-            return parseOption<T>(std::string(res));
+        ثابت نویسه * res = envRead(k.c_str());
+        اگر (res)
+            بازگشت parseOption<T>(std::string(res));
     }
-    catch (const ParseError &err)
+    بگیر (ثابت ParseError &err)
     {
         CV_Error(cv::Error::StsBadArg, err.toString(k));
     }
-    return defaultValue;
+    بازگشت default_مقدار_2;
 }
 
-bool utils::getConfigurationParameterBool(const char* name, bool defaultValue)
+منطقی utils::getConfigurationParameterBool(ثابت نویسه* name, منطقی default_مقدار_2)
 {
-    return read<bool>(name, defaultValue);
+    بازگشت اقرأ<منطقی>(name, default_مقدار_2);
 }
 
-size_t utils::getConfigurationParameterSizeT(const char* name, size_t defaultValue)
+size_t utils::getConfigurationParameterSizeT(ثابت نویسه* name, size_t default_مقدار_2)
 {
-    return read<size_t>(name, defaultValue);
+    بازگشت اقرأ<size_t>(name, default_مقدار_2);
 }
 
-std::string utils::getConfigurationParameterString(const char* name, const std::string & defaultValue)
+std::string utils::getConfigurationParameterString(ثابت نویسه* name, ثابت std::string & default_مقدار_2)
 {
-    return read<cv::String>(name, defaultValue);
+    بازگشت اقرأ<cv::String>(name, default_مقدار_2);
 }
 
-utils::Paths utils::getConfigurationParameterPaths(const char* name, const utils::Paths &defaultValue)
+utils::Paths utils::getConfigurationParameterPaths(ثابت نویسه* name, ثابت utils::Paths &default_مقدار_2)
 {
-    return read<utils::Paths>(name, defaultValue);
+    بازگشت اقرأ<utils::Paths>(name, default_مقدار_2);
 }
 
 
 #ifdef CV_COLLECT_IMPL_DATA
 ImplCollector& getImplData()
 {
-    CV_SINGLETON_LAZY_INIT_REF(ImplCollector, new ImplCollector())
+    CV_SINGLETON_LAZY_INIT_REF(ImplCollector, جدید ImplCollector())
 }
 
-void setImpl(int flags)
+تهی setImpl(صحیح flags)
 {
     cv::AutoLock lock(getImplData().mutex);
 
@@ -2237,15 +2237,15 @@ void setImpl(int flags)
     getImplData().implFun.clear();
 }
 
-void addImpl(int flag, const char* func)
+تهی addImpl(صحیح flag, ثابت نویسه* func)
 {
     cv::AutoLock lock(getImplData().mutex);
 
     getImplData().implFlags |= flag;
-    if(func) // use lazy collection if name was not specified
+    اگر(func) // use lazy collection if name was not specified
     {
         size_t index = getImplData().implCode.size();
-        if(!index || (getImplData().implCode[index-1] != flag || getImplData().implFun[index-1].compare(func))) // avoid duplicates
+        اگر(!index || (getImplData().implCode[index-1] != flag || getImplData().implFun[index-1].compare(func))) // avoid duplicates
         {
             getImplData().implCode.push_back(flag);
             getImplData().implFun.push_back(func);
@@ -2253,21 +2253,21 @@ void addImpl(int flag, const char* func)
     }
 }
 
-int getImpl(std::vector<int> &impl, std::vector<String> &funName)
+صحیح getImpl(std::vector<صحیح> &impl, std::vector<String> &funName)
 {
     cv::AutoLock lock(getImplData().mutex);
 
     impl    = getImplData().implCode;
     funName = getImplData().implFun;
-    return getImplData().implFlags; // return actual flags for lazy collection
+    بازگشت getImplData().implFlags; // return actual flags for lazy collection
 }
 
-bool useCollection()
+منطقی useCollection()
 {
-    return getImplData().useCollection;
+    بازگشت getImplData().useCollection;
 }
 
-void setUseCollection(bool flag)
+تهی setUseCollection(منطقی flag)
 {
     cv::AutoLock lock(getImplData().mutex);
 
@@ -2275,67 +2275,67 @@ void setUseCollection(bool flag)
 }
 #endif
 
-namespace instr
+فضاینام instr
 {
-bool useInstrumentation()
+منطقی useInstrumentation()
 {
 #ifdef ENABLE_INSTRUMENTATION
-    return getInstrumentStruct().useInstr;
-#else
-    return false;
+    بازگشت getInstrumentStruct().useInstr;
+#وگرنه
+    بازگشت نادرست;
 #endif
 }
 
-void setUseInstrumentation(bool flag)
+تهی setUseInstrumentation(منطقی flag)
 {
 #ifdef ENABLE_INSTRUMENTATION
     getInstrumentStruct().useInstr = flag;
-#else
+#وگرنه
     CV_UNUSED(flag);
 #endif
 }
 
-InstrNode* getTrace()
+Instr_گره* getTrace()
 {
 #ifdef ENABLE_INSTRUMENTATION
-    return &getInstrumentStruct().rootNode;
-#else
-    return NULL;
+    بازگشت &getInstrumentStruct().ریشه_گره_2;
+#وگرنه
+    بازگشت پوچ;
 #endif
 }
 
-void resetTrace()
+تهی resetTrace()
 {
 #ifdef ENABLE_INSTRUMENTATION
-    getInstrumentStruct().rootNode.removeChilds();
-    getInstrumentTLSStruct().pCurrentNode = &getInstrumentStruct().rootNode;
+    getInstrumentStruct().ریشه_گره_2.removeChilds();
+    getInstrumentTLSStruct().p_Current_گره = &getInstrumentStruct().ریشه_گره_2;
 #endif
 }
 
-void setFlags(FLAGS modeFlags)
+تهی setFlags(FLAGS modeFlags)
 {
 #ifdef ENABLE_INSTRUMENTATION
     getInstrumentStruct().flags = modeFlags;
-#else
+#وگرنه
     CV_UNUSED(modeFlags);
 #endif
 }
 FLAGS getFlags()
 {
 #ifdef ENABLE_INSTRUMENTATION
-    return (FLAGS)getInstrumentStruct().flags;
-#else
-    return (FLAGS)0;
+    بازگشت (FLAGS)getInstrumentStruct().flags;
+#وگرنه
+    بازگشت (FLAGS)0;
 #endif
 }
 
-NodeData::NodeData(const char* funName, const char* fileName, int lineNum, void* retAddress, bool alwaysExpand, cv::instr::TYPE instrType, cv::instr::IMPL implType)
+گره_Data::گره_Data(ثابت نویسه* funName, ثابت نویسه* fileName, صحیح سطر_رقم, تهی* retAddress, منطقی alwaysExpand, cv::instr::TYPE instrType, cv::instr::IMPL implType)
 {
     m_funName       = funName ? cv::String(funName) : cv::String();  // std::string doesn't accept NULL
     m_instrType     = instrType;
     m_implType      = implType;
     m_fileName      = fileName;
-    m_lineNum       = lineNum;
+    m_سطر_رقم       = سطر_رقم;
     m_retAddress    = retAddress;
     m_alwaysExpand  = alwaysExpand;
 
@@ -2343,413 +2343,413 @@ NodeData::NodeData(const char* funName, const char* fileName, int lineNum, void*
     m_counter    = 0;
     m_ticksTotal = 0;
 
-    m_funError  = false;
+    m_funError  = نادرست;
 }
-NodeData::NodeData(NodeData &ref)
+گره_Data::گره_Data(گره_Data &ref)
 {
-    *this = ref;
+    *این = ref;
 }
-NodeData& NodeData::operator=(const NodeData &right)
+گره_Data& گره_Data::operator=(ثابت گره_Data &راست)
 {
-    this->m_funName      = right.m_funName;
-    this->m_instrType    = right.m_instrType;
-    this->m_implType     = right.m_implType;
-    this->m_fileName     = right.m_fileName;
-    this->m_lineNum      = right.m_lineNum;
-    this->m_retAddress   = right.m_retAddress;
-    this->m_alwaysExpand = right.m_alwaysExpand;
+    این->m_funName      = راست.m_funName;
+    این->m_instrType    = راست.m_instrType;
+    این->m_implType     = راست.m_implType;
+    این->m_fileName     = راست.m_fileName;
+    این->m_سطر_رقم      = راست.m_سطر_رقم;
+    این->m_retAddress   = راست.m_retAddress;
+    این->m_alwaysExpand = راست.m_alwaysExpand;
 
-    this->m_threads     = right.m_threads;
-    this->m_counter     = right.m_counter;
-    this->m_ticksTotal  = right.m_ticksTotal;
+    این->m_threads     = راست.m_threads;
+    این->m_counter     = راست.m_counter;
+    این->m_ticksTotal  = راست.m_ticksTotal;
 
-    this->m_funError    = right.m_funError;
+    این->m_funError    = راست.m_funError;
 
-    return *this;
+    بازگشت *این;
 }
-NodeData::~NodeData()
+گره_Data::~گره_Data()
 {
 }
-bool operator==(const NodeData& left, const NodeData& right)
+منطقی operator==(ثابت گره_Data& چپ, ثابت گره_Data& راست)
 {
-    if(left.m_lineNum == right.m_lineNum && left.m_funName == right.m_funName && left.m_fileName == right.m_fileName)
+    اگر(چپ.m_سطر_رقم == راست.m_سطر_رقم && چپ.m_funName == راست.m_funName && چپ.m_fileName == راست.m_fileName)
     {
-        if(left.m_retAddress == right.m_retAddress || !(cv::instr::getFlags()&cv::instr::FLAGS_EXPAND_SAME_NAMES || left.m_alwaysExpand))
-            return true;
+        اگر(چپ.m_retAddress == راست.m_retAddress || !(cv::instr::getFlags()&cv::instr::FLAGS_EXPAND_SAME_NAMES || چپ.m_alwaysExpand))
+            بازگشت درست;
     }
-    return false;
+    بازگشت نادرست;
 }
 
 #ifdef ENABLE_INSTRUMENTATION
 InstrStruct& getInstrumentStruct()
 {
-    static InstrStruct instr;
-    return instr;
+    ایستا InstrStruct instr;
+    بازگشت instr;
 }
 
 InstrTLSStruct& getInstrumentTLSStruct()
 {
-    return *getInstrumentStruct().tlsStruct.get();
+    بازگشت *getInstrumentStruct().tlsStruct.get();
 }
 
-InstrNode* getCurrentNode()
+Instr_گره* get_Current_گره()
 {
-    return getInstrumentTLSStruct().pCurrentNode;
+    بازگشت getInstrumentTLSStruct().p_Current_گره;
 }
 
-IntrumentationRegion::IntrumentationRegion(const char* funName, const char* fileName, int lineNum, void *retAddress, bool alwaysExpand, TYPE instrType, IMPL implType)
+IntrumentationRegion::IntrumentationRegion(ثابت نویسه* funName, ثابت نویسه* fileName, صحیح سطر_رقم, تهی *retAddress, منطقی alwaysExpand, TYPE instrType, IMPL implType)
 {
-    m_disabled    = false;
+    m_disabled    = نادرست;
     m_regionTicks = 0;
 
     InstrStruct *pStruct = &getInstrumentStruct();
-    if(pStruct->useInstr)
+    اگر(pStruct->useInstr)
     {
         InstrTLSStruct *pTLS = &getInstrumentTLSStruct();
 
         // Disable in case of failure
-        if(!pTLS->pCurrentNode)
+        اگر(!pTLS->p_Current_گره)
         {
-            m_disabled = true;
-            return;
+            m_disabled = درست;
+            بازگشت;
         }
 
-        int depth = pTLS->pCurrentNode->getDepth();
-        if(pStruct->maxDepth && pStruct->maxDepth <= depth)
+        صحیح depth = pTLS->p_Current_گره->getDepth();
+        اگر(pStruct->maxDepth && pStruct->maxDepth <= depth)
         {
-            m_disabled = true;
-            return;
+            m_disabled = درست;
+            بازگشت;
         }
 
-        NodeData payload(funName, fileName, lineNum, retAddress, alwaysExpand, instrType, implType);
-        Node<NodeData>* pChild = NULL;
+        گره_Data payload(funName, fileName, سطر_رقم, retAddress, alwaysExpand, instrType, implType);
+        Node<گره_Data>* pChild = پوچ;
 
-        if(pStruct->flags&FLAGS_MAPPING)
+        اگر(pStruct->flags&FLAGS_MAPPING)
         {
             // Critical section
             cv::AutoLock guard(pStruct->mutexCreate); // Guard from concurrent child creation
-            pChild = pTLS->pCurrentNode->findChild(payload);
-            if(!pChild)
+            pChild = pTLS->p_Current_گره->findChild(payload);
+            اگر(!pChild)
             {
-                pChild = new Node<NodeData>(payload);
-                pTLS->pCurrentNode->addChild(pChild);
+                pChild = جدید Node<گره_Data>(payload);
+                pTLS->p_Current_گره->addChild(pChild);
             }
         }
-        else
+        وگرنه
         {
-            pChild = pTLS->pCurrentNode->findChild(payload);
-            if(!pChild)
+            pChild = pTLS->p_Current_گره->findChild(payload);
+            اگر(!pChild)
             {
-                m_disabled = true;
-                return;
+                m_disabled = درست;
+                بازگشت;
             }
         }
-        pTLS->pCurrentNode = pChild;
+        pTLS->p_Current_گره = pChild;
 
-        m_regionTicks = getTickCount();
+        m_regionTicks = get_Tick_شمار();
     }
 }
 
 IntrumentationRegion::~IntrumentationRegion()
 {
     InstrStruct *pStruct = &getInstrumentStruct();
-    if(pStruct->useInstr)
+    اگر(pStruct->useInstr)
     {
-        if(!m_disabled)
+        اگر(!m_disabled)
         {
             InstrTLSStruct *pTLS = &getInstrumentTLSStruct();
 
-            if (pTLS->pCurrentNode->m_payload.m_implType == cv::instr::IMPL_OPENCL &&
-                (pTLS->pCurrentNode->m_payload.m_instrType == cv::instr::TYPE_FUN ||
-                    pTLS->pCurrentNode->m_payload.m_instrType == cv::instr::TYPE_WRAPPER))
+            اگر (pTLS->p_Current_گره->m_payload.m_implType == cv::instr::IMPL_OPENCL &&
+                (pTLS->p_Current_گره->m_payload.m_instrType == cv::instr::TYPE_FUN ||
+                    pTLS->p_Current_گره->m_payload.m_instrType == cv::instr::TYPE_WRAPPER))
             {
                 cv::ocl::finish(); // TODO Support "async" OpenCL instrumentation
             }
 
-            uint64 ticks = (getTickCount() - m_regionTicks);
+            uint64 ticks = (get_Tick_شمار() - m_regionTicks);
             {
-                cv::AutoLock guard(pStruct->mutexCount); // Concurrent ticks accumulation
-                pTLS->pCurrentNode->m_payload.m_counter++;
-                pTLS->pCurrentNode->m_payload.m_ticksTotal += ticks;
-                pTLS->pCurrentNode->m_payload.m_tls.get()->m_ticksTotal += ticks;
+                cv::AutoLock guard(pStruct->mutex_شمار); // Concurrent ticks accumulation
+                pTLS->p_Current_گره->m_payload.m_counter++;
+                pTLS->p_Current_گره->m_payload.m_ticksTotal += ticks;
+                pTLS->p_Current_گره->m_payload.m_tls.get()->m_ticksTotal += ticks;
             }
 
-            pTLS->pCurrentNode = pTLS->pCurrentNode->m_pParent;
+            pTLS->p_Current_گره = pTLS->p_Current_گره->m_pParent;
         }
     }
 }
 #endif
 }
 
-namespace ipp
+فضاینام ipp
 {
 
 #ifdef HAVE_IPP
-struct IPPInitSingleton
+ساختار IPPInitSingleton
 {
-public:
+عمومی:
     IPPInitSingleton()
     {
-        useIPP         = true;
+        useIPP         = درست;
 
-#if defined(OPENCV_ALGO_HINT_DEFAULT)
+#اگر defined(OPENCV_ALGO_HINT_DEFAULT)
         useIPP_NE      = OPENCV_ALGO_HINT_DEFAULT == cv::ALGO_HINT_APPROX;
-#else
-        useIPP_NE      = false;
+#وگرنه
+        useIPP_NE      = نادرست;
 #endif
         ippStatus      = 0;
-        funcname       = NULL;
-        filename       = NULL;
+        funcname       = پوچ;
+        filename       = پوچ;
         linen          = 0;
         cpuFeatures    = 0;
         ippFeatures    = 0;
-        ippTopFeatures = 0;
-        pIppLibInfo    = NULL;
+        ipp_بالاترین_Features = 0;
+        pIppLibInfo    = پوچ;
 
-        ippStatus = ippGetCpuFeatures(&cpuFeatures, NULL);
-        if(ippStatus < 0)
+        ippStatus = ippGetCpuFeatures(&cpuFeatures, پوچ);
+        اگر(ippStatus < 0)
         {
-            CV_LOG_ERROR(NULL, "ERROR: IPP cannot detect CPU features, IPP was disabled");
-            useIPP = false;
-            return;
+            CV_LOG_ERROR(پوچ, "ERROR: IPP cannot detect CPU features, IPP was disabled");
+            useIPP = نادرست;
+            بازگشت;
         }
         ippFeatures = cpuFeatures;
 
         std::string env = utils::getConfigurationParameterString("OPENCV_IPP");
-        if(!env.empty())
+        اگر(!env.empty())
         {
-#if IPP_VERSION_X100 >= 201900
-            const Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
+#اگر IPP_VERSION_X100 >= 201900
+            ثابت Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
                 ippCPUID_ADCOX|ippCPUID_RDSEED|ippCPUID_PREFETCHW|ippCPUID_SHA|ippCPUID_MPX|ippCPUID_AVX512CD|ippCPUID_AVX512ER|
                 ippCPUID_AVX512PF|ippCPUID_AVX512BW|ippCPUID_AVX512DQ|ippCPUID_AVX512VL|ippCPUID_AVX512VBMI|ippCPUID_AVX512_4FMADDPS|
                 ippCPUID_AVX512_4VNNIW|ippCPUID_AVX512IFMA;
-#elif IPP_VERSION_X100 >= 201703
-            const Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
+#وگرنهاگر IPP_VERSION_X100 >= 201703
+            ثابت Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
                 ippCPUID_ADCOX|ippCPUID_RDSEED|ippCPUID_PREFETCHW|ippCPUID_SHA|ippCPUID_MPX|ippCPUID_AVX512CD|ippCPUID_AVX512ER|
                 ippCPUID_AVX512PF|ippCPUID_AVX512BW|ippCPUID_AVX512DQ|ippCPUID_AVX512VL|ippCPUID_AVX512VBMI;
-#elif IPP_VERSION_X100 >= 201700
-            const Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
+#وگرنهاگر IPP_VERSION_X100 >= 201700
+            ثابت Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
                 ippCPUID_ADCOX|ippCPUID_RDSEED|ippCPUID_PREFETCHW|ippCPUID_SHA|ippCPUID_AVX512CD|ippCPUID_AVX512ER|
                 ippCPUID_AVX512PF|ippCPUID_AVX512BW|ippCPUID_AVX512DQ|ippCPUID_AVX512VL|ippCPUID_AVX512VBMI;
-#else
-            const Ipp64u minorFeatures = 0;
+#وگرنه
+            ثابت Ipp64u minorFeatures = 0;
 #endif
 
             env = toLowerCase(env);
-            if(env.substr(0, 2) == "ne")
+            اگر(env.substr(0, 2) == "ne")
             {
-                useIPP_NE = true;
+                useIPP_NE = درست;
                 env = env.substr(3, env.size());
             }
 
-            if(env == "disabled")
+            اگر(env == "disabled")
             {
-                CV_LOG_WARNING(NULL, "WARNING: IPP was disabled by OPENCV_IPP environment variable");
-                useIPP = false;
+                CV_LOG_WARNING(پوچ, "WARNING: IPP was disabled by OPENCV_IPP environment variable");
+                useIPP = نادرست;
             }
-            else if(env == "sse42")
+            وگرنه اگر(env == "sse42")
                 ippFeatures = minorFeatures|ippCPUID_SSE2|ippCPUID_SSE3|ippCPUID_SSSE3|ippCPUID_SSE41|ippCPUID_SSE42;
-            else if(env == "avx2")
+            وگرنه اگر(env == "avx2")
                 ippFeatures = minorFeatures|ippCPUID_SSE2|ippCPUID_SSE3|ippCPUID_SSSE3|ippCPUID_SSE41|ippCPUID_SSE42|ippCPUID_AVX|ippCPUID_AVX2;
-#if IPP_VERSION_X100 >= 201700
-#if defined (_M_AMD64) || defined (__x86_64__)
-            else if(env == "avx512")
+#اگر IPP_VERSION_X100 >= 201700
+#اگر defined (_M_AMD64) || defined (__x86_64__)
+            وگرنه اگر(env == "avx512")
                 ippFeatures = minorFeatures|ippCPUID_SSE2|ippCPUID_SSE3|ippCPUID_SSSE3|ippCPUID_SSE41|ippCPUID_SSE42|ippCPUID_AVX|ippCPUID_AVX2|ippCPUID_AVX512F;
 #endif
 #endif
-            else
-                CV_LOG_ERROR(NULL, "ERROR: Improper value of OPENCV_IPP: " << env.c_str() << ". Correct values are: disabled, sse42, avx2, avx512 (Intel64 only)");
+            وگرنه
+                CV_LOG_ERROR(پوچ, "ERROR: Improper value of OPENCV_IPP: " << env.c_str() << ". Correct values are: disabled, sse42, avx2, avx512 (Intel64 only)");
 
             // Trim unsupported features
             ippFeatures &= cpuFeatures;
         }
 
         // Disable AVX1 since we don't track regressions for it. SSE42 will be used instead
-        if(cpuFeatures&ippCPUID_AVX && !(cpuFeatures&ippCPUID_AVX2))
+        اگر(cpuFeatures&ippCPUID_AVX && !(cpuFeatures&ippCPUID_AVX2))
             ippFeatures &= ~((Ipp64u)ippCPUID_AVX);
 
         // IPP integrations in OpenCV support only SSE4.2, AVX2 and AVX-512 optimizations.
-        if(!(
-#if IPP_VERSION_X100 >= 201700
+        اگر(!(
+#اگر IPP_VERSION_X100 >= 201700
             cpuFeatures&ippCPUID_AVX512F ||
 #endif
             cpuFeatures&ippCPUID_AVX2 ||
             cpuFeatures&ippCPUID_SSE42
             ))
         {
-            useIPP = false;
-            return;
+            useIPP = نادرست;
+            بازگشت;
         }
 
-        if(ippFeatures == cpuFeatures)
+        اگر(ippFeatures == cpuFeatures)
             IPP_INITIALIZER(0)
-        else
+        وگرنه
             IPP_INITIALIZER(ippFeatures)
         ippFeatures = ippGetEnabledCpuFeatures();
 
         // Detect top level optimizations to make comparison easier for optimizations dependent conditions
-#if IPP_VERSION_X100 >= 201700
-        if(ippFeatures&ippCPUID_AVX512F)
+#اگر IPP_VERSION_X100 >= 201700
+        اگر(ippFeatures&ippCPUID_AVX512F)
         {
-            if((ippFeatures&ippCPUID_AVX512_SKX) == ippCPUID_AVX512_SKX)
-                ippTopFeatures = ippCPUID_AVX512_SKX;
-            else if((ippFeatures&ippCPUID_AVX512_KNL) == ippCPUID_AVX512_KNL)
-                ippTopFeatures = ippCPUID_AVX512_KNL;
-            else
-                ippTopFeatures = ippCPUID_AVX512F; // Unknown AVX512 configuration
+            اگر((ippFeatures&ippCPUID_AVX512_SKX) == ippCPUID_AVX512_SKX)
+                ipp_بالاترین_Features = ippCPUID_AVX512_SKX;
+            وگرنه اگر((ippFeatures&ippCPUID_AVX512_KNL) == ippCPUID_AVX512_KNL)
+                ipp_بالاترین_Features = ippCPUID_AVX512_KNL;
+            وگرنه
+                ipp_بالاترین_Features = ippCPUID_AVX512F; // Unknown AVX512 configuration
         }
-        else
+        وگرنه
 #endif
-        if(ippFeatures&ippCPUID_AVX2)
-            ippTopFeatures = ippCPUID_AVX2;
-        else if(ippFeatures&ippCPUID_SSE42)
-            ippTopFeatures = ippCPUID_SSE42;
+        اگر(ippFeatures&ippCPUID_AVX2)
+            ipp_بالاترین_Features = ippCPUID_AVX2;
+        وگرنه اگر(ippFeatures&ippCPUID_SSE42)
+            ipp_بالاترین_Features = ippCPUID_SSE42;
 
         pIppLibInfo = ippiGetLibVersion();
 
         // workaround: https://github.com/opencv/opencv/issues/12959
         std::string ippName(pIppLibInfo->Name ? pIppLibInfo->Name : "");
-        if (ippName.find("SSE4.2") != std::string::npos)
+        اگر (ippName.find("SSE4.2") != std::string::npos)
         {
-            ippTopFeatures = ippCPUID_SSE42;
+            ipp_بالاترین_Features = ippCPUID_SSE42;
         }
     }
 
-public:
-    bool        useIPP;
-    bool        useIPP_NE;
+عمومی:
+    منطقی        useIPP;
+    منطقی        useIPP_NE;
 
-    int         ippStatus;  // 0 - all is ok, -1 - IPP functions failed
-    const char *funcname;
-    const char *filename;
-    int         linen;
+    صحیح         ippStatus;  // 0 - all is ok, -1 - IPP functions failed
+    ثابت نویسه *funcname;
+    ثابت نویسه *filename;
+    صحیح         linen;
     Ipp64u      ippFeatures;
     Ipp64u      cpuFeatures;
-    Ipp64u      ippTopFeatures;
-    const IppLibraryVersion *pIppLibInfo;
+    Ipp64u      ipp_بالاترین_Features;
+    ثابت IppLibraryVersion *pIppLibInfo;
 };
 
-static IPPInitSingleton& getIPPSingleton()
+ایستا IPPInitSingleton& getIPPSingleton()
 {
-    CV_SINGLETON_LAZY_INIT_REF(IPPInitSingleton, new IPPInitSingleton())
+    CV_SINGLETON_LAZY_INIT_REF(IPPInitSingleton, جدید IPPInitSingleton())
 }
 #endif
 
 unsigned long long getIppFeatures()
 {
 #ifdef HAVE_IPP
-    return getIPPSingleton().ippFeatures;
-#else
-    return 0;
+    بازگشت getIPPSingleton().ippFeatures;
+#وگرنه
+    بازگشت 0;
 #endif
 }
 
 #ifdef HAVE_IPP
-unsigned long long getIppTopFeatures()
+unsigned long long get_Ipp_بالاترین_Features()
 {
-    return getIPPSingleton().ippTopFeatures;
+    بازگشت getIPPSingleton().ipp_بالاترین_Features;
 }
 #endif
 
-void setIppStatus(int status, const char * const _funcname, const char * const _filename, int _line)
+تهی setIppStatus(صحیح status, ثابت نویسه * ثابت _funcname, ثابت نویسه * ثابت _filename, صحیح سطر_3)
 {
 #ifdef HAVE_IPP
     getIPPSingleton().ippStatus = status;
     getIPPSingleton().funcname = _funcname;
     getIPPSingleton().filename = _filename;
-    getIPPSingleton().linen = _line;
-#else
-    CV_UNUSED(status); CV_UNUSED(_funcname); CV_UNUSED(_filename); CV_UNUSED(_line);
+    getIPPSingleton().linen = سطر_3;
+#وگرنه
+    CV_UNUSED(status); CV_UNUSED(_funcname); CV_UNUSED(_filename); CV_UNUSED(سطر_3);
 #endif
 }
 
-int getIppStatus()
+صحیح getIppStatus()
 {
 #ifdef HAVE_IPP
-    return getIPPSingleton().ippStatus;
-#else
-    return 0;
+    بازگشت getIPPSingleton().ippStatus;
+#وگرنه
+    بازگشت 0;
 #endif
 }
 
 String getIppErrorLocation()
 {
 #ifdef HAVE_IPP
-    return format("%s:%d %s", getIPPSingleton().filename ? getIPPSingleton().filename : "", getIPPSingleton().linen, getIPPSingleton().funcname ? getIPPSingleton().funcname : "");
-#else
-    return String();
+    بازگشت format("%s:%d %s", getIPPSingleton().filename ? getIPPSingleton().filename : "", getIPPSingleton().linen, getIPPSingleton().funcname ? getIPPSingleton().funcname : "");
+#وگرنه
+    بازگشت String();
 #endif
 }
 
 String getIppVersion()
 {
 #ifdef HAVE_IPP
-    const IppLibraryVersion *pInfo = getIPPSingleton().pIppLibInfo;
-    if(pInfo)
-        return format("%s %s %s", pInfo->Name, pInfo->Version, pInfo->BuildDate);
-    else
-        return String("error");
-#else
-    return String("disabled");
+    ثابت IppLibraryVersion *pInfo = getIPPSingleton().pIppLibInfo;
+    اگر(pInfo)
+        بازگشت format("%s %s %s", pInfo->Name, pInfo->Version, pInfo->BuildDate);
+    وگرنه
+        بازگشت String("error");
+#وگرنه
+    بازگشت String("disabled");
 #endif
 }
 
-bool useIPP()
+منطقی useIPP()
 {
 #ifdef HAVE_IPP
     CoreTLSData& data = getCoreTlsData();
-    if (data.useIPP < 0)
+    اگر (data.useIPP < 0)
     {
         data.useIPP = getIPPSingleton().useIPP;
     }
-    return (data.useIPP > 0);
-#else
-    return false;
+    بازگشت (data.useIPP > 0);
+#وگرنه
+    بازگشت نادرست;
 #endif
 }
 
-void setUseIPP(bool flag)
+تهی setUseIPP(منطقی flag)
 {
     CoreTLSData& data = getCoreTlsData();
 #ifdef HAVE_IPP
-    data.useIPP = (getIPPSingleton().useIPP)?flag:false;
-#else
+    data.useIPP = (getIPPSingleton().useIPP)?flag:نادرست;
+#وگرنه
     CV_UNUSED(flag);
-    data.useIPP = false;
+    data.useIPP = نادرست;
 #endif
 }
 
-bool useIPP_NotExact()
+منطقی useIPP_NotExact()
 {
 #ifdef HAVE_IPP
     CoreTLSData& data = getCoreTlsData();
-    if (data.useIPP_NE < 0)
+    اگر (data.useIPP_NE < 0)
     {
         data.useIPP_NE = getIPPSingleton().useIPP_NE;
     }
-    return (data.useIPP_NE > 0);
-#else
-    return false;
+    بازگشت (data.useIPP_NE > 0);
+#وگرنه
+    بازگشت نادرست;
 #endif
 }
 
-void setUseIPP_NotExact(bool flag)
+تهی setUseIPP_NotExact(منطقی flag)
 {
     CoreTLSData& data = getCoreTlsData();
 #ifdef HAVE_IPP
     data.useIPP_NE = flag;
-#else
+#وگرنه
     CV_UNUSED(flag);
-    data.useIPP_NE = false;
+    data.useIPP_NE = نادرست;
 #endif
 }
 
 } // namespace ipp
 
 
-namespace details {
+فضاینام details {
 
-#if OPENCV_IMPL_FP_HINTS_X86
+#اگر OPENCV_IMPL_FP_HINTS_X86
 #ifndef _MM_DENORMALS_ZERO_ON  // requires pmmintrin.h (SSE3)
 #define _MM_DENORMALS_ZERO_ON 0x0040
 #endif
@@ -2758,64 +2758,64 @@ namespace details {
 #endif
 #endif
 
-void setFPDenormalsIgnoreHint(bool ignore, CV_OUT FPDenormalsModeState& state)
+تهی setFPDenormalsIgnoreHint(منطقی ignore, CV_OUT FPDenormalsModeState& state)
 {
-#if OPENCV_IMPL_FP_HINTS_X86
+#اگر OPENCV_IMPL_FP_HINTS_X86
     unsigned mask = _MM_FLUSH_ZERO_MASK;
     unsigned value = ignore ? _MM_FLUSH_ZERO_ON : 0;
-    if (featuresEnabled.have[CPU_SSE3])
+    اگر (featuresEnabled.have[CPU_SSE3])
     {
         mask |= _MM_DENORMALS_ZERO_MASK;
         value |= ignore ? _MM_DENORMALS_ZERO_ON : 0;
     }
-    const unsigned old_flags = _mm_getcsr();
-    const unsigned old_value = old_flags & mask;
+    ثابت unsigned old_flags = _mm_getcsr();
+    ثابت unsigned old_مقدار = old_flags & mask;
     unsigned flags = (old_flags & ~mask) | value;
-    CV_LOG_DEBUG(NULL, "core: update FP mxcsr flags = " << cv::format("0x%08x", flags));
+    CV_LOG_DEBUG(پوچ, "core: update FP mxcsr flags = " << cv::format("0x%08x", flags));
     // save state
     state.reserved[0] = (uint32_t)mask;
-    state.reserved[1] = (uint32_t)old_value;
+    state.reserved[1] = (uint32_t)old_مقدار;
     _mm_setcsr(flags);
-#else
+#وگرنه
     CV_UNUSED(ignore); CV_UNUSED(state);
 #endif
 }
 
-int saveFPDenormalsState(CV_OUT FPDenormalsModeState& state)
+صحیح saveFPDenormalsState(CV_OUT FPDenormalsModeState& state)
 {
-#if OPENCV_IMPL_FP_HINTS_X86
+#اگر OPENCV_IMPL_FP_HINTS_X86
     unsigned mask = _MM_FLUSH_ZERO_MASK;
-    if (featuresEnabled.have[CPU_SSE3])
+    اگر (featuresEnabled.have[CPU_SSE3])
     {
         mask |= _MM_DENORMALS_ZERO_MASK;
     }
-    const unsigned old_flags = _mm_getcsr();
-    const unsigned old_value = old_flags & mask;
+    ثابت unsigned old_flags = _mm_getcsr();
+    ثابت unsigned old_مقدار = old_flags & mask;
     // save state
     state.reserved[0] = (uint32_t)mask;
-    state.reserved[1] = (uint32_t)old_value;
-    return 2;
-#else
+    state.reserved[1] = (uint32_t)old_مقدار;
+    بازگشت 2;
+#وگرنه
     CV_UNUSED(state);
-    return 0;
+    بازگشت 0;
 #endif
 }
 
-bool restoreFPDenormalsState(const FPDenormalsModeState& state)
+منطقی restoreFPDenormalsState(ثابت FPDenormalsModeState& state)
 {
-#if OPENCV_IMPL_FP_HINTS_X86
-    const unsigned mask = (unsigned)state.reserved[0];
+#اگر OPENCV_IMPL_FP_HINTS_X86
+    ثابت unsigned mask = (unsigned)state.reserved[0];
     CV_DbgAssert(mask != 0); // invalid state (ensure that state is properly saved earlier)
-    const unsigned value = (unsigned)state.reserved[1];
-    CV_DbgCheck((int)value, value == (value & mask), "invalid SSE FP state");
-    const unsigned old_flags = _mm_getcsr();
+    ثابت unsigned value = (unsigned)state.reserved[1];
+    CV_DbgCheck((صحیح)value, value == (value & mask), "invalid SSE FP state");
+    ثابت unsigned old_flags = _mm_getcsr();
     unsigned flags = (old_flags & ~mask) | value;
-    CV_LOG_DEBUG(NULL, "core: restore FP mxcsr flags = " << cv::format("0x%08x", flags));
+    CV_LOG_DEBUG(پوچ, "core: restore FP mxcsr flags = " << cv::format("0x%08x", flags));
     _mm_setcsr(flags);
-    return true;
-#else
+    بازگشت درست;
+#وگرنه
     CV_UNUSED(state);
-    return false;
+    بازگشت نادرست;
 #endif
 }
 
@@ -2824,9 +2824,9 @@ bool restoreFPDenormalsState(const FPDenormalsModeState& state)
 AlgorithmHint getDefaultAlgorithmHint()
 {
 #ifdef OPENCV_ALGO_HINT_DEFAULT
-    return OPENCV_ALGO_HINT_DEFAULT;
-#else
-    return ALGO_HINT_ACCURATE;
+    بازگشت OPENCV_ALGO_HINT_DEFAULT;
+#وگرنه
+    بازگشت ALGO_HINT_ACCURATE;
 #endif
 };
 

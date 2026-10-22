@@ -39,24 +39,24 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "umatrix.hpp"
+#شامل "precomp.hpp"
+#شامل "opencl_kernels_core.hpp"
+#شامل "umatrix.hpp"
 
-#include <opencv2/core/utils/tls.hpp>
+#شامل <opencv2/core/utils/tls.hpp>
 
 ///////////////////////////////// UMat implementation ///////////////////////////////
 
-namespace cv {
+فضاینام cv {
 
 // forward decls, implementation is below in this file
-void setSize(UMat& m, int _dims, const int* _sz, const size_t* _steps,
-             bool autoSteps = false);
+تهی setSize(UMat& m, صحیح _dims, ثابت صحیح* _sz, ثابت size_t* _steps,
+             منطقی autoSteps = نادرست);
 
-void updateContinuityFlag(UMat& m);
-void finalizeHdr(UMat& m);
+تهی updateContinuityFlag(UMat& m);
+تهی finalizeHdr(UMat& m);
 
-UMatData::UMatData(const MatAllocator* allocator)
+UMatData::UMatData(ثابت MatAllocator* allocator)
 {
     prevAllocator = currAllocator = allocator;
     urefcount = refcount = mapcount = 0;
@@ -66,7 +66,7 @@ UMatData::UMatData(const MatAllocator* allocator)
     handle = 0;
     userdata = 0;
     allocatorFlags_ = 0;
-    originalUMatData = NULL;
+    originalUMatData = پوچ;
 }
 
 UMatData::~UMatData()
@@ -76,42 +76,42 @@ UMatData::~UMatData()
     CV_Assert(mapcount == 0);
     data = origdata = 0;
     size = 0;
-    bool isAsyncCleanup = !!(flags & UMatData::ASYNC_CLEANUP);
+    منطقی isAsyncCleanup = !!(flags & UMatData::ASYNC_CLEANUP);
     flags = static_cast<UMatData::MemoryFlag>(0);
     handle = 0;
     userdata = 0;
     allocatorFlags_ = 0;
-    if (originalUMatData)
+    اگر (originalUMatData)
     {
-        bool showWarn = false;
+        منطقی showWarn = نادرست;
         UMatData* u = originalUMatData;
-        bool zero_Ref = CV_XADD(&(u->refcount), -1) == 1;
-        if (zero_Ref)
+        منطقی zero_Ref = CV_XADD(&(u->refcount), -1) == 1;
+        اگر (zero_Ref)
         {
             // simulate Mat::deallocate
-            if (u->mapcount != 0)
+            اگر (u->mapcount != 0)
             {
                 (u->currAllocator ? u->currAllocator : /* TODO allocator ? allocator :*/ Mat::getDefaultAllocator())->unmap(u);
             }
-            else
+            وگرنه
             {
                 // we don't do "map", so we can't do "unmap"
             }
         }
-        bool zero_URef = CV_XADD(&(u->urefcount), -1) == 1;
-        if (zero_Ref && !zero_URef)
-            showWarn = true;
-        if (zero_Ref && zero_URef) // oops, we need to free resources
+        منطقی zero_URef = CV_XADD(&(u->urefcount), -1) == 1;
+        اگر (zero_Ref && !zero_URef)
+            showWarn = درست;
+        اگر (zero_Ref && zero_URef) // oops, we need to free resources
         {
             showWarn = !isAsyncCleanup;
             // simulate UMat::deallocate
             u->currAllocator->deallocate(u);
         }
 #ifndef NDEBUG
-        if (showWarn)
+        اگر (showWarn)
         {
-            static int warn_message_showed = 0;
-            if (warn_message_showed++ < 100)
+            ایستا صحیح warn_message_showed = 0;
+            اگر (warn_message_showed++ < 100)
             {
                 fflush(stdout);
                 fprintf(stderr, "\n! OPENCV warning: getUMat()/getMat() call chain possible problem."
@@ -120,106 +120,106 @@ UMatData::~UMatData()
                 fflush(stderr);
             }
         }
-#else
+#وگرنه
         CV_UNUSED(showWarn);
 #endif
-        originalUMatData = NULL;
+        originalUMatData = پوچ;
     }
 }
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
 
 // it should be a prime number for the best hash function
-enum { UMAT_NLOCKS = 31 };
-static Mutex umatLocks[UMAT_NLOCKS];
+شمارش { UMAT_NLOCKS = 31 };
+ایستا Mutex umatLocks[UMAT_NLOCKS];
 
-static size_t getUMatDataLockIndex(const UMatData* u)
+ایستا size_t getUMatDataLockIndex(ثابت UMatData* u)
 {
-    size_t idx = ((size_t)(void*)u) % UMAT_NLOCKS;
-    return idx;
+    size_t idx = ((size_t)(تهی*)u) % UMAT_NLOCKS;
+    بازگشت idx;
 }
 
-void UMatData::lock()
+تهی UMatData::lock()
 {
-    size_t idx = getUMatDataLockIndex(this);
+    size_t idx = getUMatDataLockIndex(این);
     //printf("%d lock(%d)\n", cv::utils::getThreadID(), (int)idx);
     umatLocks[idx].lock();
 }
 
-void UMatData::unlock()
+تهی UMatData::unlock()
 {
-    size_t idx = getUMatDataLockIndex(this);
+    size_t idx = getUMatDataLockIndex(این);
     //printf("%d unlock(%d)\n", cv::utils::getThreadID(), (int)idx);
     umatLocks[idx].unlock();
 }
 
 
 // Do not allow several lock() calls with different UMatData objects.
-struct UMatDataAutoLocker
+ساختار UMatDataAutoLocker
 {
-    int usage_count;
+    صحیح usage_شمار;
     UMatData* locked_objects[2];
-    UMatDataAutoLocker() : usage_count(0) { locked_objects[0] = NULL; locked_objects[1] = NULL; }
+    UMatDataAutoLocker() : usage_شمار(0) { locked_objects[0] = پوچ; locked_objects[1] = پوچ; }
 
-    void lock(UMatData*& u1)
+    تهی lock(UMatData*& u1)
     {
-        bool locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
-        if (locked_1)
+        منطقی locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
+        اگر (locked_1)
         {
-            u1 = NULL;
-            return;
+            u1 = پوچ;
+            بازگشت;
         }
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        CV_Assert(usage_شمار == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_شمار = 1;
         locked_objects[0] = u1;
         u1->lock();
     }
-    void lock(UMatData*& u1, UMatData*& u2)
+    تهی lock(UMatData*& u1, UMatData*& u2)
     {
-        bool locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
-        bool locked_2 = (u2 == locked_objects[0] || u2 == locked_objects[1]);
-        if (locked_1)
-            u1 = NULL;
-        if (locked_2)
-            u2 = NULL;
-        if (locked_1 && locked_2)
-            return;
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        منطقی locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
+        منطقی locked_2 = (u2 == locked_objects[0] || u2 == locked_objects[1]);
+        اگر (locked_1)
+            u1 = پوچ;
+        اگر (locked_2)
+            u2 = پوچ;
+        اگر (locked_1 && locked_2)
+            بازگشت;
+        CV_Assert(usage_شمار == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_شمار = 1;
         locked_objects[0] = u1;
         locked_objects[1] = u2;
-        if (u1)
+        اگر (u1)
             u1->lock();
-        if (u2)
+        اگر (u2)
             u2->lock();
     }
-    void release(UMatData* u1, UMatData* u2)
+    تهی release(UMatData* u1, UMatData* u2)
     {
-        if (u1 == NULL && u2 == NULL)
-            return;
-        CV_Assert(usage_count == 1);
-        usage_count = 0;
-        if (u1)
+        اگر (u1 == پوچ && u2 == پوچ)
+            بازگشت;
+        CV_Assert(usage_شمار == 1);
+        usage_شمار = 0;
+        اگر (u1)
             u1->unlock();
-        if (u2)
+        اگر (u2)
             u2->unlock();
-        locked_objects[0] = NULL; locked_objects[1] = NULL;
+        locked_objects[0] = پوچ; locked_objects[1] = پوچ;
     }
 };
-static TLSData<UMatDataAutoLocker>& getUMatDataAutoLockerTLS()
+ایستا TLSData<UMatDataAutoLocker>& getUMatDataAutoLockerTLS()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TLSData<UMatDataAutoLocker>, new TLSData<UMatDataAutoLocker>());
+    CV_SINGLETON_LAZY_INIT_REF(TLSData<UMatDataAutoLocker>, جدید TLSData<UMatDataAutoLocker>());
 }
-static UMatDataAutoLocker& getUMatDataAutoLocker() { return getUMatDataAutoLockerTLS().getRef(); }
+ایستا UMatDataAutoLocker& getUMatDataAutoLocker() { بازگشت getUMatDataAutoLockerTLS().getRef(); }
 
 
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(NULL)
+UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(پوچ)
 {
     getUMatDataAutoLocker().lock(u1);
 }
 UMatDataAutoLock::UMatDataAutoLock(UMatData* u1_, UMatData* u2_) : u1(u1_), u2(u2_)
 {
-    if (getUMatDataLockIndex(u1) > getUMatDataLockIndex(u2))
+    اگر (getUMatDataLockIndex(u1) > getUMatDataLockIndex(u2))
     {
         std::swap(u1, u2);
     }
@@ -230,19 +230,19 @@ UMatDataAutoLock::~UMatDataAutoLock()
     getUMatDataAutoLocker().release(u1, u2);
 }
 
-#else
+#وگرنه
 
-void UMatData::lock()
+تهی UMatData::lock()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-void UMatData::unlock()
+تهی UMatData::unlock()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(NULL)
+UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(پوچ)
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
@@ -263,68 +263,68 @@ UMat::UMat(UMatUsageFlags _usageFlags) CV_NOEXCEPT
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {}
 
-UMat::UMat(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+UMat::UMat(صحیح _rows, صحیح _cols, صحیح _type, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_rows, _cols, _type);
 }
 
-UMat::UMat(int _rows, int _cols, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
+UMat::UMat(صحیح _rows, صحیح _cols, صحیح _type, ثابت Scalar& _s, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_rows, _cols, _type);
-    *this = _s;
+    *این = _s;
 }
 
-UMat::UMat(Size _sz, int _type, UMatUsageFlags _usageFlags)
+UMat::UMat(Size _sz, صحیح _type, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create( _sz.height, _sz.width, _type );
 }
 
-UMat::UMat(Size _sz, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
+UMat::UMat(Size _sz, صحیح _type, ثابت Scalar& _s, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_sz.height, _sz.width, _type);
-    *this = _s;
+    *این = _s;
 }
 
-UMat::UMat(int _dims, const int* _sz, int _type, UMatUsageFlags _usageFlags)
+UMat::UMat(صحیح _dims, ثابت صحیح* _sz, صحیح _type, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_dims, _sz, _type);
 }
 
-UMat::UMat(int _dims, const int* _sz, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
+UMat::UMat(صحیح _dims, ثابت صحیح* _sz, صحیح _type, ثابت Scalar& _s, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_dims, _sz, _type);
-    *this = _s;
+    *این = _s;
 }
 
-UMat::UMat(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+UMat::UMat(ثابت MatShape& _shape, صحیح _type, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_shape.dims, _shape.p, _type);
 }
 
-UMat::UMat(const MatShape& _shape, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
+UMat::UMat(ثابت MatShape& _shape, صحیح _type, ثابت Scalar& _s, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_shape.dims, _shape.p, _type);
-    *this = _s;
+    *این = _s;
 }
 
-UMat::UMat(const UMat& m)
+UMat::UMat(ثابت UMat& m)
 : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), allocator(m.allocator),
   usageFlags(m.usageFlags), u(m.u), offset(m.offset), size(m.size), step(m.step)
 {
     addref();
 }
 
-UMat& UMat::operator=(const UMat& m)
+UMat& UMat::operator=(ثابت UMat& m)
 {
-    if( this != &m )
+    اگر( این != &m )
     {
         const_cast<UMat&>(m).addref();
         release();
@@ -339,73 +339,73 @@ UMat& UMat::operator=(const UMat& m)
         u = m.u;
         offset = m.offset;
     }
-    return *this;
+    بازگشت *این;
 }
 
-UMat UMat::clone() const
+UMat UMat::clone() ثابت
 {
     UMat m;
     copyTo(m);
-    return m;
+    بازگشت m;
 }
 
-void UMat::assignTo(UMat& m, int _type) const
+تهی UMat::assignTo(UMat& m, صحیح _type) ثابت
 {
-    if( _type < 0 )
-        m = *this;
-    else
+    اگر( _type < 0 )
+        m = *این;
+    وگرنه
         convertTo(m, _type);
 }
 
-void UMat::create(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::create(صحیح _rows, صحیح _cols, صحیح _type, UMatUsageFlags _usageFlags)
 {
-    int sz[] = {_rows, _cols};
+    صحیح sz[] = {_rows, _cols};
     create(2, sz, _type, _usageFlags);
 }
 
-void UMat::create(Size _sz, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::create(Size _sz, صحیح _type, UMatUsageFlags _usageFlags)
 {
     create(_sz.height, _sz.width, _type, _usageFlags);
 }
 
-void UMat::createSameSize(InputArray arr, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::createSameSize(درون_داد_Array arr, صحیح _type, UMatUsageFlags _usageFlags)
 {
     create(arr.shape(), _type, _usageFlags);
 }
 
-void UMat::addref()
+تهی UMat::addref()
 {
-    if( u )
+    اگر( u )
         CV_XADD(&(u->urefcount), 1);
 }
 
-void UMat::release()
+تهی UMat::release()
 {
-    if( u && CV_XADD(&(u->urefcount), -1) == 1 )
+    اگر( u && CV_XADD(&(u->urefcount), -1) == 1 )
         deallocate();
     u = 0;
     size.clear();
     dims = cols = rows = 0;
 }
 
-bool UMat::empty() const
+منطقی UMat::empty() ثابت
 {
-    return u == 0 || total() == 0;
+    بازگشت u == 0 || total() == 0;
 }
 
-size_t UMat::total() const
+size_t UMat::total() ثابت
 {
-    if( dims <= 2 )
-        return (size_t)rows * cols;
+    اگر( dims <= 2 )
+        بازگشت (size_t)rows * cols;
     size_t p = 1;
-    for( int i = 0; i < dims; i++ )
+    برای( صحیح i = 0; i < dims; i++ )
         p *= size[i];
-    return p;
+    بازگشت p;
 }
 
-MatShape UMat::shape() const
+MatShape UMat::shape() ثابت
 {
-    return size;
+    بازگشت size;
 }
 
 UMat::UMat(UMat&& m)
@@ -418,15 +418,15 @@ UMat::UMat(UMat&& m)
     m.usageFlags = USAGE_DEFAULT;
     m.dims = m.rows = m.cols = 0;
     m.size.clear();
-    m.allocator = NULL;
-    m.u = NULL;
+    m.allocator = پوچ;
+    m.u = پوچ;
     m.offset = 0;
 }
 
 UMat& UMat::operator=(UMat&& m)
 {
-    if (this == &m)
-      return *this;
+    اگر (این == &m)
+      بازگشت *این;
     release();
     flags = m.flags; dims = m.dims; rows = m.rows; cols = m.cols;
     allocator = m.allocator; usageFlags = m.usageFlags;
@@ -437,23 +437,23 @@ UMat& UMat::operator=(UMat&& m)
     m.flags = MAGIC_VAL;
     m.usageFlags = USAGE_DEFAULT;
     m.dims = m.rows = m.cols = 0;
-    m.allocator = NULL;
-    m.u = NULL;
+    m.allocator = پوچ;
+    m.u = پوچ;
     m.offset = 0;
-    return *this;
+    بازگشت *این;
 }
 
 
 MatAllocator* UMat::getStdAllocator()
 {
 #ifdef HAVE_OPENCL
-    if (ocl::useOpenCL())
-        return ocl::getOpenCLAllocator();
+    اگر (ocl::useOpenCL())
+        بازگشت ocl::getOpenCLAllocator();
 #endif
-    return Mat::getDefaultAllocator();
+    بازگشت Mat::getDefaultAllocator();
 }
 
-void swap( UMat& a, UMat& b )
+تهی swap( UMat& a, UMat& b )
 {
     std::swap(a.flags, b.flags);
     std::swap(a.dims, b.dims);
@@ -468,103 +468,103 @@ void swap( UMat& a, UMat& b )
 }
 
 
-void setSize( UMat& m, int _dims, const int* _sz,
-              const size_t* _steps, bool autoSteps )
+تهی setSize( UMat& m, صحیح _dims, ثابت صحیح* _sz,
+              ثابت size_t* _steps, منطقی autoSteps )
 {
     CV_Assert( 0 <= _dims && _dims <= CV_MAX_DIM && _dims <= MatShape::MAX_DIMS);
 
     m.dims = _dims;
     m.size = MatShape(_dims, _sz);
     m.step[std::max(_dims-1, 0)] = CV_ELEM_SIZE(m.flags);
-    for (int i = _dims-2; i >= 0; i--) {
+    برای (صحیح i = _dims-2; i >= 0; i--) {
         size_t autostep = m.size[i+1]*m.step[i+1];
-        if (_steps) {
+        اگر (_steps) {
             m.step[i] = _steps[i];
             //CV_Assert(m.step[i] >= autostep);
-        } else if (autoSteps) {
+        } وگرنه اگر (autoSteps) {
             m.step[i] = autostep;
-        } else {
+        } وگرنه {
             m.step[i] = 0;
         }
     }
 
-    if( _dims <= 2 )
+    اگر( _dims <= 2 )
     {
         m.cols = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
         m.rows = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
-    } else {
+    } وگرنه {
         m.cols = m.rows = -1;
     }
 }
 
 
-void UMat::updateContinuityFlag()
+تهی UMat::updateContinuityFlag()
 {
     flags = cv::updateContinuityFlag(flags, dims, size.p, step.p);
 }
 
 
-void finalizeHdr(UMat& m)
+تهی finalizeHdr(UMat& m)
 {
     m.updateContinuityFlag();
-    int d = m.dims;
-    if( d > 2 )
+    صحیح d = m.dims;
+    اگر( d > 2 )
         m.rows = m.cols = -1;
 }
 
 
-UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) const
+UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) ثابت
 {
     UMat hdr;
-    if(!data)
-        return hdr;
-    if (data != datastart)
+    اگر(!data)
+        بازگشت hdr;
+    اگر (data != datastart)
     {
         Size wholeSize;
         Point ofs;
         locateROI(wholeSize, ofs);
         Size sz(cols, rows);
-        if (ofs.x != 0 || ofs.y != 0)
+        اگر (ofs.x != 0 || ofs.y != 0)
         {
-            Mat src = *this;
-            int dtop = ofs.y;
-            int dbottom = wholeSize.height - src.rows - ofs.y;
-            int dleft = ofs.x;
-            int dright = wholeSize.width - src.cols - ofs.x;
+            Mat src = *این;
+            صحیح dtop = ofs.y;
+            صحیح dbottom = wholeSize.height - src.rows - ofs.y;
+            صحیح dleft = ofs.x;
+            صحیح dright = wholeSize.width - src.cols - ofs.x;
             src.adjustROI(dtop, dbottom, dleft, dright);
-            return src.getUMat(accessFlags, usageFlags)(cv::Rect(ofs.x, ofs.y, sz.width, sz.height));
+            بازگشت src.getUMat(accessFlags, usageFlags)(cv::Rect(ofs.x, ofs.y, sz.width, sz.height));
         }
     }
     CV_Assert(data == datastart);
 
     accessFlags |= ACCESS_RW;
-    UMatData* new_u = NULL;
+    UMatData* new_u = پوچ;
     MatStep new_step = step;
     {
         MatAllocator *a = allocator, *a0 = getDefaultAllocator();
-        if(!a)
+        اگر(!a)
             a = a0;
         new_u = a->allocate(dims, size.p, type(), data, new_step.p, accessFlags, usageFlags);
         new_u->originalUMatData = u;
     }
-    bool allocated = false;
-    try
+    منطقی allocated = نادرست;
+    تلاش
     {
         allocated = UMat::getStdAllocator()->allocate(new_u, accessFlags, usageFlags);
     }
-    catch (const cv::Exception& e)
+    بگیر (ثابت cv::Exception& e)
     {
         fprintf(stderr, "Exception: %s\n", e.what());
     }
-    if (!allocated)
+    اگر (!allocated)
     {
         allocated = getDefaultAllocator()->allocate(new_u, accessFlags, usageFlags);
         CV_Assert(allocated);
     }
-    if (u != NULL)
+    اگر (u != پوچ)
     {
 #ifdef HAVE_OPENCL
-        if (ocl::useOpenCL() && new_u->currAllocator == ocl::getOpenCLAllocator())
+        اگر (ocl::useOpenCL() && new_u->currAllocator == ocl::getOpenCLAllocator())
         {
             CV_Assert(new_u->tempUMat());
         }
@@ -572,7 +572,7 @@ UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) const
         CV_XADD(&(u->refcount), 1);
         CV_XADD(&(u->urefcount), 1);
     }
-    try
+    تلاش
     {
         hdr.flags = flags;
         hdr.usageFlags = usageFlags;
@@ -581,28 +581,28 @@ UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) const
         hdr.u = new_u;
         hdr.offset = 0; //data - datastart;
         hdr.addref();
-        return hdr;
+        بازگشت hdr;
     }
-    catch(...)
+    بگیر(...)
     {
-        if (u != NULL)
+        اگر (u != پوچ)
         {
             CV_XADD(&(u->refcount), -1);
             CV_XADD(&(u->urefcount), -1);
         }
         new_u->currAllocator->deallocate(new_u);
-        throw;
+        پرتابکن;
     }
 
 }
 
-void UMat::create(int d0, const int* _sizes, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::create(صحیح d0, ثابت صحیح* _sizes, صحیح _type, UMatUsageFlags _usageFlags)
 {
-    int sz1 = 1, d = d0;
-    int i;
-    if (d == 0) {
+    صحیح sz1 = 1, d = d0;
+    صحیح i;
+    اگر (d == 0) {
         d = 1;
-        _sizes = (const int*)&sz1;
+        _sizes = (ثابت صحیح*)&sz1;
     }
     CV_Assert(0 <= d && d <= CV_MAX_DIM && _sizes);
     _type = CV_MAT_TYPE(_type);
@@ -611,132 +611,132 @@ void UMat::create(int d0, const int* _sizes, int _type, UMatUsageFlags _usageFla
     // ...then don't change the existing usageFlags
     // it is not possible to change usage from non-default to USAGE_DEFAULT through create()
     // ...instead must construct UMat()
-    if (_usageFlags == cv::USAGE_DEFAULT)
+    اگر (_usageFlags == cv::USAGE_DEFAULT)
     {
         _usageFlags = usageFlags;
     }
 
-    if( u && d == dims && _type == type() && _usageFlags == usageFlags )
+    اگر( u && d == dims && _type == type() && _usageFlags == usageFlags )
     {
-        for( i = 0; i < d; i++ )
-            if( size[i] != _sizes[i] )
-                break;
-        if( i == d )
-            return;
+        برای( i = 0; i < d; i++ )
+            اگر( size[i] != _sizes[i] )
+                بشکن;
+        اگر( i == d )
+            بازگشت;
     }
 
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (_sizes == (this->size.p))
+    صحیح _sizes_backup[CV_MAX_DIM]; // #5991
+    اگر (_sizes == (این->size.p))
     {
-        for(i = 0; i < d; i++ )
+        برای(i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
 
     release();
     usageFlags = _usageFlags;
-    if( d == 0 )
-        return;
+    اگر( d == 0 )
+        بازگشت;
     flags = (_type & CV_MAT_TYPE_MASK) | MAGIC_VAL;
-    setSize(*this, d, _sizes, 0, true);
+    setSize(*این, d, _sizes, 0, درست);
     offset = 0;
 
-    if( total() > 0 )
+    اگر( total() > 0 )
     {
         MatAllocator *a = allocator, *a0 = getStdAllocator();
-        if (!a)
+        اگر (!a)
         {
             a = a0;
             a0 = Mat::getDefaultAllocator();
         }
-        try
+        تلاش
         {
             u = a->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, usageFlags);
             CV_Assert(u != 0);
         }
-        catch(...)
+        بگیر(...)
         {
-            if(a != a0)
+            اگر(a != a0)
                 u = a0->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, usageFlags);
             CV_Assert(u != 0);
         }
         CV_Assert( step[dims-1] == (size_t)CV_ELEM_SIZE(flags) );
     }
 
-    finalizeHdr(*this);
+    finalizeHdr(*این);
     addref();
     size.dims = dims = d0;
 }
 
-void UMat::create(const std::vector<int>& _sizes, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::create(ثابت std::vector<صحیح>& _sizes, صحیح _type, UMatUsageFlags _usageFlags)
 {
-    create((int)_sizes.size(), _sizes.data(), _type, _usageFlags);
+    create((صحیح)_sizes.size(), _sizes.data(), _type, _usageFlags);
 }
 
-void UMat::create(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::create(ثابت MatShape& _shape, صحیح _type, UMatUsageFlags _usageFlags)
 {
-    if (_shape.dims < 0) {
+    اگر (_shape.dims < 0) {
         release();
-    } else {
+    } وگرنه {
         create(_shape.dims, _shape.p, _type, _usageFlags);
         size.layout = _shape.layout;
         size.C = _shape.C;
     }
 }
 
-void UMat::fit(int _dims, const int* _sizes, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::fit(صحیح _dims, ثابت صحیح* _sizes, صحیح _type, UMatUsageFlags _usageFlags)
 {
-    if (_usageFlags == cv::USAGE_DEFAULT)
+    اگر (_usageFlags == cv::USAGE_DEFAULT)
         _usageFlags = usageFlags;
     size_t oldTotalBytes = u ? u->size : 0;
     size_t esz = CV_ELEM_SIZE(_type), newTotal = _dims >= 0;
-    for (int i = 0; i < _dims; i++)
+    برای (صحیح i = 0; i < _dims; i++)
         newTotal *= _sizes[i];
     size_t newTotalBytes = newTotal*esz;
-    if (newTotalBytes > 0 &&
+    اگر (newTotalBytes > 0 &&
         (!isContinuous() ||
          newTotalBytes > oldTotalBytes ||
          offset != 0 ||
          _usageFlags != usageFlags)) {
         create(_dims, _sizes, _type, _usageFlags);
-    } else {
+    } وگرنه {
         flags = (flags & ~Mat::TYPE_MASK) | CV_MAT_TYPE(_type);
-        int _dummy_size = 0;
-        setSize(*this, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, true);
-        finalizeHdr(*this);
+        صحیح _dummy_size = 0;
+        setSize(*این, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, درست);
+        finalizeHdr(*این);
     }
 }
 
-void UMat::fit(const std::vector<int>& _shape, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::fit(ثابت std::vector<صحیح>& _shape, صحیح _type, UMatUsageFlags _usageFlags)
 {
-    fit((int)_shape.size(), _shape.data(), _type, _usageFlags);
+    fit((صحیح)_shape.size(), _shape.data(), _type, _usageFlags);
 }
 
-void UMat::fit(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::fit(ثابت MatShape& _shape, صحیح _type, UMatUsageFlags _usageFlags)
 {
     fit(_shape.dims, _shape.p, _type, _usageFlags);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void UMat::fit(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::fit(صحیح _rows, صحیح _cols, صحیح _type, UMatUsageFlags _usageFlags)
 {
     _type &= TYPE_MASK;
-    int sz[] = {_rows, _cols};
+    صحیح sz[] = {_rows, _cols};
     fit(2, sz, _type, _usageFlags);
 }
 
-void UMat::fit(Size _sz, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::fit(Size _sz, صحیح _type, UMatUsageFlags _usageFlags)
 {
     fit(_sz.height, _sz.width, _type, _usageFlags);
 }
 
-void UMat::fitSameSize(InputArray m, int _type, UMatUsageFlags _usageFlags)
+تهی UMat::fitSameSize(درون_داد_Array m, صحیح _type, UMatUsageFlags _usageFlags)
 {
     fit(m.shape(), _type, _usageFlags);
 }
 
-void UMat::copySize(const UMat& m)
+تهی UMat::copySize(ثابت UMat& m)
 {
     dims = m.dims;
     cols = m.cols;
@@ -750,31 +750,31 @@ UMat::~UMat()
     release();
 }
 
-void UMat::deallocate()
+تهی UMat::deallocate()
 {
     UMatData* u_ = u;
-    u = NULL;
+    u = پوچ;
     u_->currAllocator->deallocate(u_);
 }
 
 
-UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
+UMat::UMat(ثابت UMat& m, ثابت Range& _rowRange, ثابت Range& _colRange)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
     CV_Assert( m.dims >= 2 && m.dims <= MatShape::MAX_DIMS );
-    if( m.dims > 2 )
+    اگر( m.dims > 2 )
     {
         Range rs[MatShape::MAX_DIMS];
         rs[0] = _rowRange;
         rs[1] = _colRange;
-        for( int i = 2; i < m.dims; i++ )
+        برای( صحیح i = 2; i < m.dims; i++ )
             rs[i] = Range::all();
-        *this = m(rs);
-        return;
+        *این = m(rs);
+        بازگشت;
     }
 
-    *this = m;
-    if( _rowRange != Range::all() && _rowRange != Range(0,rows) )
+    *این = m;
+    اگر( _rowRange != Range::all() && _rowRange != Range(0,rows) )
     {
         CV_Assert( 0 <= _rowRange.start &&
                   _rowRange.start <= _rowRange.end &&
@@ -784,7 +784,7 @@ UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
         flags |= SUBMATRIX_FLAG;
     }
 
-    if( _colRange != Range::all() && _colRange != Range(0,cols) )
+    اگر( _colRange != Range::all() && _colRange != Range(0,cols) )
     {
         CV_Assert( 0 <= _colRange.start &&
                   _colRange.start <= _colRange.end &&
@@ -796,7 +796,7 @@ UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
 
     updateContinuityFlag();
 
-    if( rows <= 0 || cols <= 0 )
+    اگر( rows <= 0 || cols <= 0 )
     {
         release();
         rows = cols = 0;
@@ -804,7 +804,7 @@ UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
 }
 
 
-UMat::UMat(const UMat& m, const Rect& roi)
+UMat::UMat(ثابت UMat& m, ثابت Rect& roi)
     : flags(m.flags), dims(2), rows(roi.height), cols(roi.width),
     allocator(m.allocator), usageFlags(m.usageFlags), u(m.u),
     offset(m.offset + roi.y*m.step[0]), size(2)
@@ -815,7 +815,7 @@ UMat::UMat(const UMat& m, const Rect& roi)
     offset += roi.x*esz;
     CV_Assert( 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols &&
               0 <= roi.y && 0 <= roi.height && roi.y + roi.height <= m.rows );
-    if( roi.width < m.cols || roi.height < m.rows )
+    اگر( roi.width < m.cols || roi.height < m.rows )
         flags |= SUBMATRIX_FLAG;
 
     size[0] = rows;
@@ -826,7 +826,7 @@ UMat::UMat(const UMat& m, const Rect& roi)
     updateContinuityFlag();
 
     addref();
-    if( rows <= 0 || cols <= 0 )
+    اگر( rows <= 0 || cols <= 0 )
     {
         rows = cols = 0;
         release();
@@ -834,22 +834,22 @@ UMat::UMat(const UMat& m, const Rect& roi)
 }
 
 
-UMat::UMat(const UMat& m, const Range* ranges)
+UMat::UMat(ثابت UMat& m, ثابت Range* ranges)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
-    int i, d = m.dims;
+    صحیح i, d = m.dims;
 
     CV_Assert(ranges);
-    for( i = 0; i < d; i++ )
+    برای( i = 0; i < d; i++ )
     {
         Range r = ranges[i];
         CV_Assert( r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]) );
     }
-    *this = m;
-    for( i = 0; i < d; i++ )
+    *این = m;
+    برای( i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        if( r != Range::all() && r != Range(0, size.p[i]))
+        اگر( r != Range::all() && r != Range(0, size.p[i]))
         {
             size.p[i] = r.end - r.start;
             offset += r.start*step.p[i];
@@ -857,29 +857,29 @@ UMat::UMat(const UMat& m, const Range* ranges)
         }
     }
 
-    if (d <= 2) {
+    اگر (d <= 2) {
         rows = d == 2 ? size[0] : 1;
         cols = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-UMat::UMat(const UMat& m, const std::vector<Range>& ranges)
+UMat::UMat(ثابت UMat& m, ثابت std::vector<Range>& ranges)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
-    int i, d = m.dims;
+    صحیح i, d = m.dims;
 
-    CV_Assert((int)ranges.size() == d);
-    for (i = 0; i < d; i++)
+    CV_Assert((صحیح)ranges.size() == d);
+    برای (i = 0; i < d; i++)
     {
         Range r = ranges[i];
         CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]));
     }
-    *this = m;
-    for (i = 0; i < d; i++)
+    *این = m;
+    برای (i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, size.p[i]))
+        اگر (r != Range::all() && r != Range(0, size.p[i]))
         {
             size.p[i] = r.end - r.start;
             offset += r.start*step.p[i];
@@ -887,26 +887,26 @@ UMat::UMat(const UMat& m, const std::vector<Range>& ranges)
         }
     }
 
-    if (d <= 2) {
+    اگر (d <= 2) {
         rows = d == 2 ? size[0] : 1;
         cols = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-UMat UMat::diag(int d) const
+UMat UMat::diag(صحیح d) ثابت
 {
     CV_Assert( dims <= 2 );
-    UMat m = *this;
+    UMat m = *این;
     size_t esz = elemSize();
-    int len;
+    صحیح len;
 
-    if( d >= 0 )
+    اگر( d >= 0 )
     {
         len = std::min(cols - d, rows);
         m.offset += esz*d;
     }
-    else
+    وگرنه
     {
         len = std::min(rows + d, cols);
         m.offset -= step[0]*d;
@@ -919,121 +919,121 @@ UMat UMat::diag(int d) const
 
     m.updateContinuityFlag();
 
-    if( size() != Size(1,1) )
+    اگر( size() != Size(1,1) )
         m.flags |= SUBMATRIX_FLAG;
 
-    return m;
+    بازگشت m;
 }
 
-void UMat::locateROI( Size& wholeSize, Point& ofs ) const
+تهی UMat::locateROI( Size& wholeSize, Point& ofs ) ثابت
 {
     CV_Assert( dims <= 2 && step[0] > 0 );
     size_t esz = elemSize(), minstep;
     ptrdiff_t delta1 = (ptrdiff_t)offset, delta2 = (ptrdiff_t)u->size;
 
-    if( delta1 == 0 )
+    اگر( delta1 == 0 )
         ofs.x = ofs.y = 0;
-    else
+    وگرنه
     {
-        ofs.y = (int)(delta1/step[0]);
-        ofs.x = (int)((delta1 - step[0]*ofs.y)/esz);
+        ofs.y = (صحیح)(delta1/step[0]);
+        ofs.x = (صحیح)((delta1 - step[0]*ofs.y)/esz);
         CV_DbgAssert( offset == (size_t)(ofs.y*step[0] + ofs.x*esz) );
     }
     minstep = (ofs.x + cols)*esz;
-    wholeSize.height = (int)((delta2 - minstep)/step[0] + 1);
+    wholeSize.height = (صحیح)((delta2 - minstep)/step[0] + 1);
     wholeSize.height = std::max(wholeSize.height, ofs.y + rows);
-    wholeSize.width = (int)((delta2 - step*(wholeSize.height-1))/esz);
+    wholeSize.width = (صحیح)((delta2 - step*(wholeSize.height-1))/esz);
     wholeSize.width = std::max(wholeSize.width, ofs.x + cols);
 }
 
 
-UMat& UMat::adjustROI( int dtop, int dbottom, int dleft, int dright )
+UMat& UMat::adjustROI( صحیح dtop, صحیح dbottom, صحیح dleft, صحیح dright )
 {
     CV_Assert( dims == 2 && step[0] > 0 );
     Size wholeSize; Point ofs;
     size_t esz = elemSize();
     locateROI( wholeSize, ofs );
-    int row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
-    int col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
-    if(row1 > row2)
+    صحیح row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
+    صحیح col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
+    اگر(row1 > row2)
         std::swap(row1, row2);
-    if(col1 > col2)
+    اگر(col1 > col2)
         std::swap(col1, col2);
 
     offset += (row1 - ofs.y)*step + (col1 - ofs.x)*esz;
     rows = row2 - row1; cols = col2 - col1;
     size.p[0] = rows; size.p[1] = cols;
     updateContinuityFlag();
-    return *this;
+    بازگشت *این;
 }
 
 
-UMat UMat::reshape(int new_cn, int new_rows) const
+UMat UMat::reshape(صحیح new_cn, صحیح new_rows) ثابت
 {
-    int cn = channels();
-    UMat hdr = *this;
+    صحیح cn = channels();
+    UMat hdr = *این;
 
-    if( dims > 2 && new_rows == 0 && new_cn != 0 && size[dims-1]*cn % new_cn == 0 )
+    اگر( dims > 2 && new_rows == 0 && new_cn != 0 && size[dims-1]*cn % new_cn == 0 )
     {
         hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
         hdr.step[dims-1] = CV_ELEM_SIZE(hdr.flags);
         hdr.size[dims-1] = hdr.size[dims-1]*cn / new_cn;
-        return hdr;
+        بازگشت hdr;
     }
 
     CV_Assert( dims <= 2 );
 
-    if( new_cn == 0 )
+    اگر( new_cn == 0 )
         new_cn = cn;
 
-    int total_width = cols * cn;
+    صحیح total_width = cols * cn;
 
-    if( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
+    اگر( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
         new_rows = rows * total_width / new_cn;
 
-    if( new_rows != 0 && new_rows != rows )
+    اگر( new_rows != 0 && new_rows != rows )
     {
-        int total_size = total_width * rows;
-        if( !isContinuous() )
+        صحیح total_size = total_width * rows;
+        اگر( !isContinuous() )
             CV_Error( cv::Error::BadStep,
             "The matrix is not continuous, thus its number of rows can not be changed" );
 
         total_width = total_size / new_rows;
 
-        if( total_width * new_rows != total_size )
+        اگر( total_width * new_rows != total_size )
             CV_Error( cv::Error::StsBadArg, "The total number of matrix elements "
                                     "is not divisible by the new number of rows" );
 
         hdr.size[0] = hdr.rows = new_rows;
         hdr.step[0] = total_width * elemSize1();
-    } else {
+    } وگرنه {
         hdr.size[0] = hdr.rows = rows;
-        if (dims <= 1)
+        اگر (dims <= 1)
             hdr.step[0] = cols * CV_ELEM_SIZE(flags);
     }
 
-    int new_width = total_width / new_cn;
+    صحیح new_width = total_width / new_cn;
 
-    if( new_width * new_cn != total_width )
-        CV_Error( cv::Error::BadNumChannels,
+    اگر( new_width * new_cn != total_width )
+        CV_Error( cv::Error::Bad_رقم_Channels,
         "The total width is not divisible by the new number of channels" );
 
     hdr.size.dims = hdr.dims = 2;
     hdr.size[1] = hdr.cols = new_width;
     hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
     hdr.step[1] = CV_ELEM_SIZE(hdr.flags);
-    return hdr;
+    بازگشت hdr;
 }
 
 #ifdef HAVE_OPENCL
-namespace {
-static bool ocl_setDiag(const UMat& d, UMat& m, int len)
+فضاینام {
+ایستا منطقی ocl_setDiag(ثابت UMat& d, UMat& m, صحیح len)
 {
-    int cn = d.channels();
-    int depth = d.depth();
+    صحیح cn = d.channels();
+    صحیح depth = d.depth();
 
-    if (depth == CV_64F && !ocl::Device::getDefault().doubleFPConfig())
-        return false;
+    اگر (depth == CV_64F && !ocl::Device::getDefault().doubleFPConfig())
+        بازگشت نادرست;
 
     String opts = format("-D SET_DIAG -D T1=%s -D cn=%d -D IS_ROW_VECTOR=%d",
                          ocl::memopTypeToStr(depth),
@@ -1041,141 +1041,141 @@ static bool ocl_setDiag(const UMat& d, UMat& m, int len)
                          (d.rows == 1) ? 1 : 0);
 
     ocl::Kernel k("setDiag", ocl::core::copyset_oclsrc, opts);
-    if (k.empty())
-        return false;
+    اگر (k.empty())
+        بازگشت نادرست;
 
     k.args(ocl::KernelArg::WriteOnly(m),
            ocl::KernelArg::ReadOnlyNoSize(d),
            len);
 
     size_t globalsize[2] = { (size_t)len, (size_t)len };
-    return k.run(2, globalsize, NULL, false);
+    بازگشت k.run(2, globalsize, پوچ, نادرست);
 }
 }
 #endif
 
-UMat UMat::diag(const UMat& d, UMatUsageFlags usageFlags)
+UMat UMat::diag(ثابت UMat& d, UMatUsageFlags usageFlags)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(d.cols == 1 || d.rows == 1);
-    int len = d.rows + d.cols - 1;
+    صحیح len = d.rows + d.cols - 1;
 
 #ifdef HAVE_OPENCL
-    if (ocl::useOpenCL())
+    اگر (ocl::useOpenCL())
     {
         UMat m(len, len, d.type(), usageFlags);
-        if (ocl_setDiag(d, m, len))
+        اگر (ocl_setDiag(d, m, len))
         {
             CV_IMPL_ADD(CV_IMPL_OCL);
-            return m;
+            بازگشت m;
         }
     }
 #endif
 
     UMat m(len, len, d.type(), Scalar(0), usageFlags);
     UMat md = m.diag();
-    if( d.cols == 1 )
+    اگر( d.cols == 1 )
         d.copyTo(md);
-    else
+    وگرنه
         transpose(d, md);
-    return m;
+    بازگشت m;
 }
 
-int UMat::checkVector(int _elemChannels, int _depth, bool _requireContinuous) const
+صحیح UMat::checkVector(صحیح _elemChannels, صحیح _depth, منطقی _requireContinuous) ثابت
 {
-    return (depth() == _depth || _depth <= 0) &&
+    بازگشت (depth() == _depth || _depth <= 0) &&
         (isContinuous() || !_requireContinuous) &&
         ((dims <= 2 && (((rows == 1 || cols == 1) && channels() == _elemChannels) ||
                         (cols == _elemChannels && channels() == 1))) ||
         (dims == 3 && channels() == 1 && size.p[2] == _elemChannels && (size.p[0] == 1 || size.p[1] == 1) &&
          (isContinuous() || step.p[1] == step.p[2]*size.p[2])))
-    ? (int)(total()*channels()/_elemChannels) : -1;
+    ? (صحیح)(total()*channels()/_elemChannels) : -1;
 }
 
-UMat UMat::reshape(int _cn, int _newndims, const int* _newsz) const
+UMat UMat::reshape(صحیح _cn, صحیح _newndims, ثابت صحیح* _newsz) ثابت
 {
-    if(_newndims == dims)
+    اگر(_newndims == dims)
     {
-        if(_newsz == 0)
-            return reshape(_cn);
-        if(_newndims == 2)
-            return reshape(_cn, _newsz[0]);
+        اگر(_newsz == 0)
+            بازگشت reshape(_cn);
+        اگر(_newndims == 2)
+            بازگشت reshape(_cn, _newsz[0]);
     }
 
-    if (isContinuous())
+    اگر (isContinuous())
     {
         CV_Assert(_cn >= 0 && _newndims >= 0 && _newndims <= CV_MAX_DIM && (_newndims == 0 || _newsz != 0));
 
-        if (_cn == 0)
-            _cn = this->channels();
-        else
+        اگر (_cn == 0)
+            _cn = این->channels();
+        وگرنه
             CV_Assert(_cn <= CV_CN_MAX);
 
-        size_t total_elem1_ref = this->total() * this->channels();
+        size_t total_elem1_ref = این->total() * این->channels();
         size_t total_elem1 = _cn;
 
-        AutoBuffer<int, 4> newsz_buf( (size_t)std::max(_newndims, 1) );
+        AutoBuffer<صحیح, 4> newsz_buf( (size_t)std::max(_newndims, 1) );
 
-        int m1_idx = -1;
+        صحیح m1_idx = -1;
 
-        for (int i = 0; i < _newndims; i++)
+        برای (صحیح i = 0; i < _newndims; i++)
         {
-            if (_newsz[i] >= 0) {
-                if (_newsz[i] == 0 && i < dims)
+            اگر (_newsz[i] >= 0) {
+                اگر (_newsz[i] == 0 && i < dims)
                     newsz_buf[i] = size.p[i];
-                else
+                وگرنه
                     newsz_buf[i] = _newsz[i];
                 total_elem1 *= (size_t)newsz_buf[i];
-            } else {
-                if (m1_idx >= 0)
+            } وگرنه {
+                اگر (m1_idx >= 0)
                     CV_Error(cv::Error::StsBadSize, "More than one '-1' occured in the new shape");
                 m1_idx = i;
             }
         }
 
-        if (m1_idx >= 0) {
-            if (total_elem1 == 0) {
+        اگر (m1_idx >= 0) {
+            اگر (total_elem1 == 0) {
                 CV_Assert(total_elem1_ref == 0);
                 total_elem1 = 1;
             }
             CV_Assert(total_elem1_ref % total_elem1 == 0);
-            newsz_buf[m1_idx] = (int)(total_elem1_ref / total_elem1);
-        } else if (total_elem1 != total_elem1_ref) {
+            newsz_buf[m1_idx] = (صحیح)(total_elem1_ref / total_elem1);
+        } وگرنه اگر (total_elem1 != total_elem1_ref) {
             CV_Error(cv::Error::StsUnmatchedSizes, "Requested and source matrices have different count of elements");
         }
 
-        UMat hdr = *this;
+        UMat hdr = *این;
         hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((_cn-1) << CV_CN_SHIFT);
-        setSize(hdr, _newndims, newsz_buf.data(), NULL, true);
+        setSize(hdr, _newndims, newsz_buf.data(), پوچ, درست);
 
-        return hdr;
+        بازگشت hdr;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "Reshaping of n-dimensional non-continuous matrices is not supported yet");
 }
 
-UMat UMat::reshape(int _cn, const MatShape& _newshape) const
+UMat UMat::reshape(صحیح _cn, ثابت MatShape& _newshape) ثابت
 {
-    if (_newshape.dims < 0) {
-        int newshape[] = {0};
-        return reshape(_cn, 1, newshape);
+    اگر (_newshape.dims < 0) {
+        صحیح newshape[] = {0};
+        بازگشت reshape(_cn, 1, newshape);
     }
-    return reshape(_cn, _newshape.dims, _newshape.p);
+    بازگشت reshape(_cn, _newshape.dims, _newshape.p);
 }
 
-Mat UMat::getMat(AccessFlag accessFlags) const
+Mat UMat::getMat(AccessFlag accessFlags) ثابت
 {
-    if(!u)
-        return Mat();
+    اگر(!u)
+        بازگشت Mat();
     // TODO Support ACCESS_READ (ACCESS_WRITE) without unnecessary data transfers
     accessFlags |= ACCESS_RW;
     UMatDataAutoLock autolock(u);
-    try
+    تلاش
     {
-        if(CV_XADD(&u->refcount, 1) == 0)
+        اگر(CV_XADD(&u->refcount, 1) == 0)
             u->currAllocator->map(u, accessFlags);
-        if (u->data != 0)
+        اگر (u->data != 0)
         {
             Mat hdr(dims, size.p, type(), u->data + offset, step.p);
             hdr.flags = flags;
@@ -1183,42 +1183,42 @@ Mat UMat::getMat(AccessFlag accessFlags) const
             hdr.datastart = u->data;
             hdr.data = u->data + offset;
             hdr.datalimit = hdr.dataend = u->data + u->size;
-            return hdr;
+            بازگشت hdr;
         }
     }
-    catch(...)
+    بگیر(...)
     {
         CV_XADD(&u->refcount, -1);
-        throw;
+        پرتابکن;
     }
     CV_XADD(&u->refcount, -1);
     CV_Assert(u->data != 0 && "Error mapping of UMat to host memory.");
-    return Mat();
+    بازگشت Mat();
 }
 
-void* UMat::handle(AccessFlag accessFlags) const
+تهی* UMat::handle(AccessFlag accessFlags) ثابت
 {
-    if( !u )
-        return 0;
+    اگر( !u )
+        بازگشت 0;
 
     CV_Assert(u->refcount == 0);
     CV_Assert(!u->deviceCopyObsolete() || u->copyOnMap());
-    if (u->deviceCopyObsolete())
+    اگر (u->deviceCopyObsolete())
     {
         u->currAllocator->unmap(u);
     }
 
-    if (!!(accessFlags & ACCESS_WRITE))
-        u->markHostCopyObsolete(true);
+    اگر (!!(accessFlags & ACCESS_WRITE))
+        u->markHostCopyObsolete(درست);
 
-    return u->handle;
+    بازگشت u->handle;
 }
 
-void UMat::ndoffset(size_t* ofs) const
+تهی UMat::ndoffset(size_t* ofs) ثابت
 {
     // offset = step[0]*ofs[0] + step[1]*ofs[1] + step[2]*ofs[2] + ...;
     size_t val = offset;
-    for( int i = 0; i < dims; i++ )
+    برای( صحیح i = 0; i < dims; i++ )
     {
         size_t s = step.p[i];
         ofs[i] = val / s;
@@ -1226,82 +1226,82 @@ void UMat::ndoffset(size_t* ofs) const
     }
 }
 
-void UMat::copyTo(OutputArray _dst) const
+تهی UMat::copyTo(OutputArray _dst) ثابت
 {
     CV_INSTRUMENT_REGION();
 
 #ifdef HAVE_CUDA
-    if (_dst.isGpuMat())
+    اگر (_dst.isGpuMat())
     {
-        _dst.getGpuMat().upload(*this);
-        return;
+        _dst.getGpuMat().upload(*این);
+        بازگشت;
     }
 #endif
 
-    int stype = type();
-    int dtype = _dst.type();
-    if( _dst.fixedType() && dtype != stype )
+    صحیح stype = type();
+    صحیح dtype = _dst.type();
+    اگر( _dst.fixedType() && dtype != stype )
     {
         CV_Assert( CV_MAT_CN(stype) == CV_MAT_CN(dtype) );
         convertTo( _dst, dtype );
-        return;
+        بازگشت;
     }
 
-    if( dims == 0 && empty() )
+    اگر( dims == 0 && empty() )
     {
         _dst.release();
-        void* obj = _dst.getObj();
-        if (_dst.isMat())
+        تهی* obj = _dst.getObj();
+        اگر (_dst.isMat())
             reinterpret_cast<Mat*>(obj)->flags = Mat::MAGIC_VAL | Mat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isUMat())
+        وگرنه اگر (_dst.isUMat())
             reinterpret_cast<UMat*>(obj)->flags = UMat::MAGIC_VAL | UMat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isGpuMat())
+        وگرنه اگر (_dst.isGpuMat())
             reinterpret_cast<cuda::GpuMat*>(obj)->flags = stype;
-        return;
+        بازگشت;
     }
 
     _dst.create( dims, size.p, stype );
-    if (empty())
-        return;
+    اگر (empty())
+        بازگشت;
 
     size_t sz[CV_MAX_DIM] = {1}, srcofs[CV_MAX_DIM]={0}, dstofs[CV_MAX_DIM]={0};
     size_t esz = CV_ELEM_SIZE(stype);
-    int i, d = std::max(dims, 1);
-    for( i = 0; i < d; i++ )
+    صحیح i, d = std::max(dims, 1);
+    برای( i = 0; i < d; i++ )
         sz[i] = size.p[i];
     sz[d-1] *= esz;
     ndoffset(srcofs);
     srcofs[d-1] *= esz;
 
-    if( _dst.isUMat() )
+    اگر( _dst.isUMat() )
     {
         UMat dst = _dst.getUMat();
         CV_Assert(dst.u);
-        if( u == dst.u && dst.offset == offset )
-            return;
+        اگر( u == dst.u && dst.offset == offset )
+            بازگشت;
 
-        if (u->currAllocator == dst.u->currAllocator)
+        اگر (u->currAllocator == dst.u->currAllocator)
         {
             dst.ndoffset(dstofs);
             dstofs[dims-1] *= esz;
-            u->currAllocator->copy(u, dst.u, d, sz, srcofs, step.p, dstofs, dst.step.p, false);
-            return;
+            u->currAllocator->copy(u, dst.u, d, sz, srcofs, step.p, dstofs, dst.step.p, نادرست);
+            بازگشت;
         }
 
         // different allocators: never map a device destination, upload into it instead
         // (through a host Mat when both sides are device memory)
         MatAllocator* hostAllocator = Mat::getDefaultAllocator();
-        if (dst.u->currAllocator != hostAllocator)
+        اگر (dst.u->currAllocator != hostAllocator)
         {
-            if (u->currAllocator == hostAllocator)
+            اگر (u->currAllocator == hostAllocator)
                 getMat(ACCESS_READ).copyTo(_dst);
-            else
+            وگرنه
             {
                 Mat tmp;
                 copyTo(tmp);
                 tmp.copyTo(_dst);
             }
-            return;
+            بازگشت;
         }
     }
 
@@ -1309,47 +1309,47 @@ void UMat::copyTo(OutputArray _dst) const
     u->currAllocator->download(u, dst.ptr(), d, sz, srcofs, step.p, dst.step.p);
 }
 
-void UMat::copyTo(OutputArray _dst, InputArray _mask) const
+تهی UMat::copyTo(OutputArray _dst, درون_داد_Array _mask) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( _mask.empty() )
+    اگر( _mask.empty() )
     {
         copyTo(_dst);
-        return;
+        بازگشت;
     }
 #ifdef HAVE_OPENCL
-    int cn = channels(), mtype = _mask.type(), mdepth = CV_MAT_DEPTH(mtype), mcn = CV_MAT_CN(mtype);
+    صحیح cn = channels(), mtype = _mask.type(), mdepth = CV_MAT_DEPTH(mtype), mcn = CV_MAT_CN(mtype);
     CV_Assert( (mdepth == CV_8U || mdepth == CV_8S || mdepth == CV_Bool) && (mcn == 1 || mcn == cn) );
 
-    if (ocl::useOpenCL() && _dst.isUMat() && dims <= 2)
+    اگر (ocl::useOpenCL() && _dst.isUMat() && dims <= 2)
     {
         UMatData * prevu = _dst.getUMat().u;
         _dst.create( size, type() );
 
         UMat dst = _dst.getUMat();
 
-        bool haveDstUninit = false;
-        if( prevu != dst.u ) // do not leave dst uninitialized
-            haveDstUninit = true;
+        منطقی haveDstUninit = نادرست;
+        اگر( prevu != dst.u ) // do not leave dst uninitialized
+            haveDstUninit = درست;
 
         String opts = format("-D COPY_TO_MASK -D T1=%s -D scn=%d -D mcn=%d%s",
                              ocl::memopTypeToStr(depth()), cn, mcn,
                              haveDstUninit ? " -D HAVE_DST_UNINIT" : "");
 
         ocl::Kernel k("copyToMask", ocl::core::copyset_oclsrc, opts);
-        if (!k.empty())
+        اگر (!k.empty())
         {
-            k.args(ocl::KernelArg::ReadOnlyNoSize(*this),
+            k.args(ocl::KernelArg::ReadOnlyNoSize(*این),
                    ocl::KernelArg::ReadOnlyNoSize(_mask.getUMat()),
                    haveDstUninit ? ocl::KernelArg::WriteOnly(dst) :
                                    ocl::KernelArg::ReadWrite(dst));
 
             size_t globalsize[2] = { (size_t)cols, (size_t)rows };
-            if (k.run(2, globalsize, NULL, false))
+            اگر (k.run(2, globalsize, پوچ, نادرست))
             {
                 CV_IMPL_ADD(CV_IMPL_OCL);
-                return;
+                بازگشت;
             }
         }
     }
@@ -1363,116 +1363,116 @@ void UMat::copyTo(OutputArray _dst, InputArray _mask) const
 // void UMat::convertTo moved to convert.dispatch.cpp
 //
 
-UMat& UMat::setTo(InputArray _value, InputArray _mask)
+UMat& UMat::setTo(درون_داد_Array مقدار, درون_داد_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
-    bool haveMask = !_mask.empty();
+    منطقی haveMask = !_mask.empty();
 #ifdef HAVE_OPENCL
-    int tp = type(), cn = CV_MAT_CN(tp), d = CV_MAT_DEPTH(tp);
+    صحیح tp = type(), cn = CV_MAT_CN(tp), d = CV_MAT_DEPTH(tp);
 
-    if( dims <= 2 && cn <= 4 && CV_MAT_DEPTH(tp) < CV_64F && ocl::useOpenCL() )
+    اگر( dims <= 2 && cn <= 4 && CV_MAT_DEPTH(tp) < CV_64F && ocl::useOpenCL() )
     {
-        Mat value = _value.getMat();
-        CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::UMAT) );
-        int kercn = haveMask || cn == 3 ? cn : std::max(cn, ocl::predictOptimalVectorWidth(*this)),
+        Mat value = مقدار.getMat();
+        CV_Assert( checkScalar(value, type(), مقدار.kind(), درون_داد_Array_2::UMAT) );
+        صحیح kercn = haveMask || cn == 3 ? cn : std::max(cn, ocl::predictOptimalVectorWidth(*این)),
                 kertp = CV_MAKE_TYPE(d, kercn);
 
-        double buf[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+        دوگانه buf[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0 };
         convertAndUnrollScalar(value, tp, (uchar *)buf, kercn / cn);
 
-        int scalarcn = kercn == 3 ? 4 : kercn, rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+        صحیح scalarcn = kercn == 3 ? 4 : kercn, rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
         String opts = format("-D dstT=%s -D rowsPerWI=%d -D dstST=%s -D dstT1=%s -D cn=%d",
                              ocl::memopTypeToStr(kertp), rowsPerWI,
                              ocl::memopTypeToStr(CV_MAKETYPE(d, scalarcn)),
                              ocl::memopTypeToStr(d), kercn);
 
         ocl::Kernel setK(haveMask ? "setMask" : "set", ocl::core::copyset_oclsrc, opts);
-        if( !setK.empty() )
+        اگر( !setK.empty() )
         {
             ocl::KernelArg scalararg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, CV_ELEM_SIZE(d) * scalarcn);
             UMat mask;
 
-            if( haveMask )
+            اگر( haveMask )
             {
                 mask = _mask.getUMat();
                 CV_Assert( mask.size() == size() && (mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) );
                 ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
-                        dstarg = ocl::KernelArg::ReadWrite(*this);
+                        dstarg = ocl::KernelArg::ReadWrite(*این);
                 setK.args(maskarg, dstarg, scalararg);
             }
-            else
+            وگرنه
             {
-                ocl::KernelArg dstarg = ocl::KernelArg::WriteOnly(*this, cn, kercn);
+                ocl::KernelArg dstarg = ocl::KernelArg::WriteOnly(*این, cn, kercn);
                 setK.args(dstarg, scalararg);
             }
 
             size_t globalsize[] = { (size_t)cols * cn / kercn, ((size_t)rows + rowsPerWI - 1) / rowsPerWI };
-            if( setK.run(2, globalsize, NULL, false) )
+            اگر( setK.run(2, globalsize, پوچ, نادرست) )
             {
                 CV_IMPL_ADD(CV_IMPL_OCL);
-                return *this;
+                بازگشت *این;
             }
         }
     }
 #endif
     Mat m = getMat(haveMask ? ACCESS_RW : ACCESS_WRITE);
-    m.setTo(_value, _mask);
-    return *this;
+    m.setTo(مقدار, _mask);
+    بازگشت *این;
 }
 
-UMat& UMat::operator = (const Scalar& s)
+UMat& UMat::operator = (ثابت Scalar& s)
 {
     setTo(s);
-    return *this;
+    بازگشت *این;
 }
 
-UMat UMat::t() const
+UMat UMat::t() ثابت
 {
     UMat m;
-    transpose(*this, m);
-    return m;
+    transpose(*این, m);
+    بازگشت m;
 }
 
-UMat UMat::zeros(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(صحیح rows, صحیح cols, صحیح type, UMatUsageFlags usageFlags)
 {
-    return UMat(rows, cols, type, Scalar::all(0), usageFlags);
+    بازگشت UMat(rows, cols, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(Size size, صحیح type, UMatUsageFlags usageFlags)
 {
-    return UMat(size, type, Scalar::all(0), usageFlags);
+    بازگشت UMat(size, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(int ndims, const int* sz, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(صحیح ndims, ثابت صحیح* sz, صحیح type, UMatUsageFlags usageFlags)
 {
-    return UMat(ndims, sz, type, Scalar::all(0), usageFlags);
+    بازگشت UMat(ndims, sz, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(const MatShape& shape, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(ثابت MatShape& shape, صحیح type, UMatUsageFlags usageFlags)
 {
-    return UMat(shape.dims, shape.p, type, Scalar::all(0), usageFlags);
+    بازگشت UMat(shape.dims, shape.p, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::ones(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(صحیح rows, صحیح cols, صحیح type, UMatUsageFlags usageFlags)
 {
-    return UMat(rows, cols, type, Scalar(1), usageFlags);
+    بازگشت UMat(rows, cols, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(Size size, صحیح type, UMatUsageFlags usageFlags)
 {
-    return UMat(size, type, Scalar(1), usageFlags);
+    بازگشت UMat(size, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(int ndims, const int* sz, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(صحیح ndims, ثابت صحیح* sz, صحیح type, UMatUsageFlags usageFlags)
 {
-    return UMat(ndims, sz, type, Scalar(1), usageFlags);
+    بازگشت UMat(ndims, sz, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(const MatShape& shape, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(ثابت MatShape& shape, صحیح type, UMatUsageFlags usageFlags)
 {
-    return UMat(shape.dims, shape.p, type, Scalar(1), usageFlags);
+    بازگشت UMat(shape.dims, shape.p, type, Scalar(1), usageFlags);
 }
 
 }

@@ -2,81 +2,81 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "opencv2/core/utils/buffer_area.private.hpp"
-#include "opencv2/core/utils/configuration.private.hpp"
+#شامل "opencv2/core/utils/buffer_area.private.hpp"
+#شامل "opencv2/core/utils/configuration.private.hpp"
 
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-static bool CV_BUFFER_AREA_OVERRIDE_SAFE_MODE =
-    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", false);
+ایستا منطقی CV_BUFFER_AREA_OVERRIDE_SAFE_MODE =
+    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", نادرست);
 #endif
 
-namespace cv { namespace utils {
+فضاینام cv { فضاینام utils {
 
 //==================================================================================================
 
-class BufferArea::Block
+رده BufferArea::Block
 {
-private:
-    inline size_t reserve_count() const
+خصوصی:
+    درونخطی size_t reserve_شمار() ثابت
     {
-        return alignment / type_size - 1;
+        بازگشت alignment / type_size - 1;
     }
-public:
-    Block(void **ptr_, ushort type_size_, size_t count_, ushort alignment_)
-        : ptr(ptr_), raw_mem(0), count(count_), type_size(type_size_), alignment(alignment_)
+عمومی:
+    Block(تهی **ptr_, ushort type_size_, size_t شمار, ushort alignment_)
+        : ptr(ptr_), raw_mem(0), شمار_2(شمار), type_size(type_size_), alignment(alignment_)
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == پوچ);
     }
-    void cleanup() const
+    تهی cleanup() ثابت
     {
         CV_DbgAssert(ptr);
-        if (raw_mem)
+        اگر (raw_mem)
             fastFree(raw_mem);
     }
-    size_t getByteCount() const
+    size_t get_Byte_شمار() ثابت
     {
-        return type_size * (count + reserve_count());
+        بازگشت type_size * (شمار_2 + reserve_شمار());
     }
-    void real_allocate()
+    تهی real_allocate()
     {
-        CV_Assert(ptr && *ptr == NULL);
-        const size_t allocated_count = count + reserve_count();
-        raw_mem = fastMalloc(type_size * allocated_count);
-        if (alignment != type_size)
+        CV_Assert(ptr && *ptr == پوچ);
+        ثابت size_t allocated_شمار = شمار_2 + reserve_شمار();
+        raw_mem = fastMalloc(type_size * allocated_شمار);
+        اگر (alignment != type_size)
         {
             *ptr = alignPtr(raw_mem, alignment);
             CV_Assert(reinterpret_cast<size_t>(*ptr) % alignment == 0);
-            CV_Assert(static_cast<uchar*>(*ptr) + type_size * count <= static_cast<uchar*>(raw_mem) + type_size * allocated_count);
+            CV_Assert(static_cast<uchar*>(*ptr) + type_size * شمار_2 <= static_cast<uchar*>(raw_mem) + type_size * allocated_شمار);
         }
-        else
+        وگرنه
         {
             *ptr = raw_mem;
         }
     }
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    void * fast_allocate(void * buf) const
+    تهی * fast_allocate(تهی * buf) ثابت
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == پوچ);
         buf = alignPtr(buf, alignment);
         CV_Assert(reinterpret_cast<size_t>(buf) % alignment == 0);
         *ptr = buf;
-        return static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * count);
+        بازگشت static_cast<تهی*>(static_cast<uchar*>(*ptr) + type_size * شمار_2);
     }
 #endif
-    bool operator==(void **other) const
+    منطقی operator==(تهی **other) ثابت
     {
         CV_Assert(ptr && other);
-        return *ptr == *other;
+        بازگشت *ptr == *other;
     }
-    void zeroFill() const
+    تهی zeroFill() ثابت
     {
         CV_Assert(ptr && *ptr);
-        memset(static_cast<uchar*>(*ptr), 0, count * type_size);
+        memset(static_cast<uchar*>(*ptr), 0, شمار_2 * type_size);
     }
-private:
-    void **ptr;
-    void * raw_mem;
-    size_t count;
+خصوصی:
+    تهی **ptr;
+    تهی * raw_mem;
+    size_t شمار_2;
     ushort type_size;
     ushort alignment;
 };
@@ -84,15 +84,15 @@ private:
 //==================================================================================================
 
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-BufferArea::BufferArea(bool safe_) :
+BufferArea::BufferArea(منطقی safe_) :
     oneBuf(0),
     totalSize(0),
     safe(safe_ || CV_BUFFER_AREA_OVERRIDE_SAFE_MODE)
 {
     // nothing
 }
-#else
-BufferArea::BufferArea(bool safe_)
+#وگرنه
+BufferArea::BufferArea(منطقی safe_)
 {
     CV_UNUSED(safe_);
 }
@@ -103,52 +103,52 @@ BufferArea::~BufferArea()
     release();
 }
 
-void BufferArea::allocate_(void **ptr, ushort type_size, size_t count, ushort alignment)
+تهی BufferArea::allocate_(تهی **ptr, ushort type_size, size_t شمار_2, ushort alignment)
 {
-    blocks.push_back(Block(ptr, type_size, count, alignment));
+    blocks.push_back(Block(ptr, type_size, شمار_2, alignment));
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    اگر (!safe)
     {
-        totalSize += blocks.back().getByteCount();
+        totalSize += blocks.back().get_Byte_شمار();
     }
-    else
+    وگرنه
 #endif
     {
         blocks.back().real_allocate();
     }
 }
 
-void BufferArea::zeroFill_(void **ptr)
+تهی BufferArea::zeroFill_(تهی **ptr)
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    برای(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
-        if (*i == ptr)
+        اگر (*i == ptr)
         {
             i->zeroFill();
-            break;
+            بشکن;
         }
     }
 }
 
-void BufferArea::zeroFill()
+تهی BufferArea::zeroFill()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    برای(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
         i->zeroFill();
     }
 }
 
-void BufferArea::commit()
+تهی BufferArea::commit()
 {
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    اگر (!safe)
     {
         CV_Assert(totalSize > 0);
-        CV_Assert(oneBuf == NULL);
+        CV_Assert(oneBuf == پوچ);
         CV_Assert(!blocks.empty());
         oneBuf = fastMalloc(totalSize);
-        void * ptr = oneBuf;
-        for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+        تهی * ptr = oneBuf;
+        برای(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
         {
             ptr = i->fast_allocate(ptr);
         }
@@ -156,15 +156,15 @@ void BufferArea::commit()
 #endif
 }
 
-void BufferArea::release()
+تهی BufferArea::release()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    برای(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
         i->cleanup();
     }
     blocks.clear();
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (oneBuf)
+    اگر (oneBuf)
     {
         fastFree(oneBuf);
         oneBuf = 0;

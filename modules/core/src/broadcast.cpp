@@ -7,13 +7,13 @@
 // list of operand Mats, collapses contiguous dims, partitions into tiles for parallel_for_, and hands
 // each 2D tile's per-operand slices to a `body` callback (which owns all semantics).
 
-#include "precomp.hpp"
-#include <algorithm>
-#include <array>
-#include <climits>
-#include <cmath>
+#شامل "precomp.hpp"
+#شامل <algorithm>
+#شامل <array>
+#شامل <climits>
+#شامل <cmath>
 
-namespace cv {
+فضاینام cv {
 
 // Per-operand steps along the (collapsed) iteration axes are kept in a MatStep (a value-type holding
 // MAX_DIMS size_t entries). Here the entries are steps in ELEMENTS (one scalar / channel value), not
@@ -32,36 +32,36 @@ namespace cv {
 //             needed (mixed channel counts, or multichannel with differing back()).
 //   CH_ELEM : channels stay inside the element (esz = full elemSize, no channel dim). Used with
 //             expandChannels=false; the body handles channels itself (deinterleave fast path).
-enum ChMode { CH_FOLD, CH_DIM, CH_ELEM };
+شمارش ChMode { CH_FOLD, CH_DIM, CH_ELEM };
 
-static void matLayout(const Mat& m, ChMode mode, MatShape& shp, MatStep& step, int& esz1)
+ایستا تهی matLayout(ثابت Mat& m, ChMode mode, MatShape& shp, MatStep& step, صحیح& esz1)
 {
-    const int nd = m.dims, cn = m.channels();
-    if (mode == CH_ELEM)
+    ثابت صحیح nd = m.dims, cn = m.channels();
+    اگر (mode == CH_ELEM)
     {
-        esz1 = (int)m.elemSize();                       // one full (cn-channel) pixel
+        esz1 = (صحیح)m.elemSize();                       // one full (cn-channel) pixel
         shp.resize(nd);
-        for (int i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
-        return;
+        برای (صحیح i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
+        بازگشت;
     }
-    esz1 = (int)m.elemSize1();                           // one scalar (channel value)
-    if (mode == CH_DIM)
+    esz1 = (صحیح)m.elemSize1();                           // one scalar (channel value)
+    اگر (mode == CH_DIM)
     {
         shp.resize(nd + 1);
-        for (int i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
+        برای (صحیح i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
         shp[nd] = cn; step[nd] = 1;                      // channels = explicit innermost dim
     }
-    else // CH_FOLD
+    وگرنه // CH_FOLD
     {
-        if (nd == 0)                                     // 0-dim scalar: channels are the only dim
+        اگر (nd == 0)                                     // 0-dim scalar: channels are the only dim
         {
             shp.assign(1, cn);
             step[0] = 1;
         }
-        else
+        وگرنه
         {
             shp.resize(nd);
-            for (int i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
+            برای (صحیح i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
             shp[nd - 1] *= cn;                           // fold channels into the innermost dim
             step[nd - 1] = 1;                            // scalars are contiguous there
         }
@@ -71,124 +71,124 @@ static void matLayout(const Mat& m, ChMode mode, MatShape& shp, MatStep& step, i
 // A single-channel scalar (one value, cn==1, total()==1) broadcasts into everything trivially
 // (step 0 on every axis incl. channels), so it must NOT force CH_DIM - it is excluded from the
 // channel-mode decision entirely.
-static bool isSingleChannelScalar(const Mat& m)
+ایستا منطقی isSingleChannelScalar(ثابت Mat& m)
 {
-    return m.channels() == 1 && m.total() == 1;
+    بازگشت m.channels() == 1 && m.total() == 1;
 }
 
 // Decide (globally, across all operands) how channels are presented for expandChannels=true:
 // CH_FOLD when no channel broadcast is needed, CH_DIM when it is. Single-channel scalars are
 // excluded first; among the rest, multichannel operands must all share the same cn (an (n,m) mix
 // with both > 1 is an error).
-static ChMode decideChannelMode(const Mat* const* arrays, int K)
+ایستا ChMode decideChannelMode(ثابت Mat* ثابت* arrays, صحیح K)
 {
-    int N = 1;                                           // the single multichannel count, if any
-    for (int k = 0; k < K; k++)
+    صحیح N = 1;                                           // the single multichannel count, if any
+    برای (صحیح k = 0; k < K; k++)
     {
-        if (isSingleChannelScalar(*arrays[k])) continue;
-        int c = arrays[k]->channels();
-        if (c > 1) { if (N == 1) N = c; else CV_Assert(N == c && "ew: (n,m) channel mix unsupported"); }
+        اگر (isSingleChannelScalar(*arrays[k])) ادامه;
+        صحیح c = arrays[k]->channels();
+        اگر (c > 1) { اگر (N == 1) N = c; وگرنه CV_Assert(N == c && "ew: (n,m) channel mix unsupported"); }
     }
-    if (N == 1) return CH_FOLD;                          // all single-channel -> fold (a no-op)
+    اگر (N == 1) بازگشت CH_FOLD;                          // all single-channel -> fold (a no-op)
 
-    bool allMulti = true, sameBack = true;
-    int back = -1;
-    for (int k = 0; k < K; k++)
+    منطقی allMulti = درست, sameBack = درست;
+    صحیح back = -1;
+    برای (صحیح k = 0; k < K; k++)
     {
-        const Mat& a = *arrays[k];
-        if (isSingleChannelScalar(a)) continue;
-        if (a.channels() != N) allMulti = false;
-        int b = a.dims > 0 ? a.size[a.dims - 1] : 1;   // 0-dim scalar has no spatial back (=1)
-        if (back < 0) back = b; else if (b != back) sameBack = false;
+        ثابت Mat& a = *arrays[k];
+        اگر (isSingleChannelScalar(a)) ادامه;
+        اگر (a.channels() != N) allMulti = نادرست;
+        صحیح b = a.dims > 0 ? a.size[a.dims - 1] : 1;   // 0-dim scalar has no spatial back (=1)
+        اگر (back < 0) back = b; وگرنه اگر (b != back) sameBack = نادرست;
     }
-    return (allMulti && sameBack) ? CH_FOLD : CH_DIM;    // fold only if no channel broadcast
+    بازگشت (allMulti && sameBack) ? CH_FOLD : CH_DIM;    // fold only if no channel broadcast
 }
 
 // numpy-style broadcast of several right-aligned shapes.
-static bool broadcastShape(const MatShape* shps, int K, MatShape& out)
+ایستا منطقی broadcastShape(ثابت MatShape* shps, صحیح K, MatShape& out)
 {
     size_t nd = 0;
-    for (int k = 0; k < K; k++) nd = std::max(nd, shps[k].size());
+    برای (صحیح k = 0; k < K; k++) nd = std::max(nd, shps[k].size());
     out.assign(nd, 1);
-    for (int k = 0; k < K; k++)
+    برای (صحیح k = 0; k < K; k++)
     {
-        const MatShape& s = shps[k];
+        ثابت MatShape& s = shps[k];
         size_t off = nd - s.size();
-        for (size_t i = 0; i < s.size(); i++)
+        برای (size_t i = 0; i < s.size(); i++)
         {
-            int d = s[i], &o = out[off + i];
-            if (o == 1) o = d;
-            else if (d != 1 && d != o) return false;
+            صحیح d = s[i], &o = out[off + i];
+            اگر (o == 1) o = d;
+            وگرنه اگر (d != 1 && d != o) بازگشت نادرست;
         }
     }
-    return true;
+    بازگشت درست;
 }
 
 // Right-align an arg's own (shp,step) to nd dims; broadcast dims get step 0.
-static void alignArg(const MatShape& shp, const MatStep& step, int nd,
+ایستا تهی alignArg(ثابت MatShape& shp, ثابت MatStep& step, صحیح nd,
                      MatStep& as, MatShape& ash)
 {
     as.clear();
     ash.assign(nd, 1);
-    int off = nd - (int)shp.size();
-    for (int i = 0; i < (int)shp.size(); i++)
+    صحیح off = nd - (صحیح)shp.size();
+    برای (صحیح i = 0; i < (صحیح)shp.size(); i++)
     {
-        int d = shp[i];
+        صحیح d = shp[i];
         ash[off + i] = d;
         as[off + i] = (d == 1) ? 0 : step[i];
     }
 }
 
 // Collapse adjacent dims that are contiguous (and broadcast-consistent) across all args.
-static int collapseDims(MatStep* S, MatShape* H, int K, MatShape& D)
+ایستا صحیح collapseDims(MatStep* S, MatShape* H, صحیح K, MatShape& D)
 {
-    int nd = (int)D.size();
-    if (nd <= 1) return nd;
+    صحیح nd = (صحیح)D.size();
+    اگر (nd <= 1) بازگشت nd;
 
-    int j = nd - 1;
-    for (int i = j - 1; i >= 0; i--)
+    صحیح j = nd - 1;
+    برای (صحیح i = j - 1; i >= 0; i--)
     {
-        bool contig = true, scalar = true, consist = true;
-        for (int k = 0; k < K; k++)
+        منطقی contig = درست, scalar = درست, consist = درست;
+        برای (صحیح k = 0; k < K; k++)
         {
             size_t st = S[k][j] * (size_t)H[k][j];
-            bool prevScalar = H[k][j] == 1;
-            bool curScalar = H[k][i] == 1;
+            منطقی prevScalar = H[k][j] == 1;
+            منطقی curScalar = H[k][i] == 1;
             contig  = contig  && (st == S[k][i]);
             scalar  = scalar  && curScalar;
             consist = consist && (curScalar == prevScalar);
         }
-        if (contig && (consist || scalar))
+        اگر (contig && (consist || scalar))
         {
-            for (int k = 0; k < K; k++) H[k][j] *= H[k][i];
+            برای (صحیح k = 0; k < K; k++) H[k][j] *= H[k][i];
             D[j] *= D[i];
         }
-        else
+        وگرنه
         {
             j--;
-            if (i < j)
+            اگر (i < j)
             {
-                for (int k = 0; k < K; k++) { H[k][j] = H[k][i]; S[k][j] = S[k][i]; }
+                برای (صحیح k = 0; k < K; k++) { H[k][j] = H[k][i]; S[k][j] = S[k][i]; }
                 D[j] = D[i];
             }
         }
     }
 
-    int m = nd - j;
-    for (int d = 0; d < m; d++)
+    صحیح m = nd - j;
+    برای (صحیح d = 0; d < m; d++)
     {
         D[d] = D[j + d];
-        for (int k = 0; k < K; k++) { S[k][d] = S[k][j + d]; H[k][d] = H[k][j + d]; }
+        برای (صحیح k = 0; k < K; k++) { S[k][d] = S[k][j + d]; H[k][d] = H[k][j + d]; }
     }
     D.resize(m);
-    for (int k = 0; k < K; k++) H[k].resize(m);
+    برای (صحیح k = 0; k < K; k++) H[k].resize(m);
 
     // Zero out steps of broadcast (size-1) dims (numpy step==0 trick).
-    for (int d = 0; d < m; d++)
-        for (int k = 0; k < K; k++)
-            if (H[k][d] == 1) S[k][d] = 0;
+    برای (صحیح d = 0; d < m; d++)
+        برای (صحیح k = 0; k < K; k++)
+            اگر (H[k][d] == 1) S[k][d] = 0;
 
-    return m;
+    بازگشت m;
 }
 
 // Fast geometry for the dominant case: every operand is either (a) an array sharing ONE common
@@ -198,35 +198,35 @@ static int collapseDims(MatStep* S, MatShape* H, int K, MatShape& D)
 // broadcastShape / alignArg / collapseDims and all their per-operand buffers entirely. Returns
 // false (leaving outputs untouched) when the operands don't fit, so the caller runs general
 // geometry. expandChannels=false (CH_ELEM) keeps channels in the element and is left to general.
-static bool fastSameShape(const Mat* const* arrays, int K, bool expandChannels,
-                          uchar** base, int* esz1, MatStep* S, MatShape& D, int& m)
+ایستا منطقی fastSameShape(ثابت Mat* ثابت* arrays, صحیح K, منطقی expandChannels,
+                          uchar** base, صحیح* esz1, MatStep* S, MatShape& D, صحیح& m)
 {
-    if (!expandChannels) return false;
-    int ref = -1;
-    for (int k = 0; k < K; k++)
-        if (!isSingleChannelScalar(*arrays[k])) { ref = k; break; }
-    if (ref < 0) return false;                       // all single-channel scalars: let general handle
-    const Mat& R = *arrays[ref];
-    const int rdims = R.dims, rcn = R.channels();
-    for (int k = 0; k < K; k++)
+    اگر (!expandChannels) بازگشت نادرست;
+    صحیح ref = -1;
+    برای (صحیح k = 0; k < K; k++)
+        اگر (!isSingleChannelScalar(*arrays[k])) { ref = k; بشکن; }
+    اگر (ref < 0) بازگشت نادرست;                       // all single-channel scalars: let general handle
+    ثابت Mat& R = *arrays[ref];
+    ثابت صحیح rdims = R.dims, rcn = R.channels();
+    برای (صحیح k = 0; k < K; k++)
     {
-        const Mat& a = *arrays[k];
-        if (isSingleChannelScalar(a)) continue;
-        if (a.channels() != rcn || a.dims != rdims || !a.isContinuous()) return false;
-        for (int i = 0; i < rdims; i++) if (a.size[i] != R.size[i]) return false;
+        ثابت Mat& a = *arrays[k];
+        اگر (isSingleChannelScalar(a)) ادامه;
+        اگر (a.channels() != rcn || a.dims != rdims || !a.isContinuous()) بازگشت نادرست;
+        برای (صحیح i = 0; i < rdims; i++) اگر (a.size[i] != R.size[i]) بازگشت نادرست;
     }
-    const long long total = (long long)R.total() * rcn;   // channels folded into the 1D run
+    ثابت long long total = (long long)R.total() * rcn;   // channels folded into the 1D run
     CV_Assert(total <= (long long)INT_MAX);
-    for (int k = 0; k < K; k++)
+    برای (صحیح k = 0; k < K; k++)
     {
-        const Mat& a = *arrays[k];
+        ثابت Mat& a = *arrays[k];
         base[k] = (uchar*)a.data;
-        esz1[k] = (int)a.elemSize1();
+        esz1[k] = (صحیح)a.elemSize1();
         S[k][0] = isSingleChannelScalar(a) ? 0 : 1;
     }
-    D.assign(1, (int)total);
+    D.assign(1, (صحیح)total);
     m = 1;
-    return true;
+    بازگشت درست;
 }
 
 // ---------------------------------------------------------------------------
@@ -234,15 +234,15 @@ static bool fastSameShape(const Mat* const* arrays, int K, bool expandChannels,
 // ---------------------------------------------------------------------------
 // At namespace scope, NOT inside run(): MSVC 2019 loses the constexpr-ness of function-local
 // constants used as template arguments inside a lambda (C2975).
-static constexpr int MAX_DIMS = MatShape::MAX_DIMS;
-static constexpr int LOCAL_OPS = 8;
+ایستا constexpr صحیح MAX_DIMS = MatShape::MAX_DIMS;
+ایستا constexpr صحیح LOCAL_OPS = 8;
 
-void BroadcastOp::run(const Mat* const* arrays, int narrays,
-                      const std::function<void(const Tile&)>& body,
-                      bool expandChannels,
-                      double nstripes)
+تهی BroadcastOp::run(ثابت Mat* ثابت* arrays, صحیح narrays,
+                      ثابت std::function<تهی(ثابت Tile&)>& body,
+                      منطقی expandChannels,
+                      دوگانه nstripes)
 {
-    const int K = narrays;
+    ثابت صحیح K = narrays;
     CV_Assert(K >= 1 && arrays != nullptr);
 
     // ---- 1-3. geometry: per-operand collapsed steps S[k], element sizes esz1[k], base
@@ -250,50 +250,50 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
     //           dominant "all same-shape arrays (+ single-channel scalars)" case in one shot; the
     //           general path does decideChannelMode + broadcastShape + align + collapse. ----
     AutoBuffer<MatStep, LOCAL_OPS>  S(K);
-    AutoBuffer<int, LOCAL_OPS>      esz1(K);
+    AutoBuffer<صحیح, LOCAL_OPS>      esz1(K);
     AutoBuffer<uchar*, LOCAL_OPS>   base(K);
     MatShape D;
-    int m;
+    صحیح m;
 
-    if (!fastSameShape(arrays, K, expandChannels, base.data(), esz1.data(), S.data(), D, m))
+    اگر (!fastSameShape(arrays, K, expandChannels, base.data(), esz1.data(), S.data(), D, m))
     {
-        const ChMode mode = expandChannels ? decideChannelMode(arrays, K) : CH_ELEM;
+        ثابت ChMode mode = expandChannels ? decideChannelMode(arrays, K) : CH_ELEM;
         AutoBuffer<MatShape, LOCAL_OPS> shp(K);
         AutoBuffer<MatStep, LOCAL_OPS>  stp(K);
-        for (int k = 0; k < K; k++)
+        برای (صحیح k = 0; k < K; k++)
         {
             matLayout(*arrays[k], mode, shp[k], stp[k], esz1[k]);
             base[k] = (uchar*)arrays[k]->data;
         }
         MatShape full;
         CV_Assert(broadcastShape(shp.data(), K, full) && "ew: operands are not broadcast-compatible");
-        const int nd = (int)full.size();
+        ثابت صحیح nd = (صحیح)full.size();
         AutoBuffer<MatShape, LOCAL_OPS> H(K);
-        for (int k = 0; k < K; k++) alignArg(shp[k], stp[k], nd, S[k], H[k]);
+        برای (صحیح k = 0; k < K; k++) alignArg(shp[k], stp[k], nd, S[k], H[k]);
         D = full;
         m = collapseDims(S.data(), H.data(), K, D);
 
         // For a cv::Mat the innermost (channel/last) axis is contiguous, so after collapse the
         // innermost stride is always in {0,1}. No gather, no materialization.
-        for (int k = 0; k < K; k++)
+        برای (صحیح k = 0; k < K; k++)
             CV_Assert(S[k][m - 1] <= 1 && "ew: unexpected innermost stride > 1");
     }
 
     // ---- 4. inner 2D tile axes: width = D[m-1], height = D[m-2] (if any) ----
-    const int wAxis = m - 1;
-    const int hAxis = (m >= 2) ? m - 2 : -1;
-    const int W   = D[wAxis];
-    const int Hgt = (hAxis >= 0) ? D[hAxis] : 1;
-    const int nOuter = (hAxis >= 0) ? m - 2 : m - 1;   // outer ("plane") axes = [0 .. nOuter)
+    ثابت صحیح wAxis = m - 1;
+    ثابت صحیح hAxis = (m >= 2) ? m - 2 : -1;
+    ثابت صحیح W   = D[wAxis];
+    ثابت صحیح Hgt = (hAxis >= 0) ? D[hAxis] : 1;
+    ثابت صحیح nOuter = (hAxis >= 0) ? m - 2 : m - 1;   // outer ("plane") axes = [0 .. nOuter)
     long long nplanes = 1;
-    for (int d = 0; d < nOuter; d++) nplanes *= D[d];
+    برای (صحیح d = 0; d < nOuter; d++) nplanes *= D[d];
 
     // ---- 5. desired parallel stripe count (work hint) ----
-    const long long total = nplanes * (long long)Hgt * (long long)W;
-    double stripes = nstripes;
-    if (stripes <= 0)                                  // broadcastOp can't see the body's cost;
-        stripes = (double)total * 100.0 / (double)(1 << 18);  // assume ~100 cycles/element
-    const int wantTiles = std::max(1, (int)std::lround(stripes));
+    ثابت long long total = nplanes * (long long)Hgt * (long long)W;
+    دوگانه stripes = nstripes;
+    اگر (stripes <= 0)                                  // broadcastOp can't see the body's cost;
+        stripes = (دوگانه)total * 100.0 / (دوگانه)(1 << 18);  // assume ~100 cycles/element
+    ثابت صحیح wantTiles = std::max(1, (صحیح)std::lround(stripes));
 
     // ---- 6. tile only for PARALLELISM. broadcastOp is op-agnostic: it does not know the body's
     //         temp-buffer footprint, so it does NOT tile for L1 - that is the body's job (it
@@ -301,33 +301,33 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
     //         Start with the largest tile (one 2D block per plane) and split (height first, then
     //         width) only until there are at least `wantTiles` tiles. Bigger tiles => fewer
     //         body/decode calls. Width is G-aligned only in the fully-contiguous (1D) case. ----
-    const int G = 16;                  // SIMD/cacheline granule
-    int tw = W, th = Hgt;
+    ثابت صحیح G = 16;                  // SIMD/cacheline granule
+    صحیح tw = W, th = Hgt;
 
-    auto ntilesOf = [&](int tw_, int th_) {
+    auto ntilesOf = [&](صحیح tw_, صحیح th_) {
         long long nw = (W + tw_ - 1) / tw_, nh = (Hgt + th_ - 1) / th_;
-        return nplanes * nh * nw;
+        بازگشت nplanes * nh * nw;
     };
     long long ntiles = ntilesOf(tw, th);
-    while (ntiles < wantTiles && th > 1)               // split height for parallelism
+    وقتی (ntiles < wantTiles && th > 1)               // split height for parallelism
     {
         th = (th + 1) / 2;
         ntiles = ntilesOf(tw, th);
     }
-    while (ntiles < wantTiles && tw > G)               // then split width
+    وقتی (ntiles < wantTiles && tw > G)               // then split width
     {
         tw = std::max(G, tw / 2);
-        if (hAxis < 0 && tw > G) tw -= tw % G;          // keep width aligned in the 1D case
+        اگر (hAxis < 0 && tw > G) tw -= tw % G;          // keep width aligned in the 1D case
         ntiles = ntilesOf(tw, th);
     }
     CV_Assert(ntiles <= (long long)INT_MAX);
 
-    const int ntilesW = (W + tw - 1) / tw;
-    const int ntilesH = (Hgt + th - 1) / th;
+    ثابت صحیح ntilesW = (W + tw - 1) / tw;
+    ثابت صحیح ntilesH = (Hgt + th - 1) / th;
 
     // ---- 7. execution; decode tile index -> per-operand slices. stepx/stepy are the same for
     //         every tile, so they are set ONCE; only the per-tile base pointer is recomputed. ----
-    auto runRange = [&](const Range& r)
+    auto runRange = [&](ثابت Range& r)
     {
         AutoBuffer<Slice, LOCAL_OPS> slices(K);
 
@@ -335,51 +335,51 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
         // ntilesH==1 and nplanes==1, so the tile index IS the width-tile index - no div/mod, no
         // plane multi-index decode, no inner step loop. This is the same-shape / fully-contiguous
         // common case.
-        if (m == 1)
+        اگر (m == 1)
         {
-            for (int k = 0; k < K; k++) { slices[k].stepy = 0; slices[k].stepx = S[k][0]; }
+            برای (صحیح k = 0; k < K; k++) { slices[k].stepy = 0; slices[k].stepx = S[k][0]; }
             Tile tile;
             tile.height = 1; tile.narrays = K; tile.slices = slices.data();
-            for (int t = r.start; t < r.end; t++)
+            برای (صحیح t = r.start; t < r.end; t++)
             {
-                const int wofs = t * tw, ww = std::min(tw, W - wofs);
-                for (int k = 0; k < K; k++)
+                ثابت صحیح wofs = t * tw, ww = std::min(tw, W - wofs);
+                برای (صحیح k = 0; k < K; k++)
                     slices[k].ptr = base[k] + (size_t)wofs * S[k][0] * (size_t)esz1[k];
                 tile.width = ww;
                 body(tile);
             }
-            return;
+            بازگشت;
         }
 
-        std::array<int, MAX_DIMS> idx;
-        for (int k = 0; k < K; k++)                     // steps are tile-independent: set once
+        std::array<صحیح, MAX_DIMS> idx;
+        برای (صحیح k = 0; k < K; k++)                     // steps are tile-independent: set once
         {
             slices[k].stepy = (hAxis >= 0) ? S[k][hAxis] : 0;
             slices[k].stepx = S[k][wAxis];
         }
-        for (int t = r.start; t < r.end; t++)
+        برای (صحیح t = r.start; t < r.end; t++)
         {
-            int wt = t % ntilesW;
-            int rest = t / ntilesW;
-            int ht = rest % ntilesH;
-            int plane = rest / ntilesH;
+            صحیح wt = t % ntilesW;
+            صحیح rest = t / ntilesW;
+            صحیح ht = rest % ntilesH;
+            صحیح plane = rest / ntilesH;
 
-            const int wofs = wt * tw, ww = std::min(tw, W - wofs);
-            const int hofs = ht * th, hh = std::min(th, Hgt - hofs);
+            ثابت صحیح wofs = wt * tw, ww = std::min(tw, W - wofs);
+            ثابت صحیح hofs = ht * th, hh = std::min(th, Hgt - hofs);
 
-            int p = plane;                              // decode plane -> outer multi-index
-            for (int d = nOuter - 1; d >= 0; d--) {
-                int dd = D[d];
-                int np = p / dd;
+            صحیح p = plane;                              // decode plane -> outer multi-index
+            برای (صحیح d = nOuter - 1; d >= 0; d--) {
+                صحیح dd = D[d];
+                صحیح np = p / dd;
                 idx[d] = p - np * dd;
                 p = np;
             }
 
-            for (int k = 0; k < K; k++)
+            برای (صحیح k = 0; k < K; k++)
             {
                 size_t off = (size_t)wofs * S[k][wAxis];
-                for (int d = 0; d < nOuter; d++) off += (size_t)idx[d] * S[k][d];
-                if (hAxis >= 0) off += (size_t)hofs * S[k][hAxis];
+                برای (صحیح d = 0; d < nOuter; d++) off += (size_t)idx[d] * S[k][d];
+                اگر (hAxis >= 0) off += (size_t)hofs * S[k][hAxis];
                 slices[k].ptr = base[k] + off * (size_t)esz1[k];
             }
 
@@ -392,10 +392,10 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
     // Single tile (small work, wantTiles==1) => run inline and skip the parallel framework
     // entirely: its dispatch (std::function wrap + Range machinery + backend hop) is pure
     // overhead when there is nothing to parallelize, and dominates small-array latency.
-    if (ntiles == 1)
+    اگر (ntiles == 1)
         runRange(Range(0, 1));
-    else
-        parallel_for_(Range(0, (int)ntiles), runRange, stripes);
+    وگرنه
+        parallel_for_(Range(0, (صحیح)ntiles), runRange, stripes);
 }
 
 } // namespace cv

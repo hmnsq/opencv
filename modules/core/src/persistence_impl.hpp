@@ -5,117 +5,117 @@
 #ifndef OPENCV_CORE_PERSISTENCE_IMPL_HPP
 #define OPENCV_CORE_PERSISTENCE_IMPL_HPP
 
-#include "persistence.hpp"
-#include "persistence_base64_encoding.hpp"
-#include <unordered_map>
-#include <iterator>
+#شامل "persistence.hpp"
+#شامل "persistence_base64_encoding.hpp"
+#شامل <unordered_map>
+#شامل <iterator>
 
 
-namespace cv
+فضاینام cv
 {
 
-enum Base64State{
+شمارش Base64State{
     Uncertain,
     NotUse,
     InUse,
 };
 
-class cv::FileStorage::Impl : public FileStorage_API
+رده cv::FileStorage::Impl : عمومی FileStorage_API
 {
-public:
-    void init();
+عمومی:
+    تهی init();
 
     Impl(FileStorage* _fs);
 
-    virtual ~Impl();
+    مجازی ~Impl();
 
-    void release(String* out=0);
+    تهی release(String* out=0);
 
-    void analyze_file_name( const std::string& file_name, std::vector<std::string>& params );
+    تهی analyze_file_name( ثابت std::string& file_name, std::vector<std::string>& params );
 
-    bool open( const char* filename_or_buf, int _flags, const char* encoding );
+    منطقی open( ثابت نویسه* filename_or_buf, صحیح _flags, ثابت نویسه* encoding );
 
-    void puts( const char* str );
+    تهی puts( ثابت نویسه* str );
 
-    char* getsFromFile( char* buf, int count );
+    نویسه* getsFromFile( نویسه* buf, صحیح شمار_2 );
 
-    char* gets( size_t maxCount );
+    نویسه* gets( size_t max_شمار );
 
-    char* gets();
+    نویسه* gets();
 
-    bool eof();
+    منطقی eof();
 
-    void setEof();
+    تهی setEof();
 
-    void closeFile();
+    تهی closeFile();
 
-    void rewind();
+    تهی rewind();
 
-    char* resizeWriteBuffer( char* ptr, int len );
+    نویسه* resizeWriteBuffer( نویسه* ptr, صحیح len );
 
-    char* flush();
+    نویسه* flush();
 
-    void endWriteStruct();
+    تهی endWriteStruct();
 
-    void startWriteStruct_helper( const char* key, int struct_flags,
-                                  const char* type_name );
+    تهی startWriteStruct_helper( ثابت نویسه* کلید, صحیح struct_flags,
+                                  ثابت نویسه* type_name );
 
-    void startWriteStruct( const char* key, int struct_flags,
-                           const char* type_name );
+    تهی startWriteStruct( ثابت نویسه* کلید, صحیح struct_flags,
+                           ثابت نویسه* type_name );
 
-    void writeComment( const char* comment, bool eol_comment );
+    تهی writeComment( ثابت نویسه* comment, منطقی eol_comment );
 
-    void startNextStream();
+    تهی startNextStream();
 
-    void write( const String& key, int value );
+    تهی اكتب( ثابت String& کلید, صحیح value );
 
-    void write( const String& key, bool value );
+    تهی اكتب( ثابت String& کلید, منطقی value );
 
-    void write( const String& key, int64_t value );
+    تهی اكتب( ثابت String& کلید, int64_t value );
 
-    void write( const String& key, double value );
+    تهی اكتب( ثابت String& کلید, دوگانه value );
 
-    void write( const String& key, const String& value );
+    تهی اكتب( ثابت String& کلید, ثابت String& value );
 
-    void writeRawData( const std::string& dt, const void* _data, size_t len );
+    تهی writeRawData( ثابت std::string& dt, ثابت تهی* _data, size_t len );
 
-    void workaround();
+    تهی workaround();
 
-    void switch_to_Base64_state( FileStorage_API::Base64State new_state);
+    تهی switch_to_Base64_state( FileStorage_API::Base64State new_state);
 
-    void make_write_struct_delayed( const char* key, int struct_flags, const char* type_name );
+    تهی make_write_struct_delayed( ثابت نویسه* کلید, صحیح struct_flags, ثابت نویسه* type_name );
 
-    void check_if_write_struct_is_delayed( bool change_type_to_base64 );
+    تهی check_if_write_struct_is_delayed( منطقی change_type_to_base64 );
 
-    void writeRawDataBase64(const void* _data, size_t len, const char* dt );
+    تهی writeRawDataBase64(ثابت تهی* _data, size_t len, ثابت نویسه* dt );
 
     String releaseAndGetString();
 
-    FileNode getFirstTopLevelNode() const;
+    File_گره get_First_بالاترین_Level_گره() ثابت;
 
-    FileNode root(int streamIdx=0) const;
+    File_گره ریشه(صحیح streamIdx=0) ثابت;
 
-    FileNode operator[](const String& nodename) const;
+    File_گره operator[](ثابت String& nodename) ثابت;
 
-    FileNode operator[](const char* /*nodename*/) const;
+    File_گره operator[](ثابت نویسه* /*nodename*/) ثابت;
 
-    virtual int getFormat() const CV_OVERRIDE;
+    مجازی صحیح getFormat() ثابت CV_OVERRIDE;
 
-    char* bufferPtr() const;
-    char* bufferStart() const;
-    char* bufferEnd() const;
-    void setBufferPtr(char* ptr);
-    int wrapMargin() const;
+    نویسه* bufferPtr() ثابت;
+    نویسه* bufferStart() ثابت;
+    نویسه* bufferEnd() ثابت;
+    تهی setBufferPtr(نویسه* ptr);
+    صحیح wrapMargin() ثابت;
 
     FStructData& getCurrentStruct();
 
-    void setNonEmpty();
+    تهی setNonEmpty();
 
-    void processSpecialDouble( char* buf, double* value, char** endptr );
+    تهی processSpecialDouble( نویسه* buf, دوگانه* value, نویسه** endptr );
 
-    double strtod( char* ptr, char** endptr );
+    دوگانه strtod( نویسه* ptr, نویسه** endptr );
 
-    void convertToCollection(int type, FileNode& node);
+    تهی convertToCollection(صحیح type, File_گره& گره);
 
     // a) allocates new FileNode (for that just set blockIdx to the last block and ofs to freeSpaceOfs) or
     // b) reallocates just created new node (blockIdx and ofs must be taken from FileNode).
@@ -124,130 +124,130 @@ public:
     //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
     // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
     // In the case (b) the existing tag and the name are copied automatically.
-    uchar* reserveNodeSpace(FileNode& node, size_t sz);
+    uchar* reserve_گره_Space(File_گره& گره, size_t sz);
 
-    unsigned getStringOfs( const std::string& key ) const;
+    unsigned getStringOfs( ثابت std::string& کلید ) ثابت;
 
-    FileNode addNode( FileNode& collection, const std::string& key,
-                      int elem_type, const void* value, int len );
+    File_گره add_گره( File_گره& collection, ثابت std::string& کلید,
+                      صحیح elem_type, ثابت تهی* value, صحیح len );
 
-    void finalizeCollection( FileNode& collection );
+    تهی finalizeCollection( File_گره& collection );
 
-    void normalizeNodeOfs(size_t& blockIdx, size_t& ofs) const;
+    تهی normalize_گره_Ofs(size_t& blockIdx, size_t& ofs) ثابت;
 
     Base64State get_state_of_writing_base64();
 
-    int get_space();
+    صحیح get_space();
 
-    class Base64Decoder
+    رده Base64Decoder
     {
-    public:
+    عمومی:
         Base64Decoder();
-        void init(const Ptr<FileStorageParser>& _parser, char* _ptr, int _indent);
+        تهی init(ثابت Ptr<FileStorageParser>& _parser, نویسه* _ptr, صحیح _indent);
 
-        bool readMore(int needed);
+        منطقی readMore(صحیح needed);
 
         uchar getUInt8();
 
         ushort getUInt16();
 
-        int getInt32();
+        صحیح getInt32();
 
         int64_t getInt64();
 
-        double getFloat64();
+        دوگانه getFloat64();
 
-        bool endOfStream() const;
-        char* getPtr() const;
-    protected:
+        منطقی endOfStream() ثابت;
+        نویسه* getPtr() ثابت;
+    محافظتشده:
 
         Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-        FileStorageParser& getParser() const
+        FileStorageParser& getParser() ثابت
         {
-            if (!parser_do_not_use_direct_dereference)
+            اگر (!parser_do_not_use_direct_dereference)
                 CV_Error(Error::StsNullPtr, "Parser is not available");
-            return *parser_do_not_use_direct_dereference;
+            بازگشت *parser_do_not_use_direct_dereference;
         }
-        char* ptr;
-        int indent;
-        std::vector<char> encoded;
+        نویسه* ptr;
+        صحیح indent;
+        std::vector<نویسه> encoded;
         std::vector<uchar> decoded;
         size_t ofs;
         size_t totalchars;
-        bool eos;
+        منطقی eos;
     };
 
-    char* parseBase64(char* ptr, int indent, FileNode& collection);
+    نویسه* parseBase64(نویسه* ptr, صحیح indent, File_گره& collection);
 
-    void parseError( const char* func_name, const std::string& err_msg, const char* source_file, int source_line );
+    تهی parseError( ثابت نویسه* func_name, ثابت std::string& err_پیام, ثابت نویسه* source_file, صحیح source_سطر );
 
-    const uchar* getNodePtr(size_t blockIdx, size_t ofs) const;
+    ثابت uchar* get_گره_Ptr(size_t blockIdx, size_t ofs) ثابت;
 
-    std::string getName( size_t nameofs ) const;
+    std::string getName( size_t nameofs ) ثابت;
 
     FileStorage* getFS();
 
     FileStorage* fs_ext;
 
     std::string filename;
-    int flags;
-    bool empty_stream;
+    صحیح flags;
+    منطقی empty_stream;
 
     FILE* file;
     gzFile gzfile;
 
-    bool is_opened;
-    bool dummy_eof;
-    bool write_mode;
-    bool mem_mode;
-    int fmt;
+    منطقی is_opened;
+    منطقی dummy_eof;
+    منطقی write_mode;
+    منطقی mem_mode;
+    صحیح fmt;
 
     State state; //!< current state of the FileStorage (used only for writing)
-    bool is_using_base64;
-    bool is_write_struct_delayed;
-    char* delayed_struct_key;
-    int   delayed_struct_flags;
-    char* delayed_type_name;
+    منطقی is_using_base64;
+    منطقی is_write_struct_delayed;
+    نویسه* delayed_struct_کلید;
+    صحیح   delayed_struct_flags;
+    نویسه* delayed_type_name;
     FileStorage_API::Base64State state_of_writing_base64;
 
-    int space, wrap_margin;
-    std::deque<FStructData> write_stack;
-    std::vector<char> buffer;
+    صحیح space, wrap_margin;
+    std::deque<FStructData> write_پشته;
+    std::vector<نویسه> buffer;
     size_t bufofs;
 
-    std::deque<char> outbuf;
+    std::deque<نویسه> outbuf;
 
     Ptr<FileStorageEmitter> emitter_do_not_use_direct_dereference;
     FileStorageEmitter& getEmitter()
     {
-        if (!emitter_do_not_use_direct_dereference)
+        اگر (!emitter_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Emitter is not available");
-        return *emitter_do_not_use_direct_dereference;
+        بازگشت *emitter_do_not_use_direct_dereference;
     }
     Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-    FileStorageParser& getParser() const
+    FileStorageParser& getParser() ثابت
     {
-        if (!parser_do_not_use_direct_dereference)
+        اگر (!parser_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Parser is not available");
-        return *parser_do_not_use_direct_dereference;
+        بازگشت *parser_do_not_use_direct_dereference;
     }
     Base64Decoder base64decoder;
     base64::Base64Writer* base64_writer;
 
-    std::vector<FileNode> roots;
+    std::vector<File_گره> roots;
     std::vector<Ptr<std::vector<uchar> > > fs_data;
     std::vector<uchar*> fs_data_ptrs;
     std::vector<size_t> fs_data_blksz;
     size_t freeSpaceOfs;
-    typedef std::unordered_map<std::string, unsigned> str_hash_t;
+    تعریفنوع std::unordered_map<std::string, unsigned> str_hash_t;
     str_hash_t str_hash;
-    std::vector<char> str_hash_data;
+    std::vector<نویسه> str_hash_data;
 
-    std::vector<char> strbufv;
-    char* strbuf;
+    std::vector<نویسه> strbufv;
+    نویسه* strbuf;
     size_t strbufsize;
     size_t strbufpos;
-    int lineno;
+    صحیح lineno;
 };
 
 }

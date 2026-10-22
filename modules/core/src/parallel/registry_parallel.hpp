@@ -5,20 +5,20 @@
 #ifndef OPENCV_CORE_PARALLEL_REGISTRY_HPP
 #define OPENCV_CORE_PARALLEL_REGISTRY_HPP
 
-#include "factory_parallel.hpp"
+#شامل "factory_parallel.hpp"
 
-namespace cv { namespace parallel {
+فضاینام cv { فضاینام parallel {
 
-struct ParallelBackendInfo
+ساختار ParallelBackendInfo
 {
-    int priority;     // 1000-<index*10> - default builtin priority
+    صحیح priority;     // 1000-<index*10> - default builtin priority
                       // 0 - disabled (OPENCV_PARALLEL_PRIORITY_<name> = 0)
                       // >10000 - prioritized list (OPENCV_PARALLEL_PRIORITY_LIST)
     std::string name;
     std::shared_ptr<IParallelBackendFactory> backendFactory;
 };
 
-const std::vector<ParallelBackendInfo>& getParallelBackendsInfo();
+ثابت std::vector<ParallelBackendInfo>& getParallelBackendsInfo();
 
 }} // namespace
 
