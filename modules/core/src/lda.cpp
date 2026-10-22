@@ -16,241 +16,241 @@
  *   See <http://www.opensource.org/licenses/bsd-license>
  */
 
-#include "precomp.hpp"
-#include <iostream>
-#include <map>
-#include <set>
+#ضمن "precomp.hpp"
+#ضمن <iostream>
+#ضمن <map>
+#ضمن <set>
 
-namespace cv
+نطاق cv
 {
 
 // Removes duplicate elements in a given vector.
-template<typename _Tp>
-inline std::vector<_Tp> remove_dups(const std::vector<_Tp>& src) {
-    typedef typename std::set<_Tp>::const_iterator constSetIterator;
-    typedef typename std::vector<_Tp>::const_iterator constVecIterator;
-    std::set<_Tp> set_elems;
-    for (constVecIterator it = src.begin(); it != src.end(); ++it)
-        set_elems.insert(*it);
+سانچو<قسم_نالو _Tp>
+مضمن std::vector<_Tp> remove_dups(ثابت std::vector<_Tp>& src) {
+    تعريفنوع قسم_نالو std::سيٽ<_Tp>::const_iterator const_سيٽ_Iterator;
+    تعريفنوع قسم_نالو std::vector<_Tp>::const_iterator constVecIterator;
+    std::سيٽ<_Tp> سيٽ_elems;
+    لكل (constVecIterator it = src.begin(); it != src.end(); ++it)
+        سيٽ_elems.insert(*it);
     std::vector<_Tp> elems;
-    for (constSetIterator it = set_elems.begin(); it != set_elems.end(); ++it)
+    لكل (const_سيٽ_Iterator it = سيٽ_elems.begin(); it != سيٽ_elems.end(); ++it)
         elems.push_back(*it);
-    return elems;
+    أرجع elems;
 }
 
-static Mat argsort(InputArray _src, bool ascending=true)
+ساكن Mat argsort(داخلا_Array _src, منطقي ascending=سچ)
 {
     Mat src = _src.getMat();
-    if (src.rows != 1 && src.cols != 1) {
-        String error_message = "Wrong shape of input matrix! Expected a matrix with one row or column.";
-        CV_Error(Error::StsBadArg, error_message);
+    إذا (src.صفون != 1 && src.کانن_ڳڻپ != 1) {
+        String error_پيغام = "Wrong shape of input matrix! Expected a matrix with one row or column.";
+        CV_Error(Error::StsBadArg, error_پيغام);
     }
-    int flags = SORT_EVERY_ROW | (ascending ? SORT_ASCENDING : SORT_DESCENDING);
+    صحيح flags = ترتيب_ڏيو_EVERY_صف | (ascending ? ترتيب_ڏيو_ASCENDING : ترتيب_ڏيو_DESCENDING);
     Mat sorted_indices;
-    sortIdx(src.reshape(1,1),sorted_indices,flags);
-    return sorted_indices;
+    ترتيب_ڏيو_Idx(src.reshape(1,1),sorted_indices,flags);
+    أرجع sorted_indices;
 }
 
-static Mat asRowMatrix(InputArrayOfArrays src, int rtype, double alpha=1, double beta=0) {
+ساكن Mat as_صف_ميٽرڪس(داخلا_Array_جو_Arrays src, صحيح rtype, مزدوج alpha=1, مزدوج beta=0) {
     // make sure the input data is a vector of matrices or vector of vector
-    if(src.kind() != _InputArray::STD_VECTOR_MAT && src.kind() != _InputArray::STD_ARRAY_MAT &&
-        src.kind() != _InputArray::STD_VECTOR_VECTOR) {
-        String error_message = "The data is expected as InputArray::STD_VECTOR_MAT (a std::vector<Mat>) or _InputArray::STD_VECTOR_VECTOR (a std::vector< std::vector<...> >).";
-        CV_Error(Error::StsBadArg, error_message);
+    إذا(src.قسم() != داخلا_Array_2::STD_ويڪٽر_MAT && src.قسم() != داخلا_Array_2::STD_ARRAY_MAT &&
+        src.قسم() != داخلا_Array_2::STD_ويڪٽر_ويڪٽر) {
+        String error_پيغام = "The data is expected as InputArray::STD_VECTOR_MAT (a std::vector<Mat>) or _InputArray::STD_VECTOR_VECTOR (a std::vector< std::vector<...> >).";
+        CV_Error(Error::StsBadArg, error_پيغام);
     }
     // number of samples
-    size_t n = src.total();
+    size_t n = src.ڪل();
     // return empty matrix if no matrices given
-    if(n == 0)
-        return Mat();
+    إذا(n == 0)
+        أرجع Mat();
     // dimensionality of (reshaped) samples
-    size_t d = src.getMat(0).total();
+    size_t d = src.getMat(0).ڪل();
     // create data matrix
-    Mat data((int)n, (int)d, rtype);
+    Mat معلومات((صحيح)n, (صحيح)d, rtype);
     // now copy data
-    for(int i = 0; i < (int)n; i++) {
+    لكل(صحيح i = 0; i < (صحيح)n; i++) {
         // make sure data can be reshaped, throw exception if not!
-        if(src.getMat(i).total() != d) {
-            String error_message = format("Wrong number of elements in matrix #%d! Expected %d was %d.", i, (int)d, (int)src.getMat(i).total());
-            CV_Error(Error::StsBadArg, error_message);
+        إذا(src.getMat(i).ڪل() != d) {
+            String error_پيغام = format("Wrong number of elements in matrix #%d! Expected %d was %d.", i, (صحيح)d, (صحيح)src.getMat(i).ڪل());
+            CV_Error(Error::StsBadArg, error_پيغام);
         }
         // get a hold of the current row
-        Mat xi = data.row(i);
+        Mat xi = معلومات.صف(i);
         // make reshape happy by cloning for non-continuous matrices
-        if(src.getMat(i).isContinuous()) {
-            src.getMat(i).reshape(1, 1).convertTo(xi, rtype, alpha, beta);
-        } else {
-            src.getMat(i).clone().reshape(1, 1).convertTo(xi, rtype, alpha, beta);
+        إذا(src.getMat(i).isContinuous()) {
+            src.getMat(i).reshape(1, 1).convert_منزل(xi, rtype, alpha, beta);
+        } وإلا {
+            src.getMat(i).clone().reshape(1, 1).convert_منزل(xi, rtype, alpha, beta);
         }
     }
-    return data;
+    أرجع معلومات;
 }
 
-static void sortMatrixColumnsByIndices(InputArray _src, InputArray _indices, OutputArray _dst) {
-    if(_indices.getMat().type() != CV_32SC1) {
+ساكن فراغ ترتيب_ڏيو_ميٽرڪس_Columns_By_Indices(داخلا_Array _src, داخلا_Array _indices, OutputArray _dst) {
+    إذا(_indices.getMat().type() != CV_32SC1) {
         CV_Error(Error::StsUnsupportedFormat, "cv::sortColumnsByIndices only works on integer indices!");
     }
     Mat src = _src.getMat();
-    std::vector<int> indices = _indices.getMat();
-    _dst.create(src.rows, src.cols, src.type());
+    std::vector<صحيح> indices = _indices.getMat();
+    _dst.create(src.صفون, src.کانن_ڳڻپ, src.type());
     Mat dst = _dst.getMat();
-    for(size_t idx = 0; idx < indices.size(); idx++) {
-        Mat originalCol = src.col(indices[idx]);
-        Mat sortedCol = dst.col((int)idx);
-        originalCol.copyTo(sortedCol);
+    لكل(size_t idx = 0; idx < indices.size(); idx++) {
+        Mat original_کانو = src.کانو(indices[idx]);
+        Mat sorted_کانو = dst.کانو((صحيح)idx);
+        original_کانو.copy_منزل(sorted_کانو);
     }
 }
 
-static Mat sortMatrixColumnsByIndices(InputArray src, InputArray indices) {
+ساكن Mat ترتيب_ڏيو_ميٽرڪس_Columns_By_Indices(داخلا_Array src, داخلا_Array indices) {
     Mat dst;
-    sortMatrixColumnsByIndices(src, indices, dst);
-    return dst;
+    ترتيب_ڏيو_ميٽرڪس_Columns_By_Indices(src, indices, dst);
+    أرجع dst;
 }
 
 
-template<typename _Tp> static bool
-isSymmetric_(InputArray src) {
+سانچو<قسم_نالو _Tp> ساكن منطقي
+is_متناظر(داخلا_Array src) {
     Mat _src = src.getMat();
-    if(_src.cols != _src.rows)
-        return false;
-    for (int i = 0; i < _src.rows; i++) {
-        for (int j = 0; j < _src.cols; j++) {
+    إذا(_src.کانن_ڳڻپ != _src.صفون)
+        أرجع خطأ;
+    لكل (صحيح i = 0; i < _src.صفون; i++) {
+        لكل (صحيح j = 0; j < _src.کانن_ڳڻپ; j++) {
             _Tp a = _src.at<_Tp> (i, j);
             _Tp b = _src.at<_Tp> (j, i);
-            if (a != b) {
-                return false;
+            إذا (a != b) {
+                أرجع خطأ;
             }
         }
     }
-    return true;
+    أرجع سچ;
 }
 
-template<typename _Tp> static bool
-isSymmetric_(InputArray src, double eps) {
+سانچو<قسم_نالو _Tp> ساكن منطقي
+is_متناظر(داخلا_Array src, مزدوج eps) {
     Mat _src = src.getMat();
-    if(_src.cols != _src.rows)
-        return false;
-    for (int i = 0; i < _src.rows; i++) {
-        for (int j = 0; j < _src.cols; j++) {
+    إذا(_src.کانن_ڳڻپ != _src.صفون)
+        أرجع خطأ;
+    لكل (صحيح i = 0; i < _src.صفون; i++) {
+        لكل (صحيح j = 0; j < _src.کانن_ڳڻپ; j++) {
             _Tp a = _src.at<_Tp> (i, j);
             _Tp b = _src.at<_Tp> (j, i);
-            if (std::abs(a - b) > eps) {
-                return false;
+            إذا (std::مطلق_قدر(a - b) > eps) {
+                أرجع خطأ;
             }
         }
     }
-    return true;
+    أرجع سچ;
 }
 
-static bool isSymmetric(InputArray src, double eps=1e-16)
+ساكن منطقي is_متناظر_2(داخلا_Array src, مزدوج eps=1e-16)
 {
     Mat m = src.getMat();
-    switch (m.type()) {
-        case CV_8SC1: return isSymmetric_<char>(m); break;
-        case CV_8UC1:
-            return isSymmetric_<unsigned char>(m); break;
-        case CV_16SC1:
-            return isSymmetric_<short>(m); break;
-        case CV_16UC1:
-            return isSymmetric_<unsigned short>(m); break;
-        case CV_32SC1:
-            return isSymmetric_<int>(m); break;
-        case CV_32FC1:
-            return isSymmetric_<float>(m, eps); break;
-        case CV_64FC1:
-            return isSymmetric_<double>(m, eps); break;
-        default:
-            break;
+    بدل (m.type()) {
+        حالة CV_8SC1: أرجع is_متناظر<حرف>(m); اكسر;
+        حالة CV_8UC1:
+            أرجع is_متناظر<بنانشان حرف>(m); اكسر;
+        حالة CV_16SC1:
+            أرجع is_متناظر<ننڍو>(m); اكسر;
+        حالة CV_16UC1:
+            أرجع is_متناظر<بنانشان ننڍو>(m); اكسر;
+        حالة CV_32SC1:
+            أرجع is_متناظر<صحيح>(m); اكسر;
+        حالة CV_32FC1:
+            أرجع is_متناظر<عائم>(m, eps); اكسر;
+        حالة CV_64FC1:
+            أرجع is_متناظر<مزدوج>(m, eps); اكسر;
+        افتراضي:
+            اكسر;
     }
-    return false;
+    أرجع خطأ;
 }
 
 
 //------------------------------------------------------------------------------
 // cv::subspaceProject
 //------------------------------------------------------------------------------
-Mat LDA::subspaceProject(InputArray _W, InputArray _mean, InputArray _src) {
+Mat LDA::subspaceProject(داخلا_Array _W, داخلا_Array سراسري, داخلا_Array _src) {
     // get data matrices
     Mat W = _W.getMat();
-    Mat mean = _mean.getMat();
+    Mat سراسري_2 = سراسري.getMat();
     Mat src = _src.getMat();
     // get number of samples and dimension
-    int n = src.rows;
-    int d = src.cols;
+    صحيح n = src.صفون;
+    صحيح d = src.کانن_ڳڻپ;
     // make sure the data has the correct shape
-    if(W.rows != d) {
-        String error_message = format("Wrong shapes for given matrices. Was size(src) = (%d,%d), size(W) = (%d,%d).", src.rows, src.cols, W.rows, W.cols);
-        CV_Error(Error::StsBadArg, error_message);
+    إذا(W.صفون != d) {
+        String error_پيغام = format("Wrong shapes for given matrices. Was size(src) = (%d,%d), size(W) = (%d,%d).", src.صفون, src.کانن_ڳڻپ, W.صفون, W.کانن_ڳڻپ);
+        CV_Error(Error::StsBadArg, error_پيغام);
     }
     // make sure mean is correct if not empty
-    if(!mean.empty() && (mean.total() != (size_t) d)) {
-        String error_message = format("Wrong mean shape for the given data matrix. Expected %d, but was %zu.", d, mean.total());
-        CV_Error(Error::StsBadArg, error_message);
+    إذا(!سراسري_2.empty() && (سراسري_2.ڪل() != (size_t) d)) {
+        String error_پيغام = format("Wrong mean shape for the given data matrix. Expected %d, but was %zu.", d, سراسري_2.ڪل());
+        CV_Error(Error::StsBadArg, error_پيغام);
     }
     // create temporary matrices
     Mat X, Y;
     // make sure you operate on correct type
-    src.convertTo(X, W.type());
+    src.convert_منزل(X, W.type());
     // safe to do, because of above assertion
-    if(!mean.empty()) {
-        for(int i=0; i<n; i++) {
-            Mat r_i = X.row(i);
-            subtract(r_i, mean.reshape(1,1), r_i);
+    إذا(!سراسري_2.empty()) {
+        لكل(صحيح i=0; i<n; i++) {
+            Mat r_i = X.صف(i);
+            ڪٽيو(r_i, سراسري_2.reshape(1,1), r_i);
         }
     }
     // finally calculate projection as Y = (X-mean)*W
     gemm(X, W, 1.0, Mat(), 0.0, Y);
-    return Y;
+    أرجع Y;
 }
 
 //------------------------------------------------------------------------------
 // cv::subspaceReconstruct
 //------------------------------------------------------------------------------
-Mat LDA::subspaceReconstruct(InputArray _W, InputArray _mean, InputArray _src)
+Mat LDA::subspaceReconstruct(داخلا_Array _W, داخلا_Array سراسري, داخلا_Array _src)
 {
     // get data matrices
     Mat W = _W.getMat();
-    Mat mean = _mean.getMat();
+    Mat سراسري_2 = سراسري.getMat();
     Mat src = _src.getMat();
     // get number of samples and dimension
-    int n = src.rows;
-    int d = src.cols;
+    صحيح n = src.صفون;
+    صحيح d = src.کانن_ڳڻپ;
     // make sure the data has the correct shape
-    if(W.cols != d) {
-        String error_message = format("Wrong shapes for given matrices. Was size(src) = (%d,%d), size(W) = (%d,%d).", src.rows, src.cols, W.rows, W.cols);
-        CV_Error(Error::StsBadArg, error_message);
+    إذا(W.کانن_ڳڻپ != d) {
+        String error_پيغام = format("Wrong shapes for given matrices. Was size(src) = (%d,%d), size(W) = (%d,%d).", src.صفون, src.کانن_ڳڻپ, W.صفون, W.کانن_ڳڻپ);
+        CV_Error(Error::StsBadArg, error_پيغام);
     }
     // make sure mean is correct if not empty
-    if(!mean.empty() && (mean.total() != (size_t) W.rows)) {
-        String error_message = format("Wrong mean shape for the given eigenvector matrix. Expected %d, but was %zu.", W.cols, mean.total());
-        CV_Error(Error::StsBadArg, error_message);
+    إذا(!سراسري_2.empty() && (سراسري_2.ڪل() != (size_t) W.صفون)) {
+        String error_پيغام = format("Wrong mean shape for the given eigenvector matrix. Expected %d, but was %zu.", W.کانن_ڳڻپ, سراسري_2.ڪل());
+        CV_Error(Error::StsBadArg, error_پيغام);
     }
     // initialize temporary matrices
     Mat X, Y;
     // copy data & make sure we are using the correct type
-    src.convertTo(Y, W.type());
+    src.convert_منزل(Y, W.type());
     // calculate the reconstruction
     gemm(Y, W, 1.0, Mat(), 0.0, X, GEMM_2_T);
     // safe to do because of above assertion
-    if(!mean.empty()) {
-        for(int i=0; i<n; i++) {
-            Mat r_i = X.row(i);
-            add(r_i, mean.reshape(1,1), r_i);
+    إذا(!سراسري_2.empty()) {
+        لكل(صحيح i=0; i<n; i++) {
+            Mat r_i = X.صف(i);
+            جوڙيو(r_i, سراسري_2.reshape(1,1), r_i);
         }
     }
-    return X;
+    أرجع X;
 }
 
 
-class EigenvalueDecomposition {
-private:
+صنف EigenvalueDecomposition {
+خاص:
 
     // Holds the data dimension.
-    int n;
+    صحيح n;
 
     // Pointer to internal memory.
-    double *d, *e, *ort;
-    double **V, **H;
+    مزدوج *d, *e, *ort;
+    مزدوج **V, **H;
 
     // Holds the computed eigenvalues.
     Mat _eigenvalues;
@@ -259,50 +259,50 @@ private:
     Mat _eigenvectors;
 
     // Allocates memory.
-    template<typename _Tp>
-    _Tp *alloc_1d(int m) {
-        return new _Tp[m];
+    سانچو<قسم_نالو _Tp>
+    _Tp *alloc_1d(صحيح m) {
+        أرجع جديد _Tp[m];
     }
 
     // Allocates memory.
-    template<typename _Tp>
-    _Tp *alloc_1d(int m, _Tp val) {
+    سانچو<قسم_نالو _Tp>
+    _Tp *alloc_1d(صحيح m, _Tp val) {
         _Tp *arr = alloc_1d<_Tp> (m);
-        for (int i = 0; i < m; i++)
+        لكل (صحيح i = 0; i < m; i++)
             arr[i] = val;
-        return arr;
+        أرجع arr;
     }
 
     // Allocates memory.
-    template<typename _Tp>
-    _Tp **alloc_2d(int m, int _n) {
-        _Tp **arr = new _Tp*[m];
-        for (int i = 0; i < m; i++)
-            arr[i] = new _Tp[_n];
-        return arr;
+    سانچو<قسم_نالو _Tp>
+    _Tp **alloc_2d(صحيح m, صحيح _n) {
+        _Tp **arr = جديد _Tp*[m];
+        لكل (صحيح i = 0; i < m; i++)
+            arr[i] = جديد _Tp[_n];
+        أرجع arr;
     }
 
     // Allocates memory.
-    template<typename _Tp>
-    _Tp **alloc_2d(int m, int _n, _Tp val) {
+    سانچو<قسم_نالو _Tp>
+    _Tp **alloc_2d(صحيح m, صحيح _n, _Tp val) {
         _Tp **arr = alloc_2d<_Tp> (m, _n);
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < _n; j++) {
+        لكل (صحيح i = 0; i < m; i++) {
+            لكل (صحيح j = 0; j < _n; j++) {
                 arr[i][j] = val;
             }
         }
-        return arr;
+        أرجع arr;
     }
 
-    static void complex_div(double xr, double xi, double yr, double yi, double& cdivr, double& cdivi) {
-        double r, dv;
-        CV_DbgAssert(std::abs(yr) + std::abs(yi) > 0.0);
-        if (std::abs(yr) > std::abs(yi)) {
+    ساكن فراغ complex_div(مزدوج xr, مزدوج xi, مزدوج yr, مزدوج yi, مزدوج& cdivr, مزدوج& cdivi) {
+        مزدوج r, dv;
+        CV_DbgAssert(std::مطلق_قدر(yr) + std::مطلق_قدر(yi) > 0.0);
+        إذا (std::مطلق_قدر(yr) > std::مطلق_قدر(yi)) {
             r = yi / yr;
             dv = yr + r * yi;
             cdivr = (xr + r * xi) / dv;
             cdivi = (xi - r * xr) / dv;
-        } else {
+        } وإلا {
             r = yr / yi;
             dv = yi + r * yr;
             cdivr = (r * xr + xi) / dv;
@@ -312,7 +312,7 @@ private:
 
     // Nonsymmetric reduction from Hessenberg to real Schur form.
 
-    void hqr2() {
+    فراغ hqr2() {
 
         //  This is derived from the Algol procedure hqr2,
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -320,52 +320,52 @@ private:
         //  Fortran subroutine in EISPACK.
 
         // Initialize
-        const int max_iters_count = 1000 * this->n;
+        ثابت صحيح max_iters_ڳڻپ = 1000 * هذا->n;
 
-        const int nn = this->n; CV_Assert(nn > 0);
-        int n1 = nn - 1;
-        const int low = 0;
-        const int high = nn - 1;
-        const double eps = std::numeric_limits<double>::epsilon();
-        double exshift = 0.0;
+        ثابت صحيح nn = هذا->n; CV_Assert(nn > 0);
+        صحيح n1 = nn - 1;
+        ثابت صحيح هيٺيون = 0;
+        ثابت صحيح مٿاهون = nn - 1;
+        ثابت مزدوج eps = std::numeric_limits<مزدوج>::epsilon();
+        مزدوج exshift = 0.0;
 
         // Store roots isolated by balanc and compute matrix norm
 
-        double norm = 0.0;
-        for (int i = 0; i < nn; i++) {
-#if 0 // 'if' condition is always false
-            if (i < low || i > high) {
+        مزدوج norm = 0.0;
+        لكل (صحيح i = 0; i < nn; i++) {
+#إذا 0 // 'if' condition is always false
+            إذا (i < هيٺيون || i > مٿاهون) {
                 d[i] = H[i][i];
                 e[i] = 0.0;
             }
-#endif
-            for (int j = std::max(i - 1, 0); j < nn; j++) {
-                norm += std::abs(H[i][j]);
+#جيڪڏهن_پورو
+            لكل (صحيح j = std::max(i - 1, 0); j < nn; j++) {
+                norm += std::مطلق_قدر(H[i][j]);
             }
         }
 
         // Outer loop over eigenvalue index
-        int iter = 0;
-        while (n1 >= low) {
+        صحيح iter = 0;
+        طالما (n1 >= هيٺيون) {
 
             // Look for single small sub-diagonal element
-            int l = n1;
-            while (l > low) {
-                if (norm < FLT_EPSILON) {
-                    break;
+            صحيح l = n1;
+            طالما (l > هيٺيون) {
+                إذا (norm < FLT_EPSILON) {
+                    اكسر;
                 }
-                double s = std::abs(H[l - 1][l - 1]) + std::abs(H[l][l]);
-                if (s == 0.0) {
+                مزدوج s = std::مطلق_قدر(H[l - 1][l - 1]) + std::مطلق_قدر(H[l][l]);
+                إذا (s == 0.0) {
                     s = norm;
                 }
-                if (std::abs(H[l][l - 1]) < eps * s) {
-                    break;
+                إذا (std::مطلق_قدر(H[l][l - 1]) < eps * s) {
+                    اكسر;
                 }
                 l--;
             }
 
             // Check for convergence
-            if (l == n1) {
+            إذا (l == n1) {
                 // One root found
                 H[n1][n1] = H[n1][n1] + exshift;
                 d[n1] = H[n1][n1];
@@ -373,41 +373,41 @@ private:
                 n1--;
                 iter = 0;
 
-            } else if (l == n1 - 1) {
+            } وإلا إذا (l == n1 - 1) {
                 // Two roots found
-                double w = H[n1][n1 - 1] * H[n1 - 1][n1];
-                double p = (H[n1 - 1][n1 - 1] - H[n1][n1]) * 0.5;
-                double q = p * p + w;
-                double z = std::sqrt(std::abs(q));
+                مزدوج w = H[n1][n1 - 1] * H[n1 - 1][n1];
+                مزدوج p = (H[n1 - 1][n1 - 1] - H[n1][n1]) * 0.5;
+                مزدوج q = p * p + w;
+                مزدوج z = std::جذر(std::مطلق_قدر(q));
                 H[n1][n1] = H[n1][n1] + exshift;
                 H[n1 - 1][n1 - 1] = H[n1 - 1][n1 - 1] + exshift;
-                double x = H[n1][n1];
+                مزدوج x = H[n1][n1];
 
-                if (q >= 0) {
+                إذا (q >= 0) {
                     // Real pair
-                    if (p >= 0) {
+                    إذا (p >= 0) {
                         z = p + z;
-                    } else {
+                    } وإلا {
                         z = p - z;
                     }
                     d[n1 - 1] = x + z;
                     d[n1] = d[n1 - 1];
-                    if (z != 0.0) {
+                    إذا (z != 0.0) {
                         d[n1] = x - w / z;
                     }
                     e[n1 - 1] = 0.0;
                     e[n1] = 0.0;
                     x = H[n1][n1 - 1];
-                    double s = std::abs(x) + std::abs(z);
+                    مزدوج s = std::مطلق_قدر(x) + std::مطلق_قدر(z);
                     p = x / s;
                     q = z / s;
-                    double r = std::sqrt(p * p + q * q);
+                    مزدوج r = std::جذر(p * p + q * q);
                     p = p / r;
                     q = q / r;
 
                     // Row modification
 
-                    for (int j = n1 - 1; j < nn; j++) {
+                    لكل (صحيح j = n1 - 1; j < nn; j++) {
                         z = H[n1 - 1][j];
                         H[n1 - 1][j] = q * z + p * H[n1][j];
                         H[n1][j] = q * H[n1][j] - p * z;
@@ -415,7 +415,7 @@ private:
 
                     // Column modification
 
-                    for (int i = 0; i <= n1; i++) {
+                    لكل (صحيح i = 0; i <= n1; i++) {
                         z = H[i][n1 - 1];
                         H[i][n1 - 1] = q * z + p * H[i][n1];
                         H[i][n1] = q * H[i][n1] - p * z;
@@ -423,13 +423,13 @@ private:
 
                     // Accumulate transformations
 
-                    for (int i = low; i <= high; i++) {
+                    لكل (صحيح i = هيٺيون; i <= مٿاهون; i++) {
                         z = V[i][n1 - 1];
                         V[i][n1 - 1] = q * z + p * V[i][n1];
                         V[i][n1] = q * V[i][n1] - p * z;
                     }
 
-                } else {
+                } وإلا {
                     // Complex pair
                     d[n1 - 1] = x + p;
                     d[n1] = x + p;
@@ -439,41 +439,41 @@ private:
                 n1 = n1 - 2;
                 iter = 0;
 
-            } else {
+            } وإلا {
                 // No convergence yet
 
                 // Form shift
-                double x = H[n1][n1];
-                double y = 0.0;
-                double w = 0.0;
-                if (l < n1) {
+                مزدوج x = H[n1][n1];
+                مزدوج y = 0.0;
+                مزدوج w = 0.0;
+                إذا (l < n1) {
                     y = H[n1 - 1][n1 - 1];
                     w = H[n1][n1 - 1] * H[n1 - 1][n1];
                 }
 
                 // Wilkinson's original ad hoc shift
-                if (iter == 10) {
+                إذا (iter == 10) {
                     exshift += x;
-                    for (int i = low; i <= n1; i++) {
+                    لكل (صحيح i = هيٺيون; i <= n1; i++) {
                         H[i][i] -= x;
                     }
-                    double s = std::abs(H[n1][n1 - 1]) + std::abs(H[n1 - 1][n1 - 2]);
+                    مزدوج s = std::مطلق_قدر(H[n1][n1 - 1]) + std::مطلق_قدر(H[n1 - 1][n1 - 2]);
                     x = y = 0.75 * s;
                     w = -0.4375 * s * s;
                 }
 
                 // MATLAB's new ad hoc shift
 
-                if (iter == 30) {
-                    double s = (y - x) * 0.5;
+                إذا (iter == 30) {
+                    مزدوج s = (y - x) * 0.5;
                     s = s * s + w;
-                    if (s > 0) {
-                        s = std::sqrt(s);
-                        if (y < x) {
+                    إذا (s > 0) {
+                        s = std::جذر(s);
+                        إذا (y < x) {
                             s = -s;
                         }
                         s = x - w / ((y - x) * 0.5 + s);
-                        for (int i = low; i <= n1; i++) {
+                        لكل (صحيح i = هيٺيون; i <= n1; i++) {
                             H[i][i] -= s;
                         }
                         exshift += s;
@@ -482,85 +482,85 @@ private:
                 }
 
                 iter = iter + 1;
-                if (iter > max_iters_count)
+                إذا (iter > max_iters_ڳڻپ)
                     CV_Error(Error::StsNoConv, "Algorithm doesn't converge (complex eigen values?)");
 
-                double p = std::numeric_limits<double>::quiet_NaN();
-                double q = std::numeric_limits<double>::quiet_NaN();
-                double r = std::numeric_limits<double>::quiet_NaN();
+                مزدوج p = std::numeric_limits<مزدوج>::quiet_NaN();
+                مزدوج q = std::numeric_limits<مزدوج>::quiet_NaN();
+                مزدوج r = std::numeric_limits<مزدوج>::quiet_NaN();
 
                 // Look for two consecutive small sub-diagonal elements
-                int m = n1 - 2;
-                while (m >= l) {
-                    double z = H[m][m];
+                صحيح m = n1 - 2;
+                طالما (m >= l) {
+                    مزدوج z = H[m][m];
                     r = x - z;
-                    double s = y - z;
+                    مزدوج s = y - z;
                     p = (r * s - w) / H[m + 1][m] + H[m][m + 1];
                     q = H[m + 1][m + 1] - z - r - s;
                     r = H[m + 2][m + 1];
-                    s = std::abs(p) + std::abs(q) + std::abs(r);
+                    s = std::مطلق_قدر(p) + std::مطلق_قدر(q) + std::مطلق_قدر(r);
                     p = p / s;
                     q = q / s;
                     r = r / s;
-                    if (m == l) {
-                        break;
+                    إذا (m == l) {
+                        اكسر;
                     }
-                    if (std::abs(H[m][m - 1]) * (std::abs(q) + std::abs(r)) < eps * (std::abs(p)
-                                                                                     * (std::abs(H[m - 1][m - 1]) + std::abs(z) + std::abs(
+                    إذا (std::مطلق_قدر(H[m][m - 1]) * (std::مطلق_قدر(q) + std::مطلق_قدر(r)) < eps * (std::مطلق_قدر(p)
+                                                                                     * (std::مطلق_قدر(H[m - 1][m - 1]) + std::مطلق_قدر(z) + std::مطلق_قدر(
                                                                                                                                            H[m + 1][m + 1])))) {
-                        break;
+                        اكسر;
                     }
                     m--;
                 }
 
-                for (int i = m + 2; i <= n1; i++) {
+                لكل (صحيح i = m + 2; i <= n1; i++) {
                     H[i][i - 2] = 0.0;
-                    if (i > m + 2) {
+                    إذا (i > m + 2) {
                         H[i][i - 3] = 0.0;
                     }
                 }
 
                 // Double QR step involving rows l:n and columns m:n
 
-                for (int k = m; k < n1; k++) {
+                لكل (صحيح k = m; k < n1; k++) {
 
-                    bool notlast = (k != n1 - 1);
-                    if (k != m) {
+                    منطقي notlast = (k != n1 - 1);
+                    إذا (k != m) {
                         p = H[k][k - 1];
                         q = H[k + 1][k - 1];
                         r = (notlast ? H[k + 2][k - 1] : 0.0);
-                        x = std::abs(p) + std::abs(q) + std::abs(r);
-                        if (x != 0.0) {
+                        x = std::مطلق_قدر(p) + std::مطلق_قدر(q) + std::مطلق_قدر(r);
+                        إذا (x != 0.0) {
                             p = p / x;
                             q = q / x;
                             r = r / x;
                         }
                     }
-                    if (x == 0.0) {
-                        break;
+                    إذا (x == 0.0) {
+                        اكسر;
                     }
-                    double s = std::sqrt(p * p + q * q + r * r);
-                    if (p < 0) {
+                    مزدوج s = std::جذر(p * p + q * q + r * r);
+                    إذا (p < 0) {
                         s = -s;
                     }
-                    if (s != 0) {
-                        if (k != m) {
+                    إذا (s != 0) {
+                        إذا (k != m) {
                             H[k][k - 1] = -s * x;
-                        } else if (l != m) {
+                        } وإلا إذا (l != m) {
                             H[k][k - 1] = -H[k][k - 1];
                         }
                         p = p + s;
                         x = p / s;
                         y = q / s;
-                        double z = r / s;
+                        مزدوج z = r / s;
                         q = q / p;
                         r = r / p;
 
                         // Row modification
 
-                        for (int j = k; j < nn; j++) {
+                        لكل (صحيح j = k; j < nn; j++) {
                             p = H[k][j] + q * H[k + 1][j];
-                            if (notlast) {
+                            إذا (notlast) {
                                 p = p + r * H[k + 2][j];
                                 H[k + 2][j] = H[k + 2][j] - p * z;
                             }
@@ -570,9 +570,9 @@ private:
 
                         // Column modification
 
-                        for (int i = 0; i <= std::min(n1, k + 3); i++) {
+                        لكل (صحيح i = 0; i <= std::min(n1, k + 3); i++) {
                             p = x * H[i][k] + y * H[i][k + 1];
-                            if (notlast) {
+                            إذا (notlast) {
                                 p = p + z * H[i][k + 2];
                                 H[i][k + 2] = H[i][k + 2] - p * r;
                             }
@@ -582,9 +582,9 @@ private:
 
                         // Accumulate transformations
 
-                        for (int i = low; i <= high; i++) {
+                        لكل (صحيح i = هيٺيون; i <= مٿاهون; i++) {
                             p = x * V[i][k] + y * V[i][k + 1];
-                            if (notlast) {
+                            إذا (notlast) {
                                 p = p + z * V[i][k + 2];
                                 V[i][k + 2] = V[i][k + 2] - p * r;
                             }
@@ -598,78 +598,78 @@ private:
 
         // Backsubstitute to find vectors of upper triangular form
 
-        if (norm < FLT_EPSILON) {
-            return;
+        إذا (norm < FLT_EPSILON) {
+            أرجع;
         }
 
-        for (n1 = nn - 1; n1 >= 0; n1--) {
-            double p = d[n1];
-            double q = e[n1];
+        لكل (n1 = nn - 1; n1 >= 0; n1--) {
+            مزدوج p = d[n1];
+            مزدوج q = e[n1];
 
-            if (q == 0) {
+            إذا (q == 0) {
                 // Real vector
-                double z = std::numeric_limits<double>::quiet_NaN();
-                double s = std::numeric_limits<double>::quiet_NaN();
+                مزدوج z = std::numeric_limits<مزدوج>::quiet_NaN();
+                مزدوج s = std::numeric_limits<مزدوج>::quiet_NaN();
 
-                int l = n1;
+                صحيح l = n1;
                 H[n1][n1] = 1.0;
-                for (int i = n1 - 1; i >= 0; i--) {
-                    double w = H[i][i] - p;
-                    double r = 0.0;
-                    for (int j = l; j <= n1; j++) {
+                لكل (صحيح i = n1 - 1; i >= 0; i--) {
+                    مزدوج w = H[i][i] - p;
+                    مزدوج r = 0.0;
+                    لكل (صحيح j = l; j <= n1; j++) {
                         r = r + H[i][j] * H[j][n1];
                     }
-                    if (e[i] < 0.0) {
+                    إذا (e[i] < 0.0) {
                         z = w;
                         s = r;
-                    } else {
+                    } وإلا {
                         l = i;
-                        if (e[i] == 0.0) {
-                            if (w != 0.0) {
+                        إذا (e[i] == 0.0) {
+                            إذا (w != 0.0) {
                                 H[i][n1] = -r / w;
-                            } else {
+                            } وإلا {
                                 H[i][n1] = -r / (eps * norm);
                             }
-                        } else {
+                        } وإلا {
                             // Solve real equations
                             CV_DbgAssert(!cvIsNaN(z));
-                            double x = H[i][i + 1];
-                            double y = H[i + 1][i];
+                            مزدوج x = H[i][i + 1];
+                            مزدوج y = H[i + 1][i];
                             q = (d[i] - p) * (d[i] - p) + e[i] * e[i];
-                            double t = (x * s - z * r) / q;
+                            مزدوج t = (x * s - z * r) / q;
                             H[i][n1] = t;
-                            if (std::abs(x) > std::abs(z)) {
+                            إذا (std::مطلق_قدر(x) > std::مطلق_قدر(z)) {
                                 H[i + 1][n1] = (-r - w * t) / x;
-                            } else {
+                            } وإلا {
                                 CV_DbgAssert(z != 0.0);
                                 H[i + 1][n1] = (-s - y * t) / z;
                             }
                         }
 
                         // Overflow control
-                        double t = std::abs(H[i][n1]);
-                        if ((eps * t) * t > 1) {
-                            double inv_t = 1.0 / t;
-                            for (int j = i; j <= n1; j++) {
+                        مزدوج t = std::مطلق_قدر(H[i][n1]);
+                        إذا ((eps * t) * t > 1) {
+                            مزدوج inv_t = 1.0 / t;
+                            لكل (صحيح j = i; j <= n1; j++) {
                                 H[j][n1] *= inv_t;
                             }
                         }
                     }
                 }
-            } else if (q < 0) {
+            } وإلا إذا (q < 0) {
                 // Complex vector
-                double z = std::numeric_limits<double>::quiet_NaN();
-                double r = std::numeric_limits<double>::quiet_NaN();
-                double s = std::numeric_limits<double>::quiet_NaN();
+                مزدوج z = std::numeric_limits<مزدوج>::quiet_NaN();
+                مزدوج r = std::numeric_limits<مزدوج>::quiet_NaN();
+                مزدوج s = std::numeric_limits<مزدوج>::quiet_NaN();
 
-                int l = n1 - 1;
+                صحيح l = n1 - 1;
 
                 // Last vector component imaginary so matrix is triangular
 
-                if (std::abs(H[n1][n1 - 1]) > std::abs(H[n1 - 1][n1])) {
+                إذا (std::مطلق_قدر(H[n1][n1 - 1]) > std::مطلق_قدر(H[n1 - 1][n1])) {
                     H[n1 - 1][n1 - 1] = q / H[n1][n1 - 1];
                     H[n1 - 1][n1] = -(H[n1][n1] - p) / H[n1][n1 - 1];
-                } else {
+                } وإلا {
                     complex_div(
                             0.0, -H[n1 - 1][n1],
                             H[n1 - 1][n1 - 1] - p, q,
@@ -678,49 +678,49 @@ private:
                 }
                 H[n1][n1 - 1] = 0.0;
                 H[n1][n1] = 1.0;
-                for (int i = n1 - 2; i >= 0; i--) {
-                    double ra, sa, vr, vi;
+                لكل (صحيح i = n1 - 2; i >= 0; i--) {
+                    مزدوج ra, sa, vr, vi;
                     ra = 0.0;
                     sa = 0.0;
-                    for (int j = l; j <= n1; j++) {
+                    لكل (صحيح j = l; j <= n1; j++) {
                         ra = ra + H[i][j] * H[j][n1 - 1];
                         sa = sa + H[i][j] * H[j][n1];
                     }
-                    double w = H[i][i] - p;
+                    مزدوج w = H[i][i] - p;
 
-                    if (e[i] < 0.0) {
+                    إذا (e[i] < 0.0) {
                         z = w;
                         r = ra;
                         s = sa;
-                    } else {
+                    } وإلا {
                         l = i;
-                        if (e[i] == 0) {
+                        إذا (e[i] == 0) {
                             complex_div(
                                     -ra, -sa,
                                     w, q,
                                     H[i][n1 - 1], H[i][n1]
                             );
-                        } else {
+                        } وإلا {
                             // Solve complex equations
 
-                            double x = H[i][i + 1];
-                            double y = H[i + 1][i];
+                            مزدوج x = H[i][i + 1];
+                            مزدوج y = H[i + 1][i];
                             vr = (d[i] - p) * (d[i] - p) + e[i] * e[i] - q * q;
                             vi = (d[i] - p) * 2.0 * q;
-                            if (vr == 0.0 && vi == 0.0) {
-                                vr = eps * norm * (std::abs(w) + std::abs(q) + std::abs(x)
-                                                   + std::abs(y) + std::abs(z));
+                            إذا (vr == 0.0 && vi == 0.0) {
+                                vr = eps * norm * (std::مطلق_قدر(w) + std::مطلق_قدر(q) + std::مطلق_قدر(x)
+                                                   + std::مطلق_قدر(y) + std::مطلق_قدر(z));
                             }
                             complex_div(
                                     x * r - z * ra + q * sa, x * s - z * sa - q * ra,
                                     vr, vi,
                                     H[i][n1 - 1], H[i][n1]);
-                            if (std::abs(x) > (std::abs(z) + std::abs(q))) {
+                            إذا (std::مطلق_قدر(x) > (std::مطلق_قدر(z) + std::مطلق_قدر(q))) {
                                 H[i + 1][n1 - 1] = (-ra - w * H[i][n1 - 1] + q
                                                    * H[i][n1]) / x;
                                 H[i + 1][n1] = (-sa - w * H[i][n1] - q * H[i][n1
                                                                             - 1]) / x;
-                            } else {
+                            } وإلا {
                                 complex_div(
                                         -r - y * H[i][n1 - 1], -s - y * H[i][n1],
                                         z, q,
@@ -730,9 +730,9 @@ private:
 
                         // Overflow control
 
-                        double t = std::max(std::abs(H[i][n1 - 1]), std::abs(H[i][n1]));
-                        if ((eps * t) * t > 1) {
-                            for (int j = i; j <= n1; j++) {
+                        مزدوج t = std::max(std::مطلق_قدر(H[i][n1 - 1]), std::مطلق_قدر(H[i][n1]));
+                        إذا ((eps * t) * t > 1) {
+                            لكل (صحيح j = i; j <= n1; j++) {
                                 H[j][n1 - 1] = H[j][n1 - 1] / t;
                                 H[j][n1] = H[j][n1] / t;
                             }
@@ -744,22 +744,22 @@ private:
 
         // Vectors of isolated roots
 
-#if 0 // 'if' condition is always false
-        for (int i = 0; i < nn; i++) {
-            if (i < low || i > high) {
-                for (int j = i; j < nn; j++) {
+#إذا 0 // 'if' condition is always false
+        لكل (صحيح i = 0; i < nn; i++) {
+            إذا (i < هيٺيون || i > مٿاهون) {
+                لكل (صحيح j = i; j < nn; j++) {
                     V[i][j] = H[i][j];
                 }
             }
         }
-#endif
+#جيڪڏهن_پورو
 
         // Back transformation to get eigenvectors of original matrix
 
-        for (int j = nn - 1; j >= low; j--) {
-            for (int i = low; i <= high; i++) {
-                double z = 0.0;
-                for (int k = low; k <= std::min(j, high); k++) {
+        لكل (صحيح j = nn - 1; j >= هيٺيون; j--) {
+            لكل (صحيح i = هيٺيون; i <= مٿاهون; i++) {
+                مزدوج z = 0.0;
+                لكل (صحيح k = هيٺيون; k <= std::min(j, مٿاهون); k++) {
                     z += V[i][k] * H[k][j];
                 }
                 V[i][j] = z;
@@ -768,33 +768,33 @@ private:
     }
 
     // Nonsymmetric reduction to Hessenberg form.
-    void orthes() {
+    فراغ orthes() {
         //  This is derived from the Algol procedures orthes and ortran,
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
         //  Vol.ii-Linear Algebra, and the corresponding
         //  Fortran subroutines in EISPACK.
-        int low = 0;
-        int high = n - 1;
+        صحيح هيٺيون = 0;
+        صحيح مٿاهون = n - 1;
 
-        for (int m = low + 1; m < high; m++) {
+        لكل (صحيح m = هيٺيون + 1; m < مٿاهون; m++) {
 
             // Scale column.
 
-            double scale = 0.0;
-            for (int i = m; i <= high; i++) {
-                scale = scale + std::abs(H[i][m - 1]);
+            مزدوج scale = 0.0;
+            لكل (صحيح i = m; i <= مٿاهون; i++) {
+                scale = scale + std::مطلق_قدر(H[i][m - 1]);
             }
-            if (scale != 0.0) {
+            إذا (scale != 0.0) {
 
                 // Compute Householder transformation.
 
-                double h = 0.0;
-                for (int i = high; i >= m; i--) {
+                مزدوج h = 0.0;
+                لكل (صحيح i = مٿاهون; i >= m; i--) {
                     ort[i] = H[i][m - 1] / scale;
                     h += ort[i] * ort[i];
                 }
-                double g = std::sqrt(h);
-                if (ort[m] > 0) {
+                مزدوج g = std::جذر(h);
+                إذا (ort[m] > 0) {
                     g = -g;
                 }
                 h = h - ort[m] * g;
@@ -803,24 +803,24 @@ private:
                 // Apply Householder similarity transformation
                 // H = (I-u*u'/h)*H*(I-u*u')/h)
 
-                for (int j = m; j < n; j++) {
-                    double f = 0.0;
-                    for (int i = high; i >= m; i--) {
+                لكل (صحيح j = m; j < n; j++) {
+                    مزدوج f = 0.0;
+                    لكل (صحيح i = مٿاهون; i >= m; i--) {
                         f += ort[i] * H[i][j];
                     }
                     f = f / h;
-                    for (int i = m; i <= high; i++) {
+                    لكل (صحيح i = m; i <= مٿاهون; i++) {
                         H[i][j] -= f * ort[i];
                     }
                 }
 
-                for (int i = 0; i <= high; i++) {
-                    double f = 0.0;
-                    for (int j = high; j >= m; j--) {
+                لكل (صحيح i = 0; i <= مٿاهون; i++) {
+                    مزدوج f = 0.0;
+                    لكل (صحيح j = مٿاهون; j >= m; j--) {
                         f += ort[j] * H[i][j];
                     }
                     f = f / h;
-                    for (int j = m; j <= high; j++) {
+                    لكل (صحيح j = m; j <= مٿاهون; j++) {
                         H[i][j] -= f * ort[j];
                     }
                 }
@@ -831,25 +831,25 @@ private:
 
         // Accumulate transformations (Algol's ortran).
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        لكل (صحيح i = 0; i < n; i++) {
+            لكل (صحيح j = 0; j < n; j++) {
                 V[i][j] = (i == j ? 1.0 : 0.0);
             }
         }
 
-        for (int m = high - 1; m > low; m--) {
-            if (H[m][m - 1] != 0.0) {
-                for (int i = m + 1; i <= high; i++) {
+        لكل (صحيح m = مٿاهون - 1; m > هيٺيون; m--) {
+            إذا (H[m][m - 1] != 0.0) {
+                لكل (صحيح i = m + 1; i <= مٿاهون; i++) {
                     ort[i] = H[i][m - 1];
                 }
-                for (int j = m; j <= high; j++) {
-                    double g = 0.0;
-                    for (int i = m; i <= high; i++) {
+                لكل (صحيح j = m; j <= مٿاهون; j++) {
+                    مزدوج g = 0.0;
+                    لكل (صحيح i = m; i <= مٿاهون; i++) {
                         g += ort[i] * V[i][j];
                     }
                     // Double division avoids possible underflow
                     g = (g / ort[m]) / H[m][m - 1];
-                    for (int i = m; i <= high; i++) {
+                    لكل (صحيح i = m; i <= مٿاهون; i++) {
                         V[i][j] += g * ort[i];
                     }
                 }
@@ -858,26 +858,26 @@ private:
     }
 
     // Releases all internal working memory.
-    void release() {
+    فراغ release() {
         // releases the working data
-        delete[] d; d = NULL;
-        delete[] e; e = NULL;
-        delete[] ort; ort = NULL;
-        for (int i = 0; i < n; i++) {
-            if (H) delete[] H[i];
-            if (V) delete[] V[i];
+        ميٽيو[] d; d = عدم;
+        ميٽيو[] e; e = عدم;
+        ميٽيو[] ort; ort = عدم;
+        لكل (صحيح i = 0; i < n; i++) {
+            إذا (H) ميٽيو[] H[i];
+            إذا (V) ميٽيو[] V[i];
         }
-        delete[] H; H = NULL;
-        delete[] V; V = NULL;
+        ميٽيو[] H; H = عدم;
+        ميٽيو[] V; V = عدم;
     }
 
     // Computes the Eigenvalue Decomposition for a matrix given in H.
-    void compute() {
+    فراغ compute() {
         // Allocate memory for the working data.
-        V = alloc_2d<double> (n, n, 0.0);
-        d = alloc_1d<double> (n);
-        e = alloc_1d<double> (n);
-        ort = alloc_1d<double> (n);
+        V = alloc_2d<مزدوج> (n, n, 0.0);
+        d = alloc_1d<مزدوج> (n);
+        e = alloc_1d<مزدوج> (n);
+        ort = alloc_1d<مزدوج> (n);
         {
             // Reduce to Hessenberg form.
             orthes();
@@ -885,28 +885,28 @@ private:
             hqr2();
             // Copy eigenvalues to OpenCV Matrix.
             _eigenvalues.create(1, n, CV_64FC1);
-            for (int i = 0; i < n; i++) {
-                _eigenvalues.at<double> (0, i) = d[i];
+            لكل (صحيح i = 0; i < n; i++) {
+                _eigenvalues.at<مزدوج> (0, i) = d[i];
             }
             // Copy eigenvectors to OpenCV Matrix.
             _eigenvectors.create(n, n, CV_64FC1);
-            for (int i = 0; i < n; i++)
-                for (int j = 0; j < n; j++)
-                    _eigenvectors.at<double> (i, j) = V[i][j];
+            لكل (صحيح i = 0; i < n; i++)
+                لكل (صحيح j = 0; j < n; j++)
+                    _eigenvectors.at<مزدوج> (i, j) = V[i][j];
             // Deallocate the memory by releasing all internal working data.
             release();
         }
     }
 
-public:
+عام:
     // Initializes & computes the Eigenvalue Decomposition for a general matrix
     // given in src. This function is a port of the EigenvalueSolver in JAMA,
     // which has been released to public domain by The MathWorks and the
     // National Institute of Standards and Technology (NIST).
     EigenvalueDecomposition() :
         n(0),
-        d(NULL), e(NULL), ort(NULL),
-        V(NULL), H(NULL)
+        d(عدم), e(عدم), ort(عدم),
+        V(عدم), H(عدم)
     {
         // nothing
     }
@@ -915,27 +915,27 @@ public:
     // given in src. This function is a port of the EigenvalueSolver in JAMA,
     // which has been released to public domain by The MathWorks and the
     // National Institute of Standards and Technology (NIST).
-    void compute(InputArray src, bool fallbackSymmetric = true)
+    فراغ compute(داخلا_Array src, منطقي fallback_متناظر = سچ)
     {
         CV_INSTRUMENT_REGION();
 
-        if(fallbackSymmetric && isSymmetric(src)) {
+        إذا(fallback_متناظر && is_متناظر_2(src)) {
             // Fall back to OpenCV for a symmetric matrix!
             cv::eigen(src, _eigenvalues, _eigenvectors);
-        } else {
+        } وإلا {
             Mat tmp;
             // Convert the given input matrix to double. Is there any way to
             // prevent allocating the temporary memory? Only used for copying
             // into working memory and deallocated after.
-            src.getMat().convertTo(tmp, CV_64FC1);
+            src.getMat().convert_منزل(tmp, CV_64FC1);
             // Get dimension of the matrix.
-            this->n = tmp.cols;
+            هذا->n = tmp.کانن_ڳڻپ;
             // Allocate the matrix data to work on.
-            this->H = alloc_2d<double> (n, n);
+            هذا->H = alloc_2d<مزدوج> (n, n);
             // Now safely copy the data.
-            for (int i = 0; i < tmp.rows; i++) {
-                for (int j = 0; j < tmp.cols; j++) {
-                    this->H[i][j] = tmp.at<double>(i, j);
+            لكل (صحيح i = 0; i < tmp.صفون; i++) {
+                لكل (صحيح j = 0; j < tmp.کانن_ڳڻپ; j++) {
+                    هذا->H[i][j] = tmp.at<مزدوج>(i, j);
                 }
             }
             // Deallocates the temporary matrix before computing.
@@ -948,58 +948,58 @@ public:
     ~EigenvalueDecomposition() { release(); }
 
     // Returns the eigenvalues of the Eigenvalue Decomposition.
-    Mat eigenvalues() const { return _eigenvalues; }
+    Mat eigenvalues() ثابت { أرجع _eigenvalues; }
     // Returns the eigenvectors of the Eigenvalue Decomposition.
-    Mat eigenvectors() const { return _eigenvectors; }
+    Mat eigenvectors() ثابت { أرجع _eigenvectors; }
 };
 
-void eigenNonSymmetric(InputArray _src, OutputArray _evals, OutputArray _evects)
+فراغ eigen_Non_متناظر(داخلا_Array _src, OutputArray _evals, OutputArray _evects)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    int type = src.type();
-    int n = src.rows;
+    صحيح type = src.type();
+    صحيح n = src.صفون;
 
-    CV_Assert(src.rows == src.cols);
+    CV_Assert(src.صفون == src.کانن_ڳڻپ);
     CV_Assert(type == CV_32F || type == CV_64F);
 
     Mat src64f;
-    if (type == CV_32F)
-        src.convertTo(src64f, CV_32FC1);
-    else
+    إذا (type == CV_32F)
+        src.convert_منزل(src64f, CV_32FC1);
+    وإلا
         src64f = src;
 
     EigenvalueDecomposition eigensystem;
-    eigensystem.compute(src64f, false);
+    eigensystem.compute(src64f, خطأ);
 
     // EigenvalueDecomposition returns transposed and non-sorted eigenvalues
-    std::vector<double> eigenvalues64f;
-    eigensystem.eigenvalues().copyTo(eigenvalues64f);
+    std::vector<مزدوج> eigenvalues64f;
+    eigensystem.eigenvalues().copy_منزل(eigenvalues64f);
     CV_Assert(eigenvalues64f.size() == (size_t)n);
 
-    std::vector<int> sort_indexes(n);
-    cv::sortIdx(eigenvalues64f, sort_indexes, SORT_EVERY_ROW | SORT_DESCENDING);
+    std::vector<صحيح> ترتيب_ڏيو_indexes(n);
+    cv::ترتيب_ڏيو_Idx(eigenvalues64f, ترتيب_ڏيو_indexes, ترتيب_ڏيو_EVERY_صف | ترتيب_ڏيو_DESCENDING);
 
-    std::vector<double> sorted_eigenvalues64f(n);
-    for (int i = 0; i < n; i++) sorted_eigenvalues64f[i] = eigenvalues64f[sort_indexes[i]];
+    std::vector<مزدوج> sorted_eigenvalues64f(n);
+    لكل (صحيح i = 0; i < n; i++) sorted_eigenvalues64f[i] = eigenvalues64f[ترتيب_ڏيو_indexes[i]];
 
-    Mat(n, 1, CV_64F, &sorted_eigenvalues64f[0]).convertTo(_evals, type);
+    Mat(n, 1, CV_64F, &sorted_eigenvalues64f[0]).convert_منزل(_evals, type);
 
-    if( _evects.needed() )
+    إذا( _evects.needed() )
     {
         Mat eigenvectors64f = eigensystem.eigenvectors().t(); // transpose
-        CV_Assert(eigenvectors64f.rows == n);
-        CV_Assert(eigenvectors64f.cols == n);
-        Mat_<double> sorted_eigenvectors64f(n, n, CV_64FC1);
-        for (int i = 0; i < n; i++)
+        CV_Assert(eigenvectors64f.صفون == n);
+        CV_Assert(eigenvectors64f.کانن_ڳڻپ == n);
+        Mat_<مزدوج> sorted_eigenvectors64f(n, n, CV_64FC1);
+        لكل (صحيح i = 0; i < n; i++)
         {
-            double* pDst = sorted_eigenvectors64f.ptr<double>(i);
-            double* pSrc = eigenvectors64f.ptr<double>(sort_indexes[i]);
-            CV_Assert(pSrc != NULL);
-            memcpy(pDst, pSrc, n * sizeof(double));
+            مزدوج* pDst = sorted_eigenvectors64f.ptr<مزدوج>(i);
+            مزدوج* pSrc = eigenvectors64f.ptr<مزدوج>(ترتيب_ڏيو_indexes[i]);
+            CV_Assert(pSrc != عدم);
+            يادگيري_نقل(pDst, pSrc, n * حجم(مزدوج));
         }
-        sorted_eigenvectors64f.convertTo(_evects, type);
+        sorted_eigenvectors64f.convert_منزل(_evects, type);
     }
 }
 
@@ -1008,139 +1008,139 @@ void eigenNonSymmetric(InputArray _src, OutputArray _evals, OutputArray _evects)
 // Linear Discriminant Analysis implementation
 //------------------------------------------------------------------------------
 
-LDA::LDA(int num_components) : _num_components(num_components) { }
+LDA::LDA(صحيح انگ_components) : انگ_components_2(انگ_components) { }
 
-LDA::LDA(InputArrayOfArrays src, InputArray labels, int num_components) : _num_components(num_components)
+LDA::LDA(داخلا_Array_جو_Arrays src, داخلا_Array labels, صحيح انگ_components) : انگ_components_2(انگ_components)
 {
-    this->compute(src, labels); //! compute eigenvectors and eigenvalues
+    هذا->compute(src, labels); //! compute eigenvectors and eigenvalues
 }
 
 LDA::~LDA() {}
 
-void LDA::save(const String& filename) const
+فراغ LDA::save(ثابت String& filename) ثابت
 {
     FileStorage fs(filename, FileStorage::WRITE);
-    if (!fs.isOpened()) {
+    إذا (!fs.isOpened()) {
         CV_Error(Error::StsError, "File can't be opened for writing!");
     }
-    this->save(fs);
+    هذا->save(fs);
     fs.release();
 }
 
 // Deserializes this object from a given filename.
-void LDA::load(const String& filename) {
+فراغ LDA::load(ثابت String& filename) {
     FileStorage fs(filename, FileStorage::READ);
-    if (!fs.isOpened())
+    إذا (!fs.isOpened())
        CV_Error(Error::StsError, "File can't be opened for reading!");
-    this->load(fs);
+    هذا->load(fs);
     fs.release();
 }
 
 // Serializes this object to a given FileStorage.
-void LDA::save(FileStorage& fs) const {
+فراغ LDA::save(FileStorage& fs) ثابت {
     // write matrices
-    fs << "num_components" << _num_components;
+    fs << "num_components" << انگ_components_2;
     fs << "eigenvalues" << _eigenvalues;
     fs << "eigenvectors" << _eigenvectors;
 }
 
 // Deserializes this object from a given FileStorage.
-void LDA::load(const FileStorage& fs) {
+فراغ LDA::load(ثابت FileStorage& fs) {
     //read matrices
-    fs["num_components"] >> _num_components;
+    fs["num_components"] >> انگ_components_2;
     fs["eigenvalues"] >> _eigenvalues;
     fs["eigenvectors"] >> _eigenvectors;
 }
 
-void LDA::lda(InputArrayOfArrays _src, InputArray _lbls) {
+فراغ LDA::lda(داخلا_Array_جو_Arrays _src, داخلا_Array _lbls) {
     // get data
     Mat src = _src.getMat();
-    std::vector<int> labels;
+    std::vector<صحيح> labels;
     // safely copy the labels
     {
         Mat tmp = _lbls.getMat();
-        for(unsigned int i = 0; i < tmp.total(); i++) {
-            labels.push_back(tmp.at<int>(i));
+        لكل(بنانشان صحيح i = 0; i < tmp.ڪل(); i++) {
+            labels.push_back(tmp.at<صحيح>(i));
         }
     }
     // turn into row sampled matrix
-    Mat data;
+    Mat معلومات;
     // ensure working matrix is double precision
-    src.convertTo(data, CV_64FC1);
+    src.convert_منزل(معلومات, CV_64FC1);
     // maps the labels, so they're ascending: [0,1,...,C]
-    std::vector<int> mapped_labels(labels.size());
-    std::vector<int> num2label = remove_dups(labels);
-    std::map<int, int> label2num;
-    for (int i = 0; i < (int)num2label.size(); i++)
+    std::vector<صحيح> mapped_labels(labels.size());
+    std::vector<صحيح> num2label = remove_dups(labels);
+    std::map<صحيح, صحيح> label2num;
+    لكل (صحيح i = 0; i < (صحيح)num2label.size(); i++)
         label2num[num2label[i]] = i;
-    for (size_t i = 0; i < labels.size(); i++)
+    لكل (size_t i = 0; i < labels.size(); i++)
         mapped_labels[i] = label2num[labels[i]];
     // get sample size, dimension
-    int N = data.rows;
-    int D = data.cols;
+    صحيح N = معلومات.صفون;
+    صحيح D = معلومات.کانن_ڳڻپ;
     // number of unique labels
-    int C = (int)num2label.size();
+    صحيح C = (صحيح)num2label.size();
     // we can't do a LDA on one class, what do you
     // want to separate from each other then?
-    if(C == 1) {
-        String error_message = "At least two classes are needed to perform a LDA. Reason: Only one class was given!";
-        CV_Error(Error::StsBadArg, error_message);
+    إذا(C == 1) {
+        String error_پيغام = "At least two classes are needed to perform a LDA. Reason: Only one class was given!";
+        CV_Error(Error::StsBadArg, error_پيغام);
     }
     // throw error if less labels, than samples
-    if (labels.size() != static_cast<size_t>(N)) {
-        String error_message = format("The number of samples must equal the number of labels. Given %zu labels, %d samples. ", labels.size(), N);
-        CV_Error(Error::StsBadArg, error_message);
+    إذا (labels.size() != static_cast<size_t>(N)) {
+        String error_پيغام = format("The number of samples must equal the number of labels. Given %zu labels, %d samples. ", labels.size(), N);
+        CV_Error(Error::StsBadArg, error_پيغام);
     }
     // warn if within-classes scatter matrix becomes singular
-    if (N < D) {
-        std::cout << "Warning: Less observations than feature dimension given!"
+    إذا (N < D) {
+        std::ٻاهر << "Warning: Less observations than feature dimension given!"
                   << "Computation will probably fail."
-                  << std::endl;
+                  << std::سٽ_پڄاڻي;
     }
     // clip number of components to be a valid number
-    if ((_num_components <= 0) || (_num_components >= C)) {
-        _num_components = (C - 1);
+    إذا ((انگ_components_2 <= 0) || (انگ_components_2 >= C)) {
+        انگ_components_2 = (C - 1);
     }
     // holds the mean over all classes
-    Mat meanTotal = Mat::zeros(1, D, data.type());
+    Mat سراسري_ڪل = Mat::zeros(1, D, معلومات.type());
     // holds the mean for each class
-    std::vector<Mat> meanClass(C);
-    std::vector<int> numClass(C);
+    std::vector<Mat> سراسري_Class(C);
+    std::vector<صحيح> انگ_Class(C);
     // initialize
-    for (int i = 0; i < C; i++) {
-        numClass[i] = 0;
-        meanClass[i] = Mat::zeros(1, D, data.type()); //! Dx1 image vector
+    لكل (صحيح i = 0; i < C; i++) {
+        انگ_Class[i] = 0;
+        سراسري_Class[i] = Mat::zeros(1, D, معلومات.type()); //! Dx1 image vector
     }
     // calculate sums
-    for (int i = 0; i < N; i++) {
-        Mat instance = data.row(i);
-        int classIdx = mapped_labels[i];
-        add(meanTotal, instance, meanTotal);
-        add(meanClass[classIdx], instance, meanClass[classIdx]);
-        numClass[classIdx]++;
+    لكل (صحيح i = 0; i < N; i++) {
+        Mat instance = معلومات.صف(i);
+        صحيح classIdx = mapped_labels[i];
+        جوڙيو(سراسري_ڪل, instance, سراسري_ڪل);
+        جوڙيو(سراسري_Class[classIdx], instance, سراسري_Class[classIdx]);
+        انگ_Class[classIdx]++;
     }
     // calculate total mean
-    meanTotal.convertTo(meanTotal, meanTotal.type(), 1.0 / static_cast<double> (N));
+    سراسري_ڪل.convert_منزل(سراسري_ڪل, سراسري_ڪل.type(), 1.0 / static_cast<مزدوج> (N));
     // calculate class means
-    for (int i = 0; i < C; i++) {
-        meanClass[i].convertTo(meanClass[i], meanClass[i].type(), 1.0 / static_cast<double> (numClass[i]));
+    لكل (صحيح i = 0; i < C; i++) {
+        سراسري_Class[i].convert_منزل(سراسري_Class[i], سراسري_Class[i].type(), 1.0 / static_cast<مزدوج> (انگ_Class[i]));
     }
     // subtract class means
-    for (int i = 0; i < N; i++) {
-        int classIdx = mapped_labels[i];
-        Mat instance = data.row(i);
-        subtract(instance, meanClass[classIdx], instance);
+    لكل (صحيح i = 0; i < N; i++) {
+        صحيح classIdx = mapped_labels[i];
+        Mat instance = معلومات.صف(i);
+        ڪٽيو(instance, سراسري_Class[classIdx], instance);
     }
     // calculate within-classes scatter
-    Mat Sw = Mat::zeros(D, D, data.type());
-    mulTransposed(data, Sw, true);
+    Mat Sw = Mat::zeros(D, D, معلومات.type());
+    mulTransposed(معلومات, Sw, سچ);
     // calculate between-classes scatter
-    Mat Sb = Mat::zeros(D, D, data.type());
-    for (int i = 0; i < C; i++) {
+    Mat Sb = Mat::zeros(D, D, معلومات.type());
+    لكل (صحيح i = 0; i < C; i++) {
         Mat tmp;
-        subtract(meanClass[i], meanTotal, tmp);
-        mulTransposed(tmp, tmp, true);
-        add(Sb, tmp, Sb);
+        ڪٽيو(سراسري_Class[i], سراسري_ڪل, tmp);
+        mulTransposed(tmp, tmp, سچ);
+        جوڙيو(Sb, tmp, Sb);
     }
     // invert Sw
     Mat Swi = Sw.inv();
@@ -1154,39 +1154,39 @@ void LDA::lda(InputArrayOfArrays _src, InputArray _lbls) {
     // reshape eigenvalues, so they are stored by column
     _eigenvalues = _eigenvalues.reshape(1, 1);
     // get sorted indices descending by their eigenvalue
-    std::vector<int> sorted_indices = argsort(_eigenvalues, false);
+    std::vector<صحيح> sorted_indices = argsort(_eigenvalues, خطأ);
     // now sort eigenvalues and eigenvectors accordingly
-    _eigenvalues = sortMatrixColumnsByIndices(_eigenvalues, sorted_indices);
-    _eigenvectors = sortMatrixColumnsByIndices(_eigenvectors, sorted_indices);
+    _eigenvalues = ترتيب_ڏيو_ميٽرڪس_Columns_By_Indices(_eigenvalues, sorted_indices);
+    _eigenvectors = ترتيب_ڏيو_ميٽرڪس_Columns_By_Indices(_eigenvectors, sorted_indices);
     // and now take only the num_components and we're out!
-    _eigenvalues = Mat(_eigenvalues, Range::all(), Range(0, _num_components));
-    _eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
+    _eigenvalues = Mat(_eigenvalues, Range::all(), Range(0, انگ_components_2));
+    _eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, انگ_components_2));
 }
 
-void LDA::compute(InputArrayOfArrays _src, InputArray _lbls) {
-    switch(_src.kind()) {
-    case _InputArray::STD_VECTOR_MAT:
-    case _InputArray::STD_ARRAY_MAT:
-        lda(asRowMatrix(_src, CV_64FC1), _lbls);
-        break;
-    case _InputArray::MAT:
+فراغ LDA::compute(داخلا_Array_جو_Arrays _src, داخلا_Array _lbls) {
+    بدل(_src.قسم()) {
+    حالة داخلا_Array_2::STD_ويڪٽر_MAT:
+    حالة داخلا_Array_2::STD_ARRAY_MAT:
+        lda(as_صف_ميٽرڪس(_src, CV_64FC1), _lbls);
+        اكسر;
+    حالة داخلا_Array_2::MAT:
         lda(_src.getMat(), _lbls);
-        break;
-    default:
-        String error_message= format("InputArray Datatype %d is not supported.", _src.kind());
-        CV_Error(Error::StsBadArg, error_message);
-        break;
+        اكسر;
+    افتراضي:
+        String error_پيغام= format("InputArray Datatype %d is not supported.", _src.قسم());
+        CV_Error(Error::StsBadArg, error_پيغام);
+        اكسر;
     }
 }
 
 // Projects one or more row aligned samples into the LDA subspace.
-Mat LDA::project(InputArray src) {
-   return subspaceProject(_eigenvectors, Mat(), src);
+Mat LDA::project(داخلا_Array src) {
+   أرجع subspaceProject(_eigenvectors, Mat(), src);
 }
 
 // Reconstructs projections from the LDA subspace from one or more row aligned samples.
-Mat LDA::reconstruct(InputArray src) {
-   return subspaceReconstruct(_eigenvectors, Mat(), src);
+Mat LDA::reconstruct(داخلا_Array src) {
+   أرجع subspaceReconstruct(_eigenvectors, Mat(), src);
 }
 
 }

@@ -4,62 +4,62 @@
 // Copyright (C) 2026, BigVision LLC, all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-namespace cv {
+نطاق cv {
 
 // In place (dst shares the data of a continuous src) only the header changes; otherwise the
 // elements are copied into dst.
-static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
+ساكن فراغ reshape_منزل(داخلا_Array _src, OutputArray _dst, ثابت MatShape& shape)
 {
     Mat src = _src.getMat();
-    CV_Assert(shape.total() == src.total());
-    if (_dst.kind() == _InputArray::MAT && src.isContinuous())
+    CV_Assert(shape.ڪل() == src.ڪل());
+    إذا (_dst.قسم() == داخلا_Array_2::MAT && src.isContinuous())
     {
         Mat& dst = _dst.getMatRef();
-        if (dst.data && dst.data == src.data)
+        إذا (dst.معلومات && dst.معلومات == src.معلومات)
         {
             dst = src.reshape(0, shape);
-            return;
+            أرجع;
         }
     }
     _dst.create(shape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data)
-        return;
-    if (dst.isContinuous())
+    إذا (dst.معلومات == src.معلومات)
+        أرجع;
+    إذا (dst.isContinuous())
     {
-        src.copyTo(Mat(src.dims, src.size.p, src.type(), dst.data));
-        return;
+        src.copy_منزل(Mat(src.dims, src.size.p, src.type(), dst.معلومات));
+        أرجع;
     }
     // create() keeps a preallocated destination of the right shape even when it is strided
     Mat tmp;
-    src.copyTo(tmp);
-    Mat(shape.dims, shape.p, src.type(), tmp.data).copyTo(dst);
+    src.copy_منزل(tmp);
+    Mat(shape.dims, shape.p, src.type(), tmp.معلومات).copy_منزل(dst);
 }
 
-void squeeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+فراغ squeeze(داخلا_Array src, OutputArray dst, ثابت std::vector<صحيح>& axes)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().squeeze(axes));
+    reshape_منزل(src, dst, src.shape().squeeze(axes));
 }
 
-void unsqueeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+فراغ unsqueeze(داخلا_Array src, OutputArray dst, ثابت std::vector<صحيح>& axes)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().unsqueeze(axes));
+    reshape_منزل(src, dst, src.shape().unsqueeze(axes));
 }
 
-void flatten(InputArray src, OutputArray dst, int startAxis, int endAxis)
+فراغ flatten(داخلا_Array src, OutputArray dst, صحيح شروعات_Axis, صحيح پڇاڙي_Axis)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().flatten(startAxis, endAxis));
+    reshape_منزل(src, dst, src.shape().flatten(شروعات_Axis, پڇاڙي_Axis));
 }
 
-void reshape(InputArray src, OutputArray dst, const std::vector<int>& newShape, bool allowZero)
+فراغ reshape(داخلا_Array src, OutputArray dst, ثابت std::vector<صحيح>& newShape, منطقي allowZero)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().reshape(MatShape(newShape), allowZero));
+    reshape_منزل(src, dst, src.shape().reshape(MatShape(newShape), allowZero));
 }
 
 } // namespace cv

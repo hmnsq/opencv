@@ -3,537 +3,537 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
-#include "stat_parallel.hpp"
-#include "opencv2/core/detail/dispatch_helper.impl.hpp"
-#include <algorithm>
+#ضمن "precomp.hpp"
+#ضمن "opencl_kernels_core.hpp"
+#ضمن "stat.hpp"
+#ضمن "stat_parallel.hpp"
+#ضمن "opencv2/core/detail/dispatch_helper.impl.hpp"
+#ضمن <algorithm>
 
-#include "minmax.simd.hpp"
-#include "minmax.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ضمن "minmax.simd.hpp"
+#ضمن "minmax.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+نطاق cv {
 
-static MinMaxIdxFunc getMinMaxIdxFunc(int depth)
+ساكن MinMaxIdxFunc getMinMaxIdxFunc(صحيح اونهائي)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getMinMaxIdxFunc, (depth),
+    CV_CPU_DISPATCH(getMinMaxIdxFunc, (اونهائي),
                     CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // The function expects 1-based indexing for ofs
 // Zero is treated as invalid offset (not found)
-static void ofs2idx(const Mat& a, size_t ofs, int* idx)
+ساكن فراغ ofs2idx(ثابت Mat& a, size_t ofs, صحيح* idx)
 {
-    int i, d = a.dims;
-    if( ofs > 0 )
+    صحيح i, d = a.dims;
+    إذا( ofs > 0 )
     {
         ofs--;
-        for( i = d-1; i >= 0; i-- )
+        لكل( i = d-1; i >= 0; i-- )
         {
-            int sz = a.size[i];
-            idx[i] = (int)(ofs % sz);
+            صحيح sz = a.size[i];
+            idx[i] = (صحيح)(ofs % sz);
             ofs /= sz;
         }
     }
-    else
+    وإلا
     {
-        for( i = d-1; i >= 0; i-- )
+        لكل( i = d-1; i >= 0; i-- )
             idx[i] = -1;
     }
 }
 
-#ifdef HAVE_OPENCL
+#جيڪڏهن_وصف_ٿيل HAVE_OPENCL
 
-#define MINMAX_STRUCT_ALIGNMENT 8 // sizeof double
+#وصف_ڪريو MINMAX_STRUCT_ALIGNMENT 8 // sizeof double
 
-template <typename T>
-void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
-                  int* minLoc, int* maxLoc,
-                  int groupnum, int cols, double * maxVal2)
+سانچو <قسم_نالو T>
+فراغ getMinMaxRes(ثابت Mat & db, مزدوج * minVal, مزدوج * maxVal,
+                  صحيح* minLoc, صحيح* maxLoc,
+                  صحيح groupnum, صحيح کانن_ڳڻپ, مزدوج * maxVal2)
 {
-    uint index_max = std::numeric_limits<uint>::max();
+    uint اشاريو_max = std::numeric_limits<uint>::max();
     T minval = std::numeric_limits<T>::max();
     T maxval = std::numeric_limits<T>::min() > 0 ? (T)-std::numeric_limits<T>::max() : std::numeric_limits<T>::min(), maxval2 = maxval;
-    uint minloc = index_max, maxloc = index_max;
+    uint minloc = اشاريو_max, maxloc = اشاريو_max;
 
-    size_t index = 0;
-    const T * minptr = NULL, * maxptr = NULL, * maxptr2 = NULL;
-    const uint * minlocptr = NULL, * maxlocptr = NULL;
-    if (minVal || minLoc)
+    size_t اشاريو = 0;
+    ثابت T * minptr = عدم, * maxptr = عدم, * maxptr2 = عدم;
+    ثابت uint * minlocptr = عدم, * maxlocptr = عدم;
+    إذا (minVal || minLoc)
     {
         minptr = db.ptr<T>();
-        index += sizeof(T) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        اشاريو += حجم(T) * groupnum;
+        اشاريو = align_سائيز(اشاريو, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal || maxLoc)
+    إذا (maxVal || maxLoc)
     {
-        maxptr = (const T *)(db.ptr() + index);
-        index += sizeof(T) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        maxptr = (ثابت T *)(db.ptr() + اشاريو);
+        اشاريو += حجم(T) * groupnum;
+        اشاريو = align_سائيز(اشاريو, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (minLoc)
+    إذا (minLoc)
     {
-        minlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        minlocptr = (ثابت uint *)(db.ptr() + اشاريو);
+        اشاريو += حجم(uint) * groupnum;
+        اشاريو = align_سائيز(اشاريو, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxLoc)
+    إذا (maxLoc)
     {
-        maxlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        maxlocptr = (ثابت uint *)(db.ptr() + اشاريو);
+        اشاريو += حجم(uint) * groupnum;
+        اشاريو = align_سائيز(اشاريو, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal2)
-        maxptr2 = (const T *)(db.ptr() + index);
+    إذا (maxVal2)
+        maxptr2 = (ثابت T *)(db.ptr() + اشاريو);
 
-    for (int i = 0; i < groupnum; i++)
+    لكل (صحيح i = 0; i < groupnum; i++)
     {
-        if (minptr && minptr[i] <= minval)
+        إذا (minptr && minptr[i] <= minval)
         {
-            if (minptr[i] == minval)
+            إذا (minptr[i] == minval)
             {
-                if (minlocptr)
+                إذا (minlocptr)
                     minloc = std::min(minlocptr[i], minloc);
             }
-            else
+            وإلا
             {
-                if (minlocptr)
+                إذا (minlocptr)
                     minloc = minlocptr[i];
                 minval = minptr[i];
             }
         }
-        if (maxptr && maxptr[i] >= maxval)
+        إذا (maxptr && maxptr[i] >= maxval)
         {
-            if (maxptr[i] == maxval)
+            إذا (maxptr[i] == maxval)
             {
-                if (maxlocptr)
+                إذا (maxlocptr)
                     maxloc = std::min(maxlocptr[i], maxloc);
             }
-            else
+            وإلا
             {
-                if (maxlocptr)
+                إذا (maxlocptr)
                     maxloc = maxlocptr[i];
                 maxval = maxptr[i];
             }
         }
-        if (maxptr2 && maxptr2[i] > maxval2)
+        إذا (maxptr2 && maxptr2[i] > maxval2)
             maxval2 = maxptr2[i];
     }
-    bool zero_mask = (minLoc && minloc == index_max) ||
-    (maxLoc && maxloc == index_max);
+    منطقي zero_نقاب = (minLoc && minloc == اشاريو_max) ||
+    (maxLoc && maxloc == اشاريو_max);
 
-    if (minVal)
-        *minVal = zero_mask ? 0 : (double)minval;
-    if (maxVal)
-        *maxVal = zero_mask ? 0 : (double)maxval;
-    if (maxVal2)
-        *maxVal2 = zero_mask ? 0 : (double)maxval2;
+    إذا (minVal)
+        *minVal = zero_نقاب ? 0 : (مزدوج)minval;
+    إذا (maxVal)
+        *maxVal = zero_نقاب ? 0 : (مزدوج)maxval;
+    إذا (maxVal2)
+        *maxVal2 = zero_نقاب ? 0 : (مزدوج)maxval2;
 
-    if (minLoc)
+    إذا (minLoc)
     {
-        minLoc[0] = zero_mask ? -1 : minloc / cols;
-        minLoc[1] = zero_mask ? -1 : minloc % cols;
+        minLoc[0] = zero_نقاب ? -1 : minloc / کانن_ڳڻپ;
+        minLoc[1] = zero_نقاب ? -1 : minloc % کانن_ڳڻپ;
     }
-    if (maxLoc)
+    إذا (maxLoc)
     {
-        maxLoc[0] = zero_mask ? -1 : maxloc / cols;
-        maxLoc[1] = zero_mask ? -1 : maxloc % cols;
+        maxLoc[0] = zero_نقاب ? -1 : maxloc / کانن_ڳڻپ;
+        maxLoc[1] = zero_نقاب ? -1 : maxloc % کانن_ڳڻپ;
     }
 }
 
-typedef void (*getMinMaxResFunc)(const Mat & db, double * minVal, double * maxVal,
-                                 int * minLoc, int *maxLoc, int gropunum, int cols, double * maxVal2);
+تعريفنوع فراغ (*getMinMaxResFunc)(ثابت Mat & db, مزدوج * minVal, مزدوج * maxVal,
+                                 صحيح * minLoc, صحيح *maxLoc, صحيح gropunum, صحيح کانن_ڳڻپ, مزدوج * maxVal2);
 
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                   int ddepth, bool absValues, InputArray _src2, double * maxVal2)
+منطقي ocl_minMaxIdx( داخلا_Array _src, مزدوج* minVal, مزدوج* maxVal, صحيح* minLoc, صحيح* maxLoc, داخلا_Array نقاب_2,
+                   صحيح ddepth, منطقي abs_قدرون, داخلا_Array _src2, مزدوج * maxVal2)
 {
-    const ocl::Device & dev = ocl::Device::getDefault();
+    ثابت ocl::Device & dev = ocl::Device::getDefault();
 
-#ifdef __ANDROID__
-    if (dev.isNVidia())
-        return false;
-#endif
+#جيڪڏهن_وصف_ٿيل __ANDROID__
+    إذا (dev.isNVidia())
+        أرجع خطأ;
+#جيڪڏهن_پورو
 
-    if (dev.deviceVersionMajor() == 1 && dev.deviceVersionMinor() < 2)
+    إذا (dev.device_نسخو_Major() == 1 && dev.device_نسخو_Minor() < 2)
     {
         // 'static' storage class specifier used by "minmaxloc" is available from OpenCL 1.2+ only
-        return false;
+        أرجع خطأ;
     }
 
-    bool doubleSupport = dev.doubleFPConfig() > 0, haveMask = !_mask.empty(),
-    haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-    kercn = haveMask ? cn : std::min(4, ocl::predictOptimalVectorWidth(_src, _src2));
+    منطقي doubleSupport = dev.doubleFPConfig() > 0, have_نقاب = !نقاب_2.empty(),
+    haveSrc2 = _src2.قسم() != داخلا_Array_2::NONE;
+    صحيح type = _src.type(), اونهائي = CV_MAT_اونهائي(type), cn = CV_MAT_CN(type),
+    kercn = have_نقاب ? cn : std::min(4, ocl::predict_Optimal_ويڪٽر_ويڪر(_src, _src2));
 
-    if (depth >= CV_16F)
-        return false;
+    إذا (اونهائي >= CV_16F)
+        أرجع خطأ;
 
     // disabled following modes since it occasionally fails on AMD devices (e.g. A10-6800K, sep. 2014)
-    if ((haveMask || type == CV_32FC1) && dev.isAMD())
-        return false;
+    إذا ((have_نقاب || type == CV_32FC1) && dev.isAMD())
+        أرجع خطأ;
 
-    CV_Assert( (cn == 1 && (!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
+    CV_Assert( (cn == 1 && (!have_نقاب || نقاب_2.type() == CV_8U || نقاب_2.type() == CV_8S || نقاب_2.type() == CV_Bool)) ||
               (cn >= 1 && !minLoc && !maxLoc) );
 
-    if (ddepth < 0)
-        ddepth = depth;
+    إذا (ddepth < 0)
+        ddepth = اونهائي;
 
     CV_Assert(!haveSrc2 || _src2.type() == type);
 
-    if (depth == CV_32S || depth == CV_8S || depth == CV_32U || depth == CV_64U ||
-        depth == CV_64S || depth == CV_16F || depth == CV_16BF)
-        return false;
+    إذا (اونهائي == CV_32S || اونهائي == CV_8S || اونهائي == CV_32U || اونهائي == CV_64U ||
+        اونهائي == CV_64S || اونهائي == CV_16F || اونهائي == CV_16BF)
+        أرجع خطأ;
 
-    if ((depth == CV_64F || ddepth == CV_64F) && !doubleSupport)
-        return false;
+    إذا ((اونهائي == CV_64F || ddepth == CV_64F) && !doubleSupport)
+        أرجع خطأ;
 
-    int groupnum = dev.maxComputeUnits();
-    size_t wgs = dev.maxWorkGroupSize();
+    صحيح groupnum = dev.maxComputeUnits();
+    size_t wgs = dev.max_Work_گروهه_سائيز();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    صحيح wgs2_aligned = 1;
+    طالما (wgs2_aligned < (صحيح)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    bool needMinVal = minVal || minLoc, needMinLoc = minLoc != NULL,
-    needMaxVal = maxVal || maxLoc, needMaxLoc = maxLoc != NULL;
+    منطقي needMinVal = minVal || minLoc, needMinLoc = minLoc != عدم,
+    needMaxVal = maxVal || maxLoc, needMaxLoc = maxLoc != عدم;
 
     // in case of mask we must know whether mask is filled with zeros or not
     // so let's calculate min or max location, if it's undefined, so mask is zeros
-    if (!(needMaxLoc || needMinLoc) && haveMask)
+    إذا (!(needMaxLoc || needMinLoc) && have_نقاب)
     {
-        if (needMinVal)
-            needMinLoc = true;
-        else
-            needMaxLoc = true;
+        إذا (needMinVal)
+            needMinLoc = سچ;
+        وإلا
+            needMaxLoc = سچ;
     }
 
-    char cvt[2][50];
+    حرف cvt[2][50];
     String opts = format("-D DEPTH_%d -D srcT1=%s%s -D WGS=%d -D srcT=%s"
                          " -D WGS2_ALIGNED=%d%s%s%s -D kercn=%d%s%s%s%s"
                          " -D dstT1=%s -D dstT=%s -D convertToDT=%s%s%s%s%s -D wdepth=%d -D convertFromU=%s"
                          " -D MINMAX_STRUCT_ALIGNMENT=%d",
-                         depth, ocl::typeToStr(depth), haveMask ? " -D HAVE_MASK" : "", (int)wgs,
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), wgs2_aligned,
+                         اونهائي, ocl::type_منزل_Str(اونهائي), have_نقاب ? " -D HAVE_MASK" : "", (صحيح)wgs,
+                         ocl::type_منزل_Str(CV_MAKE_TYPE(اونهائي, kercn)), wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
-                         _mask.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
+                         نقاب_2.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
                          needMinVal ? " -D NEED_MINVAL" : "", needMaxVal ? " -D NEED_MAXVAL" : "",
                          needMinLoc ? " -D NEED_MINLOC" : "", needMaxLoc ? " -D NEED_MAXLOC" : "",
-                         ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKE_TYPE(ddepth, kercn)),
-                         ocl::convertTypeStr(depth, ddepth, kercn, cvt[0], sizeof(cvt[0])),
-                         absValues ? " -D OP_ABS" : "",
+                         ocl::type_منزل_Str(ddepth), ocl::type_منزل_Str(CV_MAKE_TYPE(ddepth, kercn)),
+                         ocl::convertTypeStr(اونهائي, ddepth, kercn, cvt[0], حجم(cvt[0])),
+                         abs_قدرون ? " -D OP_ABS" : "",
                          haveSrc2 ? " -D HAVE_SRC2" : "", maxVal2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "", ddepth,
-                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], sizeof(cvt[1])) : "noconvert",
+                         اونهائي <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], حجم(cvt[1])) : "noconvert",
                          MINMAX_STRUCT_ALIGNMENT);
 
     ocl::Kernel k("minmaxloc", ocl::core::minmaxloc_oclsrc, opts);
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
-    int esz = CV_ELEM_SIZE(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
+    صحيح esz = CV_ELEM_سائيز(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
     dbsize = groupnum * ((needMinVal ? esz : 0) + (needMaxVal ? esz : 0) +
                          (needMinLoc ? esz32s : 0) + (needMaxLoc ? esz32s : 0) +
                          (maxVal2 ? esz : 0))
     + 5 * MINMAX_STRUCT_ALIGNMENT;
-    UMat src = _src.getUMat(), src2 = _src2.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
+    UMat src = _src.getUMat(), src2 = _src2.getUMat(), db(1, dbsize, CV_8UC1), نقاب = نقاب_2.getUMat();
 
-    if (cn > 1 && !haveMask)
+    إذا (cn > 1 && !have_نقاب)
     {
         src = src.reshape(1);
         src2 = src2.reshape(1);
     }
 
-    if (haveSrc2)
+    إذا (haveSrc2)
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(src2));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask),
-                   ocl::KernelArg::ReadOnlyNoSize(src2));
+        إذا (!have_نقاب)
+            k.دليلون(ocl::KernelArg::Read_Only_No_سائيز(src), src.کانن_ڳڻپ, (صحيح)src.ڪل(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_سائيز(src2));
+        وإلا
+            k.دليلون(ocl::KernelArg::Read_Only_No_سائيز(src), src.کانن_ڳڻپ, (صحيح)src.ڪل(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_سائيز(نقاب),
+                   ocl::KernelArg::Read_Only_No_سائيز(src2));
     }
-    else
+    وإلا
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        إذا (!have_نقاب)
+            k.دليلون(ocl::KernelArg::Read_Only_No_سائيز(src), src.کانن_ڳڻپ, (صحيح)src.ڪل(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask));
+        وإلا
+            k.دليلون(ocl::KernelArg::Read_Only_No_سائيز(src), src.کانن_ڳڻپ, (صحيح)src.ڪل(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_سائيز(نقاب));
     }
 
     size_t globalsize = groupnum * wgs;
-    if (!k.run(1, &globalsize, &wgs, true))
-        return false;
+    إذا (!k.لاڳيتو(1, &globalsize, &wgs, سچ))
+        أرجع خطأ;
 
-    static const getMinMaxResFunc functab[7] =
+    ساكن ثابت getMinMaxResFunc functab[7] =
     {
         getMinMaxRes<uchar>,
-        getMinMaxRes<char>,
+        getMinMaxRes<حرف>,
         getMinMaxRes<ushort>,
-        getMinMaxRes<short>,
-        getMinMaxRes<int>,
-        getMinMaxRes<float>,
-        getMinMaxRes<double>
+        getMinMaxRes<ننڍو>,
+        getMinMaxRes<صحيح>,
+        getMinMaxRes<عائم>,
+        getMinMaxRes<مزدوج>
     };
 
     CV_Assert(ddepth <= CV_64F);
     getMinMaxResFunc func = functab[ddepth];
 
-    int locTemp[2];
+    صحيح loc_عارضي[2];
     func(db.getMat(ACCESS_READ), minVal, maxVal,
-         needMinLoc ? minLoc ? minLoc : locTemp : minLoc,
-         needMaxLoc ? maxLoc ? maxLoc : locTemp : maxLoc,
-         groupnum, src.cols, maxVal2);
+         needMinLoc ? minLoc ? minLoc : loc_عارضي : minLoc,
+         needMaxLoc ? maxLoc ? maxLoc : loc_عارضي : maxLoc,
+         groupnum, src.کانن_ڳڻپ, maxVal2);
 
-    return true;
+    أرجع سچ;
 }
 
-#endif
+#جيڪڏهن_پورو
 
 }
 
 // serial implementation, also used for the pieces of the parallel version
-static void minMaxIdx_(cv::InputArray _src, double* minVal,
-                       double* maxVal, int* minIdx, int* maxIdx,
-                       cv::InputArray _mask)
+ساكن فراغ minMaxIdx_(cv::داخلا_Array _src, مزدوج* minVal,
+                       مزدوج* maxVal, صحيح* minIdx, صحيح* maxIdx,
+                       cv::داخلا_Array نقاب_2)
 {
-    using namespace cv;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    CV_Assert( (cn == 1 && (_mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
-               (cn > 1 && _mask.empty() && !minIdx && !maxIdx) );
+    استعمال نطاق cv;
+    صحيح type = _src.type(), اونهائي = CV_MAT_اونهائي(type), cn = CV_MAT_CN(type);
+    CV_Assert( (cn == 1 && (نقاب_2.empty() || نقاب_2.type() == CV_8U || نقاب_2.type() == CV_8S || نقاب_2.type() == CV_Bool)) ||
+               (cn > 1 && نقاب_2.empty() && !minIdx && !maxIdx) );
 
-    CV_OCL_RUN(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2  && (_mask.empty() || _src.size() == _mask.size()),
-               ocl_minMaxIdx(_src, minVal, maxVal, minIdx, maxIdx, _mask))
+    CV_OCL_لاڳيتو(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2  && (نقاب_2.empty() || _src.size() == نقاب_2.size()),
+               ocl_minMaxIdx(_src, minVal, maxVal, minIdx, maxIdx, نقاب_2))
 
-    Mat src = _src.getMat(), mask = _mask.getMat();
+    Mat src = _src.getMat(), نقاب = نقاب_2.getMat();
 
-    if (src.dims <= 2)
+    إذا (src.dims <= 2)
     {
-        if ((size_t)src.step == (size_t)mask.step || mask.empty())
+        إذا ((size_t)src.قدم == (size_t)نقاب.قدم || نقاب.empty())
         {
-            CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.data, src.step, src.cols*cn, src.rows,
-                     src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data);
+            CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.معلومات, src.قدم, src.کانن_ڳڻپ*cn, src.صفون,
+                     src.اونهائي(), minVal, maxVal, minIdx, maxIdx, نقاب.معلومات);
         }
-        CALL_HAL(minMaxIdxMaskStep, cv_hal_minMaxIdxMaskStep, src.data, src.step, src.cols*cn, src.rows,
-                 src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data, mask.step);
+        CALL_HAL(min_Max_Idx_نقاب_قدم, cv_hal_min_Max_Idx_نقاب_قدم, src.معلومات, src.قدم, src.کانن_ڳڻپ*cn, src.صفون,
+                 src.اونهائي(), minVal, maxVal, minIdx, maxIdx, نقاب.معلومات, نقاب.قدم);
     }
-    else if (src.isContinuous() && (mask.isContinuous() || mask.empty()))
+    وإلا إذا (src.isContinuous() && (نقاب.isContinuous() || نقاب.empty()))
     {
-        int res = cv_hal_minMaxIdx(src.data, 0, (int)src.total()*cn, 1, src.depth(),
-                                   minVal, maxVal, minIdx, maxIdx, mask.data);
+        صحيح res = cv_hal_minMaxIdx(src.معلومات, 0, (صحيح)src.ڪل()*cn, 1, src.اونهائي(),
+                                   minVal, maxVal, minIdx, maxIdx, نقاب.معلومات);
 
-        if (res == CV_HAL_ERROR_OK)
+        إذا (res == CV_HAL_ERROR_OK)
         {
             // minIdx[0] and minIdx[0] are always 0 for "flatten" version
-            if (minIdx)
+            إذا (minIdx)
                 ofs2idx(src, minIdx[1]+1, minIdx);
-            if (maxIdx)
+            إذا (maxIdx)
                 ofs2idx(src, maxIdx[1]+1, maxIdx);
-            return;
+            أرجع;
         }
-        else if (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
+        وإلا إذا (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
         {
-            CV_Error_(cv::Error::StsInternal,
+            CV_Error_(cv::Error::Sts_اندروني,
             ("HAL implementation minMaxIdx ==> " CVAUX_STR(cv_hal_minMaxIdx) " returned %d (0x%08x)", res, res));
         }
     }
 
-    MinMaxIdxFunc func = getMinMaxIdxFunc(depth);
+    MinMaxIdxFunc func = getMinMaxIdxFunc(اونهائي);
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ثابت Mat* arrays[] = {&src, &نقاب, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
 
     size_t minidx = 0, maxidx = 0;
     size_t startidx = 1;
-    union {
-        int i;
-        float f;
-        double d;
+    اتحاد {
+        صحيح i;
+        عائم f;
+        مزدوج d;
         int64 L;
         uint64 UL;
     } minval, maxval;
-    int planeSize = (int)it.size*cn;
+    صحيح plane_سائيز = (صحيح)it.size*cn;
     minval.L = maxval.L = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it, startidx += planeSize )
-        func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, planeSize, startidx );
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it, startidx += plane_سائيز )
+        func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, plane_سائيز, startidx );
 
-    double dminval, dmaxval;
-    if( depth <= CV_32S || depth == CV_Bool )
+    مزدوج dminval, dmaxval;
+    إذا( اونهائي <= CV_32S || اونهائي == CV_Bool )
         dminval = minval.i, dmaxval = maxval.i;
-    else if( depth == CV_32F || depth == CV_16F || depth == CV_16BF )
+    وإلا إذا( اونهائي == CV_32F || اونهائي == CV_16F || اونهائي == CV_16BF )
         dminval = minval.f, dmaxval = maxval.f;
-    else if( depth == CV_64F )
+    وإلا إذا( اونهائي == CV_64F )
         dminval = minval.d, dmaxval = maxval.d;
-    else if( depth == CV_64S || depth == CV_32U )
-        dminval = (double)minval.L, dmaxval = (double)maxval.L;
-    else {
-        CV_Assert(depth == CV_64U);
-        dminval = (double)minval.UL, dmaxval = (double)maxval.UL;
+    وإلا إذا( اونهائي == CV_64S || اونهائي == CV_32U )
+        dminval = (مزدوج)minval.L, dmaxval = (مزدوج)maxval.L;
+    وإلا {
+        CV_Assert(اونهائي == CV_64U);
+        dminval = (مزدوج)minval.UL, dmaxval = (مزدوج)maxval.UL;
     }
 
-    if( minVal )
+    إذا( minVal )
         *minVal = dminval;
-    if( maxVal )
+    إذا( maxVal )
         *maxVal = dmaxval;
 
-    if( minIdx )
+    إذا( minIdx )
         ofs2idx(src, minidx, minIdx);
-    if( maxIdx )
+    إذا( maxIdx )
         ofs2idx(src, maxidx, maxIdx);
 }
 
-void cv::minMaxIdx(InputArray _src, double* minVal,
-                   double* maxVal, int* minIdx, int* maxIdx,
-                   InputArray _mask)
+فراغ cv::minMaxIdx(داخلا_Array _src, مزدوج* minVal,
+                   مزدوج* maxVal, صحيح* minIdx, صحيح* maxIdx,
+                   داخلا_Array نقاب_2)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat())
+    إذا (!_src.isUMat())
     {
-        Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
-        const bool argsOk = (cn == 1 && (mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S ||
-                             mask.type() == CV_Bool) && src.size == mask.size))) ||
-                            (cn > 1 && mask.empty() && !minIdx && !maxIdx);
-        if (argsOk && splitForParallelStat(src, mask, chunks))
+        Mat src = _src.getMat(), نقاب = نقاب_2.getMat();
+        ثابت صحيح cn = src.channels();
+        ثابت منطقي دليلون_Ok = (cn == 1 && (نقاب.empty() || ((نقاب.type() == CV_8U || نقاب.type() == CV_8S ||
+                             نقاب.type() == CV_Bool) && src.size == نقاب.size))) ||
+                            (cn > 1 && نقاب.empty() && !minIdx && !maxIdx);
+        إذا (دليلون_Ok && ورهايو_For_Parallel_Stat(src, نقاب, chunks))
         {
-            const int n = (int)chunks.size();
-            std::vector<double> mn(n), mx(n);
+            ثابت صحيح n = (صحيح)chunks.size();
+            std::vector<مزدوج> mn(n), mx(n);
             std::vector<size_t> imn(n, 0), imx(n, 0);   // 1-based row-major indices, 0 = no element
-            parallel_for_(Range(0, n), [&](const Range& r)
+            parallel_for_(Range(0, n), [&](ثابت Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                لكل (صحيح i = r.شروعات; i < r.end; i++)
                 {
-                    int a[2] = {-1, -1}, b[2] = {-1, -1};
-                    minMaxIdx_(chunks[i].src, &mn[i], &mx[i], cn == 1 ? a : nullptr, cn == 1 ? b : nullptr,
-                               chunks[i].mask);
-                    if (cn > 1)
+                    صحيح a[2] = {-1, -1}, b[2] = {-1, -1};
+                    minMaxIdx_(chunks[i].src, &mn[i], &mx[i], cn == 1 ? a : خالي_اشارو, cn == 1 ? b : خالي_اشارو,
+                               chunks[i].نقاب);
+                    إذا (cn > 1)
                         imn[i] = imx[i] = 1;
-                    else if (a[0] >= 0)
+                    وإلا إذا (a[0] >= 0)
                     {
-                        imn[i] = chunkIndexToElem(chunks[i], a) + 1;
-                        imx[i] = chunkIndexToElem(chunks[i], b) + 1;
+                        imn[i] = chunk_اشاريو_منزل_Elem(chunks[i], a) + 1;
+                        imx[i] = chunk_اشاريو_منزل_Elem(chunks[i], b) + 1;
                     }
                 }
             });
             // pieces are in memory order, so taking the first strict improvement keeps the
             // first occurrence, as in the serial version
-            int bmin = -1, bmax = -1;
-            for (int i = 0; i < n; i++)
+            صحيح bmin = -1, bmax = -1;
+            لكل (صحيح i = 0; i < n; i++)
             {
-                if (imn[i] == 0)
-                    continue;
-                if (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
-                if (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
+                إذا (imn[i] == 0)
+                    استمر;
+                إذا (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
+                إذا (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
             }
-            if (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
-            if (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
-            if (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
-            if (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
-            return;
+            إذا (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
+            إذا (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
+            إذا (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
+            إذا (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
+            أرجع;
         }
     }
-    minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, _mask);
+    minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, نقاب_2);
 }
 
-void cv::minMaxLoc( InputArray _img, double* minVal, double* maxVal,
-                    Point* minLoc, Point* maxLoc, InputArray mask )
+فراغ cv::minMaxLoc( داخلا_Array _img, مزدوج* minVal, مزدوج* maxVal,
+                    نقطو* minLoc, نقطو* maxLoc, داخلا_Array نقاب )
 {
     CV_INSTRUMENT_REGION();
 
-    int dims = _img.dims();
+    صحيح dims = _img.dims();
     CV_CheckLE(dims, 2, "");
 
-    minMaxIdx(_img, minVal, maxVal, (int*)minLoc, (int*)maxLoc, mask);
-    if( minLoc) {
-        if (dims == 2)
+    minMaxIdx(_img, minVal, maxVal, (صحيح*)minLoc, (صحيح*)maxLoc, نقاب);
+    إذا( minLoc) {
+        إذا (dims == 2)
             std::swap(minLoc->x, minLoc->y);
-        else {
+        وإلا {
             minLoc->y = 0;
         }
     }
-    if( maxLoc) {
-        if (dims == 2)
+    إذا( maxLoc) {
+        إذا (dims == 2)
             std::swap(maxLoc->x, maxLoc->y);
-        else {
+        وإلا {
             maxLoc->y = 0;
         }
     }
 }
 
-enum class ReduceMode
+تعداد صنف Reduce_گهڻائي
 {
-    FIRST_MIN = 0, //!< get index of first min occurrence
-    LAST_MIN  = 1, //!< get index of last min occurrence
-    FIRST_MAX = 2, //!< get index of first max occurrence
-    LAST_MAX  = 3, //!< get index of last max occurrence
+    پهريون_MIN = 0, //!< get index of first min occurrence
+    آخري_MIN  = 1, //!< get index of last min occurrence
+    پهريون_MAX = 2, //!< get index of first max occurrence
+    آخري_MAX  = 3, //!< get index of last max occurrence
 };
 
-template <typename T>
-struct reduceMinMaxImpl
+سانچو <قسم_نالو T>
+بنية reduceMinMaxImpl
 {
-    void operator()(const cv::Mat& src, cv::Mat& dst, ReduceMode mode, const int axis) const
+    فراغ عامل()(ثابت cv::Mat& src, cv::Mat& dst, Reduce_گهڻائي گهڻائي, ثابت صحيح axis) ثابت
     {
-        switch(mode)
+        بدل(گهڻائي)
         {
-        case ReduceMode::FIRST_MIN:
+        حالة Reduce_گهڻائي::پهريون_MIN:
             reduceMinMaxApply<std::less>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MIN:
+            اكسر;
+        حالة Reduce_گهڻائي::آخري_MIN:
             reduceMinMaxApply<std::less_equal>(src, dst, axis);
-            break;
-        case ReduceMode::FIRST_MAX:
+            اكسر;
+        حالة Reduce_گهڻائي::پهريون_MAX:
             reduceMinMaxApply<std::greater>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MAX:
+            اكسر;
+        حالة Reduce_گهڻائي::آخري_MAX:
             reduceMinMaxApply<std::greater_equal>(src, dst, axis);
-            break;
+            اكسر;
         }
     }
 
-    template <template<class> class Cmp>
-    static void reduceMinMaxApply(const cv::Mat& src, cv::Mat& dst, const int axis)
+    سانچو <سانچو<صنف> صنف Cmp>
+    ساكن فراغ reduceMinMaxApply(ثابت cv::Mat& src, cv::Mat& dst, ثابت صحيح axis)
     {
         Cmp<T> cmp;
 
-        const auto *src_ptr = src.ptr<T>();
-        auto *dst_ptr = dst.ptr<int32_t>();
+        ثابت خودڪار *src_ptr = src.ptr<T>();
+        خودڪار *dst_ptr = dst.ptr<int32_t>();
 
-        const size_t outer_size = src.total(0, axis);
-        const auto mid_size = static_cast<size_t>(src.size[axis]);
+        ثابت size_t outer_سائيز = src.ڪل(0, axis);
+        ثابت خودڪار mid_سائيز = static_cast<size_t>(src.size[axis]);
 
-        const size_t outer_step = src.total(axis);
-        const size_t dst_step = dst.total(axis);
+        ثابت size_t outer_قدم = src.ڪل(axis);
+        ثابت size_t dst_قدم = dst.ڪل(axis);
 
-        const size_t mid_step = src.total(axis + 1);
+        ثابت size_t mid_قدم = src.ڪل(axis + 1);
 
-        for (size_t outer = 0; outer < outer_size; ++outer)
+        لكل (size_t outer = 0; outer < outer_سائيز; ++outer)
         {
-            const size_t outer_offset = outer * outer_step;
-            const size_t dst_offset = outer * dst_step;
-            for (size_t mid = 0; mid != mid_size; ++mid)
+            ثابت size_t outer_وٿي = outer * outer_قدم;
+            ثابت size_t dst_وٿي = outer * dst_قدم;
+            لكل (size_t mid = 0; mid != mid_سائيز; ++mid)
             {
-                const size_t src_offset = outer_offset + mid * mid_step;
-                for (size_t inner = 0; inner < mid_step; inner++)
+                ثابت size_t src_وٿي = outer_وٿي + mid * mid_قدم;
+                لكل (size_t inner = 0; inner < mid_قدم; inner++)
                 {
-                    int32_t& index = dst_ptr[dst_offset + inner];
+                    int32_t& اشاريو = dst_ptr[dst_وٿي + inner];
 
-                    const size_t prev = outer_offset + index * mid_step + inner;
-                    const size_t curr = src_offset + inner;
+                    ثابت size_t prev = outer_وٿي + اشاريو * mid_قدم + inner;
+                    ثابت size_t curr = src_وٿي + inner;
 
-                    if (cmp(src_ptr[curr], src_ptr[prev]))
+                    إذا (cmp(src_ptr[curr], src_ptr[prev]))
                     {
-                        index = static_cast<int32_t>(mid);
+                        اشاريو = static_cast<int32_t>(mid);
                     }
                 }
             }
@@ -541,49 +541,49 @@ struct reduceMinMaxImpl
     }
 };
 
-static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mode, int axis)
+ساكن فراغ reduceMinMax(cv::داخلا_Array src, cv::OutputArray dst, Reduce_گهڻائي گهڻائي, صحيح axis)
 {
     CV_INSTRUMENT_REGION();
 
     cv::Mat srcMat = src.getMat();
-    int dims = std::max(1, srcMat.dims);
+    صحيح dims = std::max(1, srcMat.dims);
     axis = (axis + dims) % dims;
     CV_Assert(srcMat.channels() == 1 && axis >= 0 && axis <= srcMat.dims);
 
-    std::vector<int> sizes(srcMat.dims);
+    std::vector<صحيح> sizes(srcMat.dims);
     std::copy(srcMat.size.p, srcMat.size.p + srcMat.dims, sizes.begin());
-    if(!sizes.empty())
+    إذا(!sizes.empty())
         sizes[axis] = 1;
 
-    dst.create(srcMat.dims, sizes.data(), CV_32SC1); // indices
+    dst.create(srcMat.dims, sizes.معلومات(), CV_32SC1); // indices
     cv::Mat dstMat = dst.getMat();
-    dstMat.setTo(cv::Scalar::all(0));
+    dstMat.سيٽ_منزل(cv::Scalar::all(0));
 
-    if (!srcMat.isContinuous())
+    إذا (!srcMat.isContinuous())
     {
         srcMat = srcMat.clone();
     }
 
-    bool needs_copy = !dstMat.isContinuous();
-    if (needs_copy)
+    منطقي needs_copy = !dstMat.isContinuous();
+    إذا (needs_copy)
     {
         dstMat = dstMat.clone();
     }
 
-    cv::detail::depthDispatch<reduceMinMaxImpl>(srcMat.depth(), srcMat, dstMat, mode, axis);
+    cv::detail::اونهائي_Dispatch<reduceMinMaxImpl>(srcMat.اونهائي(), srcMat, dstMat, گهڻائي, axis);
 
-    if (needs_copy)
+    إذا (needs_copy)
     {
-        dstMat.copyTo(dst);
+        dstMat.copy_منزل(dst);
     }
 }
 
-void cv::reduceArgMin(InputArray src, OutputArray dst, int axis, bool lastIndex)
+فراغ cv::reduceArgMin(داخلا_Array src, OutputArray dst, صحيح axis, منطقي آخري_اشاريو)
 {
-    reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MIN : ReduceMode::FIRST_MIN, axis);
+    reduceMinMax(src, dst, آخري_اشاريو ? Reduce_گهڻائي::آخري_MIN : Reduce_گهڻائي::پهريون_MIN, axis);
 }
 
-void cv::reduceArgMax(InputArray src, OutputArray dst, int axis, bool lastIndex)
+فراغ cv::reduceArgMax(داخلا_Array src, OutputArray dst, صحيح axis, منطقي آخري_اشاريو)
 {
-    reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MAX : ReduceMode::FIRST_MAX, axis);
+    reduceMinMax(src, dst, آخري_اشاريو ? Reduce_گهڻائي::آخري_MAX : Reduce_گهڻائي::پهريون_MAX, axis);
 }

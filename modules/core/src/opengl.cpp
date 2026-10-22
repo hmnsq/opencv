@@ -40,129 +40,129 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-#if defined (__APPLE__) || defined(MACOSX)
-   #define GL_SHARING_EXTENSION "cl_APPLE_gl_sharing"
-#else
-   #define GL_SHARING_EXTENSION "cl_khr_gl_sharing"
-#endif
+#إذا defined (__APPLE__) || defined(MACOSX)
+   #وصف_ڪريو GL_SHARING_EXTENSION "cl_APPLE_gl_sharing"
+#وإلا
+   #وصف_ڪريو GL_SHARING_EXTENSION "cl_khr_gl_sharing"
+#جيڪڏهن_پورو
 
-#ifdef HAVE_OPENGL
+#جيڪڏهن_وصف_ٿيل HAVE_OPENGL
 #  include "gl_core_3_1.hpp"
 #  ifdef HAVE_CUDA
-#    if (defined(__arm__) || defined(__aarch64__)) \
+#    إذا (defined(__arm__) || defined(__aarch64__)) \
          && !defined(OPENCV_SKIP_CUDA_OPENGL_ARM_WORKAROUND)
 #      include <GL/gl.h>
-#      ifndef GL_VERSION
-#        define GL_VERSION 0x1F02
+#      ifndef GL_نسخو
+#        define GL_نسخو 0x1F02
 #      endif
 #    endif
 #    include <cuda_gl_interop.h>
 #  endif
-#else // HAVE_OPENGL
+#وإلا // HAVE_OPENGL
 #  define NO_OPENGL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenGL support")
-#endif // HAVE_OPENGL
+#جيڪڏهن_پورو // HAVE_OPENGL
 
-using namespace cv;
-using namespace cv::cuda;
+استعمال نطاق cv;
+استعمال نطاق cv::cuda;
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4702)  // unreachable code
-#endif
+#إذا defined(_MSC_VER)
+#هدايت warning(disable : 4702)  // unreachable code
+#جيڪڏهن_پورو
 
-namespace
+نطاق
 {
-#ifndef HAVE_OPENGL
-inline static CV_NORETURN void throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
-#elif defined _DEBUG
-inline static bool checkError(const char* file, const int line, const char* func = 0)
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+مضمن ساكن CV_NORETURN فراغ throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
+#وإلاإذا defined _DEBUG
+مضمن ساكن منطقي checkError(ثابت حرف* file, ثابت صحيح سٽ, ثابت حرف* func = 0)
 {
     GLenum err = gl::GetError();
-    if (err != gl::NO_ERROR_)
+    إذا (err != gl::NO_ERROR_)
     {
-        const char* msg;
-        switch (err)
+        ثابت حرف* نياپو;
+        بدل (err)
         {
-        case gl::INVALID_ENUM:
-            msg = "An unacceptable value is specified for an enumerated argument";
-            break;
-        case gl::INVALID_VALUE:
-            msg = "A numeric argument is out of range";
-            break;
-        case gl::INVALID_OPERATION:
-            msg = "The specified operation is not allowed in the current state";
-            break;
-        case gl::OUT_OF_MEMORY:
-            msg = "There is not enough memory left to execute the command";
-            break;
-        default:
-            msg = "Unknown error";
+        حالة gl::INVALID_ENUM:
+            نياپو = "An unacceptable value is specified for an enumerated argument";
+            اكسر;
+        حالة gl::INVALID_قدر:
+            نياپو = "A numeric argument is out of range";
+            اكسر;
+        حالة gl::INVALID_OPERATION:
+            نياپو = "The specified operation is not allowed in the current state";
+            اكسر;
+        حالة gl::ٻاهريون_جو_يادگيري:
+            نياپو = "There is not enough memory left to execute the command";
+            اكسر;
+        افتراضي:
+            نياپو = "Unknown error";
         };
-        cv::error(Error::OpenGlApiCallError, func, msg, file, line);
+        cv::error(Error::OpenGlApiCallError, func, نياپو, file, سٽ);
     }
-    return true;
+    أرجع سچ;
 }
-#endif // HAVE_OPENGL
+#جيڪڏهن_پورو // HAVE_OPENGL
 } // namespace
 
-#define CV_CheckGlError() CV_DbgAssert( (checkError(__FILE__, __LINE__, CV_Func)) )
+#وصف_ڪريو CV_CheckGlError() CV_DbgAssert( (checkError(__FILE__, __LINE__, CV_Func)) )
 
-#ifdef HAVE_OPENGL
-namespace
+#جيڪڏهن_وصف_ٿيل HAVE_OPENGL
+نطاق
 {
-    const GLenum gl_types[] = { gl::UNSIGNED_BYTE, gl::BYTE, gl::UNSIGNED_SHORT, gl::SHORT, gl::INT, gl::FLOAT, gl::DOUBLE };
+    ثابت GLenum gl_types[] = { gl::UNSIGNED_BYTE, gl::BYTE, gl::UNSIGNED_SHORT, gl::SHORT, gl::INT, gl::FLOAT, gl::DOUBLE };
 }
-#endif
+#جيڪڏهن_پورو
 
 ////////////////////////////////////////////////////////////////////////
 // setGlDevice
 
-void cv::cuda::setGlDevice(int device)
+فراغ cv::cuda::سيٽ_Gl_Device(صحيح device)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(device);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(device);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(device);
+#وإلا
+    #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
+        CV_اڻ_استعمال_ٿيل(device);
         throw_no_cuda();
-    #else
-        cudaSafeCall( cudaGLSetGLDevice(device) );
-    #endif
-#endif
+    #وإلا
+        cuda_محفوظ_Call( cudaGLSetGLDevice(device) );
+    #جيڪڏهن_پورو
+#جيڪڏهن_پورو
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CudaResource
 
-#if defined(HAVE_OPENGL) && defined(HAVE_CUDA)
+#إذا defined(HAVE_OPENGL) && defined(HAVE_CUDA)
 
-namespace
+نطاق
 {
-    class CudaResource
+    صنف CudaResource
     {
-    public:
+    عام:
         CudaResource();
         ~CudaResource();
 
-        void registerBuffer(GLuint buffer);
-        void release();
+        فراغ رجسٽر_بفر(GLuint بفر);
+        فراغ release();
 
-        void copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
-        void copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0);
+        فراغ copyFrom(ثابت فراغ* src, size_t spitch, size_t ويڪر, size_t اوچائي, cuda_وهڪرو_t stream = 0);
+        فراغ copy_منزل(فراغ* dst, size_t dpitch, size_t ويڪر, size_t اوچائي, cuda_وهڪرو_t stream = 0);
 
-        void* map(cudaStream_t stream = 0);
-        void unmap(cudaStream_t stream = 0);
+        فراغ* map(cuda_وهڪرو_t stream = 0);
+        فراغ unmap(cuda_وهڪرو_t stream = 0);
 
-    private:
+    خاص:
         cudaGraphicsResource_t resource_;
-        GLuint buffer_;
+        GLuint بفر_3;
 
-        class GraphicsMapHolder;
+        صنف GraphicsMapHolder;
     };
 
-    CudaResource::CudaResource() : resource_(0), buffer_(0)
+    CudaResource::CudaResource() : resource_(0), بفر_3(0)
     {
     }
 
@@ -171,115 +171,115 @@ namespace
         release();
     }
 
-    void CudaResource::registerBuffer(GLuint buffer)
+    فراغ CudaResource::رجسٽر_بفر(GLuint بفر)
     {
-        CV_DbgAssert( buffer != 0 );
+        CV_DbgAssert( بفر != 0 );
 
-        if (buffer_ == buffer)
-            return;
+        إذا (بفر_3 == بفر)
+            أرجع;
 
         cudaGraphicsResource_t resource;
-        cudaSafeCall( cudaGraphicsGLRegisterBuffer(&resource, buffer, cudaGraphicsMapFlagsNone) );
+        cuda_محفوظ_Call( cuda_Graphics_GLRegister_بفر(&resource, بفر, cudaGraphicsMapFlagsNone) );
 
         release();
 
         resource_ = resource;
-        buffer_ = buffer;
+        بفر_3 = بفر;
     }
 
-    void CudaResource::release()
+    فراغ CudaResource::release()
     {
-        if (resource_)
+        إذا (resource_)
             cudaGraphicsUnregisterResource(resource_);
 
         resource_ = 0;
-        buffer_ = 0;
+        بفر_3 = 0;
     }
 
-    class CudaResource::GraphicsMapHolder
+    صنف CudaResource::GraphicsMapHolder
     {
-    public:
-        GraphicsMapHolder(cudaGraphicsResource_t* resource, cudaStream_t stream);
+    عام:
+        GraphicsMapHolder(cudaGraphicsResource_t* resource, cuda_وهڪرو_t stream);
         ~GraphicsMapHolder();
 
-        void reset();
+        فراغ reset();
 
-    private:
+    خاص:
         cudaGraphicsResource_t* resource_;
-        cudaStream_t stream_;
+        cuda_وهڪرو_t وهڪرو_3;
     };
 
-    CudaResource::GraphicsMapHolder::GraphicsMapHolder(cudaGraphicsResource_t* resource, cudaStream_t stream) : resource_(resource), stream_(stream)
+    CudaResource::GraphicsMapHolder::GraphicsMapHolder(cudaGraphicsResource_t* resource, cuda_وهڪرو_t stream) : resource_(resource), وهڪرو_3(stream)
     {
-        if (resource_)
-            cudaSafeCall( cudaGraphicsMapResources(1, resource_, stream_) );
+        إذا (resource_)
+            cuda_محفوظ_Call( cudaGraphicsMapResources(1, resource_, وهڪرو_3) );
     }
 
     CudaResource::GraphicsMapHolder::~GraphicsMapHolder()
     {
-        if (resource_)
-            cudaGraphicsUnmapResources(1, resource_, stream_);
+        إذا (resource_)
+            cudaGraphicsUnmapResources(1, resource_, وهڪرو_3);
     }
 
-    void CudaResource::GraphicsMapHolder::reset()
+    فراغ CudaResource::GraphicsMapHolder::reset()
     {
         resource_ = 0;
     }
 
-    void CudaResource::copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
+    فراغ CudaResource::copyFrom(ثابت فراغ* src, size_t spitch, size_t ويڪر, size_t اوچائي, cuda_وهڪرو_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
-        CV_UNUSED(h);
+        CV_اڻ_استعمال_ٿيل(h);
 
-        void* dst;
+        فراغ* dst;
         size_t size;
-        cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&dst, &size, resource_) );
+        cuda_محفوظ_Call( cuda_Graphics_Resource_Get_Mapped_اشارو(&dst, &size, resource_) );
 
-        CV_DbgAssert( width * height == size );
+        CV_DbgAssert( ويڪر * اوچائي == size );
 
-        if (stream == 0)
-            cudaSafeCall( cudaMemcpy2D(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice) );
-        else
-            cudaSafeCall( cudaMemcpy2DAsync(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice, stream) );
+        إذا (stream == 0)
+            cuda_محفوظ_Call( cudaMemcpy2D(dst, ويڪر, src, spitch, ويڪر, اوچائي, cuda_Memcpy_Device_منزل_Device) );
+        وإلا
+            cuda_محفوظ_Call( cudaMemcpy2DAsync(dst, ويڪر, src, spitch, ويڪر, اوچائي, cuda_Memcpy_Device_منزل_Device, stream) );
     }
 
-    void CudaResource::copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream)
+    فراغ CudaResource::copy_منزل(فراغ* dst, size_t dpitch, size_t ويڪر, size_t اوچائي, cuda_وهڪرو_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
-        CV_UNUSED(h);
+        CV_اڻ_استعمال_ٿيل(h);
 
-        void* src;
+        فراغ* src;
         size_t size;
-        cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&src, &size, resource_) );
+        cuda_محفوظ_Call( cuda_Graphics_Resource_Get_Mapped_اشارو(&src, &size, resource_) );
 
-        CV_DbgAssert( width * height == size );
+        CV_DbgAssert( ويڪر * اوچائي == size );
 
-        if (stream == 0)
-            cudaSafeCall( cudaMemcpy2D(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice) );
-        else
-            cudaSafeCall( cudaMemcpy2DAsync(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice, stream) );
+        إذا (stream == 0)
+            cuda_محفوظ_Call( cudaMemcpy2D(dst, dpitch, src, ويڪر, ويڪر, اوچائي, cuda_Memcpy_Device_منزل_Device) );
+        وإلا
+            cuda_محفوظ_Call( cudaMemcpy2DAsync(dst, dpitch, src, ويڪر, ويڪر, اوچائي, cuda_Memcpy_Device_منزل_Device, stream) );
     }
 
-    void* CudaResource::map(cudaStream_t stream)
+    فراغ* CudaResource::map(cuda_وهڪرو_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
 
-        void* ptr;
+        فراغ* ptr;
         size_t size;
-        cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&ptr, &size, resource_) );
+        cuda_محفوظ_Call( cuda_Graphics_Resource_Get_Mapped_اشارو(&ptr, &size, resource_) );
 
         h.reset();
 
-        return ptr;
+        أرجع ptr;
     }
 
-    void CudaResource::unmap(cudaStream_t stream)
+    فراغ CudaResource::unmap(cuda_وهڪرو_t stream)
     {
         CV_Assert( resource_ != 0 );
 
@@ -287,619 +287,619 @@ namespace
     }
 }
 
-#endif
+#جيڪڏهن_پورو
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Buffer
 
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
 
-class cv::ogl::Buffer::Impl
+صنف cv::ogl::بفر_2::Impl
 {
 };
 
-#else
+#وإلا
 
-class cv::ogl::Buffer::Impl
+صنف cv::ogl::بفر_2::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+عام:
+    ساكن ثابت Ptr<Impl>& empty();
 
-    Impl(GLuint bufId, bool autoRelease);
-    Impl(GLsizeiptr size, const GLvoid* data, GLenum target, bool autoRelease);
+    Impl(GLuint bufId, منطقي autoRelease);
+    Impl(GLsizeiptr size, ثابت GLvoid* معلومات, GLenum target, منطقي autoRelease);
     ~Impl();
 
-    void bind(GLenum target) const;
+    فراغ bind(GLenum target) ثابت;
 
-    void copyFrom(GLuint srcBuf, GLsizeiptr size);
+    فراغ copyFrom(GLuint srcBuf, GLsizeiptr size);
 
-    void copyFrom(GLsizeiptr size, const GLvoid* data);
-    void copyTo(GLsizeiptr size, GLvoid* data) const;
+    فراغ copyFrom(GLsizeiptr size, ثابت GLvoid* معلومات);
+    فراغ copy_منزل(GLsizeiptr size, GLvoid* معلومات) ثابت;
 
-    void resize(GLsizeiptr size, GLenum target);
+    فراغ resize(GLsizeiptr size, GLenum target);
 
-    void* mapHost(GLenum access);
-    void unmapHost();
+    فراغ* mapHost(GLenum access);
+    فراغ unmapHost();
 
-#ifdef HAVE_CUDA
-    void copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
-    void copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0) const;
+#جيڪڏهن_وصف_ٿيل HAVE_CUDA
+    فراغ copyFrom(ثابت فراغ* src, size_t spitch, size_t ويڪر, size_t اوچائي, cuda_وهڪرو_t stream = 0);
+    فراغ copy_منزل(فراغ* dst, size_t dpitch, size_t ويڪر, size_t اوچائي, cuda_وهڪرو_t stream = 0) ثابت;
 
-    void* mapDevice(cudaStream_t stream = 0);
-    void unmapDevice(cudaStream_t stream = 0);
-#endif
+    فراغ* mapDevice(cuda_وهڪرو_t stream = 0);
+    فراغ unmapDevice(cuda_وهڪرو_t stream = 0);
+#جيڪڏهن_پورو
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    فراغ سيٽ_Auto_Release(منطقي flag) { autoRelease_ = flag; }
 
-    GLuint bufId() const { return bufId_; }
+    GLuint bufId() ثابت { أرجع bufId_; }
 
-private:
+خاص:
     Impl();
 
     GLuint bufId_;
-    bool autoRelease_;
+    منطقي autoRelease_;
 
-#ifdef HAVE_CUDA
-    mutable CudaResource cudaResource_;
-#endif
+#جيڪڏهن_وصف_ٿيل HAVE_CUDA
+    بدلجندڙ CudaResource cudaResource_;
+#جيڪڏهن_پورو
 };
 
-const Ptr<cv::ogl::Buffer::Impl>& cv::ogl::Buffer::Impl::empty()
+ثابت Ptr<cv::ogl::بفر_2::Impl>& cv::ogl::بفر_2::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    ساكن Ptr<Impl> p(جديد Impl);
+    أرجع p;
 }
 
-cv::ogl::Buffer::Impl::Impl() : bufId_(0), autoRelease_(false)
+cv::ogl::بفر_2::Impl::Impl() : bufId_(0), autoRelease_(خطأ)
 {
 }
 
-cv::ogl::Buffer::Impl::Impl(GLuint abufId, bool autoRelease) : bufId_(abufId), autoRelease_(autoRelease)
+cv::ogl::بفر_2::Impl::Impl(GLuint abufId, منطقي autoRelease) : bufId_(abufId), autoRelease_(autoRelease)
 {
-    CV_Assert( gl::IsBuffer(abufId) == gl::TRUE_ );
+    CV_Assert( gl::Is_بفر(abufId) == gl::TRUE_ );
 }
 
-cv::ogl::Buffer::Impl::Impl(GLsizeiptr size, const GLvoid* data, GLenum target, bool autoRelease) : bufId_(0), autoRelease_(autoRelease)
+cv::ogl::بفر_2::Impl::Impl(GLsizeiptr size, ثابت GLvoid* معلومات, GLenum target, منطقي autoRelease) : bufId_(0), autoRelease_(autoRelease)
 {
     gl::GenBuffers(1, &bufId_);
     CV_CheckGlError();
 
     CV_Assert( bufId_ != 0 );
 
-    gl::BindBuffer(target, bufId_);
+    gl::Bind_بفر(target, bufId_);
     CV_CheckGlError();
 
-    gl::BufferData(target, size, data, gl::DYNAMIC_DRAW);
+    gl::بفر_معلومات(target, size, معلومات, gl::DYNAMIC_DRAW);
     CV_CheckGlError();
 
-    gl::BindBuffer(target, 0);
+    gl::Bind_بفر(target, 0);
     CV_CheckGlError();
 }
 
-cv::ogl::Buffer::Impl::~Impl()
+cv::ogl::بفر_2::Impl::~Impl()
 {
-    if (autoRelease_ && bufId_)
+    إذا (autoRelease_ && bufId_)
         gl::DeleteBuffers(1, &bufId_);
 }
 
-void cv::ogl::Buffer::Impl::bind(GLenum target) const
+فراغ cv::ogl::بفر_2::Impl::bind(GLenum target) ثابت
 {
-    gl::BindBuffer(target, bufId_);
+    gl::Bind_بفر(target, bufId_);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::copyFrom(GLuint srcBuf, GLsizeiptr size)
+فراغ cv::ogl::بفر_2::Impl::copyFrom(GLuint srcBuf, GLsizeiptr size)
 {
-    gl::BindBuffer(gl::COPY_WRITE_BUFFER, bufId_);
+    gl::Bind_بفر(gl::COPY_WRITE_بفر, bufId_);
     CV_CheckGlError();
 
-    gl::BindBuffer(gl::COPY_READ_BUFFER, srcBuf);
+    gl::Bind_بفر(gl::COPY_READ_بفر, srcBuf);
     CV_CheckGlError();
 
-    gl::CopyBufferSubData(gl::COPY_READ_BUFFER, gl::COPY_WRITE_BUFFER, 0, 0, size);
+    gl::Copy_بفر_Sub_معلومات(gl::COPY_READ_بفر, gl::COPY_WRITE_بفر, 0, 0, size);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::copyFrom(GLsizeiptr size, const GLvoid* data)
+فراغ cv::ogl::بفر_2::Impl::copyFrom(GLsizeiptr size, ثابت GLvoid* معلومات)
 {
-    gl::BindBuffer(gl::COPY_WRITE_BUFFER, bufId_);
+    gl::Bind_بفر(gl::COPY_WRITE_بفر, bufId_);
     CV_CheckGlError();
 
-    gl::BufferSubData(gl::COPY_WRITE_BUFFER, 0, size, data);
+    gl::بفر_Sub_معلومات(gl::COPY_WRITE_بفر, 0, size, معلومات);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::resize(GLsizeiptr size, GLenum target)
+فراغ cv::ogl::بفر_2::Impl::resize(GLsizeiptr size, GLenum target)
 {
-    gl::BindBuffer(target, bufId_);
+    gl::Bind_بفر(target, bufId_);
     CV_CheckGlError();
 
     // keep the same buffer id so bound vertex arrays stay valid
-    gl::BufferData(target, size, 0, gl::DYNAMIC_DRAW);
+    gl::بفر_معلومات(target, size, 0, gl::DYNAMIC_DRAW);
     CV_CheckGlError();
 
-    gl::BindBuffer(target, 0);
-    CV_CheckGlError();
-}
-
-void cv::ogl::Buffer::Impl::copyTo(GLsizeiptr size, GLvoid* data) const
-{
-    gl::BindBuffer(gl::COPY_READ_BUFFER, bufId_);
-    CV_CheckGlError();
-
-    gl::GetBufferSubData(gl::COPY_READ_BUFFER, 0, size, data);
+    gl::Bind_بفر(target, 0);
     CV_CheckGlError();
 }
 
-void* cv::ogl::Buffer::Impl::mapHost(GLenum access)
+فراغ cv::ogl::بفر_2::Impl::copy_منزل(GLsizeiptr size, GLvoid* معلومات) ثابت
 {
-    gl::BindBuffer(gl::COPY_READ_BUFFER, bufId_);
+    gl::Bind_بفر(gl::COPY_READ_بفر, bufId_);
     CV_CheckGlError();
 
-    GLvoid* data = gl::MapBuffer(gl::COPY_READ_BUFFER, access);
+    gl::Get_بفر_Sub_معلومات(gl::COPY_READ_بفر, 0, size, معلومات);
+    CV_CheckGlError();
+}
+
+فراغ* cv::ogl::بفر_2::Impl::mapHost(GLenum access)
+{
+    gl::Bind_بفر(gl::COPY_READ_بفر, bufId_);
     CV_CheckGlError();
 
-    return data;
+    GLvoid* معلومات = gl::Map_بفر(gl::COPY_READ_بفر, access);
+    CV_CheckGlError();
+
+    أرجع معلومات;
 }
 
-void cv::ogl::Buffer::Impl::unmapHost()
+فراغ cv::ogl::بفر_2::Impl::unmapHost()
 {
-    gl::UnmapBuffer(gl::COPY_READ_BUFFER);
+    gl::Unmap_بفر(gl::COPY_READ_بفر);
 }
 
-#ifdef HAVE_CUDA
+#جيڪڏهن_وصف_ٿيل HAVE_CUDA
 
-void cv::ogl::Buffer::Impl::copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
+فراغ cv::ogl::بفر_2::Impl::copyFrom(ثابت فراغ* src, size_t spitch, size_t ويڪر, size_t اوچائي, cuda_وهڪرو_t stream)
 {
-    cudaResource_.registerBuffer(bufId_);
-    cudaResource_.copyFrom(src, spitch, width, height, stream);
+    cudaResource_.رجسٽر_بفر(bufId_);
+    cudaResource_.copyFrom(src, spitch, ويڪر, اوچائي, stream);
 }
 
-void cv::ogl::Buffer::Impl::copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream) const
+فراغ cv::ogl::بفر_2::Impl::copy_منزل(فراغ* dst, size_t dpitch, size_t ويڪر, size_t اوچائي, cuda_وهڪرو_t stream) ثابت
 {
-    cudaResource_.registerBuffer(bufId_);
-    cudaResource_.copyTo(dst, dpitch, width, height, stream);
+    cudaResource_.رجسٽر_بفر(bufId_);
+    cudaResource_.copy_منزل(dst, dpitch, ويڪر, اوچائي, stream);
 }
 
-void* cv::ogl::Buffer::Impl::mapDevice(cudaStream_t stream)
+فراغ* cv::ogl::بفر_2::Impl::mapDevice(cuda_وهڪرو_t stream)
 {
-    cudaResource_.registerBuffer(bufId_);
-    return cudaResource_.map(stream);
+    cudaResource_.رجسٽر_بفر(bufId_);
+    أرجع cudaResource_.map(stream);
 }
 
-void cv::ogl::Buffer::Impl::unmapDevice(cudaStream_t stream)
+فراغ cv::ogl::بفر_2::Impl::unmapDevice(cuda_وهڪرو_t stream)
 {
     cudaResource_.unmap(stream);
 }
 
-#endif // HAVE_CUDA
+#جيڪڏهن_پورو // HAVE_CUDA
 
-#endif // HAVE_OPENGL
+#جيڪڏهن_پورو // HAVE_OPENGL
 
-cv::ogl::Buffer::Buffer() : rows_(0), cols_(0), type_(0)
+cv::ogl::بفر_2::بفر_2() : صفون_2(0), کانن_ڳڻپ_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
+#وإلا
     impl_ = Impl::empty();
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Buffer::Buffer(int arows, int acols, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::بفر_2::بفر_2(صحيح arows, صحيح acols, صحيح atype, بنانشان صحيح abufId, منطقي autoRelease) : صفون_2(0), کانن_ڳڻپ_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(atype);
-    CV_UNUSED(abufId);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arows);
+    CV_اڻ_استعمال_ٿيل(acols);
+    CV_اڻ_استعمال_ٿيل(atype);
+    CV_اڻ_استعمال_ٿيل(abufId);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(abufId, autoRelease));
-    rows_ = arows;
-    cols_ = acols;
+#وإلا
+    impl_.reset(جديد Impl(abufId, autoRelease));
+    صفون_2 = arows;
+    کانن_ڳڻپ_2 = acols;
     type_ = atype;
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Buffer::Buffer(Size asize, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::بفر_2::بفر_2(سائيز asize, صحيح atype, بنانشان صحيح abufId, منطقي autoRelease) : صفون_2(0), کانن_ڳڻپ_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(asize);
-    CV_UNUSED(atype);
-    CV_UNUSED(abufId);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(asize);
+    CV_اڻ_استعمال_ٿيل(atype);
+    CV_اڻ_استعمال_ٿيل(abufId);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(abufId, autoRelease));
-    rows_ = asize.height;
-    cols_ = asize.width;
+#وإلا
+    impl_.reset(جديد Impl(abufId, autoRelease));
+    صفون_2 = asize.اوچائي;
+    کانن_ڳڻپ_2 = asize.ويڪر;
     type_ = atype;
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Buffer::Buffer(InputArray arr, Target target, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::بفر_2::بفر_2(داخلا_Array arr, هدف target, منطقي autoRelease) : صفون_2(0), کانن_ڳڻپ_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
+    CV_اڻ_استعمال_ٿيل(target);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#وإلا
+    ثابت صحيح قسم = arr.قسم();
 
-    switch (kind)
+    بدل (قسم)
     {
-    case _InputArray::OPENGL_BUFFER:
-    case _InputArray::CUDA_GPU_MAT:
+    حالة داخلا_Array_2::OPENGL_بفر:
+    حالة داخلا_Array_2::CUDA_GPU_MAT:
         copyFrom(arr, target, autoRelease);
-        break;
+        اكسر;
 
-    default:
+    افتراضي:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            const GLsizeiptr asize = mat.rows * mat.cols * mat.elemSize();
-            impl_.reset(new Impl(asize, mat.data, target, autoRelease));
-            rows_ = mat.rows;
-            cols_ = mat.cols;
+            ثابت GLsizeiptr asize = mat.صفون * mat.کانن_ڳڻپ * mat.elem_سائيز();
+            impl_.reset(جديد Impl(asize, mat.معلومات, target, autoRelease));
+            صفون_2 = mat.صفون;
+            کانن_ڳڻپ_2 = mat.کانن_ڳڻپ;
             type_ = mat.type();
-            break;
+            اكسر;
         }
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::create(int arows, int acols, int atype, Target target, bool autoRelease)
+فراغ cv::ogl::بفر_2::create(صحيح arows, صحيح acols, صحيح atype, هدف target, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(atype);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arows);
+    CV_اڻ_استعمال_ٿيل(acols);
+    CV_اڻ_استعمال_ٿيل(atype);
+    CV_اڻ_استعمال_ٿيل(target);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || type_ != atype)
+#وإلا
+    إذا (صفون_2 != arows || کانن_ڳڻپ_2 != acols || type_ != atype)
     {
-        const GLsizeiptr asize = (GLsizeiptr)arows * acols * CV_ELEM_SIZE(atype);
+        ثابت GLsizeiptr asize = (GLsizeiptr)arows * acols * CV_ELEM_سائيز(atype);
         // resize in place when sole owner (keeps the GL id); else allocate fresh (copy-on-write)
-        if (impl_->bufId() != 0 && impl_.use_count() == 1)
+        إذا (impl_->bufId() != 0 && impl_.use_count() == 1)
         {
             impl_->resize(asize, target);
-            impl_->setAutoRelease(autoRelease);
+            impl_->سيٽ_Auto_Release(autoRelease);
         }
-        else
-            impl_.reset(new Impl(asize, 0, target, autoRelease));
-        rows_ = arows;
-        cols_ = acols;
+        وإلا
+            impl_.reset(جديد Impl(asize, 0, target, autoRelease));
+        صفون_2 = arows;
+        کانن_ڳڻپ_2 = acols;
         type_ = atype;
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::release()
+فراغ cv::ogl::بفر_2::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#جيڪڏهن_وصف_ٿيل HAVE_OPENGL
+    إذا (impl_)
+        impl_->سيٽ_Auto_Release(سچ);
     impl_ = Impl::empty();
-    rows_ = 0;
-    cols_ = 0;
+    صفون_2 = 0;
+    کانن_ڳڻپ_2 = 0;
     type_ = 0;
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::setAutoRelease(bool flag)
+فراغ cv::ogl::بفر_2::سيٽ_Auto_Release(منطقي flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#وإلا
+    impl_->سيٽ_Auto_Release(flag);
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
+فراغ cv::ogl::بفر_2::copyFrom(داخلا_Array arr, هدف target, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
+    CV_اڻ_استعمال_ٿيل(target);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#وإلا
+    ثابت صحيح قسم = arr.قسم();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    ثابت سائيز asize = arr.size();
+    ثابت صحيح atype = arr.type();
     create(asize, atype, target, autoRelease);
 
-    switch (kind)
+    بدل (قسم)
     {
-    case _InputArray::OPENGL_BUFFER:
+    حالة داخلا_Array_2::OPENGL_بفر:
         {
-            ogl::Buffer buf = arr.getOGlBuffer();
-            impl_->copyFrom(buf.bufId(), asize.area() * CV_ELEM_SIZE(atype));
-            break;
+            ogl::بفر_2 buf = arr.get_OGl_بفر();
+            impl_->copyFrom(buf.bufId(), asize.area() * CV_ELEM_سائيز(atype));
+            اكسر;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    حالة داخلا_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #وإلا
                 GpuMat dmat = arr.getGpuMat();
-                impl_->copyFrom(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
-            #endif
+                impl_->copyFrom(dmat.معلومات, dmat.قدم, dmat.کانن_ڳڻپ * dmat.elem_سائيز(), dmat.صفون);
+            #جيڪڏهن_پورو
 
-            break;
+            اكسر;
         }
 
-    default:
+    افتراضي:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            impl_->copyFrom(asize.area() * CV_ELEM_SIZE(atype), mat.data);
+            impl_->copyFrom(asize.area() * CV_ELEM_سائيز(atype), mat.معلومات);
         }
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, cuda::Stream& stream, Target target, bool autoRelease)
+فراغ cv::ogl::بفر_2::copyFrom(داخلا_Array arr, cuda::وهڪرو& stream, هدف target, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(stream);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
+    CV_اڻ_استعمال_ٿيل(stream);
+    CV_اڻ_استعمال_ٿيل(target);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(arr);
-        CV_UNUSED(stream);
-        CV_UNUSED(target);
-        CV_UNUSED(autoRelease);
+#وإلا
+    #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
+        CV_اڻ_استعمال_ٿيل(arr);
+        CV_اڻ_استعمال_ٿيل(stream);
+        CV_اڻ_استعمال_ٿيل(target);
+        CV_اڻ_استعمال_ٿيل(autoRelease);
         throw_no_cuda();
-    #else
+    #وإلا
         GpuMat dmat = arr.getGpuMat();
 
         create(dmat.size(), dmat.type(), target, autoRelease);
 
-        impl_->copyFrom(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows, cuda::StreamAccessor::getStream(stream));
-    #endif
-#endif
+        impl_->copyFrom(dmat.معلومات, dmat.قدم, dmat.کانن_ڳڻپ * dmat.elem_سائيز(), dmat.صفون, cuda::وهڪرو_Accessor::get_وهڪرو(stream));
+    #جيڪڏهن_پورو
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::copyTo(OutputArray arr) const
+فراغ cv::ogl::بفر_2::copy_منزل(OutputArray arr) ثابت
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#وإلا
+    ثابت صحيح قسم = arr.قسم();
 
-    switch (kind)
+    بدل (قسم)
     {
-    case _InputArray::OPENGL_BUFFER:
+    حالة داخلا_Array_2::OPENGL_بفر:
         {
-            arr.getOGlBufferRef().copyFrom(*this);
-            break;
+            arr.get_OGl_بفر_Ref().copyFrom(*هذا);
+            اكسر;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    حالة داخلا_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #وإلا
                 GpuMat& dmat = arr.getGpuMatRef();
-                dmat.create(rows_, cols_, type_);
-                impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
-            #endif
+                dmat.create(صفون_2, کانن_ڳڻپ_2, type_);
+                impl_->copy_منزل(dmat.معلومات, dmat.قدم, dmat.کانن_ڳڻپ * dmat.elem_سائيز(), dmat.صفون);
+            #جيڪڏهن_پورو
 
-            break;
+            اكسر;
         }
 
-    default:
+    افتراضي:
         {
-            arr.create(rows_, cols_, type_);
+            arr.create(صفون_2, کانن_ڳڻپ_2, type_);
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            impl_->copyTo(mat.rows * mat.cols * mat.elemSize(), mat.data);
+            impl_->copy_منزل(mat.صفون * mat.کانن_ڳڻپ * mat.elem_سائيز(), mat.معلومات);
         }
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::copyTo(OutputArray arr, cuda::Stream& stream) const
+فراغ cv::ogl::بفر_2::copy_منزل(OutputArray arr, cuda::وهڪرو& stream) ثابت
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(stream);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
+    CV_اڻ_استعمال_ٿيل(stream);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(arr);
-        CV_UNUSED(stream);
+#وإلا
+    #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
+        CV_اڻ_استعمال_ٿيل(arr);
+        CV_اڻ_استعمال_ٿيل(stream);
         throw_no_cuda();
-    #else
-        arr.create(rows_, cols_, type_);
+    #وإلا
+        arr.create(صفون_2, کانن_ڳڻپ_2, type_);
         GpuMat dmat = arr.getGpuMat();
-        impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows, cuda::StreamAccessor::getStream(stream));
-    #endif
-#endif
+        impl_->copy_منزل(dmat.معلومات, dmat.قدم, dmat.کانن_ڳڻپ * dmat.elem_سائيز(), dmat.صفون, cuda::وهڪرو_Accessor::get_وهڪرو(stream));
+    #جيڪڏهن_پورو
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Buffer cv::ogl::Buffer::clone(Target target, bool autoRelease) const
+cv::ogl::بفر_2 cv::ogl::بفر_2::clone(هدف target, منطقي autoRelease) ثابت
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(target);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    ogl::Buffer buf;
-    buf.copyFrom(*this, target, autoRelease);
-    return buf;
-#endif
+#وإلا
+    ogl::بفر_2 buf;
+    buf.copyFrom(*هذا, target, autoRelease);
+    أرجع buf;
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::bind(Target target) const
+فراغ cv::ogl::بفر_2::bind(هدف target) ثابت
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(target);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(target);
     throw_no_ogl();
-#else
+#وإلا
     impl_->bind(target);
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::unbind(Target target)
+فراغ cv::ogl::بفر_2::unbind(هدف target)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(target);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(target);
     throw_no_ogl();
-#else
-    gl::BindBuffer(target, 0);
+#وإلا
+    gl::Bind_بفر(target, 0);
     CV_CheckGlError();
-#endif
+#جيڪڏهن_پورو
 }
 
-Mat cv::ogl::Buffer::mapHost(Access access)
+Mat cv::ogl::بفر_2::mapHost(Access access)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(access);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(access);
     throw_no_ogl();
-#else
-    return Mat(rows_, cols_, type_, impl_->mapHost(access));
-#endif
+#وإلا
+    أرجع Mat(صفون_2, کانن_ڳڻپ_2, type_, impl_->mapHost(access));
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::unmapHost()
+فراغ cv::ogl::بفر_2::unmapHost()
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->unmapHost();
-#endif
+#وإلا
+    أرجع impl_->unmapHost();
+#جيڪڏهن_پورو
 }
 
-GpuMat cv::ogl::Buffer::mapDevice()
+GpuMat cv::ogl::بفر_2::mapDevice()
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
+#وإلا
+    #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice());
-    #endif
-#endif
+    #وإلا
+        أرجع GpuMat(صفون_2, کانن_ڳڻپ_2, type_, impl_->mapDevice());
+    #جيڪڏهن_پورو
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::unmapDevice()
+فراغ cv::ogl::بفر_2::unmapDevice()
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
+#وإلا
+    #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
         throw_no_cuda();
-    #else
+    #وإلا
         impl_->unmapDevice();
-    #endif
-#endif
+    #جيڪڏهن_پورو
+#جيڪڏهن_پورو
 }
 
-cuda::GpuMat cv::ogl::Buffer::mapDevice(cuda::Stream& stream)
+cuda::GpuMat cv::ogl::بفر_2::mapDevice(cuda::وهڪرو& stream)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(stream);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(stream);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(stream);
+#وإلا
+    #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
+        CV_اڻ_استعمال_ٿيل(stream);
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice(cuda::StreamAccessor::getStream(stream)));
-    #endif
-#endif
+    #وإلا
+        أرجع GpuMat(صفون_2, کانن_ڳڻپ_2, type_, impl_->mapDevice(cuda::وهڪرو_Accessor::get_وهڪرو(stream)));
+    #جيڪڏهن_پورو
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Buffer::unmapDevice(cuda::Stream& stream)
+فراغ cv::ogl::بفر_2::unmapDevice(cuda::وهڪرو& stream)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(stream);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(stream);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(stream);
+#وإلا
+    #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
+        CV_اڻ_استعمال_ٿيل(stream);
         throw_no_cuda();
-    #else
-        impl_->unmapDevice(cuda::StreamAccessor::getStream(stream));
-    #endif
-#endif
+    #وإلا
+        impl_->unmapDevice(cuda::وهڪرو_Accessor::get_وهڪرو(stream));
+    #جيڪڏهن_پورو
+#جيڪڏهن_پورو
 }
 
-unsigned int cv::ogl::Buffer::bufId() const
+بنانشان صحيح cv::ogl::بفر_2::bufId() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->bufId();
-#endif
+#وإلا
+    أرجع impl_->bufId();
+#جيڪڏهن_پورو
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // ogl::Texture
 
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
 
-class cv::ogl::Texture2D::Impl
+صنف cv::ogl::Texture2D::Impl
 {
 };
 
-#else
+#وإلا
 
-class cv::ogl::Texture2D::Impl
+صنف cv::ogl::Texture2D::Impl
 {
-public:
-    static const Ptr<Impl> empty();
+عام:
+    ساكن ثابت Ptr<Impl> empty();
 
-    Impl(GLuint texId, bool autoRelease);
-    Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels, bool autoRelease);
+    Impl(GLuint texId, منطقي autoRelease);
+    Impl(GLint اندروني_Format, GLsizei ويڪر, GLsizei اوچائي, GLenum format, GLenum type, ثابت GLvoid* pixels, منطقي autoRelease);
     ~Impl();
 
-    void copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
-    void copyTo(GLenum format, GLenum type, GLvoid* pixels) const;
+    فراغ copyFrom(GLsizei ويڪر, GLsizei اوچائي, GLenum format, GLenum type, ثابت GLvoid *pixels);
+    فراغ copy_منزل(GLenum format, GLenum type, GLvoid* pixels) ثابت;
 
-    void bind() const;
+    فراغ bind() ثابت;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    فراغ سيٽ_Auto_Release(منطقي flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() ثابت { أرجع texId_; }
 
-private:
+خاص:
     Impl();
 
     GLuint texId_;
-    bool autoRelease_;
+    منطقي autoRelease_;
 };
 
-const Ptr<cv::ogl::Texture2D::Impl> cv::ogl::Texture2D::Impl::empty()
+ثابت Ptr<cv::ogl::Texture2D::Impl> cv::ogl::Texture2D::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    ساكن Ptr<Impl> p(جديد Impl);
+    أرجع p;
 }
 
-cv::ogl::Texture2D::Impl::Impl() : texId_(0), autoRelease_(false)
+cv::ogl::Texture2D::Impl::Impl() : texId_(0), autoRelease_(خطأ)
 {
 }
 
-cv::ogl::Texture2D::Impl::Impl(GLuint atexId, bool autoRelease) : texId_(atexId), autoRelease_(autoRelease)
+cv::ogl::Texture2D::Impl::Impl(GLuint atexId, منطقي autoRelease) : texId_(atexId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsTexture(atexId) == gl::TRUE_ );
 }
 
-cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels, bool autoRelease) : texId_(0), autoRelease_(autoRelease)
+cv::ogl::Texture2D::Impl::Impl(GLint اندروني_Format, GLsizei ويڪر, GLsizei اوچائي, GLenum format, GLenum type, ثابت GLvoid* pixels, منطقي autoRelease) : texId_(0), autoRelease_(autoRelease)
 {
     gl::GenTextures(1, &texId_);
     CV_CheckGlError();
@@ -912,7 +912,7 @@ cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei heig
     gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
     CV_CheckGlError();
 
-    gl::TexImage2D(gl::TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, pixels);
+    gl::TexImage2D(gl::TEXTURE_2D, 0, اندروني_Format, ويڪر, اوچائي, 0, format, type, pixels);
     CV_CheckGlError();
 
     gl::GenerateMipmap(gl::TEXTURE_2D);
@@ -921,11 +921,11 @@ cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei heig
 
 cv::ogl::Texture2D::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    إذا (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
-void cv::ogl::Texture2D::Impl::copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+فراغ cv::ogl::Texture2D::Impl::copyFrom(GLsizei ويڪر, GLsizei اوچائي, GLenum format, GLenum type, ثابت GLvoid *pixels)
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
@@ -933,14 +933,14 @@ void cv::ogl::Texture2D::Impl::copyFrom(GLsizei width, GLsizei height, GLenum fo
     gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
     CV_CheckGlError();
 
-    gl::TexSubImage2D(gl::TEXTURE_2D, 0, 0, 0, width, height, format, type, pixels);
+    gl::TexSubImage2D(gl::TEXTURE_2D, 0, 0, 0, ويڪر, اوچائي, format, type, pixels);
     CV_CheckGlError();
 
     gl::GenerateMipmap(gl::TEXTURE_2D);
     CV_CheckGlError();
 }
 
-void cv::ogl::Texture2D::Impl::copyTo(GLenum format, GLenum type, GLvoid* pixels) const
+فراغ cv::ogl::Texture2D::Impl::copy_منزل(GLenum format, GLenum type, GLvoid* pixels) ثابت
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
@@ -952,893 +952,893 @@ void cv::ogl::Texture2D::Impl::copyTo(GLenum format, GLenum type, GLvoid* pixels
     CV_CheckGlError();
 }
 
-void cv::ogl::Texture2D::Impl::bind() const
+فراغ cv::ogl::Texture2D::Impl::bind() ثابت
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
 }
 
-#endif // HAVE_OPENGL
+#جيڪڏهن_پورو // HAVE_OPENGL
 
-cv::ogl::Texture2D::Texture2D() : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D() : صفون_2(0), کانن_ڳڻپ_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
+#وإلا
     impl_ = Impl::empty();
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Texture2D::Texture2D(int arows, int acols, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(صحيح arows, صحيح acols, Format aformat, بنانشان صحيح atexId, منطقي autoRelease) : صفون_2(0), کانن_ڳڻپ_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(aformat);
-    CV_UNUSED(atexId);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arows);
+    CV_اڻ_استعمال_ٿيل(acols);
+    CV_اڻ_استعمال_ٿيل(aformat);
+    CV_اڻ_استعمال_ٿيل(atexId);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(atexId, autoRelease));
-    rows_ = arows;
-    cols_ = acols;
+#وإلا
+    impl_.reset(جديد Impl(atexId, autoRelease));
+    صفون_2 = arows;
+    کانن_ڳڻپ_2 = acols;
     format_ = aformat;
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(سائيز asize, Format aformat, بنانشان صحيح atexId, منطقي autoRelease) : صفون_2(0), کانن_ڳڻپ_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(asize);
-    CV_UNUSED(aformat);
-    CV_UNUSED(atexId);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(asize);
+    CV_اڻ_استعمال_ٿيل(aformat);
+    CV_اڻ_استعمال_ٿيل(atexId);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(atexId, autoRelease));
-    rows_ = asize.height;
-    cols_ = asize.width;
+#وإلا
+    impl_.reset(جديد Impl(atexId, autoRelease));
+    صفون_2 = asize.اوچائي;
+    کانن_ڳڻپ_2 = asize.ويڪر;
     format_ = aformat;
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(داخلا_Array arr, منطقي autoRelease) : صفون_2(0), کانن_ڳڻپ_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#وإلا
+    ثابت صحيح قسم = arr.قسم();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    ثابت سائيز asize = arr.size();
+    ثابت صحيح atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    ثابت صحيح اونهائي = CV_MAT_اونهائي(atype);
+    ثابت صحيح cn = CV_MAT_CN(atype);
 
-    CV_Assert( depth <= CV_32F );
+    CV_Assert( اونهائي <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
 
-    const Format internalFormats[] =
+    ثابت Format اندروني_Formats[] =
     {
-        NONE, DEPTH_COMPONENT, NONE, RGB, RGBA
+        NONE, اونهائي_COMPONENT, NONE, RGB, RGBA
     };
-    const GLenum srcFormats[] =
+    ثابت GLenum srcFormats[] =
     {
-        0, gl::DEPTH_COMPONENT, 0, gl::BGR, gl::BGRA
+        0, gl::اونهائي_COMPONENT, 0, gl::BGR, gl::BGRA
     };
 
-    switch (kind)
+    بدل (قسم)
     {
-    case _InputArray::OPENGL_BUFFER:
+    حالة داخلا_Array_2::OPENGL_بفر:
         {
-            ogl::Buffer buf = arr.getOGlBuffer();
-            buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            break;
+            ogl::بفر_2 buf = arr.get_OGl_بفر();
+            buf.bind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+            impl_.reset(جديد Impl(اندروني_Formats[cn], asize.ويڪر, asize.اوچائي, srcFormats[cn], gl_types[اونهائي], 0, autoRelease));
+            ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+            اكسر;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    حالة داخلا_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #وإلا
                 GpuMat dmat = arr.getGpuMat();
-                ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                buf.setAutoRelease(true);
-                buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
-                ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            #endif
+                ogl::بفر_2 buf(dmat, ogl::بفر_2::PIXEL_UNPACK_بفر);
+                buf.سيٽ_Auto_Release(سچ);
+                buf.bind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+                impl_.reset(جديد Impl(اندروني_Formats[cn], asize.ويڪر, asize.اوچائي, srcFormats[cn], gl_types[اونهائي], 0, autoRelease));
+                ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+            #جيڪڏهن_پورو
 
-            break;
+            اكسر;
         }
 
-    default:
+    افتراضي:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], mat.data, autoRelease));
-            break;
+            ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+            impl_.reset(جديد Impl(اندروني_Formats[cn], asize.ويڪر, asize.اوچائي, srcFormats[cn], gl_types[اونهائي], mat.معلومات, autoRelease));
+            اكسر;
         }
     }
 
-    rows_ = asize.height;
-    cols_ = asize.width;
-    format_ = internalFormats[cn];
-#endif
+    صفون_2 = asize.اوچائي;
+    کانن_ڳڻپ_2 = asize.ويڪر;
+    format_ = اندروني_Formats[cn];
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Texture2D::create(int arows, int acols, Format aformat, bool autoRelease)
+فراغ cv::ogl::Texture2D::create(صحيح arows, صحيح acols, Format aformat, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(aformat);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arows);
+    CV_اڻ_استعمال_ٿيل(acols);
+    CV_اڻ_استعمال_ٿيل(aformat);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || format_ != aformat)
+#وإلا
+    إذا (صفون_2 != arows || کانن_ڳڻپ_2 != acols || format_ != aformat)
     {
-        ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-        impl_.reset(new Impl(aformat, acols, arows, aformat, gl::FLOAT, 0, autoRelease));
-        rows_ = arows;
-        cols_ = acols;
+        ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+        impl_.reset(جديد Impl(aformat, acols, arows, aformat, gl::FLOAT, 0, autoRelease));
+        صفون_2 = arows;
+        کانن_ڳڻپ_2 = acols;
         format_ = aformat;
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Texture2D::release()
+فراغ cv::ogl::Texture2D::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#جيڪڏهن_وصف_ٿيل HAVE_OPENGL
+    إذا (impl_)
+        impl_->سيٽ_Auto_Release(سچ);
     impl_ = Impl::empty();
-    rows_ = 0;
-    cols_ = 0;
+    صفون_2 = 0;
+    کانن_ڳڻپ_2 = 0;
     format_ = NONE;
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Texture2D::setAutoRelease(bool flag)
+فراغ cv::ogl::Texture2D::سيٽ_Auto_Release(منطقي flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#وإلا
+    impl_->سيٽ_Auto_Release(flag);
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
+فراغ cv::ogl::Texture2D::copyFrom(داخلا_Array arr, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#وإلا
+    ثابت صحيح قسم = arr.قسم();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    ثابت سائيز asize = arr.size();
+    ثابت صحيح atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    ثابت صحيح اونهائي = CV_MAT_اونهائي(atype);
+    ثابت صحيح cn = CV_MAT_CN(atype);
 
-    CV_Assert( depth <= CV_32F );
+    CV_Assert( اونهائي <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
 
-    const Format internalFormats[] =
+    ثابت Format اندروني_Formats[] =
     {
-        NONE, DEPTH_COMPONENT, NONE, RGB, RGBA
+        NONE, اونهائي_COMPONENT, NONE, RGB, RGBA
     };
-    const GLenum srcFormats[] =
+    ثابت GLenum srcFormats[] =
     {
-        0, gl::DEPTH_COMPONENT, 0, gl::BGR, gl::BGRA
+        0, gl::اونهائي_COMPONENT, 0, gl::BGR, gl::BGRA
     };
 
-    create(asize, internalFormats[cn], autoRelease);
+    create(asize, اندروني_Formats[cn], autoRelease);
 
-    switch(kind)
+    بدل(قسم)
     {
-    case _InputArray::OPENGL_BUFFER:
+    حالة داخلا_Array_2::OPENGL_بفر:
         {
-            ogl::Buffer buf = arr.getOGlBuffer();
-            buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], 0);
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            break;
+            ogl::بفر_2 buf = arr.get_OGl_بفر();
+            buf.bind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+            impl_->copyFrom(asize.ويڪر, asize.اوچائي, srcFormats[cn], gl_types[اونهائي], 0);
+            ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+            اكسر;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    حالة داخلا_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #وإلا
                 GpuMat dmat = arr.getGpuMat();
-                ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                buf.setAutoRelease(true);
-                buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], 0);
-                ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            #endif
+                ogl::بفر_2 buf(dmat, ogl::بفر_2::PIXEL_UNPACK_بفر);
+                buf.سيٽ_Auto_Release(سچ);
+                buf.bind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+                impl_->copyFrom(asize.ويڪر, asize.اوچائي, srcFormats[cn], gl_types[اونهائي], 0);
+                ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+            #جيڪڏهن_پورو
 
-            break;
+            اكسر;
         }
 
-    default:
+    افتراضي:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], mat.data);
+            ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_UNPACK_بفر);
+            impl_->copyFrom(asize.ويڪر, asize.اوچائي, srcFormats[cn], gl_types[اونهائي], mat.معلومات);
         }
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Texture2D::copyTo(OutputArray arr, int ddepth, bool autoRelease) const
+فراغ cv::ogl::Texture2D::copy_منزل(OutputArray arr, صحيح ddepth, منطقي autoRelease) ثابت
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(ddepth);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
+    CV_اڻ_استعمال_ٿيل(ddepth);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#وإلا
+    ثابت صحيح قسم = arr.قسم();
 
-    const int cn = format_ == DEPTH_COMPONENT ? 1: format_ == RGB ? 3 : 4;
-    const GLenum dstFormat = format_ == DEPTH_COMPONENT ? gl::DEPTH_COMPONENT : format_ == RGB ? gl::BGR : gl::BGRA;
+    ثابت صحيح cn = format_ == اونهائي_COMPONENT ? 1: format_ == RGB ? 3 : 4;
+    ثابت GLenum dstFormat = format_ == اونهائي_COMPONENT ? gl::اونهائي_COMPONENT : format_ == RGB ? gl::BGR : gl::BGRA;
 
-    switch(kind)
+    بدل(قسم)
     {
-    case _InputArray::OPENGL_BUFFER:
+    حالة داخلا_Array_2::OPENGL_بفر:
         {
-            ogl::Buffer& buf = arr.getOGlBufferRef();
-            buf.create(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER, autoRelease);
-            buf.bind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            impl_->copyTo(dstFormat, gl_types[ddepth], 0);
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            break;
+            ogl::بفر_2& buf = arr.get_OGl_بفر_Ref();
+            buf.create(صفون_2, کانن_ڳڻپ_2, CV_MAKE_TYPE(ddepth, cn), ogl::بفر_2::PIXEL_PACK_بفر, autoRelease);
+            buf.bind(ogl::بفر_2::PIXEL_PACK_بفر);
+            impl_->copy_منزل(dstFormat, gl_types[ddepth], 0);
+            ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_PACK_بفر);
+            اكسر;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    حالة داخلا_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #جيڪڏهن_وصف_نه_ٿيل HAVE_CUDA
                 throw_no_cuda();
-            #else
-                ogl::Buffer buf(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER);
-                buf.setAutoRelease(true);
-                buf.bind(ogl::Buffer::PIXEL_PACK_BUFFER);
-                impl_->copyTo(dstFormat, gl_types[ddepth], 0);
-                ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-                buf.copyTo(arr);
-            #endif
+            #وإلا
+                ogl::بفر_2 buf(صفون_2, کانن_ڳڻپ_2, CV_MAKE_TYPE(ddepth, cn), ogl::بفر_2::PIXEL_PACK_بفر);
+                buf.سيٽ_Auto_Release(سچ);
+                buf.bind(ogl::بفر_2::PIXEL_PACK_بفر);
+                impl_->copy_منزل(dstFormat, gl_types[ddepth], 0);
+                ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_PACK_بفر);
+                buf.copy_منزل(arr);
+            #جيڪڏهن_پورو
 
-            break;
+            اكسر;
         }
 
-    default:
+    افتراضي:
         {
-            arr.create(rows_, cols_, CV_MAKE_TYPE(ddepth, cn));
+            arr.create(صفون_2, کانن_ڳڻپ_2, CV_MAKE_TYPE(ddepth, cn));
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            impl_->copyTo(dstFormat, gl_types[ddepth], mat.data);
+            ogl::بفر_2::unbind(ogl::بفر_2::PIXEL_PACK_بفر);
+            impl_->copy_منزل(dstFormat, gl_types[ddepth], mat.معلومات);
         }
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Texture2D::bind() const
+فراغ cv::ogl::Texture2D::bind() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
+#وإلا
     impl_->bind();
-#endif
+#جيڪڏهن_پورو
 }
 
-unsigned int cv::ogl::Texture2D::texId() const
+بنانشان صحيح cv::ogl::Texture2D::texId() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
-#endif
+#وإلا
+    أرجع impl_->texId();
+#جيڪڏهن_پورو
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // ogl::TextureBuffer
 
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
 
-class cv::ogl::TextureBuffer::Impl
+صنف cv::ogl::Texture_بفر::Impl
 {
 };
 
-#else
+#وإلا
 
-class cv::ogl::TextureBuffer::Impl
+صنف cv::ogl::Texture_بفر::Impl
 {
-public:
-    static const Ptr<Impl> empty();
+عام:
+    ساكن ثابت Ptr<Impl> empty();
 
     Impl();
-    Impl(GLenum internalFormat, GLuint bufId, bool autoRelease);
+    Impl(GLenum اندروني_Format, GLuint bufId, منطقي autoRelease);
     ~Impl();
 
-    void bind(GLint unit) const;
+    فراغ bind(GLint unit) ثابت;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    فراغ سيٽ_Auto_Release(منطقي flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() ثابت { أرجع texId_; }
 
-private:
+خاص:
     GLuint texId_;
-    bool autoRelease_;
+    منطقي autoRelease_;
 };
 
-const Ptr<cv::ogl::TextureBuffer::Impl> cv::ogl::TextureBuffer::Impl::empty()
+ثابت Ptr<cv::ogl::Texture_بفر::Impl> cv::ogl::Texture_بفر::Impl::empty()
 {
-    static Ptr<Impl> p = makePtr<Impl>();
-    return p;
+    ساكن Ptr<Impl> p = makePtr<Impl>();
+    أرجع p;
 }
 
-cv::ogl::TextureBuffer::Impl::Impl() : texId_(0), autoRelease_(false)
+cv::ogl::Texture_بفر::Impl::Impl() : texId_(0), autoRelease_(خطأ)
 {
 }
 
-cv::ogl::TextureBuffer::Impl::Impl(GLenum internalFormat, GLuint bufId, bool autoRelease) : texId_(0), autoRelease_(autoRelease)
+cv::ogl::Texture_بفر::Impl::Impl(GLenum اندروني_Format, GLuint bufId, منطقي autoRelease) : texId_(0), autoRelease_(autoRelease)
 {
     gl::GenTextures(1, &texId_);
     CV_CheckGlError();
 
     CV_Assert(texId_ != 0);
 
-    gl::BindTexture(gl::TEXTURE_BUFFER, texId_);
+    gl::BindTexture(gl::TEXTURE_بفر, texId_);
     CV_CheckGlError();
 
-    gl::TexBuffer(gl::TEXTURE_BUFFER, internalFormat, bufId);
+    gl::Tex_بفر(gl::TEXTURE_بفر, اندروني_Format, bufId);
     CV_CheckGlError();
 
-    gl::BindTexture(gl::TEXTURE_BUFFER, 0);
+    gl::BindTexture(gl::TEXTURE_بفر, 0);
     CV_CheckGlError();
 }
 
-cv::ogl::TextureBuffer::Impl::~Impl()
+cv::ogl::Texture_بفر::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    إذا (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
-void cv::ogl::TextureBuffer::Impl::bind(GLint unit) const
+فراغ cv::ogl::Texture_بفر::Impl::bind(GLint unit) ثابت
 {
-    gl::ActiveTexture(gl::TEXTURE0 + unit);
+    gl::سرگرم_Texture(gl::TEXTURE0 + unit);
     CV_CheckGlError();
 
-    gl::BindTexture(gl::TEXTURE_BUFFER, texId_);
+    gl::BindTexture(gl::TEXTURE_بفر, texId_);
     CV_CheckGlError();
 }
 
-#endif // HAVE_OPENGL
+#جيڪڏهن_پورو // HAVE_OPENGL
 
-cv::ogl::TextureBuffer::TextureBuffer() : format_(NONE)
+cv::ogl::Texture_بفر::Texture_بفر() : format_(NONE)
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
+#وإلا
     impl_ = Impl::empty();
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::TextureBuffer::TextureBuffer(const Buffer& buf, Format aformat, bool autoRelease) : format_(NONE)
+cv::ogl::Texture_بفر::Texture_بفر(ثابت بفر_2& buf, Format aformat, منطقي autoRelease) : format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(buf);
-    CV_UNUSED(aformat);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(buf);
+    CV_اڻ_استعمال_ٿيل(aformat);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
+#وإلا
     impl_ = Impl::empty();
     create(buf, aformat, autoRelease);
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::TextureBuffer::create(const Buffer& buf, Format aformat, bool autoRelease)
+فراغ cv::ogl::Texture_بفر::create(ثابت بفر_2& buf, Format aformat, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(buf);
-    CV_UNUSED(aformat);
-    CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(buf);
+    CV_اڻ_استعمال_ٿيل(aformat);
+    CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
+#وإلا
     CV_Assert( !buf.empty() );
     CV_Assert( aformat != NONE );
 
     impl_ = makePtr<Impl>(aformat, buf.bufId(), autoRelease);
     buf_ = buf;
     format_ = aformat;
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::TextureBuffer::release()
+فراغ cv::ogl::Texture_بفر::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#جيڪڏهن_وصف_ٿيل HAVE_OPENGL
+    إذا (impl_)
+        impl_->سيٽ_Auto_Release(سچ);
     impl_ = Impl::empty();
-#endif
-    buf_ = Buffer();
+#جيڪڏهن_پورو
+    buf_ = بفر_2();
     format_ = NONE;
 }
 
-void cv::ogl::TextureBuffer::setAutoRelease(bool flag)
+فراغ cv::ogl::Texture_بفر::سيٽ_Auto_Release(منطقي flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#وإلا
+    impl_->سيٽ_Auto_Release(flag);
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::TextureBuffer::bind(int unit) const
+فراغ cv::ogl::Texture_بفر::bind(صحيح unit) ثابت
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(unit);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(unit);
     throw_no_ogl();
-#else
+#وإلا
     CV_Assert( unit >= 0 );
     impl_->bind(unit);
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::TextureBuffer::Format cv::ogl::TextureBuffer::format() const
+cv::ogl::Texture_بفر::Format cv::ogl::Texture_بفر::format() ثابت
 {
-    return format_;
+    أرجع format_;
 }
 
-bool cv::ogl::TextureBuffer::empty() const
+منطقي cv::ogl::Texture_بفر::empty() ثابت
 {
-    return format_ == NONE;
+    أرجع format_ == NONE;
 }
 
-unsigned int cv::ogl::TextureBuffer::texId() const
+بنانشان صحيح cv::ogl::Texture_بفر::texId() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
-#endif
+#وإلا
+    أرجع impl_->texId();
+#جيڪڏهن_پورو
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Arrays
 
-void cv::ogl::Arrays::setVertexArray(InputArray vertex)
+فراغ cv::ogl::Arrays::سيٽ_راس_Array(داخلا_Array راس)
 {
-    const int cn = vertex.channels();
-    const int depth = vertex.depth();
+    ثابت صحيح cn = راس.channels();
+    ثابت صحيح اونهائي = راس.اونهائي();
 
     CV_Assert( cn == 2 || cn == 3 || cn == 4 );
-    CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
+    CV_Assert( اونهائي == CV_16S || اونهائي == CV_32S || اونهائي == CV_32F || اونهائي == CV_64F );
 
-    if (vertex.kind() == _InputArray::OPENGL_BUFFER)
-        vertex_ = vertex.getOGlBuffer();
-    else
-        vertex_.copyFrom(vertex);
+    إذا (راس.قسم() == داخلا_Array_2::OPENGL_بفر)
+        راس_2 = راس.get_OGl_بفر();
+    وإلا
+        راس_2.copyFrom(راس);
 
-    size_ = vertex_.size().area();
+    سائيز_3 = راس_2.size().area();
 }
 
-void cv::ogl::Arrays::resetVertexArray()
+فراغ cv::ogl::Arrays::reset_راس_Array()
 {
-    vertex_.release();
-    size_ = 0;
+    راس_2.release();
+    سائيز_3 = 0;
 }
 
-void cv::ogl::Arrays::setColorArray(InputArray color)
+فراغ cv::ogl::Arrays::سيٽ_Color_Array(داخلا_Array color)
 {
-    const int cn = color.channels();
+    ثابت صحيح cn = color.channels();
 
     CV_Assert( cn == 3 || cn == 4 );
 
-    if (color.kind() == _InputArray::OPENGL_BUFFER)
-        color_ = color.getOGlBuffer();
-    else
+    إذا (color.قسم() == داخلا_Array_2::OPENGL_بفر)
+        color_ = color.get_OGl_بفر();
+    وإلا
         color_.copyFrom(color);
 }
 
-void cv::ogl::Arrays::resetColorArray()
+فراغ cv::ogl::Arrays::resetColorArray()
 {
     color_.release();
 }
 
-void cv::ogl::Arrays::setNormalArray(InputArray normal)
+فراغ cv::ogl::Arrays::سيٽ_عام_Array(داخلا_Array عام_2)
 {
-    const int cn = normal.channels();
-    const int depth = normal.depth();
+    ثابت صحيح cn = عام_2.channels();
+    ثابت صحيح اونهائي = عام_2.اونهائي();
 
     CV_Assert( cn == 3 );
-    CV_Assert( depth == CV_8S || depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
+    CV_Assert( اونهائي == CV_8S || اونهائي == CV_16S || اونهائي == CV_32S || اونهائي == CV_32F || اونهائي == CV_64F );
 
-    if (normal.kind() == _InputArray::OPENGL_BUFFER)
-        normal_ = normal.getOGlBuffer();
-    else
-        normal_.copyFrom(normal);
+    إذا (عام_2.قسم() == داخلا_Array_2::OPENGL_بفر)
+        عام_3 = عام_2.get_OGl_بفر();
+    وإلا
+        عام_3.copyFrom(عام_2);
 }
 
-void cv::ogl::Arrays::resetNormalArray()
+فراغ cv::ogl::Arrays::reset_عام_Array()
 {
-    normal_.release();
+    عام_3.release();
 }
 
-void cv::ogl::Arrays::setTexCoordArray(InputArray texCoord)
+فراغ cv::ogl::Arrays::سيٽ_Tex_Coord_Array(داخلا_Array texCoord)
 {
-    const int cn = texCoord.channels();
-    const int depth = texCoord.depth();
+    ثابت صحيح cn = texCoord.channels();
+    ثابت صحيح اونهائي = texCoord.اونهائي();
 
     CV_Assert( cn >= 1 && cn <= 4 );
-    CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
+    CV_Assert( اونهائي == CV_16S || اونهائي == CV_32S || اونهائي == CV_32F || اونهائي == CV_64F );
 
-    if (texCoord.kind() == _InputArray::OPENGL_BUFFER)
-        texCoord_ = texCoord.getOGlBuffer();
-    else
+    إذا (texCoord.قسم() == داخلا_Array_2::OPENGL_بفر)
+        texCoord_ = texCoord.get_OGl_بفر();
+    وإلا
         texCoord_.copyFrom(texCoord);
 }
 
-void cv::ogl::Arrays::resetTexCoordArray()
+فراغ cv::ogl::Arrays::resetTexCoordArray()
 {
     texCoord_.release();
 }
 
-void cv::ogl::Arrays::release()
+فراغ cv::ogl::Arrays::release()
 {
-    resetVertexArray();
+    reset_راس_Array();
     resetColorArray();
-    resetNormalArray();
+    reset_عام_Array();
     resetTexCoordArray();
 }
 
-void cv::ogl::Arrays::setAutoRelease(bool flag)
+فراغ cv::ogl::Arrays::سيٽ_Auto_Release(منطقي flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(flag);
     throw_no_ogl();
-#else
-    vertex_.setAutoRelease(flag);
-    color_.setAutoRelease(flag);
-    normal_.setAutoRelease(flag);
-    texCoord_.setAutoRelease(flag);
-#endif
+#وإلا
+    راس_2.سيٽ_Auto_Release(flag);
+    color_.سيٽ_Auto_Release(flag);
+    عام_3.سيٽ_Auto_Release(flag);
+    texCoord_.سيٽ_Auto_Release(flag);
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Arrays::bind() const
+فراغ cv::ogl::Arrays::bind() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    CV_Assert( texCoord_.empty() || texCoord_.size().area() == size_ );
-    CV_Assert( normal_.empty() || normal_.size().area() == size_ );
-    CV_Assert( color_.empty() || color_.size().area() == size_ );
+#وإلا
+    CV_Assert( texCoord_.empty() || texCoord_.size().area() == سائيز_3 );
+    CV_Assert( عام_3.empty() || عام_3.size().area() == سائيز_3 );
+    CV_Assert( color_.empty() || color_.size().area() == سائيز_3 );
 
-    if (texCoord_.empty())
+    إذا (texCoord_.empty())
     {
         gl::DisableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
     }
-    else
+    وإلا
     {
         gl::EnableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
 
-        texCoord_.bind(ogl::Buffer::ARRAY_BUFFER);
+        texCoord_.bind(ogl::بفر_2::ARRAY_بفر);
 
-        gl::TexCoordPointer(texCoord_.channels(), gl_types[texCoord_.depth()], 0, 0);
+        gl::Tex_Coord_اشارو(texCoord_.channels(), gl_types[texCoord_.اونهائي()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (normal_.empty())
+    إذا (عام_3.empty())
     {
-        gl::DisableClientState(gl::NORMAL_ARRAY);
+        gl::DisableClientState(gl::عام_ARRAY);
         CV_CheckGlError();
     }
-    else
+    وإلا
     {
-        gl::EnableClientState(gl::NORMAL_ARRAY);
+        gl::EnableClientState(gl::عام_ARRAY);
         CV_CheckGlError();
 
-        normal_.bind(ogl::Buffer::ARRAY_BUFFER);
+        عام_3.bind(ogl::بفر_2::ARRAY_بفر);
 
-        gl::NormalPointer(gl_types[normal_.depth()], 0, 0);
+        gl::عام_اشارو(gl_types[عام_3.اونهائي()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (color_.empty())
+    إذا (color_.empty())
     {
         gl::DisableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
     }
-    else
+    وإلا
     {
         gl::EnableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
 
-        color_.bind(ogl::Buffer::ARRAY_BUFFER);
+        color_.bind(ogl::بفر_2::ARRAY_بفر);
 
-        const int cn = color_.channels();
+        ثابت صحيح cn = color_.channels();
 
-        gl::ColorPointer(cn, gl_types[color_.depth()], 0, 0);
+        gl::Color_اشارو(cn, gl_types[color_.اونهائي()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (vertex_.empty())
+    إذا (راس_2.empty())
     {
-        gl::DisableClientState(gl::VERTEX_ARRAY);
+        gl::DisableClientState(gl::راس_ARRAY);
         CV_CheckGlError();
     }
-    else
+    وإلا
     {
-        gl::EnableClientState(gl::VERTEX_ARRAY);
+        gl::EnableClientState(gl::راس_ARRAY);
         CV_CheckGlError();
 
-        vertex_.bind(ogl::Buffer::ARRAY_BUFFER);
+        راس_2.bind(ogl::بفر_2::ARRAY_بفر);
 
-        gl::VertexPointer(vertex_.channels(), gl_types[vertex_.depth()], 0, 0);
+        gl::راس_اشارو(راس_2.channels(), gl_types[راس_2.اونهائي()], 0, 0);
         CV_CheckGlError();
     }
 
-    ogl::Buffer::unbind(ogl::Buffer::ARRAY_BUFFER);
-#endif
+    ogl::بفر_2::unbind(ogl::بفر_2::ARRAY_بفر);
+#جيڪڏهن_پورو
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::VertexArray
 
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
 
-class cv::ogl::VertexArray::Impl
+صنف cv::ogl::راس_Array::Impl
 {
 };
 
-#else
+#وإلا
 
-class cv::ogl::VertexArray::Impl
+صنف cv::ogl::راس_Array::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+عام:
+    ساكن ثابت Ptr<Impl>& empty();
 
-    Impl(GLuint vaId, bool autoRelease);
-    Impl(std::initializer_list<Attribute> attributes, bool autoRelease);
+    Impl(GLuint vaId, منطقي autoRelease);
+    Impl(std::initializer_list<Attribute> خاصيتون, منطقي autoRelease);
     ~Impl();
 
-    void bind();
+    فراغ bind();
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    فراغ سيٽ_Auto_Release(منطقي flag) { autoRelease_ = flag; }
 
-    GLuint vaId() const { return vaId_; }
+    GLuint vaId() ثابت { أرجع vaId_; }
 
-private:
+خاص:
     Impl();
 
     GLuint vaId_;
-    bool autoRelease_;
+    منطقي autoRelease_;
 };
 
-const Ptr<cv::ogl::VertexArray::Impl>& cv::ogl::VertexArray::Impl::empty()
+ثابت Ptr<cv::ogl::راس_Array::Impl>& cv::ogl::راس_Array::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    ساكن Ptr<Impl> p(جديد Impl);
+    أرجع p;
 }
 
-cv::ogl::VertexArray::Impl::Impl() : vaId_(0), autoRelease_(false)
+cv::ogl::راس_Array::Impl::Impl() : vaId_(0), autoRelease_(خطأ)
 {
 }
 
-cv::ogl::VertexArray::Impl::Impl(GLuint vaId, bool autoRelease) : vaId_(vaId), autoRelease_(autoRelease)
+cv::ogl::راس_Array::Impl::Impl(GLuint vaId, منطقي autoRelease) : vaId_(vaId), autoRelease_(autoRelease)
 {
-    CV_Assert( gl::IsVertexArray(vaId) == gl::TRUE_ );
+    CV_Assert( gl::Is_راس_Array(vaId) == gl::TRUE_ );
 }
 
-cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bool autoRelease) : vaId_(0), autoRelease_(autoRelease)
+cv::ogl::راس_Array::Impl::Impl(std::initializer_list<Attribute> خاصيتون, منطقي autoRelease) : vaId_(0), autoRelease_(autoRelease)
 {
-    gl::GenVertexArrays(1, &vaId_);
+    gl::Gen_راس_Arrays(1, &vaId_);
     CV_CheckGlError();
 
     CV_Assert( vaId_ != 0 );
-    gl::BindVertexArray(vaId_);
+    gl::Bind_راس_Array(vaId_);
     CV_CheckGlError();
 
-    for (auto& attribute : attributes)
+    لكل (خودڪار& attribute : خاصيتون)
     {
-        attribute.buffer_.bind(Buffer::ARRAY_BUFFER);
-        if (attribute.integer_)
+        attribute.بفر_3.bind(بفر_2::ARRAY_بفر);
+        إذا (attribute.integer_)
         {
-            gl::VertexAttribIPointer(
+            gl::راس_Attrib_IPointer(
                 attribute.shader_loc_,
-                attribute.size_,
+                attribute.سائيز_3,
                 attribute.type_,
                 static_cast<GLsizei>(attribute.stride_),
-                reinterpret_cast<const void*>(attribute.offset_)
+                reinterpret_cast<ثابت فراغ*>(attribute.وٿي)
             );
             CV_CheckGlError();
         }
-        else
+        وإلا
         {
-            gl::VertexAttribPointer(
+            gl::راس_Attrib_اشارو(
                 attribute.shader_loc_,
-                attribute.size_,
+                attribute.سائيز_3,
                 attribute.type_,
                 attribute.normalized_,
                 static_cast<GLsizei>(attribute.stride_),
-                reinterpret_cast<const void*>(attribute.offset_)
+                reinterpret_cast<ثابت فراغ*>(attribute.وٿي)
             );
             CV_CheckGlError();
         }
 
-        gl::EnableVertexAttribArray(attribute.shader_loc_);
+        gl::Enable_راس_Attrib_Array(attribute.shader_loc_);
         CV_CheckGlError();
     }
 }
 
-cv::ogl::VertexArray::Impl::~Impl()
+cv::ogl::راس_Array::Impl::~Impl()
 {
-    if (autoRelease_ && vaId_)
-        gl::DeleteVertexArrays(1, &vaId_);
+    إذا (autoRelease_ && vaId_)
+        gl::Delete_راس_Arrays(1, &vaId_);
 }
 
-void cv::ogl::VertexArray::Impl::bind()
+فراغ cv::ogl::راس_Array::Impl::bind()
 {
-    gl::BindVertexArray(vaId_);
+    gl::Bind_راس_Array(vaId_);
     CV_CheckGlError();
 }
 
-#endif // HAVE_OPENGL
+#جيڪڏهن_پورو // HAVE_OPENGL
 
-cv::ogl::VertexArray::VertexArray()
+cv::ogl::راس_Array::راس_Array()
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
+#وإلا
     impl_ = Impl::empty();
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::VertexArray::VertexArray(std::initializer_list<Attribute> attributes, bool autoRelease)
+cv::ogl::راس_Array::راس_Array(std::initializer_list<Attribute> خاصيتون, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(attributes); CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(خاصيتون); CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(attributes, autoRelease));
-#endif
+#وإلا
+    impl_.reset(جديد Impl(خاصيتون, autoRelease));
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::VertexArray::create(std::initializer_list<Attribute> attributes, bool autoRelease)
+فراغ cv::ogl::راس_Array::create(std::initializer_list<Attribute> خاصيتون, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(attributes); CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(خاصيتون); CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(attributes, autoRelease));
-#endif
+#وإلا
+    impl_.reset(جديد Impl(خاصيتون, autoRelease));
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::VertexArray::release()
+فراغ cv::ogl::راس_Array::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#جيڪڏهن_وصف_ٿيل HAVE_OPENGL
+    إذا (impl_)
+        impl_->سيٽ_Auto_Release(سچ);
     impl_ = Impl::empty();
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::VertexArray::setAutoRelease(bool flag)
+فراغ cv::ogl::راس_Array::سيٽ_Auto_Release(منطقي flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#وإلا
+    impl_->سيٽ_Auto_Release(flag);
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::VertexArray::bind() const
+فراغ cv::ogl::راس_Array::bind() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
+#وإلا
     impl_->bind();
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::VertexArray::unbind()
+فراغ cv::ogl::راس_Array::unbind()
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    gl::BindVertexArray(0);
-#endif
+#وإلا
+    gl::Bind_راس_Array(0);
+#جيڪڏهن_پورو
 }
 
-unsigned int cv::ogl::VertexArray::vaId() const
+بنانشان صحيح cv::ogl::راس_Array::vaId() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->vaId();
-#endif
+#وإلا
+    أرجع impl_->vaId();
+#جيڪڏهن_پورو
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Shader
 
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
 
-class cv::ogl::Shader::Impl
+صنف cv::ogl::Shader::Impl
 {
 };
 
-#else
+#وإلا
 
-class cv::ogl::Shader::Impl
+صنف cv::ogl::Shader::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+عام:
+    ساكن ثابت Ptr<Impl>& empty();
 
-    Impl(GLuint shaderId, bool autoRelease);
-    Impl(const char* src, GLenum type, bool autoRelease);
+    Impl(GLuint shaderId, منطقي autoRelease);
+    Impl(ثابت حرف* src, GLenum type, منطقي autoRelease);
     ~Impl();
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    فراغ سيٽ_Auto_Release(منطقي flag) { autoRelease_ = flag; }
 
-    GLuint shaderId() const { return shaderId_; }
+    GLuint shaderId() ثابت { أرجع shaderId_; }
 
-private:
+خاص:
     Impl();
 
     GLuint shaderId_;
-    bool autoRelease_;
+    منطقي autoRelease_;
 };
 
-const Ptr<cv::ogl::Shader::Impl>& cv::ogl::Shader::Impl::empty()
+ثابت Ptr<cv::ogl::Shader::Impl>& cv::ogl::Shader::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    ساكن Ptr<Impl> p(جديد Impl);
+    أرجع p;
 }
 
-cv::ogl::Shader::Impl::Impl() : shaderId_(0), autoRelease_(false)
+cv::ogl::Shader::Impl::Impl() : shaderId_(0), autoRelease_(خطأ)
 {
 }
 
-cv::ogl::Shader::Impl::Impl(GLuint shaderId, bool autoRelease) : shaderId_(shaderId), autoRelease_(autoRelease)
+cv::ogl::Shader::Impl::Impl(GLuint shaderId, منطقي autoRelease) : shaderId_(shaderId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsShader(shaderId) == gl::TRUE_ );
 }
 
-cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : shaderId_(0), autoRelease_(autoRelease)
+cv::ogl::Shader::Impl::Impl(ثابت حرف* src, GLenum type, منطقي autoRelease) : shaderId_(0), autoRelease_(autoRelease)
 {
     shaderId_ = gl::CreateShader(type);
     CV_CheckGlError();
 
     CV_Assert( shaderId_ != 0 );
 
-    GLint status;
-    gl::ShaderSource(shaderId_, 1, &src, 0);
+    GLint حالت;
+    gl::Shader_ذريعو(shaderId_, 1, &src, 0);
     gl::CompileShader(shaderId_);
-    gl::GetShaderiv(shaderId_, gl::COMPILE_STATUS, &status);
-    if (!status) {
+    gl::GetShaderiv(shaderId_, gl::COMPILE_حالت, &حالت);
+    إذا (!حالت) {
         String info_log;
-        gl::GetShaderiv(shaderId_, gl::INFO_LOG_LENGTH, &status);
-        info_log.resize(status);
-        gl::GetShaderInfoLog(shaderId_, GLsizei(info_log.size()) + 1, nullptr, &info_log[0]);
+        gl::GetShaderiv(shaderId_, gl::INFO_LOG_ڊيگهائي, &حالت);
+        info_log.resize(حالت);
+        gl::GetShaderInfoLog(shaderId_, GLsizei(info_log.size()) + 1, خالي_اشارو, &info_log[0]);
         CV_Error(Error::OpenGlApiCallError, info_log);
     }
 
@@ -1847,149 +1847,149 @@ cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : sh
 
 cv::ogl::Shader::Impl::~Impl()
 {
-    if (autoRelease_ && shaderId_)
+    إذا (autoRelease_ && shaderId_)
         gl::DeleteShader(shaderId_);
 }
 
-#endif // HAVE_OPENGL
+#جيڪڏهن_پورو // HAVE_OPENGL
 
-cv::ogl::Shader::Shader() : type_(ShaderType::VERTEX)
+cv::ogl::Shader::Shader() : type_(ShaderType::راس_3)
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
+#وإلا
     impl_ = Impl::empty();
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Shader::Shader(const char* src, ShaderType type, bool autoRelease) : type_(type)
+cv::ogl::Shader::Shader(ثابت حرف* src, ShaderType type, منطقي autoRelease) : type_(type)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(src); CV_اڻ_استعمال_ٿيل(type); CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(src, type, autoRelease));
-#endif
+#وإلا
+    impl_.reset(جديد Impl(src, type, autoRelease));
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Shader::create(const char* src, ShaderType type, bool autoRelease)
+فراغ cv::ogl::Shader::create(ثابت حرف* src, ShaderType type, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(src); CV_اڻ_استعمال_ٿيل(type); CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(src, type, autoRelease));
+#وإلا
+    impl_.reset(جديد Impl(src, type, autoRelease));
     type_ = type;
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Shader::release()
+فراغ cv::ogl::Shader::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#جيڪڏهن_وصف_ٿيل HAVE_OPENGL
+    إذا (impl_)
+        impl_->سيٽ_Auto_Release(سچ);
     impl_ = Impl::empty();
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Shader::setAutoRelease(bool flag)
+فراغ cv::ogl::Shader::سيٽ_Auto_Release(منطقي flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#وإلا
+    impl_->سيٽ_Auto_Release(flag);
+#جيڪڏهن_پورو
 }
 
-unsigned int cv::ogl::Shader::shaderId() const
+بنانشان صحيح cv::ogl::Shader::shaderId() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->shaderId();
-#endif
+#وإلا
+    أرجع impl_->shaderId();
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Shader::ShaderType cv::ogl::Shader::type() const
+cv::ogl::Shader::ShaderType cv::ogl::Shader::type() ثابت
 {
-    return type_;
+    أرجع type_;
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Program
 
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
 
-class cv::ogl::Program::Impl
+صنف cv::ogl::پروگرام_2::Impl
 {
 };
 
-#else
+#وإلا
 
-class cv::ogl::Program::Impl
+صنف cv::ogl::پروگرام_2::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+عام:
+    ساكن ثابت Ptr<Impl>& empty();
 
-    Impl(GLuint programId, bool autoRelease);
-    Impl(const Shader& vert, const Shader& frag, bool autoRelease);
+    Impl(GLuint پروگرام_Id, منطقي autoRelease);
+    Impl(ثابت Shader& vert, ثابت Shader& frag, منطقي autoRelease);
     ~Impl();
 
-    void bind();
+    فراغ bind();
 
-    int getAttributeLocation(const char* name) const;
-    int getUniformLocation(const char* name) const;
+    صحيح getAttributeLocation(ثابت حرف* name) ثابت;
+    صحيح get_هڪجهڙو_Location(ثابت حرف* name) ثابت;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    فراغ سيٽ_Auto_Release(منطقي flag) { autoRelease_ = flag; }
 
-    GLuint programId() const { return programId_; }
+    GLuint پروگرام_Id() ثابت { أرجع پروگرام_Id_2; }
 
-private:
+خاص:
     Impl();
 
     Shader vert_;
     Shader frag_;
-    GLuint programId_;
-    bool autoRelease_;
+    GLuint پروگرام_Id_2;
+    منطقي autoRelease_;
 };
 
-const Ptr<cv::ogl::Program::Impl>& cv::ogl::Program::Impl::empty()
+ثابت Ptr<cv::ogl::پروگرام_2::Impl>& cv::ogl::پروگرام_2::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    ساكن Ptr<Impl> p(جديد Impl);
+    أرجع p;
 }
 
-cv::ogl::Program::Impl::Impl() : programId_(0), autoRelease_(false)
+cv::ogl::پروگرام_2::Impl::Impl() : پروگرام_Id_2(0), autoRelease_(خطأ)
 {
 }
 
-cv::ogl::Program::Impl::Impl(GLuint programId, bool autoRelease) : programId_(programId), autoRelease_(autoRelease)
+cv::ogl::پروگرام_2::Impl::Impl(GLuint پروگرام_Id, منطقي autoRelease) : پروگرام_Id_2(پروگرام_Id), autoRelease_(autoRelease)
 {
-    CV_Assert( gl::IsProgram(programId) == gl::TRUE_ );
+    CV_Assert( gl::Is_پروگرام(پروگرام_Id) == gl::TRUE_ );
 }
 
-cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRelease) : programId_(0), autoRelease_(autoRelease)
+cv::ogl::پروگرام_2::Impl::Impl(ثابت Shader& vert, ثابت Shader& frag, منطقي autoRelease) : پروگرام_Id_2(0), autoRelease_(autoRelease)
 {
-    programId_ = gl::CreateProgram();
+    پروگرام_Id_2 = gl::Create_پروگرام();
     CV_CheckGlError();
 
-    CV_Assert( programId_ != 0 );
+    CV_Assert( پروگرام_Id_2 != 0 );
 
-    gl::AttachShader(programId_, vert.shaderId());
+    gl::AttachShader(پروگرام_Id_2, vert.shaderId());
     CV_CheckGlError();
 
-    gl::AttachShader(programId_, frag.shaderId());
+    gl::AttachShader(پروگرام_Id_2, frag.shaderId());
     CV_CheckGlError();
 
-    GLint status;
-    gl::LinkProgram(programId_);
-    gl::GetProgramiv(programId_, gl::LINK_STATUS, &status);
-    if (!status) {
+    GLint حالت;
+    gl::Link_پروگرام(پروگرام_Id_2);
+    gl::GetProgramiv(پروگرام_Id_2, gl::LINK_حالت, &حالت);
+    إذا (!حالت) {
         String info_log;
-        gl::GetProgramiv(programId_, gl::INFO_LOG_LENGTH, &status);
-        info_log.resize(status);
-        gl::GetProgramInfoLog(programId_, GLsizei(info_log.size()) + 1, nullptr, &info_log[0]);
+        gl::GetProgramiv(پروگرام_Id_2, gl::INFO_LOG_ڊيگهائي, &حالت);
+        info_log.resize(حالت);
+        gl::Get_پروگرام_Info_Log(پروگرام_Id_2, GLsizei(info_log.size()) + 1, خالي_اشارو, &info_log[0]);
         CV_Error(Error::OpenGlApiCallError, info_log);
     }
 
@@ -1999,211 +1999,211 @@ cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRe
     frag_ = frag;
 }
 
-cv::ogl::Program::Impl::~Impl()
+cv::ogl::پروگرام_2::Impl::~Impl()
 {
-    if (autoRelease_ && programId_)
-        gl::DeleteProgram(programId_);
+    إذا (autoRelease_ && پروگرام_Id_2)
+        gl::Delete_پروگرام(پروگرام_Id_2);
 }
 
-void cv::ogl::Program::Impl::bind()
+فراغ cv::ogl::پروگرام_2::Impl::bind()
 {
-    gl::UseProgram(programId_);
+    gl::Use_پروگرام(پروگرام_Id_2);
     CV_CheckGlError();
 }
 
-int cv::ogl::Program::Impl::getAttributeLocation(const char* name) const
+صحيح cv::ogl::پروگرام_2::Impl::getAttributeLocation(ثابت حرف* name) ثابت
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetAttribLocation(programId_, name);
+    صحيح location = gl::GetAttribLocation(پروگرام_Id_2, name);
     CV_CheckGlError();
-    return location;
+    أرجع location;
 }
 
-int cv::ogl::Program::Impl::getUniformLocation(const char* name) const
+صحيح cv::ogl::پروگرام_2::Impl::get_هڪجهڙو_Location(ثابت حرف* name) ثابت
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetUniformLocation(programId_, name);
+    صحيح location = gl::Get_هڪجهڙو_Location(پروگرام_Id_2, name);
     CV_CheckGlError();
-    return location;
+    أرجع location;
 }
 
-#endif // HAVE_OPENGL
+#جيڪڏهن_پورو // HAVE_OPENGL
 
-cv::ogl::Program::Program()
+cv::ogl::پروگرام_2::پروگرام_2()
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
+#وإلا
     impl_ = Impl::empty();
-#endif
+#جيڪڏهن_پورو
 }
 
-cv::ogl::Program::Program(const Shader& vert, const Shader& frag, bool autoRelease)
+cv::ogl::پروگرام_2::پروگرام_2(ثابت Shader& vert, ثابت Shader& frag, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(vert); CV_اڻ_استعمال_ٿيل(frag); CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(vert, frag, autoRelease));
-#endif
+#وإلا
+    impl_.reset(جديد Impl(vert, frag, autoRelease));
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::create(const Shader& vert, const Shader& frag, bool autoRelease)
+فراغ cv::ogl::پروگرام_2::create(ثابت Shader& vert, ثابت Shader& frag, منطقي autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(vert); CV_اڻ_استعمال_ٿيل(frag); CV_اڻ_استعمال_ٿيل(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(vert, frag, autoRelease));
-#endif
+#وإلا
+    impl_.reset(جديد Impl(vert, frag, autoRelease));
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::release()
+فراغ cv::ogl::پروگرام_2::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#جيڪڏهن_وصف_ٿيل HAVE_OPENGL
+    إذا (impl_)
+        impl_->سيٽ_Auto_Release(سچ);
     impl_ = Impl::empty();
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::setAutoRelease(bool flag)
+فراغ cv::ogl::پروگرام_2::سيٽ_Auto_Release(منطقي flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#وإلا
+    impl_->سيٽ_Auto_Release(flag);
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::bind() const
+فراغ cv::ogl::پروگرام_2::bind() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
+#وإلا
     impl_->bind();
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::unbind()
+فراغ cv::ogl::پروگرام_2::unbind()
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    gl::UseProgram(0);
-#endif
+#وإلا
+    gl::Use_پروگرام(0);
+#جيڪڏهن_پورو
 }
 
-int cv::ogl::Program::getAttributeLocation(const char* name) const
+صحيح cv::ogl::پروگرام_2::getAttributeLocation(ثابت حرف* name) ثابت
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(name);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(name);
     throw_no_ogl();
-#else
-    return impl_->getAttributeLocation(name);
-#endif
+#وإلا
+    أرجع impl_->getAttributeLocation(name);
+#جيڪڏهن_پورو
 }
 
-int cv::ogl::Program::getUniformLocation(const char* name) const
+صحيح cv::ogl::پروگرام_2::get_هڪجهڙو_Location(ثابت حرف* name) ثابت
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(name);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(name);
     throw_no_ogl();
-#else
-    return impl_->getUniformLocation(name);
-#endif
+#وإلا
+    أرجع impl_->get_هڪجهڙو_Location(name);
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::setUniformVec3(int loc, Vec3f vec)
+فراغ cv::ogl::پروگرام_2::سيٽ_هڪجهڙو_Vec3(صحيح loc, Vec3f vec)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(vec);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(loc); CV_اڻ_استعمال_ٿيل(vec);
     throw_no_ogl();
-#else
+#وإلا
     gl::Uniform3f(loc, vec(0), vec(1), vec(2));
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::setUniformVec2(int loc, Vec2f vec)
+فراغ cv::ogl::پروگرام_2::سيٽ_هڪجهڙو_Vec2(صحيح loc, Vec2f vec)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(vec);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(loc); CV_اڻ_استعمال_ٿيل(vec);
     throw_no_ogl();
-#else
+#وإلا
     gl::Uniform2f(loc, vec(0), vec(1));
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::setUniformVec4(int loc, Vec4f vec)
+فراغ cv::ogl::پروگرام_2::سيٽ_هڪجهڙو_Vec4(صحيح loc, Vec4f vec)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(vec);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(loc); CV_اڻ_استعمال_ٿيل(vec);
     throw_no_ogl();
-#else
+#وإلا
     gl::Uniform4f(loc, vec(0), vec(1), vec(2), vec(3));
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::setUniformMat4x4(int loc, Matx44f mat)
+فراغ cv::ogl::پروگرام_2::سيٽ_هڪجهڙو_Mat4x4(صحيح loc, Matx44f mat)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(mat);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(loc); CV_اڻ_استعمال_ٿيل(mat);
     throw_no_ogl();
-#else
-    gl::UniformMatrix4fv(loc, 1, true, mat.val);
-#endif
+#وإلا
+    gl::هڪجهڙو_Matrix4fv(loc, 1, سچ, mat.val);
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::setUniform1f(int loc, float value)
+فراغ cv::ogl::پروگرام_2::سيٽ_Uniform1f(صحيح loc, عائم value)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(value);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(loc); CV_اڻ_استعمال_ٿيل(value);
     throw_no_ogl();
-#else
+#وإلا
     gl::Uniform1f(loc, value);
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::Program::setUniform1i(int loc, int value)
+فراغ cv::ogl::پروگرام_2::سيٽ_Uniform1i(صحيح loc, صحيح value)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(value);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(loc); CV_اڻ_استعمال_ٿيل(value);
     throw_no_ogl();
-#else
+#وإلا
     gl::Uniform1i(loc, value);
-#endif
+#جيڪڏهن_پورو
 }
 
-unsigned int cv::ogl::Program::programId() const
+بنانشان صحيح cv::ogl::پروگرام_2::پروگرام_Id() ثابت
 {
-#ifndef HAVE_OPENGL
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->programId();
-#endif
+#وإلا
+    أرجع impl_->پروگرام_Id();
+#جيڪڏهن_پورو
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Rendering
 
-void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<double> texRect)
+فراغ cv::ogl::render(ثابت ogl::Texture2D& tex, Rect_<مزدوج> wndRect, Rect_<مزدوج> texRect)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(tex);
-    CV_UNUSED(wndRect);
-    CV_UNUSED(texRect);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(tex);
+    CV_اڻ_استعمال_ٿيل(wndRect);
+    CV_اڻ_استعمال_ٿيل(texRect);
     throw_no_ogl();
-#else
-    if (!tex.empty())
+#وإلا
+    إذا (!tex.empty())
     {
-        gl::MatrixMode(gl::PROJECTION);
-        gl::LoadIdentity();
+        gl::ميٽرڪس_گهڻائي(gl::PROJECTION);
+        gl::ڀريو_سڃاڻپ_عنصر();
         gl::Ortho(0.0, 1.0, 1.0, 0.0, -1.0, 1.0);
         CV_CheckGlError();
 
-        gl::MatrixMode(gl::MODELVIEW);
-        gl::LoadIdentity();
+        gl::ميٽرڪس_گهڻائي(gl::MODELVIEW);
+        gl::ڀريو_سڃاڻپ_عنصر();
         CV_CheckGlError();
 
         gl::Disable(gl::LIGHTING);
@@ -2214,267 +2214,267 @@ void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<dou
         gl::Enable(gl::TEXTURE_2D);
         CV_CheckGlError();
 
-        gl::TexEnvi(gl::TEXTURE_ENV, gl::TEXTURE_ENV_MODE, gl::REPLACE);
+        gl::TexEnvi(gl::TEXTURE_ENV, gl::TEXTURE_ENV_گهڻائي, gl::REPLACE);
         CV_CheckGlError();
 
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::لڪيري);
         CV_CheckGlError();
 
-        const double vertex[] =
+        ثابت مزدوج راس[] =
         {
             wndRect.x, wndRect.y, 0.0,
-            wndRect.x, (wndRect.y + wndRect.height), 0.0,
-            wndRect.x + wndRect.width, (wndRect.y + wndRect.height), 0.0,
-            wndRect.x + wndRect.width, wndRect.y, 0.0
+            wndRect.x, (wndRect.y + wndRect.اوچائي), 0.0,
+            wndRect.x + wndRect.ويڪر, (wndRect.y + wndRect.اوچائي), 0.0,
+            wndRect.x + wndRect.ويڪر, wndRect.y, 0.0
         };
-        const double texCoords[] =
+        ثابت مزدوج texCoords[] =
         {
             texRect.x, texRect.y,
-            texRect.x, texRect.y + texRect.height,
-            texRect.x + texRect.width, texRect.y + texRect.height,
-            texRect.x + texRect.width, texRect.y
+            texRect.x, texRect.y + texRect.اوچائي,
+            texRect.x + texRect.ويڪر, texRect.y + texRect.اوچائي,
+            texRect.x + texRect.ويڪر, texRect.y
         };
 
-        ogl::Buffer::unbind(ogl::Buffer::ARRAY_BUFFER);
+        ogl::بفر_2::unbind(ogl::بفر_2::ARRAY_بفر);
 
         gl::EnableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
 
-        gl::TexCoordPointer(2, gl::DOUBLE, 0, texCoords);
+        gl::Tex_Coord_اشارو(2, gl::DOUBLE, 0, texCoords);
         CV_CheckGlError();
 
-        gl::DisableClientState(gl::NORMAL_ARRAY);
+        gl::DisableClientState(gl::عام_ARRAY);
         gl::DisableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
 
-        gl::EnableClientState(gl::VERTEX_ARRAY);
+        gl::EnableClientState(gl::راس_ARRAY);
         CV_CheckGlError();
 
-        gl::VertexPointer(3, gl::DOUBLE, 0, vertex);
+        gl::راس_اشارو(3, gl::DOUBLE, 0, راس);
         CV_CheckGlError();
 
         gl::DrawArrays(gl::QUADS, 0, 4);
         CV_CheckGlError();
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, int mode, Scalar color)
+فراغ cv::ogl::render(ثابت ogl::Arrays& arr, صحيح گهڻائي, Scalar color)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(mode);
-    CV_UNUSED(color);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
+    CV_اڻ_استعمال_ٿيل(گهڻائي);
+    CV_اڻ_استعمال_ٿيل(color);
     throw_no_ogl();
-#else
-    if (!arr.empty())
+#وإلا
+    إذا (!arr.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
         arr.bind();
 
-        gl::DrawArrays(mode, 0, arr.size());
+        gl::DrawArrays(گهڻائي, 0, arr.size());
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scalar color)
+فراغ cv::ogl::render(ثابت ogl::Arrays& arr, داخلا_Array indices, صحيح گهڻائي, Scalar color)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(indices);
-    CV_UNUSED(mode);
-    CV_UNUSED(color);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(arr);
+    CV_اڻ_استعمال_ٿيل(indices);
+    CV_اڻ_استعمال_ٿيل(گهڻائي);
+    CV_اڻ_استعمال_ٿيل(color);
     throw_no_ogl();
-#else
-    if (!arr.empty() && !indices.empty())
+#وإلا
+    إذا (!arr.empty() && !indices.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
         arr.bind();
 
-        const int kind = indices.kind();
+        ثابت صحيح قسم = indices.قسم();
 
-        switch (kind)
+        بدل (قسم)
         {
-        case _InputArray::OPENGL_BUFFER :
+        حالة داخلا_Array_2::OPENGL_بفر :
             {
-                ogl::Buffer buf = indices.getOGlBuffer();
+                ogl::بفر_2 buf = indices.get_OGl_بفر();
 
-                const int depth = buf.depth();
+                ثابت صحيح اونهائي = buf.اونهائي();
 
                 CV_Assert( buf.channels() == 1 );
-                CV_Assert( depth <= CV_32S );
+                CV_Assert( اونهائي <= CV_32S );
 
                 GLenum type;
-                if (depth < CV_16U)
+                إذا (اونهائي < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                وإلا إذا (اونهائي < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                وإلا
                     type = gl::UNSIGNED_INT;
 
-                buf.bind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
+                buf.bind(ogl::بفر_2::ELEMENT_ARRAY_بفر);
 
-                gl::DrawElements(mode, buf.size().area(), type, 0);
+                gl::DrawElements(گهڻائي, buf.size().area(), type, 0);
 
-                ogl::Buffer::unbind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
+                ogl::بفر_2::unbind(ogl::بفر_2::ELEMENT_ARRAY_بفر);
 
-                break;
+                اكسر;
             }
 
-        default:
+        افتراضي:
             {
                 Mat mat = indices.getMat();
 
-                const int depth = mat.depth();
+                ثابت صحيح اونهائي = mat.اونهائي();
 
                 CV_Assert( mat.channels() == 1 );
-                CV_Assert( depth <= CV_32S );
+                CV_Assert( اونهائي <= CV_32S );
                 CV_Assert( mat.isContinuous() );
 
                 GLenum type;
-                if (depth < CV_16U)
+                إذا (اونهائي < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                وإلا إذا (اونهائي < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                وإلا
                     type = gl::UNSIGNED_INT;
 
-                ogl::Buffer::unbind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
+                ogl::بفر_2::unbind(ogl::بفر_2::ELEMENT_ARRAY_بفر);
 
-                gl::DrawElements(mode, mat.size().area(), type, mat.data);
+                gl::DrawElements(گهڻائي, mat.size().area(), type, mat.معلومات);
             }
         }
     }
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::clearColor(Scalar color)
+فراغ cv::ogl::clearColor(Scalar color)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(color);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(color);
     throw_no_ogl();
-#else
+#وإلا
     gl::ClearColor(static_cast<GLfloat>(color[0] / 255.0), static_cast<GLfloat>(color[1] / 255.0),
                    static_cast<GLfloat>(color[2] / 255.0), static_cast<GLfloat>(color[3] / 255.0));
-    gl::Clear(gl::COLOR_BUFFER_BIT);
-#endif // HAVE_OPENGL
+    gl::Clear(gl::COLOR_بفر_ٻٽو_انگ);
+#جيڪڏهن_پورو // HAVE_OPENGL
 }
 
-void cv::ogl::clearDepth(float depth)
+فراغ cv::ogl::clear_اونهائي(عائم اونهائي)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(depth);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(اونهائي);
     throw_no_ogl();
-#else
-    gl::ClearDepth(depth);
-    gl::Clear(gl::DEPTH_BUFFER_BIT);
-#endif // HAVE_OPENGL
+#وإلا
+    gl::Clear_اونهائي(اونهائي);
+    gl::Clear(gl::اونهائي_بفر_ٻٽو_انگ);
+#جيڪڏهن_پورو // HAVE_OPENGL
 }
 
-void cv::ogl::drawArrays(int first, int count, int mode)
+فراغ cv::ogl::drawArrays(صحيح first, صحيح ڳڻپ_2, صحيح گهڻائي)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(mode);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(first); CV_اڻ_استعمال_ٿيل(ڳڻپ_2); CV_اڻ_استعمال_ٿيل(گهڻائي);
     throw_no_ogl();
-#else
-    gl::DrawArrays(mode, first, count);
-#endif // HAVE_OPENGL
+#وإلا
+    gl::DrawArrays(گهڻائي, first, ڳڻپ_2);
+#جيڪڏهن_پورو // HAVE_OPENGL
 }
 
-void cv::ogl::drawElements(int first, int count, int type, int mode)
+فراغ cv::ogl::drawElements(صحيح first, صحيح ڳڻپ_2, صحيح type, صحيح گهڻائي)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(first); CV_اڻ_استعمال_ٿيل(ڳڻپ_2); CV_اڻ_استعمال_ٿيل(type); CV_اڻ_استعمال_ٿيل(گهڻائي);
     throw_no_ogl();
-#else
-    gl::DrawElements(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)));
-#endif
+#وإلا
+    gl::DrawElements(گهڻائي, ڳڻپ_2, type, reinterpret_cast<ثابت فراغ*>(static_cast<size_t>(first)));
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::drawElementsInstanced(int first, int count, int type, int mode, int instanceCount)
+فراغ cv::ogl::drawElementsInstanced(صحيح first, صحيح ڳڻپ_2, صحيح type, صحيح گهڻائي, صحيح instance_ڳڻپ)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode); CV_UNUSED(instanceCount);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(first); CV_اڻ_استعمال_ٿيل(ڳڻپ_2); CV_اڻ_استعمال_ٿيل(type); CV_اڻ_استعمال_ٿيل(گهڻائي); CV_اڻ_استعمال_ٿيل(instance_ڳڻپ);
     throw_no_ogl();
-#else
-    gl::DrawElementsInstanced(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)), instanceCount);
+#وإلا
+    gl::DrawElementsInstanced(گهڻائي, ڳڻپ_2, type, reinterpret_cast<ثابت فراغ*>(static_cast<size_t>(first)), instance_ڳڻپ);
     CV_CheckGlError();
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::blendFunc(int sfactor, int dfactor)
+فراغ cv::ogl::blendFunc(صحيح sfactor, صحيح dfactor)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(sfactor); CV_UNUSED(dfactor);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(sfactor); CV_اڻ_استعمال_ٿيل(dfactor);
     throw_no_ogl();
-#else
+#وإلا
     gl::BlendFunc(sfactor, dfactor);
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::depthMask(bool flag)
+فراغ cv::ogl::اونهائي_نقاب_2(منطقي flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(flag);
     throw_no_ogl();
-#else
-    gl::DepthMask(flag ? gl::TRUE_ : gl::FALSE_);
-#endif
+#وإلا
+    gl::اونهائي_نقاب(flag ? gl::TRUE_ : gl::FALSE_);
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::enable(int cap)
+فراغ cv::ogl::enable(صحيح cap)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(cap);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(cap);
     throw_no_ogl();
-#else
+#وإلا
     gl::Enable(cap);
-#endif
+#جيڪڏهن_پورو
 }
 
-void cv::ogl::disable(int cap)
+فراغ cv::ogl::disable(صحيح cap)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(cap);
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENGL
+    CV_اڻ_استعمال_ٿيل(cap);
     throw_no_ogl();
-#else
+#وإلا
     gl::Disable(cap);
-#endif
+#جيڪڏهن_پورو
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CL-GL Interoperability
 
-#ifdef HAVE_OPENCL
+#جيڪڏهن_وصف_ٿيل HAVE_OPENCL
 #  include "opencv2/core/opencl/runtime/opencl_core.hpp"
 #  include "opencv2/core/opencl/runtime/opencl_gl.hpp"
 #  ifdef cl_khr_gl_sharing
 #    define HAVE_OPENCL_OPENGL_SHARING
-#  else
+#  وإلا
 #    define NO_OPENCL_SHARING_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL/OpenGL sharing support")
 #  endif
-#else // HAVE_OPENCL
+#وإلا // HAVE_OPENCL
 #  define NO_OPENCL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL support")
-#endif // HAVE_OPENCL
+#جيڪڏهن_پورو // HAVE_OPENCL
 
-#if defined(HAVE_OPENGL)
-#  if defined(__ANDROID__)
+#إذا defined(HAVE_OPENGL)
+#  إذا defined(__ANDROID__)
 #    include <EGL/egl.h>
 #  elif defined(__linux__)
 #    include <GL/glx.h>
 #  endif
-#endif // HAVE_OPENGL
+#جيڪڏهن_پورو // HAVE_OPENGL
 
-namespace cv { namespace ogl {
+نطاق cv { نطاق ogl {
 
-#if defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
+#إذا defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
 // Check to avoid crash in OpenCL runtime: https://github.com/opencv/opencv/issues/5209
-static void checkOpenCLVersion()
+ساكن فراغ checkOpenCLVersion()
 {
-    using namespace cv::ocl;
-    const Device& device = Device::getDefault();
+    استعمال نطاق cv::ocl;
+    ثابت Device& device = Device::getDefault();
     //CV_Assert(!device.empty());
     cl_device_id dev = (cl_device_id)device.ptr();
     CV_Assert(dev);
@@ -2482,118 +2482,118 @@ static void checkOpenCLVersion()
     cl_platform_id platform_id = 0;
     size_t sz = 0;
 
-    cl_int status = clGetDeviceInfo(dev, CL_DEVICE_PLATFORM, sizeof(platform_id), &platform_id, &sz);
-    CV_Assert(status == CL_SUCCESS && sz == sizeof(cl_platform_id));
+    cl_int حالت = clGetDeviceInfo(dev, CL_DEVICE_PLATFORM, حجم(platform_id), &platform_id, &sz);
+    CV_Assert(حالت == CL_SUCCESS && sz == حجم(cl_platform_id));
     CV_Assert(platform_id);
 
     PlatformInfo pi(&platform_id);
-    int versionMajor = pi.versionMajor();
-    int versionMinor = pi.versionMinor();
-    if (versionMajor < 1 || (versionMajor == 1 && versionMinor <= 1))
+    صحيح نسخو_Major_2 = pi.نسخو_Major_2();
+    صحيح نسخو_Minor_2 = pi.نسخو_Minor_2();
+    إذا (نسخو_Major_2 < 1 || (نسخو_Major_2 == 1 && نسخو_Minor_2 <= 1))
         CV_Error_(cv::Error::OpenCLApiCallError,
             ("OpenCL: clCreateFromGLTexture requires OpenCL 1.2+ version: %d.%d - %s (%s)",
-                versionMajor, versionMinor, pi.name().c_str(), pi.version().c_str())
+                نسخو_Major_2, نسخو_Minor_2, pi.name().c_str(), pi.نسخو().c_str())
         );
 }
-#endif
+#جيڪڏهن_پورو
 
-namespace ocl {
+نطاق ocl {
 
 Context& initializeContextFromGL()
 {
-#if !defined(HAVE_OPENGL)
+#إذا !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#وإلاإذا !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#وإلا
     cl_uint platformsCnt = 0;
     cl_uint devCnt = 0;
-    cl_device_id* devices = nullptr;
-    cl_uint devUsed = 0;
-    cl_context context = nullptr;
+    cl_device_id* devices = خالي_اشارو;
+    cl_uint dev_استعمال_ٿيل = 0;
+    cl_context context = خالي_اشارو;
 
-    cl_int status = clGetPlatformIDs(0, NULL, &platformsCnt);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get number of platforms: %d", status));
-    if (platformsCnt == 0)
+    cl_int حالت = clGetPlatformIDs(0, عدم, &platformsCnt);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get number of platforms: %d", حالت));
+    إذا (platformsCnt == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
     std::vector<cl_platform_id> platforms(platformsCnt);
-    status = clGetPlatformIDs(platformsCnt, &platforms[0], NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platforms: %d", status));
+    حالت = clGetPlatformIDs(platformsCnt, &platforms[0], عدم);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platforms: %d", حالت));
 
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    bool sharingSupported = false;
+    منطقي sharingSupported = خطأ;
 
-    for (unsigned int i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
-        status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, NULL, &devCnt);
-        if (status != CL_SUCCESS)
-            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
+    لكل (بنانشان صحيح i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
+        حالت = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, عدم, &devCnt);
+        إذا (حالت != CL_SUCCESS)
+            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", حالت));
 
-        try {
-            devices = new cl_device_id[devCnt];
+        حاول {
+            devices = جديد cl_device_id[devCnt];
 
-            status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, devCnt, devices, NULL);
-            if (status != CL_SUCCESS)
-                CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platform devices: %d", status));
+            حالت = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, devCnt, devices, عدم);
+            إذا (حالت != CL_SUCCESS)
+                CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platform devices: %d", حالت));
 
-            for (unsigned int j = 0; (!sharingSupported && (j < devCnt)); ++j) {
-                size_t extensionSize;
-                status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, NULL, &extensionSize );
-                if (status != CL_SUCCESS)
-                    CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
+            لكل (بنانشان صحيح j = 0; (!sharingSupported && (j < devCnt)); ++j) {
+                size_t extension_سائيز;
+                حالت = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, عدم, &extension_سائيز );
+                إذا (حالت != CL_SUCCESS)
+                    CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", حالت));
 
-                if(extensionSize > 0)
+                إذا(extension_سائيز > 0)
                 {
-                    std::string devString(extensionSize, '\0');
-                    status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, devString.size(), &devString[0], &extensionSize);
-                    if (status != CL_SUCCESS)
-                        continue;
-                    if (extensionSize > 0 && devString.size() >= extensionSize)
-                        devString.resize(extensionSize - 1);
+                    std::string devString(extension_سائيز, '\0');
+                    حالت = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, devString.size(), &devString[0], &extension_سائيز);
+                    إذا (حالت != CL_SUCCESS)
+                        استمر;
+                    إذا (extension_سائيز > 0 && devString.size() >= extension_سائيز)
+                        devString.resize(extension_سائيز - 1);
 
                     size_t oldPos = 0;
                     size_t spacePos = devString.find(' ', oldPos); // extensions string is space delimited
-                    while (spacePos != devString.npos) {
-                        if (strcmp(GL_SHARING_EXTENSION,
+                    طالما (spacePos != devString.npos) {
+                        إذا (strcmp(GL_SHARING_EXTENSION,
                                 devString.substr(oldPos, spacePos - oldPos).c_str())
                                 == 0) {
                             // Device supports context sharing with OpenGL
-                            devUsed = i;
-                            sharingSupported = true;
-                            break;
+                            dev_استعمال_ٿيل = i;
+                            sharingSupported = سچ;
+                            اكسر;
                         }
-                        do {
+                        افعل {
                             oldPos = spacePos + 1;
                             spacePos = devString.find(' ', oldPos);
-                        } while (spacePos == oldPos);
+                        } طالما (spacePos == oldPos);
                     }
                 }
             }
-        } catch(...) {
+        } امسك(...) {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Exception thrown during device information gathering");
-            if(devices != nullptr) {
-                delete[] devices;
+            إذا(devices != خالي_اشارو) {
+                ميٽيو[] devices;
             }
-            continue;
+            استمر;
         }
 
-        if (sharingSupported) {
+        إذا (sharingSupported) {
             // Define OS-specific context properties and create the OpenCL context
-#if defined (__APPLE__)
+#إذا defined (__APPLE__)
                 CGLContextObj cglContext = CGLGetCurrentContext();
-                CGLShareGroupObj cglShareGroup = CGLGetShareGroup(cglContext);
+                CGLShare_گروهه_Obj cgl_Share_گروهه = CGLGet_Share_گروهه(cglContext);
                 cl_context_properties props[] =
                 {
-                    CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)cglShareGroup,
+                    CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)cgl_Share_گروهه,
                     0
                 };
-                context = clCreateContext(props, 0,0, NULL, NULL, &ciErrNum);
-#elif defined(__ANDROID__)
+                context = clCreateContext(props, 0,0, عدم, عدم, &ci_Err_انگ);
+#وإلاإذا defined(__ANDROID__)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
@@ -2601,8 +2601,8 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#elif defined(_WIN32)
+                context = clCreateContext(props, 1, &devices[dev_استعمال_ٿيل], عدم, عدم, &حالت);
+#وإلاإذا defined(_WIN32)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
@@ -2610,8 +2610,8 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#elif defined(__linux__)
+                context = clCreateContext(props, 1, &devices[dev_استعمال_ٿيل], عدم, عدم, &حالت);
+#وإلاإذا defined(__linux__)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
@@ -2619,44 +2619,44 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#endif
+                context = clCreateContext(props, 1, &devices[dev_استعمال_ٿيل], عدم, عدم, &حالت);
+#جيڪڏهن_پورو
         }
 
-        if (status != CL_SUCCESS)
-            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't create context for OpenGL interop: %d", status));
-        else
-            break;
+        إذا (حالت != CL_SUCCESS)
+            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't create context for OpenGL interop: %d", حالت));
+        وإلا
+            اكسر;
     }
 
 
-    cl_platform_id platform = platforms[devUsed];
+    cl_platform_id platform = platforms[dev_استعمال_ٿيل];
     std::string platformName = PlatformInfo(&platform).name();
 
-    OpenCLExecutionContext clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, devices[devUsed]);
-    clReleaseDevice(devices[devUsed]);
+    OpenCLExecutionContext clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, devices[dev_استعمال_ٿيل]);
+    clReleaseDevice(devices[dev_استعمال_ٿيل]);
     clReleaseContext(context);
     clExecCtx.bind();
-    return const_cast<Context&>(clExecCtx.getContext());
-#endif
+    أرجع const_cast<Context&>(clExecCtx.getContext());
+#جيڪڏهن_پورو
 }
 
 } // namespace cv::ogl::ocl
 
-void convertToGLTexture2D(InputArray src, Texture2D& texture)
+فراغ convert_منزل_GLTexture2_D(داخلا_Array src, Texture2D& texture)
 {
-    CV_UNUSED(src); CV_UNUSED(texture);
-#if !defined(HAVE_OPENGL)
+    CV_اڻ_استعمال_ٿيل(src); CV_اڻ_استعمال_ٿيل(texture);
+#إذا !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#وإلاإذا !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    Size srcSize = src.size();
-    CV_Assert(srcSize.width == (int)texture.cols() && srcSize.height == (int)texture.rows());
+#وإلا
+    سائيز src_سائيز = src.size();
+    CV_Assert(src_سائيز.ويڪر == (صحيح)texture.کانن_ڳڻپ() && src_سائيز.اوچائي == (صحيح)texture.صفون());
 
-    using namespace cv::ocl;
+    استعمال نطاق cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
 
@@ -2668,55 +2668,55 @@ void convertToGLTexture2D(InputArray src, Texture2D& texture)
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
-    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_WRITE_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
+    cl_int حالت = 0;
+    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_WRITE_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &حالت);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", حالت));
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
+    cl_command_قطار q = (cl_command_قطار)قطار::getDefault().ptr();
+    حالت = cl_قطار_اندر_وجهو_Acquire_GLObjects(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", حالت));
     size_t offset = 0; // TODO
     size_t dst_origin[3] = {0, 0, 0};
-    size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, dst_origin, region, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyBufferToImage failed: %d", status));
-    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
+    size_t region[3] = { (size_t)u.کانن_ڳڻپ, (size_t)u.صفون, 1};
+    حالت = cl_قطار_اندر_وجهو_Copy_بفر_منزل_Image(q, cl_بفر, clImage, offset, dst_origin, region, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyBufferToImage failed: %d", حالت));
+    حالت = cl_قطار_اندر_وجهو_Release_GLObjects(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", حالت));
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
+    حالت = cl_پڄاڻي(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", حالت));
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
-#endif
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", حالت));
+#جيڪڏهن_پورو
 }
 
-void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
+فراغ convertFromGLTexture2D(ثابت Texture2D& texture, OutputArray dst)
 {
-    CV_UNUSED(texture); CV_UNUSED(dst);
-#if !defined(HAVE_OPENGL)
+    CV_اڻ_استعمال_ٿيل(texture); CV_اڻ_استعمال_ٿيل(dst);
+#إذا !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#وإلاإذا !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#وإلا
     // check texture format
-    const int dtype = CV_8UC4;
+    ثابت صحيح dtype = CV_8UC4;
     CV_Assert(texture.format() == Texture2D::RGBA);
 
-    int textureType = dtype;
+    صحيح textureType = dtype;
     CV_Assert(textureType >= 0);
 
-    using namespace cv::ocl;
+    استعمال نطاق cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
 
@@ -2730,119 +2730,119 @@ void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
-    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_READ_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
+    cl_int حالت = 0;
+    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_READ_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &حالت);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", حالت));
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
+    cl_command_قطار q = (cl_command_قطار)قطار::getDefault().ptr();
+    حالت = cl_قطار_اندر_وجهو_Acquire_GLObjects(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", حالت));
     size_t offset = 0; // TODO
     size_t src_origin[3] = {0, 0, 0};
-    size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyImageToBuffer failed: %d", status));
-    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
+    size_t region[3] = { (size_t)u.کانن_ڳڻپ, (size_t)u.صفون, 1};
+    حالت = cl_قطار_اندر_وجهو_Copy_Image_منزل_بفر(q, clImage, cl_بفر, src_origin, region, offset, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyImageToBuffer failed: %d", حالت));
+    حالت = cl_قطار_اندر_وجهو_Release_GLObjects(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", حالت));
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
+    حالت = cl_پڄاڻي(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", حالت));
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
-#endif
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", حالت));
+#جيڪڏهن_پورو
 }
 
 //void mapGLBuffer(const Buffer& buffer, UMat& dst, AccessFlag accessFlags)
-UMat mapGLBuffer(const Buffer& buffer, AccessFlag accessFlags)
+UMat mapGLBuffer(ثابت بفر_2& بفر, AccessFlag accessFlags)
 {
-    CV_UNUSED(buffer); CV_UNUSED(accessFlags);
-#if !defined(HAVE_OPENGL)
+    CV_اڻ_استعمال_ٿيل(بفر); CV_اڻ_استعمال_ٿيل(accessFlags);
+#إذا !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#وإلاإذا !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    using namespace cv::ocl;
+#وإلا
+    استعمال نطاق cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
-    cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
+    cl_command_قطار cl_قطار = (cl_command_قطار)قطار::getDefault().ptr();
 
-    int clAccessFlags = 0;
-    switch (accessFlags & (ACCESS_READ|ACCESS_WRITE))
+    صحيح clAccessFlags = 0;
+    بدل (accessFlags & (ACCESS_READ|ACCESS_WRITE))
     {
-    default:
-    case ACCESS_READ+ACCESS_WRITE:
+    افتراضي:
+    حالة ACCESS_READ+ACCESS_WRITE:
         clAccessFlags = CL_MEM_READ_WRITE;
-        break;
-    case ACCESS_READ:
+        اكسر;
+    حالة ACCESS_READ:
         clAccessFlags = CL_MEM_READ_ONLY;
-        break;
-    case ACCESS_WRITE:
+        اكسر;
+    حالة ACCESS_WRITE:
         clAccessFlags = CL_MEM_WRITE_ONLY;
-        break;
+        اكسر;
     }
 
-    cl_int status = 0;
-    cl_mem clBuffer = clCreateFromGLBuffer(context, clAccessFlags, buffer.bufId(), &status);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLBuffer failed: %d", status));
+    cl_int حالت = 0;
+    cl_mem cl_بفر = clCreateFromGLBuffer(context, clAccessFlags, بفر.bufId(), &حالت);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLBuffer failed: %d", حالت));
 
-    gl::Finish();
+    gl::پڄاڻي();
 
-    status = clEnqueueAcquireGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
+    حالت = cl_قطار_اندر_وجهو_Acquire_GLObjects(cl_قطار, 1, &cl_بفر, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", حالت));
 
-    size_t step = buffer.cols() * buffer.elemSize();
-    int rows = buffer.rows();
-    int cols = buffer.cols();
-    int type = buffer.type();
+    size_t قدم = بفر.کانن_ڳڻپ() * بفر.elem_سائيز();
+    صحيح صفون = بفر.صفون();
+    صحيح کانن_ڳڻپ = بفر.کانن_ڳڻپ();
+    صحيح type = بفر.type();
 
     UMat u;
-    convertFromBuffer(clBuffer, step, rows, cols, type, u);
-    return u;
-#endif
+    convert_From_بفر(cl_بفر, قدم, صفون, کانن_ڳڻپ, type, u);
+    أرجع u;
+#جيڪڏهن_پورو
 }
 
-void unmapGLBuffer(UMat& u)
+فراغ unmapGLBuffer(UMat& u)
 {
-    CV_UNUSED(u);
-#if !defined(HAVE_OPENGL)
+    CV_اڻ_استعمال_ٿيل(u);
+#إذا !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#وإلاإذا !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    using namespace cv::ocl;
-    cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
+#وإلا
+    استعمال نطاق cv::ocl;
+    cl_command_قطار cl_قطار = (cl_command_قطار)قطار::getDefault().ptr();
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
     u.release();
 
-    cl_int status = clEnqueueReleaseGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
+    cl_int حالت = cl_قطار_اندر_وجهو_Release_GLObjects(cl_قطار, 1, &cl_بفر, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", حالت));
 
-    status = clFinish(clQueue);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
+    حالت = cl_پڄاڻي(cl_قطار);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", حالت));
 
-    status = clReleaseMemObject(clBuffer);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
-#endif
+    حالت = clReleaseMemObject(cl_بفر);
+    إذا (حالت != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", حالت));
+#جيڪڏهن_پورو
 }
 
 }} // namespace cv::ogl

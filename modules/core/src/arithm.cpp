@@ -47,95 +47,95 @@
 //
 // */
 
-#include "precomp.hpp"
-#include "arithm_expr.hpp"   // the new element-wise engine (cv::ew)
-#include "opencl_kernels_core.hpp"
+#ضمن "precomp.hpp"
+#ضمن "arithm_expr.hpp"   // the new element-wise engine (cv::ew)
+#ضمن "opencl_kernels_core.hpp"
 
-namespace cv
+نطاق cv
 {
 
 /****************************************************************************************\
 *                                   logical operations                                   *
 \****************************************************************************************/
 
-enum { OCL_OP_ADD=0, OCL_OP_SUB=1, OCL_OP_RSUB=2, OCL_OP_ABSDIFF=3, OCL_OP_MUL=4,
+تعداد { OCL_OP_جوڙيو=0, OCL_OP_SUB=1, OCL_OP_RSUB=2, OCL_OP_ABSDIFF=3, OCL_OP_MUL=4,
        OCL_OP_MUL_SCALE=5, OCL_OP_DIV_SCALE=6, OCL_OP_RECIP_SCALE=7, OCL_OP_ADDW=8,
        OCL_OP_AND=9, OCL_OP_OR=10, OCL_OP_XOR=11, OCL_OP_NOT=12, OCL_OP_MIN=13, OCL_OP_MAX=14,
        OCL_OP_RDIV_SCALE=15 };
 
 // The unified entry point for every element-wise binary op (empty + UMat/OpenCL + CPU engine). Defined
 // lower down (near cv::add); forward-declared here so cv::min/cv::max (above it) can use it too.
-static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray dst,
-                      InputArray mask, int dtype, int oclop, bool muldiv, const Scalar& params = Scalar(1));
+ساكن فراغ arithm_op(ew::چوٽي op, داخلا_Array src1, داخلا_Array src2, OutputArray dst,
+                      داخلا_Array نقاب, صحيح dtype, صحيح oclop, منطقي muldiv, ثابت Scalar& params = Scalar(1));
 
 // The unary counterpart (bitwise NOT, unary math later). Forward-declared for the same reason.
-static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mask,
-                     int dtype, const Scalar& params = Scalar());
+ساكن فراغ unary_op(ew::چوٽي op, داخلا_Array src, OutputArray dst, داخلا_Array نقاب,
+                     صحيح dtype, ثابت Scalar& params = Scalar());
 
-#ifdef HAVE_OPENCL
+#جيڪڏهن_وصف_ٿيل HAVE_OPENCL
 
-static const char* oclop2str[] = { "OP_ADD", "OP_SUB", "OP_RSUB", "OP_ABSDIFF",
+ساكن ثابت حرف* oclop2str[] = { "OP_ADD", "OP_SUB", "OP_RSUB", "OP_ABSDIFF",
     "OP_MUL", "OP_MUL_SCALE", "OP_DIV_SCALE", "OP_RECIP_SCALE",
     "OP_ADDW", "OP_AND", "OP_OR", "OP_XOR", "OP_NOT", "OP_MIN", "OP_MAX", "OP_RDIV_SCALE", 0 };
 
 // depths with no OpenCL type name (ocl::typeToStr() asserts on them)
-static inline bool noOclType(int depth)
+ساكن مضمن منطقي noOclType(صحيح اونهائي)
 {
-    return depth == CV_16BF || depth == CV_Bool || depth == CV_8F_E4M3FN || depth == CV_8F_E4M3FNUZ;
+    أرجع اونهائي == CV_16BF || اونهائي == CV_Bool || اونهائي == CV_8F_E4M3FN || اونهائي == CV_8F_E4M3FNUZ;
 }
 
-static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
-                          InputArray _mask, bool bitwise, int oclop, bool haveScalar )
+ساكن منطقي ocl_ٻٽو_op(داخلا_Array _src1, داخلا_Array _src2, OutputArray _dst,
+                          داخلا_Array نقاب_2, منطقي bitwise, صحيح oclop, منطقي haveScalar )
 {
-    bool haveMask = !_mask.empty();
-    int srctype = _src1.type();
-    int srcdepth = CV_MAT_DEPTH(srctype);
-    int cn = CV_MAT_CN(srctype);
+    منطقي have_نقاب = !نقاب_2.empty();
+    صحيح srctype = _src1.type();
+    صحيح srcdepth = CV_MAT_اونهائي(srctype);
+    صحيح cn = CV_MAT_CN(srctype);
 
-    const ocl::Device d = ocl::Device::getDefault();
-    bool doubleSupport = d.doubleFPConfig() > 0;
-    if( oclop < 0 || ((haveMask || haveScalar) && cn > 4) ||
+    ثابت ocl::Device d = ocl::Device::getDefault();
+    منطقي doubleSupport = d.doubleFPConfig() > 0;
+    إذا( oclop < 0 || ((have_نقاب || haveScalar) && cn > 4) ||
             (!doubleSupport && srcdepth == CV_64F && !bitwise) ||
             (noOclType(srcdepth) && !bitwise))
-        return false;
+        أرجع خطأ;
 
-    char opts[1024];
-    int kercn = haveMask || haveScalar ? cn : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
-    int scalarcn = kercn == 3 ? 4 : kercn;
-    int rowsPerWI = d.isIntel() ? 4 : 1;
+    حرف opts[1024];
+    صحيح kercn = have_نقاب || haveScalar ? cn : ocl::predict_Optimal_ويڪٽر_ويڪر(_src1, _src2, _dst);
+    صحيح scalarcn = kercn == 3 ? 4 : kercn;
+    صحيح صفون_في_WI = d.isIntel() ? 4 : 1;
 
-    const int dstDepth = srcdepth;
-    const int dstType = CV_MAKETYPE(dstDepth, kercn);
-    const int dstType1 = CV_MAKETYPE(dstDepth, 1);
-    const int scalarType = CV_MAKETYPE(srcdepth, scalarcn);
+    ثابت صحيح dst_اونهائي = srcdepth;
+    ثابت صحيح dstType = CV_MAKETYPE(dst_اونهائي, kercn);
+    ثابت صحيح dstType1 = CV_MAKETYPE(dst_اونهائي, 1);
+    ثابت صحيح scalarType = CV_MAKETYPE(srcdepth, scalarcn);
 
-    snprintf(opts, sizeof(opts), "-D %s%s -D %s%s -D dstT=%s -D DEPTH_dst=%d -D dstT_C1=%s -D workST=%s -D cn=%d -D rowsPerWI=%d",
-            haveMask ? "MASK_" : "", haveScalar ? "UNARY_OP" : "BINARY_OP", oclop2str[oclop],
+    snprintf(opts, حجم(opts), "-D %s%s -D %s%s -D dstT=%s -D DEPTH_dst=%d -D dstT_C1=%s -D workST=%s -D cn=%d -D rowsPerWI=%d",
+            have_نقاب ? "MASK_" : "", haveScalar ? "UNARY_OP" : "BINARY_OP", oclop2str[oclop],
             doubleSupport ? " -D DOUBLE_SUPPORT" : "",
-            bitwise ? ocl::memopTypeToStr(dstType) : ocl::typeToStr(dstType),
-            dstDepth,
-            bitwise ? ocl::memopTypeToStr(dstType1) : ocl::typeToStr(dstType1),
-            bitwise ? ocl::memopTypeToStr(scalarType) : ocl::typeToStr(scalarType),
-            kercn, rowsPerWI);
+            bitwise ? ocl::memop_Type_منزل_Str(dstType) : ocl::type_منزل_Str(dstType),
+            dst_اونهائي,
+            bitwise ? ocl::memop_Type_منزل_Str(dstType1) : ocl::type_منزل_Str(dstType1),
+            bitwise ? ocl::memop_Type_منزل_Str(scalarType) : ocl::type_منزل_Str(scalarType),
+            kercn, صفون_في_WI);
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc, opts);
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
     UMat src1 = _src1.getUMat(), src2;
-    UMat dst = _dst.getUMat(), mask = _mask.getUMat();
+    UMat dst = _dst.getUMat(), نقاب = نقاب_2.getUMat();
 
-    ocl::KernelArg src1arg = ocl::KernelArg::ReadOnlyNoSize(src1, cn, kercn);
-    ocl::KernelArg dstarg = haveMask ? ocl::KernelArg::ReadWrite(dst, cn, kercn) :
+    ocl::KernelArg src1arg = ocl::KernelArg::Read_Only_No_سائيز(src1, cn, kercn);
+    ocl::KernelArg dstarg = have_نقاب ? ocl::KernelArg::ReadWrite(dst, cn, kercn) :
                                        ocl::KernelArg::WriteOnly(dst, cn, kercn);
-    ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask, 1);
+    ocl::KernelArg maskarg = ocl::KernelArg::Read_Only_No_سائيز(نقاب, 1);
 
-    if( haveScalar )
+    إذا( haveScalar )
     {
         size_t esz = CV_ELEM_SIZE1(srctype)*scalarcn;
-        double buf[4] = {0,0,0,0};
+        مزدوج buf[4] = {0,0,0,0};
 
-        if( oclop != OCL_OP_NOT )
+        إذا( oclop != OCL_OP_NOT )
         {
             Mat src2sc = _src2.getMat();
             convertAndUnrollScalar(src2sc, srctype, (uchar*)buf, 1);
@@ -143,141 +143,141 @@ static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
 
         ocl::KernelArg scalararg = ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, esz);
 
-        if( !haveMask )
-            k.args(src1arg, dstarg, scalararg);
-        else
-            k.args(src1arg, maskarg, dstarg, scalararg);
+        إذا( !have_نقاب )
+            k.دليلون(src1arg, dstarg, scalararg);
+        وإلا
+            k.دليلون(src1arg, maskarg, dstarg, scalararg);
     }
-    else
+    وإلا
     {
         src2 = _src2.getUMat();
-        ocl::KernelArg src2arg = ocl::KernelArg::ReadOnlyNoSize(src2, cn, kercn);
+        ocl::KernelArg src2arg = ocl::KernelArg::Read_Only_No_سائيز(src2, cn, kercn);
 
-        if( !haveMask )
-            k.args(src1arg, src2arg, dstarg);
-        else
-            k.args(src1arg, src2arg, maskarg, dstarg);
+        إذا( !have_نقاب )
+            k.دليلون(src1arg, src2arg, dstarg);
+        وإلا
+            k.دليلون(src1arg, src2arg, maskarg, dstarg);
     }
 
-    size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, 0, false);
+    size_t globalsize[] = { (size_t)src1.کانن_ڳڻپ * cn / kercn, ((size_t)src1.صفون + صفون_في_WI - 1) / صفون_في_WI };
+    أرجع k.لاڳيتو(2, globalsize, 0, خطأ);
 }
 
-#endif
+#جيڪڏهن_پورو
 
 // OpenCL path for the bitwise ops (and/or/xor/not), lifted out of binary_op: choose the (possibly
 // scalar) operand order, size the destination, and dispatch the shared bitwise OpenCL kernel. Returns
 // true if OpenCL handled the op, false to fall through to the CPU engine. NOT arrives unary
 // (src2 == src1, forced-scalar). The caller gates this on a UMat operand + dims <= 2 (via CV_OCL_RUN).
-#ifdef HAVE_OPENCL
-static bool bitwise_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
-                           InputArray _mask, int oclop)
+#جيڪڏهن_وصف_ٿيل HAVE_OPENCL
+ساكن منطقي bitwise_op_ocl(داخلا_Array _src1, داخلا_Array _src2, OutputArray _dst,
+                           داخلا_Array نقاب_2, صحيح oclop)
 {
-    const _InputArray *psrc1 = &_src1, *psrc2 = &_src2;
-    _InputArray::KindFlag kind1 = psrc1->kind(), kind2 = psrc2->kind();
-    int type1 = psrc1->type(), type2 = psrc2->type();
-    bool haveScalar = false;
+    ثابت داخلا_Array_2 *psrc1 = &_src1, *psrc2 = &_src2;
+    داخلا_Array_2::قسم_Flag kind1 = psrc1->قسم(), kind2 = psrc2->قسم();
+    صحيح type1 = psrc1->type(), type2 = psrc2->type();
+    منطقي haveScalar = خطأ;
 
-    if( oclop == OCL_OP_NOT )
-        haveScalar = true;
-    else if( (kind1 == _InputArray::MATX) + (kind2 == _InputArray::MATX) == 1 ||
-             !psrc1->sameSize(*psrc2) || type1 != type2 )
+    إذا( oclop == OCL_OP_NOT )
+        haveScalar = سچ;
+    وإلا إذا( (kind1 == داخلا_Array_2::MATX) + (kind2 == داخلا_Array_2::MATX) == 1 ||
+             !psrc1->same_سائيز(*psrc2) || type1 != type2 )
     {
-        if( checkScalar(*psrc1, type2, kind1, kind2) )
+        إذا( checkScalar(*psrc1, type2, kind1, kind2) )
         { std::swap(psrc1, psrc2); std::swap(type1, type2); }        // src1 is the scalar; swap it out
-        else if( !checkScalar(*psrc2, type1, kind2, kind1) )
-            return false;
-        haveScalar = true;
+        وإلا إذا( !checkScalar(*psrc2, type1, kind2, kind1) )
+            أرجع خطأ;
+        haveScalar = سچ;
     }
-    _dst.createSameSize(*psrc1, type1);
-    return ocl_binary_op(*psrc1, *psrc2, _dst, _mask, true, oclop, haveScalar);
+    _dst.create_Same_سائيز(*psrc1, type1);
+    أرجع ocl_ٻٽو_op(*psrc1, *psrc2, _dst, نقاب_2, سچ, oclop, haveScalar);
 }
-#endif  // HAVE_OPENCL
+#جيڪڏهن_پورو  // HAVE_OPENCL
 
 }
 
 // bitwise and/or/xor: OpenCL runs the shared bitwise kernel (via bitwise_op_ocl); the CPU path is the
 // element-wise engine (OP_AND/OR/XOR, T x T -> T dispatched by element size). oclop = -1 tells
 // arithm_op the OpenCL path was already tried, so it only runs the CPU engine. NOT is unary.
-void cv::bitwise_and(InputArray a, InputArray b, OutputArray c, InputArray mask)
+فراغ cv::bitwise_and(داخلا_Array a, داخلا_Array b, OutputArray c, داخلا_Array نقاب)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_OCL_RUN((a.isUMat() || b.isUMat() || c.isUMat()) && a.dims() <= 2 && b.dims() <= 2,
-               bitwise_op_ocl(a, b, c, mask, OCL_OP_AND))
-    arithm_op(ew::OP_AND, a, b, c, mask, -1, /*oclop=*/-1, /*muldiv=*/false);
+    CV_OCL_لاڳيتو((a.isUMat() || b.isUMat() || c.isUMat()) && a.dims() <= 2 && b.dims() <= 2,
+               bitwise_op_ocl(a, b, c, نقاب, OCL_OP_AND))
+    arithm_op(ew::OP_AND, a, b, c, نقاب, -1, /*oclop=*/-1, /*muldiv=*/خطأ);
 }
 
-void cv::bitwise_or(InputArray a, InputArray b, OutputArray c, InputArray mask)
+فراغ cv::bitwise_or(داخلا_Array a, داخلا_Array b, OutputArray c, داخلا_Array نقاب)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_OCL_RUN((a.isUMat() || b.isUMat() || c.isUMat()) && a.dims() <= 2 && b.dims() <= 2,
-               bitwise_op_ocl(a, b, c, mask, OCL_OP_OR))
-    arithm_op(ew::OP_OR, a, b, c, mask, -1, /*oclop=*/-1, /*muldiv=*/false);
+    CV_OCL_لاڳيتو((a.isUMat() || b.isUMat() || c.isUMat()) && a.dims() <= 2 && b.dims() <= 2,
+               bitwise_op_ocl(a, b, c, نقاب, OCL_OP_OR))
+    arithm_op(ew::OP_OR, a, b, c, نقاب, -1, /*oclop=*/-1, /*muldiv=*/خطأ);
 }
 
-void cv::bitwise_xor(InputArray a, InputArray b, OutputArray c, InputArray mask)
+فراغ cv::bitwise_xor(داخلا_Array a, داخلا_Array b, OutputArray c, داخلا_Array نقاب)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_OCL_RUN((a.isUMat() || b.isUMat() || c.isUMat()) && a.dims() <= 2 && b.dims() <= 2,
-               bitwise_op_ocl(a, b, c, mask, OCL_OP_XOR))
-    arithm_op(ew::OP_XOR, a, b, c, mask, -1, /*oclop=*/-1, /*muldiv=*/false);
+    CV_OCL_لاڳيتو((a.isUMat() || b.isUMat() || c.isUMat()) && a.dims() <= 2 && b.dims() <= 2,
+               bitwise_op_ocl(a, b, c, نقاب, OCL_OP_XOR))
+    arithm_op(ew::OP_XOR, a, b, c, نقاب, -1, /*oclop=*/-1, /*muldiv=*/خطأ);
 }
 
-void cv::bitwise_not(InputArray a, OutputArray c, InputArray mask)
+فراغ cv::bitwise_not(داخلا_Array a, OutputArray c, داخلا_Array نقاب)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_OCL_RUN((a.isUMat() || c.isUMat()) && a.dims() <= 2,
-               bitwise_op_ocl(a, a, c, mask, OCL_OP_NOT))
-    unary_op(ew::OP_NOT, a, c, mask, -1);
+    CV_OCL_لاڳيتو((a.isUMat() || c.isUMat()) && a.dims() <= 2,
+               bitwise_op_ocl(a, a, c, نقاب, OCL_OP_NOT))
+    unary_op(ew::OP_NOT, a, c, نقاب, -1);
 }
 
-void cv::max( InputArray src1, InputArray src2, OutputArray dst )
+فراغ cv::max( داخلا_Array src1, داخلا_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_MAX, src1, src2, dst, noArray(), -1, OCL_OP_MAX, false);
+    arithm_op(ew::OP_MAX, src1, src2, dst, noArray(), -1, OCL_OP_MAX, خطأ);
 }
 
-void cv::min( InputArray src1, InputArray src2, OutputArray dst )
+فراغ cv::min( داخلا_Array src1, داخلا_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_MIN, src1, src2, dst, noArray(), -1, OCL_OP_MIN, false);
+    arithm_op(ew::OP_MIN, src1, src2, dst, noArray(), -1, OCL_OP_MIN, خطأ);
 }
 
 // The concrete Mat/UMat overloads of min/max exist because C++ overload resolution needs them (a
 // bare cv::min(mat, mat, mat) binds Mat& more tightly than InputArray); they must run the SAME engine
 // path as the InputArray forms - NOT the legacy binary_op - so mixed types and broadcasting work.
-void cv::max(const Mat& src1, const Mat& src2, Mat& dst)
+فراغ cv::max(ثابت Mat& src1, ثابت Mat& src2, Mat& dst)
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_MAX, src1, src2, dst, noArray(), -1, OCL_OP_MAX, false);
+    arithm_op(ew::OP_MAX, src1, src2, dst, noArray(), -1, OCL_OP_MAX, خطأ);
 }
 
-void cv::min(const Mat& src1, const Mat& src2, Mat& dst)
+فراغ cv::min(ثابت Mat& src1, ثابت Mat& src2, Mat& dst)
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_MIN, src1, src2, dst, noArray(), -1, OCL_OP_MIN, false);
+    arithm_op(ew::OP_MIN, src1, src2, dst, noArray(), -1, OCL_OP_MIN, خطأ);
 }
 
-void cv::max(const UMat& src1, const UMat& src2, UMat& dst)
+فراغ cv::max(ثابت UMat& src1, ثابت UMat& src2, UMat& dst)
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_MAX, src1, src2, dst, noArray(), -1, OCL_OP_MAX, false);
+    arithm_op(ew::OP_MAX, src1, src2, dst, noArray(), -1, OCL_OP_MAX, خطأ);
 }
 
-void cv::min(const UMat& src1, const UMat& src2, UMat& dst)
+فراغ cv::min(ثابت UMat& src1, ثابت UMat& src2, UMat& dst)
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_MIN, src1, src2, dst, noArray(), -1, OCL_OP_MIN, false);
+    arithm_op(ew::OP_MIN, src1, src2, dst, noArray(), -1, OCL_OP_MIN, خطأ);
 }
 
 
@@ -285,167 +285,167 @@ void cv::min(const UMat& src1, const UMat& src2, UMat& dst)
 *                                      add/subtract                                      *
 \****************************************************************************************/
 
-namespace cv
+نطاق cv
 {
 
-#ifdef HAVE_OPENCL
+#جيڪڏهن_وصف_ٿيل HAVE_OPENCL
 
 // used by the OpenCL branch only (arithm_op_ocl working-type selection)
-static int actualScalarDepth(const double* data, int len)
+ساكن صحيح actual_Scalar_اونهائي(ثابت مزدوج* معلومات, صحيح len)
 {
-    int i = 0, minval = INT_MAX, maxval = INT_MIN;
-    for(; i < len; ++i)
+    صحيح i = 0, minval = وڌ_کان_وڌ_عدد, maxval = INT_MIN;
+    لكل(; i < len; ++i)
     {
-        int ival = cvRound(data[i]);
-        if( ival != data[i] )
-            break;
+        صحيح ival = cv_ڦيرو(معلومات[i]);
+        إذا( ival != معلومات[i] )
+            اكسر;
         minval = MIN(minval, ival);
         maxval = MAX(maxval, ival);
     }
-    return i < len ? CV_64F :
-        minval >= 0 && maxval <= (int)UCHAR_MAX ? CV_8U :
-        minval >= (int)SCHAR_MIN && maxval <= (int)SCHAR_MAX ? CV_8S :
-        minval >= 0 && maxval <= (int)USHRT_MAX ? CV_16U :
-        minval >= (int)SHRT_MIN && maxval <= (int)SHRT_MAX ? CV_16S :
+    أرجع i < len ? CV_64F :
+        minval >= 0 && maxval <= (صحيح)UCHAR_MAX ? CV_8U :
+        minval >= (صحيح)SCHAR_MIN && maxval <= (صحيح)SCHAR_MAX ? CV_8S :
+        minval >= 0 && maxval <= (صحيح)USHRT_MAX ? CV_16U :
+        minval >= (صحيح)SHRT_MIN && maxval <= (صحيح)SHRT_MAX ? CV_16S :
         CV_32S;
 }
 
-static int coerceTypes(int depth1, int depth2, bool muldiv)
+ساكن صحيح coerceTypes(صحيح depth1, صحيح depth2, منطقي muldiv)
 {
-    return depth1 == depth2 ? depth1 :
+    أرجع depth1 == depth2 ? depth1 :
         ((depth1 <= CV_32S) & (depth2 <= CV_32S)) != 0 ?
-        (((int)!muldiv & (depth1 <= CV_8S) & (depth2 <= CV_8S)) != 0 ? CV_16S : CV_32S) :
+        (((صحيح)!muldiv & (depth1 <= CV_8S) & (depth2 <= CV_8S)) != 0 ? CV_16S : CV_32S) :
         ((CV_ELEM_SIZE1(depth1) > 4) | (CV_ELEM_SIZE1(depth2) > 4)) != 0 ? CV_64F : CV_32F;
 }
 
-static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
-                          InputArray _mask, int wtype,
-                          void* usrdata, int oclop,
-                          bool haveScalar )
+ساكن منطقي ocl_arithm_op(داخلا_Array _src1, داخلا_Array _src2, OutputArray _dst,
+                          داخلا_Array نقاب_2, صحيح wtype,
+                          فراغ* usrdata, صحيح oclop,
+                          منطقي haveScalar )
 {
-    const ocl::Device d = ocl::Device::getDefault();
-    bool doubleSupport = d.doubleFPConfig() > 0;
-    int type1 = _src1.type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1);
-    bool haveMask = !_mask.empty();
+    ثابت ocl::Device d = ocl::Device::getDefault();
+    منطقي doubleSupport = d.doubleFPConfig() > 0;
+    صحيح type1 = _src1.type(), depth1 = CV_MAT_اونهائي(type1), cn = CV_MAT_CN(type1);
+    منطقي have_نقاب = !نقاب_2.empty();
 
-    if ( (haveMask || haveScalar) && cn > 4 )
-        return false;
+    إذا ( (have_نقاب || haveScalar) && cn > 4 )
+        أرجع خطأ;
 
-#ifdef __APPLE__
-    if (depth1 == CV_16U && (oclop == OCL_OP_MUL || oclop == OCL_OP_MUL_SCALE))
-        return false;
-#endif
+#جيڪڏهن_وصف_ٿيل __APPLE__
+    إذا (depth1 == CV_16U && (oclop == OCL_OP_MUL || oclop == OCL_OP_MUL_SCALE))
+        أرجع خطأ;
+#جيڪڏهن_پورو
 
-    int dtype = _dst.type(), ddepth = CV_MAT_DEPTH(dtype), wdepth = std::max(CV_32S, CV_MAT_DEPTH(wtype));
-    if (!doubleSupport)
+    صحيح dtype = _dst.type(), ddepth = CV_MAT_اونهائي(dtype), wdepth = std::max(CV_32S, CV_MAT_اونهائي(wtype));
+    إذا (!doubleSupport)
         wdepth = std::min(wdepth, CV_32F);
 
     wtype = CV_MAKETYPE(wdepth, cn);
-    int type2 = haveScalar ? wtype : _src2.type(), depth2 = CV_MAT_DEPTH(type2);
-    if (!doubleSupport && (depth2 == CV_64F || depth1 == CV_64F))
-        return false;
+    صحيح type2 = haveScalar ? wtype : _src2.type(), depth2 = CV_MAT_اونهائي(type2);
+    إذا (!doubleSupport && (depth2 == CV_64F || depth1 == CV_64F))
+        أرجع خطأ;
 
-    if (noOclType(depth1) || noOclType(depth2) || noOclType(ddepth) || noOclType(wdepth))
-        return false;
+    إذا (noOclType(depth1) || noOclType(depth2) || noOclType(ddepth) || noOclType(wdepth))
+        أرجع خطأ;
 
-    int kercn = haveMask || haveScalar ? cn : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
-    int scalarcn = kercn == 3 ? 4 : kercn, rowsPerWI = d.isIntel() ? 4 : 1;
+    صحيح kercn = have_نقاب || haveScalar ? cn : ocl::predict_Optimal_ويڪٽر_ويڪر(_src1, _src2, _dst);
+    صحيح scalarcn = kercn == 3 ? 4 : kercn, صفون_في_WI = d.isIntel() ? 4 : 1;
 
-    char cvtstr[4][50], opts[1024];
-    snprintf(opts, sizeof(opts), "-D %s%s -D %s -D srcT1=%s -D srcT1_C1=%s -D srcT2=%s -D srcT2_C1=%s "
+    حرف cvtstr[4][50], opts[1024];
+    snprintf(opts, حجم(opts), "-D %s%s -D %s -D srcT1=%s -D srcT1_C1=%s -D srcT2=%s -D srcT2_C1=%s "
             "-D dstT=%s -D DEPTH_dst=%d -D dstT_C1=%s -D workT=%s -D workST=%s -D scaleT=%s -D wdepth=%d -D convertToWT1=%s "
             "-D convertToWT2=%s -D convertToDT=%s%s -D cn=%d -D rowsPerWI=%d -D convertFromU=%s",
-            (haveMask ? "MASK_" : ""), (haveScalar ? "UNARY_OP" : "BINARY_OP"),
-            oclop2str[oclop], ocl::typeToStr(CV_MAKETYPE(depth1, kercn)),
-            ocl::typeToStr(depth1), ocl::typeToStr(CV_MAKETYPE(depth2, kercn)),
-            ocl::typeToStr(depth2), ocl::typeToStr(CV_MAKETYPE(ddepth, kercn)), ddepth,
-            ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKETYPE(wdepth, kercn)),
-            ocl::typeToStr(CV_MAKETYPE(wdepth, scalarcn)),
-            ocl::typeToStr(wdepth), wdepth,
-            ocl::convertTypeStr(depth1, wdepth, kercn, cvtstr[0], sizeof(cvtstr[0])),
-            ocl::convertTypeStr(depth2, wdepth, kercn, cvtstr[1], sizeof(cvtstr[1])),
-            ocl::convertTypeStr(wdepth, ddepth, kercn, cvtstr[2], sizeof(cvtstr[2])),
-            doubleSupport ? " -D DOUBLE_SUPPORT" : "", kercn, rowsPerWI,
+            (have_نقاب ? "MASK_" : ""), (haveScalar ? "UNARY_OP" : "BINARY_OP"),
+            oclop2str[oclop], ocl::type_منزل_Str(CV_MAKETYPE(depth1, kercn)),
+            ocl::type_منزل_Str(depth1), ocl::type_منزل_Str(CV_MAKETYPE(depth2, kercn)),
+            ocl::type_منزل_Str(depth2), ocl::type_منزل_Str(CV_MAKETYPE(ddepth, kercn)), ddepth,
+            ocl::type_منزل_Str(ddepth), ocl::type_منزل_Str(CV_MAKETYPE(wdepth, kercn)),
+            ocl::type_منزل_Str(CV_MAKETYPE(wdepth, scalarcn)),
+            ocl::type_منزل_Str(wdepth), wdepth,
+            ocl::convertTypeStr(depth1, wdepth, kercn, cvtstr[0], حجم(cvtstr[0])),
+            ocl::convertTypeStr(depth2, wdepth, kercn, cvtstr[1], حجم(cvtstr[1])),
+            ocl::convertTypeStr(wdepth, ddepth, kercn, cvtstr[2], حجم(cvtstr[2])),
+            doubleSupport ? " -D DOUBLE_SUPPORT" : "", kercn, صفون_في_WI,
             oclop == OCL_OP_ABSDIFF && wdepth == CV_32S && ddepth == wdepth ?
-            ocl::convertTypeStr(CV_8U, ddepth, kercn, cvtstr[3], sizeof(cvtstr[3])) : "noconvert");
+            ocl::convertTypeStr(CV_8U, ddepth, kercn, cvtstr[3], حجم(cvtstr[3])) : "noconvert");
 
-    size_t usrdata_esz = CV_ELEM_SIZE(wdepth);
-    const uchar* usrdata_p = (const uchar*)usrdata;
-    const double* usrdata_d = (const double*)usrdata;
-    float usrdata_f[3];
-    int i, n = oclop == OCL_OP_MUL_SCALE || oclop == OCL_OP_DIV_SCALE ||
+    size_t usrdata_esz = CV_ELEM_سائيز(wdepth);
+    ثابت uchar* usrdata_p = (ثابت uchar*)usrdata;
+    ثابت مزدوج* usrdata_d = (ثابت مزدوج*)usrdata;
+    عائم usrdata_f[3];
+    صحيح i, n = oclop == OCL_OP_MUL_SCALE || oclop == OCL_OP_DIV_SCALE ||
         oclop == OCL_OP_RDIV_SCALE || oclop == OCL_OP_RECIP_SCALE ? 1 : oclop == OCL_OP_ADDW ? 3 : 0;
-    if( usrdata && n > 0 && wdepth == CV_32F )
+    إذا( usrdata && n > 0 && wdepth == CV_32F )
     {
-        for( i = 0; i < n; i++ )
-            usrdata_f[i] = (float)usrdata_d[i];
-        usrdata_p = (const uchar*)usrdata_f;
+        لكل( i = 0; i < n; i++ )
+            usrdata_f[i] = (عائم)usrdata_d[i];
+        usrdata_p = (ثابت uchar*)usrdata_f;
     }
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc, opts);
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
     UMat src1 = _src1.getUMat(), src2;
-    UMat dst = _dst.getUMat(), mask = _mask.getUMat();
+    UMat dst = _dst.getUMat(), نقاب = نقاب_2.getUMat();
 
-    ocl::KernelArg src1arg = ocl::KernelArg::ReadOnlyNoSize(src1, cn, kercn);
-    ocl::KernelArg dstarg = haveMask ? ocl::KernelArg::ReadWrite(dst, cn, kercn) :
+    ocl::KernelArg src1arg = ocl::KernelArg::Read_Only_No_سائيز(src1, cn, kercn);
+    ocl::KernelArg dstarg = have_نقاب ? ocl::KernelArg::ReadWrite(dst, cn, kercn) :
                                        ocl::KernelArg::WriteOnly(dst, cn, kercn);
-    ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask, 1);
+    ocl::KernelArg maskarg = ocl::KernelArg::Read_Only_No_سائيز(نقاب, 1);
 
-    if( haveScalar )
+    إذا( haveScalar )
     {
         size_t esz = CV_ELEM_SIZE1(wtype)*scalarcn;
-        double buf[4]={0,0,0,0};
+        مزدوج buf[4]={0,0,0,0};
         Mat src2sc = _src2.getMat();
 
-        if( !src2sc.empty() )
+        إذا( !src2sc.empty() )
             convertAndUnrollScalar(src2sc, wtype, (uchar*)buf, 1);
         ocl::KernelArg scalararg = ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, esz);
 
-        if( !haveMask )
+        إذا( !have_نقاب )
         {
-            if(n == 0)
-                k.args(src1arg, dstarg, scalararg);
-            else if(n == 1)
-                k.args(src1arg, dstarg, scalararg,
+            إذا(n == 0)
+                k.دليلون(src1arg, dstarg, scalararg);
+            وإلا إذا(n == 1)
+                k.دليلون(src1arg, dstarg, scalararg,
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p, usrdata_esz));
-            else
+            وإلا
                 CV_Error(Error::StsNotImplemented, "unsupported number of extra parameters");
         }
-        else
-            k.args(src1arg, maskarg, dstarg, scalararg);
+        وإلا
+            k.دليلون(src1arg, maskarg, dstarg, scalararg);
     }
-    else
+    وإلا
     {
         src2 = _src2.getUMat();
-        ocl::KernelArg src2arg = ocl::KernelArg::ReadOnlyNoSize(src2, cn, kercn);
+        ocl::KernelArg src2arg = ocl::KernelArg::Read_Only_No_سائيز(src2, cn, kercn);
 
-        if( !haveMask )
+        إذا( !have_نقاب )
         {
-            if (n == 0)
-                k.args(src1arg, src2arg, dstarg);
-            else if (n == 1)
-                k.args(src1arg, src2arg, dstarg,
+            إذا (n == 0)
+                k.دليلون(src1arg, src2arg, dstarg);
+            وإلا إذا (n == 1)
+                k.دليلون(src1arg, src2arg, dstarg,
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p, usrdata_esz));
-            else if (n == 3)
-                k.args(src1arg, src2arg, dstarg,
+            وإلا إذا (n == 3)
+                k.دليلون(src1arg, src2arg, dstarg,
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p, usrdata_esz),
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p + usrdata_esz, usrdata_esz),
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p + usrdata_esz*2, usrdata_esz));
-            else
+            وإلا
                 CV_Error(Error::StsNotImplemented, "unsupported number of extra parameters");
         }
-        else
-            k.args(src1arg, src2arg, maskarg, dstarg);
+        وإلا
+            k.دليلون(src1arg, src2arg, maskarg, dstarg);
     }
 
-    size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[] = { (size_t)src1.کانن_ڳڻپ * cn / kercn, ((size_t)src1.صفون + صفون_في_WI - 1) / صفون_في_WI };
+    أرجع k.لاڳيتو(2, globalsize, عدم, خطأ);
 }
 
-#endif
+#جيڪڏهن_پورو
 
 // OpenCL branch of the arithmetic ops, extracted from the former arithm_op (whose CPU compute is now
 // the element-wise engine). Returns true if an OpenCL kernel handled the op, false to let the caller
@@ -453,136 +453,136 @@ static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
 // kernel with a coerced working type. `usrdata` carries the mul/div/addWeighted scale block, `oclop`
 // the kernel id. Only reached for a UMat dst; sizes/types that don't fit the scalar/same-size pattern
 // (e.g. a broadcast) decline (return false) so the engine handles them on the CPU.
-static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
-                          InputArray _mask, int dtype, int oclop, bool muldiv, void* usrdata)
+ساكن منطقي arithm_op_ocl(داخلا_Array _src1, داخلا_Array _src2, OutputArray _dst,
+                          داخلا_Array نقاب_2, صحيح dtype, صحيح oclop, منطقي muldiv, فراغ* usrdata)
 {
-#ifndef HAVE_OPENCL
-    CV_UNUSED(_src1); CV_UNUSED(_src2); CV_UNUSED(_dst); CV_UNUSED(_mask);
-    CV_UNUSED(dtype); CV_UNUSED(oclop); CV_UNUSED(muldiv); CV_UNUSED(usrdata);
-    return false;
-#else
-    const _InputArray *psrc1 = &_src1, *psrc2 = &_src2;
-    _InputArray::KindFlag kind1 = psrc1->kind(), kind2 = psrc2->kind();
-    bool haveMask = !_mask.empty();
-    bool reallocate = false;
-    int type1 = psrc1->type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1);
-    int type2 = psrc2->type(), depth2 = CV_MAT_DEPTH(type2), cn2 = CV_MAT_CN(type2);
-    int wtype, dims1 = psrc1->dims(), dims2 = psrc2->dims();
-    Size sz1 = dims1 <= 2 ? psrc1->size() : Size();
-    Size sz2 = dims2 <= 2 ? psrc2->size() : Size();
+#جيڪڏهن_وصف_نه_ٿيل HAVE_OPENCL
+    CV_اڻ_استعمال_ٿيل(_src1); CV_اڻ_استعمال_ٿيل(_src2); CV_اڻ_استعمال_ٿيل(_dst); CV_اڻ_استعمال_ٿيل(نقاب_2);
+    CV_اڻ_استعمال_ٿيل(dtype); CV_اڻ_استعمال_ٿيل(oclop); CV_اڻ_استعمال_ٿيل(muldiv); CV_اڻ_استعمال_ٿيل(usrdata);
+    أرجع خطأ;
+#وإلا
+    ثابت داخلا_Array_2 *psrc1 = &_src1, *psrc2 = &_src2;
+    داخلا_Array_2::قسم_Flag kind1 = psrc1->قسم(), kind2 = psrc2->قسم();
+    منطقي have_نقاب = !نقاب_2.empty();
+    منطقي reallocate = خطأ;
+    صحيح type1 = psrc1->type(), depth1 = CV_MAT_اونهائي(type1), cn = CV_MAT_CN(type1);
+    صحيح type2 = psrc2->type(), depth2 = CV_MAT_اونهائي(type2), cn2 = CV_MAT_CN(type2);
+    صحيح wtype, dims1 = psrc1->dims(), dims2 = psrc2->dims();
+    سائيز sz1 = dims1 <= 2 ? psrc1->size() : سائيز();
+    سائيز sz2 = dims2 <= 2 ? psrc2->size() : سائيز();
 
-    if (!(OCL_PERFORMANCE_CHECK(_dst.isUMat()) && dims1 <= 2 && dims2 <= 2))
-        return false;
+    إذا (!(OCL_PERFORMANCE_CHECK(_dst.isUMat()) && dims1 <= 2 && dims2 <= 2))
+        أرجع خطأ;
 
     // min/max: the bitwise-style OpenCL kernel (same-type element-wise, no working-type coercion).
-    if (oclop == OCL_OP_MIN || oclop == OCL_OP_MAX)
+    إذا (oclop == OCL_OP_MIN || oclop == OCL_OP_MAX)
     {
-        bool haveScalar = false;
-        if ((kind1 == _InputArray::MATX) + (kind2 == _InputArray::MATX) == 1 ||
-            !psrc1->sameSize(*psrc2) || type1 != type2)
+        منطقي haveScalar = خطأ;
+        إذا ((kind1 == داخلا_Array_2::MATX) + (kind2 == داخلا_Array_2::MATX) == 1 ||
+            !psrc1->same_سائيز(*psrc2) || type1 != type2)
         {
-            if (checkScalar(*psrc1, type2, kind1, kind2))
+            إذا (checkScalar(*psrc1, type2, kind1, kind2))
             { std::swap(psrc1, psrc2); std::swap(type1, type2); }
-            else if (!checkScalar(*psrc2, type1, kind2, kind1))
-                return false;
-            haveScalar = true;
+            وإلا إذا (!checkScalar(*psrc2, type1, kind2, kind1))
+                أرجع خطأ;
+            haveScalar = سچ;
         }
-        _dst.createSameSize(*psrc1, type1);
-        return ocl_binary_op(*psrc1, *psrc2, _dst, _mask, false, oclop, haveScalar);
+        _dst.create_Same_سائيز(*psrc1, type1);
+        أرجع ocl_ٻٽو_op(*psrc1, *psrc2, _dst, نقاب_2, خطأ, oclop, haveScalar);
     }
 
     // reciprocal (scale/src): the OpenCL kernel is unary on src - use src2 for both operands (the CPU
     // engine received a 0-dim `1` numerator as src1, which the recip kernel would ignore). [TODO.VP: tidy]
-    if (oclop == OCL_OP_RECIP_SCALE)
+    إذا (oclop == OCL_OP_RECIP_SCALE)
     {
         psrc1 = psrc2; kind1 = kind2; type1 = type2; depth1 = depth2; cn = cn2; dims1 = dims2; sz1 = sz2;
     }
 
     // add/sub/mul/div/absdiff/addWeighted/recip: the arithm OpenCL kernel with a coerced work type.
-    bool src1Scalar = checkScalar(*psrc1, type2, kind1, kind2);
-    bool src2Scalar = checkScalar(*psrc2, type1, kind2, kind1);
-    bool haveScalar = false;
+    منطقي src1Scalar = checkScalar(*psrc1, type2, kind1, kind2);
+    منطقي src2Scalar = checkScalar(*psrc2, type1, kind2, kind1);
+    منطقي haveScalar = خطأ;
 
-    if (dims1 != dims2 || sz1 != sz2 || cn != cn2 ||
-        (kind1 == _InputArray::MATX && (sz1 == Size(1,4) || sz1 == Size(1,1))) ||
-        (kind2 == _InputArray::MATX && (sz2 == Size(1,4) || sz2 == Size(1,1))))
+    إذا (dims1 != dims2 || sz1 != sz2 || cn != cn2 ||
+        (kind1 == داخلا_Array_2::MATX && (sz1 == سائيز(1,4) || sz1 == سائيز(1,1))) ||
+        (kind2 == داخلا_Array_2::MATX && (sz2 == سائيز(1,4) || sz2 == سائيز(1,1))))
     {
-        if ((type1 == CV_64F && (sz1.height == 1 || sz1.height == 4)) && src1Scalar)
+        إذا ((type1 == CV_64F && (sz1.اوچائي == 1 || sz1.اوچائي == 4)) && src1Scalar)
         {
             // src1 is a scalar; swap it with src2
             std::swap(psrc1, psrc2); std::swap(sz1, sz2); std::swap(type1, type2);
             std::swap(depth1, depth2); std::swap(cn, cn2); std::swap(dims1, dims2);
-            if (oclop == OCL_OP_SUB) oclop = OCL_OP_RSUB;
-            if (oclop == OCL_OP_DIV_SCALE) oclop = OCL_OP_RDIV_SCALE;
+            إذا (oclop == OCL_OP_SUB) oclop = OCL_OP_RSUB;
+            إذا (oclop == OCL_OP_DIV_SCALE) oclop = OCL_OP_RDIV_SCALE;
         }
-        else if (!src2Scalar)
-            return false;   // array op array with mismatched size/cn: engine broadcasts on the CPU
-        haveScalar = true;
-        CV_Assert((type2 == CV_64F || type2 == CV_32F) && (sz2.height == 1 || sz2.height == 4));
+        وإلا إذا (!src2Scalar)
+            أرجع خطأ;   // array op array with mismatched size/cn: engine broadcasts on the CPU
+        haveScalar = سچ;
+        CV_Assert((type2 == CV_64F || type2 == CV_32F) && (sz2.اوچائي == 1 || sz2.اوچائي == 4));
 
-        if (!muldiv)
+        إذا (!muldiv)
         {
             Mat sc = psrc2->getMat();
-            depth2 = actualScalarDepth(sc.ptr<double>(), sz2 == Size(1, 1) ? cn2 : cn);
-            if (depth2 == CV_64F && CV_ELEM_SIZE1(depth1) < 8)
+            depth2 = actual_Scalar_اونهائي(sc.ptr<مزدوج>(), sz2 == سائيز(1, 1) ? cn2 : cn);
+            إذا (depth2 == CV_64F && CV_ELEM_SIZE1(depth1) < 8)
                 depth2 = CV_32F;
         }
-        else
+        وإلا
             depth2 = CV_64F;
     }
 
-    if (dtype < 0)
+    إذا (dtype < 0)
     {
-        if (_dst.fixedType())
+        إذا (_dst.fixedType())
             dtype = _dst.type();
-        else
+        وإلا
         {
-            if (!haveScalar && type1 != type2)
+            إذا (!haveScalar && type1 != type2)
                 CV_Error(cv::Error::StsBadArg,
                      "When the input arrays in add/subtract/multiply/divide functions have different types, "
                      "the output array type must be explicitly specified");
             dtype = type1;
         }
     }
-    dtype = CV_MAT_DEPTH(dtype);
+    dtype = CV_MAT_اونهائي(dtype);
 
-    if (depth1 == depth2 && dtype == depth1)
+    إذا (depth1 == depth2 && dtype == depth1)
         wtype = dtype;
-    else if (!muldiv)
+    وإلا إذا (!muldiv)
     {
-        wtype = coerceTypes(depth1, depth2, false);
-        wtype = coerceTypes(wtype, dtype, false);
-        if (dtype < CV_32F && (depth1 < CV_32F || depth2 < CV_32F))
+        wtype = coerceTypes(depth1, depth2, خطأ);
+        wtype = coerceTypes(wtype, dtype, خطأ);
+        إذا (dtype < CV_32F && (depth1 < CV_32F || depth2 < CV_32F))
             wtype = CV_32S;
     }
-    else
+    وإلا
     {
-        wtype = coerceTypes(depth1, depth2, true);
-        wtype = coerceTypes(wtype, dtype, true);
+        wtype = coerceTypes(depth1, depth2, سچ);
+        wtype = coerceTypes(wtype, dtype, سچ);
     }
 
     // The scaled OpenCL kernels (mul/div by a scale, reciprocal, addWeighted) compute in float; the old
     // same-type fast path forced max(depth, CV_32F). coerceTypes keeps same-type integer, so bump here.
-    if (oclop == OCL_OP_MUL_SCALE || oclop == OCL_OP_DIV_SCALE || oclop == OCL_OP_RDIV_SCALE ||
+    إذا (oclop == OCL_OP_MUL_SCALE || oclop == OCL_OP_DIV_SCALE || oclop == OCL_OP_RDIV_SCALE ||
         oclop == OCL_OP_RECIP_SCALE || oclop == OCL_OP_ADDW)
-        wtype = std::max(wtype, (int)CV_32F);
+        wtype = std::max(wtype, (صحيح)CV_32F);
 
     dtype = CV_MAKETYPE(dtype, cn);
     wtype = CV_MAKETYPE(wtype, cn);
 
-    if (haveMask)
+    إذا (have_نقاب)
     {
-        int mtype = _mask.type();
-        CV_Assert((mtype == CV_8UC1 || mtype == CV_8SC1 || mtype == CV_Bool) && _mask.sameSize(*psrc1));
-        reallocate = !_dst.sameSize(*psrc1) || _dst.type() != dtype;
+        صحيح mtype = نقاب_2.type();
+        CV_Assert((mtype == CV_8UC1 || mtype == CV_8SC1 || mtype == CV_Bool) && نقاب_2.same_سائيز(*psrc1));
+        reallocate = !_dst.same_سائيز(*psrc1) || _dst.type() != dtype;
     }
 
-    _dst.createSameSize(*psrc1, dtype);
-    if (reallocate)
-        _dst.setTo(0.);
+    _dst.create_Same_سائيز(*psrc1, dtype);
+    إذا (reallocate)
+        _dst.سيٽ_منزل(0.);
 
-    return ocl_arithm_op(*psrc1, *psrc2, _dst, _mask, wtype, usrdata, oclop, haveScalar);
-#endif
+    أرجع ocl_arithm_op(*psrc1, *psrc2, _dst, نقاب_2, wtype, usrdata, oclop, haveScalar);
+#جيڪڏهن_پورو
 }
 
 // Element-wise binary op (ADD/SUB/...) on two CPU operands - each an array Mat or a MATX scalar -
@@ -592,33 +592,33 @@ static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
 // through to arithm_op. Incompatible shapes make the engine throw (matching cv::add's error).
 // Does the output array already have exactly this shape+type (=> create() reuses it, no realloc)?
 // Works for Mat and UMat alike (shape/type queries, no data-pointer peeking).
-static bool outArrayMatches(const _OutputArray& a, const MatShape& shp, int type)
+ساكن منطقي ٻاهريون_Array_Matches(ثابت _OutputArray& a, ثابت MatShape& shp, صحيح type)
 {
-    if (a.empty() || a.type() != type)
-        return false;
-    int sz[MatShape::MAX_DIMS];
-    int nd = a.sizend(sz);
-    if (nd != (int)shp.size())
-        return false;
-    for (int i = 0; i < nd; i++)
-        if (sz[i] != shp[i])
-            return false;
-    return true;
+    إذا (a.empty() || a.type() != type)
+        أرجع خطأ;
+    صحيح sz[MatShape::MAX_DIMS];
+    صحيح nd = a.sizend(sz);
+    إذا (nd != (صحيح)shp.size())
+        أرجع خطأ;
+    لكل (صحيح i = 0; i < nd; i++)
+        إذا (sz[i] != shp[i])
+            أرجع خطأ;
+    أرجع سچ;
 }
 
 // Are two operands' iteration shapes (spatial dims + channels innermost, exactly how the engine
 // iterates) numpy-broadcast-compatible? Powers the scalar-like-Mat compat fallback in arithm_op.
 // Cheap by design: sizend copies the dim arrays inline - no Mat headers, no allocations.
-static bool shapesBroadcastCompat(InputArray a, int acn, InputArray b, int bcn)
+ساكن منطقي shapes_نشر_Compat(داخلا_Array a, صحيح acn, داخلا_Array b, صحيح bcn)
 {
-    int asz[MatShape::MAX_DIMS + 1], bsz[MatShape::MAX_DIMS + 1];
-    int ad = a.sizend(asz), bd = b.sizend(bsz);
+    صحيح asz[MatShape::MAX_DIMS + 1], bsz[MatShape::MAX_DIMS + 1];
+    صحيح ad = a.sizend(asz), bd = b.sizend(bsz);
     asz[ad++] = acn;
     bsz[bd++] = bcn;
-    for (int i1 = ad - 1, i2 = bd - 1; i1 >= 0 && i2 >= 0; i1--, i2--)
-        if (asz[i1] != bsz[i2] && asz[i1] != 1 && bsz[i2] != 1)
-            return false;
-    return true;
+    لكل (صحيح i1 = ad - 1, i2 = bd - 1; i1 >= 0 && i2 >= 0; i1--, i2--)
+        إذا (asz[i1] != bsz[i2] && asz[i1] != 1 && bsz[i2] != 1)
+            أرجع خطأ;
+    أرجع سچ;
 }
 
 // The one entry point for every element-wise binary op (add/sub/mul/div/min/max/absdiff/addWeighted/
@@ -628,48 +628,48 @@ static bool shapesBroadcastCompat(InputArray a, int acn, InputArray b, int bcn)
 // Below this many ELEMENTS (total * channels), the per-call constant overhead of the engine path
 // (program build + compile + executor setup) is comparable to the actual work - take the direct
 // kernel call instead. Same tier boundary as math_op's MATH_OP_SMALL for cv::exp.
-enum { ARITHM_SMALL_DIRECT = 100000 };
+تعداد { ARITHM_SMALL_سڌو = 100000 };
 
-static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray dst,
-                      InputArray mask, int dtype, int oclop, bool muldiv, const Scalar& params)
+ساكن فراغ arithm_op(ew::چوٽي op, داخلا_Array src1, داخلا_Array src2, OutputArray dst,
+                      داخلا_Array نقاب, صحيح dtype, صحيح oclop, منطقي muldiv, ثابت Scalar& params)
 {
-    if (src1.empty() || src2.empty())          // empty inputs -> empty result
+    إذا (src1.empty() || src2.empty())          // empty inputs -> empty result
     {
         CV_Assert((src1.empty() && src2.empty()) ||
                   (src1.empty() && isScalarArg(src2, src1.channels())) ||
                   (src2.empty() && isScalarArg(src1, src2.channels())));
         dst.release();
-        if (dtype >= 0)
+        إذا (dtype >= 0)
             dst.create(0, 0, dtype);
-        return;
+        أرجع;
     }
 
     // UMat -> classic OpenCL kernel. It declines (false) when OpenCL can't apply (no device, dims>2, a
     // broadcast, cn>4 masked, ...) - then the CPU engine below handles it (mapping the UMat via getMat).
     // oclop < 0 is a sentinel: the caller (e.g. cv::compare) already ran its own OpenCL path, so this
     // helper only runs the CPU engine (a UMat operand is mapped via getMat).
-    if (oclop >= 0 && cv::ocl::isOpenCLActivated() &&
+    إذا (oclop >= 0 && cv::ocl::isOpenCLActivated() &&
         (src1.isUMat() || src2.isUMat() || dst.isUMat()))
     {
-        double abg[3] = { params[0], params[1], params[2] }, scale = params[0];
-        void* usrdata = (op == ew::OP_ADDW) ? (void*)abg : (muldiv ? (void*)&scale : nullptr);
-        if (arithm_op_ocl(src1, src2, dst, mask, dtype, oclop, muldiv, usrdata))
-            return;
+        مزدوج abg[3] = { params[0], params[1], params[2] }, scale = params[0];
+        فراغ* usrdata = (op == ew::OP_ADDW) ? (فراغ*)abg : (muldiv ? (فراغ*)&scale : خالي_اشارو);
+        إذا (arithm_op_ocl(src1, src2, dst, نقاب, dtype, oclop, muldiv, usrdata))
+            أرجع;
     }
 
-    const bool haveMask = !mask.empty();
-    const int cn1 = src1.channels(), cn2 = src2.channels();
-    bool s1 = isScalarArg(src1, src2), s2 = isScalarArg(src2, src1);
-    if (s1 && s2)
-        s1 = s2 = false;    // two scalars: treat both as tiny array operands (element-wise + broadcast),
+    ثابت منطقي have_نقاب = !نقاب.empty();
+    ثابت صحيح cn1 = src1.channels(), cn2 = src2.channels();
+    منطقي s1 = isScalarArg(src1, src2), s2 = isScalarArg(src2, src1);
+    إذا (s1 && s2)
+        s1 = s2 = خطأ;    // two scalars: treat both as tiny array operands (element-wise + broadcast),
                             // matching arithm_op (Scalar+Scalar -> 4x1, number+number -> 1x1, ...)
     // A 4x1 CV_64F Mat/UMat pseudo-scalar (see isScalarArg) is hijacked only against a REAL array:
     // when the partner is itself a tiny scalar-shaped array (e.g. compare(Mat 4x1, Mat 1x1) -
     // issue #8999), both are honest data and ride the broadcast. A genuine MATX Scalar never demotes.
-    else if (s1 && src1.kind() != _InputArray::MATX && isScalarLikeMat(src2, cn1))
-        s1 = false;
-    else if (s2 && src2.kind() != _InputArray::MATX && isScalarLikeMat(src1, cn2))
-        s2 = false;
+    وإلا إذا (s1 && src1.قسم() != داخلا_Array_2::MATX && isScalarLikeMat(src2, cn1))
+        s1 = خطأ;
+    وإلا إذا (s2 && src2.قسم() != داخلا_Array_2::MATX && isScalarLikeMat(src1, cn2))
+        s2 = خطأ;
 
     // Compat fallback: Java/Python/user code passes scalars as real little Mats (the classic 4x1
     // CV_64F column, a 1xcn/cnx1 vector - see isScalarLikeMat). Those normally ride broadcasting
@@ -677,10 +677,10 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // calls that would otherwise throw get the 4.x scalar semantics, every valid broadcast keeps
     // its numpy meaning. Cheap: two geometry probes, and the O(ndims) shape walk runs only when a
     // probe hits (never for ordinary same-size or MATX-scalar calls).
-    if (!s1 && !s2)
+    إذا (!s1 && !s2)
     {
-        bool like1 = isScalarLikeMat(src1, cn2), like2 = isScalarLikeMat(src2, cn1);
-        if ((like1 || like2) && !shapesBroadcastCompat(src1, cn1, src2, cn2))
+        منطقي like1 = isScalarLikeMat(src1, cn2), like2 = isScalarLikeMat(src2, cn1);
+        إذا ((like1 || like2) && !shapes_نشر_Compat(src1, cn1, src2, cn2))
         {
             s1 = like1;             // src1 preferred when both qualify, like the old checkScalar order
             s2 = like2 && !like1;
@@ -692,31 +692,31 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // two-scalar operand handled as an array) is mapped once into a local. EXCEPTION - in-place with a
     // realloc: if dst IS one of the sources, dst.create() may free that source's data mid-op, so take a
     // header copy (increfs, keeping the old data alive) of the sources in that case only.
-    const void* dstObj = (dst.kind() == _InputArray::MAT) ? dst.getObj() : nullptr;
-    const bool aliased = dstObj && (dstObj == src1.getObj() || dstObj == src2.getObj());
+    ثابت فراغ* dstObj = (dst.قسم() == داخلا_Array_2::MAT) ? dst.getObj() : خالي_اشارو;
+    ثابت منطقي aliased = dstObj && (dstObj == src1.getObj() || dstObj == src2.getObj());
     Mat m1loc, m2loc, mloc;
-    auto asMat = [&](InputArray a, Mat& loc) -> const Mat* {
-        if (a.kind() == _InputArray::MAT && !aliased) return (const Mat*)a.getObj();
-        loc = a.getMat(); return &loc;
+    خودڪار asMat = [&](داخلا_Array a, Mat& loc) -> ثابت Mat* {
+        إذا (a.قسم() == داخلا_Array_2::MAT && !aliased) أرجع (ثابت Mat*)a.getObj();
+        loc = a.getMat(); أرجع &loc;
     };
-    const Mat* pm1 = s1 ? nullptr : asMat(src1, m1loc);
-    const Mat* pm2 = s2 ? nullptr : asMat(src2, m2loc);
-    const int adepth = s1 ? pm2->depth() : pm1->depth();   // the (first) array operand's depth
+    ثابت Mat* pm1 = s1 ? خالي_اشارو : asMat(src1, m1loc);
+    ثابت Mat* pm2 = s2 ? خالي_اشارو : asMat(src2, m2loc);
+    ثابت صحيح adepth = s1 ? pm2->اونهائي() : pm1->اونهائي();   // the (first) array operand's depth
     // auto result depth (no explicit dtype, no fixed-type dst): add/sub/mul/div keep the first array
     // operand's depth (cv::'s dtype==-1 convention), but min/max/absdiff have NO dtype argument and
     // must promote mixed inputs to their common type (min(u32,f32) in u32 would drop the float). For
     // same-type inputs promoteArith(da,db)==da, so classic behaviour is preserved (e.g. absdiff of two
     // s16 stays s16, saturating - the wide unsigned |a-b| is computed then cast back down by emitBinary).
-    int autoDepth = adepth;
-    if (op == ew::OP_MIN || op == ew::OP_MAX || op == ew::OP_ABSDIFF)
+    صحيح auto_اونهائي = adepth;
+    إذا (op == ew::OP_MIN || op == ew::OP_MAX || op == ew::OP_ABSDIFF)
     {
-        const int d1 = s1 ? ew::EW_DEPTH_NONE : pm1->depth();
-        const int d2 = s2 ? ew::EW_DEPTH_NONE : pm2->depth();
-        autoDepth = ew::promoteArith(d1, d2);
+        ثابت صحيح d1 = s1 ? ew::EW_اونهائي_NONE : pm1->اونهائي();
+        ثابت صحيح d2 = s2 ? ew::EW_اونهائي_NONE : pm2->اونهائي();
+        auto_اونهائي = ew::promoteArith(d1, d2);
     }
     // result depth: explicit dtype wins; else a fixed-type dst dictates it; else the auto depth above.
-    const int rdepth = dtype >= 0 ? CV_MAT_DEPTH(dtype)
-                     : (dst.fixedType() ? dst.depth() : autoDepth);
+    ثابت صحيح rdepth = dtype >= 0 ? CV_MAT_اونهائي(dtype)
+                     : (dst.fixedType() ? dst.اونهائي() : auto_اونهائي);
 
     // FAST PATH for the classic hot call: two same-type same-shape continuous arrays, no mask, no
     // scalar, no broadcast, result depth == input depth, and the array is SMALL. Building and
@@ -728,25 +728,25 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // kernel call and keep the ordinary path. addWeighted qualifies exactly when its direct fused
     // T -> T kernel exists (u8..f32; the 32/64-bit ints lower to wide-compute + cast and get {}
     // from getElemwiseFunc below, falling through naturally).
-    if (!haveMask && !s1 && !s2 &&
-        (op == ew::OP_ADD || op == ew::OP_SUB || op == ew::OP_MIN || op == ew::OP_MAX ||
+    إذا (!have_نقاب && !s1 && !s2 &&
+        (op == ew::OP_جوڙيو || op == ew::OP_SUB || op == ew::OP_MIN || op == ew::OP_MAX ||
          op == ew::OP_ABSDIFF || op == ew::OP_MUL || op == ew::OP_ADDW ||
          op == ew::OP_AND || op == ew::OP_OR || op == ew::OP_XOR) &&
-        rdepth == pm1->depth() && pm1->type() == pm2->type() && pm1->size == pm2->size &&
+        rdepth == pm1->اونهائي() && pm1->type() == pm2->type() && pm1->size == pm2->size &&
         pm1->isContinuous() && pm2->isContinuous() &&
-        pm1->total()*cn1 <= (size_t)ARITHM_SMALL_DIRECT)
+        pm1->ڪل()*cn1 <= (size_t)ARITHM_SMALL_سڌو)
     {
-        ew::TKernel k = ew::getElemwiseFunc(op, rdepth, rdepth, ew::EW_DEPTH_NONE, rdepth);
-        if (k.fptr)
+        ew::TKernel k = ew::getElemwiseFunc(op, rdepth, rdepth, ew::EW_اونهائي_NONE, rdepth);
+        إذا (k.fptr)
         {
-            dst.createSameSize(src1, pm1->type());   // whole-shape transfer, not piecemeal dims+sizes
+            dst.create_Same_سائيز(src1, pm1->type());   // whole-shape transfer, not piecemeal dims+sizes
             Mat dloc;
-            Mat* pd = (dst.kind() == _InputArray::MAT) ? (Mat*)dst.getObj() : &(dloc = dst.getMat());
-            if (pd->isContinuous())     // a reused non-continuous dst view falls through to the engine
+            Mat* pd = (dst.قسم() == داخلا_Array_2::MAT) ? (Mat*)dst.getObj() : &(dloc = dst.getMat());
+            إذا (pd->isContinuous())     // a reused non-continuous dst view falls through to the engine
             {
-                k.fptr(pm1->data, 0, 1, pm2->data, 0, 1, nullptr, 0, 0,
-                       pd->data, 0, (int)(pm1->total()*cn1), 1, params.val, k.flags, k.userdata);
-                return;
+                k.fptr(pm1->معلومات, 0, 1, pm2->معلومات, 0, 1, خالي_اشارو, 0, 0,
+                       pd->معلومات, 0, (صحيح)(pm1->ڪل()*cn1), 1, params.val, k.flags, k.userdata);
+                أرجع;
             }
         }
     }
@@ -754,44 +754,44 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // operand order = (src1, src2): an array becomes an INPUT, a scalar a flexible per-channel CONST
     // read straight from the caller's inline storage (getObj()), no Mat / convertTo.
     ew::TExpr p;
-    auto addOperand = [&](InputArray src, bool isScalar, const Mat* m, int otherCn) -> int {
-        if (!isScalar)
-            return p.addInput(m->depth());
-        const uchar* sp; int sd;
-        uchar scbuf[EW_SCALAR_BUF_SIZE];   // stack room for a UMAT scalar; addConst copies the values out
-        const int scn0 = scalarArgElems(src, sp, sd, scbuf), cn = otherCn;
-        const int scn = (cn == scn0 || (cn < 4 && scn0 == 4)) ? cn
+    خودڪار جوڙيو_عمليو = [&](داخلا_Array src, منطقي isScalar, ثابت Mat* m, صحيح otherCn) -> صحيح {
+        إذا (!isScalar)
+            أرجع p.جوڙيو_داخلا(m->اونهائي());
+        ثابت uchar* sp; صحيح sd;
+        uchar scbuf[EW_SCALAR_BUF_سائيز];   // stack room for a UMAT scalar; addConst copies the values out
+        ثابت صحيح scn0 = scalarArgElems(src, sp, sd, scbuf), cn = otherCn;
+        ثابت صحيح scn = (cn == scn0 || (cn < 4 && scn0 == 4)) ? cn
                       : (scn0 == 1) ? 1 : 0;
         CV_Assert(scn > 0);
-        return p.addConst(ew::EW_DEPTH_NONE, sd, sp, scn);
+        أرجع p.جوڙيو_Const(ew::EW_اونهائي_NONE, sd, sp, scn);
     };
-    const int a0 = addOperand(src1, s1, pm1, cn2);
-    const int a1 = addOperand(src2, s2, pm2, cn1);
+    ثابت صحيح a0 = جوڙيو_عمليو(src1, s1, pm1, cn2);
+    ثابت صحيح a1 = جوڙيو_عمليو(src2, s2, pm2, cn1);
 
     // Write-mask: a single-channel 1-byte array (u8/s8/bool) the size of the output spatial shape,
     // added as another broadcast input. The arithmetic result lands in a temp; a final
     // select(mask, r, dst) -> dst overwrites only mask!=0 positions of the (pre-existing) output.
-    int sMask = 0;
-    const Mat* pmask = nullptr;
-    if (haveMask)
+    صحيح s_نقاب = 0;
+    ثابت Mat* pmask = خالي_اشارو;
+    إذا (have_نقاب)
     {
-        CV_Assert(mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
-        pmask = asMat(mask, mloc);
-        sMask = p.addInput(pmask->depth());
+        CV_Assert(نقاب.type() == CV_8U || نقاب.type() == CV_8S || نقاب.type() == CV_Bool);
+        pmask = asMat(نقاب, mloc);
+        s_نقاب = p.جوڙيو_داخلا(pmask->اونهائي());
     }
-    const int sOut = p.addOutput(rdepth);               // output BEFORE emit -> moveToOutput drops the
-    const int r = p.emitBinary(op, a0, a1, rdepth, params);   // result temp (mask-free => none); scale
+    ثابت صحيح s_ٻاهريون = p.جوڙيو_Output(rdepth);               // output BEFORE emit -> moveToOutput drops the
+    ثابت صحيح r = p.emit_ٻٽو(op, a0, a1, rdepth, params);   // result temp (mask-free => none); scale
                                                         // rides params[0] (mul/div), {a,b,g} for addW
-    if (haveMask)
-        p.addInsn(ew::OP_SELECT, sMask, r, sOut, sOut);
-    else
-        p.moveToOutput(r, sOut);
+    إذا (have_نقاب)
+        p.جوڙيو_Insn(ew::OP_SELECT, s_نقاب, r, s_ٻاهريون, s_ٻاهريون);
+    وإلا
+        p.move_منزل_Output(r, s_ٻاهريون);
     p.compile();
 
-    const Mat* inputs[3]; int ni = 0;                   // inputs in program (input-index) order
-    if (!s1) inputs[ni++] = pm1;
-    if (!s2) inputs[ni++] = pm2;
-    if (haveMask) inputs[ni++] = pmask;
+    ثابت Mat* inputs[3]; صحيح ni = 0;                   // inputs in program (input-index) order
+    إذا (!s1) inputs[ni++] = pm1;
+    إذا (!s2) inputs[ni++] = pm2;
+    إذا (have_نقاب) inputs[ni++] = pmask;
 
     // Pre-create the output at the broadcast shape, ALWAYS via dst.create() - never hand exec a raw
     // dst Mat. Routing through the _OutputArray is what enforces its contract: a FIXED_SIZE/FIXED_TYPE
@@ -802,15 +802,15 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // With a mask, a freshly (re)allocated dst is zeroed so mask==0 reads 0 (matches arithm_op); a
     // reused dst keeps its prior content there - detect reuse by shape+type BEFORE create (correct for
     // a reused UMat dst too).
-    MatShape oshape; int ocn;
+    MatShape oshape; صحيح ocn;
     p.outputShape(inputs, oshape, ocn);
-    const int otype = CV_MAKETYPE(rdepth, ocn);
-    const bool reused = haveMask && outArrayMatches(dst, oshape, otype);
+    ثابت صحيح otype = CV_MAKETYPE(rdepth, ocn);
+    ثابت منطقي reused = have_نقاب && ٻاهريون_Array_Matches(dst, oshape, otype);
     dst.create(oshape, otype);
     Mat dstloc;
-    Mat* pdst = (dst.kind() == _InputArray::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
-    if (haveMask && !reused)
-        pdst->setZero();                          // setZero (not setTo, which caps at 4 channels)
+    Mat* pdst = (dst.قسم() == داخلا_Array_2::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
+    إذا (have_نقاب && !reused)
+        pdst->سيٽ_Zero();                          // setZero (not setTo, which caps at 4 channels)
     p.exec(inputs, pdst);
 }
 
@@ -818,128 +818,128 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
 // optional write-mask; result depth = dtype (>=0), else a fixed-type dst's depth, else the input
 // depth. Mirrors arithm_op's build/mask/exec tail with a single input and no scalar operand. OpenCL is
 // run by the caller (bitwise_op_ocl), so this is the CPU engine only.
-static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mask,
-                     int dtype, const Scalar& params)
+ساكن فراغ unary_op(ew::چوٽي op, داخلا_Array src, OutputArray dst, داخلا_Array نقاب,
+                     صحيح dtype, ثابت Scalar& params)
 {
-    if (src.empty())
+    إذا (src.empty())
     {
         dst.release();
-        if (dtype >= 0)
+        إذا (dtype >= 0)
             dst.create(0, 0, dtype);
-        return;
+        أرجع;
     }
 
-    const bool haveMask = !mask.empty();
+    ثابت منطقي have_نقاب = !نقاب.empty();
     // in-place (dst aliases src): keep a header copy so a shape/type-changing dst.create() can't free
     // src's data mid-op (matches arithm_op). A fixed-size/type dst never reallocs, so this is only for
     // an explicit dtype change.
-    const void* dstObj = (dst.kind() == _InputArray::MAT) ? dst.getObj() : nullptr;
-    const bool aliased = dstObj && src.kind() == _InputArray::MAT && dstObj == src.getObj();
+    ثابت فراغ* dstObj = (dst.قسم() == داخلا_Array_2::MAT) ? dst.getObj() : خالي_اشارو;
+    ثابت منطقي aliased = dstObj && src.قسم() == داخلا_Array_2::MAT && dstObj == src.getObj();
     Mat sloc, mloc;
-    const Mat* psrc = (src.kind() == _InputArray::MAT && !aliased) ? (const Mat*)src.getObj()
+    ثابت Mat* psrc = (src.قسم() == داخلا_Array_2::MAT && !aliased) ? (ثابت Mat*)src.getObj()
                                                                    : &(sloc = src.getMat());
-    const int rdepth = dtype >= 0 ? CV_MAT_DEPTH(dtype)
-                     : (dst.fixedType() ? dst.depth() : psrc->depth());
+    ثابت صحيح rdepth = dtype >= 0 ? CV_MAT_اونهائي(dtype)
+                     : (dst.fixedType() ? dst.اونهائي() : psrc->اونهائي());
 
     ew::TExpr p;
-    const int a0 = p.addInput(psrc->depth());
-    int sMask = 0;
-    const Mat* pmask = nullptr;
-    if (haveMask)
+    ثابت صحيح a0 = p.جوڙيو_داخلا(psrc->اونهائي());
+    صحيح s_نقاب = 0;
+    ثابت Mat* pmask = خالي_اشارو;
+    إذا (have_نقاب)
     {
-        CV_Assert(mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
-        pmask = (mask.kind() == _InputArray::MAT) ? (const Mat*)mask.getObj() : &(mloc = mask.getMat());
-        sMask = p.addInput(pmask->depth());
+        CV_Assert(نقاب.type() == CV_8U || نقاب.type() == CV_8S || نقاب.type() == CV_Bool);
+        pmask = (نقاب.قسم() == داخلا_Array_2::MAT) ? (ثابت Mat*)نقاب.getObj() : &(mloc = نقاب.getMat());
+        s_نقاب = p.جوڙيو_داخلا(pmask->اونهائي());
     }
-    const int sOut = p.addOutput(rdepth);
-    const int r = p.emitUnary(op, a0, rdepth, params);
-    if (haveMask)
-        p.addInsn(ew::OP_SELECT, sMask, r, sOut, sOut);
-    else
-        p.moveToOutput(r, sOut);
+    ثابت صحيح s_ٻاهريون = p.جوڙيو_Output(rdepth);
+    ثابت صحيح r = p.emitUnary(op, a0, rdepth, params);
+    إذا (have_نقاب)
+        p.جوڙيو_Insn(ew::OP_SELECT, s_نقاب, r, s_ٻاهريون, s_ٻاهريون);
+    وإلا
+        p.move_منزل_Output(r, s_ٻاهريون);
     p.compile();
 
-    const Mat* inputs[2]; int ni = 0;
+    ثابت Mat* inputs[2]; صحيح ni = 0;
     inputs[ni++] = psrc;
-    if (haveMask) inputs[ni++] = pmask;
+    إذا (have_نقاب) inputs[ni++] = pmask;
 
-    MatShape oshape; int ocn;
+    MatShape oshape; صحيح ocn;
     p.outputShape(inputs, oshape, ocn);
-    const int otype = CV_MAKETYPE(rdepth, ocn);
-    const bool reused = haveMask && outArrayMatches(dst, oshape, otype);
+    ثابت صحيح otype = CV_MAKETYPE(rdepth, ocn);
+    ثابت منطقي reused = have_نقاب && ٻاهريون_Array_Matches(dst, oshape, otype);
     dst.create(oshape, otype);
     Mat dstloc;
-    Mat* pdst = (dst.kind() == _InputArray::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
-    if (haveMask && !reused)
-        pdst->setZero();
+    Mat* pdst = (dst.قسم() == داخلا_Array_2::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
+    إذا (have_نقاب && !reused)
+        pdst->سيٽ_Zero();
     p.exec(inputs, pdst);
 }
 
 }
 
-void cv::add( InputArray src1, InputArray src2, OutputArray dst,
-          InputArray mask, int dtype )
+فراغ cv::جوڙيو( داخلا_Array src1, داخلا_Array src2, OutputArray dst,
+          داخلا_Array نقاب, صحيح dtype )
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_ADD, src1, src2, dst, mask, dtype, OCL_OP_ADD, false);
+    arithm_op(ew::OP_جوڙيو, src1, src2, dst, نقاب, dtype, OCL_OP_جوڙيو, خطأ);
 }
 
-void cv::subtract( InputArray src1, InputArray src2, OutputArray dst,
-                   InputArray mask, int dtype )
+فراغ cv::ڪٽيو( داخلا_Array src1, داخلا_Array src2, OutputArray dst,
+                   داخلا_Array نقاب, صحيح dtype )
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_SUB, src1, src2, dst, mask, dtype, OCL_OP_SUB, false);
+    arithm_op(ew::OP_SUB, src1, src2, dst, نقاب, dtype, OCL_OP_SUB, خطأ);
 }
 
-void cv::absdiff( InputArray src1, InputArray src2, OutputArray dst )
+فراغ cv::absdiff( داخلا_Array src1, داخلا_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_ABSDIFF, src1, src2, dst, noArray(), -1, OCL_OP_ABSDIFF, false);
+    arithm_op(ew::OP_ABSDIFF, src1, src2, dst, noArray(), -1, OCL_OP_ABSDIFF, خطأ);
 }
 
-void cv::copyTo(InputArray _src, OutputArray _dst, InputArray _mask)
+فراغ cv::copy_منزل(داخلا_Array _src, OutputArray _dst, داخلا_Array نقاب_2)
 {
     CV_INSTRUMENT_REGION();
 
-    _src.copyTo(_dst, _mask);
+    _src.copy_منزل(_dst, نقاب_2);
 }
 
 /****************************************************************************************\
 *                                    multiply/divide                                     *
 \****************************************************************************************/
 
-namespace cv
+نطاق cv
 {
 
-void multiply(InputArray src1, InputArray src2,
-              OutputArray dst, double scale, int dtype)
+فراغ multiply(داخلا_Array src1, داخلا_Array src2,
+              OutputArray dst, مزدوج scale, صحيح dtype)
 {
     CV_INSTRUMENT_REGION();
 
-    const int oclop = std::abs(scale - 1.0) < DBL_EPSILON ? OCL_OP_MUL : OCL_OP_MUL_SCALE;
-    arithm_op(ew::OP_MUL, src1, src2, dst, noArray(), dtype, oclop, /*muldiv*/ true, Scalar(scale));
+    ثابت صحيح oclop = std::مطلق_قدر(scale - 1.0) < DBL_EPSILON ? OCL_OP_MUL : OCL_OP_MUL_SCALE;
+    arithm_op(ew::OP_MUL, src1, src2, dst, noArray(), dtype, oclop, /*muldiv*/ سچ, Scalar(scale));
 }
 
-void divide(InputArray src1, InputArray src2,
-                OutputArray dst, double scale, int dtype)
+فراغ divide(داخلا_Array src1, داخلا_Array src2,
+                OutputArray dst, مزدوج scale, صحيح dtype)
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_DIV, src1, src2, dst, noArray(), dtype, OCL_OP_DIV_SCALE, /*muldiv*/ true, Scalar(scale));
+    arithm_op(ew::OP_DIV, src1, src2, dst, noArray(), dtype, OCL_OP_DIV_SCALE, /*muldiv*/ سچ, Scalar(scale));
 }
 
-void divide(double scale, InputArray src2,
-                OutputArray dst, int dtype)
+فراغ divide(مزدوج scale, داخلا_Array src2,
+                OutputArray dst, صحيح dtype)
 {
     CV_INSTRUMENT_REGION();
 
-    if (src2.empty())
+    إذا (src2.empty())
     {
         dst.release();
-        return;
+        أرجع;
     }
 
     // scale / src2 == scale * 1 / src2: feed a 0-dim `1` as the numerator so the CPU engine reuses the
@@ -948,18 +948,18 @@ void divide(double scale, InputArray src2,
     // numerator would force). An integer src2 keeps its div-by-zero->0 guard (both operands integer); a
     // float src2 divides as float (1/0->inf), both matching cv::divide. dtype<0 follows src2's depth (a
     // fixed-type dst still wins). The UMat path uses the dedicated reciprocal kernel (OCL_OP_RECIP_SCALE).
-    double one = 1;
-    Mat numerator(MatShape::scalar(), src2.depth(), &one);
-    scalarToRawData(Scalar(1), &one, src2.depth(), 1);       // write `1` in src2's depth (no allocation)
-    const int rtype = (dtype < 0 && !dst.fixedType()) ? src2.depth() : dtype;
-    arithm_op(ew::OP_DIV, numerator, src2, dst, noArray(), rtype, OCL_OP_RECIP_SCALE, /*muldiv*/ true, Scalar(scale));
+    مزدوج one = 1;
+    Mat numerator(MatShape::scalar(), src2.اونهائي(), &one);
+    scalar_منزل_Raw_معلومات(Scalar(1), &one, src2.اونهائي(), 1);       // write `1` in src2's depth (no allocation)
+    ثابت صحيح rtype = (dtype < 0 && !dst.fixedType()) ? src2.اونهائي() : dtype;
+    arithm_op(ew::OP_DIV, numerator, src2, dst, noArray(), rtype, OCL_OP_RECIP_SCALE, /*muldiv*/ سچ, Scalar(scale));
 }
 
-UMat UMat::mul(InputArray m, double scale) const
+UMat UMat::mul(داخلا_Array m, مزدوج scale) ثابت
 {
     UMat dst;
-    multiply(*this, m, dst, scale);
-    return dst;
+    multiply(*هذا, m, dst, scale);
+    أرجع dst;
 }
 
 /****************************************************************************************\
@@ -968,12 +968,12 @@ UMat UMat::mul(InputArray m, double scale) const
 
 }
 
-void cv::addWeighted( InputArray src1, double alpha, InputArray src2,
-                      double beta, double gamma, OutputArray dst, int dtype )
+فراغ cv::جوڙيو_Weighted( داخلا_Array src1, مزدوج alpha, داخلا_Array src2,
+                      مزدوج beta, مزدوج gamma, OutputArray dst, صحيح dtype )
 {
     CV_INSTRUMENT_REGION();
 
-    arithm_op(ew::OP_ADDW, src1, src2, dst, noArray(), dtype, OCL_OP_ADDW, /*muldiv*/ true,
+    arithm_op(ew::OP_ADDW, src1, src2, dst, noArray(), dtype, OCL_OP_ADDW, /*muldiv*/ سچ,
               Scalar(alpha, beta, gamma));
 }
 
@@ -982,149 +982,149 @@ void cv::addWeighted( InputArray src1, double alpha, InputArray src2,
 *                                          compare                                       *
 \****************************************************************************************/
 
-namespace cv
+نطاق cv
 {
 
 
-static double getMinVal(int depth)
+ساكن مزدوج getMinVal(صحيح اونهائي)
 {
-    static const double tab[CV_DEPTH_MAX] =
+    ساكن ثابت مزدوج tab[CV_اونهائي_MAX] =
     {
         0, -128, 0, -32768, INT_MIN, -FLT_MAX, -DBL_MAX,
-        -65504, -FLT_MAX, 0, 0, (double)INT64_MIN, 0
+        -65504, -FLT_MAX, 0, 0, (مزدوج)INT64_MIN, 0
     };
-    return tab[depth];
+    أرجع tab[اونهائي];
 }
 
-static double getMaxVal(int depth)
+ساكن مزدوج getMaxVal(صحيح اونهائي)
 {
-    static const double tab[CV_DEPTH_MAX] = {
-        255, 127, 65535, 32767, INT_MAX, FLT_MAX, DBL_MAX,
-        65504, FLT_MAX, 255, (double)UINT64_MAX, (double)INT64_MAX, (double)UINT32_MAX, 0
+    ساكن ثابت مزدوج tab[CV_اونهائي_MAX] = {
+        255, 127, 65535, 32767, وڌ_کان_وڌ_عدد, FLT_MAX, DBL_MAX,
+        65504, FLT_MAX, 255, (مزدوج)UINT64_MAX, (مزدوج)INT64_MAX, (مزدوج)UINT32_MAX, 0
     };
-    return tab[depth];
+    أرجع tab[اونهائي];
 }
 
-#ifdef HAVE_OPENCL
+#جيڪڏهن_وصف_ٿيل HAVE_OPENCL
 
-static bool ocl_compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op, bool haveScalar)
+ساكن منطقي ocl_compare(داخلا_Array _src1, داخلا_Array _src2, OutputArray _dst, صحيح op, منطقي haveScalar)
 {
-    const ocl::Device& dev = ocl::Device::getDefault();
-    bool doubleSupport = dev.doubleFPConfig() > 0;
-    int type1 = _src1.type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1),
-            type2 = _src2.type(), depth2 = CV_MAT_DEPTH(type2);
+    ثابت ocl::Device& dev = ocl::Device::getDefault();
+    منطقي doubleSupport = dev.doubleFPConfig() > 0;
+    صحيح type1 = _src1.type(), depth1 = CV_MAT_اونهائي(type1), cn = CV_MAT_CN(type1),
+            type2 = _src2.type(), depth2 = CV_MAT_اونهائي(type2);
 
-    if (!doubleSupport && depth1 == CV_64F)
-        return false;
+    إذا (!doubleSupport && depth1 == CV_64F)
+        أرجع خطأ;
 
     // the integer scalar path below works in int; let the CPU handle the wider 5.x integer depths
-    if (haveScalar && (depth1 == CV_32U || depth1 == CV_64U || depth1 == CV_64S))
-        return false;
+    إذا (haveScalar && (depth1 == CV_32U || depth1 == CV_64U || depth1 == CV_64S))
+        أرجع خطأ;
 
-    if (!haveScalar && (!_src1.sameSize(_src2) || type1 != type2))
-            return false;
+    إذا (!haveScalar && (!_src1.same_سائيز(_src2) || type1 != type2))
+            أرجع خطأ;
 
     // This OpenCL kernel broadcasts a scalar's FIRST channel to all channels. The CPU path compares
     // per-channel (scalar[c] for channel c), so a multichannel array against a scalar with DISTINCT
     // channel values would disagree - bail to the CPU engine in that case (rare; not worth a kernel fix).
-    if (haveScalar && cn > 1)
+    إذا (haveScalar && cn > 1)
     {
         Mat sc = _src2.getMat();
-        int scn = (int)sc.total();
-        if (scn > 1)
+        صحيح scn = (صحيح)sc.ڪل();
+        إذا (scn > 1)
         {
-            double v[4] = { 0, 0, 0, 0 };
-            getConvertFunc(sc.depth(), CV_64F)(sc.ptr(), 1, 0, 1, (uchar*)v, 1, Size(std::min(scn, 4), 1), 0);
-            for (int i = 1, n = std::min(cn, scn); i < n; i++)
-                if (v[i] != v[0])
-                    return false;
+            مزدوج v[4] = { 0, 0, 0, 0 };
+            getConvertFunc(sc.اونهائي(), CV_64F)(sc.ptr(), 1, 0, 1, (uchar*)v, 1, سائيز(std::min(scn, 4), 1), 0);
+            لكل (صحيح i = 1, n = std::min(cn, scn); i < n; i++)
+                إذا (v[i] != v[0])
+                    أرجع خطأ;
         }
     }
 
-    int kercn = haveScalar ? cn : ocl::predictOptimalVectorWidth(_src1, _src2, _dst), rowsPerWI = dev.isIntel() ? 4 : 1;
+    صحيح kercn = haveScalar ? cn : ocl::predict_Optimal_ويڪٽر_ويڪر(_src1, _src2, _dst), صفون_في_WI = dev.isIntel() ? 4 : 1;
     // Workaround for bug with "?:" operator in AMD OpenCL compiler
-    if (depth1 >= CV_16U)
+    إذا (depth1 >= CV_16U)
         kercn = 1;
 
-    int scalarcn = kercn == 3 ? 4 : kercn;
-    const char * const operationMap[] = { "==", ">", ">=", "<", "<=", "!=" };
-    char cvt[50];
+    صحيح scalarcn = kercn == 3 ? 4 : kercn;
+    ثابت حرف * ثابت operationMap[] = { "==", ">", ">=", "<", "<=", "!=" };
+    حرف cvt[50];
 
     String opts = format("-D %s -D srcT1=%s -D dstT=%s -D DEPTH_dst=%d -D workT=srcT1 -D cn=%d"
                          " -D convertToDT=%s -D OP_CMP -D CMP_OPERATOR=%s -D srcT1_C1=%s"
                          " -D srcT2_C1=%s -D dstT_C1=%s -D workST=%s -D rowsPerWI=%d%s",
                          haveScalar ? "UNARY_OP" : "BINARY_OP",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth1, kercn)),
-                         ocl::typeToStr(CV_8UC(kercn)), CV_8U, kercn,
-                         ocl::convertTypeStr(depth1, CV_8U, kercn, cvt, sizeof(cvt)),
-                         operationMap[op], ocl::typeToStr(depth1),
-                         ocl::typeToStr(depth1), ocl::typeToStr(CV_8U),
-                         ocl::typeToStr(CV_MAKE_TYPE(depth1, scalarcn)), rowsPerWI,
+                         ocl::type_منزل_Str(CV_MAKE_TYPE(depth1, kercn)),
+                         ocl::type_منزل_Str(CV_8UC(kercn)), CV_8U, kercn,
+                         ocl::convertTypeStr(depth1, CV_8U, kercn, cvt, حجم(cvt)),
+                         operationMap[op], ocl::type_منزل_Str(depth1),
+                         ocl::type_منزل_Str(depth1), ocl::type_منزل_Str(CV_8U),
+                         ocl::type_منزل_Str(CV_MAKE_TYPE(depth1, scalarcn)), صفون_في_WI,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc, opts);
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
     UMat src1 = _src1.getUMat();
-    Size size = src1.size();
+    سائيز size = src1.size();
     _dst.create(size, CV_8UC(cn));
     UMat dst = _dst.getUMat();
 
-    if (haveScalar)
+    إذا (haveScalar)
     {
         size_t esz = CV_ELEM_SIZE1(type1) * scalarcn;
-        double buf[4] = { 0, 0, 0, 0 };
+        مزدوج buf[4] = { 0, 0, 0, 0 };
         Mat src2 = _src2.getMat();
 
-        if( depth1 > CV_32S )
+        إذا( depth1 > CV_32S )
             convertAndUnrollScalar( src2, depth1, (uchar *)buf, kercn );
-        else
+        وإلا
         {
-            double fval = 0;
-            getConvertFunc(depth2, CV_64F)(src2.ptr(), 1, 0, 1, (uchar *)&fval, 1, Size(1, 1), 0);
-            if( fval < getMinVal(depth1) )
-                return dst.setTo(Scalar::all(op == CMP_GT || op == CMP_GE || op == CMP_NE ? 255 : 0)), true;
+            مزدوج fval = 0;
+            getConvertFunc(depth2, CV_64F)(src2.ptr(), 1, 0, 1, (uchar *)&fval, 1, سائيز(1, 1), 0);
+            إذا( fval < getMinVal(depth1) )
+                أرجع dst.سيٽ_منزل(Scalar::all(op == CMP_GT || op == CMP_GE || op == CMP_NE ? 255 : 0)), سچ;
 
-            if( fval > getMaxVal(depth1) )
-                return dst.setTo(Scalar::all(op == CMP_LT || op == CMP_LE || op == CMP_NE ? 255 : 0)), true;
+            إذا( fval > getMaxVal(depth1) )
+                أرجع dst.سيٽ_منزل(Scalar::all(op == CMP_LT || op == CMP_LE || op == CMP_NE ? 255 : 0)), سچ;
 
-            int ival = cvRound(fval);
-            if( fval != ival )
+            صحيح ival = cv_ڦيرو(fval);
+            إذا( fval != ival )
             {
-                if( op == CMP_LT || op == CMP_GE )
+                إذا( op == CMP_LT || op == CMP_GE )
                     ival = cvCeil(fval);
-                else if( op == CMP_LE || op == CMP_GT )
+                وإلا إذا( op == CMP_LE || op == CMP_GT )
                     ival = cvFloor(fval);
-                else
-                    return dst.setTo(Scalar::all(op == CMP_NE ? 255 : 0)), true;
+                وإلا
+                    أرجع dst.سيٽ_منزل(Scalar::all(op == CMP_NE ? 255 : 0)), سچ;
             }
             convertAndUnrollScalar(Mat(1, 1, CV_32S, &ival), depth1, (uchar *)buf, kercn);
         }
 
         ocl::KernelArg scalararg = ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, esz);
 
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src1, cn, kercn),
+        k.دليلون(ocl::KernelArg::Read_Only_No_سائيز(src1, cn, kercn),
                ocl::KernelArg::WriteOnly(dst, cn, kercn), scalararg);
     }
-    else
+    وإلا
     {
         UMat src2 = _src2.getUMat();
 
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src1),
-               ocl::KernelArg::ReadOnlyNoSize(src2),
+        k.دليلون(ocl::KernelArg::Read_Only_No_سائيز(src1),
+               ocl::KernelArg::Read_Only_No_سائيز(src2),
                ocl::KernelArg::WriteOnly(dst, cn, kercn));
     }
 
-    size_t globalsize[2] = { (size_t)dst.cols * cn / kercn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.کانن_ڳڻپ * cn / kercn, ((size_t)dst.صفون + صفون_في_WI - 1) / صفون_في_WI };
+    أرجع k.لاڳيتو(2, globalsize, عدم, خطأ);
 }
 
-#endif
+#جيڪڏهن_پورو
 
 }
 
-void cv::compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op)
+فراغ cv::compare(داخلا_Array _src1, داخلا_Array _src2, OutputArray _dst, صحيح op)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1132,41 +1132,41 @@ void cv::compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op)
                op == CMP_NE || op == CMP_GE || op == CMP_GT );
 
     CV_Assert(_src1.empty() == _src2.empty());
-    if (_src1.empty() && _src2.empty())
+    إذا (_src1.empty() && _src2.empty())
     {
         _dst.release();
-        return;
+        أرجع;
     }
 
-    bool haveScalar = false;
+    منطقي haveScalar = خطأ;
 
-    if ((_src1.isMatx() + _src2.isMatx()) == 1
-            || !_src1.sameSize(_src2)
+    إذا ((_src1.isMatx() + _src2.isMatx()) == 1
+            || !_src1.same_سائيز(_src2)
             || _src1.type() != _src2.type())
     {
-        bool is_src1_scalar = checkScalar(_src1, _src2.type(), _src1.kind(), _src2.kind());
-        bool is_src2_scalar = checkScalar(_src2, _src1.type(), _src2.kind(), _src1.kind());
+        منطقي is_src1_scalar = checkScalar(_src1, _src2.type(), _src1.قسم(), _src2.قسم());
+        منطقي is_src2_scalar = checkScalar(_src2, _src1.type(), _src2.قسم(), _src1.قسم());
 
         // exactly one scalar operand: keep it as src2 (swapping flips the ordering ops) so the OpenCL
         // path sees the array-op-scalar form. Otherwise - two arrays of different size (broadcast),
         // mixed types, or two scalars - the CPU engine broadcasts / promotes them, so there is NO error
         // here: fall through to arithm_op (which handles scalar detection, broadcast and mixed types).
-        if (is_src1_scalar && !is_src2_scalar)
+        إذا (is_src1_scalar && !is_src2_scalar)
         {
             op = op == CMP_LT ? CMP_GT : op == CMP_LE ? CMP_GE :
                 op == CMP_GE ? CMP_LE : op == CMP_GT ? CMP_LT : op;
             // src1 is a scalar; swap it with src2
             compare(_src2, _src1, _dst, op);
-            return;
+            أرجع;
         }
         haveScalar = is_src2_scalar && !is_src1_scalar;
     }
-    CV_UNUSED(haveScalar);   // consumed by CV_OCL_RUN only - a no-op without OpenCL
+    CV_اڻ_استعمال_ٿيل(haveScalar);   // consumed by CV_OCL_RUN only - a no-op without OpenCL
 
     // OpenCL handles only the same-size and array-op-scalar forms; a broadcast between two arrays of
     // different size falls through to the CPU engine.
-    CV_OCL_RUN(_src1.dims() <= 2 && _src2.dims() <= 2 && OCL_PERFORMANCE_CHECK(_dst.isUMat())
-               && (haveScalar || _src1.sameSize(_src2)),
+    CV_OCL_لاڳيتو(_src1.dims() <= 2 && _src2.dims() <= 2 && OCL_PERFORMANCE_CHECK(_dst.isUMat())
+               && (haveScalar || _src1.same_سائيز(_src2)),
                ocl_compare(_src1, _src2, _dst, op, haveScalar))
 
     // CPU: the element-wise engine. A CMP_* code maps to the corresponding OP_CMP_* TOp; the engine
@@ -1174,328 +1174,328 @@ void cv::compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op)
     // threshold promotes both operands to float - matching the classic ceil/floor threshold logic).
     // The scalar / broadcast / mixed-shape cases are handled inside arithm_op. oclop = -1 tells it the
     // OpenCL path was already tried above (via ocl_compare), so it only runs the CPU engine.
-    ew::TOp cmpOp = op == CMP_EQ ? ew::OP_CMP_EQ : op == CMP_NE ? ew::OP_CMP_NE :
+    ew::چوٽي cmpOp = op == CMP_EQ ? ew::OP_CMP_EQ : op == CMP_NE ? ew::OP_CMP_NE :
                     op == CMP_LT ? ew::OP_CMP_LT : op == CMP_LE ? ew::OP_CMP_LE :
                     op == CMP_GT ? ew::OP_CMP_GT : ew::OP_CMP_GE;
-    arithm_op(cmpOp, _src1, _src2, _dst, noArray(), CV_8U, /*oclop=*/-1, /*muldiv=*/false);
+    arithm_op(cmpOp, _src1, _src2, _dst, noArray(), CV_8U, /*oclop=*/-1, /*muldiv=*/خطأ);
 }
 
 /****************************************************************************************\
 *                                        inRange                                         *
 \****************************************************************************************/
 
-namespace cv
+نطاق cv
 {
 
-template <typename T>
-struct InRange_SIMD
+سانچو <قسم_نالو T>
+بنية اندريون_Range_SIMD
 {
-    int operator () (const T * src1, const T * src2, const T * src3, uchar * dst, int len) const
+    صحيح عامل () (ثابت T * src1, ثابت T * src2, ثابت T * src3, uchar * dst, صحيح len) ثابت
     {
-        for (int x = 0; x < len; x++)
+        لكل (صحيح x = 0; x < len; x++)
             dst[x] = (src2[x] <= src1[x] && src1[x] <= src3[x]) ? 255 : 0;
-        return len;
+        أرجع len;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
 
-template <>
-struct InRange_SIMD<uchar>
+سانچو <>
+بنية اندريون_Range_SIMD<uchar>
 {
-    int operator () (const uchar * src1, const uchar * src2, const uchar * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت uchar * src1, ثابت uchar * src2, ثابت uchar * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int width = VTraits<v_uint8>::vlanes();
+        صحيح x = 0;
+        ثابت صحيح ويڪر = VTraits<v_uint8>::vlanes();
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_uint8 values = vx_load(src1 + x);
-            v_uint8 low = vx_load(src2 + x);
-            v_uint8 high = vx_load(src3 + x);
+            v_uint8 values = vx_ڀريو(src1 + x);
+            v_uint8 هيٺيون = vx_ڀريو(src2 + x);
+            v_uint8 مٿاهون = vx_ڀريو(src3 + x);
 
-            v_store(dst + x, v_and(v_ge(values, low), v_ge(high, values)));
+            v_store(dst + x, v_and(v_ge(values, هيٺيون), v_ge(مٿاهون, values)));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-template <>
-struct InRange_SIMD<schar>
+سانچو <>
+بنية اندريون_Range_SIMD<schar>
 {
-    int operator () (const schar * src1, const schar * src2, const schar * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت schar * src1, ثابت schar * src2, ثابت schar * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int width = VTraits<v_int8>::vlanes();
+        صحيح x = 0;
+        ثابت صحيح ويڪر = VTraits<v_int8>::vlanes();
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_int8 values = vx_load(src1 + x);
-            v_int8 low = vx_load(src2 + x);
-            v_int8 high = vx_load(src3 + x);
+            v_int8 values = vx_ڀريو(src1 + x);
+            v_int8 هيٺيون = vx_ڀريو(src2 + x);
+            v_int8 مٿاهون = vx_ڀريو(src3 + x);
 
-            v_store((schar*)(dst + x), v_and(v_ge(values, low), v_ge(high, values)));
+            v_store((schar*)(dst + x), v_and(v_ge(values, هيٺيون), v_ge(مٿاهون, values)));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-template <>
-struct InRange_SIMD<ushort>
+سانچو <>
+بنية اندريون_Range_SIMD<ushort>
 {
-    int operator () (const ushort * src1, const ushort * src2, const ushort * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت ushort * src1, ثابت ushort * src2, ثابت ushort * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int width = VTraits<v_uint16>::vlanes() * 2;
+        صحيح x = 0;
+        ثابت صحيح ويڪر = VTraits<v_uint16>::vlanes() * 2;
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_uint16 values1 = vx_load(src1 + x);
-            v_uint16 low1 = vx_load(src2 + x);
-            v_uint16 high1 = vx_load(src3 + x);
+            v_uint16 values1 = vx_ڀريو(src1 + x);
+            v_uint16 low1 = vx_ڀريو(src2 + x);
+            v_uint16 high1 = vx_ڀريو(src3 + x);
 
-            v_uint16 values2 = vx_load(src1 + x + VTraits<v_uint16>::vlanes());
-            v_uint16 low2 = vx_load(src2 + x + VTraits<v_uint16>::vlanes());
-            v_uint16 high2 = vx_load(src3 + x + VTraits<v_uint16>::vlanes());
+            v_uint16 values2 = vx_ڀريو(src1 + x + VTraits<v_uint16>::vlanes());
+            v_uint16 low2 = vx_ڀريو(src2 + x + VTraits<v_uint16>::vlanes());
+            v_uint16 high2 = vx_ڀريو(src3 + x + VTraits<v_uint16>::vlanes());
 
             v_store(dst + x, v_pack(v_and(v_ge(values1, low1), v_ge(high1, values1)), v_and(v_ge(values2, low2), v_ge(high2, values2))));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-template <>
-struct InRange_SIMD<short>
+سانچو <>
+بنية اندريون_Range_SIMD<ننڍو>
 {
-    int operator () (const short * src1, const short * src2, const short * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت ننڍو * src1, ثابت ننڍو * src2, ثابت ننڍو * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int width = (int)VTraits<v_int16>::vlanes() * 2;
+        صحيح x = 0;
+        ثابت صحيح ويڪر = (صحيح)VTraits<v_int16>::vlanes() * 2;
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_int16 values1 = vx_load(src1 + x);
-            v_int16 low1 = vx_load(src2 + x);
-            v_int16 high1 = vx_load(src3 + x);
+            v_int16 values1 = vx_ڀريو(src1 + x);
+            v_int16 low1 = vx_ڀريو(src2 + x);
+            v_int16 high1 = vx_ڀريو(src3 + x);
 
-            v_int16 values2 = vx_load(src1 + x + VTraits<v_int16>::vlanes());
-            v_int16 low2 = vx_load(src2 + x + VTraits<v_int16>::vlanes());
-            v_int16 high2 = vx_load(src3 + x + VTraits<v_int16>::vlanes());
+            v_int16 values2 = vx_ڀريو(src1 + x + VTraits<v_int16>::vlanes());
+            v_int16 low2 = vx_ڀريو(src2 + x + VTraits<v_int16>::vlanes());
+            v_int16 high2 = vx_ڀريو(src3 + x + VTraits<v_int16>::vlanes());
 
             v_store((schar*)(dst + x), v_pack(v_and(v_ge(values1, low1), v_ge(high1, values1)), v_and(v_ge(values2, low2), v_ge(high2, values2))));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-template <>
-struct InRange_SIMD<int>
+سانچو <>
+بنية اندريون_Range_SIMD<صحيح>
 {
-    int operator () (const int * src1, const int * src2, const int * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت صحيح * src1, ثابت صحيح * src2, ثابت صحيح * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int width = (int)VTraits<v_int32>::vlanes() * 2;
+        صحيح x = 0;
+        ثابت صحيح ويڪر = (صحيح)VTraits<v_int32>::vlanes() * 2;
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_int32 values1 = vx_load(src1 + x);
-            v_int32 low1 = vx_load(src2 + x);
-            v_int32 high1 = vx_load(src3 + x);
+            v_int32 values1 = vx_ڀريو(src1 + x);
+            v_int32 low1 = vx_ڀريو(src2 + x);
+            v_int32 high1 = vx_ڀريو(src3 + x);
 
-            v_int32 values2 = vx_load(src1 + x + VTraits<v_int32>::vlanes());
-            v_int32 low2 = vx_load(src2 + x + VTraits<v_int32>::vlanes());
-            v_int32 high2 = vx_load(src3 + x + VTraits<v_int32>::vlanes());
+            v_int32 values2 = vx_ڀريو(src1 + x + VTraits<v_int32>::vlanes());
+            v_int32 low2 = vx_ڀريو(src2 + x + VTraits<v_int32>::vlanes());
+            v_int32 high2 = vx_ڀريو(src3 + x + VTraits<v_int32>::vlanes());
 
             v_pack_store(dst + x, v_reinterpret_as_u16(v_pack(v_and(v_ge(values1, low1), v_ge(high1, values1)), v_and(v_ge(values2, low2), v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-template <>
-struct InRange_SIMD<float>
+سانچو <>
+بنية اندريون_Range_SIMD<عائم>
 {
-    int operator () (const float * src1, const float * src2, const float * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت عائم * src1, ثابت عائم * src2, ثابت عائم * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int width = (int)VTraits<v_float32>::vlanes() * 2;
+        صحيح x = 0;
+        ثابت صحيح ويڪر = (صحيح)VTraits<v_float32>::vlanes() * 2;
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_float32 values1 = vx_load(src1 + x);
-            v_float32 low1 = vx_load(src2 + x);
-            v_float32 high1 = vx_load(src3 + x);
+            v_float32 values1 = vx_ڀريو(src1 + x);
+            v_float32 low1 = vx_ڀريو(src2 + x);
+            v_float32 high1 = vx_ڀريو(src3 + x);
 
-            v_float32 values2 = vx_load(src1 + x + VTraits<v_float32>::vlanes());
-            v_float32 low2 = vx_load(src2 + x + VTraits<v_float32>::vlanes());
-            v_float32 high2 = vx_load(src3 + x + VTraits<v_float32>::vlanes());
+            v_float32 values2 = vx_ڀريو(src1 + x + VTraits<v_float32>::vlanes());
+            v_float32 low2 = vx_ڀريو(src2 + x + VTraits<v_float32>::vlanes());
+            v_float32 high2 = vx_ڀريو(src3 + x + VTraits<v_float32>::vlanes());
 
             v_pack_store(dst + x, v_pack(v_and(v_reinterpret_as_u32(v_ge(values1, low1)), v_reinterpret_as_u32(v_ge(high1, values1))),
                                          v_and(v_reinterpret_as_u32(v_ge(values2, low2)), v_reinterpret_as_u32(v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-template <>
-struct InRange_SIMD<hfloat>
+سانچو <>
+بنية اندريون_Range_SIMD<hfloat>
 {
-    int operator () (const hfloat * src1, const hfloat * src2, const hfloat * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت hfloat * src1, ثابت hfloat * src2, ثابت hfloat * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int width = (int)VTraits<v_float32>::vlanes()*2;
+        صحيح x = 0;
+        ثابت صحيح ويڪر = (صحيح)VTraits<v_float32>::vlanes()*2;
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_float32 values1 = vx_load_expand(src1 + x);
-            v_float32 low1 = vx_load_expand(src2 + x);
-            v_float32 high1 = vx_load_expand(src3 + x);
+            v_float32 values1 = vx_ڀريو_expand(src1 + x);
+            v_float32 low1 = vx_ڀريو_expand(src2 + x);
+            v_float32 high1 = vx_ڀريو_expand(src3 + x);
 
-            v_float32 values2 = vx_load_expand(src1 + x + VTraits<v_float32>::vlanes());
-            v_float32 low2 = vx_load_expand(src2 + x + VTraits<v_float32>::vlanes());
-            v_float32 high2 = vx_load_expand(src3 + x + VTraits<v_float32>::vlanes());
+            v_float32 values2 = vx_ڀريو_expand(src1 + x + VTraits<v_float32>::vlanes());
+            v_float32 low2 = vx_ڀريو_expand(src2 + x + VTraits<v_float32>::vlanes());
+            v_float32 high2 = vx_ڀريو_expand(src3 + x + VTraits<v_float32>::vlanes());
 
             v_pack_store(dst + x, v_pack(v_and(v_reinterpret_as_u32(v_ge(values1, low1)), v_reinterpret_as_u32(v_ge(high1, values1))),
                                          v_and(v_reinterpret_as_u32(v_ge(values2, low2)), v_reinterpret_as_u32(v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-template <>
-struct InRange_SIMD<bfloat>
+سانچو <>
+بنية اندريون_Range_SIMD<bfloat>
 {
-    int operator () (const bfloat * src1, const bfloat * src2, const bfloat * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت bfloat * src1, ثابت bfloat * src2, ثابت bfloat * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int width = (int)VTraits<v_float32>::vlanes()*2;
+        صحيح x = 0;
+        ثابت صحيح ويڪر = (صحيح)VTraits<v_float32>::vlanes()*2;
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_float32 values1 = vx_load_expand(src1 + x);
-            v_float32 low1 = vx_load_expand(src2 + x);
-            v_float32 high1 = vx_load_expand(src3 + x);
+            v_float32 values1 = vx_ڀريو_expand(src1 + x);
+            v_float32 low1 = vx_ڀريو_expand(src2 + x);
+            v_float32 high1 = vx_ڀريو_expand(src3 + x);
 
-            v_float32 values2 = vx_load_expand(src1 + x + VTraits<v_float32>::vlanes());
-            v_float32 low2 = vx_load_expand(src2 + x + VTraits<v_float32>::vlanes());
-            v_float32 high2 = vx_load_expand(src3 + x + VTraits<v_float32>::vlanes());
+            v_float32 values2 = vx_ڀريو_expand(src1 + x + VTraits<v_float32>::vlanes());
+            v_float32 low2 = vx_ڀريو_expand(src2 + x + VTraits<v_float32>::vlanes());
+            v_float32 high2 = vx_ڀريو_expand(src3 + x + VTraits<v_float32>::vlanes());
 
             v_pack_store(dst + x, v_pack(v_and(v_reinterpret_as_u32(v_ge(values1, low1)), v_reinterpret_as_u32(v_ge(high1, values1))),
                                          v_and(v_reinterpret_as_u32(v_ge(values2, low2)), v_reinterpret_as_u32(v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-template <>
-struct InRange_SIMD<unsigned>
+سانچو <>
+بنية اندريون_Range_SIMD<بنانشان>
 {
-    int operator () (const unsigned * src1, const unsigned * src2, const unsigned * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت بنانشان * src1, ثابت بنانشان * src2, ثابت بنانشان * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int width = (int)VTraits<v_uint32>::vlanes() * 2;
+        صحيح x = 0;
+        ثابت صحيح ويڪر = (صحيح)VTraits<v_uint32>::vlanes() * 2;
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_uint32 values1 = vx_load(src1 + x);
-            v_uint32 low1 = vx_load(src2 + x);
-            v_uint32 high1 = vx_load(src3 + x);
+            v_uint32 values1 = vx_ڀريو(src1 + x);
+            v_uint32 low1 = vx_ڀريو(src2 + x);
+            v_uint32 high1 = vx_ڀريو(src3 + x);
 
-            v_uint32 values2 = vx_load(src1 + x + VTraits<v_uint32>::vlanes());
-            v_uint32 low2 = vx_load(src2 + x + VTraits<v_uint32>::vlanes());
-            v_uint32 high2 = vx_load(src3 + x + VTraits<v_uint32>::vlanes());
+            v_uint32 values2 = vx_ڀريو(src1 + x + VTraits<v_uint32>::vlanes());
+            v_uint32 low2 = vx_ڀريو(src2 + x + VTraits<v_uint32>::vlanes());
+            v_uint32 high2 = vx_ڀريو(src3 + x + VTraits<v_uint32>::vlanes());
 
             v_pack_store(dst + x, v_reinterpret_as_u16(v_pack(v_and(v_ge(values1, low1), v_ge(high1, values1)), v_and(v_ge(values2, low2), v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-#if CV_SIMD_64F
+#إذا CV_SIMD_64F
 
-template <>
-struct InRange_SIMD<double>
+سانچو <>
+بنية اندريون_Range_SIMD<مزدوج>
 {
-    int operator () (const double * src1, const double * src2, const double * src3,
-        uchar * dst, int len) const
+    صحيح عامل () (ثابت مزدوج * src1, ثابت مزدوج * src2, ثابت مزدوج * src3,
+        uchar * dst, صحيح len) ثابت
     {
-        int x = 0;
-        const int step = VTraits<v_float64>::vlanes();
-        const int width = step * 4;
+        صحيح x = 0;
+        ثابت صحيح قدم = VTraits<v_float64>::vlanes();
+        ثابت صحيح ويڪر = قدم * 4;
 
-        for (; x <= len - width; x += width)
+        لكل (; x <= len - ويڪر; x += ويڪر)
         {
-            v_float64 v1 = vx_load(src1 + x);
-            v_float64 l1 = vx_load(src2 + x);
-            v_float64 h1 = vx_load(src3 + x);
+            v_float64 v1 = vx_ڀريو(src1 + x);
+            v_float64 l1 = vx_ڀريو(src2 + x);
+            v_float64 h1 = vx_ڀريو(src3 + x);
             v_uint64 m1 = v_reinterpret_as_u64(v_and(v_ge(v1, l1), v_ge(h1, v1)));
 
-            v_float64 v2 = vx_load(src1 + x + step);
-            v_float64 l2 = vx_load(src2 + x + step);
-            v_float64 h2 = vx_load(src3 + x + step);
+            v_float64 v2 = vx_ڀريو(src1 + x + قدم);
+            v_float64 l2 = vx_ڀريو(src2 + x + قدم);
+            v_float64 h2 = vx_ڀريو(src3 + x + قدم);
             v_uint64 m2 = v_reinterpret_as_u64(v_and(v_ge(v2, l2), v_ge(h2, v2)));
 
-            v_float64 v3 = vx_load(src1 + x + step * 2);
-            v_float64 l3 = vx_load(src2 + x + step * 2);
-            v_float64 h3 = vx_load(src3 + x + step * 2);
+            v_float64 v3 = vx_ڀريو(src1 + x + قدم * 2);
+            v_float64 l3 = vx_ڀريو(src2 + x + قدم * 2);
+            v_float64 h3 = vx_ڀريو(src3 + x + قدم * 2);
             v_uint64 m3 = v_reinterpret_as_u64(v_and(v_ge(v3, l3), v_ge(h3, v3)));
 
-            v_float64 v4 = vx_load(src1 + x + step * 3);
-            v_float64 l4 = vx_load(src2 + x + step * 3);
-            v_float64 h4 = vx_load(src3 + x + step * 3);
+            v_float64 v4 = vx_ڀريو(src1 + x + قدم * 3);
+            v_float64 l4 = vx_ڀريو(src2 + x + قدم * 3);
+            v_float64 h4 = vx_ڀريو(src3 + x + قدم * 3);
             v_uint64 m4 = v_reinterpret_as_u64(v_and(v_ge(v4, l4), v_ge(h4, v4)));
 
 
             v_pack_store(dst + x, v_pack(v_pack(m1, m2), v_pack(m3, m4)));
         }
         vx_cleanup();
-        return x;
+        أرجع x;
     }
 };
 
-#endif
+#جيڪڏهن_پورو
 
-#endif
+#جيڪڏهن_پورو
 
-template <typename T>
-static void inRange_(const void* _src1, size_t step1, const void* _src2, size_t step2,
-         const void* _src3, size_t step3, uchar* dst, size_t step,
-         Size size)
+سانچو <قسم_نالو T>
+ساكن فراغ اندريون_Range(ثابت فراغ* _src1, size_t step1, ثابت فراغ* _src2, size_t step2,
+         ثابت فراغ* _src3, size_t step3, uchar* dst, size_t قدم,
+         سائيز size)
 {
-    const T* src1 = (const T*)_src1;
-    const T* src2 = (const T*)_src2;
-    const T* src3 = (const T*)_src3;
-    step1 /= sizeof(src1[0]);
-    step2 /= sizeof(src2[0]);
-    step3 /= sizeof(src3[0]);
+    ثابت T* src1 = (ثابت T*)_src1;
+    ثابت T* src2 = (ثابت T*)_src2;
+    ثابت T* src3 = (ثابت T*)_src3;
+    step1 /= حجم(src1[0]);
+    step2 /= حجم(src2[0]);
+    step3 /= حجم(src3[0]);
 
-    InRange_SIMD<T> vop;
+    اندريون_Range_SIMD<T> vop;
 
-    for( ; size.height--; src1 += step1, src2 += step2, src3 += step3, dst += step )
+    لكل( ; size.اوچائي--; src1 += step1, src2 += step2, src3 += step3, dst += قدم )
     {
-        int x = vop(src1, src2, src3, dst, size.width);
-        #if CV_ENABLE_UNROLLED
-        for( ; x <= size.width - 4; x += 4 )
+        صحيح x = vop(src1, src2, src3, dst, size.ويڪر);
+        #إذا CV_ENABLE_UNROLLED
+        لكل( ; x <= size.ويڪر - 4; x += 4 )
         {
-            int t0, t1;
+            صحيح t0, t1;
             t0 = src2[x] <= src1[x] && src1[x] <= src3[x];
             t1 = src2[x+1] <= src1[x+1] && src1[x+1] <= src3[x+1];
             dst[x] = (uchar)-t0; dst[x+1] = (uchar)-t1;
@@ -1503,262 +1503,262 @@ static void inRange_(const void* _src1, size_t step1, const void* _src2, size_t 
             t1 = src2[x+3] <= src1[x+3] && src1[x+3] <= src3[x+3];
             dst[x+2] = (uchar)-t0; dst[x+3] = (uchar)-t1;
         }
-        #endif
-        for( ; x < size.width; x++ )
+        #جيڪڏهن_پورو
+        لكل( ; x < size.ويڪر; x++ )
             dst[x] = (uchar)-(src2[x] <= src1[x] && src1[x] <= src3[x]);
     }
 }
 
-static void inRangeReduce(const uchar* src, uchar* dst, size_t len, int cn)
+ساكن فراغ اندريون_Range_Reduce(ثابت uchar* src, uchar* dst, size_t len, صحيح cn)
 {
-    int k = cn % 4 ? cn % 4 : 4;
+    صحيح k = cn % 4 ? cn % 4 : 4;
     size_t i, j;
-    if( k == 1 )
-        for( i = j = 0; i < len; i++, j += cn )
+    إذا( k == 1 )
+        لكل( i = j = 0; i < len; i++, j += cn )
             dst[i] = src[j];
-    else if( k == 2 )
-        for( i = j = 0; i < len; i++, j += cn )
+    وإلا إذا( k == 2 )
+        لكل( i = j = 0; i < len; i++, j += cn )
             dst[i] = src[j] & src[j+1];
-    else if( k == 3 )
-        for( i = j = 0; i < len; i++, j += cn )
+    وإلا إذا( k == 3 )
+        لكل( i = j = 0; i < len; i++, j += cn )
             dst[i] = src[j] & src[j+1] & src[j+2];
-    else
-        for( i = j = 0; i < len; i++, j += cn )
+    وإلا
+        لكل( i = j = 0; i < len; i++, j += cn )
             dst[i] = src[j] & src[j+1] & src[j+2] & src[j+3];
 
-    for( ; k < cn; k += 4 )
+    لكل( ; k < cn; k += 4 )
     {
-        for( i = 0, j = k; i < len; i++, j += cn )
+        لكل( i = 0, j = k; i < len; i++, j += cn )
             dst[i] &= src[j] & src[j+1] & src[j+2] & src[j+3];
     }
 }
 
-typedef void (*InRangeFunc)( const void* src1, size_t step1, const void* src2, size_t step2,
-                             const void* src3, size_t step3, uchar* dst, size_t step, Size sz );
+تعريفنوع فراغ (*اندريون_Range_Func)( ثابت فراغ* src1, size_t step1, ثابت فراغ* src2, size_t step2,
+                             ثابت فراغ* src3, size_t step3, uchar* dst, size_t قدم, سائيز sz );
 
-static InRangeFunc getInRangeFunc(int depth)
+ساكن اندريون_Range_Func get_اندريون_Range_Func(صحيح اونهائي)
 {
-    static InRangeFunc inRangeTab[CV_DEPTH_MAX] =
+    ساكن اندريون_Range_Func اندريون_Range_Tab[CV_اونهائي_MAX] =
     {
-        inRange_<uchar>,
-        inRange_<schar>,
-        inRange_<ushort>,
-        inRange_<short>,
-        inRange_<int>,
-        inRange_<float>,
-        inRange_<double>,
-        inRange_<hfloat>,
-        inRange_<bfloat>,
+        اندريون_Range<uchar>,
+        اندريون_Range<schar>,
+        اندريون_Range<ushort>,
+        اندريون_Range<ننڍو>,
+        اندريون_Range<صحيح>,
+        اندريون_Range<عائم>,
+        اندريون_Range<مزدوج>,
+        اندريون_Range<hfloat>,
+        اندريون_Range<bfloat>,
         0,
-        inRange_<uint64_t>,
-        inRange_<int64_t>,
-        inRange_<unsigned>,
+        اندريون_Range<uint64_t>,
+        اندريون_Range<int64_t>,
+        اندريون_Range<بنانشان>,
         0,
     };
 
-    return inRangeTab[depth];
+    أرجع اندريون_Range_Tab[اونهائي];
 }
 
-#ifdef HAVE_OPENCL
+#جيڪڏهن_وصف_ٿيل HAVE_OPENCL
 
-static bool ocl_inRange( InputArray _src, InputArray _lowerb,
-                         InputArray _upperb, OutputArray _dst )
+ساكن منطقي ocl_اندريون_Range( داخلا_Array _src, داخلا_Array _lowerb,
+                         داخلا_Array _upperb, OutputArray _dst )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    _InputArray::KindFlag skind = _src.kind(), lkind = _lowerb.kind(), ukind = _upperb.kind();
-    Size ssize = _src.size(), lsize = _lowerb.size(), usize = _upperb.size();
-    int stype = _src.type(), ltype = _lowerb.type(), utype = _upperb.type();
-    int sdepth = CV_MAT_DEPTH(stype), ldepth = CV_MAT_DEPTH(ltype), udepth = CV_MAT_DEPTH(utype);
-    int cn = CV_MAT_CN(stype), rowsPerWI = d.isIntel() ? 4 : 1;
-    bool lbScalar = false, ubScalar = false;
+    ثابت ocl::Device & d = ocl::Device::getDefault();
+    داخلا_Array_2::قسم_Flag skind = _src.قسم(), lkind = _lowerb.قسم(), ukind = _upperb.قسم();
+    سائيز ssize = _src.size(), lsize = _lowerb.size(), usize = _upperb.size();
+    صحيح stype = _src.type(), ltype = _lowerb.type(), utype = _upperb.type();
+    صحيح sdepth = CV_MAT_اونهائي(stype), ldepth = CV_MAT_اونهائي(ltype), udepth = CV_MAT_اونهائي(utype);
+    صحيح cn = CV_MAT_CN(stype), صفون_في_WI = d.isIntel() ? 4 : 1;
+    منطقي lbScalar = خطأ, ubScalar = خطأ;
 
-    if( (lkind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    إذا( (lkind == داخلا_Array_2::MATX && skind != داخلا_Array_2::MATX) ||
         ssize != lsize || stype != ltype )
     {
-        if( !checkScalar(_lowerb, stype, lkind, skind) )
+        إذا( !checkScalar(_lowerb, stype, lkind, skind) )
             CV_Error( cv::Error::StsUnmatchedSizes,
                      "The lower boundary is neither an array of the same size and same type as src, nor a scalar");
-        lbScalar = true;
+        lbScalar = سچ;
     }
 
-    if( (ukind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    إذا( (ukind == داخلا_Array_2::MATX && skind != داخلا_Array_2::MATX) ||
         ssize != usize || stype != utype )
     {
-        if( !checkScalar(_upperb, stype, ukind, skind) )
+        إذا( !checkScalar(_upperb, stype, ukind, skind) )
             CV_Error( cv::Error::StsUnmatchedSizes,
                      "The upper boundary is neither an array of the same size and same type as src, nor a scalar");
-        ubScalar = true;
+        ubScalar = سچ;
     }
 
-    if (lbScalar != ubScalar)
-        return false;
+    إذا (lbScalar != ubScalar)
+        أرجع خطأ;
 
-    bool doubleSupport = d.doubleFPConfig() > 0,
+    منطقي doubleSupport = d.doubleFPConfig() > 0,
             haveScalar = lbScalar && ubScalar;
 
-    if ( (!doubleSupport && sdepth == CV_64F) ||
+    إذا ( (!doubleSupport && sdepth == CV_64F) ||
          (!haveScalar && (sdepth != ldepth || sdepth != udepth)) )
-        return false;
+        أرجع خطأ;
 
-    int kercn = haveScalar ? cn : std::max(std::min(ocl::predictOptimalVectorWidth(_src, _lowerb, _upperb, _dst), 4), cn);
-    if (kercn % cn != 0)
+    صحيح kercn = haveScalar ? cn : std::max(std::min(ocl::predict_Optimal_ويڪٽر_ويڪر(_src, _lowerb, _upperb, _dst), 4), cn);
+    إذا (kercn % cn != 0)
         kercn = cn;
-    int colsPerWI = kercn / cn;
+    صحيح کانن_ڳڻپ_في_WI = kercn / cn;
     String opts = format("%s-D CN=%d -D SRC_T=%s -D SRC_T1=%s -D DST_T=%s -D KERCN=%d -D DEPTH=%d%s -D COLS_PER_WI=%d",
-                           haveScalar ? "-D HAVE_SCALAR " : "", cn, ocl::typeToStr(CV_MAKE_TYPE(sdepth, kercn)),
-                           ocl::typeToStr(sdepth), ocl::typeToStr(CV_8UC(colsPerWI)), kercn, sdepth,
-                           doubleSupport ? " -D DOUBLE_SUPPORT" : "", colsPerWI);
+                           haveScalar ? "-D HAVE_SCALAR " : "", cn, ocl::type_منزل_Str(CV_MAKE_TYPE(sdepth, kercn)),
+                           ocl::type_منزل_Str(sdepth), ocl::type_منزل_Str(CV_8UC(کانن_ڳڻپ_في_WI)), kercn, sdepth,
+                           doubleSupport ? " -D DOUBLE_SUPPORT" : "", کانن_ڳڻپ_في_WI);
 
     ocl::Kernel ker("inrange", ocl::core::inrange_oclsrc, opts);
-    if (ker.empty())
-        return false;
+    إذا (ker.empty())
+        أرجع خطأ;
 
     _dst.create(ssize, CV_8UC1);
     UMat src = _src.getUMat(), dst = _dst.getUMat(), lscalaru, uscalaru;
     Mat lscalar, uscalar;
 
-    if (lbScalar && ubScalar)
+    إذا (lbScalar && ubScalar)
     {
         lscalar = _lowerb.getMat();
         uscalar = _upperb.getMat();
 
-        size_t esz = src.elemSize();
+        size_t esz = src.elem_سائيز();
         size_t blocksize = 36;
 
-        AutoBuffer<uchar> _buf(blocksize*(((int)lbScalar + (int)ubScalar)*esz + cn) + 2*cn*sizeof(int) + 128);
-        uchar *buf = alignPtr(_buf.data() + blocksize*cn, 16);
+        Auto_بفر<uchar> _buf(blocksize*(((صحيح)lbScalar + (صحيح)ubScalar)*esz + cn) + 2*cn*حجم(صحيح) + 128);
+        uchar *buf = alignPtr(_buf.معلومات() + blocksize*cn, 16);
 
-        if( ldepth != sdepth && sdepth < CV_32S )
+        إذا( ldepth != sdepth && sdepth < CV_32S )
         {
-            int* ilbuf = (int*)alignPtr(buf + blocksize*esz, 16);
-            int* iubuf = ilbuf + cn;
+            صحيح* ilbuf = (صحيح*)alignPtr(buf + blocksize*esz, 16);
+            صحيح* iubuf = ilbuf + cn;
 
-            BinaryFunc sccvtfunc = getConvertFunc(ldepth, CV_32S);
-            sccvtfunc(lscalar.ptr(), 1, 0, 1, (uchar*)ilbuf, 1, Size(cn, 1), 0);
-            sccvtfunc(uscalar.ptr(), 1, 0, 1, (uchar*)iubuf, 1, Size(cn, 1), 0);
-            int minval = cvRound(getMinVal(sdepth)), maxval = cvRound(getMaxVal(sdepth));
+            ٻٽو_Func sccvtfunc = getConvertFunc(ldepth, CV_32S);
+            sccvtfunc(lscalar.ptr(), 1, 0, 1, (uchar*)ilbuf, 1, سائيز(cn, 1), 0);
+            sccvtfunc(uscalar.ptr(), 1, 0, 1, (uchar*)iubuf, 1, سائيز(cn, 1), 0);
+            صحيح minval = cv_ڦيرو(getMinVal(sdepth)), maxval = cv_ڦيرو(getMaxVal(sdepth));
 
-            for( int k = 0; k < cn; k++ )
+            لكل( صحيح k = 0; k < cn; k++ )
             {
-                if( ilbuf[k] > iubuf[k] || ilbuf[k] > maxval || iubuf[k] < minval )
+                إذا( ilbuf[k] > iubuf[k] || ilbuf[k] > maxval || iubuf[k] < minval )
                     ilbuf[k] = minval+1, iubuf[k] = minval;
             }
             lscalar = Mat(cn, 1, CV_32S, ilbuf);
             uscalar = Mat(cn, 1, CV_32S, iubuf);
         }
 
-        lscalar.convertTo(lscalar, stype);
-        uscalar.convertTo(uscalar, stype);
+        lscalar.convert_منزل(lscalar, stype);
+        uscalar.convert_منزل(uscalar, stype);
     }
-    else
+    وإلا
     {
         lscalaru = _lowerb.getUMat();
         uscalaru = _upperb.getUMat();
     }
 
-    ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
-            dstarg = ocl::KernelArg::WriteOnly(dst, 1, colsPerWI);
+    ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_سائيز(src),
+            dstarg = ocl::KernelArg::WriteOnly(dst, 1, کانن_ڳڻپ_في_WI);
 
-    if (haveScalar)
+    إذا (haveScalar)
     {
-        lscalar.copyTo(lscalaru);
-        uscalar.copyTo(uscalaru);
+        lscalar.copy_منزل(lscalaru);
+        uscalar.copy_منزل(uscalaru);
 
-        ker.args(srcarg, dstarg, ocl::KernelArg::PtrReadOnly(lscalaru),
-               ocl::KernelArg::PtrReadOnly(uscalaru), rowsPerWI);
+        ker.دليلون(srcarg, dstarg, ocl::KernelArg::PtrReadOnly(lscalaru),
+               ocl::KernelArg::PtrReadOnly(uscalaru), صفون_في_WI);
     }
-    else
-        ker.args(srcarg, dstarg, ocl::KernelArg::ReadOnlyNoSize(lscalaru),
-               ocl::KernelArg::ReadOnlyNoSize(uscalaru), rowsPerWI);
+    وإلا
+        ker.دليلون(srcarg, dstarg, ocl::KernelArg::Read_Only_No_سائيز(lscalaru),
+               ocl::KernelArg::Read_Only_No_سائيز(uscalaru), صفون_في_WI);
 
-    size_t globalsize[2] = { (size_t)ssize.width / colsPerWI, ((size_t)ssize.height + rowsPerWI - 1) / rowsPerWI };
-    return ker.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)ssize.ويڪر / کانن_ڳڻپ_في_WI, ((size_t)ssize.اوچائي + صفون_في_WI - 1) / صفون_في_WI };
+    أرجع ker.لاڳيتو(2, globalsize, عدم, خطأ);
 }
 
-#endif
+#جيڪڏهن_پورو
 
 }
 
-void cv::inRange(InputArray _src, InputArray _lowerb,
-                 InputArray _upperb, OutputArray _dst)
+فراغ cv::اندريون_Range_2(داخلا_Array _src, داخلا_Array _lowerb,
+                 داخلا_Array _upperb, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(! _src.empty());
-    if (!getInRangeFunc(_src.depth()))
+    إذا (!get_اندريون_Range_Func(_src.اونهائي()))
         CV_Error( cv::Error::StsNotImplemented,
                  "inRange: CV_Bool and CV_8F inputs are not supported, convert the input to another type first");
 
-    CV_OCL_RUN(_src.dims() <= 2 && _lowerb.dims() <= 2 &&
+    CV_OCL_لاڳيتو(_src.dims() <= 2 && _lowerb.dims() <= 2 &&
                _upperb.dims() <= 2 && OCL_PERFORMANCE_CHECK(_dst.isUMat()),
-               ocl_inRange(_src, _lowerb, _upperb, _dst))
+               ocl_اندريون_Range(_src, _lowerb, _upperb, _dst))
 
-    _InputArray::KindFlag skind = _src.kind(), lkind = _lowerb.kind(), ukind = _upperb.kind();
+    داخلا_Array_2::قسم_Flag skind = _src.قسم(), lkind = _lowerb.قسم(), ukind = _upperb.قسم();
     Mat src = _src.getMat(), lb = _lowerb.getMat(), ub = _upperb.getMat();
 
-    bool lbScalar = false, ubScalar = false;
+    منطقي lbScalar = خطأ, ubScalar = خطأ;
 
-    if( (lkind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    إذا( (lkind == داخلا_Array_2::MATX && skind != داخلا_Array_2::MATX) ||
         src.size != lb.size || src.type() != lb.type() )
     {
-        if( !checkScalar(lb, src.type(), lkind, skind) )
+        إذا( !checkScalar(lb, src.type(), lkind, skind) )
             CV_Error( cv::Error::StsUnmatchedSizes,
                      "The lower boundary is neither an array of the same size and same type as src, nor a scalar");
-        lbScalar = true;
+        lbScalar = سچ;
     }
 
-    if( (ukind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    إذا( (ukind == داخلا_Array_2::MATX && skind != داخلا_Array_2::MATX) ||
         src.size != ub.size || src.type() != ub.type() )
     {
-        if( !checkScalar(ub, src.type(), ukind, skind) )
+        إذا( !checkScalar(ub, src.type(), ukind, skind) )
             CV_Error( cv::Error::StsUnmatchedSizes,
                      "The upper boundary is neither an array of the same size and same type as src, nor a scalar");
-        ubScalar = true;
+        ubScalar = سچ;
     }
 
     CV_Assert(lbScalar == ubScalar);
 
-    int cn = src.channels(), depth = src.depth();
+    صحيح cn = src.channels(), اونهائي = src.اونهائي();
 
-    size_t esz = src.elemSize();
-    size_t blocksize0 = (size_t)(BLOCK_SIZE + esz-1)/esz;
+    size_t esz = src.elem_سائيز();
+    size_t blocksize0 = (size_t)(بلاڪ_سائيز + esz-1)/esz;
 
-    _dst.createSameSize(_src, CV_8UC1);
+    _dst.create_Same_سائيز(_src, CV_8UC1);
     Mat dst = _dst.getMat();
-    InRangeFunc func = getInRangeFunc(depth);
+    اندريون_Range_Func func = get_اندريون_Range_Func(اونهائي);
 
-    const Mat* arrays_sc[] = { &src, &dst, 0 };
-    const Mat* arrays_nosc[] = { &src, &dst, &lb, &ub, 0 };
+    ثابت Mat* arrays_sc[] = { &src, &dst, 0 };
+    ثابت Mat* arrays_nosc[] = { &src, &dst, &lb, &ub, 0 };
     uchar* ptrs[4] = {};
 
     NAryMatIterator it(lbScalar && ubScalar ? arrays_sc : arrays_nosc, ptrs);
-    size_t total = it.size, blocksize = std::min(total, blocksize0);
+    size_t ڪل = it.size, blocksize = std::min(ڪل, blocksize0);
 
-    AutoBuffer<uchar> _buf(blocksize*(((int)lbScalar + (int)ubScalar)*esz + cn) + 2*cn*sizeof(int) + 128);
-    uchar *buf = _buf.data(), *mbuf = buf, *lbuf = 0, *ubuf = 0;
+    Auto_بفر<uchar> _buf(blocksize*(((صحيح)lbScalar + (صحيح)ubScalar)*esz + cn) + 2*cn*حجم(صحيح) + 128);
+    uchar *buf = _buf.معلومات(), *mbuf = buf, *lbuf = 0, *ubuf = 0;
     buf = alignPtr(buf + blocksize*cn, 16);
 
-    if( lbScalar && ubScalar )
+    إذا( lbScalar && ubScalar )
     {
         lbuf = buf;
         ubuf = buf = alignPtr(buf + blocksize*esz, 16);
 
         CV_Assert( lb.type() == ub.type() );
-        int scdepth = lb.depth();
+        صحيح scdepth = lb.اونهائي();
 
-        if( scdepth != depth && depth < CV_32S )
+        إذا( scdepth != اونهائي && اونهائي < CV_32S )
         {
-            int* ilbuf = (int*)alignPtr(buf + blocksize*esz, 16);
-            int* iubuf = ilbuf + cn;
+            صحيح* ilbuf = (صحيح*)alignPtr(buf + blocksize*esz, 16);
+            صحيح* iubuf = ilbuf + cn;
 
-            BinaryFunc sccvtfunc = getConvertFunc(scdepth, CV_32S);
-            sccvtfunc(lb.ptr(), 1, 0, 1, (uchar*)ilbuf, 1, Size(cn, 1), 0);
-            sccvtfunc(ub.ptr(), 1, 0, 1, (uchar*)iubuf, 1, Size(cn, 1), 0);
-            int minval = cvRound(getMinVal(depth)), maxval = cvRound(getMaxVal(depth));
+            ٻٽو_Func sccvtfunc = getConvertFunc(scdepth, CV_32S);
+            sccvtfunc(lb.ptr(), 1, 0, 1, (uchar*)ilbuf, 1, سائيز(cn, 1), 0);
+            sccvtfunc(ub.ptr(), 1, 0, 1, (uchar*)iubuf, 1, سائيز(cn, 1), 0);
+            صحيح minval = cv_ڦيرو(getMinVal(اونهائي)), maxval = cv_ڦيرو(getMaxVal(اونهائي));
 
-            for( int k = 0; k < cn; k++ )
+            لكل( صحيح k = 0; k < cn; k++ )
             {
-                if( ilbuf[k] > iubuf[k] || ilbuf[k] > maxval || iubuf[k] < minval )
+                إذا( ilbuf[k] > iubuf[k] || ilbuf[k] > maxval || iubuf[k] < minval )
                     ilbuf[k] = minval+1, iubuf[k] = minval;
             }
             lb = Mat(cn, 1, CV_32S, ilbuf);
@@ -1768,40 +1768,40 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
         convertAndUnrollScalar( lb, src.type(), lbuf, blocksize );
         convertAndUnrollScalar( ub, src.type(), ubuf, blocksize );
 
-        if (depth == CV_8U && src.dims <= 2) {
+        إذا (اونهائي == CV_8U && src.dims <= 2) {
             uint8_t lb_scalar = lbuf[0];
             uint8_t ub_scalar = ubuf[0];
-            CALL_HAL(inRange_u8, cv_hal_inRange8u, src.data, src.step, dst.data, dst.step, dst.depth(), src.cols, src.rows, src.channels(),
+            CALL_HAL(اندريون_Range_u8, cv_hal_اندريون_Range8u, src.معلومات, src.قدم, dst.معلومات, dst.قدم, dst.اونهائي(), src.کانن_ڳڻپ, src.صفون, src.channels(),
                 lb_scalar, ub_scalar);
-        } else if (depth == CV_32F && src.dims <= 2) {
-            double lb_scalar = lb.ptr<double>(0)[0];
-            double ub_scalar = ub.ptr<double>(0)[0];
-            CALL_HAL(inRange_f32, cv_hal_inRange32f, src.data, src.step, dst.data, dst.step, dst.depth(), src.cols, src.rows, src.channels(),
+        } وإلا إذا (اونهائي == CV_32F && src.dims <= 2) {
+            مزدوج lb_scalar = lb.ptr<مزدوج>(0)[0];
+            مزدوج ub_scalar = ub.ptr<مزدوج>(0)[0];
+            CALL_HAL(اندريون_Range_f32, cv_hal_اندريون_Range32f, src.معلومات, src.قدم, dst.معلومات, dst.قدم, dst.اونهائي(), src.کانن_ڳڻپ, src.صفون, src.channels(),
                 lb_scalar, ub_scalar);
         }
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( size_t j = 0; j < total; j += blocksize )
+        لكل( size_t j = 0; j < ڪل; j += blocksize )
         {
-            int bsz = (int)MIN(total - j, blocksize);
+            صحيح bsz = (صحيح)MIN(ڪل - j, blocksize);
             size_t delta = bsz*esz;
             uchar *lptr = lbuf, *uptr = ubuf;
-            if( !lbScalar )
+            إذا( !lbScalar )
             {
                 lptr = ptrs[2];
                 ptrs[2] += delta;
             }
-            if( !ubScalar )
+            إذا( !ubScalar )
             {
-                int idx = !lbScalar ? 3 : 2;
+                صحيح idx = !lbScalar ? 3 : 2;
                 uptr = ptrs[idx];
                 ptrs[idx] += delta;
             }
-            func( ptrs[0], 0, lptr, 0, uptr, 0, cn == 1 ? ptrs[1] : mbuf, 0, Size(bsz*cn, 1));
-            if( cn > 1 )
-                inRangeReduce(mbuf, ptrs[1], bsz, cn);
+            func( ptrs[0], 0, lptr, 0, uptr, 0, cn == 1 ? ptrs[1] : mbuf, 0, سائيز(bsz*cn, 1));
+            إذا( cn > 1 )
+                اندريون_Range_Reduce(mbuf, ptrs[1], bsz, cn);
             ptrs[0] += delta;
             ptrs[1] += bsz;
         }

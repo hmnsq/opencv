@@ -2,50 +2,50 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGCONFIG_HPP
-#define OPENCV_CORE_LOGTAGCONFIG_HPP
+#جيڪڏهن_وصف_نه_ٿيل OPENCV_CORE_LOGTAGCONFIG_HPP
+#وصف_ڪريو OPENCV_CORE_LOGTAGCONFIG_HPP
 
-#if 1 // if not already in precompiled headers
-#include <opencv2/core/utils/logger.defines.hpp>
-#include <string>
-#endif
+#إذا 1 // if not already in precompiled headers
+#ضمن <opencv2/core/utils/logger.defines.hpp>
+#ضمن <string>
+#جيڪڏهن_پورو
 
-namespace cv {
-namespace utils {
-namespace logging {
+نطاق cv {
+نطاق utils {
+نطاق logging {
 
-struct LogTagConfig
+بنية Log_ٽيگ_Config
 {
     std::string namePart;
     LogLevel level;
-    bool isGlobal;
-    bool hasPrefixWildcard;
-    bool hasSuffixWildcard;
+    منطقي isGlobal;
+    منطقي has_اڳياڙي_Wildcard;
+    منطقي hasSuffixWildcard;
 
-    LogTagConfig()
+    Log_ٽيگ_Config()
         : namePart()
         , level()
         , isGlobal()
-        , hasPrefixWildcard()
+        , has_اڳياڙي_Wildcard()
         , hasSuffixWildcard()
     {
     }
 
-    LogTagConfig(const std::string& _namePart, LogLevel _level, bool _isGlobal = false,
-        bool _hasPrefixWildcard = false, bool _hasSuffixWildcard = false)
+    Log_ٽيگ_Config(ثابت std::string& _namePart, LogLevel _level, منطقي _isGlobal = خطأ,
+        منطقي has_اڳياڙي_Wildcard_2 = خطأ, منطقي _hasSuffixWildcard = خطأ)
         : namePart(_namePart)
         , level(_level)
         , isGlobal(_isGlobal)
-        , hasPrefixWildcard(_hasPrefixWildcard)
+        , has_اڳياڙي_Wildcard(has_اڳياڙي_Wildcard_2)
         , hasSuffixWildcard(_hasSuffixWildcard)
     {
     }
 
-    LogTagConfig(const LogTagConfig&) = default;
-    LogTagConfig(LogTagConfig&&) = default;
-    ~LogTagConfig() = default;
+    Log_ٽيگ_Config(ثابت Log_ٽيگ_Config&) = افتراضي;
+    Log_ٽيگ_Config(Log_ٽيگ_Config&&) = افتراضي;
+    ~Log_ٽيگ_Config() = افتراضي;
 };
 
 }}}
 
-#endif
+#جيڪڏهن_پورو

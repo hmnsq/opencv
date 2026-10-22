@@ -39,19 +39,19 @@
 //
 //M*/
 
-#ifndef __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
-#define __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
+#جيڪڏهن_وصف_نه_ٿيل __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
+#وصف_ڪريو __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
 
-namespace cv { namespace ocl { namespace runtime {
+نطاق cv { نطاق ocl { نطاق runtime {
 
-struct DynamicFnEntry
+بنية Dynamic_Fn_داخلا
 {
-    const char* fnName; // "clCreateContext"
-    void** ppFn; // &clCreateContext_pfn
+    ثابت حرف* fnName; // "clCreateContext"
+    فراغ** ppFn; // &clCreateContext_pfn
 };
 
 } } } // namespace cv::ocl::runtime
 
-using namespace cv::ocl::runtime;
+استعمال نطاق cv::ocl::runtime;
 
-#endif // __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
+#جيڪڏهن_پورو // __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__

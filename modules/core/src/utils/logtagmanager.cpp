@@ -2,40 +2,40 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
-#include "logtagmanager.hpp"
-#include "logtagconfigparser.hpp"
+#ضمن "../precomp.hpp"
+#ضمن "logtagmanager.hpp"
+#ضمن "logtagconfigparser.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
-
-
-const char* LogTagManager::m_globalName = "global";
+نطاق cv {
+نطاق utils {
+نطاق logging {
 
 
-LogTagManager::LogTagManager(LogLevel defaultUnconfiguredGlobalLevel)
+ثابت حرف* Log_ٽيگ_Manager::m_globalName = "global";
+
+
+Log_ٽيگ_Manager::Log_ٽيگ_Manager(LogLevel defaultUnconfiguredGlobalLevel)
     : m_mutex()
-    , m_globalLogTag(new LogTag(m_globalName, defaultUnconfiguredGlobalLevel))
-    , m_config(std::make_shared<LogTagConfigParser>(defaultUnconfiguredGlobalLevel))
+    , m_global_Log_ٽيگ(جديد Log_ٽيگ(m_globalName, defaultUnconfiguredGlobalLevel))
+    , m_config(std::make_shared<Log_ٽيگ_Config_Parser>(defaultUnconfiguredGlobalLevel))
 {
-    assign(m_globalName, m_globalLogTag.get());
+    assign(m_globalName, m_global_Log_ٽيگ.get());
 }
 
-LogTagManager::~LogTagManager()
+Log_ٽيگ_Manager::~Log_ٽيگ_Manager()
 {
 }
 
-void LogTagManager::setConfigString(const std::string& configString, bool apply /*true*/)
+فراغ Log_ٽيگ_Manager::سيٽ_Config_String(ثابت std::string& configString, منطقي apply /*true*/)
 {
     m_config->parse(configString);
-    if (m_config->hasMalformed())
+    إذا (m_config->hasMalformed())
     {
-        return;
+        أرجع;
     }
-    if (!apply)
+    إذا (!apply)
     {
-        return;
+        أرجع;
     }
     // The following code is arranged with "priority by overwriting",
     // where when the same log tag has multiple matches, the last code
@@ -46,383 +46,383 @@ void LogTagManager::setConfigString(const std::string& configString, bool apply 
     // Matching by any name part has moderate priority.
     // Matching by first name part (prefix) has lowest priority.
     //
-    const auto& globalConfig = m_config->getGlobalConfig();
-    m_globalLogTag->level = globalConfig.level;
-    for (const auto& config : m_config->getFirstPartConfigs())
+    ثابت خودڪار& globalConfig = m_config->getGlobalConfig();
+    m_global_Log_ٽيگ->level = globalConfig.level;
+    لكل (ثابت خودڪار& config : m_config->get_پهريون_Part_Configs())
     {
-        setLevelByFirstPart(config.namePart, config.level);
+        سيٽ_Level_By_پهريون_Part(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getAnyPartConfigs())
+    لكل (ثابت خودڪار& config : m_config->getAnyPartConfigs())
     {
-        setLevelByAnyPart(config.namePart, config.level);
+        سيٽ_Level_By_Any_Part(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getFullNameConfigs())
+    لكل (ثابت خودڪار& config : m_config->get_ڀريل_Name_Configs())
     {
-        setLevelByFullName(config.namePart, config.level);
+        سيٽ_Level_By_ڀريل_Name(config.namePart, config.level);
     }
 }
 
-LogTagConfigParser& LogTagManager::getConfigParser() const
+Log_ٽيگ_Config_Parser& Log_ٽيگ_Manager::getConfigParser() ثابت
 {
-    return *m_config;
+    أرجع *m_config;
 }
 
-void LogTagManager::assign(const std::string& fullName, LogTag* ptr)
+فراغ Log_ٽيگ_Manager::assign(ثابت std::string& ڀريل_Name, Log_ٽيگ* ptr)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    FullNameLookupResult result(fullName);
-    result.m_findCrossReferences = true;
-    m_nameTable.addOrLookupFullName(result);
-    FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
-    const bool isPtrChanged = (fullNameInfo.logTagPtr != ptr);
-    if (!isPtrChanged)
+    تالو_Type lock(m_mutex);
+    ڀريل_Name_Lookup_نتيجو نتيجو(ڀريل_Name);
+    نتيجو.m_ڳوليو_Cross_References = سچ;
+    m_name_جدول.جوڙيو_Or_Lookup_ڀريل_Name(نتيجو);
+    ڀريل_Name_Info& ڀريل_Name_Info_2 = *نتيجو.m_ڀريل_Name_Info_Ptr;
+    ثابت منطقي is_Ptr_بدليو = (ڀريل_Name_Info_2.log_ٽيگ_Ptr != ptr);
+    إذا (!is_Ptr_بدليو)
     {
-        return;
+        أرجع;
     }
-    fullNameInfo.logTagPtr = ptr;
-    if (!ptr)
+    ڀريل_Name_Info_2.log_ٽيگ_Ptr = ptr;
+    إذا (!ptr)
     {
-        return;
+        أرجع;
     }
-    const bool hasAppliedFullNameConfig = internal_applyFullNameConfigToTag(fullNameInfo);
-    if (hasAppliedFullNameConfig)
+    ثابت منطقي has_Applied_ڀريل_Name_Config = اندروني_apply_ڀريل_Name_Config_منزل_ٽيگ(ڀريل_Name_Info_2);
+    إذا (has_Applied_ڀريل_Name_Config)
     {
-        return;
+        أرجع;
     }
-    internal_applyNamePartConfigToSpecificTag(result);
+    اندروني_apply_Name_Part_Config_منزل_Specific_ٽيگ(نتيجو);
 }
 
-void LogTagManager::unassign(const std::string& fullName)
+فراغ Log_ٽيگ_Manager::unassign(ثابت std::string& ڀريل_Name)
 {
     // Lock is inside assign() method.
-    assign(fullName, nullptr);
+    assign(ڀريل_Name, خالي_اشارو);
 }
 
-LogTag* LogTagManager::get(const std::string& fullName)
+Log_ٽيگ* Log_ٽيگ_Manager::get(ثابت std::string& ڀريل_Name)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    FullNameInfo* fullNameInfoPtr = m_nameTable.getFullNameInfo(fullName);
-    if (fullNameInfoPtr && fullNameInfoPtr->logTagPtr)
+    تالو_Type lock(m_mutex);
+    ڀريل_Name_Info* ڀريل_Name_Info_Ptr = m_name_جدول.get_ڀريل_Name_Info(ڀريل_Name);
+    إذا (ڀريل_Name_Info_Ptr && ڀريل_Name_Info_Ptr->log_ٽيگ_Ptr)
     {
-        return fullNameInfoPtr->logTagPtr;
+        أرجع ڀريل_Name_Info_Ptr->log_ٽيگ_Ptr;
     }
-    return nullptr;
+    أرجع خالي_اشارو;
 }
 
-void LogTagManager::setLevelByFullName(const std::string& fullName, LogLevel level)
+فراغ Log_ٽيگ_Manager::سيٽ_Level_By_ڀريل_Name(ثابت std::string& ڀريل_Name, LogLevel level)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    FullNameLookupResult result(fullName);
-    result.m_findCrossReferences = false;
-    m_nameTable.addOrLookupFullName(result);
-    FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full &&
-        fullNameInfo.parsedLevel.level == level)
+    تالو_Type lock(m_mutex);
+    ڀريل_Name_Lookup_نتيجو نتيجو(ڀريل_Name);
+    نتيجو.m_ڳوليو_Cross_References = خطأ;
+    m_name_جدول.جوڙيو_Or_Lookup_ڀريل_Name(نتيجو);
+    ڀريل_Name_Info& ڀريل_Name_Info_2 = *نتيجو.m_ڀريل_Name_Info_Ptr;
+    إذا (ڀريل_Name_Info_2.parsedLevel.scope == MatchingScope::ڀريل_2 &&
+        ڀريل_Name_Info_2.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        أرجع;
     }
     // update the cached configured value.
-    fullNameInfo.parsedLevel.scope = MatchingScope::Full;
-    fullNameInfo.parsedLevel.level = level;
+    ڀريل_Name_Info_2.parsedLevel.scope = MatchingScope::ڀريل_2;
+    ڀريل_Name_Info_2.parsedLevel.level = level;
     // update the actual tag, if already registered.
-    LogTag* logTagPtr = fullNameInfo.logTagPtr;
-    if (logTagPtr)
+    Log_ٽيگ* log_ٽيگ_Ptr = ڀريل_Name_Info_2.log_ٽيگ_Ptr;
+    إذا (log_ٽيگ_Ptr)
     {
-        logTagPtr->level = level;
+        log_ٽيگ_Ptr->level = level;
     }
 }
 
-void LogTagManager::setLevelByFirstPart(const std::string& firstPart, LogLevel level)
+فراغ Log_ٽيگ_Manager::سيٽ_Level_By_پهريون_Part(ثابت std::string& پهريون_Part, LogLevel level)
 {
     // Lock is inside setLevelByNamePart() method.
-    setLevelByNamePart(firstPart, level, MatchingScope::FirstNamePart);
+    سيٽ_Level_By_Name_Part(پهريون_Part, level, MatchingScope::پهريون_Name_Part);
 }
 
-void LogTagManager::setLevelByAnyPart(const std::string& anyPart, LogLevel level)
+فراغ Log_ٽيگ_Manager::سيٽ_Level_By_Any_Part(ثابت std::string& anyPart, LogLevel level)
 {
     // Lock is inside setLevelByNamePart() method.
-    setLevelByNamePart(anyPart, level, MatchingScope::AnyNamePart);
+    سيٽ_Level_By_Name_Part(anyPart, level, MatchingScope::AnyNamePart);
 }
 
-void LogTagManager::setLevelByNamePart(const std::string& namePart, LogLevel level, MatchingScope scope)
+فراغ Log_ٽيگ_Manager::سيٽ_Level_By_Name_Part(ثابت std::string& namePart, LogLevel level, MatchingScope scope)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    NamePartLookupResult result(namePart);
-    result.m_findCrossReferences = true;
-    m_nameTable.addOrLookupNamePart(result);
-    NamePartInfo& namePartInfo = *result.m_namePartInfoPtr;
-    if (namePartInfo.parsedLevel.scope == scope &&
+    تالو_Type lock(m_mutex);
+    Name_Part_Lookup_نتيجو نتيجو(namePart);
+    نتيجو.m_ڳوليو_Cross_References = سچ;
+    m_name_جدول.جوڙيو_Or_Lookup_Name_Part(نتيجو);
+    NamePartInfo& namePartInfo = *نتيجو.m_namePartInfoPtr;
+    إذا (namePartInfo.parsedLevel.scope == scope &&
         namePartInfo.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        أرجع;
     }
     namePartInfo.parsedLevel.scope = scope;
     namePartInfo.parsedLevel.level = level;
-    internal_applyNamePartConfigToMatchingTags(result);
+    اندروني_apply_Name_Part_Config_منزل_Matching_ٽيگ_فهرست(نتيجو);
 }
 
-std::vector<std::string> LogTagManager::splitNameParts(const std::string& fullName)
+std::vector<std::string> Log_ٽيگ_Manager::ورهايو_Name_Parts(ثابت std::string& ڀريل_Name)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = fullName.length();
+    ثابت size_t npos = std::string::npos;
+    ثابت size_t len = ڀريل_Name.length();
     std::vector<std::string> nameParts;
-    size_t start = 0u;
-    while (start < len)
+    size_t شروعات = 0u;
+    طالما (شروعات < len)
     {
-        size_t nextPeriod = fullName.find('.', start);
-        if (nextPeriod == npos)
+        size_t ايندڙ_Period = ڀريل_Name.find('.', شروعات);
+        إذا (ايندڙ_Period == npos)
         {
-            nextPeriod = len;
+            ايندڙ_Period = len;
         }
-        if (nextPeriod >= start + 1u)
+        إذا (ايندڙ_Period >= شروعات + 1u)
         {
-            nameParts.emplace_back(fullName.substr(start, nextPeriod - start));
+            nameParts.emplace_back(ڀريل_Name.substr(شروعات, ايندڙ_Period - شروعات));
         }
-        start = nextPeriod + 1u;
+        شروعات = ايندڙ_Period + 1u;
     }
-    return nameParts;
+    أرجع nameParts;
 }
 
-bool LogTagManager::internal_isNamePartMatch(MatchingScope scope, size_t matchingPos)
+منطقي Log_ٽيگ_Manager::اندروني_is_Name_Part_ميلاپ(MatchingScope scope, size_t matchingPos)
 {
-    switch (scope)
+    بدل (scope)
     {
-    case MatchingScope::FirstNamePart:
-        return (matchingPos == 0u);
-    case MatchingScope::AnyNamePart:
-        return true;
-    case MatchingScope::None:
-    case MatchingScope::Full:
-    default:
-        return false;
+    حالة MatchingScope::پهريون_Name_Part:
+        أرجع (matchingPos == 0u);
+    حالة MatchingScope::AnyNamePart:
+        أرجع سچ;
+    حالة MatchingScope::None:
+    حالة MatchingScope::ڀريل_2:
+    افتراضي:
+        أرجع خطأ;
     }
 }
 
-bool LogTagManager::internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo)
+منطقي Log_ٽيگ_Manager::اندروني_apply_ڀريل_Name_Config_منزل_ٽيگ(ڀريل_Name_Info& ڀريل_Name_Info_2)
 {
-    if (!fullNameInfo.logTagPtr)
+    إذا (!ڀريل_Name_Info_2.log_ٽيگ_Ptr)
     {
-        return false;
+        أرجع خطأ;
     }
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+    إذا (ڀريل_Name_Info_2.parsedLevel.scope == MatchingScope::ڀريل_2)
     {
-        fullNameInfo.logTagPtr->level = fullNameInfo.parsedLevel.level;
-        return true;
+        ڀريل_Name_Info_2.log_ٽيگ_Ptr->level = ڀريل_Name_Info_2.parsedLevel.level;
+        أرجع سچ;
     }
-    return false;
+    أرجع خطأ;
 }
 
-bool LogTagManager::internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult)
+منطقي Log_ٽيگ_Manager::اندروني_apply_Name_Part_Config_منزل_Specific_ٽيگ(ڀريل_Name_Lookup_نتيجو& ڀريل_Name_نتيجو)
 {
-    const FullNameInfo& fullNameInfo = *fullNameResult.m_fullNameInfoPtr;
-    LogTag* const logTag = fullNameInfo.logTagPtr;
-    if (!logTag)
+    ثابت ڀريل_Name_Info& ڀريل_Name_Info_2 = *ڀريل_Name_نتيجو.m_ڀريل_Name_Info_Ptr;
+    Log_ٽيگ* ثابت log_ٽيگ = ڀريل_Name_Info_2.log_ٽيگ_Ptr;
+    إذا (!log_ٽيگ)
     {
-        return false;
+        أرجع خطأ;
     }
-    CV_Assert(fullNameResult.m_findCrossReferences);
-    const auto& crossReferences = fullNameResult.m_crossReferences;
-    const size_t matchingNamePartCount = crossReferences.size();
-    for (size_t k = 0u; k < matchingNamePartCount; ++k)
+    CV_Assert(ڀريل_Name_نتيجو.m_ڳوليو_Cross_References);
+    ثابت خودڪار& crossReferences = ڀريل_Name_نتيجو.m_crossReferences;
+    ثابت size_t matching_Name_Part_ڳڻپ = crossReferences.size();
+    لكل (size_t k = 0u; k < matching_Name_Part_ڳڻپ; ++k)
     {
-        const auto& match = crossReferences.at(k);
-        const auto& namePartInfo = *match.m_namePartInfo;
-        const auto& parsedLevel = namePartInfo.parsedLevel;
-        const auto scope = parsedLevel.scope;
-        const LogLevel level = parsedLevel.level;
-        const size_t matchingPos = match.m_matchingPos;
-        const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (isMatch)
+        ثابت خودڪار& ميلاپ = crossReferences.at(k);
+        ثابت خودڪار& namePartInfo = *ميلاپ.m_namePartInfo;
+        ثابت خودڪار& parsedLevel = namePartInfo.parsedLevel;
+        ثابت خودڪار scope = parsedLevel.scope;
+        ثابت LogLevel level = parsedLevel.level;
+        ثابت size_t matchingPos = ميلاپ.m_matchingPos;
+        ثابت منطقي is_ميلاپ = اندروني_is_Name_Part_ميلاپ(scope, matchingPos);
+        إذا (is_ميلاپ)
         {
-            logTag->level = level;
-            return true;
+            log_ٽيگ->level = level;
+            أرجع سچ;
         }
     }
-    return false;
+    أرجع خطأ;
 }
 
-void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult)
+فراغ Log_ٽيگ_Manager::اندروني_apply_Name_Part_Config_منزل_Matching_ٽيگ_فهرست(Name_Part_Lookup_نتيجو& name_Part_نتيجو)
 {
-    CV_Assert(namePartResult.m_findCrossReferences);
-    const auto& crossReferences = namePartResult.m_crossReferences;
-    const size_t matchingFullNameCount = crossReferences.size();
-    NamePartInfo& namePartInfo = *namePartResult.m_namePartInfoPtr;
-    const MatchingScope scope = namePartInfo.parsedLevel.scope;
-    CV_Assert(scope != MatchingScope::Full);
-    if (scope == MatchingScope::None)
+    CV_Assert(name_Part_نتيجو.m_ڳوليو_Cross_References);
+    ثابت خودڪار& crossReferences = name_Part_نتيجو.m_crossReferences;
+    ثابت size_t matching_ڀريل_Name_ڳڻپ = crossReferences.size();
+    NamePartInfo& namePartInfo = *name_Part_نتيجو.m_namePartInfoPtr;
+    ثابت MatchingScope scope = namePartInfo.parsedLevel.scope;
+    CV_Assert(scope != MatchingScope::ڀريل_2);
+    إذا (scope == MatchingScope::None)
     {
-        return;
+        أرجع;
     }
-    const LogLevel level = namePartInfo.parsedLevel.level;
-    for (size_t k = 0u; k < matchingFullNameCount; ++k)
+    ثابت LogLevel level = namePartInfo.parsedLevel.level;
+    لكل (size_t k = 0u; k < matching_ڀريل_Name_ڳڻپ; ++k)
     {
-        const auto& match = crossReferences.at(k);
-        FullNameInfo& fullNameInfo = *match.m_fullNameInfo;
-        LogTag* logTagPtr = fullNameInfo.logTagPtr;
-        if (!logTagPtr)
+        ثابت خودڪار& ميلاپ = crossReferences.at(k);
+        ڀريل_Name_Info& ڀريل_Name_Info_2 = *ميلاپ.m_ڀريل_Name_Info;
+        Log_ٽيگ* log_ٽيگ_Ptr = ڀريل_Name_Info_2.log_ٽيگ_Ptr;
+        إذا (!log_ٽيگ_Ptr)
         {
-            continue;
+            استمر;
         }
-        if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+        إذا (ڀريل_Name_Info_2.parsedLevel.scope == MatchingScope::ڀريل_2)
         {
             // If the full name already has valid config, that full name config
             // has precedence over name part config.
-            continue;
+            استمر;
         }
-        const size_t matchingPos = match.m_matchingPos;
-        const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (!isMatch)
+        ثابت size_t matchingPos = ميلاپ.m_matchingPos;
+        ثابت منطقي is_ميلاپ = اندروني_is_Name_Part_ميلاپ(scope, matchingPos);
+        إذا (!is_ميلاپ)
         {
-            continue;
+            استمر;
         }
-        logTagPtr->level = level;
+        log_ٽيگ_Ptr->level = level;
     }
 }
 
-void LogTagManager::NameTable::addOrLookupFullName(FullNameLookupResult& result)
+فراغ Log_ٽيگ_Manager::Name_جدول::جوڙيو_Or_Lookup_ڀريل_Name(ڀريل_Name_Lookup_نتيجو& نتيجو)
 {
-    const auto fullNameIdAndFlag = internal_addOrLookupFullName(result.m_fullName);
-    result.m_fullNameId = fullNameIdAndFlag.first;
-    result.m_nameParts = LogTagManager::splitNameParts(result.m_fullName);
-    internal_addOrLookupNameParts(result.m_nameParts, result.m_namePartIds);
-    const bool isNew = fullNameIdAndFlag.second;
-    if (isNew)
+    ثابت خودڪار ڀريل_Name_Id_And_Flag = اندروني_جوڙيو_Or_Lookup_ڀريل_Name(نتيجو.m_ڀريل_Name);
+    نتيجو.m_ڀريل_Name_Id = ڀريل_Name_Id_And_Flag.first;
+    نتيجو.m_nameParts = Log_ٽيگ_Manager::ورهايو_Name_Parts(نتيجو.m_ڀريل_Name);
+    اندروني_جوڙيو_Or_Lookup_Name_Parts(نتيجو.m_nameParts, نتيجو.m_namePartIds);
+    ثابت منطقي isNew = ڀريل_Name_Id_And_Flag.second;
+    إذا (isNew)
     {
-        internal_addCrossReference(result.m_fullNameId, result.m_namePartIds);
+        اندروني_جوڙيو_Cross_Reference(نتيجو.m_ڀريل_Name_Id, نتيجو.m_namePartIds);
     }
     // ====== IMPORTANT ====== Critical order-of-operation ======
     // The gathering of the pointers of FullNameInfo and NamePartInfo are performed
     // as the last step of the operation, so that these pointer are not invalidated
     // by the vector append operations earlier in this function.
     // ======
-    result.m_fullNameInfoPtr = internal_getFullNameInfo(result.m_fullNameId);
-    if (result.m_findCrossReferences)
+    نتيجو.m_ڀريل_Name_Info_Ptr = اندروني_get_ڀريل_Name_Info(نتيجو.m_ڀريل_Name_Id);
+    إذا (نتيجو.m_ڳوليو_Cross_References)
     {
-        internal_findMatchingNamePartsForFullName(result);
+        اندروني_ڳوليو_Matching_Name_Parts_For_ڀريل_Name(نتيجو);
     }
 }
 
-void LogTagManager::NameTable::addOrLookupNamePart(NamePartLookupResult& result)
+فراغ Log_ٽيگ_Manager::Name_جدول::جوڙيو_Or_Lookup_Name_Part(Name_Part_Lookup_نتيجو& نتيجو)
 {
-    result.m_namePartId = internal_addOrLookupNamePart(result.m_namePart);
-    result.m_namePartInfoPtr = internal_getNamePartInfo(result.m_namePartId);
-    if (result.m_findCrossReferences)
+    نتيجو.m_namePartId = اندروني_جوڙيو_Or_Lookup_Name_Part(نتيجو.m_namePart);
+    نتيجو.m_namePartInfoPtr = اندروني_get_Name_Part_Info(نتيجو.m_namePartId);
+    إذا (نتيجو.m_ڳوليو_Cross_References)
     {
-        internal_findMatchingFullNamesForNamePart(result);
+        اندروني_ڳوليو_Matching_ڀريل_نالا_For_Name_Part(نتيجو);
     }
 }
 
-std::pair<size_t, bool> LogTagManager::NameTable::internal_addOrLookupFullName(const std::string& fullName)
+std::pair<size_t, منطقي> Log_ٽيگ_Manager::Name_جدول::اندروني_جوڙيو_Or_Lookup_ڀريل_Name(ثابت std::string& ڀريل_Name)
 {
-    const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter != m_fullNameIds.end())
+    ثابت خودڪار ڀريل_Name_Id_Iter = m_ڀريل_Name_Ids.find(ڀريل_Name);
+    إذا (ڀريل_Name_Id_Iter != m_ڀريل_Name_Ids.end())
     {
-        return std::make_pair(fullNameIdIter->second, false);
+        أرجع std::make_pair(ڀريل_Name_Id_Iter->second, خطأ);
     }
-    const size_t fullNameId = m_fullNameInfos.size();
-    m_fullNameInfos.emplace_back(FullNameInfo{});
-    m_fullNameIds.emplace(fullName, fullNameId);
-    return std::make_pair(fullNameId, true);
+    ثابت size_t ڀريل_Name_Id = m_ڀريل_Name_Infos.size();
+    m_ڀريل_Name_Infos.emplace_back(ڀريل_Name_Info{});
+    m_ڀريل_Name_Ids.emplace(ڀريل_Name, ڀريل_Name_Id);
+    أرجع std::make_pair(ڀريل_Name_Id, سچ);
 }
 
-void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<std::string>& nameParts,
+فراغ Log_ٽيگ_Manager::Name_جدول::اندروني_جوڙيو_Or_Lookup_Name_Parts(ثابت std::vector<std::string>& nameParts,
     std::vector<size_t>& namePartIds)
 {
-    const size_t namePartCount = nameParts.size();
-    namePartIds.resize(namePartCount, ~(size_t)0u);
-    for (size_t namePartIndex = 0u; namePartIndex < namePartCount; ++namePartIndex)
+    ثابت size_t name_Part_ڳڻپ = nameParts.size();
+    namePartIds.resize(name_Part_ڳڻپ, ~(size_t)0u);
+    لكل (size_t name_Part_اشاريو = 0u; name_Part_اشاريو < name_Part_ڳڻپ; ++name_Part_اشاريو)
     {
-        const std::string& namePart = nameParts.at(namePartIndex);
-        const size_t namePartId = internal_addOrLookupNamePart(namePart);
-        namePartIds.at(namePartIndex) = namePartId;
+        ثابت std::string& namePart = nameParts.at(name_Part_اشاريو);
+        ثابت size_t namePartId = اندروني_جوڙيو_Or_Lookup_Name_Part(namePart);
+        namePartIds.at(name_Part_اشاريو) = namePartId;
     }
 }
 
-size_t LogTagManager::NameTable::internal_addOrLookupNamePart(const std::string& namePart)
+size_t Log_ٽيگ_Manager::Name_جدول::اندروني_جوڙيو_Or_Lookup_Name_Part(ثابت std::string& namePart)
 {
-    const auto namePartIter = m_namePartIds.find(namePart);
-    if (namePartIter != m_namePartIds.end())
+    ثابت خودڪار namePartIter = m_namePartIds.find(namePart);
+    إذا (namePartIter != m_namePartIds.end())
     {
-        return namePartIter->second;
+        أرجع namePartIter->second;
     }
-    const size_t namePartId = m_namePartInfos.size();
+    ثابت size_t namePartId = m_namePartInfos.size();
     m_namePartInfos.emplace_back(NamePartInfo{});
     m_namePartIds.emplace(namePart, namePartId);
-    return namePartId;
+    أرجع namePartId;
 }
 
-void LogTagManager::NameTable::internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds)
+فراغ Log_ٽيگ_Manager::Name_جدول::اندروني_جوڙيو_Cross_Reference(size_t ڀريل_Name_Id, ثابت std::vector<size_t>& namePartIds)
 {
-    const size_t namePartCount = namePartIds.size();
-    for (size_t namePartPos = 0u; namePartPos < namePartCount; ++namePartPos)
+    ثابت size_t name_Part_ڳڻپ = namePartIds.size();
+    لكل (size_t namePartPos = 0u; namePartPos < name_Part_ڳڻپ; ++namePartPos)
     {
-        const size_t namePartId = namePartIds.at(namePartPos);
-        m_fullNameToNamePartIds.emplace(fullNameId, std::make_pair(namePartId, namePartPos));
-        m_namePartToFullNameIds.emplace(namePartId, std::make_pair(fullNameId, namePartPos));
+        ثابت size_t namePartId = namePartIds.at(namePartPos);
+        m_ڀريل_Name_منزل_Name_Part_Ids.emplace(ڀريل_Name_Id, std::make_pair(namePartId, namePartPos));
+        m_name_Part_منزل_ڀريل_Name_Ids.emplace(namePartId, std::make_pair(ڀريل_Name_Id, namePartPos));
     }
 }
 
-LogTagManager::FullNameInfo* LogTagManager::NameTable::getFullNameInfo(const std::string& fullName)
+Log_ٽيگ_Manager::ڀريل_Name_Info* Log_ٽيگ_Manager::Name_جدول::get_ڀريل_Name_Info(ثابت std::string& ڀريل_Name)
 {
-    const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter == m_fullNameIds.end())
+    ثابت خودڪار ڀريل_Name_Id_Iter = m_ڀريل_Name_Ids.find(ڀريل_Name);
+    إذا (ڀريل_Name_Id_Iter == m_ڀريل_Name_Ids.end())
     {
-        return nullptr;
+        أرجع خالي_اشارو;
     }
-    const size_t fullNameId = fullNameIdIter->second;
-    return internal_getFullNameInfo(fullNameId);
+    ثابت size_t ڀريل_Name_Id = ڀريل_Name_Id_Iter->second;
+    أرجع اندروني_get_ڀريل_Name_Info(ڀريل_Name_Id);
 }
 
-LogTagManager::FullNameInfo* LogTagManager::NameTable::internal_getFullNameInfo(size_t fullNameId)
+Log_ٽيگ_Manager::ڀريل_Name_Info* Log_ٽيگ_Manager::Name_جدول::اندروني_get_ڀريل_Name_Info(size_t ڀريل_Name_Id)
 {
-    return std::addressof(m_fullNameInfos.at(fullNameId));
+    أرجع std::addressof(m_ڀريل_Name_Infos.at(ڀريل_Name_Id));
 }
 
-LogTagManager::NamePartInfo* LogTagManager::NameTable::internal_getNamePartInfo(size_t namePartId)
+Log_ٽيگ_Manager::NamePartInfo* Log_ٽيگ_Manager::Name_جدول::اندروني_get_Name_Part_Info(size_t namePartId)
 {
-    return std::addressof(m_namePartInfos.at(namePartId));
+    أرجع std::addressof(m_namePartInfos.at(namePartId));
 }
 
-void LogTagManager::NameTable::internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult)
+فراغ Log_ٽيگ_Manager::Name_جدول::اندروني_ڳوليو_Matching_Name_Parts_For_ڀريل_Name(ڀريل_Name_Lookup_نتيجو& ڀريل_Name_نتيجو)
 {
-    const size_t fullNameId = fullNameResult.m_fullNameId;
-    FullNameInfo* fullNameInfo = fullNameResult.m_fullNameInfoPtr;
-    const auto& namePartIds = fullNameResult.m_namePartIds;
-    const size_t namePartCount = namePartIds.size();
-    auto& crossReferences = fullNameResult.m_crossReferences;
+    ثابت size_t ڀريل_Name_Id = ڀريل_Name_نتيجو.m_ڀريل_Name_Id;
+    ڀريل_Name_Info* ڀريل_Name_Info_2 = ڀريل_Name_نتيجو.m_ڀريل_Name_Info_Ptr;
+    ثابت خودڪار& namePartIds = ڀريل_Name_نتيجو.m_namePartIds;
+    ثابت size_t name_Part_ڳڻپ = namePartIds.size();
+    خودڪار& crossReferences = ڀريل_Name_نتيجو.m_crossReferences;
     crossReferences.clear();
-    crossReferences.reserve(namePartCount);
-    for (size_t matchingPos = 0u; matchingPos < namePartCount; ++matchingPos)
+    crossReferences.reserve(name_Part_ڳڻپ);
+    لكل (size_t matchingPos = 0u; matchingPos < name_Part_ڳڻپ; ++matchingPos)
     {
-        const size_t namePartId = namePartIds.at(matchingPos);
-        NamePartInfo* namePartInfo = internal_getNamePartInfo(namePartId);
-        crossReferences.emplace_back(CrossReference(fullNameId, namePartId, matchingPos, fullNameInfo, namePartInfo));
+        ثابت size_t namePartId = namePartIds.at(matchingPos);
+        NamePartInfo* namePartInfo = اندروني_get_Name_Part_Info(namePartId);
+        crossReferences.emplace_back(CrossReference(ڀريل_Name_Id, namePartId, matchingPos, ڀريل_Name_Info_2, namePartInfo));
     }
 }
 
-void LogTagManager::NameTable::internal_findMatchingFullNamesForNamePart(NamePartLookupResult& result)
+فراغ Log_ٽيگ_Manager::Name_جدول::اندروني_ڳوليو_Matching_ڀريل_نالا_For_Name_Part(Name_Part_Lookup_نتيجو& نتيجو)
 {
-    const size_t namePartId = result.m_namePartId;
-    NamePartInfo* namePartInfo = result.m_namePartInfoPtr;
-    const size_t matchingFullNameCount = m_namePartToFullNameIds.count(namePartId);
-    std::vector<CrossReference>& crossReferences = result.m_crossReferences;
+    ثابت size_t namePartId = نتيجو.m_namePartId;
+    NamePartInfo* namePartInfo = نتيجو.m_namePartInfoPtr;
+    ثابت size_t matching_ڀريل_Name_ڳڻپ = m_name_Part_منزل_ڀريل_Name_Ids.ڳڻپ_2(namePartId);
+    std::vector<CrossReference>& crossReferences = نتيجو.m_crossReferences;
     crossReferences.clear();
-    crossReferences.reserve(matchingFullNameCount);
-    const auto namePartToFullNameIterPair = m_namePartToFullNameIds.equal_range(result.m_namePartId);
-    const auto iterBegin = namePartToFullNameIterPair.first;
-    const auto iterEnd = namePartToFullNameIterPair.second;
-    for (auto iter = iterBegin; iter != iterEnd; ++iter)
+    crossReferences.reserve(matching_ڀريل_Name_ڳڻپ);
+    ثابت خودڪار name_Part_منزل_ڀريل_Name_Iter_Pair = m_name_Part_منزل_ڀريل_Name_Ids.equal_range(نتيجو.m_namePartId);
+    ثابت خودڪار iterBegin = name_Part_منزل_ڀريل_Name_Iter_Pair.first;
+    ثابت خودڪار iter_پڇاڙي = name_Part_منزل_ڀريل_Name_Iter_Pair.second;
+    لكل (خودڪار iter = iterBegin; iter != iter_پڇاڙي; ++iter)
     {
-        const size_t fullNameId = iter->second.first;
-        const size_t matchingPos = iter->second.second;
-        FullNameInfo* fullNameInfo = internal_getFullNameInfo(fullNameId);
-        crossReferences.emplace_back(CrossReference(fullNameId, namePartId, matchingPos, fullNameInfo, namePartInfo));
+        ثابت size_t ڀريل_Name_Id = iter->second.first;
+        ثابت size_t matchingPos = iter->second.second;
+        ڀريل_Name_Info* ڀريل_Name_Info_2 = اندروني_get_ڀريل_Name_Info(ڀريل_Name_Id);
+        crossReferences.emplace_back(CrossReference(ڀريل_Name_Id, namePartId, matchingPos, ڀريل_Name_Info_2, namePartInfo));
     }
 }
 

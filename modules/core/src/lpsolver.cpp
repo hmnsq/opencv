@@ -38,41 +38,41 @@
 // the use of this software, even if advised of the possibility of such damage.
 //
 //M*/
-#include "precomp.hpp"
-#include <climits>
-#include <algorithm>
+#ضمن "precomp.hpp"
+#ضمن <climits>
+#ضمن <algorithm>
 
-#define dprintf(x)
-#define print_matrix(x)
+#وصف_ڪريو dprintf(x)
+#وصف_ڪريو print_ميٽرڪس(x)
 
-namespace cv
+نطاق cv
 {
 
-using std::vector;
+استعمال std::vector;
 
-#ifdef ALEX_DEBUG
-static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::vector<int> N,const std::vector<int> B){
-    printf("\tprint simplex state\n");
+#جيڪڏهن_وصف_ٿيل ALEX_DEBUG
+ساكن فراغ print_simplex_state(ثابت Mat& c,ثابت Mat& b,مزدوج v,ثابت std::vector<صحيح> N,ثابت std::vector<صحيح> B){
+    لکو("\tprint simplex state\n");
 
-    printf("v=%g\n",v);
+    لکو("v=%g\n",v);
 
-    printf("here c goes\n");
-    print_matrix(c);
+    لکو("here c goes\n");
+    print_ميٽرڪس(c);
 
-    printf("non-basic: ");
+    لکو("non-basic: ");
     print(Mat(N));
-    printf("\n");
+    لکو("\n");
 
-    printf("here b goes\n");
-    print_matrix(b);
-    printf("basic: ");
+    لکو("here b goes\n");
+    print_ميٽرڪس(b);
+    لکو("basic: ");
 
     print(Mat(B));
-    printf("\n");
+    لکو("\n");
 }
-#else
-#define print_simplex_state(c,b,v,N,B)
-#endif
+#وإلا
+#وصف_ڪريو print_simplex_state(c,b,v,N,B)
+#جيڪڏهن_پورو
 
 /**Due to technical considerations, the format of input b and c is somewhat special:
  *both b and c should be one column bigger than corresponding b and c of linear problem and the leftmost column will be used internally
@@ -80,161 +80,161 @@ static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::ve
  it also initializes N and B and does not make any assumptions about their init values
  * @return SOLVELP_UNFEASIBLE if problem is unfeasible, 0 if feasible.
 */
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,int leaving_index,
-        int entering_index,vector<unsigned int>& indexToRow);
+ساكن صحيح initialize_simplex(Mat_<مزدوج>& c, Mat_<مزدوج>& b,مزدوج& v,vector<صحيح>& N,vector<صحيح>& B,vector<بنانشان صحيح>& اشاريو_منزل_صف);
+ساكن مضمن فراغ محور(Mat_<مزدوج>& c,Mat_<مزدوج>& b,مزدوج& v,vector<صحيح>& N,vector<صحيح>& B,صحيح leaving_اشاريو,
+        صحيح entering_اشاريو,vector<بنانشان صحيح>& اشاريو_منزل_صف);
 /**@return SOLVELP_UNBOUNDED means the problem is unbdd, SOLVELP_MULTI means multiple solutions, SOLVELP_SINGLE means one solution.
  */
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static void swap_columns(Mat_<double>& A,int col1,int col2);
-#define SWAP(type,a,b) {type tmp=(a);(a)=(b);(b)=tmp;}
+ساكن صحيح inner_simplex(Mat_<مزدوج>& c, Mat_<مزدوج>& b,مزدوج& v,vector<صحيح>& N,vector<صحيح>& B,vector<بنانشان صحيح>& اشاريو_منزل_صف);
+ساكن فراغ مٽا_سٽا_columns(Mat_<مزدوج>& A,صحيح col1,صحيح col2);
+#وصف_ڪريو مٽا_سٽا(type,a,b) {type tmp=(a);(a)=(b);(b)=tmp;}
 
 //return codes:-2 (no_sol - unbdd),-1(no_sol - unfsbl), 0(single_sol), 1(multiple_sol=>least_l2_norm)
-int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_eps)
+صحيح solveLP(داخلا_Array Func_, داخلا_Array Constr_, OutputArray z_, مزدوج constr_eps)
 {
     dprintf(("call to solveLP\n"));
 
     //sanity check (size, type, no. of channels)
     CV_Assert(Func_.type()==CV_64FC1 || Func_.type()==CV_32FC1);
     CV_Assert(Constr_.type()==CV_64FC1 || Constr_.type()==CV_32FC1);
-    CV_Assert((Func_.rows()==1 && (Constr_.cols()-Func_.cols()==1))||
-            (Func_.cols()==1 && (Constr_.cols()-Func_.rows()==1)));
-    if (z_.fixedType())
+    CV_Assert((Func_.صفون()==1 && (Constr_.کانن_ڳڻپ()-Func_.کانن_ڳڻپ()==1))||
+            (Func_.کانن_ڳڻپ()==1 && (Constr_.کانن_ڳڻپ()-Func_.صفون()==1)));
+    إذا (z_.fixedType())
         CV_CheckType(z_.type(), z_.type() == CV_64FC1 || z_.type() == CV_32FC1 || z_.type() == CV_32SC1, "");
 
     Mat Func = Func_.getMat();
     Mat Constr = Constr_.getMat();
 
     //copy arguments for we will shall modify them
-    Mat_<double> bigC=Mat_<double>(1,(Func.rows==1?Func.cols:Func.rows)+1),
-        bigB=Mat_<double>(Constr.rows,Constr.cols+1);
-    if(Func.rows==1){
-        Func.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
-    }else{
+    Mat_<مزدوج> bigC=Mat_<مزدوج>(1,(Func.صفون==1?Func.کانن_ڳڻپ:Func.صفون)+1),
+        bigB=Mat_<مزدوج>(Constr.صفون,Constr.کانن_ڳڻپ+1);
+    إذا(Func.صفون==1){
+        Func.convert_منزل(bigC.کانو_Range_2(1,bigC.کانن_ڳڻپ),CV_64FC1);
+    }وإلا{
         Mat FuncT=Func.t();
-        FuncT.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
+        FuncT.convert_منزل(bigC.کانو_Range_2(1,bigC.کانن_ڳڻپ),CV_64FC1);
     }
-    Constr.convertTo(bigB.colRange(1,bigB.cols),CV_64FC1);
-    double v=0;
-    vector<int> N,B;
-    vector<unsigned int> indexToRow;
+    Constr.convert_منزل(bigB.کانو_Range_2(1,bigB.کانن_ڳڻپ),CV_64FC1);
+    مزدوج v=0;
+    vector<صحيح> N,B;
+    vector<بنانشان صحيح> اشاريو_منزل_صف;
 
-    if(initialize_simplex(bigC,bigB,v,N,B,indexToRow)==SOLVELP_UNFEASIBLE){
-        return SOLVELP_UNFEASIBLE;
+    إذا(initialize_simplex(bigC,bigB,v,N,B,اشاريو_منزل_صف)==SOLVELP_UNFEASIBLE){
+        أرجع SOLVELP_UNFEASIBLE;
     }
-    Mat_<double> c=bigC.colRange(1,bigC.cols),
-        b=bigB.colRange(1,bigB.cols);
+    Mat_<مزدوج> c=bigC.کانو_Range_2(1,bigC.کانن_ڳڻپ),
+        b=bigB.کانو_Range_2(1,bigB.کانن_ڳڻپ);
 
-    int res=0;
-    if((res=inner_simplex(c,b,v,N,B,indexToRow))==SOLVELP_UNBOUNDED){
-        return SOLVELP_UNBOUNDED;
+    صحيح res=0;
+    إذا((res=inner_simplex(c,b,v,N,B,اشاريو_منزل_صف))==SOLVELP_UNBOUNDED){
+        أرجع SOLVELP_UNBOUNDED;
     }
 
     //return the optimal solution
-    Mat z(c.cols,1,CV_64FC1);
-    MatIterator_<double> it=z.begin<double>();
-    unsigned int nsize = (unsigned int)N.size();
-    for(int i=1;i<=c.cols;i++,it++){
-        if(indexToRow[i]<nsize){
+    Mat z(c.کانن_ڳڻپ,1,CV_64FC1);
+    MatIterator_<مزدوج> it=z.begin<مزدوج>();
+    بنانشان صحيح nsize = (بنانشان صحيح)N.size();
+    لكل(صحيح i=1;i<=c.کانن_ڳڻپ;i++,it++){
+        إذا(اشاريو_منزل_صف[i]<nsize){
             *it=0;
-        }else{
-            *it=b.at<double>(indexToRow[i]-nsize,b.cols-1);
+        }وإلا{
+            *it=b.at<مزدوج>(اشاريو_منزل_صف[i]-nsize,b.کانن_ڳڻپ-1);
         }
     }
 
-    z.copyTo(z_);
+    z.copy_منزل(z_);
 
     //check constraints feasibility
-    Mat prod = Constr(Rect(0, 0, Constr.cols - 1, Constr.rows)) * z;
-    Mat constr_check = Constr.col(Constr.cols - 1) - prod;
-    double min_value = 0.0;
-    minMaxIdx(constr_check, &min_value);
-    if (min_value < -constr_eps)
+    Mat prod = Constr(Rect(0, 0, Constr.کانن_ڳڻپ - 1, Constr.صفون)) * z;
+    Mat constr_check = Constr.کانو(Constr.کانن_ڳڻپ - 1) - prod;
+    مزدوج min_قدر = 0.0;
+    minMaxIdx(constr_check, &min_قدر);
+    إذا (min_قدر < -constr_eps)
     {
-        return SOLVELP_LOST;
+        أرجع SOLVELP_گم;
     }
 
-    return res;
+    أرجع res;
 }
 
-int solveLP(InputArray Func, InputArray Constr, OutputArray z)
+صحيح solveLP(داخلا_Array Func, داخلا_Array Constr, OutputArray z)
 {
-    return solveLP(Func, Constr, z, 1e-12);
+    أرجع solveLP(Func, Constr, z, 1e-12);
 }
 
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
-    N.resize(c.cols);
+ساكن صحيح initialize_simplex(Mat_<مزدوج>& c, Mat_<مزدوج>& b,مزدوج& v,vector<صحيح>& N,vector<صحيح>& B,vector<بنانشان صحيح>& اشاريو_منزل_صف){
+    N.resize(c.کانن_ڳڻپ);
     N[0]=0;
-    for (std::vector<int>::iterator it = N.begin()+1 ; it != N.end(); ++it){
+    لكل (std::vector<صحيح>::iterator it = N.begin()+1 ; it != N.end(); ++it){
         *it=it[-1]+1;
     }
-    B.resize(b.rows);
-    B[0]=(int)N.size();
-    for (std::vector<int>::iterator it = B.begin()+1 ; it != B.end(); ++it){
+    B.resize(b.صفون);
+    B[0]=(صحيح)N.size();
+    لكل (std::vector<صحيح>::iterator it = B.begin()+1 ; it != B.end(); ++it){
         *it=it[-1]+1;
     }
-    indexToRow.resize(c.cols+b.rows);
-    indexToRow[0]=0;
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    اشاريو_منزل_صف.resize(c.کانن_ڳڻپ+b.صفون);
+    اشاريو_منزل_صف[0]=0;
+    لكل (std::vector<بنانشان صحيح>::iterator it = اشاريو_منزل_صف.begin()+1 ; it != اشاريو_منزل_صف.end(); ++it){
         *it=it[-1]+1;
     }
     v=0;
 
-    int k=0;
+    صحيح k=0;
     {
-        double min=DBL_MAX;
-        for(int i=0;i<b.rows;i++){
-            if(b(i,b.cols-1)<min){
-                min=b(i,b.cols-1);
+        مزدوج min=DBL_MAX;
+        لكل(صحيح i=0;i<b.صفون;i++){
+            إذا(b(i,b.کانن_ڳڻپ-1)<min){
+                min=b(i,b.کانن_ڳڻپ-1);
                 k=i;
             }
         }
     }
 
-    if(b(k,b.cols-1)>=0){
+    إذا(b(k,b.کانن_ڳڻپ-1)>=0){
         N.erase(N.begin());
-        for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+        لكل (std::vector<بنانشان صحيح>::iterator it = اشاريو_منزل_صف.begin()+1 ; it != اشاريو_منزل_صف.end(); ++it){
             --(*it);
         }
-        return 0;
+        أرجع 0;
     }
 
-    Mat_<double> old_c=c.clone();
+    Mat_<مزدوج> old_c=c.clone();
     c=0;
     c(0,0)=-1;
-    for(int i=0;i<b.rows;i++){
+    لكل(صحيح i=0;i<b.صفون;i++){
         b(i,0)=-1;
     }
 
     print_simplex_state(c,b,v,N,B);
 
     dprintf(("\tWE MAKE PIVOT\n"));
-    pivot(c,b,v,N,B,k,0,indexToRow);
+    محور(c,b,v,N,B,k,0,اشاريو_منزل_صف);
 
     print_simplex_state(c,b,v,N,B);
 
-    inner_simplex(c,b,v,N,B,indexToRow);
+    inner_simplex(c,b,v,N,B,اشاريو_منزل_صف);
 
     dprintf(("\tAFTER INNER_SIMPLEX\n"));
     print_simplex_state(c,b,v,N,B);
 
-    unsigned int nsize = (unsigned int)N.size();
-    if(indexToRow[0]>=nsize){
-        int iterator_offset=indexToRow[0]-nsize;
-        if(b(iterator_offset,b.cols-1)>0){
-            return SOLVELP_UNFEASIBLE;
+    بنانشان صحيح nsize = (بنانشان صحيح)N.size();
+    إذا(اشاريو_منزل_صف[0]>=nsize){
+        صحيح iterator_وٿي=اشاريو_منزل_صف[0]-nsize;
+        إذا(b(iterator_وٿي,b.کانن_ڳڻپ-1)>0){
+            أرجع SOLVELP_UNFEASIBLE;
         }
-        pivot(c,b,v,N,B,iterator_offset,0,indexToRow);
+        محور(c,b,v,N,B,iterator_وٿي,0,اشاريو_منزل_صف);
     }
 
-    vector<int>::iterator iterator;
+    vector<صحيح>::iterator iterator;
     {
-        int iterator_offset=indexToRow[0];
-        iterator=N.begin()+iterator_offset;
+        صحيح iterator_وٿي=اشاريو_منزل_صف[0];
+        iterator=N.begin()+iterator_وٿي;
         std::iter_swap(iterator,N.begin());
-        SWAP(int,indexToRow[*iterator],indexToRow[0]);
-        swap_columns(c,iterator_offset,0);
-        swap_columns(b,iterator_offset,0);
+        مٽا_سٽا(صحيح,اشاريو_منزل_صف[*iterator],اشاريو_منزل_صف[0]);
+        مٽا_سٽا_columns(c,iterator_وٿي,0);
+        مٽا_سٽا_columns(b,iterator_وٿي,0);
     }
 
     dprintf(("after swaps\n"));
@@ -243,18 +243,18 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     //start from 1, because we ignore x_0
     c=0;
     v=0;
-    for(int I=1;I<old_c.cols;I++){
-        if(indexToRow[I]<nsize){
+    لكل(صحيح I=1;I<old_c.کانن_ڳڻپ;I++){
+        إذا(اشاريو_منزل_صف[I]<nsize){
             dprintf(("I=%d from nonbasic\n",I));
-            int iterator_offset=indexToRow[I];
-            c(0,iterator_offset)+=old_c(0,I);
-            print_matrix(c);
-        }else{
+            صحيح iterator_وٿي=اشاريو_منزل_صف[I];
+            c(0,iterator_وٿي)+=old_c(0,I);
+            print_ميٽرڪس(c);
+        }وإلا{
             dprintf(("I=%d from basic\n",I));
-            int iterator_offset=indexToRow[I]-nsize;
-            c-=old_c(0,I)*b.row(iterator_offset).colRange(0,b.cols-1);
-            v+=old_c(0,I)*b(iterator_offset,b.cols-1);
-            print_matrix(c);
+            صحيح iterator_وٿي=اشاريو_منزل_صف[I]-nsize;
+            c-=old_c(0,I)*b.صف(iterator_وٿي).کانو_Range_2(0,b.کانن_ڳڻپ-1);
+            v+=old_c(0,I)*b(iterator_وٿي,b.کانن_ڳڻپ-1);
+            print_ميٽرڪس(c);
         }
     }
 
@@ -262,118 +262,118 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     print_simplex_state(c,b,v,N,B);
 
     N.erase(N.begin());
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    لكل (std::vector<بنانشان صحيح>::iterator it = اشاريو_منزل_صف.begin()+1 ; it != اشاريو_منزل_صف.end(); ++it){
         --(*it);
     }
-    return 0;
+    أرجع 0;
 }
 
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
+ساكن صحيح inner_simplex(Mat_<مزدوج>& c, Mat_<مزدوج>& b,مزدوج& v,vector<صحيح>& N,vector<صحيح>& B,vector<بنانشان صحيح>& اشاريو_منزل_صف){
 
-    for(;;){
-        MatIterator_<double> pos_ptr;
-        int e=-1,pos_ctr=0,min_var=INT_MAX;
-        bool all_nonzero=true;
-        for(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
-            if(*pos_ptr==0){
-                all_nonzero=false;
+    لكل(;;){
+        MatIterator_<مزدوج> pos_ptr;
+        صحيح e=-1,pos_ctr=0,min_var=وڌ_کان_وڌ_عدد;
+        منطقي all_nonzero=سچ;
+        لكل(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
+            إذا(*pos_ptr==0){
+                all_nonzero=خطأ;
             }
-            if(*pos_ptr>0){
-                if(N[pos_ctr]<min_var){
+            إذا(*pos_ptr>0){
+                إذا(N[pos_ctr]<min_var){
                     e=pos_ctr;
                     min_var=N[pos_ctr];
                 }
             }
         }
-        if(e==-1){
+        إذا(e==-1){
             dprintf(("hello from e==-1\n"));
-            print_matrix(c);
-            if(all_nonzero==true){
-                return SOLVELP_SINGLE;
-            }else{
-                return SOLVELP_MULTI;
+            print_ميٽرڪس(c);
+            إذا(all_nonzero==سچ){
+                أرجع SOLVELP_SINGLE;
+            }وإلا{
+                أرجع SOLVELP_MULTI;
             }
         }
 
-        int l=-1;
-        min_var=INT_MAX;
-        double min=DBL_MAX;
-        int row_it=0;
-        MatIterator_<double> min_row_ptr=b.begin();
-        for(MatIterator_<double> it=b.begin();it!=b.end();it+=b.cols,row_it++){
-            double myite=0;
+        صحيح l=-1;
+        min_var=وڌ_کان_وڌ_عدد;
+        مزدوج min=DBL_MAX;
+        صحيح صف_it=0;
+        MatIterator_<مزدوج> min_صف_ptr=b.begin();
+        لكل(MatIterator_<مزدوج> it=b.begin();it!=b.end();it+=b.کانن_ڳڻپ,صف_it++){
+            مزدوج myite=0;
             //check constraints, select the tightest one, reinforcing Bland's rule
-            if((myite=it[e])>0){
-                double val=it[b.cols-1]/myite;
-                if(val<min || (val==min && B[row_it]<min_var)){
-                    min_var=B[row_it];
-                    min_row_ptr=it;
+            إذا((myite=it[e])>0){
+                مزدوج val=it[b.کانن_ڳڻپ-1]/myite;
+                إذا(val<min || (val==min && B[صف_it]<min_var)){
+                    min_var=B[صف_it];
+                    min_صف_ptr=it;
                     min=val;
-                    l=row_it;
+                    l=صف_it;
                 }
             }
         }
-        if(l==-1){
-            return SOLVELP_UNBOUNDED;
+        إذا(l==-1){
+            أرجع SOLVELP_UNBOUNDED;
         }
         dprintf(("the tightest constraint is in row %d with %g\n",l,min));
 
-        pivot(c,b,v,N,B,l,e,indexToRow);
+        محور(c,b,v,N,B,l,e,اشاريو_منزل_صف);
 
         dprintf(("objective, v=%g\n",v));
-        print_matrix(c);
+        print_ميٽرڪس(c);
         dprintf(("constraints\n"));
-        print_matrix(b);
+        print_ميٽرڪس(b);
         dprintf(("non-basic: "));
-        print_matrix(Mat(N));
+        print_ميٽرڪس(Mat(N));
         dprintf(("basic: "));
-        print_matrix(Mat(B));
+        print_ميٽرڪس(Mat(B));
     }
 }
 
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,
-        int leaving_index,int entering_index,vector<unsigned int>& indexToRow){
-    double Coef=b(leaving_index,entering_index);
-    for(int i=0;i<b.cols;i++){
-        if(i==entering_index){
-            b(leaving_index,i)=1/Coef;
-        }else{
-            b(leaving_index,i)/=Coef;
+ساكن مضمن فراغ محور(Mat_<مزدوج>& c,Mat_<مزدوج>& b,مزدوج& v,vector<صحيح>& N,vector<صحيح>& B,
+        صحيح leaving_اشاريو,صحيح entering_اشاريو,vector<بنانشان صحيح>& اشاريو_منزل_صف){
+    مزدوج Coef=b(leaving_اشاريو,entering_اشاريو);
+    لكل(صحيح i=0;i<b.کانن_ڳڻپ;i++){
+        إذا(i==entering_اشاريو){
+            b(leaving_اشاريو,i)=1/Coef;
+        }وإلا{
+            b(leaving_اشاريو,i)/=Coef;
         }
     }
 
-    for(int i=0;i<b.rows;i++){
-        if(i!=leaving_index){
-            double coef=b(i,entering_index);
-            for(int j=0;j<b.cols;j++){
-                if(j==entering_index){
-                    b(i,j)=-coef*b(leaving_index,j);
-                }else{
-                    b(i,j)-=(coef*b(leaving_index,j));
+    لكل(صحيح i=0;i<b.صفون;i++){
+        إذا(i!=leaving_اشاريو){
+            مزدوج coef=b(i,entering_اشاريو);
+            لكل(صحيح j=0;j<b.کانن_ڳڻپ;j++){
+                إذا(j==entering_اشاريو){
+                    b(i,j)=-coef*b(leaving_اشاريو,j);
+                }وإلا{
+                    b(i,j)-=(coef*b(leaving_اشاريو,j));
                 }
             }
         }
     }
 
     //objective function
-    Coef=c(0,entering_index);
-    for(int i=0;i<(b.cols-1);i++){
-        if(i==entering_index){
-            c(0,i)=-Coef*b(leaving_index,i);
-        }else{
-            c(0,i)-=Coef*b(leaving_index,i);
+    Coef=c(0,entering_اشاريو);
+    لكل(صحيح i=0;i<(b.کانن_ڳڻپ-1);i++){
+        إذا(i==entering_اشاريو){
+            c(0,i)=-Coef*b(leaving_اشاريو,i);
+        }وإلا{
+            c(0,i)-=Coef*b(leaving_اشاريو,i);
         }
     }
     dprintf(("v was %g\n",v));
-    v+=Coef*b(leaving_index,b.cols-1);
+    v+=Coef*b(leaving_اشاريو,b.کانن_ڳڻپ-1);
 
-    SWAP(int,N[entering_index],B[leaving_index]);
-    SWAP(int,indexToRow[N[entering_index]],indexToRow[B[leaving_index]]);
+    مٽا_سٽا(صحيح,N[entering_اشاريو],B[leaving_اشاريو]);
+    مٽا_سٽا(صحيح,اشاريو_منزل_صف[N[entering_اشاريو]],اشاريو_منزل_صف[B[leaving_اشاريو]]);
 }
 
-static inline void swap_columns(Mat_<double>& A,int col1,int col2){
-    for(int i=0;i<A.rows;i++){
-        double tmp=A(i,col1);
+ساكن مضمن فراغ مٽا_سٽا_columns(Mat_<مزدوج>& A,صحيح col1,صحيح col2){
+    لكل(صحيح i=0;i<A.صفون;i++){
+        مزدوج tmp=A(i,col1);
         A(i,col1)=A(i,col2);
         A(i,col2)=tmp;
     }

@@ -9,282 +9,282 @@
 //==================================================================================================
 // Dynamic backend implementation
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"
+#ضمن "opencv2/core/utils/plugin_loader.private.hpp"
 
-namespace cv { namespace impl {
+نطاق cv { نطاق impl {
 
-using namespace cv::parallel;
+استعمال نطاق cv::parallel;
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#إذا OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
 
-using namespace cv::plugin::impl;  // plugin_loader.hpp
+استعمال نطاق cv::plugin::impl;  // plugin_loader.hpp
 
-class PluginParallelBackend CV_FINAL: public std::enable_shared_from_this<PluginParallelBackend>
+صنف PluginParallelBackend CV_FINAL: عام std::enable_shared_from_this<PluginParallelBackend>
 {
-protected:
-    void initPluginAPI()
+محمي:
+    فراغ initPluginAPI()
     {
-        const char* init_name = "opencv_core_parallel_plugin_init_v0";
-        FN_opencv_core_parallel_plugin_init_t fn_init = reinterpret_cast<FN_opencv_core_parallel_plugin_init_t>(lib_->getSymbol(init_name));
-        if (fn_init)
+        ثابت حرف* init_name = "opencv_core_parallel_plugin_init_v0";
+        FN_opencv_core_parallel_plugin_init_t fn_init = reinterpret_cast<FN_opencv_core_parallel_plugin_init_t>(lib_->get_نشان(init_name));
+        إذا (fn_init)
         {
-            CV_LOG_DEBUG(NULL, "Found entry: '" << init_name << "'");
-            for (int supported_api_version = API_VERSION; supported_api_version >= 0; supported_api_version--)
+            CV_LOG_DEBUG(عدم, "Found entry: '" << init_name << "'");
+            لكل (صحيح supported_api_نسخو = API_نسخو; supported_api_نسخو >= 0; supported_api_نسخو--)
             {
-                plugin_api_ = fn_init(ABI_VERSION, supported_api_version, NULL);
-                if (plugin_api_)
-                    break;
+                plugin_api_ = fn_init(ABI_نسخو, supported_api_نسخو, عدم);
+                إذا (plugin_api_)
+                    اكسر;
             }
-            if (!plugin_api_)
+            إذا (!plugin_api_)
             {
-                CV_LOG_INFO(NULL, "core(parallel): plugin is incompatible (can't be initialized): " << lib_->getName());
-                return;
+                CV_LOG_INFO(عدم, "core(parallel): plugin is incompatible (can't be initialized): " << lib_->getName());
+                أرجع;
             }
-            if (!checkCompatibility(plugin_api_->api_header, ABI_VERSION, API_VERSION, false))
+            إذا (!checkCompatibility(plugin_api_->api_سرو, ABI_نسخو, API_نسخو, خطأ))
             {
-                plugin_api_ = NULL;
-                return;
+                plugin_api_ = عدم;
+                أرجع;
             }
-            CV_LOG_INFO(NULL, "core(parallel): plugin is ready to use '" << plugin_api_->api_header.api_description << "'");
+            CV_LOG_INFO(عدم, "core(parallel): plugin is ready to use '" << plugin_api_->api_سرو.api_description << "'");
         }
-        else
+        وإلا
         {
-            CV_LOG_INFO(NULL, "core(parallel): plugin is incompatible, missing init function: '" << init_name << "', file: " << lib_->getName());
+            CV_LOG_INFO(عدم, "core(parallel): plugin is incompatible, missing init function: '" << init_name << "', file: " << lib_->getName());
         }
     }
 
 
-    bool checkCompatibility(const OpenCV_API_Header& api_header, unsigned int abi_version, unsigned int api_version, bool checkMinorOpenCVVersion)
+    منطقي checkCompatibility(ثابت Open_CV_API_سرو& api_سرو, بنانشان صحيح abi_نسخو, بنانشان صحيح api_نسخو, منطقي checkMinorOpenCVVersion)
     {
-        if (api_header.opencv_version_major != CV_VERSION_MAJOR)
+        إذا (api_سرو.opencv_نسخو_major != CV_نسخو_MAJOR)
         {
-            CV_LOG_ERROR(NULL, "core(parallel): wrong OpenCV major version used by plugin '" << api_header.api_description << "': " <<
-                cv::format("%d.%d, OpenCV version is '" CV_VERSION "'", api_header.opencv_version_major, api_header.opencv_version_minor))
-            return false;
+            CV_LOG_ERROR(عدم, "core(parallel): wrong OpenCV major version used by plugin '" << api_سرو.api_description << "': " <<
+                cv::format("%d.%d, OpenCV version is '" CV_نسخو "'", api_سرو.opencv_نسخو_major, api_سرو.opencv_نسخو_minor))
+            أرجع خطأ;
         }
-        if (!checkMinorOpenCVVersion)
+        إذا (!checkMinorOpenCVVersion)
         {
             // no checks for OpenCV minor version
         }
-        else if (api_header.opencv_version_minor != CV_VERSION_MINOR)
+        وإلا إذا (api_سرو.opencv_نسخو_minor != CV_نسخو_MINOR)
         {
-            CV_LOG_ERROR(NULL, "core(parallel): wrong OpenCV minor version used by plugin '" << api_header.api_description << "': " <<
-                cv::format("%d.%d, OpenCV version is '" CV_VERSION "'", api_header.opencv_version_major, api_header.opencv_version_minor))
-            return false;
+            CV_LOG_ERROR(عدم, "core(parallel): wrong OpenCV minor version used by plugin '" << api_سرو.api_description << "': " <<
+                cv::format("%d.%d, OpenCV version is '" CV_نسخو "'", api_سرو.opencv_نسخو_major, api_سرو.opencv_نسخو_minor))
+            أرجع خطأ;
         }
-        CV_LOG_DEBUG(NULL, "core(parallel): initialized '" << api_header.api_description << "': built with "
+        CV_LOG_DEBUG(عدم, "core(parallel): initialized '" << api_سرو.api_description << "': built with "
             << cv::format("OpenCV %d.%d (ABI/API = %d/%d)",
-                 api_header.opencv_version_major, api_header.opencv_version_minor,
-                 api_header.min_api_version, api_header.api_version)
-            << ", current OpenCV version is '" CV_VERSION "' (ABI/API = " << abi_version << "/" << api_version << ")"
+                 api_سرو.opencv_نسخو_major, api_سرو.opencv_نسخو_minor,
+                 api_سرو.min_api_نسخو, api_سرو.api_نسخو)
+            << ", current OpenCV version is '" CV_نسخو "' (ABI/API = " << abi_نسخو << "/" << api_نسخو << ")"
         );
-        if (api_header.min_api_version != abi_version)  // future: range can be here
+        إذا (api_سرو.min_api_نسخو != abi_نسخو)  // future: range can be here
         {
             // actually this should never happen due to checks in plugin's init() function
-            CV_LOG_ERROR(NULL, "core(parallel): plugin is not supported due to incompatible ABI = " << api_header.min_api_version);
-            return false;
+            CV_LOG_ERROR(عدم, "core(parallel): plugin is not supported due to incompatible ABI = " << api_سرو.min_api_نسخو);
+            أرجع خطأ;
         }
-        if (api_header.api_version != api_version)
+        إذا (api_سرو.api_نسخو != api_نسخو)
         {
-            CV_LOG_INFO(NULL, "core(parallel): NOTE: plugin is supported, but there is API version mismath: "
-                << cv::format("plugin API level (%d) != OpenCV API level (%d)", api_header.api_version, api_version));
-            if (api_header.api_version < api_version)
+            CV_LOG_INFO(عدم, "core(parallel): NOTE: plugin is supported, but there is API version mismath: "
+                << cv::format("plugin API level (%d) != OpenCV API level (%d)", api_سرو.api_نسخو, api_نسخو));
+            إذا (api_سرو.api_نسخو < api_نسخو)
             {
-                CV_LOG_INFO(NULL, "core(parallel): NOTE: some functionality may be unavailable due to lack of support by plugin implementation");
+                CV_LOG_INFO(عدم, "core(parallel): NOTE: some functionality may be unavailable due to lack of support by plugin implementation");
             }
         }
-        return true;
+        أرجع سچ;
     }
 
-public:
+عام:
     std::shared_ptr<cv::plugin::impl::DynamicLib> lib_;
-    const OpenCV_Core_Parallel_Plugin_API* plugin_api_;
+    ثابت OpenCV_Core_Parallel_Plugin_API* plugin_api_;
 
-    PluginParallelBackend(const std::shared_ptr<cv::plugin::impl::DynamicLib>& lib)
+    PluginParallelBackend(ثابت std::shared_ptr<cv::plugin::impl::DynamicLib>& lib)
         : lib_(lib)
-        , plugin_api_(NULL)
+        , plugin_api_(عدم)
     {
         initPluginAPI();
     }
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() ثابت
     {
         CV_Assert(plugin_api_);
 
-        CvPluginParallelBackendAPI instancePtr = NULL;
+        CvPluginParallelBackendAPI instancePtr = عدم;
 
-        if (plugin_api_->v0.getInstance)
+        إذا (plugin_api_->v0.getInstance)
         {
-            if (CV_ERROR_OK == plugin_api_->v0.getInstance(&instancePtr))
+            إذا (CV_ERROR_OK == plugin_api_->v0.getInstance(&instancePtr))
             {
                 CV_Assert(instancePtr);
                 // TODO C++20 "aliasing constructor"
-                return std::shared_ptr<cv::parallel::ParallelForAPI>(instancePtr, [](cv::parallel::ParallelForAPI*){});  // empty deleter
+                أرجع std::shared_ptr<cv::parallel::ParallelForAPI>(instancePtr, [](cv::parallel::ParallelForAPI*){});  // empty deleter
             }
         }
-        return std::shared_ptr<cv::parallel::ParallelForAPI>();
+        أرجع std::shared_ptr<cv::parallel::ParallelForAPI>();
     }
 };
 
 
-class PluginParallelBackendFactory CV_FINAL: public IParallelBackendFactory
+صنف PluginParallelBackendFactory CV_FINAL: عام IParallelBackendFactory
 {
-public:
-    std::string baseName_;
+عام:
+    std::string بنياد_Name_2;
     std::shared_ptr<PluginParallelBackend> backend;
-    bool initialized;
-public:
-    PluginParallelBackendFactory(const std::string& baseName)
-        : baseName_(baseName)
-        , initialized(false)
+    منطقي initialized;
+عام:
+    PluginParallelBackendFactory(ثابت std::string& بنياد_Name)
+        : بنياد_Name_2(بنياد_Name)
+        , initialized(خطأ)
     {
         // nothing, plugins are loaded on demand
     }
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() ثابت CV_OVERRIDE
     {
-        if (!initialized)
+        إذا (!initialized)
         {
-            const_cast<PluginParallelBackendFactory*>(this)->initBackend();
+            const_cast<PluginParallelBackendFactory*>(هذا)->initBackend();
         }
-        if (backend)
-            return backend->create();
-        return std::shared_ptr<cv::parallel::ParallelForAPI>();
+        إذا (backend)
+            أرجع backend->create();
+        أرجع std::shared_ptr<cv::parallel::ParallelForAPI>();
     }
-protected:
-    void initBackend()
+محمي:
+    فراغ initBackend()
     {
-        AutoLock lock(getInitializationMutex());
-        try
+        Auto_تالو lock(getInitializationMutex());
+        حاول
         {
-            if (!initialized)
-                loadPlugin();
+            إذا (!initialized)
+                ڀريو_Plugin();
         }
-        catch (...)
+        امسك (...)
         {
-            CV_LOG_INFO(NULL, "core(parallel): exception during plugin loading: " << baseName_ << ". SKIP");
+            CV_LOG_INFO(عدم, "core(parallel): exception during plugin loading: " << بنياد_Name_2 << ". SKIP");
         }
-        initialized = true;
+        initialized = سچ;
     }
-    void loadPlugin();
+    فراغ ڀريو_Plugin();
 };
 
-static
-std::vector<FileSystemPath_t> getPluginCandidates(const std::string& baseName)
+ساكن
+std::vector<File_System_رستو_t> getPluginCandidates(ثابت std::string& بنياد_Name)
 {
-    using namespace cv::utils;
-    using namespace cv::utils::fs;
-    const std::string baseName_l = toLowerCase(baseName);
-    const std::string baseName_u = toUpperCase(baseName);
-    const FileSystemPath_t baseName_l_fs = toFileSystemPath(baseName_l);
-    std::vector<FileSystemPath_t> paths;
+    استعمال نطاق cv::utils;
+    استعمال نطاق cv::utils::fs;
+    ثابت std::string بنياد_Name_l = منزل_هيٺاهون_Case(بنياد_Name);
+    ثابت std::string بنياد_Name_u = منزل_مٿانهون_Case(بنياد_Name);
+    ثابت File_System_رستو_t بنياد_Name_l_fs = منزل_File_System_رستو(بنياد_Name_l);
+    std::vector<File_System_رستو_t> paths;
     // TODO OPENCV_PLUGIN_PATH
-    const std::vector<std::string> paths_ = getConfigurationParameterPaths("OPENCV_CORE_PLUGIN_PATH", std::vector<std::string>());
-    if (paths_.size() != 0)
+    ثابت std::vector<std::string> paths_ = getConfigurationParameterPaths("OPENCV_CORE_PLUGIN_PATH", std::vector<std::string>());
+    إذا (paths_.size() != 0)
     {
-        for (size_t i = 0; i < paths_.size(); i++)
+        لكل (size_t i = 0; i < paths_.size(); i++)
         {
-            paths.push_back(toFileSystemPath(paths_[i]));
+            paths.push_back(منزل_File_System_رستو(paths_[i]));
         }
     }
-    else
+    وإلا
     {
-        FileSystemPath_t binaryLocation;
-        if (getBinLocation(binaryLocation))
+        File_System_رستو_t ٻٽو_Location;
+        إذا (getBinLocation(ٻٽو_Location))
         {
-            binaryLocation = getParent(binaryLocation);
-#ifndef CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY
-            paths.push_back(binaryLocation);
-#else
-            paths.push_back(binaryLocation + toFileSystemPath("/") + toFileSystemPath(CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY_STR));
-#endif
+            ٻٽو_Location = get_والد(ٻٽو_Location);
+#جيڪڏهن_وصف_نه_ٿيل CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY
+            paths.push_back(ٻٽو_Location);
+#وإلا
+            paths.push_back(ٻٽو_Location + منزل_File_System_رستو("/") + منزل_File_System_رستو(CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY_STR));
+#جيڪڏهن_پورو
         }
     }
-    const std::string default_expr = libraryPrefix() + "opencv_core_parallel_" + baseName_l + "*" + librarySuffix();
-    const std::string plugin_expr = getConfigurationParameterString((std::string("OPENCV_CORE_PARALLEL_PLUGIN_") + baseName_u).c_str(), default_expr.c_str());
-    std::vector<FileSystemPath_t> results;
-#ifdef _WIN32
-    FileSystemPath_t moduleName = toFileSystemPath(libraryPrefix() + "opencv_core_parallel_" + baseName_l + librarySuffix());
-    if (plugin_expr != default_expr)
+    ثابت std::string default_اظهار = library_اڳياڙي() + "opencv_core_parallel_" + بنياد_Name_l + "*" + librarySuffix();
+    ثابت std::string plugin_اظهار = getConfigurationParameterString((std::string("OPENCV_CORE_PARALLEL_PLUGIN_") + بنياد_Name_u).c_str(), default_اظهار.c_str());
+    std::vector<File_System_رستو_t> results;
+#جيڪڏهن_وصف_ٿيل _WIN32
+    File_System_رستو_t moduleName = منزل_File_System_رستو(library_اڳياڙي() + "opencv_core_parallel_" + بنياد_Name_l + librarySuffix());
+    إذا (plugin_اظهار != default_اظهار)
     {
-        moduleName = toFileSystemPath(plugin_expr);
+        moduleName = منزل_File_System_رستو(plugin_اظهار);
         results.push_back(moduleName);
     }
-    for (const FileSystemPath_t& path : paths)
+    لكل (ثابت File_System_رستو_t& رستو : paths)
     {
-        results.push_back(path + L"\\" + moduleName);
+        results.push_back(رستو + L"\\" + moduleName);
     }
     results.push_back(moduleName);
-#else
-    CV_LOG_DEBUG(NULL, "core(parallel): " << baseName << " plugin's glob is '" << plugin_expr << "', " << paths.size() << " location(s)");
-    for (const std::string& path : paths)
+#وإلا
+    CV_LOG_DEBUG(عدم, "core(parallel): " << بنياد_Name << " plugin's glob is '" << plugin_اظهار << "', " << paths.size() << " location(s)");
+    لكل (ثابت std::string& رستو : paths)
     {
-        if (path.empty())
-            continue;
+        إذا (رستو.empty())
+            استمر;
         std::vector<std::string> candidates;
-        cv::glob(utils::fs::join(path, plugin_expr), candidates);
+        cv::glob(utils::fs::join(رستو, plugin_اظهار), candidates);
         // Prefer candisates with higher versions
         // TODO: implemented accurate versions-based comparator
         std::sort(candidates.begin(), candidates.end(), std::greater<std::string>());
-        CV_LOG_DEBUG(NULL, "    - " << path << ": " << candidates.size());
+        CV_LOG_DEBUG(عدم, "    - " << رستو << ": " << candidates.size());
         copy(candidates.begin(), candidates.end(), back_inserter(results));
     }
-#endif
-    CV_LOG_DEBUG(NULL, "Found " << results.size() << " plugin(s) for " << baseName);
-    return results;
+#جيڪڏهن_پورو
+    CV_LOG_DEBUG(عدم, "Found " << results.size() << " plugin(s) for " << بنياد_Name);
+    أرجع results;
 }
 
-void PluginParallelBackendFactory::loadPlugin()
+فراغ PluginParallelBackendFactory::ڀريو_Plugin()
 {
-    for (const FileSystemPath_t& plugin : getPluginCandidates(baseName_))
+    لكل (ثابت File_System_رستو_t& plugin : getPluginCandidates(بنياد_Name_2))
     {
-        auto lib = std::make_shared<cv::plugin::impl::DynamicLib>(plugin);
-        if (!lib->isLoaded())
+        خودڪار lib = std::make_shared<cv::plugin::impl::DynamicLib>(plugin);
+        إذا (!lib->isLoaded())
         {
-            continue;
+            استمر;
         }
-        try
+        حاول
         {
-            auto pluginBackend = std::make_shared<PluginParallelBackend>(lib);
-            if (!pluginBackend)
+            خودڪار pluginBackend = std::make_shared<PluginParallelBackend>(lib);
+            إذا (!pluginBackend)
             {
-                continue;
+                استمر;
             }
-            if (pluginBackend->plugin_api_ == NULL)
+            إذا (pluginBackend->plugin_api_ == عدم)
             {
-                CV_LOG_ERROR(NULL, "core(parallel): no compatible plugin API for backend: " << baseName_ << " in " << toPrintablePath(plugin));
-                continue;
+                CV_LOG_ERROR(عدم, "core(parallel): no compatible plugin API for backend: " << بنياد_Name_2 << " in " << منزل_Printable_رستو(plugin));
+                استمر;
             }
-#if !defined(_WIN32)
+#إذا !defined(_WIN32)
             // NB: we are going to use parallel backend, so prevent automatic library unloading
             // (avoid uncontrolled crashes in worker threads of underlying libraries: libgomp, libtbb)
             // details: https://github.com/opencv/opencv/pull/19470#pullrequestreview-589834777
             lib->disableAutomaticLibraryUnloading();
-#endif
+#جيڪڏهن_پورو
             backend = pluginBackend;
-            return;
+            أرجع;
         }
-        catch (...)
+        امسك (...)
         {
-            CV_LOG_WARNING(NULL, "core(parallel): exception during plugin initialization: " << toPrintablePath(plugin) << ". SKIP");
+            CV_LOG_WARNING(عدم, "core(parallel): exception during plugin initialization: " << منزل_Printable_رستو(plugin) << ". SKIP");
         }
     }
 }
 
-#endif  // OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#جيڪڏهن_پورو  // OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
 
 }  // namespace
 
-namespace parallel {
+نطاق parallel {
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName)
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(ثابت std::string& بنياد_Name)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
-    return std::make_shared<impl::PluginParallelBackendFactory>(baseName);
-#else
-    CV_UNUSED(baseName);
-    return std::shared_ptr<IParallelBackendFactory>();
-#endif
+#إذا OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+    أرجع std::make_shared<impl::PluginParallelBackendFactory>(بنياد_Name);
+#وإلا
+    CV_اڻ_استعمال_ٿيل(بنياد_Name);
+    أرجع std::shared_ptr<IParallelBackendFactory>();
+#جيڪڏهن_پورو
 }
 
 }}  // namespace
