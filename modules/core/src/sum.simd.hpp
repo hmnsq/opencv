@@ -9,41 +9,41 @@
 namespace cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-template<typename T, typename ST, int (*fn)(const T*, const uchar*, ST*, int, int)>
-static int sumWrap(const uchar* src, const uchar* mask, uchar* sum, int len, int cn)
+template<typename T, typename ST, ཧྲིལ (*fn)(const T*, const uchar*, ST*, ཧྲིལ, ཧྲིལ)>
+static ཧྲིལ sumWrap(const uchar* src, const uchar* mask, uchar* sum, ཧྲིལ len, ཧྲིལ cn)
 {
-    return fn((const T*)src, mask, (ST*)sum, len, cn);
+    ལོག fn((const T*)src, mask, (ST*)sum, len, cn);
 }
 
-SumFunc getSumFunc(int depth);
+SumFunc getSumFunc(ཧྲིལ depth);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
 template <typename T, typename ST>
-struct Sum_SIMD
+sa_nracanaa Sum_SIMD
 {
-    Sum_SIMD(int) {}
-    int operator () (const T*, const uchar*, ST*, int, int) const
+    Sum_SIMD(ཧྲིལ) {}
+    ཧྲིལ operator () (const T*, const uchar*, ST*, ཧྲིལ, ཧྲིལ) const
     {
-        return 0;
+        ལོག 0;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#གལ་སྲིད (CV_SIMD || CV_SIMD_SCALABLE)
 
 #undef REDUCE_PARTIAL_SUMS
 #define REDUCE_PARTIAL_SUMS() \
-    if (cn == 1) \
+    གལ་སྲིད (cn == 1) \
         dst[0] += v_reduce_sum(v_add(v_add(s0, s1), s2)); \
-    else if (cn == 2) { \
+    དེ་མིན གལ་སྲིད (cn == 2) { \
         s0 = v_add(v_add(s0, s1), s2); \
         dst[0] += v_reduce_sum(v_and(s0, m0)); \
         dst[1] += v_reduce_sum(v_and(s0, m1)); \
-    } else if (cn == 3) { \
+    } དེ་མིན གལ་སྲིད (cn == 3) { \
         dst[0] += v_reduce_sum(v_add(v_add(v_and(s0, m0), v_and(s1, m1)), v_and(s2, m2))); \
         dst[1] += v_reduce_sum(v_add(v_add(v_and(s0, m3), v_and(s1, m4)), v_and(s2, m5))); \
         dst[2] += v_reduce_sum(v_add(v_add(v_and(s0, m6), v_and(s1, m7)), v_and(s2, m8))); \
-    } else if (cn == 4) { \
+    } དེ་མིན གལ་སྲིད (cn == 4) { \
         s0 = v_add(v_add(s0, s1), s2); \
         dst[0] += v_reduce_sum(v_and(s0, m0)); \
         dst[1] += v_reduce_sum(v_and(s0, m1)); \
@@ -52,24 +52,24 @@ struct Sum_SIMD
     }
 
 template<typename ST>
-static void init_maskbuf(ST* maskbuf, int cn, int simd_width)
+static void init_maskbuf(ST* maskbuf, ཧྲིལ cn, ཧྲིལ simd_width)
 {
-    memset(maskbuf, 0, simd_width*9*sizeof(maskbuf[0]));
-    if (cn == 1)
+    memset(maskbuf, 0, simd_width*9*parimaa_na(maskbuf[0]));
+    གལ་སྲིད (cn == 1)
         ;
-    else if (cn == 2)
-        for (int i = 0; i < simd_width; i += 2) {
+    དེ་མིན གལ་སྲིད (cn == 2)
+        དོན་ལུ (ཧྲིལ i = 0; i < simd_width; i += 2) {
             maskbuf[i] = (ST)-1;
             maskbuf[i+1+simd_width] = (ST)-1;
         }
-    else if (cn == 3)
-        for (int i = 0; i < simd_width*3; i += 3) {
+    དེ་མིན གལ་སྲིད (cn == 3)
+        དོན་ལུ (ཧྲིལ i = 0; i < simd_width*3; i += 3) {
             maskbuf[i] = (ST)-1;
             maskbuf[i+1+simd_width*3] = (ST)-1;
             maskbuf[i+2+simd_width*6] = (ST)-1;
         }
-    else if (cn == 4 && simd_width >= 4) {
-        for (int i = 0; i < simd_width; i += 4) {
+    དེ་མིན གལ་སྲིད (cn == 4 && simd_width >= 4) {
+        དོན་ལུ (ཧྲིལ i = 0; i < simd_width; i += 4) {
             maskbuf[i] = (ST)-1;
             maskbuf[i+1+simd_width] = (ST)-1;
             maskbuf[i+2+simd_width*2] = (ST)-1;
@@ -80,22 +80,22 @@ static void init_maskbuf(ST* maskbuf, int cn, int simd_width)
 
 #undef DEFINE_SUM_SIMD_8
 #define DEFINE_SUM_SIMD_8(T, ST, iST, VecT, load_op) \
-template<> struct Sum_SIMD<T, ST> \
+template<> sa_nracanaa Sum_SIMD<T, ST> \
 { \
-    Sum_SIMD(int cn) \
+    Sum_SIMD(ཧྲིལ cn) \
     { \
         init_maskbuf((iST*)maskbuf, cn, VTraits<VecT>::vlanes()); \
     } \
-    int operator ()(const T* src, const uchar* mask, ST* dst, int len, int cn) const \
+    ཧྲིལ operator ()(const T* src, const uchar* mask, ST* dst, ཧྲིལ len, ཧྲིལ cn) const \
     { \
-        if (mask || (cn < 1 || cn > 4)) \
-            return 0; \
+        གལ་སྲིད (mask || (cn < 1 || cn > 4)) \
+            ལོག 0; \
         len *= cn; \
-        int x = 0, simd_width = VTraits<VecT>::vlanes(); \
+        ཧྲིལ x = 0, simd_width = VTraits<VecT>::vlanes(); \
         VecT m0 = vx_load(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
-        if (cn == 1) { \
+        གལ་སྲིད (cn == 1) { \
             m1 = m2 = m3 = m4 = m5 = m6 = m7 = m8 = m0; \
-        } else { \
+        } དེ་མིན { \
             m1 = vx_load(maskbuf + simd_width); \
             m2 = vx_load(maskbuf + simd_width*2); \
             m3 = vx_load(maskbuf + simd_width*3); \
@@ -106,7 +106,7 @@ template<> struct Sum_SIMD<T, ST> \
             m8 = vx_load(maskbuf + simd_width*8); \
         } \
         VecT s0 = v_xor(m0, m0), s1 = s0, s2 = s0; \
-        for (; x <= len - simd_width*6; x += simd_width*6) { \
+        དོན་ལུ (; x <= len - simd_width*6; x += simd_width*6) { \
             auto v0 = load_op(src + x); \
             auto v1 = load_op(src + x + simd_width*2); \
             auto v2 = load_op(src + x + simd_width*4); \
@@ -119,29 +119,29 @@ template<> struct Sum_SIMD<T, ST> \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
-        return x / cn; \
+        ལོག x / cn; \
     } \
     ST maskbuf[VTraits<VecT>::max_nlanes*9]; \
 };
 
 #undef DEFINE_SUM_SIMD_16
 #define DEFINE_SUM_SIMD_16(T, ST, iST, VecT, load_op) \
-template<> struct Sum_SIMD<T, ST> \
+template<> sa_nracanaa Sum_SIMD<T, ST> \
 { \
-    Sum_SIMD(int cn) \
+    Sum_SIMD(ཧྲིལ cn) \
     { \
         init_maskbuf((iST*)maskbuf, cn, VTraits<VecT>::vlanes()); \
     } \
-    int operator ()(const T* src, const uchar* mask, ST* dst, int len, int cn) const \
+    ཧྲིལ operator ()(const T* src, const uchar* mask, ST* dst, ཧྲིལ len, ཧྲིལ cn) const \
     { \
-        if (mask || (cn < 1 || cn > 4)) \
-            return 0; \
+        གལ་སྲིད (mask || (cn < 1 || cn > 4)) \
+            ལོག 0; \
         len *= cn; \
-        int x = 0, simd_width = VTraits<VecT>::vlanes(); \
+        ཧྲིལ x = 0, simd_width = VTraits<VecT>::vlanes(); \
         VecT m0 = vx_load(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
-        if (cn == 1) { \
+        གལ་སྲིད (cn == 1) { \
             m1 = m2 = m3 = m4 = m5 = m6 = m7 = m8 = m0; \
-        } else { \
+        } དེ་མིན { \
             m1 = vx_load(maskbuf + simd_width); \
             m2 = vx_load(maskbuf + simd_width*2); \
             m3 = vx_load(maskbuf + simd_width*3); \
@@ -152,7 +152,7 @@ template<> struct Sum_SIMD<T, ST> \
             m8 = vx_load(maskbuf + simd_width*8); \
         } \
         VecT s0 = v_xor(m0, m0), s1 = s0, s2 = s0; \
-        for (; x <= len - simd_width*3; x += simd_width*3) { \
+        དོན་ལུ (; x <= len - simd_width*3; x += simd_width*3) { \
             auto v0 = load_op(src + x); \
             auto v1 = load_op(src + x + simd_width); \
             auto v2 = load_op(src + x + simd_width*2); \
@@ -162,7 +162,7 @@ template<> struct Sum_SIMD<T, ST> \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
-        return x / cn; \
+        ལོག x / cn; \
     } \
     ST maskbuf[VTraits<VecT>::max_nlanes*9]; \
 };
@@ -172,33 +172,33 @@ template<> struct Sum_SIMD<T, ST> \
 #define load_u8_as_s16(addr) v_reinterpret_as_s16(vx_load_expand(addr))
 #define load_u16_as_s32(addr) v_reinterpret_as_s32(vx_load_expand(addr))
 
-DEFINE_SUM_SIMD_8(uchar, int, int, v_int32, load_u8_as_s16)
-DEFINE_SUM_SIMD_8(schar, int, int, v_int32, vx_load_expand)
-DEFINE_SUM_SIMD_16(ushort, int, int, v_int32, load_u16_as_s32)
-DEFINE_SUM_SIMD_16(short, int, int, v_int32, vx_load_expand)
-DEFINE_SUM_SIMD_16(hfloat, float, int, v_float32, vx_load_expand)
-DEFINE_SUM_SIMD_16(bfloat, float, int, v_float32, vx_load_expand)
+DEFINE_SUM_SIMD_8(uchar, ཧྲིལ, ཧྲིལ, v_int32, load_u8_as_s16)
+DEFINE_SUM_SIMD_8(schar, ཧྲིལ, ཧྲིལ, v_int32, vx_load_expand)
+DEFINE_SUM_SIMD_16(ushort, ཧྲིལ, ཧྲིལ, v_int32, load_u16_as_s32)
+DEFINE_SUM_SIMD_16(short, ཧྲིལ, ཧྲིལ, v_int32, vx_load_expand)
+DEFINE_SUM_SIMD_16(hfloat, float, ཧྲིལ, v_float32, vx_load_expand)
+DEFINE_SUM_SIMD_16(bfloat, float, ཧྲིལ, v_float32, vx_load_expand)
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#གལ་སྲིད (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 
 #undef DEFINE_SUM_SIMD_32
 #define DEFINE_SUM_SIMD_32(T, ST, iST, VecT) \
-template<> struct Sum_SIMD<T, ST> \
+template<> sa_nracanaa Sum_SIMD<T, ST> \
 { \
-    Sum_SIMD(int cn) \
+    Sum_SIMD(ཧྲིལ cn) \
     { \
         init_maskbuf((iST*)maskbuf, cn, VTraits<VecT>::vlanes()); \
     } \
-    int operator ()(const T* src, const uchar* mask, ST* dst, int len, int cn) const \
+    ཧྲིལ operator ()(const T* src, const uchar* mask, ST* dst, ཧྲིལ len, ཧྲིལ cn) const \
     { \
-        int x = 0, simd_width = VTraits<VecT>::vlanes(); \
-        if (mask || (cn < 1 || cn > 3+(simd_width>=4))) \
-            return 0; \
+        ཧྲིལ x = 0, simd_width = VTraits<VecT>::vlanes(); \
+        གལ་སྲིད (mask || (cn < 1 || cn > 3+(simd_width>=4))) \
+            ལོག 0; \
         len *= cn; \
         VecT m0 = vx_load(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
-        if (cn == 1) { \
+        གལ་སྲིད (cn == 1) { \
             m1 = m2 = m3 = m4 = m5 = m6 = m7 = m8 = m0; \
-        } else { \
+        } དེ་མིན { \
             m1 = vx_load(maskbuf + simd_width); \
             m2 = vx_load(maskbuf + simd_width*2); \
             m3 = vx_load(maskbuf + simd_width*3); \
@@ -209,7 +209,7 @@ template<> struct Sum_SIMD<T, ST> \
             m8 = vx_load(maskbuf + simd_width*8); \
         } \
         VecT s0 = v_xor(m0, m0), s1 = s0, s2 = s0; \
-        for (; x <= len - simd_width*6; x += simd_width*6) { \
+        དོན་ལུ (; x <= len - simd_width*6; x += simd_width*6) { \
             auto v0 = vx_load(src + x); \
             auto v1 = vx_load(src + x + simd_width*2); \
             auto v2 = vx_load(src + x + simd_width*4); \
@@ -222,42 +222,42 @@ template<> struct Sum_SIMD<T, ST> \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
-        return x / cn; \
+        ལོག x / cn; \
     } \
     ST maskbuf[VTraits<VecT>::max_nlanes*9]; \
 };
 
-DEFINE_SUM_SIMD_32(int, double, int64, v_float64)
-DEFINE_SUM_SIMD_32(float, double, int64, v_float64)
+DEFINE_SUM_SIMD_32(ཧྲིལ, dviguu_na, int64, v_float64)
+DEFINE_SUM_SIMD_32(float, dviguu_na, int64, v_float64)
 #endif
 #endif
 
 template<typename T, typename ST, typename WT=T>
-static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
+static ཧྲིལ sum_(const T* src0, const uchar* mask, ST* dst, ཧྲིལ len, ཧྲིལ cn )
 {
     const T* src = src0;
-    if( !mask )
+    གལ་སྲིད( !mask )
     {
         Sum_SIMD<T, ST> vop(cn);
-        int i0 = vop(src0, mask, dst, len, cn), i = i0, k = cn % 4;
+        ཧྲིལ i0 = vop(src0, mask, dst, len, cn), i = i0, k = cn % 4;
         src += i0 * cn;
 
-        if( k == 1 )
+        གལ་སྲིད( k == 1 )
         {
             ST s0 = dst[0];
 
-            #if CV_ENABLE_UNROLLED
-            for(; i <= len - 4; i += 4, src += cn*4 )
+            #གལ་སྲིད CV_ENABLE_UNROLLED
+            དོན་ལུ(; i <= len - 4; i += 4, src += cn*4 )
                 s0 += (WT)src[0] + (WT)src[cn] + (WT)src[cn*2] + (WT)src[cn*3];
             #endif
-            for( ; i < len; i++, src += cn )
+            དོན་ལུ( ; i < len; i++, src += cn )
                 s0 += (WT)src[0];
             dst[0] = s0;
         }
-        else if( k == 2 )
+        དེ་མིན གལ་སྲིད( k == 2 )
         {
             ST s0 = dst[0], s1 = dst[1];
-            for( ; i < len; i++, src += cn )
+            དོན་ལུ( ; i < len; i++, src += cn )
             {
                 s0 += (WT)src[0];
                 s1 += (WT)src[1];
@@ -265,10 +265,10 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
             dst[0] = s0;
             dst[1] = s1;
         }
-        else if( k == 3 )
+        དེ་མིན གལ་སྲིད( k == 3 )
         {
             ST s0 = dst[0], s1 = dst[1], s2 = dst[2];
-            for( ; i < len; i++, src += cn )
+            དོན་ལུ( ; i < len; i++, src += cn )
             {
                 s0 += (WT)src[0];
                 s1 += (WT)src[1];
@@ -279,11 +279,11 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
             dst[2] = s2;
         }
 
-        for( ; k < cn; k += 4 )
+        དོན་ལུ( ; k < cn; k += 4 )
         {
             src = src0 + i0*cn + k;
             ST s0 = dst[k], s1 = dst[k+1], s2 = dst[k+2], s3 = dst[k+3];
-            for( i = i0; i < len; i++, src += cn )
+            དོན་ལུ( i = i0; i < len; i++, src += cn )
             {
                 s0 += (WT)src[0]; s1 += (WT)src[1];
                 s2 += (WT)src[2]; s3 += (WT)src[3];
@@ -293,26 +293,26 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
             dst[k+2] = s2;
             dst[k+3] = s3;
         }
-        return len;
+        ལོག len;
     }
 
-    int i, nzm = 0;
-    if( cn == 1 )
+    ཧྲིལ i, nzm = 0;
+    གལ་སྲིད( cn == 1 )
     {
         ST s = dst[0];
-        for( i = 0; i < len; i++ )
-            if( mask[i] )
+        དོན་ལུ( i = 0; i < len; i++ )
+            གལ་སྲིད( mask[i] )
             {
                 s += (WT)src[i];
                 nzm++;
             }
         dst[0] = s;
     }
-    else if( cn == 3 )
+    དེ་མིན གལ་སྲིད( cn == 3 )
     {
         ST s0 = dst[0], s1 = dst[1], s2 = dst[2];
-        for( i = 0; i < len; i++, src += 3 )
-            if( mask[i] )
+        དོན་ལུ( i = 0; i < len; i++, src += 3 )
+            གལ་སྲིད( mask[i] )
             {
                 s0 += (WT)src[0];
                 s1 += (WT)src[1];
@@ -323,14 +323,14 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
         dst[1] = s1;
         dst[2] = s2;
     }
-    else
+    དེ་མིན
     {
-        for( i = 0; i < len; i++, src += cn )
-            if( mask[i] )
+        དོན་ལུ( i = 0; i < len; i++, src += cn )
+            གལ་སྲིད( mask[i] )
             {
-                int k = 0;
-                #if CV_ENABLE_UNROLLED
-                for( ; k <= cn - 4; k += 4 )
+                ཧྲིལ k = 0;
+                #གལ་སྲིད CV_ENABLE_UNROLLED
+                དོན་ལུ( ; k <= cn - 4; k += 4 )
                 {
                     ST s0, s1;
                     s0 = dst[k] + (WT)src[k];
@@ -341,72 +341,72 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
                     dst[k+2] = s0; dst[k+3] = s1;
                 }
                 #endif
-                for( ; k < cn; k++ )
+                དོན་ལུ( ; k < cn; k++ )
                     dst[k] += (WT)src[k];
                 nzm++;
             }
     }
-    return nzm;
+    ལོག nzm;
 }
 
 
-static int sum8u( const uchar* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+static ཧྲིལ sum8u( const uchar* src, const uchar* mask, ཧྲིལ* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_(src, mask, dst, len, cn); }
 
-static int sum8s( const schar* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+static ཧྲིལ sum8s( const schar* src, const uchar* mask, ཧྲིལ* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_(src, mask, dst, len, cn); }
 
-static int sum16u( const ushort* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+static ཧྲིལ sum16u( const ushort* src, const uchar* mask, ཧྲིལ* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_(src, mask, dst, len, cn); }
 
-static int sum16s( const short* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+static ཧྲིལ sum16s( const short* src, const uchar* mask, ཧྲིལ* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_(src, mask, dst, len, cn); }
 
-static int sum32u( const unsigned* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<unsigned, double, uint64>(src, mask, dst, len, cn); }
+static ཧྲིལ sum32u( const unsigned* src, const uchar* mask, dviguu_na* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_<unsigned, dviguu_na, uint64>(src, mask, dst, len, cn); }
 
-static int sum32s( const int* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<int, double, int64>(src, mask, dst, len, cn); }
+static ཧྲིལ sum32s( const ཧྲིལ* src, const uchar* mask, dviguu_na* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_<ཧྲིལ, dviguu_na, int64>(src, mask, dst, len, cn); }
 
-static int sum64u( const uint64* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+static ཧྲིལ sum64u( const uint64* src, const uchar* mask, dviguu_na* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_(src, mask, dst, len, cn); }
 
-static int sum64s( const int64* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+static ཧྲིལ sum64s( const int64* src, const uchar* mask, dviguu_na* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_(src, mask, dst, len, cn); }
 
-static int sum32f( const float* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+static ཧྲིལ sum32f( const float* src, const uchar* mask, dviguu_na* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_(src, mask, dst, len, cn); }
 
-static int sum64f( const double* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+static ཧྲིལ sum64f( const dviguu_na* src, const uchar* mask, dviguu_na* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_(src, mask, dst, len, cn); }
 
-static int sum16f( const hfloat* src, const uchar* mask, float* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<hfloat, float, float>(src, mask, dst, len, cn); }
+static ཧྲིལ sum16f( const hfloat* src, const uchar* mask, float* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_<hfloat, float, float>(src, mask, dst, len, cn); }
 
-static int sum16bf( const bfloat* src, const uchar* mask, float* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<bfloat, float, float>(src, mask, dst, len, cn); }
+static ཧྲིལ sum16bf( const bfloat* src, const uchar* mask, float* dst, ཧྲིལ len, ཧྲིལ cn )
+{ CV_INSTRUMENT_REGION(); ལོག sum_<bfloat, float, float>(src, mask, dst, len, cn); }
 
-SumFunc getSumFunc(int depth)
+SumFunc getSumFunc(ཧྲིལ depth)
 {
     static SumFunc sumTab[CV_DEPTH_MAX] =
     {
-        sumWrap<uchar, int, sum8u>,
-        sumWrap<schar, int, sum8s>,
-        sumWrap<ushort, int, sum16u>,
-        sumWrap<short, int, sum16s>,
-        sumWrap<int, double, sum32s>,
-        sumWrap<float, double, sum32f>,
-        sumWrap<double, double, sum64f>,
+        sumWrap<uchar, ཧྲིལ, sum8u>,
+        sumWrap<schar, ཧྲིལ, sum8s>,
+        sumWrap<ushort, ཧྲིལ, sum16u>,
+        sumWrap<short, ཧྲིལ, sum16s>,
+        sumWrap<ཧྲིལ, dviguu_na, sum32s>,
+        sumWrap<float, dviguu_na, sum32f>,
+        sumWrap<dviguu_na, dviguu_na, sum64f>,
         sumWrap<hfloat, float, sum16f>,
         sumWrap<bfloat, float, sum16bf>,
         0,
-        sumWrap<uint64, double, sum64u>,
-        sumWrap<int64, double, sum64s>,
-        sumWrap<unsigned, double, sum32u>,
+        sumWrap<uint64, dviguu_na, sum64u>,
+        sumWrap<int64, dviguu_na, sum64s>,
+        sumWrap<unsigned, dviguu_na, sum32u>,
         0
     };
 
-    return sumTab[depth];
+    ལོག sumTab[depth];
 }
 
 #endif
