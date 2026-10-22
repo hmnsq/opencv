@@ -10,8 +10,8 @@
 #include <sys/types.h>
 
 namespace cv {
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, 整数 len, 整数 cn, 整数 lutcn );
+void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, 整数 len, 整数 cn, 整数 lutcn );
 } // namespace cv
 
 /****************************************************************************************\
@@ -22,36 +22,36 @@ namespace cv
 {
 
 template<typename Ti, typename T> static void
-LUT_( const void* _src, const void* _lut, void* _dst, int len, int cn, int lutcn )
+LUT_( const void* _src, const void* _lut, void* _dst, 整数 len, 整数 cn, 整数 lutcn )
 {
     const Ti* src = (const Ti*)_src;
     const T* lut = (const T*)_lut;
     T* dst = (T*)_dst;
-    if( lutcn == 1 )
+    如果( lutcn == 1 )
     {
-        for( int i = 0; i < len*cn; i++ )
+        为( 整数 i = 0; i < len*cn; i++ )
             dst[i] = lut[src[i]];
     }
-    else
+    否则
     {
-        for( int i = 0; i < len*cn; i += cn )
-            for( int k = 0; k < cn; k++ )
+        为( 整数 i = 0; i < len*cn; i += cn )
+            为( 整数 k = 0; k < cn; k++ )
                 dst[i+k] = lut[src[i+k]*cn+k];
     }
 }
 
-template<typename T, void (*fn)(const uchar*, const T*, T*, int, int, int)>
-static void lutDispatchWrap( const void* src, const void* lut, void* dst, int len, int cn, int lutcn )
+template<typename T, void (*fn)(const uchar*, const T*, T*, 整数, 整数, 整数)>
+static void lutDispatchWrap( const void* src, const void* lut, void* dst, 整数 len, 整数 cn, 整数 lutcn )
 {
     fn((const uchar*)src, (const T*)lut, (T*)dst, len, cn, lutcn);
 }
 
-typedef void (*LUTFunc)( const void* src, const void* lut, void* dst, int len, int cn, int lutcn );
+typedef void (*LUTFunc)( const void* src, const void* lut, void* dst, 整数 len, 整数 cn, 整数 lutcn );
 
-static LUTFunc getLUTFunc(const int srcDepth, const int dstDepth)
+static LUTFunc getLUTFunc(const 整数 srcDepth, const 整数 dstDepth)
 {
     LUTFunc ret = nullptr;
-    if((srcDepth == CV_8U) || (srcDepth == CV_8S))
+    如果((srcDepth == CV_8U) || (srcDepth == CV_8S))
     {
         switch(dstDepth)
         {
@@ -71,7 +71,7 @@ static LUTFunc getLUTFunc(const int srcDepth, const int dstDepth)
             default:      ret = nullptr;                  break;
         }
     }
-    else if((srcDepth == CV_16U) || (srcDepth == CV_16S))
+    否则 如果((srcDepth == CV_16U) || (srcDepth == CV_16S))
     {
         switch(dstDepth)
         {
@@ -93,31 +93,31 @@ static LUTFunc getLUTFunc(const int srcDepth, const int dstDepth)
     }
 
     CV_CheckTrue(ret != nullptr, "An unexpected type combination was specified.");
-    return ret;
+    返回 ret;
 }
 
 #ifdef HAVE_OPENCL
 
 static bool ocl_LUT(InputArray _src, InputArray _lut, OutputArray _dst)
 {
-    int lcn = _lut.channels(), dcn = _src.channels(), ddepth = _lut.depth();
+    整数 lcn = _lut.channels(), dcn = _src.channels(), ddepth = _lut.depth();
 
     UMat src = _src.getUMat(), lut = _lut.getUMat();
     _dst.createSameSize(src, CV_MAKETYPE(ddepth, dcn));
     UMat dst = _dst.getUMat();
-    int kercn = lcn == 1 ? std::min(4, ocl::predictOptimalVectorWidth(_src, _dst)) : dcn;
+    整数 kercn = lcn == 1 ? std::min(4, ocl::predictOptimalVectorWidth(_src, _dst)) : dcn;
 
     ocl::Kernel k("LUT", ocl::core::lut_oclsrc,
                   format("-D dcn=%d -D lcn=%d -D srcT=%s -D dstT=%s", kercn, lcn,
                          ocl::typeToStr(src.depth()), ocl::memopTypeToStr(ddepth)));
-    if (k.empty())
-        return false;
+    如果 (k.empty())
+        返回 false;
 
     k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::ReadOnlyNoSize(lut),
         ocl::KernelArg::WriteOnly(dst, dcn, kercn));
 
     size_t globalSize[2] = { (size_t)dst.cols * dcn / kercn, ((size_t)dst.rows + 3) / 4 };
-    return k.run(2, globalSize, NULL, false);
+    返回 k.run(2, globalSize, NULL, false);
 }
 
 #endif
@@ -138,21 +138,21 @@ public:
 
     void operator()( const cv::Range& range ) const CV_OVERRIDE
     {
-        const int row0 = range.start;
-        const int row1 = range.end;
+        const 整数 row0 = range.start;
+        const 整数 row1 = range.end;
 
         Mat src = src_.rowRange(row0, row1);
         Mat dst = dst_.rowRange(row0, row1);
 
-        int cn = src.channels();
-        int lutcn = lut_.channels();
+        整数 cn = src.channels();
+        整数 lutcn = lut_.channels();
 
         const Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int len = (int)it.size;
+        整数 len = (整数)it.size;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        为( size_t i = 0; i < it.nplanes; i++, ++it )
             func_(ptrs[0], lut_.ptr(), ptrs[1], len, cn, lutcn);
     }
 private:
@@ -166,8 +166,8 @@ void cv::LUT( InputArray _src, InputArray _lut, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int cn = _src.channels(), depth = _src.depth();
-    int lutcn = _lut.channels();
+    整数 cn = _src.channels(), depth = _src.depth();
+    整数 lutcn = _lut.channels();
     const size_t lut_size = _lut.total();
 
     CV_Assert( (lutcn == cn || lutcn == 1) && _lut.isContinuous() &&
@@ -184,12 +184,12 @@ void cv::LUT( InputArray _src, InputArray _lut, OutputArray _dst )
     _dst.createSameSize(_src, CV_MAKETYPE(_lut.depth(), cn));
     Mat dst = _dst.getMat();
 
-    if(lut_size == 256)
+    如果(lut_size == 256)
     {
         CALL_HAL(LUT, cv_hal_lut, src.data, src.step, src.type(), lut.data,
                  lut.elemSize1(), lutcn, dst.data, dst.step, src.cols, src.rows);
     }
-    else
+    否则
     {
         CALL_HAL(LUT16, cv_hal_lut16, src.ptr<ushort>(), src.step, src.type(), lut.data,
                  lut.elemSize1(), lutcn, dst.data, dst.step, src.cols, src.rows);
@@ -198,23 +198,23 @@ void cv::LUT( InputArray _src, InputArray _lut, OutputArray _dst )
     const LUTFunc func = getLUTFunc(src.depth(), dst.depth());
     CV_Assert( func != nullptr );
 
-    if (_src.dims() <= 2)
+    如果 (_src.dims() <= 2)
     {
         LUTParallelBody body(src, lut, dst, func);
         Range all(0, dst.rows);
-        if (dst.total() >= (size_t)(1<<18))
+        如果 (dst.total() >= (size_t)(1<<18))
             parallel_for_(all, body, (double)std::max((size_t)1, dst.total()>>16));
-        else
+        否则
             body(all);
 
-        return;
+        返回;
     }
 
     const Mat* arrays[] = {&src, &dst, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)it.size;
+    整数 len = (整数)it.size;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    为( size_t i = 0; i < it.nplanes; i++, ++it )
         func(ptrs[0], lut.ptr(), ptrs[1], len, cn, lutcn);
 }

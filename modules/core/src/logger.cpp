@@ -31,9 +31,9 @@ namespace internal
 struct GlobalLoggingInitStruct
 {
 public:
-#if defined NDEBUG
+#如果 defined NDEBUG
     static const bool m_isDebugBuild = false;
-#else
+#否则
     static const bool m_isDebugBuild = true;
 #endif
 
@@ -61,13 +61,13 @@ private:
     void handleMalformed()
     {
         // need to print warning for malformed log tag config strings?
-        if (m_isDebugBuild)
+        如果 (m_isDebugBuild)
         {
             const auto& parser = logTagManager.getConfigParser();
-            if (parser.hasMalformed())
+            如果 (parser.hasMalformed())
             {
                 const auto& malformedList = parser.getMalformed();
-                for (const auto& malformed : malformedList)
+                为 (const auto& malformed : malformedList)
                 {
                     std::cout << "Malformed log level config: \"" << malformed << "\"\n";
                 }
@@ -117,53 +117,53 @@ static GlobalLoggingInitCall globalLoggingInitCall;
 static LogTagManager& getLogTagManager()
 {
     static LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
-    return logTagManagerInstance;
+    返回 logTagManagerInstance;
 }
 
 static LogLevel& getLogLevelVariable()
 {
     static LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
-    return refGlobalLogLevel;
+    返回 refGlobalLogLevel;
 }
 
 LogTag* getGlobalLogTag()
 {
     static LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
-    return globalLogTagPtr;
+    返回 globalLogTagPtr;
 }
 
 } // namespace
 
 void registerLogTag(LogTag* plogtag)
 {
-    if (!plogtag || !plogtag->name)
+    如果 (!plogtag || !plogtag->name)
     {
-        return;
+        返回;
     }
     internal::getLogTagManager().assign(plogtag->name, plogtag);
 }
 
 void setLogTagLevel(const char* tag, LogLevel level)
 {
-    if (!tag)
+    如果 (!tag)
     {
-        return;
+        返回;
     }
     internal::getLogTagManager().setLevelByFullName(std::string(tag), level);
 }
 
 LogLevel getLogTagLevel(const char* tag)
 {
-    if (!tag)
+    如果 (!tag)
     {
-        return getLogLevel();
+        返回 getLogLevel();
     }
     const LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
-    if (!ptr)
+    如果 (!ptr)
     {
-        return getLogLevel();
+        返回 getLogLevel();
     }
-    return ptr->level;
+    返回 ptr->level;
 }
 
 LogLevel setLogLevel(LogLevel logLevel)
@@ -172,12 +172,12 @@ LogLevel setLogLevel(LogLevel logLevel)
     LogLevel& refGlobalLevel = internal::getLogLevelVariable();
     const LogLevel old = refGlobalLevel;
     refGlobalLevel = logLevel;
-    return old;
+    返回 old;
 }
 
 LogLevel getLogLevel()
 {
-    return internal::getLogLevelVariable();
+    返回 internal::getLogLevelVariable();
 }
 
 namespace internal {
@@ -188,29 +188,29 @@ namespace //unnamed
     std::atomic<WriteLogMessageExFuncType> stc_userWriteLogMessageExFunc{};
 } //unnamed
 
-static int getShowTimestampMode()
+static 整数 getShowTimestampMode()
 {
     static bool param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", true);
     static bool param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", false);
-    return (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
+    返回 (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
 }
 
 void writeLogMessage(LogLevel logLevel, const char* message)
 {
     WriteLogMessageFuncType userFunc = stc_userWriteLogMessageFunc.load();
-    if (userFunc && userFunc != writeLogMessage)
+    如果 (userFunc && userFunc != writeLogMessage)
     {
         (*userFunc)(logLevel, message);
-        return;
+        返回;
     }
 
-    const int threadID = cv::utils::getThreadID();
+    const 整数 threadID = cv::utils::getThreadID();
 
     std::string message_id;
     switch (getShowTimestampMode())
     {
         case 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); break;
-        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned int)getTimestampNS()); break;
+        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned 整数)getTimestampNS()); break;
         default: message_id = cv::format("%d", threadID); break;
     }
 
@@ -223,11 +223,11 @@ void writeLogMessage(LogLevel logLevel, const char* message)
     case LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; break;
     case LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; break;
     case LOG_LEVEL_VERBOSE: ss << message << std::endl; break;
-    case LOG_LEVEL_SILENT: return;  // avoid compiler warning about incomplete switch
-    case ENUM_LOG_LEVEL_FORCE_INT: return;  // avoid compiler warning about incomplete switch
+    case LOG_LEVEL_SILENT: 返回;  // avoid compiler warning about incomplete switch
+    case ENUM_LOG_LEVEL_FORCE_INT: 返回;  // avoid compiler warning about incomplete switch
     }
 #ifdef __ANDROID__
-    int android_logLevel = ANDROID_LOG_INFO;
+    整数 android_logLevel = ANDROID_LOG_INFO;
     switch (logLevel)
     {
     case LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; break;
@@ -243,7 +243,7 @@ void writeLogMessage(LogLevel logLevel, const char* message)
 #endif
     std::ostream* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::cerr : &std::cout;
     (*out) << ss.str();
-    if (logLevel <= LOG_LEVEL_WARNING)
+    如果 (logLevel <= LOG_LEVEL_WARNING)
     {
         (*out) << std::flush;
     }
@@ -255,41 +255,41 @@ static const char* stripSourceFilePathPrefix(const char* file)
     const char* pos = file;
     const char* strip_pos = NULL;
     char ch = 0;
-    while ((ch = pos[0]) != 0)
+    当 ((ch = pos[0]) != 0)
     {
         ++pos;
-        if (ch == '/' || ch == '\\')
+        如果 (ch == '/' || ch == '\\')
             strip_pos = pos;
     }
-    if (strip_pos == NULL || strip_pos == pos/*eos*/)
-        return file;
-    return strip_pos;
+    如果 (strip_pos == NULL || strip_pos == pos/*eos*/)
+        返回 file;
+    返回 strip_pos;
 }
 
-void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int line, const char* func, const char* message)
+void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, 整数 line, const char* func, const char* message)
 {
     WriteLogMessageExFuncType userFunc = stc_userWriteLogMessageExFunc.load();
-    if (userFunc && userFunc != writeLogMessageEx)
+    如果 (userFunc && userFunc != writeLogMessageEx)
     {
         (*userFunc)(logLevel, tag, file, line, func, message);
-        return;
+        返回;
     }
 
     std::ostringstream strm;
-    if (tag)
+    如果 (tag)
     {
         strm << tag << ' ';
     }
-    if (file)
+    如果 (file)
     {
         strm << stripSourceFilePathPrefix(file);
-        if (line > 0)
+        如果 (line > 0)
         {
             strm << ':' << line;
         }
         strm << ' ';
     }
-    if (func)
+    如果 (func)
     {
         strm << func << ' ';
     }
@@ -299,7 +299,7 @@ void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int
 
 void replaceWriteLogMessage(WriteLogMessageFuncType f)
 {
-    if (f == writeLogMessage)
+    如果 (f == writeLogMessage)
     {
         f = nullptr;
     }
@@ -308,7 +308,7 @@ void replaceWriteLogMessage(WriteLogMessageFuncType f)
 
 void replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
 {
-    if (f == writeLogMessageEx)
+    如果 (f == writeLogMessageEx)
     {
         f = nullptr;
     }

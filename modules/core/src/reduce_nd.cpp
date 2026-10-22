@@ -29,16 +29,16 @@ enum
 //////////////////////////////// vector traits ////////////////////////////////
 
 template<typename T> struct VecT { enum { ok = 0 }; typedef T vtype; };
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#如果 (CV_SIMD || CV_SIMD_SCALABLE)
 #define CV_RND_VEC(T, V) template<> struct VecT<T> { enum { ok = 1 }; typedef V vtype; };
 CV_RND_VEC(uchar, v_uint8)
 CV_RND_VEC(schar, v_int8)
 CV_RND_VEC(ushort, v_uint16)
 CV_RND_VEC(short, v_int16)
 CV_RND_VEC(unsigned, v_uint32)
-CV_RND_VEC(int, v_int32)
+CV_RND_VEC(整数, v_int32)
 CV_RND_VEC(float, v_float32)
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#如果 (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 CV_RND_VEC(double, v_float64)
 #endif
 #undef CV_RND_VEC
@@ -51,92 +51,92 @@ CV_RND_VEC(double, v_float64)
 
 template<typename A> struct OpSum
 {
-    static A init() { return A(0); }
-    static A apply(A a, A x) { return a + x; }
-    static A combine(A a, A b) { return a + b; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_add(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_add(a, b); }
+    static A init() { 返回 A(0); }
+    static A apply(A a, A x) { 返回 a + x; }
+    static A combine(A a, A b) { 返回 a + b; }
+    static A finalize(A a, int64) { 返回 a; }
+    template<typename V> static V vapply(const V& a, const V& x) { 返回 v_add(a, x); }
+    template<typename V> static V vcombine(const V& a, const V& b) { 返回 v_add(a, b); }
 };
 
 template<typename A> struct OpAvg : OpSum<A>
 {
-    static A finalize(A a, int64 n) { return n > 0 ? A(a/(double)n) : A(0); }
+    static A finalize(A a, int64 n) { 返回 n > 0 ? A(a/(double)n) : A(0); }
 };
 
 template<typename A> struct OpLogSum : OpSum<A>
 {
-    static A finalize(A a, int64) { return A(std::log(a)); }
+    static A finalize(A a, int64) { 返回 A(std::log(a)); }
 };
 
 template<typename A> struct OpSum2 : OpSum<A>
 {
-    static A apply(A a, A x) { return a + x*x; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_add(a, v_mul(x, x)); }
+    static A apply(A a, A x) { 返回 a + x*x; }
+    template<typename V> static V vapply(const V& a, const V& x) { 返回 v_add(a, v_mul(x, x)); }
 };
 
 template<typename A> struct OpL2 : OpSum2<A>
 {
-    static A finalize(A a, int64) { return A(std::sqrt(a)); }
+    static A finalize(A a, int64) { 返回 A(std::sqrt(a)); }
 };
 
 template<typename A> struct OpL1 : OpSum<A>
 {
-    static A apply(A a, A x) { return a + (x < A(0) ? -x : x); }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_add(a, v_abs(x)); }
+    static A apply(A a, A x) { 返回 a + (x < A(0) ? -x : x); }
+    template<typename V> static V vapply(const V& a, const V& x) { 返回 v_add(a, v_abs(x)); }
 };
 
 template<typename A> struct OpProd
 {
-    static A init() { return A(1); }
-    static A apply(A a, A x) { return a*x; }
-    static A combine(A a, A b) { return a*b; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_mul(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_mul(a, b); }
+    static A init() { 返回 A(1); }
+    static A apply(A a, A x) { 返回 a*x; }
+    static A combine(A a, A b) { 返回 a*b; }
+    static A finalize(A a, int64) { 返回 a; }
+    template<typename V> static V vapply(const V& a, const V& x) { 返回 v_mul(a, x); }
+    template<typename V> static V vcombine(const V& a, const V& b) { 返回 v_mul(a, b); }
 };
 
 // Identity elements of max and min. A trait rather than a ternary on has_infinity, so that the
 // unary minus is never compiled for an unsigned A (MSVC C4146).
 template<typename A, bool hasInf = std::numeric_limits<A>::has_infinity> struct Extremes
 {
-    static A low() { return std::numeric_limits<A>::lowest(); }
-    static A high() { return std::numeric_limits<A>::max(); }
+    static A low() { 返回 std::numeric_limits<A>::lowest(); }
+    static A high() { 返回 std::numeric_limits<A>::max(); }
 };
 
 template<typename A> struct Extremes<A, true>
 {
-    static A low() { return -std::numeric_limits<A>::infinity(); }
-    static A high() { return std::numeric_limits<A>::infinity(); }
+    static A low() { 返回 -std::numeric_limits<A>::infinity(); }
+    static A high() { 返回 std::numeric_limits<A>::infinity(); }
 };
 
 template<typename A> struct OpMax
 {
-    static A init() { return Extremes<A>::low(); }
-    static A apply(A a, A x) { return a < x ? x : a; }
-    static A combine(A a, A b) { return a < b ? b : a; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_max(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_max(a, b); }
+    static A init() { 返回 Extremes<A>::low(); }
+    static A apply(A a, A x) { 返回 a < x ? x : a; }
+    static A combine(A a, A b) { 返回 a < b ? b : a; }
+    static A finalize(A a, int64) { 返回 a; }
+    template<typename V> static V vapply(const V& a, const V& x) { 返回 v_max(a, x); }
+    template<typename V> static V vcombine(const V& a, const V& b) { 返回 v_max(a, b); }
 };
 
 template<typename A> struct OpMin
 {
-    static A init() { return Extremes<A>::high(); }
-    static A apply(A a, A x) { return x < a ? x : a; }
-    static A combine(A a, A b) { return b < a ? b : a; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_min(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_min(a, b); }
+    static A init() { 返回 Extremes<A>::high(); }
+    static A apply(A a, A x) { 返回 x < a ? x : a; }
+    static A combine(A a, A b) { 返回 b < a ? b : a; }
+    static A finalize(A a, int64) { 返回 a; }
+    template<typename V> static V vapply(const V& a, const V& x) { 返回 v_min(a, x); }
+    template<typename V> static V vcombine(const V& a, const V& b) { 返回 v_min(a, b); }
 };
 
 // second pass of log-sum-exp: sum(exp(x - m)), then m + log(sum), where m is the maximum
 template<typename A> struct OpSumExpShifted
 {
-    static A init() { return A(0); }
-    static A apply(A a, A x, A m) { return a + A(std::exp(x - m)); }
-    static A combine(A a, A b) { return a + b; }
-    static A finalize(A a, A m) { return std::isinf(m) ? m : m + A(std::log(a)); }
+    static A init() { 返回 A(0); }
+    static A apply(A a, A x, A m) { 返回 a + A(std::exp(x - m)); }
+    static A combine(A a, A b) { 返回 a + b; }
+    static A finalize(A a, A m) { 返回 std::isinf(m) ? m : m + A(std::log(a)); }
 };
 
 //////////////////////////////// row kernels ////////////////////////////////
@@ -146,9 +146,9 @@ template<class Op, typename A, bool vec = (VecT<A>::ok != 0)> struct HRow
 {
     static A run(A acc, const A* x, int64 n)
     {
-        for (int64 i = 0; i < n; i++)
+        为 (int64 i = 0; i < n; i++)
             acc = Op::apply(acc, x[i]);
-        return acc;
+        返回 acc;
     }
 };
 
@@ -157,37 +157,37 @@ template<class Op, typename A, bool vec = (VecT<A>::ok != 0)> struct VRow
 {
     static void run(A* acc, const A* x, int64 n)
     {
-        for (int64 i = 0; i < n; i++)
+        为 (int64 i = 0; i < n; i++)
             acc[i] = Op::apply(acc[i], x[i]);
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#如果 (CV_SIMD || CV_SIMD_SCALABLE)
 template<class Op, typename A> struct HRow<Op, A, true>
 {
     static A run(A acc, const A* x, int64 n)
     {
         typedef typename VecT<A>::vtype V;
-        const int L = VTraits<V>::vlanes();
+        const 整数 L = VTraits<V>::vlanes();
         int64 i = 0;
-        if (n >= 2*L)
+        如果 (n >= 2*L)
         {
             A buf[VTraits<V>::max_nlanes];
-            for (int k = 0; k < L; k++)
+            为 (整数 k = 0; k < L; k++)
                 buf[k] = Op::init();
             V a0 = vx_load(buf), a1 = a0;
-            for (; i + 2*L <= n; i += 2*L)
+            为 (; i + 2*L <= n; i += 2*L)
             {
                 a0 = Op::vapply(a0, vx_load(x + i));
                 a1 = Op::vapply(a1, vx_load(x + i + L));
             }
             v_store(buf, Op::vcombine(a0, a1));
-            for (int k = 0; k < L; k++)
+            为 (整数 k = 0; k < L; k++)
                 acc = Op::combine(acc, buf[k]);
         }
-        for (; i < n; i++)
+        为 (; i < n; i++)
             acc = Op::apply(acc, x[i]);
-        return acc;
+        返回 acc;
     }
 };
 
@@ -196,11 +196,11 @@ template<class Op, typename A> struct VRow<Op, A, true>
     static void run(A* acc, const A* x, int64 n)
     {
         typedef typename VecT<A>::vtype V;
-        const int L = VTraits<V>::vlanes();
+        const 整数 L = VTraits<V>::vlanes();
         int64 i = 0;
-        for (; i + L <= n; i += L)
+        为 (; i + L <= n; i += L)
             v_store(acc + i, Op::vapply(vx_load(acc + i), vx_load(x + i)));
-        for (; i < n; i++)
+        为 (; i < n; i++)
             acc[i] = Op::apply(acc[i], x[i]);
     }
 };
@@ -211,17 +211,17 @@ template<class Op, typename A> struct VRow<Op, A, true>
 struct Plan
 {
     // kept axes (outer first); ksstep in bytes, kdstep in result elements
-    int nk;
-    int ksize[RND_MAX_DIMS];
+    整数 nk;
+    整数 ksize[RND_MAX_DIMS];
     ptrdiff_t ksstep[RND_MAX_DIMS], kdstep[RND_MAX_DIMS];
     // reduced axes (outer first), steps in bytes
-    int nr;
-    int rsize[RND_MAX_DIMS];
+    整数 nr;
+    整数 rsize[RND_MAX_DIMS];
     ptrdiff_t rsstep[RND_MAX_DIMS];
     bool innerReduced;      // the innermost axis is reduced (horizontal mode)
 
     const uchar* src;
-    int sdepth, adepth;     // source depth and accumulator depth
+    整数 sdepth, adepth;     // source depth and accumulator depth
     size_t sesz1;
     int64 count;            // reduced elements per output
     int64 nout;             // number of outputs
@@ -231,23 +231,23 @@ struct Plan
 // iterator over the flat index space of some axes, tracking a byte offset and an element offset
 struct Iter
 {
-    int n = 0;
-    const int* size = nullptr;
+    整数 n = 0;
+    const 整数* size = nullptr;
     const ptrdiff_t* s = nullptr;
     const ptrdiff_t* d = nullptr;
     int64 idx[RND_MAX_DIMS];
     ptrdiff_t soff = 0, doff = 0;
 
-    void init(int n_, const int* size_, const ptrdiff_t* s_, const ptrdiff_t* d_, int64 flat)
+    void init(整数 n_, const 整数* size_, const ptrdiff_t* s_, const ptrdiff_t* d_, int64 flat)
     {
         n = n_; size = size_; s = s_; d = d_;
         soff = doff = 0;
-        for (int k = n - 1; k >= 0; k--)
+        为 (整数 k = n - 1; k >= 0; k--)
         {
             int64 q = flat / size[k];
             idx[k] = flat - q*size[k];
             soff += (ptrdiff_t)idx[k]*s[k];
-            if (d)
+            如果 (d)
                 doff += (ptrdiff_t)idx[k]*d[k];
             flat = q;
         }
@@ -255,15 +255,15 @@ struct Iter
 
     void next()
     {
-        for (int k = n - 1; k >= 0; k--)
+        为 (整数 k = n - 1; k >= 0; k--)
         {
             soff += s[k];
-            if (d)
+            如果 (d)
                 doff += d[k];
-            if (++idx[k] < size[k])
-                return;
+            如果 (++idx[k] < size[k])
+                返回;
             soff -= (ptrdiff_t)size[k]*s[k];
-            if (d)
+            如果 (d)
                 doff -= (ptrdiff_t)size[k]*d[k];
             idx[k] = 0;
         }
@@ -275,16 +275,16 @@ struct Iter
 template<typename A> static const A* loadRow(const Plan& pl, const uchar* p, ptrdiff_t step, int64 len,
                                              A* buf, uchar* tmp)
 {
-    if (step != (ptrdiff_t)pl.sesz1)
+    如果 (step != (ptrdiff_t)pl.sesz1)
     {
-        for (int64 i = 0; i < len; i++, p += step)
+        为 (int64 i = 0; i < len; i++, p += step)
             memcpy(tmp + i*pl.sesz1, p, pl.sesz1);
         p = tmp;
     }
-    if (!pl.cvt)
-        return (const A*)p;
-    pl.cvt(p, 0, 0, 0, (uchar*)buf, 0, Size((int)len, 1), 0);
-    return buf;
+    如果 (!pl.cvt)
+        返回 (const A*)p;
+    pl.cvt(p, 0, 0, 0, (uchar*)buf, 0, Size((整数)len, 1), 0);
+    返回 buf;
 }
 
 // Row loop with conversion blocking: calls f(x, len) on consecutive pieces of the row.
@@ -293,7 +293,7 @@ template<typename A, typename F> static void forRow(const Plan& pl, const uchar*
 {
     const bool direct = !pl.cvt && step == (ptrdiff_t)pl.sesz1;
     const int64 blk = direct ? n : (int64)RND_BLOCK;
-    for (int64 e = 0; e < n; e += blk)
+    为 (int64 e = 0; e < n; e += blk)
     {
         int64 len = std::min(blk, n - e);
         f(loadRow<A>(pl, p + e*step, step, len, buf, tmp), len);
@@ -315,7 +315,7 @@ struct Work
 template<typename A, class Op, class OpM> static void runHorizontal(const Plan& pl, const Work& w, A* res,
                                                                    const A* mbuf, A* partial)
 {
-    const int nr = pl.nr;
+    const 整数 nr = pl.nr;
     const int64 n = pl.rsize[nr - 1];                 // innermost reduced axis
     const ptrdiff_t rstep = pl.rsstep[nr - 1];
     const int64 nsplit = w.nsplit;
@@ -326,22 +326,22 @@ template<typename A, class Op, class OpM> static void runHorizontal(const Plan& 
         AutoBuffer<uchar> bufT(RND_BLOCK*pl.sesz1);
         Iter ko, ro;
         int64 it = range.start;
-        if (nsplit == 1)
+        如果 (nsplit == 1)
             ko.init(pl.nk, pl.ksize, pl.ksstep, pl.kdstep, it);
-        while (it < range.end)
+        当 (it < range.end)
         {
             const int64 o = it / nsplit, s = it - o*nsplit;
-            if (nsplit > 1)
+            如果 (nsplit > 1)
                 ko.init(pl.nk, pl.ksize, pl.ksstep, pl.kdstep, o);
             const uchar* base = pl.src + ko.soff;
             const A m = mbuf ? mbuf[ko.doff] : A(0);
             int64 a = s*pl.count/nsplit, b = (s + 1)*pl.count/nsplit;
             A acc = Op::init();
-            if (a < b)
+            如果 (a < b)
             {
                 ro.init(nr - 1, pl.rsize, pl.rsstep, nullptr, a / n);
                 int64 e = a % n;
-                while (a < b)
+                当 (a < b)
                 {
                     int64 len = std::min(n - e, b - a);
                     forRow<A>(pl, base + ro.soff + e*rstep, rstep, len, bufA.data(), bufT.data(),
@@ -351,34 +351,34 @@ template<typename A, class Op, class OpM> static void runHorizontal(const Plan& 
                     ro.next();
                 }
             }
-            if (nsplit == 1)
+            如果 (nsplit == 1)
             {
                 res[ko.doff] = OpM::finalize(acc, pl.count, m);
                 ko.next();
             }
-            else
+            否则
                 partial[s*pl.nout + ko.doff] = acc;
             it++;
         }
     };
 
-    if (w.serial)
-        body(Range(0, (int)w.nitems));
-    else
-        parallel_for_(Range(0, (int)w.nitems), body, w.nstripes);
+    如果 (w.serial)
+        body(Range(0, (整数)w.nitems));
+    否则
+        parallel_for_(Range(0, (整数)w.nitems), body, w.nstripes);
 }
 
 // Vertical mode: the innermost axis is kept; each item accumulates whole rows of a chunk of it.
 template<typename A, class Op, class OpM> static void runVertical(const Plan& pl, const Work& w, A* res,
                                                                  const A* mbuf, A* partial)
 {
-    const int nk = pl.nk;
+    const 整数 nk = pl.nk;
     const int64 m = pl.ksize[nk - 1];
     const ptrdiff_t kstep = pl.ksstep[nk - 1], kdstep = pl.kdstep[nk - 1];
     const int64 nch = (m + RND_VCHUNK - 1)/RND_VCHUNK;
     const int64 nsplit = w.nsplit;
     int64 rcount = 1;
-    for (int i = 0; i < pl.nr; i++)
+    为 (整数 i = 0; i < pl.nr; i++)
         rcount *= pl.rsize[i];
 
     auto body = [&](const Range& range)
@@ -387,7 +387,7 @@ template<typename A, class Op, class OpM> static void runVertical(const Plan& pl
         AutoBuffer<uchar> bufT(RND_BLOCK*pl.sesz1);
         A* acc = accBuf.data();
         Iter ko, ro;
-        for (int64 it = range.start; it < range.end; it++)
+        为 (int64 it = range.start; it < range.end; it++)
         {
             int64 s = it % nsplit, q = it / nsplit;
             int64 ch = q % nch, o = q / nch;
@@ -395,41 +395,41 @@ template<typename A, class Op, class OpM> static void runVertical(const Plan& pl
             const int64 e0 = ch*RND_VCHUNK, len = std::min((int64)RND_VCHUNK, m - e0);
             const ptrdiff_t soff = ko.soff + (ptrdiff_t)e0*kstep, doff = ko.doff + (ptrdiff_t)e0*kdstep;
             const A* mrow = mbuf ? mbuf + doff : nullptr;   // kdstep == 1 for the innermost kept axis
-            for (int64 i = 0; i < len; i++)
+            为 (int64 i = 0; i < len; i++)
                 acc[i] = Op::init();
 
             int64 a = s*rcount/nsplit, b = (s + 1)*rcount/nsplit;
-            if (a < b)
+            如果 (a < b)
             {
                 ro.init(pl.nr, pl.rsize, pl.rsstep, nullptr, a);
-                for (; a < b; a++, ro.next())
+                为 (; a < b; a++, ro.next())
                 {
                     const uchar* p = pl.src + soff + ro.soff;
                     const A* x = loadRow<A>(pl, p, kstep, len, bufA.data(), bufT.data());
                     OpM::vrun(acc, x, len, mrow);
                 }
             }
-            if (nsplit == 1)
-                for (int64 i = 0; i < len; i++)
+            如果 (nsplit == 1)
+                为 (int64 i = 0; i < len; i++)
                     res[doff + i] = OpM::finalize(acc[i], pl.count, mrow ? mrow[i] : A(0));
-            else
-                for (int64 i = 0; i < len; i++)
+            否则
+                为 (int64 i = 0; i < len; i++)
                     partial[s*pl.nout + doff + i] = acc[i];
         }
     };
 
-    if (w.serial)
-        body(Range(0, (int)w.nitems));
-    else
-        parallel_for_(Range(0, (int)w.nitems), body, w.nstripes);
+    如果 (w.serial)
+        body(Range(0, (整数)w.nitems));
+    否则
+        parallel_for_(Range(0, (整数)w.nitems), body, w.nstripes);
 }
 
 // Adapters that give the plain operations and the shifted-exp pass one interface.
 template<typename A, class Op> struct Plain
 {
-    static A run(A acc, const A* x, int64 n, A) { return HRow<Op, A>::run(acc, x, n); }
+    static A run(A acc, const A* x, int64 n, A) { 返回 HRow<Op, A>::run(acc, x, n); }
     static void vrun(A* acc, const A* x, int64 n, const A*) { VRow<Op, A>::run(acc, x, n); }
-    static A finalize(A a, int64 count, A) { return Op::finalize(a, count); }
+    static A finalize(A a, int64 count, A) { 返回 Op::finalize(a, count); }
 };
 
 template<typename A> struct ShiftedExp
@@ -437,36 +437,36 @@ template<typename A> struct ShiftedExp
     typedef OpSumExpShifted<A> Op;
     static A run(A acc, const A* x, int64 n, A m)
     {
-        for (int64 i = 0; i < n; i++)
+        为 (int64 i = 0; i < n; i++)
             acc = Op::apply(acc, x[i], m);
-        return acc;
+        返回 acc;
     }
     static void vrun(A* acc, const A* x, int64 n, const A* m)
     {
-        for (int64 i = 0; i < n; i++)
+        为 (int64 i = 0; i < n; i++)
             acc[i] = Op::apply(acc[i], x[i], m[i]);
     }
-    static A finalize(A a, int64, A m) { return Op::finalize(a, m); }
+    static A finalize(A a, int64, A m) { 返回 Op::finalize(a, m); }
 };
 
 template<typename A, class Op, class OpM> static void runPass(const Plan& pl, A* res, const A* mbuf)
 {
     const double work = (double)pl.nout*(double)std::max(pl.count, (int64)1);
-    const int nthreads = work < RND_SERIAL_WORK ? 1 : getNumThreads();
+    const 整数 nthreads = work < RND_SERIAL_WORK ? 1 : getNumThreads();
     Work w;
     w.serial = nthreads <= 1;
     w.nsplit = 1;
     int64 items;
-    if (pl.innerReduced)
+    如果 (pl.innerReduced)
         items = pl.nout;
-    else
+    否则
     {
         int64 nouter = pl.nout/pl.ksize[pl.nk - 1];
         items = nouter*((pl.ksize[pl.nk - 1] + RND_VCHUNK - 1)/RND_VCHUNK);
     }
     // too few outputs to keep all the threads busy: split the reduction as well
     const int64 want = 4*(int64)nthreads;
-    if (!w.serial && items < want && pl.count > 1)
+    如果 (!w.serial && items < want && pl.count > 1)
     {
         int64 rows = pl.innerReduced ? pl.count/4096 : pl.count/16;
         w.nsplit = std::max((int64)1, std::min((want + items - 1)/items, std::min(rows, (int64)256)));
@@ -477,17 +477,17 @@ template<typename A, class Op, class OpM> static void runPass(const Plan& pl, A*
     CV_Assert(w.nitems <= INT_MAX);
 
     AutoBuffer<A> partial(w.nsplit > 1 ? (size_t)(w.nsplit*pl.nout) : 1);
-    if (pl.innerReduced)
+    如果 (pl.innerReduced)
         runHorizontal<A, Op, OpM>(pl, w, res, mbuf, partial.data());
-    else
+    否则
         runVertical<A, Op, OpM>(pl, w, res, mbuf, partial.data());
 
-    if (w.nsplit > 1)
+    如果 (w.nsplit > 1)
     {
-        for (int64 o = 0; o < pl.nout; o++)
+        为 (int64 o = 0; o < pl.nout; o++)
         {
             A acc = partial[(size_t)o];
-            for (int64 s = 1; s < w.nsplit; s++)
+            为 (int64 s = 1; s < w.nsplit; s++)
                 acc = Op::combine(acc, partial[(size_t)(s*pl.nout + o)]);
             res[o] = OpM::finalize(acc, pl.count, mbuf ? mbuf[o] : A(0));
         }
@@ -496,20 +496,20 @@ template<typename A, class Op, class OpM> static void runPass(const Plan& pl, A*
 
 template<typename A> static void fillResult(A* res, int64 n, A v)
 {
-    for (int64 i = 0; i < n; i++)
+    为 (int64 i = 0; i < n; i++)
         res[i] = v;
 }
 
-template<typename A> static void runOp(const Plan& pl, int op, A* res)
+template<typename A> static void runOp(const Plan& pl, 整数 op, A* res)
 {
-    if (pl.count == 0)
+    如果 (pl.count == 0)
     {
         // empty reduction: the identity of the operation
         A v = op == REDUCE_MAX ? OpMax<A>::init() : op == REDUCE_MIN ? OpMin<A>::init() :
               op == REDUCE_PROD ? A(1) :
               op == REDUCE_LOG_SUM || op == REDUCE_LOG_SUM_EXP ? OpMax<A>::init() : A(0);
         fillResult(res, pl.nout, v);
-        return;
+        返回;
     }
     switch (op)
     {
@@ -532,33 +532,33 @@ template<typename A> static void runOp(const Plan& pl, int op, A* res)
     }
 }
 
-template<typename A> static void runMinMax(const Plan& pl, int op, A* res)
+template<typename A> static void runMinMax(const Plan& pl, 整数 op, A* res)
 {
-    if (pl.count == 0)
+    如果 (pl.count == 0)
         fillResult(res, pl.nout, op == REDUCE_MAX ? OpMax<A>::init() : OpMin<A>::init());
-    else if (op == REDUCE_MAX)
+    否则 如果 (op == REDUCE_MAX)
         runPass<A, OpMax<A>, Plain<A, OpMax<A> > >(pl, res, nullptr);
-    else
+    否则
         runPass<A, OpMin<A>, Plain<A, OpMin<A> > >(pl, res, nullptr);
 }
 
-static void dispatch(const Plan& pl, int op, uchar* res)
+static void dispatch(const Plan& pl, 整数 op, uchar* res)
 {
     const bool minmax = op == REDUCE_MAX || op == REDUCE_MIN;
     switch (pl.adepth)
     {
     case CV_32F:
-        if (minmax) runMinMax<float>(pl, op, (float*)res); else runOp<float>(pl, op, (float*)res);
+        如果 (minmax) runMinMax<float>(pl, op, (float*)res); 否则 runOp<float>(pl, op, (float*)res);
         break;
     case CV_64F:
-        if (minmax) runMinMax<double>(pl, op, (double*)res); else runOp<double>(pl, op, (double*)res);
+        如果 (minmax) runMinMax<double>(pl, op, (double*)res); 否则 runOp<double>(pl, op, (double*)res);
         break;
     case CV_8U:  runMinMax<uchar>(pl, op, (uchar*)res); break;
     case CV_8S:  runMinMax<schar>(pl, op, (schar*)res); break;
     case CV_16U: runMinMax<ushort>(pl, op, (ushort*)res); break;
     case CV_16S: runMinMax<short>(pl, op, (short*)res); break;
     case CV_32U: runMinMax<unsigned>(pl, op, (unsigned*)res); break;
-    case CV_32S: runMinMax<int>(pl, op, (int*)res); break;
+    case CV_32S: runMinMax<整数>(pl, op, (整数*)res); break;
     case CV_64U: runMinMax<uint64_t>(pl, op, (uint64_t*)res); break;
     case CV_64S: runMinMax<int64_t>(pl, op, (int64_t*)res); break;
     default:
@@ -566,22 +566,22 @@ static void dispatch(const Plan& pl, int op, uchar* res)
     }
 }
 
-static int accumulatorDepth(int sdepth, int ddepth, int op)
+static 整数 accumulatorDepth(整数 sdepth, 整数 ddepth, 整数 op)
 {
-    if (op == REDUCE_MAX || op == REDUCE_MIN)
+    如果 (op == REDUCE_MAX || op == REDUCE_MIN)
     {
-        if (sdepth == CV_16F || sdepth == CV_16BF)
-            return CV_32F;
-        return sdepth == CV_Bool ? CV_8U : sdepth;
+        如果 (sdepth == CV_16F || sdepth == CV_16BF)
+            返回 CV_32F;
+        返回 sdepth == CV_Bool ? CV_8U : sdepth;
     }
     const bool wide = sdepth == CV_32S || sdepth == CV_32U || sdepth == CV_64S || sdepth == CV_64U ||
                       sdepth == CV_64F || ddepth == CV_64F;
-    return wide ? CV_64F : CV_32F;
+    返回 wide ? CV_64F : CV_32F;
 }
 
 } // namespace
 
-ReduceParams::ReduceParams(int _rtype, const std::vector<int>& _axes, bool _keepdims, int _dtype)
+ReduceParams::ReduceParams(整数 _rtype, const std::vector<整数>& _axes, bool _keepdims, 整数 _dtype)
     : rtype(_rtype), axes(_axes), keepdims(_keepdims), dtype(_dtype)
 {
 }
@@ -590,38 +590,38 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
 {
     CV_INSTRUMENT_REGION();
 
-    const int op = params.rtype, dtype = params.dtype;
+    const 整数 op = params.rtype, dtype = params.dtype;
     const bool keepdims = params.keepdims;
     CV_Check(op, op >= REDUCE_SUM && op <= REDUCE_LOG_SUM_EXP, "reduce: unknown reduction operation");
 
     Mat src = _src.getMat();
-    const int dims = src.dims, cn = src.channels();
-    const int sdepth = src.depth();
-    int ddepth = dtype < 0 ? sdepth : CV_MAT_DEPTH(dtype);
-    if ((op == REDUCE_MAX || op == REDUCE_MIN) && sdepth == CV_Bool && ddepth != CV_Bool)
+    const 整数 dims = src.dims, cn = src.channels();
+    const 整数 sdepth = src.depth();
+    整数 ddepth = dtype < 0 ? sdepth : CV_MAT_DEPTH(dtype);
+    如果 ((op == REDUCE_MAX || op == REDUCE_MIN) && sdepth == CV_Bool && ddepth != CV_Bool)
         CV_Error(Error::StsBadArg, "reduce: the output of max/min over bool must be bool");
 
     // which axes are reduced; empty means all of them
     bool reduced[CV_MAX_DIM] = {false};
-    if (params.axes.empty())
+    如果 (params.axes.empty())
         std::fill(reduced, reduced + dims, true);
-    for (int a : params.axes)
+    为 (整数 a : params.axes)
     {
         CV_CheckGE(a, -dims, "reduce: axis is out of range");
         CV_CheckLT(a, dims, "reduce: axis is out of range");
-        int ax = a < 0 ? a + dims : a;
+        整数 ax = a < 0 ? a + dims : a;
         CV_Check(a, !reduced[ax], "reduce: duplicate axis");
         reduced[ax] = true;
     }
 
-    int keepShape[CV_MAX_DIM], outShape[CV_MAX_DIM], nout = 0;
-    for (int i = 0; i < dims; i++)
+    整数 keepShape[CV_MAX_DIM], outShape[CV_MAX_DIM], nout = 0;
+    为 (整数 i = 0; i < dims; i++)
     {
         keepShape[i] = reduced[i] ? 1 : src.size[i];
-        if (!reduced[i] || keepdims)
+        如果 (!reduced[i] || keepdims)
             outShape[nout++] = keepShape[i];
     }
-    const int dtype_ = CV_MAKETYPE(ddepth, cn);
+    const 整数 dtype_ = CV_MAKETYPE(ddepth, cn);
     _dst.create(nout, outShape, dtype_);
     Mat dst = _dst.getMat();
 
@@ -636,21 +636,21 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
     CV_Assert(pl.sdepth == pl.adepth || pl.cvt);
 
     // gather the axes (+ the channel axis), outer first
-    int n = 0;
-    int size[RND_MAX_DIMS];
+    整数 n = 0;
+    整数 size[RND_MAX_DIMS];
     ptrdiff_t sstep[RND_MAX_DIMS], dstep[RND_MAX_DIMS];
     bool red[RND_MAX_DIMS];
     ptrdiff_t dcur = cn;
     ptrdiff_t dsteps[CV_MAX_DIM];
-    for (int i = dims - 1; i >= 0; i--)
+    为 (整数 i = dims - 1; i >= 0; i--)
     {
         dsteps[i] = dcur;
         dcur *= keepShape[i];
     }
     pl.count = 1;
-    for (int i = 0; i < dims; i++)
+    为 (整数 i = 0; i < dims; i++)
     {
-        if (reduced[i])
+        如果 (reduced[i])
             pl.count *= src.size[i];
         size[n] = src.size[i];
         sstep[n] = (ptrdiff_t)src.step[i];
@@ -658,7 +658,7 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
         red[n] = reduced[i];
         n++;
     }
-    if (cn > 1)
+    如果 (cn > 1)
     {
         size[n] = cn;
         sstep[n] = (ptrdiff_t)pl.sesz1;
@@ -671,38 +671,38 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
     const bool direct = pl.adepth == ddepth && dst.isContinuous();
     Mat resMat;
     uchar* res = dst.data;
-    if (!direct)
+    如果 (!direct)
     {
-        resMat.create(1, (int)std::max(pl.nout, (int64)1), CV_MAKETYPE(pl.adepth, 1));
+        resMat.create(1, (整数)std::max(pl.nout, (int64)1), CV_MAKETYPE(pl.adepth, 1));
         res = resMat.data;
     }
-    if (pl.nout == 0)
-        return;
+    如果 (pl.nout == 0)
+        返回;
 
     // drop size-1 axes, then merge neighbours of the same kind that are contiguous in both views
-    int m = 0;
-    for (int i = 0; i < n; i++)
+    整数 m = 0;
+    为 (整数 i = 0; i < n; i++)
     {
-        if (size[i] == 0)
+        如果 (size[i] == 0)
         {
             // empty source along this axis
-            if (red[i])
+            如果 (red[i])
             {
                 pl.count = 0;
                 continue;
             }
-            return;
+            返回;
         }
-        if (size[i] == 1)
+        如果 (size[i] == 1)
             continue;
-        if (m > 0 && red[m-1] == red[i] && sstep[m-1] == sstep[i]*size[i] &&
+        如果 (m > 0 && red[m-1] == red[i] && sstep[m-1] == sstep[i]*size[i] &&
             dstep[m-1] == dstep[i]*size[i])
         {
             size[m-1] *= size[i];
             sstep[m-1] = sstep[i];
             dstep[m-1] = dstep[i];
         }
-        else
+        否则
         {
             size[m] = size[i];
             sstep[m] = sstep[i];
@@ -711,7 +711,7 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
             m++;
         }
     }
-    if (m == 0)
+    如果 (m == 0)
     {
         // a single element
         size[0] = 1;
@@ -722,15 +722,15 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
     }
     pl.innerReduced = red[m-1];
     pl.nk = pl.nr = 0;
-    for (int i = 0; i < m; i++)
+    为 (整数 i = 0; i < m; i++)
     {
-        if (red[i])
+        如果 (red[i])
         {
             pl.rsize[pl.nr] = size[i];
             pl.rsstep[pl.nr] = sstep[i];
             pl.nr++;
         }
-        else
+        否则
         {
             pl.ksize[pl.nk] = size[i];
             pl.ksstep[pl.nk] = sstep[i];
@@ -738,7 +738,7 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
             pl.nk++;
         }
     }
-    if (pl.nk == 0)
+    如果 (pl.nk == 0)
     {
         pl.ksize[0] = 1;
         pl.ksstep[0] = 0;
@@ -748,10 +748,10 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
 
     dispatch(pl, op, res);
 
-    if (!direct)
+    如果 (!direct)
     {
         Mat r(dst.dims, dst.size.p, CV_MAKETYPE(pl.adepth, cn), resMat.data);
-        if (dst.dims == 0)
+        如果 (dst.dims == 0)
             r = Mat(0, nullptr, CV_MAKETYPE(pl.adepth, cn), resMat.data);
         r.convertTo(dst, ddepth);
     }

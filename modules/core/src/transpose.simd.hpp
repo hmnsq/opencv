@@ -17,16 +17,16 @@ void transpose_32bit_blocks_simd(const uchar* src, size_t sstep,
 
 static inline void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sstep_e,
                                                uint32_t* dst32, size_t dstep_e,
-                                               int i_lo, int i_hi, int j_lo, int j_hi)
+                                               整数 i_lo, 整数 i_hi, 整数 j_lo, 整数 j_hi)
 {
-    int i = i_lo;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (VTraits<v_uint32>::vlanes() == 8)
+    整数 i = i_lo;
+#如果 (CV_SIMD || CV_SIMD_SCALABLE)
+    如果 (VTraits<v_uint32>::vlanes() == 8)
     {
-        for (; i + 8 <= i_hi; i += 8)
+        为 (; i + 8 <= i_hi; i += 8)
         {
-            int j = j_lo;
-            for (; j + 8 <= j_hi; j += 8)
+            整数 j = j_lo;
+            为 (; j + 8 <= j_hi; j += 8)
             {
                 v_uint32 r0 = vx_load(src32 + i + sstep_e*(j+0));
                 v_uint32 r1 = vx_load(src32 + i + sstep_e*(j+1));
@@ -56,17 +56,17 @@ static inline void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sst
                 vx_store(dst32 + dstep_e*(i+6) + j, b6);
                 vx_store(dst32 + dstep_e*(i+7) + j, b7);
             }
-            for (; j < j_hi; j++)
-                for (int k = 0; k < 8; k++)
+            为 (; j < j_hi; j++)
+                为 (整数 k = 0; k < 8; k++)
                     dst32[dstep_e*(i+k) + j] = src32[i + sstep_e*j + k];
         }
     }
-    else if (VTraits<v_uint32>::vlanes() == 4)
+    否则 如果 (VTraits<v_uint32>::vlanes() == 4)
     {
-        for (; i + 4 <= i_hi; i += 4)
+        为 (; i + 4 <= i_hi; i += 4)
         {
-            int j = j_lo;
-            for (; j + 4 <= j_hi; j += 4)
+            整数 j = j_lo;
+            为 (; j + 4 <= j_hi; j += 4)
             {
                 v_uint32 r0 = vx_load(src32 + i + sstep_e*(j+0));
                 v_uint32 r1 = vx_load(src32 + i + sstep_e*(j+1));
@@ -79,14 +79,14 @@ static inline void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sst
                 vx_store(dst32 + dstep_e*(i+2) + j, o2);
                 vx_store(dst32 + dstep_e*(i+3) + j, o3);
             }
-            for (; j < j_hi; j++)
-                for (int k = 0; k < 4; k++)
+            为 (; j < j_hi; j++)
+                为 (整数 k = 0; k < 4; k++)
                     dst32[dstep_e*(i+k) + j] = src32[i + sstep_e*j + k];
         }
     }
 #endif
-    for (; i < i_hi; i++)
-        for (int j = j_lo; j < j_hi; j++)
+    为 (; i < i_hi; i++)
+        为 (整数 j = j_lo; j < j_hi; j++)
             dst32[dstep_e*i + j] = src32[i + sstep_e*j];
 }
 
@@ -97,28 +97,28 @@ void transpose_32bit_blocks_simd(const uchar* src, size_t sstep,
     uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
     const size_t sstep_e = sstep / sizeof(uint32_t);
     const size_t dstep_e = dstep / sizeof(uint32_t);
-    const int m = sz.width, n = sz.height;
+    const 整数 m = sz.width, n = sz.height;
 
     // Single-threaded for small inputs to avoid parallel_for_ overhead.
     const int64_t kMinParallelElements = 64 * 1024;
-    if ((int64_t)m * n < kMinParallelElements)
+    如果 ((int64_t)m * n < kMinParallelElements)
     {
         transpose_32bit_blocks_tile(src32, sstep_e, dst32, dstep_e, 0, m, 0, n);
-        return;
+        返回;
     }
 
-    const int TILE = 32;
-    const int mtiles = (m + TILE - 1) / TILE;
-    const int ntiles = (n + TILE - 1) / TILE;
+    const 整数 TILE = 32;
+    const 整数 mtiles = (m + TILE - 1) / TILE;
+    const 整数 ntiles = (n + TILE - 1) / TILE;
     const int64_t totalTiles = (int64_t)mtiles * ntiles;
-    parallel_for_(Range(0, (int)totalTiles), [&](const Range& r)
+    parallel_for_(Range(0, (整数)totalTiles), [&](const Range& r)
     {
-        for (int idx = r.start; idx < r.end; idx++)
+        为 (整数 idx = r.start; idx < r.end; idx++)
         {
-            int ti = idx / ntiles;
-            int tj = idx - ti * ntiles;
-            int i_lo = ti * TILE, i_hi = std::min(i_lo + TILE, m);
-            int j_lo = tj * TILE, j_hi = std::min(j_lo + TILE, n);
+            整数 ti = idx / ntiles;
+            整数 tj = idx - ti * ntiles;
+            整数 i_lo = ti * TILE, i_hi = std::min(i_lo + TILE, m);
+            整数 j_lo = tj * TILE, j_hi = std::min(j_lo + TILE, n);
             transpose_32bit_blocks_tile(src32, sstep_e, dst32, dstep_e, i_lo, i_hi, j_lo, j_hi);
         }
     });

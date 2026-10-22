@@ -12,168 +12,168 @@ namespace cv
 
 template<typename _Tp, typename _Rt>
 static void batchDistL1_(const void* _src1, const void* _src2, size_t step2,
-                         int nvecs, int len, void* _dist, const uchar* mask)
+                         整数 nvecs, 整数 len, void* _dist, const uchar* mask)
 {
     const _Tp* src1 = (const _Tp*)_src1;
     const _Tp* src2 = (const _Tp*)_src2;
     _Rt* dist = (_Rt*)_dist;
     step2 /= sizeof(src2[0]);
-    if( !mask )
+    如果( !mask )
     {
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = normL1<_Tp, _Rt>(src1, src2 + step2*i, len);
     }
-    else
+    否则
     {
         _Rt val0 = std::numeric_limits<_Rt>::max();
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = mask[i] ? normL1<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
     }
 }
 
 template<typename _Tp, typename _Rt>
 static void batchDistL2Sqr_(const void* _src1, const void* _src2, size_t step2,
-                            int nvecs, int len, void* _dist, const uchar* mask)
+                            整数 nvecs, 整数 len, void* _dist, const uchar* mask)
 {
     const _Tp* src1 = (const _Tp*)_src1;
     const _Tp* src2 = (const _Tp*)_src2;
     _Rt* dist = (_Rt*)_dist;
     step2 /= sizeof(src2[0]);
-    if( !mask )
+    如果( !mask )
     {
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len);
     }
-    else
+    否则
     {
         _Rt val0 = std::numeric_limits<_Rt>::max();
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = mask[i] ? normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
     }
 }
 
 template<>
 void batchDistL2Sqr_<float, float>(const void* _src1, const void* _src2, size_t step2,
-                                   int nvecs, int len, void* _dist, const uchar* mask)
+                                   整数 nvecs, 整数 len, void* _dist, const uchar* mask)
 {
     const float* src1 = (const float*)_src1;
     const float* src2 = (const float*)_src2;
     float* dist = (float*)_dist;
     step2 /= sizeof(src2[0]);
-    if( !mask )
+    如果( !mask )
     {
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = hal::normL2Sqr_(src1, src2 + step2*i, len);
     }
-    else
+    否则
     {
         float val0 = std::numeric_limits<float>::max();
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = mask[i] ? hal::normL2Sqr_(src1, src2 + step2*i, len) : val0;
     }
 }
 
 template<typename _Tp, typename _Rt>
 static void batchDistL2_(const void* _src1, const void* _src2, size_t step2,
-                         int nvecs, int len, void* _dist, const uchar* mask)
+                         整数 nvecs, 整数 len, void* _dist, const uchar* mask)
 {
     const _Tp* src1 = (const _Tp*)_src1;
     const _Tp* src2 = (const _Tp*)_src2;
     _Rt* dist = (_Rt*)_dist;
     step2 /= sizeof(src2[0]);
-    if( !mask )
+    如果( !mask )
     {
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = std::sqrt(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len));
     }
-    else
+    否则
     {
         _Rt val0 = std::numeric_limits<_Rt>::max();
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = mask[i] ? std::sqrt(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len)) : val0;
     }
 }
 
 template<>
 void batchDistL2_<float, float>(const void* _src1, const void* _src2, size_t step2,
-                                int nvecs, int len, void* _dist, const uchar* mask)
+                                整数 nvecs, 整数 len, void* _dist, const uchar* mask)
 {
     const float* src1 = (const float*)_src1;
     const float* src2 = (const float*)_src2;
     float* dist = (float*)_dist;
     step2 /= sizeof(src2[0]);
-    if( !mask )
+    如果( !mask )
     {
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = std::sqrt(hal::normL2Sqr_(src1, src2 + step2*i, len));
     }
-    else
+    否则
     {
         float val0 = std::numeric_limits<float>::max();
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = mask[i] ? std::sqrt(hal::normL2Sqr_(src1, src2 + step2*i, len)) : val0;
     }
 }
 
 static void batchDistHamming(const void* _src1, const void* _src2, size_t step2,
-                             int nvecs, int len, void* _dist, const uchar* mask)
+                             整数 nvecs, 整数 len, void* _dist, const uchar* mask)
 {
     const uchar* src1 = (const uchar*)_src1;
     const uchar* src2 = (const uchar*)_src2;
-    int* dist = (int*)_dist;
+    整数* dist = (整数*)_dist;
     step2 /= sizeof(src2[0]);
-    if( !mask )
+    如果( !mask )
     {
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
              dist[i] = hal::normHamming(src1, src2 + step2*i, len);
     }
-    else
+    否则
     {
-        int val0 = INT_MAX;
-        for( int i = 0; i < nvecs; i++ )
+        整数 val0 = INT_MAX;
+        为( 整数 i = 0; i < nvecs; i++ )
         {
-            if (mask[i])
+            如果 (mask[i])
                 dist[i] = hal::normHamming(src1, src2 + step2*i, len);
-            else
+            否则
                 dist[i] = val0;
         }
     }
 }
 
 static void batchDistHamming2(const void* _src1, const void* _src2, size_t step2,
-                              int nvecs, int len, void* _dist, const uchar* mask)
+                              整数 nvecs, 整数 len, void* _dist, const uchar* mask)
 {
     const uchar* src1 = (const uchar*)_src1;
     const uchar* src2 = (const uchar*)_src2;
-    int* dist = (int*)_dist;
+    整数* dist = (整数*)_dist;
     step2 /= sizeof(src2[0]);
-    if( !mask )
+    如果( !mask )
     {
-        for( int i = 0; i < nvecs; i++ )
+        为( 整数 i = 0; i < nvecs; i++ )
             dist[i] = hal::normHamming(src1, src2 + step2*i, len, 2);
     }
-    else
+    否则
     {
-        int val0 = INT_MAX;
-        for( int i = 0; i < nvecs; i++ )
+        整数 val0 = INT_MAX;
+        为( 整数 i = 0; i < nvecs; i++ )
         {
-            if (mask[i])
+            如果 (mask[i])
                 dist[i] = hal::normHamming(src1, src2 + step2*i, len, 2);
-            else
+            否则
                 dist[i] = val0;
         }
     }
 }
 
 typedef void (*BatchDistFunc)(const void* src1, const void* src2, size_t step2,
-                              int nvecs, int len, void* dist, const uchar* mask);
+                              整数 nvecs, 整数 len, void* dist, const uchar* mask);
 
 
 struct BatchDistInvoker : public ParallelLoopBody
 {
     BatchDistInvoker( const Mat& _src1, const Mat& _src2,
-                      Mat& _dist, Mat& _nidx, int _K,
-                      const Mat& _mask, int _update,
+                      Mat& _dist, Mat& _nidx, 整数 _K,
+                      const Mat& _mask, 整数 _update,
                       BatchDistFunc _func)
     {
         src1 = &_src1;
@@ -188,29 +188,29 @@ struct BatchDistInvoker : public ParallelLoopBody
 
     void operator()(const Range& range) const CV_OVERRIDE
     {
-        AutoBuffer<int> buf(src2->rows);
-        int* bufptr = buf.data();
+        AutoBuffer<整数> buf(src2->rows);
+        整数* bufptr = buf.data();
 
-        for( int i = range.start; i < range.end; i++ )
+        为( 整数 i = range.start; i < range.end; i++ )
         {
             func(src1->ptr(i), src2->ptr(), src2->step, src2->rows, src2->cols,
                  K > 0 ? (uchar*)bufptr : dist->ptr(i), mask->data ? mask->ptr(i) : 0);
 
-            if( K > 0 )
+            如果( K > 0 )
             {
-                int* nidxptr = nidx->ptr<int>(i);
+                整数* nidxptr = nidx->ptr<整数>(i);
                 // since positive float's can be compared just like int's,
                 // we handle both CV_32S and CV_32F cases with a single branch
-                int* distptr = (int*)dist->ptr(i);
+                整数* distptr = (整数*)dist->ptr(i);
 
-                int j, k;
+                整数 j, k;
 
-                for( j = 0; j < src2->rows; j++ )
+                为( j = 0; j < src2->rows; j++ )
                 {
-                    int d = bufptr[j];
-                    if( d < distptr[K-1] )
+                    整数 d = bufptr[j];
+                    如果( d < distptr[K-1] )
                     {
-                        for( k = K-2; k >= 0 && distptr[k] > d; k-- )
+                        为( k = K-2; k >= 0 && distptr[k] > d; k-- )
                         {
                             nidxptr[k+1] = nidxptr[k];
                             distptr[k+1] = distptr[k];
@@ -228,27 +228,27 @@ struct BatchDistInvoker : public ParallelLoopBody
     Mat *dist;
     Mat *nidx;
     const Mat *mask;
-    int K;
-    int update;
+    整数 K;
+    整数 update;
     BatchDistFunc func;
 };
 
 }
 
 void cv::batchDistance( InputArray _src1, InputArray _src2,
-                        OutputArray _dist, int dtype, OutputArray _nidx,
-                        int normType, int K, InputArray _mask,
-                        int update, bool crosscheck )
+                        OutputArray _dist, 整数 dtype, OutputArray _nidx,
+                        整数 normType, 整数 K, InputArray _mask,
+                        整数 update, bool crosscheck )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src1 = _src1.getMat(), src2 = _src2.getMat(), mask = _mask.getMat();
-    int type = src1.type();
+    整数 type = src1.type();
     CV_Assert( type == src2.type() && src1.cols == src2.cols &&
                (type == CV_32F || type == CV_8U));
     CV_Assert( _nidx.needed() == (K > 0) );
 
-    if( dtype == -1 )
+    如果( dtype == -1 )
     {
         dtype = normType == NORM_HAMMING || normType == NORM_HAMMING2 ? CV_32S : CV_32F;
     }
@@ -258,20 +258,20 @@ void cv::batchDistance( InputArray _src1, InputArray _src2,
 
     _dist.create(src1.rows, (K > 0 ? K : src2.rows), dtype);
     Mat dist = _dist.getMat(), nidx;
-    if( _nidx.needed() )
+    如果( _nidx.needed() )
     {
         _nidx.create(dist.size(), CV_32S);
         nidx = _nidx.getMat();
     }
 
-    if( update == 0 && K > 0 )
+    如果( update == 0 && K > 0 )
     {
         dist = Scalar::all(dtype == CV_32S ? (double)INT_MAX : (double)FLT_MAX);
         nidx = Scalar::all(-1);
     }
 
 
-    if( crosscheck )
+    如果( crosscheck )
     {
         CV_Assert( K == 1 && update == 0 && mask.empty() );
         CV_Assert(!nidx.empty());
@@ -285,71 +285,71 @@ void cv::batchDistance( InputArray _src1, InputArray _src2,
         // to i*-th element of src2 and i*-th element of src2 is the closest to idx-th element of src1.
         // If nidx[idx] = -1, it means that there is no such ideal couple for it in src2.
         // This O(2N) procedure is called cross-check and it helps to eliminate some false matches.
-        if( dtype == CV_32S )
+        如果( dtype == CV_32S )
         {
-            for( int i = 0; i < tdist.rows; i++ )
+            为( 整数 i = 0; i < tdist.rows; i++ )
             {
-                int idx = tidx.at<int>(i);
-                int d = tdist.at<int>(i), d0 = dist.at<int>(idx);
-                if( d < d0 )
+                整数 idx = tidx.at<整数>(i);
+                整数 d = tdist.at<整数>(i), d0 = dist.at<整数>(idx);
+                如果( d < d0 )
                 {
-                    dist.at<int>(idx) = d;
-                    nidx.at<int>(idx) = i + update;
+                    dist.at<整数>(idx) = d;
+                    nidx.at<整数>(idx) = i + update;
                 }
             }
         }
-        else
+        否则
         {
-            for( int i = 0; i < tdist.rows; i++ )
+            为( 整数 i = 0; i < tdist.rows; i++ )
             {
-                int idx = tidx.at<int>(i);
+                整数 idx = tidx.at<整数>(i);
                 float d = tdist.at<float>(i), d0 = dist.at<float>(idx);
-                if( d < d0 )
+                如果( d < d0 )
                 {
                     dist.at<float>(idx) = d;
-                    nidx.at<int>(idx) = i + update;
+                    nidx.at<整数>(idx) = i + update;
                 }
             }
         }
-        for( int i = 0; i < sdist.rows; i++ )
+        为( 整数 i = 0; i < sdist.rows; i++ )
         {
-            if( tidx.at<int>(sidx.at<int>(i)) != i )
+            如果( tidx.at<整数>(sidx.at<整数>(i)) != i )
             {
-                nidx.at<int>(i) = -1;
+                nidx.at<整数>(i) = -1;
             }
         }
-        return;
+        返回;
     }
 
     BatchDistFunc func = 0;
-    if( type == CV_8U )
+    如果( type == CV_8U )
     {
-        if( normType == NORM_L1 && dtype == CV_32S )
-            func = batchDistL1_<uchar, int>;
-        else if( normType == NORM_L1 && dtype == CV_32F )
+        如果( normType == NORM_L1 && dtype == CV_32S )
+            func = batchDistL1_<uchar, 整数>;
+        否则 如果( normType == NORM_L1 && dtype == CV_32F )
             func = batchDistL1_<uchar, float>;
-        else if( normType == NORM_L2SQR && dtype == CV_32S )
-            func = batchDistL2Sqr_<uchar, int>;
-        else if( normType == NORM_L2SQR && dtype == CV_32F )
+        否则 如果( normType == NORM_L2SQR && dtype == CV_32S )
+            func = batchDistL2Sqr_<uchar, 整数>;
+        否则 如果( normType == NORM_L2SQR && dtype == CV_32F )
             func = batchDistL2Sqr_<uchar, float>;
-        else if( normType == NORM_L2 && dtype == CV_32F )
+        否则 如果( normType == NORM_L2 && dtype == CV_32F )
             func = batchDistL2_<uchar, float>;
-        else if( normType == NORM_HAMMING && dtype == CV_32S )
+        否则 如果( normType == NORM_HAMMING && dtype == CV_32S )
             func = batchDistHamming;
-        else if( normType == NORM_HAMMING2 && dtype == CV_32S )
+        否则 如果( normType == NORM_HAMMING2 && dtype == CV_32S )
             func = batchDistHamming2;
     }
-    else if( type == CV_32F && dtype == CV_32F )
+    否则 如果( type == CV_32F && dtype == CV_32F )
     {
-        if( normType == NORM_L1 )
+        如果( normType == NORM_L1 )
             func = batchDistL1_<float, float>;
-        else if( normType == NORM_L2SQR )
+        否则 如果( normType == NORM_L2SQR )
             func = batchDistL2Sqr_<float, float>;
-        else if( normType == NORM_L2 )
+        否则 如果( normType == NORM_L2 )
             func = batchDistL2_<float, float>;
     }
 
-    if( func == 0 )
+    如果( func == 0 )
         CV_Error_(cv::Error::StsUnsupportedFormat,
                   ("The combination of type=%d, dtype=%d and normType=%d is not supported",
                    type, dtype, normType));

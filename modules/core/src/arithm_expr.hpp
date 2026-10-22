@@ -83,7 +83,7 @@ enum TOp
 };
 
 // Arity from the encoding above (0 for OP_NOP). No table to keep in lock-step with the enum.
-inline int opArity(TOp op) { return ((int)op >> OP_ARITY_SHIFT) & 7; }
+inline 整数 opArity(TOp op) { 返回 ((整数)op >> OP_ARITY_SHIFT) & 7; }
 
 // Operation category — the graph compiler's type-inference rules differ per category.
 enum ElemwiseCategory
@@ -103,12 +103,12 @@ CV_EXPORTS ElemwiseCategory opCategory(TOp op);
 // numpy-style arithmetic promotion of two depths (see arithm_expr.cpp): INTEGER-PRESERVING and
 // COMMUTATIVE; mixed sign -> a wide-enough signed type; any float -> the smallest covering float.
 // EW_DEPTH_NONE on one side returns the other. The rdepth==-1 auto result-depth rule.
-CV_EXPORTS int promoteArith(int a, int b);
+CV_EXPORTS 整数 promoteArith(整数 a, 整数 b);
 
 // The 'safe' result depth of absdiff over a value of `depth`: a SIGNED integer difference can reach
 // 2^width-1 (|(-128)-127| = 255), so it needs the UNSIGNED type of the same width (8s->8u, 16s->16u,
 // 32s->32u, 64s->64u) to hold it without saturation. Unsigned/float depths keep their type.
-CV_EXPORTS int absdiffResultDepth(int depth);
+CV_EXPORTS 整数 absdiffResultDepth(整数 depth);
 
 // ---------------------------------------------------------------------------
 // Steps for one operand, in elemsize1 units, one entry per shape dim (parallel to a
@@ -129,13 +129,13 @@ typedef std::array<size_t, MatShape::MAX_DIMS> EwSteps;
 // 4 doubles): mul/div read params[0] as a scale (1.0 = none). `flags` carries small per-kernel options
 // (e.g. a compare op's 0/1-vs-0/255 mask value); `userdata` carries a wrapped core BinaryFunc for casts.
 // ---------------------------------------------------------------------------
-typedef int (*KernelFunc)(
+typedef 整数 (*KernelFunc)(
     const void* src0, size_t step0y, size_t step0x,
     const void* src1, size_t step1y, size_t step1x,
     const void* src2, size_t step2y, size_t step2x,
     void*       dst,  size_t dstepy,
-    int width, int height, const double* params,
-    int flags, void* userdata);
+    整数 width, 整数 height, const double* params,
+    整数 flags, void* userdata);
 
 // TKernel::flags - small per-kernel options, interpreted by the kernel itself (so the meaning is
 // per-kernel: the cast kernels read it as the dst element size, the compare kernels as the bits below).
@@ -154,13 +154,13 @@ enum TKernelFlags
 };
 
 // Decode a 2-bit patch field (0->0, 1->1, else 255) - shared by the compare kernel and its builder.
-inline int cmpPatchByte(int twoBits) { return twoBits == 0 ? 0 : twoBits == 1 ? 1 : 255; }
+inline 整数 cmpPatchByte(整数 twoBits) { 返回 twoBits == 0 ? 0 : twoBits == 1 ? 1 : 255; }
 
 struct TKernel
 {
     KernelFunc fptr = nullptr;
     void* userdata = nullptr;
-    int flags = 0;
+    整数 flags = 0;
 };
 
 // ---- per-op kernel entry points (implemented in arithm.dispatch.cpp) ----------------------
@@ -169,35 +169,35 @@ struct TKernel
 // depth, `R` the result depth; EW_DEPTH_NONE marks an unused operand. A null fptr means "no exact
 // kernel for this combination" - the compiler then inserts OP_CAST and retries with a working type.
 // These are the useful, op-specific intermediaries (candidates for CV_EXPORTS later).
-CV_EXPORTS TKernel getAddFunc(int T, int R);
-CV_EXPORTS TKernel getSubFunc(int T, int R);
-CV_EXPORTS TKernel getMulFunc(int T, int R);
-CV_EXPORTS TKernel getDivFunc(int T, int R, bool checked);   // `checked` => guard b==0 -> 0 (integer divide)
-CV_EXPORTS TKernel getPowFunc(int T, int R);
-CV_EXPORTS TKernel getMinFunc(int T, int R);
-CV_EXPORTS TKernel getMaxFunc(int T, int R);
-CV_EXPORTS TKernel getAbsdiffFunc(int T, int R);
-CV_EXPORTS TKernel getHypotFunc(int T, int R);               // OP_HYPOT, T x T -> T (float depths)
-CV_EXPORTS TKernel getAtan2Func(int T, int R);               // OP_ATAN2, T x T -> T (float depths)
-CV_EXPORTS TKernel getCmpFunc(TOp op, int T);                // T x T -> u8 mask (op = OP_CMP_*)
-CV_EXPORTS TKernel getBitwiseFunc(TOp op, int esz);          // OP_AND / OP_OR / OP_XOR, by element size
-CV_EXPORTS TKernel getNotFunc(int esz);                      // OP_NOT, by element size
-CV_EXPORTS TKernel getAddWeightedFunc(int T, int R);         // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
-CV_EXPORTS TKernel getSelectFunc(int mdepth, int T);         // OP_SELECT: 1-byte mask, a/b/dst of T
-CV_EXPORTS TKernel getClampFunc(int T);                      // OP_CLAMP: min(max(x, lo), hi), all of T
+CV_EXPORTS TKernel getAddFunc(整数 T, 整数 R);
+CV_EXPORTS TKernel getSubFunc(整数 T, 整数 R);
+CV_EXPORTS TKernel getMulFunc(整数 T, 整数 R);
+CV_EXPORTS TKernel getDivFunc(整数 T, 整数 R, bool checked);   // `checked` => guard b==0 -> 0 (integer divide)
+CV_EXPORTS TKernel getPowFunc(整数 T, 整数 R);
+CV_EXPORTS TKernel getMinFunc(整数 T, 整数 R);
+CV_EXPORTS TKernel getMaxFunc(整数 T, 整数 R);
+CV_EXPORTS TKernel getAbsdiffFunc(整数 T, 整数 R);
+CV_EXPORTS TKernel getHypotFunc(整数 T, 整数 R);               // OP_HYPOT, T x T -> T (float depths)
+CV_EXPORTS TKernel getAtan2Func(整数 T, 整数 R);               // OP_ATAN2, T x T -> T (float depths)
+CV_EXPORTS TKernel getCmpFunc(TOp op, 整数 T);                // T x T -> u8 mask (op = OP_CMP_*)
+CV_EXPORTS TKernel getBitwiseFunc(TOp op, 整数 esz);          // OP_AND / OP_OR / OP_XOR, by element size
+CV_EXPORTS TKernel getNotFunc(整数 esz);                      // OP_NOT, by element size
+CV_EXPORTS TKernel getAddWeightedFunc(整数 T, 整数 R);         // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
+CV_EXPORTS TKernel getSelectFunc(整数 mdepth, 整数 T);         // OP_SELECT: 1-byte mask, a/b/dst of T
+CV_EXPORTS TKernel getClampFunc(整数 T);                      // OP_CLAMP: min(max(x, lo), hi), all of T
 // math.dispatch.cpp (kernels in math.simd.hpp):
-CV_EXPORTS TKernel getMathFunc(TOp op, int T);               // unary math (OP_SQRT..OP_RELU), T -> T,
+CV_EXPORTS TKernel getMathFunc(TOp op, 整数 T);               // unary math (OP_SQRT..OP_RELU), T -> T,
                                                              // T in {f16, bf16, f32, f64}; exp/log at
                                                              // f32/f64 route through HAL/IPP when installed
 // the engine's OWN vector kernel over one contiguous span - the built-in implementation behind
 // cv::hal::exp32f & co (their table kernels are gone), and getMathFunc's final fallback
-CV_EXPORTS void mathSpanEngine(TOp op, int depth, const void* src, void* dst, int n);
+CV_EXPORTS void mathSpanEngine(TOp op, 整数 depth, const void* src, void* dst, 整数 n);
 // getPowFunc is declared above with the arithm getters but LIVES in math.dispatch.cpp too
 // (powKernel: special-cased scalar exponents + the exp(y*log(x)) general path)
 
 // The op-level dispatcher: routes (op, depths) to the right get*Func above. nullptr if the exact
 // combination is not provided. Unused operand depths are EW_DEPTH_NONE.
-CV_EXPORTS TKernel getElemwiseFunc(TOp op, int depth0, int depth1, int depth2, int rdepth);
+CV_EXPORTS TKernel getElemwiseFunc(TOp op, 整数 depth0, 整数 depth1, 整数 depth2, 整数 rdepth);
 
 // An element-wise expression as ONE flat program (the analogue of cv::MatExpr for element-wise ops):
 // an arg table (`arginfo`, the typed operands) + an instruction list (`prog`). The program IS the
@@ -228,13 +228,13 @@ struct CV_EXPORTS TExpr
     struct Arg
     {
         ArgKind kind = NONE;
-        int depth = EW_DEPTH_NONE;  // EW_DEPTH_NONE on a CONST = "flexible" (the emit* layers type it per use)
-        int channels = 0;           // for CONST: # of per-channel values (0/1 => single broadcast value)
-        int index = -1;             // input#/output#/temp-id depending on kind
+        整数 depth = EW_DEPTH_NONE;  // EW_DEPTH_NONE on a CONST = "flexible" (the emit* layers type it per use)
+        整数 channels = 0;           // for CONST: # of per-channel values (0/1 => single broadcast value)
+        整数 index = -1;             // input#/output#/temp-id depending on kind
         // CONST only: the constant's values live in TExpr::constbuf (in `srcdepth` until compile(),
         // which converts them to the resolved `depth`). constofs = offset into constbuf, in uint64_t
         // units. A per-channel scalar of any width is carried this way (no 4-channel Scalar limit).
-        int srcdepth = EW_DEPTH_NONE;
+        整数 srcdepth = EW_DEPTH_NONE;
         size_t constofs = 0;
         // Set on a value the parser bound to a name ("t = ...;"). Such a value may be referenced
         // any number of times later, so the two retire-the-slot manoeuvres (moveToOutput's MOVE and
@@ -253,7 +253,7 @@ struct CV_EXPORTS TExpr
     {
         TKernel kernel;
         TOp op = OP_NOP;
-        int arg0 = 0, arg1 = 0, arg2 = 0, result = 0;
+        整数 arg0 = 0, arg1 = 0, arg2 = 0, result = 0;
         Scalar params = Scalar(1);          // op scalars; params[0]=scale defaults to 1 (identity)
     };
 
@@ -261,16 +261,16 @@ struct CV_EXPORTS TExpr
     AutoBuffer<Arg, 16>    arginfo;          // slot 0 is always NONE
     AutoBuffer<uint64_t, 16> constbuf;       // CONST value store (uint64-aligned slots); Arg::constofs
                                              // indexes it. Source values on build, resolved-type after compile()
-    int ninputs = 0;
-    int noutputs = 0;
-    int ntemps = 0;
-    int nbuffers = 0;                        // distinct physical temp buffers after liveness
-    int nconsts = 0;                         // # materialized CONST slots (set by compile()) - sizes
+    整数 ninputs = 0;
+    整数 noutputs = 0;
+    整数 ntemps = 0;
+    整数 nbuffers = 0;                        // distinct physical temp buffers after liveness
+    整数 nconsts = 0;                         // # materialized CONST slots (set by compile()) - sizes
                                              // the const store; nconsts==0 enables exec()'s fast path
-    int capElems = 0;                        // # elements one ~16KB L1 scratch fragment holds (set by
+    整数 capElems = 0;                        // # elements one ~16KB L1 scratch fragment holds (set by
                                              // compile()); INT_MAX when there are no temps.
-    AutoBuffer<int, 16>    bufferOfTemp;     // temp-id -> physical buffer id
-    AutoBuffer<int, 8>     bufEszPrefix;     // [nbuffers+1] prefix sums of each physical temp buffer's
+    AutoBuffer<整数, 16>    bufferOfTemp;     // temp-id -> physical buffer id
+    AutoBuffer<整数, 8>     bufEszPrefix;     // [nbuffers+1] prefix sums of each physical temp buffer's
                                              // elem size (set by compile()); [nbuffers] = temp bytes
                                              // per output element.
 
@@ -279,39 +279,39 @@ struct CV_EXPORTS TExpr
     void dump(std::ostream& os) const;       // human-readable slot table + instruction list (debug)
 
     // ---- operand / instruction builders (return the new slot / instruction index) ----
-    int  addInput(int depth);
-    int  addConst(int depth, const Scalar& v, int channels = 1);   // source = Scalar (f64); depth NONE => flexible
-    int  addConst(int depth, int srcdepth, const void* data, int channels);   // source = native bytes
+    整数  addInput(整数 depth);
+    整数  addConst(整数 depth, const Scalar& v, 整数 channels = 1);   // source = Scalar (f64); depth NONE => flexible
+    整数  addConst(整数 depth, 整数 srcdepth, const void* data, 整数 channels);   // source = native bytes
     // A typed copy of a flexible CONST `srcSlot` at the resolved `depth` (shares its source values;
     // compile() converts them). Used by the emit* layers / parser cast where addConst(depth, cval) was.
-    int  typedConstFrom(int srcSlot, int depth);
-    int  addTemp(int depth);
-    int  addOutput(int depth);
+    整数  typedConstFrom(整数 srcSlot, 整数 depth);
+    整数  addTemp(整数 depth);
+    整数  addOutput(整数 depth);
     // addInsn resolves the instruction's kernel NOW from the operand/result depths (final at build
     // time). The 2nd form takes a pre-resolved kernel, for callers that already probed getElemwiseFunc.
-    int  addInsn(TOp op, int a0, int a1, int a2, int result, const Scalar& params = Scalar(1));
-    int  addInsn(TOp op, int a0, int a1, int a2, int result, const TKernel& kernel,
+    整数  addInsn(TOp op, 整数 a0, 整数 a1, 整数 a2, 整数 result, const Scalar& params = Scalar(1));
+    整数  addInsn(TOp op, 整数 a0, 整数 a1, 整数 a2, 整数 result, const TKernel& kernel,
                  const Scalar& params = Scalar(1));
 
     // Return `arg` unchanged if it is already of depth `depth`; otherwise append an OP_CAST into a
     // fresh temp of that depth and return the temp's slot. The one place casts are inserted.
-    int  maybeAddCast(int arg, int depth);
+    整数  maybeAddCast(整数 arg, 整数 depth);
 
     // ---- type-inference + cast-insertion policy layers (parser + hand builders) ----
     // Each derives the result depth (promotion, or a forced `rdepth`), picks the compute depth and a
     // wide fallback per op family, materializes flexible CONST operands, casts every operand to the
     // compute depth, then emits `op` (direct when a kernel exists, else compute wide and cast down).
     // Returns the slot holding the result. `rdepth` EW_DEPTH_NONE = auto.
-    int  emitUnary(TOp op, int a, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
-    int  emitBinary(TOp op, int a, int b, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
-    int  emitTernary(TOp op, int a, int b, int c, int rdepth = EW_DEPTH_NONE);
+    整数  emitUnary(TOp op, 整数 a, 整数 rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
+    整数  emitBinary(TOp op, 整数 a, 整数 b, 整数 rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
+    整数  emitTernary(TOp op, 整数 a, 整数 b, 整数 c, 整数 rdepth = EW_DEPTH_NONE);
 
     // Land `temp` in the existing slot `out`: redirect temp's single producer to write `out` directly
     // (dropping a dead last temp so compile() keeps its no-temp fast exit); otherwise copy via OP_CAST.
-    int  moveToOutput(int temp, int out);
+    整数  moveToOutput(整数 temp, 整数 out);
 
     // Declare a result tensor fed by `rootSlot` (a fresh OUTPUT of its depth) and moveToOutput into it.
-    int  output(int rootSlot);
+    整数  output(整数 rootSlot);
 
     // Finalize: pack temps into physical buffers (liveness), count consts, size the L1 fragment cap.
     void compile();
@@ -320,7 +320,7 @@ struct CV_EXPORTS TExpr
     // innermost). All outputs share it; their depth comes from arginfo. Lets a caller pre-create the
     // destination (dst.create(spatial, CV_MAKETYPE(depth, channels))) before exec writes into it.
     // Inputs are passed as an array of pointers (no Mat-header copies in the hot path).
-    void outputShape(const Mat* const* inputs, MatShape& spatial, int& channels) const;
+    void outputShape(const Mat* const* inputs, MatShape& spatial, 整数& channels) const;
 
     // Execute the compiled program over a set of input Mats, producing the broadcast result(s). If an
     // output Mat already has the right shape/type it is reused (not reallocated). Inputs are passed as
@@ -329,7 +329,7 @@ struct CV_EXPORTS TExpr
 
     // Convenience overloads: inputs as a contiguous array of Mats (builds the pointer array + forwards).
     // Handy for callers holding a Mat[]/vector<Mat>; the hot path should pass pointers directly.
-    void outputShape(const Mat* inputs, MatShape& spatial, int& channels) const;
+    void outputShape(const Mat* inputs, MatShape& spatial, 整数& channels) const;
     void exec(const Mat* inputs, Mat* outputs);
 };
 
@@ -337,11 +337,11 @@ struct CV_EXPORTS TExpr
 // Compose a binary op (ADD/SUB/MUL/DIV/MIN/MAX/ABSDIFF/CMP_*) for any (depth0, depth1, rdepth):
 // cast operands to a common type, op direct-or-wide-then-cast. maskDepth != EW_DEPTH_NONE adds a
 // write-mask input (#2); scale != 1 (mul/div) rides the instruction's params[0].
-CV_EXPORTS void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth,
-                                       int maskDepth = EW_DEPTH_NONE, double scale = 1.0);
+CV_EXPORTS void makeBinaryArithProgram(TExpr& p, TOp op, 整数 depth0, 整数 depth1, 整数 rdepth,
+                                       整数 maskDepth = EW_DEPTH_NONE, double scale = 1.0);
 
 // addWeighted(a,alpha,b,beta,gamma) = a*alpha + b*beta + gamma (two fused convert_scale MACs + add).
-CV_EXPORTS void makeAddWeightedProgram(TExpr& p, int depth0, int depth1, int rdepth,
+CV_EXPORTS void makeAddWeightedProgram(TExpr& p, 整数 depth0, 整数 depth1, 整数 rdepth,
                                        double alpha, double beta, double gamma);
 
 // NOTE: the string front-end is the PUBLIC cv::texpr() (declared in opencv2/core.hpp, defined in

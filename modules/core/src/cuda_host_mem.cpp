@@ -54,25 +54,25 @@ namespace {
 class HostMemAllocator : public MatAllocator
 {
 public:
-    explicit HostMemAllocator(unsigned int flags) : flags_(flags)
+    explicit HostMemAllocator(unsigned 整数 flags) : flags_(flags)
     {
     }
 
-    UMatData* allocate(int dims, const int* sizes, int type,
+    UMatData* allocate(整数 dims, const 整数* sizes, 整数 type,
                        void* data0, size_t* step,
                        AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
     {
         size_t total = CV_ELEM_SIZE(type);
-        for (int i = dims-1; i >= 0; i--)
+        为 (整数 i = dims-1; i >= 0; i--)
         {
-            if (step)
+            如果 (step)
             {
-                if (data0 && step[i] != CV_AUTOSTEP)
+                如果 (data0 && step[i] != CV_AUTOSTEP)
                 {
                     CV_Assert(total <= step[i]);
                     total = step[i];
                 }
-                else
+                否则
                 {
                     step[i] = total;
                 }
@@ -84,12 +84,12 @@ public:
         UMatData* u = new UMatData(this);
         u->size = total;
 
-        if (data0)
+        如果 (data0)
         {
             u->data = u->origdata = static_cast<uchar*>(data0);
             u->flags |= UMatData::USER_ALLOCATED;
         }
-        else
+        否则
         {
             void* ptr = 0;
             cudaSafeCall( cudaHostAlloc(&ptr, total, flags_) );
@@ -97,25 +97,25 @@ public:
             u->data = u->origdata = static_cast<uchar*>(ptr);
         }
 
-        return u;
+        返回 u;
     }
 
     bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
     {
-        return (u != NULL);
+        返回 (u != NULL);
     }
 
     void deallocate(UMatData* u) const CV_OVERRIDE
     {
-        if (!u)
-            return;
+        如果 (!u)
+            返回;
 
         CV_Assert(u->urefcount >= 0);
         CV_Assert(u->refcount >= 0);
 
-        if (u->refcount == 0)
+        如果 (u->refcount == 0)
         {
-            if ( !(u->flags & UMatData::USER_ALLOCATED) )
+            如果 ( !(u->flags & UMatData::USER_ALLOCATED) )
             {
                 cudaFreeHost(u->origdata);
                 u->origdata = 0;
@@ -126,7 +126,7 @@ public:
     }
 
 private:
-    unsigned int flags_;
+    unsigned 整数 flags_;
 };
 
 } // namespace
@@ -138,10 +138,10 @@ MatAllocator* cv::cuda::HostMem::getAllocator(AllocType alloc_type)
 #ifndef HAVE_CUDA
     CV_UNUSED(alloc_type);
     throw_no_cuda();
-#else
-    static std::map<unsigned int, Ptr<MatAllocator> > allocators;
+#否则
+    static std::map<unsigned 整数, Ptr<MatAllocator> > allocators;
 
-    unsigned int flag = cudaHostAllocDefault;
+    unsigned 整数 flag = cudaHostAllocDefault;
 
     switch (alloc_type)
     {
@@ -153,12 +153,12 @@ MatAllocator* cv::cuda::HostMem::getAllocator(AllocType alloc_type)
 
     Ptr<MatAllocator>& a = allocators[flag];
 
-    if (a.empty())
+    如果 (a.empty())
     {
         a = makePtr<HostMemAllocator>(flag);
     }
 
-    return a.get();
+    返回 a.get();
 #endif
 }
 
@@ -170,20 +170,20 @@ namespace
         size_t alignMask = alignment - 1;
         size_t inverseAlignMask = ~alignMask;
         size_t res = (what + alignMask) & inverseAlignMask;
-        return res;
+        返回 res;
     }
 }
 #endif
 
-void cv::cuda::HostMem::create(int rows_, int cols_, int type_)
+void cv::cuda::HostMem::create(整数 rows_, 整数 cols_, 整数 type_)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(rows_);
     CV_UNUSED(cols_);
     CV_UNUSED(type_);
     throw_no_cuda();
-#else
-    if (alloc_type == SHARED)
+#否则
+    如果 (alloc_type == SHARED)
     {
         DeviceInfo devInfo;
         CV_Assert( devInfo.canMapHostMemory() );
@@ -191,25 +191,25 @@ void cv::cuda::HostMem::create(int rows_, int cols_, int type_)
 
     type_ &= Mat::TYPE_MASK;
 
-    if (rows == rows_ && cols == cols_ && type() == type_ && data)
-        return;
+    如果 (rows == rows_ && cols == cols_ && type() == type_ && data)
+        返回;
 
-    if (data)
+    如果 (data)
         release();
 
     CV_DbgAssert( rows_ >= 0 && cols_ >= 0 );
 
-    if (rows_ > 0 && cols_ > 0)
+    如果 (rows_ > 0 && cols_ > 0)
     {
         flags = Mat::MAGIC_VAL + type_;
         rows = rows_;
         cols = cols_;
         step = elemSize() * cols;
-        int sz[] = { rows, cols };
+        整数 sz[] = { rows, cols };
         size_t steps[] = { step, (size_t)CV_ELEM_SIZE(type_) };
         flags = updateContinuityFlag(flags, 2, sz, steps);
 
-        if (alloc_type == SHARED)
+        如果 (alloc_type == SHARED)
         {
             DeviceInfo devInfo;
             step = alignUpStep(step, devInfo.textureAlignment());
@@ -218,10 +218,10 @@ void cv::cuda::HostMem::create(int rows_, int cols_, int type_)
         int64 _nettosize = (int64)step*rows;
         size_t nettosize = (size_t)_nettosize;
 
-        if (_nettosize != (int64)nettosize)
+        如果 (_nettosize != (int64)nettosize)
             CV_Error(cv::Error::StsNoMem, "Too big buffer is allocated");
 
-        size_t datasize = alignSize(nettosize, (int)sizeof(*refcount));
+        size_t datasize = alignSize(nettosize, (整数)sizeof(*refcount));
 
         void* ptr = 0;
 
@@ -236,59 +236,59 @@ void cv::cuda::HostMem::create(int rows_, int cols_, int type_)
         datastart = data =  (uchar*)ptr;
         dataend = data + nettosize;
 
-        refcount = (int*)cv::fastMalloc(sizeof(*refcount));
+        refcount = (整数*)cv::fastMalloc(sizeof(*refcount));
         *refcount = 1;
     }
 #endif
 }
 
-HostMem cv::cuda::HostMem::reshape(int new_cn, int new_rows) const
+HostMem cv::cuda::HostMem::reshape(整数 new_cn, 整数 new_rows) const
 {
     HostMem hdr = *this;
 
-    int cn = channels();
-    if (new_cn == 0)
+    整数 cn = channels();
+    如果 (new_cn == 0)
         new_cn = cn;
 
-    int total_width = cols * cn;
+    整数 total_width = cols * cn;
 
-    if ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
+    如果 ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
         new_rows = rows * total_width / new_cn;
 
-    if (new_rows != 0 && new_rows != rows)
+    如果 (new_rows != 0 && new_rows != rows)
     {
-        int total_size = total_width * rows;
+        整数 total_size = total_width * rows;
 
-        if (!isContinuous())
+        如果 (!isContinuous())
             CV_Error(cv::Error::BadStep, "The matrix is not continuous, thus its number of rows can not be changed");
 
-        if ((unsigned)new_rows > (unsigned)total_size)
+        如果 ((unsigned)new_rows > (unsigned)total_size)
             CV_Error(cv::Error::StsOutOfRange, "Bad new number of rows");
 
         total_width = total_size / new_rows;
 
-        if (total_width * new_rows != total_size)
+        如果 (total_width * new_rows != total_size)
             CV_Error(cv::Error::StsBadArg, "The total number of matrix elements is not divisible by the new number of rows");
 
         hdr.rows = new_rows;
         hdr.step = total_width * elemSize1();
     }
 
-    int new_width = total_width / new_cn;
+    整数 new_width = total_width / new_cn;
 
-    if (new_width * new_cn != total_width)
+    如果 (new_width * new_cn != total_width)
         CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
 
     hdr.cols = new_width;
     hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
 
-    return hdr;
+    返回 hdr;
 }
 
 void cv::cuda::HostMem::release()
 {
 #ifdef HAVE_CUDA
-    if (refcount && CV_XADD(refcount, -1) == 1)
+    如果 (refcount && CV_XADD(refcount, -1) == 1)
     {
         cudaFreeHost(datastart);
         fastFree(refcount);
@@ -304,13 +304,13 @@ GpuMat cv::cuda::HostMem::createGpuMatHeader() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#否则
     CV_Assert( alloc_type == SHARED );
 
     void *pdev;
     cudaSafeCall( cudaHostGetDevicePointer(&pdev, data, 0) );
 
-    return GpuMat(rows, cols, type(), pdev, step);
+    返回 GpuMat(rows, cols, type(), pdev, step);
 #endif
 }
 
@@ -319,7 +319,7 @@ void cv::cuda::registerPageLocked(Mat& m)
 #ifndef HAVE_CUDA
     CV_UNUSED(m);
     throw_no_cuda();
-#else
+#否则
     CV_Assert( m.isContinuous() );
     cudaSafeCall( cudaHostRegister(m.data, m.step * m.rows, cudaHostRegisterPortable) );
 #endif
@@ -329,7 +329,7 @@ void cv::cuda::unregisterPageLocked(Mat& m)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(m);
-#else
+#否则
     cudaSafeCall( cudaHostUnregister(m.data) );
 #endif
 }

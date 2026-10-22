@@ -48,12 +48,12 @@ using namespace cv::cuda;
 
 void cv::cuda::GpuMat::updateContinuityFlag()
 {
-    int sz[] = { rows, cols };
+    整数 sz[] = { rows, cols };
     size_t steps[] = { step, elemSize() };
     flags = cv::updateContinuityFlag(flags, 2, sz, steps);
 }
 
-cv::cuda::GpuMat::GpuMat(int rows_, int cols_, int type_, void* data_, size_t step_) :
+cv::cuda::GpuMat::GpuMat(整数 rows_, 整数 cols_, 整数 type_, void* data_, size_t step_) :
     flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(rows_), cols(cols_),
     step(step_), data((uchar*)data_), refcount(0),
     datastart((uchar*)data_), dataend((const uchar*)data_),
@@ -61,13 +61,13 @@ cv::cuda::GpuMat::GpuMat(int rows_, int cols_, int type_, void* data_, size_t st
 {
     size_t minstep = cols * elemSize();
 
-    if (step == Mat::AUTO_STEP)
+    如果 (step == Mat::AUTO_STEP)
     {
         step = minstep;
     }
-    else
+    否则
     {
-        if (rows == 1)
+        如果 (rows == 1)
             step = minstep;
 
         CV_DbgAssert( step >= minstep );
@@ -77,7 +77,7 @@ cv::cuda::GpuMat::GpuMat(int rows_, int cols_, int type_, void* data_, size_t st
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(Size size_, int type_, void* data_, size_t step_) :
+cv::cuda::GpuMat::GpuMat(Size size_, 整数 type_, void* data_, size_t step_) :
     flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(size_.height), cols(size_.width),
     step(step_), data((uchar*)data_), refcount(0),
     datastart((uchar*)data_), dataend((const uchar*)data_),
@@ -85,13 +85,13 @@ cv::cuda::GpuMat::GpuMat(Size size_, int type_, void* data_, size_t step_) :
 {
     size_t minstep = cols * elemSize();
 
-    if (step == Mat::AUTO_STEP)
+    如果 (step == Mat::AUTO_STEP)
     {
         step = minstep;
     }
-    else
+    否则
     {
-        if (rows == 1)
+        如果 (rows == 1)
             step = minstep;
 
         CV_DbgAssert( step >= minstep );
@@ -108,11 +108,11 @@ cv::cuda::GpuMat::GpuMat(const GpuMat& m, Range rowRange_, Range colRange_)
     data = m.data; datastart = m.datastart; dataend = m.dataend;
     allocator = m.allocator;
 
-    if (rowRange_ == Range::all())
+    如果 (rowRange_ == Range::all())
     {
         rows = m.rows;
     }
-    else
+    否则
     {
         CV_Assert( 0 <= rowRange_.start && rowRange_.start <= rowRange_.end && rowRange_.end <= m.rows );
 
@@ -120,11 +120,11 @@ cv::cuda::GpuMat::GpuMat(const GpuMat& m, Range rowRange_, Range colRange_)
         data += step*rowRange_.start;
     }
 
-    if (colRange_ == Range::all())
+    如果 (colRange_ == Range::all())
     {
         cols = m.cols;
     }
-    else
+    否则
     {
         CV_Assert( 0 <= colRange_.start && colRange_.start <= colRange_.end && colRange_.end <= m.cols );
 
@@ -132,10 +132,10 @@ cv::cuda::GpuMat::GpuMat(const GpuMat& m, Range rowRange_, Range colRange_)
         data += colRange_.start*elemSize();
     }
 
-    if (refcount)
+    如果 (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
+    如果 (rows <= 0 || cols <= 0)
         rows = cols = 0;
 
     updateContinuityFlag();
@@ -154,55 +154,55 @@ cv::cuda::GpuMat::GpuMat(const GpuMat& m, Rect roi) :
                0 <= roi.y && 0 <= roi.height &&
                roi.y + roi.height <= m.rows );
 
-    if (refcount)
+    如果 (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
+    如果 (rows <= 0 || cols <= 0)
         rows = cols = 0;
     updateContinuityFlag();
 }
 
-GpuMat cv::cuda::GpuMat::reshape(int new_cn, int new_rows) const
+GpuMat cv::cuda::GpuMat::reshape(整数 new_cn, 整数 new_rows) const
 {
     GpuMat hdr = *this;
 
-    int cn = channels();
-    if (new_cn == 0)
+    整数 cn = channels();
+    如果 (new_cn == 0)
         new_cn = cn;
 
-    int total_width = cols * cn;
+    整数 total_width = cols * cn;
 
-    if ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
+    如果 ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
         new_rows = rows * total_width / new_cn;
 
-    if (new_rows != 0 && new_rows != rows)
+    如果 (new_rows != 0 && new_rows != rows)
     {
-        int total_size = total_width * rows;
+        整数 total_size = total_width * rows;
 
-        if (!isContinuous())
+        如果 (!isContinuous())
             CV_Error(cv::Error::BadStep, "The matrix is not continuous, thus its number of rows can not be changed");
 
-        if ((unsigned)new_rows > (unsigned)total_size)
+        如果 ((unsigned)new_rows > (unsigned)total_size)
             CV_Error(cv::Error::StsOutOfRange, "Bad new number of rows");
 
         total_width = total_size / new_rows;
 
-        if (total_width * new_rows != total_size)
+        如果 (total_width * new_rows != total_size)
             CV_Error(cv::Error::StsBadArg, "The total number of matrix elements is not divisible by the new number of rows");
 
         hdr.rows = new_rows;
         hdr.step = total_width * elemSize1();
     }
 
-    int new_width = total_width / new_cn;
+    整数 new_width = total_width / new_cn;
 
-    if (new_width * new_cn != total_width)
+    如果 (new_width * new_cn != total_width)
         CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
 
     hdr.cols = new_width;
     hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
 
-    return hdr;
+    返回 hdr;
 }
 
 void cv::cuda::GpuMat::locateROI(Size& wholeSize, Point& ofs) const
@@ -213,25 +213,25 @@ void cv::cuda::GpuMat::locateROI(Size& wholeSize, Point& ofs) const
     ptrdiff_t delta1 = data - datastart;
     ptrdiff_t delta2 = dataend - datastart;
 
-    if (delta1 == 0)
+    如果 (delta1 == 0)
     {
         ofs.x = ofs.y = 0;
     }
-    else
+    否则
     {
-        ofs.y = static_cast<int>(delta1 / step);
-        ofs.x = static_cast<int>((delta1 - step * ofs.y) / esz);
+        ofs.y = static_cast<整数>(delta1 / step);
+        ofs.x = static_cast<整数>((delta1 - step * ofs.y) / esz);
 
         CV_DbgAssert( data == datastart + ofs.y * step + ofs.x * esz );
     }
 
     size_t minstep = (ofs.x + cols) * esz;
 
-    wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / step + 1), ofs.y + rows);
-    wholeSize.width = std::max(static_cast<int>((delta2 - step * (wholeSize.height - 1)) / esz), ofs.x + cols);
+    wholeSize.height = std::max(static_cast<整数>((delta2 - minstep) / step + 1), ofs.y + rows);
+    wholeSize.width = std::max(static_cast<整数>((delta2 - step * (wholeSize.height - 1)) / esz), ofs.x + cols);
 }
 
-GpuMat& cv::cuda::GpuMat::adjustROI(int dtop, int dbottom, int dleft, int dright)
+GpuMat& cv::cuda::GpuMat::adjustROI(整数 dtop, 整数 dbottom, 整数 dleft, 整数 dright)
 {
     Size wholeSize;
     Point ofs;
@@ -239,35 +239,35 @@ GpuMat& cv::cuda::GpuMat::adjustROI(int dtop, int dbottom, int dleft, int dright
 
     size_t esz = elemSize();
 
-    int row1 = std::max(ofs.y - dtop, 0);
-    int row2 = std::min(ofs.y + rows + dbottom, wholeSize.height);
+    整数 row1 = std::max(ofs.y - dtop, 0);
+    整数 row2 = std::min(ofs.y + rows + dbottom, wholeSize.height);
 
-    int col1 = std::max(ofs.x - dleft, 0);
-    int col2 = std::min(ofs.x + cols + dright, wholeSize.width);
+    整数 col1 = std::max(ofs.x - dleft, 0);
+    整数 col2 = std::min(ofs.x + cols + dright, wholeSize.width);
 
     data += (row1 - ofs.y) * step + (col1 - ofs.x) * esz;
     rows = row2 - row1;
     cols = col2 - col1;
 
     updateContinuityFlag();
-    return *this;
+    返回 *this;
 }
 
 namespace
 {
     template <class ObjType>
-    void createContinuousImpl(int rows, int cols, int type, ObjType& obj)
+    void createContinuousImpl(整数 rows, 整数 cols, 整数 type, ObjType& obj)
     {
-        const int area = rows * cols;
+        const 整数 area = rows * cols;
 
-        if (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
+        如果 (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
             obj.create(1, area, type);
 
         obj = obj.reshape(obj.channels(), rows);
     }
 }
 
-void cv::cuda::createContinuous(int rows, int cols, int type, OutputArray arr)
+void cv::cuda::createContinuous(整数 rows, 整数 cols, 整数 type, OutputArray arr)
 {
     switch (arr.kind())
     {
@@ -291,13 +291,13 @@ void cv::cuda::createContinuous(int rows, int cols, int type, OutputArray arr)
 namespace
 {
     template <class ObjType>
-    void ensureSizeIsEnoughImpl(int rows, int cols, int type, ObjType& obj)
+    void ensureSizeIsEnoughImpl(整数 rows, 整数 cols, 整数 type, ObjType& obj)
     {
-        if (obj.empty() || obj.type() != type || obj.data != obj.datastart)
+        如果 (obj.empty() || obj.type() != type || obj.data != obj.datastart)
         {
             obj.create(rows, cols, type);
         }
-        else
+        否则
         {
             const size_t esz = obj.elemSize();
             const ptrdiff_t delta2 = obj.dataend - obj.datastart;
@@ -305,14 +305,14 @@ namespace
             const size_t minstep = obj.cols * esz;
 
             Size wholeSize;
-            wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / static_cast<size_t>(obj.step) + 1), obj.rows);
-            wholeSize.width = std::max(static_cast<int>((delta2 - static_cast<size_t>(obj.step) * (wholeSize.height - 1)) / esz), obj.cols);
+            wholeSize.height = std::max(static_cast<整数>((delta2 - minstep) / static_cast<size_t>(obj.step) + 1), obj.rows);
+            wholeSize.width = std::max(static_cast<整数>((delta2 - static_cast<size_t>(obj.step) * (wholeSize.height - 1)) / esz), obj.cols);
 
-            if (wholeSize.height < rows || wholeSize.width < cols)
+            如果 (wholeSize.height < rows || wholeSize.width < cols)
             {
                 obj.create(rows, cols, type);
             }
-            else
+            否则
             {
                 obj.cols = cols;
                 obj.rows = rows;
@@ -321,7 +321,7 @@ namespace
     }
 }
 
-void cv::cuda::ensureSizeIsEnough(int rows, int cols, int type, OutputArray arr)
+void cv::cuda::ensureSizeIsEnough(整数 rows, 整数 cols, 整数 type, OutputArray arr)
 {
     switch (arr.kind())
     {
@@ -348,23 +348,23 @@ GpuMat cv::cuda::getInputMat(InputArray _src, Stream& stream)
     CV_UNUSED(_src);
     CV_UNUSED(stream);
     throw_no_cuda();
-#else
+#否则
     GpuMat src;
-    if (_src.kind() == _InputArray::CUDA_GPU_MAT)
+    如果 (_src.kind() == _InputArray::CUDA_GPU_MAT)
     {
         src = _src.getGpuMat();
     }
-    else if (!_src.empty())
+    否则 如果 (!_src.empty())
     {
         BufferPool pool(stream);
         src = pool.getBuffer(_src.size(), _src.type());
         src.upload(_src, stream);
     }
-    return src;
+    返回 src;
 #endif
 }
 
-GpuMat cv::cuda::getOutputMat(OutputArray _dst, int rows, int cols, int type, Stream& stream)
+GpuMat cv::cuda::getOutputMat(OutputArray _dst, 整数 rows, 整数 cols, 整数 type, Stream& stream)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(_dst);
@@ -373,19 +373,19 @@ GpuMat cv::cuda::getOutputMat(OutputArray _dst, int rows, int cols, int type, St
     CV_UNUSED(type);
     CV_UNUSED(stream);
     throw_no_cuda();
-#else
+#否则
     GpuMat dst;
-    if (_dst.kind() == _InputArray::CUDA_GPU_MAT)
+    如果 (_dst.kind() == _InputArray::CUDA_GPU_MAT)
     {
         _dst.create(rows, cols, type);
         dst = _dst.getGpuMat();
     }
-    else
+    否则
     {
         BufferPool pool(stream);
         dst = pool.getBuffer(rows, cols, type);
     }
-    return dst;
+    返回 dst;
 #endif
 }
 
@@ -396,12 +396,12 @@ void cv::cuda::syncOutput(const GpuMat& dst, OutputArray _dst, Stream& stream)
     CV_UNUSED(_dst);
     CV_UNUSED(stream);
     throw_no_cuda();
-#else
-    if (_dst.kind() != _InputArray::CUDA_GPU_MAT)
+#否则
+    如果 (_dst.kind() != _InputArray::CUDA_GPU_MAT)
     {
-        if (stream)
+        如果 (stream)
             dst.download(_dst, stream);
-        else
+        否则
             dst.download(_dst);
     }
 #endif
@@ -411,7 +411,7 @@ void cv::cuda::syncOutput(const GpuMat& dst, OutputArray _dst, Stream& stream)
 
 GpuMat::Allocator* cv::cuda::GpuMat::defaultAllocator()
 {
-    return 0;
+    返回 0;
 }
 
 void cv::cuda::GpuMat::setDefaultAllocator(Allocator* allocator)
@@ -422,10 +422,10 @@ void cv::cuda::GpuMat::setDefaultAllocator(Allocator* allocator)
 
 GpuMat::Allocator* cv::cuda::GpuMat::getStdAllocator()
 {
-    return 0;
+    返回 0;
 }
 
-void cv::cuda::GpuMat::create(int _rows, int _cols, int _type)
+void cv::cuda::GpuMat::create(整数 _rows, 整数 _cols, 整数 _type)
 {
     CV_UNUSED(_rows);
     CV_UNUSED(_cols);
@@ -435,7 +435,7 @@ void cv::cuda::GpuMat::create(int _rows, int _cols, int _type)
 
 void cv::cuda::GpuMat::release()
 {
-    if( refcount && CV_XADD(refcount, -1) == 1 )
+    如果( refcount && CV_XADD(refcount, -1) == 1 )
         defaultAllocator()->free(this);
     dataend = datastart = data = 0;
     step = 0;
@@ -443,7 +443,7 @@ void cv::cuda::GpuMat::release()
     flags &= ~Mat::MAGIC_MASK;
 }
 
-void cv::cuda::GpuMat::fit(int _rows, int _cols, int _type)
+void cv::cuda::GpuMat::fit(整数 _rows, 整数 _cols, 整数 _type)
 {
     // Emulate Mat::fit semantics for GPU: avoid reallocation when possible
     size_t oldTotalBytes = (datastart && dataend) ? (size_t)(dataend - datastart) : 0;
@@ -454,10 +454,10 @@ void cv::cuda::GpuMat::fit(int _rows, int _cols, int _type)
     // - need non-contiguous layout (GPU pitch) or ROI, or
     // - requested bytes exceed current capacity, or
     // - data pointer is not at the start (ROI)
-    if (newTotalBytes > 0 && (!isContinuous() || newTotalBytes > oldTotalBytes || data != datastart))
+    如果 (newTotalBytes > 0 && (!isContinuous() || newTotalBytes > oldTotalBytes || data != datastart))
     {
         create(_rows, _cols, _type);
-        return;
+        返回;
     }
 
     // Reuse existing allocation, just adjust header/type
@@ -467,7 +467,7 @@ void cv::cuda::GpuMat::fit(int _rows, int _cols, int _type)
     step = (size_t)cols * esz;
 }
 
-void cv::cuda::GpuMat::fit(Size _sz, int _type)
+void cv::cuda::GpuMat::fit(Size _sz, 整数 _type)
 {
     fit(_sz.height, _sz.width, _type);
 }
@@ -534,7 +534,7 @@ GpuMat& cv::cuda::GpuMat::setTo(Scalar s, InputArray _mask, Stream& _stream)
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, Stream& _stream) const
+void cv::cuda::GpuMat::convertTo(OutputArray _dst, 整数 rtype, Stream& _stream) const
 {
     CV_UNUSED(_dst);
     CV_UNUSED(rtype);
@@ -542,7 +542,7 @@ void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, Stream& _stream) c
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, double alpha, double beta, Stream& _stream) const
+void cv::cuda::GpuMat::convertTo(OutputArray _dst, 整数 rtype, double alpha, double beta, Stream& _stream) const
 {
     CV_UNUSED(_dst);
     CV_UNUSED(rtype);
