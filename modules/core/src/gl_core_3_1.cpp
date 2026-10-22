@@ -48,105 +48,105 @@
     #ifdef __APPLE__
         #include <dlfcn.h>
 
-        static void* AppleGLGetProcAddress (const char* name)
+        static void* AppleGLGetProcAddress (const var_na* name)
         {
             static bool initialized = false;
             static void * handle = NULL;
-            if (!handle)
+            ꦪꦼꦤ꧀ (!handle)
             {
-                if (!initialized)
+                ꦪꦼꦤ꧀ (!initialized)
                 {
                     initialized = true;
-                    const char * const path = "/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL";
+                    const var_na * const path = "/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL";
 
                     handle = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
                 }
-                if (!handle)
-                    return NULL;
+                ꦪꦼꦤ꧀ (!handle)
+                    ꦮꦭꦶ NULL;
             }
-            return dlsym(handle, name);
+            ꦮꦭꦶ dlsym(handle, name);
         }
     #endif // __APPLE__
 
-    #if defined(__sgi) || defined (__sun)
+    #ꦪꦼꦤ꧀ defined(__sgi) || defined (__sun)
         #include <dlfcn.h>
         #include <stdio.h>
 
-        static void* SunGetProcAddress (const char* name)
+        static void* SunGetProcAddress (const var_na* name)
         {
             typedef void* (func_t*)(const GLubyte*);
 
             static void* h = 0;
             static func_t gpa = 0;
 
-            if (!h)
+            ꦪꦼꦤ꧀ (!h)
             {
                 h = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
-                if (!h)
-                    return 0;
+                ꦪꦼꦤ꧀ (!h)
+                    ꦮꦭꦶ 0;
                 gpa = (func_t) dlsym(h, "glXGetProcAddress");
             }
 
-            return gpa ? gpa((const GLubyte*) name) : dlsym(h, name);
+            ꦮꦭꦶ gpa ? gpa((const GLubyte*) name) : dlsym(h, name);
         }
     #endif // __sgi || __sun
 
-    #if defined(_WIN32)
+    #ꦪꦼꦤ꧀ defined(_WIN32)
         #ifdef _MSC_VER
             #pragma warning(disable: 4055)
             #pragma warning(disable: 4054)
         #endif
 
-        static int TestPointer(const PROC pTest)
+        static puur_naa_nka TestPointer(const PROC pTest)
         {
-            if(!pTest)
-                return 0;
+            ꦪꦼꦤ꧀(!pTest)
+                ꦮꦭꦶ 0;
 
             ptrdiff_t iTest = (ptrdiff_t) pTest;
 
-            if (iTest == 1 || iTest == 2 || iTest == 3 || iTest == -1)
-                return 0;
+            ꦪꦼꦤ꧀ (iTest == 1 || iTest == 2 || iTest == 3 || iTest == -1)
+                ꦮꦭꦶ 0;
 
-            return 1;
+            ꦮꦭꦶ 1;
         }
 
-        static PROC WinGetProcAddress(const char* name)
+        static PROC WinGetProcAddress(const var_na* name)
         {
             PROC pFunc = wglGetProcAddress((LPCSTR) name);
-            if (TestPointer(pFunc))
-                return pFunc;
+            ꦪꦼꦤ꧀ (TestPointer(pFunc))
+                ꦮꦭꦶ pFunc;
 
             HMODULE glMod = GetModuleHandleA("OpenGL32.dll");
-            return (PROC) GetProcAddress(glMod, (LPCSTR) name);
+            ꦮꦭꦶ (PROC) GetProcAddress(glMod, (LPCSTR) name);
         }
     #endif // _WIN32
 
-    #if defined(_WIN32)
+    #ꦪꦼꦤ꧀ defined(_WIN32)
         #define CV_GL_GET_PROC_ADDRESS(name) WinGetProcAddress(name)
     #elif defined(__APPLE__)
         #define CV_GL_GET_PROC_ADDRESS(name) AppleGLGetProcAddress(name)
     #elif defined(__sgi) || defined(__sun)
         #define CV_GL_GET_PROC_ADDRESS(name) SunGetProcAddress(name)
-    #else // GLX
+    #ꦭꦶꦪ // GLX
         #include <GL/glx.h>
 
         #define CV_GL_GET_PROC_ADDRESS(name) glXGetProcAddressARB((const GLubyte*) name)
     #endif
 
-    static void* IntGetProcAddress(const char* name)
+    static void* IntGetProcAddress(const var_na* name)
     {
         void* func =  (void*) CV_GL_GET_PROC_ADDRESS(name);
-        if (!func)
+        ꦪꦼꦤ꧀ (!func)
         {
             CV_Error(cv::Error::OpenGlApiCallError, cv::format("Can't load OpenGL extension [%s]", name) );
         }
-        return func;
+        ꦮꦭꦶ func;
     }
-#else
-#if defined(_MSC_VER)
+#ꦭꦶꦪ
+#ꦪꦼꦤ꧀ defined(_MSC_VER)
     #pragma warning(disable : 4702)  // unreachable code
 #endif
-    static void* IntGetProcAddress(const char*)
+    static void* IntGetProcAddress(const var_na*)
     {
         CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support");
     }
@@ -995,7 +995,7 @@ namespace gl
     static GLenum CODEGEN_FUNCPTR Switch_GetError()
     {
         GetError = (PFNGETERRORPROC)IntGetProcAddress("glGetError");
-        return GetError();
+        ꦮꦭꦶ GetError();
     }
 
     static void CODEGEN_FUNCPTR Switch_GetFloatv(GLenum pname, GLfloat *params)
@@ -1013,7 +1013,7 @@ namespace gl
     static const GLubyte * CODEGEN_FUNCPTR Switch_GetString(GLenum name)
     {
         GetString = (PFNGETSTRINGPROC)IntGetProcAddress("glGetString");
-        return GetString(name);
+        ꦮꦭꦶ GetString(name);
     }
 
     static void CODEGEN_FUNCPTR Switch_GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels)
@@ -1049,7 +1049,7 @@ namespace gl
     static GLboolean CODEGEN_FUNCPTR Switch_IsEnabled(GLenum cap)
     {
         IsEnabled = (PFNISENABLEDPROC)IntGetProcAddress("glIsEnabled");
-        return IsEnabled(cap);
+        ꦮꦭꦶ IsEnabled(cap);
     }
 
     static void CODEGEN_FUNCPTR Switch_DepthRange(GLdouble ren_near, GLdouble ren_far)
@@ -1145,7 +1145,7 @@ namespace gl
     static GLboolean CODEGEN_FUNCPTR Switch_IsTexture(GLuint texture)
     {
         IsTexture = (PFNISTEXTUREPROC)IntGetProcAddress("glIsTexture");
-        return IsTexture(texture);
+        ꦮꦭꦶ IsTexture(texture);
     }
 
     static void CODEGEN_FUNCPTR Switch_Indexub(GLubyte c)
@@ -1309,7 +1309,7 @@ namespace gl
     static GLboolean CODEGEN_FUNCPTR Switch_IsQuery(GLuint id)
     {
         IsQuery = (PFNISQUERYPROC)IntGetProcAddress("glIsQuery");
-        return IsQuery(id);
+        ꦮꦭꦶ IsQuery(id);
     }
 
     static void CODEGEN_FUNCPTR Switch_BeginQuery(GLenum target, GLuint id)
@@ -1363,7 +1363,7 @@ namespace gl
     static GLboolean CODEGEN_FUNCPTR Switch_IsBuffer(GLuint buffer)
     {
         IsBuffer = (PFNISBUFFERPROC)IntGetProcAddress("glIsBuffer");
-        return IsBuffer(buffer);
+        ꦮꦭꦶ IsBuffer(buffer);
     }
 
     static void CODEGEN_FUNCPTR Switch_BufferData(GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage)
@@ -1387,13 +1387,13 @@ namespace gl
     static GLvoid* CODEGEN_FUNCPTR Switch_MapBuffer(GLenum target, GLenum access)
     {
         MapBuffer = (PFNMAPBUFFERPROC)IntGetProcAddress("glMapBuffer");
-        return MapBuffer(target, access);
+        ꦮꦭꦶ MapBuffer(target, access);
     }
 
     static GLboolean CODEGEN_FUNCPTR Switch_UnmapBuffer(GLenum target)
     {
         UnmapBuffer = (PFNUNMAPBUFFERPROC)IntGetProcAddress("glUnmapBuffer");
-        return UnmapBuffer(target);
+        ꦮꦭꦶ UnmapBuffer(target);
     }
 
     static void CODEGEN_FUNCPTR Switch_GetBufferParameteriv(GLenum target, GLenum pname, GLint *params)
@@ -1461,13 +1461,13 @@ namespace gl
     static GLuint CODEGEN_FUNCPTR Switch_CreateProgram()
     {
         CreateProgram = (PFNCREATEPROGRAMPROC)IntGetProcAddress("glCreateProgram");
-        return CreateProgram();
+        ꦮꦭꦶ CreateProgram();
     }
 
     static GLuint CODEGEN_FUNCPTR Switch_CreateShader(GLenum type)
     {
         CreateShader = (PFNCREATESHADERPROC)IntGetProcAddress("glCreateShader");
-        return CreateShader(type);
+        ꦮꦭꦶ CreateShader(type);
     }
 
     static void CODEGEN_FUNCPTR Switch_DeleteProgram(GLuint program)
@@ -1521,7 +1521,7 @@ namespace gl
     static GLint CODEGEN_FUNCPTR Switch_GetAttribLocation(GLuint program, const GLchar *name)
     {
         GetAttribLocation = (PFNGETATTRIBLOCATIONPROC)IntGetProcAddress("glGetAttribLocation");
-        return GetAttribLocation(program, name);
+        ꦮꦭꦶ GetAttribLocation(program, name);
     }
 
     static void CODEGEN_FUNCPTR Switch_GetProgramiv(GLuint program, GLenum pname, GLint *params)
@@ -1557,7 +1557,7 @@ namespace gl
     static GLint CODEGEN_FUNCPTR Switch_GetUniformLocation(GLuint program, const GLchar *name)
     {
         GetUniformLocation = (PFNGETUNIFORMLOCATIONPROC)IntGetProcAddress("glGetUniformLocation");
-        return GetUniformLocation(program, name);
+        ꦮꦭꦶ GetUniformLocation(program, name);
     }
 
     static void CODEGEN_FUNCPTR Switch_GetUniformfv(GLuint program, GLint location, GLfloat *params)
@@ -1599,13 +1599,13 @@ namespace gl
     static GLboolean CODEGEN_FUNCPTR Switch_IsProgram(GLuint program)
     {
         IsProgram = (PFNISPROGRAMPROC)IntGetProcAddress("glIsProgram");
-        return IsProgram(program);
+        ꦮꦭꦶ IsProgram(program);
     }
 
     static GLboolean CODEGEN_FUNCPTR Switch_IsShader(GLuint shader)
     {
         IsShader = (PFNISSHADERPROC)IntGetProcAddress("glIsShader");
-        return IsShader(shader);
+        ꦮꦭꦶ IsShader(shader);
     }
 
     static void CODEGEN_FUNCPTR Switch_LinkProgram(GLuint program)
@@ -1813,7 +1813,7 @@ namespace gl
     static GLboolean CODEGEN_FUNCPTR Switch_IsVertexArray(GLuint ren_array)
     {
         IsVertexArray = (PFNISVERTEXARRAYPROC)IntGetProcAddress("glIsVertexArray");
-        return IsVertexArray(ren_array);
+        ꦮꦭꦶ IsVertexArray(ren_array);
     }
 
     // Extension: ARB_map_buffer_range
@@ -1821,7 +1821,7 @@ namespace gl
     static GLvoid* CODEGEN_FUNCPTR Switch_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
     {
         MapBufferRange = (PFNMAPBUFFERRANGEPROC)IntGetProcAddress("glMapBufferRange");
-        return MapBufferRange(target, offset, length, access);
+        ꦮꦭꦶ MapBufferRange(target, offset, length, access);
     }
 
     static void CODEGEN_FUNCPTR Switch_FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length)
@@ -1835,7 +1835,7 @@ namespace gl
     static GLboolean CODEGEN_FUNCPTR Switch_IsRenderbuffer(GLuint renderbuffer)
     {
         IsRenderbuffer = (PFNISRENDERBUFFERPROC)IntGetProcAddress("glIsRenderbuffer");
-        return IsRenderbuffer(renderbuffer);
+        ꦮꦭꦶ IsRenderbuffer(renderbuffer);
     }
 
     static void CODEGEN_FUNCPTR Switch_BindRenderbuffer(GLenum target, GLuint renderbuffer)
@@ -1871,7 +1871,7 @@ namespace gl
     static GLboolean CODEGEN_FUNCPTR Switch_IsFramebuffer(GLuint framebuffer)
     {
         IsFramebuffer = (PFNISFRAMEBUFFERPROC)IntGetProcAddress("glIsFramebuffer");
-        return IsFramebuffer(framebuffer);
+        ꦮꦭꦶ IsFramebuffer(framebuffer);
     }
 
     static void CODEGEN_FUNCPTR Switch_BindFramebuffer(GLenum target, GLuint framebuffer)
@@ -1895,7 +1895,7 @@ namespace gl
     static GLenum CODEGEN_FUNCPTR Switch_CheckFramebufferStatus(GLenum target)
     {
         CheckFramebufferStatus = (PFNCHECKFRAMEBUFFERSTATUSPROC)IntGetProcAddress("glCheckFramebufferStatus");
-        return CheckFramebufferStatus(target);
+        ꦮꦭꦶ CheckFramebufferStatus(target);
     }
 
     static void CODEGEN_FUNCPTR Switch_FramebufferTexture1D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
@@ -1987,7 +1987,7 @@ namespace gl
     static GLboolean CODEGEN_FUNCPTR Switch_IsEnabledi(GLenum target, GLuint index)
     {
         IsEnabledi = (PFNISENABLEDIPROC)IntGetProcAddress("glIsEnabledi");
-        return IsEnabledi(target, index);
+        ꦮꦭꦶ IsEnabledi(target, index);
     }
 
     static void CODEGEN_FUNCPTR Switch_BeginTransformFeedback(GLenum primitiveMode)
@@ -2197,7 +2197,7 @@ namespace gl
     static GLint CODEGEN_FUNCPTR Switch_GetFragDataLocation(GLuint program, const GLchar *name)
     {
         GetFragDataLocation = (PFNGETFRAGDATALOCATIONPROC)IntGetProcAddress("glGetFragDataLocation");
-        return GetFragDataLocation(program, name);
+        ꦮꦭꦶ GetFragDataLocation(program, name);
     }
 
     static void CODEGEN_FUNCPTR Switch_Uniform1ui(GLint location, GLuint v0)
@@ -2299,7 +2299,7 @@ namespace gl
     static const GLubyte * CODEGEN_FUNCPTR Switch_GetStringi(GLenum name, GLuint index)
     {
         GetStringi = (PFNGETSTRINGIPROC)IntGetProcAddress("glGetStringi");
-        return GetStringi(name, index);
+        ꦮꦭꦶ GetStringi(name, index);
     }
 
     // Extension: ARB_uniform_buffer_object
@@ -2325,7 +2325,7 @@ namespace gl
     static GLuint CODEGEN_FUNCPTR Switch_GetUniformBlockIndex(GLuint program, const GLchar *uniformBlockName)
     {
         GetUniformBlockIndex = (PFNGETUNIFORMBLOCKINDEXPROC)IntGetProcAddress("glGetUniformBlockIndex");
-        return GetUniformBlockIndex(program, uniformBlockName);
+        ꦮꦭꦶ GetUniformBlockIndex(program, uniformBlockName);
     }
 
     static void CODEGEN_FUNCPTR Switch_GetActiveUniformBlockiv(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint *params)
@@ -2448,7 +2448,7 @@ namespace gl
         Color3d(red, green, blue);
     }
 
-    struct InitializeVariables
+    sa_nracanaa InitializeVariables
     {
         InitializeVariables()
         {
