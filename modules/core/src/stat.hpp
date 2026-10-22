@@ -3,41 +3,41 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#ifndef SRC_STAT_HPP
-#define SRC_STAT_HPP
+#यदि_अपरिभाषितम् SRC_STAT_HPP
+#परिभाषय SRC_STAT_HPP
 
-#include "opencv2/core/mat.hpp"
+#अन्तर्भाव "opencv2/core/mat.hpp"
 
-namespace cv {
+नामाकाश cv {
 
-#ifdef HAVE_OPENCL
+#यदि_परिभाषितम् HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
-                     InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+गणना { OCL_OP_योग = 0, OCL_OP_योग_ABS =  1, OCL_OP_योग_SQR = 2 };
+तार्किक ocl_योग( निवेशः_Array _src, Scalar & res, पूर्णाङ्क योग_op, निवेशः_Array आवरणम्_2 = noArray(),
+                     निवेशः_Array _src2 = noArray(), तार्किक calc2 = असत्य, ध्रुव Scalar & res2 = Scalar() );
+तार्किक ocl_minMaxIdx( निवेशः_Array _src, द्विगुण* minVal, द्विगुण* maxVal, पूर्णाङ्क* minLoc, पूर्णाङ्क* maxLoc, निवेशः_Array आवरणम्_2,
+                           पूर्णाङ्क ddepth = -1, तार्किक abs_मानानि = असत्य, निवेशः_Array _src2 = noArray(), द्विगुण * maxVal2 = रिक्त);
 
-template <typename T> Scalar ocl_part_sum(Mat m)
+प्रतिरूपम् <प्रकारनाम T> Scalar ocl_part_योग(Mat m)
 {
-    CV_Assert(m.rows == 1);
+    CV_Assert(m.पङ्क्तिकाः == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
-    const T * const ptr = m.ptr<T>(0);
+    पूर्णाङ्क cn = m.channels();
+    ध्रुव T * ध्रुव ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    प्रति (पूर्णाङ्क x = 0, w = m.स्तम्भसङ्ख्या * cn; x < w; )
+        प्रति (पूर्णाङ्क c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    प्रत्यागम s;
 }
 
-#endif
+#यदि_अन्तः
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+प्रकारनिर्देश पूर्णाङ्क (*योग_Func)(ध्रुव uchar*, ध्रुव uchar* आवरणम्, uchar*, पूर्णाङ्क, पूर्णाङ्क);
+योग_Func get_योग_Func(पूर्णाङ्क गभीरता);
 
 }
 
-#endif // SRC_STAT_HPP
+#यदि_अन्तः // SRC_STAT_HPP

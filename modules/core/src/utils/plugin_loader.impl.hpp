@@ -6,72 +6,72 @@
 // Not a standalone header, part of filesystem.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"
+#अन्तर्भाव "opencv2/core/utils/plugin_loader.private.hpp"
 
-#if !OPENCV_HAVE_FILESYSTEM_SUPPORT
-#error "Invalid build configuration"
-#endif
+#यदि !OPENCV_HAVE_FILESYSTEM_SUPPORT
+#दोषः "Invalid build configuration"
+#यदि_अन्तः
 
-#if 0  // TODO
-#ifdef NDEBUG
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#else
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#endif
-#include <opencv2/core/utils/logger.hpp>
-#endif
+#यदि 0  // TODO
+#यदि_परिभाषितम् NDEBUG
+#परिभाषय CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
+#अन्यथा
+#परिभाषय CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
+#यदि_अन्तः
+#अन्तर्भाव <opencv2/core/utils/logger.hpp>
+#यदि_अन्तः
 
-namespace cv { namespace plugin { namespace impl {
+नामाकाश cv { नामाकाश plugin { नामाकाश impl {
 
-DynamicLib::DynamicLib(const FileSystemPath_t& filename)
-    : handle(0), fname(filename), disableAutoUnloading_(false)
+DynamicLib::DynamicLib(ध्रुव File_System_मार्गः_t& filename)
+    : handle(0), fname(filename), disableAutoUnloading_(असत्य)
 {
-    libraryLoad(filename);
+    library_आरोपय(filename);
 }
 
 DynamicLib::~DynamicLib()
 {
-    if (!disableAutoUnloading_)
+    यदि (!disableAutoUnloading_)
     {
         libraryRelease();
     }
-    else if (handle)
+    अन्यथा यदि (handle)
     {
-        CV_LOG_INFO(NULL, "skip auto unloading (disabled): " << toPrintablePath(fname));
+        CV_LOG_INFO(रिक्त, "skip auto unloading (disabled): " << गन्तव्यम्_Printable_मार्गः(fname));
         handle = 0;
     }
 }
 
-void* DynamicLib::getSymbol(const char* symbolName) const
+शून्य* DynamicLib::get_चिह्नम्(ध्रुव वर्ण* चिह्नम्_Name) ध्रुव
 {
-    if (!handle)
+    यदि (!handle)
     {
-        return 0;
+        प्रत्यागम 0;
     }
-    void* res = getSymbol_(handle, symbolName);
-    if (!res)
+    शून्य* res = get_चिह्नम्_2(handle, चिह्नम्_Name);
+    यदि (!res)
     {
-        CV_LOG_DEBUG(NULL, "No symbol '" << symbolName << "' in " << toPrintablePath(fname));
+        CV_LOG_DEBUG(रिक्त, "No symbol '" << चिह्नम्_Name << "' in " << गन्तव्यम्_Printable_मार्गः(fname));
     }
-    return res;
+    प्रत्यागम res;
 }
 
-std::string DynamicLib::getName() const
+std::string DynamicLib::getName() ध्रुव
 {
-    return toPrintablePath(fname);
+    प्रत्यागम गन्तव्यम्_Printable_मार्गः(fname);
 }
 
-void DynamicLib::libraryLoad(const FileSystemPath_t& filename)
+शून्य DynamicLib::library_आरोपय(ध्रुव File_System_मार्गः_t& filename)
 {
-    handle = libraryLoad_(filename);
-    CV_LOG_INFO(NULL, "load " << toPrintablePath(filename) << " => " << (handle ? "OK" : "FAILED"));
+    handle = library_आरोपय_2(filename);
+    CV_LOG_INFO(रिक्त, "load " << गन्तव्यम्_Printable_मार्गः(filename) << " => " << (handle ? "OK" : "FAILED"));
 }
 
-void DynamicLib::libraryRelease()
+शून्य DynamicLib::libraryRelease()
 {
-    if (handle)
+    यदि (handle)
     {
-        CV_LOG_INFO(NULL, "unload "<< toPrintablePath(fname));
+        CV_LOG_INFO(रिक्त, "unload "<< गन्तव्यम्_Printable_मार्गः(fname));
         libraryRelease_(handle);
         handle = 0;
     }

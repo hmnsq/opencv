@@ -40,328 +40,328 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <cstdint>
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव <cstdint>
 
-using namespace cv;
-using namespace cv::cuda;
+उपयुज्य नामाकाश cv;
+उपयुज्य नामाकाश cv::cuda;
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4702)  // unreachable code
-#endif
+#यदि defined(_MSC_VER)
+#निर्देशः warning(disable : 4702)  // unreachable code
+#यदि_अन्तः
 
 /////////////////////////////////////////////////////////////
 /// MemoryStack
 
-#ifdef HAVE_CUDA
+#यदि_परिभाषितम् HAVE_CUDA
 
-namespace
+नामाकाश
 {
-    class MemoryPool;
+    वर्ग स्मृतिः_Pool;
 
-    class MemoryStack
+    वर्ग स्मृतिः_राशिः
     {
-    public:
-        uchar* requestMemory(size_t size);
-        void returnMemory(uchar* ptr);
+    सार्वजनिक:
+        uchar* request_स्मृतिः(size_t size);
+        शून्य return_स्मृतिः(uchar* ptr);
 
         uchar* datastart;
         uchar* dataend;
         uchar* tip;
 
-        bool isFree;
-        MemoryPool* pool;
+        तार्किक isFree;
+        स्मृतिः_Pool* pool;
 
-    #if !defined(NDEBUG)
+    #यदि !defined(NDEBUG)
         std::vector<size_t> allocations;
-    #endif
+    #यदि_अन्तः
     };
 
-    uchar* MemoryStack::requestMemory(size_t size)
+    uchar* स्मृतिः_राशिः::request_स्मृतिः(size_t size)
     {
-        const size_t freeMem = dataend - tip;
+        ध्रुव size_t freeMem = dataend - tip;
 
-        if (size > freeMem)
-            return 0;
+        यदि (size > freeMem)
+            प्रत्यागम 0;
 
         uchar* ptr = tip;
 
         tip += size;
 
-    #if !defined(NDEBUG)
+    #यदि !defined(NDEBUG)
         allocations.push_back(size);
-    #endif
+    #यदि_अन्तः
 
-        return ptr;
+        प्रत्यागम ptr;
     }
 
-    void MemoryStack::returnMemory(uchar* ptr)
+    शून्य स्मृतिः_राशिः::return_स्मृतिः(uchar* ptr)
     {
         CV_DbgAssert( ptr >= datastart && ptr < dataend );
 
-    #if !defined(NDEBUG)
-        const size_t allocSize = tip - ptr;
-        CV_Assert( allocSize == allocations.back() );
+    #यदि !defined(NDEBUG)
+        ध्रुव size_t alloc_आकार = tip - ptr;
+        CV_Assert( alloc_आकार == allocations.back() );
         allocations.pop_back();
-    #endif
+    #यदि_अन्तः
 
         tip = ptr;
     }
 }
 
-#endif
+#यदि_अन्तः
 
 /////////////////////////////////////////////////////////////
 /// MemoryPool
 
-#ifdef HAVE_CUDA
+#यदि_परिभाषितम् HAVE_CUDA
 
-namespace
+नामाकाश
 {
-    class MemoryPool
+    वर्ग स्मृतिः_Pool
     {
-    public:
-        MemoryPool();
-        ~MemoryPool() { release(); }
+    सार्वजनिक:
+        स्मृतिः_Pool();
+        ~स्मृतिः_Pool() { release(); }
 
-        void initialize(size_t stackSize, int stackCount);
-        void release();
+        शून्य initialize(size_t राशिः_आकार, पूर्णाङ्क राशिः_गणनम्);
+        शून्य release();
 
-        MemoryStack* getFreeMemStack();
-        void returnMemStack(MemoryStack* memStack);
+        स्मृतिः_राशिः* get_Free_Mem_राशिः();
+        शून्य return_Mem_राशिः(स्मृतिः_राशिः* mem_राशिः);
 
-    private:
-        void initilizeImpl();
+    गुप्त:
+        शून्य initilizeImpl();
 
         Mutex mtx_;
 
-        bool initialized_;
-        size_t stackSize_;
-        int stackCount_;
+        तार्किक initialized_;
+        size_t राशिः_आकार_2;
+        पूर्णाङ्क राशिः_गणनम्_2;
 
         uchar* mem_;
 
-        std::vector<MemoryStack> stacks_;
+        std::vector<स्मृतिः_राशिः> stacks_;
 
-        MemoryPool(const MemoryPool&); //= delete;
+        स्मृतिः_Pool(ध्रुव स्मृतिः_Pool&); //= delete;
     };
 
-    MemoryPool::MemoryPool() : initialized_(false), mem_(0)
+    स्मृतिः_Pool::स्मृतिः_Pool() : initialized_(असत्य), mem_(0)
     {
         // default : 10 Mb, 5 stacks
-        stackSize_ = 10 * 1024 * 1024;
-        stackCount_ = 5;
+        राशिः_आकार_2 = 10 * 1024 * 1024;
+        राशिः_गणनम्_2 = 5;
     }
 
-    void MemoryPool::initialize(size_t stackSize, int stackCount)
+    शून्य स्मृतिः_Pool::initialize(size_t राशिः_आकार, पूर्णाङ्क राशिः_गणनम्)
     {
-        AutoLock lock(mtx_);
+        Auto_तालकम् lock(mtx_);
 
         release();
 
-        stackSize_ = stackSize;
-        stackCount_ = stackCount;
+        राशिः_आकार_2 = राशिः_आकार;
+        राशिः_गणनम्_2 = राशिः_गणनम्;
 
         initilizeImpl();
     }
 
-    void MemoryPool::initilizeImpl()
+    शून्य स्मृतिः_Pool::initilizeImpl()
     {
-        const size_t totalSize = stackSize_ * stackCount_;
+        ध्रुव size_t योग_आकार = राशिः_आकार_2 * राशिः_गणनम्_2;
 
-        if (totalSize > 0)
+        यदि (योग_आकार > 0)
         {
-            cudaError_t err = cudaMalloc(&mem_, totalSize);
-            if (err != cudaSuccess)
-                return;
+            cudaError_t err = cudaMalloc(&mem_, योग_आकार);
+            यदि (err != cudaSuccess)
+                प्रत्यागम;
 
-            stacks_.resize(stackCount_);
+            stacks_.resize(राशिः_गणनम्_2);
 
             uchar* ptr = mem_;
 
-            for (int i = 0; i < stackCount_; ++i)
+            प्रति (पूर्णाङ्क i = 0; i < राशिः_गणनम्_2; ++i)
             {
                 stacks_[i].datastart = ptr;
-                stacks_[i].dataend = ptr + stackSize_;
+                stacks_[i].dataend = ptr + राशिः_आकार_2;
                 stacks_[i].tip = ptr;
-                stacks_[i].isFree = true;
-                stacks_[i].pool = this;
+                stacks_[i].isFree = सत्य;
+                stacks_[i].pool = एतत्;
 
-                ptr += stackSize_;
+                ptr += राशिः_आकार_2;
             }
 
-            initialized_ = true;
+            initialized_ = सत्य;
         }
     }
 
-    void MemoryPool::release()
+    शून्य स्मृतिः_Pool::release()
     {
-        if (mem_)
+        यदि (mem_)
         {
-#if !defined(NDEBUG)
-            for (int i = 0; i < stackCount_; ++i)
+#यदि !defined(NDEBUG)
+            प्रति (पूर्णाङ्क i = 0; i < राशिः_गणनम्_2; ++i)
             {
                 CV_DbgAssert( stacks_[i].isFree );
                 CV_DbgAssert( stacks_[i].tip == stacks_[i].datastart );
             }
-#endif
+#यदि_अन्तः
 
             cudaFree(mem_);
 
             mem_ = 0;
-            initialized_ = false;
+            initialized_ = असत्य;
         }
     }
 
-    MemoryStack* MemoryPool::getFreeMemStack()
+    स्मृतिः_राशिः* स्मृतिः_Pool::get_Free_Mem_राशिः()
     {
-        AutoLock lock(mtx_);
+        Auto_तालकम् lock(mtx_);
 
-        if (!initialized_)
+        यदि (!initialized_)
             initilizeImpl();
 
-        if (!mem_)
-            return 0;
+        यदि (!mem_)
+            प्रत्यागम 0;
 
-        for (int i = 0; i < stackCount_; ++i)
+        प्रति (पूर्णाङ्क i = 0; i < राशिः_गणनम्_2; ++i)
         {
-            if (stacks_[i].isFree)
+            यदि (stacks_[i].isFree)
             {
-                stacks_[i].isFree = false;
-                return &stacks_[i];
+                stacks_[i].isFree = असत्य;
+                प्रत्यागम &stacks_[i];
             }
         }
 
-        return 0;
+        प्रत्यागम 0;
     }
 
-    void MemoryPool::returnMemStack(MemoryStack* memStack)
+    शून्य स्मृतिः_Pool::return_Mem_राशिः(स्मृतिः_राशिः* mem_राशिः)
     {
-        AutoLock lock(mtx_);
+        Auto_तालकम् lock(mtx_);
 
-        CV_DbgAssert( !memStack->isFree );
+        CV_DbgAssert( !mem_राशिः->isFree );
 
-#if !defined(NDEBUG)
-        bool found = false;
-        for (int i = 0; i < stackCount_; ++i)
+#यदि !defined(NDEBUG)
+        तार्किक प्राप्तम् = असत्य;
+        प्रति (पूर्णाङ्क i = 0; i < राशिः_गणनम्_2; ++i)
         {
-            if (memStack == &stacks_[i])
+            यदि (mem_राशिः == &stacks_[i])
             {
-                found = true;
-                break;
+                प्राप्तम् = सत्य;
+                भङ्ग;
             }
         }
-        CV_DbgAssert( found );
-#endif
+        CV_DbgAssert( प्राप्तम् );
+#यदि_अन्तः
 
-        CV_DbgAssert( memStack->tip == memStack->datastart );
+        CV_DbgAssert( mem_राशिः->tip == mem_राशिः->datastart );
 
-        memStack->isFree = true;
+        mem_राशिः->isFree = सत्य;
     }
 }
 
-#endif
+#यदि_अन्तः
 
 ////////////////////////////////////////////////////////////////
 /// Stream::Impl
 
-#ifndef HAVE_CUDA
+#यदि_अपरिभाषितम् HAVE_CUDA
 
-class cv::cuda::Stream::Impl
+वर्ग cv::cuda::प्रवाहः::Impl
 {
-public:
-    Impl(void* ptr = 0)
+सार्वजनिक:
+    Impl(शून्य* ptr = 0)
     {
-        CV_UNUSED(ptr);
+        CV_अप्रयुक्तम्(ptr);
         throw_no_cuda();
     }
 };
 
-#else
+#अन्यथा
 
-namespace
+नामाकाश
 {
-    class StackAllocator;
+    वर्ग राशिः_Allocator;
 }
 
-class cv::cuda::Stream::Impl
+वर्ग cv::cuda::प्रवाहः::Impl
 {
-public:
-    cudaStream_t stream;
-    bool ownStream;
+सार्वजनिक:
+    cuda_प्रवाहः_t stream;
+    तार्किक own_प्रवाहः;
 
     Ptr<GpuMat::Allocator> allocator;
 
     Impl();
-    Impl(const Ptr<GpuMat::Allocator>& allocator);
-    Impl(const unsigned int cudaFlags);
-    explicit Impl(cudaStream_t stream);
+    Impl(ध्रुव Ptr<GpuMat::Allocator>& allocator);
+    Impl(ध्रुव अचिह्नित पूर्णाङ्क cudaFlags);
+    स्पष्ट Impl(cuda_प्रवाहः_t stream);
 
     ~Impl();
 };
 
-cv::cuda::Stream::Impl::Impl() : stream(0), ownStream(false)
+cv::cuda::प्रवाहः::Impl::Impl() : stream(0), own_प्रवाहः(असत्य)
 {
-    cudaSafeCall( cudaStreamCreate(&stream) );
-    ownStream = true;
+    cudaSafeCall( cuda_प्रवाहः_Create(&stream) );
+    own_प्रवाहः = सत्य;
 
-    allocator = makePtr<StackAllocator>(stream);
+    allocator = makePtr<राशिः_Allocator>(stream);
 }
 
-cv::cuda::Stream::Impl::Impl(const Ptr<GpuMat::Allocator>& allocator) : stream(0), ownStream(false), allocator(allocator)
+cv::cuda::प्रवाहः::Impl::Impl(ध्रुव Ptr<GpuMat::Allocator>& allocator) : stream(0), own_प्रवाहः(असत्य), allocator(allocator)
 {
-    cudaSafeCall( cudaStreamCreate(&stream) );
-    ownStream = true;
+    cudaSafeCall( cuda_प्रवाहः_Create(&stream) );
+    own_प्रवाहः = सत्य;
 }
 
-cv::cuda::Stream::Impl::Impl(const unsigned int cudaFlags) : stream(0), ownStream(false)
+cv::cuda::प्रवाहः::Impl::Impl(ध्रुव अचिह्नित पूर्णाङ्क cudaFlags) : stream(0), own_प्रवाहः(असत्य)
 {
-    cudaSafeCall(cudaStreamCreateWithFlags(&stream, cudaFlags));
-    ownStream = true;
-    allocator = makePtr<StackAllocator>(stream);
+    cudaSafeCall(cuda_प्रवाहः_Create_With_Flags(&stream, cudaFlags));
+    own_प्रवाहः = सत्य;
+    allocator = makePtr<राशिः_Allocator>(stream);
 }
 
-cv::cuda::Stream::Impl::Impl(cudaStream_t stream_) : stream(stream_), ownStream(false)
+cv::cuda::प्रवाहः::Impl::Impl(cuda_प्रवाहः_t प्रवाहः_3) : stream(प्रवाहः_3), own_प्रवाहः(असत्य)
 {
-    allocator = makePtr<StackAllocator>(stream);
+    allocator = makePtr<राशिः_Allocator>(stream);
 }
 
-cv::cuda::Stream::Impl::~Impl()
+cv::cuda::प्रवाहः::Impl::~Impl()
 {
     allocator.release();
 
-    if (stream && ownStream)
+    यदि (stream && own_प्रवाहः)
     {
-        cudaStreamDestroy(stream);
+        cuda_प्रवाहः_Destroy(stream);
     }
 }
 
-#endif
+#यदि_अन्तः
 
 /////////////////////////////////////////////////////////////
 /// DefaultDeviceInitializer
 
-#ifdef HAVE_CUDA
+#यदि_परिभाषितम् HAVE_CUDA
 
-namespace cv { namespace cuda
+नामाकाश cv { नामाकाश cuda
 {
-    class DefaultDeviceInitializer
+    वर्ग DefaultDeviceInitializer
     {
-    public:
+    सार्वजनिक:
         DefaultDeviceInitializer();
         ~DefaultDeviceInitializer();
 
-        Stream& getNullStream(int deviceId);
-        MemoryPool& getMemoryPool(int deviceId);
+        प्रवाहः& get_Null_प्रवाहः(पूर्णाङ्क deviceId);
+        स्मृतिः_Pool& get_स्मृतिः_Pool(पूर्णाङ्क deviceId);
 
-    private:
-        void initStreams();
-        void initPools();
+    गुप्त:
+        शून्य initStreams();
+        शून्य initPools();
 
-        std::vector<Ptr<Stream> > streams_;
+        std::vector<Ptr<प्रवाहः> > streams_;
         Mutex streams_mtx_;
 
-        std::vector<Ptr<MemoryPool> > pools_;
+        std::vector<Ptr<स्मृतिः_Pool> > pools_;
         Mutex pools_mtx_;
     };
 
@@ -373,506 +373,506 @@ namespace cv { namespace cuda
     {
         streams_.clear();
 
-        for (size_t i = 0; i < pools_.size(); ++i)
+        प्रति (size_t i = 0; i < pools_.size(); ++i)
         {
-            cudaSetDevice(static_cast<int>(i));
+            cuda_समुच्चयः_Device(static_cast<पूर्णाङ्क>(i));
             pools_[i]->release();
         }
 
         pools_.clear();
     }
 
-    Stream& DefaultDeviceInitializer::getNullStream(int deviceId)
+    प्रवाहः& DefaultDeviceInitializer::get_Null_प्रवाहः(पूर्णाङ्क deviceId)
     {
-        AutoLock lock(streams_mtx_);
+        Auto_तालकम् lock(streams_mtx_);
 
-        if (streams_.empty())
+        यदि (streams_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            पूर्णाङ्क device_गणनम् = get_Cuda_Enabled_Device_गणनम्();
 
-            if (deviceCount > 0)
-                streams_.resize(deviceCount);
+            यदि (device_गणनम् > 0)
+                streams_.resize(device_गणनम्);
         }
 
-        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<int>(streams_.size()) );
+        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<पूर्णाङ्क>(streams_.size()) );
 
-        if (streams_[deviceId].empty())
+        यदि (streams_[deviceId].empty())
         {
-            cudaStream_t stream = NULL;
-            Ptr<Stream::Impl> impl = makePtr<Stream::Impl>(stream);
-            streams_[deviceId] = Ptr<Stream>(new Stream(impl));
+            cuda_प्रवाहः_t stream = रिक्त;
+            Ptr<प्रवाहः::Impl> impl = makePtr<प्रवाहः::Impl>(stream);
+            streams_[deviceId] = Ptr<प्रवाहः>(नूतन प्रवाहः(impl));
         }
 
-        return *streams_[deviceId];
+        प्रत्यागम *streams_[deviceId];
     }
 
-    MemoryPool& DefaultDeviceInitializer::getMemoryPool(int deviceId)
+    स्मृतिः_Pool& DefaultDeviceInitializer::get_स्मृतिः_Pool(पूर्णाङ्क deviceId)
     {
-        AutoLock lock(pools_mtx_);
+        Auto_तालकम् lock(pools_mtx_);
 
-        if (pools_.empty())
+        यदि (pools_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            पूर्णाङ्क device_गणनम् = get_Cuda_Enabled_Device_गणनम्();
 
-            if (deviceCount > 0)
+            यदि (device_गणनम् > 0)
             {
-                pools_.resize(deviceCount);
-                for (size_t i = 0; i < pools_.size(); ++i)
+                pools_.resize(device_गणनम्);
+                प्रति (size_t i = 0; i < pools_.size(); ++i)
                 {
-                    cudaSetDevice(static_cast<int>(i));
-                    pools_[i] = makePtr<MemoryPool>();
+                    cuda_समुच्चयः_Device(static_cast<पूर्णाङ्क>(i));
+                    pools_[i] = makePtr<स्मृतिः_Pool>();
                 }
             }
         }
 
-        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<int>(pools_.size()) );
+        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<पूर्णाङ्क>(pools_.size()) );
 
-        MemoryPool* p = pools_[deviceId];
+        स्मृतिः_Pool* p = pools_[deviceId];
         CV_Assert(p);
-        return *p;
+        प्रत्यागम *p;
     }
 
     DefaultDeviceInitializer initializer;
 }}
 
-#endif
+#यदि_अन्तः
 
 /////////////////////////////////////////////////////////////
 /// Stream
 
-cv::cuda::Stream::Stream()
+cv::cuda::प्रवाहः::प्रवाहः()
 {
-#ifndef HAVE_CUDA
+#यदि_अपरिभाषितम् HAVE_CUDA
     throw_no_cuda();
-#else
+#अन्यथा
     impl_ = makePtr<Impl>();
-#endif
+#यदि_अन्तः
 }
 
-cv::cuda::Stream::Stream(const Ptr<GpuMat::Allocator>& allocator)
+cv::cuda::प्रवाहः::प्रवाहः(ध्रुव Ptr<GpuMat::Allocator>& allocator)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(allocator);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(allocator);
     throw_no_cuda();
-#else
+#अन्यथा
     impl_ = makePtr<Impl>(allocator);
-#endif
+#यदि_अन्तः
 }
 
-cv::cuda::Stream::Stream(const size_t cudaFlags)
+cv::cuda::प्रवाहः::प्रवाहः(ध्रुव size_t cudaFlags)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(cudaFlags);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(cudaFlags);
     throw_no_cuda();
-#else
+#अन्यथा
     impl_ = makePtr<Impl>(cudaFlags & UINT_MAX);
-#endif
+#यदि_अन्तः
 }
 
-bool cv::cuda::Stream::queryIfComplete() const
+तार्किक cv::cuda::प्रवाहः::queryIfComplete() ध्रुव
 {
-#ifndef HAVE_CUDA
+#यदि_अपरिभाषितम् HAVE_CUDA
     throw_no_cuda();
-#else
-    cudaError_t err = cudaStreamQuery(impl_->stream);
+#अन्यथा
+    cudaError_t err = cuda_प्रवाहः_Query(impl_->stream);
 
-    if (err == cudaErrorNotReady || err == cudaSuccess)
-        return err == cudaSuccess;
+    यदि (err == cudaErrorNotReady || err == cudaSuccess)
+        प्रत्यागम err == cudaSuccess;
 
     cudaSafeCall(err);
-    return false;
-#endif
+    प्रत्यागम असत्य;
+#यदि_अन्तः
 }
 
-void cv::cuda::Stream::waitForCompletion()
+शून्य cv::cuda::प्रवाहः::waitForCompletion()
 {
-#ifndef HAVE_CUDA
+#यदि_अपरिभाषितम् HAVE_CUDA
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaStreamSynchronize(impl_->stream) );
-#endif
+#अन्यथा
+    cudaSafeCall( cuda_प्रवाहः_Synchronize(impl_->stream) );
+#यदि_अन्तः
 }
 
-void cv::cuda::Stream::waitEvent(const Event& event)
+शून्य cv::cuda::प्रवाहः::waitEvent(ध्रुव Event& event)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(event);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(event);
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaStreamWaitEvent(impl_->stream, EventAccessor::getEvent(event), 0) );
-#endif
+#अन्यथा
+    cudaSafeCall( cuda_प्रवाहः_Wait_Event(impl_->stream, EventAccessor::getEvent(event), 0) );
+#यदि_अन्तः
 }
 
-#if defined(HAVE_CUDA) && (CUDART_VERSION >= 5000)
+#यदि defined(HAVE_CUDA) && (CUDART_संस्करणम् >= 5000)
 
-namespace
+नामाकाश
 {
-    struct CallbackData
+    संरचना Callback_दत्त
     {
-        Stream::StreamCallback callback;
-        void* userData;
+        प्रवाहः::प्रवाहः_Callback callback;
+        शून्य* user_दत्त;
 
-        CallbackData(Stream::StreamCallback callback_, void* userData_) : callback(callback_), userData(userData_) {}
+        Callback_दत्त(प्रवाहः::प्रवाहः_Callback callback_, शून्य* user_दत्त_2) : callback(callback_), user_दत्त(user_दत्त_2) {}
     };
 
-    void CUDART_CB cudaStreamCallback(cudaStream_t, cudaError_t status, void* userData)
+    शून्य CUDART_CB cuda_प्रवाहः_Callback(cuda_प्रवाहः_t, cudaError_t स्थितिः, शून्य* user_दत्त)
     {
-        CallbackData* data = reinterpret_cast<CallbackData*>(userData);
-        data->callback(static_cast<int>(status), data->userData);
-        delete data;
+        Callback_दत्त* दत्त = reinterpret_cast<Callback_दत्त*>(user_दत्त);
+        दत्त->callback(static_cast<पूर्णाङ्क>(स्थितिः), दत्त->user_दत्त);
+        विलोपय दत्त;
     }
 }
 
-#endif
+#यदि_अन्तः
 
-void cv::cuda::Stream::enqueueHostCallback(StreamCallback callback, void* userData)
+शून्य cv::cuda::प्रवाहः::पङ्क्तौ_निक्षिप_Host_Callback(प्रवाहः_Callback callback, शून्य* user_दत्त)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(callback);
-    CV_UNUSED(userData);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(callback);
+    CV_अप्रयुक्तम्(user_दत्त);
     throw_no_cuda();
-#else
-    #if CUDART_VERSION < 5000
-        CV_UNUSED(callback);
-        CV_UNUSED(userData);
+#अन्यथा
+    #यदि CUDART_संस्करणम् < 5000
+        CV_अप्रयुक्तम्(callback);
+        CV_अप्रयुक्तम्(user_दत्त);
         CV_Error(cv::Error::StsNotImplemented, "This function requires CUDA >= 5.0");
-    #else
-        CallbackData* data = new CallbackData(callback, userData);
+    #अन्यथा
+        Callback_दत्त* दत्त = नूतन Callback_दत्त(callback, user_दत्त);
 
-        cudaSafeCall( cudaStreamAddCallback(impl_->stream, cudaStreamCallback, data, 0) );
-    #endif
-#endif
+        cudaSafeCall( cuda_प्रवाहः_सङ्कलय_Callback(impl_->stream, cuda_प्रवाहः_Callback, दत्त, 0) );
+    #यदि_अन्तः
+#यदि_अन्तः
 }
 
-Stream& cv::cuda::Stream::Null()
+प्रवाहः& cv::cuda::प्रवाहः::Null()
 {
-#ifndef HAVE_CUDA
+#यदि_अपरिभाषितम् HAVE_CUDA
     throw_no_cuda();
-#else
-    const int deviceId = getDevice();
-    return initializer.getNullStream(deviceId);
-#endif
+#अन्यथा
+    ध्रुव पूर्णाङ्क deviceId = getDevice();
+    प्रत्यागम initializer.get_Null_प्रवाहः(deviceId);
+#यदि_अन्तः
 }
 
-void* cv::cuda::Stream::cudaPtr() const
+शून्य* cv::cuda::प्रवाहः::cudaPtr() ध्रुव
 {
-#ifndef HAVE_CUDA
-    return nullptr;
-#else
-    return impl_->stream;
-#endif
+#यदि_अपरिभाषितम् HAVE_CUDA
+    प्रत्यागम शून्यसूचकः;
+#अन्यथा
+    प्रत्यागम impl_->stream;
+#यदि_अन्तः
 }
 
-cv::cuda::Stream::operator bool_type() const
+cv::cuda::प्रवाहः::संक्रियकः bool_type() ध्रुव
 {
-#ifndef HAVE_CUDA
-    return 0;
-#else
-    return (impl_->stream != 0) ? &Stream::this_type_does_not_support_comparisons : 0;
-#endif
+#यदि_अपरिभाषितम् HAVE_CUDA
+    प्रत्यागम 0;
+#अन्यथा
+    प्रत्यागम (impl_->stream != 0) ? &प्रवाहः::this_type_does_not_support_comparisons : 0;
+#यदि_अन्तः
 }
 
-#ifdef HAVE_CUDA
+#यदि_परिभाषितम् HAVE_CUDA
 
-cudaStream_t cv::cuda::StreamAccessor::getStream(const Stream& stream)
+cuda_प्रवाहः_t cv::cuda::प्रवाहः_Accessor::get_प्रवाहः(ध्रुव प्रवाहः& stream)
 {
-    return stream.impl_->stream;
+    प्रत्यागम stream.impl_->stream;
 }
 
-Stream cv::cuda::StreamAccessor::wrapStream(cudaStream_t stream)
+प्रवाहः cv::cuda::प्रवाहः_Accessor::wrap_प्रवाहः(cuda_प्रवाहः_t stream)
 {
-    return Stream(makePtr<Stream::Impl>(stream));
+    प्रत्यागम प्रवाहः(makePtr<प्रवाहः::Impl>(stream));
 }
 
-#endif
+#यदि_अन्तः
 
-Stream cv::cuda::wrapStream(size_t cudaStreamMemoryAddress) {
-#ifndef HAVE_CUDA
-    CV_UNUSED(cudaStreamMemoryAddress);
+प्रवाहः cv::cuda::wrap_प्रवाहः(size_t cuda_प्रवाहः_स्मृतिः_स्थानाङ्कः) {
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(cuda_प्रवाहः_स्मृतिः_स्थानाङ्कः);
     throw_no_cuda();
-#else
-    return cv::cuda::StreamAccessor::wrapStream(reinterpret_cast<cudaStream_t>(cudaStreamMemoryAddress));
-#endif
+#अन्यथा
+    प्रत्यागम cv::cuda::प्रवाहः_Accessor::wrap_प्रवाहः(reinterpret_cast<cuda_प्रवाहः_t>(cuda_प्रवाहः_स्मृतिः_स्थानाङ्कः));
+#यदि_अन्तः
 }
 
 /////////////////////////////////////////////////////////////
 /// StackAllocator
 
-#ifdef HAVE_CUDA
+#यदि_परिभाषितम् HAVE_CUDA
 
-namespace
+नामाकाश
 {
-    bool enableMemoryPool = false;
+    तार्किक enable_स्मृतिः_Pool = असत्य;
 
-    class StackAllocator : public GpuMat::Allocator
+    वर्ग राशिः_Allocator : सार्वजनिक GpuMat::Allocator
     {
-    public:
-        explicit StackAllocator(cudaStream_t stream);
-        ~StackAllocator();
+    सार्वजनिक:
+        स्पष्ट राशिः_Allocator(cuda_प्रवाहः_t stream);
+        ~राशिः_Allocator();
 
-        bool allocate(GpuMat* mat, int rows, int cols, size_t elemSize) CV_OVERRIDE;
-        void free(GpuMat* mat) CV_OVERRIDE;
+        तार्किक allocate(GpuMat* mat, पूर्णाङ्क पङ्क्तिकाः, पूर्णाङ्क स्तम्भसङ्ख्या, size_t elem_आकार) CV_OVERRIDE;
+        शून्य मुक्त(GpuMat* mat) CV_OVERRIDE;
 
-    private:
-        StackAllocator(const StackAllocator&);
-        StackAllocator& operator =(const StackAllocator&);
+    गुप्त:
+        राशिः_Allocator(ध्रुव राशिः_Allocator&);
+        राशिः_Allocator& संक्रियकः =(ध्रुव राशिः_Allocator&);
 
-        cudaStream_t stream_;
-        MemoryStack* memStack_;
+        cuda_प्रवाहः_t प्रवाहः_3;
+        स्मृतिः_राशिः* mem_राशिः_2;
         size_t alignment_;
     };
 
-    StackAllocator::StackAllocator(cudaStream_t stream) : stream_(stream), memStack_(0)
+    राशिः_Allocator::राशिः_Allocator(cuda_प्रवाहः_t stream) : प्रवाहः_3(stream), mem_राशिः_2(0)
     {
-        if (enableMemoryPool)
+        यदि (enable_स्मृतिः_Pool)
         {
-            const int deviceId = getDevice();
-            memStack_ = initializer.getMemoryPool(deviceId).getFreeMemStack();
+            ध्रुव पूर्णाङ्क deviceId = getDevice();
+            mem_राशिः_2 = initializer.get_स्मृतिः_Pool(deviceId).get_Free_Mem_राशिः();
             DeviceInfo devInfo(deviceId);
             alignment_ = devInfo.textureAlignment();
         }
     }
 
-    StackAllocator::~StackAllocator()
+    राशिः_Allocator::~राशिः_Allocator()
     {
-        if (memStack_ != 0)
+        यदि (mem_राशिः_2 != 0)
         {
-            cudaStreamSynchronize(stream_);
-            memStack_->pool->returnMemStack(memStack_);
+            cuda_प्रवाहः_Synchronize(प्रवाहः_3);
+            mem_राशिः_2->pool->return_Mem_राशिः(mem_राशिः_2);
         }
     }
 
-    size_t alignUp(size_t what, size_t alignment)
+    size_t align_ऊर्ध्वम्(size_t what, size_t alignment)
     {
-        size_t alignMask = alignment-1;
-        size_t inverseAlignMask = ~alignMask;
-        size_t res = (what + alignMask) & inverseAlignMask;
-        return res;
+        size_t align_आवरणम् = alignment-1;
+        size_t inverse_Align_आवरणम् = ~align_आवरणम्;
+        size_t res = (what + align_आवरणम्) & inverse_Align_आवरणम्;
+        प्रत्यागम res;
     }
 
-    bool StackAllocator::allocate(GpuMat* mat, int rows, int cols, size_t elemSize)
+    तार्किक राशिः_Allocator::allocate(GpuMat* mat, पूर्णाङ्क पङ्क्तिकाः, पूर्णाङ्क स्तम्भसङ्ख्या, size_t elem_आकार)
     {
-        if (memStack_ == 0)
-            return false;
+        यदि (mem_राशिः_2 == 0)
+            प्रत्यागम असत्य;
 
-        size_t pitch, memSize;
+        size_t pitch, mem_आकार;
 
-        if (rows > 1 && cols > 1)
+        यदि (पङ्क्तिकाः > 1 && स्तम्भसङ्ख्या > 1)
         {
-            pitch = alignUp(cols * elemSize, alignment_);
-            memSize = pitch * rows;
+            pitch = align_ऊर्ध्वम्(स्तम्भसङ्ख्या * elem_आकार, alignment_);
+            mem_आकार = pitch * पङ्क्तिकाः;
         }
-        else
+        अन्यथा
         {
             // Single row or single column must be continuous
-            pitch = elemSize * cols;
-            memSize = alignUp(elemSize * cols * rows, 64);
+            pitch = elem_आकार * स्तम्भसङ्ख्या;
+            mem_आकार = align_ऊर्ध्वम्(elem_आकार * स्तम्भसङ्ख्या * पङ्क्तिकाः, 64);
         }
 
-        uchar* ptr = memStack_->requestMemory(memSize);
+        uchar* ptr = mem_राशिः_2->request_स्मृतिः(mem_आकार);
 
-        if (ptr == 0)
-            return false;
+        यदि (ptr == 0)
+            प्रत्यागम असत्य;
 
-        mat->data = ptr;
-        mat->step = pitch;
-        mat->refcount = (int*) fastMalloc(sizeof(int));
+        mat->दत्त = ptr;
+        mat->चरणः = pitch;
+        mat->refcount = (पूर्णाङ्क*) fastMalloc(परिमाण(पूर्णाङ्क));
 
-        return true;
+        प्रत्यागम सत्य;
     }
 
-    void StackAllocator::free(GpuMat* mat)
+    शून्य राशिः_Allocator::मुक्त(GpuMat* mat)
     {
-        if (memStack_ == 0)
-            return;
+        यदि (mem_राशिः_2 == 0)
+            प्रत्यागम;
 
-        memStack_->returnMemory(mat->datastart);
+        mem_राशिः_2->return_स्मृतिः(mat->datastart);
         fastFree(mat->refcount);
     }
 }
 
-#endif
+#यदि_अन्तः
 
 /////////////////////////////////////////////////////////////
 /// BufferPool
 
-void cv::cuda::setBufferPoolUsage(bool on)
+शून्य cv::cuda::समुच्चयः_बफर_Pool_Usage(तार्किक on)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(on);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(on);
     throw_no_cuda();
-#else
-    enableMemoryPool = on;
-#endif
+#अन्यथा
+    enable_स्मृतिः_Pool = on;
+#यदि_अन्तः
 }
 
-void cv::cuda::setBufferPoolConfig(int deviceId, size_t stackSize, int stackCount)
+शून्य cv::cuda::समुच्चयः_बफर_Pool_Config(पूर्णाङ्क deviceId, size_t राशिः_आकार, पूर्णाङ्क राशिः_गणनम्)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(deviceId);
-    CV_UNUSED(stackSize);
-    CV_UNUSED(stackCount);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(deviceId);
+    CV_अप्रयुक्तम्(राशिः_आकार);
+    CV_अप्रयुक्तम्(राशिः_गणनम्);
     throw_no_cuda();
-#else
-    const int currentDevice = getDevice();
+#अन्यथा
+    ध्रुव पूर्णाङ्क currentDevice = getDevice();
 
-    if (deviceId >= 0)
+    यदि (deviceId >= 0)
     {
-        setDevice(deviceId);
-        initializer.getMemoryPool(deviceId).initialize(stackSize, stackCount);
+        समुच्चयः_Device(deviceId);
+        initializer.get_स्मृतिः_Pool(deviceId).initialize(राशिः_आकार, राशिः_गणनम्);
     }
-    else
+    अन्यथा
     {
-        const int deviceCount = getCudaEnabledDeviceCount();
+        ध्रुव पूर्णाङ्क device_गणनम् = get_Cuda_Enabled_Device_गणनम्();
 
-        for (deviceId = 0; deviceId < deviceCount; ++deviceId)
+        प्रति (deviceId = 0; deviceId < device_गणनम्; ++deviceId)
         {
-            setDevice(deviceId);
-            initializer.getMemoryPool(deviceId).initialize(stackSize, stackCount);
+            समुच्चयः_Device(deviceId);
+            initializer.get_स्मृतिः_Pool(deviceId).initialize(राशिः_आकार, राशिः_गणनम्);
         }
     }
 
-    setDevice(currentDevice);
-#endif
+    समुच्चयः_Device(currentDevice);
+#यदि_अन्तः
 }
 
-#ifndef HAVE_CUDA
-cv::cuda::BufferPool::BufferPool(Stream& stream)
+#यदि_अपरिभाषितम् HAVE_CUDA
+cv::cuda::बफर_Pool::बफर_Pool(प्रवाहः& stream)
 {
-    CV_UNUSED(stream);
+    CV_अप्रयुक्तम्(stream);
     throw_no_cuda();
 }
-#else
-cv::cuda::BufferPool::BufferPool(Stream& stream) : allocator_(stream.impl_->allocator)
+#अन्यथा
+cv::cuda::बफर_Pool::बफर_Pool(प्रवाहः& stream) : allocator_(stream.impl_->allocator)
 {
 }
-#endif
+#यदि_अन्तः
 
-GpuMat cv::cuda::BufferPool::getBuffer(int rows, int cols, int type)
+GpuMat cv::cuda::बफर_Pool::get_बफर(पूर्णाङ्क पङ्क्तिकाः, पूर्णाङ्क स्तम्भसङ्ख्या, पूर्णाङ्क type)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(rows);
-    CV_UNUSED(cols);
-    CV_UNUSED(type);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(पङ्क्तिकाः);
+    CV_अप्रयुक्तम्(स्तम्भसङ्ख्या);
+    CV_अप्रयुक्तम्(type);
     throw_no_cuda();
-#else
+#अन्यथा
     GpuMat buf(allocator_);
-    buf.create(rows, cols, type);
-    return buf;
-#endif
+    buf.create(पङ्क्तिकाः, स्तम्भसङ्ख्या, type);
+    प्रत्यागम buf;
+#यदि_अन्तः
 }
 
 
 ////////////////////////////////////////////////////////////////
 // Event
 
-#ifndef HAVE_CUDA
+#यदि_अपरिभाषितम् HAVE_CUDA
 
-class cv::cuda::Event::Impl
+वर्ग cv::cuda::Event::Impl
 {
-public:
-    Impl(unsigned int)
+सार्वजनिक:
+    Impl(अचिह्नित पूर्णाङ्क)
     {
         throw_no_cuda();
     }
 };
 
-#else
+#अन्यथा
 
-class cv::cuda::Event::Impl
+वर्ग cv::cuda::Event::Impl
 {
-public:
+सार्वजनिक:
     cudaEvent_t event;
-    bool ownEvent;
+    तार्किक ownEvent;
 
-    explicit Impl(unsigned int flags);
-    explicit Impl(cudaEvent_t event);
+    स्पष्ट Impl(अचिह्नित पूर्णाङ्क flags);
+    स्पष्ट Impl(cudaEvent_t event);
     ~Impl();
 };
 
-cv::cuda::Event::Impl::Impl(unsigned int flags) : event(0), ownEvent(false)
+cv::cuda::Event::Impl::Impl(अचिह्नित पूर्णाङ्क flags) : event(0), ownEvent(असत्य)
 {
     cudaSafeCall( cudaEventCreateWithFlags(&event, flags) );
-    ownEvent = true;
+    ownEvent = सत्य;
 }
 
-cv::cuda::Event::Impl::Impl(cudaEvent_t e) : event(e), ownEvent(false)
+cv::cuda::Event::Impl::Impl(cudaEvent_t e) : event(e), ownEvent(असत्य)
 {
 }
 
 cv::cuda::Event::Impl::~Impl()
 {
-    if (event && ownEvent)
+    यदि (event && ownEvent)
     {
         cudaEventDestroy(event);
     }
 }
 
-cudaEvent_t cv::cuda::EventAccessor::getEvent(const Event& event)
+cudaEvent_t cv::cuda::EventAccessor::getEvent(ध्रुव Event& event)
 {
-    return event.impl_->event;
+    प्रत्यागम event.impl_->event;
 }
 
 Event cv::cuda::EventAccessor::wrapEvent(cudaEvent_t event)
 {
-    return Event(makePtr<Event::Impl>(event));
+    प्रत्यागम Event(makePtr<Event::Impl>(event));
 }
 
-#endif
+#यदि_अन्तः
 
-cv::cuda::Event::Event(const Event::CreateFlags flags)
+cv::cuda::Event::Event(ध्रुव Event::CreateFlags flags)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(flags);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(flags);
     throw_no_cuda();
-#else
+#अन्यथा
     impl_ = makePtr<Impl>(flags);
-#endif
+#यदि_अन्तः
 }
 
-void cv::cuda::Event::record(Stream& stream)
+शून्य cv::cuda::Event::लेखः(प्रवाहः& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(stream);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(stream);
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaEventRecord(impl_->event, StreamAccessor::getStream(stream)) );
-#endif
+#अन्यथा
+    cudaSafeCall( cuda_Event_लेखः(impl_->event, प्रवाहः_Accessor::get_प्रवाहः(stream)) );
+#यदि_अन्तः
 }
 
-bool cv::cuda::Event::queryIfComplete() const
+तार्किक cv::cuda::Event::queryIfComplete() ध्रुव
 {
-#ifndef HAVE_CUDA
+#यदि_अपरिभाषितम् HAVE_CUDA
     throw_no_cuda();
-#else
+#अन्यथा
     cudaError_t err = cudaEventQuery(impl_->event);
 
-    if (err == cudaErrorNotReady || err == cudaSuccess)
-        return err == cudaSuccess;
+    यदि (err == cudaErrorNotReady || err == cudaSuccess)
+        प्रत्यागम err == cudaSuccess;
 
     cudaSafeCall(err);
-    return false;
-#endif
+    प्रत्यागम असत्य;
+#यदि_अन्तः
 }
 
-void cv::cuda::Event::waitForCompletion()
+शून्य cv::cuda::Event::waitForCompletion()
 {
-#ifndef HAVE_CUDA
+#यदि_अपरिभाषितम् HAVE_CUDA
     throw_no_cuda();
-#else
+#अन्यथा
     cudaSafeCall( cudaEventSynchronize(impl_->event) );
-#endif
+#यदि_अन्तः
 }
 
-float cv::cuda::Event::elapsedTime(const Event& start, const Event& end)
+भिन्न cv::cuda::Event::elapsedTime(ध्रुव Event& start, ध्रुव Event& end)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(start);
-    CV_UNUSED(end);
+#यदि_अपरिभाषितम् HAVE_CUDA
+    CV_अप्रयुक्तम्(start);
+    CV_अप्रयुक्तम्(end);
     throw_no_cuda();
-#else
-    float ms;
+#अन्यथा
+    भिन्न ms;
     cudaSafeCall( cudaEventElapsedTime(&ms, start.impl_->event, end.impl_->event) );
-    return ms;
-#endif
+    प्रत्यागम ms;
+#यदि_अन्तः
 }

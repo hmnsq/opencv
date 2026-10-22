@@ -5,20 +5,20 @@
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "opencl_kernels_core.hpp"
+#अन्तर्भाव "stat.hpp"
 
-#include "norm.simd.hpp"
-#include "norm.simd_declarations.hpp"
+#अन्तर्भाव "norm.simd.hpp"
+#अन्तर्भाव "norm.simd_declarations.hpp"
 
 /****************************************************************************************\
 *                                         norm                                           *
 \****************************************************************************************/
 
-namespace cv { namespace hal {
+नामाकाश cv { नामाकाश hal {
 
-extern const uchar popCountTable[256] =
+बाह्य ध्रुव uchar निष्कासय_गणनम्_सारणी[256] =
 {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
@@ -30,7 +30,7 @@ extern const uchar popCountTable[256] =
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 };
 
-static const uchar popCountTable2[] =
+स्थिर ध्रुव uchar निष्कासय_गणनम्_Table2[] =
 {
     0, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3,
     1, 2, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 1, 2, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3,
@@ -42,7 +42,7 @@ static const uchar popCountTable2[] =
     2, 3, 3, 3, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4, 4, 4, 2, 3, 3, 3, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4, 4, 4
 };
 
-static const uchar popCountTable4[] =
+स्थिर ध्रुव uchar निष्कासय_गणनम्_Table4[] =
 {
     0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -55,524 +55,524 @@ static const uchar popCountTable4[] =
 };
 
 
-int normHamming(const uchar* a, int n, int cellSize)
+पूर्णाङ्क normHamming(ध्रुव uchar* a, पूर्णाङ्क n, पूर्णाङ्क cell_आकार)
 {
-    int output;
-    CALL_HAL_RET(normHamming8u, cv_hal_normHamming8u, output, a, n, cellSize);
+    पूर्णाङ्क output;
+    CALL_HAL_RET(normHamming8u, cv_hal_normHamming8u, output, a, n, cell_आकार);
 
-    if( cellSize == 1 )
-        return normHamming(a, n);
-    const uchar* tab = 0;
-    if( cellSize == 2 )
-        tab = popCountTable2;
-    else if( cellSize == 4 )
-        tab = popCountTable4;
-    else
-        return -1;
-    int i = 0;
-    int result = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    यदि( cell_आकार == 1 )
+        प्रत्यागम normHamming(a, n);
+    ध्रुव uchar* tab = 0;
+    यदि( cell_आकार == 2 )
+        tab = निष्कासय_गणनम्_Table2;
+    अन्यथा यदि( cell_आकार == 4 )
+        tab = निष्कासय_गणनम्_Table4;
+    अन्यथा
+        प्रत्यागम -1;
+    पूर्णाङ्क i = 0;
+    पूर्णाङ्क परिणाम = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
     v_uint64 t = vx_setzero_u64();
-    if ( cellSize == 2)
+    यदि ( cell_आकार == 2)
     {
-        v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x55));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        v_uint16 आवरणम् = v_reinterpret_as_u16(vx_setall_u8(0x55));
+        प्रति(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
-            v_uint16 a0 = v_reinterpret_as_u16(vx_load(a + i));
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(a0, v_shr<1>(a0)), mask))));
+            v_uint16 a0 = v_reinterpret_as_u16(vx_आरोपय(a + i));
+            t = v_सङ्कलय(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(a0, v_shr<1>(a0)), आवरणम्))));
         }
     }
-    else    // cellSize == 4
+    अन्यथा    // cellSize == 4
     {
-        v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x11));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        v_uint16 आवरणम् = v_reinterpret_as_u16(vx_setall_u8(0x11));
+        प्रति(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
-            v_uint16 a0 = v_reinterpret_as_u16(vx_load(a + i));
+            v_uint16 a0 = v_reinterpret_as_u16(vx_आरोपय(a + i));
             v_uint16 a1 = v_or(a0, v_shr<2>(a0));
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(a1, v_shr<1>(a1)), mask))));
+            t = v_सङ्कलय(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(a1, v_shr<1>(a1)), आवरणम्))));
 
         }
     }
-    result += (int)v_reduce_sum(t);
+    परिणाम += (पूर्णाङ्क)v_reduce_योग(t);
     vx_cleanup();
-#elif CV_ENABLE_UNROLLED
-    for( ; i <= n - 4; i += 4 )
-        result += tab[a[i]] + tab[a[i+1]] + tab[a[i+2]] + tab[a[i+3]];
-#endif
-    for( ; i < n; i++ )
-        result += tab[a[i]];
-    return result;
+#नोचेद्यदि CV_ENABLE_UNROLLED
+    प्रति( ; i <= n - 4; i += 4 )
+        परिणाम += tab[a[i]] + tab[a[i+1]] + tab[a[i+2]] + tab[a[i+3]];
+#यदि_अन्तः
+    प्रति( ; i < n; i++ )
+        परिणाम += tab[a[i]];
+    प्रत्यागम परिणाम;
 }
 
-int normHamming(const uchar* a, const uchar* b, int n, int cellSize)
+पूर्णाङ्क normHamming(ध्रुव uchar* a, ध्रुव uchar* b, पूर्णाङ्क n, पूर्णाङ्क cell_आकार)
 {
-    int output;
-    CALL_HAL_RET(normHammingDiff8u, cv_hal_normHammingDiff8u, output, a, b, n, cellSize);
+    पूर्णाङ्क output;
+    CALL_HAL_RET(normHammingDiff8u, cv_hal_normHammingDiff8u, output, a, b, n, cell_आकार);
 
-    if( cellSize == 1 )
-        return normHamming(a, b, n);
-    const uchar* tab = 0;
-    if( cellSize == 2 )
-        tab = popCountTable2;
-    else if( cellSize == 4 )
-        tab = popCountTable4;
-    else
-        return -1;
-    int i = 0;
-    int result = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    यदि( cell_आकार == 1 )
+        प्रत्यागम normHamming(a, b, n);
+    ध्रुव uchar* tab = 0;
+    यदि( cell_आकार == 2 )
+        tab = निष्कासय_गणनम्_Table2;
+    अन्यथा यदि( cell_आकार == 4 )
+        tab = निष्कासय_गणनम्_Table4;
+    अन्यथा
+        प्रत्यागम -1;
+    पूर्णाङ्क i = 0;
+    पूर्णाङ्क परिणाम = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
     v_uint64 t = vx_setzero_u64();
-    if ( cellSize == 2)
+    यदि ( cell_आकार == 2)
     {
-        v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x55));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        v_uint16 आवरणम् = v_reinterpret_as_u16(vx_setall_u8(0x55));
+        प्रति(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
-            v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_load(a + i), vx_load(b + i)));
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab0, v_shr<1>(ab0)), mask))));
+            v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_आरोपय(a + i), vx_आरोपय(b + i)));
+            t = v_सङ्कलय(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab0, v_shr<1>(ab0)), आवरणम्))));
         }
     }
-    else    // cellSize == 4
+    अन्यथा    // cellSize == 4
     {
-        v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x11));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        v_uint16 आवरणम् = v_reinterpret_as_u16(vx_setall_u8(0x11));
+        प्रति(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
-            v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_load(a + i), vx_load(b + i)));
+            v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_आरोपय(a + i), vx_आरोपय(b + i)));
             v_uint16 ab1 = v_or(ab0, v_shr<2>(ab0));
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab1, v_shr<1>(ab1)), mask))));
+            t = v_सङ्कलय(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab1, v_shr<1>(ab1)), आवरणम्))));
         }
     }
-    result += (int)v_reduce_sum(t);
+    परिणाम += (पूर्णाङ्क)v_reduce_योग(t);
     vx_cleanup();
-#elif CV_ENABLE_UNROLLED
-    for( ; i <= n - 4; i += 4 )
-        result += tab[a[i] ^ b[i]] + tab[a[i+1] ^ b[i+1]] +
+#नोचेद्यदि CV_ENABLE_UNROLLED
+    प्रति( ; i <= n - 4; i += 4 )
+        परिणाम += tab[a[i] ^ b[i]] + tab[a[i+1] ^ b[i+1]] +
                 tab[a[i+2] ^ b[i+2]] + tab[a[i+3] ^ b[i+3]];
-#endif
-    for( ; i < n; i++ )
-        result += tab[a[i] ^ b[i]];
-    return result;
+#यदि_अन्तः
+    प्रति( ; i < n; i++ )
+        परिणाम += tab[a[i] ^ b[i]];
+    प्रत्यागम परिणाम;
 }
 
-float normL2Sqr_(const float* a, const float* b, int n)
+भिन्न normL2Sqr_(ध्रुव भिन्न* a, ध्रुव भिन्न* b, पूर्णाङ्क n)
 {
-    int j = 0; float d = 0.f;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int vl = VTraits<v_float32>::vlanes();
+    पूर्णाङ्क j = 0; भिन्न d = 0.f;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+    ध्रुव पूर्णाङ्क vl = VTraits<v_float32>::vlanes();
     v_float32 v_d0 = vx_setzero_f32(), v_d1 = vx_setzero_f32();
     v_float32 v_d2 = vx_setzero_f32(), v_d3 = vx_setzero_f32();
-    for (; j <= n - 4 * vl; j += 4 * vl)
+    प्रति (; j <= n - 4 * vl; j += 4 * vl)
     {
-        v_float32 t0 = v_sub(vx_load(a + j), vx_load(b + j));
-        v_float32 t1 = v_sub(vx_load(a + j + vl), vx_load(b + j + vl));
+        v_float32 t0 = v_sub(vx_आरोपय(a + j), vx_आरोपय(b + j));
+        v_float32 t1 = v_sub(vx_आरोपय(a + j + vl), vx_आरोपय(b + j + vl));
         v_d0 = v_muladd(t0, t0, v_d0);
-        v_float32 t2 = v_sub(vx_load(a + j + 2 * vl), vx_load(b + j + 2 * vl));
+        v_float32 t2 = v_sub(vx_आरोपय(a + j + 2 * vl), vx_आरोपय(b + j + 2 * vl));
         v_d1 = v_muladd(t1, t1, v_d1);
-        v_float32 t3 = v_sub(vx_load(a + j + 3 * vl), vx_load(b + j + 3 * vl));
+        v_float32 t3 = v_sub(vx_आरोपय(a + j + 3 * vl), vx_आरोपय(b + j + 3 * vl));
         v_d2 = v_muladd(t2, t2, v_d2);
         v_d3 = v_muladd(t3, t3, v_d3);
     }
-    v_d0 = v_add(v_add(v_d0, v_d1), v_add(v_d2, v_d3));
-    for (; j <= n - vl; j += vl)
+    v_d0 = v_सङ्कलय(v_सङ्कलय(v_d0, v_d1), v_सङ्कलय(v_d2, v_d3));
+    प्रति (; j <= n - vl; j += vl)
     {
-        v_float32 t0 = v_sub(vx_load(a + j), vx_load(b + j));
+        v_float32 t0 = v_sub(vx_आरोपय(a + j), vx_आरोपय(b + j));
         v_d0 = v_muladd(t0, t0, v_d0);
     }
-    d = v_reduce_sum(v_d0);
-#endif
-    for( ; j < n; j++ )
+    d = v_reduce_योग(v_d0);
+#यदि_अन्तः
+    प्रति( ; j < n; j++ )
     {
-        float t = a[j] - b[j];
+        भिन्न t = a[j] - b[j];
         d += t*t;
     }
-    return d;
+    प्रत्यागम d;
 }
 
 
-float normL1_(const float* a, const float* b, int n)
+भिन्न normL1_(ध्रुव भिन्न* a, ध्रुव भिन्न* b, पूर्णाङ्क n)
 {
-    int j = 0; float d = 0.f;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int vl = VTraits<v_float32>::vlanes();
+    पूर्णाङ्क j = 0; भिन्न d = 0.f;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+    ध्रुव पूर्णाङ्क vl = VTraits<v_float32>::vlanes();
     v_float32 v_d0 = vx_setzero_f32(), v_d1 = vx_setzero_f32();
     v_float32 v_d2 = vx_setzero_f32(), v_d3 = vx_setzero_f32();
-    for (; j <= n - 4 * vl; j += 4 * vl)
+    प्रति (; j <= n - 4 * vl; j += 4 * vl)
     {
-        v_d0 = v_add(v_d0, v_absdiff(vx_load(a + j), vx_load(b + j)));
-        v_d1 = v_add(v_d1, v_absdiff(vx_load(a + j + vl), vx_load(b + j + vl)));
-        v_d2 = v_add(v_d2, v_absdiff(vx_load(a + j + 2 * vl), vx_load(b + j + 2 * vl)));
-        v_d3 = v_add(v_d3, v_absdiff(vx_load(a + j + 3 * vl), vx_load(b + j + 3 * vl)));
+        v_d0 = v_सङ्कलय(v_d0, v_absdiff(vx_आरोपय(a + j), vx_आरोपय(b + j)));
+        v_d1 = v_सङ्कलय(v_d1, v_absdiff(vx_आरोपय(a + j + vl), vx_आरोपय(b + j + vl)));
+        v_d2 = v_सङ्कलय(v_d2, v_absdiff(vx_आरोपय(a + j + 2 * vl), vx_आरोपय(b + j + 2 * vl)));
+        v_d3 = v_सङ्कलय(v_d3, v_absdiff(vx_आरोपय(a + j + 3 * vl), vx_आरोपय(b + j + 3 * vl)));
     }
-    v_d0 = v_add(v_add(v_d0, v_d1), v_add(v_d2, v_d3));
-    for (; j <= n - vl; j += vl)
-        v_d0 = v_add(v_d0, v_absdiff(vx_load(a + j), vx_load(b + j)));
-    d = v_reduce_sum(v_d0);
-#endif
-    for( ; j < n; j++ )
-        d += std::abs(a[j] - b[j]);
-    return d;
+    v_d0 = v_सङ्कलय(v_सङ्कलय(v_d0, v_d1), v_सङ्कलय(v_d2, v_d3));
+    प्रति (; j <= n - vl; j += vl)
+        v_d0 = v_सङ्कलय(v_d0, v_absdiff(vx_आरोपय(a + j), vx_आरोपय(b + j)));
+    d = v_reduce_योग(v_d0);
+#यदि_अन्तः
+    प्रति( ; j < n; j++ )
+        d += std::निरपेक्षम्(a[j] - b[j]);
+    प्रत्यागम d;
 }
 
-int normL1_(const uchar* a, const uchar* b, int n)
+पूर्णाङ्क normL1_(ध्रुव uchar* a, ध्रुव uchar* b, पूर्णाङ्क n)
 {
-    int j = 0, d = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int vl = VTraits<v_uint8>::vlanes();
-    for (; j <= n - 4 * vl; j += 4 * vl)
-        d += v_reduce_sad(vx_load(a + j), vx_load(b + j)) +
-             v_reduce_sad(vx_load(a + j + vl), vx_load(b + j + vl)) +
-             v_reduce_sad(vx_load(a + j + 2 * vl), vx_load(b + j + 2 * vl)) +
-             v_reduce_sad(vx_load(a + j + 3 * vl), vx_load(b + j + 3 * vl));
-    for (; j <= n - vl; j += vl)
-        d += v_reduce_sad(vx_load(a + j), vx_load(b + j));
-#endif
-    for( ; j < n; j++ )
-        d += std::abs(a[j] - b[j]);
-    return d;
+    पूर्णाङ्क j = 0, d = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+    ध्रुव पूर्णाङ्क vl = VTraits<v_uint8>::vlanes();
+    प्रति (; j <= n - 4 * vl; j += 4 * vl)
+        d += v_reduce_sad(vx_आरोपय(a + j), vx_आरोपय(b + j)) +
+             v_reduce_sad(vx_आरोपय(a + j + vl), vx_आरोपय(b + j + vl)) +
+             v_reduce_sad(vx_आरोपय(a + j + 2 * vl), vx_आरोपय(b + j + 2 * vl)) +
+             v_reduce_sad(vx_आरोपय(a + j + 3 * vl), vx_आरोपय(b + j + 3 * vl));
+    प्रति (; j <= n - vl; j += vl)
+        d += v_reduce_sad(vx_आरोपय(a + j), vx_आरोपय(b + j));
+#यदि_अन्तः
+    प्रति( ; j < n; j++ )
+        d += std::निरपेक्षम्(a[j] - b[j]);
+    प्रत्यागम d;
 }
 
 } //cv::hal
 
 //==================================================================================================
 
-typedef int (*NormFunc)(const uchar*, const uchar*, uchar*, int, int);
-typedef int (*NormDiffFunc)(const uchar*, const uchar*, const uchar*, uchar*, int, int);
+प्रकारनिर्देश पूर्णाङ्क (*NormFunc)(ध्रुव uchar*, ध्रुव uchar*, uchar*, पूर्णाङ्क, पूर्णाङ्क);
+प्रकारनिर्देश पूर्णाङ्क (*NormDiffFunc)(ध्रुव uchar*, ध्रुव uchar*, ध्रुव uchar*, uchar*, पूर्णाङ्क, पूर्णाङ्क);
 
-#ifdef HAVE_OPENCL
+#यदि_परिभाषितम् HAVE_OPENCL
 
-static bool ocl_norm( InputArray _src, int normType, InputArray _mask, double & result )
+स्थिर तार्किक ocl_norm( निवेशः_Array _src, पूर्णाङ्क normType, निवेशः_Array आवरणम्_2, द्विगुण & परिणाम )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
+    ध्रुव ocl::Device & d = ocl::Device::getDefault();
 
-#ifdef __ANDROID__
-    if (d.isNVidia())
-        return false;
-#endif
-    const int cn = _src.channels();
-    if (cn > 4)
-        return false;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
-    bool doubleSupport = d.doubleFPConfig() > 0,
-            haveMask = _mask.kind() != _InputArray::NONE;
+#यदि_परिभाषितम् __ANDROID__
+    यदि (d.isNVidia())
+        प्रत्यागम असत्य;
+#यदि_अन्तः
+    ध्रुव पूर्णाङ्क cn = _src.channels();
+    यदि (cn > 4)
+        प्रत्यागम असत्य;
+    पूर्णाङ्क type = _src.type(), गभीरता = CV_MAT_गभीरता(type);
+    तार्किक doubleSupport = d.doubleFPConfig() > 0,
+            have_आवरणम् = आवरणम्_2.विधा() != निवेशः_Array_2::NONE;
 
-    if (depth >= CV_16F)
-        return false;  // TODO: support FP16
+    यदि (गभीरता >= CV_16F)
+        प्रत्यागम असत्य;  // TODO: support FP16
 
-    if ( !(normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR) ||
-         (!doubleSupport && depth == CV_64F))
-        return false;
+    यदि ( !(normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR) ||
+         (!doubleSupport && गभीरता == CV_64F))
+        प्रत्यागम असत्य;
 
     UMat src = _src.getUMat();
 
-    if (normType == NORM_INF)
+    यदि (normType == NORM_INF)
     {
-        if (!ocl_minMaxIdx(_src, NULL, &result, NULL, NULL, _mask,
-                           std::max(depth, CV_32S), depth != CV_8U && depth != CV_16U))
-            return false;
+        यदि (!ocl_minMaxIdx(_src, रिक्त, &परिणाम, रिक्त, रिक्त, आवरणम्_2,
+                           std::max(गभीरता, CV_32S), गभीरता != CV_8U && गभीरता != CV_16U))
+            प्रत्यागम असत्य;
     }
-    else if (normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR)
+    अन्यथा यदि (normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR)
     {
         Scalar sc;
-        bool unstype = depth == CV_8U || depth == CV_16U;
+        तार्किक unstype = गभीरता == CV_8U || गभीरता == CV_16U;
 
-        if ( !ocl_sum(haveMask ? src : src.reshape(1), sc, normType == NORM_L2 || normType == NORM_L2SQR ?
-                    OCL_OP_SUM_SQR : (unstype ? OCL_OP_SUM : OCL_OP_SUM_ABS), _mask) )
-            return false;
+        यदि ( !ocl_योग(have_आवरणम् ? src : src.reshape(1), sc, normType == NORM_L2 || normType == NORM_L2SQR ?
+                    OCL_OP_योग_SQR : (unstype ? OCL_OP_योग : OCL_OP_योग_ABS), आवरणम्_2) )
+            प्रत्यागम असत्य;
 
-        double s = 0.0;
-        for (int i = 0; i < (haveMask ? cn : 1); ++i)
+        द्विगुण s = 0.0;
+        प्रति (पूर्णाङ्क i = 0; i < (have_आवरणम् ? cn : 1); ++i)
             s += sc[i];
 
-        result = normType == NORM_L1 || normType == NORM_L2SQR ? s : std::sqrt(s);
+        परिणाम = normType == NORM_L1 || normType == NORM_L2SQR ? s : std::वर्गमूलम्(s);
     }
 
-    return true;
+    प्रत्यागम सत्य;
 }
 
-#endif
+#यदि_अन्तः
 
-static NormFunc getNormFunc(int normType, int depth) {
+स्थिर NormFunc getNormFunc(पूर्णाङ्क normType, पूर्णाङ्क गभीरता) {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getNormFunc, (normType, depth), CV_CPU_DISPATCH_MODES_ALL);
+    CV_CPU_DISPATCH(getNormFunc, (normType, गभीरता), CV_CPU_DISPATCH_MODES_ALL);
 }
-static NormDiffFunc getNormDiffFunc(int normType, int depth) {
+स्थिर NormDiffFunc getNormDiffFunc(पूर्णाङ्क normType, पूर्णाङ्क गभीरता) {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getNormDiffFunc, (normType, depth), CV_CPU_DISPATCH_MODES_ALL);
+    CV_CPU_DISPATCH(getNormDiffFunc, (normType, गभीरता), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-double norm( InputArray _src, int normType, InputArray _mask )
+द्विगुण norm( निवेशः_Array _src, पूर्णाङ्क normType, निवेशः_Array आवरणम्_2 )
 {
     CV_INSTRUMENT_REGION();
 
-    normType &= NORM_TYPE_MASK;
+    normType &= NORM_TYPE_आवरणम्;
     CV_Assert( normType == NORM_INF || normType == NORM_L1 ||
                normType == NORM_L2 || normType == NORM_L2SQR ||
                ((normType == NORM_HAMMING || normType == NORM_HAMMING2) && _src.type() == CV_8U) );
 
-#if defined HAVE_OPENCL
-    double _result = 0;
-#endif
+#यदि defined HAVE_OPENCL
+    द्विगुण परिणाम_2 = 0;
+#यदि_अन्तः
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_norm(_src, normType, _mask, _result),
-                _result)
-#endif
+#यदि_परिभाषितम् HAVE_OPENCL
+    CV_OCL_सततम्_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+                ocl_norm(_src, normType, आवरणम्_2, परिणाम_2),
+                परिणाम_2)
+#यदि_अन्तः
 
-    Mat src = _src.getMat(), mask = _mask.getMat();
-    CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size) );
-    if( src.empty() )
-        return 0.0;
-    int depth = src.depth(), cn = src.channels();
-    if( src.dims <= 2 )
+    Mat src = _src.getMat(), आवरणम् = आवरणम्_2.getMat();
+    CV_Assert( आवरणम्.empty() || ((आवरणम्.type() == CV_8U || आवरणम्.type() == CV_8S || आवरणम्.type() == CV_Bool) && src.size == आवरणम्.size) );
+    यदि( src.empty() )
+        प्रत्यागम 0.0;
+    पूर्णाङ्क गभीरता = src.गभीरता(), cn = src.channels();
+    यदि( src.dims <= 2 )
     {
-        double result;
-        CALL_HAL_RET(norm, cv_hal_norm, result, src.data, src.step, mask.data, mask.step, src.cols, src.rows, src.type(), normType);
+        द्विगुण परिणाम;
+        CALL_HAL_RET(norm, cv_hal_norm, परिणाम, src.दत्त, src.चरणः, आवरणम्.दत्त, आवरणम्.चरणः, src.स्तम्भसङ्ख्या, src.पङ्क्तिकाः, src.type(), normType);
     }
-    else if( src.isContinuous() && mask.isContinuous() )
+    अन्यथा यदि( src.isContinuous() && आवरणम्.isContinuous() )
     {
-        double result;
-        CALL_HAL_RET(norm, cv_hal_norm, result, src.data, 0, mask.data, 0, (int)src.total(), 1, src.type(), normType);
+        द्विगुण परिणाम;
+        CALL_HAL_RET(norm, cv_hal_norm, परिणाम, src.दत्त, 0, आवरणम्.दत्त, 0, (पूर्णाङ्क)src.योग(), 1, src.type(), normType);
     }
 
-    NormFunc func = getNormFunc(normType >> 1, depth);
+    NormFunc func = getNormFunc(normType >> 1, गभीरता);
     CV_Assert( (normType >> 1) >= 3 || func != 0 );
 
-    if( src.isContinuous() && mask.empty() )
+    यदि( src.isContinuous() && आवरणम्.empty() )
     {
-        size_t len = src.total()*cn;
-        if( len == (size_t)(int)len )
+        size_t len = src.योग()*cn;
+        यदि( len == (size_t)(पूर्णाङ्क)len )
         {
-            if( depth == CV_32F )
+            यदि( गभीरता == CV_32F )
             {
-                const uchar* data = src.ptr<const uchar>();
+                ध्रुव uchar* दत्त = src.ptr<ध्रुव uchar>();
 
-                if( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
+                यदि( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
                 {
-                    double result = 0;
-                    func(data, 0, (uchar*)&result, (int)len, 1);
-                    return normType == NORM_L2 ? std::sqrt(result) : result;
+                    द्विगुण परिणाम = 0;
+                    func(दत्त, 0, (uchar*)&परिणाम, (पूर्णाङ्क)len, 1);
+                    प्रत्यागम normType == NORM_L2 ? std::वर्गमूलम्(परिणाम) : परिणाम;
                 }
-                if( normType == NORM_INF )
+                यदि( normType == NORM_INF )
                 {
-                    float result = 0;
-                    func(data, 0, (uchar*)&result, (int)len, 1);
-                    return result;
+                    भिन्न परिणाम = 0;
+                    func(दत्त, 0, (uchar*)&परिणाम, (पूर्णाङ्क)len, 1);
+                    प्रत्यागम परिणाम;
                 }
             }
-            if( depth == CV_8U )
+            यदि( गभीरता == CV_8U )
             {
-                const uchar* data = src.ptr<uchar>();
+                ध्रुव uchar* दत्त = src.ptr<uchar>();
 
-                if( normType == NORM_HAMMING )
+                यदि( normType == NORM_HAMMING )
                 {
-                    return hal::normHamming(data, (int)len, 1);
+                    प्रत्यागम hal::normHamming(दत्त, (पूर्णाङ्क)len, 1);
                 }
 
-                if( normType == NORM_HAMMING2 )
+                यदि( normType == NORM_HAMMING2 )
                 {
-                    return hal::normHamming(data, (int)len, 2);
+                    प्रत्यागम hal::normHamming(दत्त, (पूर्णाङ्क)len, 2);
                 }
             }
         }
     }
 
-    CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool );
+    CV_Assert( आवरणम्.empty() || आवरणम्.type() == CV_8U || आवरणम्.type() == CV_8S || आवरणम्.type() == CV_Bool );
 
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    यदि( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
     {
-        if( !mask.empty() )
+        यदि( !आवरणम्.empty() )
         {
-            Mat temp;
-            bitwise_and(src, mask, temp);
-            return norm(temp, normType);
+            Mat अस्थायी_2;
+            bitwise_and(src, आवरणम्, अस्थायी_2);
+            प्रत्यागम norm(अस्थायी_2, normType);
         }
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        पूर्णाङ्क cell_आकार = normType == NORM_HAMMING ? 1 : 2;
 
-        const Mat* arrays[] = {&src, 0};
+        ध्रुव Mat* arrays[] = {&src, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
-        int total = (int)it.size;
-        int result = 0;
+        पूर्णाङ्क योग = (पूर्णाङ्क)it.size;
+        पूर्णाङ्क परिणाम = 0;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        प्रति( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            result += hal::normHamming(ptrs[0], total, cellSize);
+            परिणाम += hal::normHamming(ptrs[0], योग, cell_आकार);
         }
 
-        return result;
+        प्रत्यागम परिणाम;
     }
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ध्रुव Mat* arrays[] = {&src, &आवरणम्, 0};
     uchar* ptrs[2] = {};
-    union
+    सङ्घ
     {
-        double d;
-        unsigned u;
+        द्विगुण d;
+        अचिह्नित u;
         uint64 UL;
-        float f;
+        भिन्न f;
     }
-    result;
-    result.d = 0;
+    परिणाम;
+    परिणाम.d = 0;
     NAryMatIterator it(arrays, ptrs);
-    CV_CheckLT((size_t)it.size, (size_t)INT_MAX, "");
-    bool is_fp16 = depth == CV_16F || depth == CV_16BF;
+    CV_CheckLT((size_t)it.size, (size_t)अधिकतम_पूर्णाङ्कः, "");
+    तार्किक is_fp16 = गभीरता == CV_16F || गभीरता == CV_16BF;
 
-    if ((normType == NORM_L1 && (depth <= CV_16S || depth == CV_Bool || is_fp16)) ||
-        ((normType == NORM_L2 || normType == NORM_L2SQR) && (depth <= CV_8S || depth == CV_Bool || is_fp16)))
+    यदि ((normType == NORM_L1 && (गभीरता <= CV_16S || गभीरता == CV_Bool || is_fp16)) ||
+        ((normType == NORM_L2 || normType == NORM_L2SQR) && (गभीरता <= CV_8S || गभीरता == CV_Bool || is_fp16)))
     {
         // special case to handle "integer" overflow in accumulator
-        const size_t esz = src.elemSize();
-        const int total = (int)it.size;
-        const int blockSize0 = (is_fp16 ? (1 << 10) :
-            depth == CV_Bool ? (1 << 30) :
-            normType == NORM_L1 && depth <= CV_8S ? (1 << 23) : (1 << 15))/cn;
-        const int blockSize = std::min(total, blockSize0);
-        union {
-            int i;
-            float f;
+        ध्रुव size_t esz = src.elem_आकार();
+        ध्रुव पूर्णाङ्क योग = (पूर्णाङ्क)it.size;
+        ध्रुव पूर्णाङ्क खण्डम्_Size0 = (is_fp16 ? (1 << 10) :
+            गभीरता == CV_Bool ? (1 << 30) :
+            normType == NORM_L1 && गभीरता <= CV_8S ? (1 << 23) : (1 << 15))/cn;
+        ध्रुव पूर्णाङ्क खण्डम्_आकार_2 = std::min(योग, खण्डम्_Size0);
+        सङ्घ {
+            पूर्णाङ्क i;
+            भिन्न f;
         } blocksum;
         blocksum.i = 0;
-        int count = 0;
+        पूर्णाङ्क गणनम्_2 = 0;
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        प्रति (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            for (int j = 0; j < total; j += blockSize)
+            प्रति (पूर्णाङ्क j = 0; j < योग; j += खण्डम्_आकार_2)
             {
-                int bsz = std::min(total - j, blockSize);
+                पूर्णाङ्क bsz = std::min(योग - j, खण्डम्_आकार_2);
                 func(ptrs[0], ptrs[1], (uchar*)&blocksum, bsz, cn);
-                count += bsz;
-                if (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
+                गणनम्_2 += bsz;
+                यदि (गणनम्_2 + खण्डम्_आकार_2 >= खण्डम्_Size0 || (i+1 >= it.nplanes && j+bsz >= योग))
                 {
-                    result.d += is_fp16 ? (double)blocksum.f : (double)blocksum.i;
+                    परिणाम.d += is_fp16 ? (द्विगुण)blocksum.f : (द्विगुण)blocksum.i;
                     blocksum.i = 0;
-                    count = 0;
+                    गणनम्_2 = 0;
                 }
                 ptrs[0] += bsz*esz;
-                if (ptrs[1])
+                यदि (ptrs[1])
                     ptrs[1] += bsz;
             }
         }
     }
-    else
+    अन्यथा
     {
         // generic implementation
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        प्रति (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            func(ptrs[0], ptrs[1], (uchar*)&result, (int)it.size, cn);
+            func(ptrs[0], ptrs[1], (uchar*)&परिणाम, (पूर्णाङ्क)it.size, cn);
         }
     }
 
-    if( normType == NORM_INF )
+    यदि( normType == NORM_INF )
     {
-        if(depth <= CV_32S || depth == CV_32U || depth == CV_Bool)
-            return result.u;
-        if (depth == CV_32F || is_fp16)
-            return result.f;
-        if (depth == CV_64U || depth == CV_64S)
-            return (double)result.UL;
+        यदि(गभीरता <= CV_32S || गभीरता == CV_32U || गभीरता == CV_Bool)
+            प्रत्यागम परिणाम.u;
+        यदि (गभीरता == CV_32F || is_fp16)
+            प्रत्यागम परिणाम.f;
+        यदि (गभीरता == CV_64U || गभीरता == CV_64S)
+            प्रत्यागम (द्विगुण)परिणाम.UL;
     }
-    if( normType == NORM_L2 )
-        return std::sqrt(result.d);
+    यदि( normType == NORM_L2 )
+        प्रत्यागम std::वर्गमूलम्(परिणाम.d);
 
-    return result.d;
+    प्रत्यागम परिणाम.d;
 }
 
 //==================================================================================================
 
-#ifdef HAVE_OPENCL
-static bool ocl_norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask, double & result )
+#यदि_परिभाषितम् HAVE_OPENCL
+स्थिर तार्किक ocl_norm( निवेशः_Array _src1, निवेशः_Array _src2, पूर्णाङ्क normType, निवेशः_Array आवरणम्_2, द्विगुण & परिणाम )
 {
-#ifdef __ANDROID__
-    if (ocl::Device::getDefault().isNVidia())
-        return false;
-#endif
+#यदि_परिभाषितम् __ANDROID__
+    यदि (ocl::Device::getDefault().isNVidia())
+        प्रत्यागम असत्य;
+#यदि_अन्तः
 
     Scalar sc1, sc2;
-    int cn = _src1.channels();
-    if (cn > 4)
-        return false;
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type);
-    bool relative = (normType & NORM_RELATIVE) != 0;
+    पूर्णाङ्क cn = _src1.channels();
+    यदि (cn > 4)
+        प्रत्यागम असत्य;
+    पूर्णाङ्क type = _src1.type(), गभीरता = CV_MAT_गभीरता(type);
+    तार्किक relative = (normType & NORM_RELATIVE) != 0;
     normType &= ~NORM_RELATIVE;
-    bool normsum = normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR;
+    तार्किक normsum = normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR;
 
-#ifdef __APPLE__
-    if(normType == NORM_L1 && type == CV_16UC3 && !_mask.empty())
-        return false;
-#endif
+#यदि_परिभाषितम् __APPLE__
+    यदि(normType == NORM_L1 && type == CV_16UC3 && !आवरणम्_2.empty())
+        प्रत्यागम असत्य;
+#यदि_अन्तः
 
-    if (normsum)
+    यदि (normsum)
     {
-        if (!ocl_sum(_src1, sc1, normType == NORM_L2 || normType == NORM_L2SQR ?
-                     OCL_OP_SUM_SQR : OCL_OP_SUM, _mask, _src2, relative, sc2))
-            return false;
+        यदि (!ocl_योग(_src1, sc1, normType == NORM_L2 || normType == NORM_L2SQR ?
+                     OCL_OP_योग_SQR : OCL_OP_योग, आवरणम्_2, _src2, relative, sc2))
+            प्रत्यागम असत्य;
     }
-    else
+    अन्यथा
     {
-        if (!ocl_minMaxIdx(_src1, NULL, &sc1[0], NULL, NULL, _mask, std::max(CV_32S, depth),
-                           false, _src2, relative ? &sc2[0] : NULL))
-            return false;
+        यदि (!ocl_minMaxIdx(_src1, रिक्त, &sc1[0], रिक्त, रिक्त, आवरणम्_2, std::max(CV_32S, गभीरता),
+                           असत्य, _src2, relative ? &sc2[0] : रिक्त))
+            प्रत्यागम असत्य;
         cn = 1;
     }
 
-    double s2 = 0;
-    for (int i = 0; i < cn; ++i)
+    द्विगुण s2 = 0;
+    प्रति (पूर्णाङ्क i = 0; i < cn; ++i)
     {
-        result += sc1[i];
-        if (relative)
+        परिणाम += sc1[i];
+        यदि (relative)
             s2 += sc2[i];
     }
 
-    if (normType == NORM_L2)
+    यदि (normType == NORM_L2)
     {
-        result = std::sqrt(result);
-        if (relative)
-            s2 = std::sqrt(s2);
+        परिणाम = std::वर्गमूलम्(परिणाम);
+        यदि (relative)
+            s2 = std::वर्गमूलम्(s2);
     }
 
-    if (relative)
-        result /= (s2 + DBL_EPSILON);
+    यदि (relative)
+        परिणाम /= (s2 + DBL_EPSILON);
 
-    return true;
+    प्रत्यागम सत्य;
 }  // ocl_norm()
-#endif  // HAVE_OPENCL
+#यदि_अन्तः  // HAVE_OPENCL
 
-double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask )
+द्विगुण norm( निवेशः_Array _src1, निवेशः_Array _src2, पूर्णाङ्क normType, निवेशः_Array आवरणम्_2 )
 {
     CV_INSTRUMENT_REGION();
 
     CV_CheckTypeEQ(_src1.type(), _src2.type(), "Input type mismatch");
-    CV_Assert(_src1.sameSize(_src2));
+    CV_Assert(_src1.same_आकार(_src2));
 
-#if defined HAVE_OPENCL
-    double _result = 0;
-#endif
+#यदि defined HAVE_OPENCL
+    द्विगुण परिणाम_2 = 0;
+#यदि_अन्तः
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src1.isUMat()),
-                ocl_norm(_src1, _src2, normType, _mask, _result),
-                _result)
-#endif
+#यदि_परिभाषितम् HAVE_OPENCL
+    CV_OCL_सततम्_2(OCL_PERFORMANCE_CHECK(_src1.isUMat()),
+                ocl_norm(_src1, _src2, normType, आवरणम्_2, परिणाम_2),
+                परिणाम_2)
+#यदि_अन्तः
 
-    Mat src1 = _src1.getMat(), src2 = _src2.getMat(), mask = _mask.getMat();
-    CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src1.size == mask.size) );
-    if( src1.empty() || src2.empty() )
-        return 0.0;
-    int depth = src1.depth(), cn = src1.channels();
-    if( src1.dims <= 2 )
+    Mat src1 = _src1.getMat(), src2 = _src2.getMat(), आवरणम् = आवरणम्_2.getMat();
+    CV_Assert( आवरणम्.empty() || ((आवरणम्.type() == CV_8U || आवरणम्.type() == CV_8S || आवरणम्.type() == CV_Bool) && src1.size == आवरणम्.size) );
+    यदि( src1.empty() || src2.empty() )
+        प्रत्यागम 0.0;
+    पूर्णाङ्क गभीरता = src1.गभीरता(), cn = src1.channels();
+    यदि( src1.dims <= 2 )
     {
-        double result;
-        CALL_HAL_RET(normDiff, cv_hal_normDiff, result, src1.data, src1.step, src2.data, src2.step, mask.data, mask.step, src1.cols, src1.rows, src1.type(), normType);
+        द्विगुण परिणाम;
+        CALL_HAL_RET(normDiff, cv_hal_normDiff, परिणाम, src1.दत्त, src1.चरणः, src2.दत्त, src2.चरणः, आवरणम्.दत्त, आवरणम्.चरणः, src1.स्तम्भसङ्ख्या, src1.पङ्क्तिकाः, src1.type(), normType);
     }
-    else if( src1.isContinuous() && src2.isContinuous() && mask.isContinuous() )
+    अन्यथा यदि( src1.isContinuous() && src2.isContinuous() && आवरणम्.isContinuous() )
     {
-        double result;
-        CALL_HAL_RET(normDiff, cv_hal_normDiff, result, src1.data, 0, src2.data, 0, mask.data, 0, (int)src1.total(), 1, src1.type(), normType);
+        द्विगुण परिणाम;
+        CALL_HAL_RET(normDiff, cv_hal_normDiff, परिणाम, src1.दत्त, 0, src2.दत्त, 0, आवरणम्.दत्त, 0, (पूर्णाङ्क)src1.योग(), 1, src1.type(), normType);
     }
 
-    if( normType & NORM_RELATIVE )
+    यदि( normType & NORM_RELATIVE )
     {
-        return norm(_src1, _src2, normType & ~NORM_RELATIVE, _mask)/(norm(_src2, normType, _mask) + DBL_EPSILON);
+        प्रत्यागम norm(_src1, _src2, normType & ~NORM_RELATIVE, आवरणम्_2)/(norm(_src2, normType, आवरणम्_2) + DBL_EPSILON);
     }
 
     normType &= 7;
@@ -580,288 +580,288 @@ double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask 
                normType == NORM_L2 || normType == NORM_L2SQR ||
               ((normType == NORM_HAMMING || normType == NORM_HAMMING2) && src1.type() == CV_8U) );
 
-    NormDiffFunc func = getNormDiffFunc(normType >> 1, depth);
+    NormDiffFunc func = getNormDiffFunc(normType >> 1, गभीरता);
     CV_Assert( (normType >> 1) >= 3 || func != 0 );
 
-    if( src1.isContinuous() && src2.isContinuous() && mask.empty() )
+    यदि( src1.isContinuous() && src2.isContinuous() && आवरणम्.empty() )
     {
-        size_t len = src1.total()*src1.channels();
-        if( len == (size_t)(int)len )
+        size_t len = src1.योग()*src1.channels();
+        यदि( len == (size_t)(पूर्णाङ्क)len )
         {
-            if( src1.depth() == CV_32F )
+            यदि( src1.गभीरता() == CV_32F )
             {
-                const uchar* data1 = src1.ptr<const uchar>();
-                const uchar* data2 = src2.ptr<const uchar>();
+                ध्रुव uchar* data1 = src1.ptr<ध्रुव uchar>();
+                ध्रुव uchar* data2 = src2.ptr<ध्रुव uchar>();
 
-                if( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
+                यदि( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
                 {
-                    double result = 0;
-                    func(data1, data2, 0, (uchar*)&result, (int)len, 1);
-                    return normType == NORM_L2 ? std::sqrt(result) : result;
+                    द्विगुण परिणाम = 0;
+                    func(data1, data2, 0, (uchar*)&परिणाम, (पूर्णाङ्क)len, 1);
+                    प्रत्यागम normType == NORM_L2 ? std::वर्गमूलम्(परिणाम) : परिणाम;
                 }
-                if( normType == NORM_INF )
+                यदि( normType == NORM_INF )
                 {
-                    float result = 0;
-                    func(data1, data2, 0, (uchar*)&result, (int)len, 1);
-                    return result;
+                    भिन्न परिणाम = 0;
+                    func(data1, data2, 0, (uchar*)&परिणाम, (पूर्णाङ्क)len, 1);
+                    प्रत्यागम परिणाम;
                 }
             }
         }
     }
 
-    CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool );
+    CV_Assert( आवरणम्.empty() || आवरणम्.type() == CV_8U || आवरणम्.type() == CV_8S || आवरणम्.type() == CV_Bool );
 
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    यदि( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
     {
-        if( !mask.empty() )
+        यदि( !आवरणम्.empty() )
         {
-            Mat temp;
-            bitwise_xor(src1, src2, temp);
-            bitwise_and(temp, mask, temp);
-            return norm(temp, normType);
+            Mat अस्थायी_2;
+            bitwise_xor(src1, src2, अस्थायी_2);
+            bitwise_and(अस्थायी_2, आवरणम्, अस्थायी_2);
+            प्रत्यागम norm(अस्थायी_2, normType);
         }
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        पूर्णाङ्क cell_आकार = normType == NORM_HAMMING ? 1 : 2;
 
-        const Mat* arrays[] = {&src1, &src2, 0};
+        ध्रुव Mat* arrays[] = {&src1, &src2, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int total = (int)it.size;
-        int result = 0;
+        पूर्णाङ्क योग = (पूर्णाङ्क)it.size;
+        पूर्णाङ्क परिणाम = 0;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        प्रति( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            result += hal::normHamming(ptrs[0], ptrs[1], total, cellSize);
+            परिणाम += hal::normHamming(ptrs[0], ptrs[1], योग, cell_आकार);
         }
 
-        return result;
+        प्रत्यागम परिणाम;
     }
 
-    const Mat* arrays[] = {&src1, &src2, &mask, 0};
+    ध्रुव Mat* arrays[] = {&src1, &src2, &आवरणम्, 0};
     uchar* ptrs[3] = {};
-    union
+    सङ्घ
     {
-        double d;
-        float f;
-        unsigned u;
+        द्विगुण d;
+        भिन्न f;
+        अचिह्नित u;
         uint64 UL;
     }
-    result;
-    result.d = 0;
+    परिणाम;
+    परिणाम.d = 0;
     NAryMatIterator it(arrays, ptrs);
-    CV_CheckLT((size_t)it.size, (size_t)INT_MAX, "");
+    CV_CheckLT((size_t)it.size, (size_t)अधिकतम_पूर्णाङ्कः, "");
 
-    bool is_fp16 = depth == CV_16F || depth == CV_16BF;
+    तार्किक is_fp16 = गभीरता == CV_16F || गभीरता == CV_16BF;
 
-    if ((normType == NORM_L1 && (depth <= CV_16S || depth == CV_Bool || is_fp16)) ||
-        ((normType == NORM_L2 || normType == NORM_L2SQR) && (depth <= CV_8S || depth == CV_Bool || is_fp16)))
+    यदि ((normType == NORM_L1 && (गभीरता <= CV_16S || गभीरता == CV_Bool || is_fp16)) ||
+        ((normType == NORM_L2 || normType == NORM_L2SQR) && (गभीरता <= CV_8S || गभीरता == CV_Bool || is_fp16)))
     {
         // special case to handle "integer" overflow in accumulator
-        const size_t esz = src1.elemSize();
-        const int total = (int)it.size;
-        const int blockSize0 = (is_fp16 ? (1 << 10) :
-            depth == CV_Bool ? (1 << 30) :
-            normType == NORM_L1 && depth <= CV_8S ? (1 << 23) : (1 << 15))/cn;
-        const int blockSize = std::min(total, blockSize0);
-        union {
-            int i;
-            float f;
+        ध्रुव size_t esz = src1.elem_आकार();
+        ध्रुव पूर्णाङ्क योग = (पूर्णाङ्क)it.size;
+        ध्रुव पूर्णाङ्क खण्डम्_Size0 = (is_fp16 ? (1 << 10) :
+            गभीरता == CV_Bool ? (1 << 30) :
+            normType == NORM_L1 && गभीरता <= CV_8S ? (1 << 23) : (1 << 15))/cn;
+        ध्रुव पूर्णाङ्क खण्डम्_आकार_2 = std::min(योग, खण्डम्_Size0);
+        सङ्घ {
+            पूर्णाङ्क i;
+            भिन्न f;
         } blocksum;
         blocksum.i = 0;
-        int count = 0;
+        पूर्णाङ्क गणनम्_2 = 0;
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        प्रति (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            for (int j = 0; j < total; j += blockSize)
+            प्रति (पूर्णाङ्क j = 0; j < योग; j += खण्डम्_आकार_2)
             {
-                int bsz = std::min(total - j, blockSize);
+                पूर्णाङ्क bsz = std::min(योग - j, खण्डम्_आकार_2);
                 func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&blocksum, bsz, cn);
-                count += bsz;
-                if (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
+                गणनम्_2 += bsz;
+                यदि (गणनम्_2 + खण्डम्_आकार_2 >= खण्डम्_Size0 || (i+1 >= it.nplanes && j+bsz >= योग))
                 {
-                    result.d += is_fp16 ? (double)blocksum.f : (double)blocksum.i;
+                    परिणाम.d += is_fp16 ? (द्विगुण)blocksum.f : (द्विगुण)blocksum.i;
                     blocksum.i = 0;
-                    count = 0;
+                    गणनम्_2 = 0;
                 }
                 ptrs[0] += bsz*esz;
                 ptrs[1] += bsz*esz;
-                if (ptrs[2])
+                यदि (ptrs[2])
                     ptrs[2] += bsz;
             }
         }
     }
-    else
+    अन्यथा
     {
         // generic implementation
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        प्रति (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&result, (int)it.size, cn);
+            func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&परिणाम, (पूर्णाङ्क)it.size, cn);
         }
     }
 
-    if( normType == NORM_INF )
+    यदि( normType == NORM_INF )
     {
-        if (depth <= CV_32S || depth == CV_32U || depth == CV_Bool)
-            return result.u;
-        if (depth == CV_32F || is_fp16)
-            return result.f;
-        if (depth == CV_64U || depth == CV_64S)
-            return (double)result.UL;
+        यदि (गभीरता <= CV_32S || गभीरता == CV_32U || गभीरता == CV_Bool)
+            प्रत्यागम परिणाम.u;
+        यदि (गभीरता == CV_32F || is_fp16)
+            प्रत्यागम परिणाम.f;
+        यदि (गभीरता == CV_64U || गभीरता == CV_64S)
+            प्रत्यागम (द्विगुण)परिणाम.UL;
     }
-    if( normType == NORM_L2 )
-        return std::sqrt(result.d);
+    यदि( normType == NORM_L2 )
+        प्रत्यागम std::वर्गमूलम्(परिणाम.d);
 
-    return result.d;
+    प्रत्यागम परिणाम.d;
 }
 
-cv::Hamming::ResultType Hamming::operator()( const unsigned char* a, const unsigned char* b, int size ) const
+cv::Hamming::परिणाम_Type Hamming::संक्रियकः()( ध्रुव अचिह्नित वर्ण* a, ध्रुव अचिह्नित वर्ण* b, पूर्णाङ्क size ) ध्रुव
 {
-    return cv::hal::normHamming(a, b, size);
+    प्रत्यागम cv::hal::normHamming(a, b, size);
 }
 
-double PSNR(InputArray _src1, InputArray _src2, double R)
+द्विगुण PSNR(निवेशः_Array _src1, निवेशः_Array _src2, द्विगुण R)
 {
     CV_INSTRUMENT_REGION();
 
     //Input arrays must have depth CV_8U
     CV_Assert( _src1.type() == _src2.type() );
 
-    double diff = std::sqrt(norm(_src1, _src2, NORM_L2SQR)/(_src1.total()*_src1.channels()));
-    return 20*log10(R/(diff+DBL_EPSILON));
+    द्विगुण diff = std::वर्गमूलम्(norm(_src1, _src2, NORM_L2SQR)/(_src1.योग()*_src1.channels()));
+    प्रत्यागम 20*log10(R/(diff+DBL_EPSILON));
 }
 
 
-#ifdef HAVE_OPENCL
-static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _mask, int dtype,
-                           double scale, double delta )
+#यदि_परिभाषितम् HAVE_OPENCL
+स्थिर तार्किक ocl_normalize( निवेशः_Array _src, निवेशः_Output_Array _dst, निवेशः_Array आवरणम्_2, पूर्णाङ्क dtype,
+                           द्विगुण scale, द्विगुण delta )
 {
     UMat src = _src.getUMat();
 
-    if( _mask.empty() )
-        src.convertTo( _dst, dtype, scale, delta );
-    else if (src.channels() <= 4)
+    यदि( आवरणम्_2.empty() )
+        src.convert_गन्तव्यम्( _dst, dtype, scale, delta );
+    अन्यथा यदि (src.channels() <= 4)
     {
-        const ocl::Device & dev = ocl::Device::getDefault();
+        ध्रुव ocl::Device & dev = ocl::Device::getDefault();
 
-        int stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype),
-                ddepth = CV_MAT_DEPTH(dtype), wdepth = std::max(CV_32F, std::max(sdepth, ddepth)),
-                rowsPerWI = dev.isIntel() ? 4 : 1;
+        पूर्णाङ्क stype = _src.type(), sdepth = CV_MAT_गभीरता(stype), cn = CV_MAT_CN(stype),
+                ddepth = CV_MAT_गभीरता(dtype), wdepth = std::max(CV_32F, std::max(sdepth, ddepth)),
+                पङ्क्तिकाः_प्रत्येकम्_WI = dev.isIntel() ? 4 : 1;
 
-        float fscale = static_cast<float>(scale), fdelta = static_cast<float>(delta);
-        bool haveScale = std::fabs(scale - 1) > DBL_EPSILON,
+        भिन्न fscale = static_cast<भिन्न>(scale), fdelta = static_cast<भिन्न>(delta);
+        तार्किक haveScale = std::fabs(scale - 1) > DBL_EPSILON,
                 haveZeroScale = !(std::fabs(scale) > DBL_EPSILON),
                 haveDelta = std::fabs(delta) > DBL_EPSILON,
                 doubleSupport = dev.doubleFPConfig() > 0;
 
-        if (!haveScale && !haveDelta && stype == dtype)
+        यदि (!haveScale && !haveDelta && stype == dtype)
         {
-            _src.copyTo(_dst, _mask);
-            return true;
+            _src.copy_गन्तव्यम्(_dst, आवरणम्_2);
+            प्रत्यागम सत्य;
         }
-        if (haveZeroScale)
+        यदि (haveZeroScale)
         {
-            _dst.setTo(Scalar(delta), _mask);
-            return true;
+            _dst.समुच्चयः_गन्तव्यम्(Scalar(delta), आवरणम्_2);
+            प्रत्यागम सत्य;
         }
 
-        if ((sdepth == CV_64F || ddepth == CV_64F) && !doubleSupport)
-            return false;
+        यदि ((sdepth == CV_64F || ddepth == CV_64F) && !doubleSupport)
+            प्रत्यागम असत्य;
 
-        char cvt[2][50];
+        वर्ण cvt[2][50];
         String opts = format("-D srcT=%s -D dstT=%s -D convertToWT=%s -D cn=%d -D rowsPerWI=%d"
                              " -D convertToDT=%s -D workT=%s%s%s%s -D srcT1=%s -D dstT1=%s",
-                             ocl::typeToStr(stype), ocl::typeToStr(dtype),
-                             ocl::convertTypeStr(sdepth, wdepth, cn, cvt[0], sizeof(cvt[0])), cn,
-                             rowsPerWI, ocl::convertTypeStr(wdepth, ddepth, cn, cvt[1], sizeof(cvt[1])),
-                             ocl::typeToStr(CV_MAKE_TYPE(wdepth, cn)),
+                             ocl::type_गन्तव्यम्_Str(stype), ocl::type_गन्तव्यम्_Str(dtype),
+                             ocl::convertTypeStr(sdepth, wdepth, cn, cvt[0], परिमाण(cvt[0])), cn,
+                             पङ्क्तिकाः_प्रत्येकम्_WI, ocl::convertTypeStr(wdepth, ddepth, cn, cvt[1], परिमाण(cvt[1])),
+                             ocl::type_गन्तव्यम्_Str(CV_MAKE_TYPE(wdepth, cn)),
                              doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                              haveScale ? " -D HAVE_SCALE" : "",
                              haveDelta ? " -D HAVE_DELTA" : "",
-                             ocl::typeToStr(sdepth), ocl::typeToStr(ddepth));
+                             ocl::type_गन्तव्यम्_Str(sdepth), ocl::type_गन्तव्यम्_Str(ddepth));
 
         ocl::Kernel k("normalizek", ocl::core::normalize_oclsrc, opts);
-        if (k.empty())
-            return false;
+        यदि (k.empty())
+            प्रत्यागम असत्य;
 
-        UMat mask = _mask.getUMat(), dst = _dst.getUMat();
+        UMat आवरणम् = आवरणम्_2.getUMat(), dst = _dst.getUMat();
 
-        ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
-                maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
+        ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_आकार(src),
+                maskarg = ocl::KernelArg::Read_Only_No_आकार(आवरणम्),
                 dstarg = ocl::KernelArg::ReadWrite(dst);
 
-        if (haveScale)
+        यदि (haveScale)
         {
-            if (haveDelta)
-                k.args(srcarg, maskarg, dstarg, fscale, fdelta);
-            else
-                k.args(srcarg, maskarg, dstarg, fscale);
+            यदि (haveDelta)
+                k.तर्काः(srcarg, maskarg, dstarg, fscale, fdelta);
+            अन्यथा
+                k.तर्काः(srcarg, maskarg, dstarg, fscale);
         }
-        else
+        अन्यथा
         {
-            if (haveDelta)
-                k.args(srcarg, maskarg, dstarg, fdelta);
-            else
-                k.args(srcarg, maskarg, dstarg);
+            यदि (haveDelta)
+                k.तर्काः(srcarg, maskarg, dstarg, fdelta);
+            अन्यथा
+                k.तर्काः(srcarg, maskarg, dstarg);
         }
 
-        size_t globalsize[2] = { (size_t)src.cols, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-        return k.run(2, globalsize, NULL, false);
+        size_t globalsize[2] = { (size_t)src.स्तम्भसङ्ख्या, ((size_t)src.पङ्क्तिकाः + पङ्क्तिकाः_प्रत्येकम्_WI - 1) / पङ्क्तिकाः_प्रत्येकम्_WI };
+        प्रत्यागम k.सततम्(2, globalsize, रिक्त, असत्य);
     }
-    else
+    अन्यथा
     {
-        UMat temp;
-        src.convertTo( temp, dtype, scale, delta );
-        temp.copyTo( _dst, _mask );
+        UMat अस्थायी_2;
+        src.convert_गन्तव्यम्( अस्थायी_2, dtype, scale, delta );
+        अस्थायी_2.copy_गन्तव्यम्( _dst, आवरणम्_2 );
     }
 
-    return true;
+    प्रत्यागम सत्य;
 }  // ocl_normalize
-#endif  // HAVE_OPENCL
+#यदि_अन्तः  // HAVE_OPENCL
 
-void normalize(InputArray _src, InputOutputArray _dst, double a, double b,
-               int norm_type, int rtype, InputArray _mask)
+शून्य normalize(निवेशः_Array _src, निवेशः_Output_Array _dst, द्विगुण a, द्विगुण b,
+               पूर्णाङ्क norm_type, पूर्णाङ्क rtype, निवेशः_Array आवरणम्_2)
 {
     CV_INSTRUMENT_REGION();
 
-    double scale = 1, shift = 0;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
+    द्विगुण scale = 1, सरणम् = 0;
+    पूर्णाङ्क type = _src.type(), गभीरता = CV_MAT_गभीरता(type);
 
-    if( rtype < 0 )
-        rtype = _dst.fixedType() ? _dst.depth() : depth;
+    यदि( rtype < 0 )
+        rtype = _dst.fixedType() ? _dst.गभीरता() : गभीरता;
 
-    if( norm_type == NORM_MINMAX )
+    यदि( norm_type == NORM_MINMAX )
     {
-        double smin = 0, smax = 0;
-        double dmin = MIN( a, b ), dmax = MAX( a, b );
-        minMaxIdx( _src, &smin, &smax, 0, 0, _mask );
+        द्विगुण smin = 0, smax = 0;
+        द्विगुण dmin = MIN( a, b ), dmax = MAX( a, b );
+        minMaxIdx( _src, &smin, &smax, 0, 0, आवरणम्_2 );
         scale = (dmax - dmin)*(smax - smin > DBL_EPSILON ? 1./(smax - smin) : 0);
-        if( rtype == CV_32F )
+        यदि( rtype == CV_32F )
         {
-            scale = (float)scale;
-            shift = (float)dmin - (float)(smin*scale);
+            scale = (भिन्न)scale;
+            सरणम् = (भिन्न)dmin - (भिन्न)(smin*scale);
         }
-        else
-            shift = dmin - smin*scale;
+        अन्यथा
+            सरणम् = dmin - smin*scale;
     }
-    else if( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
+    अन्यथा यदि( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
     {
-        scale = norm( _src, norm_type, _mask );
+        scale = norm( _src, norm_type, आवरणम्_2 );
         scale = scale > DBL_EPSILON ? a/scale : 0.;
-        shift = 0;
+        सरणम् = 0;
     }
-    else
+    अन्यथा
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported norm type" );
 
-    CV_OCL_RUN(_dst.isUMat(),
-               ocl_normalize(_src, _dst, _mask, rtype, scale, shift))
+    CV_OCL_सततम्(_dst.isUMat(),
+               ocl_normalize(_src, _dst, आवरणम्_2, rtype, scale, सरणम्))
 
     Mat src = _src.getMat();
-    if( _mask.empty() )
-        src.convertTo( _dst, rtype, scale, shift );
-    else
+    यदि( आवरणम्_2.empty() )
+        src.convert_गन्तव्यम्( _dst, rtype, scale, सरणम् );
+    अन्यथा
     {
-        Mat temp;
-        src.convertTo( temp, rtype, scale, shift );
-        temp.copyTo( _dst, _mask );
+        Mat अस्थायी_2;
+        src.convert_गन्तव्यम्( अस्थायी_2, rtype, scale, सरणम् );
+        अस्थायी_2.copy_गन्तव्यम्( _dst, आवरणम्_2 );
     }
 }
 

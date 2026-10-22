@@ -2,131 +2,131 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#ifndef OPENCV_CORE_BASE64_ENCODING_HPP
-#define OPENCV_CORE_BASE64_ENCODING_HPP
+#यदि_अपरिभाषितम् OPENCV_CORE_BASE64_ENCODING_HPP
+#परिभाषय OPENCV_CORE_BASE64_ENCODING_HPP
 
-namespace cv
+नामाकाश cv
 {
 
-namespace base64
+नामाकाश base64
 {
 /* A decorator for CvFileStorage
 * - no copyable
 * - not safe for now
 * - move constructor may be needed if C++11
 */
-uint8_t const base64_mapping[] =
+uint8_t ध्रुव base64_mapping[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789+/";
 
-uint8_t const base64_padding = '=';
+uint8_t ध्रुव base64_padding = '=';
 
-std::string make_base64_header(const char * dt);
+std::string make_base64_शीर्षकम्(ध्रुव वर्ण * dt);
 
-size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
+size_t base64_encode(uint8_t ध्रुव * src, uint8_t * dst, size_t off, size_t cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+पूर्णाङ्क icv_Calc_Struct_आकार( ध्रुव वर्ण* dt, पूर्णाङ्क initial_आकार );
 
-class Base64ContextEmitter;
-class Impl;
+वर्ग Base64ContextEmitter;
+वर्ग Impl;
 
-class Base64Writer
+वर्ग Base64Writer
 {
-public:
-    Base64Writer(cv::FileStorage::Impl& fs, bool can_indent);
+सार्वजनिक:
+    Base64Writer(cv::FileStorage::Impl& fs, तार्किक can_indent);
     ~Base64Writer();
-    void write(const void* _data, size_t len, const char* dt);
-    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const char* dt);
+    शून्य लिख(ध्रुव शून्य* दत्त_3, size_t len, ध्रुव वर्ण* dt);
+    प्रतिरूपम्<प्रकारनाम गन्तव्यम्_द्विमान_convertor_t> शून्य लिख(गन्तव्यम्_द्विमान_convertor_t & convertor, ध्रुव वर्ण* dt);
 
-private:
-    void check_dt(const char* dt);
+गुप्त:
+    शून्य check_dt(ध्रुव वर्ण* dt);
 
-private:
+गुप्त:
     // disable copy and assignment
-    Base64Writer(const Base64Writer &);
-    Base64Writer & operator=(const Base64Writer &);
+    Base64Writer(ध्रुव Base64Writer &);
+    Base64Writer & संक्रियकः=(ध्रुव Base64Writer &);
 
-private:
+गुप्त:
 
     Base64ContextEmitter * emitter;
-    std::string data_type_string;
+    std::string दत्त_type_string;
 };
 
-size_t base64_encode_buffer_size(size_t cnt, bool is_end_with_zero = true);
+size_t base64_encode_बफर_आकार(size_t cnt, तार्किक is_अन्तः_with_zero = सत्य);
 
-template<typename _uint_t> inline size_t
-to_binary(_uint_t val, uchar * cur)
+प्रतिरूपम्<प्रकारनाम _uint_t> अन्तःस्थ size_t
+गन्तव्यम्_द्विमान(_uint_t val, uchar * cur)
 {
     size_t delta = CHAR_BIT;
-    size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    size_t cnt = परिमाण(_uint_t);
+    यावत् (cnt --> static_cast<size_t>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    प्रत्यागम परिमाण(_uint_t);
 }
 
-template<> inline size_t to_binary(bool val, uchar * cur)
+प्रतिरूपम्<> अन्तःस्थ size_t गन्तव्यम्_द्विमान(तार्किक val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    प्रत्यागम गन्तव्यम्_द्विमान(static_cast<uchar>(val), cur);
 }
 
-template<> inline size_t to_binary(double val, uchar * cur)
+प्रतिरूपम्<> अन्तःस्थ size_t गन्तव्यम्_द्विमान(द्विगुण val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    प्रत्यागम गन्तव्यम्_द्विमान(bit64.u, cur);
 }
 
-template<> inline size_t to_binary(float val, uchar * cur)
+प्रतिरूपम्<> अन्तःस्थ size_t गन्तव्यम्_द्विमान(भिन्न val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    प्रत्यागम गन्तव्यम्_द्विमान(bit32.u, cur);
 }
 
-template<typename _primitive_t> inline size_t
-to_binary(uchar const * val, uchar * cur)
+प्रतिरूपम्<प्रकारनाम _primitive_t> अन्तःस्थ size_t
+गन्तव्यम्_द्विमान(uchar ध्रुव * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    प्रत्यागम गन्तव्यम्_द्विमान<_primitive_t>(*reinterpret_cast<_primitive_t ध्रुव *>(val), cur);
 }
 
 
 
-class RawDataToBinaryConvertor
+वर्ग Raw_दत्त_गन्तव्यम्_द्विमान_Convertor
 {
-public:
+सार्वजनिक:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    Raw_दत्त_गन्तव्यम्_द्विमान_Convertor(ध्रुव शून्य* src, पूर्णाङ्क len, ध्रुव std::string & dt);
 
-    inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
-    inline operator bool() const;
+    अन्तःस्थ Raw_दत्त_गन्तव्यम्_द्विमान_Convertor & संक्रियकः >>(uchar * & dst);
+    अन्तःस्थ संक्रियकः तार्किक() ध्रुव;
 
-private:
-    typedef size_t(*to_binary_t)(const uchar *, uchar *);
-    struct elem_to_binary_t
+गुप्त:
+    प्रकारनिर्देश size_t(*गन्तव्यम्_द्विमान_t)(ध्रुव uchar *, uchar *);
+    संरचना elem_गन्तव्यम्_द्विमान_t
     {
         size_t      offset;
-        size_t      offset_packed;
-        to_binary_t func;
+        size_t      विस्थापनम्_packed;
+        गन्तव्यम्_द्विमान_t func;
     };
 
-private:
-    size_t make_to_binary_funcs(const std::string &dt);
+गुप्त:
+    size_t make_गन्तव्यम्_द्विमान_funcs(ध्रुव std::string &dt);
 
-private:
-    const uchar * beg;
-    const uchar * cur;
-    const uchar * end;
+गुप्त:
+    ध्रुव uchar * beg;
+    ध्रुव uchar * cur;
+    ध्रुव uchar * end;
 
-    size_t step;
-    size_t step_packed;
-    std::vector<elem_to_binary_t> to_binary_funcs;
+    size_t चरणः;
+    size_t चरणः_packed;
+    std::vector<elem_गन्तव्यम्_द्विमान_t> गन्तव्यम्_द्विमान_funcs;
 };
 
 }
 
 }
-#endif
+#यदि_अन्तः

@@ -1,20 +1,20 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#ifndef OPENCV_CORE_SRC_UMATRIX_HPP
-#define OPENCV_CORE_SRC_UMATRIX_HPP
+#यदि_अपरिभाषितम् OPENCV_CORE_SRC_UMATRIX_HPP
+#परिभाषय OPENCV_CORE_SRC_UMATRIX_HPP
 
-namespace cv {
+नामाकाश cv {
 
-struct CV_EXPORTS UMatDataAutoLock
+संरचना CV_EXPORTS UMat_दत्त_Auto_तालकम्
 {
-    explicit UMatDataAutoLock(UMatData* u);
-    UMatDataAutoLock(UMatData* u1, UMatData* u2);
-    ~UMatDataAutoLock();
-    UMatData* u1;
-    UMatData* u2;
+    स्पष्ट UMat_दत्त_Auto_तालकम्(UMat_दत्त* u);
+    UMat_दत्त_Auto_तालकम्(UMat_दत्त* u1, UMat_दत्त* u2);
+    ~UMat_दत्त_Auto_तालकम्();
+    UMat_दत्त* u1;
+    UMat_दत्त* u2;
 };
 
 }
 
-#endif // OPENCV_CORE_SRC_UMATRIX_HPP
+#यदि_अन्तः // OPENCV_CORE_SRC_UMATRIX_HPP

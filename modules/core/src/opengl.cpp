@@ -40,129 +40,129 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-#if defined (__APPLE__) || defined(MACOSX)
-   #define GL_SHARING_EXTENSION "cl_APPLE_gl_sharing"
-#else
-   #define GL_SHARING_EXTENSION "cl_khr_gl_sharing"
-#endif
+#यदि defined (__APPLE__) || defined(MACOSX)
+   #परिभाषय GL_SHARING_EXTENSION "cl_APPLE_gl_sharing"
+#अन्यथा
+   #परिभाषय GL_SHARING_EXTENSION "cl_khr_gl_sharing"
+#यदि_अन्तः
 
-#ifdef HAVE_OPENGL
+#यदि_परिभाषितम् HAVE_OPENGL
 #  include "gl_core_3_1.hpp"
 #  ifdef HAVE_CUDA
-#    if (defined(__arm__) || defined(__aarch64__)) \
+#    यदि (defined(__arm__) || defined(__aarch64__)) \
          && !defined(OPENCV_SKIP_CUDA_OPENGL_ARM_WORKAROUND)
 #      include <GL/gl.h>
-#      ifndef GL_VERSION
-#        define GL_VERSION 0x1F02
+#      ifndef GL_संस्करणम्
+#        define GL_संस्करणम् 0x1F02
 #      endif
 #    endif
 #    include <cuda_gl_interop.h>
 #  endif
-#else // HAVE_OPENGL
+#अन्यथा // HAVE_OPENGL
 #  define NO_OPENGL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenGL support")
-#endif // HAVE_OPENGL
+#यदि_अन्तः // HAVE_OPENGL
 
-using namespace cv;
-using namespace cv::cuda;
+उपयुज्य नामाकाश cv;
+उपयुज्य नामाकाश cv::cuda;
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4702)  // unreachable code
-#endif
+#यदि defined(_MSC_VER)
+#निर्देशः warning(disable : 4702)  // unreachable code
+#यदि_अन्तः
 
-namespace
+नामाकाश
 {
-#ifndef HAVE_OPENGL
-inline static CV_NORETURN void throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
-#elif defined _DEBUG
-inline static bool checkError(const char* file, const int line, const char* func = 0)
+#यदि_अपरिभाषितम् HAVE_OPENGL
+अन्तःस्थ स्थिर CV_NORETURN शून्य throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
+#नोचेद्यदि defined _DEBUG
+अन्तःस्थ स्थिर तार्किक checkError(ध्रुव वर्ण* file, ध्रुव पूर्णाङ्क पङ्क्तिः, ध्रुव वर्ण* func = 0)
 {
     GLenum err = gl::GetError();
-    if (err != gl::NO_ERROR_)
+    यदि (err != gl::NO_ERROR_)
     {
-        const char* msg;
-        switch (err)
+        ध्रुव वर्ण* सन्देशः;
+        विकल्प (err)
         {
-        case gl::INVALID_ENUM:
-            msg = "An unacceptable value is specified for an enumerated argument";
-            break;
-        case gl::INVALID_VALUE:
-            msg = "A numeric argument is out of range";
-            break;
-        case gl::INVALID_OPERATION:
-            msg = "The specified operation is not allowed in the current state";
-            break;
-        case gl::OUT_OF_MEMORY:
-            msg = "There is not enough memory left to execute the command";
-            break;
-        default:
-            msg = "Unknown error";
+        पक्ष gl::INVALID_ENUM:
+            सन्देशः = "An unacceptable value is specified for an enumerated argument";
+            भङ्ग;
+        पक्ष gl::INVALID_मानम्:
+            सन्देशः = "A numeric argument is out of range";
+            भङ्ग;
+        पक्ष gl::INVALID_OPERATION:
+            सन्देशः = "The specified operation is not allowed in the current state";
+            भङ्ग;
+        पक्ष gl::बहिर्गमनम्_सम्बन्धि_स्मृतिः:
+            सन्देशः = "There is not enough memory left to execute the command";
+            भङ्ग;
+        स्वभाव:
+            सन्देशः = "Unknown error";
         };
-        cv::error(Error::OpenGlApiCallError, func, msg, file, line);
+        cv::error(Error::OpenGlApiCallError, func, सन्देशः, file, पङ्क्तिः);
     }
-    return true;
+    प्रत्यागम सत्य;
 }
-#endif // HAVE_OPENGL
+#यदि_अन्तः // HAVE_OPENGL
 } // namespace
 
-#define CV_CheckGlError() CV_DbgAssert( (checkError(__FILE__, __LINE__, CV_Func)) )
+#परिभाषय CV_CheckGlError() CV_DbgAssert( (checkError(__FILE__, __LINE__, CV_Func)) )
 
-#ifdef HAVE_OPENGL
-namespace
+#यदि_परिभाषितम् HAVE_OPENGL
+नामाकाश
 {
-    const GLenum gl_types[] = { gl::UNSIGNED_BYTE, gl::BYTE, gl::UNSIGNED_SHORT, gl::SHORT, gl::INT, gl::FLOAT, gl::DOUBLE };
+    ध्रुव GLenum gl_types[] = { gl::UNSIGNED_BYTE, gl::BYTE, gl::UNSIGNED_SHORT, gl::SHORT, gl::INT, gl::FLOAT, gl::DOUBLE };
 }
-#endif
+#यदि_अन्तः
 
 ////////////////////////////////////////////////////////////////////////
 // setGlDevice
 
-void cv::cuda::setGlDevice(int device)
+शून्य cv::cuda::समुच्चयः_Gl_Device(पूर्णाङ्क device)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(device);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(device);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(device);
+#अन्यथा
+    #यदि_अपरिभाषितम् HAVE_CUDA
+        CV_अप्रयुक्तम्(device);
         throw_no_cuda();
-    #else
+    #अन्यथा
         cudaSafeCall( cudaGLSetGLDevice(device) );
-    #endif
-#endif
+    #यदि_अन्तः
+#यदि_अन्तः
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CudaResource
 
-#if defined(HAVE_OPENGL) && defined(HAVE_CUDA)
+#यदि defined(HAVE_OPENGL) && defined(HAVE_CUDA)
 
-namespace
+नामाकाश
 {
-    class CudaResource
+    वर्ग CudaResource
     {
-    public:
+    सार्वजनिक:
         CudaResource();
         ~CudaResource();
 
-        void registerBuffer(GLuint buffer);
-        void release();
+        शून्य पञ्जिकाकोशः_बफर(GLuint बफर);
+        शून्य release();
 
-        void copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
-        void copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0);
+        शून्य copyFrom(ध्रुव शून्य* src, size_t spitch, size_t विस्तारः, size_t height, cuda_प्रवाहः_t stream = 0);
+        शून्य copy_गन्तव्यम्(शून्य* dst, size_t dpitch, size_t विस्तारः, size_t height, cuda_प्रवाहः_t stream = 0);
 
-        void* map(cudaStream_t stream = 0);
-        void unmap(cudaStream_t stream = 0);
+        शून्य* map(cuda_प्रवाहः_t stream = 0);
+        शून्य unmap(cuda_प्रवाहः_t stream = 0);
 
-    private:
+    गुप्त:
         cudaGraphicsResource_t resource_;
-        GLuint buffer_;
+        GLuint बफर_3;
 
-        class GraphicsMapHolder;
+        वर्ग GraphicsMapHolder;
     };
 
-    CudaResource::CudaResource() : resource_(0), buffer_(0)
+    CudaResource::CudaResource() : resource_(0), बफर_3(0)
     {
     }
 
@@ -171,115 +171,115 @@ namespace
         release();
     }
 
-    void CudaResource::registerBuffer(GLuint buffer)
+    शून्य CudaResource::पञ्जिकाकोशः_बफर(GLuint बफर)
     {
-        CV_DbgAssert( buffer != 0 );
+        CV_DbgAssert( बफर != 0 );
 
-        if (buffer_ == buffer)
-            return;
+        यदि (बफर_3 == बफर)
+            प्रत्यागम;
 
         cudaGraphicsResource_t resource;
-        cudaSafeCall( cudaGraphicsGLRegisterBuffer(&resource, buffer, cudaGraphicsMapFlagsNone) );
+        cudaSafeCall( cuda_Graphics_GLRegister_बफर(&resource, बफर, cudaGraphicsMapFlagsNone) );
 
         release();
 
         resource_ = resource;
-        buffer_ = buffer;
+        बफर_3 = बफर;
     }
 
-    void CudaResource::release()
+    शून्य CudaResource::release()
     {
-        if (resource_)
+        यदि (resource_)
             cudaGraphicsUnregisterResource(resource_);
 
         resource_ = 0;
-        buffer_ = 0;
+        बफर_3 = 0;
     }
 
-    class CudaResource::GraphicsMapHolder
+    वर्ग CudaResource::GraphicsMapHolder
     {
-    public:
-        GraphicsMapHolder(cudaGraphicsResource_t* resource, cudaStream_t stream);
+    सार्वजनिक:
+        GraphicsMapHolder(cudaGraphicsResource_t* resource, cuda_प्रवाहः_t stream);
         ~GraphicsMapHolder();
 
-        void reset();
+        शून्य reset();
 
-    private:
+    गुप्त:
         cudaGraphicsResource_t* resource_;
-        cudaStream_t stream_;
+        cuda_प्रवाहः_t प्रवाहः_3;
     };
 
-    CudaResource::GraphicsMapHolder::GraphicsMapHolder(cudaGraphicsResource_t* resource, cudaStream_t stream) : resource_(resource), stream_(stream)
+    CudaResource::GraphicsMapHolder::GraphicsMapHolder(cudaGraphicsResource_t* resource, cuda_प्रवाहः_t stream) : resource_(resource), प्रवाहः_3(stream)
     {
-        if (resource_)
-            cudaSafeCall( cudaGraphicsMapResources(1, resource_, stream_) );
+        यदि (resource_)
+            cudaSafeCall( cudaGraphicsMapResources(1, resource_, प्रवाहः_3) );
     }
 
     CudaResource::GraphicsMapHolder::~GraphicsMapHolder()
     {
-        if (resource_)
-            cudaGraphicsUnmapResources(1, resource_, stream_);
+        यदि (resource_)
+            cudaGraphicsUnmapResources(1, resource_, प्रवाहः_3);
     }
 
-    void CudaResource::GraphicsMapHolder::reset()
+    शून्य CudaResource::GraphicsMapHolder::reset()
     {
         resource_ = 0;
     }
 
-    void CudaResource::copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
+    शून्य CudaResource::copyFrom(ध्रुव शून्य* src, size_t spitch, size_t विस्तारः, size_t height, cuda_प्रवाहः_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
-        CV_UNUSED(h);
+        CV_अप्रयुक्तम्(h);
 
-        void* dst;
+        शून्य* dst;
         size_t size;
         cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&dst, &size, resource_) );
 
-        CV_DbgAssert( width * height == size );
+        CV_DbgAssert( विस्तारः * height == size );
 
-        if (stream == 0)
-            cudaSafeCall( cudaMemcpy2D(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice) );
-        else
-            cudaSafeCall( cudaMemcpy2DAsync(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice, stream) );
+        यदि (stream == 0)
+            cudaSafeCall( cudaMemcpy2D(dst, विस्तारः, src, spitch, विस्तारः, height, cuda_Memcpy_Device_गन्तव्यम्_Device) );
+        अन्यथा
+            cudaSafeCall( cudaMemcpy2DAsync(dst, विस्तारः, src, spitch, विस्तारः, height, cuda_Memcpy_Device_गन्तव्यम्_Device, stream) );
     }
 
-    void CudaResource::copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream)
+    शून्य CudaResource::copy_गन्तव्यम्(शून्य* dst, size_t dpitch, size_t विस्तारः, size_t height, cuda_प्रवाहः_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
-        CV_UNUSED(h);
+        CV_अप्रयुक्तम्(h);
 
-        void* src;
+        शून्य* src;
         size_t size;
         cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&src, &size, resource_) );
 
-        CV_DbgAssert( width * height == size );
+        CV_DbgAssert( विस्तारः * height == size );
 
-        if (stream == 0)
-            cudaSafeCall( cudaMemcpy2D(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice) );
-        else
-            cudaSafeCall( cudaMemcpy2DAsync(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice, stream) );
+        यदि (stream == 0)
+            cudaSafeCall( cudaMemcpy2D(dst, dpitch, src, विस्तारः, विस्तारः, height, cuda_Memcpy_Device_गन्तव्यम्_Device) );
+        अन्यथा
+            cudaSafeCall( cudaMemcpy2DAsync(dst, dpitch, src, विस्तारः, विस्तारः, height, cuda_Memcpy_Device_गन्तव्यम्_Device, stream) );
     }
 
-    void* CudaResource::map(cudaStream_t stream)
+    शून्य* CudaResource::map(cuda_प्रवाहः_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
 
-        void* ptr;
+        शून्य* ptr;
         size_t size;
         cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&ptr, &size, resource_) );
 
         h.reset();
 
-        return ptr;
+        प्रत्यागम ptr;
     }
 
-    void CudaResource::unmap(cudaStream_t stream)
+    शून्य CudaResource::unmap(cuda_प्रवाहः_t stream)
     {
         CV_Assert( resource_ != 0 );
 
@@ -287,619 +287,619 @@ namespace
     }
 }
 
-#endif
+#यदि_अन्तः
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Buffer
 
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
 
-class cv::ogl::Buffer::Impl
+वर्ग cv::ogl::बफर_2::Impl
 {
 };
 
-#else
+#अन्यथा
 
-class cv::ogl::Buffer::Impl
+वर्ग cv::ogl::बफर_2::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+सार्वजनिक:
+    स्थिर ध्रुव Ptr<Impl>& empty();
 
-    Impl(GLuint bufId, bool autoRelease);
-    Impl(GLsizeiptr size, const GLvoid* data, GLenum target, bool autoRelease);
+    Impl(GLuint bufId, तार्किक autoRelease);
+    Impl(GLsizeiptr size, ध्रुव GLvoid* दत्त, GLenum target, तार्किक autoRelease);
     ~Impl();
 
-    void bind(GLenum target) const;
+    शून्य bind(GLenum target) ध्रुव;
 
-    void copyFrom(GLuint srcBuf, GLsizeiptr size);
+    शून्य copyFrom(GLuint srcBuf, GLsizeiptr size);
 
-    void copyFrom(GLsizeiptr size, const GLvoid* data);
-    void copyTo(GLsizeiptr size, GLvoid* data) const;
+    शून्य copyFrom(GLsizeiptr size, ध्रुव GLvoid* दत्त);
+    शून्य copy_गन्तव्यम्(GLsizeiptr size, GLvoid* दत्त) ध्रुव;
 
-    void resize(GLsizeiptr size, GLenum target);
+    शून्य resize(GLsizeiptr size, GLenum target);
 
-    void* mapHost(GLenum access);
-    void unmapHost();
+    शून्य* mapHost(GLenum access);
+    शून्य unmapHost();
 
-#ifdef HAVE_CUDA
-    void copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
-    void copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0) const;
+#यदि_परिभाषितम् HAVE_CUDA
+    शून्य copyFrom(ध्रुव शून्य* src, size_t spitch, size_t विस्तारः, size_t height, cuda_प्रवाहः_t stream = 0);
+    शून्य copy_गन्तव्यम्(शून्य* dst, size_t dpitch, size_t विस्तारः, size_t height, cuda_प्रवाहः_t stream = 0) ध्रुव;
 
-    void* mapDevice(cudaStream_t stream = 0);
-    void unmapDevice(cudaStream_t stream = 0);
-#endif
+    शून्य* mapDevice(cuda_प्रवाहः_t stream = 0);
+    शून्य unmapDevice(cuda_प्रवाहः_t stream = 0);
+#यदि_अन्तः
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    शून्य समुच्चयः_Auto_Release(तार्किक flag) { autoRelease_ = flag; }
 
-    GLuint bufId() const { return bufId_; }
+    GLuint bufId() ध्रुव { प्रत्यागम bufId_; }
 
-private:
+गुप्त:
     Impl();
 
     GLuint bufId_;
-    bool autoRelease_;
+    तार्किक autoRelease_;
 
-#ifdef HAVE_CUDA
-    mutable CudaResource cudaResource_;
-#endif
+#यदि_परिभाषितम् HAVE_CUDA
+    परिवर्तनीय CudaResource cudaResource_;
+#यदि_अन्तः
 };
 
-const Ptr<cv::ogl::Buffer::Impl>& cv::ogl::Buffer::Impl::empty()
+ध्रुव Ptr<cv::ogl::बफर_2::Impl>& cv::ogl::बफर_2::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    स्थिर Ptr<Impl> p(नूतन Impl);
+    प्रत्यागम p;
 }
 
-cv::ogl::Buffer::Impl::Impl() : bufId_(0), autoRelease_(false)
+cv::ogl::बफर_2::Impl::Impl() : bufId_(0), autoRelease_(असत्य)
 {
 }
 
-cv::ogl::Buffer::Impl::Impl(GLuint abufId, bool autoRelease) : bufId_(abufId), autoRelease_(autoRelease)
+cv::ogl::बफर_2::Impl::Impl(GLuint abufId, तार्किक autoRelease) : bufId_(abufId), autoRelease_(autoRelease)
 {
-    CV_Assert( gl::IsBuffer(abufId) == gl::TRUE_ );
+    CV_Assert( gl::Is_बफर(abufId) == gl::TRUE_ );
 }
 
-cv::ogl::Buffer::Impl::Impl(GLsizeiptr size, const GLvoid* data, GLenum target, bool autoRelease) : bufId_(0), autoRelease_(autoRelease)
+cv::ogl::बफर_2::Impl::Impl(GLsizeiptr size, ध्रुव GLvoid* दत्त, GLenum target, तार्किक autoRelease) : bufId_(0), autoRelease_(autoRelease)
 {
     gl::GenBuffers(1, &bufId_);
     CV_CheckGlError();
 
     CV_Assert( bufId_ != 0 );
 
-    gl::BindBuffer(target, bufId_);
+    gl::Bind_बफर(target, bufId_);
     CV_CheckGlError();
 
-    gl::BufferData(target, size, data, gl::DYNAMIC_DRAW);
+    gl::बफर_दत्त(target, size, दत्त, gl::DYNAMIC_DRAW);
     CV_CheckGlError();
 
-    gl::BindBuffer(target, 0);
+    gl::Bind_बफर(target, 0);
     CV_CheckGlError();
 }
 
-cv::ogl::Buffer::Impl::~Impl()
+cv::ogl::बफर_2::Impl::~Impl()
 {
-    if (autoRelease_ && bufId_)
+    यदि (autoRelease_ && bufId_)
         gl::DeleteBuffers(1, &bufId_);
 }
 
-void cv::ogl::Buffer::Impl::bind(GLenum target) const
+शून्य cv::ogl::बफर_2::Impl::bind(GLenum target) ध्रुव
 {
-    gl::BindBuffer(target, bufId_);
+    gl::Bind_बफर(target, bufId_);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::copyFrom(GLuint srcBuf, GLsizeiptr size)
+शून्य cv::ogl::बफर_2::Impl::copyFrom(GLuint srcBuf, GLsizeiptr size)
 {
-    gl::BindBuffer(gl::COPY_WRITE_BUFFER, bufId_);
+    gl::Bind_बफर(gl::COPY_WRITE_बफर, bufId_);
     CV_CheckGlError();
 
-    gl::BindBuffer(gl::COPY_READ_BUFFER, srcBuf);
+    gl::Bind_बफर(gl::COPY_READ_बफर, srcBuf);
     CV_CheckGlError();
 
-    gl::CopyBufferSubData(gl::COPY_READ_BUFFER, gl::COPY_WRITE_BUFFER, 0, 0, size);
+    gl::Copy_बफर_Sub_दत्त(gl::COPY_READ_बफर, gl::COPY_WRITE_बफर, 0, 0, size);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::copyFrom(GLsizeiptr size, const GLvoid* data)
+शून्य cv::ogl::बफर_2::Impl::copyFrom(GLsizeiptr size, ध्रुव GLvoid* दत्त)
 {
-    gl::BindBuffer(gl::COPY_WRITE_BUFFER, bufId_);
+    gl::Bind_बफर(gl::COPY_WRITE_बफर, bufId_);
     CV_CheckGlError();
 
-    gl::BufferSubData(gl::COPY_WRITE_BUFFER, 0, size, data);
+    gl::बफर_Sub_दत्त(gl::COPY_WRITE_बफर, 0, size, दत्त);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::resize(GLsizeiptr size, GLenum target)
+शून्य cv::ogl::बफर_2::Impl::resize(GLsizeiptr size, GLenum target)
 {
-    gl::BindBuffer(target, bufId_);
+    gl::Bind_बफर(target, bufId_);
     CV_CheckGlError();
 
     // keep the same buffer id so bound vertex arrays stay valid
-    gl::BufferData(target, size, 0, gl::DYNAMIC_DRAW);
+    gl::बफर_दत्त(target, size, 0, gl::DYNAMIC_DRAW);
     CV_CheckGlError();
 
-    gl::BindBuffer(target, 0);
-    CV_CheckGlError();
-}
-
-void cv::ogl::Buffer::Impl::copyTo(GLsizeiptr size, GLvoid* data) const
-{
-    gl::BindBuffer(gl::COPY_READ_BUFFER, bufId_);
-    CV_CheckGlError();
-
-    gl::GetBufferSubData(gl::COPY_READ_BUFFER, 0, size, data);
+    gl::Bind_बफर(target, 0);
     CV_CheckGlError();
 }
 
-void* cv::ogl::Buffer::Impl::mapHost(GLenum access)
+शून्य cv::ogl::बफर_2::Impl::copy_गन्तव्यम्(GLsizeiptr size, GLvoid* दत्त) ध्रुव
 {
-    gl::BindBuffer(gl::COPY_READ_BUFFER, bufId_);
+    gl::Bind_बफर(gl::COPY_READ_बफर, bufId_);
     CV_CheckGlError();
 
-    GLvoid* data = gl::MapBuffer(gl::COPY_READ_BUFFER, access);
+    gl::Get_बफर_Sub_दत्त(gl::COPY_READ_बफर, 0, size, दत्त);
+    CV_CheckGlError();
+}
+
+शून्य* cv::ogl::बफर_2::Impl::mapHost(GLenum access)
+{
+    gl::Bind_बफर(gl::COPY_READ_बफर, bufId_);
     CV_CheckGlError();
 
-    return data;
+    GLvoid* दत्त = gl::Map_बफर(gl::COPY_READ_बफर, access);
+    CV_CheckGlError();
+
+    प्रत्यागम दत्त;
 }
 
-void cv::ogl::Buffer::Impl::unmapHost()
+शून्य cv::ogl::बफर_2::Impl::unmapHost()
 {
-    gl::UnmapBuffer(gl::COPY_READ_BUFFER);
+    gl::Unmap_बफर(gl::COPY_READ_बफर);
 }
 
-#ifdef HAVE_CUDA
+#यदि_परिभाषितम् HAVE_CUDA
 
-void cv::ogl::Buffer::Impl::copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
+शून्य cv::ogl::बफर_2::Impl::copyFrom(ध्रुव शून्य* src, size_t spitch, size_t विस्तारः, size_t height, cuda_प्रवाहः_t stream)
 {
-    cudaResource_.registerBuffer(bufId_);
-    cudaResource_.copyFrom(src, spitch, width, height, stream);
+    cudaResource_.पञ्जिकाकोशः_बफर(bufId_);
+    cudaResource_.copyFrom(src, spitch, विस्तारः, height, stream);
 }
 
-void cv::ogl::Buffer::Impl::copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream) const
+शून्य cv::ogl::बफर_2::Impl::copy_गन्तव्यम्(शून्य* dst, size_t dpitch, size_t विस्तारः, size_t height, cuda_प्रवाहः_t stream) ध्रुव
 {
-    cudaResource_.registerBuffer(bufId_);
-    cudaResource_.copyTo(dst, dpitch, width, height, stream);
+    cudaResource_.पञ्जिकाकोशः_बफर(bufId_);
+    cudaResource_.copy_गन्तव्यम्(dst, dpitch, विस्तारः, height, stream);
 }
 
-void* cv::ogl::Buffer::Impl::mapDevice(cudaStream_t stream)
+शून्य* cv::ogl::बफर_2::Impl::mapDevice(cuda_प्रवाहः_t stream)
 {
-    cudaResource_.registerBuffer(bufId_);
-    return cudaResource_.map(stream);
+    cudaResource_.पञ्जिकाकोशः_बफर(bufId_);
+    प्रत्यागम cudaResource_.map(stream);
 }
 
-void cv::ogl::Buffer::Impl::unmapDevice(cudaStream_t stream)
+शून्य cv::ogl::बफर_2::Impl::unmapDevice(cuda_प्रवाहः_t stream)
 {
     cudaResource_.unmap(stream);
 }
 
-#endif // HAVE_CUDA
+#यदि_अन्तः // HAVE_CUDA
 
-#endif // HAVE_OPENGL
+#यदि_अन्तः // HAVE_OPENGL
 
-cv::ogl::Buffer::Buffer() : rows_(0), cols_(0), type_(0)
+cv::ogl::बफर_2::बफर_2() : पङ्क्तिकाः_2(0), स्तम्भसङ्ख्या_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     impl_ = Impl::empty();
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::Buffer::Buffer(int arows, int acols, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::बफर_2::बफर_2(पूर्णाङ्क arows, पूर्णाङ्क acols, पूर्णाङ्क atype, अचिह्नित पूर्णाङ्क abufId, तार्किक autoRelease) : पङ्क्तिकाः_2(0), स्तम्भसङ्ख्या_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(atype);
-    CV_UNUSED(abufId);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arows);
+    CV_अप्रयुक्तम्(acols);
+    CV_अप्रयुक्तम्(atype);
+    CV_अप्रयुक्तम्(abufId);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(abufId, autoRelease));
-    rows_ = arows;
-    cols_ = acols;
+#अन्यथा
+    impl_.reset(नूतन Impl(abufId, autoRelease));
+    पङ्क्तिकाः_2 = arows;
+    स्तम्भसङ्ख्या_2 = acols;
     type_ = atype;
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::Buffer::Buffer(Size asize, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::बफर_2::बफर_2(आकार asize, पूर्णाङ्क atype, अचिह्नित पूर्णाङ्क abufId, तार्किक autoRelease) : पङ्क्तिकाः_2(0), स्तम्भसङ्ख्या_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(asize);
-    CV_UNUSED(atype);
-    CV_UNUSED(abufId);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(asize);
+    CV_अप्रयुक्तम्(atype);
+    CV_अप्रयुक्तम्(abufId);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(abufId, autoRelease));
-    rows_ = asize.height;
-    cols_ = asize.width;
+#अन्यथा
+    impl_.reset(नूतन Impl(abufId, autoRelease));
+    पङ्क्तिकाः_2 = asize.height;
+    स्तम्भसङ्ख्या_2 = asize.विस्तारः;
     type_ = atype;
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::Buffer::Buffer(InputArray arr, Target target, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::बफर_2::बफर_2(निवेशः_Array arr, Target target, तार्किक autoRelease) : पङ्क्तिकाः_2(0), स्तम्भसङ्ख्या_2(0), type_(0)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
+    CV_अप्रयुक्तम्(target);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#अन्यथा
+    ध्रुव पूर्णाङ्क विधा = arr.विधा();
 
-    switch (kind)
+    विकल्प (विधा)
     {
-    case _InputArray::OPENGL_BUFFER:
-    case _InputArray::CUDA_GPU_MAT:
+    पक्ष निवेशः_Array_2::OPENGL_बफर:
+    पक्ष निवेशः_Array_2::CUDA_GPU_MAT:
         copyFrom(arr, target, autoRelease);
-        break;
+        भङ्ग;
 
-    default:
+    स्वभाव:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            const GLsizeiptr asize = mat.rows * mat.cols * mat.elemSize();
-            impl_.reset(new Impl(asize, mat.data, target, autoRelease));
-            rows_ = mat.rows;
-            cols_ = mat.cols;
+            ध्रुव GLsizeiptr asize = mat.पङ्क्तिकाः * mat.स्तम्भसङ्ख्या * mat.elem_आकार();
+            impl_.reset(नूतन Impl(asize, mat.दत्त, target, autoRelease));
+            पङ्क्तिकाः_2 = mat.पङ्क्तिकाः;
+            स्तम्भसङ्ख्या_2 = mat.स्तम्भसङ्ख्या;
             type_ = mat.type();
-            break;
+            भङ्ग;
         }
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::create(int arows, int acols, int atype, Target target, bool autoRelease)
+शून्य cv::ogl::बफर_2::create(पूर्णाङ्क arows, पूर्णाङ्क acols, पूर्णाङ्क atype, Target target, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(atype);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arows);
+    CV_अप्रयुक्तम्(acols);
+    CV_अप्रयुक्तम्(atype);
+    CV_अप्रयुक्तम्(target);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || type_ != atype)
+#अन्यथा
+    यदि (पङ्क्तिकाः_2 != arows || स्तम्भसङ्ख्या_2 != acols || type_ != atype)
     {
-        const GLsizeiptr asize = (GLsizeiptr)arows * acols * CV_ELEM_SIZE(atype);
+        ध्रुव GLsizeiptr asize = (GLsizeiptr)arows * acols * CV_ELEM_आकार(atype);
         // resize in place when sole owner (keeps the GL id); else allocate fresh (copy-on-write)
-        if (impl_->bufId() != 0 && impl_.use_count() == 1)
+        यदि (impl_->bufId() != 0 && impl_.use_count() == 1)
         {
             impl_->resize(asize, target);
-            impl_->setAutoRelease(autoRelease);
+            impl_->समुच्चयः_Auto_Release(autoRelease);
         }
-        else
-            impl_.reset(new Impl(asize, 0, target, autoRelease));
-        rows_ = arows;
-        cols_ = acols;
+        अन्यथा
+            impl_.reset(नूतन Impl(asize, 0, target, autoRelease));
+        पङ्क्तिकाः_2 = arows;
+        स्तम्भसङ्ख्या_2 = acols;
         type_ = atype;
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::release()
+शून्य cv::ogl::बफर_2::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#यदि_परिभाषितम् HAVE_OPENGL
+    यदि (impl_)
+        impl_->समुच्चयः_Auto_Release(सत्य);
     impl_ = Impl::empty();
-    rows_ = 0;
-    cols_ = 0;
+    पङ्क्तिकाः_2 = 0;
+    स्तम्भसङ्ख्या_2 = 0;
     type_ = 0;
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::setAutoRelease(bool flag)
+शून्य cv::ogl::बफर_2::समुच्चयः_Auto_Release(तार्किक flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#अन्यथा
+    impl_->समुच्चयः_Auto_Release(flag);
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
+शून्य cv::ogl::बफर_2::copyFrom(निवेशः_Array arr, Target target, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
+    CV_अप्रयुक्तम्(target);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#अन्यथा
+    ध्रुव पूर्णाङ्क विधा = arr.विधा();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    ध्रुव आकार asize = arr.size();
+    ध्रुव पूर्णाङ्क atype = arr.type();
     create(asize, atype, target, autoRelease);
 
-    switch (kind)
+    विकल्प (विधा)
     {
-    case _InputArray::OPENGL_BUFFER:
+    पक्ष निवेशः_Array_2::OPENGL_बफर:
         {
-            ogl::Buffer buf = arr.getOGlBuffer();
-            impl_->copyFrom(buf.bufId(), asize.area() * CV_ELEM_SIZE(atype));
-            break;
+            ogl::बफर_2 buf = arr.get_OGl_बफर();
+            impl_->copyFrom(buf.bufId(), asize.area() * CV_ELEM_आकार(atype));
+            भङ्ग;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    पक्ष निवेशः_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #यदि_अपरिभाषितम् HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #अन्यथा
                 GpuMat dmat = arr.getGpuMat();
-                impl_->copyFrom(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
-            #endif
+                impl_->copyFrom(dmat.दत्त, dmat.चरणः, dmat.स्तम्भसङ्ख्या * dmat.elem_आकार(), dmat.पङ्क्तिकाः);
+            #यदि_अन्तः
 
-            break;
+            भङ्ग;
         }
 
-    default:
+    स्वभाव:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            impl_->copyFrom(asize.area() * CV_ELEM_SIZE(atype), mat.data);
+            impl_->copyFrom(asize.area() * CV_ELEM_आकार(atype), mat.दत्त);
         }
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, cuda::Stream& stream, Target target, bool autoRelease)
+शून्य cv::ogl::बफर_2::copyFrom(निवेशः_Array arr, cuda::प्रवाहः& stream, Target target, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(stream);
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
+    CV_अप्रयुक्तम्(stream);
+    CV_अप्रयुक्तम्(target);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(arr);
-        CV_UNUSED(stream);
-        CV_UNUSED(target);
-        CV_UNUSED(autoRelease);
+#अन्यथा
+    #यदि_अपरिभाषितम् HAVE_CUDA
+        CV_अप्रयुक्तम्(arr);
+        CV_अप्रयुक्तम्(stream);
+        CV_अप्रयुक्तम्(target);
+        CV_अप्रयुक्तम्(autoRelease);
         throw_no_cuda();
-    #else
+    #अन्यथा
         GpuMat dmat = arr.getGpuMat();
 
         create(dmat.size(), dmat.type(), target, autoRelease);
 
-        impl_->copyFrom(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows, cuda::StreamAccessor::getStream(stream));
-    #endif
-#endif
+        impl_->copyFrom(dmat.दत्त, dmat.चरणः, dmat.स्तम्भसङ्ख्या * dmat.elem_आकार(), dmat.पङ्क्तिकाः, cuda::प्रवाहः_Accessor::get_प्रवाहः(stream));
+    #यदि_अन्तः
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::copyTo(OutputArray arr) const
+शून्य cv::ogl::बफर_2::copy_गन्तव्यम्(OutputArray arr) ध्रुव
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#अन्यथा
+    ध्रुव पूर्णाङ्क विधा = arr.विधा();
 
-    switch (kind)
+    विकल्प (विधा)
     {
-    case _InputArray::OPENGL_BUFFER:
+    पक्ष निवेशः_Array_2::OPENGL_बफर:
         {
-            arr.getOGlBufferRef().copyFrom(*this);
-            break;
+            arr.get_OGl_बफर_Ref().copyFrom(*एतत्);
+            भङ्ग;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    पक्ष निवेशः_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #यदि_अपरिभाषितम् HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #अन्यथा
                 GpuMat& dmat = arr.getGpuMatRef();
-                dmat.create(rows_, cols_, type_);
-                impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
-            #endif
+                dmat.create(पङ्क्तिकाः_2, स्तम्भसङ्ख्या_2, type_);
+                impl_->copy_गन्तव्यम्(dmat.दत्त, dmat.चरणः, dmat.स्तम्भसङ्ख्या * dmat.elem_आकार(), dmat.पङ्क्तिकाः);
+            #यदि_अन्तः
 
-            break;
+            भङ्ग;
         }
 
-    default:
+    स्वभाव:
         {
-            arr.create(rows_, cols_, type_);
+            arr.create(पङ्क्तिकाः_2, स्तम्भसङ्ख्या_2, type_);
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            impl_->copyTo(mat.rows * mat.cols * mat.elemSize(), mat.data);
+            impl_->copy_गन्तव्यम्(mat.पङ्क्तिकाः * mat.स्तम्भसङ्ख्या * mat.elem_आकार(), mat.दत्त);
         }
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::copyTo(OutputArray arr, cuda::Stream& stream) const
+शून्य cv::ogl::बफर_2::copy_गन्तव्यम्(OutputArray arr, cuda::प्रवाहः& stream) ध्रुव
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(stream);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
+    CV_अप्रयुक्तम्(stream);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(arr);
-        CV_UNUSED(stream);
+#अन्यथा
+    #यदि_अपरिभाषितम् HAVE_CUDA
+        CV_अप्रयुक्तम्(arr);
+        CV_अप्रयुक्तम्(stream);
         throw_no_cuda();
-    #else
-        arr.create(rows_, cols_, type_);
+    #अन्यथा
+        arr.create(पङ्क्तिकाः_2, स्तम्भसङ्ख्या_2, type_);
         GpuMat dmat = arr.getGpuMat();
-        impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows, cuda::StreamAccessor::getStream(stream));
-    #endif
-#endif
+        impl_->copy_गन्तव्यम्(dmat.दत्त, dmat.चरणः, dmat.स्तम्भसङ्ख्या * dmat.elem_आकार(), dmat.पङ्क्तिकाः, cuda::प्रवाहः_Accessor::get_प्रवाहः(stream));
+    #यदि_अन्तः
+#यदि_अन्तः
 }
 
-cv::ogl::Buffer cv::ogl::Buffer::clone(Target target, bool autoRelease) const
+cv::ogl::बफर_2 cv::ogl::बफर_2::clone(Target target, तार्किक autoRelease) ध्रुव
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(target);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(target);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    ogl::Buffer buf;
-    buf.copyFrom(*this, target, autoRelease);
-    return buf;
-#endif
+#अन्यथा
+    ogl::बफर_2 buf;
+    buf.copyFrom(*एतत्, target, autoRelease);
+    प्रत्यागम buf;
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::bind(Target target) const
+शून्य cv::ogl::बफर_2::bind(Target target) ध्रुव
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(target);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(target);
     throw_no_ogl();
-#else
+#अन्यथा
     impl_->bind(target);
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::unbind(Target target)
+शून्य cv::ogl::बफर_2::unbind(Target target)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(target);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(target);
     throw_no_ogl();
-#else
-    gl::BindBuffer(target, 0);
+#अन्यथा
+    gl::Bind_बफर(target, 0);
     CV_CheckGlError();
-#endif
+#यदि_अन्तः
 }
 
-Mat cv::ogl::Buffer::mapHost(Access access)
+Mat cv::ogl::बफर_2::mapHost(Access access)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(access);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(access);
     throw_no_ogl();
-#else
-    return Mat(rows_, cols_, type_, impl_->mapHost(access));
-#endif
+#अन्यथा
+    प्रत्यागम Mat(पङ्क्तिकाः_2, स्तम्भसङ्ख्या_2, type_, impl_->mapHost(access));
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::unmapHost()
+शून्य cv::ogl::बफर_2::unmapHost()
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->unmapHost();
-#endif
+#अन्यथा
+    प्रत्यागम impl_->unmapHost();
+#यदि_अन्तः
 }
 
-GpuMat cv::ogl::Buffer::mapDevice()
+GpuMat cv::ogl::बफर_2::mapDevice()
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
+#अन्यथा
+    #यदि_अपरिभाषितम् HAVE_CUDA
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice());
-    #endif
-#endif
+    #अन्यथा
+        प्रत्यागम GpuMat(पङ्क्तिकाः_2, स्तम्भसङ्ख्या_2, type_, impl_->mapDevice());
+    #यदि_अन्तः
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::unmapDevice()
+शून्य cv::ogl::बफर_2::unmapDevice()
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
+#अन्यथा
+    #यदि_अपरिभाषितम् HAVE_CUDA
         throw_no_cuda();
-    #else
+    #अन्यथा
         impl_->unmapDevice();
-    #endif
-#endif
+    #यदि_अन्तः
+#यदि_अन्तः
 }
 
-cuda::GpuMat cv::ogl::Buffer::mapDevice(cuda::Stream& stream)
+cuda::GpuMat cv::ogl::बफर_2::mapDevice(cuda::प्रवाहः& stream)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(stream);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(stream);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(stream);
+#अन्यथा
+    #यदि_अपरिभाषितम् HAVE_CUDA
+        CV_अप्रयुक्तम्(stream);
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice(cuda::StreamAccessor::getStream(stream)));
-    #endif
-#endif
+    #अन्यथा
+        प्रत्यागम GpuMat(पङ्क्तिकाः_2, स्तम्भसङ्ख्या_2, type_, impl_->mapDevice(cuda::प्रवाहः_Accessor::get_प्रवाहः(stream)));
+    #यदि_अन्तः
+#यदि_अन्तः
 }
 
-void cv::ogl::Buffer::unmapDevice(cuda::Stream& stream)
+शून्य cv::ogl::बफर_2::unmapDevice(cuda::प्रवाहः& stream)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(stream);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(stream);
     throw_no_ogl();
-#else
-    #ifndef HAVE_CUDA
-        CV_UNUSED(stream);
+#अन्यथा
+    #यदि_अपरिभाषितम् HAVE_CUDA
+        CV_अप्रयुक्तम्(stream);
         throw_no_cuda();
-    #else
-        impl_->unmapDevice(cuda::StreamAccessor::getStream(stream));
-    #endif
-#endif
+    #अन्यथा
+        impl_->unmapDevice(cuda::प्रवाहः_Accessor::get_प्रवाहः(stream));
+    #यदि_अन्तः
+#यदि_अन्तः
 }
 
-unsigned int cv::ogl::Buffer::bufId() const
+अचिह्नित पूर्णाङ्क cv::ogl::बफर_2::bufId() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->bufId();
-#endif
+#अन्यथा
+    प्रत्यागम impl_->bufId();
+#यदि_अन्तः
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // ogl::Texture
 
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
 
-class cv::ogl::Texture2D::Impl
+वर्ग cv::ogl::Texture2D::Impl
 {
 };
 
-#else
+#अन्यथा
 
-class cv::ogl::Texture2D::Impl
+वर्ग cv::ogl::Texture2D::Impl
 {
-public:
-    static const Ptr<Impl> empty();
+सार्वजनिक:
+    स्थिर ध्रुव Ptr<Impl> empty();
 
-    Impl(GLuint texId, bool autoRelease);
-    Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels, bool autoRelease);
+    Impl(GLuint texId, तार्किक autoRelease);
+    Impl(GLint आन्तरिकम्_Format, GLsizei विस्तारः, GLsizei height, GLenum format, GLenum type, ध्रुव GLvoid* pixels, तार्किक autoRelease);
     ~Impl();
 
-    void copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
-    void copyTo(GLenum format, GLenum type, GLvoid* pixels) const;
+    शून्य copyFrom(GLsizei विस्तारः, GLsizei height, GLenum format, GLenum type, ध्रुव GLvoid *pixels);
+    शून्य copy_गन्तव्यम्(GLenum format, GLenum type, GLvoid* pixels) ध्रुव;
 
-    void bind() const;
+    शून्य bind() ध्रुव;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    शून्य समुच्चयः_Auto_Release(तार्किक flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() ध्रुव { प्रत्यागम texId_; }
 
-private:
+गुप्त:
     Impl();
 
     GLuint texId_;
-    bool autoRelease_;
+    तार्किक autoRelease_;
 };
 
-const Ptr<cv::ogl::Texture2D::Impl> cv::ogl::Texture2D::Impl::empty()
+ध्रुव Ptr<cv::ogl::Texture2D::Impl> cv::ogl::Texture2D::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    स्थिर Ptr<Impl> p(नूतन Impl);
+    प्रत्यागम p;
 }
 
-cv::ogl::Texture2D::Impl::Impl() : texId_(0), autoRelease_(false)
+cv::ogl::Texture2D::Impl::Impl() : texId_(0), autoRelease_(असत्य)
 {
 }
 
-cv::ogl::Texture2D::Impl::Impl(GLuint atexId, bool autoRelease) : texId_(atexId), autoRelease_(autoRelease)
+cv::ogl::Texture2D::Impl::Impl(GLuint atexId, तार्किक autoRelease) : texId_(atexId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsTexture(atexId) == gl::TRUE_ );
 }
 
-cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels, bool autoRelease) : texId_(0), autoRelease_(autoRelease)
+cv::ogl::Texture2D::Impl::Impl(GLint आन्तरिकम्_Format, GLsizei विस्तारः, GLsizei height, GLenum format, GLenum type, ध्रुव GLvoid* pixels, तार्किक autoRelease) : texId_(0), autoRelease_(autoRelease)
 {
     gl::GenTextures(1, &texId_);
     CV_CheckGlError();
@@ -912,7 +912,7 @@ cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei heig
     gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
     CV_CheckGlError();
 
-    gl::TexImage2D(gl::TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, pixels);
+    gl::TexImage2D(gl::TEXTURE_2D, 0, आन्तरिकम्_Format, विस्तारः, height, 0, format, type, pixels);
     CV_CheckGlError();
 
     gl::GenerateMipmap(gl::TEXTURE_2D);
@@ -921,11 +921,11 @@ cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei heig
 
 cv::ogl::Texture2D::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    यदि (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
-void cv::ogl::Texture2D::Impl::copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+शून्य cv::ogl::Texture2D::Impl::copyFrom(GLsizei विस्तारः, GLsizei height, GLenum format, GLenum type, ध्रुव GLvoid *pixels)
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
@@ -933,14 +933,14 @@ void cv::ogl::Texture2D::Impl::copyFrom(GLsizei width, GLsizei height, GLenum fo
     gl::PixelStorei(gl::UNPACK_ALIGNMENT, 1);
     CV_CheckGlError();
 
-    gl::TexSubImage2D(gl::TEXTURE_2D, 0, 0, 0, width, height, format, type, pixels);
+    gl::TexSubImage2D(gl::TEXTURE_2D, 0, 0, 0, विस्तारः, height, format, type, pixels);
     CV_CheckGlError();
 
     gl::GenerateMipmap(gl::TEXTURE_2D);
     CV_CheckGlError();
 }
 
-void cv::ogl::Texture2D::Impl::copyTo(GLenum format, GLenum type, GLvoid* pixels) const
+शून्य cv::ogl::Texture2D::Impl::copy_गन्तव्यम्(GLenum format, GLenum type, GLvoid* pixels) ध्रुव
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
@@ -952,702 +952,702 @@ void cv::ogl::Texture2D::Impl::copyTo(GLenum format, GLenum type, GLvoid* pixels
     CV_CheckGlError();
 }
 
-void cv::ogl::Texture2D::Impl::bind() const
+शून्य cv::ogl::Texture2D::Impl::bind() ध्रुव
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
 }
 
-#endif // HAVE_OPENGL
+#यदि_अन्तः // HAVE_OPENGL
 
-cv::ogl::Texture2D::Texture2D() : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D() : पङ्क्तिकाः_2(0), स्तम्भसङ्ख्या_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     impl_ = Impl::empty();
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::Texture2D::Texture2D(int arows, int acols, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(पूर्णाङ्क arows, पूर्णाङ्क acols, Format aformat, अचिह्नित पूर्णाङ्क atexId, तार्किक autoRelease) : पङ्क्तिकाः_2(0), स्तम्भसङ्ख्या_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(aformat);
-    CV_UNUSED(atexId);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arows);
+    CV_अप्रयुक्तम्(acols);
+    CV_अप्रयुक्तम्(aformat);
+    CV_अप्रयुक्तम्(atexId);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(atexId, autoRelease));
-    rows_ = arows;
-    cols_ = acols;
+#अन्यथा
+    impl_.reset(नूतन Impl(atexId, autoRelease));
+    पङ्क्तिकाः_2 = arows;
+    स्तम्भसङ्ख्या_2 = acols;
     format_ = aformat;
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(आकार asize, Format aformat, अचिह्नित पूर्णाङ्क atexId, तार्किक autoRelease) : पङ्क्तिकाः_2(0), स्तम्भसङ्ख्या_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(asize);
-    CV_UNUSED(aformat);
-    CV_UNUSED(atexId);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(asize);
+    CV_अप्रयुक्तम्(aformat);
+    CV_अप्रयुक्तम्(atexId);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(atexId, autoRelease));
-    rows_ = asize.height;
-    cols_ = asize.width;
+#अन्यथा
+    impl_.reset(नूतन Impl(atexId, autoRelease));
+    पङ्क्तिकाः_2 = asize.height;
+    स्तम्भसङ्ख्या_2 = asize.विस्तारः;
     format_ = aformat;
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(निवेशः_Array arr, तार्किक autoRelease) : पङ्क्तिकाः_2(0), स्तम्भसङ्ख्या_2(0), format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#अन्यथा
+    ध्रुव पूर्णाङ्क विधा = arr.विधा();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    ध्रुव आकार asize = arr.size();
+    ध्रुव पूर्णाङ्क atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    ध्रुव पूर्णाङ्क गभीरता = CV_MAT_गभीरता(atype);
+    ध्रुव पूर्णाङ्क cn = CV_MAT_CN(atype);
 
-    CV_Assert( depth <= CV_32F );
+    CV_Assert( गभीरता <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
 
-    const Format internalFormats[] =
+    ध्रुव Format आन्तरिकम्_Formats[] =
     {
-        NONE, DEPTH_COMPONENT, NONE, RGB, RGBA
+        NONE, गभीरता_COMPONENT, NONE, RGB, RGBA
     };
-    const GLenum srcFormats[] =
+    ध्रुव GLenum srcFormats[] =
     {
-        0, gl::DEPTH_COMPONENT, 0, gl::BGR, gl::BGRA
+        0, gl::गभीरता_COMPONENT, 0, gl::BGR, gl::BGRA
     };
 
-    switch (kind)
+    विकल्प (विधा)
     {
-    case _InputArray::OPENGL_BUFFER:
+    पक्ष निवेशः_Array_2::OPENGL_बफर:
         {
-            ogl::Buffer buf = arr.getOGlBuffer();
-            buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            break;
+            ogl::बफर_2 buf = arr.get_OGl_बफर();
+            buf.bind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+            impl_.reset(नूतन Impl(आन्तरिकम्_Formats[cn], asize.विस्तारः, asize.height, srcFormats[cn], gl_types[गभीरता], 0, autoRelease));
+            ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+            भङ्ग;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    पक्ष निवेशः_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #यदि_अपरिभाषितम् HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #अन्यथा
                 GpuMat dmat = arr.getGpuMat();
-                ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                buf.setAutoRelease(true);
-                buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
-                ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            #endif
+                ogl::बफर_2 buf(dmat, ogl::बफर_2::PIXEL_UNPACK_बफर);
+                buf.समुच्चयः_Auto_Release(सत्य);
+                buf.bind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+                impl_.reset(नूतन Impl(आन्तरिकम्_Formats[cn], asize.विस्तारः, asize.height, srcFormats[cn], gl_types[गभीरता], 0, autoRelease));
+                ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+            #यदि_अन्तः
 
-            break;
+            भङ्ग;
         }
 
-    default:
+    स्वभाव:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], mat.data, autoRelease));
-            break;
+            ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+            impl_.reset(नूतन Impl(आन्तरिकम्_Formats[cn], asize.विस्तारः, asize.height, srcFormats[cn], gl_types[गभीरता], mat.दत्त, autoRelease));
+            भङ्ग;
         }
     }
 
-    rows_ = asize.height;
-    cols_ = asize.width;
-    format_ = internalFormats[cn];
-#endif
+    पङ्क्तिकाः_2 = asize.height;
+    स्तम्भसङ्ख्या_2 = asize.विस्तारः;
+    format_ = आन्तरिकम्_Formats[cn];
+#यदि_अन्तः
 }
 
-void cv::ogl::Texture2D::create(int arows, int acols, Format aformat, bool autoRelease)
+शून्य cv::ogl::Texture2D::create(पूर्णाङ्क arows, पूर्णाङ्क acols, Format aformat, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arows);
-    CV_UNUSED(acols);
-    CV_UNUSED(aformat);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arows);
+    CV_अप्रयुक्तम्(acols);
+    CV_अप्रयुक्तम्(aformat);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || format_ != aformat)
+#अन्यथा
+    यदि (पङ्क्तिकाः_2 != arows || स्तम्भसङ्ख्या_2 != acols || format_ != aformat)
     {
-        ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-        impl_.reset(new Impl(aformat, acols, arows, aformat, gl::FLOAT, 0, autoRelease));
-        rows_ = arows;
-        cols_ = acols;
+        ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+        impl_.reset(नूतन Impl(aformat, acols, arows, aformat, gl::FLOAT, 0, autoRelease));
+        पङ्क्तिकाः_2 = arows;
+        स्तम्भसङ्ख्या_2 = acols;
         format_ = aformat;
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Texture2D::release()
+शून्य cv::ogl::Texture2D::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#यदि_परिभाषितम् HAVE_OPENGL
+    यदि (impl_)
+        impl_->समुच्चयः_Auto_Release(सत्य);
     impl_ = Impl::empty();
-    rows_ = 0;
-    cols_ = 0;
+    पङ्क्तिकाः_2 = 0;
+    स्तम्भसङ्ख्या_2 = 0;
     format_ = NONE;
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Texture2D::setAutoRelease(bool flag)
+शून्य cv::ogl::Texture2D::समुच्चयः_Auto_Release(तार्किक flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#अन्यथा
+    impl_->समुच्चयः_Auto_Release(flag);
+#यदि_अन्तः
 }
 
-void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
+शून्य cv::ogl::Texture2D::copyFrom(निवेशः_Array arr, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#अन्यथा
+    ध्रुव पूर्णाङ्क विधा = arr.विधा();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    ध्रुव आकार asize = arr.size();
+    ध्रुव पूर्णाङ्क atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    ध्रुव पूर्णाङ्क गभीरता = CV_MAT_गभीरता(atype);
+    ध्रुव पूर्णाङ्क cn = CV_MAT_CN(atype);
 
-    CV_Assert( depth <= CV_32F );
+    CV_Assert( गभीरता <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
 
-    const Format internalFormats[] =
+    ध्रुव Format आन्तरिकम्_Formats[] =
     {
-        NONE, DEPTH_COMPONENT, NONE, RGB, RGBA
+        NONE, गभीरता_COMPONENT, NONE, RGB, RGBA
     };
-    const GLenum srcFormats[] =
+    ध्रुव GLenum srcFormats[] =
     {
-        0, gl::DEPTH_COMPONENT, 0, gl::BGR, gl::BGRA
+        0, gl::गभीरता_COMPONENT, 0, gl::BGR, gl::BGRA
     };
 
-    create(asize, internalFormats[cn], autoRelease);
+    create(asize, आन्तरिकम्_Formats[cn], autoRelease);
 
-    switch(kind)
+    विकल्प(विधा)
     {
-    case _InputArray::OPENGL_BUFFER:
+    पक्ष निवेशः_Array_2::OPENGL_बफर:
         {
-            ogl::Buffer buf = arr.getOGlBuffer();
-            buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], 0);
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            break;
+            ogl::बफर_2 buf = arr.get_OGl_बफर();
+            buf.bind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+            impl_->copyFrom(asize.विस्तारः, asize.height, srcFormats[cn], gl_types[गभीरता], 0);
+            ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+            भङ्ग;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    पक्ष निवेशः_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #यदि_अपरिभाषितम् HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #अन्यथा
                 GpuMat dmat = arr.getGpuMat();
-                ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                buf.setAutoRelease(true);
-                buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], 0);
-                ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            #endif
+                ogl::बफर_2 buf(dmat, ogl::बफर_2::PIXEL_UNPACK_बफर);
+                buf.समुच्चयः_Auto_Release(सत्य);
+                buf.bind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+                impl_->copyFrom(asize.विस्तारः, asize.height, srcFormats[cn], gl_types[गभीरता], 0);
+                ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+            #यदि_अन्तः
 
-            break;
+            भङ्ग;
         }
 
-    default:
+    स्वभाव:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], mat.data);
+            ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_UNPACK_बफर);
+            impl_->copyFrom(asize.विस्तारः, asize.height, srcFormats[cn], gl_types[गभीरता], mat.दत्त);
         }
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Texture2D::copyTo(OutputArray arr, int ddepth, bool autoRelease) const
+शून्य cv::ogl::Texture2D::copy_गन्तव्यम्(OutputArray arr, पूर्णाङ्क ddepth, तार्किक autoRelease) ध्रुव
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(ddepth);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
+    CV_अप्रयुक्तम्(ddepth);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#अन्यथा
+    ध्रुव पूर्णाङ्क विधा = arr.विधा();
 
-    const int cn = format_ == DEPTH_COMPONENT ? 1: format_ == RGB ? 3 : 4;
-    const GLenum dstFormat = format_ == DEPTH_COMPONENT ? gl::DEPTH_COMPONENT : format_ == RGB ? gl::BGR : gl::BGRA;
+    ध्रुव पूर्णाङ्क cn = format_ == गभीरता_COMPONENT ? 1: format_ == RGB ? 3 : 4;
+    ध्रुव GLenum dstFormat = format_ == गभीरता_COMPONENT ? gl::गभीरता_COMPONENT : format_ == RGB ? gl::BGR : gl::BGRA;
 
-    switch(kind)
+    विकल्प(विधा)
     {
-    case _InputArray::OPENGL_BUFFER:
+    पक्ष निवेशः_Array_2::OPENGL_बफर:
         {
-            ogl::Buffer& buf = arr.getOGlBufferRef();
-            buf.create(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER, autoRelease);
-            buf.bind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            impl_->copyTo(dstFormat, gl_types[ddepth], 0);
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            break;
+            ogl::बफर_2& buf = arr.get_OGl_बफर_Ref();
+            buf.create(पङ्क्तिकाः_2, स्तम्भसङ्ख्या_2, CV_MAKE_TYPE(ddepth, cn), ogl::बफर_2::PIXEL_PACK_बफर, autoRelease);
+            buf.bind(ogl::बफर_2::PIXEL_PACK_बफर);
+            impl_->copy_गन्तव्यम्(dstFormat, gl_types[ddepth], 0);
+            ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_PACK_बफर);
+            भङ्ग;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    पक्ष निवेशः_Array_2::CUDA_GPU_MAT:
         {
-            #ifndef HAVE_CUDA
+            #यदि_अपरिभाषितम् HAVE_CUDA
                 throw_no_cuda();
-            #else
-                ogl::Buffer buf(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER);
-                buf.setAutoRelease(true);
-                buf.bind(ogl::Buffer::PIXEL_PACK_BUFFER);
-                impl_->copyTo(dstFormat, gl_types[ddepth], 0);
-                ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-                buf.copyTo(arr);
-            #endif
+            #अन्यथा
+                ogl::बफर_2 buf(पङ्क्तिकाः_2, स्तम्भसङ्ख्या_2, CV_MAKE_TYPE(ddepth, cn), ogl::बफर_2::PIXEL_PACK_बफर);
+                buf.समुच्चयः_Auto_Release(सत्य);
+                buf.bind(ogl::बफर_2::PIXEL_PACK_बफर);
+                impl_->copy_गन्तव्यम्(dstFormat, gl_types[ddepth], 0);
+                ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_PACK_बफर);
+                buf.copy_गन्तव्यम्(arr);
+            #यदि_अन्तः
 
-            break;
+            भङ्ग;
         }
 
-    default:
+    स्वभाव:
         {
-            arr.create(rows_, cols_, CV_MAKE_TYPE(ddepth, cn));
+            arr.create(पङ्क्तिकाः_2, स्तम्भसङ्ख्या_2, CV_MAKE_TYPE(ddepth, cn));
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            impl_->copyTo(dstFormat, gl_types[ddepth], mat.data);
+            ogl::बफर_2::unbind(ogl::बफर_2::PIXEL_PACK_बफर);
+            impl_->copy_गन्तव्यम्(dstFormat, gl_types[ddepth], mat.दत्त);
         }
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Texture2D::bind() const
+शून्य cv::ogl::Texture2D::bind() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     impl_->bind();
-#endif
+#यदि_अन्तः
 }
 
-unsigned int cv::ogl::Texture2D::texId() const
+अचिह्नित पूर्णाङ्क cv::ogl::Texture2D::texId() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
-#endif
+#अन्यथा
+    प्रत्यागम impl_->texId();
+#यदि_अन्तः
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // ogl::TextureBuffer
 
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
 
-class cv::ogl::TextureBuffer::Impl
+वर्ग cv::ogl::Texture_बफर::Impl
 {
 };
 
-#else
+#अन्यथा
 
-class cv::ogl::TextureBuffer::Impl
+वर्ग cv::ogl::Texture_बफर::Impl
 {
-public:
-    static const Ptr<Impl> empty();
+सार्वजनिक:
+    स्थिर ध्रुव Ptr<Impl> empty();
 
     Impl();
-    Impl(GLenum internalFormat, GLuint bufId, bool autoRelease);
+    Impl(GLenum आन्तरिकम्_Format, GLuint bufId, तार्किक autoRelease);
     ~Impl();
 
-    void bind(GLint unit) const;
+    शून्य bind(GLint unit) ध्रुव;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    शून्य समुच्चयः_Auto_Release(तार्किक flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() ध्रुव { प्रत्यागम texId_; }
 
-private:
+गुप्त:
     GLuint texId_;
-    bool autoRelease_;
+    तार्किक autoRelease_;
 };
 
-const Ptr<cv::ogl::TextureBuffer::Impl> cv::ogl::TextureBuffer::Impl::empty()
+ध्रुव Ptr<cv::ogl::Texture_बफर::Impl> cv::ogl::Texture_बफर::Impl::empty()
 {
-    static Ptr<Impl> p = makePtr<Impl>();
-    return p;
+    स्थिर Ptr<Impl> p = makePtr<Impl>();
+    प्रत्यागम p;
 }
 
-cv::ogl::TextureBuffer::Impl::Impl() : texId_(0), autoRelease_(false)
+cv::ogl::Texture_बफर::Impl::Impl() : texId_(0), autoRelease_(असत्य)
 {
 }
 
-cv::ogl::TextureBuffer::Impl::Impl(GLenum internalFormat, GLuint bufId, bool autoRelease) : texId_(0), autoRelease_(autoRelease)
+cv::ogl::Texture_बफर::Impl::Impl(GLenum आन्तरिकम्_Format, GLuint bufId, तार्किक autoRelease) : texId_(0), autoRelease_(autoRelease)
 {
     gl::GenTextures(1, &texId_);
     CV_CheckGlError();
 
     CV_Assert(texId_ != 0);
 
-    gl::BindTexture(gl::TEXTURE_BUFFER, texId_);
+    gl::BindTexture(gl::TEXTURE_बफर, texId_);
     CV_CheckGlError();
 
-    gl::TexBuffer(gl::TEXTURE_BUFFER, internalFormat, bufId);
+    gl::Tex_बफर(gl::TEXTURE_बफर, आन्तरिकम्_Format, bufId);
     CV_CheckGlError();
 
-    gl::BindTexture(gl::TEXTURE_BUFFER, 0);
+    gl::BindTexture(gl::TEXTURE_बफर, 0);
     CV_CheckGlError();
 }
 
-cv::ogl::TextureBuffer::Impl::~Impl()
+cv::ogl::Texture_बफर::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    यदि (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
-void cv::ogl::TextureBuffer::Impl::bind(GLint unit) const
+शून्य cv::ogl::Texture_बफर::Impl::bind(GLint unit) ध्रुव
 {
-    gl::ActiveTexture(gl::TEXTURE0 + unit);
+    gl::सक्रिय_Texture(gl::TEXTURE0 + unit);
     CV_CheckGlError();
 
-    gl::BindTexture(gl::TEXTURE_BUFFER, texId_);
+    gl::BindTexture(gl::TEXTURE_बफर, texId_);
     CV_CheckGlError();
 }
 
-#endif // HAVE_OPENGL
+#यदि_अन्तः // HAVE_OPENGL
 
-cv::ogl::TextureBuffer::TextureBuffer() : format_(NONE)
+cv::ogl::Texture_बफर::Texture_बफर() : format_(NONE)
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     impl_ = Impl::empty();
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::TextureBuffer::TextureBuffer(const Buffer& buf, Format aformat, bool autoRelease) : format_(NONE)
+cv::ogl::Texture_बफर::Texture_बफर(ध्रुव बफर_2& buf, Format aformat, तार्किक autoRelease) : format_(NONE)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(buf);
-    CV_UNUSED(aformat);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(buf);
+    CV_अप्रयुक्तम्(aformat);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
+#अन्यथा
     impl_ = Impl::empty();
     create(buf, aformat, autoRelease);
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::TextureBuffer::create(const Buffer& buf, Format aformat, bool autoRelease)
+शून्य cv::ogl::Texture_बफर::create(ध्रुव बफर_2& buf, Format aformat, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(buf);
-    CV_UNUSED(aformat);
-    CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(buf);
+    CV_अप्रयुक्तम्(aformat);
+    CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
+#अन्यथा
     CV_Assert( !buf.empty() );
     CV_Assert( aformat != NONE );
 
     impl_ = makePtr<Impl>(aformat, buf.bufId(), autoRelease);
     buf_ = buf;
     format_ = aformat;
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::TextureBuffer::release()
+शून्य cv::ogl::Texture_बफर::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#यदि_परिभाषितम् HAVE_OPENGL
+    यदि (impl_)
+        impl_->समुच्चयः_Auto_Release(सत्य);
     impl_ = Impl::empty();
-#endif
-    buf_ = Buffer();
+#यदि_अन्तः
+    buf_ = बफर_2();
     format_ = NONE;
 }
 
-void cv::ogl::TextureBuffer::setAutoRelease(bool flag)
+शून्य cv::ogl::Texture_बफर::समुच्चयः_Auto_Release(तार्किक flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#अन्यथा
+    impl_->समुच्चयः_Auto_Release(flag);
+#यदि_अन्तः
 }
 
-void cv::ogl::TextureBuffer::bind(int unit) const
+शून्य cv::ogl::Texture_बफर::bind(पूर्णाङ्क unit) ध्रुव
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(unit);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(unit);
     throw_no_ogl();
-#else
+#अन्यथा
     CV_Assert( unit >= 0 );
     impl_->bind(unit);
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::TextureBuffer::Format cv::ogl::TextureBuffer::format() const
+cv::ogl::Texture_बफर::Format cv::ogl::Texture_बफर::format() ध्रुव
 {
-    return format_;
+    प्रत्यागम format_;
 }
 
-bool cv::ogl::TextureBuffer::empty() const
+तार्किक cv::ogl::Texture_बफर::empty() ध्रुव
 {
-    return format_ == NONE;
+    प्रत्यागम format_ == NONE;
 }
 
-unsigned int cv::ogl::TextureBuffer::texId() const
+अचिह्नित पूर्णाङ्क cv::ogl::Texture_बफर::texId() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
-#endif
+#अन्यथा
+    प्रत्यागम impl_->texId();
+#यदि_अन्तः
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Arrays
 
-void cv::ogl::Arrays::setVertexArray(InputArray vertex)
+शून्य cv::ogl::Arrays::समुच्चयः_Vertex_Array(निवेशः_Array vertex)
 {
-    const int cn = vertex.channels();
-    const int depth = vertex.depth();
+    ध्रुव पूर्णाङ्क cn = vertex.channels();
+    ध्रुव पूर्णाङ्क गभीरता = vertex.गभीरता();
 
     CV_Assert( cn == 2 || cn == 3 || cn == 4 );
-    CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
+    CV_Assert( गभीरता == CV_16S || गभीरता == CV_32S || गभीरता == CV_32F || गभीरता == CV_64F );
 
-    if (vertex.kind() == _InputArray::OPENGL_BUFFER)
-        vertex_ = vertex.getOGlBuffer();
-    else
+    यदि (vertex.विधा() == निवेशः_Array_2::OPENGL_बफर)
+        vertex_ = vertex.get_OGl_बफर();
+    अन्यथा
         vertex_.copyFrom(vertex);
 
-    size_ = vertex_.size().area();
+    आकार_3 = vertex_.size().area();
 }
 
-void cv::ogl::Arrays::resetVertexArray()
+शून्य cv::ogl::Arrays::resetVertexArray()
 {
     vertex_.release();
-    size_ = 0;
+    आकार_3 = 0;
 }
 
-void cv::ogl::Arrays::setColorArray(InputArray color)
+शून्य cv::ogl::Arrays::समुच्चयः_Color_Array(निवेशः_Array color)
 {
-    const int cn = color.channels();
+    ध्रुव पूर्णाङ्क cn = color.channels();
 
     CV_Assert( cn == 3 || cn == 4 );
 
-    if (color.kind() == _InputArray::OPENGL_BUFFER)
-        color_ = color.getOGlBuffer();
-    else
+    यदि (color.विधा() == निवेशः_Array_2::OPENGL_बफर)
+        color_ = color.get_OGl_बफर();
+    अन्यथा
         color_.copyFrom(color);
 }
 
-void cv::ogl::Arrays::resetColorArray()
+शून्य cv::ogl::Arrays::resetColorArray()
 {
     color_.release();
 }
 
-void cv::ogl::Arrays::setNormalArray(InputArray normal)
+शून्य cv::ogl::Arrays::समुच्चयः_प्रसामान्यम्_Array(निवेशः_Array प्रसामान्यम्)
 {
-    const int cn = normal.channels();
-    const int depth = normal.depth();
+    ध्रुव पूर्णाङ्क cn = प्रसामान्यम्.channels();
+    ध्रुव पूर्णाङ्क गभीरता = प्रसामान्यम्.गभीरता();
 
     CV_Assert( cn == 3 );
-    CV_Assert( depth == CV_8S || depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
+    CV_Assert( गभीरता == CV_8S || गभीरता == CV_16S || गभीरता == CV_32S || गभीरता == CV_32F || गभीरता == CV_64F );
 
-    if (normal.kind() == _InputArray::OPENGL_BUFFER)
-        normal_ = normal.getOGlBuffer();
-    else
-        normal_.copyFrom(normal);
+    यदि (प्रसामान्यम्.विधा() == निवेशः_Array_2::OPENGL_बफर)
+        प्रसामान्यम्_2 = प्रसामान्यम्.get_OGl_बफर();
+    अन्यथा
+        प्रसामान्यम्_2.copyFrom(प्रसामान्यम्);
 }
 
-void cv::ogl::Arrays::resetNormalArray()
+शून्य cv::ogl::Arrays::reset_प्रसामान्यम्_Array()
 {
-    normal_.release();
+    प्रसामान्यम्_2.release();
 }
 
-void cv::ogl::Arrays::setTexCoordArray(InputArray texCoord)
+शून्य cv::ogl::Arrays::समुच्चयः_Tex_Coord_Array(निवेशः_Array texCoord)
 {
-    const int cn = texCoord.channels();
-    const int depth = texCoord.depth();
+    ध्रुव पूर्णाङ्क cn = texCoord.channels();
+    ध्रुव पूर्णाङ्क गभीरता = texCoord.गभीरता();
 
     CV_Assert( cn >= 1 && cn <= 4 );
-    CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
+    CV_Assert( गभीरता == CV_16S || गभीरता == CV_32S || गभीरता == CV_32F || गभीरता == CV_64F );
 
-    if (texCoord.kind() == _InputArray::OPENGL_BUFFER)
-        texCoord_ = texCoord.getOGlBuffer();
-    else
+    यदि (texCoord.विधा() == निवेशः_Array_2::OPENGL_बफर)
+        texCoord_ = texCoord.get_OGl_बफर();
+    अन्यथा
         texCoord_.copyFrom(texCoord);
 }
 
-void cv::ogl::Arrays::resetTexCoordArray()
+शून्य cv::ogl::Arrays::resetTexCoordArray()
 {
     texCoord_.release();
 }
 
-void cv::ogl::Arrays::release()
+शून्य cv::ogl::Arrays::release()
 {
     resetVertexArray();
     resetColorArray();
-    resetNormalArray();
+    reset_प्रसामान्यम्_Array();
     resetTexCoordArray();
 }
 
-void cv::ogl::Arrays::setAutoRelease(bool flag)
+शून्य cv::ogl::Arrays::समुच्चयः_Auto_Release(तार्किक flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(flag);
     throw_no_ogl();
-#else
-    vertex_.setAutoRelease(flag);
-    color_.setAutoRelease(flag);
-    normal_.setAutoRelease(flag);
-    texCoord_.setAutoRelease(flag);
-#endif
+#अन्यथा
+    vertex_.समुच्चयः_Auto_Release(flag);
+    color_.समुच्चयः_Auto_Release(flag);
+    प्रसामान्यम्_2.समुच्चयः_Auto_Release(flag);
+    texCoord_.समुच्चयः_Auto_Release(flag);
+#यदि_अन्तः
 }
 
-void cv::ogl::Arrays::bind() const
+शून्य cv::ogl::Arrays::bind() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    CV_Assert( texCoord_.empty() || texCoord_.size().area() == size_ );
-    CV_Assert( normal_.empty() || normal_.size().area() == size_ );
-    CV_Assert( color_.empty() || color_.size().area() == size_ );
+#अन्यथा
+    CV_Assert( texCoord_.empty() || texCoord_.size().area() == आकार_3 );
+    CV_Assert( प्रसामान्यम्_2.empty() || प्रसामान्यम्_2.size().area() == आकार_3 );
+    CV_Assert( color_.empty() || color_.size().area() == आकार_3 );
 
-    if (texCoord_.empty())
+    यदि (texCoord_.empty())
     {
         gl::DisableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
     }
-    else
+    अन्यथा
     {
         gl::EnableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
 
-        texCoord_.bind(ogl::Buffer::ARRAY_BUFFER);
+        texCoord_.bind(ogl::बफर_2::ARRAY_बफर);
 
-        gl::TexCoordPointer(texCoord_.channels(), gl_types[texCoord_.depth()], 0, 0);
+        gl::TexCoordPointer(texCoord_.channels(), gl_types[texCoord_.गभीरता()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (normal_.empty())
+    यदि (प्रसामान्यम्_2.empty())
     {
-        gl::DisableClientState(gl::NORMAL_ARRAY);
+        gl::DisableClientState(gl::प्रसामान्यम्_ARRAY);
         CV_CheckGlError();
     }
-    else
+    अन्यथा
     {
-        gl::EnableClientState(gl::NORMAL_ARRAY);
+        gl::EnableClientState(gl::प्रसामान्यम्_ARRAY);
         CV_CheckGlError();
 
-        normal_.bind(ogl::Buffer::ARRAY_BUFFER);
+        प्रसामान्यम्_2.bind(ogl::बफर_2::ARRAY_बफर);
 
-        gl::NormalPointer(gl_types[normal_.depth()], 0, 0);
+        gl::प्रसामान्यम्_Pointer(gl_types[प्रसामान्यम्_2.गभीरता()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (color_.empty())
+    यदि (color_.empty())
     {
         gl::DisableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
     }
-    else
+    अन्यथा
     {
         gl::EnableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
 
-        color_.bind(ogl::Buffer::ARRAY_BUFFER);
+        color_.bind(ogl::बफर_2::ARRAY_बफर);
 
-        const int cn = color_.channels();
+        ध्रुव पूर्णाङ्क cn = color_.channels();
 
-        gl::ColorPointer(cn, gl_types[color_.depth()], 0, 0);
+        gl::ColorPointer(cn, gl_types[color_.गभीरता()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (vertex_.empty())
+    यदि (vertex_.empty())
     {
         gl::DisableClientState(gl::VERTEX_ARRAY);
         CV_CheckGlError();
     }
-    else
+    अन्यथा
     {
         gl::EnableClientState(gl::VERTEX_ARRAY);
         CV_CheckGlError();
 
-        vertex_.bind(ogl::Buffer::ARRAY_BUFFER);
+        vertex_.bind(ogl::बफर_2::ARRAY_बफर);
 
-        gl::VertexPointer(vertex_.channels(), gl_types[vertex_.depth()], 0, 0);
+        gl::VertexPointer(vertex_.channels(), gl_types[vertex_.गभीरता()], 0, 0);
         CV_CheckGlError();
     }
 
-    ogl::Buffer::unbind(ogl::Buffer::ARRAY_BUFFER);
-#endif
+    ogl::बफर_2::unbind(ogl::बफर_2::ARRAY_बफर);
+#यदि_अन्तः
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::VertexArray
 
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
 
-class cv::ogl::VertexArray::Impl
+वर्ग cv::ogl::VertexArray::Impl
 {
 };
 
-#else
+#अन्यथा
 
-class cv::ogl::VertexArray::Impl
+वर्ग cv::ogl::VertexArray::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+सार्वजनिक:
+    स्थिर ध्रुव Ptr<Impl>& empty();
 
-    Impl(GLuint vaId, bool autoRelease);
-    Impl(std::initializer_list<Attribute> attributes, bool autoRelease);
+    Impl(GLuint vaId, तार्किक autoRelease);
+    Impl(std::initializer_list<Attribute> गुणाः, तार्किक autoRelease);
     ~Impl();
 
-    void bind();
+    शून्य bind();
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    शून्य समुच्चयः_Auto_Release(तार्किक flag) { autoRelease_ = flag; }
 
-    GLuint vaId() const { return vaId_; }
+    GLuint vaId() ध्रुव { प्रत्यागम vaId_; }
 
-private:
+गुप्त:
     Impl();
 
     GLuint vaId_;
-    bool autoRelease_;
+    तार्किक autoRelease_;
 };
 
-const Ptr<cv::ogl::VertexArray::Impl>& cv::ogl::VertexArray::Impl::empty()
+ध्रुव Ptr<cv::ogl::VertexArray::Impl>& cv::ogl::VertexArray::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    स्थिर Ptr<Impl> p(नूतन Impl);
+    प्रत्यागम p;
 }
 
-cv::ogl::VertexArray::Impl::Impl() : vaId_(0), autoRelease_(false)
+cv::ogl::VertexArray::Impl::Impl() : vaId_(0), autoRelease_(असत्य)
 {
 }
 
-cv::ogl::VertexArray::Impl::Impl(GLuint vaId, bool autoRelease) : vaId_(vaId), autoRelease_(autoRelease)
+cv::ogl::VertexArray::Impl::Impl(GLuint vaId, तार्किक autoRelease) : vaId_(vaId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsVertexArray(vaId) == gl::TRUE_ );
 }
 
-cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bool autoRelease) : vaId_(0), autoRelease_(autoRelease)
+cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> गुणाः, तार्किक autoRelease) : vaId_(0), autoRelease_(autoRelease)
 {
     gl::GenVertexArrays(1, &vaId_);
     CV_CheckGlError();
@@ -1656,29 +1656,29 @@ cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bo
     gl::BindVertexArray(vaId_);
     CV_CheckGlError();
 
-    for (auto& attribute : attributes)
+    प्रति (स्वचालित& attribute : गुणाः)
     {
-        attribute.buffer_.bind(Buffer::ARRAY_BUFFER);
-        if (attribute.integer_)
+        attribute.बफर_3.bind(बफर_2::ARRAY_बफर);
+        यदि (attribute.integer_)
         {
             gl::VertexAttribIPointer(
                 attribute.shader_loc_,
-                attribute.size_,
+                attribute.आकार_3,
                 attribute.type_,
                 static_cast<GLsizei>(attribute.stride_),
-                reinterpret_cast<const void*>(attribute.offset_)
+                reinterpret_cast<ध्रुव शून्य*>(attribute.विस्थापनम्)
             );
             CV_CheckGlError();
         }
-        else
+        अन्यथा
         {
             gl::VertexAttribPointer(
                 attribute.shader_loc_,
-                attribute.size_,
+                attribute.आकार_3,
                 attribute.type_,
                 attribute.normalized_,
                 static_cast<GLsizei>(attribute.stride_),
-                reinterpret_cast<const void*>(attribute.offset_)
+                reinterpret_cast<ध्रुव शून्य*>(attribute.विस्थापनम्)
             );
             CV_CheckGlError();
         }
@@ -1690,155 +1690,155 @@ cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bo
 
 cv::ogl::VertexArray::Impl::~Impl()
 {
-    if (autoRelease_ && vaId_)
+    यदि (autoRelease_ && vaId_)
         gl::DeleteVertexArrays(1, &vaId_);
 }
 
-void cv::ogl::VertexArray::Impl::bind()
+शून्य cv::ogl::VertexArray::Impl::bind()
 {
     gl::BindVertexArray(vaId_);
     CV_CheckGlError();
 }
 
-#endif // HAVE_OPENGL
+#यदि_अन्तः // HAVE_OPENGL
 
 cv::ogl::VertexArray::VertexArray()
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     impl_ = Impl::empty();
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::VertexArray::VertexArray(std::initializer_list<Attribute> attributes, bool autoRelease)
+cv::ogl::VertexArray::VertexArray(std::initializer_list<Attribute> गुणाः, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(attributes); CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(गुणाः); CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(attributes, autoRelease));
-#endif
+#अन्यथा
+    impl_.reset(नूतन Impl(गुणाः, autoRelease));
+#यदि_अन्तः
 }
 
-void cv::ogl::VertexArray::create(std::initializer_list<Attribute> attributes, bool autoRelease)
+शून्य cv::ogl::VertexArray::create(std::initializer_list<Attribute> गुणाः, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(attributes); CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(गुणाः); CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(attributes, autoRelease));
-#endif
+#अन्यथा
+    impl_.reset(नूतन Impl(गुणाः, autoRelease));
+#यदि_अन्तः
 }
 
-void cv::ogl::VertexArray::release()
+शून्य cv::ogl::VertexArray::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#यदि_परिभाषितम् HAVE_OPENGL
+    यदि (impl_)
+        impl_->समुच्चयः_Auto_Release(सत्य);
     impl_ = Impl::empty();
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::VertexArray::setAutoRelease(bool flag)
+शून्य cv::ogl::VertexArray::समुच्चयः_Auto_Release(तार्किक flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#अन्यथा
+    impl_->समुच्चयः_Auto_Release(flag);
+#यदि_अन्तः
 }
 
-void cv::ogl::VertexArray::bind() const
+शून्य cv::ogl::VertexArray::bind() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     impl_->bind();
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::VertexArray::unbind()
+शून्य cv::ogl::VertexArray::unbind()
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     gl::BindVertexArray(0);
-#endif
+#यदि_अन्तः
 }
 
-unsigned int cv::ogl::VertexArray::vaId() const
+अचिह्नित पूर्णाङ्क cv::ogl::VertexArray::vaId() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->vaId();
-#endif
+#अन्यथा
+    प्रत्यागम impl_->vaId();
+#यदि_अन्तः
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Shader
 
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
 
-class cv::ogl::Shader::Impl
+वर्ग cv::ogl::Shader::Impl
 {
 };
 
-#else
+#अन्यथा
 
-class cv::ogl::Shader::Impl
+वर्ग cv::ogl::Shader::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+सार्वजनिक:
+    स्थिर ध्रुव Ptr<Impl>& empty();
 
-    Impl(GLuint shaderId, bool autoRelease);
-    Impl(const char* src, GLenum type, bool autoRelease);
+    Impl(GLuint shaderId, तार्किक autoRelease);
+    Impl(ध्रुव वर्ण* src, GLenum type, तार्किक autoRelease);
     ~Impl();
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    शून्य समुच्चयः_Auto_Release(तार्किक flag) { autoRelease_ = flag; }
 
-    GLuint shaderId() const { return shaderId_; }
+    GLuint shaderId() ध्रुव { प्रत्यागम shaderId_; }
 
-private:
+गुप्त:
     Impl();
 
     GLuint shaderId_;
-    bool autoRelease_;
+    तार्किक autoRelease_;
 };
 
-const Ptr<cv::ogl::Shader::Impl>& cv::ogl::Shader::Impl::empty()
+ध्रुव Ptr<cv::ogl::Shader::Impl>& cv::ogl::Shader::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    स्थिर Ptr<Impl> p(नूतन Impl);
+    प्रत्यागम p;
 }
 
-cv::ogl::Shader::Impl::Impl() : shaderId_(0), autoRelease_(false)
+cv::ogl::Shader::Impl::Impl() : shaderId_(0), autoRelease_(असत्य)
 {
 }
 
-cv::ogl::Shader::Impl::Impl(GLuint shaderId, bool autoRelease) : shaderId_(shaderId), autoRelease_(autoRelease)
+cv::ogl::Shader::Impl::Impl(GLuint shaderId, तार्किक autoRelease) : shaderId_(shaderId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsShader(shaderId) == gl::TRUE_ );
 }
 
-cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : shaderId_(0), autoRelease_(autoRelease)
+cv::ogl::Shader::Impl::Impl(ध्रुव वर्ण* src, GLenum type, तार्किक autoRelease) : shaderId_(0), autoRelease_(autoRelease)
 {
     shaderId_ = gl::CreateShader(type);
     CV_CheckGlError();
 
     CV_Assert( shaderId_ != 0 );
 
-    GLint status;
+    GLint स्थितिः;
     gl::ShaderSource(shaderId_, 1, &src, 0);
     gl::CompileShader(shaderId_);
-    gl::GetShaderiv(shaderId_, gl::COMPILE_STATUS, &status);
-    if (!status) {
+    gl::GetShaderiv(shaderId_, gl::COMPILE_स्थितिः, &स्थितिः);
+    यदि (!स्थितिः) {
         String info_log;
-        gl::GetShaderiv(shaderId_, gl::INFO_LOG_LENGTH, &status);
-        info_log.resize(status);
-        gl::GetShaderInfoLog(shaderId_, GLsizei(info_log.size()) + 1, nullptr, &info_log[0]);
+        gl::GetShaderiv(shaderId_, gl::INFO_LOG_दीर्घता, &स्थितिः);
+        info_log.resize(स्थितिः);
+        gl::GetShaderInfoLog(shaderId_, GLsizei(info_log.size()) + 1, शून्यसूचकः, &info_log[0]);
         CV_Error(Error::OpenGlApiCallError, info_log);
     }
 
@@ -1847,149 +1847,149 @@ cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : sh
 
 cv::ogl::Shader::Impl::~Impl()
 {
-    if (autoRelease_ && shaderId_)
+    यदि (autoRelease_ && shaderId_)
         gl::DeleteShader(shaderId_);
 }
 
-#endif // HAVE_OPENGL
+#यदि_अन्तः // HAVE_OPENGL
 
 cv::ogl::Shader::Shader() : type_(ShaderType::VERTEX)
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     impl_ = Impl::empty();
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::Shader::Shader(const char* src, ShaderType type, bool autoRelease) : type_(type)
+cv::ogl::Shader::Shader(ध्रुव वर्ण* src, ShaderType type, तार्किक autoRelease) : type_(type)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(src); CV_अप्रयुक्तम्(type); CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(src, type, autoRelease));
-#endif
+#अन्यथा
+    impl_.reset(नूतन Impl(src, type, autoRelease));
+#यदि_अन्तः
 }
 
-void cv::ogl::Shader::create(const char* src, ShaderType type, bool autoRelease)
+शून्य cv::ogl::Shader::create(ध्रुव वर्ण* src, ShaderType type, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(src); CV_अप्रयुक्तम्(type); CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(src, type, autoRelease));
+#अन्यथा
+    impl_.reset(नूतन Impl(src, type, autoRelease));
     type_ = type;
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Shader::release()
+शून्य cv::ogl::Shader::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#यदि_परिभाषितम् HAVE_OPENGL
+    यदि (impl_)
+        impl_->समुच्चयः_Auto_Release(सत्य);
     impl_ = Impl::empty();
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Shader::setAutoRelease(bool flag)
+शून्य cv::ogl::Shader::समुच्चयः_Auto_Release(तार्किक flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#अन्यथा
+    impl_->समुच्चयः_Auto_Release(flag);
+#यदि_अन्तः
 }
 
-unsigned int cv::ogl::Shader::shaderId() const
+अचिह्नित पूर्णाङ्क cv::ogl::Shader::shaderId() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->shaderId();
-#endif
+#अन्यथा
+    प्रत्यागम impl_->shaderId();
+#यदि_अन्तः
 }
 
-cv::ogl::Shader::ShaderType cv::ogl::Shader::type() const
+cv::ogl::Shader::ShaderType cv::ogl::Shader::type() ध्रुव
 {
-    return type_;
+    प्रत्यागम type_;
 }
 
 ////////////////////////////////////////////////////////////////////////
 // ogl::Program
 
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
 
-class cv::ogl::Program::Impl
+वर्ग cv::ogl::क्रमादेशः_2::Impl
 {
 };
 
-#else
+#अन्यथा
 
-class cv::ogl::Program::Impl
+वर्ग cv::ogl::क्रमादेशः_2::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+सार्वजनिक:
+    स्थिर ध्रुव Ptr<Impl>& empty();
 
-    Impl(GLuint programId, bool autoRelease);
-    Impl(const Shader& vert, const Shader& frag, bool autoRelease);
+    Impl(GLuint क्रमादेशः_Id, तार्किक autoRelease);
+    Impl(ध्रुव Shader& vert, ध्रुव Shader& frag, तार्किक autoRelease);
     ~Impl();
 
-    void bind();
+    शून्य bind();
 
-    int getAttributeLocation(const char* name) const;
-    int getUniformLocation(const char* name) const;
+    पूर्णाङ्क getAttributeLocation(ध्रुव वर्ण* name) ध्रुव;
+    पूर्णाङ्क get_एकरूपम्_Location(ध्रुव वर्ण* name) ध्रुव;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    शून्य समुच्चयः_Auto_Release(तार्किक flag) { autoRelease_ = flag; }
 
-    GLuint programId() const { return programId_; }
+    GLuint क्रमादेशः_Id() ध्रुव { प्रत्यागम क्रमादेशः_Id_2; }
 
-private:
+गुप्त:
     Impl();
 
     Shader vert_;
     Shader frag_;
-    GLuint programId_;
-    bool autoRelease_;
+    GLuint क्रमादेशः_Id_2;
+    तार्किक autoRelease_;
 };
 
-const Ptr<cv::ogl::Program::Impl>& cv::ogl::Program::Impl::empty()
+ध्रुव Ptr<cv::ogl::क्रमादेशः_2::Impl>& cv::ogl::क्रमादेशः_2::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    स्थिर Ptr<Impl> p(नूतन Impl);
+    प्रत्यागम p;
 }
 
-cv::ogl::Program::Impl::Impl() : programId_(0), autoRelease_(false)
+cv::ogl::क्रमादेशः_2::Impl::Impl() : क्रमादेशः_Id_2(0), autoRelease_(असत्य)
 {
 }
 
-cv::ogl::Program::Impl::Impl(GLuint programId, bool autoRelease) : programId_(programId), autoRelease_(autoRelease)
+cv::ogl::क्रमादेशः_2::Impl::Impl(GLuint क्रमादेशः_Id, तार्किक autoRelease) : क्रमादेशः_Id_2(क्रमादेशः_Id), autoRelease_(autoRelease)
 {
-    CV_Assert( gl::IsProgram(programId) == gl::TRUE_ );
+    CV_Assert( gl::Is_क्रमादेशः(क्रमादेशः_Id) == gl::TRUE_ );
 }
 
-cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRelease) : programId_(0), autoRelease_(autoRelease)
+cv::ogl::क्रमादेशः_2::Impl::Impl(ध्रुव Shader& vert, ध्रुव Shader& frag, तार्किक autoRelease) : क्रमादेशः_Id_2(0), autoRelease_(autoRelease)
 {
-    programId_ = gl::CreateProgram();
+    क्रमादेशः_Id_2 = gl::Create_क्रमादेशः();
     CV_CheckGlError();
 
-    CV_Assert( programId_ != 0 );
+    CV_Assert( क्रमादेशः_Id_2 != 0 );
 
-    gl::AttachShader(programId_, vert.shaderId());
+    gl::AttachShader(क्रमादेशः_Id_2, vert.shaderId());
     CV_CheckGlError();
 
-    gl::AttachShader(programId_, frag.shaderId());
+    gl::AttachShader(क्रमादेशः_Id_2, frag.shaderId());
     CV_CheckGlError();
 
-    GLint status;
-    gl::LinkProgram(programId_);
-    gl::GetProgramiv(programId_, gl::LINK_STATUS, &status);
-    if (!status) {
+    GLint स्थितिः;
+    gl::Link_क्रमादेशः(क्रमादेशः_Id_2);
+    gl::GetProgramiv(क्रमादेशः_Id_2, gl::LINK_स्थितिः, &स्थितिः);
+    यदि (!स्थितिः) {
         String info_log;
-        gl::GetProgramiv(programId_, gl::INFO_LOG_LENGTH, &status);
-        info_log.resize(status);
-        gl::GetProgramInfoLog(programId_, GLsizei(info_log.size()) + 1, nullptr, &info_log[0]);
+        gl::GetProgramiv(क्रमादेशः_Id_2, gl::INFO_LOG_दीर्घता, &स्थितिः);
+        info_log.resize(स्थितिः);
+        gl::Get_क्रमादेशः_Info_Log(क्रमादेशः_Id_2, GLsizei(info_log.size()) + 1, शून्यसूचकः, &info_log[0]);
         CV_Error(Error::OpenGlApiCallError, info_log);
     }
 
@@ -1999,211 +1999,211 @@ cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRe
     frag_ = frag;
 }
 
-cv::ogl::Program::Impl::~Impl()
+cv::ogl::क्रमादेशः_2::Impl::~Impl()
 {
-    if (autoRelease_ && programId_)
-        gl::DeleteProgram(programId_);
+    यदि (autoRelease_ && क्रमादेशः_Id_2)
+        gl::Delete_क्रमादेशः(क्रमादेशः_Id_2);
 }
 
-void cv::ogl::Program::Impl::bind()
+शून्य cv::ogl::क्रमादेशः_2::Impl::bind()
 {
-    gl::UseProgram(programId_);
+    gl::Use_क्रमादेशः(क्रमादेशः_Id_2);
     CV_CheckGlError();
 }
 
-int cv::ogl::Program::Impl::getAttributeLocation(const char* name) const
+पूर्णाङ्क cv::ogl::क्रमादेशः_2::Impl::getAttributeLocation(ध्रुव वर्ण* name) ध्रुव
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetAttribLocation(programId_, name);
+    पूर्णाङ्क location = gl::GetAttribLocation(क्रमादेशः_Id_2, name);
     CV_CheckGlError();
-    return location;
+    प्रत्यागम location;
 }
 
-int cv::ogl::Program::Impl::getUniformLocation(const char* name) const
+पूर्णाङ्क cv::ogl::क्रमादेशः_2::Impl::get_एकरूपम्_Location(ध्रुव वर्ण* name) ध्रुव
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetUniformLocation(programId_, name);
+    पूर्णाङ्क location = gl::Get_एकरूपम्_Location(क्रमादेशः_Id_2, name);
     CV_CheckGlError();
-    return location;
+    प्रत्यागम location;
 }
 
-#endif // HAVE_OPENGL
+#यदि_अन्तः // HAVE_OPENGL
 
-cv::ogl::Program::Program()
+cv::ogl::क्रमादेशः_2::क्रमादेशः_2()
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     impl_ = Impl::empty();
-#endif
+#यदि_अन्तः
 }
 
-cv::ogl::Program::Program(const Shader& vert, const Shader& frag, bool autoRelease)
+cv::ogl::क्रमादेशः_2::क्रमादेशः_2(ध्रुव Shader& vert, ध्रुव Shader& frag, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(vert); CV_अप्रयुक्तम्(frag); CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(vert, frag, autoRelease));
-#endif
+#अन्यथा
+    impl_.reset(नूतन Impl(vert, frag, autoRelease));
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::create(const Shader& vert, const Shader& frag, bool autoRelease)
+शून्य cv::ogl::क्रमादेशः_2::create(ध्रुव Shader& vert, ध्रुव Shader& frag, तार्किक autoRelease)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(vert); CV_अप्रयुक्तम्(frag); CV_अप्रयुक्तम्(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(vert, frag, autoRelease));
-#endif
+#अन्यथा
+    impl_.reset(नूतन Impl(vert, frag, autoRelease));
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::release()
+शून्य cv::ogl::क्रमादेशः_2::release()
 {
-#ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+#यदि_परिभाषितम् HAVE_OPENGL
+    यदि (impl_)
+        impl_->समुच्चयः_Auto_Release(सत्य);
     impl_ = Impl::empty();
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::setAutoRelease(bool flag)
+शून्य cv::ogl::क्रमादेशः_2::समुच्चयः_Auto_Release(तार्किक flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(flag);
     throw_no_ogl();
-#else
-    impl_->setAutoRelease(flag);
-#endif
+#अन्यथा
+    impl_->समुच्चयः_Auto_Release(flag);
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::bind() const
+शून्य cv::ogl::क्रमादेशः_2::bind() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
+#अन्यथा
     impl_->bind();
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::unbind()
+शून्य cv::ogl::क्रमादेशः_2::unbind()
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    gl::UseProgram(0);
-#endif
+#अन्यथा
+    gl::Use_क्रमादेशः(0);
+#यदि_अन्तः
 }
 
-int cv::ogl::Program::getAttributeLocation(const char* name) const
+पूर्णाङ्क cv::ogl::क्रमादेशः_2::getAttributeLocation(ध्रुव वर्ण* name) ध्रुव
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(name);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(name);
     throw_no_ogl();
-#else
-    return impl_->getAttributeLocation(name);
-#endif
+#अन्यथा
+    प्रत्यागम impl_->getAttributeLocation(name);
+#यदि_अन्तः
 }
 
-int cv::ogl::Program::getUniformLocation(const char* name) const
+पूर्णाङ्क cv::ogl::क्रमादेशः_2::get_एकरूपम्_Location(ध्रुव वर्ण* name) ध्रुव
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(name);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(name);
     throw_no_ogl();
-#else
-    return impl_->getUniformLocation(name);
-#endif
+#अन्यथा
+    प्रत्यागम impl_->get_एकरूपम्_Location(name);
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::setUniformVec3(int loc, Vec3f vec)
+शून्य cv::ogl::क्रमादेशः_2::समुच्चयः_एकरूपम्_Vec3(पूर्णाङ्क loc, Vec3f vec)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(vec);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(loc); CV_अप्रयुक्तम्(vec);
     throw_no_ogl();
-#else
+#अन्यथा
     gl::Uniform3f(loc, vec(0), vec(1), vec(2));
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::setUniformVec2(int loc, Vec2f vec)
+शून्य cv::ogl::क्रमादेशः_2::समुच्चयः_एकरूपम्_Vec2(पूर्णाङ्क loc, Vec2f vec)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(vec);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(loc); CV_अप्रयुक्तम्(vec);
     throw_no_ogl();
-#else
+#अन्यथा
     gl::Uniform2f(loc, vec(0), vec(1));
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::setUniformVec4(int loc, Vec4f vec)
+शून्य cv::ogl::क्रमादेशः_2::समुच्चयः_एकरूपम्_Vec4(पूर्णाङ्क loc, Vec4f vec)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(vec);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(loc); CV_अप्रयुक्तम्(vec);
     throw_no_ogl();
-#else
+#अन्यथा
     gl::Uniform4f(loc, vec(0), vec(1), vec(2), vec(3));
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::setUniformMat4x4(int loc, Matx44f mat)
+शून्य cv::ogl::क्रमादेशः_2::समुच्चयः_एकरूपम्_Mat4x4(पूर्णाङ्क loc, Matx44f mat)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(mat);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(loc); CV_अप्रयुक्तम्(mat);
     throw_no_ogl();
-#else
-    gl::UniformMatrix4fv(loc, 1, true, mat.val);
-#endif
+#अन्यथा
+    gl::एकरूपम्_Matrix4fv(loc, 1, सत्य, mat.val);
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::setUniform1f(int loc, float value)
+शून्य cv::ogl::क्रमादेशः_2::समुच्चयः_Uniform1f(पूर्णाङ्क loc, भिन्न value)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(value);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(loc); CV_अप्रयुक्तम्(value);
     throw_no_ogl();
-#else
+#अन्यथा
     gl::Uniform1f(loc, value);
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::Program::setUniform1i(int loc, int value)
+शून्य cv::ogl::क्रमादेशः_2::समुच्चयः_Uniform1i(पूर्णाङ्क loc, पूर्णाङ्क value)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(loc); CV_UNUSED(value);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(loc); CV_अप्रयुक्तम्(value);
     throw_no_ogl();
-#else
+#अन्यथा
     gl::Uniform1i(loc, value);
-#endif
+#यदि_अन्तः
 }
 
-unsigned int cv::ogl::Program::programId() const
+अचिह्नित पूर्णाङ्क cv::ogl::क्रमादेशः_2::क्रमादेशः_Id() ध्रुव
 {
-#ifndef HAVE_OPENGL
+#यदि_अपरिभाषितम् HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->programId();
-#endif
+#अन्यथा
+    प्रत्यागम impl_->क्रमादेशः_Id();
+#यदि_अन्तः
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Rendering
 
-void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<double> texRect)
+शून्य cv::ogl::render(ध्रुव ogl::Texture2D& tex, Rect_<द्विगुण> wndRect, Rect_<द्विगुण> texRect)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(tex);
-    CV_UNUSED(wndRect);
-    CV_UNUSED(texRect);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(tex);
+    CV_अप्रयुक्तम्(wndRect);
+    CV_अप्रयुक्तम्(texRect);
     throw_no_ogl();
-#else
-    if (!tex.empty())
+#अन्यथा
+    यदि (!tex.empty())
     {
-        gl::MatrixMode(gl::PROJECTION);
-        gl::LoadIdentity();
+        gl::Matrix_बहुलकम्(gl::PROJECTION);
+        gl::आरोपय_तटस्थः();
         gl::Ortho(0.0, 1.0, 1.0, 0.0, -1.0, 1.0);
         CV_CheckGlError();
 
-        gl::MatrixMode(gl::MODELVIEW);
-        gl::LoadIdentity();
+        gl::Matrix_बहुलकम्(gl::MODELVIEW);
+        gl::आरोपय_तटस्थः();
         CV_CheckGlError();
 
         gl::Disable(gl::LIGHTING);
@@ -2214,28 +2214,28 @@ void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<dou
         gl::Enable(gl::TEXTURE_2D);
         CV_CheckGlError();
 
-        gl::TexEnvi(gl::TEXTURE_ENV, gl::TEXTURE_ENV_MODE, gl::REPLACE);
+        gl::TexEnvi(gl::TEXTURE_ENV, gl::TEXTURE_ENV_बहुलकम्, gl::REPLACE);
         CV_CheckGlError();
 
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::रैखिकम्);
         CV_CheckGlError();
 
-        const double vertex[] =
+        ध्रुव द्विगुण vertex[] =
         {
             wndRect.x, wndRect.y, 0.0,
             wndRect.x, (wndRect.y + wndRect.height), 0.0,
-            wndRect.x + wndRect.width, (wndRect.y + wndRect.height), 0.0,
-            wndRect.x + wndRect.width, wndRect.y, 0.0
+            wndRect.x + wndRect.विस्तारः, (wndRect.y + wndRect.height), 0.0,
+            wndRect.x + wndRect.विस्तारः, wndRect.y, 0.0
         };
-        const double texCoords[] =
+        ध्रुव द्विगुण texCoords[] =
         {
             texRect.x, texRect.y,
             texRect.x, texRect.y + texRect.height,
-            texRect.x + texRect.width, texRect.y + texRect.height,
-            texRect.x + texRect.width, texRect.y
+            texRect.x + texRect.विस्तारः, texRect.y + texRect.height,
+            texRect.x + texRect.विस्तारः, texRect.y
         };
 
-        ogl::Buffer::unbind(ogl::Buffer::ARRAY_BUFFER);
+        ogl::बफर_2::unbind(ogl::बफर_2::ARRAY_बफर);
 
         gl::EnableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
@@ -2243,7 +2243,7 @@ void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<dou
         gl::TexCoordPointer(2, gl::DOUBLE, 0, texCoords);
         CV_CheckGlError();
 
-        gl::DisableClientState(gl::NORMAL_ARRAY);
+        gl::DisableClientState(gl::प्रसामान्यम्_ARRAY);
         gl::DisableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
 
@@ -2256,225 +2256,225 @@ void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<dou
         gl::DrawArrays(gl::QUADS, 0, 4);
         CV_CheckGlError();
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, int mode, Scalar color)
+शून्य cv::ogl::render(ध्रुव ogl::Arrays& arr, पूर्णाङ्क बहुलकम्, Scalar color)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(mode);
-    CV_UNUSED(color);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
+    CV_अप्रयुक्तम्(बहुलकम्);
+    CV_अप्रयुक्तम्(color);
     throw_no_ogl();
-#else
-    if (!arr.empty())
+#अन्यथा
+    यदि (!arr.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
         arr.bind();
 
-        gl::DrawArrays(mode, 0, arr.size());
+        gl::DrawArrays(बहुलकम्, 0, arr.size());
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scalar color)
+शून्य cv::ogl::render(ध्रुव ogl::Arrays& arr, निवेशः_Array indices, पूर्णाङ्क बहुलकम्, Scalar color)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(arr);
-    CV_UNUSED(indices);
-    CV_UNUSED(mode);
-    CV_UNUSED(color);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(arr);
+    CV_अप्रयुक्तम्(indices);
+    CV_अप्रयुक्तम्(बहुलकम्);
+    CV_अप्रयुक्तम्(color);
     throw_no_ogl();
-#else
-    if (!arr.empty() && !indices.empty())
+#अन्यथा
+    यदि (!arr.empty() && !indices.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
         arr.bind();
 
-        const int kind = indices.kind();
+        ध्रुव पूर्णाङ्क विधा = indices.विधा();
 
-        switch (kind)
+        विकल्प (विधा)
         {
-        case _InputArray::OPENGL_BUFFER :
+        पक्ष निवेशः_Array_2::OPENGL_बफर :
             {
-                ogl::Buffer buf = indices.getOGlBuffer();
+                ogl::बफर_2 buf = indices.get_OGl_बफर();
 
-                const int depth = buf.depth();
+                ध्रुव पूर्णाङ्क गभीरता = buf.गभीरता();
 
                 CV_Assert( buf.channels() == 1 );
-                CV_Assert( depth <= CV_32S );
+                CV_Assert( गभीरता <= CV_32S );
 
                 GLenum type;
-                if (depth < CV_16U)
+                यदि (गभीरता < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                अन्यथा यदि (गभीरता < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                अन्यथा
                     type = gl::UNSIGNED_INT;
 
-                buf.bind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
+                buf.bind(ogl::बफर_2::ELEMENT_ARRAY_बफर);
 
-                gl::DrawElements(mode, buf.size().area(), type, 0);
+                gl::DrawElements(बहुलकम्, buf.size().area(), type, 0);
 
-                ogl::Buffer::unbind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
+                ogl::बफर_2::unbind(ogl::बफर_2::ELEMENT_ARRAY_बफर);
 
-                break;
+                भङ्ग;
             }
 
-        default:
+        स्वभाव:
             {
                 Mat mat = indices.getMat();
 
-                const int depth = mat.depth();
+                ध्रुव पूर्णाङ्क गभीरता = mat.गभीरता();
 
                 CV_Assert( mat.channels() == 1 );
-                CV_Assert( depth <= CV_32S );
+                CV_Assert( गभीरता <= CV_32S );
                 CV_Assert( mat.isContinuous() );
 
                 GLenum type;
-                if (depth < CV_16U)
+                यदि (गभीरता < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                अन्यथा यदि (गभीरता < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                अन्यथा
                     type = gl::UNSIGNED_INT;
 
-                ogl::Buffer::unbind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
+                ogl::बफर_2::unbind(ogl::बफर_2::ELEMENT_ARRAY_बफर);
 
-                gl::DrawElements(mode, mat.size().area(), type, mat.data);
+                gl::DrawElements(बहुलकम्, mat.size().area(), type, mat.दत्त);
             }
         }
     }
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::clearColor(Scalar color)
+शून्य cv::ogl::clearColor(Scalar color)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(color);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(color);
     throw_no_ogl();
-#else
+#अन्यथा
     gl::ClearColor(static_cast<GLfloat>(color[0] / 255.0), static_cast<GLfloat>(color[1] / 255.0),
                    static_cast<GLfloat>(color[2] / 255.0), static_cast<GLfloat>(color[3] / 255.0));
-    gl::Clear(gl::COLOR_BUFFER_BIT);
-#endif // HAVE_OPENGL
+    gl::Clear(gl::COLOR_बफर_BIT);
+#यदि_अन्तः // HAVE_OPENGL
 }
 
-void cv::ogl::clearDepth(float depth)
+शून्य cv::ogl::clear_गभीरता(भिन्न गभीरता)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(depth);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(गभीरता);
     throw_no_ogl();
-#else
-    gl::ClearDepth(depth);
-    gl::Clear(gl::DEPTH_BUFFER_BIT);
-#endif // HAVE_OPENGL
+#अन्यथा
+    gl::Clear_गभीरता(गभीरता);
+    gl::Clear(gl::गभीरता_बफर_BIT);
+#यदि_अन्तः // HAVE_OPENGL
 }
 
-void cv::ogl::drawArrays(int first, int count, int mode)
+शून्य cv::ogl::drawArrays(पूर्णाङ्क first, पूर्णाङ्क गणनम्_2, पूर्णाङ्क बहुलकम्)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(mode);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(first); CV_अप्रयुक्तम्(गणनम्_2); CV_अप्रयुक्तम्(बहुलकम्);
     throw_no_ogl();
-#else
-    gl::DrawArrays(mode, first, count);
-#endif // HAVE_OPENGL
+#अन्यथा
+    gl::DrawArrays(बहुलकम्, first, गणनम्_2);
+#यदि_अन्तः // HAVE_OPENGL
 }
 
-void cv::ogl::drawElements(int first, int count, int type, int mode)
+शून्य cv::ogl::drawElements(पूर्णाङ्क first, पूर्णाङ्क गणनम्_2, पूर्णाङ्क type, पूर्णाङ्क बहुलकम्)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(first); CV_अप्रयुक्तम्(गणनम्_2); CV_अप्रयुक्तम्(type); CV_अप्रयुक्तम्(बहुलकम्);
     throw_no_ogl();
-#else
-    gl::DrawElements(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)));
-#endif
+#अन्यथा
+    gl::DrawElements(बहुलकम्, गणनम्_2, type, reinterpret_cast<ध्रुव शून्य*>(static_cast<size_t>(first)));
+#यदि_अन्तः
 }
 
-void cv::ogl::drawElementsInstanced(int first, int count, int type, int mode, int instanceCount)
+शून्य cv::ogl::drawElementsInstanced(पूर्णाङ्क first, पूर्णाङ्क गणनम्_2, पूर्णाङ्क type, पूर्णाङ्क बहुलकम्, पूर्णाङ्क instance_गणनम्)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode); CV_UNUSED(instanceCount);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(first); CV_अप्रयुक्तम्(गणनम्_2); CV_अप्रयुक्तम्(type); CV_अप्रयुक्तम्(बहुलकम्); CV_अप्रयुक्तम्(instance_गणनम्);
     throw_no_ogl();
-#else
-    gl::DrawElementsInstanced(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)), instanceCount);
+#अन्यथा
+    gl::DrawElementsInstanced(बहुलकम्, गणनम्_2, type, reinterpret_cast<ध्रुव शून्य*>(static_cast<size_t>(first)), instance_गणनम्);
     CV_CheckGlError();
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::blendFunc(int sfactor, int dfactor)
+शून्य cv::ogl::blendFunc(पूर्णाङ्क sfactor, पूर्णाङ्क dfactor)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(sfactor); CV_UNUSED(dfactor);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(sfactor); CV_अप्रयुक्तम्(dfactor);
     throw_no_ogl();
-#else
+#अन्यथा
     gl::BlendFunc(sfactor, dfactor);
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::depthMask(bool flag)
+शून्य cv::ogl::गभीरता_आवरणम्_2(तार्किक flag)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(flag);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(flag);
     throw_no_ogl();
-#else
-    gl::DepthMask(flag ? gl::TRUE_ : gl::FALSE_);
-#endif
+#अन्यथा
+    gl::गभीरता_आवरणम्(flag ? gl::TRUE_ : gl::FALSE_);
+#यदि_अन्तः
 }
 
-void cv::ogl::enable(int cap)
+शून्य cv::ogl::enable(पूर्णाङ्क cap)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(cap);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(cap);
     throw_no_ogl();
-#else
+#अन्यथा
     gl::Enable(cap);
-#endif
+#यदि_अन्तः
 }
 
-void cv::ogl::disable(int cap)
+शून्य cv::ogl::disable(पूर्णाङ्क cap)
 {
-#ifndef HAVE_OPENGL
-    CV_UNUSED(cap);
+#यदि_अपरिभाषितम् HAVE_OPENGL
+    CV_अप्रयुक्तम्(cap);
     throw_no_ogl();
-#else
+#अन्यथा
     gl::Disable(cap);
-#endif
+#यदि_अन्तः
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CL-GL Interoperability
 
-#ifdef HAVE_OPENCL
+#यदि_परिभाषितम् HAVE_OPENCL
 #  include "opencv2/core/opencl/runtime/opencl_core.hpp"
 #  include "opencv2/core/opencl/runtime/opencl_gl.hpp"
 #  ifdef cl_khr_gl_sharing
 #    define HAVE_OPENCL_OPENGL_SHARING
-#  else
+#  अन्यथा
 #    define NO_OPENCL_SHARING_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL/OpenGL sharing support")
 #  endif
-#else // HAVE_OPENCL
+#अन्यथा // HAVE_OPENCL
 #  define NO_OPENCL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL support")
-#endif // HAVE_OPENCL
+#यदि_अन्तः // HAVE_OPENCL
 
-#if defined(HAVE_OPENGL)
-#  if defined(__ANDROID__)
+#यदि defined(HAVE_OPENGL)
+#  यदि defined(__ANDROID__)
 #    include <EGL/egl.h>
 #  elif defined(__linux__)
 #    include <GL/glx.h>
 #  endif
-#endif // HAVE_OPENGL
+#यदि_अन्तः // HAVE_OPENGL
 
-namespace cv { namespace ogl {
+नामाकाश cv { नामाकाश ogl {
 
-#if defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
+#यदि defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
 // Check to avoid crash in OpenCL runtime: https://github.com/opencv/opencv/issues/5209
-static void checkOpenCLVersion()
+स्थिर शून्य checkOpenCLVersion()
 {
-    using namespace cv::ocl;
-    const Device& device = Device::getDefault();
+    उपयुज्य नामाकाश cv::ocl;
+    ध्रुव Device& device = Device::getDefault();
     //CV_Assert(!device.empty());
     cl_device_id dev = (cl_device_id)device.ptr();
     CV_Assert(dev);
@@ -2482,118 +2482,118 @@ static void checkOpenCLVersion()
     cl_platform_id platform_id = 0;
     size_t sz = 0;
 
-    cl_int status = clGetDeviceInfo(dev, CL_DEVICE_PLATFORM, sizeof(platform_id), &platform_id, &sz);
-    CV_Assert(status == CL_SUCCESS && sz == sizeof(cl_platform_id));
+    cl_int स्थितिः = clGetDeviceInfo(dev, CL_DEVICE_PLATFORM, परिमाण(platform_id), &platform_id, &sz);
+    CV_Assert(स्थितिः == CL_SUCCESS && sz == परिमाण(cl_platform_id));
     CV_Assert(platform_id);
 
     PlatformInfo pi(&platform_id);
-    int versionMajor = pi.versionMajor();
-    int versionMinor = pi.versionMinor();
-    if (versionMajor < 1 || (versionMajor == 1 && versionMinor <= 1))
+    पूर्णाङ्क संस्करणम्_Major_2 = pi.संस्करणम्_Major_2();
+    पूर्णाङ्क संस्करणम्_Minor_2 = pi.संस्करणम्_Minor_2();
+    यदि (संस्करणम्_Major_2 < 1 || (संस्करणम्_Major_2 == 1 && संस्करणम्_Minor_2 <= 1))
         CV_Error_(cv::Error::OpenCLApiCallError,
             ("OpenCL: clCreateFromGLTexture requires OpenCL 1.2+ version: %d.%d - %s (%s)",
-                versionMajor, versionMinor, pi.name().c_str(), pi.version().c_str())
+                संस्करणम्_Major_2, संस्करणम्_Minor_2, pi.name().c_str(), pi.संस्करणम्().c_str())
         );
 }
-#endif
+#यदि_अन्तः
 
-namespace ocl {
+नामाकाश ocl {
 
 Context& initializeContextFromGL()
 {
-#if !defined(HAVE_OPENGL)
+#यदि !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#नोचेद्यदि !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#नोचेद्यदि !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#अन्यथा
     cl_uint platformsCnt = 0;
     cl_uint devCnt = 0;
-    cl_device_id* devices = nullptr;
-    cl_uint devUsed = 0;
-    cl_context context = nullptr;
+    cl_device_id* devices = शून्यसूचकः;
+    cl_uint dev_प्रयुक्तम् = 0;
+    cl_context context = शून्यसूचकः;
 
-    cl_int status = clGetPlatformIDs(0, NULL, &platformsCnt);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get number of platforms: %d", status));
-    if (platformsCnt == 0)
+    cl_int स्थितिः = clGetPlatformIDs(0, रिक्त, &platformsCnt);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get number of platforms: %d", स्थितिः));
+    यदि (platformsCnt == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
     std::vector<cl_platform_id> platforms(platformsCnt);
-    status = clGetPlatformIDs(platformsCnt, &platforms[0], NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platforms: %d", status));
+    स्थितिः = clGetPlatformIDs(platformsCnt, &platforms[0], रिक्त);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platforms: %d", स्थितिः));
 
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    bool sharingSupported = false;
+    तार्किक sharingSupported = असत्य;
 
-    for (unsigned int i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
-        status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, NULL, &devCnt);
-        if (status != CL_SUCCESS)
-            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
+    प्रति (अचिह्नित पूर्णाङ्क i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
+        स्थितिः = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, रिक्त, &devCnt);
+        यदि (स्थितिः != CL_SUCCESS)
+            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", स्थितिः));
 
-        try {
-            devices = new cl_device_id[devCnt];
+        यत्न {
+            devices = नूतन cl_device_id[devCnt];
 
-            status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, devCnt, devices, NULL);
-            if (status != CL_SUCCESS)
-                CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platform devices: %d", status));
+            स्थितिः = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, devCnt, devices, रिक्त);
+            यदि (स्थितिः != CL_SUCCESS)
+                CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platform devices: %d", स्थितिः));
 
-            for (unsigned int j = 0; (!sharingSupported && (j < devCnt)); ++j) {
-                size_t extensionSize;
-                status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, NULL, &extensionSize );
-                if (status != CL_SUCCESS)
-                    CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
+            प्रति (अचिह्नित पूर्णाङ्क j = 0; (!sharingSupported && (j < devCnt)); ++j) {
+                size_t extension_आकार;
+                स्थितिः = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, रिक्त, &extension_आकार );
+                यदि (स्थितिः != CL_SUCCESS)
+                    CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", स्थितिः));
 
-                if(extensionSize > 0)
+                यदि(extension_आकार > 0)
                 {
-                    std::string devString(extensionSize, '\0');
-                    status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, devString.size(), &devString[0], &extensionSize);
-                    if (status != CL_SUCCESS)
-                        continue;
-                    if (extensionSize > 0 && devString.size() >= extensionSize)
-                        devString.resize(extensionSize - 1);
+                    std::string devString(extension_आकार, '\0');
+                    स्थितिः = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, devString.size(), &devString[0], &extension_आकार);
+                    यदि (स्थितिः != CL_SUCCESS)
+                        अनुवर्त;
+                    यदि (extension_आकार > 0 && devString.size() >= extension_आकार)
+                        devString.resize(extension_आकार - 1);
 
                     size_t oldPos = 0;
                     size_t spacePos = devString.find(' ', oldPos); // extensions string is space delimited
-                    while (spacePos != devString.npos) {
-                        if (strcmp(GL_SHARING_EXTENSION,
+                    यावत् (spacePos != devString.npos) {
+                        यदि (वाक्यं_तुलय(GL_SHARING_EXTENSION,
                                 devString.substr(oldPos, spacePos - oldPos).c_str())
                                 == 0) {
                             // Device supports context sharing with OpenGL
-                            devUsed = i;
-                            sharingSupported = true;
-                            break;
+                            dev_प्रयुक्तम् = i;
+                            sharingSupported = सत्य;
+                            भङ्ग;
                         }
-                        do {
+                        कुरु {
                             oldPos = spacePos + 1;
                             spacePos = devString.find(' ', oldPos);
-                        } while (spacePos == oldPos);
+                        } यावत् (spacePos == oldPos);
                     }
                 }
             }
-        } catch(...) {
+        } गृहाण(...) {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Exception thrown during device information gathering");
-            if(devices != nullptr) {
-                delete[] devices;
+            यदि(devices != शून्यसूचकः) {
+                विलोपय[] devices;
             }
-            continue;
+            अनुवर्त;
         }
 
-        if (sharingSupported) {
+        यदि (sharingSupported) {
             // Define OS-specific context properties and create the OpenCL context
-#if defined (__APPLE__)
+#यदि defined (__APPLE__)
                 CGLContextObj cglContext = CGLGetCurrentContext();
-                CGLShareGroupObj cglShareGroup = CGLGetShareGroup(cglContext);
+                CGLShare_गणः_Obj cgl_Share_गणः = CGLGet_Share_गणः(cglContext);
                 cl_context_properties props[] =
                 {
-                    CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)cglShareGroup,
+                    CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)cgl_Share_गणः,
                     0
                 };
-                context = clCreateContext(props, 0,0, NULL, NULL, &ciErrNum);
-#elif defined(__ANDROID__)
+                context = clCreateContext(props, 0,0, रिक्त, रिक्त, &ci_Err_अङ्कः);
+#नोचेद्यदि defined(__ANDROID__)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
@@ -2601,8 +2601,8 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#elif defined(_WIN32)
+                context = clCreateContext(props, 1, &devices[dev_प्रयुक्तम्], रिक्त, रिक्त, &स्थितिः);
+#नोचेद्यदि defined(_WIN32)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
@@ -2610,8 +2610,8 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#elif defined(__linux__)
+                context = clCreateContext(props, 1, &devices[dev_प्रयुक्तम्], रिक्त, रिक्त, &स्थितिः);
+#नोचेद्यदि defined(__linux__)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
@@ -2619,44 +2619,44 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#endif
+                context = clCreateContext(props, 1, &devices[dev_प्रयुक्तम्], रिक्त, रिक्त, &स्थितिः);
+#यदि_अन्तः
         }
 
-        if (status != CL_SUCCESS)
-            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't create context for OpenGL interop: %d", status));
-        else
-            break;
+        यदि (स्थितिः != CL_SUCCESS)
+            CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't create context for OpenGL interop: %d", स्थितिः));
+        अन्यथा
+            भङ्ग;
     }
 
 
-    cl_platform_id platform = platforms[devUsed];
+    cl_platform_id platform = platforms[dev_प्रयुक्तम्];
     std::string platformName = PlatformInfo(&platform).name();
 
-    OpenCLExecutionContext clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, devices[devUsed]);
-    clReleaseDevice(devices[devUsed]);
+    OpenCLExecutionContext clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, devices[dev_प्रयुक्तम्]);
+    clReleaseDevice(devices[dev_प्रयुक्तम्]);
     clReleaseContext(context);
     clExecCtx.bind();
-    return const_cast<Context&>(clExecCtx.getContext());
-#endif
+    प्रत्यागम const_cast<Context&>(clExecCtx.getContext());
+#यदि_अन्तः
 }
 
 } // namespace cv::ogl::ocl
 
-void convertToGLTexture2D(InputArray src, Texture2D& texture)
+शून्य convert_गन्तव्यम्_GLTexture2_D(निवेशः_Array src, Texture2D& texture)
 {
-    CV_UNUSED(src); CV_UNUSED(texture);
-#if !defined(HAVE_OPENGL)
+    CV_अप्रयुक्तम्(src); CV_अप्रयुक्तम्(texture);
+#यदि !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#नोचेद्यदि !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#नोचेद्यदि !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    Size srcSize = src.size();
-    CV_Assert(srcSize.width == (int)texture.cols() && srcSize.height == (int)texture.rows());
+#अन्यथा
+    आकार src_आकार = src.size();
+    CV_Assert(src_आकार.विस्तारः == (पूर्णाङ्क)texture.स्तम्भसङ्ख्या() && src_आकार.height == (पूर्णाङ्क)texture.पङ्क्तिकाः());
 
-    using namespace cv::ocl;
+    उपयुज्य नामाकाश cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
 
@@ -2668,55 +2668,55 @@ void convertToGLTexture2D(InputArray src, Texture2D& texture)
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
-    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_WRITE_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
+    cl_int स्थितिः = 0;
+    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_WRITE_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &स्थितिः);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", स्थितिः));
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_बफर = (cl_mem)u.handle(ACCESS_READ);
 
     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
+    स्थितिः = cl_पङ्क्तौ_निक्षिप_Acquire_GLObjects(q, 1, &clImage, 0, रिक्त, रिक्त);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", स्थितिः));
     size_t offset = 0; // TODO
     size_t dst_origin[3] = {0, 0, 0};
-    size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, dst_origin, region, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyBufferToImage failed: %d", status));
-    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
+    size_t region[3] = { (size_t)u.स्तम्भसङ्ख्या, (size_t)u.पङ्क्तिकाः, 1};
+    स्थितिः = cl_पङ्क्तौ_निक्षिप_Copy_बफर_गन्तव्यम्_Image(q, cl_बफर, clImage, offset, dst_origin, region, 0, रिक्त, रिक्त);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyBufferToImage failed: %d", स्थितिः));
+    स्थितिः = cl_पङ्क्तौ_निक्षिप_Release_GLObjects(q, 1, &clImage, 0, रिक्त, रिक्त);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", स्थितिः));
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
+    स्थितिः = clFinish(q); // TODO Use events
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", स्थितिः));
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
-#endif
+    स्थितिः = clReleaseMemObject(clImage); // TODO RAII
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", स्थितिः));
+#यदि_अन्तः
 }
 
-void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
+शून्य convertFromGLTexture2D(ध्रुव Texture2D& texture, OutputArray dst)
 {
-    CV_UNUSED(texture); CV_UNUSED(dst);
-#if !defined(HAVE_OPENGL)
+    CV_अप्रयुक्तम्(texture); CV_अप्रयुक्तम्(dst);
+#यदि !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#नोचेद्यदि !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#नोचेद्यदि !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#अन्यथा
     // check texture format
-    const int dtype = CV_8UC4;
+    ध्रुव पूर्णाङ्क dtype = CV_8UC4;
     CV_Assert(texture.format() == Texture2D::RGBA);
 
-    int textureType = dtype;
+    पूर्णाङ्क textureType = dtype;
     CV_Assert(textureType >= 0);
 
-    using namespace cv::ocl;
+    उपयुज्य नामाकाश cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
 
@@ -2730,119 +2730,119 @@ void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
-    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_READ_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
+    cl_int स्थितिः = 0;
+    cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_READ_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &स्थितिः);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", स्थितिः));
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_बफर = (cl_mem)u.handle(ACCESS_READ);
 
     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
+    स्थितिः = cl_पङ्क्तौ_निक्षिप_Acquire_GLObjects(q, 1, &clImage, 0, रिक्त, रिक्त);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", स्थितिः));
     size_t offset = 0; // TODO
     size_t src_origin[3] = {0, 0, 0};
-    size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyImageToBuffer failed: %d", status));
-    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
+    size_t region[3] = { (size_t)u.स्तम्भसङ्ख्या, (size_t)u.पङ्क्तिकाः, 1};
+    स्थितिः = cl_पङ्क्तौ_निक्षिप_Copy_Image_गन्तव्यम्_बफर(q, clImage, cl_बफर, src_origin, region, offset, 0, रिक्त, रिक्त);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyImageToBuffer failed: %d", स्थितिः));
+    स्थितिः = cl_पङ्क्तौ_निक्षिप_Release_GLObjects(q, 1, &clImage, 0, रिक्त, रिक्त);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", स्थितिः));
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
+    स्थितिः = clFinish(q); // TODO Use events
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", स्थितिः));
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
-#endif
+    स्थितिः = clReleaseMemObject(clImage); // TODO RAII
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", स्थितिः));
+#यदि_अन्तः
 }
 
 //void mapGLBuffer(const Buffer& buffer, UMat& dst, AccessFlag accessFlags)
-UMat mapGLBuffer(const Buffer& buffer, AccessFlag accessFlags)
+UMat mapGLBuffer(ध्रुव बफर_2& बफर, AccessFlag accessFlags)
 {
-    CV_UNUSED(buffer); CV_UNUSED(accessFlags);
-#if !defined(HAVE_OPENGL)
+    CV_अप्रयुक्तम्(बफर); CV_अप्रयुक्तम्(accessFlags);
+#यदि !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#नोचेद्यदि !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#नोचेद्यदि !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    using namespace cv::ocl;
+#अन्यथा
+    उपयुज्य नामाकाश cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
     cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
 
-    int clAccessFlags = 0;
-    switch (accessFlags & (ACCESS_READ|ACCESS_WRITE))
+    पूर्णाङ्क clAccessFlags = 0;
+    विकल्प (accessFlags & (ACCESS_READ|ACCESS_WRITE))
     {
-    default:
-    case ACCESS_READ+ACCESS_WRITE:
+    स्वभाव:
+    पक्ष ACCESS_READ+ACCESS_WRITE:
         clAccessFlags = CL_MEM_READ_WRITE;
-        break;
-    case ACCESS_READ:
+        भङ्ग;
+    पक्ष ACCESS_READ:
         clAccessFlags = CL_MEM_READ_ONLY;
-        break;
-    case ACCESS_WRITE:
+        भङ्ग;
+    पक्ष ACCESS_WRITE:
         clAccessFlags = CL_MEM_WRITE_ONLY;
-        break;
+        भङ्ग;
     }
 
-    cl_int status = 0;
-    cl_mem clBuffer = clCreateFromGLBuffer(context, clAccessFlags, buffer.bufId(), &status);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLBuffer failed: %d", status));
+    cl_int स्थितिः = 0;
+    cl_mem cl_बफर = clCreateFromGLBuffer(context, clAccessFlags, बफर.bufId(), &स्थितिः);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLBuffer failed: %d", स्थितिः));
 
     gl::Finish();
 
-    status = clEnqueueAcquireGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
+    स्थितिः = cl_पङ्क्तौ_निक्षिप_Acquire_GLObjects(clQueue, 1, &cl_बफर, 0, रिक्त, रिक्त);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", स्थितिः));
 
-    size_t step = buffer.cols() * buffer.elemSize();
-    int rows = buffer.rows();
-    int cols = buffer.cols();
-    int type = buffer.type();
+    size_t चरणः = बफर.स्तम्भसङ्ख्या() * बफर.elem_आकार();
+    पूर्णाङ्क पङ्क्तिकाः = बफर.पङ्क्तिकाः();
+    पूर्णाङ्क स्तम्भसङ्ख्या = बफर.स्तम्भसङ्ख्या();
+    पूर्णाङ्क type = बफर.type();
 
     UMat u;
-    convertFromBuffer(clBuffer, step, rows, cols, type, u);
-    return u;
-#endif
+    convert_From_बफर(cl_बफर, चरणः, पङ्क्तिकाः, स्तम्भसङ्ख्या, type, u);
+    प्रत्यागम u;
+#यदि_अन्तः
 }
 
-void unmapGLBuffer(UMat& u)
+शून्य unmapGLBuffer(UMat& u)
 {
-    CV_UNUSED(u);
-#if !defined(HAVE_OPENGL)
+    CV_अप्रयुक्तम्(u);
+#यदि !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#नोचेद्यदि !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#नोचेद्यदि !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    using namespace cv::ocl;
+#अन्यथा
+    उपयुज्य नामाकाश cv::ocl;
     cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_बफर = (cl_mem)u.handle(ACCESS_READ);
 
     u.release();
 
-    cl_int status = clEnqueueReleaseGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
+    cl_int स्थितिः = cl_पङ्क्तौ_निक्षिप_Release_GLObjects(clQueue, 1, &cl_बफर, 0, रिक्त, रिक्त);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", स्थितिः));
 
-    status = clFinish(clQueue);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
+    स्थितिः = clFinish(clQueue);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", स्थितिः));
 
-    status = clReleaseMemObject(clBuffer);
-    if (status != CL_SUCCESS)
-        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
-#endif
+    स्थितिः = clReleaseMemObject(cl_बफर);
+    यदि (स्थितिः != CL_SUCCESS)
+        CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", स्थितिः));
+#यदि_अन्तः
 }
 
 }} // namespace cv::ogl

@@ -8,68 +8,68 @@
 // Each piece is reduced by the existing serial code (including the HAL), and the results are
 // combined in piece order.
 
-#ifndef OPENCV_CORE_STAT_PARALLEL_HPP
-#define OPENCV_CORE_STAT_PARALLEL_HPP
+#यदि_अपरिभाषितम् OPENCV_CORE_STAT_PARALLEL_HPP
+#परिभाषय OPENCV_CORE_STAT_PARALLEL_HPP
 
-namespace cv {
+नामाकाश cv {
 
-struct StatChunk
+संरचना StatChunk
 {
-    Mat src, mask;
+    Mat src, आवरणम्;
     size_t firstElem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+स्थिर अन्तःस्थ तार्किक विभज_For_Parallel_Stat(ध्रुव Mat& src, ध्रुव Mat& आवरणम्, std::vector<StatChunk>& chunks)
 {
-    const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    ध्रुव size_t योग = src.योग(), work = योग*src.channels();
+    यदि (work < ((size_t)1 << 18))
+        प्रत्यागम असत्य;
+    ध्रुव पूर्णाङ्क nthreads = get_अङ्कः_तन्तवः();
+    यदि (nthreads <= 1)
+        प्रत्यागम असत्य;
+    ध्रुव पूर्णाङ्क n = (पूर्णाङ्क)std::min((size_t)nthreads*2, work >> 16);
+    यदि (n < 2)
+        प्रत्यागम असत्य;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    यदि (src.dims <= 2 && src.पङ्क्तिकाः >= n)
     {
-        for (int i = 0; i < n; i++)
+        प्रति (पूर्णाङ्क i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            पूर्णाङ्क r0 = (पूर्णाङ्क)((int64)src.पङ्क्तिकाः*i/n), r1 = (पूर्णाङ्क)((int64)src.पङ्क्तिकाः*(i + 1)/n);
             StatChunk c;
             c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
-                c.mask = mask.rowRange(r0, r1);
-            c.firstElem = (size_t)r0*src.cols;
+            यदि (!आवरणम्.empty())
+                c.आवरणम् = आवरणम्.rowRange(r0, r1);
+            c.firstElem = (size_t)r0*src.स्तम्भसङ्ख्या;
             chunks.push_back(c);
         }
-        return true;
+        प्रत्यागम सत्य;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    यदि (src.isContinuous() && (आवरणम्.empty() || आवरणम्.isContinuous()) && योग <= (size_t)अधिकतम_पूर्णाङ्कः)
     {
-        for (int i = 0; i < n; i++)
+        प्रति (पूर्णाङ्क i = 0; i < n; i++)
         {
-            size_t e0 = total*i/n, e1 = total*(i + 1)/n;
+            size_t e0 = योग*i/n, e1 = योग*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
+            c.src = Mat(1, (पूर्णाङ्क)(e1 - e0), src.type(), (शून्य*)(src.दत्त + e0*src.elem_आकार()));
+            यदि (!आवरणम्.empty())
+                c.आवरणम् = Mat(1, (पूर्णाङ्क)(e1 - e0), आवरणम्.type(), (शून्य*)(आवरणम्.दत्त + e0*आवरणम्.elem_आकार()));
             c.firstElem = e0;
             chunks.push_back(c);
         }
-        return true;
+        प्रत्यागम सत्य;
     }
-    return false;
+    प्रत्यागम असत्य;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+स्थिर अन्तःस्थ size_t chunk_सूचकांक_गन्तव्यम्_Elem(ध्रुव StatChunk& c, ध्रुव पूर्णाङ्क* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    प्रत्यागम c.firstElem + (size_t)idx[0]*c.src.स्तम्भसङ्ख्या + idx[1];
 }
 
 } // namespace cv
 
-#endif
+#यदि_अन्तः

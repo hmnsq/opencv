@@ -2,54 +2,54 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
-#define OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
+#यदि_अपरिभाषितम् OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
+#परिभाषय OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <vector>
-#include <functional>
-#endif
+#यदि 1 // if not already in precompiled headers
+#अन्तर्भाव <string>
+#अन्तर्भाव <vector>
+#अन्तर्भाव <functional>
+#यदि_अन्तः
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#अन्तर्भाव <opencv2/core/utils/logtag.hpp>
+#अन्तर्भाव "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+नामाकाश cv {
+नामाकाश utils {
+नामाकाश logging {
 
-class LogTagConfigParser
+वर्ग Log_चिह्नकम्_Config_Parser
 {
-public:
-    LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
-    explicit LogTagConfigParser(const std::string& input);
-    ~LogTagConfigParser();
+सार्वजनिक:
+    Log_चिह्नकम्_Config_Parser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
+    स्पष्ट Log_चिह्नकम्_Config_Parser(ध्रुव std::string& निवेशः_2);
+    ~Log_चिह्नकम्_Config_Parser();
 
-public:
-    bool parse(const std::string& input);
-    bool hasMalformed() const;
-    const LogTagConfig& getGlobalConfig() const;
-    const std::vector<LogTagConfig>& getFullNameConfigs() const;
-    const std::vector<LogTagConfig>& getFirstPartConfigs() const;
-    const std::vector<LogTagConfig>& getAnyPartConfigs() const;
-    const std::vector<std::string>& getMalformed() const;
+सार्वजनिक:
+    तार्किक parse(ध्रुव std::string& निवेशः_2);
+    तार्किक hasMalformed() ध्रुव;
+    ध्रुव Log_चिह्नकम्_Config& getGlobalConfig() ध्रुव;
+    ध्रुव std::vector<Log_चिह्नकम्_Config>& get_पूर्णम्_Name_Configs() ध्रुव;
+    ध्रुव std::vector<Log_चिह्नकम्_Config>& getFirstPartConfigs() ध्रुव;
+    ध्रुव std::vector<Log_चिह्नकम्_Config>& getAnyPartConfigs() ध्रुव;
+    ध्रुव std::vector<std::string>& getMalformed() ध्रुव;
 
-private:
-    void segmentTokens();
-    void parseNameAndLevel(const std::string& s);
-    void parseWildcard(const std::string& name, LogLevel level);
-    static std::pair<LogLevel, bool> parseLogLevel(const std::string& s);
-    static std::string toString(LogLevel level);
+गुप्त:
+    शून्य segmentTokens();
+    शून्य parseNameAndLevel(ध्रुव std::string& s);
+    शून्य parseWildcard(ध्रुव std::string& name, LogLevel level);
+    स्थिर std::pair<LogLevel, तार्किक> parseLogLevel(ध्रुव std::string& s);
+    स्थिर std::string गन्तव्यम्_String(LogLevel level);
 
-private:
-    std::string m_input;
-    LogTagConfig m_parsedGlobal;
-    std::vector<LogTagConfig> m_parsedFullName;
-    std::vector<LogTagConfig> m_parsedFirstPart;
-    std::vector<LogTagConfig> m_parsedAnyPart;
+गुप्त:
+    std::string m_निवेशः;
+    Log_चिह्नकम्_Config m_parsedGlobal;
+    std::vector<Log_चिह्नकम्_Config> m_parsed_पूर्णम्_Name;
+    std::vector<Log_चिह्नकम्_Config> m_parsedFirstPart;
+    std::vector<Log_चिह्नकम्_Config> m_parsedAnyPart;
     std::vector<std::string> m_malformed;
 };
 
 }}} //namespace
 
-#endif
+#यदि_अन्तः

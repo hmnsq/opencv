@@ -39,19 +39,19 @@
 //
 //M*/
 
-#ifndef __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
-#define __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
+#यदि_अपरिभाषितम् __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
+#परिभाषय __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
 
-namespace cv { namespace ocl { namespace runtime {
+नामाकाश cv { नामाकाश ocl { नामाकाश runtime {
 
-struct DynamicFnEntry
+संरचना Dynamic_Fn_प्रविष्टिः
 {
-    const char* fnName; // "clCreateContext"
-    void** ppFn; // &clCreateContext_pfn
+    ध्रुव वर्ण* fnName; // "clCreateContext"
+    शून्य** ppFn; // &clCreateContext_pfn
 };
 
 } } } // namespace cv::ocl::runtime
 
-using namespace cv::ocl::runtime;
+उपयुज्य नामाकाश cv::ocl::runtime;
 
-#endif // __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
+#यदि_अन्तः // __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__

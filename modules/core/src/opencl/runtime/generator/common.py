@@ -1,274 +1,274 @@
-from __future__ import print_function
-import sys, os, re
+तः __future__ आनयन print_function
+आनयन sys, os, re
 
 #
 # Parser helpers
 #
 
-def remove_comments(s):
-    def replacer(match):
-        s = match.group(0)
-        if s.startswith('/'):
-            return ""
-        else:
-            return s
-    pattern = re.compile(
+परिभाषा remove_comments(s):
+    परिभाषा replacer(मेलनम्):
+        s = मेलनम्.गणः(0)
+        यदि s.startswith('/'):
+            प्रत्यागम ""
+        अन्यथा:
+            प्रत्यागम s
+    आदर्शः = re.compile(
         r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
         re.DOTALL | re.MULTILINE
     )
-    return re.sub(pattern, replacer, s)
+    प्रत्यागम re.sub(आदर्शः, replacer, s)
 
 
-def getTokens(s):
-    return re.findall(r'[a-z_A-Z0-9_]+|[^[a-z_A-Z0-9_ \n\r\t]', s)
+परिभाषा getTokens(s):
+    प्रत्यागम re.findall(r'[a-z_A-Z0-9_]+|[^[a-z_A-Z0-9_ \n\r\t]', s)
 
 
-def getParameter(pos, tokens):
+परिभाषा getParameter(pos, tokens):
     deep = 0
     p = []
-    while True:
-        if pos >= len(tokens):
-            break
-        if (tokens[pos] == ')' or tokens[pos] == ',') and deep == 0:
-            if tokens[pos] == ')':
-                pos = len(tokens)
-            else:
+    यावत् सत्य:
+        यदि pos >= दीर्घता(tokens):
+            भङ्ग
+        यदि (tokens[pos] == ')' वा tokens[pos] == ',') च deep == 0:
+            यदि tokens[pos] == ')':
+                pos = दीर्घता(tokens)
+            अन्यथा:
                 pos += 1
-            break
-        if tokens[pos] == '(':
+            भङ्ग
+        यदि tokens[pos] == '(':
             deep += 1
-        if tokens[pos] == ')':
+        यदि tokens[pos] == ')':
             deep -= 1
         p.append(tokens[pos])
         pos += 1
-    return (' '.join(p), pos)
+    प्रत्यागम (' '.join(p), pos)
 
 
-def getParameters(i, tokens):
-    assert tokens[i] == '('
+परिभाषा getParameters(i, tokens):
+    प्रतिज्ञा tokens[i] == '('
     i += 1
 
     params = []
-    while True:
-        if i >= len(tokens) or tokens[i] == ')':
-            break
+    यावत् सत्य:
+        यदि i >= दीर्घता(tokens) वा tokens[i] == ')':
+            भङ्ग
 
         (param, i) = getParameter(i, tokens)
-        if len(param) > 0:
+        यदि दीर्घता(param) > 0:
             params.append(param)
-        else:
-            assert False
-            break
+        अन्यथा:
+            प्रतिज्ञा असत्य
+            भङ्ग
 
-    if len(params) > 0 and params[0] == 'void':
-        del params[0]
+    यदि दीर्घता(params) > 0 च params[0] == 'void':
+        अपनय params[0]
 
-    return params
+    प्रत्यागम params
 
-def postProcessParameters(fns):
-    fns.sort(key=lambda x: x['name'])
-    for fn in fns:
+परिभाषा postProcessParameters(fns):
+    fns.क्रमय_2(कुञ्चिका=अनामन् x: x['name'])
+    प्रति fn अन्तः fns:
         fn['params_full'] = list(fn['params'])
-        for i in range(len(fn['params'])):
+        प्रति i अन्तः परिसरः(दीर्घता(fn['params'])):
             p = fn['params'][i]
-            if p.find('(') != -1:
+            यदि p.find('(') != -1:
                 p = re.sub(r'\* *([a-zA-Z0-9_]*) ?\)', '*)', p, 1)
                 fn['params'][i] = p
-                continue
+                अनुवर्त
             parts = re.findall(r'[a-z_A-Z0-9]+|\*', p)
-            if len(parts) > 1:
-                if parts[-1].find('*') == -1:
-                    del parts[-1]
+            यदि दीर्घता(parts) > 1:
+                यदि parts[-1].find('*') == -1:
+                    अपनय parts[-1]
             fn['params'][i] = ' '.join(parts)
 
-def readFunctionFilter(fns, fileName):
-    try:
+परिभाषा readFunctionFilter(fns, fileName):
+    यत्न:
         f = open(fileName, "r")
-    except:
-        print("ERROR: Can't open filter file: %s" % fileName)
-        return 0
+    अपवाद:
+        मुद्रय("ERROR: Can't open filter file: %s" % fileName)
+        प्रत्यागम 0
 
-    count = 0
-    while f:
-        line = f.readline()
-        if not line:
-            break
-        assert isinstance(line, str)
-        if line.startswith('#') or line.startswith('//'):
-            continue
-        line = line.replace('\n', '')
-        if len(line) == 0:
-            continue
-        found = False
-        for fn in fns:
-            if fn['name'] == line:
-                found = True
-                fn['enabled'] = True
-        if not found:
-            sys.exit("FATAL ERROR: Unknown function: %s" % line)
-        count = count + 1
+    गणनम्_2 = 0
+    यावत् f:
+        पङ्क्तिः = f.readline()
+        यदि न पङ्क्तिः:
+            भङ्ग
+        प्रतिज्ञा isinstance(पङ्क्तिः, str)
+        यदि पङ्क्तिः.startswith('#') वा पङ्क्तिः.startswith('//'):
+            अनुवर्त
+        पङ्क्तिः = पङ्क्तिः.replace('\n', '')
+        यदि दीर्घता(पङ्क्तिः) == 0:
+            अनुवर्त
+        प्राप्तम् = असत्य
+        प्रति fn अन्तः fns:
+            यदि fn['name'] == पङ्क्तिः:
+                प्राप्तम् = सत्य
+                fn['enabled'] = सत्य
+        यदि न प्राप्तम्:
+            sys.exit("FATAL ERROR: Unknown function: %s" % पङ्क्तिः)
+        गणनम्_2 = गणनम्_2 + 1
     f.close()
-    return count
+    प्रत्यागम गणनम्_2
 
 #
 # Generator helpers
 #
 
-def outputToString(f):
-    def wrapped(*args, **kwargs):
-        from io import StringIO
+परिभाषा output_गन्तव्यम्_String(f):
+    परिभाषा wrapped(*तर्काः, **kwargs):
+        तः io आनयन StringIO
         old_stdout = sys.stdout
         sys.stdout = str_stdout = StringIO()
-        res = f(*args, **kwargs)
-        assert res is None
+        res = f(*तर्काः, **kwargs)
+        प्रतिज्ञा res अस्ति किमपि_न
         sys.stdout = old_stdout
-        result = str_stdout.getvalue()
-        result = re.sub(r'([^\n /]) [ ]+', r'\1 ', result)  # don't remove spaces at start of line
-        result = re.sub(r' ,', ',', result)
-        result = re.sub(r' \*', '*', result)
-        result = re.sub(r'\( ', '(', result)
-        result = re.sub(r' \)', ')', result)
-        return result
-    return wrapped
+        परिणाम = str_stdout.getvalue()
+        परिणाम = re.sub(r'([^\n /]) [ ]+', r'\1 ', परिणाम)  # don't remove spaces at start of line
+        परिणाम = re.sub(r' ,', ',', परिणाम)
+        परिणाम = re.sub(r' \*', '*', परिणाम)
+        परिणाम = re.sub(r'\( ', '(', परिणाम)
+        परिणाम = re.sub(r' \)', ')', परिणाम)
+        प्रत्यागम परिणाम
+    प्रत्यागम wrapped
 
-@outputToString
-def generateFilterNames(fns):
-    for fn in fns:
-        print('%s%s' % ('' if 'enabled' in fn else '//', fn['name']))
-    print('#total %d' % len(fns))
+@output_गन्तव्यम्_String
+परिभाषा generate_Filter_नामानि(fns):
+    प्रति fn अन्तः fns:
+        मुद्रय('%s%s' % ('' यदि 'enabled' अन्तः fn अन्यथा '//', fn['name']))
+    मुद्रय('#total %d' % दीर्घता(fns))
 
 callback_check = re.compile(r'([^\(]*\(.*)(\* *)(\).*\(.*\))')
 
-def getTypeWithParam(t, p):
-    if callback_check.match(t):
-        return callback_check.sub(r'\1 *' + p + r'\3', t)
-    return t + ' ' + p
+परिभाषा getTypeWithParam(t, p):
+    यदि callback_check.मेलनम्(t):
+        प्रत्यागम callback_check.sub(r'\1 *' + p + r'\3', t)
+    प्रत्यागम t + ' ' + p
 
-@outputToString
-def generateStructDefinitions(fns, lprefix='opencl_fn', enumprefix='OPENCL_FN'):
-    print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
-        decl_args = []
-        for (i, t) in enumerate(fn['params']):
-            decl_args.append(getTypeWithParam(t, 'p%d' % (i+1)))
-        decl_args_str = '(' + (', '.join(decl_args)) + ')'
-        print('%s%s%d(%s_%s, %s, %s)' % \
-             (commentStr, lprefix, len(fn['params']), enumprefix, fn['name'], \
-             ' '.join(fn['ret']), decl_args_str))
-        print(commentStr + ('%s%s (%s *%s)(%s) =\n%s        %s_%s_switch_fn;' % \
-            ((' '.join(fn['modifiers'] + ' ') if len(fn['modifiers']) > 0 else ''),
+@output_गन्तव्यम्_String
+परिभाषा generateStructDefinitions(fns, lprefix='opencl_fn', enumprefix='OPENCL_FN'):
+    मुद्रय('// generated by %s' % os.मार्गः.basename(sys.argv[0]))
+    प्रति fn अन्तः fns:
+        commentStr = '' यदि 'enabled' अन्तः fn अन्यथा '//'
+        decl_तर्काः = []
+        प्रति (i, t) अन्तः enumerate(fn['params']):
+            decl_तर्काः.append(getTypeWithParam(t, 'p%d' % (i+1)))
+        decl_तर्काः_str = '(' + (', '.join(decl_तर्काः)) + ')'
+        मुद्रय('%s%s%d(%s_%s, %s, %s)' % \
+             (commentStr, lprefix, दीर्घता(fn['params']), enumprefix, fn['name'], \
+             ' '.join(fn['ret']), decl_तर्काः_str))
+        मुद्रय(commentStr + ('%s%s (%s *%s)(%s) =\n%s        %s_%s_switch_fn;' % \
+            ((' '.join(fn['modifiers'] + ' ') यदि दीर्घता(fn['modifiers']) > 0 अन्यथा ''),
              ' '.join(fn['ret']), ' '.join(fn['calling']), fn['name'], ', '.join(fn['params']), \
              commentStr, enumprefix, fn['name'])))
-        print(commentStr + ('static const struct DynamicFnEntry %s_definition = { "%s", (void**)&%s};' % (fn['name'], fn['name'], fn['name'])))
-        print()
+        मुद्रय(commentStr + ('static const struct DynamicFnEntry %s_definition = { "%s", (void**)&%s};' % (fn['name'], fn['name'], fn['name'])))
+        मुद्रय()
 
-@outputToString
-def generateStaticDefinitions(fns):
-    print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
-        decl_args = []
-        for (i, t) in enumerate(fn['params']):
-            decl_args.append(getTypeWithParam(t, 'p%d' % (i+1)))
-        decl_args_str = '(' + (', '.join(decl_args)) + ')'
-        print(commentStr + ('CL_RUNTIME_EXPORT %s%s (%s *%s_pfn)(%s) = %s;' % \
-            ((' '.join(fn['modifiers'] + ' ') if len(fn['modifiers']) > 0 else ''),
+@output_गन्तव्यम्_String
+परिभाषा generateStaticDefinitions(fns):
+    मुद्रय('// generated by %s' % os.मार्गः.basename(sys.argv[0]))
+    प्रति fn अन्तः fns:
+        commentStr = '' यदि 'enabled' अन्तः fn अन्यथा '//'
+        decl_तर्काः = []
+        प्रति (i, t) अन्तः enumerate(fn['params']):
+            decl_तर्काः.append(getTypeWithParam(t, 'p%d' % (i+1)))
+        decl_तर्काः_str = '(' + (', '.join(decl_तर्काः)) + ')'
+        मुद्रय(commentStr + ('CL_RUNTIME_EXPORT %s%s (%s *%s_pfn)(%s) = %s;' % \
+            ((' '.join(fn['modifiers'] + ' ') यदि दीर्घता(fn['modifiers']) > 0 अन्यथा ''),
              ' '.join(fn['ret']), ' '.join(fn['calling']), fn['name'], ', '.join(fn['params']), \
              fn['name'])))
 
-@outputToString
-def generateListOfDefinitions(fns, name='opencl_fn_list'):
-    print('// generated by %s' % os.path.basename(sys.argv[0]))
-    print('static const struct DynamicFnEntry* %s[] = {' % (name))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
-        if 'enabled' in fn:
-            print('    &%s_definition,' % (fn['name']))
-        else:
-            print('    NULL/*&%s_definition*/,' % (fn['name']))
-        first = False
-    print('};')
+@output_गन्तव्यम्_String
+परिभाषा generate_List_सम्बन्धि_Definitions(fns, name='opencl_fn_list'):
+    मुद्रय('// generated by %s' % os.मार्गः.basename(sys.argv[0]))
+    मुद्रय('static const struct DynamicFnEntry* %s[] = {' % (name))
+    प्रति fn अन्तः fns:
+        commentStr = '' यदि 'enabled' अन्तः fn अन्यथा '//'
+        यदि 'enabled' अन्तः fn:
+            मुद्रय('    &%s_definition,' % (fn['name']))
+        अन्यथा:
+            मुद्रय('    NULL/*&%s_definition*/,' % (fn['name']))
+        first = असत्य
+    मुद्रय('};')
 
-@outputToString
-def generateEnums(fns, prefix='OPENCL_FN'):
-    print('// generated by %s' % os.path.basename(sys.argv[0]))
-    print('enum %s_ID {' % prefix)
-    for (i, fn) in enumerate(fns):
-        commentStr = '' if 'enabled' in fn else '//'
-        print(commentStr + ('    %s_%s = %d,' % (prefix, fn['name'], i)))
-    print('};')
+@output_गन्तव्यम्_String
+परिभाषा generateEnums(fns, उपसर्गः='OPENCL_FN'):
+    मुद्रय('// generated by %s' % os.मार्गः.basename(sys.argv[0]))
+    मुद्रय('enum %s_ID {' % उपसर्गः)
+    प्रति (i, fn) अन्तः enumerate(fns):
+        commentStr = '' यदि 'enabled' अन्तः fn अन्यथा '//'
+        मुद्रय(commentStr + ('    %s_%s = %d,' % (उपसर्गः, fn['name'], i)))
+    मुद्रय('};')
 
-@outputToString
-def generateRemapOrigin(fns):
-    print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        print('#define %s %s_' % (fn['name'], fn['name']))
+@output_गन्तव्यम्_String
+परिभाषा generateRemapOrigin(fns):
+    मुद्रय('// generated by %s' % os.मार्गः.basename(sys.argv[0]))
+    प्रति fn अन्तः fns:
+        मुद्रय('#define %s %s_' % (fn['name'], fn['name']))
 
-@outputToString
-def generateRemapDynamic(fns):
-    print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        print('#undef %s' % (fn['name']))
-        commentStr = '' if 'enabled' in fn else '//'
-        print(commentStr + ('#define %s %s_pfn' % (fn['name'], fn['name'])))
+@output_गन्तव्यम्_String
+परिभाषा generateRemapDynamic(fns):
+    मुद्रय('// generated by %s' % os.मार्गः.basename(sys.argv[0]))
+    प्रति fn अन्तः fns:
+        मुद्रय('#undef %s' % (fn['name']))
+        commentStr = '' यदि 'enabled' अन्तः fn अन्यथा '//'
+        मुद्रय(commentStr + ('#define %s %s_pfn' % (fn['name'], fn['name'])))
 
-@outputToString
-def generateFnDeclaration(fns):
-    print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
-        print(commentStr + ('extern CL_RUNTIME_EXPORT %s %s (%s *%s)(%s);' % (' '.join(fn['modifiers']), ' '.join(fn['ret']), ' '.join(fn['calling']),
-                                  fn['name'], ', '.join(fn['params'] if 'params_full' not in fn else fn['params_full']))))
+@output_गन्तव्यम्_String
+परिभाषा generateFnDeclaration(fns):
+    मुद्रय('// generated by %s' % os.मार्गः.basename(sys.argv[0]))
+    प्रति fn अन्तः fns:
+        commentStr = '' यदि 'enabled' अन्तः fn अन्यथा '//'
+        मुद्रय(commentStr + ('extern CL_RUNTIME_EXPORT %s %s (%s *%s)(%s);' % (' '.join(fn['modifiers']), ' '.join(fn['ret']), ' '.join(fn['calling']),
+                                  fn['name'], ', '.join(fn['params'] यदि 'params_full' न अन्तः fn अन्यथा fn['params_full']))))
 
-@outputToString
-def generateTemplates(total, lprefix, switch_name, calling_convention=''):
-    print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for sz in range(total):
+@output_गन्तव्यम्_String
+परिभाषा generateTemplates(योग, lprefix, switch_name, calling_convention=''):
+    मुद्रय('// generated by %s' % os.मार्गः.basename(sys.argv[0]))
+    प्रति sz अन्तः परिसरः(योग):
         template_params = ['ID', '_R', 'decl_args']
-        params = ['p%d' % (i + 1) for i in range(0, sz)]
-        print('#define %s%d(%s) \\' % (lprefix, sz, ', '.join(template_params)))
-        print('    typedef _R (%s *ID##FN)decl_args; \\' % (calling_convention))
-        print('    static _R %s ID##_switch_fn decl_args \\' % (calling_convention))
-        print('    { return ((ID##FN)%s(ID))(%s); } \\' % (switch_name, ', '.join(params)))
-        print('')
+        params = ['p%d' % (i + 1) प्रति i अन्तः परिसरः(0, sz)]
+        मुद्रय('#define %s%d(%s) \\' % (lprefix, sz, ', '.join(template_params)))
+        मुद्रय('    typedef _R (%s *ID##FN)decl_args; \\' % (calling_convention))
+        मुद्रय('    static _R %s ID##_switch_fn decl_args \\' % (calling_convention))
+        मुद्रय('    { return ((ID##FN)%s(ID))(%s); } \\' % (switch_name, ', '.join(params)))
+        मुद्रय('')
 
-@outputToString
-def generateInlineWrappers(fns):
-    print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
-        print('#undef %s' % (fn['name']))
-        print(commentStr + ('#define %s %s_fn' % (fn['name'], fn['name'])))
+@output_गन्तव्यम्_String
+परिभाषा generateInlineWrappers(fns):
+    मुद्रय('// generated by %s' % os.मार्गः.basename(sys.argv[0]))
+    प्रति fn अन्तः fns:
+        commentStr = '' यदि 'enabled' अन्तः fn अन्यथा '//'
+        मुद्रय('#undef %s' % (fn['name']))
+        मुद्रय(commentStr + ('#define %s %s_fn' % (fn['name'], fn['name'])))
         params = []
         call_params = []
-        for i in range(0, len(fn['params'])):
+        प्रति i अन्तः परिसरः(0, दीर्घता(fn['params'])):
             t = fn['params'][i]
-            if t.find('*)') >= 0:
+            यदि t.find('*)') >= 0:
                 p = re.sub(r'\*\)', (' *p%d)' % i), t, 1)
                 params.append(p)
-            else:
+            अन्यथा:
                 params.append('%s p%d' % (t, i))
             call_params.append('p%d' % (i))
 
-        if len(fn['ret']) == 1 and fn['ret'][0] == 'void':
-            print(commentStr + ('inline void %s(%s) { %s_pfn(%s); }' \
+        यदि दीर्घता(fn['ret']) == 1 च fn['ret'][0] == 'void':
+            मुद्रय(commentStr + ('inline void %s(%s) { %s_pfn(%s); }' \
                     % (fn['name'], ', '.join(params), fn['name'], ', '.join(call_params))))
-        else:
-            print(commentStr + ('inline %s %s(%s) { return %s_pfn(%s); }' \
+        अन्यथा:
+            मुद्रय(commentStr + ('inline %s %s(%s) { return %s_pfn(%s); }' \
                     % (' '.join(fn['ret']), fn['name'], ', '.join(params), fn['name'], ', '.join(call_params))))
 
-def ProcessTemplate(inputFile, ctx, noteLine='//\n// AUTOGENERATED, DO NOT EDIT\n//'):
-    f = open(inputFile, "r")
-    if noteLine:
-        print(noteLine)
-    for line in f:
-        if line.startswith('@'):
-            assert line[-1] == '\n'
-            line = line[:-1]  # remove '\n'
-            assert line[-1] == '@'
-            name = line[1:-1]
-            assert name in ctx, name
-            line = ctx[name] + ('\n' if len(ctx[name]) > 0 and ctx[name][-1] != '\n' else '')
-        sys.stdout.write(line)
+परिभाषा ProcessTemplate(निवेशः_File, ctx, note_पङ्क्तिः='//\n// AUTOGENERATED, DO NOT EDIT\n//'):
+    f = open(निवेशः_File, "r")
+    यदि note_पङ्क्तिः:
+        मुद्रय(note_पङ्क्तिः)
+    प्रति पङ्क्तिः अन्तः f:
+        यदि पङ्क्तिः.startswith('@'):
+            प्रतिज्ञा पङ्क्तिः[-1] == '\n'
+            पङ्क्तिः = पङ्क्तिः[:-1]  # remove '\n'
+            प्रतिज्ञा पङ्क्तिः[-1] == '@'
+            name = पङ्क्तिः[1:-1]
+            प्रतिज्ञा name अन्तः ctx, name
+            पङ्क्तिः = ctx[name] + ('\n' यदि दीर्घता(ctx[name]) > 0 च ctx[name][-1] != '\n' अन्यथा '')
+        sys.stdout.लिख(पङ्क्तिः)
     f.close()

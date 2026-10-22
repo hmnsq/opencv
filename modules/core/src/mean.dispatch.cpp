@@ -3,497 +3,497 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
-#include "stat_parallel.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "opencl_kernels_core.hpp"
+#अन्तर्भाव "stat.hpp"
+#अन्तर्भाव "stat_parallel.hpp"
 
-#include "mean.simd.hpp"
-#include "mean.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#अन्तर्भाव "mean.simd.hpp"
+#अन्तर्भाव "mean.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
 
-namespace cv {
+नामाकाश cv {
 
 // serial implementation, also used for the pieces of the parallel version
-static Scalar mean_(const Mat& src, const Mat& mask)
+स्थिर Scalar माध्यम्_3(ध्रुव Mat& src, ध्रुव Mat& आवरणम्)
 {
-    CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size) );
-    if (src.empty())
-        return Scalar::all(0.0);
+    CV_Assert( आवरणम्.empty() || ((आवरणम्.type() == CV_8U || आवरणम्.type() == CV_8S || आवरणम्.type() == CV_Bool) && src.size == आवरणम्.size) );
+    यदि (src.empty())
+        प्रत्यागम Scalar::all(0.0);
 
-    int k, cn = src.channels(), depth = src.depth();
+    पूर्णाङ्क k, cn = src.channels(), गभीरता = src.गभीरता();
     Scalar s = Scalar::all(0.0);
 
     CV_Assert( cn <= 4 );
 
-    if (src.isContinuous() && mask.isContinuous())
+    यदि (src.isContinuous() && आवरणम्.isContinuous())
     {
-        CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.data, 0, (int)src.total(), 1, src.type(),
-                      &s[0], nullptr /*stddev*/, mask.data, 0);
+        CALL_HAL_RET2(माध्यम्_Std_Dev, cv_hal_माध्यम्_Std_Dev, s, src.दत्त, 0, (पूर्णाङ्क)src.योग(), 1, src.type(),
+                      &s[0], शून्यसूचकः /*stddev*/, आवरणम्.दत्त, 0);
     }
-    else
+    अन्यथा
     {
-        if (src.dims <= 2)
+        यदि (src.dims <= 2)
         {
-            CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.data, src.step, src.cols, src.rows, src.type(),
-                          &s[0], nullptr, mask.data, mask.step);
+            CALL_HAL_RET2(माध्यम्_Std_Dev, cv_hal_माध्यम्_Std_Dev, s, src.दत्त, src.चरणः, src.स्तम्भसङ्ख्या, src.पङ्क्तिकाः, src.type(),
+                          &s[0], शून्यसूचकः, आवरणम्.दत्त, आवरणम्.चरणः);
         }
     }
 
-    SumFunc func = getSumFunc(depth);
+    योग_Func func = get_योग_Func(गभीरता);
 
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ध्रुव Mat* arrays[] = {&src, &आवरणम्, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
-    int _buf[CV_CN_MAX];
-    int* buf = (int*)&s[0];
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
+    पूर्णाङ्क योग = (पूर्णाङ्क)it.size, खण्डम्_आकार_2 = योग, partial_खण्डम्_आकार = 0;
+    पूर्णाङ्क j, गणनम्_2 = 0;
+    पूर्णाङ्क _buf[CV_CN_MAX];
+    पूर्णाङ्क* buf = (पूर्णाङ्क*)&s[0];
+    तार्किक partial_योग_Is_Int = गभीरता < CV_32S;
+    तार्किक खण्डम्_योग = partial_योग_Is_Int || गभीरता == CV_16F || गभीरता == CV_16BF;
     size_t esz = 0, nz0 = 0;
 
-    if( blockSum )
+    यदि( खण्डम्_योग )
     {
-        partialBlockSize = depth <= CV_8S ? (1 << 23) : (1 << 15);
-        blockSize = std::min(blockSize, partialBlockSize);
+        partial_खण्डम्_आकार = गभीरता <= CV_8S ? (1 << 23) : (1 << 15);
+        खण्डम्_आकार_2 = std::min(खण्डम्_आकार_2, partial_खण्डम्_आकार);
         buf = _buf;
-        for( k = 0; k < cn; k++ )
+        प्रति( k = 0; k < cn; k++ )
             buf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_आकार();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    प्रति( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        प्रति( j = 0; j < योग; j += खण्डम्_आकार_2 )
         {
-            int bsz = std::min(total - j, blockSize);
-            int nz = func( ptrs[0], ptrs[1], (uchar*)buf, bsz, cn );
-            count += nz;
+            पूर्णाङ्क bsz = std::min(योग - j, खण्डम्_आकार_2);
+            पूर्णाङ्क nz = func( ptrs[0], ptrs[1], (uchar*)buf, bsz, cn );
+            गणनम्_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            यदि( खण्डम्_योग && (गणनम्_2 + खण्डम्_आकार_2 >= partial_खण्डम्_आकार || (i+1 >= it.nplanes && j+bsz >= योग)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                यदि (partial_योग_Is_Int) {
+                    प्रति( k = 0; k < cn; k++ )
                     {
                         s[k] += buf[k];
                         buf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } अन्यथा {
+                    प्रति( k = 0; k < cn; k++ )
                     {
-                        s[k] += ((float*)buf)[k];
+                        s[k] += ((भिन्न*)buf)[k];
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                गणनम्_2 = 0;
             }
             ptrs[0] += bsz*esz;
-            if( ptrs[1] )
+            यदि( ptrs[1] )
                 ptrs[1] += bsz;
         }
     }
-    return s*(nz0 ? 1./nz0 : 0);
+    प्रत्यागम s*(nz0 ? 1./nz0 : 0);
 }
 
 // number of elements a piece contributes to the mean
-static double statCount(const StatChunk& c)
+स्थिर द्विगुण stat_गणनम्(ध्रुव StatChunk& c)
 {
-    return c.mask.empty() ? (double)c.src.total() : (double)countNonZero(c.mask);
+    प्रत्यागम c.आवरणम्.empty() ? (द्विगुण)c.src.योग() : (द्विगुण)गणनम्_Non_Zero(c.आवरणम्);
 }
 
-Scalar mean(InputArray _src, InputArray _mask)
+Scalar माध्यम्_2(निवेशः_Array _src, निवेशः_Array आवरणम्_2)
 {
     CV_INSTRUMENT_REGION();
 
-    Mat src = _src.getMat(), mask = _mask.getMat();
-    CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
+    Mat src = _src.getMat(), आवरणम् = आवरणम्_2.getMat();
+    CV_Assert( आवरणम्.empty() || आवरणम्.type() == CV_8U || आवरणम्.type() == CV_8S || आवरणम्.type() == CV_Bool);
 
     std::vector<StatChunk> chunks;
-    if (src.channels() > 4 || !splitForParallelStat(src, mask, chunks))
-        return mean_(src, mask);
+    यदि (src.channels() > 4 || !विभज_For_Parallel_Stat(src, आवरणम्, chunks))
+        प्रत्यागम माध्यम्_3(src, आवरणम्);
 
-    const int n = (int)chunks.size();
+    ध्रुव पूर्णाङ्क n = (पूर्णाङ्क)chunks.size();
     std::vector<Scalar> part(n);
-    std::vector<double> cnt(n);
-    parallel_for_(Range(0, n), [&](const Range& r)
+    std::vector<द्विगुण> cnt(n);
+    parallel_for_(Range(0, n), [&](ध्रुव Range& r)
     {
-        for (int i = r.start; i < r.end; i++)
+        प्रति (पूर्णाङ्क i = r.start; i < r.end; i++)
         {
-            part[i] = mean_(chunks[i].src, chunks[i].mask);
-            cnt[i] = statCount(chunks[i]);
+            part[i] = माध्यम्_3(chunks[i].src, chunks[i].आवरणम्);
+            cnt[i] = stat_गणनम्(chunks[i]);
         }
     });
     Scalar s = Scalar::all(0.0);
-    double total = 0;
-    for (int i = 0; i < n; i++)
+    द्विगुण योग = 0;
+    प्रति (पूर्णाङ्क i = 0; i < n; i++)
     {
         s += part[i]*cnt[i];
-        total += cnt[i];
+        योग += cnt[i];
     }
-    return s*(total > 0 ? 1./total : 0);
+    प्रत्यागम s*(योग > 0 ? 1./योग : 0);
 }
 
-static SumSqrFunc getSumSqrFunc(int depth)
+स्थिर योग_Sqr_Func get_योग_Sqr_Func(पूर्णाङ्क गभीरता)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getSumSqrFunc, (depth),
+    CV_CPU_DISPATCH(get_योग_Sqr_Func, (गभीरता),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
-static bool ocl_meanStdDev( InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask )
+#यदि_परिभाषितम् HAVE_OPENCL
+स्थिर तार्किक ocl_माध्यम्_Std_Dev( निवेशः_Array _src, OutputArray माध्यम्, OutputArray _sdv, निवेशः_Array आवरणम्_2 )
 {
     CV_INSTRUMENT_REGION_OPENCL();
 
-    bool haveMask = _mask.kind() != _InputArray::NONE;
-    int nz = haveMask ? -1 : (int)_src.total();
-    Scalar mean(0), stddev(0);
-    const int cn = _src.channels();
-    if (cn > 4)
-        return false;
+    तार्किक have_आवरणम् = आवरणम्_2.विधा() != निवेशः_Array_2::NONE;
+    पूर्णाङ्क nz = have_आवरणम् ? -1 : (पूर्णाङ्क)_src.योग();
+    Scalar माध्यम्_2(0), stddev(0);
+    ध्रुव पूर्णाङ्क cn = _src.channels();
+    यदि (cn > 4)
+        प्रत्यागम असत्य;
 
     {
-        int type = _src.type(), depth = CV_MAT_DEPTH(type);
-        bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0,
+        पूर्णाङ्क type = _src.type(), गभीरता = CV_MAT_गभीरता(type);
+        तार्किक doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0,
                 isContinuous = _src.isContinuous(),
-                isMaskContinuous = _mask.isContinuous();
-        const ocl::Device &defDev = ocl::Device::getDefault();
-        int groups = defDev.maxComputeUnits();
-        if (defDev.isIntel())
+                is_आवरणम्_Continuous = आवरणम्_2.isContinuous();
+        ध्रुव ocl::Device &defDev = ocl::Device::getDefault();
+        पूर्णाङ्क groups = defDev.maxComputeUnits();
+        यदि (defDev.isIntel())
         {
-            static const int subSliceEUCount = 10;
-            groups = (groups / subSliceEUCount) * 2;
+            स्थिर ध्रुव पूर्णाङ्क sub_खण्डिका_EUCount = 10;
+            groups = (groups / sub_खण्डिका_EUCount) * 2;
         }
-        size_t wgs = defDev.maxWorkGroupSize();
+        size_t wgs = defDev.max_Work_गणः_आकार();
 
-        int ddepth = std::max(CV_32S, depth), sqddepth = std::max(CV_32F, depth),
+        पूर्णाङ्क ddepth = std::max(CV_32S, गभीरता), sqddepth = std::max(CV_32F, गभीरता),
                 dtype = CV_MAKE_TYPE(ddepth, cn),
                 sqdtype = CV_MAKETYPE(sqddepth, cn);
-        CV_Assert(!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool);
+        CV_Assert(!have_आवरणम् || आवरणम्_2.type() == CV_8U || आवरणम्_2.type() == CV_8S || आवरणम्_2.type() == CV_Bool);
 
-        int wgs2_aligned = 1;
-        while (wgs2_aligned < (int)wgs)
+        पूर्णाङ्क wgs2_aligned = 1;
+        यावत् (wgs2_aligned < (पूर्णाङ्क)wgs)
             wgs2_aligned <<= 1;
         wgs2_aligned >>= 1;
 
-        if ( (!doubleSupport && depth == CV_64F) )
-            return false;
+        यदि ( (!doubleSupport && गभीरता == CV_64F) )
+            प्रत्यागम असत्य;
 
-        char cvt[2][50];
+        वर्ण cvt[2][50];
         String opts = format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstT1=%s -D sqddepth=%d"
                              " -D sqdstT=%s -D sqdstT1=%s -D convertToSDT=%s -D cn=%d%s%s"
                              " -D convertToDT=%s -D WGS=%d -D WGS2_ALIGNED=%d%s%s",
-                             ocl::typeToStr(type), ocl::typeToStr(depth),
-                             ocl::typeToStr(dtype), ocl::typeToStr(ddepth), sqddepth,
-                             ocl::typeToStr(sqdtype), ocl::typeToStr(sqddepth),
-                             ocl::convertTypeStr(depth, sqddepth, cn, cvt[0], sizeof(cvt[0])),
+                             ocl::type_गन्तव्यम्_Str(type), ocl::type_गन्तव्यम्_Str(गभीरता),
+                             ocl::type_गन्तव्यम्_Str(dtype), ocl::type_गन्तव्यम्_Str(ddepth), sqddepth,
+                             ocl::type_गन्तव्यम्_Str(sqdtype), ocl::type_गन्तव्यम्_Str(sqddepth),
+                             ocl::convertTypeStr(गभीरता, sqddepth, cn, cvt[0], परिमाण(cvt[0])),
                              cn, isContinuous ? " -D HAVE_SRC_CONT" : "",
-                             isMaskContinuous ? " -D HAVE_MASK_CONT" : "",
-                             ocl::convertTypeStr(depth, ddepth, cn, cvt[1], sizeof(cvt[1])),
-                             (int)wgs, wgs2_aligned, haveMask ? " -D HAVE_MASK" : "",
+                             is_आवरणम्_Continuous ? " -D HAVE_MASK_CONT" : "",
+                             ocl::convertTypeStr(गभीरता, ddepth, cn, cvt[1], परिमाण(cvt[1])),
+                             (पूर्णाङ्क)wgs, wgs2_aligned, have_आवरणम् ? " -D HAVE_MASK" : "",
                              doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
         ocl::Kernel k("meanStdDev", ocl::core::meanstddev_oclsrc, opts);
-        if (k.empty())
-            return false;
+        यदि (k.empty())
+            प्रत्यागम असत्य;
 
-        int dbsize = groups * ((haveMask ? CV_ELEM_SIZE1(CV_32S) : 0) +
-                               CV_ELEM_SIZE(sqdtype) + CV_ELEM_SIZE(dtype));
-        UMat src = _src.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
+        पूर्णाङ्क dbsize = groups * ((have_आवरणम् ? CV_ELEM_SIZE1(CV_32S) : 0) +
+                               CV_ELEM_आकार(sqdtype) + CV_ELEM_आकार(dtype));
+        UMat src = _src.getUMat(), db(1, dbsize, CV_8UC1), आवरणम् = आवरणम्_2.getUMat();
 
-        ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+        ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_आकार(src),
                 dbarg = ocl::KernelArg::PtrWriteOnly(db),
-                maskarg = ocl::KernelArg::ReadOnlyNoSize(mask);
+                maskarg = ocl::KernelArg::Read_Only_No_आकार(आवरणम्);
 
-        if (haveMask)
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg, maskarg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg);
+        यदि (have_आवरणम्)
+            k.तर्काः(srcarg, src.स्तम्भसङ्ख्या, (पूर्णाङ्क)src.योग(), groups, dbarg, maskarg);
+        अन्यथा
+            k.तर्काः(srcarg, src.स्तम्भसङ्ख्या, (पूर्णाङ्क)src.योग(), groups, dbarg);
 
         size_t globalsize = groups * wgs;
 
-        if(!k.run(1, &globalsize, &wgs, false))
-            return false;
+        यदि(!k.सततम्(1, &globalsize, &wgs, असत्य))
+            प्रत्यागम असत्य;
 
-        typedef Scalar (* part_sum)(Mat m);
-        part_sum funcs[3] = { ocl_part_sum<int>, ocl_part_sum<float>, ocl_part_sum<double> };
+        प्रकारनिर्देश Scalar (* part_योग)(Mat m);
+        part_योग funcs[3] = { ocl_part_योग<पूर्णाङ्क>, ocl_part_योग<भिन्न>, ocl_part_योग<द्विगुण> };
         Mat dbm = db.getMat(ACCESS_READ);
 
-        mean = funcs[ddepth - CV_32S](Mat(1, groups, dtype, dbm.ptr()));
-        stddev = funcs[sqddepth - CV_32S](Mat(1, groups, sqdtype, dbm.ptr() + groups * CV_ELEM_SIZE(dtype)));
+        माध्यम्_2 = funcs[ddepth - CV_32S](Mat(1, groups, dtype, dbm.ptr()));
+        stddev = funcs[sqddepth - CV_32S](Mat(1, groups, sqdtype, dbm.ptr() + groups * CV_ELEM_आकार(dtype)));
 
-        if (haveMask)
-            nz = saturate_cast<int>(funcs[0](Mat(1, groups, CV_32SC1, dbm.ptr() +
-                                                 groups * (CV_ELEM_SIZE(dtype) +
-                                                           CV_ELEM_SIZE(sqdtype))))[0]);
+        यदि (have_आवरणम्)
+            nz = saturate_cast<पूर्णाङ्क>(funcs[0](Mat(1, groups, CV_32SC1, dbm.ptr() +
+                                                 groups * (CV_ELEM_आकार(dtype) +
+                                                           CV_ELEM_आकार(sqdtype))))[0]);
     }
 
-    double total = nz != 0 ? 1.0 / nz : 0;
-    int k, j;
-    for (int i = 0; i < cn; ++i)
+    द्विगुण योग = nz != 0 ? 1.0 / nz : 0;
+    पूर्णाङ्क k, j;
+    प्रति (पूर्णाङ्क i = 0; i < cn; ++i)
     {
-        mean[i] *= total;
-        stddev[i] = std::sqrt(std::max(stddev[i] * total - mean[i] * mean[i] , 0.));
+        माध्यम्_2[i] *= योग;
+        stddev[i] = std::वर्गमूलम्(std::max(stddev[i] * योग - माध्यम्_2[i] * माध्यम्_2[i] , 0.));
     }
 
-    for( j = 0; j < 2; j++ )
+    प्रति( j = 0; j < 2; j++ )
     {
-        const double * const sptr = j == 0 ? &mean[0] : &stddev[0];
-        _OutputArray _dst = j == 0 ? _mean : _sdv;
-        if( !_dst.needed() )
-            continue;
+        ध्रुव द्विगुण * ध्रुव sptr = j == 0 ? &माध्यम्_2[0] : &stddev[0];
+        _OutputArray _dst = j == 0 ? माध्यम् : _sdv;
+        यदि( !_dst.needed() )
+            अनुवर्त;
 
-        if( !_dst.fixedSize() )
-            _dst.create(cn, 1, CV_64F, -1, true);
+        यदि( !_dst.fixed_आकार() )
+            _dst.create(cn, 1, CV_64F, -1, सत्य);
         Mat dst = _dst.getMat();
-        int dcn = (int)dst.total();
+        पूर्णाङ्क dcn = (पूर्णाङ्क)dst.योग();
         CV_Assert( dst.type() == CV_64F && dst.isContinuous() &&
-                   (dst.cols == 1 || dst.rows == 1) && dcn >= cn );
-        double* dptr = dst.ptr<double>();
-        for( k = 0; k < cn; k++ )
+                   (dst.स्तम्भसङ्ख्या == 1 || dst.पङ्क्तिकाः == 1) && dcn >= cn );
+        द्विगुण* dptr = dst.ptr<द्विगुण>();
+        प्रति( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
-        for( ; k < dcn; k++ )
+        प्रति( ; k < dcn; k++ )
             dptr[k] = 0;
     }
 
-    return true;
+    प्रत्यागम सत्य;
 }
-#endif
+#यदि_अन्तः
 
 // serial implementation, also used for the pieces of the parallel version
-static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+स्थिर शून्य माध्यम्_Std_Dev_2(निवेशः_Array _src, OutputArray माध्यम्, OutputArray _sdv, निवेशः_Array आवरणम्_2)
 {
     CV_Assert(!_src.empty());
-    CV_Assert( _mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool );
+    CV_Assert( आवरणम्_2.empty() || आवरणम्_2.type() == CV_8U || आवरणम्_2.type() == CV_8S || आवरणम्_2.type() == CV_Bool );
 
-    CV_OCL_RUN(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-               ocl_meanStdDev(_src, _mean, _sdv, _mask))
+    CV_OCL_सततम्(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+               ocl_माध्यम्_Std_Dev(_src, माध्यम्, _sdv, आवरणम्_2))
 
-    Mat src = _src.getMat(), mask = _mask.getMat();
+    Mat src = _src.getMat(), आवरणम् = आवरणम्_2.getMat();
 
-    CV_Assert(mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size));
+    CV_Assert(आवरणम्.empty() || ((आवरणम्.type() == CV_8U || आवरणम्.type() == CV_8S || आवरणम्.type() == CV_Bool) && src.size == आवरणम्.size));
 
-    int k, cn = src.channels(), depth = src.depth();
-    Mat mean_mat, stddev_mat;
+    पूर्णाङ्क k, cn = src.channels(), गभीरता = src.गभीरता();
+    Mat माध्यम्_mat, stddev_mat;
 
-    if(_mean.needed())
+    यदि(माध्यम्.needed())
     {
-        if( !_mean.fixedSize() )
-            _mean.create(cn, 1, CV_64F, -1, true);
+        यदि( !माध्यम्.fixed_आकार() )
+            माध्यम्.create(cn, 1, CV_64F, -1, सत्य);
 
-        mean_mat = _mean.getMat();
-        int dcn = (int)mean_mat.total();
-        CV_Assert( mean_mat.type() == CV_64F && mean_mat.isContinuous() &&
-                   (mean_mat.cols == 1 || mean_mat.rows == 1) && dcn >= cn );
+        माध्यम्_mat = माध्यम्.getMat();
+        पूर्णाङ्क dcn = (पूर्णाङ्क)माध्यम्_mat.योग();
+        CV_Assert( माध्यम्_mat.type() == CV_64F && माध्यम्_mat.isContinuous() &&
+                   (माध्यम्_mat.स्तम्भसङ्ख्या == 1 || माध्यम्_mat.पङ्क्तिकाः == 1) && dcn >= cn );
 
-        double* dptr = mean_mat.ptr<double>();
-        for(k = cn ; k < dcn; k++ )
+        द्विगुण* dptr = माध्यम्_mat.ptr<द्विगुण>();
+        प्रति(k = cn ; k < dcn; k++ )
             dptr[k] = 0;
     }
 
-    if (_sdv.needed())
+    यदि (_sdv.needed())
     {
-        if( !_sdv.fixedSize() )
-            _sdv.create(cn, 1, CV_64F, -1, true);
+        यदि( !_sdv.fixed_आकार() )
+            _sdv.create(cn, 1, CV_64F, -1, सत्य);
 
         stddev_mat = _sdv.getMat();
-        int dcn = (int)stddev_mat.total();
+        पूर्णाङ्क dcn = (पूर्णाङ्क)stddev_mat.योग();
         CV_Assert( stddev_mat.type() == CV_64F && stddev_mat.isContinuous() &&
-                   (stddev_mat.cols == 1 || stddev_mat.rows == 1) && dcn >= cn );
+                   (stddev_mat.स्तम्भसङ्ख्या == 1 || stddev_mat.पङ्क्तिकाः == 1) && dcn >= cn );
 
-        double* dptr = stddev_mat.ptr<double>();
-        for(k = cn ; k < dcn; k++ )
+        द्विगुण* dptr = stddev_mat.ptr<द्विगुण>();
+        प्रति(k = cn ; k < dcn; k++ )
             dptr[k] = 0;
 
     }
 
-    if (src.isContinuous() && mask.isContinuous())
+    यदि (src.isContinuous() && आवरणम्.isContinuous())
     {
-        CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.data, 0, (int)src.total(), 1, src.type(),
-                 _mean.needed() ? mean_mat.ptr<double>() : nullptr,
-                 _sdv.needed() ? stddev_mat.ptr<double>() : nullptr,
-                 mask.data, 0);
+        CALL_HAL(माध्यम्_Std_Dev, cv_hal_माध्यम्_Std_Dev, src.दत्त, 0, (पूर्णाङ्क)src.योग(), 1, src.type(),
+                 माध्यम्.needed() ? माध्यम्_mat.ptr<द्विगुण>() : शून्यसूचकः,
+                 _sdv.needed() ? stddev_mat.ptr<द्विगुण>() : शून्यसूचकः,
+                 आवरणम्.दत्त, 0);
     }
-    else
+    अन्यथा
     {
-        if (src.dims <= 2)
+        यदि (src.dims <= 2)
         {
-            CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.data, src.step, src.cols, src.rows, src.type(),
-                     _mean.needed() ? mean_mat.ptr<double>() : nullptr,
-                     _sdv.needed() ? stddev_mat.ptr<double>() : nullptr,
-                     mask.data, mask.step);
+            CALL_HAL(माध्यम्_Std_Dev, cv_hal_माध्यम्_Std_Dev, src.दत्त, src.चरणः, src.स्तम्भसङ्ख्या, src.पङ्क्तिकाः, src.type(),
+                     माध्यम्.needed() ? माध्यम्_mat.ptr<द्विगुण>() : शून्यसूचकः,
+                     _sdv.needed() ? stddev_mat.ptr<द्विगुण>() : शून्यसूचकः,
+                     आवरणम्.दत्त, आवरणम्.चरणः);
         }
     }
 
-    SumSqrFunc func = getSumSqrFunc(depth);
+    योग_Sqr_Func func = get_योग_Sqr_Func(गभीरता);
 
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ध्रुव Mat* arrays[] = {&src, &आवरणम्, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j;
-    int64_t count = 0, nz0 = 0;
-    double _buf[CV_CN_MAX*4];
-    double *s = _buf, *sq = s + cn;
-    int *sbuf = (int*)s, *sqbuf = (int*)sq;
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
-    bool blockSqSum = depth <= CV_8S;
+    पूर्णाङ्क योग = (पूर्णाङ्क)it.size, खण्डम्_आकार_2 = योग, partial_खण्डम्_आकार = 0;
+    पूर्णाङ्क j;
+    int64_t गणनम्_2 = 0, nz0 = 0;
+    द्विगुण _buf[CV_CN_MAX*4];
+    द्विगुण *s = _buf, *sq = s + cn;
+    पूर्णाङ्क *sbuf = (पूर्णाङ्क*)s, *sqbuf = (पूर्णाङ्क*)sq;
+    तार्किक partial_योग_Is_Int = गभीरता < CV_32S;
+    तार्किक खण्डम्_योग = partial_योग_Is_Int || गभीरता == CV_16F || गभीरता == CV_16BF;
+    तार्किक खण्डम्_Sq_योग = गभीरता <= CV_8S;
     size_t esz = 0;
 
-    for( k = 0; k < cn; k++ )
+    प्रति( k = 0; k < cn; k++ )
         s[k] = sq[k] = 0;
 
-    if( blockSum )
+    यदि( खण्डम्_योग )
     {
-        partialBlockSize = 1 << 15;
-        blockSize = std::min(blockSize, partialBlockSize);
-        sbuf = (int*)(sq + cn);
-        if( blockSqSum )
+        partial_खण्डम्_आकार = 1 << 15;
+        खण्डम्_आकार_2 = std::min(खण्डम्_आकार_2, partial_खण्डम्_आकार);
+        sbuf = (पूर्णाङ्क*)(sq + cn);
+        यदि( खण्डम्_Sq_योग )
             sqbuf = sbuf + cn;
-        for( k = 0; k < cn; k++ )
+        प्रति( k = 0; k < cn; k++ )
             sbuf[k] = sqbuf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_आकार();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    प्रति( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        प्रति( j = 0; j < योग; j += खण्डम्_आकार_2 )
         {
-            int bsz = std::min(total - j, blockSize);
-            int nz = func( ptrs[0], ptrs[1], (uchar*)sbuf, (uchar*)sqbuf, bsz, cn );
-            count += nz;
+            पूर्णाङ्क bsz = std::min(योग - j, खण्डम्_आकार_2);
+            पूर्णाङ्क nz = func( ptrs[0], ptrs[1], (uchar*)sbuf, (uchar*)sqbuf, bsz, cn );
+            गणनम्_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            यदि( खण्डम्_योग && (गणनम्_2 + खण्डम्_आकार_2 >= partial_खण्डम्_आकार || (i+1 >= it.nplanes && j+bsz >= योग)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                यदि (partial_योग_Is_Int) {
+                    प्रति( k = 0; k < cn; k++ )
                     {
                         s[k] += sbuf[k];
                         sbuf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } अन्यथा {
+                    प्रति( k = 0; k < cn; k++ )
                     {
-                        s[k] += ((float*)sbuf)[k];
+                        s[k] += ((भिन्न*)sbuf)[k];
                         sbuf[k] = 0;
                     }
                 }
-                if( blockSqSum )
+                यदि( खण्डम्_Sq_योग )
                 {
-                    for( k = 0; k < cn; k++ )
+                    प्रति( k = 0; k < cn; k++ )
                     {
                         sq[k] += sqbuf[k];
                         sqbuf[k] = 0;
                     }
                 }
-                count = 0;
+                गणनम्_2 = 0;
             }
             ptrs[0] += bsz*esz;
-            if( ptrs[1] )
+            यदि( ptrs[1] )
                 ptrs[1] += bsz;
         }
     }
 
-    double scale = nz0 ? 1./nz0 : 0.;
-    for( k = 0; k < cn; k++ )
+    द्विगुण scale = nz0 ? 1./nz0 : 0.;
+    प्रति( k = 0; k < cn; k++ )
     {
         s[k] *= scale;
-        sq[k] = std::sqrt(std::max(sq[k]*scale - s[k]*s[k], 0.));
+        sq[k] = std::वर्गमूलम्(std::max(sq[k]*scale - s[k]*s[k], 0.));
     }
 
-    if (_mean.needed())
+    यदि (माध्यम्.needed())
     {
-        const double* sptr = s;
-        double* dptr = mean_mat.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        ध्रुव द्विगुण* sptr = s;
+        द्विगुण* dptr = माध्यम्_mat.ptr<द्विगुण>();
+        प्रति( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
     }
 
-    if (_sdv.needed())
+    यदि (_sdv.needed())
     {
-        const double* sptr = sq;
-        double* dptr = stddev_mat.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        ध्रुव द्विगुण* sptr = sq;
+        द्विगुण* dptr = stddev_mat.ptr<द्विगुण>();
+        प्रति( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
     }
 }
 
-static void writeStatResult(OutputArray _dst, int cn, const Scalar& v)
+स्थिर शून्य write_Stat_परिणाम(OutputArray _dst, पूर्णाङ्क cn, ध्रुव Scalar& v)
 {
-    if (!_dst.needed())
-        return;
-    if (!_dst.fixedSize())
-        _dst.create(cn, 1, CV_64F, -1, true);
+    यदि (!_dst.needed())
+        प्रत्यागम;
+    यदि (!_dst.fixed_आकार())
+        _dst.create(cn, 1, CV_64F, -1, सत्य);
     Mat d = _dst.getMat();
-    int dcn = (int)d.total();
-    CV_Assert( d.type() == CV_64F && d.isContinuous() && (d.cols == 1 || d.rows == 1) && dcn >= cn );
-    double* p = d.ptr<double>();
-    for (int k = 0; k < dcn; k++)
+    पूर्णाङ्क dcn = (पूर्णाङ्क)d.योग();
+    CV_Assert( d.type() == CV_64F && d.isContinuous() && (d.स्तम्भसङ्ख्या == 1 || d.पङ्क्तिकाः == 1) && dcn >= cn );
+    द्विगुण* p = d.ptr<द्विगुण>();
+    प्रति (पूर्णाङ्क k = 0; k < dcn; k++)
         p[k] = k < cn ? v[k] : 0;
 }
 
-void meanStdDev(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+शून्य माध्यम्_Std_Dev(निवेशः_Array _src, OutputArray माध्यम्, OutputArray _sdv, निवेशः_Array आवरणम्_2)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat() && !_src.empty())
+    यदि (!_src.isUMat() && !_src.empty())
     {
-        Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
-        const bool maskOk = mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) &&
-                                             src.size == mask.size);
-        if (cn <= 4 && maskOk && splitForParallelStat(src, mask, chunks))
+        Mat src = _src.getMat(), आवरणम् = आवरणम्_2.getMat();
+        ध्रुव पूर्णाङ्क cn = src.channels();
+        ध्रुव तार्किक आवरणम्_Ok = आवरणम्.empty() || ((आवरणम्.type() == CV_8U || आवरणम्.type() == CV_8S || आवरणम्.type() == CV_Bool) &&
+                                             src.size == आवरणम्.size);
+        यदि (cn <= 4 && आवरणम्_Ok && विभज_For_Parallel_Stat(src, आवरणम्, chunks))
         {
-            const int n = (int)chunks.size();
+            ध्रुव पूर्णाङ्क n = (पूर्णाङ्क)chunks.size();
             std::vector<Scalar> m(n), sd(n);
-            std::vector<double> cnt(n);
-            parallel_for_(Range(0, n), [&](const Range& r)
+            std::vector<द्विगुण> cnt(n);
+            parallel_for_(Range(0, n), [&](ध्रुव Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                प्रति (पूर्णाङ्क i = r.start; i < r.end; i++)
                 {
                     Mat mi, si;
-                    meanStdDev_(chunks[i].src, mi, si, chunks[i].mask);
-                    for (int k = 0; k < cn; k++)
+                    माध्यम्_Std_Dev_2(chunks[i].src, mi, si, chunks[i].आवरणम्);
+                    प्रति (पूर्णाङ्क k = 0; k < cn; k++)
                     {
-                        m[i][k] = mi.at<double>(k);
-                        sd[i][k] = si.at<double>(k);
+                        m[i][k] = mi.at<द्विगुण>(k);
+                        sd[i][k] = si.at<द्विगुण>(k);
                     }
-                    cnt[i] = statCount(chunks[i]);
+                    cnt[i] = stat_गणनम्(chunks[i]);
                 }
             });
             // combine the pieces: the variance is the mean of the piece variances plus the
             // variance of the piece means, both weighted by the piece sizes
-            double total = 0;
+            द्विगुण योग = 0;
             Scalar M = Scalar::all(0.0), V = Scalar::all(0.0);
-            for (int i = 0; i < n; i++)
+            प्रति (पूर्णाङ्क i = 0; i < n; i++)
             {
                 M += m[i]*cnt[i];
-                total += cnt[i];
+                योग += cnt[i];
             }
-            if (total > 0)
-                M *= 1./total;
-            for (int i = 0; i < n; i++)
-                for (int k = 0; k < cn; k++)
+            यदि (योग > 0)
+                M *= 1./योग;
+            प्रति (पूर्णाङ्क i = 0; i < n; i++)
+                प्रति (पूर्णाङ्क k = 0; k < cn; k++)
                 {
-                    double dm = m[i][k] - M[k];
+                    द्विगुण dm = m[i][k] - M[k];
                     V[k] += cnt[i]*(sd[i][k]*sd[i][k] + dm*dm);
                 }
             Scalar SD;
-            for (int k = 0; k < cn; k++)
-                SD[k] = total > 0 ? std::sqrt(std::max(V[k]/total, 0.)) : 0;
-            writeStatResult(_mean, cn, M);
-            writeStatResult(_sdv, cn, SD);
-            return;
+            प्रति (पूर्णाङ्क k = 0; k < cn; k++)
+                SD[k] = योग > 0 ? std::वर्गमूलम्(std::max(V[k]/योग, 0.)) : 0;
+            write_Stat_परिणाम(माध्यम्, cn, M);
+            write_Stat_परिणाम(_sdv, cn, SD);
+            प्रत्यागम;
         }
     }
-    meanStdDev_(_src, _mean, _sdv, _mask);
+    माध्यम्_Std_Dev_2(_src, माध्यम्, _sdv, आवरणम्_2);
 }
 
 } // namespace

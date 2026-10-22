@@ -1,395 +1,395 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
-#if ARITHM_USE_IPP
+#यदि ARITHM_USE_IPP
 
-namespace cv { namespace hal {
+नामाकाश cv { नामाकाश hal {
 
 //=======================================
 // Arithmetic and logical operations
 // +, -, *, /, &, |, ^, ~, abs ...
 //=======================================
 
-#define ARITHM_IPP_BIN(fun, ...)                        \
-do {                                                    \
-    if (!CV_IPP_CHECK_COND)                             \
-        return 0;                                       \
-    if (height == 1)                                    \
-        step1 = step2 = step = width * sizeof(dst[0]);  \
-    if (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__))   \
+#परिभाषय ARITHM_IPP_BIN(fun, ...)                        \
+कुरु {                                                    \
+    यदि (!CV_IPP_CHECK_COND)                             \
+        प्रत्यागम 0;                                       \
+    यदि (height == 1)                                    \
+        step1 = step2 = चरणः = विस्तारः * परिमाण(dst[0]);  \
+    यदि (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__))   \
     {                                                   \
-        CV_IMPL_ADD(CV_IMPL_IPP);                       \
-        return 1;                                       \
+        CV_IMPL_सङ्कलय(CV_IMPL_IPP);                       \
+        प्रत्यागम 1;                                       \
     }                                                   \
-    setIppErrorStatus();                                \
-    return 0;                                           \
-} while(0)
+    समुच्चयः_Ipp_Error_स्थितिः();                                \
+    प्रत्यागम 0;                                           \
+} यावत्(0)
 
 //=======================================
 // Addition
 //=======================================
 
-inline int arithm_ipp_add8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_add8u(ध्रुव uchar* src1, size_t step1, ध्रुव uchar* src2, size_t step2,
+                            uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiAdd_8u_C1RSfs, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippi_सङ्कलय_8u_C1_RSfs, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height), 0);
 }
 
-inline int arithm_ipp_add16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                             ushort* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_add16u(ध्रुव ushort* src1, size_t step1, ध्रुव ushort* src2, size_t step2,
+                             ushort* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiAdd_16u_C1RSfs, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippi_सङ्कलय_16u_C1_RSfs, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height), 0);
 }
 
-inline int arithm_ipp_add16s(const short* src1, size_t step1, const short* src2, size_t step2,
-                             short* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_add16s(ध्रुव ह्रस्व* src1, size_t step1, ध्रुव ह्रस्व* src2, size_t step2,
+                             ह्रस्व* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiAdd_16s_C1RSfs, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippi_सङ्कलय_16s_C1_RSfs, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height), 0);
 }
 
-inline int arithm_ipp_add32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                             float* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_add32f(ध्रुव भिन्न* src1, size_t step1, ध्रुव भिन्न* src2, size_t step2,
+                             भिन्न* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiAdd_32f_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippi_सङ्कलय_32f_C1_R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-#define arithm_ipp_add8s(...)  0
-#define arithm_ipp_add32s(...) 0
-#define arithm_ipp_add64f(...) 0
+#परिभाषय arithm_ipp_add8s(...)  0
+#परिभाषय arithm_ipp_add32s(...) 0
+#परिभाषय arithm_ipp_add64f(...) 0
 
 //=======================================
-// Subtract
+//व्यवकलय
 //=======================================
 
-inline int arithm_ipp_sub8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_sub8u(ध्रुव uchar* src1, size_t step1, ध्रुव uchar* src2, size_t step2,
+                            uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiSub_8u_C1RSfs, src2, (int)step2, src1, (int)step1, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippiSub_8u_C1RSfs, src2, (पूर्णाङ्क)step2, src1, (पूर्णाङ्क)step1, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height), 0);
 }
 
-inline int arithm_ipp_sub16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                             ushort* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_sub16u(ध्रुव ushort* src1, size_t step1, ध्रुव ushort* src2, size_t step2,
+                             ushort* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiSub_16u_C1RSfs, src2, (int)step2, src1, (int)step1, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippiSub_16u_C1RSfs, src2, (पूर्णाङ्क)step2, src1, (पूर्णाङ्क)step1, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height), 0);
 }
 
-inline int arithm_ipp_sub16s(const short* src1, size_t step1, const short* src2, size_t step2,
-                            short* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_sub16s(ध्रुव ह्रस्व* src1, size_t step1, ध्रुव ह्रस्व* src2, size_t step2,
+                            ह्रस्व* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiSub_16s_C1RSfs, src2, (int)step2, src1, (int)step1, dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_BIN(ippiSub_16s_C1RSfs, src2, (पूर्णाङ्क)step2, src1, (पूर्णाङ्क)step1, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height), 0);
 }
 
-inline int arithm_ipp_sub32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                            float* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_sub32f(ध्रुव भिन्न* src1, size_t step1, ध्रुव भिन्न* src2, size_t step2,
+                            भिन्न* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiSub_32f_C1R, src2, (int)step2, src1, (int)step1, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiSub_32f_C1R, src2, (पूर्णाङ्क)step2, src1, (पूर्णाङ्क)step1, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-#define arithm_ipp_sub8s(...)  0
-#define arithm_ipp_sub32s(...) 0
-#define arithm_ipp_sub64f(...) 0
+#परिभाषय arithm_ipp_sub8s(...)  0
+#परिभाषय arithm_ipp_sub32s(...) 0
+#परिभाषय arithm_ipp_sub64f(...) 0
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define ARITHM_IPP_MIN_MAX(fun, type)                            \
-do {                                                             \
-    if (!CV_IPP_CHECK_COND)                                      \
-        return 0;                                                \
+#परिभाषय ARITHM_IPP_MIN_MAX(fun, type)                            \
+कुरु {                                                             \
+    यदि (!CV_IPP_CHECK_COND)                                      \
+        प्रत्यागम 0;                                                \
     type* s1 = (type*)src1;                                      \
     type* s2 = (type*)src2;                                      \
     type* d  = dst;                                              \
-    if (height == 1)                                             \
-        step1 = step2 = step = width * sizeof(dst[0]);           \
-    int i = 0;                                                   \
-    for(; i < height; i++)                                       \
+    यदि (height == 1)                                             \
+        step1 = step2 = चरणः = विस्तारः * परिमाण(dst[0]);           \
+    पूर्णाङ्क i = 0;                                                   \
+    प्रति(; i < height; i++)                                       \
     {                                                            \
-        if (0 > CV_INSTRUMENT_FUN_IPP(fun, s1, s2, d, width))    \
-            break;                                               \
+        यदि (0 > CV_INSTRUMENT_FUN_IPP(fun, s1, s2, d, विस्तारः))    \
+            भङ्ग;                                               \
         s1 = (type*)((uchar*)s1 + step1);                        \
         s2 = (type*)((uchar*)s2 + step2);                        \
-        d  = (type*)((uchar*)d + step);                          \
+        d  = (type*)((uchar*)d + चरणः);                          \
     }                                                            \
-    if (i == height)                                             \
+    यदि (i == height)                                             \
     {                                                            \
-        CV_IMPL_ADD(CV_IMPL_IPP);                                \
-        return 1;                                                \
+        CV_IMPL_सङ्कलय(CV_IMPL_IPP);                                \
+        प्रत्यागम 1;                                                \
     }                                                            \
-    setIppErrorStatus();                                         \
-    return 0;                                                    \
-} while(0)
+    समुच्चयः_Ipp_Error_स्थितिः();                                         \
+    प्रत्यागम 0;                                                    \
+} यावत्(0)
 
 //=======================================
 // Max
 //=======================================
 
-inline int arithm_ipp_max8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                           uchar* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_max8u(ध्रुव uchar* src1, size_t step1, ध्रुव uchar* src2, size_t step2,
+                           uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
     ARITHM_IPP_MIN_MAX(ippsMaxEvery_8u, uchar);
 }
 
-inline int arithm_ipp_max16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                             ushort* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_max16u(ध्रुव ushort* src1, size_t step1, ध्रुव ushort* src2, size_t step2,
+                             ushort* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
     ARITHM_IPP_MIN_MAX(ippsMaxEvery_16u, ushort);
 }
 
-inline int arithm_ipp_max32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                             float* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_max32f(ध्रुव भिन्न* src1, size_t step1, ध्रुव भिन्न* src2, size_t step2,
+                             भिन्न* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_MIN_MAX(ippsMaxEvery_32f, float);
+    ARITHM_IPP_MIN_MAX(ippsMaxEvery_32f, भिन्न);
 }
 
-inline int arithm_ipp_max64f(const double* src1, size_t step1, const double* src2, size_t step2,
-                             double* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_max64f(ध्रुव द्विगुण* src1, size_t step1, ध्रुव द्विगुण* src2, size_t step2,
+                             द्विगुण* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_MIN_MAX(ippsMaxEvery_64f, double);
+    ARITHM_IPP_MIN_MAX(ippsMaxEvery_64f, द्विगुण);
 }
 
-#define arithm_ipp_max8s(...)  0
-#define arithm_ipp_max16s(...) 0
-#define arithm_ipp_max32s(...) 0
+#परिभाषय arithm_ipp_max8s(...)  0
+#परिभाषय arithm_ipp_max16s(...) 0
+#परिभाषय arithm_ipp_max32s(...) 0
 
 //=======================================
 // Min
 //=======================================
 
-inline int arithm_ipp_min8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_min8u(ध्रुव uchar* src1, size_t step1, ध्रुव uchar* src2, size_t step2,
+                            uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
     ARITHM_IPP_MIN_MAX(ippsMinEvery_8u, uchar);
 }
 
-inline int arithm_ipp_min16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                            ushort* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_min16u(ध्रुव ushort* src1, size_t step1, ध्रुव ushort* src2, size_t step2,
+                            ushort* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
     ARITHM_IPP_MIN_MAX(ippsMinEvery_16u, ushort);
 }
 
-inline int arithm_ipp_min32f(const float* src1, size_t step1, const float* src2,size_t step2,
-                             float* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_min32f(ध्रुव भिन्न* src1, size_t step1, ध्रुव भिन्न* src2,size_t step2,
+                             भिन्न* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_MIN_MAX(ippsMinEvery_32f, float);
+    ARITHM_IPP_MIN_MAX(ippsMinEvery_32f, भिन्न);
 }
 
-inline int arithm_ipp_min64f(const double* src1, size_t step1, const double* src2, size_t step2,
-                             double* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_min64f(ध्रुव द्विगुण* src1, size_t step1, ध्रुव द्विगुण* src2, size_t step2,
+                             द्विगुण* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_MIN_MAX(ippsMinEvery_64f, double);
+    ARITHM_IPP_MIN_MAX(ippsMinEvery_64f, द्विगुण);
 }
 
-#define arithm_ipp_min8s(...)  0
-#define arithm_ipp_min16s(...) 0
-#define arithm_ipp_min32s(...) 0
+#परिभाषय arithm_ipp_min8s(...)  0
+#परिभाषय arithm_ipp_min16s(...) 0
+#परिभाषय arithm_ipp_min32s(...) 0
 
 //=======================================
 // AbsDiff
 //=======================================
 
-inline int arithm_ipp_absdiff8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                                uchar* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_absdiff8u(ध्रुव uchar* src1, size_t step1, ध्रुव uchar* src2, size_t step2,
+                                uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiAbsDiff_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiAbsDiff_8u_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-inline int arithm_ipp_absdiff16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                                ushort* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_absdiff16u(ध्रुव ushort* src1, size_t step1, ध्रुव ushort* src2, size_t step2,
+                                ushort* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiAbsDiff_16u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiAbsDiff_16u_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-inline int arithm_ipp_absdiff32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                                float* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_absdiff32f(ध्रुव भिन्न* src1, size_t step1, ध्रुव भिन्न* src2, size_t step2,
+                                भिन्न* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiAbsDiff_32f_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiAbsDiff_32f_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
-#define arithm_ipp_absdiff8s(...)  0
-#define arithm_ipp_absdiff16s(...) 0
-#define arithm_ipp_absdiff32s(...) 0
-#define arithm_ipp_absdiff64f(...) 0
+#परिभाषय arithm_ipp_absdiff8s(...)  0
+#परिभाषय arithm_ipp_absdiff16s(...) 0
+#परिभाषय arithm_ipp_absdiff32s(...) 0
+#परिभाषय arithm_ipp_absdiff64f(...) 0
 
 //=======================================
 // Logical
 //=======================================
 
-inline int arithm_ipp_and8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_and8u(ध्रुव uchar* src1, size_t step1, ध्रुव uchar* src2, size_t step2,
+                            uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiAnd_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiAnd_8u_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-inline int arithm_ipp_or8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                           uchar* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_or8u(ध्रुव uchar* src1, size_t step1, ध्रुव uchar* src2, size_t step2,
+                           uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiOr_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiOr_8u_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-inline int arithm_ipp_xor8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_xor8u(ध्रुव uchar* src1, size_t step1, ध्रुव uchar* src2, size_t step2,
+                            uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    ARITHM_IPP_BIN(ippiXor_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_BIN(ippiXor_8u_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-inline int arithm_ipp_not8u(const uchar* src1, size_t step1, uchar* dst, size_t step, int width, int height)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_not8u(ध्रुव uchar* src1, size_t step1, uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height)
 {
-    if (!CV_IPP_CHECK_COND)
-        return 0;
-    if (height == 1)
-        step1 = step = width * sizeof(dst[0]);
-    if (0 <= CV_INSTRUMENT_FUN_IPP(ippiNot_8u_C1R, src1, (int)step1, dst, (int)step, ippiSize(width, height)))
+    यदि (!CV_IPP_CHECK_COND)
+        प्रत्यागम 0;
+    यदि (height == 1)
+        step1 = चरणः = विस्तारः * परिमाण(dst[0]);
+    यदि (0 <= CV_INSTRUMENT_FUN_IPP(ippiNot_8u_C1R, src1, (पूर्णाङ्क)step1, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height)))
     {
-        CV_IMPL_ADD(CV_IMPL_IPP);
-        return 1;
+        CV_IMPL_सङ्कलय(CV_IMPL_IPP);
+        प्रत्यागम 1;
     }
-    setIppErrorStatus();
-    return 0;
+    समुच्चयः_Ipp_Error_स्थितिः();
+    प्रत्यागम 0;
 }
 
 //=======================================
 // Compare
 //=======================================
 
-#define ARITHM_IPP_CMP(fun, ...)                          \
-do {                                                      \
-    if (!CV_IPP_CHECK_COND)                               \
-        return 0;                                         \
+#परिभाषय ARITHM_IPP_CMP(fun, ...)                          \
+कुरु {                                                      \
+    यदि (!CV_IPP_CHECK_COND)                               \
+        प्रत्यागम 0;                                         \
     IppCmpOp op = arithm_ipp_convert_cmp(cmpop);          \
-    if (op < 0)                                           \
-        return 0;                                         \
-    if (height == 1)                                      \
-        step1 = step2 = step = width * sizeof(dst[0]);    \
-    if (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__, op)) \
+    यदि (op < 0)                                           \
+        प्रत्यागम 0;                                         \
+    यदि (height == 1)                                      \
+        step1 = step2 = चरणः = विस्तारः * परिमाण(dst[0]);    \
+    यदि (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__, op)) \
     {                                                     \
-        CV_IMPL_ADD(CV_IMPL_IPP);                         \
-        return 1;                                         \
+        CV_IMPL_सङ्कलय(CV_IMPL_IPP);                         \
+        प्रत्यागम 1;                                         \
     }                                                     \
-    setIppErrorStatus();                                  \
-    return 0;                                             \
-} while(0)
+    समुच्चयः_Ipp_Error_स्थितिः();                                  \
+    प्रत्यागम 0;                                             \
+} यावत्(0)
 
-inline IppCmpOp arithm_ipp_convert_cmp(int cmpop)
+अन्तःस्थ IppCmpOp arithm_ipp_convert_cmp(पूर्णाङ्क cmpop)
 {
-    switch(cmpop)
+    विकल्प(cmpop)
     {
-        case CMP_EQ: return ippCmpEq;
-        case CMP_GT: return ippCmpGreater;
-        case CMP_GE: return ippCmpGreaterEq;
-        case CMP_LT: return ippCmpLess;
-        case CMP_LE: return ippCmpLessEq;
-        default:     return (IppCmpOp)-1;
+        पक्ष CMP_EQ: प्रत्यागम ippCmpEq;
+        पक्ष CMP_GT: प्रत्यागम ippCmpGreater;
+        पक्ष CMP_GE: प्रत्यागम ippCmpGreaterEq;
+        पक्ष CMP_LT: प्रत्यागम ippCmpLess;
+        पक्ष CMP_LE: प्रत्यागम ippCmpLessEq;
+        स्वभाव:     प्रत्यागम (IppCmpOp)-1;
     }
 }
 
-inline int arithm_ipp_cmp8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height, int cmpop)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_cmp8u(ध्रुव uchar* src1, size_t step1, ध्रुव uchar* src2, size_t step2,
+                            uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height, पूर्णाङ्क cmpop)
 {
-    ARITHM_IPP_CMP(ippiCompare_8u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_CMP(ippiCompare_8u_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-inline int arithm_ipp_cmp16u(const ushort* src1, size_t step1, const ushort* src2, size_t step2,
-                            uchar* dst, size_t step, int width, int height, int cmpop)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_cmp16u(ध्रुव ushort* src1, size_t step1, ध्रुव ushort* src2, size_t step2,
+                            uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height, पूर्णाङ्क cmpop)
 {
-    ARITHM_IPP_CMP(ippiCompare_16u_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_CMP(ippiCompare_16u_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-inline int arithm_ipp_cmp16s(const short* src1, size_t step1, const short* src2, size_t step2,
-                             uchar* dst, size_t step, int width, int height, int cmpop)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_cmp16s(ध्रुव ह्रस्व* src1, size_t step1, ध्रुव ह्रस्व* src2, size_t step2,
+                             uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height, पूर्णाङ्क cmpop)
 {
-    ARITHM_IPP_CMP(ippiCompare_16s_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_CMP(ippiCompare_16s_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-inline int arithm_ipp_cmp32f(const float* src1, size_t step1, const float* src2, size_t step2,
-                             uchar* dst, size_t step, int width, int height, int cmpop)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_cmp32f(ध्रुव भिन्न* src1, size_t step1, ध्रुव भिन्न* src2, size_t step2,
+                             uchar* dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height, पूर्णाङ्क cmpop)
 {
-    ARITHM_IPP_CMP(ippiCompare_32f_C1R, src1, (int)step1, src2, (int)step2, dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_CMP(ippiCompare_32f_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2, dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
 }
 
-#define arithm_ipp_cmp8s(...)  0
-#define arithm_ipp_cmp32s(...) 0
-#define arithm_ipp_cmp64f(...) 0
+#परिभाषय arithm_ipp_cmp8s(...)  0
+#परिभाषय arithm_ipp_cmp32s(...) 0
+#परिभाषय arithm_ipp_cmp64f(...) 0
 
 //=======================================
 // Multiply
 //=======================================
 
-#define ARITHM_IPP_MUL(fun, ...)                      \
-do {                                                  \
-    if (!CV_IPP_CHECK_COND)                           \
-        return 0;                                     \
-    float fscale = (float)scale;                      \
-    if (std::fabs(fscale - 1) > FLT_EPSILON)          \
-        return 0;                                     \
-    if (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__)) \
+#परिभाषय ARITHM_IPP_MUL(fun, ...)                      \
+कुरु {                                                  \
+    यदि (!CV_IPP_CHECK_COND)                           \
+        प्रत्यागम 0;                                     \
+    भिन्न fscale = (भिन्न)scale;                      \
+    यदि (std::fabs(fscale - 1) > FLT_EPSILON)          \
+        प्रत्यागम 0;                                     \
+    यदि (0 <= CV_INSTRUMENT_FUN_IPP(fun, __VA_ARGS__)) \
     {                                                 \
-        CV_IMPL_ADD(CV_IMPL_IPP);                     \
-        return 1;                                     \
+        CV_IMPL_सङ्कलय(CV_IMPL_IPP);                     \
+        प्रत्यागम 1;                                     \
     }                                                 \
-    setIppErrorStatus();                              \
-    return 0;                                         \
-} while(0)
+    समुच्चयः_Ipp_Error_स्थितिः();                              \
+    प्रत्यागम 0;                                         \
+} यावत्(0)
 
-inline int arithm_ipp_mul8u(const uchar *src1, size_t step1, const uchar *src2, size_t step2,
-                            uchar *dst, size_t step, int width, int height, double scale)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_mul8u(ध्रुव uchar *src1, size_t step1, ध्रुव uchar *src2, size_t step2,
+                            uchar *dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height, द्विगुण scale)
 {
-    ARITHM_IPP_MUL(ippiMul_8u_C1RSfs, src1, (int)step1, src2, (int)step2,dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_MUL(ippiMul_8u_C1RSfs, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2,dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height), 0);
 }
-inline int arithm_ipp_mul16u(const ushort *src1, size_t step1, const ushort *src2, size_t step2,
-                            ushort *dst, size_t step, int width, int height, double scale)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_mul16u(ध्रुव ushort *src1, size_t step1, ध्रुव ushort *src2, size_t step2,
+                            ushort *dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height, द्विगुण scale)
 {
-    ARITHM_IPP_MUL(ippiMul_16u_C1RSfs, src1, (int)step1, src2, (int)step2,dst, (int)step, ippiSize(width, height), 0);
-}
-
-inline int arithm_ipp_mul16s(const short *src1, size_t step1, const short *src2, size_t step2,
-                            short *dst, size_t step, int width, int height, double scale)
-{
-    ARITHM_IPP_MUL(ippiMul_16s_C1RSfs, src1, (int)step1, src2, (int)step2,dst, (int)step, ippiSize(width, height), 0);
+    ARITHM_IPP_MUL(ippiMul_16u_C1RSfs, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2,dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height), 0);
 }
 
-inline int arithm_ipp_mul32f(const float *src1, size_t step1, const float *src2, size_t step2,
-                            float *dst, size_t step, int width, int height, double scale)
+अन्तःस्थ पूर्णाङ्क arithm_ipp_mul16s(ध्रुव ह्रस्व *src1, size_t step1, ध्रुव ह्रस्व *src2, size_t step2,
+                            ह्रस्व *dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height, द्विगुण scale)
 {
-    ARITHM_IPP_MUL(ippiMul_32f_C1R, src1, (int)step1, src2, (int)step2,dst, (int)step, ippiSize(width, height));
+    ARITHM_IPP_MUL(ippiMul_16s_C1RSfs, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2,dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height), 0);
 }
 
-#define arithm_ipp_mul8s(...)  0
-#define arithm_ipp_mul32s(...) 0
-#define arithm_ipp_mul64f(...) 0
+अन्तःस्थ पूर्णाङ्क arithm_ipp_mul32f(ध्रुव भिन्न *src1, size_t step1, ध्रुव भिन्न *src2, size_t step2,
+                            भिन्न *dst, size_t चरणः, पूर्णाङ्क विस्तारः, पूर्णाङ्क height, द्विगुण scale)
+{
+    ARITHM_IPP_MUL(ippiMul_32f_C1R, src1, (पूर्णाङ्क)step1, src2, (पूर्णाङ्क)step2,dst, (पूर्णाङ्क)चरणः, ippi_आकार(विस्तारः, height));
+}
+
+#परिभाषय arithm_ipp_mul8s(...)  0
+#परिभाषय arithm_ipp_mul32s(...) 0
+#परिभाषय arithm_ipp_mul64f(...) 0
 
 //=======================================
 // Div
 //=======================================
 
-#define arithm_ipp_div8u(...)  0
-#define arithm_ipp_div8s(...)  0
-#define arithm_ipp_div16u(...) 0
-#define arithm_ipp_div16s(...) 0
-#define arithm_ipp_div32s(...) 0
-#define arithm_ipp_div32f(...) 0
-#define arithm_ipp_div64f(...) 0
+#परिभाषय arithm_ipp_div8u(...)  0
+#परिभाषय arithm_ipp_div8s(...)  0
+#परिभाषय arithm_ipp_div16u(...) 0
+#परिभाषय arithm_ipp_div16s(...) 0
+#परिभाषय arithm_ipp_div32s(...) 0
+#परिभाषय arithm_ipp_div32f(...) 0
+#परिभाषय arithm_ipp_div64f(...) 0
 
 //=======================================
 // AddWeighted
 //=======================================
 
-#define arithm_ipp_addWeighted8u(...)  0
-#define arithm_ipp_addWeighted8s(...)  0
-#define arithm_ipp_addWeighted16u(...) 0
-#define arithm_ipp_addWeighted16s(...) 0
-#define arithm_ipp_addWeighted32s(...) 0
-#define arithm_ipp_addWeighted32f(...) 0
-#define arithm_ipp_addWeighted64f(...) 0
+#परिभाषय arithm_ipp_सङ्कलय_Weighted8u(...)  0
+#परिभाषय arithm_ipp_सङ्कलय_Weighted8s(...)  0
+#परिभाषय arithm_ipp_सङ्कलय_Weighted16u(...) 0
+#परिभाषय arithm_ipp_सङ्कलय_Weighted16s(...) 0
+#परिभाषय arithm_ipp_सङ्कलय_Weighted32s(...) 0
+#परिभाषय arithm_ipp_सङ्कलय_Weighted32f(...) 0
+#परिभाषय arithm_ipp_सङ्कलय_Weighted64f(...) 0
 
 //=======================================
 // Reciprocial
 //=======================================
 
-#define arithm_ipp_recip8u(...)  0
-#define arithm_ipp_recip8s(...)  0
-#define arithm_ipp_recip16u(...) 0
-#define arithm_ipp_recip16s(...) 0
-#define arithm_ipp_recip32s(...) 0
-#define arithm_ipp_recip32f(...) 0
-#define arithm_ipp_recip64f(...) 0
+#परिभाषय arithm_ipp_recip8u(...)  0
+#परिभाषय arithm_ipp_recip8s(...)  0
+#परिभाषय arithm_ipp_recip16u(...) 0
+#परिभाषय arithm_ipp_recip16s(...) 0
+#परिभाषय arithm_ipp_recip32s(...) 0
+#परिभाषय arithm_ipp_recip32f(...) 0
+#परिभाषय arithm_ipp_recip64f(...) 0
 
 /** empty block in case if you have "fun"
 #define arithm_ipp_8u(...)  0
@@ -403,15 +403,15 @@ inline int arithm_ipp_mul32f(const float *src1, size_t step1, const float *src2,
 
 }} // cv::hal::
 
-#define ARITHM_CALL_IPP(fun, ...)       \
+#परिभाषय ARITHM_CALL_IPP(fun, ...)       \
 {                                       \
-    if (__CV_EXPAND(fun(__VA_ARGS__)))  \
-        return;                         \
+    यदि (__CV_EXPAND(fun(__VA_ARGS__)))  \
+        प्रत्यागम;                         \
 }
 
-#endif // ARITHM_USE_IPP
+#यदि_अन्तः // ARITHM_USE_IPP
 
 
-#if !ARITHM_USE_IPP
-#define ARITHM_CALL_IPP(...)
-#endif
+#यदि !ARITHM_USE_IPP
+#परिभाषय ARITHM_CALL_IPP(...)
+#यदि_अन्तः

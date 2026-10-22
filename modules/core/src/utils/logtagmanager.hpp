@@ -2,27 +2,27 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGMANAGER_HPP
-#define OPENCV_CORE_LOGTAGMANAGER_HPP
+#यदि_अपरिभाषितम् OPENCV_CORE_LOGTAGMANAGER_HPP
+#परिभाषय OPENCV_CORE_LOGTAGMANAGER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <unordered_map>
-#include <mutex>
-#include <memory>
-#endif
+#यदि 1 // if not already in precompiled headers
+#अन्तर्भाव <string>
+#अन्तर्भाव <algorithm>
+#अन्तर्भाव <functional>
+#अन्तर्भाव <unordered_map>
+#अन्तर्भाव <mutex>
+#अन्तर्भाव <memory>
+#यदि_अन्तः
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#अन्तर्भाव <opencv2/core/utils/logtag.hpp>
+#अन्तर्भाव "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+नामाकाश cv {
+नामाकाश utils {
+नामाकाश logging {
 
 // forward declaration
-class LogTagConfigParser;
+वर्ग Log_चिह्नकम्_Config_Parser;
 
 // A lookup table of LogTags using full name, first part of name, and any part of name.
 // The name parts of a LogTag is delimited by period.
@@ -30,25 +30,25 @@ class LogTagConfigParser;
 // This class does not handle wildcard characters. The name-matching method can only be
 // selected by calling the appropriate function.
 //
-class LogTagManager
+वर्ग Log_चिह्नकम्_Manager
 {
-private:
+गुप्त:
     // Current implementation does not seem to require recursive mutex;
     // also, extensible functions (accepting user-provided callback) are not allowed
     // to call LogTagManger (to prevent iterator invalidation), which needs enforced
     // with a non-recursive mutex.
-    using MutexType = cv::Mutex;
-    using LockType = cv::AutoLock;
+    उपयुज्य MutexType = cv::Mutex;
+    उपयुज्य तालकम्_Type = cv::Auto_तालकम्;
 
-    enum class MatchingScope
+    गणना वर्ग MatchingScope
     {
         None,
-        Full,
+        पूर्णम्_2,
         FirstNamePart,
         AnyNamePart
     };
 
-    struct ParsedLevel
+    संरचना ParsedLevel
     {
         LogLevel level;
         MatchingScope scope;
@@ -60,75 +60,75 @@ private:
         }
     };
 
-    struct FullNameInfo
+    संरचना पूर्णम्_Name_Info
     {
-        LogTag* logTagPtr;
+        Log_चिह्नकम्* log_चिह्नकम्_Ptr;
         ParsedLevel parsedLevel;
     };
 
-    struct NamePartInfo
+    संरचना NamePartInfo
     {
         ParsedLevel parsedLevel;
     };
 
-    struct CrossReference
+    संरचना CrossReference
     {
-        size_t m_fullNameId;
+        size_t m_पूर्णम्_Name_Id;
         size_t m_namePartId;
         size_t m_matchingPos;
-        FullNameInfo* m_fullNameInfo;
+        पूर्णम्_Name_Info* m_पूर्णम्_Name_Info;
         NamePartInfo* m_namePartInfo;
 
-        explicit CrossReference(size_t fullNameId, size_t namePartId, size_t matchingPos,
-            FullNameInfo* fullNameInfo, NamePartInfo* namePartInfo)
-            : m_fullNameId(fullNameId)
+        स्पष्ट CrossReference(size_t पूर्णम्_Name_Id, size_t namePartId, size_t matchingPos,
+            पूर्णम्_Name_Info* पूर्णम्_Name_Info_2, NamePartInfo* namePartInfo)
+            : m_पूर्णम्_Name_Id(पूर्णम्_Name_Id)
             , m_namePartId(namePartId)
             , m_matchingPos(matchingPos)
-            , m_fullNameInfo(fullNameInfo)
+            , m_पूर्णम्_Name_Info(पूर्णम्_Name_Info_2)
             , m_namePartInfo(namePartInfo)
         {
         }
     };
 
-    struct FullNameLookupResult
+    संरचना पूर्णम्_Name_Lookup_परिणाम
     {
         // The full name being looked up
-        std::string m_fullName;
+        std::string m_पूर्णम्_Name;
 
         // The full name being broken down into name parts
         std::vector<std::string> m_nameParts;
 
         // The full name ID that is added or looked up from the table
-        size_t m_fullNameId;
+        size_t m_पूर्णम्_Name_Id;
 
         // The name part IDs that are added to or looked up from the table
         // listed in the same order as m_nameParts
         std::vector<size_t> m_namePartIds;
 
         // The information struct for the full name
-        FullNameInfo* m_fullNameInfoPtr;
+        पूर्णम्_Name_Info* m_पूर्णम्_Name_Info_Ptr;
 
         // Specifies whether cross references (full names that match the name part)
         // should be computed.
-        bool m_findCrossReferences;
+        तार्किक m_findCrossReferences;
 
         // List of all full names that match the given name part.
         // This field is computed only if m_findCrossReferences is true.
         std::vector<CrossReference> m_crossReferences;
 
-        explicit FullNameLookupResult(const std::string& fullName)
-            : m_fullName(fullName)
+        स्पष्ट पूर्णम्_Name_Lookup_परिणाम(ध्रुव std::string& पूर्णम्_Name)
+            : m_पूर्णम्_Name(पूर्णम्_Name)
             , m_nameParts()
-            , m_fullNameId()
+            , m_पूर्णम्_Name_Id()
             , m_namePartIds()
-            , m_fullNameInfoPtr()
+            , m_पूर्णम्_Name_Info_Ptr()
             , m_findCrossReferences()
             , m_crossReferences()
         {
         }
     };
 
-    struct NamePartLookupResult
+    संरचना Name_Part_Lookup_परिणाम
     {
         // The name part being looked up
         std::string m_namePart;
@@ -140,13 +140,13 @@ private:
         NamePartInfo* m_namePartInfoPtr;
 
         // Specifies whether cross references (full names that match the name part) should be computed.
-        bool m_findCrossReferences;
+        तार्किक m_findCrossReferences;
 
         // List of all full names that match the given name part.
         // This field is computed only if m_findCrossReferences is true.
         std::vector<CrossReference> m_crossReferences;
 
-        explicit NamePartLookupResult(const std::string& namePart)
+        स्पष्ट Name_Part_Lookup_परिणाम(ध्रुव std::string& namePart)
             : m_namePart(namePart)
             , m_namePartId()
             , m_namePartInfoPtr()
@@ -156,14 +156,14 @@ private:
         }
     };
 
-    struct NameTable
+    संरचना Name_सारणी
     {
         // All data structures in this class are append-only. The item count
         // is being used as an incrementing integer key.
 
-    public:
+    सार्वजनिक:
         // Full name information struct.
-        std::vector<FullNameInfo> m_fullNameInfos;
+        std::vector<पूर्णम्_Name_Info> m_पूर्णम्_Name_Infos;
 
         // Name part information struct.
         std::vector<NamePartInfo> m_namePartInfos;
@@ -173,7 +173,7 @@ private:
         // .... (index into the vector of m_fullNameInfos)
         // .... (key into m_fullNameToNamePartIds)
         // .... (value.second in m_namePartToFullNameIds)
-        std::unordered_map<std::string, size_t> m_fullNameIds;
+        std::unordered_map<std::string, size_t> m_पूर्णम्_Name_Ids;
 
         // key: name part (string)
         // value: name part ID
@@ -185,100 +185,100 @@ private:
         // key: full name ID
         // value.first: name part ID
         // value.second: occurrence position of name part in the full name
-        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_fullNameToNamePartIds;
+        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_पूर्णम्_Name_गन्तव्यम्_Name_Part_Ids;
 
         // key: name part ID
         // value.first: full name ID
         // value.second: occurrence position of name part in the full name
-        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_namePartToFullNameIds;
+        std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_name_Part_गन्तव्यम्_पूर्णम्_Name_Ids;
 
-    public:
-        void addOrLookupFullName(FullNameLookupResult& result);
-        void addOrLookupNamePart(NamePartLookupResult& result);
-        FullNameInfo* getFullNameInfo(const std::string& fullName);
+    सार्वजनिक:
+        शून्य सङ्कलय_Or_Lookup_पूर्णम्_Name(पूर्णम्_Name_Lookup_परिणाम& परिणाम);
+        शून्य सङ्कलय_Or_Lookup_Name_Part(Name_Part_Lookup_परिणाम& परिणाम);
+        पूर्णम्_Name_Info* get_पूर्णम्_Name_Info(ध्रुव std::string& पूर्णम्_Name);
 
-    private:
+    गुप्त:
         // Add or get full name. Does not compute name parts or access them in the table.
         // Returns the full name ID, and a bool indicating if the full name is new.
-        std::pair<size_t, bool> internal_addOrLookupFullName(const std::string& fullName);
+        std::pair<size_t, तार्किक> आन्तरिकम्_सङ्कलय_Or_Lookup_पूर्णम्_Name(ध्रुव std::string& पूर्णम्_Name);
 
         // Add or get multiple name parts. Saves name part IDs into a vector.
-        void internal_addOrLookupNameParts(const std::vector<std::string>& nameParts, std::vector<size_t>& namePartIds);
+        शून्य आन्तरिकम्_सङ्कलय_Or_Lookup_Name_Parts(ध्रुव std::vector<std::string>& nameParts, std::vector<size_t>& namePartIds);
 
         // Add or get name part. Returns namePartId.
-        size_t internal_addOrLookupNamePart(const std::string& namePart);
+        size_t आन्तरिकम्_सङ्कलय_Or_Lookup_Name_Part(ध्रुव std::string& namePart);
 
         // For each name part ID, insert the tuples (full name, name part ID, name part position)
         // into the cross reference table
-        void internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds);
+        शून्य आन्तरिकम्_सङ्कलय_Cross_Reference(size_t पूर्णम्_Name_Id, ध्रुव std::vector<size_t>& namePartIds);
 
         // Gather pointer for full name info struct.
         // Note: The pointer is interior to the table vector. The pointers are invalidated
         // if the table is modified.
-        FullNameInfo* internal_getFullNameInfo(size_t fullNameId);
+        पूर्णम्_Name_Info* आन्तरिकम्_get_पूर्णम्_Name_Info(size_t पूर्णम्_Name_Id);
 
         // Gather pointers for name part info struct.
         // Note: The pointers are interior to the table vector. The pointers are invalidated
         // if the table is modified.
-        NamePartInfo* internal_getNamePartInfo(size_t namePartId);
+        NamePartInfo* आन्तरिकम्_get_Name_Part_Info(size_t namePartId);
 
-        void internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult);
-        void internal_findMatchingFullNamesForNamePart(NamePartLookupResult& result);
+        शून्य आन्तरिकम्_find_Matching_Name_Parts_For_पूर्णम्_Name(पूर्णम्_Name_Lookup_परिणाम& पूर्णम्_Name_परिणाम);
+        शून्य आन्तरिकम्_find_Matching_पूर्णम्_नामानि_For_Name_Part(Name_Part_Lookup_परिणाम& परिणाम);
     };
 
-public:
-    LogTagManager(LogLevel defaultUnconfiguredGlobalLevel);
-    ~LogTagManager();
+सार्वजनिक:
+    Log_चिह्नकम्_Manager(LogLevel defaultUnconfiguredGlobalLevel);
+    ~Log_चिह्नकम्_Manager();
 
-public:
+सार्वजनिक:
     // Parse and apply the config string.
-    void setConfigString(const std::string& configString, bool apply = true);
+    शून्य समुच्चयः_Config_String(ध्रुव std::string& configString, तार्किक apply = सत्य);
 
     // Gets the config parser. This is necessary to retrieve the list of malformed strings.
-    LogTagConfigParser& getConfigParser() const;
+    Log_चिह्नकम्_Config_Parser& getConfigParser() ध्रुव;
 
     // Add (register) the log tag.
     // Note, passing in nullptr as value is equivalent to unassigning.
-    void assign(const std::string& fullName, LogTag* ptr);
+    शून्य assign(ध्रुव std::string& पूर्णम्_Name, Log_चिह्नकम्* ptr);
 
     // Unassign the log tag. This is equivalent to calling assign with nullptr value.
-    void unassign(const std::string& fullName);
+    शून्य unassign(ध्रुव std::string& पूर्णम्_Name);
 
     // Retrieve the log tag by exact name.
-    LogTag* get(const std::string& fullName);
+    Log_चिह्नकम्* get(ध्रुव std::string& पूर्णम्_Name);
 
     // Changes the log level of the tag having the exact full name.
-    void setLevelByFullName(const std::string& fullName, LogLevel level);
+    शून्य समुच्चयः_Level_By_पूर्णम्_Name(ध्रुव std::string& पूर्णम्_Name, LogLevel level);
 
     // Changes the log level of the tags matching the first part of the name.
-    void setLevelByFirstPart(const std::string& firstPart, LogLevel level);
+    शून्य समुच्चयः_Level_By_First_Part(ध्रुव std::string& firstPart, LogLevel level);
 
     // Changes the log level of the tags matching any part of the name.
-    void setLevelByAnyPart(const std::string& anyPart, LogLevel level);
+    शून्य समुच्चयः_Level_By_Any_Part(ध्रुव std::string& anyPart, LogLevel level);
 
     // Changes the log level of the tags with matching name part according
     // to the specified scope.
-    void setLevelByNamePart(const std::string& namePart, LogLevel level, MatchingScope scope);
+    शून्य समुच्चयः_Level_By_Name_Part(ध्रुव std::string& namePart, LogLevel level, MatchingScope scope);
 
-private:
-    bool internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo);
-    bool internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult);
-    void internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult);
+गुप्त:
+    तार्किक आन्तरिकम्_apply_पूर्णम्_Name_Config_गन्तव्यम्_चिह्नकम्(पूर्णम्_Name_Info& पूर्णम्_Name_Info_2);
+    तार्किक आन्तरिकम्_apply_Name_Part_Config_गन्तव्यम्_Specific_चिह्नकम्(पूर्णम्_Name_Lookup_परिणाम& पूर्णम्_Name_परिणाम);
+    शून्य आन्तरिकम्_apply_Name_Part_Config_गन्तव्यम्_Matching_चिह्नकानि(Name_Part_Lookup_परिणाम& name_Part_परिणाम);
 
-private:
-    static std::vector<std::string> splitNameParts(const std::string& fullName);
-    static bool internal_isNamePartMatch(MatchingScope scope, size_t matchingPos);
+गुप्त:
+    स्थिर std::vector<std::string> विभज_Name_Parts(ध्रुव std::string& पूर्णम्_Name);
+    स्थिर तार्किक आन्तरिकम्_is_Name_Part_मेलनम्(MatchingScope scope, size_t matchingPos);
 
-private:
-    static const char* m_globalName;
+गुप्त:
+    स्थिर ध्रुव वर्ण* m_globalName;
 
-private:
-    mutable MutexType m_mutex;
-    std::unique_ptr<LogTag> m_globalLogTag;
-    NameTable m_nameTable;
-    std::shared_ptr<LogTagConfigParser> m_config;
+गुप्त:
+    परिवर्तनीय MutexType m_mutex;
+    std::unique_ptr<Log_चिह्नकम्> m_global_Log_चिह्नकम्;
+    Name_सारणी m_name_सारणी;
+    std::shared_ptr<Log_चिह्नकम्_Config_Parser> m_config;
 };
 
 }}} //namespace
 
-#endif //OPENCV_CORE_LOGTAGMANAGER_HPP
+#यदि_अन्तः //OPENCV_CORE_LOGTAGMANAGER_HPP

@@ -2,73 +2,73 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
+#अन्तर्भाव "../precomp.hpp"
 
-#include <vector>
+#अन्तर्भाव <vector>
 
-#include <opencv2/core/utils/logger.defines.hpp>
-#undef CV_LOG_STRIP_LEVEL
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#include "opencv2/core/utils/logger.hpp"
-#include "opencv2/core/utils/filesystem.hpp"
-#include "opencv2/core/utils/filesystem.private.hpp"
+#अन्तर्भाव <opencv2/core/utils/logger.defines.hpp>
+#अपरिभाषय CV_LOG_STRIP_LEVEL
+#परिभाषय CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
+#अन्तर्भाव "opencv2/core/utils/logger.hpp"
+#अन्तर्भाव "opencv2/core/utils/filesystem.hpp"
+#अन्तर्भाव "opencv2/core/utils/filesystem.private.hpp"
 
-namespace cv { namespace samples {
+नामाकाश cv { नामाकाश samples {
 
-static cv::Ptr< std::vector<cv::String> > g_data_search_path;
-static cv::Ptr< std::vector<cv::String> > g_data_search_subdir;
+स्थिर cv::Ptr< std::vector<cv::String> > g_दत्त_अन्वेषणम्_मार्गः;
+स्थिर cv::Ptr< std::vector<cv::String> > g_दत्त_अन्वेषणम्_subdir;
 
-static std::vector<cv::String>& _getDataSearchPath()
+स्थिर std::vector<cv::String>& get_दत्त_अन्वेषणम्_मार्गः()
 {
-    if (g_data_search_path.empty())
-        g_data_search_path.reset(new std::vector<cv::String>());
-    return *(g_data_search_path.get());
+    यदि (g_दत्त_अन्वेषणम्_मार्गः.empty())
+        g_दत्त_अन्वेषणम्_मार्गः.reset(नूतन std::vector<cv::String>());
+    प्रत्यागम *(g_दत्त_अन्वेषणम्_मार्गः.get());
 }
 
-static std::vector<cv::String>& _getDataSearchSubDirectory()
+स्थिर std::vector<cv::String>& get_दत्त_अन्वेषणम्_Sub_Directory()
 {
-    if (g_data_search_subdir.empty())
+    यदि (g_दत्त_अन्वेषणम्_subdir.empty())
     {
-        g_data_search_subdir.reset(new std::vector<cv::String>());
-        g_data_search_subdir->push_back("samples/data");
-        g_data_search_subdir->push_back("data");
-        g_data_search_subdir->push_back("");
+        g_दत्त_अन्वेषणम्_subdir.reset(नूतन std::vector<cv::String>());
+        g_दत्त_अन्वेषणम्_subdir->push_back("samples/data");
+        g_दत्त_अन्वेषणम्_subdir->push_back("data");
+        g_दत्त_अन्वेषणम्_subdir->push_back("");
     }
-    return *(g_data_search_subdir.get());
+    प्रत्यागम *(g_दत्त_अन्वेषणम्_subdir.get());
 }
 
 
-CV_EXPORTS void addSamplesDataSearchPath(const cv::String& path)
+CV_EXPORTS शून्य सङ्कलय_Samples_दत्त_अन्वेषणम्_मार्गः(ध्रुव cv::String& मार्गः)
 {
-    if (utils::fs::isDirectory(path))
-        _getDataSearchPath().push_back(path);
+    यदि (utils::fs::isDirectory(मार्गः))
+        get_दत्त_अन्वेषणम्_मार्गः().push_back(मार्गः);
 }
-CV_EXPORTS void addSamplesDataSearchSubDirectory(const cv::String& subdir)
+CV_EXPORTS शून्य सङ्कलय_Samples_दत्त_अन्वेषणम्_Sub_Directory(ध्रुव cv::String& subdir)
 {
-    _getDataSearchSubDirectory().push_back(subdir);
+    get_दत्त_अन्वेषणम्_Sub_Directory().push_back(subdir);
 }
 
-cv::String findFile(const cv::String& relative_path, bool required, bool silentMode)
+cv::String findFile(ध्रुव cv::String& relative_मार्गः, तार्किक required, तार्किक silent_बहुलकम्)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-    CV_LOG_DEBUG(NULL, cv::format("cv::samples::findFile('%s', %s)", relative_path.c_str(), required ? "true" : "false"));
-    cv::String result = cv::utils::findDataFile(relative_path,
+#यदि OPENCV_HAVE_FILESYSTEM_SUPPORT
+    CV_LOG_DEBUG(रिक्त, cv::format("cv::samples::findFile('%s', %s)", relative_मार्गः.c_str(), required ? "true" : "false"));
+    cv::String परिणाम = cv::utils::find_दत्त_File(relative_मार्गः,
                                                 "OPENCV_SAMPLES_DATA_PATH",
-                                                &_getDataSearchPath(),
-                                                &_getDataSearchSubDirectory());
-    if (result != relative_path && !silentMode)
+                                                &get_दत्त_अन्वेषणम्_मार्गः(),
+                                                &get_दत्त_अन्वेषणम्_Sub_Directory());
+    यदि (परिणाम != relative_मार्गः && !silent_बहुलकम्)
     {
-        CV_LOG_WARNING(NULL, "cv::samples::findFile('" << relative_path << "') => '" << result << "'");
+        CV_LOG_WARNING(रिक्त, "cv::samples::findFile('" << relative_मार्गः << "') => '" << परिणाम << "'");
     }
-    if (result.empty() && required)
-        CV_Error(cv::Error::StsError, cv::format("OpenCV samples: Can't find required data file: %s", relative_path.c_str()));
-    return result;
-#else
-    CV_UNUSED(relative_path);
-    CV_UNUSED(required);
-    CV_UNUSED(silentMode);
+    यदि (परिणाम.empty() && required)
+        CV_Error(cv::Error::StsError, cv::format("OpenCV samples: Can't find required data file: %s", relative_मार्गः.c_str()));
+    प्रत्यागम परिणाम;
+#अन्यथा
+    CV_अप्रयुक्तम्(relative_मार्गः);
+    CV_अप्रयुक्तम्(required);
+    CV_अप्रयुक्तम्(silent_बहुलकम्);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif
+#यदि_अन्तः
 }
 
 

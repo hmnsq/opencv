@@ -47,175 +47,175 @@
 //
 // */
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "opencl_kernels_core.hpp"
 
-namespace cv
+नामाकाश cv
 {
 
-template <typename T> static inline
-void scalarToRawData_(const Scalar& s, T * const buf, const int cn, const int unroll_to)
+प्रतिरूपम् <प्रकारनाम T> स्थिर अन्तःस्थ
+शून्य scalar_गन्तव्यम्_Raw_दत्त_2(ध्रुव Scalar& s, T * ध्रुव buf, ध्रुव पूर्णाङ्क cn, ध्रुव पूर्णाङ्क unroll_गन्तव्यम्)
 {
-    int i = 0;
-    for(; i < cn; i++)
+    पूर्णाङ्क i = 0;
+    प्रति(; i < cn; i++)
         buf[i] = saturate_cast<T>(s.val[i]);
-    for(; i < unroll_to; i++)
+    प्रति(; i < unroll_गन्तव्यम्; i++)
         buf[i] = buf[i-cn];
 }
 
-void scalarToRawData(const Scalar& s, void* _buf, int type, int unroll_to)
+शून्य scalar_गन्तव्यम्_Raw_दत्त(ध्रुव Scalar& s, शून्य* _buf, पूर्णाङ्क type, पूर्णाङ्क unroll_गन्तव्यम्)
 {
     CV_INSTRUMENT_REGION();
 
-    const int depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    ध्रुव पूर्णाङ्क गभीरता = CV_MAT_गभीरता(type), cn = CV_MAT_CN(type);
     CV_Assert(cn <= 4);
-    switch(depth)
+    विकल्प(गभीरता)
     {
-    case CV_8U:
-        scalarToRawData_(s, (uchar*)_buf, cn, unroll_to);
-        break;
-    case CV_8S:
-        scalarToRawData_(s, (schar*)_buf, cn, unroll_to);
-        break;
-    case CV_Bool:
-        scalarToRawData_(s, (bool*)_buf, cn, unroll_to);
-        break;
-    case CV_16U:
-        scalarToRawData_(s, (ushort*)_buf, cn, unroll_to);
-        break;
-    case CV_16S:
-        scalarToRawData_(s, (short*)_buf, cn, unroll_to);
-        break;
-    case CV_16F:
-        scalarToRawData_(s, (hfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_16BF:
-        scalarToRawData_(s, (bfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FN:
-        scalarToRawData_(s, (fp8_t*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FNUZ:
-        scalarToRawData_(s, (fp8a_t*)_buf, cn, unroll_to);
-        break;
-    case CV_32U:
-        scalarToRawData_(s, (unsigned*)_buf, cn, unroll_to);
-        break;
-    case CV_32S:
-        scalarToRawData_(s, (int*)_buf, cn, unroll_to);
-        break;
-    case CV_32F:
-        scalarToRawData_(s, (float*)_buf, cn, unroll_to);
-        break;
-    case CV_64U:
-        scalarToRawData_(s, (uint64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64S:
-        scalarToRawData_(s, (int64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64F:
-        scalarToRawData_(s, (double*)_buf, cn, unroll_to);
-        break;
-    default:
+    पक्ष CV_8U:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (uchar*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_8S:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (schar*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_Bool:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (तार्किक*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_16U:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (ushort*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_16S:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (ह्रस्व*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_16F:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (hfloat*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_16BF:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (bfloat*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_8F_E4M3FN:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (fp8_t*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_8F_E4M3FNUZ:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (fp8a_t*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_32U:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (अचिह्नित*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_32S:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (पूर्णाङ्क*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_32F:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (भिन्न*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_64U:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (uint64_t*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_64S:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (int64_t*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    पक्ष CV_64F:
+        scalar_गन्तव्यम्_Raw_दत्त_2(s, (द्विगुण*)_buf, cn, unroll_गन्तव्यम्);
+        भङ्ग;
+    स्वभाव:
         CV_Error(cv::Error::StsUnsupportedFormat,"");
     }
 }
 
-void convertAndUnrollScalar( const Mat& sc, int buftype, uchar* scbuf, size_t blocksize )
+शून्य convertAndUnrollScalar( ध्रुव Mat& sc, पूर्णाङ्क buftype, uchar* scbuf, size_t blocksize )
 {
-    int scn = (int)sc.total(), cn = CV_MAT_CN(buftype);
-    size_t esz = CV_ELEM_SIZE(buftype);
-    BinaryFunc cvtFn = getConvertFunc(sc.depth(), buftype);
+    पूर्णाङ्क scn = (पूर्णाङ्क)sc.योग(), cn = CV_MAT_CN(buftype);
+    size_t esz = CV_ELEM_आकार(buftype);
+    द्विमान_Func cvtFn = getConvertFunc(sc.गभीरता(), buftype);
     CV_Assert(cvtFn);
-    cvtFn(sc.ptr(), 1, 0, 1, scbuf, 1, Size(std::min(cn, scn), 1), 0);
+    cvtFn(sc.ptr(), 1, 0, 1, scbuf, 1, आकार(std::min(cn, scn), 1), 0);
     // unroll the scalar
-    if( scn < cn )
+    यदि( scn < cn )
     {
         CV_Assert( scn == 1 );
         size_t esz1 = CV_ELEM_SIZE1(buftype);
-        for( size_t i = esz1; i < esz; i++ )
+        प्रति( size_t i = esz1; i < esz; i++ )
             scbuf[i] = scbuf[i - esz1];
     }
-    for( size_t i = esz; i < blocksize*esz; i++ )
+    प्रति( size_t i = esz; i < blocksize*esz; i++ )
         scbuf[i] = scbuf[i - esz];
 }
 
-template<typename T> static void
-copyMask_(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+प्रतिरूपम्<प्रकारनाम T> स्थिर शून्य
+copy_आवरणम्(ध्रुव uchar* _src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, uchar* _dst, size_t dstep, आकार size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    प्रति( ; size.height--; आवरणम् += mstep, _src += sstep, _dst += dstep )
     {
-        const T* src = (const T*)_src;
+        ध्रुव T* src = (ध्रुव T*)_src;
         T* dst = (T*)_dst;
-        int x = 0;
-         #if CV_ENABLE_UNROLLED
-        for( ; x <= size.width - 4; x += 4 )
+        पूर्णाङ्क x = 0;
+         #यदि CV_ENABLE_UNROLLED
+        प्रति( ; x <= size.विस्तारः - 4; x += 4 )
         {
-            if( mask[x] )
+            यदि( आवरणम्[x] )
                 dst[x] = src[x];
-            if( mask[x+1] )
+            यदि( आवरणम्[x+1] )
                 dst[x+1] = src[x+1];
-            if( mask[x+2] )
+            यदि( आवरणम्[x+2] )
                 dst[x+2] = src[x+2];
-            if( mask[x+3] )
+            यदि( आवरणम्[x+3] )
                 dst[x+3] = src[x+3];
         }
-        #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        #यदि_अन्तः
+        प्रति( ; x < size.विस्तारः; x++ )
+            यदि( आवरणम्[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<uchar>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+प्रतिरूपम्<> शून्य
+copy_आवरणम्<uchar>(ध्रुव uchar* _src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, uchar* _dst, size_t dstep, आकार size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (int)sstep, _dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_सततम्_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (पूर्णाङ्क)sstep, _dst, (पूर्णाङ्क)dstep, ippi_आकार(size), आवरणम्, (पूर्णाङ्क)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    प्रति( ; size.height--; आवरणम् += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        ध्रुव uchar* src = (ध्रुव uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        पूर्णाङ्क x = 0;
+        #यदि (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            प्रति( ; x <= size.विस्तारः - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
-                v_uint8 v_src   = vx_load(src  + x),
-                        v_dst   = vx_load(dst  + x),
-                        v_nmask = v_eq(vx_load(mask + x), v_zero);
+                v_uint8 v_src   = vx_आरोपय(src  + x),
+                        v_dst   = vx_आरोपय(dst  + x),
+                        v_nmask = v_eq(vx_आरोपय(आवरणम् + x), v_zero);
 
                 v_dst = v_select(v_nmask, v_dst, v_src);
                 v_store(dst + x, v_dst);
             }
         }
         vx_cleanup();
-        #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        #यदि_अन्तः
+        प्रति( ; x < size.विस्तारः; x++ )
+            यदि( आवरणम्[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+प्रतिरूपम्<> शून्य
+copy_आवरणम्<Vec3b>(ध्रुव uchar* _src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, uchar* _dst, size_t dstep, आकार size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    प्रति( ; size.height--; आवरणम् += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        ध्रुव uchar* src = (ध्रुव uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        पूर्णाङ्क x = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+        प्रति( ; x <= size.विस्तारः - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
-            v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
+            v_uint8 v_nmask = v_eq(vx_आरोपय(आवरणम् + x), vx_setzero_u8());
 
             v_uint8 v_src0, v_src1, v_src2;
             v_uint8 v_dst0, v_dst1, v_dst2;
-            v_load_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
-            v_load_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
+            v_आरोपय_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
+            v_आरोपय_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
 
             v_dst0 = v_select(v_nmask, v_dst0, v_src0);
             v_dst1 = v_select(v_nmask, v_dst1, v_src1);
@@ -224,9 +224,9 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
             v_store_interleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
         }
         vx_cleanup();
-#endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+#यदि_अन्तः
+        प्रति( ; x < size.विस्तारः; x++ )
+            यदि( आवरणम्[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -234,27 +234,27 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+प्रतिरूपम्<> शून्य
+copy_आवरणम्<ushort>(ध्रुव uchar* _src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, uchar* _dst, size_t dstep, आकार size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (const Ipp16u *)_src, (int)sstep, (Ipp16u *)_dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_सततम्_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (ध्रुव Ipp16u *)_src, (पूर्णाङ्क)sstep, (Ipp16u *)_dst, (पूर्णाङ्क)dstep, ippi_आकार(size), आवरणम्, (पूर्णाङ्क)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    प्रति( ; size.height--; आवरणम् += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        ध्रुव ushort* src = (ध्रुव ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        पूर्णाङ्क x = 0;
+        #यदि (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            प्रति( ; x <= size.विस्तारः - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
-                v_uint16 v_src1 = vx_load(src + x), v_src2 = vx_load(src + x + VTraits<v_uint16>::vlanes()),
-                         v_dst1 = vx_load(dst + x), v_dst2 = vx_load(dst + x + VTraits<v_uint16>::vlanes());
+                v_uint16 v_src1 = vx_आरोपय(src + x), v_src2 = vx_आरोपय(src + x + VTraits<v_uint16>::vlanes()),
+                         v_dst1 = vx_आरोपय(dst + x), v_dst2 = vx_आरोपय(dst + x + VTraits<v_uint16>::vlanes());
 
                 v_uint8 v_nmask1, v_nmask2;
-                v_uint8 v_nmask = v_eq(vx_load(mask + x), v_zero);
+                v_uint8 v_nmask = v_eq(vx_आरोपय(आवरणम् + x), v_zero);
                 v_zip(v_nmask, v_nmask, v_nmask1, v_nmask2);
 
                 v_dst1 = v_select(v_reinterpret_as_u16(v_nmask1), v_dst1, v_src1);
@@ -264,36 +264,36 @@ copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mst
             }
         }
         vx_cleanup();
-        #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        #यदि_अन्तः
+        प्रति( ; x < size.विस्तारः; x++ )
+            यदि( आवरणम्[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+प्रतिरूपम्<> शून्य
+copy_आवरणम्<Vec3s>(ध्रुव uchar* _src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, uchar* _dst, size_t dstep, आकार size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    प्रति( ; size.height--; आवरणम् += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        ध्रुव ushort* src = (ध्रुव ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        पूर्णाङ्क x = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+        प्रति( ; x <= size.विस्तारः - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
-            v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
+            v_uint8 v_nmask = v_eq(vx_आरोपय(आवरणम् + x), vx_setzero_u8());
             v_uint8 v_nmask0, v_nmask1;
             v_zip(v_nmask, v_nmask, v_nmask0, v_nmask1);
 
             v_uint16 v_src0, v_src1, v_src2;
             v_uint16 v_dst0, v_dst1, v_dst2;
-            v_load_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
-            v_load_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
+            v_आरोपय_deinterleave(src + 3 * x, v_src0, v_src1, v_src2);
+            v_आरोपय_deinterleave(dst + 3 * x, v_dst0, v_dst1, v_dst2);
             v_uint16 v_src3, v_src4, v_src5;
             v_uint16 v_dst3, v_dst4, v_dst5;
-            v_load_deinterleave(src + 3 * (x + VTraits<v_uint16>::vlanes()), v_src3, v_src4, v_src5);
-            v_load_deinterleave(dst + 3 * (x + VTraits<v_uint16>::vlanes()), v_dst3, v_dst4, v_dst5);
+            v_आरोपय_deinterleave(src + 3 * (x + VTraits<v_uint16>::vlanes()), v_src3, v_src4, v_src5);
+            v_आरोपय_deinterleave(dst + 3 * (x + VTraits<v_uint16>::vlanes()), v_dst3, v_dst4, v_dst5);
 
             v_dst0 = v_select(v_reinterpret_as_u16(v_nmask0), v_dst0, v_src0);
             v_dst1 = v_select(v_reinterpret_as_u16(v_nmask0), v_dst1, v_src1);
@@ -306,9 +306,9 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
             v_store_interleave(dst + 3 * (x + VTraits<v_uint16>::vlanes()), v_dst3, v_dst4, v_dst5);
         }
         vx_cleanup();
-#endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+#यदि_अन्तः
+        प्रति( ; x < size.विस्तारः; x++ )
+            यदि( आवरणम्[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -316,23 +316,23 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+प्रतिरूपम्<> शून्य
+copy_आवरणम्<पूर्णाङ्क>(ध्रुव uchar* _src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, uchar* _dst, size_t dstep, आकार size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    प्रति( ; size.height--; आवरणम् += mstep, _src += sstep, _dst += dstep )
     {
-        const int* src = (const int*)_src;
-        int* dst = (int*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for (; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
+        ध्रुव पूर्णाङ्क* src = (ध्रुव पूर्णाङ्क*)_src;
+        पूर्णाङ्क* dst = (पूर्णाङ्क*)_dst;
+        पूर्णाङ्क x = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+        प्रति (; x <= size.विस्तारः - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
         {
-            v_int32 v_src0 = vx_load(src + x), v_dst0 = vx_load(dst + x);
-            v_int32 v_src1 = vx_load(src + x +     VTraits<v_int32>::vlanes()), v_dst1 = vx_load(dst + x +     VTraits<v_int32>::vlanes());
-            v_int32 v_src2 = vx_load(src + x + 2 * VTraits<v_int32>::vlanes()), v_dst2 = vx_load(dst + x + 2 * VTraits<v_int32>::vlanes());
-            v_int32 v_src3 = vx_load(src + x + 3 * VTraits<v_int32>::vlanes()), v_dst3 = vx_load(dst + x + 3 * VTraits<v_int32>::vlanes());
+            v_int32 v_src0 = vx_आरोपय(src + x), v_dst0 = vx_आरोपय(dst + x);
+            v_int32 v_src1 = vx_आरोपय(src + x +     VTraits<v_int32>::vlanes()), v_dst1 = vx_आरोपय(dst + x +     VTraits<v_int32>::vlanes());
+            v_int32 v_src2 = vx_आरोपय(src + x + 2 * VTraits<v_int32>::vlanes()), v_dst2 = vx_आरोपय(dst + x + 2 * VTraits<v_int32>::vlanes());
+            v_int32 v_src3 = vx_आरोपय(src + x + 3 * VTraits<v_int32>::vlanes()), v_dst3 = vx_आरोपय(dst + x + 3 * VTraits<v_int32>::vlanes());
 
-            v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
+            v_uint8 v_nmask = v_eq(vx_आरोपय(आवरणम् + x), vx_setzero_u8());
             v_uint8 v_nmask0, v_nmask1;
             v_zip(v_nmask, v_nmask, v_nmask0, v_nmask1);
             v_uint8 v_nmask00, v_nmask01, v_nmask10, v_nmask11;
@@ -350,74 +350,74 @@ copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep,
             vx_store(dst + x + 3 * VTraits<v_int32>::vlanes(), v_dst3);
         }
         vx_cleanup();
-#endif
-        for (; x < size.width; x++)
-            if ( mask[x] )
+#यदि_अन्तः
+        प्रति (; x < size.विस्तारः; x++)
+            यदि ( आवरणम्[x] )
                 dst[x] = src[x];
     }
 }
 
-static void
-copyMaskGeneric(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size, void* _esz)
+स्थिर शून्य
+copy_आवरणम्_Generic(ध्रुव uchar* _src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, uchar* _dst, size_t dstep, आकार size, शून्य* _esz)
 {
     size_t k, esz = *(size_t*)_esz;
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    प्रति( ; size.height--; आवरणम् += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = _src;
+        ध्रुव uchar* src = _src;
         uchar* dst = _dst;
-        int x = 0;
-        for( ; x < size.width; x++, src += esz, dst += esz )
+        पूर्णाङ्क x = 0;
+        प्रति( ; x < size.विस्तारः; x++, src += esz, dst += esz )
         {
-            if( !mask[x] )
-                continue;
-            for( k = 0; k < esz; k++ )
+            यदि( !आवरणम्[x] )
+                अनुवर्त;
+            प्रति( k = 0; k < esz; k++ )
                 dst[k] = src[k];
         }
     }
 }
 
 
-#define DEF_COPY_MASK(suffix, type) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+#परिभाषय DEF_COPY_आवरणम्(suffix, type) \
+स्थिर शून्य copy_आवरणम्_2##suffix(ध्रुव uchar* src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, \
+                             uchar* dst, size_t dstep, आकार size, शून्य*) \
 { \
-    copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
+    copy_आवरणम्<type>(src, sstep, आवरणम्, mstep, dst, dstep, size); \
 }
 
-#if defined HAVE_IPP
-#define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+#यदि defined HAVE_IPP
+#परिभाषय DEF_COPY_आवरणम्_F(suffix, type, ippfavor, ipptype) \
+स्थिर शून्य copy_आवरणम्_2##suffix(ध्रुव uchar* src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, \
+                             uchar* dst, size_t dstep, आकार size, शून्य*) \
 { \
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (const ipptype *)src, (int)sstep, (ipptype *)dst, (int)dstep, ippiSize(size), (const Ipp8u *)mask, (int)mstep) >= 0)\
-    copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
+    CV_IPP_सततम्_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (ध्रुव ipptype *)src, (पूर्णाङ्क)sstep, (ipptype *)dst, (पूर्णाङ्क)dstep, ippi_आकार(size), (ध्रुव Ipp8u *)आवरणम्, (पूर्णाङ्क)mstep) >= 0)\
+    copy_आवरणम्<type>(src, sstep, आवरणम्, mstep, dst, dstep, size); \
 }
-#else
-#define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+#अन्यथा
+#परिभाषय DEF_COPY_आवरणम्_F(suffix, type, ippfavor, ipptype) \
+स्थिर शून्य copy_आवरणम्_2##suffix(ध्रुव uchar* src, size_t sstep, ध्रुव uchar* आवरणम्, size_t mstep, \
+                             uchar* dst, size_t dstep, आकार size, शून्य*) \
 { \
-    copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
+    copy_आवरणम्<type>(src, sstep, आवरणम्, mstep, dst, dstep, size); \
 }
-#endif
+#यदि_अन्तः
 
-#if IPP_VERSION_X100 == 901 // bug in IPP 9.0.1
-DEF_COPY_MASK(32sC3, Vec3i)
-DEF_COPY_MASK(8uC3, Vec3b)
-#else
-DEF_COPY_MASK_F(8uC3, Vec3b, 8u_C3MR, Ipp8u)
-DEF_COPY_MASK_F(32sC3, Vec3i, 32s_C3MR, Ipp32s)
-#endif
-DEF_COPY_MASK(8u, uchar)
-DEF_COPY_MASK(16u, ushort)
-DEF_COPY_MASK_F(32s, int, 32s_C1MR, Ipp32s)
-DEF_COPY_MASK_F(16uC3, Vec3s, 16u_C3MR, Ipp16u)
-DEF_COPY_MASK(32sC2, Vec2i)
-DEF_COPY_MASK_F(32sC4, Vec4i, 32s_C4MR, Ipp32s)
-DEF_COPY_MASK(32sC6, Vec6i)
-DEF_COPY_MASK(32sC8, Vec8i)
+#यदि IPP_संस्करणम्_X100 == 901 // bug in IPP 9.0.1
+DEF_COPY_आवरणम्(32sC3, Vec3i)
+DEF_COPY_आवरणम्(8uC3, Vec3b)
+#अन्यथा
+DEF_COPY_आवरणम्_F(8uC3, Vec3b, 8u_C3MR, Ipp8u)
+DEF_COPY_आवरणम्_F(32sC3, Vec3i, 32s_C3MR, Ipp32s)
+#यदि_अन्तः
+DEF_COPY_आवरणम्(8u, uchar)
+DEF_COPY_आवरणम्(16u, ushort)
+DEF_COPY_आवरणम्_F(32s, पूर्णाङ्क, 32s_C1MR, Ipp32s)
+DEF_COPY_आवरणम्_F(16uC3, Vec3s, 16u_C3MR, Ipp16u)
+DEF_COPY_आवरणम्(32sC2, Vec2i)
+DEF_COPY_आवरणम्_F(32sC4, Vec4i, 32s_C4MR, Ipp32s)
+DEF_COPY_आवरणम्(32sC6, Vec6i)
+DEF_COPY_आवरणम्(32sC8, Vec8i)
 
-BinaryFunc copyMaskTab[] =
+द्विमान_Func copy_आवरणम्_Tab[] =
 {
     0,
     copyMask8u,
@@ -438,164 +438,164 @@ BinaryFunc copyMaskTab[] =
     copyMask32sC8
 };
 
-BinaryFunc getCopyMaskFunc(size_t esz)
+द्विमान_Func get_Copy_आवरणम्_Func(size_t esz)
 {
-    return esz <= 32 && copyMaskTab[esz] ? copyMaskTab[esz] : copyMaskGeneric;
+    प्रत्यागम esz <= 32 && copy_आवरणम्_Tab[esz] ? copy_आवरणम्_Tab[esz] : copy_आवरणम्_Generic;
 }
 
 /* dst = src */
-void Mat::copyTo( OutputArray _dst ) const
+शून्य Mat::copy_गन्तव्यम्( OutputArray _dst ) ध्रुव
 {
     CV_INSTRUMENT_REGION();
 
-#ifdef HAVE_CUDA
-    if (_dst.isGpuMat())
+#यदि_परिभाषितम् HAVE_CUDA
+    यदि (_dst.isGpuMat())
     {
-        _dst.getGpuMat().upload(*this);
-        return;
+        _dst.getGpuMat().upload(*एतत्);
+        प्रत्यागम;
     }
-#endif
+#यदि_अन्तः
 
-    int stype = type();
-    int dtype = _dst.type();
-    if( _dst.fixedType() && dtype != stype )
+    पूर्णाङ्क stype = type();
+    पूर्णाङ्क dtype = _dst.type();
+    यदि( _dst.fixedType() && dtype != stype )
     {
         CV_Assert( CV_MAT_CN(stype) == CV_MAT_CN(dtype) );
-        convertTo( _dst, dtype );
-        return;
+        convert_गन्तव्यम्( _dst, dtype );
+        प्रत्यागम;
     }
 
-    if( dims == 0 && empty() )
+    यदि( dims == 0 && empty() )
     {
         _dst.release();
-        void* obj = _dst.getObj();
-        if (_dst.isMat())
+        शून्य* obj = _dst.getObj();
+        यदि (_dst.isMat())
             reinterpret_cast<Mat*>(obj)->flags = Mat::MAGIC_VAL | Mat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isUMat())
+        अन्यथा यदि (_dst.isUMat())
             reinterpret_cast<UMat*>(obj)->flags = UMat::MAGIC_VAL | UMat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isGpuMat())
+        अन्यथा यदि (_dst.isGpuMat())
             reinterpret_cast<cuda::GpuMat*>(obj)->flags = stype;
-        return;
+        प्रत्यागम;
     }
 
-    bool allowTransposed = dims == 1 ||
-        _dst.kind() == _InputArray::STD_VECTOR ||
-        (_dst.fixedSize() && _dst.dims() == 1);
-    if( _dst.isUMat() )
+    तार्किक allowTransposed = dims == 1 ||
+        _dst.विधा() == निवेशः_Array_2::STD_सदिशम् ||
+        (_dst.fixed_आकार() && _dst.dims() == 1);
+    यदि( _dst.isUMat() )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
-        if (empty())
-            return;
+        यदि (empty())
+            प्रत्यागम;
         UMat dst = _dst.getUMat();
-        CV_Assert(dst.u != NULL);
-        size_t i, sz[CV_MAX_DIM] = {1}, dstofs[CV_MAX_DIM] = {0}, esz = CV_ELEM_SIZE(stype);
+        CV_Assert(dst.u != रिक्त);
+        size_t i, sz[CV_MAX_DIM] = {1}, dstofs[CV_MAX_DIM] = {0}, esz = CV_ELEM_आकार(stype);
         CV_Assert(dims >= 0 && dims < CV_MAX_DIM);
-        for( i = 0; i < (size_t)dims; i++ )
+        प्रति( i = 0; i < (size_t)dims; i++ )
             sz[i] = size.p[i];
-        int lastdim = dims >= 1 ? dims-1 : 0;
+        पूर्णाङ्क lastdim = dims >= 1 ? dims-1 : 0;
         sz[lastdim] *= esz;
         dst.ndoffset(dstofs);
         dstofs[lastdim] *= esz;
-        dst.u->currAllocator->upload(dst.u, data, std::max(dims, 1), sz, dstofs, dst.step.p, step.p);
-        return;
+        dst.u->currAllocator->upload(dst.u, दत्त, std::max(dims, 1), sz, dstofs, dst.चरणः.p, चरणः.p);
+        प्रत्यागम;
     }
 
-    if( dims <= 2 )
+    यदि( dims <= 2 )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
         Mat dst = _dst.getMat();
-        if( data == dst.data )
-            return;
+        यदि( दत्त == dst.दत्त )
+            प्रत्यागम;
 
-        if( rows > 0 && cols > 0 )
+        यदि( पङ्क्तिकाः > 0 && स्तम्भसङ्ख्या > 0 )
         {
-            Mat src = *this;
-            Size sz = getContinuousSize2D(src, dst, (int)elemSize());
-            CV_CheckGE(sz.width, 0, "");
+            Mat src = *एतत्;
+            आकार sz = getContinuousSize2D(src, dst, (पूर्णाङ्क)elem_आकार());
+            CV_CheckGE(sz.विस्तारः, 0, "");
 
-            const uchar* sptr = src.data;
-            uchar* dptr = dst.data;
+            ध्रुव uchar* sptr = src.दत्त;
+            uchar* dptr = dst.दत्त;
 
-#if IPP_VERSION_X100 >= 201700
-            CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (int)src.step, dptr, (int)dst.step, ippiSizeL(sz.width, sz.height)) >= 0)
-#endif
+#यदि IPP_संस्करणम्_X100 >= 201700
+            CV_IPP_सततम्_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (पूर्णाङ्क)src.चरणः, dptr, (पूर्णाङ्क)dst.चरणः, ippi_आकार_L(sz.विस्तारः, sz.height)) >= 0)
+#यदि_अन्तः
 
-            for (; sz.height--; sptr += src.step, dptr += dst.step)
-                memcpy(dptr, sptr, sz.width);
+            प्रति (; sz.height--; sptr += src.चरणः, dptr += dst.चरणः)
+                स्मृतिं_प्रतिलिख(dptr, sptr, sz.विस्तारः);
         }
-        return;
+        प्रत्यागम;
     }
 
     _dst.create( size, stype );
     Mat dst = _dst.getMat();
-    if( data == dst.data )
-        return;
+    यदि( दत्त == dst.दत्त )
+        प्रत्यागम;
 
-    if( total() != 0 )
+    यदि( योग() != 0 )
     {
-        const Mat* arrays[] = { this, &dst };
+        ध्रुव Mat* arrays[] = { एतत्, &dst };
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs, 2);
-        size_t sz = it.size*elemSize();
+        size_t sz = it.size*elem_आकार();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
-            memcpy(ptrs[1], ptrs[0], sz);
+        प्रति( size_t i = 0; i < it.nplanes; i++, ++it )
+            स्मृतिं_प्रतिलिख(ptrs[1], ptrs[0], sz);
     }
 }
 
-#ifdef HAVE_IPP
-static bool ipp_copyTo(const Mat &src, Mat &dst, const Mat &mask)
+#यदि_परिभाषितम् HAVE_IPP
+स्थिर तार्किक ipp_copy_गन्तव्यम्(ध्रुव Mat &src, Mat &dst, ध्रुव Mat &आवरणम्)
 {
-#ifdef HAVE_IPP_IW_LL
+#यदि_परिभाषितम् HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.channels() > 1 || mask.depth() != CV_8U)
-        return false;
+    यदि(आवरणम्.channels() > 1 || आवरणम्.गभीरता() != CV_8U)
+        प्रत्यागम असत्य;
 
-    if (src.dims <= 2)
+    यदि (src.dims <= 2)
     {
-        IppiSize size = ippiSize(src.size());
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMask, src.ptr(), (int)src.step, dst.ptr(), (int)dst.step, size, (int)src.elemSize1(), src.channels(), mask.ptr(), (int)mask.step) >= 0;
+        Ippi_आकार size = ippi_आकार(src.size());
+        प्रत्यागम CV_INSTRUMENT_FUN_IPP(llwi_Copy_आवरणम्, src.ptr(), (पूर्णाङ्क)src.चरणः, dst.ptr(), (पूर्णाङ्क)dst.चरणः, size, (पूर्णाङ्क)src.elemSize1(), src.channels(), आवरणम्.ptr(), (पूर्णाङ्क)आवरणम्.चरणः) >= 0;
     }
-    else
+    अन्यथा
     {
-        const Mat      *arrays[] = {&src, &dst, &mask, NULL};
-        uchar          *ptrs[3]  = {NULL};
+        ध्रुव Mat      *arrays[] = {&src, &dst, &आवरणम्, रिक्त};
+        uchar          *ptrs[3]  = {रिक्त};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize size = ippiSize(it.size, 1);
+        Ippi_आकार size = ippi_आकार(it.size, 1);
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        प्रति (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMask, ptrs[0], 0, ptrs[1], 0, size, (int)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
-                return false;
+            यदि(CV_INSTRUMENT_FUN_IPP(llwi_Copy_आवरणम्, ptrs[0], 0, ptrs[1], 0, size, (पूर्णाङ्क)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
+                प्रत्यागम असत्य;
         }
-        return true;
+        प्रत्यागम सत्य;
     }
-#else
-    CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(mask);
-    return false;
-#endif
+#अन्यथा
+    CV_अप्रयुक्तम्(src); CV_अप्रयुक्तम्(dst); CV_अप्रयुक्तम्(आवरणम्);
+    प्रत्यागम असत्य;
+#यदि_अन्तः
 }
-#endif
+#यदि_अन्तः
 
-void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
+शून्य Mat::copy_गन्तव्यम्( OutputArray _dst, निवेशः_Array आवरणम्_2 ) ध्रुव
 {
     CV_INSTRUMENT_REGION();
 
-    Mat mask = _mask.getMat();
-    if( !mask.data )
+    Mat आवरणम् = आवरणम्_2.getMat();
+    यदि( !आवरणम्.दत्त )
     {
-        copyTo(_dst);
-        return;
+        copy_गन्तव्यम्(_dst);
+        प्रत्यागम;
     }
 
-    int cn = channels(), mcn = mask.channels();
-    CV_Assert( (mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) && (mcn == 1 || mcn == cn) );
-    bool colorMask = mcn > 1;
-    if( dims <= 2 )
+    पूर्णाङ्क cn = channels(), mcn = आवरणम्.channels();
+    CV_Assert( (आवरणम्.गभीरता() == CV_8U || आवरणम्.गभीरता() == CV_8S || आवरणम्.गभीरता() == CV_Bool) && (mcn == 1 || mcn == cn) );
+    तार्किक color_आवरणम् = mcn > 1;
+    यदि( dims <= 2 )
     {
-        CV_Assert( size() == mask.size() );
+        CV_Assert( size() == आवरणम्.size() );
     }
 
     Mat dst;
@@ -604,52 +604,52 @@ void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
         _dst.create(size, type()); // TODO Prohibit 'dst' re-creation, user should pass it explicitly with correct size/type or empty
         dst = _dst.getMat();
 
-        if (dst.data != dst0.data) // re-allocation happened
+        यदि (dst.दत्त != dst0.दत्त) // re-allocation happened
         {
-#ifdef OPENCV_FUTURE
+#यदि_परिभाषितम् OPENCV_FUTURE
             CV_Assert(dst0.empty() &&
                 "copyTo(): dst size/type mismatch (looks like a bug) - use dst.release() before copyTo() call to suppress this message");
-#endif
+#यदि_अन्तः
             dst = Scalar(0); // do not leave dst uninitialized
         }
     }
 
-    CV_IPP_RUN_FAST(ipp_copyTo(*this, dst, mask))
-    if ( this->dims <= 2 ) {
-        if ( this->size() == dst.size() && this->size() == dst.size() ) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, this->step, dst.data, dst.step, this->cols, this->rows, this->type(), mask.data, mask.step, mask.type());
+    CV_IPP_सततम्_FAST(ipp_copy_गन्तव्यम्(*एतत्, dst, आवरणम्))
+    यदि ( एतत्->dims <= 2 ) {
+        यदि ( एतत्->size() == dst.size() && एतत्->size() == dst.size() ) {
+            CALL_HAL(copy_गन्तव्यम्_आवरणम्, cv_hal_copy_गन्तव्यम्_Masked, एतत्->दत्त, एतत्->चरणः, dst.दत्त, dst.चरणः, एतत्->स्तम्भसङ्ख्या, एतत्->पङ्क्तिकाः, एतत्->type(), आवरणम्.दत्त, आवरणम्.चरणः, आवरणम्.type());
         }
     }
-    else if ( this->isContinuous() && dst.isContinuous() && mask.isContinuous() )
+    अन्यथा यदि ( एतत्->isContinuous() && dst.isContinuous() && आवरणम्.isContinuous() )
     {
-        size_t sz = this->total();
-        if (sz < INT_MAX) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, 0, dst.data, 0, (int)sz, 1, this->type(), mask.data, 0, mask.type());
+        size_t sz = एतत्->योग();
+        यदि (sz < अधिकतम_पूर्णाङ्कः) {
+            CALL_HAL(copy_गन्तव्यम्_आवरणम्, cv_hal_copy_गन्तव्यम्_Masked, एतत्->दत्त, 0, dst.दत्त, 0, (पूर्णाङ्क)sz, 1, एतत्->type(), आवरणम्.दत्त, 0, आवरणम्.type());
         }
     }
 
-    size_t esz = colorMask ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    size_t esz = color_आवरणम् ? elemSize1() : elem_आकार();
+    द्विमान_Func copymask = get_Copy_आवरणम्_Func(esz);
 
-    if( dims <= 2 )
+    यदि( dims <= 2 )
     {
-        Mat src = *this;
-        Size sz = getContinuousSize2D(src, dst, mask, mcn);
-        copymask(src.data, src.step, mask.data, mask.step, dst.data, dst.step, sz, &esz);
-        return;
+        Mat src = *एतत्;
+        आकार sz = getContinuousSize2D(src, dst, आवरणम्, mcn);
+        copymask(src.दत्त, src.चरणः, आवरणम्.दत्त, आवरणम्.चरणः, dst.दत्त, dst.चरणः, sz, &esz);
+        प्रत्यागम;
     }
 
-    const Mat* arrays[] = { this, &dst, &mask, 0 };
+    ध्रुव Mat* arrays[] = { एतत्, &dst, &आवरणम्, 0 };
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    Size sz((int)(it.size*mcn), 1);
+    आकार sz((पूर्णाङ्क)(it.size*mcn), 1);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    प्रति( size_t i = 0; i < it.nplanes; i++, ++it )
         copymask(ptrs[0], 0, ptrs[2], 0, ptrs[1], 0, sz, &esz);
 }
 
 /* dst = src */
-void Mat::copyAt( OutputArray _dst ) const
+शून्य Mat::copyAt( OutputArray _dst ) ध्रुव
 {
     CV_INSTRUMENT_REGION();
 
@@ -657,9 +657,9 @@ void Mat::copyAt( OutputArray _dst ) const
     CV_CheckTrue( !dst.empty(), "dst must not be empty" );
     CV_CheckTypeEQ(type(), dst.type(), "Make the type of dst the same as src");
     CV_CheckEQ(size(), dst.size(), "Make the size of dst the same as src");
-    copyTo(_dst);
+    copy_गन्तव्यम्(_dst);
 }
-void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
+शून्य Mat::copyAt( OutputArray _dst, निवेशः_Array आवरणम्_2 ) ध्रुव
 {
     CV_INSTRUMENT_REGION();
 
@@ -667,241 +667,241 @@ void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
     CV_CheckTrue( !dst.empty(), "dst must not be empty" );
     CV_CheckTypeEQ(type(), dst.type(), "Make the type of dst the same as src");
     CV_CheckEQ(size(), dst.size(), "Make the size of dst the same as src");
-    copyTo(_dst, _mask);
+    copy_गन्तव्यम्(_dst, आवरणम्_2);
 }
 
 
-static bool can_apply_memset(const Mat &mat, const Scalar &s, int &fill_value)
+स्थिर तार्किक can_apply_memset(ध्रुव Mat &mat, ध्रुव Scalar &s, पूर्णाङ्क &fill_मानम्)
 {
     // check if depth is 1 byte.
-    switch (mat.depth())
+    विकल्प (mat.गभीरता())
     {
-    case CV_8U: fill_value = saturate_cast<uchar>( s.val[0] ); break;
-    case CV_8S: fill_value = saturate_cast<schar>( s.val[0] ); break;
-    default: return false;
+    पक्ष CV_8U: fill_मानम् = saturate_cast<uchar>( s.val[0] ); भङ्ग;
+    पक्ष CV_8S: fill_मानम् = saturate_cast<schar>( s.val[0] ); भङ्ग;
+    स्वभाव: प्रत्यागम असत्य;
     }
 
     // check if all element is same.
-    const int64* is = (const int64*)&s.val[0];
-    switch (mat.channels())
+    ध्रुव int64* is = (ध्रुव int64*)&s.val[0];
+    विकल्प (mat.channels())
     {
-    case 1: return true;
-    case 2: return (is[0] == is[1]);
-    case 3: return (is[0] == is[1] && is[1] == is[2]);
-    case 4: return (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
-    default: return false;
+    पक्ष 1: प्रत्यागम सत्य;
+    पक्ष 2: प्रत्यागम (is[0] == is[1]);
+    पक्ष 3: प्रत्यागम (is[0] == is[1] && is[1] == is[2]);
+    पक्ष 4: प्रत्यागम (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
+    स्वभाव: प्रत्यागम असत्य;
     }
 }
 
-Mat& Mat::operator = (const Scalar& s)
+Mat& Mat::संक्रियकः = (ध्रुव Scalar& s)
 {
     CV_INSTRUMENT_REGION();
 
-    if (this->empty())
-        return *this;
+    यदि (एतत्->empty())
+        प्रत्यागम *एतत्;
 
-    const Mat* arrays[] = { this };
+    ध्रुव Mat* arrays[] = { एतत् };
     uchar* dptr;
     NAryMatIterator it(arrays, &dptr, 1);
-    size_t elsize = it.size*elemSize();
-    const int64* is = (const int64*)&s.val[0];
+    size_t elsize = it.size*elem_आकार();
+    ध्रुव int64* is = (ध्रुव int64*)&s.val[0];
 
-    if( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
+    यदि( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
     {
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
-            memset( dptr, 0, elsize );
+        प्रति( size_t i = 0; i < it.nplanes; i++, ++it )
+            स्मृतिं_पूरय( dptr, 0, elsize );
     }
-    else
+    अन्यथा
     {
-        int fill_value = 0;
-        if ( can_apply_memset(*this, s, fill_value) )
+        पूर्णाङ्क fill_मानम् = 0;
+        यदि ( can_apply_memset(*एतत्, s, fill_मानम्) )
         {
-            for (size_t i = 0; i < it.nplanes; i++, ++it)
-                memset(dptr, fill_value, elsize);
-            return *this;
+            प्रति (size_t i = 0; i < it.nplanes; i++, ++it)
+                स्मृतिं_पूरय(dptr, fill_मानम्, elsize);
+            प्रत्यागम *एतत्;
         }
 
-        if( it.nplanes > 0 )
+        यदि( it.nplanes > 0 )
         {
-            double scalar[12];
-            scalarToRawData(s, scalar, type(), 12);
-            size_t blockSize = 12*elemSize1();
+            द्विगुण scalar[12];
+            scalar_गन्तव्यम्_Raw_दत्त(s, scalar, type(), 12);
+            size_t खण्डम्_आकार_2 = 12*elemSize1();
 
-            for( size_t j = 0; j < elsize; j += blockSize )
+            प्रति( size_t j = 0; j < elsize; j += खण्डम्_आकार_2 )
             {
-                size_t sz = MIN(blockSize, elsize - j);
-                CV_Assert(sz <= sizeof(scalar));
-                memcpy( dptr + j, scalar, sz );
+                size_t sz = MIN(खण्डम्_आकार_2, elsize - j);
+                CV_Assert(sz <= परिमाण(scalar));
+                स्मृतिं_प्रतिलिख( dptr + j, scalar, sz );
             }
         }
 
-        for( size_t i = 1; i < it.nplanes; i++ )
+        प्रति( size_t i = 1; i < it.nplanes; i++ )
         {
             ++it;
-            memcpy( dptr, data, elsize );
+            स्मृतिं_प्रतिलिख( dptr, दत्त, elsize );
         }
     }
-    return *this;
+    प्रत्यागम *एतत्;
 }
 
-#ifdef HAVE_IPP
-static bool ipp_Mat_setTo_Mat(Mat &dst, Mat &_val, Mat &mask)
+#यदि_परिभाषितम् HAVE_IPP
+स्थिर तार्किक ipp_Mat_समुच्चयः_गन्तव्यम्_Mat(Mat &dst, Mat &_val, Mat &आवरणम्)
 {
-#ifdef HAVE_IPP_IW_LL
+#यदि_परिभाषितम् HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.empty())
-        return false;
+    यदि(आवरणम्.empty())
+        प्रत्यागम असत्य;
 
-    if(mask.depth() != CV_8U || mask.channels() > 1)
-        return false;
+    यदि(आवरणम्.गभीरता() != CV_8U || आवरणम्.channels() > 1)
+        प्रत्यागम असत्य;
 
-    if(dst.channels() > 4)
-        return false;
+    यदि(dst.channels() > 4)
+        प्रत्यागम असत्य;
 
-    if (dst.depth() == CV_32F)
+    यदि (dst.गभीरता() == CV_32F)
     {
-        for (int i = 0; i < (int)(_val.total()); i++)
+        प्रति (पूर्णाङ्क i = 0; i < (पूर्णाङ्क)(_val.योग()); i++)
         {
-            float v = (float)(_val.at<double>(i));  // cast to float
-            if (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
-                return false;
+            भिन्न v = (भिन्न)(_val.at<द्विगुण>(i));  // cast to float
+            यदि (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
+                प्रत्यागम असत्य;
         }
     }
 
-    if(dst.dims <= 2)
+    यदि(dst.dims <= 2)
     {
-        IppiSize            size     = ippiSize(dst.size());
-        IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        Ippi_आकार            size     = ippi_आकार(dst.size());
+        Ipp_दत्त_Type         दत्त_Type = ippi_Get_दत्त_Type(dst.गभीरता());
+        ::ipp::Iw_मानम्_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        return CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, dst.ptr(), (int)dst.step, size, dataType, dst.channels(), mask.ptr(), (int)mask.step) >= 0;
+        प्रत्यागम CV_INSTRUMENT_FUN_IPP(llwi_समुच्चयः_आवरणम्, s, dst.ptr(), (पूर्णाङ्क)dst.चरणः, size, दत्त_Type, dst.channels(), आवरणम्.ptr(), (पूर्णाङ्क)आवरणम्.चरणः) >= 0;
     }
-    else
+    अन्यथा
     {
-        const Mat      *arrays[] = {&dst, mask.empty()?NULL:&mask, NULL};
-        uchar          *ptrs[2]  = {NULL};
+        ध्रुव Mat      *arrays[] = {&dst, आवरणम्.empty()?रिक्त:&आवरणम्, रिक्त};
+        uchar          *ptrs[2]  = {रिक्त};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize            size     = {(int)it.size, 1};
-        IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        Ippi_आकार            size     = {(पूर्णाङ्क)it.size, 1};
+        Ipp_दत्त_Type         दत्त_Type = ippi_Get_दत्त_Type(dst.गभीरता());
+        ::ipp::Iw_मानम्_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it)
+        प्रति( size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, ptrs[0], 0, size, dataType, dst.channels(), ptrs[1], 0) < 0)
-                return false;
+            यदि(CV_INSTRUMENT_FUN_IPP(llwi_समुच्चयः_आवरणम्, s, ptrs[0], 0, size, दत्त_Type, dst.channels(), ptrs[1], 0) < 0)
+                प्रत्यागम असत्य;
         }
-        return true;
+        प्रत्यागम सत्य;
     }
-#else
-    CV_UNUSED(dst); CV_UNUSED(_val); CV_UNUSED(mask);
-    return false;
-#endif
+#अन्यथा
+    CV_अप्रयुक्तम्(dst); CV_अप्रयुक्तम्(_val); CV_अप्रयुक्तम्(आवरणम्);
+    प्रत्यागम असत्य;
+#यदि_अन्तः
 }
-#endif
+#यदि_अन्तः
 
-Mat& Mat::setTo(InputArray _value, InputArray _mask)
+Mat& Mat::समुच्चयः_गन्तव्यम्(निवेशः_Array मानम्, निवेशः_Array आवरणम्_2)
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    यदि( empty() )
+        प्रत्यागम *एतत्;
 
-    Mat value = _value.getMat(), mask = _mask.getMat();
+    Mat value = मानम्.getMat(), आवरणम् = आवरणम्_2.getMat();
 
-    CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::MAT ));
-    int cn = channels(), mcn = mask.channels();
-    CV_Assert( mask.empty() || ((mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) &&
-               (mcn == 1 || mcn == cn) && size == mask.size) );
+    CV_Assert( checkScalar(value, type(), मानम्.विधा(), निवेशः_Array_2::MAT ));
+    पूर्णाङ्क cn = channels(), mcn = आवरणम्.channels();
+    CV_Assert( आवरणम्.empty() || ((आवरणम्.गभीरता() == CV_8U || आवरणम्.गभीरता() == CV_8S || आवरणम्.गभीरता() == CV_Bool) &&
+               (mcn == 1 || mcn == cn) && size == आवरणम्.size) );
 
-    CV_IPP_RUN_FAST(ipp_Mat_setTo_Mat(*this, value, mask), *this)
+    CV_IPP_सततम्_FAST(ipp_Mat_समुच्चयः_गन्तव्यम्_Mat(*एतत्, value, आवरणम्), *एतत्)
 
-    size_t esz = mcn > 1 ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    size_t esz = mcn > 1 ? elemSize1() : elem_आकार();
+    द्विमान_Func copymask = get_Copy_आवरणम्_Func(esz);
 
-    const Mat* arrays[] = { this, !mask.empty() ? &mask : 0, 0 };
+    ध्रुव Mat* arrays[] = { एतत्, !आवरणम्.empty() ? &आवरणम् : 0, 0 };
     uchar* ptrs[2]={0,0};
     NAryMatIterator it(arrays, ptrs);
-    int totalsz = (int)it.size*mcn;
-    int blockSize0 = std::min(totalsz, (int)((BLOCK_SIZE + esz-1)/esz));
-    blockSize0 -= blockSize0 % mcn;    // must be divisible without remainder for unrolling and advancing
-    AutoBuffer<uchar> _scbuf(blockSize0*esz + 32);
-    uchar* scbuf = alignPtr((uchar*)_scbuf.data(), (int)sizeof(double));
-    convertAndUnrollScalar( value, type(), scbuf, blockSize0/mcn );
+    पूर्णाङ्क totalsz = (पूर्णाङ्क)it.size*mcn;
+    पूर्णाङ्क खण्डम्_Size0 = std::min(totalsz, (पूर्णाङ्क)((खण्डम्_आकार + esz-1)/esz));
+    खण्डम्_Size0 -= खण्डम्_Size0 % mcn;    // must be divisible without remainder for unrolling and advancing
+    Auto_बफर<uchar> _scbuf(खण्डम्_Size0*esz + 32);
+    uchar* scbuf = alignPtr((uchar*)_scbuf.दत्त(), (पूर्णाङ्क)परिमाण(द्विगुण));
+    convertAndUnrollScalar( value, type(), scbuf, खण्डम्_Size0/mcn );
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    प्रति( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( int j = 0; j < totalsz; j += blockSize0 )
+        प्रति( पूर्णाङ्क j = 0; j < totalsz; j += खण्डम्_Size0 )
         {
-            Size sz(std::min(blockSize0, totalsz - j), 1);
-            size_t blockSize = sz.width*esz;
-            if( ptrs[1] )
+            आकार sz(std::min(खण्डम्_Size0, totalsz - j), 1);
+            size_t खण्डम्_आकार_2 = sz.विस्तारः*esz;
+            यदि( ptrs[1] )
             {
                 copymask(scbuf, 0, ptrs[1], 0, ptrs[0], 0, sz, &esz);
-                ptrs[1] += sz.width;
+                ptrs[1] += sz.विस्तारः;
             }
-            else
-                memcpy(ptrs[0], scbuf, blockSize);
-            ptrs[0] += blockSize;
+            अन्यथा
+                स्मृतिं_प्रतिलिख(ptrs[0], scbuf, खण्डम्_आकार_2);
+            ptrs[0] += खण्डम्_आकार_2;
         }
     }
-    return *this;
+    प्रत्यागम *एतत्;
 }
 
 
-Mat& Mat::setZero()
+Mat& Mat::समुच्चयः_Zero()
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    यदि( empty() )
+        प्रत्यागम *एतत्;
 
-    size_t esz = elemSize();
+    size_t esz = elem_आकार();
 
-    const Mat* arrays[] = { this, 0 };
+    ध्रुव Mat* arrays[] = { एतत्, 0 };
     uchar* ptrs[]={0};
     NAryMatIterator it(arrays, ptrs);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
-        memset(ptrs[0], 0, esz*it.size);
-    return *this;
+    प्रति( size_t i = 0; i < it.nplanes; i++, ++it )
+        स्मृतिं_पूरय(ptrs[0], 0, esz*it.size);
+    प्रत्यागम *एतत्;
 }
 
 
-#if defined HAVE_OPENCL && !defined __APPLE__
+#यदि defined HAVE_OPENCL && !defined __APPLE__
 
-static bool ocl_repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+स्थिर तार्किक ocl_repeat(निवेशः_Array _src, पूर्णाङ्क ny, पूर्णाङ्क nx, OutputArray _dst)
 {
-    if (ny == 1 && nx == 1)
+    यदि (ny == 1 && nx == 1)
     {
-        _src.copyTo(_dst);
-        return true;
+        _src.copy_गन्तव्यम्(_dst);
+        प्रत्यागम सत्य;
     }
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1,
-            kercn = ocl::predictOptimalVectorWidth(_src, _dst);
+    पूर्णाङ्क type = _src.type(), गभीरता = CV_MAT_गभीरता(type), cn = CV_MAT_CN(type),
+            पङ्क्तिकाः_प्रत्येकम्_WI = ocl::Device::getDefault().isIntel() ? 4 : 1,
+            kercn = ocl::predict_Optimal_सदिशम्_विस्तारः(_src, _dst);
 
     ocl::Kernel k("repeat", ocl::core::repeat_oclsrc,
                   format("-D T=%s -D nx=%d -D ny=%d -D rowsPerWI=%d -D cn=%d",
-                         ocl::memopTypeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         nx, ny, rowsPerWI, kercn));
-    if (k.empty())
-        return false;
+                         ocl::memop_Type_गन्तव्यम्_Str(CV_MAKE_TYPE(गभीरता, kercn)),
+                         nx, ny, पङ्क्तिकाः_प्रत्येकम्_WI, kercn));
+    यदि (k.empty())
+        प्रत्यागम असत्य;
 
     UMat src = _src.getUMat(), dst = _dst.getUMat();
-    k.args(ocl::KernelArg::ReadOnly(src, cn, kercn), ocl::KernelArg::WriteOnlyNoSize(dst));
+    k.तर्काः(ocl::KernelArg::ReadOnly(src, cn, kercn), ocl::KernelArg::Write_Only_No_आकार(dst));
 
-    size_t globalsize[] = { (size_t)src.cols * cn / kercn, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[] = { (size_t)src.स्तम्भसङ्ख्या * cn / kercn, ((size_t)src.पङ्क्तिकाः + पङ्क्तिकाः_प्रत्येकम्_WI - 1) / पङ्क्तिकाः_प्रत्येकम्_WI };
+    प्रत्यागम k.सततम्(2, globalsize, रिक्त, असत्य);
 }
 
-#endif
+#यदि_अन्तः
 
-void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+शून्य repeat(निवेशः_Array _src, पूर्णाङ्क ny, पूर्णाङ्क nx, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -909,43 +909,43 @@ void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
     CV_Assert( _src.dims() <= 2 );
     CV_Assert( ny > 0 && nx > 0 );
 
-    Size ssize = _src.size();
-    if( ssize.empty() )
+    आकार ssize = _src.size();
+    यदि( ssize.empty() )
     {
         _dst.create(0, 0, _src.type());
-        return;
+        प्रत्यागम;
     }
-    CV_Assert( (int64_t)ssize.height * ny <= INT_MAX && (int64_t)ssize.width * nx <= INT_MAX );
-    _dst.create(ssize.height*ny, ssize.width*nx, _src.type());
+    CV_Assert( (int64_t)ssize.height * ny <= अधिकतम_पूर्णाङ्कः && (int64_t)ssize.विस्तारः * nx <= अधिकतम_पूर्णाङ्कः );
+    _dst.create(ssize.height*ny, ssize.विस्तारः*nx, _src.type());
 
-#if !defined __APPLE__
-    CV_OCL_RUN(_dst.isUMat(),
+#यदि !defined __APPLE__
+    CV_OCL_सततम्(_dst.isUMat(),
                ocl_repeat(_src, ny, nx, _dst))
-#endif
+#यदि_अन्तः
 
     Mat src = _src.getMat(), dst = _dst.getMat();
-    Size dsize = dst.size();
-    int esz = (int)src.elemSize();
-    int x, y;
-    ssize.width *= esz; dsize.width *= esz;
+    आकार dsize = dst.size();
+    पूर्णाङ्क esz = (पूर्णाङ्क)src.elem_आकार();
+    पूर्णाङ्क x, y;
+    ssize.विस्तारः *= esz; dsize.विस्तारः *= esz;
 
-    for( y = 0; y < ssize.height; y++ )
+    प्रति( y = 0; y < ssize.height; y++ )
     {
-        for( x = 0; x < dsize.width; x += ssize.width )
-            memcpy( dst.ptr(y) + x, src.ptr(y), ssize.width );
+        प्रति( x = 0; x < dsize.विस्तारः; x += ssize.विस्तारः )
+            स्मृतिं_प्रतिलिख( dst.ptr(y) + x, src.ptr(y), ssize.विस्तारः );
     }
 
-    for( ; y < dsize.height; y++ )
-        memcpy( dst.ptr(y), dst.ptr(y - ssize.height), dsize.width );
+    प्रति( ; y < dsize.height; y++ )
+        स्मृतिं_प्रतिलिख( dst.ptr(y), dst.ptr(y - ssize.height), dsize.विस्तारः );
 }
 
-Mat repeat(const Mat& src, int ny, int nx)
+Mat repeat(ध्रुव Mat& src, पूर्णाङ्क ny, पूर्णाङ्क nx)
 {
-    if( nx == 1 && ny == 1 )
-        return src;
+    यदि( nx == 1 && ny == 1 )
+        प्रत्यागम src;
     Mat dst;
     repeat(src, ny, nx, dst);
-    return dst;
+    प्रत्यागम dst;
 }
 
 
@@ -961,346 +961,346 @@ Mat repeat(const Mat& src, int ny, int nx)
  * BORDER_WRAP:          cdefgh|abcdefgh|abcdefg
  * BORDER_CONSTANT:      iiiiii|abcdefgh|iiiiiii  with some specified 'i'
  */
-int cv::borderInterpolate( int p, int len, int borderType )
+पूर्णाङ्क cv::borderInterpolate( पूर्णाङ्क p, पूर्णाङ्क len, पूर्णाङ्क borderType )
 {
     CV_TRACE_FUNCTION_VERBOSE();
 
     CV_DbgAssert(len > 0);
 
-#ifdef CV_STATIC_ANALYSIS
-    if(p >= 0 && p < len)
-#else
-    if( (unsigned)p < (unsigned)len )
-#endif
+#यदि_परिभाषितम् CV_STATIC_ANALYSIS
+    यदि(p >= 0 && p < len)
+#अन्यथा
+    यदि( (अचिह्नित)p < (अचिह्नित)len )
+#यदि_अन्तः
         ;
-    else if( borderType == BORDER_REPLICATE )
+    अन्यथा यदि( borderType == BORDER_REPLICATE )
         p = p < 0 ? 0 : len - 1;
-    else if( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
+    अन्यथा यदि( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
     {
-        int delta = borderType == BORDER_REFLECT_101;
-        if( len == 1 )
-            return 0;
-        do
+        पूर्णाङ्क delta = borderType == BORDER_REFLECT_101;
+        यदि( len == 1 )
+            प्रत्यागम 0;
+        कुरु
         {
-            if( p < 0 )
+            यदि( p < 0 )
                 p = -p - 1 + delta;
-            else
+            अन्यथा
                 p = len - 1 - (p - len) - delta;
         }
-#ifdef CV_STATIC_ANALYSIS
-        while(p < 0 || p >= len);
-#else
-        while( (unsigned)p >= (unsigned)len );
-#endif
+#यदि_परिभाषितम् CV_STATIC_ANALYSIS
+        यावत्(p < 0 || p >= len);
+#अन्यथा
+        यावत्( (अचिह्नित)p >= (अचिह्नित)len );
+#यदि_अन्तः
     }
-    else if( borderType == BORDER_WRAP )
+    अन्यथा यदि( borderType == BORDER_WRAP )
     {
         CV_Assert(len > 0);
-        if( p < 0 || p >= len )
+        यदि( p < 0 || p >= len )
         {
             int64_t p64 = p;
             p64 %= (int64_t)len;
-            if( p64 < 0 )
+            यदि( p64 < 0 )
                 p64 += len;
-            p = (int)p64;
+            p = (पूर्णाङ्क)p64;
         }
     }
-    else if( borderType == BORDER_CONSTANT )
+    अन्यथा यदि( borderType == BORDER_CONSTANT )
         p = -1;
-    else
+    अन्यथा
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported border type" );
-    return p;
+    प्रत्यागम p;
 }
 
-namespace
+नामाकाश
 {
 
-void copyMakeBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
-                        uchar* dst, size_t dststep, cv::Size dstroi,
-                        int top, int left, int cn, int borderType )
+शून्य copyMakeBorder_8u( ध्रुव uchar* src, size_t srcstep, cv::आकार srcroi,
+                        uchar* dst, size_t dststep, cv::आकार dstroi,
+                        पूर्णाङ्क शिखरम्_2, पूर्णाङ्क वामतः, पूर्णाङ्क cn, पूर्णाङ्क borderType )
 {
-    const int isz = (int)sizeof(int);
-    int i, j, k, elemSize = 1;
-    bool intMode = false;
+    ध्रुव पूर्णाङ्क isz = (पूर्णाङ्क)परिमाण(पूर्णाङ्क);
+    पूर्णाङ्क i, j, k, elem_आकार = 1;
+    तार्किक int_बहुलकम् = असत्य;
 
-    if( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
+    यदि( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
     {
         cn /= isz;
-        elemSize = isz;
-        intMode = true;
+        elem_आकार = isz;
+        int_बहुलकम् = सत्य;
     }
 
-    cv::AutoBuffer<int> _tab((dstroi.width - srcroi.width)*cn);
-    int* tab = _tab.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    cv::Auto_बफर<पूर्णाङ्क> _tab((dstroi.विस्तारः - srcroi.विस्तारः)*cn);
+    पूर्णाङ्क* tab = _tab.दत्त();
+    पूर्णाङ्क दक्षिणतः = dstroi.विस्तारः - srcroi.विस्तारः - वामतः;
+    पूर्णाङ्क bottom = dstroi.height - srcroi.height - शिखरम्_2;
 
-    for( i = 0; i < left; i++ )
+    प्रति( i = 0; i < वामतः; i++ )
     {
-        j = cv::borderInterpolate(i - left, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
+        j = cv::borderInterpolate(i - वामतः, srcroi.विस्तारः, borderType)*cn;
+        प्रति( k = 0; k < cn; k++ )
             tab[i*cn + k] = j + k;
     }
 
-    for( i = 0; i < right; i++ )
+    प्रति( i = 0; i < दक्षिणतः; i++ )
     {
-        j = cv::borderInterpolate(srcroi.width + i, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
-            tab[(i+left)*cn + k] = j + k;
+        j = cv::borderInterpolate(srcroi.विस्तारः + i, srcroi.विस्तारः, borderType)*cn;
+        प्रति( k = 0; k < cn; k++ )
+            tab[(i+वामतः)*cn + k] = j + k;
     }
 
-    srcroi.width *= cn;
-    dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    srcroi.विस्तारः *= cn;
+    dstroi.विस्तारः *= cn;
+    वामतः *= cn;
+    दक्षिणतः *= cn;
 
-    uchar* dstInner = dst + dststep*top + left*elemSize;
+    uchar* dstInner = dst + dststep*शिखरम्_2 + वामतः*elem_आकार;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    प्रति( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
-            memcpy(dstInner, src, srcroi.width*elemSize);
+        यदि( dstInner != src )
+            स्मृतिं_प्रतिलिख(dstInner, src, srcroi.विस्तारः*elem_आकार);
 
-        if( intMode )
+        यदि( int_बहुलकम् )
         {
-            const int* isrc = (int*)src;
-            int* idstInner = (int*)dstInner;
-            for( j = 0; j < left; j++ )
-                idstInner[j - left] = isrc[tab[j]];
-            for( j = 0; j < right; j++ )
-                idstInner[j + srcroi.width] = isrc[tab[j + left]];
+            ध्रुव पूर्णाङ्क* isrc = (पूर्णाङ्क*)src;
+            पूर्णाङ्क* idstInner = (पूर्णाङ्क*)dstInner;
+            प्रति( j = 0; j < वामतः; j++ )
+                idstInner[j - वामतः] = isrc[tab[j]];
+            प्रति( j = 0; j < दक्षिणतः; j++ )
+                idstInner[j + srcroi.विस्तारः] = isrc[tab[j + वामतः]];
         }
-        else
+        अन्यथा
         {
-            for( j = 0; j < left; j++ )
-                dstInner[j - left] = src[tab[j]];
-            for( j = 0; j < right; j++ )
-                dstInner[j + srcroi.width] = src[tab[j + left]];
+            प्रति( j = 0; j < वामतः; j++ )
+                dstInner[j - वामतः] = src[tab[j]];
+            प्रति( j = 0; j < दक्षिणतः; j++ )
+                dstInner[j + srcroi.विस्तारः] = src[tab[j + वामतः]];
         }
     }
 
-    dstroi.width *= elemSize;
+    dstroi.विस्तारः *= elem_आकार;
 
-    for( i = 0; i < top; i++ )
+    प्रति( i = 0; i < शिखरम्_2; i++ )
     {
-        j = cv::borderInterpolate(i - top, srcroi.height, borderType);
-        memcpy(dst + i*dststep, dst + (top+j)*dststep, dstroi.width);
+        j = cv::borderInterpolate(i - शिखरम्_2, srcroi.height, borderType);
+        स्मृतिं_प्रतिलिख(dst + i*dststep, dst + (शिखरम्_2+j)*dststep, dstroi.विस्तारः);
     }
 
-    dst += dststep*top;
-    for( i = 0; i < bottom; i++ )
+    dst += dststep*शिखरम्_2;
+    प्रति( i = 0; i < bottom; i++ )
     {
         j = cv::borderInterpolate(i + srcroi.height, srcroi.height, borderType);
-        memcpy(dst + (i + srcroi.height)*dststep, dst + j*dststep, dstroi.width);
+        स्मृतिं_प्रतिलिख(dst + (i + srcroi.height)*dststep, dst + j*dststep, dstroi.विस्तारः);
     }
 }
 
 
-void copyMakeConstBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
-                             uchar* dst, size_t dststep, cv::Size dstroi,
-                             int top, int left, int cn, const uchar* value )
+शून्य copyMakeConstBorder_8u( ध्रुव uchar* src, size_t srcstep, cv::आकार srcroi,
+                             uchar* dst, size_t dststep, cv::आकार dstroi,
+                             पूर्णाङ्क शिखरम्_2, पूर्णाङ्क वामतः, पूर्णाङ्क cn, ध्रुव uchar* value )
 {
-    int i, j;
-    cv::AutoBuffer<uchar> _constBuf(dstroi.width*cn);
-    uchar* constBuf = _constBuf.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    पूर्णाङ्क i, j;
+    cv::Auto_बफर<uchar> _constBuf(dstroi.विस्तारः*cn);
+    uchar* constBuf = _constBuf.दत्त();
+    पूर्णाङ्क दक्षिणतः = dstroi.विस्तारः - srcroi.विस्तारः - वामतः;
+    पूर्णाङ्क bottom = dstroi.height - srcroi.height - शिखरम्_2;
 
-    for( i = 0; i < dstroi.width; i++ )
+    प्रति( i = 0; i < dstroi.विस्तारः; i++ )
     {
-        for( j = 0; j < cn; j++ )
+        प्रति( j = 0; j < cn; j++ )
             constBuf[i*cn + j] = value[j];
     }
 
-    srcroi.width *= cn;
-    dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    srcroi.विस्तारः *= cn;
+    dstroi.विस्तारः *= cn;
+    वामतः *= cn;
+    दक्षिणतः *= cn;
 
-    uchar* dstInner = dst + dststep*top + left;
+    uchar* dstInner = dst + dststep*शिखरम्_2 + वामतः;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    प्रति( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
-            memcpy( dstInner, src, srcroi.width );
-        memcpy( dstInner - left, constBuf, left );
-        memcpy( dstInner + srcroi.width, constBuf, right );
+        यदि( dstInner != src )
+            स्मृतिं_प्रतिलिख( dstInner, src, srcroi.विस्तारः );
+        स्मृतिं_प्रतिलिख( dstInner - वामतः, constBuf, वामतः );
+        स्मृतिं_प्रतिलिख( dstInner + srcroi.विस्तारः, constBuf, दक्षिणतः );
     }
 
-    for( i = 0; i < top; i++ )
-        memcpy(dst + i * dststep, constBuf, dstroi.width);
+    प्रति( i = 0; i < शिखरम्_2; i++ )
+        स्मृतिं_प्रतिलिख(dst + i * dststep, constBuf, dstroi.विस्तारः);
 
-    dst += (top + srcroi.height) * dststep;
-    for( i = 0; i < bottom; i++ )
-        memcpy(dst + i * dststep, constBuf, dstroi.width);
+    dst += (शिखरम्_2 + srcroi.height) * dststep;
+    प्रति( i = 0; i < bottom; i++ )
+        स्मृतिं_प्रतिलिख(dst + i * dststep, constBuf, dstroi.विस्तारः);
 }
 
 }
 
-#ifdef HAVE_OPENCL
+#यदि_परिभाषितम् HAVE_OPENCL
 
-namespace cv {
+नामाकाश cv {
 
-static bool ocl_copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                                int left, int right, int borderType, const Scalar& value )
+स्थिर तार्किक ocl_copyMakeBorder( निवेशः_Array _src, OutputArray _dst, पूर्णाङ्क शिखरम्_2, पूर्णाङ्क bottom,
+                                पूर्णाङ्क वामतः, पूर्णाङ्क दक्षिणतः, पूर्णाङ्क borderType, ध्रुव Scalar& value )
 {
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    bool isolated = (borderType & BORDER_ISOLATED) != 0;
+    पूर्णाङ्क type = _src.type(), cn = CV_MAT_CN(type), गभीरता = CV_MAT_गभीरता(type),
+            पङ्क्तिकाः_प्रत्येकम्_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    तार्किक isolated = (borderType & BORDER_ISOLATED) != 0;
     borderType &= ~cv::BORDER_ISOLATED;
 
-    if ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
+    यदि ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
            borderType == BORDER_WRAP || borderType == BORDER_REFLECT_101) ||
          cn > 4)
-        return false;
+        प्रत्यागम असत्य;
 
-    const char * const borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
-    int scalarcn = cn == 3 ? 4 : cn;
-    int sctype = CV_MAKETYPE(depth, scalarcn);
+    ध्रुव वर्ण * ध्रुव borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
+    पूर्णाङ्क scalarcn = cn == 3 ? 4 : cn;
+    पूर्णाङ्क sctype = CV_MAKETYPE(गभीरता, scalarcn);
     String buildOptions = format("-D T=%s -D %s -D T1=%s -D cn=%d -D ST=%s -D rowsPerWI=%d",
-                                 ocl::memopTypeToStr(type), borderMap[borderType],
-                                 ocl::memopTypeToStr(depth), cn,
-                                 ocl::memopTypeToStr(sctype), rowsPerWI);
+                                 ocl::memop_Type_गन्तव्यम्_Str(type), borderMap[borderType],
+                                 ocl::memop_Type_गन्तव्यम्_Str(गभीरता), cn,
+                                 ocl::memop_Type_गन्तव्यम्_Str(sctype), पङ्क्तिकाः_प्रत्येकम्_WI);
 
     ocl::Kernel k("copyMakeBorder", ocl::core::copymakeborder_oclsrc, buildOptions);
-    if (k.empty())
-        return false;
+    यदि (k.empty())
+        प्रत्यागम असत्य;
 
     UMat src = _src.getUMat();
-    if( src.isSubmatrix() && !isolated )
+    यदि( src.isSubmatrix() && !isolated )
     {
-        Size wholeSize;
+        आकार सम्पूर्णम्_आकार;
         Point ofs;
-        src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        src.locateROI(सम्पूर्णम्_आकार, ofs);
+        पूर्णाङ्क dtop = std::min(ofs.y, शिखरम्_2);
+        पूर्णाङ्क dbottom = std::min(सम्पूर्णम्_आकार.height - src.पङ्क्तिकाः - ofs.y, bottom);
+        पूर्णाङ्क dleft = std::min(ofs.x, वामतः);
+        पूर्णाङ्क dright = std::min(सम्पूर्णम्_आकार.विस्तारः - src.स्तम्भसङ्ख्या - ofs.x, दक्षिणतः);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        शिखरम्_2 -= dtop;
+        वामतः -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        दक्षिणतः -= dright;
     }
 
-    _dst.create(src.rows + top + bottom, src.cols + left + right, type);
+    _dst.create(src.पङ्क्तिकाः + शिखरम्_2 + bottom, src.स्तम्भसङ्ख्या + वामतः + दक्षिणतः, type);
     UMat dst = _dst.getUMat();
 
-    if (top == 0 && left == 0 && bottom == 0 && right == 0)
+    यदि (शिखरम्_2 == 0 && वामतः == 0 && bottom == 0 && दक्षिणतः == 0)
     {
-        if(src.u != dst.u || src.step != dst.step)
-            src.copyTo(dst);
-        return true;
+        यदि(src.u != dst.u || src.चरणः != dst.चरणः)
+            src.copy_गन्तव्यम्(dst);
+        प्रत्यागम सत्य;
     }
 
-    k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst),
-           top, left, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
+    k.तर्काः(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst),
+           शिखरम्_2, वामतः, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
 
-    size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.स्तम्भसङ्ख्या, ((size_t)dst.पङ्क्तिकाः + पङ्क्तिकाः_प्रत्येकम्_WI - 1) / पङ्क्तिकाः_प्रत्येकम्_WI };
+    प्रत्यागम k.सततम्(2, globalsize, रिक्त, असत्य);
 }
 
 }
-#endif
+#यदि_अन्तः
 
-#ifdef HAVE_IPP
-namespace cv {
+#यदि_परिभाषितम् HAVE_IPP
+नामाकाश cv {
 
-static bool ipp_copyMakeBorder( Mat &_src, Mat &_dst, int top, int bottom,
-                                int left, int right, int _borderType, const Scalar& value )
+स्थिर तार्किक ipp_copyMakeBorder( Mat &_src, Mat &_dst, पूर्णाङ्क शिखरम्_2, पूर्णाङ्क bottom,
+                                पूर्णाङ्क वामतः, पूर्णाङ्क दक्षिणतः, पूर्णाङ्क _borderType, ध्रुव Scalar& value )
 {
-#if defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
+#यदि defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
     CV_INSTRUMENT_REGION_IPP();
 
-    ::ipp::IwiBorderSize borderSize(left, top, right, bottom);
-    ::ipp::IwiSize       size(_src.cols, _src.rows);
-    IppDataType          dataType   = ippiGetDataType(_src.depth());
+    ::ipp::Iwi_Border_आकार border_आकार(वामतः, शिखरम्_2, दक्षिणतः, bottom);
+    ::ipp::Iwi_आकार       size(_src.स्तम्भसङ्ख्या, _src.पङ्क्तिकाः);
+    Ipp_दत्त_Type          दत्त_Type   = ippi_Get_दत्त_Type(_src.गभीरता());
     IppiBorderType       borderType = ippiGetBorderType(_borderType);
-    if((int)borderType == -1)
-        return false;
+    यदि((पूर्णाङ्क)borderType == -1)
+        प्रत्यागम असत्य;
 
-    if(_src.dims > 2)
-        return false;
+    यदि(_src.dims > 2)
+        प्रत्यागम असत्य;
 
-    Rect dstRect(borderSize.left, borderSize.top,
-        _dst.cols - borderSize.right - borderSize.left,
-        _dst.rows - borderSize.bottom - borderSize.top);
+    Rect dstRect(border_आकार.वामतः, border_आकार.शिखरम्_2,
+        _dst.स्तम्भसङ्ख्या - border_आकार.दक्षिणतः - border_आकार.वामतः,
+        _dst.पङ्क्तिकाः - border_आकार.bottom - border_आकार.शिखरम्_2);
     Mat  subDst = Mat(_dst, dstRect);
     Mat *pSrc   = &_src;
 
-    return CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->step, subDst.ptr(), subDst.step, size, dataType, _src.channels(), borderSize, borderType, &value[0]) >= 0;
-#else
-    CV_UNUSED(_src); CV_UNUSED(_dst); CV_UNUSED(top); CV_UNUSED(bottom); CV_UNUSED(left); CV_UNUSED(right);
-    CV_UNUSED(_borderType); CV_UNUSED(value);
-    return false;
-#endif
+    प्रत्यागम CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->चरणः, subDst.ptr(), subDst.चरणः, size, दत्त_Type, _src.channels(), border_आकार, borderType, &value[0]) >= 0;
+#अन्यथा
+    CV_अप्रयुक्तम्(_src); CV_अप्रयुक्तम्(_dst); CV_अप्रयुक्तम्(शिखरम्_2); CV_अप्रयुक्तम्(bottom); CV_अप्रयुक्तम्(वामतः); CV_अप्रयुक्तम्(दक्षिणतः);
+    CV_अप्रयुक्तम्(_borderType); CV_अप्रयुक्तम्(value);
+    प्रत्यागम असत्य;
+#यदि_अन्तः
 }
 }
-#endif
+#यदि_अन्तः
 
-void cv::copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                         int left, int right, int borderType, const Scalar& value )
+शून्य cv::copyMakeBorder( निवेशः_Array _src, OutputArray _dst, पूर्णाङ्क शिखरम्_2, पूर्णाङ्क bottom,
+                         पूर्णाङ्क वामतः, पूर्णाङ्क दक्षिणतः, पूर्णाङ्क borderType, ध्रुव Scalar& value )
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert( top >= 0 && bottom >= 0 && left >= 0 && right >= 0 && _src.dims() <= 2 );
+    CV_Assert( शिखरम्_2 >= 0 && bottom >= 0 && वामतः >= 0 && दक्षिणतः >= 0 && _src.dims() <= 2 );
     CV_Assert( !_src.empty() );
 
     Mat src = _src.getMat();
-    CV_Assert( (int64_t)src.rows + top + bottom <= INT_MAX );
-    CV_Assert( (int64_t)src.cols + left + right <= INT_MAX );
+    CV_Assert( (int64_t)src.पङ्क्तिकाः + शिखरम्_2 + bottom <= अधिकतम_पूर्णाङ्कः );
+    CV_Assert( (int64_t)src.स्तम्भसङ्ख्या + वामतः + दक्षिणतः <= अधिकतम_पूर्णाङ्कः );
 
-    CV_OCL_RUN(_dst.isUMat(),
-               ocl_copyMakeBorder(_src, _dst, top, bottom, left, right, borderType, value))
-    int type = src.type();
+    CV_OCL_सततम्(_dst.isUMat(),
+               ocl_copyMakeBorder(_src, _dst, शिखरम्_2, bottom, वामतः, दक्षिणतः, borderType, value))
+    पूर्णाङ्क type = src.type();
 
-    if( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
+    यदि( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
     {
-        Size wholeSize;
+        आकार सम्पूर्णम्_आकार;
         Point ofs;
-        src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        src.locateROI(सम्पूर्णम्_आकार, ofs);
+        पूर्णाङ्क dtop = std::min(ofs.y, शिखरम्_2);
+        पूर्णाङ्क dbottom = std::min(सम्पूर्णम्_आकार.height - src.पङ्क्तिकाः - ofs.y, bottom);
+        पूर्णाङ्क dleft = std::min(ofs.x, वामतः);
+        पूर्णाङ्क dright = std::min(सम्पूर्णम्_आकार.विस्तारः - src.स्तम्भसङ्ख्या - ofs.x, दक्षिणतः);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        शिखरम्_2 -= dtop;
+        वामतः -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        दक्षिणतः -= dright;
     }
 
-    _dst.create( src.rows + top + bottom, src.cols + left + right, type );
+    _dst.create( src.पङ्क्तिकाः + शिखरम्_2 + bottom, src.स्तम्भसङ्ख्या + वामतः + दक्षिणतः, type );
     Mat dst = _dst.getMat();
 
-    if(top == 0 && left == 0 && bottom == 0 && right == 0)
+    यदि(शिखरम्_2 == 0 && वामतः == 0 && bottom == 0 && दक्षिणतः == 0)
     {
-        if(src.data != dst.data || src.step != dst.step)
-            src.copyTo(dst);
-        return;
+        यदि(src.दत्त != dst.दत्त || src.चरणः != dst.चरणः)
+            src.copy_गन्तव्यम्(dst);
+        प्रत्यागम;
     }
 
     borderType &= ~BORDER_ISOLATED;
 
-    CV_IPP_RUN_FAST(ipp_copyMakeBorder(src, dst, top, bottom, left, right, borderType, value))
+    CV_IPP_सततम्_FAST(ipp_copyMakeBorder(src, dst, शिखरम्_2, bottom, वामतः, दक्षिणतः, borderType, value))
 
-    if( borderType != BORDER_CONSTANT )
-        copyMakeBorder_8u( src.ptr(), src.step, src.size(),
-                           dst.ptr(), dst.step, dst.size(),
-                           top, left, (int)src.elemSize(), borderType );
-    else
+    यदि( borderType != BORDER_CONSTANT )
+        copyMakeBorder_8u( src.ptr(), src.चरणः, src.size(),
+                           dst.ptr(), dst.चरणः, dst.size(),
+                           शिखरम्_2, वामतः, (पूर्णाङ्क)src.elem_आकार(), borderType );
+    अन्यथा
     {
-        int cn = src.channels(), cn1 = cn;
-        AutoBuffer<double> buf(cn);
-        if( cn > 4 )
+        पूर्णाङ्क cn = src.channels(), cn1 = cn;
+        Auto_बफर<द्विगुण> buf(cn);
+        यदि( cn > 4 )
         {
             CV_Assert( value[0] == value[1] && value[0] == value[2] && value[0] == value[3] );
             cn1 = 1;
         }
-        scalarToRawData(value, buf.data(), CV_MAKETYPE(src.depth(), cn1), cn);
-        copyMakeConstBorder_8u( src.ptr(), src.step, src.size(),
-                                dst.ptr(), dst.step, dst.size(),
-                                top, left, (int)src.elemSize(), (uchar*)buf.data() );
+        scalar_गन्तव्यम्_Raw_दत्त(value, buf.दत्त(), CV_MAKETYPE(src.गभीरता(), cn1), cn);
+        copyMakeConstBorder_8u( src.ptr(), src.चरणः, src.size(),
+                                dst.ptr(), dst.चरणः, dst.size(),
+                                शिखरम्_2, वामतः, (पूर्णाङ्क)src.elem_आकार(), (uchar*)buf.दत्त() );
     }
 }
 /* End of file. */

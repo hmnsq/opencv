@@ -4,62 +4,62 @@
 // Copyright (C) 2026, BigVision LLC, all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-namespace cv {
+नामाकाश cv {
 
 // In place (dst shares the data of a continuous src) only the header changes; otherwise the
 // elements are copied into dst.
-static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
+स्थिर शून्य reshape_गन्तव्यम्(निवेशः_Array _src, OutputArray _dst, ध्रुव MatShape& shape)
 {
     Mat src = _src.getMat();
-    CV_Assert(shape.total() == src.total());
-    if (_dst.kind() == _InputArray::MAT && src.isContinuous())
+    CV_Assert(shape.योग() == src.योग());
+    यदि (_dst.विधा() == निवेशः_Array_2::MAT && src.isContinuous())
     {
         Mat& dst = _dst.getMatRef();
-        if (dst.data && dst.data == src.data)
+        यदि (dst.दत्त && dst.दत्त == src.दत्त)
         {
             dst = src.reshape(0, shape);
-            return;
+            प्रत्यागम;
         }
     }
     _dst.create(shape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data)
-        return;
-    if (dst.isContinuous())
+    यदि (dst.दत्त == src.दत्त)
+        प्रत्यागम;
+    यदि (dst.isContinuous())
     {
-        src.copyTo(Mat(src.dims, src.size.p, src.type(), dst.data));
-        return;
+        src.copy_गन्तव्यम्(Mat(src.dims, src.size.p, src.type(), dst.दत्त));
+        प्रत्यागम;
     }
     // create() keeps a preallocated destination of the right shape even when it is strided
     Mat tmp;
-    src.copyTo(tmp);
-    Mat(shape.dims, shape.p, src.type(), tmp.data).copyTo(dst);
+    src.copy_गन्तव्यम्(tmp);
+    Mat(shape.dims, shape.p, src.type(), tmp.दत्त).copy_गन्तव्यम्(dst);
 }
 
-void squeeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+शून्य squeeze(निवेशः_Array src, OutputArray dst, ध्रुव std::vector<पूर्णाङ्क>& axes)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().squeeze(axes));
+    reshape_गन्तव्यम्(src, dst, src.shape().squeeze(axes));
 }
 
-void unsqueeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+शून्य unsqueeze(निवेशः_Array src, OutputArray dst, ध्रुव std::vector<पूर्णाङ्क>& axes)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().unsqueeze(axes));
+    reshape_गन्तव्यम्(src, dst, src.shape().unsqueeze(axes));
 }
 
-void flatten(InputArray src, OutputArray dst, int startAxis, int endAxis)
+शून्य flatten(निवेशः_Array src, OutputArray dst, पूर्णाङ्क startAxis, पूर्णाङ्क अन्तः_Axis)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().flatten(startAxis, endAxis));
+    reshape_गन्तव्यम्(src, dst, src.shape().flatten(startAxis, अन्तः_Axis));
 }
 
-void reshape(InputArray src, OutputArray dst, const std::vector<int>& newShape, bool allowZero)
+शून्य reshape(निवेशः_Array src, OutputArray dst, ध्रुव std::vector<पूर्णाङ्क>& newShape, तार्किक allowZero)
 {
     CV_INSTRUMENT_REGION();
-    reshapeTo(src, dst, src.shape().reshape(MatShape(newShape), allowZero));
+    reshape_गन्तव्यम्(src, dst, src.shape().reshape(MatShape(newShape), allowZero));
 }
 
 } // namespace cv

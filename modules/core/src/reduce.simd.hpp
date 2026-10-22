@@ -2,117 +2,117 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-namespace cv {
+नामाकाश cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-typedef void (*ReduceSumFunc)(const Mat& src, Mat& dst);
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth);
+प्रकारनिर्देश शून्य (*Reduce_योग_Func)(ध्रुव Mat& src, Mat& dst);
+Reduce_योग_Func getReduceCSumFunc(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth);
+Reduce_योग_Func getReduceRSumFunc(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth);
+Reduce_योग_Func getReduceRSum2Func(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#यदि_अपरिभाषितम् CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
 // =====================================================================
 //  Col reduce SUM (dim=1): sum each row into cn output values
 // =====================================================================
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
 
 // --- uchar → int ---
 // Uses u16 intermediate accumulator to halve the number of widen operations:
 // u8→u16 per iteration, u16→u32 flush every 128 iterations (max u16 value: 128*255=32640 < 65535)
-static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
+स्थिर शून्य reduce_Col_योग_8u32s(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int cols = srcmat.cols;
-    const int width = cols * cn;
+    ध्रुव पूर्णाङ्क cn = srcmat.channels();
+    ध्रुव पूर्णाङ्क स्तम्भसङ्ख्या = srcmat.स्तम्भसङ्ख्या;
+    ध्रुव पूर्णाङ्क विस्तारः = स्तम्भसङ्ख्या * cn;
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    स्वचालित body = [&](ध्रुव Range& range) {
+        प्रति (पूर्णाङ्क y = range.start; y < range.end; y++)
         {
-            const uchar* src = srcmat.ptr<uchar>(y);
-            int* dst = dstmat.ptr<int>(y);
+            ध्रुव uchar* src = srcmat.ptr<uchar>(y);
+            पूर्णाङ्क* dst = dstmat.ptr<पूर्णाङ्क>(y);
 
-            if (cn == 1)
+            यदि (cn == 1)
             {
-#if defined(CV_NEON_DOT)
+#यदि defined(CV_NEON_DOT)
                 // ARMv8.2 DOTPROD: vdotq_u32(acc, src, ones) — single instruction byte sum
                 // u32 lane max 1020/iter, overflow at ~4.2M iter (67MB) — safe without flush
-                const uint8x16_t ones = vdupq_n_u8(1);
-                uint32x4_t v_sum = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    v_sum = vdotq_u32(v_sum, vld1q_u8(src + x), ones);
-                int total = (int)vaddvq_u32(v_sum);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#elif CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+                ध्रुव uint8x16_t ones = vdupq_n_u8(1);
+                uint32x4_t v_योग = vdupq_n_u32(0);
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - 16; x += 16)
+                    v_योग = vdotq_u32(v_योग, vld1q_u8(src + x), ones);
+                पूर्णाङ्क योग = (पूर्णाङ्क)vaddvq_u32(v_योग);
+                प्रति (; x < विस्तारः; x++)
+                    योग += (पूर्णाङ्क)src[x];
+                dst[0] = योग;
+#नोचेद्यदि CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
                 // AArch64 fallback: vpaddlq chain
-                uint32x4_t v_sum = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    v_sum = vaddq_u32(v_sum, vpaddlq_u16(vpaddlq_u8(vld1q_u8(src + x))));
-                int total = (int)vaddvq_u32(v_sum);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#elif CV_AVX2
+                uint32x4_t v_योग = vdupq_n_u32(0);
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - 16; x += 16)
+                    v_योग = vaddq_u32(v_योग, vpaddlq_u16(vpaddlq_u8(vld1q_u8(src + x))));
+                पूर्णाङ्क योग = (पूर्णाङ्क)vaddvq_u32(v_योग);
+                प्रति (; x < विस्तारः; x++)
+                    योग += (पूर्णाङ्क)src[x];
+                dst[0] = योग;
+#नोचेद्यदि CV_AVX2
                 // Intel AVX2: _mm256_sad_epu8 — 32 bytes → 4×u64 sum, 1 cycle
-                const __m256i zero = _mm256_setzero_si256();
+                ध्रुव __m256i zero = _mm256_setzero_si256();
                 __m256i vsum = zero;
-                int x = 0;
-                for (; x <= width - 32; x += 32)
-                    vsum = _mm256_add_epi64(vsum, _mm256_sad_epu8(
-                        _mm256_loadu_si256((const __m256i*)(src + x)), zero));
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - 32; x += 32)
+                    vsum = mm256_सङ्कलय_epi64(vsum, _mm256_sad_epu8(
+                        _mm256_loadu_si256((ध्रुव __m256i*)(src + x)), zero));
                 // 8-byte tail: reduce max scalar tail from 31 to 7
                 // Use _mm256_inserti128_si256 instead of _mm256_castsi128_si256:
                 // the latter leaves upper 128 bits undefined per Intel spec,
                 // causing MSVC to expose stale register data to _mm256_sad_epu8.
-                for (; x <= width - 8; x += 8)
-                    vsum = _mm256_add_epi64(vsum, _mm256_sad_epu8(
-                        _mm256_inserti128_si256(_mm256_setzero_si256(), _mm_loadl_epi64((const __m128i*)(src + x)), 0), zero));
+                प्रति (; x <= विस्तारः - 8; x += 8)
+                    vsum = mm256_सङ्कलय_epi64(vsum, _mm256_sad_epu8(
+                        _mm256_inserti128_si256(_mm256_setzero_si256(), _mm_loadl_epi64((ध्रुव __m128i*)(src + x)), 0), zero));
                 __m128i lo128 = _mm256_castsi256_si128(vsum);
                 __m128i hi128 = _mm256_extracti128_si256(vsum, 1);
-                __m128i s = _mm_add_epi64(lo128, hi128);
-                s = _mm_add_epi64(s, _mm_unpackhi_epi64(s, s));
-                int total = _mm_cvtsi128_si32(s);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#elif CV_SSE2
+                __m128i s = mm_सङ्कलय_epi64(lo128, hi128);
+                s = mm_सङ्कलय_epi64(s, _mm_unpackhi_epi64(s, s));
+                पूर्णाङ्क योग = _mm_cvtsi128_si32(s);
+                प्रति (; x < विस्तारः; x++)
+                    योग += (पूर्णाङ्क)src[x];
+                dst[0] = योग;
+#नोचेद्यदि CV_SSE2
                 // Intel SSE2: _mm_sad_epu8 — 16 bytes → 2×u64 sum
-                const __m128i zero = _mm_setzero_si128();
+                ध्रुव __m128i zero = _mm_setzero_si128();
                 __m128i vsum = zero;
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    vsum = _mm_add_epi64(vsum, _mm_sad_epu8(
-                        _mm_loadu_si128((const __m128i*)(src + x)), zero));
-                __m128i s = _mm_add_epi64(vsum, _mm_unpackhi_epi64(vsum, vsum));
-                int total = _mm_cvtsi128_si32(s);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#else
-                const int vlanes8 = VTraits<v_uint8>::vlanes();
-                v_uint32 v_sum = vx_setzero_u32();
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - 16; x += 16)
+                    vsum = mm_सङ्कलय_epi64(vsum, _mm_sad_epu8(
+                        _mm_loadu_si128((ध्रुव __m128i*)(src + x)), zero));
+                __m128i s = mm_सङ्कलय_epi64(vsum, _mm_unpackhi_epi64(vsum, vsum));
+                पूर्णाङ्क योग = _mm_cvtsi128_si32(s);
+                प्रति (; x < विस्तारः; x++)
+                    योग += (पूर्णाङ्क)src[x];
+                dst[0] = योग;
+#अन्यथा
+                ध्रुव पूर्णाङ्क vlanes8 = VTraits<v_uint8>::vlanes();
+                v_uint32 v_योग = vx_setzero_u32();
                 v_uint16 v_sum16 = vx_setzero_u16();
-                int x = 0, batch = 0;
-                const int flush_at = 128;
+                पूर्णाङ्क x = 0, batch = 0;
+                ध्रुव पूर्णाङ्क flush_at = 128;
 
-                for (; x <= width - vlanes8; x += vlanes8)
+                प्रति (; x <= विस्तारः - vlanes8; x += vlanes8)
                 {
                     v_uint16 lo, hi;
-                    v_expand(vx_load(src + x), lo, hi);
-                    v_sum16 = v_add(v_sum16, v_add(lo, hi));
+                    v_expand(vx_आरोपय(src + x), lo, hi);
+                    v_sum16 = v_सङ्कलय(v_sum16, v_सङ्कलय(lo, hi));
 
-                    if (++batch >= flush_at)
+                    यदि (++batch >= flush_at)
                     {
                         v_uint32 a, b;
                         v_expand(v_sum16, a, b);
-                        v_sum = v_add(v_sum, v_add(a, b));
+                        v_योग = v_सङ्कलय(v_योग, v_सङ्कलय(a, b));
                         v_sum16 = vx_setzero_u16();
                         batch = 0;
                     }
@@ -120,26 +120,26 @@ static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
                 {
                     v_uint32 a, b;
                     v_expand(v_sum16, a, b);
-                    v_sum = v_add(v_sum, v_add(a, b));
+                    v_योग = v_सङ्कलय(v_योग, v_सङ्कलय(a, b));
                 }
 
-                int total = (int)v_reduce_sum(v_sum);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#endif
+                पूर्णाङ्क योग = (पूर्णाङ्क)v_reduce_योग(v_योग);
+                प्रति (; x < विस्तारः; x++)
+                    योग += (पूर्णाङ्क)src[x];
+                dst[0] = योग;
+#यदि_अन्तः
             }
-            else if (cn == 4)
+            अन्यथा यदि (cn == 4)
             {
-#if defined(CV_NEON_DOT)
+#यदि defined(CV_NEON_DOT)
                 // ARMv8.2 DOTPROD: vld4q_u8 deinterleave + vdotq_u32 per-channel
                 // vld4q_u8 reads 16 pixels (64 bytes), deinterleaves into 4 × u8x16
                 // vdotq_u32 sums each channel's 16 bytes into 4 partial u32 sums
-                const uint8x16_t ones = vdupq_n_u8(1);
+                ध्रुव uint8x16_t ones = vdupq_n_u8(1);
                 uint32x4_t acc0 = vdupq_n_u32(0), acc1 = vdupq_n_u32(0);
                 uint32x4_t acc2 = vdupq_n_u32(0), acc3 = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= cols - 16; x += 16)
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= स्तम्भसङ्ख्या - 16; x += 16)
                 {
                     uint8x16x4_t v = vld4q_u8(src + x * 4);
                     acc0 = vdotq_u32(acc0, v.val[0], ones);
@@ -147,65 +147,65 @@ static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
                     acc2 = vdotq_u32(acc2, v.val[2], ones);
                     acc3 = vdotq_u32(acc3, v.val[3], ones);
                 }
-                dst[0] = (int)vaddvq_u32(acc0);
-                dst[1] = (int)vaddvq_u32(acc1);
-                dst[2] = (int)vaddvq_u32(acc2);
-                dst[3] = (int)vaddvq_u32(acc3);
-                for (; x < cols; x++)
+                dst[0] = (पूर्णाङ्क)vaddvq_u32(acc0);
+                dst[1] = (पूर्णाङ्क)vaddvq_u32(acc1);
+                dst[2] = (पूर्णाङ्क)vaddvq_u32(acc2);
+                dst[3] = (पूर्णाङ्क)vaddvq_u32(acc3);
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (पूर्णाङ्क)src[x * 4];
+                    dst[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    dst[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    dst[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#elif CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+#नोचेद्यदि CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
                 // AArch64 fallback: vld4q_u8 deinterleave + vaddlvq_u8 per-channel
-                int sums[4] = {0, 0, 0, 0};
-                int x = 0;
-                for (; x <= cols - 16; x += 16)
+                पूर्णाङ्क sums[4] = {0, 0, 0, 0};
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= स्तम्भसङ्ख्या - 16; x += 16)
                 {
                     uint8x16x4_t v = vld4q_u8(src + x * 4);
-                    sums[0] += (int)vaddlvq_u8(v.val[0]);
-                    sums[1] += (int)vaddlvq_u8(v.val[1]);
-                    sums[2] += (int)vaddlvq_u8(v.val[2]);
-                    sums[3] += (int)vaddlvq_u8(v.val[3]);
+                    sums[0] += (पूर्णाङ्क)vaddlvq_u8(v.val[0]);
+                    sums[1] += (पूर्णाङ्क)vaddlvq_u8(v.val[1]);
+                    sums[2] += (पूर्णाङ्क)vaddlvq_u8(v.val[2]);
+                    sums[3] += (पूर्णाङ्क)vaddlvq_u8(v.val[3]);
                 }
                 dst[0] = sums[0]; dst[1] = sums[1];
                 dst[2] = sums[2]; dst[3] = sums[3];
-                for (; x < cols; x++)
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (पूर्णाङ्क)src[x * 4];
+                    dst[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    dst[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    dst[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#elif CV_AVX2
+#नोचेद्यदि CV_AVX2
                 // Intel AVX2: shuffle + unpack to group channels, full-register SAD
-                const __m256i zero = _mm256_setzero_si256();
-                const __m256i shuf_mask = _mm256_setr_epi8(
+                ध्रुव __m256i zero = _mm256_setzero_si256();
+                ध्रुव __m256i shuf_आवरणम् = _mm256_setr_epi8(
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15,
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15);
-                int x = 0;
+                पूर्णाङ्क x = 0;
                 // 16 pixels/iter with unpack (full-register SAD)
                 {
-                    __m256i sum_bg = zero, sum_ra = zero;
-                    for (; x <= cols - 16; x += 16)
+                    __m256i योग_bg = zero, योग_ra = zero;
+                    प्रति (; x <= स्तम्भसङ्ख्या - 16; x += 16)
                     {
-                        __m256i v0 = _mm256_loadu_si256((const __m256i*)(src + x * 4));
-                        __m256i v1 = _mm256_loadu_si256((const __m256i*)(src + x * 4 + 32));
-                        __m256i g0 = _mm256_shuffle_epi8(v0, shuf_mask);
-                        __m256i g1 = _mm256_shuffle_epi8(v1, shuf_mask);
+                        __m256i v0 = _mm256_loadu_si256((ध्रुव __m256i*)(src + x * 4));
+                        __m256i v1 = _mm256_loadu_si256((ध्रुव __m256i*)(src + x * 4 + 32));
+                        __m256i g0 = _mm256_shuffle_epi8(v0, shuf_आवरणम्);
+                        __m256i g1 = _mm256_shuffle_epi8(v1, shuf_आवरणम्);
                         __m256i bg = _mm256_unpacklo_epi32(g0, g1);
                         __m256i ra = _mm256_unpackhi_epi32(g0, g1);
-                        sum_bg = _mm256_add_epi64(sum_bg, _mm256_sad_epu8(bg, zero));
-                        sum_ra = _mm256_add_epi64(sum_ra, _mm256_sad_epu8(ra, zero));
+                        योग_bg = mm256_सङ्कलय_epi64(योग_bg, _mm256_sad_epu8(bg, zero));
+                        योग_ra = mm256_सङ्कलय_epi64(योग_ra, _mm256_sad_epu8(ra, zero));
                     }
-                    __m128i bg_lo = _mm256_castsi256_si128(sum_bg);
-                    __m128i bg_hi = _mm256_extracti128_si256(sum_bg, 1);
-                    __m128i bg_s = _mm_add_epi64(bg_lo, bg_hi);
-                    __m128i ra_lo = _mm256_castsi256_si128(sum_ra);
-                    __m128i ra_hi = _mm256_extracti128_si256(sum_ra, 1);
-                    __m128i ra_s = _mm_add_epi64(ra_lo, ra_hi);
+                    __m128i bg_lo = _mm256_castsi256_si128(योग_bg);
+                    __m128i bg_hi = _mm256_extracti128_si256(योग_bg, 1);
+                    __m128i bg_s = mm_सङ्कलय_epi64(bg_lo, bg_hi);
+                    __m128i ra_lo = _mm256_castsi256_si128(योग_ra);
+                    __m128i ra_hi = _mm256_extracti128_si256(योग_ra, 1);
+                    __m128i ra_s = mm_सङ्कलय_epi64(ra_lo, ra_hi);
                     dst[0] = _mm_cvtsi128_si32(bg_s);                     // B
                     dst[1] = _mm_cvtsi128_si32(_mm_srli_si128(bg_s, 8));  // G
                     dst[2] = _mm_cvtsi128_si32(ra_s);                     // R
@@ -213,91 +213,91 @@ static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
                 }
                 // 8-pixel tail with and/srli
                 {
-                    const __m256i mask_lo32 = _mm256_set1_epi64x(0x00000000FFFFFFFFLL);
-                    __m256i sum_br = zero, sum_ga = zero;
-                    for (; x <= cols - 8; x += 8)
+                    ध्रुव __m256i आवरणम्_lo32 = _mm256_set1_epi64x(0x00000000FFFFFFFFLL);
+                    __m256i योग_br = zero, योग_ga = zero;
+                    प्रति (; x <= स्तम्भसङ्ख्या - 8; x += 8)
                     {
-                        __m256i v = _mm256_loadu_si256((const __m256i*)(src + x * 4));
-                        __m256i grouped = _mm256_shuffle_epi8(v, shuf_mask);
-                        __m256i br = _mm256_and_si256(grouped, mask_lo32);
+                        __m256i v = _mm256_loadu_si256((ध्रुव __m256i*)(src + x * 4));
+                        __m256i grouped = _mm256_shuffle_epi8(v, shuf_आवरणम्);
+                        __m256i br = _mm256_and_si256(grouped, आवरणम्_lo32);
                         __m256i ga = _mm256_srli_epi64(grouped, 32);
-                        sum_br = _mm256_add_epi64(sum_br, _mm256_sad_epu8(br, zero));
-                        sum_ga = _mm256_add_epi64(sum_ga, _mm256_sad_epu8(ga, zero));
+                        योग_br = mm256_सङ्कलय_epi64(योग_br, _mm256_sad_epu8(br, zero));
+                        योग_ga = mm256_सङ्कलय_epi64(योग_ga, _mm256_sad_epu8(ga, zero));
                     }
-                    __m128i br_lo = _mm256_castsi256_si128(sum_br);
-                    __m128i br_hi = _mm256_extracti128_si256(sum_br, 1);
-                    __m128i br_s = _mm_add_epi64(br_lo, br_hi);
-                    __m128i ga_lo = _mm256_castsi256_si128(sum_ga);
-                    __m128i ga_hi = _mm256_extracti128_si256(sum_ga, 1);
-                    __m128i ga_s = _mm_add_epi64(ga_lo, ga_hi);
+                    __m128i br_lo = _mm256_castsi256_si128(योग_br);
+                    __m128i br_hi = _mm256_extracti128_si256(योग_br, 1);
+                    __m128i br_s = mm_सङ्कलय_epi64(br_lo, br_hi);
+                    __m128i ga_lo = _mm256_castsi256_si128(योग_ga);
+                    __m128i ga_hi = _mm256_extracti128_si256(योग_ga, 1);
+                    __m128i ga_s = mm_सङ्कलय_epi64(ga_lo, ga_hi);
                     dst[0] += _mm_cvtsi128_si32(br_s);
                     dst[1] += _mm_cvtsi128_si32(ga_s);
                     dst[2] += _mm_cvtsi128_si32(_mm_srli_si128(br_s, 8));
                     dst[3] += _mm_cvtsi128_si32(_mm_srli_si128(ga_s, 8));
                 }
-                for (; x < cols; x++)
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (पूर्णाङ्क)src[x * 4];
+                    dst[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    dst[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    dst[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#elif CV_SSSE3
+#नोचेद्यदि CV_SSSE3
                 // Intel SSSE3: _mm_shuffle_epi8 deinterleave + _mm_sad_epu8
                 // 16 bytes = 4 pixels × 4 channels per iteration
-                const __m128i zero = _mm_setzero_si128();
-                const __m128i shuf_mask = _mm_setr_epi8(
+                ध्रुव __m128i zero = _mm_setzero_si128();
+                ध्रुव __m128i shuf_आवरणम् = _mm_setr_epi8(
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15);
-                const __m128i mask_lo32 = _mm_set1_epi64x(0x00000000FFFFFFFFLL);
-                __m128i sum_br = zero, sum_ga = zero;
-                int x = 0;
-                for (; x <= cols - 4; x += 4)
+                ध्रुव __m128i आवरणम्_lo32 = _mm_set1_epi64x(0x00000000FFFFFFFFLL);
+                __m128i योग_br = zero, योग_ga = zero;
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= स्तम्भसङ्ख्या - 4; x += 4)
                 {
-                    __m128i v = _mm_loadu_si128((const __m128i*)(src + x * 4));
-                    __m128i grouped = _mm_shuffle_epi8(v, shuf_mask);
-                    __m128i br = _mm_and_si128(grouped, mask_lo32);
+                    __m128i v = _mm_loadu_si128((ध्रुव __m128i*)(src + x * 4));
+                    __m128i grouped = _mm_shuffle_epi8(v, shuf_आवरणम्);
+                    __m128i br = _mm_and_si128(grouped, आवरणम्_lo32);
                     __m128i ga = _mm_srli_epi64(grouped, 32);
-                    sum_br = _mm_add_epi64(sum_br, _mm_sad_epu8(br, zero));
-                    sum_ga = _mm_add_epi64(sum_ga, _mm_sad_epu8(ga, zero));
+                    योग_br = mm_सङ्कलय_epi64(योग_br, _mm_sad_epu8(br, zero));
+                    योग_ga = mm_सङ्कलय_epi64(योग_ga, _mm_sad_epu8(ga, zero));
                 }
-                dst[0] = _mm_cvtsi128_si32(sum_br);
-                dst[1] = _mm_cvtsi128_si32(sum_ga);
-                dst[2] = _mm_cvtsi128_si32(_mm_srli_si128(sum_br, 8));
-                dst[3] = _mm_cvtsi128_si32(_mm_srli_si128(sum_ga, 8));
-                for (; x < cols; x++)
+                dst[0] = _mm_cvtsi128_si32(योग_br);
+                dst[1] = _mm_cvtsi128_si32(योग_ga);
+                dst[2] = _mm_cvtsi128_si32(_mm_srli_si128(योग_br, 8));
+                dst[3] = _mm_cvtsi128_si32(_mm_srli_si128(योग_ga, 8));
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (पूर्णाङ्क)src[x * 4];
+                    dst[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    dst[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    dst[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#else
-                const int vlanes8 = VTraits<v_uint8>::vlanes();
+#अन्यथा
+                ध्रुव पूर्णाङ्क vlanes8 = VTraits<v_uint8>::vlanes();
                 v_uint32 vsum0 = vx_setzero_u32(), vsum1 = vx_setzero_u32();
                 v_uint32 vsum2 = vx_setzero_u32(), vsum3 = vx_setzero_u32();
                 v_uint16 vs16_0 = vx_setzero_u16(), vs16_1 = vx_setzero_u16();
                 v_uint16 vs16_2 = vx_setzero_u16(), vs16_3 = vx_setzero_u16();
-                int x = 0, batch = 0;
-                const int flush_at = 128;
+                पूर्णाङ्क x = 0, batch = 0;
+                ध्रुव पूर्णाङ्क flush_at = 128;
 
-                for (; x <= cols - vlanes8; x += vlanes8)
+                प्रति (; x <= स्तम्भसङ्ख्या - vlanes8; x += vlanes8)
                 {
                     v_uint8 ch0, ch1, ch2, ch3;
-                    v_load_deinterleave(src + x * 4, ch0, ch1, ch2, ch3);
+                    v_आरोपय_deinterleave(src + x * 4, ch0, ch1, ch2, ch3);
 
                     v_uint16 lo, hi;
-                    v_expand(ch0, lo, hi); vs16_0 = v_add(vs16_0, v_add(lo, hi));
-                    v_expand(ch1, lo, hi); vs16_1 = v_add(vs16_1, v_add(lo, hi));
-                    v_expand(ch2, lo, hi); vs16_2 = v_add(vs16_2, v_add(lo, hi));
-                    v_expand(ch3, lo, hi); vs16_3 = v_add(vs16_3, v_add(lo, hi));
+                    v_expand(ch0, lo, hi); vs16_0 = v_सङ्कलय(vs16_0, v_सङ्कलय(lo, hi));
+                    v_expand(ch1, lo, hi); vs16_1 = v_सङ्कलय(vs16_1, v_सङ्कलय(lo, hi));
+                    v_expand(ch2, lo, hi); vs16_2 = v_सङ्कलय(vs16_2, v_सङ्कलय(lo, hi));
+                    v_expand(ch3, lo, hi); vs16_3 = v_सङ्कलय(vs16_3, v_सङ्कलय(lo, hi));
 
-                    if (++batch >= flush_at)
+                    यदि (++batch >= flush_at)
                     {
                         v_uint32 a, b;
-                        v_expand(vs16_0, a, b); vsum0 = v_add(vsum0, v_add(a, b));
-                        v_expand(vs16_1, a, b); vsum1 = v_add(vsum1, v_add(a, b));
-                        v_expand(vs16_2, a, b); vsum2 = v_add(vsum2, v_add(a, b));
-                        v_expand(vs16_3, a, b); vsum3 = v_add(vsum3, v_add(a, b));
+                        v_expand(vs16_0, a, b); vsum0 = v_सङ्कलय(vsum0, v_सङ्कलय(a, b));
+                        v_expand(vs16_1, a, b); vsum1 = v_सङ्कलय(vsum1, v_सङ्कलय(a, b));
+                        v_expand(vs16_2, a, b); vsum2 = v_सङ्कलय(vsum2, v_सङ्कलय(a, b));
+                        v_expand(vs16_3, a, b); vsum3 = v_सङ्कलय(vsum3, v_सङ्कलय(a, b));
                         vs16_0 = vx_setzero_u16(); vs16_1 = vx_setzero_u16();
                         vs16_2 = vx_setzero_u16(); vs16_3 = vx_setzero_u16();
                         batch = 0;
@@ -305,149 +305,149 @@ static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
                 }
                 {
                     v_uint32 a, b;
-                    v_expand(vs16_0, a, b); vsum0 = v_add(vsum0, v_add(a, b));
-                    v_expand(vs16_1, a, b); vsum1 = v_add(vsum1, v_add(a, b));
-                    v_expand(vs16_2, a, b); vsum2 = v_add(vsum2, v_add(a, b));
-                    v_expand(vs16_3, a, b); vsum3 = v_add(vsum3, v_add(a, b));
+                    v_expand(vs16_0, a, b); vsum0 = v_सङ्कलय(vsum0, v_सङ्कलय(a, b));
+                    v_expand(vs16_1, a, b); vsum1 = v_सङ्कलय(vsum1, v_सङ्कलय(a, b));
+                    v_expand(vs16_2, a, b); vsum2 = v_सङ्कलय(vsum2, v_सङ्कलय(a, b));
+                    v_expand(vs16_3, a, b); vsum3 = v_सङ्कलय(vsum3, v_सङ्कलय(a, b));
                 }
 
-                dst[0] = (int)v_reduce_sum(vsum0);
-                dst[1] = (int)v_reduce_sum(vsum1);
-                dst[2] = (int)v_reduce_sum(vsum2);
-                dst[3] = (int)v_reduce_sum(vsum3);
+                dst[0] = (पूर्णाङ्क)v_reduce_योग(vsum0);
+                dst[1] = (पूर्णाङ्क)v_reduce_योग(vsum1);
+                dst[2] = (पूर्णाङ्क)v_reduce_योग(vsum2);
+                dst[3] = (पूर्णाङ्क)v_reduce_योग(vsum3);
 
-                for (; x < cols; x++)
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (पूर्णाङ्क)src[x * 4];
+                    dst[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    dst[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    dst[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#endif
+#यदि_अन्तः
             }
-            else
+            अन्यथा
             {
                 // generic cn: scalar fallback
-                for (int c = 0; c < cn; c++)
-                    dst[c] = (int)src[c];
-                for (int x = cn; x < width; x += cn)
-                    for (int c = 0; c < cn; c++)
-                        dst[c] += (int)src[x + c];
+                प्रति (पूर्णाङ्क c = 0; c < cn; c++)
+                    dst[c] = (पूर्णाङ्क)src[c];
+                प्रति (पूर्णाङ्क x = cn; x < विस्तारः; x += cn)
+                    प्रति (पूर्णाङ्क c = 0; c < cn; c++)
+                        dst[c] += (पूर्णाङ्क)src[x + c];
             }
         }
     };
 
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.पङ्क्तिकाः), body);
     v_cleanup();
 }
 
 // --- uchar → float ---
-static void reduceColSum_8u32f(const Mat& srcmat, Mat& dstmat)
+स्थिर शून्य reduce_Col_योग_8u32f(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int cols = srcmat.cols;
-    const int width = cols * cn;
+    ध्रुव पूर्णाङ्क cn = srcmat.channels();
+    ध्रुव पूर्णाङ्क स्तम्भसङ्ख्या = srcmat.स्तम्भसङ्ख्या;
+    ध्रुव पूर्णाङ्क विस्तारः = स्तम्भसङ्ख्या * cn;
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    स्वचालित body = [&](ध्रुव Range& range) {
+        प्रति (पूर्णाङ्क y = range.start; y < range.end; y++)
         {
-            const uchar* src = srcmat.ptr<uchar>(y);
-            float* dst = dstmat.ptr<float>(y);
+            ध्रुव uchar* src = srcmat.ptr<uchar>(y);
+            भिन्न* dst = dstmat.ptr<भिन्न>(y);
 
             // compute in int, then convert to float
-            AutoBuffer<int> ibuf(cn);
-            int* sums = ibuf.data();
-            for (int c = 0; c < cn; c++)
+            Auto_बफर<पूर्णाङ्क> ibuf(cn);
+            पूर्णाङ्क* sums = ibuf.दत्त();
+            प्रति (पूर्णाङ्क c = 0; c < cn; c++)
                 sums[c] = 0;
 
-            if (cn == 1)
+            यदि (cn == 1)
             {
-#if defined(CV_NEON_DOT)
-                const uint8x16_t ones = vdupq_n_u8(1);
-                uint32x4_t v_sum = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    v_sum = vdotq_u32(v_sum, vld1q_u8(src + x), ones);
-                sums[0] = (int)vaddvq_u32(v_sum);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#elif CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
-                uint32x4_t v_sum = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    v_sum = vaddq_u32(v_sum, vpaddlq_u16(vpaddlq_u8(vld1q_u8(src + x))));
-                sums[0] = (int)vaddvq_u32(v_sum);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#elif CV_AVX2
-                const __m256i zero = _mm256_setzero_si256();
+#यदि defined(CV_NEON_DOT)
+                ध्रुव uint8x16_t ones = vdupq_n_u8(1);
+                uint32x4_t v_योग = vdupq_n_u32(0);
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - 16; x += 16)
+                    v_योग = vdotq_u32(v_योग, vld1q_u8(src + x), ones);
+                sums[0] = (पूर्णाङ्क)vaddvq_u32(v_योग);
+                प्रति (; x < विस्तारः; x++)
+                    sums[0] += (पूर्णाङ्क)src[x];
+#नोचेद्यदि CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+                uint32x4_t v_योग = vdupq_n_u32(0);
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - 16; x += 16)
+                    v_योग = vaddq_u32(v_योग, vpaddlq_u16(vpaddlq_u8(vld1q_u8(src + x))));
+                sums[0] = (पूर्णाङ्क)vaddvq_u32(v_योग);
+                प्रति (; x < विस्तारः; x++)
+                    sums[0] += (पूर्णाङ्क)src[x];
+#नोचेद्यदि CV_AVX2
+                ध्रुव __m256i zero = _mm256_setzero_si256();
                 __m256i vsum = zero;
-                int x = 0;
-                for (; x <= width - 32; x += 32)
-                    vsum = _mm256_add_epi64(vsum, _mm256_sad_epu8(
-                        _mm256_loadu_si256((const __m256i*)(src + x)), zero));
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - 32; x += 32)
+                    vsum = mm256_सङ्कलय_epi64(vsum, _mm256_sad_epu8(
+                        _mm256_loadu_si256((ध्रुव __m256i*)(src + x)), zero));
                 // 8-byte tail: reduce max scalar tail from 31 to 7
                 // Use _mm256_inserti128_si256 instead of _mm256_castsi128_si256:
                 // the latter leaves upper 128 bits undefined per Intel spec,
                 // causing MSVC to expose stale register data to _mm256_sad_epu8.
-                for (; x <= width - 8; x += 8)
-                    vsum = _mm256_add_epi64(vsum, _mm256_sad_epu8(
-                        _mm256_inserti128_si256(_mm256_setzero_si256(), _mm_loadl_epi64((const __m128i*)(src + x)), 0), zero));
+                प्रति (; x <= विस्तारः - 8; x += 8)
+                    vsum = mm256_सङ्कलय_epi64(vsum, _mm256_sad_epu8(
+                        _mm256_inserti128_si256(_mm256_setzero_si256(), _mm_loadl_epi64((ध्रुव __m128i*)(src + x)), 0), zero));
                 __m128i lo128 = _mm256_castsi256_si128(vsum);
                 __m128i hi128 = _mm256_extracti128_si256(vsum, 1);
-                __m128i s = _mm_add_epi64(lo128, hi128);
-                s = _mm_add_epi64(s, _mm_unpackhi_epi64(s, s));
+                __m128i s = mm_सङ्कलय_epi64(lo128, hi128);
+                s = mm_सङ्कलय_epi64(s, _mm_unpackhi_epi64(s, s));
                 sums[0] = _mm_cvtsi128_si32(s);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#elif CV_SSE2
-                const __m128i zero = _mm_setzero_si128();
+                प्रति (; x < विस्तारः; x++)
+                    sums[0] += (पूर्णाङ्क)src[x];
+#नोचेद्यदि CV_SSE2
+                ध्रुव __m128i zero = _mm_setzero_si128();
                 __m128i vsum = zero;
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    vsum = _mm_add_epi64(vsum, _mm_sad_epu8(
-                        _mm_loadu_si128((const __m128i*)(src + x)), zero));
-                __m128i s = _mm_add_epi64(vsum, _mm_unpackhi_epi64(vsum, vsum));
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - 16; x += 16)
+                    vsum = mm_सङ्कलय_epi64(vsum, _mm_sad_epu8(
+                        _mm_loadu_si128((ध्रुव __m128i*)(src + x)), zero));
+                __m128i s = mm_सङ्कलय_epi64(vsum, _mm_unpackhi_epi64(vsum, vsum));
                 sums[0] = _mm_cvtsi128_si32(s);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#else
-                const int vlanes8 = VTraits<v_uint8>::vlanes();
-                v_uint32 v_sum = vx_setzero_u32();
+                प्रति (; x < विस्तारः; x++)
+                    sums[0] += (पूर्णाङ्क)src[x];
+#अन्यथा
+                ध्रुव पूर्णाङ्क vlanes8 = VTraits<v_uint8>::vlanes();
+                v_uint32 v_योग = vx_setzero_u32();
                 v_uint16 v_sum16 = vx_setzero_u16();
-                int x = 0, batch = 0;
+                पूर्णाङ्क x = 0, batch = 0;
 
-                for (; x <= width - vlanes8; x += vlanes8)
+                प्रति (; x <= विस्तारः - vlanes8; x += vlanes8)
                 {
                     v_uint16 lo, hi;
-                    v_expand(vx_load(src + x), lo, hi);
-                    v_sum16 = v_add(v_sum16, v_add(lo, hi));
-                    if (++batch >= 128)
+                    v_expand(vx_आरोपय(src + x), lo, hi);
+                    v_sum16 = v_सङ्कलय(v_sum16, v_सङ्कलय(lo, hi));
+                    यदि (++batch >= 128)
                     {
                         v_uint32 a, b;
                         v_expand(v_sum16, a, b);
-                        v_sum = v_add(v_sum, v_add(a, b));
+                        v_योग = v_सङ्कलय(v_योग, v_सङ्कलय(a, b));
                         v_sum16 = vx_setzero_u16();
                         batch = 0;
                     }
                 }
                 v_uint32 a, b;
                 v_expand(v_sum16, a, b);
-                v_sum = v_add(v_sum, v_add(a, b));
+                v_योग = v_सङ्कलय(v_योग, v_सङ्कलय(a, b));
 
-                sums[0] = (int)v_reduce_sum(v_sum);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#endif
+                sums[0] = (पूर्णाङ्क)v_reduce_योग(v_योग);
+                प्रति (; x < विस्तारः; x++)
+                    sums[0] += (पूर्णाङ्क)src[x];
+#यदि_अन्तः
             }
-            else if (cn == 4)
+            अन्यथा यदि (cn == 4)
             {
-#if defined(CV_NEON_DOT)
-                const uint8x16_t ones = vdupq_n_u8(1);
+#यदि defined(CV_NEON_DOT)
+                ध्रुव uint8x16_t ones = vdupq_n_u8(1);
                 uint32x4_t acc0 = vdupq_n_u32(0), acc1 = vdupq_n_u32(0);
                 uint32x4_t acc2 = vdupq_n_u32(0), acc3 = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= cols - 16; x += 16)
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= स्तम्भसङ्ख्या - 16; x += 16)
                 {
                     uint8x16x4_t v = vld4q_u8(src + x * 4);
                     acc0 = vdotq_u32(acc0, v.val[0], ones);
@@ -455,61 +455,61 @@ static void reduceColSum_8u32f(const Mat& srcmat, Mat& dstmat)
                     acc2 = vdotq_u32(acc2, v.val[2], ones);
                     acc3 = vdotq_u32(acc3, v.val[3], ones);
                 }
-                sums[0] = (int)vaddvq_u32(acc0);
-                sums[1] = (int)vaddvq_u32(acc1);
-                sums[2] = (int)vaddvq_u32(acc2);
-                sums[3] = (int)vaddvq_u32(acc3);
-                for (; x < cols; x++)
+                sums[0] = (पूर्णाङ्क)vaddvq_u32(acc0);
+                sums[1] = (पूर्णाङ्क)vaddvq_u32(acc1);
+                sums[2] = (पूर्णाङ्क)vaddvq_u32(acc2);
+                sums[3] = (पूर्णाङ्क)vaddvq_u32(acc3);
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (पूर्णाङ्क)src[x * 4];
+                    sums[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    sums[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    sums[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#elif CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
-                int x = 0;
-                for (; x <= cols - 16; x += 16)
+#नोचेद्यदि CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= स्तम्भसङ्ख्या - 16; x += 16)
                 {
                     uint8x16x4_t v = vld4q_u8(src + x * 4);
-                    sums[0] += (int)vaddlvq_u8(v.val[0]);
-                    sums[1] += (int)vaddlvq_u8(v.val[1]);
-                    sums[2] += (int)vaddlvq_u8(v.val[2]);
-                    sums[3] += (int)vaddlvq_u8(v.val[3]);
+                    sums[0] += (पूर्णाङ्क)vaddlvq_u8(v.val[0]);
+                    sums[1] += (पूर्णाङ्क)vaddlvq_u8(v.val[1]);
+                    sums[2] += (पूर्णाङ्क)vaddlvq_u8(v.val[2]);
+                    sums[3] += (पूर्णाङ्क)vaddlvq_u8(v.val[3]);
                 }
-                for (; x < cols; x++)
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (पूर्णाङ्क)src[x * 4];
+                    sums[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    sums[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    sums[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#elif CV_AVX2
+#नोचेद्यदि CV_AVX2
                 // Intel AVX2: shuffle + unpack to group channels, full-register SAD
-                const __m256i zero = _mm256_setzero_si256();
-                const __m256i shuf_mask = _mm256_setr_epi8(
+                ध्रुव __m256i zero = _mm256_setzero_si256();
+                ध्रुव __m256i shuf_आवरणम् = _mm256_setr_epi8(
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15,
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15);
-                int x = 0;
+                पूर्णाङ्क x = 0;
                 // 16 pixels/iter with unpack (full-register SAD)
                 {
-                    __m256i sum_bg = zero, sum_ra = zero;
-                    for (; x <= cols - 16; x += 16)
+                    __m256i योग_bg = zero, योग_ra = zero;
+                    प्रति (; x <= स्तम्भसङ्ख्या - 16; x += 16)
                     {
-                        __m256i v0 = _mm256_loadu_si256((const __m256i*)(src + x * 4));
-                        __m256i v1 = _mm256_loadu_si256((const __m256i*)(src + x * 4 + 32));
-                        __m256i g0 = _mm256_shuffle_epi8(v0, shuf_mask);
-                        __m256i g1 = _mm256_shuffle_epi8(v1, shuf_mask);
+                        __m256i v0 = _mm256_loadu_si256((ध्रुव __m256i*)(src + x * 4));
+                        __m256i v1 = _mm256_loadu_si256((ध्रुव __m256i*)(src + x * 4 + 32));
+                        __m256i g0 = _mm256_shuffle_epi8(v0, shuf_आवरणम्);
+                        __m256i g1 = _mm256_shuffle_epi8(v1, shuf_आवरणम्);
                         __m256i bg = _mm256_unpacklo_epi32(g0, g1);
                         __m256i ra = _mm256_unpackhi_epi32(g0, g1);
-                        sum_bg = _mm256_add_epi64(sum_bg, _mm256_sad_epu8(bg, zero));
-                        sum_ra = _mm256_add_epi64(sum_ra, _mm256_sad_epu8(ra, zero));
+                        योग_bg = mm256_सङ्कलय_epi64(योग_bg, _mm256_sad_epu8(bg, zero));
+                        योग_ra = mm256_सङ्कलय_epi64(योग_ra, _mm256_sad_epu8(ra, zero));
                     }
-                    __m128i bg_lo = _mm256_castsi256_si128(sum_bg);
-                    __m128i bg_hi = _mm256_extracti128_si256(sum_bg, 1);
-                    __m128i bg_s = _mm_add_epi64(bg_lo, bg_hi);
-                    __m128i ra_lo = _mm256_castsi256_si128(sum_ra);
-                    __m128i ra_hi = _mm256_extracti128_si256(sum_ra, 1);
-                    __m128i ra_s = _mm_add_epi64(ra_lo, ra_hi);
+                    __m128i bg_lo = _mm256_castsi256_si128(योग_bg);
+                    __m128i bg_hi = _mm256_extracti128_si256(योग_bg, 1);
+                    __m128i bg_s = mm_सङ्कलय_epi64(bg_lo, bg_hi);
+                    __m128i ra_lo = _mm256_castsi256_si128(योग_ra);
+                    __m128i ra_hi = _mm256_extracti128_si256(योग_ra, 1);
+                    __m128i ra_s = mm_सङ्कलय_epi64(ra_lo, ra_hi);
                     sums[0] = _mm_cvtsi128_si32(bg_s);                     // B
                     sums[1] = _mm_cvtsi128_si32(_mm_srli_si128(bg_s, 8));  // G
                     sums[2] = _mm_cvtsi128_si32(ra_s);                     // R
@@ -517,90 +517,90 @@ static void reduceColSum_8u32f(const Mat& srcmat, Mat& dstmat)
                 }
                 // 8-pixel tail with and/srli
                 {
-                    const __m256i mask_lo32 = _mm256_set1_epi64x(0x00000000FFFFFFFFLL);
-                    __m256i sum_br = zero, sum_ga = zero;
-                    for (; x <= cols - 8; x += 8)
+                    ध्रुव __m256i आवरणम्_lo32 = _mm256_set1_epi64x(0x00000000FFFFFFFFLL);
+                    __m256i योग_br = zero, योग_ga = zero;
+                    प्रति (; x <= स्तम्भसङ्ख्या - 8; x += 8)
                     {
-                        __m256i v = _mm256_loadu_si256((const __m256i*)(src + x * 4));
-                        __m256i grouped = _mm256_shuffle_epi8(v, shuf_mask);
-                        __m256i br = _mm256_and_si256(grouped, mask_lo32);
+                        __m256i v = _mm256_loadu_si256((ध्रुव __m256i*)(src + x * 4));
+                        __m256i grouped = _mm256_shuffle_epi8(v, shuf_आवरणम्);
+                        __m256i br = _mm256_and_si256(grouped, आवरणम्_lo32);
                         __m256i ga = _mm256_srli_epi64(grouped, 32);
-                        sum_br = _mm256_add_epi64(sum_br, _mm256_sad_epu8(br, zero));
-                        sum_ga = _mm256_add_epi64(sum_ga, _mm256_sad_epu8(ga, zero));
+                        योग_br = mm256_सङ्कलय_epi64(योग_br, _mm256_sad_epu8(br, zero));
+                        योग_ga = mm256_सङ्कलय_epi64(योग_ga, _mm256_sad_epu8(ga, zero));
                     }
-                    __m128i br_lo = _mm256_castsi256_si128(sum_br);
-                    __m128i br_hi = _mm256_extracti128_si256(sum_br, 1);
-                    __m128i br_s = _mm_add_epi64(br_lo, br_hi);
-                    __m128i ga_lo = _mm256_castsi256_si128(sum_ga);
-                    __m128i ga_hi = _mm256_extracti128_si256(sum_ga, 1);
-                    __m128i ga_s = _mm_add_epi64(ga_lo, ga_hi);
+                    __m128i br_lo = _mm256_castsi256_si128(योग_br);
+                    __m128i br_hi = _mm256_extracti128_si256(योग_br, 1);
+                    __m128i br_s = mm_सङ्कलय_epi64(br_lo, br_hi);
+                    __m128i ga_lo = _mm256_castsi256_si128(योग_ga);
+                    __m128i ga_hi = _mm256_extracti128_si256(योग_ga, 1);
+                    __m128i ga_s = mm_सङ्कलय_epi64(ga_lo, ga_hi);
                     sums[0] += _mm_cvtsi128_si32(br_s);
                     sums[1] += _mm_cvtsi128_si32(ga_s);
                     sums[2] += _mm_cvtsi128_si32(_mm_srli_si128(br_s, 8));
                     sums[3] += _mm_cvtsi128_si32(_mm_srli_si128(ga_s, 8));
                 }
-                for (; x < cols; x++)
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (पूर्णाङ्क)src[x * 4];
+                    sums[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    sums[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    sums[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#elif CV_SSSE3
+#नोचेद्यदि CV_SSSE3
                 // Intel SSSE3: _mm_shuffle_epi8 deinterleave + _mm_sad_epu8
-                const __m128i zero = _mm_setzero_si128();
-                const __m128i shuf_mask = _mm_setr_epi8(
+                ध्रुव __m128i zero = _mm_setzero_si128();
+                ध्रुव __m128i shuf_आवरणम् = _mm_setr_epi8(
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15);
-                const __m128i mask_lo32 = _mm_set1_epi64x(0x00000000FFFFFFFFLL);
-                __m128i sum_br = zero, sum_ga = zero;
-                int x = 0;
-                for (; x <= cols - 4; x += 4)
+                ध्रुव __m128i आवरणम्_lo32 = _mm_set1_epi64x(0x00000000FFFFFFFFLL);
+                __m128i योग_br = zero, योग_ga = zero;
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= स्तम्भसङ्ख्या - 4; x += 4)
                 {
-                    __m128i v = _mm_loadu_si128((const __m128i*)(src + x * 4));
-                    __m128i grouped = _mm_shuffle_epi8(v, shuf_mask);
-                    __m128i br = _mm_and_si128(grouped, mask_lo32);
+                    __m128i v = _mm_loadu_si128((ध्रुव __m128i*)(src + x * 4));
+                    __m128i grouped = _mm_shuffle_epi8(v, shuf_आवरणम्);
+                    __m128i br = _mm_and_si128(grouped, आवरणम्_lo32);
                     __m128i ga = _mm_srli_epi64(grouped, 32);
-                    sum_br = _mm_add_epi64(sum_br, _mm_sad_epu8(br, zero));
-                    sum_ga = _mm_add_epi64(sum_ga, _mm_sad_epu8(ga, zero));
+                    योग_br = mm_सङ्कलय_epi64(योग_br, _mm_sad_epu8(br, zero));
+                    योग_ga = mm_सङ्कलय_epi64(योग_ga, _mm_sad_epu8(ga, zero));
                 }
-                sums[0] = _mm_cvtsi128_si32(sum_br);
-                sums[1] = _mm_cvtsi128_si32(sum_ga);
-                sums[2] = _mm_cvtsi128_si32(_mm_srli_si128(sum_br, 8));
-                sums[3] = _mm_cvtsi128_si32(_mm_srli_si128(sum_ga, 8));
-                for (; x < cols; x++)
+                sums[0] = _mm_cvtsi128_si32(योग_br);
+                sums[1] = _mm_cvtsi128_si32(योग_ga);
+                sums[2] = _mm_cvtsi128_si32(_mm_srli_si128(योग_br, 8));
+                sums[3] = _mm_cvtsi128_si32(_mm_srli_si128(योग_ga, 8));
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (पूर्णाङ्क)src[x * 4];
+                    sums[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    sums[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    sums[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#else
-                const int vlanes8 = VTraits<v_uint8>::vlanes();
+#अन्यथा
+                ध्रुव पूर्णाङ्क vlanes8 = VTraits<v_uint8>::vlanes();
                 v_uint32 vsum0 = vx_setzero_u32(), vsum1 = vx_setzero_u32();
                 v_uint32 vsum2 = vx_setzero_u32(), vsum3 = vx_setzero_u32();
                 v_uint16 vs16_0 = vx_setzero_u16(), vs16_1 = vx_setzero_u16();
                 v_uint16 vs16_2 = vx_setzero_u16(), vs16_3 = vx_setzero_u16();
-                int x = 0, batch = 0;
-                const int flush_at = 128;
+                पूर्णाङ्क x = 0, batch = 0;
+                ध्रुव पूर्णाङ्क flush_at = 128;
 
-                for (; x <= cols - vlanes8; x += vlanes8)
+                प्रति (; x <= स्तम्भसङ्ख्या - vlanes8; x += vlanes8)
                 {
                     v_uint8 ch0, ch1, ch2, ch3;
-                    v_load_deinterleave(src + x * 4, ch0, ch1, ch2, ch3);
+                    v_आरोपय_deinterleave(src + x * 4, ch0, ch1, ch2, ch3);
 
                     v_uint16 lo, hi;
-                    v_expand(ch0, lo, hi); vs16_0 = v_add(vs16_0, v_add(lo, hi));
-                    v_expand(ch1, lo, hi); vs16_1 = v_add(vs16_1, v_add(lo, hi));
-                    v_expand(ch2, lo, hi); vs16_2 = v_add(vs16_2, v_add(lo, hi));
-                    v_expand(ch3, lo, hi); vs16_3 = v_add(vs16_3, v_add(lo, hi));
+                    v_expand(ch0, lo, hi); vs16_0 = v_सङ्कलय(vs16_0, v_सङ्कलय(lo, hi));
+                    v_expand(ch1, lo, hi); vs16_1 = v_सङ्कलय(vs16_1, v_सङ्कलय(lo, hi));
+                    v_expand(ch2, lo, hi); vs16_2 = v_सङ्कलय(vs16_2, v_सङ्कलय(lo, hi));
+                    v_expand(ch3, lo, hi); vs16_3 = v_सङ्कलय(vs16_3, v_सङ्कलय(lo, hi));
 
-                    if (++batch >= flush_at)
+                    यदि (++batch >= flush_at)
                     {
                         v_uint32 a, b;
-                        v_expand(vs16_0, a, b); vsum0 = v_add(vsum0, v_add(a, b));
-                        v_expand(vs16_1, a, b); vsum1 = v_add(vsum1, v_add(a, b));
-                        v_expand(vs16_2, a, b); vsum2 = v_add(vsum2, v_add(a, b));
-                        v_expand(vs16_3, a, b); vsum3 = v_add(vsum3, v_add(a, b));
+                        v_expand(vs16_0, a, b); vsum0 = v_सङ्कलय(vsum0, v_सङ्कलय(a, b));
+                        v_expand(vs16_1, a, b); vsum1 = v_सङ्कलय(vsum1, v_सङ्कलय(a, b));
+                        v_expand(vs16_2, a, b); vsum2 = v_सङ्कलय(vsum2, v_सङ्कलय(a, b));
+                        v_expand(vs16_3, a, b); vsum3 = v_सङ्कलय(vsum3, v_सङ्कलय(a, b));
                         vs16_0 = vx_setzero_u16(); vs16_1 = vx_setzero_u16();
                         vs16_2 = vx_setzero_u16(); vs16_3 = vx_setzero_u16();
                         batch = 0;
@@ -608,185 +608,185 @@ static void reduceColSum_8u32f(const Mat& srcmat, Mat& dstmat)
                 }
                 {
                     v_uint32 a, b;
-                    v_expand(vs16_0, a, b); vsum0 = v_add(vsum0, v_add(a, b));
-                    v_expand(vs16_1, a, b); vsum1 = v_add(vsum1, v_add(a, b));
-                    v_expand(vs16_2, a, b); vsum2 = v_add(vsum2, v_add(a, b));
-                    v_expand(vs16_3, a, b); vsum3 = v_add(vsum3, v_add(a, b));
+                    v_expand(vs16_0, a, b); vsum0 = v_सङ्कलय(vsum0, v_सङ्कलय(a, b));
+                    v_expand(vs16_1, a, b); vsum1 = v_सङ्कलय(vsum1, v_सङ्कलय(a, b));
+                    v_expand(vs16_2, a, b); vsum2 = v_सङ्कलय(vsum2, v_सङ्कलय(a, b));
+                    v_expand(vs16_3, a, b); vsum3 = v_सङ्कलय(vsum3, v_सङ्कलय(a, b));
                 }
 
-                sums[0] = (int)v_reduce_sum(vsum0);
-                sums[1] = (int)v_reduce_sum(vsum1);
-                sums[2] = (int)v_reduce_sum(vsum2);
-                sums[3] = (int)v_reduce_sum(vsum3);
+                sums[0] = (पूर्णाङ्क)v_reduce_योग(vsum0);
+                sums[1] = (पूर्णाङ्क)v_reduce_योग(vsum1);
+                sums[2] = (पूर्णाङ्क)v_reduce_योग(vsum2);
+                sums[3] = (पूर्णाङ्क)v_reduce_योग(vsum3);
 
-                for (; x < cols; x++)
+                प्रति (; x < स्तम्भसङ्ख्या; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (पूर्णाङ्क)src[x * 4];
+                    sums[1] += (पूर्णाङ्क)src[x * 4 + 1];
+                    sums[2] += (पूर्णाङ्क)src[x * 4 + 2];
+                    sums[3] += (पूर्णाङ्क)src[x * 4 + 3];
                 }
-#endif
+#यदि_अन्तः
             }
-            else
+            अन्यथा
             {
-                for (int x = 0, c = 0; x < width; x++, c = (c+1)&-(c < cn-1))
-                    sums[c] += (int)src[x];
+                प्रति (पूर्णाङ्क x = 0, c = 0; x < विस्तारः; x++, c = (c+1)&-(c < cn-1))
+                    sums[c] += (पूर्णाङ्क)src[x];
             }
-            for (int c = 0; c < cn; c++)
-                dst[c] = (float)sums[c];
+            प्रति (पूर्णाङ्क c = 0; c < cn; c++)
+                dst[c] = (भिन्न)sums[c];
         }
     };
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.पङ्क्तिकाः), body);
     v_cleanup();
 }
 
 // --- 16-bit (ushort/short) → float ---
-template<typename SrcT, typename VecSrc, typename VecDst>
-static void reduceColSum_16_32f(const Mat& srcmat, Mat& dstmat)
+प्रतिरूपम्<प्रकारनाम SrcT, प्रकारनाम VecSrc, प्रकारनाम VecDst>
+स्थिर शून्य reduce_Col_योग_16_32f(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int width = srcmat.cols * cn;
-    const int vlanes = VTraits<VecSrc>::vlanes();
+    ध्रुव पूर्णाङ्क cn = srcmat.channels();
+    ध्रुव पूर्णाङ्क विस्तारः = srcmat.स्तम्भसङ्ख्या * cn;
+    ध्रुव पूर्णाङ्क vlanes = VTraits<VecSrc>::vlanes();
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    स्वचालित body = [&](ध्रुव Range& range) {
+        प्रति (पूर्णाङ्क y = range.start; y < range.end; y++)
         {
-            const SrcT* src = srcmat.ptr<SrcT>(y);
-            float* dst = dstmat.ptr<float>(y);
+            ध्रुव SrcT* src = srcmat.ptr<SrcT>(y);
+            भिन्न* dst = dstmat.ptr<भिन्न>(y);
 
-            if (cn == 1)
+            यदि (cn == 1)
             {
                 VecDst v_sum0 = v_setzero_<VecDst>(), v_sum1 = v_setzero_<VecDst>();
-                int x = 0;
-                for (; x <= width - vlanes; x += vlanes)
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - vlanes; x += vlanes)
                 {
                     VecDst lo, hi;
-                    v_expand(vx_load(src + x), lo, hi);
-                    v_sum0 = v_add(v_sum0, lo);
-                    v_sum1 = v_add(v_sum1, hi);
+                    v_expand(vx_आरोपय(src + x), lo, hi);
+                    v_sum0 = v_सङ्कलय(v_sum0, lo);
+                    v_sum1 = v_सङ्कलय(v_sum1, hi);
                 }
-                dst[0] = (float)(v_reduce_sum(v_sum0) + v_reduce_sum(v_sum1));
-                for (; x < width; x++)
-                    dst[0] += (float)src[x];
+                dst[0] = (भिन्न)(v_reduce_योग(v_sum0) + v_reduce_योग(v_sum1));
+                प्रति (; x < विस्तारः; x++)
+                    dst[0] += (भिन्न)src[x];
             }
-            else
+            अन्यथा
             {
-                for (int c = 0; c < cn; c++)
+                प्रति (पूर्णाङ्क c = 0; c < cn; c++)
                     dst[c] = 0;
-                for (int x = 0, c = 0; x < width; x++, c = (c+1)&-(c < cn-1))
-                    dst[c] += (float)src[x];
+                प्रति (पूर्णाङ्क x = 0, c = 0; x < विस्तारः; x++, c = (c+1)&-(c < cn-1))
+                    dst[c] += (भिन्न)src[x];
             }
         }
     };
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.पङ्क्तिकाः), body);
     v_cleanup();
 }
 
-static void reduceColSum_16u32f(const Mat& srcmat, Mat& dstmat)
-{ reduceColSum_16_32f<ushort, v_uint16, v_uint32>(srcmat, dstmat); }
+स्थिर शून्य reduce_Col_योग_16u32f(ध्रुव Mat& srcmat, Mat& dstmat)
+{ reduce_Col_योग_16_32f<ushort, v_uint16, v_uint32>(srcmat, dstmat); }
 
-static void reduceColSum_16s32f(const Mat& srcmat, Mat& dstmat)
-{ reduceColSum_16_32f<short, v_int16, v_int32>(srcmat, dstmat); }
+स्थिर शून्य reduce_Col_योग_16s32f(ध्रुव Mat& srcmat, Mat& dstmat)
+{ reduce_Col_योग_16_32f<ह्रस्व, v_int16, v_int32>(srcmat, dstmat); }
 
 // --- float/double → same type ---
-template<typename T, typename VecT>
-static void reduceColSum_FP(const Mat& srcmat, Mat& dstmat)
+प्रतिरूपम्<प्रकारनाम T, प्रकारनाम VecT>
+स्थिर शून्य reduce_Col_योग_FP(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int width = srcmat.cols * cn;
-    const int vlanes = VTraits<VecT>::vlanes();
+    ध्रुव पूर्णाङ्क cn = srcmat.channels();
+    ध्रुव पूर्णाङ्क विस्तारः = srcmat.स्तम्भसङ्ख्या * cn;
+    ध्रुव पूर्णाङ्क vlanes = VTraits<VecT>::vlanes();
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    स्वचालित body = [&](ध्रुव Range& range) {
+        प्रति (पूर्णाङ्क y = range.start; y < range.end; y++)
         {
-            const T* src = srcmat.ptr<T>(y);
+            ध्रुव T* src = srcmat.ptr<T>(y);
             T* dst = dstmat.ptr<T>(y);
 
-            if (cn == 1)
+            यदि (cn == 1)
             {
                 VecT s0 = v_setzero_<VecT>(), s1 = v_setzero_<VecT>();
                 VecT s2 = v_setzero_<VecT>(), s3 = v_setzero_<VecT>();
-                int x = 0;
-                for (; x <= width - vlanes * 4; x += vlanes * 4)
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - vlanes * 4; x += vlanes * 4)
                 {
-                    s0 = v_add(s0, vx_load(src + x));
-                    s1 = v_add(s1, vx_load(src + x + vlanes));
-                    s2 = v_add(s2, vx_load(src + x + vlanes * 2));
-                    s3 = v_add(s3, vx_load(src + x + vlanes * 3));
+                    s0 = v_सङ्कलय(s0, vx_आरोपय(src + x));
+                    s1 = v_सङ्कलय(s1, vx_आरोपय(src + x + vlanes));
+                    s2 = v_सङ्कलय(s2, vx_आरोपय(src + x + vlanes * 2));
+                    s3 = v_सङ्कलय(s3, vx_आरोपय(src + x + vlanes * 3));
                 }
-                s0 = v_add(v_add(s0, s1), v_add(s2, s3));
-                for (; x <= width - vlanes; x += vlanes)
-                    s0 = v_add(s0, vx_load(src + x));
-                T total = (T)v_reduce_sum(s0);
-                for (; x < width; x++)
-                    total += src[x];
-                dst[0] = total;
+                s0 = v_सङ्कलय(v_सङ्कलय(s0, s1), v_सङ्कलय(s2, s3));
+                प्रति (; x <= विस्तारः - vlanes; x += vlanes)
+                    s0 = v_सङ्कलय(s0, vx_आरोपय(src + x));
+                T योग = (T)v_reduce_योग(s0);
+                प्रति (; x < विस्तारः; x++)
+                    योग += src[x];
+                dst[0] = योग;
             }
-            else
+            अन्यथा
             {
-                for (int c = 0; c < cn; c++)
+                प्रति (पूर्णाङ्क c = 0; c < cn; c++)
                     dst[c] = 0;
-                for (int x = 0, c = 0; x < width; x++, c = (c+1)&-(c < cn-1))
+                प्रति (पूर्णाङ्क x = 0, c = 0; x < विस्तारः; x++, c = (c+1)&-(c < cn-1))
                     dst[c] += src[x];
             }
         }
     };
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.पङ्क्तिकाः), body);
     v_cleanup();
 }
 
-static void reduceColSum_32f32f(const Mat& srcmat, Mat& dstmat)
-{ reduceColSum_FP<float, v_float32>(srcmat, dstmat); }
+स्थिर शून्य reduce_Col_योग_32f32f(ध्रुव Mat& srcmat, Mat& dstmat)
+{ reduce_Col_योग_FP<भिन्न, v_float32>(srcmat, dstmat); }
 
-#if CV_SIMD_64F
+#यदि CV_SIMD_64F
 // --- float → double ---
-static void reduceColSum_32f64f(const Mat& srcmat, Mat& dstmat)
+स्थिर शून्य reduce_Col_योग_32f64f(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int width = srcmat.cols * cn;
-    const int vlanes32 = VTraits<v_float32>::vlanes();
+    ध्रुव पूर्णाङ्क cn = srcmat.channels();
+    ध्रुव पूर्णाङ्क विस्तारः = srcmat.स्तम्भसङ्ख्या * cn;
+    ध्रुव पूर्णाङ्क vlanes32 = VTraits<v_float32>::vlanes();
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    स्वचालित body = [&](ध्रुव Range& range) {
+        प्रति (पूर्णाङ्क y = range.start; y < range.end; y++)
         {
-            const float* src = srcmat.ptr<float>(y);
-            double* dst = dstmat.ptr<double>(y);
+            ध्रुव भिन्न* src = srcmat.ptr<भिन्न>(y);
+            द्विगुण* dst = dstmat.ptr<द्विगुण>(y);
 
-            if (cn == 1)
+            यदि (cn == 1)
             {
                 v_float64 v_sum0 = vx_setzero_f64();
                 v_float64 v_sum1 = vx_setzero_f64();
-                int x = 0;
-                for (; x <= width - vlanes32; x += vlanes32)
+                पूर्णाङ्क x = 0;
+                प्रति (; x <= विस्तारः - vlanes32; x += vlanes32)
                 {
-                    v_float32 v = vx_load(src + x);
-                    v_sum0 = v_add(v_sum0, v_cvt_f64(v));
-                    v_sum1 = v_add(v_sum1, v_cvt_f64_high(v));
+                    v_float32 v = vx_आरोपय(src + x);
+                    v_sum0 = v_सङ्कलय(v_sum0, v_cvt_f64(v));
+                    v_sum1 = v_सङ्कलय(v_sum1, v_cvt_f64_उच्चः(v));
                 }
-                v_float64 v_total = v_add(v_sum0, v_sum1);
+                v_float64 v_योग_2 = v_सङ्कलय(v_sum0, v_sum1);
 
-                double total = v_reduce_sum(v_total);
-                for (; x < width; x++)
-                    total += (double)src[x];
-                dst[0] = total;
+                द्विगुण योग = v_reduce_योग(v_योग_2);
+                प्रति (; x < विस्तारः; x++)
+                    योग += (द्विगुण)src[x];
+                dst[0] = योग;
             }
-            else
+            अन्यथा
             {
-                for (int c = 0; c < cn; c++)
+                प्रति (पूर्णाङ्क c = 0; c < cn; c++)
                     dst[c] = 0;
-                for (int x = 0, c = 0; x < width; x++, c = (c+1)&-(c < cn-1))
-                    dst[c] += (double)src[x];
+                प्रति (पूर्णाङ्क x = 0, c = 0; x < विस्तारः; x++, c = (c+1)&-(c < cn-1))
+                    dst[c] += (द्विगुण)src[x];
             }
         }
     };
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.पङ्क्तिकाः), body);
     v_cleanup();
 }
 
-static void reduceColSum_64f64f(const Mat& srcmat, Mat& dstmat)
-{ reduceColSum_FP<double, v_float64>(srcmat, dstmat); }
-#endif // CV_SIMD_64F
+स्थिर शून्य reduce_Col_योग_64f64f(ध्रुव Mat& srcmat, Mat& dstmat)
+{ reduce_Col_योग_FP<द्विगुण, v_float64>(srcmat, dstmat); }
+#यदि_अन्तः // CV_SIMD_64F
 
 // =====================================================================
 //  Row reduce SUM (dim=0): sum each column across all rows
@@ -795,149 +795,149 @@ static void reduceColSum_64f64f(const Mat& srcmat, Mat& dstmat)
 // --- uchar → int ---
 // Uses u16 intermediate accumulator for vertical sum: accumulate u8→u16 per row,
 // flush u16→u32 every 256 rows (max u16 value: 256*255=65280 < 65535)
-static void reduceRowSum_8u32s(const Mat& srcmat, Mat& dstmat)
+स्थिर शून्य reduce_Row_योग_8u32s(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int width_cn = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes16 = VTraits<v_uint16>::vlanes();
-    const int vlanes32 = VTraits<v_int32>::vlanes();
+    ध्रुव पूर्णाङ्क विस्तारः_cn = srcmat.स्तम्भसङ्ख्या * srcmat.channels();
+    ध्रुव पूर्णाङ्क height = srcmat.पङ्क्तिकाः;
+    ध्रुव पूर्णाङ्क vlanes16 = VTraits<v_uint16>::vlanes();
+    ध्रुव पूर्णाङ्क vlanes32 = VTraits<v_int32>::vlanes();
 
-    auto body = [&](const Range& range) {
-        const int start = range.start;
-        const int end = range.end;
-        const int len = end - start;
+    स्वचालित body = [&](ध्रुव Range& range) {
+        ध्रुव पूर्णाङ्क start = range.start;
+        ध्रुव पूर्णाङ्क end = range.end;
+        ध्रुव पूर्णाङ्क len = end - start;
 
-        AutoBuffer<int> buf32_storage(len);
-        AutoBuffer<ushort> buf16_storage(len);
-        int* buf32 = buf32_storage.data();
-        ushort* buf16 = buf16_storage.data();
+        Auto_बफर<पूर्णाङ्क> buf32_storage(len);
+        Auto_बफर<ushort> buf16_storage(len);
+        पूर्णाङ्क* buf32 = buf32_storage.दत्त();
+        ushort* buf16 = buf16_storage.दत्त();
 
         // init from first row
-        const uchar* src0 = srcmat.ptr<uchar>(0) + start;
-        for (int i = 0; i < len; i++)
-            buf32[i] = (int)src0[i];
+        ध्रुव uchar* src0 = srcmat.ptr<uchar>(0) + start;
+        प्रति (पूर्णाङ्क i = 0; i < len; i++)
+            buf32[i] = (पूर्णाङ्क)src0[i];
 
-        if (height <= 1)
+        यदि (height <= 1)
         {
-            int* dst = dstmat.ptr<int>(0) + start;
-            for (int i = 0; i < len; i++)
+            पूर्णाङ्क* dst = dstmat.ptr<पूर्णाङ्क>(0) + start;
+            प्रति (पूर्णाङ्क i = 0; i < len; i++)
                 dst[i] = buf32[i];
-            return;
+            प्रत्यागम;
         }
 
-        memset(buf16, 0, len * sizeof(ushort));
-        const int flush_at = 256; // 256*255 = 65280 < 65535 (u16 safe)
-        int flush_count = 0;
+        स्मृतिं_पूरय(buf16, 0, len * परिमाण(ushort));
+        ध्रुव पूर्णाङ्क flush_at = 256; // 256*255 = 65280 < 65535 (u16 safe)
+        पूर्णाङ्क flush_गणनम् = 0;
 
-        for (int row = 1; row < height; row++)
+        प्रति (पूर्णाङ्क row = 1; row < height; row++)
         {
-            const uchar* src = srcmat.ptr<uchar>(row) + start;
-            int i = 0;
+            ध्रुव uchar* src = srcmat.ptr<uchar>(row) + start;
+            पूर्णाङ्क i = 0;
 
-#if CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+#यदि CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
             // AArch64: vaddw_u8 — single-instruction widening add (u16 += u8)
-            for (; i <= len - 16; i += 16)
+            प्रति (; i <= len - 16; i += 16)
             {
                 uint8x16_t v = vld1q_u8(src + i);
                 uint16x8_t acc_lo = vld1q_u16(buf16 + i);
                 uint16x8_t acc_hi = vld1q_u16(buf16 + i + 8);
-                vst1q_u16(buf16 + i,     vaddw_u8(acc_lo, vget_low_u8(v)));
-                vst1q_u16(buf16 + i + 8, vaddw_high_u8(acc_hi, v));
+                vst1q_u16(buf16 + i,     vaddw_u8(acc_lo, vget_नीचः_u8(v)));
+                vst1q_u16(buf16 + i + 8, vaddw_उच्चः_u8(acc_hi, v));
             }
-#elif CV_RVV
-            const int vl = (int)__riscv_vsetvlmax_e8m2();
-            for (; i <= len - vl; i += vl)
+#नोचेद्यदि CV_RVV
+            ध्रुव पूर्णाङ्क vl = (पूर्णाङ्क)__riscv_vsetvlmax_e8m2();
+            प्रति (; i <= len - vl; i += vl)
             {
                 vuint8m2_t vs = __riscv_vle8_v_u8m2(src + i, vl);
                 vuint16m4_t va = __riscv_vle16_v_u16m4(buf16 + i, vl);
                 va = __riscv_vwaddu_wv_u16m4(va, vs, vl);
                 __riscv_vse16_v_u16m4(buf16 + i, va, vl);
             }
-#else
-            const int vlanes8 = VTraits<v_uint8>::vlanes();
-            for (; i <= len - vlanes8; i += vlanes8)
+#अन्यथा
+            ध्रुव पूर्णाङ्क vlanes8 = VTraits<v_uint8>::vlanes();
+            प्रति (; i <= len - vlanes8; i += vlanes8)
             {
                 v_uint16 lo, hi;
-                v_expand(vx_load(src + i), lo, hi);
-                v_store(buf16 + i, v_add(vx_load(buf16 + i), lo));
-                v_store(buf16 + i + vlanes16, v_add(vx_load(buf16 + i + vlanes16), hi));
+                v_expand(vx_आरोपय(src + i), lo, hi);
+                v_store(buf16 + i, v_सङ्कलय(vx_आरोपय(buf16 + i), lo));
+                v_store(buf16 + i + vlanes16, v_सङ्कलय(vx_आरोपय(buf16 + i + vlanes16), hi));
             }
-#endif
-            for (; i < len; i++)
+#यदि_अन्तः
+            प्रति (; i < len; i++)
                 buf16[i] += (ushort)src[i];
 
-            if (++flush_count >= flush_at || row == height - 1)
+            यदि (++flush_गणनम् >= flush_at || row == height - 1)
             {
                 // flush u16 → u32
-                int j = 0;
-                for (; j <= len - vlanes16; j += vlanes16)
+                पूर्णाङ्क j = 0;
+                प्रति (; j <= len - vlanes16; j += vlanes16)
                 {
                     v_uint32 lo, hi;
-                    v_expand(vx_load(buf16 + j), lo, hi);
-                    v_store(buf32 + j, v_add(vx_load(buf32 + j), v_reinterpret_as_s32(lo)));
-                    v_store(buf32 + j + vlanes32, v_add(vx_load(buf32 + j + vlanes32), v_reinterpret_as_s32(hi)));
+                    v_expand(vx_आरोपय(buf16 + j), lo, hi);
+                    v_store(buf32 + j, v_सङ्कलय(vx_आरोपय(buf32 + j), v_reinterpret_as_s32(lo)));
+                    v_store(buf32 + j + vlanes32, v_सङ्कलय(vx_आरोपय(buf32 + j + vlanes32), v_reinterpret_as_s32(hi)));
                 }
-                for (; j < len; j++)
-                    buf32[j] += (int)buf16[j];
-                memset(buf16, 0, len * sizeof(ushort));
-                flush_count = 0;
+                प्रति (; j < len; j++)
+                    buf32[j] += (पूर्णाङ्क)buf16[j];
+                स्मृतिं_पूरय(buf16, 0, len * परिमाण(ushort));
+                flush_गणनम् = 0;
             }
         }
 
-        int* dst = dstmat.ptr<int>(0) + start;
-        for (int i = 0; i < len; i++)
+        पूर्णाङ्क* dst = dstmat.ptr<पूर्णाङ्क>(0) + start;
+        प्रति (पूर्णाङ्क i = 0; i < len; i++)
             dst[i] = buf32[i];
     };
 
-    parallel_for_(Range(0, width_cn), body, width_cn * CV_ELEM_SIZE(srcmat.depth()) / 64);
+    parallel_for_(Range(0, विस्तारः_cn), body, विस्तारः_cn * CV_ELEM_आकार(srcmat.गभीरता()) / 64);
     v_cleanup();
 }
 
 // --- uchar → float ---
-static void reduceRowSum_8u32f(const Mat& srcmat, Mat& dstmat)
+स्थिर शून्य reduce_Row_योग_8u32f(ध्रुव Mat& srcmat, Mat& dstmat)
 {
     // compute in int, then convert to float
-    Mat temp(dstmat.rows, dstmat.cols, CV_32SC(srcmat.channels()));
-    reduceRowSum_8u32s(srcmat, temp);
-    temp.convertTo(dstmat, dstmat.type());
+    Mat अस्थायी_2(dstmat.पङ्क्तिकाः, dstmat.स्तम्भसङ्ख्या, CV_32SC(srcmat.channels()));
+    reduce_Row_योग_8u32s(srcmat, अस्थायी_2);
+    अस्थायी_2.convert_गन्तव्यम्(dstmat, dstmat.type());
 }
 
 // --- 16-bit (ushort/short) → float row reduce ---
-template<typename SrcT, typename VecSrc, typename VecDst>
-static void reduceRowSum_16_32f(const Mat& srcmat, Mat& dstmat)
+प्रतिरूपम्<प्रकारनाम SrcT, प्रकारनाम VecSrc, प्रकारनाम VecDst>
+स्थिर शून्य reduce_Row_योग_16_32f(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int width_cn = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes16 = VTraits<VecSrc>::vlanes();
-    const int vlanes32 = vlanes16 / 2;
+    ध्रुव पूर्णाङ्क विस्तारः_cn = srcmat.स्तम्भसङ्ख्या * srcmat.channels();
+    ध्रुव पूर्णाङ्क height = srcmat.पङ्क्तिकाः;
+    ध्रुव पूर्णाङ्क vlanes16 = VTraits<VecSrc>::vlanes();
+    ध्रुव पूर्णाङ्क vlanes32 = vlanes16 / 2;
 
-    auto body = [&](const Range& range) {
-        const int start = range.start;
-        const int end = range.end;
-        const int len = end - start;
-        float* dst = dstmat.ptr<float>(0) + start;
+    स्वचालित body = [&](ध्रुव Range& range) {
+        ध्रुव पूर्णाङ्क start = range.start;
+        ध्रुव पूर्णाङ्क end = range.end;
+        ध्रुव पूर्णाङ्क len = end - start;
+        भिन्न* dst = dstmat.ptr<भिन्न>(0) + start;
 
-        int i = 0;
-        for (; i <= len - vlanes16 * 4; i += vlanes16 * 4)
+        पूर्णाङ्क i = 0;
+        प्रति (; i <= len - vlanes16 * 4; i += vlanes16 * 4)
         {
-            const SrcT* src0 = srcmat.ptr<SrcT>(0) + start + i;
+            ध्रुव SrcT* src0 = srcmat.ptr<SrcT>(0) + start + i;
             VecDst a0, a1, a2, a3, a4, a5, a6, a7;
-            v_expand(vx_load(src0), a0, a1);
-            v_expand(vx_load(src0 + vlanes16), a2, a3);
-            v_expand(vx_load(src0 + vlanes16*2), a4, a5);
-            v_expand(vx_load(src0 + vlanes16*3), a6, a7);
-            for (int row = 1; row < height; row++)
+            v_expand(vx_आरोपय(src0), a0, a1);
+            v_expand(vx_आरोपय(src0 + vlanes16), a2, a3);
+            v_expand(vx_आरोपय(src0 + vlanes16*2), a4, a5);
+            v_expand(vx_आरोपय(src0 + vlanes16*3), a6, a7);
+            प्रति (पूर्णाङ्क row = 1; row < height; row++)
             {
-                const SrcT* src = srcmat.ptr<SrcT>(row) + start + i;
+                ध्रुव SrcT* src = srcmat.ptr<SrcT>(row) + start + i;
                 VecDst lo, hi;
-                v_expand(vx_load(src), lo, hi);
-                a0 = v_add(a0, lo); a1 = v_add(a1, hi);
-                v_expand(vx_load(src + vlanes16), lo, hi);
-                a2 = v_add(a2, lo); a3 = v_add(a3, hi);
-                v_expand(vx_load(src + vlanes16*2), lo, hi);
-                a4 = v_add(a4, lo); a5 = v_add(a5, hi);
-                v_expand(vx_load(src + vlanes16*3), lo, hi);
-                a6 = v_add(a6, lo); a7 = v_add(a7, hi);
+                v_expand(vx_आरोपय(src), lo, hi);
+                a0 = v_सङ्कलय(a0, lo); a1 = v_सङ्कलय(a1, hi);
+                v_expand(vx_आरोपय(src + vlanes16), lo, hi);
+                a2 = v_सङ्कलय(a2, lo); a3 = v_सङ्कलय(a3, hi);
+                v_expand(vx_आरोपय(src + vlanes16*2), lo, hi);
+                a4 = v_सङ्कलय(a4, lo); a5 = v_सङ्कलय(a5, hi);
+                v_expand(vx_आरोपय(src + vlanes16*3), lo, hi);
+                a6 = v_सङ्कलय(a6, lo); a7 = v_सङ्कलय(a7, hi);
             }
             v_store(dst + i, v_cvt_f32(v_reinterpret_as_s32(a0)));
             v_store(dst + i + vlanes32, v_cvt_f32(v_reinterpret_as_s32(a1)));
@@ -948,71 +948,71 @@ static void reduceRowSum_16_32f(const Mat& srcmat, Mat& dstmat)
             v_store(dst + i + vlanes32*6, v_cvt_f32(v_reinterpret_as_s32(a6)));
             v_store(dst + i + vlanes32*7, v_cvt_f32(v_reinterpret_as_s32(a7)));
         }
-        for (; i <= len - vlanes16; i += vlanes16)
+        प्रति (; i <= len - vlanes16; i += vlanes16)
         {
             VecDst a0, a1;
-            v_expand(vx_load(srcmat.ptr<SrcT>(0) + start + i), a0, a1);
-            for (int row = 1; row < height; row++)
+            v_expand(vx_आरोपय(srcmat.ptr<SrcT>(0) + start + i), a0, a1);
+            प्रति (पूर्णाङ्क row = 1; row < height; row++)
             {
                 VecDst lo, hi;
-                v_expand(vx_load(srcmat.ptr<SrcT>(row) + start + i), lo, hi);
-                a0 = v_add(a0, lo); a1 = v_add(a1, hi);
+                v_expand(vx_आरोपय(srcmat.ptr<SrcT>(row) + start + i), lo, hi);
+                a0 = v_सङ्कलय(a0, lo); a1 = v_सङ्कलय(a1, hi);
             }
             v_store(dst + i, v_cvt_f32(v_reinterpret_as_s32(a0)));
             v_store(dst + i + vlanes32, v_cvt_f32(v_reinterpret_as_s32(a1)));
         }
-        for (; i < len; i++)
+        प्रति (; i < len; i++)
         {
-            int val = (int)*(srcmat.ptr<SrcT>(0) + start + i);
-            for (int row = 1; row < height; row++)
-                val += (int)*(srcmat.ptr<SrcT>(row) + start + i);
-            dst[i] = (float)val;
+            पूर्णाङ्क val = (पूर्णाङ्क)*(srcmat.ptr<SrcT>(0) + start + i);
+            प्रति (पूर्णाङ्क row = 1; row < height; row++)
+                val += (पूर्णाङ्क)*(srcmat.ptr<SrcT>(row) + start + i);
+            dst[i] = (भिन्न)val;
         }
     };
 
-    parallel_for_(Range(0, width_cn), body, width_cn * CV_ELEM_SIZE(srcmat.depth()) / 64);
+    parallel_for_(Range(0, विस्तारः_cn), body, विस्तारः_cn * CV_ELEM_आकार(srcmat.गभीरता()) / 64);
     v_cleanup();
 }
 
-static void reduceRowSum_16u32f(const Mat& srcmat, Mat& dstmat)
-{ reduceRowSum_16_32f<ushort, v_uint16, v_uint32>(srcmat, dstmat); }
+स्थिर शून्य reduce_Row_योग_16u32f(ध्रुव Mat& srcmat, Mat& dstmat)
+{ reduce_Row_योग_16_32f<ushort, v_uint16, v_uint32>(srcmat, dstmat); }
 
-static void reduceRowSum_16s32f(const Mat& srcmat, Mat& dstmat)
-{ reduceRowSum_16_32f<short, v_int16, v_int32>(srcmat, dstmat); }
+स्थिर शून्य reduce_Row_योग_16s32f(ध्रुव Mat& srcmat, Mat& dstmat)
+{ reduce_Row_योग_16_32f<ह्रस्व, v_int16, v_int32>(srcmat, dstmat); }
 
 // --- float/double → same type row reduce ---
-template<typename T, typename VecT>
-static void reduceRowSum_FP(const Mat& srcmat, Mat& dstmat)
+प्रतिरूपम्<प्रकारनाम T, प्रकारनाम VecT>
+स्थिर शून्य reduce_Row_योग_FP(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int width_cn = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes = VTraits<VecT>::vlanes();
+    ध्रुव पूर्णाङ्क विस्तारः_cn = srcmat.स्तम्भसङ्ख्या * srcmat.channels();
+    ध्रुव पूर्णाङ्क height = srcmat.पङ्क्तिकाः;
+    ध्रुव पूर्णाङ्क vlanes = VTraits<VecT>::vlanes();
 
-    auto body = [&](const Range& range) {
-        const int start = range.start;
-        const int end = range.end;
-        const int len = end - start;
+    स्वचालित body = [&](ध्रुव Range& range) {
+        ध्रुव पूर्णाङ्क start = range.start;
+        ध्रुव पूर्णाङ्क end = range.end;
+        ध्रुव पूर्णाङ्क len = end - start;
         T* dst = dstmat.ptr<T>(0) + start;
 
-        int i = 0;
-        for (; i <= len - vlanes * 8; i += vlanes * 8)
+        पूर्णाङ्क i = 0;
+        प्रति (; i <= len - vlanes * 8; i += vlanes * 8)
         {
-            const T* src0 = srcmat.ptr<T>(0) + start + i;
-            VecT s0 = vx_load(src0), s1 = vx_load(src0 + vlanes);
-            VecT s2 = vx_load(src0 + vlanes*2), s3 = vx_load(src0 + vlanes*3);
-            VecT s4 = vx_load(src0 + vlanes*4), s5 = vx_load(src0 + vlanes*5);
-            VecT s6 = vx_load(src0 + vlanes*6), s7 = vx_load(src0 + vlanes*7);
-            for (int row = 1; row < height; row++)
+            ध्रुव T* src0 = srcmat.ptr<T>(0) + start + i;
+            VecT s0 = vx_आरोपय(src0), s1 = vx_आरोपय(src0 + vlanes);
+            VecT s2 = vx_आरोपय(src0 + vlanes*2), s3 = vx_आरोपय(src0 + vlanes*3);
+            VecT s4 = vx_आरोपय(src0 + vlanes*4), s5 = vx_आरोपय(src0 + vlanes*5);
+            VecT s6 = vx_आरोपय(src0 + vlanes*6), s7 = vx_आरोपय(src0 + vlanes*7);
+            प्रति (पूर्णाङ्क row = 1; row < height; row++)
             {
-                const T* src = srcmat.ptr<T>(row) + start + i;
-                s0 = v_add(s0, vx_load(src));
-                s1 = v_add(s1, vx_load(src + vlanes));
-                s2 = v_add(s2, vx_load(src + vlanes*2));
-                s3 = v_add(s3, vx_load(src + vlanes*3));
-                s4 = v_add(s4, vx_load(src + vlanes*4));
-                s5 = v_add(s5, vx_load(src + vlanes*5));
-                s6 = v_add(s6, vx_load(src + vlanes*6));
-                s7 = v_add(s7, vx_load(src + vlanes*7));
+                ध्रुव T* src = srcmat.ptr<T>(row) + start + i;
+                s0 = v_सङ्कलय(s0, vx_आरोपय(src));
+                s1 = v_सङ्कलय(s1, vx_आरोपय(src + vlanes));
+                s2 = v_सङ्कलय(s2, vx_आरोपय(src + vlanes*2));
+                s3 = v_सङ्कलय(s3, vx_आरोपय(src + vlanes*3));
+                s4 = v_सङ्कलय(s4, vx_आरोपय(src + vlanes*4));
+                s5 = v_सङ्कलय(s5, vx_आरोपय(src + vlanes*5));
+                s6 = v_सङ्कलय(s6, vx_आरोपय(src + vlanes*6));
+                s7 = v_सङ्कलय(s7, vx_आरोपय(src + vlanes*7));
             }
             v_store(dst + i, s0);
             v_store(dst + i + vlanes, s1);
@@ -1023,144 +1023,144 @@ static void reduceRowSum_FP(const Mat& srcmat, Mat& dstmat)
             v_store(dst + i + vlanes*6, s6);
             v_store(dst + i + vlanes*7, s7);
         }
-        for (; i <= len - vlanes; i += vlanes)
+        प्रति (; i <= len - vlanes; i += vlanes)
         {
-            VecT s0 = vx_load(srcmat.ptr<T>(0) + start + i);
-            for (int row = 1; row < height; row++)
-                s0 = v_add(s0, vx_load(srcmat.ptr<T>(row) + start + i));
+            VecT s0 = vx_आरोपय(srcmat.ptr<T>(0) + start + i);
+            प्रति (पूर्णाङ्क row = 1; row < height; row++)
+                s0 = v_सङ्कलय(s0, vx_आरोपय(srcmat.ptr<T>(row) + start + i));
             v_store(dst + i, s0);
         }
-        for (; i < len; i++)
+        प्रति (; i < len; i++)
         {
             T val = *(srcmat.ptr<T>(0) + start + i);
-            for (int row = 1; row < height; row++)
+            प्रति (पूर्णाङ्क row = 1; row < height; row++)
                 val += *(srcmat.ptr<T>(row) + start + i);
             dst[i] = val;
         }
     };
 
-    parallel_for_(Range(0, width_cn), body, width_cn * CV_ELEM_SIZE(srcmat.depth()) / 64);
+    parallel_for_(Range(0, विस्तारः_cn), body, विस्तारः_cn * CV_ELEM_आकार(srcmat.गभीरता()) / 64);
     v_cleanup();
 }
 
-static void reduceRowSum_32f32f(const Mat& srcmat, Mat& dstmat)
-{ reduceRowSum_FP<float, v_float32>(srcmat, dstmat); }
+स्थिर शून्य reduce_Row_योग_32f32f(ध्रुव Mat& srcmat, Mat& dstmat)
+{ reduce_Row_योग_FP<भिन्न, v_float32>(srcmat, dstmat); }
 
-#if CV_SIMD_64F
+#यदि CV_SIMD_64F
 // --- float → double ---
-static void reduceRowSum_32f64f(const Mat& srcmat, Mat& dstmat)
+स्थिर शून्य reduce_Row_योग_32f64f(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int width_cn = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes32 = VTraits<v_float32>::vlanes();
-    const int vlanes64 = VTraits<v_float64>::vlanes();
+    ध्रुव पूर्णाङ्क विस्तारः_cn = srcmat.स्तम्भसङ्ख्या * srcmat.channels();
+    ध्रुव पूर्णाङ्क height = srcmat.पङ्क्तिकाः;
+    ध्रुव पूर्णाङ्क vlanes32 = VTraits<v_float32>::vlanes();
+    ध्रुव पूर्णाङ्क vlanes64 = VTraits<v_float64>::vlanes();
 
-    auto body = [&](const Range& range) {
-        const int start = range.start;
-        const int end = range.end;
-        const int len = end - start;
+    स्वचालित body = [&](ध्रुव Range& range) {
+        ध्रुव पूर्णाङ्क start = range.start;
+        ध्रुव पूर्णाङ्क end = range.end;
+        ध्रुव पूर्णाङ्क len = end - start;
 
-        AutoBuffer<double> buf_storage(len);
-        double* buf = buf_storage.data();
+        Auto_बफर<द्विगुण> buf_storage(len);
+        द्विगुण* buf = buf_storage.दत्त();
 
-        const float* src0 = srcmat.ptr<float>(0) + start;
-        for (int i = 0; i < len; i++)
-            buf[i] = (double)src0[i];
+        ध्रुव भिन्न* src0 = srcmat.ptr<भिन्न>(0) + start;
+        प्रति (पूर्णाङ्क i = 0; i < len; i++)
+            buf[i] = (द्विगुण)src0[i];
 
-        for (int row = 1; row < height; row++)
+        प्रति (पूर्णाङ्क row = 1; row < height; row++)
         {
-            const float* src = srcmat.ptr<float>(row) + start;
-            int i = 0;
-            for (; i <= len - vlanes32; i += vlanes32)
+            ध्रुव भिन्न* src = srcmat.ptr<भिन्न>(row) + start;
+            पूर्णाङ्क i = 0;
+            प्रति (; i <= len - vlanes32; i += vlanes32)
             {
-                v_float32 v = vx_load(src + i);
-                v_store(buf + i, v_add(vx_load(buf + i), v_cvt_f64(v)));
-                v_store(buf + i + vlanes64, v_add(vx_load(buf + i + vlanes64), v_cvt_f64_high(v)));
+                v_float32 v = vx_आरोपय(src + i);
+                v_store(buf + i, v_सङ्कलय(vx_आरोपय(buf + i), v_cvt_f64(v)));
+                v_store(buf + i + vlanes64, v_सङ्कलय(vx_आरोपय(buf + i + vlanes64), v_cvt_f64_उच्चः(v)));
             }
-            for (; i < len; i++)
-                buf[i] += (double)src[i];
+            प्रति (; i < len; i++)
+                buf[i] += (द्विगुण)src[i];
         }
 
-        double* dst = dstmat.ptr<double>(0) + start;
-        memcpy(dst, buf, len * sizeof(double));
+        द्विगुण* dst = dstmat.ptr<द्विगुण>(0) + start;
+        स्मृतिं_प्रतिलिख(dst, buf, len * परिमाण(द्विगुण));
     };
 
-    parallel_for_(Range(0, width_cn), body, width_cn * CV_ELEM_SIZE(srcmat.depth()) / 64);
+    parallel_for_(Range(0, विस्तारः_cn), body, विस्तारः_cn * CV_ELEM_आकार(srcmat.गभीरता()) / 64);
     v_cleanup();
 }
 
-static void reduceRowSum_64f64f(const Mat& srcmat, Mat& dstmat)
-{ reduceRowSum_FP<double, v_float64>(srcmat, dstmat); }
-#endif // CV_SIMD_64F
+स्थिर शून्य reduce_Row_योग_64f64f(ध्रुव Mat& srcmat, Mat& dstmat)
+{ reduce_Row_योग_FP<द्विगुण, v_float64>(srcmat, dstmat); }
+#यदि_अन्तः // CV_SIMD_64F
 
-#endif // CV_SIMD || CV_SIMD_SCALABLE
+#यदि_अन्तः // CV_SIMD || CV_SIMD_SCALABLE
 
-#if CV_SIMD_SCALABLE
-static inline v_float32 reduceRowSum2Acc4(const v_float32& acc,
-                                           const float* src0, const float* src1,
-                                           const float* src2, const float* src3)
+#यदि CV_SIMD_SCALABLE
+स्थिर अन्तःस्थ v_float32 reduceRowSum2Acc4(ध्रुव v_float32& acc,
+                                           ध्रुव भिन्न* src0, ध्रुव भिन्न* src1,
+                                           ध्रुव भिन्न* src2, ध्रुव भिन्न* src3)
 {
-    v_float32 sum = acc;
-    v_float32 x = vx_load(src0);
-    sum = v_fma(x, x, sum);
-    x = vx_load(src1);
-    sum = v_fma(x, x, sum);
-    x = vx_load(src2);
-    sum = v_fma(x, x, sum);
-    x = vx_load(src3);
-    return v_fma(x, x, sum);
+    v_float32 योग_2 = acc;
+    v_float32 x = vx_आरोपय(src0);
+    योग_2 = v_fma(x, x, योग_2);
+    x = vx_आरोपय(src1);
+    योग_2 = v_fma(x, x, योग_2);
+    x = vx_आरोपय(src2);
+    योग_2 = v_fma(x, x, योग_2);
+    x = vx_आरोपय(src3);
+    प्रत्यागम v_fma(x, x, योग_2);
 }
 
 // dim=0, REDUCE_SUM2 for CV_32F using scalable universal intrinsics.
-static void reduceRowSum2_32f32f(const Mat& srcmat, Mat& dstmat)
+स्थिर शून्य reduceRowSum2_32f32f(ध्रुव Mat& srcmat, Mat& dstmat)
 {
-    const int width = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes = VTraits<v_float32>::vlanes();
-    const int block = vlanes * 4;
-    AutoBuffer<float> buffer(width);
-    float* buf = buffer.data();
+    ध्रुव पूर्णाङ्क विस्तारः = srcmat.स्तम्भसङ्ख्या * srcmat.channels();
+    ध्रुव पूर्णाङ्क height = srcmat.पङ्क्तिकाः;
+    ध्रुव पूर्णाङ्क vlanes = VTraits<v_float32>::vlanes();
+    ध्रुव पूर्णाङ्क खण्डम्_2 = vlanes * 4;
+    Auto_बफर<भिन्न> बफर(विस्तारः);
+    भिन्न* buf = बफर.दत्त();
 
-    const float* src = srcmat.ptr<float>(0);
-    int i = 0;
-    for (; i <= width - block; i += block)
+    ध्रुव भिन्न* src = srcmat.ptr<भिन्न>(0);
+    पूर्णाङ्क i = 0;
+    प्रति (; i <= विस्तारः - खण्डम्_2; i += खण्डम्_2)
     {
-        v_float32 x0 = vx_load(src + i);
-        v_float32 x1 = vx_load(src + i + vlanes);
-        v_float32 x2 = vx_load(src + i + vlanes * 2);
-        v_float32 x3 = vx_load(src + i + vlanes * 3);
+        v_float32 x0 = vx_आरोपय(src + i);
+        v_float32 x1 = vx_आरोपय(src + i + vlanes);
+        v_float32 x2 = vx_आरोपय(src + i + vlanes * 2);
+        v_float32 x3 = vx_आरोपय(src + i + vlanes * 3);
         v_store(buf + i, v_mul(x0, x0));
         v_store(buf + i + vlanes, v_mul(x1, x1));
         v_store(buf + i + vlanes * 2, v_mul(x2, x2));
         v_store(buf + i + vlanes * 3, v_mul(x3, x3));
     }
-    for (; i <= width - vlanes; i += vlanes)
+    प्रति (; i <= विस्तारः - vlanes; i += vlanes)
     {
-        v_float32 x = vx_load(src + i);
+        v_float32 x = vx_आरोपय(src + i);
         v_store(buf + i, v_mul(x, x));
     }
-    for (; i < width; i++)
+    प्रति (; i < विस्तारः; i++)
         buf[i] = src[i] * src[i];
 
-    int row = 1;
+    पूर्णाङ्क row = 1;
     // Four rows per pass amortize buffer traffic while preserving source-row
     // accumulation order. The outer loop stays serial: splitting width into
     // tiny parallel stripes under-fills scalable vectors and adds scheduling
     // overhead for this memory-streaming kernel.
-    for (; row <= height - 4; row += 4)
+    प्रति (; row <= height - 4; row += 4)
     {
-        const float* src0 = srcmat.ptr<float>(row);
-        const float* src1 = srcmat.ptr<float>(row + 1);
-        const float* src2 = srcmat.ptr<float>(row + 2);
-        const float* src3 = srcmat.ptr<float>(row + 3);
+        ध्रुव भिन्न* src0 = srcmat.ptr<भिन्न>(row);
+        ध्रुव भिन्न* src1 = srcmat.ptr<भिन्न>(row + 1);
+        ध्रुव भिन्न* src2 = srcmat.ptr<भिन्न>(row + 2);
+        ध्रुव भिन्न* src3 = srcmat.ptr<भिन्न>(row + 3);
 
         i = 0;
-        for (; i <= width - block; i += block)
+        प्रति (; i <= विस्तारः - खण्डम्_2; i += खण्डम्_2)
         {
-            v_float32 sum0 = vx_load(buf + i);
-            v_float32 sum1 = vx_load(buf + i + vlanes);
-            v_float32 sum2 = vx_load(buf + i + vlanes * 2);
-            v_float32 sum3 = vx_load(buf + i + vlanes * 3);
+            v_float32 sum0 = vx_आरोपय(buf + i);
+            v_float32 sum1 = vx_आरोपय(buf + i + vlanes);
+            v_float32 sum2 = vx_आरोपय(buf + i + vlanes * 2);
+            v_float32 sum3 = vx_आरोपय(buf + i + vlanes * 3);
             sum0 = reduceRowSum2Acc4(sum0, src0 + i, src1 + i, src2 + i, src3 + i);
             sum1 = reduceRowSum2Acc4(sum1, src0 + i + vlanes, src1 + i + vlanes,
                                      src2 + i + vlanes, src3 + i + vlanes);
@@ -1173,112 +1173,112 @@ static void reduceRowSum2_32f32f(const Mat& srcmat, Mat& dstmat)
             v_store(buf + i + vlanes * 2, sum2);
             v_store(buf + i + vlanes * 3, sum3);
         }
-        for (; i <= width - vlanes; i += vlanes)
+        प्रति (; i <= विस्तारः - vlanes; i += vlanes)
         {
-            v_float32 sum = vx_load(buf + i);
-            sum = reduceRowSum2Acc4(sum, src0 + i, src1 + i, src2 + i, src3 + i);
-            v_store(buf + i, sum);
+            v_float32 योग_2 = vx_आरोपय(buf + i);
+            योग_2 = reduceRowSum2Acc4(योग_2, src0 + i, src1 + i, src2 + i, src3 + i);
+            v_store(buf + i, योग_2);
         }
-        for (; i < width; i++)
+        प्रति (; i < विस्तारः; i++)
         {
-            float sum = buf[i];
-            float x = src0[i]; sum += x * x;
-            x = src1[i]; sum += x * x;
-            x = src2[i]; sum += x * x;
-            x = src3[i]; sum += x * x;
-            buf[i] = sum;
+            भिन्न योग_2 = buf[i];
+            भिन्न x = src0[i]; योग_2 += x * x;
+            x = src1[i]; योग_2 += x * x;
+            x = src2[i]; योग_2 += x * x;
+            x = src3[i]; योग_2 += x * x;
+            buf[i] = योग_2;
         }
     }
 
-    for (; row < height; row++)
+    प्रति (; row < height; row++)
     {
-        src = srcmat.ptr<float>(row);
+        src = srcmat.ptr<भिन्न>(row);
         i = 0;
-        for (; i <= width - block; i += block)
+        प्रति (; i <= विस्तारः - खण्डम्_2; i += खण्डम्_2)
         {
-            v_float32 sum0 = vx_load(buf + i);
-            v_float32 sum1 = vx_load(buf + i + vlanes);
-            v_float32 sum2 = vx_load(buf + i + vlanes * 2);
-            v_float32 sum3 = vx_load(buf + i + vlanes * 3);
-            v_float32 x0 = vx_load(src + i);
-            v_float32 x1 = vx_load(src + i + vlanes);
-            v_float32 x2 = vx_load(src + i + vlanes * 2);
-            v_float32 x3 = vx_load(src + i + vlanes * 3);
+            v_float32 sum0 = vx_आरोपय(buf + i);
+            v_float32 sum1 = vx_आरोपय(buf + i + vlanes);
+            v_float32 sum2 = vx_आरोपय(buf + i + vlanes * 2);
+            v_float32 sum3 = vx_आरोपय(buf + i + vlanes * 3);
+            v_float32 x0 = vx_आरोपय(src + i);
+            v_float32 x1 = vx_आरोपय(src + i + vlanes);
+            v_float32 x2 = vx_आरोपय(src + i + vlanes * 2);
+            v_float32 x3 = vx_आरोपय(src + i + vlanes * 3);
             v_store(buf + i, v_fma(x0, x0, sum0));
             v_store(buf + i + vlanes, v_fma(x1, x1, sum1));
             v_store(buf + i + vlanes * 2, v_fma(x2, x2, sum2));
             v_store(buf + i + vlanes * 3, v_fma(x3, x3, sum3));
         }
-        for (; i <= width - vlanes; i += vlanes)
+        प्रति (; i <= विस्तारः - vlanes; i += vlanes)
         {
-            v_float32 x = vx_load(src + i);
-            v_store(buf + i, v_fma(x, x, vx_load(buf + i)));
+            v_float32 x = vx_आरोपय(src + i);
+            v_store(buf + i, v_fma(x, x, vx_आरोपय(buf + i)));
         }
-        for (; i < width; i++)
+        प्रति (; i < विस्तारः; i++)
             buf[i] += src[i] * src[i];
     }
 
     // Delay output stores until all source rows are consumed, preserving the
     // existing overlap-safe behavior of the proposed optimized path.
-    memcpy(dstmat.ptr<float>(), buf, width * sizeof(float));
+    स्मृतिं_प्रतिलिख(dstmat.ptr<भिन्न>(), buf, विस्तारः * परिमाण(भिन्न));
     v_cleanup();
 }
-#endif
+#यदि_अन्तः
 
 // =====================================================================
 //  Dispatchers
 // =====================================================================
 
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth)
+Reduce_योग_Func getReduceCSumFunc(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (sdepth == CV_8U && ddepth == CV_32S) return reduceColSum_8u32s;
-    if (sdepth == CV_8U && ddepth == CV_32F) return reduceColSum_8u32f;
-    if (sdepth == CV_16U && ddepth == CV_32F) return reduceColSum_16u32f;
-    if (sdepth == CV_16S && ddepth == CV_32F) return reduceColSum_16s32f;
-    if (sdepth == CV_32F && ddepth == CV_32F) return reduceColSum_32f32f;
-#if CV_SIMD_64F
-    if (sdepth == CV_32F && ddepth == CV_64F) return reduceColSum_32f64f;
-    if (sdepth == CV_64F && ddepth == CV_64F) return reduceColSum_64f64f;
-#endif
-#else
-    CV_UNUSED(sdepth);
-    CV_UNUSED(ddepth);
-#endif
-    return nullptr;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+    यदि (sdepth == CV_8U && ddepth == CV_32S) प्रत्यागम reduce_Col_योग_8u32s;
+    यदि (sdepth == CV_8U && ddepth == CV_32F) प्रत्यागम reduce_Col_योग_8u32f;
+    यदि (sdepth == CV_16U && ddepth == CV_32F) प्रत्यागम reduce_Col_योग_16u32f;
+    यदि (sdepth == CV_16S && ddepth == CV_32F) प्रत्यागम reduce_Col_योग_16s32f;
+    यदि (sdepth == CV_32F && ddepth == CV_32F) प्रत्यागम reduce_Col_योग_32f32f;
+#यदि CV_SIMD_64F
+    यदि (sdepth == CV_32F && ddepth == CV_64F) प्रत्यागम reduce_Col_योग_32f64f;
+    यदि (sdepth == CV_64F && ddepth == CV_64F) प्रत्यागम reduce_Col_योग_64f64f;
+#यदि_अन्तः
+#अन्यथा
+    CV_अप्रयुक्तम्(sdepth);
+    CV_अप्रयुक्तम्(ddepth);
+#यदि_अन्तः
+    प्रत्यागम शून्यसूचकः;
 }
 
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth)
+Reduce_योग_Func getReduceRSumFunc(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (sdepth == CV_8U && ddepth == CV_32S) return reduceRowSum_8u32s;
-    if (sdepth == CV_8U && ddepth == CV_32F) return reduceRowSum_8u32f;
-    if (sdepth == CV_16U && ddepth == CV_32F) return reduceRowSum_16u32f;
-    if (sdepth == CV_16S && ddepth == CV_32F) return reduceRowSum_16s32f;
-    if (sdepth == CV_32F && ddepth == CV_32F) return reduceRowSum_32f32f;
-#if CV_SIMD_64F
-    if (sdepth == CV_32F && ddepth == CV_64F) return reduceRowSum_32f64f;
-    if (sdepth == CV_64F && ddepth == CV_64F) return reduceRowSum_64f64f;
-#endif
-#else
-    CV_UNUSED(sdepth);
-    CV_UNUSED(ddepth);
-#endif
-    return nullptr;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+    यदि (sdepth == CV_8U && ddepth == CV_32S) प्रत्यागम reduce_Row_योग_8u32s;
+    यदि (sdepth == CV_8U && ddepth == CV_32F) प्रत्यागम reduce_Row_योग_8u32f;
+    यदि (sdepth == CV_16U && ddepth == CV_32F) प्रत्यागम reduce_Row_योग_16u32f;
+    यदि (sdepth == CV_16S && ddepth == CV_32F) प्रत्यागम reduce_Row_योग_16s32f;
+    यदि (sdepth == CV_32F && ddepth == CV_32F) प्रत्यागम reduce_Row_योग_32f32f;
+#यदि CV_SIMD_64F
+    यदि (sdepth == CV_32F && ddepth == CV_64F) प्रत्यागम reduce_Row_योग_32f64f;
+    यदि (sdepth == CV_64F && ddepth == CV_64F) प्रत्यागम reduce_Row_योग_64f64f;
+#यदि_अन्तः
+#अन्यथा
+    CV_अप्रयुक्तम्(sdepth);
+    CV_अप्रयुक्तम्(ddepth);
+#यदि_अन्तः
+    प्रत्यागम शून्यसूचकः;
 }
 
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth)
+Reduce_योग_Func getReduceRSum2Func(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth)
 {
-#if CV_SIMD_SCALABLE
-    if (sdepth == CV_32F && ddepth == CV_32F) return reduceRowSum2_32f32f;
-#else
-    CV_UNUSED(sdepth);
-    CV_UNUSED(ddepth);
-#endif
-    return nullptr;
+#यदि CV_SIMD_SCALABLE
+    यदि (sdepth == CV_32F && ddepth == CV_32F) प्रत्यागम reduceRowSum2_32f32f;
+#अन्यथा
+    CV_अप्रयुक्तम्(sdepth);
+    CV_अप्रयुक्तम्(ddepth);
+#यदि_अन्तः
+    प्रत्यागम शून्यसूचकः;
 }
 
-#endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#यदि_अन्तः // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_अन्तः
 } // namespace cv

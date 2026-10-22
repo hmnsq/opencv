@@ -3,537 +3,537 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
-#include "stat_parallel.hpp"
-#include "opencv2/core/detail/dispatch_helper.impl.hpp"
-#include <algorithm>
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "opencl_kernels_core.hpp"
+#अन्तर्भाव "stat.hpp"
+#अन्तर्भाव "stat_parallel.hpp"
+#अन्तर्भाव "opencv2/core/detail/dispatch_helper.impl.hpp"
+#अन्तर्भाव <algorithm>
 
-#include "minmax.simd.hpp"
-#include "minmax.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#अन्तर्भाव "minmax.simd.hpp"
+#अन्तर्भाव "minmax.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+नामाकाश cv {
 
-static MinMaxIdxFunc getMinMaxIdxFunc(int depth)
+स्थिर MinMaxIdxFunc getMinMaxIdxFunc(पूर्णाङ्क गभीरता)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getMinMaxIdxFunc, (depth),
+    CV_CPU_DISPATCH(getMinMaxIdxFunc, (गभीरता),
                     CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // The function expects 1-based indexing for ofs
 // Zero is treated as invalid offset (not found)
-static void ofs2idx(const Mat& a, size_t ofs, int* idx)
+स्थिर शून्य ofs2idx(ध्रुव Mat& a, size_t ofs, पूर्णाङ्क* idx)
 {
-    int i, d = a.dims;
-    if( ofs > 0 )
+    पूर्णाङ्क i, d = a.dims;
+    यदि( ofs > 0 )
     {
         ofs--;
-        for( i = d-1; i >= 0; i-- )
+        प्रति( i = d-1; i >= 0; i-- )
         {
-            int sz = a.size[i];
-            idx[i] = (int)(ofs % sz);
+            पूर्णाङ्क sz = a.size[i];
+            idx[i] = (पूर्णाङ्क)(ofs % sz);
             ofs /= sz;
         }
     }
-    else
+    अन्यथा
     {
-        for( i = d-1; i >= 0; i-- )
+        प्रति( i = d-1; i >= 0; i-- )
             idx[i] = -1;
     }
 }
 
-#ifdef HAVE_OPENCL
+#यदि_परिभाषितम् HAVE_OPENCL
 
-#define MINMAX_STRUCT_ALIGNMENT 8 // sizeof double
+#परिभाषय MINMAX_STRUCT_ALIGNMENT 8 // sizeof double
 
-template <typename T>
-void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
-                  int* minLoc, int* maxLoc,
-                  int groupnum, int cols, double * maxVal2)
+प्रतिरूपम् <प्रकारनाम T>
+शून्य getMinMaxRes(ध्रुव Mat & db, द्विगुण * minVal, द्विगुण * maxVal,
+                  पूर्णाङ्क* minLoc, पूर्णाङ्क* maxLoc,
+                  पूर्णाङ्क groupnum, पूर्णाङ्क स्तम्भसङ्ख्या, द्विगुण * maxVal2)
 {
-    uint index_max = std::numeric_limits<uint>::max();
+    uint सूचकांक_max = std::numeric_limits<uint>::max();
     T minval = std::numeric_limits<T>::max();
     T maxval = std::numeric_limits<T>::min() > 0 ? (T)-std::numeric_limits<T>::max() : std::numeric_limits<T>::min(), maxval2 = maxval;
-    uint minloc = index_max, maxloc = index_max;
+    uint minloc = सूचकांक_max, maxloc = सूचकांक_max;
 
-    size_t index = 0;
-    const T * minptr = NULL, * maxptr = NULL, * maxptr2 = NULL;
-    const uint * minlocptr = NULL, * maxlocptr = NULL;
-    if (minVal || minLoc)
+    size_t सूचकांक = 0;
+    ध्रुव T * minptr = रिक्त, * maxptr = रिक्त, * maxptr2 = रिक्त;
+    ध्रुव uint * minlocptr = रिक्त, * maxlocptr = रिक्त;
+    यदि (minVal || minLoc)
     {
         minptr = db.ptr<T>();
-        index += sizeof(T) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        सूचकांक += परिमाण(T) * groupnum;
+        सूचकांक = align_आकार(सूचकांक, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal || maxLoc)
+    यदि (maxVal || maxLoc)
     {
-        maxptr = (const T *)(db.ptr() + index);
-        index += sizeof(T) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        maxptr = (ध्रुव T *)(db.ptr() + सूचकांक);
+        सूचकांक += परिमाण(T) * groupnum;
+        सूचकांक = align_आकार(सूचकांक, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (minLoc)
+    यदि (minLoc)
     {
-        minlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        minlocptr = (ध्रुव uint *)(db.ptr() + सूचकांक);
+        सूचकांक += परिमाण(uint) * groupnum;
+        सूचकांक = align_आकार(सूचकांक, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxLoc)
+    यदि (maxLoc)
     {
-        maxlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        maxlocptr = (ध्रुव uint *)(db.ptr() + सूचकांक);
+        सूचकांक += परिमाण(uint) * groupnum;
+        सूचकांक = align_आकार(सूचकांक, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal2)
-        maxptr2 = (const T *)(db.ptr() + index);
+    यदि (maxVal2)
+        maxptr2 = (ध्रुव T *)(db.ptr() + सूचकांक);
 
-    for (int i = 0; i < groupnum; i++)
+    प्रति (पूर्णाङ्क i = 0; i < groupnum; i++)
     {
-        if (minptr && minptr[i] <= minval)
+        यदि (minptr && minptr[i] <= minval)
         {
-            if (minptr[i] == minval)
+            यदि (minptr[i] == minval)
             {
-                if (minlocptr)
+                यदि (minlocptr)
                     minloc = std::min(minlocptr[i], minloc);
             }
-            else
+            अन्यथा
             {
-                if (minlocptr)
+                यदि (minlocptr)
                     minloc = minlocptr[i];
                 minval = minptr[i];
             }
         }
-        if (maxptr && maxptr[i] >= maxval)
+        यदि (maxptr && maxptr[i] >= maxval)
         {
-            if (maxptr[i] == maxval)
+            यदि (maxptr[i] == maxval)
             {
-                if (maxlocptr)
+                यदि (maxlocptr)
                     maxloc = std::min(maxlocptr[i], maxloc);
             }
-            else
+            अन्यथा
             {
-                if (maxlocptr)
+                यदि (maxlocptr)
                     maxloc = maxlocptr[i];
                 maxval = maxptr[i];
             }
         }
-        if (maxptr2 && maxptr2[i] > maxval2)
+        यदि (maxptr2 && maxptr2[i] > maxval2)
             maxval2 = maxptr2[i];
     }
-    bool zero_mask = (minLoc && minloc == index_max) ||
-    (maxLoc && maxloc == index_max);
+    तार्किक zero_आवरणम् = (minLoc && minloc == सूचकांक_max) ||
+    (maxLoc && maxloc == सूचकांक_max);
 
-    if (minVal)
-        *minVal = zero_mask ? 0 : (double)minval;
-    if (maxVal)
-        *maxVal = zero_mask ? 0 : (double)maxval;
-    if (maxVal2)
-        *maxVal2 = zero_mask ? 0 : (double)maxval2;
+    यदि (minVal)
+        *minVal = zero_आवरणम् ? 0 : (द्विगुण)minval;
+    यदि (maxVal)
+        *maxVal = zero_आवरणम् ? 0 : (द्विगुण)maxval;
+    यदि (maxVal2)
+        *maxVal2 = zero_आवरणम् ? 0 : (द्विगुण)maxval2;
 
-    if (minLoc)
+    यदि (minLoc)
     {
-        minLoc[0] = zero_mask ? -1 : minloc / cols;
-        minLoc[1] = zero_mask ? -1 : minloc % cols;
+        minLoc[0] = zero_आवरणम् ? -1 : minloc / स्तम्भसङ्ख्या;
+        minLoc[1] = zero_आवरणम् ? -1 : minloc % स्तम्भसङ्ख्या;
     }
-    if (maxLoc)
+    यदि (maxLoc)
     {
-        maxLoc[0] = zero_mask ? -1 : maxloc / cols;
-        maxLoc[1] = zero_mask ? -1 : maxloc % cols;
+        maxLoc[0] = zero_आवरणम् ? -1 : maxloc / स्तम्भसङ्ख्या;
+        maxLoc[1] = zero_आवरणम् ? -1 : maxloc % स्तम्भसङ्ख्या;
     }
 }
 
-typedef void (*getMinMaxResFunc)(const Mat & db, double * minVal, double * maxVal,
-                                 int * minLoc, int *maxLoc, int gropunum, int cols, double * maxVal2);
+प्रकारनिर्देश शून्य (*getMinMaxResFunc)(ध्रुव Mat & db, द्विगुण * minVal, द्विगुण * maxVal,
+                                 पूर्णाङ्क * minLoc, पूर्णाङ्क *maxLoc, पूर्णाङ्क gropunum, पूर्णाङ्क स्तम्भसङ्ख्या, द्विगुण * maxVal2);
 
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                   int ddepth, bool absValues, InputArray _src2, double * maxVal2)
+तार्किक ocl_minMaxIdx( निवेशः_Array _src, द्विगुण* minVal, द्विगुण* maxVal, पूर्णाङ्क* minLoc, पूर्णाङ्क* maxLoc, निवेशः_Array आवरणम्_2,
+                   पूर्णाङ्क ddepth, तार्किक abs_मानानि, निवेशः_Array _src2, द्विगुण * maxVal2)
 {
-    const ocl::Device & dev = ocl::Device::getDefault();
+    ध्रुव ocl::Device & dev = ocl::Device::getDefault();
 
-#ifdef __ANDROID__
-    if (dev.isNVidia())
-        return false;
-#endif
+#यदि_परिभाषितम् __ANDROID__
+    यदि (dev.isNVidia())
+        प्रत्यागम असत्य;
+#यदि_अन्तः
 
-    if (dev.deviceVersionMajor() == 1 && dev.deviceVersionMinor() < 2)
+    यदि (dev.device_संस्करणम्_Major() == 1 && dev.device_संस्करणम्_Minor() < 2)
     {
         // 'static' storage class specifier used by "minmaxloc" is available from OpenCL 1.2+ only
-        return false;
+        प्रत्यागम असत्य;
     }
 
-    bool doubleSupport = dev.doubleFPConfig() > 0, haveMask = !_mask.empty(),
-    haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-    kercn = haveMask ? cn : std::min(4, ocl::predictOptimalVectorWidth(_src, _src2));
+    तार्किक doubleSupport = dev.doubleFPConfig() > 0, have_आवरणम् = !आवरणम्_2.empty(),
+    haveSrc2 = _src2.विधा() != निवेशः_Array_2::NONE;
+    पूर्णाङ्क type = _src.type(), गभीरता = CV_MAT_गभीरता(type), cn = CV_MAT_CN(type),
+    kercn = have_आवरणम् ? cn : std::min(4, ocl::predict_Optimal_सदिशम्_विस्तारः(_src, _src2));
 
-    if (depth >= CV_16F)
-        return false;
+    यदि (गभीरता >= CV_16F)
+        प्रत्यागम असत्य;
 
     // disabled following modes since it occasionally fails on AMD devices (e.g. A10-6800K, sep. 2014)
-    if ((haveMask || type == CV_32FC1) && dev.isAMD())
-        return false;
+    यदि ((have_आवरणम् || type == CV_32FC1) && dev.isAMD())
+        प्रत्यागम असत्य;
 
-    CV_Assert( (cn == 1 && (!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
+    CV_Assert( (cn == 1 && (!have_आवरणम् || आवरणम्_2.type() == CV_8U || आवरणम्_2.type() == CV_8S || आवरणम्_2.type() == CV_Bool)) ||
               (cn >= 1 && !minLoc && !maxLoc) );
 
-    if (ddepth < 0)
-        ddepth = depth;
+    यदि (ddepth < 0)
+        ddepth = गभीरता;
 
     CV_Assert(!haveSrc2 || _src2.type() == type);
 
-    if (depth == CV_32S || depth == CV_8S || depth == CV_32U || depth == CV_64U ||
-        depth == CV_64S || depth == CV_16F || depth == CV_16BF)
-        return false;
+    यदि (गभीरता == CV_32S || गभीरता == CV_8S || गभीरता == CV_32U || गभीरता == CV_64U ||
+        गभीरता == CV_64S || गभीरता == CV_16F || गभीरता == CV_16BF)
+        प्रत्यागम असत्य;
 
-    if ((depth == CV_64F || ddepth == CV_64F) && !doubleSupport)
-        return false;
+    यदि ((गभीरता == CV_64F || ddepth == CV_64F) && !doubleSupport)
+        प्रत्यागम असत्य;
 
-    int groupnum = dev.maxComputeUnits();
-    size_t wgs = dev.maxWorkGroupSize();
+    पूर्णाङ्क groupnum = dev.maxComputeUnits();
+    size_t wgs = dev.max_Work_गणः_आकार();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    पूर्णाङ्क wgs2_aligned = 1;
+    यावत् (wgs2_aligned < (पूर्णाङ्क)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    bool needMinVal = minVal || minLoc, needMinLoc = minLoc != NULL,
-    needMaxVal = maxVal || maxLoc, needMaxLoc = maxLoc != NULL;
+    तार्किक needMinVal = minVal || minLoc, needMinLoc = minLoc != रिक्त,
+    needMaxVal = maxVal || maxLoc, needMaxLoc = maxLoc != रिक्त;
 
     // in case of mask we must know whether mask is filled with zeros or not
     // so let's calculate min or max location, if it's undefined, so mask is zeros
-    if (!(needMaxLoc || needMinLoc) && haveMask)
+    यदि (!(needMaxLoc || needMinLoc) && have_आवरणम्)
     {
-        if (needMinVal)
-            needMinLoc = true;
-        else
-            needMaxLoc = true;
+        यदि (needMinVal)
+            needMinLoc = सत्य;
+        अन्यथा
+            needMaxLoc = सत्य;
     }
 
-    char cvt[2][50];
+    वर्ण cvt[2][50];
     String opts = format("-D DEPTH_%d -D srcT1=%s%s -D WGS=%d -D srcT=%s"
                          " -D WGS2_ALIGNED=%d%s%s%s -D kercn=%d%s%s%s%s"
                          " -D dstT1=%s -D dstT=%s -D convertToDT=%s%s%s%s%s -D wdepth=%d -D convertFromU=%s"
                          " -D MINMAX_STRUCT_ALIGNMENT=%d",
-                         depth, ocl::typeToStr(depth), haveMask ? " -D HAVE_MASK" : "", (int)wgs,
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), wgs2_aligned,
+                         गभीरता, ocl::type_गन्तव्यम्_Str(गभीरता), have_आवरणम् ? " -D HAVE_MASK" : "", (पूर्णाङ्क)wgs,
+                         ocl::type_गन्तव्यम्_Str(CV_MAKE_TYPE(गभीरता, kercn)), wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
-                         _mask.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
+                         आवरणम्_2.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
                          needMinVal ? " -D NEED_MINVAL" : "", needMaxVal ? " -D NEED_MAXVAL" : "",
                          needMinLoc ? " -D NEED_MINLOC" : "", needMaxLoc ? " -D NEED_MAXLOC" : "",
-                         ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKE_TYPE(ddepth, kercn)),
-                         ocl::convertTypeStr(depth, ddepth, kercn, cvt[0], sizeof(cvt[0])),
-                         absValues ? " -D OP_ABS" : "",
+                         ocl::type_गन्तव्यम्_Str(ddepth), ocl::type_गन्तव्यम्_Str(CV_MAKE_TYPE(ddepth, kercn)),
+                         ocl::convertTypeStr(गभीरता, ddepth, kercn, cvt[0], परिमाण(cvt[0])),
+                         abs_मानानि ? " -D OP_ABS" : "",
                          haveSrc2 ? " -D HAVE_SRC2" : "", maxVal2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "", ddepth,
-                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], sizeof(cvt[1])) : "noconvert",
+                         गभीरता <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], परिमाण(cvt[1])) : "noconvert",
                          MINMAX_STRUCT_ALIGNMENT);
 
     ocl::Kernel k("minmaxloc", ocl::core::minmaxloc_oclsrc, opts);
-    if (k.empty())
-        return false;
+    यदि (k.empty())
+        प्रत्यागम असत्य;
 
-    int esz = CV_ELEM_SIZE(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
+    पूर्णाङ्क esz = CV_ELEM_आकार(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
     dbsize = groupnum * ((needMinVal ? esz : 0) + (needMaxVal ? esz : 0) +
                          (needMinLoc ? esz32s : 0) + (needMaxLoc ? esz32s : 0) +
                          (maxVal2 ? esz : 0))
     + 5 * MINMAX_STRUCT_ALIGNMENT;
-    UMat src = _src.getUMat(), src2 = _src2.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
+    UMat src = _src.getUMat(), src2 = _src2.getUMat(), db(1, dbsize, CV_8UC1), आवरणम् = आवरणम्_2.getUMat();
 
-    if (cn > 1 && !haveMask)
+    यदि (cn > 1 && !have_आवरणम्)
     {
         src = src.reshape(1);
         src2 = src2.reshape(1);
     }
 
-    if (haveSrc2)
+    यदि (haveSrc2)
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(src2));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask),
-                   ocl::KernelArg::ReadOnlyNoSize(src2));
+        यदि (!have_आवरणम्)
+            k.तर्काः(ocl::KernelArg::Read_Only_No_आकार(src), src.स्तम्भसङ्ख्या, (पूर्णाङ्क)src.योग(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_आकार(src2));
+        अन्यथा
+            k.तर्काः(ocl::KernelArg::Read_Only_No_आकार(src), src.स्तम्भसङ्ख्या, (पूर्णाङ्क)src.योग(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_आकार(आवरणम्),
+                   ocl::KernelArg::Read_Only_No_आकार(src2));
     }
-    else
+    अन्यथा
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        यदि (!have_आवरणम्)
+            k.तर्काः(ocl::KernelArg::Read_Only_No_आकार(src), src.स्तम्भसङ्ख्या, (पूर्णाङ्क)src.योग(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask));
+        अन्यथा
+            k.तर्काः(ocl::KernelArg::Read_Only_No_आकार(src), src.स्तम्भसङ्ख्या, (पूर्णाङ्क)src.योग(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_आकार(आवरणम्));
     }
 
     size_t globalsize = groupnum * wgs;
-    if (!k.run(1, &globalsize, &wgs, true))
-        return false;
+    यदि (!k.सततम्(1, &globalsize, &wgs, सत्य))
+        प्रत्यागम असत्य;
 
-    static const getMinMaxResFunc functab[7] =
+    स्थिर ध्रुव getMinMaxResFunc functab[7] =
     {
         getMinMaxRes<uchar>,
-        getMinMaxRes<char>,
+        getMinMaxRes<वर्ण>,
         getMinMaxRes<ushort>,
-        getMinMaxRes<short>,
-        getMinMaxRes<int>,
-        getMinMaxRes<float>,
-        getMinMaxRes<double>
+        getMinMaxRes<ह्रस्व>,
+        getMinMaxRes<पूर्णाङ्क>,
+        getMinMaxRes<भिन्न>,
+        getMinMaxRes<द्विगुण>
     };
 
     CV_Assert(ddepth <= CV_64F);
     getMinMaxResFunc func = functab[ddepth];
 
-    int locTemp[2];
+    पूर्णाङ्क loc_अस्थायी[2];
     func(db.getMat(ACCESS_READ), minVal, maxVal,
-         needMinLoc ? minLoc ? minLoc : locTemp : minLoc,
-         needMaxLoc ? maxLoc ? maxLoc : locTemp : maxLoc,
-         groupnum, src.cols, maxVal2);
+         needMinLoc ? minLoc ? minLoc : loc_अस्थायी : minLoc,
+         needMaxLoc ? maxLoc ? maxLoc : loc_अस्थायी : maxLoc,
+         groupnum, src.स्तम्भसङ्ख्या, maxVal2);
 
-    return true;
+    प्रत्यागम सत्य;
 }
 
-#endif
+#यदि_अन्तः
 
 }
 
 // serial implementation, also used for the pieces of the parallel version
-static void minMaxIdx_(cv::InputArray _src, double* minVal,
-                       double* maxVal, int* minIdx, int* maxIdx,
-                       cv::InputArray _mask)
+स्थिर शून्य minMaxIdx_(cv::निवेशः_Array _src, द्विगुण* minVal,
+                       द्विगुण* maxVal, पूर्णाङ्क* minIdx, पूर्णाङ्क* maxIdx,
+                       cv::निवेशः_Array आवरणम्_2)
 {
-    using namespace cv;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    CV_Assert( (cn == 1 && (_mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
-               (cn > 1 && _mask.empty() && !minIdx && !maxIdx) );
+    उपयुज्य नामाकाश cv;
+    पूर्णाङ्क type = _src.type(), गभीरता = CV_MAT_गभीरता(type), cn = CV_MAT_CN(type);
+    CV_Assert( (cn == 1 && (आवरणम्_2.empty() || आवरणम्_2.type() == CV_8U || आवरणम्_2.type() == CV_8S || आवरणम्_2.type() == CV_Bool)) ||
+               (cn > 1 && आवरणम्_2.empty() && !minIdx && !maxIdx) );
 
-    CV_OCL_RUN(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2  && (_mask.empty() || _src.size() == _mask.size()),
-               ocl_minMaxIdx(_src, minVal, maxVal, minIdx, maxIdx, _mask))
+    CV_OCL_सततम्(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2  && (आवरणम्_2.empty() || _src.size() == आवरणम्_2.size()),
+               ocl_minMaxIdx(_src, minVal, maxVal, minIdx, maxIdx, आवरणम्_2))
 
-    Mat src = _src.getMat(), mask = _mask.getMat();
+    Mat src = _src.getMat(), आवरणम् = आवरणम्_2.getMat();
 
-    if (src.dims <= 2)
+    यदि (src.dims <= 2)
     {
-        if ((size_t)src.step == (size_t)mask.step || mask.empty())
+        यदि ((size_t)src.चरणः == (size_t)आवरणम्.चरणः || आवरणम्.empty())
         {
-            CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.data, src.step, src.cols*cn, src.rows,
-                     src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data);
+            CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.दत्त, src.चरणः, src.स्तम्भसङ्ख्या*cn, src.पङ्क्तिकाः,
+                     src.गभीरता(), minVal, maxVal, minIdx, maxIdx, आवरणम्.दत्त);
         }
-        CALL_HAL(minMaxIdxMaskStep, cv_hal_minMaxIdxMaskStep, src.data, src.step, src.cols*cn, src.rows,
-                 src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data, mask.step);
+        CALL_HAL(min_Max_Idx_आवरणम्_चरणः, cv_hal_min_Max_Idx_आवरणम्_चरणः, src.दत्त, src.चरणः, src.स्तम्भसङ्ख्या*cn, src.पङ्क्तिकाः,
+                 src.गभीरता(), minVal, maxVal, minIdx, maxIdx, आवरणम्.दत्त, आवरणम्.चरणः);
     }
-    else if (src.isContinuous() && (mask.isContinuous() || mask.empty()))
+    अन्यथा यदि (src.isContinuous() && (आवरणम्.isContinuous() || आवरणम्.empty()))
     {
-        int res = cv_hal_minMaxIdx(src.data, 0, (int)src.total()*cn, 1, src.depth(),
-                                   minVal, maxVal, minIdx, maxIdx, mask.data);
+        पूर्णाङ्क res = cv_hal_minMaxIdx(src.दत्त, 0, (पूर्णाङ्क)src.योग()*cn, 1, src.गभीरता(),
+                                   minVal, maxVal, minIdx, maxIdx, आवरणम्.दत्त);
 
-        if (res == CV_HAL_ERROR_OK)
+        यदि (res == CV_HAL_ERROR_OK)
         {
             // minIdx[0] and minIdx[0] are always 0 for "flatten" version
-            if (minIdx)
+            यदि (minIdx)
                 ofs2idx(src, minIdx[1]+1, minIdx);
-            if (maxIdx)
+            यदि (maxIdx)
                 ofs2idx(src, maxIdx[1]+1, maxIdx);
-            return;
+            प्रत्यागम;
         }
-        else if (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
+        अन्यथा यदि (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
         {
-            CV_Error_(cv::Error::StsInternal,
+            CV_Error_(cv::Error::Sts_आन्तरिकम्,
             ("HAL implementation minMaxIdx ==> " CVAUX_STR(cv_hal_minMaxIdx) " returned %d (0x%08x)", res, res));
         }
     }
 
-    MinMaxIdxFunc func = getMinMaxIdxFunc(depth);
+    MinMaxIdxFunc func = getMinMaxIdxFunc(गभीरता);
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ध्रुव Mat* arrays[] = {&src, &आवरणम्, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
 
     size_t minidx = 0, maxidx = 0;
     size_t startidx = 1;
-    union {
-        int i;
-        float f;
-        double d;
+    सङ्घ {
+        पूर्णाङ्क i;
+        भिन्न f;
+        द्विगुण d;
         int64 L;
         uint64 UL;
     } minval, maxval;
-    int planeSize = (int)it.size*cn;
+    पूर्णाङ्क plane_आकार = (पूर्णाङ्क)it.size*cn;
     minval.L = maxval.L = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it, startidx += planeSize )
-        func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, planeSize, startidx );
+    प्रति( size_t i = 0; i < it.nplanes; i++, ++it, startidx += plane_आकार )
+        func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, plane_आकार, startidx );
 
-    double dminval, dmaxval;
-    if( depth <= CV_32S || depth == CV_Bool )
+    द्विगुण dminval, dmaxval;
+    यदि( गभीरता <= CV_32S || गभीरता == CV_Bool )
         dminval = minval.i, dmaxval = maxval.i;
-    else if( depth == CV_32F || depth == CV_16F || depth == CV_16BF )
+    अन्यथा यदि( गभीरता == CV_32F || गभीरता == CV_16F || गभीरता == CV_16BF )
         dminval = minval.f, dmaxval = maxval.f;
-    else if( depth == CV_64F )
+    अन्यथा यदि( गभीरता == CV_64F )
         dminval = minval.d, dmaxval = maxval.d;
-    else if( depth == CV_64S || depth == CV_32U )
-        dminval = (double)minval.L, dmaxval = (double)maxval.L;
-    else {
-        CV_Assert(depth == CV_64U);
-        dminval = (double)minval.UL, dmaxval = (double)maxval.UL;
+    अन्यथा यदि( गभीरता == CV_64S || गभीरता == CV_32U )
+        dminval = (द्विगुण)minval.L, dmaxval = (द्विगुण)maxval.L;
+    अन्यथा {
+        CV_Assert(गभीरता == CV_64U);
+        dminval = (द्विगुण)minval.UL, dmaxval = (द्विगुण)maxval.UL;
     }
 
-    if( minVal )
+    यदि( minVal )
         *minVal = dminval;
-    if( maxVal )
+    यदि( maxVal )
         *maxVal = dmaxval;
 
-    if( minIdx )
+    यदि( minIdx )
         ofs2idx(src, minidx, minIdx);
-    if( maxIdx )
+    यदि( maxIdx )
         ofs2idx(src, maxidx, maxIdx);
 }
 
-void cv::minMaxIdx(InputArray _src, double* minVal,
-                   double* maxVal, int* minIdx, int* maxIdx,
-                   InputArray _mask)
+शून्य cv::minMaxIdx(निवेशः_Array _src, द्विगुण* minVal,
+                   द्विगुण* maxVal, पूर्णाङ्क* minIdx, पूर्णाङ्क* maxIdx,
+                   निवेशः_Array आवरणम्_2)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat())
+    यदि (!_src.isUMat())
     {
-        Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
-        const bool argsOk = (cn == 1 && (mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S ||
-                             mask.type() == CV_Bool) && src.size == mask.size))) ||
-                            (cn > 1 && mask.empty() && !minIdx && !maxIdx);
-        if (argsOk && splitForParallelStat(src, mask, chunks))
+        Mat src = _src.getMat(), आवरणम् = आवरणम्_2.getMat();
+        ध्रुव पूर्णाङ्क cn = src.channels();
+        ध्रुव तार्किक तर्काः_Ok = (cn == 1 && (आवरणम्.empty() || ((आवरणम्.type() == CV_8U || आवरणम्.type() == CV_8S ||
+                             आवरणम्.type() == CV_Bool) && src.size == आवरणम्.size))) ||
+                            (cn > 1 && आवरणम्.empty() && !minIdx && !maxIdx);
+        यदि (तर्काः_Ok && विभज_For_Parallel_Stat(src, आवरणम्, chunks))
         {
-            const int n = (int)chunks.size();
-            std::vector<double> mn(n), mx(n);
+            ध्रुव पूर्णाङ्क n = (पूर्णाङ्क)chunks.size();
+            std::vector<द्विगुण> mn(n), mx(n);
             std::vector<size_t> imn(n, 0), imx(n, 0);   // 1-based row-major indices, 0 = no element
-            parallel_for_(Range(0, n), [&](const Range& r)
+            parallel_for_(Range(0, n), [&](ध्रुव Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                प्रति (पूर्णाङ्क i = r.start; i < r.end; i++)
                 {
-                    int a[2] = {-1, -1}, b[2] = {-1, -1};
-                    minMaxIdx_(chunks[i].src, &mn[i], &mx[i], cn == 1 ? a : nullptr, cn == 1 ? b : nullptr,
-                               chunks[i].mask);
-                    if (cn > 1)
+                    पूर्णाङ्क a[2] = {-1, -1}, b[2] = {-1, -1};
+                    minMaxIdx_(chunks[i].src, &mn[i], &mx[i], cn == 1 ? a : शून्यसूचकः, cn == 1 ? b : शून्यसूचकः,
+                               chunks[i].आवरणम्);
+                    यदि (cn > 1)
                         imn[i] = imx[i] = 1;
-                    else if (a[0] >= 0)
+                    अन्यथा यदि (a[0] >= 0)
                     {
-                        imn[i] = chunkIndexToElem(chunks[i], a) + 1;
-                        imx[i] = chunkIndexToElem(chunks[i], b) + 1;
+                        imn[i] = chunk_सूचकांक_गन्तव्यम्_Elem(chunks[i], a) + 1;
+                        imx[i] = chunk_सूचकांक_गन्तव्यम्_Elem(chunks[i], b) + 1;
                     }
                 }
             });
             // pieces are in memory order, so taking the first strict improvement keeps the
             // first occurrence, as in the serial version
-            int bmin = -1, bmax = -1;
-            for (int i = 0; i < n; i++)
+            पूर्णाङ्क bmin = -1, bmax = -1;
+            प्रति (पूर्णाङ्क i = 0; i < n; i++)
             {
-                if (imn[i] == 0)
-                    continue;
-                if (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
-                if (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
+                यदि (imn[i] == 0)
+                    अनुवर्त;
+                यदि (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
+                यदि (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
             }
-            if (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
-            if (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
-            if (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
-            if (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
-            return;
+            यदि (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
+            यदि (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
+            यदि (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
+            यदि (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
+            प्रत्यागम;
         }
     }
-    minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, _mask);
+    minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, आवरणम्_2);
 }
 
-void cv::minMaxLoc( InputArray _img, double* minVal, double* maxVal,
-                    Point* minLoc, Point* maxLoc, InputArray mask )
+शून्य cv::minMaxLoc( निवेशः_Array _img, द्विगुण* minVal, द्विगुण* maxVal,
+                    Point* minLoc, Point* maxLoc, निवेशः_Array आवरणम् )
 {
     CV_INSTRUMENT_REGION();
 
-    int dims = _img.dims();
+    पूर्णाङ्क dims = _img.dims();
     CV_CheckLE(dims, 2, "");
 
-    minMaxIdx(_img, minVal, maxVal, (int*)minLoc, (int*)maxLoc, mask);
-    if( minLoc) {
-        if (dims == 2)
+    minMaxIdx(_img, minVal, maxVal, (पूर्णाङ्क*)minLoc, (पूर्णाङ्क*)maxLoc, आवरणम्);
+    यदि( minLoc) {
+        यदि (dims == 2)
             std::swap(minLoc->x, minLoc->y);
-        else {
+        अन्यथा {
             minLoc->y = 0;
         }
     }
-    if( maxLoc) {
-        if (dims == 2)
+    यदि( maxLoc) {
+        यदि (dims == 2)
             std::swap(maxLoc->x, maxLoc->y);
-        else {
+        अन्यथा {
             maxLoc->y = 0;
         }
     }
 }
 
-enum class ReduceMode
+गणना वर्ग Reduce_बहुलकम्
 {
     FIRST_MIN = 0, //!< get index of first min occurrence
-    LAST_MIN  = 1, //!< get index of last min occurrence
+    चरमः_MIN  = 1, //!< get index of last min occurrence
     FIRST_MAX = 2, //!< get index of first max occurrence
-    LAST_MAX  = 3, //!< get index of last max occurrence
+    चरमः_MAX  = 3, //!< get index of last max occurrence
 };
 
-template <typename T>
-struct reduceMinMaxImpl
+प्रतिरूपम् <प्रकारनाम T>
+संरचना reduceMinMaxImpl
 {
-    void operator()(const cv::Mat& src, cv::Mat& dst, ReduceMode mode, const int axis) const
+    शून्य संक्रियकः()(ध्रुव cv::Mat& src, cv::Mat& dst, Reduce_बहुलकम् बहुलकम्, ध्रुव पूर्णाङ्क axis) ध्रुव
     {
-        switch(mode)
+        विकल्प(बहुलकम्)
         {
-        case ReduceMode::FIRST_MIN:
+        पक्ष Reduce_बहुलकम्::FIRST_MIN:
             reduceMinMaxApply<std::less>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MIN:
+            भङ्ग;
+        पक्ष Reduce_बहुलकम्::चरमः_MIN:
             reduceMinMaxApply<std::less_equal>(src, dst, axis);
-            break;
-        case ReduceMode::FIRST_MAX:
+            भङ्ग;
+        पक्ष Reduce_बहुलकम्::FIRST_MAX:
             reduceMinMaxApply<std::greater>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MAX:
+            भङ्ग;
+        पक्ष Reduce_बहुलकम्::चरमः_MAX:
             reduceMinMaxApply<std::greater_equal>(src, dst, axis);
-            break;
+            भङ्ग;
         }
     }
 
-    template <template<class> class Cmp>
-    static void reduceMinMaxApply(const cv::Mat& src, cv::Mat& dst, const int axis)
+    प्रतिरूपम् <प्रतिरूपम्<वर्ग> वर्ग Cmp>
+    स्थिर शून्य reduceMinMaxApply(ध्रुव cv::Mat& src, cv::Mat& dst, ध्रुव पूर्णाङ्क axis)
     {
         Cmp<T> cmp;
 
-        const auto *src_ptr = src.ptr<T>();
-        auto *dst_ptr = dst.ptr<int32_t>();
+        ध्रुव स्वचालित *src_ptr = src.ptr<T>();
+        स्वचालित *dst_ptr = dst.ptr<int32_t>();
 
-        const size_t outer_size = src.total(0, axis);
-        const auto mid_size = static_cast<size_t>(src.size[axis]);
+        ध्रुव size_t outer_आकार = src.योग(0, axis);
+        ध्रुव स्वचालित mid_आकार = static_cast<size_t>(src.size[axis]);
 
-        const size_t outer_step = src.total(axis);
-        const size_t dst_step = dst.total(axis);
+        ध्रुव size_t outer_चरणः = src.योग(axis);
+        ध्रुव size_t dst_चरणः = dst.योग(axis);
 
-        const size_t mid_step = src.total(axis + 1);
+        ध्रुव size_t mid_चरणः = src.योग(axis + 1);
 
-        for (size_t outer = 0; outer < outer_size; ++outer)
+        प्रति (size_t outer = 0; outer < outer_आकार; ++outer)
         {
-            const size_t outer_offset = outer * outer_step;
-            const size_t dst_offset = outer * dst_step;
-            for (size_t mid = 0; mid != mid_size; ++mid)
+            ध्रुव size_t outer_विस्थापनम् = outer * outer_चरणः;
+            ध्रुव size_t dst_विस्थापनम् = outer * dst_चरणः;
+            प्रति (size_t mid = 0; mid != mid_आकार; ++mid)
             {
-                const size_t src_offset = outer_offset + mid * mid_step;
-                for (size_t inner = 0; inner < mid_step; inner++)
+                ध्रुव size_t src_विस्थापनम् = outer_विस्थापनम् + mid * mid_चरणः;
+                प्रति (size_t inner = 0; inner < mid_चरणः; inner++)
                 {
-                    int32_t& index = dst_ptr[dst_offset + inner];
+                    int32_t& सूचकांक = dst_ptr[dst_विस्थापनम् + inner];
 
-                    const size_t prev = outer_offset + index * mid_step + inner;
-                    const size_t curr = src_offset + inner;
+                    ध्रुव size_t पूर्व = outer_विस्थापनम् + सूचकांक * mid_चरणः + inner;
+                    ध्रुव size_t curr = src_विस्थापनम् + inner;
 
-                    if (cmp(src_ptr[curr], src_ptr[prev]))
+                    यदि (cmp(src_ptr[curr], src_ptr[पूर्व]))
                     {
-                        index = static_cast<int32_t>(mid);
+                        सूचकांक = static_cast<int32_t>(mid);
                     }
                 }
             }
@@ -541,49 +541,49 @@ struct reduceMinMaxImpl
     }
 };
 
-static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mode, int axis)
+स्थिर शून्य reduceMinMax(cv::निवेशः_Array src, cv::OutputArray dst, Reduce_बहुलकम् बहुलकम्, पूर्णाङ्क axis)
 {
     CV_INSTRUMENT_REGION();
 
     cv::Mat srcMat = src.getMat();
-    int dims = std::max(1, srcMat.dims);
+    पूर्णाङ्क dims = std::max(1, srcMat.dims);
     axis = (axis + dims) % dims;
     CV_Assert(srcMat.channels() == 1 && axis >= 0 && axis <= srcMat.dims);
 
-    std::vector<int> sizes(srcMat.dims);
+    std::vector<पूर्णाङ्क> sizes(srcMat.dims);
     std::copy(srcMat.size.p, srcMat.size.p + srcMat.dims, sizes.begin());
-    if(!sizes.empty())
+    यदि(!sizes.empty())
         sizes[axis] = 1;
 
-    dst.create(srcMat.dims, sizes.data(), CV_32SC1); // indices
+    dst.create(srcMat.dims, sizes.दत्त(), CV_32SC1); // indices
     cv::Mat dstMat = dst.getMat();
-    dstMat.setTo(cv::Scalar::all(0));
+    dstMat.समुच्चयः_गन्तव्यम्(cv::Scalar::all(0));
 
-    if (!srcMat.isContinuous())
+    यदि (!srcMat.isContinuous())
     {
         srcMat = srcMat.clone();
     }
 
-    bool needs_copy = !dstMat.isContinuous();
-    if (needs_copy)
+    तार्किक needs_copy = !dstMat.isContinuous();
+    यदि (needs_copy)
     {
         dstMat = dstMat.clone();
     }
 
-    cv::detail::depthDispatch<reduceMinMaxImpl>(srcMat.depth(), srcMat, dstMat, mode, axis);
+    cv::detail::गभीरता_Dispatch<reduceMinMaxImpl>(srcMat.गभीरता(), srcMat, dstMat, बहुलकम्, axis);
 
-    if (needs_copy)
+    यदि (needs_copy)
     {
-        dstMat.copyTo(dst);
+        dstMat.copy_गन्तव्यम्(dst);
     }
 }
 
-void cv::reduceArgMin(InputArray src, OutputArray dst, int axis, bool lastIndex)
+शून्य cv::reduceArgMin(निवेशः_Array src, OutputArray dst, पूर्णाङ्क axis, तार्किक चरमः_सूचकांक)
 {
-    reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MIN : ReduceMode::FIRST_MIN, axis);
+    reduceMinMax(src, dst, चरमः_सूचकांक ? Reduce_बहुलकम्::चरमः_MIN : Reduce_बहुलकम्::FIRST_MIN, axis);
 }
 
-void cv::reduceArgMax(InputArray src, OutputArray dst, int axis, bool lastIndex)
+शून्य cv::reduceArgMax(निवेशः_Array src, OutputArray dst, पूर्णाङ्क axis, तार्किक चरमः_सूचकांक)
 {
-    reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MAX : ReduceMode::FIRST_MAX, axis);
+    reduceMinMax(src, dst, चरमः_सूचकांक ? Reduce_बहुलकम्::चरमः_MAX : Reduce_बहुलकम्::FIRST_MAX, axis);
 }

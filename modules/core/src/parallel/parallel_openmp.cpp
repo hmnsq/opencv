@@ -1,58 +1,58 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "../precomp.hpp"
+#अन्तर्भाव "../precomp.hpp"
 
-#ifdef HAVE_OPENMP
+#यदि_परिभाषितम् HAVE_OPENMP
 
-#include "parallel.hpp"
-#include "opencv2/core/parallel/backend/parallel_for.openmp.hpp"
+#अन्तर्भाव "parallel.hpp"
+#अन्तर्भाव "opencv2/core/parallel/backend/parallel_for.openmp.hpp"
 
-namespace cv { namespace parallel {
+नामाकाश cv { नामाकाश parallel {
 
-static
+स्थिर
 std::shared_ptr<cv::parallel::openmp::ParallelForBackend>& getInstance()
 {
-    static std::shared_ptr<cv::parallel::openmp::ParallelForBackend> g_instance = std::make_shared<cv::parallel::openmp::ParallelForBackend>();
-    return g_instance;
+    स्थिर std::shared_ptr<cv::parallel::openmp::ParallelForBackend> g_instance = std::make_shared<cv::parallel::openmp::ParallelForBackend>();
+    प्रत्यागम g_instance;
 }
 
-#ifndef BUILD_PLUGIN
+#यदि_अपरिभाषितम् BUILD_PLUGIN
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendOpenMP()
 {
-    return getInstance();
+    प्रत्यागम getInstance();
 }
-#endif
+#यदि_अन्तः
 
 }}  // namespace
 
-#ifdef BUILD_PLUGIN
+#यदि_परिभाषितम् BUILD_PLUGIN
 
-#define ABI_VERSION 0
-#define API_VERSION 0
-#include "plugin_parallel_api.hpp"
+#परिभाषय ABI_संस्करणम् 0
+#परिभाषय API_संस्करणम् 0
+#अन्तर्भाव "plugin_parallel_api.hpp"
 
-static
-CvResult cv_getInstance(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
+स्थिर
+Cv_परिणाम cv_getInstance(CV_बहिर्गमनम् CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
 {
-    try
+    यत्न
     {
-        if (!handle)
-            return CV_ERROR_FAIL;
+        यदि (!handle)
+            प्रत्यागम CV_ERROR_FAIL;
         *handle = cv::parallel::getInstance().get();
-        return CV_ERROR_OK;
+        प्रत्यागम CV_ERROR_OK;
     }
-    catch (...)
+    गृहाण (...)
     {
-        return CV_ERROR_FAIL;
+        प्रत्यागम CV_ERROR_FAIL;
     }
 }
 
-static const OpenCV_Core_Parallel_Plugin_API plugin_api =
+स्थिर ध्रुव OpenCV_Core_Parallel_Plugin_API plugin_api =
 {
     {
-        sizeof(OpenCV_Core_Parallel_Plugin_API), ABI_VERSION, API_VERSION,
-        CV_VERSION_MAJOR, CV_VERSION_MINOR, CV_VERSION_REVISION, CV_VERSION_STATUS,
+        परिमाण(OpenCV_Core_Parallel_Plugin_API), ABI_संस्करणम्, API_संस्करणम्,
+        CV_संस्करणम्_MAJOR, CV_संस्करणम्_MINOR, CV_संस्करणम्_REVISION, CV_संस्करणम्_स्थितिः,
         "OpenMP (" CVAUX_STR(_OPENMP) ") OpenCV parallel plugin"
     },
     {
@@ -60,13 +60,13 @@ static const OpenCV_Core_Parallel_Plugin_API plugin_api =
     }
 };
 
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(int requested_abi_version, int requested_api_version, void* /*reserved=NULL*/) CV_NOEXCEPT
+ध्रुव OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(पूर्णाङ्क requested_abi_संस्करणम्, पूर्णाङ्क requested_api_संस्करणम्, शून्य* /*reserved=NULL*/) CV_NOEXCEPT
 {
-    if (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
-        return &plugin_api;
-    return NULL;
+    यदि (requested_abi_संस्करणम् == ABI_संस्करणम् && requested_api_संस्करणम् <= API_संस्करणम्)
+        प्रत्यागम &plugin_api;
+    प्रत्यागम रिक्त;
 }
 
-#endif  // BUILD_PLUGIN
+#यदि_अन्तः  // BUILD_PLUGIN
 
-#endif  // HAVE_TBB
+#यदि_अन्तः  // HAVE_TBB
