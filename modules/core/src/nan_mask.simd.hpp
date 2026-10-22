@@ -3,37 +3,37 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
+#অন্তর্ভাব "precomp.hpp"
 
-namespace cv {
+নামাকাশ cv {
 
-typedef void (*PatchNanFunc)(uchar* tptr, size_t len, double newVal);
-typedef void (*FiniteMaskFunc)(const uchar *src, uchar *dst, size_t total);
+প্রকারনির্দেশ শূন্য (*PatchNanFunc)(uchar* tptr, size_t len, দ্বিগুণ newVal);
+প্রকারনির্দেশ শূন্য (*FiniteMaskFunc)(ধ্রুব uchar *src, uchar *dst, size_t total);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-PatchNanFunc getPatchNanFunc(bool isDouble);
-FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn);
+PatchNanFunc getPatchNanFunc(তার্কিক isDouble);
+FiniteMaskFunc getFiniteMaskFunc(তার্কিক isDouble, পূর্ণাঙ্ক cn);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
+স্থির শূন্য patchNaNs_32f(uchar* ptr, size_t ulen, দ্বিগুণ newVal)
 {
     CV_INSTRUMENT_REGION();
 
     int32_t* tptr = (int32_t*)ptr;
     Cv32suf val;
-    val.f = (float)newVal;
+    val.f = (ভিন্ন)newVal;
 
-    int j = 0;
-    int len = (int)ulen;
+    পূর্ণাঙ্ক j = 0;
+    পূর্ণাঙ্ক len = (পূর্ণাঙ্ক)ulen;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#যদি (CV_SIMD || CV_SIMD_SCALABLE)
     v_int32 v_pos_mask = vx_setall_s32(0x7fffffff), v_exp_mask = vx_setall_s32(0x7f800000);
     v_int32 v_val = vx_setall_s32(val.i);
 
-    int cWidth = VTraits<v_int32>::vlanes();
-    for (; j < len - cWidth*2 + 1; j += cWidth*2)
+    পূর্ণাঙ্ক cWidth = VTraits<v_int32>::vlanes();
+    প্রতি (; j < len - cWidth*2 + 1; j += cWidth*2)
     {
         v_int32 v_src0 = vx_load(tptr + j);
         v_int32 v_src1 = vx_load(tptr + j + cWidth);
@@ -41,7 +41,7 @@ static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
         v_int32 v_cmp_mask0 = v_lt(v_exp_mask, v_and(v_src0, v_pos_mask));
         v_int32 v_cmp_mask1 = v_lt(v_exp_mask, v_and(v_src1, v_pos_mask));
 
-        if (v_check_any(v_or(v_cmp_mask0, v_cmp_mask1)))
+        যদি (v_check_any(v_or(v_cmp_mask0, v_cmp_mask1)))
         {
             v_int32 v_dst0 = v_select(v_cmp_mask0, v_val, v_src0);
             v_int32 v_dst1 = v_select(v_cmp_mask1, v_val, v_src1);
@@ -52,9 +52,9 @@ static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
     }
 #endif
 
-    for (; j < len; j++)
+    প্রতি (; j < len; j++)
     {
-        if ((tptr[j] & 0x7fffffff) > 0x7f800000)
+        যদি ((tptr[j] & 0x7fffffff) > 0x7f800000)
         {
             tptr[j] = val.i;
         }
@@ -62,7 +62,7 @@ static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
 }
 
 
-static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
+স্থির শূন্য patchNaNs_64f(uchar* ptr, size_t ulen, দ্বিগুণ newVal)
 {
     CV_INSTRUMENT_REGION();
 
@@ -70,16 +70,16 @@ static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
     Cv64suf val;
     val.f = newVal;
 
-    int j = 0;
-    int len = (int)ulen;
+    পূর্ণাঙ্ক j = 0;
+    পূর্ণাঙ্ক len = (পূর্ণাঙ্ক)ulen;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#যদি (CV_SIMD || CV_SIMD_SCALABLE)
     v_int64 v_exp_mask = vx_setall_s64(0x7FF0000000000000);
     v_int64 v_pos_mask = vx_setall_s64(0x7FFFFFFFFFFFFFFF);
     v_int64 v_val = vx_setall_s64(val.i);
 
-    int cWidth = VTraits<v_int64>::vlanes();
-    for (; j < len - cWidth * 2 + 1; j += cWidth*2)
+    পূর্ণাঙ্ক cWidth = VTraits<v_int64>::vlanes();
+    প্রতি (; j < len - cWidth * 2 + 1; j += cWidth*2)
     {
         v_int64 v_src0 = vx_load(tptr + j);
         v_int64 v_src1 = vx_load(tptr + j + cWidth);
@@ -87,7 +87,7 @@ static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
         v_int64 v_cmp_mask0 = v_lt(v_exp_mask, v_and(v_src0, v_pos_mask));
         v_int64 v_cmp_mask1 = v_lt(v_exp_mask, v_and(v_src1, v_pos_mask));
 
-        if (v_check_any(v_cmp_mask0) || v_check_any(v_cmp_mask1))
+        যদি (v_check_any(v_cmp_mask0) || v_check_any(v_cmp_mask1))
         {
             // v_select is not available for v_int64, emulating it
             v_int32 val32 = v_reinterpret_as_s32(v_val);
@@ -100,34 +100,34 @@ static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
     }
 #endif
 
-    for (; j < len; j++)
-        if ((tptr[j] & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000)
+    প্রতি (; j < len; j++)
+        যদি ((tptr[j] & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000)
             tptr[j] = val.i;
 }
 
-PatchNanFunc getPatchNanFunc(bool isDouble)
+PatchNanFunc getPatchNanFunc(তার্কিক isDouble)
 {
-    return isDouble ? patchNaNs_64f
+    প্রত্যাগম isDouble ? patchNaNs_64f
                     : patchNaNs_32f;
 }
 
 ////// finiteMask //////
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#যদি (CV_SIMD || CV_SIMD_SCALABLE)
 
-template <typename _Tp, int cn>
-int finiteMaskSIMD_(const _Tp *src, uchar *dst, size_t total);
+template <typename _Tp, পূর্ণাঙ্ক cn>
+পূর্ণাঙ্ক finiteMaskSIMD_(ধ্রুব _Tp *src, uchar *dst, size_t total);
 
 template <>
-int finiteMaskSIMD_<float, 1>(const float *fsrc, uchar *dst, size_t utotal)
+পূর্ণাঙ্ক finiteMaskSIMD_<ভিন্ন, 1>(ধ্রুব ভিন্ন *fsrc, uchar *dst, size_t utotal)
 {
-    const uint32_t* src = (const uint32_t*)fsrc;
-    const int osize = VTraits<v_uint8>::vlanes();
+    ধ্রুব uint32_t* src = (ধ্রুব uint32_t*)fsrc;
+    ধ্রুব পূর্ণাঙ্ক osize = VTraits<v_uint8>::vlanes();
     v_uint32 vmaskExp = vx_setall_u32(0x7f800000);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - osize + 1; i += osize )
+    পূর্ণাঙ্ক i = 0;
+    পূর্ণাঙ্ক total = (পূর্ণাঙ্ক)utotal;
+    প্রতি(; i < total - osize + 1; i += osize )
     {
         v_uint32 vv0, vv1, vv2, vv3;
         vv0 = v_ne(v_and(vx_load(src + i              ), vmaskExp), vmaskExp);
@@ -138,21 +138,21 @@ int finiteMaskSIMD_<float, 1>(const float *fsrc, uchar *dst, size_t utotal)
         v_store(dst + i, v_pack_b(vv0, vv1, vv2, vv3));
     }
 
-    return i;
+    প্রত্যাগম i;
 }
 
 
 template <>
-int finiteMaskSIMD_<float, 2>(const float *fsrc, uchar *dst, size_t utotal)
+পূর্ণাঙ্ক finiteMaskSIMD_<ভিন্ন, 2>(ধ্রুব ভিন্ন *fsrc, uchar *dst, size_t utotal)
 {
-    const uint32_t* src = (const uint32_t*)fsrc;
-    const int size8 = VTraits<v_uint8>::vlanes();
+    ধ্রুব uint32_t* src = (ধ্রুব uint32_t*)fsrc;
+    ধ্রুব পূর্ণাঙ্ক size8 = VTraits<v_uint8>::vlanes();
     v_uint32 vmaskExp = vx_setall_u32(0x7f800000);
     v_uint16 vmaskBoth = vx_setall_u16(0xffff);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
+    পূর্ণাঙ্ক i = 0;
+    পূর্ণাঙ্ক total = (পূর্ণাঙ্ক)utotal;
+    প্রতি(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
     {
         v_uint32 vv0, vv1, vv2, vv3;
         vv0 = v_ne(v_and(vx_load(src + i*2                ), vmaskExp), vmaskExp);
@@ -163,24 +163,24 @@ int finiteMaskSIMD_<float, 2>(const float *fsrc, uchar *dst, size_t utotal)
         v_uint16 vfinite = v_eq(v_reinterpret_as_u16(velems), vmaskBoth);
 
         // 2nd argument in vfinite is useless
-        v_store_low(dst + i, v_pack(vfinite, vfinite));
+        v_store_নিচের(dst + i, v_pack(vfinite, vfinite));
     }
 
-    return i;
+    প্রত্যাগম i;
 }
 
 
 template <>
-int finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
+পূর্ণাঙ্ক finiteMaskSIMD_<ভিন্ন, 3>(ধ্রুব ভিন্ন *fsrc, uchar *dst, size_t utotal)
 {
-    const uint32_t* src = (const uint32_t*)fsrc;
-    const int npixels = VTraits<v_float32>::vlanes();
+    ধ্রুব uint32_t* src = (ধ্রুব uint32_t*)fsrc;
+    ধ্রুব পূর্ণাঙ্ক npixels = VTraits<v_float32>::vlanes();
     v_uint32 vmaskExp = vx_setall_u32(0x7f800000);
     v_uint32 z = vx_setzero_u32();
 
-    int i = 0;
-    int total = (int)utotal;
-    for (; i < total - npixels + 1; i += npixels)
+    পূর্ণাঙ্ক i = 0;
+    পূর্ণাঙ্ক total = (পূর্ণাঙ্ক)utotal;
+    প্রতি (; i < total - npixels + 1; i += npixels)
     {
         v_uint32 vv0, vv1, vv2;
         vv0 = v_ne(v_and(vx_load(src + i*3            ), vmaskExp), vmaskExp);
@@ -194,7 +194,7 @@ int finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
         v_uint8 vsh2 = v_extract<2>(velems, velems);
 
         v_uint8 vres3 = v_and(v_and(velems, vsh1), vsh2);
-        for (int j = 0; j < npixels; j++)
+        প্রতি (পূর্ণাঙ্ক j = 0; j < npixels; j++)
         {
             dst[i + j] = v_get0(vres3);
             // 2nd arg is useless
@@ -202,22 +202,22 @@ int finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
         }
     }
 
-    return i;
+    প্রত্যাগম i;
 }
 
 
 template <>
-int finiteMaskSIMD_<float, 4>(const float *fsrc, uchar *dst, size_t utotal)
+পূর্ণাঙ্ক finiteMaskSIMD_<ভিন্ন, 4>(ধ্রুব ভিন্ন *fsrc, uchar *dst, size_t utotal)
 {
-    const uint32_t* src = (const uint32_t*)fsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
-    const int nfloats = VTraits<v_uint32>::vlanes();
-    const v_uint32 vMaskExp = vx_setall_u32(0x7f800000);
+    ধ্রুব uint32_t* src = (ধ্রুব uint32_t*)fsrc;
+    ধ্রুব পূর্ণাঙ্ক npixels = VTraits<v_uint8>::vlanes() / 2;
+    ধ্রুব পূর্ণাঙ্ক nfloats = VTraits<v_uint32>::vlanes();
+    ধ্রুব v_uint32 vMaskExp = vx_setall_u32(0x7f800000);
     v_uint32 vmaskAll4 = vx_setall_u32(0xFFFFFFFF);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    পূর্ণাঙ্ক i = 0;
+    পূর্ণাঙ্ক total = (পূর্ণাঙ্ক)utotal;
+    প্রতি(; i < total - npixels + 1; i += npixels )
     {
         v_uint32 v0 = vx_load(src + i * 4 + 0*nfloats);
         v_uint32 v1 = vx_load(src + i * 4 + 1*nfloats);
@@ -246,25 +246,25 @@ int finiteMaskSIMD_<float, 4>(const float *fsrc, uchar *dst, size_t utotal)
         // last 2 args are useless
         v_uint8 vres = v_pack_b(vresWide0, vresWide1, vresWide0, vresWide1);
 
-        v_store_low(dst + i, vres);
+        v_store_নিচের(dst + i, vres);
     }
 
-    return i;
+    প্রত্যাগম i;
 }
 
 
 template <>
-int finiteMaskSIMD_<double, 1>(const double *dsrc, uchar *dst, size_t utotal)
+পূর্ণাঙ্ক finiteMaskSIMD_<দ্বিগুণ, 1>(ধ্রুব দ্বিগুণ *dsrc, uchar *dst, size_t utotal)
 {
-    const uint64_t* src = (const uint64_t*)dsrc;
-    const int size8 = VTraits<v_uint8>::vlanes();
-    int i = 0;
-    int total = (int)utotal;
+    ধ্রুব uint64_t* src = (ধ্রুব uint64_t*)dsrc;
+    ধ্রুব পূর্ণাঙ্ক size8 = VTraits<v_uint8>::vlanes();
+    পূর্ণাঙ্ক i = 0;
+    পূর্ণাঙ্ক total = (পূর্ণাঙ্ক)utotal;
 
     v_uint64 vmaskExp = vx_setall_u64(0x7ff0000000000000);
     v_uint64 z = vx_setzero_u64();
 
-    for(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
+    প্রতি(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
     {
         v_uint64 vv0, vv1, vv2, vv3;
         vv0 = v_ne(v_and(vx_load(src + i                ), vmaskExp), vmaskExp);
@@ -274,24 +274,24 @@ int finiteMaskSIMD_<double, 1>(const double *dsrc, uchar *dst, size_t utotal)
 
         v_uint8 v = v_pack_b(vv0, vv1, vv2, vv3, z, z, z, z);
 
-        v_store_low(dst + i, v);
+        v_store_নিচের(dst + i, v);
     }
 
-    return i;
+    প্রত্যাগম i;
 }
 
 template <>
-int finiteMaskSIMD_<double, 2>(const double *dsrc, uchar *dst, size_t utotal)
+পূর্ণাঙ্ক finiteMaskSIMD_<দ্বিগুণ, 2>(ধ্রুব দ্বিগুণ *dsrc, uchar *dst, size_t utotal)
 {
-    const uint64_t* src = (const uint64_t*)dsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
-    const int ndoubles = VTraits<v_uint64>::vlanes();
+    ধ্রুব uint64_t* src = (ধ্রুব uint64_t*)dsrc;
+    ধ্রুব পূর্ণাঙ্ক npixels = VTraits<v_uint8>::vlanes() / 2;
+    ধ্রুব পূর্ণাঙ্ক ndoubles = VTraits<v_uint64>::vlanes();
     v_uint64 vmaskExp = vx_setall_u64(0x7ff0000000000000);
     v_uint16 vmaskBoth = vx_setall_u16(0xffff);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    পূর্ণাঙ্ক i = 0;
+    পূর্ণাঙ্ক total = (পূর্ণাঙ্ক)utotal;
+    প্রতি(; i < total - npixels + 1; i += npixels )
     {
         v_uint64 vv0 = v_ne(v_and(vx_load(src + i*2 + 0*ndoubles), vmaskExp), vmaskExp);
         v_uint64 vv1 = v_ne(v_and(vx_load(src + i*2 + 1*ndoubles), vmaskExp), vmaskExp);
@@ -308,33 +308,33 @@ int finiteMaskSIMD_<double, 2>(const double *dsrc, uchar *dst, size_t utotal)
 
         // 2nd arg is useless
         v_uint8 vres = v_pack(vfinite0, vfinite0);
-        v_store_low(dst + i, vres);
+        v_store_নিচের(dst + i, vres);
     }
 
-    return i;
+    প্রত্যাগম i;
 }
 
 
 template <>
-int finiteMaskSIMD_<double, 3>(const double *dsrc, uchar *dst, size_t utotal)
+পূর্ণাঙ্ক finiteMaskSIMD_<দ্বিগুণ, 3>(ধ্রুব দ্বিগুণ *dsrc, uchar *dst, size_t utotal)
 {
     //TODO: vectorize it properly
 
-    const uint64_t* src = (const uint64_t*)dsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
+    ধ্রুব uint64_t* src = (ধ্রুব uint64_t*)dsrc;
+    ধ্রুব পূর্ণাঙ্ক npixels = VTraits<v_uint8>::vlanes() / 2;
     uint64_t maskExp = 0x7ff0000000000000;
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    পূর্ণাঙ্ক i = 0;
+    পূর্ণাঙ্ক total = (পূর্ণাঙ্ক)utotal;
+    প্রতি(; i < total - npixels + 1; i += npixels )
     {
-        for (int j = 0; j < npixels; j++)
+        প্রতি (পূর্ণাঙ্ক j = 0; j < npixels; j++)
         {
             uint64_t val0 = src[i * 3 + j * 3 + 0];
             uint64_t val1 = src[i * 3 + j * 3 + 1];
             uint64_t val2 = src[i * 3 + j * 3 + 2];
 
-            bool finite = ((val0 & maskExp) != maskExp) &&
+            তার্কিক finite = ((val0 & maskExp) != maskExp) &&
                           ((val1 & maskExp) != maskExp) &&
                           ((val2 & maskExp) != maskExp);
 
@@ -342,23 +342,23 @@ int finiteMaskSIMD_<double, 3>(const double *dsrc, uchar *dst, size_t utotal)
         }
     }
 
-    return i;
+    প্রত্যাগম i;
 }
 
 template <>
-int finiteMaskSIMD_<double, 4>(const double *dsrc, uchar *dst, size_t utotal)
+পূর্ণাঙ্ক finiteMaskSIMD_<দ্বিগুণ, 4>(ধ্রুব দ্বিগুণ *dsrc, uchar *dst, size_t utotal)
 {
     //TODO: vectorize it properly
 
     uint64_t* src = (uint64_t*)dsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
-    const int ndoubles = VTraits<v_uint64>::vlanes();
+    ধ্রুব পূর্ণাঙ্ক npixels = VTraits<v_uint8>::vlanes() / 2;
+    ধ্রুব পূর্ণাঙ্ক ndoubles = VTraits<v_uint64>::vlanes();
     v_uint16 vmaskExp16 = vx_setall_u16(0x7ff0);
     v_uint32 z = vx_setzero_u32();
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    পূর্ণাঙ্ক i = 0;
+    পূর্ণাঙ্ক total = (পূর্ণাঙ্ক)utotal;
+    প্রতি(; i < total - npixels + 1; i += npixels )
     {
         v_uint16 vexpb0, vexpb1, vexpb2, vexpb3;
         v_uint16 dummy;
@@ -382,33 +382,33 @@ int finiteMaskSIMD_<double, 4>(const double *dsrc, uchar *dst, size_t utotal)
 
         // 2nd arg is useless
         v_uint8 vres = v_pack(vp16, vp16);
-        v_store_low(dst, vres);
+        v_store_নিচের(dst, vres);
 
         src += npixels * 4;
         dst += npixels;
     }
 
-    return i;
+    প্রত্যাগম i;
 }
 
 #endif
 
 
-template <typename _Tp, int cn>
-void finiteMask_(const uchar *src, uchar *dst, size_t total)
+template <typename _Tp, পূর্ণাঙ্ক cn>
+শূন্য finiteMask_(ধ্রুব uchar *src, uchar *dst, size_t total)
 {
     CV_INSTRUMENT_REGION();
     size_t i = 0;
-    const _Tp* tsrc = (const _Tp*) src;
+    ধ্রুব _Tp* tsrc = (ধ্রুব _Tp*) src;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#যদি (CV_SIMD || CV_SIMD_SCALABLE)
     i = finiteMaskSIMD_<_Tp, cn>(tsrc, dst, total);
 #endif
 
-    for(; i < total; i++ )
+    প্রতি(; i < total; i++ )
     {
-        bool finite = true;
-        for (int c = 0; c < cn; c++)
+        তার্কিক finite = সত্য;
+        প্রতি (পূর্ণাঙ্ক c = 0; c < cn; c++)
         {
             _Tp val = tsrc[i * cn + c];
             finite = finite && !cvIsNaN(val) && !cvIsInf(val);
@@ -417,22 +417,22 @@ void finiteMask_(const uchar *src, uchar *dst, size_t total)
     }
 }
 
-FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn)
+FiniteMaskFunc getFiniteMaskFunc(তার্কিক isDouble, পূর্ণাঙ্ক cn)
 {
-    static FiniteMaskFunc tab[CV_DEPTH_MAX] =
+    স্থির FiniteMaskFunc tab[CV_DEPTH_MAX] =
     {
-        finiteMask_<float,  1>,
-        finiteMask_<float,  2>,
-        finiteMask_<float,  3>,
-        finiteMask_<float,  4>,
-        finiteMask_<double, 1>,
-        finiteMask_<double, 2>,
-        finiteMask_<double, 3>,
-        finiteMask_<double, 4>,
+        finiteMask_<ভিন্ন,  1>,
+        finiteMask_<ভিন্ন,  2>,
+        finiteMask_<ভিন্ন,  3>,
+        finiteMask_<ভিন্ন,  4>,
+        finiteMask_<দ্বিগুণ, 1>,
+        finiteMask_<দ্বিগুণ, 2>,
+        finiteMask_<দ্বিগুণ, 3>,
+        finiteMask_<দ্বিগুণ, 4>,
     };
 
-    int idx = (isDouble ? 4 : 0) + cn - 1;
-    return tab[idx];
+    পূর্ণাঙ্ক idx = (isDouble ? 4 : 0) + cn - 1;
+    প্রত্যাগম tab[idx];
 }
 
 #endif

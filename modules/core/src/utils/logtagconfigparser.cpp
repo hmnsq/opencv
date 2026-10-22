@@ -2,303 +2,303 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
-#include "logtagconfigparser.hpp"
+#অন্তর্ভাব "../precomp.hpp"
+#অন্তর্ভাব "logtagconfigparser.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+নামাকাশ cv {
+নামাকাশ utils {
+নামাকাশ logging {
 
 LogTagConfigParser::LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel)
 {
     m_parsedGlobal.namePart = "global";
-    m_parsedGlobal.isGlobal = true;
-    m_parsedGlobal.hasPrefixWildcard = false;
-    m_parsedGlobal.hasSuffixWildcard = false;
+    m_parsedGlobal.isGlobal = সত্য;
+    m_parsedGlobal.hasPrefixWildcard = অসত্য;
+    m_parsedGlobal.hasSuffixWildcard = অসত্য;
     m_parsedGlobal.level = defaultUnconfiguredGlobalLevel;
 }
 
-LogTagConfigParser::LogTagConfigParser(const std::string& input)
+LogTagConfigParser::LogTagConfigParser(ধ্রুব std::string& প্রবেশ_2)
 {
-    parse(input);
+    parse(প্রবেশ_2);
 }
 
 LogTagConfigParser::~LogTagConfigParser()
 {
 }
 
-bool LogTagConfigParser::parse(const std::string& input)
+তার্কিক LogTagConfigParser::parse(ধ্রুব std::string& প্রবেশ_2)
 {
-    m_input = input;
+    m_প্রবেশ = প্রবেশ_2;
     segmentTokens();
-    return (m_malformed.empty());
+    প্রত্যাগম (m_malformed.empty());
 }
 
-bool LogTagConfigParser::hasMalformed() const
+তার্কিক LogTagConfigParser::hasMalformed() ধ্রুব
 {
-    return !m_malformed.empty();
+    প্রত্যাগম !m_malformed.empty();
 }
 
-const LogTagConfig& LogTagConfigParser::getGlobalConfig() const
+ধ্রুব LogTagConfig& LogTagConfigParser::getGlobalConfig() ধ্রুব
 {
-    return m_parsedGlobal;
+    প্রত্যাগম m_parsedGlobal;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFullNameConfigs() const
+ধ্রুব std::vector<LogTagConfig>& LogTagConfigParser::getFullNameConfigs() ধ্রুব
 {
-    return m_parsedFullName;
+    প্রত্যাগম m_parsedFullName;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFirstPartConfigs() const
+ধ্রুব std::vector<LogTagConfig>& LogTagConfigParser::getFirstPartConfigs() ধ্রুব
 {
-    return m_parsedFirstPart;
+    প্রত্যাগম m_parsedFirstPart;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getAnyPartConfigs() const
+ধ্রুব std::vector<LogTagConfig>& LogTagConfigParser::getAnyPartConfigs() ধ্রুব
 {
-    return m_parsedAnyPart;
+    প্রত্যাগম m_parsedAnyPart;
 }
 
-const std::vector<std::string>& LogTagConfigParser::getMalformed() const
+ধ্রুব std::vector<std::string>& LogTagConfigParser::getMalformed() ধ্রুব
 {
-    return m_malformed;
+    প্রত্যাগম m_malformed;
 }
 
-void LogTagConfigParser::segmentTokens()
+শূন্য LogTagConfigParser::segmentTokens()
 {
-    const size_t len = m_input.length();
+    ধ্রুব size_t len = m_প্রবেশ.length();
     std::vector<std::pair<size_t, size_t>> startStops;
-    bool wasSeparator = true;
-    for (size_t pos = 0u; pos < len; ++pos)
+    তার্কিক wasSeparator = সত্য;
+    প্রতি (size_t pos = 0u; pos < len; ++pos)
     {
-        char c = m_input[pos];
-        bool isSeparator = (c == ' ' || c == '\t' || c == ';');
-        if (!isSeparator)
+        বর্ণ c = m_প্রবেশ[pos];
+        তার্কিক isSeparator = (c == ' ' || c == '\t' || c == ';');
+        যদি (!isSeparator)
         {
-            if (wasSeparator)
+            যদি (wasSeparator)
             {
                 startStops.emplace_back(pos, pos + 1u);
             }
-            else
+            অন্যথা
             {
                 startStops.back().second = pos + 1u;
             }
         }
         wasSeparator = isSeparator;
     }
-    for (const auto& startStop : startStops)
+    প্রতি (ধ্রুব auto& startStop : startStops)
     {
-        const auto s = m_input.substr(startStop.first, startStop.second - startStop.first);
+        ধ্রুব auto s = m_প্রবেশ.substr(startStop.first, startStop.second - startStop.first);
         parseNameAndLevel(s);
     }
 }
 
-void LogTagConfigParser::parseNameAndLevel(const std::string& s)
+শূন্য LogTagConfigParser::parseNameAndLevel(ধ্রুব std::string& s)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = s.length();
+    ধ্রুব size_t npos = std::string::npos;
+    ধ্রুব size_t len = s.length();
     size_t colonIdx = s.find_first_of(":=");
-    if (colonIdx == npos)
+    যদি (colonIdx == npos)
     {
         // See if the whole string is a log level
         auto parsedLevel = parseLogLevel(s);
-        if (parsedLevel.second)
+        যদি (parsedLevel.second)
         {
             // If it is, assume the log level is for global
             parseWildcard("", parsedLevel.first);
-            return;
+            প্রত্যাগম;
         }
-        else
+        অন্যথা
         {
             // not sure what to do.
             m_malformed.push_back(s);
-            return;
+            প্রত্যাগম;
         }
     }
-    if (colonIdx == 0u || colonIdx + 1u == len)
+    যদি (colonIdx == 0u || colonIdx + 1u == len)
     {
         // malformed (colon or equal sign at beginning or end), cannot do anything
         m_malformed.push_back(s);
-        return;
+        প্রত্যাগম;
     }
     size_t colonIdx2 = s.find_first_of(":=", colonIdx + 1u);
-    if (colonIdx2 != npos)
+    যদি (colonIdx2 != npos)
     {
         // malformed (more than one colon or equal sign), cannot do anything
         m_malformed.push_back(s);
-        return;
+        প্রত্যাগম;
     }
     auto parsedLevel = parseLogLevel(s.substr(colonIdx + 1u));
-    if (parsedLevel.second)
+    যদি (parsedLevel.second)
     {
         parseWildcard(s.substr(0u, colonIdx), parsedLevel.first);
-        return;
+        প্রত্যাগম;
     }
-    else
+    অন্যথা
     {
         // Cannot recognize the right side of the colon or equal sign.
         // Not sure what to do.
         m_malformed.push_back(s);
-        return;
+        প্রত্যাগম;
     }
 }
 
-void LogTagConfigParser::parseWildcard(const std::string& name, LogLevel level)
+শূন্য LogTagConfigParser::parseWildcard(ধ্রুব std::string& name, LogLevel level)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = name.length();
-    if (len == 0u)
+    ধ্রুব size_t npos = std::string::npos;
+    ধ্রুব size_t len = name.length();
+    যদি (len == 0u)
     {
         m_parsedGlobal.level = level;
-        return;
+        প্রত্যাগম;
     }
-    const bool hasPrefixWildcard = (name[0u] == '*');
-    if (hasPrefixWildcard && len == 1u)
+    ধ্রুব তার্কিক hasPrefixWildcard = (name[0u] == '*');
+    যদি (hasPrefixWildcard && len == 1u)
     {
         m_parsedGlobal.level = level;
-        return;
+        প্রত্যাগম;
     }
-    const size_t firstNonWildcard = name.find_first_not_of("*.");
-    if (hasPrefixWildcard && firstNonWildcard == npos)
+    ধ্রুব size_t firstNonWildcard = name.find_first_not_of("*.");
+    যদি (hasPrefixWildcard && firstNonWildcard == npos)
     {
         m_parsedGlobal.level = level;
-        return;
+        প্রত্যাগম;
     }
-    const bool hasSuffixWildcard = (name[len - 1u] == '*');
-    const size_t lastNonWildcard = name.find_last_not_of("*.");
+    ধ্রুব তার্কিক hasSuffixWildcard = (name[len - 1u] == '*');
+    ধ্রুব size_t lastNonWildcard = name.find_last_not_of("*.");
     std::string trimmedNamePart = name.substr(firstNonWildcard, lastNonWildcard - firstNonWildcard + 1u);
     // The case of a single asterisk has been handled above;
     // here we only handle the explicit use of "global" in the log config string.
-    const bool isGlobal = (trimmedNamePart == "global");
-    if (isGlobal)
+    ধ্রুব তার্কিক isGlobal = (trimmedNamePart == "global");
+    যদি (isGlobal)
     {
         m_parsedGlobal.level = level;
-        return;
+        প্রত্যাগম;
     }
-    LogTagConfig result(trimmedNamePart, level, false, hasPrefixWildcard, hasSuffixWildcard);
-    if (hasPrefixWildcard)
+    LogTagConfig result(trimmedNamePart, level, অসত্য, hasPrefixWildcard, hasSuffixWildcard);
+    যদি (hasPrefixWildcard)
     {
         m_parsedAnyPart.emplace_back(std::move(result));
     }
-    else if (hasSuffixWildcard)
+    অন্যথা যদি (hasSuffixWildcard)
     {
         m_parsedFirstPart.emplace_back(std::move(result));
     }
-    else
+    অন্যথা
     {
         m_parsedFullName.emplace_back(std::move(result));
     }
 }
 
-std::pair<LogLevel, bool> LogTagConfigParser::parseLogLevel(const std::string& s)
+std::pair<LogLevel, তার্কিক> LogTagConfigParser::parseLogLevel(ধ্রুব std::string& s)
 {
-    const auto falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, false);
-    const auto make_parsed_result = [](LogLevel lev) -> std::pair<LogLevel, bool>
+    ধ্রুব auto falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, অসত্য);
+    ধ্রুব auto make_parsed_result = [](LogLevel lev) -> std::pair<LogLevel, তার্কিক>
     {
-        return std::make_pair(lev, true);
+        প্রত্যাগম std::make_pair(lev, সত্য);
     };
-    const size_t len = s.length();
-    if (len >= 1u)
+    ধ্রুব size_t len = s.length();
+    যদি (len >= 1u)
     {
-        const char c = (char)std::toupper(s[0]);
-        switch (c)
+        ধ্রুব বর্ণ c = (বর্ণ)std::toupper(s[0]);
+        বিকল্প (c)
         {
-        case '0':
-            if (len == 1u)
+        পক্ষ '0':
+            যদি (len == 1u)
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'D':
-            if (len == 1u ||
+            ভঙ্গ;
+        পক্ষ 'D':
+            যদি (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "DEBUG"))
             {
-                return make_parsed_result(LOG_LEVEL_DEBUG);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_DEBUG);
             }
-            if ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
+            যদি ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
                 (len == 8u && cv::toUpperCase(s) == "DISABLED"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'E':
-            if (len == 1u ||
+            ভঙ্গ;
+        পক্ষ 'E':
+            যদি (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "ERROR"))
             {
-                return make_parsed_result(LOG_LEVEL_ERROR);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_ERROR);
             }
-            break;
-        case 'F':
-            if (len == 1u ||
+            ভঙ্গ;
+        পক্ষ 'F':
+            যদি (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "FATAL"))
             {
-                return make_parsed_result(LOG_LEVEL_FATAL);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_FATAL);
             }
-            break;
-        case 'I':
-            if (len == 1u ||
+            ভঙ্গ;
+        পক্ষ 'I':
+            যদি (len == 1u ||
                 (len == 4u && cv::toUpperCase(s) == "INFO"))
             {
-                return make_parsed_result(LOG_LEVEL_INFO);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_INFO);
             }
-            break;
-        case 'O':
-            if (len == 3u && cv::toUpperCase(s) == "OFF")
+            ভঙ্গ;
+        পক্ষ 'O':
+            যদি (len == 3u && cv::toUpperCase(s) == "OFF")
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'S':
-            if (len == 1u ||
+            ভঙ্গ;
+        পক্ষ 'S':
+            যদি (len == 1u ||
                 (len == 6u && cv::toUpperCase(s) == "SILENT"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'V':
-            if (len == 1u ||
+            ভঙ্গ;
+        পক্ষ 'V':
+            যদি (len == 1u ||
                 (len == 7u && cv::toUpperCase(s) == "VERBOSE"))
             {
-                return make_parsed_result(LOG_LEVEL_VERBOSE);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_VERBOSE);
             }
-            break;
-        case 'W':
-            if (len == 1u ||
+            ভঙ্গ;
+        পক্ষ 'W':
+            যদি (len == 1u ||
                 (len == 4u && cv::toUpperCase(s) == "WARN") ||
                 (len == 7u && cv::toUpperCase(s) == "WARNING") ||
                 (len == 8u && cv::toUpperCase(s) == "WARNINGS"))
             {
-                return make_parsed_result(LOG_LEVEL_WARNING);
+                প্রত্যাগম make_parsed_result(LOG_LEVEL_WARNING);
             }
-            break;
-        default:
-            break;
+            ভঙ্গ;
+        স্বভাব:
+            ভঙ্গ;
         }
         // fall through
     }
-    return falseDontCare;
+    প্রত্যাগম falseDontCare;
 }
 
 std::string LogTagConfigParser::toString(LogLevel level)
 {
-    switch (level)
+    বিকল্প (level)
     {
-    case LOG_LEVEL_SILENT:
-        return "SILENT";
-    case LOG_LEVEL_FATAL:
-        return "FATAL";
-    case LOG_LEVEL_ERROR:
-        return "ERROR";
-    case LOG_LEVEL_WARNING:
-        return "WARNING";
-    case LOG_LEVEL_INFO:
-        return "INFO";
-    case LOG_LEVEL_DEBUG:
-        return "DEBUG";
-    case LOG_LEVEL_VERBOSE:
-        return "VERBOSE";
-    default:
-        return std::to_string((int)level);
+    পক্ষ LOG_LEVEL_SILENT:
+        প্রত্যাগম "SILENT";
+    পক্ষ LOG_LEVEL_FATAL:
+        প্রত্যাগম "FATAL";
+    পক্ষ LOG_LEVEL_ERROR:
+        প্রত্যাগম "ERROR";
+    পক্ষ LOG_LEVEL_WARNING:
+        প্রত্যাগম "WARNING";
+    পক্ষ LOG_LEVEL_INFO:
+        প্রত্যাগম "INFO";
+    পক্ষ LOG_LEVEL_DEBUG:
+        প্রত্যাগম "DEBUG";
+    পক্ষ LOG_LEVEL_VERBOSE:
+        প্রত্যাগম "VERBOSE";
+    স্বভাব:
+        প্রত্যাগম std::to_string((পূর্ণাঙ্ক)level);
     }
 }
 

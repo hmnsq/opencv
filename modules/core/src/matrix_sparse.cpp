@@ -2,183 +2,183 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "opencv2/core/mat.hpp"
 
-namespace cv {
+নামাকাশ cv {
 
-template<typename T1, typename T2> void
-convertData_(const void* _from, void* _to, int cn)
+template<typename T1, typename T2> শূন্য
+convertData_(ধ্রুব শূন্য* _from, শূন্য* _to, পূর্ণাঙ্ক cn)
 {
-    const T1* from = (const T1*)_from;
+    ধ্রুব T1* from = (ধ্রুব T1*)_from;
     T2* to = (T2*)_to;
-    if( cn == 1 )
+    যদি( cn == 1 )
         *to = saturate_cast<T2>(*from);
-    else
-        for( int i = 0; i < cn; i++ )
+    অন্যথা
+        প্রতি( পূর্ণাঙ্ক i = 0; i < cn; i++ )
             to[i] = saturate_cast<T2>(from[i]);
 }
 
-template<typename T1, typename T2> void
-convertScaleData_(const void* _from, void* _to, int cn, double alpha, double beta)
+template<typename T1, typename T2> শূন্য
+convertScaleData_(ধ্রুব শূন্য* _from, শূন্য* _to, পূর্ণাঙ্ক cn, দ্বিগুণ alpha, দ্বিগুণ beta)
 {
-    const T1* from = (const T1*)_from;
+    ধ্রুব T1* from = (ধ্রুব T1*)_from;
     T2* to = (T2*)_to;
-    if( cn == 1 )
+    যদি( cn == 1 )
         *to = saturate_cast<T2>(*from*alpha + beta);
-    else
-        for( int i = 0; i < cn; i++ )
+    অন্যথা
+        প্রতি( পূর্ণাঙ্ক i = 0; i < cn; i++ )
             to[i] = saturate_cast<T2>(from[i]*alpha + beta);
 }
 
-typedef void (*ConvertData)(const void* from, void* to, int cn);
-typedef void (*ConvertScaleData)(const void* from, void* to, int cn, double alpha, double beta);
+প্রকারনির্দেশ শূন্য (*ConvertData)(ধ্রুব শূন্য* from, শূন্য* to, পূর্ণাঙ্ক cn);
+প্রকারনির্দেশ শূন্য (*ConvertScaleData)(ধ্রুব শূন্য* from, শূন্য* to, পূর্ণাঙ্ক cn, দ্বিগুণ alpha, দ্বিগুণ beta);
 
-static ConvertData getConvertElem(int fromType, int toType)
+স্থির ConvertData getConvertElem(পূর্ণাঙ্ক fromType, পূর্ণাঙ্ক toType)
 {
-    static ConvertData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
+    স্থির ConvertData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
     {{ convertData_<uchar, uchar>, convertData_<uchar, schar>,
       convertData_<uchar, ushort>, convertData_<uchar, short>,
-      convertData_<uchar, int>, convertData_<uchar, float>,
-      convertData_<uchar, double>, 0 },
+      convertData_<uchar, পূর্ণাঙ্ক>, convertData_<uchar, ভিন্ন>,
+      convertData_<uchar, দ্বিগুণ>, 0 },
 
     { convertData_<schar, uchar>, convertData_<schar, schar>,
       convertData_<schar, ushort>, convertData_<schar, short>,
-      convertData_<schar, int>, convertData_<schar, float>,
-      convertData_<schar, double>, 0 },
+      convertData_<schar, পূর্ণাঙ্ক>, convertData_<schar, ভিন্ন>,
+      convertData_<schar, দ্বিগুণ>, 0 },
 
     { convertData_<ushort, uchar>, convertData_<ushort, schar>,
       convertData_<ushort, ushort>, convertData_<ushort, short>,
-      convertData_<ushort, int>, convertData_<ushort, float>,
-      convertData_<ushort, double>, 0 },
+      convertData_<ushort, পূর্ণাঙ্ক>, convertData_<ushort, ভিন্ন>,
+      convertData_<ushort, দ্বিগুণ>, 0 },
 
     { convertData_<short, uchar>, convertData_<short, schar>,
       convertData_<short, ushort>, convertData_<short, short>,
-      convertData_<short, int>, convertData_<short, float>,
-      convertData_<short, double>, 0 },
+      convertData_<short, পূর্ণাঙ্ক>, convertData_<short, ভিন্ন>,
+      convertData_<short, দ্বিগুণ>, 0 },
 
-    { convertData_<int, uchar>, convertData_<int, schar>,
-      convertData_<int, ushort>, convertData_<int, short>,
-      convertData_<int, int>, convertData_<int, float>,
-      convertData_<int, double>, 0 },
+    { convertData_<পূর্ণাঙ্ক, uchar>, convertData_<পূর্ণাঙ্ক, schar>,
+      convertData_<পূর্ণাঙ্ক, ushort>, convertData_<পূর্ণাঙ্ক, short>,
+      convertData_<পূর্ণাঙ্ক, পূর্ণাঙ্ক>, convertData_<পূর্ণাঙ্ক, ভিন্ন>,
+      convertData_<পূর্ণাঙ্ক, দ্বিগুণ>, 0 },
 
-    { convertData_<float, uchar>, convertData_<float, schar>,
-      convertData_<float, ushort>, convertData_<float, short>,
-      convertData_<float, int>, convertData_<float, float>,
-      convertData_<float, double>, 0 },
+    { convertData_<ভিন্ন, uchar>, convertData_<ভিন্ন, schar>,
+      convertData_<ভিন্ন, ushort>, convertData_<ভিন্ন, short>,
+      convertData_<ভিন্ন, পূর্ণাঙ্ক>, convertData_<ভিন্ন, ভিন্ন>,
+      convertData_<ভিন্ন, দ্বিগুণ>, 0 },
 
-    { convertData_<double, uchar>, convertData_<double, schar>,
-      convertData_<double, ushort>, convertData_<double, short>,
-      convertData_<double, int>, convertData_<double, float>,
-      convertData_<double, double>, 0 },
+    { convertData_<দ্বিগুণ, uchar>, convertData_<দ্বিগুণ, schar>,
+      convertData_<দ্বিগুণ, ushort>, convertData_<দ্বিগুণ, short>,
+      convertData_<দ্বিগুণ, পূর্ণাঙ্ক>, convertData_<দ্বিগুণ, ভিন্ন>,
+      convertData_<দ্বিগুণ, দ্বিগুণ>, 0 },
 
     { 0, 0, 0, 0, 0, 0, 0, 0 }};
 
     ConvertData func = tab[CV_MAT_DEPTH(fromType)][CV_MAT_DEPTH(toType)];
     CV_Assert( func != 0 );
-    return func;
+    প্রত্যাগম func;
 }
 
-static ConvertScaleData getConvertScaleElem(int fromType, int toType)
+স্থির ConvertScaleData getConvertScaleElem(পূর্ণাঙ্ক fromType, পূর্ণাঙ্ক toType)
 {
-    static ConvertScaleData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
+    স্থির ConvertScaleData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
     {{ convertScaleData_<uchar, uchar>, convertScaleData_<uchar, schar>,
       convertScaleData_<uchar, ushort>, convertScaleData_<uchar, short>,
-      convertScaleData_<uchar, int>, convertScaleData_<uchar, float>,
-      convertScaleData_<uchar, double>, 0 },
+      convertScaleData_<uchar, পূর্ণাঙ্ক>, convertScaleData_<uchar, ভিন্ন>,
+      convertScaleData_<uchar, দ্বিগুণ>, 0 },
 
     { convertScaleData_<schar, uchar>, convertScaleData_<schar, schar>,
       convertScaleData_<schar, ushort>, convertScaleData_<schar, short>,
-      convertScaleData_<schar, int>, convertScaleData_<schar, float>,
-      convertScaleData_<schar, double>, 0 },
+      convertScaleData_<schar, পূর্ণাঙ্ক>, convertScaleData_<schar, ভিন্ন>,
+      convertScaleData_<schar, দ্বিগুণ>, 0 },
 
     { convertScaleData_<ushort, uchar>, convertScaleData_<ushort, schar>,
       convertScaleData_<ushort, ushort>, convertScaleData_<ushort, short>,
-      convertScaleData_<ushort, int>, convertScaleData_<ushort, float>,
-      convertScaleData_<ushort, double>, 0 },
+      convertScaleData_<ushort, পূর্ণাঙ্ক>, convertScaleData_<ushort, ভিন্ন>,
+      convertScaleData_<ushort, দ্বিগুণ>, 0 },
 
     { convertScaleData_<short, uchar>, convertScaleData_<short, schar>,
       convertScaleData_<short, ushort>, convertScaleData_<short, short>,
-      convertScaleData_<short, int>, convertScaleData_<short, float>,
-      convertScaleData_<short, double>, 0 },
+      convertScaleData_<short, পূর্ণাঙ্ক>, convertScaleData_<short, ভিন্ন>,
+      convertScaleData_<short, দ্বিগুণ>, 0 },
 
-    { convertScaleData_<int, uchar>, convertScaleData_<int, schar>,
-      convertScaleData_<int, ushort>, convertScaleData_<int, short>,
-      convertScaleData_<int, int>, convertScaleData_<int, float>,
-      convertScaleData_<int, double>, 0 },
+    { convertScaleData_<পূর্ণাঙ্ক, uchar>, convertScaleData_<পূর্ণাঙ্ক, schar>,
+      convertScaleData_<পূর্ণাঙ্ক, ushort>, convertScaleData_<পূর্ণাঙ্ক, short>,
+      convertScaleData_<পূর্ণাঙ্ক, পূর্ণাঙ্ক>, convertScaleData_<পূর্ণাঙ্ক, ভিন্ন>,
+      convertScaleData_<পূর্ণাঙ্ক, দ্বিগুণ>, 0 },
 
-    { convertScaleData_<float, uchar>, convertScaleData_<float, schar>,
-      convertScaleData_<float, ushort>, convertScaleData_<float, short>,
-      convertScaleData_<float, int>, convertScaleData_<float, float>,
-      convertScaleData_<float, double>, 0 },
+    { convertScaleData_<ভিন্ন, uchar>, convertScaleData_<ভিন্ন, schar>,
+      convertScaleData_<ভিন্ন, ushort>, convertScaleData_<ভিন্ন, short>,
+      convertScaleData_<ভিন্ন, পূর্ণাঙ্ক>, convertScaleData_<ভিন্ন, ভিন্ন>,
+      convertScaleData_<ভিন্ন, দ্বিগুণ>, 0 },
 
-    { convertScaleData_<double, uchar>, convertScaleData_<double, schar>,
-      convertScaleData_<double, ushort>, convertScaleData_<double, short>,
-      convertScaleData_<double, int>, convertScaleData_<double, float>,
-      convertScaleData_<double, double>, 0 },
+    { convertScaleData_<দ্বিগুণ, uchar>, convertScaleData_<দ্বিগুণ, schar>,
+      convertScaleData_<দ্বিগুণ, ushort>, convertScaleData_<দ্বিগুণ, short>,
+      convertScaleData_<দ্বিগুণ, পূর্ণাঙ্ক>, convertScaleData_<দ্বিগুণ, ভিন্ন>,
+      convertScaleData_<দ্বিগুণ, দ্বিগুণ>, 0 },
 
     { 0, 0, 0, 0, 0, 0, 0, 0 }};
 
     ConvertScaleData func = tab[CV_MAT_DEPTH(fromType)][CV_MAT_DEPTH(toType)];
     CV_Assert( func != 0 );
-    return func;
+    প্রত্যাগম func;
 }
 
-enum { HASH_SIZE0 = 8 };
+গণনা { HASH_SIZE0 = 8 };
 
-static inline void copyElem(const uchar* from, uchar* to, size_t elemSize)
+স্থির অন্তঃস্থ শূন্য copyElem(ধ্রুব uchar* from, uchar* to, size_t elemSize)
 {
     size_t i;
-    for( i = 0; i + sizeof(int) <= elemSize; i += sizeof(int) )
-        *(int*)(to + i) = *(const int*)(from + i);
-    for( ; i < elemSize; i++ )
+    প্রতি( i = 0; i + পরিমাণ(পূর্ণাঙ্ক) <= elemSize; i += পরিমাণ(পূর্ণাঙ্ক) )
+        *(পূর্ণাঙ্ক*)(to + i) = *(ধ্রুব পূর্ণাঙ্ক*)(from + i);
+    প্রতি( ; i < elemSize; i++ )
         to[i] = from[i];
 }
 
-static inline bool isZeroElem(const uchar* data, size_t elemSize)
+স্থির অন্তঃস্থ তার্কিক isZeroElem(ধ্রুব uchar* data, size_t elemSize)
 {
     size_t i;
-    for( i = 0; i + sizeof(int) <= elemSize; i += sizeof(int) )
-        if( *(int*)(data + i) != 0 )
-            return false;
-    for( ; i < elemSize; i++ )
-        if( data[i] != 0 )
-            return false;
-    return true;
+    প্রতি( i = 0; i + পরিমাণ(পূর্ণাঙ্ক) <= elemSize; i += পরিমাণ(পূর্ণাঙ্ক) )
+        যদি( *(পূর্ণাঙ্ক*)(data + i) != 0 )
+            প্রত্যাগম অসত্য;
+    প্রতি( ; i < elemSize; i++ )
+        যদি( data[i] != 0 )
+            প্রত্যাগম অসত্য;
+    প্রত্যাগম সত্য;
 }
 
-SparseMat::Hdr::Hdr( int _dims, const int* _sizes, int _type )
+SparseMat::Hdr::Hdr( পূর্ণাঙ্ক _dims, ধ্রুব পূর্ণাঙ্ক* _sizes, পূর্ণাঙ্ক _type )
 {
     refcount = 1;
 
     dims = _dims;
-    valueOffset = (int)alignSize(sizeof(SparseMat::Node) - MAX_DIM*sizeof(int) +
-                                 dims*sizeof(int), CV_ELEM_SIZE1(_type));
-    nodeSize = alignSize(valueOffset +
-        CV_ELEM_SIZE(_type), (int)sizeof(size_t));
+    মান_Offset = (পূর্ণাঙ্ক)alignSize(পরিমাণ(SparseMat::Node) - MAX_DIM*পরিমাণ(পূর্ণাঙ্ক) +
+                                 dims*পরিমাণ(পূর্ণাঙ্ক), CV_ELEM_SIZE1(_type));
+    গ্রন্থি_Size = alignSize(মান_Offset +
+        CV_ELEM_SIZE(_type), (পূর্ণাঙ্ক)পরিমাণ(size_t));
 
-    int i;
-    for( i = 0; i < dims; i++ )
+    পূর্ণাঙ্ক i;
+    প্রতি( i = 0; i < dims; i++ )
         size[i] = _sizes[i];
-    for( ; i < CV_MAX_DIM; i++ )
+    প্রতি( ; i < CV_MAX_DIM; i++ )
         size[i] = 0;
     clear();
 }
 
-void SparseMat::Hdr::clear()
+শূন্য SparseMat::Hdr::clear()
 {
     hashtab.clear();
     hashtab.resize(HASH_SIZE0);
     pool.clear();
-#if defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
+#যদি defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
 #endif
-    pool.resize(nodeSize);
-#if defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
+    pool.resize(গ্রন্থি_Size);
+#যদি defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
 #pragma GCC diagnostic pop
 #endif
-    nodeCount = freeList = 0;
+    গ্রন্থি_গুনতি = freeList = 0;
 }
 
 ///////////////////////////// SparseMat /////////////////////////////
@@ -187,13 +187,13 @@ SparseMat::SparseMat()
     : flags(MAGIC_VAL), hdr(0)
 {}
 
-SparseMat::SparseMat(int _dims, const int* _sizes, int _type)
+SparseMat::SparseMat(পূর্ণাঙ্ক _dims, ধ্রুব পূর্ণাঙ্ক* _sizes, পূর্ণাঙ্ক _type)
     : flags(MAGIC_VAL), hdr(0)
 {
     create(_dims, _sizes, _type);
 }
 
-SparseMat::SparseMat(const SparseMat& m)
+SparseMat::SparseMat(ধ্রুব SparseMat& m)
     : flags(m.flags), hdr(m.hdr)
 {
     addref();
@@ -204,223 +204,223 @@ SparseMat::~SparseMat()
     release();
 }
 
-SparseMat& SparseMat::operator = (const SparseMat& m)
+SparseMat& SparseMat::operator = (ধ্রুব SparseMat& m)
 {
-    if( this != &m )
+    যদি( এতত্ != &m )
     {
-        if( m.hdr )
+        যদি( m.hdr )
             CV_XADD(&m.hdr->refcount, 1);
         release();
         flags = m.flags;
         hdr = m.hdr;
     }
-    return *this;
+    প্রত্যাগম *এতত্;
 }
 
-SparseMat& SparseMat::operator=(const Mat& m)
+SparseMat& SparseMat::operator=(ধ্রুব Mat& m)
 {
-    return (*this = SparseMat(m));
+    প্রত্যাগম (*এতত্ = SparseMat(m));
 }
 
-void SparseMat::assignTo(SparseMat& m, int _type) const
+শূন্য SparseMat::assignTo(SparseMat& m, পূর্ণাঙ্ক _type) ধ্রুব
 {
-    if( _type < 0 )
-        m = *this;
-    else
+    যদি( _type < 0 )
+        m = *এতত্;
+    অন্যথা
         convertTo(m, _type);
 }
 
-void SparseMat::addref()
+শূন্য SparseMat::addref()
 {
-    if( hdr )
+    যদি( hdr )
         CV_XADD(&hdr->refcount, 1);
 }
 
-void SparseMat::release()
+শূন্য SparseMat::release()
 {
-    if( hdr && CV_XADD(&hdr->refcount, -1) == 1 )
+    যদি( hdr && CV_XADD(&hdr->refcount, -1) == 1 )
         delete hdr;
     hdr = 0;
 }
 
-size_t SparseMat::hash(int i0) const
+size_t SparseMat::hash(পূর্ণাঙ্ক i0) ধ্রুব
 {
-    return (size_t)i0;
+    প্রত্যাগম (size_t)i0;
 }
 
-size_t SparseMat::hash(int i0, int i1) const
+size_t SparseMat::hash(পূর্ণাঙ্ক i0, পূর্ণাঙ্ক i1) ধ্রুব
 {
-    return (size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1;
+    প্রত্যাগম (size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1;
 }
 
-size_t SparseMat::hash(int i0, int i1, int i2) const
+size_t SparseMat::hash(পূর্ণাঙ্ক i0, পূর্ণাঙ্ক i1, পূর্ণাঙ্ক i2) ধ্রুব
 {
-    return ((size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1) * HASH_SCALE + (unsigned)i2;
+    প্রত্যাগম ((size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1) * HASH_SCALE + (unsigned)i2;
 }
 
-size_t SparseMat::hash(const int* idx) const
+size_t SparseMat::hash(ধ্রুব পূর্ণাঙ্ক* idx) ধ্রুব
 {
     size_t h = (unsigned)idx[0];
-    if( !hdr )
-        return 0;
-    int d = hdr->dims;
-    for(int i = 1; i < d; i++ )
+    যদি( !hdr )
+        প্রত্যাগম 0;
+    পূর্ণাঙ্ক d = hdr->dims;
+    প্রতি(পূর্ণাঙ্ক i = 1; i < d; i++ )
         h = h * HASH_SCALE + (unsigned)idx[i];
-    return h;
+    প্রত্যাগম h;
 }
 
 
-SparseMat::SparseMat(const Mat& m)
+SparseMat::SparseMat(ধ্রুব Mat& m)
 : flags(MAGIC_VAL), hdr(0)
 {
     create( m.dims, m.size.p, m.type() );
 
-    int i, idx[CV_MAX_DIM] = {0}, d = m.dims, lastSize = m.size[d - 1];
+    পূর্ণাঙ্ক i, idx[CV_MAX_DIM] = {0}, d = m.dims, lastSize = m.size[d - 1];
     size_t esz = m.elemSize();
-    const uchar* dptr = m.ptr();
+    ধ্রুব uchar* dptr = m.ptr();
 
-    for(;;)
+    প্রতি(;;)
     {
-        for( i = 0; i < lastSize; i++, dptr += esz )
+        প্রতি( i = 0; i < lastSize; i++, dptr += esz )
         {
-            if( isZeroElem(dptr, esz) )
-                continue;
+            যদি( isZeroElem(dptr, esz) )
+                অনুবর্ত;
             idx[d-1] = i;
-            uchar* to = newNode(idx, hash(idx));
+            uchar* to = new_গ্রন্থি(idx, hash(idx));
             copyElem( dptr, to, esz );
         }
 
-        for( i = d - 2; i >= 0; i-- )
+        প্রতি( i = d - 2; i >= 0; i-- )
         {
             dptr += m.step[i] - m.size[i+1]*m.step[i+1];
-            if( ++idx[i] < m.size[i] )
-                break;
+            যদি( ++idx[i] < m.size[i] )
+                ভঙ্গ;
             idx[i] = 0;
         }
-        if( i < 0 )
-            break;
+        যদি( i < 0 )
+            ভঙ্গ;
     }
 }
 
-void SparseMat::create(int d, const int* _sizes, int _type)
+শূন্য SparseMat::create(পূর্ণাঙ্ক d, ধ্রুব পূর্ণাঙ্ক* _sizes, পূর্ণাঙ্ক _type)
 {
     CV_Assert( _sizes && 0 < d && d <= CV_MAX_DIM );
-    for( int i = 0; i < d; i++ )
+    প্রতি( পূর্ণাঙ্ক i = 0; i < d; i++ )
         CV_Assert( _sizes[i] > 0 );
     _type = CV_MAT_TYPE(_type);
-    if( hdr && _type == type() && hdr->dims == d && hdr->refcount == 1 )
+    যদি( hdr && _type == type() && hdr->dims == d && hdr->refcount == 1 )
     {
-        int i;
-        for( i = 0; i < d; i++ )
-            if( _sizes[i] != hdr->size[i] )
-                break;
-        if( i == d )
+        পূর্ণাঙ্ক i;
+        প্রতি( i = 0; i < d; i++ )
+            যদি( _sizes[i] != hdr->size[i] )
+                ভঙ্গ;
+        যদি( i == d )
         {
             clear();
-            return;
+            প্রত্যাগম;
         }
     }
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (hdr && _sizes == hdr->size)
+    পূর্ণাঙ্ক _sizes_backup[CV_MAX_DIM]; // #5991
+    যদি (hdr && _sizes == hdr->size)
     {
-        for(int i = 0; i < d; i++ )
+        প্রতি(পূর্ণাঙ্ক i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
     release();
     flags = MAGIC_VAL | _type;
-    hdr = new Hdr(d, _sizes, _type);
+    hdr = নূতন Hdr(d, _sizes, _type);
 }
 
-void SparseMat::copyTo( SparseMat& m ) const
+শূন্য SparseMat::copyTo( SparseMat& m ) ধ্রুব
 {
-    if( hdr == m.hdr )
-        return;
-    if( !hdr )
+    যদি( hdr == m.hdr )
+        প্রত্যাগম;
+    যদি( !hdr )
     {
         m.release();
-        return;
+        প্রত্যাগম;
     }
     m.create( hdr->dims, hdr->size, type() );
     SparseMatConstIterator from = begin();
     size_t N = nzcount(), esz = elemSize();
 
-    for( size_t i = 0; i < N; i++, ++from )
+    প্রতি( size_t i = 0; i < N; i++, ++from )
     {
-        const Node* n = from.node();
-        uchar* to = m.newNode(n->idx, n->hashval);
+        ধ্রুব Node* n = from.গ্রন্থি();
+        uchar* to = m.new_গ্রন্থি(n->idx, n->hashval);
         copyElem( from.ptr, to, esz );
     }
 }
 
-void SparseMat::copyTo( Mat& m ) const
+শূন্য SparseMat::copyTo( Mat& m ) ধ্রুব
 {
     CV_Assert( hdr );
-    int ndims = dims();
+    পূর্ণাঙ্ক ndims = dims();
     m.create( ndims, hdr->size, type() );
     m = Scalar(0);
 
     SparseMatConstIterator from = begin();
     size_t N = nzcount(), esz = elemSize();
 
-    for( size_t i = 0; i < N; i++, ++from )
+    প্রতি( size_t i = 0; i < N; i++, ++from )
     {
-        const Node* n = from.node();
+        ধ্রুব Node* n = from.গ্রন্থি();
         copyElem( from.ptr, (ndims > 1 ? m.ptr(n->idx) : m.ptr(n->idx[0])), esz);
     }
 }
 
 
-void SparseMat::convertTo( SparseMat& m, int rtype, double alpha ) const
+শূন্য SparseMat::convertTo( SparseMat& m, পূর্ণাঙ্ক rtype, দ্বিগুণ alpha ) ধ্রুব
 {
-    int cn = channels();
-    if( rtype < 0 )
+    পূর্ণাঙ্ক cn = channels();
+    যদি( rtype < 0 )
         rtype = type();
     rtype = CV_MAKETYPE(rtype, cn);
-    if( hdr == m.hdr && rtype != type()  )
+    যদি( hdr == m.hdr && rtype != type()  )
     {
         SparseMat temp;
         convertTo(temp, rtype, alpha);
         m = temp;
-        return;
+        প্রত্যাগম;
     }
 
     CV_Assert(hdr != 0);
-    if( hdr != m.hdr )
+    যদি( hdr != m.hdr )
         m.create( hdr->dims, hdr->size, rtype );
 
     SparseMatConstIterator from = begin();
     size_t N = nzcount();
 
-    if( alpha == 1 )
+    যদি( alpha == 1 )
     {
         ConvertData cvtfunc = getConvertElem(type(), rtype);
         CV_Assert(cvtfunc);
-        for( size_t i = 0; i < N; i++, ++from )
+        প্রতি( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
-            uchar* to = hdr == m.hdr ? from.ptr : m.newNode(n->idx, n->hashval);
+            ধ্রুব Node* n = from.গ্রন্থি();
+            uchar* to = hdr == m.hdr ? from.ptr : m.new_গ্রন্থি(n->idx, n->hashval);
             cvtfunc( from.ptr, to, cn );
         }
     }
-    else
+    অন্যথা
     {
         ConvertScaleData cvtfunc = getConvertScaleElem(type(), rtype);
         CV_Assert(cvtfunc);
-        for( size_t i = 0; i < N; i++, ++from )
+        প্রতি( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
-            uchar* to = hdr == m.hdr ? from.ptr : m.newNode(n->idx, n->hashval);
+            ধ্রুব Node* n = from.গ্রন্থি();
+            uchar* to = hdr == m.hdr ? from.ptr : m.new_গ্রন্থি(n->idx, n->hashval);
             cvtfunc( from.ptr, to, cn, alpha, 0 );
         }
     }
 }
 
 
-void SparseMat::convertTo( Mat& m, int rtype, double alpha, double beta ) const
+শূন্য SparseMat::convertTo( Mat& m, পূর্ণাঙ্ক rtype, দ্বিগুণ alpha, দ্বিগুণ beta ) ধ্রুব
 {
-    int cn = channels();
-    if( rtype < 0 )
+    পূর্ণাঙ্ক cn = channels();
+    যদি( rtype < 0 )
         rtype = type();
     rtype = CV_MAKETYPE(rtype, cn);
 
@@ -431,206 +431,206 @@ void SparseMat::convertTo( Mat& m, int rtype, double alpha, double beta ) const
     SparseMatConstIterator from = begin();
     size_t N = nzcount();
 
-    if( alpha == 1 && beta == 0 )
+    যদি( alpha == 1 && beta == 0 )
     {
         ConvertData cvtfunc = getConvertElem(type(), rtype);
-        for( size_t i = 0; i < N; i++, ++from )
+        প্রতি( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
+            ধ্রুব Node* n = from.গ্রন্থি();
             uchar* to = m.ptr(n->idx);
             cvtfunc( from.ptr, to, cn );
         }
     }
-    else
+    অন্যথা
     {
         ConvertScaleData cvtfunc = getConvertScaleElem(type(), rtype);
-        for( size_t i = 0; i < N; i++, ++from )
+        প্রতি( size_t i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
+            ধ্রুব Node* n = from.গ্রন্থি();
             uchar* to = m.ptr(n->idx);
             cvtfunc( from.ptr, to, cn, alpha, beta );
         }
     }
 }
 
-void SparseMat::clear()
+শূন্য SparseMat::clear()
 {
-    if( hdr )
+    যদি( hdr )
         hdr->clear();
 }
 
-uchar* SparseMat::ptr(int i0, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(পূর্ণাঙ্ক i0, তার্কিক createMissing, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 1 );
     size_t h = hashval ? *hashval : hash(i0);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    যাবত্( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 )
-            return &value<uchar>(elem);
+        যদি( elem->hashval == h && elem->idx[0] == i0 )
+            প্রত্যাগম &value<uchar>(elem);
         nidx = elem->next;
     }
 
-    if( createMissing )
+    যদি( createMissing )
     {
-        int idx[] = { i0 };
-        return newNode( idx, h );
+        পূর্ণাঙ্ক idx[] = { i0 };
+        প্রত্যাগম new_গ্রন্থি( idx, h );
     }
-    return NULL;
+    প্রত্যাগম রিক্ত;
 }
 
-uchar* SparseMat::ptr(int i0, int i1, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(পূর্ণাঙ্ক i0, পূর্ণাঙ্ক i1, তার্কিক createMissing, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 2 );
     size_t h = hashval ? *hashval : hash(i0, i1);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    যাবত্( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
-            return &value<uchar>(elem);
+        যদি( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
+            প্রত্যাগম &value<uchar>(elem);
         nidx = elem->next;
     }
 
-    if( createMissing )
+    যদি( createMissing )
     {
-        int idx[] = { i0, i1 };
-        return newNode( idx, h );
+        পূর্ণাঙ্ক idx[] = { i0, i1 };
+        প্রত্যাগম new_গ্রন্থি( idx, h );
     }
-    return NULL;
+    প্রত্যাগম রিক্ত;
 }
 
-uchar* SparseMat::ptr(int i0, int i1, int i2, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(পূর্ণাঙ্ক i0, পূর্ণাঙ্ক i1, পূর্ণাঙ্ক i2, তার্কিক createMissing, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 3 );
     size_t h = hashval ? *hashval : hash(i0, i1, i2);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    যাবত্( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 &&
+        যদি( elem->hashval == h && elem->idx[0] == i0 &&
             elem->idx[1] == i1 && elem->idx[2] == i2 )
-            return &value<uchar>(elem);
+            প্রত্যাগম &value<uchar>(elem);
         nidx = elem->next;
     }
 
-    if( createMissing )
+    যদি( createMissing )
     {
-        int idx[] = { i0, i1, i2 };
-        return newNode( idx, h );
+        পূর্ণাঙ্ক idx[] = { i0, i1, i2 };
+        প্রত্যাগম new_গ্রন্থি( idx, h );
     }
-    return NULL;
+    প্রত্যাগম রিক্ত;
 }
 
-uchar* SparseMat::ptr(const int* idx, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(ধ্রুব পূর্ণাঙ্ক* idx, তার্কিক createMissing, size_t* hashval)
 {
     CV_Assert( hdr );
-    int i, d = hdr->dims;
+    পূর্ণাঙ্ক i, d = hdr->dims;
     size_t h = hashval ? *hashval : hash(idx);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    যাবত্( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h )
+        যদি( elem->hashval == h )
         {
-            for( i = 0; i < d; i++ )
-                if( elem->idx[i] != idx[i] )
-                    break;
-            if( i == d )
-                return &value<uchar>(elem);
+            প্রতি( i = 0; i < d; i++ )
+                যদি( elem->idx[i] != idx[i] )
+                    ভঙ্গ;
+            যদি( i == d )
+                প্রত্যাগম &value<uchar>(elem);
         }
         nidx = elem->next;
     }
 
-    return createMissing ? newNode(idx, h) : NULL;
+    প্রত্যাগম createMissing ? new_গ্রন্থি(idx, h) : রিক্ত;
 }
 
-void SparseMat::erase(int i0, int i1, size_t* hashval)
+শূন্য SparseMat::erase(পূর্ণাঙ্ক i0, পূর্ণাঙ্ক i1, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 2 );
     size_t h = hashval ? *hashval : hash(i0, i1);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    যাবত্( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
-            break;
+        যদি( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
+            ভঙ্গ;
         previdx = nidx;
         nidx = elem->next;
     }
 
-    if( nidx )
-        removeNode(hidx, nidx, previdx);
+    যদি( nidx )
+        remove_গ্রন্থি(hidx, nidx, previdx);
 }
 
-void SparseMat::erase(int i0, int i1, int i2, size_t* hashval)
+শূন্য SparseMat::erase(পূর্ণাঙ্ক i0, পূর্ণাঙ্ক i1, পূর্ণাঙ্ক i2, size_t* hashval)
 {
     CV_Assert( hdr && hdr->dims == 3 );
     size_t h = hashval ? *hashval : hash(i0, i1, i2);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    যাবত্( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 &&
+        যদি( elem->hashval == h && elem->idx[0] == i0 &&
             elem->idx[1] == i1 && elem->idx[2] == i2 )
-            break;
+            ভঙ্গ;
         previdx = nidx;
         nidx = elem->next;
     }
 
-    if( nidx )
-        removeNode(hidx, nidx, previdx);
+    যদি( nidx )
+        remove_গ্রন্থি(hidx, nidx, previdx);
 }
 
-void SparseMat::erase(const int* idx, size_t* hashval)
+শূন্য SparseMat::erase(ধ্রুব পূর্ণাঙ্ক* idx, size_t* hashval)
 {
     CV_Assert( hdr );
-    int i, d = hdr->dims;
+    পূর্ণাঙ্ক i, d = hdr->dims;
     size_t h = hashval ? *hashval : hash(idx);
     size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    যাবত্( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h )
+        যদি( elem->hashval == h )
         {
-            for( i = 0; i < d; i++ )
-                if( elem->idx[i] != idx[i] )
-                    break;
-            if( i == d )
-                break;
+            প্রতি( i = 0; i < d; i++ )
+                যদি( elem->idx[i] != idx[i] )
+                    ভঙ্গ;
+            যদি( i == d )
+                ভঙ্গ;
         }
         previdx = nidx;
         nidx = elem->next;
     }
 
-    if( nidx )
-        removeNode(hidx, nidx, previdx);
+    যদি( nidx )
+        remove_গ্রন্থি(hidx, nidx, previdx);
 }
 
-void SparseMat::resizeHashTab(size_t newsize)
+শূন্য SparseMat::resizeHashTab(size_t newsize)
 {
     newsize = std::max(newsize, (size_t)8);
-    if((newsize & (newsize-1)) != 0)
-        newsize = (size_t)1 << cvCeil(std::log((double)newsize)/CV_LOG2);
+    যদি((newsize & (newsize-1)) != 0)
+        newsize = (size_t)1 << cvCeil(std::log((দ্বিগুণ)newsize)/CV_LOG2);
 
     size_t hsize = hdr->hashtab.size();
     std::vector<size_t> _newh(newsize);
     size_t* newh = &_newh[0];
-    for( size_t i = 0; i < newsize; i++ )
+    প্রতি( size_t i = 0; i < newsize; i++ )
         newh[i] = 0;
     uchar* pool = &hdr->pool[0];
-    for( size_t i = 0; i < hsize; i++ )
+    প্রতি( size_t i = 0; i < hsize; i++ )
     {
         size_t nidx = hdr->hashtab[i];
-        while( nidx )
+        যাবত্( nidx )
         {
             Node* elem = (Node*)(pool + nidx);
             size_t next = elem->next;
@@ -643,26 +643,26 @@ void SparseMat::resizeHashTab(size_t newsize)
     hdr->hashtab = _newh;
 }
 
-uchar* SparseMat::newNode(const int* idx, size_t hashval)
+uchar* SparseMat::new_গ্রন্থি(ধ্রুব পূর্ণাঙ্ক* idx, size_t hashval)
 {
-    const int HASH_MAX_FILL_FACTOR=3;
+    ধ্রুব পূর্ণাঙ্ক HASH_MAX_FILL_FACTOR=3;
     CV_Assert(hdr);
     size_t hsize = hdr->hashtab.size();
-    if( ++hdr->nodeCount > hsize*HASH_MAX_FILL_FACTOR )
+    যদি( ++hdr->গ্রন্থি_গুনতি > hsize*HASH_MAX_FILL_FACTOR )
     {
         resizeHashTab(std::max(hsize*2, (size_t)8));
         hsize = hdr->hashtab.size();
     }
 
-    if( !hdr->freeList )
+    যদি( !hdr->freeList )
     {
-        size_t i, nsz = hdr->nodeSize, psize = hdr->pool.size(),
+        size_t i, nsz = hdr->গ্রন্থি_Size, psize = hdr->pool.size(),
             newpsize = std::max(psize*3/2, 8*nsz);
         newpsize = (newpsize/nsz)*nsz;
         hdr->pool.resize(newpsize);
         uchar* pool = &hdr->pool[0];
         hdr->freeList = std::max(psize, nsz);
-        for( i = hdr->freeList; i < newpsize - nsz; i += nsz )
+        প্রতি( i = hdr->freeList; i < newpsize - nsz; i += nsz )
             ((Node*)(pool + i))->next = i + nsz;
         ((Node*)(pool + i))->next = 0;
     }
@@ -674,41 +674,41 @@ uchar* SparseMat::newNode(const int* idx, size_t hashval)
     elem->next = hdr->hashtab[hidx];
     hdr->hashtab[hidx] = nidx;
 
-    int i, d = hdr->dims;
-    for( i = 0; i < d; i++ )
+    পূর্ণাঙ্ক i, d = hdr->dims;
+    প্রতি( i = 0; i < d; i++ )
         elem->idx[i] = idx[i];
     size_t esz = elemSize();
     uchar* p = &value<uchar>(elem);
-    if( esz == sizeof(float) )
-        *((float*)p) = 0.f;
-    else if( esz == sizeof(double) )
-        *((double*)p) = 0.;
-    else
+    যদি( esz == পরিমাণ(ভিন্ন) )
+        *((ভিন্ন*)p) = 0.f;
+    অন্যথা যদি( esz == পরিমাণ(দ্বিগুণ) )
+        *((দ্বিগুণ*)p) = 0.;
+    অন্যথা
         memset(p, 0, esz);
 
-    return p;
+    প্রত্যাগম p;
 }
 
 
-void SparseMat::removeNode(size_t hidx, size_t nidx, size_t previdx)
+শূন্য SparseMat::remove_গ্রন্থি(size_t hidx, size_t nidx, size_t previdx)
 {
-    Node* n = node(nidx);
-    if( previdx )
+    Node* n = গ্রন্থি(nidx);
+    যদি( previdx )
     {
-        Node* prev = node(previdx);
+        Node* prev = গ্রন্থি(previdx);
         prev->next = n->next;
     }
-    else
+    অন্যথা
         hdr->hashtab[hidx] = n->next;
     n->next = hdr->freeList;
     hdr->freeList = nidx;
-    --hdr->nodeCount;
+    --hdr->গ্রন্থি_গুনতি;
 }
 
 //
 // Operations
 //
-double norm( const SparseMat& src, int normType )
+দ্বিগুণ norm( ধ্রুব SparseMat& src, পূর্ণাঙ্ক normType )
 {
     CV_INSTRUMENT_REGION();
 
@@ -716,141 +716,141 @@ double norm( const SparseMat& src, int normType )
 
     size_t i, N = src.nzcount();
     normType &= NORM_TYPE_MASK;
-    int type = src.type();
-    double result = 0;
+    পূর্ণাঙ্ক type = src.type();
+    দ্বিগুণ result = 0;
 
     CV_Assert( normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 );
 
-    if( type == CV_32F )
+    যদি( type == CV_32F )
     {
-        if( normType == NORM_INF )
-            for( i = 0; i < N; i++, ++it )
+        যদি( normType == NORM_INF )
+            প্রতি( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result = std::max(result, std::abs((double)it.value<float>()));
+                result = std::max(result, std::abs((দ্বিগুণ)it.value<ভিন্ন>()));
             }
-        else if( normType == NORM_L1 )
-            for( i = 0; i < N; i++, ++it )
+        অন্যথা যদি( normType == NORM_L1 )
+            প্রতি( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result += std::abs(it.value<float>());
+                result += std::abs(it.value<ভিন্ন>());
             }
-        else
-            for( i = 0; i < N; i++, ++it )
+        অন্যথা
+            প্রতি( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                double v = it.value<float>();
+                দ্বিগুণ v = it.value<ভিন্ন>();
                 result += v*v;
             }
     }
-    else if( type == CV_64F )
+    অন্যথা যদি( type == CV_64F )
     {
-        if( normType == NORM_INF )
-            for( i = 0; i < N; i++, ++it )
+        যদি( normType == NORM_INF )
+            প্রতি( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result = std::max(result, std::abs(it.value<double>()));
+                result = std::max(result, std::abs(it.value<দ্বিগুণ>()));
             }
-        else if( normType == NORM_L1 )
-            for( i = 0; i < N; i++, ++it )
+        অন্যথা যদি( normType == NORM_L1 )
+            প্রতি( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result += std::abs(it.value<double>());
+                result += std::abs(it.value<দ্বিগুণ>());
             }
-        else
-            for( i = 0; i < N; i++, ++it )
+        অন্যথা
+            প্রতি( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                double v = it.value<double>();
+                দ্বিগুণ v = it.value<দ্বিগুণ>();
                 result += v*v;
             }
     }
-    else
+    অন্যথা
         CV_Error( cv::Error::StsUnsupportedFormat, "Only 32f and 64f are supported" );
 
-    if( normType == NORM_L2 )
+    যদি( normType == NORM_L2 )
         result = std::sqrt(result);
-    return result;
+    প্রত্যাগম result;
 }
 
-void minMaxLoc( const SparseMat& src, double* _minval, double* _maxval, int* _minidx, int* _maxidx )
+শূন্য minMaxLoc( ধ্রুব SparseMat& src, দ্বিগুণ* _minval, দ্বিগুণ* _maxval, পূর্ণাঙ্ক* _minidx, পূর্ণাঙ্ক* _maxidx )
 {
     CV_INSTRUMENT_REGION();
 
     SparseMatConstIterator it = src.begin();
     size_t i, N = src.nzcount(), d = src.hdr ? src.hdr->dims : 0;
-    int type = src.type();
-    const int *minidx = 0, *maxidx = 0;
+    পূর্ণাঙ্ক type = src.type();
+    ধ্রুব পূর্ণাঙ্ক *minidx = 0, *maxidx = 0;
 
-    if( type == CV_32F )
+    যদি( type == CV_32F )
     {
-        float minval = FLT_MAX, maxval = -FLT_MAX;
-        for( i = 0; i < N; i++, ++it )
+        ভিন্ন minval = FLT_MAX, maxval = -FLT_MAX;
+        প্রতি( i = 0; i < N; i++, ++it )
         {
             CV_Assert(it.ptr);
-            float v = it.value<float>();
-            if( v < minval )
+            ভিন্ন v = it.value<ভিন্ন>();
+            যদি( v < minval )
             {
                 minval = v;
-                minidx = it.node()->idx;
+                minidx = it.গ্রন্থি()->idx;
             }
-            if( v > maxval )
+            যদি( v > maxval )
             {
                 maxval = v;
-                maxidx = it.node()->idx;
+                maxidx = it.গ্রন্থি()->idx;
             }
         }
-        if( _minval )
+        যদি( _minval )
             *_minval = minval;
-        if( _maxval )
+        যদি( _maxval )
             *_maxval = maxval;
     }
-    else if( type == CV_64F )
+    অন্যথা যদি( type == CV_64F )
     {
-        double minval = DBL_MAX, maxval = -DBL_MAX;
-        for( i = 0; i < N; i++, ++it )
+        দ্বিগুণ minval = DBL_MAX, maxval = -DBL_MAX;
+        প্রতি( i = 0; i < N; i++, ++it )
         {
             CV_Assert(it.ptr);
-            double v = it.value<double>();
-            if( v < minval )
+            দ্বিগুণ v = it.value<দ্বিগুণ>();
+            যদি( v < minval )
             {
                 minval = v;
-                minidx = it.node()->idx;
+                minidx = it.গ্রন্থি()->idx;
             }
-            if( v > maxval )
+            যদি( v > maxval )
             {
                 maxval = v;
-                maxidx = it.node()->idx;
+                maxidx = it.গ্রন্থি()->idx;
             }
         }
-        if( _minval )
+        যদি( _minval )
             *_minval = minval;
-        if( _maxval )
+        যদি( _maxval )
             *_maxval = maxval;
     }
-    else
+    অন্যথা
         CV_Error( cv::Error::StsUnsupportedFormat, "Only 32f and 64f are supported" );
 
-    if( _minidx && minidx )
-        for( i = 0; i < d; i++ )
+    যদি( _minidx && minidx )
+        প্রতি( i = 0; i < d; i++ )
             _minidx[i] = minidx[i];
-    if( _maxidx && maxidx )
-        for( i = 0; i < d; i++ )
+    যদি( _maxidx && maxidx )
+        প্রতি( i = 0; i < d; i++ )
             _maxidx[i] = maxidx[i];
 }
 
 
-void normalize( const SparseMat& src, SparseMat& dst, double a, int norm_type )
+শূন্য normalize( ধ্রুব SparseMat& src, SparseMat& dst, দ্বিগুণ a, পূর্ণাঙ্ক norm_type )
 {
     CV_INSTRUMENT_REGION();
 
-    double scale = 1;
-    if( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
+    দ্বিগুণ scale = 1;
+    যদি( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
     {
         scale = norm( src, norm_type );
         scale = scale > DBL_EPSILON ? a/scale : 0.;
     }
-    else
+    অন্যথা
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported norm type" );
 
     src.convertTo( dst, -1, scale );

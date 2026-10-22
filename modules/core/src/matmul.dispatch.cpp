@@ -41,18 +41,18 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব <opencv2/core/utils/logger.hpp>
 
-#include "opencl_kernels_core.hpp"
-#include "opencv2/core/opencl/runtime/opencl_clblas.hpp"
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
-#include "intel_gpu_gemm.inl.hpp"
+#অন্তর্ভাব "opencl_kernels_core.hpp"
+#অন্তর্ভাব "opencv2/core/opencl/runtime/opencl_clblas.hpp"
+#অন্তর্ভাব "opencv2/core/opencl/runtime/opencl_core.hpp"
+#অন্তর্ভাব "intel_gpu_gemm.inl.hpp"
 
-#include "matmul.simd.hpp"
-#include "matmul.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#অন্তর্ভাব "matmul.simd.hpp"
+#অন্তর্ভাব "matmul.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv
+নামাকাশ cv
 {
 
 /****************************************************************************************\
@@ -61,19 +61,19 @@ namespace cv
 
 #ifdef HAVE_CLAMDBLAS
 
-static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
-                      InputArray matC, double beta, OutputArray matD, int flags )
+স্থির তার্কিক ocl_gemm_amdblas( প্রবেশ_Array matA, প্রবেশ_Array matB, দ্বিগুণ alpha,
+                      প্রবেশ_Array matC, দ্বিগুণ beta, OutputArray matD, পূর্ণাঙ্ক flags )
 {
-    int type = matA.type(), esz = CV_ELEM_SIZE(type);
-    bool haveC = matC.kind() != cv::_InputArray::NONE;
+    পূর্ণাঙ্ক type = matA.type(), esz = CV_ELEM_SIZE(type);
+    তার্কিক haveC = matC.kind() != cv::প্রবেশ_Array_2::NONE;
     Size sizeA = matA.size(), sizeB = matB.size(), sizeC = haveC ? matC.size() : Size(0, 0);
-    bool atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
+    তার্কিক atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
 
-    if (atrans)
+    যদি (atrans)
         sizeA = Size(sizeA.height, sizeA.width);
-    if (btrans)
+    যদি (btrans)
         sizeB = Size(sizeB.height, sizeB.width);
-    if (haveC && ctrans)
+    যদি (haveC && ctrans)
         sizeC = Size(sizeC.height, sizeC.width);
 
     Size sizeD(sizeB.width, sizeA.height);
@@ -82,30 +82,30 @@ static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
     CV_Assert( sizeA.width == sizeB.height && (!haveC || sizeC == sizeD) );
 
     matD.create(sizeD, type);
-    if ( matA.offset() % esz != 0 || matA.step() % esz != 0 ||
+    যদি ( matA.offset() % esz != 0 || matA.step() % esz != 0 ||
          matB.offset() % esz != 0 || matB.step() % esz != 0 ||
          (haveC && (matC.offset() % esz != 0 || matC.step() % esz != 0)) )
-        return false;
+        প্রত্যাগম অসত্য;
 
     UMat A = matA.getUMat(), B = matB.getUMat(), D = matD.getUMat();
-    if (!ocl::internal::isCLBuffer(A) || !ocl::internal::isCLBuffer(B) || !ocl::internal::isCLBuffer(D))
+    যদি (!ocl::internal::isCLBuffer(A) || !ocl::internal::isCLBuffer(B) || !ocl::internal::isCLBuffer(D))
     {
-        return false;
+        প্রত্যাগম অসত্য;
     }
-    if (haveC)
+    যদি (haveC)
     {
         UMat C = matC.getUMat();
-        if (!ocl::internal::isCLBuffer(C))
-            return false;
+        যদি (!ocl::internal::isCLBuffer(C))
+            প্রত্যাগম অসত্য;
     }
-    if (haveC)
+    যদি (haveC)
         ctrans ? transpose(matC, D) : matC.copyTo(D);
-    else
+    অন্যথা
         D.setTo(Scalar::all(0));
 
-    int M = sizeD.height, N = sizeD.width, K = sizeA.width;
-    int lda = (int)A.step / esz, ldb = (int)B.step / esz, ldc = (int)D.step / esz;
-    int offa = (int)A.offset / esz, offb = (int)B.offset / esz, offc = (int)D.offset / esz;
+    পূর্ণাঙ্ক M = sizeD.height, N = sizeD.width, K = sizeA.width;
+    পূর্ণাঙ্ক lda = (পূর্ণাঙ্ক)A.step / esz, ldb = (পূর্ণাঙ্ক)B.step / esz, ldc = (পূর্ণাঙ্ক)D.step / esz;
+    পূর্ণাঙ্ক offa = (পূর্ণাঙ্ক)A.offset / esz, offb = (পূর্ণাঙ্ক)B.offset / esz, offc = (পূর্ণাঙ্ক)D.offset / esz;
 
     cl_command_queue clq = (cl_command_queue)ocl::Queue::getDefault().ptr();
     clblasTranspose transA = atrans ? clblasTrans : clblasNoTrans;
@@ -113,82 +113,82 @@ static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
     clblasOrder order = clblasRowMajor;
     clblasStatus status = clblasSuccess;
 
-    if (type == CV_32FC1)
+    যদি (type == CV_32FC1)
         status = clblasSgemm(order, transA, transB, M, N, K,
-                             (cl_float)alpha, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
-                             (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
+                             (cl_float)alpha, (ধ্রুব cl_mem)A.handle(ACCESS_READ), offa, lda,
+                             (ধ্রুব cl_mem)B.handle(ACCESS_READ), offb, ldb,
                              (cl_float)beta, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
-                             1, &clq, 0, NULL, NULL);
-    else if (type == CV_64FC1)
+                             1, &clq, 0, রিক্ত, রিক্ত);
+    অন্যথা যদি (type == CV_64FC1)
         status = clblasDgemm(order, transA, transB, M, N, K,
-                             alpha, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
-                             (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
+                             alpha, (ধ্রুব cl_mem)A.handle(ACCESS_READ), offa, lda,
+                             (ধ্রুব cl_mem)B.handle(ACCESS_READ), offb, ldb,
                              beta, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
-                             1, &clq, 0, NULL, NULL);
-    else if (type == CV_32FC2)
+                             1, &clq, 0, রিক্ত, রিক্ত);
+    অন্যথা যদি (type == CV_32FC2)
     {
          cl_float2 alpha_2 = { { (cl_float)alpha, 0 } };
          cl_float2 beta_2  = { { (cl_float)beta, 0 } };
          status = clblasCgemm(order, transA, transB, M, N, K,
-                              alpha_2, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
-                              (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
+                              alpha_2, (ধ্রুব cl_mem)A.handle(ACCESS_READ), offa, lda,
+                              (ধ্রুব cl_mem)B.handle(ACCESS_READ), offb, ldb,
                               beta_2, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
-                              1, &clq, 0, NULL, NULL);
+                              1, &clq, 0, রিক্ত, রিক্ত);
     }
-    else if (type == CV_64FC2)
+    অন্যথা যদি (type == CV_64FC2)
     {
         cl_double2 alpha_2 = { { alpha, 0 } };
         cl_double2 beta_2  = { { beta, 0 } };
         status = clblasZgemm(order, transA, transB, M, N, K,
-                             alpha_2, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
-                             (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
+                             alpha_2, (ধ্রুব cl_mem)A.handle(ACCESS_READ), offa, lda,
+                             (ধ্রুব cl_mem)B.handle(ACCESS_READ), offb, ldb,
                              beta_2, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
-                             1, &clq, 0, NULL, NULL);
+                             1, &clq, 0, রিক্ত, রিক্ত);
     }
-    else
+    অন্যথা
         CV_Error(Error::StsUnsupportedFormat, "");
 
-    return status == clblasSuccess;
+    প্রত্যাগম status == clblasSuccess;
 }
 
 #endif
 
 #ifdef HAVE_OPENCL
-static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
-                      InputArray matC, double beta, OutputArray matD, int flags )
+স্থির তার্কিক ocl_gemm( প্রবেশ_Array matA, প্রবেশ_Array matB, দ্বিগুণ alpha,
+                      প্রবেশ_Array matC, দ্বিগুণ beta, OutputArray matD, পূর্ণাঙ্ক flags )
 {
-    int type = matA.type();
-    int depth = CV_MAT_DEPTH(type);
-    int cn = CV_MAT_CN(type);
+    পূর্ণাঙ্ক type = matA.type();
+    পূর্ণাঙ্ক depth = CV_MAT_DEPTH(type);
+    পূর্ণাঙ্ক cn = CV_MAT_CN(type);
 
     CV_CheckTypeEQ(type, matB.type(), "");
     CV_CheckType(type, type == CV_32FC1 || type == CV_64FC1 || type == CV_32FC2 || type == CV_64FC2, "");
 
-    const ocl::Device & dev = ocl::Device::getDefault();
-    bool doubleSupport = dev.doubleFPConfig() > 0;
+    ধ্রুব ocl::Device & dev = ocl::Device::getDefault();
+    তার্কিক doubleSupport = dev.doubleFPConfig() > 0;
 
-    if (!doubleSupport && depth == CV_64F)
-        return false;
+    যদি (!doubleSupport && depth == CV_64F)
+        প্রত্যাগম অসত্য;
 
-    bool haveC = matC.kind() != cv::_InputArray::NONE;
+    তার্কিক haveC = matC.kind() != cv::প্রবেশ_Array_2::NONE;
     Size sizeA = matA.size(), sizeB = matB.size(), sizeC = haveC ? matC.size() : Size(0, 0);
-    bool atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
+    তার্কিক atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
 
-    if (haveC)
+    যদি (haveC)
         CV_CheckTypeEQ(type, matC.type(), "");
 
     Size sizeD(((btrans) ? sizeB.height : sizeB.width),
                ((atrans) ? sizeA.width : sizeA.height));
 
-    if (atrans)
+    যদি (atrans)
         sizeA = Size(sizeA.height, sizeA.width);
-    if (btrans)
+    যদি (btrans)
         sizeB = Size(sizeB.height, sizeB.width);
-    if (haveC && ctrans)
+    যদি (haveC && ctrans)
         sizeC = Size(sizeC.height, sizeC.width);
 
     CV_CheckEQ(sizeA.width, sizeB.height, "");
-    if (haveC)
+    যদি (haveC)
         CV_CheckEQ(sizeC, sizeD, "");
 
     UMat A = matA.getUMat();
@@ -197,53 +197,53 @@ static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
     matD.create(sizeD, type);
     UMat D = matD.getUMat();
 
-    bool isPropagatedC2D = false;  // D content is updated with C / C.t()
+    তার্কিক isPropagatedC2D = অসত্য;  // D content is updated with C / C.t()
 
-    if (dev.intelSubgroupsSupport() && (depth == CV_32F) && cn == 1)
+    যদি (dev.intelSubgroupsSupport() && (depth == CV_32F) && cn == 1)
     {
-        if (haveC && beta != 0.0)
+        যদি (haveC && beta != 0.0)
         {
             ctrans ? transpose(matC, D) : matC.copyTo(D);
-            isPropagatedC2D = true;
+            isPropagatedC2D = সত্য;
         }
-        else
+        অন্যথা
         {
             beta = 0.0;
         }
 
-        bool res = intel_gpu_gemm(A, matA.size(),
+        তার্কিক res = intel_gpu_gemm(A, matA.size(),
                                   B, matB.size(),
                                   D, sizeD,
                                   alpha,
                                   beta,
                                   atrans, btrans,
                                   isPropagatedC2D);
-        if (res)
-            return true;
+        যদি (res)
+            প্রত্যাগম সত্য;
         // fallback on generic OpenCL code
     }
 
-    if (sizeD.width < 8 || sizeD.height < 8)
-        return false;
+    যদি (sizeD.width < 8 || sizeD.height < 8)
+        প্রত্যাগম অসত্য;
 
     String opts;
 
-    int wg_size = (int)dev.maxWorkGroupSize();
-    int sizeDmin = std::min(sizeD.width, sizeD.height);
+    পূর্ণাঙ্ক wg_size = (পূর্ণাঙ্ক)dev.maxWorkGroupSize();
+    পূর্ণাঙ্ক sizeDmin = std::min(sizeD.width, sizeD.height);
     wg_size = std::min(wg_size, sizeDmin * sizeDmin);
-    int block_size = (wg_size / (32*cn) < 32) ? (wg_size / (16*cn) < 16) ? (wg_size / (8*cn) < 8) ? 1 : 8 : 16 : 32;
+    পূর্ণাঙ্ক block_size = (wg_size / (32*cn) < 32) ? (wg_size / (16*cn) < 16) ? (wg_size / (8*cn) < 8) ? 1 : 8 : 16 : 32;
 
-    if (atrans)
+    যদি (atrans)
         A = A.t();
 
-    if (btrans)
+    যদি (btrans)
         B = B.t();
 
-    if (haveC && !isPropagatedC2D)
+    যদি (haveC && !isPropagatedC2D)
         ctrans ? transpose(matC, D) : matC.copyTo(D);
 
-    int vectorWidths[] = { 4, 4, 2, 2, 1, 4, cn, -1 };
-    int kercn = ocl::checkOptimalVectorWidth(vectorWidths, B, D);
+    পূর্ণাঙ্ক vectorWidths[] = { 4, 4, 2, 2, 1, 4, cn, -1 };
+    পূর্ণাঙ্ক kercn = ocl::checkOptimalVectorWidth(vectorWidths, B, D);
 
     opts += format(" -D T=%s -D T1=%s -D WT=%s -D cn=%d -D kercn=%d -D LOCAL_SIZE=%d%s%s%s",
                       ocl::typeToStr(type), ocl::typeToStr(depth), ocl::typeToStr(CV_MAKETYPE(depth, kercn)),
@@ -253,81 +253,81 @@ static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
                       doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
     ocl::Kernel k("gemm", cv::ocl::core::gemm_oclsrc, opts);
-    if (k.empty())
-        return false;
+    যদি (k.empty())
+        প্রত্যাগম অসত্য;
 
-    if (depth == CV_64F)
+    যদি (depth == CV_64F)
         k.args(ocl::KernelArg::ReadOnlyNoSize(A),
                ocl::KernelArg::ReadOnlyNoSize(B, cn, kercn),
                ocl::KernelArg::ReadWrite(D, cn, kercn),
                sizeA.width, alpha, beta);
-    else
+    অন্যথা
         k.args(ocl::KernelArg::ReadOnlyNoSize(A),
                ocl::KernelArg::ReadOnlyNoSize(B, cn, kercn),
                ocl::KernelArg::ReadWrite(D, cn, kercn),
-               sizeA.width, (float)alpha, (float)beta);
+               sizeA.width, (ভিন্ন)alpha, (ভিন্ন)beta);
 
     size_t globalsize[2] = { (size_t)sizeD.width * cn / kercn, (size_t)sizeD.height};
     size_t localsize[2] = { (size_t)block_size, (size_t)block_size};
 
-    return k.run(2, globalsize, block_size !=1 ? localsize : NULL, false);
+    প্রত্যাগম k.run(2, globalsize, block_size !=1 ? localsize : রিক্ত, অসত্য);
 }
 #endif
 
 
-namespace hal {
+নামাকাশ hal {
 
-void gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-             float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags)
+শূন্য gemm32f(ধ্রুব ভিন্ন* src1, size_t src1_step, ধ্রুব ভিন্ন* src2, size_t src2_step,
+             ভিন্ন alpha, ধ্রুব ভিন্ন* src3, size_t src3_step, ভিন্ন beta, ভিন্ন* dst, size_t dst_step,
+             পূর্ণাঙ্ক m_a, পূর্ণাঙ্ক n_a, পূর্ণাঙ্ক n_d, পূর্ণাঙ্ক flags)
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(gemm32f, cv_hal_gemm32f, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
 #ifdef CV_GEMM_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(gemm32f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
+#অন্যথা
     CV_CPU_DISPATCH(gemm32f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
 #endif
 }
 
-void gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-             double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags)
+শূন্য gemm64f(ধ্রুব দ্বিগুণ* src1, size_t src1_step, ধ্রুব দ্বিগুণ* src2, size_t src2_step,
+             দ্বিগুণ alpha, ধ্রুব দ্বিগুণ* src3, size_t src3_step, দ্বিগুণ beta, দ্বিগুণ* dst, size_t dst_step,
+             পূর্ণাঙ্ক m_a, পূর্ণাঙ্ক n_a, পূর্ণাঙ্ক n_d, পূর্ণাঙ্ক flags)
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(gemm64f, cv_hal_gemm64f, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
 #ifdef CV_GEMM_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(gemm64f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
+#অন্যথা
     CV_CPU_DISPATCH(gemm64f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
 #endif
 }
 
-void gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-              float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags)
+শূন্য gemm32fc(ধ্রুব ভিন্ন* src1, size_t src1_step, ধ্রুব ভিন্ন* src2, size_t src2_step,
+              ভিন্ন alpha, ধ্রুব ভিন্ন* src3, size_t src3_step, ভিন্ন beta, ভিন্ন* dst, size_t dst_step,
+              পূর্ণাঙ্ক m_a, পূর্ণাঙ্ক n_a, পূর্ণাঙ্ক n_d, পূর্ণাঙ্ক flags)
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(gemm32fc, cv_hal_gemm32fc, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
 #ifdef CV_GEMM_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(gemm32fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
+#অন্যথা
     CV_CPU_DISPATCH(gemm32fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
 #endif
 }
 
-void gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-              double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags)
+শূন্য gemm64fc(ধ্রুব দ্বিগুণ* src1, size_t src1_step, ধ্রুব দ্বিগুণ* src2, size_t src2_step,
+              দ্বিগুণ alpha, ধ্রুব দ্বিগুণ* src3, size_t src3_step, দ্বিগুণ beta, দ্বিগুণ* dst, size_t dst_step,
+              পূর্ণাঙ্ক m_a, পূর্ণাঙ্ক n_a, পূর্ণাঙ্ক n_d, পূর্ণাঙ্ক flags)
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(gemm64fc, cv_hal_gemm64fc, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
 #ifdef CV_GEMM_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(gemm64fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
+#অন্যথা
     CV_CPU_DISPATCH(gemm64fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
 #endif
@@ -335,8 +335,8 @@ void gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t s
 
 } // namespace hal
 
-void gemm(InputArray matA, InputArray matB, double alpha,
-          InputArray matC, double beta, OutputArray _matD, int flags)
+শূন্য gemm(প্রবেশ_Array matA, প্রবেশ_Array matB, দ্বিগুণ alpha,
+          প্রবেশ_Array matC, দ্বিগুণ beta, OutputArray _matD, পূর্ণাঙ্ক flags)
 {
 #ifdef HAVE_CLAMDBLAS
     CV_OCL_RUN(ocl::haveAmdBlas() && matA.dims() <= 2 && matB.dims() <= 2 && matC.dims() <= 2 && _matD.isUMat() &&
@@ -351,35 +351,35 @@ void gemm(InputArray matA, InputArray matB, double alpha,
 
     Mat A = matA.getMat(), B = matB.getMat(), C = beta != 0.0 ? matC.getMat() : Mat();
     Size a_size = A.size(), d_size;
-    int len = 0, type = A.type();
+    পূর্ণাঙ্ক len = 0, type = A.type();
 
     CV_Assert_N( type == B.type(), (type == CV_32FC1 || type == CV_64FC1 || type == CV_32FC2 || type == CV_64FC2) );
 
-    switch( flags & (GEMM_1_T|GEMM_2_T) )
+    বিকল্প( flags & (GEMM_1_T|GEMM_2_T) )
     {
-    case 0:
+    পক্ষ 0:
         d_size = Size( B.cols, a_size.height );
         len = B.rows;
         CV_Assert( a_size.width == len );
-        break;
-    case 1:
+        ভঙ্গ;
+    পক্ষ 1:
         d_size = Size( B.cols, a_size.width );
         len = B.rows;
         CV_Assert( a_size.height == len );
-        break;
-    case 2:
+        ভঙ্গ;
+    পক্ষ 2:
         d_size = Size( B.rows, a_size.height );
         len = B.cols;
         CV_Assert( a_size.width == len );
-        break;
-    case 3:
+        ভঙ্গ;
+    পক্ষ 3:
         d_size = Size( B.rows, a_size.width );
         len = B.cols;
         CV_Assert( a_size.height == len );
-        break;
+        ভঙ্গ;
     }
 
-    if( !C.empty() )
+    যদি( !C.empty() )
     {
         CV_Assert_N( C.type() == type,
             (((flags&GEMM_3_T) == 0 && C.rows == d_size.height && C.cols == d_size.width) ||
@@ -388,44 +388,44 @@ void gemm(InputArray matA, InputArray matB, double alpha,
 
     _matD.create( d_size.height, d_size.width, type );
     Mat D = _matD.getMat();
-    if( (flags & GEMM_3_T) != 0 && C.data == D.data )
+    যদি( (flags & GEMM_3_T) != 0 && C.data == D.data )
     {
         transpose( C, C );
         flags &= ~GEMM_3_T;
     }
 
     Mat *DProxyPtr = &D, DProxy;
-    if( D.data == A.data || D.data == B.data )
+    যদি( D.data == A.data || D.data == B.data )
     {
         DProxy = Mat(d_size.height, d_size.width, D.type());
         DProxyPtr = &DProxy;
     }
 
-    if( type == CV_32FC1 )
-        hal::gemm32f(A.ptr<float>(), A.step, B.ptr<float>(), B.step, static_cast<float>(alpha),
-                     C.ptr<float>(), C.step, static_cast<float>(beta),
-                     DProxyPtr->ptr<float>(), DProxyPtr->step,
+    যদি( type == CV_32FC1 )
+        hal::gemm32f(A.ptr<ভিন্ন>(), A.step, B.ptr<ভিন্ন>(), B.step, static_cast<ভিন্ন>(alpha),
+                     C.ptr<ভিন্ন>(), C.step, static_cast<ভিন্ন>(beta),
+                     DProxyPtr->ptr<ভিন্ন>(), DProxyPtr->step,
                      a_size.height, a_size.width, DProxyPtr->cols, flags);
-    else if( type == CV_64FC1 )
-        hal::gemm64f(A.ptr<double>(), A.step, B.ptr<double>(), B.step, alpha,
-                     C.ptr<double>(), C.step, beta,
-                     DProxyPtr->ptr<double>(), DProxyPtr->step,
+    অন্যথা যদি( type == CV_64FC1 )
+        hal::gemm64f(A.ptr<দ্বিগুণ>(), A.step, B.ptr<দ্বিগুণ>(), B.step, alpha,
+                     C.ptr<দ্বিগুণ>(), C.step, beta,
+                     DProxyPtr->ptr<দ্বিগুণ>(), DProxyPtr->step,
                      a_size.height, a_size.width, DProxyPtr->cols, flags);
-    else if( type == CV_32FC2 )
-        hal::gemm32fc(A.ptr<float>(), A.step, B.ptr<float>(), B.step, static_cast<float>(alpha),
-                      C.ptr<float>(), C.step, static_cast<float>(beta),
-                      DProxyPtr->ptr<float>(), DProxyPtr->step,
+    অন্যথা যদি( type == CV_32FC2 )
+        hal::gemm32fc(A.ptr<ভিন্ন>(), A.step, B.ptr<ভিন্ন>(), B.step, static_cast<ভিন্ন>(alpha),
+                      C.ptr<ভিন্ন>(), C.step, static_cast<ভিন্ন>(beta),
+                      DProxyPtr->ptr<ভিন্ন>(), DProxyPtr->step,
                       a_size.height, a_size.width, DProxyPtr->cols, flags);
-    else
+    অন্যথা
     {
         CV_Assert( type == CV_64FC2 );
-        hal::gemm64fc(A.ptr<double>(), A.step, B.ptr<double>(), B.step, alpha,
-                      C.ptr<double>(), C.step, beta,
-                      DProxyPtr->ptr<double>(), DProxyPtr->step,
+        hal::gemm64fc(A.ptr<দ্বিগুণ>(), A.step, B.ptr<দ্বিগুণ>(), B.step, alpha,
+                      C.ptr<দ্বিগুণ>(), C.step, beta,
+                      DProxyPtr->ptr<দ্বিগুণ>(), DProxyPtr->step,
                       a_size.height, a_size.width, DProxyPtr->cols, flags);
     }
 
-    if(DProxyPtr != &D)
+    যদি(DProxyPtr != &D)
         DProxyPtr->copyTo(D);
 }
 
@@ -435,83 +435,83 @@ void gemm(InputArray matA, InputArray matB, double alpha,
 *                                        Transform                                       *
 \****************************************************************************************/
 
-static TransformFunc getTransformFunc(int depth)
+স্থির TransformFunc getTransformFunc(পূর্ণাঙ্ক depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getTransformFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-static TransformFunc getDiagTransformFunc(int depth)
+স্থির TransformFunc getDiagTransformFunc(পূর্ণাঙ্ক depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getDiagTransformFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void transform(InputArray _src, OutputArray _dst, InputArray _mtx)
+শূন্য transform(প্রবেশ_Array _src, OutputArray _dst, প্রবেশ_Array _mtx)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat(), m = _mtx.getMat();
-    int depth = src.depth(), scn = src.channels(), dcn = m.rows;
+    পূর্ণাঙ্ক depth = src.depth(), scn = src.channels(), dcn = m.rows;
     CV_Assert( scn == m.cols || scn + 1 == m.cols );
-    bool isDiag = false;
+    তার্কিক isDiag = অসত্য;
 
     _dst.createSameSize( src, CV_MAKETYPE(depth, dcn) );
     Mat dst = _dst.getMat();
 
-    if (src.data == dst.data)  // inplace case
+    যদি (src.data == dst.data)  // inplace case
     {
         CV_Assert(scn == dcn);
         src = src.clone();  // TODO Add performance warning
     }
 
-    int mtype = depth == CV_32S || depth == CV_64F ? CV_64F : CV_32F;
-    AutoBuffer<double> _mbuf;
-    double* mbuf;
+    পূর্ণাঙ্ক mtype = depth == CV_32S || depth == CV_64F ? CV_64F : CV_32F;
+    AutoBuffer<দ্বিগুণ> _mbuf;
+    দ্বিগুণ* mbuf;
 
-    if( !m.isContinuous() || m.type() != mtype || m.cols != scn + 1 )
+    যদি( !m.isContinuous() || m.type() != mtype || m.cols != scn + 1 )
     {
         _mbuf.allocate(dcn*(scn+1));
         mbuf = _mbuf.data();
         Mat tmp(dcn, scn+1, mtype, mbuf);
         memset(tmp.ptr(), 0, tmp.total()*tmp.elemSize());
-        if( m.cols == scn+1 )
+        যদি( m.cols == scn+1 )
             m.convertTo(tmp, mtype);
-        else
+        অন্যথা
         {
             Mat tmppart = tmp.colRange(0, m.cols);
             m.convertTo(tmppart, mtype);
         }
         m = tmp;
     }
-    else
-        mbuf = m.ptr<double>();
+    অন্যথা
+        mbuf = m.ptr<দ্বিগুণ>();
 
-    if( scn == dcn )
+    যদি( scn == dcn )
     {
-        int i, j;
-        double eps = mtype == CV_32F ? FLT_EPSILON : DBL_EPSILON;
+        পূর্ণাঙ্ক i, j;
+        দ্বিগুণ eps = mtype == CV_32F ? FLT_EPSILON : DBL_EPSILON;
 
-        if( scn == 1 )
+        যদি( scn == 1 )
         {
-            double alpha, beta;
-            if( mtype == CV_32F )
-                alpha = m.at<float>(0), beta = m.at<float>(1);
-            else
-                alpha = m.at<double>(0), beta = m.at<double>(1);
+            দ্বিগুণ alpha, beta;
+            যদি( mtype == CV_32F )
+                alpha = m.at<ভিন্ন>(0), beta = m.at<ভিন্ন>(1);
+            অন্যথা
+                alpha = m.at<দ্বিগুণ>(0), beta = m.at<দ্বিগুণ>(1);
             src.convertTo(dst, dst.type(), alpha, beta);
-            return;
+            প্রত্যাগম;
         }
 
-        for( i = 0, isDiag = true; isDiag && i < scn; i++ )
+        প্রতি( i = 0, isDiag = সত্য; isDiag && i < scn; i++ )
         {
-            for( j = 0; isDiag && j < scn; j++ )
+            প্রতি( j = 0; isDiag && j < scn; j++ )
             {
-                double v = mtype == CV_32F ? m.at<float>(i, j) : m.at<double>(i, j);
-                if( i != j && fabs(v) > eps )
-                    isDiag = false;
+                দ্বিগুণ v = mtype == CV_32F ? m.at<ভিন্ন>(i, j) : m.at<দ্বিগুণ>(i, j);
+                যদি( i != j && fabs(v) > eps )
+                    isDiag = অসত্য;
             }
         }
     }
@@ -519,13 +519,13 @@ void transform(InputArray _src, OutputArray _dst, InputArray _mtx)
     TransformFunc func = isDiag ? getDiagTransformFunc(depth): getTransformFunc(depth);
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &dst, 0};
+    ধ্রুব Mat* arrays[] = {&src, &dst, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
     size_t i, total = it.size;
 
-    for( i = 0; i < it.nplanes; i++, ++it )
-        func( ptrs[0], ptrs[1], (uchar*)mbuf, (int)total, scn, dcn );
+    প্রতি( i = 0; i < it.nplanes; i++, ++it )
+        func( ptrs[0], ptrs[1], (uchar*)mbuf, (পূর্ণাঙ্ক)total, scn, dcn );
 }
 
 
@@ -534,30 +534,30 @@ void transform(InputArray _src, OutputArray _dst, InputArray _mtx)
 *                                  Perspective Transform                                 *
 \****************************************************************************************/
 
-static TransformFunc getPerspectiveTransform(int depth)
+স্থির TransformFunc getPerspectiveTransform(পূর্ণাঙ্ক depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getPerspectiveTransform, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void perspectiveTransform(InputArray _src, OutputArray _dst, InputArray _mtx)
+শূন্য perspectiveTransform(প্রবেশ_Array _src, OutputArray _dst, প্রবেশ_Array _mtx)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat(), m = _mtx.getMat();
-    int depth = src.depth(), scn = src.channels(), dcn = m.rows-1;
+    পূর্ণাঙ্ক depth = src.depth(), scn = src.channels(), dcn = m.rows-1;
     CV_Assert( scn + 1 == m.cols );
     CV_Assert( depth == CV_32F || depth == CV_64F );
 
     _dst.createSameSize( src, CV_MAKETYPE(depth, dcn) );
     Mat dst = _dst.getMat();
 
-    const int mtype = CV_64F;
-    AutoBuffer<double> _mbuf;
-    double* mbuf = m.ptr<double>();
+    ধ্রুব পূর্ণাঙ্ক mtype = CV_64F;
+    AutoBuffer<দ্বিগুণ> _mbuf;
+    দ্বিগুণ* mbuf = m.ptr<দ্বিগুণ>();
 
-    if( !m.isContinuous() || m.type() != mtype )
+    যদি( !m.isContinuous() || m.type() != mtype )
     {
         _mbuf.allocate((dcn+1)*(scn+1));
         mbuf = _mbuf.data();
@@ -569,13 +569,13 @@ void perspectiveTransform(InputArray _src, OutputArray _dst, InputArray _mtx)
     TransformFunc func = getPerspectiveTransform(depth);
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &dst, 0};
+    ধ্রুব Mat* arrays[] = {&src, &dst, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
     size_t i, total = it.size;
 
-    for( i = 0; i < it.nplanes; i++, ++it )
-        func( ptrs[0], ptrs[1], (uchar*)mbuf, (int)total, scn, dcn );
+    প্রতি( i = 0; i < it.nplanes; i++, ++it )
+        func( ptrs[0], ptrs[1], (uchar*)mbuf, (পূর্ণাঙ্ক)total, scn, dcn );
 }
 
 /****************************************************************************************\
@@ -584,34 +584,34 @@ void perspectiveTransform(InputArray _src, OutputArray _dst, InputArray _mtx)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_scaleAdd( InputArray _src1, double alpha, InputArray _src2, OutputArray _dst, int type )
+স্থির তার্কিক ocl_scaleAdd( প্রবেশ_Array _src1, দ্বিগুণ alpha, প্রবেশ_Array _src2, OutputArray _dst, পূর্ণাঙ্ক type )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
+    ধ্রুব ocl::Device & d = ocl::Device::getDefault();
 
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    তার্কিক doubleSupport = d.doubleFPConfig() > 0;
     Size size = _src1.size();
-    int depth = CV_MAT_DEPTH(type);
-    if ( (!doubleSupport && depth == CV_64F) || size != _src2.size() )
-        return false;
+    পূর্ণাঙ্ক depth = CV_MAT_DEPTH(type);
+    যদি ( (!doubleSupport && depth == CV_64F) || size != _src2.size() )
+        প্রত্যাগম অসত্য;
 
     _dst.create(size, type);
-    int cn = CV_MAT_CN(type), wdepth = std::max(depth, CV_32F);
-    int kercn = ocl::predictOptimalVectorWidthMax(_src1, _src2, _dst),
+    পূর্ণাঙ্ক cn = CV_MAT_CN(type), wdepth = std::max(depth, CV_32F);
+    পূর্ণাঙ্ক kercn = ocl::predictOptimalVectorWidthMax(_src1, _src2, _dst),
         rowsPerWI = d.isIntel() ? 4 : 1;
 
-    char cvt[2][50];
+    বর্ণ cvt[2][50];
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D OP_SCALE_ADD -D BINARY_OP -D dstT=%s -D DEPTH_dst=%d -D workT=%s -D convertToWT1=%s"
                          " -D srcT1=dstT -D srcT2=dstT -D convertToDT=%s -D workT1=%s"
                          " -D wdepth=%d%s -D rowsPerWI=%d",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), depth,
                          ocl::typeToStr(CV_MAKE_TYPE(wdepth, kercn)),
-                         ocl::convertTypeStr(depth, wdepth, kercn, cvt[0], sizeof(cvt[0])),
-                         ocl::convertTypeStr(wdepth, depth, kercn, cvt[1], sizeof(cvt[1])),
+                         ocl::convertTypeStr(depth, wdepth, kercn, cvt[0], পরিমাণ(cvt[0])),
+                         ocl::convertTypeStr(wdepth, depth, kercn, cvt[1], পরিমাণ(cvt[1])),
                          ocl::typeToStr(wdepth), wdepth,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "", rowsPerWI));
-    if (k.empty())
-        return false;
+    যদি (k.empty())
+        প্রত্যাগম অসত্য;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat(), dst = _dst.getUMat();
 
@@ -619,38 +619,38 @@ static bool ocl_scaleAdd( InputArray _src1, double alpha, InputArray _src2, Outp
             src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (wdepth == CV_32F)
-        k.args(src1arg, src2arg, dstarg, (float)alpha);
-    else
+    যদি (wdepth == CV_32F)
+        k.args(src1arg, src2arg, dstarg, (ভিন্ন)alpha);
+    অন্যথা
         k.args(src1arg, src2arg, dstarg, alpha);
 
     size_t globalsize[2] = { (size_t)dst.cols * cn / kercn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    প্রত্যাগম k.run(2, globalsize, রিক্ত, অসত্য);
 }
 
 #endif
 
-static ScaleAddFunc getScaleAddFunc(int depth)
+স্থির ScaleAddFunc getScaleAddFunc(পূর্ণাঙ্ক depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getScaleAddFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void scaleAdd(InputArray _src1, double alpha, InputArray _src2, OutputArray _dst)
+শূন্য scaleAdd(প্রবেশ_Array _src1, দ্বিগুণ alpha, প্রবেশ_Array _src2, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    পূর্ণাঙ্ক type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert( type == _src2.type() );
 
     CV_OCL_RUN(_src1.dims() <= 2 && _src2.dims() <= 2 && _dst.isUMat(),
             ocl_scaleAdd(_src1, alpha, _src2, _dst, type))
 
-    if( depth != CV_32F && depth != CV_64F )
+    যদি( depth != CV_32F && depth != CV_64F )
     {
         addWeighted(_src1, alpha, _src2, 1, 0, _dst, depth);
-        return;
+        প্রত্যাগম;
     }
 
     Mat src1 = _src1.getMat(), src2 = _src2.getMat();
@@ -659,49 +659,49 @@ void scaleAdd(InputArray _src1, double alpha, InputArray _src2, OutputArray _dst
     _dst.create(src1.size, type);
     Mat dst = _dst.getMat();
 
-    float falpha = (float)alpha;
-    void* palpha = depth == CV_32F ? (void*)&falpha : (void*)&alpha;
+    ভিন্ন falpha = (ভিন্ন)alpha;
+    শূন্য* palpha = depth == CV_32F ? (শূন্য*)&falpha : (শূন্য*)&alpha;
 
     ScaleAddFunc func = getScaleAddFunc(depth);
     CV_Assert(func);
 
-    if (src1.isContinuous() && src2.isContinuous() && dst.isContinuous())
+    যদি (src1.isContinuous() && src2.isContinuous() && dst.isContinuous())
     {
         size_t len = src1.total()*cn;
-        func(src1.ptr(), src2.ptr(), dst.ptr(), (int)len, palpha);
-        return;
+        func(src1.ptr(), src2.ptr(), dst.ptr(), (পূর্ণাঙ্ক)len, palpha);
+        প্রত্যাগম;
     }
 
-    const Mat* arrays[] = {&src1, &src2, &dst, 0};
+    ধ্রুব Mat* arrays[] = {&src1, &src2, &dst, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
     size_t i, len = it.size*cn;
 
-    for( i = 0; i < it.nplanes; i++, ++it )
-        func( ptrs[0], ptrs[1], ptrs[2], (int)len, palpha );
+    প্রতি( i = 0; i < it.nplanes; i++, ++it )
+        func( ptrs[0], ptrs[1], ptrs[2], (পূর্ণাঙ্ক)len, palpha );
 }
 
 /****************************************************************************************\
 *                                 Covariation Matrix                                     *
 \****************************************************************************************/
 
-void calcCovarMatrix( const Mat* data, int nsamples, Mat& covar, Mat& _mean, int flags, int ctype )
+শূন্য calcCovarMatrix( ধ্রুব Mat* data, পূর্ণাঙ্ক nsamples, Mat& covar, Mat& _mean, পূর্ণাঙ্ক flags, পূর্ণাঙ্ক ctype )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert_N( data, nsamples > 0 );
     Size size = data[0].size();
-    int sz = size.width * size.height, esz = (int)data[0].elemSize();
-    int type = data[0].type();
+    পূর্ণাঙ্ক sz = size.width * size.height, esz = (পূর্ণাঙ্ক)data[0].elemSize();
+    পূর্ণাঙ্ক type = data[0].type();
     Mat mean;
     ctype = std::max(std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), _mean.depth()), CV_32F);
 
-    if( (flags & cv::COVAR_USE_AVG) != 0 )
+    যদি( (flags & cv::COVAR_USE_AVG) != 0 )
     {
         CV_Assert( _mean.size() == size );
-        if( _mean.isContinuous() && _mean.type() == ctype )
+        যদি( _mean.isContinuous() && _mean.type() == ctype )
             mean = _mean.reshape(1, 1);
-        else
+        অন্যথা
         {
             _mean.convertTo(mean, ctype);
             mean = mean.reshape(1, 1);
@@ -710,12 +710,12 @@ void calcCovarMatrix( const Mat* data, int nsamples, Mat& covar, Mat& _mean, int
 
     Mat _data(nsamples, sz, type);
 
-    for( int i = 0; i < nsamples; i++ )
+    প্রতি( পূর্ণাঙ্ক i = 0; i < nsamples; i++ )
     {
         CV_Assert_N( data[i].size() == size, data[i].type() == type );
-        if( data[i].isContinuous() )
+        যদি( data[i].isContinuous() )
             memcpy( _data.ptr(i), data[i].ptr(), sz*esz );
-        else
+        অন্যথা
         {
             Mat dataRow(size.height, size.width, type, _data.ptr(i));
             data[i].copyTo(dataRow);
@@ -723,15 +723,15 @@ void calcCovarMatrix( const Mat* data, int nsamples, Mat& covar, Mat& _mean, int
     }
 
     calcCovarMatrix( _data, covar, mean, (flags & ~(cv::COVAR_ROWS|cv::COVAR_COLS)) | cv::COVAR_ROWS, ctype );
-    if( (flags & cv::COVAR_USE_AVG) == 0 )
+    যদি( (flags & cv::COVAR_USE_AVG) == 0 )
         _mean = mean.reshape(1, size.height);
 }
 
-void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mean, int flags, int ctype )
+শূন্য calcCovarMatrix( প্রবেশ_Array _src, OutputArray _covar, প্রবেশ_Output_Array _mean, পূর্ণাঙ্ক flags, পূর্ণাঙ্ক ctype )
 {
     CV_INSTRUMENT_REGION();
 
-    if(_src.kind() == _InputArray::STD_VECTOR_MAT || _src.kind() == _InputArray::STD_ARRAY_MAT)
+    যদি(_src.kind() == প্রবেশ_Array_2::STD_VECTOR_MAT || _src.kind() == প্রবেশ_Array_2::STD_ARRAY_MAT)
     {
         std::vector<cv::Mat> src;
         _src.getMatVector(src);
@@ -739,14 +739,14 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
         CV_Assert( src.size() > 0 );
 
         Size size = src[0].size();
-        int type = src[0].type();
+        পূর্ণাঙ্ক type = src[0].type();
 
         ctype = std::max(std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), _mean.depth()), CV_32F);
 
-        Mat _data(static_cast<int>(src.size()), size.area(), type);
+        Mat _data(static_cast<পূর্ণাঙ্ক>(src.size()), size.area(), type);
 
-        int i = 0;
-        for(std::vector<cv::Mat>::iterator each = src.begin(); each != src.end(); ++each, ++i )
+        পূর্ণাঙ্ক i = 0;
+        প্রতি(std::vector<cv::Mat>::iterator each = src.begin(); each != src.end(); ++each, ++i )
         {
             CV_Assert_N( (*each).size() == size, (*each).type() == type );
             Mat dataRow(size.height, size.width, type, _data.ptr(i));
@@ -754,14 +754,14 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
         }
 
         Mat mean;
-        if( (flags & cv::COVAR_USE_AVG) != 0 )
+        যদি( (flags & cv::COVAR_USE_AVG) != 0 )
         {
             CV_Assert( _mean.size() == size );
             Mat mean0 = _mean.getMat();
 
-            if( mean0.isContinuous() && mean0.type() == ctype )
+            যদি( mean0.isContinuous() && mean0.type() == ctype )
                 mean = mean0.reshape(1, 1);
-            else
+            অন্যথা
             {
                 mean0.convertTo(mean, ctype);
                 mean = mean.reshape(1, 1);
@@ -770,28 +770,28 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
 
         calcCovarMatrix( _data, _covar, mean, (flags & ~(cv::COVAR_ROWS|cv::COVAR_COLS)) | cv::COVAR_ROWS, ctype );
 
-        if( (flags & cv::COVAR_USE_AVG) == 0 )
+        যদি( (flags & cv::COVAR_USE_AVG) == 0 )
         {
             mean = mean.reshape(1, size.height);
             mean.copyTo(_mean);
         }
-        return;
+        প্রত্যাগম;
     }
 
     Mat data = _src.getMat(), mean;
     CV_Assert( ((flags & cv::COVAR_ROWS) != 0) ^ ((flags & cv::COVAR_COLS) != 0) );
-    bool takeRows = (flags & cv::COVAR_ROWS) != 0;
-    int type = data.type();
-    int nsamples = takeRows ? data.rows : data.cols;
+    তার্কিক takeRows = (flags & cv::COVAR_ROWS) != 0;
+    পূর্ণাঙ্ক type = data.type();
+    পূর্ণাঙ্ক nsamples = takeRows ? data.rows : data.cols;
     CV_Assert( nsamples > 0 );
     Size size = takeRows ? Size(data.cols, 1) : Size(1, data.rows);
 
-    if( (flags & cv::COVAR_USE_AVG) != 0 )
+    যদি( (flags & cv::COVAR_USE_AVG) != 0 )
     {
         mean = _mean.getMat();
         ctype = std::max(std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), mean.depth()), CV_32F);
         CV_Assert( mean.size() == size );
-        if( mean.type() != ctype )
+        যদি( mean.type() != ctype )
         {
             _mean.create(mean.size(), ctype);
             Mat tmp = _mean.getMat();
@@ -799,7 +799,7 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
             mean = tmp;
         }
     }
-    else
+    অন্যথা
     {
         ctype = std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), CV_32F);
         reduce( _src, _mean, takeRows ? 0 : 1, REDUCE_AVG, ctype );
@@ -816,11 +816,11 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
 *                                        Mahalanobis                                     *
 \****************************************************************************************/
 
-static MahalanobisImplFunc getMahalanobisImplFunc(int depth)
+স্থির MahalanobisImplFunc getMahalanobisImplFunc(পূর্ণাঙ্ক depth)
 {
 #ifdef CV_MAHALANOBIS_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(getMahalanobisImplFunc, (depth));
-#else
+#অন্যথা
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getMahalanobisImplFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
@@ -828,21 +828,21 @@ static MahalanobisImplFunc getMahalanobisImplFunc(int depth)
 }
 
 
-double Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
+দ্বিগুণ Mahalanobis(প্রবেশ_Array _v1, প্রবেশ_Array _v2, প্রবেশ_Array _icovar)
 {
     CV_INSTRUMENT_REGION();
 
     Mat v1 = _v1.getMat(), v2 = _v2.getMat(), icovar = _icovar.getMat();
-    int type = v1.type(), depth = v1.depth();
+    পূর্ণাঙ্ক type = v1.type(), depth = v1.depth();
     Size sz = v1.size();
-    int len = sz.width*sz.height*v1.channels();
-    AutoBuffer<double> buf(len);
+    পূর্ণাঙ্ক len = sz.width*sz.height*v1.channels();
+    AutoBuffer<দ্বিগুণ> buf(len);
 
     CV_Assert_N( type == v2.type(), type == icovar.type(),
         sz == v2.size(), len == icovar.rows && len == icovar.cols );
 
     sz.width *= v1.channels();
-    if( v1.isContinuous() && v2.isContinuous() )
+    যদি( v1.isContinuous() && v2.isContinuous() )
     {
         sz.width *= sz.height;
         sz.height = 1;
@@ -851,8 +851,8 @@ double Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
     MahalanobisImplFunc func = getMahalanobisImplFunc(depth);
     CV_Assert(func);
 
-    double result = func(v1, v2, icovar, buf.data(), len);
-    return std::sqrt(result);
+    দ্বিগুণ result = func(v1, v2, icovar, buf.data(), len);
+    প্রত্যাগম std::sqrt(result);
 }
 
 
@@ -861,52 +861,52 @@ double Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
 *                                        MulTransposed                                   *
 \****************************************************************************************/
 
-static MulTransposedFunc getMulTransposedFunc(int stype, int dtype, bool ata)
+স্থির MulTransposedFunc getMulTransposedFunc(পূর্ণাঙ্ক stype, পূর্ণাঙ্ক dtype, তার্কিক ata)
 {
 #ifdef CV_MULTRANSPOSED_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(getMulTransposedFunc, (stype, dtype, ata));
-#else
+#অন্যথা
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getMulTransposedFunc, (stype, dtype, ata),
         CV_CPU_DISPATCH_MODES_ALL);
 #endif
 }
 
-void mulTransposed(InputArray _src, OutputArray _dst, bool ata,
-                   InputArray _delta, double scale, int dtype)
+শূন্য mulTransposed(প্রবেশ_Array _src, OutputArray _dst, তার্কিক ata,
+                   প্রবেশ_Array _delta, দ্বিগুণ scale, পূর্ণাঙ্ক dtype)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat(), delta = _delta.getMat();
-    const int gemm_level = 100; // boundary above which GEMM is faster.
-    int stype = src.type();
+    ধ্রুব পূর্ণাঙ্ক gemm_level = 100; // boundary above which GEMM is faster.
+    পূর্ণাঙ্ক stype = src.type();
     dtype = std::max(std::max(CV_MAT_DEPTH(dtype >= 0 ? dtype : stype), delta.depth()), CV_32F);
     CV_Assert( src.channels() == 1 );
 
-    if( !delta.empty() )
+    যদি( !delta.empty() )
     {
         CV_Assert_N( delta.channels() == 1,
             (delta.rows == src.rows || delta.rows == 1),
             (delta.cols == src.cols || delta.cols == 1));
-        if( delta.type() != dtype )
+        যদি( delta.type() != dtype )
             delta.convertTo(delta, dtype);
     }
 
-    int dsize = ata ? src.cols : src.rows;
+    পূর্ণাঙ্ক dsize = ata ? src.cols : src.rows;
     _dst.create( dsize, dsize, dtype );
     Mat dst = _dst.getMat();
 
-    if( src.data == dst.data || (stype == dtype &&
+    যদি( src.data == dst.data || (stype == dtype &&
         (dst.cols >= gemm_level && dst.rows >= gemm_level &&
          src.cols >= gemm_level && src.rows >= gemm_level)))
     {
         Mat src2;
-        const Mat* tsrc = &src;
-        if( !delta.empty() )
+        ধ্রুব Mat* tsrc = &src;
+        যদি( !delta.empty() )
         {
-            if( delta.size() == src.size() )
+            যদি( delta.size() == src.size() )
                 subtract( src, delta, src2 );
-            else
+            অন্যথা
             {
                 repeat(delta, src.rows/delta.rows, src.cols/delta.cols, src2);
                 subtract( src, src2, src2 );
@@ -915,14 +915,14 @@ void mulTransposed(InputArray _src, OutputArray _dst, bool ata,
         }
         gemm( *tsrc, *tsrc, scale, Mat(), 0, dst, ata ? GEMM_1_T : GEMM_2_T );
     }
-    else
+    অন্যথা
     {
         MulTransposedFunc func = getMulTransposedFunc(stype, dtype, ata);
-        if( !func )
+        যদি( !func )
             CV_Error( cv::Error::StsUnsupportedFormat, "" );
 
         func( src, dst, delta, scale );
-        completeSymm( dst, false );
+        completeSymm( dst, অসত্য );
     }
 }
 
@@ -930,54 +930,54 @@ void mulTransposed(InputArray _src, OutputArray _dst, bool ata,
 *                                      Dot Product                                       *
 \****************************************************************************************/
 
-static double dotProd_8u(const void* src1, const void* src2, int len)
+স্থির দ্বিগুণ dotProd_8u(ধ্রুব শূন্য* src1, ধ্রুব শূন্য* src2, পূর্ণাঙ্ক len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_8u, ((const uchar*)src1, (const uchar*)src2, len),
+    CV_CPU_DISPATCH(dotProd_8u, ((ধ্রুব uchar*)src1, (ধ্রুব uchar*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_8s(const void* src1, const void* src2, int len)
+স্থির দ্বিগুণ dotProd_8s(ধ্রুব শূন্য* src1, ধ্রুব শূন্য* src2, পূর্ণাঙ্ক len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_8s, ((const schar*)src1, (const schar*)src2, len),
+    CV_CPU_DISPATCH(dotProd_8s, ((ধ্রুব schar*)src1, (ধ্রুব schar*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_16u(const void* src1, const void* src2, int len)
+স্থির দ্বিগুণ dotProd_16u(ধ্রুব শূন্য* src1, ধ্রুব শূন্য* src2, পূর্ণাঙ্ক len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_16u, ((const ushort*)src1, (const ushort*)src2, len),
+    CV_CPU_DISPATCH(dotProd_16u, ((ধ্রুব ushort*)src1, (ধ্রুব ushort*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_16s(const void* src1, const void* src2, int len)
+স্থির দ্বিগুণ dotProd_16s(ধ্রুব শূন্য* src1, ধ্রুব শূন্য* src2, পূর্ণাঙ্ক len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_16s, ((const short*)src1, (const short*)src2, len),
+    CV_CPU_DISPATCH(dotProd_16s, ((ধ্রুব short*)src1, (ধ্রুব short*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_32s(const void* src1, const void* src2, int len)
+স্থির দ্বিগুণ dotProd_32s(ধ্রুব শূন্য* src1, ধ্রুব শূন্য* src2, পূর্ণাঙ্ক len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_32s, ((const int*)src1, (const int*)src2, len),
+    CV_CPU_DISPATCH(dotProd_32s, ((ধ্রুব পূর্ণাঙ্ক*)src1, (ধ্রুব পূর্ণাঙ্ক*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_32f(const void* src1, const void* src2, int len)
+স্থির দ্বিগুণ dotProd_32f(ধ্রুব শূন্য* src1, ধ্রুব শূন্য* src2, পূর্ণাঙ্ক len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_32f, ((const float*)src1, (const float*)src2, len),
+    CV_CPU_DISPATCH(dotProd_32f, ((ধ্রুব ভিন্ন*)src1, (ধ্রুব ভিন্ন*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_64f(const void* src1, const void* src2, int len)
+স্থির দ্বিগুণ dotProd_64f(ধ্রুব শূন্য* src1, ধ্রুব শূন্য* src2, পূর্ণাঙ্ক len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_64f, ((const double*)src1, (const double*)src2, len),
+    CV_CPU_DISPATCH(dotProd_64f, ((ধ্রুব দ্বিগুণ*)src1, (ধ্রুব দ্বিগুণ*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-typedef double (*DotProdFunc)(const void* src1, const void* src2, int len);
+প্রকারনির্দেশ দ্বিগুণ (*DotProdFunc)(ধ্রুব শূন্য* src1, ধ্রুব শূন্য* src2, পূর্ণাঙ্ক len);
 
-static DotProdFunc getDotProdFunc(int depth)
+স্থির DotProdFunc getDotProdFunc(পূর্ণাঙ্ক depth)
 {
-    static DotProdFunc dotProdTab[CV_DEPTH_MAX] =
+    স্থির DotProdFunc dotProdTab[CV_DEPTH_MAX] =
     {
         dotProd_8u, dotProd_8s,
         dotProd_16u, dotProd_16s,
@@ -985,81 +985,81 @@ static DotProdFunc getDotProdFunc(int depth)
         dotProd_64f, 0
     };
 
-    return dotProdTab[depth];
+    প্রত্যাগম dotProdTab[depth];
 }
 
-double Mat::dot(InputArray _mat) const
+দ্বিগুণ Mat::dot(প্রবেশ_Array _mat) ধ্রুব
 {
     CV_INSTRUMENT_REGION();
 
     Mat mat = _mat.getMat();
     CV_Assert_N( mat.type() == type(), mat.size == size);
 
-    int cn = channels();
-    if (this->dims <= 2)
+    পূর্ণাঙ্ক cn = channels();
+    যদি (এতত্->dims <= 2)
     {
-        double product = 0;
-        CALL_HAL_RET(dotProduct, cv_hal_dotProduct, product, this->data, this->step, mat.data, mat.step,
-                     this->cols * cn, this->rows, this->depth());
+        দ্বিগুণ product = 0;
+        CALL_HAL_RET(dotProduct, cv_hal_dotProduct, product, এতত্->data, এতত্->step, mat.data, mat.step,
+                     এতত্->cols * cn, এতত্->rows, এতত্->depth());
     }
 
     DotProdFunc func = getDotProdFunc(depth());
     CV_Assert(func != 0 );
 
-    if( isContinuous() && mat.isContinuous() )
+    যদি( isContinuous() && mat.isContinuous() )
     {
         size_t len = total()*cn;
-        if( len == (size_t)(int)len )
-            return func(data, mat.data, (int)len);
+        যদি( len == (size_t)(পূর্ণাঙ্ক)len )
+            প্রত্যাগম func(data, mat.data, (পূর্ণাঙ্ক)len);
     }
 
-    const Mat* arrays[] = {this, &mat, 0};
+    ধ্রুব Mat* arrays[] = {এতত্, &mat, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)(it.size*cn);
-    double r = 0;
+    পূর্ণাঙ্ক len = (পূর্ণাঙ্ক)(it.size*cn);
+    দ্বিগুণ r = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    প্রতি( size_t i = 0; i < it.nplanes; i++, ++it )
         r += func( ptrs[0], ptrs[1], len );
 
-    return r;
+    প্রত্যাগম r;
 }
 
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_dot( InputArray _src1, InputArray _src2, double & res )
+স্থির তার্কিক ocl_dot( প্রবেশ_Array _src1, প্রবেশ_Array _src2, দ্বিগুণ & res )
 {
     UMat src1 = _src1.getUMat().reshape(1), src2 = _src2.getUMat().reshape(1);
 
-    int type = src1.type(), depth = CV_MAT_DEPTH(type),
+    পূর্ণাঙ্ক type = src1.type(), depth = CV_MAT_DEPTH(type),
             kercn = ocl::predictOptimalVectorWidth(src1, src2);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    তার্কিক doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if ( !doubleSupport && depth == CV_64F )
-        return false;
+    যদি ( !doubleSupport && depth == CV_64F )
+        প্রত্যাগম অসত্য;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
+    পূর্ণাঙ্ক dbsize = ocl::Device::getDefault().maxComputeUnits();
     size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
-    int ddepth = std::max(CV_32F, depth);
+    পূর্ণাঙ্ক ddepth = std::max(CV_32F, depth);
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    পূর্ণাঙ্ক wgs2_aligned = 1;
+    যাবত্ (wgs2_aligned < (পূর্ণাঙ্ক)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    char cvt[50];
+    বর্ণ cvt[50];
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc,
                   format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstTK=%s -D ddepth=%d -D convertToDT=%s -D OP_DOT "
                          "-D WGS=%d -D WGS2_ALIGNED=%d%s%s%s -D kercn=%d",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), ocl::typeToStr(depth),
                          ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKE_TYPE(ddepth, kercn)),
-                         ddepth, ocl::convertTypeStr(depth, ddepth, kercn, cvt, sizeof(cvt)),
-                         (int)wgs, wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
+                         ddepth, ocl::convertTypeStr(depth, ddepth, kercn, cvt, পরিমাণ(cvt)),
+                         (পূর্ণাঙ্ক)wgs, wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src1.isContinuous() ? " -D HAVE_SRC_CONT" : "",
                          _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "", kercn));
-    if (k.empty())
-        return false;
+    যদি (k.empty())
+        প্রত্যাগম অসত্য;
 
     UMat db(1, dbsize, ddepth);
 
@@ -1067,31 +1067,31 @@ static bool ocl_dot( InputArray _src1, InputArray _src2, double & res )
             src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
             dbarg = ocl::KernelArg::PtrWriteOnly(db);
 
-    k.args(src1arg, src1.cols, (int)src1.total(), dbsize, dbarg, src2arg);
+    k.args(src1arg, src1.cols, (পূর্ণাঙ্ক)src1.total(), dbsize, dbarg, src2arg);
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
+    যদি (k.run(1, &globalsize, &wgs, সত্য))
     {
         res = sum(db.getMat(ACCESS_READ))[0];
-        return true;
+        প্রত্যাগম সত্য;
     }
-    return false;
+    প্রত্যাগম অসত্য;
 }
 
 #endif
 
-double UMat::dot(InputArray m) const
+দ্বিগুণ UMat::dot(প্রবেশ_Array m) ধ্রুব
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert(m.sameSize(*this) && m.type() == type());
+    CV_Assert(m.sameSize(*এতত্) && m.type() == type());
 
 #ifdef HAVE_OPENCL
-    double r = 0;
-    CV_OCL_RUN_(dims <= 2, ocl_dot(*this, m, r), r)
+    দ্বিগুণ r = 0;
+    CV_OCL_RUN_(dims <= 2, ocl_dot(*এতত্, m, r), r)
 #endif
 
-    return getMat(ACCESS_READ).dot(m);
+    প্রত্যাগম getMat(ACCESS_READ).dot(m);
 }
 
 }  // namespace cv::
