@@ -27,7 +27,7 @@ std::string make_base64_header(const char * dt);
 size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+ціле icvCalcStructSize( const char* dt, ціле initial_size );
 
 class Base64ContextEmitter;
 class Impl;
@@ -61,36 +61,36 @@ to_binary(_uint_t val, uchar * cur)
 {
     size_t delta = CHAR_BIT;
     size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    поки (cnt --> static_cast<size_t>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    повернути sizeof(_uint_t);
 }
 
 template<> inline size_t to_binary(bool val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    повернути to_binary(static_cast<uchar>(val), cur);
 }
 
 template<> inline size_t to_binary(double val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    повернути to_binary(bit64.u, cur);
 }
 
 template<> inline size_t to_binary(float val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    повернути to_binary(bit32.u, cur);
 }
 
 template<typename _primitive_t> inline size_t
 to_binary(uchar const * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    повернути to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
 }
 
 
@@ -99,7 +99,7 @@ class RawDataToBinaryConvertor
 {
 public:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    RawDataToBinaryConvertor(const void* src, ціле len, const std::string & dt);
 
     inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
     inline operator bool() const;

@@ -5,7 +5,7 @@
 #ifndef OPENCV_CORE_LOGTAGMANAGER_HPP
 #define OPENCV_CORE_LOGTAGMANAGER_HPP
 
-#if 1 // if not already in precompiled headers
+#якщо 1 // if not already in precompiled headers
 #include <string>
 #include <algorithm>
 #include <functional>

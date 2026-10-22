@@ -17,7 +17,7 @@ namespace cv {
 // -ffast-math.
 static inline bool isFiniteVal(double x)
 {
-    return !cvIsNaN(x) && !cvIsInf(x);
+    повернути !cvIsNaN(x) && !cvIsInf(x);
 }
 
 // Type the duals and the running sums are kept in. double suits all three inputs: it holds every
@@ -30,56 +30,56 @@ template <typename T>
 static inline bool cellAllowed(T value, double costThreshold)
 {
     const double v = (double)value;
-    return isFiniteVal(v) && v <= costThreshold;
+    повернути isFiniteVal(v) && v <= costThreshold;
 }
 
 // Assigns every row to its own column at the lowest total. `work` is nrows x ncols, rows <= cols,
 // all finite. Each pass adds one row by a Dijkstra search over the reduced costs.
 template <typename Acc>
-static void solveJV(const std::vector<Acc>& work, int nrows, int ncols, std::vector<int>& colOfRow)
+static void solveJV(const std::vector<Acc>& work, ціле nrows, ціле ncols, std::vector<ціле>& colOfRow)
 {
     CV_DbgAssert(nrows <= ncols);
 
     std::vector<Acc> u((size_t)nrows, Acc(0));
     std::vector<Acc> v((size_t)ncols, Acc(0));
     std::vector<Acc> dist((size_t)ncols);
-    std::vector<int> rowOfCol((size_t)ncols, -1);
-    std::vector<int> prevRow((size_t)ncols);
+    std::vector<ціле> rowOfCol((size_t)ncols, -1);
+    std::vector<ціле> prevRow((size_t)ncols);
     std::vector<uchar> labelled((size_t)ncols);
-    std::vector<int> remaining((size_t)ncols);   // columns not yet labelled, in no order
+    std::vector<ціле> remaining((size_t)ncols);   // columns not yet labelled, in no order
 
     colOfRow.assign((size_t)nrows, -1);
 
-    for (int freeRow = 0; freeRow < nrows; freeRow++)
+    для (ціле freeRow = 0; freeRow < nrows; freeRow++)
     {
         std::fill(dist.begin(), dist.end(), std::numeric_limits<Acc>::max());
         std::fill(labelled.begin(), labelled.end(), (uchar)0);
-        for (int j = 0; j < ncols; j++)
+        для (ціле j = 0; j < ncols; j++)
             remaining[j] = j;
-        int nremaining = ncols;
+        ціле nremaining = ncols;
 
-        int row = freeRow;      // row currently being expanded
+        ціле row = freeRow;      // row currently being expanded
         Acc delta = Acc(0);     // length of the shortest path found so far
-        int sink = -1;          // free column that ends the augmenting path
+        ціле sink = -1;          // free column that ends the augmenting path
 
-        while (sink < 0)
+        поки (sink < 0)
         {
             const Acc* rowPtr = &work[(size_t)row * ncols];
             const Acc urow = u[row];
             // One pass over the unlabelled columns relaxes them and picks the nearest. A settled
             // column is swapped off the tail so it is never read again.
-            int best = 0;
+            ціле best = 0;
             Acc bestDist = std::numeric_limits<Acc>::max();
-            for (int k = 0; k < nremaining; k++)
+            для (ціле k = 0; k < nremaining; k++)
             {
-                const int j = remaining[k];
+                const ціле j = remaining[k];
                 const Acc cand = delta + rowPtr[j] - urow - v[j];
-                if (cand < dist[j])
+                якщо (cand < dist[j])
                 {
                     dist[j] = cand;
                     prevRow[j] = row;
                 }
-                if (dist[j] < bestDist)
+                якщо (dist[j] < bestDist)
                 {
                     bestDist = dist[j];
                     best = k;
@@ -89,23 +89,23 @@ static void solveJV(const std::vector<Acc>& work, int nrows, int ncols, std::vec
             // search can always reach it.
             CV_Assert(bestDist < std::numeric_limits<Acc>::max());
 
-            const int next = remaining[best];
+            const ціле next = remaining[best];
             remaining[best] = remaining[--nremaining];
             labelled[next] = 1;    // still needed by the dual update below
             delta = bestDist;
 
-            if (rowOfCol[next] < 0)
+            якщо (rowOfCol[next] < 0)
                 sink = next;
-            else
+            інакше
                 row = rowOfCol[next];   // occupied, so keep going through its row
         }
 
         // Shift the duals so the path edges land at zero without disturbing the matched pairs.
         // Must run before the matching below, which it reads.
         u[freeRow] += delta;
-        for (int j = 0; j < ncols; j++)
+        для (ціле j = 0; j < ncols; j++)
         {
-            if (labelled[j] && j != sink)
+            якщо (labelled[j] && j != sink)
             {
                 const Acc shift = delta - dist[j];
                 v[j] -= shift;
@@ -114,13 +114,13 @@ static void solveJV(const std::vector<Acc>& work, int nrows, int ncols, std::vec
         }
 
         // Walk the path back from the free column, flipping each edge.
-        for (int j = sink;;)
+        для (ціле j = sink;;)
         {
-            const int i = prevRow[j];
+            const ціле i = prevRow[j];
             rowOfCol[j] = i;
-            const int jPrev = colOfRow[i];
+            const ціле jPrev = colOfRow[i];
             colOfRow[i] = j;
-            if (i == freeRow)
+            якщо (i == freeRow)
                 break;
             j = jPrev;
         }
@@ -130,32 +130,32 @@ static void solveJV(const std::vector<Acc>& work, int nrows, int ncols, std::vec
 // Solves for one input type. `src` is read in its own type, so the padded working matrix is the
 // only copy made and no promoted duplicate of the input is allocated.
 template <typename T>
-static double solveTyped(const Mat& src, bool transposed, std::vector<int>& assignment,
+static double solveTyped(const Mat& src, bool transposed, std::vector<ціле>& assignment,
                          double costThreshold)
 {
     typedef typename LapAccumulator<T>::type Acc;
 
-    const int nrows = src.rows;
-    const int nreal = src.cols;
+    const ціле nrows = src.rows;
+    const ціле nreal = src.cols;
 
     Mat allowed(nrows, nreal, CV_8U);
     Acc absSum = Acc(0);
     double maxCost = -std::numeric_limits<double>::max();
     bool anyForbidden = false;
-    for (int i = 0; i < nrows; i++)
+    для (ціле i = 0; i < nrows; i++)
     {
         const T* s = src.ptr<T>(i);
         uchar* a = allowed.ptr<uchar>(i);
-        for (int j = 0; j < nreal; j++)
+        для (ціле j = 0; j < nreal; j++)
         {
             const bool ok = cellAllowed<T>(s[j], costThreshold);
             a[j] = ok ? 1 : 0;
-            if (ok)
+            якщо (ok)
             {
                 absSum += (Acc)std::abs((double)s[j]);
                 maxCost = std::max(maxCost, (double)s[j]);
             }
-            else
+            інакше
                 anyForbidden = true;
         }
     }
@@ -163,7 +163,7 @@ static double solveTyped(const Mat& src, bool transposed, std::vector<int>& assi
     // Price of leaving a row unmatched, clamped so the DBL_MAX default stays finite.
     // The 2 is required: k -> k+1 augments a path, so the delta is 2*absSum, not one edge.
     Acc dummy = Acc(2) * absSum + Acc(1);
-    if (costThreshold < (double)dummy)
+    якщо (costThreshold < (double)dummy)
         dummy = (Acc)costThreshold;
     CV_Assert(isFiniteVal((double)dummy));
 
@@ -174,41 +174,41 @@ static double solveTyped(const Mat& src, bool transposed, std::vector<int>& assi
 
     // Drop the dummy columns when no row can go unmatched: nothing forbidden, every cost below the
     // no-pair price. Halves the columns on square input; a cost equal to that price is a tie.
-    const int ndummy = (anyForbidden || !(maxCost < (double)dummy)) ? nrows : 0;
-    const int ncols = nreal + ndummy;
+    const ціле ndummy = (anyForbidden || !(maxCost < (double)dummy)) ? nrows : 0;
+    const ціле ncols = nreal + ndummy;
 
     std::vector<Acc> work((size_t)nrows * ncols);
-    for (int i = 0; i < nrows; i++)
+    для (ціле i = 0; i < nrows; i++)
     {
         const T* s = src.ptr<T>(i);
         const uchar* a = allowed.ptr<uchar>(i);
         Acc* w = &work[(size_t)i * ncols];
-        for (int j = 0; j < nreal; j++)
+        для (ціле j = 0; j < nreal; j++)
             w[j] = a[j] ? (Acc)s[j] : forbidden;
-        for (int j = nreal; j < ncols; j++)
+        для (ціле j = nreal; j < ncols; j++)
             w[j] = dummy;
     }
 
-    std::vector<int> colOfRow;
+    std::vector<ціле> colOfRow;
     solveJV<Acc>(work, nrows, ncols, colOfRow);
 
     double total = 0.0;
-    for (int i = 0; i < nrows; i++)
+    для (ціле i = 0; i < nrows; i++)
     {
-        const int j = colOfRow[i];
+        const ціле j = colOfRow[i];
         CV_DbgAssert(j >= 0 && j < ncols);      // solveJV gives every row a column
-        if (j >= nreal || !allowed.at<uchar>(i, j))
+        якщо (j >= nreal || !allowed.at<uchar>(i, j))
             continue;   // landed on a dummy column or a forbidden cell, so it stays unmatched
 
         total += (double)src.ptr<T>(i)[j];
-        const int row = transposed ? j : i;
+        const ціле row = transposed ? j : i;
         CV_DbgAssert(row >= 0 && (size_t)row < assignment.size());
         assignment[(size_t)row] = transposed ? i : j;
     }
-    return total;
+    повернути total;
 }
 
-double linearAssignment(InputArray _cost, std::vector<int>& assignment, double costThreshold)
+double linearAssignment(InputArray _cost, std::vector<ціле>& assignment, double costThreshold)
 {
     CV_INSTRUMENT_REGION();
 
@@ -227,16 +227,16 @@ double linearAssignment(InputArray _cost, std::vector<int>& assignment, double c
     // transpose give the same answer, since min(M,N) is the same either way.
     const bool transposed = cost.rows > cost.cols;
     Mat src;
-    if (transposed)
+    якщо (transposed)
         cv::transpose(cost, src);
-    else
+    інакше
         src = cost;
 
     switch (cost.depth())
     {
-    case CV_32F: return solveTyped<float>(src, transposed, assignment, costThreshold);
-    case CV_64F: return solveTyped<double>(src, transposed, assignment, costThreshold);
-    case CV_32S: return solveTyped<int>(src, transposed, assignment, costThreshold);
+    case CV_32F: повернути solveTyped<float>(src, transposed, assignment, costThreshold);
+    case CV_64F: повернути solveTyped<double>(src, transposed, assignment, costThreshold);
+    case CV_32S: повернути solveTyped<ціле>(src, transposed, assignment, costThreshold);
     default:     CV_Error(Error::StsUnsupportedFormat, "unsupported cost matrix type");
     }
 }

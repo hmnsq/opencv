@@ -31,37 +31,37 @@ bool LogTagConfigParser::parse(const std::string& input)
 {
     m_input = input;
     segmentTokens();
-    return (m_malformed.empty());
+    повернути (m_malformed.empty());
 }
 
 bool LogTagConfigParser::hasMalformed() const
 {
-    return !m_malformed.empty();
+    повернути !m_malformed.empty();
 }
 
 const LogTagConfig& LogTagConfigParser::getGlobalConfig() const
 {
-    return m_parsedGlobal;
+    повернути m_parsedGlobal;
 }
 
 const std::vector<LogTagConfig>& LogTagConfigParser::getFullNameConfigs() const
 {
-    return m_parsedFullName;
+    повернути m_parsedFullName;
 }
 
 const std::vector<LogTagConfig>& LogTagConfigParser::getFirstPartConfigs() const
 {
-    return m_parsedFirstPart;
+    повернути m_parsedFirstPart;
 }
 
 const std::vector<LogTagConfig>& LogTagConfigParser::getAnyPartConfigs() const
 {
-    return m_parsedAnyPart;
+    повернути m_parsedAnyPart;
 }
 
 const std::vector<std::string>& LogTagConfigParser::getMalformed() const
 {
-    return m_malformed;
+    повернути m_malformed;
 }
 
 void LogTagConfigParser::segmentTokens()
@@ -69,24 +69,24 @@ void LogTagConfigParser::segmentTokens()
     const size_t len = m_input.length();
     std::vector<std::pair<size_t, size_t>> startStops;
     bool wasSeparator = true;
-    for (size_t pos = 0u; pos < len; ++pos)
+    для (size_t pos = 0u; pos < len; ++pos)
     {
         char c = m_input[pos];
         bool isSeparator = (c == ' ' || c == '\t' || c == ';');
-        if (!isSeparator)
+        якщо (!isSeparator)
         {
-            if (wasSeparator)
+            якщо (wasSeparator)
             {
                 startStops.emplace_back(pos, pos + 1u);
             }
-            else
+            інакше
             {
                 startStops.back().second = pos + 1u;
             }
         }
         wasSeparator = isSeparator;
     }
-    for (const auto& startStop : startStops)
+    для (const auto& startStop : startStops)
     {
         const auto s = m_input.substr(startStop.first, startStop.second - startStop.first);
         parseNameAndLevel(s);
@@ -98,48 +98,48 @@ void LogTagConfigParser::parseNameAndLevel(const std::string& s)
     const size_t npos = std::string::npos;
     const size_t len = s.length();
     size_t colonIdx = s.find_first_of(":=");
-    if (colonIdx == npos)
+    якщо (colonIdx == npos)
     {
         // See if the whole string is a log level
         auto parsedLevel = parseLogLevel(s);
-        if (parsedLevel.second)
+        якщо (parsedLevel.second)
         {
             // If it is, assume the log level is for global
             parseWildcard("", parsedLevel.first);
-            return;
+            повернути;
         }
-        else
+        інакше
         {
             // not sure what to do.
             m_malformed.push_back(s);
-            return;
+            повернути;
         }
     }
-    if (colonIdx == 0u || colonIdx + 1u == len)
+    якщо (colonIdx == 0u || colonIdx + 1u == len)
     {
         // malformed (colon or equal sign at beginning or end), cannot do anything
         m_malformed.push_back(s);
-        return;
+        повернути;
     }
     size_t colonIdx2 = s.find_first_of(":=", colonIdx + 1u);
-    if (colonIdx2 != npos)
+    якщо (colonIdx2 != npos)
     {
         // malformed (more than one colon or equal sign), cannot do anything
         m_malformed.push_back(s);
-        return;
+        повернути;
     }
     auto parsedLevel = parseLogLevel(s.substr(colonIdx + 1u));
-    if (parsedLevel.second)
+    якщо (parsedLevel.second)
     {
         parseWildcard(s.substr(0u, colonIdx), parsedLevel.first);
-        return;
+        повернути;
     }
-    else
+    інакше
     {
         // Cannot recognize the right side of the colon or equal sign.
         // Not sure what to do.
         m_malformed.push_back(s);
-        return;
+        повернути;
     }
 }
 
@@ -147,22 +147,22 @@ void LogTagConfigParser::parseWildcard(const std::string& name, LogLevel level)
 {
     const size_t npos = std::string::npos;
     const size_t len = name.length();
-    if (len == 0u)
+    якщо (len == 0u)
     {
         m_parsedGlobal.level = level;
-        return;
+        повернути;
     }
     const bool hasPrefixWildcard = (name[0u] == '*');
-    if (hasPrefixWildcard && len == 1u)
+    якщо (hasPrefixWildcard && len == 1u)
     {
         m_parsedGlobal.level = level;
-        return;
+        повернути;
     }
     const size_t firstNonWildcard = name.find_first_not_of("*.");
-    if (hasPrefixWildcard && firstNonWildcard == npos)
+    якщо (hasPrefixWildcard && firstNonWildcard == npos)
     {
         m_parsedGlobal.level = level;
-        return;
+        повернути;
     }
     const bool hasSuffixWildcard = (name[len - 1u] == '*');
     const size_t lastNonWildcard = name.find_last_not_of("*.");
@@ -170,21 +170,21 @@ void LogTagConfigParser::parseWildcard(const std::string& name, LogLevel level)
     // The case of a single asterisk has been handled above;
     // here we only handle the explicit use of "global" in the log config string.
     const bool isGlobal = (trimmedNamePart == "global");
-    if (isGlobal)
+    якщо (isGlobal)
     {
         m_parsedGlobal.level = level;
-        return;
+        повернути;
     }
     LogTagConfig result(trimmedNamePart, level, false, hasPrefixWildcard, hasSuffixWildcard);
-    if (hasPrefixWildcard)
+    якщо (hasPrefixWildcard)
     {
         m_parsedAnyPart.emplace_back(std::move(result));
     }
-    else if (hasSuffixWildcard)
+    інакше якщо (hasSuffixWildcard)
     {
         m_parsedFirstPart.emplace_back(std::move(result));
     }
-    else
+    інакше
     {
         m_parsedFullName.emplace_back(std::move(result));
     }
@@ -195,80 +195,80 @@ std::pair<LogLevel, bool> LogTagConfigParser::parseLogLevel(const std::string& s
     const auto falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, false);
     const auto make_parsed_result = [](LogLevel lev) -> std::pair<LogLevel, bool>
     {
-        return std::make_pair(lev, true);
+        повернути std::make_pair(lev, true);
     };
     const size_t len = s.length();
-    if (len >= 1u)
+    якщо (len >= 1u)
     {
         const char c = (char)std::toupper(s[0]);
         switch (c)
         {
         case '0':
-            if (len == 1u)
+            якщо (len == 1u)
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                повернути make_parsed_result(LOG_LEVEL_SILENT);
             }
             break;
         case 'D':
-            if (len == 1u ||
+            якщо (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "DEBUG"))
             {
-                return make_parsed_result(LOG_LEVEL_DEBUG);
+                повернути make_parsed_result(LOG_LEVEL_DEBUG);
             }
-            if ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
+            якщо ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
                 (len == 8u && cv::toUpperCase(s) == "DISABLED"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                повернути make_parsed_result(LOG_LEVEL_SILENT);
             }
             break;
         case 'E':
-            if (len == 1u ||
+            якщо (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "ERROR"))
             {
-                return make_parsed_result(LOG_LEVEL_ERROR);
+                повернути make_parsed_result(LOG_LEVEL_ERROR);
             }
             break;
         case 'F':
-            if (len == 1u ||
+            якщо (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "FATAL"))
             {
-                return make_parsed_result(LOG_LEVEL_FATAL);
+                повернути make_parsed_result(LOG_LEVEL_FATAL);
             }
             break;
         case 'I':
-            if (len == 1u ||
+            якщо (len == 1u ||
                 (len == 4u && cv::toUpperCase(s) == "INFO"))
             {
-                return make_parsed_result(LOG_LEVEL_INFO);
+                повернути make_parsed_result(LOG_LEVEL_INFO);
             }
             break;
         case 'O':
-            if (len == 3u && cv::toUpperCase(s) == "OFF")
+            якщо (len == 3u && cv::toUpperCase(s) == "OFF")
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                повернути make_parsed_result(LOG_LEVEL_SILENT);
             }
             break;
         case 'S':
-            if (len == 1u ||
+            якщо (len == 1u ||
                 (len == 6u && cv::toUpperCase(s) == "SILENT"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                повернути make_parsed_result(LOG_LEVEL_SILENT);
             }
             break;
         case 'V':
-            if (len == 1u ||
+            якщо (len == 1u ||
                 (len == 7u && cv::toUpperCase(s) == "VERBOSE"))
             {
-                return make_parsed_result(LOG_LEVEL_VERBOSE);
+                повернути make_parsed_result(LOG_LEVEL_VERBOSE);
             }
             break;
         case 'W':
-            if (len == 1u ||
+            якщо (len == 1u ||
                 (len == 4u && cv::toUpperCase(s) == "WARN") ||
                 (len == 7u && cv::toUpperCase(s) == "WARNING") ||
                 (len == 8u && cv::toUpperCase(s) == "WARNINGS"))
             {
-                return make_parsed_result(LOG_LEVEL_WARNING);
+                повернути make_parsed_result(LOG_LEVEL_WARNING);
             }
             break;
         default:
@@ -276,7 +276,7 @@ std::pair<LogLevel, bool> LogTagConfigParser::parseLogLevel(const std::string& s
         }
         // fall through
     }
-    return falseDontCare;
+    повернути falseDontCare;
 }
 
 std::string LogTagConfigParser::toString(LogLevel level)
@@ -284,21 +284,21 @@ std::string LogTagConfigParser::toString(LogLevel level)
     switch (level)
     {
     case LOG_LEVEL_SILENT:
-        return "SILENT";
+        повернути "SILENT";
     case LOG_LEVEL_FATAL:
-        return "FATAL";
+        повернути "FATAL";
     case LOG_LEVEL_ERROR:
-        return "ERROR";
+        повернути "ERROR";
     case LOG_LEVEL_WARNING:
-        return "WARNING";
+        повернути "WARNING";
     case LOG_LEVEL_INFO:
-        return "INFO";
+        повернути "INFO";
     case LOG_LEVEL_DEBUG:
-        return "DEBUG";
+        повернути "DEBUG";
     case LOG_LEVEL_VERBOSE:
-        return "VERBOSE";
+        повернути "VERBOSE";
     default:
-        return std::to_string((int)level);
+        повернути std::to_string((ціле)level);
     }
 }
 

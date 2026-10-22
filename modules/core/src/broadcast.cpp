@@ -34,34 +34,34 @@ namespace cv {
 //             expandChannels=false; the body handles channels itself (deinterleave fast path).
 enum ChMode { CH_FOLD, CH_DIM, CH_ELEM };
 
-static void matLayout(const Mat& m, ChMode mode, MatShape& shp, MatStep& step, int& esz1)
+static void matLayout(const Mat& m, ChMode mode, MatShape& shp, MatStep& step, ціле& esz1)
 {
-    const int nd = m.dims, cn = m.channels();
-    if (mode == CH_ELEM)
+    const ціле nd = m.dims, cn = m.channels();
+    якщо (mode == CH_ELEM)
     {
-        esz1 = (int)m.elemSize();                       // one full (cn-channel) pixel
+        esz1 = (ціле)m.elemSize();                       // one full (cn-channel) pixel
         shp.resize(nd);
-        for (int i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
-        return;
+        для (ціле i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
+        повернути;
     }
-    esz1 = (int)m.elemSize1();                           // one scalar (channel value)
-    if (mode == CH_DIM)
+    esz1 = (ціле)m.elemSize1();                           // one scalar (channel value)
+    якщо (mode == CH_DIM)
     {
         shp.resize(nd + 1);
-        for (int i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
+        для (ціле i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
         shp[nd] = cn; step[nd] = 1;                      // channels = explicit innermost dim
     }
-    else // CH_FOLD
+    інакше // CH_FOLD
     {
-        if (nd == 0)                                     // 0-dim scalar: channels are the only dim
+        якщо (nd == 0)                                     // 0-dim scalar: channels are the only dim
         {
             shp.assign(1, cn);
             step[0] = 1;
         }
-        else
+        інакше
         {
             shp.resize(nd);
-            for (int i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
+            для (ціле i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
             shp[nd - 1] *= cn;                           // fold channels into the innermost dim
             step[nd - 1] = 1;                            // scalars are contiguous there
         }
@@ -73,83 +73,83 @@ static void matLayout(const Mat& m, ChMode mode, MatShape& shp, MatStep& step, i
 // channel-mode decision entirely.
 static bool isSingleChannelScalar(const Mat& m)
 {
-    return m.channels() == 1 && m.total() == 1;
+    повернути m.channels() == 1 && m.total() == 1;
 }
 
 // Decide (globally, across all operands) how channels are presented for expandChannels=true:
 // CH_FOLD when no channel broadcast is needed, CH_DIM when it is. Single-channel scalars are
 // excluded first; among the rest, multichannel operands must all share the same cn (an (n,m) mix
 // with both > 1 is an error).
-static ChMode decideChannelMode(const Mat* const* arrays, int K)
+static ChMode decideChannelMode(const Mat* const* arrays, ціле K)
 {
-    int N = 1;                                           // the single multichannel count, if any
-    for (int k = 0; k < K; k++)
+    ціле N = 1;                                           // the single multichannel count, if any
+    для (ціле k = 0; k < K; k++)
     {
-        if (isSingleChannelScalar(*arrays[k])) continue;
-        int c = arrays[k]->channels();
-        if (c > 1) { if (N == 1) N = c; else CV_Assert(N == c && "ew: (n,m) channel mix unsupported"); }
+        якщо (isSingleChannelScalar(*arrays[k])) continue;
+        ціле c = arrays[k]->channels();
+        якщо (c > 1) { якщо (N == 1) N = c; інакше CV_Assert(N == c && "ew: (n,m) channel mix unsupported"); }
     }
-    if (N == 1) return CH_FOLD;                          // all single-channel -> fold (a no-op)
+    якщо (N == 1) повернути CH_FOLD;                          // all single-channel -> fold (a no-op)
 
     bool allMulti = true, sameBack = true;
-    int back = -1;
-    for (int k = 0; k < K; k++)
+    ціле back = -1;
+    для (ціле k = 0; k < K; k++)
     {
         const Mat& a = *arrays[k];
-        if (isSingleChannelScalar(a)) continue;
-        if (a.channels() != N) allMulti = false;
-        int b = a.dims > 0 ? a.size[a.dims - 1] : 1;   // 0-dim scalar has no spatial back (=1)
-        if (back < 0) back = b; else if (b != back) sameBack = false;
+        якщо (isSingleChannelScalar(a)) continue;
+        якщо (a.channels() != N) allMulti = false;
+        ціле b = a.dims > 0 ? a.size[a.dims - 1] : 1;   // 0-dim scalar has no spatial back (=1)
+        якщо (back < 0) back = b; інакше якщо (b != back) sameBack = false;
     }
-    return (allMulti && sameBack) ? CH_FOLD : CH_DIM;    // fold only if no channel broadcast
+    повернути (allMulti && sameBack) ? CH_FOLD : CH_DIM;    // fold only if no channel broadcast
 }
 
 // numpy-style broadcast of several right-aligned shapes.
-static bool broadcastShape(const MatShape* shps, int K, MatShape& out)
+static bool broadcastShape(const MatShape* shps, ціле K, MatShape& out)
 {
     size_t nd = 0;
-    for (int k = 0; k < K; k++) nd = std::max(nd, shps[k].size());
+    для (ціле k = 0; k < K; k++) nd = std::max(nd, shps[k].size());
     out.assign(nd, 1);
-    for (int k = 0; k < K; k++)
+    для (ціле k = 0; k < K; k++)
     {
         const MatShape& s = shps[k];
         size_t off = nd - s.size();
-        for (size_t i = 0; i < s.size(); i++)
+        для (size_t i = 0; i < s.size(); i++)
         {
-            int d = s[i], &o = out[off + i];
-            if (o == 1) o = d;
-            else if (d != 1 && d != o) return false;
+            ціле d = s[i], &o = out[off + i];
+            якщо (o == 1) o = d;
+            інакше якщо (d != 1 && d != o) повернути false;
         }
     }
-    return true;
+    повернути true;
 }
 
 // Right-align an arg's own (shp,step) to nd dims; broadcast dims get step 0.
-static void alignArg(const MatShape& shp, const MatStep& step, int nd,
+static void alignArg(const MatShape& shp, const MatStep& step, ціле nd,
                      MatStep& as, MatShape& ash)
 {
     as.clear();
     ash.assign(nd, 1);
-    int off = nd - (int)shp.size();
-    for (int i = 0; i < (int)shp.size(); i++)
+    ціле off = nd - (ціле)shp.size();
+    для (ціле i = 0; i < (ціле)shp.size(); i++)
     {
-        int d = shp[i];
+        ціле d = shp[i];
         ash[off + i] = d;
         as[off + i] = (d == 1) ? 0 : step[i];
     }
 }
 
 // Collapse adjacent dims that are contiguous (and broadcast-consistent) across all args.
-static int collapseDims(MatStep* S, MatShape* H, int K, MatShape& D)
+static ціле collapseDims(MatStep* S, MatShape* H, ціле K, MatShape& D)
 {
-    int nd = (int)D.size();
-    if (nd <= 1) return nd;
+    ціле nd = (ціле)D.size();
+    якщо (nd <= 1) повернути nd;
 
-    int j = nd - 1;
-    for (int i = j - 1; i >= 0; i--)
+    ціле j = nd - 1;
+    для (ціле i = j - 1; i >= 0; i--)
     {
         bool contig = true, scalar = true, consist = true;
-        for (int k = 0; k < K; k++)
+        для (ціле k = 0; k < K; k++)
         {
             size_t st = S[k][j] * (size_t)H[k][j];
             bool prevScalar = H[k][j] == 1;
@@ -158,37 +158,37 @@ static int collapseDims(MatStep* S, MatShape* H, int K, MatShape& D)
             scalar  = scalar  && curScalar;
             consist = consist && (curScalar == prevScalar);
         }
-        if (contig && (consist || scalar))
+        якщо (contig && (consist || scalar))
         {
-            for (int k = 0; k < K; k++) H[k][j] *= H[k][i];
+            для (ціле k = 0; k < K; k++) H[k][j] *= H[k][i];
             D[j] *= D[i];
         }
-        else
+        інакше
         {
             j--;
-            if (i < j)
+            якщо (i < j)
             {
-                for (int k = 0; k < K; k++) { H[k][j] = H[k][i]; S[k][j] = S[k][i]; }
+                для (ціле k = 0; k < K; k++) { H[k][j] = H[k][i]; S[k][j] = S[k][i]; }
                 D[j] = D[i];
             }
         }
     }
 
-    int m = nd - j;
-    for (int d = 0; d < m; d++)
+    ціле m = nd - j;
+    для (ціле d = 0; d < m; d++)
     {
         D[d] = D[j + d];
-        for (int k = 0; k < K; k++) { S[k][d] = S[k][j + d]; H[k][d] = H[k][j + d]; }
+        для (ціле k = 0; k < K; k++) { S[k][d] = S[k][j + d]; H[k][d] = H[k][j + d]; }
     }
     D.resize(m);
-    for (int k = 0; k < K; k++) H[k].resize(m);
+    для (ціле k = 0; k < K; k++) H[k].resize(m);
 
     // Zero out steps of broadcast (size-1) dims (numpy step==0 trick).
-    for (int d = 0; d < m; d++)
-        for (int k = 0; k < K; k++)
-            if (H[k][d] == 1) S[k][d] = 0;
+    для (ціле d = 0; d < m; d++)
+        для (ціле k = 0; k < K; k++)
+            якщо (H[k][d] == 1) S[k][d] = 0;
 
-    return m;
+    повернути m;
 }
 
 // Fast geometry for the dominant case: every operand is either (a) an array sharing ONE common
@@ -198,35 +198,35 @@ static int collapseDims(MatStep* S, MatShape* H, int K, MatShape& D)
 // broadcastShape / alignArg / collapseDims and all their per-operand buffers entirely. Returns
 // false (leaving outputs untouched) when the operands don't fit, so the caller runs general
 // geometry. expandChannels=false (CH_ELEM) keeps channels in the element and is left to general.
-static bool fastSameShape(const Mat* const* arrays, int K, bool expandChannels,
-                          uchar** base, int* esz1, MatStep* S, MatShape& D, int& m)
+static bool fastSameShape(const Mat* const* arrays, ціле K, bool expandChannels,
+                          uchar** base, ціле* esz1, MatStep* S, MatShape& D, ціле& m)
 {
-    if (!expandChannels) return false;
-    int ref = -1;
-    for (int k = 0; k < K; k++)
-        if (!isSingleChannelScalar(*arrays[k])) { ref = k; break; }
-    if (ref < 0) return false;                       // all single-channel scalars: let general handle
+    якщо (!expandChannels) повернути false;
+    ціле ref = -1;
+    для (ціле k = 0; k < K; k++)
+        якщо (!isSingleChannelScalar(*arrays[k])) { ref = k; break; }
+    якщо (ref < 0) повернути false;                       // all single-channel scalars: let general handle
     const Mat& R = *arrays[ref];
-    const int rdims = R.dims, rcn = R.channels();
-    for (int k = 0; k < K; k++)
+    const ціле rdims = R.dims, rcn = R.channels();
+    для (ціле k = 0; k < K; k++)
     {
         const Mat& a = *arrays[k];
-        if (isSingleChannelScalar(a)) continue;
-        if (a.channels() != rcn || a.dims != rdims || !a.isContinuous()) return false;
-        for (int i = 0; i < rdims; i++) if (a.size[i] != R.size[i]) return false;
+        якщо (isSingleChannelScalar(a)) continue;
+        якщо (a.channels() != rcn || a.dims != rdims || !a.isContinuous()) повернути false;
+        для (ціле i = 0; i < rdims; i++) якщо (a.size[i] != R.size[i]) повернути false;
     }
     const long long total = (long long)R.total() * rcn;   // channels folded into the 1D run
     CV_Assert(total <= (long long)INT_MAX);
-    for (int k = 0; k < K; k++)
+    для (ціле k = 0; k < K; k++)
     {
         const Mat& a = *arrays[k];
         base[k] = (uchar*)a.data;
-        esz1[k] = (int)a.elemSize1();
+        esz1[k] = (ціле)a.elemSize1();
         S[k][0] = isSingleChannelScalar(a) ? 0 : 1;
     }
-    D.assign(1, (int)total);
+    D.assign(1, (ціле)total);
     m = 1;
-    return true;
+    повернути true;
 }
 
 // ---------------------------------------------------------------------------
@@ -234,15 +234,15 @@ static bool fastSameShape(const Mat* const* arrays, int K, bool expandChannels,
 // ---------------------------------------------------------------------------
 // At namespace scope, NOT inside run(): MSVC 2019 loses the constexpr-ness of function-local
 // constants used as template arguments inside a lambda (C2975).
-static constexpr int MAX_DIMS = MatShape::MAX_DIMS;
-static constexpr int LOCAL_OPS = 8;
+static constexpr ціле MAX_DIMS = MatShape::MAX_DIMS;
+static constexpr ціле LOCAL_OPS = 8;
 
-void BroadcastOp::run(const Mat* const* arrays, int narrays,
+void BroadcastOp::run(const Mat* const* arrays, ціле narrays,
                       const std::function<void(const Tile&)>& body,
                       bool expandChannels,
                       double nstripes)
 {
-    const int K = narrays;
+    const ціле K = narrays;
     CV_Assert(K >= 1 && arrays != nullptr);
 
     // ---- 1-3. geometry: per-operand collapsed steps S[k], element sizes esz1[k], base
@@ -250,50 +250,50 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
     //           dominant "all same-shape arrays (+ single-channel scalars)" case in one shot; the
     //           general path does decideChannelMode + broadcastShape + align + collapse. ----
     AutoBuffer<MatStep, LOCAL_OPS>  S(K);
-    AutoBuffer<int, LOCAL_OPS>      esz1(K);
+    AutoBuffer<ціле, LOCAL_OPS>      esz1(K);
     AutoBuffer<uchar*, LOCAL_OPS>   base(K);
     MatShape D;
-    int m;
+    ціле m;
 
-    if (!fastSameShape(arrays, K, expandChannels, base.data(), esz1.data(), S.data(), D, m))
+    якщо (!fastSameShape(arrays, K, expandChannels, base.data(), esz1.data(), S.data(), D, m))
     {
         const ChMode mode = expandChannels ? decideChannelMode(arrays, K) : CH_ELEM;
         AutoBuffer<MatShape, LOCAL_OPS> shp(K);
         AutoBuffer<MatStep, LOCAL_OPS>  stp(K);
-        for (int k = 0; k < K; k++)
+        для (ціле k = 0; k < K; k++)
         {
             matLayout(*arrays[k], mode, shp[k], stp[k], esz1[k]);
             base[k] = (uchar*)arrays[k]->data;
         }
         MatShape full;
         CV_Assert(broadcastShape(shp.data(), K, full) && "ew: operands are not broadcast-compatible");
-        const int nd = (int)full.size();
+        const ціле nd = (ціле)full.size();
         AutoBuffer<MatShape, LOCAL_OPS> H(K);
-        for (int k = 0; k < K; k++) alignArg(shp[k], stp[k], nd, S[k], H[k]);
+        для (ціле k = 0; k < K; k++) alignArg(shp[k], stp[k], nd, S[k], H[k]);
         D = full;
         m = collapseDims(S.data(), H.data(), K, D);
 
         // For a cv::Mat the innermost (channel/last) axis is contiguous, so after collapse the
         // innermost stride is always in {0,1}. No gather, no materialization.
-        for (int k = 0; k < K; k++)
+        для (ціле k = 0; k < K; k++)
             CV_Assert(S[k][m - 1] <= 1 && "ew: unexpected innermost stride > 1");
     }
 
     // ---- 4. inner 2D tile axes: width = D[m-1], height = D[m-2] (if any) ----
-    const int wAxis = m - 1;
-    const int hAxis = (m >= 2) ? m - 2 : -1;
-    const int W   = D[wAxis];
-    const int Hgt = (hAxis >= 0) ? D[hAxis] : 1;
-    const int nOuter = (hAxis >= 0) ? m - 2 : m - 1;   // outer ("plane") axes = [0 .. nOuter)
+    const ціле wAxis = m - 1;
+    const ціле hAxis = (m >= 2) ? m - 2 : -1;
+    const ціле W   = D[wAxis];
+    const ціле Hgt = (hAxis >= 0) ? D[hAxis] : 1;
+    const ціле nOuter = (hAxis >= 0) ? m - 2 : m - 1;   // outer ("plane") axes = [0 .. nOuter)
     long long nplanes = 1;
-    for (int d = 0; d < nOuter; d++) nplanes *= D[d];
+    для (ціле d = 0; d < nOuter; d++) nplanes *= D[d];
 
     // ---- 5. desired parallel stripe count (work hint) ----
     const long long total = nplanes * (long long)Hgt * (long long)W;
     double stripes = nstripes;
-    if (stripes <= 0)                                  // broadcastOp can't see the body's cost;
+    якщо (stripes <= 0)                                  // broadcastOp can't see the body's cost;
         stripes = (double)total * 100.0 / (double)(1 << 18);  // assume ~100 cycles/element
-    const int wantTiles = std::max(1, (int)std::lround(stripes));
+    const ціле wantTiles = std::max(1, (ціле)std::lround(stripes));
 
     // ---- 6. tile only for PARALLELISM. broadcastOp is op-agnostic: it does not know the body's
     //         temp-buffer footprint, so it does NOT tile for L1 - that is the body's job (it
@@ -301,29 +301,29 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
     //         Start with the largest tile (one 2D block per plane) and split (height first, then
     //         width) only until there are at least `wantTiles` tiles. Bigger tiles => fewer
     //         body/decode calls. Width is G-aligned only in the fully-contiguous (1D) case. ----
-    const int G = 16;                  // SIMD/cacheline granule
-    int tw = W, th = Hgt;
+    const ціле G = 16;                  // SIMD/cacheline granule
+    ціле tw = W, th = Hgt;
 
-    auto ntilesOf = [&](int tw_, int th_) {
+    auto ntilesOf = [&](ціле tw_, ціле th_) {
         long long nw = (W + tw_ - 1) / tw_, nh = (Hgt + th_ - 1) / th_;
-        return nplanes * nh * nw;
+        повернути nplanes * nh * nw;
     };
     long long ntiles = ntilesOf(tw, th);
-    while (ntiles < wantTiles && th > 1)               // split height for parallelism
+    поки (ntiles < wantTiles && th > 1)               // split height for parallelism
     {
         th = (th + 1) / 2;
         ntiles = ntilesOf(tw, th);
     }
-    while (ntiles < wantTiles && tw > G)               // then split width
+    поки (ntiles < wantTiles && tw > G)               // then split width
     {
         tw = std::max(G, tw / 2);
-        if (hAxis < 0 && tw > G) tw -= tw % G;          // keep width aligned in the 1D case
+        якщо (hAxis < 0 && tw > G) tw -= tw % G;          // keep width aligned in the 1D case
         ntiles = ntilesOf(tw, th);
     }
     CV_Assert(ntiles <= (long long)INT_MAX);
 
-    const int ntilesW = (W + tw - 1) / tw;
-    const int ntilesH = (Hgt + th - 1) / th;
+    const ціле ntilesW = (W + tw - 1) / tw;
+    const ціле ntilesH = (Hgt + th - 1) / th;
 
     // ---- 7. execution; decode tile index -> per-operand slices. stepx/stepy are the same for
     //         every tile, so they are set ONCE; only the per-tile base pointer is recomputed. ----
@@ -335,51 +335,51 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
         // ntilesH==1 and nplanes==1, so the tile index IS the width-tile index - no div/mod, no
         // plane multi-index decode, no inner step loop. This is the same-shape / fully-contiguous
         // common case.
-        if (m == 1)
+        якщо (m == 1)
         {
-            for (int k = 0; k < K; k++) { slices[k].stepy = 0; slices[k].stepx = S[k][0]; }
+            для (ціле k = 0; k < K; k++) { slices[k].stepy = 0; slices[k].stepx = S[k][0]; }
             Tile tile;
             tile.height = 1; tile.narrays = K; tile.slices = slices.data();
-            for (int t = r.start; t < r.end; t++)
+            для (ціле t = r.start; t < r.end; t++)
             {
-                const int wofs = t * tw, ww = std::min(tw, W - wofs);
-                for (int k = 0; k < K; k++)
+                const ціле wofs = t * tw, ww = std::min(tw, W - wofs);
+                для (ціле k = 0; k < K; k++)
                     slices[k].ptr = base[k] + (size_t)wofs * S[k][0] * (size_t)esz1[k];
                 tile.width = ww;
                 body(tile);
             }
-            return;
+            повернути;
         }
 
-        std::array<int, MAX_DIMS> idx;
-        for (int k = 0; k < K; k++)                     // steps are tile-independent: set once
+        std::array<ціле, MAX_DIMS> idx;
+        для (ціле k = 0; k < K; k++)                     // steps are tile-independent: set once
         {
             slices[k].stepy = (hAxis >= 0) ? S[k][hAxis] : 0;
             slices[k].stepx = S[k][wAxis];
         }
-        for (int t = r.start; t < r.end; t++)
+        для (ціле t = r.start; t < r.end; t++)
         {
-            int wt = t % ntilesW;
-            int rest = t / ntilesW;
-            int ht = rest % ntilesH;
-            int plane = rest / ntilesH;
+            ціле wt = t % ntilesW;
+            ціле rest = t / ntilesW;
+            ціле ht = rest % ntilesH;
+            ціле plane = rest / ntilesH;
 
-            const int wofs = wt * tw, ww = std::min(tw, W - wofs);
-            const int hofs = ht * th, hh = std::min(th, Hgt - hofs);
+            const ціле wofs = wt * tw, ww = std::min(tw, W - wofs);
+            const ціле hofs = ht * th, hh = std::min(th, Hgt - hofs);
 
-            int p = plane;                              // decode plane -> outer multi-index
-            for (int d = nOuter - 1; d >= 0; d--) {
-                int dd = D[d];
-                int np = p / dd;
+            ціле p = plane;                              // decode plane -> outer multi-index
+            для (ціле d = nOuter - 1; d >= 0; d--) {
+                ціле dd = D[d];
+                ціле np = p / dd;
                 idx[d] = p - np * dd;
                 p = np;
             }
 
-            for (int k = 0; k < K; k++)
+            для (ціле k = 0; k < K; k++)
             {
                 size_t off = (size_t)wofs * S[k][wAxis];
-                for (int d = 0; d < nOuter; d++) off += (size_t)idx[d] * S[k][d];
-                if (hAxis >= 0) off += (size_t)hofs * S[k][hAxis];
+                для (ціле d = 0; d < nOuter; d++) off += (size_t)idx[d] * S[k][d];
+                якщо (hAxis >= 0) off += (size_t)hofs * S[k][hAxis];
                 slices[k].ptr = base[k] + off * (size_t)esz1[k];
             }
 
@@ -392,10 +392,10 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
     // Single tile (small work, wantTiles==1) => run inline and skip the parallel framework
     // entirely: its dispatch (std::function wrap + Range machinery + backend hop) is pure
     // overhead when there is nothing to parallelize, and dominates small-array latency.
-    if (ntiles == 1)
+    якщо (ntiles == 1)
         runRange(Range(0, 1));
-    else
-        parallel_for_(Range(0, (int)ntiles), runRange, stripes);
+    інакше
+        parallel_for_(Range(0, (ціле)ntiles), runRange, stripes);
 }
 
 } // namespace cv

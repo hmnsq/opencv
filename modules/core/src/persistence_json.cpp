@@ -17,27 +17,27 @@ public:
     virtual ~JSONEmitter() {}
 
     FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                  int struct_flags, const char* type_name=0 )
+                                  ціле struct_flags, const char* type_name=0 )
     {
         char data[CV_FS_MAX_LEN + 1024];
 
         struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        якщо( !FileNode::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if( type_name && *type_name == '\0' )
+        якщо( type_name && *type_name == '\0' )
             type_name = 0;
 
         bool is_real_collection = true;
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        якщо (type_name && memcmp(type_name, "binary", 6) == 0)
         {
             struct_flags = FileNode::STR;
             data[0] = '\0';
             is_real_collection = false;
         }
 
-        if ( is_real_collection )
+        якщо ( is_real_collection )
         {
             char c = FileNode::isMap(struct_flags) ? '{' : '[';
             data[0] = c;
@@ -47,16 +47,16 @@ public:
         writeScalar( key, data );
         FStructData current_struct("", struct_flags, parent.indent + 4);
 
-        return current_struct;
+        повернути current_struct;
     }
 
     void endWriteStruct(const FStructData& current_struct)
     {
-        int struct_flags = current_struct.flags;
+        ціле struct_flags = current_struct.flags;
 
-        if (FileNode::isCollection(struct_flags)) {
-            if (!FileNode::isFlow(struct_flags)) {
-                if (fs->bufferPtr() <= fs->bufferStart() + fs->get_space()) {
+        якщо (FileNode::isCollection(struct_flags)) {
+            якщо (!FileNode::isFlow(struct_flags)) {
+                якщо (fs->bufferPtr() <= fs->bufferStart() + fs->get_space()) {
                     /* some bad code for base64_writer... */
                     char *ptr = fs->bufferPtr();
                     *ptr++ = '\n';
@@ -68,14 +68,14 @@ public:
             }
 
             char *ptr = fs->bufferPtr();
-            if (ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags))
+            якщо (ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags))
                 *ptr++ = ' ';
             *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
     }
 
-    void write(const char* key, int value)
+    void write(const char* key, ціле value)
     {
         char buf[128];
         writeScalar( key, fs::itoa( value, buf, 10 ));
@@ -97,21 +97,21 @@ public:
     {
         char buf[CV_FS_MAX_LEN*6+16];
         char* data = (char*)str;
-        int i, len;
+        ціле i, len;
 
-        if( !str )
+        якщо( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (ціле)strlen(str);
+        якщо( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        якщо( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = 1;
+            ціле need_quote = 1;
             data = buf;
             *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            для( i = 0; i < len; i++ )
             {
                 char c = str[i];
                 const unsigned char byte = static_cast<unsigned char>(c);
@@ -126,13 +126,13 @@ public:
                 case '\b': { *data++ = '\\'; *data++ = 'b'; break; }
                 case '\f': { *data++ = '\\'; *data++ = 'f'; break; }
                 default  :
-                    if (byte < 0x20)
+                    якщо (byte < 0x20)
                     {
                         static const char hex[] = "0123456789abcdef";
                         *data++ = '\\'; *data++ = 'u'; *data++ = '0'; *data++ = '0';
                         *data++ = hex[byte >> 4]; *data++ = hex[byte & 0xf];
                     }
-                    else
+                    інакше
                         *data++ = c;
                     break;
                 }
@@ -151,11 +151,11 @@ public:
         /* check write_struct */
 
         fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        якщо ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        інакше якщо ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
@@ -163,29 +163,29 @@ public:
         /* check parameters */
 
         size_t key_len = 0u;
-        if( key && *key == '\0' )
+        якщо( key && *key == '\0' )
             key = 0;
-        if ( key )
+        якщо ( key )
         {
             key_len = strlen(key);
-            if ( key_len == 0u )
+            якщо ( key_len == 0u )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
-            else if ( static_cast<int>(key_len) > CV_FS_MAX_LEN )
+            інакше якщо ( static_cast<ціле>(key_len) > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
         size_t data_len = 0u;
-        if ( data )
+        якщо ( data )
             data_len = strlen(data);
 
         FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
-        if( FileNode::isCollection(struct_flags) )
+        ціле struct_flags = current_struct.flags;
+        якщо( FileNode::isCollection(struct_flags) )
         {
-            if ( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            якщо ( (FileNode::isMap(struct_flags) ^ (key != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
-        } else {
+        } інакше {
             fs->setNonEmpty();
             struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
         }
@@ -193,24 +193,24 @@ public:
         // start to write
         char* ptr = 0;
 
-        if( FileNode::isFlow(struct_flags) )
+        якщо( FileNode::isFlow(struct_flags) )
         {
-            int new_offset;
+            ціле new_offset;
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            якщо( !FileNode::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
-            new_offset = static_cast<int>(ptr - fs->bufferStart() + key_len + data_len);
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            new_offset = static_cast<ціле>(ptr - fs->bufferStart() + key_len + data_len);
+            якщо( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
             {
                 fs->setBufferPtr(ptr);
                 ptr = fs->flush();
             }
-            else
+            інакше
                 *ptr++ = ' ';
         }
-        else
+        інакше
         {
-            if ( !FileNode::isEmptyCollection(struct_flags) )
+            якщо ( !FileNode::isEmptyCollection(struct_flags) )
             {
                 ptr = fs->bufferPtr();
                 *ptr++ = ',';
@@ -222,20 +222,20 @@ public:
             ptr = fs->flush();
         }
 
-        if( key )
+        якщо( key )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            якщо( !cv_isalpha(key[0]) && key[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
-            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(key_len) );
+            ptr = fs->resizeWriteBuffer( ptr, static_cast<ціле>(key_len) );
             *ptr++ = '\"';
 
-            for( size_t i = 0u; i < key_len; i++ )
+            для( size_t i = 0u; i < key_len; i++ )
             {
                 char c = key[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                якщо( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
@@ -245,9 +245,9 @@ public:
             *ptr++ = ' ';
         }
 
-        if( data )
+        якщо( data )
         {
-            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(data_len) );
+            ptr = fs->resizeWriteBuffer( ptr, static_cast<ціле>(data_len) );
             memcpy( ptr, data, data_len );
             ptr += data_len;
         }
@@ -258,35 +258,35 @@ public:
 
     void writeComment(const char* comment, bool eol_comment)
     {
-        if( !comment )
+        якщо( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = static_cast<int>(strlen(comment));
+        ціле len = static_cast<ціле>(strlen(comment));
         char* ptr = fs->bufferPtr();
         const char* eol = strchr(comment, '\n');
         bool multiline = eol != 0;
 
-        if( !eol_comment || multiline || fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
+        якщо( !eol_comment || multiline || fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
             ptr = fs->flush();
-        else
+        інакше
             *ptr++ = ' ';
 
-        while( comment )
+        поки( comment )
         {
             *ptr++ = '/';
             *ptr++ = '/';
             *ptr++ = ' ';
-            if( eol )
+            якщо( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
+                ptr = fs->resizeWriteBuffer( ptr, (ціле)(eol - comment) + 1 );
                 memcpy( ptr, comment, eol - comment + 1 );
                 fs->setBufferPtr(ptr + (eol - comment));
                 comment = eol + 1;
                 eol = strchr( comment, '\n' );
             }
-            else
+            інакше
             {
-                len = (int)strlen(comment);
+                len = (ціле)strlen(comment);
                 ptr = fs->resizeWriteBuffer( ptr, len );
                 memcpy( ptr, comment, len );
                 fs->setBufferPtr(ptr + len);
@@ -320,67 +320,67 @@ public:
         bool is_eof = false;
         bool is_completed = false;
 
-        while ( is_eof == false && is_completed == false )
+        поки ( is_eof == false && is_completed == false )
         {
-            if (!ptr)
+            якщо (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
             switch ( *ptr )
             {
                 /* comment */
                 case '/' : {
                     ptr++;
-                    if ( *ptr == '\0' )
+                    якщо ( *ptr == '\0' )
                     {
                         ptr = fs->gets();
-                        if( !ptr || !*ptr ) { is_eof = true; break; }
+                        якщо( !ptr || !*ptr ) { is_eof = true; break; }
                     }
 
-                    if ( *ptr == '/' )
+                    якщо ( *ptr == '/' )
                     {
-                        while ( *ptr != '\n' && *ptr != '\r' )
+                        поки ( *ptr != '\n' && *ptr != '\r' )
                         {
-                            if ( *ptr == '\0' )
+                            якщо ( *ptr == '\0' )
                             {
                                 ptr = fs->gets();
-                                if( !ptr || !*ptr ) { is_eof = true; break; }
+                                якщо( !ptr || !*ptr ) { is_eof = true; break; }
                             }
-                            else
+                            інакше
                             {
                                 ptr++;
                             }
                         }
                     }
-                    else if ( *ptr == '*' )
+                    інакше якщо ( *ptr == '*' )
                     {
                         ptr++;
-                        for (;;)
+                        для (;;)
                         {
-                            if ( *ptr == '\0' )
+                            якщо ( *ptr == '\0' )
                             {
                                 ptr = fs->gets();
-                                if( !ptr || !*ptr ) { is_eof = true; break; }
+                                якщо( !ptr || !*ptr ) { is_eof = true; break; }
                             }
-                            else if ( *ptr == '*' )
+                            інакше якщо ( *ptr == '*' )
                             {
                                 ptr++;
-                                if ( *ptr == '\0' )
+                                якщо ( *ptr == '\0' )
                                 {
                                     ptr = fs->gets();
-                                    if( !ptr || !*ptr ) { is_eof = true; break; }
+                                    якщо( !ptr || !*ptr ) { is_eof = true; break; }
                                 }
-                                if ( *ptr == '/' )
+                                якщо ( *ptr == '/' )
                                 {
                                     ptr++;
                                     break;
                                 }
                             }
-                            else
+                            інакше
                             {
                                 ptr++;
                             }
                         }
                     }
-                    else
+                    інакше
                     {
                         CV_PARSE_ERROR_CPP( "Not supported escape character" );
                     }
@@ -395,58 +395,58 @@ public:
                 case '\n':
                 case '\r': {
                     ptr = fs->gets();
-                    if( !ptr || !*ptr ) { is_eof = true; break; }
+                    якщо( !ptr || !*ptr ) { is_eof = true; break; }
                 } break;
                     /* other character */
                 default: {
-                    if( !cv_isprint(*ptr) )
+                    якщо( !cv_isprint(*ptr) )
                         CV_PARSE_ERROR_CPP( "Invalid character in the stream" );
                     is_completed = true;
                 } break;
             }
         }
 
-        if ( is_eof || !is_completed )
+        якщо ( is_eof || !is_completed )
         {
             ptr = fs->bufferStart();
             CV_Assert(ptr);
             *ptr = '\0';
             fs->setEof();
-            if( !is_completed )
+            якщо( !is_completed )
                 CV_PARSE_ERROR_CPP( "Abort at parse time" );
         }
 
-        return ptr;
+        повернути ptr;
     }
 
     uint32_t parseUnicodeEscape(char*& ptr)
     {
         uint32_t codepoint = 0;
-        for (int k = 0; k < 4; k++, ptr++) {
+        для (ціле k = 0; k < 4; k++, ptr++) {
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             char hex = *ptr;
             uint32_t digit = 0;
-            if      (hex >= '0' && hex <= '9') digit = (uint32_t)(hex - '0');
-            else if (hex >= 'a' && hex <= 'f') digit = (uint32_t)(hex - 'a') + 10u;
-            else if (hex >= 'A' && hex <= 'F') digit = (uint32_t)(hex - 'A') + 10u;
-            else CV_PARSE_ERROR_CPP("invalid \\uXXXX escape sequence");
+            якщо      (hex >= '0' && hex <= '9') digit = (uint32_t)(hex - '0');
+            інакше якщо (hex >= 'a' && hex <= 'f') digit = (uint32_t)(hex - 'a') + 10u;
+            інакше якщо (hex >= 'A' && hex <= 'F') digit = (uint32_t)(hex - 'A') + 10u;
+            інакше CV_PARSE_ERROR_CPP("invalid \\uXXXX escape sequence");
             codepoint = (codepoint << 4) | digit;
         }
-        return codepoint;
+        повернути codepoint;
     }
 
     static void appendUtf8(std::string& out, uint32_t codepoint)
     {
-        if (codepoint < 0x80) {
+        якщо (codepoint < 0x80) {
             out += (char)codepoint;
-        } else if (codepoint < 0x800) {
+        } інакше якщо (codepoint < 0x800) {
             out += (char)(0xC0 | (codepoint >> 6));
             out += (char)(0x80 | (codepoint & 0x3F));
-        } else if (codepoint < 0x10000) {
+        } інакше якщо (codepoint < 0x10000) {
             out += (char)(0xE0 | (codepoint >> 12));
             out += (char)(0x80 | ((codepoint >> 6) & 0x3F));
             out += (char)(0x80 | (codepoint & 0x3F));
-        } else {
+        } інакше {
             out += (char)(0xF0 | (codepoint >> 18));
             out += (char)(0x80 | ((codepoint >> 12) & 0x3F));
             out += (char)(0x80 | ((codepoint >> 6) & 0x3F));
@@ -461,134 +461,134 @@ public:
     void parseUnicodeEscapeToUtf8(char*& ptr, std::string& out)
     {
         uint32_t codepoint = parseUnicodeEscape(ptr);
-        if (codepoint >= 0xD800 && codepoint <= 0xDBFF)
+        якщо (codepoint >= 0xD800 && codepoint <= 0xDBFF)
         {
             // ptr is just past the four hex digits; the low half must be its own escape.
             // Short-circuits before ptr[1] when ptr[0] is the buffer's terminating NUL.
-            if (ptr[0] != '\\' || ptr[1] != 'u')
+            якщо (ptr[0] != '\\' || ptr[1] != 'u')
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
             ptr += 2;
             uint32_t low = parseUnicodeEscape(ptr);
-            if (low < 0xDC00 || low > 0xDFFF)
+            якщо (low < 0xDC00 || low > 0xDFFF)
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
             codepoint = 0x10000u + ((codepoint - 0xD800u) << 10) + (low - 0xDC00u);
         }
-        else if (codepoint >= 0xDC00 && codepoint <= 0xDFFF)
+        інакше якщо (codepoint >= 0xDC00 && codepoint <= 0xDFFF)
             CV_PARSE_ERROR_CPP("unpaired \\uXXXX low surrogate");
         appendUtf8(out, codepoint);
     }
 
     char* parseKey( char* ptr, FileNode& collection, FileNode& value_placeholder )
     {
-        if (!ptr)
+        якщо (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( *ptr != '"' )
+        якщо( *ptr != '"' )
             CV_PARSE_ERROR_CPP( "Key must start with \'\"\'" );
 
         char * beg = ptr + 1;
         std::string key_name;
         do {
-            if (*ptr == '\\') { // skip the next character if current is back slash
+            якщо (*ptr == '\\') { // skip the next character if current is back slash
                 ++ptr;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-                if (*ptr == 'u') {
+                якщо (*ptr == 'u') {
                     ++ptr;
                     parseUnicodeEscapeToUtf8(ptr, key_name);
                     continue;
                 }
                 key_name += *ptr;
-            } else if (*ptr != '"') {
+            } інакше якщо (*ptr != '"') {
                 // normal byte: append current, do NOT skip ahead first
                 key_name += *ptr;
             }
             ++ptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-        } while( cv_isprint(*ptr) && *ptr != '"' );
+        } поки( cv_isprint(*ptr) && *ptr != '"' );
 
-        if( *ptr != '"' )
+        якщо( *ptr != '"' )
             CV_PARSE_ERROR_CPP( "Key must end with \'\"\'" );
 
-        if( ptr == beg )
+        якщо( ptr == beg )
             CV_PARSE_ERROR_CPP( "Key is empty" );
         value_placeholder = fs->addNode(collection, key_name, FileNode::NONE);
 
         ptr++;
         ptr = skipSpaces( ptr );
-        if( !ptr || !*ptr )
-            return 0;
+        якщо( !ptr || !*ptr )
+            повернути 0;
 
-        if( *ptr != ':' )
+        якщо( *ptr != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\' between key and value" );
 
-        return ++ptr;
+        повернути ++ptr;
     }
 
-    bool getBase64Row(char* ptr, int /*indent*/, char* &beg, char* &end)
+    bool getBase64Row(char* ptr, ціле /*indent*/, char* &beg, char* &end)
     {
         beg = end = ptr;
-        if( !ptr || !*ptr )
-            return false;
+        якщо( !ptr || !*ptr )
+            повернути false;
 
         // find end of the row
-        while( cv_isprint(*ptr) && (*ptr != ',') && (*ptr != '"'))
+        поки( cv_isprint(*ptr) && (*ptr != ',') && (*ptr != '"'))
             ++ptr;
-        if ( *ptr == '\0' )
+        якщо ( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of line" );
 
         end = ptr;
-        return true;
+        повернути true;
     }
 
     char* parseValue( char* ptr, FileNode& node )
     {
-        if (!ptr)
+        якщо (!ptr)
             CV_PARSE_ERROR_CPP("Invalid value input");
 
         ptr = skipSpaces( ptr );
-        if( !ptr || !*ptr )
+        якщо( !ptr || !*ptr )
             CV_PARSE_ERROR_CPP( "Unexpected End-Of-File" );
 
-        if( *ptr == '"' )
+        якщо( *ptr == '"' )
         {   /* must be string or Base64 string */
             ptr++;
             char * beg = ptr;
             size_t len = 0u;
-            for ( ; (cv_isalnum(*ptr) || *ptr == '$' ) && len <= 9u; ptr++ )
+            для ( ; (cv_isalnum(*ptr) || *ptr == '$' ) && len <= 9u; ptr++ )
                 len++;
 
-            if ((len >= 8u) && (memcmp( beg, "$base64$", 8u ) == 0) )
+            якщо ((len >= 8u) && (memcmp( beg, "$base64$", 8u ) == 0) )
             {   /**************** Base64 string ****************/
                 ptr = beg + 8;
                 ptr = fs->parseBase64(ptr, 0, node);
 
-                if ( *ptr != '\"' )
+                якщо ( *ptr != '\"' )
                     CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                else
+                інакше
                     ptr++;
             }
-            else
+            інакше
             {   /**************** normal string ****************/
-                int i = 0, sz;
+                ціле i = 0, sz;
 
                 ptr = beg;
                 bool is_matching = false;
-                while ( !is_matching )
+                поки ( !is_matching )
                 {
                     switch ( *ptr )
                     {
                         case '\\':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (ціле)(ptr - beg);
+                            якщо( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                якщо (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, beg, sz);
                                 i += sz;
                             }
                             ptr++;
-                            if (i + 1 >= CV_FS_MAX_LEN)
+                            якщо (i + 1 >= CV_FS_MAX_LEN)
                                 CV_PARSE_ERROR_CPP("string is too long");
                             switch ( *ptr )
                             {
@@ -604,10 +604,10 @@ public:
                                 ptr++;
                                 std::string utf8;
                                 parseUnicodeEscapeToUtf8(ptr, utf8);
-                                if (i + (int)utf8.size() >= CV_FS_MAX_LEN)
+                                якщо (i + (ціле)utf8.size() >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, utf8.data(), utf8.size());
-                                i += (int)utf8.size();
+                                i += (ціле)utf8.size();
                                 beg = ptr;
                                 continue;
                             }
@@ -620,16 +620,16 @@ public:
                         }
                         case '\0':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (ціле)(ptr - beg);
+                            якщо( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                якщо (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, beg, sz);
                                 i += sz;
                             }
                             ptr = fs->gets();
-                            if ( !ptr || !*ptr )
+                            якщо ( !ptr || !*ptr )
                                 CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
 
                             beg = ptr;
@@ -637,10 +637,10 @@ public:
                         }
                         case '\"':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (ціле)(ptr - beg);
+                            якщо( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                якщо (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, beg, sz);
                                 i += sz;
@@ -663,35 +663,35 @@ public:
                     }
                 }
 
-                if ( *ptr != '\"' )
+                якщо ( *ptr != '\"' )
                     CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                else
+                інакше
                     ptr++;
 
                 node.setValue(FileNode::STRING, buf, i);
             }
         }
-        else if ( cv_isdigit(*ptr) || *ptr == '-' || *ptr == '+' || *ptr == '.' )
+        інакше якщо ( cv_isdigit(*ptr) || *ptr == '-' || *ptr == '+' || *ptr == '.' )
         {    /**************** number ****************/
             char * beg = ptr;
-            if ( *ptr == '+' || *ptr == '-' )
+            якщо ( *ptr == '+' || *ptr == '-' )
             {
                 ptr++;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             }
-            while( cv_isdigit(*ptr) )
+            поки( cv_isdigit(*ptr) )
             {
                 ptr++;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             }
-            if (*ptr == '.' || *ptr == 'e')
+            якщо (*ptr == '.' || *ptr == 'e')
             {
                 double fval = fs->strtod( beg, &ptr );
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
                 node.setValue(FileNode::REAL, &fval);
             }
-            else
+            інакше
             {
                 int64_t ival = strtoll( beg, &ptr, 0 );
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
@@ -699,186 +699,186 @@ public:
                 node.setValue(FileNode::INT, &ival);
             }
 
-            if ( beg >= ptr )
+            якщо ( beg >= ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
         }
-        else
+        інакше
         {    /**************** other data ****************/
             const char* beg = ptr;
-            int len = 0;
-            for ( ; cv_isalpha(*ptr) && len <= 6; )
+            ціле len = 0;
+            для ( ; cv_isalpha(*ptr) && len <= 6; )
             {
                 len++;
                 ptr++;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             }
 
-            if( len == 4 && memcmp( beg, "null", 4 ) == 0 )
+            якщо( len == 4 && memcmp( beg, "null", 4 ) == 0 )
                 ;
-            else if( (len == 4 && memcmp( beg, "true", 4 ) == 0) ||
+            інакше якщо( (len == 4 && memcmp( beg, "true", 4 ) == 0) ||
                      (len == 5 && memcmp( beg, "false", 5 ) == 0) )
             {
                 int64_t ival = *beg == 't' ? 1 : 0;
                 node.setValue(FileNode::INT, &ival);
             }
-            else
+            інакше
             {
                 CV_PARSE_ERROR_CPP( "Unrecognized value" );
             }
         }
 
-        return ptr;
+        повернути ptr;
     }
 
-    char* parseSeq( char* ptr, FileNode& node, int depth = 0 )
+    char* parseSeq( char* ptr, FileNode& node, ціле depth = 0 )
     {
-        if (!ptr)
+        якщо (!ptr)
             CV_PARSE_ERROR_CPP( "ptr is NULL" );
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        якщо( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        if ( *ptr != '[' )
+        якщо ( *ptr != '[' )
             CV_PARSE_ERROR_CPP( "'[' - left-brace of seq is missing" );
-        else
+        інакше
             ptr++;
 
         fs->convertToCollection(FileNode::SEQ, node);
 
-        for (;;)
+        для (;;)
         {
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
+            якщо( !ptr || !*ptr )
                 break;
 
-            if ( *ptr != ']' )
+            якщо ( *ptr != ']' )
             {
                 FileNode child = fs->addNode(node, std::string(), FileNode::NONE );
 
-                if ( *ptr == '[' )
+                якщо ( *ptr == '[' )
                     ptr = parseSeq( ptr, child, depth + 1 );
-                else if ( *ptr == '{' )
+                інакше якщо ( *ptr == '{' )
                     ptr = parseMap( ptr, child, depth + 1 );
-                else
+                інакше
                     ptr = parseValue( ptr, child );
             }
 
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
+            якщо( !ptr || !*ptr )
                 break;
 
-            if ( *ptr == ',' )
+            якщо ( *ptr == ',' )
                 ptr++;
-            else if ( *ptr == ']' )
+            інакше якщо ( *ptr == ']' )
                 break;
-            else
+            інакше
                 CV_PARSE_ERROR_CPP( "Unexpected character" );
         }
 
-        if (!ptr)
+        якщо (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if ( *ptr != ']' )
+        якщо ( *ptr != ']' )
             CV_PARSE_ERROR_CPP( "']' - right-brace of seq is missing" );
-        else
+        інакше
             ptr++;
 
         fs->finalizeCollection(node);
-        return ptr;
+        повернути ptr;
     }
 
-    char* parseMap( char* ptr, FileNode& node, int depth = 0 )
+    char* parseMap( char* ptr, FileNode& node, ціле depth = 0 )
     {
-        if (!ptr)
+        якщо (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        якщо( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        if ( *ptr != '{' )
+        якщо ( *ptr != '{' )
             CV_PARSE_ERROR_CPP( "'{' - left-brace of map is missing" );
-        else
+        інакше
             ptr++;
 
         fs->convertToCollection(FileNode::MAP, node);
 
-        for( ;; )
+        для( ;; )
         {
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
+            якщо( !ptr || !*ptr )
                 break;
 
-            if ( *ptr == '"' )
+            якщо ( *ptr == '"' )
             {
                 FileNode child;
                 ptr = parseKey( ptr, node, child );
-                if( !ptr || !*ptr )
+                якщо( !ptr || !*ptr )
                     break;
                 ptr = skipSpaces( ptr );
-                if( !ptr || !*ptr )
+                якщо( !ptr || !*ptr )
                     break;
 
-                if ( *ptr == '[' )
+                якщо ( *ptr == '[' )
                     ptr = parseSeq( ptr, child, depth + 1 );
-                else if ( *ptr == '{' )
+                інакше якщо ( *ptr == '{' )
                     ptr = parseMap( ptr, child, depth + 1 );
-                else
+                інакше
                     ptr = parseValue( ptr, child );
             }
 
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
+            якщо( !ptr || !*ptr )
                 break;
 
-            if ( *ptr == ',' )
+            якщо ( *ptr == ',' )
                 ptr++;
-            else if ( *ptr == '}' )
+            інакше якщо ( *ptr == '}' )
                 break;
-            else
+            інакше
             {
                 CV_PARSE_ERROR_CPP( "Unexpected character" );
             }
         }
 
-        if (!ptr)
+        якщо (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if ( *ptr != '}' )
+        якщо ( *ptr != '}' )
             CV_PARSE_ERROR_CPP( "'}' - right-brace of map is missing" );
-        else
+        інакше
             ptr++;
 
         fs->finalizeCollection(node);
-        return ptr;
+        повернути ptr;
     }
 
     bool parse( char* ptr )
     {
-        if (!ptr)
+        якщо (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         ptr = skipSpaces( ptr );
-        if ( !ptr || !*ptr )
-            return false;
+        якщо ( !ptr || !*ptr )
+            повернути false;
 
         FileNode root_collection(fs->getFS(), 0, 0);
 
-        if( *ptr == '{' )
+        якщо( *ptr == '{' )
         {
             FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::MAP);
             parseMap( ptr, root_node );
         }
-        else if ( *ptr == '[' )
+        інакше якщо ( *ptr == '[' )
         {
             FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::SEQ);
             parseSeq( ptr, root_node );
         }
-        else
+        інакше
         {
             CV_PARSE_ERROR_CPP( "left-brace of top level is missing" );
         }
 
-        return true;
+        повернути true;
     }
 
     FileStorage_API* fs;
@@ -887,12 +887,12 @@ public:
 
 Ptr<FileStorageEmitter> createJSONEmitter(FileStorage_API* fs)
 {
-    return makePtr<JSONEmitter>(fs);
+    повернути makePtr<JSONEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createJSONParser(FileStorage_API* fs)
 {
-    return makePtr<JSONParser>(fs);
+    повернути makePtr<JSONParser>(fs);
 }
 
 }

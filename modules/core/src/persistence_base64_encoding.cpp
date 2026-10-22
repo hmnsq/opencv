@@ -27,7 +27,7 @@ public:
 
         CV_Assert(fs.write_mode);
 
-        if (needs_indent)
+        якщо (needs_indent)
         {
             file_storage.flush();
         }
@@ -36,30 +36,30 @@ public:
     ~Base64ContextEmitter()
     {
         /* cleaning */
-        if (src_cur != src_beg)
+        якщо (src_cur != src_beg)
             flush();    /* encode the rest binary data to base64 buffer */
     }
 
     Base64ContextEmitter & write(const uchar * beg, const uchar * end)
     {
-        if (beg >= end)
-            return *this;
+        якщо (beg >= end)
+            повернути *this;
 
-        while (beg < end) {
+        поки (beg < end) {
             /* collect binary data and copy to binary buffer */
             size_t len = std::min(end - beg, src_end - src_cur);
             std::memcpy(src_cur, beg, len);
             beg     += len;
             src_cur += len;
 
-            if (src_cur >= src_end) {
+            якщо (src_cur >= src_end) {
                 /* binary buffer is full. */
                 /* encode it to base64 and send result to fs */
                 flush();
             }
         }
 
-        return *this;
+        повернути *this;
     }
 
     /*
@@ -76,34 +76,34 @@ public:
         uchar * beg = buffer;
         uchar * end = beg;
 
-        while (convertor) {
+        поки (convertor) {
             convertor >> end;
             write(beg, end);
             end = beg;
         }
 
-        return *this;
+        повернути *this;
     }
 
     bool flush()
     {
         /* control line width, so on. */
         size_t len = base64_encode(src_beg, base64_buffer.data(), 0U, src_cur - src_beg);
-        if (len == 0U)
-            return false;
+        якщо (len == 0U)
+            повернути false;
 
         src_cur = src_beg;
 
-        if ( !needs_indent)
+        якщо ( !needs_indent)
         {
             file_storage.puts((const char*)base64_buffer.data());
         }
-        else
+        інакше
         {
             const char newline[] = "\n";
             char space[80];
-            int ident = file_storage.write_stack.back().indent;
-            memset(space, ' ', static_cast<int>(ident));
+            ціле ident = file_storage.write_stack.back().indent;
+            memset(space, ' ', static_cast<ціле>(ident));
             space[ident] = '\0';
 
             file_storage.puts(space);
@@ -112,7 +112,7 @@ public:
             file_storage.flush();
         }
 
-        return true;
+        повернути true;
     }
 
 private:
@@ -138,15 +138,15 @@ std::string base64::make_base64_header(const char *dt) {
     CV_Assert(buffer.size() < ::base64::HEADER_SIZE);
 
     buffer.reserve(::base64::HEADER_SIZE);
-    while (buffer.size() < ::base64::HEADER_SIZE)
+    поки (buffer.size() < ::base64::HEADER_SIZE)
         buffer += ' ';
 
-    return buffer;
+    повернути buffer;
 }
 
 size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_t cnt) {
-    if (!src || !dst || !cnt)
-        return 0;
+    якщо (!src || !dst || !cnt)
+        повернути 0;
 
     /* initialize beginning and end */
     uint8_t       * dst_beg = dst;
@@ -157,7 +157,7 @@ size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_
     uint8_t const * src_end = src_cur + cnt / 3U * 3U;
 
     /* integer multiples part */
-    while (src_cur < src_end) {
+    поки (src_cur < src_end) {
         uint8_t _2 = *src_cur++;
         uint8_t _1 = *src_cur++;
         uint8_t _0 = *src_cur++;
@@ -169,11 +169,11 @@ size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_
 
     /* remainder part */
     size_t rst = src_beg + cnt - src_cur;
-    if (rst == 1U) {
+    якщо (rst == 1U) {
         uint8_t _2 = *src_cur++;
         *dst_cur++ = base64_mapping[ _2          >> 2U];
         *dst_cur++ = base64_mapping[(_2 & 0x03U) << 4U];
-    } else if (rst == 2U) {
+    } інакше якщо (rst == 2U) {
         uint8_t _2 = *src_cur++;
         uint8_t _1 = *src_cur++;
         *dst_cur++ = base64_mapping[ _2          >> 2U];
@@ -192,13 +192,13 @@ size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_
             break;
     }
 
-    return static_cast<size_t>(dst_cur - dst_beg);
+    повернути static_cast<size_t>(dst_cur - dst_beg);
 }
 
-int base64::icvCalcStructSize(const char *dt, int initial_size) {
-    int size = cv::fs::calcElemSize( dt, initial_size );
+ціле base64::icvCalcStructSize(const char *dt, ціле initial_size) {
+    ціле size = cv::fs::calcElemSize( dt, initial_size );
     size_t elem_max_size = 0;
-    for ( const char * type = dt; *type != '\0'; type++ ) {
+    для ( const char * type = dt; *type != '\0'; type++ ) {
         switch ( *type )
         {
             case 'u': { elem_max_size = std::max( elem_max_size, sizeof(uchar ) ); break; }
@@ -206,7 +206,7 @@ int base64::icvCalcStructSize(const char *dt, int initial_size) {
             case 'c': { elem_max_size = std::max( elem_max_size, sizeof(schar ) ); break; }
             case 'w': { elem_max_size = std::max( elem_max_size, sizeof(ushort) ); break; }
             case 's': { elem_max_size = std::max( elem_max_size, sizeof(short ) ); break; }
-            case 'i': { elem_max_size = std::max( elem_max_size, sizeof(int   ) ); break; }
+            case 'i': { elem_max_size = std::max( elem_max_size, sizeof(ціле   ) ); break; }
             case 'n': { elem_max_size = std::max( elem_max_size, sizeof(unsigned) ); break; }
             case 'f': { elem_max_size = std::max( elem_max_size, sizeof(float ) ); break; }
             case 'd': { elem_max_size = std::max( elem_max_size, sizeof(double) ); break; }
@@ -217,13 +217,13 @@ int base64::icvCalcStructSize(const char *dt, int initial_size) {
             default: break;
         }
     }
-    size = cvAlign( size, static_cast<int>(elem_max_size) );
-    return size;
+    size = cvAlign( size, static_cast<ціле>(elem_max_size) );
+    повернути size;
 }
 
 size_t base64::base64_encode_buffer_size(size_t cnt, bool is_end_with_zero) {
     size_t additional = static_cast<size_t>(is_end_with_zero == true);
-    return (cnt + 2U) / 3U * 4U + additional;
+    повернути (cnt + 2U) / 3U * 4U + additional;
 }
 
 base64::Base64Writer::Base64Writer(cv::FileStorage::Impl& fs, bool can_indent)
@@ -236,7 +236,7 @@ base64::Base64Writer::Base64Writer(cv::FileStorage::Impl& fs, bool can_indent)
 void base64::Base64Writer::write(const void* _data, size_t len, const char* dt)
 {
     check_dt(dt);
-    RawDataToBinaryConvertor convertor(_data, static_cast<int>(len), data_type_string);
+    RawDataToBinaryConvertor convertor(_data, static_cast<ціле>(len), data_type_string);
     emitter->write(convertor);
 }
 
@@ -254,9 +254,9 @@ base64::Base64Writer::~Base64Writer()
 
 void base64::Base64Writer::check_dt(const char* dt)
 {
-    if ( dt == 0 )
+    якщо ( dt == 0 )
         CV_Error( cv::Error::StsBadArg, "Invalid \'dt\'." );
-    else if (data_type_string.empty()) {
+    інакше якщо (data_type_string.empty()) {
         data_type_string = dt;
 
         /* output header */
@@ -265,11 +265,11 @@ void base64::Base64Writer::check_dt(const char* dt)
         const uchar * end = beg + buffer.size();
 
         emitter->write(beg, end);
-    } else if ( data_type_string != dt )
+    } інакше якщо ( data_type_string != dt )
         CV_Error( cv::Error::StsBadArg, "\'dt\' does not match." );
 }
 
-base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, int len, const std::string & dt)
+base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, ціле len, const std::string & dt)
         : beg(reinterpret_cast<const uchar *>(src))
         , cur(0)
         , end(0)
@@ -292,19 +292,19 @@ inline  base64::RawDataToBinaryConvertor&  base64::RawDataToBinaryConvertor::ope
 {
     CV_DbgAssert(*this);
 
-    for (size_t i = 0U, n = to_binary_funcs.size(); i < n; i++) {
+    для (size_t i = 0U, n = to_binary_funcs.size(); i < n; i++) {
         elem_to_binary_t & pack = to_binary_funcs[i];
         pack.func(cur + pack.offset, dst + pack.offset_packed);
     }
     cur += step;
     dst += step_packed;
 
-    return *this;
+    повернути *this;
 }
 
 inline  base64::RawDataToBinaryConvertor::operator bool() const
 {
-    return cur < end;
+    повернути cur < end;
 }
 
 size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string &dt)
@@ -315,16 +315,16 @@ size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string 
     char type = '\0';
 
     std::istringstream iss(dt);
-    while (!iss.eof()) {
-        if (!(iss >> cnt)) {
+    поки (!iss.eof()) {
+        якщо (!(iss >> cnt)) {
             iss.clear();
             cnt = 1;
         }
         CV_Assert(cnt > 0U);
-        if (!(iss >> type))
+        якщо (!(iss >> type))
             break;
 
-        while (cnt-- > 0)
+        поки (cnt-- > 0)
         {
             elem_to_binary_t pack;
 
@@ -373,7 +373,7 @@ size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string 
                     CV_Error(cv::Error::StsError, "type is not supported");
             };
 
-            offset = static_cast<size_t>(cvAlign(static_cast<int>(offset), static_cast<int>(size)));
+            offset = static_cast<size_t>(cvAlign(static_cast<ціле>(offset), static_cast<ціле>(size)));
             pack.offset = offset;
             offset += size;
 
@@ -385,7 +385,7 @@ size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string 
     }
 
     CV_Assert(iss.eof());
-    return offset_packed;
+    повернути offset_packed;
 }
 
 }

@@ -14,13 +14,13 @@ static
 std::shared_ptr<cv::parallel::openmp::ParallelForBackend>& getInstance()
 {
     static std::shared_ptr<cv::parallel::openmp::ParallelForBackend> g_instance = std::make_shared<cv::parallel::openmp::ParallelForBackend>();
-    return g_instance;
+    повернути g_instance;
 }
 
 #ifndef BUILD_PLUGIN
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendOpenMP()
 {
-    return getInstance();
+    повернути getInstance();
 }
 #endif
 
@@ -37,14 +37,14 @@ CvResult cv_getInstance(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
 {
     try
     {
-        if (!handle)
-            return CV_ERROR_FAIL;
+        якщо (!handle)
+            повернути CV_ERROR_FAIL;
         *handle = cv::parallel::getInstance().get();
-        return CV_ERROR_OK;
+        повернути CV_ERROR_OK;
     }
     catch (...)
     {
-        return CV_ERROR_FAIL;
+        повернути CV_ERROR_FAIL;
     }
 }
 
@@ -60,11 +60,11 @@ static const OpenCV_Core_Parallel_Plugin_API plugin_api =
     }
 };
 
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(int requested_abi_version, int requested_api_version, void* /*reserved=NULL*/) CV_NOEXCEPT
+const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(ціле requested_abi_version, ціле requested_api_version, void* /*reserved=NULL*/) CV_NOEXCEPT
 {
-    if (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
-        return &plugin_api;
-    return NULL;
+    якщо (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
+        повернути &plugin_api;
+    повернути NULL;
 }
 
 #endif  // BUILD_PLUGIN

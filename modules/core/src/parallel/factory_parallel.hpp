@@ -33,7 +33,7 @@ public:
 
     std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
     {
-        return create_fn_();
+        повернути create_fn_();
     }
 };
 

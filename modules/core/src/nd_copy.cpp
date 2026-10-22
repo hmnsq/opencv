@@ -20,42 +20,42 @@ View viewOf(const Mat& m)
     v.data = m.data;
     v.dims = m.dims;
     v.esz = m.elemSize();
-    for (int i = 0; i < m.dims; i++)
+    для (ціле i = 0; i < m.dims; i++)
     {
         v.size[i] = m.size[i];
         v.step[i] = (ptrdiff_t)m.step[i];
     }
-    return v;
+    повернути v;
 }
 
-View permute(const View& v, const int* order)
+View permute(const View& v, const ціле* order)
 {
     View r;
     r.data = v.data;
     r.dims = v.dims;
     r.esz = v.esz;
-    for (int i = 0; i < v.dims; i++)
+    для (ціле i = 0; i < v.dims; i++)
     {
-        int j = order[i];
+        ціле j = order[i];
         CV_DbgAssert(0 <= j && j < v.dims);
         r.size[i] = v.size[j];
         r.step[i] = v.step[j];
     }
-    return r;
+    повернути r;
 }
 
-void flip(View& v, int axis)
+void flip(View& v, ціле axis)
 {
     CV_DbgAssert(0 <= axis && axis < v.dims);
-    if (v.size[axis] > 0)
+    якщо (v.size[axis] > 0)
         v.data += (ptrdiff_t)(v.size[axis] - 1)*v.step[axis];
     v.step[axis] = -v.step[axis];
 }
 
-void slice(View& v, int axis, int start, int step, int count)
+void slice(View& v, ціле axis, ціле start, ціле step, ціле count)
 {
     CV_DbgAssert(0 <= axis && axis < v.dims && count >= 0);
-    if (count > 0)
+    якщо (count > 0)
         v.data += (ptrdiff_t)start*v.step[axis];
     v.step[axis] *= step;
     v.size[axis] = count;
@@ -90,8 +90,8 @@ struct Plan
     const uchar* src;
     uchar* dst;
     size_t esz;
-    int dims;
-    int kind;
+    ціле dims;
+    ціле kind;
     int64 size[MAX_VIEW_DIMS];
     ptrdiff_t sstep[MAX_VIEW_DIMS];
     ptrdiff_t dstep[MAX_VIEW_DIMS];
@@ -105,16 +105,16 @@ struct Plan
     double cost;
 };
 
-static void swapAxes(Plan& p, int i, int j)
+static void swapAxes(Plan& p, ціле i, ціле j)
 {
     std::swap(p.size[i], p.size[j]);
     std::swap(p.sstep[i], p.sstep[j]);
     std::swap(p.dstep[i], p.dstep[j]);
 }
 
-static void moveAxis(Plan& p, int k, int to)
+static void moveAxis(Plan& p, ціле k, ціле to)
 {
-    for (int i = k; i < to; i++)
+    для (ціле i = k; i < to; i++)
         swapAxes(p, i, i + 1);
 }
 
@@ -122,49 +122,49 @@ static void moveAxis(Plan& p, int k, int to)
 static size_t addressBits(const Plan& p)
 {
     size_t addrs = (size_t)p.src | (size_t)p.dst;
-    for (int i = 0; i < p.dims; i++)
+    для (ціле i = 0; i < p.dims; i++)
         addrs |= (size_t)p.sstep[i] | (size_t)p.dstep[i];
-    return addrs;
+    повернути addrs;
 }
 
 // 2..4 planes via the cv::split / cv::merge HAL kernels
 static bool trySplitMerge(Plan& p)
 {
     const ptrdiff_t esz = (ptrdiff_t)p.esz;
-    const int L = p.dims - 1;
-    if (L < 1 || !(esz == 1 || esz == 2 || esz == 4 || esz == 8) || p.dstep[L] != esz)
-        return false;
-    if ((addressBits(p) & (esz - 1)) != 0)
-        return false;
+    const ціле L = p.dims - 1;
+    якщо (L < 1 || !(esz == 1 || esz == 2 || esz == 4 || esz == 8) || p.dstep[L] != esz)
+        повернути false;
+    якщо ((addressBits(p) & (esz - 1)) != 0)
+        повернути false;
 
     // split: axis k holds cn planes interleaved in the source
-    for (int k = L - 1; k >= 0; k--)
+    для (ціле k = L - 1; k >= 0; k--)
     {
         const int64 cn = p.size[k];
-        if (cn >= 2 && cn <= 4 && p.sstep[k] == esz && p.sstep[L] == cn*esz &&
+        якщо (cn >= 2 && cn <= 4 && p.sstep[k] == esz && p.sstep[L] == cn*esz &&
             p.dstep[k] > 0 && p.dstep[k] % esz == 0)
         {
             moveAxis(p, k, L - 1);
             p.kind = KIND_SPLIT;
-            return true;
+            повернути true;
         }
     }
 
     // merge: the innermost axis holds cn planes interleaved in the destination
     const int64 cn = p.size[L];
-    if (cn >= 2 && cn <= 4 && p.sstep[L] > 0 && p.sstep[L] % esz == 0)
+    якщо (cn >= 2 && cn <= 4 && p.sstep[L] > 0 && p.sstep[L] % esz == 0)
     {
-        for (int k = L - 1; k >= 0; k--)
+        для (ціле k = L - 1; k >= 0; k--)
         {
-            if (p.sstep[k] == esz && p.dstep[k] == cn*esz)
+            якщо (p.sstep[k] == esz && p.dstep[k] == cn*esz)
             {
                 moveAxis(p, k, L - 1);
                 p.kind = KIND_MERGE;
-                return true;
+                повернути true;
             }
         }
     }
-    return false;
+    повернути false;
 }
 
 // Returns false when there is nothing to copy.
@@ -180,20 +180,20 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
 
     // Drop size-1 axes and make the destination steps positive
     // (reversing an axis in both views keeps the mapping).
-    int n = 0;
+    ціле n = 0;
     double total = 1;
-    for (int i = 0; i < s.dims; i++)
+    для (ціле i = 0; i < s.dims; i++)
     {
         CV_CheckEQ(s.size[i], d.size[i], "nd::copy: the shapes must match");
-        int sz = s.size[i];
+        ціле sz = s.size[i];
         CV_Assert(sz >= 0);
-        if (sz == 0)
-            return false;
+        якщо (sz == 0)
+            повернути false;
         total *= sz;
-        if (sz == 1)
+        якщо (sz == 1)
             continue;
         ptrdiff_t ss = s.step[i], ds = d.step[i];
-        if (ds < 0)
+        якщо (ds < 0)
         {
             p.src += (ptrdiff_t)(sz - 1)*ss;
             p.dst += (ptrdiff_t)(sz - 1)*ds;
@@ -207,20 +207,20 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
     }
 
     // Write the destination as sequentially as possible.
-    for (int i = 1; i < n; i++)
-        for (int j = i; j > 0 && p.dstep[j-1] < p.dstep[j]; j--)
+    для (ціле i = 1; i < n; i++)
+        для (ціле j = i; j > 0 && p.dstep[j-1] < p.dstep[j]; j--)
             swapAxes(p, j-1, j);
 
-    int m = 0;
-    for (int i = 0; i < n; i++)
+    ціле m = 0;
+    для (ціле i = 0; i < n; i++)
     {
-        if (m > 0 && p.sstep[m-1] == p.sstep[i]*p.size[i] && p.dstep[m-1] == p.dstep[i]*p.size[i])
+        якщо (m > 0 && p.sstep[m-1] == p.sstep[i]*p.size[i] && p.dstep[m-1] == p.dstep[i]*p.size[i])
         {
             p.size[m-1] *= p.size[i];
             p.sstep[m-1] = p.sstep[i];
             p.dstep[m-1] = p.dstep[i];
         }
-        else
+        інакше
         {
             p.size[m] = p.size[i];
             p.sstep[m] = p.sstep[i];
@@ -228,7 +228,7 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
             m++;
         }
     }
-    if (m == 0)
+    якщо (m == 0)
     {
         p.size[0] = 1;
         p.sstep[0] = p.dstep[0] = esz;
@@ -236,26 +236,26 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
     }
     p.dims = m;
 
-    const int L = m - 1;
+    const ціле L = m - 1;
     p.tfunc = nullptr;
-    if (p.sstep[L] == esz && p.dstep[L] == esz)
+    якщо (p.sstep[L] == esz && p.dstep[L] == esz)
         p.kind = KIND_MEMCPY;
-    else if (p.sstep[L] == 0)
+    інакше якщо (p.sstep[L] == 0)
         p.kind = KIND_FILL;
-    else if (!trySplitMerge(p))
+    інакше якщо (!trySplitMerge(p))
     {
         p.kind = KIND_STRIDED;
         // An outer axis contiguous in the source makes it a batched 2D transpose.
-        if (m >= 2 && p.dstep[L] == esz && p.sstep[L] > 0)
+        якщо (m >= 2 && p.dstep[L] == esz && p.sstep[L] > 0)
         {
-            int k = L - 1;
-            while (k >= 0 && p.sstep[k] != esz)
+            ціле k = L - 1;
+            поки (k >= 0 && p.sstep[k] != esz)
                 k--;
             TransposeFunc f = getTransposeFunc(s.esz);
             // the kernels access the elements as uchar, ushort or int based types
             const size_t align = std::min(s.esz & (0 - s.esz), (size_t)4);
             // a short axis cannot fill SIMD registers; the gather is faster then
-            if (k >= 0 && f && p.size[k] >= 8 && (addressBits(p) & (align - 1)) == 0)
+            якщо (k >= 0 && f && p.size[k] >= 8 && (addressBits(p) & (align - 1)) == 0)
             {
                 moveAxis(p, k, L - 1);
                 p.kind = KIND_TRANSPOSE;
@@ -265,11 +265,11 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
     }
 
     const double bytes = total*(double)esz;
-    if (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
+    якщо (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
     {
-        const int X = p.kind == KIND_SPLIT ? L : L - 1;
+        const ціле X = p.kind == KIND_SPLIT ? L : L - 1;
         int64 nouter = 1;
-        for (int i = 0; i < L - 1; i++)
+        для (ціле i = 0; i < L - 1; i++)
             nouter *= p.size[i];
         p.nrows = nouter;
         p.chunk = SPLIT_CHUNK;
@@ -279,10 +279,10 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
         p.nitems = nouter*p.nchunks;
         p.cost = bytes*2;
     }
-    else if (p.kind == KIND_TRANSPOSE)
+    інакше якщо (p.kind == KIND_TRANSPOSE)
     {
         int64 nouter = 1;
-        for (int i = 0; i < L - 1; i++)
+        для (ціле i = 0; i < L - 1; i++)
             nouter *= p.size[i];
         p.tilesA = (p.size[L-1] + TRANSPOSE_TILE - 1)/TRANSPOSE_TILE;
         p.tilesB = (p.size[L] + TRANSPOSE_TILE - 1)/TRANSPOSE_TILE;
@@ -292,10 +292,10 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
         p.nitems = nouter*p.tilesA*p.tilesB;
         p.cost = bytes*3;
     }
-    else
+    інакше
     {
         int64 nrows = 1;
-        for (int i = 0; i < L; i++)
+        для (ціле i = 0; i < L; i++)
             nrows *= p.size[i];
         const int64 rowLen = p.size[L];
         const double rowBytes = (double)rowLen*esz;
@@ -304,7 +304,7 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
         p.nchunks = 1;
         p.chunk = rowLen;
         p.chunkMajor = false;
-        if (p.kind == KIND_STRIDED && L > 0 && nrows <= 64 && std::abs(p.sstep[L-1]) < sstepL &&
+        якщо (p.kind == KIND_STRIDED && L > 0 && nrows <= 64 && std::abs(p.sstep[L-1]) < sstepL &&
             (double)rowLen*sstepL > 2.0*GATHER_BLOCK_BYTES)
         {
             // Rows reading interleaved source data (NHWC -> NCHW with a small C):
@@ -313,7 +313,7 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
             p.nchunks = (rowLen + p.chunk - 1)/p.chunk;
             p.chunkMajor = true;
         }
-        else if (nrows < 64 && rowBytes >= 2.0*ROW_CHUNK_BYTES)
+        інакше якщо (nrows < 64 && rowBytes >= 2.0*ROW_CHUNK_BYTES)
         {
             // few long rows: split them to have something to parallelize
             int64 nch = std::min((int64)(rowBytes/ROW_CHUNK_BYTES), (int64)1024);
@@ -324,18 +324,18 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
         p.nitems = nrows*p.nchunks;
         p.cost = p.kind == KIND_MEMCPY ? bytes : bytes*4;
     }
-    return true;
+    повернути true;
 }
 
 template<typename T> static inline bool isAligned(const void* s, const void* d, ptrdiff_t ss, ptrdiff_t ds)
 {
-    return (((size_t)s | (size_t)d | (size_t)ss | (size_t)ds) & (alignof(T) - 1)) == 0;
+    повернути (((size_t)s | (size_t)d | (size_t)ss | (size_t)ds) & (alignof(T) - 1)) == 0;
 }
 
 template<typename T> static void copyStrided_(const uchar* s, ptrdiff_t ss, uchar* d, ptrdiff_t ds, int64 n)
 {
     int64 i = 0;
-    for (; i + 4 <= n; i += 4)
+    для (; i + 4 <= n; i += 4)
     {
         T t0 = *(const T*)s, t1 = *(const T*)(s + ss);
         T t2 = *(const T*)(s + ss*2), t3 = *(const T*)(s + ss*3);
@@ -344,14 +344,14 @@ template<typename T> static void copyStrided_(const uchar* s, ptrdiff_t ss, ucha
         s += ss*4;
         d += ds*4;
     }
-    for (; i < n; i++, s += ss, d += ds)
+    для (; i < n; i++, s += ss, d += ds)
         *(T*)d = *(const T*)s;
 }
 
 template<typename T> static void fill_(const uchar* s, uchar* d, ptrdiff_t ds, int64 n)
 {
     const T v = *(const T*)s;
-    for (int64 i = 0; i < n; i++, d += ds)
+    для (int64 i = 0; i < n; i++, d += ds)
         *(T*)d = v;
 }
 
@@ -361,51 +361,51 @@ struct Elem16 { uint64_t a, b; };
 static void copyRow(const Plan& p, const uchar* s, uchar* d, int64 n)
 {
     const size_t esz = p.esz;
-    const int L = p.dims - 1;
+    const ціле L = p.dims - 1;
     const ptrdiff_t ss = p.sstep[L], ds = p.dstep[L];
 
-    if (p.kind == KIND_FILL)
+    якщо (p.kind == KIND_FILL)
     {
-        if (esz == 1 && ds == 1)
+        якщо (esz == 1 && ds == 1)
             memset(d, *s, (size_t)n);
-        else if (esz == 2 && isAligned<uint16_t>(s, d, 0, ds))
+        інакше якщо (esz == 2 && isAligned<uint16_t>(s, d, 0, ds))
             fill_<uint16_t>(s, d, ds, n);
-        else if (esz == 4 && isAligned<uint32_t>(s, d, 0, ds))
+        інакше якщо (esz == 4 && isAligned<uint32_t>(s, d, 0, ds))
             fill_<uint32_t>(s, d, ds, n);
-        else if (esz == 8 && isAligned<uint64_t>(s, d, 0, ds))
+        інакше якщо (esz == 8 && isAligned<uint64_t>(s, d, 0, ds))
             fill_<uint64_t>(s, d, ds, n);
-        else
-            for (int64 i = 0; i < n; i++, d += ds)
+        інакше
+            для (int64 i = 0; i < n; i++, d += ds)
                 memcpy(d, s, esz);
-        return;
+        повернути;
     }
 
-    if (esz == 1)
+    якщо (esz == 1)
         copyStrided_<uchar>(s, ss, d, ds, n);
-    else if (esz == 2 && isAligned<uint16_t>(s, d, ss, ds))
+    інакше якщо (esz == 2 && isAligned<uint16_t>(s, d, ss, ds))
         copyStrided_<uint16_t>(s, ss, d, ds, n);
-    else if (esz == 4 && isAligned<uint32_t>(s, d, ss, ds))
+    інакше якщо (esz == 4 && isAligned<uint32_t>(s, d, ss, ds))
         copyStrided_<uint32_t>(s, ss, d, ds, n);
-    else if (esz == 8 && isAligned<uint64_t>(s, d, ss, ds))
+    інакше якщо (esz == 8 && isAligned<uint64_t>(s, d, ss, ds))
         copyStrided_<uint64_t>(s, ss, d, ds, n);
-    else if (esz == 16 && isAligned<uint64_t>(s, d, ss, ds))
+    інакше якщо (esz == 16 && isAligned<uint64_t>(s, d, ss, ds))
         copyStrided_<Elem16>(s, ss, d, ds, n);
-    else
-        for (int64 i = 0; i < n; i++, s += ss, d += ds)
+    інакше
+        для (int64 i = 0; i < n; i++, s += ss, d += ds)
             memcpy(d, s, esz);
 }
 
 // Offsets of the given flat index over the first `naxes` axes.
-static void decode(const Plan& p, int naxes, int64 idx, int64* counters,
+static void decode(const Plan& p, ціле naxes, int64 idx, int64* counters,
                    const uchar*& s, uchar*& d)
 {
     s = p.src;
     d = p.dst;
-    for (int k = naxes - 1; k >= 0; k--)
+    для (ціле k = naxes - 1; k >= 0; k--)
     {
         int64 q = idx / p.size[k];
         int64 i = idx - q*p.size[k];
-        if (counters)
+        якщо (counters)
             counters[k] = i;
         s += i*p.sstep[k];
         d += i*p.dstep[k];
@@ -415,58 +415,58 @@ static void decode(const Plan& p, int naxes, int64 idx, int64* counters,
 
 template<bool MEMCPY> static inline void copyRowT(const Plan& p, const uchar* s, uchar* d, int64 n)
 {
-    if (MEMCPY)
+    якщо (MEMCPY)
         memcpy(d, s, (size_t)n*p.esz);
-    else
+    інакше
         copyRow(p, s, d, n);
 }
 
 template<bool MEMCPY> static void runRows(const Plan& p, int64 i0, int64 i1)
 {
-    const int L = p.dims - 1;
+    const ціле L = p.dims - 1;
     const int64 nch = p.nchunks, rowLen = p.size[L];
     const ptrdiff_t sstepL = p.sstep[L], dstepL = p.dstep[L];
     const uchar* s;
     uchar* d;
 
-    if (p.chunkMajor)
+    якщо (p.chunkMajor)
     {
-        for (int64 it = i0; it < i1; it++)
+        для (int64 it = i0; it < i1; it++)
         {
             int64 ch = it / p.nrows, row = it - ch*p.nrows;
             int64 e0 = ch*p.chunk, e1 = std::min(e0 + p.chunk, rowLen);
             decode(p, L, row, nullptr, s, d);
             copyRowT<MEMCPY>(p, s + e0*sstepL, d + e0*dstepL, e1 - e0);
         }
-        return;
+        повернути;
     }
 
     int64 counters[MAX_VIEW_DIMS];
     int64 ch = i0 % nch;
     decode(p, L, i0 / nch, counters, s, d);
 
-    if (nch == 1 && L == 1)
+    якщо (nch == 1 && L == 1)
     {
         const ptrdiff_t ss = p.sstep[0], ds = p.dstep[0];
-        for (int64 it = i0; it < i1; it++, s += ss, d += ds)
+        для (int64 it = i0; it < i1; it++, s += ss, d += ds)
             copyRowT<MEMCPY>(p, s, d, rowLen);
-        return;
+        повернути;
     }
 
-    for (int64 it = i0; it < i1; )
+    для (int64 it = i0; it < i1; )
     {
         int64 chEnd = std::min(nch, ch + (i1 - it));
         int64 e0 = ch*p.chunk, e1 = std::min(chEnd*p.chunk, rowLen);
         copyRowT<MEMCPY>(p, s + e0*sstepL, d + e0*dstepL, e1 - e0);
         it += chEnd - ch;
-        if (chEnd < nch)
+        якщо (chEnd < nch)
             break;
         ch = 0;
-        for (int k = L - 1; k >= 0; k--)
+        для (ціле k = L - 1; k >= 0; k--)
         {
             s += p.sstep[k];
             d += p.dstep[k];
-            if (++counters[k] < p.size[k])
+            якщо (++counters[k] < p.size[k])
                 break;
             s -= p.size[k]*p.sstep[k];
             d -= p.size[k]*p.dstep[k];
@@ -477,9 +477,9 @@ template<bool MEMCPY> static void runRows(const Plan& p, int64 i0, int64 i1)
 
 static void runTranspose(const Plan& p, int64 i0, int64 i1)
 {
-    const int A = p.dims - 2, B = p.dims - 1;
+    const ціле A = p.dims - 2, B = p.dims - 1;
     const int64 ntiles = p.tilesA*p.tilesB;
-    for (int64 it = i0; it < i1; it++)
+    для (int64 it = i0; it < i1; it++)
     {
         int64 o = it / ntiles, t = it - o*ntiles;
         int64 ta = t / p.tilesB, tb = t - ta*p.tilesB;
@@ -487,11 +487,11 @@ static void runTranspose(const Plan& p, int64 i0, int64 i1)
         uchar* d;
         decode(p, A, o, nullptr, s, d);
         int64 a0 = ta*TRANSPOSE_TILE, b0 = tb*TRANSPOSE_TILE;
-        int wa = (int)std::min((int64)TRANSPOSE_TILE, p.size[A] - a0);
-        int hb = (int)std::min((int64)TRANSPOSE_TILE, p.size[B] - b0);
+        ціле wa = (ціле)std::min((int64)TRANSPOSE_TILE, p.size[A] - a0);
+        ціле hb = (ціле)std::min((int64)TRANSPOSE_TILE, p.size[B] - b0);
         s += a0*p.sstep[A] + b0*p.sstep[B];
         d += a0*p.dstep[A] + b0*p.dstep[B];
-        if (cv_hal_transpose2d(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], wa, hb, (int)p.esz) == CV_HAL_ERROR_OK)
+        якщо (cv_hal_transpose2d(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], wa, hb, (ціле)p.esz) == CV_HAL_ERROR_OK)
             continue;
         p.tfunc(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], Size(wa, hb));
     }
@@ -499,54 +499,54 @@ static void runTranspose(const Plan& p, int64 i0, int64 i1)
 
 static void runSplitMerge(const Plan& p, int64 i0, int64 i1)
 {
-    const int L = p.dims - 1;
+    const ціле L = p.dims - 1;
     const bool isSplit = p.kind == KIND_SPLIT;
-    const int C = isSplit ? L - 1 : L;    // the plane axis
-    const int X = isSplit ? L : L - 1;    // the long axis
-    const int cn = (int)p.size[C];
+    const ціле C = isSplit ? L - 1 : L;    // the plane axis
+    const ціле X = isSplit ? L : L - 1;    // the long axis
+    const ціле cn = (ціле)p.size[C];
     const size_t esz = p.esz;
-    for (int64 it = i0; it < i1; it++)
+    для (int64 it = i0; it < i1; it++)
     {
         int64 o = it / p.nchunks, ch = it - o*p.nchunks;
         const uchar* s;
         uchar* d;
         decode(p, L - 1, o, nullptr, s, d);
         const int64 e0 = ch*p.chunk;
-        const int len = (int)std::min(p.chunk, p.size[X] - e0);
+        const ціле len = (ціле)std::min(p.chunk, p.size[X] - e0);
         s += e0*p.sstep[X];
         d += e0*p.dstep[X];
-        if (isSplit)
+        якщо (isSplit)
         {
             uchar* dptr[4];
-            for (int c = 0; c < cn; c++)
+            для (ціле c = 0; c < cn; c++)
                 dptr[c] = d + c*p.dstep[C];
-            if (esz == 1) hal::split8u(s, dptr, len, cn);
-            else if (esz == 2) hal::split16u((const ushort*)s, (ushort**)dptr, len, cn);
-            else if (esz == 4) hal::split32s((const int*)s, (int**)dptr, len, cn);
-            else hal::split64s((const int64*)s, (int64**)dptr, len, cn);
+            якщо (esz == 1) hal::split8u(s, dptr, len, cn);
+            інакше якщо (esz == 2) hal::split16u((const ushort*)s, (ushort**)dptr, len, cn);
+            інакше якщо (esz == 4) hal::split32s((const ціле*)s, (ціле**)dptr, len, cn);
+            інакше hal::split64s((const int64*)s, (int64**)dptr, len, cn);
         }
-        else
+        інакше
         {
             const uchar* sptr[4];
-            for (int c = 0; c < cn; c++)
+            для (ціле c = 0; c < cn; c++)
                 sptr[c] = s + c*p.sstep[C];
-            if (esz == 1) hal::merge8u(sptr, d, len, cn);
-            else if (esz == 2) hal::merge16u((const ushort**)sptr, (ushort*)d, len, cn);
-            else if (esz == 4) hal::merge32s((const int**)sptr, (int*)d, len, cn);
-            else hal::merge64s((const int64**)sptr, (int64*)d, len, cn);
+            якщо (esz == 1) hal::merge8u(sptr, d, len, cn);
+            інакше якщо (esz == 2) hal::merge16u((const ushort**)sptr, (ushort*)d, len, cn);
+            інакше якщо (esz == 4) hal::merge32s((const ціле**)sptr, (ціле*)d, len, cn);
+            інакше hal::merge64s((const int64**)sptr, (int64*)d, len, cn);
         }
     }
 }
 
 static void runPlan(const Plan& p, int64 i0, int64 i1)
 {
-    if (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
+    якщо (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
         runSplitMerge(p, i0, i1);
-    else if (p.kind == KIND_TRANSPOSE)
+    інакше якщо (p.kind == KIND_TRANSPOSE)
         runTranspose(p, i0, i1);
-    else if (p.kind == KIND_MEMCPY)
+    інакше якщо (p.kind == KIND_MEMCPY)
         runRows<true>(p, i0, i1);
-    else
+    інакше
         runRows<false>(p, i0, i1);
 }
 
@@ -554,30 +554,30 @@ static void runPlan(const Plan& p, int64 i0, int64 i1)
 // so that the shared destination (or source) is accessed sequentially.
 static bool canRunInLockstep(const Plan* plans, size_t np)
 {
-    if (np < 2)
-        return false;
+    якщо (np < 2)
+        повернути false;
     const Plan& p0 = plans[0];
-    for (size_t k = 0; k < np; k++)
+    для (size_t k = 0; k < np; k++)
     {
         const Plan& p = plans[k];
-        if (p.kind == KIND_TRANSPOSE || p.kind == KIND_SPLIT || p.kind == KIND_MERGE ||
+        якщо (p.kind == KIND_TRANSPOSE || p.kind == KIND_SPLIT || p.kind == KIND_MERGE ||
             p.chunkMajor || p.nchunks != 1 || p.dims != p0.dims)
-            return false;
-        for (int i = 0; i < p.dims - 1; i++)
-            if (p.size[i] != p0.size[i])
-                return false;
+            повернути false;
+        для (ціле i = 0; i < p.dims - 1; i++)
+            якщо (p.size[i] != p0.size[i])
+                повернути false;
     }
-    return true;
+    повернути true;
 }
 
 static void runPlans(const Plan* plans, size_t np)
 {
-    if (np == 0)
-        return;
+    якщо (np == 0)
+        повернути;
     AutoBuffer<int64, 16> ofs(np + 1);
     ofs[0] = 0;
     double cost = 0, rowBytes = 0;
-    for (size_t k = 0; k < np; k++)
+    для (size_t k = 0; k < np; k++)
     {
         ofs[k+1] = ofs[k] + plans[k].nitems;
         cost += plans[k].cost;
@@ -590,18 +590,18 @@ static void runPlans(const Plan* plans, size_t np)
 
     auto body = [&](int64 a, int64 b)
     {
-        if (lockstep)
+        якщо (lockstep)
         {
-            for (int64 r = a; r < b; r += blockRows)
+            для (int64 r = a; r < b; r += blockRows)
             {
                 int64 re = std::min(b, r + blockRows);
-                for (size_t k = 0; k < np; k++)
+                для (size_t k = 0; k < np; k++)
                     runPlan(plans[k], r, re);
             }
-            return;
+            повернути;
         }
         size_t k = std::upper_bound(ofs.data(), ofs.data() + np + 1, a) - ofs.data() - 1;
-        while (a < b)
+        поки (a < b)
         {
             int64 e = std::min(b, ofs[k+1]);
             runPlan(plans[k], a - ofs[k], e - ofs[k]);
@@ -610,16 +610,16 @@ static void runPlans(const Plan* plans, size_t np)
         }
     };
 
-    if (cost < PARALLEL_MIN_COST || total < 2 || getNumThreads() <= 1)
+    якщо (cost < PARALLEL_MIN_COST || total < 2 || getNumThreads() <= 1)
     {
         body(0, total);
-        return;
+        повернути;
     }
 
     // grouped so that the range fits into int
     const int64 ngroups = std::min(total, (int64)1 << 20);
     const double nstripes = std::min((double)ngroups, std::max(2.0, cost/STRIPE_COST));
-    parallel_for_(Range(0, (int)ngroups), [&](const Range& r)
+    parallel_for_(Range(0, (ціле)ngroups), [&](const Range& r)
     {
         body(r.start*total/ngroups, r.end*total/ngroups);
     }, nstripes);
@@ -629,10 +629,10 @@ static void runPlans(const Plan* plans, size_t np)
 static void viewRange(const View& v, const uchar*& lo, const uchar*& hi)
 {
     ptrdiff_t a = 0, b = 0;
-    for (int i = 0; i < v.dims; i++)
+    для (ціле i = 0; i < v.dims; i++)
     {
         ptrdiff_t ext = (ptrdiff_t)(v.size[i] - 1)*v.step[i];
-        if (ext < 0) a += ext; else b += ext;
+        якщо (ext < 0) a += ext; інакше b += ext;
     }
     lo = v.data + a;
     hi = v.data + b + v.esz;
@@ -640,20 +640,20 @@ static void viewRange(const View& v, const uchar*& lo, const uchar*& hi)
 
 static bool hasZeroSize(const View& v)
 {
-    for (int i = 0; i < v.dims; i++)
-        if (v.size[i] == 0)
-            return true;
-    return false;
+    для (ціле i = 0; i < v.dims; i++)
+        якщо (v.size[i] == 0)
+            повернути true;
+    повернути false;
 }
 
 static bool sameMapping(const View& s, const View& d)
 {
-    if (s.data != d.data)
-        return false;
-    for (int i = 0; i < s.dims; i++)
-        if (s.size[i] > 1 && s.step[i] != d.step[i])
-            return false;
-    return true;
+    якщо (s.data != d.data)
+        повернути false;
+    для (ціле i = 0; i < s.dims; i++)
+        якщо (s.size[i] > 1 && s.step[i] != d.step[i])
+            повернути false;
+    повернути true;
 }
 
 static bool overlap(const View& s, const View& d)
@@ -661,12 +661,12 @@ static bool overlap(const View& s, const View& d)
     const uchar *slo, *shi, *dlo, *dhi;
     viewRange(s, slo, shi);
     viewRange(d, dlo, dhi);
-    return slo < dhi && dlo < shi;
+    повернути slo < dhi && dlo < shi;
 }
 
 } // namespace
 
-void copyBatch(const View* src, const View* dst, int n)
+void copyBatch(const View* src, const View* dst, ціле n)
 {
     CV_Assert(n >= 0);
     AutoBuffer<Plan, 4> plans(n);
@@ -674,29 +674,29 @@ void copyBatch(const View* src, const View* dst, int n)
     std::vector<AutoBuffer<uchar> > temps;
     temps.reserve(n);  // the views below point into the buffers, so they must not move
 
-    for (int i = 0; i < n; i++)
+    для (ціле i = 0; i < n; i++)
     {
         View s = src[i];
         const View& d = dst[i];
         CV_CheckEQ(s.dims, d.dims, "nd::copy: the number of dimensions must match");
-        CV_CheckLE(s.dims, (int)MAX_VIEW_DIMS, "nd::copy: too many dimensions");
-        if (hasZeroSize(s) || sameMapping(s, d))
+        CV_CheckLE(s.dims, (ціле)MAX_VIEW_DIMS, "nd::copy: too many dimensions");
+        якщо (hasZeroSize(s) || sameMapping(s, d))
             continue;
         // All the copies run after this loop, so a source that overlaps any of the
         // destinations is saved first.
         bool needTemp = false;
-        for (int j = 0; j < n && !needTemp; j++)
+        для (ціле j = 0; j < n && !needTemp; j++)
             needTemp = !hasZeroSize(dst[j]) && overlap(s, dst[j]);
-        if (needTemp)
+        якщо (needTemp)
         {
             size_t total = 1;
-            for (int k = 0; k < s.dims; k++)
+            для (ціле k = 0; k < s.dims; k++)
                 total *= (size_t)s.size[k];
             temps.emplace_back(total*s.esz);
             View t = s;
             t.data = temps.back().data();
             ptrdiff_t st = (ptrdiff_t)s.esz;
-            for (int k = s.dims - 1; k >= 0; k--)
+            для (ціле k = s.dims - 1; k >= 0; k--)
             {
                 t.step[k] = st;
                 st *= s.size[k];
@@ -704,7 +704,7 @@ void copyBatch(const View* src, const View* dst, int n)
             copy(s, t);
             s = t;
         }
-        if (buildPlan(s, d, plans[np]))
+        якщо (buildPlan(s, d, plans[np]))
             np++;
     }
     runPlans(plans.data(), np);
