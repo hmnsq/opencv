@@ -2,40 +2,40 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#ضمن "precomp.hpp"
+#ضمن "opencl_kernels_core.hpp"
 
-#include "convert.simd.hpp"
-#include "convert.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ضمن "convert.simd.hpp"
+#ضمن "convert.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+نطاق cv {
 
-namespace hal {
-void cvt16f32f(const hfloat* src, float* dst, int len)
+نطاق hal {
+فراغ cvt16f32f(ثابت hfloat* src, عائم* dst, صحيح len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt16f32f, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void cvt32f16f(const float* src, hfloat* dst, int len)
+فراغ cvt32f16f(ثابت عائم* src, hfloat* dst, صحيح len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt32f16f, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void cvt32f16bf(const float* src, bfloat* dst, int len)
+فراغ cvt32f16bf(ثابت عائم* src, bfloat* dst, صحيح len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt32f16bf, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void addRNGBias32f(float* arr, const float* scaleBiasPairs, int len, int cn)
+فراغ addRNGBias32f(عائم* arr, ثابت عائم* scaleBiasPairs, صحيح len, صحيح cn)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(addRNGBias32f, (arr, scaleBiasPairs, len, cn),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn)
+فراغ addRNGBias64f(مزدوج* arr, ثابت مزدوج* scaleBiasPairs, صحيح len, صحيح cn)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(addRNGBias64f, (arr, scaleBiasPairs, len, cn),
@@ -45,7 +45,7 @@ void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn)
 } // namespace
 
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth)
+ثنائی_Func getConvertFunc(صحيح sdepth, صحيح ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getConvertFunc, (sdepth, ddepth),
@@ -53,51 +53,51 @@ BinaryFunc getConvertFunc(int sdepth, int ddepth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool noScale, double alpha, double beta)
+ساكن منطقي ocl_convertTo(داخلہ_Array src_, OutputArray dst_, صحيح ddepth, منطقي noScale, مزدوج alpha, مزدوج beta)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(ddepth >= 0);
 
-    int stype = src_.type();
-    int sdepth = CV_MAT_DEPTH(stype);
-    int cn = CV_MAT_CN(stype);
+    صحيح stype = src_.type();
+    صحيح sdepth = CV_MAT_DEPTH(stype);
+    صحيح cn = CV_MAT_CN(stype);
 
     // FP8 types are not supported by the OpenCL kernels yet; fall back to CPU.
-    if ((sdepth >= CV_8F_E4M3FN && sdepth <= CV_8F_E4M3FNUZ) ||
+    إذا ((sdepth >= CV_8F_E4M3FN && sdepth <= CV_8F_E4M3FNUZ) ||
         (ddepth >= CV_8F_E4M3FN && ddepth <= CV_8F_E4M3FNUZ))
-        return false;
+        أرجع خطأ;
 
-    int dtype = CV_MAKETYPE(ddepth, cn);
+    صحيح dtype = CV_MAKETYPE(ddepth, cn);
 
-    int wdepth = (sdepth == CV_64F) ? CV_64F : CV_32F;
+    صحيح wdepth = (sdepth == CV_64F) ? CV_64F : CV_32F;
 
-    bool needDouble = sdepth == CV_64F || ddepth == CV_64F;
-    bool doubleCheck = true;
-    if (needDouble)
+    منطقي needDouble = sdepth == CV_64F || ddepth == CV_64F;
+    منطقي doubleCheck = true;
+    إذا (needDouble)
     {
         doubleCheck = ocl::Device::getDefault().hasFP64();
     }
-    bool halfCheck = true;
-    bool needHalf = sdepth == CV_16F || ddepth == CV_16F;
-    if (needHalf)
+    منطقي halfCheck = true;
+    منطقي needHalf = sdepth == CV_16F || ddepth == CV_16F;
+    إذا (needHalf)
     {
         halfCheck = ocl::Device::getDefault().hasFP16();
     }
 
-    if (!doubleCheck)
-        return false;
-    if (!halfCheck)
-        return false;
+    إذا (!doubleCheck)
+        أرجع خطأ;
+    إذا (!halfCheck)
+        أرجع خطأ;
 
-    const int rowsPerWI = 4;
+    ثابت صحيح rowsPerWI = 4;
 
-    char cvt[2][50];
+    حرف cvt[2][50];
     ocl::Kernel k("convertTo", ocl::core::convert_oclsrc,
                   format("-D srcT=%s -D WT=%s -D dstT=%s -D convertToWT=%s -D convertToDT=%s -D rowsPerWI=%d%s%s%s",
                          ocl::typeToStr(sdepth), ocl::typeToStr(wdepth), ocl::typeToStr(ddepth),
-                         ocl::convertTypeStr(sdepth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-                         ocl::convertTypeStr(wdepth, ddepth, 1, cvt[1], sizeof(cvt[1])),
+                         ocl::convertTypeStr(sdepth, wdepth, 1, cvt[0], حجم(cvt[0])),
+                         ocl::convertTypeStr(wdepth, ddepth, 1, cvt[1], حجم(cvt[1])),
                          rowsPerWI,
                          needDouble ? " -D DOUBLE_SUPPORT" : "",
                          needHalf ? " -D HALF_SUPPORT" : "",
@@ -105,149 +105,149 @@ static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool no
                   )
     );
 
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
     UMat src = src_.getUMat();
     dst_.createSameSize(src_, dtype);
     UMat dst = dst_.getUMat();
 
-    float alphaf = (float)alpha, betaf = (float)beta;
+    عائم alphaf = (عائم)alpha, betaf = (عائم)beta;
 
-    if (noScale)
+    إذا (noScale)
         k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn));
-    else if (wdepth == CV_32F)
+    وإلا إذا (wdepth == CV_32F)
         k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alphaf, betaf);
-    else
+    وإلا
         k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alpha, beta);
 
     size_t globalsize[2] = {
         (size_t)dst.cols * cn,
         divUp((size_t)dst.rows, rowsPerWI)
     };
-    if (!k.run(2, globalsize, NULL, false))
-        return false;
+    إذا (!k.run(2, globalsize, عدم, خطأ))
+        أرجع خطأ;
 
     CV_IMPL_ADD(CV_IMPL_OCL);
-    return true;
+    أرجع true;
 }
 #endif
 
-void Mat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
+فراغ Mat::convertTo(OutputArray dst, صحيح type_, مزدوج alpha, مزدوج beta) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if (empty())
+    إذا (empty())
     {
-        int ddepth = CV_MAT_DEPTH(type_);
-        if (ddepth < 0)
+        صحيح ddepth = CV_MAT_DEPTH(type_);
+        إذا (ddepth < 0)
             ddepth = dst.fixedType() ? dst.depth() : depth();
-        const int dtype = CV_MAKETYPE(ddepth, channels());
+        ثابت صحيح dtype = CV_MAKETYPE(ddepth, channels());
 
         dst.release();
-        bool allowTransposed = dims == 1 ||
-            dst.kind() == _InputArray::STD_VECTOR ||
+        منطقي allowTransposed = dims == 1 ||
+            dst.kind() == داخلہ_Array_2::STD_VECTOR ||
             (dst.fixedSize() && dst.dims() == 1);
         dst.create(size, dtype, -1, allowTransposed);
-        return;
+        أرجع;
     }
 
-    int stype = type();
-    int sdepth = CV_MAT_DEPTH(stype);
+    صحيح stype = type();
+    صحيح sdepth = CV_MAT_DEPTH(stype);
 
-    int ddepth = sdepth;
-    if (type_ >= 0)
+    صحيح ddepth = sdepth;
+    إذا (type_ >= 0)
         ddepth = CV_MAT_DEPTH(type_);
-    else
+    وإلا
         ddepth = dst.fixedType() ? dst.depth() : sdepth;
 
-    bool noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
-    if (sdepth == ddepth && noScale)
+    منطقي noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
+    إذا (sdepth == ddepth && noScale)
     {
         copyTo(dst);
-        return;
+        أرجع;
     }
 
     CV_OCL_RUN(dims <= 2 && dst.isUMat(),
-               ocl_convertTo(*this, dst, ddepth, noScale, alpha, beta))
+               ocl_convertTo(*هذا, dst, ddepth, noScale, alpha, beta))
 
-    int cn = channels();
-    int dtype = CV_MAKETYPE(ddepth, cn);
+    صحيح cn = channels();
+    صحيح dtype = CV_MAKETYPE(ddepth, cn);
 
-    Mat src = *this;
-    bool allowTransposed = dims == 1 ||
-        dst.kind() == _InputArray::STD_VECTOR ||
+    Mat src = *هذا;
+    منطقي allowTransposed = dims == 1 ||
+        dst.kind() == داخلہ_Array_2::STD_VECTOR ||
         (dst.fixedSize() && dst.dims() == 1);
     dst.create( size, dtype, -1, allowTransposed );
     Mat dstMat = dst.getMat();
 
-    if( dims <= 2 )
+    إذا( dims <= 2 )
     {
         CALL_HAL(convertScale, cv_hal_convertScale, src.data, src.step, dstMat.data, dstMat.step, src.cols * cn, src.rows, sdepth, ddepth, alpha, beta);
     }
-    else if( src.isContinuous() && dstMat.isContinuous() )
+    وإلا إذا( src.isContinuous() && dstMat.isContinuous() )
     {
-        CALL_HAL(convertScale, cv_hal_convertScale, src.data, 0, dstMat.data, 0, (int)src.total() * cn, 1, sdepth, ddepth, alpha, beta);
+        CALL_HAL(convertScale, cv_hal_convertScale, src.data, 0, dstMat.data, 0, (صحيح)src.total() * cn, 1, sdepth, ddepth, alpha, beta);
     }
 
-    BinaryFunc func = noScale ? getConvertFunc(sdepth, ddepth) : getConvertScaleFunc(sdepth, ddepth);
-    double scale[] = {alpha, beta};
+    ثنائی_Func func = noScale ? getConvertFunc(sdepth, ddepth) : getConvertScaleFunc(sdepth, ddepth);
+    مزدوج scale[] = {alpha, beta};
     CV_Assert( func != 0 );
 
-    if( dims <= 2 )
+    إذا( dims <= 2 )
     {
         Size sz = getContinuousSize2D(src, dstMat, cn);
         func(src.data, src.step, 0, 0, dstMat.data, dstMat.step, sz, scale);
     }
-    else
+    وإلا
     {
-        const Mat* arrays[] = {&src, &dstMat, 0};
+        ثابت Mat* arrays[] = {&src, &dstMat, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        Size sz((int)(it.size*cn), 1);
+        Size sz((صحيح)(it.size*cn), 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        لكل( size_t i = 0; i < it.nplanes; i++, ++it )
             func(ptrs[0], 1, 0, 0, ptrs[1], 1, sz, scale);
     }
 }
 
-void UMat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
+فراغ UMat::convertTo(OutputArray dst, صحيح type_, مزدوج alpha, مزدوج beta) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if (empty())
+    إذا (empty())
     {
         dst.release();
         dst.create(size(), type_ >= 0 ? type_ : type());
-        return;
+        أرجع;
     }
 
 #ifdef HAVE_OPENCL
-    int stype = type();
-    int sdepth = CV_MAT_DEPTH(stype);
+    صحيح stype = type();
+    صحيح sdepth = CV_MAT_DEPTH(stype);
 
-    int ddepth = sdepth;
-    if (type_ >= 0)
+    صحيح ddepth = sdepth;
+    إذا (type_ >= 0)
         ddepth = CV_MAT_DEPTH(type_);
-    else
+    وإلا
         ddepth = dst.fixedType() ? dst.depth() : sdepth;
 
-    bool noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
-    if (sdepth == ddepth && noScale)
+    منطقي noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
+    إذا (sdepth == ddepth && noScale)
     {
         copyTo(dst);
-        return;
+        أرجع;
     }
 
     CV_OCL_RUN(dims <= 2,
-               ocl_convertTo(*this, dst, ddepth, noScale, alpha, beta))
+               ocl_convertTo(*هذا, dst, ddepth, noScale, alpha, beta))
 #endif // HAVE_OPENCL
 
-    UMat src = *this;  // Fake reference to itself.
+    UMat src = *هذا;  // Fake reference to itself.
                        // Resolves issue 8693 in case of src == dst.
     Mat m = getMat(ACCESS_READ);
     m.convertTo(dst, type_, alpha, beta);
-    (void)src;
+    (فراغ)src;
 }
 
 } // namespace cv

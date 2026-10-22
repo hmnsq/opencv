@@ -4,11 +4,11 @@
 #ifndef OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
 #define OPENCV_CORE_SRC_PARALLEL_PARALLEL_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#ضمن "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+نطاق cv { نطاق parallel {
 
-extern int numThreads;
+خارجي صحيح عدد_Threads;
 
 std::shared_ptr<ParallelForAPI>& getCurrentParallelForAPI();
 
